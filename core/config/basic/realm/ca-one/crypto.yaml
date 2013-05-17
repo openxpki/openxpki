@@ -32,15 +32,13 @@ token:
     # Default value for import, recorded in database, can be overriden
     secret: default
 
-  ca-one-signer-1:
+  ca-one-signer:
     inherit: default
-    key: /etc/openxpki/ssl/ca-one/ca-one-signer-1.pem
     
-  ca-one-vault-1:
+  ca-one-vault:
     inherit: default
-    key: /etc/openxpki/ssl/ca-one/ca-one-vault-1.pem
              
-  ca-one-scep-1:
+  ca-one-scep:
     inherit: default
     backend: OpenXPKI::Crypto::Tool::SCEP
     shell: /usr/bin/openca-scep

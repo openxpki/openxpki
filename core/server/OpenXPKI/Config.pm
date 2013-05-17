@@ -171,6 +171,37 @@ sub get_scalar_as_list {
     return @values;
 }
 
+sub get_inherit {
+	
+	##! 1: 'start'
+	my $self = shift;
+    my $path = shift;
+    my $val;
+    
+	# Shortcut - check if the full path exists    
+    $val = $self->get($path);    
+	return $val if (defined $val);
+    
+	# Path does not exist - look for "inherit" keyword
+	$path =~ /^(.*)\.([\w-]+)\.([\w-]+)$/;
+	my $prefix = $1;
+	my $section = $2;
+	my $key = $3; 
+
+    ##! 16: "split path $prefix - $section - inherit"
+    
+	$section = $self->get("$prefix.$section.inherit");
+	while ($section) {	
+		##! 16: 'Section ' . $section
+		$val = $self->get("$prefix.$section.$key");		
+		return $val if (defined $val);          
+        $section = $self->get("$prefix.$section.inherit");
+   }	
+		
+	##! 8: 'nothing found'
+	return undef;		
+	
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
@@ -279,5 +310,33 @@ the data.
        
     repo1@: connector:connectors.primary-repo
     repo2@: connector:connectors.fallback-repo   
-   
-   
+    
+=head2 get_inherit    
+
+Fetch a single value from a block using inheritance (like the crypto config).   
+
+The query
+
+	$conn->get_inherit('token.ca-one-signer.backend')
+	
+will lookup the C<inherit> key and use the value to replace the next-to-last 
+path component with it to look up the value again. It will finally return
+the value found at token.default.backend. The method walks upwards untill
+it either finds the expected key or it does not find another C<inherit>. 
+Note: As we can not distinguish an undef value from an unexisiting key, you 
+need to set the empty string to blank an entry.	
+
+=head3 configuration
+
+  token:  
+    default:
+      backend: OpenXPKI::Crypto::Backend::OpenSSL   
+      key: /etc/openxpki/ssl/default.pem
+      
+    
+    ca-one-signer:
+      inherit: default
+      key: key: /etc/openxpki/ssl/mykey.pem 
+ 
+ 
+ 

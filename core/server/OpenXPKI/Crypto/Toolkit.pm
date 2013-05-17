@@ -156,26 +156,36 @@ sub __load_config_realm_token {
     # Add the secret    
     $params_of{$ident}->{SECRET} = $arg_ref->{SECRET} if ($arg_ref->{SECRET});
         
-    my @keylist = (qw(backend engine shell wrapper randfile                        
-                    engine_section engine_usage key key_store));
-
-    # TODO Fix the inheritance stuff
-
-    # The token config uses inheritance 
-    # $config_name is set to the instance we are processing            
-    my $config_name = $name;  
-    do {     
-        ##! 32: "Add token config with config name $config_name"
-        foreach my $key (@keylist) {
-            if (not defined $params_of{$ident}->{uc($key)}) {
-                my $value = $config->get("crypto.token.$config_name.$key");
-                $params_of{$ident}->{uc($key)} = $value if (defined $value);
-                ##! 32: "Set $key -> $value"    
-            }
-        }
-        $config_name = $config->get("crypto.token.$config_name.inherit");
-    } while ( $config_name );    
         
+    # Magic inheritance code - see also TokenManager::__add_token
+	# Use backend to test for instance / group
+	my $backend_class = $config->get_inherit("crypto.token.$name.backend");
+    
+    my $config_name_group = $name;
+    # Nothing found with the full token name, so try to load from the group name    
+    if (!$backend_class) {	 
+		$config_name_group =~ /^(.+)-(\d+)$/;
+		$config_name_group = $1;	
+		##! 16: 'use group config ' . $group_config
+		$backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
+    }
+    
+    if (!$backend_class) {
+     	OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION_NO_BACKEND',
+        );
+    }
+    
+    $params_of{$ident}->{BACKEND} = $backend_class;
+	        
+    my @keylist = (qw(engine shell wrapper randfile                        
+                    engine_section engine_usage key key_store));
+ 	
+	foreach my $key (@keylist) {
+		my $value = $config->get_inherit("crypto.token.$config_name_group.$key");
+		$params_of{$ident}->{uc($key)} = $value if (defined $value);
+	}
+		     
     # FIXME - most of this params are not usefull for all tokens, need a better error checking concept
     foreach my $key (@keylist) {                    
         if (not defined $params_of{$ident}->{uc($key)}) {

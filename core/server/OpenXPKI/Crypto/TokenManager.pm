@@ -592,26 +592,30 @@ sub __add_token
     my $backend_api_class = $config->get("system.crypto.tokenapi.$type");    
     $backend_api_class = "OpenXPKI::Crypto::Backend::API" unless ($backend_api_class);
     
-    # FIXME - Need to put this somewhere for general use
-    my $config_name = $name;    
-    do {
-        ##! 32: 'Testing config crypto.token.' . $config_name
-        $backend_class = $config->get("crypto.token.$config_name.backend");                                
-        $config_name = $config->get("crypto.token.$config_name.inherit");
-    } while ( defined $config_name && not $backend_class);
+    my $config_name_group = $name;
+    # Magic inheritance code
+    # tokens have generations and we want to map a generation identifier to its base group. 
+    # The generation tag is always a suffix "-X" where X is a decimal
     
-    if (not $backend_class)  {
+    # A token config must have at least a backend (inherit is done by the connector)    
+	$backend_class = $config->get_inherit("crypto.token.$name.backend");
+    
+    # Nothing found with the full token name, so try to load from the group name    
+    if (!$backend_class) {				
+		$config_name_group =~ /^(.+)-(\d+)$/;
+		$config_name_group = $1;	
+		##! 16: 'use group config ' . $config_name_group
+		$backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
+    }
+	
+	if (not $backend_class)  {
         OpenXPKI::Exception->throw (
             message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_NO_BACKEND_CLASS",
-            params => { TYPE => $type, NAME => $name}
+            params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
         );
     }
     
-    $config_name = $name;
-    do {
-        $secret = $config->get("crypto.token.$config_name.secret");                                
-        $config_name = $config->get("crypto.token.$config_name.inherit");
-    } while ( defined $config_name && not $secret);    
+    $secret = $config->get_inherit("crypto.token.$config_name_group.secret");
     
     ##! 16: "Token backend: $backend_class, Secret group: $secret"
     
