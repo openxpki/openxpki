@@ -84,16 +84,7 @@ sub execute {
     if ($self->param('ds_wantarray')) {
     
         ##! : 16 'Array mode'
-        my @retarray;
-        # Connector will return a list of keys
-        my @iterator_keys = CTX('config')->get( $connector_key );
-        ##! 32: 'Iterator Keys: ' .Dumper( @iterator_keys ) 
-        foreach my $key (@iterator_keys) {         
-           my $val = CTX('config')->get( [ $connector_key, $key ] );
-           ##! 32: ' Fetch '.$key.', got '. $val    
-           push @retarray, $val;
-        }
-        ##! 32: 'Iterator Values: ' .Dumper( @retarray )         
+        my @retarray = CTX('config')->get_list( $connector_key );
         my $ser = OpenXPKI::Serialization::Simple->new();
         $retval = $ser->serialize( \@retarray );
                

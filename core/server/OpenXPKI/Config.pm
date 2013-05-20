@@ -64,6 +64,12 @@ before '_route_call' => sub {
     my $call = shift;
     my $location = shift;
     
+    # Location can be a string or an array
+	if (ref $location eq "ARRAY") {
+		$location = @{$location}[0];
+		##! 8: 'Location was array - shifted: ' . $location 
+	}
+    
     ##! 16: "_route_call interception on $location "            
     # system is global and never has a prefix or version
     if ( substr ($location, 0, 6) eq 'system' ) {
@@ -78,7 +84,7 @@ before '_route_call' => sub {
         $self->_config()->{''}->version( $cfg_ver );
                         
         # We also allow direct access to the realm tree 
-        if (substr ($location, 0, 6) eq 'realm.' ) {
+        if ( substr ($location, 0, 5) eq 'realm' ) {
             ##! 16: "_route_call: direct realm access " 
             $self->_config()->{''}->PREFIX( "" );
         } else {
