@@ -161,7 +161,7 @@ sub login_step {
     $role = $self->{ROLE} unless($role);
 
     ##! 16: 'role: ' . $role
-    if (!defined $role) {
+    if (!$role) {
         ##! 16: 'no certificate role found'
         return (undef, undef, {}); 
     }
