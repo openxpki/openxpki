@@ -1048,6 +1048,88 @@ sub BUILD {
                 },
             },
         },
+        
+        ### Smartcard API
+        'sc_analyze_certificate' => {
+            class  => 'Smartcard',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                'DATA' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                },
+                'CERTFORMAT' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                },
+                'DONTPARSE' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
+
+        'sc_parse_certificates' => {
+            class  => 'Smartcard',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                'CERTS' => {
+                    type  => ARRAYREF,
+                    #regex => qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;,
+                },
+                'CERTFORMAT' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                    optional => 1,
+                },
+            },
+        },
+
+        'sc_analyze_smartcard' => {
+            class  => 'Smartcard',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                'CERTS' => {
+                    type  => ARRAYREF,
+            #regex => $re_cert_string,
+               },
+                'CERTFORMAT' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                    optional => 1,
+                },
+                'SMARTCARDID' => {
+                    type => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'SMARTCHIPID' => {
+                    type => SCALAR,
+                    regex => $re_alpha_string,                    
+                    optional => 1,
+                },        
+                'USERID' => {
+                    type => SCALAR,
+                    regex => $re_sql_string,
+                    optional => 1,
+                },
+                'WORKFLOW_TYPES' => {
+                    type => ARRAYREF,
+                    optional => 1,
+                },
+            },
+        },
     };
 }
 

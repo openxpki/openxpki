@@ -11,6 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Workflow::WFObject::WFHash; 
 
 use Data::Dumper;
 
@@ -79,6 +80,28 @@ sub execute {
                     },
             );
         }
+
+	foreach my $validity_param qw( notbefore notafter ) {
+	    if (defined $context->param($validity_param)) {
+		#my $source = $source_ref->{$validity_param};
+		my $attrib_serial = $dbi->get_new_serial(
+		    TABLE => 'CSR_ATTRIBUTES',
+		    );
+		$dbi->insert(
+		    TABLE => 'CSR_ATTRIBUTES',
+		    HASH  => {
+			'ATTRIBUTE_SERIAL' => $attrib_serial,
+			'PKI_REALM'        => $pki_realm,
+			'CSR_SERIAL'       => $csr_serial,
+			'ATTRIBUTE_KEY'    => $validity_param,
+			'ATTRIBUTE_VALUE'  => $context->param($validity_param),
+			'ATTRIBUTE_SOURCE' => 'OPERATOR',
+		    },
+		    );
+	    }
+	}
+
+
         my @csr_serials;
         my $csr_serial_context = $context->param('csr_serial');
         if (defined $csr_serial_context) {
@@ -90,6 +113,16 @@ sub execute {
         $context->param(
             'csr_serial' => $serializer->serialize(\@csr_serials),
         );
+                
+        # Link the escrow key handle to the csr_id 
+        if ($csr_data->{'escrow_key_handle'}) {
+            ##! 16: 'Add escrow key handle ' . $csr_data->{'escrow_key_handle'}
+            my $cert_escrow_handle_context = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
+                { workflow => $workflow , context_key => 'cert_escrow_handle' } );        
+            $cert_escrow_handle_context->setValueForKey( $csr_serial => $csr_data->{'escrow_key_handle'} );
+        }
+        
+        
     }
     return;
 }

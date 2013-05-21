@@ -19,7 +19,7 @@ sub execute {
     my $context  = $workflow->context();
     
     my $default_token = CTX('api')->get_default_token();
-    
+
     my $namespace = $self->param('ds_namespace');
 
     my $ds_key_param = $self->param('ds_key_param') || 'token_id';
@@ -64,7 +64,8 @@ sub execute {
     # ultimately we want to save the key under the corresponding certificate
     # identifier, but we don't know this yet. we use a temporary handle
     # and will later rename it.
-    my $temp_handle = $ds_key . '_' . $workflow->id();
+    # Add some random if we have more than one escrow cert to create 
+    my $temp_handle = $ds_key . '_' . $workflow->id() . '_'. sprintf('%01d',rand()*100000);
  
     CTX('api')->set_data_pool_entry(
 	{
@@ -96,6 +97,7 @@ sub execute {
 	});
     
     $context->param('pkcs10' => $csr);
+    
     $context->param('temp_key_handle' => $temp_handle);
 
     return 1;

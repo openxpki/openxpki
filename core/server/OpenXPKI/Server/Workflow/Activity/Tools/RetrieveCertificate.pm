@@ -45,6 +45,20 @@ sub execute
 	}
     }
 
+    my $status_filter = $self->param('certstatus');
+
+    if (! defined $status_filter) {
+	$status_filter = 'ISSUED';
+    }
+    if ($status_filter !~ m{ \A (?: ISSUED | REVOKED | CRL_ISSUANCE_PENDING | ANY ) \z }xms) {
+	OpenXPKI::Exception->throw(
+				   message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RETRIEVECERTIFICATE_INVALID_CERTSTATUS_SPECIFICATION',
+				   params  => {
+				       status => $status_filter,
+				   },
+				   );
+    }
+    
 
     # propagate workflow activity parametrisation to our object
     foreach my $arg (@parameters) {
@@ -65,18 +79,23 @@ sub execute
 	);
 
     if (defined $self->cert_email()) {
-	$conditions{'CERTIFICATE.EMAIL'} = {VALUE => $self->cert_email()};
+	   $conditions{'CERTIFICATE.EMAIL'} =  {VALUE => $self->cert_email()};
     }
     if (defined $self->cert_profile()) {
-	$conditions{'CSR.PROFILE'} = {VALUE => $self->cert_profile()};
+	   $conditions{'CSR.PROFILE'} =  {VALUE => $self->cert_profile()};
     }
     if (defined $self->cert_subject()) {
-	$conditions{'CERTIFICATE.SUBJECT'} = {VALUE => $self->cert_subject()};
+	   $conditions{'CERTIFICATE.SUBJECT'} =  {VALUE => $self->cert_subject()};
     }
 
     if (scalar keys(%conditions) == 0) {
 	##! 16: 'operation mode 1 (search for certificate identifier)'
 	my $cert_identifier = $context->param('cert_identifier');
+
+	my %cert_status_condition;
+	if ($status_filter ne 'ANY') {
+	    $cert_status_condition{'STATUS'} = {VALUE => $status_filter};
+	}
 	
 	if (! defined $cert_identifier) {
 	    ##! 16: 'no certificate identifier specified, clearing context entry'
@@ -91,9 +110,9 @@ sub execute
 		'DATA',
 	    ],
 	    DYNAMIC => {
-		'IDENTIFIER' => {VALUE => $cert_identifier},
-		'STATUS'    => {VALUE => 'ISSUED'},
-		'PKI_REALM' => {VALUE => $pki_realm},
+	      'IDENTIFIER' => {VALUE => $cert_identifier},
+          'PKI_REALM' => {VALUE => $pki_realm},	    
+		  %cert_status_condition,
 	    },
 	    );
 	
@@ -102,6 +121,11 @@ sub execute
 	return 1;
     } else {
 	##! 16: 'operation mode 2 (query certificate details)'
+
+	if ($status_filter ne 'ANY') {
+	    $conditions{'CERTIFICATE.STATUS'} = {VALUE => $status_filter};
+	}
+
 	my @validity;
 
 	if (defined $self->valid_at()) {
@@ -140,8 +164,7 @@ sub execute
 		[ 'CSR_SERIAL', 'CSR_SERIAL' ],
 	    ],
 	    DYNAMIC => {
-		'CERTIFICATE.PKI_REALM'  => {VALUE => $pki_realm},
-		'CERTIFICATE.STATUS'     => {VALUE => 'ISSUED'},
+		'CERTIFICATE.PKI_REALM'  => { VALUE => $pki_realm },
 		%conditions,
 	    },
 	    VALID_AT => [ [ @validity ], undef ],
@@ -191,6 +214,14 @@ certificateoutcontextkey        context parameter to use for output certificate
 certidentifieroutcontextkey     context parameter to use for output certificate
                                 identifier
                                 (default: none, do not write to context)
+
+certstatus                      Only match certificates with the specified
+                                status. May be one of the following:
+                                ISSUED: certificate is not revoked (DEFAULT)
+                                CRL_ISSUANCE_PENDING: certificate is revoked,
+                                  but does not yet appear on any CRL
+                                REVOKED: certificate is revoked
+                                ANY: matches any certificate state
 
 
 Operation mode 1: search for certificate identifier
