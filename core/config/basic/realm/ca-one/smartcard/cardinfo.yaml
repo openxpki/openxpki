@@ -1,0 +1,32 @@
+properties:
+    rsa2:
+        puk_is_writable: 0
+        purge_token_before_unblock: 1
+        purge_token_before_personalization: 1
+        keysize: 1024
+    rsa3:
+        puk_is_writable: 0
+        purge_token_before_unblock: 1
+        purge_token_before_personalization: 1        
+        keysize: 1024
+    gem2:
+        puk_is_writable: 1
+        purge_token_before_unblock: 0
+        purge_token_before_personalization: 0        
+        keysize: 1024
+
+lotid@: connector:smartcard.cardinfo.connectors.lotid
+        
+defaultpuk@: connector:smartcard.cardinfo.connectors.defaultpuk
+
+connectors:
+    defaultpuk:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/config/carddata.yaml
+        PREFIX: defaultpuk        
+        
+    lotid:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/config/carddata.yaml
+        PREFIX: lotid        
+            

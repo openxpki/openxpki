@@ -1,0 +1,96 @@
+<actions>
+  <action name="get_ldap_data"
+	  class="OpenXPKI::Server::Workflow::Activity::SmartCard::GetLDAPData"
+          ldap_server="%LDAP_SERVER%"
+          ldap_port="%LDAP_PORT%"
+          ldap_userdn="%LDAP_USERDN%"
+          ldap_pass="%LDAP_PASS%"
+          ldap_basedn="%LDAP_BASEDN%"
+          ldap_timelimit="%LDAP_TIMELIMIT%"
+          ldap_attributes="%LDAP_ATTRIBUTES%"
+          search_key="%SEARCH_KEY%"
+          search_value_context="%SEARCH_VALUE%"
+          display_mapping="%DISPLAY_MAPPING%"
+          client_csp="%CLIENT_CSP%"
+          client_bitlength="%CLIENT_BITLENGTH%">
+  </action>
+  <action name="null"
+          class="Workflow::Action::Null">
+  </action>
+  <action name="null2"
+          class="Workflow::Action::Null">
+  </action>
+  <action name="null3"
+          class="Workflow::Action::Null">
+  </action>
+          
+  <action name="create_server_csr"
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::CreateServerCSR"
+          cert_profiles="%CERT_PROFILES%"
+          cert_roles="%CERT_ROLES%"
+          cert_subject="%CERT_SUBJECT%"
+          cert_subject_alt_names="%CERT_SUBJECT_ALT_NAMES%">
+    <field name="pkcs10"/>
+  </action>
+
+  <action name="persist_csrs"
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::PersistCSRs">
+  </action>
+
+  <action name="fork_cert_issuance_instances"
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::ForkWorkflowInstances"
+          role="CA Operator">
+  </action>
+  
+  <action name="sleep_for_children"
+	  class="OpenXPKI::Server::Workflow::Activity::Tools::Sleep"
+          time="1">
+  </action>
+
+  <action name="write_certificate_to_install"
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::WriteCertificateToInstall">
+  </action>
+
+  <action name="publish_certificates"
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::PublishCertificates"
+          ldap_server="%LDAP_SERVER%"
+          ldap_port="%LDAP_PORT%"
+          ldap_userdn="%LDAP_USERDN%"
+          ldap_pass="%LDAP_PASS%"
+          ldap_basedn="%LDAP_BASEDN%"
+          ldap_timelimit="%LDAP_TIMELIMIT%"
+          search_key="%SEARCH_KEY%"
+          search_value_context="%SEARCH_VALUE%">
+  </action>
+
+  <action name="write_certificate_test_result"
+          class="Workflow::Action::Null">
+      <field name="testresult"/>
+      <validator name="HasRequiredField">
+        <arg>testresult</arg>
+      </validator>
+  </action>
+
+  <action name="set_error_ldap"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
+          error_code="ldap_missing_data"/>
+
+  <action name="set_error_cert_test_failed"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
+          error_code="cert_test_failed"/>
+
+  <action name="set_error_issuance_failed"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
+          error_code="issuance_failed"/>
+
+  <action name="fail_workflow"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode"
+          error_code="failed_by_administrator"/>
+
+  <action name="child_finished_successfully"
+      class="Workflow::Action::Null"/>
+
+  <action name="child_finished_failure"
+      class="Workflow::Action::Null"/>
+</actions>
+

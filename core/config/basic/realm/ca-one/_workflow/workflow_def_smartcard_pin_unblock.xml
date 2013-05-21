@@ -1,0 +1,199 @@
+<workflow>
+	<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK</type>
+	<description>I18N_OPENXPKI_WF_DESC_SMARTCARD_PIN_UNBLOCK</description>
+	<persister>OpenXPKI</persister>
+
+	<state name="INITIAL">
+        <!-- reset parameters, allowing user to restart workflow -->
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_INITIAL</description>
+		<action name="unblock.initialize" resulting_state="HAVE_TOKEN_ID"/>
+	</state>
+
+	<state name="HAVE_TOKEN_ID" autorun="yes">
+        <!-- we have the token id, now find the owner in LDAP -->
+        <action name="get_ldap_data" resulting_state="CHECK_TOKEN_OWNER"/>
+	</state>
+
+	<state name="CHECK_TOKEN_OWNER" autorun="yes">
+        <!-- have token owner? -->
+		<action name="null"
+				resulting_state="HAVE_TOKEN_OWNER">
+				<condition name="sc_token_owner_exists"/>
+		</action>
+		<action name="null2"
+				resulting_state="FAILURE">
+				<condition name="!sc_token_owner_exists"/>
+		</action>
+	</state>
+
+	<state name="HAVE_TOKEN_OWNER" autorun="no">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_HAVE_TOKEN_OWNER</description>
+        <!-- store auth ids supplied by user in context and verify in LDAP -->
+		<action name="store_auth_ids"
+				resulting_state="GET_AUTH1_LDAP">
+		</action>
+        <!--
+        <action name="notify_via_rt" resulting_state="ATTEMPTED_RT_NOTIFY"/>
+        -->
+		<action name="user_abort"
+			resulting_state="FAILURE"/>
+	</state>
+
+	<state name="GET_AUTH1_LDAP" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_GET_AUTH1_LDAP</description>
+		<action name="scpu_get_auth1_ldap"
+				resulting_state="GET_AUTH2_LDAP">
+		</action>
+	</state>
+
+	<state name="GET_AUTH2_LDAP" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_GET_AUTH2_LDAP</description>
+		<action name="scpu_get_auth2_ldap"
+				resulting_state="HAVE_AUTH_IDS">
+		</action>
+	</state>
+
+	<state name="HAVE_AUTH_IDS" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_HAVE_AUTH_IDS</description>
+		<action name="notify_via_rt"
+				resulting_state="ATTEMPTED_RT_NOTIFY">
+                <condition name="sc_auth_ids_exist"/>
+		</action>
+		<action name="null"
+				resulting_state="HAVE_TOKEN_OWNER">
+                <condition name="!sc_auth_ids_exist"/>
+		</action>
+	</state>
+
+	<state name="ATTEMPTED_RT_NOTIFY" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_ATTEMPTED_RT_NOTIFY</description>
+        <!-- was an RT ticket ID saved in the notify_via_rt? -->
+		<action name="null"
+			resulting_state="PEND_ACT_CODE">
+			<condition name="sc_ticket_exists"/>
+		</action>
+		<action name="null2"
+			resulting_state="HAVE_TOKEN_OWNER">
+			<condition name="!sc_ticket_exists"/>
+		</action>
+	</state>
+
+	<!-- note: this is just a sub-step to be able to use existing code
+		for generating the activation code -->
+	<state name="PEND_ACT_CODE">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_PEND_ACT_CODE</description>
+        <!-- generate_password is no longer needed 
+		<action name="generate_password"
+			resulting_state="GENERATED_PASSWORD">
+		</action>
+        -->
+		<action name="scpu_generate_activation_code"
+				resulting_state="CHECK_FOR_ACT_HASHES">
+		</action>
+		<action name="unblock.initialize" resulting_state="HAVE_TOKEN_ID"/>
+	</state>
+
+    <!--
+	<state name="GENERATED_PASSWORD" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_GENERATED_PASSWORD</description>
+		<action name="generate_activation_code"
+				resulting_state="CHECK_FOR_ACT_HASHES">
+		</action>
+	</state>
+    -->
+
+	<state name="CHECK_FOR_ACT_HASHES" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_CHECK_FOR_ACT_HASHES</description>
+        <!-- were both activation hashes produced? -->
+		<action name="null"
+				resulting_state="PEND_PIN_CHANGE">
+				<condition name="sc_have_both_act_hashes"/>
+		</action>
+		<action name="null2"
+				resulting_state="PEND_ACT_CODE">
+				<condition name="!sc_have_both_act_hashes"/>
+		</action>
+	</state>
+
+	<state name="PEND_PIN_CHANGE">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_PEND_PIN_CHANGE</description>
+
+        <!-- smartcard owner has both activation codes and wants to set new pin -->
+		<action name="post_codes_and_pin"
+			resulting_state="HAVE_ACT_CODES"/>
+
+        <!-- if auth person forgets code, allow a new one to be generated -->
+		<action name="scpu_generate_activation_code"
+			resulting_state="CHECK_FOR_ACT_HASHES"/>
+
+        <!-- auth person retrieves activation code, which causes hash to be
+             set in context -->
+        <!-- deprecated
+		<action name="set_act_hash" resulting_state="CHECK_FOR_ACT_HASHES"/>
+        -->
+
+        <!-- allow user to start from scratch, in case an auth is no longer available -->
+		<action name="initialize" resulting_state="HAVE_TOKEN_ID"/>
+
+	</state>
+
+	<state name="HAVE_ACT_CODES" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_HAVE_ACT_CODES</description>
+        <!-- Are the activation codes valid? -->
+		<action name="null"
+				resulting_state="HAVE_ID_FROM_SMARTCARD">
+				<condition name="sc_codes_valid"/>
+		</action>
+		<action name="null2"
+				resulting_state="CHECK_MAX_PIN_ITERATION">
+				<condition name="!sc_codes_valid"/>
+		</action>
+	</state>
+
+	<state name="CHECK_MAX_PIN_ITERATION" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_CHECK_MAX_PIN_ITERATION</description>
+        <!-- did we reach the maximum iterations allowed for the PIN change? -->
+		<action name="null" resulting_state="PEND_PIN_CHANGE">
+			<condition name="!sc_max_iterations_reached"/>
+		</action>
+		<action name="null2" resulting_state="FAILURE">
+			<condition name="sc_max_iterations_reached"/>
+		</action>
+	</state>
+
+	<state name="HAVE_ID_FROM_SMARTCARD" autorun="yes">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_HAVE_ID_FROM_SMARTCARD</description>
+		<action name="null" resulting_state="CAN_FETCH_PUK"/>
+        <!--
+		<action name="null"
+				resulting_state="CAN_FETCH_PUK">
+				<condition name="sc_cardid_matches_workflow"/>
+		</action>
+		<action name="null2"
+				resulting_state="FAILURE">
+				<condition name="!sc_cardid_matches_workflow"/>
+		</action>
+        -->
+	</state>
+
+    <state name="CAN_FETCH_PUK">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_HAVE_ID_FROM_SMARTCARD</description>
+        <action name="fetch_puk" resulting_state="CAN_WRITE_PIN"/>
+    </state>
+
+	<state name="CAN_WRITE_PIN">
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PIN_UNBLOCK_CAN_WRITE_PIN</description>
+		<action name="write_pin_ok"
+				resulting_state="SUCCESS">
+		</action>
+		<action name="write_pin_err"
+				resulting_state="FAILURE">
+		</action>
+		<action name="unblock.initialize" resulting_state="HAVE_TOKEN_ID"/>
+	</state>
+
+	<state name="SUCCESS"/>
+
+	<state name="FAILURE"/>
+
+</workflow>

@@ -1,0 +1,16 @@
+<workflow>
+	<type>I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD</type>
+	<description>I18N_OPENXPKI_WF_DESC_SMARTCARD_PUK_UPLOAD</description>
+	<persister>OpenXPKI</persister>
+
+	<state name="INITIAL">
+        <!-- reset parameters, allowing user to restart workflow -->
+		<description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PUK_UPLOAD_INITIAL</description>
+		<action name="sc_puk_up_initialize" resulting_state="SUCCESS"/>
+	</state>
+
+	<state name="SUCCESS"/>
+
+	<state name="FAILURE"/>
+
+</workflow>

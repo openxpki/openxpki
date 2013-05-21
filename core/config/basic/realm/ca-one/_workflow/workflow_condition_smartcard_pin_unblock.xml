@@ -1,0 +1,83 @@
+<conditions>
+  <!-- conditions for Smartcard PIN Unblock -->
+  <condition name="sc_token_owner_exists"
+	  class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+      <!-- IMPORTANT!!!! Change the following value to match your ldap schema!!!! -->
+      <param name="context_key" value="ldap_mail"/>
+	  <param name="condition" value="notnull"/>
+  </condition>
+  <condition name="sc_auth1_id_exists"
+	  class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+	  <param name="context_key" value="auth1_id"/>
+	  <param name="condition" value="notnull"/>
+  </condition>
+  <condition name="sc_auth2_id_exists"
+	  class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+	  <param name="context_key" value="auth2_id"/>
+	  <param name="condition" value="notnull"/>
+  </condition>
+  <condition name="sc_auth_ids_exist"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::HaveAuthIDs">
+  </condition>
+  <condition name="sc_owner_aborted_workflow"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::OwnerAbortedWorkflow">
+  </condition>
+  <condition name="sc_requested_activation_code"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::RequestedActivationCode">
+  </condition>
+
+  <condition name="sc_ticket_exists"
+	  class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+	  <param name="context_key" value="ticket"/>
+	  <param name="condition" value="notnull"/>
+  </condition>
+
+  <condition name="sc_have_both_act_hashes"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::HaveBothActHashes"/>
+  <!-- TODO: implement sc_have_both_act_hashes
+  <condition name="sc_have_both_act_hashes"
+	  class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
+  <condition name="sc_have_both_act_hashes"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::HaveBothActHashes"/>
+  -->
+
+  <!--
+  <condition name="sc_ldap_found_for_cardid"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::LdapFoundForCardID">
+  </condition>
+  -->
+
+  <condition name="sc_max_iterations_reached"
+	  class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+	  <param name="context_key" value="too_many_tries"/>
+	  <param name="condition" value="notnull"/>
+  </condition>
+  <!-- TODO: implement sc_max_iterations_reached
+  <condition name="sc_max_iterations_reached"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::MaxIterationsReached">
+  </condition>
+  -->
+
+  <condition name="sc_codes_valid"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::AuthCodesValid">
+  </condition>
+
+  <!--
+  <condition name="sc_codes_and_pin_valid"
+	  class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">
+  </condition>
+  -->
+
+  <condition name="sc_cardid_matches_workflow"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::CardIDMatchesWorkflow">
+  </condition>
+
+  <condition name="sc_write_ok"
+	  class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue"/>
+  <!--
+  <condition name="sc_write_ok"
+	  class="OpenXPKI::Server::Workflow::Condition::Smartcard::WriteOK">
+  </condition>
+  -->
+
+</conditions>
