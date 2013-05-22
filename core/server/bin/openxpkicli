@@ -64,7 +64,7 @@ my $params_is_array = 1;
 foreach my $entry (@parameters) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
     if (! defined $key) {
-		$key = $entry;
+		$key = $value = $entry;
     } else {
     	 $params_is_array = 0;
     }
@@ -78,7 +78,7 @@ foreach my $entry (@args) {
     if (defined $key) {
 		$args{uc($key)} = $value;
     } else {
-    	$args{uc($value)} = 1;
+    	$args{uc($entry)} = 1;
     }
     
 }
@@ -169,24 +169,21 @@ while (1) {
  
  
 if (%parameters) {
-	$args{PARAMS} = \%parameters; 
+	if ($params_is_array) {
+        my @t = keys(%parameters);
+        $args{PARAMS} = \@t;  
+    } else {
+        $args{PARAMS} = \%parameters;
+    }	 
 } 
-
-my $command_param;
-if ($params_is_array) {
-	my @t = keys(%args);
-	$command_param = \@t;  
-} else {
-	$command_param = \%args;
-}
 
 $reply = $client->send_receive_service_msg('COMMAND', {
 	COMMAND => $command,
-	PARAMS => $command_param
+	PARAMS => \%args
 });
 
 if ($reply->{SERVICE_MSG} eq 'COMMAND') {	
-	print Dumper $reply->{PARAMS} if ($params{debug});
+	print Dumper $reply->{PARAMS};
 	print "done\n";
 	exit 0;	
 } else {				   
