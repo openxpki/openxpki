@@ -910,10 +910,10 @@ sub select {
     {         
         foreach my $dynamic_key (keys %{$args->{DYNAMIC}})
         {
-            # To support the old syntax where only the value was passed as a scalar,
+            # To support the old syntax where only the value was passed as a scalar (or list),
             # we autoconvert it and issue a warning.
-            if (ref $args->{DYNAMIC}->{$dynamic_key} eq '') {
-                ##! 1: ' UPDATE WARNING - autoconverting to new syntax, please fix! ' . Dumper $args->{DYNAMIC}  
+            if (ref $args->{DYNAMIC}->{$dynamic_key} ne 'HASH') {
+                ##! 1: ' UPDATE WARNING - autoconverting to new syntax, please fix! Key: ' .  $dynamic_key . ' - Dump ' . Dumper $args->{DYNAMIC}->{$dynamic_key}  
                 $args->{DYNAMIC}->{$dynamic_key} = { VALUE => $args->{DYNAMIC}->{$dynamic_key} };
                 CTX('log')->log(
                     MESSAGE  => "Old SQL DYNAMIC Syntax found - please fix!",
@@ -923,7 +923,7 @@ sub select {
             }
             
             # check the structure
-            if (   not ref $args->{DYNAMIC}->{$dynamic_key}
+            if (  not ref $args->{DYNAMIC}->{$dynamic_key}
                 or not ref $args->{DYNAMIC}->{$dynamic_key} eq "HASH" )
             {
                 OpenXPKI::Exception->throw (

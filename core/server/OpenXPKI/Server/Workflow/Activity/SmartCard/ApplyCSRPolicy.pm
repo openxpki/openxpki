@@ -102,8 +102,15 @@ sub execute {
         }
     }
     
-    my $cert_subject_template = $config->get( [ 'profile', $cert_profile, 'subject' ] );
-    my $sans_template = $config->get( [ 'profile', $cert_profile, 'subject_alternative_names' ] ) || '';
+    # The subject is contained in the styles - we look up the keys and take the first one
+    
+    my @styles = $config->get_keys( "profile.$cert_profile.style" );
+    @styles = sort @styles; 
+    my $style = shift @styles;
+
+    ##! 32: 'Using profile style ' . $style     
+    my $cert_subject_template = $config->get("profile.$cert_profile.style.$style.subject" );
+    my $sans_template = $config->get( "profile.$cert_profile.style.$style.subject_alternative_names" ) || '';
                           
     #############################################################
     # Processing of UPN Mappings for Windows Login certificates

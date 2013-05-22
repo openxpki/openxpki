@@ -1031,7 +1031,7 @@ sub get_data_pool_entry {
                 }
 
                 # prepare key
-                ( $algorithm, $iv, $key ) = split( /;/, $key_data->{VALUE} );
+                ( $algorithm, $iv, $key ) = split( /:/, $key_data->{VALUE} );
 
                 # cache encryption key in volatile vault
                 eval {

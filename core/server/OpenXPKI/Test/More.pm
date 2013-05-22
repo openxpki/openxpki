@@ -373,6 +373,34 @@ use Class::Std;
         }
         return $self;
     }
+    
+    sub runcmd {
+    	
+        my ( $self, $action, $params ) = @_;
+        my $msg;
+        my $client = $self->get_client;
+        
+        if ( not defined $params ) {
+            $params = {};
+        }
+
+        croak("Unable to exec action '$action' on closed connection")
+            unless defined $client;
+
+        $msg = $client->send_receive_command_msg(
+            $action, $params            
+        );
+        $self->set_msg($msg);
+        $self->diag( "Command $action returned MSG: " . Dumper($msg) )
+            if $self->get_verbose;
+        if ( $self->error ) {
+            $@ = 'Error executing ' . $action . ': ' . Dumper($msg);
+            return;
+        }
+        return $self;
+        
+    }
+    
 
     sub param {
         my ( $self, $name ) = @_;

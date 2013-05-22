@@ -28,7 +28,7 @@ use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
-use OpenXPKI::Server::Notification::Dispatcher;
+use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );

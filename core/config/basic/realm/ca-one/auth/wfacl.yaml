@@ -42,6 +42,7 @@ User:
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
     - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
+    - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4
 
     access:            
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
@@ -65,6 +66,11 @@ User:
                 show: .*
                 hide: encrypted_.*       
 
+        I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4:
+            creator: .*
+            context:
+                show: .*
+                hide: approvals
 
 RA Operator:
     create:
@@ -110,6 +116,9 @@ RA Operator:
             creator: .*
             context:
                 show: .*
+                
+        I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4:
+            creator: .*               
         
 CA Operator:
     create:
@@ -144,4 +153,6 @@ CA Operator:
         I18N_OPENXPKI_WF_TYPE_TESTING:
             creator: .*
         
+        I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4:
+            creator: .*                       
 

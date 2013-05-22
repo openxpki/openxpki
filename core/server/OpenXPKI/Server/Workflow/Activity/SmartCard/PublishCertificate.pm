@@ -22,9 +22,8 @@ sub execute {
     my $self     = shift;
     my $workflow = shift;
     my $context  = $workflow->context();
-    my $pki_realm     = CTX('session')->get_pki_realm();
-    my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default};
-    my $api           = CTX('api');
+    my $pki_realm     = CTX('session')->get_pki_realm();        
+    my $default_token = CTX('api')->get_default_token();
     my $config        = CTX('config');
 
     if (!$self->param('prefix')) {
@@ -50,7 +49,7 @@ sub execute {
     my $hash = CTX('dbi_backend')->first (
         TABLE => 'CERTIFICATE',
         DYNAMIC => {
-           IDENTIFIER =>  $context->param('cert_identifier'),
+           IDENTIFIER => { VALUE => $context->param('cert_identifier') },
         },
     );
      

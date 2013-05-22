@@ -24,7 +24,7 @@ sub execute {
     my $context      = $workflow->context();
 
     my $pki_realm   = CTX('session')->get_pki_realm();   
-    my $default_token = CTX('pki_realm_by_cfg')->{$self->config_id()}->{$pki_realm}->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
 
     # The default is to fetch the certificate PEM from the "certificate" 
     # context value. An alternative context parameter can be set.

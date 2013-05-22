@@ -27,8 +27,7 @@ sub execute {
     my $workflow      = shift;
     my $context       = $workflow->context();
 
-    my $default_token = CTX('pki_realm_by_cfg')->{ $self->config_id() }
-        ->{ $self->{PKI_REALM} }->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
     my $puk_policy = $self->param('puk_policy');
 
     # Because this code must be easy for colleagues to review, it

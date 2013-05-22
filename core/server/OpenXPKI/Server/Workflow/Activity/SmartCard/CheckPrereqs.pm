@@ -40,9 +40,7 @@ sub execute {
 		CERTFORMAT => 'BASE64',
 		SMARTCARDID => $context->param('token_id'),
 		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK ) ],
-		CONFIG_ID => $self->config_id(),
 		%params,
-	     
 	    });
 
 	##! 16: 'smartcard analyzed: ' . Dumper $result

@@ -288,8 +288,8 @@ sub list_active_aliases {
             [ 'IDENTIFIER', 'IDENTIFIER' ],
         ],
         DYNAMIC => {
-            'ALIASES.PKI_REALM' => $pki_realm,
-            'ALIASES.GROUP_ID' => $group,              
+            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
+            'ALIASES.GROUP_ID' => { VALUE => $group },              
             'CERTIFICATE.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
             'CERTIFICATE.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
         },
@@ -347,8 +347,8 @@ sub get_ca_list {
             [ 'IDENTIFIER', 'IDENTIFIER' ],
         ],
         DYNAMIC => {
-            'ALIASES.PKI_REALM' => $pki_realm,
-            'ALIASES.GROUP_ID' => $group,                                           
+            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
+            'ALIASES.GROUP_ID' => { VALUE => $group },                                           
         },
         'ORDER' => [ 'CERTIFICATE.NOTBEFORE' ],
         'REVERSE' => 1,

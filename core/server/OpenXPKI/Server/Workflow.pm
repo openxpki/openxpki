@@ -159,7 +159,8 @@ sub execute_action {
         $self->_proc_state_exception($error);
                 
         # Look into the workflow definiton weather to autofail
-        if ($self->_get_workflow_state()->{_actions}->{$action_name}->{autofail} =~ /(yes|1)/i) {
+        my $autofail = $self->_get_workflow_state()->{_actions}->{$action_name}->{autofail};
+        if (defined $autofail && $autofail =~ /(yes|1)/i) {
 		    ##! 16: 'execute failed and has autofail set'         	
         	$self->_autofail($error);
         }

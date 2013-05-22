@@ -65,6 +65,8 @@ sub execute {
 
     #   $params->{VALUE} = $context->param($valkey);
 
+    ##! 16: ' Fetch from datapool ' . Dumper $params
+
     my $msg = CTX('api')->get_data_pool_entry($params);
 
     my $retval = $msg->{VALUE};

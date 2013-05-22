@@ -39,7 +39,7 @@ sub execute {
     my $hash = CTX('dbi_backend')->first (
         TABLE => 'CERTIFICATE',
         DYNAMIC => {
-           IDENTIFIER =>  $context->param('cert_identifier'),
+           IDENTIFIER => { VALUE => $context->param('cert_identifier') },
         },
     );
      

@@ -420,7 +420,18 @@
         </action>
     </state>
 
+    <!-- Register issued cert in datapool and issuance queue -->
     <state name="CERT_ISSUED"
+            autorun="yes">
+        <action name="scpers_register_cert_in_datapool" resulting_state="CERT_IN_DATAPOOL" />        
+    </state>
+    
+    <state name="CERT_IN_DATAPOOL"
+            autorun="yes">
+        <action name="scpers_push_cert_to_issuance_queue" resulting_state="CERT_QUEUED" />        
+    </state>
+        
+    <state name="CERT_QUEUED"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_SMARTCARD_PERSONALIZATION_V4_CERT_ISSUED</description>
         <action name="scpers_null1" resulting_state="NEW_ESCROW_CERT_ISSUED">

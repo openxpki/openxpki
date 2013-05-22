@@ -22,10 +22,7 @@
     </action>
 
     <action name="scpers_issue_certificate"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::IssueCert"
-            csr_queue_key="tmp_queue"
-            issuance_queue_key="certs_issued">
-            <field name="tmp_queue" is_required="yes"/>
+            class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate">
     </action>
 
     <action name="scpers_generate_puk"
@@ -391,6 +388,24 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             SetContextParameters="overwritecontext"
             _keypassword="">
     </action>
+    
+    
+    <!--  Reworked issue activity  -->
+    <action name="scpers_register_cert_in_datapool"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::AppendToEntry"
+          ds_encrypt="0"
+          ds_force="0"
+          ds_namespace="smartcard.user.certificate"
+          ds_key_param="userinfo_employee_id"          
+          ds_value_param="cert_identifier">        
+    </action>
+    
+    <action name="scpers_push_cert_to_issuance_queue"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+            array_name="certs_issued"            
+            context_key="cert_identifier"
+            function="push">
+    </action>      
 
     <action name="scpers_null1" class="Workflow::Action::Null"/>
     <action name="scpers_null2" class="Workflow::Action::Null"/>

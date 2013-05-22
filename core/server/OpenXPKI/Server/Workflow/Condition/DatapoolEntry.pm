@@ -71,10 +71,14 @@ sub evaluate
 
     $ds_params->{NAMESPACE} = $params->{datapool_namespace};
     $ds_params->{KEY}       = $params->{datapool_key};
+    
+    ##! 32: 'Query params ' . Dumper $ds_params
 
     my $msg = CTX('api')->get_data_pool_entry($ds_params);
 
-    my $datapool_value = $msg->{VALUE};
+    ##! 32: 'api returned ' . Dumper $msg
+
+    my $datapool_value = $msg->{VALUE};    
 
     if ($condition eq 'exists') {
 	if (! defined $datapool_value) {

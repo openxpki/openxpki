@@ -60,29 +60,35 @@ sub evaluate
     my $context_key = $self->context_key();
     my $condition = $self->condition();
 
+    my $context_value = $context->param($context_key);
+
     if ($condition eq 'exists') {
-	my $context_value = $context->param($context_key);
-	if (! defined $context_value) {
-	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_DOES_NOT_EXIST';
-	}
+    		
+	    if (! defined $context_value) {
+	        condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_DOES_NOT_EXIST';
+	    }
+	     
     } elsif ($condition eq 'notnull') {
-	my $context_value = $context->param($context_key);
-	if (! defined $context_value || ($context_value eq '')) {
-	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_EMPTY';
-	}
+	
+	   if (! defined $context_value || ($context_value eq '')) {
+	       condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_EMPTY';
+	   }
+	   
     } elsif ($condition eq 'equals') {
-	my $context_value = $context->param($context_key);
-	if ($context_value ne $self->context_value()) {
-	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_EQUALITY_MISMATCH';
-	}
+	   
+	   if (! defined $context_value || $context_value ne $self->context_value()) {
+	       condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_EQUALITY_MISMATCH';
+	   }
+	   
     } elsif ($condition eq 'regex') {
-	my $context_value = $context->param($context_key);
-	my $regex = qr/$self->context_value()/ms;
-	if ($context_value =~ /$regex/) {
-	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_REGEX_MISMATCH';
-	}
+	   
+	   my $regex = qr/$self->context_value()/ms;
+	   if (! defined $context_value || $context_value =~ /$regex/) {
+	       condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_REGEX_MISMATCH';
+	   }
+	   
     } else {
-	condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_INVALID_CONDITION';
+	   condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_INVALID_CONDITION';
     }
 
     return 1;

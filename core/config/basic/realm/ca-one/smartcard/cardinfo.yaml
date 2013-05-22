@@ -22,11 +22,11 @@ defaultpuk@: connector:smartcard.cardinfo.connectors.defaultpuk
 connectors:
     defaultpuk:
         class: Connector::Proxy::YAML
-        LOCATION: /home/pkiadm/config/carddata.yaml
+        LOCATION: /home/pkiadm/ca-one/smartcard/carddata.yaml
         PREFIX: defaultpuk        
         
     lotid:
         class: Connector::Proxy::YAML
-        LOCATION: /home/pkiadm/config/carddata.yaml
+        LOCATION: /home/pkiadm/ca-one/smartcard/carddata.yaml
         PREFIX: lotid        
             

@@ -13,7 +13,7 @@ ldap@: connector:smartcard.cardstatus.connectors.ldap
 connectors:
     testing:
         class: Connector::Proxy::YAML
-        LOCATION: /home/pkiadm/config/carddata.yaml
+        LOCATION: /home/pkiadm/ca-one/smartcard/carddata.yaml
         PREFIX: status-test-overrides
 
     soap:
@@ -21,7 +21,7 @@ connectors:
 
     ldap:
         class: Connector::Proxy::Net::LDAP::Simple
-        LOCATION: ldap://localhost:389
+        LOCATION: ldap://192.168.168.120:389
         base: ou=smartcards,dc=mycompany,dc=com
         filter: (&(cn=[% ARG %]) (objectclass=device))
         binddn: cn=admin,dc=mycompany,dc=com

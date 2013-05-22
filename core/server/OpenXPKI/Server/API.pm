@@ -30,10 +30,12 @@ use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Token;
 use OpenXPKI::Server::API::Visualization;
 use OpenXPKI::Server::API::Workflow;
+use OpenXPKI::Server::API::Smartcard;
 
 my %external_of    :ATTR;
 my %method_info_of :ATTR;
 my %memoization_of :ATTR;
+our $current_method;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
@@ -47,6 +49,7 @@ sub BUILD {
 		message => "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
 		params => {
 		    ERROR => $error,		    
+		    CALL => $current_method
 		});
 	},
     );
@@ -1159,6 +1162,7 @@ sub AUTOMETHOD {
     
         ##! 16: 'args: ' . Dumper(\@args)
         # do parameter checking
+        $current_method = $method_name;
         if (scalar @args > 1 || defined $args[0]) {
             validate(
     	        @args,

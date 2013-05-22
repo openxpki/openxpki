@@ -717,8 +717,8 @@ sub sc_analyze_smartcard {
                 'CERTIFICATE.NOTAFTER',
             ],
             DYNAMIC => {
-                'CERTIFICATE.PKI_REALM' => $thisrealm,
-                'CERTIFICATE.IDENTIFIER' => \@certs_to_load_from_db,
+                'CERTIFICATE.PKI_REALM' => { VALUE => $thisrealm },
+                'CERTIFICATE.IDENTIFIER' => { VALUE => \@certs_to_load_from_db },
             },
             JOIN => [
                 [
@@ -1115,9 +1115,9 @@ sub __check_against_policy {
         my $private_key_found = CTX('dbi_backend')->first (
             TABLE => 'DATAPOOL',
             DYNAMIC => {
-                PKI_REALM    => CTX('session')->get_pki_realm(),
-                NAMESPACE    => 'certificate.privatekey',
-                DATAPOOL_KEY => $identifier,
+                PKI_REALM    => { VALUE => CTX('session')->get_pki_realm() },
+                NAMESPACE    => { VALUE => 'certificate.privatekey' },
+                DATAPOOL_KEY => { VALUE => $identifier },
             },
         );
             
@@ -1407,13 +1407,8 @@ sub sc_analyze_certificate {
 
     my $thisrealm   = CTX('session')->get_pki_realm();
 
-    my $default_token;
-
-    if (defined $cfg_id) {
-	   $default_token = CTX('pki_realm_by_cfg')->{$cfg_id}->{$thisrealm}->{crypto}->{default};
-    } else {
-	   $default_token = CTX('pki_realm')->{$thisrealm}->{crypto}->{default};
-    }
+    my $default_token = CTX('api')->get_default_token();
+    
     ##! 16: 'default token obtained'
     
     if ($dontparse && ($certformat ne 'IDENTIFIER')) {
@@ -1507,7 +1502,7 @@ sub sc_analyze_certificate {
 	    'CERTIFICATE.NOTAFTER',
 	],
 	DYNAMIC => {
-	    'CERTIFICATE.IDENTIFIER' => $identifier,
+	    'CERTIFICATE.IDENTIFIER' => { VALUE => $identifier },
 	},
 	JOIN => [
 	    [

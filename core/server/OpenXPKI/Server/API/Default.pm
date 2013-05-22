@@ -670,40 +670,13 @@ sub get_chain {
 sub list_ca_ids {
     my $self    = shift;
     my $arg_ref = shift;
-    my $cfg_id  = $arg_ref->{CONFIG_ID};
-    ##! 16: 'cfg_id: ' . $cfg_id
 
-    my %response;
-
-    ##! 2: "get pki realm configuration"
-    my $realms = CTX('pki_realm_by_cfg')->{$cfg_id}; 
-    if (! defined $cfg_id) {
-        $realms = CTX('pki_realm');
-    }
-    if (!(defined $realms && (ref $realms eq 'HASH'))) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_CONFIGURATION_UNAVAILABLE"
-        );
-    }
-
-    ##! 2: "get session's realm"
-    my $thisrealm = CTX('session')->get_pki_realm();
-    ##! 2: "$thisrealm"
-    if (! defined $thisrealm) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_LIST_CA_IDS_PKI_REALM_NOT_SET"
-	);
-    }
-    
-    ##! 32: Dumper($realms->{$thisrealm}->{ca})
-    if (exists $realms->{$thisrealm}->{ca}) {
-        ##! 64: 'if!'
-        my @return = sort keys %{$realms->{$thisrealm}->{ca}->{id}};
-        ##! 64: Dumper(\@return)
-	return \@return;
-    }
-    
-    return;
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_METHOD_OBSOLETE',
+        params  => {
+            METHOD => 'list_ca_ids ',
+        },
+    );    
 }
 
 sub __get_profile_index {

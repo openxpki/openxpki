@@ -101,12 +101,12 @@ $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4' , \%wfpar
  
 # First Time PUK ?
 if ($test->state() eq 'PUK_TO_INSTALL') {
-	$number_of_tests += 5;
+	$number_of_tests += 4;
 	$test->diag("Need to install PUK");
-    $test->execute_ok('scpers_fetch_puk');
+    $test->execute_ok('scpers_fetch_puk') || die "Error creating puk";
     $test->state_is('PUK_TO_INSTALL');
     $test->param_like('_puk','/ARRAY.*/');
-    $test->execute_ok('scpers_puk_write_ok'); 
+    $test->execute_ok('scpers_puk_write_ok') || die "Error writing puk";; 
 }
 
 # Loop here as long as we are not in the install procedure 
@@ -207,6 +207,7 @@ if ($test->state() eq "HAVE_CERT_TO_DELETE") {
 		} else {
 			$test->execute_ok('scpers_cert_del_err');
 		}
+		$number_of_tests += 2;		
 	}
 	
 	$test->diag("certificates deleted");	
