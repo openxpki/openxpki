@@ -621,10 +621,11 @@ sub sc_analyze_smartcard {
         %certs_in_datapool = map { $_ => 1; } @{$ser->deserialize($users_certificate_identifiers->{VALUE})};
     }
 
-    ##! 32: ' User has ' . scalar keys %certs_in_datapool . ' certs registered in datapool '
+    ##! 32: ' User has ' . (scalar keys (%certs_in_datapool)) . ' certs registered in datapool '
     
     # Migration helper - check for certs on card but not in datapool    
     my $update_datapool = 0;
+    my $autodiscover = $policy->get("autodiscover_certificates");
     
     #### Analyse Step 1 #####################################################
     # Parse certificates from card  
@@ -634,6 +635,7 @@ sub sc_analyze_smartcard {
         CONFIG_ID => $cfg_id,
     });
 
+    
     # Map $certs_on_card into the user_cert hash
     foreach my $cert (@$certs_on_card) {
         ##! 16: " Add certificate from card " . $cert->{IDENTIFIER}
@@ -644,7 +646,7 @@ sub sc_analyze_smartcard {
         push @{$user_certs->{on_card}}, $cert;
         
         # Check if certificate is in datapool
-        if (!$certs_in_datapool{$cert->{IDENTIFIER}}) {
+        if (!$certs_in_datapool{$cert->{IDENTIFIER}} && $autodiscover) {
             $certs_in_datapool{$cert->{IDENTIFIER}} = 1;
             $update_datapool = 1;
             CTX('log')->log(
@@ -661,7 +663,7 @@ sub sc_analyze_smartcard {
         FACILITY => [ 'system' ],
     );     
     
-    if ($update_datapool && $policy->get("autodiscover_certificates")) {
+    if ($update_datapool) {
         my @certificate_identifiers = keys %certs_in_datapool;      
         CTX('api')->set_data_pool_entry( {
             PKI_REALM => $thisrealm,
@@ -814,7 +816,7 @@ sub sc_analyze_smartcard {
         foreach my $key (qw(promote_to_preferred_profile ignore_certificates_with_missing_private_key 
             lead_validity required max_count max_age
             allow_renewal force_renewal escrow_key
-            publish purge_valid purge_invalid revoke_unused)) {
+            publish purge_valid purge_invalid revoke_unused renew_on_ownerchange)) {
            
             $type_policy->{$key} = $policy->get("certs.type.$type.$key") || 0;
         }        
@@ -853,7 +855,7 @@ sub sc_analyze_smartcard {
             
             my $identifier = $cert->{IDENTIFIER};
             ##! 16: 'Process '  . $identifier      
-            $self->__check_against_policy({ CERT => $cert, POLICY => $type_policy});
+            $self->__check_against_policy({ CERT => $cert, POLICY => $type_policy, OWNERCHANGE => $employee_data_has_changed});
 
             # If this is the topmost certificate, we check the status to see if we need 
             # to create a new certificate
@@ -1065,12 +1067,13 @@ sub __check_against_policy {
     my $args = shift;
     my $cert = $args->{CERT};
     my $policy = $args->{POLICY};
+    my $ownerchange = $args->{OWNERCHANGE};
+    
         
     my $identifier = $cert->{IDENTIFIER};
     
     ##! 16: "Do policy check on $identifier / $cert->{CERTIFICATE_TYPE}"    
-    $cert->{ANALYZE} = {
-        %{$cert->{ANALYZE}}, # Has ONCARD already set
+    $cert->{ANALYZE} = {       
         # States             
         VALID => 1, # not revoked and in validity period
         EXPECTED => 1, # preferred and not expiring       
@@ -1078,7 +1081,8 @@ sub __check_against_policy {
         ALLOW_RENEWAL => 0, # weather period is met
         FORCE_RENEWAL => 0, # weather period is met
         PREFERRED => 0, # profile matches the preferred one 
-        SOFT => 1, # soft error (allow renewal, profile upgrade)           
+        SOFT => 1, # soft error (allow renewal, profile upgrade)
+        %{$cert->{ANALYZE}}, # Has ONCARD already set, possibly more overrides
     };
     my $analyze = $cert->{ANALYZE}; 
         
@@ -1088,6 +1092,11 @@ sub __check_against_policy {
        $analyze->{VALID} = 0;
        $analyze->{SOFT} = 0;
     }
+    
+    # check for owner change
+    if ($ownerchange && $policy->{renew_on_ownerchange}) {
+    	$analyze->{EXPECTED} = 0;
+    }    
     
     # Check if it is the preferred profile
     if ($cert->{PROFILE} eq $policy->{preferred_profile}) {

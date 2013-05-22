@@ -15,6 +15,7 @@ certs:
             escrow_key: 0
             publish: 0
             purge_invalid: 0
+            renew_on_ownerchange: 0
             revoke_unused: 0
             max_login: 1
 
@@ -31,6 +32,7 @@ certs:
             escrow_key: 0
             publish: 0
             purge_invalid: 0
+            renew_on_ownerchange: 1
             revoke_unused: 1
             max_login: 1
 
@@ -50,6 +52,7 @@ certs:
             escrow_key: 1
             publish: 1
             purge_invalid: 0
+            renew_on_ownerchange: 1
 
         UNEXPECTED:
             purge_valid: 0
