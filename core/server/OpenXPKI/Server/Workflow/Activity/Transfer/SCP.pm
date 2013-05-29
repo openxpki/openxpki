@@ -103,6 +103,7 @@ sub execute {
 	    %filehandles,
 	});
 	
+	#TODO - improve handling of temporary errors 
     eval{
 		local $SIG{ALRM} = sub { die "alarm\n" };
 		alarm $config->{'timeout'} || 30;
@@ -116,12 +117,9 @@ sub execute {
 		}
     };
 	if ($EVAL_ERROR) {
-		OpenXPKI::Exception->throw (
-			message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_TIMEOUT'
-		)
+		# possibly a temporary network error, pause and try again
+		$self->pause('OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_TIMEOUT');	
 	}
-	
-	
 	
 	alarm 0;
 	

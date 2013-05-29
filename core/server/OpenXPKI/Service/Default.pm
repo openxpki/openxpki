@@ -574,6 +574,7 @@ sub __handle_COMMAND : PRIVATE {
             #        AFFECTED_ROLE => "",
             #});
         };
+        ##! 32: 'Callstack ' . Dumper $data
         if ($EVAL_ERROR) {
             ##! 1: "Permission denied for Service::".$data->{PARAMS}->{COMMAND}."."
             if (my $exc = OpenXPKI::Exception->caught()) {
