@@ -29,6 +29,8 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RANDOM_MISSING_LENGTH");
     }
     
+    $self->get_tmpfile ('OUT');
+
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     my $command = "";
     $command .= "rand -base64";
@@ -36,6 +38,7 @@ sub get_command
         if ($self->{ENGINE}->get_engine() and
             (($engine_usage =~ m{ ALWAYS }xms) or
              ($engine_usage =~ m{ RANDOM }xms)));
+    $command .= " -out $self->{OUTFILE}";
     $command .= " $length";
 
     return [ $command ];
@@ -54,7 +57,7 @@ sub key_usage
 sub get_result
 {
     my $self   = shift;
-    my $random = shift;
+    my $random = $self->read_file($self->{OUTFILE});
 
     ## remove trailing newline
     ## remove trailing =

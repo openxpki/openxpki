@@ -48,13 +48,13 @@ sub get_result
                          {"ENC_ALG" =>
                             [ "__undef", "aes256", "aes192", "aes128", "idea", "des3", "des" ],
                           "KEY_LENGTH" =>
-                            [512, 768, 1024, 2048, 4096 ]
+                            [1024, 2048, 4096 ]
                          },
                      "DSA" =>
                          {"ENC_ALG" =>
                             [ "__undef", "aes256", "aes192", "aes128", "idea", "des3", "des" ],
                           "KEY_LENGTH" =>
-                            [512, 768, 1024, 2048, 4096 ]
+                            [1024, 2048, 4096 ]
                          },
                      "EC" =>
                          {"ENC_ALG" =>
