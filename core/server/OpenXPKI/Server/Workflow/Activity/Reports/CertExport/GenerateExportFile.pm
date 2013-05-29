@@ -26,11 +26,17 @@ sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $context = $workflow->context();
-    
+       
     my $ser = OpenXPKI::Serialization::Simple->new();
   	
   	my $key_namespace = $context->param ( 'key_namespace' );
   	
+  	# Clear the target params (just in case we missed it)   
+    $context->param( 'exported_cert_ids' , '');
+    $context->param( 'xml_filename' ,  '' );
+    $context->param( 'xml_targetname' , '' );
+        
+        
     # Step 1 - find exportable certificates
     # We load the list of certificates from the datapool
 
@@ -38,20 +44,15 @@ sub execute {
     	'NAMESPACE' => $context->param ( 'queue_namespace' ) , 
     	'LIMIT' => $context->param ( 'max_records' ) 
     });        
-          
+                   
+
     # Nothing to do
-    if (!$dp_cert_to_export) {   
+    if (! scalar @{$dp_cert_to_export}) {   
 	    CTX('log')->log(
 			MESSAGE => 'Certificate export - nothing to do',
 			PRIORITY => 'info',
 			FACILITY => 'system',
-		);
-		
-		# Clear the target params (just in case we missed it)	
-		$context->param( 'exported_cert_ids' , '');
-		$context->param( 'xml_filename' ,  '' );
-		$context->param( 'xml_targetname' , '' );
-	   
+		);			   
     	return 1;
     }
            
@@ -104,7 +105,7 @@ sub execute {
 		 	#= { certType => "sig",  EmployeeID => "sb2130", email => "user\@db.com" };
 		}
 
-		##! 32: 'Basic attributes  ' . $cert_xml
+		##! 32: 'Basic attributes  ' . Dumper $cert_xml
 
 		# if no export targets are avail we do not export the p12
 		if (@enc_certs) {                

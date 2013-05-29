@@ -22,6 +22,7 @@ System:
     create:
     - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
     - I18N_OPENXPKI_WF_TYPE_TESTING
+    - I18N_OPENXPKI_WF_TYPE_CERT_EXPORT
 
     access:        
         I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
@@ -33,9 +34,11 @@ System:
                 show: .*
                 
         I18N_OPENXPKI_WF_TYPE_ENROLLMENT:                
+            creator: .*        
+      
+        I18N_OPENXPKI_WF_TYPE_CERT_EXPORT:
             creator: .*
-        
-        
+            
 User:
     create:
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST

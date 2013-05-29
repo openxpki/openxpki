@@ -215,8 +215,15 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="userinfo_workflow_creator" is_required="yes"/>
     </action>
 
+    <action name="scpers_fetch_certificate_publish"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate"
+            certstatus="ANY">
+            <field name="cert_identifier" is_required="yes"/>
+    </action>
+
     <action name="scpers_fetch_certificate"
-            class="OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate">
+            class="OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate"
+            certstatus="ANY">
             <field name="cert_identifier" is_required="yes"/>
     </action>
 
@@ -378,6 +385,38 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             <field name="csr_id"/>
     </action>
 
+    <action name="scpers_add_to_queue_enc"
+            class="OpenXPKI::Server::Workflow::Activity::Reports::CertExport::AddToQueue"
+            _map_EmployeeID="$userinfo_employee_id"
+            _map_certType="enc"
+            _map_email="$userinfo_mail"
+            namespace="export.smartcard.transfer">
+    </action>
+
+    <action name="scpers_register_cert_in_datapool"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::AppendToEntry"
+            ds_encrypt="0"
+            ds_force="0"
+            ds_key_param="userinfo_employee_id"
+            ds_namespace="smartcard.user.certificate"
+            ds_value_param="cert_identifier">
+    </action>
+
+    <action name="scpers_push_cert_to_issuance_queue"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
+            array_name="certs_issued"
+            context_key="cert_identifier"
+            function="push">
+    </action>
+
+    <action name="scpers_add_to_queue_sig"
+            class="OpenXPKI::Server::Workflow::Activity::Reports::CertExport::AddToQueue"
+            _map_EmployeeID="$userinfo_employee_id"
+            _map_certType="sig"
+            _map_email="$userinfo_mail"
+            namespace="export.smartcard.transfer">
+    </action>
+
     <action name="scpers_create_escrow_csr"
             class="Workflow::Action::Null">
             <field name="pkcs10" is_required="yes"/>
@@ -388,24 +427,6 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             SetContextParameters="overwritecontext"
             _keypassword="">
     </action>
-    
-    
-    <!--  Reworked issue activity  -->
-    <action name="scpers_register_cert_in_datapool"
-        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::AppendToEntry"
-          ds_encrypt="0"
-          ds_force="0"
-          ds_namespace="smartcard.user.certificate"
-          ds_key_param="userinfo_employee_id"          
-          ds_value_param="cert_identifier">        
-    </action>
-    
-    <action name="scpers_push_cert_to_issuance_queue"
-        class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
-            array_name="certs_issued"            
-            context_key="cert_identifier"
-            function="push">
-    </action>      
 
     <action name="scpers_null1" class="Workflow::Action::Null"/>
     <action name="scpers_null2" class="Workflow::Action::Null"/>

@@ -116,8 +116,15 @@ sub execute {
 			);	
 		}
     };
-	if ($EVAL_ERROR) {
+	if ($EVAL_ERROR) {		
 		# possibly a temporary network error, pause and try again
+		my $ee = $EVAL_ERROR;
+		##! 16: 'Eval said ' . $ee
+		CTX('log')->log(
+	        MESSAGE => 'Transfer failed, do pause' ,
+	        PRIORITY => 'info',
+	        FACILITY => 'system',
+	    );
 		$self->pause('OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_TIMEOUT');	
 	}
 	

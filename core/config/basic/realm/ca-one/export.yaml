@@ -1,0 +1,15 @@
+smartcard:   
+    max_records: 5
+    key_namespace: certificate.privatekey
+    queue_namespace: export.smartcard.transfer
+    encryption_target:
+        subject: CN=Mailgateway,O=MyCompany,C=com
+        
+    transfer:
+        target: upload@remotehost:~/certexport/
+        port: 22
+        identity: /home/pkiadm/id_scp
+        sshconfig: ''
+
+
+        
