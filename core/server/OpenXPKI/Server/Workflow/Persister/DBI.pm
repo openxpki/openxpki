@@ -156,8 +156,22 @@ sub update_workflow {
   PARAMETER:
     foreach my $key (keys %{ $params }) {
         my $value = $params->{$key};
-	# parameters with undefined values are not stored
-	next PARAMETER if (! defined $value);
+        # parameters with undefined values are not stored / deleted
+        if (! defined $value) {
+            # TODO - figure out if deletion is really necessary?
+            # HEAD does not have the delete part ...
+            ##! 4: 'value for key ' . $key . ' is undef, try to delete'
+            eval {
+                $dbi->delete(
+                    TABLE => $context_table,
+                    DATA  => {
+                        WORKFLOW_SERIAL        => $id,
+                        WORKFLOW_CONTEXT_KEY   => $key,
+                    },
+                );
+            };
+            next PARAMETER;
+        }
 
 	##! 2: "persisting context parameter: $key"
 	# ignore "volatile" context parameters starting with an underscore
