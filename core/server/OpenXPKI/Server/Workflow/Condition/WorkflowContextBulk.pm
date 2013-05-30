@@ -89,11 +89,22 @@ sub evaluate {
         }
     }
     elsif ( $condition eq 'equals' ) {
-        foreach my $context_key (@keys) {
-            my $context_value = $context->param($context_key);
-            if ( $context_value ne $self->context_value() ) {
-                condition_error
+        if ( my $context_value_expected = $self->context_value() ) {
+            foreach my $context_key (@keys) {
+                my $context_value_got = $context->param($context_key);
+                if ( $context_value_got ne $context_value_expected ) {
+                    condition_error
                     'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_EQUALITY_MISMATCH';
+                }
+            }
+        } else {
+            my $context_value_expected = $context->param($keys[0]);
+            for (my $i = 1; $i < scalar @keys; $i++) {
+                my $context_value_got = $context->param($keys[$i]);
+                if ( $context_value_got ne $context_value_expected ) {
+                    condition_error
+                    'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_EQUALITY_MISMATCH';
+                }
             }
         }
     }
@@ -146,10 +157,13 @@ a given string or regex.
 
 Parameters:
 
-context_key:            checks are applied to this context key
+context_keys:            checks are applied to this context key
 condition:              type of check: 'exists', 'notnull', 'regex', 'equals'
 context_value:          comparison value for regex or equals check
 
 Note: if parameters specified start with a '$', the corresponding workflow
 context parameter is referenced instead of the literal string.
 
+Note: using the condition 'equals' when omitting the 'context_value' will 
+cause the values of the context parameters named in 'context_keys' to be
+compared with each other.
