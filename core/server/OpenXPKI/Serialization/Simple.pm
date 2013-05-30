@@ -213,7 +213,8 @@ sub __read_data {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_DATA_TYPE_NOT_SUPPORTED",
             params  => {
-                MSG => $msg
+                MSG => $msg,
+                CALLER => [ caller(1) ],
             }
         );
     }
