@@ -108,9 +108,6 @@ my %COLUMN_of = (
 
     COLUMN_NAME           => "column_name",
     ARRAY_COUNTER         => "array_counter",
-    CONTENT_TYPE          => "content_type",
-    NUMBER                => "int_content",
-    STRING                => "char_content",
 
     TIMESTAMP             => "logtimestamp",
     MESSAGE               => "message",
@@ -252,13 +249,6 @@ my %TABLE_of = (
         COLUMNS => [ "AUDITTRAIL_SERIAL",
                      "TIMESTAMP",
                      "CATEGORY", "LOGLEVEL", "MESSAGE" ]},
-#     DATA => {
-#         NAME    => "data",
-#         INDEX   => [ "DATA_SERIAL" ],
-#         COLUMNS => [ "DATA_SERIAL",
-#                      "GLOBAL_KEY_ID", "OBJECT_ID",
-#                      "COLUMN_NAME", "ARRAY_COUNTER", "CONTENT_TYPE",
-#                      "NUMBER", "STRING" ]},
 #     PRIVATE => {
 #         NAME    => "private",
 #         INDEX   => [ "PRIVATE_SERIAL" ],
@@ -289,9 +279,6 @@ my %TABLE_of = (
         COLUMNS => [ "WORKFLOW_SERIAL",
 		     "PKI_REALM",
 		     "WORKFLOW_TYPE",
-		     "WORKFLOW_VERSION_SERIAL", # TODO - remove, it is obsolete
-                                        # as we have a config_id in
-                                        # the workflow context
 		     "WORKFLOW_STATE",
 		     "WORKFLOW_LAST_UPDATE",
 
@@ -397,7 +384,7 @@ my %INDEX_of = (
     CSR_SUBJECT => {
         NAME => "csr_subject_index",
         TABLE => "CSR",
-        COLUMNS => [ "SUBJECT" ]},
+        COLUMNS => [ "SUBJECT" ]},        
     CSR_PROFILE => {
         NAME => "csr_profile_index",
         TABLE => "CSR",
@@ -431,6 +418,58 @@ my %INDEX_of = (
         NAME => "workflow_history_workflow_serial_index",
         TABLE => "WORKFLOW_HISTORY",
         COLUMNS => [ "WORKFLOW_SERIAL" ]},
+#    DATA_COLUMN_NAME => {
+#        NAME    => "data_column_name_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "COLUMN_NAME" ]},
+#    DATA_GLOBAL_KEY_ID   => {
+#        NAME    => "data_global_id_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "GLOBAL_KEY_ID" ]},
+#    DATA_GLOBAL_COLUMN => {
+#        NAME    => "data_global_column_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "GLOBAL_KEY_ID", "COLUMN_NAME" ]},
+#    DATA_COLUMN_STRING => {
+#        NAME    => "data_column_string_index",
+#        TABLE   => "DATA",
+#        COLUMNS => [ "COLUMN_NAME", "STRING" ]},
+      
+    CERTIFICATE_REALM => {
+		NAME  => 'cert_realm_index',
+		TABLE => 'CERTIFICATE',
+		COLUMNS => [ 'PKI_REALM' ],
+    },
+    CERTIFICATE_CSRSERIAL_IDENTIFIER => {
+		NAME  => 'cert_csrid_index',
+		TABLE => 'CERTIFICATE',
+		COLUMNS => [ 'CSR_SERIAL' ],
+    },
+    CERTIFICATE_STATUS_IDENTIFIER => {
+		NAME  => 'cert_status_index',
+		TABLE => 'CERTIFICATE',
+		COLUMNS => [ 'STATUS' ],
+    },
+    CERTIFICATE_ROLE_IDENTIFIER => {
+		NAME  => 'cert_role_index',
+		TABLE => 'CERTIFICATE',
+		COLUMNS => [ 'ROLE' ],
+    },
+    WORKFLOW_HISTORY_WFSERIAL => {
+		NAME  => 'wf_hist_wfserial_index',
+		TABLE => 'WORKFLOW_HISTORY',
+		COLUMNS => [ 'WORKFLOW_SERIAL' ],
+    },
+    WORKFLOW_REALM => {
+		NAME  => 'wf_realm_index',
+		TABLE => 'WORKFLOW',
+		COLUMNS => [ 'PKI_REALM' ],
+    },    
+    WORKFLOW_CONTEXT_KEY => {
+		NAME  => 'wf_context_key_index',
+		TABLE => 'WORKFLOW_CONTEXT',
+		COLUMNS => [ 'WORKFLOW_CONTEXT_KEY' ],
+    }
     );
 
 sub new
