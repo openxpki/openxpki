@@ -89,7 +89,6 @@ sub connect
 
     ##! 2: "dsn: $dsn"
     ##! 2: "USER: ".($self->{params}->{USER} or "")
-    ##! 2: "PASSWD: ".($self->{params}->{PASSWD} or "")
     ##! 2: "DBI_OPTION: " . Dumper $self->{driver}->{dbi_option}
 
     # FIXME: we should really use RaiseError => 1, because Oracle
