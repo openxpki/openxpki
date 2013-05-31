@@ -26,6 +26,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
+use Template;
 
 use Moose;
 

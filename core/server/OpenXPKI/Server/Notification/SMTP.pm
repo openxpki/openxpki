@@ -116,6 +116,10 @@ has 'is_smtp_open' => (
     isa => 'Bool',            
 );
 
+has 'failed' => (
+    is  => 'rw',
+    isa => 'ArrayRef',
+);
 
 sub _init_transport {    
     my $self = shift;
@@ -209,7 +213,7 @@ sub notify {
     
     # Test if there is an entry for this kind of message
     my @handles = CTX('config')->get_keys( $msgconfig );
-    
+   
     ##! 16: 'Found handles ' . Dumper @handles
     
     if (!@handles) {
@@ -222,6 +226,8 @@ sub notify {
     }
     
     my $default_envelope = $self->default_envelope();
+    
+    my @failed;
     
     # Walk through the handles
     MAIL_HANDLE:
@@ -274,7 +280,8 @@ sub notify {
             my @cclist;
             ##! 32: 'Building new cc list'
             # explicit from configuration, can be a comma sep. list
-            my @ccrcpt = split(/,/, $cfg->{cc});
+            my @ccrcpt;
+            @ccrcpt = split(/,/, $cfg->{cc}) if($cfg->{cc});
             foreach my $cc (@ccrcpt) {
                 my $rcpt = $self->_render_receipient( $cc, \%vars );
                 ##! 32: 'New cc rcpt: ' . $cc . ' -> ' . $rcpt                
@@ -299,17 +306,19 @@ sub notify {
             	PRIORITY => "error",
             	FACILITY => "system",
 	        );
-	        return undef;        	
+	        push @failed, $handle;
+	        next MAIL_HANDLE;        	
         }
-        
+                
         if ($self->use_html()) {
-            $self->_send_html( $cfg, \%vars );
+            $self->_send_html( $cfg, \%vars ) || push @failed, $handle;;
         } else {
-            $self->_send_plain( $cfg, \%vars );
-        }
-               
+            $self->_send_plain( $cfg, \%vars ) ||  push @failed, $handle;
+        }            
         
     } 
+
+    $self->failed( \@failed );
 
     $self->_cleanup();
     
@@ -529,8 +538,10 @@ sub _send_html {
 	# a reusable Net::SMTP object
     my $transport = $self->transport(); 
     
-    # Host accepts a Net::SMTP object 
-    if( $msg->smtpsend( Host => $transport, MailFrom => $cfg->{from} ) ) {        
+    # Host accepts a Net::SMTP object
+    # @res is the list of receipients processed, empty on error
+    my @res = $msg->smtpsend( Host => $transport, MailFrom => $cfg->{from} );
+    if(!scalar @res) {        
         CTX('log')->log(
             MESSAGE  => sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject),
             PRIORITY => "error",
@@ -544,6 +555,8 @@ sub _send_html {
         PRIORITY => "info",
         FACILITY => "system",
     );
+    
+    return 1;
     
 }
 

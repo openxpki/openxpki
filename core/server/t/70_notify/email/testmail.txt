@@ -1,0 +1,5 @@
+*OpenXPKI SMTP Test*
+
+Dear [% data.requestor_name %]
+
+This is an automated test mail.
