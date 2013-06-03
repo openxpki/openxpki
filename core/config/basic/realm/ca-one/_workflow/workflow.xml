@@ -12,8 +12,8 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_cert_export.xml"/>                
   	   <!--  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_personalization.xml"/>  -->
   	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_personalization_v4.xml"/>
-  	   <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_pin_unblock.xml"/>
-  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_puk_upload.xml"/> -->
+  	   <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_pin_unblock.xml"/> -->
+  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_puk_upload.xml"/> 
 	  </workflows>
 	    
 	  <activities>   
@@ -30,8 +30,8 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_cert_export.xml"/>
 	    <!--  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_personalization.xml"/> -->
   	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_personalization_v4.xml"/>
-  	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_pin_unblock.xml"/>
-            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_puk_upload.xml"/>  	 -->
+  	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_pin_unblock.xml"/>  -->
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_puk_upload.xml"/> 
 
 	  </activities>
 	
