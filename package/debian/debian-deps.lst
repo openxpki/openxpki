@@ -80,3 +80,4 @@ libmath-round-perl
 libtimedate-perl
 libyaml-perl
 libmodule-install-perl
+libsoap-lite-perl

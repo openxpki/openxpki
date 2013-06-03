@@ -116,10 +116,6 @@ has 'is_smtp_open' => (
     isa => 'Bool',            
 );
 
-has 'failed' => (
-    is  => 'rw',
-    isa => 'ArrayRef',
-);
 
 sub _init_transport {    
     my $self = shift;

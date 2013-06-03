@@ -38,6 +38,11 @@ has 'config' => (
     isa => 'Str', 
 );
 
+has 'failed' => (
+    is  => 'rw',
+    isa => 'ArrayRef',
+);
+
 =head1 Functions
 
 =head2 notify({ MESSAGE, VARS, TOKEN })

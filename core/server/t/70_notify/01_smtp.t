@@ -18,7 +18,7 @@ my $backend = OpenXPKI::Server::Notification::SMTP->new({ config => 'notificatio
 ok($backend);
 
 my $ret = $backend->notify( {
-	MESSAGE => 'testmail',
+	MESSAGE => 'test',
 	VARS => { data => { sender => "root\@localhost", rcpt => "root\@localhost", requestor_name => 'Albert Einstein' } },         
   	TOKEN => {},    
 });

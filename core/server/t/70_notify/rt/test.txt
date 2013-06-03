@@ -1,0 +1,6 @@
+*OpenXPKI Ticket Test*
+
+If you can read this, your OpenXPKI system can create tickets.
+
+Originating realm: [% meta_label %].
+The base address of this installation is [% meta_baseurl %].

@@ -41,6 +41,38 @@ rt:
                   template: cert_issued
                   status: resolved
 
+servicenow: 
+    backend:
+        class: OpenXPKI::Server::Notification::ServiceNow
+        server: https://demo003.service-now.com/incident.do
+        username: admin
+        password: admin
+        timeout: 300
+
+    template:
+        dir:   t/70_notify/rt/
+
+    message:    
+        test: 
+            default:   # The internal handle for this thread
+                action: open
+                template: test
+                short_description: ServiceNow Notification Test
+                priority: 5
+                state: 1
+                category: inquiry
+                assigned_to: admin
+                
+        update: 
+            default:   # The internal handle for this thread
+                action: update
+                comments: Waiting for callback
+                state: 4
+                               
+        close: 
+            default:   # The internal handle for this thread
+                action: close
+
                         
 smtp:
     backend:
@@ -63,7 +95,7 @@ smtp:
         dir:   t/70_notify/email/
 
     message:  
-        testmail: 
+        test: 
             default:   # The internal handle for this thread
                 template: testmail
                 subject: SMTP Notification Test
