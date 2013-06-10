@@ -27,7 +27,8 @@ OpenXPKI/Client/API.pm
 OpenXPKI/Client/SCEPv2.pm
 
 ## Config Layers
-OpenXPKI/Config/Merge.pm 
+OpenXPKI/Config/Merge.pm
+OpenXPKI/Config/Test.pm 
 
 ## Crypto layer
 
@@ -180,19 +181,15 @@ OpenXPKI/Server/Authentication/ClientX509.pm
 #OpenXPKI/Server/ACL.pm
 
 OpenXPKI/Server/Notification/RT.pm
-OpenXPKI/Server/Notification/Dispatcher.pm
-OpenXPKI/Server/Notification.pm
+OpenXPKI/Server/Notification/ServiceNow.pm
 OpenXPKI/Server/Notification/Base.pm
 OpenXPKI/Server/Notification/Handler.pm
 OpenXPKI/Server/Notification/SMTP.pm
-OpenXPKI/Server/Notification/SMTP_HTML.pm
 
 
 ## Workflow
 OpenXPKI/Workflow/Factory.pm
 OpenXPKI/Workflow/Handler.pm
-# Development Helper - should be refactored before release
-OpenXPKI/Workflow/Instance.pm
 
 OpenXPKI/Server/Workflow.pm
 OpenXPKI/Server/Workflow/Pause.pm
@@ -209,6 +206,7 @@ OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 OpenXPKI/Server/Workflow/Activity/Noop.pm
 
 # FIXME: Remove for production
+OpenXPKI/Server/Workflow/Activity/Test.pm
 OpenXPKI/Server/Workflow/Activity/WorkflowTest.pm
 
 OpenXPKI/Server/Workflow/Activity/CertIssuance/PublishCertificate.pm
@@ -220,6 +218,7 @@ OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
+OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
 
 OpenXPKI/Server/Workflow/Activity/Transfer/SCP.pm 
 

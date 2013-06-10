@@ -2,6 +2,7 @@
 # Written by Martin Bartosch for the OpenXPKI project 2009
 # Copyright (c) 2009 by The OpenXPKI Project
 
+#FIXME - check if this can be merged with Tools::PublishCertificate
 package OpenXPKI::Server::Workflow::Activity::SmartCard::PublishCertificate;
 
 use strict;
