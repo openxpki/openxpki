@@ -82,9 +82,9 @@ sub update_workflow {
 	   
 	   WORKFLOW_PROC_STATE  => $workflow->proc_state(),
 	   
-	   WORKFLOW_WAKEUP_AT   => $workflow->wakeup_at(),
+	   WORKFLOW_WAKEUP_AT   => $workflow->wakeup_at() || 0,
 	   WORKFLOW_COUNT_TRY   => $workflow->count_try(),
-	   WORKFLOW_REAP_AT     => $workflow->reap_at(),
+	   WORKFLOW_REAP_AT     => $workflow->reap_at() || 0,
 	   WORKFLOW_SESSION     => $workflow->session_info(),
 	   WATCHDOG_KEY         => '',#always reset the watchdog key, if the workflow is updated from within the API/Factory
 	);
@@ -393,7 +393,7 @@ sub create_history {
 	    WORKFLOW_DESCRIPTION     => $entry->description(),
 	    WORKFLOW_STATE           => $entry->state(),
 	    WORKFLOW_USER            => $entry->user(),
-	    WORKFLOW_HISTORY_DATE    => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
+	    WORKFLOW_HISTORY_DATE    => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),	    
 	    );
 
 	if ($id) {

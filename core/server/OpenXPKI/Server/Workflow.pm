@@ -219,7 +219,7 @@ sub pause {
     		VALIDITY => $retry_interval,
         	VALIDITYFORMAT => 'relativedate',
     	    },
-    	)->datetime();
+    	)->epoch();
     ##! 16: 'Wakeup at '. $wakeup_at
     
     $self->wakeup_at($wakeup_at);
@@ -249,7 +249,7 @@ sub set_reap_at_interval{
     		VALIDITY => $interval,
         	VALIDITYFORMAT => 'relativedate',
     	    },
-    	)->datetime();
+    	)->epoch();
     
     $self->reap_at($reap_at);
     #if the wf is already running, immediately save data to db:

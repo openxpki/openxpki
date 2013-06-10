@@ -116,12 +116,12 @@ our %COLUMN = (
     "workflow_context_value"   => "LONGTEXT",
     
     "workflow_proc_state"  => "TEXT",
-    "workflow_wakeup_at"  => "TIMESTAMP",
+    "workflow_wakeup_at"  => "NUMERIC",
     "workflow_count_try"  => "BIGINT",
-    "workflow_reap_at"  => "TIMESTAMP",
+    "workflow_reap_at"  => "NUMERIC",
     "workflow_session"  => "LONGTEXT",
     "watchdog_key"  => "TEXT",
-    "watchdog_time"  => "TIMESTAMP",
+    "watchdog_time"  => "NUMERIC",
         
     "namespace"                => "TEXT_KEY",
     "datapool_key"             => "TEXT_KEY",

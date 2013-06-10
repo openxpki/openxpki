@@ -401,7 +401,7 @@ sub __flag_wf_with_watchdog_mark {
 
     # it is necessary to explicitely set WORKFLOW_LAST_UPDATE,
     # because otherwise ON UPDATE CURRENT_TIMESTAMP will set (maybe) a non UTC timestamp
-    my $now = DateTime->now->strftime('%Y-%m-%d %H:%M:%S');
+    my $now = time();
     # watchdog key will be reseted automatically, when the workflow is updated from within 
     # the API (via factory::save_workflow()), which happens immediately, when the action is executed
     # (see OpenXPKI::Server::Workflow::Persister::DBI::update_workflow())
@@ -427,7 +427,7 @@ sub __flag_wf_with_watchdog_mark {
 
 sub __fetch_paused_workflows {
     my $self = shift;
-    my $now  = DateTime->now->strftime('%Y-%m-%d %H:%M:%S');
+    my $now  = time();
 
     return $self->{dbi}->first(
         TABLE   => $self->workflow_table(),
@@ -442,14 +442,14 @@ sub __fetch_paused_workflows {
 
 sub _fetch_and_check_for_orphaned_workflows {
     my $self = shift;
-    my $now  = DateTime->now->strftime('%Y-%m-%d %H:%M:%S');
+    my $now  = time();
 
     my $time_diff = OpenXPKI::DateTime::get_validity(
         {
             VALIDITY       => '-0000000001',#should be one minute old
             VALIDITYFORMAT => 'relativedate',
         },
-    )->datetime();
+    )->epoch();
 
     my $db_result = $self->{dbi}->first(
         TABLE   => $self->workflow_table(),
