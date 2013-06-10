@@ -24,6 +24,7 @@ openxpki.xsd
 ## Client
 OpenXPKI/Client.pm
 OpenXPKI/Client/API.pm
+OpenXPKI/Client/SCEPv2.pm
 
 ## Config Layers
 OpenXPKI/Config/Merge.pm 
@@ -160,6 +161,7 @@ OpenXPKI/Server/API.pm
 OpenXPKI/Server/API/Default.pm
 OpenXPKI/Server/API/Object.pm
 OpenXPKI/Server/API/Secret.pm
+OpenXPKI/Server/API/Smartcard.pm
 OpenXPKI/Server/API/Token.pm
 OpenXPKI/Server/API/Visualization.pm
 OpenXPKI/Server/API/Workflow.pm
@@ -216,10 +218,10 @@ OpenXPKI/Server/Workflow/Activity/CertRenewal/FetchOrgCertData.pm
 OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
-OpenXPKI/Server/Workflow/Activity/CSR/ChangeNotBeforeOrAfter.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
-OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
+
+OpenXPKI/Server/Workflow/Activity/Transfer/SCP.pm 
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
@@ -243,27 +245,22 @@ OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/SetEntry.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Datapool/AppendToEntry.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/GetCertificateIdentifier.pm
 
+OpenXPKI/Server/Workflow/Activity/Tools/CalculateKeyId.pm
+
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
-OpenXPKI/Server/Workflow/Activity/DataExchange/PrepareEnv.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/ExportLogs.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/ExportWorkflowInstances.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/PackArchive.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/WriteArchive.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/ReadArchive.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/UnpackArchive.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/ImportLogs.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/ImportWorkflowInstances.pm
-OpenXPKI/Server/Workflow/Activity/DataExchange/Cleanup.pm
+OpenXPKI/Server/Workflow/Activity/Reports/CertExport/AddToQueue.pm
+OpenXPKI/Server/Workflow/Activity/Reports/CertExport/GenerateExportFile.pm
+OpenXPKI/Server/Workflow/Activity/Reports/CertExport/GetConfig.pm
+OpenXPKI/Server/Workflow/Activity/Reports/CertExport/TagAsExported.pm
 
-OpenXPKI/Server/Workflow/Activity/PasswordSafe/RetrievePassword.pm
-OpenXPKI/Server/Workflow/Activity/PasswordSafe/StorePassword.pm
 
 OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateChallenge.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateSignerTrust.pm
@@ -273,15 +270,20 @@ OpenXPKI/Server/Workflow/Activity/SCEPv2/RevokeExistingCerts.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/LoadRecentCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/CalcApprovals.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/FetchGroupPolicy.pm
-OpenXPKI/Server/Workflow/Activity/SCEPv2/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/ExtractCSR.pm
 
-OpenXPKI/Server/Workflow/Activity/SmartCard/ForkWorkflowInstances.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/RevokeCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/ApplyCSRPolicy.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/CheckPrereqs.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/ComputePUK.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/FetchPUK.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/GeneratePUK.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificate.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/RenameEscrowedKey.pm
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
@@ -299,14 +301,14 @@ OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/HasRole.pm
 
 
-OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
+#OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
 
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
 
-OpenXPKI/Server/Workflow/Condition/CheckExistingCertificate.pm
+#OpenXPKI/Server/Workflow/Condition/CheckExistingCertificate.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
 
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
@@ -326,8 +328,8 @@ OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
-OpenXPKI/Server/Workflow/Validator/CertSubject.pm
-OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
+#OpenXPKI/Server/Workflow/Validator/CertSubject.pm
+#OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
 OpenXPKI/Server/Workflow/Validator/KeyLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyReuse.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
@@ -340,7 +342,7 @@ OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
 OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/UnusedID.pm
-
+OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
 
 ## Packages for new NICE API

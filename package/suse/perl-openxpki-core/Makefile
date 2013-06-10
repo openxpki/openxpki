@@ -1,10 +1,10 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2011 by The OpenXPKI Project
 
-TOPDIR=../../../..
+TOPDIR=../../..
 
 PACKAGE=perl-openxpki-core
-SRCBASE=$(TOPDIR)/trunk/perl-modules/core/trunk
+SRCBASE=$(TOPDIR)/core/server
 SRCNAME=OpenXPKI
 
 # Makefile.inc contains common settings for all packages (checked in)

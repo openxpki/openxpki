@@ -1,10 +1,10 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2011 by The OpenXPKI Project
 
-TOPDIR=../../../..
+TOPDIR=../../..
 
 PACKAGE=openxpki-i18n
-SRCBASE=$(TOPDIR)/trunk/i18n
+SRCBASE=$(TOPDIR)/core/i18n
 SRCNAME=i18n
 
 # Makefile.inc contains common settings for all packages (checked in)

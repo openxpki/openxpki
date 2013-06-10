@@ -6,7 +6,7 @@
 # to override any of these settings!
 
 # common includes for package builds
-include $(TOPDIR)/trunk/package/common/Makefile.inc
+include $(TOPDIR)/package/common/Makefile.inc
 
 # standard directory for RPM builds, to override this use Makefile.local
 RPMBASE=/usr/src/packages

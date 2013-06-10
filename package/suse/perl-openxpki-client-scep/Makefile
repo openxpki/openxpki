@@ -1,10 +1,10 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2011 by The OpenXPKI Project
 
-TOPDIR=../../../..
+TOPDIR=../../..
 
 PACKAGE=perl-openxpki-client-scep
-SRCBASE=$(TOPDIR)/trunk/clients/perl/OpenXPKI-Client-SCEP
+SRCBASE=$(TOPDIR)/clients/perl/OpenXPKI-Client-SCEP
 SRCNAME=OpenXPKI-Client-SCEP
 
 # Makefile.inc contains common settings for all packages (checked in)
