@@ -1,4 +1,4 @@
-# OpenXPKI::Server::Workflow::Activity::SmartcardPINUnblock::GenerateActivationCode
+# OpenXPKI::Server::Workflow::Activity::SmartCard::GenerateActivationCode
 # Written by Scott Hardin for the OpenXPKI project 2005
 #
 # Based on OpenXPKI::Server::Workflow::Activity::Skeleton,
@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2009 by The OpenXPKI Project
 
-package OpenXPKI::Server::Workflow::Activity::SmartcardPINUnblock::GenerateActivationCode;
+package OpenXPKI::Server::Workflow::Activity::SmartCard::GenerateActivationCode;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
@@ -166,8 +166,7 @@ sub execute {
     my $workflow      = shift;
     my $context       = $workflow->context();
     my $user          = CTX('session')->get_user();
-    my $default_token = CTX('pki_realm_by_cfg')->{ $self->config_id() }
-        ->{ $self->{PKI_REALM} }->{crypto}->{default};
+    my $default_token = CTX('api')->get_default_token();
 
     my $code = '';
     my $salt = '';
@@ -257,29 +256,7 @@ sub execute {
 	    ##! 10: "Setting hash and salt in $a for user $user"
             # writing hash is easy... just put it in the context
             $context->param( $a . '_hash', $hash );
-
-            # For the salt attribute, use the prefix '+' to
-            # let the persister know that this value must
-            # be encrypted in the database
-            #$context->param( '+' . $a . '_salt', $salt );
-	    # 
-	    # 2010-08-05 Martin Bartosch - FIXME
-	    # encrypt salt and store in context
-
-	    my $handle = $workflow->id() . '_' . $a;
-	    CTX('api')->set_data_pool_entry(
-		{
-		    NAMESPACE => 'smartcard.pinunblock.salt',
-		    KEY       => $handle,
-		    VALUE     => $salt,
-		    # autocleanup of keys which are not crafted into certificates
-		    # later in this process
-		    EXPIRATION_DATE => time + 2 * 24 * 3600,
-		    FORCE     => 1,
-		    ENCRYPT   => 1,
-		});
-	    
-	    CTX('dbi_backend')->commit();
+            $context->param( '+' . $a . '_salt', $salt );
         }
     }
 

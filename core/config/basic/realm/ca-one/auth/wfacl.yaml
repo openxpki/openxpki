@@ -46,6 +46,7 @@ User:
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
     - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
     - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4
+    - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK
 
     access:            
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
@@ -74,6 +75,9 @@ User:
             context:
                 show: .*
                 hide: approvals
+                
+        I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK:
+            creator: .*
 
 RA Operator:
     create:

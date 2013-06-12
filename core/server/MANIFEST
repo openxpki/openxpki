@@ -283,6 +283,9 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/FetchPUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GeneratePUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/RenameEscrowedKey.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/GenerateActivationCode.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/GetOwnerByCardID.pm
+
 
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
@@ -322,6 +325,9 @@ OpenXPKI/Server/Workflow/Condition/SubjectMatchesPKCS10.pm
 OpenXPKI/Server/Workflow/Condition/Connector/IsValue.pm
 
 OpenXPKI/Server/Workflow/Condition/SCEPv2/ValidSCEPTID.pm
+
+OpenXPKI/Server/Workflow/Condition/Smartcard/AuthCodesValid.pm
+OpenXPKI/Server/Workflow/Condition/Smartcard/AuthIdValid.pm
 
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm

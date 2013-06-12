@@ -45,7 +45,7 @@ sub execute {
         
         # find all CONTEXT.* occurences in template and load them into template vars
         # $template = ' [- CONTEXT.SUBJECT -].[- CONTEXT.token_id -] ';
-        my @keys = ($keytemplate =~ /\[- CONTEXT.([^\]]+) -\]/g);
+        my @keys = ($keytemplate =~ /\[% CONTEXT.([^\]]+) %\]/g);
         
         foreach my $key (@keys) {
             ##! 32: ' Add key to template ' . $key
@@ -70,42 +70,62 @@ sub execute {
             'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_MISSPARAM_KEY_PARAM'
         )
     }
-    
+    ##! 32: 'Action params ' . Dumper $self->param() 
     my $valparam = $self->param('ds_value_param');
-    if ( not defined $valparam ) {
+    my $valmap = $self->param('ds_value_map');           
+    ##! 32: 'Param ' . $valparam
+         ##! 32: 'Map ' . $valmap
+    if ( not ( $valparam || $valmap ) ) {
         OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_MISSPARAM_VALUE_PARAM'
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_MISSPARAM_VALUE_PARAM_OR_MAP'
         )
     }
-    
-    
+        
     my $retval;
-    # Array Mode
-    if ($self->param('ds_wantarray')) {
-    
-        ##! : 16 'Array mode'
-        my @retarray = CTX('config')->get_list( $connector_key );
-        my $ser = OpenXPKI::Serialization::Simple->new();
-        $retval = $ser->serialize( \@retarray );
-               
-    } else {
-        $retval = CTX('config')->get( $connector_key );
-    }
-    
-    # undef - fall back to default if configured
-    if ( not defined $retval ) {
-        my $default_value = $self->param('ds_default_value');        
-        if ( defined $default_value ) {
-            if ( $default_value =~ s/^\$// ) {
-                $retval = $context->param($default_value);
-            } else {
-                $retval = $default_value;
-            }                         
-        } 
-    }
 
-    ##! 1: 'Ask for '.$connector_key.' and got '. Dumper ( $retval )
-    $context->param($valparam, $retval);
+
+    # Hash Mode 
+    if ($valmap) {
+        my %attrmap = map { split(/\s*[=-]>\s*/) }
+            split( /\s*,\s*/, $valmap );
+            
+        ##! : 16 'hash mode'
+        ##! : 32 'attr map ' . Dumper %attrmap        
+        my $hash = CTX('config')->get_hash( $connector_key );
+        
+        foreach my $key (keys %attrmap) {
+        	##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
+        	$context->param( $key, $hash->{$attrmap{$key}});
+        }
+        
+    } else {
+        # Array Mode
+	    if ($self->param('ds_wantarray')) {
+	    
+	        ##! : 16 'Array mode'
+	        my @retarray = CTX('config')->get_list( $connector_key );
+	        my $ser = OpenXPKI::Serialization::Simple->new();
+	        $retval = $ser->serialize( \@retarray );
+	               
+	    } else {
+	        $retval = CTX('config')->get( $connector_key );
+	    }
+	    
+	    # undef - fall back to default if configured
+	    if ( not defined $retval ) {
+	        my $default_value = $self->param('ds_default_value');        
+	        if ( defined $default_value ) {
+	            if ( $default_value =~ s/^\$// ) {
+	                $retval = $context->param($default_value);
+	            } else {
+	                $retval = $default_value;
+	            }                         
+	        } 
+	    }
+
+	    ##! 1: 'Ask for '.$connector_key.' and got '. Dumper ( $retval )
+	    $context->param($valparam, $retval);
+    }
 
     return 1;    
             
@@ -116,7 +136,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetEntry
+OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
 
 =head1 Description
 
@@ -140,7 +160,7 @@ lookup operation.
 
 A template toolkit pattern to create the the key for the connector lookup 
 from. You can refer to every value in the context with C<CONTEXT.<param name>>
-and the name of the current realm with C<PK_REALM>.
+and the name of the current realm with C<PKI_REALM>.
 This is effective only if ds_key_param or the named context value is not set.
 
 =item ds_value_param
@@ -158,6 +178,15 @@ with the given name will be used. This is optional.
 
 If you are asking the config tree for a node which returns a list of scalars,
 you need to set this to a true value.  
+
+=item ds_value_map
+
+If your connector returns a hash of values, you must use C<ds_value_map>
+instead of C<ds_value_param> to define a mapping. The syntax is:
+
+    context_name1 => connector_name1, context_name2 => connector_name2  
+
+Default value and wantarray are ignored.
 
 =back
 
@@ -179,6 +208,7 @@ The resulting value is written to the workflow context at the specified key.
     ds_key_param="query"
  	ds_key_template="smartcard.puk.default.[- CONTEXT.token_id -]"
     ds_value_param="puk"
+    ds_value_map="puk"
     ds_wantarray="0"> 	
     
     <field name="token_id" label="Serial number of Smartcard"/>

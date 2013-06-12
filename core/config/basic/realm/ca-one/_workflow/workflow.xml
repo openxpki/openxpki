@@ -10,7 +10,7 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_testing.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_cert_export.xml"/>                  	   
   	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_personalization_v4.xml"/>
-  	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_pin_unblock.xml"/> -->  	    
+  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_smartcard_pin_unblock.xml"/>	    
 	  </workflows>
 	    
 	  <activities>   
@@ -25,15 +25,15 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_testing.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_cert_export.xml"/>	    
   	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_personalization_v4.xml"/>
-  	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_pin_unblock.xml"/>  -->
+  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_smartcard_pin_unblock.xml"/>
 	  </activities>
 	
 	  <validators>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_signing_request.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_revocation_request.xml"/>
    	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_personalization_v4.xml"/>
-  	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_pin_unblock.xml"/> -->
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator.xml"/>    
+  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_pin_unblock.xml"/>
+	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator.xml"/>  -->    
 	  </validators>
 	
 	  <conditions>
@@ -43,7 +43,7 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_enrollment.xml" />	    
         <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_smartcard_personalization_v4.xml"/>
         <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_cert_export.xml"/>
-  	    <!-- <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_smartcard_pin_unblock.xml"/> -->
+  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_smartcard_pin_unblock.xml"/>
 	  </conditions>
 	
 	</workflow_config>

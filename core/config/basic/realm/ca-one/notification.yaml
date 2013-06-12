@@ -156,18 +156,19 @@ smtp:
             default: 
                 template: scpu_notify_user
                 subject: Smartcard Enrollment Verification Notice
+                to: "[% data.requestor_mail %]"
 
             auth1: 
                 template: scpu_notify_authcontact
-                to: $auth_id1
-                reply: $requestor
-                subject: Smartcard Enrollment Verification Request for [% requestor %]
+                to: "[% data.auth1_mail %]"
+                reply: "[% data.requestor_mail %]"
+                subject: Smartcard Enrollment Verification Request for [% data.requestor_name %]
                                 
             auth2: 
                 template: scpu_notify_authcontact
-                to: $auth_id1                
-                reply: $requestor                
-                subject: Smartcard Enrollment Verification Request for [% requestor %]                
+                to: "[% data.auth2_mail %]"
+                reply: "[% data.requestor_mail %]"
+                subject: Smartcard Enrollment Verification Request for [% data.requestor_name %]
                 
                             
         
