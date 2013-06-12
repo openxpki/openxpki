@@ -454,8 +454,9 @@ sub _send_html {
         Type    =>'multipart/alternative',                    
     );
     
-    #push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
-    #push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
+    
+    push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
+    push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
     
     ##! 16: 'Building with args: ' . Dumper @args
               
