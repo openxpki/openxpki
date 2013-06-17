@@ -53,11 +53,8 @@ sub __get_ca_certificate_chains : PRIVATE {
     my $pki_realm = CTX('session')->get_pki_realm();
     my $server = CTX('session')->get_server();
     
-    # TODO-SCEPv2 - replace API calls with pki_realm access!
     my $scep_cert_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'scep' });
     my $scep_ca_cert_identifier = CTX('api')->get_certificate_for_alias({ ALIAS => $scep_cert_alias })->{IDENTIFIER};
-
-    #my $scep_ca_cert_identifier = CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$server}->{identifier};
     
     if (! defined $scep_ca_cert_identifier) {
         OpenXPKI::Exception->throw(
@@ -76,54 +73,31 @@ sub __get_ca_certificate_chains : PRIVATE {
 
     ##! 32: 'ca_chains: ' . Dumper \@ca_chains;
     
-    # we also need to include (other) known CA certificates (and
-    # their chain) because the SCEP certificate might be issued by
-    # a third party
+    # ca_chains now has the full chain of the scep server entity certificate
+    # Now we will include the current issuing certificate
+    # The current issuer is obtained by get_token_alias_by_type api call
     
-    my $ca_identifiers = CTX('api')->get_ca_list();
-    ##! 32: 'ca identifiers: ' . Dumper $ca_identifiers;
+
+    my $ca_issuer_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'certsign' });
+    ##! 32: 'ca issuer: ' . Dumper $ca_issuer_alias ;
+    
+    
+    my $ca_issuer = CTX('api')->get_certificate_for_alias( { ALIAS => $ca_issuer_alias } );  
         
-    # TODO-SCEPv2 - evil hack, old version is a hash, new version is an array
-    # Should work without modifications in both environments
-    if (ref $ca_identifiers eq "ARRAY") {
-        foreach my $ca_cert (@{$ca_identifiers}) {
-            my $ca_chain = $api->get_chain({
-                'START_IDENTIFIER' => $ca_cert->{IDENTIFIER},
-                'OUTFORMAT'        => 'PEM',
-            });
-            ##! 64: 'ca_chain: ' . Dumper $ca_chain
-            foreach my $cert (@{ $ca_chain->{CERTIFICATES} }) {
-                ##! 128: 'cert: ' . $cert
-                if (! grep { $_ eq $cert } @ca_chains) {
-                    ##! 32: 'cert is not in ca_chains list, adding it'
-                    push @ca_chains, $cert;
-                }
-            }
-        }
-    } else {       
-        CA:
-        foreach my $ca (keys %{ $ca_identifiers }) {
-            ##! 16: 'ca identifier: ' . $ca
-            my $ca_obj = $ca_identifiers->{$ca}->{'cacert'};
+    my $ca_chain = $api->get_chain({
+        'START_IDENTIFIER' => $ca_issuer->{IDENTIFIER},
+        'OUTFORMAT'        => 'PEM',
+    });
     
-            next CA if (! defined $ca_obj); # skip if no CA object available,
-                                            # for example if CA has been configured
-                                            # but not yet imported
-    
-            my $ca_chain = $api->get_chain({
-                'START_IDENTIFIER' => $ca_obj->get_identifier(),
-                'OUTFORMAT'        => 'PEM',
-            });
-            ##! 64: 'ca_chain: ' . Dumper $ca_chain
-            foreach my $cert (@{ $ca_chain->{CERTIFICATES} }) {
-                ##! 128: 'cert: ' . $cert
-                if (! grep { $_ eq $cert } @ca_chains) {
-                    ##! 32: 'cert is not in ca_chains list, adding it'
-                    push @ca_chains, $cert;
-                }
-            }
-        }
-    }
+    # Holds the chain of the current issuer
+    ##! 64: 'ca_chain: ' . Dumper $ca_chain
+    foreach my $cert (@{ $ca_chain->{CERTIFICATES} }) {
+        ##! 128: 'cert: ' . $cert
+        if (! grep { $_ eq $cert } @ca_chains) {
+            ##! 32: 'cert is not in ca_chains list, adding it'
+            push @ca_chains, $cert;
+        }          
+    } 
 
     ##! 32: 'ca_chains: ' . Dumper \@ca_chains
 
@@ -139,7 +113,30 @@ OpenXPKI::Service::SCEPv2::Command::GetCACert
 
 =head1 Description
 
-Gets the CA certificate chain.
+Return information on the certificates used by the scep server.
+Following certs are returned in order:
+
+=over 8 
+
+=item scep server certificate
+
+entity certificate used by the scep server
+
+=item scep server chain
+
+the full chain including the root certificate for the scep entity certificate
+ 
+=item current issuer certificate
+
+the certificate currently used for certificate issuance.    
+
+=item issuer chain
+
+the full chain of the issuing ca, starting with the first intermediate certificate. 
+
+=back
+
+Certificates used in both scep and issuer chain are only included once.
 
 =head1 Functions
 

@@ -65,22 +65,41 @@ sub execute {
     
     # This is either empty or an array ref with the BitString
     my $csr_extensions = $csr_body->{OPENSSL_EXTENSIONS}->{'1.3.6.1.4.1.311.20.2'};    
+    
     ##! 32: ' Ext  ' . Dumper $csr_extensions
     
     if ($csr_extensions && ref $csr_extensions eq 'ARRAY') {
         my $cert_extension_name = $csr_extensions->[0];
         # it looks like as the XS Parser already converts the the BMPString to 
         # a readable representation, so we just parse the chars out        
-        $cert_extension_name =~ s/^\.\.//; # Leading Byte 
-        $cert_extension_name =~ s/(\.(\w))/$2/g;
+        $cert_extension_name =~ s/^\.\.//; # Leading Byte
+        # FIXME - I dont have any idea what chars are possible within parsed bmpstring 
+        # so this probably chokes on some strings! 
+        $cert_extension_name =~ s/(\.(.))/$2/g;
         $context->param('cert_extension_name' => $cert_extension_name);
-        CTX('log')->log(
-            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name", 
-            PRIORITY => 'info',
-            FACILITY => 'system',
-        );                        
+
+        # Check if the extension has a profile mapping, defined in scep.<server>.profile_map        
+        my $profile = $config->get("scep.$server.profile_map.$cert_extension_name");
+        if ($profile) {
+  	        # Move old profile name for reference
+            $context->param('cert_profile_default' => $context->param('cert_profile') );       
+            $context->param('cert_profile' => $profile );            
+            CTX('log')->log(
+	            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile", 
+	            PRIORITY => 'info',
+	            FACILITY => 'system',
+	        );        
+        } else {
+        	CTX('log')->log(
+                MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile", 
+                PRIORITY => 'error',
+                FACILITY => 'system',
+            );
+        }
     }
 
+
+   
    
     my $challenge = $csr_body->{'CHALLENGEPASSWORD'};
     if ($challenge) {

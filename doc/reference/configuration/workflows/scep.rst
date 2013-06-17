@@ -26,6 +26,12 @@ Here is a complete sample configuration::
             max_active_certs: 1
             allow_expired_signer: 0
             auto_revoke_existing_certs: 0
+            
+        # Mapping of names to OpenXPKI profiles to be used with the
+        # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)              
+        profile_map:
+            tlsv2: I18N_OPENXPKI_PROFILE_TLS_SERVER_v2
+                        
 
 *All time period value are interpreted as OpenXPKI::DateTime relative date but given without sign.*
 
@@ -96,6 +102,23 @@ grace_period setting and allows certificates to be used for renewal requests for
 **p_auto_revoke_existing_certs**
 
 Schedule revocation of all existing certs of the requestor.
+
+Certificate Template Name Extension
+---------------------------------------------
+
+This feature was originally introduced by Microsoft and uses a 
+Microsoft specific OID (1.3.6.1.4.1.311.20.2). Setting this value
+allows a dynamic selection of the used certificate profile. 
+You need to define a map with the strings used in the OID and the
+OpenXPKI internal profile name.
+
+    profile_map:
+        tlsv2: I18N_OPENXPKI_PROFILE_TLS_SERVER_v2                         
+
+If the OID is empty or its value is
+not found in the map, the default profile given in the scep server
+configuration is used. 
+
 
 Status Flags used in the workflow
 ----------------------------------

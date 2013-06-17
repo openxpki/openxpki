@@ -615,6 +615,10 @@ OpenXPKI/Test/More.pm
 # Control Scripts
 bin/openxpkiadm
 bin/openxpkictl
+bin/openxpkicli
 bin/openxpkicmd
+
+# cgi stuff
+cgi-bin/scepv2
 
 
