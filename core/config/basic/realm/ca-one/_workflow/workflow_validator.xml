@@ -5,9 +5,4 @@
       <param name="emptyok" value="1"/>      
   </validator>
   
-   <!-- checks whether the given identifier for a password has not yet
-  been used on the CA -->
-  <validator name="I18N_OPENXPKI_WF_VAL_UNUSEDID"
-             class="OpenXPKI::Server::Workflow::Validator::UnusedID">
-  </validator>
 </validators>
