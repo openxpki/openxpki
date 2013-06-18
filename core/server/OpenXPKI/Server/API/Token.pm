@@ -315,7 +315,7 @@ Each entry of the list is a hashref holding the full alias name (ALIAS),
 the certificate identifier (IDENTIFIER), the notbefore/notafter date, 
 the subject and the verbose status of the token. The status is returned as 
 I18 token I18N_OPENXPKI_TOKEN_STATUS_xxx, where xx is out of 
-EXPIRED, ONLINE, OFFLINE OR UNKNOWN.
+EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN.
 
 The list is sorted by notbefore date, starting with the newest date. 
 
@@ -367,8 +367,10 @@ sub get_ca_list {
         };
         
         # Check if the token is still valid - dates are already unix timestamps        
-        my $now = time();
-        if ($entry->{'CERTIFICATE.NOTBEFORE'} > $now || $entry->{'CERTIFICATE.NOTAFTER'} < $now) {
+        my $now = time();       
+        if ($entry->{'CERTIFICATE.NOTBEFORE'} > $now) {
+            $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_UPCOMING';
+        } elsif ($entry->{'CERTIFICATE.NOTAFTER'} < $now) {
             $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_EXPIRED';     
         } else {            
             # Check if the key is usable

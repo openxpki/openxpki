@@ -57,6 +57,7 @@ OpenXPKI/Crypto/Tool/SCEP/Command/get_message_type.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_transaction_id.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/create_error_reply.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/create_certificate_reply.pm
+OpenXPKI/Crypto/Tool/SCEP/Command/create_nextca_reply.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_pkcs10.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/create_pending_reply.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_signer_cert.pm
@@ -379,6 +380,8 @@ OpenXPKI/Service/Default/Command/nop.pm
 OpenXPKI/Service/SCEPv2.pm
 OpenXPKI/Service/SCEPv2/Command/PKIOperation.pm
 OpenXPKI/Service/SCEPv2/Command/GetCACert.pm
+OpenXPKI/Service/SCEPv2/Command/GetNextCACert.pm
+OpenXPKI/Service/SCEPv2/Command/GetCACaps.pm
 OpenXPKI/Service/SCEPv2/Command.pm
 
 ## test stuff

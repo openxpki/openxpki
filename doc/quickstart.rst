@@ -115,17 +115,17 @@ Testdrive
 Enabling the SCEP service
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-First, install the scep cgi client script::
-
-    aptitude install libopenxpki-client-scep-perl
+The SCEP logic is already included in the core distribution but you need to 
+setup a wrapper to access the service through your webserver.
     
-The package installs a perl script into /usr/lib/cgi-bin/ and a config file
+The package installs a wrapper script into /usr/lib/cgi-bin/ and a config file
 at /etc/openxpki/scepv2.conf. For a testdrive, there is no need for any 
-configuration.    
+configuration.
 
-The system currently supports getcacert, getcert and enroll - the test workflow
-is configured to create a certificate on each enrollment request that has a 
-challenge password set (the value of the password is irrelevant).
+The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the 
+test workflow is configured to create a certificate on each enrollment request that 
+has a challenge password set (the value of the password is irrelevant) or is a self-
+signed renewal request (must be within configured renewal period).
 
 The best way for testing the service is the sscep command line tool (available at
 e.g. https://github.com/certnanny/sscep).  

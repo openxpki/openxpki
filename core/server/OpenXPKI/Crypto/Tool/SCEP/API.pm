@@ -37,6 +37,9 @@ sub __init_command_params : PRIVATE {
         'create_pending_reply' => {
             'PKCS7' => 1,
         },
+        'create_nextca_reply' => {
+            'CHAIN' => 1,
+        },
         'create_certificate_reply' => {
             'PKCS7'       => 1,
             'CERTIFICATE' => 1,
