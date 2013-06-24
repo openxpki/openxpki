@@ -11,7 +11,10 @@ Here is a complete sample configuration::
         retry_time: 0000000001
         renewal_period: 000014        
         grace_period: 000005        
-        workflow_expiry: 000014
+        workflow_expiry: 000014        
+        key_size:
+        - 1024    
+        - 2048
         authorized_signer_on_behalf:
             technicans:
                 subject: CN=.*DC=SCEP Signer CA,DC=mycompany,DC=com
@@ -60,6 +63,10 @@ If you want to allow renewals for an infinite period of time, set the ``allow_ex
 **workflow_expiry**
 
 Needs discussion if useful - used to expire the datapool lock.
+
+**key_size**
+
+List (or single scalar) of key size accepted.
   
 **authorized_signer_on_behalf**
 
@@ -125,6 +132,9 @@ Status Flags used in the workflow
 
 The workflow uses status flags in the context to take decissions. Flags are boolean if not stated otherwise.
 
+**csr_key_size_ok**
+
+Weather the keysize of the csr matches the given array. If the key_size definition is missing, the flag is not set.
 
 **have_all_approvals**
 

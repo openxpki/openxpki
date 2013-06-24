@@ -10,6 +10,10 @@ scep-server-1:
     # How long a workflow can be reactivated
     #workflow_expiry: 000014 - unused
     
+    key_size:
+    - 1024    
+    - 2048
+    
     authorized_signer_on_behalf:
         rule1:
             # Full DN
@@ -28,6 +32,7 @@ scep-server-1:
         max_active_certs: 1
         allow_expired_signer: 0
         auto_revoke_existing_certs: 1
+
         
     # Mapping of names to OpenXPKI profiles to be used with the 
     # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)       

@@ -46,8 +46,36 @@ sub execute {
     
     
     my $csr_subject = $csr_body->{'SUBJECT'};
+    my $csr_key_size = $csr_body->{KEYSIZE};
     $context->param('cert_subject' => $csr_subject);
     $context->param('csr_type'    => 'pkcs10');
+    $context->param('csr_key_size' => $csr_key_size );
+    
+    # Check the key size against allowed ones
+    
+    my @key_size = $config->get_scalar_as_list("scep.$server.key_size");
+    if ($key_size[0]) {
+        if (grep /^$csr_key_size$/, @key_size ) {
+        	##! 16: 'keysize ok'               
+            $context->param('csr_key_size_ok' => 1 );        	
+        } else {
+	    	##! 16: 'wrong keysize'
+	        $context->param('csr_key_size_ok' => 0 );
+	        CTX('log')->log(
+	            MESSAGE => "SCEP csr has wrong key size", 
+	            PRIORITY => 'info',
+	            FACILITY => 'system',
+	        );
+        }        	    
+    } else {
+        ##! 16: 'keysize definition missing'    	
+    	CTX('log')->log(
+            MESSAGE => "SCEP csr key size check - keysize not defined", 
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        );
+    }
+    
     
     # Extract the SAN from the PKCS#10       
     my @subject_alt_names = $csr_obj->get_subject_alt_names();
