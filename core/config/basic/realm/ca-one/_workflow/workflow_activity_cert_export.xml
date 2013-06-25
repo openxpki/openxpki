@@ -8,7 +8,7 @@
 
     <action name="cert_export_initialize"
             class="Workflow::Action::Null">
-            <field name="config_id" is_required="yes"/>
+            <field name="config_path" is_required="yes"/>
             <field name="cert_identifier" is_required="no"/>
             <field name="email" is_required="no"/>
     </action>

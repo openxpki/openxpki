@@ -1236,7 +1236,7 @@ sub list_data_pool_entries {
     my $arg_ref = shift;
 
     my $namespace = $arg_ref->{NAMESPACE};
-    my $limit = $arg_ref->{MAXCOUNT};
+    my $limit = $arg_ref->{LIMIT};
     
     my $current_pki_realm   = CTX('session')->get_pki_realm();
     my $requested_pki_realm = $arg_ref->{PKI_REALM};

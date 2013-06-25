@@ -33,7 +33,7 @@ sub execute {
     my $context = $workflow->context();
     
     # Get config id from workflow
-    my $config_id = $context->param('config_id');
+    my $config_id = $context->param('config_path');
     
     my $config = CTX('config');
             
