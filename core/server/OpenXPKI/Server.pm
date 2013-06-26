@@ -20,6 +20,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
+use OpenXPKI::Server::Notification::Handler;
 use Data::Dumper;
 
 our $stop_soon = 0;
@@ -375,9 +376,15 @@ sub sig_hup {
     OpenXPKI::Server::Context::killsession();
     
     # FIXME - reload authentication handlers (cached!)
+    
+    # The notification layer also needs to be re-created
+    # Note: You need to redo this in the watchdog!
+    OpenXPKI::Server::Context::setcontext({
+        notification => OpenXPKI::Server::Notification::Handler->new(),
+        force => 1,
+    });
 
     ##! 8: 'watchdog'
-    ##! 16: 'watchdog pids ' . Dumper CTX('watchdog')->children();
     CTX('watchdog')->reload();
 
     

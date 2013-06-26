@@ -1,7 +1,24 @@
 ## OpenXPKI::Server::Watchdog::WorkflowInstance.pm
 ##
-## Written 2012 by Dieter Siebeck for the OpenXPKI project
-## Copyright (C) 2012-20xx by The OpenXPKI Project
+## Written 2013 by Dieter Siebeck and Oliver Welter for the OpenXPKI project
+## Copyright (C) 2012-2013 by The OpenXPKI Project
+
+
+=head1 NAME
+
+The workflow instance thread 
+
+=head1 DESCRIPTION
+
+This class is responsible for waking up paused workflows. Its run-method is called from OpenXPKI::Server::Watchdog and 
+recieves the db resultset as only argument. Immediately a child process will be created via fork() and _wake_up_workflow is called within the child.
+ 
+_wake_up_workflow reads all necessary infos from the resultset (representing one row from workflow table)
+the serialized session infos are imported in the current (watchdog's) session, so that the wqorkflow is executed within its original environment.
+
+the last performed action is retrieved from workflow history, than executed again (via OpenXPKI::Server::API::Workflow)
+
+=cut
 
 package OpenXPKI::Server::Watchdog::WorkflowInstance;
 use strict;
@@ -53,44 +70,33 @@ sub run {
             }
         }
     }
-    if ( !defined $pid ) {
-        OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_EXECUTION_FAILED', );
-    } elsif ( $pid != 0 ) {
-        ##! 16: 'fork_workflow_execution: parent here'
-        ##! 16: 'parent: process group: ' . getpgrp(0)
-        # we have forked successfully and have nothing to do any more except for getting a new database handle
-        CTX('dbi_log')->new_dbh();
-        ##! 16: 'new parent dbi_log dbh'
-        CTX('dbi_workflow')->new_dbh();
-        ##! 16: 'new parent dbi_workflow dbh'
-        CTX('dbi_backend')->new_dbh();
-        ##! 16: 'new parent dbi_backend dbh'
-        CTX('dbi_log')->connect();
-        CTX('dbi_workflow')->connect();
-        CTX('dbi_backend')->connect();
-
-        # get new database handles
-        ##! 16: 'parent: DB handles reconnected'        
-       
+    
+    OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_EXECUTION_FAILED' )
+        unless( defined $pid );
+    
+    # Reconnect the db handles
+    CTX('dbi_log')->new_dbh();
+    CTX('dbi_workflow')->new_dbh();
+    CTX('dbi_backend')->new_dbh();
+    CTX('dbi_log')->connect();
+    CTX('dbi_workflow')->connect();
+    CTX('dbi_backend')->connect();
+    
+    if ( $pid != 0 ) {
+    	##! 16: ' Workflow instance succesfully forked - I am the watchdog'
+    	# parent here - noop       
     } else {
-        
+
+        ##! 16: ' Workflow instance succesfully forked - I am the workflow'        
         # We need to unset the child reaper (waitpid) as the universal waitpid 
         # causes problems with Proc::SafeExec  
         $SIG{CHLD} = 'DEFAULT';
         
-        ##! 16: 'fork_workflow_execution: child here'
-        CTX('dbi_log')->new_dbh();
-        CTX('dbi_workflow')->new_dbh();
-        CTX('dbi_backend')->new_dbh();
-        CTX('dbi_log')->connect();
-        CTX('dbi_workflow')->connect();
-        CTX('dbi_backend')->connect();
-        ##! 16: 'child: DB handles reconnected'
-        
         # append fork info to process name
         $0 .= sprintf( ' watchdog reinstantiating %d', $wf_id );
         
-        # the wf instance child processs should ALWAYS exit properly and not let bubble up his exceptions up to Watchdog::_scan_for_paused_workflows
+        # the wf instance child processs should ALWAYS exit properly and not 
+        # let its exceptions bubble up to Watchdog
         eval { $self->__wake_up_workflow($db_result); };
         my $error_msg;
         if ( my $exc = OpenXPKI::Exception->caught() ) {
@@ -108,11 +114,17 @@ sub run {
                 FACILITY => "workflow"
             );
         }
-        #ALWAYS exit  child process
+        #ALWAYS exit child process
         exit;
     }
 }
 
+
+=head __wake_up_workflow
+
+Re-Instantiate the workflow and re-run the paused activity
+
+=cut
 sub __wake_up_workflow {
     my $self = shift;
     my ($db_result) = @_;
@@ -187,39 +199,30 @@ sub __wake_up_workflow {
     
 }
 
+=head2 __check_session 
+
+Make sure that the session context is set
+
+=cut
 sub __check_session {
-    #my $self = shift;
+    
+    my $self = shift;
     my $session;
     eval{
        $session = CTX('session');
     };
     if($session ){
-        return;
+        return $session;
     }
     ##! 4: "create new session"
     $session = OpenXPKI::Server::Session->new({
                    DIRECTORY => CTX('config')->get("system.server.session.directory"),
                    LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
    });
-   OpenXPKI::Server::Context::setcontext({'session' => $session});
+   OpenXPKI::Server::Context::setcontext({'session' => $session});   
    ##! 4: sprintf(" session %s created" , $session->get_id()) 
+   return $session;
+   
 }
-
-1;
-
-=head1 NAME
-
-The workflow instance thread 
-
-=head1 DESCRIPTION
-
-This class is responsible for waking up paused workflows. Its run-method is called from OpenXPKI::Server::Watchdog and 
-recieves the db resultset as only argument. Immediately a child process will be created via fork() and _wake_up_workflow is called within the child.
- 
-_wake_up_workflow reads all necessary infos from the resultset (representing one row from workflow table)
-the serialized session infos are imported in the current (watchdog's) session, so that the wqorkflow is executed within its original environment.
-
-the last performed action is retrieved from workflow history, than executed again (via OpenXPKI::Server::API::Workflow)
-
 
 1;

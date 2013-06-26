@@ -121,7 +121,6 @@ our %COLUMN = (
     "workflow_reap_at"  => "NUMERIC",
     "workflow_session"  => "LONGTEXT",
     "watchdog_key"  => "TEXT",
-    "watchdog_time"  => "NUMERIC",
         
     "namespace"                => "TEXT_KEY",
     "datapool_key"             => "TEXT_KEY",

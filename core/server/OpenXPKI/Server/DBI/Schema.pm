@@ -136,7 +136,6 @@ my %COLUMN_of = (
     WORKFLOW_CONTEXT_VALUE => "workflow_context_value",
     WORKFLOW_SESSION       => "workflow_session",
     WATCHDOG_KEY          => "watchdog_key",
-    WATCHDOG_TIME         => "watchdog_time",
 
     NAMESPACE             => "namespace",
     DATAPOOL_KEY          => "datapool_key",
@@ -288,8 +287,6 @@ my %TABLE_of = (
              "WORKFLOW_REAP_AT",
              "WORKFLOW_SESSION",
              "WATCHDOG_KEY",
-             "WATCHDOG_TIME"
-		     
 	    ]},
 
     CONFIG => {

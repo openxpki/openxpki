@@ -437,11 +437,13 @@ sub __do_init_watchdog{
     
     my $config = CTX('config');
         
-    my $Watchdog = OpenXPKI::Server::Watchdog->new( $keys );
-    $Watchdog->run({
+    my $Watchdog = OpenXPKI::Server::Watchdog->new( {
         user => OpenXPKI::Server::__get_numerical_user_id( $config->get('system.server.user') ),
         group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )        
-    });    
+    } );
+        
+    $Watchdog->run() unless ( $config->get('system.watchdog.disabled') || 0 );
+            
     OpenXPKI::Server::Context::setcontext({        
         watchdog => $Watchdog
     });

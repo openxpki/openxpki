@@ -138,7 +138,7 @@ openxpkictl [options] COMMAND
  Commands:
    start            Start OpenXPKI daemon
    stop             Stop OpenXPKI daemon
-   restart          Reload the configuration
+   reload           Reload the configuration
    restart          Restart OpenXPKI daemon
    status           Get OpenXPKI daemon status
    version          Print the OpenXPKI version info
@@ -161,6 +161,7 @@ Stops the OpenXPKI daemon.
 =item B<reload>
 
 Reloads the OpenXPKI daemon, re-reading the config repository.
+Note: Some changes need a restart, see the documentation!
 
 =item B<restart>
 
