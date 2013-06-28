@@ -442,7 +442,7 @@ sub __do_init_watchdog{
         group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )        
     } );
         
-    $Watchdog->run() unless ( $config->get('system.watchdog.disabled') || 0 );
+    $Watchdog->run() unless ( $config->get('system.watchdog.disabled') );
             
     OpenXPKI::Server::Context::setcontext({        
         watchdog => $Watchdog

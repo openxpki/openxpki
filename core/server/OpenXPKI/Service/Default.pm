@@ -536,10 +536,10 @@ sub __handle_LOGOUT : PRIVATE {
 
     ##! 8: "logout received - killing session and connection"
     CTX('log')->log(
-	MESSAGE  => 'Terminating session',
-	PRIORITY => 'info',
-	FACILITY => 'system',
-    );
+		MESSAGE  => 'Terminating session',
+		PRIORITY => 'info',
+		FACILITY => 'system',
+	);
     CTX('session')->delete();
     exit 0;
 }

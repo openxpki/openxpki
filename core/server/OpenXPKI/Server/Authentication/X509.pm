@@ -12,24 +12,68 @@ use English;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Crypto::X509;
 use MIME::Base64;
+
+use Moose;
 
 use Data::Dumper;
 
+has path => (
+    is => 'ro',
+    isa => 'Str',
+);
+
+has trust_certs => (
+    is => 'rw',
+    isa => 'ArrayRef',
+);
+
+has trust_realms => (
+    is => 'rw',
+    isa => 'ArrayRef',
+);
+
+has trust_anchors => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    builder => '_load_anchors',
+    lazy => 1
+);
+
+
 ## constructor and destructor stuff
 
-sub new {
-    my $that = shift;
-    my $class = ref($that) || $that;
-
-    my $self = {};
-
-    bless $self, $class;
-
+around BUILDARGS => sub {
+     
+    my $orig = shift;
+    my $class = shift;
+    
     my $path = shift;
+    
+    return $class->$orig({ path => $path });
+    
+};
+
+
+sub BUILD {
+    
+    my $self = shift;
+      
+    my $path = $self->path();
+    ##! 2: "load name and description for handler"
+    
     my $config = CTX('config');
 
-    ##! 2: "load name and description for handler"
+    my @trust_certs =  $config->get_scalar_as_list("$path.cacert");
+    my @trust_realms = $config->get_scalar_as_list("$path.realm");
+    
+    ##! 8: 'Config Path: ' . $path
+    ##! 8: 'Trusted Certs ' . Dumper @trust_certs
+    ##! 8: 'Trusted Realm ' . Dumper @trust_realms
+       
+    $self->trust_certs ( \@trust_certs );
+    $self->trust_realms ( \@trust_realms );
 
     $self->{DESC} = $config->get("$path.description");
     $self->{NAME} = $config->get("$path.label"); 
@@ -42,22 +86,39 @@ sub new {
         my @path = split /\./, "$path.role.handler";
         $self->{ROLEHANDLER} = \@path;     
     }
-    
+         
+    if (!$self->{CHALLENGE_LENGTH}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION',            
+        );
+    }
 
-    my @trusted_realms = $config->get_scalar_as_list("$path.realm");
-    my @trusted_certs = $config->get_scalar_as_list("$path.cacert");
+}
+
+sub _load_anchors {
+	
+	my $self = shift;
+	
+    my $trusted_realms = $self->trust_realms();
+    my $trusted_certs = $self->trust_certs();
+
+    ##! 8: 'Trusted Certs ' . Dumper $trusted_certs
+    ##! 8: 'Trusted Realm ' . Dumper $trusted_realms
 
     my @trust_anchors;   
-    if (@trusted_certs) {
-        @trust_anchors = @trusted_certs;
-    }     
     
-    foreach my $trust_realm (@trusted_realms) {
+    @trust_anchors = @{$trusted_certs} if ($trusted_certs);
+
+    foreach my $trust_realm (@{$trusted_realms}) {
         # Look up the group name used for the ca certificates in the given realm
+        ##! 16: 'Load ca signers from realm ' . $trust_realm
         my $ca_group_name = CTX('config')->get("realm.$trust_realm.crypto.type.certsign");      
         if (!$ca_group_name) { next; } # Realm is not setup as CA   
-        my $ca_certs = CTX('api')->list_active_aliases({ GROUP => $ca_group_name, REALM => $trust_realm });        
-        push @trust_anchors, map { $_->{IDENTIFIER} } $ca_certs;
+        ##! 16: 'ca group name is ' . $ca_group_name 
+        my $ca_certs = CTX('api')->list_active_aliases({ GROUP => $ca_group_name, REALM => $trust_realm });
+        ##! 16: 'ca cert in realm ' . Dumper $ca_certs
+        if (!$ca_certs) { next; }        
+        push @trust_anchors, map { $_->{IDENTIFIER} } @{$ca_certs};
     }
     
     if (! scalar @trust_anchors ) {
@@ -70,16 +131,8 @@ sub new {
    }
         
     ##! 16: 'trust_anchors: ' . Dumper \@trust_anchors
-
-    $self->{TRUST_ANCHORS} = \@trust_anchors;
-       
-    if (!$self->{CHALLENGE_LENGTH}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_CHALLENGE_LENGTH_CONFIGURATION',            
-        );
-    }
-
-    return $self;
+    return \@trust_anchors;
+    	
 }
 
 sub login_step {
@@ -164,60 +217,41 @@ sub login_step {
             );
         }
         ##! 16: 'signature valid'
-        my $signer_subject;
-        eval {
-            $signer_subject = $pkcs7_token->command({
-                COMMAND => 'get_subject',
-                PKCS7   => $pkcs7,
-                DATA    => $challenge,
-            });
-        };
-        if ($EVAL_ERROR) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNER_SUBJECT',
-            );
-        }
-        ##! 16: 'signer subject: ' . $signer_subject
+        
         my $default_token = CTX('api')->get_default_token();
-        my @signer_chain = $default_token->command({
-            COMMAND        => 'pkcs7_get_chain',
-            PKCS7          => $pkcs7,
-            SIGNER_SUBJECT => $signer_subject,
+        
+        # Looks like firefox adds \r to the p7
+        $pkcs7 =~ s/\r//g;
+        my $validate = CTX('api')->validate_certificate({
+        	PKCS7 => $pkcs7,        	        	
         });
-        ##! 64: 'signer_chain: ' . Dumper \@signer_chain
-
-        my $x509_signer = OpenXPKI::Crypto::X509->new(
-            TOKEN => $default_token,
-            DATA  => $signer_chain[0],
-        );
-        my $sig_identifier = $x509_signer->get_identifier();
-                
-        if (! defined $sig_identifier || $sig_identifier eq '') {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CERTIFICATE_IDENTIFIER',
-            );
-        }
-        ##! 64: 'sig identifier: ' . $sig_identifier
-
-        my @signer_chain_server;
-        eval {
-            @signer_chain_server = @{ CTX('api')->get_chain({
-                START_IDENTIFIER => $sig_identifier,
-            })->{IDENTIFIERS} };
-        };
-        if ($EVAL_ERROR) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_COULD_NOT_DETERMINE_SIGNATURE_CHAIN_FROM_SERVER',
+        
+        ##! 32: 'validation result ' . Dumper $validate
+        if ($validate->{STATUS}  ne 'VALID') {
+        	OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNER_CERT_NOT_VALID',
                 params  => {
-                    EVAL_ERROR => $EVAL_ERROR,
+                    'STATUS' => $validate->{STATUS}
                 },
             );
-        }
-        ##! 64: 'signer_chain_server: ' . Dumper \@signer_chain_server
+        } 
+        
+        my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{CHAIN}->[0], TOKEN => $default_token );         
+        my $signer_subject = $x509_signer->get_parsed('BODY','SUBJECT');
+               
+        ##! 32: 'signer cert pem: ' . $signer_subject 
+        
+        
+        ##! 64: 'signer_chain_server: ' . Dumper $validate->{CHAIN}
         my $anchor_found;
-        my @trust_anchors = @{ $self->{TRUST_ANCHORS} };
+        my @trust_anchors = @{$self->trust_anchors()};
+        my @signer_chain_server = @{$validate->{CHAIN}};
+        
       CHECK_CHAIN:
-        foreach my $identifier (@signer_chain_server) {
+        foreach my $pem (@signer_chain_server) {
+        	
+        	my $x509 = OpenXPKI::Crypto::X509->new( DATA => $pem, TOKEN => $default_token ); 
+        	my $identifier = $x509->get_identifier();        	
             ##! 16: 'identifier: ' . $identifier
             if (grep {$identifier eq $_} @trust_anchors) {
                 $anchor_found = 1;
@@ -228,40 +262,44 @@ sub login_step {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_UNTRUSTED_CERTIFICATE',
                 params  => {
-                    'IDENTIFIER' => $sig_identifier,
+                    'IDENTIFIER' => $x509_signer->get_identifier(),
                 },
             );
         }
+        
+        ##! 16: ' Signer Subject ' . $signer_subject  
+        my $dn = OpenXPKI::DN->new( $signer_subject );
 
-        # Get the signer cert from the DB (and check that it is valid now)
-        my $cert_db = CTX('dbi_backend')->first(
-            TABLE    => 'CERTIFICATE',
-            DYNAMIC  => {
-                'IDENTIFIER' => {VALUE => $sig_identifier},
-                'STATUS'     => {VALUE => 'ISSUED'},
-            },
-            VALID_AT => time(),
-        );
-        if (! defined $cert_db) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_NOT_FOUND_IN_DB_OR_INVALID',
-                params  => {
-                    'IDENTIFIER' => $sig_identifier,
-                },
-            );
-        } 
+        ##! 32: 'dn hash ' . Dumper $dn;
+        my %dn_hash = $dn->get_hashed_content();
+        ##! 16: 'dn hash ' . Dumper %dn_hash;
+                        
+        # in the unusual case that there is no dn we use the full subject
         my $user = $signer_subject;
+        $user = $dn_hash{'CN'}[0] if ($dn_hash{'CN'});
             
         # Assign default role            
         my $role;    
         # Ask connector    
+        ##! 16: 'Rolehandler ' . Dumper $self->{ROLEHANDLER} 
         if ($self->{ROLEHANDLER}) {               
             if ($self->{ROLEARG} eq "cn") {
-                # FIXME - how to get that fastest?
+            	$role = CTX('config')->get( [ $self->{ROLEHANDLER},  $user ]); 
             } elsif ($self->{ROLEARG} eq "subject") {    
                 $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509_signer->{PARSED}->{BODY}->{SUBJECT} ]);                    
             } elsif ($self->{ROLEARG} eq "serial") {
                 $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509_signer->{PARSED}->{BODY}->{SERIAL} ]);            
+            } else {
+            	OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_UNKNOWN_ROLE_HANDLER_ARGUMENT',
+                    params  => {
+                        'ARGUMENT' => $self->{ROLEARG},
+                    },
+                    log => {
+                        PRIORTITY => 'error',
+                        FACILITY => 'system',                        
+                    }
+                );
             }
         }    
         
@@ -270,7 +308,12 @@ sub login_step {
         ##! 16: 'role: ' . $role
         if (!$role) {
             ##! 16: 'no certificate role found'
-            return (undef, undef, {}); 
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_LOGIN_FAILED",
+                params  => {
+                    USER => $signer_subject,
+                    REASON => 'no role'
+            });            
         }
               
 

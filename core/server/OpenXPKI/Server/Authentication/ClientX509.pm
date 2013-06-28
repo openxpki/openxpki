@@ -109,6 +109,7 @@ sub login_step {
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
             params  => {
                 USER => $username,
+                REASON => 'certificate not found'
             },
         );
     }
@@ -118,6 +119,7 @@ sub login_step {
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
             params  => {
                 USER => $username,
+                REASON => 'certificate not issued'
             },
         );
     }
@@ -131,6 +133,7 @@ sub login_step {
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
             params  => {
                 USER => $username,
+                REASON => 'certificate not yet valid'
             },
         );
     }
@@ -140,6 +143,7 @@ sub login_step {
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
             params  => {
                 USER => $username,
+                REASON => 'certificate expired'
             },
         );
     }
@@ -163,6 +167,12 @@ sub login_step {
     ##! 16: 'role: ' . $role
     if (!$role) {
         ##! 16: 'no certificate role found'
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
+            params  => {
+                USER => $username,
+                REASON => 'no role'
+            });
         return (undef, undef, {}); 
     }
     

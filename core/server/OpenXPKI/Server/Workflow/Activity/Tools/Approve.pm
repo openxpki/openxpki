@@ -105,40 +105,21 @@ sub execute
             TYPE      => 'PKCS7',            
         });
 
-        my $signer_subject;
-        eval {
-                $signer_subject = $pkcs7_token->command({
-                    COMMAND => 'get_subject',
-                    PKCS7   => $pkcs7,
-                    DATA    => encode('utf8', $sig_text),
-                });
-        };
-        if ($EVAL_ERROR) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_SUBJECT',
-                params  => {
-                    'ERROR' => $EVAL_ERROR,
-                },
-                log     => {
-                    logger   => CTX('log'),
-                    priority => 'info',
-                    facility => 'system',
-                },
-            );
-        }
-        ##! 16: 'signer subject: ' . $signer_subject
         my $default_token = CTX('api')->get_default_token();
         my @signer_chain = $default_token->command({
             COMMAND        => 'pkcs7_get_chain',
-            PKCS7          => $pkcs7,
-            SIGNER_SUBJECT => $signer_subject,
+            PKCS7          => $pkcs7,        
         });
         ##! 64: 'signer_chain: ' . Dumper \@signer_chain
 
-        my $sig_identifier = OpenXPKI::Crypto::X509->new(
+        my $x509_signer = OpenXPKI::Crypto::X509->new(
             TOKEN => $default_token,
             DATA  => $signer_chain[0]
-        )->get_identifier();
+        );
+        
+        my $sig_identifier = $x509_signer->get_identifier();
+        my $signer_subject = $x509_signer->get_parsed('BODY','SUBJECT');              
+        
         if (! defined $sig_identifier || $sig_identifier eq '') {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER',

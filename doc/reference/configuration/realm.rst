@@ -106,7 +106,7 @@ Perform x509 based authentication with challenge/response. ::
 The *challenge_length* determines the size of the challenge in bytes. There are two alternative to specify which certificates are accpeted:
 
 #. If the certificates originate from the OpenXPKI instance itself, list the realms which issue them below *realm*.
-#. If you have certificates from an external ca, import the ca certificate and put its certificate identifier below *cacert*. Both lists can be combined and accept any number of items.
+#. If you have certificates from an external ca, import the ca certificate with the ``openxpkiadm utility`` and put its certificate identifier below *cacert*. Both lists can be combined and accept any number of items.
 
 The settings for *role* are the same as for the x509 client handler.
 

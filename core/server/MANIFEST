@@ -46,7 +46,6 @@ OpenXPKI/Crypto/CLI.pm
 OpenXPKI/Crypto/CSR.pm
 OpenXPKI/Crypto/CRR.pm
 OpenXPKI/Crypto/CRL.pm
-OpenXPKI/Crypto/PKCS7.pm
 OpenXPKI/Crypto/Profile/Base.pm
 OpenXPKI/Crypto/Profile/Certificate.pm
 OpenXPKI/Crypto/Profile/CRL.pm
@@ -114,7 +113,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_encrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_decrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_end_entity.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/RSA.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/DSA.pm

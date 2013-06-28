@@ -17,7 +17,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypto::X509;
-use OpenXPKI::Crypto::PKCS7;
 use OpenXPKI::Serialization::Simple;       
 
 use Moose;
@@ -140,13 +139,14 @@ sub __persistCertificateInformation {
         );
     };
     if (!$x509) {
-        ##! 16: 'Parse certificate data as pkcs7 '
-        my $pkcs7 = OpenXPKI::Crypto::PKCS7->new(
-            TOKEN => $default_token,
-            PKCS7 => $certificate_information->{'certificate'},
-        );
-        ##! 32: 'PKCS7 returned: ' . Dumper ( $pkcs7 )         
-        my $x509data = $pkcs7->get_end_entity();
+        ##! 16: 'Parse certificate data as pkcs7 '       
+        # FIXEM - Needs testing
+	    my $x509data = $default_token->command({
+	        COMMAND     => 'pkcs7_get_chain',
+	        NOCHAIN     => 1,
+	        PKCS7       => $certificate_information->{'certificate'},        
+	    });
+
         
         ##! 16: 'Parse certificate data as x509 extracted from pkcs7 '
         ##! 32: 'first x509 from chain: ' . $x509data                  

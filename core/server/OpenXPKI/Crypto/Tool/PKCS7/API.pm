@@ -31,11 +31,6 @@ sub __init_command_params : PRIVATE {
         'verify'     => { 'PKCS7' => 1,
                           'DATA'  => 0,
                         }, # + CHAIN => 0?
-        'is_not_self_signed' => { 'PKCS7' => 1,
-                                },
-        'get_subject' => { 'PKCS7' => 1,
-                           'DATA'  => 0,
-                         },
     });
 }
 

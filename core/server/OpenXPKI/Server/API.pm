@@ -444,6 +444,16 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_sql_string,
                 },
+                SUBJECT_KEY_IDENTIFIER => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                AUTHORITY_KEY_IDENTIFIER => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
                 CSR_SERIAL => {
                     type     => SCALAR,
                     optional => 1,
@@ -509,6 +519,16 @@ sub BUILD {
                     regex    => $re_integer_string,
                 },
                 'PKI_REALM' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                 SUBJECT_KEY_IDENTIFIER => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                AUTHORITY_KEY_IDENTIFIER => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                     optional => 1,
@@ -782,6 +802,21 @@ sub BUILD {
                     optional => 1,
                 },                 
             },
+        },
+        'validate_certificate' => {
+            class  => 'Object',
+            params => {
+                'PEM' => {
+                	type  => SCALAR,
+                    regex => $re_cert_string,
+                    optional => 1,                
+                },
+                'PKCS7' => {
+                    type  => SCALAR,
+                    regex => $re_cert_string,
+                    optional => 1,                
+                },                
+            }        	
         },
 
         ### Visualization API

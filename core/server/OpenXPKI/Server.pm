@@ -371,22 +371,23 @@ sub sig_hup {
     
     ##! 8: 'forward head'
     CTX('config')->update_head();
-
-    # Update head creates a session that blocks new sessions later
-    OpenXPKI::Server::Context::killsession();
-    
-    # FIXME - reload authentication handlers (cached!)
-    
+        
     # The notification layer also needs to be re-created
     # Note: You need to redo this in the watchdog!
     OpenXPKI::Server::Context::setcontext({
         notification => OpenXPKI::Server::Notification::Handler->new(),
         force => 1,
     });
-
+    
+    # FIXME - reload authentication handlers (cached!)
+    
+        
+    # Update head creates a session that blocks new sessions later
+    OpenXPKI::Server::Context::killsession();
+    
     ##! 8: 'watchdog'
     CTX('watchdog')->reload();
-
+    
     
 }
 

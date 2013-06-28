@@ -97,10 +97,8 @@ sub __init_command_params : PRIVATE {
     					  "OUTFORM"    => 0,
                           "ENC_ALG" => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "CONTENT" => 1},
-    "pkcs7_get_chain" => {"SIGNER" => 1,
-                          'SIGNER_SUBJECT' => 0,
+    "pkcs7_get_chain" => {"NOCHAIN" => 0,
                           "PKCS7"  => 1},
-    "pkcs7_get_end_entity" => {"PKCS7"  => 1},                          
     "pkcs7_sign"      => {"PASSWD"  => 0,
                           "KEY"     => 0,
                           "CERT"    => 0,
@@ -108,6 +106,9 @@ sub __init_command_params : PRIVATE {
     "pkcs7_verify"    => {"CHAIN"   => 0,
                           "CONTENT" => 1,
                           "PKCS7"   => 1},
+    "verify_cert"    =>  {"CHAIN"   => 0,
+                          "CERTIFICATE" => 1,
+                          "TRUSTED"   => 1},                          
     };
     
     ## assign the specified value to the command_params attribute  

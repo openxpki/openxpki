@@ -407,5 +407,4 @@ sub get_ca_list {
     return \@token;
 }
 
-
 1;
