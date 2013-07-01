@@ -65,50 +65,35 @@ If you just need an anonymous connection, you can use the *Anonymous* handler. :
         
 If no role is provided, you get the anonymous role. **Do never set any other role than system, unless you exactly know what you are doing!**
 
-**x509 client-based authentication**
+**x509 based authentication**
 
-*Note: OpenXPKI uses a third party tool named openca-sv to check the x509 signature. You need to build that by your own and put it into /usr/bin. The source is availale at http://www.openca.org/projects/openca/tools-sources.shtml.*  
+There are two handlers using x509 certificates for authentication. *X509Client* uses the SSL client authentication feature of apache/mod_ssl while *X509Challenge* sends a challenge to be signed by the browser. Both handlers pass the signer certificate to a validation function that cryptographically checks the chain and tests the chain against a list of trusted anchors.
 
-The ClientX509 handler uses the certificate information provided by the connecting client to perform authorization only. It's left to the client to perform the authentication step and ensure that the passed cert is controlled by the user. The handler checks the validity of the certificate and uses a connector to assign the user a role. This is a typical setup when you use Apache SSL with mutual authentication. ::
+The configuration is the same for both handlers (apart from the class name)::
 
     Certificate:
-        type: ClientX509
+        type: ClientX509/ChallengeX509
         label: Certificate
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
         role:
             default: User
             handler@: connector:auth.connector.role
-            argument: username
-            
-The role assignment is done by querying the connector specified by *handler* using the certificates component *argument*. Possible arguments are "username" (filled by the client, SSL_CLIENT_S_DN_CN for the current Mason frontend), "subject" and "serial". The value given by *default* is assigned if no match is found by the handler. If you do not specify a handler but a default role, you get a static role assignment for any matching certifiacate.
-        
-**x509 Authentication**
-
-*chain management is broken on subjects having multi-valued entries, so this will not work if you have such certificates*
-
-Perform x509 based authentication with challenge/response. ::
-  
-    Signature:
-        type: X509
-        label: Signature
-        description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
-        challenge_length: 256
-        role: 
-            default: User
-            handler@: connector:auth.connector.role
-            argument: username
-        # define your trust anchors here
+            argument: cn
         realm:
-        - my_client_auth_realm
+        - ca-one
         cacert:
-        - cert_identifier of external ca cert
+        - cert_identifier of external ca cert 
+            
+The role assignment is done by querying the connector specified by *handler* using the certificates component *argument*. Possible arguments are "cn", "subject" and "serial". The value given by *default* is assigned if no match is found by the handler. If you do not specify a handler but a default role, you get a static role assignment for any matching certificate.
 
-The *challenge_length* determines the size of the challenge in bytes. There are two alternative to specify which certificates are accpeted:
+For the trust anchor you have consider two different situations:
 
 #. If the certificates originate from the OpenXPKI instance itself, list the realms which issue them below *realm*.
-#. If you have certificates from an external ca, import the ca certificate with the ``openxpkiadm utility`` and put its certificate identifier below *cacert*. Both lists can be combined and accept any number of items.
+#. If you have certificates from an external ca, import the ca certificate with the ``openxpkiadm`` utility and put its certificate identifier below *cacert*. 
 
-The settings for *role* are the same as for the x509 client handler.
+Both lists can be combined and accept any number of items.
+
+**Note**: OpenXPKI uses a third party tool named openca-sv to check the x509 signature. You need to build that by your own and put it into /usr/bin. The source is available at http://www.openca.org/projects/openca/tools-sources.shtml.
 
 **password database handler**
 

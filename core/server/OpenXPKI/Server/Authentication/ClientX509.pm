@@ -19,36 +19,12 @@ use OpenXPKI::Crypto::X509;
 use DateTime;
 use Data::Dumper;
 
-sub new {
-    my $that = shift;
-    my $class = ref($that) || $that;
+use Moose;
 
-    my $self = {};
-
-    bless $self, $class;
-
-    ##! 1: "start"
-    
-    my $path = shift;
-    my $config = CTX('config');
-
-    ##! 2: "load name and description for handler"
-    $self->{DESC} = $config->get("$path.description");
-    $self->{NAME} = $config->get("$path.label");
-    
-    $self->{ROLE} = $config->get("$path.role.default");    
-    $self->{ROLEARG} = $config->get("$path.role.argument");
-    
-    if ($config->get("$path.role.handler")) {        
-        my @path = split /\./, "$path.role.handler";
-        $self->{ROLEHANDLER} = \@path;     
-    }
-    
-    ##! 2: "finished"
-    return $self;
-}
-
+extends 'OpenXPKI::Server::Authentication::X509';
+ 
 sub login_step {
+	
     ##! 1: 'start' 
     my $self    = shift;
     my $arg_ref = shift;
@@ -70,117 +46,21 @@ sub login_step {
         );
     }
 
-    my ($username, $certificate) = ($answer->{LOGIN}, $answer->{CERTIFICATE});
+    ##! 16: 'Service Answer ' . Dumper $answer
+    my $username = $answer->{LOGIN};
+    my $certificate = $answer->{CERTIFICATE};
 
     ##! 2: "credentials ... present"
     ##! 2: "username: $username"
-    ##! 2: "certificate: $certificate"
-
-    my $x509;
-    eval {
-        $x509 = OpenXPKI::Crypto::X509->new(
-            DATA  => $certificate,
-            TOKEN => CTX('api')->get_default_token(),
-        );
-    };
-    if (! defined $x509) {
-        ##! 16: 'x509 not defined'
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
-            params  => {
-                USER => $username,
-            },
-        );
-    }
-    
-    # FIXME - this makes only sense with known certificates, 
-    # but we might want to use external cas as well
-    
-    my $identifier = $x509->get_identifier();
-    ##! 16: 'identifier: ' . $identifier
-
-    my $cert_info = CTX('api')->get_cert({
-        IDENTIFIER => $identifier,
+    ##! 2: "certificate: " . Dumper $certificate
+  
+    my $validate = CTX('api')->validate_certificate({
+        PEM => $certificate,
+        ANCHOR => $self->trust_anchors(),                       
     });
-    ##! 16: 'cert_info: ' . Dumper $cert_info
-    if (! defined $cert_info) {
-        ##! 16: 'get_cert failed'
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
-            params  => {
-                USER => $username,
-                REASON => 'certificate not found'
-            },
-        );
-    }
-    if ($cert_info->{STATUS} ne 'ISSUED') {
-        ##! 16: 'status is not ISSUED'
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
-            params  => {
-                USER => $username,
-                REASON => 'certificate not issued'
-            },
-        );
-    }
-    
-    my $notbefore = $cert_info->{BODY}->{NOTBEFORE};
-    my $notafter  = $cert_info->{BODY}->{NOTAFTER};
-    my $now = DateTime->now();
-    if (DateTime->compare($now, OpenXPKI::DateTime::_parse_date_utc($notbefore)) == -1) {
-        ##! 16: 'certificate is not yet valid'
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
-            params  => {
-                USER => $username,
-                REASON => 'certificate not yet valid'
-            },
-        );
-    }
-    if (DateTime->compare($now, OpenXPKI::DateTime::_parse_date_utc($notafter)) == 1) {
-        ##! 16: 'certificate is no longer valid'
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
-            params  => {
-                USER => $username,
-                REASON => 'certificate expired'
-            },
-        );
-    }
-          
-            
-    # Assign default role            
-    my $role;    
-    # Ask connector    
-    if ($self->{ROLEHANDLER}) {               
-        if ($self->{ROLEARG} eq "username") {
-            $role = CTX('config')->get( [ $self->{ROLEHANDLER}, $username ]);
-        } elsif ($self->{ROLEARG} eq "subject") {    
-            $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509->{PARSED}->{BODY}->{SUBJECT} ]);                    
-        } elsif ($self->{ROLEARG} eq "serial") {
-            $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509->{PARSED}->{BODY}->{SERIAL} ]);            
-        }
-    }    
-      
-    $role = $self->{ROLE} unless($role);
-
-    ##! 16: 'role: ' . $role
-    if (!$role) {
-        ##! 16: 'no certificate role found'
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_X509_LOGIN_FAILED",
-            params  => {
-                USER => $username,
-                REASON => 'no role'
-            });
-        return (undef, undef, {}); 
-    }
-    
-    return ( $username, $role,
-        {
-            SERVICE_MSG => 'SERVICE_READY',
-        },
-    );
+ 
+    return $self->_validation_result( $validate );
+ 
 }
 
 1;
@@ -192,52 +72,8 @@ OpenXPKI::Server::Authentication::ClientX509 - support for client based X509 aut
 
 =head1 Description
 
+Leaves the SSL negotation to the client, requires the certificate chain of the authenticated
+client to be passed.
 
-=head1 Functions
-
-=head2 new
-
-the constructor reads the acceptable roles from the configuration
-
-=head2 login_step
-
-returns (user, role, service ready message) triple if login was
-successful, (undef, undef, {}) otherwise. The message which
-is supplied as a parameter to the function should contain both a
-LOGIN and a CERTIFICATE parameter.
-The certificate should be the PEM-encoded client certificate.
-In a typical Apache setting, this is $ENV{'SSL_CLIENT_CERT'} if
-the +ExportCertData SSLOption is set.
-The certificate is checked for validity at login, the certificate
-role is read from the database and compared to the list of acceptable
-roles from the configuration.
-
-=head1 configuration
-    
-Signature:
-    type: ClientX509
-    label: External X509
-    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
-    role:             
-        handler: @auth.roledb
-        argument: dn
-        default: ''
-
-=head2 parameters
-
-=over
-
-=item role.handler
-
-A connector that returns a role for the given role argument. 
-
-=item role.argument
-
-Argument to use with hander to query for a role. Supported values are I<username> (as passed by the client), I<subject>, I<serial>
-
-=item role.default
-
-The default role to assign to a user if no result is found using the handler.
-If you do not specify a handler but a default role, you get a static role assignment for any matching certificate.  
-
-=back
+See OpenXPKI::Server::Authentication::X509 for configuration and options.
+ 
