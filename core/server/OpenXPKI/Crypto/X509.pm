@@ -335,6 +335,18 @@ sub get_identifier {
     return $self->{SHA1};
 }
 
+sub get_subject {
+    my $self = shift;
+    if (! exists $self->{PARSED}->{BODY}->{SUBJECT}) {
+        OpenXPKI::Exception->throw(
+            message =>
+                'I18N_OPENXPKI_CRYPTO_X509_GET_SUBJECT_NOT_INITIALIZED',
+        );
+    }
+    return $self->{PARSED}->{BODY}->{SUBJECT};
+    
+}
+
 sub get_status {
     my $self = shift;
     if (not exists $self->{STATUS}) {

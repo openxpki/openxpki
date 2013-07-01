@@ -181,7 +181,13 @@ sub BUILD {
             params => {
                 'GROUP' => {
                     type  => SCALAR,
-                    regex => $re_alpha_string,                    
+                    regex => $re_alpha_string,
+                    optional => 1,                    
+                },
+                'TYPE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,                    
                 },
                 'VALIDITY'  => {
                     type  => HASHREF,                    
@@ -193,7 +199,16 @@ sub BUILD {
                     optional => 1,
                 },
             },
-        }, 
+        },         
+        'get_trust_anchors' => {
+            class  => 'Token',
+            params => {
+                'PATH' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,                    
+                },                
+            },
+        },
         'get_certificate_for_alias' => {
             class  => 'Token',
             params => {
@@ -807,15 +822,23 @@ sub BUILD {
             class  => 'Object',
             params => {
                 'PEM' => {
-                	type  => SCALAR,
-                    regex => $re_cert_string,
+                	type  => SCALAR | ARRAYREF,                  
                     optional => 1,                
                 },
                 'PKCS7' => {
                     type  => SCALAR,
                     regex => $re_cert_string,
                     optional => 1,                
+                },
+                'ANCHOR' => {
+                    type  => ARRAYREF,                   
+                    optional => 1,                
                 },                
+                'NOCRL' => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,                
+                },
             }        	
         },
 

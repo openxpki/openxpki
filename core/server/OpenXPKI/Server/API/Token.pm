@@ -239,14 +239,15 @@ sub get_certificate_for_alias {
  
 }
 
-=head2 list_active_aliases( { GROUP, VALIDITY, REALM } )
+=head2 list_active_aliases( { GROUP, VALIDITY, REALM, TYPE } )
 
-Get an arrayref with all tokens from the given group, which are/were valid within 
+Get an arrayref with all tokens from the given GROUP, which are/were valid within 
 the validity period given by the VALIDITY parameter.
 Each entry of the list is a hashref holding the full alias name and the 
 certificate identifier. The list is sorted by notbefore date, starting with 
 the newest date. See get_token_alias_by_group how validity works.
 REALM is optional and defaults to the session's realm.
+If you are looking for a predefined token, you can specify TYPE instead of GROUP.
   
 =cut
 
@@ -258,15 +259,21 @@ sub list_active_aliases {
     
     my $group  = $keys->{GROUP};    
     
-    if (!$group) {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
-        );        
-    }
-    
     my $pki_realm = $keys->{REALM};
     $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
     
+    
+    if (!$group) {
+    	
+    	if ($keys->{TYPE}) {
+    	   $group = CTX('config')->get("realm.$pki_realm.crypto.type.".$keys->{TYPE});
+    	}
+    	
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
+        ) if (!$group);  
+    }
+
     my %validity;             
     foreach my $key (qw(notbefore notafter) ) {
         if ($keys->{VALIDITY}->{NOTBEFORE}) {
@@ -405,6 +412,57 @@ sub get_ca_list {
     
     ##! 1: 'Finished'
     return \@token;
+}
+
+
+=head2 get_trust_anchors ( { PATH } ) 
+
+Get the trust anchors as defined at the given config path.
+Expects the config path to point to a structure like:
+
+    path:
+        realm:
+        - ca-one 
+        cacert:
+        - list of extra cert identifiers
+        
+Result is an arrayref of certificate identifiers.        
+        
+=cut
+
+sub get_trust_anchors {
+	
+	my $self = shift;
+	
+	my $args = shift;
+	my $path = $args->{PATH};
+	
+    OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_API_TOKEN_GET_TRUST_ANCHOR_NO_PATH',
+    ) unless($path); 
+	
+    my $config = CTX('config');
+    my @trust_certs =  $config->get_scalar_as_list("$path.cacert");
+    my @trust_realms = $config->get_scalar_as_list("$path.realm");
+    
+    ##! 8: 'Trusted Certs ' . Dumper @trust_certs
+    ##! 8: 'Trusted Realm ' . Dumper @trust_realms
+
+    my @trust_anchors;   
+    
+    @trust_anchors = @trust_certs if (@trust_certs);
+
+    foreach my $trust_realm (@trust_realms) {
+        ##! 16: 'Load ca signers from realm ' . $trust_realm        
+        next unless $trust_realm;
+        my $ca_certs = CTX('api')->list_active_aliases({ TYPE => 'certsign', REALM => $trust_realm });
+        ##! 16: 'ca cert in realm ' . Dumper $ca_certs
+        if (!$ca_certs) { next; }        
+        push @trust_anchors, map { $_->{IDENTIFIER} } @{$ca_certs};
+    }
+   
+   return \@trust_anchors;
+	
 }
 
 1;

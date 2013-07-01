@@ -13,7 +13,7 @@
       <!-- if you set the following parameter to 1, you can enforce
            signatures on all CSR approvals -->
       <param name="signature_required" value="0"/>
-      <param name="pkcs7tool" value="testsceppkcs7tool1"/>
+      <param name="config_path" value="approval.crr.anchor"/>
       <!-- if you set signature_required to 1, you have to defined
            identifiers for your trust anchors:
            

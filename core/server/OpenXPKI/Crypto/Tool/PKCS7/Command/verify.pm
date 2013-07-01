@@ -61,6 +61,7 @@ sub get_command {
         ##! 16: 'data_filename defined'
         $command .= " -data $data_filename";
     }
+    ##! 32: 'command ' . $command 
     return $command;
 }
 

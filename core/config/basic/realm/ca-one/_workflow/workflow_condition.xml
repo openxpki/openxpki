@@ -15,7 +15,7 @@
   
   <condition name="I18N_OPENXPKI_WF_COND_CHECK_CSR_APPROVALS" 
   	class="OpenXPKI::Server::Workflow::Condition::Approved">
-    <param name="role" value="RA Operator"/>
+    <param name="role" value="RA Operator"/>    
   </condition>
    				 
   <condition name="I18N_OPENXPKI_WF_COND_SUBJECT_MATCHES_PKCS10"  			   

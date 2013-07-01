@@ -800,13 +800,16 @@ sub get_private_key_for_cert {
 
 
 
-=head2 validate_certificate ( { PEM, PKCS7, NOCRL } )
+=head2 validate_certificate ( { PEM, PKCS7, NOCRL, ANCHOR } )
 
 Validate a certificate by creating the chain. Input can be either a
-single PEM encoded certificate or a PKCS7 container with the entity 
+single PEM encoded certificate or a PKCS7 container or PEM array with the entity 
 certificate including its chain. 
 
 if NOCRL is set to 1, no crl checks are done (certificate is marked valid) - *not implemented yet!*:
+
+ANCHOR is an optional list of trust anchors (cert identifiers). If given, the resulting 
+chain is tested against the list. If 
 
 The return value is a hashref:
 
@@ -816,6 +819,8 @@ The return value is a hashref:
 
 The overall status of the validation which is one of: VALID, BROKEN, REVOKED, NOCRL, 
 NOROOT, (incomplete chain/no root found), UNTRUSTED (got root certificate which is not known).
+
+If ANCHOR is given the result is never VALID but TRUSTED/UNTRUSTED is returned.  
 
 =item CHAIN
 
@@ -837,7 +842,7 @@ sub validate_certificate {
     my $chain_status = 'VALID';        
     
     # Single PEM certificate, try to load the chain from the database
-    if ($arg_ref->{PEM}) {
+    if ($arg_ref->{PEM} && !ref $arg_ref->{PEM}) {
     	
     	##! 8: 'PEM certificate'
     	my $x509 = OpenXPKI::Crypto::X509->new( DATA => $arg_ref->{PEM}, TOKEN => $default_token );
@@ -856,15 +861,22 @@ sub validate_certificate {
         
         @signer_chain = @{$chain->{CERTIFICATES}};
                                
-    } elsif ($arg_ref->{PKCS7}) {
+    } elsif ($arg_ref->{PKCS7} || ref $arg_ref->{PEM} eq "ARRAY") {
 
-        ##! 8: 'PKCS7 container'     
-           	
-        # returns the certificate from the p7 in order, entity first           	
-        @signer_chain = @{ $default_token->command({
-            COMMAND => 'pkcs7_get_chain',
-            PKCS7 => $arg_ref->{PKCS7},            
-        }) };
+
+        if ($arg_ref->{PKCS7}) {
+	
+	        ##! 8: 'PKCS7 container'     	           	
+	        # returns the certificate from the p7 in order, entity first           	
+	        @signer_chain = @{ $default_token->command({
+	            COMMAND => 'pkcs7_get_chain',
+	            PKCS7 => $arg_ref->{PKCS7},            
+	        }) };
+
+        } else {
+        	##! 8: 'PEM Array'
+        	@signer_chain = @{ $arg_ref->{PEM} };        	
+        }
 
         ##! 32: 'Chain ' . Dumper @signer_chain
         
@@ -954,13 +966,29 @@ sub validate_certificate {
     });
     
     $chain_status = 'BROKEN' unless($valid);
+    
+    if ($valid && $arg_ref->{ANCHOR}) {
+    	$chain_status = 'UNTRUSTED';
+    	my @trust_anchors = @{$arg_ref->{ANCHOR}};
+    	##! 16: 'Checking valid certificate against trust anchor list'
+    	##! 32: 'Anchors ' . Dumper @trust_anchors  
+        CHECK_CHAIN:
+        foreach my $pem (@signer_chain) {            
+            my $x509 = OpenXPKI::Crypto::X509->new( DATA => $pem, TOKEN => $default_token ); 
+            my $identifier = $x509->get_identifier();           
+            ##! 16: 'identifier: ' . $identifier
+            if (grep {$identifier eq $_} @trust_anchors) {
+            	##! 16: 'Found on trust anchor list'
+                $chain_status = 'TRUSTED';
+                last CHECK_CHAIN;
+            }
+        }
+    }
                 
     return { STATUS => $chain_status, CHAIN => \@signer_chain };
             
     
 }
-
-
 
 =head2 get_data_pool_entry
 

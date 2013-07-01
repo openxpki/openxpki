@@ -434,8 +434,6 @@ sub get_approval_message {
     my $arg_ref   = shift;
     my $sess_lang = CTX('session')->get_language();
     ##! 16: 'session language: ' . $sess_lang
-    my $hash_sessionid = sha1_base64(CTX('session')->get_id());
-    ##! 16: 'hash of the session ID: ' . $hash_sessionid
 
     my $result;
 
@@ -478,9 +476,7 @@ sub get_approval_message {
         # translate message
         $result = OpenXPKI::i18n::i18nGettext(
             'I18N_OPENXPKI_APPROVAL_MESSAGE_CSR',
-            '__WFID__' => $arg_ref->{ID},
-            '__HASH__' => $hash,
-            '__HASHSESSIONID__' => $hash_sessionid,
+            '__CERT_SUBJECT__' => $wf_info->{WORKFLOW}->{CONTEXT}->{cert_subject}
         );
     }
     elsif ($arg_ref->{TYPE} eq 'CRR') {
@@ -492,16 +488,13 @@ sub get_approval_message {
         my $cert_id = $wf_info->{WORKFLOW}->{CONTEXT}->{cert_identifier};
         # translate message
         $result = OpenXPKI::i18n::i18nGettext(
-            'I18N_OPENXPKI_APPROVAL_MESSAGE_CRR',
-            '__WFID__' => $arg_ref->{ID},
-            '__CERT_IDENTIFIER__' => $cert_id,
-            '__HASHSESSIONID__' => $hash_sessionid,
+            'I18N_OPENXPKI_APPROVAL_MESSAGE_CRR'                       
         );
     }
     # change back the language to the original session language
     ##! 16: 'changing back language to: ' . $sess_lang
     set_language($sess_lang);
-
+    
     ##! 16: 'result: ' . $result
     return $result;
 }

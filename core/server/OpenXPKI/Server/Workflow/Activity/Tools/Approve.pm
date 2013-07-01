@@ -106,10 +106,10 @@ sub execute
         });
 
         my $default_token = CTX('api')->get_default_token();
-        my @signer_chain = $default_token->command({
+        my @signer_chain = @{ $default_token->command({
             COMMAND        => 'pkcs7_get_chain',
             PKCS7          => $pkcs7,        
-        });
+        }) };
         ##! 64: 'signer_chain: ' . Dumper \@signer_chain
 
         my $x509_signer = OpenXPKI::Crypto::X509->new(
@@ -118,7 +118,7 @@ sub execute
         );
         
         my $sig_identifier = $x509_signer->get_identifier();
-        my $signer_subject = $x509_signer->get_parsed('BODY','SUBJECT');              
+        my $signer_subject = $x509_signer->get_subject();              
         
         if (! defined $sig_identifier || $sig_identifier eq '') {
             OpenXPKI::Exception->throw(
@@ -130,27 +130,7 @@ sub execute
                 },
             );
         }
-        my $sig_cert_db = CTX('dbi_backend')->first(
-            TABLE    => 'CERTIFICATE',
-            DYNAMIC  => {
-                'IDENTIFIER' => {VALUE => $sig_identifier},
-                'STATUS'     => {VALUE => 'ISSUED'},
-            },
-        );
-        if (! defined $sig_cert_db) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_SIGNATURE_CERT_NOT_FOUND_IN_DB',
-                params => {
-                    'IDENTIFIER' => $sig_identifier,
-                },
-                log    => {
-                    logger   => CTX('log'),
-                    priority => 'warn',
-                    facility => 'system',
-                },
-            );
-        }
-        my $signer_role = $sig_cert_db->{ROLE};
+        
         # look for already present approvals by someone with the same
         # certificate and role
         if ($self->param('multi_role_approval') &&
@@ -164,7 +144,6 @@ sub execute
                 'plaintext'         => $sig_text,
                 'signer_identifier' => $sig_identifier,
                 'signer_subject'    => $signer_subject,
-                'signer_role'       => $signer_role,
             },
         }
         elsif (! $self->param('multi_role_approval') &&
@@ -177,10 +156,10 @@ sub execute
                 'plaintext'         => $sig_text,
                 'signer_identifier' => $sig_identifier,
                 'signer_subject'    => $signer_subject,
-                'signer_role'       => $signer_role,
             },
         }
     }
+    # Unsigned Approvals
     else {
         # look for already present approval by this user with this
         # role
@@ -202,9 +181,9 @@ sub execute
             },
         }
         CTX('log')->log(
-	    MESSAGE => 'Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role",
-	    PRIORITY => 'info',
-	    FACILITY => 'audit',
+		    MESSAGE => 'Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role",
+		    PRIORITY => 'info',
+		    FACILITY => 'audit',
         );
     }
 
@@ -213,18 +192,7 @@ sub execute
     ##! 64: 'approvals serialized: ' . Dumper $approvals
 
     $context->param ('approvals' => $approvals);
-
-=cut
-    my $bulk = $context->param('bulk');
-    if (! $bulk && $workflow->type eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
-        # only notify if this is not part of a bulk request - otherwise
-        # the user would get a huge number of tickets
-        CTX('notification')->notify({
-            MESSAGE  => 'csr_approved',
-            WORKFLOW => $workflow,
-        });
-    }
-=cut    
+ 
     return 1;
 }
 

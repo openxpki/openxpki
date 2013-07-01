@@ -7,6 +7,8 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 use English;
+use OpenXPKI::Debug;
+use Data::Dumper;
 
 __PACKAGE__->mk_accessors( 'role' );
 
@@ -61,6 +63,7 @@ sub evaluate
 
     ## prepare configuration
     my %required = ();
+    ##! 16: 'Required roles ' . Dumper $roles
     foreach my $role (sort @{$roles})
     {
         $required{$role}++;
@@ -68,16 +71,9 @@ sub evaluate
 
     ## remove available approvals from the required list
     foreach my $approval (@{$approvals}) {
-        my $role;
-        if (exists $approval->{signer_role}) {
-            # the signature takes precedence over the session, if
-            # a signature is present
-            $role = $approval->{signer_role};
-        }
-        else {
-            # no signer role available, just use session role
-            $role = $approval->{session_role};
-        }
+        
+        my $role = $approval->{session_role};
+        ##! 16: 'Role of current approval ' . $role
         if ($required{$role} > 1) {
             $required{$role}--;
         }
