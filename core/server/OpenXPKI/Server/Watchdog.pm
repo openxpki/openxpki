@@ -577,17 +577,19 @@ sub __flag_and_fetch_workflow {
     # it is necessary to explicitely set WORKFLOW_LAST_UPDATE,
     # because otherwise ON UPDATE CURRENT_TIMESTAMP will set (maybe) a non UTC timestamp
     
-    my $now = time();
     # watchdog key will be reseted automatically, when the workflow is updated from within 
     # the API (via factory::save_workflow()), which happens immediately, when the action is executed
     # (see OpenXPKI::Server::Workflow::Persister::DBI::update_workflow())
     my $update_ok = $self->{dbi}->update(
         TABLE => $self->workflow_table(),
-        DATA  => { WATCHDOG_KEY => $rand_key, WORKFLOW_LAST_UPDATE => $now },
+        DATA  => { 
+            WATCHDOG_KEY => $rand_key, 
+            WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
+        },
         WHERE => {
             WATCHDOG_KEY        => '',
             WORKFLOW_SERIAL     => $wf_id,
-            WORKFLOW_PROC_STATE => 'flagged'
+            WORKFLOW_PROC_STATE => 'pause'
         }
     );
 
@@ -607,7 +609,6 @@ sub __flag_and_fetch_workflow {
         TABLE   => $self->workflow_table(),
         COLUMNS => ['WORKFLOW_SERIAL'],
         DYNAMIC => {
-            'WORKFLOW_PROC_STATE' => { VALUE => 'flagged' },
             'WATCHDOG_KEY'        => { VALUE => $rand_key },
             'WORKFLOW_SERIAL'     => { VALUE => $wf_id },
         },

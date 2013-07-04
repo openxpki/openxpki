@@ -51,10 +51,8 @@ my %known_proc_states = (
     exception   => {desc =>'an exception has been thrown',
                     action=>'_resume'},
     retry_exceeded => {desc =>'count of retries has been exceeded',
-                    action=>'_resume'},
-    flagged     => {desc =>'workflow is reloaded',
-                    action=>'_runtime_exception'},
-
+                    action=>'_resume'}
+   
 );
 
 sub init {

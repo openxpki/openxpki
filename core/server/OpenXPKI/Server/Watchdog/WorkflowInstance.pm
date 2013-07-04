@@ -136,7 +136,7 @@ sub __wake_up_workflow {
     
 
     my $wf_id   = $db_result->{WORKFLOW_SERIAL};
-    my $wf_type = $db_result->{WORKFLOW_TYPE};+
+    my $wf_type = $db_result->{WORKFLOW_TYPE};
     my $pki_realm = $db_result->{PKI_REALM};
     my $session_info = $db_result->{WORKFLOW_SESSION};
     unless ($wf_id) {
