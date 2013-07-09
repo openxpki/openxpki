@@ -395,6 +395,12 @@ sub process_request {
     my $rc;
     my $msg;
 
+    # Re-seed Perl random number generator (only used for temp file name creation, not for actual 
+    # cryptographic operation), otherwise children inherit common initialization from parent process.
+    # Without this line the forked clients will very often generate temp file names clashing with
+    # each other.
+    srand(time ^ $PROCESS_ID);
+
     eval
     {
         $rc = do_process_request(@_);
