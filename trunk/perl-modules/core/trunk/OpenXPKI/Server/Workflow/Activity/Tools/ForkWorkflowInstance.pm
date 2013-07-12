@@ -193,6 +193,14 @@ sub execute {
         }
         else {
     	    ##! 16: 'child here'
+            # Re-seed Perl random number generator (only used for temp
+            # file name creation, not for actual cryptographic operation),
+            # otherwise children inherit common initialization from
+            # parent process.
+            # Without this line the forked clients will very often
+            # generate temp file names clashing with each other.
+            srand(time ^ $PROCESS_ID);
+
             CTX('dbi_log')->new_dbh();
             ##! 16: 'new child dbi_log dbh'
             CTX('dbi_workflow')->new_dbh();
