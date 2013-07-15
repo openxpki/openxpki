@@ -123,7 +123,7 @@ sub set_env
 sub cleanup
 {
     my $self = shift;
-return 1;
+
     $self->{CONFIG}->cleanup() if ($self->{CONFIG});
 
     foreach my $file (@{$self->{CLEANUP}->{FILE}})
