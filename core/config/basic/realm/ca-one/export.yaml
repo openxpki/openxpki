@@ -1,5 +1,7 @@
 smartcard:   
     max_records: 5
+    tmpdir: /var/tmp
+    umask: 0644
     key_namespace: certificate.privatekey
     queue_namespace: export.smartcard.transfer
     encryption_target:
@@ -10,6 +12,7 @@ smartcard:
         port: 22
         identity: /home/pkiadm/id_scp
         sshconfig: ''
+        unlink: 1
 
 
         

@@ -29,9 +29,9 @@ sub execute {
        
     my $ser = OpenXPKI::Serialization::Simple->new();
   	
-  	my $key_namespace = $context->param ( 'key_namespace' );
+    my $key_namespace = $context->param ( 'key_namespace' );
   	
-  	# Clear the target params (just in case we missed it)   
+    # Clear the target params (just in case we missed it)   
     $context->param( 'exported_cert_ids' , '');
     $context->param( 'xml_filename' ,  '' );
     $context->param( 'xml_targetname' , '' );
@@ -160,10 +160,15 @@ sub execute {
 		push @exported, $cert_identifier;
     } 
     
-	my $fh = File::Temp->new( UNLINK => 0 );	
+	my $fh = File::Temp->new( UNLINK => 0, DIR => $context->param( 'tmpfile_tmpdir' ) );	
   	my $xs = XML::Simple->new(RootName => 'certificates', ContentKey => '-content', OutputFile => $fh);
   	my $xml = $xs->XMLout( { certificate  => \@xmlout } );
   	    	  	
+	# Change mode of the file if requested	
+        if ($context->param( 'tmpfile_umask' )) {        
+            chmod $context->param( 'tmpfile_umask'), $fh->filename ;
+        }
+
 	# Put list of exported id in context to tag them later	
 	$context->param( 'exported_cert_ids' , $ser->serialize( \@exported ) );
 	

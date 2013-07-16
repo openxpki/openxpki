@@ -41,7 +41,24 @@ sub execute {
 	$context->param( 'key_namespace', $config->get( "$config_id.key_namespace" ) || 'certificate.privatekey');
 	$context->param( 'queue_namespace', $config->get( "$config_id.queue_namespace" ) || 'certificate.export.default');
     
-	# The encryption target is given by subject and realm (optional) or a list of ids      
+    # Tempdir and Umask for export file
+    $context->param( 'tmpfile_tmpdir' , $config->get( "$config_id.tmpdir" ) || '/var/tmp/' ); 
+
+    my $umask = $config->get( "$config_id.umask" );
+    if ($umask) {
+        $context->param( 'tmpfile_umask' , $umask ); 
+
+        if ( $umask !~ /^0[0-7]{3}$/) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_CERTEXPORT_GETCONFIG_WRONG_UMASK',
+                params => { umask => $context->param( 'tmpfile_umask' ) }
+            );
+        }
+    } else {
+        $context->param( 'tmpfile_umask', '' ); 
+    }
+
+    # The encryption target is given by subject and realm (optional) or a list of ids      
     my $enc_target = $config->get_hash( "$config_id.encryption_target" );
     
     if (!$enc_target || (!$enc_target->{subject})) {
@@ -84,13 +101,15 @@ Takes the path to the config from the context value "config_id".
 
 =head1 Configuration 
 
-	myexport:
-	 	max_records: 5
-	    key_namespace: certificate.privatekey
-	    queue_namespace: certificate.export.default
-	    encryption_target:
-	        subject: CN=Mailgateway,O=MyCompany,C=COM
-	        realm: server-ca
+    myexport:
+        tmpdir: /var/tmp
+        umask: 0640
+        max_records: 5
+        key_namespace: certificate.privatekey
+        queue_namespace: certificate.export.default
+        encryption_target:
+            subject: CN=Mailgateway,O=MyCompany,C=COM
+            realm: server-ca
         
 The keys max_records, key_namespace, queue_namespace are all optional, with the
 values above used as default.  
