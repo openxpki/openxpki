@@ -230,6 +230,9 @@ sub run {
         });
         
         ##! 16: 'child here'
+        
+        # Re-seed Perl random number generator 
+        srand(time ^ $PROCESS_ID);
 
         $self->{dbi}                      = CTX('dbi_workflow');
         $self->{hanging_workflows}        = {};

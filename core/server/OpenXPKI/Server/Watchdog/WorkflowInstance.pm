@@ -91,6 +91,9 @@ sub run {
         # We need to unset the child reaper (waitpid) as the universal waitpid 
         # causes problems with Proc::SafeExec  
         $SIG{CHLD} = 'DEFAULT';
+
+        # Re-seed Perl random number generator 
+        srand(time ^ $PROCESS_ID);
         
         # append fork info to process name
         $0 .= sprintf( ' watchdog reinstantiating %d', $wf_id );
