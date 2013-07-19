@@ -479,7 +479,7 @@ sub __scan_for_paused_workflows {
         COLUMNS => ['WORKFLOW_SERIAL'],
         DYNAMIC => {
             'WORKFLOW_PROC_STATE' => { VALUE => 'pause' },
-            'WATCHDOG_KEY'        => { VALUE => '' },
+            'WATCHDOG_KEY'        => { VALUE => '__CATCHME' },
             'WORKFLOW_WAKEUP_AT'  => { VALUE => time(), OPERATOR => 'LESS_THAN' },
         },
     );
@@ -590,7 +590,7 @@ sub __flag_and_fetch_workflow {
             WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
         },
         WHERE => {
-            WATCHDOG_KEY        => '',
+            WATCHDOG_KEY        => '__CATCHME',
             WORKFLOW_SERIAL     => $wf_id,
             WORKFLOW_PROC_STATE => 'pause'
         }

@@ -86,7 +86,10 @@ sub update_workflow {
 	   WORKFLOW_COUNT_TRY   => $workflow->count_try(),
 	   WORKFLOW_REAP_AT     => $workflow->reap_at() || 0,
 	   WORKFLOW_SESSION     => $workflow->session_info(),
-	   WATCHDOG_KEY         => '',#always reset the watchdog key, if the workflow is updated from within the API/Factory
+           # always reset the watchdog key, if the workflow is updated from within
+           # the API/Factory, as the worlds most famous db system is unable to 
+           # handle NULL values we use a literal....
+	   WATCHDOG_KEY         => '__CATCHME', 
 	);
     
     
