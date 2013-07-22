@@ -553,7 +553,10 @@ sub __get_extensions
             $config .= "extendedKeyUsage = $critical";
             my @bits = @{$profile->get_extension("extended_key_usage")};
             $config .= "clientAuth,"      if (grep /client_auth/,      @bits);
+            $config .= "serverAuth,"      if (grep /server_auth/,      @bits);
             $config .= "emailProtection," if (grep /email_protection/, @bits);
+            $config .= "codeSigning,"     if (grep /code_signing/, @bits);
+            $config .= "timeStamping,"    if (grep /time_stamping/, @bits);
             my @oids = grep m{\.}, @bits;
             foreach my $oid (@oids)
             {
