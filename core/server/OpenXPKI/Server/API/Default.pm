@@ -219,7 +219,7 @@ sub __fetch_input_element_definitions {
         if (!$input) {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_API_DEFAULT_NO_SUCH_INPUT_ELEMENT_DEFINED",
-                param => {
+                params => {
                     'input' => $input_name,
                     'profile' => $profile,
                 }
