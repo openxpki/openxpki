@@ -55,10 +55,15 @@ sub execute {
 
     my $set_context = $nice_backend->issueCertificate( $csr );
 
-    ##! 64: 'Setting Context ' . Dumper $set_context       
-    while (my ($key, $value) = each(%$set_context)) {
+    ##! 64: 'Setting Context ' . Dumper $set_context      
+#    while (my($key,$value) = each (%{$set_context})) {
+    foreach my $key (keys %{$set_context} ) {
+        my $value = $set_context->{$key};
+        ##! 64: "Set key: $key to value $value";
         $context->param( $key, $value );
     }
+
+    ##! 64: 'Context after issue ' .  Dumper $context
     	
 }
 

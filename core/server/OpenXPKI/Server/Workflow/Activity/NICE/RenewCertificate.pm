@@ -55,7 +55,9 @@ sub execute {
     my $set_context = $nice_backend->renewCertificate( $csr, $context->param( 'org_cert_identifier' ) );
     	
     ##! 64: 'Setting Context ' . Dumper $set_context       
-    while (my ($key, $value) = each(%$set_context)) {
+    #while (my ($key, $value) = each(%$set_context)) {
+    foreach my $key (keys %{$set_context} ) {
+        my $value = $set_context->{$key};
         $context->param( $key, $value );
     }
 }
