@@ -52,13 +52,14 @@ $test->connect_ok(
 ) or die "Error - connect failed: $@";
 
 my $serializer = OpenXPKI::Serialization::Simple->new();
-
+srand();
 my $sSubject = sprintf "nicetest-%01x.openxpki.test", rand(10000000);
 my $sAlternateSubject = sprintf "nicetest-%01x.openxpki.test", rand(10000000);
 
 my %cert_subject_parts = (
 	cert_subject_hostname => $sSubject,
-	cert_subject_port => 0,
+	cert_subject_hostname2 => [ "www2.$sSubject" , "www3.$sSubject" ],
+	cert_subject_port => 8080,
 );
 
 my %cert_info = (
@@ -77,7 +78,7 @@ my %cert_subject_alt_name_parts = (
 my %wfparam = (	
 	cert_role => $cfg{csr}{role},
 	cert_profile => $cfg{csr}{profile},
-	cert_subject_style => "00_tls_basic_style",
+	cert_subject_style => "00_basic_style",
 	cert_subject_parts => $serializer->serialize( \%cert_subject_parts ),
 	cert_subject_alt_name_parts => $serializer->serialize( { %cert_subject_alt_name_parts } ),
 	cert_info => $serializer->serialize( \%cert_info ),
@@ -124,7 +125,7 @@ $test->state_is('APPROVAL');
 
 $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR' );
 
-$test->param_like( 'cert_subject', "/^CN=$sSubject,.*/" , 'Certificate Subject');
+$test->param_like( 'cert_subject', "/^CN=$sSubject:8080,.*/" , 'Certificate Subject');
 
 $test->state_is('SUCCESS');
 

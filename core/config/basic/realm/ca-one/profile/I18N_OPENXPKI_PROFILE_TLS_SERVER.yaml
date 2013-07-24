@@ -8,12 +8,13 @@ increasing_serials: 1
 randomized_serial_bytes: 8
 
 style:
-    00_tls_basic_style:
+    00_basic_style:
         label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE
         description: I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC
         ui:
             subject:
                 - hostname
+                - hostname2
                 - port
 #            san: 
             info:
@@ -23,8 +24,12 @@ style:
                 - requestor_affiliation
                 - comment
 
-        subject: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
-        subject_alternative_names: dns=[% hostname %]
+        subject: 
+            dn: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
+            san: 
+              DNS: 
+              - "[% hostname %]"
+              - "[% FOREACH entry = hostname2 %][% entry %] | [% END %]"
 
     05_advanced_style:
         label: I18N_OPENXPKI_PROFILE_ADVANCED_STYLE
@@ -47,8 +52,9 @@ style:
                 - requestor_affiliation
                 - comment
 
-        subject: CN=[% CN %][% IF OU %][% FOREACH entry = OU %],OU=[% entry %][% END %][% END %][% IF O %],O=[% O %][% END %][% FOREACH entry = DC %],DC=[% entry %][% END %][% IF C %],C=[% C %][% END %]
-        subject_alternative_names: "[% FOREACH entry = EMAIL %],email=[% entry %][% FOREACH entry = DNS %],dns=[% entry %]"
+        subject:
+            dn: CN=[% CN %][% IF OU %][% FOREACH entry = OU %],OU=[% entry %][% END %][% END %][% IF O %],O=[% O %][% END %][% FOREACH entry = DC %],DC=[% entry %][% END %][% IF C %],C=[% C %][% END %]
+
 
 role:
 - Web Server

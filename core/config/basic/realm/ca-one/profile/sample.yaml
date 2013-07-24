@@ -21,7 +21,7 @@ randomized_serial_bytes: 8
 publish: 1
 
 style:
-    00_tls_basic_style:
+    00_basic_style:
         label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE
         description: I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC
         # Default style in bulk requests
@@ -36,7 +36,6 @@ style:
             subject:
                 - hostname
                 - port
-#           san: 
             info:
                 - requestor_gname
                 - requestor_name
@@ -45,9 +44,10 @@ style:
 
         # Subject is evaluated by template toolkit with the input data from the ui.subject fields
         # Note: Fields which have max > 1 are always passed as array
-        subject: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
-        # You can use the fields from ui.san and ui.subject here
-        subject_alternative_names: dns=[% hostname %]
+        subject: 
+            dn: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
+        # You can use the fields from ui.subject here
+            san: dns=[% hostname %]
 
     05_advanced_style:
         label: I18N_OPENXPKI_PROFILE_ADVANCED_STYLE
@@ -76,9 +76,10 @@ style:
 
         # Subject is evaluated by template toolkit with the input data from the ui.subject fields
         # Note: Fields which have max > 1 are always passed as array
-        subject: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
-        # You can use the fields from ui.san and ui.subject here
-        subject_alternative_names: email=[% mail %]
+        subject: 
+            dn: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
+        # No SAN definition here!
+ 
 
 role:
 - Web Server

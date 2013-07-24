@@ -65,6 +65,18 @@ hostname:
     width: 60
     default: fully.qualified.example.com
 
+hostname2:
+    id: hostname2
+    label: I18N_OPENXPKI_HOSTNAME
+    description: I18N_OPENXPKI_HOSTNAME_DESC
+    type: freetext
+    source: CN:([^:]+)
+    match: \A [A-Za-z\d\-\.]+ \z
+    width: 60
+    default: fully.qualified.example.com
+    min: 0
+    max: 100
+
 # Port Number
 port:
     id: port
@@ -209,13 +221,13 @@ san_oid:
           value: email
         - label: I18N_OPENXPKI_SAN_DNS
           description: I18N_OPENXPKI_SAN_DNS_DESCRIPTION
-          value: dns
+          value: DNS
         - label: I18N_OPENXPKI_SAN_IP
           description: I18N_OPENXPKI_SAN_IP_DESCRIPTION
-          value: ipv4
+          value: IP
         - label: I18N_OPENXPKI_SAN_URI
           description: I18N_OPENXPKI_SAN_URI_DESCRIPTION
-          value: uri
+          value: URI
         - label: I18N_OPENXPKI_SAN_GUID
           description: I18N_OPENXPKI_SAN_GUID_DESCRIPTION
           value: guid

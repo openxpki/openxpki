@@ -77,32 +77,13 @@ sub validate {
 
     # delete entries with empty values from @sans
     @sans = grep { $_->[1] ne '' } @sans;
-
-    ##! 64: '@sans: ' . Dumper \@sans
-
-#    foreach my $san (@sans) {
-#        if (! ref $subject_alt_name_parts->{$key}) {
-#            # translate scalars to one-element arrays    
-#            $subject_alt_name_parts->{$key} = [ $subject_alt_name_parts->{$key} ];
-#        }
-#        my @tmp = @{ $subject_alt_name_parts->{$key} };
-#        my @cleaned = grep { $_ ne '' } @tmp;
-#        if (scalar @cleaned == 0) {
-#            # everything was empty, delete the whole key
-#            delete $subject_alt_name_parts->{$key};
-#            # ... and the corresponding 'key' key
-#            $key =~ s{ _value \z}{_key}xms;
-#            delete $subject_alt_name_parts->{$key};
-#        }
-#        else {
-#            $subject_alt_name_parts->{$key} = \@cleaned;
-#        }
-#    }
-#    ##! 64: 'subject_alt_name_parts after deleting empty parts: ' . Dumper $subject_alt_name_parts
-
+ 
+    my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName','GUID','UPN','RID');
+ 
     ## now check every subject alternative name component
     foreach my $pair (@sans) {
-         my $type  = $pair->[0];
+         my $type  = $san_names{ lc($pair->[0]) };
+         
          my $value = $pair->[1];
 
          ## check existence of the fields
@@ -201,7 +182,7 @@ sub validate {
                  next;
              }
          }
-         elsif ($type eq "DirName")
+         elsif ($type eq "dirName")
          {
              ## actually we have no checks for DirName
          }
@@ -226,97 +207,13 @@ sub validate {
     if (scalar @{$errors} and scalar @{$errors} > $old_errors)
     {
         $context->param ("__error" => $errors);
-	CTX('log')->log(
+	    CTX('log')->log(
 	    MESSAGE  => 'Invalid subject alternative name (' . join(', ', @{$errors}) . ')',
 	    PRIORITY => 'error',
 	    FACILITY => 'system',
         );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
-    # save subject alt names in context
-    my $pkcs10 = $context->param('pkcs10');
-    my $styles;
-    if (defined $pkcs10) {
-        $styles = CTX('api')->get_cert_subject_styles({
-            PROFILE   => $profile,
-            PKCS10    => $pkcs10,
-        });
-    }
-    else {
-        $styles = CTX('api')->get_cert_subject_styles({
-            PROFILE   => $profile,
-        });
-    }
-    ##! 64: 'styles: ' . Dumper $styles
- 
-    # template evaluation for 'fixed' SANs
-    my $template_vars = {};
-    foreach my $key (keys %{ $subject_parts }) {
-        my ($template_key) = ($key =~ m{ \A cert_subject_(.*) \z }xms);
-        $template_vars->{$template_key} = $subject_parts->{$key};
-    }
-    foreach my $san (@{ $styles->{$subj_style}->{SUBJECT_ALTERNATIVE_NAMES} }) {
-         if ($san->{KEY}->{TYPE} eq 'fixed') {
-             my $template = $san->{VALUE}->{TEMPLATE};
-             my $tt = Template->new();
-             my $result = '';
-             ##! 64: 'template: ' . $template
-             ##! 64: 'template_vars: ' . Dumper $template_vars
-             # check if template vars contains variables that are arrays,
-             # if so (and the corresponding variable is used in the
-             # template), iterate over them
-             my $iterated = 0;
-             TEMPLATE_VARS:
-             foreach my $key (keys %{ $template_vars }) {
-                 ##! 64: 'key: ' . $key
-                 if (ref $template_vars->{$key} eq 'ARRAY') {
-                     ##! 64: '... is an array.'
-                     if ($template !~ /$key/) {
-                         ##! 64: 'template does not contain ' . $key . ', skipping.'
-                         next TEMPLATE_VARS;
-                     }
-                     $iterated = 1;
-                     # if we have an array, create a temporary template
-                     # vars hash ref that contains one element as a scalar
-                     # and evaluate those
-                     foreach my $value (@{ $template_vars->{$key} }) {
-                         ##! 64: 'iterating, value = ' . $value
-                         # copy the existing template_vars except for the
-                         # non-scalar key:
-                         my $temp_template_vars = {};
-                         COPY:
-                         foreach my $k (keys %{ $template_vars }) {
-                             next COPY if $k eq $key;
-                             $temp_template_vars->{$k} = $template_vars->{$k};
-                         }
-                         # replace the corresponding template var with
-                         # a scalar entry
-                         $temp_template_vars->{$key} = $value;
-                         ##! 64: 'copied template vars: ' . Dumper $temp_template_vars
-                         my $temp_result = '';
-                         $tt->process(\$template, $temp_template_vars, \$temp_result);
-                         if ($temp_result ne '') {
-                             push @sans, [ $san->{KEY}->{VALUE}, $temp_result ];
-                         }
-                     }
-                 }
-             }
-             ##! 64: 'sans after iteration: ' . Dumper \@sans
-
-             if (! $iterated) {
-                 # by default, just process the template with the template
-                 # vars and create (at most) one SAN entry in the @sans
-                 # array:
-                 $tt->process(\$template, $template_vars, \$result);
-                 if ($result ne '') {
-                     push @sans, [ $san->{KEY}->{VALUE}, $result ];
-                 }
-             }
-         }
-    }
-    ##! 64: 'sans after evaluating fixed: ' . Dumper \@sans
-    ##FIXME: A validator should not write into the context
-    $context->param('cert_subject_alt_name' => $ser->serialize(\@sans));
 
     return 1;
 }

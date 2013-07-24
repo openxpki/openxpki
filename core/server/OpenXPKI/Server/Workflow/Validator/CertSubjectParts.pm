@@ -159,37 +159,7 @@ sub validate {
 
         validation_error ($errors->[scalar @{$errors} -1]->[0]);
     }
-
-    # escape , in values
-    # TODO - what more do we need to escape?
-
-    foreach my $key (keys %{ $subject_parts }) {
-        foreach my $elt (@{ $subject_parts->{$key} }) {
-            $elt =~ s{,}{\\,}xmsg;
-        }
-    }
-    ##! 64: 'subject_parts after escaping: ' . Dumper $subject_parts
-
-    # save cert_subject to workflow context
-
-    my $template_vars = {};
-    foreach my $key (keys %{ $subject_parts }) {
-        my ($template_key) = ($key =~ m{ \A cert_subject_(.*) \z }xms);
-        if (scalar @{ $subject_parts->{$key} } == 1) {
-            $template_vars->{$template_key} = $subject_parts->{$key}->[0];
-        }
-        else {
-            $template_vars->{$template_key} = $subject_parts->{$key};
-        }
-    }
-    ##! 64: 'template_vars: ' . Dumper $template_vars
-
-    my $template = $styles->{$style}->{DN}; #'[% TAGS [- -] -%]' . 
-    my $tt = Template->new();
-    my $cert_subject = '';
-    $tt->process(\$template, $template_vars, \$cert_subject);
-
-    $context->param('cert_subject' => $cert_subject);
+ 
     return 1;
 }
 

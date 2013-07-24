@@ -328,14 +328,9 @@ sub get_cert_subject_styles {
             $styles->{$id}->{uc($key)} = $style_config->get($key);     
         }
 
-        # subject toolkit template
-        $styles->{$id}->{DN} = $style_config->get('subject'); 
-
-        # FIX ME Bulk Flag
-        ##! 16: 'bulk defined for this style'
-        $styles->{$id}->{BULK} = $style_config->get('bulk');
+        # subject + san toolkit template
+        $styles->{$id}->{DN} = $style_config->get('subject.dn');
         
-
         # The names of the fields are a list at ui.subject
         my @input_names = $style_config->get_list('ui.subject');        
         

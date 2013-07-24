@@ -76,7 +76,11 @@
         <arg>$pkcs10</arg>
       </validator>
   </action>
-  
+      
+  <action name="I18N_OPENXPKI_WF_ACTION_RENDER_SUBJECT"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject">      
+  </action>
+    
   <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_CREATION"
           class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
           message="csr_created">

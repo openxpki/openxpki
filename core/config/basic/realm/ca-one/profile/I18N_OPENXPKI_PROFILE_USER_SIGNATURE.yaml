@@ -20,8 +20,9 @@ style:
             info:
                 - comment
 
-        subject: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
-        subject_alternative_names: email=[% mail %]
+        subject: 
+            dn: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
+            san: email=[% mail %]
         
 role:
 - User
