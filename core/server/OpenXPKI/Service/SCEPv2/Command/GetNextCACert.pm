@@ -53,7 +53,11 @@ sub execute {
     ##! 16: 'ca_chains: ' . Dumper $chain->{CERTIFICATES};
      
     # $chain->{CERTIFICATES} is an arrayref of PEM blocks - we just merge it
-    my $nextca_chain = join "\n", @{$chain->{CERTIFICATES}};      
+    #my $nextca_chain = join "\n", @{$chain->{CERTIFICATES}};     
+    
+    ## FIXME - needs discussion, SCEP draft allows inclusion of RA which seems to be unsupported
+    # by openca-scep and is somewhat useless anyway. So we send only the root for now.
+    my $nextca_chain = pop @{$chain->{CERTIFICATES}};      
 
     # We need to create a signed reply, load scep token
     my $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
