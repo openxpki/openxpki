@@ -119,7 +119,9 @@
     </action>
 
     <action name="enroll_revoke_cert"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::RevokeCertificate">
+            class="OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate"
+            auto_approval="yes"
+            reason_code="superseded">
             <field name="cert_identifier" is_required="yes"/>
     </action>
 

@@ -239,6 +239,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCRL.pm
+OpenXPKI/Server/Workflow/Activity/Tools/RevokeCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/RenderSubject.pm
 
@@ -275,7 +276,6 @@ OpenXPKI/Server/Workflow/Activity/SCEPv2/FetchGroupPolicy.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/ExtractCSR.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/RevokeCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
