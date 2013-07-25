@@ -32,7 +32,6 @@
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_signing_request.xml"/>
 	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_revocation_request.xml"/>
    	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_personalization_v4.xml"/>
-  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_smartcard_pin_unblock.xml"/>
         <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator.xml"/> 
 	  </validators>
 	

@@ -178,6 +178,7 @@ OpenXPKI/Server/Authentication/External.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/Authentication/ClientX509.pm
+OpenXPKI/Server/Authentication/ChallengeX509.pm
 #OpenXPKI/Server/ACL.pm
 
 OpenXPKI/Server/Notification/RT.pm
@@ -238,6 +239,8 @@ OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCRL.pm
+
+OpenXPKI/Server/Workflow/Activity/Tools/RenderSubject.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
 
