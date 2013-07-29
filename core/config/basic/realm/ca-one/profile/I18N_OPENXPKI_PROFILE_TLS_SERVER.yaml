@@ -42,7 +42,7 @@ style:
                 - dc
                 - c
             san:
-                - san_email_fixed
+                - san_choice
                 - san_oid
 
             info:

@@ -22,7 +22,9 @@ style:
 
         subject: 
             dn: CN=[% realname %]+UID=[% username %],,DC=Test Deployment,DC=OpenXPKI,DC=org
-            san: email=[% email %]
+            san: 
+               email: "[% email %]"
+
 role:
 - User
 

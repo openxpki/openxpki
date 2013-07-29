@@ -90,7 +90,7 @@ port:
 
 # Combined DNs
 cn:
-    id: cn
+    id: CN
     label: CN
     description: I18N_OPENXPKI_CN_DESC
     type: freetext
@@ -187,29 +187,8 @@ comment:
 
 # SAN Types
 
-san_email_fixed:
-    id: email    
-    type: keyvalue          
-    key:        
-        type: fixed
-        value: email     
-    value:
-        type: fixed
-        value: "[% email %]" 
-
-san_dns_fixed:
-    id: dns    
-    type: keyvalue          
-    key:        
-        type: fixed
-        value: dns     
-    value:
-        type: fixed
-        value: "[% hostname %]" 
-
-
-san_oid:    
-    id: oid
+san_choice:    
+    id: choice
     type: keyvalue
     key:
         max: 1000
@@ -240,7 +219,17 @@ san_oid:
     value:
         type: freetext
         width: 40
-        
+
+san_oid:    
+    id: oid
+    type: keyvalue
+    key:
+        max: 1000
+        type: oid
+    value:
+        type: freetext
+        width: 40
+       
 # For future use, syntax not implemented yet!        
 san_dns:
     id: dns
@@ -252,7 +241,7 @@ san_dns:
     max: 20
 
 san_ipv4:
-    id: ipv4
+    id: ip
     label: I18N_OPENXPKI_SAN_IP
     description: I18N_OPENXPKI_SAN_IP_DESCRIPTION
     type: freetext

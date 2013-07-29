@@ -22,7 +22,8 @@ style:
 
         subject: 
             dn: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
-            san: email=[% mail %]
+            san: 
+               email: "[% mail %]"
         
 role:
 - User

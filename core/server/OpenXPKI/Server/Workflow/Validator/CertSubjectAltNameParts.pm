@@ -78,11 +78,9 @@ sub validate {
     # delete entries with empty values from @sans
     @sans = grep { $_->[1] ne '' } @sans;
  
-    my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName','GUID','UPN','RID');
- 
     ## now check every subject alternative name component
     foreach my $pair (@sans) {
-         my $type  = $san_names{ lc($pair->[0]) };
+         my $type  = lc($pair->[0]);
          
          my $value = $pair->[1];
 
@@ -110,7 +108,7 @@ sub validate {
                  next;
              }
          }
-         elsif ($type eq "DNS")
+         elsif ($type eq "dns")
          {
              ## www.openxpki.org
              if ($value !~ /^[0-9a-zA-Z\-]+(\.[0-9a-zA-Z\-]+)+$/)
@@ -121,7 +119,7 @@ sub validate {
                  next;
              }
          }
-         elsif ($type eq "IP")
+         elsif ($type eq "ip")
          {
              ## IPv4: 123.123.123.123
              ## IPv6: abcd:abcd:abcd:abcd:abcd:abcd:abcd:abcd
@@ -135,12 +133,12 @@ sub validate {
                  next;
              }
          }
-         elsif ($type eq "URI")
+         elsif ($type eq "uri")
          {
              ## actually we have no URI validator
              ## TODO - maybe use Data::Validate::URI ?
          }
-         elsif ($type eq "GUID")
+         elsif ($type eq "guid")
          {
              ## UUID (RFC 4122): f81d4fae-7dec-11d0-a765-00a0c91e6bf6
              ## Microsoft GUID:  F8:1d:4F ...
@@ -171,7 +169,7 @@ sub validate {
                  next;
              }
          }
-         elsif ($type eq "UPN")
+         elsif ($type eq "upn")
          {
              ## this should look like an emailaddress
              if (not Mail::RFC822::Address::valid ($value))
@@ -182,15 +180,15 @@ sub validate {
                  next;
              }
          }
-         elsif ($type eq "dirName")
+         elsif ($type eq "dirname")
          {
              ## actually we have no checks for DirName
          }
-         elsif ($type eq "RID")
+         elsif ($type eq "rid")
          {
              ## we have no checks for RIDs
          }
-         elsif ($type eq 'otherName') {
+         elsif ($type eq 'othername') {
             ## we have no checks for any OID, but we accept it
             ## if the type is an OID 
          }

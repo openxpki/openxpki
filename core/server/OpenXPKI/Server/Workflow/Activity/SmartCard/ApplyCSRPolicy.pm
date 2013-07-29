@@ -101,17 +101,7 @@ sub execute {
             }
         }
     }
-    
-    # The subject is contained in the styles - we look up the keys and take the first one
-    
-    my @styles = $config->get_keys( "profile.$cert_profile.style" );
-    @styles = sort @styles; 
-    my $style = shift @styles;
-
-    ##! 32: 'Using profile style ' . $style     
-    my $cert_subject_template = $config->get("profile.$cert_profile.style.$style.subject" );
-    my $sans_template = $config->get( "profile.$cert_profile.style.$style.subject_alternative_names" ) || '';
-                          
+                              
     #############################################################
     # Processing of UPN Mappings for Windows Login certificates
     #
@@ -229,23 +219,20 @@ sub execute {
                           
     ##! 32: ' Userinfo as passed to TT : ' . Dumper ( $userinfo )
                           
-    # process subject using TT
+    # process subject using TT via API
     
-    my $tt = Template->new();
-    my $cert_subject = '';
-    $tt->process(\$cert_subject_template, $userinfo, \$cert_subject);
+    my $cert_subject = CTX('api')->render_subject_from_template({
+        PROFILE => $cert_profile, 
+        VARS    => $userinfo
+    });
+        
     ##! 16: 'cert_subject: ' . $cert_subject
 
-    # process subject alternative names using TT    
-    my $cert_subj_alt_names = '';
-    $tt->process(\$sans_template, $userinfo, \$cert_subj_alt_names);
-    ##! 16: 'cert_subj_alt_names: ' . $cert_subj_alt_names
-
-    my @sans = split(/,/, $cert_subj_alt_names);
-    foreach my $entry (@sans) {
-        my @tmp_array = split(/=/, $entry);
-        $entry = \@tmp_array;
-    }
+    my @sans = CTX('api')->render_san_from_template({
+        PROFILE => $cert_profile, 
+        VARS    => $userinfo
+    });
+    
     ##! 16: '@sans: ' . Dumper(\@sans)
  
  

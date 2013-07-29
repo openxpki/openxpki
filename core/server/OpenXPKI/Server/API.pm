@@ -26,6 +26,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DN;
 use OpenXPKI::Server::API::Default;
 use OpenXPKI::Server::API::Object;
+use OpenXPKI::Server::API::Profile;
 use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Token;
 use OpenXPKI::Server::API::Visualization;
@@ -129,22 +130,7 @@ sub BUILD {
                     regex => $re_integer_string,
                 },
             },
-        },
-        'get_possible_profiles_for_role' => {
-            class  => 'Default',
-            params => {
-                'ROLE' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                },
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-            },
-            memoize => 1,
-        },        
+        },         
         'get_default_token' => {
             class  => 'Token',
             params => {                
@@ -577,63 +563,7 @@ sub BUILD {
         'get_roles' => {
             class  => 'Default',
             params => { },
-        },
-        'get_available_cert_roles' => {
-            class  => 'Default',
-            params => {
-                PROFILES => {
-                    type     => ARRAYREF,
-                    optional => 1,                    
-                },
-            },
-            memoize => 1,
-        },
-        'get_cert_profiles' => {
-            class  => 'Default',
-            params => { },
-            memoize => 1,
-        },
-        'get_cert_subject_profiles' => {
-            class  => 'Default',
-            params => {
-                PROFILE => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                },
-            },
-            memoize => 1,
-        },
-        'get_cert_subject_styles' => {
-            class  => 'Default',
-            params => {
-                PROFILE => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                },
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                PKCS10 => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_pkcs10,
-                },
-            },
-            memoize => 1,
-        },
-        'get_additional_information_fields' => {
-            class  => 'Default',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-            },
-            memoize => 1,
-        },
+        },       
         'get_servers' => {
             class  => 'Default',
             params => { },
@@ -698,7 +628,117 @@ sub BUILD {
             },
         },
         
-
+        ## Profile API
+         'get_possible_profiles_for_role' => {
+            class  => 'Profile',
+            params => {
+                'ROLE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
+            memoize => 1,
+        },    
+        'get_available_cert_roles' => {
+            class  => 'Profile',
+            params => {
+                PROFILES => {
+                    type     => ARRAYREF,
+                    optional => 1,                    
+                },
+            },
+            memoize => 1,
+        },
+        'get_cert_profiles' => {
+            class  => 'Profile',
+            params => { },
+            memoize => 1,
+        },
+        'get_cert_subject_profiles' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+            },
+            memoize => 1,
+        },
+        'get_cert_subject_styles' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+                PKCS10 => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_pkcs10,
+                },
+            },
+            memoize => 1,
+        },
+        'get_additional_information_fields' => {
+            class  => 'Profile',
+            params => {
+                CONFIG_ID => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
+            memoize => 1,
+        },
+        'render_subject_from_template' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,                    
+                    regex    => $re_alpha_string
+                },
+                STYLE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_alpha_string,
+                },
+                VARS => {
+                    type     => HASHREF,
+                },
+            },                       
+        },
+        'render_san_from_template' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,                    
+                    regex    => $re_alpha_string
+                },
+                STYLE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_alpha_string,
+                },
+                VARS => {
+                    type     => HASHREF,
+                },
+            },                       
+        },
+        'list_supported_san' => {
+            class  => 'Profile',
+            params => {}
+        },
+        
         ### Object API
         'get_csr_info_hash_from_data' => {
             class  => 'Object',

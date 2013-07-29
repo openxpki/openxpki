@@ -67,8 +67,6 @@ OpenXPKI/Crypto/Tool/PKCS7/CLI.pm
 OpenXPKI/Crypto/Tool/PKCS7/API.pm
 OpenXPKI/Crypto/Tool/PKCS7/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Tool/PKCS7/Command/verify.pm
-OpenXPKI/Crypto/Tool/PKCS7/Command/is_not_self_signed.pm
-OpenXPKI/Crypto/Tool/PKCS7/Command/get_subject.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/CLI.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/API.pm
@@ -161,6 +159,7 @@ OpenXPKI/Server.pm
 OpenXPKI/Server/API.pm
 OpenXPKI/Server/API/Default.pm
 OpenXPKI/Server/API/Object.pm
+OpenXPKI/Server/API/Profile.pm
 OpenXPKI/Server/API/Secret.pm
 OpenXPKI/Server/API/Smartcard.pm
 OpenXPKI/Server/API/Token.pm

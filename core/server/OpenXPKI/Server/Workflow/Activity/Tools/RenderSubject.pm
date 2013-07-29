@@ -29,8 +29,7 @@ sub execute {
     my $ser = new OpenXPKI::Serialization::Simple;
     my $result;
 
-    my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName','GUID','UPN','RID');
-
+ 
     # Get the profile name and style
     my $profile = $context->param('cert_profile');
     my $style = $context->param('cert_subject_style');
@@ -45,20 +44,6 @@ sub execute {
         );
     }
     
-    # Load the dn and san template from the profile definition
-    my $profile_path = "profile.$profile.style.$style.subject"; 
-    my $dn_template = $config->get("$profile_path.dn");
-    
-    if (!$dn_template) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RENDER_SUBJECT_NO_DN_TEMPLATE',
-            params  => {
-                PROFILE => $profile,
-                STYLE   => $style,
-            }
-        );
-    }    
-
     # Render the DN - get the input data from the context    
     my $template_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
     my $subject_vars = {};    
@@ -68,57 +53,63 @@ sub execute {
         $subject_vars->{$template_key} = $template_vars->{$key};
         # Escape Comma 
         $subject_vars->{$template_key} =~ s{,}{\\,}xmsg;
-    }   
-    my $cert_subject;
-    $tt->process(\$dn_template, $subject_vars, \$cert_subject);
-    
+    }
+       
+    my $cert_subject = CTX('api')->render_subject_from_template({
+        PROFILE => $profile,
+        STYLE   => $style,
+        VARS    => $subject_vars
+    });
+        
     if (!$cert_subject) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RENDER_SUBJECT_DN_RESULT_EMPTY',
             params  => {
-                TEMPLATE => $dn_template
+                PROFILE => $profile,
+                STYLE   => $style,
             }
         );
     }
-
-
+    
+    CTX('log')->log(
+        MESSAGE => "Rendering subject: $cert_subject",
+        PRIORITY => 'info',
+        FACILITY => [ 'workflow', ],
+    );         
+    
 
     # Check for SAN Template    
-    my @san_template_keys = $config->get_keys("$profile_path.san");
+    my @san_template_keys = $config->get_keys("profile.$profile.style.$style.san");
     
     my @san_list;    
     # If san template is defined we force template mode
     if (scalar @san_template_keys) {
         ##! 16: 'Template mode' 
-        
-        foreach my $type (@san_template_keys) {
-            my @entries;
-            ##! 32: 'SAN Type ' . $type            
-            my @values = $config->get_scalar_as_list("$profile_path.san.$type");
-            ##! 32: "Found SAN templates: " . Dumper @values;
-            # Correct the Spelling of the san type
-            $type = $san_names{lc($type)};
-            # Each list item is a template to be parsed
-            foreach my $line_template (@values) {  
-                my $result; 
-                $tt->process(\$line_template, $subject_vars, \$result);
-                ##! 32: "Result of $line_template: $result\n";
-                push @entries, $result if ($result);
-            }
-            
-            # Remove duplicates and split up internal multiples (sep by |)
-            my %items = map { my $key; $key =~ s/\s*(\S.*\S)\s*/$1/; $key => 1 } split("|", join ("|", @entries) );
-            
-            # convert to the internal format used by our crypto engine 
-            foreach my $value (keys %items) {
-                push @san_list, [ $type, $value ] if ($value);
-            }
-        }
+       
+        CTX('log')->log(
+            MESSAGE => "Rendering san using template style",
+            PRIORITY => 'debug',
+            FACILITY => [ 'workflow', ],
+        );         
+       
+        @san_list = @{CTX('api')->render_san_from_template({
+            PROFILE => $profile,
+            STYLE   => $style,
+            VARS    => $subject_vars
+        })};
         
     } elsif ( my $san_data = $context->param('cert_subject_alt_name_parts') ) {
         ##! 16: 'Freestyle mode'     
+
+        CTX('log')->log(
+            MESSAGE => "Rendering san using free style",
+            PRIORITY => 'debug',
+            FACILITY => [ 'workflow', ],
+        );         
                        
         my $subject_alt_name_parts = $ser->deserialize( $context->param('cert_subject_alt_name_parts') );
+        
+        my $san_names = CTX('api')->list_supported_san();
         
         # remap to a structured hash $san_items->{type}->{value} = 1
         my $san_items = {};
@@ -153,7 +144,7 @@ sub execute {
        
         # Map the items hash to the internal san_array structure
         foreach my $type (keys %{$san_items}) {
-            my $ctype = $san_names{lc($type)};
+            my $ctype = $san_names->{lc($type)};
             # convert to the internal format used by our crypto engine 
             foreach my $value (keys %{$san_items->{$type}}) {
                 push @san_list, [ $ctype, $value ] if ($value);
@@ -162,6 +153,11 @@ sub execute {
           
     } else {
         ##! 8: 'No SAN definition'
+        CTX('log')->log(
+            MESSAGE => "No san rendered as no input was available",
+            PRIORITY => 'debug',
+            FACILITY => [ 'workflow', ],
+        );                 
         
     }
 
@@ -202,7 +198,7 @@ Example:
   ui:
     subject:
     - hostname
-    - hostname2
+    - hostname2    
     - port
     
   subject: 
@@ -227,6 +223,39 @@ If you specify input fields in the ui section of your profile, the user can
 enter his desired values for each san key. The users input is mapped without
 further templating to the san section of the certificate (duplicate items and
 and leading/trailing whitespace are removed). 
+
+Example:
+
+   # In the style definition
+   ui:
+     san:
+        - san_dns
+        - san_ip
+   
+   # In the template section
+   template:   
+     san_dns:
+       id: dns
+       label: I18N_OPENXPKI_SAN_DNS
+       description: I18N_OPENXPKI_SAN_DNS_DESCRIPTION
+       type: freetext
+       width: 40
+       min: 0
+       max: 20
+
+    san_ip:
+       id: ip
+       label: I18N_OPENXPKI_SAN_IP
+       description: I18N_OPENXPKI_SAN_IP_DESCRIPTION
+       type: freetext
+       width: 15
+       min: 0
+       max: 20
+
+The above code will present the user up to 20 fields each to enter IPs or DNS
+names. Each entry will show up "as is" as a single san entry. Freestyle mode
+will also work if you populate the "cert_subject_alt_name_parts" context entry
+in the same way as the frontend does. 
 
 =head2 Parameters in context:
 
