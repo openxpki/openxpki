@@ -1026,53 +1026,6 @@ sub parseShapedGraphic {
             );
         }
     }
-    elsif ( $shape eq 'Rectangle' ) {
-        if ( exists $obj->{Line} ) {
-
-            # looks like the label of a line
-            $objs->{$sheetnum}->{$id} = WF::LineLabel->new;
-            $objs->{$sheetnum}->{$id}->text($text);
-            $objs->{$sheetnum}->{$id}->sheet($sheetnum);
-            $objs->{$sheetnum}->{$id}->oid($id);
-            $objs->{$sheetnum}->{$id}
-                ->lineId( $obj->{Line}->value()->{ID}->value() );
-            $condLabelsByLineId->{$sheetnum}
-                ->{ $obj->{Line}->value()->{ID}->value() } = $text;
-        }
-        else {
-            $objs->{$sheetnum}->{$id} = WF::Info->new;
-            $objs->{$sheetnum}->{$id}->text($text);
-            $objs->{$sheetnum}->{$id}->sheet($sheetnum);
-            $objs->{$sheetnum}->{$id}->oid($id);
-        }
-    }
-    elsif ( $shape eq 'House' ) {
-        my ( $page, $state ) = split( /:\s*/s, $text );
-        $state =~ s/\s/_/g;
-        $objs->{$sheetnum}->{$id} = WF::Goto->new;
-        $objs->{$sheetnum}->{$id}->text($text);
-        $objs->{$sheetnum}->{$id}->sheet($sheetnum);
-        $objs->{$sheetnum}->{$id}->oid($id);
-        $objs->{$sheetnum}->{$id}->page($page);
-        $objs->{$sheetnum}->{$id}->state($state);
-    }
-    elsif ( $shape eq 'ParallelLines' ) {
-
-        # ignore - from overview on main page
-    }
-    elsif (( $shape eq 'BevelledRectangle' )
-        or ( $shape eq 'FlattenedRectangle' ) )
-    {
-
-        #        warn "FlatRect: '", $text, "'";
-        my ( $name, $args ) = split( /\n/s, $text, 2 );
-        $name =~ s/\s/_/g;
-        $objs->{$sheetnum}->{$id} = WF::Validator->new;
-        $objs->{$sheetnum}->{$id}->text($name);
-        $objs->{$sheetnum}->{$id}->sheet($sheetnum);
-        $objs->{$sheetnum}->{$id}->oid($id);
-        $objs->{$sheetnum}->{$id}->args( [ split( /\s*, \s*/s, $args ) ] );
-    }
     else {
         print
             "parseShapedGrahic(): Unknown Object - ID=$id, Shape=$shape, text=$text\n";
