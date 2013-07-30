@@ -337,7 +337,7 @@ WriteMakefile(
         'Sys::SigAction'         => '0.06',
         'Template'               => '2.15',
 	'Test'                   => 1,
-	'Test::More'                   => 1,
+	'Test::More'                   => '0.98',
 	'Test::Pod'              => "1.00",
 	'Test::Pod::Coverage'    => "1.00",
 	'Text::CSV_XS'           => "0.23",
