@@ -10,6 +10,8 @@ scep-server-1:
     # How long a workflow can be reactivated
     #workflow_expiry: 000014 - unused
     
+    workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
+
     key_size:
     - 1024    
     - 2048

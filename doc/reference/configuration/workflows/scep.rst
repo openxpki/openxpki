@@ -11,10 +11,14 @@ Here is a complete sample configuration::
         retry_time: 0000000001
         renewal_period: 000014        
         grace_period: 000005        
-        workflow_expiry: 000014        
+        workflow_expiry: 000014
+        
+        workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
+                    
         key_size:
         - 1024    
         - 2048
+        
         authorized_signer_on_behalf:
             technicans:
                 subject: CN=.*DC=SCEP Signer CA,DC=mycompany,DC=com
@@ -63,6 +67,10 @@ If you want to allow renewals for an infinite period of time, set the ``allow_ex
 **workflow_expiry**
 
 Needs discussion if useful - used to expire the datapool lock.
+
+**workflow_type**
+
+The name of the workflow that is used by this server instance.
 
 **key_size**
 

@@ -1,7 +1,8 @@
 ## OpenXPKI::Service::SCEPv2::Command::PKIOperation
 ##
 ## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
+## Rewrite 2013 by Oliver Welter
+## (C) Copyright 2006-2013 by The OpenXPKI Project
 ##
 package OpenXPKI::Service::SCEPv2::Command::PKIOperation;
 use base qw( OpenXPKI::Service::SCEPv2::Command );
@@ -22,6 +23,24 @@ use Data::Dumper;
 use MIME::Base64;
 use Math::BigInt;
 use DateTime::Format::DateParse;
+
+=head1 Name
+
+OpenXPKI::Service::SCEPv2::Command::PKIOperation
+
+=head1 Description
+
+Implements the functionality required to answer SCEP PKIOperation messages.
+
+=head1 Functions
+
+=head2 execute
+
+Parses the PKCS#7 container for the message type, calls a function
+depending on that type and returns the result, including the HTTP
+header needed for the scep CGI script.
+
+=cut
 
 sub execute {
     my $self    = shift;
@@ -93,11 +112,36 @@ sub execute {
     return $self->command_response($result);
 }
 
-# TODO: this is just a hook at the moment. I thought I'd make this class
-# handle multiple workflow types, but we'll just leave it static for now.
+
+=head2 __get_workflow_type
+
+Read the workflow type that this server is configured for from the connector.
+ 
+=cut 
 sub __get_workflow_type : PRIVATE {
-    return 'I18N_OPENXPKI_WF_TYPE_ENROLLMENT';
+    
+    my $self      = shift;
+    my $server    = CTX('session')->get_server();
+    
+    my $workflow_type = CTX('config')->get("scep.$server.workflow_type");
+    
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_NO_WORKFLOW_TYPE_DEFINED",
+        params => {
+            SERVER => $server,
+            REALM =>  CTX('session')->get_pki_realm()
+        }
+    ) unless($workflow_type);
+    
+    return $workflow_type;
 }
+
+=head2 __send_cert
+
+Create the response for the GetCert request by extracting the serial number 
+from the request, find the certificate and return it.
+
+=cut
 
 sub __send_cert : PRIVATE {
     my $self      = shift;
@@ -170,6 +214,33 @@ sub __send_cert : PRIVATE {
     return $result;
 }
 
+=head2 __pkcs_req
+
+Called by execute if the message type is 'PKCSReq' (19). This is the
+message type that is used when an SCEP client asks for a certificate.
+Named parameters are TOKEN and PKCS7, where token is a token from the
+OpenXPKI::Crypto::TokenManager of type 'SCEP'. PKCS7 is the PKCS#7 data
+received from the client. Using the crypto token, the transaction ID of
+the request is acquired. Using this transaction ID, a database lookup is done
+(using the server API search_workflow_instances function) to see whether
+there is already an existing workflow corresponding to the transaction ID.
+
+If there is no workflow, a new one of type I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST
+is created and the (base64-encoded) PKCS#7 request as well as the transaction
+ID is saved in the workflow context. From there on, the work takes place in
+the workflow.
+
+If there is a workflow, the status of this workflow is looked up and the response
+depends on the status:
+  - if the status is not 'SUCCESS' or 'FAILURE', the request is still
+    pending, and a corresponding message is returned to the SCEP client.
+  - if the status is 'SUCESS', the certificate is extracted from the
+    workflow and returned to the SCEP client.
+  - if the status is 'FAILURE', the failure code is extracted from the
+    workflow and returned to the client
+
+=cut 
+
 sub __pkcs_req : PRIVATE {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -177,8 +248,6 @@ sub __pkcs_req : PRIVATE {
     my $pki_realm = CTX('session')->get_pki_realm();
     my $profile   = CTX('session')->get_profile();
     my $server    = CTX('session')->get_server();
-
-#warn "___DEBUG___: entered __pkcs_req()";
 
     my $workflow_type = $self->__get_workflow_type();
 
@@ -195,8 +264,6 @@ sub __pkcs_req : PRIVATE {
         }
     );
 
-#warn "___DEBUG___: transaction ID: $transaction_id";
-
     ##! 16: "transaction ID: $transaction_id"
     # get workflow instance IDs corresponding to transaction ID
     # TODO: This search should be limited to SCEP workflow types!!!
@@ -210,14 +277,10 @@ sub __pkcs_req : PRIVATE {
         }
     );
     ##! 16: 'workflows: ' . Dumper $workflows
-#warn '___DEBUG___: number of workflows found: ', scalar @{$workflows};
+
     my $failure_retry;
     if ( scalar @{$workflows} > 0 ) {
-
-
-foreach my $wf ( @{ $workflows } ) {
-    #warn '___DEBUG___: Workflow: ', Dumper($wf);
-}
+ 
         if ( $workflows->[0]->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE' ) {
 
             # the last workflow is in FAILURE, check the last update
@@ -233,8 +296,6 @@ foreach my $wf ( @{ $workflows } ) {
             # determine retry time from config
             my $retry_time = CTX('config')->get("scep.$server.retry_time");
             
-            #= CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$server} ->{'retry_time'};
-            
             if ( !defined $retry_time ) {
                 $retry_time = '000001';    # default is one day
             }
@@ -249,12 +310,12 @@ foreach my $wf ( @{ $workflows } ) {
             ##! 32: 'retry_date: ' . Dumper $retry_date
             if ( DateTime->compare( $last_update_dt, $retry_date ) == -1 ) {
                 ##! 64: 'last update is earlier than retry date, allow creation of new WF'
-              # set DB result to empty, so that it looks like no wf is present
+                # set DB result to empty, so that it looks like no wf is present
                 $workflows = [];
             }
             else {
                 ##! 64: 'last update is later than retry date, do not allow creation of new WF'
-    # only include the first FAILURE wf in the result -> SCEP failure response
+                # only include the first FAILURE wf in the result -> SCEP failure response
                 $workflows = [ $workflows->[0] ];
             }
         }
@@ -290,14 +351,7 @@ foreach my $wf ( @{ $workflows } ) {
     
     if ( scalar @workflow_ids == 0 ) {
         ##! 16: "no workflow was found, creating a new one"
-#warn "___DEBUG___: no workflow was found, creating a new one";
-
-     # NOTE: move $profile to beginning of sub so we can use it to determine
-     #       the workflow type. Also, the $server was already there, so we can
-     #       spare ourselves a call here by just using that one.
-     #        my $profile = CTX('session')->get_profile();
-     #        my $server  = CTX('session')->get_server();
-
+ 
         # inject newlines if not already present
         # this is necessary for openssl / openca-scep to parse
         # the data correctly
@@ -315,41 +369,34 @@ foreach my $wf ( @{ $workflows } ) {
             $pkcs7_base64 .= "\n";
         }
         ##! 64: 'pkcs7_base64 before create_wf_instance: ' . $pkcs7_base64
-#warn '___DEBUG___: pkcs7_base64 before create_wf_instance: ' . $pkcs7_base64;
 
-        ####
         #### Extract CSR from pkcs7
-        ####
         my $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7_base64 . "-----END PKCS7-----\n";
 
         # get a crypto token of type 'SCEP'
         my $token = $self->__get_token();
-            
-#warn "___DEBUG___: got crypto token from SCEP: ";
-#warn "___DEBUG___: pkcs7: ", $pkcs7;
-
+           
         my $pkcs10 = $token->command(
             {   COMMAND => 'get_pkcs10',
                 PKCS7   => $pkcs7,
             }
         );
-#warn "___DEBUG___: ran get_pkcs10";
+        
+        ##! 64: "pkcs10 is " . $pkcs10;
         if ( not defined $pkcs10 || $pkcs10 eq '' ) {
             OpenXPKI::Exception->throw( message =>
                     "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_PKCS10_UNDEFINED",
             );
         }
-#warn "___DEBUG___: pkcs10: ", $pkcs10;
 
         my $signer_cert = $token->command(
             {   COMMAND => 'get_signer_cert',
                 PKCS7   => $pkcs7,
             }
         );
-#warn "___DEBUG___: signer_cert: ", $signer_cert;        
+    
+        ##! 64: "signer_cert: " . $signer_cert        
         
-
-
         # The maximum age until the workflow is considered outdated 
         #my $expiry = CTX('config')->get("scep.$server.workflow_expiry");
         
@@ -379,9 +426,7 @@ foreach my $wf ( @{ $workflows } ) {
                     '_url_params' => $url_params,
                 }
             }
-        );
-
-#warn "___DEBUG___: created workflow: ", Dumper $wf_info;
+        );       
 
         ##! 16: 'wf_info: ' . Dumper $wf_info
         $workflow_ids[0] = $wf_info->{WORKFLOW}->{ID};
@@ -394,7 +439,7 @@ foreach my $wf ( @{ $workflows } ) {
                 ID       => $wf_id,
             }
         );
-#warn "___DEBUG___: check to retrigger workflow: ", Dumper $wf_info;        
+             
         # TODO - Branch can be substituted with Watchdog        
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'CA_KEY_NOT_USABLE' ) {
  
@@ -427,7 +472,7 @@ foreach my $wf ( @{ $workflows } ) {
                         ID       => $wf_id,
                     }
                 );
-#warn "___DEBUG___: retriggered workflow: ", Dumper $wf_info;                
+       
                 ##! 16: 'new state after triggering activity: ' . $wf_info->{WORKFLOW}->{STATE}
             }
         }
@@ -508,6 +553,11 @@ foreach my $wf ( @{ $workflows } ) {
     return $error_msg;
 }
 
+=head2 __get_token 
+
+Get the scep token from the crypto layer
+
+=cut
 sub __get_token {
            
     # TODO-SCEPv2 - swap active version
@@ -515,15 +565,12 @@ sub __get_token {
     # HEAD Version
     my $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
     my $token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
-    
-    # LEGACY Version
-    # get a crypto token of type 'SCEP'
-    # my $token = CTX('pki_realm')->{$pki_realm}->{scep}->{id}->{$server}->{crypto};
 
     if ( !defined $token ) {
-        ##! 64: Dumper CTX('pki_realm')->{$pki_realm}->{scep}
-        OpenXPKI::Exception->throw( message =>
-                'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING',
+        ##! 16: "No token found for alias $scep_token_alias"
+        OpenXPKI::Exception->throw( 
+            message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING',
+            params => { ALIAS => $scep_token_alias }
         );
     }
     
@@ -534,45 +581,4 @@ sub __get_token {
 
 1;    # magic one at the end of module
 __END__
-
-=head1 Name
-
-OpenXPKI::Service::SCEPv2::Command::PKIOperation
-
-=head1 Description
-
-Implements the functionality required to answer SCEP PKIOperation messages.
-
-=head1 Functions
-
-=head2 execute
-
-Parses the PKCS#7 container for the message type, calls a function
-depending on that type and returns the result, including the HTTP
-header needed for the scep CGI script.
-
-=head2 __pkcs_req
-
-Called by execute if the message type is 'PKCSReq' (19). This is the
-message type that is used when an SCEP client asks for a certificate.
-Named parameters are TOKEN and PKCS7, where token is a token from the
-OpenXPKI::Crypto::TokenManager of type 'SCEP'. PKCS7 is the PKCS#7 data
-received from the client. Using the crypto token, the transaction ID of
-the request is acquired. Using this transaction ID, a database lookup is done
-(using the server API search_workflow_instances function) to see whether
-there is already an existing workflow corresponding to the transaction ID.
-
-If there is no workflow, a new one of type I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST
-is created and the (base64-encoded) PKCS#7 request as well as the transaction
-ID is saved in the workflow context. From there on, the work takes place in
-the workflow.
-
-If there is a workflow, the status of this workflow is looked up and the response
-depends on the status:
-  - if the status is not 'SUCCESS' or 'FAILURE', the request is still
-    pending, and a corresponding message is returned to the SCEP client.
-  - if the status is 'SUCESS', the certificate is extracted from the
-    workflow and returned to the SCEP client.
-  - if the status is 'FAILURE', the failure code is extracted from the
-    workflow and returned to the client
-
+ 

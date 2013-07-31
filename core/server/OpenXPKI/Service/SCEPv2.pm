@@ -60,26 +60,6 @@ sub __init_profile : PRIVATE {
     my $arg_ref = shift;
 
     my $config = CTX('config');
-    
-=begin    
-    my $realm = CTX('session')->get_pki_realm();
-
-    # check endentity profile list
-    my @list = sort keys %{ CTX('pki_realm')->{$realm}->{endentity}->{id} };
-    ##! 16: Dumper(@list)
-    if ( scalar @list < 1 ) {
-        ##! 4: "no endentity profiles configured"
-        OpenXPKI::Exception->throw( message =>
-                "I18N_OPENXPKI_SERVICE_SCEP_NO_ENDENTITY_PROFILES_CONFIGURED",
-        );
-    }
-
-    ##! 2: "build hash with names"
-    my %profiles = ();
-    foreach my $profile (@list) {
-        $profiles{$profile}->{NAME} = $profile;
-    }
-=cut
 
     my $message = $self->collect();
     ##! 16: "message collected: " . Dumper($message)
@@ -142,7 +122,6 @@ sub __init_server : PRIVATE {
     my %scep_config = map {$_ => 1} @scep_config;
     
     if ($scep_config{$requested_server})
-    #if (exists CTX('pki_realm')->{$realm}->{scep}->{id}->{$requested_server} )
     {
         # the server is valid
         $self->talk('OK');
@@ -206,8 +185,6 @@ sub __init_session : PRIVATE {
 
     my $session = undef;
 
-    # TODO-SCEPv2 - We need a fat session for the new config layer
-    # Use the MOCK session for legacy system
     $session = OpenXPKI::Server::Session->new({
         DIRECTORY => CTX('config')->get("system.server.session.directory"),
         LIFETIME  => CTX('config')->get("system.server.session.lifetime"),                       
@@ -224,24 +201,7 @@ sub __init_pki_realm : PRIVATE {
     my $arg   = shift;
 
     ##! 1: "start"
-
-=begin
-    ##! 2: "check if there is more than one PKI realm"
-    my @list = sort keys %{ CTX('pki_realm') };
-    if ( scalar @list < 1 ) {
-        ##! 4: "no PKI realm configured"
-        OpenXPKI::Exception->throw( message =>
-                "I18N_OPENXPKI_SERVICE_SCEP_GET_PKI_REALM_NO_REALM_CONFIGURED",
-        );
-    }
-
-    ##! 2: "build hash with names"
-    my %realms = ();
-    foreach my $realm (@list) {
-        $realms{$realm}->{NAME} = $realm;
-    }
-=cut
-
+ 
     my $message = $self->collect();
     ##! 16: "message collected: $message"
     my $requested_realm;
