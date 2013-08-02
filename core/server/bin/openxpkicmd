@@ -24,6 +24,7 @@ my %params = (
     wfid => undef,
     wfaction => undef,        
     param => [],
+    nosplit => undef,
     );
 
 sub debug {
@@ -45,6 +46,7 @@ GetOptions(\%params,
                 wfid=i
                 wfaction=s
                 param|set=s@
+                nosplit
                 debug
 	     )) or pod2usage(-verbose => 0);
 
@@ -59,7 +61,12 @@ my $wf_type = shift;
 
 # expect foo=bar or foo:bar in @param, split at assignment and
 # build hash
-my @wf_parameters = split(/,/, join(',', @{$params{param}}));
+my @wf_parameters;
+if ( $params{nosplit} ) {
+    @wf_parameters = @{$params{param}};
+} else {
+    @wf_parameters = split(/,/, join(',', @{$params{param}}));
+}
 my %wf_parameters;
 foreach my $entry (@wf_parameters) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
@@ -233,6 +240,7 @@ openxpkicmd [options] WORKFLOW_TYPE
     --authuser USER       authentication user (optional)
     --authpass PASS       password for authentication user (optional)
     --param KEY=VALUE     pass VALUE to WF parameter KEY (optional)
+    --nosplit             Supress splitting of given WF param on comma
     --wfid                Pickup WF with this id at its current state
     --wfaction            Execute action on exisiting workflow
     --debug               enable debug mode
