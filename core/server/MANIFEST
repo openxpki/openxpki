@@ -24,7 +24,7 @@ openxpki.xsd
 ## Client
 OpenXPKI/Client.pm
 OpenXPKI/Client/API.pm
-OpenXPKI/Client/SCEPv2.pm
+OpenXPKI/Client/SCEP.pm
 
 ## Config Layers
 OpenXPKI/Config/Merge.pm
@@ -378,12 +378,12 @@ OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
 OpenXPKI/Service/Default/Command/nop.pm
 
-OpenXPKI/Service/SCEPv2.pm
-OpenXPKI/Service/SCEPv2/Command/PKIOperation.pm
-OpenXPKI/Service/SCEPv2/Command/GetCACert.pm
-OpenXPKI/Service/SCEPv2/Command/GetNextCACert.pm
-OpenXPKI/Service/SCEPv2/Command/GetCACaps.pm
-OpenXPKI/Service/SCEPv2/Command.pm
+OpenXPKI/Service/SCEP.pm
+OpenXPKI/Service/SCEP/Command/PKIOperation.pm
+OpenXPKI/Service/SCEP/Command/GetCACert.pm
+OpenXPKI/Service/SCEP/Command/GetNextCACert.pm
+OpenXPKI/Service/SCEP/Command/GetCACaps.pm
+OpenXPKI/Service/SCEP/Command.pm
 
 ## test stuff
 
@@ -623,6 +623,6 @@ bin/openxpkicli
 bin/openxpkicmd
 
 # cgi stuff
-cgi-bin/scepv2
+cgi-bin/scep
 
 

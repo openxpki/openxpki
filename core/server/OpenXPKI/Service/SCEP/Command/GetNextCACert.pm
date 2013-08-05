@@ -1,12 +1,12 @@
-## OpenXPKI::Service::SCEPv2::Command::GetNextCACert
+## OpenXPKI::Service::SCEP::Command::GetNextCACert
 ##
-package OpenXPKI::Service::SCEPv2::Command::GetNextCACert;
+package OpenXPKI::Service::SCEP::Command::GetNextCACert;
 
 use English;
 
 use Class::Std;
 
-use base qw( OpenXPKI::Service::SCEPv2::Command );
+use base qw( OpenXPKI::Service::SCEP::Command );
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -81,7 +81,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Service::SCEPv2::Command::GetNextCACert
+OpenXPKI::Service::SCEP::Command::GetNextCACert
 
 =head1 Description
  

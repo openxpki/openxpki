@@ -34,7 +34,7 @@ service:
         enabled: 1
         timeout: 120
         
-    SCEPv2: 
+    SCEP: 
         enabled: 1
 
 # settings for i18n        

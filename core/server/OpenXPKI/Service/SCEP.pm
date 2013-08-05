@@ -1,9 +1,9 @@
-## OpenXPKI::Service::SCEPv2
+## OpenXPKI::Service::SCEP
 ##
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
 
-package OpenXPKI::Service::SCEPv2;
+package OpenXPKI::Service::SCEP;
 
 use base qw( OpenXPKI::Service );
 
@@ -22,7 +22,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session::Mock;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Service::SCEPv2::Command;
+use OpenXPKI::Service::SCEP::Command;
 use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
 
@@ -319,7 +319,7 @@ MESSAGE:
 
                 my $command;
                 eval {
-                    $command = OpenXPKI::Service::SCEPv2::Command->new(
+                    $command = OpenXPKI::Service::SCEP::Command->new(
                         {   COMMAND => $received_command,
                             PARAMS  => $received_params,
                         }
@@ -424,7 +424,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Service::SCEPv2 - SCEP service implementation
+OpenXPKI::Service::SCEP - SCEP service implementation
 
 =head1 Description
 

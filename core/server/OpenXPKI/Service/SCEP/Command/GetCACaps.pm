@@ -1,15 +1,15 @@
-## OpenXPKI::Service::SCEPv2::Command::GetCACaps
+## OpenXPKI::Service::SCEP::Command::GetCACaps
 ##
 ## Written 2013 by Oliver Welter for the OpenXPKI project
 ## (C) Copyright 2013 by The OpenXPKI Project
 ##
-package OpenXPKI::Service::SCEPv2::Command::GetCACaps;
+package OpenXPKI::Service::SCEP::Command::GetCACaps;
 
 use English;
 
 use Class::Std;
 
-use base qw( OpenXPKI::Service::SCEPv2::Command );
+use base qw( OpenXPKI::Service::SCEP::Command );
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -45,7 +45,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Service::SCEPv2::Command::GetCACaps
+OpenXPKI::Service::SCEP::Command::GetCACaps
 
 =head1 Description
 

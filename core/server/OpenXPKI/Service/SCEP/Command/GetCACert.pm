@@ -1,15 +1,15 @@
-## OpenXPKI::Service::SCEPv2::Command::GetCACert
+## OpenXPKI::Service::SCEP::Command::GetCACert
 ##
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
 ##
-package OpenXPKI::Service::SCEPv2::Command::GetCACert;
+package OpenXPKI::Service::SCEP::Command::GetCACert;
 
 use English;
 
 use Class::Std;
 
-use base qw( OpenXPKI::Service::SCEPv2::Command );
+use base qw( OpenXPKI::Service::SCEP::Command );
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -109,7 +109,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Service::SCEPv2::Command::GetCACert
+OpenXPKI::Service::SCEP::Command::GetCACert
 
 =head1 Description
 

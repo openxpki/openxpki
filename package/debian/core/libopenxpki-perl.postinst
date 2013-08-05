@@ -40,7 +40,7 @@ case "$1" in
 	   test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
 	   
 	   # scep config
-       test -e /etc/openxpki/scepv2.conf || cp /usr/share/doc/libopenxpki-perl/examples/scepv2.conf /etc/openxpki/ 
+       test -e /etc/openxpki/scep/default.conf || cp /usr/share/doc/libopenxpki-perl/examples/scep.conf /etc/openxpki/scep/default.conf 
 	   
 	   # No config - load sample config       
 	   if [ ! -e /etc/openxpki/config.d/ ]; then

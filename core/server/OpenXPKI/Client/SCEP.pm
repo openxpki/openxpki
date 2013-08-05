@@ -1,8 +1,8 @@
-# OpenXPKI::Client::SCEPv2
+# OpenXPKI::Client::SCEP
 # Written 2006 by Alexander Klink for the OpenXPKI project
 # (C) Copyright 2006 by The OpenXPKI Project
 
-package OpenXPKI::Client::SCEPv2;
+package OpenXPKI::Client::SCEP;
 
 use base qw( OpenXPKI::Client );
 use OpenXPKI::Server::Context qw( CTX );
@@ -18,7 +18,7 @@ use Data::Dumper;
     use Class::Std;
 
     use OpenXPKI::i18n qw( i18nGettext );
-    use OpenXPKI::Debug 'OpenXPKI::Client::SCEPv2';
+    use OpenXPKI::Debug 'OpenXPKI::Client::SCEP';
     use OpenXPKI::Exception;
 
     my %operation_of :ATTR( :init_arg<OPERATION> ); # SCEP operation
@@ -106,26 +106,26 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Client::SCEPv2 - OpenXPKI Simple Certificate Enrollment Protocol Client
+OpenXPKI::Client::SCEP - OpenXPKI Simple Certificate Enrollment Protocol Client
 
 
 =head1 VERSION
 
-This document describes OpenXPKI::Client::SCEPv2 version $VERSION
+This document describes OpenXPKI::Client::SCEP version $VERSION
 
 
 =head1 SYNOPSIS
 
-    use OpenXPKI::Client::SCEPv2;
+    use OpenXPKI::Client::SCEP;
     use CGI;
 
     my $query     = CGI->new();
     my $operation = $query->param('operation');
     my $message   = $query->param('message');
     
-    my $scep_client = OpenXPKI::Client::SCEPv2->new(
+    my $scep_client = OpenXPKI::Client::SCEP->new(
         {
-        SERVICE    => 'SCEPv2',
+        SERVICE    => 'SCEP',
         REALM      => $realm,
         SOCKETFILE => $socket,
         TIMEOUT    => 120, # TODO - make configurable?
@@ -139,7 +139,7 @@ This document describes OpenXPKI::Client::SCEPv2 version $VERSION
 
 =head1 DESCRIPTION
 
-OpenXPKI::Client::SCEPv2 acts as a client that sends an SCEP request
+OpenXPKI::Client::SCEP acts as a client that sends an SCEP request
 to the OpenXPKI server. It is typically called from within a CGI
 script that acts as the SCEP server.
 

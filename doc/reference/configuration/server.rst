@@ -77,7 +77,7 @@ The transport setting is reserved for future use, leave it untouched.
             enabled: 1
             timeout: 120
         
-        SCEPv2: 
+        SCEP: 
             enabled: 1
 
 The *service* block lists all services to be enabled, the key is the name of the service, the *enabled* key is supported by all services, for all other parameters consult the concrete service documentation (perldoc OpenXPKI::Service::<ServiceName>). 

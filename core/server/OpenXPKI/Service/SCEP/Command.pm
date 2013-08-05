@@ -1,4 +1,4 @@
-## OpenXPKI::Service::SCEPv2::Command
+## OpenXPKI::Service::SCEP::Command
 ##
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-package OpenXPKI::Service::SCEPv2::Command;
+package OpenXPKI::Service::SCEP::Command;
 use English;
 
 use Class::Std;
@@ -48,7 +48,7 @@ sub START {
     ##! 1: "START"
     ##! 2: ref $self
     # only in Command.pm base class: get implementation
-    if (ref $self eq 'OpenXPKI::Service::SCEPv2::Command') {
+    if (ref $self eq 'OpenXPKI::Service::SCEP::Command') {
         ##! 4: Dumper $arg_ref
 	$self->attach_impl($arg_ref);
     }
@@ -78,7 +78,7 @@ sub attach_impl : PRIVATE {
 	    });
     }
 
-    my $base = 'OpenXPKI::Service::SCEPv2::Command';
+    my $base = 'OpenXPKI::Service::SCEP::Command';
 
     if (defined $cmd && $allowed_command{$cmd}) {
 	# command was white-listed and explicitly allowed
@@ -130,7 +130,7 @@ sub execute {
     } else {
 	##! 16: "ref child: " . ref $command_impl{$ident}
 	if (ref $command_impl{$ident}
-	    eq 'OpenXPKI::Service::SCEPv2::Command::' . $command{$ident}) {
+	    eq 'OpenXPKI::Service::SCEP::Command::' . $command{$ident}) {
 	    ##! 16: "implementation is present, delegating"
 	    return $command_impl{$ident}->execute(
 	        {
@@ -179,7 +179,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Service::SCEPv2::Command
+OpenXPKI::Service::SCEP::Command
 
 =head1 Description
 
@@ -209,7 +209,7 @@ by the execute() method.
 When attaching the implementation the class tries to 'use'
 an actual Perl module which is named like the command. E. g.
 if command 'foo' is requested, it tries to attach 
-OpenXPKI::Service::SCEPv2::Command::foo.pm.
+OpenXPKI::Service::SCEP::Command::foo.pm.
 
 =head2 execute
 

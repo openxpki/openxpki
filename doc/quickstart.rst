@@ -119,7 +119,7 @@ The SCEP logic is already included in the core distribution but you need to
 setup a wrapper to access the service through your webserver.
     
 The package installs a wrapper script into /usr/lib/cgi-bin/ and a config file
-at /etc/openxpki/scepv2.conf. For a testdrive, there is no need for any 
+at /etc/openxpki/scep/default.conf. For a testdrive, there is no need for any 
 configuration.
 
 The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the 
@@ -133,14 +133,14 @@ e.g. https://github.com/certnanny/sscep).
 Check if the service is working properly at all::
 
     mkdir tmp
-    ./sscep getca -c tmp/cacert -u http://yourhost/cgi-bin/scepv2
+    ./sscep getca -c tmp/cacert -u http://yourhost/cgi-bin/scep
     
 Should show and download a list of the root certificates to the tmp folder.
 
 To test an enrollment::
 
     openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
-    ./sscep enroll -u http://yourhost/cgi-bin/scepv2 \
+    ./sscep enroll -u http://yourhost/cgi-bin/scep \
         -k tmp/scep-test.key -r tmp/scep-test.csr \
         -c tmp/cacert-0 \
         -l tmp/scep-test.crt \ 

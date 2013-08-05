@@ -1,11 +1,11 @@
-## OpenXPKI::Service::SCEPv2::Command::PKIOperation
+## OpenXPKI::Service::SCEP::Command::PKIOperation
 ##
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## Rewrite 2013 by Oliver Welter
 ## (C) Copyright 2006-2013 by The OpenXPKI Project
 ##
-package OpenXPKI::Service::SCEPv2::Command::PKIOperation;
-use base qw( OpenXPKI::Service::SCEPv2::Command );
+package OpenXPKI::Service::SCEP::Command::PKIOperation;
+use base qw( OpenXPKI::Service::SCEP::Command );
 
 use strict;
 
@@ -26,7 +26,7 @@ use DateTime::Format::DateParse;
 
 =head1 Name
 
-OpenXPKI::Service::SCEPv2::Command::PKIOperation
+OpenXPKI::Service::SCEP::Command::PKIOperation
 
 =head1 Description
 
@@ -560,7 +560,7 @@ Get the scep token from the crypto layer
 =cut
 sub __get_token {
            
-    # TODO-SCEPv2 - swap active version
+    # TODO-SCEP - swap active version
          
     # HEAD Version
     my $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
