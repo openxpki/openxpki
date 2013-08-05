@@ -9,7 +9,6 @@ PACKAGES=\
 	perl-openxpki-core \
 	perl-openxpki-client-html-mason \
 	openxpki-i18n \
-	perl-openxpki-client-scep \
 	perl-openxpki-client-html-sc 
 
 # CPAN dependencies that we'd like packaged for the target 

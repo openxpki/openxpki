@@ -67,6 +67,9 @@ CFLAGS="$RPM_OPT_FLAGS"
 
 %{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
 
+install -d -D -m 755 %{buildroot}/usr/local/lib/
+install -D -m 755 cgi-bin/scep %{buildroot}/usr/local/lib/scep-handler.cgi
+
 cmd=/usr/share/spec-helper/compress_files
 [ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
 [ -x $cmd ] && $cmd
