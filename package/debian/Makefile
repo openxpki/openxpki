@@ -17,8 +17,7 @@
 PACKAGES=			\
 	core			\
 	i18n 			\
-	mason-html-client \
-	scep-client
+	mason-html-client 
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
@@ -39,9 +38,7 @@ EXTERNAL=				\
 	Proc__SafeExec \
 	XML__Filter__XInclude \
 	Workflow \
-	Digest__SHA1 
-
-EXTERNAL2= \
+	Digest__SHA1 \
 	Connector
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) DateTime__Format__DateParse
@@ -62,12 +59,6 @@ $(EXTERNAL) $(EXTERNAL2):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
-
-# Development Builds from git repos
-Connector:
-	test -d deb || mkdir deb
-	test -d deb/cpan/Connector || git clone git://github.com/mrscotty/connector.git  deb/cpan/Connector
-	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --desc Connector --version 0.`date +%Y%m%d`  --build Connector/
 
 DateTime__Format__DateParse:
 	test -d deb || mkdir deb
