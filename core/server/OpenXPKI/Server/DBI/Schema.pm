@@ -446,12 +446,7 @@ my %INDEX_of = (
 		NAME  => 'cert_status_index',
 		TABLE => 'CERTIFICATE',
 		COLUMNS => [ 'STATUS' ],
-    },
-    CERTIFICATE_ROLE_IDENTIFIER => {
-		NAME  => 'cert_role_index',
-		TABLE => 'CERTIFICATE',
-		COLUMNS => [ 'ROLE' ],
-    },
+    }, 
     WORKFLOW_HISTORY_WFSERIAL => {
 		NAME  => 'wf_hist_wfserial_index',
 		TABLE => 'WORKFLOW_HISTORY',

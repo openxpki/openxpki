@@ -508,7 +508,7 @@ sub get_dbi
 
     my $db_config = $xml_config->get_hash($dbpath);
     
-    foreach my $key qw(type name namespace host port user passwd) {
+    foreach my $key (qw(type name namespace host port user passwd)) {
         ##! 16: "dbi: $key => " . $db_config->{$key}
         $params{uc($key)} = $db_config->{$key}; 
     }     

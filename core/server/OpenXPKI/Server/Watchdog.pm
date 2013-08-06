@@ -341,12 +341,12 @@ sub _sig_hup {
     my $new_cfg = $config->get_hash('system.watchdog');
         
     # set the config values from new head
-    foreach my $key qw(max_fork_redo
+    foreach my $key (qw(max_fork_redo
         max_exception_threshhold
         max_tries_hanging_workflows 
         interval_wait_initial
         interval_loop_idle
-        interval_loop_run) {
+        interval_loop_run)) {
                 
         if ($new_cfg->{$key}) {
             ##! 16: 'Update key ' . $key 

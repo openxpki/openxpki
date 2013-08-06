@@ -407,7 +407,7 @@ sub alias_add {
             'ORDER' => [ 'GENERATION' ],
             'REVERSE' => 1,                       
         );        
-        $insert_hash{GENERATION} = $next_generation->{GENERATION} + 1; 
+        $insert_hash{GENERATION} = ($next_generation->{GENERATION} || 0) + 1; 
         $insert_hash{GROUP_ID} = $group;
         $insert_hash{ALIAS} = sprintf "%s-%01d", $group, $insert_hash{GENERATION};   
              
