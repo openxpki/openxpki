@@ -86,9 +86,7 @@ RA Operator:
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
     - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
-    - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
     - I18N_OPENXPKI_WF_TYPE_TESTING
-    - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD
 
     access:
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
@@ -114,22 +112,14 @@ RA Operator:
         I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
             creator: .*
         
-        I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE:
-            creator: .*
-            context:
-                show: .*
-                hide: encrypted_.*
-        
         I18N_OPENXPKI_WF_TYPE_TESTING:
             creator: .*
             context:
-                show: .*
-                
+                show: .*                 
+
         I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4:
             creator: .*               
-            
-        I18N_OPENXPKI_WF_TYPE_SMARTCARD_PUK_UPLOAD:
-            creator: .*               
+
         
 CA Operator:
     create:
@@ -156,9 +146,6 @@ CA Operator:
             creator: .*
         
         I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
-            creator: .*
-        
-        I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE:
             creator: .*
         
         I18N_OPENXPKI_WF_TYPE_TESTING:

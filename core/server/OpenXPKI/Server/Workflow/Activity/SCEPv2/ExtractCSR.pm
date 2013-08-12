@@ -201,26 +201,8 @@ sub execute {
     $context->param('signer_sn_matches_csr' => ($signer_subject eq $csr_subject) ? 1 : 0);
                     
     # Validate the signature    
-    # TODO-SCEPv2 - use old token api
     my $pkcs7_token = CTX('crypto_layer')->get_system_token({ TYPE => 'PKCS7' });
     my $pkcs7 = $context->param('_pkcs7');
-    
-=begin    
-     
-    my $pki_realm = CTX('session')->get_pki_realm(); 
-    my $cfg_id = CTX('api')->get_config_id({ ID => $workflow->id() });
-          
-    my $pkcs7_token = CTX('crypto_layer')->get_token(
-        TYPE      => 'PKCS7',
-        ID        => $pkcs7tool,
-        PKI_REALM => $pki_realm,
-        CONFIG_ID => $config_id,
-    );
-    my $sig_subject = $pkcs7_token->command({
-        COMMAND => 'get_subject',
-        PKCS7   => $pkcs7,
-    });
-=cut 
     
     ##! 64: 'PKCS7: ' . $pkcs7
     my $sig_valid;

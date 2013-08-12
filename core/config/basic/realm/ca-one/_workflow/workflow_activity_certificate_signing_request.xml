@@ -174,7 +174,6 @@
   <!--  CSR Handling -->
   <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve"
-          pkcs7tool="testsceppkcs7tool1"
           multi_role_approval="0"
           check_creator="0">
           <!-- if multi_role_approval is set to 1, a user is allowed
