@@ -101,7 +101,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-08-12 09:19:59 +0000</string>
+	<string>2013-08-12 13:00:13 +0000</string>
 	<key>Modifier</key>
 	<string>Scott Hardin</string>
 	<key>NotesVisible</key>
@@ -17465,7 +17465,7 @@ APPROVALS CALCULATED}</string>
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
 
-\f0\fs20 \cf0 n/a}</string>
+\f0\fs20 \cf0 approval_points}</string>
 								<key>VerticalPad</key>
 								<integer>0</integer>
 							</dict>
@@ -18144,7 +18144,7 @@ APPROVALS CALCULATED}</string>
 					<key>UserInfo</key>
 					<dict>
 						<key>class</key>
-						<string>Workflow::Action::Null</string>
+						<string>OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals</string>
 					</dict>
 				</dict>
 				<dict>
@@ -18829,7 +18829,7 @@ CLEAR APPROVALS}</string>
 					<real>72.55792236328125</real>
 					<key>Points</key>
 					<array>
-						<string>{377.8841552734375, 621.7440185546875}</string>
+						<string>{377.8841552734375, 645.74401855468739}</string>
 						<string>{523, 246}</string>
 						<string>{138.91265015347287, 276.99254414062511}</string>
 					</array>
@@ -18907,7 +18907,7 @@ CLEAR APPROVALS}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{327.03765869140625, 573.7440185546875}, {101.6929931640625, 12}}</string>
+							<string>{{327.03765869140625, 573.7440185546875}, {101.6929931640625, 36}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18934,7 +18934,7 @@ CLEAR APPROVALS}</string>
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs20 \cf0 add approval}</string>
+\f0\b\fs20 \cf0 I18N_OPENXPKI_WF_ACTION_APPROVE_CSR}</string>
 								<key>VerticalPad</key>
 								<integer>0</integer>
 							</dict>
@@ -18943,7 +18943,7 @@ CLEAR APPROVALS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{327.03765869140625, 585.7440185546875}, {101.6929931640625, 12}}</string>
+							<string>{{327.03765869140625, 609.7440185546875}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -18986,7 +18986,7 @@ CLEAR APPROVALS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{327.03765869140625, 597.7440185546875}, {101.6929931640625, 12}}</string>
+							<string>{{327.03765869140625, 621.7440185546875}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -19029,7 +19029,7 @@ CLEAR APPROVALS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{327.03765869140625, 609.7440185546875}, {101.6929931640625, 12}}</string>
+							<string>{{327.03765869140625, 633.7440185546875}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -23572,11 +23572,9 @@ Enrollment Workflow}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>5</integer>
+		<integer>6</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
-		<key>FitInWindow</key>
-		<true/>
 		<key>Frame</key>
 		<string>{{731, 145}, {903, 1008}}</string>
 		<key>ListView</key>
@@ -23592,9 +23590,9 @@ Enrollment Workflow}</string>
 		<key>SidebarWidth</key>
 		<integer>175</integer>
 		<key>VisibleRegion</key>
-		<string>{{-42, 0}, {642.43844432447736, 783.00001138565335}}</string>
+		<string>{{-77, -43}, {713, 869}}</string>
 		<key>Zoom</key>
-		<real>1.1098339557647705</real>
+		<real>1</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
