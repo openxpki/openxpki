@@ -67,7 +67,9 @@
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_PENDING_APPROVAL</description>
         <action name="enroll_modify_metadata" resulting_state="CLEAR_APPROVALS">
         </action>
-        <action name="enroll_add_approval" resulting_state="APPROVAL">
+        <!--  <action name="enroll_add_approval" resulting_state="APPROVAL"> -->
+        <!--  needed for mason frontend -->
+        <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR" resulting_state="APPROVAL">
         </action>
         <action name="enroll_disapprove" resulting_state="FAILURE">
         </action>

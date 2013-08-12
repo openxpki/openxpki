@@ -120,6 +120,8 @@ RA Operator:
         I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4:
             creator: .*               
 
+        I18N_OPENXPKI_WF_TYPE_ENROLLMENT:
+            creator: .*              
         
 CA Operator:
     create:
