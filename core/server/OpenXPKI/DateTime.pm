@@ -71,7 +71,7 @@ sub get_validity {
     elsif ( $params->{REFERENCEDATE} ) {
 
         #parse from string
-        $refdate = _parse_date_utc( $params->{REFERENCEDATE} );
+        $refdate = parse_date_utc( $params->{REFERENCEDATE} );
 
     }
     else {
@@ -178,7 +178,8 @@ sub get_validity {
     );
 }
 
-sub _parse_date_utc {
+sub parse_date_utc {
+    
     my $date_string = shift;
 
     my ( $ss, $mm, $hh, $day, $month, $year, $zone ) = strptime($date_string);
@@ -327,7 +328,7 @@ After this has been executed a date should be printed that is 2 years
 and 7 months in the future: the relative validity 2 years, 5 months
 is added to the offset which is 2 months in the future from now.
 
-=head2 _parse_date_utc
+=head2 parse_date_utc
 
 Helpermethod. Passes the given parameter $date_string  to Date::Parse::strptime and constructs from the return an UTC DateTime object
 

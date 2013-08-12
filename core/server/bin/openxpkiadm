@@ -170,7 +170,7 @@ sub certificate_import {
                   . "(subject key id and authority key id do not match) "
                   . "please specify --realm if you want to import a "
                   . "normal certificate.\n";
-                exit 1;
+                return 2;
             }
         }
         if ( $cert->{PARSED}->{BODY}->{SUBJECT} ne
@@ -440,13 +440,56 @@ sub alias_add {
         DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, },
     );
 
-    if ( !defined $certificate && !defined $params{'force-certificate-not-found'} ) {   
+    if ( !defined $certificate ) {   
         # there is no cert with given identifier
         print STDERR "ERROR: Could not find a certificate with "
-          . "identifier '$insert_hash{IDENTIFIER}', "
-          . "are you sure it is correct?\n"
-          . "Add --force-certificate-not-found to force insert.";
+          . "identifier '$insert_hash{IDENTIFIER}', ";          
         return 2;
+    }
+    
+    if ($params{notbefore}) {
+        if ($params{notbefore} !~ /^\d+$/) {
+        
+            my $dt;
+            eval {
+                $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
+            };
+            if ($EVAL_ERROR || !$dt) {
+                print STDERR "ERROR: Could not parse notbefore date";
+                return 1;    
+            }
+            
+            $insert_hash{NOTBEFORE} = $dt->epoch();
+                        
+            if ($insert_hash{NOTBEFORE} < $certificate->{NOTBEFORE}) {
+                print STDERR "ERROR: notbefore exceeds certificate validity";
+                return 1;
+            }           
+        }    
+    } else {
+        $insert_hash{NOTBEFORE} = $certificate->{NOTBEFORE};
+    }
+    
+    
+    if ($params{notafter}) {
+        if ($params{notafter} !~ /^\d+$/) {
+            my $dt;        
+            eval {
+                $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
+            };
+            if ($EVAL_ERROR || !$dt) {
+                print STDERR "ERROR: Could not parse notafter date";
+                return 1;    
+            }            
+            $insert_hash{NOTAFTER} = $dt->epoch();
+            
+            if ($insert_hash{NOTAFTER} > $certificate->{NOTAFTER}) {
+                print STDERR "ERROR: notafter exceeds certificate validity";
+                return 1;
+            }                   
+        }    
+    } else {
+        $insert_hash{NOTAFTER} = $certificate->{NOTAFTER};
     }
     
     #### insert_hash : Dumper(\%insert_hash)
@@ -458,9 +501,117 @@ sub alias_add {
     print "Successfully created alias in realm $params{realm}:\n";
     print "  Alias     : $insert_hash{ALIAS}\n";
     print "  Identifier: $insert_hash{IDENTIFIER}\n";
+    print "  NotBefore : " . DateTime->from_epoch( epoch => $insert_hash{NOTBEFORE} )->strftime("%F %T\n");
+    print "  NotAfter : " . DateTime->from_epoch( epoch => $insert_hash{NOTAFTER} )->strftime("%F %T\n");
     return 0;
     
 }    
+
+sub alias_update {
+    
+    my %query_hash = (        
+        PKI_REALM =>  $params{realm}  
+    );
+        
+    if ($params{identifier}) {
+        $query_hash{IDENTIFIER} = $params{identifier};    
+    } elsif ($params{alias}) {
+        $query_hash{ALIAS} = $params{alias};
+    } else {
+        print STDERR "You must specify either --identifier or --alias\n";
+        return 1;
+    }
+        
+    my $dbi = __get_dbi();
+    
+    my $alias = $dbi->first(
+        TABLE   => 'ALIASES',
+        DYNAMIC => \%query_hash,
+    );
+
+    if (!$alias) {
+        print STDERR "No alias entry found matching your request\n";
+        return 2;
+    }
+
+    my %update_hash = ();
+
+    # query certificate table to check whether --identifer actually exists
+    my $certificate = $dbi->first(
+        TABLE   => 'CERTIFICATE',
+        DYNAMIC => { IDENTIFIER => $alias->{IDENTIFIER}, },
+    );
+
+    if ($params{notbefore}) {
+        if ($params{notbefore} !~ /^\d+$/) {
+            my $dt;
+            eval {
+                $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
+            };
+            if ($EVAL_ERROR || !$dt) {
+                print STDERR "ERROR: Could not parse notbefore date";
+                return 2;    
+            }            
+            $update_hash{NOTBEFORE} = $dt->epoch();
+                        
+            if ($update_hash{NOTBEFORE} < $certificate->{NOTBEFORE}) {
+                print STDERR "ERROR: notbefore exceeds certificate validity";
+                return 2;
+            }           
+        }    
+    } elsif(defined $params{notbefore}) {
+        $update_hash{NOTBEFORE} = $certificate->{NOTBEFORE};
+    }
+    
+    if ($params{notafter}) {
+        if ($params{notafter} !~ /^\d+$/) {
+            my $dt;        
+            eval {
+                $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
+            };
+            if ($EVAL_ERROR || !$dt) {
+                print STDERR "ERROR: Could not parse notafter date";
+                return 2;    
+            }            
+            $update_hash{NOTAFTER} = $dt->epoch();
+            
+            if ($update_hash{NOTAFTER} > $certificate->{NOTAFTER}) {
+                print STDERR "ERROR: notafter exceeds certificate validity";
+                return 2;
+            }                   
+        }    
+    } elsif(defined $params{notafter}) {
+        $update_hash{NOTAFTER} = $certificate->{NOTAFTER};
+    }
+
+    if (!%update_hash) {
+        print STDERR "ERROR: please specify at least notbefore or notafter";
+        return 1;        
+    }
+
+    $dbi->update(
+        TABLE => 'ALIASES', 
+        DATA => \%update_hash,
+        WHERE => {
+            ALIAS =>  $alias->{ALIAS},
+            PKI_REALM => $alias->{PKI_REALM}
+        }
+    );
+    $dbi->commit();
+
+    $alias = $dbi->first(
+        TABLE   => 'ALIASES',
+        DYNAMIC => \%query_hash,
+    );
+    
+    print "Successfully updated alias $alias->{ALIAS}:\n";    
+    print "  NotBefore: " . DateTime->from_epoch( epoch => $alias->{NOTBEFORE} )->strftime("%F %T\n");
+    print "  NotAfter : " . DateTime->from_epoch( epoch => $alias->{NOTAFTER} )->strftime("%F %T\n");
+    
+    return 0;
+    
+}    
+
 
 sub certificate_chain {
     
@@ -1007,12 +1158,14 @@ if ($cmd eq 'initdb') {
     push @options_spec, qw(
       alias=s
       remove
+      update
+      notbefore=s
+      notafter=s
       realm=s
       gen|generation=s
       group=s
       token=s
-      identifier=s
-      force-certificate-not-found
+      identifier=s      
     );
     __init();
         
@@ -1022,6 +1175,8 @@ if ($cmd eq 'initdb') {
         
     if ($params{remove}) {
         $ret = alias_del();
+    } elsif ($params{update}) {
+        $ret = alias_update();    
     } else {    
         $ret = alias_add();
     }
@@ -1063,7 +1218,8 @@ if ($cmd eq 'initdb') {
 
 
 if ($ret) {
-    pod2usage( -verbose => 0 );
+    print "\n";
+    pod2usage( -verbose => 0 ) if ($ret == 1);
     exit $ret;
 }
 
@@ -1095,6 +1251,7 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
    certificate           Manage certificates
    loadcfg               Import updated config from the filesystem 
    hashpwd               Create the salted hash for a password     
+   alias                 Manage the token alias table
 
 =head1 ARGUMENTS
 
@@ -1289,9 +1446,17 @@ for a certificate, which is associated with a specific PKI realm.
 This symbolic name can then be used in some of the openxpkiadm commands
 as well as in the configuration files.
 
+The selection of functional tokens is done based on the notbefore/notafter
+date. To force certain behaviour (e.g time of a ca rollover), you can force
+a custom notbefore/notafter date on the aliases.
+    
 Common options:
-    --realm               PKI realm for the alias
-    --identifier          The identifier of the certificate
+    --realm        PKI realm for the alias
+    --identifier   The identifier of the certificate
+    --notbefore    custom notbefore date to set
+    --notafter     custom notafter date to set
+                   accepted formats are epoch or yyyy-mm-dd hh:mm:ss
+                   a literal 0 restores the certificates validity.
 
 Force options (use only if you now what you are doing!):
   --force-certificate-not-found
@@ -1343,6 +1508,22 @@ Example:
     openxpkiadm alias --realm server-realm \
         --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \ 
         --alias my-very-important-certificate 
+
+=item B<edit alias>
+
+Update notebefore/notafter date of an existing alias.
+
+    --update        Indicates that you want to update anm existing entry 
+    --alias         You can select the alias by name rather than passing 
+                    the identifier.       
+
+Example: 
+
+     openxpkiadm alias --update --realm ca-one \
+         --alias ca-one-signer-1 
+         --notbefore "2014-01-01:00:00:00" 
+
+This updates notbefore, notafter is not changed.
   
 =item B<remove alias>
 

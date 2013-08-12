@@ -225,11 +225,10 @@ my %TABLE_of = (
 	    ],
     },
 
-
     ALIASES => {
 	   NAME    => 'aliases',
 	   INDEX   => [ 'IDENTIFIER', 'PKI_REALM', ],
-	   COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', 'GROUP_ID','GENERATION' ],
+	   COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', 'GROUP_ID','GENERATION', 'NOTAFTER', 'NOTBEFORE' ],
     },
 
     CRL => {

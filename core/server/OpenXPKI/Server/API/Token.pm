@@ -143,25 +143,22 @@ sub get_token_alias_by_group {
     }
       
     my $alias = CTX('dbi_backend')->first(    
-        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
+        TABLE   => 'ALIASES',
         COLUMNS => [ 
-            'CERTIFICATE.NOTBEFORE', # Necessary to use the column in ordering - FIXME: Pimp SQL Layer           
-            'ALIASES.ALIAS',              
-        ],
-        JOIN => [
-            [ 'IDENTIFIER', 'IDENTIFIER' ],
+            'NOTBEFORE', # Necessary to use the column in ordering - FIXME: Pimp SQL Layer           
+            'ALIAS',              
         ],
         DYNAMIC => {
-            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
-            'ALIASES.GROUP_ID' => { VALUE => $group },              
-            'CERTIFICATE.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
-            'CERTIFICATE.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
+            'PKI_REALM' => { VALUE => $pki_realm },
+            'GROUP_ID' => { VALUE => $group },              
+            'NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
+            'NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
         },
-        'ORDER' => [ 'CERTIFICATE.NOTBEFORE' ],
+        'ORDER' => [ 'NOTBEFORE' ],
         'REVERSE' => 1,
     );
 
-    if (!$alias->{'ALIASES.ALIAS'}) {
+    if (!$alias->{'ALIAS'}) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_RESULT',
             params => {
@@ -173,16 +170,16 @@ sub get_token_alias_by_group {
         );
     }
     
-    ##! 16: "Suggesting $alias->{'ALIASES.ALIAS'} as best match"      
-    return $alias->{'ALIASES.ALIAS'};
+    ##! 16: "Suggesting $alias->{'ALIAS'} as best match"      
+    return $alias->{'ALIAS'};
     
 }
 
 =head2 get_certificate_for_alias( { ALIAS } )
 
-Find the certificate for the give alias. Returns a hashref with the 
+Find the certificate for the given alias. Returns a hashref with the 
 PEM encoded certificate (DATA), Subject (SUBJECT), Identifier (IDENTIFIER)
-and NOTBEFORE/NOTAFTER as epoch
+and NOTBEFORE/NOTAFTER as epoch. Dates are the real certificate dates!
 
 =cut
 
@@ -245,9 +242,11 @@ Get an arrayref with all tokens from the given GROUP, which are/were valid withi
 the validity period given by the VALIDITY parameter.
 Each entry of the list is a hashref holding the full alias name and the 
 certificate identifier. The list is sorted by notbefore date, starting with 
-the newest date. See get_token_alias_by_group how validity works.
+the newest date. See get_token_alias_by_group how validity works, dates are custom 
+dates from the alias table!
 REALM is optional and defaults to the session's realm.
 If you are looking for a predefined token, you can specify TYPE instead of GROUP.
+
   
 =cut
 
@@ -287,7 +286,7 @@ sub list_active_aliases {
         TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
         COLUMNS => [ 
             #  Necessary to use the column in ordering - FIXME: Pimp SQL Layer
-            'CERTIFICATE.NOTBEFORE',            
+            'ALIASES.NOTBEFORE',            
             'ALIASES.ALIAS',              
             'ALIASES.IDENTIFIER',
         ],
@@ -297,10 +296,10 @@ sub list_active_aliases {
         DYNAMIC => {
             'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
             'ALIASES.GROUP_ID' => { VALUE => $group },              
-            'CERTIFICATE.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
-            'CERTIFICATE.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
+            'ALIASES.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
+            'ALIASES.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },                          
         },
-        'ORDER' => [ 'CERTIFICATE.NOTBEFORE' ],
+        'ORDER' => [ 'ALIASES.NOTBEFORE' ],
         'REVERSE' => 1,
     );
     
@@ -325,6 +324,8 @@ I18 token I18N_OPENXPKI_TOKEN_STATUS_xxx, where xx is out of
 EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN.
 
 The list is sorted by notbefore date, starting with the newest date. 
+Dates are taken from the alias table and therefore might differ 
+from the certificates validity!
 
 =cut 
 
@@ -343,8 +344,8 @@ sub get_ca_list {
     my $db_results = CTX('dbi_backend')->select(
         TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
         COLUMNS => [             
-            'CERTIFICATE.NOTBEFORE',            
-            'CERTIFICATE.NOTAFTER',
+            'ALIASES.NOTBEFORE',            
+            'ALIASES.NOTAFTER',
             'CERTIFICATE.DATA',
             'CERTIFICATE.SUBJECT',
             'ALIASES.ALIAS',              
@@ -357,7 +358,7 @@ sub get_ca_list {
             'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
             'ALIASES.GROUP_ID' => { VALUE => $group },                                           
         },
-        'ORDER' => [ 'CERTIFICATE.NOTBEFORE' ],
+        'ORDER' => [ 'ALIASES.NOTBEFORE' ],
         'REVERSE' => 1,
     );
     
@@ -368,16 +369,16 @@ sub get_ca_list {
             ALIAS => $entry->{'ALIASES.ALIAS'}, 
             IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'},
             SUBJECT => $entry->{'CERTIFICATE.SUBJECT'},
-            NOTBEFORE => $entry->{'CERTIFICATE.NOTBEFORE'},            
-            NOTAFTER => $entry->{'CERTIFICATE.NOTAFTER'},
+            NOTBEFORE => $entry->{'ALIASES.NOTBEFORE'},            
+            NOTAFTER => $entry->{'ALIASES.NOTAFTER'},
             STATUS => 'I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN'
         };
         
         # Check if the token is still valid - dates are already unix timestamps        
         my $now = time();       
-        if ($entry->{'CERTIFICATE.NOTBEFORE'} > $now) {
+        if ($entry->{'ALIASES.NOTBEFORE'} > $now) {
             $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_UPCOMING';
-        } elsif ($entry->{'CERTIFICATE.NOTAFTER'} < $now) {
+        } elsif ($entry->{'ALIASES.NOTAFTER'} < $now) {
             $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_EXPIRED';     
         } else {            
             # Check if the key is usable
