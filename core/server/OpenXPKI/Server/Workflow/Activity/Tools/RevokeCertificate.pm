@@ -61,7 +61,14 @@ sub execute {
     $reason_code     ||= 'unspecified';
     $invalidity_time ||= time();
     $comment         ||= '';
-    $auto_approval   ||= 'no';
+    $auto_approval   ||= 0;
+    
+    # Backward compatibility... Use 0|1 instead of no|yes for boolean value
+    if ( lc($auto_approval) eq 'yes' ) {
+        $auto_approval = 1;
+    } elsif ( lc($auto_approval) eq 'no' ) {
+        $auto_approval = 0;
+    }
 
     # Create a new workflow
     my $wf_info = CTX('api')->create_workflow_instance({
@@ -149,7 +156,7 @@ Invalidity time (epoch seconds, defaults to now)
 
 =item flag_crr_auto_approval
 
-Set to 'yes' if request should be automatically approved.
+Set to '1' if request should be automatically approved.
 
 =back
 
