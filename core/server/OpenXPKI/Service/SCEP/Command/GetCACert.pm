@@ -63,17 +63,25 @@ sub __get_ca_certificate_chains : PRIVATE {
     }
 
     my $api = CTX('api');
-    my $chain = $api->get_chain({
+    my $scep_chain = $api->get_chain({
         'START_IDENTIFIER' => $scep_ca_cert_identifier,
         'OUTFORMAT'        => 'PEM',
     });
     ##! 32: 'chain: ' . Dumper($chain)
 
-    my @ca_chains = @{ $chain->{CERTIFICATES} };
-
-    ##! 32: 'ca_chains: ' . Dumper \@ca_chains;
+    my @chain_result = @{ $scep_chain->{CERTIFICATES} };
     
-    # ca_chains now has the full chain of the scep server entity certificate
+    # if the chain has the complete flag, the root is included 
+    # but we dont want it in the response, so pop it off the list
+    # take care about scep server with a out-of-ca self signed cert
+    if ($scep_chain->{COMPLETE} && scalar @chain_result > 1) {
+        ##! 16: 'Strip of scep root'
+        pop @chain_result;
+    }
+
+    ##! 32: 'chain_result: ' . Dumper \@chain_result;
+    
+    # chain_result now has the full chain of the scep server entity certificate
     # Now we will include the current issuing certificate
     # The current issuer is obtained by get_token_alias_by_type api call
     
@@ -91,18 +99,27 @@ sub __get_ca_certificate_chains : PRIVATE {
     
     # Holds the chain of the current issuer
     ##! 64: 'ca_chain: ' . Dumper $ca_chain
-    foreach my $cert (@{ $ca_chain->{CERTIFICATES} }) {
+    
+    # if the chain has the complete flag, the root is included 
+    # but we dont want it in the response, so pop it off the list
+    my @issuer_chain = @{ $ca_chain->{CERTIFICATES} };
+    if ($ca_chain->{COMPLETE}) {
+        ##! 16: 'Strip of issuer root'
+        pop @issuer_chain;
+    }
+    
+    foreach my $cert (@issuer_chain) {
         ##! 128: 'cert: ' . $cert
-        if (! grep { $_ eq $cert } @ca_chains) {
-            ##! 32: 'cert is not in ca_chains list, adding it'
-            push @ca_chains, $cert;
+        if (! grep { $_ eq $cert } @chain_result) {
+            ##! 32: 'cert is not in chain_result list, adding it'
+            push @chain_result, $cert;
         }          
     } 
 
-    ##! 32: 'ca_chains: ' . Dumper \@ca_chains
+    ##! 32: 'chain_result: ' . Dumper \@chain_result
 
     ##! 4: 'end'
-    return \@ca_chains;
+    return \@chain_result;
 }
 1;
 __END__
@@ -124,7 +141,7 @@ entity certificate used by the scep server
 
 =item scep server chain
 
-the full chain including the root certificate for the scep entity certificate
+the full chain including without the root certificate for the scep entity certificate
  
 =item current issuer certificate
 
@@ -132,7 +149,7 @@ the certificate currently used for certificate issuance.
 
 =item issuer chain
 
-the full chain of the issuing ca, starting with the first intermediate certificate. 
+the chain of the issuing ca, starting with the first intermediate certificate. 
 
 =back
 
