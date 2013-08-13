@@ -391,7 +391,9 @@ sub alias_add {
 
     # Import of named tokens always ba group and generation
     if ( $params{token} ) {
-        my $group = CTX('config')->get("realm.$params{realm}.crypto.type.$params{token}");
+                
+        my $group = ($params{token} eq "root") ? 'root' : 
+            CTX('config')->get("realm.$params{realm}.crypto.type.$params{token}");
         
         if (!$group) {
             print STDERR "There is no token of type $params{token} defined\n";
@@ -433,6 +435,17 @@ sub alias_add {
         $insert_hash{IDENTIFIER} = $params{identifier};
     }
 
+    # Prevent duplicate entries (each identifier is allowed only once per group)
+    my $duplicate_alias = $dbi->first(
+        TABLE   => 'ALIASES',
+        DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, PKI_REALM => $params{realm}, 'GROUP_ID' => $insert_hash{GROUP_ID} },
+    );
+      
+    if ($duplicate_alias) {
+        print STDERR "ERROR: certificate already exisits in group\n";
+        print STDERR "Alias: " . $duplicate_alias->{ALIAS} . "\n";
+        return 2;    
+    }
 
     # query certificate table to check whether --identifer actually exists
     my $certificate = $dbi->first(
@@ -498,11 +511,66 @@ sub alias_add {
         HASH  => \%insert_hash,
     );
     $dbi->commit();
+    
     print "Successfully created alias in realm $params{realm}:\n";
     print "  Alias     : $insert_hash{ALIAS}\n";
     print "  Identifier: $insert_hash{IDENTIFIER}\n";
     print "  NotBefore : " . DateTime->from_epoch( epoch => $insert_hash{NOTBEFORE} )->strftime("%F %T\n");
     print "  NotAfter : " . DateTime->from_epoch( epoch => $insert_hash{NOTAFTER} )->strftime("%F %T\n");
+    
+    # Check if the alias is for an issuing ca cert -> create root ca alias
+    my $cs_group = CTX('config')->get("realm.$params{realm}.crypto.type.certsign");    
+    if ( $insert_hash{ALIAS} =~ /^$cs_group-(\d+)/ ) {
+        print "\nToken is certsign, looking for root...\n";
+        my $gen = $1;
+        
+        my $chain_ref = CTX('api')->get_chain({ 'START_IDENTIFIER' => $insert_hash{IDENTIFIER} });
+        
+        if ($chain_ref->{COMPLETE} != 1) {
+            print STDERR "ERROR: unable to find root certificate";
+            return 2;        
+        }
+        my $root_identifier = pop @{$chain_ref->{IDENTIFIERS}};
+               
+        # check if this root is already definde  
+        my $root_alias = $dbi->first(
+            TABLE   => 'ALIASES',
+            DYNAMIC => { IDENTIFIER => $root_identifier, PKI_REALM => $params{realm}, 'GROUP_ID' => 'root' },
+        );
+        if ($root_alias) {
+            print "Root ca already in alias table:\n";
+        } else {
+            print "Creating alias for root ca:\n";
+            # Get the notebefore/notafter date
+            $certificate = $dbi->first(
+                TABLE   => 'CERTIFICATE',
+                COLUMNS => ['NOTBEFORE' , 'NOTAFTER' ],
+                DYNAMIC => { IDENTIFIER => $root_identifier },
+            );
+            
+            $root_alias = {
+                IDENTIFIER => $root_identifier, 
+                PKI_REALM => $params{realm},
+                GROUP_ID => 'root',
+                GENERATION => $gen,
+                ALIAS => sprintf ('root-%01d', $gen),
+                NOTBEFORE => $certificate->{NOTBEFORE},
+                NOTAFTER => $certificate->{NOTAFTER},
+            };   
+            $dbi->insert(
+                TABLE => 'ALIASES',
+                HASH  => $root_alias,
+            );
+            $dbi->commit();
+        }
+              
+        print "  Alias     : $root_alias->{ALIAS}\n";
+        print "  Identifier: $root_alias->{IDENTIFIER}\n";
+        print "  NotBefore : " . DateTime->from_epoch( epoch => $root_alias->{NOTBEFORE} )->strftime("%F %T\n");
+        print "  NotAfter : " . DateTime->from_epoch( epoch => $root_alias->{NOTAFTER} )->strftime("%F %T\n");        
+        
+    }
+    
     return 0;
     
 }    
