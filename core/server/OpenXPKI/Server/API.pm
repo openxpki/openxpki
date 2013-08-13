@@ -287,7 +287,13 @@ sub BUILD {
         },
         'get_ca_list' => {
             class  => 'Token',
-            params => { },
+            params => { 
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            },
         },
         'get_ca_cert' => {
             class  => 'Object',
