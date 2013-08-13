@@ -24,50 +24,48 @@ sub execute {
     
     my $pki_realm = CTX('session')->get_pki_realm();
 
-    # The list of all issuing ca certs in this realm
-    my $all_ca = CTX('api')->get_ca_list();
-    
-    ##! 32: 'Found ca list ' . Dumper $all_ca  
-    # Newest are on top, check if the status is upcoming
-    my $next_ca;    
-    foreach my $cert (@{$all_ca}) {        
-    	##! 32: 'Next item ' . Dumper $cert
-        if ($cert->{STATUS} eq 'I18N_OPENXPKI_TOKEN_STATUS_UPCOMING') {
-           ##! 8: 'Upcoming issuer found ' . Dumper $cert
-           $next_ca = $cert;    
-        }
-        # There might be more than one upcoming, so we continue to loop
-    }
+    my $next_ca = CTX('dbi_backend')->first(
+        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
+        COLUMNS => [             
+            'ALIASES.NOTBEFORE',            
+            'ALIASES.NOTAFTER',
+            'CERTIFICATE.DATA',
+            'CERTIFICATE.SUBJECT',
+            'ALIASES.ALIAS',              
+            'ALIASES.IDENTIFIER',
+        ],
+        JOIN => [
+            [ 'IDENTIFIER', 'IDENTIFIER' ],
+        ],
+        DYNAMIC => {
+            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
+            'ALIASES.GROUP_ID' => { VALUE => 'root' },
+            'ALIASES.NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                                           
+        },
+        'ORDER' => [ 'ALIASES.NOTBEFORE' ],
+        'REVERSE' => 1,
+    );
 
-    if (!$next_ca) {    
+    if (!$next_ca) {            
+        ##! 16: 'No cert found'
+        CTX('log')->log(
+            MESSAGE => "SCEP GetNextCACert nothing found (realm $pki_realm).",
+            PRIORITY => 'debug',
+            FACILITY => 'system',
+        );        
         return;
     }
- 
-    # try to load the chain     
-    my $chain = CTX('api')->get_chain({
-        'START_IDENTIFIER' => $next_ca->{IDENTIFIER},
-        'OUTFORMAT'        => 'PEM',
-    });
-    ##! 32: 'chain: ' . Dumper($chain)
      
-    ##! 16: 'ca_chains: ' . Dumper $chain->{CERTIFICATES};
-     
-    # $chain->{CERTIFICATES} is an arrayref of PEM blocks - we just merge it
-    #my $nextca_chain = join "\n", @{$chain->{CERTIFICATES}};     
-    
-    ## FIXME - needs discussion, SCEP draft allows inclusion of RA which seems to be unsupported
-    # by openca-scep and is somewhat useless anyway. So we send only the root for now.
-    my $nextca_chain = pop @{$chain->{CERTIFICATES}};      
-
     # We need to create a signed reply, load scep token
     my $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
     my $scep_token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
    
-   ##! 32: 'nextca chain ' . $nextca_chain 
+    ##! 16: 'Found nextca cert ' .  $next_ca->{'ALIASES.ALIAS'}
+    ##! 32: 'nextca  ' . Dumper $next_ca      
    
     my $result = $scep_token->command({   
     	COMMAND => 'create_nextca_reply',
-        CHAIN   => $nextca_chain,        
+        CHAIN   => $next_ca->{'CERTIFICATE.DATA'},        
     });
 
     $result = "Content-Type: application/x-x509-next-ca-cert\n\n" . $result;
@@ -85,8 +83,9 @@ OpenXPKI::Service::SCEP::Command::GetNextCACert
 
 =head1 Description
  
-Return the certificate of an upcoming but still inactive issuing CA.
-If the chain is known, it is also included.
+Return the certificate of an upcoming but still inactive root certificate.
+To be returned the root certificate must be in the alias table, group root
+with a notbefore date in the future.
 
 =head1 Functions
 
