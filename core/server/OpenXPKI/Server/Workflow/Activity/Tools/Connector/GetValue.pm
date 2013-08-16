@@ -26,12 +26,15 @@ sub execute {
                   
     # Use value in ds_key_param as key in Connector
     my $keyparam = $self->param('ds_key_param');
+
+    $self->param( 'DBG_keyparam', $keyparam );
     
     if ($keyparam) {
         $connector_key = $context->param( $keyparam );
     }
     
     my $keytemplate = $self->param('ds_key_template');    
+    $self->param( 'DBG_keytemplate', $keytemplate );
     # Template based key 
     if ( not $connector_key && defined $keytemplate ) {
 

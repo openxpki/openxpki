@@ -47,6 +47,7 @@ User:
     - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
     - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4
     - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE
 
     access:            
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
@@ -78,6 +79,9 @@ User:
                 
         I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK:
             creator: .*
+                
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE:
+            creator: .*
 
 RA Operator:
     create:
@@ -87,6 +91,7 @@ RA Operator:
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
     - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
     - I18N_OPENXPKI_WF_TYPE_TESTING
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE
 
     access:
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
@@ -118,10 +123,13 @@ RA Operator:
                 show: .*                 
 
         I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4:
-            creator: .*               
+            creator: .*
 
         I18N_OPENXPKI_WF_TYPE_ENROLLMENT:
             creator: .*              
+            
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE:
+            creator: .*
         
 CA Operator:
     create:

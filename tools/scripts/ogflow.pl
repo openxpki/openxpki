@@ -121,7 +121,12 @@ public text  => my %shape_text;
 
 sub fqname {
     my $self = shift;
-    return $namespace . $self->text;
+    # If text does not start with 'I18N', prepend the namespace
+    if ( $self->text =~ /^I18N/ ) {
+        return $self->text;
+    } else {
+        return $namespace . $self->text;
+    }
 }
 
 sub equals {

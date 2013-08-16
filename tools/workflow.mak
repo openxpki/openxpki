@@ -27,7 +27,7 @@ config := config/workflow.cfg
 # Not all workflow docs have been transfered from customer repo, so we'll
 # just add them as we move them over.
 #workflows := test_tools smartcard_fetch_puk smartcard_cardadm smartcard_personalization_v4 enrollment
-workflows := enrollment
+workflows := enrollment certificate_revoke
 
 # config/workflow.inc contains common settings for all customized workflows
 -include config/workflow.inc
@@ -98,6 +98,11 @@ enrollment: $(xmldir)/workflow_def_enrollment.xml
 enrollment: $(xmldir)/workflow_activity_enrollment.xml
 enrollment: $(xmldir)/workflow_condition_enrollment.xml
 enrollment: $(xmldir)/workflow_validator_enrollment.xml
+
+certificate_revoke: $(xmldir)/workflow_def_certificate_revoke.xml
+certificate_revoke: $(xmldir)/workflow_activity_certificate_revoke.xml
+certificate_revoke: $(xmldir)/workflow_condition_certificate_revoke.xml
+certificate_revoke: $(xmldir)/workflow_validator_certificate_revoke.xml
 
 .SECONDARY:
 
