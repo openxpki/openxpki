@@ -26,6 +26,7 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::NOOP;
+use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Handler;
@@ -272,7 +273,19 @@ sub __do_init_i18n {
 
 sub __do_init_log {
     ##! 1: "init log"
-    my $log          = get_log();
+    
+    my $keys = shift;
+    
+    my $log;
+    
+    if ($keys->{CLI}) {
+        ##! 16 'use cli logger'
+        $log = OpenXPKI::Server::Log::CLI->new();        
+    } else {
+        ##! 16 'use server logger'        
+        $log = get_log();
+    }
+        
     ### $log
     OpenXPKI::Server::Context::setcontext(
 	{

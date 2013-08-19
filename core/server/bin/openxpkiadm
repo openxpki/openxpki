@@ -26,7 +26,6 @@ use OpenXPKI::VERSION;
 
 use Data::Dumper;
 
-
 my %params;
 my @options_spec = ('config=s');
 my $cmd = shift || 'help';
@@ -105,7 +104,7 @@ sub loadcfg {
  
 sub certificate_import {
 
-    print STDERR "Strating import\n";
+    print STDERR "Starting import\n";
     
     my $defaulttoken = CTX('crypto_layer')->get_system_token({TYPE => 'DEFAULT'});
 
@@ -288,7 +287,7 @@ sub certificate_import {
     if ( defined $certificate
         && !defined $params{'force-certificate-already-exists'} )
     {
-        if ( $certificate->{PKI_REALM} ne '' ) {
+        if ( $certificate->{PKI_REALM} ) {
             print STDERR "ERROR: The same certificate already exists "
               . "in the $certificate->{PKI_REALM} realm. Use openxpkiadm "
               . "certificate alias to reference it.\n";
@@ -1163,7 +1162,7 @@ if ($cmd eq 'initdb') {
 
     my $subcmd = shift;
     
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1,});
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
     
     if ($subcmd eq 'import') {
     
@@ -1229,7 +1228,7 @@ if ($cmd eq 'initdb') {
 
 } elsif ($cmd eq 'alias') {
            
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend'], SILENT => 1,});
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend'], SILENT => 1, CLI => 1});
            
     push @options_spec, qw(
       alias=s
