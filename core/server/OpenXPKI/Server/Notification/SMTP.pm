@@ -84,7 +84,7 @@ extends 'OpenXPKI::Server::Notification::Base';
 has 'transport' => (
     is  => 'ro',
     # Net::SMTP Object   
-    isa => 'Object',     
+    isa => 'Object|Undef',     
     builder => '_init_transport',
     lazy => 1,  
 );
@@ -132,9 +132,18 @@ sub _init_transport {
     $smtp{'Password'} = $cfg->{password} if ($cfg->{password});
     $smtp{'Timeout'} = $cfg->{timeout} if ($cfg->{timeout});
     $smtp{'Debug'} = 1 if ($cfg->{debug});
-
+    
+    my $transport = Net::SMTP->new( %smtp );    
+    # Net::SMTP returns undef if it can not reach the configured socket
+    if (!$transport || !ref $transport) {
+        CTX('log')->log(
+            MESSAGE  => sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}),
+            PRIORITY => "fatal",
+            FACILITY => "system",
+        );
+        return undef;
+    }
     $self->is_smtp_open(1);
-    my $transport = Net::SMTP->new( %smtp );
     return $transport;
         
 }
@@ -307,7 +316,7 @@ sub notify {
         }
                 
         if ($self->use_html()) {
-            $self->_send_html( $cfg, \%vars ) || push @failed, $handle;;
+            $self->_send_html( $cfg, \%vars ) || push @failed, $handle;
         } else {
             $self->_send_plain( $cfg, \%vars ) ||  push @failed, $handle;
         }            
@@ -383,6 +392,7 @@ sub _send_plain {
     ##! 64: "SMTP Msg --------------------\n$smtpmsg\n ----------------------------------";        
     
     my $smtp = $self->transport();
+    return 0 unless($smtp);
 
     $smtp->mail( $cfg->{from} );
     $smtp->to( $vars->{to} );
@@ -533,7 +543,8 @@ sub _send_html {
     } 
     
 	# a reusable Net::SMTP object
-    my $transport = $self->transport(); 
+    my $transport = $self->transport();
+    return 0 unless($transport); 
     
     # Host accepts a Net::SMTP object
     # @res is the list of receipients processed, empty on error

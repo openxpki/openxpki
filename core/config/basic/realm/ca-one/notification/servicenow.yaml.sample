@@ -1,0 +1,43 @@
+# Sample config using the ServiceNow incident tracker
+backend:
+    class: OpenXPKI::Server::Notification::ServiceNow
+    server: https://demo003.service-now.com/incident.do
+    username: admin
+    password: admin
+    timeout: 300
+
+template:
+    dir:   /etc/openxpki/notification/rt
+ 
+message:        
+    csr_created:  # The message Id as referenced in the activity
+        main:  # The internal handle for this ticket
+            action: open
+            short_description: CSR for [% cert_subject %]
+            requestor: "[% cert_info.requestor_email %]"
+            template: csr_created                  
+            priority: 5                
+            state: 1
+            category: inquiry
+            assigned_to: admin
+            assignment_group: pki team                  
+
+    csr_approved:
+        main:
+            action: update
+            state: 6                  
+            template: csr_approvers
+
+    csr_rejected:
+        main:
+            action: close
+            template: csr_rejected
+            priority: 10              
+            state: 7             
+
+    cert_issued:
+        main:
+            action: close
+            template: cert_issued
+            status: resolved
+
