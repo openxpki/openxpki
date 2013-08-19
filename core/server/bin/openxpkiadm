@@ -461,7 +461,9 @@ sub alias_add {
     }
     
     if ($params{notbefore}) {
-        if ($params{notbefore} !~ /^\d+$/) {
+        if ($params{notbefore} =~ /^\d+$/) {
+            $insert_hash{NOTBEFORE} = $params{notbefore};    
+        } else {
         
             my $dt;
             eval {
@@ -485,7 +487,9 @@ sub alias_add {
     
     
     if ($params{notafter}) {
-        if ($params{notafter} !~ /^\d+$/) {
+        if ($params{notafter} =~ /^\d+$/) {
+            $insert_hash{NOTAFTER} = $params{notafter};
+        } else {
             my $dt;        
             eval {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
@@ -610,8 +614,10 @@ sub alias_update {
         DYNAMIC => { IDENTIFIER => $alias->{IDENTIFIER}, },
     );
 
-    if ($params{notbefore}) {
-        if ($params{notbefore} !~ /^\d+$/) {
+    if ($params{notbefore}) {    
+        if ($params{notbefore} =~ /^\d+$/) {
+            $update_hash{NOTBEFORE} = $params{notbefore};    
+        } else {
             my $dt;
             eval {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
@@ -632,7 +638,9 @@ sub alias_update {
     }
     
     if ($params{notafter}) {
-        if ($params{notafter} !~ /^\d+$/) {
+        if ($params{notafter} =~ /^\d+$/) {
+            $update_hash{NOTAFTER} = $params{notafter};
+        } else {
             my $dt;        
             eval {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
@@ -1525,14 +1533,6 @@ Common options:
     --notafter     custom notafter date to set
                    accepted formats are epoch or yyyy-mm-dd hh:mm:ss
                    a literal 0 restores the certificates validity.
-
-Force options (use only if you now what you are doing!):
-  --force-certificate-not-found
-        Ignore that the certificate for which to create an
-        alias was not found in the DB
-
-Only use these options if you actually have to (the occasions where
-this happens should be really, really rare).
     
 There are different ways to deal with aliases:
 
@@ -1543,8 +1543,8 @@ There are different ways to deal with aliases:
 Looks up the name of the associated group and finds the next generation
 index by looking up the present aliases in the group. Recommended.    
     
-  --token  The name of the token B<type> you want to add,
-           e.g. I<certsign> or I<datasafe>.
+  --token  The name of the token type you want to add,
+           e.g. certsign or datasafe.
           
 Example: 
 
