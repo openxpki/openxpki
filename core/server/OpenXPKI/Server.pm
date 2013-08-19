@@ -252,6 +252,17 @@ sub post_bind_hook {
             );
         }
     }
+ 
+    # change the owner of the pidfile to the daemon user
+    my $pidfile = $self->{PARAMS}->{pid_file}; 
+    ##! 16: 'chown pidfile: ' .  $pidfile . ' user: ' . $self->{PARAMS}->{process_owner} . ' group: ' . $self->{PARAMS}->{process_group} 
+    if (! chown $self->{PARAMS}->{process_owner}, $self->{PARAMS}->{process_group}, $pidfile) {    
+        CTX('log')->log(
+            MESSAGE => "Could not change ownership for pidfile '$pidfile' to '$socket_owner:$socket_group'",
+            FACILITY => 'system',
+            PRIORITY => 'error',
+        );        
+    } 
 
     my $env = CTX('config')->get_hash('system.server.environment');
     foreach my $var (keys %{$env}) {
@@ -273,7 +284,7 @@ sub pre_loop_hook {
     # Net::Server does not provide a hook that is executed BEFORE.
     # we are tricking Net::Server to believe that it should not change
     # owner and group of the process and do it ourselves shortly afterwards
-
+   
     ### drop privileges
     eval{
         
