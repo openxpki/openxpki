@@ -516,10 +516,8 @@ sub alias_add {
     $dbi->commit();
     
     print "Successfully created alias in realm $params{realm}:\n";
-    print "  Alias     : $insert_hash{ALIAS}\n";
-    print "  Identifier: $insert_hash{IDENTIFIER}\n";
-    print "  NotBefore : " . DateTime->from_epoch( epoch => $insert_hash{NOTBEFORE} )->strftime("%F %T\n");
-    print "  NotAfter : " . DateTime->from_epoch( epoch => $insert_hash{NOTAFTER} )->strftime("%F %T\n");
+    __alias_print( \%insert_hash, $certificate );
+    
     
     # Check if the alias is for an issuing ca cert -> create root ca alias
     my $cs_group = CTX('config')->get("realm.$params{realm}.crypto.type.certsign");    
@@ -567,11 +565,8 @@ sub alias_add {
             $dbi->commit();
         }
               
-        print "  Alias     : $root_alias->{ALIAS}\n";
-        print "  Identifier: $root_alias->{IDENTIFIER}\n";
-        print "  NotBefore : " . DateTime->from_epoch( epoch => $root_alias->{NOTBEFORE} )->strftime("%F %T\n");
-        print "  NotAfter : " . DateTime->from_epoch( epoch => $root_alias->{NOTAFTER} )->strftime("%F %T\n");        
-        
+        __alias_print( $root_alias );
+              
     }
     
     return 0;
@@ -679,13 +674,121 @@ sub alias_update {
         DYNAMIC => \%query_hash,
     );
     
-    print "Successfully updated alias $alias->{ALIAS}:\n";    
-    print "  NotBefore: " . DateTime->from_epoch( epoch => $alias->{NOTBEFORE} )->strftime("%F %T\n");
-    print "  NotAfter : " . DateTime->from_epoch( epoch => $alias->{NOTAFTER} )->strftime("%F %T\n");
+    print "Successfully updated alias:\n";    
+    __alias_print( $alias, $certificate );
+
     
     return 0;
     
 }    
+
+sub alias_list {
+
+    my $realm = $params{realm};
+    # get names of groups 
+    my $groups = CTX('config')->get_hash("realm.$realm.crypto.type");
+    
+    my $dbi = __get_dbi();
+    my $alias;
+    my $cert;
+    
+    foreach my $type (keys %{$groups}) {
+    
+        my $group = $groups->{$type};
+        print "$type ($group):\n";
+          
+        $alias = $dbi->first(    
+            TABLE   => 'ALIASES',            
+            DYNAMIC => {
+                'PKI_REALM' => { VALUE => $realm },
+                'GROUP_ID' => { VALUE => $group },              
+                'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
+                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+            },
+            'ORDER' => [ 'NOTBEFORE' ],
+            'REVERSE' => 1,
+        );
+        
+        $cert = CTX('dbi_backend')->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+        );
+        
+        __alias_print( $alias, $cert );
+    
+    }     
+     
+    # Check for root ca
+    $alias = $dbi->first(    
+        TABLE   => 'ALIASES',            
+        DYNAMIC => {
+            'PKI_REALM' => { VALUE => $realm },
+            'GROUP_ID' => { VALUE => 'root' },              
+            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
+            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                                                
+        },
+        'ORDER' => [ 'NOTBEFORE' ],
+        'REVERSE' => 1,
+    );    
+    $cert = CTX('dbi_backend')->first(
+        TABLE   => 'CERTIFICATE',
+        DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+    );
+    
+    print "current root ca:\n";
+    __alias_print( $alias, $cert );
+    
+    # Check for root ca
+    $alias = $dbi->first(    
+        TABLE   => 'ALIASES',            
+        DYNAMIC => {
+            'PKI_REALM' => { VALUE => $realm },
+            'GROUP_ID' => { VALUE => 'root' },              
+            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+        },
+        'ORDER' => [ 'NOTBEFORE' ],        
+    );    
+
+    $cert = CTX('dbi_backend')->first(
+        TABLE   => 'CERTIFICATE',
+        DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+    );
+            
+    print "upcoming root ca:\n";
+    __alias_print( $alias, $cert );
+    
+    
+    return 0;
+     
+     
+}
+
+sub __alias_print {
+    
+    my $alias = shift;
+    my $cert = shift;
+    
+    if (!$alias || !$alias->{ALIAS}) {
+        print "  not set\n\n"; 
+        return; 
+    } 
+     
+    print "  Alias     : $alias->{ALIAS}\n";
+    print "  Identifier: $alias->{IDENTIFIER}\n";
+    print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{NOTBEFORE} )->strftime("%F %T");
+        
+    print DateTime->from_epoch( epoch => $cert->{NOTBEFORE} )->strftime(" (%F %T)")
+        if ($cert && $cert->{NOTBEFORE} != $alias->{NOTBEFORE});         
+    
+    print "\n";
+    print "  NotAfter  : " . DateTime->from_epoch( epoch => $alias->{NOTAFTER} )->strftime("%F %T");
+            
+    print DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime(" (%F %T)")
+        if ($cert && $cert->{NOTAFTER} != $alias->{NOTAFTER});
+                
+    print "\n\n";
+            
+}
 
 
 sub certificate_chain {
@@ -986,8 +1089,12 @@ sub alias_del {
         return 2;
     }
 
-    $dbi->delete(TABLE => 'ALIASES', DATA => $alias);
+    $dbi->delete(TABLE => 'ALIASES', DATA => {
+        ALIAS => $alias->{ALIAS},
+        PKI_REALM => $alias->{PKI_REALM},
+    });
     $dbi->commit();
+    
     print "Successfully removed the alias $alias->{ALIAS}:\n";    
     print "   Identifier: $alias->{IDENTIFIER}\n";    
     print "   Realm:      $alias->{PKI_REALM}\n";
@@ -1251,7 +1358,9 @@ if ($cmd eq 'initdb') {
     if ($params{remove}) {
         $ret = alias_del();
     } elsif ($params{update}) {
-        $ret = alias_update();    
+        $ret = alias_update();
+    } elsif (!$params{identifier}) {    
+        $ret = alias_list();            
     } else {    
         $ret = alias_add();
     }
@@ -1516,10 +1625,10 @@ openxpkiadm certificate chain --realm 'Root CA' \
  
 =head2 alias
 
-Using openxpkiadm certificate alias, you can create a symbolic name
-for a certificate, which is associated with a specific PKI realm.
-This symbolic name can then be used in some of the openxpkiadm commands
-as well as in the configuration files.
+An alias is a symbolic name for a certificate in a specific realm.
+OpenXPKI uses aliases to manage the crypto tokens for signer and 
+helper tokens. Several configs options and commands are able to 
+process aliases, too.  
 
 The selection of functional tokens is done based on the notbefore/notafter
 date. To force certain behaviour (e.g time of a ca rollover), you can force
@@ -1536,6 +1645,22 @@ Common options:
 There are different ways to deal with aliases:
 
 =over 
+
+=item B<list active functional tokens>
+
+If you pass a realm but no identifier, you will receive the list of 
+active tokens for the functional token groups, the current root certificate
+and, if set, the upcoming root certificate as used by scep I<GetNexCACert>.
+
+For items with custom notbefore/notafter settings, the certificate's value
+is shown in brackets:  
+
+    upcoming root ca:
+        Alias     : root-2
+        Identifier: xGBSVo6N-9gpjB8UFll4TS-u-Eo
+        NotBefore : 2014-01-01 00:00:00 (2013-06-17 13:54:34)
+        NotAfter  : 2016-12-31 23:59:59 (2020-06-17 13:54:34)
+
 
 =item B<add functional token with automatic group discovery>
 
@@ -1576,7 +1701,7 @@ Example:
         --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \ 
         --alias my-very-important-certificate 
 
-=item B<edit alias>
+=item B<update alias>
 
 Update notebefore/notafter date of an existing alias.
 
