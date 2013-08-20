@@ -42,8 +42,7 @@ sub execute {
             'ALIASES.GROUP_ID' => { VALUE => 'root' },
             'ALIASES.NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                                           
         },
-        'ORDER' => [ 'ALIASES.NOTBEFORE' ],
-        'REVERSE' => 1,
+        'ORDER' => [ 'ALIASES.NOTBEFORE' ],        
     );
 
     if (!$next_ca) {            
