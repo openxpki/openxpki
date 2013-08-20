@@ -5,7 +5,7 @@
 
     <action name="scpers_revoke_certificate"
             class="OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate"
-            auto_approval="yes"
+            auto_approval="1"
             reason_code="superseded">
             <field name="cert_identifier" is_required="yes"/>
     </action>
