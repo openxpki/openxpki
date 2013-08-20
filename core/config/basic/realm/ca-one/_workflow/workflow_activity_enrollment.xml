@@ -3,7 +3,7 @@
 
      File: core/config/graffle/workflow_enrollment.graffle
   Version: 2.3
-      Git: 8f12d204d43221ada9d0c1f394b01f8e5485be60
+      Git: 2a12cc884ee3b861958c0e83b56f3f6a4c1e13f0
 -->
 
 
@@ -41,9 +41,6 @@
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts">
     </action>
 
-    <action name="enroll_add_approval"
-            class="Workflow::Action::Null">
-    </action>
 
     <action name="enroll_add_authentication"
             class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
@@ -67,7 +64,7 @@
     </action>
 
     <action name="enroll_clear_approvals"
-            class="Workflow::Action::Null">
+            class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
     </action>
 
     <action name="enroll_continue_issuance"
@@ -88,6 +85,7 @@
 
     <action name="enroll_calc_approvals"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::CalcApprovals">
+            <field name="approval_points"/>
     </action>
 
     <action name="enroll_serialize_unique_id"

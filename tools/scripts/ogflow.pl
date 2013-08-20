@@ -280,6 +280,10 @@ sub asXml {
     my $null     = 0;
     my $userInfo = $self->userInfo;
 
+    if ( $self->text =~ /^I18N_/ ) {
+        return;
+    }
+
     push @out, $indentSpace x $indent++;
     push @out, '<state name="', $self->text, '"';
     if ( defined $userInfo and ref($userInfo) eq 'HASH' ) {
@@ -392,6 +396,11 @@ sub asXml {
     my $indent = shift || 0;
     my @out    = ();
     my $class  = $self->class;    # || 'Class Not Set';
+
+
+    if ( $self->text =~ /^I18N_/ ) {
+        return;
+    }
 
     push @out, $indentSpace x $indent++;
     push @out, '<condition name="', $self->fqname, '"';
@@ -625,6 +634,10 @@ sub asXml {
     my $fields   = $self->fields;
     my $actionClass;
 
+    if ( $self->text =~ /^I18N_/ ) {
+        return;
+    }
+
     if ( defined $userInfo and exists $userInfo->{class} ) {
         $actionClass = $userInfo->{class};
     }
@@ -723,6 +736,10 @@ sub asXml {
     my $indent = shift || 0;
     my @out    = ();
     my $class  = $self->class || 'Class Not Set';
+
+    if ( $self->text =~ /^I18N_/ ) {
+        return;
+    }
 
     push @out, $indentSpace x $indent++;
     push @out, '<validator name="', $self->fqname, '"', "\n";

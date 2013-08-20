@@ -3,7 +3,7 @@
 
      File: core/config/graffle/workflow_enrollment.graffle
   Version: 2.3
-      Git: 8f12d204d43221ada9d0c1f394b01f8e5485be60
+      Git: 2a12cc884ee3b861958c0e83b56f3f6a4c1e13f0
 -->
 
 
@@ -67,8 +67,6 @@
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_PENDING_APPROVAL</description>
         <action name="enroll_modify_metadata" resulting_state="CLEAR_APPROVALS">
         </action>
-        <!--  <action name="enroll_add_approval" resulting_state="APPROVAL"> -->
-        <!--  needed for mason frontend -->
         <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR" resulting_state="APPROVAL">
         </action>
         <action name="enroll_disapprove" resulting_state="FAILURE">
