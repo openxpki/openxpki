@@ -167,7 +167,8 @@ while ($test->state() =~ /TO_INSTALL/) {
 		close P12;   					
 		
 		my $pass = $test->param('_password');
-	 	`cat $cert_dir/$cert_identifier.p12 | base64 -d | openssl pkcs12  -passin pass:$pass -nodes -nocerts > $cert_dir/$cert_identifier.key`; 
+$test->diag("Passwort " . $pass );
+	 	`cat $cert_dir/$cert_identifier.p12 | openssl base64 -d | openssl pkcs12  -passin pass:$pass -nodes -nocerts > $cert_dir/$cert_identifier.key`; 
 	
 		$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');		 				
 		open PEM, ">$cert_dir/$cert_identifier.crt";
