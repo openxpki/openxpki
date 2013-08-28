@@ -289,7 +289,7 @@ sub pre_loop_hook {
     eval{
         
         # Set verbose process name        
-        $0 = "openxpki server ( $self->{PARAMS}->{alias} )";
+        $0 = "openxpkid server ( $self->{PARAMS}->{alias} )";
         
         if( $self->{PARAMS}->{process_group} ne $) ){
             $self->log(
