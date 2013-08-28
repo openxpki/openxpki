@@ -63,10 +63,15 @@ sub execute {
                 facility => 'system',
             });
     }
-    
+   
+    # split of group and generation from alias
+    $ca_alias =~ /^(.*)-(\d+)$/;
+ 
     my $data = {
         pem => $crl->{DATA},
         alias => $ca_alias,
+        group => $1,
+        generation => $2,
     };
     
     # Convert to DER
@@ -107,22 +112,6 @@ sub execute {
     return unless ($targets[0]);
 
     ##! 16: 'Publish targets at prefix '. $prefix .' -  ' . Dumper ( @targets )  
-    # Convert to DER  
-    $data->{der} = $default_token->command({
-        COMMAND => 'convert_crl',
-        DATA    => $data->{pem},
-        OUT     => 'DER',
-    }); 
-    if (!defined $data->{der} || $data->{der} eq '') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRLS_COULD_NOT_CONVERT_CERT_TO_DER',
-            log => {
-            logger => CTX('log'),
-                priority => 'error',
-                facility => 'system',
-            },
-        );
-    }
     
     # FIXME - Use exception handling to compensate failures
     ##! 32: 'Data for publication '. Dumper ( $data )      

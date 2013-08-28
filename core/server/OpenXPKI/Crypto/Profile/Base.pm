@@ -478,7 +478,11 @@ Note that each key is an array itself, even if there is only a single value in i
 Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise 
 to do urlescaping on the output, e.g. [- ISSUER.OU.0 | uri -].
 
-=item CAALIAS Alias name of the used ca (as given in the alias table)
+The hash also has ISSUER.DN set with the full dn.
+
+=item CAALIAS Hash holding information about the used ca token.
+
+Offers the keys ALIAS, GROUP, GENERATION as given in the alias table.
 
 =back
 
@@ -511,10 +515,20 @@ sub process_templates {
         
     # Get Issuer Info from selected ca    
     my $issuer_info = $x509->{PARSED}->{BODY}->{SUBJECT_HASH};
-       
+    $issuer_info->{DN} = $x509->{PARSED}->{BODY}->{SUBJECT};
+      
+   # Split alias into generation and group name
+   $self->{CA} =~ /^(.*)-(\d+)$/;
+   my $group = $1;
+   my $generation = $2;
+ 
     my %template_vars = (
         'ISSUER' => $issuer_info,
-        'CAALIAS' => $self->{CA},
+        'CAALIAS' => {
+            'ALIAS' => $self->{CA},
+            'GROUP' => $group,
+            'GENERATION' => $generation
+        }
     ); 
     ##! 32: ' Template Vars ' . Dumper ( %template_vars )  
     
