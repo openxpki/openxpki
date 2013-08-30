@@ -166,7 +166,7 @@ sub __load_config_realm_token {
     if (!$backend_class) {	 
 		$config_name_group =~ /^(.+)-(\d+)$/;
 		$config_name_group = $1;	
-		##! 16: 'use group config ' . $group_config
+		##! 16: 'use group config ' . $config_name_group
 		$backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
     }
     
@@ -199,14 +199,39 @@ sub __load_config_realm_token {
         }                                    
     }               
 
-    # diretory to file conversion for inheritance expansion on keyfiles
-    # If the name is not absolute or not an exisiting directory, it is likely a symbolic name 
-    # hopefully solves issue #27 without the need for a new parameter
-    # Perhaps we can use the Engine setting here to get a better solution     
-    if (File::Spec->file_name_is_absolute( $params_of{$ident}->{KEY} ) && -d $params_of{$ident}->{KEY})  {
-        $params_of{$ident}->{KEY} = File::Spec->catfile( $params_of{$ident}->{KEY}, $name.'.pem' );          
-    }
 
+    # Use Template Toolkit to assemble the key name,      
+    # we offer the full alias, group and generation as vars (similar to cdp)  
+    # Split alias into generation and group name
+    $name =~ /^(.*)-(\d+)$/;
+    my $group = $1;
+    my $generation = $2;
+ 
+    my $template_vars = {
+        'ALIAS' => $name,
+        'GROUP' => $group,
+        'GENERATION' => $generation
+    }; 
+    
+    ##! 16: 'Building key name from template ' . $params_of{$ident}->{KEY}
+    ##! 32: 'TT vars  ' . Dumper $template_vars 
+    
+    my $tt = Template->new();
+    my $output;
+    $tt->process(\$params_of{$ident}->{KEY}, $template_vars, \$output);
+    
+    ##! 16: 'Key path ' . $output
+    
+    # Check for output 
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CANT_BUILD_KEY_PATH',
+        param => {
+            
+        }
+    ) unless ($output);
+    
+    $params_of{$ident}->{KEY} = $output;
+    
     my $certificate = $arg_ref->{CERTIFICATE};
     $certificate = CTX('api')->get_certificate_for_alias({ALIAS => $name}) unless($certificate);    
     if (!defined $certificate || !$certificate->{DATA}) {

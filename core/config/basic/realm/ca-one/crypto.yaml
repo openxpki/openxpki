@@ -11,8 +11,9 @@ token:
   default:
     backend: OpenXPKI::Crypto::Backend::OpenSSL
     
-    # Key Directory - the file name is auto-appended from the tokens name
-    key: /etc/openxpki/ssl/ca-one/
+    # Template to create key, available vars are 
+    # ALIAS (ca-one-signer-1), GROUP (ca-one-signer), GENERATION (1)
+    key: /etc/openxpki/ssl/ca-one/[% ALIAS %].pem
     
     # possible values are OpenSSL, nCipher, LunaCA
     engine: OpenSSL

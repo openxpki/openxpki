@@ -271,12 +271,14 @@ Usually the tokens in a system share a lot of properties. To simplify the config
         
 Inheritance can daisy chain profiles. Note that inheritance works top-down and each step replaces all values that have not been defined earlier but are defined on the current level. Therefore you should not use undef values but the empty string to declare an empty setting.
 
-If your openssl setup supports the predefined naming scheme, you can also use path expansion with inheritance. Set the *key* value to a directory and name your keys "<aliasname>.pem". The example above will then look like::
+You can use template toolkit to autoconfigure the ``key`` property, this way you can roll over your key without modifying your configuration. 
+
+The example above will then look like::
 
     token:  
         default:
             backend: OpenXPKI::Crypto::Backend::OpenSSL
-            key: /etc/openxpki/ssl/ca-one/
+            key: /etc/openxpki/ssl/ca-one/[% ALIAS %].pem
             ......
             secret: default
         
@@ -286,6 +288,9 @@ If your openssl setup supports the predefined naming scheme, you can also use pa
     
         server-ca-2:
             inherit: default
+
+If you need to name your keys according to a custom scheme, you also have GROUP (ca-one-certsign) and
+GENERATION (1) available for substitution.
 
 secret groups
 ^^^^^^^^^^^^^
@@ -356,12 +361,12 @@ Once your ca certificate exceeds its validity, you are no longer able to create 
 
 **crl extensions**
 
-The following code shows the full set of supported extensions, you can leave out what you do not need::
+The following code shows the full set of supported extensions, you can skip what you do not need::
 
     extensions:
         authority_info_access:
             critical: 0
-            ca_issuers: http://myca.mycompany.com/[% CAALIAS %]/cacert.pem
+            ca_issuers: http://myca.mycompany.com/[% CAALIAS.ALIAS %]/cacert.pem
             ocsp: 
             - http://ocsp1.mycompany.com/
             - http://ocsp2.mycompany.com/
@@ -384,6 +389,7 @@ There are two  specialities in handling the *ca_issuers* and *ocsp* entries in t
 1. You can pass either a list or a single scalar to each item.
 2. For each item, template expansion based on the signing ca certificate is available. See TODO:link for details. 
 
+The ``CAALIAS`` hash also offers the components of the alias in GENERATION and GROUP.
     
 Publishing
 ----------
