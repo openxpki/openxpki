@@ -188,7 +188,7 @@ sub start {
             # check if child noticed a startup error
             my $msg = OpenXPKI::Control::__slurp $READ_FROM_KID;
 
-            if (length $msg)
+            if ($msg && length $msg)
             {
                 ## the first message is part of the informal daemon startup message
                 ## the second message is a real error message

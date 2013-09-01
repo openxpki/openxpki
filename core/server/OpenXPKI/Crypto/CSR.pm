@@ -109,7 +109,8 @@ sub __init
     # attributes seperated by newline, key/value seperated by colon
     # Keys are shown as 25 char block (padded or truncated)
     # For the moment we are just interessted in the challengePassword
-    if ($self->{PARSED}->{BODY}->{'ATTRIBUTES'} =~ /challengePassword\s*?:(.*)/) {
+    if (defined $self->{PARSED}->{BODY}->{'ATTRIBUTES'} && 
+        $self->{PARSED}->{BODY}->{'ATTRIBUTES'} =~ /challengePassword\s*?:(.*)/) {
         $self->{PARSED}->{BODY}->{'CHALLENGEPASSWORD'} = $1;
     }    
     delete $self->{PARSED}->{BODY}->{'ATTRIBUTES'};

@@ -146,7 +146,7 @@ sub login_step {
 
     if (! exists $self->{ROLE})
     {
-        $out =~ s/$self->{PATTERN}/$self->{REPLACE}/;
+        $out =~ s/$self->{PATTERN}/$self->{REPLACE}/ if (defined $self->{PATTERN} && defined $self->{REPLACE});
         $self->{ROLE} = $out;
     }
 
