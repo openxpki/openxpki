@@ -427,18 +427,28 @@ sub render_san_from_template {
             my $result; 
             $tt->process(\$line_template, $vars, \$result);
             ##! 32: "Result of $line_template: $result\n";
-            push @entries, $result if ($result);
+            
+            ## split up internal multiples (sep by |)
+            push @entries, (split (/\|/, $result)) if ($result);
         }
-        
+
+        ##! 32: 'Entries are ' . Dumper @entries       
+ 
         # Remove duplicates and split up internal multiples (sep by |)
-        my %items = map { my $key; $key =~ s/\s*(\S.*\S)\s*/$1/; $key => 1 } split("|", join ("|", @entries) );
-        
+        my %items;
+        foreach my $key (@entries) {
+            next unless ($key);
+            $key =~ s/\s*(\S.*\S)\s*/$1/; 
+            $items{$key} = 1;
+        } 
+
         # convert to the internal format used by our crypto engine 
         foreach my $value (keys %items) {                        
             push @san_list, [ $cctype, $value ] if ($value);
         }
     }
-    
+   
+    ##! 16: 'san list ' . Dumper @san_list 
     return \@san_list;
 }
 

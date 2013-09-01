@@ -228,10 +228,10 @@ sub execute {
         
     ##! 16: 'cert_subject: ' . $cert_subject
 
-    my @sans = CTX('api')->render_san_from_template({
+    my @sans = @{CTX('api')->render_san_from_template({
         PROFILE => $cert_profile, 
         VARS    => $userinfo
-    });
+    })};
     
     ##! 16: '@sans: ' . Dumper(\@sans)
  
