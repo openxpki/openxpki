@@ -160,6 +160,9 @@ sub get_factory {
     
     # There might be cases where we request unknown config version
     if (!$workflow_serialized_config) {
+         # Restore the old session info as we otherwise get stuck with the wrong version id
+         CTX('session')->set_pki_realm( $oldrealm ) if ($oldrealm);
+         CTX('session')->set_config_version( $oldversion ) if ($oldversion);
          OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_FACTORY_UNKNOWN_VERSION_REQUESTED',
             params => {
