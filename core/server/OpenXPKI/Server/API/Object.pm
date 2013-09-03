@@ -791,6 +791,9 @@ sub get_private_key_for_cert {
         FACILITY => 'audit',
     );
 
+    
+    # Fix *some* stupid utf8 encoding problems
+    Encode::_utf8_on( $result );
     return { PRIVATE_KEY => $result, };
 }
 
