@@ -722,13 +722,7 @@ sub get_private_key_for_cert {
         $command_hashref->{OUT} = 'OPENSSL_' . $key_type;
     }
     elsif ( $format eq 'PKCS12' ) {
-        my $certificate = $self->get_cert(
-            {
-                IDENTIFIER => $identifier,
-                FORMAT     => 'PEM',
-            }
-        );
-        ##! 16: 'certificate: ' . $certificate
+        ##! 16: 'identifier: ' . $identifier
 
         my @chain = $self->__get_chain_certificates(
             {
@@ -737,6 +731,9 @@ sub get_private_key_for_cert {
             }
         );
         ##! 16: 'chain: ' . Dumper \@chain
+
+        # the first one is the entity certificate
+        my $certificate = shift @chain;
 
         $command_hashref = {
             COMMAND => 'create_pkcs12',
@@ -757,7 +754,6 @@ sub get_private_key_for_cert {
             {
                 'IDENTIFIER' => $identifier,
                 'FORMAT'     => 'DER',
-                'COMPLETE'   => 1,
             }
         );
         my $decrypted_pkcs8_pem = $default_token->command(
@@ -2027,16 +2023,21 @@ sub __get_chain_certificates {
     my $identifier = $arg_ref->{IDENTIFIER};
     my $format     = $arg_ref->{FORMAT};
 
-    my @chain = @{
-        CTX('api')->get_chain(
+    ##! 4: Dumper $arg_ref
+
+    my $chain_ref = CTX('api')->get_chain(
             {
                 'START_IDENTIFIER' => $identifier,
                 'OUTFORMAT'        => $format,
             }
-          )->{CERTIFICATES}
-      };
-    if ( !$arg_ref->{COMPLETE} ) {
-        shift @chain;    # we don't need the first element
+      );
+
+    my @chain = @{ $chain_ref->{CERTIFICATES} };
+    ##! 16: 'Chain ' . Dumper $chain_ref
+
+    # pop off root certificates
+    if ( $chain_ref->{COMPLETE} && scalar @chain > 1 ) {
+        pop @chain;    # we don't need the first element
     }
     ##! 1: 'end'
     return @chain;
