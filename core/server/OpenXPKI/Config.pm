@@ -154,9 +154,9 @@ sub walkQueryPoints {
     ##! 16: " Walk resolvers at $prefix with $call "
     
     my $result;    
-    foreach my $resolver (  $self->get_list( [ $prefix, 'resolvers'] ) ) {                
+    foreach my $resolver (  $self->get_list( "$prefix.resolvers" ) ) {                
         ##! 32: 'Ask Resolver ' . $prefix.'.'.$resolver.'.'.$query
-        $result = $self->$call( [ $prefix, $resolver, $query ], $params );
+        $result = $self->$call( "$prefix.$resolver.$query", $params );
         return { 'VALUE' => $result, 'SOURCE' => $resolver } if ($result);
     }    
     return;
@@ -297,7 +297,7 @@ the of the resolver which returned the result
    
 To query the same path again, put the resolver name into the path: 
 
-   my $value = $conn->get([ $prefix, $resolver, $query ])
+   my $value = $conn->get( "$prefix.$resolver.$query" )
    
 =head3 configuration
 

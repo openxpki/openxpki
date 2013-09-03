@@ -30,8 +30,8 @@ sub execute {
     ##! 8: ' Prepare CSR for cert type ' . $cert_type 
         
     # Get profile from certificate type
-    my $cert_profile = $config->get( [ 'smartcard.policy.certs.type', $cert_type, 'allowed_profiles.0' ] );
-    my $cert_role = $config->get( [ 'smartcard.policy.certs.type', $cert_type, 'role' ] ) || 'User';
+    my $cert_profile = $config->get( "smartcard.policy.certs.type.$cert_type.allowed_profiles.0" );
+    my $cert_role = $config->get( "smartcard.policy.certs.type.$cert_type.role" ) || 'User';
     ##! 8: ' Prepare CSR for profile '. $cert_profile .' with role '. $cert_role 
     CTX('log')->log(
 		    MESSAGE => "Preparing CSR for profile '$cert_profile' with role '$cert_role'",
@@ -110,7 +110,7 @@ sub execute {
     # if number of logins matches limit, autoselect them and proceed
     # Match logins to UPNs using connector (assumed to be unique)         
     
-    my $max_login = $config->get( [ 'smartcard.policy.certs.type', $cert_type, 'max_login' ] ) || 0;
+    my $max_login = $config->get( "smartcard.policy.certs.type.$cert_type.max_login" ) || 0;
     if ($max_login > 0) {
 
         # Available Logins are in the user info hash
@@ -188,8 +188,8 @@ sub execute {
             # query point for that domain
          
             my $upn;
-            if ($user && $config->get_meta( [ 'smartcard.upninfo', $domain ] )) {
-                $upn = $config->get(['smartcard.upninfo', $domain, $user ]);
+            if ($user && $config->get_meta( [ 'smartcard','upninfo', $domain ] )) {
+                $upn = $config->get([ 'smartcard','upninfo', $domain, $user ]);
                 ##! 16: ' Direct domain lookup ' . Dumper( $upn )
             } else {
                 my $res = $config->walkQueryPoints('smartcard.upninfo', $login );
@@ -238,7 +238,7 @@ sub execute {
  
     # Mark escrow certificates
     my $escrow_key_handle = ''; 
-    if ($config->get( [ 'smartcard.policy.certs.type', $cert_type, 'escrow_key' ] ) && 
+    if ($config->get( "smartcard.policy.certs.type.$cert_type.escrow_key" ) && 
         $context->param('temp_key_handle')) {
         $escrow_key_handle =  $context->param('temp_key_handle');
     }

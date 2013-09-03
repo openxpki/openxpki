@@ -89,7 +89,7 @@ sub execute {
     }
 
     # Get the list of targets
-    my @targets = $config->get_keys([ $prefix, 'targets' ]); 
+    my @targets = $config->get_keys( "$prefix.targets" ); 
     
     # If the data point does not exist, we get a one item undef array
     return unless ($targets[0]);
@@ -100,7 +100,7 @@ sub execute {
     foreach my $target (@targets) {
        
         ##! 32: " $prefix.targets.$target.$publish_key " 
-        my $res = $config->set( [ $prefix, 'targets', $target, $publish_key ], $data );
+        my $res = $config->set( "$prefix.targets.$target.$publish_key" , $data );
         ##! 16 : 'Publish at target ' . $target . ' - Result: ' . $res
     }
 
