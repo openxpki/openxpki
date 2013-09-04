@@ -33,6 +33,7 @@ Here is a complete sample configuration::
             max_active_certs: 1
             allow_expired_signer: 0
             auto_revoke_existing_certs: 0
+            approval_points: 1
             
         # Mapping of names to OpenXPKI profiles to be used with the
         # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)              
@@ -117,6 +118,14 @@ grace_period setting and allows certificates to be used for renewal requests for
 **p_auto_revoke_existing_certs**
 
 Schedule revocation of all existing certs of the requestor.
+
+**p_approval_points**
+
+Approval of a request is done based on "approval points". One point is assigned
+for a positve "eligible" check, each manual approval vie the UI counts as one 
+additional point. You can set this to "0" to approve any authorized request.
+Note/TODO: The eligible check is currently not implemented and always true.
+
 
 Certificate Template Name Extension
 ---------------------------------------------

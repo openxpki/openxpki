@@ -54,10 +54,12 @@ sub execute {
     my $workflow   = shift;
     my $context = $workflow->context();
      
-    my $approval_points = $self->param('approval_points') || 1;  
+    my $approval_points = $context->param('p_approval_points');
+    # we accept an explicit zero but want to catch missing configs
+    $approval_points = 1 unless(defined $approval_points);
     
     my $approvals = 0;
-    if ( $context->param('signer_sn_matches_csr' ) && $context->param('eligible_for_initial_enroll' ) ) {
+    if ( $context->param('request_mode' ) eq 'initial' ) {
         ##! 16: 'auto approve for initial enrollment'
         $approvals = 1;
         CTX('log')->log(
@@ -65,7 +67,7 @@ sub execute {
             PRIORITY => 'info',
             FACILITY => 'audit',
         ) 
-    } elsif ( !$context->param('signer_sn_matches_csr' ) && $context->param('eligible_for_renewal' ) ) {
+    } elsif ( $context->param('request_mode' ) eq 'renewal' ) {
         ##! 16: 'auto approve for renewal'        
         $approvals = 1;
         CTX('log')->log(
@@ -73,7 +75,13 @@ sub execute {
             PRIORITY => 'info',
             FACILITY => 'audit',
         )
-    } 
+    } else {
+        CTX('log')->log(
+            MESSAGE => 'SCEP approval no request mode set!',
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        )
+    }
     
     # Look for manual approvals    
     my $serializer = OpenXPKI::Serialization::Simple->new();
@@ -88,20 +96,20 @@ sub execute {
     if ($approvals < $approval_points) {
         $context->param('have_all_approvals' => '0');    
         CTX('log')->log(
-            MESSAGE => 'SCEP insufficient approval points for ' . $context->param('cert_subject'),
+            MESSAGE => sprintf ('SCEP insufficient approval points (%01d/%01d) for %s ', 
+              $approvals, $approval_points, $context->param('cert_subject')),
             PRIORITY => 'info',
             FACILITY => 'audit',
         );    
     } else {
         $context->param('have_all_approvals' => '1');    
         CTX('log')->log(
-            MESSAGE => 'SCEP enough approval points for  ' . $context->param('cert_subject'),
+            MESSAGE => sprintf ('SCEP got required approval points (%01d/%01d) for  ', 
+               $approvals, $approval_points, $context->param('cert_subject')),
             PRIORITY => 'info',
             FACILITY => 'audit',
         );
     }
-    
-    $context->param('todo_kludge_num_approvals' => 'fix in OpenXPKI::Server::Workflow::Activity::SCEPv2::CalcApprovals');
 
     return 1;
 

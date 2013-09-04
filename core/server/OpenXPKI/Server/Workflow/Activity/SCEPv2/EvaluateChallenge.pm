@@ -28,7 +28,7 @@ sub execute {
         );
     }
  
-    # TODO - do some useful stuff here     
+    ## FIXME - TODO - do some useful stuff here     
     $context->param('valid_chall_pass' => 1);
     $context->param('todo_kludge_challenge_password_check'  => 'fix in Activity::SCEPv2::EvaluateChallenge');
     
