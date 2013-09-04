@@ -179,7 +179,7 @@ sub __init
     ###############################
 
     ## load all extensions
-    $ret->{PLAIN_EXTENSIONS} = $ret->{EXTENSIONS};
+    $ret->{PLAIN_EXTENSIONS} = $ret->{EXTENSIONS} || '';
     delete $ret->{EXTENSIONS};
     $ret->{OPENSSL_EXTENSIONS} = {};
 

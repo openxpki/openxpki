@@ -623,9 +623,10 @@ sub do_process_request
 	    $user = CTX('session')->get_user();
     };
     eval {
-	    $role = '(' . CTX('session')->get_role() . ')';
+	    $role = CTX('session')->get_role();
+	    $role = 'no role' unless($role);
     };
-    $0 = 'openxpkid: ' . $user . $role;
+    $0 = "openxpkid: $user ($role)";
 
     ## use user interface
     CTX('service')->run();
