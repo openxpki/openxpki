@@ -1,0 +1,35 @@
+<workflow>
+
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_PUBLISHING</description>
+  <persister>OpenXPKI</persister>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_PUBLISHING_INITIAL</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE" 
+            resulting_state="WAITING_FOR_START">
+    </action>
+  </state>
+  
+  <!-- Do NOT set autorun as this will cause the parent (issue) process to hang until we finish
+  	We need the new workflow engine to pick this up automatic
+  	As the new workflow engine does not support auto-pickup, we fake the behaviour
+  	using the disconnect tool 
+   -->
+  <state name="WAITING_FOR_START" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_WAITING_FOR_START</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_TOOLS_DISCONNECT"
+             resulting_state="PUBLISH">		
+   	</action>
+  </state>
+
+  <state name="PUBLISH" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_PUBLISHING_PUBLISH</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_PUBLISH"
+             resulting_state="SUCCESS">
+    </action>
+  </state>
+
+  <state name="SUCCESS"/>
+
+</workflow>

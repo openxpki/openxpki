@@ -1,0 +1,11 @@
+--- perl-TermReadKey.spec2	2012-01-04 10:18:04.000000000 +0100
++++ perl-TermReadKey.spec2.new	2012-01-04 10:20:17.000000000 +0100
+@@ -52,7 +52,7 @@
+ %defattr(-,root,root,-)
+ %doc README COPYING Artistic
+ %{perl_vendorarch}/auto/*
+-%{perl_vendorarch}/TermReadKey*
++%{perl_vendorarch}/*
+ %{_mandir}/man3/*
+ 
+ %changelog

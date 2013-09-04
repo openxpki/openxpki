@@ -1,0 +1,12 @@
+<html><body>
+
+<p>
+Dear [% requestor %],</p>
+
+<p>
+You certificate for <b>[% cert_subject %]</b> has been issued and is available for
+download at <a href="[% meta_baseurl %]service/api/cert_list.html?csr_serial=[% csr_serial %];auth_stack=Anonymous;pki_realm=[% meta_pki_realm %]">the pki webinterface</a>.
+</p>
+
+<p><i>Regards,<br/>PKI Team</i></p>
+</body></html>

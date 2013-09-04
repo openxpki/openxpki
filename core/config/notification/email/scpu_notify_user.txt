@@ -1,0 +1,14 @@
+Dear [% data.requestor_name %],
+
+The unblocking codes to reset your SmartCard PIN have been send to the following persons:
+
+ [% data.auth1_name %] ([% data.auth1_mail %])
+ [% data.auth2_name %] ([% data.auth2_mail %])
+
+Plese contact them to get your unblocking codes.
+
+If you have any questions on this matter, please contact us.
+
+Regards,
+  PKI Team
+            

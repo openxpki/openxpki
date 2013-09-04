@@ -1,0 +1,15 @@
+by_mail@: connector:users.connectors.by_mail
+
+connectors:                    
+    by_mail:
+        class: Connector::Proxy::Net::LDAP::Single
+        LOCATION: ldap://192.168.168.120:389
+        base: ou=people,dc=mycompany,dc=com
+        filter: (mail=[% ARG %])
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrmap:
+            cn: cn
+            mail: mail
+            
+            

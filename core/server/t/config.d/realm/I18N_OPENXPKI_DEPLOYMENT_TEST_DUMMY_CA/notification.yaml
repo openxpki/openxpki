@@ -1,0 +1,106 @@
+rt: 
+    backend:
+        class: OpenXPKI::Server::Notification::RT
+        server: http://rt.mycompany.com/
+        username: admin
+        password: admin
+        timeout: 300
+
+    template:
+        dir:   t/70_notify/rt/
+       
+    message:        
+        csr_created:  # The message Id as referenced in the activity
+            main:  # The internal handle for this ticket
+                - action: open
+                  queue: PKI
+                  owner: pki-team
+                  subject: New CSR for [% cert_subject %]
+                  template: csr_created
+                  to: "[% cert_info.requestor_email %]"
+                  priority: 1
+                  
+                - action: comment
+                  template: csr_created_comment
+                  status: open
+
+        csr_approved:
+            main:
+                - action: update
+                  status: working
+                  
+                - action: comment
+                  template: csr_approvers
+ 
+        cert_issued:
+            main:
+                - action: comment
+                  template: cert_issued_internal
+                                
+                - action: correspond
+                  template: cert_issued
+                  status: resolved
+
+servicenow: 
+    backend:
+        class: OpenXPKI::Server::Notification::ServiceNow
+        server: https://demo003.service-now.com/incident.do
+        username: admin
+        password: admin
+        timeout: 300
+
+    template:
+        dir:   t/70_notify/rt/
+
+    message:    
+        test: 
+            default:   # The internal handle for this thread
+                action: open
+                template: test
+                short_description: ServiceNow Notification Test
+                priority: 5
+                state: 1
+                category: inquiry
+                assigned_to: admin
+                
+        update: 
+            default:   # The internal handle for this thread
+                action: update
+                comments: Waiting for callback
+                state: 4
+                               
+        close: 
+            default:   # The internal handle for this thread
+                action: close
+
+                        
+smtp:
+    backend:
+        class: OpenXPKI::Server::Notification::SMTP
+        host: localhost
+        port: 25
+        username: ~
+        password: ~
+        debug: 0
+        # You need to install MIME::Tools for html support
+        use_html: 1
+
+    default:
+        to: "[% data.rcpt %]"
+        from: "noreply@mycompany.local"
+        reply: helpdesk@mycompany.local        
+                  
+    # template settings
+    template:
+        dir:   t/70_notify/email/
+
+    message:  
+        test: 
+            default:   # The internal handle for this thread
+                template: testmail
+                subject: SMTP Notification Test
+                images:
+                    banner: head.png
+         
+         
+        

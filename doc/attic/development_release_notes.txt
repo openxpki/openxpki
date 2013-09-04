@@ -1,0 +1,76 @@
+2010-04-09 09:44:52 Mbartosch (Talk | contribs | block)
+2010-04-07 09:46:28 Mbartosch (Talk | contribs | block)
+
+== Release Notes ==
+
+The release notes contain information that possibly impact existing installations.
+
+Release notes use the following tags to describe the type of change:
+; #config
+:  Configuration changes
+; #schema
+:  Database schema changes
+; #workflow
+:  Workflow definition changes
+; #dependency
+:  Software dependency (e. g. new Perl package)
+
+=== Version 1.0 ===
+The OpenXPKI project has not yet released a major version. 
+
+Please refer to the [[Development/Roadmap|Development Roadmap]] for release planning.
+
+=== Version 0.9 - development ===
+
+==== r1525: Workflow logging ====
+Tags: #config
+
+Introduces workflow engine logging via a Workflow observer class. In order to benefit from improved state logging update the Log4perl configuration file log.conf:
+
+<pre>
+...
+## FACILITY: WORKFLOW
+
+log4perl.category.openxpki.workflow = INFO, Logfile
+...
+</pre>
+
+==== r1522: Data pools ====
+Tags: #schema
+
+The commit introduces a new database table ('datapool'). Existing code will work properly without the table, but once you wish to use the data pool feature you need to add the new table.
+
+In MySQL you can add the table manually via:
+
+<pre>
+  DROP TABLE IF EXISTS `datapool`;
+  SET @saved_cs_client     = @@character_set_client;
+  SET character_set_client = utf8;
+  CREATE TABLE `datapool` (
+  `pki_realm` varchar(255) NOT NULL,
+  `namespace` varchar(255) NOT NULL,
+  `datapool_key` varchar(255) NOT NULL,
+  `datapool_value` text,
+  `encryption_key` varchar(255) default NULL,
+  `notafter` decimal(49,0) default NULL,
+  `last_update` decimal(49,0) default NULL,
+  PRIMARY KEY  (`pki_realm`,`namespace`,`datapool_key`)
+  ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  SET character_set_client = @saved_cs_client;
+</pre>
+
+For Oracle the statements are
+
+<pre>
+  CREATE TABLE NAMESPACE.DATAPOOL (
+    pki_realm VARCHAR(255) NOT NULL, 
+    namespace VARCHAR(255) NOT NULL, 
+    datapool_key VARCHAR(255) NOT NULL, 
+    datapool_value CLOB, 
+    encryption_key VARCHAR(255) default NULL, 
+    notafter NUMERIC(38) default NULL, 
+    last_update NUMERIC(38) default NULL,
+    PRIMARY KEY (pki_realm, namespace, datapool_key)
+  );
+</pre>
+

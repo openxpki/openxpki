@@ -1,0 +1,395 @@
+2010-04-07 20:49:36 Mbartosch (Talk | contribs | block)
+2010-02-26 13:24:23 Mbartosch (Talk | contribs | block)
+
+= The Global Key-Value Data Pool =
+
+== Scope ==
+
+OpenXPKI uses a workflow engine to handle stateful operations. The workflow engine implements a workflow context that allows to persistently store key/value tuples of information that is relevant to execution of the workflow. Data stored in the workflow context should be considered private to the corresponding workflow instance.
+
+The workflow context semantics only work properly if the processed data is local to the particular workflow instance. However, there are cases where workflows need to share data between multiple instances or even across workflow type boundaries.
+
+One possible remedy is to access a foreign workflow context from a workflow instance, but this should be considered a hack instead of a sensible solution for the problem.
+
+In contrast, the Data Pool feature allows for persistent storage of structured data that is used by the system globally. It should be used wherever data needs to be shared between multiple workflow instances or workflow types.
+
+== Data Pool properties ==
+
+The Data Pool provides a canonical method for storing key/value tuples that are not specific to a particular workflow instance. This mechanism is available both from the server core and from the Workflow engine. 
+
+The Data Pool can store plain text and encrypted data. Encrypted data is handled transparently for the caller (see below).
+
+Access to the data pool is allowed only via the defined Server API calls.
+
+=== Data access ===
+
+Data is organized by [PKI Realm, namespace, key] which forms the primary key for accessing the corresponding value. This means that the same key 
+can exist in multiple namespaces and that the same namespace name can exist in multiple PKI Realms.
+
+==== PKI Realm ====
+
+When called directly from a workflow activity, the API requires that the requested PKI Realm is identical to the PKI Realm of the current session. Otherwise, the caller may specify an arbitrary PKI Realm.
+
+Data stored with a PKI Realm which is set to '/' is considered instance-wide (not limited to a PKI Realm). This is called the global Data Pool which is used for storing instance-wide data.
+
+NOTE: Encryption is currently not available for the global Data Pool (because no Password Safe can be defined for it).
+
+==== Namespaces ====
+
+Namespaces may consist of alphanumerical characters, including blanks and some punctuation characters (.:_-)
+
+Namespaces in any PKI Realm beginning with 'sys.' are reserved for internal use. These values are treated as read-only by the API when directly called by a Workflow Activity (trying to set an entry in such a namespace by a Workflow activity yields an exception).
+
+In the global data pool '/' the following namespaces are reserved:
+* The namespace 'sys.config' is used for configuration data that may be modified by an administrator and that can be include in the XML configuration.
+* The namespace 'sys.stats.*' is used for performance and server health statistics.
+** An OpenXPKI host writes performance data to the namespace 'sys.stats.serverid.SERVERID.*' SERVERID is taken from the <server_id/> attribute in the database.xml configuration. This allows collecting node-specific data in cluster settings with a shared database.
+
+==== Keys ====
+
+Keys may consist of alphanumerical characters, including blanks and some punctuation characters (.:_-)
+
+==== Values ====
+
+Stored values must be in text format (binary data is not supported). Only valid UTF8 characters are allowed. The maximum size of data that can be stored depends on the underlying database. It is safe to assume that a minimum of 32 KByte text data can be stored.
+
+Currently only Scalar values may be stored in the data pool.
+
+=== Meta data ===
+
+==== Modification date ====
+
+The API call to write a value to the data pool also sets a modification time stamp in the created record. The modification time stamp is returned 
+by the corresponding read API calls.
+
+The modification date is specified in seconds since Epoch.
+
+==== Expiration date ====
+
+Each single data entry may contain an expiration date which defaults to Null. An undefined expiration date means that the stored data does not expire.
+An entry whose expiration date has passed may be deleted by the server at any time.
+
+The expiration date is specified in seconds since Epoch.
+
+
+=== Data pool encryption ===
+
+The data pool supports encryption of individual entries in order to protect sensitive data. The encryption shall prevent administrators and 
+users of the system from directly accessing stored data. Within the OpenXPKI server data may be transparently decrypted at any time.
+
+When creating a key/value tuple via the corresponding API call the creator may request encryption for the stored data. If encryption is requested and the necessary keys are available the server encrypts the value and stores the encrypted value in the database.
+
+When reading a value from the data pool the OpenXPKI server checks if the value was encrypted. If this was the case, it tries to decrypt the  encrypted value. If this is successful, the decrypted value is transparently returned to the caller. The value returned from the read API all indicates that the value was encrypted.
+
+If the server cannot access the necessary keys to decrypt the value it throws an exception.
+
+'''Important:''' Encryption of data pool values only works properly if a usable password safe is available for the requested PKI Realm.
+
+== Encrypted data storage ==
+
+=== Key Management Logic ===
+ 
+At any given time, the datapool encryption feature uses one single symmetric key for encryption of new keys. 
+
+The same symmetric key will be used for encrypting all data pool entries during the usage time of the password safe, i. e. there is a 1:1 connection
+between password safe and symmetric key used for encryption of data pool entries.
+
+After the first use the OpenXPKI server will cache the encryption key corresponding to each password safe in the SECRET table (protected by the
+server-wide VolatileVault). This dramatically speeds up access because no asymmetric operations need to be done for encryption and decryption
+of values once the cache has been prepared.
+
+'''Scenario 1:''' A new password safe is used the first time, no keys previously exist (except of the asymmetric password safe key itself).
+* generate a new symmetric key (VolatileVault, exportable)
+* store the mapping password safe id -> symmetric key id in the data pool
+* encrypt the symmetric key with the password safe (asymmetrically, PKCS#7)
+* store the encrypted symmetric key in the data pool, access key is the symmetric key id
+* cache the symmetric key in the server-wide volatile vault
+* use newly created symmetric key for encryption of the value
+
+'''Scenario 2:''' The password safe has been used before to encrypt a data pool entry, reuse it
+* get (decrypt) symmetric key from data pool (Note: this recursively resolves referenced keys until the key is decrypted. This possibly reuses cached keys in the server-wide volatile vault.)
+* use existing symmetric key for encryption of the value
+
+
+The Data Pool encryption feature uses the Data Pool itself to store metadata necessary for value encryption. The following namespaces are used in the target PKI Realm:
+
+=== Namespace: sys.datapool.pwsafe - mapping password safes to symmetric keys ===
+
+This namespace contains simple (plain text) mappings that associate symmetric keys with password safe names. When encrypting a new value, the server checks if there is already a key associated to the password safe. If a match is found, it uses the referenced key, otherwise it creates a new key and stores the mapping.
+
+Namespace: sys.datapool.pwsafe  (within the target PKI realm)
+
+Key: p7:SAFENAME  (where SAFENAME is the name of the corresponding passwordsafe from config.xml)
+
+Value: Symmetric Key Id (describes which symmetric key is used to encrypt the data)
+
+=== Namespace: sys.datapool.keys - symmetric key storage ===
+
+This namespace maps a symmetric key id to its corresponding encryption key value. The value is always encrypted, normally using the asymmetric password safe.
+
+=== Commented storage example ===
+
+Table: '''datapool'''
+
+{| border="1"
+! pki_realm 
+! namespace
+! datapool_key
+! datapool_value
+! encryption_key
+! notafter
+! last_update
+|- 
+| MYREALM 
+| sys.datapool.pwsafe 
+| p7:passwordsafe1
+| 75SKlOB23rVCs0pqGV4iRv2cx2g  
+|                                 
+|  NULL 
+|  1270368620
+|-
+| MYREALM 
+| sys.datapool.keys     
+| 75SKlOB23rVCs0pqGV4iRv2cx2g 
+| -----BEGIN PKCS7-----MIIBu... 
+| p7:passwordsafe1
+| NULL 
+|  1270368620
+|-
+| MYREALM 
+| smartcard.puk          
+| gem2_123456                                  
+| 75SKlOB2;base64-oneline;92wb/FsR+d1/YMs1 
+| 75SKlOB23rVCs0pqGV4iRv2cx2g 
+| 1270368680 
+|  1270368620
+|}
+
+==== Decryption ====
+
+In this example the value for key "gem2_123456" in namespace "smartcard.puk" is encrypted. 
+
+* The data pool is asked to get the corresponding value it checks the encryption_key column. 
+* If it is null, the value is unencrypted and directly returned. 
+* In this case, it finds the value "75SKlOB23rVCs0pqGV4iRv2cx2g", which is the symmetric key identifier used for encryption of the value.
+* Now it tries to obtain the symmetric key by querying namespace "sys.datapool.keys" for "75SKlOB23rVCs0pqGV4iRv2cx2g". 
+* For this key it finds that a value is encrypted with "p7:passwordsafe1". 
+* Now it tries to decrypt the stored value "-----BEGIN PKCS7..." with the asymmetric passwordsafe1 key. 
+* The resulting value is the used to decrypt the original encrypted value.
+
+==== Encryption ====
+
+A new key/value pair "gem2_98765" -> "1234" shall be encrypted.
+
+* The data pool determines the currently active password safe, which is literally "passwordsafe1"
+* It checks the "sys.datapool.pwsafe" table to obtain the corresponding symmetric key id.
+* It finds "75SKlOB23rVCs0pqGV4iRv2cx2g".
+* Now it tries to obtain the symmetric key by querying namespace "sys.datapool.keys" for "75SKlOB23rVCs0pqGV4iRv2cx2g". 
+* For this key it finds that a value is encrypted with "p7:passwordsafe1". 
+* Now it tries to decrypt the stored value "-----BEGIN PKCS7..." with the asymmetric passwordsafe1 key. 
+* The resulting value is the used to encrypt the value to store.
+
+=== Optimizations ===
+
+Several optimizations help to avoid unnecessary asymmetric operations which considerably speeds up subsequent encryption/decryption operations. Mainly the used symmetric keys are cached in the instance-wide volatile vault, completely eliminating the need to decrypt the symmetric key every time it is used.
+
+
+== API reference ==
+
+=== set_data_pool_entry ===
+<code>
+  CTX('api')->set_data_pool_entry({
+    PKI_REALM => scalar: PKI Realm (may be '/' for global realm)
+    NAMESPACE => scalar: Namespace to use
+    EXPIRATION_DATE => scalar, optional: expiration date after which the record may be discarded. Format: YYYYMMDD
+    ENCRYPT => scalar, optional: set to 1 to request encryption
+    KEY => scalar: Key for accessing the stored value
+    VALUE => scalar: Value to store
+    FORCE => scalar, optional: set to 1 to allow overwriting existing values
+  })
+</code>
+
+Returns: true on success, throws exception on error. 
+
+* If directly called from a Workflow Activity the API requires PKI_REALM set identical to session PKI Realm.
+* If VALUE is undefined, the corresponding tuple will be deleted from the table.
+* Side effects: calling this function will expunge all expired values from the datapool.
+* No implicit commit() is performed on the backend database handle.
+* Encryption may work even though the private key for the password safe is not available (the symmetric encryption key is encrypted for the password
+safe certificate). Retrieving encrypted information will only work if the password safe key is available during the first access to the symmetric key.
+
+Exceptions:
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_PKI_REALM : Invalid PKI Realm was specified.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_NAMESPACE : Invalid (e. g. reserved) namespace was specified.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_READ_ONLY_DATA : Attempt to modify read-only data.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENTRY_EXISTS : Specified key already exists.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENCRYPTION_NOT_CONFIGURED : Encryption is not set up properly.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENCRYPTION_KEY_UNAVAILABLE : Encryption key is currently not available (e. g. not logged in), cannot encrypt value.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_VALUE_DATA_TYPE : Value data type is not supported.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_VALUE_DATA : Value data content is not supported (e. g. binary data)
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_NESTED_VALUE_DATA : Value data type is nested.
+; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_EXPIRATION_DATE : Invalid expiration date
+
+=== get_data_pool_entry ===
+<code>
+  my $value = CTX('api')->get_data_pool_entry({
+    PKI_REALM => scalar, see above
+    NAMESPACE => scalar, see above
+    KEY => scalar, see above
+  });
+</code>
+
+Retrieves stored data entry from the data pool.
+
+Returns: Hashref:
+<code>
+  {
+    PKI_REALM => caller argument passed literally
+    NAMESPACE => caller argument passed literally
+    KEY => caller argument passed literally
+    VALUE => scalar, retrieved data
+    ENCRYPTED => 0 | 1, set to 1 if entry was originally encrypted
+    ENCRYPTION_KEY => scalar, string describing the key id used to encrypt the value
+    MTIME => modification time (Epoch)
+    EXPIRATION_DATE => expiration date (Epoch)
+  }
+</code>
+
+Exceptions:
+; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_INVALID_PKI_REALM : Invalid PKI Realm was specified.
+; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_INVALID_NAMESPACE : Invalid (e. g. reserved) namespace was specified.
+; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_ENCRYPTION_NOT_CONFIGURED : Encryption is not set up properly.
+; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_ENCRYPTION_KEY_UNAVAILABLE : Encryption key is currently not available (e. g. not logged in), cannot decrypt value.
+; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_NOT_FOUND : Specified key was not found.
+
+
+=== list_data_pool_entries ===
+<code>
+  CTX('api')->list_data_pool_entries({
+    PKI_REALM => scalar, see above
+    NAMESPACE => scalar, see above, optional
+  });
+</code>
+
+List all keys available in the specified namespace. If no namespace is specified, lists all key, namespace tuples in the specified realm.
+
+Returns: arrayref:
+<code>
+  [
+    {
+      KEY => string
+      NAMESPACE => string
+    },
+    ....
+  ]
+</code>
+
+Exceptions:
+; I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM : Invalid PKI Realm was specified.
+
+
+
+== Examples ==
+
+=== Storing and retrieving smartcard unblocking keys ===
+Smartcards use PUKs that allow to reset the Smartcard PIN. In order to allow for Smartcard unblocking by the user the system must access the Smartcard PUK and use it to allow PIN change. PUKs are sensitive information and must be stored in encrypted form.
+
+In order to store a PUK securely from a Workflow the following code could be used:
+
+<code>
+      my $pki_realm  = CTX('api')->get_pki_realm();
+      my $smartcard_id = 'gem2_123456';
+      my $smartcard_puk = 'sUpers3cr3t';
+  
+      CTX('api')->set_data_pool_entry(
+  	  {
+  	      PKI_REALM => $pki_realm,
+  	      NAMESPACE => 'smartcard.puk',
+  	      KEY => $smartcard_id,
+  	      VALUE => $smartcard_puk,
+  	      ENCRYPT => 1,
+  	      FORCE => 1,
+  	  });
+</code>
+
+In order to retrieve the encrypted PUK the following code is used:
+
+<code>
+      my $pki_realm  = CTX('api')->get_pki_realm();
+      my $smartcard_id = 'gem2_123456';
+      my $data = 
+  	CTX('api')->get_data_pool_entry(
+  	    {
+  		PKI_REALM => $pki_realm,
+  		NAMESPACE => 'smartcard.puk',
+  		KEY => $smartcard_id,
+  	    });
+      my $smartcard_puk = $data->{VALUE};
+</code>
+
+The returned data structure migh look like:
+
+<code>
+  {
+          'ENCRYPTED' => 1,
+          'ENCRYPTION_KEY' => '75SKlOB23rVCs0pqGV4iRv2cx2g',
+          'KEY' => 'gem2_123456',
+          'MTIME' => '1270371668',
+          'NAMESPACE' => 'smartcard.puk',
+          'PKI_REALM' => 'I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA',
+          'VALUE' => 'sUpers3cr3t'
+  };
+</code>
+
+=== Referencing configuration data ===
+Currently the only way to configure OpenXPKI is to include literal settings in the XML configuration file. To provide increased flexibility the configuration mechanism should support the possibility to reference entries from a key/value list stored in the database.
+
+Example data:
+<code>
+  PKI_REALM = undef
+  NAMESPACE = 'sys.config'
+  KEY = 'ldap_host'
+  VALUE = 'ldap.example.com'
+</code>
+
+=== Storing server statistics ===
+The server allows access to internal runtime information by storing performance data and other statistics in the 'sys.stats' namespace. In order to allow collection of data for multiple server nodes accessing the same database, the server shall append its server ID to the namespace.
+
+Example:
+config.xml:
+
+<code>
+  <openxpki>
+    <common>
+      <database>
+        <server_id>0</server_id>
+        <server_shift>8</server_shift>
+      </database>
+    </common>
+  </openxpki>
+</code>
+
+In this example the server ID is 0 which shall be used by the server to set its data.
+
+The following entry could be written if a new process has been spawned:
+
+<code>
+  my $config = CTX('xml_config');
+  my $server_id = $config->get_xpath (
+                   XPATH    => [ "common/database/server_id" ],
+                   COUNTER  => [ 0 ],
+                   CONFIG_ID => 'default',
+  );
+  
+  my $processes = .... # get server statistics to store
+  
+  CTX('api')->set_data_pool_entry(
+  	  {
+  	      PKI_REALM => '/',
+  	      NAMESPACE => "sys.stats.serverid.$server_id",
+  	      KEY => 'processes',
+  	      VALUE => $processes,
+  	      FORCE => 1,
+  	  });
+</code>
+

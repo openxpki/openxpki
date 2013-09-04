@@ -1,0 +1,42 @@
+# Transition of scep section in config.xml
+
+scep-server-1:
+    # Time that must elapse after a failed request
+    retry_time: 0000000001
+    # Earliest time to create a renewal request
+    renewal_period: 000014
+    # How long can the certificate be expried to make a renewal
+    grace_period: 0000000005
+    # How long a workflow can be reactivated
+    #workflow_expiry: 000014 - unused
+    
+    workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
+
+    key_size:
+    - 1024    
+    - 2048
+    
+    authorized_signer_on_behalf:
+        rule1:
+            # Full DN
+            subject: CN=scep-signer\.openxpki\.org,O=OpenXPKI Testing,C=DE
+        rule2:
+            # Wildcarded DN
+            subject: CN=scep-signer-[0-9]*\.openxpki\.org.*
+        rule3:
+            # Special cert by identifier	
+            identifier: JNHN5Hnje34HcltluuzooKVqxs2                        
+    
+    policy:         
+        allow_anon_enroll: 0
+        allow_man_authen: 1
+        allow_man_approv: 1        
+        max_active_certs: 1
+        allow_expired_signer: 0
+        auto_revoke_existing_certs: 1
+        approval_points: 1
+        
+    # Mapping of names to OpenXPKI profiles to be used with the 
+    # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)       
+    profile_map:
+        pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION

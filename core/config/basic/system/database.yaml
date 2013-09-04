@@ -1,0 +1,14 @@
+main:
+    debug: 0
+    type: MySQL
+    name: openxpki
+    host: localhost
+    port: 3306
+    user: openxpki
+    passwd: openxpki
+    environment:          
+        key: value
+    
+# To log to a different database copy and adjust the upper block
+# logging: ~
+     

@@ -1,0 +1,124 @@
+2010-03-03 11:02:12 Achim (Talk | contribs | block)
+2008-08-22 19:08:45 Alech (Talk | contribs | block)
+
+= Example commented token.xml =
+
+This is an example token.xml file detailing the configuration related to cryptographic tokens/keys in OpenXPKI.
+
+<pre>
+<token_config>
+    <!-- Default token, this token is used for a number of cryptorgraphic
+         operations that are not associated with any specific CA/SCEP/password
+         safe token -->
+    <token id="default">
+        <!-- the cryptographic backend, currently only
+             OpenXPKI::Crypto::Backend::OpenSSL is possible -->
+        <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
+
+        <!-- the engine class to be used. typicall OpenSSL, if you
+             are using a hardware security module (HSM) or GOST,
+             these may be nCipher, PKCS11 or GOST -->
+	<engine>OpenSSL</engine>
+
+        <!-- OpenSSL config entries for engine-specific configuration,
+             this highly depends on your engine -->
+        <engine_section></engine_section>
+
+        <!-- key storage location, can be OPENXPKI (for software keys
+             on disk) or ENGINE for keys stores in a HSM -->
+        <key_store>OPENXPKI</key_store>
+
+        <!-- when to use a hardware engine, can be empty (in case you
+             are not using an engine anyways), or a combination of
+             - ALWAYS
+             - NEVER
+             - NEW_ALG (if the engine introduces new crypto algorithms)
+             - PRIV_KEY_OPS (only for private key operations)
+             - RANDOM (for random generation, not used at the moment)
+        -->
+        <engine_usage></engine_usage>
+
+	<!-- OpenSSL binary location -->
+        <shell>/opt/local/bin/openssl</shell>
+
+	<!-- OpenSSL binary call gets wrapped with this command,
+             particularly useful in the HSM case, for example to
+             use nCipher's with-nfast wrapper -->
+        <wrapper></wrapper>
+
+	<!-- random file to use for OpenSSL -->
+        <randfile>/var/openxpki/rand</randfile>
+    </token>
+
+
+    <token id="testdummyca1" super="../token{default}">
+        <!-- CA key (PEM encoded) -->
+        <key>/etc/openxpki/ca/testdummyca1/cakey.pem</key>
+
+	<!-- reference to the secret config section in config.xml
+             which will determine how the secret can be unlocked -->
+        <secret>default</secret>
+    </token>
+    
+    <!-- [...] potentially more ca tokens -->
+
+    <!-- SCEP server token -->
+    <token id="testscepserver1" super="../token{default}">
+        <!-- Backend class, currently always OpenXPKI::Crypto::Tool::SCEP -->
+        <backend>OpenXPKI::Crypto::Tool::SCEP</backend>
+	
+        <!-- Backend shell command, the openca-scep binary from OpenCA-->
+        <shell>/usr/local/bin/openca-scep</shell>
+
+        <!-- Private key (PEM encoded) -->
+        <key>/etc/openxpki/ca/scepdummyserver1/key.pem</key>
+
+	<!-- Secret reference, cf. above -->
+        <secret>default</secret>
+    </token>
+    
+    <!-- SCEP PKCS#7 tool -->
+    <token id="testsceppkcs7tool1" super="../token{default}">
+        <!-- Backend class, always OpenXPKI::Crypto::Tool::PKCS7 for now -->
+        <backend>OpenXPKI::Crypto::Tool::PKCS7</backend>
+	
+        <!-- Backend shell command, openca-sv from OpenCA -->
+        <shell>/Users/klink/usr/local/bin/openca-sv</shell>
+
+        <!-- Private key (PEM encoded) -->
+        <key>/etc/openxpki/ca/scepdummyserver1/key.pem</key>
+
+	<!-- CA passphrase -->
+        <secret>default</secret>
+    </token>
+    
+    <!-- Java keystore tool, used to create Java keystore files -->
+    <token id="testcreatejavakeystore" super="../token{default}">
+        <!-- Backend class, always OpenXPKI::Crypto::Tool::CreateJavaKeystore -->
+        <backend>OpenXPKI::Crypto::Tool::CreateJavaKeystore</backend>
+	
+        <!-- Backend shell command, see trunk/create_javakeystore -->
+        <shell>/usr/local/bin/create_javakeystore</shell>
+    </token>
+    
+    <!-- Password safe configuration, needs a private key as well -->
+    <token id="passwordsafe1" super="../token{default}">
+        <!-- Backend class -->
+        <backend>OpenXPKI::Crypto::Backend::OpenSSL</backend>
+	
+        <!-- Backend shell command -->
+        <shell>/opt/local/bin/openssl</shell>
+
+        <!-- Private key (PEM encoded) -->
+        <key>/etc/openxpki/ca/passwordsafe1/key.pem</key>
+
+	<!-- CA passphrase -->
+        <secret>default</secret>
+    </token>
+
+</token_config>
+</pre>
+
+See also:
+*[[Manual/Reference/Configuration/token.xml/Engine/PKCS11 PKCS11 Example]]
+

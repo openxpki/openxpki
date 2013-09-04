@@ -1,0 +1,71 @@
+<validators>
+  <validator name="I18N_OPENXPKI_WF_VAL_KEYLENGTH"
+             class="OpenXPKI::Server::Workflow::Validator::KeyLength">
+      <param name="min" value="rsaEncryption: 1024, dsaEncryption: 1024, id-ecPublicKey: 191"/>
+      <!-- the following is optional, if you want your users to be able
+           to use arbitrarily long keys, you can comment it -->
+      <param name="max" value="rsaEncryption: 8192, dsaEncryption: 8192, id-ecPublicKey: 800"/>
+      <!-- this defines whether you want to fail if an algorithm is used
+           for which you have not defined a minimal length -->
+      <param name="fail_on_unknown_algorithm" value="1"/>
+  </validator>
+
+  <validator name="I18N_OPENXPKI_WF_VAL_BULK"
+             class="OpenXPKI::Server::Workflow::Validator::Bulk">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_KEYREUSE"
+             class="OpenXPKI::Server::Workflow::Validator::KeyReuse">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_HASREQUIREDFIELD"
+             class="Workflow::Validator::HasRequiredField">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTROLE"
+             class="OpenXPKI::Server::Workflow::Validator::CertRole">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTPROFILE"
+             class="OpenXPKI::Server::Workflow::Validator::CertProfile">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTSUBJECTPARTS"
+             class="OpenXPKI::Server::Workflow::Validator::CertSubjectParts">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_CERTSUBJECTALTNAMEPARTS"
+             class="OpenXPKI::Server::Workflow::Validator::CertSubjectAltNameParts">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_VALIDITYTIME"
+             class="OpenXPKI::Server::Workflow::Validator::ValidityTime">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_SPKAC"
+             class="OpenXPKI::Server::Workflow::Validator::SPKAC">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_PKCS10"
+             class="OpenXPKI::Server::Workflow::Validator::PKCS10">
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_PASSWORDQUALITY"
+             class="OpenXPKI::Server::Workflow::Validator::PasswordQuality">
+        <param name="DICTIONARY" value="5"/>
+        <param name="FOLLOWING" value="3"/>
+        <param name="FOLLOWING_KEYBOARD" value="1"/>
+        <param name="GROUPS" value="2"/>
+        <param name="MINLEN" value="8"/>
+        <param name="MAXLEN" value="32"/>
+        <!--
+        <param name="DICTIONARIES" value="/usr/share/dict/ngerman,/usr/share/dict/american-english"/>
+        -->
+  </validator>
+  <validator name="I18N_OPENXPKI_WF_VAL_VALIDAPPROVALSIGNATURECSR"
+             class="OpenXPKI::Server::Workflow::Validator::ApprovalSignature">
+      <!-- if you set the following parameter to 1, you can enforce
+           signatures on all CSR approvals -->
+      <param name="signature_required" value="0"/>
+      <param name="config_path" value="approval.csr.anchor"/>
+      <!-- if you set signature_required to 1, you have to defined
+           identifiers for your trust anchors:
+           
+      <param name="trust_anchors" value="identifier1,identifier2,..."/>
+
+      Alternatively, you can also specify realms, which will then be
+      replaced by all CA identifiers defined in that realm
+      -->
+
+  </validator>
+</validators>

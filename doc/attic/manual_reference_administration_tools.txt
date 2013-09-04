@@ -1,0 +1,58 @@
+2010-04-22 16:06:54 Mbartosch (Talk | contribs | block) 
+2010-04-22 15:46:45 Mbartosch (Talk | contribs | block)
+
+== openxpkicmd ==
+
+The openxpkicmd command allows to instantiate new Workflows from the command line. It is possible to choose the target realm and authentication stack, as well as specifying user login information if needed.
+
+One use of the tool is to automate recurrent actions, such as CRL issuance. To make this work, some configuration settings are necessary:
+
+First of all, a new anonymous authentication stack '_System' is configured in auth.xml. The web frontend ignores stacks whose name starts with an underscore, so this stack is not presented as a choice to the user on the web frontend. The authentication handler then binds the _System stack to the Role 'System'.
+
+auth.xml:
+<pre>
+<auth>
+…
+  <stack name="_System">
+  <description>I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_AUTH_SYSTEM</description>
+    <handler>System</handler>
+  </stack>
+…
+  <handler name="System" type="Anonymous">
+    <role>System</role>
+  </handler>
+</auth>
+</pre>
+
+Now the role 'System' is defined in auth.xml and the necessary permissions and workflow permissions are set in order to grant the System role the necessary privileges:
+
+<pre>
+<acl>
+…
+  <role>System</role>
+…
+  <!-- allow system user to create CRLs -->
+  <permission>
+     <server>*</server>
+     <activity>Workflow::start_crl_issuance</activity>
+     <affected_role>*</affected_role>
+     <auth_role>System</auth_role>
+  </permission>
+…
+  <workflow_permissions role="System"> <!-- system user (via command line) -->
+      <server name="*">
+          <create>
+              <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
+          </create>
+          <read>
+              <creator>.*</creator>
+              <type>I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE</type>
+          </read>
+      </server>
+  </workflow_permissions>
+…
+</acl>
+</pre>
+
+This setup allows all Unix user with read/write permissions to the OpenXPKI socket creation of CRL Issuance workflows. It is strongly recommended to limit read/write access to the OpenXPKI socket via Unix permissions.
+

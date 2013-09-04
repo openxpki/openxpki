@@ -1,0 +1,47 @@
+2008-09-04 14:43:14 Jkunkel (Talk | contribs | block)
+
+== OpenCA-Tools ==
+
+#'''openca-scep''':  OpenCA Simple Certificate Enrollment Protocol Tools
+#'''openca-sv''': OpenCA Sign and Verify Toolkit
+
+
+
+Get the source ,build the deb packages and install the tools...
+ openXpki:/$ '''mkdir /usr/src/openca-tools'''
+ openXpki:/$ '''cd /usr/src/openca-tools'''
+ openXpki:/usr/src/openca-tools$ '''wget http://switch.dl.sourceforge.net/sourceforge/openca/openca-tools-1.0.0.tar.gz'''
+ openXpki:/usr/src/openca-tools$ '''tar -xvzf openca-tools-1.0.0.tar.gz'''
+ openXpki:/usr/src/openca-tools$ '''cd openca-tools-1.0.0'''
+ openXpki:/usr/src/openca-tools/openca-tools-1.0.0$ '''dh_make -e jkunkel@ACME.de -f ../openca-tools-1.0.0.tar.gz'''
+ 
+ Type of package: single binary, multiple binary, library, kernel module or cdbs?
+  [s/m/l/k/b] m  
+ 
+ Maintainer name : root
+ Email-Address   : jkunkel@ACME.de
+ Date            : Thu,  4 Sep 2008 13:32:14 +0200
+ Package Name    : openca-tools
+ Version         : 1.0.0
+ License         : blank
+ Type of Package : Multi-Binary
+ Hit <enter> to confirm:
+ Done. Please edit the files in the debian/ subdirectory now. openca-tools
+ uses a configure script, so you probably don't have to edit the Makefiles.  
+ 
+ openXpki:/usr/src/openca-tools/openca-tools-1.0.0$ '''dpkg-buildpackage -rfakeroot'''
+ dpkg-buildpackage: source package is openca-tools
+ dpkg-buildpackage: source version is 1.0.0-1
+ dpkg-buildpackage: source changed by root <jkunkel@ACME.de>
+ dpkg-buildpackage: host architecture i386
+ dpkg-buildpackage: source version without epoch 1.0.0-1
+  fakeroot debian/rules clean
+ dh_testdir
+ dh_testroot
+ rm -f build-arch-stamp build-indep-stamp #CONFIGURE-STAMP#
+ ...
+ ...
+ root@openXpki:/usr/src/openca-tools/openca-tools-1.0.0# '''dpkg -i ../openca-tools-1.0.0.tar.gz ''' \
+                                                                 '''../openca-tools-doc_1.0.0-1_all.deb'''
+
+

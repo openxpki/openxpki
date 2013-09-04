@@ -1,0 +1,21 @@
+Dear [% requestor %],
+
+We have received a certificate request from you for a certificate
+with the following data:
+
+Subject: [% cert_subject %]
+[% FOREACH san = cert_subject_alt_name  -%]
+Subject alternative name: [% san.0 %]: [% san.1 %]
+[% END -%]
+
+For this request, a new workflow has been created on the CA system
+with ID [% meta_wf_id %].
+
+If you have any questions or comments regarding this certificate
+request, please reply to this mail keeping the subject intact.
+
+We will notify you once the certificate has been issued and is
+ready for download.
+
+Regards,
+  PKI Team

@@ -1,0 +1,14 @@
+This directory contains the final content state of the OpenXPKI Wiki as
+of 2012-10-10.
+
+The individual files are loosely named based on the original page title,
+the main/index page can be found in main_page.txt.
+
+Each file starts with a one or two line preamble, indicating timestamp
+and author of the last recorded change and (if applicable) of the initial
+version of the page.
+
+The content follows as raw MediaWiki markup.
+
+Content is left unedited and mostly only applies to OpenXPKI version 0.9.x.
+ 

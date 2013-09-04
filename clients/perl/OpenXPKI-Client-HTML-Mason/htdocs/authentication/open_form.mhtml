@@ -1,0 +1,16 @@
+<%args>
+    $session_id => undef
+    $next_comp   => undef
+    $no_menu    => undef
+    $name      => 'OpenXPKI'
+</%args>
+% my $title = $m->request_comp()->title();
+%    $title =~ s/[^\/]+\//..\//g;
+%    $title =~ s/\/[^\/]*$/\//;
+%    $title =~ s/^\///;
+% $next_comp = '' if (! defined $next_comp);
+% $no_menu = '' if (! defined $no_menu);
+        <form action="<% $title %>authentication/index.html" name="<% $name %>" method="post">
+          <input type="hidden" name="next_comp" value="<% $next_comp %>"/>
+          <input type="hidden" name="no_menu" value="<% $no_menu %>"/>
+

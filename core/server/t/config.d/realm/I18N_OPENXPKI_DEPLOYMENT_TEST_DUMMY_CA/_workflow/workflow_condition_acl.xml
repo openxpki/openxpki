@@ -1,0 +1,100 @@
+<!-- Conditions for refactored naming scheme
+  normal conditions start with  I18N_OPENXPKI_WF_COND_
+  acl conditions should use the special prefix I18N_OPENXPKI_WF_ACL_ 
+  The name should reflect or be inspired by the implementing class to avoid naming conflicts
+  -->
+<conditions>
+ <!-- TODO: in many cases, param name is useless, one can just read the
+      condition name instead. This is only useful if activity is different
+      from the ACL name -->
+  <condition name="I18N_OPENXPKI_WF_ACL_STORE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>    
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_RETRIEVE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_FAIL_WORKFLOW" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+
+  <!-- ACL Checks for Certificate Issuance
+ 	Note: It would make perhaps more sense to refactor the names to reflect a tree like structure
+	so, out CSR as the first part of the name  -->
+  <condition name="I18N_OPENXPKI_WF_ACL_CREATE_CSR" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_ROLE" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_PROFILE" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT_STYLE" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT_ALT_NAME" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_INFO" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_NOTBEFORE" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_NOTAFTER" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_APPROVE_CSR" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CANCEL_CSR_APPROVAL" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_INSERT_CSR" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_PERSIST_CSR" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_REJECT_CSR" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  
+  <!--  Smartcard -->
+  <condition name="I18N_OPENXPKI_WF_ACL_SMARTCARD_PERSONALIZATION" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  
+  <!-- Revocation -->
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">    
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_INVALIDITY_TIME" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_REASON" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_APPROVE" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CANCEL_APPROVAL" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_REVOKE_CERTIFICATE" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_INSERT" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_REJECT" class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+
+  
+ </conditions>

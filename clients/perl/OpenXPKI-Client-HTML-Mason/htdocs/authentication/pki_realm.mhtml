@@ -1,0 +1,49 @@
+<%args>
+  $msg             => undef
+</%args>
+
+    <& '/authentication/open_form.mhtml' &>
+    <div class="title">
+    <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_TITLE') %>
+    </div>
+    <div class="description">
+        <% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_GET_PKI_REALM_DESCRIPTION') %>
+    </div>
+    <select name="pki_realm">
+% foreach my $realm (keys %{ $pki_realms }) {
+        <option value=<% $realm %>><% i18nGettext($pki_realms->{$realm}->{NAME}) %></option>
+% }
+    </select>
+    <& '/authentication/close_form.mhtml' &>
+
+<%init>
+    my $session_id = $context->{session_id};
+    my $client     = $context->{client};
+
+    ## check that we must handle this message
+    return $msg if ($msg->{SERVICE_MSG} ne "GET_PKI_REALM");
+
+    ## was the pki realm specified by the user?
+    my $requested_realm = $m->request_args()->{'pki_realm'};
+    if (exists $ENV{'OPENXPKI_PKI_REALM'}) {
+        # a default realm for this webserver/vhost was set using the
+        # OPENXPKI_PKI_REALM environment variable ...
+        $requested_realm = $ENV{'OPENXPKI_PKI_REALM'};
+    }
+    if (defined $requested_realm) {
+        $msg = $client->send_receive_service_msg(
+            'GET_PKI_REALM',
+            {
+                'PKI_REALM' => $requested_realm
+            },
+        );
+        if ($msg->{'SERVICE_MSG'} ne 'GET_PKI_REALM') {
+            return $msg;
+        }
+    }
+
+    ## ok let's ask the user for the PKI realm
+    ## cache the last message in the context
+    my $pki_realms  = $msg->{PARAMS}->{PKI_REALMS};
+    $context->{msg} = $msg;
+</%init>

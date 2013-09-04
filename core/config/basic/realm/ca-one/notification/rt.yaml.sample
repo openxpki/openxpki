@@ -1,0 +1,49 @@
+# Sample config using rt ticket system 
+backend:
+    class: OpenXPKI::Server::Notification::RT
+    server: http://rt.mycompany.com/
+    username: admin
+    password: admin
+    timeout: 300
+
+template:
+    dir:   /etc/openxpki/notification/rt
+   
+message:        
+    csr_created:  # The message Id as referenced in the activity
+        main:  # The internal handle for this ticket
+            - action: open
+              queue: PKI
+              owner: pki-team
+              subject: New CSR for [% cert_subject %]
+              template: csr_created
+              to: "[% cert_info.requestor_email %]"
+              priority: 1
+              
+            - action: comment
+              template: csr_created_comment
+              status: open
+
+    csr_approved:
+        main:
+            - action: update
+              status: working
+              
+            - action: comment
+              template: csr_approvers
+
+    csr_rejected:
+        main:
+            - action: correspond
+              template: csr_rejected
+              priority: 10              
+
+    cert_issued:
+        main:
+            - action: comment
+              template: cert_issued_internal
+                            
+            - action: correspond
+              template: cert_issued
+              status: resolved
+ 

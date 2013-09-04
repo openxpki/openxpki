@@ -1,0 +1,71 @@
+<%args>
+  $serial        => undef
+  $filename      => undef    
+  $format       => "PEM"
+  $content_type => undef
+</%args>
+
+<%init>
+  my $extension = '';
+  ## first we have to check the format
+  switch ($format)
+  {
+    case "PKCS7" {$format = "PKCS7"; $extension = 'pk7'; }
+    case "TXT"   {$format = "TXT";   $extension = 'txt'; }
+    case "DER"   {$format = "DER";   $extension = 'crl'; }
+    else {$format = "PEM";           $extension = 'pem'; }
+  }
+
+  ## second we compensate a missing content-type
+  $content_type = "PKCS7"
+    if (not $content_type and $format eq "PKCS7");
+  $content_type = "DER"
+    if (not $content_type and ($format eq "PEM" or $format eq "DER"));
+  $content_type = "TXT"
+    if (not $content_type and $format eq "TXT");
+
+  ## first we have to determine the content-type
+  switch ($content_type)
+  {
+    case "PKCS7" {$content_type = "application/pkcs7-crl"}
+    case "PEM"   {$content_type = "application/pkix-crl"}
+    case "DER"   {$content_type = "application/pkix-crl"}
+    else {$content_type = "text/plain"}
+  }
+
+  ## now request the certificate from the server
+  my $msg  = $context->{client}->send_receive_command_msg (
+                  "get_crl",
+                  {'SERIAL'    => $serial,                   
+                   'FORMAT'   => $format});
+  my $item = $msg->{PARAMS};
+  
+  # If filename is given, sanitize it
+  if ($filename) {
+    $filename =~ s/[^A-Za-z0-9\s_-]//g;
+  }
+  
+  # If no filename is given, get the name of the realm as filename
+  # FIXME - I guess that info is already somewhere in the session but I can find how to access it....
+  if (!$filename) {
+     $msg = $context->{client}->send_receive_command_msg ('get_pki_realm');
+     $filename = $msg->{PARAMS};     
+  }
+
+  my $download_filename = $filename . '.' . $extension;
+  ## now send the stuff
+  eval {
+    $r->header_out('Content-Disposition' => ("attachment; filename=$download_filename")); 
+  };
+  if ($EVAL_ERROR) {
+    # mod_perl 2
+    $r->headers_out->add('Content-Disposition' => ("attachment; filename=$download_filename"));
+  }
+  $r->content_type ($content_type);
+  print $item;
+  return 1;
+</%init>
+<%once>
+  use Switch;
+  use English;
+</%once>

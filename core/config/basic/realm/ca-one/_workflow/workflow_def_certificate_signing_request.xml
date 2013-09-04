@@ -1,0 +1,171 @@
+<workflow>
+
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST</description>
+  <persister>OpenXPKI</persister>
+  <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
+    <action name="create_csr" 
+	    resulting_state="BUILD_SUBJECT">
+    </action>
+  </state>
+  
+  <state name="BUILD_SUBJECT" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITED</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_RENDER_SUBJECT" 
+        resulting_state="NICE_CREATED">
+    </action>
+  </state>
+  
+
+  <state name="NICE_CREATED" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_CREATION"
+            resulting_state="PENDING">
+        <condition name="!I18N_OPENXPKI_WF_COND_SERVER_KEY_GENERATION"/>
+    </action>
+
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+            resulting_state="SERVER_KEY_GENERATION">
+        <condition name="I18N_OPENXPKI_WF_COND_SERVER_KEY_GENERATION"/>
+    </action>
+  </state>
+
+  <state name="SERVER_KEY_GENERATION">
+    <action name="generate_key"
+            resulting_state="NICE_KEY_GENERATED">
+    </action>
+  </state>
+
+  <state name="NICE_KEY_GENERATED" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_GENERATE_PKCS10"
+            resulting_state="NICE_PKCS10_GENERATED">
+    </action>
+  </state>
+  
+   <state name="NICE_PKCS10_GENERATED" autorun="yes">
+   	<action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_CREATION"    
+            resulting_state="PENDING">
+    </action>
+  </state>
+
+  <!-- Pending and Approval are taken from old workflow, as the state names are 
+  	hardcoded in the GUI we stick with them for the moment -->  
+  <state name="PENDING">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_PENDING</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_ROLE"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_PROFILE"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_SUBJECT_ALT_NAME"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_SUBJECT_ALT_NAME"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_INFO"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_CSR_INFO"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTBEFORE"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_NOTBEFORE"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_NOTAFTER"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CHANGE_NOTAFTER"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="NOTIFY_APPROVAL">
+      <condition name="I18N_OPENXPKI_WF_ACL_APPROVE_CSR"/>
+      <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="REJECTED">
+      <condition name="I18N_OPENXPKI_WF_ACL_REJECT_CSR"/>
+    </action>
+  </state>
+  
+  <state name="APPROVAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_APPROVAL</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
+	    resulting_state="NICE_ISSUE_CERTIFICATE">
+      <condition name="I18N_OPENXPKI_WF_ACL_INSERT_CSR"/>
+      <condition name="I18N_OPENXPKI_WF_COND_CHECK_CSR_APPROVALS"/>
+    </action>
+    <!-- perhaps we need more than one approval or                 -->
+    <!-- perhaps the first approval was from a not authorized role -->
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
+	    resulting_state="NOTIFY_APPROVAL">
+      <condition name="I18N_OPENXPKI_WF_ACL_APPROVE_CSR"/>
+      <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_APPROVAL"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CANCEL_CSR_APPROVAL"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
+	    resulting_state="REJECTED">
+      <condition name="I18N_OPENXPKI_WF_ACL_REJECT_CSR"/>
+    </action>
+  </state>  
+  
+  <state name="NOTIFY_APPROVAL" autorun="yes">
+  <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_APPROVAL"
+        resulting_state="APPROVAL">      
+    </action>
+  </state>  
+
+  <state name="NICE_ISSUE_CERTIFICATE" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE"
+            resulting_state="NICE_PICKUP_CERTIFICATE">
+    </action>
+  </state>  
+  
+  <state name="NICE_PICKUP_CERTIFICATE" autorun="yes">
+        
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+            resulting_state="NICE_CERTIFICATE_ISSUED">
+            <condition name="I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"/>
+    </action>
+    
+    <action name="I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE"
+            resulting_state="NICE_PICKUP_CERTIFICATE">
+            <condition name="I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_PENDING"/>
+    </action>
+    
+	<action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
+            resulting_state="FAILURE">
+            <condition name="!I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_PENDING"/>
+            <condition name="!I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"/>
+    </action>            
+  </state>
+  
+  <state name="NICE_CERTIFICATE_ISSUED" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_ISSUANCE"
+              resulting_state="NICE_PUBLISH_CERTIFICATE" />
+  </state>
+      
+  <!-- Generic Publication - call always and decide inside where to publish  -->
+  <state name="NICE_PUBLISH_CERTIFICATE" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_PUBLISH_CERTIFICATE"
+              resulting_state="SUCCESS">		
+	</action>	
+  </state>
+
+  <state name="REJECTED" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+            resulting_state="FAILURE">
+    </action>
+  </state>
+  
+  <state name="FAILURE" />
+  <state name="SUCCESS" />
+</workflow>

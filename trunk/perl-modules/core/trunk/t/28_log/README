@@ -1,8 +1,0 @@
-Please note that the DBI log appender can only be tested with an activated
-OpenXPKI::Server::DBI. Therefore the DBI log tests are performed by the tests
-in 30_dbi. The related perl module is OpenXPKI::Server::Log::Appender::DBI.
-
-We only test here the basic logging stuff. You can find messages from this
-test in your local7 syslog facility, in stderr.log and in sqlite_log.db.
-The last two files are only persistent if you avoid its removal in
-t/99_cleanup/28_log.t.

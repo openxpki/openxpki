@@ -1,0 +1,7 @@
+2010-07-22 17:33:32 Mbartosch
+2008-08-13 15:00:04 WikiSysop 
+
+= Talks =
+
+* Talk on OpenXPKI at the [http://mrmcd.metarheinmain.de/ metarheinmain chaos days 111b], September 5th - 7th, 2008 in Darmstadt, Germany
+

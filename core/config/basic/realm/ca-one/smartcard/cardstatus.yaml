@@ -1,0 +1,32 @@
+# cardstatus.yaml
+# Get the status and keyid fotr a smatcard token id
+# Used as resolver in hash mode, expected attributes are
+# status, serialnumber, keyid
+# serialnumber must match the query key (security check) 
+# keyid is optional and used to calculate the default puk for newer cards.
+resolvers:
+- testing
+- ldap        
+testing@: connector:smartcard.cardstatus.connectors.testing   
+ldap@: connector:smartcard.cardstatus.connectors.ldap
+
+connectors:
+    testing:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/ca-one/smartcard/carddata.yaml
+        PREFIX: status-test-overrides
+
+    soap:
+        class: Connector::Proxy::SOAP
+
+    ldap:
+        class: Connector::Proxy::Net::LDAP::Simple
+        LOCATION: ldap://192.168.168.120:389
+        base: ou=smartcards,dc=mycompany,dc=com
+        filter: (&(cn=[% ARG %]) (objectclass=device))
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrs: description
+
+
+

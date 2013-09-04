@@ -1,0 +1,59 @@
+<%args>
+  $msg             => undef
+  $next_comp       => undef
+  $no_menu         => undef
+</%args>
+    <& '/authentication/open_form.mhtml',
+            'next_comp'  => $next_comp,
+            'no_menu'    => $no_menu,
+    &>
+<& /lib/html/hidden.mhtml, 'name' => 'signature', 'value' => '' &>
+<& /lib/html/hidden.mhtml, 'name' => 'text', value => $challenge &>
+
+<& /lib/javascript.mhtml &>
+
+    <h1><% i18nGettext ($name) %></h1>
+    <p>
+      <% i18nGettext ($desc) %>
+    </p>
+<input type="submit" name="sign" value="<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_LOGIN_USING_SIGNATURE') %>" onClick="signForm(document.OpenXPKI)">
+</form>
+
+<%init>
+    my $session_id = $context->{session_id};
+    my $client     = $context->{client};
+
+    ## check that we must handle this message
+    return $msg if (! exists $msg->{SERVICE_MSG});
+    return $msg if (exists $msg->{SERVICE_MSG} &&
+                           $msg->{SERVICE_MSG} ne "GET_X509_LOGIN");
+
+    my $challenge = $msg->{PARAMS}->{CHALLENGE};
+
+    ## was the challenge signed specified by the user?
+    my %data = $m->request_args();
+    if (exists $data{'signature'})
+    {
+        $msg = $client->send_receive_service_msg (
+                            'GET_X509_LOGIN',
+                            {
+                             'SIGNATURE'  => $data{'signature'},
+                             'CHALLENGE'  => $data{'text'},
+                            });
+        if ($msg->{'SERVICE_MSG'} ne 'GET_X509_LOGIN')
+        {
+            return $msg;
+        }
+    }
+    ## ok let's ask the user for the login and password
+    ## cache the last message in the context
+    my $name = $msg->{PARAMS}->{NAME} || '';
+    my $desc = $msg->{PARAMS}->{DESCRIPTION} || '';
+    $context->{msg} = $msg;
+    $m->comp ('/lib/debug.mhtml',
+              'level' => 99,
+              'msg'   => "CONTEXT->MSG: ".Dumper($context->{msg}));
+</%init>
+<%once>
+    use Data::Dumper;
+</%once>

@@ -1,0 +1,22 @@
+2011-07-21 15:23:10 Aleibl (Talk | contribs | block)
+2010-04-16 10:46:47 Mbartosch (Talk | contribs | block)
+
+== Organizational information ==
+* [[Development/Developer_Guidelines|Developer Guidelines]]
+* [[Development/Roadmap|Development Roadmap]]
+
+== Technical information ==
+* Managing data in OpenXPKI
+** [[Development/Database_Schema|Database schema]]
+** [[Development/Data_Pools|(Encrypted) data pools]]
+** [[Development/Encrypted_workflow_context_values|Encrypted workflow context values]]
+* How to use the OpenXPKI::Client to talk to the server
+** [[Development/ServiceCommand|Possible service commands to send and introduction]]
+** [[Development/Command|Possible commands to send]]
+* Coding Recommendations
+** [[Development/Exceptions|Exception Handling]]
+* [[Development/TipsAndTricks|Ad Hoc Tips and Tricks]]
+
+== New features ==
+* Scalability and High Availability for OpenXPKI: new whitepaper (coming soon)
+

@@ -1,0 +1,236 @@
+<%args>
+    $limit  => 10
+    $start  => 1
+    $page   => undef
+    $show_approval_buttons => undef
+    $creator               => '%'
+    $heading => 1
+</%args>
+<h<% $heading %>><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_TITLE') %></h<% $heading %>>
+% if ($creator ne '%') {
+  <p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_PENDING_REQUESTS_LIMITED_TO_CREATOR', '__CREATOR__' => $creator) %>
+  </p>
+% }
+<table>
+  <tr>
+% if ($show_approval_buttons) {
+    <& /service/open_form.mhtml, 'action' => $context->{menu}->get_root()."/service/workflow/bulk_approval.html" &>
+    <script language="JavaScript" type="text/javascript">
+<!--
+function ToggleAll() {
+  for (var i = 0; i < document.OpenXPKI.elements.length; i++) {
+    if (document.OpenXPKI.elements[i].type == 'checkbox') {
+        document.OpenXPKI.elements[i].checked = !(document.OpenXPKI.elements[i].checked);
+    }
+  }
+}
+-->
+    </script>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_APPROVE') %><br>
+<input type="checkbox" name="toggleAll" title="Toggle" onclick="ToggleAll()">
+    </th>
+% }
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE') %></th>
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_ROLE') %></th>
+% if ($creator eq '%') {
+    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATOR') %></th>
+% }
+  </tr>
+% foreach my $res (@results) {
+  <tr>
+%   if ($show_approval_buttons) {
+    <td><input type="checkbox" name="approvals"></td>
+%   }
+    <td><input type="hidden" name="serials" value="<% $res->{'SERIAL'} %>" />
+        <& /lib/html/a.mhtml,
+            target   => $context->{menu}->get_root() . '/service/workflow/show_csr_brief.html',
+            label    => $res->{'SERIAL'},
+            params   => [
+                [ 'id' , $res->{'SERIAL'} ],
+            ],
+        &>
+    </td>
+    <td>
+% foreach my $ticket (@{ $res->{'TICKETS'} }) {
+<small><a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a></small><br>
+% }
+    </td>
+    <td><% $res->{'LAST_UPDATE'} %></td>
+    <td>
+%  if ($res->{'CERT_COUNT'}) {        
+      <& /lib/html/a.mhtml,
+          target => $context->{menu}->get_root() . '/service/api/cert_list.html',
+          label  => $res->{'SUBJECT'},
+          params => [
+                [ 'subject' => $res->{'SUBJECT'} ],
+          ],
+          &> (<% $res->{'CERT_COUNT'} %>)
+%  }
+%  else {
+        <% $res->{'SUBJECT'} %> 
+% }
+%   foreach my $san (@{ $res->{'SUBJECT_ALT_NAMES'} }) {
+%      if ($san =~ m{ \A DNS:(.*) \z }xms) {
+%         if (! gethostbyname($1)) {
+            <br><small><font color="#ff0000"><% $san %></font></small>
+%         }
+%         else {
+            <br><small><font color="#009900"><% $san %></font></small>
+%         }
+%      }
+%      else {
+        <br><small><% $san %></small>
+%      }
+%   }
+    </td>
+    <td><% i18nGettext($res->{'PROFILE'}) %></td>
+    <td><% i18nGettext($res->{'ROLE'}) %></td>
+%   if ($creator eq '%') {
+<td><a href="<% $context->{menu}->get_root() %>/service/workflow/show_pending_requests.html?creator=<% $res->{'CREATOR'} %>;show_approval_buttons=1;<% $context->{menu}->get_link_params() %>"><% $res->{'CREATOR'} %></a></td>
+%   }
+  </tr>
+% }
+</table>
+% if ($show_approval_buttons) {
+    <& /service/send_form.mhtml &>
+    <& /service/close_form.mhtml &>
+% }
+
+<%init>
+use OpenXPKI::Serialization::Simple;
+
+my $ser = OpenXPKI::Serialization::Simple->new();
+
+
+my $search_context;
+if ($creator ne '%') {
+    $search_context = [
+    {
+        KEY   => 'creator',
+        VALUE => $creator,
+    }];
+}
+my @results;
+
+my $nr_msg = $context->{client}->send_receive_command_msg(
+              "search_workflow_instances_count",
+              {
+                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION', 'I18N_OPENXPKI_WF_TYPE_ENROLLMENT' ],
+                     'CONTEXT' => $search_context,
+                     'STATE'   => [ 'PENDING', 'APPROVAL', 'PENDING_APPROVAL' ],
+              },
+);
+
+
+use Data::Dumper;
+
+my $count = $nr_msg->{PARAMS};
+
+my $pageInfo;
+if (! defined $show_approval_buttons) {
+    $pageInfo = $m->comp('/lib/paging.mhtml',
+        totalEntries   => $count,
+        entriesPerPage => $limit,
+        page           => $page,
+        start          => $start,
+        url            => $context->{menu}->get_root() . '/service/workflow/show_pending_requests.html',
+    );
+}
+my %optional_params;
+if (defined $pageInfo) {
+    $optional_params{LIMIT} = $limit;
+    $optional_params{START} = $pageInfo->first - 1;
+}
+
+
+my $msg = $context->{client}->send_receive_command_msg(
+              "search_workflow_instances",
+              {
+                     "TYPE"    => [ 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST', 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION', 'I18N_OPENXPKI_WF_TYPE_ENROLLMENT' ],
+                     'CONTEXT' => $search_context,
+                     'STATE'   => [ 'PENDING', 'APPROVAL', 'PENDING_APPROVAL' ],
+                     %optional_params,
+              },
+);
+my @instances;
+if (defined $msg->{PARAMS} && ref $msg->{PARAMS} eq 'ARRAY') {
+    @instances = @{ $msg->{PARAMS} };
+}
+# TODO - error handling
+
+foreach my $instance (@instances) {
+    my $wf_info = $context->{client}->send_receive_command_msg(
+            'get_workflow_info',
+            {
+                ID       => $instance->{'WORKFLOW.WORKFLOW_SERIAL'}, 
+            },
+    );
+    # TODO - error handling
+    $m->comp('/lib/debug.mhtml',
+        'level' => 10,
+        'msg' => Dumper $wf_info,
+    );
+    my $wf_context = $wf_info->{PARAMS}->{WORKFLOW}->{CONTEXT};
+    my $san_ref;
+    if (exists $wf_context->{'cert_subject_alt_name'}) {
+        $san_ref = $ser->deserialize($wf_context->{'cert_subject_alt_name'});
+        $m->comp('/lib/debug.mhtml',
+            'level' => 10,
+            'msg' => Dumper $san_ref,
+        );
+    }
+    my @subject_alt_names;
+    if (defined $san_ref && ref $san_ref eq 'ARRAY') {
+        foreach my $san_pair (@{ $san_ref }) {
+            push @subject_alt_names, $san_pair->[0] . ':' . $san_pair->[1];
+        }
+    }
+    $m->comp('/lib/debug.mhtml',
+        'level' => 10,
+        'msg' => Dumper \@subject_alt_names,
+    );
+    # TODO - error handling
+    my @tickets;
+    if (exists $wf_context->{'ticket'}) {
+        my $tickets = $ser->deserialize($wf_context->{'ticket'});
+        foreach my $key (keys %{ $tickets }) {
+            my $ticket_entry;
+            $ticket_entry->{ID} = $tickets->{$key};
+            my $url_msg = $context->{client}->send_receive_command_msg(
+                'get_url_for_ticket',
+                {
+                    NOTIFIER => $key,
+                    TICKET   => $tickets->{$key},
+                },
+            );
+            $ticket_entry->{URL} = $url_msg->{PARAMS};
+            push @tickets, $ticket_entry;
+        }
+    }
+    my $certs = $context->{client}->send_receive_command_msg(
+        'search_cert_count', 
+        {
+            'SUBJECT'  => $wf_context->{'cert_subject'},
+            'STATUS'   => 'ISSUED',
+            'VALID_AT' => time(),
+        },
+    )->{PARAMS};
+
+    push @results, {
+        'SERIAL'            => $instance->{'WORKFLOW.WORKFLOW_SERIAL'},
+        'LAST_UPDATE'       => $instance->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+        'SUBJECT'           => $wf_context->{'cert_subject'},
+        'SUBJECT_ALT_NAMES' => \@subject_alt_names,
+        'PROFILE'           => $wf_context->{'cert_profile'},
+        'ROLE'              => $wf_context->{'cert_role'},
+        'CREATOR'           => $wf_context->{'creator'},
+        'TICKETS'           => \@tickets,
+        'CERT_COUNT'        => $certs,
+    };
+}
+</%init>

@@ -1,0 +1,233 @@
+2010-12-09 11:53:42 Scotty (Talk | contribs | block)
+2008-09-04 14:08:04 Jkunkel (Talk | contribs | block)
+
+== How to install OpenXPKI from SVN | '''debian ETCH''' ==
+
+
+=== Set accurate date.===
+
+ # e.g. 192.168.90.9 is a NTP-Server 
+ # or take a free NTP-Server 
+ # http://support.ntp.org/bin/view/Servers/ServersSynchronizedByGPS
+ ntpdate 192.168.90.9
+
+=== Install required sytemtools and perl libs ===
+ aptitude install perl-modules openssl libssl-dev build-essential \
+                  dh-make-perl unzip ftp gnupg less ncftp bzip2  \
+                  subversion debconf-utils apache graphviz ntpdate \
+                  lintian
+
+ aptitude install libversion-perl libmodule-build-perl \
+                  liblog-log4perl-perl libdatetime-perl libexception-class-perl \
+                  libapache-request-perl libxml-sax-perl libxml-sax-writer-perl \
+                  libtree-dagnode-perl liburi-perl libclass-factory-perl \
+                  libxml-simple-perl libdatetime-format-strptime-perl \
+                  libhttp-server-simple-perl libdata-page-perl \
+                  libdbd-sqlite3-perl libapache2-request-perl
+
+May be you can install all perl libs needed by openxpki, here is the list I have installed on my system
+* libappconfig-perl                 
+* libapt-pkg-perl                 
+* libapache2-request-perl  
+* libauthen-sasl-perl               
+* libcache-cache-perl               
+* libcgi-session-perl               
+* libclass-accessor-chained-perl    
+* libclass-accessor-perl            
+* libclass-container-perl           
+* libclass-data-inheritable-perl    
+* libclass-factory-perl             
+* libclass-observable-perl          
+* libclass-singleton-perl           
+* libclass-std-perl                 
+* libcompress-raw-zlib-perl         
+* libcompress-zlib-perl             
+* libconfig-file-perl               
+* libconfig-inifiles-perl           
+* libconfig-std-perl                
+* libconvert-asn1-perl              
+* libconvert-binhex-perl            
+* libcrypt-cbc-perl                 
+* libcrypt-openssl-aes-perl         
+* libcrypt-rijndael-perl            
+* libcrypt-ssleay-perl              
+* libdata-page-perl                 
+* libdata-password-perl             
+* libdata-serializer-perl           
+* libdata-spreadpagination-perl     
+* libdatetime-format-dateparse-perl 
+* libdatetime-format-strptime-perl  
+* libdatetime-locale-perl           
+* libdatetime-perl                  
+* libdatetime-timezone-perl         
+* libdbd-mock-perl                  
+* libdbd-mysql-perl                 
+* libdbd-sqlite3-perl               
+* libdbi-perl                       
+* libdevel-cycle-perl               
+* libdevel-stacktrace-perl          
+* libdevel-symdump-perl             
+* libdigest-sha1-perl               
+* libemail-date-format-perl         
+* liberror-perl                     
+* libexception-class-perl           
+* libfcgi-perl                      
+* libfile-chdir-perl                
+* libfile-slurp-perl                
+* libfilter-perl                    
+* libfont-afm-perl                  
+* libhook-lexwrap-perl              
+* libhtml-format-perl               
+* libhtml-mason-perl                
+* libhtml-parser-perl               
+* libhtml-tagset-perl               
+* libhtml-template-perl             
+* libhtml-tree-perl                 
+* libhttp-response-encoding-perl    
+* libhttp-server-simple-mason-perl  
+* libhttp-server-simple-perl        
+* libintl-perl                      
+* libio-compress-base-perl          
+* libio-compress-zlib-perl          
+* libio-multiplex-perl              
+* libio-prompt-perl                 
+* libio-pty-perl                    
+* libio-socket-ssl-perl             
+* libio-string-perl                 
+* libio-stringy-perl                
+* libipc-run-perl                   
+* libipc-shareable-perl             
+* libipc-sharelite-perl             
+* liblist-moreutils-perl            
+* liblocale-gettext-perl            
+* liblog-dispatch-perl              
+* liblog-log4perl-perl              
+* libmail-rfc822-address-perl       
+* libmail-sendmail-perl             
+* libmailtools-perl                 
+* libmath-round-perl                
+* libmime-tools-perl                
+* libmodule-build-perl              
+* libmodule-depends-perl            
+* libnet-cidr-perl                  
+* libnet-daemon-perl                
+* libnet-ip-perl                    
+* libnet-ldap-perl                  
+* libnet-libidn-perl                
+* libnet-server-perl                
+* libnet-snmp-perl                  
+* libnet-ssleay-perl                
+* libopenxpki-client-html-mason-perl
+* libopenxpki-client-perl           
+* libopenxpki-client-scep-perl      
+* libopenxpki-perl                  
+* libossp-uuid-perl                 
+* libpadwalker-perl                 
+* libparams-validate-perl           
+* libparse-debcontrol-perl          
+* libparse-debianchangelog-perl     
+* libpcre3                          
+* libpcre3-dev                      
+* libpcrecpp0                       
+* libperl5.10                       
+* libplrpc-perl                     
+* libpod-coverage-perl              
+* libproc-processtable-perl         
+* libregexp-common-perl             
+* librrdp-perl                      
+* librrds-perl                      
+* libsoap-lite-perl                 
+* libsub-uplevel-perl               
+* libsys-hostname-long-perl         
+* libsys-sigaction-perl             
+* libtemplate-perl                  
+* libterm-readkey-perl              
+* libterm-size-perl                 
+* libtest-exception-perl            
+* libtest-http-server-simple-perl   
+* libtest-memory-cycle-perl         
+* libtest-pod-coverage-perl         
+* libtest-pod-perl                  
+* libtext-charwidth-perl            
+* libtext-csv-perl                  
+* libtext-csv-xs-perl               
+* libtext-iconv-perl                
+* libtext-wrapi18n-perl             
+* libtie-ixhash-perl                
+* libtimedate-perl                  
+* libtree-dagnode-perl              
+* liburi-perl                       
+* libwant-perl                      
+* libworkflow-perl          (make sure you install 1.33 and later because of a bug in 1.32)        
+* libwww-mechanize-perl             
+* libwww-perl                       
+* libxml-filter-buffertext-perl     
+* libxml-filter-xinclude-perl       
+* libxml-namespacesupport-perl      
+* libxml-parser-perl                
+* libxml-sax-expat-perl             
+* libxml-sax-perl                   
+* libxml-sax-writer-perl            
+* libxml-simple-perl                
+* libxml-validator-schema-perl      
+* libyaml-perl                      
+* libyaml-syck-perl
+
+=== Get the source ===
+Getting the code from source control. The OpenXPKI Team uses Subversion for source control.
+ cd /usr/src/
+ svn co https://openxpki.svn.sourceforge.net/svnroot/openxpki openxpki
+
+===Build required CPAN===
+Build deb packages from required CPAN (http://www.cpan.org) perl libs. 
+ cd trunk/package/debian/
+ make cpan_dependency
+
+In case of any errors install the missing perl lib and rerun  *make cpan_dependency* or watch out the Makefile to complete cpan_dependancy by hand.
+
+====Install required perl libs.====
+ dpkg -i deb/cpan/*.deb
+
+===Generate OpenXPKI-core===
+ make core
+
+====Install OpenXPKI-core====
+ dpkg -i deb/core/libopenxpki-perl*.deb
+
+===Generate OpenXPKI-Client-API===
+ make perl-client-api
+
+Watch out the dependencies for apache, apache is no longer available for debian lenny/squeeze
+
+====Install OpenXPKI-Client-API====
+ dpkg -i deb/client_api/libopenxpki-client-perl*.deb
+
+===Generate OpenXPKI-Client-Tools===
+ make i18n
+ make deployment
+ make scep-client
+ make mason-html-client
+
+====Install OpenXPKI-Client-Tools====
+ dpkg -i deb/client/openxpki-i18n_*.deb
+ dpkg -i deb/client/libopenxpki-client-html-mason-perl_*.deb
+ dpkg -i deb/client/openxpki-deployment_*.deb
+ dpkg -i deb/client/libopenxpki-client-scep-perl_*.deb
+
+== How to handle missing Perl packages? ==
+
+(This is only needed if new perl dependency are introduced and not added to the Debian package dependency list - so hopefully, rarely)
+
+ apt-get install dh-make-perl
+ dh-make-perl --build --cpan MODULE (or you use dh-make-perl PERL_SRC_DIR)
+ dpkg -i libMODULE-perl_*.deb
+
+Example:
+
+ dh-make-perl --build --cpan XML::Filter::XInclude
+ dh-make-perl --build --cpan XML::Validator::Schema
+ dh-make-perl --build --cpan Data::Password
+ dpkg -i libxml-filter-xinclude-perl_1.0-1_all.deb
+ dpkg -i libxml-validator-schema-perl_1.08-1_all.deb
+ dpkg -i libdata-password-perl_1.07-1_all.de
+

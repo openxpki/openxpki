@@ -1,0 +1,50 @@
+# Shown in the processlist to distinguish multiple instances
+name: main
+
+# this is the former server_id/server_shift from the database config
+shift: 8
+node:    
+    id: 0
+
+# Location of the log4perl configuration
+log4perl: /etc/openxpki/log.conf
+
+# Daemon settings
+user:         openxpki
+group:        openxpki
+socket_file:  /var/openxpki/openxpki.socket
+pid_file:     /var/run/openxpkid.pid
+stderr:       /var/openxpki/stderr.log
+tmpdir:       /var/tmp
+environment:
+#    key: value
+
+# Session
+session:
+    directory: /var/openxpki/session
+    lifetime: 1200
+
+# Which transport to initialize    
+transport: 
+    Simple: 1
+
+# Which services to initialize
+service: 
+    Default: 
+        enabled: 1
+        timeout: 120
+        
+    SCEP: 
+        enabled: 1
+
+# settings for i18n        
+i18n:
+    locale_directory: /usr/share/locale
+    default_language: C
+
+# Dataexhange directories - might be wise to have this per realm?
+data_exchange:
+    export: /var/openxpki/dataexchange/export
+    import: /var/openxpki/dataexchange/import
+
+    

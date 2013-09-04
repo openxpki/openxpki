@@ -1,5 +1,0 @@
-The CSR has been approved.
-Current approvers are:
-[% FOREACH approval = approvals -%]
-  [% approval.session_user %] ([% IF approval.signer_role %][% approval.signer_role %][% ELSE %][% approval.session_role %][% END %])
-[% END %]

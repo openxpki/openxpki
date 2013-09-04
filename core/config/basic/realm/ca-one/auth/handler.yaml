@@ -1,0 +1,88 @@
+Certificate:
+    type: ClientX509
+    label: Certificate
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
+    role:
+        default: User
+        handler@: connector:auth.connector.role
+        argument: cn
+    cacert: Piv38gMblvOM5sTYqF0-LVhHag8
+        
+Signature:
+    type: ChallengeX509
+    label: Signature
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
+    challenge_length: 256
+    role: 
+        default: 'User'
+        handler@: connector:auth.connector.role
+        argument: cn
+    # define your trust anchors here
+    # Allows every known user of the realm to login
+    realm:
+    - ca-one 
+    cacert:
+    - list of extra cert identifiers
+        
+
+Anonymous:
+    type: Anonymous
+    label: Anonymous
+
+# Note - both password handlers are tied together by the auth stack
+# The naming does not imply any meaning for the users rights. 
+# You are free to add Operators to the external database.
+# Note the difference: Adding users to the external file does NOT require
+# a server reload while changing the values in the config requires a config
+# reload and creates a new datapoint in the config repository.
+User Password:
+    type: Password
+    label: User Password
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
+    # Users are taken from a yaml file using a connector
+    user@: connector:auth.connector.userdb
+
+Operator Password:
+    type: Password
+    label: Operator Password
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
+    user:
+        root:
+            digest: "{MD5}Y6nw6nu5gFB5a2SehUgYRQ"
+            role: CA Operator
+        raop:
+            digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
+            role: RA Operator
+ 
+External Dynamic Role:
+    type: External
+    label: External Dynamic Role
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL
+    command: echo -n $PASSWD
+    # if this field is empty then the role is determined dynamically -->
+    role: ''
+    pattern: x
+    replacement: x
+    env:
+       LOGIN: __USER__
+       PASSWD: __PASSWD__
+
+External Static Role:
+    type: External
+    label: External Static Role
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL
+    command: echo -n $PASSWD
+    role: RA Operator
+    pattern: x
+    replacement: x
+    env:
+       LOGIN: __USER__
+       PASSWD: __PASSWD__
+
+System:
+    type: Anonymous
+    label: System
+    role: System
+
+
+

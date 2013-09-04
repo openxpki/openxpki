@@ -1,0 +1,286 @@
+------------------------------------------------------------
+OVERVIEW
+------------------------------------------------------------
+
+The Debian Squeeze packages provide a starting point for installing
+OpenXPKI. It uses MySQL as the database and has OpenSSL for software
+encryption (as opposed to an HSM).
+
+The instructions here are used to create the debian packages. You'll
+probably have the best results if you follow these steps:
+
+ - In a VMWare guest, create a pristine OS installation for building.
+ - Install the build prereqs and get OpenXPKI source
+ - Create the packages
+ - Set up APT and, optionally, APT-PROXY
+ - Create a second VMWare guest and install pristine OS for installing
+   OpenXPKI packages
+ - Install OpenXPKI using debian packages created above
+
+------------------------------------------------------------
+CREATING A PRISTINE OS INSTALLATION
+------------------------------------------------------------
+
+Note: this method can be used for both the build system and the
+test system you install OpenXPKI on.
+
+NOTE: if you're installing a test debian version, be sure to get the
+right netinst image!!!! OK, Arkadius?
+
+- Download the debian squeeze netinst ISO (or equivalent) from
+  http://www.debian.org/CD/netinst/
+
+- Create a VMWare guest and install using above image
+
+	- 2 GB of disk space
+    - 256MB RAM should be sufficient
+    - Specify netinst ISO image as the virtual CD drive
+
+- Start the guest VM and go through the installation. Most defaults
+  should be OK. At the package selection, 'Standard' should be
+  enough.
+
+- Optional: finish customizing (timezone, openssh-server, sudo, etc.)
+  and take a snapshot in VMWare.
+
+
+- Update Guest OS
+
+  sudo aptitude update
+  sudo aptitude safe-upgrade
+  cpan CPAN
+
+------------------------------------------------------------
+INSTALL THE BUILD PREREQS AND GET OpenXPKI SOURCE
+------------------------------------------------------------
+
+- Set your EMAIL environment variable to reflect the address
+  that should appear in the packages. (Put it in your .profile)
+
+  export EMAIL="<your-email-address>"
+
+- Obtain the SVN sources
+
+To get the latest sources, depending on your preference, you can use either
+subversion or git. 
+
+  --- using Git
+
+  cd ~/
+  sudo aptitude -y install git
+  git clone git://openxpki.git.sourceforge.net/gitroot/openxpki/openxpki
+
+  --- using Subversion
+
+  mkdir -p ~/openxpki
+  cd ~/openxpki
+  sudo aptitude -y install subversion
+  svn co https://openxpki.svn.sourceforge.net/svnroot/openxpki/tools tools
+  svn co https://openxpki.svn.sourceforge.net/svnroot/openxpki/trunk trunk
+
+  ---
+
+
+- Install debian packages that contain build tools
+
+  sudo aptitude -y install dh-make-perl libmodule-build-perl
+
+
+- Create openxpki/openxpki user and group
+
+  sudo addgroup openxpki
+  sudo adduser --ingroup openxpki --disabled-password --gecos 'OpenXPKI User' openxpki
+ 
+- Install OpenXPKI prerequisites from debian
+
+  cd ~/openxpki/trunk/package/debian
+  sudo xargs aptitude -y install < debian-deps.lst
+
+------------------------------------------------------------
+CREATE PACKAGES
+------------------------------------------------------------
+
+- Create the needed CPAN packages that are not in debian and then
+  install them for the further steps
+
+  cd ~/openxpki/trunk/package/debian
+  make cpan_dependency
+  sudo dpkg -i deb/cpan/*.deb 
+
+  make Workflow
+  sudo dpkg -i deb/cpan/libworkflow-perl*.deb
+
+- Create and install the OpenXPKI packages (only the packages
+  needed for following build steps are installed)
+
+  cd ~/openxpki/trunk/package/debian
+  make core
+  sudo dpkg -i deb/core/*.deb
+  make perl-client-api
+  sudo dpkg -i deb/client_api/*.deb
+  make i18n && make deployment && make scep-client && make mason-html-client
+  
+------------------------------------------------------------
+CREATING APT REPOSITORY
+------------------------------------------------------------
+
+- Enable in Apache, if necessary, by adding the following to
+  the file "/etc/apache2/conf.d/dpkg":
+
+  Alias /dpkg "/home/YOURUSERNAME/openxpki/dpkg/"
+  <Directory "/home/YOURUSERNAME/openxpki/dpkg/">
+    Options Indexes FollowSymlinks
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+    AddDefaultCharset off
+  </Directory>
+
+- Restart Apache
+
+  sudo /usr/sbin/apache2ctl restart
+
+- Create repository directories
+
+  # Debian: squeeze
+  # Ubuntu: lucid
+  # set dist to squeeze or lucid
+  if [ -f /etc/lsb-release ]; then
+    . /etc/lsb-release
+    dist="$DISTRIB_CODENAME"
+  else 
+    dist=squeeze
+  fi
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/cpan
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/core
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/client
+  mkdir -p ~/openxpki/dpkg/${dist}/binary/client_api
+
+- Create the APT configuration file to be used by clients
+
+  echo "deb http://YOURBUILDADDRESS/dpkg ${dist}/binary/" > \
+    ~/openxpki/dpkg/openxpki-deb-${dist}.list
+
+- Copy the freshly-build packages to your Apache directory
+
+  cd ~/openxpki/trunk/package/debian
+  
+  cp deb/cpan/*.deb ~/openxpki/dpkg/${dist}/binary/cpan/
+  cp deb/core/*.deb ~/openxpki/dpkg/${dist}/binary/core/
+  cp deb/client_api/*.deb ~/openxpki/dpkg/${dist}/binary/client_api/
+  cp deb/client/*.deb ~/openxpki/dpkg/${dist}/binary/client/
+
+  (cd ~/openxpki/dpkg && \
+    (dpkg-scanpackages ${dist}/binary /dev/null | \
+    gzip -9c > ${dist}/binary/Packages.gz) )
+
+  > ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Archive: stable" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Component: openxpki" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Origin: openxpki" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Label: OpenXPKI Debian Repository" >> ~/openxpki/dpkg/${dist}/binary/Release
+  echo "Architecture: i386" >> ~/openxpki/dpkg/${dist}/binary/Release
+
+------------------------------------------------------------
+INSTALLING ON PRISTINE OS INSTALLATION
+------------------------------------------------------------
+
+- Create pristine OS installation (see above)
+
+- Add the OpenXPKI Debian repository to your APT config:
+
+  sudo wget -O /etc/apt/sources.list.d/openxpki.list \
+    http://YOURBUILDADDRESS/dpkg/openxpki-deb-squeeze.list
+  sudo aptitude update
+
+- Confirm APT config (you should see the OpenXPKI packages):
+
+  aptitude search openxpki
+
+- Create the OpenXPKI user/group
+
+  sudo addgroup openxpki
+  sudo adduser --disabled-password --gecos 'OpenXPKI Admin' \
+    --ingroup openxpki openxpki
+
+- OPTIONAL: install just prereqs and create snapshot to make testing easier
+
+  sudo aptitude -y install \
+    make openssl libauthen-sasl-perl libcgi-session-perl libdatetime-perl \
+    libdigest-sha1-perl libexception-class-perl libio-prompt-perl \
+    liblog-log4perl-perl libmail-rfc822-address-perl libnet-ip-perl \
+    libnet-ldap-perl libnet-server-perl libparams-validate-perl \
+    libregexp-common-perl libtemplate-perl libtest-pod-perl \
+    libtest-pod-coverage-perl libtext-csv-perl libxml-parser-perl \
+    libxml-sax-perl libxml-sax-writer-perl libxml-simple-perl \
+    libipc-sharelite-perl libintl-perl libfilter-perl \
+    libdata-password-perl libdata-serializer-perl \
+    libdatetime-format-dateparse-perl libproc-processtable-perl \
+    libsys-sigaction-perl libtemplate-perl libworkflow-perl \
+    libxml-filter-xinclude-perl libxml-validator-schema-perl libdbi-perl \
+    libdevel-stacktrace-perl libclass-accessor-perl \
+    libcrypt-openssl-aes-perl libcrypt-cbc-perl libtree-dagnode-perl \
+    libclass-observable-perl libclass-factory-perl libconfig-std-perl \
+    libtimedate-perl libconfig-merge-perl libproc-safeexec-perl \
+    mysql-server libdbd-mysql-perl libwww-mechanize-perl \
+    apache2 libhtml-mason-perl libapache2-mod-perl2 libapache2-request-perl \
+    graphviz libhttp-server-simple-perl libdata-page-perl \
+    libdatetime-format-strptime-perl libdata-spreadpagination-perl \
+    libmath-round-perl libversion-perl libversion-perl libclass-std-perl 
+
+  sudo shutdown now
+
+  # take snapshot in vmware
+
+- Install using following scripts
+
+  sudo aptitude -y --allow-untrusted install \
+    libopenxpki-client-html-mason-perl \
+    libopenxpki-client-scep-perl \
+    openxpki-i18n \
+    openxpki-deployment
+
+------------------------------------------------------------
+MISC NOTES (possibly outdated/deprecated)
+------------------------------------------------------------
+
+How to handle outdated Perl packages?
+=====================================
+
+1. Switch deb-src to an actual distribution.
+
+2. apt-get -y build-dep MODULE
+
+3. apt-get -t testing -b source MODULE
+
+4. dpkg -i libMODULE-perl_*.deb
+
+Example:
+
+apt-get build-dep libclass-std-perl
+apt-get -b source libclass-std-perl
+dpkg -i libclass-std-perl_0.0.9-2_all.deb
+
+or
+
+apt-get -y build-dep libhook-lexwrap-perl
+apt-get -t testing -b source libhook-lexwrap-perl
+dpkg -i libhook-lexwrap-perl_0.20-2_all.deb
+
+How to handle missing Perl packages?
+====================================
+
+1. apt-get install dh-make-perl
+
+2. dh-make-perl --build --cpan MODULE (or you use dh-make-perl PERL_SRC_DIR)
+
+3. dpkg -i libMODULE-perl_*.deb
+
+Example:
+
+dh-make-perl --build --cpan XML::Filter::XInclude
+dh-make-perl --build --cpan XML::Validator::Schema
+dh-make-perl --build --cpan Data::Password
+dpkg -i libxml-filter-xinclude-perl_1.0-1_all.deb
+dpkg -i libxml-validator-schema-perl_1.08-1_all.deb
+dpkg -i libdata-password-perl_1.07-1_all.deb

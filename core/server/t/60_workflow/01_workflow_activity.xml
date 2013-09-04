@@ -1,0 +1,6 @@
+<actions>
+  <!-- No-operation action -->
+  <action name="noop"
+	  class="OpenXPKI::Server::Workflow::Activity::Noop"/>
+</actions>
+				   

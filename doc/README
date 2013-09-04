@@ -1,0 +1,40 @@
+Welcome to the OpenXPKI documentation.
+
+Reading the documentation online
+================================
+
+The ReadTheDocs site
+
+http://openxpki.readthedocs.org/en/latest/
+
+always contains the latest documentation of the upstream project.
+
+
+Reading the documentation offline
+=================================
+
+In order to build the documentation (either for offline reading or for
+contributing) please install Sphinx (http://sphinx.pocoo.org/) and run
+
+make html
+
+in order to build the documentation.
+
+
+Contributing
+============
+
+If you wish to contribute documentation please fork the OpenXPKI project
+(https://github.com/openxpki/openxpki) on Github.
+
+Checkout the branch you wish to write documentation for (typically either
+master or develop) and branch off a feature branch locally:
+
+git checkout develop
+git branch feature/documentation
+
+Read the Sphinx documentation (http://sphinx.pocoo.org/index.html) before
+contributing.
+Once you are done, push your work to your Github repository and raise a
+Pull Request via the Github infrastructure.
+

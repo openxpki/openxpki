@@ -1,0 +1,9 @@
+main:
+    debug: 0
+    type: MySQL
+    name: openxpki
+    host: localhost
+    port: 3306
+    user: openxpki
+    passwd: openxpki
+

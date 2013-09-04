@@ -1,0 +1,261 @@
+2010-03-22 12:23:34 Mbartosch (Talk | contribs | block)
+2008-08-22 17:21:57 Alech (Talk | contribs | block) 
+
+= Commented example config.xml file =
+
+The following is a commented version of a pretty standard config.xml configuration file, which should help in understanding the main OpenXPKI settings.
+
+<pre>
+<openxpki>
+  <common>
+    <!-- Location of the log configuration file -->
+    <log_config>/etc/openxpki/log.conf</log_config>
+
+    <!-- Server configuration settings -->
+    <server>
+        <!-- run as the following Unix user/group -->
+        <user>openxpki</user>
+        <group>openxpki</group>
+
+        <!-- the path to the socket file which will be used by clients
+             to connect to the OpenXPKI server -->
+        <socket_file>/var/openxpki/openxpki.socket</socket_file>
+
+        <!-- the file containing the process ID (PID) of the running
+             OpenXPKI process, used for openxpkictl -->
+        <pid_file>/var/openxpki/openxpki.pid</pid_file>
+
+        <!-- the location of the session directory where the user sessions
+             are stored. Needs to be writable by the user/group above
+             and should not be readable to anyone else -->
+        <session_dir>/var/openxpki/session</session_dir>
+
+        <!-- Connection timeout, this is how long the server waits (in
+             seconds) for the client to send a command before timing out.
+             Influences your webserver performance, if set too high, you
+             will have many idling servers -->
+        <connection_timeout>120</connection_timeout>
+
+        <!-- Session lifetime - the session will expire after this many
+             seconds if it has not been used. Trade convenience vs.
+             security here. -->
+        <session_lifetime>1200</session_lifetime>
+
+        <!-- Location of the stderr/debug file, debug information is
+             written to this file. May grow pretty large if debugging
+             is enabled. -->
+        <stderr>/var/openxpki/stderr.log</stderr>
+
+        <!-- temporary directory where OpenXPKI may create temporary files -->
+        <tmpdir>/var/tmp</tmpdir>
+
+        <!-- a list of possible transport modules, currently only 'Simple'
+             is possible. -->
+        <transport>Simple</transport>
+
+        <!-- a list of enabled services, currently only Default (which is
+             used by the Perl and HTML::Mason client) and SCEP (which is
+             used - surprise - by the SCEP client) are possible values. -->
+        <service>Default</service>
+        <service>SCEP</service>
+    </server>
+
+    <!-- Internationalization settings -->
+    <i18n>
+        <!-- The directory containg your gettext files, should contain
+             LC_MESSAGES/openxpki.mo in the de_DE, en_GB and ru_RU
+             subdirectories -->
+        <locale_directory>/usr/local/share/locale</locale_directory>
+
+        <!-- The default language, will typically be overwritten by
+             the client (always in the HTML::Mason interface), so you
+             can typically leave it at 'C'. -->
+        <default_language>C</default_language>
+    </i18n>
+
+    <!-- Directories for the data exchange in case you have an online/offline
+         separation. As this feature is not yet implemented, changing these
+         values does not help you. -->
+    <data_exchange>
+        <export>
+            <dir>/var/openxpki/dataexchange/export</dir>
+        </export>
+        <import>
+            <dir>/var/openxpki/dataexchange/import</dir>
+        </import>
+    </data_exchange>
+
+    <!-- Database configuration settings -->
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="database.xml"/>
+
+    <!-- Log database settings, in case you want to log entries to go to a database -->
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="log_database.xml"/>
+
+    <!-- cryptographic token settings, such as CA key, etc. -->
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="token.xml"/>
+
+    <!-- notification subsystem (typically RT) configuration) -->
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="notification.xml"/>
+  </common>
+
+
+  <!-- PKI realm section, both name and id are needed and should typically
+       be the same -->
+  <pki_realm name="I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA" id="I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA">
+    <common id="default">
+      <!-- default token (used for general crypto operations not requiring
+           private key operations) -->
+      <token super="common/token_config/token{default}"/>
+
+      <!-- secret group configuration - how to unlock certain secrets for
+           accessing private keys -->
+      <secret>
+        <group id="default" label="I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP">
+          <!-- just a simple password to be input via a client, e.g. on the
+               web interface -->
+          <method id="plain">
+            <total_shares>1</total_shares>
+          </method>
+
+        <!-- alternatively use one of the following methods:
+          <method id="literal">password</method>
+          Literal password in the configuration file, not recommended
+          except for testing.
+
+          <method id="split">
+            <total_shares>3</total_shares>
+          </method>
+          Shamir's secret splitting, three passphrase shares, three
+          required to unlock the secret.
+
+          <method id="split">
+            <total_shares>5</total_shares>
+            <required_shares>3</required_shares>
+          </method>
+          Shamir's secret splitting, five passphrase shares, any three
+          required to unlock the secret.
+        --> 
+          <!-- How long the secret will be cached -->
+          <cache>
+            <!-- cache while the daemon is running ("daemon") or only
+                 while the unlocking session still exists ("session") -->
+            <type>daemon</type>
+
+            <!-- how many operations can be done using the unlocked key until
+                 the secret is erased and needs to be logged in again.
+                 Currently not implemented yet. -->
+            <usage_count>-1</usage_count>
+          </cache>
+        </group>
+      </secret>
+
+      <!-- Notifier settings -->
+      <notification>
+         <!-- a list of notifiers to be used, details about them are defined
+              in notification.xml -->
+         <notifier>TEST_DUMMY_NOTIFIER_RT_!</notifier>
+      </notification>
+
+      <!-- certificate and CRL profile settings -->
+      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="profile.xml"/>
+      <!-- LDAP publication settings __>
+      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ldappublic.xml"/>
+    </common>
+
+    <!-- Issuing CAs defined for this realm -->
+    <!-- 'id' is the internal CA identifier -->
+    <ca id="testdummyca1">
+      <!-- reference to the crypto token configuration defined in token.xml -->
+      <token super="common/token_config/token{testdummyca1}"/>
+
+      <!-- certificate details -->
+      <cert>
+          <!-- can either be <identifier>certificate_identifier</identier>
+               or: -->
+          <alias>testdummyca1</alias>
+          <realm>I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA</realm>
+          <!-- where aliases can be defined using openxpkiadm certificate alias,
+               see openxpkiadm man for details on how to do this -->
+      </cert>
+      <!-- Certificate Revocation List (CRL) publication settings -->
+      <crl_publication>
+        <file>
+            <!-- location of the file written during a CRL issuance workflow -->
+            <filename>/etc/openxpki/ca/testdummyca1/crl.pem</filename>
+            <!-- format, can be either PEM or DER -->
+            <format>PEM</format>
+        </file>
+        <!-- Alternatively or in addition, LDAP can be used to publish the CRL -->
+        <ldap>
+            <!-- LDAP server hostname, can also be ldaps://host for ldaps -->
+            <server>ldap.example.com</server>
+            <!-- LDAP server port, typically 389 or 636 for ldaps -->
+            <port>389</port>
+            <!-- DN to use to bind to the LDAP server -->
+            <bind_dn></bind_dn>
+            <!-- password to use to bind to the LDAP server -->
+            <pass></pass>
+            <!-- the base DN to use for the search -->
+            <base_dn></base_dn>
+            <!-- the search DN used to search for correct location -->
+            <search_dn></search_dn>
+        </ldap>
+      </crl_publication>
+    </ca>
+    <!-- more CAs with different can follow here with <ca id="..."> -->
+
+    <!-- Subsystems defined for this realm -->
+    <!-- 'id' is the subsystem identifier -->
+
+    <!-- SCEP subsystem -->
+    <scep id="testscepserver1">
+      <!-- The SCEP certificate used, same options as with the CA certificate (see above) -->
+      <cert>
+        <alias>testscepserver1</alias>
+        <realm>I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA</realm>
+      </cert>
+      <!-- a reference to the crypto token defined in token.xml -->
+      <token super="common/token_config/token{testscepserver1}"/>
+    </scep>
+
+    <!-- a reference to the PKCS#7 token used by the SCEP server to create
+         its messages -->
+    <pkcs7 id="testsceppkcs7tool1">
+      <token super="common/token_config/token{testsceppkcs7tool1}"/>
+    </pkcs7>
+
+    <!-- a reference to the Java keystore token, only needed if you
+         want users to be able to download Java keystores of certificates
+         where the key has been created on the server -->
+    <createjavakeystore id="testcreatejavakeystore">
+      <token super="common/token_config/token{testcreatejavakeystore}"/>
+    </createjavakeystore>
+
+    <!-- password safe configuration, optional feature without web interface
+         for the moment -->
+    <password_safe id="passwordsafe1">
+      <!-- certificate configuration, see CA section -->
+      <cert>
+        <alias>passwordsafe1</alias>
+        <realm>I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA</realm>
+      </cert>
+      <!-- reference to the crypto token defined in token.xml -->
+      <token super="common/token_config/token{passwordsafe1}"/>
+    </password_safe>
+
+    <!-- Authentication configuration, how users may authenticate to the
+         server -->
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="auth.xml"/>
+
+    <!-- Access Control List settings, what users may do once they are
+         authenticated for a certain role -->
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="acl.xml"/>
+
+    <!-- Workflow configuration, which workflows are available on the CA -->
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow.xml"/>
+  </pki_realm>
+
+  <!-- more PKI realms may follow using <pki_realm name="..." id="..."> -->
+</openxpki>
+</pre>
+

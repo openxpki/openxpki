@@ -1,0 +1,18 @@
+2008-08-13 17:56:48 Alech (Talk | contribs | block) 
+
+== Debugging ==
+
+To debug an OpenXPKI instance, start it using openxpkictl start with the --debug option. --debug may take either a debug level or a coma-seperated list of modules and debug levels. Thus
+
+  openxpkictl start --debug 128
+
+starts OpenXPKI with the global debugging level set to 128 - this will produce quite an amount of data in your stderr.log file.
+
+If you already know or have an idea where a bug might lurk, use
+
+  openxpkictl start --debug OpenXPKI::Buggy::Module:128
+
+to debug only that particular module.
+
+The interesting parts in stderr.log are normally in the vicinity of a line that matches get_error, so start from the bottom of the file and look for get_error. If you want to see the communication between client and server, search for 'talk' and 'collect' respectively - this can help identifying which call on the server caused the problem.
+

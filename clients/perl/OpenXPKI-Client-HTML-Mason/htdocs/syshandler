@@ -1,0 +1,57 @@
+<%args>
+    $__session_id => undef
+</%args>
+% $m->call_next;
+<%once>
+  # FIXME: move this to Apache handler?
+  use URI;
+  use OpenXPKI::Client::HTML::Mason;
+  use OpenXPKI::Client::HTML::Mason::Javascript;
+  use OpenXPKI::Client::HTML::Mason::Menu;
+  use OpenXPKI::i18n qw( i18nGettext set_language get_language set_locale_prefix );
+  use OpenXPKI::DN;
+  use English;
+  use Data::Dumper;
+  use HTML::Entities;
+  use CGI::Session qw/-ip-match/;
+
+  if ((defined $ENV{OPENXPKI_LOCALE_PREFIX}) and (-e $ENV{OPENXPKI_LOCALE_PREFIX})) {
+    set_locale_prefix($ENV{OPENXPKI_LOCALE_PREFIX});
+  }
+  $context->{socket_file} = $ENV{OPENXPKI_SOCKET_FILE};
+
+  if (defined $ENV{OPENXPKI_DEBUG_FILE}) {
+    open $context->{debugfh}, ">>", $ENV{OPENXPKI_DEBUG_FILE};
+  }
+  $context->{debug}       = sub {
+    my $arg = shift;
+    my $fh = $context->{debugfh};
+    if (defined $fh) {
+      local $OUTPUT_AUTOFLUSH = 1;
+      print $fh $arg . "\n";
+    }
+  };
+
+  # guard against XSS attacks
+  $m->interp->set_escape(
+    h => \&HTML::Mason::Escapes::basic_html_escape,
+  );
+  
+</%once>
+<%init>
+    ## if there is a session and we are not in the authentication process
+    ## then re-use the session
+    if (defined $__session_id and
+        0 > index ($m->request_comp()->title(), "authentication/"))
+    {
+        $m->comp('/authentication/session.mhtml');
+        $m->comp('/authentication/role.mhtml') if ($context and not exists $context->{role});
+    } else {
+        undef $context;
+    }
+    $m->comp ('/lib/language.mhtml');
+</%init>
+<%flags>
+  # this is the toplevel handler
+  inherit => undef
+</%flags>

@@ -1,0 +1,35 @@
+# Default CRL profile
+# You can have a profile for each ca, if no profile with the name
+# of the ca is found, we fall back to this default profile
+
+# Validity control for the crl
+validity: 
+    # validity interval used while the ca is active (relative date!)
+    nextupdate: +000014
+    
+    # how long before next update a new crl should be issued
+    renewal: +000003
+
+    # validity of last crl issued before ca is end of life    
+    lastcrl: 20301231235900
+
+digest: sha1
+extensions:
+    authority_info_access:
+        critical: 0
+        # ca_issuers and ocsp can be scalar or list
+        #ca_issuers: http://localhost/cacert.crt
+        #ocsp: http://ocsp.openxpki.org/
+
+    authority_key_identifier:
+        critical: 0
+        keyid:  1
+        issuer: 1
+
+
+    issuer_alt_name:        
+        critical: 0
+        # If the issuer has no subject alternative name, copying returns
+        # an empty extension, which is problematic with both RSA SecurId
+        # tokens and Cisco devices!
+        copy: 0

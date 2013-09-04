@@ -1,0 +1,194 @@
+2010-10-22 18:09:32 Scotty (Talk | contribs | block)
+2010-02-09 22:47:15 Scotty (Talk | contribs | block) 
+
+=LDAP Integration=
+
+Note: this is work in progress. It is planned to integrate these steps in the OpenXPKI debian packages and Live CD. Specifically, the configuration of the attributes (display mapping and required fields) were just hacks to get things running for the tests I needed to run. I'll polish the examples as I continue with testing.
+
+LDAP is used in the SmartCard personalization process to publish Certificates that are issued to the users. Here, the steps needed to integrate OpenXPKI and LDAP for this process are described.
+
+==Installing LDAP (optional)==
+
+On Debian, install the LDAP Server and Tools using aptitude:
+
+ aptitude -y install slapd ldap-utils
+
+===Using OpenLDAP on Debian Squeeze===
+
+The version of OpenLDAP delivered with Squeeze no longer uses the slapd.conf configuration by default. Instead, the configuration is dynamic. The following should be enough to get the basic configuration started, but as I am no LDAP expert and currently, the how-to guides floating around still use the old configuration style, so YMMV.
+
+Adding the smartcard schema requires write access for the user cn=admin,cn=config, which is not assigned a password by default. I just copied the "olcRootPW" entry from hdb.ldif to config.ldif: 
+
+<pre>
+grep olcRootPW /etc/ldap/slapd.d/cn\=config/olcDatabase\=\{1\}hdb.ldif >> \
+  /etc/ldap/slapd.d/cn\=config/olcDatabase\=\{0\}config.ldif
+/etc/init.d/slapd restart
+</pre>
+
+Then, I added the schema by creating the file scbentry.ldif (the olc* entries must each be on one line):
+
+<pre>
+dn: cn=scbentry,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: scbentry
+olcAttributeTypes: {0}( 1.3.6.1.4.1.11417.1.1.2.2.1 NAME 'scbserialnumber' DESC 'canonical smartcard identifier' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'user defined' )
+olcAttributeTypes: {1}( 1.3.6.1.4.1.11417.1.1.2.2.2 NAME 'scbstatus' DESC 'logical state of smartcard' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'user defined' )
+olcObjectClasses: {2}( 1.3.6.1.4.1.11417.1.1.1.3.1 NAME 'scbentry' DESC 'Smartcard Badge Entry' SUP top STRUCTURAL MUST scbserialnumber MAY ( scbstatus ) X-ORIGIN 'user defined' )
+</pre>
+
+Then, add it to the LDAP with the command:
+
+<pre>
+ldapadd -x -D cn=admin,cn=config -W -f scbentry.ldif
+</pre>
+
+===Using OpenLDAP on Debian Lenny===
+
+Modify the following configuration steps to meet your needs:
+
+ echo "BASE    dc=example,dc=com" >> /etc/ldap/ldap.conf
+ echo "URI    ldap://localhost" >> /etc/ldap/ldap.conf
+ echo '# Schema for OpenXPKI' >> /etc/ldap/slapd.conf
+ echo 'include         /etc/openxpki/local/etc/scbentry.schema' >> /etc/ldap/slapd.conf
+ echo '# Allow OpenXPKI access to people' >> /etc/ldap/slapd.conf
+ echo 'access to dn=".*,ou=people,dc=localdomain"' >> /etc/ldap/slapd.conf
+ echo '        by dn="cn=openxpki,dc=localdomain" write' >> /etc/ldap/slapd.conf
+
+Create tie file /etc/openxpki/local/etc/scbentry.schema, if necessary:
+
+ attributeType ( 1.3.6.1.4.1.11417.1.1.2.2.1
+    NAME 'scbserialnumber'
+    DESC 'canonical smartcard identifier'
+    EQUALITY caseExactMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE X-ORIGIN 'user defined')
+ 
+ attributeType ( 1.3.6.1.4.1.11417.1.1.2.2.2
+    NAME 'scbstatus'
+    DESC 'logical state of smartcard'
+    EQUALITY caseExactMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE X-ORIGIN 'user defined')
+ 
+ objectClass ( 1.3.6.1.4.1.11417.1.1.1.3.1
+    NAME 'scbentry'
+        DESC 'Smartcard Badge Entry'
+    SUP top
+    STRUCTURAL
+        MUST scbserialnumber
+        MAY ( scbstatus )
+        X-ORIGIN 'user defined')
+
+===Tip===
+
+Optionally, you can install phpLDAPAdmin and point your browser to http://yourhost/phpldapadmin/:
+
+ aptitude -y install phpldapadmin
+
+==Creating LDAP Organizational Units==
+
+Create the file ou_people.ldif with the following contents:
+
+ # file ou_people.ldif
+ dn: ou=people,dc=localdomain
+ ou: people
+ objectClass: top
+ objectClass: organizationalUnit
+
+Create the file ou_groups.ldif with the following contents:
+
+ # file ou_groups.ldif
+ dn: ou=groups,dc=localdomain
+ ou: groups
+ objectClass: top
+ objectClass: groupOfUniqueNames
+
+Import them into your LDAP server with the following (replace 'secret' with your admin password):
+
+ ldapadd -a -x -D "cn=admin,dc=localdomain" -w secret -h localhost -f ou_people.ldif
+ ldapadd -a -x -D "cn=admin,dc=localdomain" -w secret -h localhost -f ou_groups.ldif
+
+==Creating Technical User for OpenXPKI==
+
+To dd your technical user for OpenXPKI to access LDAP, create the file openxpki.ldif with the following contents (modifying userPassword as desired):
+
+ dn: cn=openxpki, dc=localdomain
+ objectClass: simpleSecurityObject
+ objectClass: organizationalRole
+ cn: openxpki
+ description: OpenXPKI Technical User
+ userPassword: openxpki
+
+
+Import it into your LDAP server with the following (replace 'secret' with your admin password):
+
+ ldapadd -a -x -D "cn=admin,dc=localdomain" -w secret -h localhost -f openxpki.ldif
+
+==Modifying Smartcard Personalization to use LDAP==
+
+In the workflow configuration for Smartcard personalization, the configuration is added to the file workflow_activity_smartcard_personalization.xml. Look for the actions "get_ldap_data", "create_server_csr" and "publish_certificates", using the the following as examples:
+
+<pre>
+  <action name="get_ldap_data"
+	  class="OpenXPKI::Server::Workflow::Activity::SmartCard::GetLDAPData"
+          ldap_server="localhost"
+          ldap_port="389"
+          ldap_userdn="cn=openxpki,dc=localdomain"
+          ldap_pass="openxpki"
+          ldap_basedn="ou=people,dc=localdomain"
+          ldap_timelimit="5"
+          ldap_attributes="userid,CN,givenName,initials,sn,mail,telephoneNumber"
+          search_key="mail"
+          search_value_context="creator"
+          display_mapping="CN -> I18N_OPENXPKI_HTML_SMARTCARD_LDAP_CN, telephoneNumber -> I18N_OPENXPKI_HTML_SMARTCARD_LDAP_TELEPHONENUMBER"
+          client_csp="RSA Sign-on Manager CSP"
+          client_bitlength="1024">
+  </action>
+
+  <action name="create_server_csr"
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::CreateServerCSR"
+          cert_profiles="I18N_OPENXPKI_PROFILE_USER"
+          cert_roles="User"
+          cert_subject="cn=[% givenName %][% IF initials %] [% initials %][% END %] [% sn %],O=Example,dc=example,dc=com"
+          cert_subject_alt_names="email=[% mail %],otherName=1.3.6.1.4.1.311.20.2.3;UTF8:[% userPrincipalName %]">
+    <field name="pkcs10"/>
+  </action>
+
+  <action name="publish_certificates"
+          class="OpenXPKI::Server::Workflow::Activity::SmartCard::PublishCertificates"
+          ldap_server="localhost"
+          ldap_port="389"
+          ldap_userdn="cn=openxpki,dc=localdomain"
+          ldap_pass="openxpki"
+          ldap_basedn="dc=localdomain"
+          ldap_timelimit="5"
+          search_key="mail"
+          search_value_context="creator">
+  </action>
+</pre>
+
+In the file workflow_condition.xml, the value of the parameter "required" needs to be set to a list of the parameters that are expected to be available during the personalization. For my tests, I set it to "telephoneNumber", but for production installations, this should be adapted. Here's the example:
+
+<pre>
+  <condition name="certificate_issuance_possible"
+          class="OpenXPKI::Server::Workflow::Condition::IsCertificateIssuancePossible">
+      <param name="required" value="telephoneNumber"/>
+  </condition>
+</pre>
+
+On one final note, for the Smartcard personalization, I found that an ACL entry was missing in acl.xml. For the role "User", the following must be added so the user can read their certificates:
+
+<pre>
+  <read>
+    <creator>.*</creator>
+    <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE</type>
+    <context_filter>
+      <show>(cert_profile|certificate)</show>
+    </context_filter>
+  </read>
+</pre>
+
+==Conclusion==
+
+The above details show a working example based on a local LDAP server installed for OpenXPKI. It should be easily applicable to existing LDAP servers in other environments.
+

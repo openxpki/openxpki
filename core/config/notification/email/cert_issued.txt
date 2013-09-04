@@ -1,0 +1,7 @@
+Dear [% requestor %],
+
+You certificate for [% cert_subject %] has been issued and is available for
+download from [% meta_baseurl %]service/api/cert_list.html?csr_serial=[% csr_serial %];auth_stack=Anonymous;pki_realm=[% meta_pki_realm %]
+
+Regards,
+  PKI Team

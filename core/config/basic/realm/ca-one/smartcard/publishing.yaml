@@ -1,0 +1,26 @@
+# smartcard.publishing
+targets:
+    repo1@: connector:smartcard.publishing.connectors.repo1
+    repo2@: connector:smartcard.publishing.connectors.repo-externals
+    
+connectors:
+    repo1:
+        class: Connector::Proxy::Net::LDAP::Single
+        LOCATION: ldap://192.168.168.120:389
+        base: ou=people,dc=mycompany,dc=com
+        filter: (|(mail=[% ARG %]) (objectCategory=person))
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrmap:
+            der: usercertificate;binary
+           
+    repo-externals:
+        class: Connector::Proxy::Net::LDAP::Single
+        LOCATION: ldap://192.168.168.120:389
+        base: ou=externals,dc=mycompany,dc=com
+        filter: (|(mail=[% ARG %]) (objectCategory=person))
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrmap:
+            der: usercertificate;binary
+

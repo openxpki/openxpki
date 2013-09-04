@@ -1,0 +1,41 @@
+2010-04-22 16:26:13 Mbartosch (Talk | contribs | block)
+2010-04-22 16:25:16 Mbartosch (Talk | contribs | block)
+
+== Clean up superfluous workflow instances and related meta data ==
+
+Heavily loaded SCEP server instances can produce huge amounts of SCEP workflow instances, in particular if the actual SCEP request fails. In this case every single SCEP request creates a SCEP workflow instance which is left in status FAILURE. Nobody needs these instances after a few days (possibly they are useful immediately after reception for debugging purposes).
+
+In order to clean up these superfluous workflow instances the following SQL statements can be used to wipe all unwanted workflow instances and all related data (workflow context and workflow history).
+
+Assumptions:
+* Database is Oracle
+* OpenXPKI schema user is 'l2openxpki'
+* Failed SCEP workflow instances should be kept for one month
+
+<pre>
+-- delete all SCEP workflows in FAILURE older than one month
+delete from l2openxpki.workflow 
+  where workflow_type = 'I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST' 
+  and workflow_state = 'FAILURE' 
+  and workflow_last_update < (select to_char(add_months(sysdate, -1), 'YYYY-MM-DD') from dual);
+
+-- now we have dangling workflow contexts and workflow history, clean up
+delete from l2openxpki.workflow_history 
+  where workflow_id in (
+    select distinct l2openxpki.workflow_history.workflow_id 
+      from l2openxpki.workflow_history left outer join l2openxpki.workflow 
+      on l2openxpki.workflow_history.workflow_id = l2openxpki.workflow.workflow_id 
+        where l2openxpki.workflow.workflow_id is NULL
+  );
+
+delete from l2openxpki.workflow_context 
+  where workflow_id in (
+    select distinct l2openxpki.workflow_context.workflow_id 
+      from l2openxpki.workflow_context left outer join l2openxpki.workflow 
+      on l2openxpki.workflow_context.workflow_id = l2openxpki.workflow.workflow_id 
+        where l2openxpki.workflow.workflow_id is NULL
+);
+
+commit;
+</pre>
+

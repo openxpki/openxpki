@@ -1,0 +1,6 @@
+# This is the list of realms in this PKI
+# You only need to enable the realms which are visible on the server
+
+ca-one:
+    label: Verbose name of this realm
+    baseurl: http://192.168.168.103:80/openxpki/

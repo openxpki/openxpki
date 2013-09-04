@@ -1,0 +1,75 @@
+<%args>
+    $type   => undef
+    $id     => undef
+    $filled => undef
+    $reason_code => undef
+</%args>
+
+<& /service/open_form.mhtml, action => 'change_crr_reason.html' &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'type',   'value' => $type &>
+<& /lib/html/hidden.mhtml, 'name' => 'id',     'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'filled', 'value' => '1' &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CRR_REASON_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_CHANGE_CRR_REASON_DESCRIPTION') %>
+</p>
+<p>
+<& /lib/html/select.mhtml,
+   'name'    => "reason_code",
+   'default' => [ $old_reason_code ],
+   'values'  => [ @revocation_reasons ] &>
+</p>
+<& /service/send_form.mhtml &>
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    use OpenXPKI::Client::HTML::Mason::CRR;
+
+    my @errors = ();
+
+    my @revocation_reasons;
+    my $old_reason_code;
+    if (! $filled)
+    {
+        ## load the revocation_reason from the workflow
+        my $msg = $context->{client}->send_receive_command_msg
+                  (
+                      "get_workflow_info",
+                      {
+                          "WORKFLOW" => $type,
+                          "ID"       => $id
+                      }
+                  );
+        $old_reason_code = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{reason_code};
+        @revocation_reasons = OpenXPKI::Client::HTML::Mason::CRR->get_possible_revocation_reasons();
+    }
+    else {
+        # send the change to the server
+        my $msg = $context->{client}->send_receive_command_msg(
+            'execute_workflow_activity',
+            {
+                WORKFLOW => $type,
+                ID       => $id,
+                ACTIVITY => 'I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON',
+                PARAMS   => {
+                    'reason_code' => $reason_code,
+                },
+            },
+        );
+        if (exists $msg->{SERVICE_MSG} && $msg->{SERVICE_MSG} eq 'ERROR') {
+            @errors = $m->comp('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        }
+        else {
+            return $m->comp('/service/workflow/show_instance.html',
+                'msg'  => $msg,
+                'type' => $type,
+                'id'   => $id,
+            );
+        }
+    }
+    ## ok, we have to ask the user
+</%init>

@@ -1,0 +1,118 @@
+<%args>
+    $type      => undef
+    $id        => undef
+    $filled    => undef
+    $signature => undef
+    $text      => undef
+</%args>
+
+<& /service/open_form.mhtml, action => 'approve_crr.html' &>
+
+<& /lib/html/hidden.mhtml, 'name' => 'type',   'value' => $type &>
+<& /lib/html/hidden.mhtml, 'name' => 'id',     'value' => $id &>
+<& /lib/html/hidden.mhtml, 'name' => 'filled', 'value' => '1' &>
+<& /lib/html/hidden.mhtml, 'name' => 'signature', 'value' => '' &>
+<& /lib/html/hidden.mhtml, 'name' => 'text', value => $to_be_signed &>
+
+<& /lib/javascript.mhtml &>
+
+<h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_TITLE') %></h1>
+<p>
+  <% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_DESCRIPTION') %>
+</p>
+<input type="submit" name="sign" value="<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_SIGNING') %>" onClick="signForm(document.OpenXPKI)">
+<input type="submit" name="nosign" value="<% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_ACTIVITY_APPROVE_CRR_WITHOUT_SIGNING') %>">
+
+<& /service/close_form.mhtml &>
+
+<& /service/create_csr/print_errors.mhtml, 'errors' => \@errors &>
+
+<%init>
+    my @errors = ();
+    my $to_be_signed;
+
+            
+    if ($filled)
+    {
+        ## approve the CRR
+        my $params = {};
+        if (defined $signature && $signature ne '') {
+            $params->{'_signature'}      = $signature;
+            $params->{'_signature_text'} = $text;
+        }
+        my $msg = $context->{client}->send_receive_command_msg (
+                      "execute_workflow_activity",
+                      {
+                        WORKFLOW => $type,
+                        ID       => $id,
+                        ACTIVITY => "I18N_OPENXPKI_WF_ACTION_APPROVE_CRR",
+                        PARAMS   => $params,
+                      }
+        );
+        if (exists $msg->{SERVICE_MSG} and
+            $msg->{SERVICE_MSG} eq "ERROR")
+        {
+            @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+        }
+        else
+        {
+            # if available, try to revoke the cert now
+            my $act_msg = $context->{client}->send_receive_command_msg(
+                'get_workflow_activities',
+                {
+                    WORKFLOW => $type,
+                    ID       => $id,
+                },
+            );
+            if (grep { $_ eq 'revoke_certificate' } @{ $act_msg->{PARAMS} }) {
+                $msg = $context->{client}->send_receive_command_msg(
+                      'execute_workflow_activity',
+                      {
+                        WORKFLOW => $type,
+                        ID       => $id,
+                        ACTIVITY => "I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE",
+                      }
+                );
+            }
+            if (exists $msg->{SERVICE_MSG} and
+                $msg->{SERVICE_MSG} eq "ERROR")
+            {
+                @errors = $m->comp ('/lib/get_deep_error.mhtml', 'msg' => $msg);
+            }
+            elsif ($msg->{PARAMS}->{WORKFLOW}->{STATE} eq 'SUCCESS') {
+                return $m->comp('/service/create_crr/success.mhtml',
+                    'msg'  => $msg,
+                    'type' => $type,
+                    'id'   => $id,
+                );
+            }
+            else {
+                return $m->comp ('/service/workflow/show_instance.html',
+                                 'msg'  => $msg,
+                                 'type' => $type,
+                                 'id'   => $id);
+            }
+        }
+    }
+    # get translated approval message from server
+    my $lang = 'en_US';
+    if (defined $session_cache{$context->{'session_id'}}->{language}) {
+        $lang = $session_cache{$context->{'session_id'}}->{language};
+    }
+    my $sig_msg = $context->{client}->send_receive_command_msg(
+        'get_approval_message',
+        {
+           TYPE     => 'CRR',
+           WORKFLOW => $type,
+           ID       => $id,
+           LANG     => $lang,
+        }
+    );
+    if (exists $sig_msg->{SERVICE_MSG} &&
+       $sig_msg->{SERVICE_MSG} eq "ERROR") {
+        @errors = $m->comp ('/lib/get_deep_error.mhtml', 'sig_msg' => $sig_msg);
+    }
+    $to_be_signed = $sig_msg->{PARAMS};
+
+    ## ok, we have to ask the user
+</%init>

@@ -1,0 +1,16 @@
+# The main userdb 
+# Must contain a Yaml hash of the form for each user:
+# John Doe:
+#    digest: "{ssha}9DgilxbKtDVpSW86NjCzcnUkuBtzYWx0"
+#    role: User
+#
+# Use the openxpkiadm tool to create the password hashes
+
+userdb:
+    class: Connector::Proxy::YAML
+    LOCATION: /home/pkiadm/ca-one-userdb.yaml
+
+role:
+    class: Connector::Proxy::YAML
+    LOCATION: /home/pkiadm/ca-one-x509-roles.yaml
+

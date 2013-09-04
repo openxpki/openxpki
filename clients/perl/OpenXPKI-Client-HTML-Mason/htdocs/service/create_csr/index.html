@@ -1,0 +1,230 @@
+<%args>
+    $workflow_id      => undef
+    $workflow_type    => undef
+    $role             => undef
+    $profile          => undef
+    $subject_style    => undef
+    $keygen           => undef
+    $subject          => undef
+    $subject_alt_name => undef
+    $info             => undef
+    $spkac            => undef
+    $pkcs10           => undef
+    $key              => undef
+    $keytype          => undef
+    $keyparameters    => undef
+    $password_gen     => undef
+    $password         => undef
+    $verify_password  => undef
+    $additional_entries => undef
+</%args>
+<%init>
+    use Data::Dumper;
+    $m->comp('/lib/debug.mhtml',
+        'level' => 1,
+        'msg' => 'pkcs10: ' . defined $pkcs10 ? $pkcs10 : 'undef',
+    );
+    #use OpenXPKI::Debug 'service/create_csr/index.html';
+    # why doesn't this work?
+    #$OpenXPKI::Debug::LEVEL{'service/create_csr/index.html'} = 100;
+    ##! 16: 'bla'
+    
+    my %params = (CONFIG => $CONFIG);
+
+    ## which workflow type
+    $params{workflow_type} = $m->comp ('/service/create_csr/get_workflow_type.mhtml',
+                                       %params, 'workflow_type' => $workflow_type);
+    return if (not defined $params{workflow_type});
+
+    ## which role
+    $params{role} = $m->comp ('/service/create_csr/get_role.mhtml',
+                              %params, 'role' => $role);
+    return if (not defined $params{role} or not length ($params{role}));
+
+    ## which profile
+    $params{profile} = $m->comp ('/service/create_csr/get_profile.mhtml',
+                                 %params, 'profile' => $profile);
+    return if (not defined $params{profile} or not length ($params{profile}));
+
+    ## which subject style
+    $params{subject_style} = $m->comp ('/service/create_csr/get_subject_style.mhtml',
+                                       %params, 'subject_style' => $subject_style);
+    return if (not defined $params{subject_style});
+
+    ## which key generation
+    ## this is necessary in this phase
+    ## because PKCS#10 parsing must before subject reading
+    $params{keygen} = $m->comp ('/service/create_csr/get_keygen.mhtml',
+                                %params, 'keygen' => $keygen);
+    return if (not defined $params{keygen});
+
+    ## get PKCS#10 if available
+    if ($params{keygen} eq "PKCS10")
+    {
+        ## get the CSR
+        ($params{pkcs10}, $subject) =
+             $m->comp ('/service/create_csr/get_pkcs10.mhtml',
+                       %params, 'pkcs10' => $pkcs10, 'subject' => $subject);
+        return if (not $params{pkcs10});
+    }
+
+    ## get subject
+    $params{subject_parts} = $m->comp ('/service/create_csr/get_subject.mhtml',
+                                 %params, 'subject' => $subject);
+    return if (not $params{subject_parts});
+
+    ## get subject alt name
+    $params{subject_alt_name_parts} = $m->comp ('/service/create_csr/get_subject_alt_name.mhtml',
+                                          %params, 'subject_alt_name' => $subject_alt_name, 'additional_entries' => $additional_entries);
+    return if (not $params{subject_alt_name_parts});
+
+    ## get additional_infos
+    $params{info} = $m->comp ('/service/create_csr/get_info.mhtml',
+                              %params, 'info' => $info);
+    return if (not $params{info});
+
+    ## get generated request
+    my $msg = undef;
+    if ($params{keygen} eq "SPKAC")
+    {
+        $msg = $m->comp ('/service/create_csr/get_spkac.mhtml',
+                         %params, 'spkac' => $spkac);
+    }
+    elsif ($params{keygen} eq "SERVERSIDE" && ! defined $workflow_id)
+    {
+        $m->comp('/lib/debug.mhtml',
+            'level' => 1,
+            'msg' => 'serverside',
+        );
+        ## serverside
+        $msg = $m->comp ('/service/create_csr/store_serverside.mhtml',
+                         %params);
+        $workflow_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
+    }
+    elsif ($params{keygen} eq 'IE') 
+    {
+        $params{pkcs10} = $m->comp ('/service/create_csr/get_ie_pkcs10.mhtml',
+                                        %params, 'pkcs10' => $pkcs10);
+        return if (not $params{pkcs10});
+        $msg = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
+                         %params);
+    }
+    elsif ($params{keygen} eq 'PKCS10')
+    {
+        $m->comp('/lib/debug.mhtml',
+            'level' => 1,
+            'msg' => 'PKCS#10 upload',
+        );
+        $msg = $m->comp ('/service/create_csr/store_pkcs10.mhtml',
+                             %params, 'pkcs10' => $pkcs10);
+        $workflow_id = $msg->{PARAMS}->{WORKFLOW}->{ID};
+    }
+    return if (! defined $msg && ! defined $workflow_id);
+    ## if we reach this point then the workflow is already created
+
+    ## store and display CSR
+    if ($params{'keygen'} ne 'SERVERSIDE') {
+        $m->comp ('/service/create_csr/show_receipt_confirmation.mhtml', 'msg' => $msg);
+    }
+    else {
+        # continue here with selection of key parameters and
+        # password entry/verification 
+        if (!defined $keytype) {
+            $m->comp ('/service/create_csr/get_keytype.mhtml',
+                        %params,
+                        'workflow_id' => $workflow_id,
+                        'keytype'     => $keytype,
+            );
+        }
+        return if (not $keytype);
+        if (not $params{keyparameters}) {
+            $params{'keyparameters'} = $m->comp ('/service/create_csr/get_keyparameters.mhtml',
+                        %params,
+                        'workflow_id' => $workflow_id,
+                        'keytype'     => $keytype,
+                        'keyparameters' => $keyparameters,
+            );
+        }
+        return if (not $params{'keyparameters'});
+        if (defined $keytype && !defined $password) {
+            $m->comp ('/service/create_csr/get_password.mhtml',
+                        'password_gen'  => $password_gen,
+                        'workflow_id'   => $workflow_id,
+                        'keytype'       => $keytype,
+                        'keyparameters' => $keyparameters,
+                        %params,
+            );
+        }
+        elsif (defined $keytype && defined $password) {
+            $m->comp('/lib/debug.mhtml',
+                'level' => 1,
+                'msg' => 'keytype: ' . $keytype,
+            );
+            if (defined $verify_password
+              && $password ne $verify_password) {
+                $m->comp ('/service/create_csr/get_password.mhtml',
+                            'verify_password' => $verify_password,
+                            'error'         => 1,
+                            'password_gen'  => $password_gen,
+                            'workflow_id'   => $workflow_id,
+                            'keytype'       => $keytype,
+                            'keyparameters' => $keyparameters,
+                             %params,
+                );
+            }
+            else {
+                # create key using password
+                my $exec_msg = $context->{client}->send_receive_command_msg(
+                    'execute_workflow_activity',
+                    {
+                        WORKFLOW => $params{'workflow_type'},
+                        ID       => $workflow_id,
+                        ACTIVITY => 'generate_key',
+                        PARAMS   => {
+                            '_key_type'       => $keytype,
+                            '_password'       => $password,
+                            '_key_gen_params' => $keyparameters,
+                        },
+                    },
+                );
+                $m->comp('/lib/debug.mhtml',
+                    'level' => 1,
+                    'msg' => 'exec_msg: ' . Dumper $exec_msg,
+                );
+                if (exists $exec_msg->{SERVICE_MSG} &&
+                           $exec_msg->{SERVICE_MSG} eq 'ERROR') {
+                  #  $exec_msg->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD') {
+                    $m->comp('/lib/debug.mhtml',
+                        'level' => 1,
+                        'msg' => 'error during generate_key'
+                    );
+                    $m->comp ('/service/create_csr/get_password.mhtml',
+                                'password_gen'  => $password_gen,
+                                'workflow_id'   => $workflow_id,
+                                'keytype'       => $keytype,
+                                'keyparameters' => $keyparameters,
+                                'msg'           => $exec_msg,
+                    );
+                }
+                else {
+                    # get workflow_info
+                    my $i_msg = $context->{client}->send_receive_command_msg(
+                        'get_workflow_info',
+                      {
+                        WORKFLOW => $params{workflow_type},
+                        ID       => $workflow_id,
+                      },
+                    );
+                    # TODO - check for more errors
+                    # we are done, show instance
+                    $m->comp ('/service/create_csr/show_receipt_confirmation.mhtml', 'msg' => $i_msg);
+                }
+            }
+        }
+    }
+</%init>
+<%once>
+    my $CONFIG = {
+                   KEY_GENERATION => ["SPKAC", "IE", "SERVERSIDE", 'PKCS10', "AUTO"],
+                 };
+</%once>
