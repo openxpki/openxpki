@@ -187,6 +187,10 @@ OpenXPKI/Server/Notification/Base.pm
 OpenXPKI/Server/Notification/Handler.pm
 OpenXPKI/Server/Notification/SMTP.pm
 
+# SOAP
+OpenXPKI/SOAP.pm
+OpenXPKI/SOAP/Revoke.pm
+
 
 ## Workflow
 OpenXPKI/Workflow/Factory.pm
