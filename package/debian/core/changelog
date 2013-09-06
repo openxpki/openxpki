@@ -1,5 +1,0 @@
-libopenxpki-perl (20080911) unstable; urgency=low
-
-  * add SASL support for workflow PublishCRL.pm #2 
-
- -- Jochen Kunkel <jkunkel@aplusg.de>  Thu, 11 Sep 2008 15:05:34 +0200

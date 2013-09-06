@@ -32,5 +32,13 @@ and the i18n language files. There are individual make targets for them:
    make i18n                    
    make mason-html-client 
    
+About versions and tagging
+--------------------------
 
+The version numbers of the package are determined from the vergen tool.
+The main version (x.y.z) is always constructed from the values set in the 
+.VERSION_* files in the top level directory. If you build from a commit 
+that has a git tag associated, the value from VERSION_PKGREL is appended
+to the version, e.g. 0.11.2-1, if you build from an untagged commit, the
+appreviated commit hash is added, e.g. 0.11.2-1ca8e51.
 

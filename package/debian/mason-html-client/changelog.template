@@ -1,0 +1,5 @@
+libopenxpki-client-html-mason-perl ([% IF GIT_TAG %][% version %]-[% PKGREL %][% ELSE %][% git_commit %][% END %]) unstable; urgency=low
+
+  * [% IF GIT_TAG %]Release build [% GIT_TAG %] [% ELSE %]Development build [% END %]
+
+ -- OpenXPKI Foundation <debian@openxpki.org>  [% BUILD_DATE %]
