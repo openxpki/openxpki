@@ -21,5 +21,5 @@ examples:
 	tar -xzf /tmp/openxpki-examples.tar.gz  -C examples; \
 	cd examples; \
 	tar -zcf basic.tgz basic; \
-	tar -zcf profiles.tgz profiles;
+	tar -zcf profiles.tgz profiles; \
 	tar -zcf notification.tgz notification;  

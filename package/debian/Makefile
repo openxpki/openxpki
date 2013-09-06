@@ -89,3 +89,7 @@ clean:
 	done
 
 distclean: clean
+
+scan:
+	dpkg-scanpackages deb | gzip > deb/Packages.gz
+

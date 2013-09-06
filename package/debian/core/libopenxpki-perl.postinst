@@ -42,11 +42,16 @@ case "$1" in
 	   # scep config
        test -e /etc/openxpki/scep/default.conf || cp /usr/share/doc/libopenxpki-perl/examples/scep.conf /etc/openxpki/scep/default.conf 
 	   
+	   # soap config
+       test -e /etc/openxpki/soap.conf || cp /usr/share/doc/libopenxpki-perl/examples/soap.conf /etc/openxpki/soap.conf 
+	   
 	   # No config - load sample config       
 	   if [ ! -e /etc/openxpki/config.d/ ]; then
 	       mkdir -m 750 /etc/openxpki/config.d	             
+	       mkdir -m 750 /etc/openxpki/config.git	             
 	       tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/basic.tgz -C /etc/openxpki/config.d/ 
 	       chown -R openxpki:root /etc/openxpki/config.d/
+	       chown -R openxpki:root /etc/openxpki/config.git/
 	       openxpkiadm loadcfg 2>/dev/null
 	   fi	   
 	
