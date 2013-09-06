@@ -440,12 +440,7 @@ my %INDEX_of = (
 		NAME  => 'cert_csrid_index',
 		TABLE => 'CERTIFICATE',
 		COLUMNS => [ 'CSR_SERIAL' ],
-    },
-    CERTIFICATE_STATUS_IDENTIFIER => {
-		NAME  => 'cert_status_index',
-		TABLE => 'CERTIFICATE',
-		COLUMNS => [ 'STATUS' ],
-    }, 
+    },    
     WORKFLOW_HISTORY_WFSERIAL => {
 		NAME  => 'wf_hist_wfserial_index',
 		TABLE => 'WORKFLOW_HISTORY',
