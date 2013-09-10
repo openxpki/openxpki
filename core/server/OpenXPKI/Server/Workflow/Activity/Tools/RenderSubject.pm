@@ -79,7 +79,9 @@ sub execute {
     
 
     # Check for SAN Template    
-    my @san_template_keys = $config->get_keys("profile.$profile.style.$style.san");
+    my @san_template_keys = $config->get_keys("profile.$profile.style.$style.subject.san");
+    
+    ##! 32: "Keys found at profile.$profile.style.$style.subject.san : " . Dumper @san_template_keys   
     
     my @san_list;    
     # If san template is defined we force template mode

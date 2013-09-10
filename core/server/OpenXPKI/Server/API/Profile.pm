@@ -436,9 +436,10 @@ sub render_san_from_template {
  
         # Remove duplicates and split up internal multiples (sep by |)
         my %items;
-        foreach my $key (@entries) {
-            next unless ($key);
-            $key =~ s/\s*(\S.*\S)\s*/$1/; 
+        foreach my $key (@entries) {                       
+            $key =~ s{ \A \s+ }{}xms;
+            $key =~ s{ \s+ \z }{}xms;
+            next if ($key eq ''); 
             $items{$key} = 1;
         } 
 
