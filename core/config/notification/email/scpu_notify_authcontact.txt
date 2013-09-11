@@ -19,7 +19,7 @@ following:
 
 1. Fetch your activation code at the following address:
 
-    [% data.openxpki_url %]/service/reset_token/unblock_pin.html?WF_ID=[% workflow_id %]
+    [% meta_baseurl %]/service/reset_token/unblock_pin.html?WF_ID=[% workflow_id %]
 
 2. Give the activation code to the Smartcard owner so he or she can complete the
 transaction.

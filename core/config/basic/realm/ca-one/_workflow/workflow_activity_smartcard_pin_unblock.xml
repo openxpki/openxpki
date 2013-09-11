@@ -48,8 +48,7 @@
         _map_auth2_name="$auth2_cn"
         _map_auth2_mail="$auth2_mail"
         _map_requestor_mail="$owner_mail"
-        _map_requestor_name="$owner_cn"
-        _map_openxpki_url="https://ldev-user-ca.tools.intranet.db.com">       
+        _map_requestor_name="$owner_cn">       
     </action>
 
     <action name="scunblock_store_auth_ids"
