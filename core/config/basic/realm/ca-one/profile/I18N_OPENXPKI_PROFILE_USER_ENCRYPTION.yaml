@@ -12,14 +12,6 @@ style:
         label: I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE
         description: I18N_OPENXPKI_PROFILE_USER_BASIC_DESC
 
-        ui:
-            subject:
-                - username
-                - realname
-                - email
-            info:
-                - comment
-
         subject:
             dn: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
             san: 
