@@ -65,6 +65,22 @@ sub execute {
 
     ##! 64: 'Context after issue ' .  Dumper $context
     	
+    ## Add the workflow if of this certificate to the cert_attributes
+
+    my $serial = CTX('dbi_backend')->get_new_serial(
+        TABLE => 'CERTIFICATE_ATTRIBUTES',
+    );
+    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes with key ' . $serial . ' for cert ' . $set_context->{cert_identifier} 
+    CTX('dbi_backend')->insert(
+        TABLE => 'CERTIFICATE_ATTRIBUTES', 
+        HASH => {
+            ATTRIBUTE_SERIAL => $serial,
+            IDENTIFIER => $set_context->{cert_identifier},
+            ATTRIBUTE_KEY => 'system_csr_workflow',
+            ATTRIBUTE_VALUE => $workflow->id
+        }
+    );        	
+    CTX('dbi_backend')->commit();   	
 }
 
 1;
