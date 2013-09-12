@@ -25,7 +25,7 @@ connectors:
         
     branch1:
         class: Connector::Proxy::Net::LDAP::Simple
-        LOCATION: ldap://192.168.168.120:389
+        LOCATION: ldap://localhost:389
         base: ou=winlogon,dc=mycompany,dc=com
         filter: (cn=[% ARG %])
         binddn: cn=admin,dc=mycompany,dc=com
