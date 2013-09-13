@@ -1,0 +1,29 @@
+<workflow>
+    <type>I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA</type>
+    <description>I18N_OPENXPKI_WF_DESC_CHANGE_METADATA</description>
+    <persister>OpenXPKI</persister>
+    
+    <state name="INITIAL">
+        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_INITIAL</description>
+        <action name="changemeta_load_data" resulting_state="DATA_LOADED">
+        </action>
+    </state>
+    
+    <state name="DATA_LOADED">
+        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_INITIAL</description>
+        <action name="changemeta_update_context" resulting_state="DATA_LOADED">
+        </action>
+        
+        <action name="changemeta_persist" resulting_state="SUCCESS">
+            <!--  <condition name="changemeta_context_valid"/> -->        
+        </action>
+    </state>
+    
+    <state name="FAILURE">
+        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_FAILURE</description>
+    </state>
+    <state name="SUCCESS">
+        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_SUCCESS</description>
+    </state>
+
+</workflow>

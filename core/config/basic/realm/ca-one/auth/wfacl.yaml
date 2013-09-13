@@ -92,6 +92,7 @@ RA Operator:
     - I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
     - I18N_OPENXPKI_WF_TYPE_TESTING
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE
+    - I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA
 
     access:
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
@@ -129,6 +130,9 @@ RA Operator:
             creator: .*              
             
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE:
+            creator: .*
+
+        I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA:
             creator: .*
         
 CA Operator:

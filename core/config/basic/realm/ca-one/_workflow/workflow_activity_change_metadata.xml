@@ -1,0 +1,18 @@
+<actions>
+
+    <action name="changemeta_load_data"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata">            
+            <field name="cert_identifier" is_required="yes"/>            
+    </action>
+
+    <action name="changemeta_update_context"
+            class="Workflow::Action::Null">
+            <field name="metadata_update"/>
+            <validator name="changemeta_validate_metadata"/>        
+    </action>
+
+    <action name="changemeta_persist"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata">
+    </action>  
+    
+</actions>
