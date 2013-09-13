@@ -744,6 +744,23 @@ sub BUILD {
             class  => 'Profile',
             params => {}
         },
+        'render_metadata_from_template'=> {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,                    
+                    regex    => $re_alpha_string
+                },
+                STYLE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_alpha_string,
+                },
+                VARS => {
+                    type     => HASHREF,
+                },
+            },                       
+        },
         
         ### Object API
         'get_csr_info_hash_from_data' => {

@@ -261,6 +261,10 @@ OpenXPKI/Server/Workflow/Activity/Tools/GetCertificateIdentifier.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateKeyId.pm
 
+OpenXPKI/Server/Workflow/Activity/Tools/LoadCertificateMetadata.pm
+OpenXPKI/Server/Workflow/Activity/Tools/PersistCertificateMetadata.pm
+OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
+
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
 OpenXPKI/Server/Workflow/Activity/Reports/CertExport/AddToQueue.pm
@@ -356,6 +360,8 @@ OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/UnusedID.pm
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
+
+OpenXPKI/Server/Workflow/Validator/CertificateMetadata.pm
 
 ## Packages for new NICE API
 OpenXPKI/Server/Workflow/NICE.pm
