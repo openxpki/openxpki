@@ -759,7 +759,7 @@ sub sc_analyze_smartcard {
         my $cert = $user_certs->{by_identifier}->{$identifier};
         
         # Try to get the type based on the profile, NB: requires that a profile may not be used in two types        
-        $cert->{CERTIFICATE_TYPE} = $policy->get("xref.profile.$cert->{PROFILE}.type") if ($cert->{PROFILE}); 
+        $cert->{CERTIFICATE_TYPE} = $policy->get( [ 'xref','profile', $cert->{PROFILE}, 'type' ] ) if ($cert->{PROFILE}); 
 
         # Force the profile to be "UNKNOWN" if it is not in the current map
         if (!$cert->{CERTIFICATE_TYPE}) {
@@ -1044,10 +1044,10 @@ sub _get_policy {
         my $isFirst = 1;       
         foreach my $allowed_profile ( $policy->get_list("certs.type.$type.allowed_profiles") ) {
             ##! 16: "Profile: $allowed_profile"    
-            $policy->set(['xref.profile', $allowed_profile, 'type'], $type );        
+            $policy->set(['xref','profile', $allowed_profile, 'type'], $type );        
             if ($isFirst) {
                 # first profile is preferred
-                $policy->set(['xref.profile', $allowed_profile, 'preferred'], 1 );
+                $policy->set(['xref','profile', $allowed_profile, 'preferred'], 1 );
                 $isFirst = 0;            
             }                            
         }
