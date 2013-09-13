@@ -25,6 +25,10 @@ style:
             san: 
                email: "[% email %]"
 
+        metadata:
+            requestor: "[% realname %]"
+            email: "[% email %]"
+
 role:
 - User
 

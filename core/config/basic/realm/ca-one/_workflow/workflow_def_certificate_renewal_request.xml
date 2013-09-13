@@ -154,9 +154,14 @@
   </state>
   
   <state name="NICE_CERTIFICATE_ISSUED" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_METADATA"
+              resulting_state="NICE_METADATA_PERSISTED" />
+  </state>
+  
+  <state name="NICE_METADATA_PERSISTED" autorun="yes">
     <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_ISSUANCE"
               resulting_state="NICE_PUBLISH_CERTIFICATE" />
-  </state>
+  </state>            
       
   <!-- Generic Publication - call always and decide inside where to publish  -->
   <state name="NICE_PUBLISH_CERTIFICATE" autorun="yes">

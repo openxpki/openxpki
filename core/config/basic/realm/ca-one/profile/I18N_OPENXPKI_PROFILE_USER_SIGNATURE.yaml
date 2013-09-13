@@ -16,6 +16,10 @@ style:
             dn: cn=[% givenname %][% IF initials %] [% initials %][% END %] [% sn %],dc=My Company,dc=com
             san: 
                email: "[% mail %]"
+
+        metadata:
+            requestor: "[% givenname %] [% sn %]"
+            email: "[% mail %]"
         
 role:
 - User
