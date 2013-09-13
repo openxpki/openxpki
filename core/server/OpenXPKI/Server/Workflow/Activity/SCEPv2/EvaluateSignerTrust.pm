@@ -67,62 +67,89 @@ sub execute {
         TOKEN => $default_token
     );       
        
-    # Check the chain       
-    my $cert_identifier = $x509->get_identifier();    
-    my $i = 10; # Max Chain Depth - TODO Trusthandling / configuration
-    my $cert_db;    
-    do {
-        $cert_db = CTX('dbi_backend')->first(
-            TABLE    => 'CERTIFICATE',
-            COLUMNS  => ['ISSUER_IDENTIFIER','PKI_REALM'],
-            DYNAMIC  => {
-                'IDENTIFIER' => {VALUE => $cert_identifier},
-                'STATUS'     => {VALUE => 'ISSUED'},
-            }            
+    # reset the context flags    
+    $context->param('signer_trusted' => 0);    
+    $context->param('signer_on_behalf' => 0);              
+       
+       
+    # Check the chain
+    my $signer_identifier = $x509->get_identifier();
+           
+    # Get profile and realm of the signer certificate
+    my $cert_hash = CTX('dbi_backend')->first(
+        TABLE    => [ 'CERTIFICATE','CSR' ],
+        JOIN => [ [ 'CSR_SERIAL', 'CSR_SERIAL', ], ],
+        COLUMNS  => ['CSR.PROFILE', 'CERTIFICATE.PKI_REALM', 'CERTIFICATE.ISSUER_IDENTIFIER'],
+        DYNAMIC  => { 'IDENTIFIER' => {VALUE => $signer_identifier }, }                            
+    );
+    
+    my $signer_profile = $cert_hash->{'CSR.PROFILE'} || 'unknown';
+    my $signer_realm = $cert_hash->{'CSR.PKI_REALM'} || 'unknown';
+    my $signer_issuer = $cert_hash->{'CERTIFICATE.ISSUER_IDENTIFIER'};
+    
+    ##! 32: 'Signer profile ' .$signer_profile
+    ##! 32: 'Signer realm ' .  $signer_realm 
+    ##! 32: 'Signer issuer ' . $signer_issuer   
+
+    my $signer_trusted = 0;
+    my $signer_root = '';
+    if ($signer_issuer) {          
+        my $signer_chain = CTX('api')->get_chain({
+            'START_IDENTIFIER' => $signer_issuer,        
+        });                                    
+        if ($signer_chain->{COMPLETE}) {
+            $signer_trusted = 1;
+            $context->param('signer_trusted' => 1);
+            $signer_root = pop @{$signer_chain->{IDENTIFIERS}}; 
+        }
+    }
+    
+    if ($signer_root) {
+        CTX('log')->log(
+            MESSAGE => "SCEP Signer validated - trusted root is $signer_root", 
+            PRIORITY => 'info',
+            FACILITY => ['audit','system']
+        );        
+    } else {
+        CTX('log')->log(
+            MESSAGE => "SCEP Signer NOT validated", 
+            PRIORITY => 'info',
+            FACILITY => ['audit','system']
         );
-        if (!$cert_db || $i-- < 0) {
-            $context->param('signer_trusted' => 0);
-            $context->param('signer_on_behalf' => 0);                        
-            return 1;
-        }        
-        $cert_identifier = $cert_db->{'ISSUER_IDENTIFIER'};        
-    } while($cert_db->{PKI_REALM});
-    
-    # TODO: Trusthandling
-    
-    CTX('log')->log(
-        MESSAGE => "SCEP Signer validated - trusted root is $cert_identifier", 
-        PRIORITY => 'info',
-        FACILITY => ['audit','system']
-    );       
-    
-    $context->param('signer_trusted' => 1);
+    }
 
     # End chain validation, now check the authorization
 
     my $signer_subject = $x509->get_parsed('BODY', 'SUBJECT');
-    my $signer_identifier = $x509->get_identifier();
     ##! 32: 'Check signer '.$signer_subject.' against trustlist' 
     
     my @rules = $config->get_keys("scep.$server.authorized_signer_on_behalf");
     
     my $matched = 0;
+    my $current_realm = CTX('session')->get_pki_realm();
     
     TRUST_RULE:
-    foreach my $rule (@rules) {        
-        my $trustrule = $config->get_hash("scep.$server.authorized_signer_on_behalf.$rule");
+    foreach my $rule (@rules) {
+        ##! 32: 'Testing rule ' . $rule
+        my $trustrule = $config->get_hash("scep.$server.authorized_signer_on_behalf.$rule");        
+        $trustrule->{realm} = $current_realm if (!$trustrule->{realm});
+        
         $matched = 0;
         foreach my $key (keys %{$trustrule}) {
             my $match = $trustrule->{$key};
+            ##! 64: 'expected match ' . $key . '/' . $match
             if ($key eq 'subject') {            
-                ##! 64: 'Check subject rule '.$rule 
                 $matched = ($signer_subject =~ /^$match$/i);
-            } elsif ($key eq 'identifier') {
-                ##! 64: 'Check identifier '.$rule 
-                $matched = ($signer_identifier eq $match);  
-            #} elsif ($key eq 'profile') {
-            # TODO - implement!                    
                 
+            } elsif ($key eq 'identifier') {
+                $matched = ($signer_identifier eq $match);
+                  
+            } elsif ($key eq 'realm') {
+                $matched = ($signer_realm eq $match);
+                
+            } elsif ($key eq 'profile') {                                    
+                $matched = ($signer_profile eq $match);
+                                
             } else {                
                 CTX('log')->log(
                     MESSAGE => "SCEP Signer Authorization unknown ruleset $key:$match",
@@ -133,7 +160,7 @@ sub execute {
             }
             next TRUST_RULE if (!$matched);
 
-            ##! 32: 'Matched '.$match
+            ##! 32: 'Matched ' . $match
         }
         
         if ($matched) {
@@ -149,7 +176,7 @@ sub execute {
     }
      
     CTX('log')->log(
-        MESSAGE => "SCEP Signer not found in trust list.",
+        MESSAGE => "SCEP Signer not found in trust list ($signer_subject).",
         PRIORITY => 'info',
         FACILITY => ['system','audit']
     );
