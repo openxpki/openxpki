@@ -27,7 +27,7 @@ connectors:
         class: Connector::Proxy::Net::LDAP::Simple
         LOCATION: ldap://localhost:389
         base: ou=winlogon,dc=mycompany,dc=com
-        filter: (cn=[% ARG %])
+        filter: (cn=[% ARGS.0 %])
         binddn: cn=admin,dc=mycompany,dc=com
         password: admin
         attrs: uid

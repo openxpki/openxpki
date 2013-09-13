@@ -23,7 +23,7 @@ connectors:
         class: Connector::Proxy::Net::LDAP::Simple
         LOCATION: ldap://localhost:389
         base: ou=smartcards,dc=mycompany,dc=com
-        filter: (&(cn=[% ARG %]) (objectclass=device))
+        filter: (&(cn=[% ARGS.0 %]) (objectclass=device))
         binddn: cn=admin,dc=mycompany,dc=com
         password: admin
         attrs: description

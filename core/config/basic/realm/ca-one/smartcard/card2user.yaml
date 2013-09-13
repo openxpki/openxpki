@@ -22,7 +22,7 @@ connectors:
         class: Connector::Proxy::Net::LDAP::Simple
         LOCATION: ldap://localhost:389
         base: ou=people,dc=mycompany,dc=com
-        filter: (seealso=cn=[% ARG %],ou=smartcards,dc=mycompany,dc=com)
+        filter: (seealso=cn=[% ARGS.0 %],ou=smartcards,dc=mycompany,dc=com)
         binddn: cn=admin,dc=mycompany,dc=com
         password: admin
         attrs: employeeNumber
@@ -31,7 +31,7 @@ connectors:
         class: Connector::Proxy::Net::LDAP::Simple
         LOCATION: ldap://localhost:389
         base: ou=externals,dc=mycompany,dc=com
-        filter: (seealso=cn=[% ARG %],ou=smartcards,dc=mycompany,dc=com)
+        filter: (seealso=cn=[% ARGS.0 %],ou=smartcards,dc=mycompany,dc=com)
         binddn: cn=admin,dc=mycompany,dc=com
         password: admin
         attrs: employeeNumber
