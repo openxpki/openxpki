@@ -101,7 +101,7 @@ sub execute {
         
         my $renewal;
         # Check if there is a named profile 
-        my $profile_renewal = $config->get("crl.".$ca->{ALIAS}."validity.renewal");
+        my $profile_renewal = $config->get("crl.".$ca->{ALIAS}.".validity.renewal");
         if ($profile_renewal) {
             $renewal = OpenXPKI::DateTime::get_validity({        
                 VALIDITY => $profile_renewal,
