@@ -100,10 +100,10 @@ sub execute {
         my $cert_extension_name = $csr_extensions->[0];
         # it looks like as the XS Parser already converts the the BMPString to 
         # a readable representation, so we just parse the chars out        
-        $cert_extension_name =~ s/^\.\.//; # Leading Byte
+        $cert_extension_name =~ s/^..//; # Leading Byte
         # FIXME - I dont have any idea what chars are possible within parsed bmpstring 
         # so this probably chokes on some strings! 
-        $cert_extension_name =~ s/(\.(.))/$2/g;
+        $cert_extension_name =~ s/.(.)/$1/g;
         $context->param('cert_extension_name' => $cert_extension_name);
 
         # Check if the extension has a profile mapping, defined in scep.<server>.profile_map        

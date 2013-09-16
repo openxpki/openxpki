@@ -84,7 +84,7 @@ sub execute {
     );
     
     my $signer_profile = $cert_hash->{'CSR.PROFILE'} || 'unknown';
-    my $signer_realm = $cert_hash->{'CSR.PKI_REALM'} || 'unknown';
+    my $signer_realm = $cert_hash->{'CERTIFICATE.PKI_REALM'} || 'unknown';
     my $signer_issuer = $cert_hash->{'CERTIFICATE.ISSUER_IDENTIFIER'};
     
     ##! 32: 'Signer profile ' .$signer_profile
