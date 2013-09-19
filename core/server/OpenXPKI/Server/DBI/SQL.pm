@@ -917,7 +917,7 @@ sub select {
                 $args->{DYNAMIC}->{$dynamic_key} = { VALUE => $args->{DYNAMIC}->{$dynamic_key} };
                 CTX('log')->log(
                     MESSAGE  => "Old SQL DYNAMIC Syntax found - please fix!",
-                    PRIORITY => 'warn',
+                    PRIORITY => 'debug',
                     FACILITY => 'system',
                 );
             }
