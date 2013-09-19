@@ -19,13 +19,7 @@ scep-server-1:
     authorized_signer_on_behalf:
         rule1:
             # Full DN
-            subject: CN=scep-signer\.openxpki\.org,O=OpenXPKI Testing,C=DE
-        rule2:
-            # Wildcarded DN
-            subject: CN=scep-signer-[0-9]*\.openxpki\.org.*
-        rule3:
-            # Special cert by identifier	
-            identifier: JNHN5Hnje34HcltluuzooKVqxs2                        
+            subject: CN=enroll[0-9]*:scepclient,.*
     
     policy:         
         allow_anon_enroll: 0
@@ -40,3 +34,46 @@ scep-server-1:
     # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)       
     profile_map:
         pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
+
+    challenge:
+       value: SecretChallenge
+
+    challenge-bind:
+       mode: bind
+       value@: connector:scep.connectors.challenge
+       args: 
+       - "[% context.url_mac %]"
+
+    eligible:
+        initial:
+           value: 1
+
+        renew:
+           value: 1
+
+connectors:
+    devices:
+        ## This connector just checks if the given mac 
+        ## exisits in the ldap
+        class: Connector::Proxy::Net::LDAP::Simple
+        LOCATION: ldap://localhost:389
+        base: ou=devices,dc=mycompany,dc=com
+        filter: (macaddress=[% ARGS.1 %])
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrs: macaddress
+
+    devices2:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/ca-one/scep.yaml
+        PREFIX: status
+
+    challenge2:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/ca-one/scep.yaml
+        PREFIX: challenge
+
+    challenge:
+        class: Connector::Builtin::Authentication::Password
+        LOCATION: /home/pkiadm/ca-one/passwd.txt
+

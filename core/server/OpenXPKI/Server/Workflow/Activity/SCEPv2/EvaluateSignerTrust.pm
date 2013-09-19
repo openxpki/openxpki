@@ -108,13 +108,13 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "SCEP Signer validated - trusted root is $signer_root", 
             PRIORITY => 'info',
-            FACILITY => ['audit','system']
+            FACILITY => ['workflow','auth']
         );        
     } else {
         CTX('log')->log(
-            MESSAGE => "SCEP Signer NOT validated", 
+            MESSAGE => "SCEP Signer validation FAILED", 
             PRIORITY => 'info',
-            FACILITY => ['audit','system']
+            FACILITY => ['workflow','auth']
         );
     }
 
@@ -127,6 +127,12 @@ sub execute {
     
     my $matched = 0;
     my $current_realm = CTX('session')->get_pki_realm();
+    
+    CTX('log')->log(
+        MESSAGE => "SCEP Signer Authorization $signer_profile / $signer_realm / $signer_subject",        
+        PRIORITY => 'trace',
+        FACILITY => 'workflow',
+    );            
     
     TRUST_RULE:
     foreach my $rule (@rules) {
@@ -160,6 +166,11 @@ sub execute {
             }
             next TRUST_RULE if (!$matched);
 
+            CTX('log')->log(
+                MESSAGE => "SCEP Signer Authorization matched subrule $rule/$match",
+                PRIORITY => 'debug',
+                FACILITY => 'workflow',
+            );            
             ##! 32: 'Matched ' . $match
         }
         
@@ -168,7 +179,7 @@ sub execute {
             CTX('log')->log(
                 MESSAGE => "SCEP Signer Authorization matched rule $rule",
                 PRIORITY => 'info',
-                FACILITY => ['audit','system'],
+                FACILITY => 'workflow',
             );            
             $context->param('signer_on_behalf' => 1);
             return 1;

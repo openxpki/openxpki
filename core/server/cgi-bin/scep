@@ -12,6 +12,7 @@ use CGI::Carp qw( fatalsToBrowser );
 use Config::Std;
 use NetAddr::IP;
 use English;
+use Log::Log4perl qw( :easy );
 
 require OpenXPKI::Client::SCEP;
 my $query = new CGI;
@@ -35,8 +36,20 @@ if ($ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE}) {
     }
 
     # Test for specific config file based on script name
-    $ENV{SCRIPT_NAME} =~ qq|/([^/]+)\$|;
-    $configfile = "$basedir/$1.conf";
+    # SCRIPT_URL is only available with mod_rewrite
+    if (defined $ENV{SCRIPT_URL}) {
+        $ENV{SCRIPT_URL} =~ qq|/([^/]+)\$|;
+        $configfile = "$basedir/$1.conf";
+
+    # Should always work
+    } elsif (defined $ENV{REQUEST_URI}) {
+        $ENV{REQUEST_URI} =~ qq|/([^/\?]+)(\\?.*)?\$|;        
+        $configfile = "$basedir/$1.conf";
+    
+    # Hopefully never seen 
+    } else {
+        die "Unable to detect script name - please check the docs";
+    }
    
     # use default if no custom file
     $configfile = $basedir.'/default.conf' unless ( -f $configfile );
@@ -54,13 +67,28 @@ my $profile = $config{global}{profile};
 my $server  = $config{global}{servername};
 my $enc_alg = $config{global}{encryption_algorithm};
 
+my $log;
+my $log_config = $config{global}{log_config};
+if ($log_config) {
+    Log::Log4perl->init_once($log_config);    
+    $log = Log::Log4perl->get_logger( $config{global}{log_facility} || 'scep' );
+} else {
+    Log::Log4perl->easy_init( $ERROR );
+    $log = Log::Log4perl->get_logger();
+}
+
 my $allowed_range = new NetAddr::IP $iprange; # the allowed IP range
                      # from the config file
 my $requesting_host = new NetAddr::IP $ENV{'REMOTE_ADDR'}; # the host
 
+$log->debug('Used configfile ' . $configfile);
+
 # Check if requesting host is allowed to talk to us
 if (!$requesting_host->within($allowed_range)) {
 # TODO: better response?
+
+    $log->info('Blocked request from ' . $requesting_host );
+ 
     print "Content-Type: text/plain\n\nGo away\n";
     die("Unauthorized access from $requesting_host");
 }
@@ -80,6 +108,7 @@ else {
         $params->{$param} = $query->param($param);
     }
    
+   $log->info('Incoming request from ' . $requesting_host . ' with ' . $operation );
    
     # OpenXPKI::Client::SCEP does the actual work
     my $scep_client = OpenXPKI::Client::SCEP->new(
@@ -186,3 +215,19 @@ script:
 
 =back
  
+=head2 webserver setup
+ 
+If you use apache, the easiest way is a directory based wildcard alias.
+ 
+    ScriptAlias /scep  /usr/lib/cgi-bin/scep
+    <Directory "/usr/lib/cgi-bin/">
+            AllowOverride None
+            Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+            Order allow,deny
+            Allow from all
+    </Directory>
+ 
+Make your requests to C<http://server/scep/myserver> which will pull in 
+the config from /etc/openxpki/scep/myserver.conf.
+ 
+Note: SCEP usually uses HTTP/1.0, so name based virtual hosts are not working.

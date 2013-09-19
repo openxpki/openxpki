@@ -3,7 +3,7 @@
 
      File: core/config/graffle/workflow_enrollment.graffle
   Version: 2.3
-      Git: 2a12cc884ee3b861958c0e83b56f3f6a4c1e13f0
+      Git: ec222ee12c92b17c46e38df23278a6400e5c96bc (modified)
 -->
 
 
@@ -171,11 +171,6 @@
         <param name="condition" value="is_empty" />
     </condition>
 
-    <condition name="enroll_eligible_for_initial_enroll"
-            class="Workflow::Condition::Evaluate">
-        <param name="test" value="not not $context-&gt;{eligible_for_initial_enroll}" />
-    </condition>
-
     <condition name="enroll_auto_revoke_existing_certs"
             class="Workflow::Condition::Evaluate">
         <param name="test" value="$context-&gt;{p_auto_revoke_existing_certs}" />
@@ -198,11 +193,6 @@
             class="Workflow::Condition::LazyOR">
         <param name="condition1" value="enroll_num_active_certs_less_than_max" />
         <param name="condition2" value="enroll_in_renewal_window" />
-    </condition>
-
-    <condition name="enroll_eligible_for_renewal"
-            class="Workflow::Condition::Evaluate">
-        <param name="test" value="not not $context-&gt;{eligible_for_renewal}" />
     </condition>
 
     <condition name="enroll_at_least_one_active_cert"

@@ -59,7 +59,7 @@ sub execute {
     $approval_points = 1 unless(defined $approval_points);
     
     my $approvals = 0;
-    if ( $context->param('request_mode' ) eq 'initial' ) {
+    if ( $context->param('request_mode' ) eq 'initial' && $context->param('eligible_for_initial_enroll') ) {
         ##! 16: 'auto approve for initial enrollment'
         $approvals = 1;
         CTX('log')->log(
@@ -67,7 +67,7 @@ sub execute {
             PRIORITY => 'info',
             FACILITY => 'audit',
         ) 
-    } elsif ( $context->param('request_mode' ) eq 'renewal' ) {
+    } elsif ( $context->param('request_mode' ) eq 'renewal'  && $context->param('eligible_for_renewal') ) {
         ##! 16: 'auto approve for renewal'        
         $approvals = 1;
         CTX('log')->log(
@@ -77,9 +77,9 @@ sub execute {
         )
     } else {
         CTX('log')->log(
-            MESSAGE => 'SCEP approval no request mode set!',
-            PRIORITY => 'error',
-            FACILITY => 'system',
+            MESSAGE => 'SCEP no auto approval for eligibility!',
+            PRIORITY => 'info',
+            FACILITY => 'audit',
         )
     }
     
