@@ -14,11 +14,11 @@ use OpenXPKI::Server::Workflow::Pause;
 use Workflow::Exception qw( workflow_error );
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( qw( resulting_state workflow ) );
+__PACKAGE__->mk_accessors( qw( resulting_state workflow _map ) );
 
 sub init {
     my ( $self, $wf, $params ) = @_;
-    ##! 1: 'start'
+    ##! 1: 'start ' . $params->{name}
     ##! 64: 'self: ' . Dumper $self
     ##! 64: 'params: ' . Dumper $params
     ##! 64: 'wf: ' . Dumper $wf
@@ -37,11 +37,48 @@ sub init {
     ##! 16: 'self->{CONFIG_ID} = ' . $self->{CONFIG_ID}
     
     $self->workflow( $wf );
-    
-    
-    # call Workflow::Action's init()
-    $self->SUPER::init($wf, $params);
 
+    
+    # copy the source params
+    my $params_merged = { % { $params }};
+    
+    # init the _map parameters
+    my $_map = {};
+    
+    foreach my $key (keys %{$params}) {
+        if ($key !~ /^_map_(.*)/) { next; }
+        
+        # Remove map key from the hash
+        delete $params_merged->{$key};
+        
+        my $name = $1;
+        my $val = $params->{$key};
+        $_map->{$name} = $params->{$key};
+        ##! 8: 'Found param ' . $name . ' - value : ' . $params->{$key}
+=cut                
+        if ($val =~ /^\$(\S+)/) {
+            # copy from context
+            $_map->{$name} = ['ctx', $1];
+                
+        } else { # }if ($val =~ /^\&(\S+)/) {
+            # TT parser           
+            $_map->{$name} = ['tt', $val ];
+        #} else { 
+        #    
+        #    # static value, add to plain params hash 
+        #    $params_merged->{$name} = $val;
+        } 
+=cut        
+    }
+       
+    # call Workflow::Action's init()
+    $self->SUPER::init($wf, $params_merged);
+
+    $self->_map( $_map );
+    
+    ##! 32: 'merged params ' . Dumper  $params_merged
+    ##! 32: 'map ' . Dumper  $_map    
+    
     ##! 1: 'end'
     return 1;
 }
@@ -66,6 +103,59 @@ sub pause{
     OpenXPKI::Server::Workflow::Pause->throw( cause => $cause);
 }
 
+
+sub param {
+        
+    my ( $self, $name, $value ) = @_;
+    
+    unless ( defined $name ) {
+        my $result = { %{ $self->{PARAMS} } };
+        
+        # add mapped params
+        my $map = $self->_map();
+        foreach my $key (keys %{ $map }) {
+            $result->{$key} = $self->param( $key );            
+        }         
+        return $result;
+    }
+
+    # set requests are pushed upstream
+    if ( ref $name ne '' || defined $value ) {
+        return $self->SUPER::param( $name, $value );
+    }
+
+    if ( exists $self->{PARAMS}{$name} ) {
+        return $self->{PARAMS}{$name};
+    } else {
+        my $map = $self->_map();        
+        return undef unless ($map->{$name});
+        ##! 16: 'query for mapped key ' . $name
+        
+        my $template = $map->{$name};
+        # shortcut for single context value        
+        if ($template =~ /^\$(\S+)/) {
+            my $ctxkey = $1;       
+            ##! 16: 'load from context ' . $ctxkey
+            my $ctx = $self->workflow()->context()->param( $ctxkey );            
+            if ($ctx =~ m{ \A HASH | \A ARRAY }xms) {                
+                ##! 32: ' needs deserialize '
+                my $ser  = OpenXPKI::Serialization::Simple->new();                 
+                return $ser->deserialize( $ctx );
+            } else {
+                return $ctx;    
+            }
+        } else {
+            ##! 16: 'parse using tt ' . $map->{$name}->[1]
+            my $tt = Template->new();
+            my $out;
+            $tt->process( \$template, { context => $self->workflow()->context()->param() }, \$out );
+            ##! 32: 'tt result ' . $out
+            return $out;                                 
+        }
+    }
+    return undef;    
+}
+ 
 sub get_max_allowed_retries{
     my $self     = shift;
     
@@ -366,6 +456,8 @@ settings, the actual time can be much greater!
 If set to "yes", the workflow is moved directly to the FAILURE state and
 set to finished in case of an error. This also affects a retry_exceeded
 situation!
+
+=back 
     
 =head1 Functions
 
@@ -430,204 +522,40 @@ identifier if the config ID is not yet set (this happens in the very
 first workflow activity)
 
 
-=head2 Setting parameters
+=head1 Parameter mapping
 
-Activity parameters can stem from three sources:
+Parameters in the xml configuration of the activity that start with I<_map_>
+are parsed using template toolkit and imported into the namespace of the 
+action class.   
 
-=over 4
+The prefix is stripped and the param is set to the result of the evaluation,
+the value is interpreted as template and filled with the context:
+  
+  <action name=".." class="..."
+   _map_my_tt_param="my_prefix_[% context.my_context_key %]>
+   
+If you just need a single context value, the dollar sign is a shortcut:
 
-=item * 
-
-Default values defined in the Activity implementation Perl code itself
-
-=item * 
-
-Parameters configured in the Activity XML configuration file for the
-particular Activity.
-
-=item * 
-
-Parameters passed in via the Workflow Context
-
-=back
-
-These sources are ordered with descending trust level.
-A default value configured in the source code should
-always be considered trusted. A value in the configuration file is
-at least specified or reviewed by authorized persons who specify the 
-system behaviour.
-However, a  parameter that is passed via the Workflow Context 
-is potentially user specified input which may inflict security problems.
-
-The Activity implementation MUST take care or proper handling whenever
-untrusted user input (from the Workflow Context) is processeed.
-
-It is recommended that the Activity implementation code processes, prepares,
-and validates all parameters before doing anything else. To assist the
-implementer in this task it is recommended to specify expected 
-parameter name, possible sources and possible defaults via setparams().
-
-
-=head2 setparams ( $workflow, \%expected_params )
-
-Checks Activity parameters (from Activity XML configuration) and context 
-passed by caller for required and optional parameters and copies the 
-named parameters to the Activity parameters. 
-
-Modifies Activity parameters (accessible via $self->param(...) within
-the code). Does NOT modify the context itself!
-
-The method expects the current workflow instance as first parameter.
-The second parameter must be a hash reference that contains the expected
-fields as keys.
-
-The corresponding values are again hash references that include a description
-if the key parameter is optional, required or should be assigned a default
-value if unset.
-If a required parameter is not found in the context the method throws
-an exception.
-After the function returns the caller can access copies of all 
-parameters that are referenced in the parameter definition
-via its own parameters ($self->param(...)). This includes parameters
-passed in from the context if this was allowed explicitly.
-
-Implementers MUST make sure that untrusted user input is validated properly.
-
-
-The hash reference members are hash references with three possible keys:
-
-  accept_from => <arrayref>
-  default => <any Perl data structure>
-  required => integer
-
-=over 4
-
-=item * 
-
-The C<accept_from> value is an array ref that names the possible 
-sources for the parameter value. Allowed values in this list are 
-'context', 'config' and 'default'. Unknown sources are ignored. If
-a parameter value is defined in the specified source, this value is 
-accepted. If the specified source does not contain the named parameter
-the search continues until the end of the list is reached. If no
-source contained a suitable value, the parameter will be set to
-undef.
-
-If C<accept_from> is not specified, it defaults to [ 'config', 'default' ].
-
-=item * 
-
-The C<default> value is the value that should be assigned to the
-parameter if the source 'default' is quieried.
-
-=item * 
-
-If C<required> is set to a true value and the parameter could not
-be determined from the specified sources the method throws an
-C<I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_PARAMETER> exception.
-
-=back
-
-The hash reference must be constructed as follows:
-
-  {
-    # If 'some_parameter' is specified in the context, use it. otherwise
-    # use the value specified in the activity configuration. if neither
-    # is available, use the default value 'abc123'.
-    # $self->param('some_parameter') will always return a defined value
-    # after this check has been processed.
-    some_parameter => {
-      accept_from => [ 'context', 'config', 'default' ],
-      default => "abc123",
-    },
-
-    # 'protected_parameter' is ignored if it is present in the Context.
-    # If specified in the XML config, $self->param('protected_parameter')
-    # will return the value defined there. Otherwise it will return 
-    # 'abc456'.
-    protected_parameter => {
-      accept_from => [ 'config', 'default' ],
-      default => "abc456",
-    },
-
-    # identical to 'protected_parameter': [ 'config', 'default' ] is the
-    # default for accept_from.
-    protected_parameter2 => {
-      default => "abc456",
-    },
-
-    # $self->param('user_parameter') will return the value specified 
-    # in the context if it is present there. Otherwise it will return 
-    # the default value.
-    user_parameter => {
-      accept_from => [ 'context', 'default' ],
-      default => "abc123",
-    },
-
-    # $self->param('weird_parameter') is taken from the configuration 
-    # file.
-    # If it is NOT specified there, the corresponding context value is
-    # used instead. If neither exist, an exception is thrown.
-    weird_parameter => {
-      accept_from => [ 'config', 'context' ],
-      required => 1,
-    },
-
-    # $self->param('cleared_parameter') is always undefined, even if it
-    # was specified in the configuration or in the context. Not very 
-    # useful but possible...
-    cleared_parameter => {
-      accept_from => [ ],
-    },
-  }
-
-
-=head3 Example
-
-Caller example as seen from the Activity implementation:
-
-  ...
-  use base qw( OpenXPKI::Server::Workflow::Activity );
-  ...
-  sub execute {
-    my $self = shift;
-    my $workflow = shift;
-
-    $self->setparams($workflow, 
-		     {
-			keytype => {
-                            accept_from => [ 'context', 'default' ],
-			    default => 'RSA',
-			},
-			keypass => {
-                            accept_from => [ 'context' ],
-			},
-			_token => {
-                            accept_from => [ 'context' ],
-			    required => 1,
-			},
-		    });
-
-  ...
-  # later in the Activity implementation you can reference the
-  # local parameter
-  my $keytype = $self->param('keytype');
-  ...
-
-In this case the setparams() function will throw a 'missing context 
-parameter' exception if the required '_token' parameter was not found 
-in the context.
-If no 'keytype' parameter was found, it will set the default 'RSA'.
-The 'keypass' parameter is optional in this case and will simply be
-copied to the Activity parameters.
+  <action name=".." class="..."
+    _map_my_simple_param="$my_context_key">
+   
+The values are accessible thru the $self->param call using the basename. 
 
 =head3 Activity configuration example
 
-In this definition the parameter C<tokentype> is set to "DEFAULT":
+If C<my_context_key> has a value of foo in the context, this configuration:
 
-  <action name="token.default.get"
-	  class="OpenXPKI::Server::Workflow::Activity::Token::Get"
-	  tokentype="DEFAULT">
-    <description>Instantiate a default crypto token</description>
+  <action name="..." class="..."  
+   _map_my_simple_param="$my_context_key"
+   _map_my_tt_param="my_prefix_[% context.my_context_key %]">
   </action>
+
+Is the same as:
+
+  <action name="..." class="..."  
+   my_simple_param="foo"
+   my_tt_param="my_prefix_foo">
+  </action>
+  
+    
 
