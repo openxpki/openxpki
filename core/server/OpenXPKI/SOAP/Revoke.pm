@@ -14,9 +14,11 @@ use OpenXPKI::Exception;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
+use Apache2::ModSSL;
+
 use Log::Log4perl qw(:easy);
 
-my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap.conf';
+my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap/default.conf';
 
 my $config;
 if (! read_config $configfile, $config) {

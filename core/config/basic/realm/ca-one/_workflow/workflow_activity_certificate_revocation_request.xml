@@ -9,7 +9,8 @@
       <field name="reason_code"/>
       <field name="comment"/>
       <field name="invalidity_time"/>
-      <field name="flag_crr_auto_approval"/>      
+      <field name="flag_crr_auto_approval"/>
+      <field name="crr_info"/>            
       <validator name="I18N_OPENXPKI_WF_VAL_HASREQUIREDFIELD">
         <arg>cert_identifier</arg>
         <arg>reason_code</arg>
