@@ -1,6 +1,8 @@
 examples/log.conf
-examples/scep.conf
-examples/soap.conf
+examples/scep/default.conf
+examples/scep/log.conf
+examples/soap/default.conf
+examples/soap/log.conf
 examples/basic.tgz
 examples/profiles.tgz
 examples/notification.tgz
