@@ -64,13 +64,15 @@
 
     <action name="scunblock_get_auth1_id"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue"                       
-        ds_key_template="users.by_mail.[% CONTEXT.auth1_id %]"      
+        ds_key_prefix="users.by_mail"
+        _map_ds_key="[% context.auth1_id %]"      
         ds_value_map="auth1_mail -> mail, auth1_cn -> cn">  
     </action>
 
     <action name="scunblock_get_auth2_id"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue"                       
-        ds_key_template="users.by_mail.[% CONTEXT.auth2_id %]"
+        ds_key_prefix="users.by_mail"
+        _map_ds_key="[% context.auth2_id %]"
         ds_value_map="auth2_mail -> mail, auth2_cn -> cn">  
     </action>
      
