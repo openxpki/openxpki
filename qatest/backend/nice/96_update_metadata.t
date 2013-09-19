@@ -40,7 +40,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 12 );
+$test->plan( tests => 8 );
  
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
