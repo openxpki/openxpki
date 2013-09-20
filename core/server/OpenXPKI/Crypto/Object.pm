@@ -94,7 +94,8 @@ sub set_header_attribute
 
 sub get_subject_alt_names {
     my $self = shift;
-
+    my $args = shift;
+    
     my @subject_alt_names;
     eval { 
         @subject_alt_names = @{$self->get_parsed('BODY',
@@ -113,14 +114,27 @@ sub get_subject_alt_names {
             $all_sans .= $san_line;
         }
         my @sans = split q{, }, $all_sans;
-        foreach my $san (@sans) {
-            ##! 64: 'san: ' . $san
-            # convert from string to array ref of form [ 'DNS', 'example.com' ]
-            my @temp = split /:/, $san;
-            $san = [ $temp[0], $temp[1] ];
+        
+        if ($args->{FORMAT} eq 'HASH') {
+            my $ret = {};
+            foreach my $san (@sans) {
+                ##! 64: 'san: ' . $san
+                # convert from string to array ref of form [ 'DNS', 'example.com' ]
+                my @temp = split /:/, $san;
+                if (!$ret->{$temp[0]}) { $ret->{$temp[0]} = []; }
+                push @{$ret->{$temp[0]}}, $temp[1];
+            }
+            return $ret; 
+        } else {
+            foreach my $san (@sans) {
+                ##! 64: 'san: ' . $san
+                # convert from string to array ref of form [ 'DNS', 'example.com' ]
+                my @temp = split /:/, $san;
+                $san = [ $temp[0], $temp[1] ];
+            }
+            ##! 64: 'sans: ' . Dumper(\@sans)
+            return @sans;
         }
-        ##! 64: 'sans: ' . Dumper(\@sans)
-        return @sans;
     }
 }
 
@@ -179,9 +193,19 @@ set an attribute in the header.
 
 =head2 get_subject_alt_names
 
-returns the subject alternative names in an array of arrays, i.e.
+returns the subject alternative names, by default as array of arrays, i.e.
  [
     [ 'DNS', 'www.example.com' ],
     [ 'DNS', 'www.example.org' ],
 ]
+
 This works only for certificates or certificate signing requests.
+
+If you pass { FORMAT => HASH } as parameter, you will get the sans as hash:
+
+   {
+       DNS => [ 'www.example.com', 'www.example.org' ],
+       IP  => [ '1.2.3.4' ]       
+   } 
+
+
