@@ -738,6 +738,10 @@ sub BUILD {
                 VARS => {
                     type     => HASHREF,
                 },
+                ADDITIONAL => {
+                    type     => HASHREF,
+                    optional => 1
+                },
             },                       
         },
         'list_supported_san' => {

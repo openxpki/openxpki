@@ -82,6 +82,15 @@ sub execute {
     my @san_template_keys = $config->get_keys("profile.$profile.style.$style.subject.san");
     
     ##! 32: "Keys found at profile.$profile.style.$style.subject.san : " . Dumper @san_template_keys   
+
+    my $csr_info = {};
+    my $pkcs10 = $context->param('pkcs10');
+    
+    if ($pkcs10) {
+        my $obj = OpenXPKI::Crypto::CSR->new( DATA => $pkcs10, TOKEN => CTX('api')->get_default_token() );
+        $csr_info = $obj->get_subject_alt_names({ FORMAT => 'HASH' });
+    }    
+    ##! 32: 'csr info ' . Dumper $csr_info  
     
     my @san_list;    
     # If san template is defined we force template mode
@@ -97,7 +106,8 @@ sub execute {
         @san_list = @{CTX('api')->render_san_from_template({
             PROFILE => $profile,
             STYLE   => $style,
-            VARS    => $subject_vars
+            VARS    => $subject_vars,
+            ADDITIONAL => $csr_info
         })};
         
     } elsif ( my $san_data = $context->param('cert_subject_alt_name_parts') ) {
@@ -108,6 +118,9 @@ sub execute {
             PRIORITY => 'debug',
             FACILITY => [ 'workflow', ],
         );         
+                       
+        # FIXME -  should get refactored when new ui is ready
+        # TODO - this is mostly untested
                        
         my $subject_alt_name_parts = $ser->deserialize( $context->param('cert_subject_alt_name_parts') );
         
@@ -142,6 +155,15 @@ sub execute {
                     $san_items->{$type}->{$value} = 1 if($value);  
                 }
             }
+        }
+        
+        # push additional items from pcks10
+        if ($csr_info) {
+            foreach my $type (keys %{$csr_info}) {
+                foreach my $value (@{$csr_info->{$type}}) {
+                    $san_items->{$type}->{$value} = 1 if($value);
+                }                
+            }                    
         }
        
         # Map the items hash to the internal san_array structure

@@ -382,8 +382,9 @@ sub render_san_from_template {
     ##! 1: 'Start '
     
     my $profile = $args->{PROFILE};
-    my $style = $args->{STYLE};
-    my $vars = $args->{VARS};
+    my $style   = $args->{STYLE};
+    my $vars    = $args->{VARS};
+    my $items   = $args->{ADDITIONAL} || {};
 
     my $config = CTX('config');    
             
@@ -431,21 +432,31 @@ sub render_san_from_template {
             ## split up internal multiples (sep by |)
             push @entries, (split (/\|/, $result)) if ($result);
         }
+     
+        # merge into the preset hash
+        if ($items->{$cctype}) {
+            push @{$items->{$cctype}}, @entries;
+        } else {
+            $items->{$cctype} = \@entries;
+        }        
+    }
+        
+    foreach my $type (keys %{$items}) {        
 
         ##! 32: 'Entries are ' . Dumper @entries       
- 
-        # Remove duplicates and split up internal multiples (sep by |)
-        my %items;
-        foreach my $key (@entries) {                       
+        
+        # Remove duplicates
+        my %entry;
+        foreach my $key ( @{$items->{$type}} ) {                       
             $key =~ s{ \A \s+ }{}xms;
             $key =~ s{ \s+ \z }{}xms;
             next if ($key eq ''); 
-            $items{$key} = 1;
+            $entry{$key} = 1;
         } 
 
         # convert to the internal format used by our crypto engine 
-        foreach my $value (keys %items) {                        
-            push @san_list, [ $cctype, $value ] if ($value);
+        foreach my $value (keys %entry) {                        
+            push @san_list, [ $type, $value ] if ($value);
         }
     }
    
@@ -619,6 +630,12 @@ Parameters:
     PROFILE: name of the profile
     STYLE:   name of the substyle, if omited the first one is chosen
     VARS:    the vars to pass to the template parser
+    ADDITIONAL: additional san as hash 
+    
+The additional sans are merged with the results of the template parser,
+duplicates are removed. Expected hash format (empty refs are ok):
+
+    { DNS => [ 'www.example.com', 'www.example.org' ] }    
 
 Configuration example:
 
