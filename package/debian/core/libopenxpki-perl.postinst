@@ -40,12 +40,22 @@ case "$1" in
        test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
    
        # scep/soap config
-       test -e /etc/openxpki/scep/default.conf || tar -zxf /usr/share/doc/libopenxpki-perl/examples/scep.tgz -C /etc/openxpki/scep/
-       test -e /etc/openxpki/soap/default.conf || tar -zxf /usr/share/doc/libopenxpki-perl/examples/soap.tgz -C /etc/openxpki/soap/       
+       test -e /etc/openxpki/scep/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/scep.tgz -C /etc/openxpki/scep/
+       test -e /etc/openxpki/soap/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/soap.tgz -C /etc/openxpki/soap/       
 
        test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf 
 
-       # No config - load sample config       
+       # add apache user to openxpki group (to allow connecting the socket)
+       usermod -G openxpki www-data
+       
+        # UI logfiles
+        for f in scep.log soap.log; do 
+            touch /var/openxpki/$f
+            chown www-data:openxpki /var/openxpki/$f
+            chmod 640 /var/openxpki/$f
+        done;
+
+        # No config - load sample config       
 	   if [ ! -e /etc/openxpki/config.d/ ]; then
 	       mkdir -m 750 /etc/openxpki/config.d	             
 	       mkdir -m 750 /etc/openxpki/config.git	             
