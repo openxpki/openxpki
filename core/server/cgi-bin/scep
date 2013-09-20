@@ -38,12 +38,12 @@ if ($ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE}) {
     # Test for specific config file based on script name
     # SCRIPT_URL is only available with mod_rewrite
     if (defined $ENV{SCRIPT_URL}) {
-        $ENV{SCRIPT_URL} =~ qq|/([^/]+)\$|;
+        $ENV{SCRIPT_URL} =~ qq|scep/([^/]+)\$|;
         $configfile = "$basedir/$1.conf";
 
     # Should always work
     } elsif (defined $ENV{REQUEST_URI}) {
-        $ENV{REQUEST_URI} =~ qq|/([^/\?]+)(\\?.*)?\$|;        
+        $ENV{REQUEST_URI} =~ qq|scep/([^/\?]+)(\\?.*)?\$|;        
         $configfile = "$basedir/$1.conf";
     
     # Hopefully never seen 

@@ -43,6 +43,8 @@ case "$1" in
        test -e /etc/openxpki/scep/default.conf || tar -zxf /usr/share/doc/libopenxpki-perl/examples/scep.tgz -C /etc/openxpki/scep/
        test -e /etc/openxpki/soap/default.conf || tar -zxf /usr/share/doc/libopenxpki-perl/examples/soap.tgz -C /etc/openxpki/soap/       
 
+       test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf 
+
        # No config - load sample config       
 	   if [ ! -e /etc/openxpki/config.d/ ]; then
 	       mkdir -m 750 /etc/openxpki/config.d	             
