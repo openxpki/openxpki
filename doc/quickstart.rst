@@ -8,18 +8,20 @@ Debian/Ubuntu Development Builds
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the mason client will crash otherwise!**
 
-You can find packages for Debian Squeeze and Ubuntu 12.04 at http://packages.openxpki.org/.
+Starting with our preview release 0.11.3 we will publish packages mainly for debian 7 (wheezy) and Ubuntu 12.04.  
+You can find them on our package mirror at http://packages.openxpki.org/. 
 
-Packages are build from the development head, it "should work" but some stuff might need a bit of manual tweaking.
+Packages are build from the development head, versioned packages are build from the release branch. 
+The preview builds "should work" but some stuff might need a bit of manual tweaking.
 
-Add the repository to your source list (squeeze)::
+Add the repository to your source list (wheezy)::
 
-    echo "deb http://packages.openxpki.org/debian/ squeeze/binary/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/debian/ wheezy/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
 or ubuntu::
 
-    echo "deb http://packages.openxpki.org/ubuntu/ precise/binary/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/ubuntu/ precise/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
 
 As the init script uses mysql as default, but does not force it as a dependancy, it is crucial that you have the mysql server installed before you pull the OpenXPKI package::
@@ -38,39 +40,90 @@ Now, create the database user::
     GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
     flush privileges;
 
-Create your ca certificate:: 
-    
-    cd /etc/openxpki/ssl/ca-one/
-    openssl req -newkey rsa:2048 -new -days 1830 -x509 -keyout ca-one-signer-1.pem -out ca-one-signer-1.crt  -passout pass:root
-    
-Create a key for the internal datasafe (not exposed externally)::    
+It is now time to init the server::
 
-    openssl req -newkey rsa:2048 -new -days 400 -x509 -keyout ca-one-vault-1.pem -out ca-one-vault-1.crt -passout pass:root
-
-If you plan to use the SCEP service, you need another certificate::    
-
-    openssl req -newkey rsa:2048 -new -days 400 -x509 -keyout ca-one-scep-1.pem -out ca-one-scep-1.crt -passout pass:root
-
-
-**Note:** The sample config uses the fixed passphrase *root* as password for both keys, please change this for your production deployment!
-
-The following creates the initial configuration repository, inits the database schema and imports the certificates into the database:: 
-       
     openxpkiadm loadcfg
     openxpkiadm initdb
+
+Setup base certificates
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The debian package comes with a shell script ``sampleconfig.sh`` that does all the work for you 
+(look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two stage ca with 
+a root ca certificate and below your issuing ca and certs for SCEP and the internal datasafe.
+
+The sample script proves certs for a quickstart but should never be used for production systems 
+(it has the fixed passphrase *root* for all keys ;) and no policy/crl, etc config ).
+ 
+Here is what you need to do:
+
+#. Create a key/certificate as signer certificate (ca = true)
+#. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
+#. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
+
+Move the key files to /etc/openxpki/ssl/ca-one/ and name them ca-one-signer-1.pem, ca-one-vault-1.pem, ca-one-scep-1.pem. 
+The key files must be readable by the openxpki user, so we recommend to make them owned by the openxpki user with mode 0400. 
+
+Now import the certificates to the database, the realm/issuer line is required if the certificate is not self signed. 
     
-    openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-signer-1.crt 
-    openxpkiadm alias --realm ca-one --token certsign --identifier <identifier from import>
+    openxpkiadm certificate import  --file ca-root-1.crt 
+        
+    openxpkiadm certificate import  --file ca-one-signer-1.crt \
+        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`
+        
+    openxpkiadm certificate import  --file ca-one-vault-1.crt \
+        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`
+           
+    openxpkiadm certificate import  --file ca-one-scep-1.crt \
+        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`     
+        
+To link these certificates to the internal tokens, you need to set a so called alias::         
+     
+    openxpkiadm alias --realm ca-one --token certsign \
+        --identifier `openxpkiadm certificate id --file ca-one-signer-1.crt`
+        
+    openxpkiadm alias --realm ca-one --token datasafe \
+        --identifier `openxpkiadm certificate id --file ca-one-vault-1.crt`  \        
+
+    openxpkiadm alias --realm ca-one --token scep \
+        --identifier `openxpkiadm certificate id --file ca-one-scep-1.crt`  \
+        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`
+
+If the import went smooth, you should see something like this (ids and times will vary)::
+
+    $ openxpkiadm alias --realm ca-one
     
-    openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-vault-1.crt 
-    openxpkiadm alias --realm ca-one --token datasafe --identifier <identifier from import>
+    scep (ca-one-scep):
+      Alias     : ca-one-scep-1
+      Identifier: Xol0OArASuzS4bYiROxLvGKdl_4
+      NotBefore : 2013-09-20 08:41:05
+      NotAfter  : 2014-09-20 08:41:05
     
-    openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-scep-1.crt 
-    openxpkiadm alias --realm ca-one --token scep --identifier <identifier from import>
+    datasafe (ca-one-vault):
+      Alias     : ca-one-vault-1
+      Identifier: ZnUjwmB4gqOtZagj2iSc8hLqJis
+      NotBefore : 2013-09-20 08:41:05
+      NotAfter  : 2014-09-20 08:41:05
+    
+    certsign (ca-one-signer):
+      Alias     : ca-one-signer-1
+      Identifier: She8R9sivQf_F7Rql7_Qph2Ec0U
+      NotBefore : 2013-09-20 08:41:04
+      NotAfter  : 2014-09-20 08:41:04
+    
+    current root ca:
+      Alias     : root-1
+      Identifier: eGDjexhUDL60vzl4Se-DlIlhpUA
+      NotBefore : 2013-09-20 08:41:03
+      NotAfter  : 2018-08-25 08:41:03
+    
+    upcoming root ca:
+      not set
+        
     
 Now it is time to see if anything is fine::
 
-    openxpkictl start
+    $ openxpkictl start
     
     Starting OpenXPKI...
     OpenXPKI Server is running and accepting requests.
