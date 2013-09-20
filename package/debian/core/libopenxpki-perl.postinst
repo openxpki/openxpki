@@ -36,18 +36,14 @@ case "$1" in
 	   chown -R openxpki:root /etc/openxpki/ssl/
 	   chmod -R 750 /etc/openxpki/ssl/
 	   
-	   # log config
-	   test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
-	   
-	   # scep config
-       test -e /etc/openxpki/scep/default.conf || cp /usr/share/doc/libopenxpki-perl/examples/scep/default.conf /etc/openxpki/scep/default.conf 
-	   test -e /etc/openxpki/scep/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/scep/log.conf /etc/openxpki/scep/log.conf
-	   
-	   # soap config
-       test -e /etc/openxpki/soap/default.conf || cp /usr/share/doc/libopenxpki-perl/examples/soap/default.conf /etc/openxpki/soap/default.conf 
-       test -e /etc/openxpki/soap/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/soap/log.conf /etc/openxpki/soap/log.conf 
-	   
-	   # No config - load sample config       
+       # log config
+       test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
+   
+       # scep/soap config
+       test -e /etc/openxpki/scep/default.conf || tar -zxf /usr/share/doc/libopenxpki-perl/examples/scep.tgz -C /etc/openxpki/scep/
+       test -e /etc/openxpki/soap/default.conf || tar -zxf /usr/share/doc/libopenxpki-perl/examples/soap.tgz -C /etc/openxpki/soap/       
+
+       # No config - load sample config       
 	   if [ ! -e /etc/openxpki/config.d/ ]; then
 	       mkdir -m 750 /etc/openxpki/config.d	             
 	       mkdir -m 750 /etc/openxpki/config.git	             
