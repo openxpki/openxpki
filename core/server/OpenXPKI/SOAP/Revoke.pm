@@ -14,8 +14,6 @@ use OpenXPKI::Exception;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
-use Apache2::ModSSL;
-
 use Log::Log4perl qw(:easy);
 
 my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap/default.conf';
@@ -52,8 +50,6 @@ sub RevokeCertificate {
     my $cert_identifier   = shift;
     my $reason = shift || 'unspecified';
 
-
-
     $log->debug("SOAP: Entered RevokeCertificate - ",
 		"certificate: $cert_identifier, ",
 		"reason: $reason");
@@ -84,18 +80,18 @@ sub RevokeCertificate {
 
     my $auth_dn;
     my $auth_cn;
-    if ($c->is_https) {
-	$log->debug("calling context is https");
+    if (defined $ENV{HTTPS} && lc($ENV{HTTPS}) eq 'on') {
 	
-	$auth_dn = $ENV{SSL_CLIENT_S_DN};
+	   $log->debug("calling context is https");	
+	   $auth_dn = $ENV{SSL_CLIENT_S_DN};
         $auth_cn = $ENV{SSL_CLIENT_S_DN_CN};
-	if (defined $auth_dn) {
-	    $log->info("SOAP Revoke authenticated client DN: $auth_dn");
-	} else {
-	    $log->info("SOAP Revoke unauthenticated");
-	}
+    	if (defined $auth_dn) {
+    	    $log->info("SOAP Revoke authenticated client DN: $auth_dn");
+    	} else {
+    	    $log->info("SOAP Revoke unauthenticated");
+    	}
     } else {
-	$log->debug("calling context is http");
+	   $log->debug("calling context is http");
     }
 
 #    foreach my $key (keys %ENV) {

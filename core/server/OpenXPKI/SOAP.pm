@@ -8,8 +8,6 @@ use Data::Dumper;
 use SOAP::Transport::HTTP;
 #use SOAP::Transport::HTTP2; # Please adjust contructor call below, if you switch this!
 
-#use Apache2::ModSSL;
-
 use Log::Log4perl qw(:easy);
 
 my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap/default.conf';
