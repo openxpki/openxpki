@@ -19,7 +19,7 @@ cd "$TMP";
 (
 cat <<EOF
 HOME			= .
-RANDFILE		= $ENV::HOME/.rnd
+RANDFILE		= \$ENV::HOME/.rnd
 [ ca ]
 default_ca	= CA_default
 
@@ -54,6 +54,7 @@ x509_extensions = v3_ca
 
 [ req_distinguished_name ]
 domainComponent = Domain Component
+domainComponent_default = not allowed to be empty 
 commonName = Common Name
 
 [ usr_cert ]
@@ -75,6 +76,9 @@ touch index.txt
 touch index.txt.attr
 echo 01 > serial
 echo 00 > crlnumber
+
+
+echo "Creating certificates"
 
 exec 2>/dev/null
 
@@ -117,6 +121,8 @@ openxpkiadm alias --realm ca-one --token datasafe --identifier `openxpkiadm cert
 openxpkiadm certificate import --file $BASE/ca-one-scep-1.crt --realm ca-one --issuer $ROOTID
 openxpkiadm alias --realm ca-one --token scep --identifier `openxpkiadm certificate id --file $BASE/ca-one-scep-1.crt`
 
-echo "Have a nice day ;)"
+echo "Configuration should be done now, 'openxpkictl start' to fire up server'"
+echo ""
+echo "Thanks for using OpenXPKI - Have a nice day ;)"
 echo ""
 
