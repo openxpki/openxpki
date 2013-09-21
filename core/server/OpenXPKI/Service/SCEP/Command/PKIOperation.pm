@@ -499,6 +499,27 @@ sub __pkcs_req : PRIVATE {
         my $cert_identifier = $wf_info->{WORKFLOW}->{CONTEXT}->{'cert_identifier'};
         ##! 32: 'cert_identifier: ' . $cert_identifier
  
+        if (!$cert_identifier) {
+            # Fallback for old workflows
+            my $csr_serial = $wf_info->{WORKFLOW}->{CONTEXT}->{'csr_serial'};
+            ##! 32: 'csr serial ' . $csr_serial
+ 
+            my $csr_result = $api->search_cert({ CSR_SERIAL => $csr_serial });
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_CSR_SERIAL_FALLBACK_FAILED'
+            ) if (ref $csr_result ne 'ARRAY' || scalar @{ $csr_result } != 1);
+
+            $cert_identifier = $csr_result->[0]->{IDENTIFIER};  
+
+        }
+       
+        if (!$cert_identifier) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_CERT_IDENTIFIER_MISSING'
+            );
+        }
+       
+
         my $certificate = $api->get_cert(
             {   IDENTIFIER => $cert_identifier,
                 FORMAT     => 'PEM',
