@@ -180,24 +180,6 @@ sub update_workflow {
 	# ignore "volatile" context parameters starting with an underscore
 	next PARAMETER if ($key =~ m{ \A _ }xms);
 
-	# context parameter sanity checks 
-	if (length($value) > $context_value_max_length) {
-	    ##! 4: "parameter length exceeded"
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
-		params  => {
-		    WORKFLOW_ID => $id,
-		    CONTEXT_KEY => $key,
-		    CONTEXT_VALUE_LENGTH => length($value),
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
-
         ##! 2: "persisting context parameter: $key"
         # ignore "volatile" context parameters starting with an underscore
         next PARAMETER if ($key =~ m{ \A _ }xms);
