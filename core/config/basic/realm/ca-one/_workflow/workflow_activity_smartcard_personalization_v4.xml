@@ -417,6 +417,7 @@ Suggested behavior of client: if more than one PUK is returned, try to change th
             _map_EmployeeID="$userinfo_employee_id"
             _map_certType="sig"
             _map_email="$userinfo_mail"
+            attribs="EmployeeID,certType,email"
             namespace="export.smartcard.transfer">
     </action>
 
