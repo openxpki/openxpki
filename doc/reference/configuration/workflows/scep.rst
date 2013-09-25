@@ -48,7 +48,7 @@ Here is a complete sample configuration::
             initial:
                 value: 1
 
-            renew:
+            renewal:
                 value: 1
                         
 

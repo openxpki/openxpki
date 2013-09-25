@@ -42,7 +42,7 @@ scep-server-1:
         initial:
            value: 1
 
-        renew:
+        renewal:
            value: 1
  
 

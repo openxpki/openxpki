@@ -148,7 +148,6 @@
             class="Workflow::Condition::LazyAND">
         <param name="condition3" value="enroll_at_least_one_active_cert" />
         <param name="condition1" value="enroll_active_cert_count_ok" />
-        <param name="condition2" value="enroll_eligible_for_renewal" />
     </condition>
 
     <condition name="enroll_num_active_certs_less_than_max"
