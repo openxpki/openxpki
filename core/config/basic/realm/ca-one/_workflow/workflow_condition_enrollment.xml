@@ -3,7 +3,7 @@
 
      File: core/config/graffle/workflow_enrollment.graffle
   Version: 2.3
-      Git: e72b4f9dc71a094a1b75c01eee1676e8f11498b3 (modified)
+      Git: f72347e68004b47f4a1e44745bdbfb9bc3160aa1 (modified)
 -->
 
 
@@ -169,11 +169,6 @@
             class="OpenXPKI::Server::Workflow::Condition::WFArray">
         <param name="array_name" value="tmp_queue" />
         <param name="condition" value="is_empty" />
-    </condition>
-
-    <condition name="enroll_eligible_for_initial_enroll"
-            class="Workflow::Condition::Evaluate">
-        <param name="test" value="not not $context-&gt;{eligible_for_initial_enroll}" />
     </condition>
 
     <condition name="enroll_auto_revoke_existing_certs"
