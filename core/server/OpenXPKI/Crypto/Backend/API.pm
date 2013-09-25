@@ -281,7 +281,7 @@ sub get_object_function {
     if ($type eq "X509")
     {
         @functions = ("serial", "subject", "issuer", "notbefore", "notafter",
-                      "alias", "modulus", "pubkey", "fingerprint", "emailaddress",
+                      "alias", "modulus", "pubkey", "pubkey_hash", "fingerprint", "emailaddress",
                       "version", "pubkey_algorithm", "signature_algorithm", "exponent",
                       "keysize", "extensions", "openssl_subject"
                      );
