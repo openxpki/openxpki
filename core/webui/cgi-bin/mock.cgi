@@ -77,9 +77,8 @@ sub handle {
             'page' => {
                 'label' => 'OpenXPKI Login',
                 'desc' => 'Please log in ;)',
-                'type' => 'form'
             },
-            'main' => [{ 'action' => 'login', 'fields' => [
+            'main' => [{ 'action' => 'login','type' => 'form', 'fields' => [
                 { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },
                 { 'name' => 'password', 'label' => 'Password', 'type' => 'password' },
             ]}]
@@ -87,9 +86,9 @@ sub handle {
     } elsif ($page eq 'home') { 
         return {  
             'page' => {
-                'label' => 'Welcome to OpenXPKI',       
-                'type' => 'text'         
-            },            
+                'label' => 'Welcome to OpenXPKI',             
+            }, 
+            'main' => [{'type' => 'text'}],           
             'status' => $res->{status}
         };
     } elsif ($page eq 'certsearch') {
@@ -97,9 +96,9 @@ sub handle {
             'page' => {
                 'label' => 'Certificate Search',
                 'desc' => 'You can search for certs here.',
-                'type' => 'form'
+                
             },
-            'main' => [{ 'action' => 'certsearch', 'fields' => [
+            'main' => [{ 'type' => 'form','action' => 'certsearch', 'fields' => [
                 { 'name' => 'subject', 'label' => 'Subject', 'type' => 'text' },
                 { 'name' => 'issuer', 'label' => 'Issuer', 'type' => 'text' },
             ]}]
@@ -109,10 +108,10 @@ sub handle {
         return {  
             'page' => {
                 'label' => 'Your Searchresult',
-                'type' => 'grid'                
+                                
             },
             'main' => [{
-                result => $res->{result},        
+                'type' => 'grid', result => $res->{result},        
             }]};               
     }
         
