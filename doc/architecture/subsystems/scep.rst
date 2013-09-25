@@ -16,6 +16,9 @@ The default wrapper looks for its config file at ``/etc/openxpki/scep/default.co
 The config uses plain ini format, a default is deployed by the package::
 
     [global]
+    log_config = /etc/openxpki/scep/log.conf
+    log_facility = client.scep
+
     socket=/var/openxpki/openxpki.socket
     realm=ca-one
     iprange=0.0.0.0/0
@@ -25,6 +28,14 @@ The config uses plain ini format, a default is deployed by the package::
 
 Parameters
 ^^^^^^^^^^
+
+**log_config**
+
+Path to the log4perl config file.
+
+**log_facility**
+
+Facility to log with.
 
 **socket**
 
@@ -42,8 +53,8 @@ supported, the default of 0.0.0.0/0 allows all ips to connect.
 
 **profile**
 
-The profile of the certificate to be requested, note that depending on the
-backing workflow this might be ignored or overridden by other paramters.
+The default profile of the certificate to be requested, note that depending on 
+the backing workflow this might be ignored or overridden by other paramters.
 
 **servername**
 
@@ -57,12 +68,17 @@ Encrpytion to use, supported values are I<DES> and I<3DES>.
 Multiple Configs
 ^^^^^^^^^^^^^^^^^
 
-The default location for config files is /etc/openxpki/scep, the script
-will use the filename of the called script (from ENV{SCRIPT_NAME)) and looks
-for /etc/openxpki/scep/<filename>.conf. If no file is found, the default
-config is loaded from /etc/openxpki/scep/default.conf.
-Note: The scriptname value respects symlinks, so you can use a single scep
-handler script and create symlinks on it.
+The default location for config files is /etc/openxpki/scep, in combination
+with the default wrapper setup, the part after /scep/ in the url is used to
+probe for a filename holding a custom config, e.g.::
+
+    http://host/scep/mailgw  -> /etc/openxpki/scep/mailgw.conf
+
+If no file is found, the default config is loaded from 
+/etc/openxpki/scep/default.conf. The wrapper uses SCRIPT_URL or REQUEST_URI
+from the apache environment to extract the requests path, this should work 
+in most environments with mod_rewrite, symlinks or alias definitions.
+
 
 **custom base directory**
 
@@ -79,5 +95,10 @@ this can be combined with location to set a config for a special script::
       SetEnv OPENXPKI_SCEP_CLIENT_CONF_FILE /home/mailadm/scep.conf
    </Location>
 
+*Note*: The scep standard is not exact about the use of HTTP/1.1 features.
+We saw a lot of clients which where sending plain HTTP/1.0 requests which 
+is not compatible with name based virtual hosting!
    
+
+
    

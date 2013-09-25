@@ -64,7 +64,9 @@ Here is what you need to do:
 Move the key files to /etc/openxpki/ssl/ca-one/ and name them ca-one-signer-1.pem, ca-one-vault-1.pem, ca-one-scep-1.pem. 
 The key files must be readable by the openxpki user, so we recommend to make them owned by the openxpki user with mode 0400. 
 
-Now import the certificates to the database, the realm/issuer line is required if the certificate is not self signed. 
+Now import the certificates to the database, the realm/issuer line is required if the certificate is not self signed.
+
+:: 
     
     openxpkiadm certificate import  --file ca-root-1.crt 
         
@@ -168,17 +170,18 @@ Testdrive
 Enabling the SCEP service
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The SCEP logic is already included in the core distribution but you need to 
-setup a wrapper to access the service through your webserver.
-    
-The package installs a wrapper script into /usr/lib/cgi-bin/ and a config file
-at /etc/openxpki/scep/default.conf. For a testdrive, there is no need for any 
-configuration.
+The SCEP logic is already included in the core distribution. The package installs
+a wrapper script into /usr/lib/cgi-bin/ and creates a suitable alias in the apache
+config redirecting all requests to `http://host/scep/<any value>` to the wrapper. 
+A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive, 
+there is no need for any configuration, just call ``http://host/scep/scep``.
 
 The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the 
-test workflow is configured to create a certificate on each enrollment request that 
-has a challenge password set (the value of the password is irrelevant) or is a self-
-signed renewal request (must be within configured renewal period).
+shipped workflow is configured to allow enrollment with password or signer on behalf.
+The password has to be set in ``scep.yaml``, the default is 'SecretChallenge'.
+For signing on behalf, use the UI to create a certificate with the 'SCEP Client'
+profile - there is no password necessary. Advanced configuration is described in the 
+scep workflow section. 
 
 The best way for testing the service is the sscep command line tool (available at
 e.g. https://github.com/certnanny/sscep).  
@@ -186,24 +189,23 @@ e.g. https://github.com/certnanny/sscep).
 Check if the service is working properly at all::
 
     mkdir tmp
-    ./sscep getca -c tmp/cacert -u http://yourhost/cgi-bin/scep
+    ./sscep getca -c tmp/cacert -u http://yourhost/scep/scep
     
 Should show and download a list of the root certificates to the tmp folder.
 
 To test an enrollment::
 
     openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
-    ./sscep enroll -u http://yourhost/cgi-bin/scep \
+    ./sscep enroll -u http://yourhost/scep/scep \
         -k tmp/scep-test.key -r tmp/scep-test.csr \
         -c tmp/cacert-0 \
         -l tmp/scep-test.crt \ 
         -t 10 -n 1
 
-Make sure you set any non empty value for the challenge password when prompted.
+Make sure you set the challenge password when prompted (default: 'SecretChallenge').
 On current desktop hardware the issue workflow will take approx. 15 seconds to 
 finish and you should end up with a certificate matching your request in the tmp 
 folder.      
-
 
 Starting from scratch
 ---------------------

@@ -41,6 +41,17 @@ Here is a complete sample configuration::
             tlsv2: I18N_OPENXPKI_PROFILE_TLS_SERVER_v2
                         
 
+        challenge:
+            value: SecretChallenge
+
+        eligible:
+            initial:
+                value: 1
+
+            renew:
+                value: 1
+                        
+
 *All time period value are interpreted as OpenXPKI::DateTime relative date but given without sign.*
 
 Configuration Items
@@ -67,7 +78,7 @@ If you want to allow renewals for an infinite period of time, set the ``allow_ex
 
 **workflow_expiry**
 
-Needs discussion if useful - used to expire the datapool lock.
+Needs discussion if useful - used to expire the datapool lock (currently not used)
 
 **workflow_type**
 
@@ -96,7 +107,7 @@ Those flags are imported from the config system into the workflow. The ``p_``-pr
 
 **p_allow_anon_enroll**
 
-Accept anonymous initial enrollments.  
+Accept anonymous initial enrollments.
 
 **p_allow_man_approv**
 
@@ -143,6 +154,62 @@ If the OID is empty or its value is
 not found in the map, the default profile given in the scep server
 configuration is used. 
 
+Challenge Validation
+--------------------
+
+The sample config above defines a static challenge password. For a dynamic
+check, you can use a connector here::
+
+    challenge:
+       mode: bind
+       value@: connector:scep.connectors.challenge
+       args:
+       - "[% context.cert_subject %]"
+
+    connectors:
+        challenge:
+            class: Connector::Builtin::Authentication::Password
+            LOCATION: /home/pkiadm/ca-one/passwd.txt
+
+This will use the cert_subject to validate the given password against a list
+of given passwords. For config details, check the perldoc of
+OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateChallenge 
+
+Eligibility Check
+-----------------
+
+You can add a datasource to check if a device/request is allowed to perform
+an enrollment or renewal request. The default config is always true, resulting
+in an immediate approval of requests having valid authentication (challenge or
+trusted signer).
+
+Here is a sample config to check weather a device exisits in an ldap repository::
+
+    eligible:
+        initial:
+            value@: connector:your.connector 
+            args: 
+            - "[% context.cert_subject %]" 
+            - "[% context.url_mac %]"
+
+    connectors:
+        devices:
+            ## This connector just checks if the given mac
+            ## exisits in the ldap
+            class: Connector::Proxy::Net::LDAP::Simple
+            LOCATION: ldap://localhost:389
+            base: ou=devices,dc=mycompany,dc=com
+            filter: (macaddress=[% ARGS.1 %])
+            binddn: cn=admin,dc=mycompany,dc=com
+            password: admin
+            attrs: macaddress
+    
+To have the mac in the workflow, you need to pass it with the request as an url
+parameter to the wrapper: `http://host/scep/scep?mac=001122334455`. 
+    
+For more options and samples, see the perldoc of 
+OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility
+
 
 Status Flags used in the workflow
 ----------------------------------
@@ -168,6 +235,10 @@ The number of given manual authentications. Can override missing authentication 
 **scep_uniq_id_ok**
 
 The internal request id is really unique across the whole system. 
+
+**signer_is_self_signed**
+
+The signer and the csr have the same public key. Note: If you allow key renewal this might also be a renewal!
   
 **signer_on_behalf**
 
@@ -204,7 +275,7 @@ Request was authenticated using kerberos (not implemented yet)
 Workflow entries used
 ----------------------
 
-*csr_profile_oid*
+**csr_profile_oid**
 
 The profile name as extracted from the Certificate Type Extension (Microsoft specific)  
 
