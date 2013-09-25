@@ -146,23 +146,37 @@ sub execute {
         TOKEN => $default_token
     );
 
+
     ##! 32: 'signer x509: ' . Dumper $x509    
     my $now = DateTime->now();
     my $notbefore = $x509->get_parsed('BODY', 'NOTBEFORE');
     my $notafter = $x509->get_parsed('BODY', 'NOTAFTER');
-        
+    my $signer_subject = $x509->get_parsed('BODY', 'SUBJECT');
+    my $signer_issuer = $x509->get_parsed('BODY', 'ISSUER');
+    my $signer_identifier = $x509->get_identifier();
+    
+    ##! 16: 'signer cert_identifier: ' . $x509->get_identifier()    
+    
     if ( ( DateTime->compare( $notbefore, $now ) <= 0)  && ( DateTime->compare( $now,  $notafter) < 0) ) {
         $context->param('signer_validity_ok' => '1');
     } else {
         $context->param('signer_validity_ok' => '0');
     }
     
-    
-    ##! 32: 'signer cert_identifier: ' . $x509->get_identifier()
-    
-    my $signer_subject = $x509->get_parsed('BODY', 'SUBJECT');
-    my $signer_issuer = $x509->get_parsed('BODY', 'ISSUER');
-    my $signer_identifier = $x509->get_identifier();
+    # check if the csr is self signed (based on the pubkey)        
+    my $csr_pubkey_hash = $csr_body->{'PUBKEY_HASH'};
+    my $x509_pubkey_hash = $x509->get_parsed('BODY', 'PUBKEY_HASH');
+    ##! 32: 'csr pubkey ' . $csr_pubkey_hash
+    ##! 32: 'signer pubkey ' . $x509_pubkey_hash     
+
+    my $is_self_signed = ($csr_pubkey_hash eq $x509_pubkey_hash ? 1 : 0);
+    $context->param('signer_is_self_signed' => $is_self_signed);
+                        
+    CTX('log')->log(
+        MESSAGE => "SCEP signer subject: " . $signer_subject . ($is_self_signed ? ' - is selfsign' : ''),
+        PRIORITY => 'info',
+        FACILITY => 'workflow',
+    );       
                
     # Check if revoked in the database                
     

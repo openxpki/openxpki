@@ -49,6 +49,7 @@
     <condition name="enroll_trusted_self_sign"
             class="Workflow::Condition::LazyAND">
         <param name="condition1" value="enroll_signer_sn_matches_csr" />
+        <param name="condition1" value="enroll_signer_is_self_signed" />
         <param name="condition2" value="enroll_trusted_self_sign_details" />
     </condition>
 
@@ -82,6 +83,7 @@
             class="Workflow::Condition::LazyOR">
         <param name="condition1" value="enroll_allow_expired_signer" />
         <param name="condition2" value="enroll_signer_validity_ok" />
+        <param name="condition2" value="enroll_self_signed_initial_enroll" />        
     </condition>
 
     <condition name="enroll_allow_expired_signer"
@@ -209,5 +211,18 @@
             class="Workflow::Condition::Evaluate">
         <param name="test" value="$context-&gt;{signer_trusted};" />
     </condition>
+    
+    <condition name="enroll_signer_is_self_signed"
+            class="Workflow::Condition::Evaluate">
+        <param name="test" value="$context-&gt;{signer_is_self_signed};" />
+    </condition>
+
+    <condition name="enroll_self_signed_initial_enroll"
+            class="Workflow::Condition::LazyAND">
+        <param name="condition1" value="!enroll_signer_trusted" />
+        <param name="condition2" value="enroll_signer_sn_matches_csr" />
+        <param name="condition2" value="enroll_signer_is_self_signed" />
+    </condition>
+
 
 </conditions>
