@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+
+    <title>Open XPKI - Open Source Trustcenter</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this project -->
+    <link href="css/oxi.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/libs/html5shiv.js"></script>
+      <script src="js/libs/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+   <div id="application">
+   <!-- application content -->
+   </div>
+   <div id="footer">
+      <div class="container">
+        <p class="text-muted credit">&copy; Copyright 2013, The OpenXPKI Project. See <a href="http://www.openxpki.org/">Open XPKI project home</a>.</p>
+      </div>
+    </div>   
+<script type="text/x-handlebars">
+   <!-- headline -->
+   <div class="container">
+      <!-- headline -->
+      <div class="page-header" style="margin-top:0px;margin-bottom:0px;">
+        <h2><img src="img/logo.png" class=toplogo>  <small>Open Source Trustcenter</small></h2>
+      </div>
+    </div>
+    <!--/headline-->
+    <!-- navbar -->
+    <div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          
+          <a class="navbar-brand" href="#"></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            {{#each ressource in App.NavArrayController}}
+                  {{#view App.MainNavItemView classBinding="ressource.active"}}
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ressource.title}}<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      {{#each item in ressource.entries}}
+                         {{#view App.SideNavItemView}}
+                           {{#link-to item.goto}}{{item.title}}{{/link-to}}
+                        {{/view}}
+                      {{/each}}
+                    </ul>
+                  {{/view}}
+                {{/each}}
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><p class="navbar-text">Signed in as: Dieter Siebeck</p></li>
+            <li><a href="#logout">Log out</a></li>
+          </ul>  
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+   <div class="container maincontent">
+      <div class="row">
+        <div class="col-md-2">
+          <div class="bs-sidebar hidden-print" role="complementary">
+            <ul class="nav bs-sidenav">
+              
+                {{#each App.CurrentSideNav}}
+                  {{#view App.SideNavItemView classBinding="active" gotoBinding="goto"}}
+                    {{#link-to goto}}{{title}}{{/link-to}}
+                  {{/view}}
+                {{/each}}
+                
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-10" role="main">
+         {{outlet}}
+        </div>
+      </div>
+   </div>
+     </script>
+    <script type="text/x-handlebars" data-template-name="simple-content">
+    hello
+      <div>Current action is: {{current_action}}</div>
+    </script>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/libs/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/libs/handlebars-1.0.0.js"></script>
+    <script type="text/javascript" >
+      //Environment for ember:
+    ENV = {
+      LOG_VERSION:false
+    };
+    </script>
+   <script src="js/libs/ember-1.0.0.js"></script>
+   <script src="js/app.js"></script>
+  </body>
+  
+</html>

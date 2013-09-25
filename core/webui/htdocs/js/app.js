@@ -1,4 +1,4 @@
-var route_structure = {
+var testStructure = {
    home :{
       label: 'Home',
       entries: {
@@ -41,9 +41,17 @@ App = Ember.Application.create(
    {
      LOG_TRANSITIONS: true,
      rootElement: '#application',
+     
+     serverUrl = '/cgi-bin/mock.cgi',
+     
      //store currentPath (of router) to have a observable property for navigation-highlighting:
      currentPath: '',
      currentRootPath:'',
+     SideNavs : {},    
+    CurrentSideNav : null,
+    sideTreeStructure: {},
+    
+    
 
     ApplicationController : Ember.Controller.extend({
         updateCurrentPath: function() {
@@ -55,11 +63,18 @@ App = Ember.Application.create(
                content: Ember.A([])
             }
     ),
+       
+     ready: function() {
+       Ember.debug('Application ready');
+       this.sideTreeStructure = testStructure;
+     },
     
-    SideNavs : {},
-    
-    CurrentSideNav : null,
-    
+    checkSideStructure: function(){
+       Ember.debug('Application checkSideStructure');
+       this.deferReadiness();
+       this.sideTreeStructure = testStructure;
+       this.advanceReadiness();
+    },
     
     
     setCurrentPath:function(currentPath){
@@ -78,6 +93,11 @@ App = Ember.Application.create(
    }
 );
 
+
+App.checkSideStructure();
+
+
+
 App.Route = Ember.Route.extend({
   
   mainActionKey:null,
@@ -85,6 +105,7 @@ App.Route = Ember.Route.extend({
   
   setupController: function(controller) {
     // Set the IndexController's `title`
+    Ember.debug('App.Route:setupController');
     controller.set('title', 'def title');
     //debugger;
     js_debug('path: '+ this.routeName);
@@ -103,6 +124,14 @@ App.Route = Ember.Route.extend({
    }
 });
 
+App.ApplicationRoute = Ember.Route.extend({
+  
+  setupController: function(controller) {
+      Ember.debug('ApplicationRoute:setupController');
+  }
+});
+
+
 //Navigation-Stuff
 
 
@@ -115,7 +144,7 @@ App.NavItem = Ember.Object.extend({
      entries:null,
      active: function(){
              //js_debug({currPath:App.currentPath,goto:this.get("goto")});
-             if (App.currentPath == this.get("goto")){//App.Router.router.isActive(this.get("goto"))
+             if (App.currentPath == this.get("goto")){
                return true;
              }else{
                return false;
@@ -160,13 +189,13 @@ App.MainNavItemView = Ember.View.extend({
 
 
 App.Router.map(function() {
-  //js_debug('App.Router.map');
-  
+  Ember.debug('App.Router.map');
+  this.route('login');  
   this.route('logout');  
-  
+   
   var main_key, second_key, routes,route;
-  for(main_key in route_structure){
-      var ressource = route_structure[main_key];
+  for(main_key in App.sideTreeStructure){
+      var ressource = App.sideTreeStructure[main_key];
       routes = ressource.entries;
       this.resource(main_key,  function() {
           var subLevelControler = Ember.ArrayController.create({ content: Ember.A([])});
@@ -194,15 +223,7 @@ App.Router.map(function() {
 
 
 
-App.ApplicationRoute = Ember.Route.extend({
-  
-  route_structure: route_structure,
-  
-  setupController: function(controller) {
-      Ember.debug('ApplicationRoute:setupController');
-    
-  }
-});
+
 
 
 
