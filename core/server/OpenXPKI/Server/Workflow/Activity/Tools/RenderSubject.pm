@@ -107,7 +107,7 @@ sub execute {
             PROFILE => $profile,
             STYLE   => $style,
             VARS    => $subject_vars,
-            ADDITIONAL => $csr_info
+            ADDITIONAL => $csr_info || {},
         })};
         
     } elsif ( my $san_data = $context->param('cert_subject_alt_name_parts') ) {

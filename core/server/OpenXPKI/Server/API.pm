@@ -675,7 +675,7 @@ sub BUILD {
                     type     => HASHREF,
                 },
                 ADDITIONAL => {
-                    type     => HASHREF,
+                    type     => HASHREF | UNDEF,
                     optional => 1
                 },
             },                       
