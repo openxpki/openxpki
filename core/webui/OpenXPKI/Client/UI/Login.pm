@@ -14,7 +14,7 @@ my $meta = __PACKAGE__->meta;
 sub BUILD {
     
     my $self = shift;
-    $self->_page ({'type' => 'form','label' => 'Please log in.'});    
+    $self->_page ({'label' => 'Please log in'});    
 }
 
 sub init_realm_select {
@@ -22,7 +22,7 @@ sub init_realm_select {
     my $self = shift;
     my $realms = shift;
         
-    $self->_result()->{main} = [{ 'action' => 'login.realm', 'fields' => [
+    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.realm', 'fields' => [
         { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => $realms },
     ]}];
     
@@ -34,7 +34,7 @@ sub init_auth_stack {
     my $self = shift;
     my $stacks = shift;
           
-    $self->_result()->{main} = [{ 'action' => 'login.stack', 'fields' => [
+    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.stack', 'fields' => [
         { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => $stacks },
     ]}];
     
@@ -45,7 +45,7 @@ sub init_login_passwd {
     
     my $self = shift;
           
-    $self->_result()->{main} = [{ 'action' => 'login.password', 'fields' => [
+    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.password', 'fields' => [
         { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },
         { 'name' => 'password', 'label' => 'Password', 'type' => 'password' },
     ]}];
@@ -60,7 +60,6 @@ sub do_login {
     my $args = shift;
     
     my $cgi = $args->{cgi};
-    
     
 }
 

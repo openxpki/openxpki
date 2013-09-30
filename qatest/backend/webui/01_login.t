@@ -64,7 +64,7 @@ my $cgi = CGIMock->new({ data => {  }});
 
 $result = $client->handle_request({ cgi => $cgi });    
 
-is($result->{page}->{type}, 'form');
+is($result->{page}->{label}, 'Please log in');
 is(scalar (@{$result->{main}->[0]->{fields}->[0]->{options}}), 8);
 
 $session->close();
