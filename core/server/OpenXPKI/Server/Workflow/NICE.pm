@@ -48,14 +48,6 @@ has 'context' => (
     lazy => 1,  
 );
 
-has 'config_id' => (
-	is  => 'ro',
-    isa => 'Str',
-    reader => 'config_id',  
-    builder => '_init_config_id',
-    lazy => 1,  
-);
-
 # Moose pre-constuctor to map single argument activity into expected hashref
 
 around BUILDARGS => sub {
@@ -75,11 +67,6 @@ sub _init_workflow {
 sub _init_context {
 	my $self = shift;	
 	return $self->_get_workflow->context();	
-} 
-  
-sub _init_config_id {
-	my $self = shift;
-	return  $self->_get_context_param( 'config_id' );
 } 
 
 sub _get_context_param {

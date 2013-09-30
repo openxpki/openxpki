@@ -140,7 +140,6 @@ sub get_cert_subject_styles {
     my $self      = shift;
     my $arg_ref   = shift;
     my $profile   = $arg_ref->{PROFILE};
-    my $cfg_id    = $arg_ref->{CONFIG_ID};
     my $pkcs10    = $arg_ref->{PKCS10};
     ##! 1: 'start'
 

@@ -31,10 +31,6 @@ sub init {
     ##! 16: 'resulting_state: ' . $self->resulting_state()
     $self->{PKI_REALM} = CTX('session')->get_pki_realm();
     ##! 16: 'self->{PKI_REALM} = ' . $self->{PKI_REALM}
-
-    # determine workflow's config ID
-    $self->{CONFIG_ID} = CTX('api')->get_config_id({ ID => $wf->id() });
-    ##! 16: 'self->{CONFIG_ID} = ' . $self->{CONFIG_ID}
     
     $self->workflow( $wf );
 
@@ -293,11 +289,6 @@ sub _get_wf_action_param{
     return $value
 }
 
-sub config_id {
-    my $self = shift;
-    return;
-}
-
 sub setparams {
     my ($self,
 	$workflow,
@@ -463,9 +454,8 @@ situation!
 
 =head2 init
 
-Is called during the creation of the activity class. Initializes
-$self->{CONFIG_ID}, which is the config ID of the workflow.
-Also sets $self->{PKI_REALM} to CTX('session')->get_pki_realm()
+Is called during the creation of the activity class. 
+Sets $self->{PKI_REALM} to CTX('session')->get_pki_realm()
 
 Sets $self->workflow() as a reference to the current workflow.
 
@@ -514,13 +504,6 @@ The current workflow is given as first argument, the process state to recover fr
 =head2 runtime_exception
 
 Hook method. Will be called if Workflow::execute_action() is called with an proc-state which is not appropriate (e.g. "finished" or "running")  The current workflow is given as argument.
- 
-=head2 config_id
-
-Returns the config identifier for the workflow or the current config
-identifier if the config ID is not yet set (this happens in the very
-first workflow activity)
-
 
 =head1 Parameter mapping
 

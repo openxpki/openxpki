@@ -162,35 +162,6 @@ sub get_head_version_id {
     return CTX('config')->get_head_version();
 }
 
-sub get_current_config_id {
-    my $self = shift;
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CURRENT_CONFIG_ID',
-    );   
-}
-
-sub list_config_ids {
-    my $self = shift;
-    ##! 1: 'start'
-    my $config_entries = CTX('dbi_backend')->select(
-        TABLE   => 'CONFIG',
-        DYNAMIC => {
-            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
-        },
-    );
-    if (! defined $config_entries
-        || ref $config_entries ne 'ARRAY'
-        || scalar @{ $config_entries } == 0) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_LIST_CONFIG_IDS_NO_CONFIG_IDS_IN_DB',
-        );
-    }
-    ##! 64: 'config_entries: ' . Dumper $config_entries
-
-    my @config_ids = map { $_->{CONFIG_IDENTIFIER} } @{ $config_entries };
-    return \@config_ids;
-}
-   
 sub get_approval_message {
     my $self      = shift;
     my $arg_ref   = shift;

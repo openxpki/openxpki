@@ -116,21 +116,6 @@ sub BUILD {
                  },
             },
         },
-        'list_config_ids' => {
-            class  => 'Default',
-            params => {
-            },
-            memoize => 1,
-        },
-        'get_config_id' => {
-            class  => 'Workflow',
-            params => {
-                'ID' => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-            },
-        },         
         'get_default_token' => {
             class  => 'Token',
             params => {                
@@ -642,11 +627,6 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
             },
             memoize => 1,
         },    
@@ -681,12 +661,7 @@ sub BUILD {
                 PROFILE => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                },
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+                },               
                 PKCS10 => {
                     type     => SCALAR,
                     optional => 1,
@@ -697,12 +672,7 @@ sub BUILD {
         },
         'get_additional_information_fields' => {
             class  => 'Profile',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
             },
             memoize => 1,
         },
@@ -1180,12 +1150,7 @@ sub BUILD {
         ### Smartcard API
         'sc_analyze_certificate' => {
             class  => 'Smartcard',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
                 'DATA' => {
                     type  => SCALAR,
                     regex => $re_cert_string,
@@ -1203,12 +1168,7 @@ sub BUILD {
 
         'sc_parse_certificates' => {
             class  => 'Smartcard',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
                 'CERTS' => {
                     type  => ARRAYREF,
                     #regex => qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;,
@@ -1223,12 +1183,7 @@ sub BUILD {
 
         'sc_analyze_smartcard' => {
             class  => 'Smartcard',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
                 'CERTS' => {
                     type  => ARRAYREF,
             #regex => $re_cert_string,

@@ -46,8 +46,6 @@ my %COLUMN_of = (
     SUBJECT_KEY_IDENTIFIER   => "subject_key_identifier",
     AUTHORITY_KEY_IDENTIFIER => "authority_key_identifier",
 
-    CONFIG_IDENTIFIER     => 'config_identifier',
-
     SUBMIT_DATE           => "submit_date",
     APPROVAL_DATE         => "approval_date",
     TYPE                  => "format",
@@ -287,15 +285,6 @@ my %TABLE_of = (
              "WORKFLOW_SESSION",
              "WATCHDOG_KEY",
 	    ]},
-
-    CONFIG => {
-        NAME    => 'config',
-        INDEX   => [ 'CONFIG_IDENTIFIER' ],
-        COLUMNS => [
-            'CONFIG_IDENTIFIER',
-            'DATA',
-        ],
-    },
 
 #     WORKFLOW_VERSION => {
 #         NAME    => "workflow_version",

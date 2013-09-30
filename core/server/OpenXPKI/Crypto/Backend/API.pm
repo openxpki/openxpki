@@ -172,7 +172,7 @@ sub START {
     {
         next if (grep /^$key$/, ("TMP", "NAME",
                                  "TOKEN_TYPE", 
-                                 "CERTIFICATE", "SECRET", 'CONFIG_ID'));
+                                 "CERTIFICATE", "SECRET"));
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",
             params  => {NAME => $key, VALUE => $arg_ref->{$key}});

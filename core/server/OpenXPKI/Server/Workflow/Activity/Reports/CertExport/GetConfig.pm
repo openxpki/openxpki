@@ -10,7 +10,7 @@ OpenXPKI::Server::Workflow::Activity::Reports::CertExport::GetConfig
 
 =head1 Description
 
-Load the export config specified by the config_id read from the context.
+Load the export config specified by the config_path read from the context.
 Looks up the identifiers of the necessary encryption certificates.
 The config is written to the workflow context.
 
@@ -33,18 +33,18 @@ sub execute {
     my $context = $workflow->context();
     
     # Get config id from workflow
-    my $config_id = $context->param('config_path');
+    my $config_path = $context->param('config_path');
     
     my $config = CTX('config');
             
-    $context->param( 'max_records' , $config->get( "$config_id.max_records" ) || 100 ); 
-	$context->param( 'key_namespace', $config->get( "$config_id.key_namespace" ) || 'certificate.privatekey');
-	$context->param( 'queue_namespace', $config->get( "$config_id.queue_namespace" ) || 'certificate.export.default');
+    $context->param( 'max_records' , $config->get( "$config_path.max_records" ) || 100 ); 
+	$context->param( 'key_namespace', $config->get( "$config_path.key_namespace" ) || 'certificate.privatekey');
+	$context->param( 'queue_namespace', $config->get( "$config_path.queue_namespace" ) || 'certificate.export.default');
     
     # Tempdir and Umask for export file
-    $context->param( 'tmpfile_tmpdir' , $config->get( "$config_id.tmpdir" ) || '/var/tmp/' ); 
+    $context->param( 'tmpfile_tmpdir' , $config->get( "$config_path.tmpdir" ) || '/var/tmp/' ); 
 
-    my $umask = $config->get( "$config_id.umask" );
+    my $umask = $config->get( "$config_path.umask" );
     if ($umask) {
         $context->param( 'tmpfile_umask' , $umask ); 
 
@@ -59,7 +59,7 @@ sub execute {
     }
 
     # The encryption target is given by subject and realm (optional) or a list of ids      
-    my $enc_target = $config->get_hash( "$config_id.encryption_target" );
+    my $enc_target = $config->get_hash( "$config_path.encryption_target" );
     
     if (!$enc_target || (!$enc_target->{subject})) {
     	OpenXPKI::Exception->throw(
@@ -97,7 +97,7 @@ OpenXPKI::Server::Workflow::Activity::Reports::CertExport::GetConfig
 Load the configuration from the config layer into the workflow context, 
 setting default values if parameter is missing.
 
-Takes the path to the config from the context value "config_id".
+Takes the path to the config from the context value "config_path".
 
 =head1 Configuration 
 
