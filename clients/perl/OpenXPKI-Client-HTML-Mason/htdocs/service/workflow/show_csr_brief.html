@@ -68,15 +68,6 @@
 % }
 <!-- TODO - add type (basic, PKCS#10, SPKAC, IE) -->
 
-% if (scalar @tickets) {
-  <tr>
-    <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS') %>:</td>
-    <td>
-% my $tickets = join(q{, }, @tickets);
-<% $tickets | n %>
-    </td>
-  </tr>
-% }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></td>
     <td><% $last_update %></td>
@@ -288,26 +279,7 @@
 
     my $role    = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_role};
     my $profile = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_profile};
-
-    my @tickets = ();
-    my $ticket_ser = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{ticket};
-    if (defined $ticket_ser) {
-        my $tickets = $ser->deserialize($ticket_ser);
-        foreach my $key (keys %{ $tickets }) {
-            my $ticket_entry;
-            $ticket_entry->{ID} = $tickets->{$key};
-            my $url_msg = $context->{client}->send_receive_command_msg(
-                'get_url_for_ticket',
-                {
-                    NOTIFIER => $key,
-                    TICKET   => $tickets->{$key},
-                },
-            );
-            $ticket_entry->{URL} = $url_msg->{PARAMS};
-            push @tickets, qq{<a href="$url_msg->{PARAMS}">$tickets->{$key}</a>};
-        }
-    }
-
+    
     my %cert_info;
     my $cert_info_ser = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_info};
     if (defined $cert_info_ser) {

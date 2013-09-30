@@ -71,24 +71,6 @@ sub get_csr_info_hash_from_data {
     return $obj->get_info_hash();
 }
 
-sub get_url_for_ticket {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    ##! 1: 'end'
-    return CTX('notification')->get_url_for_ticket($arg_ref);
-}
-
-sub get_ticket_info {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    ##! 1: 'end'
-    return CTX('notification')->get_ticket_info($arg_ref);
-}
-
 =head2 get_ca_cert
 
 returns the certificate of one CA. This is a wrapper around get_cert to make

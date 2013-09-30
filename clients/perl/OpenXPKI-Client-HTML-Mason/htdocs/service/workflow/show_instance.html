@@ -275,23 +275,7 @@
                   }
                   $value .= '</table>';
                   $untainted{'cert_info'} = 1;
-             }
-             elsif ($param eq 'ticket') {
-                $value = '<ul>';
-                foreach my $key (sort keys %{$ref}) {
-                     my $url_msg = $context->{client}->send_receive_command_msg(
-                         "get_url_for_ticket",
-                         {
-                             "NOTIFIER" => $key,
-                             "TICKET"   => $ref->{$key}
-                         },
-                     );
-                     my $url = $url_msg->{PARAMS};
-                     $value .= '<li><a href="' . $url . '">' . i18nGettext($key) . ': ' .  i18nGettext($ref->{$key}) . '</a>';
-                  }
-                $value .= '</ul>';
-                $untainted{'ticket'} = 1;
-            }
+             }             
             elsif ($param eq "cert_subject_alt_name")
             {
                 ## array of arrays

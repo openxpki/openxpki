@@ -496,33 +496,6 @@ sub convert_certificate {
     return $data;
 }
 
-sub create_bulk_request_ticket {
-    ##! 1: 'start'
-    my $self      = shift;
-    my $arg_ref   = shift;
-    my $workflows = $arg_ref->{WORKFLOWS};
-    my $ser       = OpenXPKI::Serialization::Simple->new();
-
-    my $dummy_workflow = Workflow->new();
-    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
-    $dummy_workflow->context->param('creator' => CTX('session')->get_user());
-
-    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
-    my $ticket = CTX('notification')->notify({
-        MESSAGE  => 'create_bulk_request',
-        WORKFLOW => $dummy_workflow,
-    });
-    $dummy_workflow->context->param('ticket' => $ser->serialize($ticket));
-    $dummy_workflow->context->param('workflows' => $ser->serialize($workflows));
-
-    CTX('notification')->notify({
-        MESSAGE  => 'create_bulk_request_workflows',
-        WORKFLOW => $dummy_workflow,
-    });
-
-    return $ticket;
-}
-
 sub send_notification {
     ##! 1: 'start'
     my $self      = shift;
