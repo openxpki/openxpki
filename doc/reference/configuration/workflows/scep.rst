@@ -51,6 +51,8 @@ Here is a complete sample configuration::
             renewal:
                 value: 1
                         
+        response:
+	    getcacert_strip_root: 0
 
 *All time period value are interpreted as OpenXPKI::DateTime relative date but given without sign.*
 
@@ -99,6 +101,11 @@ a special meaning in perl regexp need to be escaped! Identifier and profile are 
 The rules in one entry are ANDed together. If you want to provide alternatives, add multiple 
 list items. The name of the rule is just used for logging purpose.
  
+**response.getcacert_strip_root**
+
+The scep standard is a bit unclear if the root should be in the chain or not. 
+We consider it a security risk (trust should be always set by hand) but as most clients seem to expect it, we include the root by default. If you are sure your clients do not need the root and have it
+deployed, set this flag to 1 to strip the root certificate from the getcacert response.
 
 Policy Flags
 -------------
