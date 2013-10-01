@@ -1,7 +1,9 @@
 <actions>
 
   <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE"
-  	class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate">  
+  	class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate"
+  	retry_count="10" 
+    retry_interval="+0000000030">  
   </action>
    
   <action name="I18N_OPENXPKI_WF_ACTION_NICE_RENEW_CERTIFICATE"

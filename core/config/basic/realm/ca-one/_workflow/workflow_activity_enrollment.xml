@@ -34,7 +34,9 @@
     </action>
 
     <action name="enroll_issue_cert"
-            class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate">
+        class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate"
+        retry_count="10" 
+        retry_interval="+0000000030">
     </action>
 
     <action name="enroll_revoke_existing_certs"

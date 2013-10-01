@@ -24,7 +24,9 @@
     </action>
 
     <action name="scpers_issue_certificate"
-            class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate">
+            class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate"
+            retry_count="10" 
+            retry_interval="+0000000030">
     </action>
 
     <action name="scpers_generate_puk"
