@@ -263,34 +263,50 @@ sub __pkcs_req : PRIVATE {
             PKCS7   => $pkcs7_decoded,
         }
     );
-
-    ##! 16: "transaction ID: $transaction_id"
-    # get workflow instance IDs corresponding to transaction ID
-    # TODO: This search should be limited to SCEP workflow types!!!
-    my $workflows = $api->search_workflow_instances(
-        {   CONTEXT => [
-                {   KEY   => 'scep_tid',
-                    VALUE => $transaction_id,
-                },
-            ],
-            TYPE => $self->__get_workflow_type(),
+    
+    my $workflow_id = 0;
+    my $wf_info; # filled in either one of the branches 
+        
+    # Search transaction id in datapool
+    CTX('dbi_backend')->commit();    
+    my $res = CTX('api')->get_data_pool_entry({       
+        NAMESPACE => 'scep.transaction_id',
+        KEY => "$server:$transaction_id",
+    });
+    if ($res) {
+        # Congrats - we got a race condition
+        if (!$res->{VALUE}) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_PARALLEL_REQUESTS_DETECTED",
+                params => {
+                    SERVER => $server,
+                    TRANSACTION_ID => $transaction_id,
+                }
+            );                
         }
-    );
-    ##! 16: 'workflows: ' . Dumper $workflows
+        $workflow_id = $res->{VALUE};
+    }
+  
+    ##! 16: "transaction ID: $transaction_id - workflow id: ' . $workflow_id
 
-    my $failure_retry;
-    if ( scalar @{$workflows} > 0 ) {
+    # this cleans up failed workflows
+    if ( $workflow_id ) {
  
-        if ( $workflows->[0]->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE' ) {
+        # Fetch the workflow
+        my $wf_info = $api->get_workflow_info({   
+            WORKFLOW => $self->__get_workflow_type(),
+            ID       => $workflow_id,
+        });
+ 
+        if ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE' ) {
 
             # the last workflow is in FAILURE, check the last update
             # date to see if user is already allowed to retry
-            my $last_update
-                = $workflows->[0]->{'WORKFLOW.WORKFLOW_LAST_UPDATE'};
+            my $last_update = $wf_info->{WORKFLOW}->{'LAST_UPDATE'};
+            
             ##! 16: 'FAILURE workflow found, last update: ' . $last_update
             my $last_update_dt
-                = DateTime::Format::DateParse->parse_datetime( $last_update,
-                'UTC' );
+                = DateTime::Format::DateParse->parse_datetime( $last_update, 'UTC' );
             ##! 32: 'last update dt: ' . Dumper $last_update_dt
 
             # determine retry time from config
@@ -310,46 +326,39 @@ sub __pkcs_req : PRIVATE {
             ##! 32: 'retry_date: ' . Dumper $retry_date
             if ( DateTime->compare( $last_update_dt, $retry_date ) == -1 ) {
                 ##! 64: 'last update is earlier than retry date, allow creation of new WF'
-                # set DB result to empty, so that it looks like no wf is present
-                $workflows = [];
+                # unset the workflow
+                $workflow_id = 0;
+                $wf_info = undef;
+                
+                # Delete it from the datapool
+                CTX('api')->set_data_pool_entry({       
+                    NAMESPACE => 'scep.transaction_id',
+                    KEY => "$server:$transaction_id",
+                    VALUE => undef,                            
+                });
+                CTX('dbi_backend')->commit(); 
+                
+                CTX('log')->log(
+                    MESSAGE => "SCEP workflow failed before, retry allowed",
+                    PRIORITY => 'info',
+                    FACILITY => 'workflow',
+                );
             }
             else {
                 ##! 64: 'last update is later than retry date, do not allow creation of new WF'
                 # only include the first FAILURE wf in the result -> SCEP failure response
-                $workflows = [ $workflows->[0] ];
+                CTX('log')->log(
+                    MESSAGE => "SCEP workflow failed before and retry wait window not elapsed",
+                    PRIORITY => 'info',
+                    FACILITY => 'workflow',
+                );
             }
         }
-    }
-    if ( scalar @{$workflows} > 1 ) {
+    } # end cleanup failed workflows
 
-        # if more than one workflow is present, we delete the FAILURE ones
-        # from it
-        my @no_fail_workflows
-            = grep { $_->{'WORKFLOW.WORKFLOW_STATE'} ne 'FAILURE' }
-            @{$workflows};
-        $workflows = \@no_fail_workflows;
-        
-    }
-    ##! 16: 'workflows after retry checking: ' . Dumper $workflows
-
-    my @workflow_ids = map { $_->{'WORKFLOW.WORKFLOW_SERIAL'} } @{$workflows};
-
-    my $num_of_workflows = scalar @workflow_ids;
-    ##! 16: " $num_of_workflows workflows found"    
-    if ( $num_of_workflows > 1 ) {    # this should _never_ happen ...
-        OpenXPKI::Exception->throw(
-            message =>
-                "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_WORKFLOW_FOUND",
-            params => {
-                WORKFLOWS      => $num_of_workflows,
-                TRANSACTION_ID => $transaction_id,
-            }
-        );
-    }
-
-    my $wf_info; # filled in either one of the branches 
     
-    if ( scalar @workflow_ids == 0 ) {
+    if ( !$workflow_id ) {
+        
         ##! 16: "no workflow was found, creating a new one"
  
         # inject newlines if not already present
@@ -394,7 +403,7 @@ sub __pkcs_req : PRIVATE {
                 PKCS7   => $pkcs7,
             }
         );
-    
+            
         ##! 64: "signer_cert: " . $signer_cert        
         
         # The maximum age until the workflow is considered outdated 
@@ -404,6 +413,31 @@ sub __pkcs_req : PRIVATE {
         #    VALIDITY => '+'.$expiry,
         #    VALIDITYFORMAT => 'relativedate',
         #});
+        
+        # preregister the datapool key to prevent 
+        # race conditions with parallel workflows
+                
+        eval {
+            # prepare the registration record - this will fail if the 
+            # request ran into a race condition       
+            CTX('dbi_backend')->commit();    
+            CTX('api')->set_data_pool_entry({       
+                NAMESPACE => 'scep.transaction_id',
+                KEY => "$server:$transaction_id",
+                VALUE => 'creating',        
+                EXPIRATION_DATE => time() + 300, # Creating the workflow should never take any longer 
+            });
+            CTX('dbi_backend')->commit();
+        };
+        if ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILED_TO_REGISTER_SCEP_TID",
+                params => {
+                    SERVER => $server,
+                    TRANSACTION_ID => $transaction_id,
+                }
+            );
+        }  
         
         $wf_info = $api->create_workflow_instance(
             {   WORKFLOW => $self->__get_workflow_type(),
@@ -429,57 +463,26 @@ sub __pkcs_req : PRIVATE {
         );       
 
         ##! 16: 'wf_info: ' . Dumper $wf_info
-        $workflow_ids[0] = $wf_info->{WORKFLOW}->{ID};
-        ##! 16: '@workflow_ids: ' . Dumper \@workflow_ids
-    } 
-    else {    # everything is fine, we have only one matching workflow
-        my $wf_id   = $workflow_ids[0];
-        $wf_info = $api->get_workflow_info(
-            {   WORKFLOW => $self->__get_workflow_type(),
-                ID       => $wf_id,
-            }
-        );
-             
-        # TODO - Branch can be substituted with Watchdog        
-        if ( $wf_info->{WORKFLOW}->{STATE} eq 'CA_KEY_NOT_USABLE' ) {
- 
-            my $activities = $api->get_workflow_activities(
-                {   WORKFLOW => $self->__get_workflow_type(),
-                    ID       => $wf_id,
-                }
-            );
-            ##! 32: 'activities: ' . Dumper $activities
-            if ( defined $activities && scalar @{$activities} > 1 ) {
-
-                # this should _never_ happen
-                OpenXPKI::Exception->throw( message =>
-                        'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_MORE_THAN_ONE_ACTIVITY_FOUND',
-                );
-            }
-            elsif ( defined $activities && scalar @{$activities} == 1 ) {
-
-                # execute possible activity
-                $api->execute_workflow_activity(
-                    {   WORKFLOW => $self->__get_workflow_type(),
-                        ID       => $wf_id,
-                        ACTIVITY => $activities->[0],
-                    }
-                );
-
-                # get new info and state
-                $wf_info = $api->get_workflow_info(
-                    {   WORKFLOW => $self->__get_workflow_type(),
-                        ID       => $wf_id,
-                    }
-                );
-       
-                ##! 16: 'new state after triggering activity: ' . $wf_info->{WORKFLOW}->{STATE}
-            }
-        }
-    } # End refetched workflow
+        $workflow_id = $wf_info->{WORKFLOW}->{ID};
+        ##! 16: 'workflow_id: ' . $workflow_id
         
-       
-    # wf_info is either from create or from fetch!
+        # Record the scep tid and the workflow in the datapool      
+        CTX('dbi_backend')->commit();    
+        CTX('api')->set_data_pool_entry({       
+            NAMESPACE => 'scep.transaction_id',
+            KEY => "$server:$transaction_id",
+            VALUE => $workflow_id,        
+            EXPIRATION_DATE => 0, # TODO - expiry time
+            FORCE => 1, 
+         });
+        CTX('dbi_backend')->commit();
+        
+    } 
+    
+    # We should now have a workflow object,
+    # either a reloaded that did not meet conditions to be retried
+    # or a freshly created one
+           
     my $wf_state = $wf_info->{WORKFLOW}->{STATE};
     
     if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {        
@@ -494,7 +497,7 @@ sub __pkcs_req : PRIVATE {
         
     if ( $wf_state eq 'SUCCESS' ) {  
         # the workflow is finished,
-        # get the CSR serial from the workflow
+        # get the certificate from the workflow
         
         my $cert_identifier = $wf_info->{WORKFLOW}->{CONTEXT}->{'cert_identifier'};
         ##! 32: 'cert_identifier: ' . $cert_identifier
@@ -518,7 +521,6 @@ sub __pkcs_req : PRIVATE {
                 message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_CERT_IDENTIFIER_MISSING'
             );
         }
-       
 
         my $certificate = $api->get_cert(
             {   IDENTIFIER => $cert_identifier,
