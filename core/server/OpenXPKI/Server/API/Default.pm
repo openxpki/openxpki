@@ -138,23 +138,54 @@ sub get_workflow_ids_for_cert {
     my $self    = shift;
     my $arg_ref = shift;
     my $csr_serial = $arg_ref->{'CSR_SERIAL'};
+    my $cert_identifier = $arg_ref->{'IDENTIFIER'};
 
-    my $workflow_ids = CTX('api')->search_workflow_instances(
-        {
-            CONTEXT => [
-                {
-                    KEY   => 'csr_serial',
-                    VALUE => $csr_serial,
-                },
-            ],
-            TYPE => [
-                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE'
-            ]
-        }
+    # Fallback for legacy calls with csr instead of identifier
+    if (!$cert_identifier && $csr_serial) {
+        my $cert_identifier_result = CTX('dbi_backend')->select(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {             
+                CSR_SERIAL => $csr_serial, 
+            },
+        );
+        $cert_identifier = $cert_identifier_result->{IDENTIFIER}; 
+    }
+
+    my @result;
+    # CSR Workflow
+    my $workflow_id_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => { 
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_csr_workflow', 
+        },
     );
+    my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};         
+    # we fake the old return structure to satisfy the mason ui
+    # # FIXME - needs remodeling 
+    push @result, {
+        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
+        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
+    } if ($workflow_id);
+    
+                
+    # CRR Workflow
+    $workflow_id_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => { 
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_crr_workflow', 
+        },
+    );
+    $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
+       
+    push @result, {
+        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
+        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
+    } if ($workflow_id);
 
-    return $workflow_ids;
+    return \@result;
+    
 }
 
 sub get_head_version_id {
