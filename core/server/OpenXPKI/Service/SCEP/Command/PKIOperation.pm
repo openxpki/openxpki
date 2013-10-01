@@ -222,10 +222,10 @@ Named parameters are TOKEN and PKCS7, where token is a token from the
 OpenXPKI::Crypto::TokenManager of type 'SCEP'. PKCS7 is the PKCS#7 data
 received from the client. Using the crypto token, the transaction ID of
 the request is acquired. Using this transaction ID, a database lookup is done
-(using the server API search_workflow_instances function) to see whether
+(using the datapool) to see whether
 there is already an existing workflow corresponding to the transaction ID.
 
-If there is no workflow, a new one of type I18N_OPENXPKI_WF_TYPE_SCEP_REQUEST
+If there is no workflow, a new one of the type defined in the server configuration
 is created and the (base64-encoded) PKCS#7 request as well as the transaction
 ID is saved in the workflow context. From there on, the work takes place in
 the workflow.
@@ -234,11 +234,15 @@ If there is a workflow, the status of this workflow is looked up and the respons
 depends on the status:
   - if the status is not 'SUCCESS' or 'FAILURE', the request is still
     pending, and a corresponding message is returned to the SCEP client.
-  - if the status is 'SUCESS', the certificate is extracted from the
+  - if the status is 'SUCCESS', the certificate is extracted from the
     workflow and returned to the SCEP client.
-  - if the status is 'FAILURE', the failure code is extracted from the
-    workflow and returned to the client
-
+  - if the status is 'FAILURE' and the retry interval has not elapsed,
+    the failure code is extracted from the workflow and returned to 
+    the client. 
+  - if the status is 'FAILURE' and the retry interval has elapsed,
+    the failed workflow is unlinked from this transaction id and a 
+    new one is started
+   
 =cut 
 
 sub __pkcs_req : PRIVATE {
