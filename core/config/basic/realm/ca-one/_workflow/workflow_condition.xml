@@ -27,18 +27,9 @@
   	class="OpenXPKI::Server::Workflow::Condition::CertificateHasStatus">    
     <param name="expected_status" value="CRL_ISSUANCE_PENDING"/>
   </condition>
-  
-  <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED" 
-  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">    
-    <param name="crl_issuance_pending_accept" value="0"/>
-  </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING" 
-  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
-    <!-- here you can set whether you want accept more CRRs while the
-         certificate is still in state CRL_ISSUANCE_PENDING (as compared
-         to REVOKED) or not -->
-    <param name="crl_issuance_pending_accept" value="1"/>
+  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">    
   </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS" 
