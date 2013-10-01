@@ -41,8 +41,24 @@ sub execute {
 	       params => { crr_serial => $crr_serial }
        );
     }
-       
+           
     $nice_backend->revokeCertificate( $crr );
+
+    # add the crr workflow id to the cert attributes table    
+    my $serial = CTX('dbi_backend')->get_new_serial(
+        TABLE => 'CERTIFICATE_ATTRIBUTES',
+    );
+    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes with key ' . $serial . ' for cert ' . $set_context->{cert_identifier} 
+    CTX('dbi_backend')->insert(
+        TABLE => 'CERTIFICATE_ATTRIBUTES', 
+        HASH => {
+            ATTRIBUTE_SERIAL => $serial,
+            IDENTIFIER => $context->param('cert_identifier'),
+            ATTRIBUTE_KEY => 'system_crr_workflow',
+            ATTRIBUTE_VALUE => $workflow->id
+        }
+    );          
+    CTX('dbi_backend')->commit();       
     	
 }
 
