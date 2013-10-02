@@ -75,8 +75,8 @@ sub login_step {
 
     ## check account - the handler config has a connector at .user 
     # that returns password and role for a requested username
-
-    my $user_info = CTX('config')->get_hash( $self->{PREFIX}.".$account" );
+    
+    my $user_info = CTX('config')->get_hash( [ @{$self->{PREFIX}}, $account ] );
    
     if (!$user_info) {
         ##! 4: "No such user: $account"
