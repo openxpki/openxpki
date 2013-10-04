@@ -174,11 +174,11 @@ OpenXPKI/Server/Authentication.pm
 OpenXPKI/Server/Authentication/Anonymous.pm
 OpenXPKI/Server/Authentication/ClientSSO.pm
 OpenXPKI/Server/Authentication/External.pm
-#OpenXPKI/Server/Authentication/LDAP.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/Authentication/ClientX509.pm
 OpenXPKI/Server/Authentication/ChallengeX509.pm
+OpenXPKI/Server/Authentication/Connector.pm
 #OpenXPKI/Server/ACL.pm
 
 OpenXPKI/Server/Notification/RT.pm
