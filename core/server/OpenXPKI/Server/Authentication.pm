@@ -262,14 +262,17 @@ sub login_step {
     }
 
     if (defined $user && defined $role) {
-	CTX('log')->log(
+	   CTX('log')->log(
 	    MESSAGE  => "Login successful using authentication stack '$stack' (user: '$user', role: '$role')",
 	    PRIORITY => 'info',
 	    FACILITY => 'auth',
-	    );
-    }
+	   );
+    
+        return ($user, $role, $return_msg);
+    } 
 
-    return ($user, $role, $return_msg); 
+    return (undef, undef, $return_msg);
+    
 };
 
 1;
