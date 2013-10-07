@@ -31,6 +31,11 @@ style:
               - "[% hostname %]"
               - "[% FOREACH entry = hostname2 %][% entry %] | [% END %]"
 
+        metadata:
+            requestor: "[% requestor_gname %] [% requestor_name %]"
+            email: "[% requestor_email %]"
+
+
     05_advanced_style:
         label: I18N_OPENXPKI_PROFILE_ADVANCED_STYLE
         description: I18N_OPENXPKI_PROFILE_ADVANCED_DESC

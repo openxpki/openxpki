@@ -102,6 +102,58 @@ sub loadcfg {
     
 }
  
+ 
+sub certificate_id {
+    
+    my $format = $params{format} || 'openxpki';
+    
+    my $filename = $params{file};
+
+    if ( !-r $filename ) {
+        print STDERR "ERROR: filename '$filename' is not readable\n";
+        return 2;
+    }
+    
+    if ($format eq 'openssl') {
+        my @exec = ('openssl','x509','-noout','-hash','-inform','PEM','-in', $filename);
+        my ($id, undef) = Proc::SafeExec::backtick(@exec);
+        chomp $id;
+        print "$id\n";
+        return 0;
+    } elsif ($format ne 'openxpki') {
+        print STDERR "Invalid format - supported formats are openssl|openxpki\n";
+        return 1;
+    }
+    
+    my $defaulttoken = CTX('crypto_layer')->get_system_token({TYPE => 'DEFAULT'});
+
+    if ( !defined $defaulttoken ) {
+        print STDERR "ERROR: Could not get default token\n";
+        return 2;
+    }
+    
+    my $FileUtils = OpenXPKI::FileUtils->new();
+    my $certdata  = $FileUtils->read_file($filename);
+
+    if ( !defined $certdata ) {
+        print STDERR "ERROR: Could not parse certificate data\n";
+        return 2;
+    }
+
+    my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
+
+    my $cert = OpenXPKI::Crypto::X509->new(
+        TOKEN => $defaulttoken,
+        DATA  => $extracted_certdata,
+    );
+  
+    print $cert->get_identifier();
+    print "\n";
+    
+    return 0;
+  
+ }
+ 
 sub certificate_import {
 
     print STDERR "Starting import\n";
@@ -1271,7 +1323,18 @@ if ($cmd eq 'initdb') {
     
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
     
-    if ($subcmd eq 'import') {
+    
+    
+    if ($subcmd eq 'id') {
+        
+        push @options_spec, qw(        
+            file=s
+            format=s
+        );       
+        __init(); 
+        $ret = certificate_id();
+        
+    } elsif ($subcmd eq 'import') {
     
         push @options_spec, qw(
             realm=s

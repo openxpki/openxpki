@@ -101,7 +101,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-08-12 13:00:13 +0000</string>
+	<string>2013-09-25 15:15:11 +0000</string>
 	<key>Modifier</key>
 	<string>Scott Hardin</string>
 	<key>NotesVisible</key>
@@ -1735,7 +1735,308 @@ Enrollment Workflow}</string>
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{208.85832983039714, 634.28323853117195}, {16, 14}}</string>
+					<string>{{423.83970410333467, 664.2742919921875}, {116.384, 45.982100000000003}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>Size</key>
+						<real>10</real>
+					</dict>
+					<key>ID</key>
+					<integer>2054</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{1, 1}</string>
+						<string>{1, -1}</string>
+						<string>{-1, -1}</string>
+						<string>{-1, 1}</string>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
+					<key>Shape</key>
+					<string>Diamond</string>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Beneath</key>
+							<string>YES</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Pad</key>
+						<integer>1</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\fs20 \cf0 signer trusted?}</string>
+						<key>VerticalPad</key>
+						<integer>1</integer>
+					</dict>
+					<key>UserInfo</key>
+					<dict>
+						<key>class</key>
+						<string>Workflow::Condition::Evaluate</string>
+						<key>test</key>
+						<string>$context-&gt;{signer_trusted};</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{404.88461078701391, 618.29216329487497}, {116.384, 45.982100000000003}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>Size</key>
+						<real>10</real>
+					</dict>
+					<key>ID</key>
+					<integer>1990</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{1, 1}</string>
+						<string>{1, -1}</string>
+						<string>{-1, -1}</string>
+						<string>{-1, 1}</string>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
+					<key>Shape</key>
+					<string>Diamond</string>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Beneath</key>
+							<string>YES</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Pad</key>
+						<integer>1</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\fs20 \cf0 signer sn matches csr?}</string>
+						<key>VerticalPad</key>
+						<integer>1</integer>
+					</dict>
+					<key>UserInfo</key>
+					<dict>
+						<key>class</key>
+						<string>Workflow::Condition::Evaluate</string>
+						<key>test</key>
+						<string>not not $context-&gt;{signer_sn_matches_csr};</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>LineGraphic</string>
+					<key>Head</key>
+					<dict>
+						<key>ID</key>
+						<integer>2050</integer>
+					</dict>
+					<key>ID</key>
+					<integer>2053</integer>
+					<key>Points</key>
+					<array>
+						<string>{480.2130695195533, 550.03398974590618}</string>
+						<string>{482.86921255087583, 511.60737377706783}</string>
+					</array>
+					<key>Style</key>
+					<dict>
+						<key>stroke</key>
+						<dict>
+							<key>HeadArrow</key>
+							<string>Arrow</string>
+							<key>HeadScale</key>
+							<real>1.0000001192092896</real>
+							<key>HopLines</key>
+							<true/>
+							<key>HopType</key>
+							<integer>101</integer>
+							<key>Legacy</key>
+							<true/>
+							<key>LineType</key>
+							<integer>1</integer>
+							<key>Pattern</key>
+							<integer>11</integer>
+							<key>TailArrow</key>
+							<string>0</string>
+						</dict>
+					</dict>
+					<key>Tail</key>
+					<dict>
+						<key>ID</key>
+						<integer>2051</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{423.83967764324478, 570.72231223486472}, {116.384, 45.982100000000003}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>Size</key>
+						<real>10</real>
+					</dict>
+					<key>ID</key>
+					<integer>2052</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
+					<key>Shape</key>
+					<string>Diamond</string>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Beneath</key>
+							<string>YES</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Pad</key>
+						<integer>1</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\fs20 \cf0 signer is self signed?}</string>
+						<key>VerticalPad</key>
+						<integer>1</integer>
+					</dict>
+					<key>UserInfo</key>
+					<dict>
+						<key>class</key>
+						<string>Workflow::Condition::Evaluate</string>
+						<key>test</key>
+						<string>$context-&gt;{signer_is_self_signed};</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{404.88461633713041, 550.53279952272248}, {139.06581115722656, 166.69160461425781}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>2051</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Pad</key>
+						<integer>2</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
+
+\f0\i\b\fs20 \cf0 Lazy AND}</string>
+						<key>VerticalPad</key>
+						<integer>2</integer>
+					</dict>
+					<key>TextPlacement</key>
+					<integer>0</integer>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{424.71169151027931, 465.12646400023522}, {116.384, 45.982100000000003}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>Size</key>
+						<real>10</real>
+					</dict>
+					<key>ID</key>
+					<integer>2050</integer>
+					<key>Magnets</key>
+					<array>
+						<string>{0, 1}</string>
+						<string>{0, -1}</string>
+						<string>{1, 0}</string>
+						<string>{-1, 0}</string>
+					</array>
+					<key>Shape</key>
+					<string>Diamond</string>
+					<key>Style</key>
+					<dict>
+						<key>shadow</key>
+						<dict>
+							<key>Beneath</key>
+							<string>YES</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Pad</key>
+						<integer>1</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\fs20 \cf0 self signed initial enroll?}</string>
+						<key>VerticalPad</key>
+						<integer>1</integer>
+					</dict>
+					<key>UserInfo</key>
+					<dict>
+						<key>class</key>
+						<string>Workflow::Condition::LazyAND</string>
+						<key>condition1</key>
+						<string>!enroll_signer_trusted</string>
+						<key>condition2</key>
+						<string>enroll_signer_sn_matches_csr</string>
+						<key>condition3</key>
+						<string>enroll_signer_is_self_signed</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{208.81732260610141, 634.28323853117195}, {16, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1803,9 +2104,9 @@ Enrollment Workflow}</string>
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
-						<integer>2019</integer>
+						<integer>2027</integer>
 						<key>Info</key>
-						<integer>3</integer>
+						<integer>4</integer>
 					</dict>
 					<key>ID</key>
 					<integer>2048</integer>
@@ -1814,12 +2115,12 @@ Enrollment Workflow}</string>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>4.893559455871582</real>
+					<real>3.9498324394226074</real>
 					<key>Points</key>
 					<array>
 						<string>{199.73469098089237, 641.28323853117195}</string>
-						<string>{221.42180990780255, 148.24469515711178}</string>
-						<string>{320.19200258660385, 180.34994227405551}</string>
+						<string>{219.53435570907456, 149.57192392407188}</string>
+						<string>{331.10506329945378, 170.54537623308897}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2019,9 +2320,7 @@ Enrollment Workflow}</string>
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
-						<integer>2035</integer>
-						<key>Info</key>
-						<integer>3</integer>
+						<integer>2019</integer>
 					</dict>
 					<key>ID</key>
 					<integer>2042</integer>
@@ -2033,8 +2332,8 @@ Enrollment Workflow}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{320.19200258660385, 425.14066770626812}</string>
-						<string>{320.19200258660385, 457.11696324879142}</string>
+						<string>{320.19201685738597, 276.95258893280004}</string>
+						<string>{320.19200258660385, 302.57837647298555}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2065,7 +2364,7 @@ Enrollment Workflow}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 377.14066770626812}, {101.6929931640625, 12}}</string>
+							<string>{{269.34552027535472, 228.95258893280001}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2101,7 +2400,7 @@ Enrollment Workflow}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 389.14066770626812}, {101.6929931640625, 12}}</string>
+							<string>{{269.34552027535472, 240.95258893280001}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2144,7 +2443,7 @@ Enrollment Workflow}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 401.14066770626812}, {101.6929931640625, 12}}</string>
+							<string>{{269.34552027535472, 252.95258893280004}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2187,7 +2486,7 @@ Enrollment Workflow}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 413.14066770626812}, {101.6929931640625, 12}}</string>
+							<string>{{269.34552027535472, 264.95258893280004}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2398,7 +2697,7 @@ CHECK FOR VALID REQUEST}</string>
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
-						<integer>2027</integer>
+						<integer>2035</integer>
 						<key>Info</key>
 						<integer>3</integer>
 					</dict>
@@ -2412,8 +2711,8 @@ CHECK FOR VALID REQUEST}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{320.19200258660385, 289.8132485876755}</string>
-						<string>{320.19200258660385, 318.73345500655699}</string>
+						<string>{320.19200258660385, 412.04168278660563}</string>
+						<string>{320.19200258660385, 457.11696324879142}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2444,7 +2743,7 @@ CHECK FOR VALID REQUEST}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 241.81324858767553}, {101.6929931640625, 12}}</string>
+							<string>{{269.3455060045726, 364.04168278660563}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2480,7 +2779,7 @@ CHECK FOR VALID REQUEST}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 253.8132485876755}, {101.6929931640625, 12}}</string>
+							<string>{{269.3455060045726, 376.04168278660563}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2523,7 +2822,7 @@ CHECK FOR VALID REQUEST}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 265.8132485876755}, {101.6929931640625, 12}}</string>
+							<string>{{269.3455060045726, 388.04168278660563}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2566,7 +2865,7 @@ CHECK FOR VALID REQUEST}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{269.3455060045726, 277.8132485876755}, {101.6929931640625, 12}}</string>
+							<string>{{269.3455060045726, 400.04168278660563}, {101.6929931640625, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2661,8 +2960,8 @@ CHECK FOR VALID REQUEST}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{320.19199143577828, 348.22045500655696}</string>
-						<string>{320.19200258660385, 377.14066770626812}</string>
+						<string>{320.19199143577828, 200.03237623308897}</string>
+						<string>{320.19201685738597, 228.95258893280001}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2688,7 +2987,7 @@ CHECK FOR VALID REQUEST}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{273.42210258660384, 318.73345500655699}, {93.5398, 29.486999999999998}}</string>
+					<string>{{273.42210258660384, 170.54537623308897}, {93.5398, 29.486999999999998}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -2777,7 +3076,7 @@ EVAL SIGNER TRUST}</string>
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
-						<integer>2019</integer>
+						<integer>2027</integer>
 						<key>Info</key>
 						<integer>2</integer>
 					</dict>
@@ -2788,11 +3087,11 @@ EVAL SIGNER TRUST}</string>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>98.9268798828125</real>
+					<real>95.713462829589844</real>
 					<key>Points</key>
 					<array>
 						<string>{141.5426909808923, 746.98971625173328}</string>
-						<string>{309.27897789354677, 180.34994227405548}</string>
+						<string>{309.27897789354677, 170.54537623308897}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3040,8 +3339,8 @@ EVAL SIGNER TRUST}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{320.19199143577828, 209.8369422740555}</string>
-						<string>{320.19200258660385, 241.8132485876755}</string>
+						<string>{320.19199143577828, 332.06537647298558}</string>
+						<string>{320.19200258660385, 364.04168278660569}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3067,7 +3366,7 @@ EVAL SIGNER TRUST}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{273.42210258660384, 180.34994227405548}, {93.5398, 29.486999999999998}}</string>
+					<string>{{273.42210258660384, 302.57837647298561}, {93.5398, 29.486999999999998}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -3152,7 +3451,7 @@ EVAL ELIGIBILITY}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{377.14576136089943, 530.9901544808929}, {16, 14}}</string>
+					<string>{{377.22745401096347, 530.9901544808929}, {16, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -3231,13 +3530,12 @@ EVAL ELIGIBILITY}</string>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>6.7868928909301758</real>
+					<real>-1</real>
 					<key>Points</key>
 					<array>
 						<string>{378.38400258660391, 537.9901544808929}</string>
-						<string>{403.85778778191059, 537.14125828967371}</string>
-						<string>{412, 621}</string>
-						<string>{479.18222829097493, 690.428955078125}</string>
+						<string>{400.4085219681885, 724.43269177682998}</string>
+						<string>{436.06696339839681, 734.3440843260156}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3407,8 +3705,8 @@ HAVE VALID REQUEST}</string>
 					<integer>1983</integer>
 					<key>Points</key>
 					<array>
-						<string>{483.69094908111771, 473.07052712524336}</string>
-						<string>{484.04677965226767, 443.8551395792918}</string>
+						<string>{460.47526368271144, 352.30050020421277}</string>
+						<string>{456.86735681961869, 326.3573274859894}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -3440,7 +3738,7 @@ HAVE VALID REQUEST}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{421.85350366623197, 473.57049004913415}, {122.093505859375, 128.83932495117188}}</string>
+					<string>{{404.01266390279397, 352.79573413989976}, {139.06581115722656, 186.97735595703125}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -3474,7 +3772,7 @@ HAVE VALID REQUEST}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{425.85479681840536, 549.05442242523293}, {116.384, 45.982100000000003}}</string>
+					<string>{{404.01267313233649, 419.48699178400466}, {116.384, 45.982100000000003}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -3527,7 +3825,7 @@ HAVE VALID REQUEST}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{425.85477965226767, 495.74905209442232}, {116.384, 45.982100000000003}}</string>
+					<string>{{423.00000023011768, 373.50490187880126}, {116.384, 45.982100000000003}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -3575,12 +3873,12 @@ HAVE VALID REQUEST}</string>
 						<key>class</key>
 						<string>Workflow::Condition::Evaluate</string>
 						<key>test</key>
-						<string>$context-&gt;{p_allow_expired_signer}</string>
+						<string>$context-&gt;{p_allow_expired_signer};</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{425.85477965226767, 397.87303957929174}, {116.384, 45.982100000000003}}</string>
+					<string>{{398.6064849424863, 279.87999354993372}, {116.384, 45.982100000000003}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -3635,6 +3933,8 @@ HAVE VALID REQUEST}</string>
 						<string>enroll_allow_expired_signer</string>
 						<key>condition2</key>
 						<string>enroll_signer_validity_ok</string>
+						<key>condition3</key>
+						<string>enroll_self_signed_initial_enroll</string>
 					</dict>
 				</dict>
 				<dict>
@@ -4270,7 +4570,7 @@ READY TO PROCESS}</string>
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{413.68617101452048, 95.973997481018529}, {138.42820739746094, 12}}</string>
+							<string>{{219.53435570907459, 74.709748109536804}, {226.66781616210938, 12}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -4328,7 +4628,7 @@ READY TO PROCESS}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{413.68617101452048, 107.97399748101853}, {138.42820739746094, 80}}</string>
+							<string>{{219.53435570907459, 86.709748109536804}, {226.66781616210938, 50}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -4427,8 +4727,8 @@ signer cert crypt ok: the cert is cryptographically OK, but may be expired.}</st
 					<integer>1964</integer>
 					<key>Points</key>
 					<array>
-						<string>{482.90025506072789, 187.97399748101853}</string>
-						<string>{482.90025506072789, 214.91726588074667}</string>
+						<string>{370.64626301661315, 136.7097481095368}</string>
+						<string>{395.548484571389, 161.42808488937411}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -4472,7 +4772,7 @@ signer cert crypt ok: the cert is cryptographically OK, but may be expired.}</st
 					<integer>1669</integer>
 					<key>Points</key>
 					<array>
-						<string>{421.56314473973515, 425.17253553377907}</string>
+						<string>{424.62181350384066, 342.7956866359408}</string>
 						<string>{349.28800258660385, 526.49462948089285}</string>
 					</array>
 					<key>Style</key>
@@ -4505,7 +4805,7 @@ signer cert crypt ok: the cert is cryptographically OK, but may be expired.}</st
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{421.85350366623197, 215.41726589146293}, {122.093505859375, 247.53427124023438}}</string>
+					<string>{{395.90334574580129, 126.48239844446539}, {146.33540344238281, 215.85067749023438}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -4539,7 +4839,7 @@ signer cert crypt ok: the cert is cryptographically OK, but may be expired.}</st
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{425.85477965226767, 232.01241241497925}, {116.384, 45.982100000000003}}</string>
+					<string>{{424.14651931484474, 143.07754496798168}, {116.384, 45.982100000000003}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -4590,7 +4890,7 @@ signer cert crypt ok: the cert is cryptographically OK, but may be expired.}</st
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{425.85477965226767, 345.52315588614618}, {116.384, 45.982100000000003}}</string>
+					<string>{{424.14651931484474, 232.3657364388709}, {116.384, 45.982100000000003}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -4643,7 +4943,7 @@ signer cert crypt ok: the cert is cryptographically OK, but may be expired.}</st
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{425.85477965226767, 288.76777988354087}, {116.384, 45.982100000000003}}</string>
+					<string>{{398.60646280920594, 185.75615619813848}, {116.384, 45.982100000000003}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -4911,7 +5211,7 @@ CHECK FOR CHALLENGE PASSWORD}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{421.499267578125, 690.428955078125}, {93.5398, 29.486999999999998}}</string>
+					<string>{{378.38400268554688, 734.3440843260156}, {93.5398, 29.486999999999998}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -7999,7 +8299,7 @@ Enrollment Workflow}</string>
 					<real>-1</real>
 					<key>Points</key>
 					<array>
-						<string>{526.35240479399351, 428.08995152377832}</string>
+						<string>{526.3440467442681, 428.73237144896422}</string>
 						<string>{541, 417.98261904296879}</string>
 						<string>{506.54354236411046, 368.09205262001234}</string>
 					</array>
@@ -8033,7 +8333,7 @@ Enrollment Workflow}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{401.96910759138063, 424.58340454101562}, {123.97176361083984, 93.125717163085938}}</string>
+					<string>{{401.96910759138063, 424.58340454101562}, {123.97176361083984, 99.819366455078125}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -11016,7 +11316,7 @@ Enrollment Workflow}</string>
 						<key>class</key>
 						<string>Workflow::Condition::Evaluate</string>
 						<key>test</key>
-						<string>not not $context-&gt;{signer_sn_matches_csr}</string>
+						<string>not not $context-&gt;{signer_sn_matches_csr};</string>
 					</dict>
 				</dict>
 				<dict>
@@ -11401,213 +11701,6 @@ Enrollment Workflow}</string>
 				</dict>
 				<dict>
 					<key>Class</key>
-					<string>TableGroup</string>
-					<key>Graphics</key>
-					<array>
-						<dict>
-							<key>Bounds</key>
-							<string>{{482.65490857299164, 221.18571671046828}, {68, 12}}</string>
-							<key>Class</key>
-							<string>ShapedGraphic</string>
-							<key>FitText</key>
-							<string>Vertical</string>
-							<key>Flow</key>
-							<string>Resize</string>
-							<key>ID</key>
-							<integer>2048</integer>
-							<key>ImageID</key>
-							<integer>1</integer>
-							<key>ManualSizeImage</key>
-							<string>YES</string>
-							<key>Scale</key>
-							<real>0.36487001180648804</real>
-							<key>Shape</key>
-							<string>Rectangle</string>
-							<key>Style</key>
-							<dict>
-								<key>image fill</key>
-								<dict>
-									<key>ImageSizing</key>
-									<integer>0</integer>
-									<key>Scale</key>
-									<real>0.36487001180648804</real>
-								</dict>
-								<key>shadow</key>
-								<dict>
-									<key>Beneath</key>
-									<string>YES</string>
-								</dict>
-								<key>stroke</key>
-								<dict>
-									<key>Color</key>
-									<dict>
-										<key>b</key>
-										<string>0.89145</string>
-										<key>g</key>
-										<string>0.574635</string>
-										<key>r</key>
-										<string>0.366472</string>
-									</dict>
-									<key>Draws</key>
-									<string>NO</string>
-								</dict>
-							</dict>
-							<key>Text</key>
-							<dict>
-								<key>Text</key>
-								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
-
-\f0\fs20 \cf0  }</string>
-								<key>VerticalPad</key>
-								<integer>0</integer>
-							</dict>
-							<key>TextPlacement</key>
-							<integer>0</integer>
-						</dict>
-						<dict>
-							<key>Bounds</key>
-							<string>{{482.65490857299164, 233.18571671046828}, {68, 40}}</string>
-							<key>Class</key>
-							<string>ShapedGraphic</string>
-							<key>FitText</key>
-							<string>Vertical</string>
-							<key>Flow</key>
-							<string>Resize</string>
-							<key>ID</key>
-							<integer>2049</integer>
-							<key>Shape</key>
-							<string>Rectangle</string>
-							<key>Style</key>
-							<dict>
-								<key>fill</key>
-								<dict>
-									<key>GradientCenter</key>
-									<string>{-0.29411799, -0.26470599}</string>
-								</dict>
-								<key>shadow</key>
-								<dict>
-									<key>Beneath</key>
-									<string>YES</string>
-								</dict>
-								<key>stroke</key>
-								<dict>
-									<key>Color</key>
-									<dict>
-										<key>b</key>
-										<string>0.89145</string>
-										<key>g</key>
-										<string>0.574635</string>
-										<key>r</key>
-										<string>0.366472</string>
-									</dict>
-									<key>Draws</key>
-									<string>NO</string>
-								</dict>
-							</dict>
-							<key>Text</key>
-							<dict>
-								<key>Align</key>
-								<integer>0</integer>
-								<key>Text</key>
-								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
-
-\f0\fs16 \cf0 E.g.: correct status of device in external database}</string>
-								<key>VerticalPad</key>
-								<integer>0</integer>
-							</dict>
-							<key>TextPlacement</key>
-							<integer>0</integer>
-						</dict>
-					</array>
-					<key>GridH</key>
-					<array>
-						<integer>2048</integer>
-						<integer>2049</integer>
-						<array/>
-					</array>
-					<key>GroupConnect</key>
-					<string>YES</string>
-					<key>ID</key>
-					<integer>2047</integer>
-					<key>Magnets</key>
-					<array>
-						<string>{-0.73960000000000004, -1.1093999999999999}</string>
-						<string>{-0.42163699999999998, -1.26491}</string>
-						<string>{0, -1.3333299999999999}</string>
-						<string>{0.42163699999999998, -1.26491}</string>
-						<string>{0.73960000000000004, -1.1093999999999999}</string>
-						<string>{1.1093999999999999, -0.73960000000000004}</string>
-						<string>{1.26491, -0.42163699999999998}</string>
-						<string>{1.3333299999999999, 0}</string>
-						<string>{1.26491, 0.42163699999999998}</string>
-						<string>{1.1093999999999999, 0.73960000000000004}</string>
-						<string>{0.73960000000000004, 1.1093999999999999}</string>
-						<string>{0.42163699999999998, 1.26491}</string>
-						<string>{0, 1.3333299999999999}</string>
-						<string>{-0.42163699999999998, 1.26491}</string>
-						<string>{-0.73960000000000004, 1.1093999999999999}</string>
-						<string>{-1.1093999999999999, 0.73960102000000005}</string>
-						<string>{-1.26491, 0.42163699999999998}</string>
-						<string>{-1.3333299999999999, -6.3578301000000001e-07}</string>
-						<string>{-1.26491, -0.42163699999999998}</string>
-						<string>{-1.1093999999999999, -0.73960000000000004}</string>
-					</array>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>LineGraphic</string>
-					<key>Head</key>
-					<dict>
-						<key>ID</key>
-						<integer>2015</integer>
-						<key>Info</key>
-						<integer>2</integer>
-					</dict>
-					<key>ID</key>
-					<integer>2046</integer>
-					<key>Points</key>
-					<array>
-						<string>{482.65490857299159, 247.18570431266858}</string>
-						<string>{308.59599197787423, 232.68124110075408}</string>
-					</array>
-					<key>Style</key>
-					<dict>
-						<key>stroke</key>
-						<dict>
-							<key>HeadArrow</key>
-							<string>Arrow</string>
-							<key>HeadScale</key>
-							<real>1.0000001192092896</real>
-							<key>HopLines</key>
-							<true/>
-							<key>HopType</key>
-							<integer>101</integer>
-							<key>Legacy</key>
-							<true/>
-							<key>LineType</key>
-							<integer>1</integer>
-							<key>Pattern</key>
-							<integer>11</integer>
-							<key>TailArrow</key>
-							<string>0</string>
-						</dict>
-					</dict>
-					<key>Tail</key>
-					<dict>
-						<key>ID</key>
-						<integer>2047</integer>
-						<key>Info</key>
-						<integer>18</integer>
-					</dict>
-				</dict>
-				<dict>
-					<key>Class</key>
 					<string>LineGraphic</string>
 					<key>Head</key>
 					<dict>
@@ -11869,55 +11962,6 @@ Enrollment Workflow}</string>
 					</dict>
 				</dict>
 				<dict>
-					<key>Class</key>
-					<string>LineGraphic</string>
-					<key>Head</key>
-					<dict>
-						<key>ID</key>
-						<integer>2015</integer>
-						<key>Info</key>
-						<integer>6</integer>
-					</dict>
-					<key>ID</key>
-					<integer>2016</integer>
-					<key>OrthogonalBarAutomatic</key>
-					<true/>
-					<key>OrthogonalBarPoint</key>
-					<string>{0, 0}</string>
-					<key>OrthogonalBarPosition</key>
-					<real>-1</real>
-					<key>Points</key>
-					<array>
-						<string>{279.49998000186412, 192.92921230446086}</string>
-						<string>{279.49999197787423, 221.18571610075404}</string>
-					</array>
-					<key>Style</key>
-					<dict>
-						<key>stroke</key>
-						<dict>
-							<key>HeadArrow</key>
-							<string>Arrow</string>
-							<key>HopLines</key>
-							<true/>
-							<key>HopType</key>
-							<integer>102</integer>
-							<key>Legacy</key>
-							<true/>
-							<key>LineType</key>
-							<integer>2</integer>
-							<key>TailArrow</key>
-							<string>0</string>
-						</dict>
-					</dict>
-					<key>Tail</key>
-					<dict>
-						<key>ID</key>
-						<integer>2008</integer>
-						<key>Info</key>
-						<integer>18</integer>
-					</dict>
-				</dict>
-				<dict>
 					<key>Bounds</key>
 					<string>{{355.78236785499246, 172.78144606754486}, {116.384, 45.982100000000003}}</string>
 					<key>Class</key>
@@ -12068,162 +12112,6 @@ Enrollment Workflow}</string>
 					</dict>
 				</dict>
 				<dict>
-					<key>Bounds</key>
-					<string>{{201.40799235934381, 248.55824919215635}, {16, 14}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>YES</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Color</key>
-						<dict>
-							<key>w</key>
-							<string>0</string>
-						</dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>Size</key>
-						<real>12</real>
-					</dict>
-					<key>ID</key>
-					<integer>2037</integer>
-					<key>Line</key>
-					<dict>
-						<key>ID</key>
-						<integer>2036</integer>
-						<key>Position</key>
-						<real>0.078385062515735626</real>
-						<key>RotationType</key>
-						<integer>0</integer>
-					</dict>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Pad</key>
-						<integer>1</integer>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
-
-\f0\fs24 \cf0 no}</string>
-						<key>VerticalPad</key>
-						<integer>0</integer>
-					</dict>
-					<key>Wrap</key>
-					<string>NO</string>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>LineGraphic</string>
-					<key>Head</key>
-					<dict>
-						<key>ID</key>
-						<integer>1865</integer>
-					</dict>
-					<key>ID</key>
-					<integer>2036</integer>
-					<key>OrthogonalBarAutomatic</key>
-					<true/>
-					<key>OrthogonalBarPoint</key>
-					<string>{0, 0}</string>
-					<key>OrthogonalBarPosition</key>
-					<real>-1</real>
-					<key>Points</key>
-					<array>
-						<string>{221.30799197787408, 244.17676610075409}</string>
-						<string>{209.40799362344541, 529.2912459379188}</string>
-					</array>
-					<key>Style</key>
-					<dict>
-						<key>stroke</key>
-						<dict>
-							<key>HeadArrow</key>
-							<string>Arrow</string>
-							<key>HopLines</key>
-							<true/>
-							<key>HopType</key>
-							<integer>102</integer>
-							<key>Legacy</key>
-							<true/>
-							<key>LineType</key>
-							<integer>2</integer>
-							<key>TailArrow</key>
-							<string>0</string>
-						</dict>
-					</dict>
-					<key>Tail</key>
-					<dict>
-						<key>ID</key>
-						<integer>2015</integer>
-						<key>Info</key>
-						<integer>8</integer>
-					</dict>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>LineGraphic</string>
-					<key>Head</key>
-					<dict>
-						<key>ID</key>
-						<integer>2034</integer>
-						<key>Info</key>
-						<integer>3</integer>
-					</dict>
-					<key>ID</key>
-					<integer>2011</integer>
-					<key>Points</key>
-					<array>
-						<string>{54.699999012947139, 586.55426103115099}</string>
-						<string>{66.8521737269553, 667.45206233572605}</string>
-					</array>
-					<key>Style</key>
-					<dict>
-						<key>stroke</key>
-						<dict>
-							<key>HeadArrow</key>
-							<string>Arrow</string>
-							<key>HeadScale</key>
-							<real>1.0000001192092896</real>
-							<key>HopLines</key>
-							<true/>
-							<key>HopType</key>
-							<integer>101</integer>
-							<key>Legacy</key>
-							<true/>
-							<key>LineType</key>
-							<integer>1</integer>
-							<key>Pattern</key>
-							<integer>11</integer>
-							<key>TailArrow</key>
-							<string>0</string>
-						</dict>
-					</dict>
-					<key>Tail</key>
-					<dict>
-						<key>ID</key>
-						<integer>2012</integer>
-					</dict>
-				</dict>
-				<dict>
 					<key>Class</key>
 					<string>LineGraphic</string>
 					<key>Head</key>
@@ -12272,63 +12160,6 @@ Enrollment Workflow}</string>
 					<dict>
 						<key>ID</key>
 						<integer>2033</integer>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{37.756173726955325, 655.95653733572613}, {116.384, 45.982100000000003}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>Size</key>
-						<real>10</real>
-					</dict>
-					<key>ID</key>
-					<integer>2034</integer>
-					<key>Magnets</key>
-					<array>
-						<string>{1, 1}</string>
-						<string>{1, -1}</string>
-						<string>{-1, -1}</string>
-						<string>{-1, 1}</string>
-						<string>{0, 1}</string>
-						<string>{0, -1}</string>
-						<string>{1, 0}</string>
-						<string>{-1, 0}</string>
-					</array>
-					<key>Shape</key>
-					<string>Diamond</string>
-					<key>Style</key>
-					<dict>
-						<key>shadow</key>
-						<dict>
-							<key>Beneath</key>
-							<string>YES</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Pad</key>
-						<integer>1</integer>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
-
-\f0\fs20 \cf0 eligible for renewal?}</string>
-						<key>VerticalPad</key>
-						<integer>1</integer>
-					</dict>
-					<key>UserInfo</key>
-					<dict>
-						<key>class</key>
-						<string>Workflow::Condition::Evaluate</string>
-						<key>test</key>
-						<string>not not $context-&gt;{eligible_for_renewal}</string>
 					</dict>
 				</dict>
 				<dict>
@@ -12870,117 +12701,6 @@ CONTINUE INITIAL ENROLL}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{268.99999197787423, 278.89751102817598}, {21, 14}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>YES</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Color</key>
-						<dict>
-							<key>w</key>
-							<string>0</string>
-						</dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>Size</key>
-						<real>12</real>
-					</dict>
-					<key>ID</key>
-					<integer>2020</integer>
-					<key>Line</key>
-					<dict>
-						<key>ID</key>
-						<integer>2019</integer>
-						<key>Position</key>
-						<real>0.40848571062088013</real>
-						<key>RotationType</key>
-						<integer>0</integer>
-					</dict>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Pad</key>
-						<integer>1</integer>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
-
-\f0\fs24 \cf0 yes}</string>
-						<key>VerticalPad</key>
-						<integer>0</integer>
-					</dict>
-					<key>Wrap</key>
-					<string>NO</string>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>LineGraphic</string>
-					<key>Head</key>
-					<dict>
-						<key>ID</key>
-						<integer>2018</integer>
-					</dict>
-					<key>ID</key>
-					<integer>2019</integer>
-					<key>OrthogonalBarAutomatic</key>
-					<true/>
-					<key>OrthogonalBarPoint</key>
-					<string>{0, 0}</string>
-					<key>OrthogonalBarPosition</key>
-					<real>-1</real>
-					<key>Points</key>
-					<array>
-						<string>{279.49999197787423, 267.16781610075407}</string>
-						<string>{279.49999197787423, 313.01934655264006}</string>
-					</array>
-					<key>Style</key>
-					<dict>
-						<key>stroke</key>
-						<dict>
-							<key>HeadArrow</key>
-							<string>Arrow</string>
-							<key>HopLines</key>
-							<true/>
-							<key>HopType</key>
-							<integer>102</integer>
-							<key>Legacy</key>
-							<true/>
-							<key>LineType</key>
-							<integer>2</integer>
-							<key>TailArrow</key>
-							<string>0</string>
-						</dict>
-					</dict>
-					<key>Tail</key>
-					<dict>
-						<key>ID</key>
-						<integer>2015</integer>
-						<key>Info</key>
-						<integer>5</integer>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
 					<string>{{229.2690210306086, 313.01934655264006}, {100.46194189453126, 29.486999999999998}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
@@ -13123,224 +12843,7 @@ ELIGIBLE FOR INITIAL ENROLL }</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{221.30799197787422, 221.18571610075409}, {116.384, 45.982100000000003}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>Size</key>
-						<real>10</real>
-					</dict>
-					<key>ID</key>
-					<integer>2015</integer>
-					<key>Magnets</key>
-					<array>
-						<string>{1, 1}</string>
-						<string>{1, -1}</string>
-						<string>{-1, -1}</string>
-						<string>{-1, 1}</string>
-						<string>{0, 1}</string>
-						<string>{0, -1}</string>
-						<string>{1, 0}</string>
-						<string>{-1, 0}</string>
-					</array>
-					<key>Shape</key>
-					<string>Diamond</string>
-					<key>Style</key>
-					<dict>
-						<key>shadow</key>
-						<dict>
-							<key>Beneath</key>
-							<string>YES</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Pad</key>
-						<integer>1</integer>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
-
-\f0\fs20 \cf0 eligible for initial enroll?}</string>
-						<key>VerticalPad</key>
-						<integer>1</integer>
-					</dict>
-					<key>UserInfo</key>
-					<dict>
-						<key>class</key>
-						<string>Workflow::Condition::Evaluate</string>
-						<key>test</key>
-						<string>not not $context-&gt;{eligible_for_initial_enroll}</string>
-					</dict>
-				</dict>
-				<dict>
-					<key>Class</key>
-					<string>TableGroup</string>
-					<key>Graphics</key>
-					<array>
-						<dict>
-							<key>Bounds</key>
-							<string>{{20.699999012947131, 534.55426103115099}, {68, 12}}</string>
-							<key>Class</key>
-							<string>ShapedGraphic</string>
-							<key>FitText</key>
-							<string>Vertical</string>
-							<key>Flow</key>
-							<string>Resize</string>
-							<key>ID</key>
-							<integer>2013</integer>
-							<key>ImageID</key>
-							<integer>1</integer>
-							<key>ManualSizeImage</key>
-							<string>YES</string>
-							<key>Scale</key>
-							<real>0.36487001180648804</real>
-							<key>Shape</key>
-							<string>Rectangle</string>
-							<key>Style</key>
-							<dict>
-								<key>image fill</key>
-								<dict>
-									<key>ImageSizing</key>
-									<integer>0</integer>
-									<key>Scale</key>
-									<real>0.36487001180648804</real>
-								</dict>
-								<key>shadow</key>
-								<dict>
-									<key>Beneath</key>
-									<string>YES</string>
-								</dict>
-								<key>stroke</key>
-								<dict>
-									<key>Color</key>
-									<dict>
-										<key>b</key>
-										<string>0.89145</string>
-										<key>g</key>
-										<string>0.574635</string>
-										<key>r</key>
-										<string>0.366472</string>
-									</dict>
-									<key>Draws</key>
-									<string>NO</string>
-								</dict>
-							</dict>
-							<key>Text</key>
-							<dict>
-								<key>Text</key>
-								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
-
-\f0\fs20 \cf0  }</string>
-								<key>VerticalPad</key>
-								<integer>0</integer>
-							</dict>
-							<key>TextPlacement</key>
-							<integer>0</integer>
-						</dict>
-						<dict>
-							<key>Bounds</key>
-							<string>{{20.699999012947131, 546.55426103115099}, {68, 40}}</string>
-							<key>Class</key>
-							<string>ShapedGraphic</string>
-							<key>FitText</key>
-							<string>Vertical</string>
-							<key>Flow</key>
-							<string>Resize</string>
-							<key>ID</key>
-							<integer>2014</integer>
-							<key>Shape</key>
-							<string>Rectangle</string>
-							<key>Style</key>
-							<dict>
-								<key>fill</key>
-								<dict>
-									<key>GradientCenter</key>
-									<string>{-0.29411799, -0.26470599}</string>
-								</dict>
-								<key>shadow</key>
-								<dict>
-									<key>Beneath</key>
-									<string>YES</string>
-								</dict>
-								<key>stroke</key>
-								<dict>
-									<key>Color</key>
-									<dict>
-										<key>b</key>
-										<string>0.89145</string>
-										<key>g</key>
-										<string>0.574635</string>
-										<key>r</key>
-										<string>0.366472</string>
-									</dict>
-									<key>Draws</key>
-									<string>NO</string>
-								</dict>
-							</dict>
-							<key>Text</key>
-							<dict>
-								<key>Align</key>
-								<integer>0</integer>
-								<key>Text</key>
-								<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
-
-\f0\fs16 \cf0 E.g.: correct status of device in external database}</string>
-								<key>VerticalPad</key>
-								<integer>0</integer>
-							</dict>
-							<key>TextPlacement</key>
-							<integer>0</integer>
-						</dict>
-					</array>
-					<key>GridH</key>
-					<array>
-						<integer>2013</integer>
-						<integer>2014</integer>
-						<array/>
-					</array>
-					<key>GroupConnect</key>
-					<string>YES</string>
-					<key>ID</key>
-					<integer>2012</integer>
-					<key>Magnets</key>
-					<array>
-						<string>{-0.73960000000000004, -1.1093999999999999}</string>
-						<string>{-0.42163699999999998, -1.26491}</string>
-						<string>{0, -1.3333299999999999}</string>
-						<string>{0.42163699999999998, -1.26491}</string>
-						<string>{0.73960000000000004, -1.1093999999999999}</string>
-						<string>{1.1093999999999999, -0.73960000000000004}</string>
-						<string>{1.26491, -0.42163699999999998}</string>
-						<string>{1.3333299999999999, 0}</string>
-						<string>{1.26491, 0.42163699999999998}</string>
-						<string>{1.1093999999999999, 0.73960000000000004}</string>
-						<string>{0.73960000000000004, 1.1093999999999999}</string>
-						<string>{0.42163699999999998, 1.26491}</string>
-						<string>{0, 1.3333299999999999}</string>
-						<string>{-0.42163699999999998, 1.26491}</string>
-						<string>{-0.73960000000000004, 1.1093999999999999}</string>
-						<string>{-1.1093999999999999, 0.73960102000000005}</string>
-						<string>{-1.26491, 0.42163699999999998}</string>
-						<string>{-1.3333299999999999, -6.3578301000000001e-07}</string>
-						<string>{-1.26491, -0.42163699999999998}</string>
-						<string>{-1.1093999999999999, -0.73960000000000004}</string>
-					</array>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{189.28400383377084, 312.55341435440704}, {16, 14}}</string>
+					<string>{{190.2053042747977, 327.25643540840224}, {16, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -13401,91 +12904,6 @@ ELIGIBLE FOR INITIAL ENROLL }</string>
 					</dict>
 					<key>Wrap</key>
 					<string>NO</string>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{229.2690210306086, 163.44221230446084}, {100.46194189453126, 29.486999999999998}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Color</key>
-						<dict>
-							<key>w</key>
-							<string>0</string>
-						</dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>NSKern</key>
-						<real>0.0</real>
-						<key>Size</key>
-						<real>10</real>
-					</dict>
-					<key>ID</key>
-					<integer>2008</integer>
-					<key>Magnets</key>
-					<array>
-						<string>{-0.56384800000000002, -1.20824}</string>
-						<string>{-0.30297299999999999, -1.2984500000000001}</string>
-						<string>{0, -1.3333299999999999}</string>
-						<string>{0.30297400000000002, -1.2984500000000001}</string>
-						<string>{0.56384800000000002, -1.20824}</string>
-						<string>{0.84107399999999999, -1.0345899999999999}</string>
-						<string>{0.94300899999999999, -0.94260900000000003}</string>
-						<string>{1.0655600000000001, -0.80147299999999999}</string>
-						<string>{1.1952100000000001, -0.59096599999999999}</string>
-						<string>{1.3001100000000001, -0.295769}</string>
-						<string>{1.2928500000000001, 0.32606200000000002}</string>
-						<string>{1.18381, 0.61349299999999996}</string>
-						<string>{1.05382, 0.81685099999999999}</string>
-						<string>{0.92273799999999995, 0.96246200000000004}</string>
-						<string>{0.83302100000000001, 1.04108}</string>
-						<string>{0.56384699999999999, 1.20824}</string>
-						<string>{0.30297200000000002, 1.2984599999999999}</string>
-						<string>{-3.1789100000000002e-07, 1.3333299999999999}</string>
-						<string>{-0.30297200000000002, 1.2984599999999999}</string>
-						<string>{-0.56384599999999996, 1.20824}</string>
-						<string>{-0.84107299999999996, 1.0345899999999999}</string>
-						<string>{-0.94300799999999996, 0.94260999999999995}</string>
-						<string>{-1.0655600000000001, 0.80147400000000002}</string>
-						<string>{-1.1952100000000001, 0.59096800000000005}</string>
-						<string>{-1.3001100000000001, 0.29577199999999998}</string>
-						<string>{-1.2928500000000001, -0.32606000000000002}</string>
-						<string>{-1.18381, -0.61349200000000004}</string>
-						<string>{-1.05382, -0.81684999999999997}</string>
-						<string>{-0.92273899999999998, -0.96246100000000001}</string>
-						<string>{-0.83302200000000004, -1.04108}</string>
-					</array>
-					<key>Shape</key>
-					<string>RoundRect</string>
-					<key>Style</key>
-					<dict>
-						<key>shadow</key>
-						<dict>
-							<key>Beneath</key>
-							<string>YES</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Pad</key>
-						<integer>1</integer>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
-
-\f0\fs18 \cf0 \expnd0\expndtw0\kerning0
-CHECK INITIAL ENROLL ELIGIBILITY}</string>
-						<key>VerticalPad</key>
-						<integer>1</integer>
-					</dict>
-					<key>UserInfo</key>
-					<dict>
-						<key>autorun</key>
-						<string>yes</string>
-					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
@@ -14002,8 +13420,6 @@ CHECK INITIAL ENROLL ELIGIBILITY}</string>
 						<key>condition1</key>
 						<string>enroll_active_cert_count_ok</string>
 						<key>condition2</key>
-						<string>enroll_eligible_for_renewal</string>
-						<key>condition3</key>
 						<string>enroll_at_least_one_active_cert</string>
 					</dict>
 				</dict>
@@ -14807,22 +14223,22 @@ Enrollment Workflow}</string>
 					<key>Head</key>
 					<dict>
 						<key>ID</key>
-						<integer>2008</integer>
+						<integer>2018</integer>
 						<key>Info</key>
 						<integer>3</integer>
 					</dict>
 					<key>ID</key>
 					<integer>2009</integer>
 					<key>OrthogonalBarAutomatic</key>
-					<false/>
+					<true/>
 					<key>OrthogonalBarPoint</key>
 					<string>{0, 0}</string>
 					<key>OrthogonalBarPosition</key>
-					<real>0.0</real>
+					<real>41.107994079589844</real>
 					<key>Points</key>
 					<array>
 						<string>{185.38400421524074, 334.25643540840224}</string>
-						<string>{279.49999197787423, 163.44221230446081}</string>
+						<string>{279.49999197787423, 313.01934655264006}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -23572,11 +22988,13 @@ Enrollment Workflow}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>6</integer>
+		<integer>4</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
+		<key>FitInWindow</key>
+		<true/>
 		<key>Frame</key>
-		<string>{{731, 145}, {903, 1008}}</string>
+		<string>{{598, 153}, {903, 1008}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -23590,9 +23008,9 @@ Enrollment Workflow}</string>
 		<key>SidebarWidth</key>
 		<integer>175</integer>
 		<key>VisibleRegion</key>
-		<string>{{-77, -43}, {713, 869}}</string>
+		<string>{{-42, 0}, {642.43844432447736, 783.00001138565335}}</string>
 		<key>Zoom</key>
-		<real>1</real>
+		<real>1.1098339557647705</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>

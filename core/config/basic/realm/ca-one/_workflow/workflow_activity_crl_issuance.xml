@@ -24,7 +24,9 @@
   </action>
     
   <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL"
-      class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL">
+      class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL"
+      retry_count="10" 
+      retry_interval="+0000000030">
   </action>
   
   <action name="I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL"

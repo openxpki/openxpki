@@ -20,11 +20,11 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Server::Authentication::Anonymous;
 use OpenXPKI::Server::Authentication::External;
-#use OpenXPKI::Server::Authentication::LDAP;
 use OpenXPKI::Server::Authentication::Password;
 use OpenXPKI::Server::Authentication::ChallengeX509;
 use OpenXPKI::Server::Authentication::ClientSSO;
 use OpenXPKI::Server::Authentication::ClientX509;
+use OpenXPKI::Server::Authentication::Connector;
 
 ## constructor and destructor stuff
 
@@ -262,14 +262,17 @@ sub login_step {
     }
 
     if (defined $user && defined $role) {
-	CTX('log')->log(
+	   CTX('log')->log(
 	    MESSAGE  => "Login successful using authentication stack '$stack' (user: '$user', role: '$role')",
 	    PRIORITY => 'info',
 	    FACILITY => 'auth',
-	    );
-    }
+	   );
+    
+        return ($user, $role, $return_msg);
+    } 
 
-    return ($user, $role, $return_msg); 
+    return (undef, undef, $return_msg);
+    
 };
 
 1;

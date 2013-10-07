@@ -3,7 +3,7 @@
 
      File: core/config/graffle/workflow_enrollment.graffle
   Version: 2.3
-      Git: 2a12cc884ee3b861958c0e83b56f3f6a4c1e13f0
+      Git: f72347e68004b47f4a1e44745bdbfb9bc3160aa1 (modified)
 -->
 
 
@@ -34,7 +34,9 @@
     </action>
 
     <action name="enroll_issue_cert"
-            class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate">
+        class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate"
+        retry_count="10" 
+        retry_interval="+0000000030">
     </action>
 
     <action name="enroll_revoke_existing_certs"

@@ -16,7 +16,7 @@ use OpenXPKI::Serialization::Simple;
 
 use Log::Log4perl qw(:easy);
 
-my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap.conf';
+my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap/default.conf';
 
 my $config;
 if (! read_config $configfile, $config) {
@@ -50,8 +50,6 @@ sub RevokeCertificate {
     my $cert_identifier   = shift;
     my $reason = shift || 'unspecified';
 
-
-
     $log->debug("SOAP: Entered RevokeCertificate - ",
 		"certificate: $cert_identifier, ",
 		"reason: $reason");
@@ -82,18 +80,18 @@ sub RevokeCertificate {
 
     my $auth_dn;
     my $auth_cn;
-    if ($c->is_https) {
-	$log->debug("calling context is https");
+    if (defined $ENV{HTTPS} && lc($ENV{HTTPS}) eq 'on') {
 	
-	$auth_dn = $ENV{SSL_CLIENT_S_DN};
+	   $log->debug("calling context is https");	
+	   $auth_dn = $ENV{SSL_CLIENT_S_DN};
         $auth_cn = $ENV{SSL_CLIENT_S_DN_CN};
-	if (defined $auth_dn) {
-	    $log->info("SOAP Revoke authenticated client DN: $auth_dn");
-	} else {
-	    $log->info("SOAP Revoke unauthenticated");
-	}
+    	if (defined $auth_dn) {
+    	    $log->info("SOAP Revoke authenticated client DN: $auth_dn");
+    	} else {
+    	    $log->info("SOAP Revoke unauthenticated");
+    	}
     } else {
-	$log->debug("calling context is http");
+	   $log->debug("calling context is http");
     }
 
 #    foreach my $key (keys %ENV) {
@@ -107,14 +105,12 @@ sub RevokeCertificate {
 
     if (! defined $pki_realm) {
 	$log->error("SOAP CertificateRevoke: no pki_realm set for requested URI $canonical_uri");
-	return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	return 1;
+	return SOAP::Data->new(name => 'responseCode', value => 1);
     }
 
     if (! defined $workflow_type) {
 	$log->error("SOAP CertificateRevoke: no workflow_type set for requested URI $canonical_uri");
-	return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	return 1;
+	return SOAP::Data->new(name => 'responseCode', value => 1);
     }
 
     # This should be moved into the workflow!
@@ -142,26 +138,22 @@ sub RevokeCertificate {
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
 	$log->error("Could not establish OpenXPKI connection via socket file $socketfile: " . $exc->message);
-	return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	return 1;
+	return SOAP::Data->new(name => 'responseCode', value => 1);
     }
 
     if (! $client) {
 	$log->error("Could instantiate client object");
-	return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	return 1;
+	return SOAP::Data->new(name => 'responseCode', value => 1);
     }
 
     if (! $client->is_connected()) {
 	$log->error("Could not connect to server");
-	return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	return 1;
+	return SOAP::Data->new(name => 'responseCode', value => 1);
     }
 
     if (! $client->init_session()) {
 	$log->error("Could not initialize session");
-	return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	return 1;
+	return SOAP::Data->new(name => 'responseCode', value => 1);
     }
     
     my $session_id = $client->get_session_id();
@@ -194,15 +186,14 @@ sub RevokeCertificate {
 		next SERVICE_MESSAGE;
 	    } else {
 		$log->error("Authentication stack requested but not configured");
-		return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-		return 1;
+		return SOAP::Data->new(name => 'responseCode', value => 1);
 	    }
 	}
 	
 	if ($reply->{SERVICE_MSG} eq 'GET_PASSWD_LOGIN') {
 	    $log->error("Username/password login requested (only anonymous login supported)");
-	    return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	    return 1;
+	    return SOAP::Data->new(name => 'responseCode', value => 1);
+
 #	    $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
 #						       {
 #							   LOGIN => $params{authuser},
@@ -216,8 +207,7 @@ sub RevokeCertificate {
 	}
 	
 	$log->error("Unhandled service message: '$status'");
-	return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-	return 1;
+	return SOAP::Data->new(name => 'responseCode', value => 1);
     }
 
     
@@ -255,17 +245,14 @@ sub RevokeCertificate {
     if (exists $reply->{SERVICE_MSG}) {
 	if ($reply->{SERVICE_MSG} eq 'ERROR') {
 	    $log->error("Could not create workflow instance");
-	    #return SOAP::Data->name('responseCode')->value(1);
 	    return SOAP::Data->new(name => 'responseCode', value => 1);
-	    return 1;
 	}
 
 	if ($reply->{SERVICE_MSG} eq 'COMMAND') {
 	    my $state = $reply->{PARAMS}->{WORKFLOW}->{STATE};
 	    my $id    = $reply->{PARAMS}->{WORKFLOW}->{ID};
 	    $log->info("Queued revocation request creation workflow (Workflow id: $id, state: $state)");
-	    return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(0);
-	    return 0;
+	    return SOAP::Data->new(name => 'responseCode', value => 0);
 	}
     }
     
@@ -273,8 +260,7 @@ sub RevokeCertificate {
     $log->warn("Revocation request was not processed properly");
     my $res = Dumper $reply;
     $log->debug("reply dump: " . $res);
-    return SOAP::Data->name('return')->type('integer')->uri('http://' . $canonical_uri)->value(1);
-    return 1;
+    return SOAP::Data->new(name => 'responseCode', value => 1);
 }
 
 sub true {

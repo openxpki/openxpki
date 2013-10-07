@@ -22,4 +22,6 @@ examples:
 	cd examples; \
 	tar -zcf basic.tgz basic; \
 	tar -zcf profiles.tgz profiles; \
+	tar -zcf soap.tgz soap; \
+	tar -zcf scep.tgz scep; \
 	tar -zcf notification.tgz notification;  

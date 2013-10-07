@@ -116,21 +116,6 @@ sub BUILD {
                  },
             },
         },
-        'list_config_ids' => {
-            class  => 'Default',
-            params => {
-            },
-            memoize => 1,
-        },
-        'get_config_id' => {
-            class  => 'Workflow',
-            params => {
-                'ID' => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-            },
-        },         
         'get_default_token' => {
             class  => 'Token',
             params => {                
@@ -393,32 +378,6 @@ sub BUILD {
                 },
             },
         },
-        'get_url_for_ticket' => {
-            class  => 'Object',
-            params => {
-                'NOTIFIER' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                },
-                'TICKET' => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-            },
-        },
-        'get_ticket_info' => {
-            class  => 'Object',
-            params => {
-                'NOTIFIER' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                },
-                'TICKET' => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-            },
-        },
         'get_random' => {
             class  => 'Default',
             params => {
@@ -611,15 +570,7 @@ sub BUILD {
                     regex => $re_csr_format,
                 },
             },
-        },
-        'create_bulk_request_ticket' => {
-            class  => 'Default',
-            params => {
-                WORKFLOWS => {
-                    type   => ARRAYREF,
-                },
-            },
-        },
+        }, 
         'send_notification' => {
             class  => 'Default',
             params => {
@@ -641,11 +592,6 @@ sub BUILD {
                 'ROLE' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                },
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
                 },
             },
             memoize => 1,
@@ -681,12 +627,7 @@ sub BUILD {
                 PROFILE => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                },
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+                },               
                 PKCS10 => {
                     type     => SCALAR,
                     optional => 1,
@@ -697,12 +638,7 @@ sub BUILD {
         },
         'get_additional_information_fields' => {
             class  => 'Profile',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
             },
             memoize => 1,
         },
@@ -738,11 +674,32 @@ sub BUILD {
                 VARS => {
                     type     => HASHREF,
                 },
+                ADDITIONAL => {
+                    type     => HASHREF | UNDEF,
+                    optional => 1
+                },
             },                       
         },
         'list_supported_san' => {
             class  => 'Profile',
             params => {}
+        },
+        'render_metadata_from_template'=> {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,                    
+                    regex    => $re_alpha_string
+                },
+                STYLE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_alpha_string,
+                },
+                VARS => {
+                    type     => HASHREF,
+                },
+            },                       
         },
         
         ### Object API
@@ -1159,12 +1116,7 @@ sub BUILD {
         ### Smartcard API
         'sc_analyze_certificate' => {
             class  => 'Smartcard',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
                 'DATA' => {
                     type  => SCALAR,
                     regex => $re_cert_string,
@@ -1182,12 +1134,7 @@ sub BUILD {
 
         'sc_parse_certificates' => {
             class  => 'Smartcard',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
                 'CERTS' => {
                     type  => ARRAYREF,
                     #regex => qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;,
@@ -1202,12 +1149,7 @@ sub BUILD {
 
         'sc_analyze_smartcard' => {
             class  => 'Smartcard',
-            params => {
-                CONFIG_ID => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
+            params => {                
                 'CERTS' => {
                     type  => ARRAYREF,
             #regex => $re_cert_string,

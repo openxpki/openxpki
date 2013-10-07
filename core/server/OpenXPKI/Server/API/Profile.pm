@@ -140,7 +140,6 @@ sub get_cert_subject_styles {
     my $self      = shift;
     my $arg_ref   = shift;
     my $profile   = $arg_ref->{PROFILE};
-    my $cfg_id    = $arg_ref->{CONFIG_ID};
     my $pkcs10    = $arg_ref->{PKCS10};
     ##! 1: 'start'
 
@@ -382,8 +381,9 @@ sub render_san_from_template {
     ##! 1: 'Start '
     
     my $profile = $args->{PROFILE};
-    my $style = $args->{STYLE};
-    my $vars = $args->{VARS};
+    my $style   = $args->{STYLE};
+    my $vars    = $args->{VARS};
+    my $items   = $args->{ADDITIONAL} || {};
 
     my $config = CTX('config');    
             
@@ -431,25 +431,105 @@ sub render_san_from_template {
             ## split up internal multiples (sep by |)
             push @entries, (split (/\|/, $result)) if ($result);
         }
+     
+        # merge into the preset hash
+        if ($items->{$cctype}) {
+            push @{$items->{$cctype}}, @entries;
+        } else {
+            $items->{$cctype} = \@entries;
+        }        
+    }
+        
+    foreach my $type (keys %{$items}) {        
 
         ##! 32: 'Entries are ' . Dumper @entries       
- 
-        # Remove duplicates and split up internal multiples (sep by |)
-        my %items;
-        foreach my $key (@entries) {
-            next unless ($key);
-            $key =~ s/\s*(\S.*\S)\s*/$1/; 
-            $items{$key} = 1;
+        
+        # Remove duplicates
+        my %entry;
+        foreach my $key ( @{$items->{$type}} ) {                       
+            $key =~ s{ \A \s+ }{}xms;
+            $key =~ s{ \s+ \z }{}xms;
+            next if ($key eq ''); 
+            $entry{$key} = 1;
         } 
 
         # convert to the internal format used by our crypto engine 
-        foreach my $value (keys %items) {                        
-            push @san_list, [ $cctype, $value ] if ($value);
+        foreach my $value (keys %entry) {                        
+            push @san_list, [ $type, $value ] if ($value);
         }
     }
    
     ##! 16: 'san list ' . Dumper @san_list 
     return \@san_list;
+}
+
+sub render_metadata_from_template {
+    
+    my $self = shift;
+    my $args = shift;
+
+    ##! 1: 'Start '
+    
+    my $profile = $args->{PROFILE};
+    my $style = $args->{STYLE};
+    my $vars = $args->{VARS};
+
+    my $config = CTX('config');    
+            
+    if (!$style) {
+        my @styles = $config->get_keys("profile.$profile.style");
+        @styles = sort @styles;
+        $style = shift @styles;
+        ##! 8: 'Autodetecting style ' . $style  
+    }
+        
+    my $profile_path = "profile.$profile.style.$style.metadata";        
+    # Check for SAN Template    
+    my @meta_template_keys = $config->get_keys("$profile_path");    
+    my $metadata = {}; 
+    
+    if (! scalar @meta_template_keys) { return undef; }
+    
+    my $tt = Template->new();
+    
+    foreach my $type (@meta_template_keys) {
+        my @entries;
+        ##! 32: 'Meta Key ' . $type            
+        my @values = $config->get_scalar_as_list("$profile_path.$type");
+        ##! 32: "Found Meta templates: " . Dumper @values;
+        
+        # Each list item is a template to be parsed
+        foreach my $line_template (@values) {  
+            my $result; 
+            $tt->process(\$line_template, $vars, \$result);
+            ##! 32: "Result of $line_template: $result\n";
+            
+            ## split up internal multiples (sep by |)
+            push @entries, (split (/\|/, $result)) if ($result);
+        }
+
+        ##! 32: 'Entries are ' . Dumper @entries       
+ 
+        # Remove duplicates and split up internal multiples (sep by |)
+        my %items;
+        foreach my $key (@entries) {                       
+            $key =~ s{ \A \s+ }{}xms;
+            $key =~ s{ \s+ \z }{}xms;
+            next if ($key eq ''); 
+            $items{$key} = 1;
+        } 
+
+        my @items = keys %items;        
+        if (scalar @items == 1) {
+            $metadata->{$type} = $items[0];
+        } elsif (scalar @items > 1) {
+            $metadata->{$type} = \@items;
+        }                        
+        
+    }
+   
+    ##! 16: 'metadata' . Dumper $metadata 
+    return $metadata;
 }
 
 sub list_supported_san {    
@@ -549,6 +629,12 @@ Parameters:
     PROFILE: name of the profile
     STYLE:   name of the substyle, if omited the first one is chosen
     VARS:    the vars to pass to the template parser
+    ADDITIONAL: additional san as hash 
+    
+The additional sans are merged with the results of the template parser,
+duplicates are removed. Expected hash format (empty refs are ok):
+
+    { DNS => [ 'www.example.com', 'www.example.org' ] }    
 
 Configuration example:
 
@@ -565,5 +651,15 @@ Configuration example:
 return a hashref of all supported san attributes, the keys are all lowercase while
 the value is in correct CamelCaseing for OpenSSL.
 
+=head2 render_metadata_from_template
 
+Uses the same syntax as render_san_from_template but uses the templates found
+at style.<style>.metadata and returns a hashref.
+Templates resulting in a single item are stores as scalar, empty results are
+not stored, lists are inserted as array ref.
 
+Configuration example:
+
+  metadata:  
+      requestor: "[% requestor_gname %] [% requestor_name %]"
+    

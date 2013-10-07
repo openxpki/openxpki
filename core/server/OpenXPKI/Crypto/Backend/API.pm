@@ -172,7 +172,7 @@ sub START {
     {
         next if (grep /^$key$/, ("TMP", "NAME",
                                  "TOKEN_TYPE", 
-                                 "CERTIFICATE", "SECRET", 'CONFIG_ID'));
+                                 "CERTIFICATE", "SECRET"));
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",
             params  => {NAME => $key, VALUE => $arg_ref->{$key}});
@@ -281,7 +281,7 @@ sub get_object_function {
     if ($type eq "X509")
     {
         @functions = ("serial", "subject", "issuer", "notbefore", "notafter",
-                      "alias", "modulus", "pubkey", "fingerprint", "emailaddress",
+                      "alias", "modulus", "pubkey", "pubkey_hash", "fingerprint", "emailaddress",
                       "version", "pubkey_algorithm", "signature_algorithm", "exponent",
                       "keysize", "extensions", "openssl_subject"
                      );

@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 12 );
+$test->plan( tests => 14 );
  
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
@@ -74,17 +74,9 @@ my %wfparam = (
 	reason_code => 'unspecified',
     comment => 'Automated Test',
     invalidity_time => time(),
-    flag_crr_auto_approval => 'yes',     
+    flag_crr_auto_approval => 0,     
 );
     
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
- or die "Workflow Create failed: $@";
-
-$test->state_is('CHECK_FOR_REVOCATION');
-
-# Now try manual approval
-delete ($wfparam{flag_crr_auto_approval});
-
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Revoke Workflow')
  or die "Workflow Create failed: $@";
 
@@ -105,7 +97,24 @@ $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_APPROVE_CRR' );
 
 $test->state_is('APPROVAL');
  
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE' );
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_REJECT_CRR' );
+ 
+$test->state_is('FAILURE'); 
+ 
+# Test auto revoke
+$wfparam{flag_crr_auto_approval} = 1;     
+
+$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
+ or die "Workflow Create failed: $@";
+
+# Go to pending
+$test->state_is('CHECK_FOR_REVOCATION');
+
+# Do a second test - should go to check as already approved
+$wfparam{flag_crr_auto_approval} = 0;     
+
+$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
+ or die "Workflow Create failed: $@";
 
 $test->state_is('CHECK_FOR_REVOCATION');
 

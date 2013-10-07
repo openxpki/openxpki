@@ -208,4 +208,9 @@
 	  workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING"
 	  >
   </action>
+  
+  <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_METADATA"
+          class="OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata">      
+  </action>
+  
 </actions>

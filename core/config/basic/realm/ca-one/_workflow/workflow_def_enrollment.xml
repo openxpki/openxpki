@@ -3,7 +3,7 @@
 
      File: core/config/graffle/workflow_enrollment.graffle
   Version: 2.3
-      Git: 2a12cc884ee3b861958c0e83b56f3f6a4c1e13f0
+      Git: f72347e68004b47f4a1e44745bdbfb9bc3160aa1 (modified)
 -->
 
 
@@ -35,10 +35,10 @@
     <state name="CHECK_FOR_CHALLENGE_PASSWORD"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_FOR_CHALLENGE_PASSWORD</description>
-        <action name="enroll_null1" resulting_state="EVAL_ELIGIBILITY">
+        <action name="enroll_null1" resulting_state="EVAL_SIGNER_TRUST">
             <condition name="!enroll_have_challenge_password"/>
         </action>
-        <action name="enroll_eval_challenge" resulting_state="EVAL_ELIGIBILITY">
+        <action name="enroll_eval_challenge" resulting_state="EVAL_SIGNER_TRUST">
             <condition name="enroll_have_challenge_password"/>
         </action>
     </state>
@@ -95,7 +95,7 @@
         <action name="enroll_null1" resulting_state="CHECK_RENEWAL_ELIGIBILITY">
             <condition name="enroll_signed_renewal"/>
         </action>
-        <action name="enroll_null2" resulting_state="CHECK_INITIAL_ENROLL_ELIGIBILITY">
+        <action name="enroll_null2" resulting_state="ELIGIBLE_FOR_INITIAL_ENROLL">
             <condition name="!enroll_signed_renewal"/>
         </action>
     </state>
@@ -256,17 +256,6 @@
         </action>
     </state>
 
-    <state name="CHECK_INITIAL_ENROLL_ELIGIBILITY"
-            autorun="yes">
-        <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_INITIAL_ENROLL_ELIGIBILITY</description>
-        <action name="enroll_null1" resulting_state="FAILURE">
-            <condition name="!enroll_eligible_for_initial_enroll"/>
-        </action>
-        <action name="enroll_null2" resulting_state="ELIGIBLE_FOR_INITIAL_ENROLL">
-            <condition name="enroll_eligible_for_initial_enroll"/>
-        </action>
-    </state>
-
     <state name="ELIGIBLE_FOR_INITIAL_ENROLL"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_ELIGIBLE_FOR_INITIAL_ENROLL</description>
@@ -281,7 +270,7 @@
     <state name="EVAL_ELIGIBILITY"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_EVAL_ELIGIBILITY</description>
-        <action name="enroll_eval_eligibility" resulting_state="EVAL_SIGNER_TRUST">
+        <action name="enroll_eval_eligibility" resulting_state="CHECK_FOR_VALID_REQUEST">
         </action>
     </state>
 
@@ -306,7 +295,7 @@
     <state name="EVAL_SIGNER_TRUST"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_EVAL_SIGNER_TRUST</description>
-        <action name="enroll_eval_signer_trust" resulting_state="CHECK_FOR_VALID_REQUEST">
+        <action name="enroll_eval_signer_trust" resulting_state="EVAL_ELIGIBILITY">
         </action>
     </state>
 

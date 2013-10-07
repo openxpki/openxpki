@@ -138,23 +138,54 @@ sub get_workflow_ids_for_cert {
     my $self    = shift;
     my $arg_ref = shift;
     my $csr_serial = $arg_ref->{'CSR_SERIAL'};
+    my $cert_identifier = $arg_ref->{'IDENTIFIER'};
 
-    my $workflow_ids = CTX('api')->search_workflow_instances(
-        {
-            CONTEXT => [
-                {
-                    KEY   => 'csr_serial',
-                    VALUE => $csr_serial,
-                },
-            ],
-            TYPE => [
-                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE'
-            ]
-        }
+    # Fallback for legacy calls with csr instead of identifier
+    if (!$cert_identifier && $csr_serial) {
+        my $cert_identifier_result = CTX('dbi_backend')->select(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {             
+                CSR_SERIAL => $csr_serial, 
+            },
+        );
+        $cert_identifier = $cert_identifier_result->{IDENTIFIER}; 
+    }
+
+    my @result;
+    # CSR Workflow
+    my $workflow_id_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => { 
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_csr_workflow', 
+        },
     );
+    my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};         
+    # we fake the old return structure to satisfy the mason ui
+    # # FIXME - needs remodeling 
+    push @result, {
+        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
+        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
+    } if ($workflow_id);
+    
+                
+    # CRR Workflow
+    $workflow_id_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => { 
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_crr_workflow', 
+        },
+    );
+    $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
+       
+    push @result, {
+        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
+        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
+    } if ($workflow_id);
 
-    return $workflow_ids;
+    return \@result;
+    
 }
 
 sub get_head_version_id {
@@ -162,35 +193,6 @@ sub get_head_version_id {
     return CTX('config')->get_head_version();
 }
 
-sub get_current_config_id {
-    my $self = shift;
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CURRENT_CONFIG_ID',
-    );   
-}
-
-sub list_config_ids {
-    my $self = shift;
-    ##! 1: 'start'
-    my $config_entries = CTX('dbi_backend')->select(
-        TABLE   => 'CONFIG',
-        DYNAMIC => {
-            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
-        },
-    );
-    if (! defined $config_entries
-        || ref $config_entries ne 'ARRAY'
-        || scalar @{ $config_entries } == 0) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_LIST_CONFIG_IDS_NO_CONFIG_IDS_IN_DB',
-        );
-    }
-    ##! 64: 'config_entries: ' . Dumper $config_entries
-
-    my @config_ids = map { $_->{CONFIG_IDENTIFIER} } @{ $config_entries };
-    return \@config_ids;
-}
-   
 sub get_approval_message {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -523,33 +525,6 @@ sub convert_certificate {
         DATA    => $arg_ref->{DATA},
     });
     return $data;
-}
-
-sub create_bulk_request_ticket {
-    ##! 1: 'start'
-    my $self      = shift;
-    my $arg_ref   = shift;
-    my $workflows = $arg_ref->{WORKFLOWS};
-    my $ser       = OpenXPKI::Serialization::Simple->new();
-
-    my $dummy_workflow = Workflow->new();
-    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
-    $dummy_workflow->context->param('creator' => CTX('session')->get_user());
-
-    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
-    my $ticket = CTX('notification')->notify({
-        MESSAGE  => 'create_bulk_request',
-        WORKFLOW => $dummy_workflow,
-    });
-    $dummy_workflow->context->param('ticket' => $ser->serialize($ticket));
-    $dummy_workflow->context->param('workflows' => $ser->serialize($workflows));
-
-    CTX('notification')->notify({
-        MESSAGE  => 'create_bulk_request_workflows',
-        WORKFLOW => $dummy_workflow,
-    });
-
-    return $ticket;
 }
 
 sub send_notification {

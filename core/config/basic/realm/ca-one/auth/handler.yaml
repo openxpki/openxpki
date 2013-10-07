@@ -24,7 +24,6 @@ Signature:
     cacert:
     - list of extra cert identifiers
         
-
 Anonymous:
     type: Anonymous
     label: Anonymous
@@ -84,5 +83,12 @@ System:
     label: System
     role: System
 
+# Sample using a Password "bind" connector
+Password Connector:
+    type: Connector
+    label: User Password
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD   
+    role: User
+    source@: connector:auth.connector.localuser
 
 

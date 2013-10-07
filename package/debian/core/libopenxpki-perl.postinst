@@ -36,16 +36,26 @@ case "$1" in
 	   chown -R openxpki:root /etc/openxpki/ssl/
 	   chmod -R 750 /etc/openxpki/ssl/
 	   
-	   # log config
-	   test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
-	   
-	   # scep config
-       test -e /etc/openxpki/scep/default.conf || cp /usr/share/doc/libopenxpki-perl/examples/scep.conf /etc/openxpki/scep/default.conf 
-	   
-	   # soap config
-       test -e /etc/openxpki/soap.conf || cp /usr/share/doc/libopenxpki-perl/examples/soap.conf /etc/openxpki/soap.conf 
-	   
-	   # No config - load sample config       
+       # log config
+       test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
+   
+       # scep/soap config
+       test -e /etc/openxpki/scep/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/scep.tgz -C /etc/openxpki/scep/
+       test -e /etc/openxpki/soap/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/soap.tgz -C /etc/openxpki/soap/       
+
+       test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf 
+
+       # add apache user to openxpki group (to allow connecting the socket)
+       usermod -G openxpki www-data
+       
+        # UI logfiles
+        for f in scep.log soap.log; do 
+            touch /var/openxpki/$f
+            chown www-data:openxpki /var/openxpki/$f
+            chmod 640 /var/openxpki/$f
+        done;
+
+        # No config - load sample config       
 	   if [ ! -e /etc/openxpki/config.d/ ]; then
 	       mkdir -m 750 /etc/openxpki/config.d	             
 	       mkdir -m 750 /etc/openxpki/config.git	             

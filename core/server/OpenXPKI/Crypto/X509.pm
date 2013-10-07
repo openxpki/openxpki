@@ -89,7 +89,7 @@ sub __init
     $self->{PARSED}->{HEADER} = $self->{header}->get_parsed();
     foreach my $attr ( "serial", "subject", "issuer", "notbefore", "notafter",
                        "alias", "modulus", "pubkey", "fingerprint", "emailaddress",
-                       "version", "pubkey_algorithm", "signature_algorithm", "exponent",
+                       "version", "pubkey_hash", "pubkey_algorithm", "signature_algorithm", "exponent",
                        "keysize", "extensions", "openssl_subject" )
     {
         $self->{PARSED}->{BODY}->{uc($attr)} 

@@ -42,8 +42,6 @@ sub sc_parse_certificates {
     my $self = shift;
     my $arg_ref = shift;
 
-    my $cfg_id = $arg_ref->{CONFIG_ID};
-    
     if ($arg_ref->{CERTFORMAT} !~ m{ \A (?:DER|PEM|BASE64|IDENTIFIER) \z }xms) {
 	OpenXPKI::Exception->throw(
 	    message => 'I18N_OPENXPKI_SERVER_API_SMARTCARD_SC_PARSE_CERTIFICATES_INVALID_CERT_FORMAT',
@@ -65,7 +63,6 @@ sub sc_parse_certificates {
     foreach my $entry (@{$certs}) {
 	my $data = $self->sc_analyze_certificate(
 	    {
-		CONFIG_ID  => $cfg_id,
 		DATA       => $entry,
 		CERTFORMAT => $arg_ref->{CERTFORMAT},
 	    });
@@ -95,12 +92,9 @@ sub sc_analyze_smartcard {
     my $chipid  = $arg_ref->{SMARTCHIPID};    
     my $userid   = $arg_ref->{USERID};
     my $wf_types = $arg_ref->{WORKFLOW_TYPES};
-    my $cfg_id   = $arg_ref->{CONFIG_ID};
     
     my $ser = OpenXPKI::Serialization::Simple->new();
     
-    ##! 16: 'cfg_id: ' . $cfg_id
-
     ##! 16: 'sc_analyze_smartcard() wf_types = $wf_types (' . Dumper($wf_types) . ')'
 
     if (defined $wf_types && (ref $wf_types ne 'ARRAY')) {
@@ -632,7 +626,6 @@ sub sc_analyze_smartcard {
     my $certs_on_card = $self->sc_parse_certificates({ 
         CERTS => $arg_ref->{CERTS}, 
         CERTFORMAT => $arg_ref->{CERTFORMAT},         
-        CONFIG_ID => $cfg_id,
     });
 
     
@@ -759,7 +752,7 @@ sub sc_analyze_smartcard {
         my $cert = $user_certs->{by_identifier}->{$identifier};
         
         # Try to get the type based on the profile, NB: requires that a profile may not be used in two types        
-        $cert->{CERTIFICATE_TYPE} = $policy->get("xref.profile.$cert->{PROFILE}.type") if ($cert->{PROFILE}); 
+        $cert->{CERTIFICATE_TYPE} = $policy->get( [ 'xref','profile', $cert->{PROFILE}, 'type' ] ) if ($cert->{PROFILE}); 
 
         # Force the profile to be "UNKNOWN" if it is not in the current map
         if (!$cert->{CERTIFICATE_TYPE}) {
@@ -1044,10 +1037,10 @@ sub _get_policy {
         my $isFirst = 1;       
         foreach my $allowed_profile ( $policy->get_list("certs.type.$type.allowed_profiles") ) {
             ##! 16: "Profile: $allowed_profile"    
-            $policy->set(['xref.profile', $allowed_profile, 'type'], $type );        
+            $policy->set(['xref','profile', $allowed_profile, 'type'], $type );        
             if ($isFirst) {
                 # first profile is preferred
-                $policy->set(['xref.profile', $allowed_profile, 'preferred'], 1 );
+                $policy->set(['xref','profile', $allowed_profile, 'preferred'], 1 );
                 $isFirst = 0;            
             }                            
         }
@@ -1411,8 +1404,6 @@ sub sc_analyze_certificate {
     my $certformat = $arg_ref->{CERTFORMAT};
     my $dontparse  = $arg_ref->{DONTPARSE};       
     my $data       = $arg_ref->{DATA};
-    my $cfg_id  = $arg_ref->{CONFIG_ID};
-    ##! 16: 'cfg_id: ' . $cfg_id
 
     my $thisrealm   = CTX('session')->get_pki_realm();
 

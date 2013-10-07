@@ -154,9 +154,13 @@ sub walkQueryPoints {
     ##! 16: " Walk resolvers at $prefix with $call "
     
     my $result;    
-    foreach my $resolver (  $self->get_list( "$prefix.resolvers" ) ) {                
+    
+    my @path_prefix = $self->_build_path( $prefix );
+    my @prep_query = $self->_build_path( $query );
+    
+    foreach my $resolver (  $self->get_list( [ @path_prefix, 'resolvers' ] ) ) {                
         ##! 32: 'Ask Resolver ' . $prefix.'.'.$resolver.'.'.$query
-        $result = $self->$call( "$prefix.$resolver.$query", $params );
+        $result = $self->$call( [ @path_prefix, $resolver, @prep_query ] , $params );
         return { 'VALUE' => $result, 'SOURCE' => $resolver } if ($result);
     }    
     return;
@@ -189,19 +193,29 @@ sub get_inherit {
 	return $val if (defined $val);
     
 	# Path does not exist - look for "inherit" keyword
-	$path =~ /^(.*)\.([\w-]+)\.([\w-]+)$/;
-	my $prefix = $1;
-	my $section = $2;
-	my $key = $3; 
+	my ($pre, $section, $key);
+	my @prefix;
+	
+	if (ref $path eq "") {
+    	$path =~ /^(.*)\.([\w-]+)\.([\w-]+)$/;
+    	$key = $3;
+        $section = $2;
+    	@prefix = $self->_build_path( $1 );    	
+	} else {
+	    my @path = @{$path};
+        $key = pop @path;
+        $section = pop @path;
+        @prefix = @path;
+	}
 
     ##! 16: "split path $prefix - $section - inherit"
     
-	$section = $self->get("$prefix.$section.inherit");
+	$section = $self->get( [ @prefix , $section, 'inherit' ] );
 	while ($section) {	
 		##! 16: 'Section ' . $section
-		$val = $self->get("$prefix.$section.$key");		
-		return $val if (defined $val);          
-        $section = $self->get("$prefix.$section.inherit");
+		$val = $self->get( [ @prefix , $section, $key ]);		
+		return $val if (defined $val);                  
+        $section = $self->get( [ @prefix , $section, 'inherit' ] );
    }	
 		
 	##! 8: 'nothing found'

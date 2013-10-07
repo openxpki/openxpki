@@ -174,11 +174,11 @@ OpenXPKI/Server/Authentication.pm
 OpenXPKI/Server/Authentication/Anonymous.pm
 OpenXPKI/Server/Authentication/ClientSSO.pm
 OpenXPKI/Server/Authentication/External.pm
-#OpenXPKI/Server/Authentication/LDAP.pm
 OpenXPKI/Server/Authentication/Password.pm
 OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/Authentication/ClientX509.pm
 OpenXPKI/Server/Authentication/ChallengeX509.pm
+OpenXPKI/Server/Authentication/Connector.pm
 #OpenXPKI/Server/ACL.pm
 
 OpenXPKI/Server/Notification/RT.pm
@@ -260,6 +260,10 @@ OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GetCertificateIdentifier.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateKeyId.pm
+
+OpenXPKI/Server/Workflow/Activity/Tools/LoadCertificateMetadata.pm
+OpenXPKI/Server/Workflow/Activity/Tools/PersistCertificateMetadata.pm
+OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
@@ -353,9 +357,10 @@ OpenXPKI/Server/Workflow/Validator/CertSubjectParts.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
 OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
-OpenXPKI/Server/Workflow/Validator/UnusedID.pm
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
+
+OpenXPKI/Server/Workflow/Validator/CertificateMetadata.pm
 
 ## Packages for new NICE API
 OpenXPKI/Server/Workflow/NICE.pm

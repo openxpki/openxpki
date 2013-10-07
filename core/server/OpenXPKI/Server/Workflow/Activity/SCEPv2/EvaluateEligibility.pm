@@ -23,7 +23,7 @@ sub execute {
     # To make support a bit easier, we write the operation mode
     # verbosely to the context (its in there already!)
      
-    my $is_initial = ( !$context->param( 'signer_trusted' ) && $context->param('signer_sn_matches_csr' ) );
+    my $is_initial = (!( $context->param( 'signer_trusted' ) && $context->param('signer_sn_matches_csr' )));
     
     $context->param( 'request_mode' => ( $is_initial ? 'initial' : 'renewal' ) );
     
@@ -36,44 +36,68 @@ sub execute {
     $context->param('eligible_for_initial_enroll' => 0);
     $context->param('eligible_for_renewal' => 0);       
                   
-    my ($flag, $prefix, $value, $query, $res);
+    my ($flag, @prefix, $res);
 
     if ($is_initial) {
-        $prefix = [ 'scep', $server, 'eligible','initial' ];
+        @prefix = ( 'scep', $server, 'eligible','initial' );
         $flag = 'eligible_for_initial_enroll';
     } else {
-        $prefix = [ 'scep', $server, 'eligible','renewal' ];       
+        @prefix = ( 'scep', $server, 'eligible','renewal' );       
         $flag = 'eligible_for_renewal';
     }        
-    
-=cut
-    ## FIXME - syntax for path building needs to be defined and implemented    
-    $value = $config->get( [ $prefix, 'value' ] );    
-    $query = $context->param($value) if ($value);
-    
-    ##! 16: 'Lookup using ' . $value . ' which is ' . $query
-    if ($query) {
-        $res = $config->get( [ $prefix, 'source', $query ] ) ;
-        ##! 32: 'result is ' . $res 
-        $context->param($flag => $res );         
-    }
-=cut
-
-    $context->param('todo_kludge_eligibility_check'  => 'fix in Activity::SCEPv2::EvaluateEligibility');
-    
-    ## FIXME - always true for now
-    ## Also needs update to workflow (workflow should not fail on failed eligible check) 
-    my $res = 1;
-    $context->param( $flag => 1);
         
+    my @attrib = $config->get_scalar_as_list( [ @prefix, 'args' ] );
+
+    ##! 32: 'Attribs ' . Dumper @attrib    
+    # dynamic case - context is used in evaluation
+    if (defined $attrib[0]) {
+        
+        my $tt = Template->new();
+        my @path;
+        my $param =  { context => $context->param() };       
+        foreach my $item (@attrib) {
+            my $out;
+            $tt->process(\$item, $param , \$out);
+            push @path, $out if ($out); 
+        } 
+            
+        ##! 16: 'Lookup at path ' . Dumper @path
+        if (@path) {          
+            my $plain_result = $config->get( [ @prefix, 'value', @path ] ) ;
+            ##! 32: 'result is ' . $plain_result 
+            # Evaluate whatever comes back to a boolean 0/1 f
+            $res = $plain_result ? 1 : 0;        
+                    
+            CTX('log')->log(
+                MESSAGE => "SCEP eligibility check raw result " . $plain_result . ' using path ' . join('|', @path),
+                PRIORITY => 'debug',
+                FACILITY => 'workflow',
+            );        
+        }
+    } else {
+    # No attribs, static case  
+      my $plain_result = $config->get( [ @prefix, 'value' ] ) ;
+      ##! 32: 'static check - result is ' . Dumper $plain_result       
+      # check the ref and explicit return to make sure it was not a stupid config
+      $res = (ref $plain_result eq '' && $plain_result eq '1');
+      
+      CTX('log')->log(
+        MESSAGE => "SCEP eligibility check without path - result " . $plain_result,
+        PRIORITY => 'debug',
+        FACILITY => 'workflow',
+      );
+        
+    }
+       
+    $context->param($flag => $res );
+    
     CTX('log')->log(
-        MESSAGE => "SCEP Eligibility for " . 
+        MESSAGE => "SCEP eligibility for " . 
             ($is_initial ? 'initial enrollment ' : 'renewal ' ) .
             ($res ? 'granted' : 'failed'),
         PRIORITY => 'info',
         FACILITY => ['audit','system'],
     );       
-    
     
     return 1;
 }
@@ -96,12 +120,31 @@ server:
   scep-server-1:
     eligible:
       initial:
-        source@: connector: your.connector 
-        value: cert_subject
+        value@: connector:your.connector 
+        args: 
+        - "[% context.cert_subject %]" 
+        - "[% context.url_mac %]"
 
       renewal: ''
         
 For inital enrollment, the given connector is queried using the requested
-subject as parameter. Renewal is disabled as the path is empty.
-        
+subject and mac address (gathered by url parameter), e.g.:
+
+   your.connector.cn=foo,dc=bar.00:01:02:34:56:78
+
+Renewal is disabled as the path is empty.
+
+=head2 Configuration alternatives
+
+To globally enable a feature without taking the request into account, omit the
+args and set value to a literal 1:
+
+  scep-server-1:
+    eligible:
+      initial:
+        value: 1 
+
+      renewal:
+        value: 1
+
         

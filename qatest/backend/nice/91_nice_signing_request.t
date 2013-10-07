@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 13 );
+$test->plan( tests => 16 );
 
 $test->connect_ok(
     user => $cfg{user}{name},
@@ -129,7 +129,25 @@ $test->param_like( 'cert_subject', "/^CN=$sSubject:8080,.*/" , 'Certificate Subj
 
 $test->state_is('SUCCESS');
 
+$test->disconnect();
+
+$test->connect_ok(
+    user => $cfg{user}{name},
+    password => $cfg{user}{role},
+) or die "Error - connect failed: $@";
+
+my $cert_identifier = $test->param( 'cert_identifier' );
+# Try to fetch the key via API
+$test->runcmd('get_cert', { IDENTIFIER => $cert_identifier, FORMAT => 'PEM' });
+$test->ok ( $test->get_msg()->{PARAMS} =~ /^-----BEGIN CERTIFICATE-----/, 'Fetch certificate' );
+
+$test->runcmd('get_private_key_for_cert', { IDENTIFIER => $cert_identifier, FORMAT => 'PKCS12', 'PASSWORD' => 'm4#bDf7m3abd' });
+$test->ok ( $test->get_msg()->{PARAMS}->{PRIVATE_KEY} ne '', 'Fetch p12');
+
+$test->disconnect();
+
+
 open(CERT, ">$cfg{instance}{buffer}");
-print CERT $serializer->serialize({ cert_identifier => $test->param( 'cert_identifier' ) }); 
+print CERT $serializer->serialize({ cert_identifier => $cert_identifier  }); 
 close CERT; 
 

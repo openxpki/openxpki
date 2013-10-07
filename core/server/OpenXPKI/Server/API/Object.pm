@@ -71,24 +71,6 @@ sub get_csr_info_hash_from_data {
     return $obj->get_info_hash();
 }
 
-sub get_url_for_ticket {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    ##! 1: 'end'
-    return CTX('notification')->get_url_for_ticket($arg_ref);
-}
-
-sub get_ticket_info {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    ##! 1: 'end'
-    return CTX('notification')->get_ticket_info($arg_ref);
-}
-
 =head2 get_ca_cert
 
 returns the certificate of one CA. This is a wrapper around get_cert to make
@@ -593,50 +575,35 @@ is available.
 sub __get_private_key_from_db {
     my $self       = shift;
     my $arg_ref    = shift;
-    my $identifier = $arg_ref->{IDENTIFIER};
+    my $cert_identifier = $arg_ref->{IDENTIFIER};
 
     ##! 16: 'identifier: $identifier'
 
-    my $search_result = $self->search_cert( { IDENTIFIER => $identifier, } );
-    ##! 64: 'search result: ' . Dumper $search_result
+    my $workflow_id_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => { 
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_csr_workflow', 
+        },
+    );
 
-    my $csr_serial = $search_result->[0]->{CSR_SERIAL};
-    ##! 64: 'csr_serial: ' . $csr_serial
+    ##! 64: 'workflow_id_result: ' . Dumper $workflow_id_result              
+    if (!$workflow_id_result || scalar @{$workflow_id_result} == 0) {
+        return;
+    }       
+    
+    my $workflow_id = $workflow_id_result->[0]->{ATTRIBUTE_VALUE};
 
-    if ( defined $csr_serial ) {
+    if ( defined $workflow_id ) {
 
-        # search workflows with given CSR serial
-        my $workflows = CTX('api')->search_workflow_instances(
-            {
-                CONTEXT => [
-                    {
-                        KEY   => 'csr_serial',
-                        VALUE => $csr_serial,
-                    },
-                ],
-                TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-            }
-        );
-        ##! 64: 'workflows: ' . Dumper $workflows
+        my $wf_info = CTX('api')->get_workflow_info({
+            WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+            ID => $workflow_id,
+        });
+        ##! 64: 'wf_info: ' . Dumper $wf_info
 
-        my @workflow_ids =
-          map { $_->{'WORKFLOW.WORKFLOW_SERIAL'} } @{$workflows};
-        my $workflow_id = $workflow_ids[0];
-        ##! 16: 'workflow_id: ' . Dumper $workflow_id
-
-        if ( defined $workflow_id ) {
-            my $wf_info = CTX('api')->get_workflow_info(
-                {
-                    WORKFLOW =>
-                      'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-                    ID => $workflow_id,
-                }
-            );
-            ##! 64: 'wf_info: ' . Dumper $wf_info
-
-            my $private_key = $wf_info->{WORKFLOW}->{CONTEXT}->{'private_key'};
-            return $private_key;
-        }
+        my $private_key = $wf_info->{WORKFLOW}->{CONTEXT}->{'private_key'};
+        return $private_key;        
     }
     return;
 }

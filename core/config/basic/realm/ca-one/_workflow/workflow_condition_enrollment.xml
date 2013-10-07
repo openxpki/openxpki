@@ -3,7 +3,7 @@
 
      File: core/config/graffle/workflow_enrollment.graffle
   Version: 2.3
-      Git: 2a12cc884ee3b861958c0e83b56f3f6a4c1e13f0
+      Git: f72347e68004b47f4a1e44745bdbfb9bc3160aa1 (modified)
 -->
 
 
@@ -80,13 +80,14 @@
 
     <condition name="enroll_signer_cert_active"
             class="Workflow::Condition::LazyOR">
+        <param name="condition3" value="enroll_self_signed_initial_enroll" />
         <param name="condition1" value="enroll_allow_expired_signer" />
         <param name="condition2" value="enroll_signer_validity_ok" />
     </condition>
 
     <condition name="enroll_allow_expired_signer"
             class="Workflow::Condition::Evaluate">
-        <param name="test" value="$context-&gt;{p_allow_expired_signer}" />
+        <param name="test" value="$context-&gt;{p_allow_expired_signer};" />
     </condition>
 
     <condition name="enroll_policy_allows_anon_enroll"
@@ -122,7 +123,7 @@
 
     <condition name="enroll_signer_sn_matches_csr"
             class="Workflow::Condition::Evaluate">
-        <param name="test" value="not not $context-&gt;{signer_sn_matches_csr}" />
+        <param name="test" value="not not $context-&gt;{signer_sn_matches_csr};" />
     </condition>
 
     <condition name="enroll_approval_manager"
@@ -144,9 +145,8 @@
 
     <condition name="enroll_ca_policy_approval"
             class="Workflow::Condition::LazyAND">
-        <param name="condition3" value="enroll_at_least_one_active_cert" />
         <param name="condition1" value="enroll_active_cert_count_ok" />
-        <param name="condition2" value="enroll_eligible_for_renewal" />
+        <param name="condition2" value="enroll_at_least_one_active_cert" />
     </condition>
 
     <condition name="enroll_num_active_certs_less_than_max"
@@ -169,11 +169,6 @@
             class="OpenXPKI::Server::Workflow::Condition::WFArray">
         <param name="array_name" value="tmp_queue" />
         <param name="condition" value="is_empty" />
-    </condition>
-
-    <condition name="enroll_eligible_for_initial_enroll"
-            class="Workflow::Condition::Evaluate">
-        <param name="test" value="not not $context-&gt;{eligible_for_initial_enroll}" />
     </condition>
 
     <condition name="enroll_auto_revoke_existing_certs"
@@ -200,11 +195,6 @@
         <param name="condition2" value="enroll_in_renewal_window" />
     </condition>
 
-    <condition name="enroll_eligible_for_renewal"
-            class="Workflow::Condition::Evaluate">
-        <param name="test" value="not not $context-&gt;{eligible_for_renewal}" />
-    </condition>
-
     <condition name="enroll_at_least_one_active_cert"
             class="Workflow::Condition::Evaluate">
         <param name="test" value="$context-&gt;{num_active_certs} &gt; 0" />
@@ -215,9 +205,21 @@
         <param name="test" value="defined $context-&gt;{_challenge_password};" />
     </condition>
 
+    <condition name="enroll_self_signed_initial_enroll"
+            class="Workflow::Condition::LazyAND">
+        <param name="condition3" value="enroll_signer_is_self_signed" />
+        <param name="condition1" value="!enroll_signer_trusted" />
+        <param name="condition2" value="enroll_signer_sn_matches_csr" />
+    </condition>
+
     <condition name="enroll_signer_trusted"
             class="Workflow::Condition::Evaluate">
         <param name="test" value="$context-&gt;{signer_trusted};" />
+    </condition>
+
+    <condition name="enroll_signer_is_self_signed"
+            class="Workflow::Condition::Evaluate">
+        <param name="test" value="$context-&gt;{signer_is_self_signed};" />
     </condition>
 
 </conditions>

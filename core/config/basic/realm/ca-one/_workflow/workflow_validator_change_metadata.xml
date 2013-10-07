@@ -1,0 +1,6 @@
+
+<validators>
+  <validator name="changemeta_validate_metadata"
+      class="OpenXPKI::Server::Workflow::Validator::CertificateMetadata">      
+  </validator>  
+</validators>

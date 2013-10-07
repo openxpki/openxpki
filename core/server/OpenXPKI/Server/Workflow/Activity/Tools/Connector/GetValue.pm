@@ -22,62 +22,35 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     
-    my $connector_key;
-                  
-    # Use value in ds_key_param as key in Connector
-    my $keyparam = $self->param('ds_key_param');
-
-    $self->param( 'DBG_keyparam', $keyparam );
+    # Get prefix from vars - always asumed to be a string
+    my $connector_prefix = $self->param('ds_key_prefix');
     
-    if ($keyparam) {
-        $connector_key = $context->param( $keyparam );
+    # Usually we have only one key but in case we need more there is a syntax for it
+    my $keynames = $self->param('ds_keylist') || 'ds_key';
+    
+    ##! 16: 'Keynames are ' . $keynames    
+    my @keys = split /,/, $keynames;
+    
+    my @path;
+    foreach my $key (@keys) {
+        my $val = $self->param($key);
+        next unless (defined $val && $val ne '');
+        push @path, $val;
     }
-    
-    my $keytemplate = $self->param('ds_key_template');    
-    $self->param( 'DBG_keytemplate', $keytemplate );
-    # Template based key 
-    if ( not $connector_key && defined $keytemplate ) {
 
-        ##! 32: ' Use TT Template ' . $keytemplate
-                
-        # Get Issuer Info from selected ca 
-        my %template_vars = (
-            PKI_REALM => CTX('api')->get_pki_realm(),
-            CONTEXT => {}  
-        ); 
-        
-        # find all CONTEXT.* occurences in template and load them into template vars
-        # $template = ' [- CONTEXT.SUBJECT -].[- CONTEXT.token_id -] ';
-        my @keys = ($keytemplate =~ /\[% CONTEXT.([^\]]+) %\]/g);
-        
-        foreach my $key (@keys) {
-            ##! 32: ' Add key to template ' . $key
-            $template_vars{CONTEXT}->{$key} = $context->param( $key );
-        }   
-        
-        ##! 32: ' Template Vars ' . Dumper ( %template_vars )  
-        
-        #$keytemplate = '[% TAGS [- -] -%]' .  $keytemplate;
-        my $tt = Template->new();        
-        $tt->process(\$keytemplate, \%template_vars, \$connector_key);                    
-
-        if ( not defined $connector_key ) {
-            OpenXPKI::Exception->throw( message =>
-                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_TEMPLATE_FAILED'
-            )
-        }        
-    }
-    
-    if ( not $connector_key ) {
+    if ( not scalar @path ) {
         OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_MISSPARAM_KEY_PARAM'
-        )
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_PATH'
+        )               
     }
-    ##! 32: 'Action params ' . Dumper $self->param() 
+    
+    ##! 16: 'Path is ' . Dumper @path
+     
+    ##! 64: 'Action params ' . Dumper $self->param() 
     my $valparam = $self->param('ds_value_param');
     my $valmap = $self->param('ds_value_map');           
     ##! 32: 'Param ' . $valparam
-         ##! 32: 'Map ' . $valmap
+    ##! 32: 'Map ' . $valmap
     if ( not ( $valparam || $valmap ) ) {
         OpenXPKI::Exception->throw( message =>
             'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_MISSPARAM_VALUE_PARAM_OR_MAP'
@@ -86,6 +59,11 @@ sub execute {
         
     my $retval;
 
+    # Am I evil? - hack to have a string prefix but use key array 
+    my $wrapper = $connector_prefix ? 
+        CTX('config')->get_wrapper( $connector_prefix ) : 
+        CTX('config');
+        
 
     # Hash Mode 
     if ($valmap) {
@@ -94,7 +72,7 @@ sub execute {
             
         ##! : 16 'hash mode'
         ##! : 32 'attr map ' . Dumper %attrmap        
-        my $hash = CTX('config')->get_hash( $connector_key );
+        my $hash = $wrapper->get_hash( \@path );
         
         foreach my $key (keys %attrmap) {
         	##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
@@ -106,12 +84,12 @@ sub execute {
 	    if ($self->param('ds_wantarray')) {
 	    
 	        ##! : 16 'Array mode'
-	        my @retarray = CTX('config')->get_list( $connector_key );
+	        my @retarray = $wrapper->get_list( \@path );;
 	        my $ser = OpenXPKI::Serialization::Simple->new();
 	        $retval = $ser->serialize( \@retarray );
 	               
 	    } else {
-	        $retval = CTX('config')->get( $connector_key );
+	        $retval = $wrapper->get( \@path );
 	    }
 	    
 	    # undef - fall back to default if configured
@@ -165,6 +143,10 @@ A template toolkit pattern to create the the key for the connector lookup
 from. You can refer to every value in the context with C<CONTEXT.<param name>>
 and the name of the current realm with C<PKI_REALM>.
 This is effective only if ds_key_param or the named context value is not set.
+
+=item ds_key_prefix
+
+A prefix to prepend to the key
 
 =item ds_value_param
 

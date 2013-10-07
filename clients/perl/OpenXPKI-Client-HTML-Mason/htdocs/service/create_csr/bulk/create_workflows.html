@@ -95,12 +95,6 @@
             $results[$i]->{ID}      = $msg->{PARAMS}->{WORKFLOW}->{ID};
         }
     }
-    $msg = $context->{'client'}->send_receive_command_msg(
-        'create_bulk_request_ticket',
-        {
-            WORKFLOWS => \@results,
-        },
-    );
 </%init>
 <h1><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_RESULTS_TITLE') %></h1>
 <p><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_BULK_RESULTS_DESC') %></p>

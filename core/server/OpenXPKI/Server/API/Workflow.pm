@@ -135,23 +135,6 @@ sub get_cert_identifier_by_csr_wf {
     return $cert_identifier;
 }
 
-sub get_config_id {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    # determine workflow's config ID
-    CTX('dbi_workflow')->commit();
-    my $wf = CTX('dbi_workflow')->first(
-        TABLE   => 'WORKFLOW_CONTEXT',
-        DYNAMIC => {
-            'WORKFLOW_SERIAL'      => {VALUE => $arg_ref->{ID}},
-            'WORKFLOW_CONTEXT_KEY' => {VALUE => 'config_id'},
-        },
-    );
-    return $wf->{WORKFLOW_CONTEXT_VALUE};
-}
-
 sub list_workflow_instances {
     ##! 1: "start"
     my $self    = shift;
@@ -870,7 +853,6 @@ sub __get_workflow_factory {
 
     # Fetch the serialized session from the workflow table        
     ##! 16: 'determine factory for workflow ' . $arg_ref->{WORKFLOW_ID}
-    # determine workflow's config ID and set config_id accordingly
     my $wf = CTX('dbi_workflow')->first(
         TABLE   => 'WORKFLOW',
         KEY => $arg_ref->{WORKFLOW_ID}                            
@@ -1018,11 +1000,6 @@ object must be set before instantiating the API.
 =head2 new
 
 Default constructor created by Class::Std.
-
-=head2 get_config_id
-
-Looks up the configuration ID for a given workflow ID (passed with the
-named parameter 'ID') from the database.
 
 =head2 list_workflow_titles
 

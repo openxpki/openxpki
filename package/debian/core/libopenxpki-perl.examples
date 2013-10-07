@@ -1,7 +1,9 @@
 examples/log.conf
-examples/scep.conf
-examples/soap.conf
+examples/scep.tgz
+examples/soap.tgz
 examples/basic.tgz
 examples/profiles.tgz
 examples/notification.tgz
+examples/sampleconfig.sh
+examples/openxpki-scep.conf
 examples/README

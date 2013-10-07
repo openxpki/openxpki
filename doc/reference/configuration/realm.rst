@@ -132,6 +132,21 @@ Define the user database file inside auth.connector.yaml::
 
 The user file has the same structure as the *user* section above. You can share a user database file within realms.
 
+**authentication connectors**
+
+There is a family of authentication connectors. The main difference against 
+other connector is, that the password is passed as a parameter and is not 
+part of the path. Check for connectors starting with Connector::Builtin::Authentication.
+The connector only validates the password, therefore the role must be set in
+the configuration (same for all users handled by this item)::
+
+	Password Connector:
+	    type: Connector
+	    label: User Password
+	    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD   
+	    role: User
+	    source@: connector:auth.connector.localuser
+
 **external authentication**
 
 If you have a proxy or sso system in front of your OpenXPKI server that authenticates your users, the external handler can be used to set the user information::

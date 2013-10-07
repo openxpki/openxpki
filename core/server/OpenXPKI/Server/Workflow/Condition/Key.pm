@@ -23,8 +23,6 @@ sub evaluate
 
     my $realm   = CTX('session')->get_pki_realm();
 
-    my $cfg_id = CTX('api')->get_config_id({ ID => $wf->id() });
-
     ##! 16: 'realm: ' . $realm
     ##! 16: 'ca: ' . $ca
     my $certificate = CTX('pki_realm_by_cfg')->{$cfg_id}->{$realm}->{ca}->{id}->{$ca}->{certificate};

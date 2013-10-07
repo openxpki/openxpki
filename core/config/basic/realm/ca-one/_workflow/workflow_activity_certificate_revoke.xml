@@ -57,7 +57,7 @@
 
     <action name="certrevoke_initialize_context_params"
             class="OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue"
-            ds_key_template="realm.[% PKI_REALM %].cert_revoke.policy.auto_approve"
+            ds_key="cert_revoke.policy.auto_approve"
             ds_value_param="flag_crr_auto_approval">
     </action>
 

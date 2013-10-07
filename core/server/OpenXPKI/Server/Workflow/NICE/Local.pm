@@ -175,11 +175,13 @@ sub issueCertificate {
     }
 
     ##! 16: 'performing key online test'
-        # TODO: Pause Workflow and come back later - depends on workflow machine improvment 
-    if (! $ca_token->key_usable()) {
-	   OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_KEY_UNUSABLE',
-       );
+    if (! $ca_token->key_usable()) {        
+	    CTX('log')->log(
+                MESSAGE => "Token for $issuing_ca not usable",
+                PRIORITY => 'info',
+                FACILITY => [ 'monitor', 'audit', 'workflow' ],            
+        );        
+        $self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_CERTSIGN_TOKEN_NOT_USABLE');                        
     }
     
     ##! 32: 'issuing certificate'
@@ -382,6 +384,16 @@ sub issueCRL {
             TABLE => 'CRL',
     );
     $crl_profile->set_serial($serial);
+
+    ##! 16: 'performing key online test'
+    if (! $ca_token->key_usable()) {                
+        CTX('log')->log(
+            MESSAGE => "Token for $ca_identifier not usable",
+            PRIORITY => 'info',
+            FACILITY => [ 'monitor', 'audit', 'workflow' ],
+        );
+        $self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_CRL_TOKEN_NOT_USABLE');
+    }
 
     my $crl = $ca_token->command({
         COMMAND => 'issue_crl',

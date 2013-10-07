@@ -32,7 +32,6 @@ function ToggleAll() {
     </th>
 % }
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SERIAL') %></th>
-    <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_TICKETS') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_LAST_UPDATE') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_SUBJECT') %></th>
     <th><% i18nGettext('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_CSR_CERT_PROFILE') %></th>
@@ -54,11 +53,6 @@ function ToggleAll() {
                 [ 'id' , $res->{'SERIAL'} ],
             ],
         &>
-    </td>
-    <td>
-% foreach my $ticket (@{ $res->{'TICKETS'} }) {
-<small><a href="<% $ticket->{URL} %>"><% $ticket->{ID} %></a></small><br>
-% }
     </td>
     <td><% $res->{'LAST_UPDATE'} %></td>
     <td>
@@ -194,24 +188,6 @@ foreach my $instance (@instances) {
         'level' => 10,
         'msg' => Dumper \@subject_alt_names,
     );
-    # TODO - error handling
-    my @tickets;
-    if (exists $wf_context->{'ticket'}) {
-        my $tickets = $ser->deserialize($wf_context->{'ticket'});
-        foreach my $key (keys %{ $tickets }) {
-            my $ticket_entry;
-            $ticket_entry->{ID} = $tickets->{$key};
-            my $url_msg = $context->{client}->send_receive_command_msg(
-                'get_url_for_ticket',
-                {
-                    NOTIFIER => $key,
-                    TICKET   => $tickets->{$key},
-                },
-            );
-            $ticket_entry->{URL} = $url_msg->{PARAMS};
-            push @tickets, $ticket_entry;
-        }
-    }
     my $certs = $context->{client}->send_receive_command_msg(
         'search_cert_count', 
         {
@@ -229,7 +205,6 @@ foreach my $instance (@instances) {
         'PROFILE'           => $wf_context->{'cert_profile'},
         'ROLE'              => $wf_context->{'cert_role'},
         'CREATOR'           => $wf_context->{'creator'},
-        'TICKETS'           => \@tickets,
         'CERT_COUNT'        => $certs,
     };
 }
