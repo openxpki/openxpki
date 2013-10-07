@@ -1,14 +1,210 @@
 <!DOCTYPE html>
-<html>
-<head>    
-    <link rel="stylesheet" type="text/css" href="css/w2ui-1.2.css" />
-    <link rel="stylesheet" type="text/css" href="css/openxpki.css" />
-    <script src="js/jquery.js"></script>
-    <script type="text/javascript" src="js/w2ui-1.2.js"></script>
-    <script type="text/javascript" src="js/openxpki.js"></script>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+
+    <title>Open XPKI - Open Source Trustcenter</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this project -->
+    <link href="css/oxi.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/libs/html5shiv.js"></script>
+      <script src="js/libs/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+   <div id="application">
+   <!-- application content -->
+   </div>
+   <div id="footer">
+      <div class="container">
+        <p class="text-muted credit">&copy; Copyright 2013, The OpenXPKI Project. See <a href="http://www.openxpki.org/">Open XPKI project home</a>.</p>
+      </div>
+    </div>   
+<script type="text/x-handlebars">
+   <!-- headline -->
+   <div class="container">
+      <!-- headline -->
+      <div class="page-header" style="margin-top:0px;margin-bottom:0px;">
+        <h2><img src="img/logo.png" class=toplogo>  <small>Open Source Trustcenter</small></h2>
+      </div>
+    </div>
+    <!--/headline-->
+    <!-- navbar -->
+    <div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          
+          <a class="navbar-brand" href="#"></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            {{#each ressource in App.NavArrayController}}
+                  {{#view App.MainNavItemView classBinding="ressource.active"}}
+                    {{#unless ressource.has_entries}}
+                         {{#link-to ressource.goto}}{{ressource.title}}{{/link-to}}
+                     {{else}}
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ressource.title}}<b class="caret"></b></a>
+                          <ul class="dropdown-menu">
+                            {{#each item in ressource.entries}}
+                               {{#view App.SideNavItemView}}
+                                 {{#link-to item.goto}}{{item.title}}{{/link-to}}
+                              {{/view}}
+                            {{/each}}
+                          </ul>
+                     {{/unless}} 
+                  {{/view}}
+                {{/each}}
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            {{#if App.user_logged_in}}
+            <li><p class="navbar-text">Signed in as: <strong>{{ App.username }}</strong></p></li>
+            <li><a href="#logout">Log out</a></li>
+            {{/if}}
+          </ul>  
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+   <div class="container maincontent">
+      <div class="row">
+        <div class="col-md-2">
+          <div class="bs-sidebar hidden-print" role="complementary">
+            <ul class="nav bs-sidenav">
+              
+                {{#each App.CurrentSideNav}}
+                  {{#view App.SideNavItemView classBinding="active" gotoBinding="goto"}}
+                    {{#link-to goto}}{{title}}{{/link-to}}
+                  {{/view}}
+                {{/each}}
+                
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-10" role="main">
+         {{outlet}}
+         {{outlet main-content}}
+        
+        </div>
+      </div>
+   </div>
+     </script>
+    <script type="text/x-handlebars" data-template-name="main-content">
+      {{view App.MainView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="sections">
+      <h2>{{view.page_label}}</h2>
+      <p>{{view.page_desc}}</p>
+      <div class="container sections">
+      <div class="row">
+      <div class="col-md-12">
+      {{#each SectionView in view.SectionViewList}}
+      {{view SectionView}}
+      {{/each}}
+      </div>
+      </div>
+      </div>
+    </script>
+    <script type="text/x-handlebars" data-template-name="section">
+    <div class="container section">
+    <!-- section content-->
+    {{view view.ContentView}}
+    </div>
+    <!-- /section content-->
+    </script>
     
-</head>
-<body>
-    <div id="layout" style="width: 95%; height:650px;"></div>
-</body>
+    <script type="text/x-handlebars" data-template-name="text-view">
+      <!--Text-View-->
+      <h3>{{view.headline}}</h3>
+      {{#each paragraph in view.paragraphs}}
+      <p>{{paragraph.text}}</p>
+      {{/each}}
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="form-view">
+     {{#if view.form_title}}<h3>{{view.form_title}}</h3>{{/if}}
+     
+     <div {{bind-attr class=":alert view._hasError:alert-danger:hide"}}>{{view.getErrorsAsString}}</div>
+     
+     <form class="form-horizontal" role="form">
+     <div class="form-group">
+     {{#each FieldContainer in view.FieldContainerList}}
+     {{view FieldContainer}}
+     {{/each}}
+     
+    <div class="col-lg-offset-2 col-lg-10">
+      <button type="submit" class="btn btn-default">{{view.submit_label}}</button>
+    </div>
+    </div><!--/formgroup-->
+     </form>
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="form-textfield">
+      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
+        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
+        <div class="col-lg-6">
+          {{view view.FieldView}}
+          {{#if view._hasError}}
+          <span class="help-block">{{view.getErrorsAsString}}</span>
+          {{/if}}
+        </div>
+        </div>
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="form-checkbox">
+      <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
+      <div class="checkbox">
+        <label>
+          {{view view.FieldView}} {{view.label}}
+        </label>
+      </div>
+    </div>
+    </script>
+    <script type="text/x-handlebars" data-template-name="grid-view">
+      Grid-View
+    </script>
+    <script type="text/x-handlebars" data-template-name="notfound">
+      The page {{original_target}} doesn't exist.
+    </script>
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/libs/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/libs/handlebars-1.0.0.js"></script>
+    <script type="text/javascript" >
+      //Environment for ember:
+    ENV = {
+      LOG_VERSION:false
+    };
+    </script>
+   <script src="js/libs/ember-1.0.0.js"></script>
+   <script src="js/oxi/namespace.js"></script>
+   <script src="js/oxi/application.js"></script>
+   <script src="js/oxi/navigation.js"></script>
+   <script src="js/oxi/sections.js"></script>
+   <script src="js/oxi/form.js"></script>
+   <script src="js/oxi/grid.js"></script>
+   <script src="js/oxi/text.js"></script>
+   <script src="js/run.js"></script>
+  </body>
+  
 </html>

@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+﻿#!/usr/bin/perl
+use strict;
 
 use CGI;
 use CGI::Session;
@@ -7,49 +8,56 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 
 Log::Log4perl->easy_init($DEBUG);
-   
+
+my $session_id;
+my $user;
+
 
 sub handle {
 
 
     my $q = shift;    
     my $session = new CGI::Session(undef, $q, {Directory=>'/tmp'});
-    my $session_id = $session->id;            
+    $session_id = $session->id;            
     # the action param indicates what is requested, no action = Home/Login 
-    
-#    my $query = $q->param('record[subject]');
-    
-#$session->param("my_name", $name);
-    
+       
     logger()->debug('Session id ' . $session_id);
     
     my $res;
  
     my $action = $q->param('action') || '';
-    my $user = $session->param('user');
+    $user = $session->param('user');
+    
+    #actions which work without login
+    if($action eq 'get_structure'){
+         my $structure = ($user &&  $user->{login})?
+            get_side_structure_logged_in($user)
+            :get_side_structure_not_logged_in();
+            ;
+         
+         return {structure => $structure, session_id=>$session_id, user=>$user};
+    }
+    
+    
+    
     # Login page
     
     logger()->debug('User ' .  Dumper $user );
         
     if (!$user ||  !$user->{login}) {
-=cut        
-        return {  
-            'page' => {
-                'label' => 'OpenXPKI Login',
-                'desc' => 'Please select authentication handler'
-            },
-            'section' => [{ 'action' => 'login', 'fields' => [
-                { name => 'authstack', 'label' => 'Auth System', 'type' => 'select', 'options' => [
-                    { 'label' => 'Local', 'value' => 'local' },
-                    { 'label' => 'Remote', 'value' => 'remote' }
-                ]},                
-            ]}]
-        };
-=cut        
         
         if ($action eq 'login') {
-            $res = handle_login( $q );            
-            $session->param("user", { 'login' => 'admin' }) unless( $res->{error});           
+            $res = handle_login( $q );   
+            if($res->{user} && !$res->{error}){
+                $user =  $res->{user}; 
+                logger()->debug('User logged in' .  Dumper $user );    
+                $session->param("user", $user );
+                
+                $res->{goto} = ($q->param('original_target'))?
+                            $q->param('original_target')
+                            :'home';
+                
+            }     
         } else {
             $res = { 'page' => 'login' };
         }
@@ -66,72 +74,160 @@ sub handle {
         $res = {'page' => $q->param('page') };
     }
     
-    print $q->header( -cookie=> $q->cookie(CGISESSID =>  $session_id), -type => 'application/json' );
+    
     
     # error occured, just send error hash
     return $res unless($res->{page});
     my $page = $res->{page};
         
     if ($page eq 'login') {
-        return {  
-            'page' => {
+        return {     
+            page => {
                 'label' => 'OpenXPKI Login',
                 'desc' => 'Please log in ;)',
-                'type' => 'form'
             },
-            'main' => [{ 'action' => 'login', 'fields' => [
-                { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },
-                { 'name' => 'password', 'label' => 'Password', 'type' => 'password' },
-            ]}]
+            main => [
+                        #first section
+                        { action => 'login','type' => 'form', 
+                          content => { 
+                                         title=>'', 
+                                         submit_label => 'do login',
+                                         fields => [
+                                                 { name => 'username', label => 'Username', type => 'text' },
+                                                 { name => 'password', label => 'Password',type => 'password' },
+                                             ]
+                           }
+                        }
+                      ]
         };
     } elsif ($page eq 'home') { 
         return {  
-            'page' => {
-                'label' => 'Welcome to OpenXPKI',       
-                'type' => 'text'         
-            },            
-            'status' => $res->{status}
+            page => {
+                label => 'Welcome to OpenXPKI',             
+            }, 
+            main => [ 
+                        {type => 'text',content => {
+                                          headline => 'My little Headline',
+                                          paragraphs => [{text=>'Paragraph 1'},{text=>'Paragraph 2'}]
+                                       }
+                        }
+                     ],           
+            status => $res->{status}
         };
-    } elsif ($page eq 'certsearch') {
+    } elsif ($page eq 'search_certificates') {
         return {  
-            'page' => {
-                'label' => 'Certificate Search',
-                'desc' => 'You can search for certs here.',
-                'type' => 'form'
+            page => {
+                label => 'Certificate Search',
+                desc => 'You can search for certs here.',
+                
             },
-            'main' => [{ 'action' => 'certsearch', 'fields' => [
-                { 'name' => 'subject', 'label' => 'Subject', 'type' => 'text' },
-                { 'name' => 'issuer', 'label' => 'Issuer', 'type' => 'text' },
-            ]}]
+            main => [{ type => 'form',action => 'certsearch', 
+                        content => { 
+                                         title=>'', 
+                                         submit_label => 'search now',
+                                          fields => [
+                                           { name => 'subject', label => 'Subject', type => 'text' },
+                                           { name => 'issuer', label => 'Issuer', type => 'text' },
+                                       ]
+                        }
+                     }]
         };
     } elsif($page eq 'grid') {
         
         return {  
-            'page' => {
-                'label' => 'Your Searchresult',
-                'type' => 'grid'                
+            page => {
+                label => 'Your Searchresult',
+                                
             },
-            'main' => [{
-                result => $res->{result},        
+            main => [{
+                type => 'grid', result => $res->{result},        
             }]};               
+    }else{
+         return {  
+            page => {
+                label => 'Sorry!',
+                desc => 'The page '.$page.' is not implemented yet.'
+                                
+            }
+         }; 
+      
     }
         
         
+}
+
+sub get_side_structure_not_logged_in{
+   return [
+      {
+         key => 'login_form',
+         label =>  'Login',
+         entries =>  [
+             
+         ]   
+      }
+   ];
+}
+
+sub get_side_structure_logged_in{
+   my $user = shift;
+   return [
+      {
+         key=> 'home',
+         label=>  'Home',
+         entries=>  [
+             {key=> 'my_tasks', label =>  "My tasks"},
+             {key=> 'my_workflows',label =>  "My workflows"},  
+             {key=> 'my_certificates',label =>  "My certificates"} , 
+             {key=> 'key_status',label =>  "Key status"}  
+         ]   
+      },
+      
+      {
+         key=> 'request',
+         label=>  'Request',
+         entries=>  [
+             {key=> 'request_cert', label =>  "Request new certificate"},
+             {key=> 'request_renewal',label =>  "Request renewal"},  
+             {key=> 'request_revocation',label =>  "Request revocation"} , 
+             {key=> 'issue_clr',label =>  "Issue CLR"}  
+         ]   
+      },
+      
+      {
+         key=> 'info',
+         label=>  'Information',
+         entries=>  [
+             {key=> 'ca_cetrificates', label =>  "CA certificates"},
+             {key=> 'revocation_lists',label =>  "Revocation lists"},  
+             {key=> 'pollicy_docs',label =>  "Pollicy documents"}   
+         ]   
+      },
+      
+      {
+         key=> 'search',
+         label=>  'Search',
+         entries=>  [
+             {key=> 'search_certificates', label =>  "Certificates"},
+             {key=> 'search_workflows',label =>  "Workflows"} 
+         ]   
+      }
+   
+   ];  
 }
         
 sub handle_login {
     
     my $q = shift;
-    
-    if ($q->param('username') eq 'admin' && $q->param('password') eq 'openxpki') {
-        return { 'page' => 'home', 'status' => { 'level' => 'success', 'message' => 'Login successful' } };
+    my $dummy_user = {login=>'admin',password=>'oxi'};
+    if ($q->param('username') eq $dummy_user->{login} && $q->param('password') eq $dummy_user->{password}) {
+        return { user=>$dummy_user, reloadTree=> 1, status => { level => 'success', message => 'Login successful' } };
     }
 
-    return { 'error' => {
-        'username' => 'invalid',
-        'password' => 'invalid',
+    return { error => {
+        username => 'invalid',
+        password => 'invalid',
     },
-    'status' => { 'level' => 'error', 'message' => 'Login credentials are wrong!' } 
+    status => { level => 'error', message => 'Login credentials are wrong!' } 
     };
 
 }
@@ -145,7 +241,8 @@ sub handle_certsearch {
     
     return {'status' => { 'level' => 'error', 'message' => 'Invalid search params!' }} unless ($subject || $issuer);
     
-    return { 'page' => 'grid',
+    return { 
+         'page' => 'grid',
         'result' => {
             'count' => 2,
             'page'  => 1,
@@ -181,13 +278,32 @@ sub logger {
 }
 
 my $q = CGI->new;   
-my $log = 
+my $ret = handle($q);
+
+
+
+#print $q->header(-cookie=> $q->cookie(CGISESSID =>  $session_id));# -cookie=> $q->cookie(CGISESSID =>  $session_id), -type => 'application/json' ); 
+#print $q->header(-cookie=> $q->cookie(CGISESSID =>  $session_id), -type => 'application/json' );
+#print $q->header({cookie=> [$q->cookie(CGISESSID =>  $session_id)],type=>'text/html'});
+
+my %header = (
+        type => 'application/json',#'text/html',
+        status => '200 OK',
+        charset => 'utf-8',
+        cache_control => 'no-cache, no-store, must-revalidate',
+        
+       );
+
+my $cookie = $q->cookie(CGISESSID =>  $session_id);
+$header{cookie} = $cookie;
+print $q->header(\%header);
+#print $q->header(\%header);
 
 my $json = new JSON();    
-
-my $ret = handle($q);
-    
 if (ref $ret eq 'HASH') {   
+    if(!$ret->{status}){
+        $ret->{status} = { 'level' => 'success'  };
+    }
     print $json->encode($ret);
 } else {
     print $json->encode({ 'level' => 'error', 'message' => 'Application error!' });
@@ -255,3 +371,4 @@ Call with a valid session (do login - works using cookie magic) and the param
 page=certsearch, fill the form as requested, you get back a 'grid' page.
 
 
+ 
