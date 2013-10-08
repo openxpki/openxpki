@@ -7,16 +7,16 @@ package OpenXPKI::Client::UI;
 use Moose; 
 
 use OpenXPKI::Client;
+use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
  
 # ref to the cgi frontend session
-has '_session' => (
+has 'session' => (
     required => 1,
-    is => 'ro',
+    is => 'rw',
     isa => 'Object|Undef',                   
-    init_arg => 'session',
 );
 
 # the OXI::Client object
@@ -61,7 +61,10 @@ sub _init_client {
         });
 
     # create new session    
-    my $old_session =  $self->_session()->{backend_session_id} || undef;
+    my $session = $self->session();    
+    my $old_session =  $session->param('backend_session_id') || undef;
+    
+    $self->logger()->info('old backend session ' . $old_session);    
     $client->init_session({ SESSION_ID => $old_session });
     
     my $client_session = $client->get_session_id();    
@@ -73,7 +76,8 @@ sub _init_client {
         } else {
             $self->logger()->info('New backend session with id ' . $client_session);
         }
-        $self->_session()->{backend_session_id} = $client_session;        
+        $session->param('backend_session_id', $client_session);
+        $self->logger()->info( Dumper $session );        
     }
     return $client;
 }
@@ -82,30 +86,54 @@ sub _init_client {
 sub BUILD {
     my $self = shift;
 
-}    
+    if (!$self->session()->param('initialized')) {        
+        my $session = $self->session();
+        $session->param('initialized', 1);
+        $session->param('is_logged_in', 0);
+        $session->param('user', undef);
+    }
 
+}    
+ 
 sub handle_request {
     
     my $self = shift;
     my $args = shift;    
     my $cgi = $args->{cgi};
+
+    my $action = $cgi->param('action') || '';
+     
+    # Handle logout / session restart
+    # Do this before connecting the server to have the client in the
+    # new session and to recover from backend session failure
+    if ($action eq 'logout') {
+        # TODO - kill backend session, seems to be not implemented yet....
+        $self->session()->delete();
+        $self->session()->flush();
+        $self->session( new CGI::Session(undef, undef, {Directory=>'/tmp'}) );    
+    }
     
     my $reply = $self->_client()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
     $self->logger()->trace('Ping replied ' . Dumper $reply);
     $self->logger()->debug('current session status ' . Dumper $status);
-    
-    
+        
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         my $result = OpenXPKI::Client::UI::Login->new();                
         $self->logger()->debug("Got error from server");        
         return $result->set_status_from_error_reply( $reply );    
     }
-           
+    
+    # Call to bootstrap components
+    if ($action =~ /^bootstrap\.(.+)/) {                
+        my $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self });        
+        return $result->init_structure( )->render();
+    }
+          
     # Only handle requests if we have an open channel
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {      
         return $self->handle_page( $args );         
-    }
+    }    
     
     # try to log in 
     return $self->handle_login( { cgi => $cgi, reply => $reply } );           
@@ -116,6 +144,7 @@ sub handle_page {
 
     my $self = shift;
     my $args = shift;
+    my $method_args = shift || {};
     
     my $cgi = $args->{cgi};
     
@@ -130,8 +159,17 @@ sub handle_page {
          
     my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
     
-        
+    my ($class, $method) = split /\./, $page;
+    $class = "OpenXPKI::Client::UI::".ucfirst($class);
+    eval "use $class;1" or die "Error use'ing $class: $@";
+    $self->logger()->debug("Loading page handler class $class");   
+    $result = $class->new({ client => $self });
     
+    $method  = 'index' if (!$method );
+    $method  = "init_$method";
+    
+    $result->$method( $method_args );
+    return $result->render();
     
 }
 
@@ -142,17 +180,17 @@ sub handle_login {
     
     my $cgi = $args->{cgi};
     my $reply = $args->{reply};
-
-    $self->logger()->info('not logged in - doing auth');
-        
+       
     $reply = $self->_client()->send_receive_service_msg('PING') if (!$reply);
         
     my $status = $reply->{SERVICE_MSG};
     
     # Login works in three steps realm -> auth stack -> credentials
     
-    my $session = $self->_session();
+    my $session = $self->session();
     my $action = $cgi->param('action') || '';
+
+    $self->logger()->info('not logged in - doing auth - action is ' . $action);
     
     # Special handling for pki_realm and stack params
     if ($action eq 'login.realm' && $cgi->param('pki_realm')) {
@@ -167,8 +205,9 @@ sub handle_login {
     
     my $pki_realm = $session->{'pki_realm'} || '';
     my $auth_stack =  $session->{'auth_stack'};
+    #$auth_stack = 'External Dynamic';
     
-    my $result = OpenXPKI::Client::UI::Login->new();
+    my $result = OpenXPKI::Client::UI::Login->new({ client => $self });
           
     if ( $status eq 'GET_PKI_REALM' ) {
         if ($pki_realm) {            
@@ -190,6 +229,7 @@ sub handle_login {
             $status = $reply->{SERVICE_MSG};            
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
+            my $i=0;
             my @stack_list = map { $_ = {'value' => $stacks->{$_}->{NAME}, 'label' => $stacks->{$_}->{DESCRIPTION}} } keys %{$stacks} ;  
             $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
             return $result->init_auth_stack( \@stack_list )->render();
@@ -212,7 +252,6 @@ sub handle_login {
             ##FIXME - Input validation!
             $reply = $self->_client()->send_receive_service_msg( $status, 
                 { LOGIN => $cgi->param('username'), PASSWD => $cgi->param('password') } );
-
             $self->logger()->trace('Auth result ' . Dumper $reply);
         } else {
             $self->logger()->debug('No credentials, render form');
@@ -221,8 +260,14 @@ sub handle_login {
     }
     
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {        
-        $self->logger()->info('Authentication successul');
-        return $self->handle_page( { 'page' => 'home', 'action' => '', cgi => $cgi }  );
+        $self->logger()->info('Authentication successul - fetch session info');            
+        # Fetch the user info from the server
+        $reply = $self->_client()->send_receive_command_msg( 'get_session_info' );
+        if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) { 
+            $self->session()->param('user', $reply->{PARAMS});
+            $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});         
+            return $self->handle_page( { 'page' => 'home', 'action' => '', cgi => $cgi }, { initial => 1 } );
+        }
     }
             
     if ( $reply->{SERVICE_MSG} eq 'ERROR') {

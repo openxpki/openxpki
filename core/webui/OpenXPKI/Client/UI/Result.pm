@@ -6,7 +6,12 @@ package OpenXPKI::Client::UI::Result;
 
 use Moose; 
 
-# ref to the cgi frontend session
+has _client => (       
+    is => 'ro',
+    isa => 'Object',
+    init_arg => 'client'
+);
+
 has _error => (       
     is => 'rw',
     isa => 'HashRef|Undef',
@@ -29,6 +34,13 @@ has _result => (
     isa => 'HashRef|Undef',
     default => sub { return {}; }
 );
+
+has reload => (
+    is => 'rw',       
+    isa => 'Bool',
+    default => 0,
+);
+
 
 sub set_status {
     
@@ -67,6 +79,7 @@ sub render {
     $result->{error} = $self->_error() if $self->_error();
     $result->{status} = $self->_status() if $self->_status();    
     $result->{page} = $self->_page() if $self->_page();
+    $result->{reloadTree} = 1 if $self->reload();
     
     return $result;
 }

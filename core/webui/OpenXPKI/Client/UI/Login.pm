@@ -22,10 +22,11 @@ sub init_realm_select {
     my $self = shift;
     my $realms = shift;
         
-    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.realm', 'fields' => [
-        { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => $realms },
-    ]}];
-    
+    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.realm',  content => {
+        fields => [
+            { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => $realms },
+        ]}
+    }];    
     return $self;
 }
 
@@ -34,9 +35,14 @@ sub init_auth_stack {
     my $self = shift;
     my $stacks = shift;
           
-    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.stack', 'fields' => [
-        { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => $stacks },
-    ]}];
+    $self->_result()->{main} = [
+        { 'type' => 'form', 'action' => 'login.stack', content => {
+            title => '', submit_label => 'do login',
+            fields => [
+                { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => $stacks },
+            ]
+        }
+    }];
     
     return $self;
 }
@@ -45,10 +51,12 @@ sub init_login_passwd {
     
     my $self = shift;
           
-    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.password', 'fields' => [
-        { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },
-        { 'name' => 'password', 'label' => 'Password', 'type' => 'password' },
-    ]}];
+    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.password', content => {
+        fields => [
+            { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },
+            { 'name' => 'password', 'label' => 'Password', 'type' => 'password' },
+        ]}
+    }];
     
     return $self;
     
