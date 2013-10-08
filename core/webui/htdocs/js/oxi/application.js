@@ -13,7 +13,7 @@ OXI.Application = Ember.Application.extend(
    user:null,
    username:function(){
       if(this.user){
-         return this.user.login;
+         return this.user.name;
       }else{
          return '';
       }
@@ -100,14 +100,14 @@ OXI.Application = Ember.Application.extend(
       this.set('sideTreeStructure',{});
       //this.sideTreeStructure = testStructure;
       var App = this;
-      return this.callServer({action:'get_structure'})
+      return this.callServer({action:'bootstrap.structure'})
       .done(function(json){
          js_debug('sidestructure retrieved');
          //js_debug( json,2);
          if(json.structure){
             App.set('sideTreeStructure', json.structure);
          }else{
-            App.applicationError('call to get_structure failed!',json);
+            App.applicationError('call to bootstrap.structure failed!',json);
          }
          if(json.user){
               App.login(json.user);
