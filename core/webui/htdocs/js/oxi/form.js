@@ -260,6 +260,9 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
       //Ember.debug('OXI.PulldownContainer :init '+this.fieldDef.label);
       this._super();
       this.setFieldView(OXI.Select.create(this.fieldDef));
+   },
+   getValue:function(){
+	    return this.FieldView.selection.value;
    }
 });
 
