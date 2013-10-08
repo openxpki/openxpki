@@ -228,6 +228,10 @@ sub BUILD {
             class  => 'Default',
             params => { },
         },
+        'get_session_info' => {
+            class  => 'Default',
+            params => { },
+        },        
         'get_alg_names' => {
             class  => 'Default',
             params => { },
