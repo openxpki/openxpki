@@ -287,7 +287,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
         this.setFieldView(OXI.Select.create(this.fieldDef));
     },
     getValue:function(){
-        return this.FieldView.selection.key;
+        return this.FieldView.selection.value;
     }
 });
 
