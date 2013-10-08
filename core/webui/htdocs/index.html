@@ -7,7 +7,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="assets/ico/favicon.png">
 
-    <title>Open XPKI - Open Source Trustcenter</title>
+    <title>OpenXPKI - Open Source Trustcenter</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
@@ -28,7 +28,7 @@
    </div>
    <div id="footer">
       <div class="container">
-        <p class="text-muted credit">&copy; Copyright 2013, The OpenXPKI Project. See <a href="http://www.openxpki.org/">Open XPKI project home</a>.</p>
+        <p class="text-muted credit">&copy; Copyright 2013, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a>.</p>
       </div>
     </div>   
 <script type="text/x-handlebars">
@@ -56,20 +56,26 @@
           <ul class="nav navbar-nav">
             {{#each ressource in App.NavArrayController}}
                   {{#view App.MainNavItemView classBinding="ressource.active"}}
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ressource.title}}<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      {{#each item in ressource.entries}}
-                         {{#view App.SideNavItemView}}
-                           {{#link-to item.goto}}{{item.title}}{{/link-to}}
-                        {{/view}}
-                      {{/each}}
-                    </ul>
+                    {{#unless ressource.has_entries}}
+                         {{#link-to ressource.goto}}{{ressource.title}}{{/link-to}}
+                     {{else}}
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ressource.title}}<b class="caret"></b></a>
+                          <ul class="dropdown-menu">
+                            {{#each item in ressource.entries}}
+                               {{#view App.SideNavItemView}}
+                                 {{#link-to item.goto}}{{item.title}}{{/link-to}}
+                              {{/view}}
+                            {{/each}}
+                          </ul>
+                     {{/unless}} 
                   {{/view}}
                 {{/each}}
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><p class="navbar-text">Signed in as: Dieter Siebeck</p></li>
+            {{#if App.user_logged_in}}
+            <li><p class="navbar-text">Signed in as: <strong>{{ App.username }}</strong></p></li>
             <li><a href="#logout">Log out</a></li>
+            {{/if}}
           </ul>  
         </div><!--/.nav-collapse -->
       </div>
@@ -93,14 +99,107 @@
         </div>
         <div class="col-md-10" role="main">
          {{outlet}}
+         {{outlet main-content}}
+        
         </div>
       </div>
    </div>
      </script>
-    <script type="text/x-handlebars" data-template-name="simple-content">
-    hello
-      <div>Current action is: {{current_action}}</div>
+    <script type="text/x-handlebars" data-template-name="main-content">
+      {{view App.MainView}}
     </script>
+    <script type="text/x-handlebars" data-template-name="sections">
+      <h2>{{view.page_label}}</h2>
+      <p>{{view.page_desc}}</p>
+      {{view view.MessageView}}
+      <div class="container sections">
+      <div class="row">
+      <div class="col-md-12">
+      {{#each SectionView in view.SectionViewList}}
+      {{view SectionView}}
+      {{/each}}
+      </div>
+      </div>
+      </div>
+    </script>
+    <script type="text/x-handlebars" data-template-name="section">
+    <div class="container section">
+    <!-- section content-->
+    {{view view.ContentView}}
+    </div>
+    <!-- /section content-->
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="text-view">
+      <!--Text-View-->
+      <h3>{{view.headline}}</h3>
+      {{#each paragraph in view.paragraphs}}
+      <p>{{paragraph.text}}</p>
+      {{/each}}
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="form-view">
+     {{#if view.form_title}}<h3>{{view.form_title}}</h3>{{/if}}
+     {{#if view.form_text}}<div style="margin-bottom:6px;">{{view.form_text}}</div>{{/if}}
+     <div {{bind-attr class=":alert view._hasError:alert-danger:hide"}}>{{view.getErrorsAsString}}</div>
+     
+     <form class="form-horizontal" role="form">
+     <div class="form-group">
+     {{#each FieldContainer in view.FieldContainerList}}
+     {{view FieldContainer}}
+     {{/each}}
+     
+    <div class="col-lg-offset-2 col-lg-10">
+      {{#each Button in view.ButtonList}}
+     {{view Button}}
+     {{/each}}
+      
+      
+      <button type="submit" class="btn btn-default">{{view.submit_label}}</button>
+    </div>
+    </div><!--/formgroup-->
+     </form>
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="form-textfield">
+      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
+        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
+        <div class="col-lg-6">
+          {{view view.FieldView}}
+          {{#if view._hasError}}
+          <span class="help-block">{{view.getErrorsAsString}}</span>
+          {{/if}}
+        </div>
+        </div>
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="form-checkbox">
+      <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
+      <div class="checkbox">
+        <label>
+          {{view view.FieldView}} {{view.label}}
+        </label>
+      </div>
+    </div>
+    </script>
+    
+     <script type="text/x-handlebars" data-template-name="form-button">
+      <button type="button" class="btn btn-default">{{view.label}}</button>
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="grid-view">
+      Grid-View
+    </script>
+    <script type="text/x-handlebars" data-template-name="notfound">
+      The page {{original_target}} doesn't exist.
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="page-message">
+      <div {{bind-attr class=":alert view.msg_class"}}>{{view.message}}</div>
+    </script>
+    
+   
+    
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -115,7 +214,14 @@
     };
     </script>
    <script src="js/libs/ember-1.0.0.js"></script>
-   <script src="js/app.js"></script>
+   <script src="js/oxi/namespace.js"></script>
+   <script src="js/oxi/application.js"></script>
+   <script src="js/oxi/navigation.js"></script>
+   <script src="js/oxi/sections.js"></script>
+   <script src="js/oxi/form.js"></script>
+   <script src="js/oxi/grid.js"></script>
+   <script src="js/oxi/text.js"></script>
+   <script src="js/run.js"></script>
   </body>
   
 </html>
