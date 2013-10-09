@@ -19,12 +19,12 @@ OXI.FormView = OXI.View.extend({
 
     FieldContainerList:[],
     ButtonList:[],//additional (submit-)buttons
-    
+
     submit: function (event){
-        
+
         return false;
     },
-    
+
     submitAction: function(action, do_submit) {
         // will be invoked whenever the user triggers
         // the browser's `submit` method
@@ -41,7 +41,7 @@ OXI.FormView = OXI.View.extend({
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
                 //this.debug(FieldView.fieldname +': '+FieldView.getValue());
-    
+
                 if(!FieldView.isValid()){
                     submit_ok = false;
                     this.debug(FieldView.fieldname +' not valid: '+FieldView.getErrorsAsString);
@@ -102,7 +102,7 @@ OXI.FormView = OXI.View.extend({
             this.debug('submit nok');
         }
 
-        
+
     },
 
 
@@ -111,14 +111,14 @@ OXI.FormView = OXI.View.extend({
         this._super();
         this.FieldContainerList = [];
         this.ButtonList = [];
-        
+
         this.fieldContainerMap = {};
         this.fields = [];
         this.default_action = null;
         this.form_title=null;
         this.form_text=null;
-        
-        
+
+
         if(!this.content || !this.content.fields){
             App.applicationError('Form, init failed: no content definition!');
             return;
@@ -130,11 +130,11 @@ OXI.FormView = OXI.View.extend({
         if (this.content.title){
             this.form_text = this.content.text;
         }
-        
+
         this._initFields();
         this._initButtons();
     },
-    
+
     _initButtons:function(){
         if(!this.content.buttons){
             //default/fallback: no list with buttons is given: lets create ONE Submit-Button with Submit-Labekl and Action
@@ -143,9 +143,9 @@ OXI.FormView = OXI.View.extend({
                 App.applicationError('Form created without action!');
                 return;
             }
-            //the one-and-only button is obviously the default action: 
+            //the one-and-only button is obviously the default action:
             this.default_action = this.action;
-            this.ButtonList.push(this.createChildView(OXI.FormButton.create({Form:this,label:label,action:this.action,do_submit:true,is_default:true}))); 
+            this.ButtonList.push(this.createChildView(OXI.FormButton.create({Form:this,label:label,action:this.action,do_submit:true,is_default:true})));
         }else{
             var i;
             //determine default action:
@@ -153,19 +153,19 @@ OXI.FormView = OXI.View.extend({
                 var def = this.content.buttons[i];
                 if(def.do_submit && (!this.default_action ||def.default)){
                     //first submit-button (or the one specially marked as "default") found: mark it as default
-                    this.default_action = def.action;    
+                    this.default_action = def.action;
                 }
             }
-            
+
             for(i=0;i<this.content.buttons.length;i++){
                 var def = this.content.buttons[i];
                 def.Form = this;
                 def.is_default=(def.action == this.default_action);
-                this.ButtonList.push(this.createChildView(OXI.FormButton.create(def))); 
+                this.ButtonList.push(this.createChildView(OXI.FormButton.create(def)));
             }
         }
     },
-    
+
     _initFields:function(){
         this.fields = this.content.fields;
         var i;
@@ -211,7 +211,7 @@ OXI.FormView = OXI.View.extend({
 });
 
 OXI.FormButton = OXI.View.extend({
-    
+
     jsClassName:'OXI.FormButton',
     templateName: "form-button",
     tagName: 'button',
@@ -222,43 +222,43 @@ OXI.FormButton = OXI.View.extend({
         if(this.is_default){
             return 'submit';
         }else{
-            return 'button';   
+            return 'button';
         }
-        }.property(),
+    }.property(),
     btn_type:function(){
         if(this.is_default){
             return 'btn-primary';
         }else if(this.do_submit){
-            return 'btn-info';   
+            return 'btn-info';
         }else{
-            return 'btn-default';   
+            return 'btn-default';
         }
-        }.property(),
-    
+    }.property(),
+
     action:null,//set via constructor (from json)
     do_submit:false,//set via constructor (from json)
     is_default:false,//set via constructor
     label:null,//set via constructor (from json)
     Form:null,
-    
+
     click: function(evt) {
         js_debug("Button with action "+this.action+" was clicked");
         this.Form.submitAction(this.action,this.do_submit);
     },
-    
+
     init:function(){
         this._super();
         if(!this.Form){
             App.applicationError('FormButton withot Form!');
-            return;   
+            return;
         }
         if(!this.label){
             App.applicationError('FormButton withot label!');
-            return;   
+            return;
         }
         if(!this.action){
             App.applicationError('FormButton withot action!');
-            return;   
+            return;
         }
     }
 
@@ -295,7 +295,7 @@ OXI.FormFieldContainer = OXI.View.extend({
         this.label = this.fieldDef.label;
         this.fieldname = this.fieldDef.name;
         if(this.fieldDef.is_optional){//required is default!
-            this.isRequired = false;        
+            this.isRequired = false;
         }
     },
     setFieldView:function(View){
@@ -331,6 +331,17 @@ OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
     }
 });
 
+OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
+    templateName: "form-textarea",
+    jsClassName:'OXI.TextAreaContainer',
+    init:function(){
+        //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
+        this._super();
+        this.setFieldView(OXI.TextArea.create(this.fieldDef));
+    }
+
+});
+
 OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     templateName: "form-textfield",
     jsClassName:'OXI.PulldownContainer',
@@ -341,7 +352,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
         this.setFieldView(OXI.Select.create(this.fieldDef));
     },
     getValue:function(){
-        return this.FieldView.selection.key;
+        return this.FieldView.selection.value;
     }
 });
 
@@ -353,7 +364,7 @@ OXI.Checkbox = Ember.Checkbox.extend(
 OXI.Select = Ember.Select.extend(
 {
     optionLabelPath: 'content.label',
-    optionValuePath: 'content.key',
+    optionValuePath: 'content.value',
     classNames: ['form-control'] ,
     init:function(){
         //Ember.debug('OXI.Select :init ');
@@ -364,7 +375,9 @@ OXI.Select = Ember.Select.extend(
 });
 
 OXI.TextArea = Ember.TextArea.extend(
-{}
+{
+    classNames: ['form-control']
+}
 );
 
 OXI.TextField = Ember.TextField.extend(

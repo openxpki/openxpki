@@ -176,13 +176,27 @@
         </div>
     </script>
     
+    <script type="text/x-handlebars" data-template-name="form-textarea">
+      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
+        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
+        <div class="col-lg-6">
+          {{view view.FieldView}}
+          {{#if view._hasError}}
+          <span class="help-block">{{view.getErrorsAsString}}</span>
+          {{/if}}
+        </div>
+        </div>
+    </script>
+    
     <script type="text/x-handlebars" data-template-name="form-checkbox">
+      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
       <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
       <div class="checkbox">
         <label>
           {{view view.FieldView}} {{view.label}}
         </label>
       </div>
+    </div>
     </div>
     </script>
     
