@@ -111,6 +111,7 @@
     <script type="text/x-handlebars" data-template-name="sections">
       <h2>{{view.page_label}}</h2>
       <p>{{view.page_desc}}</p>
+      {{view view.MessageView}}
       <div class="container sections">
       <div class="row">
       <div class="col-md-12">
@@ -139,7 +140,7 @@
     
     <script type="text/x-handlebars" data-template-name="form-view">
      {{#if view.form_title}}<h3>{{view.form_title}}</h3>{{/if}}
-     
+     {{#if view.form_text}}<div style="margin-bottom:6px;">{{view.form_text}}</div>{{/if}}
      <div {{bind-attr class=":alert view._hasError:alert-danger:hide"}}>{{view.getErrorsAsString}}</div>
      
      <form class="form-horizontal" role="form">
@@ -149,6 +150,11 @@
      {{/each}}
      
     <div class="col-lg-offset-2 col-lg-10">
+      {{#each Button in view.ButtonList}}
+     {{view Button}}
+     {{/each}}
+      
+      
       <button type="submit" class="btn btn-default">{{view.submit_label}}</button>
     </div>
     </div><!--/formgroup-->
@@ -176,12 +182,23 @@
       </div>
     </div>
     </script>
+    
+     <script type="text/x-handlebars" data-template-name="form-button">
+      <button type="button" class="btn btn-default">{{view.label}}</button>
+    </script>
+    
     <script type="text/x-handlebars" data-template-name="grid-view">
       Grid-View
     </script>
     <script type="text/x-handlebars" data-template-name="notfound">
       The page {{original_target}} doesn't exist.
     </script>
+    
+    <script type="text/x-handlebars" data-template-name="page-message">
+      <div {{bind-attr class=":alert view.msg_class"}}>{{view.message}}</div>
+    </script>
+    
+   
     
     <!-- Bootstrap core JavaScript
     ================================================== -->

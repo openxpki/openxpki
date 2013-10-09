@@ -2768,7 +2768,11 @@ var set = function set(obj, keyName, value, tolerant) {
   }
 
   Ember.assert("You need to provide an object and key to `set`.", !!obj && keyName !== undefined);
+<<<<<<< HEAD
   Ember.assert('calling set '+keyName+' on destroyed object '+obj.toString(), !obj.isDestroyed);
+=======
+  Ember.assert('calling set on destroyed object', !obj.isDestroyed);
+>>>>>>> dsiebeck/feature/webui
 
   var meta = obj[META_KEY], desc = meta && meta.descs[keyName],
       isUnknown, currentValue;

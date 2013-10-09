@@ -4,7 +4,11 @@
 var OXI = {
    
    Config:Ember.Object.create({
+<<<<<<< HEAD
          serverUrl : '/cgi-bin/connect.cgi',
+=======
+         serverUrl : '/cgi-bin/mock.cgi',
+>>>>>>> dsiebeck/feature/webui
          rootElement: '#application',
       })
    
