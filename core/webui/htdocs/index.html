@@ -148,17 +148,20 @@
      {{#each FieldContainer in view.FieldContainerList}}
      {{view FieldContainer}}
      {{/each}}
-     
-    <div class="col-lg-offset-2 col-lg-10">
+     </div><!--/formgroup-->
+     <div class="col-lg-offset-2">
+     <div class="btn-group">
       {{#each Button in view.ButtonList}}
      {{view Button}}
      {{/each}}
-      
-      
-      <button type="submit" class="btn btn-default">{{view.submit_label}}</button>
     </div>
-    </div><!--/formgroup-->
+    </div>
+    
      </form>
+    </script>
+    
+     <script type="text/x-handlebars" data-template-name="form-button">
+      {{view.label}}
     </script>
     
     <script type="text/x-handlebars" data-template-name="form-textfield">
@@ -183,9 +186,7 @@
     </div>
     </script>
     
-     <script type="text/x-handlebars" data-template-name="form-button">
-      <button type="button" class="btn btn-default">{{view.label}}</button>
-    </script>
+    
     
     <script type="text/x-handlebars" data-template-name="grid-view">
       Grid-View
