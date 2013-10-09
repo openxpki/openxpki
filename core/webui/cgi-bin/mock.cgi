@@ -69,8 +69,8 @@ sub handle {
         $res = {'page' => 'login' , 'status' => { 'level' => 'success', 'message' => 'Session terminated' } };
     } elsif ($action eq 'certsearch') {
         $res = handle_certsearch( $q );
-    } elsif ($action eq 'request_cert') {
-        $res = handle_request_cert( $q,$session );
+    } elsif ($action =~ /^request_cert/) {
+        $res = handle_request_cert( $q,$session,$action );
     }elsif ($q->param('page')) {
         $res = {'page' => $q->param('page') };
     }
@@ -260,41 +260,69 @@ sub handle_login {
 sub handle_request_cert{
     my $q = shift;
     my $session = shift;
+    my $action = shift;
+    
     #demonstration of 2-step form with reset-action
     if($q->param('cert_typ')){
         $session->param('cert_typ',$q->param('cert_typ'));  
+    }elsif($action eq 'request_cert.reset_typ'){
+        #reset the first selection
+        $session->param('cert_typ',undef);
     }
+    
     my $typ = $session->param('cert_typ');
     if(!$typ){
         return {'page' => 'request_cert'};
     }
     
-    if($typ eq 't1'){
-        return {
-            page => {
+    
+    if($typ){
+        
+        if($q->param('cert_purpose')){
+            #process finished
+            $session->param('cert_typ',undef);
+            return {
+                page => {
+                     'label' => 'Request cert',
+                },  
+                status => {level => 'success',message=> 'Congrats...you are finished!'},
+                main => [
+                        {type => 'text',content => {
+                            #headline => 'My little Headline',
+                            paragraphs => [{text=>'next steps: ...'}]
+                            }
+                        }]
+                };
                 
-            },
-            status => {level => 'info',message=> 'well done ... we see the light at the end of the tunnel...'},
-            main => [
-            #first section
-            { action => 'request_cert','type' => 'form',
-                content => {
-                    title=>'Step 2',
-                    text => 'you choosed typ 1...so so',
-                    submit_label => 'finish',
-                    
-                    buttons => [
-                        {subaction => 'reset_typ',do_submit=>0,label=>'change type selection'}
-                    ],
-                    
-                    fields => [
-                    { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{key=>'p1',label=>'Purpose 1'},{key=>'p2',label=>'Purpose 2'},{key=>'p3',label=>'Purpose 3'}] },
-                    
-                    ]
+        }else{
+        
+            return {
+                page => {
+                    'label' => 'Request cert',
+                },
+                status => {level => 'info',message=> 'well done ... we see the light at the end of the tunnel...'},
+                main => [
+                #first section
+                { action => 'request_cert','type' => 'form',
+                    content => {
+                        title=>'Step 2',
+                        text => sprintf('you choosed type "%s"... - are you sure?',$typ),
+                        #submit_label => 'finish',
+                        
+                        buttons => [
+                            {action => 'request_cert.reset_typ',do_submit=>0,label=>'change type selection'},
+                            {action => 'request_cert',do_submit=>1,label=>'finish'},
+                        ],
+                        
+                        fields => [
+                        { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{key=>'p1',label=>'Purpose 1'},{key=>'p2',label=>'Purpose 2'},{key=>'p3',label=>'Purpose 3'}] },
+                        
+                        ]
+                    }
                 }
-            }
-            ]
-        };
+                ]
+            };
+        }
     }else{
         
     }

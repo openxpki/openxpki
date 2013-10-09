@@ -75,7 +75,7 @@ OXI.SectionViewContainer = OXI.View.extend({
     },
 
     setStatus:function(status){
-        if(status.message){
+        if(status && status.message){
             var level = (status.level)?status.level:'info';
             this.MessageView.setMessage(status.message,level);
         }else{
@@ -97,9 +97,9 @@ OXI.SectionViewContainer = OXI.View.extend({
             }
         }
 
-        if(json.status ){
-            this.setStatus(json.status);
-        }
+        
+        this.setStatus(json.status);
+       
 
         //die einzelnen sections abbilden
         if(json.main){

@@ -135,12 +135,8 @@ App.Route = Ember.Route.extend({
             if(pageKey == 'logout'){
                 App.callServer({action:pageKey})
                 .success(function(json){
-                    if(json.status.level =='success'){
-                        App.logout();
-                        App.reloadPage();
-                    }else{
-                        App.applicationError('Server responded with status-level '+json.status.level+' - '+  json.status.message);
-                    }
+                    App.logout();
+                    App.reloadPage();
                 });
             }else{
                 App.callServer({page:pageKey})

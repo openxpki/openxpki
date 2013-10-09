@@ -185,8 +185,8 @@ OXI.FormView = OXI.View.extend({
 
     //content prop: must be set via create() , info comes fropm server
     content:null,
-
-    submit_label: null,
+    default_action:null,
+    default_submit_label: 'send',
     form_title :null,
     form_text:null,
     action:null,
@@ -195,36 +195,42 @@ OXI.FormView = OXI.View.extend({
 
     FieldContainerList:[],
     ButtonList:[],//additional (submit-)buttons
-
-    submit: function(event) {
+    
+    submit: function (event){
+        
+        return false;
+    },
+    
+    submitAction: function(action, do_submit) {
         // will be invoked whenever the user triggers
         // the browser's `submit` method
-        //this.debug('Form submit!');
-        if(!this.action){
-            App.applicationError('Form without action!');
+        this.debug('Form submit with action '+action);
+        if(!action){
+            App.applicationError('Form or Button without action!');
             return;
         }
         this.resetErrors();
         var i;
         var submit_ok = true;
         var formValues = {};
-        for(i=0;i<this.FieldContainerList.length;i++){
-            var FieldView = this.FieldContainerList[i];
-            //this.debug(FieldView.fieldname +': '+FieldView.getValue());
-
-            if(!FieldView.isValid()){
-                submit_ok = false;
-                this.debug(FieldView.fieldname +' not valid: '+FieldView.getErrorsAsString);
-            }else{
-                formValues[FieldView.fieldname] = FieldView.getValue();
+        if(do_submit){//should the form-values be transmitted to the server?
+            for(i=0;i<this.FieldContainerList.length;i++){
+                var FieldView = this.FieldContainerList[i];
+                //this.debug(FieldView.fieldname +': '+FieldView.getValue());
+    
+                if(!FieldView.isValid()){
+                    submit_ok = false;
+                    this.debug(FieldView.fieldname +' not valid: '+FieldView.getErrorsAsString);
+                }else{
+                    formValues[FieldView.fieldname] = FieldView.getValue();
+                }
             }
         }
-
         if(submit_ok){
             this.debug('submit ok');
-            formValues.action = this.action;
+            formValues.action = action;
             var FormView = this;
-            if(this.action=='login'){
+            if(action=='login'){
                 var original_target = App.get('original_target');
                 js_debug('original_target:'+original_target);
                 if(original_target){
@@ -272,7 +278,7 @@ OXI.FormView = OXI.View.extend({
             this.debug('submit nok');
         }
 
-        return false;
+        
     },
 
 
@@ -284,14 +290,11 @@ OXI.FormView = OXI.View.extend({
         
         this.fieldContainerMap = {};
         this.fields = [];
-
+        this.default_action = null;
         this.form_title=null;
         this.form_text=null;
-        this.submit_label='send';
-        if(!this.action){//action must be set via create()!
-            App.applicationError('Form created without action!');
-            return;
-        }
+        
+        
         if(!this.content || !this.content.fields){
             App.applicationError('Form, init failed: no content definition!');
             return;
@@ -303,20 +306,40 @@ OXI.FormView = OXI.View.extend({
         if (this.content.title){
             this.form_text = this.content.text;
         }
-        if (this.content.submit_label){
-            this.submit_label = this.content.submit_label;
-        }
+        
         this._initFields();
         this._initButtons();
     },
     
     _initButtons:function(){
-        if(!this.content.buttons)return;
-        var i;
-        for(i=0;i<this.content.buttons.length;i++){
-            this.ButtonList.push(this.createChildView(OXI.FormButton.create(this.content.buttons[i]))); 
+        if(!this.content.buttons){
+            //default/fallback: no list with buttons is given: lets create ONE Submit-Button with Submit-Labekl and Action
+            var label = (this.content.submit_label)?this.content.submit_label:this.default_submit_label;
+            if(!this.action){//action must be set via create()!
+                App.applicationError('Form created without action!');
+                return;
+            }
+            //the one-and-only button is obviously the default action: 
+            this.default_action = this.action;
+            this.ButtonList.push(this.createChildView(OXI.FormButton.create({Form:this,label:label,action:this.action,do_submit:true,is_default:true}))); 
+        }else{
+            var i;
+            //determine default action:
+            for(i=0;i<this.content.buttons.length;i++){
+                var def = this.content.buttons[i];
+                if(def.do_submit && (!this.default_action ||def.default)){
+                    //first submit-button (or the one specially marked as "default") found: mark it as default
+                    this.default_action = def.action;    
+                }
+            }
+            
+            for(i=0;i<this.content.buttons.length;i++){
+                var def = this.content.buttons[i];
+                def.Form = this;
+                def.is_default=(def.action == this.default_action);
+                this.ButtonList.push(this.createChildView(OXI.FormButton.create(def))); 
+            }
         }
-        
     },
     
     _initFields:function(){
@@ -372,19 +395,50 @@ OXI.FormButton = OXI.View.extend({
     
     jsClassName:'OXI.FormButton',
     templateName: "form-button",
+    tagName: 'button',
+    classNames: ['btn', 'btn-default'],
+    classNameBindings:['btn_type'],
+    attributeBindings: ['type'],
+    type:function(){
+        if(this.is_default){
+            return 'submit';
+        }else{
+            return 'button';   
+        }
+        }.property(),
+    btn_type:function(){
+        if(this.is_default){
+            return 'btn-primary';
+        }else if(this.do_submit){
+            return 'btn-info';   
+        }else{
+            return 'btn-default';   
+        }
+        }.property(),
     
-    subaction:null,//set via constructor (from json)
+    action:null,//set via constructor (from json)
     do_submit:false,//set via constructor (from json)
+    is_default:false,//set via constructor
     label:null,//set via constructor (from json)
+    Form:null,
+    
+    click: function(evt) {
+        js_debug("Button with action "+this.action+" was clicked");
+        this.Form.submitAction(this.action,this.do_submit);
+    },
     
     init:function(){
         this._super();
+        if(!this.Form){
+            App.applicationError('FormButton withot Form!');
+            return;   
+        }
         if(!this.label){
             App.applicationError('FormButton withot label!');
             return;   
         }
-        if(!this.subaction){
-            App.applicationError('FormButton withot subaction!');
+        if(!this.action){
+            App.applicationError('FormButton withot action!');
             return;   
         }
     }
