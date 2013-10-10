@@ -147,6 +147,13 @@ sub login_step {
     if (! exists $self->{ROLE})
     {
         $out =~ s/$self->{PATTERN}/$self->{REPLACE}/ if (defined $self->{PATTERN} && defined $self->{REPLACE});
+        
+        # Assert if the role is not defined
+        if (!CTX('config')->get_hash("auth.roles.$out")) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_EXTERNAL_UNKNOWN_ROLE",
+                params  => { ROLE => $out });
+        }        
         $self->{ROLE} = $out;
     }
 
