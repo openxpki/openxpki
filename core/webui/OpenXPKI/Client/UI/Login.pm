@@ -14,14 +14,15 @@ my $meta = __PACKAGE__->meta;
 sub BUILD {
     
     my $self = shift;
-    $self->_page ({'label' => 'Please log in'});    
+
 }
 
 sub init_realm_select {
     
     my $self = shift;
     my $realms = shift;
-        
+
+    $self->_page ({'label' => 'Please log in'});            
     $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.realm',  content => {
         fields => [
             { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => $realms },
@@ -35,6 +36,7 @@ sub init_auth_stack {
     my $self = shift;
     my $stacks = shift;
           
+    $self->_page ({'label' => 'Please log in'});
     $self->_result()->{main} = [
         { 'type' => 'form', 'action' => 'login.stack', content => {
             title => '', submit_label => 'do login',
@@ -50,7 +52,8 @@ sub init_auth_stack {
 sub init_login_passwd {
     
     my $self = shift;
-          
+    
+    $self->_page ({'label' => 'Please log in'});    
     $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.password', content => {
         fields => [
             { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },

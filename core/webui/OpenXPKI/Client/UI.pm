@@ -6,6 +6,7 @@ package OpenXPKI::Client::UI;
 
 use Moose; 
 
+use English;
 use OpenXPKI::Client;
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
@@ -62,23 +63,38 @@ sub _init_client {
 
     # create new session    
     my $session = $self->session();    
-    my $old_session =  $session->param('backend_session_id') || undef;
+    my $old_session =  $session->param('backend_session_id') || undef;    
+    $self->logger()->info('old backend session ' . $old_session);
     
-    $self->logger()->info('old backend session ' . $old_session);    
-    $client->init_session({ SESSION_ID => $old_session });
+    # Fetch errors on session init 
+    eval {
+        $client->init_session({ SESSION_ID => $old_session });
+    };   
+    if ($EVAL_ERROR) {
+        my $exc = OpenXPKI::Exception->caught();  
+        if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
+            # The session has gone - start a new one - might happen if the gui 
+            # was idle too long or the server was flushed
+            $client->init_session({ SESSION_ID => undef });
+            $self->logger()->info('Backend session was gone - start a new one');
+        } else {
+            $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
+            $self->logger()->trace($EVAL_ERROR);
+            die "Backend communication problem";
+        }
+    }
     
     my $client_session = $client->get_session_id();    
+    # logging stuff only
     if ($old_session && $client_session eq $old_session) {
         $self->logger()->info('Resume backend session with id ' . $client_session);
+    } elsif ($old_session) { 
+        $self->logger()->info('Re-Init backend session ' . $client_session . '/' . $old_session );        
     } else {
-        if ($old_session) { 
-            $self->logger()->info('Re-Init backend session ' . $client_session . '/' . $old_session );        
-        } else {
-            $self->logger()->info('New backend session with id ' . $client_session);
-        }
-        $session->param('backend_session_id', $client_session);
-        $self->logger()->info( Dumper $session );        
+        $self->logger()->info('New backend session with id ' . $client_session);
     }
+    $session->param('backend_session_id', $client_session);
+    $self->logger()->trace( Dumper $session );
     return $client;
 }
 
@@ -116,7 +132,7 @@ sub handle_request {
     my $reply = $self->_client()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
     $self->logger()->trace('Ping replied ' . Dumper $reply);
-    $self->logger()->debug('current session status ' . Dumper $status);
+    $self->logger()->debug('current session status ' . $status);
         
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         my $result = OpenXPKI::Client::UI::Login->new();                
@@ -167,6 +183,8 @@ sub handle_page {
     
     $method  = 'index' if (!$method );
     $method  = "init_$method";
+    
+    $self->logger()->debug("Method is $method");   
     
     $result->$method( $method_args );
     return $result->render();
@@ -249,10 +267,17 @@ sub handle_login {
         # Credentials are passed!
         if ($cgi->param('action') eq 'login.password') {
             $self->logger()->debug('Seems to be an auth try - validating');
-            ##FIXME - Input validation!
+            ##FIXME - Input validation, dynamic config (alternate logins)!
             $reply = $self->_client()->send_receive_service_msg( $status, 
                 { LOGIN => $cgi->param('username'), PASSWD => $cgi->param('password') } );
             $self->logger()->trace('Auth result ' . Dumper $reply);
+
+            # Failure here is most likely a wrong password            
+            if ( $reply->{SERVICE_MSG} eq 'ERROR' &&
+                $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {                
+                $result->set_status('Login failed','error');
+                return $result->render();
+            }
         } else {
             $self->logger()->debug('No credentials, render form');
             return $result->init_login_passwd()->render();
@@ -271,6 +296,7 @@ sub handle_login {
     }
             
     if ( $reply->{SERVICE_MSG} eq 'ERROR') {
+        $self->logger()->debug('Server Error Msg: '. Dumper $reply);
         return $result->set_status_from_error_reply->render( $reply );
     }
          
