@@ -102,7 +102,7 @@ OXI.Application = Ember.Application.extend(
             if(json.structure){
                 App.set('sideTreeStructure', json.structure);
             }else{
-                App.applicationError('call to get_structure failed!',json);
+                App.applicationError('call to bootstrap.structure failed!',json);
             }
             if(json.user){
                 App.login(json.user);

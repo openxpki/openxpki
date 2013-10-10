@@ -117,7 +117,7 @@ sub handle {
                     title=>'Step 1',
                     submit_label => 'proceed',
                     fields => [
-                    { name => 'cert_typ', label => 'Typ', type => 'select',options=>[{key=>'t1',label=>'Typ 1'},{key=>'t2',label=>'Typ 2'},{key=>'t3',label=>'Typ 3'}] },
+                    { name => 'cert_typ', label => 'Typ', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
                     
                     ]
                 }
@@ -281,11 +281,17 @@ sub handle_request_cert{
         if($q->param('cert_purpose')){
             #process finished
             $session->param('cert_typ',undef);
+            
+            my $status = {level => 'success',message=> 'Congrats...you are finished!'};
+            if($q->param('is_urgent')){
+                $status = {level => 'warn',message=> 'Oh..its urgent. We will do what we can!'};
+            }
+            
             return {
                 page => {
                      'label' => 'Request cert',
                 },  
-                status => {level => 'success',message=> 'Congrats...you are finished!'},
+                status => $status,
                 main => [
                         {type => 'text',content => {
                             #headline => 'My little Headline',
@@ -315,8 +321,11 @@ sub handle_request_cert{
                         ],
                         
                         fields => [
-                        { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{key=>'p1',label=>'Purpose 1'},{key=>'p2',label=>'Purpose 2'},{key=>'p3',label=>'Purpose 3'}] },
-                        
+                        { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
+                        #{ name => 'some_text', label => 'Text', type => 'text' },
+                        #{ name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
+                        #{ name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
+                        #{ name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }
                 }
