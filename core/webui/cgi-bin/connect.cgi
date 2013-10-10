@@ -9,7 +9,8 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use OpenXPKI::Client::UI;
 
-Log::Log4perl->easy_init({ level => $TRACE, file => '/var/openxpki/webui.log'});
+#Log::Log4perl->init('/etc/openxpki/webui/log.conf');
+Log::Log4perl->easy_init({ level => $TRACE, file => '>>/var/openxpki/webui.log' });
 
 my $log = Log::Log4perl->get_logger();
 
@@ -39,10 +40,7 @@ print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $session_front->id), -ty
 my $json = new JSON();    
 if (ref $result eq 'HASH') {
     $result->{session_id} = $session_front->id;   
-    
-    # Hack für GUI Fehler
-    $result->{status} = { level => 'success'} unless($result->{status});
-    
+     
     print $json->encode($result);
     $log->debug('got valid result');
     $log->trace( Dumper $result );
