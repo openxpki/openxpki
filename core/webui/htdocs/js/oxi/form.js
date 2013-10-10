@@ -79,17 +79,13 @@ OXI.FormView = OXI.View.extend({
                 }
 
 
-                //error-message form-level
-                //TODO: needed?
-                if(json.form_error){
-                    FormView.setError(json.form_error);
-                }
+                
 
-                if(json.field_errors){
+                if(json.error){
                     var field;
-                    for(field in json.field_errors){
+                    for(field in json.error){
                         var FieldView = FormView.getFieldView(field);
-                        FieldView.setError(json.field_errors[field]);
+                        FieldView.setError(json.error[field]);
                     }
                 }
 
