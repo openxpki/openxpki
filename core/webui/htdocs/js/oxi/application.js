@@ -18,6 +18,13 @@ OXI.Application = Ember.Application.extend(
             return '';
         }
     }.property('user'),
+    userrole:function(){
+        if(this.user){
+            return this.user.role;
+        }else{
+            return '';
+        }
+    }.property('user'),
 
     //store currentPath (of router) to have a observable property for navigation-highlighting:
     currentPath: '',
