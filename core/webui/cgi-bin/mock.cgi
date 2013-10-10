@@ -243,17 +243,12 @@ sub get_side_structure_logged_in{
 sub handle_login {
 
     my $q = shift;
-    my $dummy_user = {login=>'admin',password=>'oxi'};
+    my $dummy_user = {login=>'admin',name => 'D.Siebeck', role=> 'admin', password=>'oxi'};
     if ($q->param('username') eq $dummy_user->{login} && $q->param('password') eq $dummy_user->{password}) {
         return { goto => 'home', user=>$dummy_user, reloadTree=> 1, status => { level => 'success', message => 'Login successful' } };
     }
 
-    return { error => {
-        username => 'invalid',
-        password => 'invalid',
-    },
-    status => { level => 'error', message => 'Login credentials are wrong!' }
-};
+    return { status => { level => 'error', message => 'Login credentials are wrong!' }};
 
 }
 
