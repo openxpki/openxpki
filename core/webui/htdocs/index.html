@@ -73,7 +73,7 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {{#if App.user_logged_in}}
-            <li><p class="navbar-text">Signed in as: <strong>{{ App.username }}</strong></p></li>
+            <li><p class="navbar-text">Signed in as: <strong>{{ App.username }} ({{ App.userrole }})</strong></p></li>
             <li><a href="#logout">Log out</a></li>
             {{/if}}
           </ul>  
