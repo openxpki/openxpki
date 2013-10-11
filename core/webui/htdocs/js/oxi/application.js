@@ -5,9 +5,11 @@ defines the OXI Application classs
 OXI.Application = Ember.Application.extend(
 {
     LOG_TRANSITIONS: true,
+    //LOG_TRANSITIONS_INTERNAL: true,
+    
     rootElement: null,//read from config
     serverUrl:null,//read from config
-
+    cookieName:null,
 
     user_logged_in: false,
     user:null,
@@ -37,6 +39,8 @@ OXI.Application = Ember.Application.extend(
 
     ApplicationController : Ember.Controller.extend({
         updateCurrentPath: function() {
+            
+            //js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
             App.setCurrentPath( this.get('currentPath'));
         }.observes('currentPath')
     }),
@@ -76,6 +80,7 @@ OXI.Application = Ember.Application.extend(
         this._super();
         this.rootElement = OXI.Config.get('rootElement');
         this.serverUrl = OXI.Config.get('serverUrl');
+        this.cookieName = OXI.Config.get('cookieName');
     },
 
     logout:function(){
@@ -111,7 +116,10 @@ OXI.Application = Ember.Application.extend(
     },
 
     applicationError: function(msg,data){
-        alert('Application-Error: ' + msg);
+        if(confirm('A bad application error happened: '+msg+'. Do you want to reset your session?')){
+            $.removeCookie(this.cookieName);
+            this.reloadPage();
+        }
         js_debug(data);
     },
 

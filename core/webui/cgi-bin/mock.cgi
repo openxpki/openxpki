@@ -40,7 +40,6 @@ sub handle {
         get_side_structure_logged_in($user)
         :get_side_structure_not_logged_in();
         ;
-
         return {structure => $structure, session_id=>$session_id, user=>$user};
     }
 
@@ -201,7 +200,7 @@ sub get_side_structure_logged_in{
         label=>  'Home',
         entries=>  [
         {key=> 'my_tasks', label =>  "My tasks"},
-        {key=> 'my_workflows',label =>  "My workflows"},
+        {key=> 'my_workflows:all',label =>  "My workflows (all)"},
         {key=> 'my_certificates',label =>  "My certificates"} ,
         {key=> 'key_status',label =>  "Key status"}
         ]
