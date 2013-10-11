@@ -821,6 +821,8 @@ sub search_workflow_instances {
                          $workflow_table . '.WORKFLOW_SERIAL',
                          $workflow_table . '.WORKFLOW_TYPE',
                          $workflow_table . '.WORKFLOW_STATE',
+                         $workflow_table . '.WORKFLOW_PROC_STATE',
+                         $workflow_table . '.WORKFLOW_WAKEUP_AT' 
                     ],
         JOIN     => [
                          \@joins,
