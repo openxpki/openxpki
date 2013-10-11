@@ -100,14 +100,14 @@ OXI.Application = Ember.Application.extend(
         this.set('sideTreeStructure',{});
         //this.sideTreeStructure = testStructure;
         var App = this;
-        return this.callServer({action:'bootstrap.structure'})
+        return this.callServer({action:'bootstrap!structure'})
         .done(function(json){
             js_debug('sidestructure retrieved');
             //js_debug( json,2);
             if(json.structure){
                 App.set('sideTreeStructure', json.structure);
             }else{
-                App.applicationError('call to bootstrap.structure failed!',json);
+                App.applicationError('call to bootstrap!structure failed!',json);
             }
             if(json.user){
                 App.login(json.user);
@@ -120,6 +120,11 @@ OXI.Application = Ember.Application.extend(
             $.removeCookie(this.cookieName);
             this.reloadPage();
         }
+        js_debug(data);
+    },
+    
+    applicationAlert: function(msg,data){
+        alert(msg);
         js_debug(data);
     },
 
