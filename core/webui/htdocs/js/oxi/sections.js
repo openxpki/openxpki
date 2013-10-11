@@ -135,7 +135,7 @@ OXI.MessageView = OXI.View.extend({
     setMessage:function(message,level){
         this.set('level',level);
         this.set('message',message);
-        this.debug({level:level,message:message});
+        //this.debug({level:level,message:message});
     },
 
     reset:function(){

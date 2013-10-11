@@ -20,14 +20,14 @@ App.Route = Ember.Route.extend({
 
         //Ember.debug('App.Route:setupController');
 
-        js_debug('route name: '+ this.routeName);
+        //js_debug('route name: '+ this.routeName);
         //js_debug(this.router.router.targetHandlerInfos,2);
         var routes = this.router.router.targetHandlerInfos;
         var i;
         var final_route = routes[routes.length-1].name;
 
         if(final_route == this.routeName){
-            js_debug('final route reached:'+final_route);
+            //js_debug('final route reached:'+final_route);
             var p = this.routeName.indexOf('.');
             if(p>0){
 

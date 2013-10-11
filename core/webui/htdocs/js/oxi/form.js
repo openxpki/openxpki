@@ -40,7 +40,7 @@ OXI.FormView = OXI.View.extend({
         if(do_submit){//should the form-values be transmitted to the server?
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
-                //this.debug(FieldView.fieldname +': '+FieldView.getValue());
+                this.debug(FieldView.fieldname +': '+FieldView.getValue());
 
                 if(!FieldView.isValid()){
                     submit_ok = false;
@@ -65,7 +65,7 @@ OXI.FormView = OXI.View.extend({
             App.callServer(formValues).success(
             function(json){
                 FormView.debug('server responded');
-                js_debug(json,2);
+                //js_debug(json,2);
 
                 //status-messages page-level:
                 if(json.status){
@@ -298,7 +298,7 @@ OXI.FormFieldContainer = OXI.View.extend({
         this.FieldView = this.createChildView( View );
     },
     destroy: function() {
-        Ember.debug('FormFieldContainer::destroy:'+this.fieldname);
+        //Ember.debug('FormFieldContainer::destroy:'+this.fieldname);
         this._super()
     },
     getValue:function(){
@@ -321,9 +321,16 @@ OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
     templateName: "form-checkbox",
     jsClassName:'OXI.CheckboxContainer',
     init:function(){
-        Ember.debug('OXI.CheckboxContainer :init '+this.fieldDef.label);
+        //Ember.debug('OXI.CheckboxContainer :init '+this.fieldDef.label);
         this._super();
         this.setFieldView(OXI.Checkbox.create(this.fieldDef));
+    },
+    isValid:function(){
+        return true;//checkbox shopuld be always valid
+    },
+    
+    getValue:function(){
+        return (this.FieldView.isChecked())?1:0;
     }
 });
 
@@ -354,7 +361,13 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
 
 OXI.Checkbox = Ember.Checkbox.extend(
-{}
+{
+    isChecked:function(){
+        var checkbox = this.$();
+        //we ask the DOM-element itself, not its jquery wrapper
+        return checkbox[0].checked;   
+    }    
+}
 );
 
 OXI.Select = Ember.Select.extend(

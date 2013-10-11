@@ -156,17 +156,7 @@ sub handle {
             }
         }]
     };
-} elsif($page eq 'grid') {
-
-    return {
-        page => {
-            label => 'Your Searchresult',
-
-        },
-        main => [{
-            type => 'grid', result => $res->{result},
-        }]};
-    }else{
+} else{
         return {
             page => {
                 label => 'Sorry!',
@@ -280,16 +270,23 @@ sub handle_request_cert{
             if($q->param('is_urgent')){
                 $status = {level => 'warn',message=> 'Oh..its urgent. We will do what we can!'};
             }
+            my @keys = $q->param();
+            my @input;
+            foreach my $k (@keys){
+                push @input, {text => sprintf('%s: %s',$k,$q->param($k))} ;
+            }
+            
             
             return {
                 page => {
                      'label' => 'Request cert',
+                     
                 },  
                 status => $status,
                 main => [
                         {type => 'text',content => {
-                            #headline => 'My little Headline',
-                            paragraphs => [{text=>'next steps: ...'}]
+                            headline => 'Your input',
+                            paragraphs => \@input
                             }
                         }]
                 };
@@ -316,10 +313,10 @@ sub handle_request_cert{
                         
                         fields => [
                         { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
-                        #{ name => 'some_text', label => 'Text', type => 'text' },
-                        #{ name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
-                        #{ name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
-                        #{ name => 'long_text', label => 'Some long text', type => 'textarea' },
+                        { name => 'some_text', label => 'Text', type => 'text' },
+                        { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
+                        { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
+                        { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }
                 }

@@ -190,7 +190,7 @@ OXI.Application = Ember.Application.extend(
             var i,j;
             for(i=0;i<App.sideTreeStructure.length;i++){
                 var ressource = App.sideTreeStructure[i];
-                Ember.debug('add to Top Nav: '+ressource.key);
+                //Ember.debug('add to Top Nav: '+ressource.key);
                 if(!ressource.entries || !ressource.entries.length){
                     this.route(ressource.key);
                     App.NavArrayController.pushObject(
