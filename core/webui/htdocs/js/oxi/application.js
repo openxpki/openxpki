@@ -100,7 +100,7 @@ OXI.Application = Ember.Application.extend(
         this.set('sideTreeStructure',{});
         //this.sideTreeStructure = testStructure;
         var App = this;
-        return this.callServer({action:'bootstrap!structure'})
+        return this.callServer({page:'bootstrap!structure'})
         .done(function(json){
             js_debug('sidestructure retrieved');
             //js_debug( json,2);
@@ -146,7 +146,7 @@ OXI.Application = Ember.Application.extend(
     callServer: function(params, callback,debug){
         var app = this;
         return jQuery.ajax({
-            type: "POST",
+            type: params.action ? "POST" : "GET",
             url: this.serverUrl,
             dataType: "json",
             data:params,
