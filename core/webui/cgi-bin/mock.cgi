@@ -29,13 +29,13 @@ sub handle {
     logger()->debug('Session id ' . $session_id);
 
     my $res;
-
+    my $page = $q->param('page') || '';
     my $action = $q->param('action') || '';
     logger()->debug('action ' . $action);
     $user = $session->param('user');
     #my $user = {name=>'paul',login=>1};
     #actions which work without login
-    if($action eq 'bootstrap!structure'){
+    if($page eq 'bootstrap!structure'){
         my $structure = ($user &&  $user->{login})?
         get_side_structure_logged_in($user)
         :get_side_structure_not_logged_in();
@@ -62,7 +62,7 @@ sub handle {
 
         logger()->debug('Result after handling' . Dumper $res);
 
-    } elsif ($action eq 'logout') {
+    } elsif ($page eq 'logout') {
         $session->delete();
         $session_id = '';
         $res = {'page' => 'login' , 'status' => { 'level' => 'success', 'message' => 'Session terminated' } };
