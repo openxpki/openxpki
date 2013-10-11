@@ -111,7 +111,7 @@ OXI.SectionView = OXI.View.extend({
             break;
             case 'grid':
             ContentView = OXI.GridView.create(
-            {action:this.sectionData.action, results:this.sectionData.results}
+            {action:this.sectionData.action, content:this.sectionData.content}
             );
             break;
             default:

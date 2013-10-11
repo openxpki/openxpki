@@ -35,7 +35,7 @@ sub handle {
     $user = $session->param('user');
     #my $user = {name=>'paul',login=>1};
     #actions which work without login
-    if($action eq 'bootstrap.structure'){
+    if($action eq 'bootstrap!structure'){
         my $structure = ($user &&  $user->{login})?
         get_side_structure_logged_in($user)
         :get_side_structure_not_logged_in();
@@ -200,7 +200,7 @@ sub get_side_structure_logged_in{
         label=>  'Home',
         entries=>  [
         {key=> 'my_tasks', label =>  "My tasks"},
-        {key=> 'my_workflows:all',label =>  "My workflows (all)"},
+        {key=> 'my_workflows',label =>  "My workflows"},
         {key=> 'my_certificates',label =>  "My certificates"} ,
         {key=> 'key_status',label =>  "Key status"}
         ]
@@ -344,31 +344,39 @@ sub handle_certsearch {
     
 
     return {
-        'page' => 'grid',
-        'result' => {
-            'count' => 2,
-            'page'  => 1,
-            'pagecount' => 25,
-            records => [{
-                'recid' =>  1,
-                'serial' => '0123',
-                'subject' => 'CN=John M Miller,DC=My Company,DC=com',
-                'email' => 'john.miller@my-company.com',
-                'notbefore' => 1379587708,
-                'notafter' => 1395226097,
-                'issuer' => 'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE',
-                'identifier' => 'swBdX644xhsn-brmKLbKOb8buMc',
-            },{
-                'recid' =>  2,
-                'serial' => '0456',
-                'subject' => 'CN=Bob Builder,DC=My Company,DC=com',
-                'email' => '',
-                'notbefore' => 1379587517,
-                'notafter' => 1411113697,
-                'issuer' => 'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE',
-                'identifier' => 'qqA2HidUoRvlSLhsFIB6_ps6CpQ',
-            }]
-        }
+        page => {label => 'Your Searchresult'},
+        status => {},
+        
+        main => [
+                #first section
+                {
+        
+                    'type' => 'grid',
+                    'processing_type' => 'all',
+                    'content' => {
+                        #'header' => 'Grid-Headline',
+                        'preambel' => 'some text before...',
+                        #'postambel' => 'some text after...',
+                        'columns' => [
+            						{ "sTitle" => "serial" },
+            						{ "sTitle" => "subject" },
+            						{ "sTitle" => "email"},
+            						{ "sTitle" => "notbefore"},
+            						{ "sTitle" => "notafter"},
+            						{ "sTitle" => "issuer"},
+            						{ "sTitle" => "identifier"}
+            					] ,
+            	        'data' => [
+            	            ['0123','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1379587708,1395226097,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8buMc'],
+            	            ['0456','CN=Bob Builder,DC=My Company,DC=com','',1379587517,1411113697,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','qqA2HidUoRvlSLhsFIB6_ps6CpQ']
+            	        ],   
+                        
+                    },
+                }
+                ]
+        
+        
+        
     };
 
 }
@@ -402,6 +410,9 @@ print $q->header(\%header);
 #print $q->header(\%header);
 
 my $json = new JSON();
+
+logger()->debug('will return ' .  Dumper $ret );
+
 if (ref $ret eq 'HASH') {
     
     print $json->encode($ret);

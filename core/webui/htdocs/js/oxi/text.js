@@ -1,5 +1,8 @@
-OXI.TextView = Ember.View.extend({
+OXI.TextView = OXI.View.extend({
+    
+    jsClassName:'OXI.TextView',
     templateName: "text-view",
+    
     content:null,
     headline:null,
     paragraphs:null,

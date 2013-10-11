@@ -11,7 +11,8 @@
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
-
+    <!-- CSS for Data Table Grid --> 
+    <link href="css/jquery.dataTables.css" rel="stylesheet">
     <!-- Custom styles for this project -->
     <link href="css/oxi.css" rel="stylesheet">
 
@@ -203,8 +204,16 @@
     
     
     <script type="text/x-handlebars" data-template-name="grid-view">
-      Grid-View
+      {{#if view.headline}}<h3>{{view.headline}}</h3>{{/if}}
+     {{#if view.preambel}}<div style="margin-bottom:12px;">{{view.preambel}}</div>{{/if}}
+      
+      <table class="table table-striped" {{bind-attr id=view.grid_id}}>
+      
+      </table>
+      {{#if view.postambel}}<div style="margin-top:12px;">{{view.postambel}}</div>{{/if}}
     </script>
+    
+    
     <script type="text/x-handlebars" data-template-name="notfound">
       The page {{original_target}} doesn't exist.
     </script>
@@ -220,7 +229,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="js/libs/jquery.js"></script>
     <script src="js/libs/jquery.cookie.js"></script>
-    
+    <script src="js/libs/jquery.dataTables.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/libs/handlebars-1.0.0.js"></script>
