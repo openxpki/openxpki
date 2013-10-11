@@ -40,7 +40,6 @@ sub handle {
         get_side_structure_logged_in($user)
         :get_side_structure_not_logged_in();
         ;
-
         return {structure => $structure, session_id=>$session_id, user=>$user};
     }
 
@@ -201,7 +200,7 @@ sub get_side_structure_logged_in{
         label=>  'Home',
         entries=>  [
         {key=> 'my_tasks', label =>  "My tasks"},
-        {key=> 'my_workflows',label =>  "My workflows"},
+        {key=> 'my_workflows:all',label =>  "My workflows (all)"},
         {key=> 'my_certificates',label =>  "My certificates"} ,
         {key=> 'key_status',label =>  "Key status"}
         ]
@@ -243,17 +242,12 @@ sub get_side_structure_logged_in{
 sub handle_login {
 
     my $q = shift;
-    my $dummy_user = {login=>'admin',password=>'oxi'};
+    my $dummy_user = {login=>'admin',name => 'D.Siebeck', role=> 'admin', password=>'oxi'};
     if ($q->param('username') eq $dummy_user->{login} && $q->param('password') eq $dummy_user->{password}) {
         return { goto => 'home', user=>$dummy_user, reloadTree=> 1, status => { level => 'success', message => 'Login successful' } };
     }
 
-    return { error => {
-        username => 'invalid',
-        password => 'invalid',
-    },
-    status => { level => 'error', message => 'Login credentials are wrong!' }
-};
+    return { status => { level => 'error', message => 'Login credentials are wrong!' }};
 
 }
 

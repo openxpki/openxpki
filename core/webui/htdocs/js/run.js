@@ -25,12 +25,14 @@ App.Route = Ember.Route.extend({
         var routes = this.router.router.targetHandlerInfos;
         var i;
         var final_route = routes[routes.length-1].name;
-        js_debug('final route '+final_route);
+        
         if(final_route == this.routeName){
-            if(this.routeName.indexOf('.')>0){
-                var temp = this.routeName.split('.');
-                this.mainActionKey = temp[0];
-                this.subActionKey = temp[1];
+            js_debug('final route reached:'+final_route);
+            var p = this.routeName.indexOf('.');
+            if(p>0){
+                
+                this.mainActionKey = this.routeName.substr(0,p);
+                this.subActionKey = this.routeName.substr(p+1);
             }else{
                 this.subActionKey =  this.routeName;
             }
@@ -72,6 +74,7 @@ App.Route = Ember.Route.extend({
 
         App.MainView.initSections(json);
         this.render('main-content',{outlet:'main-content'});
+        
         //js_debug('available routes: '+Ember.keys(App.Router.router.recognizer.names));
     },
 
