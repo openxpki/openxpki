@@ -141,7 +141,7 @@ OXI.Application = Ember.Application.extend(
     callServer: function(params, callback,debug){
         var app = this;
         return jQuery.ajax({
-            type: "POST",
+            type: params.action ? "POST" : "GET",
             url: this.serverUrl,
             dataType: "json",
             data:params,
