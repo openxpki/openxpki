@@ -9,8 +9,6 @@ use Data::Dumper;
 
 extends 'OpenXPKI::Client::UI::Result';
 
-my $meta = __PACKAGE__->meta;
-
 sub BUILD {
     
     my $self = shift;
@@ -33,7 +31,7 @@ sub init_index {
     # Initial login
     if ($args->{initial}) {
         $self->reload(1);
-        #$self->set_status("You have 5 pending requests.");
+        $self->set_status("You have 5 pending requests.");
     }
         
     return $self;

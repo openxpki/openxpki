@@ -75,8 +75,8 @@ sub _init_structure_for_user {
          key=> 'search',
          label=>  'Search',
          entries=>  [
-             {key=> 'search_certificates', label =>  "Certificates"},
-             {key=> 'search_workflows',label =>  "Workflows"} 
+             {key=> 'search!certificate', label =>  "Certificates"},
+             {key=> 'search!workflow',label =>  "Workflows"} 
          ]   
       }
    
@@ -86,4 +86,19 @@ sub _init_structure_for_user {
    return $self;  
 }
 
+sub init_error {
+    
+    my $self = shift;
+    my $args = shift;
+    
+    $self->_result()->{main} = [{ 
+        type => 'text',
+        content => {
+            headline => 'Ooops - something went wrong',
+            paragraphs => [{text=>'Something is wrong here'}]
+        }
+    }];
+        
+    return $self;
+}
 1;

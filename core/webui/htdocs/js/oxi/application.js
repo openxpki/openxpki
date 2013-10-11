@@ -100,7 +100,7 @@ OXI.Application = Ember.Application.extend(
         this.set('sideTreeStructure',{});
         //this.sideTreeStructure = testStructure;
         var App = this;
-        return this.callServer({action:'bootstrap!structure'})
+        return this.callServer({page:'bootstrap!structure'})
         .done(function(json){
             js_debug('sidestructure retrieved');
             //js_debug( json,2);

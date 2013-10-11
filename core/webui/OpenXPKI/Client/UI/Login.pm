@@ -23,7 +23,7 @@ sub init_realm_select {
     my $realms = shift;
 
     $self->_page ({'label' => 'Please log in'});            
-    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.realm',  content => {
+    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!realm',  content => {
         fields => [
             { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => $realms },
         ]}
@@ -38,7 +38,7 @@ sub init_auth_stack {
           
     $self->_page ({'label' => 'Please log in'});
     $self->_result()->{main} = [
-        { 'type' => 'form', 'action' => 'login.stack', content => {
+        { 'type' => 'form', 'action' => 'login!stack', content => {
             title => '', submit_label => 'do login',
             fields => [
                 { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => $stacks },
@@ -54,7 +54,7 @@ sub init_login_passwd {
     my $self = shift;
     
     $self->_page ({'label' => 'Please log in'});    
-    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login.password', content => {
+    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!password', content => {
         fields => [
             { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },
             { 'name' => 'password', 'label' => 'Password', 'type' => 'password' },

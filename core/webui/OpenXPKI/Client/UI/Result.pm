@@ -6,6 +6,11 @@ package OpenXPKI::Client::UI::Result;
 
 use Moose; 
 
+has cgi => (       
+    is => 'ro',
+    isa => 'Object',
+);
+
 has _client => (       
     is => 'ro',
     isa => 'Object',
@@ -41,6 +46,25 @@ has reload => (
     default => 0,
 );
 
+sub BUILD {
+    
+    my $self = shift;
+    # load global client status if set 
+    if ($self->_client()->_status()) {
+        $self->_status(  $self->_client()->_status() );
+    }
+    
+}
+sub add_section {
+    
+    my $self = shift;
+    my $arg = shift;
+    
+    push @{$self->_result()->{main}}, $arg;
+    
+    return $self;
+    
+}
 
 sub set_status {
     
@@ -53,6 +77,28 @@ sub set_status {
     return $self;
     
 }
+
+
+sub send_command {
+    
+    my $self = shift;
+    my $command = shift;
+    my $params = shift || {};
+    
+    my $backend = $self->_client()->backend();
+    my $reply = $backend->send_receive_service_msg( 
+        'COMMAND', { COMMAND => $command, PARAMS => {} }  
+    );
+    
+    if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
+        $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
+        $self->set_status_from_error_reply( $reply );
+        return undef;
+    }
+    
+    return $reply->{PARAMS};
+    
+} 
 
 sub set_status_from_error_reply {
     
@@ -68,6 +114,22 @@ sub set_status_from_error_reply {
     $self->_status({ level => 'error', message => $message });
     
     return $self;
+}
+
+sub param {
+    
+    my $self = shift;
+    my $key = shift;
+    my $cgi = $self->cgi();
+    return undef unless($cgi);
+    
+    return $cgi->param($key);
+}
+
+sub logger {
+    
+    my $self = shift;
+    return $self->_client()->logger();
 }
 
 sub render {

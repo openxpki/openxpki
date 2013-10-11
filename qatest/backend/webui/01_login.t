@@ -73,7 +73,7 @@ $session = new CGI::Session(undef, $session_id, {Directory=>'/tmp'});
 is ($session->id, $session_id, 'Session resumed');
 
 $cgi->data({
-    'action' => 'login.stack',
+    'action' => 'login:stack',
     'auth_stack' => "External Dynamic",
 });
 $result = $client->handle_request({ cgi => $cgi });    
@@ -84,7 +84,7 @@ $session = new CGI::Session(undef, $session_id, {Directory=>'/tmp'});
 is ($session->id, $session_id, 'Session resumed');
 
 $cgi->data({
-    'action' => 'login.password',
+    'action' => 'login:password',
     'username' => 'ui user',
     'password' => 'User'
 });

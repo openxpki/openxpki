@@ -21,12 +21,12 @@ has 'session' => (
 );
 
 # the OXI::Client object
-has '_client' => (        
+has 'backend' => (        
     required => 0,
     lazy => 1,
     is => 'rw',
     isa => 'Object',
-    builder => '_init_client',                   
+    builder => '_init_backend',                   
 );
 
 # should be passed by the ui script to be shared, if not we create it
@@ -46,13 +46,21 @@ has '_config' => (
     init_arg => 'config',                   
 );
 
-=head2 _init_client
+# Hold warnings from init
+has _status => (    
+    is => 'rw',   
+    isa => 'HashRef|Undef',
+    lazy => 1,    
+    default => undef
+);
+
+=head2 _init_backend
 
 Builder that creates an instance of OpenXPKI::Client and cares about 
 switching/creating the backend session
  
 =cut
-sub _init_client {
+sub _init_backend {
 
 
     my $self = shift;    
@@ -77,6 +85,7 @@ sub _init_client {
             # was idle too long or the server was flushed
             $client->init_session({ SESSION_ID => undef });
             $self->logger()->info('Backend session was gone - start a new one');
+            $self->_status({ level => 'warn', 'Backend session is gone - please re-login'});
         } else {
             $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
             $self->logger()->trace($EVAL_ERROR);
@@ -129,7 +138,7 @@ sub handle_request {
         $self->session( new CGI::Session(undef, undef, {Directory=>'/tmp'}) );    
     }
     
-    my $reply = $self->_client()->send_receive_service_msg('PING');
+    my $reply = $self->backend()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
     $self->logger()->trace('Ping replied ' . Dumper $reply);
     $self->logger()->debug('current session status ' . $status);
@@ -170,23 +179,49 @@ sub handle_page {
     my $result;
     if ($action) {
         $self->logger()->info('handle action ' . $action);
-        #$result =            
+        
+        my ($class, $method) = split /!/, $action;    
+        $class = "OpenXPKI::Client::UI::".ucfirst($class);
+        $self->logger()->debug("Loading page action class $class");                
+        eval "use $class;1";        
+        if ($EVAL_ERROR) {                       
+            $self->logger()->error("Failed loading action class $class");
+            $self->_status({ level => 'error', 'Failed to handle request - action not found'});            
+        } else {
+            $method  = 'index' if (!$method );
+            $method  = "action_$method";
+            $self->logger()->debug("Method is $method");
+            $result = $class->new({ client => $self, cgi => $cgi });           
+            $result->$method( $method_args );
+        }
     }    
          
-    my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
+    # Render a page only if  there is no action result         
+    if (!$result) {
+             
+        my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
+        
+        my ($class, $method) = split /!/, $page;    
+        $class = "OpenXPKI::Client::UI::".ucfirst($class);
+        $self->logger()->debug("Loading page handler class $class");
+        
+        eval "use $class;1";        
+        if ($EVAL_ERROR) {
+            $self->logger()->error("Failed loading page class $class");
+            $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self });        
+            $result->init_error();
+            $result->set_status('Page was not found','error');
+                 
+        } else {
+        
+            $result = $class->new({ client => $self, cgi => $cgi });    
+            $method  = 'index' if (!$method );
+            $method  = "init_$method";    
+            $self->logger()->debug("Method is $method");       
+            $result->$method( $method_args );
+        }
+    }
     
-    my ($class, $method) = split /\./, $page;
-    $class = "OpenXPKI::Client::UI::".ucfirst($class);
-    eval "use $class;1" or die "Error use'ing $class: $@";
-    $self->logger()->debug("Loading page handler class $class");   
-    $result = $class->new({ client => $self });
-    
-    $method  = 'index' if (!$method );
-    $method  = "init_$method";
-    
-    $self->logger()->debug("Method is $method");   
-    
-    $result->$method( $method_args );
     return $result->render();
     
 }
@@ -199,7 +234,7 @@ sub handle_login {
     my $cgi = $args->{cgi};
     my $reply = $args->{reply};
        
-    $reply = $self->_client()->send_receive_service_msg('PING') if (!$reply);
+    $reply = $self->backend()->send_receive_service_msg('PING') if (!$reply);
         
     my $status = $reply->{SERVICE_MSG};
     
@@ -211,25 +246,27 @@ sub handle_login {
     $self->logger()->info('not logged in - doing auth - action is ' . $action);
     
     # Special handling for pki_realm and stack params
-    if ($action eq 'login.realm' && $cgi->param('pki_realm')) {
+    if ($action eq 'login!realm' && $cgi->param('pki_realm')) {
         $session->{'pki_realm'} = $cgi->param('pki_realm');
         $session->{'auth_stack'} = undef;
         $self->logger()->debug('set realm in session: ' . $cgi->param('pki_realm') ); 
     } 
-    if($action eq 'login.stack' && $cgi->param('auth_stack')) {
+    if($action eq 'login!stack' && $cgi->param('auth_stack')) {
         $session->{'auth_stack'} = $cgi->param('auth_stack');
         $self->logger()->debug('set auth_stack in session: ' . $cgi->param('auth_stack') );
     }
     
     my $pki_realm = $session->{'pki_realm'} || '';
     my $auth_stack =  $session->{'auth_stack'};
-    #$auth_stack = 'External Dynamic';
     
-    my $result = OpenXPKI::Client::UI::Login->new({ client => $self });
+    my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
+
+    # force reload of structure if this is an initial request
+    $result->reload(1) unless ($action && $action =~ /^login!/);
           
     if ( $status eq 'GET_PKI_REALM' ) {
         if ($pki_realm) {            
-            $reply = $self->_client()->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm, } );
+            $reply = $self->backend()->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm, } );
             $status = $reply->{SERVICE_MSG};
             $self->logger()->debug("Selected realm $pki_realm, new status " . $status);
         } else {
@@ -243,7 +280,7 @@ sub handle_login {
     if ( $status eq 'GET_AUTHENTICATION_STACK' ) {
         if ( $auth_stack ) {
             $self->logger()->debug("Authentication stack: $auth_stack");
-            $reply = $self->_client()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $auth_stack, } );
+            $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $auth_stack, } );
             $status = $reply->{SERVICE_MSG};            
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
@@ -265,10 +302,10 @@ sub handle_login {
         
         $self->logger()->info('Requested login type ' . $login_type );
         # Credentials are passed!
-        if ($cgi->param('action') eq 'login.password') {
+        if ($cgi->param('action') eq 'login!password') {
             $self->logger()->debug('Seems to be an auth try - validating');
             ##FIXME - Input validation, dynamic config (alternate logins)!
-            $reply = $self->_client()->send_receive_service_msg( $status, 
+            $reply = $self->backend()->send_receive_service_msg( $status, 
                 { LOGIN => $cgi->param('username'), PASSWD => $cgi->param('password') } );
             $self->logger()->trace('Auth result ' . Dumper $reply);
 
@@ -287,7 +324,7 @@ sub handle_login {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {        
         $self->logger()->info('Authentication successul - fetch session info');            
         # Fetch the user info from the server
-        $reply = $self->_client()->send_receive_command_msg( 'get_session_info' );
+        $reply = $self->backend()->send_receive_command_msg( 'get_session_info' );
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) { 
             $self->session()->param('user', $reply->{PARAMS});
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});         
