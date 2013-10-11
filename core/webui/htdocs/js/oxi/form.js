@@ -90,6 +90,11 @@ OXI.FormView = OXI.View.extend({
                 }
 
                 if(json.page){
+                    var s = App;
+                    //debugger;
+                    FormView.get('controller').send('routeContentChanged', true);
+                    //App.Router.markRouteContentChanged();
+                    
                     App.get('MainView').initSections(json);
                 }
             }

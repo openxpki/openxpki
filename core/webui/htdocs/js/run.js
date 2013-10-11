@@ -15,12 +15,27 @@ App.Route = Ember.Route.extend({
 
     mainActionKey:null,
     subActionKey:null,
-
+    
+    actions: {
+            routeContentChanged: function(level){
+                    js_debug('App.Route routeContentChanged');
+                    this.router.markRouteContentChanged();
+                }
+        },
+    activate:function(){
+        js_debug('App.Route activate') ;
+    },
     setupController: function(controller) {
 
         //Ember.debug('App.Route:setupController');
-
-        //js_debug('route name: '+ this.routeName);
+        
+        /*
+        this.actions = {
+            markRouteContentChanged : function(level){
+                    js_debug('App.Route juhu');
+                }};
+        */
+        js_debug('App.Route.setupController: route name: '+ this.routeName);
         //js_debug(this.router.router.targetHandlerInfos,2);
         var routes = this.router.router.targetHandlerInfos;
         var i;
@@ -40,9 +55,10 @@ App.Route = Ember.Route.extend({
     },
 
     renderTemplate: function(controller, model) {
-        //js_debug('renderTemplate');
+        
 
         if(this.subActionKey){
+            js_debug('App.Route.renderTemplate for '+this.subActionKey);
             controller.set('current_action', this.subActionKey);
 
             var Route = this;

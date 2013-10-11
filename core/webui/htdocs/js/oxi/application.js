@@ -5,7 +5,7 @@ defines the OXI Application classs
 OXI.Application = Ember.Application.extend(
 {
     LOG_TRANSITIONS: true,
-    //LOG_TRANSITIONS_INTERNAL: true,
+    LOG_TRANSITIONS_INTERNAL: true,
     
     rootElement: null,//read from config
     serverUrl:null,//read from config
@@ -42,7 +42,14 @@ OXI.Application = Ember.Application.extend(
             
             //js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
             App.setCurrentPath( this.get('currentPath'));
-        }.observes('currentPath')
+        }.observes('currentPath'),
+        
+        actions: {
+            routeContentChanged: function(level){
+                    js_debug('ApplicationController routeContentChanged');
+                }
+        },
+        
     }),
 
     BadUrlRoute: Ember.Route.extend({
@@ -70,7 +77,32 @@ OXI.Application = Ember.Application.extend(
         }
     }),
 
-
+    Router: Ember.Router.extend({
+        
+        _routeContentHasChanged:{},
+        
+        
+        
+        markRouteContentChanged: function(){
+            this._routeContentHasChanged[App.get('currentPath')] = true;
+            js_debug('App.Router.markRouteContentChanged: '+App.get('currentPath'));
+        },
+        
+        didTransition: function(infos){
+            this._super(infos);
+            var path = Ember.Router._routePath(infos);
+            
+            js_debug('didTransition ' + path); 
+            
+            if(this._routeContentHasChanged[path]){
+                js_debug('_routeContentHasChanged from path '+path);
+                this._routeContentHasChanged[path] = false;
+                js_debug('reload...');
+                App.reloadPage(path);
+            }
+            
+        }
+    }),
 
     ready: function() {
         Ember.debug('Application ready');
@@ -132,6 +164,7 @@ OXI.Application = Ember.Application.extend(
         js_debug('reloadPage!');
         if(!goto) goto='/';
         try{
+            goto = goto.replace(/\./g,'/');
             if(goto.indexOf('/')!=0){
                 goto = '/'+goto;
             }
