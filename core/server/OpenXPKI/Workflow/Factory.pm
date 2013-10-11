@@ -97,7 +97,7 @@ sub list_workflow_titles {
     foreach my $item (keys %{$self->{_workflow_config}}) {
         my $type = $self->{_workflow_config}->{$item}->{type};
         my $desc = $self->{_workflow_config}->{$item}->{description};
-        $result->{$type} = { description => $desc }
+        $result->{$type} = { label => $type, description => $desc || $type }
     }    
     return $result;
 }
