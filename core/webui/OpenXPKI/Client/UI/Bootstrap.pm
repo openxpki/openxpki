@@ -15,7 +15,7 @@ sub init_structure {
     my $session = $self->_client()->session();   
     my $user = $session->param('user') || undef;
     
-    if ($user) {
+    if ($session->param('is_logged_in') && $user) {
         $self->_result()->{user} = $user;        
         $self->_init_structure_for_user( $user );
     }

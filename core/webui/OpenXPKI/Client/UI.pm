@@ -127,16 +127,13 @@ sub handle_request {
     my $cgi = $args->{cgi};
 
     my $action = $cgi->param('action') || '';
+    my $page = $cgi->param('page') || '';
      
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
-    # new session and to recover from backend session failure
-    if ($action eq 'logout') {
-        # TODO - kill backend session, seems to be not implemented yet....
-        $self->session()->delete();
-        $self->session()->flush();
-        $self->session( new CGI::Session(undef, undef, {Directory=>'/tmp'}) );    
-    }
+    # new session and to recover from backend session failure    
+    $self->flush_session() if ($action eq 'logout');
+
     
     my $reply = $self->backend()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
@@ -150,7 +147,7 @@ sub handle_request {
     }
     
     # Call to bootstrap components
-    if ($action =~ /^bootstrap\.(.+)/) {                
+    if ($page =~ /^bootstrap!(.+)/) {                
         my $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self });        
         return $result->init_structure( )->render();
     }
@@ -159,6 +156,10 @@ sub handle_request {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {      
         return $self->handle_page( $args );         
     }    
+    
+    # if the backend session logged out but did not terminate
+    # we get the probleme that ui is logged in but backend is not
+    $self->flush_session() if ($self->session()->param('is_logged_in'));
     
     # try to log in 
     return $self->handle_login( { cgi => $cgi, reply => $reply } );           
@@ -327,6 +328,7 @@ sub handle_login {
         $reply = $self->backend()->send_receive_command_msg( 'get_session_info' );
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) { 
             $self->session()->param('user', $reply->{PARAMS});
+            $self->session()->param('is_logged_in', 1);
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});         
             return $self->handle_page( { 'page' => 'home', 'action' => '', cgi => $cgi }, { initial => 1 } );
         }
@@ -341,4 +343,16 @@ sub handle_login {
     return;         
     
 }
+
+sub flush_session {
+    
+    my $self = shift;
+    $self->logger()->info("flush session");
+    # TODO - kill backend session, seems to be not implemented yet....
+    $self->session()->delete();
+    $self->session()->flush();
+    $self->session( new CGI::Session(undef, undef, {Directory=>'/tmp'}) );    
+    
+}
+
 1;
