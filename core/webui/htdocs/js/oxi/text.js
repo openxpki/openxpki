@@ -4,14 +4,14 @@ OXI.TextView = OXI.View.extend({
     templateName: "text-view",
     
     content:null,
-    headline:null,
-    paragraphs:null,
+    label:null,
+    description:null,
 
     init:function(){
         Ember.debug('OXI.TextView :init ');
         this._super();
-        this.headline = this.content.headline;
-        this.paragraphs = this.content.paragraphs;
+        this.label = this.content.label;
+        this.description = this.content.description;
     }
 
 });

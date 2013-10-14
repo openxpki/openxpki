@@ -5,7 +5,7 @@ defines the OXI Application classs
 OXI.Application = Ember.Application.extend(
 {
     LOG_TRANSITIONS: true,
-    LOG_TRANSITIONS_INTERNAL: true,
+    //LOG_TRANSITIONS_INTERNAL: true,
     
     rootElement: null,//read from config
     serverUrl:null,//read from config
@@ -34,21 +34,19 @@ OXI.Application = Ember.Application.extend(
     SideNavs : {},
     CurrentSideNav : null,
     sideTreeStructure: {},
-
-
+    
+    
+    _actualPageRenderCount:0,
+    _actualPageKey: null,
 
     ApplicationController : Ember.Controller.extend({
         updateCurrentPath: function() {
             
-            //js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
+            js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
             App.setCurrentPath( this.get('currentPath'));
         }.observes('currentPath'),
         
-        actions: {
-            routeContentChanged: function(level){
-                    js_debug('ApplicationController routeContentChanged');
-                }
-        },
+        
         
     }),
 
@@ -79,26 +77,16 @@ OXI.Application = Ember.Application.extend(
 
     Router: Ember.Router.extend({
         
-        _routeContentHasChanged:{},
-        
-        
-        
-        markRouteContentChanged: function(){
-            this._routeContentHasChanged[App.get('currentPath')] = true;
-            js_debug('App.Router.markRouteContentChanged: '+App.get('currentPath'));
-        },
         
         didTransition: function(infos){
             this._super(infos);
             var path = Ember.Router._routePath(infos);
-            
+            //this hook is triggered if a link has been clicked on the page
             js_debug('didTransition ' + path); 
-            
-            if(this._routeContentHasChanged[path]){
-                js_debug('_routeContentHasChanged from path '+path);
-                this._routeContentHasChanged[path] = false;
-                js_debug('reload...');
-                App.reloadPage(path);
+            //we check, if the content for the current route(=server page) has been changed (via form actions etc)
+            //if so, we reload page infos from server (otherwise, the re-rendered püagecontent (e.e. form-submits, searchresults) will not be changed)
+            if(App.get('_actualPageRenderCount')>1){
+                 App.reloadPageInfoFromServer();  
             }
             
         }
@@ -113,6 +101,7 @@ OXI.Application = Ember.Application.extend(
         this.rootElement = OXI.Config.get('rootElement');
         this.serverUrl = OXI.Config.get('serverUrl');
         this.cookieName = OXI.Config.get('cookieName');
+        this._actualPageRenderCount = 0;
     },
 
     logout:function(){
@@ -159,18 +148,68 @@ OXI.Application = Ember.Application.extend(
         alert(msg);
         js_debug(data);
     },
+    
+    reloadPageInfoFromServer: function(){
+        js_debug('App.reloadPageInfoFromServer');
+        this.loadPageInfoFromServer(this._actualPageKey);
+    },
+    
+    loadPageInfoFromServer: function(pageKey){
+        var App = this;
+        js_debug('App.loadPageInfoFromServer: '+pageKey);
+        this.set('_actualPageRenderCount',0);
+        this.set('_actualPageKey',pageKey);
+        this.callServer({page:pageKey})
+            .success(function(json){
+                if(pageKey == 'logout'){
+                    App.logout();
+                    App.reloadPage('login');
+                }else{
+                    App.renderPage(json);
+                }
+            });
+    },
+    
+    renderPage: function(json){
+        js_debug({'App.renderPage':json},3);
+        if(json.status){
+            this.MainView.setStatus(json.status);
+        }
+        if(json.page){
+            this.MainView.initSections(json);
+            this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
+        }
+        
+        
+        
+        //this.MainView.get('controller').send('routeContentChanged', true);
+        
+        if(json.reloadTree){
+            var timeout = (json.status)?1000:0;
+            window.setTimeout(function(){App.reloadPage(json.goto);},timeout);
+            return;   
+        }else if(json.goto){
+            //goto solo...   
+            var timeout = (json.status)?1000:0;
+            window.setTimeout(function(){App.goto(json.goto);},timeout);
+        }
+    },
+    
+    goto: function(target){
+        try{
+            target = target.replace(/\./g,'/');
+            if(target.indexOf('/')!=0){
+                target = '/'+target;
+            }
+            location.hash=target;
+        }catch(e){
+        }
+    },
 
     reloadPage: function(goto){
         js_debug('reloadPage!');
-        if(!goto) goto='/';
-        try{
-            goto = goto.replace(/\./g,'/');
-            if(goto.indexOf('/')!=0){
-                goto = '/'+goto;
-            }
-            location.hash=goto;
-        }catch(e){
-
+        if(goto){
+            this.goto(goto);
         }
         js_debug('do reload');
         location.reload();
@@ -202,6 +241,7 @@ OXI.Application = Ember.Application.extend(
 
     setCurrentPath:function(currentPath){
         js_debug('updateCurrentPath: '+ currentPath );
+        this.set('_actualPageRenderCount',0);
         this.set('currentPath',currentPath);
         var currentRootPath = currentPath.split('.')[0];
         if(currentRootPath =='index')currentRootPath='home';
@@ -217,6 +257,7 @@ OXI.Application = Ember.Application.extend(
             this.route('login');
             this.route('logout');
             this.route('notfound');
+            this.route('welcome');
             App.set('NavArrayController', Ember.ArrayController.create({
                 content: Ember.A([])
             }));

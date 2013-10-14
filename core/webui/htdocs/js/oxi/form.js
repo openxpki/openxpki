@@ -11,8 +11,8 @@ OXI.FormView = OXI.View.extend({
     content:null,
     default_action:null,
     default_submit_label: 'send',
-    form_title :null,
-    form_text:null,
+    label :null,
+    description:null,
     action:null,
 
     fields:[],
@@ -66,36 +66,14 @@ OXI.FormView = OXI.View.extend({
             function(json){
                 FormView.debug('server responded');
                 //js_debug(json,2);
-
-                //status-messages page-level:
-                if(json.status){
-                    App.MainView.setStatus(json.status);
-                }
-
-                if(json.reloadTree){
-                    var timeout = (json.status)?100:0;
-                    window.setTimeout(function(){App.reloadPage();},timeout);
-                    return;
-                }
-
-
+                App.renderPage(json);
                 
-
                 if(json.error){
                     var field;
                     for(field in json.error){
                         var FieldView = FormView.getFieldView(field);
                         FieldView.setError(json.error[field]);
                     }
-                }
-
-                if(json.page){
-                    var s = App;
-                    //debugger;
-                    FormView.get('controller').send('routeContentChanged', true);
-                    //App.Router.markRouteContentChanged();
-                    
-                    App.get('MainView').initSections(json);
                 }
             }
             );
@@ -116,8 +94,8 @@ OXI.FormView = OXI.View.extend({
         this.fieldContainerMap = {};
         this.fields = [];
         this.default_action = null;
-        this.form_title=null;
-        this.form_text=null;
+        this.label=null;
+        this.description=null;
 
 
         if(!this.content || !this.content.fields){
@@ -125,11 +103,11 @@ OXI.FormView = OXI.View.extend({
             return;
         }
 
-        if (this.content.title){
-            this.form_title = this.content.title;
+        if (this.content.label){
+            this.label = this.content.label;
         }
-        if (this.content.title){
-            this.form_text = this.content.text;
+        if (this.content.description){
+            this.description = this.content.description;
         }
 
         this._initFields();
