@@ -85,7 +85,7 @@ sub handle {
         return {
             page => {
                 'label' => 'OpenXPKI Login',
-                'desc' => 'Please log in ;)',
+                'description' => 'Please log in ;)',
             },
             main => [
             #first section
@@ -107,13 +107,14 @@ sub handle {
         return {
             page => {
                 'label' => 'Request cert',
-                'desc' => '',
+                'description' => '',
             },
             main => [
             #first section
             { action => 'request_cert','type' => 'form',
                 content => {
-                    title=>'Step 1',
+                    label=>'Step 1',
+                    description=> 'First you must master provide a certificate type, then you can choose some mmore details',
                     submit_label => 'proceed',
                     fields => [
                     { name => 'cert_typ', label => 'Typ', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
@@ -130,24 +131,25 @@ sub handle {
                 label => 'Welcome to OpenXPKI',
             },
             main => [
-            {type => 'text',content => {
-                headline => 'My little Headline',
-                paragraphs => [{text=>'Paragraph 1'},{text=>'Paragraph 2'}]
-            }
-        }
-        ],
+                {type => 'text',
+                 content => {
+                    label => 'My little Headline',
+                    description => 'Some text block',
+                    }
+                }
+            ],
         status => $res->{status}
     };
 } elsif ($page eq 'search_certificates') {
     return {
         page => {
             label => 'Certificate Search',
-            desc => 'You can search for certs here.',
+            description => 'You can search for certs here.',
 
         },
         main => [{ type => 'form',action => 'certsearch',
             content => {
-                title=>'',
+                label=>'',
                 submit_label => 'search now',
                 fields => [
                 { name => 'subject', label => 'Subject', type => 'text',is_optional => 1 },
@@ -156,26 +158,47 @@ sub handle {
             }
         }]
     };
-} elsif($page eq 'grid') {
-
+} elsif ($page eq 'welcome') {
+    return {
+            page => {
+                label => 'Welcome to OpenXPKI',
+            },
+            main => [
+                {type => 'text',
+                 content => {
+                    label => 'Whats new?',
+                    description => 'some news of the day...',
+                    }
+                }
+            ],
+        status => { level => 'success', message => 'Login successful' }
+    };    
+} elsif ($page eq 'test_reload') {
+    if(!$session->param("pageReloaded")){
+        $session->param("pageReloaded",1);
+        return {page=>{},reloadTree=> 1,status=>{level=>'warn',message=>'page will reload now!'}};
+    }else{
+        $session->param("pageReloaded",0); 
+        return {
+            page => {},
+            status => { level => 'success', message => 'Page has been reloaded!' }
+        }; 
+    }
+    
+}elsif($page eq 'test_goto'){
+    my $target = 'search/search_certificates';
+    return {page=>{},'goto'=> $target,status=>{level=>'info',message=>'url will change to '.$target}};
+    
+}else{
     return {
         page => {
-            label => 'Your Searchresult',
+            label => 'Sorry!',
+            description => 'The page '.$page.' is not implemented yet.'
 
-        },
-        main => [{
-            type => 'grid', result => $res->{result},
-        }]};
-    }else{
-        return {
-            page => {
-                label => 'Sorry!',
-                desc => 'The page '.$page.' is not implemented yet.'
+        }
+    };
 
-            }
-        };
-
-    }
+}
 
 
 }
@@ -213,7 +236,8 @@ sub get_side_structure_logged_in{
         {key=> 'request_cert', label =>  "Request new certificate"},
         {key=> 'request_renewal',label =>  "Request renewal"},
         {key=> 'request_revocation',label =>  "Request revocation"} ,
-        {key=> 'issue_clr',label =>  "Issue CLR"}
+        {key=> 'issue_clr',label =>  "Issue CLR"},
+        
         ]
     },
 
@@ -234,6 +258,14 @@ sub get_side_structure_logged_in{
         {key=> 'search_certificates', label =>  "Certificates"},
         {key=> 'search_workflows',label =>  "Workflows"}
         ]
+    },
+    {
+        key=> 'test',
+        label=>  'Tests',
+        entries=>  [
+        {key=> 'test_reload',label =>  "Test page reload"},
+        {key=> 'test_goto',label =>  "Test goto"}
+        ]
     }
 
     ];
@@ -244,7 +276,7 @@ sub handle_login {
     my $q = shift;
     my $dummy_user = {login=>'admin',name => 'D.Siebeck', role=> 'admin', password=>'oxi'};
     if ($q->param('username') eq $dummy_user->{login} && $q->param('password') eq $dummy_user->{password}) {
-        return { goto => 'home', user=>$dummy_user, reloadTree=> 1, status => { level => 'success', message => 'Login successful' } };
+        return { goto => 'welcome', user=>$dummy_user, reloadTree=> 1, status => { level => 'success', message => 'Login successful' } };
     }
 
     return { status => { level => 'error', message => 'Login credentials are wrong!' }};
@@ -259,7 +291,7 @@ sub handle_request_cert{
     #demonstration of 2-step form with reset-action
     if($q->param('cert_typ')){
         $session->param('cert_typ',$q->param('cert_typ'));  
-    }elsif($action eq 'request_cert.reset_typ'){
+    }elsif($action eq 'request_cert!reset_typ'){
         #reset the first selection
         $session->param('cert_typ',undef);
     }
@@ -280,16 +312,23 @@ sub handle_request_cert{
             if($q->param('is_urgent')){
                 $status = {level => 'warn',message=> 'Oh..its urgent. We will do what we can!'};
             }
+            my @keys = $q->param();
+            my @input;
+            foreach my $k (@keys){
+                push @input, sprintf('%s: %s',$k,$q->param($k)) ;
+            }
+            
             
             return {
                 page => {
                      'label' => 'Request cert',
+                     
                 },  
                 status => $status,
                 main => [
                         {type => 'text',content => {
-                            #headline => 'My little Headline',
-                            paragraphs => [{text=>'next steps: ...'}]
+                            label => 'Your input',
+                            description => join('<br>',@input)
                             }
                         }]
                 };
@@ -305,21 +344,21 @@ sub handle_request_cert{
                 #first section
                 { action => 'request_cert','type' => 'form',
                     content => {
-                        title=>'Step 2',
-                        text => sprintf('you choosed type "%s"... - are you sure?',$typ),
+                        label=>'Step 2',
+                        description => sprintf('you choosed type "%s"... - are you sure?',$typ),
                         #submit_label => 'finish',
                         
                         buttons => [
-                            {action => 'request_cert.reset_typ',do_submit=>0,label=>'change type selection'},
+                            {action => 'request_cert!reset_typ',do_submit=>0,label=>'change type selection'},
                             {action => 'request_cert',do_submit=>1,label=>'finish'},
                         ],
                         
                         fields => [
                         { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
-                        #{ name => 'some_text', label => 'Text', type => 'text' },
-                        #{ name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
-                        #{ name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
-                        #{ name => 'long_text', label => 'Some long text', type => 'textarea' },
+                        { name => 'some_text', label => 'Text', type => 'text' },
+                        { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
+                        { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
+                        { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }
                 }
@@ -354,9 +393,8 @@ sub handle_certsearch {
                     'type' => 'grid',
                     'processing_type' => 'all',
                     'content' => {
-                        #'header' => 'Grid-Headline',
-                        'preambel' => 'some text before...',
-                        #'postambel' => 'some text after...',
+                        #'label' => 'Grid-Headline',
+                        'description' => 'some text before...',
                         'columns' => [
             						{ "sTitle" => "serial" },
             						{ "sTitle" => "subject" },
@@ -440,7 +478,6 @@ The global structure is as follows:
 
 {
     page => {
-        type => <page type> (form, grid, text),
         label => string, used as h1/title
         description => global intro text
     },
@@ -448,10 +485,30 @@ The global structure is as follows:
         level =>  one of 'error','success','info','warn',
         message => the status message
     },
+    
+    goto => string, will be evaluated as url-hashtag target 
+    
+    reloadTree => bool, if set, the browser will perform a complete reload. If an additional "goto" is set, the page-url will change to this target
+    
+    
     main => {
+        [
+        #one or more sectiosns
+        {
+            type => text|grid|form|key-value
+            
+            content => {
+                    label => string (section headline)
+                    description => string (optional text
+                    additional params depending from type ...
+                }
+            
+            additional params depending from type 
+            
+        }
+        ]
         Holds content for the main area, depends on page type
     }
-
 
 }
 
@@ -459,6 +516,7 @@ The global structure is as follows:
 
 Most calls return a key status in the response hash. Subkeys are level and
 message where level is one of 'error','success','info','warn'.
+
 
 =head2 Forms
 

@@ -2,32 +2,30 @@
 var App = OXI.Application.create();
 
 App.ApplicationRoute = Ember.Route.extend({
-
     setupController: function(controller) {
         // Ember.debug('ApplicationRoute:setupController');
-
     }
 });
-
 
 
 App.Route = Ember.Route.extend({
 
     mainActionKey:null,
     subActionKey:null,
-
+    
+    
+    activate:function(){
+        js_debug('App.Route activate') ;
+    },
     setupController: function(controller) {
-
-        //Ember.debug('App.Route:setupController');
-
-        js_debug('route name: '+ this.routeName);
+        //js_debug('App.Route.setupController: route name: '+ this.routeName);
         //js_debug(this.router.router.targetHandlerInfos,2);
         var routes = this.router.router.targetHandlerInfos;
         var i;
         var final_route = routes[routes.length-1].name;
 
         if(final_route == this.routeName){
-            js_debug('final route reached:'+final_route);
+            //js_debug('final route reached:'+final_route);
             var p = this.routeName.indexOf('.');
             if(p>0){
 
@@ -40,9 +38,10 @@ App.Route = Ember.Route.extend({
     },
 
     renderTemplate: function(controller, model) {
-        //js_debug('renderTemplate');
+        
 
         if(this.subActionKey){
+            js_debug('App.Route.renderTemplate for '+this.subActionKey);
             controller.set('current_action', this.subActionKey);
 
             var Route = this;
@@ -50,36 +49,11 @@ App.Route = Ember.Route.extend({
             if(!pageKey || pageKey == 'index' ){//this is the case when called without hashtagin URI
                 pageKey ='home';
             }
-
-
-            App.callServer({page:pageKey})
-            .success(function(json){
-                if(pageKey == 'logout'){
-                    App.logout();
-                    App.reloadPage();
-                }else{
-                    Ember.debug('got page infos from server');
-                    Route.applyJsonToPage(json);
-                }
-
-
-            });
-
+            App.set('MainView',OXI.SectionViewContainer.create());
+            this.render('main-content',{outlet:'main-content'});
+            App.loadPageInfoFromServer(pageKey);
         }
-    },
-
-    applyJsonToPage:function(json){
-
-        App.set('MainView',OXI.SectionViewContainer.create());
-
-        App.MainView.initSections(json);
-        this.render('main-content',{outlet:'main-content'});
-
-        //js_debug('available routes: '+Ember.keys(App.Router.router.recognizer.names));
-    },
-
-
-
+    }
 
 });
 

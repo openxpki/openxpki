@@ -3,10 +3,9 @@ OXI.GridView = OXI.View.extend({
     jsClassName:'OXI.GridView',
     templateName: "grid-view",
     
-    headline:null,
-    preambel:null,
-    postambel:null,
-    
+    label:null,
+    description:null,
+        
     grid_id:function(){
             js_debug('grid_id called ');
             return 'cya';
@@ -15,9 +14,8 @@ OXI.GridView = OXI.View.extend({
     init:function(){
         //Ember.debug('OXI.FormView :init ');
         this._super();
-        this.headline = this.content.header;
-        this.preambel = this.content.preambel;
-        this.postambel = this.content.postambel;
+        this.label = this.content.header;
+        this.description = this.content.description;
         
         if( ! this.content.columns ){
             App.applicationAlert(this.jsClassName + ': no columns given!');
