@@ -6,10 +6,7 @@ OXI.GridView = OXI.View.extend({
     label:null,
     description:null,
         
-    grid_id:function(){
-            js_debug('grid_id called ');
-            return 'cya';
-        }.property(),
+    
     
     init:function(){
         //Ember.debug('OXI.FormView :init ');
@@ -30,8 +27,11 @@ OXI.GridView = OXI.View.extend({
     
     
     didInsertElement: function(){
-        //this.debug('DOM is ready!'+this.$('table').attr('id'));   
+        this.debug('DOM is ready!'+this.$().attr('id'));   
         var $table = this.$('table');
+        //give the table element a unique ID
+        var grid_id = this.$().attr('id')+'-grid';
+        $table.attr('id',grid_id);
         var bPaginate = (this.content.data.length > 10);
         var bFilter = (this.content.data.length > 5);
         
@@ -54,16 +54,52 @@ OXI.GridView = OXI.View.extend({
             $table.removeClass('table-striped').removeClass('table-hover');
             tableInit.fnCreatedRow = function(nRow, aData, iDataIndex){
                                 var rowStatus = aData[statusIndex];
-                                js_debug({rowStatus:rowStatus, nRow:nRow, aData:aData, iDataIndex:iDataIndex});
-                                if(rowStatus){
+                                //js_debug({rowStatus:rowStatus, nRow:nRow, aData:aData, iDataIndex:iDataIndex});
+                                if(rowStatus && rowStatus!='[none]'){
                                     $(nRow).addClass('gridrow-'+rowStatus);
                                 }else{
                                     $(nRow).addClass('gridrow');
                                 }
-                            }   
+                            };
+            //display status-filter
+            if(bFilter){
+                var availableStati = this._getAvailableStati(statusIndex);
+                //js_debug({availableStati:availableStati},2);
+                if(availableStati.length>1){
+                    var StatusFilterContainer = $('<div/>').attr('id',grid_id+'_statusfilter_cont').addClass('dataTables_filter').css('padding-left','10px');
+                    var StatusFilter = $('<select/>').attr('id',grid_id+'_statusfilter');
+                    StatusFilter.change(function(){
+                            var sel_status = $( this ).val();
+                            js_debug('status filter changed: '+sel_status);
+                            var DataTable = $('#'+grid_id).dataTable();
+                            if(sel_status){
+                                DataTable.fnFilter(sel_status,statusIndex);
+                            }else{
+                                DataTable.fnFilter('',statusIndex);
+                            }
+                        });
+                    //empty option
+                    $("<option />", {value: '', text: 'all'}).appendTo(StatusFilter);
+                    var i;
+                    for(i = 0;i<availableStati.length;i++){
+                        $("<option />", {value: availableStati[i], text: availableStati[i]}).appendTo(StatusFilter);
+                    }
+                    var StatusFilterLabel = $('<label/>').html('Status: ');
+                    StatusFilterLabel.append(StatusFilter);
+                    StatusFilterContainer.html(StatusFilterLabel);
+                    tableInit.fnDrawCallback = function(oSettings ){
+                          var oFilterContainer = $('#'+grid_id+'_filter');
+                          js_debug('check grid-filter-wrapper...' + oFilterContainer.attr('id'))  ;
+                          StatusFilterContainer.appendTo(oFilterContainer);
+                          
+                        };
+                        
+                }
+            }
         }
         
         $table.dataTable(tableInit );
+        js_debug('dataTable tableInit');
     },
     
     _getColumnDef: function(){
@@ -100,6 +136,23 @@ OXI.GridView = OXI.View.extend({
                 }
                  
         }
+    },
+    
+    _getAvailableStati: function(iStatusIndex){
+        var seen = new Object();
+        var i;
+        for(i=0;i<this.content.data.length;i++){
+            if(!this.content.data[i][iStatusIndex]){
+                this.content.data[i][iStatusIndex] = '[none]';
+            }
+            seen[this.content.data[i][iStatusIndex]] = 1;
+        }
+        var key,keys=[];
+        for(key in seen){
+            keys.push(key);   
+        }
+        
+        return keys;
     },
     
     _getStatusColumnIndex: function(aColumns){
