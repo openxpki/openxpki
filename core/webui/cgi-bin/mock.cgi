@@ -396,17 +396,23 @@ sub handle_certsearch {
                         #'label' => 'Grid-Headline',
                         'description' => 'some text before...',
                         'columns' => [
-            						{ "sTitle" => "serial" },
-            						{ "sTitle" => "subject" },
-            						{ "sTitle" => "email"},
-            						{ "sTitle" => "notbefore"},
-            						{ "sTitle" => "notafter"},
-            						{ "sTitle" => "issuer"},
-            						{ "sTitle" => "identifier"}
+            						{ sTitle => "serial" },
+            						{ sTitle => "subject" },
+            						{ sTitle => "email"},
+            						{ sTitle => "notbefore",format => 'timestamp'},
+            						{ sTitle => "notafter",format => 'timestamp'},
+            						{ sTitle => "issuer"},
+            						{ sTitle => "identifier"},
+            						{ sTitle => "_id"},#internal ID (will not be displayed)
+            						{ sTitle => "_status"},#row status (will not be displayed, but translated in gridrow css class)
             					] ,
             	        'data' => [
-            	            ['0123','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1379587708,1395226097,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8buMc'],
-            	            ['0456','CN=Bob Builder,DC=My Company,DC=com','',1379587517,1411113697,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','qqA2HidUoRvlSLhsFIB6_ps6CpQ']
+            	            ['0123','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1379587708,1395226097,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8buMc','888','issued'],
+            	            ['0456','CN=Bob Builder,DC=My Company,DC=com','',1379587517,1411113697,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','qqA2HidUoRvlSLhsFIB6_ps6CpQ','999','expired'],
+            	            ['0776','CN=Bob Builder,DC=My Company,DC=com','',1279588888,1311113697,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','qqA2HidUoRvlSLhsFIB6_ps6CxX','989','revoked'],
+            	            ['7676','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1379585522,1395220000,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8buyy','886','issued'],
+            	            ['7670','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1378585522,1395110000,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8bu11','880','issued'],
+            	            ['7671','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1398585522,1393560000,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8bu22','881','expired'],
             	        ],   
                         
                     },
