@@ -48,7 +48,7 @@ extensions:
         critical: 0
         client_auth:      1
         email_protection: 0
-        oid: 1.3.6.1.4.1.311.20.2.2
+        1.3.6.1.4.1.311.20.2.2: 1
 
     subject_key_identifier:
         critical: 0
