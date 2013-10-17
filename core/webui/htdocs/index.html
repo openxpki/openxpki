@@ -210,7 +210,17 @@
       
       </table>
     </script>
-    
+    <script type="text/x-handlebars" data-template-name="keyvalue-view">
+      {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
+     {{#if view.description}}<div style="margin-bottom:12px;">{{view.description}}</div>{{/if}}
+      
+      <table class="table table-bordered">
+      {{#each item in view.data}}
+      <tr><td>{{item.label}}</td><td>{{item.value}}</td></tr>
+      {{/each}}
+      </table>
+
+    </script>
     
     <script type="text/x-handlebars" data-template-name="notfound">
       The page {{original_target}} doesn't exist.
@@ -246,6 +256,7 @@
    <script src="js/oxi/form.js"></script>
    <script src="js/oxi/grid.js"></script>
    <script src="js/oxi/text.js"></script>
+   <script src="js/oxi/keyvalue.js"></script>
    <script src="js/run.js"></script>
   </body>
   
