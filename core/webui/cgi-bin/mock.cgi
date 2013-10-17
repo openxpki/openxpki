@@ -189,6 +189,10 @@ sub handle {
     my $target = 'search/search_certificates';
     return {page=>{},'goto'=> $target,status=>{level=>'info',message=>'url will change to '.$target}};
     
+}elsif($page eq 'secret_page'){
+   
+    return {page=>{'label' => 'some special page'}};
+    
 }else{
     return {
         page => {
@@ -395,6 +399,17 @@ sub handle_certsearch {
                     'content' => {
                         #'label' => 'Grid-Headline',
                         'description' => 'some text before...',
+                        'actions' => [
+                            {path => 'cert!detail!{id}',
+                             label => 'Details'
+                            },
+                            {path => 'cert!copy!{id}',
+                             label => 'Create copy'
+                            },
+                            {path => 'cert!mail2issuer!{id}',
+                             label => 'Send an email to issuer'
+                            },
+                        ],
                         'columns' => [
             						{ sTitle => "serial" },
             						{ sTitle => "subject" },
@@ -411,7 +426,7 @@ sub handle_certsearch {
             	            ['0456','CN=Bob Builder,DC=My Company,DC=com','',1379587517,1411113697,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','qqA2HidUoRvlSLhsFIB6_ps6CpQ','999','expired'],
             	            ['0776','CN=Bob Builder,DC=My Company,DC=com','',1279588888,1311113697,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','qqA2HidUoRvlSLhsFIB6_ps6CxX','989','revoked'],
             	            ['7676','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1379585522,1395220000,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8buyy','886','issued'],
-            	            ['7670','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1378585522,1395110000,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8bu11','880','issued'],
+            	            ['7670','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1378585522,1395110000,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8bu11','880',''],
             	            ['7671','CN=John M Miller,DC=My Company,DC=com','john.miller@my-company.com',1398585522,1393560000,'CN=CA 1,O=OpenXOKI Testing,ST=Bayern,C=DE','swBdX644xhsn-brmKLbKOb8bu22','881','expired'],
             	        ],   
                         
