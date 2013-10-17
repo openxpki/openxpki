@@ -53,12 +53,14 @@ OXI.Application = Ember.Application.extend(
     BadUrlRoute: Ember.Route.extend({
         beforeModel: function(transition) {
             Ember.debug('BadUrlRoute '+location.hash+' check transition');
-
-            App.set('original_target',location.hash.substr(1));
+            var orig_target = location.hash.substr(1);
+            App.set('original_target',orig_target);
+            js_debug('original_target stored: ' + orig_target);
             if(!App.user_logged_in){
                 this.transitionTo('login');
             }else{
-                this.transitionTo('notfound');
+                
+                this.transitionTo('forward');
             }
         }
     }),
@@ -258,6 +260,8 @@ OXI.Application = Ember.Application.extend(
             this.route('logout');
             this.route('notfound');
             this.route('welcome');
+            this.route('forward');
+            
             App.set('NavArrayController', Ember.ArrayController.create({
                 content: Ember.A([])
             }));

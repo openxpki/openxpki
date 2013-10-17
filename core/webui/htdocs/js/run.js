@@ -26,13 +26,21 @@ App.Route = Ember.Route.extend({
 
         if(final_route == this.routeName){
             //js_debug('final route reached:'+final_route);
-            var p = this.routeName.indexOf('.');
-            if(p>0){
-
-                this.mainActionKey = this.routeName.substr(0,p);
-                this.subActionKey = this.routeName.substr(p+1);
+            
+            if(final_route == 'forward'){
+                this.subActionKey = App.get('original_target');
+                js_debug('forward to original target: '+this.subActionKey);
+                App.set('original_target','');
             }else{
-                this.subActionKey =  this.routeName;
+            
+                var p = this.routeName.indexOf('.');
+                if(p>0){
+    
+                    this.mainActionKey = this.routeName.substr(0,p);
+                    this.subActionKey = this.routeName.substr(p+1);
+                }else{
+                    this.subActionKey =  this.routeName;
+                }
             }
         }
     },

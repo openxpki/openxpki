@@ -189,6 +189,10 @@ sub handle {
     my $target = 'search/search_certificates';
     return {page=>{},'goto'=> $target,status=>{level=>'info',message=>'url will change to '.$target}};
     
+}elsif($page eq 'secret_page'){
+   
+    return {page=>{'label' => 'some special page'}};
+    
 }else{
     return {
         page => {
@@ -395,6 +399,17 @@ sub handle_certsearch {
                     'content' => {
                         #'label' => 'Grid-Headline',
                         'description' => 'some text before...',
+                        'actions' => [
+                            {path => 'cert!detail!{id}',
+                             label => 'Details'
+                            },
+                            {path => 'cert!copy!{id}',
+                             label => 'Create copy'
+                            },
+                            {path => 'cert!mail2issuer!{id}',
+                             label => 'Send an email to issuer'
+                            },
+                        ],
                         'columns' => [
             						{ sTitle => "serial" },
             						{ sTitle => "subject" },
