@@ -4,11 +4,19 @@
 
 package OpenXPKI::Client::UI::Result;
 
+use OpenXPKI::Serialization::Simple;
+
 use Moose; 
 
 has cgi => (       
     is => 'ro',
     isa => 'Object',
+);
+
+has extra => (       
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub { return {}; }    
 );
 
 has _client => (       
@@ -44,6 +52,19 @@ has reload => (
     is => 'rw',       
     isa => 'Bool',
     default => 0,
+);
+
+has redirect => (
+    is => 'rw',       
+    isa => 'Str',
+    default => '',
+);
+
+has serializer => (
+    is => 'ro',       
+    isa => 'Object',
+    lazy => 1,
+    default => sub { return OpenXPKI::Serialization::Simple->new(); }  
 );
 
 sub BUILD {
@@ -87,7 +108,7 @@ sub send_command {
     
     my $backend = $self->_client()->backend();
     my $reply = $backend->send_receive_service_msg( 
-        'COMMAND', { COMMAND => $command, PARAMS => {} }  
+        'COMMAND', { COMMAND => $command, PARAMS => $params }  
     );
     
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
@@ -107,9 +128,14 @@ sub set_status_from_error_reply {
     
     my $message = 'unknown error'; 
     if ($reply->{'LIST'} 
-        && ref $reply->{'LIST'} eq 'ARRAY'
-        && $reply->{'LIST'}->[0]->{LABEL}) {    
-        $message = $reply->{'LIST'}->[0]->{LABEL};            
+        && ref $reply->{'LIST'} eq 'ARRAY') {            
+        # Workflow errors            
+        if ($reply->{'LIST'}->[0]->{PARAMS} && $reply->{'LIST'}->[0]->{PARAMS}->{__ERROR__}) {
+            $message = $reply->{'LIST'}->[0]->{PARAMS}->{__ERROR__};
+        } elsif($reply->{'LIST'}->[0]->{LABEL}) {    
+            $message = $reply->{'LIST'}->[0]->{LABEL};
+        }            
+        $self->logger()->error($message);        
     }   
     $self->_status({ level => 'error', message => $message });
     
@@ -120,9 +146,16 @@ sub param {
     
     my $self = shift;
     my $key = shift;
+    
+    my $extra = $self->extra()->{$key};
+    return $extra if (defined $extra);
+                
     my $cgi = $self->cgi();
     return undef unless($cgi);
     
+    if (wantarray) {
+        return \({$cgi->param($key)});
+    }   
     return $cgi->param($key);
 }
 
@@ -142,6 +175,7 @@ sub render {
     $result->{status} = $self->_status() if $self->_status();    
     $result->{page} = $self->_page() if $self->_page();
     $result->{reloadTree} = 1 if $self->reload();
+    $result->{goto} = $self->redirect() if $self->redirect();
     
     return $result;
 }

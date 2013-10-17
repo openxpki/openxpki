@@ -159,7 +159,20 @@ Valid types are html form types plus:
 Values for select elements are passed either as symbolic name to a predefined set (e.g. crr reason) or as verbose array with the field definition. Each field can have the name of a validation rule attached, on-the-fly validation is done on the client. When the is send to the server, it will respond with either a list of errors in the current form or the ruleset for the next page to be rendered.
 Fieldtypes and Validation rules should be easily extendable, t.b.d: perhaps its easier to bundle validation + layout into complex types (e.g. field type = type, size, validator).
 
+Configuration
+=============
 
+It should be possible to render most of the workflow actions to suitable ui
+presentation using a generic class and workflow internals.
+
+Approach:
+* obtain list of fields from activity
+* attribute "type" is used to give rendering hints
+* attribute label is default label
+* type can be a simple form type - rendered by the ui
+* type can be a named element, that points to a form defintion (like in profile)
+* complex ui requirements with "uiclass" attribute on activity level (disabled autorendering)
+* consideration: nested elements using source_list/source_class
 
 
 

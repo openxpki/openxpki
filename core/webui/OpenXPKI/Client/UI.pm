@@ -132,7 +132,7 @@ sub handle_request {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure    
-    $self->flush_session() if ($action eq 'logout');
+    $self->flush_session() if ($page eq 'logout' || $action eq 'logout');
 
     
     my $reply = $self->backend()->send_receive_service_msg('PING');
@@ -174,14 +174,15 @@ sub handle_page {
     
     my $cgi = $args->{cgi};
     
-    # set action - args always wins about cgi
+    # set action and page - args always wins about cgi
     my $action = (defined $args->{action} ? $args->{action} : $cgi->param('action')) || '';
+    my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
     
     my $result;
     if ($action) {
         $self->logger()->info('handle action ' . $action);
-        
-        my ($class, $method) = split /!/, $action;    
+                
+        my ($class, $method) = split /!/, $action;           
         $class = "OpenXPKI::Client::UI::".ucfirst($class);
         $self->logger()->debug("Loading page action class $class");                
         eval "use $class;1";        
@@ -200,26 +201,31 @@ sub handle_page {
     # Render a page only if  there is no action result         
     if (!$result) {
              
-        my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
-        
-        my ($class, $method) = split /!/, $page;    
+        my ($class, $method, %extra);
+        # Handling of special page requests - to be replaced by hash if it grows
+        if ($page eq 'welcome') {
+            $class = 'home';
+            $method = 'welcome';
+        } else {
+            ($class, $method, %extra) = split /!/, $page;
+        }    
         $class = "OpenXPKI::Client::UI::".ucfirst($class);
-        $self->logger()->debug("Loading page handler class $class");
+        $self->logger()->debug("Loading page handler class $class, extra params " . Dumper \%extra );
         
-        eval "use $class;1";        
+        eval "use $class;1";
         if ($EVAL_ERROR) {
             $self->logger()->error("Failed loading page class $class");
             $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self });        
             $result->init_error();
             $result->set_status('Page was not found','error');
-                 
-        } else {
-        
-            $result = $class->new({ client => $self, cgi => $cgi });    
+                            
+        } else {        
+            $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });    
             $method  = 'index' if (!$method );
             $method  = "init_$method";    
             $self->logger()->debug("Method is $method");       
             $result->$method( $method_args );
+            
         }
     }
     
@@ -243,7 +249,7 @@ sub handle_login {
     
     my $session = $self->session();
     my $action = $cgi->param('action') || '';
-
+    
     $self->logger()->info('not logged in - doing auth - action is ' . $action);
     
     # Special handling for pki_realm and stack params
@@ -263,7 +269,7 @@ sub handle_login {
     my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
 
     # force reload of structure if this is an initial request
-    $result->reload(1) unless ($action && $action =~ /^login!/);
+    $result->reload(1) if ($action && $action !~ /^login!/);
           
     if ( $status eq 'GET_PKI_REALM' ) {
         if ($pki_realm) {            
@@ -330,7 +336,7 @@ sub handle_login {
             $self->session()->param('user', $reply->{PARAMS});
             $self->session()->param('is_logged_in', 1);
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});         
-            return $self->handle_page( { 'page' => 'home', 'action' => '', cgi => $cgi }, { initial => 1 } );
+            return $result->init_success()->render();
         }
     }
             

@@ -15,6 +15,18 @@ sub BUILD {
     $self->_page ({'label' => 'Welcome to your OpenXPKI Trustcenter'});    
 }
 
+sub init_welcome {
+    
+    
+    my $self = shift;
+    my $args = shift;
+    
+    $self->set_status("You have 5 pending requests.");
+    $self->init_index( $args );
+    
+    return $self;
+}
+
 sub init_index {
     
     my $self = shift;
@@ -23,16 +35,10 @@ sub init_index {
     $self->_result()->{main} = [{ 
         type => 'text',
         content => {
-            headline => 'My little Headline',
-            paragraphs => [{text=>'Paragraph 1'},{text=>'Paragraph 2'}]
+            label => 'My little Headline',
+            description => 'Hello World'
         }
     }];
-    
-    # Initial login
-    if ($args->{initial}) {
-        $self->reload(1);
-        $self->set_status("You have 5 pending requests.");
-    }
         
     return $self;
 }

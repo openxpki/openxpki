@@ -65,13 +65,14 @@ sub init_login_passwd {
     
 }
 
-sub do_login {
+sub init_success {
     
     my $self = shift;
-    my $args = shift;
     
-    my $cgi = $args->{cgi};
+    $self->reload(1);
+    $self->redirect('welcome');
     
-}
+    return $self;
+} 
 
 1;

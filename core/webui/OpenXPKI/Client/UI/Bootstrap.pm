@@ -56,11 +56,17 @@ sub _init_structure_for_user {
          entries=>  [
              {key=> 'request_cert', label =>  "Request new certificate"},
              {key=> 'request_renewal',label =>  "Request renewal"},  
-             {key=> 'request_revocation',label =>  "Request revocation"} , 
-             {key=> 'issue_clr',label =>  "Issue CLR"}  
+             {key=> 'request_revocation',label =>  "Request revocation"} ,          
          ]   
       },
-      
+      {
+         key=> 'pkiadm',
+         label=>  'PKI Operation',
+         entries=>  [
+             {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', label =>  "Change metadata"},
+             {key=> 'crl',label =>  "Manage CRL"}
+         ]   
+      },
       {
          key=> 'info',
          label=>  'Information',

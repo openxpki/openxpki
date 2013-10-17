@@ -20,7 +20,7 @@ sub init_certificate {
     
     $self->_page({
         label => 'Certificate Search',
-        desc => 'You can search for certs here.',
+        description => 'You can search for certs here.',
     });
     
     $self->_result()->{main} = [        
@@ -66,7 +66,7 @@ sub action_certificate {
 
     $self->_page({
         label => 'Certificate Search - Results',
-        desc => 'Here are the results of the swedish jury:',
+        description => 'Here are the results of the swedish jury:',
     });
     
     my $i = 1;
@@ -115,7 +115,7 @@ sub init_workflow {
 
     $self->_page({
         label => 'Workflow Search',
-        desc => 'You can search for workflows here.',
+        description => 'You can search for workflows here.',
     });
     
     
@@ -183,7 +183,7 @@ sub action_workflow {
 
     $self->_page({
         label => 'Workflow Search - Results',
-        desc => 'Here are the results of the swedish jury:',
+        description => 'Here are the results of the swedish jury:',
     });
     
     my $i = 1;

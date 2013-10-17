@@ -151,7 +151,8 @@ OXI.FormView = OXI.View.extend({
         for(i=0;i<this.fields.length;i++){
             var field=this.fields[i];
             var ContainerView;
-            switch(field.type){
+            switch(field.type){              
+                case 'hidden':
                 case 'text':
                 case 'password':
                 ContainerView = OXI.TextFieldContainer.create({fieldDef:field});
