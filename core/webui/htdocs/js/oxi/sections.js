@@ -111,6 +111,11 @@ OXI.SectionView = OXI.View.extend({
             {content:this.sectionData.content}
             );
             break;
+            case 'keyvalue':
+            ContentView = OXI.KeyValueView.create(
+            {content:this.sectionData.content}
+            );
+            break;
             case 'grid':
             ContentView = OXI.GridView.create(
             {action:this.sectionData.action, content:this.sectionData.content}

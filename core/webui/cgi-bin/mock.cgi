@@ -193,13 +193,32 @@ sub handle {
    
     return {page=>{'label' => 'some special page'}};
     
+}elsif($page eq 'test_key_value'){
+   
+    return {page=>{'label' => 'Test Key Value'},
+            main => [
+                {type => 'keyvalue',content => {
+                    label => '',
+                    description => '',
+                    data => [
+                        {label => 'key 1', value => 'value 1'},
+                        {label => 'key 2', value => '1395226097', format=>'timestamp'},
+                        {label => 'key 2', value => ['123','876']},
+                    ]    
+                }
+            }]
+        };
+    
 }else{
     return {
         page => {
             label => 'Sorry!',
             description => 'The page '.$page.' is not implemented yet.'
-
         }
+        
+        
+            
+        
     };
 
 }
@@ -268,7 +287,9 @@ sub get_side_structure_logged_in{
         label=>  'Tests',
         entries=>  [
         {key=> 'test_reload',label =>  "Test page reload"},
-        {key=> 'test_goto',label =>  "Test goto"}
+        {key=> 'test_goto',label =>  "Test goto"},
+        {key=> 'test_key_value',label =>  "Test Key/Value"},
+        
         ]
     }
 
