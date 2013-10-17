@@ -4,5 +4,10 @@
       class="OpenXPKI::Server::Workflow::Validator::RelativeDate">
       <param name="emptyok" value="1"/>      
   </validator>
+
+  <validator name="I18N_OPENXPKI_WF_VAL_CERT_IDENTIFIER_EXISTS"
+      class="OpenXPKI::Server::Workflow::Validator::CertIdentifierExists">
+      <param name="emptyok" value="1"/>      
+  </validator>
   
 </validators>
