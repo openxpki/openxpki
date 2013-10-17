@@ -1,12 +1,21 @@
 <actions>
 
+    <action name="changemeta_initial"
+            class="OpenXPKI::Server::Workflow::Activity::Noop">
+    </action>
+            
     <action name="changemeta_load_data"
             class="OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata">            
-            <field name="cert_identifier" is_required="yes"/>            
+            <field name="cert_identifier" is_required="yes"/>   
+            <validator name="I18N_OPENXPKI_WF_VAL_CERT_IDENTIFIER_EXISTS">
+              <arg>$cert_identifier</arg>
+            </validator>                            
     </action>
 
     <action name="changemeta_update_context"
-            class="Workflow::Action::Null">
+            class="OpenXPKI::Server::Workflow::Activity::Noop"
+            uihandle="OpenXPKI::Client::UI::Workflow::Metadata::render_update_form"
+            description="I18N_OPENXPKI_ACTION_UPDATE_METADATA_ACTION"> 
             <field name="metadata_update"/>
             <validator name="changemeta_validate_metadata"/>        
     </action>
@@ -14,5 +23,10 @@
     <action name="changemeta_persist"
             class="OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata">
     </action>  
+
+    <action name="changemeta_load_form"
+            class="OpenXPKI::Server::Workflow::Activity::Noop">
+    </action>
+    
     
 </actions>
