@@ -202,6 +202,7 @@ sub get_cert_subject_styles {
     return $styles;
 }
 
+
 sub get_additional_information_fields {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -242,6 +243,18 @@ sub get_additional_information_fields {
         }               
     }
     return $additional_information;
+}    
+
+# new ui - get definition hashes for requested fields
+sub get_field_definition {
+    my $self      = shift;
+    my $arg_ref   = shift;
+    ##! 1: 'start'
+    
+    my $result = $self->__fetch_input_element_definitions($arg_ref->{PROFILE}, $arg_ref->{FIELDS});
+    ##! 16: 'result ' . Dumper $result
+    return $result; 
+         
 }    
 
 sub get_possible_profiles_for_role {

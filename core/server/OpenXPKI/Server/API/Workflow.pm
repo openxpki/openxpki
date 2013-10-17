@@ -296,11 +296,43 @@ sub get_workflow_info {
         WORKFLOW_ID => $wf_id,
     });
     my $workflow = $factory->fetch_workflow(
-	    $wf_title,
-	    $wf_id
-    );
+        $wf_title,
+        $wf_id
+    );        
 
     return __get_workflow_info($workflow);
+}
+
+sub get_workflow_initial_info {
+    
+    ##! 1: 'start'
+    
+    my $self  = shift;
+    my $args  = shift;
+    
+    my $factory = __get_workflow_factory();     
+    my $wf_config = $factory->_get_workflow_config($args->{WORKFLOW});
+    
+    
+    ##! 64: 'config ' . Dumper $wf_config
+    
+        
+=cut        
+    # extract the action in the initial state from the config        
+    foreach my $state (@{$wf_config->{state}}) {
+        next if ($state->{name} ne 'INITIAL');
+        my $initial_action = $state->{action}->[0]->{name};    
+        $factory->{_action_config}{default}{$initial_action}               
+    }
+=cut        
+
+    return {
+        WORKFLOW => {
+            TYPE        => $wf_config->{type},
+            DESCRIPTION => $wf_config->{description},                
+        }        
+    }
+    
 }
 
 sub get_workflow_history {
@@ -333,6 +365,8 @@ sub execute_workflow_activity {
     my $wf_id       = $args->{ID};
     my $wf_activity = $args->{ACTIVITY};
     my $wf_params   = $args->{PARAMS};
+
+    ##! 32: 'params ' . Dumper $wf_params  
 
     if (! defined $wf_title) {
         $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
@@ -955,8 +989,28 @@ sub __get_workflow_info {
 	},
     };
     
+    # FIXME - poking into the workflow internals is not that nice, we should perhaps move that at least to the factory
+    
+    # drill down into the state definition to find the ui setting
+    foreach my $state (@{$workflow->{_factory}->{_workflow_config}->{$workflow->type()}->{state}}) {
+        next unless ($state->{name} eq $workflow->state());
+        $result->{STATE} = { DESCRIPTION => $state->{description} || '' };
+        if ($state->{uihandle}) {
+            $result->{STATE}->{UIHANDLE} = $state->{uihandle}; 
+        }
+    }
+   
     foreach my $activity ($workflow->get_current_actions()) {
 	##! 2: $activity
+
+    # We extract the values from the action definition for ui rendering
+    my $info = $workflow->{_factory}->{_action_config}->{default}->{$activity};
+        
+    $result->{ACTIVITY}->{$activity} = {
+        LABEL => $info->{description} || $activity        
+    };
+    $result->{ACTIVITY}->{$activity}->{UIHANDLE} = $info->{uihandle} if ($info->{uihandle});
+    
 
 	# FIXME - bug in Workflow::Action (v0.17)?: if no fields are defined the
 	# method tries to return an arrayref on an undef'd value
@@ -967,10 +1021,13 @@ sub __get_workflow_info {
 	
 	foreach my $field (@fields) {
 	    ##! 4: $field->name()
+	    ##! 64: 'Field info ' . Dumper $field
 	    $result->{ACTIVITY}->{$activity}->{FIELD}->{$field->name()} =
 	    {
 		DESCRIPTION => $field->description(),
 		REQUIRED    => $field->is_required(),
+		TYPE        => $field->type(),
+		LABEL       => $field->label(),
 	    };
 	}
     }

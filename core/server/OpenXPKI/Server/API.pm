@@ -642,6 +642,18 @@ sub BUILD {
             },
             memoize => 1,
         },
+        'get_field_definition' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,                    
+                    regex    => $re_alpha_string
+                },
+                FIELDS => {
+                    type     => ARRAYREF,
+                },
+            },                       
+        },
         'render_subject_from_template' => {
             class  => 'Profile',
             params => {
@@ -939,6 +951,15 @@ sub BUILD {
                 },
 	        },
         },
+        'get_workflow_initial_info' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,                    
+                },
+            },
+        }, 
         'get_workflow_history' => {
             class  => 'Workflow',
             params => {
