@@ -314,6 +314,16 @@ my %TABLE_of = (
 		     "WORKFLOW_CONTEXT_VALUE",
 	    ]},
 
+
+    WORKFLOW_ATTRIBUTES => {
+        NAME    => "workflow_attributes",
+        INDEX   => [ "WORKFLOW_SERIAL", "ATTRIBUTE_KEY", ],
+        COLUMNS => [ "WORKFLOW_SERIAL", 
+             "ATTRIBUTE_KEY", 
+             "ATTRIBUTE_VALUE",
+        ],
+    },
+
     DATAPOOL => {
         NAME    => "datapool",
         INDEX   => [ "PKI_REALM", "NAMESPACE", "DATAPOOL_KEY", ],
@@ -444,6 +454,16 @@ my %INDEX_of = (
 		NAME  => 'wf_context_key_index',
 		TABLE => 'WORKFLOW_CONTEXT',
 		COLUMNS => [ 'WORKFLOW_CONTEXT_KEY' ],
+    },
+    WORKFLOW_ATTRIBUTES_WORKFLOW_KEY => {
+        NAME  => 'wf_attributes_key_index',
+        TABLE => 'WORKFLOW_ATTRIBUTES',
+        COLUMNS => [ 'WORKFLOW_SERIAL' ],
+    },
+    WORKFLOW_ATTRIBUTES_VALUE_KEY => {
+        NAME  => 'wf_attributes_value_index',
+        TABLE => 'WORKFLOW_ATTRIBUTES',
+        COLUMNS => [ 'ATTRIBUTE_VALUE' ],
     }
     );
 
