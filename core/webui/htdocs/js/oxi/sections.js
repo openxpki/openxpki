@@ -24,6 +24,8 @@ OXI.SectionViewContainer = OXI.View.extend({
             this.MessageView.reset();
         }
     },
+    
+    
 
     initSections:function(json){
         //js_debug(json,2);

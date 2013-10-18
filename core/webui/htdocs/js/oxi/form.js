@@ -62,10 +62,12 @@ OXI.FormView = OXI.View.extend({
                     App.set('original_target','');
                 }
             }
+            App.showLoader();
             App.callServer(formValues).success(
             function(json){
                 FormView.debug('server responded');
                 //js_debug(json,2);
+                App.hideLoader();
                 App.renderPage(json);
                 
                 if(json.error){

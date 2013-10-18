@@ -69,7 +69,8 @@ OXI.Application = Ember.Application.extend(
     
     rootElement: null,//read from config
     serverUrl:null,//read from config
-    cookieName:null,
+    cookieName:null,//read from config
+    ajaxLoaderTimeout:0,//read from config
 
     user_logged_in: false,
     user:null,
@@ -138,6 +139,8 @@ OXI.Application = Ember.Application.extend(
         
         
     }),
+    
+    
 
     NotfoundRoute: Ember.Route.extend({
 
@@ -150,6 +153,8 @@ OXI.Application = Ember.Application.extend(
             this.render('notfound');
         }
     }),
+    
+    
 
     Router: Ember.Router.extend({
         
@@ -160,7 +165,7 @@ OXI.Application = Ember.Application.extend(
             //this hook is triggered if a link has been clicked on the page
             js_debug('didTransition ' + path); 
             //we check, if the content for the current route(=server page) has been changed (via form actions etc)
-            //if so, we reload page infos from server (otherwise, the re-rendered püagecontent (e.e. form-submits, searchresults) will not be changed)
+            //if so, we reload page infos from server (otherwise, the re-rendered pagecontent (e.e. form-submits, searchresults) will not be changed)
             if(App.get('_actualPageRenderCount')>1){
                  App.reloadPageInfoFromServer();  
             }
@@ -177,7 +182,9 @@ OXI.Application = Ember.Application.extend(
         this.rootElement = OXI.Config.get('rootElement');
         this.serverUrl = OXI.Config.get('serverUrl');
         this.cookieName = OXI.Config.get('cookieName');
+        this.ajaxLoaderTimeout = OXI.Config.get('ajaxLoaderTimeout');
         this._actualPageRenderCount = 0;
+        this.set('AjaxLoadingView',OXI.LoadingView.create());
     },
 
     logout:function(){
@@ -235,16 +242,30 @@ OXI.Application = Ember.Application.extend(
         js_debug('App.loadPageInfoFromServer: '+pageKey);
         this.set('_actualPageRenderCount',0);
         this.set('_actualPageKey',pageKey);
+        
+        this.showLoader();
         this.callServer({page:pageKey})
             .success(function(json){
+                
                 if(pageKey == 'logout'){
                     App.logout();
                     App.reloadPage('login');
                 }else{
                     App.renderPage(json);
+                    App.hideLoader();
                 }
             });
     },
+    
+    showLoader: function(){
+        this._loader = setTimeout(function(){$('#ajaxLoadingModal').modal({backdrop:false});},this.ajaxLoaderTimeout);
+    },
+    
+    hideLoader: function(){
+        if(this._loader)clearTimeout(this._loader);
+        $('#ajaxLoadingModal').modal('hide');
+    },
+    
     
     renderPage: function(json){
         js_debug({'App.renderPage':json},3);
