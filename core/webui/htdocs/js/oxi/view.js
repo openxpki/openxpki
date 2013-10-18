@@ -38,3 +38,21 @@ OXI.View = Ember.View.extend({
       js_debug({jsClassName:this._toString(),data:data},3);
    }
 });
+
+OXI.LoadingView = OXI.View.extend(
+    {
+        jsClassName:'OXI.LoadingView',
+        templateName: "loading",
+        
+        show:function(){
+            this.debug('show!');
+            $('#ajaxLoadingModal').modal('show');
+        },
+        hide:function(){
+            this.debug('hide!');
+            $('#ajaxLoadingModal').modal('hide');
+        }
+        
+    }
+    
+);

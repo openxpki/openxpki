@@ -47,6 +47,7 @@ OXI.GridView = OXI.View.extend({
                 }
         };
         
+        var callbacksOnDraw = [];
         
         //do we have a "status"-column defined?
         var statusIndex = this._getStatusColumnIndex(columnDef);
@@ -55,10 +56,9 @@ OXI.GridView = OXI.View.extend({
             tableInit.fnCreatedRow = function(nRow, aData, iDataIndex){
                                 var rowStatus = aData[statusIndex];
                                 //js_debug({rowStatus:rowStatus, nRow:nRow, aData:aData, iDataIndex:iDataIndex});
+                                $(nRow).addClass('gridrow');
                                 if(rowStatus && rowStatus!='[none]'){
                                     $(nRow).addClass('gridrow-'+rowStatus);
-                                }else{
-                                    $(nRow).addClass('gridrow');
                                 }
                             };
             //display status-filter
@@ -66,33 +66,64 @@ OXI.GridView = OXI.View.extend({
                 var availableStati = this._getAvailableStati(statusIndex);
                 //js_debug({availableStati:availableStati},2);
                 if(availableStati.length>1){
-                    tableInit.fnDrawCallback = this._getStatusFilterDrawCallback(statusIndex,availableStati); 
+                    callbacksOnDraw.push( this._getStatusFilterDrawCallback(statusIndex,availableStati)); 
                 }
             }
+        }else{
+            tableInit.fnCreatedRow = function(nRow, aData, iDataIndex){ $(nRow).addClass('gridrow'); };  
         }
         
         if(this.content.actions  ){
-            var actions = this.content.actions;
-            tableInit.fnRowCallback = function( nRow, aData, iDisplayIndex ) {
-                //js_debug('fnRowCallback ... '+iDisplayIndex);  
-                var strTooltip='',i;
-                for(i=0;i<actions.length;i++){
-                   strTooltip += '<div action-path="'+actions[i].path+'">'+actions[i].label +'</div>';  
-                }
-                $('td', nRow).popover(
-                    {trigger:'click',
-                     html:true,
-                     placement:'auto',
-                     title:'Possible actions',
-                     content:strTooltip,
-                     container: 'body'
-                        }
-                );
-            };   
+            callbacksOnDraw.push(this._getContextMenuCallback(columnDef,this.content.actions));
+        }
+        
+        tableInit.fnDrawCallback = function(oSettings){
+            var i;
+            for(i=0;i< callbacksOnDraw.length;i++){
+                var cb = callbacksOnDraw[i];
+                //js_debug('exec callback on draw '+cb);
+                cb(oSettings);    
+            }  
         }
         
         $table.dataTable(tableInit );
         js_debug('dataTable tableInit');
+    },
+    
+    _getContextMenuCallback: function(columnDef,actions){
+        
+        var i,items = {};
+        
+        for(i=0;i<actions.length;i++){
+            var action = actions[i];
+            items[action.path] = {name:action.label};
+            if(action.icon){
+                items[action.path].icon = action.icon;
+            }
+        }
+        var grid_id = this.grid_id;
+        return function (oSettings){
+                    var DataTable = $('#'+grid_id).dataTable();
+                    var columns = columnDef;
+                    $.contextMenu({
+                    selector: 'tr.gridrow', 
+                    trigger: 'left',
+                    callback: function(key, options) {
+                        js_debug("menu clicked: " + key);// + " on " + $(this).text());
+                        var data = DataTable.fnGetData(this[0]);
+                        var i;
+                        var path = key;
+                        for(i=0;i<columns.length;i++){
+                            var col = columns[i].sTitle;
+                            path = path.replace('{'+col+'}',data[i]);
+                        }
+                        js_debug('dynamic path: '+path);
+                        //App.loadPageInfoFromServer(path);
+                        App.goto(path);
+                    },
+                    items: items
+                });   
+            };
     },
     
     _getStatusFilterDrawCallback: function(statusIndex, availableStati){

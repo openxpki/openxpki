@@ -193,6 +193,10 @@ sub handle {
    
     return {page=>{'label' => 'some special page'}};
     
+}elsif($page eq 'test_loading'){
+    sleep(5);
+    return {page=>{'label' => 'phew...this took a while...'}};
+    
 }elsif($page eq 'test_key_value'){
    
     return {page=>{'label' => 'Test Key Value'},
@@ -288,6 +292,7 @@ sub get_side_structure_logged_in{
         entries=>  [
         {key=> 'test_reload',label =>  "Test page reload"},
         {key=> 'test_goto',label =>  "Test goto"},
+        {key=> 'test_loading',label =>  "Test long loading"},
         {key=> 'test_key_value',label =>  "Test Key/Value"},
         
         ]
@@ -421,13 +426,14 @@ sub handle_certsearch {
                         #'label' => 'Grid-Headline',
                         'description' => 'some text before...',
                         'actions' => [
-                            {path => 'cert!detail!{id}',
-                             label => 'Details'
+                            {path => 'cert!detail!{_id}',
+                             label => 'Details',
+                             icon => 'view'
                             },
-                            {path => 'cert!copy!{id}',
+                            {path => 'cert!copy!{identifier}',
                              label => 'Create copy'
                             },
-                            {path => 'cert!mail2issuer!{id}',
+                            {path => 'cert!mail2issuer!{email}',
                              label => 'Send an email to issuer'
                             },
                         ],

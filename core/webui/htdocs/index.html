@@ -13,6 +13,8 @@
     <link href="css/bootstrap.css" rel="stylesheet">
     <!-- CSS for Data Table Grid --> 
     <link href="css/jquery.dataTables.css" rel="stylesheet">
+    <!-- CSS for context menu --> 
+    <link href="css/jquery.contextMenu.css" rel="stylesheet">
     <!-- Custom styles for this project -->
     <link href="css/oxi.css" rel="stylesheet">
     <link href="css/oxi-grid.css" rel="stylesheet">
@@ -32,7 +34,20 @@
       <div class="container">
         <p class="text-muted credit">&copy; Copyright 2013, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a>.</p>
       </div>
-    </div>   
+    </div> 
+    <div class="modal" id="ajaxLoadingModal" tabindex="-1" role="dialog" aria-labelledby="loading..." aria-hidden="true"
+        style="padding-top:200px;"
+        >
+      <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+        </div>
+        <div class="modal-body" >
+        <div style="text-align:center;width:100%;">Please be patient while loading...<br><img src="img/ajax-loader.gif" ></div>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+      </div>
 <script type="text/x-handlebars">
    <!-- headline -->
    <div class="container">
@@ -109,6 +124,7 @@
      </script>
     <script type="text/x-handlebars" data-template-name="main-content">
       {{view App.MainView}}
+      
     </script>
     <script type="text/x-handlebars" data-template-name="sections">
       <h2>{{view.label}}</h2>
@@ -226,6 +242,10 @@
       The page {{original_target}} doesn't exist.
     </script>
     
+    <script type="text/x-handlebars" data-template-name="loading">
+      
+    </script>
+    
     <script type="text/x-handlebars" data-template-name="page-message">
       <div {{bind-attr class=":alert view.msg_class"}}>{{view.message}}</div>
     </script>
@@ -238,6 +258,8 @@
     <script src="js/libs/jquery.js"></script>
     <script src="js/libs/jquery.cookie.js"></script>
     <script src="js/libs/jquery.dataTables.min.js"></script>
+    <script src="js/libs/jquery.ui.position.js"></script>
+    <script src="js/libs/jquery.contextMenu.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/libs/handlebars-1.0.0.js"></script>
