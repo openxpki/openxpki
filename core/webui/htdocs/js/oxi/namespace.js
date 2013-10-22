@@ -13,8 +13,7 @@ var OXI = {
          //name of cgi-session cookie (needed to reset the client session
          cookieName: 'CGISESSID',
          
-         //delay (in milliseconds) before the ajax loading spinner shows off
-         ajaxLoaderTimeout:500
+         
       })
    
 };

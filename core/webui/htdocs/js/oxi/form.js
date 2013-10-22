@@ -14,6 +14,7 @@ OXI.FormView = OXI.View.extend({
     label :null,
     description:null,
     action:null,
+    _actionIsTriggered : false,
 
     fields:[],
 
@@ -24,10 +25,19 @@ OXI.FormView = OXI.View.extend({
 
         return false;
     },
+    
+    
 
     submitAction: function(action, do_submit) {
         // will be invoked whenever the user triggers
-        // the browser's `submit` method
+        // the browser's `submit` method or a button is clicked explicitly
+        
+        if(this._actionIsTriggered){
+            js_debug('action already triggered ...return.');   
+            return;
+        }
+        this.set('_actionIsTriggered',true);
+        
         this.debug('Form submit with action '+action);
         if(!action){
             App.applicationError('Form or Button without action!');
@@ -62,10 +72,11 @@ OXI.FormView = OXI.View.extend({
                     App.set('original_target','');
                 }
             }
-            App.showLoader();
+            //App.showLoader();
             App.callServer(formValues).success(
             function(json){
                 FormView.debug('server responded');
+                FormView.set('_actionIsTriggered',false);
                 //js_debug(json,2);
                 App.hideLoader();
                 App.renderPage(json);
@@ -81,6 +92,7 @@ OXI.FormView = OXI.View.extend({
             );
         }else{
             this.debug('submit nok');
+            this.set('_actionIsTriggered',false);
         }
 
 
@@ -98,7 +110,7 @@ OXI.FormView = OXI.View.extend({
         this.default_action = null;
         this.label=null;
         this.description=null;
-
+        this.set('_actionIsTriggered',false);
 
         if(!this.content || !this.content.fields){
             App.applicationError('Form, init failed: no content definition!');
