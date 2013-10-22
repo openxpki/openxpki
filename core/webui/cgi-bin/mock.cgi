@@ -305,8 +305,11 @@ sub handle_login {
 
     my $q = shift;
     my $dummy_user = {login=>'admin',name => 'D.Siebeck', role=> 'admin', password=>'oxi'};
+    
+    my $goto = ($q->param('original_target'))?$q->param('original_target'):'welcome';
+    
     if ($q->param('username') eq $dummy_user->{login} && $q->param('password') eq $dummy_user->{password}) {
-        return { goto => 'welcome', user=>$dummy_user, reloadTree=> 1, status => { level => 'success', message => 'Login successful' } };
+        return { goto => $goto, user=>$dummy_user, reloadTree=> 1, status => { level => 'success', message => 'Login successful' } };
     }
 
     return { status => { level => 'error', message => 'Login credentials are wrong!' }};

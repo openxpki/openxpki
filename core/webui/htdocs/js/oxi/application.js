@@ -118,11 +118,11 @@ OXI.Application = Ember.Application.extend(
         
         beforeModel: function(transition) {
             Ember.debug('BadUrlRoute '+location.hash+' check transition');
-            this.originalTarget = location.hash.substr(1);
+            this.set('originalTarget',location.hash.substr(1));
             
             if(!App.user_logged_in){
-                App.set('original_target',orig_target);
-                js_debug('original_target stored: ' + orig_target);
+                App.set('original_target',this.originalTarget);
+                js_debug('original_target stored: ' + this.originalTarget);
                 this.transitionTo('login');
             }else{
                 if(this.originalTarget .indexOf('/') == 0){
@@ -184,7 +184,7 @@ OXI.Application = Ember.Application.extend(
         this.cookieName = OXI.Config.get('cookieName');
         this.ajaxLoaderTimeout = OXI.Config.get('ajaxLoaderTimeout');
         this._actualPageRenderCount = 0;
-        this.set('AjaxLoadingView',OXI.LoadingView.create());
+        
     },
 
     logout:function(){
@@ -258,11 +258,11 @@ OXI.Application = Ember.Application.extend(
     },
     
     showLoader: function(){
-        this._loader = setTimeout(function(){$('#ajaxLoadingModal').modal({backdrop:false});},this.ajaxLoaderTimeout);
+        $('#ajaxLoadingModal').modal({backdrop:'static'});
     },
     
     hideLoader: function(){
-        if(this._loader)clearTimeout(this._loader);
+        
         $('#ajaxLoadingModal').modal('hide');
     },
     
