@@ -53,12 +53,15 @@ OXI.GridView = OXI.View.extend({
         var statusIndex = this._getStatusColumnIndex(columnDef);
         if(statusIndex >-1){
             $table.removeClass('table-striped').removeClass('table-hover');
+            var grid_id = this.grid_id;
             tableInit.fnCreatedRow = function(nRow, aData, iDataIndex){
                                 var rowStatus = aData[statusIndex];
                                 //js_debug({rowStatus:rowStatus, nRow:nRow, aData:aData, iDataIndex:iDataIndex});
-                                $(nRow).addClass('gridrow');
+                                $(nRow).addClass('gridrow-'+grid_id);
                                 if(rowStatus && rowStatus!='[none]'){
                                     $(nRow).addClass('gridrow-'+rowStatus);
+                                }else{
+                                    $(nRow).addClass('gridrow');
                                 }
                             };
             //display status-filter
@@ -70,7 +73,8 @@ OXI.GridView = OXI.View.extend({
                 }
             }
         }else{
-            tableInit.fnCreatedRow = function(nRow, aData, iDataIndex){ $(nRow).addClass('gridrow'); };  
+            var grid_id = this.grid_id;
+            tableInit.fnCreatedRow = function(nRow, aData, iDataIndex){ $(nRow).addClass('gridrow-'+grid_id); };  
         }
         
         if(this.content.actions  ){
@@ -90,7 +94,43 @@ OXI.GridView = OXI.View.extend({
         js_debug('dataTable tableInit');
     },
     
+    doAction:function(path,data){
+        var i;
+        var aColumns = this.content.columns;                
+        for(i=0;i<aColumns.length;i++){
+            var col = aColumns[i].sTitle;
+            path = path.replace('{'+col+'}',data[i]);
+        }
+        js_debug('dynamic path: '+path);
+        App.goto(path);
+    },
+    
     _getContextMenuCallback: function(columnDef,actions){
+        
+        var grid_id = this.grid_id;
+        var GridView = this;
+        
+        if(actions.length==1){
+            //immediate action "on click"   
+            
+            var single_action = actions[0].path;
+            if(!single_action){
+                App.applicationAlert('no path for grid single action given!', actions[0]);
+                return;
+            }
+            return function (oSettings){
+                var DataTable = $('#'+grid_id).dataTable();
+                $('tr.gridrow-'+grid_id).click(
+                    function(){
+                        js_debug("row with single action clicked");
+                        var data = DataTable.fnGetData(this[0]);  
+                        GridView.doAction(single_action,data);
+                    }
+                );
+                
+            }
+        }
+        
         
         var i,items = {};
         
@@ -101,25 +141,17 @@ OXI.GridView = OXI.View.extend({
                 items[action.path].icon = action.icon;
             }
         }
-        var grid_id = this.grid_id;
+        
         return function (oSettings){
                     var DataTable = $('#'+grid_id).dataTable();
                     var columns = columnDef;
                     $.contextMenu({
-                    selector: 'tr.gridrow', 
+                    selector: 'tr.gridrow-'+grid_id, 
                     trigger: 'left',
                     callback: function(key, options) {
                         js_debug("menu clicked: " + key);// + " on " + $(this).text());
                         var data = DataTable.fnGetData(this[0]);
-                        var i;
-                        var path = key;
-                        for(i=0;i<columns.length;i++){
-                            var col = columns[i].sTitle;
-                            path = path.replace('{'+col+'}',data[i]);
-                        }
-                        js_debug('dynamic path: '+path);
-                        //App.loadPageInfoFromServer(path);
-                        App.goto(path);
+                        GridView.doAction(key,data);
                     },
                     items: items
                 });   

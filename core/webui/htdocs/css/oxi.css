@@ -29,6 +29,9 @@ body {
    margin-bottom:300px;  
 }
 
+.container.sections{
+    padding-top:20px;  
+}
 
 img.toplogo{
    padding-top:6px;
