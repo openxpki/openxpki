@@ -108,7 +108,7 @@ OXI.GridView = OXI.View.extend({
             path = path.replace('{'+col+'}',data[i]);
         }
         //js_debug('dynamic path: '+path+ ', target '+action.target);
-        App.handleAction(path,action.target);
+        App.handleAction(path,action.target,action.label);
     },
     
     _getContextMenuCallback: function(columnDef,actions){
@@ -128,8 +128,8 @@ OXI.GridView = OXI.View.extend({
                 var DataTable = $('#'+grid_id).dataTable();
                 $('tr.gridrow-'+grid_id).click(
                     function(){
-                        js_debug("row with single action clicked");
-                        var data = DataTable.fnGetData(this[0]);  
+                        //js_debug("row with single action clicked");
+                        var data = DataTable.fnGetData(this);  
                         GridView.doAction(single_action,data);
                     }
                 );

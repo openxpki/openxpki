@@ -34,15 +34,12 @@ OXI.TabView = OXI.View.extend({
         return '#'+this.get('elementId');
     }.property(),
     
-    isLast:function(){
-        return (this.tabindex == this.ParentView.lastTabIndex());
-    }.property(),
+    
     
     init:function(){
         this._super();
         if(!this.label){
-            App.applicationAlert('Tab withot label!');
-            return;
+            this.label = '';
         }
         if(!this.ParentView){
             App.applicationAlert('Tab withot ParentView!');
@@ -53,11 +50,13 @@ OXI.TabView = OXI.View.extend({
             return;
         }
         this.set('controller',OXI.TabControler.create({view:this}));
-        this.set('ContentView', this.createChildView(OXI.SectionViewContainer.create()));
+        this.set('ContentView', this.createChildView(
+                                    OXI.SectionViewContainer.create({displayType:'tab'})
+                                   ));
         this.set('_domReady',false);
     },
     closeTab:function(){
-        js_debug('will close myself...');
+        //js_debug('will close myself...');
         this.ParentView.closeTab(this.tabindex)
     },
     
@@ -95,15 +94,13 @@ OXI.SectionViewContainer = OXI.View.extend({
     label:null,
     shortlabel:null,
     description:null,
+    displayType:'main',
     
     //computed properties:
      hasNoTabs: function(){
        return (!this._hasTabs);
     }.property('_hasTabs'),
     
-    lastTabIndex: function(){
-        return this.Tabs.content.length-1;
-    },
     
     labelTabMain: function(){
        var label = (this.shortlabel)?this.shortlabel:this.label;
@@ -115,7 +112,7 @@ OXI.SectionViewContainer = OXI.View.extend({
     
     //methods:
     addTab: function(label){
-        js_debug('add tab called,  label '+label);  
+        //js_debug('add tab called,  label '+label);  
         var TabView = OXI.TabView.create({label:label,ParentView:this,tabindex:this.Tabs.content.length});
         this.Tabs.pushObject(this.createChildView(TabView));
         this.set('_hasTabs',true);
@@ -182,20 +179,21 @@ OXI.SectionViewContainer = OXI.View.extend({
         this.set('shortlabel','');
         this.set('desc','');
         if(json.page){
-            if(json.page.label){
-                this.set('label', json.page.label);
+            if(this.displayType == 'main'){//no label/description in tabs
+                if(json.page.label){
+                    this.set('label', json.page.label);
+                }
+                if(json.page.description){
+                    this.set('description', json.page.description);
+                }
+                this.setStatus(json.status);
             }
             if(json.page.shortlabel){
                 this.set('shortlabel', json.page.shortlabel);
             }
-            if(json.page.description){
-                this.set('description', json.page.description);
-            }
+            
         }
 
-        
-        this.setStatus(json.status);
-       
         //die einzelnen sections abbilden
         if(json.main){
             var i;
