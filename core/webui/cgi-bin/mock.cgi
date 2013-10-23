@@ -323,6 +323,12 @@ sub handle {
                 {type => 'keyvalue',content => {
                     label => '',
                     description => '',
+                    buttons => [
+                            {action => 'test_key_value!action1',label=>'Action 1'},
+                            {page => 'test_key_value!page1',label=>'Page 1'},
+                            {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
+                            {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
+                        ],                    
                     data => [
                         {label => 'key 1', value => 'value 1'},
                         {label => 'key 2', value => '1395226097', format=>'timestamp'},
