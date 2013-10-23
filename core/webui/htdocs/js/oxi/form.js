@@ -2,24 +2,22 @@
 defines classes for Forms
 */
 
-OXI.FormView = OXI.View.extend({
+OXI.FormView = OXI.ContentBaseView.extend({
 
     templateName: "form-view",
     jsClassName:'OXI.FormView',
 
-    //content prop: must be set via create() , info comes fropm server
-    content:null,
+    
     default_action:null,
     default_submit_label: 'send',
-    label :null,
-    description:null,
+    
     action:null,
     _actionIsTriggered : false,
 
     fields:[],
 
     FieldContainerList:[],
-    ButtonList:[],//additional (submit-)buttons
+    
 
     submit: function (event){
 
@@ -103,27 +101,18 @@ OXI.FormView = OXI.View.extend({
         //Ember.debug('OXI.FormView :init ');
         this._super();
         this.FieldContainerList = [];
-        this.ButtonList = [];
+        
 
         this.fieldContainerMap = {};
         this.fields = [];
         this.default_action = null;
-        this.label=null;
-        this.description=null;
+        
         this.set('_actionIsTriggered',false);
 
-        if(!this.content || !this.content.fields){
+        if(!this.content.fields){
             App.applicationError('Form, init failed: no content definition!');
             return;
         }
-
-        if (this.content.label){
-            this.label = this.content.label;
-        }
-        if (this.content.description){
-            this.description = this.content.description;
-        }
-
         this._initFields();
         this._initButtons();
     },
@@ -138,7 +127,7 @@ OXI.FormView = OXI.View.extend({
             }
             //the one-and-only button is obviously the default action:
             this.default_action = this.action;
-            this.ButtonList.push(this.createChildView(OXI.FormButton.create({Form:this,label:label,action:this.action,do_submit:true,is_default:true})));
+            this.addButton(OXI.FormButton.create({Form:this,label:label,action:this.action,do_submit:true,is_default:true}));
         }else{
             var i;
             //determine default action:
@@ -154,7 +143,11 @@ OXI.FormView = OXI.View.extend({
                 var def = this.content.buttons[i];
                 def.Form = this;
                 def.is_default=(def.action == this.default_action);
-                this.ButtonList.push(this.createChildView(OXI.FormButton.create(def)));
+                js_debug('addButton: '+i);
+                js_debug(def);
+                var B = OXI.FormButton.create(def);
+                js_debug('created');
+                this.addButton(B);
             }
         }
     },

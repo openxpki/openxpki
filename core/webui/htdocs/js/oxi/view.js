@@ -27,12 +27,14 @@ OXI.View = Ember.View.extend({
       this.set('errors',[]);
       this.set('_hasError',false);
    },
-
+   
    init:function(){
       //js_debug(this.jsClassName+':init' + this.toString());
       this.resetErrors();
+      
       this._super();
    },
+   
    
    destroy:function(){
       //js_debug(this.jsClassName+':destroy' + this.toString());
@@ -42,6 +44,39 @@ OXI.View = Ember.View.extend({
    debug:function(data){
       js_debug({jsClassName:this._toString(),data:data},3);
    }
+});
+
+OXI.ContentBaseView = OXI.View.extend(
+    {
+    //content prop: must be set via create() , info comes fropm server
+    content:null,
+    label:null,
+    description:null,
+    ButtonList:[],
+    
+    init:function(){
+      
+      this.ButtonList = [];
+      this.label=null;
+      this.description=null;
+      this._super();
+      if(!this.content ){
+        App.applicationError('ContentBaseView, init failed: no content definition!');
+        return;
+     }
+     if (this.content.label){
+            this.label = this.content.label;
+        }
+        if (this.content.description){
+            this.description = this.content.description;
+        }
+      
+   },
+   
+   addButton: function(ButtonView){
+        this.ButtonList.push(this.createChildView(ButtonView));
+   }
+   
 });
 
 OXI.LoadingView = OXI.View.extend(
