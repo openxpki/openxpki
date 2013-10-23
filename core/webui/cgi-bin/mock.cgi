@@ -209,6 +209,19 @@ sub handle {
                              label => 'Test 2',
                              target => 'tab',
                             },
+                            {path => 'my_tasks',
+                             label => 'another (nested) my tasks...',
+                             target => 'tab',
+                            },
+                            {path => 'my_workflows',
+                             label => 'my workflows',
+                             target => 'tab',
+                            },
+                            ,
+                            {path => 'my_certificates',
+                             label => 'my certificates',
+                             target => 'tab',
+                            },
                             
                         ],
                         'columns' => [
@@ -237,10 +250,12 @@ sub handle {
                             'actions' => [
                             {path => 'my_workflows!xxx',
                              label => 'WF Test 1',
-                             icon => 'view'
+                             icon => 'view',
+                             target => 'tab',
                             },
                             {path => 'my_workflows!yyy',
-                             label => 'WF Test 2'
+                             label => 'WF Test 2',
+                             target => 'tab',
                             },
                             
                         ],
@@ -270,7 +285,8 @@ sub handle {
                             'actions' => [
                             
                             {path => 'my_certificates!zzz',
-                             label => 'Grid Main action'
+                             label => 'Grid Main action',
+                             target => 'tab',
                             },
                             
                         ],
