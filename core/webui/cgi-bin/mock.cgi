@@ -210,7 +210,7 @@ sub handle {
                              icon => 'view',
                              target => 'tab',
                             },
-                            {path => 'my_tasks!blub',
+                            {path => 'my_tasks!date!{date_issued}',
                              label => 'Test 2',
                              target => 'tab',
                             },
@@ -289,7 +289,7 @@ sub handle {
                     'content' => {
                             'actions' => [
                             
-                            {path => 'my_certificates!zzz',
+                            {path => 'my_certificates!{date_issued}',
                              label => 'Grid Main action',
                              target => 'tab',
                             },
@@ -335,13 +335,10 @@ sub handle {
 }else{
     return {
         page => {
-            label => 'Sorry!',
-            description => 'The page '.$page.' is not implemented yet.'
-        }
-        
-        
             
-        
+        },
+        status => {level=>'warn',message=>'The page '.$page.' is not implemented yet.'}
+
     };
 
 }
@@ -550,7 +547,8 @@ sub handle_certsearch {
                         'actions' => [
                             {path => 'cert!detail!{_id}',
                              label => 'Details',
-                             icon => 'view'
+                             icon => 'view',
+                             target => 'tab',
                             },
                             {path => 'cert!copy!{identifier}',
                              label => 'Create copy'
