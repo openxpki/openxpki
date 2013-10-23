@@ -28,7 +28,7 @@ OXI.FormView = OXI.View.extend({
     
     
 
-    submitAction: function(action, do_submit) {
+    submitAction: function(action, do_submit,target) {
         // will be invoked whenever the user triggers
         // the browser's `submit` method or a button is clicked explicitly
         
@@ -38,7 +38,7 @@ OXI.FormView = OXI.View.extend({
         }
         this.set('_actionIsTriggered',true);
         
-        this.debug('Form submit with action '+action);
+        this.debug('Form submit with action '+action + ', target '+target);
         if(!action){
             App.applicationError('Form or Button without action!');
             return;
@@ -50,11 +50,11 @@ OXI.FormView = OXI.View.extend({
         if(do_submit){//should the form-values be transmitted to the server?
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
-                this.debug(FieldView.fieldname +': '+FieldView.getValue());
+                //this.debug(FieldView.fieldname +': '+FieldView.getValue());
 
                 if(!FieldView.isValid()){
                     submit_ok = false;
-                    this.debug(FieldView.fieldname +' not valid: '+FieldView.getErrorsAsString);
+                    //this.debug(FieldView.fieldname +' not valid: '+FieldView.getErrorsAsString);
                 }else{
                     formValues[FieldView.fieldname] = FieldView.getValue();
                 }
@@ -79,7 +79,7 @@ OXI.FormView = OXI.View.extend({
                 FormView.set('_actionIsTriggered',false);
                 //js_debug(json,2);
                 App.hideLoader();
-                App.renderPage(json);
+                App.renderPage(json,target);
                 
                 if(json.error){
                     var field;
@@ -232,11 +232,12 @@ OXI.FormButton = OXI.View.extend({
     do_submit:false,//set via constructor (from json)
     is_default:false,//set via constructor
     label:null,//set via constructor (from json)
+    target:null,
     Form:null,
 
     click: function(evt) {
         js_debug("Button with action "+this.action+" was clicked");
-        this.Form.submitAction(this.action,this.do_submit);
+        this.Form.submitAction(this.action,this.do_submit,this.target);
     },
 
     init:function(){

@@ -147,10 +147,15 @@ sub handle {
             description => 'You can search for certs here.',
 
         },
-        main => [{ type => 'form',action => 'certsearch',
+        main => [{ type => 'form',action => '',
             content => {
                 label=>'',
-                submit_label => 'search now',
+                
+                buttons => [
+                            
+                            {action => 'certsearch',do_submit=>1,label=>'search now',target=>'tab'},
+                        ],
+                
                 fields => [
                 { name => 'subject', label => 'Subject', type => 'text',is_optional => 1 },
                 { name => 'issuer', label => 'Issuer', type => 'text',is_optional => 1 },

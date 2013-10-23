@@ -8,13 +8,13 @@ OXI.Route = Ember.Route.extend({
 
     mainActionKey:null,
     subActionKey:null,
-    
+
     actions: {
-            addTab: function(){
-              js_debug('add tab triggered - app route level');
-            }
-          },
-    
+        addTab: function(){
+            js_debug('add tab triggered - app route level');
+        }
+    },
+
     activate:function(){
         js_debug('App.Route activate') ;
     },
@@ -27,16 +27,16 @@ OXI.Route = Ember.Route.extend({
 
         if(final_route == this.routeName){
             //js_debug('final route reached:'+final_route);
-            
+
             if(final_route == 'forward'){
                 this.subActionKey = App.get('original_target');
                 js_debug('forward to original target: '+this.subActionKey);
                 App.set('original_target','');
             }else{
-            
+
                 var p = this.routeName.indexOf('.');
                 if(p>0){
-    
+
                     this.mainActionKey = this.routeName.substr(0,p);
                     this.subActionKey = this.routeName.substr(p+1);
                 }else{
@@ -47,7 +47,7 @@ OXI.Route = Ember.Route.extend({
     },
 
     renderTemplate: function(controller, model) {
-        
+
 
         if(this.subActionKey){
             js_debug('App.Route.renderTemplate for '+this.subActionKey);
@@ -71,7 +71,7 @@ OXI.Application = Ember.Application.extend(
 {
     LOG_TRANSITIONS: true,
     //LOG_TRANSITIONS_INTERNAL: true,
-    
+
     rootElement: null,//read from config
     serverUrl:null,//read from config
     cookieName:null,//read from config
@@ -100,51 +100,51 @@ OXI.Application = Ember.Application.extend(
     SideNavs : {},
     CurrentSideNav : null,
     sideTreeStructure: {},
-    
-    
+
+
     _actualPageRenderCount:0,
     _actualPageKey: null,
 
     ApplicationController : Ember.Controller.extend({
         updateCurrentPath: function() {
-            
+
             js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
             App.setCurrentPath( this.get('currentPath'));
         }.observes('currentPath'),
-        
-         
+
+
     }),
 
     BadUrlRoute : OXI.Route.extend({
-        
+
         originalTarget:null,
         subActionKey:null,
-        
+
         beforeModel: function(transition) {
             Ember.debug('BadUrlRoute '+location.hash+' check transition');
             this.set('originalTarget',location.hash.substr(1));
-            
+
             if(!App.user_logged_in){
                 App.set('original_target',this.originalTarget);
                 js_debug('original_target stored: ' + this.originalTarget);
                 this.transitionTo('login');
             }else{
                 if(this.originalTarget .indexOf('/') == 0){
-                    this.subActionKey  = this.originalTarget .substr(1);   
+                    this.subActionKey  = this.originalTarget .substr(1);
                 }
-                
+
                 //this.transitionTo('forward');
             }
         },
-        
+
         setupController: function(controller) {
         },
-        
-        
-        
+
+
+
     }),
-    
-    
+
+
 
     NotfoundRoute: Ember.Route.extend({
 
@@ -157,23 +157,23 @@ OXI.Application = Ember.Application.extend(
             this.render('notfound');
         }
     }),
-    
-    
+
+
 
     Router: Ember.Router.extend({
-        
-        
+
+
         didTransition: function(infos){
             this._super(infos);
             var path = Ember.Router._routePath(infos);
             //this hook is triggered if a link has been clicked on the page
-            js_debug('didTransition ' + path); 
+            js_debug('didTransition ' + path);
             //we check, if the content for the current route(=server page) has been changed (via form actions etc)
             //if so, we reload page infos from server (otherwise, the re-rendered pagecontent (e.e. form-submits, searchresults) will not be changed)
             if(App.get('_actualPageRenderCount')>1){
-                 App.reloadPageInfoFromServer();  
+                App.reloadPageInfoFromServer();
             }
-            
+
         }
     }),
 
@@ -188,7 +188,7 @@ OXI.Application = Ember.Application.extend(
         this.cookieName = OXI.Config.get('cookieName');
         this.ajaxLoaderTimeout = OXI.Config.get('ajaxLoaderTimeout');
         this._actualPageRenderCount = 0;
-        
+
     },
 
     logout:function(){
@@ -230,54 +230,52 @@ OXI.Application = Ember.Application.extend(
         }
         js_debug(data);
     },
-    
+
     applicationAlert: function(msg,data){
         alert(msg);
         js_debug(data);
     },
-    
+
     reloadPageInfoFromServer: function(){
         js_debug('App.reloadPageInfoFromServer');
         this.loadPageInfoFromServer(this._actualPageKey);
     },
-    
+
     loadPageInfoFromServer: function(pageKey){
         var App = this;
         js_debug('App.loadPageInfoFromServer: '+pageKey);
         this.set('_actualPageRenderCount',0);
         this.set('_actualPageKey',pageKey);
-        
+
         this.showLoader();
         this.callServer({page:pageKey})
-            .success(function(json){
-                
-                if(pageKey == 'logout'){
-                    App.logout();
-                    App.reloadPage('login');
-                }else{
-                    App.renderPage(json);
-                    App.hideLoader();
-                }
-            });
+        .success(function(json){
+
+            if(pageKey == 'logout'){
+                App.logout();
+                App.reloadPage('login');
+            }else{
+                App.renderPage(json);
+                App.hideLoader();
+            }
+        });
     },
-    
+
     showLoader: function(){
         $('#ajaxLoadingModal').modal({backdrop:'static'});
     },
-    
+
     hideLoader: function(){
-        
+
         $('#ajaxLoadingModal').modal('hide');
     },
-    
-    
-    renderPage: function(json, TargetView){
+
+
+    renderPage: function(json, target){
         js_debug({'App.renderPage':json},3);
-        
-        if(!TargetView){
-            TargetView = this.MainView;   
-        }
-        
+
+        TargetView = this.getTargetView(target,json);
+
         if(json.status){
             TargetView.setStatus(json.status);
         }
@@ -285,41 +283,49 @@ OXI.Application = Ember.Application.extend(
             TargetView.initSections(json);
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
         }
-        
+
         if(json.reloadTree){
             var timeout = (json.status)?1000:0;
             window.setTimeout(function(){App.reloadPage(json.goto);},timeout);
-            return;   
+            return;
         }else if(json.goto){
-            //goto solo...   
+            //goto solo...
             var timeout = (json.status)?1000:0;
             window.setTimeout(function(){App.goto(json.goto);},timeout);
         }
     },
-    
+
+    getTargetView: function(target,json){
+        if(!target || target=='_self'){
+            return this.MainView;
+        }
+        if(target=='tab'){
+            //open new tab
+            var tabLabel = (json.page && json.page.shortlabel)?json.page.shortlabel:json.page.label;
+            var Tab = App.MainView.addTab(tabLabel);
+            Tab.setActive();
+            return Tab.ContentView;
+        }
+    },
+
     handleAction: function(path,target){
         js_debug({method:'App.handleAction',path:path,target:target});
         if(!target || target=='_self'){
-            return this.goto(path);   
+            return this.goto(path);
         }
-        if(target=='tab'){
-            js_debug('open '+path + ' in new tab');  
-            var App = this;
-            this.showLoader();
-            this.callServer({page:path})
-                .success(function(json){
-                    js_debug('server delivered josn to page '+path);
-                    var tabLabel = (json.page && json.page.shortlabel)?json.page.shortlabel:json.page.label;
-                    
-                    var Tab = App.MainView.addTab(tabLabel);
-                    App.renderPage(json , Tab.ContentView);
-                    Tab.setActive();
-                    App.hideLoader();
-                    
-                });  
-        }  
+
+        js_debug('open '+path + ' in target '+target);
+        var App = this;
+        this.showLoader();
+        this.callServer({page:path})
+        .success(function(json){
+            js_debug('server delivered josn to page '+path);
+            App.renderPage(json , target);
+            App.hideLoader();
+        });
+
     },
-    
+
     goto: function(target){
         try{
             target = target.replace(/\./g,'/');
@@ -384,7 +390,7 @@ OXI.Application = Ember.Application.extend(
             this.route('notfound');
             this.route('welcome');
             this.route('forward');
-            
+
             App.set('NavArrayController', Ember.ArrayController.create({
                 content: Ember.A([])
             }));
