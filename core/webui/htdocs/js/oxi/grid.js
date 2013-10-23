@@ -94,15 +94,21 @@ OXI.GridView = OXI.View.extend({
         js_debug('dataTable tableInit');
     },
     
-    doAction:function(path,data){
+    doAction:function(action,data){
         var i;
+        js_debug(action);
+        if(!action.path){
+            App.applicationAlert('action without path!');
+            return;   
+        }
+        var path = action.path;
         var aColumns = this.content.columns;                
         for(i=0;i<aColumns.length;i++){
             var col = aColumns[i].sTitle;
             path = path.replace('{'+col+'}',data[i]);
         }
-        js_debug('dynamic path: '+path);
-        App.goto(path);
+        //js_debug('dynamic path: '+path+ ', target '+action.target);
+        App.handleAction(path,action.target);
     },
     
     _getContextMenuCallback: function(columnDef,actions){
@@ -113,7 +119,7 @@ OXI.GridView = OXI.View.extend({
         if(actions.length==1){
             //immediate action "on click"   
             
-            var single_action = actions[0].path;
+            var single_action = actions[0];
             if(!single_action){
                 App.applicationAlert('no path for grid single action given!', actions[0]);
                 return;
@@ -133,10 +139,11 @@ OXI.GridView = OXI.View.extend({
         
         
         var i,items = {};
-        
+        var actionHash = {};
         for(i=0;i<actions.length;i++){
             var action = actions[i];
             items[action.path] = {name:action.label};
+            actionHash[action.path] =action;
             if(action.icon){
                 items[action.path].icon = action.icon;
             }
@@ -151,7 +158,7 @@ OXI.GridView = OXI.View.extend({
                     callback: function(key, options) {
                         js_debug("menu clicked: " + key);// + " on " + $(this).text());
                         var data = DataTable.fnGetData(this[0]);
-                        GridView.doAction(key,data);
+                        GridView.doAction(actionHash[key],data);
                     },
                     items: items
                 });   

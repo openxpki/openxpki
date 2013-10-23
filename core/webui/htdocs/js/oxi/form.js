@@ -242,15 +242,15 @@ OXI.FormButton = OXI.View.extend({
     init:function(){
         this._super();
         if(!this.Form){
-            App.applicationError('FormButton withot Form!');
+            App.applicationAlert('FormButton withot Form!');
             return;
         }
         if(!this.label){
-            App.applicationError('FormButton withot label!');
+            App.applicationAlert('FormButton withot label!');
             return;
         }
         if(!this.action){
-            App.applicationError('FormButton withot action!');
+            App.applicationAlert('FormButton withot action!');
             return;
         }
     }

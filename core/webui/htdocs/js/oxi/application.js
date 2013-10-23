@@ -9,6 +9,11 @@ OXI.Route = Ember.Route.extend({
     mainActionKey:null,
     subActionKey:null,
     
+    actions: {
+            addTab: function(){
+              js_debug('add tab triggered - app route level');
+            }
+          },
     
     activate:function(){
         js_debug('App.Route activate') ;
@@ -107,8 +112,7 @@ OXI.Application = Ember.Application.extend(
             App.setCurrentPath( this.get('currentPath'));
         }.observes('currentPath'),
         
-        
-        
+         
     }),
 
     BadUrlRoute : OXI.Route.extend({
@@ -267,19 +271,20 @@ OXI.Application = Ember.Application.extend(
     },
     
     
-    renderPage: function(json){
+    renderPage: function(json, TargetView){
         js_debug({'App.renderPage':json},3);
+        
+        if(!TargetView){
+            TargetView = this.MainView;   
+        }
+        
         if(json.status){
-            this.MainView.setStatus(json.status);
+            TargetView.setStatus(json.status);
         }
         if(json.page){
-            this.MainView.initSections(json);
+            TargetView.initSections(json);
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
         }
-        
-        
-        
-        //this.MainView.get('controller').send('routeContentChanged', true);
         
         if(json.reloadTree){
             var timeout = (json.status)?1000:0;
@@ -290,6 +295,29 @@ OXI.Application = Ember.Application.extend(
             var timeout = (json.status)?1000:0;
             window.setTimeout(function(){App.goto(json.goto);},timeout);
         }
+    },
+    
+    handleAction: function(path,target){
+        js_debug({method:'App.handleAction',path:path,target:target});
+        if(!target || target=='_self'){
+            return this.goto(path);   
+        }
+        if(target=='tab'){
+            js_debug('open '+path + ' in new tab');  
+            var App = this;
+            this.showLoader();
+            this.callServer({page:path})
+                .success(function(json){
+                    js_debug('server delivered josn to page '+path);
+                    var tabLabel = (json.page && json.page.shortlabel)?json.page.shortlabel:json.page.label;
+                    
+                    var Tab = App.MainView.addTab(tabLabel);
+                    App.renderPage(json , Tab.ContentView);
+                    Tab.setActive();
+                    App.hideLoader();
+                    
+                });  
+        }  
     },
     
     goto: function(target){

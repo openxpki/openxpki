@@ -115,6 +115,7 @@
           </div>
         </div>
         <div class="col-md-10" role="main">
+
          {{outlet}}
          {{outlet main-content}}
         
@@ -122,6 +123,8 @@
       </div>
    </div>
      </script>
+     
+     
     <script type="text/x-handlebars" data-template-name="main-content">
       {{view App.MainView}}
       
@@ -130,22 +133,50 @@
       <h2>{{view.label}}</h2>
       <p>{{view.description}}</p>
       {{view view.MessageView}}
-      <div class="container sections">
-      <div class="row">
-      <div class="col-md-12">
-      {{#each SectionView in view.SectionViewList}}
-      {{view SectionView}}
-      {{/each}}
-      </div>
-      </div>
-      </div>
+      
+      <ul {{bind-attr class=":nav :nav-tabs view.hasNoTabs:hidden"}}>
+        <li><a href="#section-main-tab" data-toggle="tab">{{view.labelTabMain}}</a></li>
+        {{#each TabView in view.Tabs}}
+        <li><a {{bind-attr href=TabView.getTabHref}} data-toggle="tab">{{TabView.label}}</a></li>
+        {{/each}}
+        </ul>
+        <!-- tab list -->
+        <div class="tab-content">
+            <!--main tab -->
+            <div class="tab-pane active" id="section-main-tab">
+                  <div class="container sections">
+                  <div class="row">
+                  <div class="col-md-12">
+                  {{#each SectionView in view.SectionViewList}}
+                  {{#if view._debugTabs }}Section {{SectionView.elementId}}{{/if}}
+                  {{view SectionView}}
+                  {{/each}}
+                  </div>
+                  </div>
+                  </div>
+            </div>
+            <!--/main tab -->
+            {{#each TabView in view.Tabs}}
+            {{view TabView}}
+            {{/each}}
+        </div>
+        <!-- /tab list -->
+      {{#if view._debugTabs }}<button {{action 'addTab'}}>add tab</button>{{/if}}
     </script>
+    
+    
+    
     <script type="text/x-handlebars" data-template-name="section">
-    <div class="container section">
     <!-- section content-->
+    <div class="container section">
     {{view view.ContentView}}
     </div>
     <!-- /section content-->
+    </script>
+    
+    <script type="text/x-handlebars" data-template-name="tab-pane">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" {{action 'closeTab'}}>&times;</button>
+    {{view view.ContentView}}
     </script>
     
     <script type="text/x-handlebars" data-template-name="text-view">
@@ -277,6 +308,8 @@
    <script src="js/oxi/text.js"></script>
    <script src="js/oxi/keyvalue.js"></script>
    <script src="js/run.js"></script>
+   
+   
   </body>
   
 </html>

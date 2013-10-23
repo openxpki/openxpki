@@ -191,7 +191,7 @@ sub handle {
     
 }elsif($page eq 'secret_page'){
    
-    return {page=>{'label' => 'some special page'}};
+    return {page=>{'label' => 'some special page','shortlabel'=>'special'}};
     
 }elsif($page eq 'my_tasks'){
    
@@ -200,12 +200,14 @@ sub handle {
                     'processing_type' => 'all',
                     'content' => {
                             'actions' => [
-                            {path => 'my_tasks!bla',
-                             label => 'Test 1',
-                             icon => 'view'
+                            {path => 'secret_page',
+                             label => 'Secret Page in Tab',
+                             icon => 'view',
+                             target => 'tab',
                             },
                             {path => 'my_tasks!blub',
-                             label => 'Test 2'
+                             label => 'Test 2',
+                             target => 'tab',
                             },
                             
                         ],
