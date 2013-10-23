@@ -191,7 +191,121 @@ sub handle {
     
 }elsif($page eq 'secret_page'){
    
-    return {page=>{'label' => 'some special page'}};
+    return {page=>{'label' => 'some special page','shortlabel'=>'special'}};
+    
+}elsif($page eq 'my_tasks'){
+   
+    return {page=>{'label' => 'My tasks'},main=>[
+            {'type' => 'grid',
+                    'processing_type' => 'all',
+                    'content' => {
+                            'actions' => [
+                            {path => 'secret_page',
+                             label => 'Secret Page in Tab',
+                             icon => 'view',
+                             target => 'tab',
+                            },
+                            {path => 'my_tasks!blub',
+                             label => 'Test 2',
+                             target => 'tab',
+                            },
+                            {path => 'my_tasks',
+                             label => 'another (nested) my tasks...',
+                             target => 'tab',
+                            },
+                            {path => 'my_workflows',
+                             label => 'my workflows',
+                             target => 'tab',
+                            },
+                            ,
+                            {path => 'my_certificates',
+                             label => 'my certificates',
+                             target => 'tab',
+                            },
+                            
+                        ],
+                        'columns' => [
+            						{ sTitle => "title" },
+            						{ sTitle => "description" },
+            						
+            						{ sTitle => "date_issued",format => 'timestamp'}
+            						
+            					] ,
+            	        'data' => [
+            	            ['Titel 1','Description 1',1379587708],
+            	            ['Titel 2','Description 2',1379587799],
+            	            ['Titel 3','Description 3',1312158770],
+            	            ['Titel 4','Description 4',1376687708],
+            	        ],   
+                        }
+            }
+        ]};
+    
+}elsif($page eq 'my_workflows'){
+   
+    return {page=>{'label' => 'My workflows'},main=>[
+            {'type' => 'grid',
+                    'processing_type' => 'all',
+                    'content' => {
+                            'actions' => [
+                            {path => 'my_workflows!xxx',
+                             label => 'WF Test 1',
+                             icon => 'view',
+                             target => 'tab',
+                            },
+                            {path => 'my_workflows!yyy',
+                             label => 'WF Test 2',
+                             target => 'tab',
+                            },
+                            
+                        ],
+                        'columns' => [
+            						{ sTitle => "title" },
+            						{ sTitle => "description" },
+            						
+            						{ sTitle => "date_issued",format => 'timestamp'}
+            						
+            					] ,
+            	        'data' => [
+            	            ['Workflow 1','sldkjflsdjflksjd flkjsd f 1',1379587708],
+            	            ['Workflow 2','wertkwer ,sndf ksd f 2',1379587799],
+            	            ['Workflow 3','asldkhlsadkjf lkasjd  3',1312158770],
+            	            ['Workflow 4','wksghrkjqhwekjhqwkjeh 4',1376687708],
+            	        ],   
+                        }
+            }
+        ]};
+    
+}elsif($page eq 'my_certificates'){
+   
+    return {page=>{'label' => 'My certificates','description'=>'only one action assigned to grid'},main=>[
+            {'type' => 'grid',
+                    'processing_type' => 'all',
+                    'content' => {
+                            'actions' => [
+                            
+                            {path => 'my_certificates!zzz',
+                             label => 'Grid Main action',
+                             target => 'tab',
+                            },
+                            
+                        ],
+                        'columns' => [
+            						{ sTitle => "title" },
+            						{ sTitle => "description" },
+            						
+            						{ sTitle => "date_issued",format => 'timestamp'}
+            						
+            					] ,
+            	        'data' => [
+            	            ['Workflow 1','sldkjflsdjflksjd flkjsd f 1',1379587708],
+            	            ['Workflow 2','wertkwer ,sndf ksd f 2',1379587799],
+            	            ['Workflow 3','asldkhlsadkjf lkasjd  3',1312158770],
+            	            ['Workflow 4','wksghrkjqhwekjhqwkjeh 4',1376687708],
+            	        ],   
+                        }
+            }
+        ]};
     
 }elsif($page eq 'test_loading'){
     sleep(5);

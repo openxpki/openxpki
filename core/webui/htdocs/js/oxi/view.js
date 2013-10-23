@@ -29,8 +29,13 @@ OXI.View = Ember.View.extend({
    },
 
    init:function(){
-      //Ember.debug(this.jsClassName+':init' + this.toString());
+      //js_debug(this.jsClassName+':init' + this.toString());
       this.resetErrors();
+      this._super();
+   },
+   
+   destroy:function(){
+      //js_debug(this.jsClassName+':destroy' + this.toString());
       this._super();
    },
    
