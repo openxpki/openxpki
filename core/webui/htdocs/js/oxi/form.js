@@ -44,7 +44,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
         this.resetErrors();
         var i;
         var submit_ok = true;
-        var formValues = {};
+        var formValues = {target:target};
         if(do_submit){//should the form-values be transmitted to the server?
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
@@ -101,7 +101,6 @@ OXI.FormView = OXI.ContentBaseView.extend({
         //Ember.debug('OXI.FormView :init ');
         this._super();
         this.FieldContainerList = [];
-        
 
         this.fieldContainerMap = {};
         this.fields = [];
@@ -114,7 +113,6 @@ OXI.FormView = OXI.ContentBaseView.extend({
             return;
         }
         this._initFields();
-        this._initButtons();
     },
 
     _initButtons:function(){

@@ -280,6 +280,11 @@ OXI.Application = Ember.Application.extend(
             target =  json.page.target;  
         }
         
+        //messages immer im main view
+-       if(json.status){
+-            this.MainView.setStatus(json.status); 
+        }
+        
         TargetView = this.getTargetView(target,json);
 
         if(json.status){
