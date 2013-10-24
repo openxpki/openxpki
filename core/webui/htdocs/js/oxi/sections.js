@@ -65,12 +65,12 @@ OXI.TabView = OXI.View.extend({
             this._markAsActive = false;
             this.ParentView.showTab(this.tabindex); //this.get('elementId')
         }else{
-            js_debug('mark as active ...delayed!');
+            //js_debug('mark as active ...delayed!');
             this._markAsActive = true;
         }
     },
     didInsertElement: function(){
-        this.debug('DOM is ready!'+this.get('elementId')); 
+        //this.debug('DOM is ready!'+this.get('elementId')); 
         this.set('_domReady',true);
         if(this._markAsActive){
             var Tab = this;
@@ -121,18 +121,14 @@ OXI.SectionViewContainer = OXI.View.extend({
     },
     
     showTab: function(tab_index){
-        js_debug('show tab '+tab_index);
+        //js_debug('show tab '+tab_index);
         tab_index++;//we must increnent the index, because the first (bootstrap-)tab "main" is not in our TabList
-        var selector = '.nav-tabs  li:eq('+tab_index+') a';
-        js_debug(selector);
-        js_debug(this.$(selector).html());
-        
-        this.$(selector).tab('show'); 
+        this.$('.nav-tabs  li:eq('+tab_index+') a').tab('show'); 
     },
     
     
     closeTab:function(tabindex){
-        js_debug('will close tab #' + tabindex);
+        //js_debug('will close tab #' + tabindex);
         var Tab = this.Tabs.content[tabindex];
         if(!Tab){
             js_debug('no tab at index '+tabindex);
@@ -243,6 +239,10 @@ OXI.SectionView = OXI.View.extend({
     ContentView:null,
     section_nr:null,
     section_type:null,
+    
+    hasButtons: function(){
+        return this.ContentView.getButtonCount();
+    }.property(),
     
     
     destroy: function() {

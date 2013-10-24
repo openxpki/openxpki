@@ -33,6 +33,15 @@ body {
     padding-top:20px;  
 }
 
+.oxi-grid-container{
+   padding-bottom:40px;     
+}
+
+.oxi-button-container{
+   padding:20px;
+   /*margin:20px;   */
+}
+
 img.toplogo{
    padding-top:6px;
    padding-right:12px;   

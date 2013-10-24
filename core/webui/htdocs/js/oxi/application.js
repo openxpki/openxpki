@@ -248,7 +248,7 @@ OXI.Application = Ember.Application.extend(
         this.set('_actualPageKey',pageKey);
 
         this.showLoader();
-        this.callServer({page:pageKey})
+        this.callServer({page:pageKey,target:'main'})
         .success(function(json){
 
             if(pageKey == 'logout'){
@@ -279,17 +279,14 @@ OXI.Application = Ember.Application.extend(
         if(json.page && json.page.target){
             target =  json.page.target;  
         }
-        
+        if(!target)target='main';
         //messages immer im main view
--       if(json.status){
--            this.MainView.setStatus(json.status); 
-        }
-        
-        TargetView = this.getTargetView(target,json);
+       if(json.status){
+            this.MainView.setStatus(json.status);        
+       }
+        TargetView = this.getTargetView(target,json.page);
 
-        if(json.status){
-            TargetView.setStatus(json.status);
-        }
+        
         if(json.page){
             TargetView.initSections(json);
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
@@ -306,32 +303,47 @@ OXI.Application = Ember.Application.extend(
         }
     },
 
-    getTargetView: function(target,json){
-        if(!target || target=='_self'){
+    getTargetView: function(target,page){
+        if(!target || target=='main'){
             return this.MainView;
         }
         if(target=='tab'){
             //open new tab
-            var tabLabel = (json.page && json.page.shortlabel)?json.page.shortlabel:json.page.label;
+            var tabLabel = (page.shortlabel)?page.shortlabel:page.label;
             var Tab = App.MainView.addTab(tabLabel);
             Tab.setActive();
             return Tab.ContentView;
         }
     },
 
-    handleAction: function(path,target){
-        js_debug({method:'App.handleAction',path:path,target:target});
-        if(!target || target=='_self'){
-            return this.goto(path);
+    handleAction: function(action){
+        js_debug({method:'App.handleAction',action:action},2);
+        
+        if(!action.target)action.target='main';
+        
+        if(action.page && !action.action &&  action.target=='main'){
+            //new page in main window
+            return this.goto(action.page);
         }
-
-        js_debug('open '+path + ' in target '+target);
+        if(!action.page && !action.action){
+            App.applicationAlert('Action '+action.label+' without page or action triggered!');
+            return; 
+        }
+        var iSlash = action.page.indexOf('/');
+        if(iSlash){
+            action.page = action.page.substr(iSlash+1);
+        }
+        
         var App = this;
         this.showLoader();
-        this.callServer({page:path})
+        this.callServer({page:action.page,target:action.target,action:action.action})
         .success(function(json){
-            js_debug('server delivered josn to page '+path);
-            App.renderPage(json , target);
+            js_debug('server delivered josn to page '+action.page);
+            if(!json.page)json.page={};
+            if(!json.page.label && !json.page.shortlabel){
+                json.page.label = action.label
+            }
+            App.renderPage(json , action.target);
             App.hideLoader();
         });
 

@@ -171,6 +171,15 @@
     <div class="container section">
     {{view view.ContentView}}
     </div>
+    {{#if view.hasButtons}}
+    <div class="oxi-button-container">
+         <div class="btn-group">
+          {{#each Button in view.ContentView.ButtonList}}
+         {{view Button}}
+         {{/each}}
+        </div>
+    </div>
+    {{/if}}
     <!-- /section content-->
     </script>
     
@@ -195,19 +204,11 @@
      {{#each FieldContainer in view.FieldContainerList}}
      {{view FieldContainer}}
      {{/each}}
-     </div><!--/formgroup-->
-     <div class="col-lg-offset-2">
-     <div class="btn-group">
-      {{#each Button in view.ButtonList}}
-     {{view Button}}
-     {{/each}}
-    </div>
-    </div>
-    
+     </div>
      </form>
     </script>
     
-     <script type="text/x-handlebars" data-template-name="form-button">
+     <script type="text/x-handlebars" data-template-name="page-button">
       {{view.label}}
     </script>
     
@@ -252,10 +253,10 @@
     <script type="text/x-handlebars" data-template-name="grid-view">
       {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
      {{#if view.description}}<div style="margin-bottom:12px;">{{view.description}}</div>{{/if}}
-      
+      <div class="oxi-grid-container">
       <table class="table table-striped table-bordered table-hover">
-      
       </table>
+      </div>
     </script>
     <script type="text/x-handlebars" data-template-name="keyvalue-view">
       {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
