@@ -153,7 +153,7 @@ sub handle {
                 
                 buttons => [
                             
-                            {action => 'certsearch',do_submit=>1,label=>'search now',target=>'tab'},
+                            {action => 'certsearch',do_submit=>1,label=>'search now'},#target=>'tab'
                         ],
                 
                 fields => [
@@ -210,7 +210,7 @@ sub handle {
                              icon => 'view',
                              target => 'tab',
                             },
-                            {path => 'my_tasks!date!{date_issued}',
+                            {path => 'my_tasks!blub',
                              label => 'Test 2',
                              target => 'tab',
                             },
@@ -289,7 +289,7 @@ sub handle {
                     'content' => {
                             'actions' => [
                             
-                            {path => 'my_certificates!{date_issued}',
+                            {path => 'my_certificates!zzz',
                              label => 'Grid Main action',
                              target => 'tab',
                             },
@@ -323,12 +323,6 @@ sub handle {
                 {type => 'keyvalue',content => {
                     label => '',
                     description => '',
-                    buttons => [
-                            {action => 'test_key_value!action1',label=>'Action 1'},
-                            {page => 'test_key_value!page1',label=>'Page 1'},
-                            {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
-                            {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
-                        ],                    
                     data => [
                         {label => 'key 1', value => 'value 1'},
                         {label => 'key 2', value => '1395226097', format=>'timestamp'},
@@ -341,10 +335,13 @@ sub handle {
 }else{
     return {
         page => {
+            label => 'Sorry!',
+            description => 'The page '.$page.' is not implemented yet.'
+        }
+        
+        
             
-        },
-        status => {level=>'warn',message=>'The page '.$page.' is not implemented yet.'}
-
+        
     };
 
 }
@@ -538,7 +535,7 @@ sub handle_certsearch {
     
 
     return {
-        page => {label => 'Your Searchresult'},
+        page => {label => 'Your Searchresult',target=>'tab'},
         status => {},
         
         main => [
@@ -553,8 +550,7 @@ sub handle_certsearch {
                         'actions' => [
                             {path => 'cert!detail!{_id}',
                              label => 'Details',
-                             icon => 'view',
-                             target => 'tab',
+                             icon => 'view'
                             },
                             {path => 'cert!copy!{identifier}',
                              label => 'Create copy'

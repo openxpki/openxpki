@@ -273,12 +273,18 @@ OXI.Application = Ember.Application.extend(
 
     renderPage: function(json, target){
         js_debug({'App.renderPage':json},3);
-        //messages immer im main view
-        if(json.status){
-            this.MainView.setStatus(json.status);
-        }
-        TargetView = this.getTargetView(target,json);
         
+        //target can given via action AND also be set in the returned json (page.target)
+        //the later overwrites the first
+        if(json.page && json.page.target){
+            target =  json.page.target;  
+        }
+        
+        TargetView = this.getTargetView(target,json);
+
+        if(json.status){
+            TargetView.setStatus(json.status);
+        }
         if(json.page){
             TargetView.initSections(json);
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
@@ -308,21 +314,18 @@ OXI.Application = Ember.Application.extend(
         }
     },
 
-    handleAction: function(path,target,action_label){
-        //js_debug({method:'App.handleAction',path:path,target:target});
+    handleAction: function(path,target){
+        js_debug({method:'App.handleAction',path:path,target:target});
         if(!target || target=='_self'){
             return this.goto(path);
         }
 
-        //js_debug('open '+path + ' in target '+target);
+        js_debug('open '+path + ' in target '+target);
         var App = this;
         this.showLoader();
         this.callServer({page:path})
         .success(function(json){
-            //js_debug('server delivered json to page '+path);
-            if(!json.page.label && !json.page.shortlabel){
-                json.page.shortlabel = action_label;
-            }
+            js_debug('server delivered josn to page '+path);
             App.renderPage(json , target);
             App.hideLoader();
         });
