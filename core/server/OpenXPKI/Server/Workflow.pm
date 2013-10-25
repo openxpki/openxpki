@@ -184,6 +184,96 @@ sub execute_action {
 
 }
 
+sub attrib {
+    
+    ##! 1: 'start'
+    my $self = shift;
+    my $arg = shift;
+    
+    my $wf_id = $self->id();
+    # return all attributes of workflow
+    if (!$arg) {
+        ##! 8: 'no key, fetch all'
+       
+        my $result = CTX('dbi_backend')->select(
+            TABLE => 'WORKFLOW_ATTRIBUTES',
+            COLUMNS => [ 'ATTRIBUTE_KEY', 'ATTRIBUTE_VALUE' ],
+            DYNAMIC => {            
+                WORKFLOW_SERIAL => { VALUE => $wf_id },
+                ATTRIBUTE_KEY => { VALUE => $arg },                
+        });
+        my $attribs = {};
+        foreach my $line (@{$result}) {
+           $attribs->{$line->{ATTRIBUTE_KEY}} = $line->{ATTRIBUTE_VALUE};              
+        }
+        return $attribs; 
+       
+    # arg is scalar - get value       
+    } elsif (ref $arg eq '') {
+
+        ##! 8: 'fetch value for ' . $arg    
+        my $result = CTX('dbi_backend')->first(
+            TABLE => 'WORKFLOW_ATTRIBUTES', 
+            DYNAMIC => {            
+                WORKFLOW_SERIAL => { VALUE => $wf_id },
+                ATTRIBUTE_KEY => { VALUE => $arg },                
+        });
+        ##! 32: 'Result ' . Dumper $result
+        return $result->{ATTRIBUTE_VALUE};
+
+    # set multi        
+    } elsif (ref $arg eq 'HASH') {
+       
+        ##! 8: 'received hash - setting values'
+        foreach my $key (keys %{$arg}) {
+            if (defined $arg->{$key}) {
+                ##! 16: 'set key ' . $key
+                # check if the attribute is already in the table
+                my $result = CTX('dbi_backend')->select (
+                    TABLE => 'WORKFLOW_ATTRIBUTES',
+                    DYNAMIC => {
+                        WORKFLOW_SERIAL => { VALUE => $wf_id },
+                        ATTRIBUTE_KEY => { VALUE => $key },
+                    }
+                );
+                
+                # update
+                if ($result) {
+                    ##! 32: 'key exisits, update'
+                    CTX('dbi_backend')->update (
+                        TABLE => 'WORKFLOW_ATTRIBUTES', 
+                        DATA  => { ATTRIBUTE_VALUE => $arg->{$key} },
+                        WHERE => {
+                            WORKFLOW_SERIAL => $wf_id,
+                            ATTRIBUTE_KEY => $key,
+                        }
+                    );                       
+                # insert new
+                } else {
+                    ##! 32: 'new item, insert'                    
+                    CTX('dbi_backend')->insert(
+                        TABLE => 'WORKFLOW_ATTRIBUTES', 
+                        HASH => {            
+                            WORKFLOW_SERIAL => $wf_id,
+                            ATTRIBUTE_KEY => $key,
+                            ATTRIBUTE_VALUE => $arg->{$key}
+                        }
+                    );
+                }
+           
+            # value is undef - delete the item         
+            } else {
+                ##! 16: 'got undef, delete item'
+                CTX('dbi_backend')->delete(
+                    TABLE => 'WORKFLOW_ATTRIBUTES', 
+                    DATA => {            
+                        WORKFLOW_SERIAL => $wf_id,
+                        ATTRIBUTE_KEY => $key,                        
+                });
+            }
+        }
+    }  
+}
 
 
 sub pause {
