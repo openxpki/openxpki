@@ -1,18 +1,15 @@
-OXI.GridView = OXI.View.extend({
+OXI.GridView = OXI.ContentBaseView.extend({
     
     jsClassName:'OXI.GridView',
     templateName: "grid-view",
     
-    label:null,
-    description:null,
+    
     grid_id:null,    
     
     
     init:function(){
         //Ember.debug('OXI.FormView :init ');
         this._super();
-        this.label = this.content.header;
-        this.description = this.content.description;
         
         if( ! this.content.columns ){
             App.applicationAlert(this.jsClassName + ': no columns given!');
@@ -27,7 +24,7 @@ OXI.GridView = OXI.View.extend({
     
     
     didInsertElement: function(){
-        this.debug('DOM is ready!'+this.$().attr('id'));   
+        //this.debug('DOM is ready!'+this.$().attr('id'));   
         var $table = this.$('table');
         //give the table element a unique ID
         this.grid_id = this.$().attr('id')+'-grid';
@@ -108,7 +105,9 @@ OXI.GridView = OXI.View.extend({
             path = path.replace('{'+col+'}',data[i]);
         }
         //js_debug('dynamic path: '+path+ ', target '+action.target);
-        App.handleAction(path,action.target,action.label);
+        action.page = path;
+        action.source = this;
+        App.handleAction(action);
     },
     
     _getContextMenuCallback: function(columnDef,actions){
@@ -128,7 +127,7 @@ OXI.GridView = OXI.View.extend({
                 var DataTable = $('#'+grid_id).dataTable();
                 $('tr.gridrow-'+grid_id).click(
                     function(){
-                        //js_debug("row with single action clicked");
+                        js_debug("row with single action clicked");
                         var data = DataTable.fnGetData(this);  
                         GridView.doAction(single_action,data);
                     }

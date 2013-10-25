@@ -128,14 +128,36 @@
     <script type="text/x-handlebars" data-template-name="main-content">
       {{view App.MainView}}
       
+      {{view App.ModalView}}
+      
     </script>
+    
+    <script type="text/x-handlebars" data-template-name="modal-main">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{view.label}}</h4>
+              </div>
+              <div class="modal-body">
+                {{view view.ContentView}}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+
+    </script>    
+    
+    
     <script type="text/x-handlebars" data-template-name="sections">
       <h2>{{view.label}}</h2>
       <p>{{view.description}}</p>
       {{view view.MessageView}}
       
       <ul {{bind-attr class=":nav :nav-tabs view.hasNoTabs:hidden"}}>
-        <li><a href="#section-main-tab" data-toggle="tab">{{view.labelTabMain}}</a></li>
+        <li><a {{bind-attr href=view.getMainTabHref}} data-toggle="tab">{{view.labelTabMain}}</a></li>
         {{#each TabView in view.Tabs}}
         <li><a {{bind-attr href=TabView.getTabHref}} data-toggle="tab">{{TabView.label}}</a></li>
         {{/each}}
@@ -143,7 +165,7 @@
         <!-- tab list -->
         <div class="tab-content">
             <!--main tab -->
-            <div class="tab-pane active" id="section-main-tab">
+            <div class="tab-pane active" {{bind-attr id=view.mainTabId}}>
                   <div class="container sections">
                   <div class="row">
                   <div class="col-md-12">
@@ -171,11 +193,20 @@
     <div class="container section">
     {{view view.ContentView}}
     </div>
+    {{#if view.hasButtons}}
+    <div class="oxi-button-container">
+         <div class="btn-group">
+          {{#each Button in view.ContentView.ButtonList}}
+         {{view Button}}
+         {{/each}}
+        </div>
+    </div>
+    {{/if}}
     <!-- /section content-->
     </script>
     
     <script type="text/x-handlebars" data-template-name="tab-pane">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" {{action 'closeTab'}}>&times;</button>
+    <button type="button" class="close" aria-hidden="true" {{action 'closeTab'}}>&times;</button>
     {{view view.ContentView}}
     </script>
     
@@ -195,19 +226,11 @@
      {{#each FieldContainer in view.FieldContainerList}}
      {{view FieldContainer}}
      {{/each}}
-     </div><!--/formgroup-->
-     <div class="col-lg-offset-2">
-     <div class="btn-group">
-      {{#each Button in view.ButtonList}}
-     {{view Button}}
-     {{/each}}
-    </div>
-    </div>
-    
+     </div>
      </form>
     </script>
     
-     <script type="text/x-handlebars" data-template-name="form-button">
+     <script type="text/x-handlebars" data-template-name="page-button">
       {{view.label}}
     </script>
     
@@ -252,10 +275,10 @@
     <script type="text/x-handlebars" data-template-name="grid-view">
       {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
      {{#if view.description}}<div style="margin-bottom:12px;">{{view.description}}</div>{{/if}}
-      
+      <div class="oxi-grid-container">
       <table class="table table-striped table-bordered table-hover">
-      
       </table>
+      </div>
     </script>
     <script type="text/x-handlebars" data-template-name="keyvalue-view">
       {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}

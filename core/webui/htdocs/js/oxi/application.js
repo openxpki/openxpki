@@ -8,6 +8,8 @@ OXI.Route = Ember.Route.extend({
 
     mainActionKey:null,
     subActionKey:null,
+    
+    
 
     actions: {
         addTab: function(){
@@ -59,6 +61,8 @@ OXI.Route = Ember.Route.extend({
                 pageKey ='home';
             }
             App.set('MainView',OXI.SectionViewContainer.create());
+            App.set('ModalView',OXI.ModalView.create());
+            
             this.render('main-content',{outlet:'main-content'});
             App.loadPageInfoFromServer(pageKey);
         }
@@ -100,7 +104,11 @@ OXI.Application = Ember.Application.extend(
     SideNavs : {},
     CurrentSideNav : null,
     sideTreeStructure: {},
-
+    
+    MainView:null,
+    ModalView:null,
+    
+    
 
     _actualPageRenderCount:0,
     _actualPageKey: null,
@@ -186,7 +194,6 @@ OXI.Application = Ember.Application.extend(
         this.rootElement = OXI.Config.get('rootElement');
         this.serverUrl = OXI.Config.get('serverUrl');
         this.cookieName = OXI.Config.get('cookieName');
-        this.ajaxLoaderTimeout = OXI.Config.get('ajaxLoaderTimeout');
         this._actualPageRenderCount = 0;
 
     },
@@ -248,7 +255,7 @@ OXI.Application = Ember.Application.extend(
         this.set('_actualPageKey',pageKey);
 
         this.showLoader();
-        this.callServer({page:pageKey})
+        this.callServer({page:pageKey,target:'main'})
         .success(function(json){
 
             if(pageKey == 'logout'){
@@ -262,23 +269,38 @@ OXI.Application = Ember.Application.extend(
     },
 
     showLoader: function(){
+        js_debug('show loader');
         $('#ajaxLoadingModal').modal({backdrop:'static'});
     },
 
     hideLoader: function(){
-
+        js_debug('hide loader');
         $('#ajaxLoadingModal').modal('hide');
     },
 
 
-    renderPage: function(json, target){
-        js_debug({'App.renderPage':json},3);
-        //messages immer im main view
-        if(json.status){
-            this.MainView.setStatus(json.status);
-        }
-        TargetView = this.getTargetView(target,json);
+    renderPage: function(json, target,SourceView){
+        //js_debug({'App.renderPage':json},3);
+        js_debug('App.renderPage in target '+target);
         
+        //target can given via action AND also be set in the returned json (page.target)
+        //the later overwrites the first
+        if(json.page && json.page.target){
+            target =  json.page.target;  
+        }
+        if(!target)target='main';
+        TargetView = this.getTargetView(target,json.page,SourceView);
+        
+        if(TargetView == this.MainView){
+            js_debug('close modal...');
+            this.ModalView.close();
+        }
+        this.hideLoader();
+        
+        //Status messages will be displayed in main view - except for modals:
+        StatusView = (target=='modal' || target=='self')?TargetView:this.MainView;
+        StatusView.setStatus(json.status); 
+
         if(json.page){
             TargetView.initSections(json);
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
@@ -295,35 +317,64 @@ OXI.Application = Ember.Application.extend(
         }
     },
 
-    getTargetView: function(target,json){
-        if(!target || target=='_self'){
+    getTargetView: function(target,page,SourceView){
+        if(!target || target=='main'){
             return this.MainView;
         }
+        js_debug({SourceView:SourceView},2);
+        var shortLabel = (page.shortlabel)?page.shortlabel:page.label;
+        var Self = (SourceView && SourceView.getMainViewContainer)?SourceView.getMainViewContainer():App.MainView;
+        if(target == 'self'){
+            js_debug({Self:Self,MainView:App.MainView});
+            return Self;
+        }
+        
         if(target=='tab'){
             //open new tab
-            var tabLabel = (json.page && json.page.shortlabel)?json.page.shortlabel:json.page.label;
-            var Tab = App.MainView.addTab(tabLabel);
+            //when called from modal, we open the new tab in the modal - otherwise in MainView
+            
+            var Tab = Self.addTab(shortLabel);
             Tab.setActive();
             return Tab.ContentView;
         }
+        
+        if(target=='modal'){
+            this.ModalView.show(shortLabel);
+            return this.ModalView.ContentView;  
+        }
+        
+        js_debug('target "'+target+'" is not implmented yet!');
+        return this.MainView;
     },
 
-    handleAction: function(path,target,action_label){
-        //js_debug({method:'App.handleAction',path:path,target:target});
-        if(!target || target=='_self'){
-            return this.goto(path);
+    handleAction: function(action){
+        js_debug({method:'App.handleAction',action:action},2);
+        
+        if(!action.target)action.target='main';
+        
+        if(action.page && !action.action &&  action.target=='main'){
+            //new page in main window
+            return this.goto(action.page);
         }
-
-        //js_debug('open '+path + ' in target '+target);
+        if(!action.page && !action.action){
+            App.applicationAlert('Action '+action.label+' without page or action triggered!');
+            return; 
+        }
+        var iSlash = action.page.indexOf('/');
+        if(iSlash){
+            action.page = action.page.substr(iSlash+1);
+        }
+        
         var App = this;
         this.showLoader();
-        this.callServer({page:path})
+        this.callServer({page:action.page,target:action.target,action:action.action})
         .success(function(json){
-            //js_debug('server delivered json to page '+path);
+            js_debug('server delivered josn to page '+action.page);
+            if(!json.page)json.page={};
             if(!json.page.label && !json.page.shortlabel){
-                json.page.shortlabel = action_label;
+                json.page.label = action.label
             }
-            App.renderPage(json , target);
+            App.renderPage(json , action.target,action.source);
             App.hideLoader();
         });
 

@@ -153,7 +153,7 @@ sub handle {
                 
                 buttons => [
                             
-                            {action => 'certsearch',do_submit=>1,label=>'search now',target=>'tab'},
+                            {action => 'certsearch',do_submit=>1,label=>'search now'},#target=>'tab'
                         ],
                 
                 fields => [
@@ -201,42 +201,54 @@ sub handle {
 }elsif($page eq 'my_tasks'){
    
     return {page=>{'label' => 'My tasks'},main=>[
-            {'type' => 'grid',
-                    'processing_type' => 'all',
-                    'content' => {
-                            'actions' => [
-                            {path => 'secret_page',
-                             label => 'Secret Page in Tab',
-                             icon => 'view',
-                             target => 'tab',
-                            },
-                            {path => 'my_tasks!date!{date_issued}',
-                             label => 'Test 2',
-                             target => 'tab',
-                            },
-                            {path => 'my_tasks',
-                             label => 'another (nested) my tasks...',
-                             target => 'tab',
-                            },
-                            {path => 'my_workflows',
-                             label => 'my workflows',
-                             target => 'tab',
-                            },
-                            ,
-                            {path => 'my_certificates',
-                             label => 'my certificates',
-                             target => 'tab',
-                            },
+            {type => 'grid',
+                    processing_type => 'all',
+                    content => {
+                            buttons => [
+                                
+                                {page => 'my_workflows',label=>'My workflows (tab)',target=>'tab'},
+                                {page => 'home/my_certificates',label=>'My certificates (new page)',target=>'main'},
+                                {page => 'home/my_certificates',label=>'My certificates (tab)',target=>'tab'},
+                                {page => 'home/my_certificates',label=>'My certificates (modal)',target=>'modal'},
+                                {page => 'request_cert',label=>'Request cert (modal)',target=>'modal'},
+                                {page => 'request_cert',label=>'Request cert (tab)',target=>'tab'},
+                                
+                                
+                            ],    
                             
-                        ],
-                        'columns' => [
+                            actions => [
+                                {path => 'secret_page',
+                                 label => 'Secret Page in Tab',
+                                 icon => 'view',
+                                 target => 'tab',
+                                },
+                                {path => 'my_tasks!{date_issued}',
+                                 label => 'Test 2 (modal)',
+                                 target => 'modal',
+                                },
+                                {path => 'my_tasks',
+                                 label => 'another (nested) my tasks...',
+                                 target => 'tab',
+                                },
+                                {path => 'my_workflows',
+                                 label => 'my workflows (tab)',
+                                 target => 'tab',
+                                },
+                                ,
+                                {path => 'my_certificates',
+                                 label => 'my certificates',
+                                 target => 'tab',
+                                },
+                            
+                            ],
+                        columns => [
             						{ sTitle => "title" },
             						{ sTitle => "description" },
             						
             						{ sTitle => "date_issued",format => 'timestamp'}
             						
             					] ,
-            	        'data' => [
+            	        data => [
             	            ['Titel 1','Description 1',1379587708],
             	            ['Titel 2','Description 2',1379587799],
             	            ['Titel 3','Description 3',1312158770],
@@ -253,12 +265,12 @@ sub handle {
                     'processing_type' => 'all',
                     'content' => {
                             'actions' => [
-                            {path => 'my_workflows!xxx',
+                            {path => 'my_workflows!{date_issued}',
                              label => 'WF Test 1',
                              icon => 'view',
                              target => 'tab',
                             },
-                            {path => 'my_workflows!yyy',
+                            {path => 'my_workflows!blub',
                              label => 'WF Test 2',
                              target => 'tab',
                             },
@@ -284,29 +296,38 @@ sub handle {
 }elsif($page eq 'my_certificates'){
    
     return {page=>{'label' => 'My certificates','description'=>'only one action assigned to grid'},main=>[
-            {'type' => 'grid',
-                    'processing_type' => 'all',
-                    'content' => {
-                            'actions' => [
+            {type => 'grid',
+                    processing_type => 'all',
+                    content => {
+                         actions => [
                             
                             {path => 'my_certificates!{date_issued}',
                              label => 'Grid Main action',
-                             target => 'tab',
                             },
                             
                         ],
-                        'columns' => [
+                        buttons => [
+                                
+                                {page => 'test_key_value',label=>'Key Value (in Tab)',target=>'tab'},
+                                {page => 'test_text',label=>'Plain text (in Tab)',target=>'tab'},
+                                {page => 'test_text',label=>'Plain text (no target)'},
+                                {page => 'test_text',label=>'Plain text (target self)',target=>'self'},
+                                {page => 'request_cert',label=>'Request cert (tab)',target=>'tab'},
+                                {page => 'request_cert',label=>'Request cert (self)',target=>'self'}
+                            ],
+
+                        columns => [
             						{ sTitle => "title" },
             						{ sTitle => "description" },
             						
             						{ sTitle => "date_issued",format => 'timestamp'}
             						
             					] ,
-            	        'data' => [
-            	            ['Workflow 1','sldkjflsdjflksjd flkjsd f 1',1379587708],
-            	            ['Workflow 2','wertkwer ,sndf ksd f 2',1379587799],
-            	            ['Workflow 3','asldkhlsadkjf lkasjd  3',1312158770],
-            	            ['Workflow 4','wksghrkjqhwekjhqwkjeh 4',1376687708],
+            	        data => [
+            	            ['Cert 1','sldkjflsdjflksjd flkjsd f 1',1379587708],
+            	            ['Cert 2','wertkwer ,sndf ksd f 2',1379587799],
+            	            ['Cert 3','asldkhlsadkjf lkasjd  3',1312158770],
+            	            ['Cert 4','wksghrkjqhwekjhqwkjeh 4',1376687708],
             	        ],   
                         }
             }
@@ -323,6 +344,12 @@ sub handle {
                 {type => 'keyvalue',content => {
                     label => '',
                     description => '',
+                    buttons => [
+                            {action => 'test_key_value!action1',label=>'Action 1'},
+                            {page => 'test_key_value!page1',label=>'Page 1'},
+                            {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
+                            {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
+                        ],                    
                     data => [
                         {label => 'key 1', value => 'value 1'},
                         {label => 'key 2', value => '1395226097', format=>'timestamp'},
@@ -332,13 +359,44 @@ sub handle {
             }]
         };
     
+}elsif($page eq 'test_text'){
+    return {page=>{'label' => 'Some plain text',description=>'some long text sjahdasd  lajsd ajsd l kaj dljahweorzowejasdh'},
+            main => [
+                {type => 'text',
+                 content => {
+                    label => 'Block 1',
+                    description => 'Text 1;: aksjdhkashdkahsdkhaksdhakshdkashdkjashdkjashd'
+                    }
+                },
+                {type => 'text',
+                content => {
+                    label => 'Block 2',
+                    description => 'Text 2 aksjdhkashdkahsdkhaksdhakshdkashdkjashdkjashd',
+                    buttons => [
+                            {action => 'test_key_value!action1',label=>'Action 1'},
+                            {page => 'test_key_value!page1',label=>'Page 1 (modal)',target=>'modal'},
+                            {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
+                            {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
+                        ],
+                    } 
+                },
+                {type => 'text',
+                     content => {
+                        label => 'Block 3',
+                        description => 'Text 3 aksjdhkashdkahsdkhaksdhakshdkashdkjashdkjashd',
+                    }
+                }
+            ]
+        };
+    
 }else{
     return {
-        page => {
+        page => { },
+         status => {level=>'warn',message=>'The page '.$page.' is not implemented yet.'} 
+        
+        
             
-        },
-        status => {level=>'warn',message=>'The page '.$page.' is not implemented yet.'}
-
+        
     };
 
 }
@@ -410,7 +468,7 @@ sub get_side_structure_logged_in{
         {key=> 'test_goto',label =>  "Test goto"},
         {key=> 'test_loading',label =>  "Test long loading"},
         {key=> 'test_key_value',label =>  "Test Key/Value"},
-        
+        {key=> 'test_text',label =>  "Plain text page"},
         ]
     }
 
@@ -532,7 +590,7 @@ sub handle_certsearch {
     
 
     return {
-        page => {label => 'Your Searchresult'},
+        page => {label => 'Your Searchresult',target=>'tab'},
         status => {},
         
         main => [
@@ -548,7 +606,7 @@ sub handle_certsearch {
                             {path => 'cert!detail!{_id}',
                              label => 'Details',
                              icon => 'view',
-                             target => 'tab',
+                             target => 'tab'
                             },
                             {path => 'cert!copy!{identifier}',
                              label => 'Create copy'

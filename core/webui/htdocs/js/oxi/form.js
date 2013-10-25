@@ -2,25 +2,22 @@
 defines classes for Forms
 */
 
-OXI.FormView = OXI.View.extend({
+OXI.FormView = OXI.ContentBaseView.extend({
 
     templateName: "form-view",
     jsClassName:'OXI.FormView',
 
-    //content prop: must be set via create() , info comes fropm server
-    content:null,
+    
     default_action:null,
     default_submit_label: 'send',
-    label :null,
-    description:null,
+    
     action:null,
     _actionIsTriggered : false,
 
     fields:[],
 
     FieldContainerList:[],
-    ButtonList:[],//additional (submit-)buttons
-
+    
     submit: function (event){
 
         return false;
@@ -43,10 +40,11 @@ OXI.FormView = OXI.View.extend({
             App.applicationError('Form or Button without action!');
             return;
         }
+        if(!target)target='self';
         this.resetErrors();
         var i;
         var submit_ok = true;
-        var formValues = {};
+        var formValues = {target:target};
         if(do_submit){//should the form-values be transmitted to the server?
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
@@ -79,7 +77,7 @@ OXI.FormView = OXI.View.extend({
                 FormView.set('_actionIsTriggered',false);
                 //js_debug(json,2);
                 App.hideLoader();
-                App.renderPage(json,target);
+                App.renderPage(json,target,FormView);
                 
                 if(json.error){
                     var field;
@@ -100,35 +98,26 @@ OXI.FormView = OXI.View.extend({
 
 
     init:function(){
-        //Ember.debug('OXI.FormView :init ');
+        //this.debug('init!');
         this._super();
         this.FieldContainerList = [];
-        this.ButtonList = [];
-
         this.fieldContainerMap = {};
         this.fields = [];
         this.default_action = null;
-        this.label=null;
-        this.description=null;
+        
         this.set('_actionIsTriggered',false);
 
-        if(!this.content || !this.content.fields){
+        if( !this.content.fields){
             App.applicationError('Form, init failed: no content definition!');
             return;
         }
 
-        if (this.content.label){
-            this.label = this.content.label;
-        }
-        if (this.content.description){
-            this.description = this.content.description;
-        }
-
         this._initFields();
-        this._initButtons();
     },
-
+    
+    //method overwritten from ContentBaseView
     _initButtons:function(){
+        this.debug('init buttons!');
         if(!this.content.buttons){
             //default/fallback: no list with buttons is given: lets create ONE Submit-Button with Submit-Labekl and Action
             var label = (this.content.submit_label)?this.content.submit_label:this.default_submit_label;
@@ -138,7 +127,7 @@ OXI.FormView = OXI.View.extend({
             }
             //the one-and-only button is obviously the default action:
             this.default_action = this.action;
-            this.ButtonList.push(this.createChildView(OXI.FormButton.create({Form:this,label:label,action:this.action,do_submit:true,is_default:true})));
+            this.addButton(OXI.FormButton.create({ParentView:this,label:label,action:this.action,do_submit:true,is_default:true}));
         }else{
             var i;
             //determine default action:
@@ -152,9 +141,9 @@ OXI.FormView = OXI.View.extend({
 
             for(i=0;i<this.content.buttons.length;i++){
                 var def = this.content.buttons[i];
-                def.Form = this;
+                def.ParentView = this;
                 def.is_default=(def.action == this.default_action);
-                this.ButtonList.push(this.createChildView(OXI.FormButton.create(def)));
+                this.addButton(OXI.FormButton.create(def));
             }
         }
     },
@@ -204,12 +193,10 @@ OXI.FormView = OXI.View.extend({
 
 });
 
-OXI.FormButton = OXI.View.extend({
+OXI.FormButton = OXI.PageButton.extend({
 
     jsClassName:'OXI.FormButton',
-    templateName: "form-button",
-    tagName: 'button',
-    classNames: ['btn', 'btn-default'],
+    
     classNameBindings:['btn_type'],
     attributeBindings: ['type'],
     type:function(){
@@ -232,25 +219,16 @@ OXI.FormButton = OXI.View.extend({
     action:null,//set via constructor (from json)
     do_submit:false,//set via constructor (from json)
     is_default:false,//set via constructor
-    label:null,//set via constructor (from json)
-    target:null,
-    Form:null,
+    
 
     click: function(evt) {
         js_debug("Button with action "+this.action+" was clicked");
-        this.Form.submitAction(this.action,this.do_submit,this.target);
+        this.ParentView.submitAction(this.action,this.do_submit,this.target);
     },
 
     init:function(){
         this._super();
-        if(!this.Form){
-            App.applicationAlert('FormButton withot Form!');
-            return;
-        }
-        if(!this.label){
-            App.applicationAlert('FormButton withot label!');
-            return;
-        }
+        
         if(!this.action){
             App.applicationAlert('FormButton withot action!');
             return;
