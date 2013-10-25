@@ -8,6 +8,9 @@ OXI.Route = Ember.Route.extend({
 
     mainActionKey:null,
     subActionKey:null,
+    
+    MainView:null,
+    ModalView:null,
 
     actions: {
         addTab: function(){
@@ -59,6 +62,8 @@ OXI.Route = Ember.Route.extend({
                 pageKey ='home';
             }
             App.set('MainView',OXI.SectionViewContainer.create());
+            App.set('ModalView',OXI.ModalView.create());
+            
             this.render('main-content',{outlet:'main-content'});
             App.loadPageInfoFromServer(pageKey);
         }
@@ -314,6 +319,9 @@ OXI.Application = Ember.Application.extend(
             Tab.setActive();
             return Tab.ContentView;
         }
+        
+        js_debug('target "'+target+'" is not implmented yet!');
+        return this.MainView;
     },
 
     handleAction: function(action){

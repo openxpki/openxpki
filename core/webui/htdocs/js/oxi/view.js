@@ -131,3 +131,9 @@ OXI.PageButton = OXI.View.extend({
     }
 
 });
+
+OXI.ModalView = OXI.View.extend({
+
+    jsClassName:'OXI.ModalView',
+    templateName: "modal-main"
+});
