@@ -314,7 +314,7 @@ sub get_cert_profiles {
     
     my $config = CTX('config');    
 
-    my %profiles = map { $_ => 1 } $config->get_keys('profile');
+    my %profiles = map { $_ => { label => $_ }  } $config->get_keys('profile');
     
     delete $profiles{'template'};
 
