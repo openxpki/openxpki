@@ -127,7 +127,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
             }
             //the one-and-only button is obviously the default action:
             this.default_action = this.action;
-            this.addButton(OXI.FormButton.create({ParentView:this,label:label,action:this.action,do_submit:true,is_default:true}));
+            this.addButton({ParentView:this,label:label,action:this.action,do_submit:true,is_default:true});
         }else{
             var i;
             //determine default action:
@@ -143,9 +143,19 @@ OXI.FormView = OXI.ContentBaseView.extend({
                 var def = this.content.buttons[i];
                 def.ParentView = this;
                 def.is_default=(def.action == this.default_action);
-                this.addButton(OXI.FormButton.create(def));
+                this.addButton(def);
             }
         }
+    },
+    
+    /*overwritten from base-class: when "page" is given, go to parent-class::_getButton
+    otherwise return a FormButton
+    */
+    _getButton: function(button_def){
+        if(button_def.page){
+            return this._super(button_def);
+        }
+        return OXI.FormButton.create(button_def);   
     },
 
     _initFields:function(){
