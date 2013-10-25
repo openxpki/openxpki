@@ -142,7 +142,7 @@ sub get_workflow_ids_for_cert {
 
     # Fallback for legacy calls with csr instead of identifier
     if (!$cert_identifier && $csr_serial) {
-        my $cert_identifier_result = CTX('dbi_backend')->select(
+        my $cert_identifier_result = CTX('dbi_backend')->first(
             TABLE   => 'CERTIFICATE',
             DYNAMIC => {             
                 CSR_SERIAL => $csr_serial, 
@@ -153,7 +153,7 @@ sub get_workflow_ids_for_cert {
 
     my @result;
     # CSR Workflow
-    my $workflow_id_result = CTX('dbi_backend')->select(
+    my $workflow_id_result = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
         DYNAMIC => { 
             'IDENTIFIER' => $cert_identifier,
@@ -177,13 +177,13 @@ sub get_workflow_ids_for_cert {
             ATTRIBUTE_KEY => 'system_crr_workflow', 
         },
     );
-    $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
-       
-    push @result, {
-        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
-        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
-    } if ($workflow_id);
-
+    foreach my $line (@{$workflow_id_result}) {     
+        $workflow_id = $line->{ATTRIBUTE_VALUE};          
+        push @result, {
+            'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
+            'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
+        } if ($workflow_id);
+    }
     return \@result;
     
 }
