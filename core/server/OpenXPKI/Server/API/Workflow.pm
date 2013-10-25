@@ -311,11 +311,10 @@ sub get_workflow_initial_info {
     my $args  = shift;
     
     my $factory = __get_workflow_factory();     
+    
     my $wf_config = $factory->_get_workflow_config($args->{WORKFLOW});
     
-    
     ##! 64: 'config ' . Dumper $wf_config
-    
         
 =cut        
     # extract the action in the initial state from the config        
@@ -384,6 +383,8 @@ sub execute_workflow_activity {
 	    $wf_title,
 	    $wf_id
     );
+    
+    # TODO - perhaps that should be moved to the oxi workflow class
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
@@ -434,7 +435,7 @@ sub execute_workflow_activity {
     };
     if ($EVAL_ERROR) {
         my $eval = $EVAL_ERROR;
-	CTX('log')->log(
+        CTX('log')->log(
 			MESSAGE  => "Error executing workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title'): $eval",
 			PRIORITY => 'info',
 			FACILITY => 'system',
@@ -533,7 +534,22 @@ sub get_workflow_activities_params {
 	return \@list;
 }
 
+=head2 create_workflow_instance 
 
+Limitations and Requirements:
+
+Each workflow MUST start with a state called INITIAL and MUST have exactly
+one action that MUST NOT accept ay parameters. The inital action SHOULD
+set the context value 'creator' to the id of the (associated) user of this
+workflow. Note that the creator is afterwards attached to the workflow
+as attribtue and would not update if you set the context value later!   
+
+You MAY pass startup parameters to this method, if you do so, the first 
+non-autorun state MUST be named INITIALIZED and provide one useable activity 
+(conditions are ok). The method will internally dispatch the call to the 
+execute_workflow_activity
+
+=cut
 sub create_workflow_instance {
     my $self  = shift;
     my $args  = shift;
@@ -547,145 +563,114 @@ sub create_workflow_instance {
     my $workflow = __get_workflow_factory()->create_workflow($wf_title);
 
     if (! defined $workflow) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE",
-	    params => {
-		WORKFLOW => $wf_title,
-	    });
+    	OpenXPKI::Exception->throw (
+	        message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE",
+	        params => { WORKFLOW => $wf_title }
+	    );
     }
+    
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
     $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
     $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::Log');
 
-    my $creator = CTX('session')->get_user();
-    ##! 2: $creator
-    if (! defined $creator) {
-	$creator = '';
+    # load the first state and check for the initial action
+    my $state = undef;
+    
+    my @actions = $workflow->get_current_actions();
+    if (not scalar @actions || scalar @actions != 1) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY",
+            params => { WORKFLOW => $wf_title }
+        );
+    }
+    my $initial_action = shift @actions;
+    ##! 8: "initial action: " . $initial_action
+
+    eval {
+        $state = $workflow->execute_action($initial_action);        
+    };
+
+    # TODO - refactor error handling
+    
+    # Eval error - should usually not happen on init action 
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED_EVAL_ERROR",
+            params => {
+                error => $EVAL_ERROR,
+                wferror => $workflow->context->param('__error')
+            }            
+        );
+    }
+    
+    # Something got wrong and we ended up in the initial state
+    if ($state eq 'INITIAL') {
+        OpenXPKI::Exception->throw (
+            message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED_INIT_STUCK",
+            params => {
+                wferror => $workflow->context->param('__error')
+            }
+        );
     }
 
-    $workflow->context->param(creator => $creator);
-
-    # our convention is that every workflow MUST have the following properties:
-    # - it must have an activity called 'create'
-    # - it must have a state called 'CREATED' that is reached by executing
-    #   'create'
-
-    my $state = undef;
-    eval
-    {
-        ##! 4: "determine the first action"
-        my @list = $workflow->get_current_actions();
-        if (not scalar @list)
-        {
-	    OpenXPKI::Exception->throw (
-	        message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY",
-	        params => {
-		    WORKFLOW => $wf_title,
-	        });
-        }
-        ##! 4: "pass in specified parameters if available"
-        if (exists $args->{PARAMS} &&
-            (ref $args->{PARAMS} eq 'HASH'))
-        {
-            ##! 8: "load allowed parameters"
-            ##! 32: '@list: ' . Dumper(\@list)
-            ##! 64: 'workflow: ' . Dumper($workflow)
-            my @activities = $workflow->get_current_actions();
-            ##! 64: 'activity: ' . $list[0]
-            my %fields = ();
-            ##! 64: 'fields: ' . $workflow->get_action_fields($list[0])
-            foreach my $field ($workflow->get_action_fields($list[0]))
-            {
-                ##! 32: 'field: ' . $field->name()
-                $fields{$field->name()} = $field->description();
-            }
-            ##! 8: "store the allowed parameters"
-
-            # store workflow parent ID and delete it from the arguments
-            $workflow->context->param('workflow_parent_id' => delete($args->{PARAMS}->{'workflow_parent_id'}));
-
-	    foreach my $key (keys %{$args->{PARAMS}})
-            {
-                next if (not exists $fields{$key} and $args->{FILTER_PARAMS});
-                if (not exists $fields{$key})
-                {
-                    OpenXPKI::Exception->throw (
-                        message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_ILLEGAL_PARAM",
-                        params => {
-                                   WORKFLOW => $wf_title,
-                                   ACTIVITY => $list[0],
-                                   PARAM    => $key,
-                                   VALUE    => $args->{PARAMS}->{$key}
-                                  });
-                }
-	        $workflow->context->param($key => $args->{PARAMS}->{$key});
-            }
-        }
-        $state = $workflow->execute_action($list[0]);
-    };
-    
-    if ($EVAL_ERROR || $state eq 'INITIAL') {
-        my $eval = $EVAL_ERROR;
-        ##! 16: 'eval error: ' . $EVAL_ERROR
-        my $error = $workflow->context->param('__error');
-        if (defined $error) {
-            if (ref $error eq '')
-            {
-                OpenXPKI::Exception->throw (
-                    message => $error);
-            }
-            if (ref $error eq 'ARRAY')
-            {
-                my @list = ();
-                foreach my $item (@{$error})
-                {
-                    eval {
-                        OpenXPKI::Exception->throw (
-                            message => $item->[0],
-                            params  => $item->[1]);
-                    };
-                    push @list, $EVAL_ERROR;
-                }
-                OpenXPKI::Exception->throw (
-                    message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
-                    children => [ @list ]);
-            } 
-        }
-        if ($eval)
-        {
-            if (index ($eval, "The following fields require a value:") > -1)
-            {
-                ## missing field(s) in workflow
-                $eval =~ s/^.*://;
-                OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
-                    params  => {FIELDS => $eval});
-            }
-            if (ref $eval eq 'OpenXPKI::Exception') {
-                $eval->rethrow();
-            }
-            else {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED_EVAL_ERROR',
-                    params  => {
-                        ERROR => "$eval",
-                    },
-                );
-            }
-        }
+    # Guys, if you pass parameters, make sure your second state has the correct name!
+    if (exists $args->{PARAMS} && (ref $args->{PARAMS} eq 'HASH') && $state ne 'INITIALIZED') {
         OpenXPKI::Exception->throw (
-                message => 'I18N_WF_ERROR_ILLEGAL_STATE');
-    }        
+            message => 'I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_ILLEGAL_STATE',
+            params => { state => $state }
+        );        
+    }
 
-    my $wf_id = $workflow->id();
+    # if we are here, the workflow was created and initialized, time to proceed
+    # First, we check for the creator, in order:
+    # 1) set from the context (provided by the initial method)
+    # 2) use the session user
+    # 3) leave empty         
+
+
+    my $creator = $workflow->context->param('creator');
+    $creator = CTX('session')->get_user() unless($creator);
+    $creator = '' unless (defined $creator);
     
-    CTX('log')->log(
-	MESSAGE  => "Workflow instance $wf_id created (type: '$wf_title')",
-	PRIORITY => 'info',
-	FACILITY => 'system',
-	);
+    my $wf_id = $workflow->id();
+    ##! 16: 'workflow id ' .  $wf_id 
+    # attach the creator as attribute
+    CTX('dbi_backend')->insert(
+        TABLE => 'WORKFLOW_ATTRIBUTES', 
+        HASH => {            
+            WORKFLOW_SERIAL => $wf_id,
+            ATTRIBUTE_KEY => 'creator',
+            ATTRIBUTE_VALUE => $creator
+        }
+    );          
+    CTX('dbi_backend')->commit();
 
+    CTX('log')->log(
+        MESSAGE  => "Workflow instance $wf_id created (type: '$wf_title')",
+        PRIORITY => 'info',
+        FACILITY => 'system',
+    );
+
+    # now check if there are parameters to pass    
+    if (exists $args->{PARAMS} && (ref $args->{PARAMS} eq 'HASH')) {
+        
+        @actions = $workflow->get_current_actions();
+        if (not scalar @actions || scalar @actions != 1) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_INITIAL_PARAMS_NO_ACTIVITY",
+                params => { WORKFLOW => $wf_title, ACTIONS => join(":", @actions) }
+            );
+        }
+        ##! 1: "execute first activity"
+        return $self->execute_workflow_activity({
+            WORKFLOW => $wf_title,
+            ID       => $wf_id,
+            ACTIVITY => $actions[0],
+            PARAMS   => $args->{PARAMS}            
+        });
+    }        
+    
     return __get_workflow_info($workflow);
 }
 
@@ -768,14 +753,14 @@ sub search_workflow_instances {
     # );
     my $i = 0;
     foreach my $context_entry (@context) {
-        my $table_alias = $context_table . '_' . $i;
+        my $table_alias = 'WORKFLOW_ATTRIBUTES_' . $i;
         my $key   = $context_entry->{KEY};
         my $value = $context_entry->{VALUE};
         my $operator = 'EQUAL';
         $operator = $context_entry->{OPERATOR} if($context_entry->{OPERATOR});
-        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_KEY'}   = {VALUE => $key};
-        $dynamic->{$table_alias . '.WORKFLOW_CONTEXT_VALUE'} = {VALUE => $value, OPERATOR  => $operator };
-        push @tables, [ $context_table => $table_alias ];
+        $dynamic->{$table_alias . '.ATTRIBUTE_KEY'}   = {VALUE => $key};
+        $dynamic->{$table_alias . '.ATTRIBUTE_VALUE'} = {VALUE => $value, OPERATOR  => $operator };
+        push @tables, [ 'WORKFLOW_ATTRIBUTES' => $table_alias ];
         push @joins, 'WORKFLOW_SERIAL';
         $i++;
     }

@@ -134,8 +134,9 @@ sub __authorize_workflow {
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
        
-        my %allowed_workflows = map { $_ => 1 } ($config->get_list("auth.wfacl.$role.create")); 
-        
+        my %allowed_workflows = map { $_ => 1 } ($config->get_list("auth.wfacl.$role.create"));
+         
+        ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows               
         if (! exists $allowed_workflows{$type} ) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED',
@@ -173,7 +174,9 @@ sub __authorize_workflow {
         if ($allowed_creator_re) {
             ##! 16: 'allowed_creator_re: ' . $allowed_creator_re
             # check it against the workflow creator
-            my $wf_creator = $workflow->context()->param('creator') || '';
+            #my $wf_creator = $workflow->context()->param('creator') || '';
+            my $wf_creator = $workflow->attrib('creator') || '';
+            
             ##! 16: 'wf_creator: ' . $wf_creator
             if ($wf_creator !~ qr/$allowed_creator_re/ &&
                 $wf_creator ne $allowed_creator_re) {
