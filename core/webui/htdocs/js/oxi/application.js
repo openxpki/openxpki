@@ -322,7 +322,10 @@ OXI.Application = Ember.Application.extend(
             return this.MainView;
         }
         js_debug({SourceView:SourceView},2);
-        var shortLabel = (page.shortlabel)?page.shortlabel:page.label;
+        var shortLabel = '';
+        if(page){
+            shortLabel = (page.shortlabel)?page.shortlabel:page.label;
+        }
         var Self = (SourceView && SourceView.getMainViewContainer)?SourceView.getMainViewContainer():App.MainView;
         if(target == 'self'){
             js_debug({Self:Self,MainView:App.MainView});
