@@ -40,7 +40,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
             App.applicationError('Form or Button without action!');
             return;
         }
-        if(!target)target='main';
+        if(!target)target='self';
         this.resetErrors();
         var i;
         var submit_ok = true;
@@ -77,7 +77,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
                 FormView.set('_actionIsTriggered',false);
                 //js_debug(json,2);
                 App.hideLoader();
-                App.renderPage(json,target);
+                App.renderPage(json,target,FormView);
                 
                 if(json.error){
                     var field;

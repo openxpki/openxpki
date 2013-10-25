@@ -53,7 +53,11 @@ OXI.ContentBaseView = OXI.View.extend(
     label:null,
     description:null,
     ButtonList:[],
+    SectionView:null,//set via Constructor, points to parent
     
+    getMainViewContainer:function(){
+        return this.SectionView.SectionContainer;  
+    },
     
     getButtonCount:function(){
         return this.ButtonList.length;
@@ -110,7 +114,14 @@ OXI.PageButton = OXI.View.extend({
 
     click: function(evt) {
         js_debug("Button "+this.label+" was clicked");
-        App.handleAction({action:this.action,page:this.page,label:this.label,target:this.target});
+        var action = {
+            action:this.action,
+            page:this.page,
+            label:this.label,
+            target:this.target,
+            source:this.ParentView
+        };
+        App.handleAction(action);
     },
 
     init:function(){
@@ -135,5 +146,30 @@ OXI.PageButton = OXI.View.extend({
 OXI.ModalView = OXI.View.extend({
 
     jsClassName:'OXI.ModalView',
-    templateName: "modal-main"
+    templateName: "modal-main",
+    classNames: ['modal', 'fade'],//this is for the outer div around the dialog
+    label:null,
+    
+    show: function(label){
+        this.set('label',label);
+        js_debug('show modal');
+        this.$().modal('show');
+    },
+    
+    close: function(){
+        this.set('label','');
+        js_debug('hide modal');
+        this.$().modal('hide');
+        $('.modal-backdrop.fade.in').hide();
+    },
+    
+    init:function(){
+        this._super();
+        
+        //this.set('controller',OXI.ModalControler.create({view:this}));
+        this.set('ContentView', this.createChildView(
+                                    OXI.SectionViewContainer.create({displayType:'modal'})
+                                   ));
+        
+    },
 });

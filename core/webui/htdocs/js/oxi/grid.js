@@ -106,6 +106,7 @@ OXI.GridView = OXI.ContentBaseView.extend({
         }
         //js_debug('dynamic path: '+path+ ', target '+action.target);
         action.page = path;
+        action.source = this;
         App.handleAction(action);
     },
     

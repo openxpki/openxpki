@@ -133,23 +133,21 @@
     </script>
     
     <script type="text/x-handlebars" data-template-name="modal-main">
-        <div class="modal fade">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Modal title</h4>
+                <h4 class="modal-title">{{view.label}}</h4>
               </div>
               <div class="modal-body">
-                Modal content
+                {{view view.ContentView}}
               </div>
               <div class="modal-footer">
-                <<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
               </div>
             </div><!-- /.modal-content -->
           </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
+
     </script>    
     
     
@@ -159,7 +157,7 @@
       {{view view.MessageView}}
       
       <ul {{bind-attr class=":nav :nav-tabs view.hasNoTabs:hidden"}}>
-        <li><a href="#section-main-tab" data-toggle="tab">{{view.labelTabMain}}</a></li>
+        <li><a {{bind-attr href=view.getMainTabHref}} data-toggle="tab">{{view.labelTabMain}}</a></li>
         {{#each TabView in view.Tabs}}
         <li><a {{bind-attr href=TabView.getTabHref}} data-toggle="tab">{{TabView.label}}</a></li>
         {{/each}}
@@ -167,7 +165,7 @@
         <!-- tab list -->
         <div class="tab-content">
             <!--main tab -->
-            <div class="tab-pane active" id="section-main-tab">
+            <div class="tab-pane active" {{bind-attr id=view.mainTabId}}>
                   <div class="container sections">
                   <div class="row">
                   <div class="col-md-12">
@@ -208,7 +206,7 @@
     </script>
     
     <script type="text/x-handlebars" data-template-name="tab-pane">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" {{action 'closeTab'}}>&times;</button>
+    <button type="button" class="close" aria-hidden="true" {{action 'closeTab'}}>&times;</button>
     {{view view.ContentView}}
     </script>
     

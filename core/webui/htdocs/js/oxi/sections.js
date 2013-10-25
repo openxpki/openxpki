@@ -107,8 +107,24 @@ OXI.SectionViewContainer = OXI.View.extend({
        if(this._debugTabs){
            label += ' #'+ this.get('elementId');
        }
+       if(!label)label = 'Main page';
        return label;
     }.property('label','shortlabel'),
+    
+    getMainTabHref:function(){
+        return '#' + this.getMainTabId();
+    }.property(),
+    
+    getMainTabId:function(){
+        return this.get('elementId') +'-main-tab';
+
+    },
+    
+    mainTabId:function(){
+        return this.getMainTabId();
+    }.property(),
+    
+    
     
     //methods:
     addTab: function(label){
@@ -173,7 +189,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         this.set('SectionViewList',[]);
         this.set('label','');
         this.set('shortlabel','');
-        this.set('desc','');
+        this.set('description','');
         if(json.page){
             if(this.displayType == 'main'){//no label/description in tabs
                 if(json.page.label){
@@ -187,7 +203,6 @@ OXI.SectionViewContainer = OXI.View.extend({
             if(json.page.shortlabel){
                 this.set('shortlabel', json.page.shortlabel);
             }
-            
         }
 
         //die einzelnen sections abbilden
@@ -198,7 +213,8 @@ OXI.SectionViewContainer = OXI.View.extend({
 
                 if(!sections[i])next;
 
-                this.addSectionView({sectionData:sections[i],
+                this.addSectionView({
+                    sectionData:sections[i],
                     section_nr:i+1
                 });
             }
@@ -208,7 +224,7 @@ OXI.SectionViewContainer = OXI.View.extend({
 
     addSectionView:function(params){
         //Ember.debug('SectionViewContainer:addSectionView');
-
+        params.SectionContainer = this;
         var SectionView = this.createChildView(OXI.SectionView.create(params));
 
         if(!this.SectionViewList){
@@ -240,6 +256,8 @@ OXI.SectionView = OXI.View.extend({
     section_nr:null,
     section_type:null,
     
+    SectionContainer:null,//set via Constructor, points to parent
+    
     hasButtons: function(){
         return this.ContentView.getButtonCount();
     }.property(),
@@ -258,35 +276,30 @@ OXI.SectionView = OXI.View.extend({
         
         
         var ContentView;
-        
+        var params = {SectionView:this, content:this.sectionData.content};
+        if(this.sectionData.action){
+            params.action =  this.sectionData.action;  
+        }
         switch(this.section_type){
             case 'form':
-            ContentView = OXI.FormView.create(
-            {action:this.sectionData.action, content:this.sectionData.content}
-            );
+            ContentView = OXI.FormView.create(params);
             break;
             case 'text':
-            ContentView = OXI.TextView.create(
-            {content:this.sectionData.content}
-            );
+            ContentView = OXI.TextView.create(params);
             break;
             case 'keyvalue':
-            ContentView = OXI.KeyValueView.create(
-            {content:this.sectionData.content}
-            );
+            ContentView = OXI.KeyValueView.create(params);
             break;
             case 'grid':
-            ContentView = OXI.GridView.create(
-            {action:this.sectionData.action, content:this.sectionData.content}
-            );
+            ContentView = OXI.GridView.create(params);
             break;
             default:
-            alert('section '+  this.section_nr+' has unkown type: '+this.section_type);
+            App.applicationError('section '+  this.section_nr+' has unkown type: '+this.section_type);
             return;
         }
         this.ContentView = this.createChildView(ContentView);
     }
-
+    
 
 });
 

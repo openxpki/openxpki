@@ -209,6 +209,11 @@ sub handle {
                                 {page => 'my_workflows',label=>'My workflows (tab)',target=>'tab'},
                                 {page => 'home/my_certificates',label=>'My certificates (new page)',target=>'main'},
                                 {page => 'home/my_certificates',label=>'My certificates (tab)',target=>'tab'},
+                                {page => 'home/my_certificates',label=>'My certificates (modal)',target=>'modal'},
+                                {page => 'request_cert',label=>'Request cert (modal)',target=>'modal'},
+                                {page => 'request_cert',label=>'Request cert (tab)',target=>'tab'},
+                                
+                                
                             ],    
                             
                             actions => [
@@ -218,15 +223,15 @@ sub handle {
                                  target => 'tab',
                                 },
                                 {path => 'my_tasks!{date_issued}',
-                                 label => 'Test 2',
-                                 target => 'tab',
+                                 label => 'Test 2 (modal)',
+                                 target => 'modal',
                                 },
                                 {path => 'my_tasks',
                                  label => 'another (nested) my tasks...',
                                  target => 'tab',
                                 },
                                 {path => 'my_workflows',
-                                 label => 'my workflows',
+                                 label => 'my workflows (tab)',
                                  target => 'tab',
                                 },
                                 ,
@@ -298,7 +303,6 @@ sub handle {
                             
                             {path => 'my_certificates!{date_issued}',
                              label => 'Grid Main action',
-                             target => 'tab',
                             },
                             
                         ],
@@ -306,6 +310,10 @@ sub handle {
                                 
                                 {page => 'test_key_value',label=>'Key Value (in Tab)',target=>'tab'},
                                 {page => 'test_text',label=>'Plain text (in Tab)',target=>'tab'},
+                                {page => 'test_text',label=>'Plain text (no target)'},
+                                {page => 'test_text',label=>'Plain text (target self)',target=>'self'},
+                                {page => 'request_cert',label=>'Request cert (tab)',target=>'tab'},
+                                {page => 'request_cert',label=>'Request cert (self)',target=>'self'}
                             ],
 
                         columns => [
@@ -366,7 +374,7 @@ sub handle {
                     description => 'Text 2 aksjdhkashdkahsdkhaksdhakshdkashdkjashdkjashd',
                     buttons => [
                             {action => 'test_key_value!action1',label=>'Action 1'},
-                            {page => 'test_key_value!page1',label=>'Page 1'},
+                            {page => 'test_key_value!page1',label=>'Page 1 (modal)',target=>'modal'},
                             {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
                             {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
                         ],
