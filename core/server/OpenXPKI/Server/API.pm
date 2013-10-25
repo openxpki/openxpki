@@ -113,7 +113,13 @@ sub BUILD {
                 'CSR_SERIAL' => {
                     type => SCALAR,
                     regex => $re_integer_string,
-                 },
+                    optional => 1,
+                 },            
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                    optional => 1,
+                },
             },
         },
         'get_default_token' => {
