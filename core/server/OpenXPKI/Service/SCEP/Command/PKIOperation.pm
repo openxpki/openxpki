@@ -291,7 +291,7 @@ sub __pkcs_req : PRIVATE {
         $workflow_id = $res->{VALUE};
     }
   
-    ##! 16: "transaction ID: $transaction_id - workflow id: ' . $workflow_id
+    ##! 16: "transaction ID: $transaction_id - workflow id: $workflow_id"
 
     # this cleans up failed workflows
     if ( $workflow_id ) {
