@@ -81,9 +81,9 @@ sub init_detail {
     my $self = shift;
     my $args = shift;
     
-    my $cert_identifier = $self->param('identifier');     
-    my $cert = $self->send_command( 'get_cert', { FORMAT => 'HASH', IDENTIFIER => $cert_identifier });
-    
+    my $cert_identifier = $self->param('identifier');
+        
+    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier });    
     $self->logger()->debug("result: " . Dumper $cert);
     
     $self->_page({
@@ -134,13 +134,54 @@ sub init_detail {
 
 
 
-sub init_detail {
+sub init_workflows {
 
     
     my $self = shift;
     my $args = shift;
     
     my $cert_identifier = $self->param('identifier');
+    
+           
+    my $workflows = $self->send_command( 'get_workflow_ids_for_cert', {  IDENTIFIER => $cert_identifier });
+    
+    $self->logger()->debug("result: " . Dumper $workflows);
+        
+    $self->_page({
+        label => 'Workflows related to Certificate',        
+    });
+    
+    my @result;
+    foreach my $line (@{$workflows}) {
+        push @result, [ 
+            $line->{'WORKFLOW.WORKFLOW_SERIAL'},            
+            $line->{'WORKFLOW.WORKFLOW_TYPE'},            
+        ];        
+    }
+         
+    $self->add_section({
+        type => 'grid',
+        processing_type => 'all',
+        content => {
+            header => 'Grid-Headline',
+            actions => [{   
+                path => 'workflow!load!wf_id!{serial}',
+                label => 'Open Workflow',
+                icon => 'view',
+                target => 'tab',
+            }],            
+            columns => [                        
+                { sTitle => "serial" },
+                #{ sTitle => "updated" },
+                { sTitle => "type"},
+                #{ sTitle => "state"},
+                #{ sTitle => "procstate"},
+                #{ sTitle => "wake up"},                                
+            ],
+            data => \@result            
+        }
+    });
+    return $self;
     
          
 }
