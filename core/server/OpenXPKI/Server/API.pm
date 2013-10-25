@@ -439,9 +439,24 @@ sub BUILD {
                     regex => $re_alpha_string,
                     optional => 1,
                 },
-		CERT_ATTRIBUTES => {
+                NOTBEFORE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                NOTAFTER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                PROFILE => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                CERT_ATTRIBUTES => {
                     type     => ARRAYREF,
-		    optional => 1,
+                    optional => 1,
                 },
                 VALID_AT => {
                     type     => SCALAR,
@@ -503,10 +518,25 @@ sub BUILD {
                     regex => $re_alpha_string,
                     optional => 1,
                 },
-		CERT_ATTRIBUTES => {
-                    type     => ARRAYREF,
-		    optional => 1,
+                NOTBEFORE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
                 },
+                NOTAFTER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_integer_string,
+                },
+                PROFILE => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                CERT_ATTRIBUTES => {
+                    type     => ARRAYREF,
+                    optional => 1,
+                },              
                 LIMIT => {
                     type     => SCALAR,
                     optional => 1,

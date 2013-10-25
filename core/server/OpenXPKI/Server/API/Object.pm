@@ -146,8 +146,8 @@ sub get_cert {
         # NOTBEFORE and NOTAFTER are DateTime objects, which we do
         # not want to be serialized, so we just send out the stringified
         # version ...
-        $return_ref->{BODY}->{NOTBEFORE} = "$return_ref->{BODY}->{NOTBEFORE}";
-        $return_ref->{BODY}->{NOTAFTER}  = "$return_ref->{BODY}->{NOTAFTER}";
+        $return_ref->{BODY}->{NOTBEFORE} = $return_ref->{BODY}->{NOTBEFORE}->epoch();
+        $return_ref->{BODY}->{NOTAFTER}  = $return_ref->{BODY}->{NOTAFTER}->epoch();
         $return_ref->{STATUS}            = $hash->{STATUS};
         $return_ref->{ROLE}              = $hash->{ROLE};
         $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
@@ -400,6 +400,8 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * VALID_AT
 
+=item * NOTBEFORE/NOTAFTER (less/greater to match "other side" of validity)
+
 =back
 
 The result is an array of hashes. The hashes do not contain the data field
@@ -484,12 +486,24 @@ sub search_cert {
         $params{VALID_AT} = $args->{VALID_AT};
     }
 
+    # notbefore/notafter should only be used for timestamps outside
+    # the validity interval, therefore the operators are fixed
+    if ( defined $args->{NOTBEFORE} ) {
+        $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
+              { VALUE => $args->{NOTBEFORE}, OPERATOR => "GREATER_THAN" };
+    }
+    
+    if ( defined $args->{NOTAFTER} ) {
+        $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
+              { VALUE => $args->{NOTAFTER}, OPERATOR => "LESS_THAN" };
+    }
+
+
     # FIXME - need this for trust anchor and cross realm search
     if ( $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'}->{VALUE} eq '_ANY' ) {
     	delete $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'};
     }
     
-
     # handle certificate attributes (such as SANs)
     if ( defined $args->{CERT_ATTRIBUTES} ) {
         if ( ref $args->{CERT_ATTRIBUTES} ne 'ARRAY' ) {
@@ -515,10 +529,34 @@ sub search_cert {
             # add search constraint
             $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_KEY' } =
               { VALUE => $entry->[0] };
+              
+            # sanitize wildcards (don't overdo it...)
+            my $val = $entry->[1];
+            $val =~ s/\*/%/g;
+            $val =~ s/%%+/%/g;            
             $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_VALUE' } =
-              { VALUE => $entry->[1] };
+              { VALUE =>  $val, OPERATOR => 'LIKE' };
             $ii++;
         }
+    }
+
+    if (  $args->{PROFILE} ) {
+        
+        my @join = ('CSR_SERIAL');
+        for (my $i=1; $i < scalar @{ $params{TABLE} }; $i++) {
+           push @join, undef; 
+        }
+        push @join, 'CSR_SERIAL';
+        
+        # add csr table
+        push @{ $params{TABLE} }, 'CSR';
+
+        # add join statement
+        push @{ $params{JOIN}->[0] }, undef;
+        push @{ $params{JOIN} }, \@join;
+        
+        # add search constraint
+        $params{DYNAMIC}->{ 'CSR.PROFILE' } = { VALUE => $args->{PROFILE} };            
     }
 
     ##! 16: 'certificate search arguments: ' . Dumper \%params
