@@ -1,9 +1,5 @@
 <actions>
-
-    <action name="changemeta_initial"
-            class="OpenXPKI::Server::Workflow::Activity::Noop">
-    </action>
-            
+ 
     <action name="changemeta_load_data"
             class="OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata">            
             <field name="cert_identifier" is_required="yes"/>   
@@ -15,17 +11,25 @@
     <action name="changemeta_update_context"
             class="OpenXPKI::Server::Workflow::Activity::Noop"
             uihandle="OpenXPKI::Client::UI::Workflow::Metadata::render_update_form"
-            description="I18N_OPENXPKI_ACTION_UPDATE_METADATA_ACTION"> 
+            description="I18N_OPENXPKI_ACTION_METADATA_SAVE_FORM"> 
             <field name="metadata_update"/>
             <validator name="changemeta_validate_metadata"/>        
     </action>
 
     <action name="changemeta_persist"
-            class="OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata">
+            class="OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata"
+            description="I18N_OPENXPKI_ACTION_CHANGEMETA_PERSIST_DATA">
     </action>  
 
     <action name="changemeta_load_form"
-            class="OpenXPKI::Server::Workflow::Activity::Noop">
+            class="OpenXPKI::Server::Workflow::Activity::Noop"
+            description="I18N_OPENXPKI_ACTION_CHANGEMETA_LOAD_FORM">
+    </action>
+
+
+    <action name="changemeta_terminate"
+            class="OpenXPKI::Server::Workflow::Activity::Noop"
+            description="I18N_OPENXPKI_ACTION_CHANGEMETA_TERMINATE">
     </action>
     
     

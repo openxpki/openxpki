@@ -4,12 +4,16 @@
   <persister>OpenXPKI</persister>
   <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
 
-
- <state name="INITIAL">
+  <state name="INITIAL">
+      <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
+      <action name="global_initialize_workflow" resulting_state="INITIALIZED">
+      </action>
+  </state>
+    
+ <state name="INITIALIZED">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL</description>
     <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"	    
 	    resulting_state="AUTOAPPROVAL">	    
-      <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE"/>
     </action>    
   </state>
   

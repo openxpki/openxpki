@@ -1,0 +1,10 @@
+<conditions>
+  
+  <condition 
+     name="changemeta_cond_has_update" 
+     class="OpenXPKI::Server::Workflow::Condition::WorkflowContext">
+    <param name="context_key" value="metadata_update"/>
+    <param name="condition" value="exists"/>
+  </condition>
+  
+</conditions>
