@@ -88,20 +88,75 @@ sub init_load {
     # re-instance existing workflow
     my $id = $self->param('wf_id');
     
+    
+    
     my $wf_info = $self->send_command( 'get_workflow_info', {
         ID => $id 
     }); 
     
-    if (!$wf_info) {
-        $self->set_status('Unable to load workflow information','error');
+    if (!$wf_info) {        
+        $self->set_status('Unable to load workflow information','error') unless($self->_status());
         return $self;
     }
-     
+    
     $self->__render_from_workflow({ WF_INFO => $wf_info });
      
     return $self;   
     
 }
+
+=head2
+
+Render form for the workflow search.
+#TODO: Preset parameters
+
+=cut
+sub init_search {
+    
+    my $self = shift;
+    my $args = shift;
+
+    $self->_page({
+        label => 'Workflow Search',
+        description => 'You can search for workflows here.',
+    });
+    
+    my $workflows = $self->send_command( 'list_workflow_titles' );
+    return $self unless(defined $workflows);
+    
+    # TODO Sorting / I18
+    my @wf_names = keys %{$workflows};
+    @wf_names = sort @wf_names;
+    
+    my @wfl_list = map { $_ = {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
+    unshift @wfl_list, {'value' => '', 'label' => 'all'};
+    
+    $self->_result()->{main} = [  
+        {   type => 'form',
+            action => 'workflow!load',
+            content => {
+                title => 'Get workflow info by known workflow id',
+                submit_label => 'search now',
+                fields => [                    
+                    { name => 'wf_id', label => 'Workflow Id', type => 'text', is_optional => 1 },                                       
+                ]
+        }},      
+        {   type => 'form',
+            action => 'workflow!search',
+            content => {
+                title => 'Search the database',
+                submit_label => 'search now',
+                fields => [                    
+                    { name => 'wf_type', label => 'Type', type => 'select', is_optional => 1, options => \@wfl_list  },
+                    { name => 'wf_state', label => 'State', type => 'text', is_optional => 1 },                    
+                    { name => 'wf_creator', label => 'Creator', type => 'text', is_optional => 1 },                    
+                ]
+        }}  
+    ];
+        
+    return $self;
+}
+
 
 =head2 action_index 
 
@@ -223,13 +278,28 @@ sub action_index {
         $wf_info = $self->send_command( 'create_workflow_instance', {
             WORKFLOW => $wf_type, 
         }); 
-                    
     }   
     
     $self->__render_from_workflow({ WF_INFO => $wf_info });
     
           
     return $self;
+    
+}
+
+=head2 action_load
+
+Load a workflow given by wf_id, redirects to init_load 
+
+=cut 
+
+sub action_load {
+
+    my $self = shift;
+    my $args = shift;
+    
+    $self->redirect('workflow!load!wf_id!'.$self->param('wf_id') );
+    return $self;   
     
 }
 
@@ -292,6 +362,85 @@ sub action_select {
     $self->__render_from_workflow( $args );
     
     return $self;
+}
+
+=head2 action_search
+
+Handler for the workflow search dialog, consumes the data from the 
+search form and displays the matches as a grid.
+
+=cut
+
+sub action_search {
+    
+    
+    my $self = shift;
+    my $args = shift;
+    
+    my $query = { LIMIT => 100 }; # Safety barrier
+    foreach my $key (qw(type state)) {
+        my $val = $self->param("wf_$key");    
+        if (defined $val && $val ne '') {
+            $query->{uc($key)} = $val;     
+        }
+    }
+    
+    # creator via context (urgh... - needs change)
+    if ($self->param('wf_creator')) {
+        $query->{CONTEXT} = [{ KEY => 'creator', VALUE => ~~ $self->param('wf_creator') }];
+    }
+    
+    $self->logger()->debug("query : " . Dumper $query);
+            
+    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    return $self unless(defined $search_result);
+    
+    $self->logger()->debug( "search result: " . Dumper $search_result);
+
+    $self->_page({
+        label => 'Workflow Search - Results',
+        description => 'Here are the results of the swedish jury:',
+    });
+    
+    my $i = 1;
+    my @result;
+    foreach my $item (@{$search_result}) {
+        push @result, [
+            $item->{'WORKFLOW.WORKFLOW_SERIAL'},            
+            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+            $item->{'WORKFLOW.WORKFLOW_TYPE'},
+            $item->{'WORKFLOW.WORKFLOW_STATE'},
+            $item->{'WORKFLOW.WORKFLOW_PROC_STATE'},
+            $item->{'WORKFLOW.WORKFLOW_WAKEUP_AT'},                
+        ]
+    }
+ 
+    $self->logger()->trace( "dumper result: " . Dumper @result);
+    
+    $self->add_section({
+        type => 'grid',
+        processing_type => 'all',
+        content => {
+            header => 'Grid-Headline',
+            actions => [{   
+                path => 'workflow!load!wf_id!{serial}',
+                label => 'Open Workflow',
+                icon => 'view',
+                target => 'tab',
+            }],            
+            columns => [                        
+                { sTitle => "serial" },
+                { sTitle => "updated" },
+                { sTitle => "type"},
+                { sTitle => "state"},
+                { sTitle => "procstate"},
+                { sTitle => "wake up"},                                
+            ],
+            data => \@result            
+        }
+    });
+    return $self;
+    
 }
 
 =head1 internal methods
@@ -389,9 +538,17 @@ sub __render_from_workflow {
         
         $self->logger()->debug('activity info ' . Dumper $wf_action_info );
      
+        # we allow prefill of the from if the workflow is in the initial state
+        my $do_prefill = $wf_info->{WORKFLOW}->{STATE} eq 'INITIALIZED';
+     
+     
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
         my @fields;
         foreach my $field (keys %{$wf_action_info->{FIELD}}) {
+            
+            next if ($field =~ m{ \A workflow_id }x);
+            next if ($field =~ m{ \A wf_ }x);
+            next if ($field =~ m{ \A _ }x);     
             
             my $type = $wf_action_info->{FIELD}->{$field}->{TYPE} || 'text';
             
@@ -399,7 +556,24 @@ sub __render_from_workflow {
             $type = 'text' if ($type eq 'basic');
             
             # TODO - map field types, required, etc            
-            push @fields, { name => $field, label => $field, type => $type, value => $context->{$field} };    
+            
+            my $item = {
+                name => $field, 
+                label => $field, 
+                type => $type
+            };
+            if ($do_prefill && defined $self->param($field)) {
+                # TODO - XSS Checks / Escaping / Validation!
+                $item->{value} = $self->param($field);
+            } elsif (defined $context->{$field}) {
+                $item->{value} = $context->{$field};
+            }
+            
+            if ($wf_action_info->{FIELD}->{$field}->{REQUIRED} ne 'yes') {
+                $item->{is_optional} = 1;
+            }
+            
+            push @fields, $item;    
            
         }
         
@@ -411,6 +585,7 @@ sub __render_from_workflow {
         
         $self->_page({
             label => $wf_info->{WORKFLOW}->{TYPE},
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
             description => $wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION},
         });
         
@@ -428,10 +603,27 @@ sub __render_from_workflow {
         
          $self->_page({
             label => $wf_info->{WORKFLOW}->{TYPE},
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
             description => $wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION},
         });
         
-        my @section;
+        my @fields;
+        my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+        foreach my $key (keys %{$context}) {
+            next if ($key =~ m{ \A workflow_id }x);
+            next if ($key =~ m{ \A wf_ }x);
+            next if ($key =~ m{ \A _ }x);            
+            push @fields, { label => $key, value => $context->{$key} };
+        }
+        
+        my @section = {
+            type => 'keyvalue',
+            content => {
+                label => '',
+                description => '',
+                data => \@fields,
+        }};           
+        
         foreach my $wf_action (@activities) {
            my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
             
@@ -450,7 +642,29 @@ sub __render_from_workflow {
         
         $self->_result()->{main} = \@section if (@section);
         
+        # set status decorator on final states
+        if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
+            $self->set_status('Workflow finished successfully.','success');
+        } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') { 
+            $self->set_status('Workflow failed finally.','error');
+        } elsif ( $wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') {
+            $self->set_status('Watchdog is active on this workflow.','warning');             
+        }
+        
     }
+        
+    unshift @{$self->_result()->{main}}, {   
+        type => 'keyvalue',
+        content => {
+            label => '',
+            description => '',
+            data => [
+                { label => 'Workflow Id', value => $wf_info->{WORKFLOW}->{ID} },
+                { label => 'Workflow State', value => $wf_info->{WORKFLOW}->{STATE} },
+                { label => 'Run State', value => $wf_info->{WORKFLOW}->{PROC_STATE} },                
+            ],
+    }};           
+    
     return $self;
     
 }

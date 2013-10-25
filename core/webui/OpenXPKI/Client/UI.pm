@@ -182,18 +182,21 @@ sub handle_page {
     if ($action) {
         $self->logger()->info('handle action ' . $action);
                 
-        my ($class, $method) = split /!/, $action;           
+        my ($class, $method, %extra) = split /!/, $action;
+        
+        $self->logger()->debug("Loading action handler class $class, extra params " . Dumper \%extra );
+                   
         $class = "OpenXPKI::Client::UI::".ucfirst($class);
         $self->logger()->debug("Loading page action class $class");                
         eval "use $class;1";        
         if ($EVAL_ERROR) {                       
             $self->logger()->error("Failed loading action class $class");
-            $self->_status({ level => 'error', 'Failed to handle request - action not found'});            
+            $self->_status({ level => 'error', 'message' => 'Failed to handle request - action not found'});            
         } else {
             $method  = 'index' if (!$method );
             $method  = "action_$method";
             $self->logger()->debug("Method is $method");
-            $result = $class->new({ client => $self, cgi => $cgi });           
+            $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });           
             $result->$method( $method_args );
         }
     }    
@@ -248,9 +251,10 @@ sub handle_login {
     # Login works in three steps realm -> auth stack -> credentials
     
     my $session = $self->session();
+    my $page = $cgi->param('page') || '';
     my $action = $cgi->param('action') || '';
     
-    $self->logger()->info('not logged in - doing auth - action is ' . $action);
+    $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
     
     # Special handling for pki_realm and stack params
     if ($action eq 'login!realm' && $cgi->param('pki_realm')) {
@@ -269,7 +273,7 @@ sub handle_login {
     my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
 
     # force reload of structure if this is an initial request
-    $result->reload(1) if ($action && $action !~ /^login!/);
+    ($result->reload(1) && $result->redirect('login'))  if ($action !~ /^login/ && $page !~ /^login/);
           
     if ( $status eq 'GET_PKI_REALM' ) {
         if ($pki_realm) {            

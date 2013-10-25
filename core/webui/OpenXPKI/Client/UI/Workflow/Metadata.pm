@@ -79,7 +79,9 @@ sub render_current_data {
     
     my $wf_info = $args->{WF_INFO};    
             
-    my $current_metadata_ser = $wf_info->{WORKFLOW}->{CONTEXT}->{current_metadata};
+    my $current_metadata_ser = $wf_info->{WORKFLOW}->{CONTEXT}->{metadata_update}   
+        || $wf_info->{WORKFLOW}->{CONTEXT}->{current_metadata};
+        
     # Serialization 
     my $ser = OpenXPKI::Serialization::Simple->new();
     my $current_metadata  = $ser->deserialize($current_metadata_ser);

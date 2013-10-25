@@ -64,7 +64,7 @@ sub _init_structure_for_user {
          label=>  'PKI Operation',
          entries=>  [
              {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', label =>  "Change metadata"},
-             {key=> 'crl',label =>  "Manage CRL"}
+             {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE', label =>  "Issue CRL"},
          ]   
       },
       {
@@ -81,8 +81,8 @@ sub _init_structure_for_user {
          key=> 'search',
          label=>  'Search',
          entries=>  [
-             {key=> 'search!certificate', label =>  "Certificates"},
-             {key=> 'search!workflow',label =>  "Workflows"} 
+             {key=> 'certificate!search', label =>  "Certificates"},
+             {key=> 'workflow!search',label =>  "Workflows"} 
          ]   
       }
    
