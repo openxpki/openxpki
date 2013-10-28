@@ -2,6 +2,10 @@
 defines classes for Forms
 */
 
+
+
+
+
 OXI.FormView = OXI.ContentBaseView.extend({
 
     templateName: "form-view",
@@ -163,26 +167,8 @@ OXI.FormView = OXI.ContentBaseView.extend({
         var i;
         for(i=0;i<this.fields.length;i++){
             var field=this.fields[i];
-            var ContainerView;
-            switch(field.type){
-                case 'text':
-                case 'password':
-                ContainerView = OXI.TextFieldContainer.create({fieldDef:field});
-                break;
-
-                case 'textarea':
-                ContainerView = OXI.TextAreaContainer.create({fieldDef:field});
-                break;
-                case 'select':
-                ContainerView = OXI.PulldownContainer.create({fieldDef:field});
-                break;
-                case 'checkbox':
-                ContainerView = OXI.CheckboxContainer.create({fieldDef:field});
-                break;
-                default:
-                alert('field '+field.name+': type not supported: '+field.type);
-
-            }
+            var ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field});
+            
             this.FieldContainerList.push(this.createChildView(ContainerView));
             var i = this.FieldContainerList.length -1;
             this.fieldContainerMap[field.name] = i;
