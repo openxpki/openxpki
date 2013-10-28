@@ -6,7 +6,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
 
     templateName: "form-view",
     jsClassName:'OXI.FormView',
-
+    
     
     default_action:null,
     default_submit_label: 'send',
@@ -19,7 +19,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
     FieldContainerList:[],
     
     submit: function (event){
-
+        js_debug('form submit!');
         return false;
     },
     
