@@ -4,7 +4,9 @@ Base Class for all Views in OXI namespace
 
 OXI.View = Ember.View.extend({
     jsClassName:'OXI.View: you must define jsClassName in your subclass!',
-
+    _domReady:false,
+    
+    
     _toString:function(){
         return this.jsClassName + ' '+ this.toString();
     },
@@ -43,6 +45,11 @@ OXI.View = Ember.View.extend({
 
     debug:function(data){
         js_debug({jsClassName:this._toString(),data:data},3);
+    },
+    didInsertElement: function(){
+        //this.debug('DOM is ready!'+this.get('elementId')); 
+        this.set('_domReady',true);
+        
     }
 });
 
@@ -82,9 +89,7 @@ OXI.ContentBaseView = OXI.View.extend(
         this._initButtons();
     },
 
-    addButton: function(ButtonView){
-        this.ButtonList.push(this.createChildView(ButtonView));
-    },
+    
     
     _initButtons:function(){
         //this.debug('init buttons!');
@@ -93,11 +98,21 @@ OXI.ContentBaseView = OXI.View.extend(
         for(i=0;i<this.content.buttons.length;i++){
             var def = this.content.buttons[i];
             def.ParentView = this;
-            this.ButtonList.push(this.createChildView(OXI.PageButton.create(def)));
+            this.addButton(def);
         }
         
     },
-
+    
+    addButton: function(button_def){
+        this.addButtonView(this._getButton(button_def));
+    },
+    
+    addButtonView: function(ButtonView){
+        this.ButtonList.push(this.createChildView(ButtonView));
+    },
+    _getButton: function(button_def){
+        return OXI.PageButton.create(button_def);   
+    }
 });
 
 OXI.PageButton = OXI.View.extend({

@@ -253,7 +253,9 @@ OXI.Application = Ember.Application.extend(
         js_debug('App.loadPageInfoFromServer: '+pageKey);
         this.set('_actualPageRenderCount',0);
         this.set('_actualPageKey',pageKey);
-
+        //reset tabs:
+        this.MainView.closeTabs();        
+        
         this.showLoader();
         this.callServer({page:pageKey,target:'main'})
         .success(function(json){
@@ -321,7 +323,7 @@ OXI.Application = Ember.Application.extend(
         if(!target || target=='main'){
             return this.MainView;
         }
-        js_debug({SourceView:SourceView},2);
+        js_debug({SourceView:SourceView},1);
         var shortLabel = '';
         if(page){
             shortLabel = (page.shortlabel)?page.shortlabel:page.label;
@@ -354,7 +356,7 @@ OXI.Application = Ember.Application.extend(
         js_debug({method:'App.handleAction',action:action},2);
         
         if(!action.target)action.target='main';
-        
+        if(!action.page)action.page='';
         if(action.page && !action.action &&  action.target=='main'){
             //new page in main window
             return this.goto(action.page);

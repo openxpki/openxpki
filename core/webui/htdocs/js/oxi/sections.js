@@ -27,7 +27,7 @@ OXI.TabView = OXI.View.extend({
     label:null,
     tabindex:null,
     ParentView:null, //
-    _domReady:false,
+    
     _markAsActive:false,
     
     getTabHref:function(){
@@ -70,8 +70,7 @@ OXI.TabView = OXI.View.extend({
         }
     },
     didInsertElement: function(){
-        //this.debug('DOM is ready!'+this.get('elementId')); 
-        this.set('_domReady',true);
+         this._super();
         if(this._markAsActive){
             var Tab = this;
             //for some (unknown) reasons the immediate call to setActive fails here...although the DOM is ready... 
@@ -138,6 +137,7 @@ OXI.SectionViewContainer = OXI.View.extend({
     
     showTab: function(tab_index){
         //js_debug('show tab '+tab_index);
+        if(!this._domReady)return;
         tab_index++;//we must increnent the index, because the first (bootstrap-)tab "main" is not in our TabList
         this.$('.nav-tabs  li:eq('+tab_index+') a').tab('show'); 
     },
@@ -161,14 +161,28 @@ OXI.SectionViewContainer = OXI.View.extend({
         );
         this.showTab(tabindex-1);
     },
+    
+    closeTabs:function(){
+        this.Tabs.forEach(
+            function(Tab, index, enumerable){
+                Tab.destroy();
+            }
+        );
+        this.initTabs();
+        this.showTab(-1);//main tab
+    },
+    
+    initTabs:function(){
+        this.set('Tabs', Ember.ArrayController.create({
+                content: Ember.A([])
+            }));
+    },
 
     init:function(){
         //Ember.debug('SectionViewContainer init ');
         this._super();
         this.SectionViewList = [];
-        this.Tabs = Ember.ArrayController.create({
-                content: Ember.A([])
-            });
+        this.initTabs();
         this.set('controller',OXI.TabListControler.create({view:this}));
         this.MessageView = this.createChildView(OXI.MessageView.create());
     },
@@ -259,6 +273,9 @@ OXI.SectionView = OXI.View.extend({
     SectionContainer:null,//set via Constructor, points to parent
     
     hasButtons: function(){
+        if(this.ContentView.jsClassName == 'OXI.FormView'){
+            return false;    
+        }
         return this.ContentView.getButtonCount();
     }.property(),
     

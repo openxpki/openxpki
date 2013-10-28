@@ -557,6 +557,8 @@ sub handle_request_cert{
                         
                         buttons => [
                             {action => 'request_cert!reset_typ',do_submit=>0,label=>'change type selection'},
+                            {page => 'test_text',do_submit=>0,label=>'other (new) page'},#target="main" is implicit
+                            {page => 'test_text',do_submit=>0,label=>'other page (same tab)',target=>'self'},
                             {action => 'request_cert',do_submit=>1,label=>'finish'},
                         ],
                         

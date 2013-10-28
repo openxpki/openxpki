@@ -227,6 +227,15 @@
      {{view FieldContainer}}
      {{/each}}
      </div>
+     <!-- dipslay form buttons directly inside form-tags -->
+     <div class="oxi-button-container">
+         <div class="btn-group">
+          {{#each Button in view.ButtonList}}
+         {{view Button}}
+         {{/each}}
+        </div>
+    </div>
+     
      </form>
     </script>
     
