@@ -273,6 +273,9 @@ OXI.SectionView = OXI.View.extend({
     SectionContainer:null,//set via Constructor, points to parent
     
     hasButtons: function(){
+        if(this.ContentView.jsClassName == 'OXI.FormView'){
+            return false;    
+        }
         return this.ContentView.getButtonCount();
     }.property(),
     
