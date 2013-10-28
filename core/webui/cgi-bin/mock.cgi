@@ -371,7 +371,7 @@ sub handle {
                 {type => 'text',
                 content => {
                     label => 'Block 2',
-                    description => 'Text 2 aksjdhkashdkahsdkhaksdhakshdkashdkjashdkjashd',
+                    description => 'Text 2 aksjdhkashdkahsdk <b>bold</b> <i>italic> text. <br> haksdhakshdkashdkjashdkjashd. <div class=xx>inside div</div>',
                     buttons => [
                             {action => 'test_key_value!action1',label=>'Action 1'},
                             {page => 'test_key_value!page1',label=>'Page 1 (modal)',target=>'modal'},
@@ -563,7 +563,7 @@ sub handle_request_cert{
                         ],
                         
                         fields => [
-                        { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
+                        { name => 'cert_purpose', label => 'Purpose', type => 'select',freetext => 'other',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
                         { name => 'some_text', label => 'Text', type => 'text' },
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },

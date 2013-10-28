@@ -153,7 +153,7 @@
     
     <script type="text/x-handlebars" data-template-name="sections">
       <h2>{{view.label}}</h2>
-      <p>{{view.description}}</p>
+      <p>{{{view.description}}}</p>
       {{view view.MessageView}}
       
       <ul {{bind-attr class=":nav :nav-tabs view.hasNoTabs:hidden"}}>
@@ -213,7 +213,7 @@
     <script type="text/x-handlebars" data-template-name="text-view">
       <!--Text-View-->
       <h3>{{view.label}}</h3>
-      <div>{{view.description}}</div>
+      <div>{{{view.description}}}</div>
     </script>
     
     <script type="text/x-handlebars" data-template-name="form-view">
@@ -248,6 +248,20 @@
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-6">
           {{view view.FieldView}}
+          {{#if view._hasError}}
+          <span class="help-block">{{view.getErrorsAsString}}</span>
+          {{/if}}
+        </div>
+        </div>
+    </script>
+    <script type="text/x-handlebars" data-template-name="form-selectfield">
+      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
+        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
+        <div class="col-lg-6">
+          {{view view.FieldView}}
+          {{#if view.hasFreetext}}
+          {{view view.FreeTextView}}
+          {{/if}}
           {{#if view._hasError}}
           <span class="help-block">{{view.getErrorsAsString}}</span>
           {{/if}}
