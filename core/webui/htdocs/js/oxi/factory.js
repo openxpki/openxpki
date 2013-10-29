@@ -28,6 +28,7 @@ OXI.FormFieldFactory = OXI.ComponentFactory.create({
    
    _componentMap : {
         text :      'TextFieldContainer',
+        hidden :    'TextFieldContainer',
         password:   'TextFieldContainer',
         textarea:   'TextAreaContainer',
         select :    'PulldownContainer',

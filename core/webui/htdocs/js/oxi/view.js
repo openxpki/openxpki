@@ -73,6 +73,7 @@ OXI.ContentBaseView = OXI.View.extend(
     
     getMainViewContainer:function(){
         return this.SectionView.SectionContainer;  
+        
     },
     
     getButtonCount:function(){
@@ -129,12 +130,13 @@ OXI.PageButton = OXI.View.extend({
     jsClassName:'OXI.PageButton',
     templateName: "page-button",
     tagName: 'button',
-    classNames: ['btn', 'btn-default'],
+    classNames: ['btn'],
     label:null,//set via constructor 
     target:null,//set via constructor 
     action:null,//set via constructor 
     ParentView:null,//set via constructor 
-    page:null,
+    page:null,//set via constructor 
+    css_class:null,//set via constructor 
 
     click: function(evt) {
         js_debug("Button "+this.label+" was clicked");
@@ -163,6 +165,17 @@ OXI.PageButton = OXI.View.extend({
             App.applicationAlert('Button without action and page!');
             return;
         }
+        if(this.css_class){//set via constructor 
+            var tmp = this.css_class.split(/\s+/);
+            var i;
+            for(i=0;i<tmp.length;i++){
+                this.classNames.push(tmp[i]);   
+            }   
+        }else{
+            this.classNames.push('btn-default');
+        }
+        
+        
     }
 
 });

@@ -7,7 +7,7 @@ App.ApplicationRoute = Ember.Route.extend({
     }
 });
 
-/* //demonstration of dynamicallöy added new Form-Classes
+/* //demonstration of dynamically added new Form-Classes
 OXI.FormFieldFactory.registerComponent('select','MySpecialSelect',OXI.FormFieldContainer.extend({
                                         templateName: "form-textfield",
                                         jsClassName:'OXI.PulldownContainer',

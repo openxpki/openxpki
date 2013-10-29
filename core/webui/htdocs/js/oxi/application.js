@@ -323,12 +323,15 @@ OXI.Application = Ember.Application.extend(
         if(!target || target=='main'){
             return this.MainView;
         }
-        js_debug({SourceView:SourceView},1);
+        
         var shortLabel = '';
         if(page){
             shortLabel = (page.shortlabel)?page.shortlabel:page.label;
         }
         var Self = (SourceView && SourceView.getMainViewContainer)?SourceView.getMainViewContainer():App.MainView;
+        
+        js_debug({target:target, SourceView:SourceView._toString(),Self:Self._toString()},1);
+        
         if(target == 'self'){
             js_debug({Self:Self,MainView:App.MainView});
             return Self;
@@ -337,8 +340,9 @@ OXI.Application = Ember.Application.extend(
         if(target=='tab'){
             //open new tab
             //when called from modal, we open the new tab in the modal - otherwise in MainView
-            
-            var Tab = Self.addTab(shortLabel);
+            //var TabContainer = Self.getMainViewContainer();
+            var TabContainer = (Self.displayType=='modal')?Self:App.MainView;
+            var Tab = TabContainer.addTab(shortLabel);
             Tab.setActive();
             return Tab.ContentView;
         }

@@ -117,7 +117,7 @@ sub handle {
                     description=> 'First you must master provide a certificate type, then you can choose some mmore details',
                     submit_label => 'proceed',
                     fields => [
-                    { name => 'cert_typ', label => 'Typ', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type', value=>'t2', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
                     
                     ]
                 }
@@ -207,10 +207,10 @@ sub handle {
                             buttons => [
                                 
                                 {page => 'my_workflows',label=>'My workflows (tab)',target=>'tab'},
-                                {page => 'home/my_certificates',label=>'My certificates (new page)',target=>'main'},
+                                {page => 'home/my_certificates',label=>'My certificates (new page)',target=>'main',css_class=> 'btn-primary'},
                                 {page => 'home/my_certificates',label=>'My certificates (tab)',target=>'tab'},
                                 {page => 'home/my_certificates',label=>'My certificates (modal)',target=>'modal'},
-                                {page => 'request_cert',label=>'Request cert (modal)',target=>'modal'},
+                                {page => 'request_cert',label=>'Request cert (modal)',target=>'modal',css_class=> 'btn-info btn-lg'},
                                 {page => 'request_cert',label=>'Request cert (tab)',target=>'tab'},
                                 
                                 
@@ -553,13 +553,12 @@ sub handle_request_cert{
                     content => {
                         label=>'Step 2',
                         description => sprintf('you choosed type "%s"... - are you sure?',$typ),
-                        #submit_label => 'finish',
                         
                         buttons => [
                             {action => 'request_cert!reset_typ',do_submit=>0,label=>'change type selection'},
                             {page => 'test_text',do_submit=>0,label=>'other (new) page'},#target="main" is implicit
                             {page => 'test_text',do_submit=>0,label=>'other page (same tab)',target=>'self'},
-                            {action => 'request_cert',do_submit=>1,label=>'finish'},
+                            {action => 'request_cert',do_submit=>1,label=>'finish',css_class=>'btn-primary'},
                         ],
                         
                         fields => [
@@ -567,6 +566,8 @@ sub handle_request_cert{
                         { name => 'some_text', label => 'Text', type => 'text' },
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
+                        { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
+                    
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }
