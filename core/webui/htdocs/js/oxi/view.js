@@ -42,7 +42,16 @@ OXI.View = Ember.View.extend({
         //js_debug(this.jsClassName+':destroy' + this.toString());
         this._super();
     },
-
+    
+    show:function(){
+        this.set('isVisible', true);
+    },
+    hide:function(){
+        this.set('isVisible', false);
+    },
+    toggle:function(bShow){
+         this.set('isVisible', bShow);  
+    },
     debug:function(data){
         js_debug({jsClassName:this._toString(),data:data},3);
     },

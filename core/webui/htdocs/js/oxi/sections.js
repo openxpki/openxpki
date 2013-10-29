@@ -1,3 +1,7 @@
+
+
+
+
 OXI.TabListControler = Ember.Controller.extend({
    actions: {
             addTab: function(){
@@ -290,31 +294,14 @@ OXI.SectionView = OXI.View.extend({
         
         this._super();
         this.section_type = this.sectionData.type;
-        
-        
-        var ContentView;
         var params = {SectionView:this, content:this.sectionData.content};
         if(this.sectionData.action){
             params.action =  this.sectionData.action;  
         }
-        switch(this.section_type){
-            case 'form':
-            ContentView = OXI.FormView.create(params);
-            break;
-            case 'text':
-            ContentView = OXI.TextView.create(params);
-            break;
-            case 'keyvalue':
-            ContentView = OXI.KeyValueView.create(params);
-            break;
-            case 'grid':
-            ContentView = OXI.GridView.create(params);
-            break;
-            default:
-            App.applicationError('section '+  this.section_nr+' has unkown type: '+this.section_type);
-            return;
-        }
-        this.ContentView = this.createChildView(ContentView);
+        
+        this.ContentView = this.createChildView(
+                                OXI.SectionViewFactory.getComponent(this.section_type,params)
+                            );
     }
     
 

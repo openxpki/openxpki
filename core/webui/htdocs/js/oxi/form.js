@@ -2,39 +2,43 @@
 defines classes for Forms
 */
 
+
+
+
+
 OXI.FormView = OXI.ContentBaseView.extend({
 
     templateName: "form-view",
     jsClassName:'OXI.FormView',
-    
-    
+
+
     default_action:null,
     default_submit_label: 'send',
-    
+
     action:null,
     _actionIsTriggered : false,
 
     fields:[],
 
     FieldContainerList:[],
-    
+
     submit: function (event){
         js_debug('form submit!');
         return false;
     },
-    
-    
+
+
 
     submitAction: function(action, do_submit,target) {
         // will be invoked whenever the user triggers
         // the browser's `submit` method or a button is clicked explicitly
-        
+
         if(this._actionIsTriggered){
-            js_debug('action already triggered ...return.');   
+            js_debug('action already triggered ...return.');
             return;
         }
         this.set('_actionIsTriggered',true);
-        
+
         this.debug('Form submit with action '+action + ', target '+target);
         if(!action){
             App.applicationError('Form or Button without action!');
@@ -78,7 +82,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
                 //js_debug(json,2);
                 App.hideLoader();
                 App.renderPage(json,target,FormView);
-                
+
                 if(json.error){
                     var field;
                     for(field in json.error){
@@ -104,7 +108,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
         this.fieldContainerMap = {};
         this.fields = [];
         this.default_action = null;
-        
+
         this.set('_actionIsTriggered',false);
 
         if( !this.content.fields){
@@ -114,7 +118,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
 
         this._initFields();
     },
-    
+
     //method overwritten from ContentBaseView
     _initButtons:function(){
         this.debug('init buttons!');
@@ -147,7 +151,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
             }
         }
     },
-    
+
     /*overwritten from base-class: when "page" is given, go to parent-class::_getButton
     otherwise return a FormButton
     */
@@ -155,7 +159,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
         if(button_def.page){
             return this._super(button_def);
         }
-        return OXI.FormButton.create(button_def);   
+        return OXI.FormButton.create(button_def);
     },
 
     _initFields:function(){
@@ -163,27 +167,8 @@ OXI.FormView = OXI.ContentBaseView.extend({
         var i;
         for(i=0;i<this.fields.length;i++){
             var field=this.fields[i];
-            var ContainerView;
-            switch(field.type){              
-                case 'hidden':
-                case 'text':
-                case 'password':
-                ContainerView = OXI.TextFieldContainer.create({fieldDef:field});
-                break;
+            var ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field});
 
-                case 'textarea':
-                ContainerView = OXI.TextAreaContainer.create({fieldDef:field});
-                break;
-                case 'select':
-                ContainerView = OXI.PulldownContainer.create({fieldDef:field});
-                break;
-                case 'checkbox':
-                ContainerView = OXI.CheckboxContainer.create({fieldDef:field});
-                break;
-                default:
-                alert('field '+field.name+': type not supported: '+field.type);
-
-            }
             this.FieldContainerList.push(this.createChildView(ContainerView));
             var i = this.FieldContainerList.length -1;
             this.fieldContainerMap[field.name] = i;
@@ -206,7 +191,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
 OXI.FormButton = OXI.PageButton.extend({
 
     jsClassName:'OXI.FormButton',
-    
+
     classNameBindings:['btn_type'],
     attributeBindings: ['type'],
     type:function(){
@@ -229,7 +214,7 @@ OXI.FormButton = OXI.PageButton.extend({
     action:null,//set via constructor (from json)
     do_submit:false,//set via constructor (from json)
     is_default:false,//set via constructor
-    
+
 
     click: function(evt) {
         js_debug("Button with action "+this.action+" was clicked");
@@ -238,7 +223,7 @@ OXI.FormButton = OXI.PageButton.extend({
 
     init:function(){
         this._super();
-        
+
         if(!this.action){
             App.applicationAlert('FormButton withot action!');
             return;
@@ -300,7 +285,8 @@ OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
         this._super();
         this.setFieldView(OXI.TextField.create(this.fieldDef));
-    }
+    },
+    
 
 });
 
@@ -315,7 +301,7 @@ OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
     isValid:function(){
         return true;//checkbox shopuld be always valid
     },
-    
+
     getValue:function(){
         return (this.FieldView.isChecked())?1:0;
     }
@@ -333,17 +319,56 @@ OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
 });
 
 OXI.PulldownContainer = OXI.FormFieldContainer.extend({
-    templateName: "form-textfield",
+    templateName: "form-selectfield",
     jsClassName:'OXI.PulldownContainer',
+
+    FreeTextView: null,
+    hasFreetext:false,
+    _freeTextKey : '_freetext_',
+
 
     init:function(){
         //Ember.debug('OXI.PulldownContainer :init '+this.fieldDef.label);
+        this.set('hasFreetext',false);
         this._super();
+
+        if(this.fieldDef.freetext){
+
+            this.set('hasFreetext',true);
+
+            this.FreeTextView = this.createChildView(
+            OXI.TextField.create({name:this.fieldDef.name+'_free',isVisible:false,placeholder:'Please enter a value'})
+            );
+            this.fieldDef.options.push({value : this._freeTextKey ,label:this.fieldDef.freetext});
+        }
+
         this.setFieldView(OXI.Select.create(this.fieldDef));
     },
+    
+    /**
+    returns the selected value
+    in case of "freetext"-option the entered freetext is returned
+    */
+    
     getValue:function(){
-        return this.FieldView.selection.value;
-    }
+        var sel_val = this._getSelected();
+        return (sel_val == this._freeTextKey)? this.FreeTextView.value : sel_val;
+    },
+    
+    _getSelected:function(){
+        return (this.FieldView.selection)?this.FieldView.selection.value:'';
+    },
+
+    change: function () {
+        //console.log(this.FieldView.name + ' changed to '+this.getValue());
+        if(this.hasFreetext){
+
+            this.FreeTextView.toggle((this._getSelected() == this._freeTextKey));
+        }
+    },
+    
+    
+
 });
 
 
@@ -352,8 +377,8 @@ OXI.Checkbox = Ember.Checkbox.extend(
     isChecked:function(){
         var checkbox = this.$();
         //we ask the DOM-element itself, not its jquery wrapper
-        return checkbox[0].checked;   
-    }    
+        return checkbox[0].checked;
+    }
 }
 );
 
@@ -362,11 +387,13 @@ OXI.Select = Ember.Select.extend(
     optionLabelPath: 'content.label',
     optionValuePath: 'content.value',
     classNames: ['form-control'] ,
+    prompt: ' ',
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
         this.content = Ember.A(this.options);
-    }
+    },
+
 
 });
 
@@ -378,6 +405,9 @@ OXI.TextArea = Ember.TextArea.extend(
 
 OXI.TextField = Ember.TextField.extend(
 {
-    classNames: ['form-control']
+    classNames: ['form-control'],
+    toggle:function(bShow){
+         this.set('isVisible', bShow);  
+    },
 }
 );
