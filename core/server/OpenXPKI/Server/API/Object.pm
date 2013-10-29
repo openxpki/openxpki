@@ -248,13 +248,17 @@ sub get_crl {
     return $output;
 }
 
-=head2 get_crl_list( { PKI_REALM, ISSUER, FORMAT } )
+=head2 get_crl_list( { PKI_REALM, ISSUER, FORMAT, LIMIT, VALID_AT } )
 
 List all CRL issued in the given realm. If no realm is given, use the 
 realm of the current session. You can add an ISSUER (cert_identifier)
 in which case you get only the CRLs issued by this issuer.
 The result is an arrayref of matching entries ordered by last_update, 
-newest first.
+newest first. LIMIT has a default of 25.
+VALID_AT accepts a single timestamp and will match all crl which have been
+valid at this moment.
+(this might crash your server if used together with a FORMAT!)
+ 
 The FORMAT parameter determines the return format:
 
 =over
@@ -287,9 +291,16 @@ sub get_crl_list {
     
     my $format = $keys->{FORMAT};                      
              
+    my $limit = $keys->{LIMIT} || 25;              
+             
     my %dynamic = (
-        'PKI_REALM' => { VALUE => $pki_realm },      
+        'PKI_REALM' => { VALUE => $pki_realm },        
     );             
+    
+    if ($keys->{VALID_AT}) {
+        $dynamic{'LAST_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'LESS_THAN'};
+        $dynamic{'NEXT_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'GREATER_THAN'};
+    }
     
     if ($keys->{ISSUER}) {
         $dynamic{'ISSUER_IDENTIFIER'} = { VALUE => $keys->{ISSUER} };        
@@ -307,6 +318,7 @@ sub get_crl_list {
         DYNAMIC => \%dynamic,
         'ORDER' => [ 'LAST_UPDATE' ],
         'REVERSE' => 1,
+        LIMIT => $limit,
     );
     
     my @result;

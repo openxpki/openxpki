@@ -386,6 +386,16 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_crl_format,
                 },
+                VALID_AT => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                LIMIT  => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                    optional => 1,
+                },
             },
         },
         'get_random' => {
