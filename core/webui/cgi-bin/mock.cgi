@@ -207,10 +207,10 @@ sub handle {
                             buttons => [
                                 
                                 {page => 'my_workflows',label=>'My workflows (tab)',target=>'tab'},
-                                {page => 'home/my_certificates',label=>'My certificates (new page)',target=>'main'},
+                                {page => 'home/my_certificates',label=>'My certificates (new page)',target=>'main',css_class=> 'btn-primary'},
                                 {page => 'home/my_certificates',label=>'My certificates (tab)',target=>'tab'},
                                 {page => 'home/my_certificates',label=>'My certificates (modal)',target=>'modal'},
-                                {page => 'request_cert',label=>'Request cert (modal)',target=>'modal'},
+                                {page => 'request_cert',label=>'Request cert (modal)',target=>'modal',css_class=> 'btn-info btn-lg'},
                                 {page => 'request_cert',label=>'Request cert (tab)',target=>'tab'},
                                 
                                 
@@ -553,13 +553,12 @@ sub handle_request_cert{
                     content => {
                         label=>'Step 2',
                         description => sprintf('you choosed type "%s"... - are you sure?',$typ),
-                        #submit_label => 'finish',
                         
                         buttons => [
                             {action => 'request_cert!reset_typ',do_submit=>0,label=>'change type selection'},
                             {page => 'test_text',do_submit=>0,label=>'other (new) page'},#target="main" is implicit
                             {page => 'test_text',do_submit=>0,label=>'other page (same tab)',target=>'self'},
-                            {action => 'request_cert',do_submit=>1,label=>'finish'},
+                            {action => 'request_cert',do_submit=>1,label=>'finish',css_class=>'btn-primary'},
                         ],
                         
                         fields => [

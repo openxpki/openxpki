@@ -201,15 +201,7 @@ OXI.FormButton = OXI.PageButton.extend({
             return 'button';
         }
     }.property(),
-    btn_type:function(){
-        if(this.is_default){
-            return 'btn-primary';
-        }else if(this.do_submit){
-            return 'btn-info';
-        }else{
-            return 'btn-default';
-        }
-    }.property(),
+    
 
     action:null,//set via constructor (from json)
     do_submit:false,//set via constructor (from json)
