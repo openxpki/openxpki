@@ -96,6 +96,9 @@ sub __load_pki_realm
         $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} = 
             $config->get("auth.stack.$stack.description");
     
+        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL} = 
+            $config->get("auth.stack.$stack.label") || $stack;
+    
         ##! 8: "determine all used handlers"
         my @supported_handler = $config->get_scalar_as_list("auth.stack.$stack.handler");
         ##! 32: " supported_handler " . Dumper @supported_handler
@@ -165,6 +168,7 @@ sub list_authentication_stacks {
     foreach my $stack (sort keys %{$self->{PKI_REALM}->{$realm}->{STACK}}) {
         $stacks{$stack}->{NAME}        = $stack;
         $stacks{$stack}->{DESCRIPTION} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION};
+        $stacks{$stack}->{LABEL} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL};
     }
     ##! 1: 'end'
     return \%stacks;
