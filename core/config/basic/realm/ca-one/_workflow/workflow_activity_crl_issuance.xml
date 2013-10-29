@@ -3,9 +3,9 @@
 	<action name="I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL"
 		class="Workflow::Action::Null">
 		<!-- flags not implemented yet! -->		
-		<field name="crl_validity" type="text" />
-		<field name="force_issue" type="hidden" />
-		<field name="delta_crl"  type="hidden" />
+		<!--  <field name="crl_validity" type="text" />  -->
+		<field name="force_issue" type="bool" />
+		<!--  <field name="delta_crl"  type="hidden" />  -->
 		<validator name="I18N_OPENXPKI_WF_VAL_RELATIVEDATE">
           <arg>$crl_validity</arg>
         </validator>		

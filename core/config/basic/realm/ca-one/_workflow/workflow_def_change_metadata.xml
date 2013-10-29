@@ -11,28 +11,22 @@
     
     <state name="INITIALIZED">
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
-        <action name="changemeta_load_data" resulting_state="DATA_LOADED">
+        <action name="changemeta_load_data" resulting_state="DATA_UPDATE">
         </action>
     </state>
     
-    <state name="DATA_LOADED" uihandle="OpenXPKI::Client::UI::Workflow::Metadata::render_current_data">
-        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_LOADED</description>        
-        <action name="changemeta_load_form" resulting_state="DATA_UPDATE"/>
-               
-        <action name="changemeta_persist" resulting_state="SUCCESS">
-           <condition name="changemeta_cond_has_update"/>        
-        </action>
-        
-        <action name="changemeta_terminate" resulting_state="SUCCESS">
-           <condition name="!changemeta_cond_has_update"/>        
-        </action>
-    </state>
-    
-    <state name="DATA_UPDATE">
+    <state name="DATA_UPDATE">        
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_UPDATE</description>        
-        <action name="changemeta_update_context" resulting_state="DATA_LOADED">
-        </action>        
+        <action name="changemeta_update_context" resulting_state="CHOOSE_ACTION"/>
     </state>
+    
+    <state name="CHOOSE_ACTION">        
+        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_CHOOSE_ACTION</description>        
+        <action name="changemeta_load_form" resulting_state="DATA_UPDATE"/>
+        <action name="changemeta_terminate" resulting_state="FAILURE" />
+        <action name="changemeta_persist" resulting_state="SUCCESS" />
+    </state>
+    
     
     <state name="FAILURE">
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_FAILURE</description>
