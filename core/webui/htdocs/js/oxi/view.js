@@ -196,7 +196,12 @@ OXI.ModalView = OXI.View.extend({
     close: function(){
         this.set('label','');
         js_debug('hide modal');
-        this.$().modal('hide');
+        try{
+            this.$().modal('hide');
+        }catch(e){
+            js_debug('exception while closing modal...' + e);
+            
+        }
         $('.modal-backdrop.fade.in').hide();
     },
     
