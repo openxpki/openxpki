@@ -277,6 +277,9 @@ OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
         this._super();
         this.setFieldView(OXI.TextField.create(this.fieldDef));
+        if(this.fieldDef.type == 'hidden'){
+            this.hide();   
+        }
     },
     
 
@@ -379,11 +382,15 @@ OXI.Select = Ember.Select.extend(
     optionLabelPath: 'content.label',
     optionValuePath: 'content.value',
     classNames: ['form-control'] ,
-    prompt: ' ',
+    prompt:null,
+    
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
         this.content = Ember.A(this.options);
+        if(typeof this.prompt != 'undefined' && this.prompt=='' ){
+            this.prompt = ' ';//display white option   
+        }
     },
 
 

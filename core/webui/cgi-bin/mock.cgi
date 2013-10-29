@@ -117,7 +117,7 @@ sub handle {
                     description=> 'First you must master provide a certificate type, then you can choose some mmore details',
                     submit_label => 'proceed',
                     fields => [
-                    { name => 'cert_typ', label => 'Typ', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type', value=>'t2', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
                     
                     ]
                 }
@@ -566,6 +566,8 @@ sub handle_request_cert{
                         { name => 'some_text', label => 'Text', type => 'text' },
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
+                        { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
+                    
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }
