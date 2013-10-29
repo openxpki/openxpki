@@ -38,7 +38,9 @@ OXI.TabView = OXI.View.extend({
         return '#'+this.get('elementId');
     }.property(),
     
-    
+    getMainViewContainer:function(){
+        return this.ParentView.getMainViewContainer();  
+    },
     
     init:function(){
         this._super();
@@ -55,7 +57,7 @@ OXI.TabView = OXI.View.extend({
         }
         this.set('controller',OXI.TabControler.create({view:this}));
         this.set('ContentView', this.createChildView(
-                                    OXI.SectionViewContainer.create({displayType:'tab'})
+                                    OXI.SectionViewContainer.create({displayType:'tab',parentContainer:this})
                                    ));
         this.set('_domReady',false);
     },
@@ -98,6 +100,7 @@ OXI.SectionViewContainer = OXI.View.extend({
     shortlabel:null,
     description:null,
     displayType:'main',
+    parentContainer:null,
     
     //computed properties:
      hasNoTabs: function(){
@@ -130,6 +133,14 @@ OXI.SectionViewContainer = OXI.View.extend({
     
     
     //methods:
+    getMainViewContainer: function(){
+        if(this.displayType=='tab'){
+            return this.parentContainer.getMainViewContainer();
+        }
+        return this;  
+        
+    },
+    
     addTab: function(label){
         //js_debug('add tab called,  label '+label);  
         var TabView = OXI.TabView.create({label:label,ParentView:this,tabindex:this.Tabs.content.length});

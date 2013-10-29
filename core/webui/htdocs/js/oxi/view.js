@@ -73,6 +73,7 @@ OXI.ContentBaseView = OXI.View.extend(
     
     getMainViewContainer:function(){
         return this.SectionView.SectionContainer;  
+        
     },
     
     getButtonCount:function(){
