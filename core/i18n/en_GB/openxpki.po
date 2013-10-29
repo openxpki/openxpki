@@ -1716,9 +1716,8 @@ msgstr "Validity"
 #~ msgid "I18N_OPENXPKI_ACTIVITY_CSR_INSERTREQUEST_UNSUPPORTED_CSR_TYPE"
 #~ msgstr "Certificates"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_ANONYMOUS_USER"
-#~ msgstr "URI"
+msgid "I18N_OPENXPKI_ANONYMOUS_USER"
+msgstr "Anonymous"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_API_TOKEN_ALIAS_BY_TYPE_NO_GROUP_FOUND"

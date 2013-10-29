@@ -30,7 +30,8 @@ sub init_index {
         
     $self->_page ({
         label => 'Manage the secrets of this realm',
-        description => 'The list shows the state of your secret groups defined in this realm. To login/logout click on the row.'
+        description => 'The list shows the state of your secret groups defined in this realm. To login/logout click on the row.',
+        target => 'main'
     });
     
     $self->add_section({
@@ -62,14 +63,13 @@ sub init_manage {
     my $secret = $self->param('id');
     my $status = $self->send_command("is_secret_complete", {SECRET => $secret}) || 0;
     
-    $status = 0;
-    if ($status) {
+    if (0 && $status) {
         $self->_page ({label => 'Clear secret'});
         $self->add_section({
             type => 'text',        
             content => {
                 description => 'Secret is complete',                
-                buttons => [{ label => 'Clear', page => 'secret!clear!id!'.$secret, css_class => 'btn-primary', target => 'main' }]
+                buttons => [{ label => 'Clear', page => 'secret!clear!id!'.$secret, css_class => 'btn-warning', target => 'modal' }]
             }
         });
     } else {
@@ -85,7 +85,7 @@ sub init_manage {
                     label => 'Unlock',
                     do_submit => 1, 
                     action => 'secret!unlock', 
-                    css_class => 'btn-danger' 
+                    css_class => 'btn-danger',                    
                 }]
             }
         });        
@@ -108,8 +108,7 @@ sub init_clear {
         $self->set_status('Clearing failed - please check again!','error');
     }
     
-    $self->redirect('secret!index');
-    $self->reload(1);
+    $self->init_index();
         
     return $self;
 }
@@ -118,19 +117,18 @@ sub action_unlock {
  
     my $self = shift;
     my $args = shift;
-   
 
-    my $msg = 0;#  = $self->send_command ( "set_secret_part", 
-        #{ SECRET => $self->param('secret'), VALUE => $self->param('phrase') });
+    my $phrase = $self->param('phrase');
+    my $secret = $self->param('id');
+    my $msg = $self->send_command ( "set_secret_part", 
+        { SECRET => $secret, VALUE => $phrase });
         
     if ($msg) {
         $self->set_status('Secret accepted','success');
+        $self->init_index();
     } elsif (defined $msg) {
-        $self->set_status('Secret rejected','error');
+        $self->set_status('Secret rejected','error');        
     }     
-    
-    $self->redirect('secret!index');
-    $self->reload(1);
     
     return $self;
     
