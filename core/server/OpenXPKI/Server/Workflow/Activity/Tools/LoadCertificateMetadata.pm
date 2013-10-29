@@ -41,24 +41,16 @@ sub execute {
     );
     
     ##! 32: ' Size of cert_metadata '. scalar( @{$cert_metadata} )
-    
-    my $data = {};
     foreach my $metadata (@{$cert_metadata}) {
         ##! 51: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
-        my $key = $metadata->{ATTRIBUTE_KEY};
-        $key =~ s{ \A meta_ }{}xms;
-        
+        my $key = $metadata->{ATTRIBUTE_KEY};        
         my $value = $metadata->{ATTRIBUTE_VALUE};
         if ($value =~ /^(ARRAY|HASH)/) {
             ##! 32: 'Deserialize '
-            $data->{$key} = $ser->deserialize( $value );
-        } else {
-            $data->{$key} = $value;
+            $value = $ser->deserialize( $value );
         }
+        $context->param( $key => $value );
     }
-    
-    ##! 32: 'Compiled meta data ' . Dumper $data
-    $context->param('current_metadata' => $ser->serialize($data) );
     
     return 1;
     

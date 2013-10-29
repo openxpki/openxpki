@@ -4,26 +4,35 @@
     <persister>OpenXPKI</persister>
     
     <state name="INITIAL">
-        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_INITIAL</description>
-        <action name="changemeta_load_data" resulting_state="DATA_LOADED">
+        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
+        <action name="global_initialize_workflow" resulting_state="INITIALIZED">
         </action>
     </state>
     
-    <state name="DATA_LOADED">
-        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_INITIAL</description>
-        <action name="changemeta_update_context" resulting_state="DATA_LOADED">
-        </action>
-        
-        <action name="changemeta_persist" resulting_state="SUCCESS">
-            <!--  <condition name="changemeta_context_valid"/> -->        
+    <state name="INITIALIZED">
+        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
+        <action name="changemeta_load_data" resulting_state="DATA_UPDATE">
         </action>
     </state>
+    
+    <state name="DATA_UPDATE">        
+        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_UPDATE</description>        
+        <action name="changemeta_update_context" resulting_state="CHOOSE_ACTION"/>
+    </state>
+    
+    <state name="CHOOSE_ACTION">        
+        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_CHOOSE_ACTION</description>        
+        <action name="changemeta_load_form" resulting_state="DATA_UPDATE"/>
+        <action name="changemeta_terminate" resulting_state="FAILURE" />
+        <action name="changemeta_persist" resulting_state="SUCCESS" />
+    </state>
+    
     
     <state name="FAILURE">
-        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_FAILURE</description>
+        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_FAILURE</description>
     </state>
     <state name="SUCCESS">
-        <description>I18N_OPENXPKI_WF_STATE_CERT_EXPORT_SUCCESS</description>
+        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_SUCCESS</description>
     </state>
 
 </workflow>

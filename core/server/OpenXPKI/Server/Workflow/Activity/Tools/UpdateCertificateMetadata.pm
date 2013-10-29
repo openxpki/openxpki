@@ -27,7 +27,6 @@ sub execute {
      
     ##! 16: ' cert_identifier' . $cert_identifier   
     
-  
     my $cert_metadata = CTX('dbi_backend')->select(
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
         DYNAMIC => {
@@ -35,91 +34,85 @@ sub execute {
             'ATTRIBUTE_KEY' => { OPERATOR => 'LIKE', VALUE => 'meta_%' },            
         },
     );
-
-    my $metadata_update = $context->param('metadata_update');
     
-    if (!$metadata_update) {
-         CTX('log')->log(
-            MESSAGE => 'Nothing to update for cert_identifier ' . $cert_identifier,
-            PRIORITY => 'info',
-            FACILITY => 'audit',        
-        );
+    # map database into kay/value hash
+    my $current_meta = {};    
+    foreach my $item (@{$cert_metadata}) {
+       $current_meta->{$item->{ATTRIBUTE_KEY}} = $item; 
     }
+
+    ##! 32: 'Current meta ' . Dumper $current_meta    
+
+    my $param = $context->param();     
      
-    my $new_data = $ser->deserialize( $metadata_update  ); 
-    
-    ##! 32: 'Update info ' . Dumper $new_data 
-    
-    ##! 32: ' Size of present metadata '. scalar( @{$cert_metadata} )
+    ##! 32: 'Update info ' . Dumper $context
     
     my $dbi = CTX('dbi_backend');
-    foreach my $metadata (@{$cert_metadata}) {
-        ##! 51: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
-        my $key = $metadata->{ATTRIBUTE_KEY};
-        $key =~ s{ \A meta_ }{}xms;
+    foreach my $key (keys %{$param}) {
         
-        if (not defined $new_data->{$key}) {
-            ##! 32: 'No value for key in update - wont touch'
-            next;
-        }
+        next if ($key !~ m{ \A meta_ }xms);
         
-        my $value = $new_data->{$key};
-        $value = $ser->serialize( $value ) if (ref $value ne '');
-        
-        if ($value eq $metadata->{ATTRIBUTE_VALUE}) {
-            ##! 32: 'Values are equal - no update'
-            ##FIXME - there is chance that the serialization differes even if 
-            # the value was not changed, so the update marker might be wrong 
-            next;
-        } else {
+        # check if the key was registered before
+        # todo - delete, non scalar items
+        if ($current_meta->{$key}) {
             
-            ##! 32: sprintf 'change attr %s, old value %s, new value %s', $key, $metadata->{ATTRIBUTE_VALUE}, $value),
+            # key already present - do update
+            
+            # not changed - do nothing
+            next if ($current_meta->{$key}->{ATTRIBUTE_VALUE} eq $param->{$key});
+                       
+            ##! 32: sprintf 'change attr %s, old value %s, new value %s', $key, $current_meta->{$key}->{ATTRIBUTE_VALUE}, $param->{$key}),
             CTX('log')->log(
                 MESSAGE => sprintf ('cert metadata changed, cert %s, attr %s, new value %s',
-                   $cert_identifier, $key, $value),
+                   $key, $current_meta->{$key}->{ATTRIBUTE_VALUE}, $param->{$key}),
                 PRIORITY => 'info',
                 FACILITY => 'audit',        
             );
-            $dbi->update(
-                TABLE => 'CERTIFICATE_ATTRIBUTES', 
-                DATA => {
-                    ATTRIBUTE_VALUE => $value,
-                },
-                WHERE => {
-                    ATTRIBUTE_SERIAL => $metadata->{ATTRIBUTE_SERIAL}
-                }
-            );
-        }
-        delete $new_data->{$key};
-    }
-    
-    # Check if new items have been added
-    foreach my $key (keys(%{$new_data})) {
-        my $value = $new_data->{$key};
-        next if ($value eq '');
-        $value = $ser->serialize( $value ) if (ref $value ne '');
-        CTX('log')->log(
-            MESSAGE => sprintf ('cert metadata added, cert %s, attr %s, value %s',
-               $cert_identifier, $key, $value),
-            PRIORITY => 'info',
-            FACILITY => 'audit',        
-        );
-                             
-        ##! 32: 'Add new attribute ' . $key . ' value ' . $value
-        my $serial = $dbi->get_new_serial(
-            TABLE => 'CERTIFICATE_ATTRIBUTES',
-        );
-        $dbi->insert(
-            TABLE => 'CERTIFICATE_ATTRIBUTES', 
-            HASH => {
-                ATTRIBUTE_SERIAL => $serial,
-                IDENTIFIER => $cert_identifier,
-                ATTRIBUTE_KEY => 'meta_'.$key,
-                ATTRIBUTE_VALUE => $value,
+            # delete if value is empty
+            if ($param->{$key} eq '') {
+                $dbi->delete(
+                    TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                    DATA => {
+                        ATTRIBUTE_SERIAL => $current_meta->{$key}->{ATTRIBUTE_SERIAL}
+                    }
+                );                 
+            } else {
+                $dbi->update(
+                    TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                    DATA => {
+                        ATTRIBUTE_VALUE => $param->{$key},
+                    },
+                    WHERE => {
+                        ATTRIBUTE_SERIAL => $current_meta->{$key}->{ATTRIBUTE_SERIAL}
+                    }
+                );
             }
-        );        
-    }
-    
+        } else {
+            
+            # insert new value
+            CTX('log')->log(
+                MESSAGE => sprintf ('cert metadata added, cert %s, attr %s, value %s',
+                   $cert_identifier, $key, $param->{$key}),
+                PRIORITY => 'info',
+                FACILITY => 'audit',        
+            );
+                                 
+            ##! 32: 'Add new attribute ' . $key . ' value ' . $param->{$key}
+            my $serial = $dbi->get_new_serial(
+                TABLE => 'CERTIFICATE_ATTRIBUTES',
+            );
+            $dbi->insert(
+                TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                HASH => {
+                    ATTRIBUTE_SERIAL => $serial,
+                    IDENTIFIER => $cert_identifier,
+                    ATTRIBUTE_KEY => $key,
+                    ATTRIBUTE_VALUE => $param->{$key},
+                }
+            );        
+            
+        }
+    }  
     $dbi->commit();
     return 1;
     
