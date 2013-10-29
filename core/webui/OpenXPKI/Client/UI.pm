@@ -8,6 +8,7 @@ use Moose;
 
 use English;
 use OpenXPKI::Client;
+use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
 use OpenXPKI::Server::Context qw( CTX );
@@ -85,7 +86,7 @@ sub _init_backend {
             # was idle too long or the server was flushed
             $client->init_session({ SESSION_ID => undef });
             $self->logger()->info('Backend session was gone - start a new one');
-            $self->_status({ level => 'warn', 'Backend session is gone - please re-login'});
+            $self->_status({ level => 'warn', i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
         } else {
             $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
             $self->logger()->trace($EVAL_ERROR);
@@ -191,7 +192,7 @@ sub handle_page {
         eval "use $class;1";        
         if ($EVAL_ERROR) {                       
             $self->logger()->error("Failed loading action class $class");
-            $self->_status({ level => 'error', 'message' => 'Failed to handle request - action not found'});            
+            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND')});            
         } else {
             $method  = 'index' if (!$method );
             $method  = "action_$method";
@@ -220,7 +221,7 @@ sub handle_page {
             $self->logger()->error("Failed loading page class $class");
             $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self });        
             $result->init_error();
-            $result->set_status('Page was not found','error');
+            $result->set_status(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'),'error');
                             
         } else {        
             $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });    
@@ -282,7 +283,7 @@ sub handle_login {
             $self->logger()->debug("Selected realm $pki_realm, new status " . $status);
         } else {
             my $realms = $reply->{'PARAMS'}->{'PKI_REALMS'};
-            my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => $realms->{$_}->{DESCRIPTION}} } keys %{$realms};
+            my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => i18nGettext($realms->{$_}->{DESCRIPTION})} } keys %{$realms};
             $self->logger()->trace("Offering realms: " . Dumper \@realm_list );
             return $result->init_realm_select( \@realm_list  )->render();
         }        
@@ -296,7 +297,7 @@ sub handle_login {
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
             my $i=0;
-            my @stack_list = map { $_ = {'value' => $stacks->{$_}->{NAME}, 'label' => $stacks->{$_}->{DESCRIPTION}} } keys %{$stacks} ;  
+            my @stack_list = map { $_ = {'value' => $stacks->{$_}->{NAME}, 'label' => i18nGettext($stacks->{$_}->{LABEL})} } keys %{$stacks} ;  
             $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
             return $result->init_auth_stack( \@stack_list )->render();
         }
@@ -323,7 +324,7 @@ sub handle_login {
             # Failure here is most likely a wrong password            
             if ( $reply->{SERVICE_MSG} eq 'ERROR' &&
                 $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {                
-                $result->set_status('Login failed','error');
+                $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');
                 return $result->render();
             }
         } else {

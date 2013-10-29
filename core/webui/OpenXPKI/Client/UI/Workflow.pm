@@ -7,6 +7,7 @@ package OpenXPKI::Client::UI::Workflow;
 use Moose; 
 use Data::Dumper;
 use Digest::SHA1 qw(sha1_base64);
+use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -50,13 +51,13 @@ sub init_index {
     }); 
     
     if (!$wf_info) {
-        $self->set_status('Unable to load workflow information','error');
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
         return $self;
     }
         
     $self->_page({
-        label => $wf_info->{WORKFLOW}->{TYPE},
-        description => $wf_info->{WORKFLOW}->{DESCRIPTION},
+        label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
+        description => i18nGettext($wf_info->{WORKFLOW}->{DESCRIPTION}),
     });
     
     $self->_result()->{main} = [{   
@@ -95,7 +96,7 @@ sub init_load {
     }); 
     
     if (!$wf_info) {        
-        $self->set_status('Unable to load workflow information','error') unless($self->_status());
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error') unless($self->_status());
         return $self;
     }
     
@@ -129,7 +130,13 @@ sub init_search {
     @wf_names = sort @wf_names;
     
     my @wfl_list = map { $_ = {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
-    unshift @wfl_list, {'value' => '', 'label' => 'all'};
+    
+    my @states = (
+        { label => 'SUCCESS', value => 'SUCCESS' },
+        { label => 'FAILURE', value => 'FAILURE' },
+        { label => 'PENDING', value => 'PENDING' },
+        { label => 'APPROVAL', value => 'APPROVAL' },
+    );
     
     $self->_result()->{main} = [  
         {   type => 'form',
@@ -147,8 +154,8 @@ sub init_search {
                 title => 'Search the database',
                 submit_label => 'search now',
                 fields => [                    
-                    { name => 'wf_type', label => 'Type', type => 'select', is_optional => 1, options => \@wfl_list  },
-                    { name => 'wf_state', label => 'State', type => 'text', is_optional => 1 },                    
+                    { name => 'wf_type', label => 'Type', type => 'select', is_optional => 1, prompt => ' ', options => \@wfl_list  },
+                    { name => 'wf_state', label => 'State', type => 'select', is_optional => 1, freetext => 'other', options => \@states },                    
                     { name => 'wf_creator', label => 'Creator', type => 'text', is_optional => 1 },                    
                 ]
         }}  
@@ -229,7 +236,7 @@ sub action_index {
         }
         
         if (!$wf_args->{wf_action}) {           
-            $self->set_status('Invalid request (no action)!','error');
+            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
             return $self;
         }
         
@@ -270,11 +277,12 @@ sub action_index {
             PARAMS   => \%wf_param,
         }); 
         
-        $self->set_status('Workflow was updated','done');
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED'),'success');
         
         
     # no token, might be an initial request
     } elsif(my $wf_type = $self->param('wf_type')) {
+                
         $wf_info = $self->send_command( 'create_workflow_instance', {
             WORKFLOW => $wf_type, 
         }); 
@@ -336,7 +344,7 @@ sub action_select {
     }); 
     
     if (!$wf_info) {
-        $self->set_status('Unable to load workflow information','error');
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
         return $self;
     }
     
@@ -434,7 +442,7 @@ sub action_search {
                 { sTitle => "type"},
                 { sTitle => "state"},
                 { sTitle => "procstate"},
-                { sTitle => "wake up"},                                
+                { sTitle => "wake up", format => 'timestamp' },                                
             ],
             data => \@result            
         }
@@ -505,7 +513,7 @@ sub __render_from_workflow {
     
     $self->logger()->debug( "wf_info: " . Dumper $wf_info);
     if (!$wf_info) {
-        $self->set_status('Unable to load workflow information','error');
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
         return $self;
     }
     
@@ -523,7 +531,7 @@ sub __render_from_workflow {
     } elsif($args->{WF_ACTION}) {
         $wf_action = $args->{WF_ACTION};                
         if (!$wf_info->{ACTIVITY}->{$wf_action}) {
-            $self->set_status('Requested action is not available','error');
+            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE'),'error');
             return $self;            
         }        
     }
@@ -559,7 +567,7 @@ sub __render_from_workflow {
             
             my $item = {
                 name => $field, 
-                label => $field, 
+                label => i18nGettext($field), 
                 type => $type
             };
             if ($do_prefill && defined $self->param($field)) {
@@ -584,16 +592,16 @@ sub __render_from_workflow {
         });
         
         $self->_page({
-            label => $wf_info->{WORKFLOW}->{TYPE},
-            shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description => $wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION},
+            label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
+            shortlabel => i18nGettext($wf_info->{WORKFLOW}->{ID}),
+            description => i18nGettext($wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION}),
         });
         
         $self->_result()->{main} = [{   
             type => 'form',
             action => 'workflow',
             content => {           
-            submit_label => $wf_action_info->{LABEL} || 'proceed',
+            submit_label => i18nGettext($wf_action_info->{LABEL} || 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE'),
                 fields => \@fields
             }},
         ];
@@ -602,9 +610,9 @@ sub __render_from_workflow {
         # more than one action available, so we offer some buttons to choose how to continue
         
          $self->_page({
-            label => $wf_info->{WORKFLOW}->{TYPE},
-            shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description => $wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION},
+            label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
+            shortlabel => i18nGettext($wf_info->{WORKFLOW}->{ID}),
+            description => i18nGettext($wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION}),
         });
         
         my @fields;
@@ -612,7 +620,8 @@ sub __render_from_workflow {
         foreach my $key (keys %{$context}) {
             next if ($key =~ m{ \A workflow_id }x);
             next if ($key =~ m{ \A wf_ }x);
-            next if ($key =~ m{ \A _ }x);            
+            next if ($key =~ m{ \A _ }x);
+            # todo - i18n labels            
             push @fields, { label => $key, value => $context->{$key} };
         }
         
@@ -622,33 +631,19 @@ sub __render_from_workflow {
                 label => '',
                 description => '',
                 data => \@fields,
+                buttons => $self->__get_action_buttons( $wf_info )
         }};           
         
-        foreach my $wf_action (@activities) {
-           my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
-            
-           push @section, {   
-            type => 'form',
-            action => 'workflow!select',
-            content => {
-            submit_label => $wf_action_info->{LABEL} || $wf_action,
-                fields => [ 
-                    { name => 'wf_action', type => 'hidden', value => $wf_action }, 
-                    { name => 'wf_id', type => 'hidden', value => $wf_info->{WORKFLOW}->{ID}} 
-                ]
-            }},
-            
-        }
-        
-        $self->_result()->{main} = \@section if (@section);
+        $self->_result()->{main} = \@section;
         
         # set status decorator on final states
+        my $desc = $wf_info->{STATE}->{DESCRIPTION};
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
-            $self->set_status('Workflow finished successfully.','success');
+            $self->set_status( i18nGettext($desc || 'I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
         } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') { 
-            $self->set_status('Workflow failed finally.','error');
+            $self->set_status( i18nGettext($desc || 'I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
         } elsif ( $wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') {
-            $self->set_status('Watchdog is active on this workflow.','warning');             
+            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'warning');             
         }
         
     }
@@ -672,8 +667,8 @@ sub __render_from_workflow {
 =head2 __get_action_buttons 
 
 For states having multiple actions, this helper renders a set of buttons to
-dispatch to the next action. It expacts a workfwo info structure as single 
-parameter and returns a ref to a list of content sections.
+dispatch to the next action. It expects a workflow info structure as single 
+parameter and returns a ref to a list to be put in the buttons field.
 
 =cut
 
@@ -682,19 +677,16 @@ sub __get_action_buttons {
     my $self = shift;
     my $wf_info = shift;
      
-    my @section;
+    my @buttons;
     foreach my $wf_action (keys %{$wf_info->{ACTIVITY}}) {
        my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};            
-       push @section, {   
-        type => 'form',
-        action => 'workflow!select',
-        content => {
-        submit_label => $wf_action_info->{LABEL} || $wf_action,
-            fields => [ { name => 'wf_action', type => 'hidden', value => $wf_action }, {  name => 'wf_id', type => 'hidden', value => $wf_info->{WORKFLOW}->{ID} } ]
-        }},            
+       push @buttons, {   
+            label => i18nGettext($wf_action_info->{LABEL} || $wf_action),
+            action => sprintf 'workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID},            
+        };
     }
                 
-    return \@section;
+    return \@buttons;
 }
 
 =head2 __delegate_call

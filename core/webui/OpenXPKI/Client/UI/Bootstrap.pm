@@ -43,10 +43,9 @@ sub _init_structure_for_user {
          key=> 'home',
          label=>  'Home',
          entries=>  [
-             {key=> 'my_tasks', label =>  "My tasks"},
-             {key=> 'my_workflows',label =>  "My workflows"},  
-             {key=> 'my_certificates',label =>  "My certificates"} , 
-             {key=> 'key_status',label =>  "Key status"}  
+             {key=> 'home!task', label =>  "My tasks"},
+             {key=> 'home!workflow',label =>  "My workflows"},  
+             {key=> 'home!certificate',label =>  "My certificates"} ,                
          ]   
       },
       
@@ -54,9 +53,9 @@ sub _init_structure_for_user {
          key=> 'request',
          label=>  'Request',
          entries=>  [
-             {key=> 'request_cert', label =>  "Request new certificate"},
-             {key=> 'request_renewal',label =>  "Request renewal"},  
-             {key=> 'request_revocation',label =>  "Request revocation"} ,          
+              #{key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', label =>  "Request new certificate"},
+              #{key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', label =>  "Request renewal"},  
+              {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST', label =>  "Request revocation"} ,          
          ]   
       },
       {
@@ -65,15 +64,16 @@ sub _init_structure_for_user {
          entries=>  [
              {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', label =>  "Change metadata"},
              {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE', label =>  "Issue CRL"},
+             {key=> 'secret!index', label =>  "Manage Secrets"},
          ]   
       },
       {
          key=> 'info',
          label=>  'Information',
          entries=>  [
-             {key=> 'ca_cetrificates', label =>  "CA certificates"},
-             {key=> 'revocation_lists',label =>  "Revocation lists"},  
-             {key=> 'policy_docs',label =>  "Pollicy documents"}   
+             {key=> 'information!issuer', label =>  "CA certificates"},
+             {key=> 'information!crl',label =>  "Revocation lists"},  
+             {key=> 'information!policy',label =>  "Pollicy documents"}   
          ]   
       },
       
@@ -81,7 +81,7 @@ sub _init_structure_for_user {
          key=> 'search',
          label=>  'Search',
          entries=>  [
-             {key=> 'certificate!search', label =>  "Certificates"},
+             {key=> 'certificate!search', label =>  "Certificates", target => 'main'},
              {key=> 'workflow!search',label =>  "Workflows"} 
          ]   
       }

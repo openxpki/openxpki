@@ -4,6 +4,7 @@
 
 package OpenXPKI::Client::UI::Result;
 
+use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
 
 use Moose; 
@@ -126,7 +127,7 @@ sub set_status_from_error_reply {
     my $self = shift;
     my $reply = shift;
     
-    my $message = 'unknown error'; 
+    my $message = 'I18N_OPENXPKI_UI_UNKNOWN_ERROR'; 
     if ($reply->{'LIST'} 
         && ref $reply->{'LIST'} eq 'ARRAY') {            
         # Workflow errors            
@@ -137,7 +138,7 @@ sub set_status_from_error_reply {
         }            
         $self->logger()->error($message);        
     }   
-    $self->_status({ level => 'error', message => $message });
+    $self->_status({ level => 'error', message => i18nGettext($message) });
     
     return $self;
 }

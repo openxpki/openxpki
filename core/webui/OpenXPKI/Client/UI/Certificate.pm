@@ -39,10 +39,8 @@ sub init_search {
     @profile_names = sort @profile_names;
     
     my @profile_list = map { $_ = {'value' => $_, 'label' => $profile->{$_}->{label}} } @profile_names ;
-    unshift @profile_list, { value => "", label => "all" };
     
     my @states = (
-        { label => 'all', value => ''},        
         { label => 'ISSUED', value => 'ISSUED'},
         { label => 'VALID', value => 'VALID'},
         { label => 'EXPIRED', value => 'EXPIRED'},
@@ -59,8 +57,8 @@ sub init_search {
                 fields => [
                 { name => 'subject', label => 'Subject', type => 'text', is_optional => 1 },
                 { name => 'san', label => 'SAN', type => 'text', is_optional => 1 },
-                { name => 'status', label => 'status', type => 'select', is_optional => 1, options => \@states },                        
-                { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, options => \@profile_list },
+                { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', freetext => 'other', options => \@states },                        
+                { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list },
                 { name => 'meta_requestor', label => 'Requestor', type => 'text', is_optional => 1 },
                 { name => 'meta_email', label => 'Req. eMail', type => 'text', is_optional => 1 },
                 ]
@@ -105,12 +103,21 @@ sub init_detail {
         { label => 'Status', value => $cert->{STATUS}, format => 'certstatus' },
     );                     
    
-    my @buttons = {action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA!cert_identifier!$cert_identifier", label=>'metadata'};
-    push @buttons, {action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST!cert_identifier!$cert_identifier", label=>'revoke'}
-        if ($cert->{STATUS} eq 'ISSUED');
+    my @buttons = {
+        action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA!cert_identifier!$cert_identifier", 
+        label  => 'metadata',
+        target => 'main'
+    };
+    
+    push @buttons, {
+        action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST!cert_identifier!$cert_identifier", 
+        label  => 'revoke'
+    } if ($cert->{STATUS} eq 'ISSUED');
                          
-    push @buttons, {action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST!org_cert_identifier!$cert_identifier", label=>'renew'}
-        if ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED');
+    push @buttons, {
+        action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST!org_cert_identifier!$cert_identifier", 
+        label  => 'renew'
+    } if ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED');
                 
     $self->_result()->{main} = [{
         type => 'keyvalue',
@@ -118,16 +125,8 @@ sub init_detail {
             label => '',
             description => '',
             data => \@fields,
-        }},           
-        {
-        type => 'form',
-        action => 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA',        
-        content => {            
             buttons => \@buttons,
-            fields => [                 
-                { name => 'cert_identifier', type => 'hidden', value => $cert_identifier } 
-            ]
-        }}
+        }},           
     ]; 
     
 }
