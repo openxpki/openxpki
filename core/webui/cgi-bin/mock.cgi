@@ -297,7 +297,7 @@ sub handle {
                     content => {
                          actions => [
                             
-                            {path => 'my_certificates!{date_issued}',
+                            {path => 'test_text',target=>'modal',
                              label => 'Grid Main action',
                             },
                             
@@ -370,6 +370,7 @@ sub handle {
                     description => 'Text 2 aksjdhkashdkahsdk <b>bold</b> <i>italic> text. <br> haksdhakshdkashdkjashdkjashd. <div class=xx>inside div</div>',
                     buttons => [
                             {action => 'test_key_value!action1',label=>'Action 1'},
+                            {page => 'test_key_value',label=>'Key Value (main)'},
                             {page => 'test_key_value',label=>'Key Value (modal)',target=>'modal'},
                             {page => 'test_key_value',label=>'Key Value (in Tab)',target=>'tab'},
                             {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
