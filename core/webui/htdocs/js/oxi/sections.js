@@ -191,6 +191,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         this.set('Tabs', Ember.ArrayController.create({
                 content: Ember.A([])
             }));
+        this.set('_hasTabs',false);
     },
 
     init:function(){

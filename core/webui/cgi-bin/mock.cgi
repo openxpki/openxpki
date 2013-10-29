@@ -217,13 +217,9 @@ sub handle {
                             ],    
                             
                             actions => [
+                                
                                 {path => 'secret_page',
-                                 label => 'Secret Page in Tab',
-                                 icon => 'view',
-                                 target => 'tab',
-                                },
-                                {path => 'my_tasks!{date_issued}',
-                                 label => 'Test 2 (modal)',
+                                 label => 'Secret Page (modal)',
                                  target => 'modal',
                                 },
                                 {path => 'my_tasks',
@@ -345,8 +341,8 @@ sub handle {
                     label => '',
                     description => '',
                     buttons => [
-                            {action => 'test_key_value!action1',label=>'Action 1'},
-                            {page => 'test_key_value!page1',label=>'Page 1'},
+                            {action => 'test_text',label=>'Plain text (as action, no target)'},
+                            {page => 'test_text',label=>'Plain text (no target (=main)',target=>'main'},
                             {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
                             {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
                         ],                    
@@ -374,8 +370,8 @@ sub handle {
                     description => 'Text 2 aksjdhkashdkahsdk <b>bold</b> <i>italic> text. <br> haksdhakshdkashdkjashdkjashd. <div class=xx>inside div</div>',
                     buttons => [
                             {action => 'test_key_value!action1',label=>'Action 1'},
-                            {page => 'test_key_value!page1',label=>'Page 1 (modal)',target=>'modal'},
-                            {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
+                            {page => 'test_key_value',label=>'Key Value (modal)',target=>'modal'},
+                            {page => 'test_key_value',label=>'Key Value (in Tab)',target=>'tab'},
                             {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
                         ],
                     } 

@@ -296,6 +296,7 @@ OXI.Application = Ember.Application.extend(
         if(TargetView == this.MainView){
             js_debug('close modal...');
             this.ModalView.close();
+            this.MainView.closeTabs();
         }
         this.hideLoader();
         
