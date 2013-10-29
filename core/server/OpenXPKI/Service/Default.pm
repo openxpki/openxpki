@@ -278,10 +278,12 @@ sub __handle_PING : PRIVATE {
     }
     elsif ($state_of{$ident} eq 'WAITING_FOR_PKI_REALM') {        
         my @realm_names = CTX('config')->get_keys("system.realms");        
-        my %realms =();      
+        my %realms =();             
         foreach my $realm (sort @realm_names) {
+            my $label = CTX('config')->get("system.realms.$realm.label");
             $realms{$realm}->{NAME} = $realm;
-            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
+            $realms{$realm}->{LABEL} = $label;
+            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.description") || $label;
         }
         return {
 	       SERVICE_MSG => 'GET_PKI_REALM',
