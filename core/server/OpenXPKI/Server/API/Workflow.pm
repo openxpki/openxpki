@@ -303,34 +303,84 @@ sub get_workflow_info {
     return __get_workflow_info($workflow);
 }
 
-sub get_workflow_initial_info {
+sub get_workflow_ui_info {
     
     ##! 1: 'start'
     
     my $self  = shift;
     my $args  = shift;
     
-    my $factory = __get_workflow_factory();     
+    my $factory;
+    my $result;
+       
+    # TODO FIXME - poking into the workflow internals is not that nice
+    # TODO - this should become the default workflow info structure
     
-    my $wf_config = $factory->_get_workflow_config($args->{WORKFLOW});
-    
-    ##! 64: 'config ' . Dumper $wf_config
+    # initial info receives a workflow title
+    my ($wf_type, $wf_description, $wf_state);
+    my @activities;     
+    if (!$args->{ID}) {
         
-=cut        
-    # extract the action in the initial state from the config        
-    foreach my $state (@{$wf_config->{state}}) {
-        next if ($state->{name} ne 'INITIAL');
-        my $initial_action = $state->{action}->[0]->{name};    
-        $factory->{_action_config}{default}{$initial_action}               
+        $factory = __get_workflow_factory();
+        my $wf_config = $factory->_get_workflow_config($args->{WORKFLOW});
+        $wf_type = $wf_config->{type};
+        $wf_description = $wf_config->{description};
+        $wf_state = 'INITIAL';
+        # extract the action in the initial state from the config        
+        foreach my $state (@{$wf_config->{state}}) {
+            next if ($state->{name} ne 'INITIAL');
+            @activities = ($state->{action}->[0]->{name});
+            last;                      
+        }
+        
+        $result->{WORKFLOW} = {
+            TYPE        => $wf_type,
+            DESCRIPTION => $wf_description,                
+        };
+        
+    } else {
+        my $wf_id = $args->{ID};
+        my $wf_title =  $args->{WORKFLOW} || $self->get_workflow_type_for_id({ ID => $wf_id });        
+        # FIXME TODO - refactor handles!
+        # commit to get a current snapshot of the database in the
+        # highest isolation level.
+        # Without this, we will only see old data, especially if
+        # other processes are writing to the database at the same time
+        CTX('dbi_workflow')->commit();
+        ##! 2: "load workflow"
+        $factory = __get_workflow_factory({
+            WORKFLOW_ID => $wf_id,
+        });
+        my $workflow = $factory->fetch_workflow(
+            $wf_title,
+            $wf_id
+        );
+        
+        $result = __get_workflow_info( $workflow );        
+        if ($args->{ACTIVITY}) {
+            @activities = ( $args->{ACTIVITY} );
+        } else {
+            @activities = keys %{$result->{ACTIVITY}};    
+        }
+        $wf_state = $workflow->state();
     }
-=cut        
-
-    return {
-        WORKFLOW => {
-            TYPE        => $wf_config->{type},
-            DESCRIPTION => $wf_config->{description},                
-        }        
+            
+    
+    $result->{ACTIVITY} = {};
+    foreach my $wf_action (@activities) { 
+        $result->{ACTIVITY}->{$wf_action} = $factory->get_activity_info( $wf_action );
+    } 
+            
+    # drill down into the state definition to find the ui setting
+    foreach my $state (@{$factory->{_workflow_config}->{$result->{WORKFLOW}->{TYPE}}->{state}}) {
+        next unless ($state->{name} eq $wf_state);
+        $result->{STATE} = { DESCRIPTION => $state->{description} || '' };
+        if ($state->{uihandle}) {
+            $result->{STATE}->{UIHANDLE} = $state->{uihandle}; 
+        }
     }
+ 
+    return $result;
     
 }
 
@@ -384,115 +434,23 @@ sub execute_workflow_activity {
 	    $wf_id
     );
     
-    # TODO - perhaps that should be moved to the oxi workflow class
-    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
-    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
-    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
-    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::Log');
+    $workflow->reload_observer();
 
-    ##! 2: "check parameters"
-    my %fields = ();
-    if (scalar keys %{ $wf_params } > 0) {
-        # only call get_action_fields if parameters are actually passed
-        # this especially helps with the call to the
-        # CheckForkedWorkflowChildren condition - get_action_fields
-        # evaluates the condition even though the activity class is
-        # called without any parameters.
-        foreach my $field ($workflow->get_action_fields($wf_activity))
-        {
-            $fields{$field->name()} = $field->description();
-        }
-    }
-    foreach my $key (keys %{$wf_params})
-    {
-        if (not exists $fields{$key})
-        {
-	    OpenXPKI::Exception->throw (
-	        message => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_ILLEGAL_PARAM",
-	        params => {
-		    WORKFLOW => $wf_title,
-                    ID       => $wf_id,
-                    ACTIVITY => $wf_activity,
-                    PARAM    => $key,
-                    VALUE    => $wf_params->{$key}
-	        },
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
-    }
-
-    ##! 2: "set parameters"
-    my $context = $workflow->context();
-    $context->param ($wf_params);
+    # check the input params
+    my $params = $self->__validate_input_param( $workflow, $wf_activity, $wf_params );    
+    ##! 16: 'activity params ' . $params
+    
+    my $context = $workflow->context();    
+    $context->param ( $params ) if ($params);
 
     ##! 64: Dumper $workflow
-    eval {
-        $workflow->execute_action($wf_activity);
-    };
-    if ($EVAL_ERROR) {
-        my $eval = $EVAL_ERROR;
-        CTX('log')->log(
-			MESSAGE  => "Error executing workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title'): $eval",
-			PRIORITY => 'info',
-			FACILITY => 'system',
-			);
 
-	my $log = {
-	    logger => CTX('log'),
-	    priority => 'error',
-	    facility => 'system',
-	};
-
-        ## normal OpenXPKI exception
-        $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
-
-        ## workflow exception
-        my $error = $workflow->context->param('__error');
-        if (defined $error)
-        {
-            if (ref $error eq '')
-            {
-                OpenXPKI::Exception->throw (
-                    message => $error,
-		    log     => $log,
-		    );
-            }
-            if (ref $error eq 'ARRAY')
-            {
-                my @list = ();
-                foreach my $item (@{$error})
-                {
-                    eval {
-                        OpenXPKI::Exception->throw (
-                            message => $item->[0],
-                            params  => $item->[1]);
-                    };
-                    push @list, $EVAL_ERROR;
-                }
-                OpenXPKI::Exception->throw (
-                    message  => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED",
-                    children => [ @list ],
-		    log      => $log,
-		    );
-            }
-        }
-
-        ## unknown exception
-        OpenXPKI::Exception->throw(
-	    message => scalar $eval,
-	    log     => $log,
-	    );
-    };
-    ##! 64: Dumper $workflow
+    $self->__execute_workflow_activity( $workflow, $wf_activity );
 
     CTX('log')->log(
-	MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
-	PRIORITY => 'info',
-	FACILITY => 'system',
+    	MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
+    	PRIORITY => 'info',
+    	FACILITY => 'system',
 	);
 
     return __get_workflow_info($workflow);
@@ -559,7 +517,6 @@ sub create_workflow_instance {
 
     my $wf_title = $args->{WORKFLOW};
 
-    # 'data only certificate request'
     my $workflow = __get_workflow_factory()->create_workflow($wf_title);
 
     if (! defined $workflow) {
@@ -569,10 +526,22 @@ sub create_workflow_instance {
 	    );
     }
     
-    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
-    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
-    $workflow->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
-    $workflow->add_observer ('OpenXPKI::Server::Workflow::Observer::Log');
+    $workflow->reload_observer();
+
+    ## init creator
+    my $wf_id = $workflow->id();    
+    my $context = $workflow->context();
+    my $creator = CTX('session')->get_user();
+    $context->param( 'creator'  => $creator );
+    
+    
+    ##! 16: 'workflow id ' .  $wf_id
+    CTX('log')->log(
+        MESSAGE  => "Workflow instance $wf_id created for $creator (type: '$wf_title')",
+        PRIORITY => 'info',
+        FACILITY => 'system',
+    );
+
 
     # load the first state and check for the initial action
     my $state = undef;
@@ -585,93 +554,29 @@ sub create_workflow_instance {
         );
     }
     my $initial_action = shift @actions;
+    
     ##! 8: "initial action: " . $initial_action
-
-    eval {
-        $state = $workflow->execute_action($initial_action);        
-    };
-
-    # TODO - refactor error handling
     
-    # Eval error - should usually not happen on init action 
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED_EVAL_ERROR",
-            params => {
-                error => $EVAL_ERROR,
-                wferror => $workflow->context->param('__error')
-            }            
-        );
-    }
+    # check the input params
+    my $params = $self->__validate_input_param( $workflow, $initial_action, $args->{PARAMS} );    
+    ##! 16: ' initial params ' . $params
     
-    # Something got wrong and we ended up in the initial state
-    if ($state eq 'INITIAL') {
-        OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED_INIT_STUCK",
-            params => {
-                wferror => $workflow->context->param('__error')
-            }
-        );
-    }
+    $context->param ( $params ) if ($params);
 
-    # Guys, if you pass parameters, make sure your second state has the correct name!
-    if (exists $args->{PARAMS} && (ref $args->{PARAMS} eq 'HASH') && $state ne 'INITIALIZED') {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_ILLEGAL_STATE',
-            params => { state => $state }
-        );        
-    }
+    ##! 64: Dumper $workflow
 
-    # if we are here, the workflow was created and initialized, time to proceed
-    # First, we check for the creator, in order:
-    # 1) set from the context (provided by the initial method)
-    # 2) use the session user
-    # 3) leave empty         
-
-
-    my $creator = $workflow->context->param('creator');
-    $creator = CTX('session')->get_user() unless($creator);
-    $creator = '' unless (defined $creator);
+    $self->__execute_workflow_activity( $workflow, $initial_action );
     
-    my $wf_id = $workflow->id();
-    ##! 16: 'workflow id ' .  $wf_id 
-    # attach the creator as attribute
-    CTX('dbi_backend')->insert(
-        TABLE => 'WORKFLOW_ATTRIBUTES', 
-        HASH => {            
-            WORKFLOW_SERIAL => $wf_id,
-            ATTRIBUTE_KEY => 'creator',
-            ATTRIBUTE_VALUE => $creator
-        }
-    );          
-    CTX('dbi_backend')->commit();
-
-    CTX('log')->log(
-        MESSAGE  => "Workflow instance $wf_id created (type: '$wf_title')",
-        PRIORITY => 'info',
-        FACILITY => 'system',
-    );
-
-    # now check if there are parameters to pass    
-    if (exists $args->{PARAMS} && (ref $args->{PARAMS} eq 'HASH')) {
-        
-        @actions = $workflow->get_current_actions();
-        if (not scalar @actions || scalar @actions != 1) {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_INITIAL_PARAMS_NO_ACTIVITY",
-                params => { WORKFLOW => $wf_title, ACTIONS => join(":", @actions) }
-            );
-        }
-        ##! 1: "execute first activity"
-        return $self->execute_workflow_activity({
-            WORKFLOW => $wf_title,
-            ID       => $wf_id,
-            ACTIVITY => $actions[0],
-            PARAMS   => $args->{PARAMS}            
-        });
-    }        
+    # check back for the creator in the context and copy it to the attribute table
     
+    # doh - somebody deleted the creator from the context
+    if (!$context->param( 'creator' )) {
+        $context->param( 'creator' => $creator );        
+    }     
+    $workflow->attrib({ creator => $context->param( 'creator' ) });
+            
     return __get_workflow_info($workflow);
+    
 }
 
 sub get_workflow_activities {
@@ -976,53 +881,148 @@ sub __get_workflow_info {
 	},
     };
     
-    # FIXME - poking into the workflow internals is not that nice, we should perhaps move that at least to the factory
-    
-    # drill down into the state definition to find the ui setting
-    foreach my $state (@{$workflow->{_factory}->{_workflow_config}->{$workflow->type()}->{state}}) {
-        next unless ($state->{name} eq $workflow->state());
-        $result->{STATE} = { DESCRIPTION => $state->{description} || '' };
-        if ($state->{uihandle}) {
-            $result->{STATE}->{UIHANDLE} = $state->{uihandle}; 
-        }
-    }
-   
+    # this stuff seems to be unused and does not reflect the attributes
+    # invented for the new ui stuff
     foreach my $activity ($workflow->get_current_actions()) {
-	##! 2: $activity
+    ##! 2: $activity
 
-    # We extract the values from the action definition for ui rendering
-    my $info = $workflow->{_factory}->{_action_config}->{default}->{$activity};
-        
-    $result->{ACTIVITY}->{$activity} = {
-        LABEL => $info->{description} || $activity        
+    # FIXME - bug in Workflow::Action (v0.17)?: if no fields are defined the
+    # method tries to return an arrayref on an undef'd value
+    my @fields;
+    eval {
+        @fields = $workflow->get_action_fields($activity);
     };
-    $result->{ACTIVITY}->{$activity}->{UIHANDLE} = $info->{uihandle} if ($info->{uihandle});
     
-
-	# FIXME - bug in Workflow::Action (v0.17)?: if no fields are defined the
-	# method tries to return an arrayref on an undef'd value
-	my @fields;
-	eval {
-	    @fields = $workflow->get_action_fields($activity);
-	};
-	
-	foreach my $field (@fields) {
-	    ##! 4: $field->name()
-	    ##! 64: 'Field info ' . Dumper $field
-	    $result->{ACTIVITY}->{$activity}->{FIELD}->{$field->name()} =
-	    {
-		DESCRIPTION => $field->description(),
-		REQUIRED    => $field->is_required(),
-		TYPE        => $field->type(),
-		LABEL       => $field->label(),
-	    };
-	}
+    foreach my $field (@fields) {
+        ##! 4: $field->name()
+        $result->{ACTIVITY}->{$activity}->{FIELD}->{$field->name()} =
+        {
+        DESCRIPTION => $field->description(),
+        REQUIRED    => $field->is_required(),
+        };
     }
-
-
+    }
+    
     return $result;
 }
 
+# validate the parameters given against the field spec of the current activity
+# uses positional params: workflow, activity, params
+# for now, we do NOT check on types or even requirement to not breal old stuff
+# TODO - implement check for type and requirement (perhaps using a validator 
+# and db transations would be the best way) 
+sub __validate_input_param {
+    
+    my $self = shift;
+    my $workflow = shift;
+    my $wf_activity = shift;
+    my $wf_params   = shift || {};
+    
+    ##! 2: "check parameters"
+    if (!defined $wf_params || scalar keys %{ $wf_params } == 0) {
+        return undef;             
+    }
+        
+    my %fields = ();
+    foreach my $field ($workflow->get_action_fields($wf_activity)) {
+        $fields{$field->name()} = 1;
+    }
+    
+    # throw exception on fields not listed in the field spec
+    # todo - perhaps build a filter from the spec and tolerate additonal params
+    
+    my $result;
+    foreach my $key (keys %{$wf_params}) {
+        if (not exists $fields{$key}) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_ILLEGAL_PARAM",
+                params => {
+                    WORKFLOW => $workflow->type(),
+                    ID       => $workflow->id(),
+                    ACTIVITY => $wf_activity,
+                    PARAM    => $key,
+                    VALUE    => $wf_params->{$key}
+                },
+                log => {
+                    logger => CTX('log'),
+                    priority => 'error',
+                    facility => 'system',
+                },
+            );
+        }
+        $result->{$key} = $wf_params->{$key};
+    }
+
+    return $result;
+} 
+
+sub __execute_workflow_activity {
+    
+    my $self = shift;
+    my $workflow = shift;
+    my $wf_activity = shift;
+    
+    ##! 64: Dumper $workflow
+    eval {
+        $workflow->execute_action($wf_activity);
+    };
+    if ($EVAL_ERROR) {
+        my $eval = $EVAL_ERROR;
+        CTX('log')->log(
+            MESSAGE  => sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
+                $wf_activity, $workflow->id(), $workflow->type(), $eval),
+            PRIORITY => 'info',
+            FACILITY => 'system',
+        );
+
+        my $log = {
+            logger => CTX('log'),
+            priority => 'error',
+            facility => 'system',
+        };
+
+        ## normal OpenXPKI exception
+        $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
+
+        ## workflow exception
+        my $error = $workflow->context->param('__error');
+        if (defined $error)
+        {
+            if (ref $error eq '') {
+                OpenXPKI::Exception->throw (
+                    message => $error,
+                    log     => $log,
+                );
+            }
+            if (ref $error eq 'ARRAY')
+            {
+                my @list = ();
+                foreach my $item (@{$error})
+                {
+                    eval {
+                        OpenXPKI::Exception->throw (
+                            message => $item->[0],
+                            params  => $item->[1]);
+                    };
+                    push @list, $EVAL_ERROR;
+                }
+                OpenXPKI::Exception->throw (
+                    message  => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED",
+                    children => [ @list ],
+                    log      => $log,
+                );
+            }
+        }
+
+        ## unknown exception
+        OpenXPKI::Exception->throw(
+            message => scalar $eval,
+            log     => $log,
+        );
+    };
+ 
+    return 1;
+}
 1;
 __END__
 

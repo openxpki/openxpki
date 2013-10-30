@@ -1001,12 +1001,23 @@ sub BUILD {
                 },
 	        },
         },
-        'get_workflow_initial_info' => {
+        'get_workflow_ui_info' => {
             class  => 'Workflow',
             params => {
                 WORKFLOW => {
                     type     => SCALAR,
-                    regex    => $re_alpha_string,                    
+                    regex    => $re_alpha_string,
+                    optional => 1,                    
+                },
+                ID => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                    optional => 1,
+                },
+                ACTIVITY => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
                 },
             },
         }, 

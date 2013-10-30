@@ -102,6 +102,38 @@ sub list_workflow_titles {
     return $result;
 }
 
+sub get_activity_info {
+    
+    my $self = shift;
+    my $args = shift;
+        
+    my $activity = $args->{ACTIVITY};
+    
+    ##! 2: $activity
+    
+    # We extract the values from the action definition for ui rendering
+    my $info = $self->{_action_config}->{default}->{$activity};
+
+    my $result = {
+        LABEL => $info->{description} || $activity        
+    };
+    $result->{UIHANDLE} = $info->{uihandle} if ($info->{uihandle});
+    
+    my @fields;
+    foreach my $field (@{$info->{field}}) {        
+        ##! 64: 'Field info ' . Dumper $field
+        
+        push @fields, {
+            name => $field->{name},
+            label => $field->{label} || $field->{name},
+            type => $field->{type} || 'text',
+            required => ($field->{is_required} && $field->{is_required} eq 'yes') || 0,                        
+        }        
+    }
+
+    return $result;
+}
+
 sub __authorize_workflow {
         
     my $self     = shift;
@@ -174,8 +206,8 @@ sub __authorize_workflow {
         if ($allowed_creator_re) {
             ##! 16: 'allowed_creator_re: ' . $allowed_creator_re
             # check it against the workflow creator
-            #my $wf_creator = $workflow->context()->param('creator') || '';
-            my $wf_creator = $workflow->attrib('creator') || '';
+            my $wf_creator = $workflow->context()->param('creator') || '';
+            #my $wf_creator = $workflow->attrib('creator') || '';
             
             ##! 16: 'wf_creator: ' . $wf_creator
             if ($wf_creator !~ qr/$allowed_creator_re/ &&
