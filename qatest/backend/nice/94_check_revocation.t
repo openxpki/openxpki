@@ -64,8 +64,8 @@ $test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier'
 
 # Login to use socket
 $test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    user => $cfg{operator}{name},
+    password => $cfg{operator}{role},
 ) or die "Error - connect failed: $@";
 
 $test->set_wftype ( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' );
@@ -75,6 +75,7 @@ $test->reset();
 
 # We might need to wait for the watchdog
 my $i = 25;
+
 while ($test->state() eq 'CHECK_FOR_REVOCATION' && $i--) {    
     sleep 1;
     $test->reset();
