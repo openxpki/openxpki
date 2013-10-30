@@ -46,7 +46,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
      
-    my $wf_info = $self->send_command( 'get_workflow_initial_info', {
+    my $wf_info = $self->send_command( 'get_workflow_ui_info', {
         WORKFLOW => $self->param('wf_type') 
     }); 
     
@@ -89,9 +89,7 @@ sub init_load {
     # re-instance existing workflow
     my $id = $self->param('wf_id');
     
-    
-    
-    my $wf_info = $self->send_command( 'get_workflow_info', {
+    my $wf_info = $self->send_command( 'get_workflow_ui_info', {
         ID => $id 
     }); 
     
@@ -288,6 +286,11 @@ sub action_index {
         }); 
     }   
     
+    # TODO - we need to fetch the ui info until we change the api 
+    $wf_info = $self->send_command( 'get_workflow_ui_info', {
+        ID => $wf_info->{WORKFLOW}->{ID},
+        WORKFLOW => $wf_info->{WORKFLOW}->{TYPE} 
+    });
     $self->__render_from_workflow({ WF_INFO => $wf_info });
     
           
@@ -339,7 +342,7 @@ sub action_select {
         $wf_id = $wf_args->{wf_id};
     }
     
-    my $wf_info = $self->send_command( 'get_workflow_info', {
+    my $wf_info = $self->send_command( 'get_workflow_ui_info', {
         ID => $wf_id 
     }); 
     
@@ -360,7 +363,11 @@ sub action_select {
             WORKFLOW => $wf_info->{WORKFLOW}->{TYPE},
             ID       => $wf_info->{WORKFLOW}->{ID},
             ACTIVITY => $wf_action,            
-        }); 
+        });
+        # TODO - change API
+        $wf_info = $self->send_command( 'get_workflow_ui_info', {
+            ID => $wf_id 
+        });      
     } else {
         $args->{WF_ACTION} = $wf_action;
     }
@@ -505,7 +512,7 @@ sub __render_from_workflow {
     my $wf_info = $args->{WF_INFO} || undef;
 
     if (!$wf_info && $args->{WF_ID}) {
-        $wf_info = $self->send_command( 'get_workflow_info', {
+        $wf_info = $self->send_command( 'get_workflow_ui_info', {
             ID => $args->{WF_ID}, 
         }); 
         $args->{WF_INFO} = $wf_info;
