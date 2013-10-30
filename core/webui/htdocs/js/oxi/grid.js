@@ -212,6 +212,18 @@ OXI.GridView = OXI.ContentBaseView.extend({
     },
     
     _getColRenderCallback: function(format){
+        var Grid = this;
+        return function(data, type, full){
+            if(type=='display' || type=='filter'){
+                if(typeof(data) == 'object'){
+                    data.source = Grid;   
+                }
+                return OXI.FormatHelperFactory.getHelper(format).format(data);
+            }
+            return (typeof(data) == 'object')?data.label:data;
+        };
+        
+        /*
         switch(format){
             case 'timestamp':
                 return function(data, type, full){
@@ -227,7 +239,7 @@ OXI.GridView = OXI.ContentBaseView.extend({
                     return data;
                 }
                  
-        }
+        }*/
     },
     
     _getAvailableStati: function(iStatusIndex){
