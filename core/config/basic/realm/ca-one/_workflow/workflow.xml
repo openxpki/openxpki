@@ -50,7 +50,6 @@
         <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_cert_export.xml"/>
   	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_smartcard_pin_unblock.xml"/>
   	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_certificate_revoke.xml"/>
-  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_change_metadata.xml"/>  	    
 	  </conditions>
 	
 	</workflow_config>

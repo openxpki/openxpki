@@ -5,13 +5,7 @@
   <persister>OpenXPKI</persister>
   <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
 
-  <state name="INITIAL">       
-        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
-        <action name="global_initialize_workflow" resulting_state="INITIALIZED">
-        </action>
-    </state>
-    
-  <state name="INITIALIZED">
+  <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
     <action name="create_csr" 
 	    resulting_state="BUILD_SUBJECT">

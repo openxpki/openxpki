@@ -1,6 +1,4 @@
 #!/usr/bin/perl
-#
- 
 
 use strict;
 use warnings;
@@ -72,16 +70,14 @@ my %wfparam = (
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA' , \%wfparam, 'Create Workflow')
  or die "Workflow Create failed: $@";
 
-$test->state_is('DATA_LOADED');
+$test->state_is('DATA_UPDATE');
 
-$test->diag('Current data ' . Dumper $test->param( 'current_metadata') );
+$test->execute_ok( 'changemeta_update_context', {
+    'meta_requestor' => 'Uli Update',
+    'meta_system_id' => '12345'    
+});
 
-$test->execute_ok( 'changemeta_update_context', { metadata_update => $serializer->serialize({ 
-    'requestor' => 'Uli Update',
-    'certowner' => 'Andreas Anders'    
-})} );
-
-$test->state_is('DATA_LOADED');
+$test->state_is('CHOOSE_ACTION');
 
 $test->execute_ok( 'changemeta_persist' );
 

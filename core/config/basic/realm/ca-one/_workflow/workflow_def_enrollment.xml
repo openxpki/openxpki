@@ -12,7 +12,7 @@
     <description>I18N_OPENXPKI_WF_DESC_ENROLLMENT</description>
     <persister>OpenXPKI</persister>
 
-    <state name="EXTRACT"
+    <state name="INITIALIZED"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_INITIALIZED</description>
         <action name="enroll_extract_csr" resulting_state="READY_TO_PROCESS">
@@ -26,15 +26,9 @@
         </action>
     </state>
 
-    <state name="INITIALIZED">
-        <action name="enroll_initialize" resulting_state="EXTRACT">
-        </action>
-    </state>
-        
-    
-    <state name="INITIAL">    
+    <state name="INITIAL">
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_INITIAL</description>
-        <action name="global_initialize_workflow" resulting_state="INITIALIZED">
+        <action name="enroll_initialize" resulting_state="INITIALIZED">
         </action>
     </state>
 

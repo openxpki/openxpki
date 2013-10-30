@@ -43,9 +43,5 @@
 	class="OpenXPKI::Server::Workflow::Activity::Tools::Disconnect"> 	
   </action>  
  
-  <action name="global_initialize_workflow"
-    class="Workflow::Action::Null">
-    <field name="creator"/>      
-  </action>
  
 </actions>
