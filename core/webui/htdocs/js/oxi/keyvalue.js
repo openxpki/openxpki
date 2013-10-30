@@ -7,10 +7,10 @@ OXI.KeyValueView = OXI.ContentBaseView.extend({
     
 
     init:function(){
-        Ember.debug('OXI.TextView :init ');
+        
         this._super();
         this.set('data',[]);
-
+        //this.debug(this.content.data);
         var i;
         for(i=0;i<this.content.data.length;i++){
             var item = this.content.data[i];
@@ -27,6 +27,10 @@ OXI.KeyValueItem = Ember.Object.extend({
     label:null,
     value:null,
     format:null,
+    
+    init: function(){
+        //js_debug('KeyValueItem init: '+this.value);  
+    },
     
     formatedVal: function(){
         if(this.format){

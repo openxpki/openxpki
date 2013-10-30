@@ -180,6 +180,8 @@ OXI.PageButton = OXI.View.extend({
 
 });
 
+
+
 OXI.ModalView = OXI.View.extend({
 
     jsClassName:'OXI.ModalView',
@@ -189,13 +191,17 @@ OXI.ModalView = OXI.View.extend({
     
     show: function(label){
         this.set('label',label);
-        js_debug('show modal');
-        this.$().modal('show');
+        //js_debug('show modal');
+        try{
+            this.$().modal('show');
+        }catch(e){
+            js_debug('exception while closing modal...' + e);
+        }
     },
     
     close: function(){
         this.set('label','');
-        js_debug('hide modal');
+        //js_debug('hide modal');
         try{
             this.$().modal('hide');
         }catch(e){

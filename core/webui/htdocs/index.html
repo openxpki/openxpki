@@ -126,10 +126,10 @@
      
      
     <script type="text/x-handlebars" data-template-name="main-content">
-      {{view App.MainView}}
       
-      {{view App.ModalView}}
-      
+        {{view App.MainView}}
+         
+     {{view App.ModalView}}
     </script>
     
     <script type="text/x-handlebars" data-template-name="modal-main">
@@ -150,12 +150,22 @@
 
     </script>    
     
+    <script type="text/x-handlebars" data-template-name="right-pane">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{view.label}}</h3>
+      </div>
+      <div class="panel-body">
+        {{view view.ContentView}}
+      </div>
+     </script> 
     
     <script type="text/x-handlebars" data-template-name="sections">
-      <h2>{{view.label}}</h2>
-      <p>{{{view.description}}}</p>
       {{view view.MessageView}}
       
+      <h2>{{view.label}}</h2>
+      <p>{{{view.description}}}</p>
+      
+            
       <ul {{bind-attr class=":nav :nav-tabs view.hasNoTabs:hidden"}}>
         <li><a {{bind-attr href=view.getMainTabHref}} data-toggle="tab">{{view.labelTabMain}}</a></li>
         {{#each TabView in view.Tabs}}
@@ -168,12 +178,19 @@
             <div class="tab-pane active" {{bind-attr id=view.mainTabId}}>
                   <div class="container sections">
                   <div class="row">
-                  <div class="col-md-12">
+                  <!-- main pane -->
+                  <div {{bind-attr class="view.hasRightPane:col-md-10:col-md-12"}}>
                   {{#each SectionView in view.SectionViewList}}
                   {{#if view._debugTabs }}Section {{SectionView.elementId}}{{/if}}
                   {{view SectionView}}
                   {{/each}}
                   </div>
+                  <!-- left pane -->
+                  <div {{bind-attr class="view.hasRightPane:col-md-2:hide"}}>
+                 {{view view.RightPaneView}}
+                 </div>
+                  
+                  
                   </div>
                   </div>
             </div>
@@ -183,6 +200,8 @@
             {{/each}}
         </div>
         <!-- /tab list -->
+        
+                
       {{#if view._debugTabs }}<button {{action 'addTab'}}>add tab</button>{{/if}}
     </script>
     

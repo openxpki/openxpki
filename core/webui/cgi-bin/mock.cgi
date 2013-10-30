@@ -353,7 +353,25 @@ sub handle {
                         {label => 'key 1', value => 'value 1'},
                         {label => 'key 2', value => '1395226097', format=>'timestamp'},
                         {label => 'key 2', value => ['123','876']},
-                        {label => 'Link',  value => {label => 'Test Text',page => 'test_text',target=>'modal'},format=>'link'},
+                        {label => 'Link KV',  value => {label => 'Test KV 2',page => 'test_key_value2'},format=>'link'},
+                        {label => 'Link Text',  value => {label => 'Test Textpage',page => 'test_text'},format=>'link'},
+                    ]    
+                }
+            }]
+        };
+    
+}elsif($page eq 'test_key_value2'){
+   
+    return {page=>{'label' => 'Test Key Value 2'},
+            main => [
+                {type => 'keyvalue',content => {
+                    
+                    data => [
+                        {label => 'key 11', value => 'value 2'},
+                        {label => 'key 111', value => 'value 2222'},
+                        {label => 'key 21', value => '1395226097', format=>'timestamp'},
+                        {label => 'key 21', value => ['456','789']},
+                        {label => 'Link 2',  value => {label => 'Test KV 1',page => 'test_key_value'},format=>'link'},
                     ]    
                 }
             }]
@@ -361,6 +379,19 @@ sub handle {
     
 }elsif($page eq 'test_text'){
     return {page=>{'label' => 'Some plain text',description=>'some long text sjahdasd  lajsd ajsd l kaj dljahweorzowejasdh'},
+            status => {level=>'info',message => 'Status-Message'},
+            
+            right => {
+                main=>[
+                    {type => 'text',
+                     content => {
+                        label => 'Right pane 1',
+                        description => 'Text 1;: lajsdlkajsd lkajsd lkajsd lkajsd lkajs dlja skdj lasjd '
+                        }
+                    },
+                ]
+            },
+            
             main => [
                 {type => 'text',
                  content => {

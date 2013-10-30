@@ -93,6 +93,7 @@ OXI.SectionViewContainer = OXI.View.extend({
     templateName: "sections",
     SectionViewList:[],
     MessageView:null,
+    RightPaneView:null,
     Tabs: null,
     _hasTabs:false,
     _debugTabs:false,
@@ -130,7 +131,9 @@ OXI.SectionViewContainer = OXI.View.extend({
         return this.getMainTabId();
     }.property(),
     
-    
+    hasRightPane:function(){
+        return false;
+    }.property(),
     
     //methods:
     getMainViewContainer: function(){
@@ -195,12 +198,20 @@ OXI.SectionViewContainer = OXI.View.extend({
     },
 
     init:function(){
-        //Ember.debug('SectionViewContainer init ');
+        this.debug('SectionViewContainer init '+this.displayType);
         this._super();
         this.SectionViewList = [];
         this.initTabs();
         this.set('controller',OXI.TabListControler.create({view:this}));
-        this.MessageView = this.createChildView(OXI.MessageView.create());
+        if(this.displayType != 'right'){
+            this.RightPaneView = this.createChildView(OXI.RightPaneView.create());
+            this.MessageView = this.createChildView(OXI.MessageView.create());
+        }else{
+            this.RightPaneView = this.createChildView(OXI.EmptyView.create()); 
+            this.MessageView = this.createChildView(OXI.EmptyView.create()); 
+        }
+            
+        
     },
 
     setStatus:function(status){
@@ -223,6 +234,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         if(json.page){
             if(this.displayType == 'main'){//no label/description in tabs
                 if(json.page.label){
+                    this.debug('set label '+ json.page.label);
                     this.set('label', json.page.label);
                 }
                 if(json.page.description){
@@ -319,10 +331,30 @@ OXI.SectionView = OXI.View.extend({
 
 });
 
+OXI.RightPaneView = OXI.View.extend({
+    jsClassName:'OXI.ModalView',
+    templateName: "right-pane",
+    classNames: ['panel panel-default'],//http://getbootstrap.com/components/#panels
+    
+    init:function(){
+        this._super();
+        
+        //this.set('controller',OXI.ModalControler.create({view:this}));
+        this.set('ContentView', this.createChildView(
+                                    OXI.SectionViewContainer.create({displayType:'right'})
+                                   ));
+        
+    },
+});
+
+OXI.EmptyView = OXI.View.extend({
+    jsClassName:'OXI.EmptyView'
+});
+
 OXI.MessageView = OXI.View.extend({
     
     jsClassName:'OXI.MessageView',
-    
+    classNames: ['oxi-message'],
     message:null,
     templateName: "page-message",
     level:null,
@@ -356,9 +388,21 @@ OXI.MessageView = OXI.View.extend({
             return '';
 
         }
-    }.property('level','message')
+    }.property('level','message'),
+    
+    didInsertElement: function(){
+        this._super();
+        /*
+        var elemId = this.get('elementId');
+        $(window).scroll(function(){            
+            $('#'+elemId)
+                .stop()
+                .animate({"marginTop": ($(window).scrollTop() )}, "slow" );         
+        });
+        */   
+    }
 
 
-
+    
 
 });
