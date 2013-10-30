@@ -13,15 +13,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
 
-
-sub init {
-    my ( $self, $wf, $params ) = @_;
-    
-    ##! 1: 'got init ' . Dumper $params
-    $self->SUPER::init($wf, $params);    
-    
-}
-
 sub execute {
     ##! 1: 'start'
     my $self     = shift;
