@@ -133,3 +133,15 @@ img.toplogo{
     width: 263px;
   }
 }
+
+span.certstatus-issued {
+    color: green;   
+}
+
+span.certstatus-revoked {
+	color: red;	
+}
+
+span.certstatus-expired {
+    color: #444;   
+}
