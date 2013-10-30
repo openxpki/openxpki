@@ -184,6 +184,20 @@ sub execute_action {
 
 }
 
+# migrated from api - i have no idea what this is good for
+sub reload_observer {
+ 
+    ##! 1: 'start'
+    my $self = shift;
+    
+    $self->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
+    $self->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
+    $self->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
+    $self->add_observer ('OpenXPKI::Server::Workflow::Observer::Log');
+
+    return $self;    
+}
+
 sub attrib {
     
     ##! 1: 'start'
@@ -238,7 +252,8 @@ sub attrib {
                 );
                 
                 # update
-                if ($result) {
+                ##! 64: 'check result ' . Dumper $result
+                if (scalar @{$result}) {
                     ##! 32: 'key exisits, update'
                     CTX('dbi_backend')->update (
                         TABLE => 'WORKFLOW_ATTRIBUTES', 
