@@ -86,7 +86,7 @@ sub init_detail {
     
     $self->_page({
         label => 'Certificate Information',   
-        shortlabel => $cert->{BODY}->{SUBJECT_HASH}->{CN},     
+        shortlabel => $cert->{BODY}->{SUBJECT_HASH}->{CN}->[0],     
     });
       
       
@@ -97,11 +97,14 @@ sub init_detail {
     my @fields = (
         { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
         { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
-        { label => 'Issuer', value => $cert->{BODY}->{ISSUER} },              
+        { label => 'Issuer', value => {label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER}, target => 'modal' }, format=>'link' },
         { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
         { label => 'Status', value => $cert->{STATUS}, format => 'certstatus' },
     );                     
+    
+    
+    
    
     my @buttons = {
         action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA!cert_identifier!$cert_identifier", 
