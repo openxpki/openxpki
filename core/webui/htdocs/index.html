@@ -309,7 +309,7 @@
       
       <table class="table table-bordered">
       {{#each item in view.data}}
-      <tr><td>{{item.label}}</td><td>{{item.value}}</td></tr>
+      <tr><td>{{item.label}}</td><td>{{{item.formatedVal}}}</td></tr>
       {{/each}}
       </table>
 
@@ -346,7 +346,9 @@
    <script src="js/libs/ember-1.0.0.js"></script>
    
    <script src="js/oxi/namespace.js"></script>
+   <script src="js/oxi/config.js"></script>
    <script src="js/oxi/factory.js"></script>
+   <script src="js/oxi/format.js"></script>
    <script src="js/oxi/view.js"></script>
    <script src="js/oxi/application.js"></script>
    <script src="js/oxi/navigation.js"></script>

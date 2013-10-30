@@ -2,18 +2,28 @@
 //and basic conf
 
 var OXI = {
-   
-   Config:Ember.Object.create({
-         
-         serverUrl : '/cgi-bin/mock.cgi',
-         
-         //root element in index.html (for ember application)
-         rootElement: '#application',
-         
-         //name of cgi-session cookie (needed to reset the client session
-         cookieName: 'CGISESSID',
-         
-         
-      })
-   
+
+    _idCounter : 0,
+    getUniqueId: function(){
+
+        this._idCounter++;
+        return 'oxi-'+this._idCounter;
+
+    },
+
+    _registeredMethods:{},
+    registerMethod: function(identifier,method){
+        this._registeredMethods[identifier] =  method;
+    },
+
+    callMethod: function(identifier){
+        var m = this._registeredMethods[identifier];
+        if(!m){
+            App.applicationAlert('no method registerd with identifier '+identifier);
+            return;
+        }
+        m();
+    }
+
+
 };

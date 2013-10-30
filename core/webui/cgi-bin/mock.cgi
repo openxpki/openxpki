@@ -241,14 +241,17 @@ sub handle {
             						{ sTitle => "title" },
             						{ sTitle => "description" },
             						
-            						{ sTitle => "date_issued",format => 'timestamp'}
+            						{ sTitle => "date_issued",format => 'timestamp'},
+            						{ sTitle => "link",format => 'link'}
             						
             					] ,
             	        data => [
-            	            ['Titel 1','Description 1',1379587708],
-            	            ['Titel 2','Description 2',1379587799],
-            	            ['Titel 3','Description 3',1312158770],
-            	            ['Titel 4','Description 4',1376687708],
+            	            ['Titel 1','Description 1',1379587708,{label=>'Z Test page',page => 'test_text',target=>'modal'}],
+            	            
+            	            ['Titel 2','Description 2',1379587799,{label=>'A Test page',page => 'test_text',target=>'modal'}],
+            	            ['Titel 3','Description 3',1312158770,{label=>'B Test page',page => 'test_text',target=>'modal'}],
+            	            ['Titel 4','Description 4',1376687708,{label=>'E Test page',page => 'test_text',target=>'modal'}],
+            	            
             	        ],   
                         }
             }
@@ -350,6 +353,7 @@ sub handle {
                         {label => 'key 1', value => 'value 1'},
                         {label => 'key 2', value => '1395226097', format=>'timestamp'},
                         {label => 'key 2', value => ['123','876']},
+                        {label => 'Link',  value => {label => 'Test Text',page => 'test_text',target=>'modal'},format=>'link'},
                     ]    
                 }
             }]
