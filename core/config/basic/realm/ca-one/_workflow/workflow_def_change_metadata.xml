@@ -3,13 +3,7 @@
     <description>I18N_OPENXPKI_WF_DESC_CHANGE_METADATA</description>
     <persister>OpenXPKI</persister>
     
-    <state name="INITIAL">
-        <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
-        <action name="global_initialize_workflow" resulting_state="INITIALIZED">
-        </action>
-    </state>
-    
-    <state name="INITIALIZED">
+    <state name="INITIAL"> 
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
         <action name="changemeta_load_data" resulting_state="DATA_UPDATE">
         </action>
