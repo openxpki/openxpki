@@ -61,6 +61,7 @@ sub BUILD {
     my $re_all               = qr{ \A .* \z }xms;
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
     my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
+    my $re_boolean           = qr{ \A [01] \z }xms;
     my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
     my $re_cert_string       = qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;
     my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
@@ -277,6 +278,11 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_cert_format,
+                },
+                BUNDLE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
                 },
             },
         },

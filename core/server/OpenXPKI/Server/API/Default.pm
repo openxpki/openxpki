@@ -375,6 +375,13 @@ sub get_chain {
     my $dbi = CTX('dbi_backend');
     my @certs;
 
+    my $inner_format = $arg_ref->{OUTFORMAT} || '';
+    if ($arg_ref->{BUNDLE}) {
+        $inner_format = 'PEM';
+    }
+
+
+
     while (! $finished) {
         ##! 128: '@identifiers: ' . Dumper(\@identifiers)
         ##! 128: '@certs: ' . Dumper(\@certs)
@@ -389,11 +396,11 @@ sub get_chain {
             $finished = 1;
         }
         else {
-            if (defined $arg_ref->{OUTFORMAT}) {
-                if ($arg_ref->{OUTFORMAT} eq 'PEM') {
+            if ($inner_format) {
+                if ($inner_format eq 'PEM') {
                     push @certs, $cert->{DATA};
                 }
-                elsif ($arg_ref->{OUTFORMAT} eq 'DER') {
+                elsif ($inner_format eq 'DER') {
                     if (! defined $default_token) {
                         OpenXPKI::Exception->throw(
                             message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN',
@@ -430,6 +437,22 @@ sub get_chain {
             }
         }
     }
+    
+    # Return a pkcs7 structure instead of the hash
+    if ($arg_ref->{BUNDLE}) {    
+        
+        # we do NOT include the root in p7 bundles
+        pop @certs if ($complete); 
+                    
+        my $result = $default_token->command({
+            COMMAND          => 'convert_cert',
+            DATA             => \@certs,
+            OUT              =>  ($arg_ref->{OUTFORMAT} eq 'DER' ? 'DER' : 'PEM'),
+            CONTAINER_FORMAT => 'PKCS7',
+        });
+        return $result;
+    }
+    
     $return_ref->{IDENTIFIERS} = \@identifiers;
     $return_ref->{COMPLETE}    = $complete;
     if (defined $arg_ref->{OUTFORMAT}) {
