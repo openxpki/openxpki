@@ -19,7 +19,7 @@
             description="I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA"> 
             <field name="meta_email"/>
             <field name="meta_requestor"/>
-            <field name="meta_system_id"/>            
+            <field name="meta_system_id" is_required="no"/>            
             <validator name="changemeta_validate_metadata"/>        
     </action>
 
