@@ -105,17 +105,15 @@ sub list_workflow_titles {
 sub get_activity_info {
     
     my $self = shift;
-    my $args = shift;
+    my $activity = shift;
         
-    my $activity = $args->{ACTIVITY};
-    
     ##! 2: $activity
     
     # We extract the values from the action definition for ui rendering
     my $info = $self->{_action_config}->{default}->{$activity};
 
     my $result = {
-        LABEL => $info->{description} || $activity        
+        LABEL => $info->{description} || $activity,               
     };
     $result->{UIHANDLE} = $info->{uihandle} if ($info->{uihandle});
     
@@ -131,6 +129,8 @@ sub get_activity_info {
         }        
     }
 
+    $result->{FIELD} = \@fields if (scalar @fields);
+    
     return $result;
 }
 
