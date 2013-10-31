@@ -15,7 +15,7 @@ OXI.TabListControler = Ember.Controller.extend({
 
 OXI.TabControler = Ember.Controller.extend({
    actions: {
-            closeTab: function(){
+            closeTab: function(){f
               js_debug('close tab triggered - controler level');
               this.view.closeTab();
             }
@@ -346,7 +346,7 @@ OXI.SectionView = OXI.View.extend({
 OXI.RightPaneView = OXI.View.extend({
     jsClassName:'OXI.ModalView',
     templateName: "right-pane",
-    classNames: ['panel panel-default right-pane'],//http://getbootstrap.com/components/#panels
+    classNames: ['well'],//['panel panel-default right-pane'],//http://getbootstrap.com/components/#panels
     ContentView:null,
     
     
