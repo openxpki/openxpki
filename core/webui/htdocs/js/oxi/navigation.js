@@ -1,6 +1,9 @@
 //Navigation-Stuff
 // NavItem has two settable properties and
 // an programmatic active state depending on the router
+
+"use strict";
+
 OXI.NavItem = Ember.Object.extend({
     title: '',
     goto: null,    // this is the name of the state we want to go to!

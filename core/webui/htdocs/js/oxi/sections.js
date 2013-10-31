@@ -1,3 +1,7 @@
+
+"use strict";
+
+
 OXI.TabListControler = Ember.Controller.extend({
    actions: {
             addTab: function(){
@@ -227,6 +231,7 @@ OXI.SectionViewContainer = OXI.View.extend({
 
     initSections:function(json){
         //js_debug(json,2);
+        this.debug('start initSections');
         this.set('SectionViewList',[]);
         this.set('label','');
         this.set('shortlabel','');
@@ -234,7 +239,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         if(json.page){
             if(this.displayType == 'main'){//no label/description in tabs
                 if(json.page.label){
-                    this.debug('set label '+ json.page.label);
+                    //this.debug('set label '+ json.page.label);
                     this.set('label', json.page.label);
                 }
                 if(json.page.description){
@@ -261,7 +266,7 @@ OXI.SectionViewContainer = OXI.View.extend({
                 });
             }
         }
-        //this.debug('initSections finished');
+        this.debug('initSections finished');
     },
 
 
@@ -270,7 +275,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         //js_debug(params);
         params.SectionContainer = this;
         var SectionView = this.createChildView(OXI.SectionView.create(params));
-        js_debug('section created');
+        js_debug('section '+params.section_nr+' created');
         if(!this.SectionViewList){
             //this.SectionViewList= [];
             this.set('SectionViewList',[]);

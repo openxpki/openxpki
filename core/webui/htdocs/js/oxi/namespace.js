@@ -1,6 +1,8 @@
 //defines the OXI namespace
 //and basic conf
 
+"use strict";
+
 var OXI = {
 
     _idCounter : 0,

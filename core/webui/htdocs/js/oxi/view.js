@@ -1,6 +1,7 @@
 ﻿/**
 Base Class for all Views in OXI namespace
 */
+"use strict";
 
 OXI.View = Ember.View.extend({
     jsClassName:'OXI.View: you must define jsClassName in your subclass!',

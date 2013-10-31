@@ -1,5 +1,7 @@
 /* flexible factory for new (OXI)-Components */
 
+"use strict";
+
 OXI.ComponentFactory = Ember.Object.extend({
 
     _componentMap : {},//must bve defined in concrete instances!

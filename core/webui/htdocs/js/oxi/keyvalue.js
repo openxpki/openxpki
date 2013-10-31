@@ -1,3 +1,5 @@
+"use strict";
+
 OXI.KeyValueView = OXI.ContentBaseView.extend({
     
     jsClassName:'OXI.KeyValueView',

@@ -1,4 +1,4 @@
-
+"use strict";
 var App = OXI.Application.create();
 
 App.ApplicationRoute = Ember.Route.extend({

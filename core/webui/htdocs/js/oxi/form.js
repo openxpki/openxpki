@@ -4,7 +4,7 @@ defines classes for Forms
 
 
 
-
+"use strict";
 
 OXI.FormView = OXI.ContentBaseView.extend({
 

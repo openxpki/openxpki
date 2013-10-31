@@ -1,3 +1,5 @@
+"use strict";
+
 OXI.GridView = OXI.ContentBaseView.extend({
     
     jsClassName:'OXI.GridView',

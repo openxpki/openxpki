@@ -2,7 +2,7 @@
 defines the OXI Application classs
 */
 
-
+"use strict";
 
 OXI.Route = Ember.Route.extend({
 
@@ -291,8 +291,7 @@ OXI.Application = Ember.Application.extend(
 
     renderPage: function(json, target,SourceView){
         //js_debug({'App.renderPage':json},3);
-        js_debug('App.renderPage in target '+target);
-        js_debug('MainView: '+this.MainView);
+        
         
         //target can given via action AND also be set in the returned json (page.target)
         //the later overwrites the first
@@ -300,7 +299,11 @@ OXI.Application = Ember.Application.extend(
             target =  json.page.target;  
         }
         if(!target)target='main';
-        TargetView = this.getTargetView(target,json.page,SourceView);
+        
+        js_debug('App.renderPage in target '+target);
+        //js_debug('MainView: '+this.MainView);
+        
+        var TargetView = this.getTargetView(target,json.page,SourceView);
         
         if(TargetView == this.MainView){
             //js_debug('close modal...');
@@ -311,7 +314,7 @@ OXI.Application = Ember.Application.extend(
         this.hideLoader();
         
         //Status messages will be displayed in main view - except for modals:
-        StatusView = (target=='modal' || target=='self')?TargetView:this.MainView;
+        var StatusView = (target=='modal' || target=='self')?TargetView:this.MainView;
         StatusView.setStatus(json.status); 
 
         if(json.page){
