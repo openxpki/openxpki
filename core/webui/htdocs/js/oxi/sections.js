@@ -135,9 +135,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         return this.getMainTabId();
     }.property(),
     
-    hasRightPane:function(){
-        return false;
-    }.property(),
+    hasRightPane:false,
     
     //methods:
     getMainViewContainer: function(){
@@ -236,6 +234,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         this.set('label','');
         this.set('shortlabel','');
         this.set('description','');
+        this.set('hasRightPane',false);
         if(json.page){
             if(this.displayType == 'main'){//no label/description in tabs
                 if(json.page.label){
@@ -265,6 +264,12 @@ OXI.SectionViewContainer = OXI.View.extend({
                     section_nr:i+1
                 });
             }
+        }
+        
+        //right pane:
+        if(json.right && json.right.length > 0){
+            this.set('hasRightPane',true);
+            this.RightPaneView.initSections(json.right);
         }
         this.debug('initSections finished');
     },
@@ -341,15 +346,23 @@ OXI.SectionView = OXI.View.extend({
 OXI.RightPaneView = OXI.View.extend({
     jsClassName:'OXI.ModalView',
     templateName: "right-pane",
-    classNames: ['panel panel-default'],//http://getbootstrap.com/components/#panels
+    classNames: ['panel panel-default right-pane'],//http://getbootstrap.com/components/#panels
+    ContentView:null,
+    
     
     init:function(){
         this._super();
         this.set('ContentView', this.createChildView(
-                                    OXI.SectionViewContainer.create({displayType:'right'})
+                                    OXI.SectionViewContainer.create({displayType:'right',templateName:'sections-right'})
                                    ));
         
     },
+    
+    initSections: function(sections){
+        this.debug('init Sections');
+        this.ContentView.initSections({main : sections});
+    },
+    
     _lastItem: '' //avoid trailing commas
 });
 

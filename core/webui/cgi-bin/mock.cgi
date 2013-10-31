@@ -346,6 +346,8 @@ sub handle {
                     buttons => [
                             {action => 'test_text',label=>'Plain text (as action, no target)'},
                             {page => 'test_text',label=>'Plain text (no target (=main)',target=>'main'},
+                            {page => 'test_text',label=>'Plain text (modal)',target=>'modal'},
+                            {page => 'test_text',label=>'Plain text (tab)',target=>'tab'},
                             {page => 'test_key_value!page2',label=>'Page 2 (in Tab)',target=>'tab'},
                             {action => 'test_key_value!action2',page => 'test_key_value!page3',label=>'Action 2/Page 3 (in Tab)',target=>'tab'},
                         ],                    
@@ -381,16 +383,15 @@ sub handle {
     return {page=>{'label' => 'Some plain text',description=>'some long text sjahdasd  lajsd ajsd l kaj dljahweorzowejasdh'},
             status => {level=>'info',message => 'Status-Message'},
             
-            right => {
-                main=>[
+            right => [
                     {type => 'text',
                      content => {
-                        label => 'Right pane 1',
+                        label => '',#Right pane 1',
                         description => 'Text 1;: lajsdlkajsd lkajsd lkajsd lkajsd lkajs dlja skdj lasjd '
                         }
                     },
-                ]
-            },
+                ],
+            
             
             main => [
                 {type => 'text',

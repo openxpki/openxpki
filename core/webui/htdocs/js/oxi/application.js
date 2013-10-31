@@ -442,6 +442,7 @@ OXI.Application = Ember.Application.extend(
             url: this.serverUrl,
             dataType: "json",
             data:params,
+            cache: false,
             success: function(json, textStatus){
                 if(!json){
                     ajaxErrorAlert(app.serverUrl,textStatus,'no json returned');

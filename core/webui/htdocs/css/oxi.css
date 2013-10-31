@@ -37,6 +37,10 @@ body {
     padding-top:20px;  
 }
 
+div.section{
+    padding:0px !important;   
+}
+
 .oxi-grid-container{
    padding-bottom:40px;     
 }

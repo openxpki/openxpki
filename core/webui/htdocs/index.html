@@ -151,13 +151,17 @@
     </script>    
     
     <script type="text/x-handlebars" data-template-name="right-pane">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{view.label}}</h3>
-      </div>
+    
       <div class="panel-body">
         {{view view.ContentView}}
       </div>
      </script> 
+     <script type="text/x-handlebars" data-template-name="sections-right">
+      {{#each SectionView in view.SectionViewList}}
+      {{#if view._debugTabs }}Section {{SectionView.elementId}}{{/if}}
+      {{view SectionView}}
+      {{/each}}
+     </script>
     
     <script type="text/x-handlebars" data-template-name="sections">
       {{view view.MessageView}}
@@ -179,14 +183,14 @@
                   <div class="container sections">
                   <div class="row">
                   <!-- main pane -->
-                  <div {{bind-attr class="view.hasRightPane:col-md-10:col-md-12"}}>
+                  <div {{bind-attr class="view.hasRightPane:col-md-8:col-md-12"}}>
                   {{#each SectionView in view.SectionViewList}}
                   {{#if view._debugTabs }}Section {{SectionView.elementId}}{{/if}}
                   {{view SectionView}}
                   {{/each}}
                   </div>
                   <!-- left pane -->
-                  <div {{bind-attr class="view.hasRightPane:col-md-2:hide"}}>
+                  <div {{bind-attr class="view.hasRightPane:col-md-4:hide"}}>
                  {{view view.RightPaneView}}
                  </div>
                   
@@ -231,8 +235,8 @@
     
     <script type="text/x-handlebars" data-template-name="text-view">
       <!--Text-View-->
-      <h3>{{view.label}}</h3>
-      <div>{{{view.description}}}</div>
+      {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
+      {{#if view.description}}<div style="margin-bottom:6px;">{{view.description}}</div>{{/if}}
     </script>
     
     <script type="text/x-handlebars" data-template-name="form-view">
