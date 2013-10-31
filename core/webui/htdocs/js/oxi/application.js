@@ -66,7 +66,9 @@ OXI.Route = Ember.Route.extend({
             this.render('main-content',{outlet:'main-content'});
             App.loadPageInfoFromServer(pageKey);
         }
-    }
+    },
+    
+    _lastItem: '' //avoid trailing commas
 
 });
 
@@ -118,7 +120,7 @@ OXI.Application = Ember.Application.extend(
 
             //js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
             App.setCurrentPath( this.get('currentPath'));
-        }.observes('currentPath'),
+        }.observes('currentPath')
 
 
     }),
@@ -146,9 +148,7 @@ OXI.Application = Ember.Application.extend(
         },
 
         setupController: function(controller) {
-        },
-
-
+        }
 
     }),
 
@@ -538,5 +538,7 @@ OXI.Application = Ember.Application.extend(
         tagName: "li",
         classNames:['dropdown']
     }),
-
+    
+    
+    _lastItem: '' //avoid trailing commas
 });

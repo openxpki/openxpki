@@ -270,6 +270,6 @@ OXI.GridView = OXI.ContentBaseView.extend({
         return index;
     },
     
-    
+    _lastItem: '' //avoid trailing commas
     
 });

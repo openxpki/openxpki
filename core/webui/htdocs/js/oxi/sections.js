@@ -1,14 +1,12 @@
-
-
-
-
 OXI.TabListControler = Ember.Controller.extend({
    actions: {
             addTab: function(){
               js_debug('add tab triggered - section controler level');
               this.view.addTab('Test new');
             }
-          }, 
+          },
+          
+   _lastItem: '' //avoid trailing commas    
 });
 
 OXI.TabControler = Ember.Controller.extend({
@@ -18,6 +16,7 @@ OXI.TabControler = Ember.Controller.extend({
               this.view.closeTab();
             }
           }, 
+   _lastItem: '' //avoid trailing commas       
 });
 
 OXI.TabView = OXI.View.extend({
@@ -82,8 +81,9 @@ OXI.TabView = OXI.View.extend({
             //for some (unknown) reasons the immediate call to setActive fails here...although the DOM is ready... 
             setTimeout(function(){Tab.setActive();},100);
         }
-    }
+    },
     
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.SectionViewContainer = OXI.View.extend({
@@ -345,10 +345,13 @@ OXI.RightPaneView = OXI.View.extend({
                                    ));
         
     },
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.EmptyView = OXI.View.extend({
-    jsClassName:'OXI.EmptyView'
+    jsClassName:'OXI.EmptyView',
+    
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.MessageView = OXI.View.extend({
@@ -400,9 +403,7 @@ OXI.MessageView = OXI.View.extend({
                 .animate({"marginTop": ($(window).scrollTop() )}, "slow" );         
         });
         */   
-    }
-
-
+    },
     
-
+    _lastItem: '' //avoid trailing commas
 });

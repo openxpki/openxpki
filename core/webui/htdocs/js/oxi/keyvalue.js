@@ -22,7 +22,8 @@ OXI.KeyValueView = OXI.ContentBaseView.extend({
             }
             this.data[i] = OXI.KeyValueItem.create( item ); 
         }
-    }
+    },
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.KeyValueItem = Ember.Object.extend({
@@ -41,7 +42,7 @@ OXI.KeyValueItem = Ember.Object.extend({
         }else{
             return this.value;   
         }
-    }.property('value','format')
+    }.property('value','format'),
     
-
+    _lastItem: '' //avoid trailing commas
 });

@@ -59,7 +59,9 @@ OXI.View = Ember.View.extend({
         //this.debug('DOM is ready!'+this.get('elementId')); 
         this.set('_domReady',true);
         
-    }
+    },
+    
+     _lastItem: '' //avoid trailing commas
 });
 
 OXI.ContentBaseView = OXI.View.extend(
@@ -122,7 +124,10 @@ OXI.ContentBaseView = OXI.View.extend(
     },
     _getButton: function(button_def){
         return OXI.PageButton.create(button_def);   
-    }
+    },
+    
+    
+     _lastItem: '' //avoid trailing commas
 });
 
 OXI.PageButton = OXI.View.extend({
@@ -176,8 +181,9 @@ OXI.PageButton = OXI.View.extend({
         }
         
         
-    }
-
+    },
+    
+     _lastItem: '' //avoid trailing commas
 });
 
 
@@ -220,4 +226,6 @@ OXI.ModalView = OXI.View.extend({
                                    ));
         
     },
+    
+     _lastItem: '' //avoid trailing commas
 });
