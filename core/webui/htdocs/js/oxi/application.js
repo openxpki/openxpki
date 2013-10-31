@@ -318,7 +318,7 @@ OXI.Application = Ember.Application.extend(
             TargetView.initSections(json);
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
         }
-
+        
         if(json.reloadTree){
             var timeout = (json.status)?1000:0;
             window.setTimeout(function(){App.reloadPage(json.goto);},timeout);
@@ -328,6 +328,7 @@ OXI.Application = Ember.Application.extend(
             var timeout = (json.status)?1000:0;
             window.setTimeout(function(){App.goto(json.goto);},timeout);
         }
+        js_debug('render page finished');
     },
 
     getTargetView: function(target,page,SourceView){
@@ -403,10 +404,19 @@ OXI.Application = Ember.Application.extend(
     goto: function(target){
         js_debug('goto '+target);
         try{
-            target = target.replace(/\./g,'/');
+           target = target.replace(/\./g,'/');
+            var new_route = target;
             if(target.indexOf('/')!=0){
                 target = '/'+target;
+            }else{
+                new_route = new_route.substr(1);   
             }
+            
+            
+            App.Router.map(function() {
+                Ember.debug('App.Router.map '+new_route);
+                this.route(new_route);
+            });
             location.hash=target;
         }catch(e){
             js_debug('exception while goto...'+e);

@@ -261,14 +261,16 @@ OXI.SectionViewContainer = OXI.View.extend({
                 });
             }
         }
+        //this.debug('initSections finished');
     },
 
 
     addSectionView:function(params){
-        //Ember.debug('SectionViewContainer:addSectionView');
+        //js_debug('SectionViewContainer:addSectionView');
+        //js_debug(params);
         params.SectionContainer = this;
         var SectionView = this.createChildView(OXI.SectionView.create(params));
-
+        js_debug('section created');
         if(!this.SectionViewList){
             //this.SectionViewList= [];
             this.set('SectionViewList',[]);
@@ -338,8 +340,6 @@ OXI.RightPaneView = OXI.View.extend({
     
     init:function(){
         this._super();
-        
-        //this.set('controller',OXI.ModalControler.create({view:this}));
         this.set('ContentView', this.createChildView(
                                     OXI.SectionViewContainer.create({displayType:'right'})
                                    ));

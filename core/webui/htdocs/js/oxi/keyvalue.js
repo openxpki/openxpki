@@ -14,6 +14,9 @@ OXI.KeyValueView = OXI.ContentBaseView.extend({
         var i;
         for(i=0;i<this.content.data.length;i++){
             var item = this.content.data[i];
+            if(!item){
+                next;
+            }
             if(typeof(item.value) == 'object'){
                 item.value.source = this;   
             }
@@ -34,7 +37,7 @@ OXI.KeyValueItem = Ember.Object.extend({
     
     formatedVal: function(){
         if(this.format){
-            return OXI.FormatHelperFactory.getHelper(this.format).format(this.value);   
+            return OXI.FormatHelperFactory.getHelper(this.format).format(this.value);  
         }else{
             return this.value;   
         }
