@@ -20,6 +20,9 @@ OXI.ComponentFactory = Ember.Object.extend({
             App.applicationAlert('OXI.ComponentFactory: container-class '+classname+' for type '+type+' not defined in OXI namespace');
             return;
         }
+        if(!params){
+            params = {};
+        }
         return OXI[classname].create(params);
     },
 
