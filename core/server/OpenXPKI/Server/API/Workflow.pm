@@ -356,11 +356,14 @@ sub get_workflow_ui_info {
             $wf_id
         );
         
-        $result = __get_workflow_info( $workflow );        
+        $result = __get_workflow_info( $workflow );       
+        ##! 32: 'Workflow result ' . Dumper $result   
         if ($args->{ACTIVITY}) {
             @activities = ( $args->{ACTIVITY} );
         } else {
-            @activities = keys %{$result->{ACTIVITY}};    
+            # Note - the ACTIVITY Hash in the result of __get_workflow_info
+            # contains only activities that have fields! 
+            @activities = $workflow->get_current_actions();    
         }
         $wf_state = $workflow->state();
     }
