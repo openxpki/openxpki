@@ -106,9 +106,14 @@ sub init_crl {
         processing_type => 'all',
         content => {
             actions => [{   
-                path => 'certificate!detail!identifier!{identifier}',                
+                label => 'download as Text',
+                path => 'crl!download!serial!{serial}',                
+                target => 'modal',
+            },{   
+                label => 'view details in browser',
+                path => 'crl!detail!serial!{serial}',                
                 target => 'tab',
-            }],            
+            }],
             columns => [                        
                 { sTitle => "serial" },
                 { sTitle => "issuer" },
@@ -135,4 +140,5 @@ sub init_policy {
       
     
 }
+
 1;

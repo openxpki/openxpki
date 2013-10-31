@@ -603,7 +603,7 @@ sub __render_from_workflow {
                 $item->{value} = $context->{$name};
             }
             
-            if ($field->{required}) {
+            if (!$field->{required}) {
                 $item->{is_optional} = 1;
             }
             
@@ -643,10 +643,11 @@ sub __render_from_workflow {
         
         my @fields;
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
-        foreach my $key (keys %{$context}) {
-            next if ($key =~ m{ \A workflow_id }x);
+        foreach my $key (keys %{$context}) {                       
             next if ($key =~ m{ \A wf_ }x);
             next if ($key =~ m{ \A _ }x);
+            next if ($key =~ m{ \A workflow_id }x);
+            next if ($key =~ m{ \A sources }x);
             # todo - i18n labels            
             push @fields, { label => $key, value => $context->{$key} };
         }
@@ -674,7 +675,7 @@ sub __render_from_workflow {
         
     }
         
-    unshift @{$self->_result()->{main}}, {   
+    $self->_result()->{right} = [{   
         type => 'keyvalue',
         content => {
             label => '',
@@ -684,7 +685,7 @@ sub __render_from_workflow {
                 { label => 'Workflow State', value => $wf_info->{WORKFLOW}->{STATE} },
                 { label => 'Run State', value => $wf_info->{WORKFLOW}->{PROC_STATE} },                
             ],
-    }} if ($wf_info->{WORKFLOW}->{ID} );           
+    }}] if ($wf_info->{WORKFLOW}->{ID} );           
     
     return $self;
     

@@ -7,6 +7,8 @@ package OpenXPKI::Client::UI::Certificate;
 use Moose; 
 use Data::Dumper;
 use OpenXPKI::DN;
+use OpenXPKI::i18n qw( i18nGettext );
+
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -97,10 +99,10 @@ sub init_detail {
     my @fields = (
         { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
         { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
-        { label => 'Issuer', value => {label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER} }, format=>'link' },
+        { label => 'Issuer',  format=>'link', value => { label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER} } },
         { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
-        { label => 'Status', value => $cert->{STATUS}, format => 'certstatus' },
+        { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
     );                     
     
     my @buttons = {
@@ -182,6 +184,86 @@ sub init_workflows {
     return $self;
     
          
+}
+
+
+
+sub init_download {
+
+    
+    my $self = shift;
+    my $args = shift;
+    
+    my $cert_identifier = $self->param('identifier');    
+    my $format = $self->param('format');
+    
+    # No format, draw a list 
+    if (!$format) {
+        
+        my $pattern = "<li><a href=\"/cgi-bin/connect.cgi?page=certificate!download!identifier!$cert_identifier!format!%s\">%s</a></li>";
+        
+        $self->add_section({
+            type => 'text',
+            content => {
+                label => '',
+                description => '<ul>'.
+                sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
+                sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
+                sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
+                sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+                '</ul>',                
+        }});           
+        
+    } elsif ($format eq 'pkcs7') {      
+        
+        my $pkcs7  = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, BUNDLE => 1 });
+        
+        my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
+        my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
+            
+        print $self->cgi()->header( -type => 'application/pkcs7-mime', -expires => "1m", -attachment => "$filename.p7c" );
+        print $pkcs7; 
+        exit;
+                
+    } else {
+        
+        my $cert = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => uc($format) });
+        
+        my $content_type = 'application/octet-string';
+        my $filename = '';
+        my $ext = '';
+        
+        if ($format eq 'txt') {
+            $content_type = 'text/plain';
+        } else {
+            my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
+            
+            $self->logger()->debug("cert_info : " . Dumper $cert_info  );
+    
+            $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
+            if ($format eq 'pem') {
+                $filename .= '.pem';
+            } elsif ($format eq 'der') {
+                $filename .= '.crt';                
+            }
+            
+            if ($format eq 'pem' || $format eq 'der') {
+                # need special content type on ca certs                
+                if ($cert_info->{ISSUER_IDENTIFIER} eq $cert_info->{IDENTIFIER}) {
+                    $content_type = 'application/x-x509-ca-cert';
+                } else {
+                    $content_type = 'application/x-x509-user-cert'; 
+                }                       
+            }
+        }
+        
+        print $self->cgi()->header( -type => $content_type, -expires => "1m", -attachment => $filename );
+        print $cert; 
+        exit;
+        
+    }
+    
+    return $self;
 }
 
 
@@ -274,8 +356,9 @@ sub action_search {
             header => 'Grid-Headline',
             actions => [{   
                 path => 'certificate!download!identifier!{identifier}',
-                label => 'Download as PEM',
-                icon => 'download'
+                label => 'Download',
+                icon => 'download',
+                target => 'modal'
             },{   
                 path => 'certificate!detail!identifier!{identifier}',
                 label => 'Detailed Information',

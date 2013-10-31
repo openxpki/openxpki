@@ -63,7 +63,7 @@ sub init_manage {
     my $secret = $self->param('id');
     my $status = $self->send_command("is_secret_complete", {SECRET => $secret}) || 0;
     
-    if (0 && $status) {
+    if ($status) {
         $self->_page ({label => 'Clear secret'});
         $self->add_section({
             type => 'text',        
