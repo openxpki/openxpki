@@ -21,6 +21,10 @@ body {
   background-color: #f5f5f5;
 }
 
+.oxi-message{
+
+}
+
 .navbar{
    margin-bottom:10px;  
 }
@@ -31,6 +35,10 @@ body {
 
 .container.sections{
     padding-top:20px;  
+}
+
+div.section{
+    padding:0px !important;   
 }
 
 .oxi-grid-container{

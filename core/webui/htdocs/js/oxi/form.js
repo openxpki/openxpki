@@ -4,7 +4,7 @@ defines classes for Forms
 
 
 
-
+"use strict";
 
 OXI.FormView = OXI.ContentBaseView.extend({
 
@@ -267,7 +267,9 @@ OXI.FormFieldContainer = OXI.View.extend({
     },
     getValue:function(){
         return this.FieldView.value;
-    }
+    },
+    
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
@@ -282,7 +284,7 @@ OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
         }
     },
     
-
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
@@ -299,7 +301,9 @@ OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
 
     getValue:function(){
         return (this.FieldView.isChecked())?1:0;
-    }
+    },
+    
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
@@ -309,8 +313,9 @@ OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
         this._super();
         this.setFieldView(OXI.TextArea.create(this.fieldDef));
-    }
-
+    },
+    
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.PulldownContainer = OXI.FormFieldContainer.extend({
@@ -362,7 +367,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
         }
     },
     
-    
+    _lastItem: '' //avoid trailing commas
 
 });
 
@@ -373,7 +378,8 @@ OXI.Checkbox = Ember.Checkbox.extend(
         var checkbox = this.$();
         //we ask the DOM-element itself, not its jquery wrapper
         return checkbox[0].checked;
-    }
+    },
+    _lastItem: '' //avoid trailing commas
 }
 );
 
@@ -392,7 +398,7 @@ OXI.Select = Ember.Select.extend(
             this.prompt = ' ';//display white option   
         }
     },
-
+    _lastItem: '' //avoid trailing commas
 
 });
 
@@ -408,5 +414,6 @@ OXI.TextField = Ember.TextField.extend(
     toggle:function(bShow){
          this.set('isVisible', bShow);  
     },
+    _lastItem: '' //avoid trailing commas
 }
 );

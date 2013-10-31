@@ -2,7 +2,7 @@
 defines the OXI Application classs
 */
 
-
+"use strict";
 
 OXI.Route = Ember.Route.extend({
 
@@ -60,13 +60,15 @@ OXI.Route = Ember.Route.extend({
             if(!pageKey || pageKey == 'index' ){//this is the case when called without hashtagin URI
                 pageKey ='home';
             }
-            App.set('MainView',OXI.SectionViewContainer.create());
-            App.set('ModalView',OXI.ModalView.create());
+            
+            
             
             this.render('main-content',{outlet:'main-content'});
             App.loadPageInfoFromServer(pageKey);
         }
-    }
+    },
+    
+    _lastItem: '' //avoid trailing commas
 
 });
 
@@ -116,9 +118,9 @@ OXI.Application = Ember.Application.extend(
     ApplicationController : Ember.Controller.extend({
         updateCurrentPath: function() {
 
-            js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
+            //js_debug('ApplicationController:updateCurrentPath '+this.get('currentPath'));
             App.setCurrentPath( this.get('currentPath'));
-        }.observes('currentPath'),
+        }.observes('currentPath')
 
 
     }),
@@ -129,12 +131,12 @@ OXI.Application = Ember.Application.extend(
         subActionKey:null,
 
         beforeModel: function(transition) {
-            Ember.debug('BadUrlRoute '+location.hash+' check transition');
+            //Ember.debug('BadUrlRoute '+location.hash+' check transition');
             this.set('originalTarget',location.hash.substr(1));
 
             if(!App.user_logged_in){
                 App.set('original_target',this.originalTarget);
-                js_debug('original_target stored: ' + this.originalTarget);
+                //js_debug('original_target stored: ' + this.originalTarget);
                 this.transitionTo('login');
             }else{
                 if(this.originalTarget .indexOf('/') == 0){
@@ -146,9 +148,7 @@ OXI.Application = Ember.Application.extend(
         },
 
         setupController: function(controller) {
-        },
-
-
+        }
 
     }),
 
@@ -170,7 +170,6 @@ OXI.Application = Ember.Application.extend(
 
     Router: Ember.Router.extend({
 
-
         didTransition: function(infos){
             this._super(infos);
             var path = Ember.Router._routePath(infos);
@@ -184,7 +183,10 @@ OXI.Application = Ember.Application.extend(
 
         }
     }),
-
+    
+    
+    
+    
     ready: function() {
         Ember.debug('Application ready');
     },
@@ -195,6 +197,9 @@ OXI.Application = Ember.Application.extend(
         this.serverUrl = OXI.Config.get('serverUrl');
         this.cookieName = OXI.Config.get('cookieName');
         this._actualPageRenderCount = 0;
+        
+        
+        
 
     },
 
@@ -253,8 +258,11 @@ OXI.Application = Ember.Application.extend(
         js_debug('App.loadPageInfoFromServer: '+pageKey);
         this.set('_actualPageRenderCount',0);
         this.set('_actualPageKey',pageKey);
-        //reset tabs:
-        this.MainView.closeTabs();        
+        
+        this.set('MainView',OXI.SectionViewContainer.create());
+        this.set('ModalView',OXI.ModalView.create());
+        
+         
         
         this.showLoader();
         this.callServer({page:pageKey,target:'main'})
@@ -271,19 +279,19 @@ OXI.Application = Ember.Application.extend(
     },
 
     showLoader: function(){
-        js_debug('show loader');
+        //js_debug('show loader');
         $('#ajaxLoadingModal').modal({backdrop:'static'});
     },
 
     hideLoader: function(){
-        js_debug('hide loader');
+        //js_debug('hide loader');
         $('#ajaxLoadingModal').modal('hide');
     },
 
 
     renderPage: function(json, target,SourceView){
         //js_debug({'App.renderPage':json},3);
-        js_debug('App.renderPage in target '+target);
+        
         
         //target can given via action AND also be set in the returned json (page.target)
         //the later overwrites the first
@@ -291,24 +299,29 @@ OXI.Application = Ember.Application.extend(
             target =  json.page.target;  
         }
         if(!target)target='main';
-        TargetView = this.getTargetView(target,json.page,SourceView);
+        
+        js_debug('App.renderPage in target '+target);
+        //js_debug('MainView: '+this.MainView);
+        
+        var TargetView = this.getTargetView(target,json.page,SourceView);
         
         if(TargetView == this.MainView){
-            js_debug('close modal...');
+            //js_debug('close modal...');
             this.ModalView.close();
             this.MainView.closeTabs();
+            
         }
         this.hideLoader();
         
         //Status messages will be displayed in main view - except for modals:
-        StatusView = (target=='modal' || target=='self')?TargetView:this.MainView;
+        var StatusView = (target=='modal' || target=='self')?TargetView:this.MainView;
         StatusView.setStatus(json.status); 
 
         if(json.page){
             TargetView.initSections(json);
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
         }
-
+        
         if(json.reloadTree){
             var timeout = (json.status)?1000:0;
             window.setTimeout(function(){App.reloadPage(json.goto);},timeout);
@@ -318,6 +331,7 @@ OXI.Application = Ember.Application.extend(
             var timeout = (json.status)?1000:0;
             window.setTimeout(function(){App.goto(json.goto);},timeout);
         }
+        js_debug('render page finished');
     },
 
     getTargetView: function(target,page,SourceView){
@@ -391,13 +405,24 @@ OXI.Application = Ember.Application.extend(
     },
 
     goto: function(target){
+        js_debug('goto '+target);
         try{
-            target = target.replace(/\./g,'/');
+           target = target.replace(/\./g,'/');
+            var new_route = target;
             if(target.indexOf('/')!=0){
                 target = '/'+target;
+            }else{
+                new_route = new_route.substr(1);   
             }
+            
+            
+            App.Router.map(function() {
+                Ember.debug('App.Router.map '+new_route);
+                this.route(new_route);
+            });
             location.hash=target;
         }catch(e){
+            js_debug('exception while goto...'+e);
         }
     },
 
@@ -417,6 +442,7 @@ OXI.Application = Ember.Application.extend(
             url: this.serverUrl,
             dataType: "json",
             data:params,
+            cache: false,
             success: function(json, textStatus){
                 if(!json){
                     ajaxErrorAlert(app.serverUrl,textStatus,'no json returned');
@@ -435,7 +461,7 @@ OXI.Application = Ember.Application.extend(
     },
 
     setCurrentPath:function(currentPath){
-        js_debug('updateCurrentPath: '+ currentPath );
+        //js_debug('updateCurrentPath: '+ currentPath );
         this.set('_actualPageRenderCount',0);
         this.set('currentPath',currentPath);
         var currentRootPath = currentPath.split('.')[0];
@@ -516,5 +542,7 @@ OXI.Application = Ember.Application.extend(
         tagName: "li",
         classNames:['dropdown']
     }),
-
+    
+    
+    _lastItem: '' //avoid trailing commas
 });

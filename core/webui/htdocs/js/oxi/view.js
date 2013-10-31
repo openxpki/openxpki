@@ -1,6 +1,7 @@
 ﻿/**
 Base Class for all Views in OXI namespace
 */
+"use strict";
 
 OXI.View = Ember.View.extend({
     jsClassName:'OXI.View: you must define jsClassName in your subclass!',
@@ -59,7 +60,9 @@ OXI.View = Ember.View.extend({
         //this.debug('DOM is ready!'+this.get('elementId')); 
         this.set('_domReady',true);
         
-    }
+    },
+    
+     _lastItem: '' //avoid trailing commas
 });
 
 OXI.ContentBaseView = OXI.View.extend(
@@ -122,7 +125,10 @@ OXI.ContentBaseView = OXI.View.extend(
     },
     _getButton: function(button_def){
         return OXI.PageButton.create(button_def);   
-    }
+    },
+    
+    
+     _lastItem: '' //avoid trailing commas
 });
 
 OXI.PageButton = OXI.View.extend({
@@ -176,9 +182,12 @@ OXI.PageButton = OXI.View.extend({
         }
         
         
-    }
-
+    },
+    
+     _lastItem: '' //avoid trailing commas
 });
+
+
 
 OXI.ModalView = OXI.View.extend({
 
@@ -189,13 +198,17 @@ OXI.ModalView = OXI.View.extend({
     
     show: function(label){
         this.set('label',label);
-        js_debug('show modal');
-        this.$().modal('show');
+        //js_debug('show modal');
+        try{
+            this.$().modal('show');
+        }catch(e){
+            js_debug('exception while closing modal...' + e);
+        }
     },
     
     close: function(){
         this.set('label','');
-        js_debug('hide modal');
+        //js_debug('hide modal');
         try{
             this.$().modal('hide');
         }catch(e){
@@ -214,4 +227,6 @@ OXI.ModalView = OXI.View.extend({
                                    ));
         
     },
+    
+     _lastItem: '' //avoid trailing commas
 });
