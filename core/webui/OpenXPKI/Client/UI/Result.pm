@@ -4,6 +4,7 @@
 
 package OpenXPKI::Client::UI::Result;
 
+use Digest::SHA1 qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
 
@@ -180,5 +181,99 @@ sub render {
     
     return $result;
 }
+
+=head2 __register_wf_token( wf_info, token ) 
+
+Generates a new random id and stores the passed workflow info, expects
+a wf_info and the token info to store as parameter, returns a hashref
+with the definiton of a hidden field which can be directly
+pushed onto the field list.
+
+=cut
+
+sub __register_wf_token {
+    
+    my $self = shift;
+    my $wf_info = shift;
+    my $token = shift;
+
+    $token->{wf_id} = $wf_info->{WORKFLOW}->{ID};
+    $token->{wf_type} = $wf_info->{WORKFLOW}->{TYPE};
+    $token->{wf_last_update} = $wf_info->{WORKFLOW}->{LAST_UPDATE};
+
+    # poor mans random id  
+    my $id = sha1_base64(time.$token.rand().$$);  
+    $id = 'wfl_12345';      
+    $self->logger()->debug('wf token id ' . $id);        
+    $self->_client->session()->param($id, $token);
+    return { name => 'wf_token', type => 'hidden', value => $id };            
+}
+
+
+=head2 __register_wf_token_initial ( wf_type, token ) 
+
+Create a token to init a new workflow, expects the name of the workflow
+as string and an optional hash to pass as initial parameters to the
+create method. Returns the full action target as string.  
+
+=cut
+
+sub __register_wf_token_initial {
+    
+    my $self = shift;
+    my $wf_info = shift;
+    my $wf_param = shift || {};
+ 
+    my $token = {
+        wf_type => $wf_info,
+        wf_param => $wf_param
+    };
+
+    # poor mans random id  
+    my $id = sha1_base64(time.$token.rand().$$);  
+    $self->logger()->debug('wf token id ' . $id);        
+    $self->_client->session()->param($id, $token);
+    return  "workflow!index!wf_token!$id";            
+}
+
+    
+    
+=head2 __fetch_wf_token( wf_token, purge )
+
+Return the hashref stored by __register_wf_token for the given
+token id. If purge is set to a true value, the info is purged
+from the session context.
+
+=cut
+sub __fetch_wf_token {
+    
+    my $self = shift;
+    my $id = shift;
+    my $purge = shift || 0;
+
+    $self->logger()->debug( "load wf_token " . $id );
+        
+    my $token = $self->_client->session()->param($id);
+    $self->_client->session()->clear($id) if($purge);
+    return $token;
+    
+}
+
+=head2 __purge_wf_token( wf_token )
+
+Purge the token info from the session.
+ 
+=cut 
+sub __purge_wf_token {
+    
+    my $self = shift;    
+    my $id = shift;
+    
+    $self->logger()->debug( "purge wf_token " . $id );
+    $self->_client->session()->clear($id);
+    
+    return $self;
+    
+}    
 
 1;

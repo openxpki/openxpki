@@ -97,28 +97,24 @@ sub init_detail {
     my @fields = (
         { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
         { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
-        { label => 'Issuer', value => {label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER}, target => 'modal' }, format=>'link' },
+        { label => 'Issuer', value => {label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER} }, format=>'link' },
         { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
         { label => 'Status', value => $cert->{STATUS}, format => 'certstatus' },
     );                     
     
-    
-    
-   
     my @buttons = {
-        action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA!cert_identifier!$cert_identifier", 
-        label  => 'metadata',
-        target => 'main'
+        action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', { cert_identifier => $cert_identifier }),         
+        label  => 'metadata',        
     };
     
     push @buttons, {
-        action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST!cert_identifier!$cert_identifier", 
+        action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST', { cert_identifier => $cert_identifier }),                 
         label  => 'revoke'
     } if ($cert->{STATUS} eq 'ISSUED');
                          
     push @buttons, {
-        action => "workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST!org_cert_identifier!$cert_identifier", 
+        action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST', { org_cert_identifier => $cert_identifier }),                         
         label  => 'renew'
     } if ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED');
                 

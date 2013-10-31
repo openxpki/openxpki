@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Workflow;
 
 use Moose; 
 use Data::Dumper;
-use Digest::SHA1 qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
@@ -54,12 +53,16 @@ sub init_index {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
         return $self;
     }
+   
+    $self->__render_from_workflow({ WF_INFO => $wf_info });
+    return $self;
+   
         
     $self->_page({
         label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
         description => i18nGettext($wf_info->{WORKFLOW}->{DESCRIPTION}),
     });
-    
+   
     $self->_result()->{main} = [{   
         type => 'form',
         action => 'workflow',
@@ -222,51 +225,66 @@ sub action_index {
 
     my $wf_info; 
     # wf_token found, so its a real action
-    if ($wf_token) {
+    if (!$wf_token) {
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!'),'error');
+        return $self;        
+    }
+
+    my $wf_args = $self->__fetch_wf_token( $wf_token );
+        
+    $self->logger()->debug( "wf args: " . Dumper $wf_args);
     
-        my $wf_args = $self->__fetch_wf_token( $wf_token );
-            
-        $self->logger()->debug( "wf args: " . Dumper $wf_args);
-        
-        # check for delegation
-        if ($wf_args->{wf_handler}) {
-            return $self->__delegate_call($wf_args->{wf_handler}, $args);
+    # check for delegation
+    if ($wf_args->{wf_handler}) {
+        return $self->__delegate_call($wf_args->{wf_handler}, $args);
+    }
+    
+    
+    my %wf_param;
+    
+    # take over params from token, if any
+    %wf_param = %{$wf_args->{wf_param}} if($wf_args->{wf_param});
+    
+    # Get the list of accepted fields and try to fetch the data from cgi
+    
+    my @fields;
+    # can be empty when external renderers are used with params
+    @fields = @{$wf_args->{wf_fields}} if ($wf_args->{wf_fields});
+    foreach my $field (@fields) {
+        my $name = $field->{name};            
+        # strip internal fields (start with wf_)
+        next if ($name =~ m{ \A wf_ }xms);            
+        # TODO - validation
+        my $val = $self->param($name);
+        # autodetection of array and hashes
+        if ($name =~ m{ \A (\w+)\[\] }xms) {
+            push @{$wf_param{$1}}, $val; 
+        } elsif ($name =~ m{ \A (\w+){(\w+)} }xms) {
+            $wf_param{$1}->{$2} = $val;
+        } else {          
+            $wf_param{$name} = $val;
         }
-        
+    }
+    
+    # purge the workflow token
+    $self->__purge_wf_token( $wf_token );
+    
+    # Apply serialization        
+    foreach my $key (keys %wf_param) {            
+        $wf_param{$key} = $self->serializer()->serialize($wf_param{$key}) if (ref $wf_param{$key});                        
+    }
+
+    $self->logger()->debug( "wf params: " . Dumper %wf_param );
+    
+    if ($wf_args->{wf_id}) {              
+           
         if (!$wf_args->{wf_action}) {           
             $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
             return $self;
         }
-        
-        my %wf_param;
-        # Get the list of accepted fields and try to fetch the data from cgi
-        my @fields = @{$wf_args->{wf_fields}};
-        foreach my $field (@fields) {
-            my $name = $field->{name};            
-            # strip internal fields (start with wf_)
-            next if ($name =~ m{ \A wf_ }xms);            
-            # TODO - validation
-            my $val = $self->param($name);
-            # autodetection of array and hashes
-            if ($name =~ m{ \A (\w+)\[\] }xms) {
-                push @{$wf_param{$1}}, $val; 
-            } elsif ($name =~ m{ \A (\w+){(\w+)} }xms) {
-                $wf_param{$1}->{$2} = $val;
-            } else {          
-                $wf_param{$name} = $val;
-            }
-        }
-        
-        # purge the workflow token
-        $self->__purge_wf_token( $wf_token );
-        
-        # Apply serialization        
-        foreach my $key (keys %wf_param) {            
-            $wf_param{$key} = $self->serializer()->serialize($wf_param{$key}) if (ref $wf_param{$key});                        
-        }
-
-        $self->logger()->debug( "wf params: " . Dumper %wf_param );
-           
+    
+        $self->logger()->info(sprintf "Run %s on workflow #%01d", $wf_args->{wf_action}, $wf_args->{wf_id} );
+               
         # send input data to workflow                
         $wf_info = $self->send_command( 'execute_workflow_activity', {
             WORKFLOW => $wf_args->{wf_type}, 
@@ -274,19 +292,22 @@ sub action_index {
             ACTIVITY => $wf_args->{wf_action},
             PARAMS   => \%wf_param,
         }); 
-        
+    
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED'),'success');
         
-        
-    # no token, might be an initial request
-    } elsif(my $wf_type = $self->param('wf_type')) {
-                
+    } elsif($wf_args->{wf_type}) {
+                                
         $wf_info = $self->send_command( 'create_workflow_instance', {
-            WORKFLOW => $wf_type, 
-        }); 
-    }   
+            WORKFLOW => $wf_args->{wf_type}, PARAMS   => \%wf_param                
+        });
+        $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{WORKFLOW}->{ID} );
+         
+    } else {
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
+        return $self;       
+    }
     
-    # TODO - we need to fetch the ui info until we change the api 
+    # TODO - we need to refetch the ui info until we change the api 
     $wf_info = $self->send_command( 'get_workflow_ui_info', {
         ID => $wf_info->{WORKFLOW}->{ID},
         WORKFLOW => $wf_info->{WORKFLOW}->{TYPE} 
@@ -559,32 +580,30 @@ sub __render_from_workflow {
      
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
         my @fields;
-        foreach my $field (keys %{$wf_action_info->{FIELD}}) {
+        foreach my $field (@{$wf_action_info->{FIELD}}) {
             
-            next if ($field =~ m{ \A workflow_id }x);
-            next if ($field =~ m{ \A wf_ }x);
-            next if ($field =~ m{ \A _ }x);     
+            my $name = $field->{name};
+            next if ($name =~ m{ \A workflow_id }x);
+            next if ($name =~ m{ \A wf_ }x);
+            next if ($name =~ m{ \A _ }x);     
             
-            my $type = $wf_action_info->{FIELD}->{$field}->{TYPE} || 'text';
-            
-            # special handling of workflows internal default type
-            $type = 'text' if ($type eq 'basic');
+            my $type = $field->{type} || 'text';
             
             # TODO - map field types, required, etc            
             
             my $item = {
-                name => $field, 
-                label => i18nGettext($field), 
+                name => $name, 
+                label => i18nGettext($name), 
                 type => $type
             };
-            if ($do_prefill && defined $self->param($field)) {
+            if ($do_prefill && defined $self->param($name)) {
                 # TODO - XSS Checks / Escaping / Validation!
-                $item->{value} = $self->param($field);
-            } elsif (defined $context->{$field}) {
-                $item->{value} = $context->{$field};
+                $item->{value} = $self->param($name);
+            } elsif (defined $context->{$name}) {
+                $item->{value} = $context->{$name};
             }
             
-            if ($wf_action_info->{FIELD}->{$field}->{REQUIRED} ne 'yes') {
+            if ($field->{required}) {
                 $item->{is_optional} = 1;
             }
             
@@ -665,7 +684,7 @@ sub __render_from_workflow {
                 { label => 'Workflow State', value => $wf_info->{WORKFLOW}->{STATE} },
                 { label => 'Run State', value => $wf_info->{WORKFLOW}->{PROC_STATE} },                
             ],
-    }};           
+    }} if ($wf_info->{WORKFLOW}->{ID} );           
     
     return $self;
     
@@ -715,71 +734,7 @@ sub __delegate_call {
     return $class->$method( $self, $args );
     
 }
-
-=head2 __register_wf_token( wf_info, token ) 
-
-Generates a new random id and stores the passed workflow info, expects
-a wf_info hash and the token info to store as parameter, returns a hashref
-with the definiton of a hidden field which can be directly
-pushed onto the field list.
-
-=cut
-sub __register_wf_token {
-    
-    my $self = shift;
-    my $wf_info = shift;
-    my $token = shift;
-
-    $token->{wf_id} = $wf_info->{WORKFLOW}->{ID};
-    $token->{wf_type} = $wf_info->{WORKFLOW}->{TYPE};
-    $token->{wf_last_update} = $wf_info->{WORKFLOW}->{LAST_UPDATE};
-
-    # poor mans random id  
-    my $id = sha1_base64(time.$token.rand().$$);  
-    $id = 'wfl_12345';      
-    $self->logger()->debug('wf token id ' . $id);        
-    $self->_client->session()->param($id, $token);
-    return { name => 'wf_token', type => 'hidden', value => $id };            
-}
-    
-=head2 __fetch_wf_token( wf_token, purge )
-
-Return the hashref stored by __register_wf_token for the given
-token id. If purge is set to a true value, the info is purged
-from the session context.
-
-=cut
-sub __fetch_wf_token {
-    
-    my $self = shift;
-    my $id = shift;
-    my $purge = shift || 0;
-
-    $self->logger()->debug( "load wf_token " . $id );
-        
-    my $token = $self->_client->session()->param($id);
-    $self->_client->session()->clear($id) if($purge);
-    return $token;
-    
-}
-
-=head2 __purge_wf_token( wf_token )
-
-Purge the token info from the session.
  
-=cut 
-sub __purge_wf_token {
-    
-    my $self = shift;    
-    my $id = shift;
-    
-    $self->logger()->debug( "purge wf_token " . $id );
-    $self->_client->session()->clear($id);
-    
-    return $self;
-    
-}    
-
 =head1 example workflow config
 
 =head2 State with default rendering
