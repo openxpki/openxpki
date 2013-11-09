@@ -535,8 +535,8 @@ sub create_workflow_instance {
     my $wf_id = $workflow->id();    
     my $context = $workflow->context();
     my $creator = CTX('session')->get_user();
-    $context->param( 'creator'  => $creator );
-    
+    $context->param( 'creator'  => $creator );    
+    $context->param( 'creator_role'  => CTX('session')->get_role() );
     
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->log(
@@ -575,7 +575,7 @@ sub create_workflow_instance {
     # doh - somebody deleted the creator from the context
     if (!$context->param( 'creator' )) {
         $context->param( 'creator' => $creator );        
-    }     
+    }
     $workflow->attrib({ creator => $context->param( 'creator' ) });
             
     return __get_workflow_info($workflow);
