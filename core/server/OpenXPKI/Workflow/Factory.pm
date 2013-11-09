@@ -119,14 +119,29 @@ sub get_activity_info {
     
     my @fields;
     foreach my $field (@{$info->{field}}) {        
-        ##! 64: 'Field info ' . Dumper $field
+        ##! 64: 'Field info ' . Dumper $field        
         
-        push @fields, {
+        my $item = {
             name => $field->{name},
             label => $field->{label} || $field->{name},
             type => $field->{type} || 'text',
-            required => ($field->{is_required} && $field->{is_required} eq 'yes') || 0,                        
-        }        
+            
+            required => ($field->{is_required} && $field->{is_required} eq 'yes') || 0,
+        };
+        
+        # check for the source_list and source_class attributes        
+        if ($field->{source_class} || $field->{source_list}) {
+            # Create Field object to use enumeration code
+            my $fo = Workflow::Action::InputField->new($field);
+            my @options = $fo->get_possible_values();
+            $item->{options} = \@options;
+        }
+
+        if (defined $field->{default}) {
+            $item->{default} = $field->{default};    
+        }
+        
+        push @fields, $item;        
     }
 
     $result->{FIELD} = \@fields if (scalar @fields);
