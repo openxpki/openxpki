@@ -46,7 +46,9 @@ OXI.FormFieldFactory = OXI.ComponentFactory.create({
         password:   'TextFieldContainer',
         textarea:   'TextAreaContainer',
         select :    'PulldownContainer',
-        checkbox:   'CheckboxContainer'
+        checkbox:   'CheckboxContainer',
+    	date :      'TextFieldContainer',
+    	bool :      'TextFieldContainer'    	
     }
 
 });
