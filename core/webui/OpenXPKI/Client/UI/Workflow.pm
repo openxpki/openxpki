@@ -146,7 +146,7 @@ sub init_search {
                 title => 'Get workflow info by known workflow id',
                 submit_label => 'search now',
                 fields => [                    
-                    { name => 'wf_id', label => 'Workflow Id', type => 'text', is_optional => 1 },                                       
+                    { name => 'wf_id', label => 'Workflow Id', type => 'text' },                                       
                 ]
         }},      
         {   type => 'form',
@@ -265,10 +265,7 @@ sub action_index {
             $wf_param{$name} = $val;
         }
     }
-    
-    # purge the workflow token
-    $self->__purge_wf_token( $wf_token );
-    
+        
     # Apply serialization        
     foreach my $key (keys %wf_param) {            
         $wf_param{$key} = $self->serializer()->serialize($wf_param{$key}) if (ref $wf_param{$key});                        
@@ -276,7 +273,7 @@ sub action_index {
 
     $self->logger()->debug( "wf params: " . Dumper %wf_param );
     
-    if ($wf_args->{wf_id}) {              
+    if ($wf_args->{wf_id}) {
            
         if (!$wf_args->{wf_action}) {           
             $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
@@ -291,21 +288,39 @@ sub action_index {
             ID       => $wf_args->{wf_id},
             ACTIVITY => $wf_args->{wf_action},
             PARAMS   => \%wf_param,
-        }); 
+        });
+        
+        if (!$wf_info) {
+            # todo - handle workflow errors
+            $self->logger()->error("workflow acton failed!");
+            return $self;
+        }
     
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED'),'success');
+        # purge the workflow token
+        $self->__purge_wf_token( $wf_token );
         
     } elsif($wf_args->{wf_type}) {
                                 
         $wf_info = $self->send_command( 'create_workflow_instance', {
             WORKFLOW => $wf_args->{wf_type}, PARAMS   => \%wf_param                
         });
+        if (!$wf_info) {
+            # todo - handle workflow errors
+            $self->logger()->error("Create workflow failed");
+            return $self;
+        }
         $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{WORKFLOW}->{ID} );
-         
+        
+        # purge the workflow token
+        $self->__purge_wf_token( $wf_token );
+             
     } else {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
         return $self;       
     }
+    
+    
     
     # TODO - we need to refetch the ui info until we change the api 
     $wf_info = $self->send_command( 'get_workflow_ui_info', {
@@ -365,7 +380,8 @@ sub action_select {
     
     my $wf_info = $self->send_command( 'get_workflow_ui_info', {
         ID => $wf_id 
-    }); 
+    });
+    $self->logger()->debug('wf_info ' . Dumper  $wf_info); 
     
     if (!$wf_info) {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
@@ -373,8 +389,9 @@ sub action_select {
     }
     
     # If the activity has no fields and no ui class we proceed immediately
-    my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};   
-    if ((!$wf_action_info->{FIELD} || (scalar keys %{$wf_action_info->{FIELD}}) == 0) &&
+    my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
+    $self->logger()->trace('wf_action_info ' . Dumper  $wf_action_info);    
+    if ((!$wf_action_info->{FIELD} || (scalar @{$wf_action_info->{FIELD}}) == 0) &&
         !$wf_action_info->{UIHANDLE}) {
     
         $self->logger()->debug('activity has no input - execute');
@@ -435,7 +452,7 @@ sub action_search {
 
     $self->_page({
         label => 'Workflow Search - Results',
-        description => 'Here are the results of the swedish jury:',
+        description => 'Results of your search:',
     });
     
     my $i = 1;
@@ -574,9 +591,8 @@ sub __render_from_workflow {
         
         $self->logger()->debug('activity info ' . Dumper $wf_action_info );
      
-        # we allow prefill of the from if the workflow is in the initial state
-        my $do_prefill = $wf_info->{WORKFLOW}->{STATE} eq 'INITIALIZED';
-     
+        # we allow prefill of the form if the workflow is started
+        my $do_prefill = !defined $wf_info->{WORKFLOW}->{STATE};
      
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
         my @fields;
@@ -589,18 +605,27 @@ sub __render_from_workflow {
             
             my $type = $field->{type} || 'text';
             
-            # TODO - map field types, required, etc            
+            # fields to be filled only by server sided workflows
+            next if ($type eq "server");
             
             my $item = {
                 name => $name, 
                 label => i18nGettext($name), 
                 type => $type
             };
-            if ($do_prefill && defined $self->param($name)) {
-                # TODO - XSS Checks / Escaping / Validation!
-                $item->{value} = $self->param($name);
+             
+            $item->{options} = $field->{options} if ($field->{options});
+                        
+            my $val = $self->param($name);
+            if ($do_prefill && defined $val) {                
+                # XSS prevention - very rude, but if you need to pass something
+                # more sophisticated use the wf_token technique
+                $val =~ s/[^A-Za-z0-9_=,-\. ]//;                                
+                $item->{value} = $val;
             } elsif (defined $context->{$name}) {
                 $item->{value} = $context->{$name};
+            } elsif ($field->{default}) {
+                $item->{value} = $field->{default};
             }
             
             if (!$field->{required}) {
@@ -648,8 +673,17 @@ sub __render_from_workflow {
             next if ($key =~ m{ \A _ }x);
             next if ($key =~ m{ \A workflow_id }x);
             next if ($key =~ m{ \A sources }x);
-            # todo - i18n labels            
-            push @fields, { label => $key, value => $context->{$key} };
+            
+            my $item = { label => $key, value => $context->{$key} };
+            
+            # create a link on cert_identifier fields
+            if ( $key =~ m{ cert_identifier \z }x) {                
+                $item->{format} = 'link';
+                $item->{value}  = { label => $context->{$key}, page => 'certificate!info!identifier!'. $context->{$key}, target => 'modal' };
+            }            
+            
+            # todo - i18n labels                        
+            push @fields, $item;
         }
         
         my @section = {

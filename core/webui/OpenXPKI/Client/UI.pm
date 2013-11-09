@@ -277,7 +277,7 @@ sub handle_login {
     ($result->reload(1) && $result->redirect('login'))  if ($action !~ /^login/ && $page !~ /^login/);
           
     if ( $status eq 'GET_PKI_REALM' ) {
-        if ($pki_realm) {            
+        if ($pki_realm) {  
             $reply = $self->backend()->send_receive_service_msg( 'GET_PKI_REALM', { PKI_REALM => $pki_realm, } );
             $status = $reply->{SERVICE_MSG};
             $self->logger()->debug("Selected realm $pki_realm, new status " . $status);
@@ -304,32 +304,42 @@ sub handle_login {
     } 
     
     $self->logger()->debug("Selected realm $pki_realm, new status " . $status);
+    $self->logger()->trace(Dumper $reply);
     
     # we have more than one login handler and leave it to the login 
     # class to render it right. 
     if ( $status =~ /GET_(.*)_LOGIN/ ) {
         my $login_type = $1;
         
-        ## FIXME - need a good way to configure login handlers        
-        
+        ## FIXME - need a good way to configure login handlers
         $self->logger()->info('Requested login type ' . $login_type );
-        # Credentials are passed!
-        if ($cgi->param('action') eq 'login!password') {
-            $self->logger()->debug('Seems to be an auth try - validating');
-            ##FIXME - Input validation, dynamic config (alternate logins)!
-            $reply = $self->backend()->send_receive_service_msg( $status, 
-                { LOGIN => $cgi->param('username'), PASSWD => $cgi->param('password') } );
+        
+        # SSO Login uses data from the ENV, so no need to render anything        
+        if ( $login_type eq 'CLIENT_SSO' ) {
+            $reply = $result->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN', 
+                { LOGIN => $ENV{REMOTE_USER} } );
             $self->logger()->trace('Auth result ' . Dumper $reply);
-
-            # Failure here is most likely a wrong password            
-            if ( $reply->{SERVICE_MSG} eq 'ERROR' &&
-                $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {                
-                $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');
-                return $result->render();
+                        
+        } elsif( $login_type  eq 'PASSWD' ) {
+            
+            # Credentials are passed!
+            if ($cgi->param('action') eq 'login!password') {
+                $self->logger()->debug('Seems to be an auth try - validating');
+                ##FIXME - Input validation, dynamic config (alternate logins)!
+                $reply = $self->backend()->send_receive_service_msg( $status, 
+                    { LOGIN => $cgi->param('username'), PASSWD => $cgi->param('password') } );
+                $self->logger()->trace('Auth result ' . Dumper $reply);
+    
+                # Failure here is most likely a wrong password            
+                if ( $reply->{SERVICE_MSG} eq 'ERROR' &&
+                    $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {                
+                    $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');
+                    return $result->render();
+                }
+            } else {
+                $self->logger()->debug('No credentials, render form');
+                return $result->init_login_passwd()->render();
             }
-        } else {
-            $self->logger()->debug('No credentials, render form');
-            return $result->init_login_passwd()->render();
         }
     }
     
@@ -339,6 +349,7 @@ sub handle_login {
         $reply = $self->backend()->send_receive_command_msg( 'get_session_info' );
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) { 
             $self->session()->param('user', $reply->{PARAMS});
+            $self->session()->param('pki_realm', $reply->{PARAMS}->{pki_realm});            
             $self->session()->param('is_logged_in', 1);
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});         
             return $result->init_success()->render();

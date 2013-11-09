@@ -75,6 +75,48 @@ sub init_search {
 }
 
 
+sub init_info {
+
+    
+    my $self = shift;
+    my $args = shift;
+    
+    my $cert_identifier = $self->param('identifier');
+        
+    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier });    
+    $self->logger()->debug("result: " . Dumper $cert);
+    
+    $self->_page({
+        label => 'Certificate Information',   
+        shortlabel => $cert->{BODY}->{SUBJECT_HASH}->{CN}->[0],     
+    });
+      
+      
+    if ($cert->{STATUS} eq 'ISSUED' && $cert->{BODY}->{NOTAFTER} < time()) {
+        $cert->{STATUS} = 'EXPIRED';
+    }      
+       
+    my @fields = (
+        { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
+        { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
+        { label => 'Issuer',  format=>'link', value => { label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER} } },
+        { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
+        { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
+        { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
+    );                     
+            
+    $self->_result()->{main} = [{
+        type => 'keyvalue',
+        content => {
+            label => '',
+            description => '',
+            data => \@fields,
+        }},           
+    ]; 
+    
+}
+
+
 sub init_detail {
 
     
@@ -96,6 +138,13 @@ sub init_detail {
         $cert->{STATUS} = 'EXPIRED';
     }      
       
+    # check if this is a entity certificate from the current realm
+    my $is_local_entity = 0;
+    if ($cert->{CSR_SERIAL} && $cert->{PKI_REALM} eq $self->_client()->session()->param('pki_realm')) {
+        $self->logger()->debug("cert is local entity");
+        $is_local_entity = 1;    
+    }      
+      
     my @fields = (
         { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
         { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
@@ -105,20 +154,22 @@ sub init_detail {
         { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
     );                     
     
-    my @buttons = {
+    my @buttons;
+    push @buttons, {
         action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', { cert_identifier => $cert_identifier }),         
         label  => 'metadata',        
-    };
+    } if ($is_local_entity);
     
     push @buttons, {
-        action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST', { cert_identifier => $cert_identifier }),                 
+        #action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST', { cert_identifier => $cert_identifier }),
+        page => 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST!cert_identifier!'.$cert_identifier,
         label  => 'revoke'
-    } if ($cert->{STATUS} eq 'ISSUED');
+    } if ($is_local_entity && $cert->{STATUS} eq 'ISSUED');
                          
     push @buttons, {
         action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST', { org_cert_identifier => $cert_identifier }),                         
         label  => 'renew'
-    } if ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED');
+    } if ($is_local_entity && ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED'));
                 
     $self->_result()->{main} = [{
         type => 'keyvalue',
@@ -131,7 +182,6 @@ sub init_detail {
     ]; 
     
 }
-
 
 
 sub init_workflows {
@@ -200,7 +250,7 @@ sub init_download {
     # No format, draw a list 
     if (!$format) {
         
-        my $pattern = "<li><a href=\"/cgi-bin/connect.cgi?page=certificate!download!identifier!$cert_identifier!format!%s\">%s</a></li>";
+        my $pattern = "<li><a href=\"/cgi-bin/connect.cgi?page=certificate!download!identifier!$cert_identifier!format!%s\" target=\"_blank\">%s</a></li>";
         
         $self->add_section({
             type => 'text',
@@ -326,7 +376,7 @@ sub action_search {
     $self->_page({
         label => 'Certificate Search - Results',
         shortlabel => 'Results',
-        description => 'Here are the results of the swedish jury:',
+        description => 'Results of your search:',
     });
     
     my $i = 1;

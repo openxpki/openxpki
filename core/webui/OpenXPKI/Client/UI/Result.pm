@@ -203,7 +203,6 @@ sub __register_wf_token {
 
     # poor mans random id  
     my $id = sha1_base64(time.$token.rand().$$);  
-    $id = 'wfl_12345';      
     $self->logger()->debug('wf token id ' . $id);        
     $self->_client->session()->param($id, $token);
     return { name => 'wf_token', type => 'hidden', value => $id };            
