@@ -284,10 +284,12 @@ sub get_session_info {
     
     my $session = CTX('session');
     return {
-        'name' => $session->get_user(),
-        'role' => CTX('config')->get([ 'auth', 'roles', $session->get_role(), 'label' ]), 
-        'realm' => CTX('config')->get([ 'system', 'realms', $session->get_pki_realm(), 'label' ]),
-        'lang' => 'en',
+        name => $session->get_user(),
+        role => $session->get_role(),
+        role_label => CTX('config')->get([ 'auth', 'roles', $session->get_role(), 'label' ]),        
+        pki_realm => $session->get_pki_realm(),
+        pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->get_pki_realm(), 'label' ]),        
+        lang => 'en',
     }
     
 }
