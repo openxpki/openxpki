@@ -152,6 +152,7 @@ sub get_cert {
         $return_ref->{ROLE}              = $hash->{ROLE};
         $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
         $return_ref->{CSR_SERIAL}        = $hash->{CSR_SERIAL};
+        $return_ref->{PKI_REALM}         = $hash->{PKI_REALM};
         return $return_ref;
     }
 
