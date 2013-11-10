@@ -11,6 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use English;
+use OpenXPKI::DN;
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::X509;
 use OpenXPKI::Serialization::Simple;
@@ -45,7 +46,7 @@ sub execute {
     
     my $csr_subject = $csr_body->{'SUBJECT'};
     my $csr_key_size = $csr_body->{KEYSIZE};
-    $context->param('cert_subject' => $csr_subject);
+    $context->param('csr_subject' => $csr_subject);    
     $context->param('csr_type'    => 'pkcs10');
     $context->param('csr_key_size' => $csr_key_size );
     
@@ -74,19 +75,6 @@ sub execute {
         );
     }
     
-    
-    # Extract the SAN from the PKCS#10       
-    my @subject_alt_names = $csr_obj->get_subject_alt_names();
-    ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)    
-    $context->param('cert_subject_alt_name' =>
-                    $serializer->serialize(\@subject_alt_names));
-
-    # Fetch the sources hash from the context and extend it 
-    my $sources = $serializer->deserialize( $context->param('sources') );
-    $sources->{'cert_subject'} = 'SCEP';
-    $sources->{'cert_subject_alt_name_parts'}  = 'SCEP';   
-    $context->param('sources' => $serializer->serialize($sources));
-
     # Test for the embeded Profile name at OID 1.3.6.1.4.1.311.20.2 
     
     # This is either empty or an array ref with the BitString
@@ -123,10 +111,82 @@ sub execute {
             );
         }
     }
+    
+    my %hashed_dn = OpenXPKI::DN->new( $csr_subject )->get_hashed_content();
+    ##! 16: 'DN ' . Dumper \%dn            
+    $context->param('cert_subject_parts' => $serializer->serialize( \%hashed_dn ) );
+    
+    # Fetch the sources hash from the context and extend it 
+    my $sources = $serializer->deserialize( $context->param('sources') );
+    $sources->{'cert_subject'} = 'SCEP';
+    $sources->{'cert_subject_alt_name_parts'}  = 'SCEP';   
+    $context->param('sources' => $serializer->serialize($sources));
+    
+    my $cert_subject = $csr_subject;        
+    # Check if there is a subject style to enable subject rendering
+    # NOTE - this needs to be done after the csr extension block as this can change the profile
+    my $subject_style = $config->get("scep.$server.subject_style");
+    my @subject_alt_names;
+    if ($subject_style) {
 
+        my $profile = $context->param('cert_profile');    
+                     
+        $context->param('cert_subject_style' => $subject_style);    
+        CTX('log')->log(
+            MESSAGE => "SCEP subject rendering enabled ( $profile / $subject_style ) ",
+            PRIORITY => 'info',
+            FACILITY => ['system'],
+        );  
+    
+        my %subject_vars = %hashed_dn;
+    
+        # slurp url params if any and add them to the request
+        # FIXME - is there a security problem with shell chars or the like?
+        my $url_params = $context->param('_url_params');        
+        $subject_vars{URL_PARAM} = $url_params if($url_params);
+        
+        $cert_subject = CTX('api')->render_subject_from_template({
+            PROFILE => $profile,
+            STYLE   => $subject_style,
+            VARS    => \%subject_vars
+        });
+        
+        if (!$cert_subject) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_ACTIVITY_SCEP_EXTRACT_CSR_RENDER_SUBJECT_FAILED',
+                params => { PROFILE => $profile, STYLE   => $subject_style }
+            );
+        }
+    
+        my @san_template_keys = $config->get_keys("profile.$profile.style.$subject_style.subject.san");
+        if (scalar @san_template_keys > 0) {
 
-   
-   
+            CTX('log')->log(
+                MESSAGE => "SCEP san rendering enabled ( $profile / $subject_style ) ",
+                PRIORITY => 'info',
+                FACILITY => ['system'],
+            );
+                 
+            my $csr_info = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });             
+            my @subject_alt_names = @{CTX('api')->render_san_from_template({
+                PROFILE => $profile,
+                STYLE   => $subject_style,
+                VARS    => \%subject_vars,
+                ADDITIONAL => $csr_info || {},
+            })};   
+        }        
+    }
+    
+    # in case no san rendering has been done, just copy them from the pkcs10 
+    @subject_alt_names = $csr_obj->get_subject_alt_names() unless (defined @subject_alt_names);                   
+    
+
+    ##! 64: 'subject : ' . $cert_subject    
+    ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)
+        
+    $context->param('cert_subject' => $cert_subject);
+    $context->param('cert_subject_alt_name' => $serializer->serialize( @subject_alt_names )) if (@subject_alt_names);
+        
     my $challenge = $csr_body->{'CHALLENGEPASSWORD'};
     if ($challenge) {
         ##! 32: 'challenge: ' . Dumper $challenge
