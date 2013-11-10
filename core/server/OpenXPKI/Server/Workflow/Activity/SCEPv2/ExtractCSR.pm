@@ -178,7 +178,7 @@ sub execute {
     }
     
     # in case no san rendering has been done, just copy them from the pkcs10 
-    @subject_alt_names = $csr_obj->get_subject_alt_names() unless (defined @subject_alt_names);                   
+    @subject_alt_names = $csr_obj->get_subject_alt_names() unless (@subject_alt_names);                   
     
 
     ##! 64: 'subject : ' . $cert_subject    
