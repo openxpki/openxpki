@@ -569,7 +569,10 @@ sub search_cert {
         push @{ $params{JOIN} }, \@join;
         
         # add search constraint
-        $params{DYNAMIC}->{ 'CSR.PROFILE' } = { VALUE => $args->{PROFILE} };            
+        $params{DYNAMIC}->{ 'CSR.PROFILE' } = { VALUE => $args->{PROFILE} };       
+        
+        $params{VALID_AT} = [ $params{VALID_AT}, undef ] if ($params{VALID_AT});
+             
     }
 
     ##! 16: 'certificate search arguments: ' . Dumper \%params
