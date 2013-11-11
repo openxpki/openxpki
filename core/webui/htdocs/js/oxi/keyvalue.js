@@ -39,10 +39,11 @@ OXI.KeyValueItem = Ember.Object.extend({
     },
     
     formatedVal: function(){
-        if(this.format){
+    	if(this.format) {
+    		if (this.format == 'raw') { return this.value }
             return OXI.FormatHelperFactory.getHelper(this.format).format(this.value);  
         }else{
-            return this.value;   
+        	return $('<div/>').text( this.value ).html();               
         }
     }.property('value','format'),
     
