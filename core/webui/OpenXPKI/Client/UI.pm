@@ -269,7 +269,7 @@ sub handle_login {
     }
     
     my $pki_realm = $session->{'pki_realm'} || $ENV{OPENXPKI_PKI_REALM} || '';
-    my $auth_stack =  $session->{'auth_stack'};
+    my $auth_stack =  $session->{'auth_stack'} || $ENV{OPENXPKI_AUTH_STACK} || '';
     
     my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
 
