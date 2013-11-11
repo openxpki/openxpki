@@ -1,4 +1,4 @@
-﻿/**
+/**
 Base Class for all Views in OXI namespace
 */
 "use strict";
@@ -230,3 +230,4 @@ OXI.ModalView = OXI.View.extend({
     
      _lastItem: '' //avoid trailing commas
 });
+
