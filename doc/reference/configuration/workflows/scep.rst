@@ -39,7 +39,8 @@ Here is a complete sample configuration::
         # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)              
         profile_map:
             tlsv2: I18N_OPENXPKI_PROFILE_TLS_SERVER_v2
-                        
+
+	subject_style: 05_advanced_style
 
         challenge:
             value: SecretChallenge
@@ -144,6 +145,21 @@ for a positve "eligible" check, each manual approval vie the UI counts as one
 additional point. You can set this to "0" to approve any authorized request.
 Note/TODO: The eligible check is currently not implemented and always true.
 
+Subject Rendering
+-----------------
+
+By default the received csr is used to create the certificate "as is". To have
+some sort of control about the issued certificates, you can use the subject 
+rendering engine which is also used with the frontend by setting a profile
+style to be used:
+
+    subject_style: 05_advanced_style
+
+The subject will be created using Template Toolkit with the parsed subject hash
+as input vars. The vars hash will use the name of the attribute as key and pass
+all values as array in order of appearance (it is always an array, even if the
+atrribute is found only once!). You can also add SAN items but there is no way 
+to filter or  remove san items that are passed with the request, yet.
 
 Certificate Template Name Extension
 ---------------------------------------------
