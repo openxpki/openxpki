@@ -268,7 +268,7 @@ sub handle_login {
         $self->logger()->debug('set auth_stack in session: ' . $cgi->param('auth_stack') );
     }
     
-    my $pki_realm = $session->{'pki_realm'} || '';
+    my $pki_realm = $session->{'pki_realm'} || $ENV{OPENXPKI_PKI_REALM} || '';
     my $auth_stack =  $session->{'auth_stack'};
     
     my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
@@ -316,8 +316,10 @@ sub handle_login {
         
         # SSO Login uses data from the ENV, so no need to render anything        
         if ( $login_type eq 'CLIENT_SSO' ) {
-            $reply = $result->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN', 
-                { LOGIN => $ENV{REMOTE_USER} } );
+            $self->logger()->trace('ENV is ' . Dumper \%ENV);
+            $self->logger()->info('Sending SSO Login ( '.$ENV{'REMOTE_USER'}.' )');
+            $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN', 
+                { LOGIN => $ENV{'REMOTE_USER'}, PSEUDO_ROLE => '' } );
             $self->logger()->trace('Auth result ' . Dumper $reply);
                         
         } elsif( $login_type  eq 'PASSWD' ) {
