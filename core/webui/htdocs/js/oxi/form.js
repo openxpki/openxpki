@@ -137,7 +137,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
             //determine default action:
             for(i=0;i<this.content.buttons.length;i++){
                 var def = this.content.buttons[i];
-                if(def.do_submit && (!this.default_action ||def.default)){
+                if(def.do_submit && (!this.default_action || def['default'])){
                     //first submit-button (or the one specially marked as "default") found: mark it as default
                     this.default_action = def.action;
                 }
