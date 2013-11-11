@@ -386,11 +386,11 @@ sub action_search {
         
         push @result, [
             $item->{CERTIFICATE_SERIAL},
-            $item->{SUBJECT},
+            $self->_escape($item->{SUBJECT}),
             $item->{EMAIL} || '',
             $item->{NOTBEFORE},
             $item->{NOTAFTER},
-            $item->{ISSUER_DN},
+            $self->_escape($item->{ISSUER_DN}),
             $item->{IDENTIFIER},
             lc($item->{STATUS}),
             $item->{IDENTIFIER},                    
@@ -421,9 +421,9 @@ sub action_search {
                 target => 'tab',
             }],            
             columns => [                        
-                { sTitle => "serial" },
+                { sTitle => "serial"},
                 { sTitle => "subject" },
-                { sTitle => "email"},
+                { sTitle => "email", format => 'email' },
                 { sTitle => "notbefore", format => 'timestamp' },
                 { sTitle => "notafter", format => 'timestamp' },
                 { sTitle => "issuer"},

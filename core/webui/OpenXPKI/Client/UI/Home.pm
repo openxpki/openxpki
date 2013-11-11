@@ -60,7 +60,7 @@ sub init_certificate {
     my @result;
     foreach my $item (@{$search_result}) {
         push @result, [
-            $item->{'CERTIFICATE.SUBJECT'},
+            $self->_escape($item->{'CERTIFICATE.SUBJECT'}),
             $item->{'CERTIFICATE.NOTBEFORE'},
             $item->{'CERTIFICATE.NOTAFTER'},
             $item->{'CERTIFICATE.STATUS'},

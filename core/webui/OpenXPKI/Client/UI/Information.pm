@@ -47,7 +47,7 @@ sub init_issuer {
     my @result;
     foreach my $cert (@{$issuers}) {      
         push @result, [    
-            $cert->{SUBJECT}, 
+            $self->_escape($cert->{SUBJECT}), 
             $cert->{NOTBEFORE},
             $cert->{NOTAFTER},
             $cert->{STATUS},
@@ -94,7 +94,7 @@ sub init_crl {
     foreach my $crl (@{$crl_list}) {      
         push @result, [    
             $crl->{BODY}->{'SERIAL'},
-            $crl->{BODY}->{'ISSUER'},                                               
+            $self->_escape($crl->{BODY}->{'ISSUER'}),                                               
             $crl->{BODY}->{'LAST_UPDATE'},
             $crl->{BODY}->{'NEXT_UPDATE'},
             scalar @{$crl->{LIST}},            

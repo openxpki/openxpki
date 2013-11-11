@@ -4,6 +4,7 @@
 
 package OpenXPKI::Client::UI::Result;
 
+use HTML::Entities;
 use Digest::SHA1 qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
@@ -181,6 +182,22 @@ sub render {
     
     return $result;
 }
+
+=head2 _escape ( string )
+
+Replacce html entities in string by their encoding 
+
+=cut 
+
+sub _escape {
+
+    my $self = shift;
+    my $arg = shift;
+    return encode_entities($arg);    
+    
+}
+
+
 
 =head2 __register_wf_token( wf_info, token ) 
 
