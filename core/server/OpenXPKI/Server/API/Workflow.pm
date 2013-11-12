@@ -568,10 +568,24 @@ sub create_workflow_instance {
 
     ##! 64: Dumper $workflow
 
-    $self->__execute_workflow_activity( $workflow, $initial_action );
+    # FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID
+    # The old ui validates requests by probing them against the create method
+    # and ignores the missing field error by string parsing
+    # we therefore need to keep that behaviour until decomissioning the old UI
+    eval {
+        $self->__execute_workflow_activity( $workflow, $initial_action );
+    };
+    if ($EVAL_ERROR && index ($EVAL_ERROR , "The following fields require a value:") > -1) {
+        my $eval = $EVAL_ERROR;
+        ## missing field(s) in workflow
+        $eval =~ s/^.*://;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
+            params  => {FIELDS => $eval}
+        );
+    }
     
-    # check back for the creator in the context and copy it to the attribute table
-    
+    # check back for the creator in the context and copy it to the attribute table    
     # doh - somebody deleted the creator from the context
     if (!$context->param( 'creator' )) {
         $context->param( 'creator' => $creator );        
