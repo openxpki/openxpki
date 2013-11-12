@@ -360,7 +360,8 @@ OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
 
-OpenXPKI/Server/Workflow/Validator/CertificateMetadata.pm
+OpenXPKI/Server/Workflow/Validator/Connector.pm
+OpenXPKI/Server/Workflow/Validator/Regex.pm
 
 ## Packages for new NICE API
 OpenXPKI/Server/Workflow/NICE.pm
