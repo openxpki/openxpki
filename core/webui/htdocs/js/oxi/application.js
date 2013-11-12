@@ -251,11 +251,11 @@ OXI.Application = Ember.Application.extend(
 
     reloadPageInfoFromServer: function(){
         js_debug('App.reloadPageInfoFromServer');
-        this.loadPageInfoFromServer(this._actualPageKey);
+        this.loadPageInfoFromServer(this._actualPageKey, true);
         //this.reloadPage();
     },
 
-    loadPageInfoFromServer: function(pageKey){
+    loadPageInfoFromServer: function(pageKey, isReload){
         var App = this;
         js_debug('App.loadPageInfoFromServer: '+pageKey);
         this.set('_actualPageRenderCount',0);
@@ -263,10 +263,10 @@ OXI.Application = Ember.Application.extend(
         this.set('_actualPageKey',pageKey);
         
         //initialisation of the 2 basic views:
-        if(!this.MainView){
+        if(!isReload){
             this.set('MainView',OXI.SectionViewContainer.create());
         }
-        if(!this.ModalView){
+        if(!isReload){
             this.set('ModalView',OXI.ModalView.create());
         }
         
