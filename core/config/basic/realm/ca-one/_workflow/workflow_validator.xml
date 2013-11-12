@@ -10,4 +10,9 @@
       <param name="emptyok" value="1"/>      
   </validator>
   
+  <validator name="global_validate_regex"
+      class="OpenXPKI::Server::Workflow::Validator::Regex">     
+  </validator>
+  
+  
 </validators>
