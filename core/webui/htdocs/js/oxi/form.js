@@ -74,7 +74,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
                     App.set('original_target','');
                 }
             }
-            //App.showLoader();
+            App.showLoader();
             App.callServer(formValues).success(
             function(json){
                 FormView.debug('server responded');

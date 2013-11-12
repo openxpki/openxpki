@@ -626,7 +626,7 @@ sub handle_certsearch {
     
 
     return {
-        page => {label => 'Your Searchresult',target=>'tab'},
+        page => {label => 'Your Searchresult',target=>'main'},
         status => {},
         
         main => [
