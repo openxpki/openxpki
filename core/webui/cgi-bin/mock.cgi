@@ -599,6 +599,11 @@ sub handle_request_cert{
                         { name => 'some_text', label => 'Text', type => 'text' },
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
+                        { name => 'start_date', label => 'Start date', type => 'date', value=> '1379587708',notbefore => '1366587708', notafter => '1399587708'},
+                        { name => 'today', label => 'today', type => 'date',value=>'now'},
+                        
+                        { name => 'end_date', label => 'End date', type => 'date',notbefore=>'now'},
+                        
                         { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
                         { name => 'clone_key', label => 'Key', type => 'text',clonable=>1, 'values' =>['proposed value' ]},
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },

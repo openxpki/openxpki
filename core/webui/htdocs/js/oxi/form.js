@@ -196,33 +196,33 @@ OXI.FormView = OXI.ContentBaseView.extend({
 
 
 OXI.ClonableFieldControler =  Ember.Controller.extend({
-   actions: {
-            addField: function(){
-              //js_debug('addField triggered');
-              this.view.addField();
-            },
-            removeField: function(fieldindex){
-              //js_debug('removeField ' + fieldindex);
-              this.view.removeField(fieldindex);
-            }
-          },
-          
-   _lastItem: '' //avoid trailing commas    
+    actions: {
+        addField: function(){
+            //js_debug('addField triggered');
+            this.view.addField();
+        },
+        removeField: function(fieldindex){
+            //js_debug('removeField ' + fieldindex);
+            this.view.removeField(fieldindex);
+        }
+    },
+
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.ClonableFieldContainer = OXI.View.extend({
-    
-    
+
+
     templateName: "form-clonable",
     jsClassName:'OXI.ClonableFieldContainer',
-    
+
     fieldDef:null,//set via constructor
     FieldContainerList: null,
     label:null,
     fieldname:null,
-    
+
     init:function(){
-        
+
         this._super();
         if(!this.fieldDef){
             App.applicationAlert('ClonableFieldContainer: no fielddef!');
@@ -230,7 +230,7 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         this.set('label',this.fieldDef.label);
         this.set('fieldname', this.fieldDef.name);
         this.set('FieldContainerList', Ember.ArrayController.create({
-                content: Ember.A([])
+            content: Ember.A([])
         }));
         var i;
         //for each given value in value-array one field
@@ -241,59 +241,59 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         }
         this.set('controller',OXI.ClonableFieldControler.create({view:this}));
     },
-    
+
     addField: function(value){
         var fieldDef = this.fieldDef;
         fieldDef.value = value;
-        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type, 
-                                                            {fieldDef:fieldDef,
-                                                             fieldindex:this.FieldContainerList.content.length    
-                                                            }
-                                                          );
-        this.FieldContainerList.pushObject(this.createChildView(FieldView));   
+        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type,
+        {fieldDef:fieldDef,
+            fieldindex:this.FieldContainerList.content.length
+        }
+        );
+        this.FieldContainerList.pushObject(this.createChildView(FieldView));
     },
-    
+
     removeField: function(fieldindex){
         var FieldView = this.FieldContainerList.content[fieldindex];
         if(!FieldView){
             js_debug('no FieldView at index '+fieldindex);
             return
         }
-        
+
         this.FieldContainerList.removeAt(fieldindex);
         FieldView.destroy();
         //reindexing all tabs:
         this.FieldContainerList.forEach(
-            function(FieldView, index, enumerable){
-                FieldView.set('fieldindex',index);   
-            }
+        function(FieldView, index, enumerable){
+            FieldView.set('fieldindex',index);
+        }
         );
     },
-    
+
     isValid: function(){
         this.resetErrors();
         var isValid = true;
         this.FieldContainerList.forEach(
-            function(FieldView, index, enumerable){
-                if(! FieldView.isValid()){
-                    isValid = false;  
-                }
+        function(FieldView, index, enumerable){
+            if(! FieldView.isValid()){
+                isValid = false;
             }
+        }
         );
         return isValid;
     },
-    
+
     getValue: function(){
         var values = [];
         this.FieldContainerList.forEach(
-            function(FieldView, index, enumerable){
-                values.push(FieldView.getValue());
-            }
+        function(FieldView, index, enumerable){
+            values.push(FieldView.getValue());
+        }
         );
         return values;
     },
-        
-    _lastItem: '' //avoid trailing commas    
+
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.FormFieldContainer = OXI.View.extend({
@@ -305,7 +305,7 @@ OXI.FormFieldContainer = OXI.View.extend({
     clonable: false,
     classNames: ['form-group'],
     classNameBindings: ['_hasError:has-error'],
-    
+
     isValid: function(){
         this.resetErrors();
         if(this.isRequired && this.fieldindex==0){
@@ -316,7 +316,7 @@ OXI.FormFieldContainer = OXI.View.extend({
         }
         return true;
     },
-    
+
     //needed for clonalbe fields:
     fieldindex:0,
     isFirst: function(){
@@ -335,7 +335,7 @@ OXI.FormFieldContainer = OXI.View.extend({
         this._super();
         this.label = this.fieldDef.label;
         this.fieldname = this.fieldDef.name;
-        
+
         if(this.fieldDef.is_optional){//required is default!
             this.isRequired = false;
         }
@@ -350,7 +350,7 @@ OXI.FormFieldContainer = OXI.View.extend({
     getValue:function(){
         return this.FieldView.value;
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
@@ -361,9 +361,91 @@ OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
         this._super();
         this.setFieldView(OXI.TextField.create(this.fieldDef));
-        if(this.fieldDef.type == 'hidden'){
-            this.hide();   
+    },
+
+    _lastItem: '' //avoid trailing commas
+});
+
+OXI.HiddenFieldContainer = OXI.TextFieldContainer.extend({
+    init:function(){
+        this._super();
+        this.hide();
+    },
+    
+    _lastItem: '' //avoid trailing commas
+});
+
+OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
+    /**
+    convert given field value (in UNIX epoch) to default format of datepicker: mm/dd/yyyy
+    */
+    init:function(){
+        var D = this._getDateObjectFromTime(this.fieldDef.value);
+        if(D){
+            //
+            this.fieldDef.value =
+            ('00' + (D.getUTCMonth()+1)).slice(-2) + '/' +
+            ('00' +  D.getUTCDate()).slice(-2) + '/' +
+            D.getUTCFullYear()
+            ;
         }
+        this._super();
+    },
+    
+    
+    
+    /**
+    re-convert the datepicker format "mm/dd/yyyy" to unix seconds
+    */
+    getValue:function(){
+        var v = this._super();
+        if(!v) return v;
+        var temp = v.split('/');
+        var year = parseInt(temp[2]);
+        var month = parseInt(temp[0]) - 1;
+        var day = parseInt(temp[1]);
+        var D = new Date(year,month,day);
+        var ms = D.getTime();
+        if(ms){
+            return parseInt(ms/1000);//seconds
+        }
+    },
+    
+    /**
+    convert the stupid textfield to an bootstrap datepicker
+    for documentation see http://bootstrap-datepicker.readthedocs.org/en/latest/
+    */
+    didInsertElement: function(){
+
+        this._super();
+        var options = {autoclose:true};
+        var DateNotBefore = this._getDateObjectFromTime(this.fieldDef.notbefore);
+        if(DateNotBefore){
+            options.startDate = DateNotBefore;    
+        }
+        var DateNotAfter = this._getDateObjectFromTime(this.fieldDef.notafter);
+        if(DateNotAfter){
+            options.endDate = DateNotAfter;    
+        }
+        this.$('input').datepicker(options);
+    },
+    
+    /**
+    returns an JS-Date-Object, if possible
+    recognices the string "now"
+    */
+    _getDateObjectFromTime: function(time){
+        if(!time)return;
+        if(time == 'now'){
+            return new Date();   
+        }
+        var time = parseInt(time);
+        if (time != 0) {
+            var D = new Date();
+            D.setTime(time*1000);
+            return D;
+        }
+
     },
     
     _lastItem: '' //avoid trailing commas
@@ -384,7 +466,7 @@ OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
     getValue:function(){
         return (this.FieldView.isChecked())?1:0;
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
@@ -396,7 +478,7 @@ OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
         this._super();
         this.setFieldView(OXI.TextArea.create(this.fieldDef));
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
@@ -426,17 +508,17 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
         this.setFieldView(OXI.Select.create(this.fieldDef));
     },
-    
+
     /**
     returns the selected value
     in case of "freetext"-option the entered freetext is returned
     */
-    
+
     getValue:function(){
         var sel_val = this._getSelected();
         return (sel_val == this._freeTextKey)? this.FreeTextView.value : sel_val;
     },
-    
+
     _getSelected:function(){
         return (this.FieldView.selection)?this.FieldView.selection.value:'';
     },
@@ -448,7 +530,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
             this.FreeTextView.toggle((this._getSelected() == this._freeTextKey));
         }
     },
-    
+
     _lastItem: '' //avoid trailing commas
 
 });
@@ -471,13 +553,13 @@ OXI.Select = Ember.Select.extend(
     optionValuePath: 'content.value',
     classNames: ['form-control'] ,
     prompt:null,
-    
+
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
         this.content = Ember.A(this.options);
         if(typeof this.prompt != 'undefined' && this.prompt=='' ){
-            this.prompt = ' ';//display white option   
+            this.prompt = ' ';//display white option
         }
     },
     _lastItem: '' //avoid trailing commas
@@ -494,7 +576,7 @@ OXI.TextField = Ember.TextField.extend(
 {
     classNames: ['form-control'],
     toggle:function(bShow){
-         this.set('isVisible', bShow);  
+        this.set('isVisible', bShow);
     },
     _lastItem: '' //avoid trailing commas
 }
@@ -514,7 +596,7 @@ OXI.FormButton = OXI.PageButton.extend({
             return 'button';
         }
     }.property(),
-    
+
 
     action:null,//set via constructor (from json)
     do_submit:false,//set via constructor (from json)
@@ -534,6 +616,6 @@ OXI.FormButton = OXI.PageButton.extend({
             return;
         }
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
