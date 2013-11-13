@@ -167,7 +167,13 @@ OXI.FormView = OXI.ContentBaseView.extend({
         var i;
         for(i=0;i<this.fields.length;i++){
             var field=this.fields[i];
-            var ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field});
+            var ContainerView;
+            if(field.clonable){
+                //wrap FieldContainer  in ClonableContainer
+                ContainerView = OXI.ClonableFieldContainer.create({fieldDef:field});
+            }else{
+                ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field});
+            }
 
             this.FieldContainerList.push(this.createChildView(ContainerView));
             var i = this.FieldContainerList.length -1;
@@ -188,40 +194,106 @@ OXI.FormView = OXI.ContentBaseView.extend({
 
 });
 
-OXI.FormButton = OXI.PageButton.extend({
 
-    jsClassName:'OXI.FormButton',
+OXI.ClonableFieldControler =  Ember.Controller.extend({
+   actions: {
+            addField: function(){
+              //js_debug('addField triggered');
+              this.view.addField();
+            },
+            removeField: function(fieldindex){
+              //js_debug('removeField ' + fieldindex);
+              this.view.removeField(fieldindex);
+            }
+          },
+          
+   _lastItem: '' //avoid trailing commas    
+});
 
-    classNameBindings:['btn_type'],
-    attributeBindings: ['type'],
-    type:function(){
-        if(this.is_default){
-            return 'submit';
-        }else{
-            return 'button';
-        }
-    }.property(),
+OXI.ClonableFieldContainer = OXI.View.extend({
     
-
-    action:null,//set via constructor (from json)
-    do_submit:false,//set via constructor (from json)
-    is_default:false,//set via constructor
-
-
-    click: function(evt) {
-        js_debug("Button with action "+this.action+" was clicked");
-        this.ParentView.submitAction(this.action,this.do_submit,this.target);
-    },
-
+    
+    templateName: "form-clonable",
+    jsClassName:'OXI.ClonableFieldContainer',
+    
+    fieldDef:null,//set via constructor
+    FieldContainerList: null,
+    label:null,
+    fieldname:null,
+    
     init:function(){
+        
         this._super();
-
-        if(!this.action){
-            App.applicationAlert('FormButton withot action!');
-            return;
+        if(!this.fieldDef){
+            App.applicationAlert('ClonableFieldContainer: no fielddef!');
         }
-    }
-
+        this.set('label',this.fieldDef.label);
+        this.set('fieldname', this.fieldDef.name);
+        this.set('FieldContainerList', Ember.ArrayController.create({
+                content: Ember.A([])
+        }));
+        var i;
+        //for each given value in value-array one field
+        //this.debug('given values' + typeof this.fieldDef.values);
+        var values = (typeof this.fieldDef.values == 'object' && this.fieldDef.values.length>1)?this.fieldDef.values : [''];
+        for(i=0;i<values.length;i++){
+            this.addField(values[i]);
+        }
+        this.set('controller',OXI.ClonableFieldControler.create({view:this}));
+    },
+    
+    addField: function(value){
+        var fieldDef = this.fieldDef;
+        fieldDef.value = value;
+        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type, 
+                                                            {fieldDef:fieldDef,
+                                                             fieldindex:this.FieldContainerList.content.length    
+                                                            }
+                                                          );
+        this.FieldContainerList.pushObject(this.createChildView(FieldView));   
+    },
+    
+    removeField: function(fieldindex){
+        var FieldView = this.FieldContainerList.content[fieldindex];
+        if(!FieldView){
+            js_debug('no FieldView at index '+fieldindex);
+            return
+        }
+        
+        this.FieldContainerList.removeAt(fieldindex);
+        FieldView.destroy();
+        //reindexing all tabs:
+        this.FieldContainerList.forEach(
+            function(FieldView, index, enumerable){
+                FieldView.set('fieldindex',index);   
+            }
+        );
+    },
+    
+    isValid: function(){
+        this.resetErrors();
+        var isValid = true;
+        this.FieldContainerList.forEach(
+            function(FieldView, index, enumerable){
+                if(! FieldView.isValid()){
+                    isValid = false;  
+                }
+            }
+        );
+        return isValid;
+    },
+    
+    getValue: function(){
+        var values = [];
+        this.FieldContainerList.forEach(
+            function(FieldView, index, enumerable){
+                values.push(FieldView.getValue());
+            }
+        );
+        return values;
+    },
+        
+    _lastItem: '' //avoid trailing commas    
 });
 
 OXI.FormFieldContainer = OXI.View.extend({
@@ -230,10 +302,13 @@ OXI.FormFieldContainer = OXI.View.extend({
     fieldname:null,
     fieldDef:null,
     isRequired:true,
-
-    isValid:function(){
+    clonable: false,
+    classNames: ['form-group'],
+    classNameBindings: ['_hasError:has-error'],
+    
+    isValid: function(){
         this.resetErrors();
-        if(this.isRequired){
+        if(this.isRequired && this.fieldindex==0){
             if(!this.getValue()){
                 this.setError('Please specify a value');
                 return false;
@@ -241,6 +316,12 @@ OXI.FormFieldContainer = OXI.View.extend({
         }
         return true;
     },
+    
+    //needed for clonalbe fields:
+    fieldindex:0,
+    isFirst: function(){
+        return (this.fieldindex==0);
+    }.property('fieldindex'),
 
     _toString:function(){
         return this._super()+' '+this.fieldname;
@@ -254,6 +335,7 @@ OXI.FormFieldContainer = OXI.View.extend({
         this._super();
         this.label = this.fieldDef.label;
         this.fieldname = this.fieldDef.name;
+        
         if(this.fieldDef.is_optional){//required is default!
             this.isRequired = false;
         }
@@ -417,3 +499,41 @@ OXI.TextField = Ember.TextField.extend(
     _lastItem: '' //avoid trailing commas
 }
 );
+
+
+OXI.FormButton = OXI.PageButton.extend({
+
+    jsClassName:'OXI.FormButton',
+
+    classNameBindings:['btn_type'],
+    attributeBindings: ['type'],
+    type:function(){
+        if(this.is_default){
+            return 'submit';
+        }else{
+            return 'button';
+        }
+    }.property(),
+    
+
+    action:null,//set via constructor (from json)
+    do_submit:false,//set via constructor (from json)
+    is_default:false,//set via constructor
+
+
+    click: function(evt) {
+        js_debug("Button with action "+this.action+" was clicked");
+        this.ParentView.submitAction(this.action,this.do_submit,this.target);
+    },
+
+    init:function(){
+        this._super();
+
+        if(!this.action){
+            App.applicationAlert('FormButton withot action!');
+            return;
+        }
+    },
+    
+    _lastItem: '' //avoid trailing commas
+});

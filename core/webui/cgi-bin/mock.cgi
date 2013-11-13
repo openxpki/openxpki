@@ -158,7 +158,7 @@ sub handle {
                 
                 fields => [
                 { name => 'subject', label => 'Subject', type => 'text',is_optional => 1 },
-                { name => 'issuer', label => 'Issuer', type => 'text',is_optional => 1 },
+                { name => 'issuer', label => 'Issuer', type => 'text',is_optional => 1,clonable=>1, values => ['Issuer 1','Issuer 2'] },
                 ]
             }
         }]
@@ -600,7 +600,7 @@ sub handle_request_cert{
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
                         { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
-                    
+                        { name => 'clone_key', label => 'Key', type => 'text',clonable=>1 },
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }
@@ -619,15 +619,15 @@ sub handle_certsearch {
     my $q = shift;
 
     my $subject = $q->param('subject');
-    my $issuer  = $q->param('issuer');
+    my @issuer  = $q->param('issuer[]');
 
-    return {'status' => { 'level' => 'error', 'message' => 'Please specify either subject or issuer!' }} unless ($subject || $issuer);
+    return {'status' => { 'level' => 'error', 'message' => 'Please specify either subject or issuer!' }} unless ($subject || @issuer);
     
     
 
     return {
         page => {label => 'Your Searchresult',target=>'main'},
-        status => {},
+        status => {level => 'info',message=> 'given issuer: '.join(', ', @issuer)},
         
         main => [
                 #first section
