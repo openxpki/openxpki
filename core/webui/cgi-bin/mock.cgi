@@ -600,9 +600,11 @@ sub handle_request_cert{
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
                         { name => 'start_date', label => 'Start date', type => 'date', value=> '1379587708',notbefore => '1366587708', notafter => '1399587708'},
-                        { name => 'today', label => 'today', type => 'date',value=>'now'},
+                        { name => 'today', label => 'today', type => 'date',value=>'now',return_format => 'iso8601'},
                         
                         { name => 'end_date', label => 'End date', type => 'date',notbefore=>'now'},
+                        { name => 'sql_date', label => 'sql date', type => 'date',value=>'2014-05-24',return_format => 'printable'},
+                        { name => 'no_date', label => 'no date', type => 'date',value=>'halleluhja',return_format => 'terse'},
                         
                         { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
                         { name => 'clone_key', label => 'Key', type => 'text',clonable=>1, 'values' =>['proposed value' ]},
