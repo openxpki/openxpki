@@ -600,7 +600,7 @@ sub handle_request_cert{
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
                         { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
-                        { name => 'clone_key', label => 'Key', type => 'text',clonable=>1 },
+                        { name => 'clone_key', label => 'Key', type => 'text',clonable=>1, 'values' =>['proposed value' ]},
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }

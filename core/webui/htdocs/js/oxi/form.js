@@ -235,7 +235,7 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         var i;
         //for each given value in value-array one field
         //this.debug('given values' + typeof this.fieldDef.values);
-        var values = (typeof this.fieldDef.values == 'object' && this.fieldDef.values.length>1)?this.fieldDef.values : [''];
+        var values = (typeof this.fieldDef.values == 'object' && this.fieldDef.values.length>0)?this.fieldDef.values : [''];
         for(i=0;i<values.length;i++){
             this.addField(values[i]);
         }
