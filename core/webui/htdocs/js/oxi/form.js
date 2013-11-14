@@ -239,18 +239,16 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         for(i=0;i<values.length;i++){
             this.addField(values[i]);
         }
+        
         this.set('controller',OXI.ClonableFieldControler.create({view:this}));
     },
 
     addField: function(value){
         var fieldDef = this.fieldDef;
         fieldDef.value = value;
-        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type,
-        {fieldDef:fieldDef,
-            fieldindex:this.FieldContainerList.content.length
-        }
-        );
+        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type,{fieldDef:fieldDef});
         this.FieldContainerList.pushObject(this.createChildView(FieldView));
+        this._updateIndex();
     },
 
     removeField: function(fieldindex){
@@ -262,10 +260,21 @@ OXI.ClonableFieldContainer = OXI.View.extend({
 
         this.FieldContainerList.removeAt(fieldindex);
         FieldView.destroy();
-        //reindexing all tabs:
+        this._updateIndex();
+        
+    },
+    
+    /**
+    reindexing all clone fields, set property "isLast":
+    */
+    _updateIndex: function(){
+        var last_index = this.FieldContainerList.content.length -1;
         this.FieldContainerList.forEach(
         function(FieldView, index, enumerable){
             FieldView.set('fieldindex',index);
+            var isLast = (index==last_index);
+            FieldView.set('isLast',isLast);
+            js_debug('index '+index+' is Last? '+isLast);
         }
         );
     },
@@ -322,6 +331,8 @@ OXI.FormFieldContainer = OXI.View.extend({
     isFirst: function(){
         return (this.fieldindex==0);
     }.property('fieldindex'),
+    
+    isLast: false,//wird vom ClonableFieldContainer gesetzt
 
     _toString:function(){
         return this._super()+' '+this.fieldname;

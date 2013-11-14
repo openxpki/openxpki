@@ -271,17 +271,17 @@
     
     <script type="text/x-handlebars" data-template-name="form-clonable">
     {{#each FieldView in view.FieldContainerList}}
-        {{#unless FieldView.isFirst}}
+        {{#if FieldView.isLast}}
         <div class="pull-right" style="margin-right: 260px;">
-            <a class="btn btn-xs btn-default form-remove" {{action 'removeField' FieldView.fieldindex}} title="remove">&nbsp;</a>
+            <a class="btn btn-xs btn-default clonable-icon clonable-add" {{action 'addField'}} title="add">&nbsp;</a>
         </div>
-        {{/unless}}
+        {{else}}
+        <div class="pull-right" style="margin-right: 260px;">
+            <a class="btn btn-xs btn-default clonable-icon clonable-remove" {{action 'removeField' FieldView.fieldindex}} title="remove">&nbsp;</a>
+        </div>
+        {{/if}}
         {{view FieldView}}
     {{/each}}
-    <div class="col-lg-2 control-label">
-    <a class="btn btn-xs btn-default form-add" {{action 'addField'}}>add {{view.label}}</a>
-    </div>
-    <div class="clearfix" style="margin-bottom:12px;"></div>
     </script>
     
     <script type="text/x-handlebars" data-template-name="form-textfield">

@@ -54,13 +54,15 @@ img.toplogo{
    padding-top:6px;
    padding-right:12px;   
 }
-.form-add{
-    background: url("../img/add.png") no-repeat scroll left center rgba(0, 0, 0, 0);
-     text-indent: 16px;
+
+.clonable-icon{
+    text-indent: 6px;
 }
-.form-remove{
+.clonable-icon.clonable-add{
+    background: url("../img/add.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+}
+.clonable-icon.clonable-remove{
     background: url("../img/remove.png") no-repeat scroll left center rgba(0, 0, 0, 0);
-     text-indent: 6px;
 }
 
 
