@@ -34,11 +34,16 @@ sub execute {
             'ATTRIBUTE_KEY' => { OPERATOR => 'LIKE', VALUE => 'meta_%' },            
         },
     );
-    
-    # map database into kay/value hash
+                
+    # map database into key/value hash
     my $current_meta = {};    
-    foreach my $item (@{$cert_metadata}) {
-       $current_meta->{$item->{ATTRIBUTE_KEY}} = $item; 
+    foreach my $item (@{$cert_metadata}) {        
+        # represent a multivalued attribute
+        if ($item->{ATTRIBUTE_KEY} =~ m{ \A (\w+)\[(\d+)] }xms) {                         
+            $current_meta->{$1.'[]'}->{$2} = $item;     
+        } else {
+            $current_meta->{$item->{ATTRIBUTE_KEY}} = $item;
+        }         
     }
 
     ##! 32: 'Current meta ' . Dumper $current_meta    
@@ -52,9 +57,80 @@ sub execute {
         
         next if ($key !~ m{ \A meta_ }xms);
         
+        # non scalar items
+        if ($key =~ m{ \A (\w+)\[\] }xms) {
+
+            my $keybase = $1;
+            my $curr = $current_meta->{$keybase.'[]'};
+            my @values;
+            
+            # How this works:
+            # The curr holds a hash with the key incl. the position
+            # and the full dbi hash as value. To prevent key collisions
+            # we need to run over the keys, set the values and save them
+            # afterwards we delete anything that is left.
+                        
+            if (ref $param->{$key}) {
+                @values = @{$param->{$key}}; 
+            } else {
+                @values = @{$ser->deserialize( $param->{$key} )};
+            }
+            
+            my $pos = 0;
+            foreach my $val (@values) {                
+                            
+                # check if there is a item at this postion
+                if ($curr->{$pos}) {                                    
+                    $dbi->update(
+                        TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                        DATA => {                            
+                            ATTRIBUTE_VALUE => $val,
+                        },
+                        WHERE => { ATTRIBUTE_SERIAL => $curr->{$pos}->{ATTRIBUTE_SERIAL} }
+                    ) if ($val ne $curr->{$pos}->{ATTRIBUTE_VALUE});
+                    delete $curr->{$pos};                    
+                } else {                                 
+                    ##! 32: 'Add new sub-attribute ' . $key . ' value ' . $param->{$key}
+                    my $serial = $dbi->get_new_serial( TABLE => 'CERTIFICATE_ATTRIBUTES' );
+                    $dbi->insert(
+                        TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                        HASH => {
+                            ATTRIBUTE_SERIAL => $serial,
+                            IDENTIFIER => $cert_identifier,
+                            ATTRIBUTE_KEY => $keybase.'['.$pos.']',
+                            ATTRIBUTE_VALUE => $val
+                        }
+                    );      
+                }
+                $pos++;
+            }
+            
+            # remove leftovers from the hash 
+            foreach my $key (keys %{$curr}) {
+                ##! 32: 'remove leftover sub-attribute at ' . $keybase.'['.$key.']' 
+                $dbi->delete(
+                    TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                    DATA => {                        
+                        ATTRIBUTE_SERIAL => $curr->{$key}->{ATTRIBUTE_SERIAL}
+                    }
+                );
+                delete $curr->{$key};
+            }            
+            
+            # If we moved here from a scalar value, there might be one item left
+            if ($current_meta->{$keybase}) {
+                ##! 32: 'Delete scalar item at ' . $keybase
+                $dbi->delete(
+                    TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                    DATA => {                        
+                        ATTRIBUTE_SERIAL => $current_meta->{$keybase}->{ATTRIBUTE_SERIAL}
+                    }
+                );
+                delete $current_meta->{$keybase};
+            }
+        
         # check if the key was registered before
-        # todo - delete, non scalar items
-        if ($current_meta->{$key}) {
+        } elsif ($current_meta->{$key}) {
             
             # key already present - do update
             

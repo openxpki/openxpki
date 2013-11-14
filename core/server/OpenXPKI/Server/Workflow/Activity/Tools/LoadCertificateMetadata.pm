@@ -40,16 +40,34 @@ sub execute {
         },
     );
     
-    ##! 32: ' Size of cert_metadata '. scalar( @{$cert_metadata} )
+    my %arrays;
+    ##! 16: ' Size of cert_metadata '. scalar( @{$cert_metadata} )
     foreach my $metadata (@{$cert_metadata}) {
-        ##! 51: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
-        my $key = $metadata->{ATTRIBUTE_KEY};        
+        ##! 32: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
+        my $key = $metadata->{ATTRIBUTE_KEY};
         my $value = $metadata->{ATTRIBUTE_VALUE};
         if ($value =~ /^(ARRAY|HASH)/) {
             ##! 32: 'Deserialize '
             $value = $ser->deserialize( $value );
         }
-        $context->param( $key => $value );
+        
+        # represent a multivalued attribute, so use array
+        if ($key =~ m{ \A (\w+)\[(\d+)] }xms) {
+            ##! 32: 'add to array with key ' . $key            
+            $arrays{$1.'[]'}->[$2] = $value;            
+        } else {
+            ##! 32: 'set context for ' . $key  
+            $context->param( $key => $value );
+        }
+    }
+    
+    ##! 64: 'Non-scalar types ' . Dumper \%arrays 
+    
+    # write back the arrays
+    foreach my $key (keys %arrays) {
+        my $val = $ser->serialize( $arrays{$key} );
+        ##! 64: 'Set key ' . $key . ' to ' . $val
+        $context->param( $key => $ser->serialize( $arrays{$key} ) );
     }
     
     return 1;
