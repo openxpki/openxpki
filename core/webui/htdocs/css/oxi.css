@@ -55,6 +55,14 @@ img.toplogo{
    padding-right:12px;   
 }
 
+.clonable-margin-right{
+    margin-right: 0px; 
+}
+
+.clonable-margin-normal{
+    margin-right: 270px;    
+}
+
 .clonable-icon{
     text-indent: 6px;
 }

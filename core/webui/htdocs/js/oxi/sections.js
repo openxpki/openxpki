@@ -319,6 +319,11 @@ OXI.SectionView = OXI.View.extend({
         return this.ContentView.getButtonCount();
     }.property(),
     
+    hasRightPane: function(){
+        //this.debug('hasRightPane? ' + this.SectionContainer.hasRightPane);
+        return this.SectionContainer.hasRightPane;
+    },
+    
     
     destroy: function() {
         //Ember.debug('SectionView::destroy '+this.section_nr);
