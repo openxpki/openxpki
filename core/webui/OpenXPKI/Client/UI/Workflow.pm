@@ -314,13 +314,21 @@ sub action_index {
         
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
+        
+        # always redirect after create to have the url pointing to the created workflow
+        $wf_args->{redirect} = 1;
              
     } else {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
         return $self;       
     }
     
-    
+    # If we call the token action from within a result list we want 
+    # to "break out" and set the new url instead rendering the result inline
+    if ($wf_args->{redirect}) {
+        $self->redirect('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID});
+        return $self;
+    }
     
     # TODO - we need to refetch the ui info until we change the api 
     $wf_info = $self->send_command( 'get_workflow_ui_info', {
