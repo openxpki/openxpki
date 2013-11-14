@@ -26,7 +26,11 @@ OXI.FormView = OXI.ContentBaseView.extend({
         js_debug('form submit!');
         return false;
     },
-
+    
+    hasRightPane:function(){
+        //this.debug('hasRightPane? ');
+        return this.SectionView.hasRightPane();
+    },
 
 
     submitAction: function(action, do_submit,target) {
@@ -165,14 +169,15 @@ OXI.FormView = OXI.ContentBaseView.extend({
     _initFields:function(){
         this.fields = this.content.fields;
         var i;
+        var FormView = this;
         for(i=0;i<this.fields.length;i++){
             var field=this.fields[i];
             var ContainerView;
             if(field.clonable){
                 //wrap FieldContainer  in ClonableContainer
-                ContainerView = OXI.ClonableFieldContainer.create({fieldDef:field});
+                ContainerView = OXI.ClonableFieldContainer.create({fieldDef:field,FormView:FormView});
             }else{
-                ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field});
+                ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field,FormView:FormView});
             }
 
             this.FieldContainerList.push(this.createChildView(ContainerView));
@@ -215,12 +220,18 @@ OXI.ClonableFieldContainer = OXI.View.extend({
 
     templateName: "form-clonable",
     jsClassName:'OXI.ClonableFieldContainer',
-
+    
+    FormView:null,//set via constructor
     fieldDef:null,//set via constructor
     FieldContainerList: null,
     label:null,
     fieldname:null,
-
+    
+    hasRightPane:function(){
+        //this.debug('hasRightPane? ');
+        return this.FormView.hasRightPane();
+    }.property(),
+    
     init:function(){
 
         this._super();
@@ -246,7 +257,7 @@ OXI.ClonableFieldContainer = OXI.View.extend({
     addField: function(value){
         var fieldDef = this.fieldDef;
         fieldDef.value = value;
-        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type,{fieldDef:fieldDef});
+        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type,{fieldDef:fieldDef,FormView:this.FormView});
         this.FieldContainerList.pushObject(this.createChildView(FieldView));
         this._updateIndex();
     },
@@ -274,7 +285,6 @@ OXI.ClonableFieldContainer = OXI.View.extend({
             FieldView.set('fieldindex',index);
             var isLast = (index==last_index);
             FieldView.set('isLast',isLast);
-            js_debug('index '+index+' is Last? '+isLast);
         }
         );
     },
@@ -306,15 +316,18 @@ OXI.ClonableFieldContainer = OXI.View.extend({
 });
 
 OXI.FormFieldContainer = OXI.View.extend({
+    
+    fieldDef:null,//set via constructor
+    FormView:null,//set via constructor
+    
     FieldView: null,
     label:null,
     fieldname:null,
-    fieldDef:null,
     isRequired:true,
     clonable: false,
     classNames: ['form-group'],
     classNameBindings: ['_hasError:has-error'],
-
+    
     isValid: function(){
         this.resetErrors();
         if(this.isRequired && this.fieldindex==0){
@@ -325,6 +338,11 @@ OXI.FormFieldContainer = OXI.View.extend({
         }
         return true;
     },
+    
+    hasRightPane:function(){
+        //this.debug('hasRightPane? ');
+        return this.FormView.hasRightPane();
+    }.property(),
 
     //needed for clonalbe fields:
     fieldindex:0,

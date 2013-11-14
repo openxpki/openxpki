@@ -272,11 +272,11 @@
     <script type="text/x-handlebars" data-template-name="form-clonable">
     {{#each FieldView in view.FieldContainerList}}
         {{#if FieldView.isLast}}
-        <div class="pull-right" style="margin-right: 260px;">
+        <div {{bind-attr class=":pull-right view.hasRightPane:clonable-margin-right:clonable-margin-normal"}} >
             <a class="btn btn-xs btn-default clonable-icon clonable-add" {{action 'addField'}} title="add">&nbsp;</a>
         </div>
         {{else}}
-        <div class="pull-right" style="margin-right: 260px;">
+        <div {{bind-attr class=":pull-right view.hasRightPane:clonable-margin-right:clonable-margin-normal"}} >
             <a class="btn btn-xs btn-default clonable-icon clonable-remove" {{action 'removeField' FieldView.fieldindex}} title="remove">&nbsp;</a>
         </div>
         {{/if}}
@@ -286,7 +286,7 @@
     
     <script type="text/x-handlebars" data-template-name="form-textfield">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
-        <div class="col-lg-6">
+        <div {{bind-attr class="view.hasRightPane:col-lg-9:col-lg-6"}}>
           {{view view.FieldView}}
           {{#if view._hasError}}
           <span class="help-block">{{view.getErrorsAsString}}</span>

@@ -147,6 +147,16 @@ sub handle {
             description => 'You can search for certs here.',
 
         },
+        
+        xright => [
+                    {type => 'text',
+                     content => {
+                        label => 'Bla',#Right pane 1',
+                        description => 'Text 1;: lajsdlkajsd lkajsd lkajsd lkajsd lkajs dlja skdj lasjd '
+                        }
+                    },
+                ],
+        
         main => [{ type => 'form',action => '',
             content => {
                 label=>'',
