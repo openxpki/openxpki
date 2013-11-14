@@ -16,13 +16,39 @@ function ajaxErrorAlert(script_url,textStatus,errDetail){
 
     }
 
-    var iMaxDebugLevel = 1;
-    function js_debug(data,depth){
-        var str = _dataToString(data,0,depth);
-        my_debug(str);
+    
+    function js_debug(data,depth,with_trace){
+        var message = _dataToString(data,0,depth);
+
+        if(with_trace){
+            var error;
+
+            // When using new Error, we can't do the arguments check for Chrome. Alternatives are welcome
+            try { __fail__.fail(); } catch (e) { error = e; }
+
+            if (error.stack) {
+                var stack, stackStr = '';
+                if (error['arguments']) {
+                    // Chrome
+                    stack = error.stack.replace(/^\s+at\s+/gm, '').
+                    replace(/^([^\(]+?)([\n$])/gm, '{anonymous}($1)$2').
+                    replace(/^Object.<anonymous>\s*\(([^\)]+)\)/gm, '{anonymous}($1)').split('\n');
+                    stack.shift();
+                } else {
+                    // Firefox
+                    stack = error.stack.replace(/(?:\n@:0)?\s+$/m, '').
+                    replace(/^\(/gm, '{anonymous}(').split('\n');
+                }
+
+                stackStr = "\n    " + stack.slice(2).join("\n    ");
+                message = message + stackStr;
+            }
+        }
+
+        my_debug(message);
     }
 
-
+    var iMaxDebugLevel = 1;
     function _dataToString(data){
         var k;
         var level =  (_dataToString.arguments[1])?_dataToString.arguments[1]:0;

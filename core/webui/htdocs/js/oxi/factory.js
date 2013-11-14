@@ -42,13 +42,13 @@ OXI.FormFieldFactory = OXI.ComponentFactory.create({
 
     _componentMap : {
         text :      'TextFieldContainer',
-        hidden :    'TextFieldContainer',
+        hidden :    'HiddenFieldContainer',
         password:   'TextFieldContainer',
         textarea:   'TextAreaContainer',
         select :    'PulldownContainer',
         checkbox:   'CheckboxContainer',
-    	date :      'TextFieldContainer',
-    	bool :      'TextFieldContainer'    	
+    	date :      'DateFieldContainer',
+    	bool :      'CheckboxContainer'    	
     }
 
 });

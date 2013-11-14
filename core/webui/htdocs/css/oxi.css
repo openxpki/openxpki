@@ -54,7 +54,14 @@ img.toplogo{
    padding-top:6px;
    padding-right:12px;   
 }
-
+.form-add{
+    background: url("../img/add.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+     text-indent: 16px;
+}
+.form-remove{
+    background: url("../img/remove.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+     text-indent: 6px;
+}
 
 
 /*

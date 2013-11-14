@@ -74,7 +74,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
                     App.set('original_target','');
                 }
             }
-            //App.showLoader();
+            App.showLoader();
             App.callServer(formValues).success(
             function(json){
                 FormView.debug('server responded');
@@ -167,7 +167,13 @@ OXI.FormView = OXI.ContentBaseView.extend({
         var i;
         for(i=0;i<this.fields.length;i++){
             var field=this.fields[i];
-            var ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field});
+            var ContainerView;
+            if(field.clonable){
+                //wrap FieldContainer  in ClonableContainer
+                ContainerView = OXI.ClonableFieldContainer.create({fieldDef:field});
+            }else{
+                ContainerView = OXI.FormFieldFactory.getComponent(field.type, {fieldDef:field});
+            }
 
             this.FieldContainerList.push(this.createChildView(ContainerView));
             var i = this.FieldContainerList.length -1;
@@ -188,40 +194,106 @@ OXI.FormView = OXI.ContentBaseView.extend({
 
 });
 
-OXI.FormButton = OXI.PageButton.extend({
 
-    jsClassName:'OXI.FormButton',
-
-    classNameBindings:['btn_type'],
-    attributeBindings: ['type'],
-    type:function(){
-        if(this.is_default){
-            return 'submit';
-        }else{
-            return 'button';
+OXI.ClonableFieldControler =  Ember.Controller.extend({
+    actions: {
+        addField: function(){
+            //js_debug('addField triggered');
+            this.view.addField();
+        },
+        removeField: function(fieldindex){
+            //js_debug('removeField ' + fieldindex);
+            this.view.removeField(fieldindex);
         }
-    }.property(),
-    
-
-    action:null,//set via constructor (from json)
-    do_submit:false,//set via constructor (from json)
-    is_default:false,//set via constructor
-
-
-    click: function(evt) {
-        js_debug("Button with action "+this.action+" was clicked");
-        this.ParentView.submitAction(this.action,this.do_submit,this.target);
     },
 
+    _lastItem: '' //avoid trailing commas
+});
+
+OXI.ClonableFieldContainer = OXI.View.extend({
+
+
+    templateName: "form-clonable",
+    jsClassName:'OXI.ClonableFieldContainer',
+
+    fieldDef:null,//set via constructor
+    FieldContainerList: null,
+    label:null,
+    fieldname:null,
+
     init:function(){
+
         this._super();
-
-        if(!this.action){
-            App.applicationAlert('FormButton withot action!');
-            return;
+        if(!this.fieldDef){
+            App.applicationAlert('ClonableFieldContainer: no fielddef!');
         }
-    }
+        this.set('label',this.fieldDef.label);
+        this.set('fieldname', this.fieldDef.name);
+        this.set('FieldContainerList', Ember.ArrayController.create({
+            content: Ember.A([])
+        }));
+        var i;
+        //for each given value in value-array one field
+        //this.debug('given values' + typeof this.fieldDef.values);
+        var values = (typeof this.fieldDef.values == 'object' && this.fieldDef.values.length>0)?this.fieldDef.values : [''];
+        for(i=0;i<values.length;i++){
+            this.addField(values[i]);
+        }
+        this.set('controller',OXI.ClonableFieldControler.create({view:this}));
+    },
 
+    addField: function(value){
+        var fieldDef = this.fieldDef;
+        fieldDef.value = value;
+        var FieldView = OXI.FormFieldFactory.getComponent(this.fieldDef.type,
+        {fieldDef:fieldDef,
+            fieldindex:this.FieldContainerList.content.length
+        }
+        );
+        this.FieldContainerList.pushObject(this.createChildView(FieldView));
+    },
+
+    removeField: function(fieldindex){
+        var FieldView = this.FieldContainerList.content[fieldindex];
+        if(!FieldView){
+            js_debug('no FieldView at index '+fieldindex);
+            return
+        }
+
+        this.FieldContainerList.removeAt(fieldindex);
+        FieldView.destroy();
+        //reindexing all tabs:
+        this.FieldContainerList.forEach(
+        function(FieldView, index, enumerable){
+            FieldView.set('fieldindex',index);
+        }
+        );
+    },
+
+    isValid: function(){
+        this.resetErrors();
+        var isValid = true;
+        this.FieldContainerList.forEach(
+        function(FieldView, index, enumerable){
+            if(! FieldView.isValid()){
+                isValid = false;
+            }
+        }
+        );
+        return isValid;
+    },
+
+    getValue: function(){
+        var values = [];
+        this.FieldContainerList.forEach(
+        function(FieldView, index, enumerable){
+            values.push(FieldView.getValue());
+        }
+        );
+        return values;
+    },
+
+    _lastItem: '' //avoid trailing commas
 });
 
 OXI.FormFieldContainer = OXI.View.extend({
@@ -230,10 +302,13 @@ OXI.FormFieldContainer = OXI.View.extend({
     fieldname:null,
     fieldDef:null,
     isRequired:true,
+    clonable: false,
+    classNames: ['form-group'],
+    classNameBindings: ['_hasError:has-error'],
 
-    isValid:function(){
+    isValid: function(){
         this.resetErrors();
-        if(this.isRequired){
+        if(this.isRequired && this.fieldindex==0){
             if(!this.getValue()){
                 this.setError('Please specify a value');
                 return false;
@@ -241,6 +316,12 @@ OXI.FormFieldContainer = OXI.View.extend({
         }
         return true;
     },
+
+    //needed for clonalbe fields:
+    fieldindex:0,
+    isFirst: function(){
+        return (this.fieldindex==0);
+    }.property('fieldindex'),
 
     _toString:function(){
         return this._super()+' '+this.fieldname;
@@ -254,6 +335,7 @@ OXI.FormFieldContainer = OXI.View.extend({
         this._super();
         this.label = this.fieldDef.label;
         this.fieldname = this.fieldDef.name;
+
         if(this.fieldDef.is_optional){//required is default!
             this.isRequired = false;
         }
@@ -268,7 +350,7 @@ OXI.FormFieldContainer = OXI.View.extend({
     getValue:function(){
         return this.FieldView.value;
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
@@ -279,9 +361,127 @@ OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
         this._super();
         this.setFieldView(OXI.TextField.create(this.fieldDef));
-        if(this.fieldDef.type == 'hidden'){
-            this.hide();   
+    },
+
+    _lastItem: '' //avoid trailing commas
+});
+
+OXI.HiddenFieldContainer = OXI.TextFieldContainer.extend({
+    init:function(){
+        this._super();
+        this.hide();
+    },
+    
+    _lastItem: '' //avoid trailing commas
+});
+
+OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
+    /**
+    convert given field value (in UNIX epoch) to default format of datepicker: mm/dd/yyyy
+    */
+    init:function(){
+        var D = this._getDateObjectFromTime(this.fieldDef.value);
+        if(D){
+            //
+            this.fieldDef.value =
+            ('00' + (D.getUTCMonth()+1)).slice(-2) + '/' +
+            ('00' +  D.getUTCDate()).slice(-2) + '/' +
+            D.getUTCFullYear()
+            ;
+        }else{
+            this.fieldDef.value = '';
         }
+        this._super();
+    },
+    
+    
+    
+    /**
+    re-convert the datepicker format "mm/dd/yyyy" to specified return format
+    return format can be specified via field parameter "return_format"
+    for valid formats see OpenXPKI::Datetime
+    default is "epoch"
+    
+    */
+    getValue:function(){
+        var v = this._super();
+        if(!v) return v;
+        var temp = v.split('/');
+        var year = parseInt(temp[2]);
+        var month = parseInt(temp[0]);
+        var day = parseInt(temp[1]);
+        
+        var return_format = (this.fieldDef.return_format)?this.fieldDef.return_format:'epoch';
+        var nf = function(i){
+            if(i<10) return '0'+i;
+            return i;   
+        }
+        switch(return_format){
+            case 'terse':
+                return year+''+ nf(month) +''+ nf(day) +'000000';
+            case 'printable':
+                return year+'-'+ nf(month) +'-'+ nf(day) +' 00:00:00';
+            case 'iso8601':
+                return year+'-'+ nf(month) +'T'+ nf(day) +' 00:00:00';
+            case 'terse':
+                return year+''+month +''+ day +'000000';
+            case 'epoch':
+                var D = new Date(year,month-1,day);
+                var ms = D.getTime();
+                if(ms){
+                    return parseInt(ms/1000);//seconds
+                }
+                return 0;
+            default:
+                App.applicationAlert('date field '+this.label+': no valid return format specified: '+return_format);
+                return 0;
+        }
+        
+        
+    },
+    
+    /**
+    convert the stupid textfield to an bootstrap datepicker
+    for documentation see http://bootstrap-datepicker.readthedocs.org/en/latest/
+    */
+    didInsertElement: function(){
+
+        this._super();
+        var options = {autoclose:true};
+        var DateNotBefore = this._getDateObjectFromTime(this.fieldDef.notbefore);
+        if(DateNotBefore){
+            options.startDate = DateNotBefore;    
+        }
+        var DateNotAfter = this._getDateObjectFromTime(this.fieldDef.notafter);
+        if(DateNotAfter){
+            options.endDate = DateNotAfter;    
+        }
+        this.$('input').datepicker(options);
+    },
+    
+    /**
+    returns an JS-Date-Object, if possible
+    recognices the string "now"
+    */
+    _getDateObjectFromTime: function(time){
+        if(!time)return;
+        if(time == 'now'){
+            return new Date();   
+        }
+        //sql date and iso8601:
+        if(time.match(/^\d{4}-\d{2}-\d{2}/)){
+            var temp = time.split('-');
+            var D = new Date(parseInt(temp[0]),parseInt(temp[1])-1,parseInt(temp[2]));
+            return D;
+        }
+        //js_debug('epoch date? '+ time);
+        var time = parseInt(time);
+        if (time && !isNaN(time)) {
+            var D = new Date();
+            D.setTime(time*1000);
+            return D;
+        }
+
     },
     
     _lastItem: '' //avoid trailing commas
@@ -302,7 +502,7 @@ OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
     getValue:function(){
         return (this.FieldView.isChecked())?1:0;
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
@@ -314,7 +514,7 @@ OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
         this._super();
         this.setFieldView(OXI.TextArea.create(this.fieldDef));
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
@@ -344,17 +544,17 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
         this.setFieldView(OXI.Select.create(this.fieldDef));
     },
-    
+
     /**
     returns the selected value
     in case of "freetext"-option the entered freetext is returned
     */
-    
+
     getValue:function(){
         var sel_val = this._getSelected();
         return (sel_val == this._freeTextKey)? this.FreeTextView.value : sel_val;
     },
-    
+
     _getSelected:function(){
         return (this.FieldView.selection)?this.FieldView.selection.value:'';
     },
@@ -366,7 +566,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
             this.FreeTextView.toggle((this._getSelected() == this._freeTextKey));
         }
     },
-    
+
     _lastItem: '' //avoid trailing commas
 
 });
@@ -389,13 +589,13 @@ OXI.Select = Ember.Select.extend(
     optionValuePath: 'content.value',
     classNames: ['form-control'] ,
     prompt:null,
-    
+
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
         this.content = Ember.A(this.options);
         if(typeof this.prompt != 'undefined' && this.prompt=='' ){
-            this.prompt = ' ';//display white option   
+            this.prompt = ' ';//display white option
         }
     },
     _lastItem: '' //avoid trailing commas
@@ -412,8 +612,46 @@ OXI.TextField = Ember.TextField.extend(
 {
     classNames: ['form-control'],
     toggle:function(bShow){
-         this.set('isVisible', bShow);  
+        this.set('isVisible', bShow);
     },
     _lastItem: '' //avoid trailing commas
 }
 );
+
+
+OXI.FormButton = OXI.PageButton.extend({
+
+    jsClassName:'OXI.FormButton',
+
+    classNameBindings:['btn_type'],
+    attributeBindings: ['type'],
+    type:function(){
+        if(this.is_default){
+            return 'submit';
+        }else{
+            return 'button';
+        }
+    }.property(),
+
+
+    action:null,//set via constructor (from json)
+    do_submit:false,//set via constructor (from json)
+    is_default:false,//set via constructor
+
+
+    click: function(evt) {
+        js_debug("Button with action "+this.action+" was clicked");
+        this.ParentView.submitAction(this.action,this.do_submit,this.target);
+    },
+
+    init:function(){
+        this._super();
+
+        if(!this.action){
+            App.applicationAlert('FormButton withot action!');
+            return;
+        }
+    },
+
+    _lastItem: '' //avoid trailing commas
+});

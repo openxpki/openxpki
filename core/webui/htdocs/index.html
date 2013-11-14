@@ -14,6 +14,8 @@
     <link href="css/bootstrap.css" rel="stylesheet">
     <!-- CSS for Data Table Grid --> 
     <link href="css/jquery.dataTables.css" rel="stylesheet">
+    <!-- CSS for Datepicker --> 
+    <link href="css/datepicker.css" rel="stylesheet">
     <!-- CSS for context menu --> 
     <link href="css/jquery.contextMenu.css" rel="stylesheet">
     <!-- Custom styles for this project -->
@@ -267,8 +269,22 @@
       {{view.label}}
     </script>
     
+    <script type="text/x-handlebars" data-template-name="form-clonable">
+    {{#each FieldView in view.FieldContainerList}}
+        {{#unless FieldView.isFirst}}
+        <div class="pull-right" style="margin-right: 260px;">
+            <a class="btn btn-xs btn-default form-remove" {{action 'removeField' FieldView.fieldindex}} title="remove">&nbsp;</a>
+        </div>
+        {{/unless}}
+        {{view FieldView}}
+    {{/each}}
+    <div class="col-lg-2 control-label">
+    <a class="btn btn-xs btn-default form-add" {{action 'addField'}}>add {{view.label}}</a>
+    </div>
+    <div class="clearfix" style="margin-bottom:12px;"></div>
+    </script>
+    
     <script type="text/x-handlebars" data-template-name="form-textfield">
-      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-6">
           {{view view.FieldView}}
@@ -276,10 +292,11 @@
           <span class="help-block">{{view.getErrorsAsString}}</span>
           {{/if}}
         </div>
-        </div>
     </script>
+    
+    
+    
     <script type="text/x-handlebars" data-template-name="form-selectfield">
-      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-6">
           {{view view.FieldView}}
@@ -290,11 +307,9 @@
           <span class="help-block">{{view.getErrorsAsString}}</span>
           {{/if}}
         </div>
-        </div>
     </script>
     
     <script type="text/x-handlebars" data-template-name="form-textarea">
-      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-6">
           {{view view.FieldView}}
@@ -302,18 +317,15 @@
           <span class="help-block">{{view.getErrorsAsString}}</span>
           {{/if}}
         </div>
-        </div>
     </script>
     
     <script type="text/x-handlebars" data-template-name="form-checkbox">
-      <div  {{bind-attr class=":form-group view._hasError:has-error"}}>
       <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
       <div class="checkbox">
         <label>
           {{view view.FieldView}} {{view.label}}
         </label>
       </div>
-    </div>
     </div>
     </script>
     
@@ -358,6 +370,7 @@
     <script src="js/libs/jquery.dataTables.min.js"></script>
     <script src="js/libs/jquery.ui.position.js"></script>
     <script src="js/libs/jquery.contextMenu.js"></script>
+    <script src="js/libs/bootstrap-datepicker.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/libs/handlebars-1.0.0.js"></script>

@@ -196,11 +196,14 @@ OXI.ModalView = OXI.View.extend({
     classNames: ['modal', 'fade'],//this is for the outer div around the dialog
     label:null,
     
+    _is_opened: false,
+    
     show: function(label){
         this.set('label',label);
         //js_debug('show modal');
         try{
             this.$().modal('show');
+            this.set('_is_opened',true);
         }catch(e){
             js_debug('exception while closing modal...' + e);
         }
@@ -208,19 +211,23 @@ OXI.ModalView = OXI.View.extend({
     
     close: function(){
         this.set('label','');
+        $('.modal-backdrop.fade.in').hide();
+        
         //js_debug('hide modal');
         try{
-            this.$().modal('hide');
+            if(this._is_opened){
+                this.$().modal('hide');
+            }
         }catch(e){
             js_debug('exception while closing modal...' + e);
             
         }
-        $('.modal-backdrop.fade.in').hide();
+        
     },
     
     init:function(){
         this._super();
-        
+        this.set('_is_opened',false);
         //this.set('controller',OXI.ModalControler.create({view:this}));
         this.set('ContentView', this.createChildView(
                                     OXI.SectionViewContainer.create({displayType:'modal'})

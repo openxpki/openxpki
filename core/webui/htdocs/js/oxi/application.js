@@ -174,10 +174,11 @@ OXI.Application = Ember.Application.extend(
             this._super(infos);
             var path = Ember.Router._routePath(infos);
             //this hook is triggered if a link has been clicked on the page
-            js_debug('didTransition ' + path);
+            js_debug('didTransition ' + path+' , act page count: ' + App.get('_actualPageRenderCount'));
             //we check, if the content for the current route(=server page) has been changed (via form actions etc)
             //if so, we reload page infos from server (otherwise, the re-rendered pagecontent (e.e. form-submits, searchresults) will not be changed)
             if(App.get('_actualPageRenderCount')>1){
+                js_debug('_actualPageRenderCount> 1: reload page from server');
                 App.reloadPageInfoFromServer();
             }
 
@@ -250,17 +251,24 @@ OXI.Application = Ember.Application.extend(
 
     reloadPageInfoFromServer: function(){
         js_debug('App.reloadPageInfoFromServer');
-        this.loadPageInfoFromServer(this._actualPageKey);
+        this.loadPageInfoFromServer(this._actualPageKey, true);
+        //this.reloadPage();
     },
 
-    loadPageInfoFromServer: function(pageKey){
+    loadPageInfoFromServer: function(pageKey, isReload){
         var App = this;
         js_debug('App.loadPageInfoFromServer: '+pageKey);
         this.set('_actualPageRenderCount',0);
+        js_debug('_actualPageRenderCount reset to 0');
         this.set('_actualPageKey',pageKey);
         
-        this.set('MainView',OXI.SectionViewContainer.create());
-        this.set('ModalView',OXI.ModalView.create());
+        //initialisation of the 2 basic views:
+        if(!isReload){
+            this.set('MainView',OXI.SectionViewContainer.create());
+        }
+        if(!isReload){
+            this.set('ModalView',OXI.ModalView.create());
+        }
         
          
         
@@ -319,7 +327,9 @@ OXI.Application = Ember.Application.extend(
 
         if(json.page){
             TargetView.initSections(json);
+            
             this.set('_actualPageRenderCount',this._actualPageRenderCount +1);
+            js_debug('actual page count increased: ' + this._actualPageRenderCount);
         }
         
         if(json.reloadTree){
