@@ -17,7 +17,7 @@
     <action name="changemeta_update_context"
             class="OpenXPKI::Server::Workflow::Activity::Noop"            
             description="I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA"> 
-            <field name="meta_email"/>
+            <field name="meta_email[]"/>
             <field name="meta_requestor"/>
             <field name="meta_system_id" is_required="no"/>            
             <validator name="changemeta_validate_system_id">
