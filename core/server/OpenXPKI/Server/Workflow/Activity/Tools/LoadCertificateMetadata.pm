@@ -40,7 +40,7 @@ sub execute {
         },
     );
     
-    my %arrays;
+    my $context_data;
     ##! 16: ' Size of cert_metadata '. scalar( @{$cert_metadata} )
     foreach my $metadata (@{$cert_metadata}) {
         ##! 32: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
@@ -50,24 +50,31 @@ sub execute {
             ##! 32: 'Deserialize '
             $value = $ser->deserialize( $value );
         }
-        
-        # represent a multivalued attribute, so use array
-        if ($key =~ m{ \A (\w+)\[(\d+)] }xms) {
-            ##! 32: 'add to array with key ' . $key            
-            $arrays{$1.'[]'}->[$2] = $value;            
+       
+        # find multivalues
+        if ($context_data->{$key}) {
+            ##! 32: 'set multivalue context for ' . $key            
+            # on second element, create array with first one
+            if (!ref $context_data->{$key}) {
+                $context_data->{$key} = [ $context_data->{$key} ];
+            }
+            push @{$context_data->{$key}}, $value;                
         } else {
-            ##! 32: 'set context for ' . $key  
-            $context->param( $key => $value );
-        }
+            ##! 32: 'set scalar context for ' . $key  
+            $context_data->{$key} = $value;
+        }        
     }
     
-    ##! 64: 'Non-scalar types ' . Dumper \%arrays 
-    
-    # write back the arrays
-    foreach my $key (keys %arrays) {
-        my $val = $ser->serialize( $arrays{$key} );
-        ##! 64: 'Set key ' . $key . ' to ' . $val
-        $context->param( $key => $ser->serialize( $arrays{$key} ) );
+    # write to the context, serialize non-scalars and add []
+    foreach my $key (keys %{$context_data}) {
+        my $val = $context_data->{$key};
+        if (ref $context_data->{$key}) {
+            ##! 64: 'Set key ' . $key . ' to array ' . Dumper $val              
+            $context->param( $key.'[]' => $ser->serialize( $val  ) );               
+        } else {
+            ##! 64: 'Set key ' . $key . ' to ' . $val            
+            $context->param( $key => $val  );
+        }        
     }
     
     return 1;
