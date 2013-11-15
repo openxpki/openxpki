@@ -359,6 +359,7 @@ OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
+OpenXPKI/Server/Workflow/Validator/CertIdentifierExists.pm
 
 OpenXPKI/Server/Workflow/Validator/Connector.pm
 OpenXPKI/Server/Workflow/Validator/Regex.pm
