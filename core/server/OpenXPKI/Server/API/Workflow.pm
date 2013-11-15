@@ -500,15 +500,14 @@ sub get_workflow_activities_params {
 Limitations and Requirements:
 
 Each workflow MUST start with a state called INITIAL and MUST have exactly
-one action that MUST NOT accept ay parameters. The inital action SHOULD
-set the context value 'creator' to the id of the (associated) user of this
-workflow. Note that the creator is afterwards attached to the workflow
-as attribtue and would not update if you set the context value later!   
+one action. The factory presets the context value for creator with the current
+session user, the inital action SHOULD set the context value 'creator' to the 
+id of the (associated) user of this workflow if this differs from the system
+user. Note that the creator is afterwards attached to the workflow
+as attribtue and would not update if you set the context value later!
 
-You MAY pass startup parameters to this method, if you do so, the first 
-non-autorun state MUST be named INITIALIZED and provide one useable activity 
-(conditions are ok). The method will internally dispatch the call to the 
-execute_workflow_activity
+Workflows that fail on complete the inital action are NOT saved and can not
+be continued.   
 
 =cut
 sub create_workflow_instance {
