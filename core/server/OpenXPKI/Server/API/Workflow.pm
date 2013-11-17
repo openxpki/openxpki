@@ -561,28 +561,27 @@ sub create_workflow_instance {
     
     # check the input params
     my $params = $self->__validate_input_param( $workflow, $initial_action, $args->{PARAMS} );    
-    ##! 16: ' initial params ' . $params
+    ##! 16: ' initial params ' . Dumper  $params
     
     $context->param ( $params ) if ($params);
 
     ##! 64: Dumper $workflow
-
-    # FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID
-    # The old ui validates requests by probing them against the create method
-    # and ignores the missing field error by string parsing
-    # we therefore need to keep that behaviour until decomissioning the old UI
-    eval {
-        $self->__execute_workflow_activity( $workflow, $initial_action );
-    };
-    if ($EVAL_ERROR && index ($EVAL_ERROR , "The following fields require a value:") > -1) {
-        my $eval = $EVAL_ERROR;
-        ## missing field(s) in workflow
-        $eval =~ s/^.*://;
+    
+    $self->__execute_workflow_activity( $workflow, $initial_action );
+    
+    # FIXME - ported from old factory but I do not understand if this ever can happen..
+    # From theory, the workflow should throw an exception if the action can not be handled
+    # Workflow is still in initial state - so something went wrong.
+    if ($workflow->state() eq 'INITIAL') {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
-            params  => {FIELDS => $eval}
-        );
-    }
+            message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
+            log =>  {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => 'system',
+            }            
+        );        
+    }    
     
     # check back for the creator in the context and copy it to the attribute table    
     # doh - somebody deleted the creator from the context
@@ -999,6 +998,21 @@ sub __execute_workflow_activity {
 
         ## normal OpenXPKI exception
         $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
+
+    
+        # FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID
+        # The old ui validates requests by probing them against the create method
+        # and ignores the missing field error by string parsing
+        # we therefore need to keep that behaviour until decomissioning the old UI
+        # The string is from in Workflow::Validator::HasRequiredField    
+        if (index ($eval , "The following fields require a value:") > -1) {
+            ## missing field(s) in workflow
+            $eval =~ s/^.*://;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
+                params  => {FIELDS => $eval}
+            );
+        }
 
         ## workflow exception
         my $error = $workflow->context->param('__error');
