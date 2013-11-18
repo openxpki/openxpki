@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use base qw( Workflow::Validator );
 use OpenXPKI::Debug;
+use Data::Dumper;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error );
-
+use OpenXPKI::Serialization::Simple;
 
 __PACKAGE__->mk_accessors(qw(regex error));
 
@@ -32,15 +33,31 @@ sub validate {
     
     # replace named regexes
     if ($regex eq 'email') {
-        $regex = qr/ \A [a-z0-9\.-]+\@([\w_-]+\.)+(\w+) \z /xi;
-        
+        $regex = qr/ \A [a-z0-9\.-]+\@([\w_-]+\.)+(\w+) \z /xi;        
     # or quote the string if no named match    
     } else {
         $regex = qr/$regex/;
     }
+        
+    # Array Magic
+    my @errors;
+    if ($field =~ m{ \[\] \z }x) {
+        if (!ref $value) {            
+            $value = OpenXPKI::Serialization::Simple->new()->deserialize( $value );
+        }        
+        foreach my $val (@{$value}) {
+            # skip empty       
+            next if (!defined $val || $val eq '');
+            push @errors, $val if ($val !~ $regex);
+        }        
+    } else {
+        push @errors, $value if ($value !~ $regex);
+    }
     
-    if ($value !~ $regex) {
-        $wf->context()->param( '__error_field' => $field );
+    if (@errors) {
+        # Need to implement this in New UI first
+        #$wf->context()->param( '__error' => [ $self->error(), { FIELD => $field, VALUES => \@errors }]);
+        ##! 32: 'Regex errors on field ' . $field . ', values '  . Dumper \@errors
         CTX('log')->log(
             MESSAGE  => "Regex validator failed on regex $regex",
             PRIORITY => 'info',

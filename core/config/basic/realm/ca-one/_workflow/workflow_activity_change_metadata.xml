@@ -24,8 +24,8 @@
                 <arg>meta_system_id</arg>
             </validator>
             <validator name="global_validate_regex">       
-                <arg>meta_email</arg>
-                <arg>email</arg>
+                <arg>meta_email[]</arg>
+                <arg>email</arg>                
             </validator>
     </action>
 
