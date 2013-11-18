@@ -72,7 +72,8 @@ sub execute {
             # The curr holds a hash with items values as key and the full dbi hash as value.
             # We run thru the context values and diff them against the curr hash
             # We remove items from curr if we want to keep them and delete anything left at the end
-            foreach my $val (@values) {                                           
+            foreach my $val (@values) {                                          
+                next unless (defined $val && $val ne '');
                 # check if this value already exists
                 if ($curr->{$val}) {
                     ##! 32: 'Value exists ' . $val
@@ -115,17 +116,21 @@ sub execute {
             } else {
                 ##! 32: 'updating'
                 # take the first item from the hash and modify it
-                keys %{$curr};
-                my $oldval = shift; 
+                my @t = keys %{$curr};
+                my $oldval = shift @t; 
+##! 64: 'oldval ' . $oldval
                 my $serial = $curr->{$oldval}->{ATTRIBUTE_SERIAL};
-                
+
+                # obviously we want to keep this, therefore delete it                
+                delete $curr->{$oldval};
+
                 $dbi->update(
                     TABLE => 'CERTIFICATE_ATTRIBUTES', 
                     DATA => { ATTRIBUTE_VALUE => $val },
                     WHERE => { ATTRIBUTE_SERIAL => $serial }
                 );
                                      
-                ##! 32: sprintf 'change attr %s, old value %s, new value %s', $key, $current_meta->{$key}->{ATTRIBUTE_VALUE}, $param->{$key}),
+                ##! 32: sprintf ('change attr %s, old value %s, new value %s', $key, $current_meta->{$key}->{ATTRIBUTE_VALUE}, $param->{$key}),
                 CTX('log')->log(
                     MESSAGE => sprintf ('cert metadata changed, cert %s, attr %s, new value %s',
                        $key, $oldval, $val),
