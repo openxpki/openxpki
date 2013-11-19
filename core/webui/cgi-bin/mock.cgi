@@ -168,7 +168,7 @@ sub handle {
                 
                 fields => [
                 { name => 'subject', label => 'Subject', type => 'text',is_optional => 1 },
-                { name => 'issuer', label => 'Issuer', type => 'text',is_optional => 1,clonable=>1, values => ['Issuer 1','Issuer 2'] },
+                { name => 'issuer', label => 'Issuer', type => 'text',is_optional => 1,clonable=>1, value => ['Issuer 1','Issuer 2'] },
                 ]
             }
         }]
@@ -617,7 +617,7 @@ sub handle_request_cert{
                         { name => 'no_date', label => 'no date', type => 'date',value=>'halleluhja',return_format => 'terse'},
                         
                         { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
-                        { name => 'clone_key', label => 'Key', type => 'text',clonable=>1, 'values' =>['proposed value' ]},
+                        { name => 'clone_key', label => 'Key', type => 'text',clonable=>1, 'value' =>['proposed value' ]},
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         ]
                     }
