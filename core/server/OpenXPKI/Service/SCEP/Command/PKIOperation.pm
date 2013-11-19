@@ -297,11 +297,12 @@ sub __pkcs_req : PRIVATE {
     if ( $workflow_id ) {
  
         # Fetch the workflow
-        my $wf_info = $api->get_workflow_info({   
+        $wf_info = $api->get_workflow_info({   
             WORKFLOW => $self->__get_workflow_type(),
             ID       => $workflow_id,
         });
  
+        ##! 64: 'wf_info ' . Dumper $wf_info
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE' ) {
 
             # the last workflow is in FAILURE, check the last update
@@ -486,8 +487,12 @@ sub __pkcs_req : PRIVATE {
     # We should now have a workflow object,
     # either a reloaded that did not meet conditions to be retried
     # or a freshly created one
+    
+    ##! 64: 'wf_info ' . Dumper $wf_info
            
     my $wf_state = $wf_info->{WORKFLOW}->{STATE};
+    
+    ##! 16: 'Workflow state ' . $wf_state 
     
     if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {        
         # we are still pending
