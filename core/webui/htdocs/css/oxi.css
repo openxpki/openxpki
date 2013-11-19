@@ -67,10 +67,10 @@ img.toplogo{
     text-indent: 6px;
 }
 .clonable-icon.clonable-add{
-    background: url("../img/add.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+    background: url("../img/add.png") no-repeat scroll left center;
 }
 .clonable-icon.clonable-remove{
-    background: url("../img/remove.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+    background: url("../img/remove.png") no-repeat scroll left center;
 }
 
 
