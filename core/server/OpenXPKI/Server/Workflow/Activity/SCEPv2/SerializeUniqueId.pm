@@ -60,7 +60,6 @@ sub execute {
             NAMESPACE => 'scep.uniq_id',
             KEY => $uniq_id,
             VALUE => $workflow->id,        
-            EXPIRATION_DATE => 0,
          });
         CTX('dbi_backend')->commit();
     };

@@ -160,7 +160,6 @@ sub __persistCertificateInformation {
 	   VALUE => $serialized_data,
 	   ENCRYPT => 0,
 	   FORCE => 1,
-	   EXPIRATION_DATE => 0,
  	});    
  	 	 
  	# Try to autodetected the ca_identifier ....

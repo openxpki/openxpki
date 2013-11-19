@@ -476,11 +476,10 @@ sub __pkcs_req : PRIVATE {
         CTX('api')->set_data_pool_entry({       
             NAMESPACE => 'scep.transaction_id',
             KEY => "$server:$transaction_id",
-            VALUE => $workflow_id,        
-            EXPIRATION_DATE => 0, # TODO - expiry time
-            FORCE => 1, 
+            VALUE => $workflow_id,
+            FORCE => 1,
          });
-        CTX('dbi_backend')->commit();
+         CTX('dbi_backend')->commit();
         
     } 
     
