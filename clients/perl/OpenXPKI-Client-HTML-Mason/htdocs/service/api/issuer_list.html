@@ -25,10 +25,10 @@
     print "    </td>\n";
     print "    <td> ". i18nGettext($ca->{'STATUS'}) ."</td>\n";
     print "    <td>\n";
-    print "      ".join (" ", split "T", $ca->{'NOTBEFORE'})." UTC\n";
+    print           $ca->{'NOTBEFORE'};
     print "    </td>\n";
     print "    <td>\n";
-    print "      ".join (" ", split "T", $ca->{'NOTAFTER'})." UTC\n";
+    print           $ca->{'NOTAFTER'};
     print "    </td>\n";
     print "    <td>\n";
 </%perl>

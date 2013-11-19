@@ -34,15 +34,13 @@
   </tr>
 % foreach my $cert (@results) {
 %   my $notbefore = OpenXPKI::DateTime::convert_date({
-%       DATE => DateTime->from_epoch(epoch => $cert->{NOTBEFORE}),
+%       DATE => DateTime->from_epoch(epoch => $cert->{NOTBEFORE}), OUTFORMAT => 'printable'
 %   });
-%   $notbefore =~ s/T/ /;
 %   $notbefore .= ' UTC';
 
 %   my $notafter = OpenXPKI::DateTime::convert_date({
-%       DATE => DateTime->from_epoch(epoch => $cert->{NOTAFTER}),
+%       DATE => DateTime->from_epoch(epoch => $cert->{NOTAFTER}), OUTFORMAT => 'printable'
 %   });
-%   $notafter =~ s/T/ /;
 %   $notafter .= ' UTC';
 <tr>
   <td>

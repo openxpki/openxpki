@@ -32,10 +32,17 @@
 <%perl>
     print "    </td>\n";
     print "    <td>\n";
-    print "      ".join (" ", split "T", $list{$ca}->{BODY}->{NOTBEFORE})." UTC\n";
+    print  OpenXPKI::DateTime::convert_date({
+              DATE      => DateTime->from_epoch(epoch => $list{$ca}->{BODY}->{NOTBEFORE}),
+              OUTFORMAT => 'printable',
+           }) . ' UTC';
+    
     print "    </td>\n";
     print "    <td>\n";
-    print "      ".join (" ", split "T", $list{$ca}->{BODY}->{NOTAFTER})." UTC\n";
+    print OpenXPKI::DateTime::convert_date({
+              DATE      => DateTime->from_epoch(epoch => $list{$ca}->{BODY}->{NOTAFTER}),
+              OUTFORMAT => 'printable',
+           }) . ' UTC';
     print "    </td>\n";
     print "  <tr>\n";
   }
@@ -55,3 +62,8 @@
     $list{$ca} = $msg->{PARAMS};
   }
 </%init>
+<%once>
+  use OpenXPKI::DateTime;
+  use DateTime;
+</%once>
+

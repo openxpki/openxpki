@@ -54,7 +54,9 @@
 % }
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></td>
-    <td><% join " ", split "T", delete $params->{NOTBEFORE} %> UTC
+    <td><%  OpenXPKI::DateTime::convert_date({
+            DATE => DateTime->from_epoch(epoch => delete $params->{NOTBEFORE}), 
+            OUTFORMAT => 'printable' }) %> UTC
 % if ($not_yet_valid) {
 <b>(<% i18nGettext('I18N_OPENXPKI_CERT_NOT_YET_VALID') %>)</b>
 % }
@@ -62,7 +64,9 @@
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></td>
-    <td><% join " ", split "T", delete $params->{NOTAFTER} %> UTC
+    <td><%  OpenXPKI::DateTime::convert_date({
+            DATE => DateTime->from_epoch(epoch => delete $params->{NOTAFTER}), 
+            OUTFORMAT => 'printable' }) %> UTC
 % if ($expired) {
 <b>(<% i18nGettext('I18N_OPENXPKI_CERT_EXPIRED') %>)</b>
     </td>
@@ -266,13 +270,13 @@
   my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime(time);
   $year += 1900;
   $mon++;
-  my $now = sprintf("%04d-%02d-%02dT%02d:%02d:%02d", $year, $mon, $mday, $hour, $min, $sec);
+  my $now = time();
   my $not_yet_valid;
   my $expired;
-  if ($now lt $params->{NOTBEFORE}) {
+  if ($now < $params->{NOTBEFORE}) {
     $not_yet_valid = 1;
   }
-  if ($now gt $params->{NOTAFTER}) {
+  if ($now > $params->{NOTAFTER}) {
     $expired = 1;
   }
   my $serial = $params->{SERIAL};
@@ -293,5 +297,7 @@
   $pubkey =~ s/\n/<br\/>/g;
 </%init>
 <%once>
-    use Data::Dumper;
+    use Data::Dumper;    
+  use OpenXPKI::DateTime;
+  use DateTime;    
 </%once>

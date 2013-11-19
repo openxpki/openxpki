@@ -31,11 +31,11 @@
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTBEFORE') %></td>
-    <td><% join " ", split "T", $notbefore %> UTC</td>
+    <td><% $notbefore %> UTC</td>
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_NOTAFTER') %></td>
-    <td><% join " ", split "T", $notafter %> UTC</td>
+    <td><% $notafter %> UTC</td>
   </tr>
   <tr>
     <td><% i18nGettext('I18N_OPENXPKI_CERT_ISSUER') %></td>
@@ -93,9 +93,18 @@
   ## print Dumper($msg)."\n";
 
   my $params      = $msg->{PARAMS}->{BODY};
-  my $subject     = $params->{SUBJECT};
-  my $notbefore   = $params->{NOTBEFORE};
-  my $notafter    = $params->{NOTAFTER};
+  my $subject     = $params->{SUBJECT};  
+  my $notbefore = OpenXPKI::DateTime::convert_date({
+      DATE => DateTime->from_epoch(epoch => $params->{NOTBEFORE}), OUTFORMAT => 'printable'
+  });
+  my $notafter = OpenXPKI::DateTime::convert_date({
+      DATE => DateTime->from_epoch(epoch => $params->{NOTAFTER}), OUTFORMAT => 'printable'
+  });
+  
   my $issuer      = $params->{ISSUER};
   my $fingerprint = $params->{FINGERPRINT};
 </%init>
+<%once>
+  use OpenXPKI::DateTime;
+  use DateTime;
+</%once>
