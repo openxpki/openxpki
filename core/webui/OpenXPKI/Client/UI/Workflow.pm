@@ -648,9 +648,9 @@ sub __render_from_workflow {
                 # clonables need array as value
                 if ($item->{clonable}) {                    
                     if (!ref $context->{$name}) {
-                        $item->{values} = $self->serializer()->deserialize($context->{$name});
+                        $item->{value} = $self->serializer()->deserialize($context->{$name});
                     } else {
-                        $item->{values} = $context->{$name};    
+                        $item->{value} = $context->{$name};    
                     }
                 } else {
                     $item->{value} = $context->{$name};
