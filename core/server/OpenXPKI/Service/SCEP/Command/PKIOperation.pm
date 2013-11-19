@@ -279,12 +279,13 @@ sub __pkcs_req : PRIVATE {
     });
     if ($res) {
         # Congrats - we got a race condition
-        if (!$res->{VALUE}) {
+        if ($res->{VALUE} !~ m{ \A \d+ \z }x) {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_PARALLEL_REQUESTS_DETECTED",
                 params => {
                     SERVER => $server,
                     TRANSACTION_ID => $transaction_id,
+                    DPSTATE => $res->{VALUE}
                 }
             );                
         }
