@@ -42,8 +42,7 @@ scep-server-1:
     profile_map:
         pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
 
-    subject_style: 05_advanced_style
-
+    subject_style: enroll
     challenge:
        value: SecretChallenge
 
