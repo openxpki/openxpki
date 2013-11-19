@@ -793,7 +793,7 @@ sub BUILD {
                     regex => $re_alpha_string,
                 },
                 'EXPIRATION_DATE' => {
-                    type  => SCALAR,
+                    type  => SCALAR | UNDEF,
                     regex => $re_integer_string,
                     optional => 1,
                 },

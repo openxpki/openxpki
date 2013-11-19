@@ -1334,7 +1334,14 @@ Named parameters:
 
 =item * FORCE - optional, set to 1 in order to force writing entry to database
 
-=item * EXPIRATION_DATE - optional, seconds since epoch. If entry is older than this value the server may delete the entry.
+=item * EXPIRATION_DATE 
+
+optional, seconds since epoch. If entry is older than this value the server may delete the entry.
+Default is to keep the value for infinity.  
+If you call set_data_pool_entry with the FORCE option to update an exisiting value, 
+the (new) expiry date must be passed again or will be reset to inifity! 
+To prevent unwanted deletion, a value of 0 is not accepted. Set value to undef
+to delete an entry.
 
 =back
 
@@ -1720,10 +1727,8 @@ sub __set_data_pool_entry : PRIVATE {
         }
     }
 
-    if ( defined $expiration_date ) {
-        if (   ( $expiration_date < 0 )
-            || ( $expiration_date > 0 && $expiration_date < time ) )
-        {
+    if ( defined $expiration_date 
+        && $expiration_date < time ) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE',
                 params => {
@@ -1737,8 +1742,7 @@ sub __set_data_pool_entry : PRIVATE {
                     priority => 'error',
                     facility => [ 'system', ],
                 },
-            );
-        }
+            );        
     }
 
     my $encryption_key_id = '';
@@ -1811,16 +1815,18 @@ sub __set_data_pool_entry : PRIVATE {
     );
 
     if ( defined $expiration_date ) {
-        $values{NOTAFTER} = $expiration_date;
+        $values{NOTAFTER} = $expiration_date;    
+    } else {
+        $values{NOTAFTER} = undef;
     }
 
     my $rows_updated;
     if ($force) {
-
-       # force means we can overwrite entries, so first try to update the value.
+        
+        # force means we can overwrite entries, so first try to update the value.
         $rows_updated = CTX('dbi_backend')->update(
             TABLE => 'DATAPOOL',
-            DATA  => { %values, },
+            DATA  => { %values },
             WHERE => \%key,
         );
         if ($rows_updated) {
