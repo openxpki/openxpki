@@ -148,7 +148,7 @@ sub handle {
 
         },
         
-        xright => [
+        right => [
                     {type => 'text',
                      content => {
                         label => 'Bla',#Right pane 1',

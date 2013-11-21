@@ -21,6 +21,10 @@ body {
   background-color: #f5f5f5;
 }
 
+.oxi-form{
+    width: 600px;
+}
+
 .oxi-message{
 
 }
@@ -60,7 +64,7 @@ img.toplogo{
 }
 
 .clonable-margin-normal{
-    margin-right: 270px;    
+    margin-right: 0px;     
 }
 
 .clonable-icon{

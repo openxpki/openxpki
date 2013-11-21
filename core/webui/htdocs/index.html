@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="IE=8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -27,6 +27,11 @@
       <script src="js/libs/html5shiv.js"></script>
       <script src="js/libs/respond.min.js"></script>
     <![endif]-->
+    
+    <!--[if lt IE 9]>
+      <link href="css/ie-8.css" rel="stylesheet">
+    <![endif]-->
+
   </head>
 
   <body>
@@ -248,7 +253,7 @@
      <div {{bind-attr class=":alert view._hasError:alert-danger:hide"}}>{{view.getErrorsAsString}}</div>
      
      <form class="form-horizontal" role="form">
-     <div class="form-group">
+     <div class="form-group oxi-form">
      {{#each FieldContainer in view.FieldContainerList}}
      {{view FieldContainer}}
      {{/each}}
@@ -286,7 +291,7 @@
     
     <script type="text/x-handlebars" data-template-name="form-textfield">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
-        <div {{bind-attr class="view.hasRightPane:col-lg-9:col-lg-6"}}>
+        <div class="col-lg-9">
           {{view view.FieldView}}
           {{#if view._hasError}}
           <span class="help-block">{{view.getErrorsAsString}}</span>
@@ -298,7 +303,7 @@
     
     <script type="text/x-handlebars" data-template-name="form-selectfield">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
-        <div class="col-lg-6">
+        <div class="col-lg-9">
           {{view view.FieldView}}
           {{#if view.hasFreetext}}
           {{view view.FreeTextView}}
@@ -311,7 +316,7 @@
     
     <script type="text/x-handlebars" data-template-name="form-textarea">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
-        <div class="col-lg-6">
+        <div class="col-lg-9">
           {{view view.FieldView}}
           {{#if view._hasError}}
           <span class="help-block">{{view.getErrorsAsString}}</span>
