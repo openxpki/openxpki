@@ -16,6 +16,8 @@
     <link href="css/jquery.dataTables.css" rel="stylesheet">
     <!-- CSS for Datepicker --> 
     <link href="css/datepicker.css" rel="stylesheet">
+    <!-- CSS for editable select --> 
+    <link href="css/bootstrap-combobox.css" rel="stylesheet">
     <!-- CSS for context menu --> 
     <link href="css/jquery.contextMenu.css" rel="stylesheet">
     <!-- Custom styles for this project -->
@@ -314,6 +316,8 @@
         </div>
     </script>
     
+    
+    
     <script type="text/x-handlebars" data-template-name="form-textarea">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-9">
@@ -370,11 +374,13 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/libs/jquery.js"></script>
+    <script src="js/libs/jquery.10.2.js"></script>
     <script src="js/libs/jquery.cookie.js"></script>
     <script src="js/libs/jquery.dataTables.min.js"></script>
     <script src="js/libs/jquery.ui.position.js"></script>
     <script src="js/libs/jquery.contextMenu.js"></script>
+    
+    
     <script src="js/libs/bootstrap-datepicker.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/utils.js"></script>
@@ -386,7 +392,8 @@
     };
     </script>
    <script src="js/libs/ember-1.1.2.js"></script>
-   
+   <!-- customisation of https://github.com/danielfarrell/bootstrap-combobox -->
+   <script src="js/oxi/bootstrap-combobox-oxi.js"></script>
    <script src="js/oxi/namespace.js"></script>
    <script src="js/oxi/config.js"></script>
    <script src="js/oxi/factory.js"></script>

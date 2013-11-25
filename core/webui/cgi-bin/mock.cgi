@@ -168,6 +168,8 @@ sub handle {
                 
                 fields => [
                 { name => 'subject', label => 'Subject', type => 'text',is_optional => 1 },
+                { name => 'cert_purpose', label => 'Purpose',prompt=>'', editable=>1, type => 'select',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
+                        
                 { name => 'issuer', label => 'Issuer', type => 'text',is_optional => 1,clonable=>1, value => ['Issuer 1','Issuer 2'] },
                 ]
             }
@@ -644,7 +646,7 @@ sub handle_certsearch {
 
     return {
         page => {label => 'Your Searchresult',target=>'main'},
-        status => {level => 'info',message=> 'given issuer: '.join(', ', @issuer)},
+        status => {level => 'info',message=> 'purpose: '.$q->param('cert_purpose').', given issuer: '.join(', ', @issuer)},
         
         main => [
                 #first section

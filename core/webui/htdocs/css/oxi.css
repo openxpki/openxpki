@@ -41,6 +41,10 @@ body {
     padding-top:20px;  
 }
 
+.form-control-combo {
+  width: 95%;
+}
+
 div.section{
     padding:0px !important;   
 }

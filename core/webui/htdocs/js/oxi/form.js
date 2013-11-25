@@ -547,6 +547,8 @@ OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
     _lastItem: '' //avoid trailing commas
 });
 
+
+
 OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     templateName: "form-selectfield",
     jsClassName:'OXI.PulldownContainer',
@@ -554,12 +556,18 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     FreeTextView: null,
     hasFreetext:false,
     _freeTextKey : '_freetext_',
+    
+    editable:false,
 
 
     init:function(){
         //Ember.debug('OXI.PulldownContainer :init '+this.fieldDef.label);
         this.set('hasFreetext',false);
+        this.set('editable',false);
         this._super();
+        if(this.fieldDef.editable){
+            this.set('editable',true);   
+        }
 
         if(this.fieldDef.freetext){
 
@@ -580,6 +588,11 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     */
 
     getValue:function(){
+        if(this.editable){
+            var v = this.$('select').combobox('getValue');   
+            this.debug(v);
+            return v;
+        }
         var sel_val = this._getSelected();
         return (sel_val == this._freeTextKey)? this.FreeTextView.value : sel_val;
     },
@@ -595,6 +608,19 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
             this.FreeTextView.toggle((this._getSelected() == this._freeTextKey));
         }
     },
+    
+    didInsertElement: function(){
+
+        this._super();
+        if(this.editable){
+            js_debug(this.fieldname+' is editable');
+            this.$('select').addClass('form-control-combo'); 
+            this.$('select').combobox();  
+            
+        }
+    },
+    
+    
 
     _lastItem: '' //avoid trailing commas
 
@@ -618,7 +644,7 @@ OXI.Select = Ember.Select.extend(
     optionValuePath: 'content.value',
     classNames: ['form-control'] ,
     prompt:null,
-
+    
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
