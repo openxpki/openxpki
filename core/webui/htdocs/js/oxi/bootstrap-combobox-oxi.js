@@ -15,6 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ============================================================ */
+ 
+ 
+ /**
+ minor modifications for OXIproject:
+ 
+ 1) its possible to enter free text value (with activated constructor option 'editable')
+ 2)  public method "getValue": var v = $(...).comobox('getValue');
+ 3) ajax/autocompleter feature
+ 
+ */
 
 !function( $ ) {
 
@@ -25,6 +35,12 @@
 
   var Combobox = function ( element, options ) {
     this.options = $.extend({}, $.fn.combobox.defaults, options);
+    //js_debug(this.options);
+    this.ajaxSource = (this.options.ajaxSource)?this.options.ajaxSource:'';
+    this.ajaxMinChars = (this.options.ajaxMinChars)?this.options.ajaxMinChars:1;
+    this.queryDelay = (this.options.queryDelay)?this.options.queryDelay:100;
+    this.editable = this.options.editable;
+    this.queryTimout = null;
     this.$source = $(element);
     this.$container = this.setup();
     this.$element = this.$container.find('input[type=text]');
@@ -37,6 +53,9 @@
     this.shown = false;
     this.selected = false;
     this.refresh();
+    if(this.ajaxSource){
+        this.$container.addClass('combobox-selected');
+    }
     this.transferAttributes();
     this.listen();
   };
@@ -134,12 +153,59 @@
 
   , lookup: function (event) {
       this.query = this.$element.val();
+      if(this.ajaxSource && this.query.length >= this.ajaxMinChars){
+           return this.handleAjax(this.query);
+      }
       return this.process(this.source);
     }
+  , handleAjax: function(query){
+        if (this.queryTimout) clearTimeout(this.queryTimout);
+        var Combo = this;
+        this.queryTimout = setTimeout(function(){Combo.doAjaxQuery(query);},this.queryDelay);
+    }
+  , doAjaxQuery: function(query){
+    var Combo = this;
+    //js_debug('doAjaxQuery: '+  query);
+    jQuery.ajax({
+            type:  "GET",
+            url: this.ajaxSource,
+            dataType: "json",
+            data:{q:query},
+            cache: false,
+            success: function(json, textStatus){
+                if(!json){
+                    return;
+                }
+                if(!json.options || typeof json.options != 'object'){
+                    return;
+                }
+                //js_debug(json.options);
+                Combo.updateOptions(json.options);
+            },
+            error: function(XMLHttpRequest, textStatus){
+                //js_debug(XMLHttpRequest);
+                ajaxErrorAlert(app.ajaxSource,textStatus,XMLHttpRequest.responseText);
+            }
+        });
+  }
+  
+  , updateOptions: function(options){
+      //js_debug('update options');
+      this.source=[];
+      this.map = {};
+      var i,op;
+      for(i=0;i<options.length;i++){
+          op = options[i];
+          this.source.push(op.label);
+          this.map[op.label] = op.value;
+      }
+      
+      return this.render(this.source).show();
+  }
 
   , process: function (items) {
       var that = this;
-
+      //js_debug(items);
       items = $.grep(items, function (item) {
         return that.matcher(item);
       })
@@ -149,7 +215,7 @@
       if (!items.length) {
         return this.shown ? this.hide() : this;
       }
-
+      
       return this.render(items.slice(0, this.options.items)).show();
     }
 
@@ -181,13 +247,13 @@
 
   , render: function (items) {
       var that = this;
-
+      //js_debug(items);
       items = $(items).map(function (i, item) {
         i = $(that.options.item).attr('data-value', item);
         i.find('a').html(that.highlighter(item));
         return i[0];
       })
-
+      //js_debug(items);
       items.first().addClass('active');
       this.$menu.html(items);
       return this;
@@ -216,16 +282,22 @@
     }
 
   , toggle: function () {
-    if (this.$container.hasClass('combobox-selected')) {
-      this.clearTarget();
-      this.triggerChange();
-      this.clearElement();
+    if ( this.$container.hasClass('combobox-selected')) {
+      if(!this.ajaxSource){
+          this.clearTarget();
+          this.triggerChange();
+          this.clearElement();
+        }else{
+           if (!this.shown)this.show();
+        }
     } else {
       if (this.shown) {
         this.hide();
       } else {
-        this.clearElement();
-        this.lookup();
+        if(!this.ajaxSource){
+            this.clearElement();
+            this.lookup();
+        }
       }
     }
   }
@@ -355,17 +427,21 @@
       this.focused = false;
       var val = this.$element.val();
       if (!this.selected && val !== '' ) {
-        
-        //this.$element.val('');
-        //this.$source.val(val).trigger('change');
-
-        //this.$target.val(val).trigger('change');
+        if(!this.editable){
+            this.$element.val('');
+            this.$source.val(val).trigger('change');
+            this.$target.val(val).trigger('change');
+        }
       }
       if (!this.mousedover && this.shown) {setTimeout(function () { that.hide(); }, 200);}
     }
     ,getValue: function(){
-        js_debug('getValue');
-        return (this.selected)?this.$source.val():this.$element.val();
+        //js_debug('getValue');
+        var textinput = this.$element.val();
+        if(this.map[textinput]){
+            return  this.map[textinput];  
+        }
+        return (this.editable)?textinput:'';
     }
 
   , click: function (e) {
@@ -405,6 +481,8 @@
   template: '<div class="combobox-container"><input type="hidden" /><input type="text" autocomplete="off" /><span class="add-on btn dropdown-toggle" data-dropdown="dropdown"><span class="caret"/><span class="combobox-clear"><i class="icon-remove"/></span></span></div>'
   , menu: '<ul class="typeahead typeahead-long dropdown-menu"></ul>'
   , item: '<li><a href="#"></a></li>'
+  , ajaxMinChars: 3 //minimum amount of chars typed in before ajax query starts
+  ,queryDelay: 100 // num of milliseconds before ajax query is run.
   };
 
   $.fn.combobox.Constructor = Combobox;

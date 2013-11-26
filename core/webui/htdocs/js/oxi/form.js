@@ -558,6 +558,8 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     _freeTextKey : '_freetext_',
     
     editable:false,
+    optionAjaxSource:null,
+    _isComboBox:false,
 
 
     init:function(){
@@ -566,7 +568,14 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
         this.set('editable',false);
         this._super();
         if(this.fieldDef.editable){
-            this.set('editable',true);   
+            this.set('editable',true);
+            this.set('_isComboBox',true);   
+        }
+        
+        if(typeof this.fieldDef.options == 'string'){
+            this.set('_isComboBox',true);   
+            this.set('optionAjaxSource',this.fieldDef.options);
+            this.fieldDef.options = [];
         }
 
         if(this.fieldDef.freetext){
@@ -588,9 +597,9 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     */
 
     getValue:function(){
-        if(this.editable){
+        if(this._isComboBox){
             var v = this.$('select').combobox('getValue');   
-            this.debug(v);
+            this.debug({combo: this.fieldname, combovalue: v});
             return v;
         }
         var sel_val = this._getSelected();
@@ -612,10 +621,15 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     didInsertElement: function(){
 
         this._super();
-        if(this.editable){
+        if(this._isComboBox){
             js_debug(this.fieldname+' is editable');
+            var comboOptions = {queryDelay: 300,editable:this.editable};
+            if(this.optionAjaxSource){
+                comboOptions.ajaxSource = App.serverUrl + '?action='+this.optionAjaxSource;
+            }
+            
             this.$('select').addClass('form-control-combo'); 
-            this.$('select').combobox();  
+            this.$('select').combobox(comboOptions);  
             
         }
     },
@@ -648,7 +662,8 @@ OXI.Select = Ember.Select.extend(
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
-        this.content = Ember.A(this.options);
+        var options = (typeof this.options == 'object')?this.options:[];
+        this.content = Ember.A(options);
         if(typeof this.prompt != 'undefined' && this.prompt=='' ){
             this.prompt = ' ';//display white option
         }
