@@ -27,7 +27,7 @@
 .combobox-container .add-on {
   float: left;
   display: inline-block;
-  width: auto;
+  width: 22px;
   min-width: 16px;
   height: 34px;/*inherit !important;*/
   margin-right: -1px;

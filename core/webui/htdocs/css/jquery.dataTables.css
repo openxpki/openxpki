@@ -196,12 +196,12 @@ table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
 /*
  * Sorting
  */
-.sorting { background: url('/img/datatable/sort_both.png') no-repeat center right; }
-.sorting_asc { background: url('/img/datatable/sort_asc.png') no-repeat center right; }
-.sorting_desc { background: url('/img/datatable/sort_desc.png') no-repeat center right; }
+.sorting { background: url('../img/datatable/sort_both.png') no-repeat center right; }
+.sorting_asc { background: url('../img/datatable/sort_asc.png') no-repeat center right; }
+.sorting_desc { background: url('../img/datatable/sort_desc.png') no-repeat center right; }
 
-.sorting_asc_disabled { background: url('/img/datatable/sort_asc_disabled.png') no-repeat center right; }
-.sorting_desc_disabled { background: url('/img/datatable/sort_desc_disabled.png') no-repeat center right; }
+.sorting_asc_disabled { background: url('../img/datatable/sort_asc_disabled.png') no-repeat center right; }
+.sorting_desc_disabled { background: url('../img/datatable/sort_desc_disabled.png') no-repeat center right; }
  
 table.dataTable thead th:active,
 table.dataTable thead td:active {
