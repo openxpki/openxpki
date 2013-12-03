@@ -168,7 +168,7 @@ sub execute {
             );
                  
             my $csr_info = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });             
-            my @subject_alt_names = @{CTX('api')->render_san_from_template({
+            @subject_alt_names = @{CTX('api')->render_san_from_template({
                 PROFILE => $profile,
                 STYLE   => $subject_style,
                 VARS    => \%subject_vars,
@@ -185,7 +185,7 @@ sub execute {
     ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)
         
     $context->param('cert_subject' => $cert_subject);
-    $context->param('cert_subject_alt_name' => $serializer->serialize( @subject_alt_names )) if (@subject_alt_names);
+    $context->param('cert_subject_alt_name' => $serializer->serialize( \@subject_alt_names )) if (@subject_alt_names);
         
     my $challenge = $csr_body->{'CHALLENGEPASSWORD'};
     if ($challenge) {

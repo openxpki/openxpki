@@ -455,7 +455,7 @@ sub render_san_from_template {
         
     foreach my $type (keys %{$items}) {        
 
-        ##! 32: 'Entries are ' . Dumper @entries       
+        ##! 32: 'Entries are ' . Dumper $items       
         
         # Remove duplicates
         my %entry;
