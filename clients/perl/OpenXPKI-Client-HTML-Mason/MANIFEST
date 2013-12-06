@@ -138,6 +138,8 @@ htdocs/service/workflow/activity/change_crr_reason.html
 htdocs/service/workflow/activity/change_crr_invalidity_time.html
 htdocs/service/workflow/activity/issue_certificate.html
 htdocs/service/workflow/activity/fail_workflow.html
+htdocs/service/workflow/activity/enroll_add_authentication.html
+htdocs/service/workflow/activity/enroll_deny_authentication.html
 
 htdocs/service/create_csr/index.html
 htdocs/service/create_csr/get_workflow_type.mhtml
