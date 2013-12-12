@@ -1,0 +1,7 @@
+% layout 'default';
+% title 'Welcome';
+<h2><%= $message %></h2>
+
+Please contact customer support for the correct URL.
+
+
