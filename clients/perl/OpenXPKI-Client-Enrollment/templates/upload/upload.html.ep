@@ -1,0 +1,28 @@
+% layout 'default';
+% title 'Upload CSR';
+
+<h2><%= $message %></h2>
+%# <p><%= $details %></p>
+
+<p>
+Your certificate request has been uploaded successfully. Please
+contact your customer support contact for the next steps.
+</p>
+
+<br/>
+<p>
+<a href="<%= url_for( '/' . $group ) %>">Upload another CSR</a>
+</p>
+
+% if ( $certpem ) {
+<br/>
+<hr/>
+<br/>
+<p>
+Certificate:<br/>
+<pre>
+<%= $certpem %>
+</pre>
+%# <a href="<%= url_for( '/' . $group . '/getcert/' . $certsn ) %>">Download Certificate</a>
+</p>
+% }

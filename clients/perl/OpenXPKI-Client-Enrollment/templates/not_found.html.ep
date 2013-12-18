@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
+    <title>Error</title>
+  </head>
+  <body>
+    <h1>Not Found</h1>
+    <p>
+    Sorry, the requested page was not found.
+    </p>
+%#    <h2>Reason:</h2>
+%#    <%= $message %>
+%#    <h2>Details:</h2>
+%#    <pre>
+%#    <%= $details %>
+%#    </pre>
+  </body>
+</html>
+

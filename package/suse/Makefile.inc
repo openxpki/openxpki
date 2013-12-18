@@ -9,7 +9,8 @@
 include $(TOPDIR)/package/common/Makefile.inc
 
 # standard directory for RPM builds, to override this use Makefile.local
-RPMBASE=/usr/src/packages
+# or by setting it in your shell environment
+RPMBASE?=/usr/src/packages
 
 ifdef PREFIX
 PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
