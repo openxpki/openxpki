@@ -193,8 +193,8 @@ sub login_step {
 	    },
 	    log     => {
 		logger => CTX('log'),
-		priority => 'info',
-		facility => 'auth',
+		priority => 'warn',
+		facility => 'auth'
 	    },
         );
     }
@@ -218,7 +218,7 @@ sub login_step {
 		log => {
 		    logger => CTX('log'),
 		    priority => 'error',
-		    facility => 'system',
+		    facility => 'auth',
 		},
 		);
         }

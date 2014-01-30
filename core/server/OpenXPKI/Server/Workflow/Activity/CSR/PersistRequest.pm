@@ -170,6 +170,12 @@ sub execute
 
     $dbi->commit();
     $context->param('csr_serial' => $csr_serial);
+        
+    CTX('log')->log(
+        MESSAGE  => "persisted csr for $subject with csr_serial $csr_serial",
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
 }
 
 1;

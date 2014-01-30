@@ -98,9 +98,9 @@ sub execute
     ##! 16: 'key: ' . $key
 
     CTX('log')->log(
-	MESSAGE => 'Created ' . $key_type . ' private key for ' . $context->param('creator'),
-	PRIORITY => 'info',
-	FACILITY => 'audit',
+    	MESSAGE => 'Created ' . $key_type . ' private key for ' . $context->param('creator'),
+    	PRIORITY => 'info',
+    	FACILITY => 'audit',
 	);
 
     $context->param('private_key' => $key);

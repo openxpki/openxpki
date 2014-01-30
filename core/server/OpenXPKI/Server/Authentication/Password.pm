@@ -107,7 +107,7 @@ sub login_step {
         },
         log => {
             logger => CTX('log'),
-            priority => 'error',
+            priority => 'fatal',
             facility => 'system',
         },
         )
@@ -122,7 +122,7 @@ sub login_step {
             },
             log => {
                 logger => CTX('log'),
-                priority => 'error',
+                priority => 'fatal',
                 facility => 'system',
         });
     }

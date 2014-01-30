@@ -34,7 +34,12 @@ sub execute {
     ##! 16: 'check if publishing is enabled for profile ' . $cert_profile     
      
     if (!CTX('config')->get("profile.$cert_profile.publish")) {
-        ##! 32: 'Publishing not enabled for profile ' . $cert->{CSR.PROFILE}
+        ##! 32: 'Publishing not enabled for profile ' . $cert_profile     
+        CTX('log')->log(
+            MESSAGE  => 'Publishing not enabled for profile ' . $cert_profile,
+            PRIORITY => 'debug',
+            FACILITY => 'application',
+        );
         return 1;
     }
                 
@@ -46,6 +51,12 @@ sub execute {
             cert_identifier =>  $cert_identifier,
         },
     });
+
+    CTX('log')->log(
+        MESSAGE  => 'Publishing workflow created with id ' . $wf_info->{WORKFLOW}->{ID},
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
         
     ##! 16: 'Publishing Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
         

@@ -1341,7 +1341,7 @@ sub AUTOMETHOD {
 		    log => {
 			logger => CTX('log'),
 			priority => 'error',
-			facility => 'system',
+			facility => [ 'system', 'audit' ]
 		    },
                 );
             }

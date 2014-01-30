@@ -195,6 +195,12 @@ sub execute {
         $context->param('max_validity' => 0);
     }
 
+    CTX('log')->log(
+        MESSAGE => 'SmartCard status: ' . $result->{SMARTCARD}->{status},
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );   
+
 	##! 1: 'Leaving Initialize::execute()'
 	return 1;
 }

@@ -115,6 +115,12 @@ sub issueCertificate {
 
     ##! 32: 'issuing ca: ' . $issuing_ca
     
+    CTX('log')->log(
+       MESSAGE => "try to issue csr $csr_serial using token $issuing_ca",
+       PRIORITY => 'debug',
+       FACILITY => [ 'application', ],
+    );
+    
     my $default_token = CTX('api')->get_default_token();
     my $ca_token = CTX('crypto_layer')->get_token({
         TYPE => 'certsign',
@@ -179,7 +185,7 @@ sub issueCertificate {
 	    CTX('log')->log(
                 MESSAGE => "Token for $issuing_ca not usable",
                 PRIORITY => 'info',
-                FACILITY => [ 'monitor', 'audit', 'workflow' ],            
+                FACILITY => [ 'monitor', 'audit', 'application' ],            
         );        
         $self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_CERTSIGN_TOKEN_NOT_USABLE');                        
     }
@@ -207,7 +213,7 @@ sub issueCertificate {
     CTX('log')->log(
 	   MESSAGE => "CA '$issuing_ca' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . CTX('api')->get_pki_realm() . "'",
 	   PRIORITY => 'info',
-	   FACILITY => [ 'audit', 'system', ],
+	   FACILITY => [ 'audit', 'application', ],
 	);
 	
 	
@@ -260,6 +266,12 @@ sub checkForRevocation{
         DYNAMIC => {
             IDENTIFIER => {VALUE => $self->_get_context_param('cert_identifier')},
         }
+    );
+        
+    CTX('log')->log(
+       MESSAGE => "Check for revocation of ".$self->_get_context_param('cert_identifier').", result: " . $cert->{STATUS}, 
+       PRIORITY => 'debug',
+       FACILITY => 'application',
     );
 	
 	if ($cert->{STATUS} eq 'REVOKED') {

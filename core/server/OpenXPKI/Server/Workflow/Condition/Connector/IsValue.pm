@@ -55,7 +55,13 @@ sub evaluate
     
     my $expected = $self->value();
     
-    if ($value != $self->value()) {
+    CTX('log')->log(
+        MESSAGE => "Condition mismatch '$value' != '$expected'",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+    
+    if ($value != $expected ) {
         ##! 16: " Values differ - expected: $expected, found: $value "   
         condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CONNECTOR_IS_VALUE");
     }

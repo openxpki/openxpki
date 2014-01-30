@@ -87,7 +87,7 @@ sub _render_template_file {
     if (! -e $filename  ) {
         CTX('log')->log(
             MESSAGE  => "Template file missing $filename  ",
-            PRIORITY => "error",
+            PRIORITY => "warn",
             FACILITY => "system",
         );
         return undef;

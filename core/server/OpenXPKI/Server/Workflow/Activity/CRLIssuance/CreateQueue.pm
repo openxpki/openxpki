@@ -48,7 +48,7 @@ sub execute {
          CTX('log')->log(
             MESSAGE  => sprintf( "Forced CRL update requested on realm $pki_realm" ),
             PRIORITY => "info",
-            FACILITY => "system",
+            FACILITY => [ 'audit', "application" ],
         );       
         return 1;
     }
@@ -68,7 +68,12 @@ sub execute {
     );   
     my %ca_identifier;
     foreach my $entry (@{ $db_results }) {
-        ##! 16: ' ca has revoked certificates pending ' . $entry->{ISSUER_IDENTIFIER}         
+        ##! 16: ' ca has revoked certificates pending ' . $entry->{ISSUER_IDENTIFIER}           
+        CTX('log')->log(
+            MESSAGE  => 'ca has revoked certificates pending ' . $entry->{ISSUER_IDENTIFIER},
+            PRIORITY => 'debug',
+            FACILITY => 'application',
+        );                    
         $ca_identifier{$entry->{ISSUER_IDENTIFIER}} = 1;
     }
     
@@ -126,6 +131,11 @@ sub execute {
          
         if ($crl) {
             ##! 32: ' ca '. $ca->{IDENTIFIER} .' has crl beyond next renewal date '
+            CTX('log')->log(
+                MESSAGE  => ' ca '. $ca->{IDENTIFIER} .' has crl beyond next renewal date ',
+                PRIORITY => 'debug',
+                FACILITY => 'application',
+            );   
             next;                
         }
 

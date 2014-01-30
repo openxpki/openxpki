@@ -47,6 +47,7 @@ sub evaluate
     my $context     = $workflow->context();
     my $pki_realm   = CTX('session')->get_pki_realm();
 
+    # FIXME - I do not see a reason why we need to map all the stuff first...
     foreach my $arg (@parameters) {
 	# access workflow context instead of literal value if value starts
 	# with a $
@@ -59,6 +60,12 @@ sub evaluate
 
     my $context_key = $self->context_key();
     my $condition = $self->condition();
+
+    CTX('log')->log(
+        MESSAGE => "Testing context $context_key for $condition", 
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
 
     my $context_value = $context->param($context_key);
 

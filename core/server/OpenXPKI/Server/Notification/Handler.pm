@@ -95,7 +95,7 @@ sub _init_backends_for_realm {
             CTX('log')->log(
                 MESSAGE  => "Initialization of Notification backend failed: $backend / $EVAL_ERROR",
                 PRIORITY => "error",
-                FACILITY => "system",
+                FACILITY => [ "system", "monitor" ]
             );
             next INIT_BACKEND; 
         }

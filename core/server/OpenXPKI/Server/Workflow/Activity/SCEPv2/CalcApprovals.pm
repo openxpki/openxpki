@@ -65,7 +65,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => 'SCEP auto approval for initial enrollment of ' . $context->param('cert_subject'),
             PRIORITY => 'info',
-            FACILITY => 'audit',
+            FACILITY => ['audit', 'application']
         ) 
     } elsif ( $context->param('request_mode' ) eq 'renewal'  && $context->param('eligible_for_renewal') ) {
         ##! 16: 'auto approve for renewal'        
@@ -73,13 +73,13 @@ sub execute {
         CTX('log')->log(
             MESSAGE => 'SCEP auto approval for renwal of ' . $context->param('cert_subject'),
             PRIORITY => 'info',
-            FACILITY => 'audit',
+            FACILITY => ['audit', 'application'],
         )
     } else {
         CTX('log')->log(
             MESSAGE => 'SCEP no auto approval for eligibility!',
             PRIORITY => 'info',
-            FACILITY => 'audit',
+            FACILITY => 'application',
         )
     }
     
@@ -99,7 +99,7 @@ sub execute {
             MESSAGE => sprintf ('SCEP insufficient approval points (%01d/%01d) for %s ', 
               $approvals, $approval_points, $context->param('cert_subject')),
             PRIORITY => 'info',
-            FACILITY => 'audit',
+            FACILITY => 'application',
         );    
     } else {
         $context->param('have_all_approvals' => '1');    
@@ -107,7 +107,7 @@ sub execute {
             MESSAGE => sprintf ('SCEP got required approval points (%01d/%01d) for  ', 
                $approvals, $approval_points, $context->param('cert_subject')),
             PRIORITY => 'info',
-            FACILITY => 'audit',
+            FACILITY => ['audit','application']
         );
     }
 

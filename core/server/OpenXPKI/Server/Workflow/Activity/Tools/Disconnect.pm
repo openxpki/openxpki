@@ -25,9 +25,19 @@ sub execute {
     
     if (!$cnt) {
         ##! 8: 'First Call - doing pause'
+        CTX('log')->log(
+            MESSAGE => 'Prepate fork of inline workflow, id ' . $workflow->id,
+            PRIORITY => 'info',
+            FACILITY => [ 'workflow' ],
+        );        
         $self->pause();
     }
     ##! 8: 'Resumed'
+    CTX('log')->log(
+        MESSAGE => 'resumed inline workflow, id ' . $workflow->id,
+        PRIORITY => 'info',
+        FACILITY => [ 'workflow' ],
+    );        
     return 1;
     
 }

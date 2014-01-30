@@ -56,14 +56,19 @@ sub execute {
     if ($key_size[0]) {
         if (grep /^$csr_key_size$/, @key_size ) {
         	##! 16: 'keysize ok'               
-            $context->param('csr_key_size_ok' => 1 );        	
+            $context->param('csr_key_size_ok' => 1 );
+            CTX('log')->log(
+                MESSAGE => "SCEP csr key size ok ($csr_key_size)", 
+                PRIORITY => 'debug',
+                FACILITY => 'application',
+            );        	
         } else {
 	    	##! 16: 'wrong keysize'
 	        $context->param('csr_key_size_ok' => 0 );
 	        CTX('log')->log(
-	            MESSAGE => "SCEP csr has wrong key size", 
-	            PRIORITY => 'info',
-	            FACILITY => 'system',
+	            MESSAGE => "SCEP csr has wrong key size ($csr_key_size)", 
+	            PRIORITY => 'error',
+	            FACILITY => 'application',
 	        );
         }        	    
     } else {
@@ -101,13 +106,13 @@ sub execute {
             CTX('log')->log(
 	            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile", 
 	            PRIORITY => 'info',
-	            FACILITY => 'system',
+	            FACILITY => 'application',
 	        );        
         } else {
         	CTX('log')->log(
                 MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile", 
-                PRIORITY => 'error',
-                FACILITY => 'system',
+                PRIORITY => 'warn',
+                FACILITY => 'application',
             );
         }
     }
@@ -135,7 +140,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "SCEP subject rendering enabled ( $profile / $subject_style ) ",
             PRIORITY => 'info',
-            FACILITY => ['system'],
+            FACILITY => ['application'],
         );  
     
         my %subject_vars = %hashed_dn;
@@ -164,7 +169,7 @@ sub execute {
             CTX('log')->log(
                 MESSAGE => "SCEP san rendering enabled ( $profile / $subject_style ) ",
                 PRIORITY => 'info',
-                FACILITY => ['system'],
+                FACILITY => ['application'],
             );
                  
             my $csr_info = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });             
@@ -194,7 +199,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "SCEP challenge password present on CSR subject: " . $context->param('cert_subject'),
             PRIORITY => 'info',
-            FACILITY => ['audit','system'],
+            FACILITY => ['audit','application'],
         );       
     }   
 
@@ -233,7 +238,7 @@ sub execute {
     CTX('log')->log(
         MESSAGE => "SCEP signer subject: " . $signer_subject . ($is_self_signed ? ' - is selfsign' : ''),
         PRIORITY => 'info',
-        FACILITY => 'workflow',
+        FACILITY => 'application',
     );       
                
     # Check if revoked in the database                
@@ -251,14 +256,14 @@ sub execute {
              CTX('log')->log(
                 MESSAGE => "SCEP signer certificate revoked; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject",
                 PRIORITY => 'info',
-                FACILITY => 'audit',
+                FACILITY => ['audit','monitor','application']
             );
         } else {
             $context->param('signer_status_revoked' => '0');
             CTX('log')->log(
                 MESSAGE => "SCEP signer certificate valid; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject",
                 PRIORITY => 'info',
-                FACILITY => 'audit',
+                FACILITY => [ 'audit', 'application'],
             );            
         }
         $context->param('signer_cert_identifier' => $signer_hash->{IDENTIFIER});
@@ -288,15 +293,15 @@ sub execute {
         ##! 4: 'signature invalid: ' . $EVAL_ERROR                
         CTX('log')->log(
             MESSAGE => "Invalid SCEP signature; CSR subject: " . $context->param('cert_subject'),
-            PRIORITY => 'info',
-            FACILITY => 'audit',
+            PRIORITY => 'warn',
+            FACILITY => ['audit','application'],
         );
         $context->param('signer_signature_valid' => 0);                        
     } else {
         CTX('log')->log(
             MESSAGE => "SCEP signature verified; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject",
             PRIORITY => 'info',
-            FACILITY => 'audit',
+            FACILITY => ['audit','application'],
         );
         $context->param('signer_signature_valid' => 1);
     }
@@ -350,8 +355,8 @@ sub execute {
                 $cert_count = 1;
                 CTX('log')->log(
                     MESSAGE => "SCEP Signer $signer_identifier is in grace period",
-                    PRIORITY => 'info',
-                    FACILITY => 'audit',
+                    PRIORITY => 'info',                    
+                    FACILITY => ['audit','application'],
                 );
             }
         }        
@@ -382,7 +387,7 @@ sub execute {
                  CTX('log')->log(
                     MESSAGE => 'Certificate '.$cert->{IDENTIFIER}.' is within renewal period',
                     PRIORITY => 'info',
-                    FACILITY => 'audit',
+                    FACILITY => 'application',
                 );
                 last;
             }

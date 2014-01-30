@@ -1114,7 +1114,7 @@ sub get_data_pool_entry {
         # no entry found, do not raise exception but simply return undef
         CTX('log')->log(
             MESSAGE => "Requested data pool entry [$requested_pki_realm:$namespace:$key] not available",
-            PRIORITY => 'info',
+            PRIORITY => 'debug',
             FACILITY => 'system',
         );
         return;

@@ -131,6 +131,12 @@ sub execute
             );
         }
         
+        CTX('log')->log(
+            MESSAGE => 'Signed approval for workflow ' . $workflow->id() . " by user $user, role $role",
+            PRIORITY => 'info',
+            FACILITY => ['audit', 'application' ],
+        );
+        
         # look for already present approvals by someone with the same
         # certificate and role
         if ($self->param('multi_role_approval') &&
@@ -183,13 +189,19 @@ sub execute
         CTX('log')->log(
 		    MESSAGE => 'Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role",
 		    PRIORITY => 'info',
-		    FACILITY => 'audit',
+		    FACILITY => ['audit', 'application' ],
         );
     }
 
     ##! 64: 'approvals: ' . Dumper \@approvals
     $approvals = $serializer->serialize(\@approvals);
     ##! 64: 'approvals serialized: ' . Dumper $approvals
+
+    CTX('log')->log(
+        MESSAGE => 'Total number of approvals ' . scalar @approvals,
+        PRIORITY => 'debug',
+        FACILITY => [ 'application' ],
+    );
 
     $context->param ('approvals' => $approvals);
  

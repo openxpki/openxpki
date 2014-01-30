@@ -123,6 +123,11 @@ sub execute_action {
     ##! 16: 'set proc_state "running"'
     $self->_set_proc_state('running');#saves wf state and other infos to DB
     
+    CTX('log')->log(
+        MESSAGE  => "Execute action $action_name on workflow #" . $self->id,
+        PRIORITY => "info",
+        FACILITY => "application"
+    );
 
     my $state='';
     # the double eval construct is used, because the handling of a caught pause throws a runtime error as real exception, 
@@ -342,6 +347,12 @@ sub pause {
         )
     );
     $self->_set_proc_state('pause');#saves wf data
+    
+    CTX('log')->log(
+        MESSAGE  => "Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup " . DateTime->from_epoch( epoch => $wakeup_at )->strftime("%F %T"),    
+        PRIORITY => "info",
+        FACILITY => "application"
+    );
 }
 
 sub set_reap_at_interval{
@@ -383,12 +394,27 @@ sub _handle_proc_state{
     #we COULD use symbolic references to method-calls here, but - for the moment - we handle it explizit:
     if($action_needed eq '_wake_up'){
         ##! 1: 'paused, call wakeup '
+         CTX('log')->log(
+            MESSAGE  => "Action $action_name waking up",    
+            PRIORITY => "debug",
+            FACILITY => "application"
+        );
         $self->_wake_up($action_name);
     }elsif($action_needed eq '_resume'){
         ##! 1: 'call _resume '
+        CTX('log')->log(
+            MESSAGE  => "Action $action_name resume",    
+            PRIORITY => "debug",
+            FACILITY => "application"
+        );
         $self->_resume($action_name);
     }elsif($action_needed eq '_runtime_exception'){
         ##! 1: 'call _runtime_exception '
+        CTX('log')->log(
+            MESSAGE  => "Action $action_name runtime exception",    
+            PRIORITY => "debug",
+            FACILITY => "application"
+        );
         $self->_runtime_exception($action_name);
     }else{
         
@@ -569,10 +595,15 @@ sub _autofail {
         );
         $self->_save();
     };
+    CTX('log')->log(
+        MESSAGE  => "Autofail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." failed",    
+        PRIORITY => "error",
+        FACILITY => "application"
+    );
 	
 }
 
-
+## FIXME - is this used anywhere - looks like a duplicate leftover from autofail
 sub _skip {
 	
 	my $self = shift;	
@@ -633,6 +664,12 @@ sub _save{
     # even if the excpetion is somewhere later. Should be gone after moving to direct subclassing
     if ($self->state() eq 'INITIAL' &&
         ($proc_state eq 'init' || $proc_state eq 'running'  || $proc_state eq'exception' )) {
+    
+         CTX('log')->log(
+            MESSAGE  => "Workflow crashed during startup  wont save!",    
+            PRIORITY => "error",
+            FACILITY => ["workflow","application"]
+        );
     
         ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
         return; 

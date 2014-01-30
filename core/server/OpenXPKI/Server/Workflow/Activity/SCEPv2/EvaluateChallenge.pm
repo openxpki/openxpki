@@ -48,7 +48,7 @@ sub execute {
     CTX('log')->log(
         MESSAGE => "SCEP validation path " . join("|", @path),
         PRIORITY => 'debug',
-        FACILITY => 'workflow',
+        FACILITY => 'application',
     );   
 
     my $res; 
@@ -64,7 +64,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "SCEP Challenge using bind " . ($res ? "validated" : "validation FAILED!"),
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );        
            
     } else {
@@ -76,7 +76,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "SCEP Challenge using compare " . ($res ? "validated" : "validation FAILED!"),
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );                        
     }
     

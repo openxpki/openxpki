@@ -63,7 +63,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "No metadata for $profile / $style ",
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );         
         return 1;
     }

@@ -108,13 +108,13 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "SCEP Signer validated - trusted root is $signer_root", 
             PRIORITY => 'info',
-            FACILITY => ['workflow','auth']
+            FACILITY => ['application','audit']
         );        
     } else {
         CTX('log')->log(
             MESSAGE => "SCEP Signer validation FAILED", 
             PRIORITY => 'info',
-            FACILITY => ['workflow','auth']
+            FACILITY => ['application']
         );
     }
 
@@ -131,7 +131,7 @@ sub execute {
     CTX('log')->log(
         MESSAGE => "SCEP Signer Authorization $signer_profile / $signer_realm / $signer_subject",        
         PRIORITY => 'trace',
-        FACILITY => 'workflow',
+        FACILITY => 'application',
     );            
     
     TRUST_RULE:
@@ -169,7 +169,7 @@ sub execute {
             CTX('log')->log(
                 MESSAGE => "SCEP Signer Authorization matched subrule $rule/$match",
                 PRIORITY => 'debug',
-                FACILITY => 'workflow',
+                FACILITY => 'application',
             );            
             ##! 32: 'Matched ' . $match
         }
@@ -179,7 +179,7 @@ sub execute {
             CTX('log')->log(
                 MESSAGE => "SCEP Signer Authorization matched rule $rule",
                 PRIORITY => 'info',
-                FACILITY => 'workflow',
+                FACILITY => 'application',
             );            
             $context->param('signer_on_behalf' => 1);
             return 1;
@@ -189,7 +189,7 @@ sub execute {
     CTX('log')->log(
         MESSAGE => "SCEP Signer not found in trust list ($signer_subject).",
         PRIORITY => 'info',
-        FACILITY => ['system','audit']
+        FACILITY => ['application','audit']
     );
 
     $context->param('signer_on_behalf' => 0);

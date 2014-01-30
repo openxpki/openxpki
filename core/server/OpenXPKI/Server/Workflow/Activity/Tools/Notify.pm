@@ -42,6 +42,12 @@ sub execute {
     my $notify = $context->param('wfl_notify');
     $handles = $ser->deserialize( $notify  ) if ($notify);
     ##! 32: 'Found persisted data: ' . Dumper $handles  
+        
+    CTX('log')->log(
+        MESSAGE => 'Trigger notification message ' .$message,    
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );  
     
     # Re-Assign the handles from the return value 
     $handles = CTX('notification')->notify({

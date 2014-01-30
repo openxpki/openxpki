@@ -53,6 +53,12 @@ sub execute {
         );
     }   
 
+    CTX('log')->log(
+        MESSAGE  => "start cert issue for serial $csr_serial, workflow " . $workflow->id,
+        PRIORITY => 'info',
+        FACILITY => [ 'application', 'audit' ]
+    );
+
     my $set_context = $nice_backend->issueCertificate( $csr );
 
     ##! 64: 'Setting Context ' . Dumper $set_context      
@@ -70,6 +76,7 @@ sub execute {
     my $serial = CTX('dbi_backend')->get_new_serial(
         TABLE => 'CERTIFICATE_ATTRIBUTES',
     );
+    
     ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes with key ' . $serial . ' for cert ' . $set_context->{cert_identifier} 
     CTX('dbi_backend')->insert(
         TABLE => 'CERTIFICATE_ATTRIBUTES', 

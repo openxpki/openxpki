@@ -135,7 +135,7 @@ sub execute {
                     MESSAGE => sprintf ('cert metadata changed, cert %s, attr %s, new value %s',
                        $key, $oldval, $val),
                     PRIORITY => 'info',
-                    FACILITY => 'audit',        
+                    FACILITY => ['audit','application']        
                 );
             }           
         } elsif(defined $param->{$key}) {
@@ -145,7 +145,7 @@ sub execute {
                 MESSAGE => sprintf ('cert metadata added, cert %s, attr %s, value %s',
                    $cert_identifier, $key, $param->{$key}),
                 PRIORITY => 'info',
-                FACILITY => 'audit',        
+                FACILITY => ['audit','application']        
             );
                                  
             ##! 32: 'Add new attribute ' . $key . ' value ' . $param->{$key}

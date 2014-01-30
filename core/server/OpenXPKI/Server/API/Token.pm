@@ -403,7 +403,7 @@ sub get_ca_list {
                 CTX('log')->log(
                     MESSAGE  => 'I18N_OPENXPKI_API_TOKEN_GET_CA_LIST_TOKEN_STATUS_EVAL_ERROR',
                     PRIORITY => "error",
-                    FACILITY => "system",
+                    FACILITY => [ 'application', 'system', 'monitor' ],
                 );    
             }         
         }        

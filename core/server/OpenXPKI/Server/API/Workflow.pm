@@ -453,7 +453,7 @@ sub execute_workflow_activity {
     CTX('log')->log(
     	MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
     	PRIORITY => 'info',
-    	FACILITY => 'system',
+    	FACILITY => 'workflow',
 	);
 
     return __get_workflow_info($workflow);
@@ -541,7 +541,7 @@ sub create_workflow_instance {
     CTX('log')->log(
         MESSAGE  => "Workflow instance $wf_id created for $creator (type: '$wf_title')",
         PRIORITY => 'info',
-        FACILITY => 'system',
+        FACILITY => 'workflow',
     );
 
 
@@ -578,7 +578,7 @@ sub create_workflow_instance {
             log =>  {
                 logger => CTX('log'),
                 priority => 'error',
-                facility => 'system',
+                facility => [ 'system', 'workflow' ]
             }            
         );        
     }    
@@ -858,7 +858,7 @@ sub __get_workflow_factory {
         CTX('log')->log(
             MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config version ' . $wf_session_info->{config_version} . ' (falling back to current head ' . CTX('config')->get_head_version() . ')',
             PRIORITY => 'warn',
-            FACILITY => 'system',
+            FACILITY => 'workflow',
         );
     }
     
@@ -961,7 +961,7 @@ sub __validate_input_param {
                 log => {
                     logger => CTX('log'),
                     priority => 'error',
-                    facility => 'system',
+                    facility => 'workflow',
                 },
             );
         }
@@ -986,14 +986,14 @@ sub __execute_workflow_activity {
         CTX('log')->log(
             MESSAGE  => sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
                 $wf_activity, $workflow->id(), $workflow->type(), $eval),
-            PRIORITY => 'info',
-            FACILITY => 'system',
+            PRIORITY => 'error',
+            FACILITY => 'workflow',
         );
 
         my $log = {
             logger => CTX('log'),
             priority => 'error',
-            facility => 'system',
+            facility => 'workflow',
         };
 
         ## normal OpenXPKI exception

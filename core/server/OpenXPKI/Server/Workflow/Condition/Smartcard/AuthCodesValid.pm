@@ -82,6 +82,12 @@ sub evaluate {
         return -1;
     }
 
+    CTX('log')->log(
+        MESSAGE => "Auth codes checked.",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+
     return 1
 
 }

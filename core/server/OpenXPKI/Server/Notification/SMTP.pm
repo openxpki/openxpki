@@ -139,7 +139,7 @@ sub _init_transport {
         CTX('log')->log(
             MESSAGE  => sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}),
             PRIORITY => "fatal",
-            FACILITY => "system",
+            FACILITY => [ "system", "monitor" ]
         );
         return undef;
     }
@@ -184,8 +184,8 @@ sub _init_use_html {
         if ($EVAL_ERROR) {
             CTX('log')->log(
                 MESSAGE  => "Initialization of MIME::Entity failed, falling back to plain text",
-                PRIORITY => "error",
-                FACILITY => "system",
+                PRIORITY => "fatal",
+                FACILITY => [ "system", "monitor" ]
             );
             return 0;
         } else {
@@ -225,7 +225,7 @@ sub notify {
         CTX('log')->log(
             MESSAGE  => "No notifcations to send for $msgconfig",
             PRIORITY => "debug",
-            FACILITY => "system",
+            FACILITY => "application",
         );  
         return undef;
     }
@@ -308,8 +308,8 @@ sub notify {
         if (!$vars{to}) {        	
         	CTX('log')->log(
             	MESSAGE  => "Failed sending notification - no receipient",
-            	PRIORITY => "error",
-            	FACILITY => "system",
+            	PRIORITY => "warn",
+            	FACILITY => "application",
 	        );
 	        push @failed, $handle;
 	        next MAIL_HANDLE;        	
@@ -350,8 +350,8 @@ sub _render_receipient {
         ##! 8: 'This is not an address ' . $mail
         CTX('log')->log(
             MESSAGE  => "Not a mail address: $mail",
-            PRIORITY => "error",
-            FACILITY => "system",
+            PRIORITY => "warn",
+            FACILITY => "application",
         );
         return undef;
     }

@@ -60,9 +60,9 @@ sub create_workflow {
     ##! 2: "BTW we shredder many workflow IDs here"
 
     CTX('log')->log(
-	MESSAGE  => "Created workflow ID $id.",
-	PRIORITY => "info",
-	FACILITY => "system"
+    	MESSAGE  => "Created workflow ID $id.",
+    	PRIORITY => "info",
+    	FACILITY => "workflow"
 	);
 
     return $id;
@@ -254,7 +254,7 @@ sub update_workflow {
     CTX('log')->log(
         MESSAGE  => "Updated workflow $id",
         PRIORITY => "info",
-        FACILITY => "system"
+        FACILITY => "workflow"
 	);
 
     return 1;
@@ -283,8 +283,8 @@ sub fetch_workflow {
 	(! $result->{WORKFLOW_LAST_UPDATE})) {
 	CTX('log')->log(
 	    MESSAGE  => "Could not retrieve workflow entry $id",
-	    PRIORITY => "info",
-	    FACILITY => "system"
+	    PRIORITY => "warn",
+	    FACILITY => "workflow"
 	    );
 
 	OpenXPKI::Exception->throw (
@@ -414,8 +414,8 @@ sub create_history {
 
 	CTX('log')->log(
 	    MESSAGE  => "Created workflow history entry $id",
-	    PRIORITY => "info",
-	    FACILITY => "system"
+	    PRIORITY => "debug",
+	    FACILITY => "workflow"
 	    );
     }
 
@@ -460,7 +460,7 @@ sub fetch_history {
 	CTX('log')->log(
 	    MESSAGE  => "Fetched history object '$histid'",
 	    PRIORITY => "debug",
-	    FACILITY => "system"
+	    FACILITY => "workflow"
 	    );
 	
         $hist->set_saved();

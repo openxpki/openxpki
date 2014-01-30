@@ -74,7 +74,7 @@ sub execute {
     CTX('log')->log(
         MESSAGE => "Rendering subject: $cert_subject",
         PRIORITY => 'info',
-        FACILITY => [ 'workflow', ],
+        FACILITY => [ 'application', ],
     );         
     
 
@@ -100,7 +100,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "Rendering san using template style",
             PRIORITY => 'debug',
-            FACILITY => [ 'workflow', ],
+            FACILITY => [ 'application', ],
         );         
        
         @san_list = @{CTX('api')->render_san_from_template({
@@ -116,7 +116,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "Rendering san using free style",
             PRIORITY => 'debug',
-            FACILITY => [ 'workflow', ],
+            FACILITY => [ 'application', ],
         );         
                        
         # FIXME -  should get refactored when new ui is ready
@@ -180,7 +180,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "No san rendered as no input was available",
             PRIORITY => 'debug',
-            FACILITY => [ 'workflow', ],
+            FACILITY => [ 'application', ],
         );                 
         
     }

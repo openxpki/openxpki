@@ -45,7 +45,13 @@ sub execute {
     CTX('api')->modify_data_pool_entry($params);
 
     CTX('dbi_backend')->commit();
-
+    
+    CTX('log')->log(
+        MESSAGE => "SmartCard escrow key renamed for csr_serial " . $context->param('csr_serial'), 
+        PRIORITY => 'info',
+        FACILITY => 'application'
+    );
+    
     return 1;
 }
 

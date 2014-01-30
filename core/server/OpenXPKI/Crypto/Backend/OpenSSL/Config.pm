@@ -171,7 +171,7 @@ sub set_cert_list
 		    CTX('log')->log(
 			MESSAGE => "Invalid reason code '" . $reason_code . "' specified",
 			PRIORITY => 'warn',
-			FACILITY => [ 'system' ],
+			FACILITY => [ 'application' ],
 			);
 		    $reason_code = 'unspecified';
 		}

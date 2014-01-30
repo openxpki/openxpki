@@ -573,7 +573,7 @@ sub __flag_and_fetch_workflow {
 
     CTX('log')->log(
         MESSAGE  => sprintf( 'watchdog: paused wf %d found, mark with flag "%s"', $wf_id, $rand_key ),
-        PRIORITY => "info",
+        PRIORITY => "debug",
         FACILITY => "workflow",
     );
 
@@ -599,8 +599,8 @@ sub __flag_and_fetch_workflow {
     if ( !$update_ok ) {
         CTX('log')->log(
             MESSAGE  => sprintf( 'watchdog, paused wf %d: update with mark "%s" not succesfull', $wf_id, $rand_key ),
-            PRIORITY => "info",
-            FACILITY => "workflow",
+            PRIORITY => "warn",
+            FACILITY => ["workflow","system"]
         );        
         return;
     }
@@ -621,7 +621,7 @@ sub __flag_and_fetch_workflow {
         CTX('log')->log(
             MESSAGE  => sprintf( 'watchdog, refetching wf %d with mark "%s" not succesfull', $wf_id, $rand_key ),
             PRIORITY => "error",
-            FACILITY => "workflow",
+            FACILITY => ["workflow","system"]
         );
         return;
     }

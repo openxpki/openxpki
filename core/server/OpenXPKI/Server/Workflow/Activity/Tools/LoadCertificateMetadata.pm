@@ -77,6 +77,12 @@ sub execute {
         }        
     }
     
+    CTX('log')->log(
+        MESSAGE => 'Found metadata keys '. join(", ", keys %{$context_data}) .' for ' . $cert_identifier,   
+        PRIORITY => 'debug',
+        FACILITY => [ 'application' ],
+    );  
+    
     return 1;
     
 }

@@ -179,7 +179,7 @@ sub __send_cert : PRIVATE {
             log => {
                 logger => CTX('log'),
                 priority => 'error',
-                facility => 'system',
+                facility => 'application',
             },
         );          
     }
@@ -188,7 +188,7 @@ sub __send_cert : PRIVATE {
          CTX('log')->log(
             MESSAGE => "SCEP getcert - no certificate found for serial $requested_serial_hex",
             PRIORITY => 'info',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );             
         
         return $token->command(
@@ -271,7 +271,7 @@ sub __pkcs_req : PRIVATE {
     CTX('log')->log(
         MESSAGE => "SCEP incoming request, id $transaction_id",
         PRIORITY => 'info',
-        FACILITY => 'workflow',
+        FACILITY => 'application',
     );
 
     my $workflow_id = 0;
@@ -312,7 +312,7 @@ sub __pkcs_req : PRIVATE {
         CTX('log')->log(
             MESSAGE => "SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );
         ##! 64: 'wf_info ' . Dumper $wf_info
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE' ) {
@@ -358,7 +358,7 @@ sub __pkcs_req : PRIVATE {
                 CTX('log')->log(
                     MESSAGE => "SCEP workflow failed before, retry allowed",
                     PRIORITY => 'info',
-                    FACILITY => 'workflow',
+                    FACILITY => 'application',
                 );
             }
             else {
@@ -367,7 +367,7 @@ sub __pkcs_req : PRIVATE {
                 CTX('log')->log(
                     MESSAGE => "SCEP workflow failed before and retry wait window not elapsed",
                     PRIORITY => 'info',
-                    FACILITY => 'workflow',
+                    FACILITY => 'application',
                 );
             }
         }
@@ -381,7 +381,7 @@ sub __pkcs_req : PRIVATE {
         CTX('log')->log(
             MESSAGE => "SCEP try to start new workflow for $transaction_id",
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );
         # inject newlines if not already present
         # this is necessary for openssl / openca-scep to parse
@@ -491,7 +491,7 @@ sub __pkcs_req : PRIVATE {
         CTX('log')->log(
             MESSAGE => "SCEP started new workflow with id $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );
         # Record the scep tid and the workflow in the datapool      
         CTX('dbi_backend')->commit();    
@@ -519,7 +519,7 @@ sub __pkcs_req : PRIVATE {
         CTX('log')->log(
             MESSAGE => "SCEP $workflow_id in state $wf_state, send pending reply",
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );
 
         # we are still pending
@@ -584,7 +584,7 @@ sub __pkcs_req : PRIVATE {
         CTX('log')->log(
             MESSAGE => "Delivered certificate via SCEP ($cert_identifier)",
             PRIORITY => 'info',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );
 
         return $certificate_msg;
@@ -599,14 +599,14 @@ sub __pkcs_req : PRIVATE {
         CTX('log')->log(
             MESSAGE => "SCEP Request failed without error code set - default to badRequest",
             PRIORITY => 'error',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );
         $error_code = 'badRequest';
     } else {
         CTX('log')->log(
             MESSAGE => "SCEP Request failed with error $error_code",
             PRIORITY => 'error',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );
     }
     my $error_msg = $token->command(

@@ -266,6 +266,11 @@ sub execute {
     #
     if ($found) {
 
+        CTX('log')->log(
+            MESSAGE => 'SmartCard delivered activation code to ' . $user,
+            PRIORITY => 'info',
+            FACILITY => ['audit','application']
+        );
         # pass on the activation code back to the user interface
         $context->param( '_password', $code );
         return $self;
@@ -278,7 +283,7 @@ sub execute {
             log => {
                 logger => CTX('log'),
                 priority => 'warn',
-                facility => 'system',
+                facility => 'application',
             },
         );
         return;

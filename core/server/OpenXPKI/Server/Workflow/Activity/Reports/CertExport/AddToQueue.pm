@@ -32,6 +32,12 @@ sub execute {
        $export->{$key} = $self->param($key) || '';  
     }    
 
+    CTX('log')->log(
+        MESSAGE  => "prepare cert ".$context->param( 'cert_identifier' )." for export",
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
+
     ##! 16: 'Mapping attributes: ' . Dumper $export  
     
     CTX('api')->set_data_pool_entry({'NAMESPACE' => $namespace, 'KEY' => $context->param( 'cert_identifier' ), 'VALUE' => $ser->serialize( $export ), 'FORCE' => 1 });

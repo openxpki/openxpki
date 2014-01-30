@@ -26,7 +26,7 @@ sub execute
     CTX('log')->log(
 	MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
 	PRIORITY => 'info',
-	FACILITY => 'audit',
+	FACILITY => ['audit','application']
     );
 =cut
     my $bulk = $context->param('bulk');
