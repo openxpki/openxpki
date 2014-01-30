@@ -268,6 +268,12 @@ sub __pkcs_req : PRIVATE {
         }
     );
     
+    CTX('log')->log(
+        MESSAGE => "SCEP incoming request, id $transaction_id",
+        PRIORITY => 'info',
+        FACILITY => 'workflow',
+    );
+
     my $workflow_id = 0;
     my $wf_info; # filled in either one of the branches 
         
@@ -303,6 +309,11 @@ sub __pkcs_req : PRIVATE {
             ID       => $workflow_id,
         });
  
+        CTX('log')->log(
+            MESSAGE => "SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
+            PRIORITY => 'info',
+            FACILITY => 'workflow',
+        );
         ##! 64: 'wf_info ' . Dumper $wf_info
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE' ) {
 
@@ -367,6 +378,11 @@ sub __pkcs_req : PRIVATE {
         
         ##! 16: "no workflow was found, creating a new one"
  
+        CTX('log')->log(
+            MESSAGE => "SCEP try to start new workflow for $transaction_id",
+            PRIORITY => 'info',
+            FACILITY => 'workflow',
+        );
         # inject newlines if not already present
         # this is necessary for openssl / openca-scep to parse
         # the data correctly
@@ -472,6 +488,11 @@ sub __pkcs_req : PRIVATE {
         $workflow_id = $wf_info->{WORKFLOW}->{ID};
         ##! 16: 'workflow_id: ' . $workflow_id
         
+        CTX('log')->log(
+            MESSAGE => "SCEP started new workflow with id $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
+            PRIORITY => 'info',
+            FACILITY => 'workflow',
+        );
         # Record the scep tid and the workflow in the datapool      
         CTX('dbi_backend')->commit();    
         CTX('api')->set_data_pool_entry({       
@@ -495,6 +516,12 @@ sub __pkcs_req : PRIVATE {
     ##! 16: 'Workflow state ' . $wf_state 
     
     if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {        
+        CTX('log')->log(
+            MESSAGE => "SCEP $workflow_id in state $wf_state, send pending reply",
+            PRIORITY => 'info',
+            FACILITY => 'workflow',
+        );
+
         # we are still pending
         my $pending_msg = $token->command(
             {   COMMAND => 'create_pending_reply',
@@ -571,10 +598,16 @@ sub __pkcs_req : PRIVATE {
         #);
         CTX('log')->log(
             MESSAGE => "SCEP Request failed without error code set - default to badRequest",
-            PRIORITY => 'info',
+            PRIORITY => 'error',
             FACILITY => 'system',
         );
         $error_code = 'badRequest';
+    } else {
+        CTX('log')->log(
+            MESSAGE => "SCEP Request failed with error $error_code",
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        );
     }
     my $error_msg = $token->command(
         {   COMMAND      => 'create_error_reply',
