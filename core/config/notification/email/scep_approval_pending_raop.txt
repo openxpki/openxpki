@@ -1,0 +1,14 @@
+Dear Operator,
+
+We have received a new certification request via SCEP with the following data:
+
+Subject: [% cert_subject %]
+[% FOREACH san = cert_subject_alt_name  -%]
+Subject alternative name: [% san.0 %]: [% san.1 %]
+[% END -%]
+
+For this request, a new workflow has been created on the CA system
+with ID [% meta_wf_id %].
+
+Regards,
+  PKI Team

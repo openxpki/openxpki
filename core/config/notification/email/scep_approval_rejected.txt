@@ -1,0 +1,10 @@
+Dear Customer,
+
+We have to inform you that your SCEP certificate request for
+  [% cert_subject %]
+has been rejected.
+
+If you have any questions on this matter, please contact us.
+
+Regards,
+  PKI Team
