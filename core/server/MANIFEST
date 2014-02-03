@@ -252,6 +252,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/SetEntry.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Datapool/DeleteEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/AppendToEntry.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
