@@ -40,15 +40,17 @@ sub get_parsed
 
     foreach my $name (@_)
     {
+        ##! 16: 'Name ' . $name
         if (defined $ref and exists $ref->{$name})
         {
             $ref = $ref->{$name};
+                       
         } else {
             $ref = undef;
         }
     }
     if (not defined $ref or ref($ref) eq "HASH")
-    {
+    {               
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE",
             params  => {"NAME" => join ("/", @_)});

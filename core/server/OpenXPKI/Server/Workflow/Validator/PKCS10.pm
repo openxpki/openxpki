@@ -88,9 +88,11 @@ sub validate {
 
     my $subject = $csr->get_parsed('SUBJECT');
     if (! defined $subject) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
-            );
+         CTX('log')->log(
+            MESSAGE  => 'PKCS10 has no subject',
+            PRIORITY => "warn",
+            FACILITY => "application"
+        );        
     }
 
     # propagate fixed PKCS#10 request to workflow context
