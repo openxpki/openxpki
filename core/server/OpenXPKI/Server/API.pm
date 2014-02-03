@@ -284,6 +284,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_boolean,
                 },
+                KEEPROOT  => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                }, 
             },
         },
         'get_ca_list' => {

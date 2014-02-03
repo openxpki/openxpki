@@ -444,7 +444,7 @@ sub get_chain {
     if ($arg_ref->{BUNDLE}) {    
         
         # we do NOT include the root in p7 bundles
-        pop @certs if ($complete); 
+        pop @certs if ($complete && !$arg_ref->{KEEPROOT}); 
                     
         my $result = $default_token->command({
             COMMAND          => 'convert_cert',
@@ -638,3 +638,7 @@ Returns a hash ref with the following entries:
     COMPLETE      1 if the complete chain was found in the database
                   0 otherwise
  
+By setting "BUNDLE => 1" you will not get a hash but a PKCS7 encoded bundle
+holding the requested certificate and all intermediates (if found). Add  
+"KEEPROOT => 1" to also have the root in PKCS7 container.   
+
