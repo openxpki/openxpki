@@ -63,7 +63,9 @@ style:
     enroll:
         subject: 
             dn: CN=[% CN.0 %]:blueroad,OU=Blueroad,O=Stadt Freising,L=Freising,C=de
-  
+        
+        metadata:
+            system_id: "[% data.cust_id %]"
 
 role:
 - Web Server
