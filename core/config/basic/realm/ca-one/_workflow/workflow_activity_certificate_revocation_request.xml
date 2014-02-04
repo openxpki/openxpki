@@ -3,20 +3,14 @@
   <!-- because it is only used to initialize the workflow -->
   <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource">
-      <field name="creator"/>
-      <field name="creator_role"/>
-      <field name="cert_identifier"/>
-      <field name="reason_code"/>
+      <field name="cert_identifier" is_required="yes" />
+      <field name="reason_code"  is_required="yes"
+        type="select" 
+        source_list="unspecified,keyCompromise,CACompromise,affiliationChanged,superseded,cessationOfOperation" />
       <field name="comment"/>
-      <field name="invalidity_time"/>
-      <field name="flag_crr_auto_approval"/>
-      <field name="crr_info"/>            
-      <validator name="I18N_OPENXPKI_WF_VAL_HASREQUIREDFIELD">
-        <arg>cert_identifier</arg>
-        <arg>reason_code</arg>
-        <arg>comment</arg>
-        <arg>invalidity_time</arg>
-      </validator>
+      <field name="invalidity_time"  is_required="yes" type="date"  default="now" />
+      <field name="flag_crr_auto_approval" type="server" />
+      <field name="crr_info"  type="server" />                 
       <validator name="I18N_OPENXPKI_WF_VAL_CREATOR"/>
       <validator name="I18N_OPENXPKI_WF_VAL_INVALIDITYTIME">
         <arg>$invalidity_time</arg>
@@ -28,21 +22,20 @@
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource">
-      <field name="invalidity_time"/>
+      <field name="invalidity_time" type="date" />
       <validator name="I18N_OPENXPKI_WF_VAL_INVALIDITYTIME">
         <arg>$invalidity_time</arg>
       </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource">
-      <field name="reason_code"/>
+      <field name="reason_code" type="select" source_list="unspecified,keyCompromise,CACompromise,affiliationChanged,superseded,cessationOfOperation" />
       <validator name="I18N_OPENXPKI_WF_VAL_REASONCODE">
         <arg>$reason_code</arg>
       </validator>
   </action>
   <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve"
-          pkcs7tool="testsceppkcs7tool1"
           multi_role_approval="0"
           check_creator="0">
           <!-- if multi_role_approval is set to 1, a user is allowed
@@ -59,13 +52,7 @@
   <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
 	  class="Workflow::Action::Null">
   </action> 
-  
-  <action name="I18N_OPENXPKI_WF_ACTION_EXPORT_CRR"
-	  class="OpenXPKI::Server::Workflow::Activity::Tools::Export"
-          export_destination="0"
-          export_state="INITIAL_IMPORT">
-  </action>
-  
+   
   <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
 	  class="OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest">
   </action>
