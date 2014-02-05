@@ -42,9 +42,21 @@ sub execute {
         
     my $csr_body = $csr_obj->get_parsed_ref()->{BODY};
     ##! 32: 'csr_parsed: ' . Dumper $csr_body
-    
-    
+        
     my $csr_subject = $csr_body->{'SUBJECT'};
+    # Explicit check for empty subject - should never happen but if it crashes the logic
+    if (!$csr_subject) {
+        CTX('log')->log(
+            MESSAGE => "SCEP csr has no subject", 
+            PRIORITY => 'error',
+            FACILITY => 'application',
+        );
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_ACTIVITY_SCEP_EXTRACT_CSR_NO_SUBJECT'
+        );
+    }
+    
+    
     my $csr_key_size = $csr_body->{KEYSIZE};
     $context->param('csr_subject' => $csr_subject);    
     $context->param('csr_type'    => 'pkcs10');

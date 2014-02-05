@@ -39,7 +39,9 @@
   </validator>
   <validator name="I18N_OPENXPKI_WF_VAL_PKCS10"
              class="OpenXPKI::Server::Workflow::Validator::PKCS10">
+        <param name="empty_subject" value="0" />             
   </validator>
+  
   <validator name="I18N_OPENXPKI_WF_VAL_PASSWORDQUALITY"
              class="OpenXPKI::Server::Workflow::Validator::PasswordQuality">
         <param name="DICTIONARY" value="5"/>
