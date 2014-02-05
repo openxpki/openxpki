@@ -8,9 +8,14 @@ scep-server-1:
     
     workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
 
+    # allow rsa keys with 1020 to 2048 bit
+    # the 1020 is necessary as some implementations can have
+    # leading 0 in the modulus which will reduce the bitcount
     key_size:
-    - 1024    
-    - 2048
+        rsaEncryption: 1020-2048
+
+    hash_type: 
+    - sha1
     
     authorized_signer_on_behalf:
         rule1:

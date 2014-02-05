@@ -58,39 +58,71 @@ sub execute {
     
     
     my $csr_key_size = $csr_body->{KEYSIZE};
+    my $csr_key_type = $csr_body->{PUBKEY_ALGORITHM};
+    my ($csr_hash_type) = lc($csr_body->{PUBKEY_HASH}) =~ m{ \A ([^:]+) : }x;
+         
     $context->param('csr_subject' => $csr_subject);    
     $context->param('csr_type'    => 'pkcs10');
     $context->param('csr_key_size' => $csr_key_size );
+    $context->param('csr_key_type' => $csr_key_type );
+    $context->param('csr_hash_type' => $csr_hash_type );
     
-    # Check the key size against allowed ones
-    
-    my @key_size = $config->get_scalar_as_list("scep.$server.key_size");
-    if ($key_size[0]) {
-        if (grep /^$csr_key_size$/, @key_size ) {
-        	##! 16: 'keysize ok'               
-            $context->param('csr_key_size_ok' => 1 );
-            CTX('log')->log(
-                MESSAGE => "SCEP csr key size ok ($csr_key_size)", 
-                PRIORITY => 'debug',
-                FACILITY => 'application',
-            );        	
-        } else {
-	    	##! 16: 'wrong keysize'
-	        $context->param('csr_key_size_ok' => 0 );
-	        CTX('log')->log(
-	            MESSAGE => "SCEP csr has wrong key size ($csr_key_size)", 
-	            PRIORITY => 'error',
-	            FACILITY => 'application',
-	        );
-        }        	    
+    # Check the key size against allowed ones    
+    my $key_size_allowed = $config->get_hash("scep.$server.key_size");
+    $context->param('csr_key_size_ok' => 0 );
+    $context->param('csr_key_type_ok' => 0 );
+                
+    if (!$key_size_allowed->{$csr_key_type}) {
+        CTX('log')->log(
+            MESSAGE => "SCEP csr key type not known ($csr_key_type)", 
+            PRIORITY => 'warn',
+            FACILITY => 'application',
+        );
     } else {
-        ##! 16: 'keysize definition missing'    	
-    	CTX('log')->log(
-            MESSAGE => "SCEP csr key size check - keysize not defined", 
-            PRIORITY => 'error',
-            FACILITY => 'system',
+        $key_size_allowed->{$csr_key_type} =~ m{ (\d+)(\s*\-\s*(\d+))? }x;
+        my $min = $1; my $max = $3 ? $3 : undef;
+        $context->param('csr_key_type_ok' => 1 );
+        if ($csr_key_size < $min) {
+            CTX('log')->log(
+                MESSAGE => "SCEP csr key size is too small ($csr_key_type / $csr_key_size < $min)", 
+                PRIORITY => 'warn',
+                FACILITY => 'application',
+            );
+        } elsif($max && $csr_key_size > $max)  {
+            CTX('log')->log(
+                MESSAGE => "SCEP csr key size is too long ($csr_key_type / $csr_key_size > $max)", 
+                PRIORITY => 'warn',
+                FACILITY => 'application',
+            );
+        } else {
+            $context->param('csr_key_size_ok' => 1 );               
+            CTX('log')->log(
+                MESSAGE => "SCEP csr key size is ok ($csr_key_type / $csr_key_size)", 
+                PRIORITY => 'warn',
+                FACILITY => 'application',
+            );
+        }  
+    }
+    
+    # Test hash type        
+    my @hash_allowed = $config->get_scalar_as_list("scep.$server.hash_type");
+    my %hash_allowed = map { lc($_) => 1 } @hash_allowed;
+    if ($hash_allowed{$csr_hash_type}) {
+        $context->param('csr_hash_type_ok' => 1 );               
+        CTX('log')->log(
+            MESSAGE => "SCEP csr hash type is ok ($csr_hash_type)", 
+            PRIORITY => 'info',
+            FACILITY => 'application',
+        );
+    } else {
+        $context->param('csr_hash_type_ok' => 0 );               
+        CTX('log')->log(
+            MESSAGE => "SCEP csr hash type not in allowed list ($csr_hash_type)", 
+            PRIORITY => 'warn',
+            FACILITY => 'application',
         );
     }
+ 
     
     # Test for the embeded Profile name at OID 1.3.6.1.4.1.311.20.2 
     
