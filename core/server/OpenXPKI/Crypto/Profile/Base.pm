@@ -92,7 +92,7 @@ sub load_extension
             CTX('log')->log(
                 MESSAGE  => "Critical flag is not set for $ext in profile $profile_path!",
                 PRIORITY => 'warn',
-                FACILITY => 'system',
+                FACILITY => 'application',
             );
         }
         $critical = 'false';

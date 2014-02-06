@@ -82,6 +82,14 @@ sub execute {
     
     ##! 16: 'Config vars : ' . Dumper $context->param()
     
+    CTX('log')->log(
+        MESSAGE  => sprintf ("export config, max records: %01d, queue %s, no of enc targets: %01d ",
+             $context->param( 'max_records' ), $context->param( 'queue_namespace' ), scalar @{$enc_cert}),
+        PRIORITY => 'info',
+        FACILITY => ['application', 'audit']
+    );
+    
+    
     return 1;
 
 }

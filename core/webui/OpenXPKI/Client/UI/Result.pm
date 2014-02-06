@@ -155,10 +155,7 @@ sub param {
                 
     my $cgi = $self->cgi();
     return undef unless($cgi);
-    
-    if (wantarray) {
-        return \({$cgi->param($key)});
-    }   
+
     return $cgi->param($key);
 }
 
@@ -242,7 +239,8 @@ sub __register_wf_token_initial {
  
     my $token = {
         wf_type => $wf_info,
-        wf_param => $wf_param
+        wf_param => $wf_param,
+        redirect => 1, # initial create always forces a reload of the page
     };
 
     # poor mans random id  

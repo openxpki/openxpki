@@ -17,11 +17,19 @@ sub execute {
   
     my $context = $workflow->context();
   
+    my $need_to_wait;
   	# do some work
   	if ($need_to_wait) {
   		# The text is written to the logs and is optional
   		$self->pause('Waiting');
   	}
+  	
+  	CTX('log')->log(
+        MESSAGE => "Please use the application facility to log your stuff, and please be verbose!",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    );         
+     
     
 }
 

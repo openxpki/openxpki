@@ -44,7 +44,7 @@ sub execute
     }
     $context->param(
         'sources' => $serializer->serialize($source_ref),
-    );
+    );    
     return;
 }
 

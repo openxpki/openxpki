@@ -453,7 +453,7 @@ sub execute_workflow_activity {
     CTX('log')->log(
     	MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
     	PRIORITY => 'info',
-    	FACILITY => 'system',
+    	FACILITY => 'workflow',
 	);
 
     return __get_workflow_info($workflow);
@@ -500,15 +500,14 @@ sub get_workflow_activities_params {
 Limitations and Requirements:
 
 Each workflow MUST start with a state called INITIAL and MUST have exactly
-one action that MUST NOT accept ay parameters. The inital action SHOULD
-set the context value 'creator' to the id of the (associated) user of this
-workflow. Note that the creator is afterwards attached to the workflow
-as attribtue and would not update if you set the context value later!   
+one action. The factory presets the context value for creator with the current
+session user, the inital action SHOULD set the context value 'creator' to the 
+id of the (associated) user of this workflow if this differs from the system
+user. Note that the creator is afterwards attached to the workflow
+as attribtue and would not update if you set the context value later!
 
-You MAY pass startup parameters to this method, if you do so, the first 
-non-autorun state MUST be named INITIALIZED and provide one useable activity 
-(conditions are ok). The method will internally dispatch the call to the 
-execute_workflow_activity
+Workflows that fail on complete the inital action are NOT saved and can not
+be continued.   
 
 =cut
 sub create_workflow_instance {
@@ -542,7 +541,7 @@ sub create_workflow_instance {
     CTX('log')->log(
         MESSAGE  => "Workflow instance $wf_id created for $creator (type: '$wf_title')",
         PRIORITY => 'info',
-        FACILITY => 'system',
+        FACILITY => 'workflow',
     );
 
 
@@ -562,16 +561,29 @@ sub create_workflow_instance {
     
     # check the input params
     my $params = $self->__validate_input_param( $workflow, $initial_action, $args->{PARAMS} );    
-    ##! 16: ' initial params ' . $params
+    ##! 16: ' initial params ' . Dumper  $params
     
     $context->param ( $params ) if ($params);
 
     ##! 64: Dumper $workflow
-
+    
     $self->__execute_workflow_activity( $workflow, $initial_action );
     
-    # check back for the creator in the context and copy it to the attribute table
+    # FIXME - ported from old factory but I do not understand if this ever can happen..
+    # From theory, the workflow should throw an exception if the action can not be handled
+    # Workflow is still in initial state - so something went wrong.
+    if ($workflow->state() eq 'INITIAL') {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
+            log =>  {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => [ 'system', 'workflow' ]
+            }            
+        );        
+    }    
     
+    # check back for the creator in the context and copy it to the attribute table    
     # doh - somebody deleted the creator from the context
     if (!$context->param( 'creator' )) {
         $context->param( 'creator' => $creator );        
@@ -846,7 +858,7 @@ sub __get_workflow_factory {
         CTX('log')->log(
             MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config version ' . $wf_session_info->{config_version} . ' (falling back to current head ' . CTX('config')->get_head_version() . ')',
             PRIORITY => 'warn',
-            FACILITY => 'system',
+            FACILITY => 'workflow',
         );
     }
     
@@ -949,7 +961,7 @@ sub __validate_input_param {
                 log => {
                     logger => CTX('log'),
                     priority => 'error',
-                    facility => 'system',
+                    facility => 'workflow',
                 },
             );
         }
@@ -974,18 +986,33 @@ sub __execute_workflow_activity {
         CTX('log')->log(
             MESSAGE  => sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
                 $wf_activity, $workflow->id(), $workflow->type(), $eval),
-            PRIORITY => 'info',
-            FACILITY => 'system',
+            PRIORITY => 'error',
+            FACILITY => 'workflow',
         );
 
         my $log = {
             logger => CTX('log'),
             priority => 'error',
-            facility => 'system',
+            facility => 'workflow',
         };
 
         ## normal OpenXPKI exception
         $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
+
+    
+        # FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID
+        # The old ui validates requests by probing them against the create method
+        # and ignores the missing field error by string parsing
+        # we therefore need to keep that behaviour until decomissioning the old UI
+        # The string is from in Workflow::Validator::HasRequiredField    
+        if (index ($eval , "The following fields require a value:") > -1) {
+            ## missing field(s) in workflow
+            $eval =~ s/^.*://;
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
+                params  => {FIELDS => $eval}
+            );
+        }
 
         ## workflow exception
         my $error = $workflow->context->param('__error');

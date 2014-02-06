@@ -51,7 +51,7 @@ sub sc_parse_certificates {
 	    log => {
 		logger => CTX('log'),
 		priority => 'error',
-		facility => [ 'system', ],
+		facility => [ 'application', ],
 	    },
 	    );
     }
@@ -106,7 +106,7 @@ sub sc_analyze_smartcard {
 	    log => {
 		logger => CTX('log'),
 		priority => 'error',
-		facility => [ 'system', ],
+		facility => [ 'application', ],
 	    },
 	    );
     }
@@ -114,7 +114,7 @@ sub sc_analyze_smartcard {
     CTX('log')->log(
     	MESSAGE => "Start analyze, ChipId: $chipid, TokenId: $tokenid",
         PRIORITY => 'info',
-        FACILITY => [ 'system' ],
+        FACILITY => 'application',
 	);
     
     my $thisrealm = CTX('session')->get_pki_realm();
@@ -206,7 +206,7 @@ sub sc_analyze_smartcard {
             log => {
                 logger => CTX('log'),
                 priority => 'error',
-                facility => [ 'system', ],
+                facility => [ 'application', ],
             },
         );                
     }
@@ -225,7 +225,7 @@ sub sc_analyze_smartcard {
 		log => {
 		    logger => CTX('log'),
 		    priority => 'error',
-		    facility => [ 'system', ],
+		    facility => [ 'application', ],
 		},
 		);
 	} # Status Check
@@ -250,7 +250,7 @@ sub sc_analyze_smartcard {
         log => {
             logger => CTX('log'),
             priority => 'error',
-            facility => [ 'system', ],
+            facility => [ 'application', ],
         },
         );    
 	}
@@ -261,7 +261,7 @@ sub sc_analyze_smartcard {
     CTX('log')->log(
     	MESSAGE => "card is assigned to $holder_employee_id - status is $cardstatus",
         PRIORITY => 'debug',
-        FACILITY => [ 'system' ],
+        FACILITY => [ 'application' ],
 	);
  
 	
@@ -302,7 +302,7 @@ sub sc_analyze_smartcard {
             CTX('log')->log(
                 MESSAGE => "Chip Id of presented token mismatches recorded value! Token: $tokenid, Expected: $chipid, Presented: $retval",
                 PRIORITY => 'warn',
-                FACILITY => [ 'audit', 'system', ],
+                FACILITY => [ 'audit', 'application', ],
             );
         }
     }
@@ -343,7 +343,7 @@ sub sc_analyze_smartcard {
 		log => {
 		    logger => CTX('log'),
 		    priority => 'error',
-		    facility => [ 'system', ],
+		    facility => [ 'application', ],
 		},
 	    );
 	}
@@ -357,7 +357,7 @@ sub sc_analyze_smartcard {
         log => {
             logger => CTX('log'),
             priority => 'error',
-            facility => [ 'system', ],
+            facility => [ 'application', ],
         },
         );
 	}
@@ -382,7 +382,7 @@ sub sc_analyze_smartcard {
 	CTX('log')->log(
     	MESSAGE => "Holder Details: Name: $employeeinfo->{VALUE}->{cn}, Mail: $employeeinfo->{VALUE}->{mail}",
         PRIORITY => 'debug',
-        FACILITY => [ 'system' ],
+        FACILITY => [ 'application' ],
 	);
  	    	    
     # We use the mail address for the workflows
@@ -412,7 +412,7 @@ sub sc_analyze_smartcard {
 			CTX('log')->log(
 		    	MESSAGE => "Holder Details have changed $employee_data_has_changed",
 		        PRIORITY => 'info',
-		        FACILITY => [ 'system' ],
+		        FACILITY => [ 'application' ],
 			);
 		}			
 	} else {		
@@ -445,7 +445,7 @@ sub sc_analyze_smartcard {
 				log => {
 				    logger => CTX('log'),
 				    priority => 'error',
-				    facility => [ 'system', ],
+				    facility => [ 'application', ],
 				},
 				);
 		}	
@@ -534,7 +534,7 @@ sub sc_analyze_smartcard {
 		CTX('log')->log(
 	    	MESSAGE => "PUK for the card was found in datapool (TokenId $tokenid)",
 	        PRIORITY => 'debug',
-	        FACILITY => [ 'system' ],
+	        FACILITY => [ 'application' ],
 		);
        
     } 
@@ -557,7 +557,7 @@ sub sc_analyze_smartcard {
         log => {
         logger => CTX('log'),
         priority => 'error',
-        facility => [ 'system', ],
+        facility => [ 'application', ],
         },
         );
     }    
@@ -644,8 +644,8 @@ sub sc_analyze_smartcard {
             $update_datapool = 1;
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} found on card but not registered in datapool",
-                PRIORITY => 'info',
-                FACILITY => [ 'system' ],
+                PRIORITY => 'debug',
+                FACILITY => [ 'application' ],
             );
         }
     }
@@ -653,7 +653,7 @@ sub sc_analyze_smartcard {
     CTX('log')->log(
         MESSAGE => "Certificates found on card: " . join(', ', keys %{$user_certs->{by_identifier}}),
         PRIORITY => 'info',
-        FACILITY => [ 'system' ],
+        FACILITY => [ 'application' ],
     );     
     
     if ($update_datapool) {
@@ -668,7 +668,7 @@ sub sc_analyze_smartcard {
         CTX('log')->log(
             MESSAGE => "Found unassigned certificates, updating datapool.",
             PRIORITY => 'info',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );        
 
     }
@@ -692,7 +692,7 @@ sub sc_analyze_smartcard {
     CTX('log')->log(
         MESSAGE => "Certificates to load from database: " . join(', ', @certs_to_load_from_db),
         PRIORITY => 'info',
-        FACILITY => [ 'system' ],
+        FACILITY => [ 'application' ],
     );  
 
     if (scalar (@certs_to_load_from_db)) {
@@ -775,7 +775,7 @@ sub sc_analyze_smartcard {
         CTX('log')->log(
             MESSAGE => "Certificate $identifier has profile $cert->{PROFILE} and type $cert->{CERTIFICATE_TYPE}",
             PRIORITY => 'debug',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );
     }
     
@@ -796,7 +796,7 @@ sub sc_analyze_smartcard {
         CTX('log')->log(
             MESSAGE => "Start evaluation for type $type",
             PRIORITY => 'debug',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );
         
         # Sort the list by NOTBEFORE date
@@ -839,7 +839,7 @@ sub sc_analyze_smartcard {
             CTX('log')->log(
                 MESSAGE => "create initial certificate of $type",
                 PRIORITY => 'info',
-                FACILITY => [ 'system' ],
+                FACILITY => [ 'application' ],
             );
         } 
                         
@@ -859,7 +859,7 @@ sub sc_analyze_smartcard {
                 CTX('log')->log(
                     MESSAGE => "add certificate of $type",
                     PRIORITY => 'info',
-                    FACILITY => [ 'system' ],
+                    FACILITY => [ 'application' ],
                 );
             }
             
@@ -878,7 +878,7 @@ sub sc_analyze_smartcard {
                         CTX('log')->log(
                             MESSAGE => "certificate is beyond cutoff date, certificate $identifier will be revoked",
                             PRIORITY => 'debug',
-                            FACILITY => [ 'system' ],
+                            FACILITY => [ 'application' ],
                         );
                     }
                     
@@ -889,7 +889,7 @@ sub sc_analyze_smartcard {
                         CTX('log')->log(
                             MESSAGE => "certificate is beyond cutoff date, certificate $identifier will be purged",
                             PRIORITY => 'debug',
-                            FACILITY => [ 'system' ],
+                            FACILITY => [ 'application' ],
                         );                    
                     }                                   
                     next CERT_ANALYZE_LOOP;    
@@ -909,7 +909,7 @@ sub sc_analyze_smartcard {
                     CTX('log')->log(
                         MESSAGE => "max_count for type $type reached, certificate $identifier will be revoked",
                         PRIORITY => 'debug',
-                        FACILITY => [ 'system' ],
+                        FACILITY => [ 'application' ],
                     );
                 }
                 
@@ -920,7 +920,7 @@ sub sc_analyze_smartcard {
                     CTX('log')->log(
                         MESSAGE => "max_count for type $type reached, certificate $identifier will be purged",
                         PRIORITY => 'debug',
-                        FACILITY => [ 'system' ],
+                        FACILITY => [ 'application' ],
                     );                    
                 }
                 
@@ -946,7 +946,7 @@ sub sc_analyze_smartcard {
                     CTX('log')->log(
                         MESSAGE => "certificate $identifier of type $type will be $action 'ed due to policy",
                         PRIORITY => 'debug',
-                        FACILITY => [ 'system' ],
+                        FACILITY => [ 'application' ],
                     );                    
                 }
             }
@@ -963,7 +963,7 @@ sub sc_analyze_smartcard {
                 CTX('log')->log(
                     MESSAGE => "Set validity based on $identifier to " . DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime("%F %T"),
                     PRIORITY => 'info',
-                    FACILITY => [ 'system' ],
+                    FACILITY => [ 'application' ],
                 );                                          
             }
                         
@@ -999,7 +999,7 @@ sub sc_analyze_smartcard {
     CTX('log')->log(
         MESSAGE => "Overall Status is $result->{OVERALL_STATUS}",
         PRIORITY => 'info',
-        FACILITY => [ 'system' ],
+        FACILITY => [ 'application' ],
     );         
 
     # SC UI needs info about the certs on card
@@ -1102,7 +1102,7 @@ sub __check_against_policy {
         CTX('log')->log(
             MESSAGE => "Certificate $identifier needs profile update ($cert->{PROFILE} to $policy->{preferred_profile})",
             PRIORITY => 'debug',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );
     }
     
@@ -1131,7 +1131,7 @@ sub __check_against_policy {
             CTX('log')->log(
                 MESSAGE  => "Private key not found for escrow certificate [$identifier], dequeueing",
                 PRIORITY => 'info',
-                FACILITY => 'system',
+                FACILITY => 'application',
             );
         }
     } else {        
@@ -1153,7 +1153,7 @@ sub __check_against_policy {
         CTX('log')->log(
             MESSAGE => "Certificate $identifier is outside validity period ($cert->{NOTBEFORE} to $cert->{NOTAFTER})",
             PRIORITY => 'debug',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );
     } else {
         ##! 64: $identifier. ' is in validity period, check renewals'    
@@ -1177,14 +1177,14 @@ sub __check_against_policy {
                     CTX('log')->log(
                         MESSAGE => "Validity: $entry is scheduled for $renewal_date - needs renewal",
                         PRIORITY => 'debug',
-                        FACILITY => [ 'system' ],
+                        FACILITY => [ 'application' ],
                     );
                 } else {
                     ##! 64: "Validity: $entry is scheduled for $renewal_date - no action"                     
                     CTX('log')->log(
                         MESSAGE => "Validity: $entry is scheduled for $renewal_date - no action",
                         PRIORITY => 'debug',
-                        FACILITY => [ 'system' ],
+                        FACILITY => [ 'application' ],
                     );
                 }
             }
@@ -1203,7 +1203,7 @@ sub __check_against_policy {
      CTX('log')->log(
         MESSAGE => "Certificate $identifier analyzed, visual status is $cert->{VISUAL_STATUS}",
         PRIORITY => 'info',
-        FACILITY => [ 'system' ],
+        FACILITY => [ 'application' ],
     );
     
     ##! 32: "Analyze result of $identifier: " . Dumper( $cert->{ANALYZE} )
@@ -1243,7 +1243,7 @@ sub __check_actions_on_install_candidate {
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} is valid and purged from card",
                 PRIORITY => 'debug',
-                FACILITY => [ 'system' ],
+                FACILITY => [ 'application' ],
             );
             $flags->{PURGE} = 1;
             $flags->{SOFT} = 0;
@@ -1256,7 +1256,7 @@ sub __check_actions_on_install_candidate {
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} is invalid and purged from card",
                 PRIORITY => 'debug',
-                FACILITY => [ 'system' ],
+                FACILITY => [ 'application' ],
             );
             last IF_PURGE;
         }
@@ -1267,7 +1267,7 @@ sub __check_actions_on_install_candidate {
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} will be superseeded and is purged from card",
                 PRIORITY => 'debug',
-                FACILITY => [ 'system' ],
+                FACILITY => [ 'application' ],
             );
             last IF_PURGE;
         }        
@@ -1282,14 +1282,14 @@ sub __check_actions_on_install_candidate {
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} is not usable and will be revoked",
                 PRIORITY => 'debug',
-                FACILITY => [ 'system' ],
+                FACILITY => [ 'application' ],
             );
         } elsif (!$analyze->{EXPECTED}) {
             $flags->{REVOKE} = 1;
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} is not expected and will be revoked",
                 PRIORITY => 'debug',
-                FACILITY => [ 'system' ],
+                FACILITY => [ 'application' ],
             );
         }
     }
@@ -1309,8 +1309,8 @@ sub __check_actions_on_install_candidate {
             $flags->{SOFT} = 0;
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} is valid/usable and restored to card",
-                PRIORITY => 'debug',
-                FACILITY => [ 'system' ],
+                PRIORITY => 'info',
+                FACILITY => [ 'application', 'audit' ],
             );
             last IF_INSTALL;        
         }
@@ -1322,8 +1322,8 @@ sub __check_actions_on_install_candidate {
             $flags->{SOFT} = 0;            
             CTX('log')->log(
                 MESSAGE => "Certificate $cert->{IDENTIFIER} is invalid and restored to card",
-                PRIORITY => 'debug',
-                FACILITY => [ 'system' ],
+                PRIORITY => 'info',
+                FACILITY => [ 'application', 'audit' ],
             );
             last IF_INSTALL;
         }
@@ -1362,7 +1362,7 @@ sub __check_actions_on_discard_candidate {
          CTX('log')->log(
             MESSAGE => "Certificate $cert->{IDENTIFIER} is discarded and purged from card",
             PRIORITY => 'debug',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );
     } 
     
@@ -1372,7 +1372,7 @@ sub __check_actions_on_discard_candidate {
         CTX('log')->log(
             MESSAGE => "Certificate $cert->{IDENTIFIER} is not expected and will be revoked",
             PRIORITY => 'debug',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );        
     }
     
@@ -1420,7 +1420,7 @@ sub sc_analyze_certificate {
             log => {
                 logger => CTX('log'),
                 priority => 'error',
-                facility => [ 'system', ],
+                facility => [ 'application', ],
            },
 	    );
     }
@@ -1438,7 +1438,7 @@ sub sc_analyze_certificate {
 	       log => {
 		      logger => CTX('log'),
 		      priority => 'error',
-		      facility => [ 'system', ],
+		      facility => [ 'application', ],
 	       },
 	    );
     }
@@ -1478,7 +1478,7 @@ sub sc_analyze_certificate {
 	       log => {
 		      logger => CTX('log'),
 	          priority => 'error',
-		      facility => [ 'system', ],
+		      facility => [ 'application' ],
 	       },
 	    );
     }

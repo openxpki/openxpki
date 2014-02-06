@@ -83,9 +83,9 @@ sub execute {
     
     ##! 16: 'datapool entry saved to ' . $namespace . ':' . $temp_handle
     CTX('log')->log(
-	MESSAGE => 'Created ' . $keyalg . ' private key for ' . $context->param('creator') . ', saved to datapool entry ' . $namespace . '/' . $temp_handle,
-	PRIORITY => 'info',
-	FACILITY => 'audit',
+    	MESSAGE => 'Created ' . $keyalg . ' private key for ' . $context->param('creator') . ', saved to datapool entry ' . $namespace . '/' . $temp_handle,
+    	PRIORITY => 'info',
+    	FACILITY => ['audit','application']
 	);
     
     my $csr = $default_token->command (

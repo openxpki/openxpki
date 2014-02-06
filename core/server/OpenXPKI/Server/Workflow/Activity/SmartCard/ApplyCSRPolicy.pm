@@ -34,10 +34,10 @@ sub execute {
     my $cert_role = $config->get( "smartcard.policy.certs.type.$cert_type.role" ) || 'User';
     ##! 8: ' Prepare CSR for profile '. $cert_profile .' with role '. $cert_role 
     CTX('log')->log(
-		    MESSAGE => "Preparing CSR for profile '$cert_profile' with role '$cert_role'",
-		    PRIORITY => 'info',
-		    FACILITY => [ 'workflow' ],
-		    );               
+	    MESSAGE => "Preparing CSR for profile '$cert_profile' with role '$cert_role'",
+	    PRIORITY => 'info',
+	    FACILITY => [ 'application' ],
+    );    
 
     # cert_issuance_data is an array of hashes, one entry per certificate
     
@@ -48,19 +48,19 @@ sub execute {
     # If max_validity is not in context, check if the current cert_type has the lead_validity flag set    
     my $max_validity = $context->param('max_validity');    
     if (!$max_validity && $config->get("smartcard.policy.certs.type.$cert_type.lead_validity")) {
-	CTX('log')->log(
-			MESSAGE => "Certificate of type '$cert_type' is a lead certificate",
+	   CTX('log')->log(
+            MESSAGE => "Certificate of type '$cert_type' is a lead certificate",
 			PRIORITY => 'info',
-			FACILITY => [ 'workflow' ],
-			);               
+			FACILITY => [ 'application' ],
+		);               
 	
         # Check for testing override
         my $validity = $config->get("testing.smartcard.max_validity");
         if ($validity) {
             CTX('log')->log(
                 MESSAGE => "Certificate validity override for testing: $validity",
-                PRIORITY => 'info',
-                FACILITY => [ 'audit', 'workflow', ],
+                PRIORITY => 'warn',
+                FACILITY => [ 'audit', 'application', ],
             );               
         }  else {        
             # Fetch validity from profile if no testing value is set        
@@ -68,7 +68,7 @@ sub execute {
             CTX('log')->log(
                 MESSAGE => "Certificate validity configured for profile '$cert_profile': $validity",
                 PRIORITY => 'info',
-                FACILITY => [ 'workflow', ],
+                FACILITY => [ 'application', ],
             );               
         }
 
@@ -80,11 +80,11 @@ sub execute {
             })
         });
         ##! 32: ' Set notafter date due to lead_validity flag to ' .$notafter
-	CTX('log')->log(
+        CTX('log')->log(
 			MESSAGE => "Force notafter date to $notafter",
 			PRIORITY => 'info',
-			FACILITY => [ 'workflow' ],
-			);               
+			FACILITY => [ 'application' ],
+		);               
         $context->param('notafter' => $notafter);
         $context->param('max_validity' => $notafter);
     }
@@ -119,6 +119,12 @@ sub execute {
         
         ##! 8: ' Certificate needs '. $max_login . ' Login/UPNs. Found: '  . scalar @{$allowed_logins}
         ##! 16: ' Allowed Logins found ' .  join("\n", @{$allowed_logins})
+        
+        CTX('log')->log(
+            MESSAGE => ' Certificate needs '. $max_login . ' Login/UPNs. Found: '  . scalar @{$allowed_logins},
+            PRIORITY => 'debug',
+            FACILITY => [ 'application' ],
+        );               
         
         # Check if frontend passed a selection        
         if ($context->param( 'login_ids' )) {
@@ -156,7 +162,13 @@ sub execute {
             $context->param( 'login_ids' );
         } elsif (scalar @{$allowed_logins} > $max_login) {        
             # More then allowed
-            ##! 16: ' Too many logins found - ask frontend '        
+            ##! 16: ' Too many logins found - ask frontend '                 
+            CTX('log')->log(
+                MESSAGE => 'Too many logins, need to ask frontend',
+                PRIORITY => 'info',
+                FACILITY => [ 'application' ],
+            );                               
+              
             # Present the available Logins and the max_login count via the context
             # Clean context first
             $context->param( policy_login_ids => );
@@ -211,6 +223,11 @@ sub execute {
         
         ##! 16: ' UPNs found ' . Dumper( @{$userinfo->{upn}} )
         
+        CTX('log')->log(
+            MESSAGE => 'SmartCard Logins: '.join(" / ", @use_logins).' UPNs: '.join(" / ", @{$userinfo->{upn}}),
+            PRIORITY => 'debug',
+            FACILITY => [ 'application' ],
+        );                                       
 
         # Add the chosel logins to the userinfo structure                    
         $userinfo->{chosen_logins} = \@use_logins;

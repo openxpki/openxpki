@@ -263,7 +263,7 @@ MESSAGE:
         my $data;
         eval {
             $data = $self->collect();
-            ##! 16: "data collected: $data"
+            ##! 16: "data collected: " . Dumper $data
         };
         if ( my $exc = OpenXPKI::Exception->caught() ) {
             if ( $exc->message()

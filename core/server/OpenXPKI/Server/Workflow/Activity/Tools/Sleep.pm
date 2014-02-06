@@ -2,6 +2,8 @@
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
 
+# FIXME - should be replaced by the watchdog and removed
+
 package OpenXPKI::Server::Workflow::Activity::Tools::Sleep;
 
 use strict;
@@ -17,7 +19,14 @@ sub execute
     my $workflow = shift;
     my $context = $workflow->context();
     my $time    = $self->param('time');
-    ##! 32: 'started sleeping (' . $time . ' seconds)' 
+    ##! 32: 'started sleeping (' . $time . ' seconds)'    
+    
+    CTX('log')->log(
+        MESSAGE => "Workflow ".$workflow->id." will sleep now for $time seconds",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    );         
+     
     sleep $time;
     ##! 32: 'stopped sleeping'
     return 1;

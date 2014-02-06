@@ -97,6 +97,13 @@ sub execute {
     ##! 16: 'Publish targets at prefix '. $prefix .' -  ' . Dumper ( @targets )
     ##! 32: 'Data for publication '. Dumper ( $data )
 
+ 
+    CTX('log')->log(
+        MESSAGE => "SmartCard publishing targets: " .join(", ",@targets), 
+        PRIORITY => 'info',
+        FACILITY => 'application'
+    );
+
     foreach my $target (@targets) {
        
         ##! 32: " $prefix.targets.$target.$publish_key " 

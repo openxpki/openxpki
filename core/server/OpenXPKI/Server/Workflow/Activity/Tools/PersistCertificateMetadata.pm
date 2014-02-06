@@ -48,6 +48,9 @@ sub execute {
         my ($template_key) = ($key =~ m{ \A cert_subject_(.*) \z }xms); 
         $subject_vars->{$template_key} = $template_vars->{$key} unless(defined $subject_vars->{$template_key});
     }
+    # Add params from the activity definition
+    $subject_vars->{data} = $params;
+    
     ##! 32: 'Combined vars hash ' . Dumper $subject_vars 
 
     my $metadata = CTX('api')->render_metadata_from_template({
@@ -60,7 +63,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "No metadata for $profile / $style ",
             PRIORITY => 'info',
-            FACILITY => 'workflow',
+            FACILITY => 'application',
         );         
         return 1;
     }

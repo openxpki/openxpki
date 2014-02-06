@@ -51,6 +51,12 @@ sub execute {
 	       params => { EXPECTED => 'pkcs10', TYPE => $csr->{TYPE} },
         );
     }   
+        
+    CTX('log')->log(
+        MESSAGE  => "start cert renewal for csr_serial $csr_serial, workflow " . $workflow->id,
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
     
     my $set_context = $nice_backend->renewCertificate( $csr, $context->param( 'org_cert_identifier' ) );
     	
@@ -62,7 +68,7 @@ sub execute {
     }
     
     
-    ## Add the workflow if of this certificate to the cert_attributes
+    ## Add the workflow id of this certificate to the cert_attributes
 
     my $serial = CTX('dbi_backend')->get_new_serial(
         TABLE => 'CERTIFICATE_ATTRIBUTES',

@@ -90,6 +90,12 @@ sub execute {
 	# value to an empty string
 	$context->param($valparam => '');
     }
+        
+    CTX('log')->log(
+        MESSAGE => 'Set datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE},
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );
 
     # TODO: handle return code from set_data_pool_entry()
 

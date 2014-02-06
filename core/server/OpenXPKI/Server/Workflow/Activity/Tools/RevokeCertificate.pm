@@ -101,7 +101,7 @@ sub execute {
 		    . ', comment: '
 		    . $comment,
 		    PRIORITY => 'info',
-		    FACILITY => [ 'system' ],
+		    FACILITY => [ 'application' ],
 		    );
 
     return 1;

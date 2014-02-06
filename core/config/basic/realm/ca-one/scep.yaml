@@ -1,20 +1,21 @@
 # Transition of scep section in config.xml
 
 scep-server-1:
-    # Time that must elapse after a failed request
-    retry_time: 0000000001
     # Earliest time to create a renewal request
     renewal_period: 000014
     # How long can the certificate be expried to make a renewal
     grace_period: 0000000005
-    # How long a workflow can be reactivated
-    #workflow_expiry: 000014 - unused
     
     workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
 
+    # allow rsa keys with 1020 to 2048 bit
+    # the 1020 is necessary as some implementations can have
+    # leading 0 in the modulus which will reduce the bitcount
     key_size:
-    - 1024    
-    - 2048
+        rsaEncryption: 1020-2048
+
+    hash_type: 
+    - sha1
     
     authorized_signer_on_behalf:
         rule1:
@@ -42,8 +43,7 @@ scep-server-1:
     profile_map:
         pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
 
-    subject_style: 05_advanced_style
-
+    subject_style: enroll
     challenge:
        value: SecretChallenge
 

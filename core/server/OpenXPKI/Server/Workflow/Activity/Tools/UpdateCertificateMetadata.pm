@@ -34,11 +34,11 @@ sub execute {
             'ATTRIBUTE_KEY' => { OPERATOR => 'LIKE', VALUE => 'meta_%' },            
         },
     );
-    
-    # map database into kay/value hash
+
+    # map current database info into 2-dim hash
     my $current_meta = {};    
-    foreach my $item (@{$cert_metadata}) {
-       $current_meta->{$item->{ATTRIBUTE_KEY}} = $item; 
+    foreach my $item (@{$cert_metadata}) {            
+        $current_meta->{$item->{ATTRIBUTE_KEY}}->{$item->{ATTRIBUTE_VALUE}} = $item;        
     }
 
     ##! 32: 'Current meta ' . Dumper $current_meta    
@@ -52,55 +52,104 @@ sub execute {
         
         next if ($key !~ m{ \A meta_ }xms);
         
-        # check if the key was registered before
-        # todo - delete, non scalar items
-        if ($current_meta->{$key}) {
+        my $curr; 
+        # non scalar items - in context we have the square brackets!
+        if ($key =~ m{ \A (\w+)\[\] }xms) {
+
+            my $keybase = $1;
+            ##! 32: 'non scalar key ' .$keybase            
+            $curr = $current_meta->{$keybase};
+            my @values;
             
-            # key already present - do update
-            
-            # not changed - do nothing
-            next if ($current_meta->{$key}->{ATTRIBUTE_VALUE} eq $param->{$key});
-                       
-            ##! 32: sprintf 'change attr %s, old value %s, new value %s', $key, $current_meta->{$key}->{ATTRIBUTE_VALUE}, $param->{$key}),
-            CTX('log')->log(
-                MESSAGE => sprintf ('cert metadata changed, cert %s, attr %s, new value %s',
-                   $key, $current_meta->{$key}->{ATTRIBUTE_VALUE}, $param->{$key}),
-                PRIORITY => 'info',
-                FACILITY => 'audit',        
-            );
-            # delete if value is empty
-            if ($param->{$key} eq '') {
-                $dbi->delete(
-                    TABLE => 'CERTIFICATE_ATTRIBUTES', 
-                    DATA => {
-                        ATTRIBUTE_SERIAL => $current_meta->{$key}->{ATTRIBUTE_SERIAL}
-                    }
-                );                 
+            # the context might already be deserialized if we jump into a live workflow                        
+            if (ref $param->{$key}) {
+                @values = @{$param->{$key}}; 
             } else {
+                @values = @{$ser->deserialize( $param->{$key} )};
+            }
+            
+            # How this works:
+            # The curr holds a hash with items values as key and the full dbi hash as value.
+            # We run thru the context values and diff them against the curr hash
+            # We remove items from curr if we want to keep them and delete anything left at the end
+            foreach my $val (@values) {                                          
+                next unless (defined $val && $val ne '');
+                # check if this value already exists
+                if ($curr->{$val}) {
+                    ##! 32: 'Value exists ' . $val
+                    delete $curr->{$val};                
+                } else {                                      
+                    # does not exists, so create it                             
+                    ##! 32: 'Add new sub-attribute ' . $key . ' value ' . $param->{$key}
+                    my $serial = $dbi->get_new_serial( TABLE => 'CERTIFICATE_ATTRIBUTES' );
+                    $dbi->insert(
+                        TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                        HASH => {
+                            ATTRIBUTE_SERIAL => $serial,
+                            IDENTIFIER => $cert_identifier,
+                            ATTRIBUTE_KEY => $keybase,
+                            ATTRIBUTE_VALUE => $val
+                        }
+                    );      
+                }
+            }
+            
+        # scalar value - check if the key was registered before
+        } elsif ($current_meta->{$key}) {
+            
+            $curr = $current_meta->{$key};
+            
+            ##! 16: 'existing scalar value at ' . $key
+            
+            # key already present - check the value
+            # note - in case somebody wants to shift back from multivalue to scalar
+            # there can be more than one key!
+            my $val = $param->{$key};
+            
+            if (!defined $val) {
+                ##! 32: 'undef - delete it'
+                # noop - will get deleted by final loop            
+            } elsif ($curr->{$val}) {
+                # The value already exists, delete it from the hash to keep it
+                ##! 32: 'unchanged'                                
+                delete $curr->{$val};
+            } else {
+                ##! 32: 'updating'
+                # take the first item from the hash and modify it
+                my @t = keys %{$curr};
+                my $oldval = shift @t; 
+##! 64: 'oldval ' . $oldval
+                my $serial = $curr->{$oldval}->{ATTRIBUTE_SERIAL};
+
+                # obviously we want to keep this, therefore delete it                
+                delete $curr->{$oldval};
+
                 $dbi->update(
                     TABLE => 'CERTIFICATE_ATTRIBUTES', 
-                    DATA => {
-                        ATTRIBUTE_VALUE => $param->{$key},
-                    },
-                    WHERE => {
-                        ATTRIBUTE_SERIAL => $current_meta->{$key}->{ATTRIBUTE_SERIAL}
-                    }
+                    DATA => { ATTRIBUTE_VALUE => $val },
+                    WHERE => { ATTRIBUTE_SERIAL => $serial }
                 );
-            }
-        } else {
-            
+                                     
+                ##! 32: sprintf ('change attr %s, old value %s, new value %s', $key, $current_meta->{$key}->{ATTRIBUTE_VALUE}, $param->{$key}),
+                CTX('log')->log(
+                    MESSAGE => sprintf ('cert metadata changed, cert %s, attr %s, new value %s',
+                       $key, $oldval, $val),
+                    PRIORITY => 'info',
+                    FACILITY => ['audit','application']        
+                );
+            }           
+        } elsif(defined $param->{$key}) {
+            ##! 32: 'insert'
             # insert new value
             CTX('log')->log(
                 MESSAGE => sprintf ('cert metadata added, cert %s, attr %s, value %s',
                    $cert_identifier, $key, $param->{$key}),
                 PRIORITY => 'info',
-                FACILITY => 'audit',        
+                FACILITY => ['audit','application']        
             );
                                  
             ##! 32: 'Add new attribute ' . $key . ' value ' . $param->{$key}
-            my $serial = $dbi->get_new_serial(
-                TABLE => 'CERTIFICATE_ATTRIBUTES',
-            );
+            my $serial = $dbi->get_new_serial( TABLE => 'CERTIFICATE_ATTRIBUTES' );
             $dbi->insert(
                 TABLE => 'CERTIFICATE_ATTRIBUTES', 
                 HASH => {
@@ -112,6 +161,21 @@ sub execute {
             );        
             
         }
+        
+        ##! 64: ' curr is ' . Dumper $curr
+        
+        # remove leftovers from the hash 
+        foreach my $key (keys %{$curr}) {
+            ##! 32: 'remove leftover attribute ' . $key 
+            $dbi->delete(
+                TABLE => 'CERTIFICATE_ATTRIBUTES', 
+                DATA => {                        
+                    ATTRIBUTE_SERIAL => $curr->{$key}->{ATTRIBUTE_SERIAL}
+                }
+            );
+            delete $curr->{$key};
+        }            
+    
     }  
     $dbi->commit();
     return 1;

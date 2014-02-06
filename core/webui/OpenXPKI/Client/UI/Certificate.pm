@@ -423,7 +423,7 @@ sub action_search {
             columns => [                        
                 { sTitle => "serial"},
                 { sTitle => "subject" },
-                { sTitle => "email", format => 'email' },
+                { sTitle => "email"  },
                 { sTitle => "notbefore", format => 'timestamp' },
                 { sTitle => "notafter", format => 'timestamp' },
                 { sTitle => "issuer"},

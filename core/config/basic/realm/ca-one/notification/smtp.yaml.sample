@@ -76,6 +76,40 @@ message:
             to: "[% data.auth2_mail %]"
             reply: "[% data.requestor_mail %]"
             subject: Smartcard Enrollment Verification Request for [% data.requestor_name %]
-            
-                        
+                                    
+    # notifies for the scep server
+    scep_auth_denied:
+        requestor:
+            template: scep_auth_denied
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request REJECTED - [% cert_subject %]
+        
+    scep_approval_pending:
+        requestor:
+            template: scep_approval_pending_requestor
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request PENDING - [% cert_subject %]
+        
+        raop:
+            template: scep_approval_pending_raop
+            to: reg-office@mycompany.local
+            cc: ''                 
+            subject: SCEP request PENDING - [% cert_subject %]
+                
+    scep_approval_rejected:
+        requestor:
+            template: scep_approval_rejected
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request REJECTED - [% cert_subject %]
+        
+    scep_cert_issued:
+        requestor:
+            template: scep_cert_issued
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request ISSUED - [% cert_subject %]
+                                
         

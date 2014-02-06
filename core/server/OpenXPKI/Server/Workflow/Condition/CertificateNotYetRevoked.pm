@@ -38,6 +38,13 @@ sub evaluate
             'PKI_REALM'  => {VALUE => $pki_realm},
         }
     );
+        
+    CTX('log')->log(
+        MESSAGE => "Cert status is ".$cert->{'STATUS'},
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+    
     ##! 16: 'status: ' . $cert->{'STATUS'}
     if ($cert->{'STATUS'} eq 'CRL_ISSUANCE_PENDING') {
         # certificate is in state 'CRL_ISSUANCE_PENDING', throw

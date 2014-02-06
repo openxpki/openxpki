@@ -187,7 +187,7 @@ sub _validation_result {
                     'ARGUMENT' => $self->{ROLEARG},
                 },
                 log => {
-                    PRIORTITY => 'error',
+                    PRIORTITY => 'fatal',
                     FACILITY => 'system',                        
                 }
             );

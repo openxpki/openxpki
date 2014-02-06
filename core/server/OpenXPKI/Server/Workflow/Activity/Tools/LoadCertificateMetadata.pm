@@ -40,17 +40,48 @@ sub execute {
         },
     );
     
-    ##! 32: ' Size of cert_metadata '. scalar( @{$cert_metadata} )
+    my $context_data;
+    ##! 16: ' Size of cert_metadata '. scalar( @{$cert_metadata} )
     foreach my $metadata (@{$cert_metadata}) {
-        ##! 51: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
-        my $key = $metadata->{ATTRIBUTE_KEY};        
+        ##! 32: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
+        my $key = $metadata->{ATTRIBUTE_KEY};
         my $value = $metadata->{ATTRIBUTE_VALUE};
         if ($value =~ /^(ARRAY|HASH)/) {
             ##! 32: 'Deserialize '
             $value = $ser->deserialize( $value );
         }
-        $context->param( $key => $value );
+       
+        # find multivalues
+        if ($context_data->{$key}) {
+            ##! 32: 'set multivalue context for ' . $key            
+            # on second element, create array with first one
+            if (!ref $context_data->{$key}) {
+                $context_data->{$key} = [ $context_data->{$key} ];
+            }
+            push @{$context_data->{$key}}, $value;                
+        } else {
+            ##! 32: 'set scalar context for ' . $key  
+            $context_data->{$key} = $value;
+        }        
     }
+    
+    # write to the context, serialize non-scalars and add []
+    foreach my $key (keys %{$context_data}) {
+        my $val = $context_data->{$key};
+        if (ref $context_data->{$key}) {
+            ##! 64: 'Set key ' . $key . ' to array ' . Dumper $val              
+            $context->param( $key.'[]' => $ser->serialize( $val  ) );               
+        } else {
+            ##! 64: 'Set key ' . $key . ' to ' . $val            
+            $context->param( $key => $val  );
+        }        
+    }
+    
+    CTX('log')->log(
+        MESSAGE => 'Found metadata keys '. join(", ", keys %{$context_data}) .' for ' . $cert_identifier,   
+        PRIORITY => 'debug',
+        FACILITY => [ 'application' ],
+    );  
     
     return 1;
     

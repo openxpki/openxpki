@@ -460,11 +460,12 @@ my %INDEX_of = (
         TABLE => 'WORKFLOW_ATTRIBUTES',
         COLUMNS => [ 'WORKFLOW_SERIAL' ],
     },
-    WORKFLOW_ATTRIBUTES_VALUE_KEY => {
-        NAME  => 'wf_attributes_value_index',
-        TABLE => 'WORKFLOW_ATTRIBUTES',
-        COLUMNS => [ 'ATTRIBUTE_VALUE' ],
-    }
+    #### FIXME - not working as the autoinit stuff generates a LONGTEXT for ATTRIBUTE_VALUE
+    #WORKFLOW_ATTRIBUTES_VALUE_KEY => {
+    #    NAME  => 'wf_attributes_value_index',
+    #    TABLE => 'WORKFLOW_ATTRIBUTES',
+    #    COLUMNS => [ 'ATTRIBUTE_VALUE' ],
+    #}
     );
 
 sub new

@@ -94,6 +94,13 @@ sub execute
 		$context->param($key => $value);
 	    }
 	}
+         
+    CTX('log')->log(
+        MESSAGE => "Setting context $key to $value",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    );
+             
     }
 
     return 1;

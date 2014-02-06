@@ -123,7 +123,7 @@ sub execute {
 		CTX('log')->log(
 	        MESSAGE => 'Transfer failed, do pause' ,
 	        PRIORITY => 'info',
-	        FACILITY => 'system',
+	        FACILITY => 'application',
 	    );
 		$self->pause('OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_TIMEOUT');	
 	}
@@ -137,7 +137,7 @@ sub execute {
     CTX('log')->log(
 		MESSAGE => 'Transfer of file successful' ,
 		PRIORITY => 'info',
-		FACILITY => 'system',
+		FACILITY => 'application',
 	);
     
     return 1;

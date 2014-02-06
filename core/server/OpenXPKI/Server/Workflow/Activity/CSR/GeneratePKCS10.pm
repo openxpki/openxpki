@@ -32,6 +32,12 @@ sub execute
     });
     ##! 16: 'pkcs10: ' . $pkcs10
 
+    CTX('log')->log(
+        MESSAGE  => "generated pkcs#10 request for $subject",
+        PRIORITY => 'debug',
+        FACILITY => 'application',
+    );
+
     $context->param('pkcs10' => $pkcs10);
 
     return 1;

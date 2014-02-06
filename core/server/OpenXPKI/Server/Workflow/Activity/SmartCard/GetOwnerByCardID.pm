@@ -21,74 +21,73 @@ use Data::Dumper;
 
 sub execute {
     ##! 1: 'Entered GetLDAPByCardID::execute()'
-    my $self = shift;
+    my $self     = shift;
     my $workflow = shift;
-    my $context = $workflow->context();
+    my $context  = $workflow->context();
 
     my $config = CTX('config');
 
     my $tokenid = $context->param('token_id');
 
     # get holder from connector
-    my $res = $config->walkQueryPoints('smartcard.card2user', $tokenid, 'get');
+    my $res =
+      $config->walkQueryPoints( 'smartcard.card2user', $tokenid, 'get' );
     my $holder_id = $res->{VALUE};
 
-    if (! $holder_id) {
-	OpenXPKI::Exception->throw(
-	    message =>
-	    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SmartCard_GETLDAPBYCARDID',
-	    params => {
-		TOKEN_ID => $tokenid,
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'workflow', ],
-	    },
-	    );
+    if ( !$holder_id ) {
+        OpenXPKI::Exception->throw(
+            message => 
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID',
+            params => { TOKEN_ID => $tokenid, },
+            log    => {
+                logger   => CTX('log'),
+                priority => 'error',
+                facility => ['application'],
+            },
+        );
     }
-    
-    # now get required user data entries for this user
-    my $employeeinfo = $config->walkQueryPoints( 'smartcard.employee', 
-						 $holder_id, 
-						 { 
-						     call => 'get_hash', 
-						     deep => 1 } );    
 
-    if (! $employeeinfo) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SmartCard_GETLDAPBYCARDID_SEARCH_PERSON_FAILED',
-	    params  => {
-		EMPLOYEEID => $holder_id,
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'workflow', ],
-	    },
-	    );
+    # now get required user data entries for this user
+    my $employeeinfo =
+      $config->walkQueryPoints( 'smartcard.employee', $holder_id,
+        { call => 'get_hash', deep => 1 } );
+
+    if ( !$employeeinfo ) {
+        OpenXPKI::Exception->throw(
+            message =>
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID_SEARCH_PERSON_FAILED',
+            params => { EMPLOYEEID => $holder_id },
+            log    => {
+                logger   => CTX('log'),
+                priority => 'error',
+                facility => ['application'],
+            },
+        );
+    }
+    if ( !$employeeinfo->{VALUE}->{mail} ) {
+        OpenXPKI::Exception->throw(
+            message =>
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID_PERSON_ENTRY_DOES_NOT_HAVE_MAIL_ATTRIBUTE',
+            params => { EMPLOYEEINFO => $employeeinfo->{VALUE} },
+            log    => {
+                logger   => CTX('log'),
+                priority => 'error',
+                facility => [ 'application', ],
+            },
+        );
     }
     
-    if (! $employeeinfo->{VALUE}->{mail}) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKISERVER_WORKFLOW_ACTIVITY_SmartCard_GETLDAPBYCARDID_PERSON_ENTRY_DOES_NOT_HAVE_MAIL_ATTRIBUTE',
-	    params  => {
-		EMPLOYEEINFO =>  $employeeinfo->{VALUE}
-	    },
-	    log => {
-		logger => CTX('log'),
-		priority => 'error',
-		facility => [ 'workflow', ],
-	    },
-	    );
-    }
-    
-    $context->param('owner_mail' => $employeeinfo->{VALUE}->{mail});
-    $context->param('owner_cn' => $employeeinfo->{VALUE}->{cn});
+    CTX('log')->log(
+        MESSAGE => "SmartCard got owner for $tokenid, ". $employeeinfo->{VALUE}->{mail} ." / ". $employeeinfo->{VALUE}->{cn}, 
+        PRIORITY => 'info',
+        FACILITY => 'application'
+    );
+
+    $context->param( 'owner_mail' => $employeeinfo->{VALUE}->{mail} );
+    $context->param( 'owner_cn'   => $employeeinfo->{VALUE}->{cn} );
 
     return;
 }
-
 
 1;
 __END__

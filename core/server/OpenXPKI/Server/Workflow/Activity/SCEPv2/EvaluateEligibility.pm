@@ -71,7 +71,7 @@ sub execute {
             CTX('log')->log(
                 MESSAGE => "SCEP eligibility check raw result " . $plain_result . ' using path ' . join('|', @path),
                 PRIORITY => 'debug',
-                FACILITY => 'workflow',
+                FACILITY => 'application',
             );        
         }
     } else {
@@ -84,7 +84,7 @@ sub execute {
       CTX('log')->log(
         MESSAGE => "SCEP eligibility check without path - result " . $plain_result,
         PRIORITY => 'debug',
-        FACILITY => 'workflow',
+        FACILITY => 'application',
       );
         
     }
@@ -96,7 +96,7 @@ sub execute {
             ($is_initial ? 'initial enrollment ' : 'renewal ' ) .
             ($res ? 'granted' : 'failed'),
         PRIORITY => 'info',
-        FACILITY => ['audit','system'],
+        FACILITY => ['audit','application'],
     );       
     
     return 1;

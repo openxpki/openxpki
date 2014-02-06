@@ -62,6 +62,12 @@ sub execute {
     $pkcs12 = encode_base64($pkcs12, '');
     
     $context->param($contextentry_of{'pkcs12base64'} => $pkcs12);
+    
+    CTX('log')->log(
+        MESSAGE => 'SmartCard created pkcs12 container',
+        PRIORITY => 'info',
+        FACILITY => ['audit','application']
+    );
     return 1;
 }
 1;

@@ -284,6 +284,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_boolean,
                 },
+                KEEPROOT  => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                }, 
             },
         },
         'get_ca_list' => {
@@ -793,7 +798,7 @@ sub BUILD {
                     regex => $re_alpha_string,
                 },
                 'EXPIRATION_DATE' => {
-                    type  => SCALAR,
+                    type  => SCALAR | UNDEF,
                     regex => $re_integer_string,
                     optional => 1,
                 },
@@ -1341,7 +1346,7 @@ sub AUTOMETHOD {
 		    log => {
 			logger => CTX('log'),
 			priority => 'error',
-			facility => 'system',
+			facility => [ 'system', 'audit' ]
 		    },
                 );
             }

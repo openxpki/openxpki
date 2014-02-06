@@ -27,7 +27,12 @@ sub execute {
     }
     
     foreach my $cert_identifier (@{ $ser->deserialize( $exported_cert_ids ) }) {
-    	# set without value deletes the entry
+         CTX('log')->log(
+            MESSAGE  => 'remove '.$cert_identifier.' from export queue',
+            PRIORITY => 'info',
+            FACILITY => ['application', 'audit']
+        );
+    	# set without value deletes the entry    	  
     	CTX('api')->set_data_pool_entry({'NAMESPACE' => $context->param( 'queue_namespace' ) , 'KEY' => $cert_identifier, 'VALUE' => undef  });
     }
     

@@ -50,7 +50,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => "SCEP GetNextCACert nothing found (realm $pki_realm).",
             PRIORITY => 'debug',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );        
         return;
     }

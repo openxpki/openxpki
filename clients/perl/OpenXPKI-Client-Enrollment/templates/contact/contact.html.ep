@@ -1,0 +1,18 @@
+% layout 'default';
+% title 'Contact';
+<h2><%= $message %></h2>
+
+<br/>
+<p>
+<table>
+% foreach my $rec ( @{$contact_data} ) {
+<tr><td><%== $rec->{label} %></td><td>
+%   if ( $rec->{link} ) {
+<a href="<%= $rec->{link} %>"><%== $rec->{value} %></a>
+%   } else {
+<%== $rec->{value} %>
+%   }
+</td></tr>
+% }
+</table
+

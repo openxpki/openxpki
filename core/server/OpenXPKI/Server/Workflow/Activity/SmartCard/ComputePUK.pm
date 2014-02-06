@@ -72,6 +72,11 @@ sub execute {
 
     ##! 32: 'got puk ' . $puk
     
+    CTX('log')->log(
+        MESSAGE => "SmartCard $token_id from lot id $lot_id, puk was computed",
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );  
     $context->param({ _default_puk => $puk });
        
 }    

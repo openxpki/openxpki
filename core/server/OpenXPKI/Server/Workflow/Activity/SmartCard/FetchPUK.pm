@@ -29,6 +29,12 @@ sub execute {
     ##! 32: 'token_id: ' . Dumper($context->param('token_id'));
     ##! 32: 'value: ' . Dumper($value);
 
+    CTX('log')->log(
+        MESSAGE => 'SmartCard fetching puk from datapool for ' . $context->param('token_id'),
+        PRIORITY => 'info',
+        FACILITY => ['audit','application']
+    );
+
     my $ser = OpenXPKI::Serialization::Simple->new();
     # autodetect serialized arrays
     if ($value =~ m{ \A ARRAY }xms) {

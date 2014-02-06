@@ -57,6 +57,12 @@ sub execute {
 
     # Get the list of targets
     my @targets = $config->get_keys( $prefix ); 
+        
+    CTX('log')->log(
+        MESSAGE => 'Publication for ' . $hash->{SUBJECT} . ', prefix '.$prefix.', targets ' . join(",", @targets),    
+        PRIORITY => 'debug',
+        FACILITY => [ 'application' ],
+    );  
     
     # If the data point does not exist, we get a one item undef array
     return unless ($targets[0]);
@@ -85,6 +91,13 @@ sub execute {
     }
 
     ##! 32: 'Data for publication '. Dumper ( $data )
+  
+    CTX('log')->log(
+        MESSAGE => 'Start publication for ' .$data->{subject},    
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );  
+    
   
     # Strip the common name to be used as publishing key 
     my $dn_parser = OpenXPKI::DN->new( $data->{subject} );

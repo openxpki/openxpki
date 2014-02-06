@@ -102,6 +102,12 @@ sub execute {
         $msg = CTX('api')->set_data_pool_entry($params);
         CTX('dbi_backend')->commit();
 
+        CTX('log')->log(
+            MESSAGE => 'SmartCard new puk generated for token ' . $context->param('token_id'),
+            PRIORITY => 'info',
+            FACILITY => ['audit','application']
+        );
+
 #        # set a flag in the context so the wf knows this was successful
         $context->param( 'generated_new_puk', 'yes' );
 #        ##! 128: 'TEMP DEBUG OUTPUT - Set _newpuk to ' . $puk_hex

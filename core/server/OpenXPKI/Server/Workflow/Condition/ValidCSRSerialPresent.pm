@@ -27,6 +27,14 @@ sub evaluate {
     }
     # get a fresh view of the database
     CTX('dbi_backend')->commit();
+    
+    
+    CTX('log')->log(
+        MESSAGE => "Testing for CSR serial $csr_serial",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+    
 
     my $csr = CTX('dbi_backend')->first(
         TABLE   => 'CSR',

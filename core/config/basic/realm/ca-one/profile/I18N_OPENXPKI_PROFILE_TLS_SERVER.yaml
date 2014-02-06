@@ -59,7 +59,13 @@ style:
 
         subject:
             dn: CN=[% CN %][% IF OU %][% FOREACH entry = OU %],OU=[% entry %][% END %][% END %][% IF O %],O=[% O %][% END %][% FOREACH entry = DC %],DC=[% entry %][% END %][% IF C %],C=[% C %][% END %]
-
+  
+    enroll:
+        subject: 
+            dn: CN=[% CN.0 %]:blueroad,OU=Blueroad,O=Stadt Freising,L=Freising,C=de
+        
+        metadata:
+            system_id: "[% data.cust_id %]"
 
 role:
 - Web Server

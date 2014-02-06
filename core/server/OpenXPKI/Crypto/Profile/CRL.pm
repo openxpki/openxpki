@@ -179,7 +179,7 @@ sub __load_profile
                  CTX('log')->log(
                     MESSAGE => 'CRL for CA ' . $self->{CA}. ' in realm ' . $pki_realm . ' will be end of life before next update is scheduled!',
                     PRIORITY => 'warn',
-                    FACILITY => [ 'monitor','audit' ],
+                    FACILITY => [ 'monitor', 'application' ],
                 );
          } else {
             $notafter = OpenXPKI::DateTime::get_validity({
@@ -194,7 +194,7 @@ sub __load_profile
             CTX('log')->log(
                 MESSAGE => 'CRL for CA ' . $self->{CA} . ' in realm ' . $pki_realm . ' nearly EOL - will issue with last crl interval!',
                 PRIORITY => 'info',
-                FACILITY => [ 'monitor','audit' ],
+                FACILITY => [ 'monitor', 'application' ],
             );                
          }
     } 

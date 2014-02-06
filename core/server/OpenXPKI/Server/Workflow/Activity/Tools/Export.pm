@@ -85,6 +85,12 @@ sub execute
     }
     print FD $msg;
     close FD;
+    
+    CTX('log')->log(
+        MESSAGE => 'serialized workflow for export in ' . $filename, 
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );   
 
     # workflow is now serialized in the export directory
 }

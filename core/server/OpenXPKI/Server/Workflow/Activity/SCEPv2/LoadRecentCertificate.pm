@@ -93,6 +93,12 @@ sub execute {
     $sources->{'cert_subject_alt_name_parts'}  = 'SCEP-RENEWAL';   
     $context->param('sources' => $serializer->serialize($sources));
 
+    CTX('log')->log(
+        MESSAGE => "SCEP renewal from old csr " . $cert->{CSR_SERIAL} . " with profile " . $old_profile->{PROFILE}, 
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );       
+
     return 1;
 }
 

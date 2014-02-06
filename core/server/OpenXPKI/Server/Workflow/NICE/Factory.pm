@@ -42,7 +42,12 @@ sub getHandler {
       		    class =>  $BackendClass
       		}                  
     	);        
-    }	
+    }
+    CTX('log')->log(
+        MESSAGE => "NICE backend $backend loaded, execute $activity", 
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 	
     return $BackendClass->new( $activity );
 	 	
 }

@@ -255,14 +255,17 @@ sub action_index {
         # strip internal fields (start with wf_)
         next if ($name =~ m{ \A wf_ }xms);            
         # TODO - validation
-        my $val = $self->param($name);
+
         # autodetection of array and hashes
         if ($name =~ m{ \A (\w+)\[\] }xms) {
-            push @{$wf_param{$1}}, $val; 
+            my @val = $self->param($name);
+            $wf_param{$name} = \@val; 
         } elsif ($name =~ m{ \A (\w+){(\w+)} }xms) {
-            $wf_param{$1}->{$2} = $val;
-        } else {          
-            $wf_param{$name} = $val;
+            my $val = $self->param($name);            
+            $wf_param{$1.'{}'}->{$2} = $val;
+        } else {
+            my $val = $self->param($name);          
+            $wf_param{$name} = $val;            
         }
     }
         
@@ -314,13 +317,21 @@ sub action_index {
         
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
+        
+        # always redirect after create to have the url pointing to the created workflow
+        $wf_args->{redirect} = 1;
              
     } else {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
         return $self;       
     }
     
-    
+    # If we call the token action from within a result list we want 
+    # to "break out" and set the new url instead rendering the result inline
+    if ($wf_args->{redirect}) {
+        $self->redirect('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID});
+        return $self;
+    }
     
     # TODO - we need to refetch the ui info until we change the api 
     $wf_info = $self->send_command( 'get_workflow_ui_info', {
@@ -329,7 +340,6 @@ sub action_index {
     });
     $self->__render_from_workflow({ WF_INFO => $wf_info });
     
-          
     return $self;
     
 }
@@ -615,6 +625,18 @@ sub __render_from_workflow {
             };
              
             $item->{options} = $field->{options} if ($field->{options});
+
+            # autodetection of array and hashes
+            if ($name =~ m{ \A (\w+)\[\] }xms) {                
+                $item->{clonable} = 1;
+                # Migration code - to move from former scalar values to arrays                
+                my $basename = $1;
+                if (!defined $context->{$name} && $context->{$basename}) {
+                    $context->{$name} = [ $context->{$basename} ];
+                }                
+            } elsif ($name =~ m{ \A (\w+){} }xms) {
+                
+            }                
                         
             my $val = $self->param($name);
             if ($do_prefill && defined $val) {                
@@ -623,7 +645,16 @@ sub __render_from_workflow {
                 $val =~ s/[^A-Za-z0-9_=,-\. ]//;                                
                 $item->{value} = $val;
             } elsif (defined $context->{$name}) {
-                $item->{value} = $context->{$name};
+                # clonables need array as value
+                if ($item->{clonable}) {                    
+                    if (!ref $context->{$name}) {
+                        $item->{value} = $self->serializer()->deserialize($context->{$name});
+                    } else {
+                        $item->{value} = $context->{$name};    
+                    }
+                } else {
+                    $item->{value} = $context->{$name};
+                }
             } elsif ($field->{default}) {
                 $item->{value} = $field->{default};
             }
@@ -681,6 +712,12 @@ sub __render_from_workflow {
                 $item->{format} = 'link';
                 $item->{value}  = { label => $context->{$key}, page => 'certificate!info!identifier!'. $context->{$key}, target => 'modal' };
             }            
+                        
+            if ($key =~ m{ \A (\w+)\[\] }xms) {
+                $item->{value}  = $self->serializer()->deserialize( $context->{$key} ) if (!ref $context->{$key});
+            } elsif ($key =~ m{ \A (\w+){} }xms) {
+                # need to find output format    
+            }                
             
             # todo - i18n labels                        
             push @fields, $item;
@@ -708,7 +745,7 @@ sub __render_from_workflow {
         }
         
     }
-        
+
     $self->_result()->{right} = [{   
         type => 'keyvalue',
         content => {
