@@ -12,7 +12,7 @@ use OpenXPKI::Client::UI;
 Log::Log4perl->easy_init($DEBUG);
 #Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 7;
+use Test::More tests => 5;
 
 package CGIMock;
 
@@ -71,7 +71,7 @@ $cgi->data({
     'action' => 'login!stack',
     'auth_stack' => "External Dynamic",
 });
-$result = $client->handle_request({ cgi => $cgi });    
+$result = $client->handle_request({ cgi => $cgi });   
 
 $cgi->data({
     'action' => 'login!password',

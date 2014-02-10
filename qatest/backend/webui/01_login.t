@@ -9,8 +9,8 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use OpenXPKI::Client::UI;
 
-Log::Log4perl->easy_init($DEBUG);
-#Log::Log4perl->easy_init($ERROR);
+#Log::Log4perl->easy_init($DEBUG);
+Log::Log4perl->easy_init($ERROR);
 
 use Test::More tests => 7;
 
