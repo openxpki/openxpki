@@ -176,7 +176,7 @@ sub __get_safe_template
     }
 
     ##! 2: 'build template'
-    return File::Spec->catfile($arg_ref->{TMP}, 'openxpkiXXXXXX');
+    return File::Spec->catfile($arg_ref->{TMP}, "openxpki${PID}XXXXXXXX");
 }
 
 1;

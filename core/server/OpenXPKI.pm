@@ -152,7 +152,7 @@ sub get_safe_tmpfile
     }
 
     ##! 2: "build template"
-    my $template = File::Spec->catfile($keys->{TMP}, "openxpkiXXXXXX");
+    my $template = File::Spec->catfile($keys->{TMP}, "openxpki${PID}XXXXXXXX");
 
     ##! 2: "build tmp file"
     my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );          
