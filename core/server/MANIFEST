@@ -25,7 +25,7 @@ openxpki.xsd
 OpenXPKI/Client.pm
 OpenXPKI/Client/API.pm
 OpenXPKI/Client/SCEP.pm
-OpenXPKI/Client/SIMPLE.pm
+OpenXPKI/Client/Simple.pm
 
 ## Config Layers
 OpenXPKI/Config/Merge.pm
