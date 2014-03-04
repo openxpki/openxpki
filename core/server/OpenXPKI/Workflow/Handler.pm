@@ -131,7 +131,7 @@ sub get_factory {
     if ($args->{XML_CONFIG}) {
         return OpenXPKI::Workflow::Handler::__get_instance ({ XML_CONFIG => $args->{XML_CONFIG}, WF_CONFIG_MAP => $self->_workflow_config() });
     }
-        
+
     $args->{PKI_REALM} = CTX('session')->get_pki_realm() unless($args->{PKI_REALM});
     $args->{VERSION} = CTX('session')->get_config_version() unless($args->{VERSION});
     
@@ -174,7 +174,11 @@ sub get_factory {
     
     my $xml_config = OpenXPKI::XML::Cache->new( SERIALIZED_CACHE => $workflow_serialized_config );
     
-    my $factory = OpenXPKI::Workflow::Handler::__get_instance ({ XML_CONFIG => $xml_config, WF_CONFIG_MAP => $self->_workflow_config() });    
+    my $factory = OpenXPKI::Workflow::Handler::__get_instance ({ 
+        XML_CONFIG => $xml_config, 
+        WF_CONFIG_MAP => $self->_workflow_config(),
+        FAKE_MISSING_CLASSES => 1  
+    });    
     $self->_cache->{ $args->{PKI_REALM} }->{ $args->{VERSION} } = $factory;
     
     CTX('session')->set_pki_realm( $oldrealm ) if ($oldrealm);
@@ -192,6 +196,7 @@ sub __get_instance {
     
     my $xml_config = $arg_ref->{XML_CONFIG};
     my $workflow_config  = $arg_ref->{WF_CONFIG_MAP};    
+    my $fake_missing_classes = $arg_ref->{FAKE_MISSING_CLASSES};
     my $workflow_factory = OpenXPKI::Workflow::Factory->new();
         
     ##! 129: "xml_config: " .  Dumper $xml_config
@@ -237,6 +242,24 @@ sub __get_instance {
                     ##! 32: 'entry ' . $iii . ': ' . Dumper $entry
                     # '__flatten_content()' turns our XMLin
                     # structure into the one compatible to Workflow
+                                                                                               
+                    # When using an older config, some classes might be deleted
+                    # so we fake the class name to be a stub class if its missing
+                    # so the workflow factory can load it
+                    # this will obviously not make the workflow run!
+                    # Due to the structure of the XML all class definitions go thru this
+                    # branch and never the one below, so its ok to have this only here 
+                    if ($fake_missing_classes && $entry->{class}) {                        
+                        eval "require $entry->{class}";
+                        if ($EVAL_ERROR) {    
+                            CTX('log')->log(
+                                MESSAGE => 'Fake missing workflow class ' . $entry->{class},
+                                PRIORITY => 'debug',
+                                FACILITY => 'application'
+                            );
+                            $entry->{class} = 'OpenXPKI::Server::Workflow::Stub';    
+                        }
+                    }
                     
                     $workflow_factory->add_config(
                         $workflow_config->{$type}->{factory_param} =>
@@ -262,7 +285,7 @@ sub __get_instance {
                     $workflow_config->{$type}->{force_array}
                 );
                 ##! 256: 'entry after flattening: ' . Dumper $entry
-                ##! 512: 'workflow_factory: ' . Dumper $workflow_factory
+                ##! 512: 'workflow_factory: ' . Dumper $workflow_factory                   
                 $workflow_factory->add_config(
                     $workflow_config->{$type}->{factory_param} => $entry,
                 );
@@ -342,6 +365,7 @@ sub __flatten_content {
     }
     return $entry;
 }
+
 
 1;
 
