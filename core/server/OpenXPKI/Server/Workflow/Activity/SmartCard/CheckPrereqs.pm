@@ -38,19 +38,12 @@ sub execute {
 	    {
  		CERTS => \@certs,
 		CERTFORMAT => 'BASE64',
-		SMARTCARDID => $context->param('token_id'),
-		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK ) ],
+		SMARTCARDID => $context->param('token_id'),		
 		%params,
 	    });
 
 	##! 16: 'smartcard analyzed: ' . Dumper $result
 	
-    # Save the details on workflows in our context. Note: since complex data
-    # structures cannot be persisted without serializing, use the underscore
-    # prefix to surpress persisting.
-
-    $context->param('_workflows', $result->{WORKFLOWS});
-
 	# set cert ids in context
 	my $cert_ids = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
 	    {
@@ -67,10 +60,7 @@ sub execute {
 		workflow    => $workflow,
 		context_key => 'certificate_types',
 	    } );
-	    	
     
-    my $config = CTX('config');       
-	
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
  
