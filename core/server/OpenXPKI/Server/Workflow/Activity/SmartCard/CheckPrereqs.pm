@@ -34,6 +34,19 @@ sub execute {
 	
 	my $ser = OpenXPKI::Serialization::Simple->new();
 
+    # In case we want to deal with exisiting workflows we need to load them
+    # This is the case when using this activity from the admin wfl   
+    my $wf_types = $self->param('wf_types');    
+    if ($wf_types) {
+        CTX('log')->log(
+            MESSAGE => 'SmartCard will search for workflows of type : ' . $wf_types,
+            PRIORITY => 'info',
+            FACILITY => [ 'application' ],
+        );
+        my @wf_type_list = split /,/, $wf_types if ($wf_types);        
+        $params{WORKFLOW_TYPES} = \@wf_type_list;
+    }
+
 	my $result = CTX('api')->sc_analyze_smartcard(
 	    {
  		CERTS => \@certs,
@@ -44,6 +57,19 @@ sub execute {
 
 	##! 16: 'smartcard analyzed: ' . Dumper $result
 	
+    # Save the details on workflows in our context. Note: since complex data
+    # structures cannot be persisted without serializing, use the underscore
+    # prefix to surpress persisting.
+
+    $context->param('_workflows', $result->{WORKFLOWS});
+    if ($wf_types) {
+        CTX('log')->log(
+            MESSAGE => 'SmartCard found existing workflows: ' . Dumper $result->{WORKFLOWS},
+            PRIORITY => 'trace',
+            FACILITY => [ 'application' ],
+        );
+    } 
+
 	# set cert ids in context
 	my $cert_ids = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
 	    {
@@ -60,6 +86,7 @@ sub execute {
 		workflow    => $workflow,
 		context_key => 'certificate_types',
 	    } );
+	    	
     
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
