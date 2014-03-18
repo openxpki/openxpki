@@ -219,12 +219,12 @@ A html select element, the options parameter is requried, others are optional::
 
 The ``options`` parameter can be fetched via an ajax call. If you set ``options => 'fetch_cert_status_options', an ajax call to "server_url.cgi?action=fetch_cert_status_options" is made. The call must return the label/value list as defined given above.
 
-Setting the editable flag to a true value enables the users to enter any value into the select box. See `https://github.com/danielfarrell/bootstrap-combobox`_.
+Setting the editable flag to a true value enables the users to enter any value into the select box (created with `Bootstrap Combobox <https://github.com/danielfarrell/bootstrap-combobox>`_).
 
 Field-Type "radio"
 ^^^^^^^^^^^^^^^^^^
 
-The radio type is the little brother of the select field, but renders the items as a list of items using html radio-buttons. It shares the syntax of the ``options`` field with the select element:
+The radio type is the little brother of the select field, but renders the items as a list of items using html radio-buttons. It shares the syntax of the ``options`` field with the select element::
 
     FORM_FIELD_DEF:
     {
