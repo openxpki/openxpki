@@ -28,12 +28,15 @@ Anonymous:
     type: Anonymous
     label: Anonymous
 
-# Note - both password handlers are tied together by the auth stack
-# The naming does not imply any meaning for the users rights. 
-# You are free to add Operators to the external database.
-# Note the difference: Adding users to the external file does NOT require
-# a server reload while changing the values in the config requires a config
-# reload and creates a new datapoint in the config repository.
+User NoAuth:
+    type: External
+    label: User
+    command: /bin/true
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_USER
+    role: User
+    env:
+       LOGIN: __USER__
+ 
 User Password:
     type: Password
     label: User Password
@@ -45,14 +48,19 @@ Operator Password:
     type: Password
     label: Operator Password
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
+    # The passwords can be generated with "openxpkiadm hashpwd"
+    # The password below is "openxpki" for all three users
     user:
-        root:
-            digest: "{MD5}Y6nw6nu5gFB5a2SehUgYRQ"
+        caop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
             role: CA Operator
         raop:
-            digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
             role: RA Operator
- 
+        raop2:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator 
+
 External Dynamic Role:
     type: External
     label: External Dynamic Role
