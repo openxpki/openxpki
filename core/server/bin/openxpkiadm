@@ -744,10 +744,31 @@ sub alias_list {
     my $alias;
     my $cert;
     
+    # Load the list of exisiting aliased groups as there can be custom tokens
+    # outside the main groups (e.g. alternative scep tokens)
+    my $db_results = $dbi->select(
+        TABLE   => 'ALIASES',
+        DYNAMIC => {
+            'PKI_REALM' => { VALUE => $realm },                              
+            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
+            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+        },
+        'ORDER' => [ 'NOTBEFORE' ],
+        'REVERSE' => 1,
+    );
+        
+    my %anon_groups;
+    foreach my $entry (@{ $db_results }) {
+        $anon_groups{ $entry->{GROUP_ID} } = 1;
+    }
+    # remove root from the list
+    delete $anon_groups{'root'};
+    
+    print "=== functional token ===\n";    
     foreach my $type (keys %{$groups}) {
     
         my $group = $groups->{$type};
-        print "$type ($group):\n";
+        print "$group ($type):\n";
           
         $alias = $dbi->first(    
             TABLE   => 'ALIASES',            
@@ -761,7 +782,36 @@ sub alias_list {
             'REVERSE' => 1,
         );
         
-        $cert = CTX('dbi_backend')->first(
+        $cert = $dbi->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+        );
+        
+        __alias_print( $alias, $cert );
+    
+       # unset in anon group list
+       delete $anon_groups{$group};
+    
+    }
+    
+    print "=== anonymous groups ===\n" if (%anon_groups);
+    foreach my $group (keys %anon_groups) {
+    
+        print "$group:\n";
+          
+        $alias = $dbi->first(    
+            TABLE   => 'ALIASES',            
+            DYNAMIC => {
+                'PKI_REALM' => { VALUE => $realm },
+                'GROUP_ID' => { VALUE => $group },              
+                'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
+                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+            },
+            'ORDER' => [ 'NOTBEFORE' ],
+            'REVERSE' => 1,
+        );
+        
+        $cert = $dbi->first(
             TABLE   => 'CERTIFICATE',
             DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
         );
@@ -769,7 +819,7 @@ sub alias_list {
         __alias_print( $alias, $cert );
     
     }     
-     
+          
     # Check for root ca
     $alias = $dbi->first(    
         TABLE   => 'ALIASES',            
@@ -787,7 +837,7 @@ sub alias_list {
         DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
     );
     
-    print "current root ca:\n";
+    print "=== root ca ===\ncurrent root ca:\n";
     __alias_print( $alias, $cert );
     
     # Check for root ca

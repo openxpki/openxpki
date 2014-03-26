@@ -58,7 +58,7 @@ sub __get_ca_certificate_chains : PRIVATE {
         $strip_root = CTX('config')->get(['scep', $server, 'response', 'getcacert_strip_root']) ? 1 : 0;
     }
      
-    my $scep_cert_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'scep' });
+    my $scep_cert_alias = $self->__get_token_alias( $server );
     my $scep_ca_cert_identifier = CTX('api')->get_certificate_for_alias({ ALIAS => $scep_cert_alias })->{IDENTIFIER};
         
     if (! defined $scep_ca_cert_identifier) {

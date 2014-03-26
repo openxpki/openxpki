@@ -544,32 +544,6 @@ sub __pkcs_req : PRIVATE {
     return $error_msg;
 }
 
-=head2 __get_token 
-
-Get the scep token from the crypto layer
-
-=cut
-sub __get_token {
-           
-    # TODO-SCEP - swap active version
-         
-    # HEAD Version
-    my $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
-    my $token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
-
-    if ( !defined $token ) {
-        ##! 16: "No token found for alias $scep_token_alias"
-        OpenXPKI::Exception->throw( 
-            message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING',
-            params => { ALIAS => $scep_token_alias }
-        );
-    }
-    
-    return $token;
-    
-}
-
-
 1;    # magic one at the end of module
 __END__
  

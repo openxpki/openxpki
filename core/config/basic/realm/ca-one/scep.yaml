@@ -1,6 +1,12 @@
 # Transition of scep section in config.xml
 
 scep-server-1:
+
+    # By default, all scep endpoints wll use the default token defined
+    # by the scep token group, if you pass a name here, it is considered
+    # a group name from the alias table
+    #token: ca-one-special-scep
+
     # Earliest time to create a renewal request
     renewal_period: 000014
     # How long can the certificate be expried to make a renewal
@@ -44,6 +50,7 @@ scep-server-1:
         pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
 
     subject_style: enroll
+
     challenge:
        value: SecretChallenge
 

@@ -8,17 +8,19 @@ The workflow fetches all information from the configuration system at ``scep.<se
 Here is a complete sample configuration::
     
     scep-server-1:
-        retry_time: 0000000001
-        renewal_period: 000014        
-        grace_period: 000005        
-        workflow_expiry: 000014
-        
+
+        token: my-special-scep
+        renewal_period: 000014
+        grace_period: 0000000005
+    
         workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
-                    
+
         key_size:
-        - 1024    
-        - 2048
-        
+            rsaEncryption: 1020-2048
+
+        hash_type: 
+        - sha1
+   
         authorized_signer_on_behalf:
             technicans:
                 subject: CN=.*DC=SCEP Signer CA,DC=mycompany,DC=com
@@ -26,6 +28,9 @@ Here is a complete sample configuration::
             super-admin:                
                 identifier: JNHN5Hnje34HcltluuzooKVqxss                                    
         
+        response:
+            getcacert_strip_root: 0          
+
         policy:         
             allow_anon_enroll: 0
             allow_man_approv: 1
@@ -34,13 +39,14 @@ Here is a complete sample configuration::
             allow_expired_signer: 0
             auto_revoke_existing_certs: 0
             approval_points: 1
-            
+  
+
         # Mapping of names to OpenXPKI profiles to be used with the
         # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)              
         profile_map:
             tlsv2: I18N_OPENXPKI_PROFILE_TLS_SERVER_v2
 
-	subject_style: 05_advanced_style
+	subject_style: enroll
 
         challenge:
             value: SecretChallenge
@@ -60,11 +66,25 @@ Here is a complete sample configuration::
 Configuration Items
 -------------------
 
-**retry_time**
+**token**
 
-If a client request ends up in a failed workflow, any subsequent request within the retry period 
-is rejected without creating a new workflow. This prevents DOS attacks against the workflow system 
-and defaults to one minute if not set.
+This key is optional, if not given the name of the token group to use is looked up from the
+type map under `crypto.type.scep` and all scep servers will share the same token.
+You can give the name of a token group alias, which needs to be registered as an anonymous 
+alias::
+
+    openxpkiadm alias --realm ca-one --identifier <identifier> --group my-special-scep --gen 1
+
+Note that you need to care yourself about the generation index. The token will then be listed as anonymous group item::
+
+    openxpkiadm alias --realm ca-one
+
+    === anonymous groups ===
+    ca-one-special-scep:
+      Alias     : ca-one-special-scep-1
+      Identifier: O9vtjge0wHpYhDpfko2O6xYtCWw
+      NotBefore : 2014-03-25 15:26:18
+      NotAfter  : 2015-03-25 15:26:18
 
 **renewal_period**
 
@@ -79,17 +99,21 @@ after the certificate expired. Note: Due to the way this is implemented set this
 and never to be larger than ``cert lifetime - renewal period`` as the code will do funny things otherwise!
 If you want to allow renewals for an infinite period of time, set the ``allow_expired_signer`` policy flag instead. 
 
-**workflow_expiry**
-
-Needs discussion if useful - used to expire the datapool lock (currently not used)
-
 **workflow_type**
 
 The name of the workflow that is used by this server instance.
 
 **key_size**
 
-List (or single scalar) of key size accepted.
+A hash item list for allowed key sizes and algorithms. The name of the option must be
+the key algorithm as given by openssl, the required byte count is given as a range in
+bytes. There must not be any space between the dash and the numbers. Hint: Some 
+implementations do not set the highest bit to 1 which will result in a nominal key 
+size which is one bit smaller than the requested one. So stating a small offset here
+will reduce the propability to reject such a key.
+
+**hash_type**
+List (or single scalar) of accepted hash algorithms used to sign the request.
   
 **authorized_signer_on_behalf**
 
@@ -153,7 +177,7 @@ some sort of control about the issued certificates, you can use the subject
 rendering engine which is also used with the frontend by setting a profile
 style to be used:
 
-    subject_style: 05_advanced_style
+    subject_style: enroll
 
 The subject will be created using Template Toolkit with the parsed subject hash
 as input vars. The vars hash will use the name of the attribute as key and pass

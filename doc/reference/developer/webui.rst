@@ -217,7 +217,7 @@ A html select element, the options parameter is requried, others are optional::
         editable => BOOL # activates the ComboBox
     }
 
-The ``options`` parameter can be fetched via an ajax call. If you set ``options => 'fetch_cert_status_options', an ajax call to "server_url.cgi?action=fetch_cert_status_options" is made. The call must return the label/value list as defined given above.
+The ``options`` parameter can be fetched via an ajax call. If you set ``options => 'fetch_cert_status_options'``, an ajax call to "server_url.cgi?action=fetch_cert_status_options" is made. The call must return the label/value list as defined given above.
 
 Setting the editable flag to a true value enables the users to enter any value into the select box (created with `Bootstrap Combobox <https://github.com/danielfarrell/bootstrap-combobox>`_).
 
@@ -234,7 +234,7 @@ The radio type is the little brother of the select field, but renders the items 
        
 
 Field-Type "upload"
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 Renders a field to upload files with some additional benefits::
 
