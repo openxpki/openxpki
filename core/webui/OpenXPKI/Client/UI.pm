@@ -290,14 +290,18 @@ sub handle_login {
     }
 
     if ( $status eq 'GET_AUTHENTICATION_STACK' ) {
-        if ( $auth_stack ) {
+        # Never auth with an internal stack!
+        if ( $auth_stack && $auth_stack !~ /^_/) {
             $self->logger()->debug("Authentication stack: $auth_stack");
             $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $auth_stack, } );
             $status = $reply->{SERVICE_MSG};            
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
             my $i=0;
-            my @stack_list = map { $_ = {'value' => $stacks->{$_}->{NAME}, 'label' => i18nGettext($stacks->{$_}->{LABEL})} } keys %{$stacks} ;  
+            # List stacks and hide those starting with an underscore
+            my @stack_list = map { 
+                ($stacks->{$_}->{NAME} !~ /^_/) ? ($_ = {'value' => $stacks->{$_}->{NAME}, 'label' => i18nGettext($stacks->{$_}->{LABEL})} ) : () 
+            }  keys %{$stacks} ;  
             $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
             return $result->init_auth_stack( \@stack_list )->render();
         }
