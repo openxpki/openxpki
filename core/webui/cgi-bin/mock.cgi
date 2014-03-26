@@ -439,6 +439,40 @@ sub handle {
                 }
             ]
         };
+        
+        
+}elsif($page eq 'test_upload'){
+    return {page=>{'label' => 'Some plain text',description=>'some long text sjahdasd  lajsd ajsd l kaj dljahweorzowejasdh'},
+            status => {level=>'info',message => 'Status-Message'},           
+            main => [
+                { action => 'test_upload','type' => 'form',
+                content => {
+                    label=>'Step 1',
+                    description=> 'Any Description might be fine',
+                    submit_label => 'proceed',
+                    fields => [
+                   {name => 'upload', label => 'File', type => 'upload', areaVisible => '1', allowedFiles =>['txt', 'jpg', 'crt', 'pem'], maxSize => 20000000000, textAreaSize =>[{width => '100'}, {height => '150'}]}                                      
+                    ]
+                }
+            }
+            ]
+        };    
+
+}elsif($page eq 'test_radio'){
+    return {page=>{'label' => 'Some plain text',description=>'some long text sjahdasd  lajsd ajsd l kaj dljahweorzowejasdh'},                      
+            main => [
+                { action => 'test_upload','type' => 'form',
+                content => {
+                    label=>'Step 1',
+                    description=> 'Any Description might be fine',
+                    submit_label => 'proceed',
+                    fields => [
+                        {name => 'radio', 'type' => 'radio', label => 'File', options => [{value=>'c1',label=>'Cert 1'},{value=>'c2',label=>'Cert 2'},{value=>'c3',label=>'Cert 3'}] }                                      
+                    ]
+                }
+            }
+            ]
+        };    
     
 }else{
     return {
