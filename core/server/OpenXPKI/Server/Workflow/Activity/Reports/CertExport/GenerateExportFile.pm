@@ -102,7 +102,7 @@ sub execute {
             if (ref $attributes eq "HASH") {
                  $cert_xml = $attributes;
             } 
-             #= { certType => "sig",  EmployeeID => "sb2130", email => "user\@db.com" };
+            # Someting like { certType => "sig",  EmployeeID => "sb2130", email => "user\@company.com" };
         }
 
         ##! 32: 'Basic attributes  ' . Dumper $cert_xml
