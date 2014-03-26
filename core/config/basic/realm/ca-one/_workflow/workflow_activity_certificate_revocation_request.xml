@@ -3,12 +3,14 @@
   <!-- because it is only used to initialize the workflow -->
   <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource">
-      <field name="cert_identifier" is_required="yes" />
+      <field name="cert_identifier" is_required="yes" label="I18N_OPENXPKI_UI_CERT_IDENTIFIER" />
       <field name="reason_code"  is_required="yes"
         type="select" 
-        source_list="unspecified,keyCompromise,CACompromise,affiliationChanged,superseded,cessationOfOperation" />
-      <field name="comment"/>
-      <field name="invalidity_time"  is_required="yes" type="date"  default="now" />
+        source_list="unspecified,keyCompromise,CACompromise,affiliationChanged,superseded,cessationOfOperation" 
+        label="I18N_OPENXPKI_UI_CRR_REASON"
+        />
+      <field name="comment" label="I18N_OPENXPKI_UI_COMMENT" />
+      <field name="invalidity_time"  is_required="yes" type="date"  default="now" label="I18N_OPENXPKI_UI_CRR_TIME" />
       <field name="flag_crr_auto_approval" type="server" />
       <field name="crr_info"  type="server" />                 
       <validator name="I18N_OPENXPKI_WF_VAL_CREATOR"/>
