@@ -620,7 +620,7 @@ sub __render_from_workflow {
             
             my $item = {
                 name => $name, 
-                label => i18nGettext($name), 
+                label => i18nGettext($field->{label}) || $name, 
                 type => $type
             };
              
