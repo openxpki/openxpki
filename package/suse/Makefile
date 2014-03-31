@@ -8,8 +8,7 @@ TOPDIR=../..
 PACKAGES=\
 	perl-openxpki-core \
 	perl-openxpki-client-html-mason \
-	openxpki-i18n \
-	perl-openxpki-client-html-sc 
+	openxpki-i18n 
 
 OPT_PACKAGES=\
 	openxpki-perldeps-enrollment
