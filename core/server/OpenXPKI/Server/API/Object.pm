@@ -775,6 +775,7 @@ sub get_private_key_for_cert {
             {
                 'IDENTIFIER' => $identifier,
                 'FORMAT'     => 'DER',
+                'KEEPROOT'   =>  1	
             }
         );
         my $decrypted_pkcs8_pem = $default_token->command(
@@ -2066,7 +2067,7 @@ sub __get_chain_certificates {
     ##! 16: 'Chain ' . Dumper $chain_ref
 
     # pop off root certificates
-    if ( $chain_ref->{COMPLETE} && scalar @chain > 1 ) {
+    if ( $chain_ref->{COMPLETE} && scalar @chain > 1 && !$arg_ref->{KEEPROOT} ) {
         pop @chain;    # we don't need the first element
     }
     ##! 1: 'end'

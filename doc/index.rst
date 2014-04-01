@@ -46,6 +46,7 @@ Table of Contents:
    reference/developer/conventions
    reference/developer/coding
    reference/developer/api
+   reference/developer/webui
    glossary
 
 

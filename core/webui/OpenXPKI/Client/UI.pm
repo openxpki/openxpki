@@ -73,7 +73,7 @@ sub _init_backend {
     # create new session    
     my $session = $self->session();    
     my $old_session =  $session->param('backend_session_id') || undef;    
-    $self->logger()->info('old backend session ' . $old_session);
+    $self->logger()->info('old backend session ' . $old_session) if ($old_session);
     
     # Fetch errors on session init 
     eval {
@@ -163,7 +163,7 @@ sub handle_request {
     $self->flush_session() if ($self->session()->param('is_logged_in'));
     
     # try to log in 
-    return $self->handle_login( { cgi => $cgi, reply => $reply } );           
+    return $self->handle_login( { cgi => $cgi, reply => $reply } );
     
 }
 

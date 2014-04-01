@@ -55,9 +55,7 @@ sub execute {
         return;
     }
      
-    # We need to create a signed reply, load scep token
-    my $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
-    my $scep_token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
+    my $scep_token =  $self->__get_token();
    
     ##! 16: 'Found nextca cert ' .  $next_ca->{'ALIASES.ALIAS'}
     ##! 32: 'nextca  ' . Dumper $next_ca      

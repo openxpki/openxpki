@@ -63,11 +63,11 @@ sub evaluate {
    
    ##! 16: ' Key: ' . $key . ' - Value ' . Dumper ( $val )
    
-    CTX('log')->log(
-        MESSAGE => "Testing if WFHash ".$self->array_name()." key $key is " . $self->condition(),
+   CTX('log')->log(
+        MESSAGE => "Testing if WFHash ". $self->hash_name() ." key $key is " . $self->condition(),
         PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+        FACILITY => [ 'application' ]
+    );
    
     if ($self->condition() eq 'key_defined') {       
        if (defined $val) {

@@ -38,11 +38,15 @@ token:
     
   ca-one-vault:
     inherit: default
-             
+
   ca-one-scep:
     inherit: default
-    backend: OpenXPKI::Crypto::Tool::SCEP
+    backend: OpenXPKI::Crypto::Tool::SCEP  
     shell: /usr/bin/openca-scep
+
+  # A different scep token for another scep server
+  ca-one-special-scep:
+    inherit: ca-one-scep
       
 # Define the secret groups. (TODO> The mapping between secret and token is done on 
 # key import and recorded in the alias table. Default value can be set in the

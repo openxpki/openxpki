@@ -62,7 +62,7 @@ sub RevokeCertificate {
     }
 
     my $client_ip   = $ENV{REMOTE_ADDR}; # dotted quad
-    my $server_name = $ENV{SERVER_NAME}; # "dev-user-ca.tools.intranet.db.com"
+    my $server_name = $ENV{SERVER_NAME}; # ca.company.com 
     my $request_uri = $ENV{REQUEST_URI}; # "/soap/"
 
     my $package = __PACKAGE__;

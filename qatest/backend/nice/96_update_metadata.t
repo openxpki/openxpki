@@ -47,10 +47,9 @@ my $buffer = do { # slurp
 };
 
 my $serializer = OpenXPKI::Serialization::Simple->new();
-#my $input_data = $serializer->deserialize( $buffer );
+my $input_data = $serializer->deserialize( $buffer );
 
-#my $cert_identifier = $input_data->{'cert_identifier'};
-my $cert_identifier = 'wMhLpZyOKGxgQdfCZMutxn6z5xw';
+my $cert_identifier = $input_data->{'cert_identifier'};
 
 $test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier')
  || die "Unable to proceed without Certificate Identifier: $@";
@@ -74,7 +73,7 @@ $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA' , \%wfparam, 'Create W
 $test->state_is('DATA_UPDATE');
 
 $test->execute_ok( 'changemeta_update_context', {
-    'meta_email' => 'oliver.welter@db.com',
+    'meta_email[]' => $serializer->serialize( ['uli.update@openxpki.local' ]),
     'meta_requestor' => 'Uli Update',
     'meta_system_id' => '12345'    
 });

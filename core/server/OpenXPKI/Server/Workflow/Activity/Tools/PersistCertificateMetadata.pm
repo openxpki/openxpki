@@ -30,14 +30,22 @@ sub execute {
     my $profile = $context->param('cert_profile');
     my $style = $context->param('cert_subject_style');
     
-    if (!$profile  || !$style) {
+    if (!$profile) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PERSIST_CERTIFICATE_METADATA_NO_PROFILE',
             params  => {
-                PROFILE => $profile,
-                STYLE   => $style,
+                PROFILE => $profile,                
             }
         );
+    }
+    
+    if (!$style) {
+        CTX('log')->log(
+            MESSAGE => "No style defined, skipping metadata",
+            PRIORITY => 'info',
+            FACILITY => 'application',
+        );
+        return 1;
     }
         
     my $cert_info  = $context->param('cert_info');

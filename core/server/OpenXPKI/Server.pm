@@ -391,7 +391,7 @@ sub sig_hup {
     });
     
     # FIXME - reload authentication handlers (cached!)
-    
+    # FIXME - should also reinit some of the services for speed (e.g. workflow)
         
     # Update head creates a session that blocks new sessions later
     OpenXPKI::Server::Context::killsession();

@@ -29,6 +29,10 @@ As the init script uses mysql as default, but does not force it as a dependancy,
     aptitude install mysql-server
     aptitude install libopenxpki-perl
 
+We are fighting with a stupid debian build issue, the 0.12 release packages suffer of a file collision that can be solved by adding a force option::
+
+    aptitude -o Dpkg::Options::="--force-overwrite" install libopenxpki-perl
+
 If the install was successful, you should see the result of the initial config import at the bottom of your install log (the hash value might vary)::
 
     Current Tree Version: 64f82c3479f5773536f9ff7d37da366ea49abae9

@@ -15,6 +15,7 @@ use Class::Std;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API;
+use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 
 my %command        : ATTR;
@@ -174,6 +175,62 @@ sub command_response {
 }
 
 
+
+=head2 __get_token 
+
+Get the scep token alias for the current server
+
+=cut
+sub __get_token_alias {
+              
+    my $self = shift;
+    my $server = shift;
+    $server = CTX('session')->get_server() unless($server);
+    
+    my $token = CTX('config')->get(['scep', $server, 'token']);
+     
+    my $scep_token_alias;
+    if ($token) {
+        # Special token group requested
+        $scep_token_alias = CTX('api')->get_token_alias_by_group({ 'GROUP' => $token });
+        CTX('log')->log(
+            MESSAGE => "SCEP command requested special token ($token -> $scep_token_alias)",
+            PRIORITY => 'debug',
+            FACILITY => 'application',
+        );        
+    } else {
+        # Use the default token group        
+        $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
+    }
+ 
+    return $scep_token_alias;   
+}
+
+=head2 __get_token 
+
+Get the scep token from the crypto layer
+
+=cut
+sub __get_token {
+    
+    my $self = shift;
+    my $server = shift;
+    $server = CTX('session')->get_server() unless($server);
+    
+    my $scep_token_alias = $self->__get_token_alias( $server );
+            
+    my $scep_token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
+    
+    if ( !defined $scep_token ) {
+        OpenXPKI::Exception->throw( 
+            message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING',
+            params => { ALIAS => $scep_token_alias }
+        );
+    }
+    
+    return $scep_token;
+}
+
 1;
 __END__
 
@@ -220,4 +277,9 @@ that can be serialized and directly returned to the client.
 
 Returns a properly formatted command response (hash reference containing
 the proper arguments). To be called by command implementations.
+
+=head2 __get_token
+
+Return the scep token (crypto object), active group token if set in the
+servers configuration or the default token.
 

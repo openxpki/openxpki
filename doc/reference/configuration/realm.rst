@@ -217,7 +217,7 @@ Sometimes the workflow context contains items, you don't want to show to the use
                     hide: encrypted_.*       
 
 
-The given example shows everything but any context items that begin with "encrypted_". The filters are additive, so a key must match the show expression but must not match the hide expression to show up. *Note*: No setting or an empty string for *show* results in no filtering! To hide the whole context set a wildcard ".*" for *hide*.
+The given example shows everything but any context items that begin with "encrypted\_". The filters are additive, so a key must match the show expression but must not match the hide expression to show up. *Note*: No setting or an empty string for *show* results in no filtering! To hide the whole context set a wildcard ".*" for *hide*.
 
 
 Crypto layer
