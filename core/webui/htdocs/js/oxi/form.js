@@ -643,6 +643,11 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
 OXI.Checkbox = Ember.Checkbox.extend(
 {
+	label: '',
+	
+	init: function(){
+		this._super();
+	},
     isChecked:function(){
         var checkbox = this.$();
         //we ask the DOM-element itself, not its jquery wrapper
@@ -681,9 +686,32 @@ OXI.TextArea = Ember.TextArea.extend(
 OXI.TextField = Ember.TextField.extend(
 {
     classNames: ['form-control'],
+	autoComplete: null,//source, value, url
     toggle:function(bShow){
         this.set('isVisible', bShow);
     },
+	didInsertElement: function(){
+	if(this.autoComplete){
+		var mySource = new Bloodhound({
+			  datumTokenizer: function(d) { 
+			    return Bloodhound.tokenizers.whitespace(d.value); 
+			  },
+			  queryTokenizer: Bloodhound.tokenizers.whitespace,
+			  local: [],
+			  remote: ''
+
+			});
+		if(this.autoComplete.type == 'value' || this.autoComplete.type == 'source')
+			mySource.local = this.autoComplete.source;
+		if(this.autoComplete.type == 'url')
+			mySource.remote = this.autoComplete.source;
+		
+		mySource.initialize();
+
+		$('#'+this.elementId).typeahead(null, {source: mySource.ttAdapter()});
+
+	}
+	},
     _lastItem: '' //avoid trailing commas
 }
 );
@@ -724,4 +752,283 @@ OXI.FormButton = OXI.PageButton.extend({
     },
 
     _lastItem: '' //avoid trailing commas
+});
+
+OXI.UploadButton = Ember.View.extend({
+	jsClassName:'OXI.PageButton',
+	templateName: "page-button",
+	tagName: 'button',
+	classNames: ['btn'],
+	parent: null,
+	
+	click: function(){
+		this.upload();
+	},
+	
+	upload: function(){
+		var certToSend = $('#' + this.parent.textArea.elementId).val();
+		var dataToSend = {'action' : 'upload_cert', 'rawData' : certToSend};
+		if(certToSend){
+			$.post(App.serverUrl, dataToSend, function(data, status, xhr){
+				alert(data.message);
+			});
+		}else{
+			App.applicationAlert('Please chose a File to upload!');
+		}
+	},
+	_lastItem: ''
+});
+
+OXI.Upload = Ember.TextField.extend({
+	
+	jsClassName:'OXI.Upload',
+	classNameBindings:['btn_type'],
+	classNames: ['form-control'],
+	type: 'file',
+	textArea: OXI.TextArea.create(),
+	areaVisible: 0,
+	uploadButton: null,
+	maxSize: 0, //maxSize in byte!
+	allowedFiles: null,
+	textAreaSize: null,
+	
+	init: function(){
+		this._super();
+	},	
+	
+	didInsertElement: function(){
+		var field = this.$();
+		var self = this;
+		if(this.textAreaSize){
+			var area = this.textArea.$().css({"width" : this.textAreaSize[0].width, "height" : this.textAreaSize[1].height});
+		}
+		if(this.areaVisible == 0){
+			this.textArea.$().css('display', 'none');
+		}
+		field.textArea = this.textArea;
+		field.maxSize = this.maxSize;
+		field.allowedFiles = this.allowedFiles;
+		field[0].addEventListener('change', function(e){
+			var tempExtension = e.target.value.split('.');
+			var extension = tempExtension[tempExtension.length-1];
+			if(field.allowedFiles && !field.allowedFiles.contains(extension)){
+				bootbox.alert("This file extension is not allowed for upload. Allowed extensions are: "+ field.allowedFiles.toString());
+				field.val('');
+				$('#' + field.textArea.elementId).val('');
+				return false;
+			}
+			var reader = new FileReader();
+			reader.textArea = $('#' + field.textArea.elementId);
+			if(!field.textArea.elementId){
+				reader.textArea = $(document).find('textarea');
+				}
+			reader.maxSize = field.maxSize;
+			reader.readAsDataURL(e.target.files[0]);
+			reader.onload = function(e){
+				var dataURL = reader.result;
+				$('#data').val(dataURL);
+				if(reader.maxSize && reader.maxSize >= e.total){
+					reader.textArea.val(dataURL);//if maxSize is set and its valid
+				}else if(!reader.maxSize){
+					reader.textArea.val(dataURL);//if maxSize is not set
+				}else{
+					bootbox.alert('Your file is too big to upload.');
+					field.val('');
+					$('#' + field.textArea.elementId).val('');
+				}
+			};
+		});
+		
+	},
+	_lastItem: ''
+});
+
+OXI.UploadContainer = OXI.FormFieldContainer.extend({
+    templateName: "upload-view",
+    jsClassName:'OXI.UploadContainer',
+	uploadField: '',
+	textArea: null,
+    init:function(){
+        this._super();
+		this.uploadField = OXI.Upload.create(this.fieldDef);
+		this.uploadField.set('type', 'file');//naming issue in componentFactory
+		this.uploadField.set('name', 'file');
+		this.textArea = this.uploadField.textArea;
+		this.textAreaId = this.uploadField.textArea.elementId;
+		this.setFieldView(this.uploadField);
+    },
+    getValue: function(){
+    	return $('#' + this.textAreaId).val();
+    },
+    isValid: function(){
+		if($('#'+this.textAreaId).val() != '' && $('#'+this.textAreaId).val() != null){
+			return true;
+		}else{
+			return false;
+		}
+	},
+    _lastItem: '' //avoid trailing commas
+});
+
+OXI.RadioContainer = OXI.FormFieldContainer.extend({
+	templateName: "radio-view",
+	jsClassName: 'OXI.RadioContainer',
+	options: null,
+	multi: false,
+	checkBoxList: null, //should never be set by constructor
+	
+	init:function(){
+		this._super();
+		this.options = this.fieldDef.options;
+		if(this.fieldDef.multi){
+			this.multi = this.fieldDef.multi;
+			this.checkBoxList = new Array(this.options.length);
+			for(var i = 0; i < this.options.length; i++){
+				/*this.checkBoxList[i] = OXI.Checkbox.create();
+				this.checkBoxList[i].set('value', this.options[i].value);
+				this.checkBoxList[i].set('label', this.options[i].label);*/
+				this.checkBoxList[i] = this.createChildView(OXI.Checkbox.create().set('value', this.options[i].value).set('label', this.options[i].label));
+				//var FieldView = OXI.FormFieldFactory.getComponent('checkbox',{fieldDef:[{label : this.options[i].label} , {value: this.options[i].value}],FormView:this.FormView});
+				//this.checkBoxList[i] = FieldView;
+			}
+		}else{
+			this.checkBoxList = new Array(this.options.length);
+			for(var i = 0; i < this.options.length; i++){
+				this.checkBoxList[i] = this.options[i].value;
+			}
+		}
+	},
+	getValue: function(){
+		if(this.multi){			
+			var values = [];
+			for(var i = 0; i <this.checkBoxList.length; i++){
+				if (this.checkBoxList[i].isChecked()) {
+					values.push(this.checkBoxList[i].value);
+				}
+			}
+			return values;
+				
+			/*var values = [];
+	        this.checkBoxList.forEach(
+	        function(FieldView){
+	            values.push(FieldView.getValue());
+	        }
+	        );
+	        return values;*/
+			}
+		else{
+			var checkBoxList = this.checkBoxList;
+			var ret = '';
+			var i = -1;
+			$("input[type = 'radio']").each(function(){
+				i++;
+				if($(this).get(0).checked){
+					ret = checkBoxList[i];
+				}
+			});
+			return ret;
+		}
+	},
+	isValid: function(){
+		var ret = false;
+		for(var i = 0; i < this.checkBoxList.length; i++){
+			if(this.checkBoxList[i].isChecked()){
+				ret = true;
+			}
+		}
+		return ret;
+	},
+	_lastItem: ''
+	
+});
+
+//main validator class
+OXI.Validator = Ember.Object.extend({
+	inputField: null,
+	
+	getInput: function(){
+		return $('#'+this.inputField.elementId).val();
+	},
+	setInput: function(input){
+		$('#'+this.inputField.elementId).val(input);
+	},
+	validate: function(data){
+		//override in subclass
+	},
+	
+	_lastItem: ''
+});
+
+OXI.EmailValidator = OXI.Validator.extend({
+	
+	validate: function(data){
+		var mail = this.getInput();
+		var match = mail.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}\b/);
+		return match ? true : false;
+	},
+	
+	_lastItem: ''
+});
+
+//popover helper class
+OXI.Popover = Ember.Object.extend({
+	popoverField: null,
+	options: null,
+	register: function(){
+		var field = $('#'+this.popoverField.elementId);
+		field.options = this.options;
+		var trigger =  field.options['trigger'] ? field.options['trigger'] : 'manual';
+		field.popover({
+			placement: function(){
+				return field.options['placement'] ? field.options['placement'] : 'top';
+			},
+			html: 'true',
+			content: function(){
+				return field.options['content'] ? field.options['content'] : '<div><p>No content defiend<p></div>';
+			},
+			trigger: trigger// return field.options['content'] ? field.options['content'] : 'hover' provokes an intern bug in bootstrap!
+		});
+	},
+	show: function(){//can only be called after register was called
+		$('#'+this.popoverField.elementId).popover('show');
+	},
+	hide: function(){//can only be called after register was called
+		$('#'+this.popoverField.elementId).popover('hide');
+	},
+	_lastItem: ''
+});
+
+OXI.MetaEmailField = OXI.TextField.extend({
+	validator: null,
+	popover: null,
+	didInsertElement: function(){
+		this.validator = OXI.EmailValidator.create({'inputField' : this});
+		var options = new Object();
+		options['trigger'] = 'manual';
+		options['placement'] = 'top';
+		this.popover = OXI.Popover.create({'popoverField' : this, 'options' : options});
+		this.popover.register();
+		var field = this.$();
+		field.validator = this.validator;
+		field.popover = this.popover;
+		field.focusout(function(){
+			if(!field.validator.validate()){
+				field.popover.show();
+			}
+		field.focusin(function(){
+			field.popover.hide();
+		});	
+		});
+	},
+	_lastItem: ''
+});
+
+OXI.MetaEmailContainer = OXI.FormFieldContainer.extend({
+	templateName: "meta_email-view",
+	jsClassName: 'OXI.MetaEmailContainer',
+	init: function(){
+		this._super();
+		this.setFieldView(OXI.MetaEmailField.create(this.fieldDef));
+	},
+	_lastItem: ''
 });

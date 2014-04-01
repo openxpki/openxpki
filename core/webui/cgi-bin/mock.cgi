@@ -8,7 +8,7 @@ use JSON;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 
-Log::Log4perl->easy_init($DEBUG);
+Log::Log4perl->easy_init({ 'level' => $DEBUG, 'file' => '/tmp/newoxi.log'});
 
 my $session_id;
 my $user;
@@ -44,6 +44,13 @@ sub handle {
     }
 
 
+	if  ($action eq 'upload_cert'){
+		my $cert = $q->param('rawData');
+		return {message => $cert};
+	}
+	if($action eq 'term'){
+		return [{value => "test"}, {value => "test2"}];
+	}
 
     # Login page
 
@@ -122,8 +129,9 @@ sub handle {
                     description=> 'First you must master provide a certificate type, then you can choose some mmore details',
                     submit_label => 'proceed',
                     fields => [
-                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type', value=>'t2', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
-                    
+                    {name => 'upload', label => 'File', type => 'upload', areaVisible => '0', textAreaSize =>[{width => '200'}, {height => '200'}], is_optional => 1},
+                    {name => 'radio', multi => 1, type => 'radio', options => [{value=>'v1', label => 'erster wert'}, {value=>'v2', label => 'zweiter wert'}, {value=>'v3', label=>'dritter wert'}], value => 'v2' },
+					{name => 'tada', clonable=>1, label => 'autoComplete', type => 'text', autoComplete => {source => '/cgi-bin/mock.cgi?action=term', type => 'url'}, 'value' => 'Test'},
                     ]
                 }
             }
@@ -580,6 +588,9 @@ sub handle_request_cert{
     my $session = shift;
     my $action = shift;
     
+   
+    logger()->debug('Upload  ' . $q->param('upload'));
+    
     #demonstration of 2-step form with reset-action
     if($q->param('cert_typ')){
         $session->param('cert_typ',$q->param('cert_typ'));  
@@ -772,8 +783,7 @@ my $json = new JSON();
 
 logger()->debug('will return ' .  Dumper $ret );
 
-if (ref $ret eq 'HASH') {
-    
+if (ref $ret) {    
     print $json->encode($ret);
 } else {
     print $json->encode({ 'level' => 'error', 'message' => 'Application error!' });

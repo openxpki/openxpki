@@ -20,6 +20,8 @@
     <link href="css/bootstrap-combobox.css" rel="stylesheet">
     <!-- CSS for context menu --> 
     <link href="css/jquery.contextMenu.css" rel="stylesheet">
+    <!-- CSS for typeahead -->
+    <link href="css/typeahead.css" rel="stylesheet">
     <!-- Custom styles for this project -->
     <link href="css/oxi.css" rel="stylesheet">
     <link href="css/oxi-grid.css" rel="stylesheet">
@@ -369,7 +371,42 @@
       <div {{bind-attr class=":alert view.msg_class"}}>{{view.message}}</div>
     </script>
     
-   
+    <script type="text/x-handlebars" data-template-name="radio-view">
+    <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
+    <div>
+    {{#if view.multi}}
+      {{#each checkBox in view.checkBoxList}}
+
+        {{view checkBox}} {{checkBox.label}}
+
+      {{/each}}
+    	{{else}}
+    		{{#each view.options}}
+    			<input type="radio" name="radio" value="{{value}}">{{label}}</input>
+    		{{/each}}
+    	{{/if}}
+    </div>			
+    </div>
+    {{#if view._hasError}}
+    <span class="help-block">{{view.getErrorsAsString}}</span>
+    {{/if}}
+    </script>
+    
+	<script type="text/x-handlebars" data-template-name="upload-view">
+	<label class="col-lg-2 control-label">{{view.label}}</label>
+	  <div class="col-lg-9">
+		{{view view.FieldView}}
+		<p><div>{{view view.textArea}} </div></p>
+		<input type="hidden" name ="data" id="data">
+	</div>
+	</script>
+	
+	<script type="text/x-handlebars" data-template-name="meta_email-view">
+	<label class="col-lg-2 control-label">{{view.label}}</label>
+	  <div class="col-lg-9">
+		{{view view.FieldView}}
+	</div>
+	</script>
     
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -379,12 +416,15 @@
     <script src="js/libs/jquery.dataTables.min.js"></script>
     <script src="js/libs/jquery.ui.position.js"></script>
     <script src="js/libs/jquery.contextMenu.js"></script>
-    
+    <script src="js/libs/jquery.ui-min.js"></script>
+	
     
     <script src="js/libs/bootstrap-datepicker.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/libs/bootbox.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/libs/handlebars-1.0.0.js"></script>
+    <script src="js/libs/typeahead.bundle.js"></script>
     <script type="text/javascript" >
       //Environment for ember:
     ENV = {
@@ -407,7 +447,7 @@
    <script src="js/oxi/text.js"></script>
    <script src="js/oxi/keyvalue.js"></script>
    <script src="js/run.js"></script>
-   
+
    
   </body>
   

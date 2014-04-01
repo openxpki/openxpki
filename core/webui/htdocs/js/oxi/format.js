@@ -74,5 +74,12 @@ OXI.FormatCertStatus = OXI.FormatHelper.extend({
     }
 });
 
+OXI.FormatEmail = OXI.FormatHelper.extend({
+	format: function(mail){
+		var a = $('<a/>').html(mail).attr('href', 'mailto:'+mail);
+		return a.html();
+	}
+});
+
 
 
