@@ -1,7 +1,11 @@
 # The name of the file equals the name of the profile
 
-validity:
-    notafter: +01
+validity: 
+    notafter@: connector:realm.ca-one.profile.I18N_OPENXPKI_PROFILE_TLS_SERVER.con
+
+con:
+    class: OpenXPKI::Connector::FakeValidity
+    LOCATION: "+0003"
 
 digest: sha1
 increasing_serials: 1
