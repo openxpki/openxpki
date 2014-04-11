@@ -1,11 +1,7 @@
 # The name of the file equals the name of the profile
 
 validity: 
-    notafter@: connector:realm.ca-one.profile.I18N_OPENXPKI_PROFILE_TLS_SERVER.con
-
-con:
-    class: OpenXPKI::Connector::FakeValidity
-    LOCATION: "+0003"
+    notafter: +0003
 
 digest: sha1
 increasing_serials: 1
@@ -66,7 +62,7 @@ style:
   
     enroll:
         subject: 
-            dn: CN=[% CN.0 %]:blueroad,OU=Blueroad,O=Stadt Freising,L=Freising,C=de
+            dn: CN=[% CN.0 %],DC=Test Deployment,DC=OpenXPKI,DC=org
         
         metadata:
             system_id: "[% data.cust_id %]"
