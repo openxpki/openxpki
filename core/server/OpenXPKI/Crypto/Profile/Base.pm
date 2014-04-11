@@ -275,15 +275,24 @@ sub load_extension
     elsif ($ext eq "oid")
     {
             
-        # The numeric value is used as key, the content is a hash below
-        my @oids = $config->get_keys("$path");    
 
-        foreach my $oid (@oids) { 
-            $values[0] = ["FORMAT", $config->get("$path.$oid.format") ];
-            $values[1] = ["ENCODING", $config->get("$path.$oid.encoding") ];
-            $values[2] = ["CONTENT", $config->get("$path.$oid.value") ];
-            $self->set_extension (NAME     => $oid,
-                                  CRITICAL => $config->get("$path.$oid.critical") ? 'true' : 'false',
+        my @oids = $config->get_keys("$path");    
+    
+        # TODO - fix Config::Version and simplify!
+        # we need the array syntax if we want to use the oid directly as key
+        # this is currently not working as Config::Versioned does not handle 
+        # the dots in the path correctly, so we offer setting the oid as 
+        # attribute as a fallback 
+        my  @basepath = split /\./, $path;
+        foreach my $name (@oids) {            
+            
+            my $attr = $config->get_hash( [ @basepath, $name ] );
+            ##! 32: 'oid attributes, name ' . $name. ', attr: ' . Dumper $attr 
+             
+            # For the moment we just use a single predefined value
+            @values = ( $attr->{value} );
+            $self->set_extension (NAME     => $attr->{oid} ? $attr->{oid} : $name,
+                                  CRITICAL => $attr->{critical} ? 'true' : 'false',
                                   VALUES   => [@values]);
         }
     }

@@ -650,6 +650,12 @@ sub __get_extensions
                 params  => {NAME => $name});
         }
     }
+    
+    foreach my $oid(sort $profile->get_oid_extensions()) {        
+        my $string =  join ("", @{$profile->get_extension($oid)});        
+        $config .= "$oid=$string\n";        
+    }
+    
     $config .= "\n".$sections;
     ##! 16: "extensions ::= $config"
 
