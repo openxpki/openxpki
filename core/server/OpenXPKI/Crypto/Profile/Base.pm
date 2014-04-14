@@ -86,9 +86,8 @@ sub load_extension
     
     if ($critical) {
         $critical = 'true';
-    } else {
-        # FIXME: No flag in OID
-        if (! defined $critical) {
+    } else {        
+        if (!(defined $critical || $ext eq 'oid' )) {
             CTX('log')->log(
                 MESSAGE  => "Critical flag is not set for $ext in profile $profile_path!",
                 PRIORITY => 'warn',

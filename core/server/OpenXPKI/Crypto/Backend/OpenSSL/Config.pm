@@ -418,6 +418,7 @@ sub __get_ca
                "name_opt          = RFC2253,-esc_msb\n".
                "utf8              = yes\n".
                "string_mask       = utf8only\n".
+               "copy_extensions   = ".$self->{PROFILE}->get_copy_extensions()."\n".
                "\n";
 
     ##! 4: "end"

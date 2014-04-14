@@ -73,6 +73,8 @@ role:
 
 # Profile extensions - set 0/1 as needed
 extensions:
+    copy: copy
+
     basic_constraints:
         critical: 1
         ca: 0
