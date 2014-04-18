@@ -1,0 +1,89 @@
+# OpenXPKI Core Perl Dependencies
+#
+# Scott Hardin <scott.hardin@hnsc.de>
+#
+
+Name:         openxpki-perldeps-core
+License:      Apache
+Group:        Applications/CPAN
+Autoreqprov:  off
+Summary:      OpenXPKI Core Perl Dependencies
+Version:      [% version %]
+[% IF PKGREL %]
+Release: [% PKGREL %]
+[% ELSE %]
+Release:      1
+[% END %]
+Vendor:       OpenXPKI Project
+Packager:     Scott Hardin <scott.hardin@hnsc.de>
+Source:       openxpki-perldeps-core.tar.gz
+BuildRoot:    /var/tmp/%{name}-root
+
+%define filelist %{pkgname}-%{version}-filelist
+
+%description
+Perl binary and dependencies for the OpenXPKI Core.
+
+Packaging information:
+OpenXPKI version:      [% version %]
+Built from git branch: [% GIT_BRANCH %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git description:       [% GIT_DESCRIPTION %]
+Git tag:               
+[%- IF GIT_TAGS -%]
+[%- GIT_TAGS -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
+
+%install
+set -x
+umask 022
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+mkdir %{buildroot}
+tar xzf $RPM_SOURCE_DIR/%{name}.tar.gz -C %{buildroot}
+
+%{__perl} -MFile::Find -le '
+    find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
+    #print "%doc  CHANGES INSTALL LICENSE README";
+    for my $x (sort @dirs, @files) {
+        push @ret, $x unless indirs($x);
+        }
+    print join "\n", sort @ret;
+
+    sub wanted {
+        return if /auto$/;
+
+        local $_ = $File::Find::name;
+        my $f = $_; s|^\Q%{buildroot}\E||;
+        return unless length;
+        return $files[@files] = $_ if (-f $f || -l $f);
+
+        $d = $_;
+        /\Q$d\E/ && return for reverse sort @INC;
+        $d =~ /\Q$_\E/ && return
+            #for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /var |;
+            for qw| /etc /opt /usr /srv /var |;
+
+        $dirs[@dirs] = $_;
+        }
+
+    sub indirs {
+        my $x = shift;
+        $x =~ /^\Q$_\E\// && $x ne $_ && return 1 for @dirs;
+        }
+    ' > %filelist
+
+[ -z %filelist ] && {
+    echo "ERROR: empty %files listing"
+    exit -1
+    }
+
+#%post
+#/usr/local/sbin/rcm-config-pkg-postinstall.sh
+
+%clean
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+
+%files -f %filelist
+%defattr(-,root,root)
