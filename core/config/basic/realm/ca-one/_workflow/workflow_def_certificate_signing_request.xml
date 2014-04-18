@@ -131,23 +131,19 @@
   
   <state name="NICE_PICKUP_CERTIFICATE" autorun="yes">
         
+    <!-- syncronus backends return the certificate on issue, so no need for a pickup -->
     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
             resulting_state="NICE_CERTIFICATE_ISSUED">
             <condition name="I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"/>
     </action>
     
     <action name="I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE"
-            resulting_state="NICE_PICKUP_CERTIFICATE">
-            <condition name="I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_PENDING"/>
+        resulting_state="NICE_CERTIFICATE_ISSUED">
+        <condition name="!I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"/>
     </action>
     
-	<action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
-            resulting_state="FAILURE">
-            <condition name="!I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_PENDING"/>
-            <condition name="!I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"/>
-    </action>            
   </state>
-    
+  
   <state name="NICE_CERTIFICATE_ISSUED" autorun="yes">
     <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_METADATA"
               resulting_state="NICE_METADATA_PERSISTED" />
