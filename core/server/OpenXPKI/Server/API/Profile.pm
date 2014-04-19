@@ -63,13 +63,21 @@ sub __fetch_input_element_definitions {
         }
         
         if (!$input) {
+            # check if there is a default section (only look in the profile!)
+            $input = $config->get_hash(['profile', $profile, 'template' , '_default' ]);                
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_API_DEFAULT_NO_SUCH_INPUT_ELEMENT_DEFINED",
                 params => {
                     'input' => $input_name,
                     'profile' => $profile,
                 }
-            );
+            ) unless($input);
+                        
+            # got a default item, create field using default 
+            # set id and label to name
+            $input->{id} = $input_name;
+            $input->{label} = $input_name;
+             
         }
 
         # Uppercase the keys and push it to the array
