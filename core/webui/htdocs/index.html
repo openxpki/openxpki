@@ -294,7 +294,13 @@
     </script>
     
     <script type="text/x-handlebars" data-template-name="form-textfield">
-        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
+        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">
+            {{#if view.LabelView}}
+            {{view view.LabelView}}
+            {{else}}
+            {{view.getLabel}}
+            {{/if}}
+        </label>
         <div class="col-lg-9">
           {{view view.FieldView}}
           {{#if view._hasError}}
@@ -309,9 +315,6 @@
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-9">
           {{view view.FieldView}}
-          {{#if view.hasFreetext}}
-          {{view view.FreeTextView}}
-          {{/if}}
           {{#if view._hasError}}
           <span class="help-block">{{view.getErrorsAsString}}</span>
           {{/if}}
@@ -416,7 +419,7 @@
     <script src="js/libs/jquery.dataTables.min.js"></script>
     <script src="js/libs/jquery.ui.position.js"></script>
     <script src="js/libs/jquery.contextMenu.js"></script>
-    <script src="js/libs/jquery.ui-min.js"></script>
+    <!--<script src="js/libs/jquery.ui-min.js"></script>-->
 	
     
     <script src="js/libs/bootstrap-datepicker.js"></script>

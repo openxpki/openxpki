@@ -321,6 +321,7 @@ OXI.FormFieldContainer = OXI.View.extend({
     FormView:null,//set via constructor
     
     FieldView: null,
+    LabelView:null,
     label:null,
     fieldname:null,
     isRequired:true,
@@ -343,6 +344,13 @@ OXI.FormFieldContainer = OXI.View.extend({
         //this.debug('hasRightPane? ');
         return this.FormView.hasRightPane();
     }.property(),
+    
+    getLabel:function(){
+        if(typeof(this.label) =='string'){
+            return this.label;
+        }
+        
+    }.property(),
 
     //needed for clonalbe fields:
     fieldindex:0,
@@ -360,10 +368,20 @@ OXI.FormFieldContainer = OXI.View.extend({
         //Ember.debug('OXI.FormFieldContainer :init '+this.fieldDef.label);
         this.isRequired = true;
         this.FieldView = null;
-
+        this.LabelView = null;
         this._super();
-        this.label = this.fieldDef.label;
-        this.fieldname = this.fieldDef.name;
+        
+        
+        if(typeof(this.fieldDef.name) =='string'){
+            this.fieldname = this.fieldDef.name;
+            this.label = this.fieldDef.label;
+        }else{
+            this.fieldname = 'FlexField';
+            this.LabelView  =  this.createChildView(
+                OXI.Select.create({name:this.fieldname+'_label', options:this.fieldDef.name,prompt:''})
+            );
+        }
+        
 
         if(this.fieldDef.is_optional){//required is default!
             this.isRequired = false;
@@ -452,8 +470,7 @@ OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
                 return year+'-'+ nf(month) +'-'+ nf(day) +' 00:00:00';
             case 'iso8601':
                 return year+'-'+ nf(month) +'T'+ nf(day) +' 00:00:00';
-            case 'terse':
-                return year+''+month +''+ day +'000000';
+            
             case 'epoch':
                 var D = new Date(year,month-1,day);
                 var ms = D.getTime();
@@ -553,9 +570,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     templateName: "form-selectfield",
     jsClassName:'OXI.PulldownContainer',
 
-    FreeTextView: null,
-    hasFreetext:false,
-    _freeTextKey : '_freetext_',
+   
     
     editable:false,
     optionAjaxSource:null,
@@ -564,7 +579,6 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
     init:function(){
         //Ember.debug('OXI.PulldownContainer :init '+this.fieldDef.label);
-        this.set('hasFreetext',false);
         this.set('editable',false);
         this._super();
         if(this.fieldDef.editable){
@@ -577,23 +591,11 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
             this.set('optionAjaxSource',this.fieldDef.options);
             this.fieldDef.options = [];
         }
-
-        if(this.fieldDef.freetext){
-
-            this.set('hasFreetext',true);
-
-            this.FreeTextView = this.createChildView(
-            OXI.TextField.create({name:this.fieldDef.name+'_free',isVisible:false,placeholder:'Please enter a value'})
-            );
-            this.fieldDef.options.push({value : this._freeTextKey ,label:this.fieldDef.freetext});
-        }
-
         this.setFieldView(OXI.Select.create(this.fieldDef));
     },
 
     /**
     returns the selected value
-    in case of "freetext"-option the entered freetext is returned
     */
 
     getValue:function(){
@@ -602,8 +604,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
             this.debug({combo: this.fieldname, combovalue: v});
             return v;
         }
-        var sel_val = this._getSelected();
-        return (sel_val == this._freeTextKey)? this.FreeTextView.value : sel_val;
+        return this._getSelected();
     },
 
     _getSelected:function(){
@@ -612,10 +613,6 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
     change: function () {
         //console.log(this.FieldView.name + ' changed to '+this.getValue());
-        if(this.hasFreetext){
-
-            this.FreeTextView.toggle((this._getSelected() == this._freeTextKey));
-        }
     },
     
     didInsertElement: function(){
@@ -657,6 +654,7 @@ OXI.Checkbox = Ember.Checkbox.extend(
 }
 );
 
+
 OXI.Select = Ember.Select.extend(
 {
     optionLabelPath: 'content.label',
@@ -667,7 +665,11 @@ OXI.Select = Ember.Select.extend(
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
+        js_debug(this.name);
+        js_debug(this.options,2);
+        
         var options = (typeof this.options == 'object')?this.options:[];
+        
         this.content = Ember.A(options);
         if(typeof this.prompt != 'undefined' && this.prompt=='' ){
             this.prompt = ' ';//display white option

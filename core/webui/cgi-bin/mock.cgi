@@ -129,9 +129,8 @@ sub handle {
                     description=> 'First you must master provide a certificate type, then you can choose some mmore details',
                     submit_label => 'proceed',
                     fields => [
-                    {name => 'upload', label => 'File', type => 'upload', areaVisible => '0', textAreaSize =>[{width => '200'}, {height => '200'}], is_optional => 1},
-                    {name => 'radio', multi => 1, type => 'radio', options => [{value=>'v1', label => 'erster wert'}, {value=>'v2', label => 'zweiter wert'}, {value=>'v3', label=>'dritter wert'}], value => 'v2' },
-					{name => 'tada', clonable=>1, label => 'autoComplete', type => 'text', autoComplete => {source => '/cgi-bin/mock.cgi?action=term', type => 'url'}, 'value' => 'Test'},
+                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type', value=>'t2', type => 'select',options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+                    
                     ]
                 }
             }
@@ -658,7 +657,7 @@ sub handle_request_cert{
                         ],
                         
                         fields => [
-                        { name => 'cert_purpose', label => 'Purpose', type => 'select',freetext => 'other',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
+                        { name => 'cert_purpose', label => 'Purpose', type => 'select',options=>[{value=>'p1',label=>'Purpose 1'},{value=>'p2',label=>'Purpose 2'},{value=>'p3',label=>'Purpose 3'}] },
                         { name => 'some_text', label => 'Text', type => 'text' },
                         { name => 'opt_text', label => 'Text (opt)', type => 'text' ,is_optional=>1},
                         { name => 'is_urgent', label => 'Yes, this is urgent!', type => 'checkbox' },
@@ -672,6 +671,8 @@ sub handle_request_cert{
                         { name => 'hidden_info', label => 'Hidden',type => 'hidden',value=>'secret'},
                         { name => 'clone_key', label => 'Key', type => 'text',clonable=>1, 'value' =>['proposed value' ]},
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },
+                        #demonstration of dynamic key-valuefield
+                        { name => [{key=>"dyn1",label=>"Dyn 1"},{key=>"dyn2",label=>"Dyn 2 lajd ajd lj lj"},{key=>"dyn3",label=>"Dyn 3"},{key=>"dyn3",label=>"Dyn 3"}], type => 'text' },
                         ]
                     }
                 }
