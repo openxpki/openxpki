@@ -617,7 +617,15 @@ sub handle_request_cert{
             my @keys = $q->param();
             my @input;
             foreach my $k (@keys){
-                push @input, sprintf('%s: %s',$k,$q->param($k)) ;
+                my $val;
+                if($k =~ /\[\]/){
+                   my @tmp = $q->param($k);
+                   $val = join(', ', @tmp);
+                }else{
+                    $val = $q->param($k);
+                }
+ 
+                push @input, sprintf('%s: %s',$k,$val) ;
             }
             
             
@@ -672,7 +680,9 @@ sub handle_request_cert{
                         { name => 'clone_key', label => 'Key', type => 'text',clonable=>1, 'value' =>['proposed value' ]},
                         { name => 'long_text', label => 'Some long text', type => 'textarea' },
                         #demonstration of dynamic key-valuefield
-                        { name => [{key=>"dyn1",label=>"Dyn 1"},{key=>"dyn2",label=>"Dyn 2 lajd ajd lj lj"},{key=>"dyn3",label=>"Dyn 3"},{key=>"dyn3",label=>"Dyn 3"}], type => 'text' },
+                        { name => 'dyn_key_val', label => 'Dyn Key-Value', 'keys' => [{value=>"key_x",label=>"Typ X"},{value=>"key_y",label=>"Typ Y"}], type => 'text' },
+                        { name => 'dyn_key_val_2', label => 'Dyn Key-Val (clonable)',clonable=>1, 'keys' => [{value=>"key2_x",label=>"Typ XX"},{value=>"key2_y",label=>"Typ YY"}], type => 'text' },
+                        
                         ]
                     }
                 }

@@ -293,27 +293,12 @@
     {{/each}}
     </script>
     
-    <script type="text/x-handlebars" data-template-name="form-textfield">
-        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">
-            {{#if view.LabelView}}
-            {{view view.LabelView}}
-            {{else}}
-            {{view.getLabel}}
-            {{/if}}
-        </label>
-        <div class="col-lg-9">
-          {{view view.FieldView}}
-          {{#if view._hasError}}
-          <span class="help-block">{{view.getErrorsAsString}}</span>
-          {{/if}}
-        </div>
-    </script>
-    
-    
-    
-    <script type="text/x-handlebars" data-template-name="form-selectfield">
+    <script type="text/x-handlebars" data-template-name="form-field">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-9">
+          {{#if view.hasDynamicKeys}}
+          {{view view.DynamicKeyView}}
+          {{/if}}
           {{view view.FieldView}}
           {{#if view._hasError}}
           <span class="help-block">{{view.getErrorsAsString}}</span>
@@ -321,17 +306,11 @@
         </div>
     </script>
     
-    
-    
-    <script type="text/x-handlebars" data-template-name="form-textarea">
-        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
-        <div class="col-lg-9">
-          {{view view.FieldView}}
-          {{#if view._hasError}}
-          <span class="help-block">{{view.getErrorsAsString}}</span>
-          {{/if}}
-        </div>
+    <script type="text/x-handlebars" data-template-name="form-dynamic-key-selection">
+    {{view view.SelectView}}
     </script>
+    
+    
     
     <script type="text/x-handlebars" data-template-name="form-checkbox">
       <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">

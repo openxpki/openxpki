@@ -56,16 +56,23 @@ OXI.FormView = OXI.ContentBaseView.extend({
         if(do_submit){//should the form-values be transmitted to the server?
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
-                //this.debug(FieldView.fieldname +': '+FieldView.getValue());
+                //this.debug(FieldView.getKey() +': '+FieldView.getValue());
 
                 if(!FieldView.isValid()){
                     submit_ok = false;
-                    //this.debug(FieldView.fieldname +' not valid: '+FieldView.getErrorsAsString);
+                    //this.debug(FieldView.getKey() +' not valid: '+FieldView.getErrorsAsString);
                 }else{
-                    formValues[FieldView.fieldname] = FieldView.getValue();
+                    //formValues[FieldView.getKey()] = FieldView.getValue();
+                    var values = FieldView.getKeyValueEntries();
+                    var k;
+                    for(k in values){
+                        formValues[k] = values[k];
+                    }
+                    
                 }
             }
         }
+        js_debug(formValues);
         if(submit_ok){
             this.debug('submit ok');
             formValues.action = action;
@@ -232,6 +239,10 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         return this.FormView.hasRightPane();
     }.property(),
     
+    getKey:function(){
+         return this.fieldname;  
+    },
+    
     init:function(){
 
         this._super();
@@ -302,30 +313,54 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         return isValid;
     },
 
-    getValue: function(){
-        var values = [];
+    
+    getKeyValueEntries: function(){
+        var entries = {};
         this.FieldContainerList.forEach(
-        function(FieldView, index, enumerable){
-            values.push(FieldView.getValue());
-        }
+            function(FieldView, index, enumerable){
+                var k = FieldView.getKey();
+                if(!entries[k]){
+                    entries[k] = [];    
+                }
+                entries[k].push(FieldView.getValue());
+            }
         );
-        return values;
+        return entries;
     },
 
     _lastItem: '' //avoid trailing commas
 });
 
-OXI.FormFieldContainer = OXI.View.extend({
+OXI.DynamicKeyView = OXI.View.extend({
+    templateName: "form-dynamic-key-selection",
+    jsClassName:'OXI.DynamicKeyView',
+    options:null,
+    SelectView: null,
+    init:function(){
+        
+        this._super();
+        this.SelectView = this.createChildView(OXI.Select.create({options:this.options}));
+    },
     
+    getSelectedKey: function(){
+        return (this.SelectView.selection)?this.SelectView.selection.value:'';
+    },
+    
+    _lastItem: '' //avoid trailing commas
+});
+
+OXI.FormFieldContainer = OXI.View.extend({
+    templateName: "form-field",
     fieldDef:null,//set via constructor
     FormView:null,//set via constructor
     
     FieldView: null,
-    LabelView:null,
+    DynamicKeyView: null,
     label:null,
     fieldname:null,
     isRequired:true,
     clonable: false,
+    
     classNames: ['form-group'],
     classNameBindings: ['_hasError:has-error'],
     
@@ -345,11 +380,8 @@ OXI.FormFieldContainer = OXI.View.extend({
         return this.FormView.hasRightPane();
     }.property(),
     
-    getLabel:function(){
-        if(typeof(this.label) =='string'){
-            return this.label;
-        }
-        
+    hasDynamicKeys:function(){
+        return (this.DynamicKeyView);
     }.property(),
 
     //needed for clonalbe fields:
@@ -361,27 +393,28 @@ OXI.FormFieldContainer = OXI.View.extend({
     isLast: false,//wird vom ClonableFieldContainer gesetzt
 
     _toString:function(){
-        return this._super()+' '+this.fieldname;
+        return this._super()+' '+this.getKey();
+    },
+    
+    getKey:function(){
+         if(this.DynamicKeyView){
+            return this.DynamicKeyView.getSelectedKey();   
+         }
+         return this.fieldname;  
     },
 
     init:function(){
         //Ember.debug('OXI.FormFieldContainer :init '+this.fieldDef.label);
         this.isRequired = true;
         this.FieldView = null;
-        this.LabelView = null;
+        this.DynamicKeyView = null;
+        
         this._super();
-        
-        
-        if(typeof(this.fieldDef.name) =='string'){
-            this.fieldname = this.fieldDef.name;
-            this.label = this.fieldDef.label;
-        }else{
-            this.fieldname = 'FlexField';
-            this.LabelView  =  this.createChildView(
-                OXI.Select.create({name:this.fieldname+'_label', options:this.fieldDef.name,prompt:''})
-            );
+        this.label = this.fieldDef.label;
+        this.fieldname = this.fieldDef.name;
+        if(this.fieldDef.keys && typeof(this.fieldDef.keys) =='object'){
+            this.DynamicKeyView = this.createChildView(OXI.DynamicKeyView.create({options:this.fieldDef.keys}));
         }
-        
 
         if(this.fieldDef.is_optional){//required is default!
             this.isRequired = false;
@@ -391,18 +424,25 @@ OXI.FormFieldContainer = OXI.View.extend({
         this.FieldView = this.createChildView( View );
     },
     destroy: function() {
-        //Ember.debug('FormFieldContainer::destroy:'+this.fieldname);
+        //Ember.debug('FormFieldContainer::destroy:'+this.getKey());
         this._super()
     },
     getValue:function(){
         return this.FieldView.value;
+    },
+    
+    getKeyValueEntries:function(){
+       var k = this.getKey();
+       var entries = {};
+       entries[k] = this.getValue();
+       return entries;
     },
 
     _lastItem: '' //avoid trailing commas
 });
 
 OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
-    templateName: "form-textfield",
+    
     jsClassName:'OXI.TextFieldContainer',
     init:function(){
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
@@ -553,7 +593,7 @@ OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
 });
 
 OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
-    templateName: "form-textarea",
+
     jsClassName:'OXI.TextAreaContainer',
     init:function(){
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
@@ -567,7 +607,7 @@ OXI.TextAreaContainer = OXI.FormFieldContainer.extend({
 
 
 OXI.PulldownContainer = OXI.FormFieldContainer.extend({
-    templateName: "form-selectfield",
+
     jsClassName:'OXI.PulldownContainer',
 
    
@@ -601,7 +641,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     getValue:function(){
         if(this._isComboBox){
             var v = this.$('select').combobox('getValue');   
-            this.debug({combo: this.fieldname, combovalue: v});
+            this.debug({combo: this.getKey(), combovalue: v});
             return v;
         }
         return this._getSelected();
@@ -619,7 +659,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
         this._super();
         if(this._isComboBox){
-            js_debug(this.fieldname+' is editable');
+            js_debug(this.getKey()+' is editable');
             var comboOptions = {queryDelay: 300,editable:this.editable};
             if(this.optionAjaxSource){
                 comboOptions.ajaxSource = App.serverUrl + '?action='+this.optionAjaxSource;
@@ -654,7 +694,6 @@ OXI.Checkbox = Ember.Checkbox.extend(
 }
 );
 
-
 OXI.Select = Ember.Select.extend(
 {
     optionLabelPath: 'content.label',
@@ -665,11 +704,7 @@ OXI.Select = Ember.Select.extend(
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
-        js_debug(this.name);
-        js_debug(this.options,2);
-        
         var options = (typeof this.options == 'object')?this.options:[];
-        
         this.content = Ember.A(options);
         if(typeof this.prompt != 'undefined' && this.prompt=='' ){
             this.prompt = ' ';//display white option
