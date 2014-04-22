@@ -31,7 +31,11 @@ OXI.FormView = OXI.ContentBaseView.extend({
         //this.debug('hasRightPane? ');
         return this.SectionView.hasRightPane();
     },
-
+    
+    callServer: function(action,sourceField){
+        this.debug('call server with action '+action+', sourceField '+sourceField.fieldname);
+    },
+    
 
     submitAction: function(action, do_submit,target) {
         // will be invoked whenever the user triggers
@@ -615,7 +619,15 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     editable:false,
     optionAjaxSource:null,
     _isComboBox:false,
-
+    
+    
+    triggerSelectionChanged:function(){
+        //js_debug('triggerSelectionChanged'); 
+        if(this.fieldDef.actionOnChange){
+            //js_debug('call actionOnChange '+ this.fieldDef.actionOnChange );
+            this.FormView.callServer(this.fieldDef.actionOnChange, this);            
+        }
+    },
 
     init:function(){
         //Ember.debug('OXI.PulldownContainer :init '+this.fieldDef.label);
@@ -694,12 +706,23 @@ OXI.Checkbox = Ember.Checkbox.extend(
 }
 );
 
+
+
 OXI.Select = Ember.Select.extend(
 {
     optionLabelPath: 'content.label',
     optionValuePath: 'content.value',
+    
     classNames: ['form-control'] ,
     prompt:null,
+    
+    
+    checkSelection:function(){
+        //js_debug('sel val changed: ' + this.selection.value);
+        this.get('parentView').triggerSelectionChanged();
+        
+        
+    }.observes('selection.value'),
     
     init:function(){
         //Ember.debug('OXI.Select :init ');
@@ -709,6 +732,8 @@ OXI.Select = Ember.Select.extend(
         if(typeof this.prompt != 'undefined' && this.prompt=='' ){
             this.prompt = ' ';//display white option
         }
+        
+        //this.set('controller',OXI.SelectFieldControler.create({view:this}));
     },
     _lastItem: '' //avoid trailing commas
 

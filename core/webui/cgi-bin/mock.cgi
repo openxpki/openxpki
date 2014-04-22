@@ -404,6 +404,23 @@ sub handle {
             }]
         };
     
+}elsif($page eq 'test_dep_select'){
+   
+    return {page=> {'label' => 'Test Dependent Selects'},
+            main => [
+                { action => 'test_dep_select_submit','type' => 'form',
+                content => {
+                    
+                    fields => [
+                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!',  type => 'select',options=>[] },
+                    
+                    ]
+                }
+                
+            }]
+        };
+    
 }elsif($page eq 'test_text'){
     return {page=>{'label' => 'Some plain text',description=>'some long text sjahdasd  lajsd ajsd l kaj dljahweorzowejasdh'},
             status => {level=>'info',message => 'Status-Message'},
@@ -561,6 +578,8 @@ sub get_side_structure_logged_in{
         {key=> 'test_loading',label =>  "Test long loading"},
         {key=> 'test_key_value',label =>  "Test Key/Value"},
         {key=> 'test_text',label =>  "Plain text page"},
+        {key=> 'test_dep_select',label =>  "Dependent selects"},
+        
         ]
     }
 
