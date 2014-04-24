@@ -418,9 +418,14 @@ sub __get_ca
                "name_opt          = RFC2253,-esc_msb\n".
                "utf8              = yes\n".
                "string_mask       = utf8only\n".
-               "copy_extensions   = ".$self->{PROFILE}->get_copy_extensions()."\n".
                "\n";
 
+    # add the copy_extensions only if set, this prevents adding it to the CRL config
+    my $copy_ext = $self->{PROFILE}->get_copy_extensions();
+    if ($copy_ext && $copy_ext ne 'none') {
+        $config .= "copy_extensions = $copy_ext\n";
+    }
+    
     ##! 4: "end"
     return $config;
 }
