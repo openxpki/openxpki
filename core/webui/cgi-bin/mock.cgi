@@ -77,6 +77,9 @@ sub handle {
         $res = handle_certsearch( $q );
     } elsif ($action =~ /^request_cert/) {
         $res = handle_request_cert( $q,$session,$action );
+    }elsif($action eq 'test_dep_select!change_type'){
+        #dependent options for second select
+        $res = getDependentSecondOptions($q);;       
     }elsif ($q->param('page')) {
         $res = {'page' => $q->param('page') };
     }elsif($action eq 'cert_search!options'){
@@ -406,20 +409,7 @@ sub handle {
     
 }elsif($page eq 'test_dep_select'){
    
-    return {page=> {'label' => 'Test Dependent Selects'},
-            main => [
-                { action => 'test_dep_select_submit','type' => 'form',
-                content => {
-                    
-                    fields => [
-                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
-                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!',  type => 'select',options=>[] },
-                    
-                    ]
-                }
-                
-            }]
-        };
+    return getDependentSelectForm();
     
 }elsif($page eq 'test_text'){
     return {page=>{'label' => 'Some plain text',description=>'some long text sjahdasd  lajsd ajsd l kaj dljahweorzowejasdh'},
@@ -713,6 +703,44 @@ sub handle_request_cert{
     }
        
 }
+
+sub getDependentSecondOptions{
+    my $q = shift;  
+    my $cert_typ = $q->param('cert_typ');
+    my %options = (
+        t1 => [{value=>'t1_1',label=>'Subtyp 1 zu 1'},{value=>'t1_2',label=>'Subtyp 2 zu 1'},{value=>'t1_3',label=>'Subtyp 3 zu 1'}],
+        t2 => [{value=>'t2_1',label=>'Subtyp 1 zu 2'},{value=>'t2_2',label=>'Subtyp 2 zu 2'},{value=>'t2_3',label=>'Subtyp 3 zu 2'}],
+        t3 => [{value=>'t3_1',label=>'Subtyp 1 zu 3'},{value=>'t3_2',label=>'Subtyp 2 zu 3'},{value=>'t3_3',label=>'Subtyp 3 zu 3'}],
+    );
+    
+    my $depOptions = ($options{$cert_typ})?$options{$cert_typ}:{};
+    my $prompt = ($options{$cert_typ})?'':'please select type!';
+    return {
+        _returnType => 'partial',
+        fields => [
+              {name => 'cert_subtyp', prompt=>$prompt,options=>$depOptions,label=>'Bla'} 
+              ]   
+        
+        };
+    
+}
+
+sub getDependentSelectForm{
+        return {page=> {'label' => 'Test Dependent Selects'},
+            main => [
+                { action => 'test_dep_select_submit','type' => 'form',
+                content => {
+                    
+                    fields => [
+                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!',  type => 'select',options=>[] },
+                    
+                    ]
+                }
+                
+            }]
+        };
+    }
 
 sub handle_certsearch {
 

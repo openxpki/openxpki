@@ -34,6 +34,50 @@ OXI.FormView = OXI.ContentBaseView.extend({
     
     callServer: function(action,sourceField){
         this.debug('call server with action '+action+', sourceField '+sourceField.fieldname);
+        var formValues = this.getFormValues();
+        formValues.action = action;
+        formValues._sourceField = sourceField.getKey();
+        var FormView = this;
+        App.showLoader();
+        App.callServer(formValues).success(
+            function(json){
+                FormView.debug('server responded');
+                //js_debug(json,2);
+                App.hideLoader();
+                
+                //wenn server das ganze form zurückgibt, das neu rendern - sonst nur die speziellen felder
+                switch(json._returnType){
+                    case 'partial':
+                        if(!json.fields){
+                            js_debug('Server returned no fields for action "'+action+'", triggered by "'+formValues._sourceField+'"');
+                            return;
+                        }
+                        FormView.updateFields(json.fields);
+                        break;
+                    case 'full':
+                        break;
+                    default:
+                        //this should not happen!
+                        App.applicationAlert('Server returned wrong returnType for action "'+action+'", triggered by "'+formValues._sourceField+'": '+json._returnType);
+                        
+                        return;
+                }
+                
+            }
+        );
+    },
+    
+    getFormValues: function(){
+        var i;
+        var formValues = {};
+        for(i=0;i<this.FieldContainerList.length;i++){
+            var values = this.FieldContainerList[i].getKeyValueEntries();
+            var k;
+            for(k in values){
+                formValues[k] = values[k];
+            }
+        }
+        return formValues;
     },
     
 
@@ -56,26 +100,21 @@ OXI.FormView = OXI.ContentBaseView.extend({
         this.resetErrors();
         var i;
         var submit_ok = true;
-        var formValues = {target:target};
+        var formValues = {};
+
         if(do_submit){//should the form-values be transmitted to the server?
+            
+            formValues = this.getFormValues();
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
                 //this.debug(FieldView.getKey() +': '+FieldView.getValue());
-
                 if(!FieldView.isValid()){
                     submit_ok = false;
                     //this.debug(FieldView.getKey() +' not valid: '+FieldView.getErrorsAsString);
-                }else{
-                    //formValues[FieldView.getKey()] = FieldView.getValue();
-                    var values = FieldView.getKeyValueEntries();
-                    var k;
-                    for(k in values){
-                        formValues[k] = values[k];
-                    }
-                    
                 }
             }
         }
+        formValues.target = target;
         js_debug(formValues);
         if(submit_ok){
             this.debug('submit ok');
@@ -196,6 +235,16 @@ OXI.FormView = OXI.ContentBaseView.extend({
             this.fieldContainerMap[field.name] = i;
             //js_debug('added field '+field.name+ ' to field-map with index '+i);
         }
+    },
+    
+    updateFields: function(fields){
+        var i;
+        for(i=0;i< fields.length;i++){
+            var fieldDef = fields[i];
+            if(!fieldDef.name)continue;
+            var FieldView = this.getFieldView(fieldDef.name);
+            FieldView.updateFormProperties(fieldDef);
+        } 
     },
 
     getFieldView:function(field){
@@ -377,6 +426,15 @@ OXI.FormFieldContainer = OXI.View.extend({
             }
         }
         return true;
+    },
+    
+    updateFormProperties: function(fieldDef){
+        var k;
+        for(k in fieldDef){
+            if(k=='name' || k=='type')continue;
+            this.set( k,fieldDef[k]);
+            this.FieldView.set(k,fieldDef[k]) ;
+        }  
     },
     
     hasRightPane:function(){
@@ -716,6 +774,10 @@ OXI.Select = Ember.Select.extend(
     classNames: ['form-control'] ,
     prompt:null,
     
+    _optionUpdateTrigger: function(){
+       this.setOptions(this.options);  
+    }.observes('this.options'),
+    
     
     checkSelection:function(){
         //js_debug('sel val changed: ' + this.selection.value);
@@ -727,14 +789,19 @@ OXI.Select = Ember.Select.extend(
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
-        var options = (typeof this.options == 'object')?this.options:[];
-        this.content = Ember.A(options);
+        this.setOptions(this.options);
         if(typeof this.prompt != 'undefined' && this.prompt=='' ){
             this.prompt = ' ';//display white option
         }
         
         //this.set('controller',OXI.SelectFieldControler.create({view:this}));
     },
+    
+    setOptions:function(options){
+        options = (typeof options == 'object')?options:[];
+        this.set('content', Ember.A(options));
+    },
+    
     _lastItem: '' //avoid trailing commas
 
 });
