@@ -3,7 +3,6 @@ defines classes for Forms
 */
 
 
-
 "use strict";
 
 OXI.FormView = OXI.ContentBaseView.extend({
@@ -45,7 +44,6 @@ OXI.FormView = OXI.ContentBaseView.extend({
                 //js_debug(json,2);
                 App.hideLoader();
                 
-                //wenn server das ganze form zurückgibt, das neu rendern - sonst nur die speziellen felder
                 switch(json._returnType){
                     case 'partial':
                         if(!json.fields){
@@ -695,7 +693,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     triggerSelectionChanged:function(){
         //js_debug('triggerSelectionChanged'); 
         if(this.fieldDef.actionOnChange){
-            //js_debug('call actionOnChange '+ this.fieldDef.actionOnChange );
+            this.debug('call actionOnChange '+ this.fieldDef.actionOnChange );
             this.FormView.callServer(this.fieldDef.actionOnChange, this);            
         }
     },
@@ -793,9 +791,9 @@ OXI.Select = Ember.Select.extend(
     
     
     checkSelection:function(){
-        //js_debug('sel val changed: ' + this.selection.value);
+        var v = (this.selection)?this.selection.value:'-';
+        js_debug(this.name +': sel val changed: ' + v);
         this.get('parentView').triggerSelectionChanged();
-        
         
     }.observes('selection.value'),
     
@@ -814,7 +812,7 @@ OXI.Select = Ember.Select.extend(
         options = (typeof options == 'object')?options:[];
         this.set('content', Ember.A(options));
         if(!this.prompt && !this.value && options[0]){
-            this.set('value',   options[0].value);
+            this.set('selection',   options[0]);
         }
     },
     
