@@ -115,7 +115,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
             }
         }
         formValues.target = target;
-        js_debug(formValues);
+        //js_debug(formValues);
         if(submit_ok){
             this.debug('submit ok');
             formValues.action = action;
@@ -432,6 +432,10 @@ OXI.FormFieldContainer = OXI.View.extend({
         var k;
         for(k in fieldDef){
             if(k=='name' || k=='type')continue;
+            if(k=='visible'){
+                this.toggle(fieldDef[k]);
+                continue;   
+            }
             this.set( k,fieldDef[k]);
             this.FieldView.set(k,fieldDef[k]) ;
         }  
@@ -464,6 +468,8 @@ OXI.FormFieldContainer = OXI.View.extend({
          }
          return this.fieldname;  
     },
+    
+    
 
     init:function(){
         //Ember.debug('OXI.FormFieldContainer :init '+this.fieldDef.label);
@@ -477,6 +483,10 @@ OXI.FormFieldContainer = OXI.View.extend({
         if(this.fieldDef.keys && typeof(this.fieldDef.keys) =='object'){
             this.DynamicKeyView = this.createChildView(OXI.DynamicKeyView.create({options:this.fieldDef.keys}));
         }
+        if(typeof(this.fieldDef.visible) != 'undefined'){
+            var bVis = (this.fieldDef.visible)?true:false;
+            this.toggle(bVis) ;
+        }
 
         if(this.fieldDef.is_optional){//required is default!
             this.isRequired = false;
@@ -484,6 +494,9 @@ OXI.FormFieldContainer = OXI.View.extend({
     },
     setFieldView:function(View){
         this.FieldView = this.createChildView( View );
+        if(!this.isVisible){
+            //this.FieldView.set( 'isVisible',false);
+        }
     },
     destroy: function() {
         //Ember.debug('FormFieldContainer::destroy:'+this.getKey());
@@ -800,6 +813,9 @@ OXI.Select = Ember.Select.extend(
     setOptions:function(options){
         options = (typeof options == 'object')?options:[];
         this.set('content', Ember.A(options));
+        if(!this.prompt && !this.value && options[0]){
+            this.set('value',   options[0].value);
+        }
     },
     
     _lastItem: '' //avoid trailing commas

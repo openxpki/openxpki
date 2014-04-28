@@ -80,6 +80,12 @@ sub handle {
     }elsif($action eq 'test_dep_select!change_type'){
         #dependent options for second select
         $res = getDependentSecondOptions($q);;       
+    }elsif($action eq 'test_dep_select!change_subtype'){
+        #dependent options for second select
+        $res = getDependentThirdOptions($q);;       
+    }elsif($action eq 'test_dep_select_submit'){
+        #dependent options for second select
+        $res = getFormConfirm($q);;       
     }elsif ($q->param('page')) {
         $res = {'page' => $q->param('page') };
     }elsif($action eq 'cert_search!options'){
@@ -87,6 +93,11 @@ sub handle {
         #ajax autocompleter options
         return {options => [{value=>'c1',label=>'Cert 1'},{value=>'c2',label=>'Cert 2'},{value=>'c3',label=>'Cert 3'}]};
         
+    }elsif($action){
+        return {
+            page => { },
+            status => {level=>'warn',message=>'Unkown action '.$action} 
+          };
     }
 
 
@@ -704,6 +715,38 @@ sub handle_request_cert{
        
 }
 
+sub getFormConfirm{
+    my $q = shift;  
+
+           
+            my @keys = $q->param();
+            my @input;
+            foreach my $k (@keys){
+                my $val;
+                if($k =~ /\[\]/){
+                   my @tmp = $q->param($k);
+                   $val = join(', ', @tmp);
+                }else{
+                    $val = $q->param($k);
+                }
+ 
+                push @input, sprintf('%s: %s',$k,$val) ;
+            }
+    return {
+                page => {
+                     'label' => 'Thank you!',
+                     
+                },  
+                status => {level => 'success',message=> 'Congrats...you are finished!'},
+                main => [
+                        {type => 'text',content => {
+                            label => 'Your input',
+                            description => join('<br>',@input)
+                            }
+                        }]
+                };
+}
+
 sub getDependentSecondOptions{
     my $q = shift;  
     my $cert_typ = $q->param('cert_typ');
@@ -715,15 +758,47 @@ sub getDependentSecondOptions{
     
     my $depOptions = ($options{$cert_typ})?$options{$cert_typ}:{};
     my $prompt = ($options{$cert_typ})?'':'please select type!';
+    if($cert_typ eq 't3'){
+       $prompt = 'Please select your subtype now';    
+    }
+    my $value= ($cert_typ eq 't2')?'t2_2':'';
+    my $specialVisible = ($cert_typ eq 't2');
     return {
         _returnType => 'partial',
         fields => [
-              {name => 'cert_subtyp', prompt=>$prompt,options=>$depOptions,label=>'Bla'} 
+              { name => 'cert_subtyp', prompt=>$prompt,options=>$depOptions,value=>$value} ,
+              { name => 'special',visible=>$specialVisible }
               ]   
         
         };
     
 }
+
+sub getDependentThirdOptions{
+    my $q = shift;  
+    my $subtyp = $q->param('cert_subtyp');
+    my @options;
+    my $prompt = 'please select sub type!';
+    
+    if($subtyp){
+        my $i;
+        for($i=1;$i<5;$i++){
+            my $k = $subtyp.'-'.$i;
+            push @options,{value=>$k,label=>$k};
+        }
+        $prompt = '';
+    }
+    
+    return {
+        _returnType => 'partial',
+        fields => [
+              {name => 'subsubtyp', prompt=>$prompt,options=>\@options} 
+              ]   
+        
+        };
+    
+}
+
 
 sub getDependentSelectForm{
         return {page=> {'label' => 'Test Dependent Selects'},
@@ -732,8 +807,11 @@ sub getDependentSelectForm{
                 content => {
                     
                     fields => [
-                    { name => 'cert_typ', label => 'Typ',prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
-                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!',  type => 'select',options=>[] },
+                    { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2 (subtyp vorselektiert auf "Subtyp 2 zu 2")'},{value=>'t3',label=>'Typ 3'}] },
+                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!', actionOnChange => 'test_dep_select!change_subtype', type => 'select',options=>[] },                    
+                    { name => 'subsubtyp', label => 'Sub-Sub-Type',prompt => 'first select sub type!',  type => 'select',options=>[] },
+                    
+                    { name => 'special', label => 'Spezial (nur Typ 2',  type => 'checkbox',visible => 0 },
                     
                     ]
                 }
