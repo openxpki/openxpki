@@ -179,6 +179,7 @@ Render a form to submit data to the server
         is_optional => BOOL, # if false (or not given at all) the field is required
         clonable => BOOL,  creates fields that can be added more than once
         visible => BOOL, #if set to "false" ("0" in perl) this field will be not displayed (initial) 
+        keys => ARRAY ,#optional, activates the special feature of "dynamic key value fields", see below.
         # + additional keys depending for some types
     }
 
@@ -250,6 +251,19 @@ Renders a field to upload files with some additional benefits::
 By default, a file upload button is shown which loads the selected file into a hidden textarea. Binary content is encoded with base64 and prefixed with the word "binary:". With `mode = visible` the textarea is also shown so the user can either upload or paste the data (which is very handy for CSR uploads), the textAreaSize will affect the size of the area field. With ``mode = raw`` the element degrades to a html form upload button and the selected file is send with the form as raw data.
 
 AllowedFiles can contain a list of allowed file extensions. 
+
+Dynamic key value fields
+^^^^^^^^^^^^^^^^^^^
+If a field is defined with the property "keys", a pulldown of options is displayed above the actual field. This allows the user to specify, which kind of information he wants to specify.
+The content of the actual field will be submitted to the server with the selected key in the key-pulldown.
+
+Example:
+    { name => '...', label => 'Dyn Key-Value', 'keys' => [{value=>"key_x",label=>"Typ X"},{value=>"key_y",label=>"Typ Y"}], type => 'text' },
+                        
+    This example definition will render a Textfield with label "Dyn Key-Value". Above the textfield a select is displayed with three options ("Typ x","Typ y" and "Typ z").
+    If the user chooses "Typ Z", the entered value in the textfield will be posted to server with key "key_z".
+    
+    This feature makes often more sense in combination with "clonable" fields.
 
 Dynamic form rendering
 ^^^^^^^^^^^^^^^^^^^
