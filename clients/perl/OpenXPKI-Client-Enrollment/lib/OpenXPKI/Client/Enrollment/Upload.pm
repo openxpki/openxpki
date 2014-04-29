@@ -207,9 +207,10 @@ EOF
             template => 'error',
             message  => "Error processing CSR: ($exit_status) ",
             details  => join( '',
-                "\nCOMMAND:\n",
-                "\t$sscep_cmd $sscep_cfg enroll $csr_filename\n",
-                "\nSTDERR:\n", @stderr, "\n\nSTDOUT:\n", @stdout )
+                "\nCOMMAND:\n", "\t",
+                join(', ', @exec_args),
+                "\n\nSTDERR:\n", @stderr,
+                "\n\nSTDOUT:\n", @stdout),
         );
     }
 }
