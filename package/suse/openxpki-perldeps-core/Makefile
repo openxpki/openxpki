@@ -14,7 +14,7 @@
 TOPDIR=../../..
 
 ifndef SRCNAME
-SRCNAME				:= core
+SRCNAME				= core
 endif
 PACKAGE				= openxpki-perldeps-$(SRCNAME)
 PERLNAME			= $(PACKAGE)

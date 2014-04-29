@@ -124,6 +124,7 @@ VAG_GIT_CONF_DIR := file:///git/enroll-ui-config
 # VARIABLES (SHOULDN'T NEED MODIFICATIONS)
 #################################################################
 
+ENV_PROFILE = $(if $(wildcard $(VAG_DIR)/env.profile),. /vagrant/env.profile &&,)
 OXI_PERLDEP_RPM = openxpki-perldeps-enrollment-$(PKG_VER).x86_64.rpm
 OXI_ENROLL_RPM = perl-openxpki-client-enrollment-$(PKG_VER).x86_64.rpm
 ENROLL_CFG_RPM = $(CONF_PKG_NAME)-$(CONF_PKG_VER).x86_64.rpm
@@ -173,7 +174,7 @@ $(VAG_DIR)/.code-repo.state: $(VAG_DIR)/build.sshcfg
 	touch $@
 
 $(VAG_DIR)/$(OXI_PERLDEP_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.code-repo.state
-	ssh -F $(VAG_DIR)/build.sshcfg build ". /vagrant/env.profile && cd ~/git/openxpki/package/suse/openxpki-perldeps-enrollment && make"
+	ssh -F $(VAG_DIR)/build.sshcfg build "$(ENV_PROFILE) cd ~/git/openxpki/package/suse/openxpki-perldeps-enrollment && make"
 	scp -F $(VAG_DIR)/build.sshcfg build:rpmbuild/RPMS/x86_64/$(OXI_PERLDEP_RPM) $@
 
 $(VAG_DIR)/.perldeps-inst.state: $(VAG_DIR)/build.sshcfg $(VAG_DIR)/$(OXI_PERLDEP_RPM)
@@ -182,7 +183,7 @@ $(VAG_DIR)/.perldeps-inst.state: $(VAG_DIR)/build.sshcfg $(VAG_DIR)/$(OXI_PERLDE
 
 $(VAG_DIR)/$(OXI_ENROLL_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.perldeps-inst.state
 	ssh -F $(VAG_DIR)/build.sshcfg build \
-		". /vagrant/env.profile && cd ~/git/openxpki/package/suse/perl-openxpki-client-enrollment && PATH=$(DEP_PATH):\$$PATH make"
+		"$(ENV_PROFILE) cd ~/git/openxpki/package/suse/perl-openxpki-client-enrollment && PATH=$(DEP_PATH):\$$PATH make"
 	scp -F $(VAG_DIR)/build.sshcfg \
 		build:git/openxpki/package/suse/perl-openxpki-client-enrollment/$(OXI_ENROLL_RPM) $@
 
@@ -205,6 +206,8 @@ $(VAG_DIR)/$(ENROLL_CFG_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.code-repo.stat
 		$(VAG_DIR)/build.sshcfg \
 		build:rpmbuild/RPMS/x86_64/$(ENROLL_CFG_RPM) $@
 
+fdestroy:
+	cd $(VAG_DIR) && vagrant destroy -f
 
 ########################################
 # HELPER TARGETS
