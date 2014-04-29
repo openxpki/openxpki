@@ -4,5 +4,5 @@
 include ../openxpki-perldeps-core/Makefile
 
 SRCNAME		:= enrollment
-SRCBASE=$(TOPDIR)/clients/perl/OpenXPKI-Client-Enrollment
+SRCBASE		=  $(TOPDIR)/clients/perl/OpenXPKI-Client-Enrollment
 

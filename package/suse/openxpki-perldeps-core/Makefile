@@ -13,10 +13,14 @@
 
 TOPDIR=../../..
 
-SRCNAME				= core
+ifndef SRCNAME
+SRCNAME				:= core
+endif
 PACKAGE				= openxpki-perldeps-$(SRCNAME)
 PERLNAME			= $(PACKAGE)
-SRCBASE				= $(TOPDIR)/core/server
+ifndef SRCBASE
+SRCBASE				:= $(TOPDIR)/core/server
+endif
 
 RPMBUILD_DIR		= $(HOME)/rpmbuild
 RPM_SOURCE_TARBALL	= $(RPMBUILD_DIR)/SOURCES/$(PACKAGE).tar.gz
@@ -29,8 +33,8 @@ include ../Makefile.inc
 
 VERGEN := $(TOPDIR)/tools/vergen
 
-VERSION := $(shell $(VERGEN) --format version)
-PKGREL := $(shell $(VERGEN) --format PKGREL)
+VERSION = $(shell $(VERGEN) --format version)
+PKGREL = $(shell $(VERGEN) --format PKGREL)
 
 PERL_ROOT=/usr/share/$(PERLNAME)
 PERL_VERSION=5.16.3
