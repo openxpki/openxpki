@@ -25,6 +25,7 @@ sub startup {
     {
         if ( -f $f ) {
             $cfgfile = $f;
+            last;
         }
     }
 
