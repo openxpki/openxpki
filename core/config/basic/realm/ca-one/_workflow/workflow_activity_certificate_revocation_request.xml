@@ -10,6 +10,7 @@
       <field name="comment"/>
       <field name="invalidity_time"  is_required="yes" type="date"  default="now" />
       <field name="flag_crr_auto_approval" type="server" />
+      <field name="flag_delayed_revoke" type="server" />
       <field name="crr_info"  type="server" />                 
       <validator name="I18N_OPENXPKI_WF_VAL_CREATOR"/>
       <validator name="I18N_OPENXPKI_WF_VAL_INVALIDITYTIME">
@@ -63,6 +64,12 @@
   
   <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
+  </action>
+  
+  <action name="I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION"
+      class="OpenXPKI::Server::Workflow::Activity::Tools::Pause"
+      _map_wakeup="$invalidity_time"
+      reason="I18N_OPENXPKI_DELEAYED_REVOCATION_REQUESTED">  
   </action>
   
 </actions>

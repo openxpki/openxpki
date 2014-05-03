@@ -9,9 +9,13 @@ scep-server-1:
 
     # Earliest time to create a renewal request
     renewal_period: 000014
-    # How long can the certificate be expried to make a renewal
-    grace_period: 0000000005
-    
+
+    replace_period: 05
+
+    revoke_on_replace:
+        reason_code: keyCompromise
+        invalidity_time: +000002
+
     workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
 
     # allow rsa keys with 1020 to 2048 bit

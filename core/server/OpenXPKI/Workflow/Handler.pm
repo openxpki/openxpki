@@ -254,7 +254,7 @@ sub __get_instance {
                         if ($EVAL_ERROR) {    
                             CTX('log')->log(
                                 MESSAGE => 'Fake missing workflow class ' . $entry->{class},
-                                PRIORITY => 'debug',
+                                PRIORITY => 'warn',
                                 FACILITY => 'application'
                             );
                             $entry->{class} = 'OpenXPKI::Server::Workflow::Stub';    

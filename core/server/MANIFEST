@@ -244,6 +244,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Pause.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCRL.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RevokeCertificate.pm
@@ -267,7 +268,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/CalculateKeyId.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/LoadCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PersistCertificateMetadata.pm
-OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
+OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm    
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
@@ -314,6 +315,7 @@ OpenXPKI/Server/Workflow/Observer/Log.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysFalse.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
+OpenXPKI/Server/Workflow/Condition/DateTime.pm
 OpenXPKI/Server/Workflow/Condition/Key.pm
 OpenXPKI/Server/Workflow/Condition/HasRole.pm
 

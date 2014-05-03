@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 14 );
+$test->plan( tests => 17 );
  
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
@@ -74,14 +74,14 @@ my %wfparam = (
 	reason_code => 'unspecified',
     comment => 'Automated Test',
     invalidity_time => time(),
-    flag_crr_auto_approval => 0,     
+    flag_crr_auto_approval => 0,
+    flag_delayed_revoke => 0,          
 );
-    
+
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Revoke Workflow')
  or die "Workflow Create failed: $@";
 
 $test->state_is('PENDING');
-
 
 $test->disconnect();
  
@@ -100,9 +100,21 @@ $test->state_is('APPROVAL');
 $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_REJECT_CRR' );
  
 $test->state_is('FAILURE'); 
+
+# Test delayed revoke
+$wfparam{flag_crr_auto_approval} = 1;
+$wfparam{invalidity_time} = time() + 5;
+$wfparam{flag_delayed_revoke} = 1;
+$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create delayed Revoke Workflow')
+   or die "Workflow Create failed: $@";
+  
+$test->state_is('CRR_CHECK_FOR_DELAYED_REVOKE');
+my $delayed_revoke_id =  $test->get_wfid(); 
  
 # Test auto revoke
-$wfparam{flag_crr_auto_approval} = 1;     
+$wfparam{flag_crr_auto_approval} = 1;
+$wfparam{invalidity_time} = time();
+$wfparam{flag_delayed_revoke} = 0;
 
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
  or die "Workflow Create failed: $@";
@@ -116,6 +128,18 @@ $wfparam{flag_crr_auto_approval} = 0;
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
  or die "Workflow Create failed: $@";
 
+$test->state_is('CHECK_FOR_REVOCATION');
+
+# Finally, check if the delayed workflow has finished
+$test->set_wfid( $delayed_revoke_id );
+
+$test->diag('Switch back to delayed workflow #'.$delayed_revoke_id);
+my $i = 0;
+do {
+    sleep 5;
+    $test->reset();    
+    $i++;
+} while($test->state() ne 'CHECK_FOR_REVOCATION' && $i < 6);
 $test->state_is('CHECK_FOR_REVOCATION');
 
 open(CERT, ">$cfg{instance}{buffer}");

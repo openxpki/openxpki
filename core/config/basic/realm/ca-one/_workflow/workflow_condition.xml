@@ -42,6 +42,11 @@
   	<param name="iterator_name" value="crr_max_checks"/>
   	<param name="max_count" value="5"/>
   </condition>
+  
+  <condition name="I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION"
+        class="Workflow::Condition::Evaluate">
+        <param name="test" value="$context-&gt;{flag_delayed_revoke}" />               
+  </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL" 
             class="Workflow::Condition::Evaluate">

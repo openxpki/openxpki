@@ -16,7 +16,7 @@
   <state name="AUTOAPPROVAL" autorun="yes">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_AUTOAPPROVAL</description>  
     <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
-        resulting_state="CRR_PERSIST">        
+        resulting_state="CRR_CHECK_FOR_DELAYED_REVOKE">        
         <condition name="I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL"/>
         <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>        
     </action>    
@@ -63,7 +63,7 @@
   <state name="APPROVAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL</description>
     <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
-	    resulting_state="CRR_PERSIST">
+	    resulting_state="CRR_CHECK_FOR_DELAYED_REVOKE">
       <condition name="I18N_OPENXPKI_WF_ACL_REVOKE_CERTIFICATE"/>
       <condition name="I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS"/>
       <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>      
@@ -90,6 +90,17 @@
         resulting_state="CHECK_FOR_REVOCATION">                
         <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>        
     </action>   
+  </state>
+         
+  <state name="CRR_CHECK_FOR_DELAYED_REVOKE" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION"
+        resulting_state="CRR_PERSIST">        
+          <condition name="I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+            resulting_state="CRR_PERSIST">
+      <condition name="!I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION"/>
+    </action>       
   </state>
          
   <state name="CRR_PERSIST" autorun="yes">
