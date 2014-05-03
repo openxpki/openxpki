@@ -81,8 +81,13 @@ sub get_validity {
     if ( $validityformat eq 'detect' ) {
         if ( $validity =~ m{\A [+\-]}xms ) {
             $validityformat = 'relativedate';
-        }
-        else {
+        } 
+        # we hopefully wont have validities that far in the past
+        # and I guess this software wont run if we reach the next epoch
+        # so it should be safe to distinguish between terse date and epoch
+        elsif ($validity =~ m{\A \d{9,10} \z }xms ) {
+            $validityformat = 'epoch';
+        } else {
             $validityformat = 'absolutedate';
         }
     }
@@ -269,6 +274,13 @@ terse date string.
 =item * 
 
 'epoch': the specified validity is a unix epoch, used as absolute date.
+
+=item *
+
+'detect': tries to guess what it got, relativedate if it has a sign (+/-),
+epoch if it has between 8 and 10 digits and aboslutedate otherwise. Days
+can not be autodetected as the look like relativedate.
+
 
 =back
 
