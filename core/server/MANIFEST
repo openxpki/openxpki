@@ -237,7 +237,6 @@ OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
-OpenXPKI/Server/Workflow/Activity/Tools/Sleep.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notify.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
