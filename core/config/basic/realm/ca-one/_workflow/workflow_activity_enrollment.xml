@@ -159,6 +159,16 @@
             reason_code="superseded">
             <field name="cert_identifier" is_required="yes"/>
     </action>
+    
+    
+    <action name="enroll_revoke_cert_after_replace"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate"
+            auto_approval="1"
+            _map_cert_identifier="$replace_cert_identifier">
+            <field name="replace_cert_identifier" is_required="yes"/>
+            <field name="reason_code" is_required="yes"/>
+            <field name="invalidity_time"/>
+    </action>
 
     <action name="enroll_null1" class="Workflow::Action::Null"/>
     <action name="enroll_null2" class="Workflow::Action::Null"/>

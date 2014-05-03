@@ -14,7 +14,7 @@ scep-server-1:
 
     revoke_on_replace:
         reason_code: keyCompromise
-        invalidity_time: +000002
+        invalidity_time: +000014
 
     workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
 

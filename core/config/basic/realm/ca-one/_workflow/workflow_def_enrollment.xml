@@ -238,6 +238,17 @@
     </state>
 
     <state name="NOTIFIED_CERT_ISSUED"
+        autorun="yes">        
+        <action name="enroll_revoke_cert_after_replace" resulting_state="REVOKE_ON_REPLACE_DONE">
+            <condition name="enroll_need_revoke_after_replace"/>
+        </action>
+        <action name="enroll_null1" resulting_state="REVOKE_ON_REPLACE_DONE">
+            <condition name="!enroll_need_revoke_after_replace"/>
+        </action>
+                
+    </state>
+    
+    <state name="REVOKE_ON_REPLACE_DONE"
             autorun="yes">
         <description>I18N_OPENXPKI_WF_STATE_ENROLLMENT_NOTIFIED_CERT_ISSUED</description>
         <action name="enroll_fork_publish" resulting_state="CLEANUP">
