@@ -84,18 +84,24 @@ sub pause{
     my $self = shift;
     my ($cause, $retry_interval) = @_;
     
-    #retry_interval can be modified ioa method arguments:
+    # retry_interval can be modified via method arguments:
     $retry_interval =  $self->get_retry_intervall() if !$retry_interval;
     
-    #max retries can NOT be modified ioa method arguments:
+    # max retries can NOT be modified via method arguments:
     my $max_retries = $self->get_max_allowed_retries();
     
     $cause ||= '';
     
     if($self->workflow()){
-        $self->workflow()->pause($cause,$max_retries,$retry_interval);
+        # Workflow expects explicit wakeup as epoch
+        my $dt_wakeup_at = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $retry_interval,
+            VALIDITYFORMAT => 'detect',
+        });
+        
+        $self->workflow()->pause($cause, $max_retries, $dt_wakeup_at->epoch() );
     }
-    #disrupt the execution of the run-method: 
+    # disrupt the execution of the run-method: 
     OpenXPKI::Server::Workflow::Pause->throw( cause => $cause);
 }
 
