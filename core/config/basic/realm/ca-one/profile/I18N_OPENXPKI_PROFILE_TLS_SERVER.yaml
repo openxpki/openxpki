@@ -66,6 +66,7 @@ style:
         
         metadata:
             system_id: "[% data.cust_id %]"
+            server_id: "[% data.server_id %]"
 
 role:
 - Web Server
