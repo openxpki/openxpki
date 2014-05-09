@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::X509;
 use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use Math::BigInt;
-use Digest::SHA1 qw(sha1_base64);
+use Digest::SHA qw(sha1_base64);
 use OpenXPKI::DateTime;
 
 use base qw(OpenXPKI::Crypto::Object);

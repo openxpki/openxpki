@@ -16,7 +16,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Digest::SHA1;
+use Digest::SHA;
 use Digest::MD5;
 use MIME::Base64;
 
@@ -129,13 +129,13 @@ sub login_step {
       
 	my ($computed_secret, $salt);
 	if ($scheme eq 'sha') {
- 	    my $ctx = Digest::SHA1->new();
+ 	    my $ctx = Digest::SHA->new();
  	    $ctx->add($passwd);
 	    $computed_secret = $ctx->b64digest();
 	}
 	if ($scheme eq 'ssha') {
 	    $salt = substr(decode_base64($encrypted), 20);
- 	    my $ctx = Digest::SHA1->new(); 	     	    
+ 	    my $ctx = Digest::SHA->new(); 	     	    
  	    $ctx->add($passwd);
 	    $ctx->add($salt);
 	    $computed_secret = encode_base64($ctx->digest() . $salt, '');	    

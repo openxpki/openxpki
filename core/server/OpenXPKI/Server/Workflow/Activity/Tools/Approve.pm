@@ -14,7 +14,7 @@ use OpenXPKI::Debug;
 
 use English;
 use Data::Dumper;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 
 use Encode qw(encode decode);
 
