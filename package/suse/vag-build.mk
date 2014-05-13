@@ -112,12 +112,15 @@ OXI_MASON_RPM = perl-openxpki-client-html-mason-$(PKG_VER).x86_64.rpm
 
 #RPMS := $(patsubst %,$(VAG_DIR)/%,$(OXI_PERLDEP_RPM) $(OXI_CORE_RPM) $(OXI_I18N_RPM) $(OXI_MASON_RPM))
 RPMS := $(OXI_PERLDEP_RPM) $(OXI_CORE_RPM) $(OXI_I18N_RPM) $(OXI_MASON_RPM)
-STATES := $(patsubst %,$(VAG_DIR)/%,.code-repo.state .perldeps-inst.state)
+STATES := $(patsubst %,$(VAG_DIR)/%,.code-repo.state .perldeps-inst.state .oxicore-inst.state .oxii18n-inst.state .oximason-inst.state)
 VAG_INSTANCES := build test
 SSH_CFGS = $(patsubst %,$(VAG_DIR)/%.sshcfg,$(VAG_INSTANCES))
 VAG_ID_FILES := $(patsubst %,$(VAG_DIR)/.vagrant/machines/%/$(VAG_PROVIDER)/id,$(VAG_INSTANCES))
 
 all: $(RPMS)
+
+info:
+	@echo "PKG_VER = $(PKG_VER)"
 
 ########################################
 # VAGRANT OPERATIONS
@@ -154,7 +157,7 @@ $(VAG_DIR)/.code-repo.state: $(VAG_DIR)/build.sshcfg
 	touch $@
 
 $(OXI_PERLDEP_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.code-repo.state
-	ssh -F $(VAG_DIR)/build.sshcfg build "cd ~/git/openxpki/package/suse/openxpki-perldeps-core && make CPAN_MIRROR_DIR=$(CPAN_MIRROR_DIR) PERL_SKIP_TEST=$(PERL_SKIP_TEST)"
+	ssh -F $(VAG_DIR)/build.sshcfg build "cd ~/git/openxpki/package/suse/openxpki-perldeps-core && make CPAN_MIRROR_DIR=$(CPAN_MIRROR_DIR) CPAN_ADDON=\"$(CPAN_ADDON)\" PERL_SKIP_TEST=$(PERL_SKIP_TEST)"
 	scp -F $(VAG_DIR)/build.sshcfg build:rpmbuild/RPMS/x86_64/$(OXI_PERLDEP_RPM) $@
 
 $(VAG_DIR)/.perldeps-inst.state: $(VAG_DIR)/build.sshcfg $(OXI_PERLDEP_RPM)
@@ -168,6 +171,10 @@ $(OXI_CORE_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.perldeps-inst.state
 		$(VAG_DIR)/build.sshcfg build:git/openxpki/package/suse/perl-openxpki-core/$(OXI_CORE_RPM) \
 		$@
 
+$(VAG_DIR)/.oxicore-inst.state: $(VAG_DIR)/build.sshcfg $(OXI_CORE_RPM)
+	ssh -F $(VAG_DIR)/build.sshcfg build "sudo rpm -Uvh git/openxpki/package/suse/perl-openxpki-core/$(OXI_CORE_RPM)"
+	touch $@
+
 $(OXI_I18N_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.perldeps-inst.state
 	ssh -F $(VAG_DIR)/build.sshcfg build \
 		"cd ~/git/openxpki/package/suse/openxpki-i18n && PATH=$(DEP_PATH):\$$PATH make"
@@ -175,22 +182,31 @@ $(OXI_I18N_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.perldeps-inst.state
 		$(VAG_DIR)/build.sshcfg build:git/openxpki/package/suse/openxpki-i18n/$(OXI_I18N_RPM) \
 		$@
 
-$(OXI_MASON_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.perldeps-inst.state
+$(VAG_DIR)/.oxii18n-inst.state: $(VAG_DIR)/build.sshcfg $(OXI_I18N_RPM)
+	ssh -F $(VAG_DIR)/build.sshcfg build "sudo rpm -Uvh git/openxpki/package/suse/openxpki-i18n/$(OXI_I18N_RPM)"
+	touch $@
+
+$(OXI_MASON_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.oxicore-inst.state
 	ssh -F $(VAG_DIR)/build.sshcfg build \
-		"cd ~/git/openxpki/package/suse/perl-openxpki-client-html-mason && PATH=$(DEP_PATH):\$$PATH make"
+		"cd ~/git/openxpki/package/suse && PATH=$(DEP_PATH):\$$PATH make perl-openxpki-client-html-mason"
 	scp -F \
 		$(VAG_DIR)/build.sshcfg build:git/openxpki/package/suse/perl-openxpki-client-html-mason/$(OXI_MASON_RPM) \
 		$@
+
+$(VAG_DIR)/.oximason-inst.state: $(VAG_DIR)/build.sshcfg $(OXI_MASON_RPM)
+	ssh -F $(VAG_DIR)/build.sshcfg build "sudo rpm -Uvh git/openxpki/package/suse/perl-openxpki-client-html-mason/$(OXI_MASON_RPM)"
+	touch $@
 
 clean:
 	rm -rf $(RPMS) $(STATES) $(SSH_CFGS) 
 
 # Helper targets
-.PHONY: perldep core i18n mason
+.PHONY: perldep core i18n mason test
 perldep: $(OXI_PERLDEP_RPM)
 core: $(OXI_CORE_RPM)
 i18n: $(OXI_I18N_RPM)
 mason: $(OXI_MASON_RPM)
+test: $(VAG_DIR)/.oxii18n-inst.state $(VAG_DIR)/.oximason-inst.state
 
 ########################################
 # DEBUGGING STUFF

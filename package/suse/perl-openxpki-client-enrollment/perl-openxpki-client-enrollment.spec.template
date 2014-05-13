@@ -83,8 +83,8 @@ cmd=/usr/share/spec-helper/compress_files
 if [ -e /etc/SuSE-release -o -e /etc/UnitedLinux-release ]
 then
     %{__mkdir_p} %{buildroot}/var/adm/perl-modules
-    %{__cat} `find %{buildroot} -name "perllocal.pod"`  \
-        | %{__sed} -e s+%{buildroot}++g                 \
+    find %{buildroot} -name "perllocal.pod"  \
+        -exec '%{__sed} -e s+%{buildroot}++g {}' \;                 \
         > %{buildroot}/var/adm/perl-modules/%{name}
 fi
 

@@ -124,11 +124,12 @@ VAG_GIT_CONF_DIR := file:///git/enroll-ui-config
 # VARIABLES (SHOULDN'T NEED MODIFICATIONS)
 #################################################################
 
+ENV_PROFILE = $(if $(wildcard $(VAG_DIR)/env.profile),. /vagrant/env.profile &&,)
 OXI_PERLDEP_RPM = openxpki-perldeps-enrollment-$(PKG_VER).x86_64.rpm
 OXI_ENROLL_RPM = perl-openxpki-client-enrollment-$(PKG_VER).x86_64.rpm
 ENROLL_CFG_RPM = $(CONF_PKG_NAME)-$(CONF_PKG_VER).x86_64.rpm
 
-RPMS := $(patsubst %,$(VAG_DIR)/%,$(OXI_PERLDEP_RPM) $(OXI_ENROLL_RPM))
+RPMS := $(OXI_PERLDEP_RPM) $(OXI_ENROLL_RPM)
 STATES := $(patsubst %,$(VAG_DIR)/%,.code-repo.state .perldeps-inst.state .enroll-ui-config-repo.state)
 VAG_INSTANCES := build test
 SSH_CFGS = $(patsubst %,$(VAG_DIR)/%.sshcfg,$(VAG_INSTANCES))
@@ -172,17 +173,17 @@ $(VAG_DIR)/.code-repo.state: $(VAG_DIR)/build.sshcfg
 		"git clone --single-branch --depth=1 --branch=$(CODE_BRANCH) $(VAG_GIT_CODE_DIR) ~/git/openxpki"
 	touch $@
 
-$(VAG_DIR)/$(OXI_PERLDEP_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.code-repo.state
-	ssh -F $(VAG_DIR)/build.sshcfg build "cd ~/git/openxpki/package/suse/openxpki-perldeps-enrollment && make"
+$(OXI_PERLDEP_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.code-repo.state
+	ssh -F $(VAG_DIR)/build.sshcfg build "$(ENV_PROFILE) cd ~/git/openxpki/package/suse/openxpki-perldeps-enrollment && make"
 	scp -F $(VAG_DIR)/build.sshcfg build:rpmbuild/RPMS/x86_64/$(OXI_PERLDEP_RPM) $@
 
 $(VAG_DIR)/.perldeps-inst.state: $(VAG_DIR)/build.sshcfg $(VAG_DIR)/$(OXI_PERLDEP_RPM)
 	ssh -F $(VAG_DIR)/build.sshcfg build "sudo rpm -Uvh rpmbuild/RPMS/x86_64/openxpki-perldeps-enrollment-$(PKG_VER).x86_64.rpm"
 	touch $@
 
-$(VAG_DIR)/$(OXI_ENROLL_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.perldeps-inst.state
+$(OXI_ENROLL_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.perldeps-inst.state
 	ssh -F $(VAG_DIR)/build.sshcfg build \
-		"cd ~/git/openxpki/package/suse/perl-openxpki-client-enrollment && PATH=$(DEP_PATH):\$$PATH make"
+		"$(ENV_PROFILE) cd ~/git/openxpki/package/suse/perl-openxpki-client-enrollment && PATH=$(DEP_PATH):\$$PATH make"
 	scp -F $(VAG_DIR)/build.sshcfg \
 		build:git/openxpki/package/suse/perl-openxpki-client-enrollment/$(OXI_ENROLL_RPM) $@
 
@@ -198,24 +199,26 @@ $(VAG_DIR)/.enroll-ui-conf-repo.state: $(VAG_DIR)/build.sshcfg
 		"git clone --single-branch --depth=1 --branch=$(CONF_BRANCH) $(VAG_GIT_CONF_DIR) ~/git/enroll-ui-config"
 	touch $@
 
-$(VAG_DIR)/$(ENROLL_CFG_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.code-repo.state $(VAG_DIR)/.enroll-ui-conf-repo.state
+$(ENROLL_CFG_RPM): $(VAG_DIR)/build.sshcfg $(VAG_DIR)/.code-repo.state $(VAG_DIR)/.enroll-ui-conf-repo.state
 	ssh -F $(VAG_DIR)/build.sshcfg build \
 		"cd ~/git/enroll-ui-config && make"
 	scp -F \
 		$(VAG_DIR)/build.sshcfg \
 		build:rpmbuild/RPMS/x86_64/$(ENROLL_CFG_RPM) $@
 
+fdestroy:
+	cd $(VAG_DIR) && vagrant destroy -f
 
 ########################################
 # HELPER TARGETS
 ########################################
 
 .PHONY: perldep enroll config
-perldep: $(VAG_DIR)/$(OXI_PERLDEP_RPM)
-enroll: $(VAG_DIR)/$(OXI_ENROLL_RPM)
-#config: $(VAG_DIR)/$(ENROLL_CFG_RPM)
+perldep: $(OXI_PERLDEP_RPM)
+enroll: $(OXI_ENROLL_RPM)
+#config: $(ENROLL_CFG_RPM)
 
-config: $(VAG_DIR)/$(ENROLL_CFG_RPM)
+config: $(ENROLL_CFG_RPM)
 	@echo $^
 
 ########################################

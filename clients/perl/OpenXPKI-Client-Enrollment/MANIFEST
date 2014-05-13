@@ -2,6 +2,7 @@ lib/OpenXPKI/Client/Enrollment.pm
 lib/OpenXPKI/Client/Enrollment/Contact.pm
 lib/OpenXPKI/Client/Enrollment/Upload.pm
 lib/OpenXPKI/Client/Enrollment/Welcome.pm
+lib/OpenXPKI/Client/Enrollment/GetCert.pm
 lib/OpenXPKI/Client/Enrollment/DevDie.pm
 lib/OpenXPKI/Client/Enrollment/DevErr.pm
 Makefile.PL
