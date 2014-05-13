@@ -201,6 +201,7 @@ OpenXPKI/Workflow/Handler.pm
 
 OpenXPKI/Server/Workflow.pm
 OpenXPKI/Server/Workflow/Pause.pm
+OpenXPKI/Server/Workflow/Stub.pm
 OpenXPKI/Server/Watchdog.pm
 OpenXPKI/Server/Watchdog/WorkflowInstance.pm
 
