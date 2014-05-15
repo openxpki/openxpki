@@ -8,15 +8,14 @@ Debian/Ubuntu Development Builds
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the mason client will crash otherwise!**
 
-Starting with our preview release 0.11.3 we will publish packages mainly for debian 7 (wheezy) and Ubuntu 12.04.  
-You can find them on our package mirror at http://packages.openxpki.org/. 
+We had to change our release policy a bit, we will focus on debian wheezy 64bit for the moment until we have solved some dependancy issues. However the build should also work for Ubuntu 12 and 14 LTS server version but we will perhaps discontinue to publish/test packages for those in the near future.
 
-Packages are build from the development head, versioned packages are build from the release branch. 
-The preview builds "should work" but some stuff might need a bit of manual tweaking.
+Current release is 0.13 which is out for debian wheezy and ubuntu 12.04 LTS on the package mirror at http://packages.openxpki.org/. 
+Release builds have some kind of testing and should be fully functional, preview builds "should work" but some stuff might need a bit of manual tweaking.
 
 Add the repository to your source list (wheezy)::
 
-    echo "deb http://packages.openxpki.org/debian/ wheezy/release/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/debian/ wheezy release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
 or ubuntu::
@@ -29,7 +28,7 @@ As the init script uses mysql as default, but does not force it as a dependancy,
     aptitude install mysql-server
     aptitude install libopenxpki-perl
 
-We are fighting with a stupid debian build issue, the 0.12 release packages suffer of a file collision that can be solved by adding a force option::
+We are fighting with a stupid debian build issue, if your install complains about a file collision in ``perllocal.pod``, add the force option::
 
     aptitude -o Dpkg::Options::="--force-overwrite" install libopenxpki-perl
 
