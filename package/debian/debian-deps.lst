@@ -31,7 +31,7 @@ libdatetime-locale-perl
 libdatetime-timezone-perl
 libdatetime-format-strptime-perl
 libdatetime-perl
-libdigest-sha1-perl
+libdigest-sha-perl
 libexception-class-perl
 libfile-slurp-perl
 libfilter-perl
