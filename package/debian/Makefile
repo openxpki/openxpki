@@ -31,15 +31,17 @@ EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Data__SpreadPagination		\
 	Class__Observable 		\
-	Test__utf8 \
 	Git__PurePerl \
 	Config__Merge \
 	Config__Versioned \
 	Proc__SafeExec \
 	XML__Filter__XInclude \
 	Workflow \
-	Digest__SHA1 \
-	Connector
+	Digest__SHA
+
+EXTERNAL2= \
+	Connector \
+	Test__utf8 
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) DateTime__Format__DateParse
 
@@ -55,10 +57,15 @@ default:	clean
 
 # Fetch outdated version of Workflow because the newest isn't
 # compatible with OpenXPKI
-$(EXTERNAL) $(EXTERNAL2):
+$(EXTERNAL):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
+
+$(EXTERNAL2):
+	test -d deb || mkdir deb
+	test -d deb/cpan || mkdir deb/cpan/
+	cd deb/cpan/ && PERL5LIB="../../lib:$PERL5LIB" DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
 DateTime__Format__DateParse:
 	test -d deb || mkdir deb

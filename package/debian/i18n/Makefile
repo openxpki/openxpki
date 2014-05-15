@@ -37,6 +37,7 @@ source-clean:
 	rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean
-	if [ -e changelog.org ]; then mv changelog.org changelog; fi
+	if [ -e changelog ]; then rm changelog; fi
+	if [ -e control ]; then rm control; fi
 	rm -f *.dsc *.dsc.asc *.tar.gz $(PKGDIR)/$(PACKAGE)_* *.changes
 
