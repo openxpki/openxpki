@@ -26,9 +26,8 @@ use Moose;
 
 has 'activity' => (
 	is  => 'ro',
-    isa => 'Workflow::Action',
-    reader => '_get_activity',
-    required => 1    
+    isa => 'Object|Undef',
+    reader => '_get_activity',    
 );
 
 
@@ -61,7 +60,9 @@ around BUILDARGS => sub {
 
 sub _init_workflow {
 	my $self = shift;	
-	return $self->_get_activity->workflow();
+	my $activity = $self->_get_activity;
+	return undef unless ($activity); 
+	return $activity->workflow();
 } 
 
 sub _init_context {
@@ -224,6 +225,21 @@ sub __persistCertificateInformation {
             },
         );
     }
+    
+    # if this originates from a workflow, register the workflow id in the attribute table    
+    if ($self->_get_workflow()) {
+        my $serial = CTX('dbi_backend')->get_new_serial( TABLE => 'CERTIFICATE_ATTRIBUTES' );
+        CTX('dbi_backend')->insert(
+            TABLE => 'CERTIFICATE_ATTRIBUTES', 
+            HASH => {
+                ATTRIBUTE_SERIAL => $serial,
+                IDENTIFIER => $identifier,
+                ATTRIBUTE_KEY => 'system_csr_workflow',
+                ATTRIBUTE_VALUE => $self->_get_workflow()->id
+            }
+        );  
+    }         
+    
     CTX('dbi_backend')->commit();
 	
 	return $identifier;

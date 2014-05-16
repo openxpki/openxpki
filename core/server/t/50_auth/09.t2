@@ -319,7 +319,7 @@ sub secure_password {
     my $pass_salt='12345';
     my $secure_pass;
     if ($algorithm eq "sha1") {
-        $digest = Digest::SHA1->new;
+        $digest = Digest::SHA->new;
         $digest->add($passwd);
         my $b64digest = $digest->b64digest;
         $secure_pass = $b64digest;

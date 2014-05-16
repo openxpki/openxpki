@@ -11,7 +11,11 @@ Here is a complete sample configuration::
 
         token: my-special-scep
         renewal_period: 000014
-        grace_period: 0000000005
+
+        replace_period: 05
+        revoke_on_replace:
+            reason_code: keyCompromise
+            invalidity_time: +000014
     
         workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
 
@@ -89,11 +93,40 @@ Note that you need to care yourself about the generation index. The token will t
 **renewal_period**
 
 How long before the expiry of the current certificate a client can request a renewal. Requests 
-made earlier are rejected. If you need to renew a certificate prior this time, revoke the current 
-one first!  
+made earlier are rejected. If you need to renew a certificate prior this time, you need to use 
+initial enrollment.
+
+**replace_period**
+
+Replace is like renewal but with two differences. You get a new certificate for a new key but
+it will have the validity of the old one. This can be useful if you need to migrate to a new
+profile or replace keys for a large amount of certificates and do not want them to get all the 
+same validity (we used that to replace keys after the Heartbleed bug).
+
+**revoke_on_replace**
+
+This parameter is the second difference between renew and replace. The reason_code needs to be
+one of the openssl revocation codes (mind the CamelCasing), the invalidity_time can be relative
+or absolute date as consumed by OpenXPKI::DateTime, any empty value becomes "now". If you set a 
+date in the future, the revocation is triggered but hold back and will appear first on the next 
+crl update after the given date. E.g. if you want to give your admins a 48h window to replace 
+the certificates before they show up on the CRL, use ::
+
+    revoke_on_replace:
+        reason_code: superseded
+        invalidity_time: +000002
+
+It also works the other way round - assume you know the security breach happend on the seventh of
+april and you want to tell this to the people::   
+
+    revoke_on_replace:
+        reason_code: keyCompromise
+        invalidity_time: 20140407
+
 
 **grace_period**
 
+*Code needs to be redone - not implemented*
 This is the life-saver for sloppy admins - it allows signing of renewal requests for a certain period 
 after the certificate expired. Note: Due to the way this is implemented set this just to a few days 
 and never to be larger than ``cert lifetime - renewal period`` as the code will do funny things otherwise!

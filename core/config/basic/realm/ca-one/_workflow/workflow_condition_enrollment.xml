@@ -128,6 +128,11 @@
         <param name="test" value="($context-&gt;{num_active_certs} &lt;= $context-&gt;{p_max_active_certs}) and $context-&gt;{in_renew_window}" />
     </condition>
 
+    <condition name="enroll_in_replace_window"
+            class="Workflow::Condition::Evaluate">
+        <param name="test" value="($context-&gt;{num_active_certs} &lt;= $context-&gt;{p_max_active_certs})  and $context-&gt;{in_replace_window} and $context-&gt;{renewal_mode} eq 'replace'" />
+    </condition>
+    
     <condition name="enroll_signed_renewal"
             class="Workflow::Condition::LazyAND">
         <param name="condition1" value="enroll_signer_trusted" />
@@ -154,6 +159,7 @@
             class="Workflow::Condition::LazyOR">
         <param name="condition1" value="enroll_num_active_certs_less_than_max" />
         <param name="condition2" value="enroll_in_renewal_window" />
+        <param name="condition2" value="enroll_in_replace_window" />
     </condition>
 
     <condition name="enroll_trusted_self_sign_details"
@@ -214,6 +220,12 @@
     <condition name="enroll_csr_hash_type_ok"
             class="Workflow::Condition::Evaluate">
         <param name="test" value="$context-&gt;{csr_hash_type_ok};" />
+    </condition>
+
+
+    <condition name="enroll_need_revoke_after_replace"
+            class="Workflow::Condition::Evaluate">
+        <param name="test" value="$context-&gt;{replace_cert_identifier};" />
     </condition>
 
 </conditions>

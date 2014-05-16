@@ -201,10 +201,35 @@ sub __load_profile
             EXT => $ext,            
         });
     }
+    
+    # check for the copy_extension flag
+    my $copy = $config->get("profile.$profile_name.extensions.copy");
+    $copy = 'none' unless ($copy);
+    $self->set_copy_extensions( $copy );
+    
 
     ##! 2: Dumper($self->{PROFILE})
     ##! 1: "end"
     return 1;
+}
+
+sub get_copy_extensions
+{
+    my $self = shift;
+    return $self->{PROFILE}->{COPYEXT};
+}
+
+sub set_copy_extensions
+{
+    my $self = shift;
+    my $copy = shift;
+    if ($copy !~ /(none|copy|copyall)/) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_COPY_EXTENSION_INVALID_VALUE",
+            params => { VALUE => $copy }
+        );                        
+    }
+    $self->{PROFILE}->{COPYEXT} = $copy;
 }
 
 sub get_notbefore

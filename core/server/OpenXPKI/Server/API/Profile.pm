@@ -20,7 +20,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );
-use Digest::SHA1 qw( sha1_base64 );
+use Digest::SHA qw( sha1_base64 );
 use DateTime;
 
 use Template;
@@ -63,13 +63,21 @@ sub __fetch_input_element_definitions {
         }
         
         if (!$input) {
+            # check if there is a default section (only look in the profile!)
+            $input = $config->get_hash(['profile', $profile, 'template' , '_default' ]);                
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_API_DEFAULT_NO_SUCH_INPUT_ELEMENT_DEFINED",
                 params => {
                     'input' => $input_name,
                     'profile' => $profile,
                 }
-            );
+            ) unless($input);
+                        
+            # got a default item, create field using default 
+            # set id and label to name
+            $input->{id} = $input_name;
+            $input->{label} = $input_name;
+             
         }
 
         # Uppercase the keys and push it to the array
@@ -269,14 +277,30 @@ sub get_possible_profiles_for_role {
     my @profiles = $config->get_keys('profile');
     my @matching_profiles; 
     
+    PROFILE:
     foreach my $profile (@profiles) {
         my @roles = $config->get_list("profile.$profile.role");
         ##! 16: "Profile $profile, Roles " .join " ", @roles              
         if (grep /^$req_role$/,  @roles) {
-            ##! 16: 'Profile matches role' 
-            push @matching_profiles, $profile;     
+            ##! 16: 'Profile matches role'            
+            if (!$arg_ref->{NOHIDE}) {
+                ##! 16: 'Test for ui profile'        
+                my @style_names = $config->get_keys(['profile', $profile, 'style' ]);
+                foreach my $style (@style_names) {
+                    if ($config->get_meta(['profile', $profile, 'style', $style, 'ui' ])) {
+                        ##! 16: 'Found ui style ' . $style
+                        push @matching_profiles, $profile;                                       
+                        next PROFILE;
+                    }
+                }
+            } else {
+                push @matching_profiles, $profile;
+            }                     
         }
     }
+    
+    
+    
     
     ##! 1: 'end'
     return \@matching_profiles;
@@ -311,16 +335,38 @@ sub get_available_cert_roles {
 }
 
 sub get_cert_profiles {
+      
+    my $self = shift;    
+    my $args = shift;
+      
+    my $config = CTX('config');
+        
+    my $profiles;
+    my @profile_names = $config->get_keys('profile');        
+    PROFILE:
+    foreach my $profile (@profile_names) {
+        next PROFILE if ($profile eq 'template');
+        
+        my $label = $config->get(['profile', $profile, 'label' ]) || $profile;                      
+        if (!$args->{NOHIDE}) {        
+            ##! 32: "Evaluate UI for $profile"
+            my @style_names = $config->get_keys(['profile', $profile, 'style' ]);
+            foreach my $style (@style_names) {
+                if ($config->get_meta(['profile', $profile, 'style', $style, 'ui' ])) {
+                    ##! 32: 'Found ui style ' . $style                           
+                    $profiles->{$profile} = { label => $label };
+                    next PROFILE;
+                }
+            }    
+            ##! 32: 'No ui styles found'        
+        } else {
+            $profiles->{$profile} = { label => $label };
+        } 
+    }
     
-    my $config = CTX('config');    
-
-    my %profiles = map { $_ => { label => $_ }  } $config->get_keys('profile');
+    ##! 16: 'Profiles ' .Dumper $profiles
     
-    delete $profiles{'template'};
-
-    ##! 16: 'Profiles ' .Dumper %profiles
-    
-    return \%profiles;
+    return $profiles;
 }
  
 sub get_cert_subject_profiles {
@@ -573,6 +619,11 @@ Returns an array reference of possible certificate profiles for a given
 certificate role (passed in the named parameter ROLE) taken from the
 configuration.
 
+Parameters:
+
+    NOHIDE: If set, show also Non-UI Profiles
+    
+
 =head2 get_cert_subject_styles
 
 Returns the configured subject styles for the specified profile.
@@ -606,9 +657,13 @@ Return the role names as arrarref.
 
 =head2 get_cert_profiles
 
-Return a hash ref with all profiles. The key is the id of the profile, the 
-value was formerly set as the position in the xml tree, not it is simply "1".
+Return a hash ref with all UI profiles. The key is the id of the profile, the 
+value was formerly set as the position in the xml tree, not it is a hash with
+additional data (for the moment only a label).
 
+Parameters:
+
+    NOHIDE: If set, show also Non-UI Profiles
 
 =head2 get_cert_subject_profiles
 

@@ -435,8 +435,6 @@ sub _send_html {
     my $cfg = shift;
     my $vars = shift;
             
-    my $tt = Template->new();
-
     require MIME::Entity;
 
     # Parse the templates - txt and html 

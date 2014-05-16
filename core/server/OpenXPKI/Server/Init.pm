@@ -44,7 +44,7 @@ use Data::Dumper;
 
 use Test::More;
 
-use Digest::SHA1 qw( sha1_base64 );
+use Digest::SHA qw( sha1_base64 );
  
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution

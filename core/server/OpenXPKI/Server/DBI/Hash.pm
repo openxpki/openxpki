@@ -14,7 +14,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::DBI::SQL;
 use OpenXPKI::Server::DBI::Schema;
 
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 
 sub new
 {

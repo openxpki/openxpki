@@ -2,8 +2,8 @@ If you want to try out OpenXPKI, you should use our prebuild packages at
 http://packages.openxpki.org. Check out the quickstart how-to at
 https://openxpki.readthedocs.org/en/latest/quickstart.html
 
-These instuctions should work on debian squeeze and 
-ubuntu 12.04 lts server.
+These instuctions should work on debian wheezy and 
+Ubuntu 14.04 LTS server.
 
 Install required dependencies
 #############################
@@ -15,6 +15,10 @@ Install all packages listed in debian-deps.lst
 The current version of the CPAN Workflow module requires Module::Build >0.40
 which is outdated in the debian/ubuntu archives. Install a suitable version
 from cpan and set PERL5LIB path accordingly.
+
+Connector and Test::utf8 also require a newer MakeMaker version, whereas 
+other packages have problem with it (esp. our core package). The Makefile
+adds local path "lib" for those packages, please put MM there before building.
 
 A simple "make" should now create the required packages in deb/cpan/. 
 Before you proceed, install them on your build system!

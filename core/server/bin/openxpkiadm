@@ -14,7 +14,7 @@ use Proc::ProcessTable;
 
 # For the password hasher
 use IO::Prompt;
-use Digest::SHA1;
+use Digest::SHA;
 use Digest::MD5;
 use Proc::SafeExec;
 use MIME::Base64;
@@ -1275,11 +1275,11 @@ sub hash_password {
     
     my $computed_secret;
     if ($params{scheme} eq 'sha') {
-        my $ctx = Digest::SHA1->new();
+        my $ctx = Digest::SHA->new();
         $ctx->add($passwd);
         $computed_secret = $ctx->b64digest();
     } elsif ($params{scheme} eq 'ssha') {
-        my $ctx = Digest::SHA1->new();              
+        my $ctx = Digest::SHA->new();              
         $ctx->add($passwd);
         $ctx->add($salt);
         $computed_secret = encode_base64( $ctx->digest() . $salt, '');       

@@ -5,7 +5,7 @@
 package OpenXPKI::Client::UI::Result;
 
 use HTML::Entities;
-use Digest::SHA1 qw(sha1_base64);
+use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
 

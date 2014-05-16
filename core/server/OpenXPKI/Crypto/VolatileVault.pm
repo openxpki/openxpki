@@ -16,7 +16,7 @@ use OpenXPKI::Exception;
 
 use MIME::Base64;
 use Crypt::CBC;
-use Digest::SHA1 qw( sha1_base64 );
+use Digest::SHA qw( sha1_base64 );
 
 # use Smart::Comments;
 

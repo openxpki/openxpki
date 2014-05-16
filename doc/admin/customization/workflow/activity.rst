@@ -86,3 +86,20 @@ loop, the workflow is stopped with an error. As we have the *autofail* flag set,
 the workflow is immediately send into the *FAILURE* state and set to finished.    
 Note that the autofail flag is only allowed in the <state> block, but not in
 the activity definition itself!
+
+Important Precondition
+^^^^^^^^^^^^^^^^^^^^^^
+
+Do not use activities with pause together with conditions that might change over
+time! Workflows are always resumed by state and if your paused activity is 
+linked with a condition, it gets re-evaluated. If the result is false now,
+the workflow layer will block access to the (formerly paused) activity so the 
+watchdog can not rerun it. 
+
+To solve such issues, either create two seperate states for the evaluation and the
+paused activity (using a NOOP activity) or write your condition in a way that it 
+will not change, e.g. by persisting the relevant parameters into the context on 
+the first run.
+
+
+

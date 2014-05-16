@@ -8,7 +8,7 @@
 </%args>
 <h1><% i18nGettext ('I18N_OPENXPKI_CLIENT_HTML_MASON_WORKFLOW_SHOW_INSTANCE_TITLE', '__ID__' => $msg->{PARAMS}->{WORKFLOW}->{ID}, '__STATE__' => $msg->{PARAMS}->{WORKFLOW}->{STATE}) %></h1>
 <div>
-    <!-- 
+    <!--
 <% Dumper $msg->{PARAMS} %>
     -->
 <div class="floatbox" style="width: 30%">
@@ -55,7 +55,7 @@
 %    ## I expect the following:
 %    ## SERVICE_MSG => "COMMAND",
 %    ## COMMAND     => $cmd,
-%    ## PARAMS      => 
+%    ## PARAMS      =>
 %    ## {
 %    ##     WORKFLOW =>
 %    ##     {
@@ -172,7 +172,7 @@
     <tr>
         <td><% $entry->{'WORKFLOW_HISTORY_DATE'} %></td>
         <td><% $entry->{'WORKFLOW_STATE'} %></td>
-        <td><& /lib/field_to_i18n.mhtml, 
+        <td><& /lib/field_to_i18n.mhtml,
                 field => $entry->{'WORKFLOW_ACTION'} &></td>
         <td>
 %           if ($entry->{'WORKFLOW_DESCRIPTION'} =~ /NEW_STATE_AUTORUN/) {
@@ -249,7 +249,7 @@
             'context' => $msg->{PARAMS}->{WORKFLOW}->{CONTEXT},
         );
     }
-    foreach my $param (keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} }) {    
+    foreach my $param (keys %{ $msg->{PARAMS}->{WORKFLOW}->{CONTEXT} }) {
         my $value = $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{$param};
         if ($param eq 'csr_serial' && $value =~ m{\A \d+ \z}xms) {
             # transform a scalar csr_serial into a one-element array
@@ -266,7 +266,7 @@
                   $value = '<table style="border:0px; border-spacing:0px">';
                   foreach my $key (sort keys %{$ref})
                   {
-                      my $key_i18n = $m->scomp('/lib/field_to_i18n.mhtml', 
+                      my $key_i18n = $m->scomp('/lib/field_to_i18n.mhtml',
                           'field' => $key,
                       );
                       $ref->{$key} =~ encode_entities($ref->{$key});
@@ -275,7 +275,7 @@
                   }
                   $value .= '</table>';
                   $untainted{'cert_info'} = 1;
-             }             
+             }
             elsif ($param eq "cert_subject_alt_name")
             {
                 ## array of arrays
@@ -310,7 +310,7 @@
                        $value .= encode_entities($approval->{session_user}) . '&rarr;' . encode_entities($approval->{session_role}) . '<br/><br/>================================================================<br/>';
                    }
                 }
-                $untainted{'approvals'} = 1; 
+                $untainted{'approvals'} = 1;
             }
             elsif ($param eq 'wf_children_instances') {
                 $value = '';
@@ -347,7 +347,7 @@
             $untainted{'spkac'} = 1;
         }
         elsif ($param eq 'notafter' || $param eq 'notbefore') {
-            $value = substr($value, 0, 4) . '-' . substr($value, 4, 2) . '-' . substr($value, 6, 2) . ' ' . substr($value, 8, 2) . ':' . substr($value, 10, 2) . ':' . substr($value, 12, 2) . ' UTC';    
+            $value = substr($value, 0, 4) . '-' . substr($value, 4, 2) . '-' . substr($value, 6, 2) . ' ' . substr($value, 8, 2) . ':' . substr($value, 10, 2) . ':' . substr($value, 12, 2) . ' UTC';
         }
         elsif ($param eq 'cert_subject') {
             # make certificate subject more breakable
@@ -362,7 +362,7 @@
             $untainted{$param} = 1;
         }
         elsif ($param eq 'invalidity_time') {
-            $value = DateTime->from_epoch( epoch => $value )->strftime('%Y-%m-%d %H:%M UTC');
+            $value = DateTime->from_epoch( epoch => $value )->strftime('%Y-%m-%d %H:%M UTC') if ($value =~ /^\d+$/);
         }
         elsif ($value =~ m{ \A -----BEGIN }xms || $param eq 'pkcs7_content') { # PKCS 10/7 or key
             $value = encode_entities($value);
@@ -389,7 +389,7 @@
     }
     my @history = ();
     if ($history) {
-        my $msg = $context->{client}->send_receive_command_msg( 
+        my $msg = $context->{client}->send_receive_command_msg(
             'get_workflow_history',
             {
                 'ID' => $id,

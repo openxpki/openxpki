@@ -787,6 +787,8 @@ For convenience there is a shortcut, setting the status to "resolved"::
 Template Variables
 ^^^^^^^^^^^^^^^^^^
 
+The notification handler injects those values into the template parser on any invocation.
+
 **realm info**
 
 - meta_pki_realm (key of the current realm)
@@ -811,6 +813,22 @@ Template Variables
  
 - creator
 - requestor (real name of the requestor, if available assembled from cert_info.requestor_gname + requestor_name, otherwise the word "unknown")     
+
+**Certificate Info Plugin**
+
+The default install also provides a plugin to get detailed informations on a certificate::
+   
+  [% USE Certificate %]
+    
+  Serial: [% Certificate.serial(cert_identifier) %]
+  Hex Serial: [% Certificate.serial_hex(cert_identifier) %]
+  CSR: [% Certificate.csr_serial(cert_identifier) %]
+  Issuer: [% Certificate.issuer(cert_identifier) %]
+  Status: [% Certificate.status(cert_identifier) %]
+
+  Body-Subject: [% Certificate.body(cert_identifier, 'Subject') %]
+
+The body method will return any field of the body structure offered by the get_cert api method. Fore further info check the modules documentation (OpenXPKI::Template::Plugin::Certificate).
 
         
 Workflow

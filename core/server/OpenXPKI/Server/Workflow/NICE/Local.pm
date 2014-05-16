@@ -75,12 +75,12 @@ sub issueCertificate {
     }
     
     # Set notbefore/notafter according to profile settings if it was not set in csr
-    my $profile_validity = $config->get_hash("profile.$cert_profile.validity");
-    
+   
     if (not $notbefore) {
-        if ($profile_validity->{notbefore}) {
+        my $profile_notbefore = $config->get("profile.$cert_profile.validity.notbefore");       
+        if ($profile_notbefore) {
             $notbefore = OpenXPKI::DateTime::get_validity({
-                VALIDITY => $profile_validity->{notbefore},
+                VALIDITY => $profile_notbefore,
                 VALIDITYFORMAT => 'detect',
             });
         } else {
@@ -88,8 +88,10 @@ sub issueCertificate {
             $notbefore = DateTime->now( time_zone => 'UTC' );
         }
     }
-    if (not $notafter) {
-        if (not $profile_validity->{notafter}) {     
+    if (not $notafter) {        
+        my $profile_notafter = $config->get("profile.$cert_profile.validity.notafter");       
+        ##! 32: 'Notafter ' . Dumper $profile_notafter 
+        if (not $profile_notafter) {     
            OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUE_NOT_AFTER_NOT_SET",
             params  => {
@@ -99,7 +101,7 @@ sub issueCertificate {
         }         
         $notafter = OpenXPKI::DateTime::get_validity({
             REFERENCEDATE => $notbefore,
-            VALIDITY => $profile_validity->{notafter},
+            VALIDITY => $profile_notafter,
             VALIDITYFORMAT => 'detect',
         });        
     }

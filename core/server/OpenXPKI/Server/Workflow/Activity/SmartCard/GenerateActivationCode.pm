@@ -14,7 +14,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 use MIME::Base64;
 
 use Data::Dumper;

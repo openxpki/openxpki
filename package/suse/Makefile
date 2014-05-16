@@ -6,6 +6,7 @@
 TOPDIR=../..
 
 PACKAGES=\
+	openxpki-perldeps-core \
 	perl-openxpki-core \
 	perl-openxpki-client-html-mason \
 	openxpki-i18n 

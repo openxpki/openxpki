@@ -654,6 +654,11 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
+                'NOHIDE' => {                    
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             },
             memoize => 1,
         },    
@@ -669,7 +674,13 @@ sub BUILD {
         },
         'get_cert_profiles' => {
             class  => 'Profile',
-            params => { },
+            params => {
+                'NOHIDE' => {                    
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
+            },
             memoize => 1,
         },
         'get_cert_subject_profiles' => {

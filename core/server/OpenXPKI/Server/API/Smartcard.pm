@@ -23,7 +23,7 @@ use Net::LDAP;
 use Class::Std;
 use MIME::Base64;
 use Data::Dumper;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 
 sub START {
     # somebody tried to instantiate us, but we are just an

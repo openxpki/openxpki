@@ -154,7 +154,7 @@ sub execute_action {
         }elsif($e = Exception::Class->caught()){
             #any other exceptions will be passed to the outer eval
             ##! 128: 'Exception (no pause) caught and rethrown'
-            ref $e ? $e->rethrow : croak $e;
+            (ref $e ne '') ? $e->rethrow : croak $e;
         }
          
     };
@@ -172,11 +172,17 @@ sub execute_action {
         
         # Don't use 'workflow_error' here since $error should already
         # be a Workflow::Exception object or subclass
-        croak $error;
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE",
+            params => {
+                ACTION => $action_name,
+                ERROR => scalar $error       
+            }                        
+        );
 
-    }elsif($self->_has_paused()){
+    } elsif ($self->_has_paused()){
         return $state;
-    }else {
+    } else {
         #reset "count_try"
         $self->count_try(0);
         
@@ -298,10 +304,10 @@ sub attrib {
 
 sub pause {
     
-    #this method will be called from within the "pause"-Method of a OpenXPKI::Server::Workflow::Activity Object
+    # this method will be called from within the "pause"-Method of a OpenXPKI::Server::Workflow::Activity Object
     
     my $self = shift;
-    my ($cause_description,$max_retries,$retry_interval) = @_;
+    my ($cause_description, $max_retries, $wakeup_at) = @_;
     
     #increase count try 
     my $count_try = $self->count_try();
@@ -309,10 +315,9 @@ sub pause {
     $count_try++;
     
     
-    ##! 16: sprintf('pause because of %s, max retries %d, retry intervall %d, count try: %d ',$cause_description,$max_retries,$retry_interval,$count_try)
+    ##! 16: sprintf('pause because of %s, max retries %d, retry intervall %d, count try: %d ',$cause_description, $max_retries, $retry_interval, $wakeup_at)
         
-    
-    #maximum exceeded?
+    # maximum exceeded?
     if($count_try > $max_retries){
         #this exception will be catched from the workflow::execute_action method
         #proc_state and notifies/history-events will be handled there
@@ -322,17 +327,12 @@ sub pause {
        );
     }
     
-    #calc retry-intervall:
     
-    my $wakeup_at = OpenXPKI::DateTime::get_validity(
-    	    {		
-    		VALIDITY => $retry_interval,
-        	VALIDITYFORMAT => 'relativedate',
-    	    },
-    	)->epoch();
-    ##! 16: 'Wakeup at '. $wakeup_at
+    # This will catch invalid time formats 
+    my $dt_wakeup_at = DateTime->from_epoch( epoch => $wakeup_at );
+    ##! 16: 'Wakeup at '. $dt_wakeup_at
     
-    $self->wakeup_at($wakeup_at);
+    $self->wakeup_at( $dt_wakeup_at->epoch() );
     $self->count_try($count_try);   
     $self->context->param( wf_pause_msg => $cause_description );
     $self->notify_observers( 'pause', $self->{_CURRENT_ACTION}, $cause_description );
@@ -340,7 +340,7 @@ sub pause {
         Workflow::History->new(
             {
                 action      => $self->{_CURRENT_ACTION},
-                description => sprintf( 'PAUSED because of %s, count try %d, wakeup at %s', $cause_description ,$count_try, $wakeup_at),
+                description => sprintf( 'PAUSED because of %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
                 state       => $self->state(),
                 user        => CTX('session')->get_user(),
             }
@@ -349,7 +349,7 @@ sub pause {
     $self->_set_proc_state('pause');#saves wf data
     
     CTX('log')->log(
-        MESSAGE  => "Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup " . DateTime->from_epoch( epoch => $wakeup_at )->strftime("%F %T"),    
+        MESSAGE  => "Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup $dt_wakeup_at",    
         PRIORITY => "info",
         FACILITY => "application"
     );
@@ -744,10 +744,11 @@ after super::execute_action() the special "OpenXPKI::Server::Workflow::Pause"-ex
 
 =head2 pause
 
-should not be called manually/explicitly. Activities should alwasd use $self->pause($msg) (= OpenXPKI::Server::Workflow::Activity::pause()).  
-calculates and stores the "count_try" and "wake_up_at" information. if "max_count:_try" is exceeded, an special exception I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED will be thrown.
-the given cause of pausing will be sotored in context key "wf_pause_msg". history etries are made, observers notified.
-
+should not be called manually/explicitly. Activities should always use $self->pause($msg) (= OpenXPKI::Server::Workflow::Activity::pause()).  
+calculates and stores the "count_try" and "wake_up_at" information. if "max_count:_try" is exceeded, an special exception 
+I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED will be thrown.
+The given cause of pausing will be stored in context key "wf_pause_msg". history etries are made, observers notified.
+Note that pause requires an epoch value for $wakeup_at and NOT a relative date!
 
 =head2 _handle_proc_state
 
