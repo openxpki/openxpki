@@ -178,6 +178,8 @@ Render a form to submit data to the server
         type => STRING_FIELD_TYPE, # see below for supported field types 
         is_optional => BOOL, # if false (or not given at all) the field is required
         clonable => BOOL,  creates fields that can be added more than once
+        visible => BOOL, #if set to "false" ("0" in perl) this field will be not displayed (initial) 
+        keys => ARRAY ,#optional, activates the special feature of "dynamic key value fields", see below.
         # + additional keys depending for some types
     }
 
@@ -208,13 +210,14 @@ A text field with a jquery datapicker attached. Additional (all optional) params
 Field-Type "select"
 ^^^^^^^^^^^^^^^^^^^^ 
 
-A html select element, the options parameter is requried, others are optional::
+A html select element, the options parameter is required, others are optional::
 
     FORM_FIELD_DEF:
     {
         options => [{value=>'key 1',label=>'Label 1'},{value=>'key 2',label=>'Label 2'},...],
         prompt => STRING # first option shown in the box, no value (soemthing like "please choose")
-        editable => BOOL # activates the ComboBox
+        editable => BOOL # activates the ComboBox,
+        actionOnChange => STRING_ACTION # if the pulldown is changed by the user (or an initial value is given), server will be called with this "action". See "Dynamic form rendering" for details.
     }
 
 The ``options`` parameter can be fetched via an ajax call. If you set ``options => 'fetch_cert_status_options'``, an ajax call to "server_url.cgi?action=fetch_cert_status_options" is made. The call must return the label/value list as defined given above.
@@ -248,6 +251,66 @@ Renders a field to upload files with some additional benefits::
 By default, a file upload button is shown which loads the selected file into a hidden textarea. Binary content is encoded with base64 and prefixed with the word "binary:". With `mode = visible` the textarea is also shown so the user can either upload or paste the data (which is very handy for CSR uploads), the textAreaSize will affect the size of the area field. With ``mode = raw`` the element degrades to a html form upload button and the selected file is send with the form as raw data.
 
 AllowedFiles can contain a list of allowed file extensions. 
+
+Dynamic key value fields
+^^^^^^^^^^^^^^^^^^^
+If a field is defined with the property "keys", a pulldown of options is displayed above the actual field. This allows the user to specify, which kind of information he wants to specify.
+The content of the actual field will be submitted to the server with the selected key in the key-pulldown.
+
+Example:
+    { name => '...', label => 'Dyn Key-Value', 'keys' => [{value=>"key_x",label=>"Typ X"},{value=>"key_y",label=>"Typ Y"}], type => 'text' },
+                        
+    This example definition will render a Textfield with label "Dyn Key-Value". Above the textfield a select is displayed with three options ("Typ x","Typ y" and "Typ z").
+    If the user chooses "Typ Z", the entered value in the textfield will be posted to server with key "key_z".
+    
+    This feature makes often more sense in combination with "clonable" fields.
+
+Dynamic form rendering
+^^^^^^^^^^^^^^^^^^^
+If a select field is defined with the property "actionOnChange", each change event of this pulldown will trigger
+an submit of all formvalues (without validity checks etc) to the server with key "action" set to the value of "actionOnChange".
+
+The returned JSON must contain the key "_returnType" which should have the value "partial" or "full".  
+This "_returnType" defines the mode of re-definition of the content of the form.
+
+Partial redefinition:
+    Beside the key "_returntype" the key "fields"  is expected in the returned JSON-Structure.
+    "fields" contains an array, which is semantically identic to the key "fields" in the definition of the form.
+    This array "fields" must contain only only the fields (and properties), which should react to the change of the (master-)field (pulldown) .
+    The property "name" is required (otherwise the client can not identify the field).
+    The property "type" can not be subject to changes. With aid of the property "visible" one can dynamically show or hide some fields.
+    Only known fields (which are already defined in the initial "fields"-property of the form-section) can be subject of the "partial" re-rendering.
+    Its not possible to add new fields here.
+    
+    You can define more than one (cascading) dependent select.
+    
+    *Example*::
+    
+    Initial definition of fields:
+    fields => [
+                    { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!', type => 'select',options=>[] },                    
+                    
+                    { name => 'special', label => 'Spezial (nur Typ 2',  type => 'checkbox',visible => 0 },
+                    
+                    ]
+    
+    Action "test_dep_select!change_type" returns a (partially updated) definition of fields 
+    
+    {
+        _returnType => 'partial',
+        fields => [
+              { name => 'cert_subtyp', options=> [{value=>'x', label => 'Subtyp X'},...],value=>'x'} ,
+              { name => 'special',visible=> 1 }
+              ]   
+        
+        };
+    
+    
+    
+Full redefinition:
+    is not implemented yet.
+    
 
 Item Level
 ==========

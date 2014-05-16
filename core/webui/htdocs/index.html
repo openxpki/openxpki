@@ -293,9 +293,12 @@
     {{/each}}
     </script>
     
-    <script type="text/x-handlebars" data-template-name="form-textfield">
+    <script type="text/x-handlebars" data-template-name="form-field">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-9">
+          {{#if view.hasDynamicKeys}}
+          {{view view.DynamicKeyView}}
+          {{/if}}
           {{view view.FieldView}}
           {{#if view._hasError}}
           <span class="help-block">{{view.getErrorsAsString}}</span>
@@ -303,32 +306,11 @@
         </div>
     </script>
     
-    
-    
-    <script type="text/x-handlebars" data-template-name="form-selectfield">
-        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
-        <div class="col-lg-9">
-          {{view view.FieldView}}
-          {{#if view.hasFreetext}}
-          {{view view.FreeTextView}}
-          {{/if}}
-          {{#if view._hasError}}
-          <span class="help-block">{{view.getErrorsAsString}}</span>
-          {{/if}}
-        </div>
+    <script type="text/x-handlebars" data-template-name="form-dynamic-key-selection">
+    {{view view.SelectView}}
     </script>
     
     
-    
-    <script type="text/x-handlebars" data-template-name="form-textarea">
-        <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
-        <div class="col-lg-9">
-          {{view view.FieldView}}
-          {{#if view._hasError}}
-          <span class="help-block">{{view.getErrorsAsString}}</span>
-          {{/if}}
-        </div>
-    </script>
     
     <script type="text/x-handlebars" data-template-name="form-checkbox">
       <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
@@ -416,14 +398,14 @@
     <script src="js/libs/jquery.dataTables.min.js"></script>
     <script src="js/libs/jquery.ui.position.js"></script>
     <script src="js/libs/jquery.contextMenu.js"></script>
-    <script src="js/libs/jquery.ui-min.js"></script>
+    <!--<script src="js/libs/jquery.ui-min.js"></script>-->
 	
     
     <script src="js/libs/bootstrap-datepicker.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/libs/bootbox.min.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/libs/handlebars-1.0.0.js"></script>
+    <script src="js/libs/handlebars-v1.3.0.js"></script>
     <script src="js/libs/typeahead.bundle.js"></script>
     <script type="text/javascript" >
       //Environment for ember:
@@ -431,7 +413,7 @@
       LOG_VERSION:false
     };
     </script>
-   <script src="js/libs/ember-1.1.2.js"></script>
+   <script src="js/libs/ember-1.3.2.js"></script>
    <!-- customisation of https://github.com/danielfarrell/bootstrap-combobox -->
    <script src="js/oxi/bootstrap-combobox-oxi.js"></script>
    <script src="js/oxi/namespace.js"></script>

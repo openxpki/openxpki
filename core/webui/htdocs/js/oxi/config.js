@@ -2,7 +2,7 @@
 
 OXI.Config = Ember.Object.create({
     
-    serverUrl : '/cgi-bin/connect.cgi',
+    serverUrl : '/cgi-bin/mock.cgi',
 
     //root element in index.html (for ember application)
     rootElement: '#application',
