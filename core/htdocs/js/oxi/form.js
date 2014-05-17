@@ -528,7 +528,7 @@ OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
 
 OXI.TextFieldCertIdentifierContainer = OXI.FormFieldContainer.extend({
 
-    jsClassName:'OXI.TextFieldContainer',
+    jsClassName:'OXI.TextFieldCertIdentifierContainer',
     init:function(){
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
         this._super();
@@ -550,8 +550,18 @@ OXI.HiddenFieldContainer = OXI.TextFieldContainer.extend({
     _lastItem: '' //avoid trailing commas
 });
 
-OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
+OXI.DatetimeFieldContainer = OXI.TextFieldContainer.extend({
 
+	init:function(){
+		this._super();
+		if (typeof this.fieldDef.notime != undefined) {
+			this.notime = this.fieldDef.notime;
+		}
+		if (typeof this.fieldDef.nodate != undefined) {
+			this.nodate = this.fieldDef.nodate;
+		}
+
+	},
     /**
     re-convert the datepicker format "mm/dd/yyyy" to specified return format
     return format can be specified via field parameter "return_format"
@@ -589,7 +599,7 @@ OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
     didInsertElement: function(){
 
         this._super();
-        var options = {autoclose:true};
+        var options = {};
         var DateNotBefore = this._getDateObjectFromTime(this.fieldDef.notbefore);
         if (DateNotBefore) {
             options.minDate = DateNotBefore;
@@ -600,11 +610,27 @@ OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
             options.maxDate = DateNotAfter;
         }
 
-        if (this.fieldDef.value) {
-        	options.defaultDate = this._getDateObjectFromTime(this.fieldDef.notafter);
+        if (this.nodate) {
+        	options.pickDate = false;
         }
 
+        if (this.notime) {
+        	options.pickTime = false;
+        }
+
+        if (this.fieldDef.value) {
+        	options.defaultDate = this._getDateObjectFromTime(this.fieldDef.value);
+        }
+        console.log(this.fieldDef);
+        console.log(options);
+
         this.$('input').datetimepicker(options);
+
+        // This creates a readable string in the input field
+        if (options.defaultDate) {
+        	this.$('input').data("DateTimePicker").setDate(options.defaultDate);
+        }
+
     },
 
     /**
@@ -634,11 +660,26 @@ OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
     _lastItem: '' //avoid trailing commas
 });
 
+OXI.DateFieldContainer = OXI.DatetimeFieldContainer.extend({
+	init:function(){
+		this._super();
+		this.notime = true;
+	}
+});
+
+OXI.TimeFieldContainer = OXI.DatetimeFieldContainer.extend({
+	init:function(){
+		this._super();
+		this.nodate = true;
+	}
+});
+
 OXI.CheckboxContainer = OXI.FormFieldContainer.extend({
     templateName: "form-checkbox",
     jsClassName:'OXI.CheckboxContainer',
     init:function(){
         //Ember.debug('OXI.CheckboxContainer :init '+this.fieldDef.label);
+    	this.fieldDef.type = 'checkbox';
         this._super();
         this.setFieldView(OXI.Checkbox.create(this.fieldDef));
     },

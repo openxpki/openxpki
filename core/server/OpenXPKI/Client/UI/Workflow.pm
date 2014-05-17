@@ -158,8 +158,6 @@ sub init_search {
                     { name => 'wf_type', label => 'Type', type => 'select', is_optional => 1,  options => \@wfl_list  },
                     { name => 'wf_state', label => 'State', type => 'select', is_optional => 1, editable => 0, prompt => '', options => \@states },
                     { name => 'wf_creator', label => 'Creator', type => 'text', is_optional => 1 },
-                    { name => 'cert', 'label' => 'Cert Test', autoComplete => {source => '/cgi-bin/webui.cgi?action=certificate!autocomplete', type => 'url' }, 'type' => 'text'}
-
                 ]
         }}
     ];
