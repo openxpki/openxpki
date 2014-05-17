@@ -9,7 +9,7 @@ OXI.ComponentFactory = Ember.Object.extend({
     getComponent: function(type,params){
         if(!type){
             App.applicationAlert('OXI.ComponentFactory:getComponent called without type!');
-            return;   
+            return;
         }
         var classname = this._componentMap[type];
         if(!classname){
@@ -51,7 +51,8 @@ OXI.FormFieldFactory = OXI.ComponentFactory.create({
     	bool :      'CheckboxContainer',
 		upload :    'UploadContainer',
 		radio :     'RadioContainer',
-		meta_email: 'MetaEmailContainer'
+		meta_email: 'MetaEmailContainer',
+		cert_identifier: 'TextFieldCertIdentifierContainer'
     }
 
 });

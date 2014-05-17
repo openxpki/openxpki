@@ -25,12 +25,12 @@ OXI.FormView = OXI.ContentBaseView.extend({
         js_debug('form submit!');
         return false;
     },
-    
+
     hasRightPane:function(){
         //this.debug('hasRightPane? ');
         return this.SectionView.hasRightPane();
     },
-    
+
     callServer: function(action,sourceField){
         this.debug('call server with action '+action+', sourceField '+sourceField.fieldname);
         var formValues = this.getFormValues();
@@ -43,7 +43,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
                 FormView.debug('server responded');
                 //js_debug(json,2);
                 App.hideLoader();
-                
+
                 switch(json._returnType){
                     case 'partial':
                         if(!json.fields){
@@ -57,14 +57,14 @@ OXI.FormView = OXI.ContentBaseView.extend({
                     default:
                         //this should not happen!
                         App.applicationAlert('Server returned wrong returnType for action "'+action+'", triggered by "'+formValues._sourceField+'": '+json._returnType);
-                        
+
                         return;
                 }
-                
+
             }
         );
     },
-    
+
     getFormValues: function(){
         var i;
         var formValues = {};
@@ -77,7 +77,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
         }
         return formValues;
     },
-    
+
 
     submitAction: function(action, do_submit,target) {
         // will be invoked whenever the user triggers
@@ -101,7 +101,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
         var formValues = {};
 
         if(do_submit){//should the form-values be transmitted to the server?
-            
+
             formValues = this.getFormValues();
             for(i=0;i<this.FieldContainerList.length;i++){
                 var FieldView = this.FieldContainerList[i];
@@ -234,7 +234,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
             //js_debug('added field '+field.name+ ' to field-map with index '+i);
         }
     },
-    
+
     updateFields: function(fields){
         var i;
         for(i=0;i< fields.length;i++){
@@ -242,7 +242,7 @@ OXI.FormView = OXI.ContentBaseView.extend({
             if(!fieldDef.name)continue;
             var FieldView = this.getFieldView(fieldDef.name);
             FieldView.updateFormProperties(fieldDef);
-        } 
+        }
     },
 
     getFieldView:function(field){
@@ -278,22 +278,22 @@ OXI.ClonableFieldContainer = OXI.View.extend({
 
     templateName: "form-clonable",
     jsClassName:'OXI.ClonableFieldContainer',
-    
+
     FormView:null,//set via constructor
     fieldDef:null,//set via constructor
     FieldContainerList: null,
     label:null,
     fieldname:null,
-    
+
     hasRightPane:function(){
         //this.debug('hasRightPane? ');
         return this.FormView.hasRightPane();
     }.property(),
-    
+
     getKey:function(){
-         return this.fieldname;  
+         return this.fieldname;
     },
-    
+
     init:function(){
 
         this._super();
@@ -312,7 +312,7 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         for(i=0;i<values.length;i++){
             this.addField(values[i]);
         }
-        
+
         this.set('controller',OXI.ClonableFieldControler.create({view:this}));
     },
 
@@ -334,9 +334,9 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         this.FieldContainerList.removeAt(fieldindex);
         FieldView.destroy();
         this._updateIndex();
-        
+
     },
-    
+
     /**
     reindexing all clone fields, set property "isLast":
     */
@@ -364,14 +364,14 @@ OXI.ClonableFieldContainer = OXI.View.extend({
         return isValid;
     },
 
-    
+
     getKeyValueEntries: function(){
         var entries = {};
         this.FieldContainerList.forEach(
             function(FieldView, index, enumerable){
                 var k = FieldView.getKey();
                 if(!entries[k]){
-                    entries[k] = [];    
+                    entries[k] = [];
                 }
                 entries[k].push(FieldView.getValue());
             }
@@ -388,15 +388,15 @@ OXI.DynamicKeyView = OXI.View.extend({
     options:null,
     SelectView: null,
     init:function(){
-        
+
         this._super();
         this.SelectView = this.createChildView(OXI.Select.create({options:this.options}));
     },
-    
+
     getSelectedKey: function(){
         return (this.SelectView.selection)?this.SelectView.selection.value:'';
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
@@ -404,17 +404,17 @@ OXI.FormFieldContainer = OXI.View.extend({
     templateName: "form-field",
     fieldDef:null,//set via constructor
     FormView:null,//set via constructor
-    
+
     FieldView: null,
     DynamicKeyView: null,
     label:null,
     fieldname:null,
     isRequired:true,
     clonable: false,
-    
+
     classNames: ['form-group'],
     classNameBindings: ['_hasError:has-error'],
-    
+
     isValid: function(){
         this.resetErrors();
         if(this.isRequired && this.fieldindex==0){
@@ -425,25 +425,25 @@ OXI.FormFieldContainer = OXI.View.extend({
         }
         return true;
     },
-    
+
     updateFormProperties: function(fieldDef){
         var k;
         for(k in fieldDef){
             if(k=='name' || k=='type')continue;
             if(k=='visible'){
                 this.toggle(fieldDef[k]);
-                continue;   
+                continue;
             }
             this.set( k,fieldDef[k]);
             this.FieldView.set(k,fieldDef[k]) ;
-        }  
+        }
     },
-    
+
     hasRightPane:function(){
         //this.debug('hasRightPane? ');
         return this.FormView.hasRightPane();
     }.property(),
-    
+
     hasDynamicKeys:function(){
         return (this.DynamicKeyView);
     }.property(),
@@ -453,28 +453,28 @@ OXI.FormFieldContainer = OXI.View.extend({
     isFirst: function(){
         return (this.fieldindex==0);
     }.property('fieldindex'),
-    
+
     isLast: false,//wird vom ClonableFieldContainer gesetzt
 
     _toString:function(){
         return this._super()+' '+this.getKey();
     },
-    
+
     getKey:function(){
          if(this.DynamicKeyView){
-            return this.DynamicKeyView.getSelectedKey();   
+            return this.DynamicKeyView.getSelectedKey();
          }
-         return this.fieldname;  
+         return this.fieldname;
     },
-    
-    
+
+
 
     init:function(){
         //Ember.debug('OXI.FormFieldContainer :init '+this.fieldDef.label);
         this.isRequired = true;
         this.FieldView = null;
         this.DynamicKeyView = null;
-        
+
         this._super();
         this.label = this.fieldDef.label;
         this.fieldname = this.fieldDef.name;
@@ -503,7 +503,7 @@ OXI.FormFieldContainer = OXI.View.extend({
     getValue:function(){
         return this.FieldView.value;
     },
-    
+
     getKeyValueEntries:function(){
        var k = this.getKey();
        var entries = {};
@@ -515,7 +515,7 @@ OXI.FormFieldContainer = OXI.View.extend({
 });
 
 OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
-    
+
     jsClassName:'OXI.TextFieldContainer',
     init:function(){
         //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
@@ -683,18 +683,18 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
     jsClassName:'OXI.PulldownContainer',
 
-   
-    
+
+
     editable:false,
     optionAjaxSource:null,
     _isComboBox:false,
-    
-    
+
+
     triggerSelectionChanged:function(){
-        //js_debug('triggerSelectionChanged'); 
+        //js_debug('triggerSelectionChanged');
         if(this.fieldDef.actionOnChange){
             this.debug('call actionOnChange '+ this.fieldDef.actionOnChange );
-            this.FormView.callServer(this.fieldDef.actionOnChange, this);            
+            this.FormView.callServer(this.fieldDef.actionOnChange, this);
         }
     },
 
@@ -704,11 +704,11 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
         this._super();
         if(this.fieldDef.editable){
             this.set('editable',true);
-            this.set('_isComboBox',true);   
+            this.set('_isComboBox',true);
         }
-        
+
         if(typeof this.fieldDef.options == 'string'){
-            this.set('_isComboBox',true);   
+            this.set('_isComboBox',true);
             this.set('optionAjaxSource',this.fieldDef.options);
             this.fieldDef.options = [];
         }
@@ -721,7 +721,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 
     getValue:function(){
         if(this._isComboBox){
-            var v = this.$('select').combobox('getValue');   
+            var v = this.$('select').combobox('getValue');
             this.debug({combo: this.getKey(), combovalue: v});
             return v;
         }
@@ -735,7 +735,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
     change: function () {
         //console.log(this.FieldView.name + ' changed to '+this.getValue());
     },
-    
+
     didInsertElement: function(){
 
         this._super();
@@ -745,14 +745,14 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
             if(this.optionAjaxSource){
                 comboOptions.ajaxSource = App.serverUrl + '?action='+this.optionAjaxSource;
             }
-            
-            this.$('select').addClass('form-control-combo'); 
-            this.$('select').combobox(comboOptions);  
-            
+
+            this.$('select').addClass('form-control-combo');
+            this.$('select').combobox(comboOptions);
+
         }
     },
-    
-    
+
+
 
     _lastItem: '' //avoid trailing commas
 
@@ -762,7 +762,7 @@ OXI.PulldownContainer = OXI.FormFieldContainer.extend({
 OXI.Checkbox = Ember.Checkbox.extend(
 {
 	label: '',
-	
+
 	init: function(){
 		this._super();
 	},
@@ -781,41 +781,41 @@ OXI.Select = Ember.Select.extend(
 {
     optionLabelPath: 'content.label',
     optionValuePath: 'content.value',
-    
+
     classNames: ['form-control'] ,
     prompt:null,
-    
+
     _optionUpdateTrigger: function(){
-       this.setOptions(this.options);  
+       this.setOptions(this.options);
     }.observes('this.options'),
-    
-    
+
+
     checkSelection:function(){
         var v = (this.selection)?this.selection.value:'-';
         js_debug(this.name +': sel val changed: ' + v);
         this.get('parentView').triggerSelectionChanged();
-        
+
     }.observes('selection.value'),
-    
+
     init:function(){
         //Ember.debug('OXI.Select :init ');
         this._super();
         this.setOptions(this.options);
-        if(typeof this.prompt != 'undefined' && this.prompt=='' ){
+        if( !this.isRequired || (typeof this.prompt != 'undefined' && this.prompt=='' )) {
             this.prompt = ' ';//display white option
         }
-        
+
         //this.set('controller',OXI.SelectFieldControler.create({view:this}));
     },
-    
+
     setOptions:function(options){
         options = (typeof options == 'object')?options:[];
         this.set('content', Ember.A(options));
-        if(!this.prompt && !this.value && options[0]){
+        if(typeof this.prompt == 'undefined' && !this.value && options[0]){
             this.set('selection',   options[0]);
         }
     },
-    
+
     _lastItem: '' //avoid trailing commas
 
 });
@@ -835,30 +835,35 @@ OXI.TextField = Ember.TextField.extend(
     },
 	didInsertElement: function(){
 	if(this.autoComplete){
-		var mySource = new Bloodhound({
-			  datumTokenizer: function(d) { 
-			    return Bloodhound.tokenizers.whitespace(d.value); 
-			  },
-			  queryTokenizer: Bloodhound.tokenizers.whitespace,
-			  local: [],
-			  remote: ''
 
-			});
-		if(this.autoComplete.type == 'value' || this.autoComplete.type == 'source')
-			mySource.local = this.autoComplete.source;
-		if(this.autoComplete.type == 'url')
-			mySource.remote = this.autoComplete.source;
-		
+
+		var tt_init = {
+		};
+
+		var bh_init = {
+			datumTokenizer: function(d) { alert(d); return Bloodhound.tokenizers.whitespace(d.val); },
+			queryTokenizer: Bloodhound.tokenizers.whitespace,
+		};
+		if(this.autoComplete.type == 'value' || this.autoComplete.type == 'source') {
+			bh_init.local = this.autoComplete.source;
+		}
+		if(this.autoComplete.type == 'url') {
+			bh_init.remote = this.autoComplete.source;
+		}
+
+		var mySource = new Bloodhound(bh_init);
 		mySource.initialize();
 
-		$('#'+this.elementId).typeahead(null, {source: mySource.ttAdapter()});
+		$('#'+this.elementId).typeahead(tt_init, {
+			source: mySource.ttAdapter(),
+			templates: { suggestion: function(model) { return '<span>'+model.label+'</span>'; } },
+		});
 
 	}
 	},
     _lastItem: '' //avoid trailing commas
 }
 );
-
 
 OXI.FormButton = OXI.PageButton.extend({
 
@@ -903,11 +908,11 @@ OXI.UploadButton = Ember.View.extend({
 	tagName: 'button',
 	classNames: ['btn'],
 	parent: null,
-	
+
 	click: function(){
 		this.upload();
 	},
-	
+
 	upload: function(){
 		var certToSend = $('#' + this.parent.textArea.elementId).val();
 		var dataToSend = {'action' : 'upload_cert', 'rawData' : certToSend};
@@ -923,7 +928,7 @@ OXI.UploadButton = Ember.View.extend({
 });
 
 OXI.Upload = Ember.TextField.extend({
-	
+
 	jsClassName:'OXI.Upload',
 	classNameBindings:['btn_type'],
 	classNames: ['form-control'],
@@ -934,11 +939,11 @@ OXI.Upload = Ember.TextField.extend({
 	maxSize: 0, //maxSize in byte!
 	allowedFiles: null,
 	textAreaSize: null,
-	
+
 	init: function(){
 		this._super();
-	},	
-	
+	},
+
 	didInsertElement: function(){
 		var field = this.$();
 		var self = this;
@@ -981,7 +986,7 @@ OXI.Upload = Ember.TextField.extend({
 				}
 			};
 		});
-		
+
 	},
 	_lastItem: ''
 });
@@ -1019,7 +1024,7 @@ OXI.RadioContainer = OXI.FormFieldContainer.extend({
 	options: null,
 	multi: false,
 	checkBoxList: null, //should never be set by constructor
-	
+
 	init:function(){
 		this._super();
 		this.options = this.fieldDef.options;
@@ -1042,7 +1047,7 @@ OXI.RadioContainer = OXI.FormFieldContainer.extend({
 		}
 	},
 	getValue: function(){
-		if(this.multi){			
+		if(this.multi){
 			var values = [];
 			for(var i = 0; i <this.checkBoxList.length; i++){
 				if (this.checkBoxList[i].isChecked()) {
@@ -1050,7 +1055,7 @@ OXI.RadioContainer = OXI.FormFieldContainer.extend({
 				}
 			}
 			return values;
-				
+
 			/*var values = [];
 	        this.checkBoxList.forEach(
 	        function(FieldView){
@@ -1082,13 +1087,13 @@ OXI.RadioContainer = OXI.FormFieldContainer.extend({
 		return ret;
 	},
 	_lastItem: ''
-	
+
 });
 
 //main validator class
 OXI.Validator = Ember.Object.extend({
 	inputField: null,
-	
+
 	getInput: function(){
 		return $('#'+this.inputField.elementId).val();
 	},
@@ -1098,18 +1103,18 @@ OXI.Validator = Ember.Object.extend({
 	validate: function(data){
 		//override in subclass
 	},
-	
+
 	_lastItem: ''
 });
 
 OXI.EmailValidator = OXI.Validator.extend({
-	
+
 	validate: function(data){
 		var mail = this.getInput();
 		var match = mail.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}\b/);
 		return match ? true : false;
 	},
-	
+
 	_lastItem: ''
 });
 
@@ -1160,7 +1165,7 @@ OXI.MetaEmailField = OXI.TextField.extend({
 			}
 		field.focusin(function(){
 			field.popover.hide();
-		});	
+		});
 		});
 	},
 	_lastItem: ''

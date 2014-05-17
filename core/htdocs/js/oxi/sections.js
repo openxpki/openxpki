@@ -9,18 +9,18 @@ OXI.TabListControler = Ember.Controller.extend({
               this.view.addTab('Test new');
             }
           },
-          
-   _lastItem: '' //avoid trailing commas    
+
+   _lastItem: '' //avoid trailing commas
 });
 
 OXI.TabControler = Ember.Controller.extend({
    actions: {
-            closeTab: function(){f
+            closeTab: function(){
               js_debug('close tab triggered - controler level');
               this.view.closeTab();
             }
-          }, 
-   _lastItem: '' //avoid trailing commas       
+          },
+   _lastItem: '' //avoid trailing commas
 });
 
 OXI.TabView = OXI.View.extend({
@@ -29,22 +29,22 @@ OXI.TabView = OXI.View.extend({
     classNames: ['tab-pane'],
     //this is the View for the Tab-Content (another instance of SectionViewContainer)
     ContentView: null,
-    
+
     //set via constructor
     label:null,
     tabindex:null,
     ParentView:null, //
-    
+
     _markAsActive:false,
-    
+
     getTabHref:function(){
         return '#'+this.get('elementId');
     }.property(),
-    
+
     getMainViewContainer:function(){
-        return this.ParentView.getMainViewContainer();  
+        return this.ParentView.getMainViewContainer();
     },
-    
+
     init:function(){
         this._super();
         if(!this.label){
@@ -68,7 +68,7 @@ OXI.TabView = OXI.View.extend({
         //js_debug('will close myself...');
         this.ParentView.closeTab(this.tabindex)
     },
-    
+
     setActive: function(){
         if(this._domReady){
             this._markAsActive = false;
@@ -82,18 +82,18 @@ OXI.TabView = OXI.View.extend({
          this._super();
         if(this._markAsActive){
             var Tab = this;
-            //for some (unknown) reasons the immediate call to setActive fails here...although the DOM is ready... 
+            //for some (unknown) reasons the immediate call to setActive fails here...although the DOM is ready...
             setTimeout(function(){Tab.setActive();},100);
         }
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
 OXI.SectionViewContainer = OXI.View.extend({
-    
+
     jsClassName:'OXI.SectionViewContainer',
-    
+
     templateName: "sections",
     SectionViewList:[],
     MessageView:null,
@@ -106,13 +106,13 @@ OXI.SectionViewContainer = OXI.View.extend({
     description:null,
     displayType:'main',
     parentContainer:null,
-    
+
     //computed properties:
      hasNoTabs: function(){
        return (!this._hasTabs);
     }.property('_hasTabs'),
-    
-    
+
+
     labelTabMain: function(){
        var label = (this.shortlabel)?this.shortlabel:this.label;
        if(this._debugTabs){
@@ -121,48 +121,48 @@ OXI.SectionViewContainer = OXI.View.extend({
        if(!label)label = 'Main page';
        return label;
     }.property('label','shortlabel'),
-    
+
     getMainTabHref:function(){
         return '#' + this.getMainTabId();
     }.property(),
-    
+
     getMainTabId:function(){
         return this.get('elementId') +'-main-tab';
 
     },
-    
+
     mainTabId:function(){
         return this.getMainTabId();
     }.property(),
-    
+
     hasRightPane:false,
-    
+
     //methods:
     getMainViewContainer: function(){
         if(this.displayType=='tab'){
             return this.parentContainer.getMainViewContainer();
         }
-        return this;  
-        
+        return this;
+
     },
-    
+
     addTab: function(label){
-        //js_debug('add tab called,  label '+label);  
+        //js_debug('add tab called,  label '+label);
         var TabView = OXI.TabView.create({label:label,ParentView:this,tabindex:this.Tabs.content.length});
         this.Tabs.pushObject(this.createChildView(TabView));
         this.set('_hasTabs',true);
-        
+
         return TabView;
     },
-    
+
     showTab: function(tab_index){
         //js_debug('show tab '+tab_index);
         if(!this._domReady)return;
         tab_index++;//we must increnent the index, because the first (bootstrap-)tab "main" is not in our TabList
-        this.$('.nav-tabs  li:eq('+tab_index+') a').tab('show'); 
+        this.$('.nav-tabs  li:eq('+tab_index+') a').tab('show');
     },
-    
-    
+
+
     closeTab:function(tabindex){
         //js_debug('will close tab #' + tabindex);
         var Tab = this.Tabs.content[tabindex];
@@ -170,18 +170,18 @@ OXI.SectionViewContainer = OXI.View.extend({
             js_debug('no tab at index '+tabindex);
             return
         }
-        
+
         this.Tabs.removeAt(tabindex);
         Tab.destroy();
         //reindexing all tabs:
         this.Tabs.forEach(
             function(Tab, index, enumerable){
-                Tab.set('tabindex',index);   
+                Tab.set('tabindex',index);
             }
         );
         this.showTab(tabindex-1);
     },
-    
+
     closeTabs:function(){
         this.Tabs.forEach(
             function(Tab, index, enumerable){
@@ -191,7 +191,7 @@ OXI.SectionViewContainer = OXI.View.extend({
         this.initTabs();
         this.showTab(-1);//main tab
     },
-    
+
     initTabs:function(){
         this.set('Tabs', Ember.ArrayController.create({
                 content: Ember.A([])
@@ -209,11 +209,11 @@ OXI.SectionViewContainer = OXI.View.extend({
             this.RightPaneView = this.createChildView(OXI.RightPaneView.create());
             this.MessageView = this.createChildView(OXI.MessageView.create());
         }else{
-            this.RightPaneView = this.createChildView(OXI.EmptyView.create()); 
-            this.MessageView = this.createChildView(OXI.EmptyView.create()); 
+            this.RightPaneView = this.createChildView(OXI.EmptyView.create());
+            this.MessageView = this.createChildView(OXI.EmptyView.create());
         }
-            
-        
+
+
     },
 
     setStatus:function(status){
@@ -224,8 +224,8 @@ OXI.SectionViewContainer = OXI.View.extend({
             this.MessageView.reset();
         }
     },
-    
-    
+
+
 
     initSections:function(json){
         //js_debug(json,2);
@@ -265,7 +265,7 @@ OXI.SectionViewContainer = OXI.View.extend({
                 });
             }
         }
-        
+
         //right pane:
         if(json.right && json.right.length > 0){
             this.set('hasRightPane',true);
@@ -301,30 +301,30 @@ OXI.SectionViewContainer = OXI.View.extend({
 
 
 OXI.SectionView = OXI.View.extend({
-    
+
     jsClassName:'OXI.SectionView',
-    
+
     templateName: "section",
     sectionData: null,
     ContentView:null,
     section_nr:null,
     section_type:null,
-    
+
     SectionContainer:null,//set via Constructor, points to parent
-    
+
     hasButtons: function(){
         if(this.ContentView.jsClassName == 'OXI.FormView'){
-            return false;    
+            return false;
         }
         return this.ContentView.getButtonCount();
     }.property(),
-    
+
     hasRightPane: function(){
         //this.debug('hasRightPane? ' + this.SectionContainer.hasRightPane);
         return this.SectionContainer.hasRightPane;
     },
-    
-    
+
+
     destroy: function() {
         //Ember.debug('SectionView::destroy '+this.section_nr);
         this._super()
@@ -332,19 +332,19 @@ OXI.SectionView = OXI.View.extend({
     init:function(){
         //Ember.debug('App.SectionView Nr '+this.section_nr+':init ');
         this.ContentView = null;
-        
+
         this._super();
         this.section_type = this.sectionData.type;
         var params = {SectionView:this, content:this.sectionData.content};
         if(this.sectionData.action){
-            params.action =  this.sectionData.action;  
+            params.action =  this.sectionData.action;
         }
-        
+
         this.ContentView = this.createChildView(
                                 OXI.SectionViewFactory.getComponent(this.section_type,params)
                             );
     }
-    
+
 
 });
 
@@ -353,32 +353,32 @@ OXI.RightPaneView = OXI.View.extend({
     templateName: "right-pane",
     classNames: ['well'],//['panel panel-default right-pane'],//http://getbootstrap.com/components/#panels
     ContentView:null,
-    
-    
+
+
     init:function(){
         this._super();
         this.set('ContentView', this.createChildView(
                                     OXI.SectionViewContainer.create({displayType:'right',templateName:'sections-right'})
                                    ));
-        
+
     },
-    
+
     initSections: function(sections){
         this.debug('init Sections');
         this.ContentView.initSections({main : sections});
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
 OXI.EmptyView = OXI.View.extend({
     jsClassName:'OXI.EmptyView',
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
 OXI.MessageView = OXI.View.extend({
-    
+
     jsClassName:'OXI.MessageView',
     classNames: ['oxi-message'],
     message:null,
@@ -395,7 +395,7 @@ OXI.MessageView = OXI.View.extend({
         this.set('level','');
         this.set('message', '');
     },
-    
+
     msg_class:function(){
         //this.debug('eval msg_class');
         if(!this.message){
@@ -415,18 +415,18 @@ OXI.MessageView = OXI.View.extend({
 
         }
     }.property('level','message'),
-    
+
     didInsertElement: function(){
         this._super();
         /*
         var elemId = this.get('elementId');
-        $(window).scroll(function(){            
+        $(window).scroll(function(){
             $('#'+elemId)
                 .stop()
-                .animate({"marginTop": ($(window).scrollTop() )}, "slow" );         
+                .animate({"marginTop": ($(window).scrollTop() )}, "slow" );
         });
-        */   
+        */
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
