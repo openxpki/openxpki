@@ -310,7 +310,45 @@ sub init_download {
         print $self->cgi()->header( -type => $content_type, -expires => "1m", -attachment => $filename );
         print $cert;
         exit;
-        
+
+    }
+
+    return $self;
+}
+
+
+=head2 action_autocomplete
+
+Handle searches via autocomplete
+
+=cut
+
+sub action_autocomplete {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $term = $self->param('query') || '';
+
+    $self->logger()->debug( "autocomplete term: " . Dumper $term);
+
+    my $query = {
+        SUBJECT => "%$term%",
+        VALID_AT => time(),
+        STATUS => 'ISSUED'
+    };
+
+    my $search_result = $self->send_command( 'search_cert', $query );
+    $self->logger()->trace( "search result: " . Dumper $search_result);
+
+    my @result;
+    foreach my $item (@{$search_result}) {
+        push @result, {
+            value => $item->{IDENTIFIER},
+            label => $self->_escape($item->{SUBJECT}),
+            notbefore => $item->{NOTBEFORE},
+            notafter => $item->{NOTAFTER}
+        };
     }
 
     $self->logger()->debug( "search result: " . Dumper \@result);

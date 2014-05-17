@@ -526,79 +526,62 @@ OXI.TextFieldContainer = OXI.FormFieldContainer.extend({
     _lastItem: '' //avoid trailing commas
 });
 
+OXI.TextFieldCertIdentifierContainer = OXI.FormFieldContainer.extend({
+
+    jsClassName:'OXI.TextFieldContainer',
+    init:function(){
+        //Ember.debug('OXI.TextFieldContainer :init '+this.fieldDef.label);
+        this._super();
+        if (!this.fieldDef.autoComplete) {
+        	this.fieldDef.autoComplete = {source: '/cgi-bin/webui.cgi?action=certificate!autocomplete&query=%QUERY', type: 'url' };
+        }
+        this.setFieldView(OXI.TextField.create(this.fieldDef));
+    },
+
+    _lastItem: '' //avoid trailing commas
+});
+
 OXI.HiddenFieldContainer = OXI.TextFieldContainer.extend({
     init:function(){
         this._super();
         this.hide();
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 
 OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
-    /**
-    convert given field value (in UNIX epoch) to default format of datepicker: mm/dd/yyyy
-    */
-    init:function(){
-        var D = this._getDateObjectFromTime(this.fieldDef.value);
-        if(D){
-            //
-            this.fieldDef.value =
-            ('00' + (D.getUTCMonth()+1)).slice(-2) + '/' +
-            ('00' +  D.getUTCDate()).slice(-2) + '/' +
-            D.getUTCFullYear()
-            ;
-        }else{
-            this.fieldDef.value = '';
-        }
-        this._super();
-    },
-    
-    
-    
+
     /**
     re-convert the datepicker format "mm/dd/yyyy" to specified return format
     return format can be specified via field parameter "return_format"
     for valid formats see OpenXPKI::Datetime
     default is "epoch"
-    
+
     */
     getValue:function(){
         var v = this._super();
         if(!v) return v;
-        var temp = v.split('/');
-        var year = parseInt(temp[2]);
-        var month = parseInt(temp[0]);
-        var day = parseInt(temp[1]);
-        
-        var return_format = (this.fieldDef.return_format)?this.fieldDef.return_format:'epoch';
-        var nf = function(i){
-            if(i<10) return '0'+i;
-            return i;   
-        }
+
+        var return_format = (this.fieldDef.return_format) ? this.fieldDef.return_format : 'epoch';
+
         switch(return_format){
             case 'terse':
-                return year+''+ nf(month) +''+ nf(day) +'000000';
+            	return moment(v).format('YYYYMMDDhhmmss');
             case 'printable':
-                return year+'-'+ nf(month) +'-'+ nf(day) +' 00:00:00';
+                return moment(v).format('YYYY-MM-DD hh:mm:ss');
             case 'iso8601':
-                return year+'-'+ nf(month) +'T'+ nf(day) +' 00:00:00';
-            
+            	return moment(v).format('YYYY-MM-DDThh:mm:ss');
             case 'epoch':
-                var D = new Date(year,month-1,day);
-                var ms = D.getTime();
-                if(ms){
-                    return parseInt(ms/1000);//seconds
-                }
+            	return moment(v).format('X');
                 return 0;
             default:
                 App.applicationAlert('date field '+this.label+': no valid return format specified: '+return_format);
                 return 0;
         }
-        
-        
+
     },
-    
+
     /**
     convert the stupid textfield to an bootstrap datepicker
     for documentation see http://bootstrap-datepicker.readthedocs.org/en/latest/
@@ -608,41 +591,46 @@ OXI.DateFieldContainer = OXI.TextFieldContainer.extend({
         this._super();
         var options = {autoclose:true};
         var DateNotBefore = this._getDateObjectFromTime(this.fieldDef.notbefore);
-        if(DateNotBefore){
-            options.startDate = DateNotBefore;    
+        if (DateNotBefore) {
+            options.minDate = DateNotBefore;
         }
+
         var DateNotAfter = this._getDateObjectFromTime(this.fieldDef.notafter);
-        if(DateNotAfter){
-            options.endDate = DateNotAfter;    
+        if (DateNotAfter) {
+            options.maxDate = DateNotAfter;
         }
-        this.$('input').datepicker(options);
+
+        if (this.fieldDef.value) {
+        	options.defaultDate = this._getDateObjectFromTime(this.fieldDef.notafter);
+        }
+
+        this.$('input').datetimepicker(options);
     },
-    
+
     /**
-    returns an JS-Date-Object, if possible
-    recognices the string "now"
+    returns a moment object or undefined
+    recognices the string "now", epoch or any string parseable by
+    the moment lib (http://momentjs.com/)
     */
     _getDateObjectFromTime: function(time){
-        if(!time)return;
+        if (!time) return;
+
         if(time == 'now'){
-            return new Date();   
+            return moment();
         }
-        //sql date and iso8601:
-        if(time.match(/^\d{4}-\d{2}-\d{2}/)){
-            var temp = time.split('-');
-            var D = new Date(parseInt(temp[0]),parseInt(temp[1])-1,parseInt(temp[2]));
-            return D;
+
+        // digits only is epoch
+        if(time.match(/^\d+$/)) {
+        	time = parseInt(time) * 1000;
         }
-        //js_debug('epoch date? '+ time);
-        var time = parseInt(time);
-        if (time && !isNaN(time)) {
-            var D = new Date();
-            D.setTime(time*1000);
-            return D;
+        // Try to use moment lib to parse the string, will also recognize the epoch
+        var D = moment(time);
+        if (D.isValid()) {
+        	return D;
         }
 
     },
-    
+
     _lastItem: '' //avoid trailing commas
 });
 

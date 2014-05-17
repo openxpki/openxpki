@@ -12,26 +12,26 @@
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
-    <!-- CSS for Data Table Grid --> 
+    <!-- CSS for Data Table Grid -->
     <link href="css/jquery.dataTables.css" rel="stylesheet">
-    <!-- CSS for Datepicker --> 
-    <link href="css/datepicker.css" rel="stylesheet">
-    <!-- CSS for editable select --> 
+    <!-- CSS for Datepicker -->
+    <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <!-- CSS for editable select -->
     <link href="css/bootstrap-combobox.css" rel="stylesheet">
-    <!-- CSS for context menu --> 
+    <!-- CSS for context menu -->
     <link href="css/jquery.contextMenu.css" rel="stylesheet">
     <!-- CSS for typeahead -->
     <link href="css/typeahead.css" rel="stylesheet">
     <!-- Custom styles for this project -->
     <link href="css/oxi.css" rel="stylesheet">
     <link href="css/oxi-grid.css" rel="stylesheet">
-        
+
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="js/libs/html5shiv.js"></script>
       <script src="js/libs/respond.min.js"></script>
     <![endif]-->
-    
+
     <!--[if lt IE 9]>
       <link href="css/ie-8.css" rel="stylesheet">
     <![endif]-->
@@ -46,7 +46,7 @@
       <div class="container">
         <p class="text-muted credit">&copy; Copyright 2013, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a>.</p>
       </div>
-    </div> 
+    </div>
     <div class="modal" id="ajaxLoadingModal" tabindex="-1" role="dialog" aria-labelledby="loading..." aria-hidden="true"
         style="padding-top:200px;"
         >
@@ -78,7 +78,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          
+
           <a class="navbar-brand" href="#"></a>
         </div>
         <div class="navbar-collapse collapse">
@@ -96,7 +96,7 @@
                               {{/view}}
                             {{/each}}
                           </ul>
-                     {{/unless}} 
+                     {{/unless}}
                   {{/view}}
                 {{/each}}
           </ul>
@@ -105,7 +105,7 @@
             <li><p class="navbar-text">Signed in as: <strong>{{ App.username }} ({{ App.userrole }})</strong></p></li>
             <li><a href="#logout">Log out</a></li>
             {{/if}}
-          </ul>  
+          </ul>
         </div><!--/.nav-collapse -->
       </div>
     </div>
@@ -116,13 +116,13 @@
         <div class="col-md-2">
           <div class="bs-sidebar hidden-print" role="complementary">
             <ul class="nav bs-sidenav">
-              
+
                 {{#each App.CurrentSideNav}}
                   {{#view App.SideNavItemView classBinding="active" gotoBinding="goto"}}
                     {{#link-to goto}}{{title}}{{/link-to}}
                   {{/view}}
                 {{/each}}
-                
+
             </ul>
           </div>
         </div>
@@ -130,20 +130,20 @@
 
          {{outlet}}
          {{outlet main-content}}
-        
+
         </div>
       </div>
    </div>
      </script>
-     
-     
+
+
     <script type="text/x-handlebars" data-template-name="main-content">
-      
+
         {{view App.MainView}}
-         
+
      {{view App.ModalView}}
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="modal-main">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -160,28 +160,28 @@
             </div><!-- /.modal-content -->
           </div><!-- /.modal-dialog -->
 
-    </script>    
-    
+    </script>
+
     <script type="text/x-handlebars" data-template-name="right-pane">
-    
+
       <div class="panel-body">
         {{view view.ContentView}}
       </div>
-     </script> 
+     </script>
      <script type="text/x-handlebars" data-template-name="sections-right">
       {{#each SectionView in view.SectionViewList}}
       {{#if view._debugTabs }}Section {{SectionView.elementId}}{{/if}}
       {{view SectionView}}
       {{/each}}
      </script>
-    
+
     <script type="text/x-handlebars" data-template-name="sections">
       {{view view.MessageView}}
-      
+
       <h2>{{view.label}}</h2>
       <p>{{{view.description}}}</p>
-      
-            
+
+
       <ul {{bind-attr class=":nav :nav-tabs view.hasNoTabs:hidden"}}>
         <li><a {{bind-attr href=view.getMainTabHref}} data-toggle="tab">{{view.labelTabMain}}</a></li>
         {{#each TabView in view.Tabs}}
@@ -205,8 +205,8 @@
                   <div {{bind-attr class="view.hasRightPane:col-md-4:hide"}}>
                  {{view view.RightPaneView}}
                  </div>
-                  
-                  
+
+
                   </div>
                   </div>
             </div>
@@ -216,13 +216,13 @@
             {{/each}}
         </div>
         <!-- /tab list -->
-        
-                
+
+
       {{#if view._debugTabs }}<button {{action 'addTab'}}>add tab</button>{{/if}}
     </script>
-    
-    
-    
+
+
+
     <script type="text/x-handlebars" data-template-name="section">
     <!-- section content-->
     <div class="container section">
@@ -239,23 +239,23 @@
     {{/if}}
     <!-- /section content-->
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="tab-pane">
     <button type="button" class="close" aria-hidden="true" {{action 'closeTab'}}>&times;</button>
     {{view view.ContentView}}
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="text-view">
       <!--Text-View-->
       {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
       {{#if view.description}}<div style="margin-bottom:6px;">{{{view.description}}}</div>{{/if}}
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="form-view">
      {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
      {{#if view.description}}<div style="margin-bottom:6px;">{{view.description}}</div>{{/if}}
      <div {{bind-attr class=":alert view._hasError:alert-danger:hide"}}>{{view.getErrorsAsString}}</div>
-     
+
      <form class="form-horizontal" role="form">
      <div class="form-group oxi-form">
      {{#each FieldContainer in view.FieldContainerList}}
@@ -270,14 +270,14 @@
          {{/each}}
         </div>
     </div>
-     
+
      </form>
     </script>
-    
+
      <script type="text/x-handlebars" data-template-name="page-button">
       {{view.label}}
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="form-clonable">
     {{#each FieldView in view.FieldContainerList}}
         {{#if FieldView.isLast}}
@@ -292,7 +292,7 @@
         {{view FieldView}}
     {{/each}}
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="form-field">
         <label {{bind-attr for=view.fieldname}} class="col-lg-2 control-label">{{view.label}}</label>
         <div class="col-lg-9">
@@ -305,13 +305,13 @@
           {{/if}}
         </div>
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="form-dynamic-key-selection">
     {{view view.SelectView}}
     </script>
-    
-    
-    
+
+
+
     <script type="text/x-handlebars" data-template-name="form-checkbox">
       <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
       <div class="checkbox">
@@ -321,9 +321,9 @@
       </div>
     </div>
     </script>
-    
-    
-    
+
+
+
     <script type="text/x-handlebars" data-template-name="grid-view">
       {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
      {{#if view.description}}<div style="margin-bottom:12px;">{{view.description}}</div>{{/if}}
@@ -335,7 +335,7 @@
     <script type="text/x-handlebars" data-template-name="keyvalue-view">
       {{#if view.label}}<h3>{{view.label}}</h3>{{/if}}
      {{#if view.description}}<div style="margin-bottom:12px;">{{view.description}}</div>{{/if}}
-      
+
       <table class="table table-bordered">
       {{#each item in view.data}}
       <tr><td>{{item.label}}</td><td>{{{item.formatedVal}}}</td></tr>
@@ -343,16 +343,16 @@
       </table>
 
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="notfound">
       The page {{original_target}} doesn't exist.
     </script>
-    
-    
+
+
     <script type="text/x-handlebars" data-template-name="page-message">
       <div {{bind-attr class=":alert view.msg_class"}}>{{view.message}}</div>
     </script>
-    
+
     <script type="text/x-handlebars" data-template-name="radio-view">
     <div class="col-lg-offset-2 col-lg-8" style="margin-bottom:4px;">
     <div>
@@ -367,13 +367,13 @@
     			<input type="radio" name="radio" value="{{value}}">{{label}}</input>
     		{{/each}}
     	{{/if}}
-    </div>			
+    </div>
     </div>
     {{#if view._hasError}}
     <span class="help-block">{{view.getErrorsAsString}}</span>
     {{/if}}
     </script>
-    
+
 	<script type="text/x-handlebars" data-template-name="upload-view">
 	<label class="col-lg-2 control-label">{{view.label}}</label>
 	  <div class="col-lg-9">
@@ -382,14 +382,14 @@
 		<input type="hidden" name ="data" id="data">
 	</div>
 	</script>
-	
+
 	<script type="text/x-handlebars" data-template-name="meta_email-view">
 	<label class="col-lg-2 control-label">{{view.label}}</label>
 	  <div class="col-lg-9">
 		{{view view.FieldView}}
 	</div>
 	</script>
-    
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -399,9 +399,9 @@
     <script src="js/libs/jquery.ui.position.js"></script>
     <script src="js/libs/jquery.contextMenu.js"></script>
     <!--<script src="js/libs/jquery.ui-min.js"></script>-->
-	
-    
-    <script src="js/libs/bootstrap-datepicker.js"></script>
+
+    <script src="js/libs/moment-with-langs.min.js"></script>
+    <script src="js/libs/bootstrap-datetimepicker.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/libs/bootbox.min.js"></script>
     <script src="js/utils.js"></script>
@@ -430,7 +430,7 @@
    <script src="js/oxi/keyvalue.js"></script>
    <script src="js/run.js"></script>
 
-   
+
   </body>
-  
+
 </html>
