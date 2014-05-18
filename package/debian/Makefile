@@ -36,8 +36,7 @@ EXTERNAL=				\
 	Config__Versioned \
 	Proc__SafeExec \
 	XML__Filter__XInclude \
-	Workflow \
-	Digest__SHA
+	Workflow
 
 EXTERNAL2= \
 	Connector \
