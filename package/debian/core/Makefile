@@ -15,6 +15,7 @@ include ../Makefile.inc
 
 examples:
 	cd $(EXAMPLE); \
+	tar -zcf htdocs.tgz ../htdocs; \
 	tar -czf /tmp/openxpki-examples.tar.gz .; \
 	cd /tmp/$(PERLNAME)-*; \
 	mkdir examples; \
@@ -24,4 +25,5 @@ examples:
 	tar -zcf profiles.tgz profiles; \
 	tar -zcf soap.tgz soap; \
 	tar -zcf scep.tgz scep; \
-	tar -zcf notification.tgz notification;  
+	tar -zcf webui.tgz webui; \
+	tar -zcf notification.tgz notification; 

@@ -3,7 +3,7 @@
 BASE="/etc/openxpki/ssl/ca-one/";
 
 if [ ! -d "$BASE" ]; then 
-    mkdir "$BASE";
+    mkdir -p "$BASE";
 fi
 
 if [ -e "$BASE/ca-root-1.crt" ] ||  [ -e "$BASE/ca-root-1.pem" ]; then

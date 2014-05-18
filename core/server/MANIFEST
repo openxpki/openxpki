@@ -29,9 +29,24 @@ OpenXPKI/Client/API.pm
 OpenXPKI/Client/SCEP.pm
 OpenXPKI/Client/Simple.pm
 
+# New UI Client
+OpenXPKI/Client/UI.pm
+OpenXPKI/Client/UI/Bootstrap.pm
+OpenXPKI/Client/UI/Certificate.pm
+OpenXPKI/Client/UI/Crl.pm
+OpenXPKI/Client/UI/Home.pm
+OpenXPKI/Client/UI/Information.pm
+OpenXPKI/Client/UI/Login.pm
+OpenXPKI/Client/UI/Login/Passwd.pm
+OpenXPKI/Client/UI/Result.pm
+OpenXPKI/Client/UI/Secret.pm
+OpenXPKI/Client/UI/Workflow.pm
+OpenXPKI/Client/UI/Workflow/Metadata.pm
+
+
 ## Config Layers
 OpenXPKI/Config/Merge.pm
-OpenXPKI/Config/Test.pm 
+OpenXPKI/Config/Test.pm
 
 ## Crypto layer
 
@@ -209,7 +224,7 @@ OpenXPKI/Server/Workflow/WFObject.pm
 OpenXPKI/Server/Workflow/WFObject/WFArray.pm
 OpenXPKI/Server/Workflow/WFObject/WFHash.pm
 
-OpenXPKI/Server/Workflow/Activity.pm 
+OpenXPKI/Server/Workflow/Activity.pm
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 
 OpenXPKI/Server/Workflow/Activity/Noop.pm
@@ -229,7 +244,7 @@ OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
 
-OpenXPKI/Server/Workflow/Activity/Transfer/SCP.pm 
+OpenXPKI/Server/Workflow/Activity/Transfer/SCP.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
@@ -268,7 +283,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/CalculateKeyId.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/LoadCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PersistCertificateMetadata.pm
-OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm    
+OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
@@ -308,7 +323,7 @@ OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
 OpenXPKI/Server/Workflow/Observer/Debug.pm
 OpenXPKI/Server/Workflow/Observer/Log.pm
 
-# @todo  A lot of those are unused - check what is really needed 
+# @todo  A lot of those are unused - check what is really needed
 #OpenXPKI/Server/Workflow/Condition/ACL.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysFalse.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
@@ -639,5 +654,7 @@ bin/openxpkicmd
 
 # cgi stuff
 cgi-bin/scep
+cgi-bin/webui.cgi
+cgi-bin/webui.fcgi
 
 

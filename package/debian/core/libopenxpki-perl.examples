@@ -4,6 +4,8 @@ examples/soap.tgz
 examples/basic.tgz
 examples/profiles.tgz
 examples/notification.tgz
+examples/htdocs.tgz
+examples/webui.tgz
 examples/sampleconfig.sh
 examples/openxpki-scep.conf
 examples/README

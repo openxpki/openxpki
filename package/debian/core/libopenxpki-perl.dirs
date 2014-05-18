@@ -4,3 +4,4 @@ etc/openxpki
 etc/openxpki/ssl/ca-one
 etc/openxpki/scep
 etc/openxpki/soap
+etc/openxpki/webui
