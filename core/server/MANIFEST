@@ -281,7 +281,6 @@ OpenXPKI/Server/Workflow/Activity/Reports/CertExport/TagAsExported.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateChallenge.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateSignerTrust.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateEligibility.pm
-OpenXPKI/Server/Workflow/Activity/SCEPv2/SerializeUniqueId.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/RevokeExistingCerts.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/LoadRecentCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/CalcApprovals.pm
@@ -289,7 +288,6 @@ OpenXPKI/Server/Workflow/Activity/SCEPv2/FetchGroupPolicy.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/ExtractCSR.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
-OpenXPKI/Server/Workflow/Activity/SmartCard/WriteCertificateToInstall.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreateEscrowedKey.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/ApplyCSRPolicy.pm
@@ -332,7 +330,6 @@ OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
 
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
 OpenXPKI/Server/Workflow/Condition/WFHash.pm
-OpenXPKI/Server/Workflow/Condition/WFValue.pm
 OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 
 OpenXPKI/Server/Workflow/Condition/CertificateHasStatus.pm
