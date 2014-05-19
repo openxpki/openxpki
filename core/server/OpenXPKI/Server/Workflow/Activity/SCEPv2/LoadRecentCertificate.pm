@@ -94,7 +94,7 @@ sub execute {
 
     # TODO - This should be moved outside to the workflow
     # This is a replacement - so we copy the validity
-    if (!$context->param('in_renewal_window') && $context->param('in_replace_window')) {
+    if (!$context->param('in_renew_window') && $context->param('in_replace_window')) {
         # cert hash contains epoch but we need absolute date!
         foreach my $validity_param (qw( notbefore notafter )) {
             my $validity = OpenXPKI::DateTime::convert_date({
