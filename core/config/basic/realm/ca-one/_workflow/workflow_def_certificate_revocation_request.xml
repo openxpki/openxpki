@@ -1,71 +1,52 @@
 <workflow>
-
   <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST</type>
   <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_REVOCATION_REQUEST</description>
   <persister>OpenXPKI</persister>
   <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
 
+
  <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_INITIAL</description>
-    <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"
-	    resulting_state="CHECK_APPROVALS">
-    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CRR"	    
+	    resulting_state="AUTOAPPROVAL">	    
+      <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE"/>
+    </action>    
   </state>
-
-  <state name="CHECK_APPROVALS" autorun="yes">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_CHECK_APPROVALS</description>
-
-    <!-- certificate is already revoked -->
+  
+  <state name="AUTOAPPROVAL" autorun="yes">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_AUTOAPPROVAL</description>  
+    <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+        resulting_state="CRR_CHECK_FOR_DELAYED_REVOKE">        
+        <condition name="I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL"/>
+        <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>        
+    </action>    
     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
-        resulting_state="SUCCESS">
-        <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
+        resulting_state="PENDING">        
+        <condition name="!I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL"/>
+        <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>        
     </action>
-
-    <!-- All Approvals given -->
     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
-        resulting_state="CRR_CHECK_FOR_DELAYED_REVOKE">
-        <!-- this condition also checks for the autoapproval flag -->
-        <condition name="crr_cond_is_approved"/>
-        <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
-    </action>
-
-    <!--  approval required -->
-    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
-        resulting_state="NOTIFY_CRR_PENDING">
-        <condition name="!crr_cond_is_approved"/>
-        <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
-    </action>
-  </state>
-
-  <!--  Send notification if it was not send already -->
-  <state name="NOTIFY_CRR_PENDING" autorun="yes">
-    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
-        resulting_state="PENDING">
-        <condition name="crr_cond_pending_notification_send"/>
-    </action>
-    <action name="crr_send_pending_notification"
-        resulting_state="PENDING">
-        <condition name="!crr_cond_pending_notification_send"/>
-    </action>
-  </state>
-
-  <state name="FLAG_NOTIFY_SEND" autorun="yes">
-    <action name="crr_flag_pending_notification_send"
-        resulting_state="PENDING">
-    </action>
+        resulting_state="CHECK_FOR_REVOCATION">                
+        <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>        
+    </action>    
   </state>
 
   <state name="PENDING">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING</description>
-    <action name="crr_edit_request"
-        resulting_state="EDIT_REQUEST">
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_INVALIDITY_TIME"
+        resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_INVALIDITY_TIME"/>
+      <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
+    </action>        
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_REASON"/>
       <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
-	    resulting_state="CHECK_APPROVALS">
+	    resulting_state="APPROVAL">
       <condition name="I18N_OPENXPKI_WF_ACL_CRR_APPROVE"/>
-      <!-- Comment this condition to allow RA Operators to approve their own CRRs -->
-      <!--  <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/> -->
+      <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
       <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
@@ -74,31 +55,54 @@
       <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
-        resulting_state="SUCCESS">
-        <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
-    </action>
+        resulting_state="CHECK_FOR_REVOCATION">                
+        <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>        
+    </action>   
   </state>
 
-
-  <!-- This renders the update form and the action clears the approvals  -->
-  <state name="EDIT_REQUEST">
-    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_EDIT_REQUEST</description>
-    <action name="crr_update_request"
-        resulting_state="PENDING">
+  <state name="APPROVAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_APPROVAL</description>
+    <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+	    resulting_state="CRR_CHECK_FOR_DELAYED_REVOKE">
+      <condition name="I18N_OPENXPKI_WF_ACL_REVOKE_CERTIFICATE"/>
+      <condition name="I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS"/>
+      <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>      
     </action>
+    <!-- perhaps we need more than one approval or                 -->
+    <!-- perhaps the first approval was from a not authorized role -->
+    <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CRR"
+	    resulting_state="APPROVAL">
+      <condition name="I18N_OPENXPKI_WF_ACL_CRR_APPROVE"/>
+      <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/>
+      <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+	    resulting_state="PENDING">
+      <condition name="I18N_OPENXPKI_WF_ACL_CRR_CANCEL_APPROVAL"/>
+      <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
+	    resulting_state="REJECTED">
+      <condition name="I18N_OPENXPKI_WF_ACL_CRR_REJECT"/>
+      <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
+    </action>
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+        resulting_state="CHECK_FOR_REVOCATION">                
+        <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>        
+    </action>   
   </state>
-
+         
   <state name="CRR_CHECK_FOR_DELAYED_REVOKE" autorun="yes">
     <action name="I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION"
-        resulting_state="CRR_PERSIST">
+        resulting_state="CRR_PERSIST">        
           <condition name="I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION"/>
     </action>
     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
             resulting_state="CRR_PERSIST">
       <condition name="!I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION"/>
-    </action>
+    </action>       
   </state>
-
+         
   <state name="CRR_PERSIST" autorun="yes">
     <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
 	    resulting_state="NICE_DISPATCH_REVOKE">
@@ -109,23 +113,23 @@
       <condition name="!I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
     </action>
   </state>
-
-  <state name="NICE_DISPATCH_REVOKE" autorun="yes">
+    
+  <state name="NICE_DISPATCH_REVOKE" autorun="yes">    
     <action name="I18N_OPENXPKI_WF_ACTION_NICE_REVOKE_CERTIFICATE"
-	    resulting_state="CHECK_FOR_REVOCATION" />
+	    resulting_state="CHECK_FOR_REVOCATION" />          
   </state>
-
-  <state name="CHECK_FOR_REVOCATION" autorun="yes">
-    <!-- Loop as long as the certificate is not revoked or max checks is reached
-       All the loop magic is done by the workflow engine, the activity wont proceed
+  
+  <state name="CHECK_FOR_REVOCATION" autorun="yes">   	
+    <!-- Loop as long as the certificate is not revoked or max checks is reached 
+       All the loop magic is done by the workflow engine, the activity wont proceed 
        as long as the certificate is not revoked   -->
   	<action name="I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION"
   		resulting_state="SUCCESS"
-  		retry_count="30"
-  		retry_interval="+000000000015">
- 	</action>
+  		retry_count="30"     
+  		retry_interval="+000000000015">       	  		
+ 	</action> 	 	
   </state>
-
+ 
   <state name="REJECTED" autorun="yes">
     <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
             resulting_state="FAILURE">

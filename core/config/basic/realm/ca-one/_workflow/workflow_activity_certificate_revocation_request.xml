@@ -52,7 +52,19 @@
      </validator>
   </action>
 
+  <action name="I18N_OPENXPKI_WF_ACTION_REVOKE_CERTIFICATE"
+      class="Workflow::Action::Null">
+  </action>
+
+  <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
+      class="OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest">
+  </action>
+
   <action name="crr_edit_request"
+      class="Workflow::Action::Null">
+  </action>
+
+  <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
       class="Workflow::Action::Null">
   </action>
 
@@ -86,12 +98,8 @@
   </action>
 
 
-  <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CRR"
-	  class="OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest">
-  </action>
-
-  <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CRR"
-	  class="Workflow::Action::Null">
+  <action name="I18N_OPENXPKI_WF_ACTION_CANCEL_CRR_APPROVAL"
+         class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
   </action>
 
   <action name="I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION"
