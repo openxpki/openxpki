@@ -1,4 +1,4 @@
-## OpenXPKI::Server::API::Workflow.pm 
+## OpenXPKI::Server::API::Workflow.pm
 ##
 ## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
@@ -222,7 +222,7 @@ sub list_context_keys {
              $context_table . '.WORKFLOW_CONTEXT_KEY',
         ],
 	    DYNAMIC => {
-                "$workflow_table.WORKFLOW_TYPE" => {VALUE => $arg_ref->{'WORKFLOW_TYPE'}}, 
+                "$workflow_table.WORKFLOW_TYPE" => {VALUE => $arg_ref->{'WORKFLOW_TYPE'}},
                 "$workflow_table.PKI_REALM"     => {VALUE => CTX('session')->get_pki_realm()},
 	    },
         JOIN => [ [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ] ],
@@ -298,49 +298,49 @@ sub get_workflow_info {
     my $workflow = $factory->fetch_workflow(
         $wf_title,
         $wf_id
-    );        
+    );
 
     return __get_workflow_info($workflow);
 }
 
 sub get_workflow_ui_info {
-    
+
     ##! 1: 'start'
-    
+
     my $self  = shift;
     my $args  = shift;
-    
+
     my $factory;
     my $result;
-       
+
     # TODO FIXME - poking into the workflow internals is not that nice
     # TODO - this should become the default workflow info structure
-    
+
     # initial info receives a workflow title
     my ($wf_type, $wf_description, $wf_state);
-    my @activities;     
+    my @activities;
     if (!$args->{ID}) {
-        
+
         $factory = __get_workflow_factory();
         my $wf_config = $factory->_get_workflow_config($args->{WORKFLOW});
         $wf_type = $wf_config->{type};
         $wf_description = $wf_config->{description};
         $wf_state = 'INITIAL';
-        # extract the action in the initial state from the config        
+        # extract the action in the initial state from the config
         foreach my $state (@{$wf_config->{state}}) {
             next if ($state->{name} ne 'INITIAL');
             @activities = ($state->{action}->[0]->{name});
-            last;                      
+            last;
         }
-        
+
         $result->{WORKFLOW} = {
             TYPE        => $wf_type,
-            DESCRIPTION => $wf_description,                
+            DESCRIPTION => $wf_description,
         };
-        
+
     } else {
         my $wf_id = $args->{ID};
-        my $wf_title =  $args->{WORKFLOW} || $self->get_workflow_type_for_id({ ID => $wf_id });        
+        my $wf_title =  $args->{WORKFLOW} || $self->get_workflow_type_for_id({ ID => $wf_id });
         # FIXME TODO - refactor handles!
         # commit to get a current snapshot of the database in the
         # highest isolation level.
@@ -355,36 +355,36 @@ sub get_workflow_ui_info {
             $wf_title,
             $wf_id
         );
-        
-        $result = __get_workflow_info( $workflow );       
-        ##! 32: 'Workflow result ' . Dumper $result   
+
+        $result = __get_workflow_info( $workflow );
+        ##! 32: 'Workflow result ' . Dumper $result
         if ($args->{ACTIVITY}) {
             @activities = ( $args->{ACTIVITY} );
         } else {
             # Note - the ACTIVITY Hash in the result of __get_workflow_info
-            # contains only activities that have fields! 
-            @activities = $workflow->get_current_actions();    
+            # contains only activities that have fields!
+            @activities = $workflow->get_current_actions();
         }
         $wf_state = $workflow->state();
     }
-            
-    
+
+
     $result->{ACTIVITY} = {};
-    foreach my $wf_action (@activities) { 
+    foreach my $wf_action (@activities) {
         $result->{ACTIVITY}->{$wf_action} = $factory->get_activity_info( $wf_action );
-    } 
-            
+    }
+
     # drill down into the state definition to find the ui setting
     foreach my $state (@{$factory->{_workflow_config}->{$result->{WORKFLOW}->{TYPE}}->{state}}) {
         next unless ($state->{name} eq $wf_state);
         $result->{STATE} = { DESCRIPTION => $state->{description} || '' };
         if ($state->{uihandle}) {
-            $result->{STATE}->{UIHANDLE} = $state->{uihandle}; 
+            $result->{STATE}->{UIHANDLE} = $state->{uihandle};
         }
     }
- 
+
     return $result;
-    
+
 }
 
 sub get_workflow_history {
@@ -418,7 +418,7 @@ sub execute_workflow_activity {
     my $wf_activity = $args->{ACTIVITY};
     my $wf_params   = $args->{PARAMS};
 
-    ##! 32: 'params ' . Dumper $wf_params  
+    ##! 32: 'params ' . Dumper $wf_params
 
     if (! defined $wf_title) {
         $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
@@ -436,14 +436,14 @@ sub execute_workflow_activity {
 	    $wf_title,
 	    $wf_id
     );
-    
+
     $workflow->reload_observer();
 
     # check the input params
-    my $params = $self->__validate_input_param( $workflow, $wf_activity, $wf_params );    
+    my $params = $self->__validate_input_param( $workflow, $wf_activity, $wf_params );
     ##! 16: 'activity params ' . $params
-    
-    my $context = $workflow->context();    
+
+    my $context = $workflow->context();
     $context->param ( $params ) if ($params);
 
     ##! 64: Dumper $workflow
@@ -495,19 +495,19 @@ sub get_workflow_activities_params {
 	return \@list;
 }
 
-=head2 create_workflow_instance 
+=head2 create_workflow_instance
 
 Limitations and Requirements:
 
 Each workflow MUST start with a state called INITIAL and MUST have exactly
 one action. The factory presets the context value for creator with the current
-session user, the inital action SHOULD set the context value 'creator' to the 
+session user, the inital action SHOULD set the context value 'creator' to the
 id of the (associated) user of this workflow if this differs from the system
 user. Note that the creator is afterwards attached to the workflow
 as attribtue and would not update if you set the context value later!
 
 Workflows that fail on complete the inital action are NOT saved and can not
-be continued.   
+be continued.
 
 =cut
 sub create_workflow_instance {
@@ -527,16 +527,16 @@ sub create_workflow_instance {
 	        params => { WORKFLOW => $wf_title }
 	    );
     }
-    
+
     $workflow->reload_observer();
 
     ## init creator
-    my $wf_id = $workflow->id();    
+    my $wf_id = $workflow->id();
     my $context = $workflow->context();
     my $creator = CTX('session')->get_user();
-    $context->param( 'creator'  => $creator );    
+    $context->param( 'creator'  => $creator );
     $context->param( 'creator_role'  => CTX('session')->get_role() );
-    
+
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->log(
         MESSAGE  => "Workflow instance $wf_id created for $creator (type: '$wf_title')",
@@ -547,7 +547,7 @@ sub create_workflow_instance {
 
     # load the first state and check for the initial action
     my $state = undef;
-    
+
     my @actions = $workflow->get_current_actions();
     if (not scalar @actions || scalar @actions != 1) {
         OpenXPKI::Exception->throw (
@@ -556,19 +556,19 @@ sub create_workflow_instance {
         );
     }
     my $initial_action = shift @actions;
-    
+
     ##! 8: "initial action: " . $initial_action
-    
+
     # check the input params
-    my $params = $self->__validate_input_param( $workflow, $initial_action, $args->{PARAMS} );    
+    my $params = $self->__validate_input_param( $workflow, $initial_action, $args->{PARAMS} );
     ##! 16: ' initial params ' . Dumper  $params
-    
+
     $context->param ( $params ) if ($params);
 
     ##! 64: Dumper $workflow
-    
+
     $self->__execute_workflow_activity( $workflow, $initial_action );
-    
+
     # FIXME - ported from old factory but I do not understand if this ever can happen..
     # From theory, the workflow should throw an exception if the action can not be handled
     # Workflow is still in initial state - so something went wrong.
@@ -579,19 +579,19 @@ sub create_workflow_instance {
                 logger => CTX('log'),
                 priority => 'error',
                 facility => [ 'system', 'workflow' ]
-            }            
-        );        
-    }    
-    
-    # check back for the creator in the context and copy it to the attribute table    
+            }
+        );
+    }
+
+    # check back for the creator in the context and copy it to the attribute table
     # doh - somebody deleted the creator from the context
     if (!$context->param( 'creator' )) {
-        $context->param( 'creator' => $creator );        
+        $context->param( 'creator' => $creator );
     }
     $workflow->attrib({ creator => $context->param( 'creator' ) });
-            
+
     return __get_workflow_info($workflow);
-    
+
 }
 
 sub get_workflow_activities {
@@ -761,7 +761,7 @@ sub search_workflow_instances {
                          $workflow_table . '.WORKFLOW_TYPE',
                          $workflow_table . '.WORKFLOW_STATE',
                          $workflow_table . '.WORKFLOW_PROC_STATE',
-                         $workflow_table . '.WORKFLOW_WAKEUP_AT' 
+                         $workflow_table . '.WORKFLOW_WAKEUP_AT'
                     ],
         JOIN     => [
                          \@joins,
@@ -777,26 +777,26 @@ sub search_workflow_instances {
     ##! 16: 'result: ' . Dumper $result
     return $result;
 }
- 
+
 ###########################################################################
 # private functions
 
 sub __get_workflow_factory {
     ##! 1: 'start'
-    
+
     my $arg_ref = shift;
-    
+
     # No Workflow - just get the standard factory
     if (!$arg_ref->{WORKFLOW_ID}) {
         ##! 16: 'No workflow id - create factory from session info'
         return CTX('workflow_factory')->get_factory();
     }
 
-    # Fetch the serialized session from the workflow table        
+    # Fetch the serialized session from the workflow table
     ##! 16: 'determine factory for workflow ' . $arg_ref->{WORKFLOW_ID}
     my $wf = CTX('dbi_workflow')->first(
         TABLE   => 'WORKFLOW',
-        KEY => $arg_ref->{WORKFLOW_ID}                            
+        KEY => $arg_ref->{WORKFLOW_ID}
     );
     if (! defined $wf) {
         OpenXPKI::Exception->throw(
@@ -806,7 +806,7 @@ sub __get_workflow_factory {
             },
         );
     }
-    my $pki_realm = $wf->{PKI_REALM};    
+    my $pki_realm = $wf->{PKI_REALM};
     my $wf_session_info = CTX('session')->parse_serialized_info($wf->{WORKFLOW_SESSION});
     if (!$wf_session_info || ref $wf_session_info ne 'HASH' || !$wf_session_info->{config_version}) {
         OpenXPKI::Exception->throw(
@@ -817,8 +817,8 @@ sub __get_workflow_factory {
             },
         );
     }
-   
-     
+
+
     # We have now obtained the configuration id that was active during
     # creation of the workflow instance. However, if for some reason
     # the matching configuration is not available we have two options:
@@ -828,7 +828,7 @@ sub __get_workflow_factory {
     # Option 1 is not ideal: if the corresponding configuration has for
     # some reason be deleted from the database the workflow cannot be
     # instantiated any longer. This is often not really a problem but
-    # sometimes this will lead to severe problems, e. g. for long 
+    # sometimes this will lead to severe problems, e. g. for long
     # running workflows. unfortunately, if a workflow cannot be instantiated
     # it can neither be displayed, nor executed.
     # In order to make things a bit more robust fall back to using a newer
@@ -842,33 +842,33 @@ sub __get_workflow_factory {
 
     my $factory;
     eval {
-        $factory = CTX('workflow_factory')->get_factory({ 
-            PKI_REALM => $pki_realm, 
-            VERSION => $wf_session_info->{config_version} 
+        $factory = CTX('workflow_factory')->get_factory({
+            PKI_REALM => $pki_realm,
+            VERSION => $wf_session_info->{config_version}
         });
     };
     my $exc = OpenXPKI::Exception->caught();
     # We were unsuccessful in restoring the factory for an older version - try to get it for the head version
     if (defined $exc && $exc->message() eq 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_FACTORY_UNKNOWN_VERSION_REQUESTED') {
-        $factory = CTX('workflow_factory')->get_factory({ 
-            PKI_REALM => $pki_realm, 
+        $factory = CTX('workflow_factory')->get_factory({
+            PKI_REALM => $pki_realm,
             VERSION => CTX('config')->get_head_version()
-        });        
-        
+        });
+
         CTX('log')->log(
             MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config version ' . $wf_session_info->{config_version} . ' (falling back to current head ' . CTX('config')->get_head_version() . ')',
             PRIORITY => 'warn',
             FACILITY => 'workflow',
         );
     }
-    
-    ##! 64: 'factory: ' . Dumper $factory    
+
+    ##! 64: 'factory: ' . Dumper $factory
     if (! defined $factory) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED',
         );
     }
-    
+
     return $factory;
 }
 
@@ -890,12 +890,12 @@ sub __get_workflow_info {
 	    COUNT_TRY  => $workflow->count_try(),
 	    WAKE_UP_AT  => $workflow->wakeup_at(),
 	    REAP_AT  => $workflow->reap_at(),
-	    CONTEXT => { 
-		%{$workflow->context()->param()} 
+	    CONTEXT => {
+		%{$workflow->context()->param()}
 	    },
 	},
     };
-    
+
     # this stuff seems to be unused and does not reflect the attributes
     # invented for the new ui stuff
     foreach my $activity ($workflow->get_current_actions()) {
@@ -907,7 +907,7 @@ sub __get_workflow_info {
     eval {
         @fields = $workflow->get_action_fields($activity);
     };
-    
+
     foreach my $field (@fields) {
         ##! 4: $field->name()
         $result->{ACTIVITY}->{$activity}->{FIELD}->{$field->name()} =
@@ -917,35 +917,35 @@ sub __get_workflow_info {
         };
     }
     }
-    
+
     return $result;
 }
 
 # validate the parameters given against the field spec of the current activity
 # uses positional params: workflow, activity, params
 # for now, we do NOT check on types or even requirement to not breal old stuff
-# TODO - implement check for type and requirement (perhaps using a validator 
-# and db transations would be the best way) 
+# TODO - implement check for type and requirement (perhaps using a validator
+# and db transations would be the best way)
 sub __validate_input_param {
-    
+
     my $self = shift;
     my $workflow = shift;
     my $wf_activity = shift;
     my $wf_params   = shift || {};
-    
+
     ##! 2: "check parameters"
     if (!defined $wf_params || scalar keys %{ $wf_params } == 0) {
-        return undef;             
+        return undef;
     }
-        
+
     my %fields = ();
     foreach my $field ($workflow->get_action_fields($wf_activity)) {
         $fields{$field->name()} = 1;
     }
-    
+
     # throw exception on fields not listed in the field spec
     # todo - perhaps build a filter from the spec and tolerate additonal params
-    
+
     my $result;
     foreach my $key (keys %{$wf_params}) {
         if (not exists $fields{$key}) {
@@ -969,14 +969,14 @@ sub __validate_input_param {
     }
 
     return $result;
-} 
+}
 
 sub __execute_workflow_activity {
-    
+
     my $self = shift;
     my $workflow = shift;
     my $wf_activity = shift;
-    
+
     ##! 64: Dumper $workflow
     eval {
         $workflow->execute_action($wf_activity);
@@ -996,15 +996,11 @@ sub __execute_workflow_activity {
             facility => 'workflow',
         };
 
-        ## normal OpenXPKI exception
-        $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
-
-    
         # FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID
         # The old ui validates requests by probing them against the create method
         # and ignores the missing field error by string parsing
         # we therefore need to keep that behaviour until decomissioning the old UI
-        # The string is from in Workflow::Validator::HasRequiredField    
+        # The string is from in Workflow::Validator::HasRequiredField
         if (index ($eval , "The following fields require a value:") > -1) {
             ## missing field(s) in workflow
             $eval =~ s/^.*://;
@@ -1013,6 +1009,13 @@ sub __execute_workflow_activity {
                 params  => {FIELDS => $eval}
             );
         }
+
+        ## This MUST be after the compat block as our workflow  class
+        ## transforms any errors into OXI Exceptions now! (breaks mason otherwise)
+
+        ## normal OpenXPKI exception
+        $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
+
 
         ## workflow exception
         my $error = $workflow->context->param('__error');
@@ -1050,7 +1053,7 @@ sub __execute_workflow_activity {
             log     => $log,
         );
     };
- 
+
     return 1;
 }
 1;
@@ -1148,5 +1151,5 @@ number of results instead of the results themselves.
 
 =head2 __get_workflow_factory
 
-Get a suitable factory from handler. If a workflow id is given, the config 
-version and realm are extracted from the workflow system. 
+Get a suitable factory from handler. If a workflow id is given, the config
+version and realm are extracted from the workflow system.
