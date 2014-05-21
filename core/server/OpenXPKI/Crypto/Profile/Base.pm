@@ -308,8 +308,8 @@ sub load_extension
     elsif ($ext eq "netscape.certificate_type")
     {
         my @bits = ( "ssl_client", "smime_client", "object_signing",
-                     "ssl_client_ca", "smime_client_ca", "object_signing_ca" );
- 
+                     "ssl_client_ca", "smime_client_ca", "object_signing_ca", "ssl_server", "reserved" );
+
         foreach my $bit (@bits) {
             push @values, $bit if (  $config->get("$path.$bit") );    
         }                      

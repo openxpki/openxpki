@@ -17,10 +17,26 @@ sub startup {
         }
     );
 
-    my $config = $self->plugin( 'JSONConfig',
-        'file' => '/etc/enroller-ui/enroller.json' );
+    my $shortname = `hostname -s`;
+    chomp $shortname;
+    my $cfgfile;
+    foreach my $f ( '/etc/enroller-ui/enroller-' . $shortname . '.json',
+        '/etc/enroller-ui/enroller.json' )
+    {
+        if ( -f $f ) {
+            $cfgfile = $f;
+            last;
+        }
+    }
+
+    if ( not $cfgfile ) {
+        die "Error: no configuration file (e.g. enroller.json) found";
+    }
+    warn "$0: reading config from $cfgfile";
+    my $config = $self->plugin( 'JSONConfig', 'file' => $cfgfile );
 
     if ( my $templates_local = $config->{templates_local} ) {
+
         unshift @{ $self->renderer->paths }, $templates_local;
     }
 
@@ -53,7 +69,7 @@ sub startup {
         ->name('upload');
 
     # Download (Get Cert)
-    $r->post('/:group/getcert/:certid')->to(
+    $r->get('/:group/getcert/:certid')->to(
         controller => 'getcert',
         action     => 'getcert',
         config     => $config

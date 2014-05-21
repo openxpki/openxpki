@@ -638,6 +638,8 @@ sub __get_extensions
             $config .= "sslCA,"   if (grep /ssl_client_ca/, @bits);
             $config .= "objCA,"   if (grep /object_signing_ca/, @bits);
             $config .= "emailCA," if (grep /smime_client_ca/, @bits);
+            $config .= "server," if (grep /ssl_server/, @bits);
+            $config .= "reserved," if (grep /reserved/, @bits);
             $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
             $config .= "\n";
         }

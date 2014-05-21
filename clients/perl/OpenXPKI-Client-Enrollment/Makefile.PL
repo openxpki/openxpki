@@ -40,6 +40,7 @@ WriteMakefile(
         'Proc::SafeExec'    => 0,
         'Config::Std'       => 0, # only needed for current build scripts
         'Moose'             => 0, # only needed for test, but include anyway
+        'Template'          => '2.25', # convenient for config/deploy scripts
     },
     test => {TESTS => 't/*/*.t t/*.t'},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

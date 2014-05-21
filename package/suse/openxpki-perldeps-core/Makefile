@@ -10,13 +10,21 @@
 # 	cpan/<cpan mirror tree>
 #
 #	MIRROR_DIR = /mirrors
+#
+# If you need additional CPAN modules in addition to the prereqs from
+# core/server/Makefile.PL, just set the variable CPAN_ADDON in your
+# Makefile.local
 
 TOPDIR=../../..
 
+ifndef SRCNAME
 SRCNAME				= core
+endif
 PACKAGE				= openxpki-perldeps-$(SRCNAME)
 PERLNAME			= $(PACKAGE)
-SRCBASE				= $(TOPDIR)/core/server
+ifndef SRCBASE
+SRCBASE				:= $(TOPDIR)/core/server
+endif
 
 RPMBUILD_DIR		= $(HOME)/rpmbuild
 RPM_SOURCE_TARBALL	= $(RPMBUILD_DIR)/SOURCES/$(PACKAGE).tar.gz
@@ -29,11 +37,11 @@ include ../Makefile.inc
 
 VERGEN := $(TOPDIR)/tools/vergen
 
-VERSION := $(shell $(VERGEN) --format version)
-PKGREL := $(shell $(VERGEN) --format PKGREL)
+VERSION = $(shell $(VERGEN) --format version)
+PKGREL = $(shell $(VERGEN) --format PKGREL)
 
 PERL_ROOT=/usr/share/$(PERLNAME)
-PERL_VERSION=5.16.3
+PERL_VERSION=5.18.2
 PERL_5_BASEURL=http://ftp.gwdg.de/pub/languages/perl/CPAN/src/5.0
 PERL_SOURCE_TARBALL=perl-$(PERL_VERSION).tar.bz2
 PERL_SOURCE_URL=$(PERL_5_BASEURL)/$(PERL_SOURCE_TARBALL)
@@ -208,6 +216,11 @@ build-cpan: $(PERL_ROOT)/.build-cpan
 $(PERL_ROOT)/.build-cpan: $(NEWCPANM)
 	PATH=$(NEW_PERL_BIN):$(PATH) $(NEWCPANM) $(CPANM_OPTS) --quiet --notest Config::Std
 	(cd $(SRCBASE) && PATH=$(NEW_PERL_BIN):$(PATH) $(NEWCPANM) $(CPANM_OPTS) --quiet --installdeps --notest .)
+ifdef CPAN_ADDON
+	PATH=$(NEW_PERL_BIN):$(PATH) \
+		 $(NEWCPANM) $(CPANM_OPTS) \
+		 --quiet --notest $(CPAN_ADDON)
+endif
 	touch $@
 
 .PHONY: build-tarball
