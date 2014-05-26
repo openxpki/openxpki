@@ -5,7 +5,7 @@ aptitude update
 
 # Install mysql without password (no prompt)
 DEBIAN_FRONTEND=noninteractive aptitude install --assume-yes mysql-server
-aptitude install --assume-yes --allow-untrusted libdbd-mysql-perl libopenxpki-perl openxpki-i18n
+aptitude -o Dpkg::Options::="--force-overwrite" install --assume-yes --allow-untrusted libdbd-mysql-perl libopenxpki-perl openxpki-i18n
 
 echo " 
 CREATE database openxpki;
@@ -19,6 +19,9 @@ openxpkiadm initdb
 
 # create certificates 
 bash /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh
+
+# Need to pickup new group 
+/etc/init.d/apache2 restart
 
 # Start
 openxpkictl start
