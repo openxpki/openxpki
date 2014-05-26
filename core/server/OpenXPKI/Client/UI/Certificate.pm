@@ -61,8 +61,7 @@ sub init_search {
                 { name => 'san', label => 'SAN', type => 'text', is_optional => 1 },
                 { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', editable => 1, options => \@states },
                 { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list },
-                { name => 'meta_requestor', label => 'Requestor', type => 'text', is_optional => 1 },
-                { name => 'meta_email', label => 'Req. eMail', type => 'text', is_optional => 1 },
+                { name => 'meta', label => 'Metadata', 'keys' => [{ value => "meta_requestor", label=> "Requestor" },{ value => "meta_email", label => "eMail" }], type => 'text', is_optional => 1, 'clonable' => 1 },
                 ]
         }},
         {   type => 'text', content => {
@@ -398,10 +397,14 @@ sub action_search {
 
     $self->logger()->debug("query : " . Dumper $self->cgi()->param());
 
+    # the extended search attribtues are clonables and therefore
+    # are suffixed with array brackets
     foreach my $key (qw(meta_requestor meta_email)) {
-        my $val = $self->param($key);
-        if (defined $val && $val ne '') {
-            push @attr, [ $key , $val ];
+        my @val = $self->param($key.'[]');
+        if (scalar @val > 0) {
+            while (my $val = shift @val) {
+                push @attr, [ $key , $val ];
+            }
         }
     }
 
