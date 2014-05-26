@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use lib qw(
-  /usr/lib/perl5/ 
+  /usr/lib/perl5/
   ../../lib
 );
 
@@ -39,7 +39,7 @@ my $test = OpenXPKI::Test::More->new(
 $test->set_verbose($cfg{instance}{verbose});
 
 $test->plan( tests => 8 );
- 
+
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<', $cfg{instance}{buffer};
@@ -53,7 +53,7 @@ my $cert_identifier = $input_data->{'cert_identifier'};
 
 $test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier')
  || die "Unable to proceed without Certificate Identifier: $@";
- 
+
 
 # Login to use socket
 $test->connect_ok(
@@ -64,9 +64,9 @@ $test->connect_ok(
 # First try an autoapproval request
 
 my %wfparam = (
-	cert_identifier => $cert_identifier,	    
+	cert_identifier => $cert_identifier,
 );
-    
+
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA' , \%wfparam, 'Create Workflow')
  or die "Workflow Create failed: $@";
 
@@ -75,7 +75,7 @@ $test->state_is('DATA_UPDATE');
 $test->execute_ok( 'changemeta_update_context', {
     'meta_email[]' => $serializer->serialize( ['uli.update@openxpki.local' ]),
     'meta_requestor' => 'Uli Update',
-    'meta_system_id' => '12345'    
+    'meta_system_id' => '',
 });
 
 $test->state_is('CHOOSE_ACTION');
@@ -85,4 +85,4 @@ $test->execute_ok( 'changemeta_persist' );
 $test->state_is('SUCCESS');
 
 $test->disconnect();
- 
+
