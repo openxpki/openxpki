@@ -18,6 +18,7 @@ my %tmp_of     :ATTR;
 my %pkcs7_of   :ATTR;
 my %engine_of  :ATTR;
 my %error_of   :ATTR;
+my %hash_alg_of  :ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -27,12 +28,13 @@ sub START {
     $tmp_of   {$ident} = $arg_ref->{TMP};
     $pkcs7_of {$ident} = $arg_ref->{PKCS7};
     $error_of {$ident} = $arg_ref->{'ERROR_CODE'};
+    $hash_alg_of {$ident} = $arg_ref->{HASH_ALG};
 }
 
 sub get_command {
     my $self  = shift;
     my $ident = ident $self;
-    
+
     # keyfile, signcert, passin
     if (! defined $engine_of{$ident}) {
         OpenXPKI::Exception->throw(
@@ -74,7 +76,13 @@ sub get_command {
             }
         );
     }
-    my $command = " -new -passin env:pwd -signcert $certfile -msgtype CertRep -status FAILURE -failinfo $error_of{$ident} -keyfile $keyfile -inform DER -in $in_filename -outform DER -out $outfile_of{$ident} "; 
+
+    my $command = " -new -passin env:pwd -signcert $certfile -msgtype CertRep -status FAILURE -failinfo $error_of{$ident} -keyfile $keyfile -inform DER -in $in_filename -outform DER -out $outfile_of{$ident} ";
+
+    if ($hash_alg_of{$ident}) {
+        $command .= ' -'.$hash_alg_of{$ident};
+    }
+
     return $command;
 }
 

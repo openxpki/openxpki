@@ -66,6 +66,7 @@ my $iprange = $config{global}{iprange};
 my $profile = $config{global}{profile};
 my $server  = $config{global}{servername};
 my $enc_alg = $config{global}{encryption_algorithm};
+my $hash_alg = $config{global}{hash_algorithm};
 
 my $log;
 my $log_config = $config{global}{log_config};
@@ -124,7 +125,8 @@ else {
         OPERATION  => $operation,
         MESSAGE    => $message,
         SERVER     => $server,
-        ENCRYPTION_ALGORITHM => $enc_alg
+        ENCRYPTION_ALGORITHM => $enc_alg,
+        HASH_ALGORITHM => $hash_alg
         });
     if (! defined $scep_client) {
         die "SCEP client not defined";

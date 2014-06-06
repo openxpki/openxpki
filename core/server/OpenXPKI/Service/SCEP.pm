@@ -45,9 +45,11 @@ sub init {
     CTX('session')->set_server($server);
     my $encryption_alg = $self->__init_encryption_alg();
     CTX('session')->set_enc_alg($encryption_alg);
-    
+    my $hash_alg = $self->__init_hash_alg();
+    CTX('session')->set_hash_alg($hash_alg);
+
     #my $context = $self->__init_context_parameter();
-    
+
     CTX('session')->set_user($server);
 
     return 1;
@@ -75,7 +77,7 @@ sub __init_profile : PRIVATE {
         # this is an uncaught exception
     }
 
-    # Retrieve the profiles from the connector       
+    # Retrieve the profiles from the connector
     my @profiles = $config->get_keys('profile');
     my %profiles = map {$_ => 1} @profiles;
 
@@ -116,11 +118,11 @@ sub __init_server : PRIVATE {
 
         # this is an uncaught exception
     }
-    
+
     # Retrieve valid scep server configurations from the connector
     my @scep_config = $config->get_keys('scep');
     my %scep_config = map {$_ => 1} @scep_config;
-    
+
     if ($scep_config{$requested_server})
     {
         # the server is valid
@@ -132,6 +134,45 @@ sub __init_server : PRIVATE {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVICE_SCEP_INVALID_SERVER_REQUESTED",
             params  => { REQUESTED_SERVER => $requested_server },
+        );
+    }
+}
+
+sub __init_hash_alg : PRIVATE {
+    ##! 4: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $arg_ref = shift;
+
+    my $realm = CTX('session')->get_pki_realm();
+
+    my $message = $self->collect();
+    ##! 16: "message collected: " . Dumper($message)
+    my $requested_hash_alg;
+    if ( $message =~ /^SELECT_HASH_ALGORITHM (.*)/ ) {
+        $requested_hash_alg = lc($1);
+        ##! 16: "requested encryption_alg: $requested_encryption_alg"
+    }
+    else {
+        OpenXPKI::Exception->throw( message =>
+                "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_HASH_ALGORITHM_RECEIVED",
+        );
+
+        # this is an uncaught exception
+    }
+    if (  $requested_hash_alg eq 'md5'
+        || $requested_hash_alg =~ /sha(1|224|256|384|512)/i )
+    {
+        # the encryption_alg is valid
+        $self->talk('OK');
+        return $requested_hash_alg;
+    }
+    else {    # the requested encryption algorithm is invalid
+        $self->talk('NOTFOUND');
+        OpenXPKI::Exception->throw(
+            message =>
+                "I18N_OPENXPKI_SERVICE_SCEP_INVALID_ALGORITHM_REQUESTED",
+            params => { REQUESTED_ALGORITHM => $requested_hash_alg },
         );
     }
 }
@@ -176,9 +217,9 @@ sub __init_encryption_alg : PRIVATE {
 }
 
 sub __init_session : PRIVATE {
-    
+
     ##! 4: 'start'
-    
+
     my $self  = shift;
     my $ident = ident $self;
     my $arg   = shift;
@@ -187,7 +228,7 @@ sub __init_session : PRIVATE {
 
     $session = OpenXPKI::Server::Session->new({
         DIRECTORY => CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),                       
+        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
     });
 
     # use a mock session to save the PKI realm in
@@ -201,7 +242,7 @@ sub __init_pki_realm : PRIVATE {
     my $arg   = shift;
 
     ##! 1: "start"
- 
+
     my $message = $self->collect();
     ##! 16: "message collected: $message"
     my $requested_realm;
@@ -212,7 +253,7 @@ sub __init_pki_realm : PRIVATE {
     else {
         OpenXPKI::Exception->throw( message =>
                 "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PKI_REALM_RECEIVED", );
-    }  
+    }
 
     if (defined CTX('config')->get_meta("system.realms.$requested_realm")) {
     #if ( defined $realms{$requested_realm}->{NAME} ) {    # the realm is valid
@@ -245,12 +286,12 @@ sub __init_context_parameter: PRIVATE {
     else {
         OpenXPKI::Exception->throw( message =>
             "I18N_OPENXPKI_SERVICE_SCEP_NO_SET_PARAMETER_RECEIVED", );
-    }  
+    }
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $context = $serializer->deserialize($serialized_data));
-    
+
     return $context;
-} 
+}
 =cut
 
 sub run {

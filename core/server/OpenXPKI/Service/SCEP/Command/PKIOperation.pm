@@ -49,10 +49,10 @@ sub execute {
     my $result;
 
     my $params = $self->get_PARAMS();
-    
-    my $url_params = $params->{URLPARAMS} || {}; 
-    
-    my $pkcs7_base64 = $params->{MESSAGE};    
+
+    my $url_params = $params->{URLPARAMS} || {};
+
+    my $pkcs7_base64 = $params->{MESSAGE};
     ##! 64: 'pkcs7_base64: ' . $pkcs7_base64
     my $pkcs7_decoded = decode_base64($pkcs7_base64);
 
@@ -60,7 +60,7 @@ sub execute {
     my $pki_realm = CTX('session')->get_pki_realm();
     my $server    = CTX('session')->get_server();
 
-    my $token = $self->__get_token();    
+    my $token = $self->__get_token();
 
     my $message_type_ref = $token->command(
         {   COMMAND => 'get_message_type',
@@ -74,7 +74,7 @@ sub execute {
         $result = $self->__pkcs_req(
             {   TOKEN => $token,
                 PKCS7 => $pkcs7_base64,
-                PARAMS => $url_params, 
+                PARAMS => $url_params,
             }
         );
     }
@@ -84,7 +84,7 @@ sub execute {
         $result = $self->__pkcs_req(
             {   TOKEN => $token,
                 PKCS7 => $pkcs7_base64,
-                PARAMS => $url_params,                
+                PARAMS => $url_params,
             }
         );
     }
@@ -94,15 +94,16 @@ sub execute {
         $result = $self->__send_cert(
             {   TOKEN => $token,
                 PKCS7 => $pkcs7_decoded,
-                PARAMS => $url_params,                
+                PARAMS => $url_params,
             }
         );
 
-    }    
+    }
     else {
         $result = $token->command(
             {   COMMAND      => 'create_error_reply',
                 PKCS7        => $pkcs7_decoded,
+                HASH_ALG     => CTX('session')->get_hash_alg(),
                 'ERROR_CODE' => 'badRequest',
             }
         );
@@ -116,15 +117,15 @@ sub execute {
 =head2 __get_workflow_type
 
 Read the workflow type that this server is configured for from the connector.
- 
-=cut 
+
+=cut
 sub __get_workflow_type : PRIVATE {
-    
+
     my $self      = shift;
     my $server    = CTX('session')->get_server();
-    
+
     my $workflow_type = CTX('config')->get("scep.$server.workflow_type");
-    
+
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_NO_WORKFLOW_TYPE_DEFINED",
         params => {
@@ -132,13 +133,13 @@ sub __get_workflow_type : PRIVATE {
             REALM =>  CTX('session')->get_pki_realm()
         }
     ) unless($workflow_type);
-    
+
     return $workflow_type;
 }
 
 =head2 __send_cert
 
-Create the response for the GetCert request by extracting the serial number 
+Create the response for the GetCert request by extracting the serial number
 from the request, find the certificate and return it.
 
 =cut
@@ -146,26 +147,26 @@ from the request, find the certificate and return it.
 sub __send_cert : PRIVATE {
     my $self      = shift;
     my $arg_ref   = shift;
-    
+
     my $token = $arg_ref->{TOKEN};
     my $pkcs7_decoded = $arg_ref->{PKCS7};
-    
-    my $requested_serial_hex = $token->command({   
+
+    my $requested_serial_hex = $token->command({
         COMMAND => 'get_getcert_serial',
         PKCS7   => $pkcs7_decoded,
     });
 
     # Serial is in Hex Format - we need decimal!
-    my $mbi = Math::BigInt->from_hex( "0x$requested_serial_hex" );       
+    my $mbi = Math::BigInt->from_hex( "0x$requested_serial_hex" );
     my $requested_serial_dec = scalar $mbi->bstr();
-    
+
     ##! 16: 'Found serial - hex: ' . $requested_serial_hex . ' - dec: ' . $requested_serial_dec
-                    
+
     my $cert_result = CTX('api')->search_cert({ 'CERT_SERIAL' => $requested_serial_dec });
-    
-    ##! 32: 'Search result ' . Dumper $cert_result 
+
+    ##! 32: 'Search result ' . Dumper $cert_result
     my $cert_count = scalar @{$cert_result};
-    
+
     # more than one - no usable result
     if ($cert_count > 1) {
         OpenXPKI::Exception->throw(
@@ -181,26 +182,27 @@ sub __send_cert : PRIVATE {
                 priority => 'error',
                 facility => 'application',
             },
-        );          
+        );
     }
-    
+
     if ($cert_count == 0) {
          CTX('log')->log(
             MESSAGE => "SCEP getcert - no certificate found for serial $requested_serial_hex",
             PRIORITY => 'info',
             FACILITY => 'application',
-        );             
-        
+        );
+
         return $token->command(
             {   COMMAND      => 'create_error_reply',
                 PKCS7        => $pkcs7_decoded,
+                HASH_ALG     => CTX('session')->get_hash_alg(),
                 'ERROR_CODE' => 'badCertId',
             }
-        );  
+        );
     }
-    
+
     my $cert_identifier  = $cert_result->[0]->{'IDENTIFIER'};
-    ##! 16: 'Load Cert Identifier ' . $cert_identifier 
+    ##! 16: 'Load Cert Identifier ' . $cert_identifier
     my $cert_pem = CTX('api')->get_cert({ 'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'PEM' });
 
     ##! 16: 'cert data ' . Dumper $cert_pem
@@ -208,6 +210,7 @@ sub __send_cert : PRIVATE {
         {   COMMAND        => 'create_certificate_reply',
             PKCS7          => $pkcs7_decoded,
             CERTIFICATE    => $cert_pem,
+            HASH_ALG       => CTX('session')->get_hash_alg(),
             ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
         }
     );
@@ -237,13 +240,13 @@ depends on the status:
   - if the status is 'SUCCESS', the certificate is extracted from the
     workflow and returned to the SCEP client.
   - if the status is 'FAILURE' and the retry interval has not elapsed,
-    the failure code is extracted from the workflow and returned to 
-    the client. 
+    the failure code is extracted from the workflow and returned to
+    the client.
   - if the status is 'FAILURE' and the retry interval has elapsed,
-    the failed workflow is unlinked from this transaction id and a 
+    the failed workflow is unlinked from this transaction id and a
     new one is started
-   
-=cut 
+
+=cut
 
 sub __pkcs_req : PRIVATE {
     my $self      = shift;
@@ -267,7 +270,7 @@ sub __pkcs_req : PRIVATE {
             PKCS7   => $pkcs7_decoded,
         }
     );
-    
+
     CTX('log')->log(
         MESSAGE => "SCEP incoming request, id $transaction_id",
         PRIORITY => 'info',
@@ -275,11 +278,11 @@ sub __pkcs_req : PRIVATE {
     );
 
     my $workflow_id = 0;
-    my $wf_info; # filled in either one of the branches 
-        
+    my $wf_info; # filled in either one of the branches
+
     # Search transaction id in datapool
-    CTX('dbi_backend')->commit();    
-    my $res = CTX('api')->get_data_pool_entry({       
+    CTX('dbi_backend')->commit();
+    my $res = CTX('api')->get_data_pool_entry({
         NAMESPACE => 'scep.transaction_id',
         KEY => "$server:$transaction_id",
     });
@@ -293,31 +296,31 @@ sub __pkcs_req : PRIVATE {
                     TRANSACTION_ID => $transaction_id,
                     DPSTATE => $res->{VALUE}
                 }
-            );                
+            );
         }
         $workflow_id = $res->{VALUE};
     }
-  
+
     ##! 16: "transaction ID: $transaction_id - workflow id: $workflow_id"
 
     if ( $workflow_id ) {
- 
+
         # Fetch the workflow
-        $wf_info = $api->get_workflow_info({   
+        $wf_info = $api->get_workflow_info({
             WORKFLOW => $self->__get_workflow_type(),
             ID       => $workflow_id,
         });
- 
+
         CTX('log')->log(
             MESSAGE => "SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
             PRIORITY => 'info',
             FACILITY => 'application',
-        );        
-         
+        );
+
     } else {
-        
+
         ##! 16: "no workflow was found, creating a new one"
- 
+
         CTX('log')->log(
             MESSAGE => "SCEP try to start new workflow for $transaction_id",
             PRIORITY => 'info',
@@ -334,7 +337,7 @@ sub __pkcs_req : PRIVATE {
             $divides64 = 1;
         }
         $pkcs7_base64 =~ s{ (.{64}) }{$1\n}xmsg;
-        
+
         if ( !$divides64 ) {
             ##! 64: 'pkcs7 length does not divide 64, add an additional newline'
             $pkcs7_base64 .= "\n";
@@ -346,13 +349,13 @@ sub __pkcs_req : PRIVATE {
 
         # get a crypto token of type 'SCEP'
         my $token = $self->__get_token();
-           
+
         my $pkcs10 = $token->command(
             {   COMMAND => 'get_pkcs10',
                 PKCS7   => $pkcs7,
             }
         );
-        
+
         ##! 64: "pkcs10 is " . $pkcs10;
         if ( not defined $pkcs10 || $pkcs10 eq '' ) {
             OpenXPKI::Exception->throw( message =>
@@ -365,20 +368,20 @@ sub __pkcs_req : PRIVATE {
                 PKCS7   => $pkcs7,
             }
         );
-            
-        ##! 64: "signer_cert: " . $signer_cert        
- 
-        # preregister the datapool key to prevent 
+
+        ##! 64: "signer_cert: " . $signer_cert
+
+        # preregister the datapool key to prevent
         # race conditions with parallel workflows
         eval {
-            # prepare the registration record - this will fail if the 
-            # request ran into a race condition       
-            CTX('api')->set_data_pool_entry({       
+            # prepare the registration record - this will fail if the
+            # request ran into a race condition
+            CTX('api')->set_data_pool_entry({
                 NAMESPACE => 'scep.transaction_id',
                 KEY => "$server:$transaction_id",
-                VALUE => 'creating',        
-                EXPIRATION_DATE => time() + 300, # Creating the workflow should never take any longer 
-            });            
+                VALUE => 'creating',
+                EXPIRATION_DATE => time() + 300, # Creating the workflow should never take any longer
+            });
         };
         if ($EVAL_ERROR) {
             OpenXPKI::Exception->throw(
@@ -388,9 +391,9 @@ sub __pkcs_req : PRIVATE {
                     TRANSACTION_ID => $transaction_id,
                 }
             );
-        }  
-        
-        $wf_info = $api->create_workflow_instance({   
+        }
+
+        $wf_info = $api->create_workflow_instance({
                 WORKFLOW => $self->__get_workflow_type(),
                 PARAMS   => {
                     'scep_tid'    => $transaction_id,
@@ -403,9 +406,9 @@ sub __pkcs_req : PRIVATE {
                     'cert_profile' => $profile,
                     'server'       => $server,
 
-                    # necessary to check the signature - volatile only 
+                    # necessary to check the signature - volatile only
                     '_pkcs7' => $pkcs7, # contains scep_tid, signer_cert, csr
-                    
+
                     # Extra url params - as we never write them to the backend,
                     # we can pass the plain hash here (no serialization)
                     '_url_params' => $url_params,
@@ -416,32 +419,32 @@ sub __pkcs_req : PRIVATE {
         ##! 16: 'wf_info: ' . Dumper $wf_info
         $workflow_id = $wf_info->{WORKFLOW}->{ID};
         ##! 16: 'workflow_id: ' . $workflow_id
-        
+
         CTX('log')->log(
             MESSAGE => "SCEP started new workflow with id $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
             PRIORITY => 'info',
             FACILITY => 'application',
         );
-        
-        # Record the scep tid and the workflow in the datapool                 
-        CTX('api')->set_data_pool_entry({       
+
+        # Record the scep tid and the workflow in the datapool
+        CTX('api')->set_data_pool_entry({
             NAMESPACE => 'scep.transaction_id',
             KEY => "$server:$transaction_id",
             VALUE => $workflow_id,
             FORCE => 1,
          });
-    } 
-    
+    }
+
     # We should now have a workflow object,
     # either a reloaded or a freshly created one
-    
+
     ##! 64: 'wf_info ' . Dumper $wf_info
-           
+
     my $wf_state = $wf_info->{WORKFLOW}->{STATE};
-    
-    ##! 16: 'Workflow state ' . $wf_state 
-    
-    if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {        
+
+    ##! 16: 'Workflow state ' . $wf_state
+
+    if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {
         CTX('log')->log(
             MESSAGE => "SCEP $workflow_id in state $wf_state, send pending reply",
             PRIORITY => 'info',
@@ -450,34 +453,35 @@ sub __pkcs_req : PRIVATE {
 
         # we are still pending
         my $pending_msg = $token->command(
-            {   COMMAND => 'create_pending_reply',
-                PKCS7   => $pkcs7_decoded,
+            {   COMMAND  => 'create_pending_reply',
+                PKCS7    => $pkcs7_decoded,
+                HASH_ALG => CTX('session')->get_hash_alg(),
             }
         );
         return $pending_msg;
     }
-        
-    if ( $wf_state eq 'SUCCESS' ) {  
+
+    if ( $wf_state eq 'SUCCESS' ) {
         # the workflow is finished,
         # get the certificate from the workflow
-        
+
         my $cert_identifier = $wf_info->{WORKFLOW}->{CONTEXT}->{'cert_identifier'};
         ##! 32: 'cert_identifier: ' . $cert_identifier
- 
+
         if (!$cert_identifier) {
             # Fallback for old workflows
             my $csr_serial = $wf_info->{WORKFLOW}->{CONTEXT}->{'csr_serial'};
             ##! 32: 'csr serial ' . $csr_serial
- 
+
             my $csr_result = $api->search_cert({ CSR_SERIAL => $csr_serial });
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_CSR_SERIAL_FALLBACK_FAILED'
             ) if (ref $csr_result ne 'ARRAY' || scalar @{ $csr_result } != 1);
 
-            $cert_identifier = $csr_result->[0]->{IDENTIFIER};  
+            $cert_identifier = $csr_result->[0]->{IDENTIFIER};
 
         }
-       
+
         if (!$cert_identifier) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_CERT_IDENTIFIER_MISSING'
@@ -504,6 +508,7 @@ sub __pkcs_req : PRIVATE {
                 PKCS7          => $pkcs7_decoded,
                 CERTIFICATE    => $certificate,
                 ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
+                HASH_ALG       => CTX('session')->get_hash_alg(),
             }
         );
 
@@ -515,7 +520,7 @@ sub __pkcs_req : PRIVATE {
 
         return $certificate_msg;
     }
-        
+
     ##! 32: 'FAILURE'
     my $error_code = $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
     if ( !defined $error_code ) {
@@ -538,6 +543,7 @@ sub __pkcs_req : PRIVATE {
     my $error_msg = $token->command(
         {   COMMAND      => 'create_error_reply',
             PKCS7        => $pkcs7_decoded,
+            HASH_ALG     => CTX('session')->get_hash_alg(),
             'ERROR_CODE' => $error_code,
         }
     );
@@ -546,4 +552,4 @@ sub __pkcs_req : PRIVATE {
 
 1;    # magic one at the end of module
 __END__
- 
+
