@@ -387,33 +387,6 @@ sub execute {
     my $cert_count = scalar(@{$certs});
     $context->param('num_active_certs' => $cert_count );
 
-
-
-
-    # If no active certs are found, check if we have a renewal and check if
-    # the signer certificate is in the grace period
-    if (!$cert_count && $signer_subject eq $csr_subject && $signer_hash) {
-
-        my $grace = $config->get("scep.$server.grace_period") || 0;
-        ##! 32: 'Checking certs in the grace period: ' . $grace
-        if ($grace) {
-            my $grace_expiry = OpenXPKI::DateTime::get_validity({
-                VALIDITY       => '-' . $grace,
-                VALIDITYFORMAT => 'relativedate',
-            })->epoch();
-
-            if ($signer_hash->{NOTAFTER} > $grace_expiry) {
-                ##! 32: 'Signer cert is in grace period'
-                $cert_count = 1;
-                CTX('log')->log(
-                    MESSAGE => "SCEP Signer $signer_identifier is in grace period",
-                    PRIORITY => 'info',
-                    FACILITY => ['audit','application'],
-                );
-            }
-        }
-    }
-
     # Check if the request was received within the renewal window
     # We check the validity of the signer certificate against the renewal window
     # Note - the in_renew_window flag will become misslieading if we are not in an
