@@ -16,6 +16,9 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 
+# Make sure the underlying connector is recent
+use Connector 1.08;
+
 extends 'Connector::Multi';
 
 has '+BASECONNECTOR' => ( required => 0 );
@@ -175,8 +178,9 @@ sub get_scalar_as_list {
     if ($meta && $meta->{TYPE} eq 'list') {
         @values = $self->get_list( $path );
     } else {
-        @values = ( $self->get( $path ) );
-    }   
+        my $val = ( $self->get( $path ) );
+        @values = ( $val ) if (defined $val);
+    }
     ##! 16: 'values ' . Dumper @values
     return @values;
 }
