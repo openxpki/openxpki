@@ -311,6 +311,7 @@ sub execute {
             );
         }
         $context->param('signer_cert_identifier' => $signer_hash->{IDENTIFIER});
+        $context->param('signer_cert_subject' => $signer_hash->{SUBJECT});
     } else {
         $context->param('signer_status_revoked' => '0');
     }
