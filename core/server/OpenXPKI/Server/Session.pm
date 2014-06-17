@@ -116,6 +116,8 @@ sub export_serialized_info{
 sub import_serialized_info {
     my $self = shift;
     my $serialized_string = shift;
+    my $args = shift;
+
     unless($serialized_string){
         OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_SESSION_IMPORT_SERIALIZED_STRING_CAN_NOT_BE_EMPTY"
@@ -131,8 +133,12 @@ sub import_serialized_info {
     }
     my @import_keys = $self->_get_persitence_keys();
 
-    foreach my $key (@import_keys){
-        $self->{session}->param($key, $info->{$key});
+    foreach my $key (@import_keys) {
+        # We use the setter as there might be extra actions!
+        if (defined $info->{$key} && !$args->{'skip_'.$key}) {
+            my $call = "set_".$key;
+            $self->$call( $info->{$key} );
+        }
     }
 }
 
@@ -460,8 +466,10 @@ Currently the fields are user role config_version.
 Return a key/value hash with the keys named in _get_persitence_keys.
 
 =head3 import_serialized_info
-Reset the values of the current session to the values of the passed
-hash.
+
+Pass a string with the serialized info as obtained by export_serialized_info.
+The parameters overwrite the current session settings. You can add a hash a
+second parameter with I<skip_variable_name =\> 1> to skip certain values.
 
 =head3 parse_serialized_info
 

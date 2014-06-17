@@ -807,7 +807,20 @@ sub __get_workflow_factory {
             },
         );
     }
-    my $pki_realm = $wf->{PKI_REALM};
+
+    # We can not load workflows from other realms as this will break config and security
+    # The watchdog switches the session realm before instantiating a new factory
+    if (CTX('session')->get_pki_realm() ne $wf->{PKI_REALM}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_REALM_MISSMATCH',
+            params  => {
+                WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
+                WORKFLOW_REALM => $wf->{PKI_REALM},
+                SESSION_REALM => CTX('session')->get_pki_realm()
+            },
+        );
+    }
+
     my $wf_session_info = CTX('session')->parse_serialized_info($wf->{WORKFLOW_SESSION});
     if (!$wf_session_info || ref $wf_session_info ne 'HASH' || !$wf_session_info->{config_version}) {
         OpenXPKI::Exception->throw(
@@ -844,17 +857,14 @@ sub __get_workflow_factory {
     my $factory;
     eval {
         $factory = CTX('workflow_factory')->get_factory({
-            PKI_REALM => $pki_realm,
             VERSION => $wf_session_info->{config_version}
         });
     };
     my $exc = OpenXPKI::Exception->caught();
     # We were unsuccessful in restoring the factory for an older version - try to get it for the head version
+    # FIXME Should perhaps better move into get_factory as it might be useful elsewhere
     if (defined $exc && $exc->message() eq 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_FACTORY_UNKNOWN_VERSION_REQUESTED') {
-        $factory = CTX('workflow_factory')->get_factory({
-            PKI_REALM => $pki_realm,
-            VERSION => CTX('config')->get_head_version()
-        });
+        $factory = CTX('workflow_factory')->get_factory();
 
         CTX('log')->log(
             MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config version ' . $wf_session_info->{config_version} . ' (falling back to current head ' . CTX('config')->get_head_version() . ')',
