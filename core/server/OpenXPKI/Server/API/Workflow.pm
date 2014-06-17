@@ -399,9 +399,10 @@ sub get_workflow_history {
         DYNAMIC => {
             WORKFLOW_SERIAL => {VALUE => $wf_id},
         },
+        ORDER => [ 'WORKFLOW_HISTORY_DATE', 'WORKFLOW_HISTORY_SERIAL' ]
     );
     # sort ascending (unsorted within seconds)
-    @{$history} = sort { $a->{WORKFLOW_HISTORY_SERIAL} <=> $b->{WORKFLOW_HISTORY_SERIAL} } @{$history};
+    #@{$history} = sort { $a->{WORKFLOW_HISTORY_SERIAL} <=> $b->{WORKFLOW_HISTORY_SERIAL} } @{$history};
     ##! 64: 'history: ' . Dumper $history
 
     return $history;
