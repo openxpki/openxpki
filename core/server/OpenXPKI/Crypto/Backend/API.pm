@@ -5,7 +5,7 @@
 ## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Backend::API;
 use base qw( OpenXPKI::Crypto::API );
-	
+
 use strict;
 use warnings;
 
@@ -35,8 +35,8 @@ sub __init_command_params : PRIVATE {
     my $self = shift;
 
     ## application of the crypto layer policy: names of crypto algorithms should be defined in the crypto backend
-    ## now implemented for the public key algoriths only 
- 
+    ## now implemented for the public key algoriths only
+
     ## define params for all the crypto commands except 'create_key'
     my $command_params = {
     "list_algorithms" => {"FORMAT"        => 1,
@@ -61,7 +61,7 @@ sub __init_command_params : PRIVATE {
     "convert_pkcs10"  => {"DATA" => 1,
                           "IN"   => [ 'DER', 'PEM' ],
                           "OUT"  => [ 'DER', 'PEM', 'TXT']
-                         },   
+                         },
     "create_pkcs10"   => {"PASSWD"  => 0,
                           "KEY"     => 0,
                           "SUBJECT" => 1},
@@ -103,25 +103,26 @@ sub __init_command_params : PRIVATE {
                           "KEY"     => 0,
                           "CERT"    => 0,
                           "CONTENT" => 1},
-    "pkcs7_verify"    => {"CHAIN"   => 0,
-                          "CONTENT" => 1,
+    "pkcs7_verify"    => {"CHAIN"   => 0, # optional only when NO_VERIFY is set
+                          "NO_CHAIN" => 0,
+                          "CONTENT" => 0,
                           "PKCS7"   => 1},
     "verify_cert"    =>  {"CHAIN"   => 0,
                           "CERTIFICATE" => 1,
-                          "TRUSTED"   => 1},                          
+                          "TRUSTED"   => 1},
     };
-    
-    ## assign the specified value to the command_params attribute  
+
+    ## assign the specified value to the command_params attribute
     $self->set_command_params($command_params);
 
     ## ask crypto backend for supported public key algorithms and their params
     ## for this execute a command 'list_algorithms'
     my $supported_algs;
-    $supported_algs = $self->command({COMMAND       => "list_algorithms",                                                                                   
+    $supported_algs = $self->command({COMMAND       => "list_algorithms",
                                       FORMAT        => "all_data"});
 
     ## extract public key algorithms names and appropriate params from the answer of the backend
-    my @types = ();  
+    my @types = ();
     my $parameters;
     while (my ($alg, $params) = each(%{$supported_algs})) {
         push @types, $alg;
@@ -150,7 +151,7 @@ sub START {
     ## check for missing but required parameters
 
     $self->__init_command_params();
-    
+
     ##! 16: 'after __init_command_params()'
     ##! 16: 'get_command_params() child: ' . Dumper($self->get_command_params())
     ##FIXME - create useful checks
@@ -159,7 +160,7 @@ sub START {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_NAME");
         }
-        
+
         if (not exists $arg_ref->{TOKEN_TYPE}) {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_MISSING_TOKEN_TYPE");
@@ -171,7 +172,7 @@ sub START {
     foreach my $key (keys %{$arg_ref})
     {
         next if (grep /^$key$/, ("TMP", "NAME",
-                                 "TOKEN_TYPE", 
+                                 "TOKEN_TYPE",
                                  "CERTIFICATE", "SECRET"));
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_NEW_ILLEGAL_PARAMETER",
@@ -361,15 +362,15 @@ __END__
 
 OpenXPKI::Crypto::Backend::API - API for cryptographic backends.
 
-=head1 Description   
-    
+=head1 Description
+
 this is the basic class for crypto backend API. It inherits from
 OpenXPKI::Crypto::API
-        
+
 =head1 Functions
-     
+
 =head2 START
- 
+
 is the constructor.
 
 =head2 get_cmd_param

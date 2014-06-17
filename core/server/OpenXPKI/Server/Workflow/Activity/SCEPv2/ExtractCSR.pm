@@ -322,14 +322,14 @@ sub execute {
     $context->param('signer_sn_matches_csr' => ($signer_subject eq $csr_subject) ? 1 : 0);
 
     # Validate the signature
-    my $pkcs7_token = CTX('crypto_layer')->get_system_token({ TYPE => 'PKCS7' });
     my $pkcs7 = $context->param('_pkcs7');
 
     ##! 64: 'PKCS7: ' . $pkcs7
     my $sig_valid;
     eval {
-        $pkcs7_token->command({
-            COMMAND => 'verify',
+        $default_token->command({
+            COMMAND => 'pkcs7_verify',
+            NO_CHAIN => 1,
             PKCS7   => $pkcs7,
         });
     };
@@ -339,6 +339,11 @@ sub execute {
             MESSAGE => "Invalid SCEP signature; CSR subject: " . $context->param('cert_subject'),
             PRIORITY => 'warn',
             FACILITY => ['audit','application'],
+        );
+        CTX('log')->log(
+            MESSAGE => "SCEP signature failed, reason $EVAL_ERROR",
+            PRIORITY => 'debug',
+            FACILITY => ['application'],
         );
         $context->param('signer_signature_valid' => 0);
     } else {

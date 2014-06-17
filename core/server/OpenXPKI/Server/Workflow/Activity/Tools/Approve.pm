@@ -28,7 +28,7 @@ sub execute
     my $context   = $workflow->context();
     my $user      = CTX('session')->get_user();
     my $role      = CTX('session')->get_role();
-    my $pki_realm = CTX('session')->get_pki_realm(); 
+    my $pki_realm = CTX('session')->get_pki_realm();
 
     if (defined $context->param('_check_hash')) {
         # compute SHA1 hash over the serialization of the context,
@@ -49,7 +49,7 @@ sub execute
         my $context_hash = sha1_hex($serialized_context);
 
         ##! 16: 'context_hash: ' . $context_hash
-        
+
         if ($context_hash ne $context->param('_check_hash')) {
             # this means that the context changed, do not approve
             # and throw an exception
@@ -101,14 +101,11 @@ sub execute
                 . "-----END PKCS7-----\n";
 
         ##! 32: 'pkcs7: ' . $pkcs7
-        my $pkcs7_token = CTX('crypto_layer')->get_system_token({
-            TYPE      => 'PKCS7',            
-        });
 
         my $default_token = CTX('api')->get_default_token();
         my @signer_chain = @{ $default_token->command({
             COMMAND        => 'pkcs7_get_chain',
-            PKCS7          => $pkcs7,        
+            PKCS7          => $pkcs7,
         }) };
         ##! 64: 'signer_chain: ' . Dumper \@signer_chain
 
@@ -116,10 +113,10 @@ sub execute
             TOKEN => $default_token,
             DATA  => $signer_chain[0]
         );
-        
+
         my $sig_identifier = $x509_signer->get_identifier();
-        my $signer_subject = $x509_signer->get_subject();              
-        
+        my $signer_subject = $x509_signer->get_subject();
+
         if (! defined $sig_identifier || $sig_identifier eq '') {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER',
@@ -130,13 +127,13 @@ sub execute
                 },
             );
         }
-        
+
         CTX('log')->log(
             MESSAGE => 'Signed approval for workflow ' . $workflow->id() . " by user $user, role $role",
             PRIORITY => 'info',
             FACILITY => ['audit', 'application' ],
         );
-        
+
         # look for already present approvals by someone with the same
         # certificate and role
         if ($self->param('multi_role_approval') &&
@@ -204,7 +201,7 @@ sub execute
     );
 
     $context->param ('approvals' => $approvals);
- 
+
     return 1;
 }
 

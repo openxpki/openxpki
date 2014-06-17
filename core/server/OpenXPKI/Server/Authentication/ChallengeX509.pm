@@ -20,19 +20,19 @@ use Moose;
 extends 'OpenXPKI::Server::Authentication::X509';
 
 use Data::Dumper;
-  
+
 
 sub login_step {
-    ##! 1: 'start' 
+    ##! 1: 'start'
     my $self    = shift;
     my $arg_ref = shift;
- 
+
     my $name    = $arg_ref->{HANDLER};
     my $msg     = $arg_ref->{MESSAGE};
 
     if (! exists $msg->{PARAMS}->{CHALLENGE} ||
         ! exists $msg->{PARAMS}->{SIGNATURE}) {
-        ##! 4: 'no login data received (yet)' 
+        ##! 4: 'no login data received (yet)'
         # The challenge is just the session ID, so we do not have to
         # remember the challenge (which could only be done in the
         # session anyways as people might talk to different servers
@@ -42,7 +42,7 @@ sub login_step {
         # save the pending challenge to check later that we
         # received a valid challenge
 
-        return (undef, undef, 
+        return (undef, undef,
             {
 		SERVICE_MSG => "GET_X509_LOGIN",
 		PARAMS      => {
@@ -53,7 +53,7 @@ sub login_step {
             },
         );
     }
-    
+
 
         ##! 2: 'login data / signature received'
         my $challenge = $msg->{PARAMS}->{CHALLENGE};
@@ -87,16 +87,18 @@ sub login_step {
               '-----BEGIN PKCS7-----' . "\n"
             . $signature
             . '-----END PKCS7-----';
-        my $pkcs7_token = CTX('crypto_layer')->get_system_token({ TYPE => "PKCS7" });
-          
+        my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });
+
         ##! 64: ' Signature blob: ' . $pkcs7
-        ##! 64: ' Challenge: ' . $challenge          
-            
+        ##! 64: ' Challenge: ' . $challenge
+
         eval {
-            $pkcs7_token->command({
-                COMMAND => 'verify',
+            # FIXME - this needs testing
+            $default_token->command({
+                COMMAND => 'pkcs7_verify',
+                NO_CHAIN => 1,
                 PKCS7   => $pkcs7,
-                DATA    => $challenge,
+                CONTENT => $challenge,
             });
         };
         if ($EVAL_ERROR) {
@@ -105,19 +107,19 @@ sub login_step {
             );
         }
         ##! 16: 'signature valid'
-        
-        
+
+
         # Looks like firefox adds \r to the p7
         $pkcs7 =~ s/\r//g;
         my $validate = CTX('api')->validate_certificate({
         	PKCS7 => $pkcs7,
-        	ANCHOR => $self->trust_anchors(),        	        	
+        	ANCHOR => $self->trust_anchors(),
         });
-        
+
         return $self->_validation_result( $validate );
-        
+
 }
- 
+
 
 1;
 __END__
@@ -130,5 +132,4 @@ OpenXPKI::Server::Authentication::ChallengeX509 - certificate based authenticati
 
 Send the user a challenge to be signed by the browser. Requires a supported browser.
 
-See OpenXPKI::Server::Authentication::X509 for configuration options. 
- 
+See OpenXPKI::Server::Authentication::X509 for configuration options.
