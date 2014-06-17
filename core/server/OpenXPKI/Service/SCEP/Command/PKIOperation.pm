@@ -347,9 +347,6 @@ sub __pkcs_req : PRIVATE {
         #### Extract CSR from pkcs7
         my $pkcs7 = "-----BEGIN PKCS7-----\n" . $pkcs7_base64 . "-----END PKCS7-----\n";
 
-        # get a crypto token of type 'SCEP'
-        my $token = $self->__get_token();
-
         my $pkcs10 = $token->command(
             {   COMMAND => 'get_pkcs10',
                 PKCS7   => $pkcs7,
