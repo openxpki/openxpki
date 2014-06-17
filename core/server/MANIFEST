@@ -83,11 +83,6 @@ OpenXPKI/Crypto/Tool/SCEP/Command/create_pending_reply.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_signer_cert.pm
 OpenXPKI/Crypto/Tool/SCEP/Command/get_getcert_serial.pm
 OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
-OpenXPKI/Crypto/Tool/PKCS7.pm
-OpenXPKI/Crypto/Tool/PKCS7/CLI.pm
-OpenXPKI/Crypto/Tool/PKCS7/API.pm
-OpenXPKI/Crypto/Tool/PKCS7/Engine/OpenSSL.pm
-OpenXPKI/Crypto/Tool/PKCS7/Command/verify.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/CLI.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/API.pm

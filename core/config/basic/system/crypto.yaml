@@ -23,14 +23,6 @@ token:
 
         # random file to use for OpenSSL
         randfile: /var/openxpki/rand       
-        
-    pkcs7:
-        backend: OpenXPKI::Crypto::Tool::PKCS7
-        api: OpenXPKI::Crypto::Tool::PKCS7::API 
-        engine:  OpenSSL        
-        key_store: OPENXPKI
-        shell: /usr/bin/openca-sv
-        randfile: /var/openxpki/rand       
      
     javaks:
         backend: OpenXPKI::Crypto::Tool::CreateJavaKeystore
