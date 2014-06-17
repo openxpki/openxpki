@@ -48,6 +48,9 @@ OpenXPKI/Client/UI/Workflow/Metadata.pm
 OpenXPKI/Config/Merge.pm
 OpenXPKI/Config/Test.pm
 
+# Config Connector
+OpenXPKI/Connector/FakeValidity.pm
+
 ## Crypto layer
 
 OpenXPKI/Crypto/API.pm
