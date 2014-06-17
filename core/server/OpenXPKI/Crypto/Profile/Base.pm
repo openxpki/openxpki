@@ -1,4 +1,4 @@
-# OpenXPKI::Crypto::Profile::Base.pm 
+# OpenXPKI::Crypto::Profile::Base.pm
 # Written 2005 by Michael Bell for the OpenXPKI project
 # Copyright (C) 2005-2006 by The OpenXPKI Project
 
@@ -60,33 +60,32 @@ sub load_extension
     ##! 1: 'start'
     my $self  = shift;
     my $args  = shift;
-    my $profile_path = $args->{PATH};    
+    my $profile_path = $args->{PATH};
     my $ext = $args->{EXT};
     my @values  = ();
-    
+
     ##! 32: Dumper ( $args )
-    
+
     my $config = CTX('config');
-           
+
     ##! 4: "Profile: $profile_path, Extension: $ext"
     my $path = "$profile_path.extensions.$ext";
-    
+
     ##! 16: 'path: ' . $path
 
-    my $ext_type = $config->get_meta($path);
     ## is the extension used at all?
-    if (!$ext_type) {
-        ##! 16: "Extension $ext is not used"        
+    if (!$config->exists($path)) {
+        ##! 16: "Extension $ext is not used"
         return 0;
     }
 
     ## is this a critical extension?
 
     my $critical = $config->get("$path.critical");
-    
+
     if ($critical) {
         $critical = 'true';
-    } else {        
+    } else {
         if (!(defined $critical || $ext eq 'oid' )) {
             CTX('log')->log(
                 MESSAGE  => "Critical flag is not set for $ext in profile $profile_path!",
@@ -96,12 +95,12 @@ sub load_extension
         }
         $critical = 'false';
     }
-    
+
     if ($ext eq "basic_constraints")
     {
         $values[0] = ["CA", ($config->get("$path.ca") || 0) ];
         my $path_length = $config->get("$path.path_length");
-        if (defined $path_length) 
+        if (defined $path_length)
         {
             $values[1] = ["PATH_LENGTH", $path_length];
         }
@@ -114,11 +113,11 @@ sub load_extension
         my @bits = ( "digital_signature", "non_repudiation", "key_encipherment",
                      "data_encipherment", "key_agreement", "key_cert_sign",
                      "crl_sign", "encipher_only", "decipher_only" );
-                     
+
         foreach my $bit (@bits) {
-            push @values, $bit if ($config->get("$path.$bit"));    
-        }                     
-                              
+            push @values, $bit if ($config->get("$path.$bit"));
+        }
+
         $self->set_extension (NAME     => "key_usage",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
@@ -128,18 +127,18 @@ sub load_extension
         my $bits_set = $config->get_hash("$path");
         ##! 16: "ext key usage bits: ". Dumper $bits_set
         my @bits = ( "client_auth", "server_auth","email_protection","code_signing","time_stamping");
-        
+
         foreach my $bit (@bits) {
-            push @values, $bit if ( $bits_set->{$bit} );    
+            push @values, $bit if ( $bits_set->{$bit} );
         }
-         
+
         # check keys of hash for numeric oids
         foreach my $oid (keys %{$bits_set}) {
             if ($oid =~ /^\d+(\.\d+)+$/) {
-                push @values, $oid;    
+                push @values, $oid;
             }
-        }          
-    	            
+        }
+
         if (scalar @values)
         {
             $self->set_extension (NAME     => "extended_key_usage",
@@ -148,7 +147,7 @@ sub load_extension
         }
     }
     elsif ($ext eq "subject_key_identifier")
-    {        
+    {
         if ($config->get("$path.hash"))
         {
             $self->set_extension (NAME     => "subject_key_identifier",
@@ -158,11 +157,11 @@ sub load_extension
     }
     elsif ($ext eq "authority_key_identifier")
     {
-        
+
         my @bits = ( "keyid", "issuer" );
         foreach my $bit (@bits) {
-            push @values, $bit if (  $config->get("$path.$bit") );    
-        } 
+            push @values, $bit if (  $config->get("$path.$bit") );
+        }
         if (scalar @values)
         {
             $self->set_extension (NAME     => "authority_key_identifier",
@@ -171,7 +170,7 @@ sub load_extension
         }
     }
     elsif ($ext eq "issuer_alt_name")
-    {        
+    {
         if ($config->get("$path.copy") )
         {
             $self->set_extension (NAME     => "issuer_alt_name",
@@ -181,18 +180,11 @@ sub load_extension
     }
     elsif ($ext eq "crl_distribution_points")
     {
-        
-        my @uri;
-        my $meta = $config->get_meta("$path.uri");
-        if ($meta && $meta->{TYPE} eq 'list') {                
-            @uri = $config->get_list("$path.uri");
-        } else {
-            @uri = ( $config->get("$path.uri") );
-        }
-        
-        # Parse using Template Toolkit 
+
+        my @uri = $config->get_scalar_as_list("$path.uri");
+        # Parse using Template Toolkit
         @values = @{ $self->process_templates(\@uri) };
-        
+
         if (scalar @values)
         {
             $self->set_extension (NAME     => "cdp",
@@ -202,25 +194,17 @@ sub load_extension
     }
     elsif ($ext eq "authority_info_access")
     {
-        
+
         my @bits = ( "keyid", "issuer" );
         foreach my $bit (qw(ca_issuers ocsp)) {
-        
-            my @template_list; 
-            my $meta = $config->get_meta("$path.$bit");
-            if ($meta && $meta->{TYPE} eq 'list') {
-                @template_list = $config->get_list("$path.$bit");
-            } else {
-                my $template = $config->get("$path.$bit");
-                push @template_list, $template if ($template);
-            }
-                     
-            # Parse using Template Toolkit and push result 
+
+            my @template_list = $config->get_scalar_as_list("$path.$bit");
+            # Parse using Template Toolkit and push result
             if (scalar @template_list) {
                 push @values, [uc($bit), $self->process_templates( \@template_list ) ];
-            }                               
+            }
         }
- 
+
     	if (scalar @values)
     	{
             $self->set_extension (NAME     => "authority_info_access",
@@ -230,24 +214,20 @@ sub load_extension
     }
     elsif ($ext eq "user_notice")
     {
-        my $meta = $config->get_meta("$path");
-        if ($meta && $meta->{TYPE} eq 'list') {
-            @values = $config->get_list("$path");
-        } else {
-            @values = ( $config->get("$path") );
-        }
-        
+
+        @values = $config->get_scalar_as_list("$path");
+
         if (scalar @values) {
             $self->set_extension (NAME     => "user_notice",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
         }
-                              
+
     }
     elsif ($ext eq "policy_identifier")
     {
-        
-        @values = $config->get_scalar_as_list("$path.oid");                        
+
+        @values = $config->get_scalar_as_list("$path.oid");
         if (scalar @values)
         {
             $self->set_extension (NAME     => "policy_identifier",
@@ -256,14 +236,9 @@ sub load_extension
         }
     }
     elsif ($ext eq "cps")
-    {        
-        my $meta = $config->get_meta("$path.uri");
-        if ($meta && $meta->{TYPE} eq 'list') {
-            @values = $config->get_list("$path.uri");
-        } else {
-            @values = ( $config->get("$path.uri") );
-        }
+    {
 
+        @values = $config->get_scalar_as_list("$path.uri");
         if (scalar @values)
         {
             $self->set_extension (NAME     => "cps",
@@ -273,21 +248,21 @@ sub load_extension
     }
     elsif ($ext eq "oid")
     {
-            
 
-        my @oids = $config->get_keys("$path");    
-    
+
+        my @oids = $config->get_keys("$path");
+
         # TODO - fix Config::Version and simplify!
         # we need the array syntax if we want to use the oid directly as key
-        # this is currently not working as Config::Versioned does not handle 
-        # the dots in the path correctly, so we offer setting the oid as 
-        # attribute as a fallback 
+        # this is currently not working as Config::Versioned does not handle
+        # the dots in the path correctly, so we offer setting the oid as
+        # attribute as a fallback
         my  @basepath = split /\./, $path;
-        foreach my $name (@oids) {            
-            
+        foreach my $name (@oids) {
+
             my $attr = $config->get_hash( [ @basepath, $name ] );
-            ##! 32: 'oid attributes, name ' . $name. ', attr: ' . Dumper $attr 
-             
+            ##! 32: 'oid attributes, name ' . $name. ', attr: ' . Dumper $attr
+
             # For the moment we just use a single predefined value
             @values = ( $attr->{value} );
             $self->set_extension (NAME     => $attr->{oid} ? $attr->{oid} : $name,
@@ -298,8 +273,8 @@ sub load_extension
     elsif ($ext eq "netscape.comment")
     {
         my $comment = $config->get("$path.text");
-        if ($comment) 
-        { 
+        if ($comment)
+        {
             $self->set_extension (NAME     => "netscape.comment",
                               CRITICAL => $critical,
                               VALUES   => [ $comment ]);
@@ -311,21 +286,21 @@ sub load_extension
                      "ssl_client_ca", "smime_client_ca", "object_signing_ca", "ssl_server", "reserved" );
 
         foreach my $bit (@bits) {
-            push @values, $bit if (  $config->get("$path.$bit") );    
-        }                      
+            push @values, $bit if (  $config->get("$path.$bit") );
+        }
 
         if (scalar @values) {
             $self->set_extension (NAME     => "netscape.certificate_type",
               CRITICAL => $critical,
               VALUES   => [@values]);
         }
-                              
+
     }
     elsif ($ext eq "netscape.cdp")
     {
-        
+
         my $cdp = $config->get("$path.uri");
-        if ($cdp) {            
+        if ($cdp) {
             $self->set_extension (NAME     => "netscape.cdp",
                   CRITICAL => $critical,
                   VALUES   => [$cdp]);
@@ -356,13 +331,13 @@ sub set_extension
     my $name     = $keys->{NAME};
     my $critical = $keys->{CRITICAL};
     my $value    = $keys->{VALUES};
-    
+
     if (! defined $name) {
 	OpenXPKI::Exception->throw(
 	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_NAME_NOT_SPECIFIED",
 	    );
     }
-	
+
     if (! defined $value) {
 	OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_VALUE_NOT_SPECIFIED",
@@ -385,7 +360,7 @@ sub set_extension
 		CRITICALITY => $critical,
 	    });
     }
-    
+
     ##! 16: 'name: ' . $name
     ##! 16: 'critical: ' . $critical
     ##! 16: 'value: ' . Dumper ( $value )
@@ -476,14 +451,14 @@ sub get_named_extensions
 
 Helper method to parse profile items through template toolkit.
 Expects an array of strings containing one TT Template per line.
-Available variables for substitution are 
+Available variables for substitution are
 
 =over
 
-=item ISSUER.x Hash with the subject parts of the issuing certificate. 
+=item ISSUER.x Hash with the subject parts of the issuing certificate.
 
-Note that each key is an array itself, even if there is only a single value in it. 
-Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise 
+Note that each key is an array itself, even if there is only a single value in it.
+Therefore you need to write e.g. ISSUER.OU.0 for the (first) OU entry. Its wise
 to do urlescaping on the output, e.g. [- ISSUER.OU.0 | uri -].
 
 The hash also has ISSUER.DN set with the full dn.
@@ -497,39 +472,39 @@ Offers the keys ALIAS, GROUP, GENERATION as given in the alias table.
 =cut
 
 sub process_templates {
-    
+
     my $self = shift;
-    my $values = shift;    
-    
+    my $values = shift;
+
     # Add ability to use template toolkit - check if there are tags inside
-        
-    ##! 32: ' Test for TT ' . Dumper ( $values )      
+
+    ##! 32: ' Test for TT ' . Dumper ( $values )
     if (! scalar(grep /\[.*\]/, @$values) ) {
         return $values;
     }
-            
+
     ##! 16: 'Tags found - init TT'
     my $tt = Template->new();
 
-    if (not $self->{CACERTIFICATE}) {    
+    if (not $self->{CACERTIFICATE}) {
         $self->{CACERTIFICATE} = CTX('api')->get_certificate_for_alias( { 'ALIAS' => $self->{CA} });
     }
-    my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });    
-    
+    my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });
+
     my $x509 = OpenXPKI::Crypto::X509->new(
         DATA  => $self->{CACERTIFICATE}->{DATA},
         TOKEN => $default_token,
     );
-        
-    # Get Issuer Info from selected ca    
+
+    # Get Issuer Info from selected ca
     my $issuer_info = $x509->{PARSED}->{BODY}->{SUBJECT_HASH};
     $issuer_info->{DN} = $x509->{PARSED}->{BODY}->{SUBJECT};
-      
+
    # Split alias into generation and group name
    $self->{CA} =~ /^(.*)-(\d+)$/;
    my $group = $1;
    my $generation = $2;
- 
+
     my %template_vars = (
         'ISSUER' => $issuer_info,
         'CAALIAS' => {
@@ -537,25 +512,25 @@ sub process_templates {
             'GROUP' => $group,
             'GENERATION' => $generation
         }
-    ); 
-    ##! 32: ' Template Vars ' . Dumper ( %template_vars )  
-    
+    );
+    ##! 32: ' Template Vars ' . Dumper ( %template_vars )
+
     my @newvalues;
-    while (my $template = shift @$values) {  
+    while (my $template = shift @$values) {
         if ($template =~ /\[.+\]/) {
             my $output;
             #$template = '[% TAGS [- -] -%]' .  $template;
-            $tt->process(\$template, \%template_vars, \$output);                    
+            $tt->process(\$template, \%template_vars, \$output);
             ##! 32: ' Tags found - ' . $template . ' -> '. $output
             if($output) {
                 push @newvalues, $output;
-            }                                                         
+            }
         } else {
             push @newvalues, $template;
-        }                
-    }            
-         
-    ##! 64: ' Processed CRL DP ' . Dumper ( @newvalues )        
+        }
+    }
+
+    ##! 64: ' Processed CRL DP ' . Dumper ( @newvalues )
     return \@newvalues;
 }
 
@@ -572,4 +547,4 @@ sub AUTOLOAD {
 1;
 __END__
 
- 
+

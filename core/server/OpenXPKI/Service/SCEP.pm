@@ -255,7 +255,7 @@ sub __init_pki_realm : PRIVATE {
                 "I18N_OPENXPKI_SERVICE_SCEP_NO_SELECT_PKI_REALM_RECEIVED", );
     }
 
-    if (defined CTX('config')->get_meta("system.realms.$requested_realm")) {
+    if (defined CTX('config')->exists("system.realms.$requested_realm")) {
     #if ( defined $realms{$requested_realm}->{NAME} ) {    # the realm is valid
         $self->talk('OK');
         return $requested_realm;

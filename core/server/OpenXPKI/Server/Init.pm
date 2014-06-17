@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Init.pm 
+## OpenXPKI::Server::Init.pm
 ##
 ## Written by Michael Bell for the OpenXPKI project 2005
 ## Copyright (C) 2005 by The OpenXPKI Project
@@ -34,7 +34,7 @@ use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session::Mock;
-                
+
 use OpenXPKI::Crypto::X509;
 
 use OpenXPKI::Serialization::Simple;
@@ -45,28 +45,28 @@ use Data::Dumper;
 use Test::More;
 
 use Digest::SHA qw( sha1_base64 );
- 
+
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution
 # order.
 my @init_tasks = qw(
   config_versioned
-  config_test  
+  config_test
   i18n
   dbi_log
   log
   redirect_stderr
   prepare_daemon
   dbi_backend
-  dbi_workflow  
-  crypto_layer  
-  api  
+  dbi_workflow
+  crypto_layer
+  api
   workflow_factory
   volatile_vault
   authentication
   notification
   server
-  watchdog  
+  watchdog
 );
 #
 
@@ -80,13 +80,13 @@ sub init {
     my $keys = shift;
 
     # We need a valid session to access the realm parts of the config
-    if (!OpenXPKI::Server::Context::hascontext('session')) { 
+    if (!OpenXPKI::Server::Context::hascontext('session')) {
         my $session = OpenXPKI::Server::Session::Mock->new();
-        OpenXPKI::Server::Context::setcontext({'session' => $session});        
+        OpenXPKI::Server::Context::setcontext({'session' => $session});
         if (OpenXPKI::Server::Context::hascontext('config')) {
             CTX('session')->set_config_version( CTX('config')->get_head_version() );
-        }        
-    }    
+        }
+    }
 
     if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
 	log_wrapper(
@@ -107,11 +107,11 @@ sub init {
 
     delete $keys->{TASKS};
 
-    
-    
+
+
   TASK:
     foreach my $task (@tasks) {
-        ##! 16: 'task: ' . $task        
+        ##! 16: 'task: ' . $task
 	if (! exists $is_initialized{$task}) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
@@ -152,7 +152,7 @@ sub init {
 		    PRIORITY => "fatal",
 		    FACILITY => "system",
 		});
-	    
+
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
 		params  => {
@@ -182,9 +182,9 @@ sub init {
 		FACILITY => "system",
 	    });
     }
-    
+
     OpenXPKI::Server::Context::killsession();
-    
+
     return 1;
 }
 
@@ -197,7 +197,7 @@ sub log_wrapper {
 	    foreach my $entry (@log_queue) {
 		CTX('log')->log(
 		    %{$entry},
-		    );	
+		    );
 	    }
 	    @log_queue = ();
 	}
@@ -205,7 +205,7 @@ sub log_wrapper {
 	    %{$arg},
 	    );
     } else {
-	# log system not yet prepared, queue log statement 
+	# log system not yet prepared, queue log statement
 	push @log_queue, $arg;
     }
     return 1;
@@ -232,9 +232,9 @@ sub get_remaining_init_tasks {
 sub __do_init_workflow_factory {
     my $keys = shift;
     ##! 1: 'init workflow factory'
-    
+
     my $workflow_factory = OpenXPKI::Workflow::Handler->new();
-    $workflow_factory->load_default_factories(); 
+    $workflow_factory->load_default_factories();
     OpenXPKI::Server::Context::setcontext({
         workflow_factory => $workflow_factory,
     });
@@ -265,7 +265,7 @@ sub __do_init_config_test {
     });
     return 1;
 }
- 
+
 sub __do_init_i18n {
     ##! 1: "init i18n"
     init_i18n();
@@ -273,19 +273,19 @@ sub __do_init_i18n {
 
 sub __do_init_log {
     ##! 1: "init log"
-    
+
     my $keys = shift;
-    
+
     my $log;
-    
+
     if ($keys->{CLI}) {
         ##! 16 'use cli logger'
-        $log = OpenXPKI::Server::Log::CLI->new();        
+        $log = OpenXPKI::Server::Log::CLI->new();
     } else {
-        ##! 16 'use server logger'        
+        ##! 16 'use server logger'
         $log = get_log();
     }
-        
+
     ### $log
     OpenXPKI::Server::Context::setcontext(
 	{
@@ -301,7 +301,7 @@ sub __do_init_prepare_daemon {
     # create new session
     POSIX::setsid or
 	die "unable to create new session!: $!";
-    
+
     # prepare daemonizing myself
     # redirect filehandles
     open STDOUT, ">/dev/null" or
@@ -354,7 +354,7 @@ sub __do_init_dbi_backend {
 	{
 	    PURPOSE => 'backend',
 	});
-    
+
     OpenXPKI::Server::Context::setcontext(
 	{
 	    dbi_backend => $dbi,
@@ -363,7 +363,7 @@ sub __do_init_dbi_backend {
     CTX('dbi_backend')->connect();
     CTX('dbi_backend')->delete(
         TABLE => 'SECRET',
-        ALL   => 1, 
+        ALL   => 1,
     );
     CTX('dbi_backend')->commit();
     CTX('dbi_backend')->disconnect();
@@ -375,7 +375,7 @@ sub __do_init_dbi_workflow {
 	{
 	    PURPOSE => 'workflow',
 	});
-    
+
     OpenXPKI::Server::Context::setcontext(
 	{
 	    dbi_workflow => $dbi,
@@ -388,7 +388,7 @@ sub __do_init_dbi_log {
 	{
 	    PURPOSE => 'log',
 	});
-    
+
     OpenXPKI::Server::Context::setcontext(
 	{
 	    dbi_log => $dbi,
@@ -447,20 +447,20 @@ sub __do_init_notification {
 
 sub __do_init_watchdog{
     my $keys = shift;
-    
+
     my $config = CTX('config');
-        
+
     my $Watchdog = OpenXPKI::Server::Watchdog->new( {
         user => OpenXPKI::Server::__get_numerical_user_id( $config->get('system.server.user') ),
-        group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )        
+        group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )
     } );
-        
+
     $Watchdog->run() unless ( $config->get('system.watchdog.disabled') );
-            
-    OpenXPKI::Server::Context::setcontext({        
+
+    OpenXPKI::Server::Context::setcontext({
         watchdog => $Watchdog
     });
-    return 1;    
+    return 1;
 }
 
 
@@ -478,7 +478,7 @@ sub init_i18n
         );
     }
     my $language = CTX('config')->get('system.server.i18n.default_language') || 'C';
-     
+
     set_locale_prefix ($prefix);
     set_language      ($language);
 
@@ -495,7 +495,7 @@ sub get_crypto_layer
 
     return OpenXPKI::Crypto::TokenManager->new();
 }
- 
+
 sub get_dbi
 {
     my $args = shift;
@@ -508,9 +508,9 @@ sub get_dbi
     my $dbpath = 'system.database.main';
     if (exists $args->{PURPOSE} && $args->{PURPOSE} eq 'log') {
         ##! 16: 'purpose: log'
-        # if there is a logging section we use it        
-        if ($xml_config->get_meta('system.database.logging')) {
-            ##! 16: 'use logging section'            
+        # if there is a logging section we use it
+        if ($xml_config->exists('system.database.logging')) {
+            ##! 16: 'use logging section'
             $dbpath = 'system.database.logging';
         }
         %params = (LOG => OpenXPKI::Server::Log::NOOP->new());
@@ -520,21 +520,21 @@ sub get_dbi
     }
 
     my $db_config = $xml_config->get_hash($dbpath);
-    
+
     foreach my $key (qw(type name namespace host port user passwd)) {
         ##! 16: "dbi: $key => " . $db_config->{$key}
-        $params{uc($key)} = $db_config->{$key}; 
-    }     
-        
+        $params{uc($key)} = $db_config->{$key};
+    }
+
    $params{SERVER_ID} = $xml_config->get('system.server.node.id');
-   $params{SERVER_SHIFT} = $xml_config->get('system.server.shift');  
-        
-    # environment 
+   $params{SERVER_SHIFT} = $xml_config->get('system.server.shift');
+
+    # environment
     my @env_names = $xml_config->get_keys("$dbpath.environment");
-    
-    foreach my $env_name (@env_names) {    
+
+    foreach my $env_name (@env_names) {
         my $env_value = $xml_config->get_keys("$dbpath.environment.$env_name");
-        $ENV{$env_name} = $env_value;        
+        $ENV{$env_name} = $env_value;
         ##! 4: "DBI Environment: $env_name => $env_value"
     }
 
@@ -634,13 +634,13 @@ to initialize the remaining tasks.
 If called without the TASKS argument the function will perform all steps
 that were not already executed before.
 
-If called with the named argument SILENT set to a true value the 
+If called with the named argument SILENT set to a true value the
 init method does not log successful initialization steps.
 
 =head3 get_remaining_init_tasks
 
 Returns an array of all remaining initialization task names (i. e. all
-tasks that have not yet been executed) in the order they would normally 
+tasks that have not yet been executed) in the order they would normally
 be processed.
 
 =head3 get_workflow_factory
@@ -724,7 +724,7 @@ Undefined 'notbefore' dates are interpreted as 'now' during issuance.
 Relative notafter dates relate to the corresponding notbefore date.
 
 Two sections are contained in the hash: 'endentity' and 'crl'
-The ID of endentity validities is the corresponding role (profile). 
+The ID of endentity validities is the corresponding role (profile).
 The ID of CRL validities is the internal CA name.
 
 
