@@ -1,0 +1,9 @@
+div.row: div.col-md-12
+  =textarea class="form-control" rows=content.textAreaSize.height cols=content.textAreaSize.width  value=content.value
+
+if canReadFile
+  div.row: div.col-md-offset-8.col-md-4 style="position:relative; padding-bottom:34px"
+    =input type="file" class="oxi-file-input"
+else
+  input name="file" id="file" size="27" type="file"
+  iframe name="upload_target" src="" style="width:0;height:0;border:0px solid #fff;"

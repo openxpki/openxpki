@@ -1,0 +1,40 @@
+unless isHidden
+  div class={ :form-group hasError }
+    if isCheckbox
+      div.col-md-2
+    else
+      if isBool
+        div.col-md-2
+      else
+        label.col-md-2.control-label = content.label
+    div.col-md-7
+      if isBool
+        oxifield-bool content=content
+      if isCertIdentifier
+        oxifield-certidentifier content=content
+      if isDate
+        oxifield-date content=content
+      if isDatetime
+        oxifield-datetime content=content
+      if isCheckbox
+        oxifield-checkbox content=content
+      if isPassword
+        oxifield-password content=content
+      if isSelect
+        oxifield-select content=content
+      if isText
+        oxifield-text content=content
+      if isTextarea
+        oxifield-textarea content=content
+      if content.error
+        span.help-block = content.error
+    if content.keys
+      div.col-md-2
+        Em.Select class="form-control" content=content.keys optionValuePath="content.value" optionLabelPath="content.label" value=content.name
+    if content.clonable
+      div.col-md-1
+        if content.isLast
+          button.btn.btn-primary click="addClone": span.glyphicon.glyphicon-plus
+        else
+          button.btn.btn-danger click="delClone": span.glyphicon.glyphicon-minus
+

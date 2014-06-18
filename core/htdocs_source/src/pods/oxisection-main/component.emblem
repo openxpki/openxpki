@@ -1,0 +1,11 @@
+h3 = content.content.label
+div style="margin-bottom:6px;" = content.content.description
+
+if isForm
+  oxisection-form content=content
+if isGrid
+  oxisection-grid content=content
+if isKeyValue
+  oxisection-keyvalue content=content
+if isText
+  oxisection-text content=content

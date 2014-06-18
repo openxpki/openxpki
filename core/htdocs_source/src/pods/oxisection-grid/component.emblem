@@ -1,0 +1,23 @@
+div.table-responsive
+  table class={ :table :table-striped :table-bordered :table-hover content.className }
+    thead
+      tr
+        each columns
+          th style="cursor:pointer; -webkit-user-select:none" click="sort this"
+            span Xstyle="user-select:none" = sTitle
+            if isSorted
+              if isInverted
+                  span.pull-right.glyphicon.glyphicon-sort-by-attributes-alt
+              else
+                  span.pull-right.glyphicon.glyphicon-sort-by-attributes
+    tbody
+      each sortedData
+        tr class={ :context this.className } /click="showContextmenu this"
+          each this
+            td: oxivalue-format content=this
+
+div.dropdown
+  ul class="dropdown-menu" role="menu"
+    each content.content.actions
+      li
+        a tabindex="-1" href="#" = label

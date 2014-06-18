@@ -1,0 +1,32 @@
+/* classes for table-grid */
+
+/*plain grid-row without status */
+tr.gridrow > td {}
+tr.gridrow:hover > td {background-color: #E7E7E7 !important;}
+
+/* certificate specific classes: issued, expired, revoked */
+tr.gridrow-issued > td {}
+tr.gridrow-issued:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-expired > td {color:silver;}
+tr.gridrow-expired:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-revoked > td {background-color: #ebcccc !important;}
+tr.gridrow-revoked:hover > td {background-color: #e6c1c7 !important;}
+
+/* workflow specific classes: success, failed, manual, paused */
+tr.gridrow-success > td {background-color: #dff0d8 !important;}
+tr.gridrow-success:hover > td {background-color: #c9e2b3 !important;}
+tr.gridrow-failed > td {background-color: #ebcccc !important;}
+tr.gridrow-failed:hover > td {background-color: #e6c1c7 !important;}
+tr.gridrow-manual > td {color:silver;}
+tr.gridrow-manual:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-paused > td {background-color: #fbeed5 !important;}
+tr.gridrow-paused:hover > td {background-color: #faf2cc !important;}
+
+
+/**general classes...*/
+tr.gridrow-ok > td {background-color: #dff0d8 !important;}
+tr.gridrow-ok:hover > td {background-color: #c9e2b3 !important;}
+tr.gridrow-warning > td {background-color: #fbeed5 !important;}
+tr.gridrow-warning:hover > td {background-color: #faf2cc !important;}
+tr.gridrow-danger > td {background-color: #ebcccc !important;}
+tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
