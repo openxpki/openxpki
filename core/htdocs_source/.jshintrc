@@ -1,0 +1,17 @@
+{
+    "browser": true,
+    "jquery": true,
+    "curly": true,
+    "eqeqeq": true,
+    "esnext": true,
+    "indent": 4,
+    "trailing": true,
+    "undef": true,
+    "unused": true,
+    "white": false,
+    "predef": [
+        "define",
+        "require",
+        "requirejs"
+    ]
+}

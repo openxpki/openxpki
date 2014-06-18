@@ -1,0 +1,56 @@
+
+@import "../vendor/bootstrap/dist/css/bootstrap.css"
+@import "../vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css"
+@import "oxi.css"
+@import "oxi-grid.css"
+
+.oxi-file-input
+    width:100px
+    position:absolute
+    right:15px
+    visibility:hidden
+
+.oxi-file-input::before
+    visibility:visible
+    position:absolute
+    width:100px
+    height:34px
+    content: 'Select a file'
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+
+.oxi-file-input:hover::before
+    color: #333;
+    text-decoration: none;
+    background-color: #ebebeb;
+    border-color: #adadad;
+
+.oxi-file-input:active::before
+    outline: thin dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+    color: #333;
+    background-color: #ebebeb;
+    border-color: #adadad;
+    background-image: none;
+
+.input-group .twitter-typeahead
+    display: table-cell !important;
+
+.Xmaincontent.ajaxloading
+    display: none

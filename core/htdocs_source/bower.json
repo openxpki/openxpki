@@ -1,0 +1,15 @@
+{
+    "name": "openxpki-web",
+    "dependencies": {
+        "bootstrap": "",
+        "bootstrap-contextmenu": "",
+        "bootstrap3-typeahead": "",
+        "eonasdan-bootstrap-datetimepicker": "",
+        "ember": "",
+        "emblem": "",
+        "jquery": "<2.0.0",
+        "moment": "",
+        "requirejs": ""
+    },
+    "devDependencies": {}
+}

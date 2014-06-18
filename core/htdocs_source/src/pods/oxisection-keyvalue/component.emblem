@@ -1,0 +1,12 @@
+table.table.table-bordered
+  tbody
+    each item in content.content.data
+      tr
+        td = item.label
+        td: oxivalue-format content=item
+
+div.oxi-button-container
+  div.btn-group
+    each btn in content.content.buttons
+      button.btn.btn-default click="execute btn"
+        btn.label

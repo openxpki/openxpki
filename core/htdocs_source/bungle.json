@@ -1,0 +1,257 @@
+{
+    "profiles": {
+        "default": {
+            "description": "Start development server",
+            "config": {
+                "notify.verbose": true
+            }
+        },
+        "build": {
+            "description": "Build bundles and exit",
+            "config": {
+                "reader.continuous": false,
+                "webserver.enabled": false,
+                "jsbundler.enabled": true,
+                "cssbundler.enabled": true,
+                "writer.enabled": true,
+                "hbs2html.context": {
+                    "modules": false,
+                    "es6": false
+                }
+            }
+        }
+    },
+    "pipes": {
+        "reader": {
+            "description": "Read files from disk, everything starts here.",
+            "pipe": "file-reader",
+            "continuous": true,
+            "pattern": "{.jshintrc,src/**/.jshintrc,*.{js,json,hbs},{src,style,vendor}/**/*.{emblem,coffee,js,css,styl,jpg,png,eot,svg,ttf,woff}}"
+        },
+
+        "hbs2html": {
+            "description": "Compile Handlebars resources to html.",
+            "pipe": "template-compiler",
+            "context": {
+                "modules": true,
+                "es6": false
+            },
+            "passthrough": true,
+            "inputs": ["reader"]
+        },
+
+        "jshint": {
+            "description": "Run jshint on all own js files.",
+            "pipe": "jshint",
+            "pattern": "src/**/*.js",
+            "passthrough": true,
+            "inputs": ["hbs2html"]
+        },
+
+        "coffee2js": {
+            "description": "Compile CoffeeScript files to JavaScript.",
+            "pipe": "coffee",
+            "passthrough": true,
+            "inputs": ["jshint"]
+        },
+
+        "styl2css": {
+            "description": "Compile Stylus files to CSS.",
+            "pipe": "stylus",
+            "passthrough": true,
+            "inputs": ["coffee2js"]
+        },
+
+        "forwardvendor": {
+            "description": "Split out vendor resources required by subsequent pipes. Emblem pipe requires untouched handlebars, ember, and emblem.",
+            "pipe": "move",
+            "pattern": "**/{handlebars/handlebars,ember/ember,emblem/dist/emblem}.js",
+            "dir": "../__vendor__",
+            "inputs": ["styl2css"]
+        },
+
+        "bower": {
+            "description": "Menage vendor directory via bower",
+            "pipe": "bower",
+            "main": {
+                "emblem": ["dist/emblem.js"],
+                "FileSaver": ["FileSaver.js"],
+                "marked": ["lib/marked.js"],
+                "moment-timezone": [
+                    "moment-timezone.js",
+                    "moment-timezone.json"
+                ],
+                "pdfjs-build": ["pdf.js", "pdf.worker.js"],
+                "socket.io-client": ["socket.io.js"]
+            },
+            "passthrough": true,
+            "es6ify": true,
+            "requirejs": true,
+            "directory": "vendor",
+            "inputs": ["styl2css"]
+        },
+
+        "precompiled": {
+            "description": "After this node processing will split into multiple paths. This node exists only for convenience.",
+            "pipe": "passthrough",
+            "inputs": ["bower"]
+        },
+
+
+
+        "src": {
+            "description": "Split out src.",
+            "pipe": "passthrough",
+            "pattern": "src/**/*",
+            "inputs": ["precompiled"]
+        },
+
+        "src2": {
+            "description": "Move all sources one directory up.",
+            "pipe": "move",
+            "dir": "..",
+            "inputs": ["src"]
+        },
+
+        "src3": {
+            "description": "Compile Handlebars and Emblem templates into module. This pipe gets its vendor dependencies from forwardvendor.",
+            "pipe": "ember-templates",
+            "filename": "templates/templates.js",
+            "passthrough": true,
+            "inputs": ["src2", "forwardvendor"]
+        },
+
+        "src4": {
+            "description": "Create Ember application that autoimports all modules.",
+            "pipe": "ember-auto-import",
+            "filename": "ember-app.js",
+            "passthrough": true,
+            "inputs": ["src3"]
+        },
+
+        "src5": {
+            "description": "Transpile sources from ES6 to AMD.",
+            "pipe": "es6-module-transpiler",
+            "sourceMap": false,
+            "strict": true,
+            "passthrough": true,
+            "inputs": ["src4"]
+        },
+
+        "build": {
+            "description": "Move built sources to their final destination 'build/'.",
+            "pipe": "move",
+            "dir": "build",
+            "inputs": ["src5"]
+        },
+
+
+
+        "style": {
+            "description": "Split out style.",
+            "pipe": "passthrough",
+            "pattern": "style/**/*",
+            "inputs": ["precompiled"]
+        },
+
+        "style1": {
+            "description": "Add vendor prefixes.",
+            "pipe": "auto-prefixer",
+            "browsers": ["last 2 versions", "Explorer >= 8"],
+            "passthrough": true,
+            "inputs": ["style"]
+        },
+
+
+        "vendor": {
+            "description": "Split out vendor.",
+            "pipe": "passthrough",
+            "pattern": "vendor/**/*.{js,css,styl,eot,svg,ttf,woff,json}",
+            "inputs": ["precompiled"]
+        },
+
+        "vendor3": {
+            "description": "Transpile vendor from ES6 to AMD.",
+            "pipe": "es6-module-transpiler",
+            "passthrough": true,
+            "inputs": ["vendor"]
+        },
+
+
+
+        "other": {
+            "description": "Top level resources not in {src,style,vendor}.",
+            "pipe": "passthrough",
+            "pattern": "!{src,style,vendor}/**/*",
+            "inputs": ["precompiled"]
+        },
+
+
+
+        "jsbundler": {
+            "description": "Create js bundle.",
+            "pipe": "bundle-amd",
+            "enabled": false,
+            "main": "build/main",
+            "filename": "main-built.js",
+            "inputs": ["build", "vendor3"]
+        },
+
+        "jscompressor": {
+            "description": "Compress js bundle.",
+            "pipe": "uglify",
+            "inputs": ["jsbundler"]
+        },
+
+        "cssbundler": {
+            "description": "Create css bundle.",
+            "pipe": "bundle-css",
+            "enabled": false,
+            "main": "style/style.css",
+            "filename": "main-built.css",
+            "inputs": ["style1", "vendor"]
+        },
+
+
+
+        "everything": {
+            "description": "Merge all above paths into one.",
+            "pipe": "passthrough",
+            "inputs": ["src", "style1", "build", "vendor3", "other", "jscompressor", "cssbundler"]
+        },
+
+
+
+        "dist": {
+            "description": "Move output files to directory 'dist/'.",
+            "pipe": "move",
+            "dir": "dist",
+            "inputs": ["everything"]
+        },
+
+        "writer": {
+            "description": "Write files to disk.",
+            "pipe": "file-writer",
+            "pattern": "dist/{*.{html,js,css},style/img/**/*}",
+            "enabled": false,
+            "inputs": ["dist"]
+        },
+
+
+
+        "webserver": {
+            "description": "Serve build results via http. Index.html reloads automatically on change.",
+            "pipe": "webserver",
+            "reload": "*.html",
+            "inputs": ["everything"]
+        },
+
+
+
+        "notify": {
+            "description": "Show notifications via libnotify or growl.",
+            "pipe": "notify",
+            "inputs": ["webserver"]
+        }
+    }
+}

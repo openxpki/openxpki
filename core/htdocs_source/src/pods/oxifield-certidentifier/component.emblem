@@ -1,0 +1,7 @@
+div.drowdown
+  =input class="form-control" value=search
+  ul.dropdown-menu role="menu"
+    each searchResults
+      li: a click="selectResult this" = this.label
+    else
+      li: a click="" No matches found

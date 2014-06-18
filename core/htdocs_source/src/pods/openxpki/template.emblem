@@ -1,0 +1,106 @@
+div.navbar.navbar-default role="navigation"
+  div.container-fluid
+    div.navbar-header
+      button.navbar-toggle type="button" data-toggle="collapse" data-target=".navbar-collapse"
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+      a.navbar-brand href="#"
+
+    div.navbar-collapse.collapse
+      ul.nav.navbar-nav
+        each navEntry in navEntries
+          if navEntry.entries.length
+            li class={ :dropdown navEntry.active }
+              a.dropdown-toggle href="#" data-toggle="dropdown"
+                =navEntry.label
+                b.caret
+              ul.dropdown-menu
+                each entry in navEntry.entries
+                  li: link-to "openxpki" entry.key
+                    entry.label
+          else
+            li class={ navEntry.active }
+              link-to "openxpki" navEntry.key
+                navEntry.label
+
+      ul.nav.navbar-nav.navbar-right
+        if user
+          li: p.navbar-text
+            'Signed in as:
+            strong {{user.name}} ({{user.role}})
+          li: link-to "openxpki" "logout" | Log out
+
+div.container-fluid.Xmaincontent
+  div.row
+    div.col-md-2
+      div.bs-sidebar.hidden-print role="complementary"
+        ul.nav.bs-sidenav
+          each sideNavEntries
+            li class={ active }
+              link-to "openxpki" key
+                =label
+    div.col-md-10 role="main"
+      div.oxi-message
+        div class={ :alert statusClass }
+          =status.message
+
+      h2 = content.firstObject.page.label
+      div style="margin-bottom:6px;" = content.firstObject.page.description
+
+      if showTabs
+        ul.nav.nav-tabs
+          each content
+            li class={ active }
+              a click="activateTab this"
+                if page.shortlabel
+                  = page.shortlabel
+                else
+                  = page.label
+                |&nbsp;
+                button click="closeTab this" class="close" &times;
+
+        div.tab-content
+          each content
+            div class={ :tab-pane active }
+              div.Xcontainer.sections
+                div.row
+                  div class={ right:col-md-8:col-md-12 }
+                    each main
+                      oxisection-main content=this
+                  div class={ right:col-md-4:hide }
+                    each right
+                      h3
+                      div.well
+                        oxisection-main content=this
+      else
+        div.Xcontainer.sections
+          each content
+            div.row
+              div class={ right:col-md-8:col-md-12 }
+                each main
+                  oxisection-main content=this
+              div class={ right:col-md-4:hide }
+                each right
+                  div.well
+                    oxisection-main content=this
+
+div class="modal fade"
+  div class="modal-dialog"
+    div class="modal-content"
+      div class="modal-header"
+        button class="close" data-dismiss="modal" aria-hidden="true" &times;
+        h4 class="modal-title"
+          if modalContent.main.firstObject.content.title
+            modalContent.main.firstObject.content.title
+          else
+            | Title field is missing
+      div class="modal-body"
+        |{{{modalContent.main.firstObject.content.description}}}
+      div class="modal-footer"
+        button.btn.btn-default data-dismiss="modal" Close
+
+div.loading style="display:none"
+  div.progress.progress-striped.active style="width:100px; position:absolute; top:30px; right:20px;"
+    div.progress-bar role="progressbar" style="width: 100%"
+      p.text-center Loading ...
