@@ -11,10 +11,11 @@ Component = Em.Component.extend
     isSelect: Em.computed.equal "content.type", "select"
     isText: (->
         @get("content.type") not in [
-            "bool", "cert_identifier", "checkbox", "date", "datetime", "hidden", "password", "select", "textarea"
+            "bool", "cert_identifier", "checkbox", "date", "datetime", "hidden", "password", "select", "textarea", "uploadarea"
         ]
     ).property "content.type"
     isTextarea: Em.computed.equal "content.type", "textarea"
+    isUploadarea: Em.computed.equal "content.type", "uploadarea"
 
     hasError: Em.computed.bool "content.error"
 

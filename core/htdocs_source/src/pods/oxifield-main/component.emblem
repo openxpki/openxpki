@@ -26,6 +26,8 @@ unless isHidden
         oxifield-text content=content
       if isTextarea
         oxifield-textarea content=content
+      if isUploadarea
+        oxifield-uploadarea content=content
       if content.error
         span.help-block = content.error
     if content.keys
