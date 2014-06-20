@@ -6,6 +6,8 @@ Quickstart guide
 Debian/Ubuntu Development Builds
 ---------------------------------
 
+**I am sorry, but: The ubuntu package is outdated and known to fail the certficate request workflow. There is a 0.14 release for debian that should do better and we also have a vagrant file that you can use for a quick start (Instructions will follow). We are heavily working on getting the new UI out (ETA End of June) that should fix those issues.**
+
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the mason client will crash otherwise!**
 
 We had to change our release policy a bit, we will focus on debian wheezy 64bit for the moment until we have solved some dependancy issues. However the build should also work for Ubuntu 12 and 14 LTS server version but we will perhaps discontinue to publish/test packages for those in the near future.
