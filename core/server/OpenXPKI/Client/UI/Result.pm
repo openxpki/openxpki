@@ -9,6 +9,8 @@ use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
 
+use Data::Dumper;
+
 use Moose;
 
 has cgi => (
@@ -68,6 +70,12 @@ has serializer => (
     isa => 'Object',
     lazy => 1,
     default => sub { return OpenXPKI::Serialization::Simple->new(); }
+);
+
+has type => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'json',
 );
 
 sub BUILD {
@@ -145,19 +153,108 @@ sub set_status_from_error_reply {
     return $self;
 }
 
+=head2 param
+
+This method returns value from the input. It combines the real cgi parameters
+with those encoded in the action name using "!". The method has multiple
+personalities depending on the key you pass as argument. Parameters from the
+actiion name have preceedence.
+
+=item scalar
+
+Return the value with the given key. Key can be a stringified hash/array
+element, e.g. "key_param{curve_name}" (no quotation marks!). This will only
+return scalar values and NOT try to resolve a group of params to a non scalar
+return type!
+
+=item arrayref
+
+Give a list of keys to retrieve, return value is a hashref holding the value
+for all your keys, set to undef if not found. Non-scalar keys will be combined
+to hashref or arrayref but contain only the items listed in the input.
+
+=item undef
+
+Returns a complete hash of all values defined in extra and cgi->param.
+Parameters with array or hash notation ([] or {} in their name), are converted
+to hashref/arrayref.
+
+=cut
 sub param {
 
     my $self = shift;
     my $key = shift;
 
-    my $extra = $self->extra()->{$key};
-    return $extra if (defined $extra);
+    # Scalar requested, just return what we find
+    if (defined $key && ref $key eq '') {
 
+        $self->logger()->trace('Param request for scalar ' . $key );
+
+        my $extra = $self->extra()->{$key};
+        return $extra if (defined $extra);
+
+        my $cgi = $self->cgi();
+        return undef unless($cgi);
+
+        return $cgi->param($key);
+    }
+
+    my $result;
     my $cgi = $self->cgi();
-    return undef unless($cgi);
+    my @keys;
 
-    return $cgi->param($key);
+    if (ref $key eq 'ARRAY') {
+        $self->logger()->trace('Param request for keylist ' . join ":", @{$key} );
+        my $extra = $self->extra();
+        foreach my $p (@{$key}) {
+            if (defined $extra->{$p}) {
+                $result->{$p} = $extra->{$p};
+            } elsif ($p !~ m{ \A wf_ }xms) {
+                push @keys, $p;
+            }
+        }
+    } else {
+        $result = $self->extra();
+        @keys = $cgi->param if ($cgi);
+        $self->logger()->trace('Param request for full set - cgi keys ' . Dumper \@keys );
+    }
+
+    if (!(@keys && $cgi)) {
+        return $result;
+    }
+
+    foreach my $name (@keys) {
+        # for workflows - strip internal fields (start with wf_)
+        next if ($name =~ m{ \A wf_ }xms);
+
+        # autodetection of array and hashes
+        if ($name =~ m{ \A (\w+)\[\] \z }xms) {
+            my @val = $self->param($name);
+            $result->{$name} = \@val;
+        } elsif ($name =~ m{ \A (\w+){(\w+)}(\[\])? \z }xms) {
+            # if $3 is set we have an array element of a named parameter
+            # (e.g. multivalued subject_parts)
+            $result->{$1} = {} unless( $result->{$1} );
+            if ($3) {
+                my @val = $self->param($name);
+                $result->{$1}->{$2} = \@val;
+            } else {
+                $result->{$1}->{$2} = $self->param($name);
+            }
+        } else {
+            my $val = $self->param($name);
+            $result->{$name} = $val;
+        }
+    }
+    return $result;
+
 }
+
+=head2 logger
+
+Return the class logger (log4perl ref)
+
+=cut
 
 sub logger {
 
@@ -165,6 +262,12 @@ sub logger {
     return $self->_client()->logger();
 }
 
+=head2 render
+
+Assemble the return hash from the internal caches and send the result
+to the browser.
+
+=cut
 sub render {
 
     my $self = shift;
@@ -177,8 +280,21 @@ sub render {
     $result->{reloadTree} = 1 if $self->reload();
     $result->{goto} = $self->redirect() if $self->redirect();
 
-    return $result;
+    # Start output stream
+    my $cgi = $self->cgi();
+    print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => 'application/json' );
+
+    my $json = new JSON();
+    if ($result->{_raw}) {
+        print $json->encode($result->{_raw});
+    } else {
+        $result->{session_id} = $self->_client()->session()->id;
+        print $json->encode($result);
+    }
+
+    return $self;
 }
+
 
 =head2 _escape ( string )
 
@@ -218,6 +334,7 @@ sub __register_wf_token {
     # poor mans random id
     my $id = sha1_base64(time.$token.rand().$$);
     $self->logger()->debug('wf token id ' . $id);
+    $self->logger()->trace('token info ' . Dumper  $token);
     $self->_client->session()->param($id, $token);
     return { name => 'wf_token', type => 'hidden', value => $id };
 }

@@ -22,10 +22,10 @@ sub execute
     my $context    = $workflow->context();
     my $default_token = CTX('api')->get_default_token();
 
-    my $key_type = $context->param('_key_type');
+    my $key_type = $context->param('_key_type') || $self->param('key_type');
     ##! 16: 'key_type: ' . $key_type
 
-    my $password = $context->param('_password');
+    my $password = $context->param('_password') || $self->param('password');
     # password check
     if (! defined $password || $password eq '') {
         OpenXPKI::Exception->throw(
@@ -35,7 +35,7 @@ sub execute
 
     my $supported_algs = $default_token->command({COMMAND       => "list_algorithms",
                                                   FORMAT        => "all_data"});
-    
+
     # keytype check
     if (! exists $supported_algs->{$key_type}) {
         OpenXPKI::Exception->throw(
@@ -62,7 +62,7 @@ sub execute
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMNAME',
                 params => {
-                    'KEYTYPE'   => $key_type, 
+                    'KEYTYPE'   => $key_type,
                     'PARAMNAME' => $param,
                 }
             );
@@ -72,12 +72,12 @@ sub execute
                                                  FORMAT        => "param_values",
                                                  ALG           => $key_type,
                                                  PARAM         => $param});
-                                      
+
         if (! exists $param_values->{$value}) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMVALUE',
                 params => {
-                    'KEYTYPE'    => $key_type, 
+                    'KEYTYPE'    => $key_type,
                     'PARAMNAME'  => $param,
                     'PARAMVALUE' => $value,
                 }

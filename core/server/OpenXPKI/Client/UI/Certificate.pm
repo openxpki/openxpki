@@ -210,6 +210,7 @@ sub init_workflows {
 
     $self->add_section({
         type => 'grid',
+        className => 'workflow',
         processing_type => 'all',
         content => {
             header => 'Grid-Headline',
@@ -447,6 +448,7 @@ sub action_search {
 
     $self->add_section({
         type => 'grid',
+        className => 'certificate',
         processing_type => 'all',
         content => {
             header => 'Grid-Headline',
@@ -474,7 +476,7 @@ sub action_search {
                 { sTitle => "notafter", format => 'timestamp' },
                 { sTitle => "issuer"},
                 { sTitle => "identifier"},
-                { sTitle => "_status"},
+                { sTitle => "_className"},
             ],
             data => \@result
         }

@@ -41,31 +41,29 @@ while (my $cgi = CGI::Fast->new()) {
         $log->trace( Dumper $result );
     };
 
-    print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $session_front->id), -type => 'application/json' );
-
-    my $json = new JSON();
-    if (ref $result eq 'HASH') {
-
-        if ($result->{_raw}) {
-            print $json->encode($result->{_raw});
-        } else {
-            $result->{session_id} = $session_front->id;
-            print $json->encode($result);
-        }
-
-        $log->debug('got valid result');
-        $log->trace( Dumper $result );
-    } else {
-
+    if (!$result || ref $result !~ /OpenXPKI::Client::UI/) {
+        my $json = new JSON();
+        my $error;
         if ($EVAL_ERROR) {
             $log->error('eval error during handle' );
-            $log->trace($EVAL_ERROR);
-            print $json->encode( { status => { 'level' => 'error', 'message' => i18nGettext($EVAL_ERROR) } });
+            $log->debug($EVAL_ERROR);
+            $error = i18nGettext($EVAL_ERROR);
         } else {
             $log->error('uncaught application error');
-            print $json->encode( { status => { 'level' => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR') } });
+            $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR')
         }
 
+        my $accept = $cgi->http('HTTP_ACCEPT');
+        my $xreq = $cgi->http('HTTP_X-REQUESTED-WITH');
+        if ($accept =~ /json/ || $xreq) {
+            print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $session_front->id), -type => 'application/json' );
+            print $json->encode( { status => { 'level' => 'error', 'message' => $error } });
+        } else {
+            print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $session_front->id), -type => 'text/html' );
+            print $cgi->start_html( -title => $error );
+            print "<h1>An error occured</h1><p>$error</p>";
+            print $cgi->end_html;
+        }
         $log->trace('result was ' . Dumper $result);
     }
 

@@ -242,31 +242,16 @@ sub action_index {
 
     my %wf_param;
 
+    if ($wf_args->{wf_fields}) {
+        my @fields = map { $_->{name} } @{$wf_args->{wf_fields}};
+        my $fields = $self->param( \@fields );
+        %wf_param = %{ $fields } if ($fields);
+        $self->logger()->debug( "wf fields: " . Dumper \@fields );
+    }
+
     # take over params from token, if any
-    %wf_param = %{$wf_args->{wf_param}} if($wf_args->{wf_param});
-
-    # Get the list of accepted fields and try to fetch the data from cgi
-
-    my @fields;
-    # can be empty when external renderers are used with params
-    @fields = @{$wf_args->{wf_fields}} if ($wf_args->{wf_fields});
-    foreach my $field (@fields) {
-        my $name = $field->{name};
-        # strip internal fields (start with wf_)
-        next if ($name =~ m{ \A wf_ }xms);
-        # TODO - validation
-
-        # autodetection of array and hashes
-        if ($name =~ m{ \A (\w+)\[\] }xms) {
-            my @val = $self->param($name);
-            $wf_param{$name} = \@val;
-        } elsif ($name =~ m{ \A (\w+){(\w+)} }xms) {
-            my $val = $self->param($name);
-            $wf_param{$1.'{}'}->{$2} = $val;
-        } else {
-            my $val = $self->param($name);
-            $wf_param{$name} = $val;
-        }
+    if($wf_args->{wf_param}) {
+        %wf_param = (%wf_param, %{$wf_args->{wf_param}});
     }
 
     # Apply serialization
@@ -274,7 +259,7 @@ sub action_index {
         $wf_param{$key} = $self->serializer()->serialize($wf_param{$key}) if (ref $wf_param{$key});
     }
 
-    $self->logger()->debug( "wf params: " . Dumper %wf_param );
+    $self->logger()->debug( "wf params: " . Dumper \%wf_param );
 
     if ($wf_args->{wf_id}) {
 
@@ -399,6 +384,7 @@ sub action_select {
     }
 
     # If the activity has no fields and no ui class we proceed immediately
+    # FIXME - really a good idea - intentional stop items without fields?
     my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
     $self->logger()->trace('wf_action_info ' . Dumper  $wf_action_info);
     if ((!$wf_action_info->{FIELD} || (scalar @{$wf_action_info->{FIELD}}) == 0) &&
@@ -482,6 +468,7 @@ sub action_search {
 
     $self->add_section({
         type => 'grid',
+        className => 'workflow',
         processing_type => 'all',
         content => {
             header => 'Grid-Headline',
@@ -566,7 +553,7 @@ sub __render_from_workflow {
         $args->{WF_INFO} = $wf_info;
     }
 
-    $self->logger()->debug( "wf_info: " . Dumper $wf_info);
+    $self->logger()->trace( "wf_info: " . Dumper $wf_info);
     if (!$wf_info) {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
         return $self;
@@ -596,7 +583,7 @@ sub __render_from_workflow {
         my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
         # delegation based on activity
         if ($wf_action_info->{UIHANDLE}) {
-            return $self->__delegate_call($wf_action_info->{UIHANDLE}, $args);
+            return $self->__delegate_call($wf_action_info->{UIHANDLE}, $args, $wf_action);
         }
 
         $self->logger()->debug('activity info ' . Dumper $wf_action_info );
@@ -611,7 +598,8 @@ sub __render_from_workflow {
             my $name = $field->{name};
             next if ($name =~ m{ \A workflow_id }x);
             next if ($name =~ m{ \A wf_ }x);
-            next if ($name =~ m{ \A _ }x);
+            # _ fields are volatile but not hidden (e.g. password input)
+            #next if ($name =~ m{ \A _ }x);
 
             my $type = $field->{type} || 'text';
 
@@ -713,10 +701,12 @@ sub __render_from_workflow {
                 $item->{value}  = { label => $context->{$key}, page => 'certificate!info!identifier!'. $context->{$key}, target => 'modal' };
             }
 
-            if ($key =~ m{ \A (\w+)\[\] }xms) {
-                $item->{value}  = $self->serializer()->deserialize( $context->{$key} ) if (!ref $context->{$key});
-            } elsif ($key =~ m{ \A (\w+){} }xms) {
-                # need to find output format
+            # FIXME - will not work once we change serialization format
+            if (ref $item->{value} eq '' &&  $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
+                $item->{value} = $self->serializer()->deserialize( $context->{$key} );
+                if (ref $item->{value} eq 'HASH') {
+                    $item->{format} = 'deflist';
+                }
             }
 
             # todo - i18n labels
@@ -791,7 +781,8 @@ sub __get_action_buttons {
 
 Used to delegate the rendering to another class, requires the method
 to dispatch to as string (class + method using the :: notation) and
-a ref to the args to be passed.
+a ref to the args to be passed. If called from within an action, the
+name of the action is passed as additonal parameter.
 
 =cut
 sub __delegate_call {
@@ -799,11 +790,13 @@ sub __delegate_call {
     my $self = shift;
     my $call = shift;
     my $args = shift;
+    my $wf_action = shift || '';
 
     my ($class, $method) = $call =~ /(.+)::([^:]+)/;
     $self->logger()->debug("deletegating render to $class, $method" );
-    eval "use $class;1";
-    return $class->$method( $self, $args );
+    eval "use $class; 1;";
+    $class->$method( $self, $args, $wf_action );
+    return $self;
 
 }
 

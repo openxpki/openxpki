@@ -1,4 +1,4 @@
-## OpenXPKI::Server::API.pm 
+## OpenXPKI::Server::API.pm
 ##
 ## Written 2005, 2006, 2007 by Michael Bell, Martin Bartosch and
 ## Alexander Klink for the OpenXPKI project
@@ -40,16 +40,16 @@ our $current_method;
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
-    
+
     Params::Validate::validation_options(
 	# let parameter validation errors throw a proper exception
 	on_fail => sub {
 	    my $error = shift;
-	    
+
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
 		params => {
-		    ERROR => $error,		    
+		    ERROR => $error,
 		    CALL => $current_method
 		});
 	},
@@ -108,14 +108,14 @@ sub BUILD {
                 },
             },
         },
-        'get_workflow_ids_for_cert' => {   
+        'get_workflow_ids_for_cert' => {
             class => 'Default',
             params => {
                 'CSR_SERIAL' => {
                     type => SCALAR,
                     regex => $re_integer_string,
                     optional => 1,
-                 },            
+                 },
                 IDENTIFIER => {
                     type     => SCALAR,
                     regex    => $re_base64_string,
@@ -125,7 +125,7 @@ sub BUILD {
         },
         'get_default_token' => {
             class  => 'Token',
-            params => {                
+            params => {
             },
         },
         'get_token_alias_by_type' => {
@@ -133,10 +133,10 @@ sub BUILD {
             params => {
                 'TYPE' => {
                     type  => SCALAR,
-                    regex => $re_alpha_string,                    
+                    regex => $re_alpha_string,
                 },
                 'VALIDITY'  => {
-                    type  => HASHREF,                    
+                    type  => HASHREF,
                     optional => 1,
                 },
             },
@@ -146,10 +146,10 @@ sub BUILD {
             params => {
                 'GROUP' => {
                     type  => SCALAR,
-                    regex => $re_alpha_string,                    
+                    regex => $re_alpha_string,
                 },
                 'VALIDITY'  => {
-                    type  => HASHREF,                    
+                    type  => HASHREF,
                     optional => 1,
                 },
             },
@@ -160,15 +160,15 @@ sub BUILD {
                 'GROUP' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                    optional => 1,                    
+                    optional => 1,
                 },
                 'TYPE' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                    optional => 1,                    
+                    optional => 1,
                 },
                 'VALIDITY'  => {
-                    type  => HASHREF,                    
+                    type  => HASHREF,
                     optional => 1,
                 },
                 'REALM' => {
@@ -177,14 +177,14 @@ sub BUILD {
                     optional => 1,
                 },
             },
-        },         
+        },
         'get_trust_anchors' => {
             class  => 'Token',
             params => {
                 'PATH' => {
                     type  => SCALAR,
-                    regex => $re_alpha_string,                    
-                },                
+                    regex => $re_alpha_string,
+                },
             },
         },
         'get_certificate_for_alias' => {
@@ -192,8 +192,8 @@ sub BUILD {
             params => {
                 'ALIAS' => {
                     type  => SCALAR,
-                    regex => $re_alpha_string,                    
-                },                
+                    regex => $re_alpha_string,
+                },
             },
         },
         'get_approval_message' => {
@@ -222,7 +222,7 @@ sub BUILD {
         'get_head_version_id'  => {
             class  => 'Default',
             params => { },
-        }, 
+        },
         'get_pki_realm' => {
             class  => 'Default',
             params => { },
@@ -238,7 +238,7 @@ sub BUILD {
         'get_session_info' => {
             class  => 'Default',
             params => { },
-        },        
+        },
         'get_alg_names' => {
             class  => 'Default',
             params => { },
@@ -249,6 +249,7 @@ sub BUILD {
                 'KEYTYPE' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
+                    optional => 1,
                 },
             },
             memoize => 1,
@@ -273,7 +274,7 @@ sub BUILD {
                 START_IDENTIFIER => {
                     type     => SCALAR,
                     regex    => $re_base64_string,
-                }, 
+                },
                 OUTFORMAT => {
                     type     => SCALAR,
                     optional => 1,
@@ -288,12 +289,12 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
-                }, 
+                },
             },
         },
         'get_ca_list' => {
             class  => 'Token',
-            params => { 
+            params => {
                 PKI_REALM => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
@@ -386,7 +387,7 @@ sub BUILD {
                     type     => SCALAR,
                     regex    => $re_base64_string,
                     optional => 1,
-                },                              
+                },
                 'PKI_REALM' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
@@ -563,7 +564,7 @@ sub BUILD {
                 CERT_ATTRIBUTES => {
                     type     => ARRAYREF,
                     optional => 1,
-                },              
+                },
                 LIMIT => {
                     type     => SCALAR,
                     optional => 1,
@@ -589,7 +590,7 @@ sub BUILD {
         'get_roles' => {
             class  => 'Default',
             params => { },
-        },       
+        },
         'get_servers' => {
             class  => 'Default',
             params => { },
@@ -631,7 +632,7 @@ sub BUILD {
                     regex => $re_csr_format,
                 },
             },
-        }, 
+        },
         'send_notification' => {
             class  => 'Default',
             params => {
@@ -645,7 +646,7 @@ sub BUILD {
                 },
             },
         },
-        
+
         ## Profile API
          'get_possible_profiles_for_role' => {
             class  => 'Profile',
@@ -654,20 +655,20 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
-                'NOHIDE' => {                    
+                'NOHIDE' => {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
                 },
             },
             memoize => 1,
-        },    
+        },
         'get_available_cert_roles' => {
             class  => 'Profile',
             params => {
                 PROFILES => {
                     type     => ARRAYREF,
-                    optional => 1,                    
+                    optional => 1,
                 },
             },
             memoize => 1,
@@ -675,7 +676,7 @@ sub BUILD {
         'get_cert_profiles' => {
             class  => 'Profile',
             params => {
-                'NOHIDE' => {                    
+                'NOHIDE' => {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
@@ -699,7 +700,7 @@ sub BUILD {
                 PROFILE => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                },               
+                },
                 PKCS10 => {
                     type     => SCALAR,
                     optional => 1,
@@ -710,7 +711,7 @@ sub BUILD {
         },
         'get_additional_information_fields' => {
             class  => 'Profile',
-            params => {                
+            params => {
             },
             memoize => 1,
         },
@@ -718,19 +719,28 @@ sub BUILD {
             class  => 'Profile',
             params => {
                 PROFILE => {
-                    type     => SCALAR,                    
+                    type     => SCALAR,
                     regex    => $re_alpha_string
                 },
                 FIELDS => {
                     type     => ARRAYREF,
+                    optional => 1,
                 },
-            },                       
+                STYLE => {
+                    type     => SCALAR,
+                    optional => 1,
+                },
+                SECTION => {
+                    type     => SCALAR,
+                    optional => 1,
+                },
+            },
         },
         'render_subject_from_template' => {
             class  => 'Profile',
             params => {
                 PROFILE => {
-                    type     => SCALAR,                    
+                    type     => SCALAR,
                     regex    => $re_alpha_string
                 },
                 STYLE => {
@@ -741,13 +751,13 @@ sub BUILD {
                 VARS => {
                     type     => HASHREF,
                 },
-            },                       
+            },
         },
         'render_san_from_template' => {
             class  => 'Profile',
             params => {
                 PROFILE => {
-                    type     => SCALAR,                    
+                    type     => SCALAR,
                     regex    => $re_alpha_string
                 },
                 STYLE => {
@@ -762,7 +772,7 @@ sub BUILD {
                     type     => HASHREF | UNDEF,
                     optional => 1
                 },
-            },                       
+            },
         },
         'list_supported_san' => {
             class  => 'Profile',
@@ -772,7 +782,7 @@ sub BUILD {
             class  => 'Profile',
             params => {
                 PROFILE => {
-                    type     => SCALAR,                    
+                    type     => SCALAR,
                     regex    => $re_alpha_string
                 },
                 STYLE => {
@@ -783,9 +793,9 @@ sub BUILD {
                 VARS => {
                     type     => HASHREF,
                 },
-            },                       
+            },
         },
-        
+
         ### Object API
         'get_csr_info_hash_from_data' => {
             class  => 'Object',
@@ -902,31 +912,31 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_integer_string,
                     optional => 1,
-                },                 
+                },
             },
         },
         'validate_certificate' => {
             class  => 'Object',
             params => {
                 'PEM' => {
-                	type  => SCALAR | ARRAYREF,                  
-                    optional => 1,                
+                	type  => SCALAR | ARRAYREF,
+                    optional => 1,
                 },
                 'PKCS7' => {
                     type  => SCALAR,
                     regex => $re_cert_string,
-                    optional => 1,                
+                    optional => 1,
                 },
                 'ANCHOR' => {
-                    type  => ARRAYREF,                   
-                    optional => 1,                
-                },                
+                    type  => ARRAYREF,
+                    optional => 1,
+                },
                 'NOCRL' => {
                     type  => SCALAR,
                     regex => $re_integer_string,
-                    optional => 1,                
+                    optional => 1,
                 },
-            }        	
+            }
         },
 
         ### Visualization API
@@ -1029,7 +1039,7 @@ sub BUILD {
                 WORKFLOW => {
                     type     => SCALAR,
                     regex    => $re_alpha_string,
-                    optional => 1,                    
+                    optional => 1,
                 },
                 ID => {
                     type     => SCALAR,
@@ -1042,7 +1052,7 @@ sub BUILD {
                     optional => 1,
                 },
             },
-        }, 
+        },
         'get_workflow_history' => {
             class  => 'Workflow',
             params => {
@@ -1216,11 +1226,11 @@ sub BUILD {
                 },
             },
         },
-        
+
         ### Smartcard API
         'sc_analyze_certificate' => {
             class  => 'Smartcard',
-            params => {                
+            params => {
                 'DATA' => {
                     type  => SCALAR,
                     regex => $re_cert_string,
@@ -1238,7 +1248,7 @@ sub BUILD {
 
         'sc_parse_certificates' => {
             class  => 'Smartcard',
-            params => {                
+            params => {
                 'CERTS' => {
                     type  => ARRAYREF,
                     #regex => qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;,
@@ -1253,7 +1263,7 @@ sub BUILD {
 
         'sc_analyze_smartcard' => {
             class  => 'Smartcard',
-            params => {                
+            params => {
                 'CERTS' => {
                     type  => ARRAYREF,
             #regex => $re_cert_string,
@@ -1269,9 +1279,9 @@ sub BUILD {
                 },
                 'SMARTCHIPID' => {
                     type => SCALAR,
-                    regex => $re_alpha_string,                    
+                    regex => $re_alpha_string,
                     optional => 1,
-                },        
+                },
                 'USERID' => {
                     type => SCALAR,
                     regex => $re_sql_string,
@@ -1309,7 +1319,7 @@ sub AUTOMETHOD {
         }
         my $class         = $method_info_of{$ident}->{$method_name}->{class};
         my $valid_params  = $method_info_of{$ident}->{$method_name}->{params};
-    
+
         ##! 16: 'args: ' . Dumper(\@args)
         # do parameter checking
         $current_method = $method_name;
@@ -1320,7 +1330,7 @@ sub AUTOMETHOD {
             );
         }
 
-        
+
         # ACL checking - FIXME - ACL - need implementation
         if (0 && $external_of{$ident}) { # do ACL checking
             my $affected_role
@@ -1338,7 +1348,7 @@ sub AUTOMETHOD {
                 #CTX('acl')->authorize($acl_hashref);
     		# logging is done in ACL class
             };
-        
+
             if (my $exc = OpenXPKI::Exception->caught()) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED',
@@ -1368,7 +1378,7 @@ sub AUTOMETHOD {
 	    PRIORITY => 'debug',
 	    FACILITY => 'system',
 	    );
-    
+
         my $memoization_key;
         if (exists $method_info_of{$ident}->{$method_name}->{memoize} &&
             $method_info_of{$ident}->{$method_name}->{memoize}) {
@@ -1380,7 +1390,7 @@ sub AUTOMETHOD {
             ##! 128: 'args: ' . Dumper \@args
             if ($memoization_key eq '') {
                 # special key is needed if no arguments are passed
-                $memoization_key = 'no_args'; 
+                $memoization_key = 'no_args';
             }
             ##! 128: 'memoization key: ' . $memoization_key
             if (exists $memoization_of{$ident}->{$method_name}->{$memoization_key}) {
@@ -1403,7 +1413,7 @@ sub AUTOMETHOD {
         return $result;
     };
 }
-    
+
 ###########################################################################
 
 1;

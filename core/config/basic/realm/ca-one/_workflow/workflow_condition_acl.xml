@@ -1,6 +1,6 @@
 <!-- Conditions for refactored naming scheme
   normal conditions start with  I18N_OPENXPKI_WF_COND_
-  acl conditions should use the special prefix I18N_OPENXPKI_WF_ACL_ 
+  acl conditions should use the special prefix I18N_OPENXPKI_WF_ACL_
   The name should reflect or be inspired by the implementing class to avoid naming conflicts
   -->
 <conditions>
@@ -8,7 +8,7 @@
       condition name instead. This is only useful if activity is different
       from the ACL name -->
   <condition name="I18N_OPENXPKI_WF_ACL_STORE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::HasRole">
-    <param name="roles" value="CA Operator,RA Operator"/>    
+    <param name="roles" value="CA Operator,RA Operator"/>
   </condition>
   <condition name="I18N_OPENXPKI_WF_ACL_RETRIEVE_PASSWORD" class="OpenXPKI::Server::Workflow::Condition::HasRole">
     <param name="roles" value="CA Operator,RA Operator"/>
@@ -65,14 +65,14 @@
   <condition name="I18N_OPENXPKI_WF_ACL_REJECT_CSR" class="OpenXPKI::Server::Workflow::Condition::HasRole">
     <param name="roles" value="CA Operator,RA Operator"/>
   </condition>
-  
+
   <!--  Smartcard -->
   <condition name="I18N_OPENXPKI_WF_ACL_SMARTCARD_PERSONALIZATION" class="OpenXPKI::Server::Workflow::Condition::HasRole">
     <param name="roles" value="CA Operator,RA Operator"/>
   </condition>
-  
+
   <!-- Revocation -->
-  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">    
+  <condition name="I18N_OPENXPKI_WF_ACL_CRR_CREATE" class="OpenXPKI::Server::Workflow::Condition::AlwaysTrue">
   </condition>
   <condition name="I18N_OPENXPKI_WF_ACL_CRR_CHANGE_INVALIDITY_TIME" class="OpenXPKI::Server::Workflow::Condition::HasRole">
     <param name="roles" value="CA Operator,RA Operator"/>
@@ -96,5 +96,16 @@
     <param name="roles" value="CA Operator,RA Operator"/>
   </condition>
 
-  
+  <condition name="csr_cond_acl_can_approve"
+    class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+
+  <condition name="csr_cond_acl_can_reject"
+    class="OpenXPKI::Server::Workflow::Condition::HasRole">
+    <param name="roles" value="CA Operator,RA Operator"/>
+  </condition>
+
+
+
  </conditions>

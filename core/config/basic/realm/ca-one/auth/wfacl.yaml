@@ -45,6 +45,7 @@ User:
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2
     - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
     - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4
     - I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK
@@ -61,6 +62,12 @@ User:
             creator: self
         
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST:
+            creator: self
+            context:
+                show: .*
+                hide: approvals
+
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2:
             creator: self
             context:
                 show: .*
@@ -94,6 +101,7 @@ RA Operator:
     - I18N_OPENXPKI_WF_TYPE_TESTING
     - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE
     - I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA
+    - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2
 
     access:
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
@@ -116,6 +124,9 @@ RA Operator:
                 # to not impair his or her judgement
                 #hide: approvals
         
+        I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2:
+            creator: .*
+
         I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE:
             creator: .*
         

@@ -210,7 +210,7 @@ sub get_cert_subject_styles {
     return $styles;
 }
 
-
+# For ALL profiles (for search mask)
 sub get_additional_information_fields {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -259,7 +259,16 @@ sub get_field_definition {
     my $arg_ref   = shift;
     ##! 1: 'start'
 
-    my $result = $self->__fetch_input_element_definitions($arg_ref->{PROFILE}, $arg_ref->{FIELDS});
+    my $fields = $arg_ref->{FIELDS};
+    # If STYLE is given we lookup the fields from the profile ourself
+    if (!$fields && $arg_ref->{STYLE}) {
+        my $section = $arg_ref->{SECTION} || 'subject';
+        my @fields = CTX('config')->get_list(['profile', $arg_ref->{PROFILE}, 'style', $arg_ref->{STYLE}, 'ui', $section ]);
+        ##! 16: 'fields ' . Dumper \@fields
+        $fields = \@fields;
+    }
+
+    my $result = $self->__fetch_input_element_definitions($arg_ref->{PROFILE}, $fields);
     ##! 16: 'result ' . Dumper $result
     return $result;
 
@@ -354,13 +363,13 @@ sub get_cert_profiles {
             foreach my $style (@style_names) {
                 if ($config->exists(['profile', $profile, 'style', $style, 'ui' ])) {
                     ##! 32: 'Found ui style ' . $style
-                    $profiles->{$profile} = { label => $label };
+                    $profiles->{$profile} = { label => $label, value => $profile };
                     next PROFILE;
                 }
             }
             ##! 32: 'No ui styles found'
         } else {
-            $profiles->{$profile} = { label => $label };
+            $profiles->{$profile} = { value => $profile, label => $label };
         }
     }
 
@@ -643,6 +652,10 @@ configured.
 
 Return structure: hash ref; key is the name of the field, value is the
 corresponding I18N tag.
+
+=head2 get_field_definition
+
+Get the definition of input fields for a given profile/style.
 
 
 =head2 get_available_cert_roles

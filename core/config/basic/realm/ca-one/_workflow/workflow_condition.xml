@@ -72,4 +72,22 @@
     <param name="condition" value="is_empty"/>
   </condition>
 
+
+
+    <!-- CSR v2 -->
+    <condition name="csr_cond_is_approved"
+        class="OpenXPKI::Server::Workflow::Condition::Approved">
+        <param name="role" value="RA Operator"/>
+    </condition>
+
+    <condition name="csr_cond_pending_notification_send"
+        class="Workflow::Condition::Evaluate">
+        <param name="test" value="$context-&gt;{flag_pending_notification_send}" />
+    </condition>
+
+    <condition name="csr_cond_server_key_generation"
+        class="Workflow::Condition::Evaluate">
+        <param name="test" value="not $context-&gt;{pkcs10} &amp;&amp; not $context-&gt;{spkac}" />
+    </condition>
+
 </conditions>

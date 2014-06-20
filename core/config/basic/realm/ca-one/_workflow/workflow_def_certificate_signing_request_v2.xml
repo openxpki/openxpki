@@ -1,0 +1,241 @@
+<workflow>
+
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2</type>
+  <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_SIGNING_REQUEST</description>
+  <persister>OpenXPKI</persister>
+  <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>
+
+  <state name="INITIAL">
+    <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
+    <action name="csr_select_profile"
+	    resulting_state="SETUP_REQUEST_TYPE">
+    </action>
+  </state>
+
+  <state name="SETUP_REQUEST_TYPE">
+    <description></description>
+    <action name="csr_provide_server_key_password"
+            resulting_state="ENTER_SUBJECT">
+    </action>
+
+    <action name="csr_generate_key_client"
+            resulting_state="ENTER_SUBJECT">
+    </action>
+
+    <action name="csr_upload_pkcs10"
+            resulting_state="ENTER_SUBJECT">
+    </action>
+
+    <action name="csr_select_profile"
+        resulting_state="SETUP_REQUEST_TYPE">
+    </action>
+
+  </state>
+
+  <state name="ENTER_SUBJECT">
+    <description></description>
+    <action name="csr_edit_subject"
+        resulting_state="ENTER_SAN">
+    </action>
+  </state>
+
+  <state name="ENTER_SAN">
+    <description></description>
+    <action name="csr_edit_san"
+        resulting_state="ENTER_CERT_INFO">
+    </action>
+  </state>
+
+  <state name="ENTER_CERT_INFO">
+    <description></description>
+    <action name="csr_edit_cert_info"
+        resulting_state="BUILD_SUBJECT">
+    </action>
+  </state>
+
+  <state name="BUILD_SUBJECT" autorun="yes">
+    <description></description>
+    <action name="csr_render_subject"
+        resulting_state="SUBJECT_COMPLETE">
+    </action>
+  </state>
+
+  <state name="SUBJECT_COMPLETE">
+    <description></description>
+    <action name="csr_submit"
+        resulting_state="EVAL_ELIGIBILITY">
+    </action>
+    <action name="csr_edit_subject"
+        resulting_state="BUILD_SUBJECT">
+    </action>
+    <action name="csr_edit_san"
+        resulting_state="BUILD_SUBJECT">
+    </action>
+    <action name="csr_edit_cert_info"
+        resulting_state="BUILD_SUBJECT">
+    </action>
+  </state>
+
+  <state name="EVAL_ELIGIBILITY" autorun="yes">
+    <description></description>
+    <action name="csr_eval_eligibility"
+        resulting_state="CHECK_APPROVALS">
+    </action>
+  </state>
+
+  <state name="CHECK_APPROVALS" autorun="yes">
+    <description></description>
+
+    <!-- All Approvals given -->
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING2"
+        resulting_state="NOTIFY_APPROVAL">
+        <condition name="csr_cond_is_approved"/>
+    </action>
+
+    <!--  approval required -->
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+        resulting_state="NOTIFY_CSR_PENDING">
+        <condition name="!csr_cond_is_approved"/>
+    </action>
+  </state>
+
+  <!--  Send notification if it was not send already -->
+  <state name="NOTIFY_CSR_PENDING" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_DO_NOTHING"
+        resulting_state="PENDING">
+        <condition name="csr_cond_pending_notification_send"/>
+    </action>
+    <action name="csr_send_pending_notification"
+        resulting_state="PENDING">
+        <condition name="!csr_cond_pending_notification_send"/>
+    </action>
+  </state>
+
+  <state name="FLAG_NOTIFY_SEND" autorun="yes">
+    <action name="csr_flag_pending_notification_send"
+        resulting_state="PENDING">
+    </action>
+  </state>
+
+  <state name="PENDING">
+    <description></description>
+     <action name="csr_edit_subject"
+        resulting_state="CANCEL_APPROVALS">
+    </action>
+    <action name="csr_edit_san"
+        resulting_state="CANCEL_APPROVALS">
+    </action>
+    <action name="csr_edit_cert_info"
+        resulting_state="CANCEL_APPROVALS">
+    </action>
+
+    <action name="csr_approve_csr"
+        resulting_state="CHECK_APPROVALS">
+        <condition name="csr_cond_acl_can_approve"/>
+        <!-- Comment this condition to allow RA Operators to approve their own CRRs -->
+        <!--  <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/> -->
+    </action>
+    <action name="csr_reject_request"
+        resulting_state="REJECTED">
+        <condition name="csr_cond_acl_can_reject"/>
+    </action>
+    <action name="csr_put_request_on_hold"
+        resulting_state="ONHOLD">
+        <condition name="csr_cond_acl_can_approve"/>
+    </action>
+  </state>
+
+  <state name="ONHOLD">
+    <action name="csr_release_on_hold"
+        resulting_state="PENDING">
+    </action>
+  </state>
+
+  <state name="CANCEL_APPROVALS" autorun="yes">
+    <action name="csr_cancel_approvals"
+        resulting_state="UPDATE_SUBJECT">
+    </action>
+  </state>
+
+  <state name="UPDATE_SUBJECT" autorun="yes">
+    <action name="csr_render_subject"
+        resulting_state="PENDING">
+    </action>
+  </state>
+
+  <state name="NOTIFY_APPROVAL" autorun="yes">
+  <action name="csr_notify_approval"
+        resulting_state="APPROVED">
+    </action>
+  </state>
+
+  <state name="APPROVED" autorun="yes">
+    <action name="csr_generate_key"
+        resulting_state="KEY_GENERATED">
+        <condition name="csr_cond_server_key_generation"/>
+    </action>
+    <action name="global_null"
+        resulting_state="REQUEST_COMPLETE">
+        <condition name="!csr_cond_server_key_generation"/>
+    </action>
+  </state>
+
+ <state name="KEY_GENERATED" autorun="yes">
+    <action name="csr_generate_pkcs10"
+        resulting_state="REQUEST_COMPLETE">
+    </action>
+  </state>
+
+  <state name="REQUEST_COMPLETE" autorun="yes">
+    <action name="csr_persist_csr"
+        resulting_state="NICE_ISSUE_CERTIFICATE">
+    </action>
+  </state>
+
+  <state name="NICE_ISSUE_CERTIFICATE" autorun="yes">
+    <action name="I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE"
+            resulting_state="NICE_PICKUP_CERTIFICATE">
+    </action>
+  </state>
+
+  <state name="NICE_PICKUP_CERTIFICATE" autorun="yes">
+
+    <!-- syncronus backends return the certificate on issue, so no need for a pickup -->
+    <action name="global_null"
+        resulting_state="NICE_CERTIFICATE_ISSUED">
+        <condition name="I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"/>
+    </action>
+
+    <action name="I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE"
+        resulting_state="NICE_CERTIFICATE_ISSUED">
+        <condition name="!I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"/>
+    </action>
+
+  </state>
+
+  <state name="NICE_CERTIFICATE_ISSUED" autorun="yes">
+    <action name="csr_persist_metadata"
+              resulting_state="NICE_METADATA_PERSISTED" />
+  </state>
+
+  <state name="NICE_METADATA_PERSISTED" autorun="yes">
+    <action name="csr_notify_issued"
+              resulting_state="NICE_PUBLISH_CERTIFICATE" />
+  </state>
+
+  <!-- Generic Publication - call always and decide inside where to publish  -->
+  <state name="NICE_PUBLISH_CERTIFICATE" autorun="yes">
+    <action name="csr_publish_certificate"
+              resulting_state="SUCCESS">
+	</action>
+  </state>
+
+  <state name="REJECTED" autorun="yes">
+    <action name="csr_notify_rejected"
+            resulting_state="FAILURE">
+    </action>
+  </state>
+
+  <state name="FAILURE" />
+  <state name="SUCCESS" />
+</workflow>

@@ -1,4 +1,4 @@
-## OpenXPKI::Server::API::Default.pm 
+## OpenXPKI::Server::API::Default.pm
 ## (was once the main part of OpenXPKI::Server::API)
 ##
 ## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
@@ -61,7 +61,7 @@ sub list_my_certificates {
     }
     my @results;
     my $db_results = CTX('dbi_backend')->select(
-        TABLE => [            
+        TABLE => [
             [ 'WORKFLOW_CONTEXT' => 'context2' ],
             [ 'WORKFLOW_CONTEXT' => 'context3' ],
             'CERTIFICATE',
@@ -74,13 +74,13 @@ sub list_my_certificates {
             'CERTIFICATE.STATUS',
             'CERTIFICATE.CERTIFICATE_SERIAL',
         ],
-        DYNAMIC => {            
+        DYNAMIC => {
             'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'creator'},
             'context3.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'cert_identifier'},
             'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => $user},
             'CERTIFICATE.PKI_REALM'           => {VALUE => $realm},
         },
-        JOIN => [            
+        JOIN => [
             [
                 undef,
                 'WORKFLOW_CONTEXT_VALUE',
@@ -144,48 +144,48 @@ sub get_workflow_ids_for_cert {
     if (!$cert_identifier && $csr_serial) {
         my $cert_identifier_result = CTX('dbi_backend')->first(
             TABLE   => 'CERTIFICATE',
-            DYNAMIC => {             
-                CSR_SERIAL => $csr_serial, 
+            DYNAMIC => {
+                CSR_SERIAL => $csr_serial,
             },
         );
-        $cert_identifier = $cert_identifier_result->{IDENTIFIER}; 
+        $cert_identifier = $cert_identifier_result->{IDENTIFIER};
     }
 
     my @result;
     # CSR Workflow
     my $workflow_id_result = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => { 
+        DYNAMIC => {
             'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_csr_workflow', 
+            ATTRIBUTE_KEY => 'system_csr_workflow',
         },
     );
-    my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};         
+    my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
     # we fake the old return structure to satisfy the mason ui
-    # # FIXME - needs remodeling 
+    # # FIXME - needs remodeling
     push @result, {
-        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
+        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
         'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
     } if ($workflow_id);
-    
-                
+
+
     # CRR Workflow
     $workflow_id_result = CTX('dbi_backend')->select(
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => { 
+        DYNAMIC => {
             'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_crr_workflow', 
+            ATTRIBUTE_KEY => 'system_crr_workflow',
         },
     );
-    foreach my $line (@{$workflow_id_result}) {     
-        $workflow_id = $line->{ATTRIBUTE_VALUE};          
+    foreach my $line (@{$workflow_id_result}) {
+        $workflow_id = $line->{ATTRIBUTE_VALUE};
         push @result, {
-            'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id, 
+            'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
             'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
         } if ($workflow_id);
     }
     return \@result;
-    
+
 }
 
 sub get_head_version_id {
@@ -203,7 +203,7 @@ sub get_approval_message {
 
     # temporarily change the I18N language
     ##! 16: 'changing language to: ' . $arg_ref->{LANG}
-    set_language($arg_ref->{LANG});            
+    set_language($arg_ref->{LANG});
 
     if (! defined $arg_ref->{TYPE}) {
         if ($arg_ref->{'WORKFLOW'} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
@@ -252,13 +252,13 @@ sub get_approval_message {
         my $cert_id = $wf_info->{WORKFLOW}->{CONTEXT}->{cert_identifier};
         # translate message
         $result = OpenXPKI::i18n::i18nGettext(
-            'I18N_OPENXPKI_APPROVAL_MESSAGE_CRR'                       
+            'I18N_OPENXPKI_APPROVAL_MESSAGE_CRR'
         );
     }
     # change back the language to the original session language
     ##! 16: 'changing back language to: ' . $sess_lang
     set_language($sess_lang);
-    
+
     ##! 16: 'result: ' . $result
     return $result;
 }
@@ -279,19 +279,20 @@ sub get_role {
 }
 
 sub get_session_info {
-    
+
     my $self    = shift;
-    
+
     my $session = CTX('session');
     return {
         name => $session->get_user(),
         role => $session->get_role(),
-        role_label => CTX('config')->get([ 'auth', 'roles', $session->get_role(), 'label' ]),        
+        role_label => CTX('config')->get([ 'auth', 'roles', $session->get_role(), 'label' ]),
         pki_realm => $session->get_pki_realm(),
-        pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->get_pki_realm(), 'label' ]),        
+        pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->get_pki_realm(), 'label' ]),
         lang => 'en',
+        version => $session->get_config_version(),
     }
-    
+
 }
 
 sub get_random {
@@ -411,8 +412,8 @@ sub get_chain {
                             },
                         );
                     }
-                    
-                    #FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"                    
+
+                    #FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"
                     my $utf8fix = $default_token->command({
                         COMMAND => 'convert_cert',
                         DATA    => $cert->{DATA},
@@ -439,13 +440,13 @@ sub get_chain {
             }
         }
     }
-    
+
     # Return a pkcs7 structure instead of the hash
-    if ($arg_ref->{BUNDLE}) {    
-        
+    if ($arg_ref->{BUNDLE}) {
+
         # we do NOT include the root in p7 bundles
-        pop @certs if ($complete && !$arg_ref->{KEEPROOT}); 
-                    
+        pop @certs if ($complete && !$arg_ref->{KEEPROOT});
+
         my $result = $default_token->command({
             COMMAND          => 'convert_cert',
             DATA             => \@certs,
@@ -454,7 +455,7 @@ sub get_chain {
         });
         return $result;
     }
-    
+
     $return_ref->{IDENTIFIERS} = \@identifiers;
     $return_ref->{COMPLETE}    = $complete;
     if (defined $arg_ref->{OUTFORMAT}) {
@@ -472,8 +473,8 @@ sub list_ca_ids {
         params  => {
             METHOD => 'list_ca_ids ',
         },
-    );    
-} 
+    );
+}
 
 sub get_pki_realm_index {
      ##! 1: 'start'
@@ -482,14 +483,14 @@ sub get_pki_realm_index {
         params  => {
             METHOD => 'get_pki_realm_index',
         },
-    );    
+    );
 }
 
-sub get_roles {    
+sub get_roles {
     #FIXME-ACL - should go with the new acl system
     return CTX('config')->get_keys('auth.roles');
 }
- 
+
 
 # FIXME - needs migration
 sub get_export_destinations
@@ -500,7 +501,7 @@ sub get_export_destinations
     my $pki_realm = CTX('session')->get_pki_realm();
 
     ##! 2: "load destination numbers"
-    my $export = CTX('config')->get('system.server.data_exchange.export'); 
+    my $export = CTX('config')->get('system.server.data_exchange.export');
     my $import = CTX('config')->get('system.server.data_exchange.import');
     my @list = ();
     foreach my $dir ($import, $export)
@@ -555,7 +556,7 @@ sub convert_csr {
 sub convert_certificate {
     my $self    = shift;
     my $arg_ref = shift;
-    
+
     my $default_token = CTX('api')->get_default_token();
     my $data = $default_token->command({
         COMMAND => 'convert_cert',
@@ -570,15 +571,15 @@ sub send_notification {
     ##! 1: 'start'
     my $self      = shift;
     my $arg_ref   = shift;
-    
+
     my $message = $arg_ref->{MESSAGE};
-    my $vars = $arg_ref->{PARAMS}; 
-    
+    my $vars = $arg_ref->{PARAMS};
+
     return CTX('notification')->notify({
         MESSAGE => $message,
         DATA => $vars
     });
-	
+
 }
 
 1;
@@ -637,8 +638,8 @@ Returns a hash ref with the following entries:
                   (if requested)
     COMPLETE      1 if the complete chain was found in the database
                   0 otherwise
- 
+
 By setting "BUNDLE => 1" you will not get a hash but a PKCS7 encoded bundle
-holding the requested certificate and all intermediates (if found). Add  
-"KEEPROOT => 1" to also have the root in PKCS7 container.   
+holding the requested certificate and all intermediates (if found). Add
+"KEEPROOT => 1" to also have the root in PKCS7 container.
 

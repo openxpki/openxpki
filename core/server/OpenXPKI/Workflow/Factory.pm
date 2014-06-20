@@ -14,7 +14,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow;
 use Workflow::Exception qw( configuration_error workflow_error );
-use Data::Dumper; 
+use Data::Dumper;
 
 
 sub new {
@@ -22,52 +22,52 @@ sub new {
     return bless( {} => $class );
 }
 
-sub instance {    
+sub instance {
     # To stay compatible to the Workflow Module, accept instance on exisiting instances
     my $self = shift;
     return $self if (ref $self);
-     
+
     # use "new", not instance to create a new one
-    OpenXPKI::Exception->throw (message => "I18N_OPENXPKI_WORKFLOW_FACTORY_INSTANCE_METHOD_NOT_SUPPORTED");    
+    OpenXPKI::Exception->throw (message => "I18N_OPENXPKI_WORKFLOW_FACTORY_INSTANCE_METHOD_NOT_SUPPORTED");
 }
 
 sub create_workflow{
-    
-    my ( $self, $wf_type, $context ) = @_;    
-    
+
+    my ( $self, $wf_type, $context ) = @_;
+
     $self->__authorize_workflow({
         ACTION => 'create',
         TYPE   => $wf_type,
     });
-    
-    return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );     
+
+    return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );
 }
 
 sub fetch_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
-    
-    
+
+
     my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
     # the following both checks whether the user is allowed to
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
-    
+
 	##! 16: 'Fetch Wfl: ' . Dumper $wf;
-	    
+
     $self->__authorize_workflow({
         ACTION   => 'access',
         WORKFLOW => $wf,
         FILTER   => 1,
     });
-    
-    return $wf; 
-     
+
+    return $wf;
+
 }
 
-sub fetch_unfiltered_workflow {    
+sub fetch_unfiltered_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
     my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
-    
+
     $self->__authorize_workflow({
         ACTION   => 'access',
         WORKFLOW => $wf,
@@ -85,7 +85,7 @@ sub fetch_unfiltered_workflow {
 }
 
 sub list_workflow_titles {
-    
+
     my $self = shift;
 
     my $result = {};
@@ -93,43 +93,43 @@ sub list_workflow_titles {
     if (ref $self->{_workflow_config} ne 'HASH') {
         return $result;
     }
-        
+
     foreach my $item (keys %{$self->{_workflow_config}}) {
         my $type = $self->{_workflow_config}->{$item}->{type};
         my $desc = $self->{_workflow_config}->{$item}->{description};
         $result->{$type} = { label => $type, description => $desc || $type }
-    }    
+    }
     return $result;
 }
 
 sub get_activity_info {
-    
+
     my $self = shift;
     my $activity = shift;
-        
+
     ##! 2: $activity
-    
+
     # We extract the values from the action definition for ui rendering
     my $info = $self->{_action_config}->{default}->{$activity};
 
     my $result = {
-        LABEL => $info->{description} || $activity,               
+        LABEL => $info->{description} || $activity,
     };
     $result->{UIHANDLE} = $info->{uihandle} if ($info->{uihandle});
-    
+
     my @fields;
-    foreach my $field (@{$info->{field}}) {        
-        ##! 64: 'Field info ' . Dumper $field        
-        
+    foreach my $field (@{$info->{field}}) {
+        ##! 64: 'Field info ' . Dumper $field
+
         my $item = {
             name => $field->{name},
             label => $field->{label} || $field->{name},
             type => $field->{type} || 'text',
-            
+
             required => ($field->{is_required} && $field->{is_required} eq 'yes') || 0,
         };
-        
-        # check for the source_list and source_class attributes        
+
+        # check for the source_list and source_class attributes
         if ($field->{source_class} || $field->{source_list}) {
             # Create Field object to use enumeration code
             my $fo = Workflow::Action::InputField->new($field);
@@ -138,52 +138,52 @@ sub get_activity_info {
         }
 
         if (defined $field->{default}) {
-            $item->{default} = $field->{default};    
+            $item->{default} = $field->{default};
         }
-        
-        push @fields, $item;        
+
+        push @fields, $item;
     }
 
     $result->{FIELD} = \@fields if (scalar @fields);
-    
+
     return $result;
 }
 
 sub __authorize_workflow {
-        
+
     my $self     = shift;
     my $arg_ref  = shift;
-    
+
     my $config = CTX('config');
-    
+
     # Action = create or access
     # Type = Name of the workflow
     # workflow = workflow instance (access)
     # Filter = 0/1 weather to apply filter
-    
+
     my $action   = $arg_ref->{ACTION};
     ##! 16: 'action: ' . $action
-    
+
     my $filter   = $arg_ref->{ACTION};
     ##! 16: 'filter: ' . $filter
-       
+
     my $realm    = CTX('session')->get_pki_realm();
     ##! 16: 'realm: ' . $realm
-    
-    my $role     = CTX('session')->get_role();    
-    $role = 'Anonymous' unless($role);       
+
+    my $role     = CTX('session')->get_role();
+    $role = 'Anonymous' unless($role);
     ##! 16: 'role: ' . $role
-    
+
     my $user     = CTX('session')->get_user();
     ##! 16: 'user: ' . $user
 
-    
+
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
-       
+
         my %allowed_workflows = map { $_ => 1 } ($config->get_list("auth.wfacl.$role.create"));
-         
-        ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows               
+
+        ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows
         if (! exists $allowed_workflows{$type} ) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED',
@@ -195,14 +195,14 @@ sub __authorize_workflow {
             );
         }
         return 1;
-    } 
+    }
     elsif ($action eq 'access') {
         my $workflow = $arg_ref->{WORKFLOW};
         my $filter   = $arg_ref->{FILTER};
         my $type     = $workflow->type();
-        
-        my $allowed_creator_re = $config->get("auth.wfacl.$role.access.$type.creator"); 
-        
+
+        my $allowed_creator_re = $config->get("auth.wfacl.$role.access.$type.creator");
+
         if (! defined $allowed_creator_re) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE',
@@ -213,7 +213,7 @@ sub __authorize_workflow {
                 },
             );
         }
-        
+
         if ($allowed_creator_re eq 'self') {
             # this is a meta name, replace by current user name
             $allowed_creator_re = $user;
@@ -223,7 +223,7 @@ sub __authorize_workflow {
             # check it against the workflow creator
             my $wf_creator = $workflow->context()->param('creator') || '';
             #my $wf_creator = $workflow->attrib('creator') || '';
-            
+
             ##! 16: 'wf_creator: ' . $wf_creator
             if ($wf_creator !~ qr/$allowed_creator_re/ &&
                 $wf_creator ne $allowed_creator_re) {
@@ -233,19 +233,19 @@ sub __authorize_workflow {
                 );
             }
         }
-        
-         
-        my $context_filter = $config->get_hash("auth.wfacl.$role.access.$type.context");                
+
+
+        my $context_filter = $config->get_hash("auth.wfacl.$role.access.$type.context");
         if ($filter &&  $context_filter) {
             # context filtering is defined for this type, so
             # iterate over the context parameters and check them against
             # the show/hide configuration values
             my $show = $context_filter->{show};
             if (! defined $show) {
-                $show = ''; # will not filter anything! 
+                $show = ''; # will not filter anything!
             }
             ##! 16: 'show: ' . $show
-            
+
             my $hide = $context_filter->{hide};
             if (! defined $hide) {
                 $hide = ''; # liberal default: do not hide anything
@@ -326,5 +326,5 @@ be used if really necessary (and should only be used to create a temporary
 object that is used to retrieve the relevant entries).
 
 
-All methods return an object of class OpenXPKI::Server::Workflow, which is derived 
+All methods return an object of class OpenXPKI::Server::Workflow, which is derived
 from Workflow base class and implements the pause/resume-features. see there for details.
