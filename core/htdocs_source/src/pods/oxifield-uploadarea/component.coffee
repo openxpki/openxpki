@@ -1,8 +1,6 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
-    needs: ["config"]
-
     textTypes: [
         "application/pkcs8"
         "application/pkcs10"
@@ -41,10 +39,12 @@ Component = Em.Component.extend
             file = @$().find "input[type=file]"
             clone = file.clone()
 
+            url = @container.lookup("controller:config").get ".url"
+
             form = $ """
                 <form method='post'
                       enctype='multipart/form-data'
-                      action='#{@get "controllers.config.url"}'
+                      action='#{url}'
                       target='upload_target'>
                     <input type="hidden" name="action" value="plain!upload">
                 </form>

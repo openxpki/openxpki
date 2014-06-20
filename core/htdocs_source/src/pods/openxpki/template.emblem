@@ -91,12 +91,13 @@ div class="modal fade"
       div class="modal-header"
         button class="close" data-dismiss="modal" aria-hidden="true" &times;
         h4 class="modal-title"
-          if modalContent.main.firstObject.content.title
-            modalContent.main.firstObject.content.title
+          if modalContent.page.shortlabel
+            modalContent.page.shortlabel
           else
             | Title field is missing
       div class="modal-body"
-        |{{{modalContent.main.firstObject.content.description}}}
+        each modalContent.main
+          oxisection-main content=this
       div class="modal-footer"
         button.btn.btn-default data-dismiss="modal" Close
 
