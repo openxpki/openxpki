@@ -28,6 +28,12 @@ Component = Em.Component.extend
         else
             @set "content.value", label
 
+    sanitizeValue: Em.observer "content.options", ->
+        options = (o.value for o in @get "content.options")
+        value = @get "content.value"
+        if value not in options
+            @set "content.value", options[0]
+
     editing: true
     actions:
         toggleEdit: ->

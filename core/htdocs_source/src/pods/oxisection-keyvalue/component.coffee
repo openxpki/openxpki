@@ -1,9 +1,14 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
-    isCertstatus: Em.computed.equal "content.format", "certstatus"
-    isLink: Em.computed.equal "content.format", "link"
-    isTimestamp: Em.computed.equal "content.format", "timestamp"
+    click: (evt) ->
+        if evt.target.tagName is "A"
+            evt.stopPropagation()
+            evt.preventDefault()
+            @container.lookup("route:openxpki").sendAjax
+                data:
+                    page:evt.target.href.split("#")[1]
+                    target:evt.target.target
 
     actions:
         execute: (btn) ->
