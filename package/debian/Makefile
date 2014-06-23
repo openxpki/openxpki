@@ -35,11 +35,11 @@ EXTERNAL=				\
 	Config__Merge \
 	Config__Versioned \
 	Proc__SafeExec \
-	XML__Filter__XInclude \
-	Workflow
+	XML__Filter__XInclude 
 
 EXTERNAL2= \
 	Connector \
+	Workflow \
 	Test__utf8 
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) DateTime__Format__DateParse
@@ -64,7 +64,7 @@ $(EXTERNAL):
 $(EXTERNAL2):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/
-	cd deb/cpan/ && PERL5LIB="../../lib:$PERL5LIB" DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
+	cd deb/cpan/ && PERL5LIB=`pwd`"/../../lib/:$PERL5LIB" DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
 DateTime__Format__DateParse:
 	test -d deb || mkdir deb

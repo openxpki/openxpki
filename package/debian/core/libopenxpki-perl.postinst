@@ -43,7 +43,12 @@ case "$1" in
        test -e /etc/openxpki/scep/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/scep.tgz -C /etc/openxpki/scep/
        test -e /etc/openxpki/soap/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/soap.tgz -C /etc/openxpki/soap/
 
-       test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf
+       # Ubuntu names it conf-enabled while wheezy has conf.d
+       if [ -d /etc/apache2/conf-enabled/ ]; then
+           test -e /etc/apache2/conf-enabled/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf-enabled/openxpki-scep.conf
+       else 
+           test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf
+       fi;
 
        # add apache user to openxpki group (to allow connecting the socket)
        usermod -G openxpki www-data

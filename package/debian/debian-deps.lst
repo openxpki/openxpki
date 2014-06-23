@@ -25,6 +25,7 @@ libdata-password-perl
 libdata-serializer-perl
 libdbd-mock-perl
 libnet-ip-perl
+libnetaddr-ip-perl
 libparams-validate-perl
 libdata-password-perl
 libdatetime-locale-perl
@@ -81,3 +82,5 @@ libtimedate-perl
 libyaml-libyaml-perl
 libmodule-install-perl
 libsoap-lite-perl
+
+dh-make-perl
