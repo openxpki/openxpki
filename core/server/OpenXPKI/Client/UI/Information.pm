@@ -140,7 +140,12 @@ sub init_policy {
         description => 'we need to add some logic here to enable easy config outside the pm',
     });
 
-
+    $self->add_section({
+        type => 'text',
+        content => {
+            description => 'tbd',
+        }
+    });
 }
 
 1;

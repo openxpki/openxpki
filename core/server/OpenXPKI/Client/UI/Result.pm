@@ -122,6 +122,8 @@ sub send_command {
         'COMMAND', { COMMAND => $command, PARAMS => $params }
     );
 
+    $self->logger()->trace('send command raw reply: '. Dumper $reply);
+
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
         $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
         $self->set_status_from_error_reply( $reply );
@@ -207,8 +209,20 @@ sub param {
         $self->logger()->trace('Param request for keylist ' . join ":", @{$key} );
         my $extra = $self->extra();
         foreach my $p (@{$key}) {
-            if (defined $extra->{$p}) {
+            $self->logger()->trace('Fetch ' . $p );
+            # Resolve wildcard keys used in dynamic key fields
+            if ($p =~ m{ \A (\w+)\{\*\}(\[\])? \z }xs) {
+                my $pattern = '^'.$1.'{\w+}';
+                $self->logger()->debug('Wildcard pattern found ' . $p . ' - search : ' . $pattern);
+                foreach my $wc ($cgi->param) {
+                    push @keys, $wc if ($wc =~ /$pattern/);
+                }
+                $self->logger()->debug('Wildcard pattern found, keys ' . join ",", @keys);
+            # Paramater is in extra attributes
+            } elsif (defined $extra->{$p}) {
                 $result->{$p} = $extra->{$p};
+
+            # queue the key to get it from cgi later
             } elsif ($p !~ m{ \A wf_ }xms) {
                 push @keys, $p;
             }
@@ -230,7 +244,7 @@ sub param {
         # autodetection of array and hashes
         if ($name =~ m{ \A (\w+)\[\] \z }xms) {
             my @val = $self->param($name);
-            $result->{$name} = \@val;
+            $result->{$1} = \@val;
         } elsif ($name =~ m{ \A (\w+){(\w+)}(\[\])? \z }xms) {
             # if $3 is set we have an array element of a named parameter
             # (e.g. multivalued subject_parts)

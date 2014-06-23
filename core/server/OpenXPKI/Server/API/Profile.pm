@@ -118,7 +118,18 @@ sub __fetch_input_element_definitions {
         }
 
         # SAN use fields with dynamic key/value assignment
-        # We introduce a new type "dynamic" for that
+        # Those have a special section "keys" which is a list of hashes
+        # Get size of list to iterate
+        if ($ucinput{KEYS}) {
+            my $size = $config->get_size("$input_path.keys");
+            my @keys;
+            for (my $i=0;$i<$size;$i++) {
+                my $key = $config->get_hash( "$input_path.keys.$i" );
+                push @keys, { value => $key->{value}, label => $key->{label} };
+            }
+            $ucinput{KEYS} = \@keys;
+        }
+=cut
         if ($ucinput{TYPE} eq 'keyvalue') {
             # "key" and "value" are a hash
             foreach my $key (qw(key value)) {
@@ -137,6 +148,7 @@ sub __fetch_input_element_definitions {
                 $ucinput{uc($key)} = \%hash;
             }
         }
+=cut
         push @definitions, \%ucinput;
     }
     ##! 64: 'Definitions: ' . Dumper @definitions

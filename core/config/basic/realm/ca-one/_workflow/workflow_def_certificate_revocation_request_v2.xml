@@ -1,6 +1,6 @@
 <workflow>
 
-  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_NEWUI</type>
+  <type>I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2</type>
   <description>I18N_OPENXPKI_WF_DESC_CERTIFICATE_REVOCATION_REQUEST</description>
   <persister>OpenXPKI</persister>
   <observer class="OpenXPKI::Server::Workflow::Observer::Debug"/>

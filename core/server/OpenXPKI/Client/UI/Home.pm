@@ -60,13 +60,13 @@ sub init_certificate {
     my @result;
     foreach my $item (@{$search_result}) {
         push @result, [
-            $self->_escape($item->{'CERTIFICATE.SUBJECT'}),
-            $item->{'CERTIFICATE.NOTBEFORE'},
-            $item->{'CERTIFICATE.NOTAFTER'},
-            $item->{'CERTIFICATE.STATUS'},
-            $item->{'CERTIFICATE.CERTIFICATE_SERIAL'},
-            $item->{'CERTIFICATE.IDENTIFIER'},
-            $item->{'CERTIFICATE.STATUS'},
+            $self->_escape($item->{'SUBJECT'}),
+            $item->{'NOTBEFORE'},
+            $item->{'NOTAFTER'},
+            { value => $item->{'STATUS'}, label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{'STATUS'}) },
+            $item->{'CERTIFICATE_SERIAL'},
+            $item->{'IDENTIFIER'},
+            $item->{'STATUS'},
         ]
     }
 
@@ -85,7 +85,7 @@ sub init_certificate {
                 { sTitle => "subject" },
                 { sTitle => "not before", format => 'timestamp'},
                 { sTitle => "not after", format => 'timestamp'},
-                { sTitle => "status"},
+                { sTitle => "status", format => 'certstatus'},
                 { sTitle => "serial"},
                 { sTitle => "identifier"},
                 { sTitle => "_className"},
@@ -103,7 +103,7 @@ sub init_workflow {
     my $args = shift;
 
     my $query = {
-        CONTEXT => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{user} }],
+        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name} }],
         LIMIT => 100
     };
 
@@ -156,4 +156,107 @@ sub init_workflow {
     return $self;
 
 }
+
+=head2 init_task
+
+Outstanding tasks, for now pending approvals on CRR and CSR
+
+=cut
+
+sub init_task {
+
+    my $self = shift;
+    my $args = shift;
+
+    $self->_page({
+        label => 'Outstanding tasks'
+    });
+
+    # CSR
+    my $search_result = $self->send_command( 'search_workflow_instances', {
+        LIMIT => 100,  # Safety barrier
+        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
+        TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2',
+        STATE => [ 'PENDING', 'APPROVAL' ],
+    });
+
+    my @csr;
+    foreach my $item (@{$search_result}) {
+        push @csr, [
+            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
+            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+            $item->{'WORKFLOW.WORKFLOW_TYPE'},
+            $item->{'WORKFLOW.WORKFLOW_STATE'},
+            $item->{'WORKFLOW.WORKFLOW_PROC_STATE'},
+        ]
+    }
+
+    $self->logger()->trace( "dumper result: " . Dumper @csr);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'workflow',
+        processing_type => 'all',
+        content => {
+            label => 'Certificate requests',
+            actions => [{
+                path => 'redirect!workflow!load!wf_id!{serial}',
+                icon => 'view',
+            }],
+            columns => [
+                { sTitle => "serial" },
+                { sTitle => "updated" },
+                { sTitle => "type"},
+                { sTitle => "state"},
+                { sTitle => "procstate"},
+            ],
+            data => \@csr
+        }
+    });
+
+
+    $search_result = $self->send_command( 'search_workflow_instances', {
+        LIMIT => 100,  # Safety barrier
+        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
+        TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2',
+        STATE => [ 'PENDING', 'ONHOLD' ],
+    });
+
+    my @crr = ();
+    foreach my $item (@{$search_result}) {
+        push @crr, [
+            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
+            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+            $item->{'WORKFLOW.WORKFLOW_TYPE'},
+            $item->{'WORKFLOW.WORKFLOW_STATE'},
+            $item->{'WORKFLOW.WORKFLOW_PROC_STATE'},
+        ]
+    }
+
+    $self->logger()->trace( "dumper result: " . Dumper @crr);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'workflow',
+        processing_type => 'all',
+        content => {
+            label => 'Revocation requests',
+            actions => [{
+                path => 'redirect!workflow!load!wf_id!{serial}',
+                icon => 'view',
+            }],
+            columns => [
+                { sTitle => "serial" },
+                { sTitle => "updated" },
+                { sTitle => "type"},
+                { sTitle => "state"},
+                { sTitle => "procstate"},
+            ],
+            data => \@crr
+        }
+    });
+
+
+}
+
 1;

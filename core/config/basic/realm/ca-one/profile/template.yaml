@@ -10,7 +10,7 @@ sample:
     # The short label besides the UI field
     label: O
     # Help/Description on the field
-    description: I18N_OPENXPKI_O_DESC
+    description: I18N_OPENXPKI_UI_PROFILE_O_DESC
      # HTML type to use
     type: freetext
     # Regex to test the input against
@@ -30,8 +30,8 @@ sample:
 # Person certificates
 username:
     id: username
-    label: I18N_OPENXPKI_USERNAME
-    description: I18N_OPENXPKI_USERNAME_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_USERNAME
+    description: I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC
     type: freetext
     match: \A [A-Za-z0-9\.]+ \z
     width: 20
@@ -39,16 +39,16 @@ username:
 
 realname:
     id: realname
-    label: I18N_OPENXPKI_REALNAME
-    description: I18N_OPENXPKI_REALNAME_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_REALNAME
+    description: I18N_OPENXPKI_UI_PROFILE_REALNAME_DESC
     type: freetext
     match: .+
     width: 40
 
 email:
     id: email
-    label: I18N_OPENXPKI_EMAILADDRESS
-    description: I18N_OPENXPKI_EMAILADDRESS_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS
+    description: I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC
     type: freetext
     match: .+@.+
     width: 30
@@ -57,8 +57,8 @@ email:
 # A simple FQDN
 hostname:
     id: hostname
-    label: I18N_OPENXPKI_HOSTNAME
-    description: I18N_OPENXPKI_HOSTNAME_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_HOSTNAME
+    description: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC
     type: freetext
     source: CN:([^:]+)
     match: \A [A-Za-z\d\-\.]+ \z
@@ -67,8 +67,8 @@ hostname:
 
 hostname2:
     id: hostname2
-    label: I18N_OPENXPKI_HOSTNAME
-    description: I18N_OPENXPKI_HOSTNAME_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_HOSTNAME
+    description: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC
     type: freetext
     source: CN:([^:]+)
     match: \A [A-Za-z\d\-\.]+ \z
@@ -80,8 +80,8 @@ hostname2:
 # Port Number
 port:
     id: port
-    label: I18N_OPENXPKI_PORT
-    description: I18N_OPENXPKI_PORT_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_PORT
+    description: I18N_OPENXPKI_UI_PROFILE_PORT_DESC
     type: freetext
     source: CN:.+:(.+)
     match: \A \d+ \z
@@ -92,14 +92,14 @@ port:
 cn:
     id: CN
     label: CN
-    description: I18N_OPENXPKI_CN_DESC
+    description: I18N_OPENXPKI_UI_PROFILE_CN_DESC
     type: freetext
     source: CN:(.+)
     width: 60
 o:
     id: O
     label: O
-    description: I18N_OPENXPKI_O_DESC
+    description: I18N_OPENXPKI_UI_PROFILE_O_DESC
     type: freetext
     source: O:(.+)
     min: 0
@@ -109,7 +109,7 @@ o:
 ou:
     id: OU
     label: OU
-    description: I18N_OPENXPKI_OU_DESC
+    description: I18N_OPENXPKI_UI_PROFILE_OU_DESC
     type: freetext
     source: OU:(.+)
     width: 40
@@ -119,7 +119,7 @@ ou:
 dc:
     id: DC
     label: DC
-    description: I18N_OPENXPKI_DC_DESC
+    description: I18N_OPENXPKI_UI_PROFILE_DC_DESC
     type: freetext
     width: 40
     min: 0
@@ -128,7 +128,7 @@ dc:
 c:
     id: C
     label: C
-    description: I18N_OPENXPKI_C_DESC
+    description: I18N_OPENXPKI_UI_PROFILE_C_DESC
     type: freetext
     width: 2
     source: C:(.+)
@@ -139,37 +139,37 @@ c:
 
 requestor_gname:
     id: requestor_gname
-    label: I18N_OPENXPKI_REQUESTOR_FIRSTNAME
-    description: I18N_OPENXPKI_REQUESTOR_FIRSTNAME_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME
+    description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME_DESC
     type: freetext
     width: 40
 
 requestor_name:
     id: requestor_name
-    label: I18N_OPENXPKI_REQUESTOR_LASTNAME
-    description: I18N_OPENXPKI_REQUESTOR_LASTNAME_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME
+    description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC
     type: freetext
     width: 40
 
 requestor_email:
     id: requestor_email
-    label: I18N_OPENXPKI_REQUESTOR_EMAIL
-    description: I18N_OPENXPKI_REQUESTOR_EMAIL_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL
+    description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL_DESC
     type: freetext
     width: 40
     match: .+@.+
 
 requestor_phone:
     id: requestor_phone
-    label: I18N_OPENXPKI_PHONE
-    description: I18N_OPENXPKI_PHONE_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_PHONE
+    description: I18N_OPENXPKI_UI_PROFILE_PHONE_DESC
     type: freetext
     width: 20
 
 requestor_affiliation:
     id: requestor_affiliation
-    label: I18N_OPENXPKI_REQUESTOR_AFFILIATION
-    description: I18N_OPENXPKI_REQUESTOR_AFFILIATION_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION
+    description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION_DESC
     type: select
     option:
     - System Owner
@@ -179,62 +179,51 @@ requestor_affiliation:
 
 comment:
     id: comment
-    label: I18N_OPENXPKI_COMMENT
-    description: I18N_OPENXPKI_COMMENT_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_COMMENT
+    description: I18N_OPENXPKI_UI_PROFILE_COMMENT_DESC
     type: textarea
     width: 40
     height: 10
 
 # SAN Types
-
-san_choice:    
-    id: choice
-    type: keyvalue
-    key:
-        max: 1000
-        type: select
-        width: 20
-        option:
-        - label: I18N_OPENXPKI_SAN_EMAIL
-          description: I18N_OPENXPKI_SAN_EMAIL_DESCRIPTION
+# Key/Value field
+san_free:
+    id: free
+    label: I18N_OPENXPKI_UI_PROFILE_SAN_FREE
+    description: I18N_OPENXPKI_UI_PROFILE_SAN_FREE_DESCRIPTION
+    type: freetext
+    width: 40
+    min: 0
+    max: 20
+    keys:
+        - label: I18N_OPENXPKI_UI_PROFILE_SAN_EMAIL
+          description: I18N_OPENXPKI_UI_PROFILE_SAN_EMAIL_DESCRIPTION
           value: email
-        - label: I18N_OPENXPKI_SAN_DNS
-          description: I18N_OPENXPKI_SAN_DNS_DESCRIPTION
+        - label: I18N_OPENXPKI_UI_PROFILE_SAN_DNS
+          description: I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION
           value: DNS
-        - label: I18N_OPENXPKI_SAN_IP
-          description: I18N_OPENXPKI_SAN_IP_DESCRIPTION
+        - label: I18N_OPENXPKI_UI_PROFILE_SAN_IP
+          description: I18N_OPENXPKI_UI_PROFILE_SAN_IP_DESCRIPTION
           value: IP
-        - label: I18N_OPENXPKI_SAN_URI
-          description: I18N_OPENXPKI_SAN_URI_DESCRIPTION
+        - label: I18N_OPENXPKI_UI_PROFILE_SAN_URI
+          description: I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION
           value: URI
-        - label: I18N_OPENXPKI_SAN_GUID
-          description: I18N_OPENXPKI_SAN_GUID_DESCRIPTION
+        - label: I18N_OPENXPKI_UI_PROFILE_SAN_GUID
+          description: I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION
           value: guid
-        - label: I18N_OPENXPKI_SAN_UPN
-          description: I18N_OPENXPKI_SAN_UPN_DESCRIPTION
+        - label: I18N_OPENXPKI_UI_PROFILE_SAN_UPN
+          description: I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION
           value: upn
-        - label: I18N_OPENXPKI_SAN_RID
-          description: I18N_OPENXPKI_SAN_RID_DESCRIPTION
+        - label: I18N_OPENXPKI_UI_PROFILE_SAN_RID
+          description: I18N_OPENXPKI_UI_PROFILE_SAN_RID_DESCRIPTION
           value: rid
-    value:
-        type: freetext
-        width: 40
 
-san_oid:    
-    id: oid
-    type: keyvalue
-    key:
-        max: 1000
-        type: oid
-    value:
-        type: freetext
-        width: 40
-       
+
 # For future use, syntax not implemented yet!        
 san_dns:
     id: dns
-    label: I18N_OPENXPKI_SAN_DNS
-    description: I18N_OPENXPKI_SAN_DNS_DESCRIPTION
+    label: I18N_OPENXPKI_UI_PROFILE_SAN_DNS
+    description: I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION
     type: freetext
     width: 40
     min: 0
@@ -242,8 +231,8 @@ san_dns:
 
 san_ipv4:
     id: ip
-    label: I18N_OPENXPKI_SAN_IP
-    description: I18N_OPENXPKI_SAN_IP_DESCRIPTION
+    label: I18N_OPENXPKI_UI_PROFILE_SAN_IP
+    description: I18N_OPENXPKI_UI_PROFILE_SAN_IP_DESCRIPTION
     type: freetext
     width: 40
     min: 0
@@ -251,8 +240,8 @@ san_ipv4:
 
 san_uri:
     id: uri
-    label: I18N_OPENXPKI_SAN_URI
-    description: I18N_OPENXPKI_SAN_URI_DESCRIPTION
+    label: I18N_OPENXPKI_UI_PROFILE_SAN_URI
+    description: I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION
     type: freetext
     width: 40
     min: 0
@@ -260,8 +249,8 @@ san_uri:
 
 san_guid:
     id: guid
-    label: I18N_OPENXPKI_SAN_GUID
-    description: I18N_OPENXPKI_SAN_GUID_DESCRIPTION
+    label: I18N_OPENXPKI_UI_PROFILE_SAN_GUID
+    description: I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION
     type: freetext
     width: 40
     min: 0
@@ -269,8 +258,8 @@ san_guid:
 
 san_upn:
     id: upn
-    label: I18N_OPENXPKI_SAN_UPN
-    description: I18N_OPENXPKI_SAN_UPN_DESCRIPTION
+    label: I18N_OPENXPKI_UI_PROFILE_SAN_UPN
+    description: I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION
     type: freetext
     width: 40
     min: 0
@@ -278,8 +267,8 @@ san_upn:
 
 san_rid:
     id: rid
-    label: I18N_OPENXPKI_SAN_RID
-    description: I18N_OPENXPKI_SAN_RID_DESCRIPTION
+    label: I18N_OPENXPKI_UI_PROFILE_SAN_RID
+    description: I18N_OPENXPKI_UI_PROFILE_SAN_RID_DESCRIPTION
     type: freetext
     width: 40
     min: 0

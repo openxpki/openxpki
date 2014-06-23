@@ -55,7 +55,7 @@ sub _init_structure_for_user {
          entries=>  [
               {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2', label =>  "Request new certificate"},
               #{key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', label =>  "Request renewal"},
-              {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_NEWUI', label =>  "Request revocation"} ,
+              {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2', label =>  "Request revocation"} ,
          ]
       },
       {

@@ -649,10 +649,22 @@ sub search_workflow_instances {
 
     my $realm = CTX('session')->get_pki_realm();
 
-    my @context = ();
-    eval {
-        @context = @{ $arg_ref->{CONTEXT} };
-    };
+    my @attrib;
+
+    # We want to drop searches in context, so log a deprecation warning if context is used
+    if ($arg_ref->{CONTEXT} && ref $arg_ref->{CONTEXT} eq 'ARRAY') {
+        CTX('log')->log(
+            MESSAGE  => "workflow search using context - please fix",
+            PRIORITY => 'warn',
+            FACILITY => 'application',
+        );
+        @attrib = @{ $arg_ref->{CONTEXT} };
+    }
+
+    if ($arg_ref->{ATTRIBUTE} && ref $arg_ref->{ATTRIBUTE} eq 'ARRAY') {
+        @attrib = @{ $arg_ref->{ATTRIBUTE} };
+    }
+
     my $dynamic;
     my @tables;
     my @joins;
@@ -673,12 +685,12 @@ sub search_workflow_instances {
     #                 },
     # );
     my $i = 0;
-    foreach my $context_entry (@context) {
+    foreach my $attrib (@attrib) {
         my $table_alias = 'WORKFLOW_ATTRIBUTES_' . $i;
-        my $key   = $context_entry->{KEY};
-        my $value = $context_entry->{VALUE};
+        my $key   = $attrib->{KEY};
+        my $value = $attrib->{VALUE};
         my $operator = 'EQUAL';
-        $operator = $context_entry->{OPERATOR} if($context_entry->{OPERATOR});
+        $operator = $attrib->{OPERATOR} if($attrib->{OPERATOR});
         $dynamic->{$table_alias . '.ATTRIBUTE_KEY'}   = {VALUE => $key};
         $dynamic->{$table_alias . '.ATTRIBUTE_VALUE'} = {VALUE => $value, OPERATOR  => $operator };
         push @tables, [ 'WORKFLOW_ATTRIBUTES' => $table_alias ];

@@ -1136,6 +1136,10 @@ sub BUILD {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },
+                ATTRIBUTE => {
+                    type     => ARRAYREF | UNDEF,
+                    optional => 1,
+                },
                 TYPE => {
                     type     => SCALAR | ARRAYREF,
                 #    regex    => $re_alpha_string,
@@ -1166,6 +1170,10 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 CONTEXT => {
+                    type     => ARRAYREF | UNDEF,
+                    optional => 1,
+                },
+                ATTRIBUTE => {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },

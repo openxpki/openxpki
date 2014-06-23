@@ -46,18 +46,30 @@ sub execute
         );
     }
 
-    my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
-    my $context_parameters = $context->param('_key_gen_params');
-    if (! defined $context_parameters) {
+    # TODO - can be cleaned up after removal of old workflows
+    # The old mason ui uses a custom sep, the new uses the default
+    my $parameters;
+    if (my $key_gen_params = $context->param('_key_gen_params')) {
+        my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+        $parameters = $serializer->deserialize($key_gen_params);
+    } else {
+        # param auto deserializes!
+        $parameters = $self->param('key_gen_params');
+    }
+
+    if (! defined $parameters) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_PARAMETERS',
         );
     }
-    my $parameters = $serializer->deserialize($context_parameters);
 
     # parameters check
     my ($param, $value, $param_values) = ("","","undef");
     while (($param, $value) = each(%{$parameters})) {
+
+        # unset empty parameters
+        if ( !defined $value || $value eq '' ) { delete $parameters->{$param}; next; };
+
         if (! exists $supported_algs->{$key_type}->{$param}) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMNAME',

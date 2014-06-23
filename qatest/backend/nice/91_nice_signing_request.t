@@ -69,10 +69,6 @@ my %cert_info = (
 );
 
 my %cert_subject_alt_name_parts = (
-    'cert_subject_alt_name_choice_key' => ['DNS','DNS'],
-    'cert_subject_alt_name_choice_value' => [$sAlternateSubject,'www.'.$sAlternateSubject],
-    'cert_subject_alt_name_oid_key' => [],
-    'cert_subject_alt_name_oid_value' => []
 ); 
 
 my %wfparam = (	

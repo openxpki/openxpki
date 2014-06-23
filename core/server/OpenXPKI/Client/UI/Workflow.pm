@@ -54,25 +54,12 @@ sub init_index {
         return $self;
     }
 
-    $self->__render_from_workflow({ WF_INFO => $wf_info });
+    # Pass the initial activity so we get the form right away
+    my $wf_action = (keys %{$wf_info->{ACTIVITY}})[0];
+
+    $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action });
     return $self;
 
-
-    $self->_page({
-        label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
-        description => i18nGettext($wf_info->{WORKFLOW}->{DESCRIPTION}),
-    });
-
-    $self->_result()->{main} = [{
-        type => 'form',
-        action => 'workflow',
-        content => {
-        submit_label => 'start',
-            fields => [ { type => 'hidden', 'name' => 'wf_type', value => $self->param('wf_type') } ]
-        }}
-    ];
-
-    return $self;
 }
 
 
@@ -91,6 +78,8 @@ sub init_load {
 
     # re-instance existing workflow
     my $id = $self->param('wf_id');
+    my $wf_action = $self->param('wf_action') || '';
+    my $view = $self->param('view') || '';
 
     my $wf_info = $self->send_command( 'get_workflow_ui_info', {
         ID => $id
@@ -101,7 +90,7 @@ sub init_load {
         return $self;
     }
 
-    $self->__render_from_workflow({ WF_INFO => $wf_info });
+    $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action, VIEW => $view });
 
     return $self;
 
@@ -246,7 +235,7 @@ sub action_index {
         my @fields = map { $_->{name} } @{$wf_args->{wf_fields}};
         my $fields = $self->param( \@fields );
         %wf_param = %{ $fields } if ($fields);
-        $self->logger()->debug( "wf fields: " . Dumper \@fields );
+        $self->logger()->debug( "wf fields: " . Dumper $fields );
     }
 
     # take over params from token, if any
@@ -314,7 +303,13 @@ sub action_index {
     # If we call the token action from within a result list we want
     # to "break out" and set the new url instead rendering the result inline
     if ($wf_args->{redirect}) {
-        $self->redirect('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID});
+        # Check if we can auto-load the next available action
+        my $redirect = 'workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
+        my @activity = keys %{$wf_info->{ACTIVITY}};
+        if (scalar @activity == 1) {
+            $redirect .= '!wf_action!'.$activity[0];
+        }
+        $self->redirect($redirect);
         return $self;
     }
 
@@ -323,7 +318,15 @@ sub action_index {
         ID => $wf_info->{WORKFLOW}->{ID},
         WORKFLOW => $wf_info->{WORKFLOW}->{TYPE}
     });
-    $self->__render_from_workflow({ WF_INFO => $wf_info });
+
+    # Check if we can auto-load the next available action
+    my $wf_action;
+    my @activity = keys %{$wf_info->{ACTIVITY}};
+    if (scalar @activity == 1) {
+        $wf_action = $activity[0];
+    }
+
+    $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action });
 
     return $self;
 
@@ -402,6 +405,12 @@ sub action_select {
         $wf_info = $self->send_command( 'get_workflow_ui_info', {
             ID => $wf_id
         });
+
+        my @activity = keys %{$wf_info->{ACTIVITY}};
+        if (scalar @activity == 1) {
+            $args->{WF_ACTION} = $activity[0];
+        }
+
     } else {
         $args->{WF_ACTION} = $wf_action;
     }
@@ -473,7 +482,7 @@ sub action_search {
         content => {
             header => 'Grid-Headline',
             actions => [{
-                path => 'workflow!load!wf_id!{serial}',
+                path => 'workflow!load!wf_id!{serial}!view!result',
                 label => 'Open Workflow',
                 icon => 'view',
                 target => 'tab',
@@ -568,9 +577,10 @@ sub __render_from_workflow {
 
     my $wf_action;
 
-    if (scalar @activities == 1) {
-        $wf_action = $activities[0];
-    } elsif($args->{WF_ACTION}) {
+    #if (scalar @activities == 1) {
+    #    $wf_action = $activities[0];
+    #} els
+    if($args->{WF_ACTION}) {
         $wf_action = $args->{WF_ACTION};
         if (!$wf_info->{ACTIVITY}->{$wf_action}) {
             $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE'),'error');
@@ -613,17 +623,9 @@ sub __render_from_workflow {
             };
 
             $item->{options} = $field->{options} if ($field->{options});
-
-            # autodetection of array and hashes
-            if ($name =~ m{ \A (\w+)\[\] }xms) {
+            if ($field->{clonable}) {
                 $item->{clonable} = 1;
-                # Migration code - to move from former scalar values to arrays
-                my $basename = $1;
-                if (!defined $context->{$name} && $context->{$basename}) {
-                    $context->{$name} = [ $context->{$basename} ];
-                }
-            } elsif ($name =~ m{ \A (\w+){} }xms) {
-
+                $item->{name} .= '[]';
             }
 
             my $val = $self->param($name);
@@ -635,10 +637,12 @@ sub __render_from_workflow {
             } elsif (defined $context->{$name}) {
                 # clonables need array as value
                 if ($item->{clonable}) {
-                    if (!ref $context->{$name}) {
+                    if (ref $context->{$name}) {
+                        $item->{value} = $context->{$name};
+                    } elsif($context->{$name} =~ /^ARRAY/) {
                         $item->{value} = $self->serializer()->deserialize($context->{$name});
                     } else {
-                        $item->{value} = $context->{$name};
+                        $item->{value} = [ $context->{$name} ];
                     }
                 } else {
                     $item->{value} = $context->{$name};
@@ -687,7 +691,7 @@ sub __render_from_workflow {
 
         my @fields;
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
-        foreach my $key (keys %{$context}) {
+        foreach my $key (sort keys %{$context}) {
             next if ($key =~ m{ \A wf_ }x);
             next if ($key =~ m{ \A _ }x);
             next if ($key =~ m{ \A workflow_id }x);
@@ -713,13 +717,17 @@ sub __render_from_workflow {
             push @fields, $item;
         }
 
+        # Add action buttons only if we are not in result view
+        my $buttons;
+        $buttons = $self->__get_action_buttons( $wf_info ) if ($args->{VIEW} ne 'result');
+
         my @section = {
             type => 'keyvalue',
             content => {
                 label => '',
                 description => '',
                 data => \@fields,
-                buttons => $self->__get_action_buttons( $wf_info )
+                buttons => $buttons
         }};
 
         $self->_result()->{main} = \@section;
@@ -728,25 +736,38 @@ sub __render_from_workflow {
         my $desc = $wf_info->{STATE}->{DESCRIPTION};
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
             $self->set_status( i18nGettext($desc || 'I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
-        } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
+        } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
             $self->set_status( i18nGettext($desc || 'I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
         } elsif ( $wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') {
             $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'warning');
         }
 
     }
+    if ($wf_info->{WORKFLOW}->{ID} ) {
 
-    $self->_result()->{right} = [{
-        type => 'keyvalue',
-        content => {
-            label => '',
-            description => '',
-            data => [
-                { label => 'Workflow Id', value => $wf_info->{WORKFLOW}->{ID} },
-                { label => 'Workflow State', value => $wf_info->{WORKFLOW}->{STATE} },
-                { label => 'Run State', value => $wf_info->{WORKFLOW}->{PROC_STATE} },
-            ],
-    }}] if ($wf_info->{WORKFLOW}->{ID} );
+        my @buttons;
+        if ($args->{VIEW} eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/) {
+            @buttons = ({
+                'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                'label' => 'open workflow',
+            });
+        }
+
+        $self->_result()->{right} = [{
+            type => 'keyvalue',
+            content => {
+                label => '',
+                description => '',
+                data => [
+                    { label => 'Workflow Id', value => $wf_info->{WORKFLOW}->{ID} },
+                    { label => 'Workflow State', value => $wf_info->{WORKFLOW}->{STATE} },
+                    { label => 'Run State', value => $wf_info->{WORKFLOW}->{PROC_STATE} }
+                ],
+                buttons => \@buttons,
+        }}];
+    }
+
+
 
     return $self;
 

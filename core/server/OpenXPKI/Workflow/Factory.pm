@@ -125,8 +125,8 @@ sub get_activity_info {
             name => $field->{name},
             label => $field->{label} || $field->{name},
             type => $field->{type} || 'text',
-
             required => ($field->{is_required} && $field->{is_required} eq 'yes') || 0,
+            clonable => (defined $field->{min} || $field->{max}) || 0,
         };
 
         # check for the source_list and source_class attributes

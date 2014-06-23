@@ -41,33 +41,32 @@ sub action_get_styles_for_profile {
 }
 
 # this is called when the user selects the key algorithm
-# it must update the key_enc and key_param field at once
-sub action_get_key_param {
+# it must update the key_enc and key_gen_param field at once
+sub action_get_key_gen_param {
 
     my $self = shift;
     my $args = shift;
 
-    my $key_alg = $self->param('key_alg');
-    $self->logger()->debug( 'get_key_param for key_alg: ' .$key_alg . ' with preset ' . Dumper $self->param('key_param{curve_name}'));
+    my $key_type = $self->param('key_type');
 
     # Get the possible parameters for this algo
-    my $key_param_names = $key_alg ? $self->send_command( 'get_param_names', { KEYTYPE => $key_alg }) : {};
+    my $key_gen_param_names = $key_type ? $self->send_command( 'get_param_names', { KEYTYPE => $key_type }) : {};
 
-    $self->logger()->debug( '$key_param_names: ' . Dumper $key_param_names );
+    $self->logger()->debug( '$key_gen_param_names: ' . Dumper $key_gen_param_names );
 
     # The field names used in the ui are in the request
     my $in = $self->param();
-    my $key_param = $in->{key_param};
+    my $key_gen_params = $in->{key_gen_params};
 
     my @fields;
-    foreach my $pn (keys %{$key_param}) {
+    foreach my $pn (keys %{$key_gen_params}) {
         my @param;
         my $param_name = uc($pn);
-        if ($key_param_names->{$param_name}) {
-            my $param = $self->send_command( 'get_param_values', { KEYTYPE => $key_alg, PARAMNAME => $param_name });
+        if ($key_gen_param_names->{$param_name}) {
+            my $param = $self->send_command( 'get_param_values', { KEYTYPE => $key_type, PARAMNAME => $param_name });
             @param = map { { value => $_, label => $_ } } sort keys %{$param};
 
-            my $preset = $key_param->{$pn};
+            my $preset = $key_gen_params->{$pn};
 
             $self->logger()->debug( 'Preset '.$preset. ' Values ' . Dumper keys %{$param});
 
@@ -76,14 +75,14 @@ sub action_get_key_param {
             }
 
             push @fields, {
-                name => "key_param{$pn}",
+                name => "key_gen_params{$pn}",
                 value => $preset,
                 type => 'select',
                 options => \@param,
                 is_optional => 0
             };
         } else {
-            push @fields, { name => "key_param{".$pn."}", value => $key_param->{$pn}, type => 'hidden', is_optional => 1 };
+            push @fields, { name => "key_gen_params{".$pn."}", value => $key_gen_params->{$pn}, type => 'hidden', is_optional => 1 };
         }
     }
 

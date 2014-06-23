@@ -37,12 +37,13 @@ OpenXPKI/Client/UI/Crl.pm
 OpenXPKI/Client/UI/Home.pm
 OpenXPKI/Client/UI/Information.pm
 OpenXPKI/Client/UI/Login.pm
-OpenXPKI/Client/UI/Login/Passwd.pm
+OpenXPKI/Client/UI/Plain.pm
+OpenXPKI/Client/UI/Profile.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Workflow.pm
 OpenXPKI/Client/UI/Workflow/Metadata.pm
-
+OpenXPKI/Client/UI/Handle/Profile.pm
 
 ## Config Layers
 OpenXPKI/Config/Merge.pm

@@ -130,6 +130,15 @@ sub handle_request {
     my $action = $cgi->param('action') || '';
     my $page = $cgi->param('page') || '';
 
+    # Check for goto redirection first
+    if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
+        my $goto = $1;
+        my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });
+        $self->logger()->debug("Send redirect to $goto");
+        $result->redirect( $goto );
+        return $result->render();
+    }
+
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure

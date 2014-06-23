@@ -14,7 +14,8 @@ style:
         ui:
             subject:
                 - hostname
-#            san: 
+            san: 
+                - san_free
             info:
                 - requestor_gname
                 - requestor_name

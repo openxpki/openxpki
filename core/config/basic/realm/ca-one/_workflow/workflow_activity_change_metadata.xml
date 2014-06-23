@@ -1,42 +1,42 @@
 <actions>
- 
+
     <action name="changemeta_load_data"
             class="OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata"
-            description="I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_DATA">            
-            <field name="cert_identifier" is_required="yes"/>   
+            description="I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_DATA">
+            <field name="cert_identifier" is_required="yes" type="cert_identifier" />
             <validator name="I18N_OPENXPKI_WF_VAL_CERT_IDENTIFIER_EXISTS">
               <arg>$cert_identifier</arg>
-            </validator>                            
+            </validator>
     </action>
 
     <action name="changemeta_load_form"
-            class="OpenXPKI::Server::Workflow::Activity::Noop"            
-            description="I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_FORM">                    
-    </action>    
-    
+            class="OpenXPKI::Server::Workflow::Activity::Noop"
+            description="I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_FORM">
+    </action>
+
     <action name="changemeta_update_context"
-            class="OpenXPKI::Server::Workflow::Activity::Noop"            
-            description="I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA"> 
-            <field name="meta_email[]"/>
+            class="OpenXPKI::Server::Workflow::Activity::Noop"
+            description="I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA">
+            <field name="meta_email" min="1" max="10" />
             <field name="meta_requestor"/>
-            <field name="meta_system_id" is_required="no"/>            
+            <field name="meta_system_id" is_required="no"/>
             <validator name="changemeta_validate_system_id">
                 <arg>meta_system_id</arg>
             </validator>
-            <validator name="global_validate_regex">       
-                <arg>meta_email[]</arg>
-                <arg>email</arg>                
+            <validator name="global_validate_regex">
+                <arg>meta_email</arg>
+                <arg>email</arg>
             </validator>
     </action>
 
     <action name="changemeta_persist"
             class="OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata"
             description="I18N_OPENXPKI_WF_ACTION_METADATA_SAVE_DATA">
-    </action>  
+    </action>
 
     <action name="changemeta_terminate"
             class="OpenXPKI::Server::Workflow::Activity::Noop"
             description="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_ABORT">
     </action>
-    
+
 </actions>

@@ -9,11 +9,18 @@
     </action>
 
     <action name="csr_provide_server_key_password"
-        class="OpenXPKI::Server::Workflow::Activity::CSR::SetKeyPassword"
-        uihandle="OpenXPKI::Client::UI::Handle::Profile::render_key_select">
+        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
+        uihandle="OpenXPKI::Client::UI::Handle::Profile::render_key_select"
+        ds_namespace="csr_keygen_password"
+        ds_key_param="workflow_id"
+        ds_value_param="_password"
+        ds_encrypt="1"
+        ds_force="1"
+        ds_unset_context_value="1">
         <field name="_password"  />
-        <field name="key_alg"  />
-        <field name="key_param"  />
+        <field name="key_type"  />
+        <field name="key_gen_params"  />
+        <field name="csr_type" type="hidden" default="pkcs10" />
     </action>
 
     <action name="csr_generate_key_client"
@@ -77,14 +84,14 @@
         check_creator="0">
           <!-- if multi_role_approval is set to 1, a user is allowed
                to approve the certificate request with different
-               session roles -->
+               session roles
         <field name="_check_hash"/>
         <field name="_signature"/>
         <field name="_signature_text"/>
         <validator name="I18N_OPENXPKI_WF_VAL_VALIDAPPROVALSIGNATURECSR">
             <arg>$_signature</arg>
             <arg>$_signature_text</arg>
-        </validator>
+        </validator> -->
     </action>
 
     <action name="csr_reject_request"
@@ -110,12 +117,17 @@
         message="csr_notify_approval">
     </action>
 
+    <action name="csr_load_key_password"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry"
+        ds_namespace="csr_keygen_password"
+        ds_key_param="workflow_id"
+        ds_value_param="_password">
+    </action>
 
     <action name="csr_generate_key"
-          class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey">
-      <field name="key_type"/>
-      <field name="key_gen_params"/>
-      <field name="_password"/>
+        class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey"
+        _map_key_type="$key_type"
+        _map_key_gen_params="$key_gen_params">
     </action>
 
     <action name="csr_generate_pkcs10"

@@ -16,7 +16,9 @@ style:
                 - hostname
                 - hostname2
                 - port
-#            san: 
+            san: 
+                - san_dns
+                - san_ipv4
             info:
                 - requestor_gname
                 - requestor_name
@@ -46,9 +48,9 @@ style:
                 - ou
                 - dc
                 - c
-            san:
-                - san_choice
-                - san_oid
+#            san:
+#                - san_choice
+#                - san_oid
 
             info:
                 - requestor_gname

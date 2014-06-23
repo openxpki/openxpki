@@ -170,13 +170,20 @@
   </state>
 
   <state name="APPROVED" autorun="yes">
-    <action name="csr_generate_key"
-        resulting_state="KEY_GENERATED">
+    <action name="csr_load_key_password"
+        resulting_state="KEY_PASSWORD_LOADED">
         <condition name="csr_cond_server_key_generation"/>
     </action>
     <action name="global_null"
         resulting_state="REQUEST_COMPLETE">
         <condition name="!csr_cond_server_key_generation"/>
+    </action>
+  </state>
+
+ <state name="KEY_PASSWORD_LOADED" autorun="yes">
+    <action name="csr_generate_key"
+        resulting_state="KEY_GENERATED">
+        <condition name="csr_cond_server_key_generation"/>
     </action>
   </state>
 
