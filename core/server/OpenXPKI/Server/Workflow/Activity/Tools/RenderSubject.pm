@@ -92,119 +92,66 @@ sub execute {
     );
 
 
-    # Check for SAN Template
-    my @san_template_keys = $config->get_keys("profile.$profile.style.$style.subject.san");
 
-    ##! 32: "Keys found at profile.$profile.style.$style.subject.san : " . Dumper @san_template_keys
-
-    my $csr_info = {};
+    # This is a temporary hack to handle old ui workflows -
+    # we "blindly copy" the pkcs10 sans if the new cert_san_parts is not set
+    # The pkcs10 alternative path should be removed after UI change
+    my $cert_san_parts  = $context->param('cert_san_parts');
     my $pkcs10 = $context->param('pkcs10');
 
-    if ($pkcs10) {
+    my $extra_san = {};
+    if ($cert_san_parts) {
+        $extra_san = $ser->deserialize( $cert_san_parts );
+    } elsif ($pkcs10) {
         my $obj = OpenXPKI::Crypto::CSR->new( DATA => $pkcs10, TOKEN => CTX('api')->get_default_token() );
-        $csr_info = $obj->get_subject_alt_names({ FORMAT => 'HASH' });
+        $extra_san = $obj->get_subject_alt_names({ FORMAT => 'HASH' });
     }
-    ##! 32: 'csr info ' . Dumper $csr_info
 
-    my @san_list;
-    # If san template is defined we force template mode
-    if (scalar @san_template_keys) {
-        ##! 16: 'Template mode'
+    ##! 32: 'extra san' . Dumper $extra_san
 
-        CTX('log')->log(
-            MESSAGE => "Rendering san using template style",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application', ],
-        );
+    my $san_list;
+    # Try to render using the template mode, will return undef if there is no
+    # rendering rule
 
-        @san_list = @{CTX('api')->render_san_from_template({
-            PROFILE => $profile,
-            STYLE   => $style,
-            VARS    => $subject_vars,
-            ADDITIONAL => $csr_info || {},
-        })};
+    $san_list = CTX('api')->render_san_from_template({
+        PROFILE => $profile,
+        STYLE   => $style,
+        VARS    => $subject_vars,
+        ADDITIONAL => $extra_san || {},
+    });
 
-    } elsif ( my $san_data = $context->param('cert_subject_alt_name_parts') ) {
-        ##! 16: 'Freestyle mode'
-
-        CTX('log')->log(
-            MESSAGE => "Rendering san using free style",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application', ],
-        );
-
-        # FIXME -  should get refactored when new ui is ready
-        # TODO - this is mostly untested
-
-        my $subject_alt_name_parts = $ser->deserialize( $context->param('cert_subject_alt_name_parts') );
-
+    # No SAN template exists - if we have extra san just map them to the
+    # array ref structure required by the csr persister
+    if (!$san_list && $extra_san) {
         my $san_names = CTX('api')->list_supported_san();
 
-        # remap to a structured hash $san_items->{type}->{value} = 1
+        # create a nested has to remove duplicates
         my $san_items = {};
-        foreach my $key (grep m{ _key \z }xms, keys %{ $subject_alt_name_parts }) {
-            my ($id) = ($key =~ m{ \A cert_subject_alt_name_(.*)_key \z }xms);
-            if (! ref $subject_alt_name_parts->{$key}) {
-                # scalar case
-                my $type  = $subject_alt_name_parts->{$key};
-                my $value = $subject_alt_name_parts->{
-                            'cert_subject_alt_name_' . $id . '_value'};
-                if ($type =~ m{ \A ((?: \d+\.)+ \d) \z}xms) { # type is an OID
-                    my $oid  = $1;
-                    $type = 'otherName';
-                    $value = $oid . ';UTF8:' . $value;
-                }
+        foreach my $type (keys %{$extra_san}) {
+            foreach my $value (@{$extra_san->{$type}}) {
                 $san_items->{$type}->{$value} = 1 if($value);
             }
-            elsif (ref $subject_alt_name_parts->{$key} eq 'ARRAY') {
-                for (my $i = 0; $i < scalar @{ $subject_alt_name_parts->{$key} }; $i++) {
-                    my $type  = $subject_alt_name_parts->{$key}->[$i];
-                    my $value = $subject_alt_name_parts->{
-                            'cert_subject_alt_name_' . $id . '_value'}->[$i];
-                    if ($type =~ m{ \A (\d+\.)+\d \z}xms) { # type is an OID
-                        my $oid  = $1;
-                        $type = 'otherName';
-                        $value = $oid . ';UTF8:' . $value;
-                    }
-                    $san_items->{$type}->{$value} = 1 if($value);
-                }
-            }
         }
 
-        # push additional items from pcks10
-        if ($csr_info) {
-            foreach my $type (keys %{$csr_info}) {
-                foreach my $value (@{$csr_info->{$type}}) {
-                    $san_items->{$type}->{$value} = 1 if($value);
-                }
-            }
-        }
-
-        # Map the items hash to the internal san_array structure
+        # Map the items hash to san_array structure used by our crypto engine
         foreach my $type (keys %{$san_items}) {
-            my $ctype = $san_names->{lc($type)};
-            # convert to the internal format used by our crypto engine
             foreach my $value (keys %{$san_items->{$type}}) {
-                push @san_list, [ $ctype, $value ] if ($value);
+                push @{$san_list}, [ $type, $value ] if ($value);
             }
         }
 
-    } else {
-        ##! 8: 'No SAN definition'
         CTX('log')->log(
-            MESSAGE => "No san rendered as no input was available",
+            MESSAGE => "San template empty but extra_san present",
             PRIORITY => 'debug',
             FACILITY => [ 'application', ],
         );
-
     }
 
-    ##! 64: "Entries in san_list \n" .  Dumper @san_list;
+    ##! 64: "Entries in san_list \n" .  Dumper $san_list;
 
     # store in context
     $context->param('cert_subject' => $cert_subject);
-
-    $context->param('cert_subject_alt_name' => $ser->serialize( \@san_list ));
+    $context->param('cert_subject_alt_name' => $ser->serialize( $san_list ));
 
     # If the SAN come from the internal rendering we need to set the source
     # parameter for as this is required by persist_csr
@@ -231,14 +178,12 @@ OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject;
 
 Take the input parameters provided by the ui and render the subject and
 subject alternative according to the profiles template definition.
-There are two different parsing modes "template" and "freestyle", which
-are autodetected by the presence of the "san" section in either the
-subject part (template) or the "ui" part (freestyle).
+The SAN part is made up from two seperate sources:
 
-=head2 Template Mode
+=head2 templated SAN entries
 
-In template mode, you MUST not define any SAN input field in the ui section.
-You CAN specify a san section using the same values as in the subject field.
+Define template fields in the ui.subject section of you profile and use them in the
+rendering information in subject.san the same way you do for the subject.
 
 Example:
 
@@ -263,13 +208,20 @@ each entry with the pipe symbol |. Hint: The foreach loop automagically
 degrades if the given value is a scalar or even undef, so use foreach
 whenever a list is possible.
 
-=head2 Freestyle Mode
+Templated entries are displayed to the user during request but can not be
+removed by the user.
 
-In freestyle mode, the subject dn is parsed the same way as in template mode.
-If you specify input fields in the ui section of your profile, the user can
-enter his desired values for each san key. The users input is mapped without
-further templating to the san section of the certificate (duplicate items and
-and leading/trailing whitespace are removed).
+=head2 free SAN entries
+
+To enable free SAN entries add a section ui.san next to you ui.subject. The
+form fields MUST have a key that fits any of the allowed SAN items (e.g DNS,
+IP, OID) and the value must be given in the approriate format for this item.
+The users input is mapped without further templating to the san section of the
+certificate (duplicate items and and leading/trailing whitespace are removed).
+
+Note: If you upload a PKCS10 request having SANs, those ones that match the
+available type are prefilled. Items that do not match a defined type are
+discarded.
 
 Example:
 
@@ -300,11 +252,9 @@ Example:
        max: 20
 
 The above code will present the user up to 20 fields each to enter IPs or DNS
-names. Each entry will show up "as is" as a single san entry. Freestyle mode
-will also work if you populate the "cert_subject_alt_name_parts" context entry
-in the same way as the frontend does.
+names. Each entry will show up "as is" as a single san entry.
 
-=head2 Parameters in context:
+=head2 context values
 
 =over
 
@@ -312,10 +262,6 @@ in the same way as the frontend does.
 
 The main subject parameters, used for rendering the subject dn and in template
 mode for the san. The "cert_subject_" prefix is removed from the keys name.
-
-=item cert_subject_alt_name_parts
-
-Used in freestyle mode to form the san.
 
 =item cert_profile
 

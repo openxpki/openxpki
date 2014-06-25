@@ -30,7 +30,7 @@
     </action>
 
     <action name="csr_upload_pkcs10"
-        class="OpenXPKI::Server::Workflow::Activity::Noop">
+        class="OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10">
         <field name="pkcs10" label="CSR (PKCS#10)" is_required="yes" type="textarea" />
         <field name="csr_type" type="hidden" default="pkcs10" />
     </action>
@@ -46,7 +46,7 @@
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_subject_form"
         source="USER">
-        <field name="cert_subject_alt_parts" type="cert_san" />
+        <field name="cert_san_parts" type="cert_san" />
     </action>
 
     <action name="csr_edit_cert_info"

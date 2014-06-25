@@ -129,6 +129,12 @@ sub __fetch_input_element_definitions {
             }
             $ucinput{KEYS} = \@keys;
         }
+
+        if (defined $ucinput{MIN} || $ucinput{MAX}) {
+            $ucinput{CLONABLE} = 1;
+        }
+
+
 =cut
         if ($ucinput{TYPE} eq 'keyvalue') {
             # "key" and "value" are a hash
@@ -485,6 +491,15 @@ sub render_san_from_template {
 
     # Fix CamelCaseing
     my $san_names = $self->list_supported_san();
+
+    # Fix CamelCasing on items
+    foreach my $key (keys %{$items}) {
+        my $cckey = $san_names->{lc($key)};
+        if ($key ne $cckey) {
+            $items->{$cckey} = $items->{$key};
+            delete $items->{$key};
+        }
+    }
 
     foreach my $type (@san_template_keys) {
         my @entries;

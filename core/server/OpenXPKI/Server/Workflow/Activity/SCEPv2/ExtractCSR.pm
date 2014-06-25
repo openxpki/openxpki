@@ -1,6 +1,7 @@
 # OpenXPKI::Server::Workflow::Activity::SCEPv2::ExtractCSR
 # Written by Alexander Klink for the OpenXPKI project 2006
 # Copyright (c) 2006 by The OpenXPKI Project
+# TODO - startup parsing now also in Tools::ParsePKCS10, perhaps merge
 
 package OpenXPKI::Server::Workflow::Activity::SCEPv2::ExtractCSR;
 

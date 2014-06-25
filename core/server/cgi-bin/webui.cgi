@@ -32,7 +32,10 @@ eval {
     my $client = OpenXPKI::Client::UI->new({
         session => $session_front,
         logger => $log,
-        config => { socket => '/var/openxpki/openxpki.socket' }
+        config => {
+            socket => '/var/openxpki/openxpki.socket',
+            scripturl => '/cgi-bin/webui.fcgi'
+        }
     });
     $result = $client->handle_request({ cgi => $cgi });
     $log->debug('request handled');

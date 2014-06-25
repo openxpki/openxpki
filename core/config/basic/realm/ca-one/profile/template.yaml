@@ -61,6 +61,7 @@ hostname:
     description: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC
     type: freetext
     source: CN:([^:]+)
+    preset: CN
     match: \A [A-Za-z\d\-\.]+ \z
     width: 60
     default: fully.qualified.example.com

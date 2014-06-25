@@ -42,7 +42,6 @@ OpenXPKI/Client/UI/Profile.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Workflow.pm
-OpenXPKI/Client/UI/Workflow/Metadata.pm
 OpenXPKI/Client/UI/Handle/Profile.pm
 
 ## Config Layers
@@ -283,6 +282,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/CalculateKeyId.pm
 OpenXPKI/Server/Workflow/Activity/Tools/LoadCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PersistCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
+OpenXPKI/Server/Workflow/Activity/Tools/ParsePKCS10.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 

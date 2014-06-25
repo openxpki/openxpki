@@ -705,6 +705,12 @@ sub __render_from_workflow {
                 $item->{value}  = { label => $context->{$key}, page => 'certificate!info!identifier!'. $context->{$key}, target => 'modal' };
             }
 
+            # Code format any PEM blocks
+            if ( $key =~ m{ (pkcs10) }x) {
+                $item->{format} = 'code';
+            }
+
+
             # FIXME - will not work once we change serialization format
             if (ref $item->{value} eq '' &&  $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
                 $item->{value} = $self->serializer()->deserialize( $context->{$key} );
@@ -719,7 +725,7 @@ sub __render_from_workflow {
 
         # Add action buttons only if we are not in result view
         my $buttons;
-        $buttons = $self->__get_action_buttons( $wf_info ) if ($args->{VIEW} ne 'result');
+        $buttons = $self->__get_action_buttons( $wf_info ) if (!$args->{VIEW} || $args->{VIEW} ne 'result');
 
         my @section = {
             type => 'keyvalue',
@@ -746,7 +752,7 @@ sub __render_from_workflow {
     if ($wf_info->{WORKFLOW}->{ID} ) {
 
         my @buttons;
-        if ($args->{VIEW} eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/) {
+        if ($args->{VIEW} && $args->{VIEW} eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/) {
             @buttons = ({
                 'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
                 'label' => 'open workflow',

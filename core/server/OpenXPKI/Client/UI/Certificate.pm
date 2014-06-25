@@ -104,12 +104,31 @@ sub init_info {
         { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
     );
 
+    # TODO - Need to decide of we use buttons or links
+    my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!$cert_identifier!format!";
+    my @buttons = (
+        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM'), 'href' => $base.'pem' },
+        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER'), 'page' => $base.'der', target => '_blank' },
+        # core bug see #185 { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT'), 'page' => $base.'txt', target => '_blank' },
+        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7'), 'page' => $base.'pkcs7', target => '_blank' }
+    );
+
+    my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
+    push @fields, { label => 'Download', value => '<ul>'.
+        sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
+        # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
+        sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
+        sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+        '</ul>'
+    };
+
     $self->_result()->{main} = [{
         type => 'keyvalue',
         content => {
             label => '',
             description => '',
             data => \@fields,
+            #buttons => \@buttons
         }},
     ];
 
@@ -250,7 +269,7 @@ sub init_download {
     # No format, draw a list
     if (!$format) {
 
-        my $pattern = "<li><a href=\"/cgi-bin/connect.cgi?page=certificate!download!identifier!$cert_identifier!format!%s\" target=\"_blank\">%s</a></li>";
+        my $pattern = '<li><a href="'.$self->_client()->_config()->{'scripturl'}.'page=certificate!download!identifier!$cert_identifier!format!%s" target="_blank">%s</a></li>';
 
         $self->add_section({
             type => 'text',
@@ -258,7 +277,7 @@ sub init_download {
                 label => '',
                 description => '<ul>'.
                 sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
-                sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
+                #sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')). # core bug see #185
                 sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
                 sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
                 '</ul>',
@@ -278,32 +297,29 @@ sub init_download {
     } else {
 
         my $cert = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => uc($format) });
+        my $cert_info = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
+
+        $self->logger()->debug("cert info " . Dumper $cert_info );
+
 
         my $content_type = 'application/octet-string';
-        my $filename = '';
-        my $ext = '';
+        my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
 
         if ($format eq 'txt') {
             $content_type = 'text/plain';
-        } else {
-            my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
+            $filename .= '.txt';
+        } elsif ($format eq 'pem') {
+            $filename .= '.pem';
+        } elsif ($format eq 'der') {
+            $filename .= '.crt';
+        }
 
-            $self->logger()->debug("cert_info : " . Dumper $cert_info  );
-
-            $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
-            if ($format eq 'pem') {
-                $filename .= '.pem';
-            } elsif ($format eq 'der') {
-                $filename .= '.crt';
-            }
-
-            if ($format eq 'pem' || $format eq 'der') {
-                # need special content type on ca certs
-                if ($cert_info->{ISSUER_IDENTIFIER} eq $cert_info->{IDENTIFIER}) {
-                    $content_type = 'application/x-x509-ca-cert';
-                } else {
-                    $content_type = 'application/x-x509-user-cert';
-                }
+        if ($format eq 'pem' || $format eq 'der') {
+            # need special content type on ca certs
+            if ($cert_info->{ISSUER_IDENTIFIER} eq $cert_info->{IDENTIFIER}) {
+                $content_type = 'application/x-x509-ca-cert';
+            } else {
+                $content_type = 'application/x-x509-user-cert';
             }
         }
 

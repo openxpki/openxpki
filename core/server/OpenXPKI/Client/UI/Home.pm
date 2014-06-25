@@ -22,7 +22,6 @@ sub init_welcome {
     my $self = shift;
     my $args = shift;
 
-    $self->set_status("You have 5 pending requests.");
     $self->init_index( $args );
 
     return $self;

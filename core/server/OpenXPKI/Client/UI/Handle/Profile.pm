@@ -121,6 +121,7 @@ sub render_subject_form {
         description => i18nGettext($wf_info->{STATE}->{DESCRIPTION}),
     });
 
+
     $self->_result()->{main} = [{
         type => 'form',
         action => 'workflow',
@@ -264,3 +265,6 @@ sub __translate_form_def {
 
 }
 
+1;
+
+__END__

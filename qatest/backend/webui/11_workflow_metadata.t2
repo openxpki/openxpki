@@ -13,7 +13,7 @@ use MockUI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 package main;
 
@@ -54,4 +54,8 @@ $result = $client->mock_request({
     'password' => 'RA Operator'
 });
 
-is($result->{goto}, 'welcome', 'Logged in');
+$result = $client->mock_request({
+    'page' => 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA',
+});
+
+# tbd
