@@ -2,7 +2,7 @@
 
 Component = Em.Component.extend
     click: (evt) ->
-        if evt.target.tagName is "A"
+        if evt.target.tagName is "A" and not /^(html|\/)/.test evt.target.href
             evt.stopPropagation()
             evt.preventDefault()
             @container.lookup("route:openxpki").sendAjax
