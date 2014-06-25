@@ -29,6 +29,10 @@ Component = Em.Component.extend
         fields
     ).property "content.content.fields.@each.name"
 
+    click: (evt) ->
+        if evt.target.tagName is "BUTTON"
+            $(evt.target).addClass "btn-loading"
+
     actions:
         addClone: (field) ->
             fields = @get "content.content.fields"
@@ -81,7 +85,9 @@ Component = Em.Component.extend
                     delete field.error
                 names.push field.name if field.name not in names
 
-            return if isError
+            if isError
+                @$().find(".btn-loading").removeClass "btn-loading"
+                return
 
             for name in names
                 clones = (f for f in fields when f.name is name)

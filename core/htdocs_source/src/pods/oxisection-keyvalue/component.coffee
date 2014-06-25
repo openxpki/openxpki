@@ -2,13 +2,15 @@
 
 Component = Em.Component.extend
     click: (evt) ->
-        if evt.target.tagName is "A"
+        if evt.target.tagName is "A" and not /^(html|\/)/.test evt.target.href
             evt.stopPropagation()
             evt.preventDefault()
             @container.lookup("route:openxpki").sendAjax
                 data:
                     page:evt.target.href.split("#")[1]
                     target:evt.target.target
+        else if evt.target.tagName is "BUTTON"
+            $(evt.target).addClass "btn-loading"
 
     actions:
         execute: (btn) ->

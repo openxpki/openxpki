@@ -21,7 +21,6 @@ Route = Em.Route.extend
         data.url ?= @controllerFor("config").get "url"
         data.data._ = (new Date()).getTime()
         $(".loading").show()
-        $(".Xmaincontent").addClass("ajaxloading")
         $.ajax(data).then (doc) =>
             @controllerFor("openxpki").set "status", doc.status
             if doc.structure
@@ -36,11 +35,11 @@ Route = Em.Route.extend
             if doc.goto
                 @transitionTo "openxpki", doc.goto
             $(".loading").hide()
-            $(".Xmaincontent").removeClass("ajaxloading")
+            $(".btn-loading").removeClass("btn-loading")
             doc
         , (err) ->
             $(".loading").hide()
-            $(".Xmaincontent").removeClass("ajaxloading")
+            $(".btn-loading").removeClass("btn-loading")
             console.log "Ajax error", err
 
 `export default Route`
