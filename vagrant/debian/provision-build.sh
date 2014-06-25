@@ -20,6 +20,7 @@ dpkg -i /tmp/openca-tools_1.3.0-1_amd64.deb
 cd /code-repo/package/debian
 
 # For stupid deps problem, unpack current MakeMaker and Module::Build in lib
+mkdir -p lib/
 cd lib/
 wget http://search.cpan.org/CPAN/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-6.98.tar.gz 
 wget http://search.cpan.org/CPAN/authors/id/L/LE/LEONT/Module-Build-0.4205.tar.gz
