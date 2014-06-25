@@ -33595,7 +33595,7 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</ul></div></div></div><div class="container-fluid Xmaincontent"><div class="row"><div class="col-md-2"><div role="complementary" class="bs-sidebar hidden-print"><ul class="nav bs-sidenav">');
+        data.buffer.push('</ul></div></div></div><div class="container-fluid"><div class="row"><div class="col-md-2"><div role="complementary" class="bs-sidebar hidden-print"><ul class="nav bs-sidenav">');
         stack1 = helpers.each.call(depth0, 'sideNavEntries', {
             hash: {},
             hashTypes: {},
@@ -34964,6 +34964,50 @@ define('templates/templates', [
             return buffer;
         }
         function program5(depth0, data) {
+            var stack1;
+            stack1 = helpers['if'].call(depth0, 'btn.href', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                inverse: self.program(8, program8, data),
+                fn: self.program(6, program6, data),
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            } else {
+                data.buffer.push('');
+            }
+        }
+        function program6(depth0, data) {
+            var buffer = '', stack1;
+            data.buffer.push('<a ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'href': 'btn.href' },
+                hashTypes: { 'href': 'STRING' },
+                hashContexts: { 'href': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            })));
+            data.buffer.push(' target="_blank" class="btn btn-default">');
+            stack1 = helpers._triageMustache.call(depth0, 'btn.label', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push('</a>');
+            return buffer;
+        }
+        function program8(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<button ');
             data.buffer.push(escapeExpression(helpers.action.call(depth0, 'execute', 'btn', {
@@ -35260,6 +35304,12 @@ define('pods/oxivalue-format/component', [
             text: function (v) {
                 return v;
             },
+            code: function (v) {
+                return '<code>' + v.replace(/(\r\n|\n|\r)/gm, '<br>') + '</code>';
+            },
+            raw: function (v) {
+                return v;
+            },
             deflist: function (v) {
                 var k, w;
                 return '<dl>' + function () {
@@ -35303,7 +35353,7 @@ define('pods/oxisection-keyvalue/component', [
     var Component;
     Component = Em.Component.extend({
         click: function (evt) {
-            if (evt.target.tagName === 'A') {
+            if (evt.target.tagName === 'A' && evt.target.target !== '_blank') {
                 evt.stopPropagation();
                 evt.preventDefault();
                 return this.container.lookup('route:openxpki').sendAjax({
@@ -35312,12 +35362,17 @@ define('pods/oxisection-keyvalue/component', [
                         target: evt.target.target
                     }
                 });
+            } else if (evt.target.tagName === 'BUTTON') {
+                return $(evt.target).addClass('btn-loading');
             }
         },
         actions: {
             execute: function (btn) {
                 if (btn.action) {
                     return this.container.lookup('route:openxpki').sendAjax({ data: { action: btn.action } });
+                } else {
+                    console.log('Transition');
+                    return this.container.lookup('route:openxpki').transitionTo('openxpki', btn.page);
                 }
             }
         }
@@ -35585,6 +35640,11 @@ define('pods/oxisection-form/component', [
             }
             return fields;
         }.property('content.content.fields.@each.name'),
+        click: function (evt) {
+            if (evt.target.tagName === 'BUTTON') {
+                return $(evt.target).addClass('btn-loading');
+            }
+        },
         actions: {
             addClone: function (field) {
                 var fields, index;
@@ -35680,6 +35740,7 @@ define('pods/oxisection-form/component', [
                     }
                 }
                 if (isError) {
+                    this.$().find('.btn-loading').removeClass('btn-loading');
                     return;
                 }
                 for (_j = 0, _len1 = names.length; _j < _len1; _j++) {
@@ -36035,7 +36096,6 @@ define('pods/openxpki/route', [
             }
             data.data._ = new Date().getTime();
             $('.loading').show();
-            $('.Xmaincontent').addClass('ajaxloading');
             return $.ajax(data).then(function (_this) {
                 return function (doc) {
                     _this.controllerFor('openxpki').set('status', doc.status);
@@ -36055,12 +36115,12 @@ define('pods/openxpki/route', [
                         _this.transitionTo('openxpki', doc.goto);
                     }
                     $('.loading').hide();
-                    $('.Xmaincontent').removeClass('ajaxloading');
+                    $('.btn-loading').removeClass('btn-loading');
                     return doc;
                 };
             }(this), function (err) {
                 $('.loading').hide();
-                $('.Xmaincontent').removeClass('ajaxloading');
+                $('.btn-loading').removeClass('btn-loading');
                 return console.log('Ajax error', err);
             });
         }

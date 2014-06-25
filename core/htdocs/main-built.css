@@ -2975,8 +2975,8 @@ input[type="button"].btn-block {
 
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url('vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot');
-  src: url('vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff') format('woff'), url('vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+  src: url(style/'../fonts/glyphicons-halflings-regular.eot');
+  src: url(style/'../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url(style/'../fonts/glyphicons-halflings-regular.woff') format('woff'), url(style/'../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url(style/'../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
 .glyphicon {
@@ -7733,6 +7733,17 @@ tr.gridrow-danger:hover > td {
   display: table-cell !important;
 }
 
-.Xmaincontent.ajaxloading {
-  display: none;
+button.btn-loading {
+  color: #fff;
+  background-color: #428bca;
+  border-color: #357ebd;
+}
+
+button.btn-loading:hover,
+button.btn-loading:focus,
+button.btn-loading:active,
+button.btn-loading.active {
+  color: #fff;
+  background-color: #3276b1;
+  border-color: #285e8e;
 }

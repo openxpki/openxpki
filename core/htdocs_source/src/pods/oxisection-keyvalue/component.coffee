@@ -2,7 +2,7 @@
 
 Component = Em.Component.extend
     click: (evt) ->
-        if evt.target.tagName is "A" and not /^(html|\/)/.test evt.target.href
+        if evt.target.tagName is "A" and evt.target.target != '_blank'
             evt.stopPropagation()
             evt.preventDefault()
             @container.lookup("route:openxpki").sendAjax
@@ -18,5 +18,8 @@ Component = Em.Component.extend
                 @container.lookup("route:openxpki").sendAjax
                     data:
                         action:btn.action
+            else
+                console.log('Transition');
+                @container.lookup("route:openxpki").transitionTo "openxpki", btn.page
 
 `export default Component`
