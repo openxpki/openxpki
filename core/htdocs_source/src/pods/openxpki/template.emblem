@@ -31,7 +31,7 @@ div.navbar.navbar-default role="navigation"
             strong {{user.name}} ({{user.role}})
           li: link-to "openxpki" "logout" | Log out
 
-div.container-fluid.Xmaincontent
+div.container-fluid
   div.row
     div.col-md-2
       div.bs-sidebar.hidden-print role="complementary"

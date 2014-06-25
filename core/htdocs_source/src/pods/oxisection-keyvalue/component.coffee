@@ -9,6 +9,8 @@ Component = Em.Component.extend
                 data:
                     page:evt.target.href.split("#")[1]
                     target:evt.target.target
+        else if evt.target.tagName is "BUTTON"
+            $(evt.target).addClass "btn-loading"
 
     actions:
         execute: (btn) ->
