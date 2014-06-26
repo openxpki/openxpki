@@ -39,8 +39,7 @@ EXTERNAL=				\
 
 EXTERNAL2= \
 	Connector \
-	Workflow \
-	Test__utf8 
+	Workflow 
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) DateTime__Format__DateParse
 
