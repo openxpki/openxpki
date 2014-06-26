@@ -6,14 +6,11 @@ Quickstart guide
 Debian/Ubuntu Development Builds
 ---------------------------------
 
-**I am sorry, but: The ubuntu package is outdated and known to fail the certficate request workflow. There is a 0.14 release for debian that should do better and we also have a vagrant file that you can use for a quick start (Instructions will follow). We are heavily working on getting the new UI out (ETA End of June) that should fix those issues.**
+**Starting with the 0.15 release we will no longer support the old mason ui, the 0.15 release includes a very rude but functional version of the new ui component based on the Ember.js framework. We are reworking our build process, debian wheezy packages will hit the servers first, ubuntu trusty should follow within some days.**
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the mason client will crash otherwise!**
 
-We had to change our release policy a bit, we will focus on debian wheezy 64bit for the moment until we have solved some dependancy issues. However the build should also work for Ubuntu 12 and 14 LTS server version but we will perhaps discontinue to publish/test packages for those in the near future.
-
-Current release is 0.13 which is out for debian wheezy and ubuntu 12.04 LTS on the package mirror at http://packages.openxpki.org/. 
-Release builds have some kind of testing and should be fully functional, preview builds "should work" but some stuff might need a bit of manual tweaking.
+Current release is 0.15 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (wheezy)::
 
@@ -146,34 +143,27 @@ If this is not the case, check */var/openxpki/stderr.log*.
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
 
-The webclient uses the Mason toolkit and mod_perl, get the package::
+The new webclient is included in the core packages now. Just open your browser and navigate to *http://yourhost/newoxi/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
 
-    aptitude install libopenxpki-client-html-mason-perl
-    
-If the install is done, point your webbrowser to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
-
-The test setup uses a fully insecure password handler *External Dynamic* - just enter any username and give one of
-
-* User
-* RA Operator
-* CA Operator
-
-as the password. You will be logged in with the username and the "password" is used as the default role (pay attention to the captial letters, it's case SenSitIve!).
+Login as user can be done with any password, there is a preconfigured operator account with user raop and password openxpki. Note that the UI does not recognize the backends acl and will render useless links and buttons for the user role.
 
 Testdrive
 ^^^^^^^^^
 
-#. Login as User (Username: bob, Password: User)
-#. Go to "Request", select "Certificate Signing Request"
-#. Follow the white rabbit
-#. Logout and re-login as RA Operator (Username: raop, Password: RA Operator)  
-#. Go to "Approval", select "Pending Signing Requests"
-#. Select your Request, use the button on the top to approve the request
+#. Login as User (Username: bob, Password: <any>)
+#. Go to "Request", select "Request new certificate"
+#. Complete the pages until you get to the status "PENDING" (gray box on the right)
+#. Logout and re-login as RA Operator (Username: raop, Password: openxpki )  
+#. Go to "Approval", select "Home / My tasks"
+#. Select your Request, change the request or use the "approve" button
 #. After some seconds, your first certificate is ready :)
 #. You can now login with your username and fetch the certificate 
 
 Enabling the SCEP service
 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Note: You need to manually install the openca-tools package which is available from 
+our package server in order to use the scep service.**
 
 The SCEP logic is already included in the core distribution. The package installs
 a wrapper script into /usr/lib/cgi-bin/ and creates a suitable alias in the apache
@@ -214,6 +204,8 @@ folder.
 
 Starting from scratch
 ---------------------
+
+**This section is outdated - sorry**
 
 If you don't use debian or just like the hard way you can of course start from out github repo.
 The debian build file are the current "authorative source" regarding to dependencies, etc. so 
