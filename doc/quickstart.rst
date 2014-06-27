@@ -3,14 +3,21 @@
 Quickstart guide
 ================
 
+Vagrant
+-------
+
+We have a vagrant setup for debian wheezy and ubuntu trusty. If you have vagrant you can just 
+checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
+minutes and will give you a ready to run OXI install available at http://localhost:8080/newoxi/.
+
 Debian/Ubuntu Development Builds
 ---------------------------------
 
 **Starting with the 0.15 release we will no longer support the old mason ui, the 0.15 release includes a very rude but functional version of the new ui component based on the Ember.js framework. We are reworking our build process, debian wheezy packages will hit the servers first, ubuntu trusty should follow within some days.**
 
-**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the mason client will crash otherwise!**
+**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
 
-Current release is 0.15 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
+Current release is 0.15 which is out for debian wheezy and ubuntu trusty on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (wheezy)::
 
@@ -19,12 +26,12 @@ Add the repository to your source list (wheezy)::
     
 or ubuntu::
 
-    echo "deb http://packages.openxpki.org/ubuntu/ precise/release/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
 
-As the init script uses mysql as default, but does not force it as a dependancy, it is crucial that you have the mysql server installed before you pull the OpenXPKI package::
+As the init script uses mysql as default, but does not force it as a dependancy, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
-    aptitude install mysql-server
+    aptitude install mysql-server libdbd-mysql-perl
     aptitude install libopenxpki-perl
 
 We are fighting with a stupid debian build issue, if your install complains about a file collision in ``perllocal.pod``, add the force option::

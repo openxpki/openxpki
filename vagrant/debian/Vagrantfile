@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "test-trusty", primary:true do |test|
       config.vm.box = "williamwu/ubuntu-14.04-server-x64-eng"
       config.vm.hostname = "test-trusty"
-      config.vm.provision :shell, :path => "provision-test.sh"
+      config.vm.provision :shell, :path => "provision-test.sh", :args => "ubuntu"
       config.vm.network :forwarded_port, guest: 80, host: 8080
       config.vm.network :forwarded_port, guest: 443, host: 8443
       config.vm.synced_folder "../../qatest", "/qatest"

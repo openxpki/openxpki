@@ -1,5 +1,12 @@
 #!/bin/bash
-wget http://packages.openxpki.org/debian/openxpki.list -O /etc/apt/sources.list.d/openxpki.list
+
+DIST=$1
+
+if [ "$DIST" == "ubuntu" ]; then
+    wget http://packages.openxpki.org/ubuntu/openxpki.list -O /etc/apt/sources.list.d/openxpki.list
+else 
+    wget http://packages.openxpki.org/debian/openxpki.list -O /etc/apt/sources.list.d/openxpki.list
+fi
 
 aptitude update
 
