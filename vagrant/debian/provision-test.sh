@@ -7,5 +7,11 @@ aptitude update
 DEBIAN_FRONTEND=noninteractive aptitude install --assume-yes mysql-server
 aptitude -o Dpkg::Options::="--force-overwrite" install --assume-yes --allow-untrusted libdbd-mysql-perl libopenxpki-perl openxpki-i18n
 
-/code-repo/vagrant/debian/setup-dummy.sh
+/vagrant/setup-dummy.sh
+
+cd /qatest/backend/nice
+prove . 
+
+cd /qatest/backend/webui
+prove . 
 

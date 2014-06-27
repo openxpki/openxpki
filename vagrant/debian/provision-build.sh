@@ -42,9 +42,12 @@ dpkg -i deb/cpan/*deb deb/core/*deb
 apt-get  install --fix-broken --yes
 
 # run the setup stuff
-/code-repo/vagrant/debian/setup-dummy.sh
+/vagrant/setup-dummy.sh
 
 # Kick off prove
 cd /code-repo/qatest/backend/nice
+prove . 
+
+cd /code-repo/qatest/backend/webui
 prove . 
 
