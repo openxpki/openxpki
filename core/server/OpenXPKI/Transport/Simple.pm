@@ -52,6 +52,9 @@ sub write
 
     my @list = ();
 
+    # We want utf8 encoding on the transport socket
+    utf8::upgrade( $data );
+
     for (my $i=0; $i < length($data)/$MAX_MSG_LENGTH-1;$i++)
     {
         ##! 4: "sending intermediate message"
@@ -180,6 +183,9 @@ sub read
         CORE::close $self->{STDIN};
         delete $self->{STDIN};
     }
+
+    # We silently assume that the transport socket is utf8
+    utf8::upgrade( $msg );
 
     return $msg;
 }
