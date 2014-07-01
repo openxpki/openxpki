@@ -11,7 +11,7 @@ use strict;
 use warnings;
 
 use lib qw(
-  /usr/lib/perl5/ 
+  /usr/lib/perl5/
   ../../lib
 );
 
@@ -45,7 +45,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 16 );
+$test->plan( tests => 20 );
 
 $test->connect_ok(
     user => $cfg{user}{name},
@@ -70,9 +70,9 @@ my %cert_info = (
 );
 
 my %cert_subject_alt_name_parts = (
-); 
+);
 
-my %wfparam = (	
+my %wfparam = (
 	cert_role => $cfg{csr}{role},
 	cert_profile => $cfg{csr}{profile},
 	cert_subject_style => "00_basic_style",
@@ -84,9 +84,9 @@ my %wfparam = (
 
 
 
-	
+
 print "CSR Subject: $sSubject\n";
-	
+
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' , \%wfparam, 'Create Issue Test Workflow')
  or die "Workflow Create failed: $@";
 
@@ -99,15 +99,15 @@ $test->execute_ok( 'generate_key', {
 	_key_type => "RSA",
     _key_gen_params => $param_serializer->serialize( { KEY_LENGTH => 2048, ENC_ALG => "aes128" } ),
     _password => "m4#bDf7m3abd" } ) or die "Error - keygen failed: $@";
- 	 	
+
 
 $test->state_is('PENDING');
 
-# ACL Test - should not be allowed to user 
+# ACL Test - should not be allowed to user
 $test->execute_nok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE', {  cert_role => $cfg{csr}{role}}, 'Disallow change role' );
 
 $test->disconnect();
- 
+
 # Re-login with Operator for approval
 $test->connect_ok(
     user => $cfg{operator}{name},
@@ -134,17 +134,40 @@ $test->connect_ok(
 ) or die "Error - connect failed: $@";
 
 my $cert_identifier = $test->param( 'cert_identifier' );
+my $tmpfile = "/tmp/mytest.$$";
+
 # Try to fetch the key via API
 $test->runcmd('get_cert', { IDENTIFIER => $cert_identifier, FORMAT => 'PEM' });
-$test->ok ( $test->get_msg()->{PARAMS} =~ /^-----BEGIN CERTIFICATE-----/, 'Fetch certificate' );
+my $pem = $test->get_msg()->{PARAMS};
+$test->like( $pem, "/^-----BEGIN CERTIFICATE-----/", 'Fetch certificate (PEM)' );
+
+# Try DER Format
+$test->runcmd('get_cert', { IDENTIFIER => $cert_identifier, FORMAT => 'DER' });
+
+$test->ok(open(DER, ">$tmpfile"), 'Write DER');
+print DER $test->get_msg()->{PARAMS};
+close DER;
+
+my $pem2 =  `openssl x509 -in $tmpfile -inform DER`;
+
+# Clear all whitespace to compare
+$pem =~ s{\s}{}gxms;
+$pem2 =~ s{\s}{}gxms;
+$test->is( $pem, $pem2, 'DER ?= PEM' );
 
 $test->runcmd('get_private_key_for_cert', { IDENTIFIER => $cert_identifier, FORMAT => 'PKCS12', 'PASSWORD' => 'm4#bDf7m3abd' });
 $test->ok ( $test->get_msg()->{PARAMS}->{PRIVATE_KEY} ne '', 'Fetch p12');
 
+$test->ok(open(P12, ">$tmpfile"));
+print P12 $test->get_msg()->{PARAMS}->{PRIVATE_KEY};
+close P12;
+
 $test->disconnect();
 
+$test->like( `openssl pkcs12 -in $tmpfile -nokeys -noout -passin pass:'m4#bDf7m3abd' 2>&1`, "/MAC verified OK/", 'Test P12' );
+unlink $tmpfile;
 
 open(CERT, ">$cfg{instance}{buffer}");
-print CERT $serializer->serialize({ cert_identifier => $cert_identifier  }); 
-close CERT; 
+print CERT $serializer->serialize({ cert_identifier => $cert_identifier  });
+close CERT;
 

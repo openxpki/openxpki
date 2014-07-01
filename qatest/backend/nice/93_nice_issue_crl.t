@@ -11,7 +11,7 @@ use strict;
 use warnings;
 
 use lib qw(
-  /usr/lib/perl5/ 
+  /usr/lib/perl5/
   ../../lib
 );
 
@@ -44,8 +44,8 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 3 );
-  
+$test->plan( tests => 7 );
+
 # Login to use socket
 $test->connect_ok(
     user => $cfg{operator}{name},
@@ -56,15 +56,29 @@ $test->connect_ok(
 my %wfparam = (
     force_issue => 1,
     #delta_crl => 0, # not supported yet
-    #crl_validity=>'+000014',	
+    #crl_validity=>'+000014',
 );
-    
+
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' , \%wfparam, 'Create CRL Workflow')
  or die "Workflow Create failed: $@";
 
 $test->state_is('SUCCESS');
 
 
+# Fetch the most recent crl, pem
+$test->runcmd('get_crl', { FORMAT => 'PEM' });
+$test->like( $test->get_msg()->{PARAMS}, "/----BEGIN X509 CRL-----/", 'Fetch CRL (PEM)');
+
+# test crl der format
+$test->runcmd('get_crl', { FORMAT => 'DER' });
+$test->ok ( $test->get_msg()->{PARAMS} ne '', 'Fetch CRL (DER)');
+
+my $tmpfile = "/tmp/mycrl.der.$$";
+$test->ok(open(CRL, ">$tmpfile"));
+print CRL $test->get_msg()->{PARAMS};
+close CRL;
 
 $test->disconnect();
-  
+
+$test->nok( `openssl crl -in $tmpfile -inform DER -noout 2>/dev/null` );
+unlink $tmpfile;
