@@ -78,9 +78,9 @@ $hash = {
         };
 $text = $ref->serialize ($hash, 'utf8 serialization');
 
-$expected_serialization = "HASH-92-2-cn-ARRAY-34-0-SCALAR-21-Иван Петров-3-uid-ARRAY-29-0-SCALAR-16-Тестиров-";
+$expected_serialization = "HASH-73-2-cn-ARRAY-24-0-SCALAR-11-Иван Петров-3-uid-ARRAY-20-0-SCALAR-8-Тестиров-";
 ## downgrade from utf8 to byte level
-$expected_serialization = pack ("C*", unpack ("U0C*", $expected_serialization));
+#$expected_serialization = pack ("C*", unpack ("U0C*", $expected_serialization));
 is($text, $expected_serialization, 'UTF8 serialization produces expected result');
 
 $res = $ref->deserialize($text);
