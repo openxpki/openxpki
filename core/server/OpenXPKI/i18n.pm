@@ -14,7 +14,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
-use Encode;
 
 our $language = "";
 our $locale_prefix = "";
@@ -49,7 +48,7 @@ sub i18nGettext {
 	# first argument is a scalar
 	my %arguments = @_;
 	$arg_ref = \%arguments;
-    } 
+    }
     elsif ($ref_of_first_argument eq "HASH") {
 	$arg_ref = $_[0];
     }
@@ -62,11 +61,11 @@ sub i18nGettext {
     #my $i18n_string = pack "U0C*", unpack "C*", gettext ($text);
     my $i18n_string = gettext ($text);
 
-    Encode::_utf8_on ($i18n_string);
+    utf8::upgrade($i18n_string);
 
     if ($i18n_string ne $text)
     {
-	## there is a translation for this, so replace the parameters 
+	## there is a translation for this, so replace the parameters
 	## in the resulting string
 
 	for my $parameter (keys %{$arg_ref}) {
@@ -86,9 +85,9 @@ sub i18nGettext {
 
 	## append arguments passed to the function
         $i18n_string = join ("; ", $text,
-                                   map { $_ . " => " . $arg_ref->{$_}  } 
+                                   map { $_ . " => " . $arg_ref->{$_}  }
                                        keys %{$arg_ref});
-	
+
         #it's too slow, I try to use "use utf8;"
         #$i18n_string = pack "U0C*", unpack "C*", $untranslated;
     }
@@ -174,7 +173,7 @@ This module manages all i18n stuff for the L<OpenXPKi> system.
 The main job is the implementation of the translation function and
 the storage of the activated language.
 
-All functions work in static mode (static member functions). 
+All functions work in static mode (static member functions).
 This means that they are to be invoked directly and not via an object
 instance.
 
@@ -207,7 +206,7 @@ Examples:
 
     my $text;
     $text = i18nGettext("I18N_OPENXPKI_FOO_BAR");
-    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR", 
+    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR",
                         "__COUNT__" => 1,
                         "__ORDER__" => "descending",
                         );

@@ -413,14 +413,12 @@ sub get_chain {
                         );
                     }
 
-                    #FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"
                     my $utf8fix = $default_token->command({
                         COMMAND => 'convert_cert',
                         DATA    => $cert->{DATA},
                         IN      => 'PEM',
                         OUT     => 'DER',
                     });
-                    Encode::_utf8_on($utf8fix );
                     push @certs, $utf8fix ;
                 }
             }
