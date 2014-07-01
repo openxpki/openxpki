@@ -15,6 +15,7 @@ our $VERSION = $OpenXPKI::VERSION::VERSION;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use Data::Dumper;
+use MIME::Base64;
 
 sub new {
     my $that = shift;
@@ -120,7 +121,16 @@ sub __write_scalar {
 
     my $separator = $self->{SEPARATOR};
 
-    return "SCALAR".$separator.
+    my $type = "SCALAR";
+    # encode data having control chars
+
+    if ($data =~ m{[\x00-\x09]}s) {
+        ##! 8: 'Found binary data - do base64'
+        $type = "BASE64";
+        $data  = encode_base64( $data );
+    }
+
+    return $type.$separator.
            length($data).$separator.
            $data.$separator;
 }
@@ -191,7 +201,7 @@ sub __read_data {
 
     my $separator = $self->{SEPARATOR};
 
-    if ( $msg =~ /^SCALAR$separator/ ) {
+    if ( $msg =~ /^(SCALAR|BASE64)$separator/ ) {
         # it's a scalar
         return $self->__read_scalar($msg);
     }
@@ -236,7 +246,7 @@ sub __read_scalar {
     my $returnmessage = "";
 
     # check for correct scalar format
-    if ( not $msg =~ /^SCALAR$separator[0-9]+$separator/ ) {
+    if ( not $msg =~ /^(SCALAR|BASE64)$separator[0-9]+$separator/ ) {
         # scalar is not formatted appropriately
         OpenXPKI::Exception->throw (
              message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_SCALAR_FORMAT_CORRUPTED",
@@ -247,8 +257,9 @@ sub __read_scalar {
     }
 
     # extract scalar length
-    $msg =~ /^SCALAR$separator([0-9]+)$separator/;
-    my $scalarlength = $1;
+    $msg =~ /^(SCALAR|BASE64)$separator([0-9]+)$separator/;
+    my $encoding = $1;
+    my $scalarlength = $2;
 
     # extract scalar value
     if ( ( length($msg) - length($scalarlength) - 8 ) < $scalarlength ) {
@@ -265,7 +276,13 @@ sub __read_scalar {
     my $scalarvalue = substr ($msg, length($scalarlength) + 8, $scalarlength);
 
     # create return message used to extract scalar data
-    $returnmessage = "SCALAR$separator$scalarlength$separator$scalarvalue$separator";
+    $returnmessage = "$encoding$separator$scalarlength$separator$scalarvalue$separator";
+
+    if ($encoding eq 'BASE64') {
+       ##! 8: 'Found base64 data - decode'
+       $scalarvalue = decode_base64($scalarvalue);
+    }
+
 
     return {
         data          => $scalarvalue,
