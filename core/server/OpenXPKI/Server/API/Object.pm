@@ -182,28 +182,46 @@ sub get_crl {
     my $serial    = $args->{SERIAL};
     my $pki_realm = $args->{PKI_REALM};
     my $format   = "PEM";
-    
+
     $format = $args->{FORMAT} if ( exists $args->{FORMAT} );
     $pki_realm =  CTX('session')->get_pki_realm() unless( $args->{PKI_REALM} );
 
     ##! 16: 'Load crl by serial ' . $serial
 
-    my $db_results = CTX('dbi_backend')->first(
-        TABLE   => 'CRL',
-        COLUMNS => [ 
-            'DATA',
-            'PKI_REALM'
-        ],
-        KEY => $serial,        
-    );
-    
-    ##! 32: 'DB Result ' . Dumper $db_results 
-    
+
+    my $db_results;
+
+    if ($serial) {
+        $db_results = CTX('dbi_backend')->first(
+            TABLE   => 'CRL',
+            COLUMNS => [
+                'DATA',
+                'PKI_REALM'
+            ],
+            KEY => $serial,
+        );
+    } else {
+        $db_results = CTX('dbi_backend')->first(
+            TABLE   => 'CRL',
+            COLUMNS => [
+                'DATA',
+                'PKI_REALM'
+            ],
+            DYNAMIC => {
+                PKI_REALM => { VALUE => $pki_realm },
+            },
+            ORDER => [ 'LAST_UPDATE' ],
+            REVERSE => 1,
+        );
+    }
+
+    ##! 32: 'DB Result ' . Dumper $db_results
+
     if ( not $db_results ) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND', );
     }
-    
+
     if ($pki_realm ne $db_results->{PKI_REALM}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_IN_REALM', );

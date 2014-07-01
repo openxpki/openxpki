@@ -362,6 +362,7 @@ sub BUILD {
                 SERIAL => {
                     type     => SCALAR,
                     regex    => $re_integer_string,
+                    optional => 1,
                 },
                 FILENAME => {
                     type     => SCALAR,
