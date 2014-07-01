@@ -110,9 +110,6 @@ sub __write_scalar {
 
     my $separator = $self->{SEPARATOR};
 
-    # downgrade unicode characters to bytes
-    $data = pack("C*", unpack("U0C*", $data));
-
     return "SCALAR".$separator.
            length($data).$separator.
            $data.$separator;
@@ -177,11 +174,7 @@ sub deserialize {
         );
     }
 
-
-
-    Encode::_utf8_off($msg);
-
-    my $ret = $self->__read_data($msg);
+    my $ret = $self->__read_data( $msg );
 
     return $ret->{data};
 }
@@ -262,9 +255,6 @@ sub __read_scalar {
 
     # create return message used to extract scalar data
     $returnmessage = "SCALAR$separator$scalarlength$separator$scalarvalue$separator";
-
-    # convert bytes to unicode characters
-    $scalarvalue = pack("U0C*", unpack("C*", $scalarvalue));
 
     return {
         data          => $scalarvalue,

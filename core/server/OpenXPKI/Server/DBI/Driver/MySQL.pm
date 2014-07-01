@@ -21,9 +21,10 @@ our %TYPE = (
              NUMERIC    => "NUMERIC(49)");
 
 our $DBI_OPTION = {
-                   RaiseError => 0, 
+                   RaiseError => 0,
 # FIXME See https://github.com/openxpki/openxpki/issues/44
- 		   mysql_bind_type_guessing => 1,  
+ 		   mysql_bind_type_guessing => 1,
+                    mysql_enable_utf8 => 1,
                    AutoCommit => 0};
 
 our $TABLE_OPTION = "Engine=InnoDB";

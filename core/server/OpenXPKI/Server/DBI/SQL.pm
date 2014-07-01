@@ -1167,9 +1167,7 @@ sub select {
             if ( not defined $item->[$i] ) {
                 push @tab, undef;
             } else {
-                ## this is only a method to make a normale string a utf8 string
-                ## decoding is necessary because at minimum SQLite returns no utf8
-                push @tab, pack( "U0C*", unpack "C*", $item->[$i] );
+                push @tab, $item->[$i];
             }
         }
         push @result, [@tab];
