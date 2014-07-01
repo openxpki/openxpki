@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use utf8;
+use JSON;
 
 package OpenXPKI::Serialization::Simple;
 
@@ -13,7 +14,7 @@ our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Encode;
+use Data::Dumper;
 
 sub new {
     my $that = shift;
@@ -52,6 +53,13 @@ sub new {
 
 
 
+sub _json {
+    my $self = shift;
+    if (!$self->{JSON}) {
+        $self->{JSON} = new JSON()->allow_blessed();
+    }
+    return $self->{JSON};
+}
 
 
 sub serialize {
@@ -72,10 +80,12 @@ sub __write_data {
     }
     elsif ( ref $data eq "ARRAY" && defined $data ) {
         # it's an array
+        #return "JSON".$self->{SEPARATOR}.$self->_json->encode($data);
         return $self->__write_array($data);
     }
     elsif ( ref $data eq "HASH" && defined $data ) {
         # it's a hash
+        #return "JSON".$self->{SEPARATOR}.$self->_json->encode($data);
         return $self->__write_hash($data);
     }
     elsif ( not defined $data ) {
@@ -160,10 +170,6 @@ sub __write_undef {
 }
 
 
-
-
-
-
 sub deserialize {
     my $self = shift;
     my $msg  = shift;
@@ -200,6 +206,11 @@ sub __read_data {
     elsif ( $msg =~ /^UNDEF$separator/ ) {
         # it's an undef
         return $self->__read_undef($msg);
+    }
+    elsif ( $msg =~ /^JSON$separator(.*)/ ) {
+        # it's json
+        ##! 1: 'Its json'
+        return $self->__read_json($1);
     }
     else {
         # data type is not supported
@@ -493,7 +504,22 @@ sub __read_undef {
     };
 }
 
+# Not used yet
+sub __read_json {
+    my $self   = shift;
+    my $msg    = shift;
 
+    # utf8::upgrade( $msg );
+    ##! 4: 'json data ' . $msg
+    my $json = JSON->new()->decode( $msg );
+
+    ##! 4: 'json decoded ' . Dumper $json
+
+    return {
+        data           => $json,
+        returnmessage  => $msg
+    };
+}
 
 
 
