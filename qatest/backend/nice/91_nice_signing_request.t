@@ -26,6 +26,7 @@ Log::Log4perl->easy_init($WARN);
 
 use OpenXPKI::Test::More;
 use TestCfg;
+use utf8;
 
 my $dirname = dirname($0);
 
@@ -63,9 +64,9 @@ my %cert_subject_parts = (
 );
 
 my %cert_info = (
-    requestor_gname => "Andreas",
-    requestor_name => "Anders",
-    requestor_email => "andreas.anders\@mycompany.local",	
+    requestor_gname => "Andreäs",
+    requestor_name => "Andärs",
+    requestor_email => "andreas.anders\@mycompany.local",
 );
 
 my %cert_subject_alt_name_parts = (
