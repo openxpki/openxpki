@@ -8,6 +8,7 @@ use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
+use Encode;
 
 use Data::Dumper;
 
@@ -198,7 +199,8 @@ sub param {
         my $cgi = $self->cgi();
         return undef unless($cgi);
 
-        return $cgi->param($key);
+
+        return decode utf8 => $cgi->param($key);
     }
 
     my $result;
@@ -296,9 +298,9 @@ sub render {
 
     # Start output stream
     my $cgi = $self->cgi();
-    print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => 'application/json' );
+    print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => 'application/json; charset=UTF-8' );
 
-    my $json = new JSON();
+    my $json = new JSON()->utf8;
     if ($result->{_raw}) {
         print $json->encode($result->{_raw});
     } else {

@@ -14,7 +14,7 @@ has 'cgi' => (
 has json => (
     is => 'rw',
     isa => 'Object',
-    default =>  sub { return JSON->new(); }
+    default =>  sub { return JSON->new()->utf8; }
 );
 
 has wf_token => (
