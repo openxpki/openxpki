@@ -20,9 +20,9 @@ Signature:
     # define your trust anchors here
     # Allows every known user of the realm to login
     realm:
-    - ca-one 
+        - ca-one 
     cacert:
-    - list of extra cert identifiers
+        - list of extra cert identifiers
         
 Anonymous:
     type: Anonymous

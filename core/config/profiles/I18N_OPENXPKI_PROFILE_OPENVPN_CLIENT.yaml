@@ -47,7 +47,7 @@ style:
         subject_alternative_names: "[% FOREACH entry = EMAIL %],email=[% entry %][% FOREACH entry = DNS %],dns=[% entry %]"
 
 role:
-- OpenVPN Client
+    - OpenVPN Client
 
 # Profile extensions - set 0/1 as needed
 extensions:
@@ -93,15 +93,15 @@ extensions:
     crl_distribution_points:
         critical: 0
         uri:
-        - http://localhost/cacrl.crt
-        - ldap://localhost/cn=[% ISSUER.CN.0 %],dc=OpenXPKI,dc=org
+            - http://localhost/cacrl.crt
+            - ldap://localhost/cn=[% ISSUER.CN.0 %],dc=OpenXPKI,dc=org
 
     authority_info_access:
         critical: 0
         ca_issuers: http://localhost/cacert.crt
         ocsp: 
-        - http://ocsp.openxpki.org/
-        - https://ocsp.openxpki.org/        
+            - http://ocsp.openxpki.org/
+            - https://ocsp.openxpki.org/        
 
     policy_identifier:
         critical: 0
