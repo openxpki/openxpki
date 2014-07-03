@@ -128,7 +128,7 @@ This class publishes a single certificate, identified by the context
 parameter. Publication is done using the connector using a list of
 repositories. 
 
-=head Configuration
+=head1 Configuration
 
 Set the C<prefix> paramater to tell the activity where to find the connector
     <action name="scpers_publish_certificate"

@@ -135,7 +135,8 @@ sub __fetch_input_element_definitions {
         }
 
 
-=cut
+=begin disabled-by-oli
+
         if ($ucinput{TYPE} eq 'keyvalue') {
             # "key" and "value" are a hash
             foreach my $key (qw(key value)) {
@@ -154,7 +155,9 @@ sub __fetch_input_element_definitions {
                 $ucinput{uc($key)} = \%hash;
             }
         }
-=cut
+
+=end disabled-by-oli
+
         push @definitions, \%ucinput;
     }
     ##! 64: 'Definitions: ' . Dumper @definitions

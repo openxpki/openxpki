@@ -28,7 +28,9 @@ sub execute
 	PRIORITY => 'info',
 	FACILITY => ['audit','application']
     );
-=cut
+
+=begin disabled-by-oli
+
     my $bulk = $context->param('bulk');
     if (! $bulk) {
         # only notify if this is not part of a bulk request - otherwise
@@ -38,7 +40,9 @@ sub execute
             WORKFLOW => $workflow,
         });
     }
-=cut    
+
+=end disabled-by-oli
+
     return 1;
 }
 
