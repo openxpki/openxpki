@@ -5,6 +5,11 @@
 
 language: perl
 
+env:
+    global:
+        - PERL_CPANM_OPT="--mirror http://cpan.cpantesters.org/ --mirror http://search.cpan.org/CPAN --mirror http://cpan.mirrors.travis-ci.org --cascade-search"
+        - PATH="/opt/myperl/bin:$PATH"
+
 # Note: language-pack-de is needed for the i18n test
 before_install:
     - sudo apt-get update -qq
