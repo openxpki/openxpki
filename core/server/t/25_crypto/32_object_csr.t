@@ -5,7 +5,7 @@ use English;
 use Encode;
 use utf8;
 
-plan tests => 25;
+plan tests => 20;
 
 print STDERR "OpenXPKI::Crypto::CSR\n" if $ENV{VERBOSE};
 
@@ -33,6 +33,9 @@ SKIP: {
 ## parameter checks for TokenManager init
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
+
+TODO: {
+    todo_skip 'See Issue #188', 18;
 
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
@@ -147,5 +150,6 @@ for (my $i=0; $i < scalar @example; $i++)
     }
 }
 
+}
 }
 1;

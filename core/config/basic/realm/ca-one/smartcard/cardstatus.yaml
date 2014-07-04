@@ -5,8 +5,8 @@
 # serialnumber must match the query key (security check) 
 # keyid is optional and used to calculate the default puk for newer cards.
 resolvers:
-- testing
-- ldap        
+    - testing
+    - ldap        
 testing@: connector:smartcard.cardstatus.connectors.testing   
 ldap@: connector:smartcard.cardstatus.connectors.ldap
 

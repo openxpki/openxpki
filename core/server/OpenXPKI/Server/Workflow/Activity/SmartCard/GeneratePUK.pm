@@ -158,9 +158,9 @@ definition):
 
 =over 12
 
-B<Note:> Planned for future version. For now, 'gem2' is always used.
-
 =item puk_policy
+
+B<Note:> Planned for future version. For now, 'gem2' is always used.
 
 Specifies the name of the puk policy to use. Possible choices are:
 

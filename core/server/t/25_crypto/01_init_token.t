@@ -16,6 +16,8 @@ ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
 ## parameter checks for get_token
 
+TODO: {
+    todo_skip 'See Issue #188', 1;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -25,5 +27,6 @@ my $token = $mgmt->get_token ({
    }
 });
 ok (defined $token, 'Parameter checks for get_token');
+}
 
 1;

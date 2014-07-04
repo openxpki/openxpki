@@ -23,7 +23,8 @@ use OpenXPKI qw( read_file write_file );
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
-use OpenXPKI::Crypto::PKCS7;
+# TODO: See Issue #188 - PKCS7 is missing!
+#use OpenXPKI::Crypto::PKCS7;
 use OpenXPKI::FileUtils;
 use Time::HiRes;
 

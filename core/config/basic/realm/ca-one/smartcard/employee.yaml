@@ -8,7 +8,7 @@
 # than one loginid.
 
 resolvers:
-- ldap 
+    - ldap 
 testing@: connector:smartcard.employee.connectors.testing
 soap@: connector:smartcard.employee.connectors.soap
 ldap@: connector:smartcard.employee.connectors.ldap

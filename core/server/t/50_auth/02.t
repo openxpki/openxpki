@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use English;
-use Test::More;
-BEGIN { plan tests => 2 };
+use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
+#BEGIN { plan tests => 2 };
 
 print STDERR "OpenXPKI::Server::Authentication\n" if $ENV{VERBOSE};
 

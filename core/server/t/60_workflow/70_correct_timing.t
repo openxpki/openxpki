@@ -4,13 +4,18 @@ use English;
 use Test::More;
 use DateTime;
 
-use OpenXPKI::Server::Workflow::Condition::CorrectTiming;
+BEGIN {
+TODO: {
+    todo_skip 'See Issue #188';
+use_ok('OpenXPKI::Server::Workflow::Condition::CorrectTiming');
+}
+}
 
 print "Running tests for CorrectTiming...\n" if $ENV{VERBOSE};
 
-plan tests => 5;
 
-
+TODO: {
+    todo_skip 'See Issue #188', 5;
 
 # hash used as input parameter
 my %hash = ();
@@ -53,3 +58,6 @@ is($ct->difference(), "3456000", "difference parsing: 40 days (3456000 seconds)"
 $hash{difference} = "50w";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
 is($ct->difference(), "30240000", "difference parsing: 50 weeks (30240000 seconds)");
+}
+
+done_testing();

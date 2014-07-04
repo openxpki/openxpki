@@ -397,7 +397,7 @@ sub _send_plain {
     # For Net::SMTP we need to build the full message including the header part
     my $smtpmsg = "User-Agent: OpenXPKI Notification Service using Net::SMTP\n";
     $smtpmsg .= "Date: " . DateTime->now()->strftime("%a, %d %b %Y %H:%M:%S %z\n");
-    $smtpmsg .= "OpenXPKI-Thread-Id: $vars->{'thread'}\n";
+    $smtpmsg .= "OpenXPKI-Thread-Id: " . (defined $vars->{'thread'} ? $vars->{'thread'} : 'undef') . "\n";
     $smtpmsg .= "From: " . $cfg->{from} . "\n";
     $smtpmsg .= "To: " . $vars->{to} . "\n";
     $smtpmsg .= "Cc: " . join(",", @{$vars->{cc}}) . "\n" if ($vars->{cc});

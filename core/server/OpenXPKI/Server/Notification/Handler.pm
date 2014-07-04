@@ -119,6 +119,7 @@ workflow (@see _prepare_template_vars) and the data from the DATA variable, whic
 is added under the key "data".
 
 =cut 
+
 sub notify {
     
     ##! 'start'
@@ -185,7 +186,10 @@ Creates a hashref containing useful values from the realm and the workflow.
  
     requestor (real name of the requestor, assembled from cert_info.requestor_gname + requestor_name)     
 
+=back
+
 =cut
+
 sub _prepare_template_vars {
     
     ##! 1: 'start'

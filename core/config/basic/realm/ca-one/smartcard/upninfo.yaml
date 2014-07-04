@@ -10,8 +10,8 @@
 # A direct resolver can be in the list of automated resolvers, but mind the
 # different query syntax in both modes!
 resolvers:
-- testing
-- branch1    
+    - testing
+    - branch1    
 testing@: connector:smartcard.upninfo.connectors.testing
 branch1@: connector:smartcard.upninfo.connectors.branch1  
 

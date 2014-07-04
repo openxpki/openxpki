@@ -1637,6 +1637,8 @@ certificate from the database and analyze it.
 Only acceptable for cert format 'IDENTIFIER'. If set, the certificate 
 fetched from the database will not be parsed, but only the cert information
 from the database (CSR and CERTIFICATE table entries) will be propagated.
+
+=back
   
 =head3 Function results
 
@@ -1766,7 +1768,6 @@ the actual personalization should happen.
 
 =over 8
 
-
 =item * OVERALL_STATUS (scalar)
 
 This is the global status of the Smartcard which can be directly 
@@ -1775,6 +1776,8 @@ displayed by the frontend.
 Possible values: 'green' (default), 'amber', 'red'
 
 =item * SMARTCARD (hashref)
+
+=back
 
 The referenced structure contains the details of the Smartcard:
 
@@ -1813,6 +1816,8 @@ Possible values are valid|new|mismatch.
 
 =back
 
+=over
+
 =item * CERT_TYPES (array)
 
 Lists all certificate types configured for this Smartcard. This is 
@@ -1826,6 +1831,8 @@ search_workflow_instances() API function.
 =item * PROCESS_FLAGS (hash of scalars, interpreted as booleans)
 
 These flags can be used for decisions in the personalization workflow.
+
+=back
 
 =over 8
 
@@ -1873,11 +1880,11 @@ The purge_token_before* flags are set per card-type at
 I<smartcard.cardinfo.properties.card_type.flag_name>, others are defined at    
 I<smartcard.policy.flag_name>.
  
+=over 8
+
 =item * VALIDITY (hashref)
 
 Store information about forced notafter/validity setting 
-
-=over 8
 
 =item * set_to_value 
 
@@ -1887,11 +1894,11 @@ Epoch timestamp which should be used as notafter date
 
 Certificate type which was used to determine the value
 	
-=back
-
 =item * TASKS (hashref)
 
 Holds the information what should actually be done. 
+
+=back
 
 =over 8
 
@@ -1911,10 +1918,9 @@ List of certificates (descriptive hash) to purge.
 
 List of certificates (descriptive hash) to revoke.
 
-=back
-
 =item * PARSED_CERTS (array ref)
 
 List of certificates found on the card. Each entry is a hash ref with the
 merged results of sc_parse_certificate and the __check* methods. 
 
+=back

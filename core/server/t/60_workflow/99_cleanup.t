@@ -8,7 +8,7 @@ use OpenXPKI::Control;
 use Cwd;
 
  
-plan tests => 6;
+plan tests => 4;
 
 my $socketfile = 't/var/openxpki/openxpki.socket'; 
 my $pidfile = 't/var/openxpki/openxpkid.pid';
@@ -19,12 +19,14 @@ if (-e $pidfile) {
     ok(1, 'No pid file - skip server stop');
 } 
 
-SKIP: {
-    local $TODO = 'Server cleanup needs fixing';
+TODO: {
+    local $TODO = 'See Issue #188';
     ok (!-e $pidfile, 'PID-file removed' ) || unlink $pidfile;
     ok (!- $socketfile, 'Socketfile removed' ) || unlink $socketfile;
 }
 
+TODO: {
+    todo_skip 'See Issue #188';
 our $dbi;
 require 't/common/dbi.pl';
 
@@ -34,5 +36,6 @@ $dbi->delete (TABLE => "CERTIFICATE", DATA => {
     ISSUER_DN => "DC=test,DC=openxpki,CN=test-ca",
 });
 ok($dbi->commit());
+}
 
 
