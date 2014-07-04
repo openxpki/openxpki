@@ -160,9 +160,9 @@ requestor_affiliation:
     description: I18N_OPENXPKI_REQUESTOR_AFFILIATION_DESC
     type: select
     option:
-    - System Owner
-    - System Admin
-    - Other
+        - System Owner
+        - System Admin
+        - Other
     width: 20
 
 comment:
@@ -204,27 +204,27 @@ san_oid:
         type: select
         width: 20
         option:
-        - label: I18N_OPENXPKI_SAN_EMAIL
-          description: I18N_OPENXPKI_SAN_EMAIL_DESCRIPTION
-          value: email
-        - label: I18N_OPENXPKI_SAN_DNS
-          description: I18N_OPENXPKI_SAN_DNS_DESCRIPTION
-          value: dns
-        - label: I18N_OPENXPKI_SAN_IP
-          description: I18N_OPENXPKI_SAN_IP_DESCRIPTION
-          value: ipv4
-        - label: I18N_OPENXPKI_SAN_URI
-          description: I18N_OPENXPKI_SAN_URI_DESCRIPTION
-          value: uri
-        - label: I18N_OPENXPKI_SAN_GUID
-          description: I18N_OPENXPKI_SAN_GUID_DESCRIPTION
-          value: guid
-        - label: I18N_OPENXPKI_SAN_UPN
-          description: I18N_OPENXPKI_SAN_UPN_DESCRIPTION
-          value: upn
-        - label: I18N_OPENXPKI_SAN_RID
-          description: I18N_OPENXPKI_SAN_RID_DESCRIPTION
-          value: rid
+            - label: I18N_OPENXPKI_SAN_EMAIL
+              description: I18N_OPENXPKI_SAN_EMAIL_DESCRIPTION
+              value: email
+            - label: I18N_OPENXPKI_SAN_DNS
+              description: I18N_OPENXPKI_SAN_DNS_DESCRIPTION
+              value: dns
+            - label: I18N_OPENXPKI_SAN_IP
+              description: I18N_OPENXPKI_SAN_IP_DESCRIPTION
+              value: ipv4
+            - label: I18N_OPENXPKI_SAN_URI
+              description: I18N_OPENXPKI_SAN_URI_DESCRIPTION
+              value: uri
+            - label: I18N_OPENXPKI_SAN_GUID
+              description: I18N_OPENXPKI_SAN_GUID_DESCRIPTION
+              value: guid
+            - label: I18N_OPENXPKI_SAN_UPN
+              description: I18N_OPENXPKI_SAN_UPN_DESCRIPTION
+              value: upn
+            - label: I18N_OPENXPKI_SAN_RID
+              description: I18N_OPENXPKI_SAN_RID_DESCRIPTION
+              value: rid
     value:
         type: freetext
         width: 40
