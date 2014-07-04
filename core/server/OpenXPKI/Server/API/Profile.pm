@@ -135,28 +135,28 @@ sub __fetch_input_element_definitions {
         }
 
 
-=begin disabled-by-oli
-
-        if ($ucinput{TYPE} eq 'keyvalue') {
-            # "key" and "value" are a hash
-            foreach my $key (qw(key value)) {
-                my %hash = %{$config->get_hash("$input_path.$key")};
-                %hash = map { uc $_ => $hash{$_} } keys %hash;
-                # To make it worse, they can have options which is a list of hash
-                if ($hash{TYPE} eq 'select') {
-                    my @options;
-                    for (my $i=0; $i<$config->get_size("$input_path.$key.option"); $i++) {
-                       my %sub = %{$config->get_hash("$input_path.$key.option.$i")};
-                       %sub = map { uc $_ => $sub{$_} } keys %sub;
-                       push @options, \%sub;
-                    }
-                    $hash{OPTIONS} = \@options;
-                }
-                $ucinput{uc($key)} = \%hash;
-            }
-        }
-
-=end disabled-by-oli
+#=begin disabled-by-oli
+#
+#        if ($ucinput{TYPE} eq 'keyvalue') {
+#            # "key" and "value" are a hash
+#            foreach my $key (qw(key value)) {
+#                my %hash = %{$config->get_hash("$input_path.$key")};
+#                %hash = map { uc $_ => $hash{$_} } keys %hash;
+#                # To make it worse, they can have options which is a list of hash
+#                if ($hash{TYPE} eq 'select') {
+#                    my @options;
+#                    for (my $i=0; $i<$config->get_size("$input_path.$key.option"); $i++) {
+#                       my %sub = %{$config->get_hash("$input_path.$key.option.$i")};
+#                       %sub = map { uc $_ => $sub{$_} } keys %sub;
+#                       push @options, \%sub;
+#                    }
+#                    $hash{OPTIONS} = \@options;
+#                }
+#                $ucinput{uc($key)} = \%hash;
+#            }
+#        }
+#
+#=end disabled-by-oli
 
         push @definitions, \%ucinput;
     }
