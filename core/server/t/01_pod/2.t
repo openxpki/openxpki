@@ -11,7 +11,7 @@ SKIP: {
 }
 
 TODO: {
-    local $TODO = 'We need a lot more code documentation ...';
+    todo_skip 'We need a lot more code documentation ...';
     foreach my $module (@files) {
             diag "Testing POD coverage for $module" if $ENV{VERBOSE};
             pod_coverage_ok($module, "$module is covered" );

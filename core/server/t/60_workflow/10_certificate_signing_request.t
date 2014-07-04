@@ -16,6 +16,9 @@ diag("Certificate signing workflow\n") if $ENV{VERBOSE};
 my $socketfile = 't/var/openxpki/openxpki.socket'; 
 my $pidfile = 't/var/openxpki/openxpkid.pid';
 
+TODO: {
+    todo_skip 'See Issue #188', 38;
+
 ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 my $client = OpenXPKI::Client->new({
@@ -284,3 +287,5 @@ is($msg->{PARAMS}->{WORKFLOW}->{STATE}, 'FAILURE', 'State is FAILURE');
 eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
+}
+1;

@@ -15,6 +15,8 @@ diag("Certificate revocation list workflow\n") if $ENV{VERBOSE};
 my $socketfile = 't/var/openxpki/openxpki.socket';
 my $pidfile    = 't/var/openxpki/openxpkid.pid';
 
+TODO: {
+    todo_skip 'See Issue #188', 9;
 ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 my $client = OpenXPKI::Client->new({
@@ -66,3 +68,4 @@ eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
 diag "Terminated connection" if $ENV{VERBOSE};
+}

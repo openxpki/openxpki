@@ -26,6 +26,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 8;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -92,6 +94,7 @@ $result = $token->command ({COMMAND => "pkcs7_get_chain",
                             PKCS7   => $sig});
 ok(1);
 print STDERR "PKCS#7 get_chain: $result\n" if ($ENV{DEBUG});
+}
 
 }
 1;

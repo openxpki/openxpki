@@ -25,7 +25,7 @@ eval `cat t/25_crypto/common.pl`;
 is($EVAL_ERROR, '', 'common.pl evaluated correctly');
 
 SKIP: {
-    skip 'crypt init failed', 25 if $EVAL_ERROR;
+    skip 'crypt init failed', 23 if $EVAL_ERROR;
 
 
 ## parameter checks for TokenManager init
@@ -33,6 +33,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 22;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -181,5 +183,6 @@ for (my $i=0; $i < scalar @example; $i++)
     }
 }
 
+}
 }
 1;

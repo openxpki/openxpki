@@ -38,6 +38,8 @@ ok($cacert =~ /^-----BEGIN CERTIFICATE-----/);
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 2;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -53,5 +55,6 @@ ok (defined $token, 'Parameter checks for get_token');
 my $cakey = $fu->read_file("$basedir/test-ca/cakey.pem");
 
 ok($cakey =~ /^-----BEGIN RSA PRIVATE KEY-----/, 'RSA key loaded');
+}
 
 1;

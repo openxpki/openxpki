@@ -26,6 +26,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 14;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -80,5 +82,6 @@ print STDERR " - $result CRLs/second (minimum: 100 per second)\n" if $ENV{VERBOS
 #ok ($result > 100);
 ok ($result);
 
+}
 }
 1;

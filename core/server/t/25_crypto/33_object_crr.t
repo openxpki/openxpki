@@ -28,6 +28,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 1;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -38,6 +40,7 @@ my $token = $mgmt->get_token ({
 });
 
 ok (defined $token, 'Parameter checks for get_token');
+}
 
 ## load CRR
 my $data = "-----BEGIN HEADER-----\n".

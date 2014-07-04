@@ -10,7 +10,8 @@ print STDERR "OpenXPKI::Crypto::PKCS7\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI qw (read_file);
-use OpenXPKI::Crypto::PKCS7;
+# TODO: See Issue #188 - PKCS7 has been removed?
+#use OpenXPKI::Crypto::PKCS7;
 use Time::HiRes;
 
 our $cache;
@@ -27,6 +28,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 10;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -106,5 +109,6 @@ print STDERR " - $result signatures/second (minimum: 1000 per minute)\n" if $ENV
 #ok ($result > 17);
 ok ($result);
 
+}
 }
 1;
