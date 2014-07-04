@@ -307,6 +307,7 @@ WriteMakefile(
     'Connector'              => '1.08',
     'Crypt::CBC'             => '2.29',
     'Crypt::OpenSSL::AES'    => '0.02',
+    'DBD::Mock'              => '1.45',
     'DBI'                    => 1,
     'Data::Password'         => '1.07',
     'Data::Serializer'       => '0.44',
@@ -321,6 +322,7 @@ WriteMakefile(
     'IO::Socket::SSL'        => '1.973',
     ## includes the version of libintl-perl which includes Locale::Messages
     'IPC::ShareLite'         => '0.09',
+    'JSON'                   => undef,
     'Locale::TextDomain'     => 1,
     'Log::Log4perl'          => '0.51',
     #'LWP'                    => '6',
@@ -342,6 +344,7 @@ WriteMakefile(
     'Proc::ProcessTable'     => '0.43',
     'Proc::SafeExec'         => '1.4',
     'Regexp::Common'         => 2,
+    'SOAP::Lite'             => undef,
     'Switch'                 => 1,
     'Sys::SigAction'         => '0.06',
     'Template'               => '2.15',
