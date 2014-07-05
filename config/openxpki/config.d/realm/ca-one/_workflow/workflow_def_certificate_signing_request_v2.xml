@@ -189,6 +189,12 @@
 
  <state name="KEY_GENERATED" autorun="yes">
     <action name="csr_generate_pkcs10"
+        resulting_state="PKCS10_GENERATED">
+    </action>
+ </state>
+
+ <state name="PKCS10_GENERATED" autorun="yes">
+    <action name="csr_move_key_to_dp"
         resulting_state="REQUEST_COMPLETE">
     </action>
   </state>
@@ -226,6 +232,23 @@
   </state>
 
   <state name="NICE_METADATA_PERSISTED" autorun="yes">
+    <action name="csr_rename_private_key"
+        resulting_state="CLEANUP_KEY_PASSWORD">
+        <condition name="csr_cond_server_key_generation"/>
+    </action>
+    <action name="global_null"
+        resulting_state="NICE_SEND_NOTIFICATION">
+        <condition name="!csr_cond_server_key_generation"/>
+    </action>
+  </state>
+
+  <state name="CLEANUP_KEY_PASSWORD" autorun="yes">
+    <action name="csr_cleanup_key_password"
+        resulting_state="NICE_SEND_NOTIFICATION" />
+  </state>
+
+
+  <state name="NICE_SEND_NOTIFICATION" autorun="yes">
     <action name="csr_notify_issued"
               resulting_state="NICE_PUBLISH_CERTIFICATE" />
   </state>

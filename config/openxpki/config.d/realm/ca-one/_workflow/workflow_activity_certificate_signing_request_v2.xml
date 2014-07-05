@@ -11,7 +11,7 @@
     <action name="csr_provide_server_key_password"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_key_select"
-        ds_namespace="csr_keygen_password"
+        ds_namespace="workflow.csr.keygen_password"
         ds_key_param="workflow_id"
         ds_value_param="_password"
         ds_encrypt="1"
@@ -119,7 +119,7 @@
 
     <action name="csr_load_key_password"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry"
-        ds_namespace="csr_keygen_password"
+        ds_namespace="workflow.csr.keygen_password"
         ds_key_param="workflow_id"
         ds_value_param="_password">
     </action>
@@ -132,6 +132,29 @@
 
     <action name="csr_generate_pkcs10"
         class="OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10">
+    </action>
+
+	<action name="csr_move_key_to_dp"
+		class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
+		ds_namespace="certificate.privatekey"
+		ds_key_param="workflow_id"
+		ds_value_param="private_key"
+		ds_encrypt="1"
+		ds_force="1"
+		ds_unset_context_value="1">
+	</action>
+
+    <action name="csr_rename_private_key"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry"
+        ds_namespace="certificate.privatekey"
+        ds_key="$workflow_id"
+        ds_newkey="$cert_identifier">
+    </action>
+
+    <action name="csr_cleanup_key_password"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry"
+        ds_namespace="workflow.csr.keygen_password"
+        ds_key_param="workflow_id">
     </action>
 
     <action name="csr_persist_csr"

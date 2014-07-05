@@ -87,7 +87,7 @@
 
     <condition name="csr_cond_server_key_generation"
         class="Workflow::Condition::Evaluate">
-        <param name="test" value="not $context-&gt;{pkcs10} &amp;&amp; not $context-&gt;{spkac}" />
+        <param name="test" value="defined $context-&gt;{key_gen_params}" />
     </condition>
 
 </conditions>
