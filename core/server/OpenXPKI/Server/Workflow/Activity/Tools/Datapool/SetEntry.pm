@@ -42,7 +42,7 @@ sub execute {
 	    $params->{ uc($key) } = $self->param( 'ds_' . $key );
 	}
     }
-    
+
     if (defined $params->{EXPIRATION_DATE}) {
 	my $then = OpenXPKI::DateTime::get_validity(
 	    {
@@ -69,14 +69,6 @@ sub execute {
               . 'MISSPARAM_VALUE_PARAM' );
     }
 
-    if (    $params->{ENCRYPT}
-        and not $valparam =~ m/^_/ )
-    {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
-              . 'VALKEY_NONVOL' );
-    }
-
     $params->{VALUE} = $context->param($valparam);
 
     CTX('api')->set_data_pool_entry($params);
@@ -90,7 +82,7 @@ sub execute {
 	# value to an empty string
 	$context->param($valparam => '');
     }
-        
+
     CTX('log')->log(
         MESSAGE => 'Set datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE},
         PRIORITY => 'info',
@@ -135,18 +127,18 @@ datastore entry.
 
 =item ds_value_param
 
-The name of the context parameter that contains the value for this 
+The name of the context parameter that contains the value for this
 datastore entry.
 
-B<Note:> If encryption is enabled, the parameter name must be 
+B<Note:> If encryption is enabled, the parameter name must be
 preceeded with an underscore.
 
 =item ds_encrypt
 
-A boolean value that specifies whether the value of the entry is to be 
+A boolean value that specifies whether the value of the entry is to be
 encrypted. [optional - default is I<0>]
 
-=item ds_force 
+=item ds_force
 
 Causes the set action to overwrite an existing entry.
 

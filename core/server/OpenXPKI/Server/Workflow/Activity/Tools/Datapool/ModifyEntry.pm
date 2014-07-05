@@ -23,8 +23,8 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
 
-    my $params     = { 
-	PKI_REALM => CTX('api')->get_pki_realm(), 
+    my $params     = {
+	PKI_REALM => CTX('api')->get_pki_realm(),
     };
 
     foreach my $key (qw( namespace key )) {
@@ -54,9 +54,9 @@ sub execute {
 	}
     }
 
-    
+
     if (exists $params->{EXPIRATION_DATE}) {
-	if (defined $params->{EXPIRATION_DATE} 
+	if (defined $params->{EXPIRATION_DATE}
 	    && ($params->{EXPIRATION_DATE} ne '')) {
 	    my $then = OpenXPKI::DateTime::get_validity(
 		{
@@ -87,7 +87,8 @@ OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry
 
 =head1 Description
 
-This class modifies an entry in the Datapool.
+This class modifies the key and/or expiration date of a datapool entry.
+It does NOT change the value of a datapool entry.
 
 =head1 Configuration
 
@@ -107,7 +108,11 @@ The namespace to use.
 Key within the namespace to access. If it starts with a $, the context
 value with the specified name is dereferenced.
 
-=item ds_force 
+=item ds_newkey
+
+New key for the entry.
+
+=item ds_force
 
 Causes the set action to overwrite an existing entry.
 
