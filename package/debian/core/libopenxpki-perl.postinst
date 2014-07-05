@@ -46,7 +46,7 @@ case "$1" in
        # Ubuntu names it conf-enabled while wheezy has conf.d
        if [ -d /etc/apache2/conf-enabled/ ]; then
            test -e /etc/apache2/conf-enabled/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf-enabled/openxpki-scep.conf
-       else 
+       else
            test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf
        fi;
 
@@ -77,6 +77,23 @@ case "$1" in
 	       chown -R openxpki:root /etc/openxpki/config.git/
 	       openxpkiadm loadcfg 2>/dev/null
 	   fi
+
+	    # Create the pkiadm user
+        COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
+        if [ $COUNT -eq 0 ]; then
+            # Use useradd here as we need an additonal group
+            useradd --create-home -G openxpki pkiadm;
+
+            # In case somebody decided to change the home base
+            HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
+            chown pkiadm:openxpki $HOME
+            chmod 750 $HOME
+        fi;
+
+	    # Create the sudo file to restart oxi from pkiadm
+	    if [ ! -e /etc/sudoers.d/pkiadm && -d /etc/sudoers.d ]; then
+	        echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
+        fi;
 
     ;;
 
