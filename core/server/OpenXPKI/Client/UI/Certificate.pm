@@ -59,7 +59,7 @@ sub init_search {
                 fields => [
                 { name => 'subject', label => 'Subject', type => 'text', is_optional => 1 },
                 { name => 'san', label => 'SAN', type => 'text', is_optional => 1 },
-                { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', editable => 1, options => \@states },
+                { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states },
                 { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list },
                 { name => 'meta', label => 'Metadata', 'keys' => [{ value => "meta_requestor", label=> "Requestor" },{ value => "meta_email", label => "eMail" }], type => 'text', is_optional => 1, 'clonable' => 1 },
                 ]
