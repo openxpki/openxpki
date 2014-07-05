@@ -8,10 +8,12 @@ export DEBIAN_FRONTEND=noninteractive
 aptitude install --assume-yes  dh-make-perl mysql-server
 cat /code-repo/package/debian/build-deps.lst | xargs aptitude install --assume-yes
 
+# openca-tools is now only used for scep which we do not test for now
+# so there is no need to install it
 # We still need openca-tools and I dont want to bother with that now
 # so we just assume its on the server and pull it
-wget http://packages.openxpki.org/debian/wheezy/release/binary-amd64/openca-tools_1.3.0-1_amd64.deb -O /tmp/openca-tools_1.3.0-1_amd64.deb
-dpkg -i /tmp/openca-tools_1.3.0-1_amd64.deb
+#wget http://packages.openxpki.org/debian/wheezy/release/binary-amd64/openca-tools_1.3.0-1_amd64.deb -O /tmp/openca-tools_1.3.0-1_amd64.deb
+#dpkg -i /tmp/openca-tools_1.3.0-1_amd64.deb
 
 # This inits the cpan module for dh-make-perl
 (echo y;echo o conf prerequisites_policy follow;echo o conf commit)|cpan
