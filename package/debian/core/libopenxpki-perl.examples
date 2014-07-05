@@ -1,11 +1,6 @@
-examples/log.conf
-examples/scep.tgz
-examples/soap.tgz
-examples/basic.tgz
+examples/openxpki-etc.tgz
+examples/openxpki-feature.tgz
 examples/profiles.tgz
-examples/notification.tgz
-examples/htdocs.tgz
-examples/webui.tgz
 examples/sampleconfig.sh
-examples/openxpki-scep.conf
-examples/README
+examples/apache/openxpki-scep.conf
+examples/README.md

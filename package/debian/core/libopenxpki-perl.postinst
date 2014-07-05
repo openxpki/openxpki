@@ -31,17 +31,17 @@ case "$1" in
         #if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
 	set -e
 
-	   # Fix directory permissions
-	   chown -R openxpki:openxpki /var/openxpki
-	   chown -R openxpki:root /etc/openxpki/ssl/
-	   chmod -R 750 /etc/openxpki/ssl/
+        # No config - load sample config - also includes/overwrites other
+        # files in /etc/openxpki/ !
+        if [ ! -e /etc/openxpki/config.d/ ]; then
+           tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz -C /etc/openxpki
 
-       # log config
-       test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/
-
-       # scep/soap config
-       test -e /etc/openxpki/scep/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/scep.tgz -C /etc/openxpki/scep/
-       test -e /etc/openxpki/soap/default.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/soap.tgz -C /etc/openxpki/soap/
+           chmod 750 /etc/openxpki/config.d
+           mkdir -p -m 750 /etc/openxpki/config.git
+           chown -R openxpki:root /etc/openxpki/config.d/
+           chown -R openxpki:root /etc/openxpki/config.git/
+           openxpkiadm loadcfg 2>/dev/null
+       fi
 
        # Ubuntu names it conf-enabled while wheezy has conf.d
        if [ -d /etc/apache2/conf-enabled/ ]; then
@@ -50,16 +50,13 @@ case "$1" in
            test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf
        fi;
 
+       # Fix directory permissions
+       chown -R openxpki:openxpki /var/openxpki
+       chown -R openxpki:root /etc/openxpki/ssl/
+       chmod -R 750 /etc/openxpki/ssl/
+
        # add apache user to openxpki group (to allow connecting the socket)
        usermod -G openxpki www-data
-
-       # For the moment we keep the webui with the examples
-       if [ ! -e /var/www/newoxi ]; then
-           mkdir -p /var/www/newoxi;
-           tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/htdocs.tgz -C /var/www/newoxi;
-       fi;
-
-       test -e /etc/openxpki/webui/log.conf || tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/webui.tgz -C /etc/openxpki/webui/
 
         # UI logfiles
         for f in scep.log soap.log webui.log; do
@@ -67,16 +64,6 @@ case "$1" in
             chown www-data:openxpki /var/openxpki/$f
             chmod 640 /var/openxpki/$f
         done;
-
-        # No config - load sample config
-	   if [ ! -e /etc/openxpki/config.d/ ]; then
-	       mkdir -m 750 /etc/openxpki/config.d
-	       mkdir -m 750 /etc/openxpki/config.git
-	       tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/basic.tgz -C /etc/openxpki/config.d/
-	       chown -R openxpki:root /etc/openxpki/config.d/
-	       chown -R openxpki:root /etc/openxpki/config.git/
-	       openxpkiadm loadcfg 2>/dev/null
-	   fi
 
 	    # Create the pkiadm user
         COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
@@ -91,7 +78,7 @@ case "$1" in
         fi;
 
 	    # Create the sudo file to restart oxi from pkiadm
-	    if [ ! -e /etc/sudoers.d/pkiadm && -d /etc/sudoers.d ]; then
+	    if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
 	        echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
         fi;
 
