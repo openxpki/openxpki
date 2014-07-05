@@ -10,7 +10,21 @@ randomized_serial_bytes: 8
 publish: 0
 
 style:
-    00_tls_basic_style:
+    00_user_style:
+        label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE
+        description: I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC
+        ui:
+            subject:
+                - email
+            info:
+                - requestor_gname
+                - requestor_name
+                - comment
+
+         subject: 
+            dn: CN=[% email %],DC=VPN,DC=Test Deployment,DC=OpenXPKI,DC=org
+
+    10_server_style:
         label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE
         description: I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC
         ui:
@@ -23,31 +37,9 @@ style:
                 - requestor_affiliation
                 - comment
 
-        subject: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=OpenVPN CA,DC=OpenXPKI,DC=org
-        subject_alternative_names: dns=[% hostname %]
+         subject: 
+            dn: CN=[% hostname %],DC=VPN,DC=Test Deployment,DC=OpenXPKI,DC=org
 
-    05_advanced_style:
-        label: I18N_OPENXPKI_PROFILE_ADVANCED_STYLE
-        description: I18N_OPENXPKI_PROFILE_ADVANCED_DESC
-        ui:
-            subject:
-                - cn
-                - o
-                - ou
-                - dc
-                - c
-            info:
-                - requestor_gname
-                - requestor_name
-                - requestor_email
-                - requestor_affiliation
-                - comment
-
-        subject: CN=[% CN %][% IF OU %][% FOREACH entry = OU %],OU=[% entry %][% END %][% END %][% IF O %],O=[% O %][% END %][% FOREACH entry = DC %],DC=[% entry %][% END %][% IF C %],C=[% C %][% END %]
-        subject_alternative_names: "[% FOREACH entry = EMAIL %],email=[% entry %][% FOREACH entry = DNS %],dns=[% entry %]"
-
-role:
-- OpenVPN Client
 
 # Profile extensions - set 0/1 as needed
 extensions:
