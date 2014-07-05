@@ -656,4 +656,15 @@ cgi-bin/scep
 cgi-bin/webui.cgi
 cgi-bin/webui.fcgi
 
+# Client UI 
+htdocs/main-built.js
+htdocs/localconfig.js
+htdocs/readme.md
+htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
+htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
+htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf
+htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg
+htdocs/style/img/logo.png
+htdocs/main-built.css
+htdocs/index.html
 
