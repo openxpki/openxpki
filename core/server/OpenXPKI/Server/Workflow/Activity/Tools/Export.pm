@@ -122,7 +122,7 @@ is the server_id of the destination server.
 
 is the state on the destination server.
 
-=over
+=back
 
 Additionally you must configure the export directory for the data
 exchange in config.xml and you must define the server id in the database

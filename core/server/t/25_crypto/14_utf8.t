@@ -30,6 +30,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 18;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -125,6 +127,7 @@ for (my $i=0; $i < scalar @example; $i++)
     ok (1);
     print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
     OpenXPKI->write_file (FILENAME => "$basedir/test-ca/utf8.$i.crl.pem", CONTENT => $crl, FORCE => 1);
+}
 }
 
 }

@@ -12,6 +12,9 @@ use OpenXPKI::Serialization::Simple;
 # this is needed because we need to manually output the number of tests run
 diag("CSR with cert issuance workflow forking\n") if $ENV{VERBOSE};
 
+TODO: {
+    todo_skip 'See Issue #188', 20;
+
 # reuse the already deployed server
 my $socketfile = 't/var/openxpki/openxpki.socket';
 my $pidfile    = 't/var/openxpki/openxpkid.pid';
@@ -150,3 +153,4 @@ eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
 diag "Terminated connection";
+}

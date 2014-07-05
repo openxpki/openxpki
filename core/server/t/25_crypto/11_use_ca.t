@@ -5,7 +5,7 @@ use utf8;
  
 use Test::More;
  
-plan tests => 21;
+plan tests => 20;
 
 diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n" if $ENV{VERBOSE};
 
@@ -34,6 +34,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 18;
 my $ca_token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -380,6 +382,7 @@ eval
 };
 ok($crl, 'CRL creation') or diag "Exception: $EVAL_ERROR";
 
+}
 }
 
 1;

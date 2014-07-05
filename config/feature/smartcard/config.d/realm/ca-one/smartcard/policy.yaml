@@ -2,10 +2,10 @@ certs:
     type:
         nonescrow:
             usage: 
-            - AUTHENTICATION
+                - AUTHENTICATION
             allowed_profiles:
-            - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL
-            - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL
+                - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL
+                - I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL
             promote_to_preferred_profile: 1
             required: 1
             max_count: 1
@@ -21,9 +21,9 @@ certs:
 
         signature:
             usage: 
-            - SIGNATURE
+                - SIGNATURE
             allowed_profiles:
-            - I18N_OPENXPKI_PROFILE_USER_SIGNATURE
+                - I18N_OPENXPKI_PROFILE_USER_SIGNATURE
             promote_to_preferred_profile: 1
             required: 1
             max_count: 1
@@ -38,10 +38,10 @@ certs:
 
         escrow:
             usage:
-            - ENCRYPTION
+                - ENCRYPTION
             allowed_profiles:
-            - I18N_OPENXPKI_PROFILE_USER_ENCRYPTION
-            - I18N_OPENXPKI_PROFILE_USER_FSE
+                - I18N_OPENXPKI_PROFILE_USER_ENCRYPTION
+                - I18N_OPENXPKI_PROFILE_USER_FSE
             promote_to_preferred_profile: 1
             required: 1
             max_count: 3

@@ -30,7 +30,7 @@ style:
             email: "[% email %]"
 
 role:
-- User
+    - User
 
 # Profile extensions - set 0/1 as needed
 extensions:
@@ -76,8 +76,8 @@ extensions:
     crl_distribution_points:
         critical: 0
         uri:
-        - http://localhost/cacrl.crt
-        - ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org
+            - http://localhost/cacrl.crt
+            - ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org
 
     authority_info_access:
         critical: 0

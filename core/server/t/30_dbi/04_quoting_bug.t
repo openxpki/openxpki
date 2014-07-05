@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-plan tests => 7;
+plan tests => 3;
 
 diag "OpenXPKI::Server::DBI: Quoting bug\n" if $ENV{VERBOSE};
 
@@ -11,6 +11,8 @@ use OpenXPKI::Crypto::CRL;
 
 use Data::Dumper;
 
+TODO: {
+    todo_skip 'See Issue #188', 3;
 our $dbi;
 our $token;
 require 't/30_dbi/common.pl';
@@ -50,4 +52,5 @@ TODO: {
     is(scalar @{$result}, 1, 'one entry returned');
 }
 
+}
 1;

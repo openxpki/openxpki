@@ -163,6 +163,8 @@ with those encoded in the action name using "!". The method has multiple
 personalities depending on the key you pass as argument. Parameters from the
 actiion name have preceedence.
 
+=over
+
 =item scalar
 
 Return the value with the given key. Key can be a stringified hash/array
@@ -182,7 +184,10 @@ Returns a complete hash of all values defined in extra and cgi->param.
 Parameters with array or hash notation ([] or {} in their name), are converted
 to hashref/arrayref.
 
+=back
+
 =cut
+
 sub param {
 
     my $self = shift;

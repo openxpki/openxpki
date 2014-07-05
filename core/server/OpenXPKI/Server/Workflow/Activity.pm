@@ -51,7 +51,9 @@ sub init {
         my $val = $params->{$key};
         $_map->{$name} = $params->{$key};
         ##! 8: 'Found param ' . $name . ' - value : ' . $params->{$key}
-=cut                
+
+=begin disabled-by-oli
+
         if ($val =~ /^\$(\S+)/) {
             # copy from context
             $_map->{$name} = ['ctx', $1];
@@ -64,7 +66,9 @@ sub init {
         #    # static value, add to plain params hash 
         #    $params_merged->{$name} = $val;
         } 
-=cut        
+
+=end disabled-by-oli
+
     }
        
     # call Workflow::Action's init()

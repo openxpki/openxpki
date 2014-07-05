@@ -123,11 +123,12 @@ sub run {
 }
 
 
-=head __wake_up_workflow
+=head1 __wake_up_workflow
 
 Re-Instantiate the workflow and re-run the paused activity
 
 =cut
+
 sub __wake_up_workflow {
     my $self = shift;
     my ($db_result) = @_;
@@ -207,6 +208,7 @@ sub __wake_up_workflow {
 Make sure that the session context is set
 
 =cut
+
 sub __check_session {
 
     my $self = shift;

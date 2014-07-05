@@ -38,7 +38,7 @@ sub evaluate
     ##! 1: 'end'
     return 1;
 
-=end
+=end temporarily_disabled
 
 =cut
 

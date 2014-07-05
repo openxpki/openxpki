@@ -24,6 +24,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 13;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -59,6 +61,7 @@ foreach my $func ("version", "issuer", "issuer_hash", "serial",
         ok(0);
         print STDERR "Error: function $func failed\n";
     }
+}
 }
 
 }

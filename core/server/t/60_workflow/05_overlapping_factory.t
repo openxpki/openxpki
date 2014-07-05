@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More;
-plan tests => 27;
+#use Test::More tests => 27;
+use Test::More skip_all => 'See Issue #188';
 
 use OpenXPKI::XML::Cache;
 use OpenXPKI::Workflow::Handler;
@@ -70,3 +70,4 @@ do_step($workflow,
     EXPECTED_ACTIONS => [ 'noop' ],
 );
 
+done_testing();

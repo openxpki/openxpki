@@ -96,6 +96,8 @@ but sleep is used if wakeup contains a false value.
 
 =head2 Parameters
 
+=over
+
 =item *sleep*
 
 Sleep for a relative time starting from now. The value given to sleep is evaluated
@@ -135,3 +137,5 @@ Hint - this is very handy in combination with the parameter mapping feature:
 
 The reason parameter is optional an takes a string to be logged as reason for the
 pause.
+
+=back

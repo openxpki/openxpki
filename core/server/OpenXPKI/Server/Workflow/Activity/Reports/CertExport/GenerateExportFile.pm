@@ -240,6 +240,8 @@ Array of certificate identifiers to enrypt the p12 passwords to
 
 The following parameters are written to the context
 
+=over
+
 =item * exported_cert_ids
 
 Array of certificate identifiers contained in the xml 
@@ -252,4 +254,5 @@ Name of the xml file on the local system (tempfile)
 
 Expected name of the file on the target system after transfer
 
+=back
             

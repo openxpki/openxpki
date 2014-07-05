@@ -11,6 +11,9 @@ use OpenXPKI::Serialization::Simple;
 
 diag("Certificate revocation request workflow\n") if $ENV{VERBOSE};
 
+TODO: {
+    todo_skip 'See Issue #188', 23;
+
 # reuse the already deployed server
 my $socketfile = 't/var/openxpki/openxpki.socket';
 my $pidfile    = 't/var/openxpki/openxpkid.pid';
@@ -196,3 +199,4 @@ eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
 diag "Terminated connection";
+}

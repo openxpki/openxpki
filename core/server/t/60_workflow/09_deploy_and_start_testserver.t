@@ -12,6 +12,9 @@ plan tests => 4;
 #use OpenXPKI::Tests;
 use File::Copy;
 
+TODO: {
+    todo_skip 'See Issue #188', 4;
+
 diag("Deploying OpenXPKI test instance\n");
 
 # The server tests relys on the ca and database which is setup 
@@ -48,3 +51,5 @@ ok(-e $pidfile, "PID file exists");
 ok(-e $socketfile, "Socketfile exists");
 
 ok(OpenXPKI::Control::status({ SOCKETFILE => $socketfile, SILENT => 1}) == 0);
+}
+1;

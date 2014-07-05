@@ -10,8 +10,10 @@ rt:
         dir:   t/70_notify/rt/
        
     message:        
-        csr_created:  # The message Id as referenced in the activity
-            main:  # The internal handle for this ticket
+        # The message Id as referenced in the activity
+        csr_created:
+            # The internal handle for this ticket
+            main:
                 - action: open
                   queue: PKI
                   owner: pki-team
@@ -54,7 +56,8 @@ servicenow:
 
     message:    
         test: 
-            default:   # The internal handle for this thread
+            # The internal handle for this thread
+            default:
                 action: open
                 template: test
                 short_description: ServiceNow Notification Test
@@ -64,13 +67,15 @@ servicenow:
                 assigned_to: admin
                 
         update: 
-            default:   # The internal handle for this thread
+            # The internal handle for this thread
+            default:
                 action: update
                 comments: Waiting for callback
                 state: 4
                                
         close: 
-            default:   # The internal handle for this thread
+            # The internal handle for this thread
+            default:
                 action: close
 
                         
@@ -96,7 +101,8 @@ smtp:
 
     message:  
         test: 
-            default:   # The internal handle for this thread
+            # The internal handle for this thread
+            default:
                 template: testmail
                 subject: SMTP Notification Test
                 images:

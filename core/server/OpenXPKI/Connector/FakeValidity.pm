@@ -87,6 +87,8 @@ Connector to align a validity time spec to a fixed point in the week.
 
 =head2 Configuration
 
+=over
+
 =item cut_wday
 
 The day of week as used by perl DateTime, default is 6 (Saturday).
@@ -95,3 +97,6 @@ Note that Sunday is 7 (and not 0)!
 =item cut_time
 
 The time of the day, given as hh:mm, default is 17:00 (UTC)
+
+=back
+

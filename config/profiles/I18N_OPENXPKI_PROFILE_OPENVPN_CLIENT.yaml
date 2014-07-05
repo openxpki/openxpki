@@ -85,15 +85,15 @@ extensions:
     crl_distribution_points:
         critical: 0
         uri:
-        - http://localhost/cacrl.crt
-        - ldap://localhost/cn=[% ISSUER.CN.0 %],dc=OpenXPKI,dc=org
+            - http://localhost/cacrl.crt
+            - ldap://localhost/cn=[% ISSUER.CN.0 %],dc=OpenXPKI,dc=org
 
     authority_info_access:
         critical: 0
         ca_issuers: http://localhost/cacert.crt
         ocsp: 
-        - http://ocsp.openxpki.org/
-        - https://ocsp.openxpki.org/        
+            - http://ocsp.openxpki.org/
+            - https://ocsp.openxpki.org/        
 
     policy_identifier:
         critical: 0

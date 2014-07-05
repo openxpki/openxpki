@@ -29,6 +29,8 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
+TODO: {
+    todo_skip 'See Issue #188', 11;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -62,6 +64,7 @@ foreach my $func ("pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent"
     my $result = $spkac->$func();
     ok($result, "SPKAC object method $func");
     diag "$func: $result\n" if ($ENV{DEBUG});
+}
 }
 
 }
