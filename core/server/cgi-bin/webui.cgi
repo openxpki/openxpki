@@ -34,7 +34,7 @@ eval {
         logger => $log,
         config => {
             socket => '/var/openxpki/openxpki.socket',
-            scripturl => '/cgi-bin/webui.fcgi'
+            scripturl => '/cgi-bin/webui.cgi'
         }
     });
     $result = $client->handle_request({ cgi => $cgi });
