@@ -52,7 +52,7 @@ sub init {
         $_map->{$name} = $params->{$key};
         ##! 8: 'Found param ' . $name . ' - value : ' . $params->{$key}
 
-=begin disabled-by-oli
+=cut disabled-by-oli
 
         if ($val =~ /^\$(\S+)/) {
             # copy from context
@@ -67,7 +67,7 @@ sub init {
         #    $params_merged->{$name} = $val;
         } 
 
-=end disabled-by-oli
+=cut disabled-by-oli
 
     }
        
