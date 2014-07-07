@@ -644,6 +644,21 @@ sub __get_private_key_from_db {
 
     ##! 16: 'identifier: $identifier'
 
+    # TODO-MIGRATION - the UI 2.0 workflow stores the key in the datapool
+    # The old workflows have them in the context
+
+    # new workflows
+    my $datapool = CTX('api')->get_data_pool_entry({
+        NAMESPACE   =>  'certificate.privatekey',
+        KEY         =>  $cert_identifier
+    });
+
+    if ($datapool) {
+        return $datapool->{VALUE};
+    }
+
+
+    # No key found, check old format
     my $workflow_id_result = CTX('dbi_backend')->select(
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
         DYNAMIC => {
