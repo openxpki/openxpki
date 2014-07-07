@@ -34,8 +34,9 @@ Route = Em.Route.extend
                     @controllerFor("openxpki").set "content", [doc]
             if doc.goto
                 @transitionTo "openxpki", doc.goto
-            $(".loading").hide()
-            $(".btn-loading").removeClass("btn-loading")
+            Em.run.scheduleOnce "afterRender", ->
+                $(".loading").hide()
+                $(".btn-loading").removeClass("btn-loading")
             doc
         , (err) ->
             $(".loading").hide()
