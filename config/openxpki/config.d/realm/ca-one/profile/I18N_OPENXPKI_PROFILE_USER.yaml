@@ -16,18 +16,20 @@ style:
             subject:
                 - username
                 - realname
+                - department
                 - email
             info:
                 - comment
 
         subject: 
-            dn: CN=[% realname %]+UID=[% username %],DC=Test Deployment,DC=OpenXPKI,DC=org
+            dn: CN=[% realname %]+UID=[% username %][% IF department %],DC=[% department %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
             san: 
                email: "[% email %]"
 
         metadata:
             requestor: "[% realname %]"
             email: "[% email %]"
+            department: [% department %]		
 
 role:
     - User

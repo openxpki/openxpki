@@ -29,6 +29,10 @@ msgid "I18N_OPENXPKI_ACTIVITY_CSR_INSERTREQUEST_UNSUPPORTED_CSR_TYPE"
 msgstr "Zertifikatserstellung vorbereitet"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_ACTIVITY_PARSE_PKCS10_TT_DIED"
+msgstr "Warten"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_ACTIVITY_SCEP_EXTRACT_CSR_NO_SUBJECT"
 msgstr "Ändern des Namens des zukünftigen Zertifikates"
 
@@ -4152,6 +4156,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_PKCS7"
 msgstr "Herunterladen der kompletten Zertifizierungskette"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY"
+msgstr "PEM (CRT) Format"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Textformat (txt)"
 
@@ -4217,6 +4225,15 @@ msgstr ""
 "eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
 "können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
 "beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC"
+msgstr ""
+"Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt wird"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS"
@@ -4401,6 +4418,18 @@ msgstr ""
 "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
 "oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
 "Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_USERID_DESC"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME"
@@ -5285,6 +5314,10 @@ msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_ENROLLMENT_SUCCESS"
+msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_OGFLOW_INITIALIZED"
 msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
@@ -9133,6 +9166,19 @@ msgstr "testuser"
 #~ msgstr "ja"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_ACCOUNT"
+#~ msgstr "Kommentar"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_ACCOUNT_DESC"
+#~ msgstr ""
+#~ "Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+#~ "mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+#~ "eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+#~ "können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die "
+#~ "Angabe beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_CERTIFICATE_LDAP_PUBLISHING"
 #~ msgstr "Publish a certificate using LDAP"
 
@@ -9363,9 +9409,6 @@ msgstr "testuser"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TO_INSTALL"
-#~ msgstr "Warten"
-
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
 #~ msgstr "Warten"
 
 #, fuzzy

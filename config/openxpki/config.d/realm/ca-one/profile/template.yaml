@@ -37,6 +37,15 @@ username:
     width: 20
     default: testuser
 
+userid:
+    id: userid
+    label: I18N_OPENXPKI_UI_PROFILE_USERID
+    description: I18N_OPENXPKI_UI_PROFILE_USERID_DESC
+    type: freetext
+    match: \A [0-9]+ \z
+    width: 40
+    default: 12345
+
 realname:
     id: realname
     label: I18N_OPENXPKI_UI_PROFILE_REALNAME
@@ -44,6 +53,14 @@ realname:
     type: freetext
     match: .+
     width: 40
+
+department
+    id: department
+    label: I18N_OPENXPKI_UI_PROFILE_DEPARTMENT
+    description: I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC
+    type: freetext
+    match: .+
+    width: 60
 
 email:
     id: email

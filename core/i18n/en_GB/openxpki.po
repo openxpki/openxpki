@@ -8,10 +8,11 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2014-06-23 16:25+0100\n"
+"PO-Revision-Date: 2014-07-07 16:17+0100\n"
 "Last-Translator: Oliver Welter <oliver.welter@leitwelt.com>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,6 +29,10 @@ msgstr "Persist CSR"
 #, fuzzy
 msgid "I18N_OPENXPKI_ACTIVITY_CSR_INSERTREQUEST_UNSUPPORTED_CSR_TYPE"
 msgstr "Certificates"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_ACTIVITY_PARSE_PKCS10_TT_DIED"
+msgstr "Sleep"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_ACTIVITY_SCEP_EXTRACT_CSR_NO_SUBJECT"
@@ -193,7 +198,7 @@ msgstr ""
 "correct password?"
 
 msgid "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED"
-msgstr ""
+msgstr "Failed to start session"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CLIENT_INIT_TRANSPORT_PROTOCOL_REJECTED"
@@ -2249,7 +2254,7 @@ msgstr ""
 "You could not be authenticated using your certificate with CN __USER__."
 
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED"
-msgstr ""
+msgstr "Login failed"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK"
@@ -4330,13 +4335,16 @@ msgid "I18N_OPENXPKI_UI_CRR_TIME"
 msgstr "revocation time"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_DER"
-msgstr "DER (CER) format"
+msgstr "Download DER (CER) format"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PEM"
-msgstr "PEM (CRT) format"
+msgstr "Download PEM (CRT) format"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PKCS7"
 msgstr "Download complete certificate chain"
+
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY"
+msgstr "Download private key"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "TXT format"
@@ -4392,6 +4400,13 @@ msgstr ""
 "supposed to look like and have a good understanding of the certificate "
 "subject components and your local naming conventions. It also allows you to "
 "set arbitrary subject alternative names."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT"
+msgstr "Department"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC"
+msgstr "The (TCP) port that is used with the certificate"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS"
 msgstr "E-mail:"
@@ -4559,6 +4574,17 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr ""
 "Uniform Ressource Identifier (URI) can be any address or reference to an "
 "information source. Example: http://www.openxpki.org/~testuser/."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
+msgstr "User ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_USERID_DESC"
+msgstr ""
+"If you use this style, you'll only be required to enter your name, username "
+"and e-mail address. This is the easiest way to obtain a certificate, use it "
+"if you have no specific requirement for which you would need the advanced "
+"style."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME"
 msgstr "Username"
@@ -5424,6 +5450,10 @@ msgstr "SCEP Certificate Signing Request"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_STATE_ENROLLMENT_SUCCESS"
+msgstr "SCEP Certificate Signing Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_STATE_OGFLOW_INITIALIZED"
 msgstr "SCEP Certificate Signing Request"
 
 #, fuzzy
@@ -9137,6 +9167,17 @@ msgstr "testuser"
 #~ msgid "I18N_OPENXPKI_SUCCESS"
 #~ msgstr "Success"
 
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_ACCOUNT"
+#~ msgstr "Account"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_ACCOUNT_DESC"
+#~ msgstr ""
+#~ "Choose this style if you know exactly how your certificate subject is "
+#~ "supposed to look like and have a good understanding of the certificate "
+#~ "subject components and your local naming conventions. It also allows you "
+#~ "to set arbitrary subject alternative names."
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_CERTIFICATE_LDAP_PUBLISHING"
 #~ msgstr "Publish a certificate using LDAP"
@@ -9359,9 +9400,6 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_WRITE_CERTIFICATE_TO_INSTALL"
 #~ msgstr "Revoke the certificate"
-
-#~ msgid "I18N_OPENXPKI_WF_ACTIVITY_SLEEP"
-#~ msgstr "Sleep"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_COND_LDAP_DN_AVAILABLE"
