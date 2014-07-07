@@ -292,6 +292,7 @@ to the browser.
 sub render {
 
     my $self = shift;
+    my $output = shift;
 
     my $result = $self->_result();
 
@@ -299,27 +300,67 @@ sub render {
     $result->{status} = $self->_status() if $self->_status();
     $result->{page} = $self->_page() if $self->_page();
     $result->{reloadTree} = 1 if $self->reload();
-    $result->{goto} = $self->redirect() if $self->redirect();
+
+    my $json = new JSON()->utf8;
+    my $body;
+    if ($self->redirect()) {
+        $body = $json->encode( {goto => $self->redirect() } );
+    } elsif ($result->{_raw}) {
+        $body = $json->encode($result->{_raw});
+    } else {
+        $result->{session_id} = $self->_client()->session()->id;
+        $body = $json->encode($result);
+    }
+
+    # Return the output into the given pointer
+    if ($output && ref $output eq 'SCALAR') {
+        $$output = $body;
+    } else {
+        # Start output stream
+        my $cgi = $self->cgi();
+        print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => 'application/json; charset=UTF-8' );
+        print $body;
+    }
+
+
+    return $self;
+}
+
+=head2 init_fetch
+
+Method to send the result persisted with __persist_response
+
+=cut
+
+sub init_fetch {
+
+    my $self = shift;
+    my $arg = shift;
+
+    my $response = $self->param('id');
+    my $data = $self->__fetch_response( $response );
+
+    if (!$data) {
+        $self->logger()->error('Got empty response');
+        return;
+    }
+
+    $self->logger()->debug('Got response ' . Dumper $data);
+
+    $data->{mime} = "application/json; charset=UTF-8" unless($data->{mime});
 
     # Start output stream
     my $cgi = $self->cgi();
-    print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => 'application/json; charset=UTF-8' );
+    print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => $data->{mime}, -attachment => $data->{attachment} );
+    print $data->{data};
+    exit;
 
-    my $json = new JSON()->utf8;
-    if ($result->{_raw}) {
-        print $json->encode($result->{_raw});
-    } else {
-        $result->{session_id} = $self->_client()->session()->id;
-        print $json->encode($result);
-    }
-
-    return $self;
 }
 
 
 =head2 _escape ( string )
 
-Replacce html entities in string by their encoding
+Replace html entities in string by their encoding
 
 =cut
 
@@ -425,6 +466,61 @@ sub __purge_wf_token {
     $self->_client->session()->clear($id);
 
     return $self;
+
+}
+
+=head2 __persist_response
+
+Persist the current response to retrieve it after a http roundtrip
+Used to break out of the JS app for downloads or reroute result pages
+
+=cut
+
+sub __persist_response {
+
+    my $self = shift;
+    my $data = shift;
+    my $expire = shift;
+
+    $expire = '+5m' unless defined $expire;
+
+    my $id = sha1_base64(time.rand().$$);
+    $self->logger()->debug('persist response ' . $id);
+
+    # Auto Persist - use current result when no data is given
+    if (!defined $data) {
+        my $out;
+        $self->render( \$out );
+        $data = { data => $out };
+    }
+
+    $self->_client->session()->param('response_'.$id, $data );
+
+    $self->_client->session()->expire('response_'.$id, $expire) if ($expire) ;
+
+    return  "result!fetch!id!$id";
+
+}
+
+
+=head2 __fetch_response
+
+Get the data for the persisted response.
+
+=cut
+
+sub __fetch_response {
+
+    my $self = shift;
+    my $id = shift;
+
+    $self->logger()->debug('fetch response ' . $id);
+    my $response = $self->_client->session()->param('response_'.$id);
+    if (!$response) {
+        $self->logger()->error( "persisted response with id $id does not exist" );
+        return;
+    }
+    return $response;
 
 }
 

@@ -498,6 +498,8 @@ sub action_search {
             data => \@result
         }
     });
+
+    $self->redirect( $self->__persist_response( undef ) );
     return $self;
 
 }

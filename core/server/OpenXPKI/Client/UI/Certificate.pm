@@ -256,9 +256,32 @@ sub init_workflows {
 }
 
 
+sub init_pkcs12 {
+
+    my $self = shift;
+    my $cert_identifier = $self->param('identifier');
+
+    $self->_page({
+        label => 'Download private key for certificate.',
+        description => 'Please enter the key passphrase you set during certificate request.'
+    });
+
+    $self->add_section({
+        type => 'form',
+        action => 'certificate!pkcs12!identifier!' . $cert_identifier,
+        content => {
+           title => '',
+           submit_label => 'download',
+           fields => [
+                { name => 'passphrase', label => 'Passphrase', type => 'password' },
+            ]
+        }});
+
+    return $self;
+
+}
 
 sub init_download {
-
 
     my $self = shift;
     my $args = shift;
@@ -269,7 +292,15 @@ sub init_download {
     # No format, draw a list
     if (!$format) {
 
-        my $pattern = '<li><a href="'.$self->_client()->_config()->{'scripturl'}.'page=certificate!download!identifier!$cert_identifier!format!%s" target="_blank">%s</a></li>';
+        my $pattern = '<li><a href="'.$self->_client()->_config()->{'scripturl'}.'?page=certificate!download!identifier!'.$cert_identifier.'!format!%s" target="_blank">%s</a></li>';
+
+
+        my $pkcs12 = '';
+        # check for private key
+        # TODO - add ACL, only owner should be allowed to dl key
+        if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
+            $pkcs12 = '<li><a target="_blank" href="#/openxpki/certificate!pkcs12!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS12').'</a></li>';
+        }
 
         $self->add_section({
             type => 'text',
@@ -280,6 +311,7 @@ sub init_download {
                 #sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')). # core bug see #185
                 sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
                 sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+                $pkcs12.
                 '</ul>',
         }});
 
@@ -497,6 +529,66 @@ sub action_search {
             data => \@result
         }
     });
+
+    $self->redirect( $self->__persist_response( undef ) );
+
+    return $self;
+
+}
+
+=head2 action_pkcs12
+
+Retrieve the key passphrase and - if matches - send the key as pkcs12
+binary to the client.
+
+=cut
+sub action_pkcs12 {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $cert_identifier = $self->param('identifier');
+    my $passphrase = $self->param('passphrase');
+
+    $self->logger()->debug( "Request pkcs12 for $cert_identifier, Passphrase " . $passphrase);
+
+    my $pkcs12  = $self->send_command ( "get_private_key_for_cert", { IDENTIFIER => $cert_identifier, FORMAT => 'PKCS12', 'PASSWORD' => $passphrase });
+
+    if (ref $pkcs12 ne 'HASH' || !defined $pkcs12->{PRIVATE_KEY} )  {
+        $self->logger()->error('Unable to get pkcs12');
+        # TODO - send error
+        return;
+    }
+
+    $self->logger()->debug( "Got pkcs12 " );
+    my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
+    my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
+
+    $self->logger()->trace( "Cert Info:  " . Dumper $cert_info );
+
+    my $page = $self->__persist_response({
+        'mime' => 'application/x-pkcs12-mime',
+        'attachment' => "$filename.p12",
+        'data' => $pkcs12->{PRIVATE_KEY}
+    }, '+1m');
+
+    # We need to send the redirect to a non-ember url to load outside ember
+    my $link = $self->_client()->_config()->{'scripturl'}.'?page='.$page;
+    #$self->redirect( $link );
+
+    $self->_page({
+        label => 'Download private key for certificate.',
+        description => ''
+    });
+
+    $self->add_section({
+        type => 'text',
+        content => {
+           title => '',
+           description => 'Password accepted - <a href="'.$link.'">click here to download your key</a>.<br>
+           <b>The link expires after 30 seconds.</b>'
+    }});
+
     return $self;
 
 }
