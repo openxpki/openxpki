@@ -28,6 +28,7 @@ Route = Em.Route.extend
             if data.data.target is "modal"
                 @controllerFor("openxpki").set "modalContent", doc
             else if doc.page and doc.main
+                $(".modal.in").modal "hide"
                 if data.data.target is "tab"
                     @controllerFor("openxpki").get("content").pushObject doc
                 else
@@ -37,8 +38,9 @@ Route = Em.Route.extend
                     window.location.href = doc.goto
                 else
                     @transitionTo "openxpki", doc.goto
-            $(".loading").hide()
-            $(".btn-loading").removeClass("btn-loading")
+            Em.run.scheduleOnce "afterRender", ->
+                $(".loading").hide()
+                $(".btn-loading").removeClass("btn-loading")
             doc
         , (err) ->
             $(".loading").hide()
