@@ -304,7 +304,7 @@ sub render {
     my $json = new JSON()->utf8;
     my $body;
     if ($self->redirect()) {
-        $body = $json->encode( {goto => $self->redirect() } );
+        $body = $json->encode({ goto => $self->redirect() } );
     } elsif ($result->{_raw}) {
         $body = $json->encode($result->{_raw});
     } else {
@@ -342,7 +342,8 @@ sub init_fetch {
 
     if (!$data) {
         $self->logger()->error('Got empty response');
-        return;
+        $self->redirect('home!welcome');
+        return $self;
     }
 
     $self->logger()->debug('Got response ' . Dumper $data);

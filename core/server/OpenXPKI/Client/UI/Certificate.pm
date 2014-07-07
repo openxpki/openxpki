@@ -256,7 +256,7 @@ sub init_workflows {
 }
 
 
-sub init_pkcs12 {
+sub init_privkey{
 
     my $self = shift;
     my $cert_identifier = $self->param('identifier');
@@ -268,12 +268,19 @@ sub init_pkcs12 {
 
     $self->add_section({
         type => 'form',
-        action => 'certificate!pkcs12!identifier!' . $cert_identifier,
+        action => 'certificate!privkey!identifier!' . $cert_identifier,
         content => {
            title => '',
            submit_label => 'download',
            fields => [
                 { name => 'passphrase', label => 'Passphrase', type => 'password' },
+                { name => 'format', label => 'Format', type => 'select', options => [
+                    { value => 'PKCS12', label => 'PKCS12' },
+                    { value => 'PKCS8_PEM', label => 'PKCS8 (PEM)' },
+                    { value => 'PKCS8_DER', label => 'PKCS8 (DER)' },
+                    { value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
+                    ]
+                },
             ]
         }});
 
@@ -295,11 +302,11 @@ sub init_download {
         my $pattern = '<li><a href="'.$self->_client()->_config()->{'scripturl'}.'?page=certificate!download!identifier!'.$cert_identifier.'!format!%s" target="_blank">%s</a></li>';
 
 
-        my $pkcs12 = '';
+        my $privkey = '';
         # check for private key
         # TODO - add ACL, only owner should be allowed to dl key
         if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-            $pkcs12 = '<li><a target="_blank" href="#/openxpki/certificate!pkcs12!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS12').'</a></li>';
+            $privkey = '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
         }
 
         $self->add_section({
@@ -311,7 +318,7 @@ sub init_download {
                 #sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')). # core bug see #185
                 sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
                 sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
-                $pkcs12.
+                $privkey.
                 '</ul>',
         }});
 
@@ -536,40 +543,54 @@ sub action_search {
 
 }
 
-=head2 action_pkcs12
+=head2 action_privkey
 
 Retrieve the key passphrase and - if matches - send the key as pkcs12
 binary to the client.
 
 =cut
-sub action_pkcs12 {
+sub action_privkey {
 
     my $self = shift;
     my $args = shift;
 
     my $cert_identifier = $self->param('identifier');
     my $passphrase = $self->param('passphrase');
+    my $format = $self->param('format');
 
-    $self->logger()->debug( "Request pkcs12 for $cert_identifier, Passphrase " . $passphrase);
+    my $format_mime = {
+        'PKCS12' => [ 'application/x-pkcs12', 'p12' ],
+        'PKCS8_PEM' => [ 'application/pkcs8', 'key' ],
+        'PKCS8_DER' => [ 'application/pkcs8', 'p8' ],
+        'JAVA_KEYSTORE' => [ 'application/x-java-keystore', 'jks' ]
+    };
 
-    my $pkcs12  = $self->send_command ( "get_private_key_for_cert", { IDENTIFIER => $cert_identifier, FORMAT => 'PKCS12', 'PASSWORD' => $passphrase });
-
-    if (ref $pkcs12 ne 'HASH' || !defined $pkcs12->{PRIVATE_KEY} )  {
-        $self->logger()->error('Unable to get pkcs12');
-        # TODO - send error
+    if (!$format_mime->{$format}) {
+        $self->logger()->error( "Invalid key format requested ($format)" );
+        $self->set_status('Invalid key format requested','error');
         return;
     }
 
-    $self->logger()->debug( "Got pkcs12 " );
+    $self->logger()->debug( "Request privkey for $cert_identifier, Passphrase " . $passphrase);
+
+    my $privkey  = $self->send_command ( "get_private_key_for_cert", { IDENTIFIER => $cert_identifier, FORMAT => $format, 'PASSWORD' => $passphrase });
+
+    if (ref $privkey ne 'HASH' || !defined $privkey->{PRIVATE_KEY} )  {
+        $self->logger()->error('Unable to get private key');
+        $self->set_status('Unable to get key - wrong password?','error');
+        return;
+    }
+
+    $self->logger()->debug( "Got private key " );
     my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
     my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
 
     $self->logger()->trace( "Cert Info:  " . Dumper $cert_info );
 
     my $page = $self->__persist_response({
-        'mime' => 'application/x-pkcs12-mime',
-        'attachment' => "$filename.p12",
-        'data' => $pkcs12->{PRIVATE_KEY}
+        'mime' => $format_mime->{$format}->[0],
+        'attachment' => "$filename." . $format_mime->{$format}->[1],
+        'data' => $privkey->{PRIVATE_KEY}
     }, '+1m');
 
     # We need to send the redirect to a non-ember url to load outside ember

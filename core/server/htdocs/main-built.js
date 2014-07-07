@@ -36259,6 +36259,7 @@ define('pods/openxpki/route', [
                     if (data.data.target === 'modal') {
                         _this.controllerFor('openxpki').set('modalContent', doc);
                     } else if (doc.page && doc.main) {
+                        $('.modal.in').modal('hide');
                         if (data.data.target === 'tab') {
                             _this.controllerFor('openxpki').get('content').pushObject(doc);
                         } else {
@@ -36272,8 +36273,10 @@ define('pods/openxpki/route', [
                             _this.transitionTo('openxpki', doc.goto);
                         }
                     }
-                    $('.loading').hide();
-                    $('.btn-loading').removeClass('btn-loading');
+                    Em.run.scheduleOnce('afterRender', function () {
+                        $('.loading').hide();
+                        return $('.btn-loading').removeClass('btn-loading');
+                    });
                     return doc;
                 };
             }(this), function (err) {
