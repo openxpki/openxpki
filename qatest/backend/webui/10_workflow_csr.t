@@ -38,7 +38,9 @@ my $client = MockUI->new({
 });
 
 
-$result = $client->mock_request({});
+$result = $client->mock_request({
+    page => 'login'
+});
 
 is($result->{page}->{label}, 'Please log in');
 is($result->{main}->[0]->{action}, 'login!stack');
@@ -122,4 +124,3 @@ $result = $client->mock_request({
 is ($result->{status}->{level}, 'success', 'Status is success');
 
 
-print Dumper $result;

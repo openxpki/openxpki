@@ -13,7 +13,7 @@ use MockUI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 package main;
 
@@ -39,6 +39,11 @@ my $client = MockUI->new({
 
 
 $result = $client->mock_request({});
+is($result->{goto}, 'login');
+
+$result = $client->mock_request({
+    page => 'login'
+});
 
 is($result->{page}->{label}, 'Please log in');
 is($result->{main}->[0]->{action}, 'login!stack');
