@@ -33,7 +33,10 @@ Route = Em.Route.extend
                 else
                     @controllerFor("openxpki").set "content", [doc]
             if doc.goto
-                @transitionTo "openxpki", doc.goto
+                if doc.target == '_blank' || /^(http|\/)/.test doc.goto
+                    window.location.href = doc.goto
+                else
+                    @transitionTo "openxpki", doc.goto
             $(".loading").hide()
             $(".btn-loading").removeClass("btn-loading")
             doc
