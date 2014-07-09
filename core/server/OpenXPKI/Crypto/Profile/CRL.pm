@@ -109,7 +109,7 @@ sub __load_profile
         $ca_profile_name = 'default';
     }
 
-    $path = "crl.default";
+    $path = "crl." . $ca_profile_name;
 
     ##! 16: "Using config at $path";
 
