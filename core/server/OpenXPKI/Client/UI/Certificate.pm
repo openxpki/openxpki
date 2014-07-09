@@ -114,6 +114,14 @@ sub init_info {
     );
 
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
+    
+    my $privkey = '';
+    # check for private key
+    # TODO - add ACL, only owner should be allowed to dl key
+    if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {    	
+    	$privkey = sprintf ($pattern, 'privkey', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY'));
+	}
+    
     push @fields, { label => 'Download', value => '<ul>'.
         sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
         # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
@@ -288,6 +296,7 @@ sub init_privkey{
 
 }
 
+# TODO - either merge with info or make sub to build buttons
 sub init_download {
 
     my $self = shift;
@@ -591,7 +600,7 @@ sub action_privkey {
         'mime' => $format_mime->{$format}->[0],
         'attachment' => "$filename." . $format_mime->{$format}->[1],
         'data' => $privkey->{PRIVATE_KEY}
-    }, '+1m');
+    }, '+3m');
 
     # We need to send the redirect to a non-ember url to load outside ember
     my $link = $self->_client()->_config()->{'scripturl'}.'?page='.$page;
@@ -607,7 +616,7 @@ sub action_privkey {
         content => {
            title => '',
            description => 'Password accepted - <a href="'.$link.'">click here to download your key</a>.<br>
-           <b>The link expires after 30 seconds.</b>'
+           <b>The link expires after 60 seconds.</b>'
     }});
 
     return $self;
