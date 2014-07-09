@@ -146,7 +146,13 @@ sub __load_profile
     ## check if those are overriden in config
     foreach my $key (keys %{$self->{PROFILE}} ) {
         my $value = $config->get("profile.$profile_name.".lc($key));
-        if ($value) {
+        
+        # Test for realm default
+        if (!defined $value) {
+        	$value = $config->get("profile.default.".lc($key));
+        }
+        
+        if (defined $value) {
             $self->{PROFILE}->{$key} = $value;
             ##! 16: "Override $key from profile with $value"
         }
@@ -155,8 +161,12 @@ sub __load_profile
     ###########################################################################
     # determine certificate validity
 
+	my $validity_path = "profile.$profile_name.validity";
+	if (!$config->exists($validity_path)) {
+		$validity_path = "profile.default.validity";
+	}
 
-    my $notbefore = $config->get("profile.$profile_name.validity.notbefore");
+    my $notbefore = $config->get("$validity_path.notbefore");
     if ($notbefore) {
         $self->{PROFILE}->{NOTBEFORE} = OpenXPKI::DateTime::get_validity({
             VALIDITYFORMAT => 'detect',
@@ -166,7 +176,7 @@ sub __load_profile
         $self->{PROFILE}->{NOTBEFORE} = DateTime->now( time_zone => 'UTC' );
     }
 
-    my $notafter = $config->get("profile.$profile_name.validity.notafter");
+    my $notafter = $config->get("$validity_path.notafter");
     if (! $notafter) {
 	OpenXPKI::Exception->throw (
 	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
@@ -204,9 +214,11 @@ sub __load_profile
 
     # check for the copy_extension flag
     my $copy = $config->get("profile.$profile_name.extensions.copy");
+    if (!$copy) {
+    	$config->get("profile.default.extensions.copy");
+    }
     $copy = 'none' unless ($copy);
     $self->set_copy_extensions( $copy );
-
 
     ##! 2: Dumper($self->{PROFILE})
     ##! 1: "end"

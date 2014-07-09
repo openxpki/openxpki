@@ -75,8 +75,16 @@ sub load_extension
 
     ## is the extension used at all?
     if (!$config->exists($path)) {
-        ##! 16: "Extension $ext is not used"
-        return 0;
+    	
+    	# Test for default settings
+    	$path =~ /(profile|crl)/;
+    	$path = $1.'default';
+    	if ($config->exists($path)) {
+    		##! 16: 'Using default value for ' . $ext
+    	} else {
+    	    ##! 16: "Extension $ext is not used"
+    	    return 0;
+    	}
     }
 
     ## is this a critical extension?
