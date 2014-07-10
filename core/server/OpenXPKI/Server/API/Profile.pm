@@ -375,7 +375,7 @@ sub get_cert_profiles {
     my @profile_names = $config->get_keys('profile');
     PROFILE:
     foreach my $profile (@profile_names) {
-        next PROFILE if ($profile eq 'template');
+        next PROFILE if ($profile =~ /(template|default|sample)/);
 
         my $label = $config->get(['profile', $profile, 'label' ]) || $profile;
         if (!$args->{NOHIDE}) {
@@ -634,6 +634,100 @@ sub list_supported_san {
     my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName','GUID','UPN','RID');
     ##! 16: 'Supported san names ' . Dumper %san_names
     return \%san_names;
+}
+
+=head2 get_key_algs ( { PROFILE } )
+
+Return a list of supported key algorithms for the given profile
+
+=cut
+
+sub get_key_algs {
+
+
+    my $self = shift;
+    my $args = shift;
+
+    my $profile = $args->{PROFILE};
+
+    my $config = CTX('config');
+
+    if (!$config->exists( [ 'profile', $profile, 'key', 'alg' ] ) ) {
+        $profile = 'default';
+    }
+
+    my @alg = $config->get_list( [ 'profile', $profile, 'key', 'alg' ] );
+
+    return \@alg;
+
+}
+
+=head2 get_key_enc ( { PROFILE } )
+
+Return a list of supported encryption algorithms for the given profile
+
+=cut
+
+sub get_key_enc {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $profile = $args->{PROFILE};
+
+    my $config = CTX('config');
+
+    if (!$config->exists( [ 'profile', $profile, 'key', 'enc' ] ) ) {
+        $profile = 'default';
+    }
+
+    my @enc = $config->get_list( [ 'profile', $profile, 'key', 'enc' ] );
+
+    return \@enc;
+
+}
+
+=head2 get_key_params ( { PROFILE, ALG } )
+
+Returns all input parameters accepted by the selected algorithm
+as defined for the given profile (or the default).
+If no algorithm is given, only returns a list of all possible paramaters
+in all algorithms (used for prerendering the UI forms)
+Note: This does not check if the algorithm is in the supported list for
+the given profile, use get_key_alg to check!
+
+=cut
+
+sub get_key_params {
+
+    my $self = shift;
+    my $args = shift;
+
+    ##! 1: 'Start '
+
+    my $profile = $args->{PROFILE};
+    my $algorithm = $args->{ALG};
+
+    my $config = CTX('config');
+
+    if (!$algorithm) {
+        # TODO - grab that from the config
+        return [ 'key_length', 'curve_name' ];
+    }
+
+    my $path;
+    if (!$config->exists( [ 'profile', $profile, 'key', $algorithm ] ) ) {
+        $profile = 'default';
+    }
+
+    my @keys = $config->get_keys( [ 'profile', $profile, 'key', $algorithm ] );
+    my $params;
+    foreach my $key (@keys) {
+       $params->{$key} = [ $config->get_list( [ 'profile', $profile, 'key', $algorithm, $key ] ) ];
+    }
+
+    return $params;
+
 }
 
 

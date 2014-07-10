@@ -23,7 +23,7 @@ sub execute
     my $private_key = $context->param('private_key');
     my $password    = $context->param('_password');
     my $subject     = $context->param('cert_subject');
-    
+
     my $pkcs10 = $default_token->command({
         COMMAND => 'create_pkcs10',
         PASSWD  => $password,
@@ -31,6 +31,8 @@ sub execute
         SUBJECT => $subject,
     });
     ##! 16: 'pkcs10: ' . $pkcs10
+
+    # TODO - add SANs
 
     CTX('log')->log(
         MESSAGE  => "generated pkcs#10 request for $subject",

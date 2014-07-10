@@ -147,43 +147,48 @@ sub render_key_select {
     $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
 
     $self->_page({
-        label => 'Select profile',
-        description => 'do we need some more here?'
+        label => 'Set key parameters',
+        description => ''
     });
 
     my $wf_info = $args->{WF_INFO};
+    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
 
-    # Get the list of profiles from the backend - return is a hash with id => hash
-    my $key_type = $self->send_command( 'get_alg_names', {});
-    # Transform hash into value/label list and sort it
+    # Get the list of allowed algorithms
+    my $key_alg = $self->send_command( 'get_key_algs', { PROFILE => $context->{cert_profile} });
     my @key_type;
-    foreach my $alg (sort keys %{$key_type}) {
-       push @key_type, { label => $alg, value => $alg };
+    foreach my $alg (@{$key_alg}) {
+       push @key_type, { label => i18nGettext('I18N_OPENXPKI_UI_KEY_ALG_'.uc($alg)) , value => $alg };
     }
 
     my @fields = (
-        { name => "key_type", label => 'Algorithm', value => undef, type => 'select', 'options' => \@key_type, actionOnChange => 'profile!get_key_gen_param' },
+        { name => "key_alg", label => i18nGettext('I18N_OPENXPKI_UI_KEY_ALG'), value => undef, type => 'select', 'options' => \@key_type, actionOnChange => 'profile!get_key_param' },
     );
 
-    my $key_gen_param_names = $self->send_command( 'get_param_names', {});
+    my $key_gen_param_names = $self->send_command( 'get_key_params', { PROFILE => $context->{cert_profile} });
 
     # current values from context when changing values!
-    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
     my $key_gen_param_values = $context->{key_gen_params} ? $self->serializer()->deserialize( $context->{key_gen_params} ) : {};
 
-    foreach my $pn (keys %{$key_gen_param_names}) {
+    foreach my $pn (@{$key_gen_param_names}) {
+        $pn = uc($pn);
         # We create the label as I18 string from the param name
-        my $label = 'I18N_OPENXPKI_UI_KEYGEN_PARAM_'.$pn;
+        my $label = i18nGettext('I18N_OPENXPKI_UI_KEY_'.$pn);
         push @fields, { name => "key_gen_params{$pn}", label => $label, value => $key_gen_param_values->{ $pn }, type => 'select', 'options' => [] };
     }
 
-    push @fields, { name => "_password", label => 'Key Password', type => 'text' };
+    # Encryption
+    my $key_enc = $self->send_command( 'get_key_enc', { PROFILE => $context->{cert_profile} });
+    my @enc = map { { value => $_, label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_'.uc($_))  }  } @{$key_enc};
+    push @fields, { name => "enc_alg", label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC'), type => 'select', 'options' => \@enc };
+    push @fields, { name => "_password", label => 'Encryption Password', type => 'text' };
     push @fields, { name => "csr_type", type => 'hidden', 'value' => 'pkcs10' };
 
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
         wf_action =>  (keys %{$wf_info->{ACTIVITY}})[0],
         wf_fields => \@fields,
+        cert_profile => $context->{cert_profile}
     });
 
     $self->_result()->{main} = [{

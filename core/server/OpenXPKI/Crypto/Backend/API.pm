@@ -110,6 +110,15 @@ sub __init_command_params : PRIVATE {
     "verify_cert"    =>  {"CHAIN"   => 0,
                           "CERTIFICATE" => 1,
                           "TRUSTED"   => 1},
+    "create_pkey"    =>  {"PASSWD"   => 1,
+                          "KEY_ALG" => 0, # default RSA
+                          "ENC_ALG" => 0, # default aes256
+                          "PKEYOPT" => 0,
+                          "PARAM" => 0,
+                          },
+    "create_params"   =>  {"TYPE"   => 1, # DSA or DH
+                          "PKEYOPT" => 1,
+                          },
     };
 
     ## assign the specified value to the command_params attribute

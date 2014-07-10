@@ -3,6 +3,10 @@
 # Rewritten by Julia Dubenskaya for the OpenXPKI project 2007
 # Copyright (c) 2006-2007 by The OpenXPKI Project
 
+# This is the OLD Activity which is used by the V1 CSR Workflows
+# The CSR v2 use Tools::GenerateKey which has a slighlty different parameter
+# format and does not validate the keygen parameters (that is done by the workflow)
+
 package OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey;
 
 use strict;
@@ -22,7 +26,7 @@ sub execute
     my $context    = $workflow->context();
     my $default_token = CTX('api')->get_default_token();
 
-    my $key_type = $context->param('_key_type') || $self->param('key_type');
+    my $key_type = $context->param('_key_type') || uc($self->param('key_type'));
     ##! 16: 'key_type: ' . $key_type
 
     my $password = $context->param('_password') || $self->param('password');

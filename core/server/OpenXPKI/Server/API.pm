@@ -302,6 +302,26 @@ sub BUILD {
                 },
             },
         },
+        'generate_key' => {
+            class  => 'Object',
+            params => {
+                PASSWD => {
+                    type     => SCALAR,
+                },
+                KEY_ALG => {
+                    type     => SCALAR,
+                    optional => 1
+                },
+                ENC_ALG => {
+                    type     => SCALAR,
+                    optional => 1
+                },
+                PARAMS => {
+                    type     => HASHREF,
+                    optional => 1
+                }
+            },
+        },
         'get_ca_cert' => {
             class  => 'Object',
             params => {
@@ -795,6 +815,38 @@ sub BUILD {
                     type     => HASHREF,
                 },
             },
+        },
+        'get_key_algs' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string
+                },
+            }
+        },
+        'get_key_enc' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string
+                }
+            }
+        },
+        'get_key_params' => {
+            class  => 'Profile',
+            params => {
+                PROFILE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string
+                },
+                ALG => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
+            }
         },
 
         ### Object API

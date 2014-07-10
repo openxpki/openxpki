@@ -50,6 +50,111 @@ sub START {
 }
 
 
+sub generate_key {
+
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+
+    my $pass = $args->{PASSWD};
+    if (!$pass) {
+        OpenXPKI::Exception->throw( message =>
+          'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_REQUIRES_PASSWORD' );
+    }
+
+    my $key_alg = lc($args->{KEY_ALG}) || 'rsa';
+    my $enc_alg = lc($args->{ENC_ALG});
+
+    my $params = $args->{PARAMS};
+
+    my $token = CTX('api')->get_default_token();
+
+
+    # prepare command definition
+    my $command = {
+         COMMAND    => 'create_pkey',
+         KEY_ALG    => $key_alg,
+         ENC_ALG    => $enc_alg,
+         PASSWD     => $pass,
+    };
+
+    my $pkeyopt;
+    # Handling of pkeyopts for standard algorithms
+    if ($params->{PKEYOPT} && ref $params->{PKEYOPT} eq 'HASH') {
+        $pkeyopt = $params->{PKEYOPT};
+    } elsif ($key_alg eq "rsa") {
+        if ($params->{KEY_LENGTH} && $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs) {
+            $pkeyopt->{rsa_keygen_bits} = $params->{KEY_LENGTH};
+        } else {
+            $pkeyopt->{rsa_keygen_bits} = 2048;
+        }
+    } elsif ($key_alg eq "ec") {
+
+        # With openssl <=1.0.1 you need to create EC the same way as DSA
+        # means params and key in two steps
+        # see http://openssl.6102.n7.nabble.com/EC-private-key-generation-problem-td47261.html
+        if (!$params->{ECPARAM}) {
+            if (!$params->{CURVE_NAME}) {
+                OpenXPKI::Exception->throw( message =>
+                    'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_EC_REQUIRES_CURVE_NAME' );
+            }
+            $params->{ECPARAM} = $token->command({
+                COMMAND => 'create_params',
+                TYPE    => 'EC',
+                PKEYOPT => { ec_paramgen_curve => $params->{CURVE_NAME} }
+            });
+        }
+
+        if (!$params->{ECPARAM}) {
+            OpenXPKI::Exception->throw( message =>
+                'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_EC_PARAM' );
+        }
+
+        delete $command->{KEY_ALG};
+        $command->{PARAM} = $params->{ECPARAM};
+
+    } elsif ($key_alg eq "dsa") {
+
+        if (!$params->{DSAPARAM}) {
+            # Generate Parameters
+            my $bits = 2048;
+            if ($params->{KEY_LENGTH} && $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs) {
+                $bits = $params->{KEY_LENGTH};
+            }
+            $params->{DSAPARAM} = $token->command({
+                COMMAND => 'create_params',
+                TYPE    => 'DSA',
+                PKEYOPT => { dsa_paramgen_bits => $bits }
+            });
+        }
+
+        if (!$params->{DSAPARAM}) {
+            OpenXPKI::Exception->throw( message =>
+                'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM' );
+        }
+
+        delete $command->{KEY_ALG};
+        $command->{PARAM} = $params->{DSAPARAM};
+    }
+
+    CTX('log')->log(
+        MESSAGE  => "Creating private $key_alg key with params " . Dumper $pkeyopt,
+        PRIORITY => 'debug',
+        FACILITY => 'application',
+    );
+
+    # append the pkeyopt if any
+    if ($pkeyopt) {
+        $command->{PKEYOPT} = $pkeyopt;
+    }
+    ##! 16: 'command: ' . Dumper $command
+
+    my $key = $token->command( $command );
+
+    return $key;
+
+}
+
 =head2 get_csr_info_hash_from_data
 
 return a hash reference which includes all parsed informations from

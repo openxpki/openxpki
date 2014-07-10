@@ -137,6 +137,9 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST2001CP.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94CP.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_params.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkey.pm
+
 OpenXPKI/Crypto/Backend/OpenSSL/Command/list_algorithms.pm
 
 ## XS sources
@@ -253,6 +256,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notify.pm
 
+OpenXPKI/Server/Workflow/Activity/Tools/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
@@ -656,7 +660,7 @@ cgi-bin/scep
 cgi-bin/webui.cgi
 cgi-bin/webui.fcgi
 
-# Client UI 
+# Client UI
 htdocs/main-built.js
 htdocs/localconfig.js
 htdocs/readme.md

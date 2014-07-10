@@ -18,7 +18,8 @@
         ds_force="1"
         ds_unset_context_value="1">
         <field name="_password"  />
-        <field name="key_type"  />
+        <field name="key_alg"  />
+        <field name="enc_alg"  />
         <field name="key_gen_params"  />
         <field name="csr_type" type="hidden" default="pkcs10" />
     </action>
@@ -125,9 +126,11 @@
     </action>
 
     <action name="csr_generate_key"
-        class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey"
-        _map_key_type="$key_type"
-        _map_key_gen_params="$key_gen_params">
+        class="OpenXPKI::Server::Workflow::Activity::Tools::GenerateKey"
+        _map_key_alg="$key_alg"
+        _map_enc_alg="$enc_alg"
+        _map_key_gen_params="$key_gen_params"
+        _map_password="$_password">
     </action>
 
     <action name="csr_generate_pkcs10"

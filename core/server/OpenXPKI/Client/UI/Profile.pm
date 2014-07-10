@@ -44,17 +44,20 @@ sub action_get_styles_for_profile {
 
 # this is called when the user selects the key algorithm
 # it must update the key_enc and key_gen_param field at once
-sub action_get_key_gen_param {
+sub action_get_key_param {
 
     my $self = shift;
     my $args = shift;
 
-    my $key_type = $self->param('key_type');
+    my $key_alg = $self->param('key_alg');
+
+    # fetch the wf_token and extract saved profile info
+    my $token = $self->__fetch_wf_token( $self->param('wf_token') );
 
     # Get the possible parameters for this algo
-    my $key_gen_param_names = $key_type ? $self->send_command( 'get_param_names', { KEYTYPE => $key_type }) : {};
+    my $key_gen_param_supported = $key_alg ? $self->send_command( 'get_key_params', { PROFILE => $token->{cert_profile}, ALG => $key_alg }) : {};
 
-    $self->logger()->debug( '$key_gen_param_names: ' . Dumper $key_gen_param_names );
+    $self->logger()->debug( '$key_gen_param_supported: ' . Dumper $key_gen_param_supported );
 
     # The field names used in the ui are in the request
     my $in = $self->param();
@@ -63,16 +66,15 @@ sub action_get_key_gen_param {
     my @fields;
     foreach my $pn (keys %{$key_gen_params}) {
         my @param;
-        my $param_name = uc($pn);
-        if ($key_gen_param_names->{$param_name}) {
-            my $param = $self->send_command( 'get_param_values', { KEYTYPE => $key_type, PARAMNAME => $param_name });
-            @param = map { { value => $_, label => $_ } } sort keys %{$param};
+        my $param_name = lc($pn);
+        if ($key_gen_param_supported->{$param_name}) {
+            @param = map { { value => $_, label => i18nGettext('I18N_OPENXPKI_UI_KEY_'.uc($param_name.'_'.$_)) } } @{$key_gen_param_supported->{$param_name}};
 
             my $preset = $key_gen_params->{$pn};
 
-            $self->logger()->debug( 'Preset '.$preset. ' Values ' . Dumper keys %{$param});
+            $self->logger()->debug( 'Preset '.$preset. ' Values ' . Dumper $key_gen_param_supported->{$param_name});
 
-            if (!(grep $preset,  keys %{$param})) {
+            if (!(grep $preset,  @{$key_gen_param_supported->{$param_name}})) {
                 $preset = $param[0]->{value};
             }
 

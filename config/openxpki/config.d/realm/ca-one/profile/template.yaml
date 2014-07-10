@@ -54,7 +54,7 @@ realname:
     match: .+
     width: 40
 
-department
+department:
     id: department
     label: I18N_OPENXPKI_UI_PROFILE_DEPARTMENT
     description: I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC
