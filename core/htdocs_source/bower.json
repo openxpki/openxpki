@@ -5,7 +5,7 @@
         "bootstrap-contextmenu": "",
         "bootstrap3-typeahead": "",
         "eonasdan-bootstrap-datetimepicker": "",
-        "ember": "",
+        "ember": "<1.6.0",
         "emblem": "",
         "jquery": "<2.0.0",
         "moment": "",
