@@ -65,18 +65,19 @@ sub init_manage {
     my $status = $self->send_command("is_secret_complete", {SECRET => $secret}) || 0;
 
     if ($status) {
-        $self->_page ({label => 'Clear secret'});
+        $self->_page ({ shortlabel => 'Clear secret' });
         $self->add_section({
             type => 'text',
             content => {
-                description => 'Secret is complete',
-                buttons => [{ label => 'Clear', page => 'secret!clear!id!'.$secret, css_class => 'btn-warning', target => 'modal' }]
+                description => 'Secret is complete - <a href="#/openxpki/secret!clear!id!'.$secret.'">[clear secret]</a>.'
+                #buttons => [{ label => 'Clear', page => 'secret!clear!id!'.$secret, css_class => 'btn-warning', target => 'modal' }]
             }
         });
     } else {
-        $self->_page ({label => 'Unlock secret'});
+        $self->_page ({ label => 'Unlock secret' });
         $self->add_section({
             type => 'form',
+            action => 'secret!unlock',
             content => {
                 fields => [
                     { 'name' => 'phrase', 'label' => 'Passphrase', 'type' => 'password' },
@@ -123,6 +124,9 @@ sub action_unlock {
     my $secret = $self->param('id');
     my $msg = $self->send_command ( "set_secret_part",
         { SECRET => $secret, VALUE => $phrase });
+
+   $self->logger()->info('Secret was send');
+   $self->logger()->debug('Return ' . Dumper $msg);
 
     if ($msg) {
         $self->set_status('Secret accepted','success');

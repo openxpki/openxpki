@@ -98,7 +98,7 @@ sub init_crl {
             $self->_escape($crl->{BODY}->{'ISSUER'}),
             $crl->{BODY}->{'LAST_UPDATE'},
             $crl->{BODY}->{'NEXT_UPDATE'},
-            scalar @{$crl->{LIST}},
+            (defined $crl->{LIST} ? scalar @{$crl->{LIST}} : 0),
         ];
     }
 
