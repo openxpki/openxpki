@@ -29,6 +29,9 @@ sub render_profile_select {
     # Get the list of profiles from the backend - return is a hash with id => hash
     my $profiles = $self->send_command( 'get_cert_profiles', {});
     # Transform hash into value/label list and sort it
+    # Apply translation
+    map { $profiles->{$_}->{label} = i18nGettext($profiles->{$_}->{label}) } keys %{$profiles};
+    # Sort
     my @profiles = sort { lc($a->{label}) cmp lc($b->{label}) } values %{$profiles};
 
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
@@ -42,7 +45,7 @@ sub render_profile_select {
         my $styles = $self->send_command( 'get_cert_subject_profiles', { PROFILE => $cert_profile });
         # TODO clean up API after Mason decomissioning
         # Transform hash into value/label list and sort it
-        @styles = map { { value => $_, label => $styles->{$_}->{LABEL}, description => $styles->{$_}->{DESCRIPTION} } } keys %{$styles};
+        @styles = map { { value => $_, label => i18nGettext($styles->{$_}->{LABEL}), i18nGettext(description => $styles->{$_}->{DESCRIPTION}) } } keys %{$styles};
         @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
     }
 

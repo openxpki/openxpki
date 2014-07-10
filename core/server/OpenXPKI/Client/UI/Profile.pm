@@ -7,6 +7,8 @@ use Moose;
 use Data::Dumper;
 use English;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::i18n qw( i18nGettext );
+
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -22,7 +24,7 @@ sub action_get_styles_for_profile {
 
     # TODO clean up API after Mason decomissioning
     # Transform hash into value/label list and sort it
-    my @styles = map { { value => $_, label => $styles->{$_}->{LABEL}, description => $styles->{$_}->{DESCRIPTION} } } keys %{$styles};
+    my @styles = map { { value => $_, label => i18nGettext($styles->{$_}->{LABEL}), i18nGettext(description => $styles->{$_}->{DESCRIPTION}) } } keys %{$styles};
     @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
 
     my $cert_subject_style;
@@ -93,4 +95,6 @@ sub action_get_key_gen_param {
     return $self;
 
 }
+
+
 

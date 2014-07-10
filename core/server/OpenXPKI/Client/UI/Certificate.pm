@@ -114,19 +114,20 @@ sub init_info {
     );
 
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
-    
+
     my $privkey = '';
     # check for private key
     # TODO - add ACL, only owner should be allowed to dl key
-    if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {    	
-    	$privkey = sprintf ($pattern, 'privkey', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY'));
+    if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
+    	$privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
 	}
-    
+
     push @fields, { label => 'Download', value => '<ul>'.
         sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
         # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
         sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
         sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+        $privkey.
         '</ul>'
     };
 

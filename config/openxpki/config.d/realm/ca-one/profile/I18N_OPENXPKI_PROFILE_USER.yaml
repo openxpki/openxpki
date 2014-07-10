@@ -1,5 +1,7 @@
 # The name of the file equals the name of the profile
 
+label: I18N_OPENXPKI_PROFILE_USER
+
 validity:
     notafter: +01
 
@@ -29,7 +31,7 @@ style:
         metadata:
             requestor: "[% realname %]"
             email: "[% email %]"
-            department: [% department %]		
+            department: "[% department %]"
 
 role:
     - User

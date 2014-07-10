@@ -8,11 +8,10 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2014-07-07 16:17+0100\n"
-"Last-Translator: Oliver Welter <oliver.welter@leitwelt.com>\n"
+"PO-Revision-Date: 2014-07-10 16:02+0100\n"
+"Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -26,9 +25,8 @@ msgstr "Persist CSR"
 msgid "I18N_OPENXPKI_ACTION_UPDATE_METADATA_ACTION"
 msgstr "Persist CSR"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_ACTIVITY_CSR_INSERTREQUEST_UNSUPPORTED_CSR_TYPE"
-msgstr "Certificates"
+msgstr "Unsupported request type"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_ACTIVITY_PARSE_PKCS10_TT_DIED"
@@ -4364,6 +4362,85 @@ msgstr "Key length"
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Parameters"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_"
+msgstr "Username"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG"
+msgstr "Key algorithm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_"
+msgstr "Username"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_DSA"
+msgstr "DSA (Signature only)"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
+msgstr "Elliptic Curve"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+msgstr "GOST 2001"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+msgstr "GOST 94"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
+msgstr "RSA"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME"
+msgstr "Curve name"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_C2TNB191V1"
+msgstr "Curve c2tnb191v1"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME192V1"
+msgstr "Curve prime192v1"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
+msgstr "Curve prime239v1"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
+msgstr "Curve sect571r1"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC"
+msgstr "Encryption"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_"
+msgstr "Username"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_3DES"
+msgstr "3DES"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_AES256"
+msgstr "AES 256bit"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
+msgstr "IDEA"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
+msgstr "Key length"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
+msgstr "2048 bits (default)"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
+msgstr "4096 (very strong)"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE"
+msgstr "Key size"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_2048"
+msgstr "2048 bits (default)"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_4096"
+msgstr "4096 (very strong)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
+msgstr "Username"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "login failed"
 
@@ -6324,14 +6401,8 @@ msgstr "testuser"
 #~ msgid "I18N_OPENXPKI_CERT_KEYUSAGE"
 #~ msgstr "Key usage"
 
-#~ msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
-#~ msgstr "Key algorithm"
-
 #~ msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
 #~ msgstr "Key exponent (for RSA)"
-
-#~ msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
-#~ msgstr "Key size"
 
 #~ msgid "I18N_OPENXPKI_CERT_NOTAFTER"
 #~ msgstr "Not after"
@@ -9166,6 +9237,26 @@ msgstr "testuser"
 
 #~ msgid "I18N_OPENXPKI_SUCCESS"
 #~ msgstr "Success"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_C2TNB191V1"
+#~ msgstr "Curve c2tnb191v1"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_PRIME192V1"
+#~ msgstr "Curve prime192v1"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_PRIME239V1"
+#~ msgstr "Curve prime239v1"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_SECT571R1"
+#~ msgstr "Curve sect571r1"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_PARAM_"
+#~ msgstr "Username"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_ACCOUNT"
 #~ msgstr "Account"

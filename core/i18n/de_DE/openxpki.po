@@ -4184,6 +4184,111 @@ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_DSA"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+msgstr "Algorithmus des Schlüssels"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+msgstr "Algorithmus des Schlüssels"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_C2TNB191V1"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME192V1"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_3DES"
+msgstr ""
+"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+"mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+"eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+"können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
+"beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_AES256"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
+msgstr "Schlüssellänge"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
+msgstr "Schlüssellänge"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE"
+msgstr "Schlüssellänge"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_2048"
+msgstr "Schlüssellänge"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_4096"
+msgstr "Schlüssellänge"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
+msgstr "Benutzername"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Die Datei konnte nicht geöffnet werden"
 
@@ -6194,14 +6299,8 @@ msgstr "testuser"
 #~ msgid "I18N_OPENXPKI_CERT_KEYUSAGE"
 #~ msgstr "Schlüsselnutzung"
 
-#~ msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
-#~ msgstr "Algorithmus des Schlüssels"
-
 #~ msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
 #~ msgstr "Exponent des Schlüssels (für RSA)"
-
-#~ msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
-#~ msgstr "Schlüssellänge"
 
 #~ msgid "I18N_OPENXPKI_CERT_NOTAFTER"
 #~ msgstr "Gültig bis"
@@ -9164,6 +9263,26 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SUCCESS"
 #~ msgstr "ja"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_C2TNB191V1"
+#~ msgstr "Benutzername"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_PRIME192V1"
+#~ msgstr "Benutzername"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_PRIME239V1"
+#~ msgstr "Benutzername"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_SECT571R1"
+#~ msgstr "Benutzername"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_PARAM_"
+#~ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_ACCOUNT"

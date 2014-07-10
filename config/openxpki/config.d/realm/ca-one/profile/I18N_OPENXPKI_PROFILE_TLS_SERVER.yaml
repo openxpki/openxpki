@@ -1,4 +1,5 @@
 # The name of the file equals the name of the profile
+label: I18N_OPENXPKI_PROFILE_TLS_SERVER
 
 validity: 
     notafter: +0003

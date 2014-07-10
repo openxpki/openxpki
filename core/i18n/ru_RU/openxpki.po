@@ -4242,6 +4242,111 @@ msgstr ""
 "Идентификатор функциональности -  __METHOD_NAME__."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_DSA"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+msgstr "Алгоритм ключа"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+msgstr "Алгоритм ключа"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_C2TNB191V1"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME192V1"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_3DES"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_AES256"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
+msgstr "Длина ключа"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
+msgstr "Длина ключа"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE"
+msgstr "Длина ключа"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_2048"
+msgstr "Длина ключа"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_4096"
+msgstr "Длина ключа"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Процесс закончился с ошибкой"
 
@@ -6257,14 +6362,8 @@ msgstr "Тестировщик"
 #~ msgid "I18N_OPENXPKI_CERT_KEYUSAGE"
 #~ msgstr "Предназначение ключа"
 
-#~ msgid "I18N_OPENXPKI_CERT_KEY_ALGORITHM"
-#~ msgstr "Алгоритм ключа"
-
 #~ msgid "I18N_OPENXPKI_CERT_KEY_EXPONENT"
 #~ msgstr "Экспонента ключа"
-
-#~ msgid "I18N_OPENXPKI_CERT_KEY_SIZE"
-#~ msgstr "Длина ключа"
 
 #~ msgid "I18N_OPENXPKI_CERT_NOTAFTER"
 #~ msgstr "Действителен по"
@@ -8827,6 +8926,26 @@ msgstr "Тестировщик"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SUCCESS"
 #~ msgstr "Да"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_C2TNB191V1"
+#~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_PRIME192V1"
+#~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_PRIME239V1"
+#~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_SECT571R1"
+#~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_PARAM_"
+#~ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_ACCOUNT"
