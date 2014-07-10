@@ -24,12 +24,20 @@ div.navbar.navbar-default role="navigation"
               link-to "openxpki" navEntry.key
                 navEntry.label
 
+      if user
+        div style="position:absolute;top:-50px;right:30px;font-size:small;color:#aaa;"
+          ul.nav
+            li style="text-align:right"
+              'Signed in as:
+              strong {{user.name}} ({{user.role}})
+            li style="text-align:right"
+              'Realm:
+              strong {{user.pki_realm_label}} ({{user.pki_realm}})
+
       ul.nav.navbar-nav.navbar-right
         if user
-          li: p.navbar-text
-            'Signed in as:
-            strong {{user.name}} ({{user.role}})
           li: link-to "openxpki" "logout" | Log out
+
 
 div.container-fluid
   div.row
@@ -94,7 +102,7 @@ div class="modal fade"
           if modalContent.page.shortlabel
             modalContent.page.shortlabel
           else
-            | Title field is missing
+            modalContent.page.label
       div class="modal-body"
         each modalContent.main
           oxisection-main content=this

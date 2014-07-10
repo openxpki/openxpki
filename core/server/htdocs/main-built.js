@@ -33128,7 +33128,7 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</div><div id="footer"><div class="container-fluid"><p class="text-center text-muted credit">&copy; Copyright 2013, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a></p></div></div>');
+        data.buffer.push('</div><div id="footer"><div class="container-fluid"><p class="text-center text-muted credit">&copy; Copyright 2014, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a></p></div></div>');
         return buffer;
     });
     T['openxpki'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
@@ -33301,8 +33301,8 @@ define('templates/templates', [
             }
         }
         function program11(depth0, data) {
-            var buffer = '', stack1, helper, options;
-            data.buffer.push('<li><p class="navbar-text">Signed in as: <strong>');
+            var buffer = '', stack1;
+            data.buffer.push('<div style="position:absolute;top:-50px;right:30px;font-size:small;color:#aaa;"><ul class="nav"><li style="text-align:right">Signed in as: <strong>');
             stack1 = helpers._triageMustache.call(depth0, 'user.name', {
                 hash: {},
                 hashTypes: {},
@@ -33326,13 +33326,42 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            data.buffer.push(')</strong></p></li><li>');
+            data.buffer.push(')</strong></li><li style="text-align:right">Realm: <strong>');
+            stack1 = helpers._triageMustache.call(depth0, 'user.pki_realm_label', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push(' (');
+            stack1 = helpers._triageMustache.call(depth0, 'user.pki_realm', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push(')</strong></li></ul></div>');
+            return buffer;
+        }
+        function program13(depth0, data) {
+            var buffer = '', stack1, helper, options;
+            data.buffer.push('<li>');
             stack1 = (helper = helpers['link-to'] || depth0 && depth0['link-to'], options = {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(12, program12, data),
+                fn: self.program(14, program14, data),
                 contexts: [
                     depth0,
                     depth0
@@ -33349,10 +33378,10 @@ define('templates/templates', [
             data.buffer.push('</li>');
             return buffer;
         }
-        function program12(depth0, data) {
+        function program14(depth0, data) {
             data.buffer.push('Log out');
         }
-        function program14(depth0, data) {
+        function program16(depth0, data) {
             var buffer = '', stack1, helper, options;
             data.buffer.push('<li ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
@@ -33369,7 +33398,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(15, program15, data),
+                fn: self.program(17, program17, data),
                 contexts: [
                     depth0,
                     depth0
@@ -33386,7 +33415,7 @@ define('templates/templates', [
             data.buffer.push('</li>');
             return buffer;
         }
-        function program15(depth0, data) {
+        function program17(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'label', {
                 hash: {},
@@ -33402,7 +33431,7 @@ define('templates/templates', [
                 data.buffer.push('');
             }
         }
-        function program17(depth0, data) {
+        function program19(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<ul class="nav nav-tabs">');
             stack1 = helpers.each.call(depth0, 'content', {
@@ -33410,7 +33439,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(18, program18, data),
+                fn: self.program(20, program20, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33424,7 +33453,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(23, program23, data),
+                fn: self.program(25, program25, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33435,7 +33464,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program18(depth0, data) {
+        function program20(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<li ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
@@ -33466,8 +33495,8 @@ define('templates/templates', [
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
-                inverse: self.program(21, program21, data),
-                fn: self.program(19, program19, data),
+                inverse: self.program(23, program23, data),
+                fn: self.program(21, program21, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33493,7 +33522,7 @@ define('templates/templates', [
             data.buffer.push(' class="close">&times;</button></a></li>');
             return buffer;
         }
-        function program19(depth0, data) {
+        function program21(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'page.shortlabel', {
                 hash: {},
@@ -33509,7 +33538,7 @@ define('templates/templates', [
                 data.buffer.push('');
             }
         }
-        function program21(depth0, data) {
+        function program23(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'page.label', {
                 hash: {},
@@ -33525,7 +33554,7 @@ define('templates/templates', [
                 data.buffer.push('');
             }
         }
-        function program23(depth0, data) {
+        function program25(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
@@ -33551,7 +33580,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(24, program24, data),
+                fn: self.program(26, program26, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33574,7 +33603,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(26, program26, data),
+                fn: self.program(28, program28, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33585,7 +33614,7 @@ define('templates/templates', [
             data.buffer.push('</div></div></div></div>');
             return buffer;
         }
-        function program24(depth0, data) {
+        function program26(depth0, data) {
             var helper, options;
             data.buffer.push(escapeExpression((helper = helpers['oxisection-main'] || depth0 && depth0['oxisection-main'], options = {
                 hash: { 'content': '' },
@@ -33596,7 +33625,7 @@ define('templates/templates', [
                 data: data
             }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxisection-main', options))));
         }
-        function program26(depth0, data) {
+        function program28(depth0, data) {
             var buffer = '', helper, options;
             data.buffer.push('<h3></h3><div class="well">');
             data.buffer.push(escapeExpression((helper = helpers['oxisection-main'] || depth0 && depth0['oxisection-main'], options = {
@@ -33610,7 +33639,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program28(depth0, data) {
+        function program30(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div class="Xcontainer sections">');
             stack1 = helpers.each.call(depth0, 'content', {
@@ -33618,7 +33647,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(29, program29, data),
+                fn: self.program(31, program31, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33629,7 +33658,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program29(depth0, data) {
+        function program31(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div class="row"><div ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
@@ -33646,7 +33675,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(24, program24, data),
+                fn: self.program(26, program26, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33669,7 +33698,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(30, program30, data),
+                fn: self.program(32, program32, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33680,7 +33709,7 @@ define('templates/templates', [
             data.buffer.push('</div></div>');
             return buffer;
         }
-        function program30(depth0, data) {
+        function program32(depth0, data) {
             var buffer = '', helper, options;
             data.buffer.push('<div class="well">');
             data.buffer.push(escapeExpression((helper = helpers['oxisection-main'] || depth0 && depth0['oxisection-main'], options = {
@@ -33694,7 +33723,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program32(depth0, data) {
+        function program34(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'modalContent.page.shortlabel', {
                 hash: {},
@@ -33710,8 +33739,21 @@ define('templates/templates', [
                 data.buffer.push('');
             }
         }
-        function program34(depth0, data) {
-            data.buffer.push('Title field is missing');
+        function program36(depth0, data) {
+            var stack1;
+            stack1 = helpers._triageMustache.call(depth0, 'modalContent.page.label', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            } else {
+                data.buffer.push('');
+            }
         }
         data.buffer.push('<div role="navigation" class="navbar navbar-default"><div class="container-fluid"><div class="navbar-header"><button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="#" class="navbar-brand"></a></div><div class="navbar-collapse collapse"><ul class="nav navbar-nav">');
         stack1 = helpers.each.call(depth0, 'navEntry', 'in', 'navEntries', {
@@ -33735,7 +33777,7 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</ul><ul class="nav navbar-nav navbar-right">');
+        data.buffer.push('</ul>');
         stack1 = helpers['if'].call(depth0, 'user', {
             hash: {},
             hashTypes: {},
@@ -33749,13 +33791,27 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
+        data.buffer.push('<ul class="nav navbar-nav navbar-right">');
+        stack1 = helpers['if'].call(depth0, 'user', {
+            hash: {},
+            hashTypes: {},
+            hashContexts: {},
+            inverse: self.program(6, program6, data),
+            fn: self.program(13, program13, data),
+            contexts: [depth0],
+            types: ['ID'],
+            data: data
+        });
+        if (stack1 || stack1 === 0) {
+            data.buffer.push(stack1);
+        }
         data.buffer.push('</ul></div></div></div><div class="container-fluid"><div class="row"><div class="col-md-2"><div role="complementary" class="bs-sidebar hidden-print"><ul class="nav bs-sidenav">');
         stack1 = helpers.each.call(depth0, 'sideNavEntries', {
             hash: {},
             hashTypes: {},
             hashContexts: {},
             inverse: self.program(6, program6, data),
-            fn: self.program(14, program14, data),
+            fn: self.program(16, program16, data),
             contexts: [depth0],
             types: ['ID'],
             data: data
@@ -33813,8 +33869,8 @@ define('templates/templates', [
             hash: {},
             hashTypes: {},
             hashContexts: {},
-            inverse: self.program(28, program28, data),
-            fn: self.program(17, program17, data),
+            inverse: self.program(30, program30, data),
+            fn: self.program(19, program19, data),
             contexts: [depth0],
             types: ['ID'],
             data: data
@@ -33827,8 +33883,8 @@ define('templates/templates', [
             hash: {},
             hashTypes: {},
             hashContexts: {},
-            inverse: self.program(34, program34, data),
-            fn: self.program(32, program32, data),
+            inverse: self.program(36, program36, data),
+            fn: self.program(34, program34, data),
             contexts: [depth0],
             types: ['ID'],
             data: data
@@ -33842,7 +33898,7 @@ define('templates/templates', [
             hashTypes: {},
             hashContexts: {},
             inverse: self.program(6, program6, data),
-            fn: self.program(24, program24, data),
+            fn: self.program(26, program26, data),
             contexts: [depth0],
             types: ['ID'],
             data: data
@@ -36451,7 +36507,21 @@ define('pods/config/controller', [
     });
     __exports__.__default__ = Controller;
 });
+define('pods/application/controller', [
+    'vendor/ember',
+    'exports'
+], function (__dependency0__, __exports__) {
+    'use strict';
+    var Em = __dependency0__.__default__;
+    var Controller;
+    Controller = Em.ArrayController.extend({
+        structure: null,
+        user: Em.computed.alias('structure.user')
+    });
+    __exports__.__default__ = Controller;
+});
 define('ember-app', [
+    'pods/application/controller',
     'pods/config/controller',
     'pods/index/route',
     'pods/openxpki/controller',
@@ -36469,25 +36539,27 @@ define('ember-app', [
     'routers/main',
     'templates/templates',
     'exports'
-], function (__dependency0__, __dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __exports__) {
+], function (__dependency0__, __dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __dependency16__, __exports__) {
     'use strict';
-    var ConfigController = __dependency0__.__default__;
-    var IndexRoute = __dependency1__.__default__;
-    var OpenxpkiController = __dependency2__.__default__;
-    var OpenxpkiRoute = __dependency3__.__default__;
-    var OxifieldCertidentifierComponent = __dependency4__.__default__;
-    var OxifieldDatetimeComponent = __dependency5__.__default__;
-    var OxifieldMainComponent = __dependency6__.__default__;
-    var OxifieldSelectComponent = __dependency7__.__default__;
-    var OxifieldUploadareaComponent = __dependency8__.__default__;
-    var OxisectionFormComponent = __dependency9__.__default__;
-    var OxisectionGridComponent = __dependency10__.__default__;
-    var OxisectionKeyvalueComponent = __dependency11__.__default__;
-    var OxisectionMainComponent = __dependency12__.__default__;
-    var OxivalueFormatComponent = __dependency13__.__default__;
-    var MainRouter = __dependency14__.__default__;
-    var TemplatesTemplate = __dependency15__.__default__;
+    var ApplicationController = __dependency0__.__default__;
+    var ConfigController = __dependency1__.__default__;
+    var IndexRoute = __dependency2__.__default__;
+    var OpenxpkiController = __dependency3__.__default__;
+    var OpenxpkiRoute = __dependency4__.__default__;
+    var OxifieldCertidentifierComponent = __dependency5__.__default__;
+    var OxifieldDatetimeComponent = __dependency6__.__default__;
+    var OxifieldMainComponent = __dependency7__.__default__;
+    var OxifieldSelectComponent = __dependency8__.__default__;
+    var OxifieldUploadareaComponent = __dependency9__.__default__;
+    var OxisectionFormComponent = __dependency10__.__default__;
+    var OxisectionGridComponent = __dependency11__.__default__;
+    var OxisectionKeyvalueComponent = __dependency12__.__default__;
+    var OxisectionMainComponent = __dependency13__.__default__;
+    var OxivalueFormatComponent = __dependency14__.__default__;
+    var MainRouter = __dependency15__.__default__;
+    var TemplatesTemplate = __dependency16__.__default__;
     var App = {
+            ApplicationController: ApplicationController,
             ConfigController: ConfigController,
             IndexRoute: IndexRoute,
             OpenxpkiController: OpenxpkiController,
