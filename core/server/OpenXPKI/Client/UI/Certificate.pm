@@ -572,7 +572,7 @@ sub action_privkey {
         'PKCS12' => [ 'application/x-pkcs12', 'p12' ],
         'PKCS8_PEM' => [ 'application/pkcs8', 'key' ],
         'PKCS8_DER' => [ 'application/pkcs8', 'p8' ],
-        'JAVA_KEYSTORE' => [ 'application/x-java-keystore', 'jks' ]
+        #'JAVA_KEYSTORE' => [ 'application/x-java-keystore', 'jks' ]
     };
 
     if (!$format_mime->{$format}) {
