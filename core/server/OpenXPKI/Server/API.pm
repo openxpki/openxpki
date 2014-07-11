@@ -32,6 +32,7 @@ use OpenXPKI::Server::API::Token;
 use OpenXPKI::Server::API::Visualization;
 use OpenXPKI::Server::API::Workflow;
 use OpenXPKI::Server::API::Smartcard;
+use OpenXPKI::Server::API::UI;
 
 my %external_of    :ATTR;
 my %method_info_of :ATTR;
@@ -1354,6 +1355,17 @@ sub BUILD {
                 },
             },
         },
+
+        # Methods for UI
+        'get_ui_system_status' => {
+            class  => 'UI',
+            params => {
+                'ITEMS' => {
+                    type  => ARRAYREF,
+                    optional => 1,
+               },
+            }
+        }
     };
 }
 

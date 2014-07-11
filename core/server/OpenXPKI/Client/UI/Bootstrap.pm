@@ -43,6 +43,7 @@ sub _init_structure_for_user {
          key=> 'home',
          label=>  'Home',
          entries=>  [
+             {key=> 'home!index', label =>  "Home"},
              {key=> 'home!task', label =>  "My tasks"},
              {key=> 'home!workflow',label =>  "My workflows"},
              {key=> 'home!certificate',label =>  "My certificates"} ,
@@ -73,19 +74,19 @@ sub _init_structure_for_user {
          entries=>  [
              {key=> 'information!issuer', label =>  "CA certificates"},
              {key=> 'information!crl',label =>  "Revocation lists"},
-             {key=> 'information!policy',label =>  "Pollicy documents"}
+             #{key=> 'information!policy',label =>  "Pollicy documents"}
          ]
       },
-
       {
-         key=> 'search',
-         label=>  'Search',
-         entries=>  [
-             {key=> 'certificate!search', label =>  "Certificates", target => 'main'},
-             {key=> 'workflow!search',label =>  "Workflows"}
-         ]
+          key=> 'certificate!search',
+          label =>  "Certificates",
+          entries=> []
+      },
+      {
+         key => 'workflow!search',
+         label =>  "Workflows",
+         entries=>  []
       }
-
    ];
 
 

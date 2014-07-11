@@ -20,13 +20,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->_result()->{main} = [{
-        type => 'text',
-        content => {
-            label => 'My little Headline',
-            description => 'Hello World'
-        }
-    }];
+    $self->redirect('home!index');
 
     return $self;
 }
@@ -137,7 +131,7 @@ sub init_policy {
 
     $self->_page({
         label => 'Policy documents',
-        description => 'we need to add some logic here to enable easy config outside the pm',
+        description => '',
     });
 
     $self->add_section({

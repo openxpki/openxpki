@@ -1,0 +1,104 @@
+## OpenXPKI::Server::API::Object.pm
+##
+## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
+## Copyright (C) 2005-2006 by The OpenXPKI Project
+
+=head1 Name
+
+OpenXPKI::Server::API::UI
+
+=head1 Description
+
+
+=head1 Functions
+
+=cut
+
+package OpenXPKI::Server::API::UI;
+
+use strict;
+use warnings;
+use utf8;
+use English;
+
+use Data::Dumper;
+
+use Class::Std;
+use OpenXPKI::Debug;
+use OpenXPKI::Exception;
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Crypto::CSR;
+use OpenXPKI::Crypto::VolatileVault;
+use OpenXPKI::FileUtils;
+use DateTime;
+use List::Util qw(first);
+
+use MIME::Base64 qw( encode_base64 decode_base64 );
+
+sub START {
+
+    # somebody tried to instantiate us, but we are just an
+    # utility class with static methods
+    OpenXPKI::Exception->throw( message =>
+          'I18N_OPENXPKI_SERVER_API_SUBCLASSES_CAN_NOT_BE_INSTANTIATED', );
+}
+
+=head2 get_ui_system_status
+
+Return information about critical items of the system such as
+status of secret groups, expiring crls/tokens, etc.
+
+=cut
+
+sub get_ui_system_status {
+
+    my $self = shift;
+
+    my $result;
+    my $crypto = CTX('crypto_layer');
+    my $pki_realm = CTX('api')->get_pki_realm();
+
+    # Offline Secrets
+    my $offline = 0;
+    my %secrets = $crypto->get_secret_groups();
+    foreach my $secret (keys %secrets) {
+        my $status = $crypto->is_secret_group_complete( $secret ) || 0;
+        if (!$status) { $offline++ };
+    }
+
+    $result->{secret_offline} = $offline;
+
+    # Expiring CRLs
+    my $crl_result = CTX('dbi_backend')->first(
+        TABLE   => 'CRL',
+        COLUMNS => [ 'NEXT_UPDATE' ],
+        DYNAMIC => { PKI_REALM => { VALUE => $pki_realm }, },
+        ORDER => [ 'NEXT_UPDATE' ],
+        REVERSE => 1,
+    );
+    $result->{crl_expiry} = $crl_result->{NEXT_UPDATE};
+
+    # Vault Token
+    my $dv_group = CTX('config')->get("crypto.type.datasafe");
+    my $dv_token = CTX('dbi_backend')->first(
+        TABLE   => 'ALIASES',
+        COLUMNS => [
+            'NOTAFTER',
+        ],
+        DYNAMIC => {
+            'PKI_REALM' => { VALUE => $pki_realm },
+            'GROUP_ID' => { VALUE => $dv_group },
+        },
+        'ORDER' => [ 'NOTAFTER' ],
+        'REVERSE' => 1,
+    );
+
+    $result->{dv_expiry} = $dv_token->{NOTAFTER};
+
+    return $result;
+
+}
+
+1,
+
+__END__;

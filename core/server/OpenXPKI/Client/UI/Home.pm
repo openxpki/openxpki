@@ -22,7 +22,60 @@ sub init_welcome {
     my $self = shift;
     my $args = shift;
 
-    $self->init_index( $args );
+    my $status = $self->send_command("get_ui_system_status");
+
+    my @fields;
+
+    my $critical = 0;
+    if ($status->{secret_offline}) {
+        push @fields, {
+            label => 'Secret groups',
+            format=>'link',
+            value => {
+                label => sprintf ('%01d secret groups are NOT available',  $status->{secret_offline}),
+                page => 'secret!index',
+                target => '_top'
+            }
+        };
+        $critical = 1;
+    }
+
+    my $now = time();
+    if ($status->{crl_expiry} < $now + 5*86400) {
+        push @fields, {
+            label  => 'CRL update required',
+            format => 'timestamp',
+            value  => $status->{crl_expiry}
+        };
+        $critical = 1 if ($status->{crl_expiry} < $now);
+    }
+
+    if ($status->{dv_expiry} < $now + 30*86400) {
+        push @fields, {
+            label  => 'Encryption token expires',
+            format => 'timestamp',
+            value  => $status->{dv_expiry}
+        };
+        $critical = 1 if ($status->{dv_expiry} < $now);
+    }
+
+    if (@fields) {
+        if ($critical) {
+            $self->set_status('Your system status is critical!','error');
+        } else {
+            $self->set_status('Your system status requires your attention!','warn');
+        }
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => 'OpenXPKI system status',
+                data => \@fields
+            }
+        });
+    } else {
+        $self->set_status('System status is good','success');
+        $self->init_index( $args );
+    }
 
     return $self;
 }
@@ -32,13 +85,13 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->_result()->{main} = [{
+    $self->add_section({
         type => 'text',
         content => {
-            label => 'My little Headline',
-            description => 'Hello World'
+            label => '',
+            description => 'This page was left blank.'
         }
-    }];
+    });
 
     return $self;
 }
@@ -171,10 +224,11 @@ sub init_task {
         label => 'Outstanding tasks'
     });
 
+    # TODO - need to make enable filter for own workflows by configuration
     # CSR
     my $search_result = $self->send_command( 'search_workflow_instances', {
         LIMIT => 100,  # Safety barrier
-        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
+        #ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
         TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2',
         STATE => [ 'PENDING', 'APPROVAL' ],
     });
@@ -216,7 +270,7 @@ sub init_task {
 
     $search_result = $self->send_command( 'search_workflow_instances', {
         LIMIT => 100,  # Safety barrier
-        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
+        #ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
         TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2',
         STATE => [ 'PENDING', 'ONHOLD' ],
     });
