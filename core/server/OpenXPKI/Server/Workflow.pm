@@ -134,48 +134,24 @@ sub execute_action {
     # if some strange error in the process flow ocurred (for example, if somebody manually "throws" a OpenXPKI::Server::Workflow::Pause object)
 
     my $e;
-    eval {
-        eval{
-            $state = $self->SUPER::execute_action( $action_name, $autorun );
 
-        };
-
-        if(Exception::Class->caught('OpenXPKI::Server::Workflow::Pause')){
-            if ( $self->_has_paused() ) {
-                #proc-state is 'pause', db-commit already done, so lets return:
-                ##! 16: 'caught: OpenXPKI::Server::Workflow::Pause'
-
-            }else{
-                #this should NEVER happen:
-                OpenXPKI::Exception->throw (
-                        message => "I18N_OPENXPKI_SERVER_WORKFLOW_RUNTIME_ERROR",
-                        params => {description => 'OpenXPKI::Server::Workflow::Pause thrown and caught, but workflow has not paused!'}
-                    );
-                };
-
-        }elsif($e = Exception::Class->caught()){
-            #any other exceptions will be passed to the outer eval
-            ##! 128: 'Exception (no pause) caught and rethrown'
-            (ref $e ne '') ? $e->rethrow : croak $e;
-        }
-
+    eval{
+        $state = $self->SUPER::execute_action( $action_name, $autorun );
     };
-    ##! 16: 'state after super::execute_action '.$state
-    if ($EVAL_ERROR) {
-        my $error = $EVAL_ERROR;
-        $self->_proc_state_exception($error);
 
-        # Look into the workflow definiton weather to autofail
-        my $autofail = $self->_get_workflow_state()->{_actions}->{$action_name}->{autofail};
-        if (defined $autofail && $autofail =~ /(yes|1)/i) {
-		    ##! 16: 'execute failed and has autofail set'
-        	$self->_autofail($error);
-        }
+    # As pause comes up with an exception we can never have pause + an extra exception
+    # so we just ignore any expcetions here
+    if ($self->_has_paused()) {
+        # noop
+    } elsif( $EVAL_ERROR ) {
+
+        my $error = $EVAL_ERROR;
 
         # If we have consecutive autorun actions the error bubbles up as the
         # workflow engine makes recursive calls, rethrow the first exception
         # instead of cascading them
-        if( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE') {
+        if (( $e = Exception::Class->caught() ) &&
+            ( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE')) {
 
             ##! 16: 'bubbled up error - rethrow'
             CTX('log')->log(
@@ -185,21 +161,26 @@ sub execute_action {
             );
 
             $e->rethrow;
-        } else {
-
-            # Don't use 'workflow_error' here since $error should already
-            # be a Workflow::Exception object or subclass
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE",
-                params => {
-                    ACTION => $action_name,
-                    ERROR => scalar $error
-                }
-            );
         }
 
-    } elsif ($self->_has_paused()){
-        return $state;
+        $self->_proc_state_exception($error);
+        # Look into the workflow definiton weather to autofail
+        my $autofail = $self->_get_workflow_state()->{_actions}->{$action_name}->{autofail};
+        if (defined $autofail && $autofail =~ /(yes|1)/i) {
+		    ##! 16: 'execute failed and has autofail set'
+        	$self->_autofail($error);
+        }
+
+        # Something unexpected went wrong inside the action, throw exception
+        # with original error attached
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE",
+            params => {
+                ACTION => $action_name,
+                ERROR => scalar $error
+            }
+        );
+
     } else {
         #reset "count_try"
         $self->count_try(0);
