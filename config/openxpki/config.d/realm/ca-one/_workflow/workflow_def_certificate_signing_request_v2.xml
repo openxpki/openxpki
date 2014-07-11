@@ -18,10 +18,11 @@
             resulting_state="ENTER_SUBJECT">
     </action>
 
+<!--  Not supported by UI yet
     <action name="csr_generate_key_client"
             resulting_state="ENTER_SUBJECT">
     </action>
-
+ -->
     <action name="csr_upload_pkcs10"
             resulting_state="ENTER_SUBJECT">
     </action>
