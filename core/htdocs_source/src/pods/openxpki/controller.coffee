@@ -43,8 +43,8 @@ Controller = Em.ArrayController.extend
         return "hide" if not message
         return "alert-danger" if level is "error"
         return "alert-success" if level is "success"
-        return "alert-info" if level is "info"
         return "alert-warning" if level is "warn"
+        return "alert-info"
     ).property "status.level", "status.message"
 
     activeTab: null

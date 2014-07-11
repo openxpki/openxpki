@@ -7,7 +7,10 @@ unless isHidden
         div.col-md-2
       else
         label.col-md-2.control-label = content.label
-    div.col-md-7
+    if content.keys
+      div class="col-md-2"
+        Em.Select class="form-control" content=content.keys optionValuePath="content.value" optionLabelPath="content.label" value=content.name
+    div class=sFieldSize
       if isBool
         oxifield-bool content=content
       if isCertIdentifier
@@ -30,9 +33,6 @@ unless isHidden
         oxifield-uploadarea content=content
       if content.error
         span.help-block = content.error
-    if content.keys
-      div.col-md-2
-        Em.Select class="form-control" content=content.keys optionValuePath="content.value" optionLabelPath="content.label" value=content.name
     if content.clonable
       div.col-md-1
         if content.isLast

@@ -34094,7 +34094,7 @@ define('templates/templates', [
         ];
         helpers = this.merge(helpers, Ember.Handlebars.helpers);
         data = data || {};
-        var stack1, self = this, helperMissing = helpers.helperMissing, escapeExpression = this.escapeExpression;
+        var stack1, self = this, escapeExpression = this.escapeExpression, helperMissing = helpers.helperMissing;
         function program1(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div ');
@@ -34120,8 +34120,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            data.buffer.push('<div class="col-md-7">');
-            stack1 = helpers['if'].call(depth0, 'isBool', {
+            stack1 = helpers['if'].call(depth0, 'content.keys', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34134,7 +34133,17 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isCertIdentifier', {
+            data.buffer.push('<div ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'class': 'sFieldSize' },
+                hashTypes: { 'class': 'STRING' },
+                hashContexts: { 'class': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            })));
+            data.buffer.push('>');
+            stack1 = helpers['if'].call(depth0, 'isBool', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34147,7 +34156,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isDate', {
+            stack1 = helpers['if'].call(depth0, 'isCertIdentifier', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34160,7 +34169,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isDatetime', {
+            stack1 = helpers['if'].call(depth0, 'isDate', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34173,7 +34182,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isCheckbox', {
+            stack1 = helpers['if'].call(depth0, 'isDatetime', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34186,7 +34195,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isPassword', {
+            stack1 = helpers['if'].call(depth0, 'isCheckbox', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34199,7 +34208,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isSelect', {
+            stack1 = helpers['if'].call(depth0, 'isPassword', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34212,7 +34221,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isText', {
+            stack1 = helpers['if'].call(depth0, 'isSelect', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34225,7 +34234,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isTextarea', {
+            stack1 = helpers['if'].call(depth0, 'isText', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34238,7 +34247,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isUploadarea', {
+            stack1 = helpers['if'].call(depth0, 'isTextarea', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34251,7 +34260,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'content.error', {
+            stack1 = helpers['if'].call(depth0, 'isUploadarea', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34264,8 +34273,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            data.buffer.push('</div>');
-            stack1 = helpers['if'].call(depth0, 'content.keys', {
+            stack1 = helpers['if'].call(depth0, 'content.error', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34278,6 +34286,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
+            data.buffer.push('</div>');
             stack1 = helpers['if'].call(depth0, 'content.clonable', {
                 hash: {},
                 hashTypes: {},
@@ -34333,137 +34342,6 @@ define('templates/templates', [
             return buffer;
         }
         function program7(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-bool'] || depth0 && depth0['oxifield-bool'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-bool', options))));
-        }
-        function program9(depth0, data) {
-            var buffer = '';
-            return buffer;
-        }
-        function program11(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-certidentifier'] || depth0 && depth0['oxifield-certidentifier'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-certidentifier', options))));
-        }
-        function program13(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-date'] || depth0 && depth0['oxifield-date'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-date', options))));
-        }
-        function program15(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-datetime'] || depth0 && depth0['oxifield-datetime'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-datetime', options))));
-        }
-        function program17(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-checkbox'] || depth0 && depth0['oxifield-checkbox'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-checkbox', options))));
-        }
-        function program19(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-password'] || depth0 && depth0['oxifield-password'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-password', options))));
-        }
-        function program21(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-select'] || depth0 && depth0['oxifield-select'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-select', options))));
-        }
-        function program23(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-text'] || depth0 && depth0['oxifield-text'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-text', options))));
-        }
-        function program25(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-textarea'] || depth0 && depth0['oxifield-textarea'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-textarea', options))));
-        }
-        function program27(depth0, data) {
-            var helper, options;
-            data.buffer.push(escapeExpression((helper = helpers['oxifield-uploadarea'] || depth0 && depth0['oxifield-uploadarea'], options = {
-                hash: { 'content': 'content' },
-                hashTypes: { 'content': 'ID' },
-                hashContexts: { 'content': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-uploadarea', options))));
-        }
-        function program29(depth0, data) {
-            var buffer = '', stack1;
-            data.buffer.push('<span class="help-block">');
-            stack1 = helpers._triageMustache.call(depth0, 'content.error', {
-                hash: {},
-                hashTypes: {},
-                hashContexts: {},
-                contexts: [depth0],
-                types: ['ID'],
-                data: data
-            });
-            if (stack1 || stack1 === 0) {
-                data.buffer.push(stack1);
-            }
-            data.buffer.push('</span>');
-            return buffer;
-        }
-        function program31(depth0, data) {
             var buffer = '';
             data.buffer.push('<div class="col-md-2">');
             data.buffer.push(escapeExpression(helpers.view.call(depth0, 'Em.Select', {
@@ -34493,6 +34371,137 @@ define('templates/templates', [
                 data: data
             })));
             data.buffer.push('</div>');
+            return buffer;
+        }
+        function program9(depth0, data) {
+            var buffer = '';
+            return buffer;
+        }
+        function program11(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-bool'] || depth0 && depth0['oxifield-bool'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-bool', options))));
+        }
+        function program13(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-certidentifier'] || depth0 && depth0['oxifield-certidentifier'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-certidentifier', options))));
+        }
+        function program15(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-date'] || depth0 && depth0['oxifield-date'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-date', options))));
+        }
+        function program17(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-datetime'] || depth0 && depth0['oxifield-datetime'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-datetime', options))));
+        }
+        function program19(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-checkbox'] || depth0 && depth0['oxifield-checkbox'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-checkbox', options))));
+        }
+        function program21(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-password'] || depth0 && depth0['oxifield-password'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-password', options))));
+        }
+        function program23(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-select'] || depth0 && depth0['oxifield-select'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-select', options))));
+        }
+        function program25(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-text'] || depth0 && depth0['oxifield-text'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-text', options))));
+        }
+        function program27(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-textarea'] || depth0 && depth0['oxifield-textarea'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-textarea', options))));
+        }
+        function program29(depth0, data) {
+            var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-uploadarea'] || depth0 && depth0['oxifield-uploadarea'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-uploadarea', options))));
+        }
+        function program31(depth0, data) {
+            var buffer = '', stack1;
+            data.buffer.push('<span class="help-block">');
+            stack1 = helpers._triageMustache.call(depth0, 'content.error', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push('</span>');
             return buffer;
         }
         function program33(depth0, data) {
@@ -36168,6 +36177,32 @@ define('pods/oxifield-main/component', [
         }.property('content.type'),
         isTextarea: Em.computed.equal('content.type', 'textarea'),
         isUploadarea: Em.computed.equal('content.type', 'uploadarea'),
+        sFieldSize: function () {
+            var keys, keysize, size;
+            keys = this.get('content.keys');
+            size = this.get('content.size');
+            keysize = this.get('content.keysize');
+            if (!size) {
+                if (keys) {
+                    if (!keysize) {
+                        keysize = 2;
+                    }
+                    size = 7 - keysize;
+                } else {
+                    size = 7;
+                }
+            }
+            return 'col-md-' + size;
+        }.property('content.size', 'content.keysize'),
+        sKeyFieldSize: function () {
+            var keysize;
+            keysize = this.get('content.keysize');
+            if (keysize) {
+                return 'col-md-' + size;
+            } else {
+                return 'col-md-2';
+            }
+        }.property('content.keysize'),
         hasError: Em.computed.bool('content.error'),
         resetError: Em.observer('content.value', function () {
             return this.set('content.error');
@@ -36432,12 +36467,10 @@ define('pods/openxpki/controller', [
             if (level === 'success') {
                 return 'alert-success';
             }
-            if (level === 'info') {
-                return 'alert-info';
-            }
             if (level === 'warn') {
                 return 'alert-warning';
             }
+            return 'alert-info';
         }.property('status.level', 'status.message'),
         activeTab: null,
         activateLast: Em.observer('content.length', function () {
@@ -36507,21 +36540,7 @@ define('pods/config/controller', [
     });
     __exports__.__default__ = Controller;
 });
-define('pods/application/controller', [
-    'vendor/ember',
-    'exports'
-], function (__dependency0__, __exports__) {
-    'use strict';
-    var Em = __dependency0__.__default__;
-    var Controller;
-    Controller = Em.ArrayController.extend({
-        structure: null,
-        user: Em.computed.alias('structure.user')
-    });
-    __exports__.__default__ = Controller;
-});
 define('ember-app', [
-    'pods/application/controller',
     'pods/config/controller',
     'pods/index/route',
     'pods/openxpki/controller',
@@ -36539,27 +36558,25 @@ define('ember-app', [
     'routers/main',
     'templates/templates',
     'exports'
-], function (__dependency0__, __dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __dependency16__, __exports__) {
+], function (__dependency0__, __dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __exports__) {
     'use strict';
-    var ApplicationController = __dependency0__.__default__;
-    var ConfigController = __dependency1__.__default__;
-    var IndexRoute = __dependency2__.__default__;
-    var OpenxpkiController = __dependency3__.__default__;
-    var OpenxpkiRoute = __dependency4__.__default__;
-    var OxifieldCertidentifierComponent = __dependency5__.__default__;
-    var OxifieldDatetimeComponent = __dependency6__.__default__;
-    var OxifieldMainComponent = __dependency7__.__default__;
-    var OxifieldSelectComponent = __dependency8__.__default__;
-    var OxifieldUploadareaComponent = __dependency9__.__default__;
-    var OxisectionFormComponent = __dependency10__.__default__;
-    var OxisectionGridComponent = __dependency11__.__default__;
-    var OxisectionKeyvalueComponent = __dependency12__.__default__;
-    var OxisectionMainComponent = __dependency13__.__default__;
-    var OxivalueFormatComponent = __dependency14__.__default__;
-    var MainRouter = __dependency15__.__default__;
-    var TemplatesTemplate = __dependency16__.__default__;
+    var ConfigController = __dependency0__.__default__;
+    var IndexRoute = __dependency1__.__default__;
+    var OpenxpkiController = __dependency2__.__default__;
+    var OpenxpkiRoute = __dependency3__.__default__;
+    var OxifieldCertidentifierComponent = __dependency4__.__default__;
+    var OxifieldDatetimeComponent = __dependency5__.__default__;
+    var OxifieldMainComponent = __dependency6__.__default__;
+    var OxifieldSelectComponent = __dependency7__.__default__;
+    var OxifieldUploadareaComponent = __dependency8__.__default__;
+    var OxisectionFormComponent = __dependency9__.__default__;
+    var OxisectionGridComponent = __dependency10__.__default__;
+    var OxisectionKeyvalueComponent = __dependency11__.__default__;
+    var OxisectionMainComponent = __dependency12__.__default__;
+    var OxivalueFormatComponent = __dependency13__.__default__;
+    var MainRouter = __dependency14__.__default__;
+    var TemplatesTemplate = __dependency15__.__default__;
     var App = {
-            ApplicationController: ApplicationController,
             ConfigController: ConfigController,
             IndexRoute: IndexRoute,
             OpenxpkiController: OpenxpkiController,
