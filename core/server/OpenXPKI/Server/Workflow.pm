@@ -133,12 +133,13 @@ sub execute_action {
     # the double eval construct is used, because the handling of a caught pause throws a runtime error as real exception,
     # if some strange error in the process flow ocurred (for example, if somebody manually "throws" a OpenXPKI::Server::Workflow::Pause object)
 
+    my $e;
     eval {
         eval{
             $state = $self->SUPER::execute_action( $action_name, $autorun );
 
         };
-        my $e;
+
         if(Exception::Class->caught('OpenXPKI::Server::Workflow::Pause')){
             if ( $self->_has_paused() ) {
                 #proc-state is 'pause', db-commit already done, so lets return:
@@ -151,6 +152,7 @@ sub execute_action {
                         params => {description => 'OpenXPKI::Server::Workflow::Pause thrown and caught, but workflow has not paused!'}
                     );
                 };
+
         }elsif($e = Exception::Class->caught()){
             #any other exceptions will be passed to the outer eval
             ##! 128: 'Exception (no pause) caught and rethrown'
@@ -170,15 +172,31 @@ sub execute_action {
         	$self->_autofail($error);
         }
 
-        # Don't use 'workflow_error' here since $error should already
-        # be a Workflow::Exception object or subclass
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE",
-            params => {
-                ACTION => $action_name,
-                ERROR => scalar $error
-            }
-        );
+        # If we have consecutive autorun actions the error bubbles up as the
+        # workflow engine makes recursive calls, rethrow the first exception
+        # instead of cascading them
+        if( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE') {
+
+            ##! 16: 'bubbled up error - rethrow'
+            CTX('log')->log(
+                MESSAGE  => "Bubble up error from nested action",
+                PRIORITY => "debug",
+                FACILITY => "application"
+            );
+
+            $e->rethrow;
+        } else {
+
+            # Don't use 'workflow_error' here since $error should already
+            # be a Workflow::Exception object or subclass
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE",
+                params => {
+                    ACTION => $action_name,
+                    ERROR => scalar $error
+                }
+            );
+        }
 
     } elsif ($self->_has_paused()){
         return $state;
