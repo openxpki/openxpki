@@ -287,7 +287,7 @@ sub init_privkey{
                     { value => 'PKCS12', label => 'PKCS12' },
                     { value => 'PKCS8_PEM', label => 'PKCS8 (PEM)' },
                     { value => 'PKCS8_DER', label => 'PKCS8 (DER)' },
-                    { value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
+                    #{ value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
                     ]
                 },
             ]
