@@ -6,25 +6,25 @@ Quickstart guide
 Vagrant
 -------
 
-We have a vagrant setup for debian wheezy and ubuntu trusty. If you have vagrant you can just 
+We have a vagrant setup for debian wheezy and ubuntu trusty (currently disfuctional). If you have vagrant you can just 
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
 minutes and will give you a ready to run OXI install available at http://localhost:8080/newoxi/.
 
 Debian/Ubuntu Development Builds
 ---------------------------------
 
-**Starting with the 0.15 release we will no longer support the old mason ui, the 0.15 release includes a very rude but functional version of the new ui component based on the Ember.js framework. We are reworking our build process, debian wheezy packages will hit the servers first, ubuntu trusty should follow within some days.**
+**Starting with the 0.15 release we will no longer support the old mason ui, the current 0.18 release includes a useable but still a bit ugly version of the new ui component based on the Ember.js framework**
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
 
-Current release is 0.15 which is out for debian wheezy and ubuntu trusty on the package mirror at http://packages.openxpki.org/. 
+Current release is 0.18 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (wheezy)::
 
     echo "deb http://packages.openxpki.org/debian/ wheezy release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
-or ubuntu::
+or ubuntu **temporary discontinued due to package problems**::
 
     echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
