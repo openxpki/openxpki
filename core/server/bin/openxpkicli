@@ -20,7 +20,7 @@ my %params = (
     authuser => undef,
     authpass => undef,
     wfid => undef,
-    wfaction => undef,        
+    wfaction => undef,
     param => [],
     arg => [],
     );
@@ -40,7 +40,7 @@ GetOptions(\%params,
                 realm=s
                 authstack=s
                 authuser=s
-                authpass=s                
+                authpass=s
                 command|cmd|c=s
                 param|set=s@
                 arg=s@
@@ -50,7 +50,7 @@ GetOptions(\%params,
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
 if (scalar @ARGV != 1) {
-    print STDERR "Usage: openxpkicmd [OPTIONS] COMMAND\n";
+    print STDERR "Usage: openxpkicli [OPTIONS] COMMAND\n";
     exit 0;
 }
 
@@ -80,7 +80,7 @@ foreach my $entry (@args) {
     } else {
     	$args{uc($entry)} = 1;
     }
-    
+
 }
 
 if(!$params{socketfile}){
@@ -166,27 +166,27 @@ while (1) {
 }
 
 # logged in, now run requested command
- 
- 
+
+
 if (%parameters) {
 	if ($params_is_array) {
         my @t = keys(%parameters);
-        $args{PARAMS} = \@t;  
+        $args{PARAMS} = \@t;
     } else {
         $args{PARAMS} = \%parameters;
-    }	 
-} 
+    }
+}
 
 $reply = $client->send_receive_service_msg('COMMAND', {
 	COMMAND => $command,
 	PARAMS => \%args
 });
 
-if ($reply->{SERVICE_MSG} eq 'COMMAND') {	
+if ($reply->{SERVICE_MSG} eq 'COMMAND') {
 	print Dumper $reply->{PARAMS};
 	print "done\n";
-	exit 0;	
-} else {				   
+	exit 0;
+} else {
     print "Error:\n";
     print Dumper $reply;
     exit 1;
@@ -211,7 +211,7 @@ openxpkicli [options] command
     --authstack STACK     authentication stack to use
     --authuser USER       authentication user
     --authpass PASS       password for authentication user
-	--arg KEY=VALUE       pass VALUE to method as parameter KEY
+    --arg KEY=VALUE       pass VALUE to method as parameter KEY
     --param VALUE     	  stack VALUE onto methods PARAMS array
     --param KEY=VALUE     set VALUE in methods PARAMS hash using KEY
     --debug               enable debug mode
@@ -221,8 +221,8 @@ openxpkicli [options] command
 Invoke the named command through the OpenXPKI API using the given conenction socket.
 
 Anything passed using C<arg> is added to the methods argument list. If the
-method has a PARAMS argument which accepts an array or hash, you can use 
-param to fill this argument. You must not mix value only and key=value param 
+method has a PARAMS argument which accepts an array or hash, you can use
+param to fill this argument. You must not mix value only and key=value param
 calls on one command.
 
 =head1 EXAMPLES
