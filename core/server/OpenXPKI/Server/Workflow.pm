@@ -150,8 +150,9 @@ sub execute_action {
         # If we have consecutive autorun actions the error bubbles up as the
         # workflow engine makes recursive calls, rethrow the first exception
         # instead of cascading them
-        if (( $e = Exception::Class->caught() ) &&
-            ( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE')) {
+        $e = OpenXPKI::Exception->caught();
+        if ( (ref $e eq 'OpenXPKI::Exception') &&
+            ( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE') ) {
 
             ##! 16: 'bubbled up error - rethrow'
             CTX('log')->log(
