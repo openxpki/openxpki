@@ -26,7 +26,7 @@ TODO: {
 }
 
 TODO: {
-    todo_skip 'See Issue #188';
+    todo_skip 'See Issue #188', 1;
 our $dbi;
 require 't/common/dbi.pl';
 
