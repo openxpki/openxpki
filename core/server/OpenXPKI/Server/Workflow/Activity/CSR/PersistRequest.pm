@@ -88,24 +88,26 @@ sub execute
             message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCES_UNDEFINED',
         );
     }
-    
+
     my $san_serialized = $context->param('cert_subject_alt_name');
     if ($san_serialized) {
         my $subj_alt_names = $serializer->deserialize($san_serialized);
-    
-        my @subj_alt_names = @{$subj_alt_names};
+
+        # Required as serialized value can be undef
+        my @subj_alt_names;
+        @subj_alt_names = @{$subj_alt_names} if ($subj_alt_names);
         ##! 16: '$subj_alt_names: ' . Dumper($subj_alt_names)
         ##! 16: '@subj_alt_names: ' . Dumper(\@subj_alt_names)
-        
+
         my $san_source = $source_ref->{'cert_subject_alt_name_parts'};
         $san_source = $source_ref->{'cert_subject_alt_name'} unless($san_source);
-    
+
         if (! defined $san_source) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED',
             );
         }
-    
+
         foreach my $san (@subj_alt_names) {
             ##! 64: 'san: ' . $san
             my $attrib_serial = $dbi->get_new_serial(
@@ -124,7 +126,7 @@ sub execute
             );
         }
     }
-    
+
     foreach my $validity_param (qw( notbefore notafter )) {
         if (defined $context->param($validity_param)) {
             my $source = $source_ref->{$validity_param};
@@ -144,12 +146,12 @@ sub execute
             );
         }
     }
-    
+
     # process additional information (user configurable in profile)
     if (defined $context->param('cert_info')) {
 	my $cert_info = $serializer->deserialize($context->param('cert_info'));
 	##! 16: 'additional certificate information: ' . Dumper $cert_info
-	
+
 	foreach my $custom_key (keys %{$cert_info}) {
 	    my $attrib_serial = $dbi->get_new_serial(
 		TABLE => 'CSR_ATTRIBUTES',
@@ -170,7 +172,7 @@ sub execute
 
     $dbi->commit();
     $context->param('csr_serial' => $csr_serial);
-        
+
     CTX('log')->log(
         MESSAGE  => "persisted csr for $subject with csr_serial $csr_serial",
         PRIORITY => 'info',

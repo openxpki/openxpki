@@ -151,7 +151,13 @@ sub execute {
 
     # store in context
     $context->param('cert_subject' => $cert_subject);
-    $context->param('cert_subject_alt_name' => $ser->serialize( $san_list ));
+
+    # Current serialize creates an "UNDEF" string which fails an easy "is empty" test
+    if ($san_list) {
+        $context->param('cert_subject_alt_name' => $ser->serialize( $san_list ));
+    } else {
+        $context->param('cert_subject_alt_name' => '');
+    }
 
     # If the SAN come from the internal rendering we need to set the source
     # parameter for as this is required by persist_csr
