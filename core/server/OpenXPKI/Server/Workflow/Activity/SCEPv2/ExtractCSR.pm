@@ -140,6 +140,11 @@ sub execute {
         # FIXME - I dont have any idea what chars are possible within parsed bmpstring
         # so this probably chokes on some strings!
         $cert_extension_name =~ s/.(.)/$1/g;
+	# sometimes this heuristic does not work, resulting in leading dots in the extension name
+	# work around this by discarding them.
+	# TODO: do this right, i. e. use a real CSR parser!
+        $cert_extension_name =~ s/^\.+//g;
+
         $context->param('cert_extension_name' => $cert_extension_name);
 
         # Check if the extension has a profile mapping, defined in scep.<server>.profile_map
