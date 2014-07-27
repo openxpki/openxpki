@@ -161,7 +161,7 @@ sub set_status_from_error_reply {
 This method returns value from the input. It combines the real cgi parameters
 with those encoded in the action name using "!". The method has multiple
 personalities depending on the key you pass as argument. Parameters from the
-actiion name have preceedence.
+action name have precedence.
 
 =over
 
@@ -204,8 +204,14 @@ sub param {
         my $cgi = $self->cgi();
         return undef unless($cgi);
 
-
+        # We need to fetch from cgi as array for multivalues
+        if (wantarray) {
+            my @raw = $cgi->param($key);
+            @raw = map { decode utf8 => $_ } @raw;
+            return @raw;
+        }
         return decode utf8 => $cgi->param($key);
+
     }
 
     my $result;
