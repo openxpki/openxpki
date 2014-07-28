@@ -96,7 +96,8 @@ sub run {
         srand(time ^ $PROCESS_ID);
 
         # append fork info to process name
-        $0 .= sprintf( ' watchdog reinstantiating %d', $wf_id );
+        $0 = sprintf('openxpkid (%s) workflow: id %d', (CTX('config')->get('system.server.name') || 'main'), $wf_id);
+
 
         # the wf instance child processs should ALWAYS exit properly and not
         # let its exceptions bubble up to Watchdog

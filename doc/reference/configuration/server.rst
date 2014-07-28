@@ -95,18 +95,24 @@ TODO - this is not used yet
 Watchdog
 --------
 
-The openxpkid daemon forks a watchdog process to take care of background processes. It is initialised with default settings, but you can provide your own values by setting them at ``system.watchdog``. ::
+The openxpkid daemon forks a watchdog process to take care of background processes.
+It is initialised with default settings, but you can provide your own values by setting them at ``system.watchdog``. ::
 
-    max_fork_redo: 5
+    # How to deal with exceptions
     max_exception_threshhold: 10
     interval_sleep_exception: 60
     max_tries_hanging_workflows:  3
-    interval_wait_initial: 10
+
+    # Control the wait intervals
+    interval_wait_initial: 60
     interval_loop_idle: 5
     interval_loop_run: 1
 
-Please see perldoc OpenXPKI::Server::Watchdog for details.
+    # You should not change this unless you know what you are doing
+    max_instance_count: 1
+    disabled: 0
 
+Please see perldoc OpenXPKI::Server::Watchdog for details.
 
 Crypto layer (global)
 ---------------------

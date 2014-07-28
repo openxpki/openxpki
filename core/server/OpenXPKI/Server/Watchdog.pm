@@ -37,8 +37,17 @@ The number of seconds to sleep after the watchdog ran into an exception.
 default: 60
 
 =item max_tries_hanging_workflows
+
 Try to restarted stale workflows this often before failing them.
 default:  3
+
+=item max_instance_count
+
+Allow multiple watchdogs in parallel. This controls the number of control
+process, setting this to more than one is usually not necessary (and also
+not wise).
+
+default: 1
 
 =item interval_wait_initial
 
@@ -68,6 +77,7 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Watchdog::WorkflowInstance;
 use OpenXPKI::DateTime;
+use Proc::ProcessTable;
 
 use Net::Server::Daemonize qw( set_uid set_gid );
 
@@ -105,11 +115,18 @@ has max_tries_hanging_workflows => (
     isa => 'Int',
     default =>  3
 );
+
+has max_instance_count => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  1
+);
+
 # All timers in seconds
 has interval_wait_initial => (
     is => 'rw',
     isa => 'Int',
-    default =>  10
+    default =>  60
 );
 
 has interval_loop_idle => (
@@ -122,12 +139,6 @@ has interval_loop_run => (
     is => 'rw',
     isa => 'Int',
     default =>  1
-);
-
-has children => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    default  => sub { return []; }
 );
 
 has _uid => (
@@ -167,7 +178,7 @@ around BUILDARGS => sub {
 =head1 Methods
 =head2 run
 
-Forks away a worker child
+Forks away a worker child, returns the pid of the worker
 
 =cut
 
@@ -176,6 +187,23 @@ sub run {
 
     my $pid;
     my $redo_count = 0;
+
+    # Check if we already have a watchdog running
+    my $result = OpenXPKI::Control::get_pids();
+    my $instance_count = scalar @{$result->{watchdog}};
+    if ($instance_count >= $self->max_instance_count()) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_WATCHDOG_RUN_TOO_MANY_INSTANCES',
+            params => {
+                'instance_running' => $instance_count,
+                'max_instance_count' =>  $self->max_instance_count()
+            },
+            log => {
+                logger => CTX('log'),
+                priority => 'error',
+                facility => 'system',
+        });
+    }
 
     $SIG{CHLD} = 'IGNORE';
     while ( !defined $pid && $redo_count < $self->max_fork_redo() ) {
@@ -223,10 +251,8 @@ sub run {
 
     if ( $pid != 0 ) {
 
-        my $children = $self->children();
-        push @{ $children }, $pid;
-        $self->children( $children );
         ##! 16: 'parent here - process group: ' . getpgrp(0)
+        return $pid;
 
     } else {
 
@@ -252,7 +278,7 @@ sub run {
 
         # set process name
 
-        $0 = sprintf ('openxpkid watchdog ( %s )', CTX('config')->get('system.server.name') || 'main');
+        $0 = sprintf ('openxpkid (%s) watchdog', CTX('config')->get('system.server.name') || 'main');
 
         set_gid($self->_gid()) if( $self->_gid() );
         set_uid($self->_uid()) if( $self->_uid() );
@@ -310,14 +336,16 @@ sub run {
 
                 print STDERR $error_msg, "\n";
 
+                my $sleep = $self->interval_sleep_exception();
                 CTX('log')->log(
-                    MESSAGE  => "Watchdog error, have a nap ($error_msg)",
+                    MESSAGE  => "Watchdog error, have a nap ($sleep sec, $error_msg)",
                     PRIORITY => "error",
                     FACILITY => "system"
                 );
 
-                if ( ++$exception_count > $self->max_exception_threshhold() ) {
-                    my $msg = 'Watchdog exception limit ('. $self->max_exception_threshhold() .') reached, exiting!';
+                my $threshold = $self->max_exception_threshhold();
+                if ($threshold > 0 && ++$exception_count > $threshold ) {
+                    my $msg = 'Watchdog exception limit ($threshold) reached, exiting!';
 	                print STDERR $msg, "\n";
 	                OpenXPKI::Exception->throw(
 	                    message => $msg,
@@ -329,7 +357,7 @@ sub run {
                 }
 
                 # sleep to give the system a chance to recover
-                sleep($self->interval_sleep_exception());
+                sleep($sleep);
 
 
             }
@@ -400,13 +428,19 @@ sub _sig_term {
     ##! 1: 'Got TERM'
     $OpenXPKI::Server::Watchdog::terminate  = 1;
 
+    CTX('log')->log(
+        MESSAGE  => 'Watchdog worker $$ got term signal - cleaning up.',
+        PRIORITY => "info",
+        FACILITY => "system",
+    );
+
 	return;
 }
 
 =head2 reload
 
 This method is called from the main server to inform the watchdog
-to reload the config. NEVER call this from inside a watchdog worker.
+to reload the config. You should not call this from inside a watchdog worker.
 
 =cut
 
@@ -415,40 +449,44 @@ sub reload {
     ##! 1: 'reloading'
     my $self = shift;
 
-    # check if this is the master or the watchdog
-    my $children = CTX('watchdog')->children();
-    ##! 16: 'watchdog pids ' . Dumper $children;
+    my $result = OpenXPKI::Control::get_pids();
 
     # Check for enable/disable change
     my $disabled = CTX('config')->get('system.watchdog.disabled') || 0;
 
-    # Need to kill the watchdog
-    if ($disabled && scalar @{$children}) {
-    	##! 8: 'Disabled but childs running - call terminate'
-        $self->terminate();
-    # Need to start the watchdog
-    } elsif (!$disabled && (scalar @{$children} == 0)) {
-        ##! 8: 'Enabled but no childs running - start'
-    	$self->run();
-    # check if watchdog process are running
-    } elsif (scalar @{$children}) {
-        ##! 8: 'Send HUP to watchdog'
-	    kill 'HUP', @{$children};
-    } else {
-        ##! 8: 'watchdog not enabled'
-	    CTX('log')->log(
-            MESSAGE  => 'Watchdog not running',
+    # Terminate if we have a watchdog where we dont should have
+    if ($disabled && scalar @{$result->{watchdog}}) {
+
+        CTX('log')->log(
+            MESSAGE  => 'Watchdog should not run - terminating.',
             PRIORITY => "info",
             FACILITY => "system",
         );
+        kill 'TERM', @{$result->{watchdog}};
+
+    } elsif (!scalar @{$result->{watchdog}}) {
+
+        CTX('log')->log(
+            MESSAGE  => 'Watchdog missing - start it.',
+            PRIORITY => "info",
+            FACILITY => "system",
+        );
+        CTX('watchdog')->run();
+
+    } else {
+        kill 'HUP', @{$result->{watchdog}};
     }
+
+    return 1;
 
 }
 
 =head2 terminate
 
-This method is called from the main server to inform the watchdog
-to shutdown. NEVER call this from inside a watchdog worker.
+This method uses the process table to look for watchdog instances and workers
+and sends them a SIGHUP signal. This will NOT kill the watchdog but tell him
+to not start any new workers. Running workers wont be touched.
+You should not call this from inside a watchdog worker.
 
 =cut
 
@@ -457,18 +495,23 @@ sub terminate {
    ##! 1: 'terminate'
     my $self = shift;
 
-    #terminate childs:
-    my $children = $self->children();
-    kill 'TERM', @{$children};
+    my $result = OpenXPKI::Control::get_pids();
 
-    # We silently assume that the childs terminate
-    $self->children([]);
+    if (ref $result->{watchdog}) {
+        kill 'TERM', @{$result->{watchdog}};
 
- 	CTX('log')->log(
-    	MESSAGE  => 'Watchdog terminated',
-		PRIORITY => "info",
-        FACILITY => "system",
-	);
+     	CTX('log')->log(
+        	MESSAGE  => 'Told watchdog to terminate',
+		  PRIORITY => "info",
+            FACILITY => "system",
+	   );
+    } else {
+        CTX('log')->log(
+            MESSAGE  => 'No watchdog pids to terminate',
+            PRIORITY => "error",
+            FACILITY => "system",
+       );
+    }
 
     return 1;
 }
