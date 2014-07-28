@@ -24,6 +24,7 @@ use English;
 use Data::Dumper;
 
 use Class::Std;
+use OpenXPKI::Control;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -95,7 +96,22 @@ sub get_ui_system_status {
 
     $result->{dv_expiry} = $dv_token->{NOTAFTER};
 
+    my $pids = OpenXPKI::Control::get_pids();
+    $result->{watchdog} =  scalar @{$pids->{watchdog}};
+    $result->{worker} =  scalar @{$pids->{worker}};
+    $result->{workflow} =  scalar @{$pids->{workflow}};
+
     return $result;
+
+}
+
+sub list_process {
+
+    my $self = shift;
+
+    my $process = OpenXPKI::Control::list_process();
+
+    return $process;
 
 }
 

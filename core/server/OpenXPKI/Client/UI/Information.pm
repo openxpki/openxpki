@@ -142,4 +142,47 @@ sub init_policy {
     });
 }
 
+sub init_process {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $process = $self->send_command( 'list_process' );
+
+    $self->logger()->debug("result: " . Dumper $process );
+
+    $self->_page({
+        label => 'Running processes (global)',
+    });
+
+    my @result;
+    my $now = time;
+    foreach my $proc (@{$process}) {
+        push @result, [
+            $proc->{pid},
+            $proc->{time},
+            $now - $proc->{time},
+            $proc->{info},
+        ];
+    }
+
+    @result = sort { $a->[1] < $b->[1] } @result;
+
+    $self->add_section({
+        type => 'grid',
+        className => 'proc',
+        processing_type => 'all',
+        content => {
+            columns => [
+                { sTitle => "PID" },
+                { sTitle => "started", format => 'timestamp'},
+                { sTitle => "seconds" },
+                { sTitle => "info"},
+            ],
+            data => \@result
+        }
+    });
+
+    return $self;
+}
 1;

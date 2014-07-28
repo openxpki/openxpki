@@ -59,6 +59,14 @@ sub init_welcome {
         $critical = 1 if ($status->{dv_expiry} < $now);
     }
 
+    if ($status->{watchdog} < 1) {
+        push @fields, {
+            label  => 'Watchdog',
+            value  => 'Not running!'
+        };
+        $critical = 1;
+    }
+
     if (@fields) {
         if ($critical) {
             $self->set_status('Your system status is critical!','error');

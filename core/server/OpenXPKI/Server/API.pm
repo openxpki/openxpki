@@ -609,6 +609,14 @@ sub BUILD {
                 },
             },
         },
+        'control_watchdog' => {
+            class => 'Object',
+            params => {
+                'ACTION' => {
+                    type => SCALAR,
+                }
+            }
+        },
         'get_roles' => {
             class  => 'Default',
             params => { },
@@ -1364,6 +1372,11 @@ sub BUILD {
                     type  => ARRAYREF,
                     optional => 1,
                },
+            }
+        },
+        'list_process' => {
+            class  => 'UI',
+            params => {
             }
         }
     };

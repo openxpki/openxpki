@@ -36,6 +36,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::FileUtils;
+use OpenXPKI::Server::Watchdog;
+use OpenXPKI::Control;
 use DateTime;
 use List::Util qw(first);
 
@@ -1756,6 +1758,68 @@ sub modify_data_pool_entry {
 
     return 1;
 }
+
+
+=head2 control_watchdog { ACTION => (START|STOP) }
+
+Start ot stop the watchdog.
+
+=cut
+sub control_watchdog {
+
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $action = $arg_ref->{ACTION};
+
+    if ($action =~ /STOP/i) {
+
+        if (!OpenXPKI::Server::Context::hascontext('watchdog')) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_NO_WATCHDOG'
+            );
+        }
+
+        CTX('log')->log(
+            MESSAGE => "Watchdog termination requested via API",
+            PRIORITY => 'info',
+            FACILITY => 'system',
+        );
+
+        CTX('watchdog')->terminate();
+
+    } elsif ($action =~ /START/i) {
+
+        if (!OpenXPKI::Server::Context::hascontext('watchdog')) {
+            OpenXPKI::Server::Context::setcontext({
+                watchdog => OpenXPKI::Server::Watchdog->new()
+            });
+        }
+
+        my $worker = CTX('watchdog')->run();
+        return $worker;
+
+
+    } elsif ($action =~ /STATUS/i) {
+
+        my $result = OpenXPKI::Control::get_pids();
+
+        return {
+            pid => $result->{watchdog},
+            children => ref $result->{workflow} ? scalar @{$result->{workflow}} : 0
+        }
+
+    } else {
+
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_INVALID_ACTION',
+            params => {
+                ACTION => $action,
+        });
+
+    }
+}
+
 
 # internal worker function, accepts more parameters than the API function
 # named attributes:
