@@ -1,6 +1,6 @@
 <actions>
 
-   <!-- CSR Creation -->   
+   <!-- CSR Creation -->
   <action name="create_csr"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="USER">
@@ -39,11 +39,6 @@
       <validator name="I18N_OPENXPKI_WF_VAL_HASREQUIREDFIELD">
         <arg>cert_profile</arg>
       </validator>
-      <validator name="I18N_OPENXPKI_WF_VAL_CERTPROFILE">
-        <arg>$cert_profile</arg>
-        <arg>$cert_profile_id</arg>
-        <arg>$cert_role</arg>
-      </validator>
       <validator name="I18N_OPENXPKI_WF_VAL_HASREQUIREDFIELD">
         <arg>cert_subject_style</arg>
         <arg>cert_subject_parts</arg>
@@ -76,22 +71,22 @@
         <arg>$pkcs10</arg>
       </validator>
   </action>
-      
+
   <action name="I18N_OPENXPKI_WF_ACTION_RENDER_SUBJECT"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject">      
+          class="OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject">
   </action>
-    
+
   <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_CREATION"
           class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
           message="csr_created">
       <validator name="I18N_OPENXPKI_WF_VAL_KEYLENGTH"/>
   </action>
-  
+
   <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_USER_OF_ISSUANCE"
           class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
           message="cert_issued">
   </action>
-  
+
  <!--   I18N_OPENXPKI_WF_ACTION_CSR_GENERATE_KEY -->
   <action name="generate_key"
           class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey">
@@ -105,7 +100,7 @@
   <action name="I18N_OPENXPKI_WF_ACTION_CSR_GENERATE_PKCS10"
           class="OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10">
   </action>
-  
+
 
    <!-- CSR Manipulation -->
    <action name="I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE"
@@ -170,7 +165,7 @@
       <!-- because this ignores the order of the validators -->
       <field name="cert_info"/>
   </action>
-  
+
   <!--  CSR Handling -->
   <action name="I18N_OPENXPKI_WF_ACTION_APPROVE_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::Approve"
@@ -187,30 +182,30 @@
         <arg>$_signature_text</arg>
      </validator>
   </action>
-  
+
   <action name="I18N_OPENXPKI_WF_ACTION_REJECT_CSR"
 		class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
         message="csr_rejected">
   </action>
-    
+
   <action name="I18N_OPENXPKI_WF_ACTION_NOTIFY_APPROVAL"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
         message="csr_approved">
   </action>
-  
-  
+
+
   <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest">
   </action>
-  
+
   <action name="I18N_OPENXPKI_WF_ACTION_PUBLISH_CERTIFICATE"
 	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate"
 	  workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING"
 	  >
   </action>
-  
+
   <action name="I18N_OPENXPKI_WF_ACTION_PERSIST_METADATA"
-          class="OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata">      
+          class="OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata">
   </action>
-  
+
 </actions>

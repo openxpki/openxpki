@@ -42,7 +42,7 @@ key:
 
 
 validity: 
-    notafter: +0003
+    notafter: +01
 
 digest: sha1
 increasing_serials: 1

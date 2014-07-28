@@ -3,7 +3,7 @@
 label: I18N_OPENXPKI_PROFILE_USER
 
 validity:
-    notafter: +01
+    notafter: +0006
  
 style:
     00_user_basic_style:
@@ -33,7 +33,7 @@ style:
 # Also see sections defined in default.yaml
 extensions:
     key_usage:
-        critical: 0
+        critical: 1
         digital_signature: 1
         non_repudiation:   1
         key_encipherment:  1
@@ -45,7 +45,7 @@ extensions:
         decipher_only:     0
 
     extended_key_usage:
-        critical: 0
+        critical: 1
         client_auth:      1
         server_auth:      0
         email_protection: 1

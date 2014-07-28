@@ -2,7 +2,7 @@
 label: I18N_OPENXPKI_PROFILE_TLS_SERVER
 
 validity: 
-    notafter: +03
+    notafter: +0006
 
 style:
     00_basic_style:
@@ -71,19 +71,19 @@ style:
 # Also see sections defined in default.yaml
 extensions: 
     key_usage:
-        critical: 0
+        critical: 1
         digital_signature: 1
         non_repudiation:   0
         key_encipherment:  1
         data_encipherment: 0
-        key_agreement:     1
+        key_agreement:     0
         key_cert_sign:     0
         crl_sign:          0
         encipher_only:     0
         decipher_only:     0
 
     extended_key_usage:
-        critical: 0
+        critical: 1
         # these are OIDs, some OIDs are known and have names
         client_auth:      0
         server_auth:      1
