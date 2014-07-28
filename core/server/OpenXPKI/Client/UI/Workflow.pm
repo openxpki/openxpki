@@ -154,6 +154,56 @@ sub init_search {
     return $self;
 }
 
+sub init_history {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $id = $self->param('wf_id');
+
+    $self->_page({
+        label => 'Workflow History',
+        description => '',
+    });
+
+    my $workflow_history = $self->send_command( 'get_workflow_history', { ID => $id } );
+
+    $self->logger()->debug( "dumper result: " . Dumper $workflow_history);
+
+    my $i = 1;
+    my @result;
+    foreach my $item (@{$workflow_history}) {
+        push @result, [
+            $item->{'WORKFLOW_HISTORY_DATE'},
+            $item->{'WORKFLOW_STATE'},
+            $item->{'WORKFLOW_ACTION'},
+            $item->{'WORKFLOW_DESCRIPTION'},
+            $item->{'WORKFLOW_USER'}
+        ]
+    }
+
+    $self->logger()->trace( "dumper result: " . Dumper $workflow_history);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'workflow',
+        processing_type => 'all',
+        content => {
+            columns => [
+                { sTitle => "execution time" }, #, format => 'datetime'},
+                { sTitle => "state" },
+                { sTitle => "action"},
+                { sTitle => "description"},
+                { sTitle => "user"},
+            ],
+            data => \@result
+        }
+    });
+
+    return $self;
+
+}
+
 
 =head2 action_index
 
@@ -760,6 +810,11 @@ sub __render_from_workflow {
                 'label' => 'open workflow',
             });
         }
+
+        push @buttons, {
+            'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+            'label' => 'workflow history',
+        };
 
         $self->_result()->{right} = [{
             type => 'keyvalue',
