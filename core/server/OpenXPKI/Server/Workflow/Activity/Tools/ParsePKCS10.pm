@@ -95,7 +95,7 @@ sub execute {
         } else {
             $tt->process(\$preset, \%hashed_dn, \$val) || OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_ACTIVITY_PARSE_PKCS10_TT_DIED',
-                params => { PROFILE => $cert_profile, STYLE => $cert_subject_style, FIELD => $field, PATTERN => $preset }
+                params => { PROFILE => $cert_profile, STYLE => $cert_subject_style, FIELD => $field, PATTERN => $preset, 'ERROR' => $tt->error() }
             );
             if ($val) {
                 $cert_subject_parts->{ $field->{ID} } = $val;

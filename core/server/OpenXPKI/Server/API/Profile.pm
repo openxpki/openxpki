@@ -456,7 +456,15 @@ sub render_subject_from_template {
 
     my $cert_subject;
     my $tt = Template->new();
-    $tt->process(\$dn_template, $vars, \$cert_subject);
+    if (!$tt->process(\$dn_template, $vars, \$cert_subject)) {
+        OpenXPKI::Exception->throw({
+            MESSAGE => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SUBJECT_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
+            PARAMS => {
+                'TEMPLATE' => $dn_template,
+                'ERROR' => $tt->error()
+            }
+        });
+    }
 
     return $cert_subject;
 
@@ -523,7 +531,15 @@ sub render_san_from_template {
         # Each list item is a template to be parsed
         foreach my $line_template (@values) {
             my $result;
-            $tt->process(\$line_template, $vars, \$result);
+            if (!$tt->process(\$line_template, $vars, \$result)) {
+                OpenXPKI::Exception->throw({
+                    MESSAGE => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SAN_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
+                    PARAMS => {
+                        'TEMPLATE' => $line_template,
+                        'ERROR' => $tt->error()
+                    }
+                });
+            }
             ##! 32: "Result of $line_template: $result\n";
 
             ## split up internal multiples (sep by |)
@@ -599,7 +615,14 @@ sub render_metadata_from_template {
         # Each list item is a template to be parsed
         foreach my $line_template (@values) {
             my $result;
-            $tt->process(\$line_template, $vars, \$result);
+            if (!$tt->process(\$line_template, $vars, \$result)) {
+                OpenXPKI::Exception->throw({
+                    MESSAGE => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_METADATA_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
+                    PARAMS => {
+                        'TEMPLATE' => $line_template,
+                    }
+                });
+            }
             ##! 32: "Result of $line_template: $result\n";
 
             ## split up internal multiples (sep by |)

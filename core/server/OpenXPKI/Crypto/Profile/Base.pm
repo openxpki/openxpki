@@ -75,7 +75,7 @@ sub load_extension
 
     ## is the extension used at all?
     if (!$config->exists($path)) {
-    	
+
     	# Test for default settings
     	$path =~ /(profile|crl)/;
     	$path = $1.'default';
@@ -528,7 +528,16 @@ sub process_templates {
         if ($template =~ /\[.+\]/) {
             my $output;
             #$template = '[% TAGS [- -] -%]' .  $template;
-            $tt->process(\$template, \%template_vars, \$output);
+            if (!$tt->process(\$template, \%template_vars, \$output)) {
+                OpenXPKI::Exception->throw({
+                    MESSAGE => 'I18N_OPENXPKI_CRYPTO_PROFILE_BASE_ERROR_PARSING_TEMPLATE',
+                    PARAMS => {
+                        'TEMPLATE' => $template,
+                        'ERROR' => $tt->error()
+                    }
+                });
+            }
+
             ##! 32: ' Tags found - ' . $template . ' -> '. $output
             if($output) {
                 push @newvalues, $output;
