@@ -35520,6 +35520,9 @@ define('pods/oxivalue-format/component', [
             timestamp: function (v) {
                 return moment.unix(v).format('dd, DD MMMM YYYY, HH:mm:ss z');
             },
+            datetime: function (v) {
+                return moment(v).format('dd, DD MMMM YYYY, HH:mm:ss z');
+            },
             text: function (v) {
                 return v;
             },
