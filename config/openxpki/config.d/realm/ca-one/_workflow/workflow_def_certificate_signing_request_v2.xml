@@ -13,7 +13,7 @@
   </state>
 
   <state name="SETUP_REQUEST_TYPE">
-    <description></description>
+    <description>Please choose how you want to provide the certificates private key or go back to select an alternative profile.</description>
     <action name="csr_provide_server_key_password"
             resulting_state="ENTER_SUBJECT">
     </action>
@@ -34,21 +34,22 @@
   </state>
 
   <state name="ENTER_SUBJECT">
-    <description></description>
+    <description>Please enter the data requested below. This information is used to create the subject of your certificate.</description>
     <action name="csr_edit_subject"
         resulting_state="ENTER_SAN">
     </action>
   </state>
 
   <state name="ENTER_SAN">
-    <description></description>
+    <description>Please enter the data requested below. This information is added as "subject alternative name" to the certificate.</description>
     <action name="csr_edit_san"
         resulting_state="ENTER_CERT_INFO">
     </action>
   </state>
 
   <state name="ENTER_CERT_INFO">
-    <description></description>
+    <description>Please enter the data requested below. This information is for informational purpose only. It will be used by
+    the registration officer to validate your request and link additional information to this certificate.</description>
     <action name="csr_edit_cert_info"
         resulting_state="BUILD_SUBJECT">
     </action>
@@ -62,7 +63,9 @@
   </state>
 
   <state name="SUBJECT_COMPLETE">
-    <description></description>
+    <description>All information has been collected, your request is ready to be processed now. Please validate the information
+    listed below and use the edit buttons to change it if necessary. If the data is correct, please use the submit button to
+    send the request to the registration officers.</description>
     <action name="csr_submit"
         resulting_state="EVAL_ELIGIBILITY">
     </action>
@@ -119,7 +122,9 @@
   </state>
 
   <state name="PENDING">
-    <description></description>
+    <description>This certification request is waiting to get its approvals. Please check the information,
+    use the buttons to correct minor issues or reject the request if it is inevitably broken. If the request
+    meets all requirements and you have verified it, please use the approve button to trigger its issue. </description>
      <action name="csr_edit_subject"
         resulting_state="CANCEL_APPROVALS">
     </action>
@@ -147,6 +152,7 @@
   </state>
 
   <state name="ONHOLD">
+    <description>This request was set on hold by an adminstrative action. Consider to enter a comment and use the button to release the workflow.</description>
     <action name="csr_release_on_hold"
         resulting_state="PENDING">
     </action>
@@ -268,5 +274,7 @@
   </state>
 
   <state name="FAILURE" />
-  <state name="SUCCESS" />
+  <state name="SUCCESS">
+  <description>This workflow finished with success. You can download the certifcate by clicking on the field names certificate_identifier.</description>
+  </state>
 </workflow>
