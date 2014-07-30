@@ -36086,22 +36086,24 @@ define('pods/oxifield-select/component', [
     Component = Em.Component.extend({
         initializeValue: Em.on('init', function () {
             var options, prompt;
+            prompt = this.get('content.prompt');
             if (prompt) {
                 options = this.get('content.options');
-                options.unshift({
+                return options.unshift({
                     label: prompt,
                     value: ''
                 });
             } else {
                 options = this.get('content.options');
-                if (!this.get('content.editable')) {
-                    options.unshift({
-                        label: '',
-                        value: ''
-                    });
+                if (content.is_optional) {
+                    if (!this.get('content.editable')) {
+                        return options.unshift({
+                            label: '',
+                            value: ''
+                        });
+                    }
                 }
             }
-            return prompt = this.get('content.prompt');
         }),
         didInsertElement: function () {
             return this.$().find('.typeahead').typeahead({

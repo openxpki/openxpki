@@ -2,6 +2,7 @@
 
 Component = Em.Component.extend
     initializeValue: Em.on "init", ->
+        prompt = @get "content.prompt"
         if prompt
             options = @get "content.options"
             options.unshift
@@ -9,11 +10,12 @@ Component = Em.Component.extend
                 value: ""
         else
             options = @get "content.options"
-            if not @get "content.editable"
-                options.unshift
-                    label: ""
-                    value: ""
-        prompt = @get "content.prompt"
+            if content.is_optional
+                if not @get "content.editable"
+                    options.unshift
+                        label: ""
+                        value: ""
+
 
     didInsertElement: ->
         @$().find(".typeahead").typeahead
