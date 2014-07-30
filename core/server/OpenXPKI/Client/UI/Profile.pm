@@ -25,18 +25,25 @@ sub action_get_styles_for_profile {
     # TODO clean up API after Mason decomissioning
     # Transform hash into value/label list and sort it
     my @styles = map { { value => $_, label => i18nGettext($styles->{$_}->{LABEL}), i18nGettext(description => $styles->{$_}->{DESCRIPTION}) } } keys %{$styles};
-    @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
 
-    my $cert_subject_style;
+    if (scalar @styles == 0) {
+        @styles = ({ value => '', label => i18nGettext('I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST') });
+    } else {
+        @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
+    }
 
-    if (scalar @styles == 1) { $cert_subject_style = $styles[0]->{value}; }
+    my $cert_subject_style = $styles[0]->{value};
 
     $self->_result()->{_raw} = {
         _returnType => 'partial',
-        fields => [
-            { name => "cert_subject_style", label => 'Subject Style', value => $cert_subject_style, type => 'select', 'options' => \@styles },
-        ]
-        };
+        fields => [{
+            name => "cert_subject_style",
+            label => 'Subject Style',
+            value => $cert_subject_style,
+            type => 'select',
+            options => \@styles
+        }]
+    };
 
     return $self;
 

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2014-07-10 16:02+0100\n"
+"PO-Revision-Date: 2014-07-30 09:03+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -654,6 +654,10 @@ msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_KEY_LENGTH"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PARAMS_MISSING_TYPE"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
@@ -687,6 +691,18 @@ msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_PASSWD_TOO_SHORT"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_MISSING_PASSWD"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_PKEYOPT_IS_NOT_HASH"
+msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_REQUIRE_KEY_ALG_OR_PARAM"
 msgstr "The IP address __IP__ is wrong. We support IPv4 and IPv6 addresses."
 
 #, fuzzy
@@ -1004,6 +1020,12 @@ msgstr "Deutsch"
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_AUTOLOAD_ILLEGAL_FUNCTION"
 msgstr "Basic user naming style"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_ERROR_PARSING_TEMPLATE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_COPY_EXTENSION_INVALID_VALUE"
@@ -1860,6 +1882,18 @@ msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
 msgstr "The SPKAC string is empty."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACTIVITY_EVALUATE_ELIGIBILITY_ERROR_PARSING_TEMPLATE"
+msgstr ""
+"You called an invalid method at the OpenXPKI server. The illegal method name "
+"is __METHOD_NAME__."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -1929,6 +1963,42 @@ msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"
 msgstr ""
 "You called an invalid method at the OpenXPKI server. The illegal method name "
 "is __METHOD_NAME__."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_INVALID_ACTION"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_NO_WATCHDOG"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_EC_PARAM"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_EC_REQUIRES_CURVE_NAME"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_REQUIRES_PASSWORD"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB"
@@ -2063,7 +2133,25 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_METADATA_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SAN_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SAN_FROM_TEMPLATE_UNKNOWN_SAN_TYPE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SUBJECT_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -3113,6 +3201,12 @@ msgstr ""
 "action."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EVALUATE_CHALLENGE_ERROR_PARSING_TEMPLATE"
+msgstr ""
+"The workflow is missing some required fields (__FIELDS__) for the next "
+"action."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EVALUATE_CHALLENGE_UNDEFINED"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
@@ -3640,12 +3734,6 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_FETCH_WORKFLOW_FAILURE"
-msgstr ""
-"The workflow is missing some required fields (__FIELDS__) for the next "
-"action."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_RUNTIME_ERROR"
 msgstr ""
 "The workflow is missing some required fields (__FIELDS__) for the next "
 "action."
@@ -4428,15 +4516,6 @@ msgstr "2048 bits (default)"
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 (very strong)"
 
-msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE"
-msgstr "Key size"
-
-msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_2048"
-msgstr "2048 bits (default)"
-
-msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_4096"
-msgstr "4096 (very strong)"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Username"
@@ -4446,6 +4525,12 @@ msgstr "login failed"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE"
+msgstr "Please choose a profile"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+msgstr "Please select profile first"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
@@ -4710,6 +4795,10 @@ msgstr "Username"
 
 msgid "I18N_OPENXPKI_USERNAME_DESC"
 msgstr "Your username or account, for example 'jdoe'"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WATCHDOG_RUN_TOO_MANY_INSTANCES"
+msgstr "Create a new workflow instance for certificate issuance"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WFOBJECT_DESERIALIZE_ERR"
@@ -9164,6 +9253,12 @@ msgstr "testuser"
 #~ msgstr "The SPKAC string is empty."
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_RUNTIME_ERROR"
+#~ msgstr ""
+#~ "The workflow is missing some required fields (__FIELDS__) for the next "
+#~ "action."
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPOVALSIGNATURE_PKCS7TOOL_NOT_CONFIGURED"
 #~ msgstr "The SPKAC string is empty."
 
@@ -9237,6 +9332,15 @@ msgstr "testuser"
 
 #~ msgid "I18N_OPENXPKI_SUCCESS"
 #~ msgstr "Success"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE"
+#~ msgstr "Key size"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_2048"
+#~ msgstr "2048 bits (default)"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_4096"
+#~ msgstr "4096 (very strong)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_C2TNB191V1"
@@ -9360,10 +9464,6 @@ msgstr "testuser"
 #~ msgstr "Fail workflow"
 
 #~ msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
-#~ msgstr "Create a new workflow instance for certificate issuance"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCES"
 #~ msgstr "Create a new workflow instance for certificate issuance"
 
 #, fuzzy

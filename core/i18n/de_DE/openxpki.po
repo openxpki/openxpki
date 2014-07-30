@@ -706,6 +706,12 @@ msgstr ""
 "einegültige IPv4- oder IPv6-Adresse handelt."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PARAMS_MISSING_TYPE"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um "
+"einegültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEY"
 msgstr ""
 "Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um "
@@ -755,6 +761,24 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_PASSWD_TOO_SHORT"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um "
+"einegültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_MISSING_PASSWD"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um "
+"einegültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_PKEYOPT_IS_NOT_HASH"
+msgstr ""
+"Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um "
+"einegültige IPv4- oder IPv6-Adresse handelt."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_REQUIRE_KEY_ALG_OR_PARAM"
 msgstr ""
 "Die IP-Adresse __IP__ ist falsch. Bitte überprüfen Sie, dass es sich um "
 "einegültige IPv4- oder IPv6-Adresse handelt."
@@ -1110,6 +1134,10 @@ msgstr "Deutsch"
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_AUTOLOAD_ILLEGAL_FUNCTION"
 msgstr "Einfache Benennungsart"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CRYPTO_PROFILE_BASE_ERROR_PARSING_TEMPLATE"
+msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_COPY_EXTENSION_INVALID_VALUE"
@@ -2010,6 +2038,14 @@ msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_ACTIVITY_EVALUATE_ELIGIBILITY_ERROR_PARSING_TEMPLATE"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_ACL_CHECK_FAILED"
 msgstr "PKI Realm"
 
@@ -2060,6 +2096,30 @@ msgstr "Prozesse anzeigen"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER"
 msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_INVALID_ACTION"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_NO_WATCHDOG"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_EC_PARAM"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_EC_REQUIRES_CURVE_NAME"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_REQUIRES_PASSWORD"
+msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB"
@@ -2162,8 +2222,20 @@ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_VALIDATE_CERTIFICATE_NO_DATA"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_METADATA_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SAN_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SAN_FROM_TEMPLATE_UNKNOWN_SAN_TYPE"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SUBJECT_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE"
+msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SUBJECT_FROM_TEMPLATE_NO_DN_TEMPLATE"
@@ -3055,6 +3127,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EVALUATE_CHALLENGE_ERROR_PARSING_TEMPLATE"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EVALUATE_CHALLENGE_UNDEFINED"
 msgstr "PKI Realm"
 
@@ -3460,10 +3536,6 @@ msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_FETCH_WORKFLOW_FAILURE"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_RUNTIME_ERROR"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -4273,18 +4345,6 @@ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "Schlüssellänge"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE"
-msgstr "Schlüssellänge"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_2048"
-msgstr "Schlüssellänge"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_4096"
-msgstr "Schlüssellänge"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Benutzername"
 
@@ -4295,6 +4355,14 @@ msgstr "Die Datei konnte nicht geöffnet werden"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "testuser"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
+msgstr "Nutzer"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
@@ -4593,6 +4661,10 @@ msgstr "Benutzername"
 
 msgid "I18N_OPENXPKI_USERNAME_DESC"
 msgstr "Ihr Benutzername, z. B. 'pmueller'"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WATCHDOG_RUN_TOO_MANY_INSTANCES"
+msgstr "Start der Zertifikatserstellung"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WFOBJECT_DESERIALIZE_ERR"
@@ -9189,6 +9261,10 @@ msgstr "testuser"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_RUNTIME_ERROR"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPOVALSIGNATURE_PKCS7TOOL_NOT_CONFIGURED"
 #~ msgstr "Prozesse anzeigen"
 
@@ -9263,6 +9339,18 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SUCCESS"
 #~ msgstr "ja"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE"
+#~ msgstr "Schlüssellänge"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_2048"
+#~ msgstr "Schlüssellänge"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_4096"
+#~ msgstr "Schlüssellänge"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_SIZE_CURVE_NAME_C2TNB191V1"
@@ -9395,10 +9483,6 @@ msgstr "testuser"
 #~ msgstr "Warten"
 
 #~ msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCE"
-#~ msgstr "Start der Zertifikatserstellung"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_FORK_CERT_ISSUANCE_INSTANCES"
 #~ msgstr "Start der Zertifikatserstellung"
 
 #, fuzzy

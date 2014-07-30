@@ -21,7 +21,9 @@ sub render_profile_select {
 
     $self->_page({
         label => 'Select profile',
-        description => 'do we need some more here?'
+        description => 'The certificate profile defines the key usage and other
+        properties of the issued certficate. The subject styles control the
+        structure of the certificates subject and subject alternative name items.'
     });
 
     my $wf_info = $args->{WF_INFO};
@@ -50,8 +52,8 @@ sub render_profile_select {
     }
 
     my @fields = (
-        { name => "cert_profile", label => 'Profile', value => $cert_profile, type => 'select', 'options' => \@profiles, actionOnChange => 'profile!get_styles_for_profile' },
-        { name => "cert_subject_style", label => 'Subject Style', value => $cert_subject_style, type => 'select', 'options' => \@styles },
+        { name => "cert_profile", label => 'Profile', value => $cert_profile, type => 'select', 'options' => \@profiles, actionOnChange => 'profile!get_styles_for_profile', prompt => i18nGettext('I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE') },
+        { name => "cert_subject_style", label => 'Subject Style', value => $cert_subject_style, type => 'select', 'options' => \@styles, prompt => i18nGettext('I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST') },
     );
 
     # record the workflow info in the session
