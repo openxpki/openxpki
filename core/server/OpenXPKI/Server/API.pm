@@ -721,6 +721,11 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
+                'NOHIDE' => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             },
             memoize => 1,
         },

@@ -403,6 +403,7 @@ sub get_cert_subject_profiles {
     my $self = shift;
     my $args = shift;
     my $profile = $args->{PROFILE};
+    my $nohide = $args->{NOHIDE};
 
     ##! 1: 'Start '
 
@@ -413,8 +414,13 @@ sub get_cert_subject_profiles {
     ## get all available profiles
     my %styles = ();
     foreach my $style (@style_names) {
-        $styles{$style}->{LABEL}       = $config->get("profile.$profile.style.$style.label");
-        $styles{$style}->{DESCRIPTION} = $config->get("profile.$profile.style.$style.description");
+
+        # Hide No UI styles if NOHIDE is not set
+        if (!($nohide || $config->exists(['profile', $profile, 'style', $style, 'ui' ]))) {
+            next;
+        }
+        $styles{$style}->{LABEL}       = $config->get(['profile', $profile, 'style', $style, 'label']);
+        $styles{$style}->{DESCRIPTION} = $config->get(['profile', $profile, 'style', $style, 'description']);
     }
 
     ##! 32: Dumper %profiles
