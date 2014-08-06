@@ -187,7 +187,7 @@ sub get_revision_info {
 	    $result->{'git-description' . $postfix} = $description;
 	}
     }
-    
+
     return $result;
 }
 
@@ -290,6 +290,41 @@ if (exists $config{GIT_REFERENCE_TAGS}) {
     delete $config{GIT_REFERENCE_TAGS};
 }
 
+# try to get revision from git
+$revision_info = get_revision_info();
+
+if (! scalar keys %{$revision_info}) {
+    # could not get revision from git, check if cached result is available
+    print STDERR "NOTE: could not determine revision info from version control\n";
+    # determine base directory of VERSION_DEFINITION file
+    my ($volume, $dir, $file) =
+	File::Spec->splitpath( $def_file );
+    my $revision_file = File::Spec->catfile($dir, '.vergen_revision_state');
+
+    if (-r $revision_file) {
+	print STDERR "NOTE: reading cached revision information from $revision_file\n";
+	my $data = slurp($revision_file);
+	eval $data;
+    }
+}
+
+if (! scalar keys %{$revision_info}) {
+    print STDERR "NOTE: neither git nor .vergen_revision_state was found.\n";
+    print STDERR "\n";
+    print STDERR "vergen works best when called within a checked out git repository.\n";
+    print STDERR "Where this is not possible (e. g. when working on an extracted\n";
+    print STDERR "tarball without the .git directory) it is possible to include\n";
+    print STDERR "the complete revision information before creation of the tarball\n";
+    print STDERR "and archive this file inside the archive.\n\n";
+    print STDERR "To do so, do the following in the same directory that contains the\n";
+    print STDERR ".VERSION_DEFINITION file:\n\n";
+    print STDERR "vergen --show-revisioninfo >.vergen_revision_state\n\n";
+    print STDERR "If this file is present (and git is not found) subsequent calls to\n";
+    print STDERR "vergen will use the cached information instead.\n\n";
+    exit 1;
+}
+
+
 
 ### %config
 ### $format_of
@@ -322,11 +357,6 @@ foreach my $component (keys %config) {
                                 git-tags |
                                 git-description.*
                             ) \z }xms) {
-        $revision_info ||= get_revision_info();
-
-        if (! scalar keys %{$revision_info}) {
-            die "Could not determine revision info. (Hint: svn and/or git executable in path?)";
-        }
 
         $mapping_of->{component}->{$component} = {
             keyword => $config{$component}->{keyword},
@@ -456,9 +486,7 @@ if (defined $params{'dump'}) {
 }
 
 if (defined $params{'show-revisioninfo'}) {
-    foreach my $key (sort keys %{$revision_info}) {
-	print $key . '=' . ($revision_info->{$key} || '') . "\n";
-    }
+    print Data::Dumper->Dump([ $revision_info ], ['revision_info']);
 }
 
 exit 0;
@@ -510,6 +538,21 @@ When used within a directory hierarchy under revision control via
 Subversion and/or Git, B<vergen> is able to obtain and use information about
 the current checkout.
 
+vergen works best when called within a checked out git repository.
+Where this is not possible (e. g. when working on an extracted
+tarball without the .git directory) it is possible to include
+the complete revision information before creation of the tarball
+and archive this file inside the archive.
+
+To do so, do the following in the same directory that contains the
+.VERSION_DEFINITION file:
+
+vergen --show-revisioninfo >.vergen_revision_state
+
+If this file is present (and git is not found) subsequent calls to
+vergen will use the cached information instead.
+
+
 
 =head1 OPTIONS
 
@@ -554,7 +597,7 @@ List all keywords (can be part of version format of may be referenced directly).
 
 =item B<--show-revisioninfo>
 
-Show all revision information that could be obtained from revision control 
+Dump all revision information that could be obtained from revision control 
 tools.
 
 =item B<--verbose>

@@ -13,6 +13,9 @@ VERSION_FILE    = ./VERSION
 
 .PHONY:	default test install clean clean.local distclean openxpki.pot
 
+# do not run parallel make on the target files (does not work properly, at least on FreeBSD)
+.NOTPARALLEL: $(MO_TRANSLATIONS)
+
 default::	$(MO_TRANSLATIONS)
 	@echo Languages: $(LANGS)
 
