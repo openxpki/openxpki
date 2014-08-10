@@ -1,13 +1,4 @@
 div#application
-  div.container-fluid
-    div.page-header style="margin-top:0px;margin-bottom:0px;"
-      h2
-        img src="style/img/logo.png" class=toplogo
-        '
-        small Open Source Trustcenter
-
+  partial "applicationHeader"
   outlet
-
-div#footer
-  div.container-fluid
-    p.text-center.text-muted.credit &copy; Copyright 2014, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a>
+partial "applicationFooter"

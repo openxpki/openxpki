@@ -42,6 +42,10 @@ Component = Em.Component.extend
         res
     ).property "content.content.data"
 
+    hasAction: (->
+        not not @get "content.content.actions"
+    ).property "content.content.actions"
+
     sortedData: (->
         data = @get "data"
         data = data.toArray()
@@ -95,6 +99,7 @@ Component = Em.Component.extend
         @set "contextIndex", index
 
         actions = @get "content.content.actions"
+        return if not actions
         if actions.length is 1
             @onItem()
         else

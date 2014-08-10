@@ -24,74 +24,55 @@ div.navbar.navbar-default role="navigation"
               link-to "openxpki" navEntry.key
                 navEntry.label
 
-      if user
-        div style="position:absolute;top:-50px;right:30px;font-size:small;color:#aaa;"
-          ul.nav
-            li style="text-align:right"
-              'Signed in as:
-              strong {{user.name}} ({{user.role}})
-            li style="text-align:right"
-              'Realm:
-              strong {{user.pki_realm_label}} ({{user.pki_realm}})
-
       ul.nav.navbar-nav.navbar-right
         if user
           li: link-to "openxpki" "logout" | Log out
 
 
 div.container-fluid
-  div.row
-    div.col-md-2
-      div.bs-sidebar.hidden-print role="complementary"
-        ul.nav.bs-sidenav
-          each sideNavEntries
-            li class={ active }
-              link-to "openxpki" key
-                =label
-    div.col-md-10 role="main"
-      div.oxi-message
-        div class={ :alert statusClass }
-          =status.message
+  div.oxi-message
+    div class={ :alert statusClass }
+      =status.message
 
-      h2 = content.firstObject.page.label
-      div style="margin-bottom:6px;" = content.firstObject.page.description
+  h2 = content.firstObject.page.label
+  div style="margin-bottom:6px;" = content.firstObject.page.description
 
-      if showTabs
-        ul.nav.nav-tabs
-          each content
-            li class={ active }
-              a click="activateTab this"
-                if page.shortlabel
-                  = page.shortlabel
-                else
-                  = page.label
-                |&nbsp;
-                button click="closeTab this" class="close" &times;
+  if showTabs
+    ul.nav.nav-tabs
+      each content
+        li class={ active }
+          a click="activateTab this"
+            if page.shortlabel
+              = page.shortlabel
+            else
+              = page.label
+            |&nbsp;
+            button click="closeTab this" class="close" &times;
 
-        div.tab-content
-          each content
-            div class={ :tab-pane active }
-              div.Xcontainer.sections
-                div.row
-                  div class={ right:col-md-8:col-md-12 }
-                    each main
-                      oxisection-main content=this
-                  div class={ right:col-md-4:hide }
-                    each right
-                      h3
-                      div.well
-                        oxisection-main content=this
-      else
-        div.Xcontainer.sections
-          each content
+    div.tab-content
+      each content
+        div class={ :tab-pane active }
+          div.Xcontainer.sections
             div.row
               div class={ right:col-md-8:col-md-12 }
                 each main
                   oxisection-main content=this
               div class={ right:col-md-4:hide }
                 each right
+                  h3
                   div.well
                     oxisection-main content=this
+  else
+    div.Xcontainer.sections
+      each content
+        div.row
+          div class={ right:col-md-8:col-md-12 }
+            each main
+              oxisection-main content=this
+          div class={ right:col-md-4:hide }
+            each right
+              div.well
+                oxisection-main content=this
 
 div class="modal fade"
   div class="modal-dialog"
@@ -109,7 +90,7 @@ div class="modal fade"
       div class="modal-footer"
         button.btn.btn-default data-dismiss="modal" Close
 
-div.loading style="display:none"
+div.loading
   div.progress.progress-striped.active style="width:100px; position:absolute; top:30px; right:20px;"
     div.progress-bar role="progressbar" style="width: 100%"
       p.text-center Loading ...

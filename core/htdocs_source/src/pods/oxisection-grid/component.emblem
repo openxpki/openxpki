@@ -12,7 +12,7 @@ div.table-responsive
                   span.pull-right.glyphicon.glyphicon-sort-by-attributes
     tbody
       each sortedData
-        tr class={ :context this.className } /click="showContextmenu this"
+        tr class={ :context this.className controller.hasAction }
           each this
             td: oxivalue-format content=this
 

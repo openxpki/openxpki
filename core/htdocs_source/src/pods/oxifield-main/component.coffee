@@ -52,6 +52,13 @@ Component = Em.Component.extend
     handleActionOnChange: Em.observer "content.value", ->
         @sendAction "valueChange", @get "content"
 
+    keyPress: (event) ->
+        if event.which is 13
+            if @get "content.clonable"
+                @send "addClone"
+                event.stopPropagation()
+                event.preventDefault()
+
     actions:
         addClone: (field) -> @sendAction "addClone", @get "content"
         delClone: (field) -> @sendAction "delClone", @get "content"
