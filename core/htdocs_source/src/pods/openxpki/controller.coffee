@@ -8,14 +8,6 @@ Controller = Em.ArrayController.extend
     ).property "content.length"
 
     navEntries: Em.computed.alias "structure.structure"
-    sideNavEntries: (->
-        return if not @get "navEntries"
-        cat = @get("page")
-        for entry in @get "navEntries"
-            keys = (e.key for e in entry.entries)
-            return entry.entries if cat in keys
-        null
-    ).property "navEntries", "page"
 
     manageActive: Em.observer "page", ->
         return if not @get "navEntries"

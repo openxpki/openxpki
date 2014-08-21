@@ -1,0 +1,3 @@
+div#footer
+  div.container-fluid
+    p.text-center.text-muted.credit &copy; Copyright 2014, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a>

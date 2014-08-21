@@ -26,7 +26,7 @@
             "description": "Read files from disk, everything starts here.",
             "pipe": "file-reader",
             "continuous": true,
-            "pattern": "{.jshintrc,src/**/.jshintrc,*.{js,json,hbs},{src,style,vendor}/**/*.{emblem,coffee,js,css,styl,jpg,png,eot,svg,ttf,woff}}"
+            "pattern": "{.jshintrc,src/**/.jshintrc,*.{js,json,hbs,html},{src,style,vendor}/**/*.{emblem,coffee,js,css,styl,jpg,png,eot,svg,ttf,woff}}"
         },
 
         "hbs2html": {

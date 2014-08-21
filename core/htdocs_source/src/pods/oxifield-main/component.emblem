@@ -10,7 +10,7 @@ unless isHidden
     if content.keys
       div class="col-md-2"
         Em.Select class="form-control" content=content.keys optionValuePath="content.value" optionLabelPath="content.label" value=content.name
-    div class=sFieldSize
+    div class=sFieldSize title=content.title
       if isBool
         oxifield-bool content=content
       if isCertIdentifier
@@ -36,7 +36,7 @@ unless isHidden
     if content.clonable
       div.col-md-1
         if content.isLast
-          button.btn.btn-primary click="addClone": span.glyphicon.glyphicon-plus
+          button.btn.btn-primary.clone type="button" click="addClone": span.glyphicon.glyphicon-plus
         else
-          button.btn.btn-danger click="delClone": span.glyphicon.glyphicon-minus
+          button.btn.btn-danger.clone type="button" click="delClone": span.glyphicon.glyphicon-minus
 

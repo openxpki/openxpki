@@ -20,7 +20,7 @@ Route = Em.Route.extend
         data.type = if data?.data?.action then "POST" else "GET"
         data.url ?= @controllerFor("config").get "url"
         data.data._ = (new Date()).getTime()
-        $(".loading").show()
+        $(".loading").addClass "in-progress"
         $.ajax(data).then (doc) =>
             @controllerFor("openxpki").set "status", doc.status
             if doc.structure
@@ -38,13 +38,15 @@ Route = Em.Route.extend
                     window.location.href = doc.goto
                 else
                     @transitionTo "openxpki", doc.goto
-            Em.run.scheduleOnce "afterRender", ->
-                $(".loading").hide()
-                $(".btn-loading").removeClass("btn-loading")
+
+            if not doc.structure and not doc.goto
+                Em.run.scheduleOnce "afterRender", ->
+                    $(".loading").removeClass "in-progress"
+                    $(".btn-loading").removeClass "btn-loading"
             doc
         , (err) ->
-            $(".loading").hide()
-            $(".btn-loading").removeClass("btn-loading")
+            $(".loading").removeClass "in-progress"
+            $(".btn-loading").removeClass "btn-loading"
             console.log "Ajax error", err
 
 `export default Route`

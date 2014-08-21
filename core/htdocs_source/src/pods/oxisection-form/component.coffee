@@ -65,8 +65,8 @@ Component = Em.Component.extend
                     for newField in doc.fields
                         for oldField, i in fields
                             if oldField.name is newField.name
-                                for key, value  of newField
-                                    Em.set oldField, key, Em.copy value
+                                idx = fields.indexOf oldField
+                                fields.replace idx, 1, [Em.copy newField]
                     null
 
         submit: (action) ->
