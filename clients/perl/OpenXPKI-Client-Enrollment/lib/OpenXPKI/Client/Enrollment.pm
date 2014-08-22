@@ -55,29 +55,29 @@ sub startup {
 
     # Normal route to controller
     $r->get('/')
-        ->to( controller => 'welcome', action => 'welcome', group => '' )
+        ->to( controller => 'Welcome', action => 'welcome', group => '' )
         ->name('index');
     $r->get('/:group')->to(
-        controller => 'welcome',
+        controller => 'Welcome',
         action     => 'prompt',
         config     => $config
     )->name('index');
 
     # Upload
     $r->post('/:group/upload')
-        ->to( controller => 'upload', action => 'upload', config => $config )
+        ->to( controller => 'Upload', action => 'upload', config => $config )
         ->name('upload');
 
     # Download (Get Cert)
     $r->get('/:group/getcert/:certid')->to(
-        controller => 'getcert',
+        controller => 'GetCert',
         action     => 'getcert',
         config     => $config
     )->name('getcert');
 
     # Contact
     $r->get('/:group/contact')->to(
-        controller => 'contact',
+        controller => 'Contact',
         action     => 'contact',
         config     => $config
     )->name('contact');
