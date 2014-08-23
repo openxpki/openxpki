@@ -23,6 +23,8 @@ unless isHidden
         oxifield-checkbox content=content
       if isPassword
         oxifield-password content=content
+      if isPasswordVerify
+        oxifield-passwordverify content=content
       if isSelect
         oxifield-select content=content
       if isText
