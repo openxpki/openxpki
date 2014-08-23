@@ -1,1 +1,1 @@
-=input class="form-control" value=content.value
+=input class="form-control" value=content.value placeholder=content.placeholder

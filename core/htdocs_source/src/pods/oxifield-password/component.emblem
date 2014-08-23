@@ -1,1 +1,1 @@
-=input class="form-control" type="password" value=content.value
+=input class="form-control" type="password" value=content.value placeholder=content.placeholder

@@ -1,5 +1,5 @@
 div.drowdown
-  =input class="form-control" value=search
+  =input class="form-control" value=search placeholder=content.placeholder
   ul.dropdown-menu role="menu"
     each searchResults
       li: a click="selectResult this" = this.label

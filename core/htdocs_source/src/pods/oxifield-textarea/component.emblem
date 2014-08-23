@@ -1,1 +1,1 @@
-=textarea class="form-control" rows=content.textAreaSize.height cols=content.textAreaSize.width  value=content.value
+=textarea class="form-control" rows=content.textAreaSize.height cols=content.textAreaSize.width  value=content.value placeholder=content.placeholder
