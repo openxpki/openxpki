@@ -7,9 +7,11 @@ Component = Em.Component.extend
     options: {}
 
     setup: (->
-        @set "content.value", "now"
-        if "now" is @get "content.value"
+        value = @get "content.value"
+        if value is "now"
             @set "content.pickvalue", moment().format(@get "format")
+        else if value
+            @set "content.pickvalue", moment.unix(value).format(@get "format")
         Em.run.next =>
             @$().find(".date").datetimepicker()
     ).on "didInsertElement"
