@@ -10,7 +10,7 @@ unless isHidden
     if content.keys
       div class="col-md-2"
         Em.Select class="form-control" content=content.keys optionValuePath="content.value" optionLabelPath="content.label" value=content.name
-    div class=sFieldSize title=content.title
+    div class=sFieldSize title=content.tooltip
       if isBool
         oxifield-bool content=content
       if isCertIdentifier
@@ -23,6 +23,8 @@ unless isHidden
         oxifield-checkbox content=content
       if isPassword
         oxifield-password content=content
+      if isPasswordVerify
+        oxifield-passwordverify content=content
       if isSelect
         oxifield-select content=content
       if isText

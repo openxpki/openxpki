@@ -6,6 +6,13 @@ Component = Em.Component.extend
 
     confirmFocus: false
 
+    isFixed: false
+    setMode: Em.on "init", ->
+        if @get "content.value"
+            @set "password", @get "content.value"
+            @set "isFixed", true
+            @set "content.value", ""
+
     showConfirm: (->
         @get("password") isnt @get("confirm") or @get "confirmFocus"
     ).property "password", "confirm", "confirmFocus"

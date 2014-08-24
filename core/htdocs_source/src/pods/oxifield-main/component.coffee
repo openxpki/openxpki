@@ -8,10 +8,21 @@ Component = Em.Component.extend
     isDatetime: Em.computed.equal "content.type", "datetime"
     isHidden: Em.computed.equal "content.type", "hidden"
     isPassword: Em.computed.equal "content.type", "password"
+    isPasswordVerify: Em.computed.equal "content.type", "passwordverify"
     isSelect: Em.computed.equal "content.type", "select"
     isText: (->
         @get("content.type") not in [
-            "bool", "cert_identifier", "checkbox", "date", "datetime", "hidden", "password", "select", "textarea", "uploadarea"
+            "bool"
+            "cert_identifier"
+            "checkbox"
+            "date"
+            "datetime"
+            "hidden"
+            "password"
+            "passwordverify"
+            "select"
+            "textarea"
+            "uploadarea"
         ]
     ).property "content.type"
     isTextarea: Em.computed.equal "content.type", "textarea"

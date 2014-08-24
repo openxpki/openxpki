@@ -12,6 +12,11 @@ Component = Em.Component.extend
         else if evt.target.tagName is "BUTTON"
             $(evt.target).addClass "btn-loading"
 
+    buttonsWithDescription: (->
+        @get("content.content.buttons").isAny "description"
+    ).property "content.content.buttons.@each.description"
+
+
     actions:
         execute: (btn) ->
             if btn.action
