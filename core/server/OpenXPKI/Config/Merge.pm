@@ -21,16 +21,16 @@ sub new {
     my $class = ref($this) || $this;
     my $params = shift;
 
-    
+
     # Set from ENV
     $params->{dbpath} = $ENV{OPENXPKI_CONF_DB} if ($ENV{OPENXPKI_CONF_DB});
     $params->{path} = [ split( /:/, $ENV{OPENXPKI_CONF_PATH} ) ] if ( $ENV{OPENXPKI_CONF_PATH} );
 
     # Set to defaults if nothing is set
     $params->{dbpath} = '/etc/openxpki/config.git' unless($params->{dbpath});
-    $params->{path} = [qw( /etc/openxpki/config.d )] if ( not exists $params->{path} );              
-    
-    $params->{autocreate} = 1;    
+    $params->{path} = [qw( /etc/openxpki/config.d )] if ( not exists $params->{path} );
+
+    $params->{autocreate} = 1;
     $this->SUPER::new($params);
 }
 
@@ -41,32 +41,32 @@ sub new {
 sub parser {
     my $self   = shift;
     my $params = shift;
-             
+
     my $dir;
     if ( exists $params->{'path'} ) {
         $dir = $params->{path}->[0];
     } else {
-        $dir = $self->path()->[0];        
+        $dir = $self->path()->[0];
     }
-    
+
     # If the directory was not set or doesn't exist, don't bother
     # trying to import any configuration
     if ( not $dir or not -d $dir ) {
         return;
     }
 
-    # Skip the workflow directories 
+    # Skip the workflow directories
     my $cm    = Config::Merge->new( path => $dir, skip => qr/realm\.\w+\._workflow/ );
     my $cmref = $cm->();
 
     my $tree = $self->cm2tree($cmref);
-    
+
     # Incorporate the Workflow XML definitions
     # List the realms from the system.realms tree
-    foreach my $realm (keys %{$tree->{system}->{realms}}) {                        
-        my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => "$dir/realm/$realm/_workflow/workflow.xml");
-        $tree->{realm}->{$realm}->{workflow} = $xml_cache->get_serialized();         
-    }    
+    foreach my $realm (keys %{$tree->{system}->{realms}}) {
+        #my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => "$dir/realm/$realm/_workflow/workflow.xml");
+        #$tree->{realm}->{$realm}->{workflow} = $xml_cache->get_serialized();
+    }
     $params->{comment} = 'import from ' . $dir . ' using Config::Merge';
     $self->commit( $tree, @_, $params );
 }
@@ -79,15 +79,15 @@ sub cm2tree {
     my $self = shift;
     my $cm   = shift;
     my $tree = {};
-    
+
     if ( ref($cm) eq 'HASH' ) {
         my $ret = {};
-        foreach my $key ( keys %{$cm} ) {            
-            if ( $key =~ m{ (?: \A @ (.*?) @ \z | \A @ (.*) | (.*?) @ \z ) }xms ) {        
+        foreach my $key ( keys %{$cm} ) {
+            if ( $key =~ m{ (?: \A @ (.*?) @ \z | \A @ (.*) | (.*?) @ \z ) }xms ) {
                 my $match = $1 || $2 || $3;
                 #make it a ref to an anonymous scalar so we know it's a symlink
-                $ret->{$match} = \$cm->{$key};                        
-            } else {            
+                $ret->{$match} = \$cm->{$key};
+            } else {
                 $ret->{$key} = $self->cm2tree( $cm->{$key} )
             }
         }
@@ -149,7 +149,7 @@ and not a colon-separated list.
 
 =head2 new()
 
-This overrides the parent class, adding the default locations for the 
+This overrides the parent class, adding the default locations for the
 configuration files needed by OpenXPKI.
 
 =head1 MORE INFO
