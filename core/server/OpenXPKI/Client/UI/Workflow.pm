@@ -451,10 +451,22 @@ sub action_select {
             ID       => $wf_info->{WORKFLOW}->{ID},
             ACTIVITY => $wf_action,
         });
+
+        # in case we need access to volatile context values we store them away
+        # and merge them back later - this can be removed after refactoring the API
+        my $org_context = $wf_info->{WORKFLOW}->{CONTEXT};
+
         # TODO - change API
         $wf_info = $self->send_command( 'get_workflow_ui_info', {
             ID => $wf_id
         });
+
+        # Merge back the private context values
+        foreach my $key (keys %{$org_context}) {
+            if ($key =~ /^_/) {
+                $wf_info->{WORKFLOW}->{CONTEXT}->{$key} = $org_context->{$key};
+            }
+        }
 
         my @activity = keys %{$wf_info->{ACTIVITY}};
         if (scalar @activity == 1) {

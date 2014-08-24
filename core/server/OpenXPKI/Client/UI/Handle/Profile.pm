@@ -156,6 +156,8 @@ sub render_key_select {
     my $wf_info = $args->{WF_INFO};
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
 
+    # TODO - create fieldsets as macros and read names and labels from the Workflow
+
     # Get the list of allowed algorithms
     my $key_alg = $self->send_command( 'get_key_algs', { PROFILE => $context->{cert_profile} });
     my @key_type;
@@ -183,7 +185,6 @@ sub render_key_select {
     my $key_enc = $self->send_command( 'get_key_enc', { PROFILE => $context->{cert_profile} });
     my @enc = map { { value => $_, label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_'.uc($_))  }  } @{$key_enc};
     push @fields, { name => "enc_alg", label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC'), type => 'select', 'options' => \@enc };
-    push @fields, { name => "_password", label => 'Encryption Password', type => 'text' };
     push @fields, { name => "csr_type", type => 'hidden', 'value' => 'pkcs10' };
 
     # record the workflow info in the session

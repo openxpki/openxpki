@@ -87,6 +87,7 @@ sub action_get_key_param {
 
             push @fields, {
                 name => "key_gen_params{$pn}",
+                label => i18nGettext('I18N_OPENXPKI_UI_KEY_'.$pn),
                 value => $preset,
                 type => 'select',
                 options => \@param,

@@ -8,14 +8,18 @@
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
     <action name="csr_select_profile"
-	    resulting_state="SETUP_REQUEST_TYPE">
+        resulting_state="SETUP_REQUEST_TYPE">
     </action>
   </state>
 
   <state name="SETUP_REQUEST_TYPE">
     <description>Please choose how you want to provide the certificates private key or go back to select an alternative profile.</description>
-    <action name="csr_provide_server_key_password"
-            resulting_state="ENTER_SUBJECT">
+    <action name="csr_generate_password"
+            resulting_state="PERSIST_SERVER_GEN_PASSWORD">
+    </action>
+
+    <action name="csr_ask_client_password"
+            resulting_state="ENTER_KEY_PARAMS">
     </action>
 
 <!--  Not supported by UI yet
@@ -32,6 +36,27 @@
     </action>
 
   </state>
+
+  <state name="PERSIST_SERVER_GEN_PASSWORD" autorun="yes">
+    <action name="csr_persist_password"
+            resulting_state="RETYPE_SERVER_GEN_PASSWORD">
+    </action>
+  </state>
+
+  <state name="RETYPE_SERVER_GEN_PASSWORD">
+    <description>The system has generated a password for you, please write it down in a secure place as you will need it to download your private key later.</description>
+    <action name="csr_retype_server_password"
+            resulting_state="ENTER_KEY_PARAMS">
+    </action>
+  </state>
+
+  <state name="ENTER_KEY_PARAMS">
+    <description>Please choose the parameters for key generation.</description>
+    <action name="csr_provide_server_key_params"
+        resulting_state="ENTER_SUBJECT">
+    </action>
+  </state>
+
 
   <state name="ENTER_SUBJECT">
     <description>Please enter the data requested below. This information is used to create the subject of your certificate.</description>
@@ -135,12 +160,17 @@
         resulting_state="CANCEL_APPROVALS">
     </action>
 
+    <action name="csr_edit_validity"
+        resulting_state="CANCEL_APPROVALS">
+    </action>
+
     <action name="csr_approve_csr"
         resulting_state="CHECK_APPROVALS">
         <condition name="csr_cond_acl_can_approve"/>
         <!-- Comment this condition to allow RA Operators to approve their own CRRs -->
         <!--  <condition name="!I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"/> -->
     </action>
+
     <action name="csr_reject_request"
         resulting_state="REJECTED">
         <condition name="csr_cond_acl_can_reject"/>
@@ -264,7 +294,7 @@
   <state name="NICE_PUBLISH_CERTIFICATE" autorun="yes">
     <action name="csr_publish_certificate"
               resulting_state="SUCCESS">
-	</action>
+    </action>
   </state>
 
   <state name="REJECTED" autorun="yes">

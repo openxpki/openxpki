@@ -8,20 +8,44 @@
         <field name="cert_subject_style"/>
     </action>
 
-    <action name="csr_provide_server_key_password"
+
+    <action name="csr_generate_password"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword">
+    </action>
+
+    <action name="csr_persist_password"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
-        uihandle="OpenXPKI::Client::UI::Handle::Profile::render_key_select"
+        ds_namespace="workflow.csr.keygen_password"
+        ds_key_param="workflow_id"
+        ds_value_param="_password"
+        ds_encrypt="1"
+        ds_force="1"
+        ds_unset_context_value="0">
+    </action>
+
+    <!-- This is simply a dummy action to make sure the user has noted the password
+         The password given is discarded so it is not possible to trick the workflow
+         as we use the original password to encrypt the key  -->
+    <action name="csr_retype_server_password"
+        class="OpenXPKI::Server::Workflow::Activity::Noop">
+        <field name="_dummy" type="passwordverify"  is_required="yes"  />
+        <field name="_password" type="text" />
+    </action>
+
+    <!-- For client provided passwords, the retype validation is done by the client
+         and the password persisted afterwards -->
+    <action name="csr_ask_client_password"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
         ds_namespace="workflow.csr.keygen_password"
         ds_key_param="workflow_id"
         ds_value_param="_password"
         ds_encrypt="1"
         ds_force="1"
         ds_unset_context_value="1">
-        <field name="_password"  />
-        <field name="key_alg"  />
-        <field name="enc_alg"  />
-        <field name="key_gen_params"  />
-        <field name="csr_type" type="hidden" default="pkcs10" />
+        <field name="_password" type="passwordverify"  is_required="yes"  />
+        <!--  <validator name="global_password_quality">
+            <arg>$_password</arg>
+        </validator>  -->
     </action>
 
     <action name="csr_generate_key_client"
@@ -30,9 +54,19 @@
         <field name="csr_type" type="hidden" default="spkac" />
     </action>
 
+    <action name="csr_provide_server_key_params"
+        uihandle="OpenXPKI::Client::UI::Handle::Profile::render_key_select"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+        source="USER">
+        <field name="key_alg"  />
+        <field name="enc_alg"  />
+        <field name="key_gen_params"  />
+        <field name="csr_type" type="hidden" default="pkcs10" />
+    </action>
+
     <action name="csr_upload_pkcs10"
         class="OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10">
-        <field name="pkcs10" label="CSR (PKCS#10)" is_required="yes" type="textarea" />
+        <field name="pkcs10" label="CSR (PKCS#10)" is_required="yes" type="uploadarea" />
         <field name="csr_type" type="hidden" default="pkcs10" />
     </action>
 
@@ -55,6 +89,16 @@
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_subject_form"
         source="USER">
         <field name="cert_info" type="cert_info" />
+    </action>
+
+    <action name="csr_edit_validity"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
+        source="USER">
+        <field name="notbefore" type="datetime" />
+        <field name="notafter" type="datetime" />
+        <!--  <validator name="global_password_quality">
+            <arg>$_password</arg>
+        </validator>  -->
     </action>
 
     <action name="csr_render_subject"
@@ -137,15 +181,15 @@
         class="OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10">
     </action>
 
-	<action name="csr_move_key_to_dp"
-		class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
-		ds_namespace="certificate.privatekey"
-		ds_key_param="workflow_id"
-		ds_value_param="private_key"
-		ds_encrypt="1"
-		ds_force="1"
-		ds_unset_context_value="1">
-	</action>
+    <action name="csr_move_key_to_dp"
+        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
+        ds_namespace="certificate.privatekey"
+        ds_key_param="workflow_id"
+        ds_value_param="private_key"
+        ds_encrypt="1"
+        ds_force="1"
+        ds_unset_context_value="1">
+    </action>
 
     <action name="csr_rename_private_key"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry"
@@ -176,8 +220,8 @@
     </action>
 
     <action name="csr_publish_certificate"
-	  class="OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate"
-	  workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING">
+      class="OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate"
+      workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING">
     </action>
 
      <action name="csr_persist_metadata"

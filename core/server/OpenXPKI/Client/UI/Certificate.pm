@@ -119,8 +119,8 @@ sub init_info {
     # check for private key
     # TODO - add ACL, only owner should be allowed to dl key
     if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-    	$privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
-	}
+        $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
+    }
 
     push @fields, { label => 'Download', value => '<ul>'.
         sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
