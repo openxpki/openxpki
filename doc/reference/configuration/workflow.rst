@@ -13,11 +13,6 @@ It should not be necessary to touch those. These values are used as a default fo
 * ``persister`` holds the name of the used persister, it must be a scalar.
 * ``observer`` can hold a scalar or list of class names.
 
-Global Entities
----------------
-
-You can define entities for action, condition and validator for global use in the corresponding files below ``workflow.global.``. The format is the same as described below, the "global_" prefix is added by the system.
-
 Configuration Cache
 -------------------
 
@@ -41,14 +36,15 @@ Each workflow is represented by a file or directory structure below ``workflow.d
             autofail: 0/1
             label: visible name
             description: the text for the page head
-            action: [] array of names only, as defined below or starting with ``global_``
+            action: 
+              - name_of_action > state_on_success
+              - name_of_other_action > other_state_on_success
 
     action:
         name_of_action: (as used above)
             label: Verbose name, shown as label on the button
             description: Verbose description, show on UI page
             class: Name of the implementation class
-            success: new state on success
             abort: state to jump to on abort (UI button, optional) # not implemented yet
             resume: state to jump to on resume (after exception, optional) # not implemented yet
             condition: scalar/list with names or inline definiton as hash
@@ -56,9 +52,61 @@ Each workflow is represented by a file or directory structure below ``workflow.d
             params:
                 key: value - passed as params to the action class
        
-     
+Note: All entity names must contain only letters (lower ascii), digits and the underscore.
 
-Creating Makros
+Below is a simple, but working workflow config (no conditions, no validators, the global action is defined outside this file)::
+
+    head:
+        label: I am a Test
+        description: This is a Workflow for Testing
+        prefix: test
+
+    state: 
+        INITIAL:
+        label: initial state
+        description: This is where everything starts
+        action: run_test1 > PENDING
+
+        PENDING:
+        label: pending state
+        description: We hold here for a while
+        action: global_run_test2 > SUCCESS
+        
+        SUCCESS:
+        label: finals state
+        description: It's done - really!
+        
+        
+    action:
+        run_test1:
+        label: The first Action
+        description: I am first!
+        class: Workflow::Action::Null  
+        fields: tbd
+        params:
+            message: "Hi, I am a log message"
+ 
+
+
+Workflow Head
+^^^^^^^^^^^^^
+
+States
+^^^^^^
+
+The ``action`` attribute is a list (or scalar) holding the action name and the
+follow up state. Put the name of the action and the expected state on success, 
+seperated by the ``>`` sign (is greater than).
+
+Action
+^^^^^^
+
+Global Entities
+---------------
+
+You can define entities for action, condition and validator for global use in the corresponding files below ``workflow.global.``. The format is the same as described below, the "global_" prefix is added by the system.
+
+Creating Macros
 ---------------
 
 If you have a sequence of states/actions you need in multiple workflows, you can 

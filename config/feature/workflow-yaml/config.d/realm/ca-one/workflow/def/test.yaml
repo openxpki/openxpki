@@ -1,0 +1,30 @@
+head:
+    label: I am a Test
+    description: This is a Workflow for Testing
+    prefix: test
+
+state: 
+    INITIAL:
+        label: initial state
+        description: This is where everything starts
+        action: run_test1 > PENDING
+
+    PENDING:
+        label: pending state
+        description: We hold here for a while
+        action: global_run_test2 > SUCCESS
+        
+    SUCCESS:
+        label: finals state
+        description: It's done - really!
+        
+        
+action:
+    run_test1:
+        label: The first Action
+        description: I am first!
+        class: Workflow::Action::Null  
+        fields: tbd
+        params:
+            message: "Hi, I am a log message"
+
