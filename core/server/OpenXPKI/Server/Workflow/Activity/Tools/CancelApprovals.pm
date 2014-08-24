@@ -24,12 +24,12 @@ sub execute
     my $user = CTX('session')->get_user();
     my $role = CTX('session')->get_role();
     CTX('log')->log(
-	MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
-	PRIORITY => 'info',
-	FACILITY => ['audit','application']
+    MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
+    PRIORITY => 'info',
+    FACILITY => ['audit','application']
     );
 
-=begin disabled-by-oli
+=cut disabled-by-oli
 
     my $bulk = $context->param('bulk');
     if (! $bulk) {
@@ -41,7 +41,7 @@ sub execute
         });
     }
 
-=end disabled-by-oli
+=cut disabled-by-oli
 
     return 1;
 }
