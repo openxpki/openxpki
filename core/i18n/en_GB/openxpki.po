@@ -8,10 +8,11 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2014-07-30 09:03+0100\n"
+"PO-Revision-Date: 2014-08-25 11:03+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -4507,6 +4508,12 @@ msgstr "AES 256bit"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "IDEA"
 
+msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
+msgstr "Choose password yourself"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER"
+msgstr "Generate password on server"
+
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
 msgstr "Key length"
 
@@ -4516,7 +4523,6 @@ msgstr "2048 bits (default)"
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 (very strong)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Username"
 
@@ -4525,6 +4531,9 @@ msgstr "login failed"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
+
+msgid "I18N_OPENXPKI_UI_PASSWORD"
+msgstr "Password"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE"
 msgstr "Please choose a profile"
@@ -4762,9 +4771,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
-msgstr "Request invalid - no action"
+msgstr "Request invalid - action without token"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "Request invalid - no action"

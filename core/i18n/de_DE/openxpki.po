@@ -4333,6 +4333,24 @@ msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "Benutzername"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
+msgstr ""
+"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+"mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+"eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+"können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
+"beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER"
+msgstr ""
+"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+"mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+"eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+"können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
+"beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
 msgstr "Prozesse anzeigen"
 
@@ -4355,6 +4373,10 @@ msgstr "Die Datei konnte nicht geöffnet werden"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "testuser"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD"
+msgstr "Port"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE"
