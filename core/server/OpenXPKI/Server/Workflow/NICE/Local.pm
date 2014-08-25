@@ -29,17 +29,17 @@ extends 'OpenXPKI::Server::Workflow::NICE';
 
 sub issueCertificate {
 
-	my $self = shift;
-	my $csr = shift;
+    my $self = shift;
+    my $csr = shift;
 
-	##! 1: 'Starting '
-	my $serializer = OpenXPKI::Serialization::Simple->new();
+    ##! 1: 'Starting '
+    my $serializer = OpenXPKI::Serialization::Simple->new();
     my $realm = CTX('session')->get_pki_realm();
     my $config = CTX('config');
 
-	my $csr_serial = $csr->{CSR_SERIAL};
+    my $csr_serial = $csr->{CSR_SERIAL};
 
-	##! 8: 'csr serial  ' . $csr_serial
+    ##! 8: 'csr serial  ' . $csr_serial
 
     my $cert_profile = $csr->{PROFILE};
     ##! 64: 'certificate profile: ' . $cert_profile
@@ -63,12 +63,12 @@ sub issueCertificate {
             push @subject_alt_names,  $serializer->deserialize($metadata->{ATTRIBUTE_VALUE});
         } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notbefore') {
             $notbefore = OpenXPKI::DateTime::get_validity({
-                VALIDITY_FORMAT => 'absolutedate',
+                VALIDITYFORMAT => 'detect',
                 VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
             });
        } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notafter') {
             $notafter = OpenXPKI::DateTime::get_validity({
-                VALIDITY_FORMAT => 'absolutedate',
+                VALIDITYFORMAT => 'detect',
                 VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
             });
         }
@@ -135,15 +135,15 @@ sub issueCertificate {
     });
 
     if (!defined $ca_token) {
-	    OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
+        OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
         );
     }
 
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-		CA        => $issuing_ca,
-		ID        => $cert_profile,
-		TYPE      => 'ENDENTITY', # FIXME - should be useless
+        CA        => $issuing_ca,
+        ID        => $cert_profile,
+        TYPE      => 'ENDENTITY', # FIXME - should be useless
     );
 
     ##! 64: 'propagating cert subject: ' . $csr->{SUBJECT}
@@ -151,8 +151,8 @@ sub issueCertificate {
 
     ##! 51: 'SAN List ' . Dumper ( @subject_alt_names )
     if (scalar @subject_alt_names) {
-    	##! 64: 'propagating subject alternative names: ' . Dumper @subject_alt_names
-	   $profile->set_subject_alt_name(\@subject_alt_names);
+        ##! 64: 'propagating subject alternative names: ' . Dumper @subject_alt_names
+       $profile->set_subject_alt_name(\@subject_alt_names);
     }
 
     my $rand_length = $profile->get_randomized_serial_bytes();
@@ -183,13 +183,13 @@ sub issueCertificate {
     }
 
     if (defined $notafter) {
-    	##! 32: 'propagating notafter date: ' . $notafter
+        ##! 32: 'propagating notafter date: ' . $notafter
         $profile->set_notafter($notafter);
     }
 
     ##! 16: 'performing key online test'
     if (! $ca_token->key_usable()) {
-	    CTX('log')->log(
+        CTX('log')->log(
                 MESSAGE => "Token for $issuing_ca not usable",
                 PRIORITY => 'info',
                 FACILITY => [ 'monitor', 'audit', 'application' ],
@@ -200,11 +200,11 @@ sub issueCertificate {
     ##! 32: 'issuing certificate'
     ##! 64: 'certificate profile '. Dumper( $profile )
     my $certificate = $ca_token->command(
-	{
-	    COMMAND => "issue_cert",
-	    PROFILE => $profile,
-	    CSR     => $csr->{DATA},
-	});
+    {
+        COMMAND => "issue_cert",
+        PROFILE => $profile,
+        CSR     => $csr->{DATA},
+    });
 
     # SPKAC Requests return binary format - so we need to convert that
     if ($certificate !~ m{\A -----BEGIN }xms) {
@@ -218,10 +218,10 @@ sub issueCertificate {
     }
 
     CTX('log')->log(
-	   MESSAGE => "CA '$issuing_ca' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . CTX('api')->get_pki_realm() . "'",
-	   PRIORITY => 'info',
-	   FACILITY => [ 'audit', 'application', ],
-	);
+       MESSAGE => "CA '$issuing_ca' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . CTX('api')->get_pki_realm() . "'",
+       PRIORITY => 'info',
+       FACILITY => [ 'audit', 'application', ],
+    );
 
 
     ##! 64: 'cert: ' . $certificate
@@ -234,9 +234,9 @@ sub issueCertificate {
             csr_serial  => $csr_serial
         },
         {}
-	);
+    );
 
-	##! 16: 'cert_identifier: ' . $cert_identifier
+    ##! 16: 'cert_identifier: ' . $cert_identifier
 
     return { 'cert_identifier' => $cert_identifier };
 
@@ -261,10 +261,10 @@ sub revokeCertificate {
 
 sub checkForRevocation{
 
-	my $self = shift;
+    my $self = shift;
 
-	# As the local crl issuance process will set the state in the certificate
-	# table directly, we get the certificate status from the local table
+    # As the local crl issuance process will set the state in the certificate
+    # table directly, we get the certificate status from the local table
 
     ##! 16: 'Checking revocation status'
     my $cert = CTX('dbi_backend')->first (
@@ -281,36 +281,36 @@ sub checkForRevocation{
        FACILITY => 'application',
     );
 
-	if ($cert->{STATUS} eq 'REVOKED') {
-	   ##! 32: 'certificate revoked'
+    if ($cert->{STATUS} eq 'REVOKED') {
+       ##! 32: 'certificate revoked'
        return 1;
-	}
+    }
 
-	# If the certificate is not revoked, trigger pause
-	##! 32: 'Revocation is pending - going to pause'
-	$self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING');
+    # If the certificate is not revoked, trigger pause
+    ##! 32: 'Revocation is pending - going to pause'
+    $self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING');
 
-	return;
+    return;
 }
 
 
 sub issueCRL {
 
     my $self = shift;
-	my $ca_alias = shift;
+    my $ca_alias = shift;
 
-	my $pki_realm = CTX('session')->get_pki_realm();
-	my $dbi = CTX('dbi_backend');
+    my $pki_realm = CTX('session')->get_pki_realm();
+    my $dbi = CTX('dbi_backend');
 
-	# FIXME - we want to have a context free api....
-	my $crl_validity = $self->_get_context_param('crl_validity');
-	my $delta_crl = $self->_get_context_param('delta_crl');
+    # FIXME - we want to have a context free api....
+    my $crl_validity = $self->_get_context_param('crl_validity');
+    my $delta_crl = $self->_get_context_param('delta_crl');
 
-	if ($delta_crl) {
-	    OpenXPKI::Exception->throw(
+    if ($delta_crl) {
+        OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT",
         );
-	}
+    }
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
@@ -361,11 +361,11 @@ sub issueCRL {
 
     my @cert_timestamps; # array with certificate data and timestamp
     my $already_revoked_certs = $dbi->select(
-	   TABLE   => 'CERTIFICATE',
+       TABLE   => 'CERTIFICATE',
        COLUMNS => [
-	       'CERTIFICATE_SERIAL',
+           'CERTIFICATE_SERIAL',
             'IDENTIFIER',
-	    # 'DATA'
+        # 'DATA'
         ],
         DYNAMIC => {
             'PKI_REALM'         => $pki_realm,
@@ -383,7 +383,7 @@ sub issueCRL {
     my $certs_to_be_revoked = $dbi->select(
         TABLE   => 'CERTIFICATE',
         COLUMNS => [
-	    'CERTIFICATE_SERIAL',
+        'CERTIFICATE_SERIAL',
             'IDENTIFIER',
             # 'DATA'
         ],
@@ -427,10 +427,10 @@ sub issueCRL {
     ##! 128: 'crl: ' . Dumper($crl)
 
     CTX('log')->log(
-    	MESSAGE => 'CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm,
-    	PRIORITY => 'info',
-    	FACILITY => [ 'audit', 'system' ],
-	);
+        MESSAGE => 'CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm,
+        PRIORITY => 'info',
+        FACILITY => [ 'audit', 'system' ],
+    );
 
 
     # publish_crl can then publish all those with a PUBLICATION_DATE of -1
