@@ -13,7 +13,11 @@ Component = Em.Component.extend
             $(evt.target).addClass "btn-loading"
 
     buttonsWithDescription: (->
-        @get("content.content.buttons").isAny "description"
+        buttons = @get "content.content.buttons"
+        if buttons
+            buttons.isAny "description"
+        else
+            false
     ).property "content.content.buttons.@each.description"
 
 
