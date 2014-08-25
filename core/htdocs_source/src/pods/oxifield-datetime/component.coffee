@@ -2,7 +2,7 @@
 `import moment from "vendor/moment"`
 
 Component = Em.Component.extend
-    format: "MM/DD/YYYY hh:mm A"
+    format: "DD.MM.YYYY HH:mm"
 
     options: {}
 

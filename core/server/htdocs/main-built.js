@@ -35995,7 +35995,13 @@ define('pods/oxisection-keyvalue/component', [
             }
         },
         buttonsWithDescription: function () {
-            return this.get('content.content.buttons').isAny('description');
+            var buttons;
+            buttons = this.get('content.content.buttons');
+            if (buttons) {
+                return buttons.isAny('description');
+            } else {
+                return false;
+            }
         }.property('content.content.buttons.@each.description'),
         actions: {
             execute: function (btn) {
@@ -36734,7 +36740,7 @@ define('pods/oxifield-datetime/component', [
     var moment = __dependency1__.__default__;
     var Component;
     Component = Em.Component.extend({
-        format: 'MM/DD/YYYY hh:mm A',
+        format: 'DD.MM.YYYY HH:mm',
         options: {},
         setup: function () {
             var value;
@@ -36746,7 +36752,7 @@ define('pods/oxifield-datetime/component', [
             }
             return Em.run.next(function (_this) {
                 return function () {
-                    return _this.$().find('.date').datetimepicker();
+                    return _this.$().find('.date').datetimepicker({ format: _this.get('format') });
                 };
             }(this));
         }.on('didInsertElement'),
