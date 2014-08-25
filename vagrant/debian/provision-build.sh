@@ -39,7 +39,7 @@ cd ../
 
 # Now build the deps
 make clean
-#make cpan_dependency cpan_dependency2 
+make cpan_dependency cpan_dependency2 
 make core
 make i18n
 
