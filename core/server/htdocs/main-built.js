@@ -22,7 +22,7 @@ var require = function (name) {
 define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
     var module = { exports: {} };
     (function (undefined) {
-        var moment, VERSION = '2.8.0', globalScope = typeof global !== 'undefined' ? global : this, oldGlobalMoment, round = Math.round, i, YEAR = 0, MONTH = 1, DATE = 2, HOUR = 3, MINUTE = 4, SECOND = 5, MILLISECOND = 6, locales = {}, momentProperties = [], hasModule = typeof module !== 'undefined' && module.exports, aspNetJsonRegex = /^\/?Date\((\-?\d+)/i, aspNetTimeSpanJsonRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/, isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/, formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|X|zz?|ZZ?|.)/g, localFormattingTokens = /(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g, parseTokenOneOrTwoDigits = /\d\d?/, parseTokenOneToThreeDigits = /\d{1,3}/, parseTokenOneToFourDigits = /\d{1,4}/, parseTokenOneToSixDigits = /[+\-]?\d{1,6}/, parseTokenDigits = /\d+/, parseTokenWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i, parseTokenTimezone = /Z|[\+\-]\d\d:?\d\d/gi, parseTokenT = /T/i, parseTokenTimestampMs = /[\+\-]?\d+(\.\d{1,3})?/, parseTokenOrdinal = /\d{1,2}/, parseTokenOneDigit = /\d/, parseTokenTwoDigits = /\d\d/, parseTokenThreeDigits = /\d{3}/, parseTokenFourDigits = /\d{4}/, parseTokenSixDigits = /[+-]?\d{6}/, parseTokenSignedNumber = /[+-]?\d+/, isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/, isoFormat = 'YYYY-MM-DDTHH:mm:ssZ', isoDates = [
+        var moment, VERSION = '2.8.2', globalScope = typeof global !== 'undefined' ? global : this, oldGlobalMoment, round = Math.round, hasOwnProperty = Object.prototype.hasOwnProperty, i, YEAR = 0, MONTH = 1, DATE = 2, HOUR = 3, MINUTE = 4, SECOND = 5, MILLISECOND = 6, locales = {}, momentProperties = [], hasModule = typeof module !== 'undefined' && module.exports, aspNetJsonRegex = /^\/?Date\((\-?\d+)/i, aspNetTimeSpanJsonRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/, isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/, formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|X|zz?|ZZ?|.)/g, localFormattingTokens = /(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g, parseTokenOneOrTwoDigits = /\d\d?/, parseTokenOneToThreeDigits = /\d{1,3}/, parseTokenOneToFourDigits = /\d{1,4}/, parseTokenOneToSixDigits = /[+\-]?\d{1,6}/, parseTokenDigits = /\d+/, parseTokenWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i, parseTokenTimezone = /Z|[\+\-]\d\d:?\d\d/gi, parseTokenT = /T/i, parseTokenTimestampMs = /[\+\-]?\d+(\.\d{1,3})?/, parseTokenOrdinal = /\d{1,2}/, parseTokenOneDigit = /\d/, parseTokenTwoDigits = /\d\d/, parseTokenThreeDigits = /\d{3}/, parseTokenFourDigits = /\d{4}/, parseTokenSixDigits = /[+-]?\d{6}/, parseTokenSignedNumber = /[+-]?\d+/, isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/, isoFormat = 'YYYY-MM-DDTHH:mm:ssZ', isoDates = [
                 [
                     'YYYYYY-MM-DD',
                     /[+-]\d{6}-\d{2}-\d{2}/
@@ -243,6 +243,9 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 throw new Error('Implement me');
             }
         }
+        function hasOwnProp(a, b) {
+            return hasOwnProperty.call(a, b);
+        }
         function defaultParsingFlags() {
             return {
                 empty: false,
@@ -317,14 +320,14 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
         }
         function extend(a, b) {
             for (var i in b) {
-                if (b.hasOwnProperty(i)) {
+                if (hasOwnProp(b, i)) {
                     a[i] = b[i];
                 }
             }
-            if (b.hasOwnProperty('toString')) {
+            if (hasOwnProp(b, 'toString')) {
                 a.toString = b.toString;
             }
-            if (b.hasOwnProperty('valueOf')) {
+            if (hasOwnProp(b, 'valueOf')) {
                 a.valueOf = b.valueOf;
             }
             return a;
@@ -466,7 +469,7 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
         function normalizeObjectUnits(inputObject) {
             var normalizedInput = {}, normalizedProp, prop;
             for (prop in inputObject) {
-                if (inputObject.hasOwnProperty(prop)) {
+                if (hasOwnProp(inputObject, prop)) {
                     normalizedProp = normalizeUnits(prop);
                     if (normalizedProp) {
                         normalizedInput[normalizedProp] = inputObject[prop];
@@ -1432,7 +1435,7 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 duration.M = diffRes.months;
             }
             ret = new Duration(duration);
-            if (moment.isDuration(input) && input.hasOwnProperty('_locale')) {
+            if (moment.isDuration(input) && hasOwnProp(input, '_locale')) {
                 ret._locale = input._locale;
             }
             return ret;
@@ -1506,7 +1509,7 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
             return chooseLocale(key);
         };
         moment.isMoment = function (obj) {
-            return obj instanceof Moment || obj != null && obj.hasOwnProperty('_isAMomentObject');
+            return obj instanceof Moment || obj != null && hasOwnProp(obj, '_isAMomentObject');
         };
         moment.isDuration = function (obj) {
             return obj instanceof Duration;
@@ -1814,7 +1817,12 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 }
             },
             lang: deprecate('moment().lang() is deprecated. Use moment().localeData() instead.', function (key) {
-                return this.localeData(key);
+                if (key === undefined) {
+                    return this.localeData();
+                } else {
+                    this._locale = moment.localeData(key);
+                    return this;
+                }
             }),
             localeData: function () {
                 return this._locale;
@@ -1982,13 +1990,14 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 return this._locale;
             }
         });
+        moment.duration.fn.toString = moment.duration.fn.toISOString;
         function makeDurationGetter(name) {
             moment.duration.fn[name] = function () {
                 return this._data[name];
             };
         }
         for (i in unitMillisecondFactors) {
-            if (unitMillisecondFactors.hasOwnProperty(i)) {
+            if (hasOwnProp(unitMillisecondFactors, i)) {
                 makeDurationGetter(i.toLowerCase());
             }
         }
@@ -13129,430 +13138,337 @@ define('vendor/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.es
             Picker = f(jquery, moment);
         };
     define.amd = true;
-    (function (n) {
-        if (typeof define == 'function' && define.amd)
+    !function (a, b) {
+        'use strict';
+        if ('function' == typeof define && define.amd)
             define([
                 'jquery',
                 'moment'
-            ], n);
-        else if (jQuery)
-            if (moment)
-                n(jQuery, moment);
-            else
-                throw 'bootstrap-datetimepicker requires moment.js to be loaded first';
-        else
-            throw 'bootstrap-datetimepicker requires jQuery to be loaded first';
-    }(function (n, t) {
-        if (typeof t == 'undefined') {
-            alert('momentjs is requried');
-            throw new Error('momentjs is required');
+            ], b);
+        else if ('object' == typeof exports)
+            b(require('jquery'), require('moment'));
+        else {
+            if (!jQuery)
+                throw new Error('bootstrap-datetimepicker requires jQuery to be loaded first');
+            if (!moment)
+                throw new Error('bootstrap-datetimepicker requires moment.js to be loaded first');
+            b(a.jQuery, moment);
         }
-        var u = 0, r = t, f = function (t, f) {
-                var st = {
-                        pickDate: !0,
-                        pickTime: !0,
-                        useMinutes: !0,
-                        useSeconds: !1,
-                        useCurrent: !0,
-                        minuteStepping: 1,
-                        minDate: new r({ y: 1900 }),
-                        maxDate: new r().add(100, 'y'),
-                        showToday: !0,
-                        collapse: !0,
-                        language: 'en',
-                        defaultDate: '',
-                        disabledDates: !1,
-                        enabledDates: !1,
-                        icons: {},
-                        useStrict: !1,
-                        direction: 'auto',
-                        sideBySide: !1,
-                        daysOfWeekDisabled: !1
-                    }, ht = {
+    }(this, function (a, b) {
+        'use strict';
+        if ('undefined' == typeof b)
+            throw new Error('momentjs is required');
+        var c = 0, d = function (d, e) {
+                var f, g = a.fn.datetimepicker.defaults, h = {
                         time: 'glyphicon glyphicon-time',
                         date: 'glyphicon glyphicon-calendar',
                         up: 'glyphicon glyphicon-chevron-up',
                         down: 'glyphicon glyphicon-chevron-down'
-                    }, e = this, ct = function () {
-                        var i = !1, o, h, s;
-                        if (e.options = n.extend({}, st, f), e.options.icons = n.extend({}, ht, e.options.icons), e.element = n(t), lt(), !(e.options.pickTime || e.options.pickDate))
+                    }, i = this, j = !1, k = function () {
+                        var f, j, k = !1;
+                        if (i.options = a.extend({}, g, e), i.options.icons = a.extend({}, h, i.options.icons), i.element = a(d), m(), !i.options.pickTime && !i.options.pickDate)
                             throw new Error('Must choose at least one picker');
-                        if (e.id = u++, r.lang(e.options.language), e.date = r(), e.unset = !1, e.isInput = e.element.is('input'), e.component = !1, e.element.hasClass('input-group') && (e.component = e.element.find('.datepickerbutton').size() == 0 ? e.element.find('[class^=\'input-group-\']') : e.element.find('.datepickerbutton')), e.format = e.options.format, o = r()._lang._longDateFormat, e.format || (e.format = e.options.pickDate ? o.L : '', e.options.pickDate && e.options.pickTime && (e.format += ' '), e.format += e.options.pickTime ? o.LT : '', e.options.useSeconds && (~o.LT.indexOf(' A') ? e.format = e.format.split(' A')[0] + ':ss A' : e.format += ':ss')), e.use24hours = e.format.toLowerCase().indexOf('a') < 1, e.component && (i = e.component.find('span')), e.options.pickTime && i && i.addClass(e.options.icons.time), e.options.pickDate && i && (i.removeClass(e.options.icons.time), i.addClass(e.options.icons.date)), e.widget = n(ni()).appendTo('body'), e.options.useSeconds && !e.use24hours && e.widget.width(300), e.minViewMode = e.options.minViewMode || 0, typeof e.minViewMode == 'string')
-                            switch (e.minViewMode) {
+                        if (i.id = c++, b.locale(i.options.language), i.date = b(), i.unset = !1, i.isInput = i.element.is('input'), i.component = !1, i.element.hasClass('input-group') && (i.component = i.element.find(0 === i.element.find('.datepickerbutton').size() ? '[class^="input-group-"]' : '.datepickerbutton')), i.format = i.options.format, f = b().localeData(), i.format || (i.format = i.options.pickDate ? f.longDateFormat('L') : '', i.options.pickDate && i.options.pickTime && (i.format += ' '), i.format += i.options.pickTime ? f.longDateFormat('LT') : '', i.options.useSeconds && (-1 !== f.longDateFormat('LT').indexOf(' A') ? i.format = i.format.split(' A')[0] + ':ss A' : i.format += ':ss')), i.use24hours = i.format.toLowerCase().indexOf('a') < 0 && i.format.indexOf('h') < 0, i.component && (k = i.component.find('span')), i.options.pickTime && k && k.addClass(i.options.icons.time), i.options.pickDate && k && (k.removeClass(i.options.icons.time), k.addClass(i.options.icons.date)), i.options.widgetParent = 'string' == typeof i.options.widgetParent && i.options.widgetParent || i.element.parents().filter(function () {
+                                return 'scroll' === a(this).css('overflow-y');
+                            }).get(0) || 'body', i.widget = a(Q()).appendTo(i.options.widgetParent), i.minViewMode = i.options.minViewMode || 0, 'string' == typeof i.minViewMode)
+                            switch (i.minViewMode) {
                             case 'months':
-                                e.minViewMode = 1;
+                                i.minViewMode = 1;
                                 break;
                             case 'years':
-                                e.minViewMode = 2;
+                                i.minViewMode = 2;
                                 break;
                             default:
-                                e.minViewMode = 0;
+                                i.minViewMode = 0;
                             }
-                        if (e.viewMode = e.options.viewMode || 0, typeof e.viewMode == 'string')
-                            switch (e.viewMode) {
+                        if (i.viewMode = i.options.viewMode || 0, 'string' == typeof i.viewMode)
+                            switch (i.viewMode) {
                             case 'months':
-                                e.viewMode = 1;
+                                i.viewMode = 1;
                                 break;
                             case 'years':
-                                e.viewMode = 2;
+                                i.viewMode = 2;
                                 break;
                             default:
-                                e.viewMode = 0;
+                                i.viewMode = 0;
                             }
-                        e.options.disabledDates = d(e.options.disabledDates);
-                        e.options.enabledDates = d(e.options.enabledDates);
-                        e.startViewMode = e.viewMode;
-                        e.setMinDate(e.options.minDate);
-                        e.setMaxDate(e.options.maxDate);
-                        at();
-                        vt();
-                        yt();
-                        pt();
-                        wt();
-                        l();
-                        b();
-                        ut();
-                        e.options.defaultDate !== '' && p().val() == '' && e.setValue(e.options.defaultDate);
-                        e.options.minuteStepping !== 1 && (h = e.date.minutes(), s = e.options.minuteStepping, e.date.minutes(Math.round(h / s) * s % 60).seconds(0));
-                    }, p = function () {
-                        return e.isInput ? e.element : dateStr = e.element.find('input');
-                    }, lt = function () {
-                        var n;
-                        n = e.element.is('input') ? e.element.data() : e.element.data();
-                        n.dateFormat !== undefined && (e.options.format = n.dateFormat);
-                        n.datePickdate !== undefined && (e.options.pickDate = n.datePickdate);
-                        n.datePicktime !== undefined && (e.options.pickTime = n.datePicktime);
-                        n.dateUseminutes !== undefined && (e.options.useMinutes = n.dateUseminutes);
-                        n.dateUseseconds !== undefined && (e.options.useSeconds = n.dateUseseconds);
-                        n.dateUsecurrent !== undefined && (e.options.useCurrent = n.dateUsecurrent);
-                        n.dateMinutestepping !== undefined && (e.options.minuteStepping = n.dateMinutestepping);
-                        n.dateMindate !== undefined && (e.options.minDate = n.dateMindate);
-                        n.dateMaxdate !== undefined && (e.options.maxDate = n.dateMaxdate);
-                        n.dateShowtoday !== undefined && (e.options.showToday = n.dateShowtoday);
-                        n.dateCollapse !== undefined && (e.options.collapse = n.dateCollapse);
-                        n.dateLanguage !== undefined && (e.options.language = n.dateLanguage);
-                        n.dateDefaultdate !== undefined && (e.options.defaultDate = n.dateDefaultdate);
-                        n.dateDisableddates !== undefined && (e.options.disabledDates = n.dateDisableddates);
-                        n.dateEnableddates !== undefined && (e.options.enabledDates = n.dateEnableddates);
-                        n.dateIcons !== undefined && (e.options.icons = n.dateIcons);
-                        n.dateUsestrict !== undefined && (e.options.useStrict = n.dateUsestrict);
-                        n.dateDirection !== undefined && (e.options.direction = n.dateDirection);
-                        n.dateSidebyside !== undefined && (e.options.sideBySide = n.dateSidebyside);
-                    }, it = function () {
-                        var u = 'absolute', t = e.component ? e.component.offset() : e.element.offset(), i = n(window), r;
-                        e.width = e.component ? e.component.outerWidth() : e.element.outerWidth();
-                        t.top = t.top + e.element.outerHeight();
-                        e.options.direction === 'up' ? r = 'top' : e.options.direction === 'bottom' ? r = 'bottom' : e.options.direction === 'auto' && (r = t.top + e.widget.height() > i.height() + i.scrollTop() && e.widget.height() + e.element.outerHeight() < t.top ? 'top' : 'bottom');
-                        r === 'top' ? (t.top -= e.widget.height() + e.element.outerHeight() + 15, e.widget.addClass('top').removeClass('bottom')) : (t.top += 1, e.widget.addClass('bottom').removeClass('top'));
-                        e.options.width !== undefined && e.widget.width(e.options.width);
-                        e.options.orientation === 'left' && (e.widget.addClass('left-oriented'), t.left = t.left - e.widget.width() + 20);
-                        gt() && (u = 'fixed', t.top -= i.scrollTop(), t.left -= i.scrollLeft());
-                        i.width() < t.left + e.widget.outerWidth() ? (t.right = i.width() - t.left - e.width, t.left = 'auto', e.widget.addClass('pull-right')) : (t.right = 'auto', e.widget.removeClass('pull-right'));
-                        e.widget.css({
-                            position: u,
-                            top: t.top,
-                            left: t.left,
-                            right: t.right
+                        i.viewMode = Math.max(i.viewMode, i.minViewMode), i.options.disabledDates = O(i.options.disabledDates), i.options.enabledDates = O(i.options.enabledDates), i.startViewMode = i.viewMode, i.setMinDate(i.options.minDate), i.setMaxDate(i.options.maxDate), r(), s(), u(), v(), w(), q(), E(), l().prop('disabled') || F(), '' !== i.options.defaultDate && '' === l().val() && i.setValue(i.options.defaultDate), 1 !== i.options.minuteStepping && (j = i.options.minuteStepping, i.date.minutes(Math.round(i.date.minutes() / j) * j % 60).seconds(0));
+                    }, l = function () {
+                        var a;
+                        if (i.isInput)
+                            return i.element;
+                        if (a = i.element.find('.datepickerinput'), 0 === a.size())
+                            a = i.element.find('input');
+                        else if (!a.is('input'))
+                            throw new Error('CSS class "datepickerinput" cannot be applied to non input element');
+                        return a;
+                    }, m = function () {
+                        var a;
+                        a = i.element.is('input') ? i.element.data() : i.element.find('input').data(), void 0 !== a.dateFormat && (i.options.format = a.dateFormat), void 0 !== a.datePickdate && (i.options.pickDate = a.datePickdate), void 0 !== a.datePicktime && (i.options.pickTime = a.datePicktime), void 0 !== a.dateUseminutes && (i.options.useMinutes = a.dateUseminutes), void 0 !== a.dateUseseconds && (i.options.useSeconds = a.dateUseseconds), void 0 !== a.dateUsecurrent && (i.options.useCurrent = a.dateUsecurrent), void 0 !== a.calendarWeeks && (i.options.calendarWeeks = a.calendarWeeks), void 0 !== a.dateMinutestepping && (i.options.minuteStepping = a.dateMinutestepping), void 0 !== a.dateMindate && (i.options.minDate = a.dateMindate), void 0 !== a.dateMaxdate && (i.options.maxDate = a.dateMaxdate), void 0 !== a.dateShowtoday && (i.options.showToday = a.dateShowtoday), void 0 !== a.dateCollapse && (i.options.collapse = a.dateCollapse), void 0 !== a.dateLanguage && (i.options.language = a.dateLanguage), void 0 !== a.dateDefaultdate && (i.options.defaultDate = a.dateDefaultdate), void 0 !== a.dateDisableddates && (i.options.disabledDates = a.dateDisableddates), void 0 !== a.dateEnableddates && (i.options.enabledDates = a.dateEnableddates), void 0 !== a.dateIcons && (i.options.icons = a.dateIcons), void 0 !== a.dateUsestrict && (i.options.useStrict = a.dateUsestrict), void 0 !== a.dateDirection && (i.options.direction = a.dateDirection), void 0 !== a.dateSidebyside && (i.options.sideBySide = a.dateSidebyside), void 0 !== a.dateDaysofweekdisabled && (i.options.daysOfWeekDisabled = a.dateDaysofweekdisabled);
+                    }, n = function () {
+                        var b, c = 'absolute', d = i.component ? i.component.offset() : i.element.offset(), e = a(window);
+                        i.width = i.component ? i.component.outerWidth() : i.element.outerWidth(), d.top = d.top + i.element.outerHeight(), 'up' === i.options.direction ? b = 'top' : 'bottom' === i.options.direction ? b = 'bottom' : 'auto' === i.options.direction && (b = d.top + i.widget.height() > e.height() + e.scrollTop() && i.widget.height() + i.element.outerHeight() < d.top ? 'top' : 'bottom'), 'top' === b ? (d.bottom = e.height() - d.top + i.element.outerHeight() + 3, i.widget.addClass('top').removeClass('bottom')) : (d.top += 1, i.widget.addClass('bottom').removeClass('top')), void 0 !== i.options.width && i.widget.width(i.options.width), 'left' === i.options.orientation && (i.widget.addClass('left-oriented'), d.left = d.left - i.widget.width() + 20), J() && (c = 'fixed', d.top -= e.scrollTop(), d.left -= e.scrollLeft()), e.width() < d.left + i.widget.outerWidth() ? (d.right = e.width() - d.left - i.width, d.left = 'auto', i.widget.addClass('pull-right')) : (d.right = 'auto', i.widget.removeClass('pull-right')), i.widget.css('top' === b ? {
+                            position: c,
+                            bottom: d.bottom,
+                            top: 'auto',
+                            left: d.left,
+                            right: d.right
+                        } : {
+                            position: c,
+                            top: d.top,
+                            bottom: 'auto',
+                            left: d.left,
+                            right: d.right
                         });
-                    }, c = function (n, t) {
-                        r(e.date).isSame(r(n)) || (e.element.trigger({
+                    }, o = function (a, c) {
+                        (!b(i.date).isSame(b(a)) || j) && (j = !1, i.element.trigger({
                             type: 'dp.change',
-                            date: r(e.date),
-                            oldDate: r(n)
-                        }), t !== 'change' && e.element.change());
-                    }, g = function (n) {
-                        e.element.trigger({
+                            date: b(i.date),
+                            oldDate: b(a)
+                        }), 'change' !== c && i.element.change());
+                    }, p = function (a) {
+                        j = !0, i.element.trigger({
                             type: 'dp.error',
-                            date: r(n)
+                            date: b(a, i.format, i.options.useStrict)
                         });
-                    }, l = function (n) {
-                        r.lang(e.options.language);
-                        var t = n;
-                        t || (t = p().val(), t && (e.date = r(t, e.format, e.options.useStrict)), e.date || (e.date = r()));
-                        e.viewDate = r(e.date).startOf('month');
-                        y();
-                        nt();
-                    }, at = function () {
-                        r.lang(e.options.language);
-                        var i = n('<tr>'), u = r.weekdaysMin(), t;
-                        if (r()._lang._week.dow == 0)
-                            for (t = 0; t < 7; t++)
-                                i.append('<th class="dow">' + u[t] + '</th>');
+                    }, q = function (a) {
+                        b.locale(i.options.language);
+                        var c = a;
+                        c || (c = l().val(), c && (i.date = b(c, i.format, i.options.useStrict)), i.date || (i.date = b())), i.viewDate = b(i.date).startOf('month'), t(), x();
+                    }, r = function () {
+                        b.locale(i.options.language);
+                        var c, d = a('<tr>'), e = b.weekdaysMin();
+                        if (i.options.calendarWeeks === !0 && d.append('<th class="cw">#</th>'), 0 === b().localeData()._week.dow)
+                            for (c = 0; 7 > c; c++)
+                                d.append('<th class="dow">' + e[c] + '</th>');
                         else
-                            for (t = 1; t < 8; t++)
-                                t == 7 ? i.append('<th class="dow">' + u[0] + '</th>') : i.append('<th class="dow">' + u[t] + '</th>');
-                        e.widget.find('.datepicker-days thead').append(i);
-                    }, vt = function () {
-                        r.lang(e.options.language);
-                        for (var n = '', t = 0, i = r.monthsShort(); t < 12;)
-                            n += '<span class="month">' + i[t++] + '</span>';
-                        e.widget.find('.datepicker-months td').append(n);
-                    }, y = function () {
-                        r.lang(e.options.language);
-                        var t = e.viewDate.year(), h = e.viewDate.month(), o = e.options.minDate.year(), y = e.options.minDate.month(), s = e.options.maxDate.year(), p = e.options.maxDate.month(), i, w, c = [], v, f, u, b, d, l, a = r.months();
-                        for (e.widget.find('.datepicker-days').find('.disabled').removeClass('disabled'), e.widget.find('.datepicker-months').find('.disabled').removeClass('disabled'), e.widget.find('.datepicker-years').find('.disabled').removeClass('disabled'), e.widget.find('.datepicker-days th:eq(1)').text(a[h] + ' ' + t), i = r(e.viewDate).subtract('months', 1), b = i.daysInMonth(), i.date(b).startOf('week'), (t == o && h <= y || t < o) && e.widget.find('.datepicker-days th:eq(0)').addClass('disabled'), (t == s && h >= p || t > s) && e.widget.find('.datepicker-days th:eq(2)').addClass('disabled'), w = r(i).add(42, 'd'); i.isBefore(w);) {
-                            if (i.weekday() === r().startOf('week').weekday() && (v = n('<tr>'), c.push(v)), f = '', i.year() < t || i.year() == t && i.month() < h ? f += ' old' : (i.year() > t || i.year() == t && i.month() > h) && (f += ' new'), i.isSame(r({
-                                    y: e.date.year(),
-                                    M: e.date.month(),
-                                    d: e.date.date()
-                                })) && (f += ' active'), (k(i) || !ot(i)) && (f += ' disabled'), e.options.showToday === !0 && i.isSame(r(), 'day') && (f += ' today'), e.options.daysOfWeekDisabled)
-                                for (u in e.options.daysOfWeekDisabled)
-                                    if (i.day() == e.options.daysOfWeekDisabled[u]) {
-                                        f += ' disabled';
-                                        break;
-                                    }
-                            v.append('<td class="day' + f + '">' + i.date() + '</td>');
-                            i.add(1, 'd');
+                            for (c = 1; 8 > c; c++)
+                                d.append(7 === c ? '<th class="dow">' + e[0] + '</th>' : '<th class="dow">' + e[c] + '</th>');
+                        i.widget.find('.datepicker-days thead').append(d);
+                    }, s = function () {
+                        b.locale(i.options.language);
+                        var a, c = '', d = b.monthsShort();
+                        for (a = 0; 12 > a; a++)
+                            c += '<span class="month">' + d[a] + '</span>';
+                        i.widget.find('.datepicker-months td').append(c);
+                    }, t = function () {
+                        if (i.options.pickDate) {
+                            b.locale(i.options.language);
+                            var c, d, e, f, g, h, j, k, l, m = i.viewDate.year(), n = i.viewDate.month(), o = i.options.minDate.year(), p = i.options.minDate.month(), q = i.options.maxDate.year(), r = i.options.maxDate.month(), s = [], t = b.months();
+                            for (i.widget.find('.datepicker-days').find('.disabled').removeClass('disabled'), i.widget.find('.datepicker-months').find('.disabled').removeClass('disabled'), i.widget.find('.datepicker-years').find('.disabled').removeClass('disabled'), i.widget.find('.datepicker-days th:eq(1)').text(t[n] + ' ' + m), d = b(i.viewDate, i.format, i.options.useStrict).subtract(1, 'months'), j = d.daysInMonth(), d.date(j).startOf('week'), (m === o && p >= n || o > m) && i.widget.find('.datepicker-days th:eq(0)').addClass('disabled'), (m === q && n >= r || m > q) && i.widget.find('.datepicker-days th:eq(2)').addClass('disabled'), e = b(d).add(42, 'd'); d.isBefore(e);) {
+                                if (d.weekday() === b().startOf('week').weekday() && (f = a('<tr>'), s.push(f), i.options.calendarWeeks === !0 && f.append('<td class="cw">' + d.week() + '</td>')), g = '', d.year() < m || d.year() === m && d.month() < n ? g += ' old' : (d.year() > m || d.year() === m && d.month() > n) && (g += ' new'), d.isSame(b({
+                                        y: i.date.year(),
+                                        M: i.date.month(),
+                                        d: i.date.date()
+                                    })) && (g += ' active'), (M(d, 'day') || !N(d)) && (g += ' disabled'), i.options.showToday === !0 && d.isSame(b(), 'day') && (g += ' today'), i.options.daysOfWeekDisabled)
+                                    for (h = 0; h < i.options.daysOfWeekDisabled.length; h++)
+                                        if (d.day() === i.options.daysOfWeekDisabled[h]) {
+                                            g += ' disabled';
+                                            break;
+                                        }
+                                f.append('<td class="day' + g + '">' + d.date() + '</td>'), c = d.date(), d.add(1, 'd'), c === d.date() && d.add(1, 'd');
+                            }
+                            for (i.widget.find('.datepicker-days tbody').empty().append(s), l = i.date.year(), t = i.widget.find('.datepicker-months').find('th:eq(1)').text(m).end().find('span').removeClass('active'), l === m && t.eq(i.date.month()).addClass('active'), o > m - 1 && i.widget.find('.datepicker-months th:eq(0)').addClass('disabled'), m + 1 > q && i.widget.find('.datepicker-months th:eq(2)').addClass('disabled'), h = 0; 12 > h; h++)
+                                m === o && p > h || o > m ? a(t[h]).addClass('disabled') : (m === q && h > r || m > q) && a(t[h]).addClass('disabled');
+                            for (s = '', m = 10 * parseInt(m / 10, 10), k = i.widget.find('.datepicker-years').find('th:eq(1)').text(m + '-' + (m + 9)).parents('table').find('td'), i.widget.find('.datepicker-years').find('th').removeClass('disabled'), o > m && i.widget.find('.datepicker-years').find('th:eq(0)').addClass('disabled'), m + 9 > q && i.widget.find('.datepicker-years').find('th:eq(2)').addClass('disabled'), m -= 1, h = -1; 11 > h; h++)
+                                s += '<span class="year' + (-1 === h || 10 === h ? ' old' : '') + (l === m ? ' active' : '') + (o > m || m > q ? ' disabled' : '') + '">' + m + '</span>', m += 1;
+                            k.html(s);
                         }
-                        for (e.widget.find('.datepicker-days tbody').empty().append(c), l = e.date.year(), a = e.widget.find('.datepicker-months').find('th:eq(1)').text(t).end().find('span').removeClass('active'), l === t && a.eq(e.date.month()).addClass('active'), l - 1 < o && e.widget.find('.datepicker-months th:eq(0)').addClass('disabled'), l + 1 > s && e.widget.find('.datepicker-months th:eq(2)').addClass('disabled'), u = 0; u < 12; u++)
-                            t == o && y > u || t < o ? n(a[u]).addClass('disabled') : (t == s && p < u || t > s) && n(a[u]).addClass('disabled');
-                        for (c = '', t = parseInt(t / 10, 10) * 10, d = e.widget.find('.datepicker-years').find('th:eq(1)').text(t + '-' + (t + 9)).end().find('td'), e.widget.find('.datepicker-years').find('th').removeClass('disabled'), o > t && e.widget.find('.datepicker-years').find('th:eq(0)').addClass('disabled'), s < t + 9 && e.widget.find('.datepicker-years').find('th:eq(2)').addClass('disabled'), t -= 1, u = -1; u < 11; u++)
-                            c += '<span class="year' + (u === -1 || u === 10 ? ' old' : '') + (l === t ? ' active' : '') + (t < o || t > s ? ' disabled' : '') + '">' + t + '</span>', t += 1;
-                        d.html(c);
-                    }, yt = function () {
-                        r.lang(e.options.language);
-                        var f = e.widget.find('.timepicker .timepicker-hours table'), n = '', t, i, u;
-                        if (f.parent().hide(), e.use24hours)
-                            for (t = 0, i = 0; i < 6; i += 1) {
-                                for (n += '<tr>', u = 0; u < 4; u += 1)
-                                    n += '<td class="hour">' + s(t.toString()) + '</td>', t++;
-                                n += '</tr>';
+                    }, u = function () {
+                        b.locale(i.options.language);
+                        var a, c, d, e = i.widget.find('.timepicker .timepicker-hours table'), f = '';
+                        if (e.parent().hide(), i.use24hours)
+                            for (a = 0, c = 0; 6 > c; c += 1) {
+                                for (f += '<tr>', d = 0; 4 > d; d += 1)
+                                    f += '<td class="hour">' + P(a.toString()) + '</td>', a++;
+                                f += '</tr>';
                             }
                         else
-                            for (t = 1, i = 0; i < 3; i += 1) {
-                                for (n += '<tr>', u = 0; u < 4; u += 1)
-                                    n += '<td class="hour">' + s(t.toString()) + '</td>', t++;
-                                n += '</tr>';
+                            for (a = 1, c = 0; 3 > c; c += 1) {
+                                for (f += '<tr>', d = 0; 4 > d; d += 1)
+                                    f += '<td class="hour">' + P(a.toString()) + '</td>', a++;
+                                f += '</tr>';
                             }
-                        f.html(n);
-                    }, pt = function () {
-                        var f = e.widget.find('.timepicker .timepicker-minutes table'), n = '', i = 0, r, u, t = e.options.minuteStepping;
-                        for (f.parent().hide(), (t = 1) && (t = 5), r = 0; r < Math.ceil(15 / t); r++) {
-                            for (n += '<tr>', u = 0; u < 4; u += 1)
-                                i < 60 ? (n += '<td class="minute">' + s(i.toString()) + '</td>', i += t) : n += '<td></td>';
-                            n += '</tr>';
+                        e.html(f);
+                    }, v = function () {
+                        var a, b, c = i.widget.find('.timepicker .timepicker-minutes table'), d = '', e = 0, f = i.options.minuteStepping;
+                        for (c.parent().hide(), 1 === f && (f = 5), a = 0; a < Math.ceil(60 / f / 4); a++) {
+                            for (d += '<tr>', b = 0; 4 > b; b += 1)
+                                60 > e ? (d += '<td class="minute">' + P(e.toString()) + '</td>', e += f) : d += '<td></td>';
+                            d += '</tr>';
                         }
-                        f.html(n);
-                    }, wt = function () {
-                        var r = e.widget.find('.timepicker .timepicker-seconds table'), n = '', u = 0, t, i;
-                        for (r.parent().hide(), t = 0; t < 3; t++) {
-                            for (n += '<tr>', i = 0; i < 4; i += 1)
-                                n += '<td class="second">' + s(u.toString()) + '</td>', u += 5;
-                            n += '</tr>';
+                        c.html(d);
+                    }, w = function () {
+                        var a, b, c = i.widget.find('.timepicker .timepicker-seconds table'), d = '', e = 0;
+                        for (c.parent().hide(), a = 0; 3 > a; a++) {
+                            for (d += '<tr>', b = 0; 4 > b; b += 1)
+                                d += '<td class="second">' + P(e.toString()) + '</td>', e += 5;
+                            d += '</tr>';
                         }
-                        r.html(n);
-                    }, nt = function () {
-                        if (e.date) {
-                            var t = e.widget.find('.timepicker span[data-time-component]'), n = e.date.hours(), i = 'AM';
-                            e.use24hours || (n >= 12 && (i = 'PM'), n === 0 ? n = 12 : n != 12 && (n = n % 12), e.widget.find('.timepicker [data-action=togglePeriod]').text(i));
-                            t.filter('[data-time-component=hours]').text(s(n));
-                            t.filter('[data-time-component=minutes]').text(s(e.date.minutes()));
-                            t.filter('[data-time-component=seconds]').text(s(e.date.second()));
+                        c.html(d);
+                    }, x = function () {
+                        if (i.date) {
+                            var a = i.widget.find('.timepicker span[data-time-component]'), b = i.date.hours(), c = i.date.format('A');
+                            i.use24hours || (0 === b ? b = 12 : 12 !== b && (b %= 12), i.widget.find('.timepicker [data-action=togglePeriod]').text(c)), a.filter('[data-time-component=hours]').text(P(b)), a.filter('[data-time-component=minutes]').text(P(i.date.minutes())), a.filter('[data-time-component=seconds]').text(P(i.date.second()));
                         }
-                    }, bt = function (t) {
-                        t.stopPropagation();
-                        t.preventDefault();
-                        e.unset = !1;
-                        var i = n(t.target).closest('span, td, th'), u, f, s, h, l = r(e.date);
-                        if (i.length === 1 && !i.is('.disabled'))
-                            switch (i[0].nodeName.toLowerCase()) {
+                    }, y = function (c) {
+                        c.stopPropagation(), c.preventDefault(), i.unset = !1;
+                        var d, e, f, g, h = a(c.target).closest('span, td, th'), j = b(i.date);
+                        if (1 === h.length && !h.is('.disabled'))
+                            switch (h[0].nodeName.toLowerCase()) {
                             case 'th':
-                                switch (i[0].className) {
-                                case 'switch':
-                                    b(1);
+                                switch (h[0].className) {
+                                case 'picker-switch':
+                                    E(1);
                                     break;
                                 case 'prev':
                                 case 'next':
-                                    s = o.modes[e.viewMode].navStep;
-                                    i[0].className === 'prev' && (s = s * -1);
-                                    e.viewDate.add(s, o.modes[e.viewMode].navFnc);
-                                    y();
+                                    f = R.modes[i.viewMode].navStep, 'prev' === h[0].className && (f = -1 * f), i.viewDate.add(f, R.modes[i.viewMode].navFnc), t();
                                 }
                                 break;
                             case 'span':
-                                i.is('.month') ? (u = i.parent().find('span').index(i), e.viewDate.month(u)) : (f = parseInt(i.text(), 10) || 0, e.viewDate.year(f));
-                                e.viewMode === e.minViewMode && (e.date = r({
-                                    y: e.viewDate.year(),
-                                    M: e.viewDate.month(),
-                                    d: e.viewDate.date(),
-                                    h: e.date.hours(),
-                                    m: e.date.minutes(),
-                                    s: e.date.seconds()
-                                }), c(l, t.type), a());
-                                b(-1);
-                                y();
+                                h.is('.month') ? (d = h.parent().find('span').index(h), i.viewDate.month(d)) : (e = parseInt(h.text(), 10) || 0, i.viewDate.year(e)), i.viewMode === i.minViewMode && (i.date = b({
+                                    y: i.viewDate.year(),
+                                    M: i.viewDate.month(),
+                                    d: i.viewDate.date(),
+                                    h: i.date.hours(),
+                                    m: i.date.minutes(),
+                                    s: i.date.seconds()
+                                }), K(), o(j, c.type)), E(-1), t();
                                 break;
                             case 'td':
-                                i.is('.day') && (h = parseInt(i.text(), 10) || 1, u = e.viewDate.month(), f = e.viewDate.year(), i.is('.old') ? u === 0 ? (u = 11, f -= 1) : u -= 1 : i.is('.new') && (u == 11 ? (u = 0, f += 1) : u += 1), e.date = r({
-                                    y: f,
-                                    M: u,
-                                    d: h,
-                                    h: e.date.hours(),
-                                    m: e.date.minutes(),
-                                    s: e.date.seconds()
-                                }), e.viewDate = r({
-                                    y: f,
-                                    M: u,
-                                    d: Math.min(28, h)
-                                }), y(), a(), c(l, t.type));
+                                h.is('.day') && (g = parseInt(h.text(), 10) || 1, d = i.viewDate.month(), e = i.viewDate.year(), h.is('.old') ? 0 === d ? (d = 11, e -= 1) : d -= 1 : h.is('.new') && (11 === d ? (d = 0, e += 1) : d += 1), i.date = b({
+                                    y: e,
+                                    M: d,
+                                    d: g,
+                                    h: i.date.hours(),
+                                    m: i.date.minutes(),
+                                    s: i.date.seconds()
+                                }), i.viewDate = b({
+                                    y: e,
+                                    M: d,
+                                    d: Math.min(28, g)
+                                }), t(), K(), o(j, c.type));
                             }
-                    }, w = {
+                    }, z = {
                         incrementHours: function () {
-                            v('add', 'hours', 1);
+                            L('add', 'hours', 1);
                         },
                         incrementMinutes: function () {
-                            v('add', 'minutes', e.options.minuteStepping);
+                            L('add', 'minutes', i.options.minuteStepping);
                         },
                         incrementSeconds: function () {
-                            v('add', 'seconds', 1);
+                            L('add', 'seconds', 1);
                         },
                         decrementHours: function () {
-                            v('subtract', 'hours', 1);
+                            L('subtract', 'hours', 1);
                         },
                         decrementMinutes: function () {
-                            v('subtract', 'minutes', e.options.minuteStepping);
+                            L('subtract', 'minutes', i.options.minuteStepping);
                         },
                         decrementSeconds: function () {
-                            v('subtract', 'seconds', 1);
+                            L('subtract', 'seconds', 1);
                         },
                         togglePeriod: function () {
-                            var n = e.date.hours();
-                            n >= 12 ? n -= 12 : n += 12;
-                            e.date.hours(n);
+                            var a = i.date.hours();
+                            a >= 12 ? a -= 12 : a += 12, i.date.hours(a);
                         },
                         showPicker: function () {
-                            e.widget.find('.timepicker > div:not(.timepicker-picker)').hide();
-                            e.widget.find('.timepicker .timepicker-picker').show();
+                            i.widget.find('.timepicker > div:not(.timepicker-picker)').hide(), i.widget.find('.timepicker .timepicker-picker').show();
                         },
                         showHours: function () {
-                            e.widget.find('.timepicker .timepicker-picker').hide();
-                            e.widget.find('.timepicker .timepicker-hours').show();
+                            i.widget.find('.timepicker .timepicker-picker').hide(), i.widget.find('.timepicker .timepicker-hours').show();
                         },
                         showMinutes: function () {
-                            e.widget.find('.timepicker .timepicker-picker').hide();
-                            e.widget.find('.timepicker .timepicker-minutes').show();
+                            i.widget.find('.timepicker .timepicker-picker').hide(), i.widget.find('.timepicker .timepicker-minutes').show();
                         },
                         showSeconds: function () {
-                            e.widget.find('.timepicker .timepicker-picker').hide();
-                            e.widget.find('.timepicker .timepicker-seconds').show();
+                            i.widget.find('.timepicker .timepicker-picker').hide(), i.widget.find('.timepicker .timepicker-seconds').show();
                         },
-                        selectHour: function (t) {
-                            var r = e.widget.find('.timepicker [data-action=togglePeriod]').text(), i = parseInt(n(t.target).text(), 10);
-                            r == 'PM' && (i += 12);
-                            e.date.hours(i);
-                            w.showPicker.call(e);
+                        selectHour: function (b) {
+                            var c = parseInt(a(b.target).text(), 10);
+                            i.use24hours || (i.date.hours() >= 12 ? 12 !== c && (c += 12) : 12 === c && (c = 0)), i.date.hours(c), z.showPicker.call(i);
                         },
-                        selectMinute: function (t) {
-                            e.date.minutes(parseInt(n(t.target).text(), 10));
-                            w.showPicker.call(e);
+                        selectMinute: function (b) {
+                            i.date.minutes(parseInt(a(b.target).text(), 10)), z.showPicker.call(i);
                         },
-                        selectSecond: function (t) {
-                            e.date.seconds(parseInt(n(t.target).text(), 10));
-                            w.showPicker.call(e);
+                        selectSecond: function (b) {
+                            i.date.seconds(parseInt(a(b.target).text(), 10)), z.showPicker.call(i);
                         }
-                    }, kt = function (t) {
-                        var i = r(e.date), u = n(t.currentTarget).data('action'), f = w[u].apply(e, arguments);
-                        return tt(t), e.date || (e.date = r({ y: 1970 })), a(), nt(), c(i, t.type), f;
-                    }, tt = function (n) {
-                        n.stopPropagation();
-                        n.preventDefault();
-                    }, rt = function (t) {
-                        r.lang(e.options.language);
-                        var f = n(t.target), u = r(e.date), i = r(f.val(), e.format, e.options.useStrict);
-                        i.isValid() && !k(i) && ot(i) ? (l(), e.setValue(i), c(u, t.type), a()) : (e.viewDate = u, c(u, t.type), g(i), e.unset = !0);
-                    }, b = function (n) {
-                        n && (e.viewMode = Math.max(e.minViewMode, Math.min(2, e.viewMode + n)));
-                        var t = o.modes[e.viewMode].clsName;
-                        e.widget.find('.datepicker > div').hide().filter('.datepicker-' + o.modes[e.viewMode].clsName).show();
-                    }, ut = function () {
-                        var i, r, t, f, u;
-                        e.widget.on('click', '.datepicker *', n.proxy(bt, this));
-                        e.widget.on('click', '[data-action]', n.proxy(kt, this));
-                        e.widget.on('mousedown', n.proxy(tt, this));
-                        if (e.options.pickDate && e.options.pickTime)
-                            e.widget.on('click.togglePicker', '.accordion-toggle', function (o) {
-                                if (o.stopPropagation(), i = n(this), r = i.closest('ul'), t = r.find('.in'), f = r.find('.collapse:not(.in)'), t && t.length) {
-                                    if (u = t.data('collapse'), u && u.date - transitioning)
-                                        return;
-                                    t.collapse('hide');
-                                    f.collapse('show');
-                                    i.find('span').toggleClass(e.options.icons.time + ' ' + e.options.icons.date);
-                                    e.element.find('.input-group-addon span').toggleClass(e.options.icons.time + ' ' + e.options.icons.date);
-                                }
-                            });
-                        if (e.isInput)
-                            e.element.on({
-                                focus: n.proxy(e.show, this),
-                                change: n.proxy(rt, this),
-                                blur: n.proxy(e.hide, this)
-                            });
-                        else {
-                            e.element.on({ change: n.proxy(rt, this) }, 'input');
-                            if (e.component)
-                                e.component.on('click', n.proxy(e.show, this));
-                            else
-                                e.element.on('click', n.proxy(e.show, this));
-                        }
-                    }, dt = function () {
-                        n(window).on('resize.datetimepicker' + e.id, n.proxy(it, this));
-                        if (!e.isInput)
-                            n(document).on('mousedown.datetimepicker' + e.id, n.proxy(e.hide, this));
-                    }, ft = function () {
-                        e.widget.off('click', '.datepicker *', e.click);
-                        e.widget.off('click', '[data-action]');
-                        e.widget.off('mousedown', e.stopEvent);
-                        e.options.pickDate && e.options.pickTime && e.widget.off('click.togglePicker');
-                        e.isInput ? e.element.off({
-                            focus: e.show,
-                            change: e.change
-                        }) : (e.element.off({ change: e.change }, 'input'), e.component ? e.component.off('click', e.show) : e.element.off('click', e.show));
-                    }, et = function () {
-                        n(window).off('resize.datetimepicker' + e.id);
-                        e.isInput || n(document).off('mousedown.datetimepicker' + e.id);
-                    }, gt = function () {
-                        if (e.element) {
-                            for (var i = e.element.parents(), r = !1, t = 0; t < i.length; t++)
-                                if (n(i[t]).css('position') == 'fixed') {
-                                    r = !0;
+                    }, A = function (c) {
+                        var d = b(i.date), e = a(c.currentTarget).data('action'), f = z[e].apply(i, arguments);
+                        return B(c), i.date || (i.date = b({ y: 1970 })), K(), x(), o(d, c.type), f;
+                    }, B = function (a) {
+                        a.stopPropagation(), a.preventDefault();
+                    }, C = function (a) {
+                        27 === a.keyCode && i.hide();
+                    }, D = function (c) {
+                        b.locale(i.options.language);
+                        var d = a(c.target), e = b(i.date), f = b(d.val(), i.format, i.options.useStrict);
+                        f.isValid() && !M(f) && N(f) ? (q(), i.setValue(f), o(e, c.type), K()) : (i.viewDate = e, i.unset = !0, o(e, c.type), p(f));
+                    }, E = function (a) {
+                        a && (i.viewMode = Math.max(i.minViewMode, Math.min(2, i.viewMode + a))), i.widget.find('.datepicker > div').hide().filter('.datepicker-' + R.modes[i.viewMode].clsName).show();
+                    }, F = function () {
+                        var b, c, d, e, f;
+                        i.widget.on('click', '.datepicker *', a.proxy(y, this)), i.widget.on('click', '[data-action]', a.proxy(A, this)), i.widget.on('mousedown', a.proxy(B, this)), i.element.on('keydown', a.proxy(C, this)), i.options.pickDate && i.options.pickTime && i.widget.on('click.togglePicker', '.accordion-toggle', function (g) {
+                            if (g.stopPropagation(), b = a(this), c = b.closest('ul'), d = c.find('.in'), e = c.find('.collapse:not(.in)'), d && d.length) {
+                                if (f = d.data('collapse'), f && f.transitioning)
+                                    return;
+                                d.collapse('hide'), e.collapse('show'), b.find('span').toggleClass(i.options.icons.time + ' ' + i.options.icons.date), i.component && i.component.find('span').toggleClass(i.options.icons.time + ' ' + i.options.icons.date);
+                            }
+                        }), i.isInput ? i.element.on({
+                            click: a.proxy(i.show, this),
+                            focus: a.proxy(i.show, this),
+                            change: a.proxy(D, this),
+                            blur: a.proxy(i.hide, this)
+                        }) : (i.element.on({ change: a.proxy(D, this) }, 'input'), i.component ? (i.component.on('click', a.proxy(i.show, this)), i.component.on('mousedown', a.proxy(B, this))) : i.element.on('click', a.proxy(i.show, this)));
+                    }, G = function () {
+                        a(window).on('resize.datetimepicker' + i.id, a.proxy(n, this)), i.isInput || a(document).on('mousedown.datetimepicker' + i.id, a.proxy(i.hide, this));
+                    }, H = function () {
+                        i.widget.off('click', '.datepicker *', i.click), i.widget.off('click', '[data-action]'), i.widget.off('mousedown', i.stopEvent), i.options.pickDate && i.options.pickTime && i.widget.off('click.togglePicker'), i.isInput ? i.element.off({
+                            focus: i.show,
+                            change: i.change,
+                            click: i.show,
+                            blur: i.hide
+                        }) : (i.element.off({ change: i.change }, 'input'), i.component ? (i.component.off('click', i.show), i.component.off('mousedown', i.stopEvent)) : i.element.off('click', i.show));
+                    }, I = function () {
+                        a(window).off('resize.datetimepicker' + i.id), i.isInput || a(document).off('mousedown.datetimepicker' + i.id);
+                    }, J = function () {
+                        if (i.element) {
+                            var b, c = i.element.parents(), d = !1;
+                            for (b = 0; b < c.length; b++)
+                                if ('fixed' === a(c[b]).css('position')) {
+                                    d = !0;
                                     break;
                                 }
-                            return r;
+                            return d;
                         }
                         return !1;
-                    }, a = function () {
-                        r.lang(e.options.language);
-                        var n = '';
-                        e.unset || (n = r(e.date).format(e.format));
-                        p().val(n);
-                        e.element.data('date', n);
-                        e.options.pickTime || e.hide();
-                    }, v = function (n, t, i) {
-                        r.lang(e.options.language);
-                        var u;
-                        if (n == 'add' ? (u = r(e.date), u.hours() == 23 && u.add(i, t), u.add(i, t)) : u = r(e.date).subtract(i, t), k(r(u.subtract(i, t))) || k(u)) {
-                            g(u.format(e.format));
-                            return;
-                        }
-                        n == 'add' ? e.date.add(i, t) : e.date.subtract(i, t);
-                        e.unset = !1;
-                    }, k = function (n) {
-                        return (r.lang(e.options.language), n.isAfter(e.options.maxDate) || n.isBefore(e.options.minDate)) ? !0 : e.options.disabledDates === !1 ? !1 : e.options.disabledDates[r(n).format('YYYY-MM-DD')] === !0;
-                    }, ot = function (n) {
-                        return (r.lang(e.options.language), e.options.enabledDates === !1) ? !0 : e.options.enabledDates[r(n).format('YYYY-MM-DD')] === !0;
-                    }, d = function (n) {
-                        var t = {}, u = 0;
-                        for (i = 0; i < n.length; i++)
-                            dDate = r(n[i]), dDate.isValid() && (t[dDate.format('YYYY-MM-DD')] = !0, u++);
-                        return u > 0 ? t : !1;
-                    }, s = function (n) {
-                        return n = n.toString(), n.length >= 2 ? n : '0' + n;
-                    }, ni = function () {
-                        if (e.options.pickDate && e.options.pickTime) {
-                            var n = '';
-                            return n = '<div class="bootstrap-datetimepicker-widget' + (e.options.sideBySide ? ' timepicker-sbs' : '') + ' dropdown-menu" style="z-index:9999 !important;">', n += e.options.sideBySide ? '<div class="row"><div class="col-sm-6 datepicker">' + o.template + '</div><div class="col-sm-6 timepicker">' + h.getTemplate() + '</div></div>' : '<ul class="list-unstyled"><li' + (e.options.collapse ? ' class="collapse in"' : '') + '><div class="datepicker">' + o.template + '</div></li><li class="picker-switch accordion-toggle"><a class="btn" style="width:100%"><span class="' + e.options.icons.time + '"></span></a></li><li' + (e.options.collapse ? ' class="collapse"' : '') + '><div class="timepicker">' + h.getTemplate() + '</div></li></ul>', n + '</div>';
-                        }
-                        return e.options.pickTime ? '<div class="bootstrap-datetimepicker-widget dropdown-menu"><div class="timepicker">' + h.getTemplate() + '</div></div>' : '<div class="bootstrap-datetimepicker-widget dropdown-menu"><div class="datepicker">' + o.template + '</div></div>';
-                    }, o = {
+                    }, K = function () {
+                        b.locale(i.options.language);
+                        var a = '';
+                        i.unset || (a = b(i.date).format(i.format)), l().val(a), i.element.data('date', a), i.options.pickTime || i.hide();
+                    }, L = function (a, c, d) {
+                        b.locale(i.options.language);
+                        var e;
+                        return 'add' === a ? (e = b(i.date), 23 === e.hours() && e.add(d, c), e.add(d, c)) : e = b(i.date).subtract(d, c), M(b(e.subtract(d, c))) || M(e) ? void p(e.format(i.format)) : ('add' === a ? i.date.add(d, c) : i.date.subtract(d, c), void (i.unset = !1));
+                    }, M = function (a, c) {
+                        b.locale(i.options.language);
+                        var d = b(i.options.maxDate, i.format, i.options.useStrict), e = b(i.options.minDate, i.format, i.options.useStrict);
+                        return c && (d = d.endOf(c), e = e.startOf(c)), a.isAfter(d) || a.isBefore(e) ? !0 : i.options.disabledDates === !1 ? !1 : i.options.disabledDates[a.format('YYYY-MM-DD')] === !0;
+                    }, N = function (a) {
+                        return b.locale(i.options.language), i.options.enabledDates === !1 ? !0 : i.options.enabledDates[a.format('YYYY-MM-DD')] === !0;
+                    }, O = function (a) {
+                        var c, d = {}, e = 0;
+                        for (c = 0; c < a.length; c++)
+                            f = b.isMoment(a[c]) || a[c] instanceof Date ? b(a[c]) : b(a[c], i.format, i.options.useStrict), f.isValid() && (d[f.format('YYYY-MM-DD')] = !0, e++);
+                        return e > 0 ? d : !1;
+                    }, P = function (a) {
+                        return a = a.toString(), a.length >= 2 ? a : '0' + a;
+                    }, Q = function () {
+                        var a = '<thead><tr><th class="prev">&lsaquo;</th><th colspan="' + (i.options.calendarWeeks ? '6' : '5') + '" class="picker-switch"></th><th class="next">&rsaquo;</th></tr></thead>', b = '<tbody><tr><td colspan="' + (i.options.calendarWeeks ? '8' : '7') + '"></td></tr></tbody>', c = '<div class="datepicker-days"><table class="table-condensed">' + a + '<tbody></tbody></table></div><div class="datepicker-months"><table class="table-condensed">' + a + b + '</table></div><div class="datepicker-years"><table class="table-condensed">' + a + b + '</table></div>', d = '';
+                        return i.options.pickDate && i.options.pickTime ? (d = '<div class="bootstrap-datetimepicker-widget' + (i.options.sideBySide ? ' timepicker-sbs' : '') + (i.use24hours ? ' usetwentyfour' : '') + ' dropdown-menu" style="z-index:9999 !important;">', d += i.options.sideBySide ? '<div class="row"><div class="col-sm-6 datepicker">' + c + '</div><div class="col-sm-6 timepicker">' + S.getTemplate() + '</div></div>' : '<ul class="list-unstyled"><li' + (i.options.collapse ? ' class="collapse in"' : '') + '><div class="datepicker">' + c + '</div></li><li class="picker-switch accordion-toggle"><a class="btn" style="width:100%"><span class="' + i.options.icons.time + '"></span></a></li><li' + (i.options.collapse ? ' class="collapse"' : '') + '><div class="timepicker">' + S.getTemplate() + '</div></li></ul>', d += '</div>') : i.options.pickTime ? '<div class="bootstrap-datetimepicker-widget dropdown-menu"><div class="timepicker">' + S.getTemplate() + '</div></div>' : '<div class="bootstrap-datetimepicker-widget dropdown-menu"><div class="datepicker">' + c + '</div></div>';
+                    }, R = {
                         modes: [
                             {
                                 clsName: 'days',
@@ -13569,100 +13485,96 @@ define('vendor/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.es
                                 navFnc: 'year',
                                 navStep: 10
                             }
-                        ],
-                        headTemplate: '<thead><tr><th class="prev">&lsaquo;</th><th colspan="5" class="switch"></th><th class="next">&rsaquo;</th></tr></thead>',
-                        contTemplate: '<tbody><tr><td colspan="7"></td></tr></tbody>'
-                    }, h = {
+                        ]
+                    }, S = {
                         hourTemplate: '<span data-action="showHours"   data-time-component="hours"   class="timepicker-hour"></span>',
                         minuteTemplate: '<span data-action="showMinutes" data-time-component="minutes" class="timepicker-minute"></span>',
                         secondTemplate: '<span data-action="showSeconds"  data-time-component="seconds" class="timepicker-second"></span>'
                     };
-                o.template = '<div class="datepicker-days"><table class="table-condensed">' + o.headTemplate + '<tbody></tbody></table></div><div class="datepicker-months"><table class="table-condensed">' + o.headTemplate + o.contTemplate + '</table></div><div class="datepicker-years"><table class="table-condensed">' + o.headTemplate + o.contTemplate + '</table></div>';
-                h.getTemplate = function () {
-                    return '<div class="timepicker-picker"><table class="table-condensed"><tr><td><a href="#" class="btn" data-action="incrementHours"><span class="' + e.options.icons.up + '"></span></a></td><td class="separator"></td><td>' + (e.options.useMinutes ? '<a href="#" class="btn" data-action="incrementMinutes"><span class="' + e.options.icons.up + '"></span></a>' : '') + '</td>' + (e.options.useSeconds ? '<td class="separator"></td><td><a href="#" class="btn" data-action="incrementSeconds"><span class="' + e.options.icons.up + '"></span></a></td>' : '') + (e.use24hours ? '' : '<td class="separator"></td>') + '</tr><tr><td>' + h.hourTemplate + '</td> <td class="separator">:</td><td>' + (e.options.useMinutes ? h.minuteTemplate : '<span class="timepicker-minute">00</span>') + '</td> ' + (e.options.useSeconds ? '<td class="separator">:</td><td>' + h.secondTemplate + '</td>' : '') + (e.use24hours ? '' : '<td class="separator"></td><td><button type="button" class="btn btn-primary" data-action="togglePeriod"></button></td>') + '</tr><tr><td><a href="#" class="btn" data-action="decrementHours"><span class="' + e.options.icons.down + '"></span></a></td><td class="separator"></td><td>' + (e.options.useMinutes ? '<a href="#" class="btn" data-action="decrementMinutes"><span class="' + e.options.icons.down + '"></span></a>' : '') + '</td>' + (e.options.useSeconds ? '<td class="separator"></td><td><a href="#" class="btn" data-action="decrementSeconds"><span class="' + e.options.icons.down + '"></span></a></td>' : '') + (e.use24hours ? '' : '<td class="separator"></td>') + '</tr></table></div><div class="timepicker-hours" data-action="selectHour"><table class="table-condensed"></table></div><div class="timepicker-minutes" data-action="selectMinute"><table class="table-condensed"></table></div>' + (e.options.useSeconds ? '<div class="timepicker-seconds" data-action="selectSecond"><table class="table-condensed"></table></div>' : '');
-                };
-                e.destroy = function () {
-                    ft();
-                    et();
-                    e.widget.remove();
-                    e.element.removeData('DateTimePicker');
-                    e.component && e.component.removeData('DateTimePicker');
-                };
-                e.show = function (n) {
-                    e.options.useCurrent === !0 && p().val() == '' && e.setValue(r().format(e.format));
-                    e.widget.show();
-                    e.height = e.component ? e.component.outerHeight() : e.element.outerHeight();
-                    it();
-                    e.element.trigger({
-                        type: 'dp.show',
-                        date: r(e.date)
-                    });
-                    dt();
-                    n && tt(n);
-                };
-                e.disable = function () {
-                    var n = e.element.find('input');
-                    n.prop('disabled') || (n.prop('disabled', !0), ft());
-                };
-                e.enable = function () {
-                    var n = e.element.find('input');
-                    n.prop('disabled') && (n.prop('disabled', !1), ut());
-                };
-                e.hide = function (t) {
-                    if (!t || !n(t.target).is(e.element.attr('id'))) {
-                        for (var f = e.widget.find('.collapse'), u, i = 0; i < f.length; i++)
-                            if (u = f.eq(i).data('collapse'), u && u.date - transitioning)
-                                return;
-                        e.widget.hide();
-                        e.viewMode = e.startViewMode;
-                        b();
-                        e.element.trigger({
-                            type: 'dp.hide',
-                            date: r(e.date)
-                        });
-                        et();
+                S.getTemplate = function () {
+                    return '<div class="timepicker-picker"><table class="table-condensed"><tr><td><a href="#" class="btn" data-action="incrementHours"><span class="' + i.options.icons.up + '"></span></a></td><td class="separator"></td><td>' + (i.options.useMinutes ? '<a href="#" class="btn" data-action="incrementMinutes"><span class="' + i.options.icons.up + '"></span></a>' : '') + '</td>' + (i.options.useSeconds ? '<td class="separator"></td><td><a href="#" class="btn" data-action="incrementSeconds"><span class="' + i.options.icons.up + '"></span></a></td>' : '') + (i.use24hours ? '' : '<td class="separator"></td>') + '</tr><tr><td>' + S.hourTemplate + '</td> <td class="separator">:</td><td>' + (i.options.useMinutes ? S.minuteTemplate : '<span class="timepicker-minute">00</span>') + '</td> ' + (i.options.useSeconds ? '<td class="separator">:</td><td>' + S.secondTemplate + '</td>' : '') + (i.use24hours ? '' : '<td class="separator"></td><td><button type="button" class="btn btn-primary" data-action="togglePeriod"></button></td>') + '</tr><tr><td><a href="#" class="btn" data-action="decrementHours"><span class="' + i.options.icons.down + '"></span></a></td><td class="separator"></td><td>' + (i.options.useMinutes ? '<a href="#" class="btn" data-action="decrementMinutes"><span class="' + i.options.icons.down + '"></span></a>' : '') + '</td>' + (i.options.useSeconds ? '<td class="separator"></td><td><a href="#" class="btn" data-action="decrementSeconds"><span class="' + i.options.icons.down + '"></span></a></td>' : '') + (i.use24hours ? '' : '<td class="separator"></td>') + '</tr></table></div><div class="timepicker-hours" data-action="selectHour"><table class="table-condensed"></table></div><div class="timepicker-minutes" data-action="selectMinute"><table class="table-condensed"></table></div>' + (i.options.useSeconds ? '<div class="timepicker-seconds" data-action="selectSecond"><table class="table-condensed"></table></div>' : '');
+                }, i.destroy = function () {
+                    H(), I(), i.widget.remove(), i.element.removeData('DateTimePicker'), i.component && i.component.removeData('DateTimePicker');
+                }, i.show = function (a) {
+                    if (!l().prop('disabled')) {
+                        if (i.options.useCurrent && '' === l().val()) {
+                            if (1 !== i.options.minuteStepping) {
+                                var c = b(), d = i.options.minuteStepping;
+                                c.minutes(Math.round(c.minutes() / d) * d % 60).seconds(0), i.setValue(c.format(i.format));
+                            } else
+                                i.setValue(b().format(i.format));
+                            o('', a.type);
+                        }
+                        a && 'click' === a.type && i.isInput && i.widget.hasClass('picker-open') || (i.widget.hasClass('picker-open') ? (i.widget.hide(), i.widget.removeClass('picker-open')) : (i.widget.show(), i.widget.addClass('picker-open')), i.height = i.component ? i.component.outerHeight() : i.element.outerHeight(), n(), i.element.trigger({
+                            type: 'dp.show',
+                            date: b(i.date)
+                        }), G(), a && B(a));
                     }
-                };
-                e.setValue = function (n) {
-                    r.lang(e.options.language);
-                    n ? e.unset = !1 : (e.unset = !0, a());
-                    r.isMoment(n) || (n = r(n));
-                    n.isValid() ? (e.date = n, a(), e.viewDate = r({
-                        y: e.date.year(),
-                        M: e.date.month()
-                    }), y(), nt()) : g(n);
-                };
-                e.getDate = function () {
-                    return e.unset ? null : e.date;
-                };
-                e.setDate = function (n) {
-                    var t = r(e.date);
-                    n ? e.setValue(n) : e.setValue(null);
-                    c(t, 'function');
-                };
-                e.setDisabledDates = function (n) {
-                    e.options.disabledDates = d(n);
-                    e.viewDate && l();
-                };
-                e.setEnabledDates = function (n) {
-                    e.options.enabledDates = d(n);
-                    e.viewDate && l();
-                };
-                e.setMaxDate = function (n) {
-                    n != undefined && (e.options.maxDate = r(n), e.viewDate && l());
-                };
-                e.setMinDate = function (n) {
-                    n != undefined && (e.options.minDate = r(n), e.viewDate && l());
-                };
-                ct();
+                }, i.disable = function () {
+                    var a = l();
+                    a.prop('disabled') || (a.prop('disabled', !0), H());
+                }, i.enable = function () {
+                    var a = l();
+                    a.prop('disabled') && (a.prop('disabled', !1), F());
+                }, i.hide = function () {
+                    var a, c, d = i.widget.find('.collapse');
+                    for (a = 0; a < d.length; a++)
+                        if (c = d.eq(a).data('collapse'), c && c.transitioning)
+                            return;
+                    i.widget.hide(), i.widget.removeClass('picker-open'), i.viewMode = i.startViewMode, E(), i.element.trigger({
+                        type: 'dp.hide',
+                        date: b(i.date)
+                    }), I();
+                }, i.setValue = function (a) {
+                    b.locale(i.options.language), a ? i.unset = !1 : (i.unset = !0, K()), a = b.isMoment(a) ? a.locale(i.options.language) : a instanceof Date ? b(a) : b(a, i.format, i.options.useStrict), a.isValid() ? (i.date = a, K(), i.viewDate = b({
+                        y: i.date.year(),
+                        M: i.date.month()
+                    }), t(), x()) : p(a);
+                }, i.getDate = function () {
+                    return i.unset ? null : b(i.date);
+                }, i.setDate = function (a) {
+                    var c = b(i.date);
+                    i.setValue(a ? a : null), o(c, 'function');
+                }, i.setDisabledDates = function (a) {
+                    i.options.disabledDates = O(a), i.viewDate && q();
+                }, i.setEnabledDates = function (a) {
+                    i.options.enabledDates = O(a), i.viewDate && q();
+                }, i.setMaxDate = function (a) {
+                    void 0 !== a && (i.options.maxDate = b.isMoment(a) || a instanceof Date ? b(a) : b(a, i.format, i.options.useStrict), i.viewDate && q());
+                }, i.setMinDate = function (a) {
+                    void 0 !== a && (i.options.minDate = b.isMoment(a) || a instanceof Date ? b(a) : b(a, i.format, i.options.useStrict), i.viewDate && q());
+                }, k();
             };
-        n.fn.datetimepicker = function (t) {
+        a.fn.datetimepicker = function (b) {
             return this.each(function () {
-                var i = n(this), r = i.data('DateTimePicker');
-                r || i.data('DateTimePicker', new f(this, t));
+                var c = a(this), e = c.data('DateTimePicker');
+                e || c.data('DateTimePicker', new d(this, b));
             });
+        }, a.fn.datetimepicker.defaults = {
+            format: !1,
+            pickDate: !0,
+            pickTime: !0,
+            useMinutes: !0,
+            useSeconds: !1,
+            useCurrent: !0,
+            calendarWeeks: !1,
+            minuteStepping: 1,
+            minDate: b({ y: 1900 }),
+            maxDate: b().add(100, 'y'),
+            showToday: !0,
+            collapse: !0,
+            language: b.locale(),
+            defaultDate: '',
+            disabledDates: !1,
+            enabledDates: !1,
+            icons: {},
+            useStrict: !1,
+            direction: 'auto',
+            sideBySide: !1,
+            daysOfWeekDisabled: [],
+            widgetParent: !1
         };
-    }));
+    });
     __exports__.__default__ = Picker;
 });
 define('vendor/bootstrap/bootstrap.es6', [
@@ -33260,17 +33172,16 @@ define('templates/templates', [
         ];
         helpers = this.merge(helpers, Ember.Handlebars.helpers);
         data = data || {};
-        var buffer = '', stack1, escapeExpression = this.escapeExpression;
-        data.buffer.push('<div id="application"><div class="container-fluid"><div style="margin-top:0px;margin-bottom:0px;" class="page-header"><h2><img src="style/img/logo.png" ');
-        data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
-            hash: { 'class': 'toplogo' },
-            hashTypes: { 'class': 'STRING' },
-            hashContexts: { 'class': depth0 },
-            contexts: [],
-            types: [],
+        var buffer = '', stack1, helper, options, helperMissing = helpers.helperMissing, escapeExpression = this.escapeExpression;
+        data.buffer.push('<div id="application">');
+        data.buffer.push(escapeExpression((helper = helpers.partial || depth0 && depth0.partial, options = {
+            hash: {},
+            hashTypes: {},
+            hashContexts: {},
+            contexts: [depth0],
+            types: ['STRING'],
             data: data
-        })));
-        data.buffer.push(' /> <small>Open Source Trustcenter</small></h2></div></div>');
+        }, helper ? helper.call(depth0, 'applicationHeader', options) : helperMissing.call(depth0, 'partial', 'applicationHeader', options))));
         stack1 = helpers._triageMustache.call(depth0, 'outlet', {
             hash: {},
             hashTypes: {},
@@ -33282,8 +33193,135 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</div><div id="footer"><div class="container-fluid"><p class="text-center text-muted credit">&copy; Copyright 2014, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a></p></div></div>');
+        data.buffer.push('</div>');
+        data.buffer.push(escapeExpression((helper = helpers.partial || depth0 && depth0.partial, options = {
+            hash: {},
+            hashTypes: {},
+            hashContexts: {},
+            contexts: [depth0],
+            types: ['STRING'],
+            data: data
+        }, helper ? helper.call(depth0, 'applicationFooter', options) : helperMissing.call(depth0, 'partial', 'applicationFooter', options))));
         return buffer;
+    });
+    T['applicationFooter'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
+        this.compilerInfo = [
+            4,
+            '>= 1.0.0'
+        ];
+        helpers = this.merge(helpers, Ember.Handlebars.helpers);
+        data = data || {};
+        data.buffer.push('<div id="footer"><div class="container-fluid"><p class="text-center text-muted credit">&copy; Copyright 2014, The OpenXPKI Project. See <a href="http://www.openxpki.org/">OpenXPKI project home</a></p></div></div>');
+    });
+    T['applicationHeader'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
+        this.compilerInfo = [
+            4,
+            '>= 1.0.0'
+        ];
+        helpers = this.merge(helpers, Ember.Handlebars.helpers);
+        data = data || {};
+        var buffer = '', helper, options, escapeExpression = this.escapeExpression, helperMissing = helpers.helperMissing;
+        data.buffer.push('<div class="container-fluid"><div class="page-header header row"><div class="col-xs-6"><h2><img src="style/img/logo.png" ');
+        data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+            hash: { 'class': 'toplogo' },
+            hashTypes: { 'class': 'STRING' },
+            hashContexts: { 'class': depth0 },
+            contexts: [],
+            types: [],
+            data: data
+        })));
+        data.buffer.push(' /> <small>Open Source Trustcenter</small></h2></div><div class="col-xs-6">');
+        data.buffer.push(escapeExpression((helper = helpers.partial || depth0 && depth0.partial, options = {
+            hash: {},
+            hashTypes: {},
+            hashContexts: {},
+            contexts: [depth0],
+            types: ['STRING'],
+            data: data
+        }, helper ? helper.call(depth0, 'applicationHeaderUserinfo', options) : helperMissing.call(depth0, 'partial', 'applicationHeaderUserinfo', options))));
+        data.buffer.push('</div></div></div>');
+        return buffer;
+    });
+    T['applicationHeaderUserinfo'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
+        this.compilerInfo = [
+            4,
+            '>= 1.0.0'
+        ];
+        helpers = this.merge(helpers, Ember.Handlebars.helpers);
+        data = data || {};
+        var stack1, self = this;
+        function program1(depth0, data) {
+            var buffer = '', stack1;
+            data.buffer.push('<div class="userinfo"><ul class="nav"><li class="text-right">Signed in as: <strong>');
+            stack1 = helpers._triageMustache.call(depth0, 'user.name', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push(' (');
+            stack1 = helpers._triageMustache.call(depth0, 'user.role', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push(')</strong></li><li class="text-right">Realm: <strong>');
+            stack1 = helpers._triageMustache.call(depth0, 'user.pki_realm_label', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push(' (');
+            stack1 = helpers._triageMustache.call(depth0, 'user.pki_realm', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push(')</strong></li></ul></div>');
+            return buffer;
+        }
+        function program3(depth0, data) {
+            var buffer = '';
+            return buffer;
+        }
+        stack1 = helpers['if'].call(depth0, 'user', {
+            hash: {},
+            hashTypes: {},
+            hashContexts: {},
+            inverse: self.program(3, program3, data),
+            fn: self.program(1, program1, data),
+            contexts: [depth0],
+            types: ['ID'],
+            data: data
+        });
+        if (stack1 || stack1 === 0) {
+            data.buffer.push(stack1);
+        } else {
+            data.buffer.push('');
+        }
     });
     T['openxpki'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
         this.compilerInfo = [
@@ -33455,59 +33493,6 @@ define('templates/templates', [
             }
         }
         function program11(depth0, data) {
-            var buffer = '', stack1;
-            data.buffer.push('<div style="position:absolute;top:-50px;right:30px;font-size:small;color:#aaa;"><ul class="nav"><li style="text-align:right">Signed in as: <strong>');
-            stack1 = helpers._triageMustache.call(depth0, 'user.name', {
-                hash: {},
-                hashTypes: {},
-                hashContexts: {},
-                contexts: [depth0],
-                types: ['ID'],
-                data: data
-            });
-            if (stack1 || stack1 === 0) {
-                data.buffer.push(stack1);
-            }
-            data.buffer.push(' (');
-            stack1 = helpers._triageMustache.call(depth0, 'user.role', {
-                hash: {},
-                hashTypes: {},
-                hashContexts: {},
-                contexts: [depth0],
-                types: ['ID'],
-                data: data
-            });
-            if (stack1 || stack1 === 0) {
-                data.buffer.push(stack1);
-            }
-            data.buffer.push(')</strong></li><li style="text-align:right">Realm: <strong>');
-            stack1 = helpers._triageMustache.call(depth0, 'user.pki_realm_label', {
-                hash: {},
-                hashTypes: {},
-                hashContexts: {},
-                contexts: [depth0],
-                types: ['ID'],
-                data: data
-            });
-            if (stack1 || stack1 === 0) {
-                data.buffer.push(stack1);
-            }
-            data.buffer.push(' (');
-            stack1 = helpers._triageMustache.call(depth0, 'user.pki_realm', {
-                hash: {},
-                hashTypes: {},
-                hashContexts: {},
-                contexts: [depth0],
-                types: ['ID'],
-                data: data
-            });
-            if (stack1 || stack1 === 0) {
-                data.buffer.push(stack1);
-            }
-            data.buffer.push(')</strong></li></ul></div>');
-            return buffer;
-        }
-        function program13(depth0, data) {
             var buffer = '', stack1, helper, options;
             data.buffer.push('<li>');
             stack1 = (helper = helpers['link-to'] || depth0 && depth0['link-to'], options = {
@@ -33515,7 +33500,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(14, program14, data),
+                fn: self.program(12, program12, data),
                 contexts: [
                     depth0,
                     depth0
@@ -33532,60 +33517,10 @@ define('templates/templates', [
             data.buffer.push('</li>');
             return buffer;
         }
-        function program14(depth0, data) {
+        function program12(depth0, data) {
             data.buffer.push('Log out');
         }
-        function program16(depth0, data) {
-            var buffer = '', stack1, helper, options;
-            data.buffer.push('<li ');
-            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
-                hash: { 'class': 'active' },
-                hashTypes: { 'class': 'STRING' },
-                hashContexts: { 'class': depth0 },
-                contexts: [],
-                types: [],
-                data: data
-            })));
-            data.buffer.push('>');
-            stack1 = (helper = helpers['link-to'] || depth0 && depth0['link-to'], options = {
-                hash: {},
-                hashTypes: {},
-                hashContexts: {},
-                inverse: self.program(6, program6, data),
-                fn: self.program(17, program17, data),
-                contexts: [
-                    depth0,
-                    depth0
-                ],
-                types: [
-                    'STRING',
-                    'ID'
-                ],
-                data: data
-            }, helper ? helper.call(depth0, 'openxpki', 'key', options) : helperMissing.call(depth0, 'link-to', 'openxpki', 'key', options));
-            if (stack1 || stack1 === 0) {
-                data.buffer.push(stack1);
-            }
-            data.buffer.push('</li>');
-            return buffer;
-        }
-        function program17(depth0, data) {
-            var stack1;
-            stack1 = helpers._triageMustache.call(depth0, 'label', {
-                hash: {},
-                hashTypes: {},
-                hashContexts: {},
-                contexts: [depth0],
-                types: ['ID'],
-                data: data
-            });
-            if (stack1 || stack1 === 0) {
-                data.buffer.push(stack1);
-            } else {
-                data.buffer.push('');
-            }
-        }
-        function program19(depth0, data) {
+        function program14(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<ul class="nav nav-tabs">');
             stack1 = helpers.each.call(depth0, 'content', {
@@ -33593,7 +33528,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(20, program20, data),
+                fn: self.program(15, program15, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33607,7 +33542,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(25, program25, data),
+                fn: self.program(20, program20, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33618,7 +33553,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program20(depth0, data) {
+        function program15(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<li ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
@@ -33649,8 +33584,8 @@ define('templates/templates', [
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
-                inverse: self.program(23, program23, data),
-                fn: self.program(21, program21, data),
+                inverse: self.program(18, program18, data),
+                fn: self.program(16, program16, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33676,7 +33611,7 @@ define('templates/templates', [
             data.buffer.push(' class="close">&times;</button></a></li>');
             return buffer;
         }
-        function program21(depth0, data) {
+        function program16(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'page.shortlabel', {
                 hash: {},
@@ -33692,7 +33627,7 @@ define('templates/templates', [
                 data.buffer.push('');
             }
         }
-        function program23(depth0, data) {
+        function program18(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'page.label', {
                 hash: {},
@@ -33708,7 +33643,7 @@ define('templates/templates', [
                 data.buffer.push('');
             }
         }
-        function program25(depth0, data) {
+        function program20(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
@@ -33734,7 +33669,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(26, program26, data),
+                fn: self.program(21, program21, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33757,7 +33692,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(28, program28, data),
+                fn: self.program(23, program23, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33768,7 +33703,7 @@ define('templates/templates', [
             data.buffer.push('</div></div></div></div>');
             return buffer;
         }
-        function program26(depth0, data) {
+        function program21(depth0, data) {
             var helper, options;
             data.buffer.push(escapeExpression((helper = helpers['oxisection-main'] || depth0 && depth0['oxisection-main'], options = {
                 hash: { 'content': '' },
@@ -33779,7 +33714,7 @@ define('templates/templates', [
                 data: data
             }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxisection-main', options))));
         }
-        function program28(depth0, data) {
+        function program23(depth0, data) {
             var buffer = '', helper, options;
             data.buffer.push('<h3></h3><div class="well">');
             data.buffer.push(escapeExpression((helper = helpers['oxisection-main'] || depth0 && depth0['oxisection-main'], options = {
@@ -33793,7 +33728,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program30(depth0, data) {
+        function program25(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div class="Xcontainer sections">');
             stack1 = helpers.each.call(depth0, 'content', {
@@ -33801,7 +33736,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(31, program31, data),
+                fn: self.program(26, program26, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33812,7 +33747,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program31(depth0, data) {
+        function program26(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div class="row"><div ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
@@ -33829,7 +33764,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(26, program26, data),
+                fn: self.program(21, program21, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33852,7 +33787,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(6, program6, data),
-                fn: self.program(32, program32, data),
+                fn: self.program(27, program27, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -33863,7 +33798,7 @@ define('templates/templates', [
             data.buffer.push('</div></div>');
             return buffer;
         }
-        function program32(depth0, data) {
+        function program27(depth0, data) {
             var buffer = '', helper, options;
             data.buffer.push('<div class="well">');
             data.buffer.push(escapeExpression((helper = helpers['oxisection-main'] || depth0 && depth0['oxisection-main'], options = {
@@ -33877,7 +33812,7 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program34(depth0, data) {
+        function program29(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'modalContent.page.shortlabel', {
                 hash: {},
@@ -33893,7 +33828,7 @@ define('templates/templates', [
                 data.buffer.push('');
             }
         }
-        function program36(depth0, data) {
+        function program31(depth0, data) {
             var stack1;
             stack1 = helpers._triageMustache.call(depth0, 'modalContent.page.label', {
                 hash: {},
@@ -33931,7 +33866,7 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</ul>');
+        data.buffer.push('</ul><ul class="nav navbar-nav navbar-right">');
         stack1 = helpers['if'].call(depth0, 'user', {
             hash: {},
             hashTypes: {},
@@ -33945,35 +33880,7 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('<ul class="nav navbar-nav navbar-right">');
-        stack1 = helpers['if'].call(depth0, 'user', {
-            hash: {},
-            hashTypes: {},
-            hashContexts: {},
-            inverse: self.program(6, program6, data),
-            fn: self.program(13, program13, data),
-            contexts: [depth0],
-            types: ['ID'],
-            data: data
-        });
-        if (stack1 || stack1 === 0) {
-            data.buffer.push(stack1);
-        }
-        data.buffer.push('</ul></div></div></div><div class="container-fluid"><div class="row"><div class="col-md-2"><div role="complementary" class="bs-sidebar hidden-print"><ul class="nav bs-sidenav">');
-        stack1 = helpers.each.call(depth0, 'sideNavEntries', {
-            hash: {},
-            hashTypes: {},
-            hashContexts: {},
-            inverse: self.program(6, program6, data),
-            fn: self.program(16, program16, data),
-            contexts: [depth0],
-            types: ['ID'],
-            data: data
-        });
-        if (stack1 || stack1 === 0) {
-            data.buffer.push(stack1);
-        }
-        data.buffer.push('</ul></div></div><div role="main" class="col-md-10"><div class="oxi-message"><div ');
+        data.buffer.push('</ul></div></div></div><div class="container-fluid"><div class="oxi-message"><div ');
         data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
             hash: { 'class': ':alert statusClass' },
             hashTypes: { 'class': 'STRING' },
@@ -34023,8 +33930,8 @@ define('templates/templates', [
             hash: {},
             hashTypes: {},
             hashContexts: {},
-            inverse: self.program(30, program30, data),
-            fn: self.program(19, program19, data),
+            inverse: self.program(25, program25, data),
+            fn: self.program(14, program14, data),
             contexts: [depth0],
             types: ['ID'],
             data: data
@@ -34032,13 +33939,13 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</div></div></div><div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">');
+        data.buffer.push('</div><div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">');
         stack1 = helpers['if'].call(depth0, 'modalContent.page.shortlabel', {
             hash: {},
             hashTypes: {},
             hashContexts: {},
-            inverse: self.program(36, program36, data),
-            fn: self.program(34, program34, data),
+            inverse: self.program(31, program31, data),
+            fn: self.program(29, program29, data),
             contexts: [depth0],
             types: ['ID'],
             data: data
@@ -34052,7 +33959,7 @@ define('templates/templates', [
             hashTypes: {},
             hashContexts: {},
             inverse: self.program(6, program6, data),
-            fn: self.program(26, program26, data),
+            fn: self.program(21, program21, data),
             contexts: [depth0],
             types: ['ID'],
             data: data
@@ -34060,7 +33967,7 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</div><div class="modal-footer"><button data-dismiss="modal" class="btn btn-default">Close</button></div></div></div></div><div style="display:none" class="loading"><div style="width:100px; position:absolute; top:30px; right:20px;" class="progress progress-striped active"><div role="progressbar" style="width: 100%" class="progress-bar"><p class="text-center">Loading ...</p></div></div></div>');
+        data.buffer.push('</div><div class="modal-footer"><button data-dismiss="modal" class="btn btn-default">Close</button></div></div></div></div><div class="loading"><div style="width:100px; position:absolute; top:30px; right:20px;" class="progress progress-striped active"><div role="progressbar" style="width: 100%" class="progress-bar"><p class="text-center">Loading ...</p></div></div></div>');
         return buffer;
     });
     T['components/oxifield-bool'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
@@ -34141,15 +34048,18 @@ define('templates/templates', [
         data.buffer.push(escapeExpression((helper = helpers.input || depth0 && depth0.input, options = {
             hash: {
                 'class': 'form-control',
-                'value': 'search'
+                'value': 'search',
+                'placeholder': 'content.placeholder'
             },
             hashTypes: {
                 'class': 'STRING',
-                'value': 'ID'
+                'value': 'ID',
+                'placeholder': 'ID'
             },
             hashContexts: {
                 'class': depth0,
-                'value': depth0
+                'value': depth0,
+                'placeholder': depth0
             },
             contexts: [],
             types: [],
@@ -34224,15 +34134,18 @@ define('templates/templates', [
         data.buffer.push(escapeExpression((helper = helpers.input || depth0 && depth0.input, options = {
             hash: {
                 'class': 'form-control date',
-                'value': 'content.pickvalue'
+                'value': 'content.pickvalue',
+                'placeholder': 'content.placeholder'
             },
             hashTypes: {
                 'class': 'STRING',
-                'value': 'ID'
+                'value': 'ID',
+                'placeholder': 'ID'
             },
             hashContexts: {
                 'class': depth0,
-                'value': depth0
+                'value': depth0,
+                'placeholder': depth0
             },
             contexts: [],
             types: [],
@@ -34292,6 +34205,15 @@ define('templates/templates', [
                 hash: { 'class': 'sFieldSize' },
                 hashTypes: { 'class': 'STRING' },
                 hashContexts: { 'class': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            })));
+            data.buffer.push(' ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'title': 'content.tooltip' },
+                hashTypes: { 'title': 'STRING' },
+                hashContexts: { 'title': depth0 },
                 contexts: [],
                 types: [],
                 data: data
@@ -34375,7 +34297,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isSelect', {
+            stack1 = helpers['if'].call(depth0, 'isPasswordVerify', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34388,7 +34310,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isText', {
+            stack1 = helpers['if'].call(depth0, 'isSelect', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34401,7 +34323,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isTextarea', {
+            stack1 = helpers['if'].call(depth0, 'isText', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34414,7 +34336,7 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'isUploadarea', {
+            stack1 = helpers['if'].call(depth0, 'isTextarea', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
@@ -34427,12 +34349,25 @@ define('templates/templates', [
             if (stack1 || stack1 === 0) {
                 data.buffer.push(stack1);
             }
-            stack1 = helpers['if'].call(depth0, 'content.error', {
+            stack1 = helpers['if'].call(depth0, 'isUploadarea', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(9, program9, data),
                 fn: self.program(31, program31, data),
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            stack1 = helpers['if'].call(depth0, 'content.error', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                inverse: self.program(9, program9, data),
+                fn: self.program(33, program33, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -34446,7 +34381,7 @@ define('templates/templates', [
                 hashTypes: {},
                 hashContexts: {},
                 inverse: self.program(9, program9, data),
-                fn: self.program(33, program33, data),
+                fn: self.program(35, program35, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -34599,6 +34534,17 @@ define('templates/templates', [
         }
         function program23(depth0, data) {
             var helper, options;
+            data.buffer.push(escapeExpression((helper = helpers['oxifield-passwordverify'] || depth0 && depth0['oxifield-passwordverify'], options = {
+                hash: { 'content': 'content' },
+                hashTypes: { 'content': 'ID' },
+                hashContexts: { 'content': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-passwordverify', options))));
+        }
+        function program25(depth0, data) {
+            var helper, options;
             data.buffer.push(escapeExpression((helper = helpers['oxifield-select'] || depth0 && depth0['oxifield-select'], options = {
                 hash: { 'content': 'content' },
                 hashTypes: { 'content': 'ID' },
@@ -34608,7 +34554,7 @@ define('templates/templates', [
                 data: data
             }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-select', options))));
         }
-        function program25(depth0, data) {
+        function program27(depth0, data) {
             var helper, options;
             data.buffer.push(escapeExpression((helper = helpers['oxifield-text'] || depth0 && depth0['oxifield-text'], options = {
                 hash: { 'content': 'content' },
@@ -34619,7 +34565,7 @@ define('templates/templates', [
                 data: data
             }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-text', options))));
         }
-        function program27(depth0, data) {
+        function program29(depth0, data) {
             var helper, options;
             data.buffer.push(escapeExpression((helper = helpers['oxifield-textarea'] || depth0 && depth0['oxifield-textarea'], options = {
                 hash: { 'content': 'content' },
@@ -34630,7 +34576,7 @@ define('templates/templates', [
                 data: data
             }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-textarea', options))));
         }
-        function program29(depth0, data) {
+        function program31(depth0, data) {
             var helper, options;
             data.buffer.push(escapeExpression((helper = helpers['oxifield-uploadarea'] || depth0 && depth0['oxifield-uploadarea'], options = {
                 hash: { 'content': 'content' },
@@ -34641,7 +34587,7 @@ define('templates/templates', [
                 data: data
             }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'oxifield-uploadarea', options))));
         }
-        function program31(depth0, data) {
+        function program33(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<span class="help-block">');
             stack1 = helpers._triageMustache.call(depth0, 'content.error', {
@@ -34658,15 +34604,15 @@ define('templates/templates', [
             data.buffer.push('</span>');
             return buffer;
         }
-        function program33(depth0, data) {
+        function program35(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<div class="col-md-1">');
             stack1 = helpers['if'].call(depth0, 'content.isLast', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
-                inverse: self.program(36, program36, data),
-                fn: self.program(34, program34, data),
+                inverse: self.program(38, program38, data),
+                fn: self.program(36, program36, data),
                 contexts: [depth0],
                 types: ['ID'],
                 data: data
@@ -34677,9 +34623,9 @@ define('templates/templates', [
             data.buffer.push('</div>');
             return buffer;
         }
-        function program34(depth0, data) {
+        function program36(depth0, data) {
             var buffer = '';
-            data.buffer.push('<button ');
+            data.buffer.push('<button type="button" ');
             data.buffer.push(escapeExpression(helpers.action.call(depth0, 'addClone', {
                 hash: { 'on': 'click' },
                 hashTypes: { 'on': 'STRING' },
@@ -34688,12 +34634,12 @@ define('templates/templates', [
                 types: ['STRING'],
                 data: data
             })));
-            data.buffer.push(' class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span></button>');
+            data.buffer.push(' class="btn btn-primary clone"><span class="glyphicon glyphicon-plus"></span></button>');
             return buffer;
         }
-        function program36(depth0, data) {
+        function program38(depth0, data) {
             var buffer = '';
-            data.buffer.push('<button ');
+            data.buffer.push('<button type="button" ');
             data.buffer.push(escapeExpression(helpers.action.call(depth0, 'delClone', {
                 hash: { 'on': 'click' },
                 hashTypes: { 'on': 'STRING' },
@@ -34702,7 +34648,7 @@ define('templates/templates', [
                 types: ['STRING'],
                 data: data
             })));
-            data.buffer.push(' class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span></button>');
+            data.buffer.push(' class="btn btn-danger clone"><span class="glyphicon glyphicon-minus"></span></button>');
             return buffer;
         }
         stack1 = helpers.unless.call(depth0, 'isHidden', {
@@ -34733,22 +34679,152 @@ define('templates/templates', [
             hash: {
                 'class': 'form-control',
                 'type': 'password',
-                'value': 'content.value'
+                'value': 'content.value',
+                'placeholder': 'content.placeholder'
             },
             hashTypes: {
                 'class': 'STRING',
                 'type': 'STRING',
-                'value': 'ID'
+                'value': 'ID',
+                'placeholder': 'ID'
             },
             hashContexts: {
                 'class': depth0,
                 'type': depth0,
-                'value': depth0
+                'value': depth0,
+                'placeholder': depth0
             },
             contexts: [],
             types: [],
             data: data
         }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'input', options))));
+    });
+    T['components/oxifield-passwordverify'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
+        this.compilerInfo = [
+            4,
+            '>= 1.0.0'
+        ];
+        helpers = this.merge(helpers, Ember.Handlebars.helpers);
+        data = data || {};
+        var stack1, helperMissing = helpers.helperMissing, escapeExpression = this.escapeExpression, self = this;
+        function program1(depth0, data) {
+            var buffer = '', helper, options;
+            data.buffer.push(escapeExpression((helper = helpers.input || depth0 && depth0.input, options = {
+                hash: {
+                    'class': 'form-control in-form-group',
+                    'type': 'text',
+                    'readonly': 'readonly',
+                    'value': 'password'
+                },
+                hashTypes: {
+                    'class': 'STRING',
+                    'type': 'STRING',
+                    'readonly': 'STRING',
+                    'value': 'ID'
+                },
+                hashContexts: {
+                    'class': depth0,
+                    'type': depth0,
+                    'readonly': depth0,
+                    'value': depth0
+                },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'input', options))));
+            data.buffer.push(escapeExpression((helper = helpers.input || depth0 && depth0.input, options = {
+                hash: {
+                    'class': 'form-control in-form-group',
+                    'type': 'text',
+                    'value': 'confirm',
+                    'placeholder': 'placeholder'
+                },
+                hashTypes: {
+                    'class': 'STRING',
+                    'type': 'STRING',
+                    'value': 'ID',
+                    'placeholder': 'ID'
+                },
+                hashContexts: {
+                    'class': depth0,
+                    'type': depth0,
+                    'value': depth0,
+                    'placeholder': depth0
+                },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'input', options))));
+            return buffer;
+        }
+        function program3(depth0, data) {
+            var buffer = '', helper, options;
+            data.buffer.push(escapeExpression((helper = helpers.input || depth0 && depth0.input, options = {
+                hash: {
+                    'class': 'form-control in-form-group',
+                    'type': 'password',
+                    'value': 'password'
+                },
+                hashTypes: {
+                    'class': 'STRING',
+                    'type': 'STRING',
+                    'value': 'ID'
+                },
+                hashContexts: {
+                    'class': depth0,
+                    'type': depth0,
+                    'value': depth0
+                },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'input', options))));
+            data.buffer.push(escapeExpression((helper = helpers.input || depth0 && depth0.input, options = {
+                hash: {
+                    'class': 'form-control in-form-group',
+                    'type': 'password',
+                    'value': 'confirm',
+                    'focus-in': 'confirmFocusIn',
+                    'focus-out': 'confirmFocusOut',
+                    'placeholder': 'placeholder'
+                },
+                hashTypes: {
+                    'class': 'STRING',
+                    'type': 'STRING',
+                    'value': 'ID',
+                    'focus-in': 'STRING',
+                    'focus-out': 'STRING',
+                    'placeholder': 'ID'
+                },
+                hashContexts: {
+                    'class': depth0,
+                    'type': depth0,
+                    'value': depth0,
+                    'focus-in': depth0,
+                    'focus-out': depth0,
+                    'placeholder': depth0
+                },
+                contexts: [],
+                types: [],
+                data: data
+            }, helper ? helper.call(depth0, options) : helperMissing.call(depth0, 'input', options))));
+            return buffer;
+        }
+        stack1 = helpers['if'].call(depth0, 'isFixed', {
+            hash: {},
+            hashTypes: {},
+            hashContexts: {},
+            inverse: self.program(3, program3, data),
+            fn: self.program(1, program1, data),
+            contexts: [depth0],
+            types: ['ID'],
+            data: data
+        });
+        if (stack1 || stack1 === 0) {
+            data.buffer.push(stack1);
+        } else {
+            data.buffer.push('');
+        }
     });
     T['components/oxifield-select'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
         this.compilerInfo = [
@@ -34836,15 +34912,18 @@ define('templates/templates', [
         data.buffer.push(escapeExpression((helper = helpers.input || depth0 && depth0.input, options = {
             hash: {
                 'class': 'form-control',
-                'value': 'content.value'
+                'value': 'content.value',
+                'placeholder': 'content.placeholder'
             },
             hashTypes: {
                 'class': 'STRING',
-                'value': 'ID'
+                'value': 'ID',
+                'placeholder': 'ID'
             },
             hashContexts: {
                 'class': depth0,
-                'value': depth0
+                'value': depth0,
+                'placeholder': depth0
             },
             contexts: [],
             types: [],
@@ -34864,19 +34943,22 @@ define('templates/templates', [
                 'class': 'form-control',
                 'rows': 'content.textAreaSize.height',
                 'cols': 'content.textAreaSize.width',
-                'value': 'content.value'
+                'value': 'content.value',
+                'placeholder': 'content.placeholder'
             },
             hashTypes: {
                 'class': 'STRING',
                 'rows': 'ID',
                 'cols': 'ID',
-                'value': 'ID'
+                'value': 'ID',
+                'placeholder': 'ID'
             },
             hashContexts: {
                 'class': depth0,
                 'rows': depth0,
                 'cols': depth0,
-                'value': depth0
+                'value': depth0,
+                'placeholder': depth0
             },
             contexts: [],
             types: [],
@@ -35189,7 +35271,7 @@ define('templates/templates', [
             var buffer = '', stack1;
             data.buffer.push('<tr ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
-                hash: { 'class': ':context this.className' },
+                hash: { 'class': ':context this.className controller.hasAction' },
                 hashTypes: { 'class': 'STRING' },
                 hashContexts: { 'class': depth0 },
                 contexts: [],
@@ -35338,14 +35420,22 @@ define('templates/templates', [
         }
         function program5(depth0, data) {
             var stack1;
-            stack1 = helpers['if'].call(depth0, 'btn.href', {
+            stack1 = helpers.each.call(depth0, 'btn', 'in', 'content.content.buttons', {
                 hash: {},
                 hashTypes: {},
                 hashContexts: {},
-                inverse: self.program(8, program8, data),
+                inverse: self.program(3, program3, data),
                 fn: self.program(6, program6, data),
-                contexts: [depth0],
-                types: ['ID'],
+                contexts: [
+                    depth0,
+                    depth0,
+                    depth0
+                ],
+                types: [
+                    'ID',
+                    'ID',
+                    'ID'
+                ],
                 data: data
             });
             if (stack1 || stack1 === 0) {
@@ -35356,6 +35446,37 @@ define('templates/templates', [
         }
         function program6(depth0, data) {
             var buffer = '', stack1;
+            data.buffer.push('<div class="row stacked-buttons"><div class="col-xs-4">');
+            stack1 = helpers['if'].call(depth0, 'btn.href', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                inverse: self.program(9, program9, data),
+                fn: self.program(7, program7, data),
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push('</div><div class="col-xs-8 btn-bt-margin">');
+            stack1 = helpers._triageMustache.call(depth0, 'btn.description', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push('</div></div>');
+            return buffer;
+        }
+        function program7(depth0, data) {
+            var buffer = '', stack1;
             data.buffer.push('<a ');
             data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
                 hash: { 'href': 'btn.href' },
@@ -35365,7 +35486,16 @@ define('templates/templates', [
                 types: [],
                 data: data
             })));
-            data.buffer.push(' target="_blank" class="btn btn-default">');
+            data.buffer.push(' target="_blank" ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'title': 'btn.tooltip' },
+                hashTypes: { 'title': 'STRING' },
+                hashContexts: { 'title': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            })));
+            data.buffer.push(' class="btn btn-block btn-default">');
             stack1 = helpers._triageMustache.call(depth0, 'btn.label', {
                 hash: {},
                 hashTypes: {},
@@ -35380,7 +35510,7 @@ define('templates/templates', [
             data.buffer.push('</a>');
             return buffer;
         }
-        function program8(depth0, data) {
+        function program9(depth0, data) {
             var buffer = '', stack1;
             data.buffer.push('<button ');
             data.buffer.push(escapeExpression(helpers.action.call(depth0, 'execute', 'btn', {
@@ -35395,6 +35525,136 @@ define('templates/templates', [
                     'STRING',
                     'ID'
                 ],
+                data: data
+            })));
+            data.buffer.push(' ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'title': 'btn.tooltip' },
+                hashTypes: { 'title': 'STRING' },
+                hashContexts: { 'title': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            })));
+            data.buffer.push(' class="btn btn-block btn-default">');
+            stack1 = helpers._triageMustache.call(depth0, 'btn.label', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push('</button>');
+            return buffer;
+        }
+        function program11(depth0, data) {
+            var buffer = '', stack1;
+            data.buffer.push('<div class="btn-group">');
+            stack1 = helpers.each.call(depth0, 'btn', 'in', 'content.content.buttons', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                inverse: self.program(3, program3, data),
+                fn: self.program(12, program12, data),
+                contexts: [
+                    depth0,
+                    depth0,
+                    depth0
+                ],
+                types: [
+                    'ID',
+                    'ID',
+                    'ID'
+                ],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push('</div>');
+            return buffer;
+        }
+        function program12(depth0, data) {
+            var stack1;
+            stack1 = helpers['if'].call(depth0, 'btn.href', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                inverse: self.program(15, program15, data),
+                fn: self.program(13, program13, data),
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            } else {
+                data.buffer.push('');
+            }
+        }
+        function program13(depth0, data) {
+            var buffer = '', stack1;
+            data.buffer.push('<a ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'href': 'btn.href' },
+                hashTypes: { 'href': 'STRING' },
+                hashContexts: { 'href': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            })));
+            data.buffer.push(' target="_blank" ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'title': 'btn.tooltip' },
+                hashTypes: { 'title': 'STRING' },
+                hashContexts: { 'title': depth0 },
+                contexts: [],
+                types: [],
+                data: data
+            })));
+            data.buffer.push(' class="btn btn-default">');
+            stack1 = helpers._triageMustache.call(depth0, 'btn.label', {
+                hash: {},
+                hashTypes: {},
+                hashContexts: {},
+                contexts: [depth0],
+                types: ['ID'],
+                data: data
+            });
+            if (stack1 || stack1 === 0) {
+                data.buffer.push(stack1);
+            }
+            data.buffer.push('</a>');
+            return buffer;
+        }
+        function program15(depth0, data) {
+            var buffer = '', stack1;
+            data.buffer.push('<button ');
+            data.buffer.push(escapeExpression(helpers.action.call(depth0, 'execute', 'btn', {
+                hash: { 'on': 'click' },
+                hashTypes: { 'on': 'STRING' },
+                hashContexts: { 'on': depth0 },
+                contexts: [
+                    depth0,
+                    depth0
+                ],
+                types: [
+                    'STRING',
+                    'ID'
+                ],
+                data: data
+            })));
+            data.buffer.push(' ');
+            data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {
+                hash: { 'title': 'btn.tooltip' },
+                hashTypes: { 'title': 'STRING' },
+                hashContexts: { 'title': depth0 },
+                contexts: [],
+                types: [],
                 data: data
             })));
             data.buffer.push(' class="btn btn-default">');
@@ -35434,29 +35694,21 @@ define('templates/templates', [
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</tbody></table><div class="oxi-button-container"><div class="btn-group">');
-        stack1 = helpers.each.call(depth0, 'btn', 'in', 'content.content.buttons', {
+        data.buffer.push('</tbody></table><div class="oxi-button-container">');
+        stack1 = helpers['if'].call(depth0, 'buttonsWithDescription', {
             hash: {},
             hashTypes: {},
             hashContexts: {},
-            inverse: self.program(3, program3, data),
+            inverse: self.program(11, program11, data),
             fn: self.program(5, program5, data),
-            contexts: [
-                depth0,
-                depth0,
-                depth0
-            ],
-            types: [
-                'ID',
-                'ID',
-                'ID'
-            ],
+            contexts: [depth0],
+            types: ['ID'],
             data: data
         });
         if (stack1 || stack1 === 0) {
             data.buffer.push(stack1);
         }
-        data.buffer.push('</div></div>');
+        data.buffer.push('</div>');
         return buffer;
     });
     T['components/oxisection-main'] = t(function anonymous(Handlebars, depth0, helpers, partials, data) {
@@ -35742,6 +35994,9 @@ define('pods/oxisection-keyvalue/component', [
                 return $(evt.target).addClass('btn-loading');
             }
         },
+        buttonsWithDescription: function () {
+            return this.get('content.content.buttons').isAny('description');
+        }.property('content.content.buttons.@each.description'),
         actions: {
             execute: function (btn) {
                 if (btn.action) {
@@ -35824,6 +36079,9 @@ define('pods/oxisection-grid/component', [
             }
             return res;
         }.property('content.content.data'),
+        hasAction: function () {
+            return !!this.get('content.content.actions');
+        }.property('content.content.actions'),
         sortedData: function () {
             var data, re, sortNum;
             data = this.get('data');
@@ -35898,6 +36156,9 @@ define('pods/oxisection-grid/component', [
             }
             this.set('contextIndex', index);
             actions = this.get('content.content.actions');
+            if (!actions) {
+                return;
+            }
             if (actions.length === 1) {
                 return this.onItem();
             } else {
@@ -36078,17 +36339,15 @@ define('pods/oxisection-form/component', [
                     }
                     return this.container.lookup('route:openxpki').sendAjax({ data: data }).then(function (_this) {
                         return function (doc) {
-                            var i, key, newField, oldField, value, _k, _l, _len2, _len3, _ref1;
+                            var i, idx, newField, oldField, _k, _l, _len2, _len3, _ref1;
                             _ref1 = doc.fields;
                             for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
                                 newField = _ref1[_k];
                                 for (i = _l = 0, _len3 = fields.length; _l < _len3; i = ++_l) {
                                     oldField = fields[i];
                                     if (oldField.name === newField.name) {
-                                        for (key in newField) {
-                                            value = newField[key];
-                                            Em.set(oldField, key, Em.copy(value));
-                                        }
+                                        idx = fields.indexOf(oldField);
+                                        fields.replace(idx, 1, [Em.copy(newField)]);
                                     }
                                 }
                             }
@@ -36314,6 +36573,81 @@ define('pods/oxifield-select/component', [
     });
     __exports__.__default__ = Component;
 });
+define('pods/oxifield-passwordverify/component', [
+    'vendor/ember',
+    'exports'
+], function (__dependency0__, __exports__) {
+    'use strict';
+    var Em = __dependency0__.__default__;
+    var Component;
+    Component = Em.Component.extend({
+        password: '',
+        confirm: '',
+        confirmFocus: false,
+        isFixed: false,
+        setMode: Em.on('init', function () {
+            if (this.get('content.value')) {
+                this.set('password', this.get('content.value'));
+                this.set('isFixed', true);
+                return this.set('content.value', '');
+            }
+        }),
+        showConfirm: function () {
+            return this.get('password') !== this.get('confirm') || this.get('confirmFocus');
+        }.property('password', 'confirm', 'confirmFocus'),
+        valueSetter: Em.observer('password', 'confirm', function () {
+            var confirm, password;
+            password = this.get('password');
+            confirm = this.get('confirm');
+            if (password === confirm) {
+                return this.set('content.value', password);
+            } else {
+                return this.set('content.value', null);
+            }
+        }),
+        placeholder: function () {
+            return this.get('content.placeholder') || 'Retype password';
+        }.property('content.placeholder'),
+        label: '',
+        updateValue: Em.observer('label', function () {
+            var i, label, values;
+            label = this.get('label');
+            values = function () {
+                var _i, _len, _ref, _results;
+                _ref = this.get('content.options');
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                    i = _ref[_i];
+                    if (i.label === label) {
+                        _results.push(i.value);
+                    }
+                }
+                return _results;
+            }.call(this);
+            if (values.length === 1) {
+                return this.set('content.value', values[0]);
+            } else {
+                return this.set('content.value', label);
+            }
+        }),
+        passwordChange: Em.observer('password', function () {
+            this.set('confirm', '');
+            return this.set('content.error', null);
+        }),
+        actions: {
+            confirmFocusIn: function () {
+                return this.set('confirmFocus', true);
+            },
+            confirmFocusOut: function () {
+                this.set('confirmFocus', false);
+                if (this.get('password') !== this.get('confirm')) {
+                    return this.set('content.error', 'Passwords do not match');
+                }
+            }
+        }
+    });
+    __exports__.__default__ = Component;
+});
 define('pods/oxifield-main/component', [
     'vendor/ember',
     'exports'
@@ -36329,10 +36663,11 @@ define('pods/oxifield-main/component', [
         isDatetime: Em.computed.equal('content.type', 'datetime'),
         isHidden: Em.computed.equal('content.type', 'hidden'),
         isPassword: Em.computed.equal('content.type', 'password'),
+        isPasswordVerify: Em.computed.equal('content.type', 'passwordverify'),
         isSelect: Em.computed.equal('content.type', 'select'),
         isText: function () {
             var _ref;
-            return (_ref = this.get('content.type')) !== 'bool' && _ref !== 'cert_identifier' && _ref !== 'checkbox' && _ref !== 'date' && _ref !== 'datetime' && _ref !== 'hidden' && _ref !== 'password' && _ref !== 'select' && _ref !== 'textarea' && _ref !== 'uploadarea';
+            return (_ref = this.get('content.type')) !== 'bool' && _ref !== 'cert_identifier' && _ref !== 'checkbox' && _ref !== 'date' && _ref !== 'datetime' && _ref !== 'hidden' && _ref !== 'password' && _ref !== 'passwordverify' && _ref !== 'select' && _ref !== 'textarea' && _ref !== 'uploadarea';
         }.property('content.type'),
         isTextarea: Em.computed.equal('content.type', 'textarea'),
         isUploadarea: Em.computed.equal('content.type', 'uploadarea'),
@@ -36369,6 +36704,15 @@ define('pods/oxifield-main/component', [
         handleActionOnChange: Em.observer('content.value', function () {
             return this.sendAction('valueChange', this.get('content'));
         }),
+        keyPress: function (event) {
+            if (event.which === 13) {
+                if (this.get('content.clonable')) {
+                    this.send('addClone');
+                    event.stopPropagation();
+                    return event.preventDefault();
+                }
+            }
+        },
         actions: {
             addClone: function (field) {
                 return this.sendAction('addClone', this.get('content'));
@@ -36393,9 +36737,12 @@ define('pods/oxifield-datetime/component', [
         format: 'MM/DD/YYYY hh:mm A',
         options: {},
         setup: function () {
-            this.set('content.value', 'now');
-            if ('now' === this.get('content.value')) {
+            var value;
+            value = this.get('content.value');
+            if (value === 'now') {
                 this.set('content.pickvalue', moment().format(this.get('format')));
+            } else if (value) {
+                this.set('content.pickvalue', moment.unix(value).format(this.get('format')));
             }
             return Em.run.next(function (_this) {
                 return function () {
@@ -36499,7 +36846,7 @@ define('pods/openxpki/route', [
                 data.url = this.controllerFor('config').get('url');
             }
             data.data._ = new Date().getTime();
-            $('.loading').show();
+            $('.loading').addClass('in-progress');
             return $.ajax(data).then(function (_this) {
                 return function (doc) {
                     _this.controllerFor('openxpki').set('status', doc.status);
@@ -36523,14 +36870,16 @@ define('pods/openxpki/route', [
                             _this.transitionTo('openxpki', doc.goto);
                         }
                     }
-                    Em.run.scheduleOnce('afterRender', function () {
-                        $('.loading').hide();
-                        return $('.btn-loading').removeClass('btn-loading');
-                    });
+                    if (!doc.structure && !doc.goto) {
+                        Em.run.scheduleOnce('afterRender', function () {
+                            $('.loading').removeClass('in-progress');
+                            return $('.btn-loading').removeClass('btn-loading');
+                        });
+                    }
                     return doc;
                 };
             }(this), function (err) {
-                $('.loading').hide();
+                $('.loading').removeClass('in-progress');
                 $('.btn-loading').removeClass('btn-loading');
                 return console.log('Ajax error', err);
             });
@@ -36544,44 +36893,13 @@ define('pods/openxpki/controller', [
 ], function (__dependency0__, __exports__) {
     'use strict';
     var Em = __dependency0__.__default__;
-    var Controller, __indexOf = [].indexOf || function (item) {
-            for (var i = 0, l = this.length; i < l; i++) {
-                if (i in this && this[i] === item)
-                    return i;
-            }
-            return -1;
-        };
+    var Controller;
     Controller = Em.ArrayController.extend({
         structure: null,
         showTabs: function () {
             return this.get('content.length') > 1;
         }.property('content.length'),
         navEntries: Em.computed.alias('structure.structure'),
-        sideNavEntries: function () {
-            var cat, e, entry, keys, _i, _len, _ref;
-            if (!this.get('navEntries')) {
-                return;
-            }
-            cat = this.get('page');
-            _ref = this.get('navEntries');
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                entry = _ref[_i];
-                keys = function () {
-                    var _j, _len1, _ref1, _results;
-                    _ref1 = entry.entries;
-                    _results = [];
-                    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-                        e = _ref1[_j];
-                        _results.push(e.key);
-                    }
-                    return _results;
-                }();
-                if (__indexOf.call(keys, cat) >= 0) {
-                    return entry.entries;
-                }
-            }
-            return null;
-        }.property('navEntries', 'page'),
         manageActive: Em.observer('page', function () {
             var e, entry, page, _i, _j, _len, _len1, _ref, _ref1;
             if (!this.get('navEntries')) {
@@ -36699,7 +37017,36 @@ define('pods/config/controller', [
     });
     __exports__.__default__ = Controller;
 });
+define('pods/application/view', [
+    'vendor/ember',
+    'exports'
+], function (__dependency0__, __exports__) {
+    'use strict';
+    var Em = __dependency0__.__default__;
+    var View;
+    View = Em.View.extend({
+        removeLoadings: Em.on('didInsertElement', function () {
+            return $('.waiting-for-ember').remove();
+        })
+    });
+    __exports__.__default__ = View;
+});
+define('pods/application/controller', [
+    'vendor/ember',
+    'exports'
+], function (__dependency0__, __exports__) {
+    'use strict';
+    var Em = __dependency0__.__default__;
+    var Controller;
+    Controller = Em.ArrayController.extend({
+        needs: ['openxpki'],
+        user: Em.computed.alias('controllers.openxpki.user')
+    });
+    __exports__.__default__ = Controller;
+});
 define('ember-app', [
+    'pods/application/controller',
+    'pods/application/view',
     'pods/config/controller',
     'pods/index/route',
     'pods/openxpki/controller',
@@ -36707,6 +37054,7 @@ define('ember-app', [
     'pods/oxifield-certidentifier/component',
     'pods/oxifield-datetime/component',
     'pods/oxifield-main/component',
+    'pods/oxifield-passwordverify/component',
     'pods/oxifield-select/component',
     'pods/oxifield-uploadarea/component',
     'pods/oxisection-form/component',
@@ -36717,25 +37065,30 @@ define('ember-app', [
     'routers/main',
     'templates/templates',
     'exports'
-], function (__dependency0__, __dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __exports__) {
+], function (__dependency0__, __dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __dependency16__, __dependency17__, __dependency18__, __exports__) {
     'use strict';
-    var ConfigController = __dependency0__.__default__;
-    var IndexRoute = __dependency1__.__default__;
-    var OpenxpkiController = __dependency2__.__default__;
-    var OpenxpkiRoute = __dependency3__.__default__;
-    var OxifieldCertidentifierComponent = __dependency4__.__default__;
-    var OxifieldDatetimeComponent = __dependency5__.__default__;
-    var OxifieldMainComponent = __dependency6__.__default__;
-    var OxifieldSelectComponent = __dependency7__.__default__;
-    var OxifieldUploadareaComponent = __dependency8__.__default__;
-    var OxisectionFormComponent = __dependency9__.__default__;
-    var OxisectionGridComponent = __dependency10__.__default__;
-    var OxisectionKeyvalueComponent = __dependency11__.__default__;
-    var OxisectionMainComponent = __dependency12__.__default__;
-    var OxivalueFormatComponent = __dependency13__.__default__;
-    var MainRouter = __dependency14__.__default__;
-    var TemplatesTemplate = __dependency15__.__default__;
+    var ApplicationController = __dependency0__.__default__;
+    var ApplicationView = __dependency1__.__default__;
+    var ConfigController = __dependency2__.__default__;
+    var IndexRoute = __dependency3__.__default__;
+    var OpenxpkiController = __dependency4__.__default__;
+    var OpenxpkiRoute = __dependency5__.__default__;
+    var OxifieldCertidentifierComponent = __dependency6__.__default__;
+    var OxifieldDatetimeComponent = __dependency7__.__default__;
+    var OxifieldMainComponent = __dependency8__.__default__;
+    var OxifieldPasswordverifyComponent = __dependency9__.__default__;
+    var OxifieldSelectComponent = __dependency10__.__default__;
+    var OxifieldUploadareaComponent = __dependency11__.__default__;
+    var OxisectionFormComponent = __dependency12__.__default__;
+    var OxisectionGridComponent = __dependency13__.__default__;
+    var OxisectionKeyvalueComponent = __dependency14__.__default__;
+    var OxisectionMainComponent = __dependency15__.__default__;
+    var OxivalueFormatComponent = __dependency16__.__default__;
+    var MainRouter = __dependency17__.__default__;
+    var TemplatesTemplate = __dependency18__.__default__;
     var App = {
+            ApplicationController: ApplicationController,
+            ApplicationView: ApplicationView,
             ConfigController: ConfigController,
             IndexRoute: IndexRoute,
             OpenxpkiController: OpenxpkiController,
@@ -36743,6 +37096,7 @@ define('ember-app', [
             OxifieldCertidentifierComponent: OxifieldCertidentifierComponent,
             OxifieldDatetimeComponent: OxifieldDatetimeComponent,
             OxifieldMainComponent: OxifieldMainComponent,
+            OxifieldPasswordverifyComponent: OxifieldPasswordverifyComponent,
             OxifieldSelectComponent: OxifieldSelectComponent,
             OxifieldUploadareaComponent: OxifieldUploadareaComponent,
             OxisectionFormComponent: OxisectionFormComponent,

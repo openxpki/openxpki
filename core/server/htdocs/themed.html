@@ -10,26 +10,34 @@
 
     <title>OpenXPKI - Open Source Trustcenter</title>
 
-
-
     <link rel="stylesheet" href="main-built.css" />
-
 
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-
-
     <script src="main-built.js"></script>
-
     <script src="localconfig.js"></script>
+
+    <script type="text/x-handlebars" data-template-name="_applicationHeader">
+      <div class="container-fluid header">
+        <p>Header can be overridden.</p>
+        <p>
+           It can use: <pre>partial "applicationHeaderUserinfo"</pre> to
+           display information about the signed in user.
+        </p>
+        {{partial "applicationHeaderUserinfo"}}
+      </div>
+    </script>
+
+    <script type="text/x-handlebars" data-template-name="_applicationFooter">
+      <div class="container-fluid">
+        <p>Footer can be overridden too.</p>
+      </div>
+    </script>
   </head>
 
   <body>
-    <div class="waiting-for-ember">
-      <div class="alert alert-success" role="alert">OpenXPKI is loading ...</div>
-    </div>
   </body>
 </html>

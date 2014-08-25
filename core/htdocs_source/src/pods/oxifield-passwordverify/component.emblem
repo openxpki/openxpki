@@ -1,5 +1,5 @@
 if isFixed
-  =input class="form-control in-form-group" type="text" disabled="disabled" value=password
+  =input class="form-control in-form-group" type="text" readonly="readonly" value=password
   =input class="form-control in-form-group" type="text" value=confirm placeholder=placeholder
 else
   =input class="form-control in-form-group" type="password" value=password
