@@ -7,24 +7,24 @@
 
   <!-- general CSR conditions -->
   <condition name="I18N_OPENXPKI_WF_COND_IS_WORKFLOW_CREATOR"
-  	class="OpenXPKI::Server::Workflow::Condition::WorkflowCreator"/>
+      class="OpenXPKI::Server::Workflow::Condition::WorkflowCreator"/>
 
   <!-- Request and Issuance -->
   <condition name="I18N_OPENXPKI_WF_COND_SERVER_KEY_GENERATION"
-  	class="OpenXPKI::Server::Workflow::Condition::IsServerKeyGeneration" />
+      class="OpenXPKI::Server::Workflow::Condition::IsServerKeyGeneration" />
 
   <condition name="I18N_OPENXPKI_WF_COND_CHECK_CSR_APPROVALS"
-  	class="OpenXPKI::Server::Workflow::Condition::Approved">
+      class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
   </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_SUBJECT_MATCHES_PKCS10"
-		class="OpenXPKI::Server::Workflow::Condition::SubjectMatchesPKCS10">
+        class="OpenXPKI::Server::Workflow::Condition::SubjectMatchesPKCS10">
   </condition>
 
   <!--  revocation -->
   <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_REVOCATION_CRL_ISSUANCE_PENDING"
-  	class="OpenXPKI::Server::Workflow::Condition::CertificateHasStatus">
+      class="OpenXPKI::Server::Workflow::Condition::CertificateHasStatus">
     <param name="expected_status" value="CRL_ISSUANCE_PENDING"/>
   </condition>
 
@@ -40,18 +40,18 @@
   </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"
-  	class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
+      class="OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked">
   </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS"
-  	class="OpenXPKI::Server::Workflow::Condition::Approved">
+      class="OpenXPKI::Server::Workflow::Condition::Approved">
     <param name="role" value="RA Operator"/>
   </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_CHECK_FOR_REVOCATION_CHECKS_LEFT"
-  	class="OpenXPKI::Server::Workflow::Condition::MaxIterationsNotReached">
-  	<param name="iterator_name" value="crr_max_checks"/>
-  	<param name="max_count" value="5"/>
+      class="OpenXPKI::Server::Workflow::Condition::MaxIterationsNotReached">
+      <param name="iterator_name" value="crr_max_checks"/>
+      <param name="max_count" value="5"/>
   </condition>
 
   <condition name="I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION"
@@ -89,5 +89,11 @@
         class="Workflow::Condition::Evaluate">
         <param name="test" value="defined $context-&gt;{key_gen_params}" />
     </condition>
+
+    <condition name="csr_key_password_server"
+        class="Workflow::Condition::Evaluate">
+        <param name="test" value="$context-&gt;{password_type} eq 'server'" />
+    </condition>
+
 
 </conditions>

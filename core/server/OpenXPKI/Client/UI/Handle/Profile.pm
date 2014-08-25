@@ -145,6 +145,7 @@ sub render_key_select {
     my $class = shift; # static call
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
+    my $wf_action = shift;
 
     $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
 
@@ -186,6 +187,55 @@ sub render_key_select {
     my @enc = map { { value => $_, label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_'.uc($_))  }  } @{$key_enc};
     push @fields, { name => "enc_alg", label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC'), type => 'select', 'options' => \@enc };
     push @fields, { name => "csr_type", type => 'hidden', 'value' => 'pkcs10' };
+    push @fields, { name => "password_type", type => 'select', 'options' => [
+        { value => 'server', label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER') },
+        { value => 'client', label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT') },
+    ] };
+
+    # record the workflow info in the session
+    push @fields, $self->__register_wf_token($wf_info, {
+        wf_action => $wf_action,
+        wf_fields => \@fields,
+        cert_profile => $context->{cert_profile}
+    });
+
+    $self->_result()->{main} = [{
+        type => 'form',
+        action => 'workflow',
+        content => {
+        submit_label => 'proceed',
+            fields => \@fields
+        }},
+    ];
+
+    return $self;
+
+}
+
+sub render_server_password {
+
+    my $class = shift; # static call
+    my $self = shift; # reference to the wrapping workflow/result
+    my $args = shift;
+
+    $self->logger()->debug( 'render_server_password with args: ' . Dumper $args );
+
+    $self->_page({
+        label => 'The system has generated a password for you, please write it down in a secure place as you will need it to download your private key later.',
+        description => ''
+    });
+
+    my $wf_info = $args->{WF_INFO};
+    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+
+    # TODO - create fieldsets as macros and read names and labels from the Workflow
+
+    # Get the list of allowed algorithms
+    my $password = $self->send_command( 'get_random', { LENGTH => 16 });
+
+    my @fields = (
+        { name => "_password", label => i18nGettext('I18N_OPENXPKI_UI_PASSWORD'), type => 'passwordverify', 'value' => $password }
+    );
 
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
@@ -206,6 +256,7 @@ sub render_key_select {
     return $self;
 
 }
+
 
 sub __translate_form_def {
 

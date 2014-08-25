@@ -14,12 +14,9 @@
 
   <state name="SETUP_REQUEST_TYPE">
     <description>Please choose how you want to provide the certificates private key or go back to select an alternative profile.</description>
-    <action name="csr_generate_password"
-            resulting_state="PERSIST_SERVER_GEN_PASSWORD">
-    </action>
 
-    <action name="csr_ask_client_password"
-            resulting_state="ENTER_KEY_PARAMS">
+    <action name="csr_provide_server_key_params"
+        resulting_state="ENTER_KEY_PASSWORD">
     </action>
 
 <!--  Not supported by UI yet
@@ -37,26 +34,23 @@
 
   </state>
 
-  <state name="PERSIST_SERVER_GEN_PASSWORD" autorun="yes">
-    <action name="csr_persist_password"
-            resulting_state="RETYPE_SERVER_GEN_PASSWORD">
-    </action>
-  </state>
-
-  <state name="RETYPE_SERVER_GEN_PASSWORD">
-    <description>The system has generated a password for you, please write it down in a secure place as you will need it to download your private key later.</description>
+  <state name="ENTER_KEY_PASSWORD">
     <action name="csr_retype_server_password"
-            resulting_state="ENTER_KEY_PARAMS">
+        resulting_state="PERSIST_KEY_PASSWORD">
+        <condition name="csr_key_password_server"></condition>
+    </action>
+
+    <action name="csr_ask_client_password"
+        resulting_state="PERSIST_KEY_PASSWORD">
+        <condition name="!csr_key_password_server"></condition>
     </action>
   </state>
 
-  <state name="ENTER_KEY_PARAMS">
-    <description>Please choose the parameters for key generation.</description>
-    <action name="csr_provide_server_key_params"
-        resulting_state="ENTER_SUBJECT">
+  <state name="PERSIST_KEY_PASSWORD" autorun="yes">
+    <action name="csr_persist_key_password"
+            resulting_state="ENTER_SUBJECT">
     </action>
   </state>
-
 
   <state name="ENTER_SUBJECT">
     <description>Please enter the data requested below. This information is used to create the subject of your certificate.</description>

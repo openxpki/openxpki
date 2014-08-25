@@ -8,33 +8,21 @@
         <field name="cert_subject_style"/>
     </action>
 
-
-    <action name="csr_generate_password"
-        class="OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword">
-    </action>
-
-    <action name="csr_persist_password"
-        class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
-        ds_namespace="workflow.csr.keygen_password"
-        ds_key_param="workflow_id"
-        ds_value_param="_password"
-        ds_encrypt="1"
-        ds_force="1"
-        ds_unset_context_value="0">
-    </action>
-
     <!-- This is simply a dummy action to make sure the user has noted the password
          The password given is discarded so it is not possible to trick the workflow
          as we use the original password to encrypt the key  -->
-    <action name="csr_retype_server_password"
+    <action name="csr_ask_client_password"
         class="OpenXPKI::Server::Workflow::Activity::Noop">
-        <field name="_dummy" type="passwordverify"  is_required="yes"  />
-        <field name="_password" type="text" />
+        <field name="_password" type="passwordverify"  is_required="yes"  />
     </action>
 
-    <!-- For client provided passwords, the retype validation is done by the client
-         and the password persisted afterwards -->
-    <action name="csr_ask_client_password"
+    <action name="csr_retype_server_password"
+        class="OpenXPKI::Server::Workflow::Activity::Noop"
+        uihandle="OpenXPKI::Client::UI::Handle::Profile::render_server_password">
+        <field name="_password" type="passwordverify"  is_required="yes"  />
+    </action>
+
+    <action name="csr_persist_key_password"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
         ds_namespace="workflow.csr.keygen_password"
         ds_key_param="workflow_id"
@@ -42,8 +30,8 @@
         ds_encrypt="1"
         ds_force="1"
         ds_unset_context_value="1">
-        <field name="_password" type="passwordverify"  is_required="yes"  />
-        <!--  <validator name="global_password_quality">
+        <!--  <field name="_password" type="passwordverify"  is_required="yes"  />
+        <validator name="global_password_quality">
             <arg>$_password</arg>
         </validator>  -->
     </action>
@@ -61,6 +49,7 @@
         <field name="key_alg"  />
         <field name="enc_alg"  />
         <field name="key_gen_params"  />
+        <field name="password_type" />
         <field name="csr_type" type="hidden" default="pkcs10" />
     </action>
 
