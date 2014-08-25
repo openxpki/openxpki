@@ -10,8 +10,10 @@ fi
 
 aptitude update
 
+rm -rf /etc/openxpki/
+
 # Install mysql without password (no prompt)
-DEBIAN_FRONTEND=noninteractive aptitude install --assume-yes mysql-server
+#DEBIAN_FRONTEND=noninteractive aptitude install --assume-yes mysql-server
 aptitude -o Dpkg::Options::="--force-overwrite" install --assume-yes --allow-untrusted libdbd-mysql-perl libopenxpki-perl openxpki-i18n
 
 /vagrant/setup-dummy.sh

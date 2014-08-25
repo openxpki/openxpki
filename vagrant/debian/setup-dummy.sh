@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -rf /etc/openxpki/ssl/
+
 echo " 
 DROP database if exists openxpki;
 CREATE database openxpki;
@@ -10,8 +12,6 @@ flush privileges;" | mysql -u root
 #Setup the database
 openxpkiadm loadcfg
 openxpkiadm initdb
-
-rm -rf /etc/openxpki/ssl/ 
 
 # create certificates 
 bash /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh

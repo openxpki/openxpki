@@ -5,8 +5,8 @@ aptitude update
 
 # Install the deps
 export DEBIAN_FRONTEND=noninteractive
-aptitude install --assume-yes  dh-make-perl mysql-server
-cat /code-repo/package/debian/build-deps.lst | xargs aptitude install --assume-yes
+#aptitude install --assume-yes  dh-make-perl mysql-server
+#cat /code-repo/package/debian/build-deps.lst | xargs aptitude install --assume-yes
 
 # openca-tools is now only used for scep which we do not test for now
 # so there is no need to install it
@@ -24,16 +24,22 @@ cd /code-repo/package/debian
 # For stupid deps problem, unpack current MakeMaker and Module::Build in lib
 mkdir -p lib/
 cd lib/
-wget http://search.cpan.org/CPAN/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-6.98.tar.gz 
-wget http://search.cpan.org/CPAN/authors/id/L/LE/LEONT/Module-Build-0.4205.tar.gz
-tar -ax --strip-components=2 -f  ExtUtils-MakeMaker-6.98.tar.gz ExtUtils-MakeMaker-6.98/lib/
-tar -ax --strip-components=2 -f  Module-Build-0.4205.tar.gz Module-Build-0.4205/lib/
+
+if [ ! -d "ExtUtils-MakeMaker-6.98" ]; then
+        test -e ExtUtils-MakeMaker-6.98.tar.gz || wget http://search.cpan.org/CPAN/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-6.98.tar.gz 
+    tar -ax --strip-components=2 -f  ExtUtils-MakeMaker-6.98.tar.gz ExtUtils-MakeMaker-6.98/lib/
+fi
+
+if [ ! -d "Module-Build-0.4205" ]; then
+    test -e Module-Build-0.4205.tar.gz || wget http://search.cpan.org/CPAN/authors/id/L/LE/LEONT/Module-Build-0.4205.tar.gz
+    tar -ax --strip-components=2 -f  Module-Build-0.4205.tar.gz Module-Build-0.4205/lib/
+fi
 
 cd ../
 
-# No build the deps
+# Now build the deps
 make clean
-make cpan_dependency cpan_dependency2 
+#make cpan_dependency cpan_dependency2 
 make core
 make i18n
 
