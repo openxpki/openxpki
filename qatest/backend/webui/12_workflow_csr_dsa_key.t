@@ -81,7 +81,7 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_provide_server_key_password!wf_id!'.$wf_id,
+    'action' => 'workflow!select!wf_action!csr_provide_server_key_params!wf_id!'.$wf_id,
 });
 
 $result = $client->mock_request({
@@ -90,6 +90,12 @@ $result = $client->mock_request({
     'enc_alg' => 'aes256',
     'key_gen_params{KEY_LENGTH}' => 1024,
     'csr_type' => 'pkcs10',
+    'password_type' => 'client',
+    'wf_token' => undef
+});
+
+$result = $client->mock_request({
+    'action' => 'workflow!index',
     '_password' => '1234',
     'wf_token' => undef
 });
