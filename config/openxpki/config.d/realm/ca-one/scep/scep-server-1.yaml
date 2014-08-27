@@ -21,7 +21,7 @@ key_size:
     rsaEncryption: 1020-2048
 
 hash_type: 
-- sha1
+  - sha1
 
 authorized_signer_on_behalf:
     rule1:
