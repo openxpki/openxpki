@@ -16,7 +16,6 @@ use OpenXPKI::Server::Workflow;
 use Workflow::Exception qw( configuration_error workflow_error );
 use Data::Dumper;
 
-
 sub new {
     my $class = ref $_[0] || $_[0];
     return bless( {} => $class );
@@ -52,7 +51,7 @@ sub fetch_workflow {
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
 
-	##! 16: 'Fetch Wfl: ' . Dumper $wf;
+    ##! 16: 'Fetch Wfl: ' . Dumper $wf;
 
     $self->__authorize_workflow({
         ACTION   => 'access',
@@ -80,7 +79,7 @@ sub fetch_unfiltered_workflow {
         FACILITY => 'audit',
     );
 
-	return $wf;
+    return $wf;
 
 }
 
@@ -102,51 +101,71 @@ sub list_workflow_titles {
     return $result;
 }
 
-sub get_activity_info {
+=head2 get_action_info
+
+Return the UI info for the named action.
+
+Todo: Some of this code is duplicated in the OpenXPKI::Workflow::Config - might
+be useful to merge this into a helper. Might be useful in the API.
+
+=cut
+sub get_action_info {
 
     my $self = shift;
-    my $activity = shift;
+    my $action_name = shift;
+    my $wf_name = shift; # this can be replaced after creating a lookup map for prefix -> workflow
+    my $conn = CTX('config');
 
-    ##! 2: $activity
+    # Check if it is a global or local action
+    my ($prefix, $name) = ($action_name =~ m{ \A (\w+?)_(\w+) \z }xs);
 
-    # We extract the values from the action definition for ui rendering
-    my $info = $self->{_action_config}->{default}->{$activity};
-
-    my $result = {
-        LABEL => $info->{description} || $activity,
-    };
-    $result->{UIHANDLE} = $info->{uihandle} if ($info->{uihandle});
-
-    my @fields;
-    foreach my $field (@{$info->{field}}) {
-        ##! 64: 'Field info ' . Dumper $field
-
-        my $item = {
-            name => $field->{name},
-            label => $field->{label} || $field->{name},
-            type => $field->{type} || 'text',
-            required => ($field->{is_required} && $field->{is_required} eq 'yes') || 0,
-            clonable => (defined $field->{min} || $field->{max}) || 0,
-        };
-
-        # check for the source_list and source_class attributes
-        if ($field->{source_class} || $field->{source_list}) {
-            # Create Field object to use enumeration code
-            my $fo = Workflow::Action::InputField->new($field);
-            my @options = $fo->get_possible_values();
-            $item->{options} = \@options;
-        }
-
-        if (defined $field->{default}) {
-            $item->{default} = $field->{default};
-        }
-
-        push @fields, $item;
+    my @path;
+    if ($prefix eq 'global') {
+        @path = ('workflow','global','action',$name);
+    } else {
+        @path = ('workflow','def', $wf_name, 'action' , $name);
     }
 
-    $result->{FIELD} = \@fields if (scalar @fields);
+    my $action = { name => $action_name, label => $action_name };
+    foreach my $key (qw(label tooltip description abort resume uihandle)) {
+        my $val = $conn->get([ @path, $key]);
+        if (defined $val) {
+            $action->{$key} = $val;
+        }
+    }
 
-    return $result;
+    my @input = $conn->get_scalar_as_list([ @path, 'input' ]);
+    my @fields;
+    foreach my $field_name (@input) {
+        ##! 64: 'Field info ' . Dumper $field
+
+        my @field_path;
+        # Fields can be defined local or global (only actions inside workflow)
+        if ($wf_name) {
+            @field_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
+            if (!$conn->exists( @field_path )) {
+                @field_path = ( 'workflow', 'global', 'field', $field_name );
+            }
+        } else {
+            @field_path = ( 'workflow', 'global', 'field', $field_name );
+        }
+
+        my $field = $conn->get_hash( \@field_path );
+
+        # Do an explicit get_hash call to check for recursion
+        if ($field->{options}) {
+            $field->{options} = $conn->get_list( [ @field_path, 'option' ] );
+        }
+
+        $field->{type} = 'text' unless ($field->{type});
+        $field->{clonable} = (defined $field->{min} || $field->{max}) || 0;
+
+        push @fields, $field;
+    }
+
+    $action->{field} = \@fields if (scalar @fields);
+
+    return $action;
 }
 
 sub __authorize_workflow {

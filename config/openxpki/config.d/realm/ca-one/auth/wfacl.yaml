@@ -107,6 +107,7 @@ RA Operator:
         - I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA
         - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2
         - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2
+        - test
 
     access:
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
@@ -155,6 +156,9 @@ RA Operator:
         I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA:
             creator: .*
         
+        test:
+            creator: .*
+
 CA Operator:
     create:
         - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING

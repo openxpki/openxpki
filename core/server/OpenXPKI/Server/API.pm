@@ -43,17 +43,17 @@ sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
 
     Params::Validate::validation_options(
-	# let parameter validation errors throw a proper exception
-	on_fail => sub {
-	    my $error = shift;
+    # let parameter validation errors throw a proper exception
+    on_fail => sub {
+        my $error = shift;
 
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
-		params => {
-		    ERROR => $error,
-		    CALL => $current_method
-		});
-	},
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
+        params => {
+            ERROR => $error,
+            CALL => $current_method
+        });
+    },
     );
     if ($arg_ref->{EXTERNAL}) { # we are called externally, do ACL checks
         $external_of{$ident} = 1;
@@ -666,10 +666,10 @@ sub BUILD {
         'send_notification' => {
             class  => 'Default',
             params => {
-            	MESSAGE => {
-					type  => SCALAR,
+                MESSAGE => {
+                    type  => SCALAR,
                     regex => $re_alpha_string,
-            	},
+                },
                 PARAMS => {
                     type   => HASHREF,
                     optional => 1,
@@ -956,7 +956,7 @@ sub BUILD {
                 },
                 'EXPIRATION_DATE' => {
                     type  => SCALAR | UNDEF,
-		    # allow integers but also empty string (undef...)
+            # allow integers but also empty string (undef...)
                     regex => qr{ \A $RE{num}{int}* \z }xms,
                     optional => 1,
                 },
@@ -986,7 +986,7 @@ sub BUILD {
             class  => 'Object',
             params => {
                 'PEM' => {
-                	type  => SCALAR | ARRAYREF,
+                    type  => SCALAR | ARRAYREF,
                     optional => 1,
                 },
                 'PKCS7' => {
@@ -1090,33 +1090,29 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 WORKFLOW => {
-                    type     => SCALAR,
+                    type     => SCALAR|HASHREF,
                     regex    => $re_alpha_string,
                     optional => 1,
                 },
                 ID => {
-                        type  => SCALAR,
-                        regex => $re_integer_string,
-                },
-	        },
-        },
-        'get_workflow_ui_info' => {
-            class  => 'Workflow',
-            params => {
-                WORKFLOW => {
-                    type     => SCALAR,
-                    regex    => $re_alpha_string,
+                    type  => SCALAR,
+                    regex => $re_integer_string,
                     optional => 1,
                 },
-                ID => {
+                TYPE => {
                     type     => SCALAR,
-                    regex    => $re_integer_string,
+                    regex    => $re_alpha_string,
                     optional => 1,
                 },
                 ACTIVITY => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                     optional => 1,
+                },
+                UIINFO => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
                 },
             },
         },
@@ -1127,7 +1123,7 @@ sub BUILD {
                         type  => SCALAR,
                         regex => $re_integer_string,
                 },
-	        },
+            },
         },
         'execute_workflow_activity' => {
             class  => 'Workflow',
@@ -1150,6 +1146,11 @@ sub BUILD {
                     type     => HASHREF,
                     optional => 1,
                 },
+                UIINFO => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             },
         },
         'create_workflow_instance' => {
@@ -1168,6 +1169,11 @@ sub BUILD {
                     type     => HASHREF,
                     optional => 1,
                 },
+                UIINFO => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             },
         },
         'get_workflow_activities' => {
@@ -1177,25 +1183,25 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
-	        ID => {
-		    type  => SCALAR,
-		    regex => $re_integer_string,
+            ID => {
+            type  => SCALAR,
+            regex => $re_integer_string,
                 },
-	    },
         },
-	'get_workflow_activities_params' => {
-		class => 'Workflow',
-		params => {
-			WORKFLOW => {
-				type => SCALAR,
-				regex => $re_alpha_string,
-			},
-			ID => {
-				type => SCALAR,
-				regex => $re_integer_string,
-			},
-		},
-	},
+        },
+    'get_workflow_activities_params' => {
+        class => 'Workflow',
+        params => {
+            WORKFLOW => {
+                type => SCALAR,
+                regex => $re_alpha_string,
+            },
+            ID => {
+                type => SCALAR,
+                regex => $re_integer_string,
+            },
+        },
+    },
         'search_workflow_instances' => {
             class  => 'Workflow',
             params => {
@@ -1401,11 +1407,11 @@ sub AUTOMETHOD {
                 params  => {
                     'METHOD_NAME' => $method_name,
                 },
-		log => {
-		    logger => CTX('log'),
-		    priority => 'info',
-		    facility => 'system',
-		},
+        log => {
+            logger => CTX('log'),
+            priority => 'info',
+            facility => 'system',
+        },
             );
         }
         my $class         = $method_info_of{$ident}->{$method_name}->{class};
@@ -1416,7 +1422,7 @@ sub AUTOMETHOD {
         $current_method = $method_name;
         if (scalar @args > 1 || defined $args[0]) {
             validate(
-    	        @args,
+                @args,
                 $valid_params,
             );
         }
@@ -1437,7 +1443,7 @@ sub AUTOMETHOD {
             eval {
                 #FIXME - ACL checking is disabled
                 #CTX('acl')->authorize($acl_hashref);
-    		# logging is done in ACL class
+            # logging is done in ACL class
             };
 
             if (my $exc = OpenXPKI::Exception->caught()) {
@@ -1455,20 +1461,20 @@ sub AUTOMETHOD {
                     params  => {
                         'EVAL_ERROR' => $EVAL_ERROR,
                     },
-		    log => {
-			logger => CTX('log'),
-			priority => 'error',
-			facility => [ 'system', 'audit' ]
-		    },
+            log => {
+            logger => CTX('log'),
+            priority => 'error',
+            facility => [ 'system', 'audit' ]
+            },
                 );
             }
         }
 
         CTX('log')->log(
-	    MESSAGE  => "Method '$method_name' called via API",
-	    PRIORITY => 'debug',
-	    FACILITY => 'system',
-	    );
+        MESSAGE  => "Method '$method_name' called via API",
+        PRIORITY => 'debug',
+        FACILITY => 'system',
+        );
 
         my $memoization_key;
         if (exists $method_info_of{$ident}->{$method_name}->{memoize} &&

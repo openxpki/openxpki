@@ -24,7 +24,17 @@ action:
         label: The first Action
         description: I am first!
         class: Workflow::Action::Null  
-        fields: tbd
+        input: [ comment ]
         params:
             message: "Hi, I am a log message"
 
+
+field:
+    comment:
+        label: Comment to Operator
+        name: comment
+        description: This it not used, yet
+        placeholder: Please enter a comment here
+        tooltip: Tell us what you think about it!
+        type: textarea
+        required: 1

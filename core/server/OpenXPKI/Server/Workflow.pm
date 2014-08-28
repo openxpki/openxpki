@@ -61,7 +61,7 @@ sub init {
 
     my ( $self, $id, $current_state, $config, $wf_state_objects, $factory ) = @_;
 
-	$self->SUPER::init( $id, $current_state, $config, $wf_state_objects, $factory );
+    $self->SUPER::init( $id, $current_state, $config, $wf_state_objects, $factory );
 
     $self->{_CURRENT_ACTION} = '';
 
@@ -70,16 +70,16 @@ sub init {
 
     # For existing workflows - check for the watchdog extra fields
     if ($id) {
-	    my $persister = $self->_factory()->get_persister( $config->{persister} );
-	    my $wf_info   = $persister->fetch_workflow($id);
+        my $persister = $self->_factory()->get_persister( $config->{persister} );
+        my $wf_info   = $persister->fetch_workflow($id);
 
-	    # fetch additional infos from database:
-	    $count_try = $wf_info->{count_try} if ($wf_info->{count_try});
-	    $proc_state = $wf_info->{proc_state} if ($wf_info->{proc_state});
+        # fetch additional infos from database:
+        $count_try = $wf_info->{count_try} if ($wf_info->{count_try});
+        $proc_state = $wf_info->{proc_state} if ($wf_info->{proc_state});
     }
 
-	##! 16: 'count try: '.$count_try
-	$self->count_try( $count_try );
+    ##! 16: 'count try: '.$count_try
+    $self->count_try( $count_try );
     $self->proc_state($proc_state);
 
     if($proc_state eq 'init'){
@@ -168,8 +168,8 @@ sub execute_action {
         # Look into the workflow definiton weather to autofail
         my $autofail = $self->_get_workflow_state()->{_actions}->{$action_name}->{autofail};
         if (defined $autofail && $autofail =~ /(yes|1)/i) {
-		    ##! 16: 'execute failed and has autofail set'
-        	$self->_autofail($error);
+            ##! 16: 'execute failed and has autofail set'
+            $self->_autofail($error);
         }
 
         # Something unexpected went wrong inside the action, throw exception
@@ -323,8 +323,8 @@ sub pause {
         #this exception will be catched from the workflow::execute_action method
         #proc_state and notifies/history-events will be handled there
         OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED',
-	       params => { retries => $count_try, next_proc_state => 'retry_exceeded' }
+           message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED',
+           params => { retries => $count_try, next_proc_state => 'retry_exceeded' }
        );
     }
 
@@ -362,11 +362,11 @@ sub set_reap_at_interval{
     ##! 16: sprintf('set retry intervall to %s',$interval )
 
     my $reap_at = OpenXPKI::DateTime::get_validity(
-    	    {
-    		VALIDITY => $interval,
-        	VALIDITYFORMAT => 'relativedate',
-    	    },
-    	)->epoch();
+            {
+            VALIDITY => $interval,
+            VALIDITYFORMAT => 'relativedate',
+            },
+        )->epoch();
 
     $self->reap_at($reap_at);
     #if the wf is already running, immediately save data to db:
@@ -578,13 +578,13 @@ sub _proc_state_exception {
 
 sub _autofail {
 
-	my $self      = shift;
+    my $self      = shift;
     my $error = shift;
 
-	eval{
-	    $self->state('FAILURE');
-		$self->_set_proc_state('finished');
-		$self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);
+    eval{
+        $self->state('FAILURE');
+        $self->_set_proc_state('finished');
+        $self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);
         $self->add_history(
             Workflow::History->new(
                 {
@@ -607,13 +607,13 @@ sub _autofail {
 ## FIXME - is this used anywhere - looks like a duplicate leftover from autofail
 sub _skip {
 
-	my $self = shift;
+    my $self = shift;
     my $error = shift;
 
-	eval{
-	    $self->state('FAILURE');
-		$self->_set_proc_state('finished');
-		$self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);
+    eval{
+        $self->state('FAILURE');
+        $self->_set_proc_state('finished');
+        $self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);
         $self->add_history(
             Workflow::History->new(
                 {
@@ -699,6 +699,7 @@ sub factory {
     my $self = shift;
     return $self->_factory();
 }
+
 
 1;
 __END__

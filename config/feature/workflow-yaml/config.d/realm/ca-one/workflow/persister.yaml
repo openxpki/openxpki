@@ -1,3 +1,5 @@
 OpenXPKI:
-    class: "Workflow::Persister::File"
-    path: "/tmp/workflow"
+    name: OpenXPKI
+    class: OpenXPKI::Server::Workflow::Persister::DBI
+    workflow_table: WORKFLOW
+    history_table: WORKFLOW_HISTORY

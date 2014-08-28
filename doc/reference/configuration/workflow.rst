@@ -43,14 +43,28 @@ Each workflow is represented by a file or directory structure below ``workflow.d
     action:
         name_of_action: (as used above)
             label: Verbose name, shown as label on the button
+            tooltip: Hint to show as tooltip on the button in 
             description: Verbose description, show on UI page
             class: Name of the implementation class
             abort: state to jump to on abort (UI button, optional) # not implemented yet
             resume: state to jump to on resume (after exception, optional) # not implemented yet
             condition: scalar/list with names or inline definiton as hash
             validator: same as condition
+            input: list of field names for input, to be defined in field section 
             params:
                 key: value - passed as params to the action class
+
+    field:
+        field_name: (as used above)
+            name: key used in context
+            label: The fields label
+            placeholder: Hint text shown in empty form elements
+            tooltip: Text for "tooltip help"
+            type:     Type of form element (default is input)
+            required: 0|1
+            default:  default value
+            more_key: other_value  (depends on form type)
+
        
 Note: All entity names must contain only letters (lower ascii), digits and the underscore.
 
@@ -82,10 +96,19 @@ Below is a simple, but working workflow config (no conditions, no validators, th
         label: The first Action
         description: I am first!
         class: Workflow::Action::Null  
-        fields: tbd
+        input: [ comment ]
         params:
             message: "Hi, I am a log message"
  
+    field:
+        comment: (as used above)
+            name: comment
+            label: Your Comment
+            placeholder: Please enter a comment here
+            tooltip: Tell us what you think about it!
+            type: textarea
+            required: 1
+            default: ''
 
 
 Workflow Head

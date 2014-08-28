@@ -54,8 +54,8 @@ sub get_cert_identifier_by_csr_wf {
         );
     }
     my $workflow = $factory->fetch_workflow(
-	    'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-	    $wf_id,
+        'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+        $wf_id,
     );
     if (! defined $workflow) {
         OpenXPKI::Exception->throw(
@@ -116,8 +116,8 @@ sub get_cert_identifier_by_csr_wf {
         );
     }
     $workflow = $factory->fetch_workflow(
-	    $child_type,
-	    $child_id,
+        $child_type,
+        $child_id,
     );
     if (! defined $workflow) {
         OpenXPKI::Exception->throw(
@@ -153,10 +153,10 @@ sub list_workflow_instances {
     ##! 16: 'start: ' . $start
 
     my $instances = $dbi->select(
-	TABLE   => $workflow_table,
-	DYNAMIC => {
-	    PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
-	},
+    TABLE   => $workflow_table,
+    DYNAMIC => {
+        PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
+    },
         LIMIT   => {
             AMOUNT => $limit,
             START  => $start,
@@ -183,11 +183,11 @@ sub get_number_of_workflow_instances {
     # TODO - wait for someone to implement aggregates without joins
     # and then use a simpler query (cf. feature request #1675572)
     my $instances = $dbi->select(
-	TABLE     => [ $workflow_table ],
+    TABLE     => [ $workflow_table ],
         JOIN      => [ [ 'WORKFLOW_SERIAL'] ],
-	DYNAMIC   => {
-	    PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
-	},
+    DYNAMIC   => {
+        PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
+    },
         COLUMNS   => [
             {
                 COLUMN    => 'WORKFLOW_SERIAL',
@@ -217,14 +217,14 @@ sub list_context_keys {
         $arg_ref->{'WORKFLOW_TYPE'} = '%';
     }
     my $context_keys = $dbi->select(
-	    TABLE    => [ $workflow_table, $context_table ],
+        TABLE    => [ $workflow_table, $context_table ],
         COLUMNS  => [
              $context_table . '.WORKFLOW_CONTEXT_KEY',
         ],
-	    DYNAMIC => {
+        DYNAMIC => {
                 "$workflow_table.WORKFLOW_TYPE" => {VALUE => $arg_ref->{'WORKFLOW_TYPE'}},
                 "$workflow_table.PKI_REALM"     => {VALUE => CTX('session')->get_pki_realm()},
-	    },
+        },
         JOIN => [ [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ] ],
         DISTINCT => 1,
     );
@@ -254,8 +254,8 @@ sub get_workflow_type_for_id {
     $dbi->commit();
 
     my $db_result = $dbi->first(
-	TABLE    => $workflow_table,
-	DYNAMIC  => {
+    TABLE    => $workflow_table,
+    DYNAMIC  => {
             'WORKFLOW_SERIAL' => {VALUE => $id},
         },
     );
@@ -278,32 +278,38 @@ sub get_workflow_info {
 
     ##! 1: "get_workflow_info"
 
-    # commit to get a current snapshot of the database in the
-    # highest isolation level.
-    # Without this, we will only see old data, especially if
-    # other processes are writing to the database at the same time
-    CTX('dbi_workflow')->commit();
+    ## NOTE - This breaks the API a bit, the "old" code passed id and type
+    ## to load a workflow which is no longer necessary. The attribute "WORKFLOW"
+    ## was used as workflow name, we now use it as workflow object!
+    ## The order ensures that calls with the old parameters are handled
+    ## After finally removing mason we can remove the old code branch
 
-    my $wf_title = $args->{WORKFLOW};
-    my $wf_id    = $args->{ID};
+    # All new call set UIINFO
+    if ($args->{UIINFO}) {
 
-    if (! defined $wf_title) {
-        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
+        return $self->__get_workflow_ui_info( $args );
+
+    } else {
+        my $workflow = CTX('workflow_factory')->get_workflow({ ID => $args->{ID}} );
+        return __get_workflow_info($workflow);
     }
-
-    # get the factory corresponding to the workflow
-    my $factory = __get_workflow_factory({
-        WORKFLOW_ID => $wf_id,
-    });
-    my $workflow = $factory->fetch_workflow(
-        $wf_title,
-        $wf_id
-    );
-
-    return __get_workflow_info($workflow);
 }
 
-sub get_workflow_ui_info {
+
+=head2 get_workflow_ui_info
+
+Return a hash with the information taken from the workflow engine plus
+additional information taken from the workflow config via connector.
+Expects one of:
+
+=item ID numeric workflow id
+
+=item TYPE workflow type
+
+=item WORKFLOW workflow object
+
+=cut
+sub __get_workflow_ui_info {
 
     ##! 1: 'start'
 
@@ -311,21 +317,24 @@ sub get_workflow_ui_info {
     my $args  = shift;
 
     my $factory;
-    my $result;
-
-    # TODO FIXME - poking into the workflow internals is not that nice
-    # TODO - this should become the default workflow info structure
+    my $result = {};
 
     # initial info receives a workflow title
-    my ($wf_type, $wf_description, $wf_state);
+    my ($wf_description, $wf_state);
     my @activities;
-    if (!$args->{ID}) {
+    if (!$args->{ID} && !$args->{WORKFLOW}) {
 
-        $factory = __get_workflow_factory();
-        my $wf_config = $factory->_get_workflow_config($args->{WORKFLOW});
-        $wf_type = $wf_config->{type};
-        $wf_description = $wf_config->{description};
-        $wf_state = 'INITIAL';
+        if (!$args->{TYPE}) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NO_WORKFLOW_GIVEN',
+                params => { ARGS => $args }
+            );
+        }
+
+        # TODO we might use the OpenXPKI::Workflow::Config object for this
+        # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
+        $factory = CTX('workflow_factory')->get_factory();
+        my $wf_config = $factory->_get_workflow_config($args->{TYPE});
         # extract the action in the initial state from the config
         foreach my $state (@{$wf_config->{state}}) {
             next if ($state->{name} ne 'INITIAL');
@@ -334,54 +343,54 @@ sub get_workflow_ui_info {
         }
 
         $result->{WORKFLOW} = {
-            TYPE        => $wf_type,
-            DESCRIPTION => $wf_description,
+            TYPE        => $args->{TYPE},
+            ID          => 0,
+            STATE       => 'INITIAL',
         };
 
     } else {
-        my $wf_id = $args->{ID};
-        my $wf_title =  $args->{WORKFLOW} || $self->get_workflow_type_for_id({ ID => $wf_id });
-        # FIXME TODO - refactor handles!
-        # commit to get a current snapshot of the database in the
-        # highest isolation level.
-        # Without this, we will only see old data, especially if
-        # other processes are writing to the database at the same time
-        CTX('dbi_workflow')->commit();
-        ##! 2: "load workflow"
-        $factory = __get_workflow_factory({
-            WORKFLOW_ID => $wf_id,
-        });
-        my $workflow = $factory->fetch_workflow(
-            $wf_title,
-            $wf_id
-        );
 
-        $result = __get_workflow_info( $workflow );
+        my $workflow;
+        if ($args->{ID}) {
+            $workflow = CTX('workflow_factory')->get_workflow({ ID => $args->{ID}} );
+        } else {
+            $workflow = $args->{WORKFLOW};
+        }
+        $factory = $workflow->factory();
+
+        $result->{WORKFLOW} = {
+            ID          => $workflow->id(),
+            STATE       => $workflow->state(),
+            TYPE        => $workflow->type(),
+            LAST_UPDATE => $workflow->last_update(),
+            PROC_STATE  => $workflow->proc_state(),
+            COUNT_TRY   => $workflow->count_try(),
+            WAKE_UP_AT  => $workflow->wakeup_at(),
+            REAP_AT     => $workflow->reap_at(),
+            CONTEXT     => { %{$workflow->context()->param() } },
+        };
+
         ##! 32: 'Workflow result ' . Dumper $result
         if ($args->{ACTIVITY}) {
             @activities = ( $args->{ACTIVITY} );
         } else {
-            # Note - the ACTIVITY Hash in the result of __get_workflow_info
-            # contains only activities that have fields!
             @activities = $workflow->get_current_actions();
         }
-        $wf_state = $workflow->state();
     }
-
 
     $result->{ACTIVITY} = {};
     foreach my $wf_action (@activities) {
-        $result->{ACTIVITY}->{$wf_action} = $factory->get_activity_info( $wf_action );
+        $result->{ACTIVITY}->{$wf_action} = $factory->get_action_info( $wf_action, $result->{WORKFLOW}->{TYPE} );
     }
 
-    # drill down into the state definition to find the ui setting
-    foreach my $state (@{$factory->{_workflow_config}->{$result->{WORKFLOW}->{TYPE}}->{state}}) {
-        next unless ($state->{name} eq $wf_state);
-        $result->{STATE} = { DESCRIPTION => $state->{description} || '' };
-        if ($state->{uihandle}) {
-            $result->{STATE}->{UIHANDLE} = $state->{uihandle};
-        }
-    }
+    # Add Workflow UI Info
+    my $head = CTX('config')->get_hash([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'head' ]);
+    $result->{WORKFLOW}->{label} = $head->{label};
+    $result->{WORKFLOW}->{description} = $head->{description};
+
+    # Add State UI Info
+    $result->{STATE} = CTX('config')->get_hash([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'state', $result->{WORKFLOW}->{STATE} ]);
+    delete $result->{STATE}->{action};
 
     return $result;
 
@@ -418,6 +427,7 @@ sub execute_workflow_activity {
     my $wf_id       = $args->{ID};
     my $wf_activity = $args->{ACTIVITY};
     my $wf_params   = $args->{PARAMS};
+    my $wf_uiinfo  = $args->{UIINFO};
 
     ##! 32: 'params ' . Dumper $wf_params
 
@@ -434,8 +444,8 @@ sub execute_workflow_activity {
         WORKFLOW_ID => $wf_id,
     });
     my $workflow = $factory->fetch_workflow(
-	    $wf_title,
-	    $wf_id
+        $wf_title,
+        $wf_id
     );
 
     $workflow->reload_observer();
@@ -452,48 +462,52 @@ sub execute_workflow_activity {
     $self->__execute_workflow_activity( $workflow, $wf_activity );
 
     CTX('log')->log(
-    	MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
-    	PRIORITY => 'info',
-    	FACILITY => 'workflow',
-	);
+        MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
+        PRIORITY => 'info',
+        FACILITY => 'workflow',
+    );
 
-    return __get_workflow_info($workflow);
+    if ($wf_uiinfo) {
+        return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
+    } else {
+        return __get_workflow_info($workflow);
+    }
 }
 
 sub get_workflow_activities_params {
-	my $self = shift;
-	my $args = shift;
-	my @list = ();
+    my $self = shift;
+    my $args = shift;
+    my @list = ();
 
-	my $wf_title = $args->{WORKFLOW};
-	my $wf_id = $args-> {ID};
+    my $wf_title = $args->{WORKFLOW};
+    my $wf_id = $args-> {ID};
 
-	# Commit to get a current snapshot and avoid old data
-	CTX('dbi_workflow')->commit();
+    # Commit to get a current snapshot and avoid old data
+    CTX('dbi_workflow')->commit();
 
-	my $factory = __get_workflow_factory({
-			WORKFLOW_ID => $wf_id,
-		});
+    my $factory = __get_workflow_factory({
+            WORKFLOW_ID => $wf_id,
+        });
 
-	my $workflow = $factory->fetch_workflow(
-		$wf_title,
-		$wf_id,
-	);
+    my $workflow = $factory->fetch_workflow(
+        $wf_title,
+        $wf_id,
+    );
 
-	foreach my $action ( $workflow->get_current_actions() ) {
-		my $fields = [];
-		foreach my $field ($workflow->get_action_fields( $action ) ) {
-			push @{ $fields }, {
-				'name'		=> $field->name(),
-				'label'		=> $field->label(),
-				'description'	=> $field->description(),
-				'type'		=> $field->type(),
-				'requirement'	=> $field->requirement(),
-			};
-		};
-		push @list, $action, $fields;
-	}
-	return \@list;
+    foreach my $action ( $workflow->get_current_actions() ) {
+        my $fields = [];
+        foreach my $field ($workflow->get_action_fields( $action ) ) {
+            push @{ $fields }, {
+                'name'		=> $field->name(),
+                'label'		=> $field->label(),
+                'description'	=> $field->description(),
+                'type'		=> $field->type(),
+                'requirement'	=> $field->requirement(),
+            };
+        };
+        push @list, $action, $fields;
+    }
+    return \@list;
 }
 
 =head2 create_workflow_instance
@@ -519,14 +533,15 @@ sub create_workflow_instance {
     ##! 2: Dumper $args
 
     my $wf_title = $args->{WORKFLOW};
+    my $wf_uiinfo = $args->{UIINFO};
 
     my $workflow = __get_workflow_factory()->create_workflow($wf_title);
 
     if (! defined $workflow) {
-    	OpenXPKI::Exception->throw (
-	        message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE",
-	        params => { WORKFLOW => $wf_title }
-	    );
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE",
+            params => { WORKFLOW => $wf_title }
+        );
     }
 
     $workflow->reload_observer();
@@ -591,7 +606,11 @@ sub create_workflow_instance {
     }
     $workflow->attrib({ creator => $context->param( 'creator' ) });
 
-    return __get_workflow_info($workflow);
+    if ($wf_uiinfo) {
+        return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
+    } else {
+        return __get_workflow_info($workflow);
+    }
 
 }
 
@@ -612,8 +631,8 @@ sub get_workflow_activities {
         WORKFLOW_ID => $wf_id,
     });
     my $workflow = $factory->fetch_workflow(
-	    $wf_title,
-	    $wf_id,
+        $wf_title,
+        $wf_id,
     );
     my @list = $workflow->get_current_actions();
 
@@ -767,7 +786,7 @@ sub search_workflow_instances {
     ##! 16: 'dynamic: ' . Dumper $dynamic
     ##! 16: 'tables: ' . Dumper(\@tables)
     my $result = $dbi->select(
-	TABLE   => \@tables,
+    TABLE   => \@tables,
         COLUMNS  => [
                          $workflow_table . '.WORKFLOW_LAST_UPDATE',
                          $workflow_table . '.WORKFLOW_SERIAL',
@@ -780,7 +799,7 @@ sub search_workflow_instances {
                          \@joins,
                     ],
         REVERSE  => 1,
-	    DYNAMIC  => $dynamic,
+        DYNAMIC  => $dynamic,
         DISTINCT => 1,
         ORDER => [
             $workflow_table . '.WORKFLOW_SERIAL',
@@ -903,20 +922,20 @@ sub __get_workflow_info {
     ##! 64: Dumper $workflow
 
     my $result = {
-	WORKFLOW => {
-	    ID          => $workflow->id(),
-	    STATE       => $workflow->state(),
-	    TYPE        => $workflow->type(),
-	    DESCRIPTION => $workflow->description(),
-	    LAST_UPDATE => $workflow->last_update(),
-	    PROC_STATE  => $workflow->proc_state(),
-	    COUNT_TRY  => $workflow->count_try(),
-	    WAKE_UP_AT  => $workflow->wakeup_at(),
-	    REAP_AT  => $workflow->reap_at(),
-	    CONTEXT => {
-		%{$workflow->context()->param()}
-	    },
-	},
+    WORKFLOW => {
+        ID          => $workflow->id(),
+        STATE       => $workflow->state(),
+        TYPE        => $workflow->type(),
+        DESCRIPTION => $workflow->description(),
+        LAST_UPDATE => $workflow->last_update(),
+        PROC_STATE  => $workflow->proc_state(),
+        COUNT_TRY  => $workflow->count_try(),
+        WAKE_UP_AT  => $workflow->wakeup_at(),
+        REAP_AT  => $workflow->reap_at(),
+        CONTEXT => {
+        %{$workflow->context()->param()}
+        },
+    },
     };
 
     # this stuff seems to be unused and does not reflect the attributes
@@ -1137,11 +1156,11 @@ Examples:
 
   my @workflow_ids = $api->search_workflow_instances(
       {
-	  CONTEXT =>
-	      {
-		  KEY   => 'SCEP_TID',
-		  VALUE => 'ECB001D912E2A357E6E813D87A72E641',
-	      },
+      CONTEXT =>
+          {
+          KEY   => 'SCEP_TID',
+          VALUE => 'ECB001D912E2A357E6E813D87A72E641',
+          },
       }
 
 =over

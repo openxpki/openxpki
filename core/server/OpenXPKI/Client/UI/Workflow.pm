@@ -45,8 +45,8 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    my $wf_info = $self->send_command( 'get_workflow_ui_info', {
-        WORKFLOW => $self->param('wf_type')
+    my $wf_info = $self->send_command( 'get_workflow_info', {
+        TYPE => $self->param('wf_type'), UIINFO => 1
     });
 
     if (!$wf_info) {
@@ -81,8 +81,9 @@ sub init_load {
     my $wf_action = $self->param('wf_action') || '';
     my $view = $self->param('view') || '';
 
-    my $wf_info = $self->send_command( 'get_workflow_ui_info', {
-        ID => $id
+    my $wf_info = $self->send_command( 'get_workflow_info', {
+        ID => $id,
+        UIINFO => 1,
     });
 
     if (!$wf_info) {
@@ -327,10 +328,10 @@ sub action_index {
 
         # send input data to workflow
         $wf_info = $self->send_command( 'execute_workflow_activity', {
-            WORKFLOW => $wf_args->{wf_type},
             ID       => $wf_args->{wf_id},
             ACTIVITY => $wf_args->{wf_action},
             PARAMS   => \%wf_param,
+            UIINFO => 1
         });
 
         if (!$wf_info) {
@@ -338,7 +339,7 @@ sub action_index {
             $self->logger()->error("workflow acton failed!");
             return $self;
         }
-
+        $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED'),'success');
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
@@ -346,13 +347,15 @@ sub action_index {
     } elsif($wf_args->{wf_type}) {
 
         $wf_info = $self->send_command( 'create_workflow_instance', {
-            WORKFLOW => $wf_args->{wf_type}, PARAMS   => \%wf_param
+            WORKFLOW => $wf_args->{wf_type}, PARAMS   => \%wf_param, UIINFO => 1
         });
         if (!$wf_info) {
             # todo - handle workflow errors
             $self->logger()->error("Create workflow failed");
             return $self;
         }
+        $self->logger()->trace("wf info on create: " . Dumper $wf_info );
+
         $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{WORKFLOW}->{ID} );
 
         # purge the workflow token
@@ -380,10 +383,10 @@ sub action_index {
     }
 
     # TODO - we need to refetch the ui info until we change the api
-    $wf_info = $self->send_command( 'get_workflow_ui_info', {
-        ID => $wf_info->{WORKFLOW}->{ID},
-        WORKFLOW => $wf_info->{WORKFLOW}->{TYPE}
-    });
+    #$wf_info = $self->send_command( 'get_workflow_info', {
+    #    ID => $wf_info->{WORKFLOW}->{ID},
+    #    UIINFO => 1
+    #});
 
     # Check if we can auto-load the next available action
     my $wf_action;
@@ -442,8 +445,8 @@ sub action_select {
         $wf_id = $wf_args->{wf_id};
     }
 
-    my $wf_info = $self->send_command( 'get_workflow_ui_info', {
-        ID => $wf_id
+    my $wf_info = $self->send_command( 'get_workflow_info', {
+        ID => $wf_id, UIINFO => 1
     });
     $self->logger()->debug('wf_info ' . Dumper  $wf_info);
 
@@ -466,6 +469,7 @@ sub action_select {
             WORKFLOW => $wf_info->{WORKFLOW}->{TYPE},
             ID       => $wf_info->{WORKFLOW}->{ID},
             ACTIVITY => $wf_action,
+            UIINFO => 1
         });
 
         # in case we need access to volatile context values we store them away
@@ -473,9 +477,9 @@ sub action_select {
         #my $org_context = $wf_info->{WORKFLOW}->{CONTEXT};
 
         # TODO - change API
-        $wf_info = $self->send_command( 'get_workflow_ui_info', {
-            ID => $wf_id
-        });
+        #$wf_info = $self->send_command( 'get_workflow_ui_info', {
+        #    ID => $wf_id
+        #});
 
         # Merge back the private context values
         #foreach my $key (keys %{$org_context}) {
@@ -629,6 +633,7 @@ always be called regardless of the internal workflow state, a handler on the
 action level gets called only if the action is selected by above means.
 
 
+
 =cut
 sub __render_from_workflow {
 
@@ -638,21 +643,21 @@ sub __render_from_workflow {
     my $wf_info = $args->{WF_INFO} || undef;
 
     if (!$wf_info && $args->{WF_ID}) {
-        $wf_info = $self->send_command( 'get_workflow_ui_info', {
-            ID => $args->{WF_ID},
+        $wf_info = $self->send_command( 'get_workflow_info', {
+            ID => $args->{WF_ID}, UIINFO => 1
         });
         $args->{WF_INFO} = $wf_info;
     }
 
-    $self->logger()->trace( "wf_info: " . Dumper $wf_info);
+    $self->logger()->debug( "wf_info: " . Dumper $wf_info);
     if (!$wf_info) {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
         return $self;
     }
 
     # delegate handling to custom class
-    if ($wf_info->{STATE}->{UIHANDLE}) {
-        return $self->__delegate_call($wf_info->{STATE}->{UIHANDLE}, $args);
+    if ($wf_info->{STATE}->{uihandle}) {
+        return $self->__delegate_call($wf_info->{STATE}->{uihandle}, $args);
     }
 
     my @activities = keys %{$wf_info->{ACTIVITY}};
@@ -670,12 +675,18 @@ sub __render_from_workflow {
         }
     }
 
+    $self->_page({
+        label => i18nGettext($wf_info->{WORKFLOW}->{label} || $wf_info->{WORKFLOW}->{TYPE}),
+        shortlabel => i18nGettext($wf_info->{WORKFLOW}->{ID}),
+        description => i18nGettext($wf_info->{STATE}->{description} || $wf_info->{WORKFLOW}->{description}),
+    });
+
     # if there is one activity selected (or only one present), we render it now
     if ($wf_action) {
         my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
         # delegation based on activity
-        if ($wf_action_info->{UIHANDLE}) {
-            return $self->__delegate_call($wf_action_info->{UIHANDLE}, $args, $wf_action);
+        if ($wf_action_info->{uihandle}) {
+            return $self->__delegate_call($wf_action_info->{uihandle}, $args, $wf_action);
         }
 
         $self->logger()->debug('activity info ' . Dumper $wf_action_info );
@@ -685,7 +696,7 @@ sub __render_from_workflow {
 
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
         my @fields;
-        foreach my $field (@{$wf_action_info->{FIELD}}) {
+        foreach my $field (@{$wf_action_info->{field}}) {
 
             my $name = $field->{name};
             next if ($name =~ m{ \A workflow_id }x);
@@ -703,6 +714,9 @@ sub __render_from_workflow {
                 label => i18nGettext($field->{label}) || $name,
                 type => $type
             };
+
+            $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
+            $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
 
             $item->{options} = $field->{options} if ($field->{options});
             if ($field->{clonable}) {
@@ -747,29 +761,19 @@ sub __render_from_workflow {
             wf_fields => \@fields,
         });
 
-        $self->_page({
-            label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
-            shortlabel => i18nGettext($wf_info->{WORKFLOW}->{ID}),
-            description => i18nGettext($wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION}),
-        });
-
         $self->_result()->{main} = [{
             type => 'form',
             action => 'workflow',
             content => {
-            submit_label => i18nGettext($wf_action_info->{LABEL} || 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE'),
+                label => $wf_action_info->{label},
+                description => $wf_action_info->{description},
+                submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE'),
                 fields => \@fields
             }},
         ];
     } else {
 
         # more than one action available, so we offer some buttons to choose how to continue
-
-         $self->_page({
-            label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
-            shortlabel => i18nGettext($wf_info->{WORKFLOW}->{ID}),
-            description => i18nGettext($wf_info->{STATE}->{DESCRIPTION} || $wf_info->{WORKFLOW}->{DESCRIPTION}),
-        });
 
         my @fields;
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
@@ -821,7 +825,7 @@ sub __render_from_workflow {
         $self->_result()->{main} = \@section;
 
         # set status decorator on final states
-        my $desc = $wf_info->{STATE}->{DESCRIPTION};
+        my $desc = $wf_info->{STATE}->{description};
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
             $self->set_status( i18nGettext($desc || 'I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
         } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
