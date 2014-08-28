@@ -1,0 +1,11 @@
+$revision_info = {
+                   'git-description' => 'v0.21.0',
+                   'git-branch' => 'testing/release-0.21',
+                   'git-commit-hash' => '908559d9e4db4758b0ac15271c1beaffd6a5c586',
+                   'git-abbreviated-commit-hash' => '908559d',
+                   'last-changed-revision' => '1591',
+                   'revision' => '1591',
+                   'git-tags' => 'v0.21.0',
+                   'git-description-root' => undef,
+                   'git-tag' => 'v0.21.0'
+                 };
