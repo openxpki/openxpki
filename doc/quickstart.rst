@@ -29,10 +29,13 @@ or ubuntu **temporary discontinued due to package problems**::
     echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
 
-As the init script uses mysql as default, but does not force it as a dependancy, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
+As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
     aptitude install mysql-server libdbd-mysql-perl
-    aptitude install libopenxpki-perl
+
+Now install the OpenXPKI core package and the translation package::
+
+    aptitude install libopenxpki-perl openxpki-i18n
 
 We are fighting with a stupid debian build issue, if your install complains about a file collision in ``perllocal.pod``, add the force option::
 
