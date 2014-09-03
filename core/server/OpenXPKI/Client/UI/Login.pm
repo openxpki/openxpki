@@ -23,10 +23,12 @@ sub init_realm_select {
     my $self = shift;
     my $realms = shift;
 
+    my @realms = sort { lc($a->{label}) cmp lc($b->{label}) } @{$realms};
+
     $self->_page ({'label' => 'Please log in'});            
     $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!realm',  content => {
         fields => [
-            { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => $realms },
+            { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => \@realms },
         ]}
     }];    
     return $self;
@@ -36,13 +38,15 @@ sub init_auth_stack {
     
     my $self = shift;
     my $stacks = shift;
+
+    my @stacks = sort { lc($a->{label}) cmp lc($b->{label}) } @{$stacks};
           
     $self->_page ({'label' => 'Please log in'});
     $self->_result()->{main} = [
         { 'type' => 'form', 'action' => 'login!stack', content => {
             title => '', submit_label => 'do login',
             fields => [
-                { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => $stacks },
+                { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => \@stacks },
             ]
         }
     }];
