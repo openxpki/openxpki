@@ -57,7 +57,8 @@ sub get_command
     my $key_store = $self->{ENGINE}->get_key_store();
     if ($key_store ne 'ENGINE' && not -e $self->{KEYFILE}) {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_KEYFILE_DOES_NOT_EXIST");        
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_KEYFILE_DOES_NOT_EXIST",
+                params => { KEYFILE => $self->{KEYFILE} });
     }
 
     ## prepare data

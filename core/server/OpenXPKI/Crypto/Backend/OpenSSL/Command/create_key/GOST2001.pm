@@ -33,7 +33,8 @@ sub verify_params
          and $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} ne "des" )
     {
         OpenXPKI::Exception->throw( message =>
-            "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG");
+            "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG",
+            params => { ENC_ALG => $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} });
     }
 
     return 1;

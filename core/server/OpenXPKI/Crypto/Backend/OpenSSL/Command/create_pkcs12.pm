@@ -65,7 +65,8 @@ sub get_command
         $self->{ENC_ALG} ne "des")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG",
+            params => { ENC_ALG => $self->{ENC_ALG} });
     }
 
     if (exists $self->{CSP}) {
