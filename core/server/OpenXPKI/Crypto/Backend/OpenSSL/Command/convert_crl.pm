@@ -37,7 +37,8 @@ sub get_command
     if ($self->{OUT} ne 'DER' && $self->{OUT} ne 'TXT' && $self->{OUT} ne 'PEM')
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_WRONG_OUTPUT_FORMAT");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_WRONG_OUTPUT_FORMAT",
+            params => { OUTPUT_FORMAT => $self->{OUT} } );
     }
 
     ## build the command

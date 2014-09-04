@@ -89,13 +89,14 @@ sub get_token_alias_by_type {
 
     ##! 32: "Lookup group for type $keys->{TYPE}"
     $keys->{GROUP} = CTX('config')->get("crypto.type.".$keys->{TYPE});
-    delete $keys->{TYPE};
 
    if (not $keys->{GROUP}) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_API_TOKEN_ALIAS_BY_TYPE_NO_GROUP_FOUND',
+            params => { TYPE => $keys->{TYPE} }
         );
     }
+    delete $keys->{TYPE};
 
     ##! 32: " Found keys " . Dumper ($keys)
 

@@ -34,7 +34,8 @@ sub verify_params
         $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} ne "des")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG",
+            params => { ENC_ALG => $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} });
     }
 
     if ($self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^(secp|prime|sect|c2pnb|c2tnb)[1-9][0-9]{2}?[krvw][1-3]$/i and
@@ -44,7 +45,8 @@ sub verify_params
         $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^wap-wsg-idm-ecid-wtls[0-9]*$/)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_EC_CURVE_NAME");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_EC_CURVE_NAME",
+            params => { EC_CURVE_NAME => $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} });
     }
 
     return 1;
