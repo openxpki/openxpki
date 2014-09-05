@@ -52,7 +52,7 @@ sub START {
 }
 
 
-sub generate_key {
+sub I18N_OPENXPKI_WF_ACTION_GENERATE_KEY {
 
     ##! 1: "start"
     my $self = shift;

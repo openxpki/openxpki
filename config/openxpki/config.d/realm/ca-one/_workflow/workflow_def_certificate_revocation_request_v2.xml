@@ -43,21 +43,21 @@
         resulting_state="PENDING">
         <condition name="crr_cond_pending_notification_send"/>
     </action>
-    <action name="crr_send_pending_notification"
+    <action name="I18N_OPENXPKI_WF_ACTION_CRR_SEND_PENDING_NOTIFICATION"
         resulting_state="PENDING">
         <condition name="!crr_cond_pending_notification_send"/>
     </action>
   </state>
 
   <state name="FLAG_NOTIFY_SEND" autorun="yes">
-    <action name="crr_flag_pending_notification_send"
+    <action name="I18N_OPENXPKI_WF_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND"
         resulting_state="PENDING">
     </action>
   </state>
 
   <state name="PENDING">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_PENDING</description>
-    <action name="crr_edit_request"
+    <action name="I18N_OPENXPKI_WF_ACTION_CRR_EDIT_REQUEST"
         resulting_state="EDIT_REQUEST">
       <condition name="I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING"/>
     </action>
@@ -83,7 +83,7 @@
   <!-- This renders the update form and the action clears the approvals  -->
   <state name="EDIT_REQUEST">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_REVOCATION_REQUEST_EDIT_REQUEST</description>
-    <action name="crr_update_request"
+    <action name="I18N_OPENXPKI_WF_ACTION_CRR_UPDATE_REQUEST"
         resulting_state="PENDING">
     </action>
   </state>

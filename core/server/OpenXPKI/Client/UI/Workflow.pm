@@ -108,45 +108,60 @@ sub init_search {
     my $args = shift;
 
     $self->_page({
-        label => 'Workflow Search',
-        description => 'You can search for workflows here.',
+        label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE'),
+        description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION'),
     });
 
     my $workflows = $self->send_command( 'list_workflow_titles' );
     return $self unless(defined $workflows);
 
-    # TODO Sorting / I18
     my @wf_names = keys %{$workflows};
-    @wf_names = sort @wf_names;
-
-    my @wfl_list = map { $_ = {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
+    my @wfl_list = map { $_ = {'value' => $_, 'label' => i18nGettext($workflows->{$_}->{label})} } @wf_names ;
+    @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
 
     my @states = (
-        { label => 'SUCCESS', value => 'SUCCESS' },
-        { label => 'FAILURE', value => 'FAILURE' },
-        { label => 'PENDING', value => 'PENDING' },
-        { label => 'APPROVAL', value => 'APPROVAL' },
+        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL'), value => 'SUCCESS' },
+        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_FAILURE_LABEL'), value => 'FAILURE' },
+        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PENDING_LABEL'), value => 'PENDING' },
+        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_APPROVAL_LABEL'), value => 'APPROVAL' },
     );
+    @states = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @states;
 
     $self->_result()->{main} = [
         {   type => 'form',
             action => 'workflow!load',
             content => {
-                title => 'Get workflow info by known workflow id',
-                submit_label => 'search now',
+                title => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE'),
+                submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL'),
                 fields => [
-                    { name => 'wf_id', label => 'Workflow Id', type => 'text' },
+                    { name => 'wf_id', label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL'), type => 'text' },
                 ]
         }},
         {   type => 'form',
             action => 'workflow!search',
             content => {
-                title => 'Search the database',
-                submit_label => 'search now',
+                title => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE'),
+                submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL'),
                 fields => [
-                    { name => 'wf_type', label => 'Type', type => 'select', is_optional => 1,  options => \@wfl_list  },
-                    { name => 'wf_state', label => 'State', type => 'select', is_optional => 1, editable => 0, prompt => '', options => \@states },
-                    { name => 'wf_creator', label => 'Creator', type => 'text', is_optional => 1 },
+                    { name => 'wf_type',
+                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL'), 
+                      type => 'select',
+                      is_optional => 1,
+                      options => \@wfl_list 
+                    },
+                    { name => 'wf_state',
+                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL'), #'State',
+                      type => 'select',
+                      is_optional => 1,
+                      editable => 0,
+                      prompt => '',
+                      options => \@states
+                    },
+                    { name => 'wf_creator',
+                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL'), # 'Creator',
+                      type => 'text',
+                      is_optional => 1
+                    },
                 ]
         }}
     ];
@@ -162,8 +177,8 @@ sub init_history {
     my $id = $self->param('wf_id');
 
     $self->_page({
-        label => 'Workflow History',
-        description => '',
+        label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE'),
+        description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION'),
     });
 
     my $workflow_history = $self->send_command( 'get_workflow_history', { ID => $id } );
@@ -175,9 +190,9 @@ sub init_history {
     foreach my $item (@{$workflow_history}) {
         push @result, [
             $item->{'WORKFLOW_HISTORY_DATE'},
-            $item->{'WORKFLOW_STATE'},
-            $item->{'WORKFLOW_ACTION'},
-            $item->{'WORKFLOW_DESCRIPTION'},
+            i18nGettext($item->{'WORKFLOW_STATE'}),
+            i18nGettext($item->{'WORKFLOW_ACTION'}),
+            i18nGettext($item->{'WORKFLOW_DESCRIPTION'}),
             $item->{'WORKFLOW_USER'}
         ]
     }
@@ -190,11 +205,11 @@ sub init_history {
         processing_type => 'all',
         content => {
             columns => [
-                { sTitle => "execution time" }, #, format => 'datetime'},
-                { sTitle => "state" },
-                { sTitle => "action"},
-                { sTitle => "description"},
-                { sTitle => "user"},
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_EXEC_TIME_LABEL') }, #, format => 'datetime'},
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_STATE_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_ACTION_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_USER_LABEL') },
             ],
             data => \@result
         }
@@ -903,7 +918,7 @@ sub __delegate_call {
     <state name="DATA_LOADED">
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_LOADED</description>
         <action name="changemeta_update" resulting_state="DATA_UPDATE"/>
-        <action name="changemeta_persist" resulting_state="SUCCESS"/>
+        <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST" resulting_state="SUCCESS"/>
     </state>
     ...
     <action name="changemeta_update"
@@ -911,7 +926,7 @@ sub __delegate_call {
         description="I18N_OPENXPKI_ACTION_UPDATE_METADATA">
         <field name="metadata_update" />
     </action>
-    <action name="changemeta_persist"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST"
         class="OpenXPKI::Server::Workflow::Activity::PersistData">
     </action>
 
@@ -919,7 +934,7 @@ When reached first, a page with the text from the description tag and two
 buttons will appear. The update button has I18N_OPENXPKI_ACTION_UPDATE_METADATA
 as label an after pushing it, a form with one text field will be rendered.
 The persist button has no description and will have the action name
-changemeta_persist as label. As it has no input fields, the workflow will go
+I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST as label. As it has no input fields, the workflow will go
 to the next state without further ui interaction.
 
 =head2 State with custom rendering
@@ -937,7 +952,7 @@ reached, the render_current_data method is called.
     <state name="DATA_LOADED">
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_LOADED</description>
         <action name="changemeta_update" resulting_state="DATA_UPDATE"/>
-        <action name="changemeta_persist" resulting_state="SUCCESS"/>
+        <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST" resulting_state="SUCCESS"/>
     </state>
 
     <action name="changemeta_update"

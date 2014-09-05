@@ -1,6 +1,6 @@
 <actions>
 
-    <action name="csr_select_profile"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_SELECT_PROFILE"
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_profile_select"
         source="USER">
@@ -11,18 +11,18 @@
     <!-- This is simply a dummy action to make sure the user has noted the password
          The password given is discarded so it is not possible to trick the workflow
          as we use the original password to encrypt the key  -->
-    <action name="csr_ask_client_password"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_ASK_CLIENT_PASSWORD"
         class="OpenXPKI::Server::Workflow::Activity::Noop">
         <field name="_password" type="passwordverify"  is_required="yes"  />
     </action>
 
-    <action name="csr_retype_server_password"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_RETYPE_SERVER_PASSWORD"
         class="OpenXPKI::Server::Workflow::Activity::Noop"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_server_password">
         <field name="_password" type="passwordverify"  is_required="yes"  />
     </action>
 
-    <action name="csr_persist_key_password"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_PERSIST_KEY_PASSWORD"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
         ds_namespace="workflow.csr.keygen_password"
         ds_key_param="workflow_id"
@@ -36,13 +36,13 @@
         </validator>  -->
     </action>
 
-    <action name="csr_generate_key_client"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_GENERATE_KEY_CLIENT"
         class="OpenXPKI::Server::Workflow::Activity::Noop">
         <field name="_spkac"/>
         <field name="csr_type" type="hidden" default="spkac" />
     </action>
 
-    <action name="csr_provide_server_key_params"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_key_select"
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
         source="USER">
@@ -53,34 +53,34 @@
         <field name="csr_type" type="hidden" default="pkcs10" />
     </action>
 
-    <action name="csr_upload_pkcs10"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_UPLOAD_PKCS10"
         class="OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10">
         <field name="pkcs10" label="CSR (PKCS#10)" is_required="yes" type="uploadarea" />
         <field name="csr_type" type="hidden" default="pkcs10" />
     </action>
 
-    <action name="csr_edit_subject"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_EDIT_SUBJECT"
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_subject_form"
         source="USER">
         <field name="cert_subject_parts" type="cert_subject" />
     </action>
 
-    <action name="csr_edit_san"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_EDIT_SAN"
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_subject_form"
         source="USER">
         <field name="cert_san_parts" type="cert_san" />
     </action>
 
-    <action name="csr_edit_cert_info"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_EDIT_CERT_INFO"
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
         uihandle="OpenXPKI::Client::UI::Handle::Profile::render_subject_form"
         source="USER">
         <field name="cert_info" type="cert_info" />
     </action>
 
-    <action name="csr_edit_validity"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_EDIT_VALIDITY"
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
         source="USER">
         <field name="notbefore" type="datetime" />
@@ -90,29 +90,29 @@
         </validator>  -->
     </action>
 
-    <action name="csr_render_subject"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_RENDER_SUBJECT"
         class="OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject">
     </action>
 
-    <action name="csr_submit"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_SUBMIT"
         class="OpenXPKI::Server::Workflow::Activity::Noop">
     </action>
 
-    <action name="csr_eval_eligibility"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_EVAL_ELIGIBILITY"
         class="OpenXPKI::Server::Workflow::Activity::Noop">
     </action>
 
-    <action name="csr_send_pending_notification"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_SEND_PENDING_NOTIFICATION"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
         message="csr_created">
     </action>
 
-    <action name="csr_flag_pending_notification_send"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_FLAG_PENDING_NOTIFICATION_SEND"
         class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
         flag_pending_notification_send="1">
     </action>
 
-    <action name="csr_approve_csr"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_APPROVE_CSR"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Approve"
         multi_role_approval="0"
         check_creator="0">
@@ -128,37 +128,37 @@
         </validator> -->
     </action>
 
-    <action name="csr_reject_request"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_REJECT_REQUEST"
         class="OpenXPKI::Server::Workflow::Activity::Noop">
     </action>
 
-    <action name="csr_put_request_on_hold"
-        class="OpenXPKI::Server::Workflow::Activity::Noop">
-        <field name="onhold_comment"/>
-    </action>
-
-    <action name="csr_release_on_hold"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_PUT_REQUEST_ON_HOLD"
         class="OpenXPKI::Server::Workflow::Activity::Noop">
         <field name="onhold_comment"/>
     </action>
 
-    <action name="csr_cancel_approvals"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_RELEASE_ON_HOLD"
+        class="OpenXPKI::Server::Workflow::Activity::Noop">
+        <field name="onhold_comment"/>
+    </action>
+
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_CANCEL_APPROVALS"
       class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
     </action>
 
-    <action name="csr_notify_approval"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_NOTIFY_APPROVAL"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
-        message="csr_notify_approval">
+        message="I18N_OPENXPKI_WF_ACTION_CSR_NOTIFY_APPROVAL">
     </action>
 
-    <action name="csr_load_key_password"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_LOAD_KEY_PASSWORD"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry"
         ds_namespace="workflow.csr.keygen_password"
         ds_key_param="workflow_id"
         ds_value_param="_password">
     </action>
 
-    <action name="csr_generate_key"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_GENERATE_KEY"
         class="OpenXPKI::Server::Workflow::Activity::Tools::GenerateKey"
         _map_key_alg="$key_alg"
         _map_enc_alg="$enc_alg"
@@ -166,11 +166,11 @@
         _map_password="$_password">
     </action>
 
-    <action name="csr_generate_pkcs10"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_GENERATE_PKCS10"
         class="OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10">
     </action>
 
-    <action name="csr_move_key_to_dp"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_MOVE_KEY_TO_DP"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
         ds_namespace="certificate.privatekey"
         ds_key_param="workflow_id"
@@ -180,40 +180,40 @@
         ds_unset_context_value="1">
     </action>
 
-    <action name="csr_rename_private_key"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_RENAME_PRIVATE_KEY"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry"
         ds_namespace="certificate.privatekey"
         ds_key="$workflow_id"
         ds_newkey="$cert_identifier">
     </action>
 
-    <action name="csr_cleanup_key_password"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_CLEANUP_KEY_PASSWORD"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry"
         ds_namespace="workflow.csr.keygen_password"
         ds_key_param="workflow_id">
     </action>
 
-    <action name="csr_persist_csr"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_PERSIST_CSR"
         class="OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest">
     </action>
 
 
-    <action name="csr_notify_rejected"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_NOTIFY_REJECTED"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
         message="csr_rejected">
     </action>
 
-    <action name="csr_notify_issued"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_NOTIFY_ISSUED"
         class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
         message="cert_issued">
     </action>
 
-    <action name="csr_publish_certificate"
+    <action name="I18N_OPENXPKI_WF_ACTION_CSR_PUBLISH_CERTIFICATE"
       class="OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate"
       workflow_type="I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING">
     </action>
 
-     <action name="csr_persist_metadata"
+     <action name="I18N_OPENXPKI_WF_ACTION_CSR_PERSIST_METADATA"
           class="OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata">
      </action>
 

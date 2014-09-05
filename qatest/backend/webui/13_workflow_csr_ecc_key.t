@@ -81,7 +81,7 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_provide_server_key_params!wf_id!'.$wf_id,
+    'action' => 'workflow!select!wf_action!I18N_OPENXPKI_WF_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS!wf_id!'.$wf_id,
 });
 
 $result = $client->mock_request({
@@ -121,11 +121,11 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_submit!wf_id!' . $wf_id,
+    'action' => 'workflow!select!wf_action!I18N_OPENXPKI_WF_ACTION_CSR_SUBMIT!wf_id!' . $wf_id,
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,
+    'action' => 'workflow!select!wf_action!I18N_OPENXPKI_WF_ACTION_CSR_APPROVE_CSR!wf_id!' . $wf_id,
 });
 
 is ($result->{status}->{level}, 'success', 'Status is success');

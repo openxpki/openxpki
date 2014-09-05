@@ -64,7 +64,7 @@ sub execute
     }
 
     # command definition
-    my $pkcs8 = CTX('api')->generate_key({
+    my $pkcs8 = CTX('api')->I18N_OPENXPKI_WF_ACTION_GENERATE_KEY({
          KEY_ALG    => $key_alg,
          ENC_ALG    => $enc_alg,
          PASSWD     => $password,

@@ -7,7 +7,7 @@
 
   <state name="INITIAL">
     <description>I18N_OPENXPKI_WF_STATE_CERTIFICATE_SIGNING_REQUEST_INITIAL</description>
-    <action name="create_csr" 
+    <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CSR" 
 	    resulting_state="BUILD_SUBJECT">
     </action>
   </state>
@@ -33,7 +33,7 @@
   </state>
 
   <state name="SERVER_KEY_GENERATION">
-    <action name="generate_key"
+    <action name="I18N_OPENXPKI_WF_ACTION_GENERATE_KEY"
             resulting_state="NICE_KEY_GENERATED">
     </action>
   </state>

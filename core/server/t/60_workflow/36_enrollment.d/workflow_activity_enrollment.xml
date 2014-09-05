@@ -9,7 +9,7 @@
 
 <actions>
 
-    <action name="enroll_initialize"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_INITIALIZE"
             class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
             source="SCEP">
             <field name="_pkcs7" is_required="yes"/>
@@ -25,19 +25,19 @@
             <field name="t_signer_validity_ok"/>
     </action>
 
-    <action name="enroll_disapprove"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_DISAPPROVE"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_deny_authentication"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_DENY_AUTHENTICATION"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_issue_cert"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_ISSUE_CERT"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::IssueCert">
     </action>
 
-    <action name="enroll_revoke_existing_certs"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_REVOKE_EXISTING_CERTS"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts">
     </action>
 
@@ -45,48 +45,48 @@
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_add_authentication"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_ADD_AUTHENTICATION"
             class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
             num_manual_authen="1">
     </action>
 
-    <action name="enroll_invalidate_challenge_pass"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_INVALIDATE_CHALLENGE_PASS"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_persist_csr"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_PERSIST_CSR"
             class="OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest">
     </action>
 
-    <action name="enroll_modify_metadata"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_MODIFY_METADATA"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_fetch_group_policy"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_FETCH_GROUP_POLICY"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::FetchGroupPolicy">
     </action>
 
-    <action name="enroll_clear_approvals"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_CLEAR_APPROVALS"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_continue_issuance"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_CONTINUE_ISSUANCE"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_extract_csr"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_EXTRACT_CSR"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::ExtractCSR">
     </action>
 
-    <action name="enroll_fork_publish"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_FORK_PUBLISH"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_get_cert_profile"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_GET_CERT_PROFILE"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_calc_approvals"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_CALC_APPROVALS"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::CalcApprovals">
     </action>
 
@@ -94,23 +94,23 @@
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::SerializeUniqueId">
     </action>
 
-    <action name="enroll_eval_challenge"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_EVAL_CHALLENGE"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateChallenge">
     </action>
 
-    <action name="enroll_load_recent_certificate"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_LOAD_RECENT_CERTIFICATE"
             class="Workflow::Action::Null">
     </action>
 
-    <action name="enroll_eval_eligibility"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_EVAL_ELIGIBILITY"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility">
     </action>
 
-    <action name="enroll_eval_signer_trust"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_EVAL_SIGNER_TRUST"
             class="OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust">
     </action>
 
-    <action name="enroll_next_cert_to_revoke"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_NEXT_CERT_TO_REVOKE"
             class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
             array_name="tmp_queue"
             context_key="cert_identifier"
@@ -118,12 +118,12 @@
             <field name="tmp_queue" is_required="yes"/>
     </action>
 
-    <action name="enroll_revoke_cert"
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_REVOKE_CERT"
             class="OpenXPKI::Server::Workflow::Activity::SmartCard::RevokeCertificate">
             <field name="cert_identifier" is_required="yes"/>
     </action>
 
-    <action name="enroll_null1" class="Workflow::Action::Null"/>
-    <action name="enroll_null2" class="Workflow::Action::Null"/>
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_NULL1" class="Workflow::Action::Null"/>
+    <action name="I18N_OPENXPKI_WF_ACTION_ENROLL_NULL2" class="Workflow::Action::Null"/>
     <action name="enroll_null3" class="Workflow::Action::Null"/>
 </actions>

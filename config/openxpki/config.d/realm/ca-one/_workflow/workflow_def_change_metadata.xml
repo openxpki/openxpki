@@ -5,20 +5,20 @@
     
     <state name="INITIAL"> 
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_INITIAL</description>
-        <action name="changemeta_load_data" resulting_state="DATA_UPDATE">
+        <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_DATA" resulting_state="DATA_UPDATE">
         </action>
     </state>
     
     <state name="DATA_UPDATE">        
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_UPDATE</description>        
-        <action name="changemeta_update_context" resulting_state="CHOOSE_ACTION"/>
+        <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_UPDATE_CONTEXT" resulting_state="CHOOSE_ACTION"/>
     </state>
     
     <state name="CHOOSE_ACTION">        
         <description>I18N_OPENXPKI_WF_STATE_CHANGE_METADATA_CHOOSE_ACTION</description>        
-        <action name="changemeta_load_form" resulting_state="DATA_UPDATE"/>
-        <action name="changemeta_terminate" resulting_state="FAILURE" />
-        <action name="changemeta_persist" resulting_state="SUCCESS" />
+        <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_FORM" resulting_state="DATA_UPDATE"/>
+        <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_TERMINATE" resulting_state="FAILURE" />
+        <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST" resulting_state="SUCCESS" />
     </state>
     
     

@@ -38,7 +38,7 @@
  	class="Workflow::Action::Null">
   </action>
 
-  <action name="global_null"
+  <action name="I18N_OPENXPKI_WF_ACTION_GLOBAL_NULL"
     class="Workflow::Action::Null">
   </action>
 

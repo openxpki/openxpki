@@ -59,7 +59,7 @@ OpenXPKI::Server::Workflow::Condition::HasRole
 
 =head1 SYNOPSIS
 
-<condition name="ACL::create_csr"
+<condition name="ACL::I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
     class="OpenXPKI::Server::Workflow::Condition::HasRole">
     <param name="role" value="CA Operator,RA Operator"/>
 </condition>

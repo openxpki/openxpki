@@ -1,6 +1,6 @@
 <actions>
 
-    <action name="changemeta_load_data"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_DATA"
             class="OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata"
             description="I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_DATA">
             <field name="cert_identifier" is_required="yes" type="cert_identifier" />
@@ -9,12 +9,12 @@
             </validator>
     </action>
 
-    <action name="changemeta_load_form"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_FORM"
             class="OpenXPKI::Server::Workflow::Activity::Noop"
             description="I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_FORM">
     </action>
 
-    <action name="changemeta_update_context"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_UPDATE_CONTEXT"
             class="OpenXPKI::Server::Workflow::Activity::Noop"
             description="I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA">
             <field name="meta_email" min="1" max="10" />
@@ -29,12 +29,12 @@
             </validator>
     </action>
 
-    <action name="changemeta_persist"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST"
             class="OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata"
             description="I18N_OPENXPKI_WF_ACTION_METADATA_SAVE_DATA">
     </action>
 
-    <action name="changemeta_terminate"
+    <action name="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_TERMINATE"
             class="OpenXPKI::Server::Workflow::Activity::Noop"
             description="I18N_OPENXPKI_WF_ACTION_CHANGEMETA_ABORT">
     </action>

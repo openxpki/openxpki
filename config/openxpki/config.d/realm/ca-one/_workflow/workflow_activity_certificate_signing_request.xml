@@ -1,7 +1,7 @@
 <actions>
 
    <!-- CSR Creation -->
-  <action name="create_csr"
+  <action name="I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
 	  class="OpenXPKI::Server::Workflow::Activity::Tools::SetSource"
          source="USER">
       <field name="cert_role"/>
@@ -88,7 +88,7 @@
   </action>
 
  <!--   I18N_OPENXPKI_WF_ACTION_CSR_GENERATE_KEY -->
-  <action name="generate_key"
+  <action name="I18N_OPENXPKI_WF_ACTION_GENERATE_KEY"
           class="OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey">
       <field name="_key_type"/>
       <field name="_key_gen_params"/>

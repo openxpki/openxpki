@@ -43,7 +43,7 @@
   </state>
 
   <state name="SERVER_KEY_GENERATION">
-    <action name="generate_key"
+    <action name="I18N_OPENXPKI_WF_ACTION_GENERATE_KEY"
             resulting_state="NICE_KEY_GENERATED">
     </action>
   </state>
