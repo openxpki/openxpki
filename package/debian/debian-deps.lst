@@ -82,5 +82,6 @@ libtimedate-perl
 libyaml-libyaml-perl
 libmodule-install-perl
 libsoap-lite-perl
+librt-client-rest-perl
 
 dh-make-perl

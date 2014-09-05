@@ -37,7 +37,7 @@ OpenXPKI::Server::Workflow::Validator::Bulk
 
 =head1 SYNOPSIS
 
-<action name="create_csr">
+<action name="I18N_OPENXPKI_WF_ACTION_CREATE_CSR">
   <validator name="Bulk"
            class="OpenXPKI::Server::Workflow::Validator::Bulk">
   </validator>

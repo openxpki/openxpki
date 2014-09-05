@@ -95,7 +95,7 @@ $test->state_is('SERVER_KEY_GENERATION');
 # Trigger key generation
 my $param_serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
 
-$test->execute_ok( 'generate_key', {
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_GENERATE_KEY', {
 	_key_type => "RSA",
     _key_gen_params => $param_serializer->serialize( { KEY_LENGTH => 2048, ENC_ALG => "aes128" } ),
     _password => "m4#bDf7m3abd" } ) or die "Error - keygen failed: $@";

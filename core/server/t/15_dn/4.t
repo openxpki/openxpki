@@ -8,6 +8,7 @@
 use strict;
 use warnings;
 use utf8;
+use open ':std', ':encoding(utf8)';
 binmode STDERR, ":utf8";
 use Test::More;
 use OpenXPKI::DN;

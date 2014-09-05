@@ -60,7 +60,7 @@
       class="OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest">
   </action>
 
-  <action name="crr_edit_request"
+  <action name="I18N_OPENXPKI_WF_ACTION_CRR_EDIT_REQUEST"
       class="Workflow::Action::Null">
   </action>
 
@@ -68,7 +68,7 @@
       class="Workflow::Action::Null">
   </action>
 
-  <action name="crr_update_request"
+  <action name="I18N_OPENXPKI_WF_ACTION_CRR_UPDATE_REQUEST"
       class="OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals">
       <description>Update</description>
       <field name="reason_code"  is_required="yes"
@@ -87,12 +87,12 @@
       </validator>
   </action>
 
-  <action name="crr_send_pending_notification"
+  <action name="I18N_OPENXPKI_WF_ACTION_CRR_SEND_PENDING_NOTIFICATION"
      class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
      message="crr_pending_approval">
   </action>
 
-  <action name="crr_flag_pending_notification_send"
+  <action name="I18N_OPENXPKI_WF_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND"
      class="OpenXPKI::Server::Workflow::Activity::Tools::SetContext"
      flag_pending_notification_send="1">
   </action>

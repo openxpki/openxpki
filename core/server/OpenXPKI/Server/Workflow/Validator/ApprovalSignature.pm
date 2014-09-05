@@ -180,7 +180,7 @@ sub validate {
 
     ##! 32: 'signer pem ' . $validate->{CHAIN}->[0]
 
-    my $default_token = CTX('api')->get_default_token();
+    $default_token = CTX('api')->get_default_token();
     my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{CHAIN}->[0], TOKEN => $default_token );
     my $signer_subject = $x509_signer->get_subject();
     my $signer_identifier = $x509_signer->get_identifier();
@@ -213,7 +213,7 @@ OpenXPKI::Server::Workflow::Validator::ApprovalSignature
 
 =head1 SYNOPSIS
 
-<action name="create_csr">
+<action name="I18N_OPENXPKI_WF_ACTION_CREATE_CSR">
   <validator name="ApprovalSignature"
            class="OpenXPKI::Server::Workflow::Validator::ApprovalSignature">
   </validator>

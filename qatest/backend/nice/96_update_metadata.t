@@ -72,7 +72,7 @@ $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA' , \%wfparam, 'Create W
 
 $test->state_is('DATA_UPDATE');
 
-$test->execute_ok( 'changemeta_update_context', {
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CHANGEMETA_UPDATE_CONTEXT', {
     'meta_email' => $serializer->serialize( ['uli.update@openxpki.local' ]),
     'meta_requestor' => 'Uli Update',
     'meta_system_id' => '',
@@ -80,7 +80,7 @@ $test->execute_ok( 'changemeta_update_context', {
 
 $test->state_is('CHOOSE_ACTION');
 
-$test->execute_ok( 'changemeta_persist' );
+$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST' );
 
 $test->state_is('SUCCESS');
 

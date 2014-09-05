@@ -52,22 +52,22 @@ sub init {
         $_map->{$name} = $params->{$key};
         ##! 8: 'Found param ' . $name . ' - value : ' . $params->{$key}
 
-=cut disabled-by-oli
-
-        if ($val =~ /^\$(\S+)/) {
-            # copy from context
-            $_map->{$name} = ['ctx', $1];
-
-        } else { # }if ($val =~ /^\&(\S+)/) {
-            # TT parser
-            $_map->{$name} = ['tt', $val ];
-        #} else {
-        #
-        #    # static value, add to plain params hash
-        #    $params_merged->{$name} = $val;
-        }
-
-=cut disabled-by-oli
+##=cut disabled-by-oli
+##
+##        if ($val =~ /^\$(\S+)/) {
+##            # copy from context
+##            $_map->{$name} = ['ctx', $1];
+##
+##        } else { # }if ($val =~ /^\&(\S+)/) {
+##            # TT parser
+##            $_map->{$name} = ['tt', $val ];
+##        #} else {
+##        #
+##        #    # static value, add to plain params hash
+##        #    $params_merged->{$name} = $val;
+##        }
+##
+##=cut disabled-by-oli
 
     }
 

@@ -80,9 +80,9 @@ OpenXPKI::Server::Workflow::Condition::ACL
 =head1 SYNOPSIS
 
 <action name="CreateCSR">
-  <condition name="ACL::create_csr"
+  <condition name="ACL::I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
              class="OpenXPKI::Server::Workflow::Condition::ACL">
-    <param name="activity" value="create_csr"/>
+    <param name="activity" value="I18N_OPENXPKI_WF_ACTION_CREATE_CSR"/>
   </condition>
 </action>
 
