@@ -51,7 +51,7 @@ sub get_command
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_ENC_ALG",
-            params => { ENC_ALG => $self->{ENC_ALG} );
+            params => { ENC_ALG => $self->{ENC_ALG} });
     }
     if (not exists $self->{PASSWD})
     {
