@@ -303,7 +303,7 @@ sub BUILD {
                 },
             },
         },
-        'I18N_OPENXPKI_WF_ACTION_GENERATE_KEY' => {
+        'generate_key' => {
             class  => 'Object',
             params => {
                 PASSWD => {
