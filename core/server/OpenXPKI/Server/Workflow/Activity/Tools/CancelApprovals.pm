@@ -29,19 +29,19 @@ sub execute
     FACILITY => ['audit','application']
     );
 
-=cut disabled-by-oli
-
-    my $bulk = $context->param('bulk');
-    if (! $bulk) {
-        # only notify if this is not part of a bulk request - otherwise
-        # the user would get a huge number of tickets
-        CTX('notification')->notify({
-            MESSAGE  => 'csr_approvals_canceled',
-            WORKFLOW => $workflow,
-        });
-    }
-
-=cut disabled-by-oli
+##=cut disabled-by-oli
+##
+##    my $bulk = $context->param('bulk');
+##    if (! $bulk) {
+##        # only notify if this is not part of a bulk request - otherwise
+##        # the user would get a huge number of tickets
+##        CTX('notification')->notify({
+##            MESSAGE  => 'csr_approvals_canceled',
+##            WORKFLOW => $workflow,
+##        });
+##    }
+##
+##=cut disabled-by-oli
 
     return 1;
 }
