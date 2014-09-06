@@ -184,9 +184,9 @@ sub init_workflow {
         push @result, [
             $item->{'WORKFLOW.WORKFLOW_SERIAL'},
             $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            $item->{'WORKFLOW.WORKFLOW_TYPE'},
-            $item->{'WORKFLOW.WORKFLOW_STATE'},
-            $item->{'WORKFLOW.WORKFLOW_PROC_STATE'},
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
             $item->{'WORKFLOW.WORKFLOW_WAKEUP_AT'},
         ]
     }
@@ -246,9 +246,9 @@ sub init_task {
         push @csr, [
             $item->{'WORKFLOW.WORKFLOW_SERIAL'},
             $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            $item->{'WORKFLOW.WORKFLOW_TYPE'},
-            $item->{'WORKFLOW.WORKFLOW_STATE'},
-            $item->{'WORKFLOW.WORKFLOW_PROC_STATE'},
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
         ]
     }
 
@@ -288,9 +288,9 @@ sub init_task {
         push @crr, [
             $item->{'WORKFLOW.WORKFLOW_SERIAL'},
             $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            $item->{'WORKFLOW.WORKFLOW_TYPE'},
-            $item->{'WORKFLOW.WORKFLOW_STATE'},
-            $item->{'WORKFLOW.WORKFLOW_PROC_STATE'},
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
         ]
     }
 
