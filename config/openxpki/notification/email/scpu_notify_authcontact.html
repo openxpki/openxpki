@@ -1,0 +1,49 @@
+<html><body>
+
+<img src="cid:banner" />
+
+[% IF to == data.auth1_mail %]
+    [% SET name = data.auth1_name %]
+    [% SET mail = data.auth1_mail %]
+[% ELSE %]
+    [% SET name = data.auth2_name %]
+    [% SET mail = data.auth2_mail %]
+[% END %]
+<p>
+Dear [% name %],
+</p>
+
+<p>
+A request to reset the PIN of the Smartcard belonging to<br/><br/>
+
+    [% data.requestor_name %] <[% data.requestor_mail %]><br/><br/>
+
+has been made.
+</p>
+
+<p>
+That person has specified you as one of the authorizing persons and requests
+that you authorize the transaction. To assist this person, please do the
+following:<br/><br/>
+
+<ol>
+  <li>Fetch your activation code at the following address:<br/>
+
+    [% meta_baseurl %]/service/reset_token/unblock_pin.html?WF_ID=[% workflow_id %]
+  </li>
+  <li>Give the activation code to the Smartcard owner so he or she can complete the
+    transaction.</li>
+</ol>
+<p>
+If you do not know this person or otherwise suspect abuse or fraud, do not
+forward the activation code to anyone. Instead, please contact your
+security officer immediately to report the incident.
+</p>
+
+<p>
+Note: The request tracking ticket for this notification will be automatically
+closed.
+</p>
+
+<img src="cid:footer" />
+</body></html>

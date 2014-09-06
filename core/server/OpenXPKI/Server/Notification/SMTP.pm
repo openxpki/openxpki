@@ -167,28 +167,65 @@ sub transport {
 
 }
 
-sub _init_transport {
+sub _new_smtp {
+  my $self = shift;
+  return Net::SMTP->new( @_ );
+}
 
+sub _cfg_to_smtp_new_args {
     my $self = shift;
-
-    ##! 8: 'creating Net::SMTP transport'
-    my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
-
+    my $cfg = shift;
     my %smtp = (
         Host => $cfg->{host} || 'localhost',
     );
-
     $smtp{'Port'} = $cfg->{port} if ($cfg->{port});
     $smtp{'User'} = $cfg->{username} if ($cfg->{username});
     $smtp{'Password'} = $cfg->{password} if ($cfg->{password});
     $smtp{'Timeout'} = $cfg->{timeout} if ($cfg->{timeout});
     $smtp{'Debug'} = 1 if ($cfg->{debug});
+    return %smtp;
+}
 
-    my $transport = Net::SMTP->new( %smtp );
+sub _init_transport {
+    my $self = shift;
+
+    ##! 8: 'creating Net::SMTP transport'
+    my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
+
+    my %smtp =  $self->_cfg_to_smtp_new_args($cfg);
+    my $transport = $self->_new_smtp( %smtp );
+
     # Net::SMTP returns undef if it can not reach the configured socket
     if (!$transport || !ref $transport) {
         CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}));
         return undef;
+    }
+
+    if($cfg->{username}) {
+        if(!$cfg->{password}) {
+          CTX('log')->log(
+              MESSAGE  => sprintf("Empty password or no password provided (for user %s)", $cfg->{username}),
+              PRIORITY => "error",
+              FACILITY => [ "system", "monitor" ]
+          );
+          $transport->quit;
+          return undef;
+        }
+        CTX('log')->log(
+            MESSAGE  => sprintf("Authenticating to server (user %s)", $cfg->{username}),
+            PRIORITY => "debug",
+            FACILITY => [ "system", "monitor" ]
+        );
+        
+        if(!$transport->auth($cfg->{username}, $cfg->{password})) {
+          CTX('log')->log(
+              MESSAGE  => sprintf("SMTP SASL authentication failed (user: %s, error: %s)", $cfg->{username}, $transport->message),
+              PRIORITY => "error",
+              FACILITY => [ "system", "monitor" ]
+          );
+          $transport->quit;
+          return undef;
+        }
     }
     $self->is_smtp_open(1);
     return $transport;
