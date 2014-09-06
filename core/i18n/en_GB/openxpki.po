@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2014-09-04 14:05+0100\n"
+"PO-Revision-Date: 2014-09-05 13:16+0100\n"
 "Last-Translator: Paweł Tomulik <ptomulik@meil.pw.edu.pl>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -506,7 +506,8 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_CRYPTO_CSR_GET_INFO_HASH_EVAL_OF_DUMP_FAILED"
 msgstr ""
-"Dumper failed (error: __EVAL_ERROR) in OpenXPKI::Crypto::CSR::get_info_hash()"
+"Dumper failed (error: __EVAL_ERROR__) in OpenXPKI::Crypto::CSR::"
+"get_info_hash()"
 
 # This should be probably removed. It appears only in a commented-out block of code.
 msgid "I18N_OPENXPKI_CRYPTO_CSR_INIT_MISSING_SUBJECT"
@@ -522,8 +523,7 @@ msgid "I18N_OPENXPKI_CRYPTO_CSR_NEW_WRONG_TYPE"
 msgstr "Wrong CSR type (__TYPE__) in call to OpenXPKI::Crypto::CSR::new()"
 
 msgid "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE"
-msgstr ""
-"Missing value (PARSED) in call to OpenXPKI::Crypto::Object::get_parsed()"
+msgstr "Found no value for __NAME__ in OpenXPKI::Crypto::Object::get_parsed()"
 
 msgid "I18N_OPENXPKI_CRYPTO_OBJECT_SET_HEADER_ATTRIBUTE_REINIT_FAILED"
 msgstr ""
@@ -5259,7 +5259,7 @@ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING"
 msgstr "Publish certificate"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST"
-msgstr "Certificate renewal request"
+msgstr "Certificate Renewal Request"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST"
 msgstr "Certificate Revocation Request (CRR)"
@@ -5268,7 +5268,7 @@ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_OFFLINE_CA"
 msgstr "Offline part of a Certificate Revocation Request (CRR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2"
-msgstr "Certificate revocation request (v2)"
+msgstr "Certificate Revocation Request (CRR v2)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE"
 msgstr "Revoke certificate"
@@ -5280,16 +5280,16 @@ msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
 msgstr "Offline part of a Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2"
-msgstr "Certificate Signing Request (v2)"
+msgstr "Certificate Signing Request (CSR v2)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERT_EXPORT"
 msgstr "Export certificate"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA"
-msgstr "Change a certificate's metadata"
+msgstr "Change Certificate Metadata"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE"
-msgstr "CRL Issuance"
+msgstr "Certificate Revocation List (CRL) Issuance"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CYCLE_SUB"
@@ -5530,6 +5530,318 @@ msgstr "I18N_OPENXPKI_XML_CACHE_REPLACE_SUPER_LEVEL_TOO_DEEP_POSSIBLE_SUPER_LOOP
 #, fuzzy
 msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL"
+msgstr "SUCCESS"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_FAILURE_LABEL"
+msgstr "FAILURE"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PENDING_LABEL"
+msgstr "PENDING"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_APPROVAL_LABEL"
+msgstr "APPROVAL"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
+msgstr "Workflow Search"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION"
+msgstr "You can search for workflows here."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL"
+msgstr "Search now"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
+msgstr "Workflow Id"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE"
+msgstr "Get workflow info by known workflow id"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE"
+msgstr "Search the database"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL"
+msgstr "Type"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL"
+msgstr "State"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
+msgstr "Creator"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE"
+msgstr "Workflow history"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION"
+msgstr "Use workflow history for audit or troubleshooting"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_EXEC_TIME_LABEL"
+msgstr "Execution time"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_STATE_LABEL"
+msgstr "State"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_ACTION_LABEL"
+msgstr "Action"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION_LABEL"
+msgstr "Description"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_USER_LABEL"
+msgstr "User"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_DATA"
+msgstr "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_DATA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_FORM"
+msgstr "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_LOAD_FORM"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST"
+msgstr "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_PERSIST"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_TERMINATE"
+msgstr "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_TERMINATE"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_UPDATE_CONTEXT"
+msgstr "I18N_OPENXPKI_WF_ACTION_CHANGEMETA_UPDATE_CONTEXT"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
+msgstr "Create CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CRR_EDIT_REQUEST"
+msgstr "Edit Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND"
+msgstr "I18N_OPENXPKI_WF_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CRR_SEND_PENDING_NOTIFICATION"
+msgstr "Send Pending Notification"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CRR_UPDATE_REQUEST"
+msgstr "Update Request"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_APPROVE_CSR"
+msgstr "Approve CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_ASK_CLIENT_PASSWORD"
+msgstr "Ask Client Password"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_CANCEL_APPROVALS"
+msgstr "Cancel Approvals"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_CLEANUP_KEY_PASSWORD"
+msgstr "Cleanup Key Password"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_EDIT_CERT_INFO"
+msgstr "Edit Certificate Info"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_EDIT_SAN"
+msgstr "Edit Alternative Name"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_EDIT_SUBJECT"
+msgstr "Edit Subject"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_EDIT_VALIDITY"
+msgstr "Edit Validity"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_EVAL_ELIGIBILITY"
+msgstr "Evaluate Eligibility"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_FLAG_PENDING_NOTIFICATION_SEND"
+msgstr "Send Pending Notification"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_LOAD_KEY_PASSWORD"
+msgstr "Load Key Password"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_MOVE_KEY_TO_DP"
+msgstr "Move Key to DP"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_NOTIFY_APPROVAL"
+msgstr "Notify of Approval"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_NOTIFY_ISSUED"
+msgstr "Notify of Issuance"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_NOTIFY_REJECTED"
+msgstr "Notify of Rejection"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_PERSIST_CSR"
+msgstr "Persist CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_PERSIST_KEY_PASSWORD"
+msgstr "Persist Key Password"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_PERSIST_METADATA"
+msgstr "Persist Metadata"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS"
+msgstr "Provide Key Parameters"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_PUBLISH_CERTIFICATE"
+msgstr "Publish Certificate"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_PUT_REQUEST_ON_HOLD"
+msgstr "Put Request on Hold"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_REJECT_REQUEST"
+msgstr "Reject Request"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_RELEASE_ON_HOLD"
+msgstr "Release on Hold"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_RENAME_PRIVATE_KEY"
+msgstr "Rename Private Key"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_RENDER_SUBJECT"
+msgstr "Render Subject"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_RETYPE_SERVER_PASSWORD"
+msgstr "Retype Server Password"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_SELECT_PROFILE"
+msgstr "Select Profile"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_SEND_PENDING_NOTIFICATION"
+msgstr "Send Notification of Pending"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_SUBMIT"
+msgstr "Submit CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_CSR_UPLOAD_PKCS10"
+msgstr "Upload PKCS10"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_ADD_AUTHENTICATION"
+msgstr "Add Authentication"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_ALLOW_RETRY"
+msgstr "Allow Retry"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_CALC_APPROVALS"
+msgstr "Calculate Approvals"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_CLEAR_APPROVALS"
+msgstr "Clear Approvals"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_CONTINUE_ISSUANCE"
+msgstr "Continue Issuance"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_DENY_AUTHENTICATION"
+msgstr "Deny Authentication"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_DISAPPROVE"
+msgstr "Disapprove"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_EVAL_CHALLENGE"
+msgstr "Evaluate Challenge"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_EVAL_ELIGIBILITY"
+msgstr "Evaluate Eligibility"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_EVAL_SIGNER_TRUST"
+msgstr "Evaluate Signer Trust"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_EXTRACT_CSR"
+msgstr "Extract CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_FAIL"
+msgstr "Fail"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_FETCH_GROUP_POLICY"
+msgstr "Fetch Group Policy"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_FORK_PUBLISH"
+msgstr "Fork Publish"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_GET_CERT_PROFILE"
+msgstr "Get Certificate Profile"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_INITIALIZE"
+msgstr "Initialize"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_INVALIDATE_CHALLENGE_PASS"
+msgstr "Invalidate Challenge Password"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_ISSUE_CERT"
+msgstr "Issue Certificate"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_LOAD_RECENT_CERTIFICATE"
+msgstr "Load Recent Certificate"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_MODIFY_METADATA"
+msgstr "Modify Metadata"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_NEXT_CERT_TO_REVOKE"
+msgstr "Next Certificate to Revoke"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_NOTIFY_CERT_ISSUED"
+msgstr "Notify of Issuance"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_NOTIFY_PENDING_APPROVAL"
+msgstr "Notify of Pending Approval"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_NULL1"
+msgstr "NULL1"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_NULL2"
+msgstr "NULL2"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_PERSIST_CERT_METADATA"
+msgstr "Persist Metadata"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_PERSIST_CSR"
+msgstr "Persist CSR"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_REVOKE_CERT"
+msgstr "Revoke Certificate"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_REVOKE_CERT_AFTER_REPLACE"
+msgstr "Revoke After Replace"
+
+msgid "I18N_OPENXPKI_WF_ACTION_ENROLL_REVOKE_EXISTING_CERTS"
+msgstr "Revoke Existing Certificates"
+
+msgid "I18N_OPENXPKI_WF_ACTION_GLOBAL_NULL"
+msgstr "NULL"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
+msgstr "Workflow Id"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
+msgstr "Run State"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
+msgstr "Open Workflow"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL"
+msgstr "Workflow History"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE"
+msgstr "Workflow Search - Results"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
+msgstr "Results of your search:"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL"
+msgstr "Serial"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL"
+msgstr "Updated"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
+msgstr "Type"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
+msgstr "State"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
+msgstr "Wake Up"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_ACTION_CHANGEMETA_LOAD_FORM"
@@ -8589,10 +8901,6 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 
 #~ msgid "I18N_OPENXPKI_WF_ACTION_CONTINUE_ISSUANCE"
 #~ msgstr "Continue with issuance"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACTION_CREATE_CSR"
-#~ msgstr "Reject CSR"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACTION_CREATE_SERVER_CSR"
