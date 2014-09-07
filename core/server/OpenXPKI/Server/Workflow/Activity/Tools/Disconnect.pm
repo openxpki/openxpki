@@ -6,6 +6,7 @@ package OpenXPKI::Server::Workflow::Activity::Tools::Disconnect;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
+use OpenXPKI::Server::Context qw( CTX );
 
 
 sub init {
