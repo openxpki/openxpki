@@ -311,24 +311,57 @@ sub run {
 
             eval {
 
-            	my $wf_id = $self->__scan_for_paused_workflows();
+                my $wf_id = $self->__scan_for_paused_workflows();
 
                 # Duration of Pause depends on weather a workflow was found or not
                 if ($wf_id) {
                     ##! 80: sprintf('watchdog sleeps %d secs (busy)', $self->interval_loop_run())
-                	sleep($self->interval_loop_run());
+                    sleep($self->interval_loop_run());
                 } else {
                     ##! 80: sprintf('watchdog sleeps %d secs (idle)', $self->interval_loop_idle())
                     sleep($self->interval_loop_idle());
-            	}
+                }
 
                 # Reset the exception counter after every successfull loop
-            	$exception_count = 0;
+                $exception_count = 0;
 
             };
             my $error_msg;
             if ( my $exc = OpenXPKI::Exception->caught() ) {
-                $error_msg = "Watchdog, fatal exception: " . $exc->message_code();
+                my $em = $exc->message_code();
+                # Special handling of DBI errors - reconnect dbh and try again
+                # only if this is not the first exception
+                if ($exception_count > 0 && $em =~ /I18N_OPENXPKI_SERVER_DBI_DBH/) {
+                    CTX('log')->log(
+                        MESSAGE  => "DBI error in watchdog - trying reconnect",
+                        PRIORITY => "warn",
+                        FACILITY => "system"
+                    );
+                    # Ping the database
+                    if (!$self->{dbi}->is_connected()) {
+                        # Todo need to refactor the handles and clean that up
+                        # imho the watchdog should use backend and not workflow
+                        eval {
+                            CTX('dbi_log')->connect();
+                            CTX('dbi_workflow')->connect();
+                            CTX('dbi_backend')->connect();
+                            $self->{dbi} = CTX('dbi_workflow');
+                        };
+                    }
+                    if (!$self->{dbi}->is_connected()) {
+                        $error_msg = "Watchdog, fatal exception: DBI error and reconnect failed";
+                    } else {
+                        # ping was successful
+                        CTX('log')->log(
+                            MESSAGE  => "DBI error in watchdog - reconnected",
+                            PRIORITY => "info",
+                            FACILITY => "system"
+                        );
+                        # no error message, so next loop will start just immediatley
+                    }
+                } else {
+                    $error_msg = "Watchdog, fatal exception: " . $em;
+                }
             } elsif ($EVAL_ERROR) {
                 $error_msg = "Watchdog, fatal error: " . $EVAL_ERROR;
             }
@@ -346,10 +379,10 @@ sub run {
                 my $threshold = $self->max_exception_threshhold();
                 if ($threshold > 0 && ++$exception_count > $threshold ) {
                     my $msg = 'Watchdog exception limit ($threshold) reached, exiting!';
-	                print STDERR $msg, "\n";
-	                OpenXPKI::Exception->throw(
-	                    message => $msg,
-	                    log => {
+                    print STDERR $msg, "\n";
+                    OpenXPKI::Exception->throw(
+                        message => $msg,
+                        log => {
                             logger => CTX('log'),
                             priority => 'fatal',
                             facility => 'system',
@@ -376,8 +409,8 @@ Trigger via IPC by the master process when a reload happens.
 =cut
 sub _sig_hup {
 
-	##! 1: 'Got HUP'
-	my $watchdog = CTX('watchdog');
+    ##! 1: 'Got HUP'
+    my $watchdog = CTX('watchdog');
 
     ##! 4: 'run update head on watchdog child ' . $$
     my $config = CTX('config');
@@ -413,7 +446,7 @@ sub _sig_hup {
         PRIORITY => "info",
         FACILITY => "system",
     );
-	return;
+    return;
 
 }
 
@@ -434,7 +467,7 @@ sub _sig_term {
         FACILITY => "system",
     );
 
-	return;
+    return;
 }
 
 =head2 reload
@@ -500,11 +533,11 @@ sub terminate {
     if (ref $result->{watchdog}) {
         kill 'TERM', @{$result->{watchdog}};
 
-     	CTX('log')->log(
-        	MESSAGE  => 'Told watchdog to terminate',
-		  PRIORITY => "info",
+         CTX('log')->log(
+            MESSAGE  => 'Told watchdog to terminate',
+          PRIORITY => "info",
             FACILITY => "system",
-	   );
+       );
     } else {
         CTX('log')->log(
             MESSAGE  => 'No watchdog pids to terminate',
@@ -526,7 +559,7 @@ workflow is returned. Returns undef, if nothing is found.
 =cut
 sub __scan_for_paused_workflows {
 
-	##! 1: 'start'
+    ##! 1: 'start'
 
     my $self = shift;
 
