@@ -85,9 +85,10 @@
         source="USER">
         <field name="notbefore" type="datetime" />
         <field name="notafter" type="datetime" />
-        <!--  <validator name="global_password_quality">
-            <arg>$_password</arg>
-        </validator>  -->
+        <validator name="global_validity_window">
+            <arg>$notbefore</arg>
+            <arg>$notafter</arg>
+        </validator>
     </action>
 
     <action name="csr_render_subject"
