@@ -52,6 +52,9 @@ apt-get  install --fix-broken --yes
 # run the setup stuff
 /vagrant/setup-dummy.sh
 
+# Need to wait until server and watchdog are up
+sleep 30;
+
 # Kick off prove
 cd /code-repo/qatest/backend/nice
 prove . 

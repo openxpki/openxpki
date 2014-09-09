@@ -52,7 +52,7 @@ default: 1
 =item interval_wait_initial
 
 Seconds to wait after server start before the watchdog starts scanning.
-default: 60;
+default: 30;
 
 =item interval_loop_idle
 
@@ -126,7 +126,7 @@ has max_instance_count => (
 has interval_wait_initial => (
     is => 'rw',
     isa => 'Int',
-    default =>  60
+    default =>  30
 );
 
 has interval_loop_idle => (

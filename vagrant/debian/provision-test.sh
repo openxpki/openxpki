@@ -18,6 +18,9 @@ aptitude -o Dpkg::Options::="--force-overwrite" install --assume-yes --allow-unt
 
 /vagrant/setup-dummy.sh
 
+# Need to wait until server and watchdog are up
+sleep 30;
+
 cd /qatest/backend/nice
 prove . 
 
