@@ -36,7 +36,7 @@ sub validate {
         $regex = qr/ \A [a-z0-9\.-]+\@([\w_-]+\.)+(\w+) \z /xi;
     # or quote the string if no named match
     } else {
-        $regex = qr/$regex/;
+        $regex = qr/$regex/x;
     }
 
     # Array Magic
