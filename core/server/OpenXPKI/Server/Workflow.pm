@@ -121,7 +121,7 @@ sub execute_action {
     $self->set_reap_at_interval($reap_at_interval);
 
     ##! 16: 'set proc_state "running"'
-    $self->_set_proc_state('running');#saves wf state and other infos to DB
+    $self->_set_proc_state('running'); # saves wf state and other infos to DB
 
     CTX('log')->log(
         MESSAGE  => "Execute action $action_name on workflow #" . $self->id,
@@ -147,6 +147,20 @@ sub execute_action {
 
         my $error = $EVAL_ERROR;
 
+        # Check for validation errors (dont set the workflow to exception)
+        if (ref $error eq 'Workflow::Exception::Validation') {
+            # Set workflow status to manual
+            $self->_set_proc_state( 'manual' );
+
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE",
+                params => {
+                    ACTION => $action_name,
+                    ERROR => scalar $error,
+                }
+            );
+        }
+
         # If we have consecutive autorun actions the error bubbles up as the
         # workflow engine makes recursive calls, rethrow the first exception
         # instead of cascading them
@@ -164,7 +178,9 @@ sub execute_action {
             $e->rethrow;
         }
 
+
         $self->_proc_state_exception($error);
+
         # Look into the workflow definiton weather to autofail
         my $autofail = $self->_get_workflow_state()->{_actions}->{$action_name}->{autofail};
         if (defined $autofail && $autofail =~ /(yes|1)/i) {
@@ -178,7 +194,8 @@ sub execute_action {
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE",
             params => {
                 ACTION => $action_name,
-                ERROR => scalar $error
+                ERROR => scalar $error,
+                EXCEPTION => ref $error
             }
         );
 
@@ -530,6 +547,8 @@ sub _set_proc_state{
 
     $self->proc_state($proc_state);
     # save current proc-state immediately to DB
+    # This also persists the (invalid) context of the current transaction
+    # into the database which should not be, see #236
     $self->_save();
 
 }

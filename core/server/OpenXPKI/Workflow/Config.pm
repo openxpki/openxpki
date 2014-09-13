@@ -63,6 +63,12 @@ sub _build_workflow_config {
             $self->__process_condition(['workflow','def', $wf_name, 'condition', $condition_name ]);
         }
 
+        # Add workflow defined validators
+        my @validator_names = $conn->get_keys(['workflow','def', $wf_name, 'validator']);
+        foreach my $validator_name (@validator_names) {
+            $self->__process_validator(['workflow','def', $wf_name, 'validator', $validator_name ]);
+        }
+
     }
 
     # Finally add the global actions
@@ -75,6 +81,12 @@ sub _build_workflow_config {
     my @condition_names = $conn->get_keys(['workflow','global', 'condition']);
     foreach my $condition_name (@condition_names) {
         $self->__process_condition(['workflow','global', 'condition', $condition_name ]);
+    }
+
+    # Validators
+    my @validator_names = $conn->get_keys(['workflow','global', 'validator']);
+    foreach my $validator_name (@validator_names) {
+        $self->__process_validator(['workflow','global', 'validator', $validator_name ]);
     }
 
     return $self->_workflow_config
@@ -114,7 +126,7 @@ sub __process_workflow {
                 ($action_item =~ m{ \A (global_)?(\w+)\s*>\s*(\w+)(\s*\?\s*([!\w\s]+))? }xs);
 
             CTX('log')->log(
-                MESSAGE  => "Adding Action: $action_name -> $next_state",
+                MESSAGE  => "Adding action: $action_name -> $next_state",
                 PRIORITY => 'debug',
                 FACILITY => 'workflow',
             );
@@ -139,11 +151,21 @@ sub __process_workflow {
                 $item->{condition} = [];
                 # we need to insert the prefix and take care of the ! mark
                 foreach my $cond (@conditions) {
+                    # Check for opposite
+                    my $flag_opposite = '';
                     if ($cond =~ /^!/) {
-                        push @{$item->{condition}}, { name => '!'.$prefix.substr($cond,1) }
-                    } else {
-                        push @{$item->{condition}}, { name => $prefix.$_ }
+                        $flag_opposite = '!';
+                        $cond = substr($cond,1);
                     }
+
+                    # Conditions can have another prefix then the action, so check for it
+                    if ($cond !~ /^global_/) {
+                        $cond = $wf_prefix.'_'.$cond;
+                    }
+
+                    # Merge opposite and prefixed name
+                    push @{$item->{condition}}, { name => $flag_opposite.$cond }
+
                 }
             }
             push @actions, $item;
@@ -187,6 +209,12 @@ sub __process_action {
     my $prefix;
     my @path = @{$path};
 
+    CTX('log')->log(
+        MESSAGE  => "Adding action definition: " . join (".", @path),
+        PRIORITY => 'debug',
+        FACILITY => 'workflow',
+    );
+
     my $wf_name;
     # check if its a global or workflow path to determine prefix
     if ($path[1] eq 'def') {
@@ -207,18 +235,18 @@ sub __process_action {
     my @fields = ();
     foreach my $field_name (@input) {
 
-        my @field_path;
+        my @item_path;
         # Fields can be defined local or global (only actions inside workflow)
         if ($wf_name) {
-            @field_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
-            if (!$conn->exists( @field_path )) {
-                @field_path = ( 'workflow', 'global', 'field', $field_name );
+            @item_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
+            if (!$conn->exists( @item_path )) {
+                @item_path = ( 'workflow', 'global', 'field', $field_name );
             }
         } else {
-            @field_path = ( 'workflow', 'global', 'field', $field_name );
+            @item_path = ( 'workflow', 'global', 'field', $field_name );
         }
 
-        my $context_key = $conn->get( [ @field_path, 'name' ] );
+        my $context_key = $conn->get( [ @item_path, 'name' ] );
         if (!$context_key) {
             OpenXPKI::Exception->throw(
                 message => 'Field name used in workflow config is not defined',
@@ -228,19 +256,59 @@ sub __process_action {
 
         # We just need the name and the required flag for the workflow engine
         # anything else is UI control only and pulled from the connector at runtime
-        my $required = $conn->get( [ @field_path, 'required' ] );
+        my $required = $conn->get( [ @item_path, 'required' ] );
         my $is_required = (defined $required && $required =~ m/(yes|1)/i);
+
+        CTX('log')->log(
+            MESSAGE  => "Adding field $field_name / $context_key",
+            PRIORITY => 'debug',
+            FACILITY => 'workflow',
+        );
 
         # Push to the field list for the action
         push @fields, { name => $context_key, is_required => $is_required ? 'yes' : 'no' };
 
     }
 
+    my @validators = ();
+    # Attach validators - name => $name, arg  => [ $value ]
+    my @valid = $conn->get_scalar_as_list( [ @path, 'validator' ] );
+    foreach my $valid_name (@valid) {
+
+        my @item_path;
+        # Inside workflow, check if validator has global prefix
+        if ($valid_name =~ /^global_(\S+)/) {
+            @item_path = ( 'workflow', 'global', 'validator', $1 );
+        } else {
+            # Are we in a global definiton?
+            if ($wf_name) {
+                @item_path = ( 'workflow', 'def', $wf_name, 'validator', $valid_name );
+            } else {
+                @item_path = ( 'workflow', 'global', 'validator', $valid_name );
+            }
+             # Prefix is global_ in global defs, so matches both cases
+            $valid_name = $prefix.$valid_name;
+        }
+
+        # Validator can have an argument list, params are handled by the global implementation definiton!
+        my @extra_args = $conn->get_scalar_as_list( [ @item_path, 'args' ] );
+
+        CTX('log')->log(
+            MESSAGE  => "Adding validator $valid_name",
+            PRIORITY => 'debug',
+            FACILITY => 'workflow',
+        );
+
+        # Push to the field list for the action
+        push @validators, { name => $valid_name,  args => \@extra_args };
+
+    }
 
     my $action = {
         name => $prefix.$action_name,
         class => $action_class,
-        field => \@fields
+        field => \@fields,
+        validator => \@validators
     };
 
     push @{$self->_workflow_config()->{action}}, $action;
@@ -266,11 +334,18 @@ sub __process_condition {
     my $prefix;
     my @path = @{$path};
 
+    CTX('log')->log(
+        MESSAGE  => "Adding condition " . join(".", @path),
+        PRIORITY => 'debug',
+        FACILITY => 'workflow',
+    );
+
     my $wf_name;
     # check if its a global or workflow path to determine prefix
     if ($path[1] eq 'def') {
         $wf_name = $path[2];
         $prefix = $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix' ] );
+        $prefix .= '_';
     } else {
         $prefix = 'global_';
     }
@@ -293,9 +368,79 @@ sub __process_condition {
         $condition->{param} = \@param;
     }
 
+    CTX('log')->log(
+        MESSAGE  => "Adding condition " . (Dumper $condition),
+        PRIORITY => 'debug',
+        FACILITY => 'workflow',
+    );
+
     push @{$self->_workflow_config()->{condition}}, $condition;
 
     return $condition;
+
+}
+
+
+=head2 __process_validator
+
+Add the validator implementation details to the global definition.
+This includes class, class params and parameters.
+
+=cut
+sub __process_validator {
+
+    my $self = shift;
+    my $path = shift;
+
+    my $conn = $self->_config();
+
+    # Get the prefix
+    my $prefix;
+    my @path = @{$path};
+
+    CTX('log')->log(
+        MESSAGE  => "Adding validator " . join(".", @path),
+        PRIORITY => 'debug',
+        FACILITY => 'workflow',
+    );
+
+    my $wf_name;
+    # check if its a global or workflow path to determine prefix
+    if ($path[1] eq 'def') {
+        $wf_name = $path[2];
+        $prefix = $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix' ] );
+        $prefix .= '_';
+    } else {
+        $prefix = 'global_';
+    }
+
+    my $validator_name = $path[-1];
+
+    # Get the implementation class
+    my $validator_class = $conn->get([ @path, 'class' ] );
+
+    my $validator = {
+        name => $prefix.$validator_name,
+        class => $validator_class,
+    };
+
+    # Get params
+    my $param = $conn->get([ @path, 'param' ] );
+    my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
+
+    if (scalar @param) {
+        $validator->{param} = \@param;
+    }
+
+    CTX('log')->log(
+        MESSAGE  => "Adding validator " . (Dumper $validator),
+        PRIORITY => 'debug',
+        FACILITY => 'workflow',
+    );
+
+    push @{$self->_workflow_config()->{validator}}, $validator;
+
+    return $validator;
 
 }
 1;

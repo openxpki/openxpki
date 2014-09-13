@@ -12,7 +12,9 @@ state:
     PENDING:
         label: pending state
         description: We hold here for a while
-        action: global_run_test2 > SUCCESS
+        action: 
+          - run_test2 > SUCCESS ? is_true
+          - global_run_test2 > PENDING ? !is_true
         
     SUCCESS:
         label: finals state
@@ -23,11 +25,31 @@ action:
     run_test1:
         label: The first Action
         description: I am first!
-        class: Workflow::Action::Null  
-        input: [ comment ]
+        class: OpenXPKI::Server::Workflow::Activity::Noop
         params:
             message: "Hi, I am a log message"
 
+    run_test2:
+        label: The first alternative Action
+        description: I am first!
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        input: comment
+        validator: is_ascii
+        params:
+            message: "Hi, I am a log message"
+
+condition:
+    is_true:
+        class: OpenXPKI::Server::Workflow::Condition::AlwaysTrue
+
+# We combine argument and params in a single block
+validator:
+    is_ascii:
+        class: OpenXPKI::Server::Workflow::Validator::Regex
+        params:
+            regex: '\A (\w\s)+ \z'
+        args:
+            - $comment
 
 field:
     comment:

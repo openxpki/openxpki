@@ -96,7 +96,7 @@ Below is a simple, but working workflow config (no conditions, no validators, th
         label: The first Action
         description: I am first!
         class: Workflow::Action::Null  
-        input: [ comment ]
+        input: comment
         params:
             message: "Hi, I am a log message"
  

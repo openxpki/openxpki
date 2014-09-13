@@ -146,10 +146,10 @@ sub init_search {
                 submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL'),
                 fields => [
                     { name => 'wf_type',
-                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL'), 
+                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL'),
                       type => 'select',
                       is_optional => 1,
-                      options => \@wfl_list 
+                      options => \@wfl_list
                     },
                     { name => 'wf_state',
                       label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL'), #'State',
@@ -459,8 +459,8 @@ sub action_select {
     # FIXME - really a good idea - intentional stop items without fields?
     my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
     $self->logger()->trace('wf_action_info ' . Dumper  $wf_action_info);
-    if ((!$wf_action_info->{FIELD} || (scalar @{$wf_action_info->{FIELD}}) == 0) &&
-        !$wf_action_info->{UIHANDLE}) {
+    if ((!$wf_action_info->{field} || (scalar @{$wf_action_info->{field}}) == 0) &&
+        !$wf_action_info->{uihandle}) {
 
         $self->logger()->debug('activity has no input - execute');
 
