@@ -171,10 +171,18 @@ sub __process_workflow {
             push @actions, $item;
         } # end actions
 
-        push @{$workflow->{state}}, {
+        my $state = {
             name => $state_name,
             action => \@actions
         };
+
+        # Autorun
+        my $is_autorun = $conn->get(['workflow', 'def', $wf_name, 'state', $state_name, 'autorun' ] );
+        if ($is_autorun && $is_autorun =~ m/(1|true|yes)/) {
+            $state->{autorun} = 'yes';
+        }
+        push @{$workflow->{state}}, $state;
+
     } # end states
 
     ##! 32: 'Workflow Config ' . Dumper $workflow
@@ -239,7 +247,7 @@ sub __process_action {
         # Fields can be defined local or global (only actions inside workflow)
         if ($wf_name) {
             @item_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
-            if (!$conn->exists( @item_path )) {
+            if (!$conn->exists( \@item_path )) {
                 @item_path = ( 'workflow', 'global', 'field', $field_name );
             }
         } else {
@@ -250,7 +258,11 @@ sub __process_action {
         if (!$context_key) {
             OpenXPKI::Exception->throw(
                 message => 'Field name used in workflow config is not defined',
-                params => { workflow => $wf_name, action => $action_name, field => $field_name }
+                params => {
+                    workflow => $wf_name,
+                    action => $action_name,
+                    field => $field_name,
+                }
             );
         }
 
@@ -291,16 +303,19 @@ sub __process_action {
         }
 
         # Validator can have an argument list, params are handled by the global implementation definiton!
-        my @extra_args = $conn->get_scalar_as_list( [ @item_path, 'args' ] );
+        my @extra_args = $conn->get_scalar_as_list( [ @item_path, 'arg' ] );
+
+        ##! 16: 'Validator path ' . Dumper \@item_path
+        ##! 16: 'Validator arguments ' . Dumper @extra_args
 
         CTX('log')->log(
-            MESSAGE  => "Adding validator $valid_name",
+            MESSAGE  => "Adding validator $valid_name with args " . (join", ", @extra_args),
             PRIORITY => 'debug',
             FACILITY => 'workflow',
         );
 
         # Push to the field list for the action
-        push @validators, { name => $valid_name,  args => \@extra_args };
+        push @validators, { name => $valid_name,  arg => \@extra_args };
 
     }
 
@@ -310,6 +325,16 @@ sub __process_action {
         field => \@fields,
         validator => \@validators
     };
+
+    # Additional params are read from the object itself
+    my $param = $conn->get_hash([ @path, 'param' ] );
+    map {  $action->{$_} = $param->{$_} } keys %{$param};
+
+    CTX('log')->log(
+        MESSAGE  => "Adding action " . (Dumper $action),
+        PRIORITY => 'debug',
+        FACILITY => 'workflow',
+    );
 
     push @{$self->_workflow_config()->{action}}, $action;
 
@@ -361,7 +386,7 @@ sub __process_condition {
     };
 
     # Get params
-    my $param = $conn->get([ @path, 'param' ] );
+    my $param = $conn->get_hash([ @path, 'param' ] );
     my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
 
     if (scalar @param) {
@@ -425,7 +450,7 @@ sub __process_validator {
     };
 
     # Get params
-    my $param = $conn->get([ @path, 'param' ] );
+    my $param = $conn->get_hash([ @path, 'param' ] );
     my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
 
     if (scalar @param) {

@@ -63,8 +63,8 @@ sub _init_structure_for_user {
          key=> 'pkiadm',
          label=>  'PKI Operation',
          entries=>  [
-             {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', label =>  "Change metadata"},
-             {key=> 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE', label =>  "Issue CRL"},
+             {key=> 'workflow!index!wf_type!change_meta', label =>  "Change metadata"},
+             {key=> 'workflow!index!wf_type!crl_issue', label =>  "Issue CRL"},
              {key=> 'secret!index', label =>  "Manage Secrets"},
              {key=> 'information!process',label =>  "Process Information"}
          ]

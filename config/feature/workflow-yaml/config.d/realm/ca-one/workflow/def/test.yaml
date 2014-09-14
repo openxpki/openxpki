@@ -26,7 +26,7 @@ action:
         label: The first Action
         description: I am first!
         class: OpenXPKI::Server::Workflow::Activity::Noop
-        params:
+        param:
             message: "Hi, I am a log message"
 
     run_test2:
@@ -35,19 +35,19 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         input: comment
         validator: is_ascii
-        params:
+        param:
             message: "Hi, I am a log message"
 
 condition:
     is_true:
         class: OpenXPKI::Server::Workflow::Condition::AlwaysTrue
 
-# We combine argument and params in a single block
+# We combine argument and param in a single block
 validator:
     is_ascii:
         class: OpenXPKI::Server::Workflow::Validator::Regex
-        params:
-            regex: '\A (\w\s)+ \z'
+        param:
+            regex: \A (\w\s)+ \z
         args:
             - $comment
 

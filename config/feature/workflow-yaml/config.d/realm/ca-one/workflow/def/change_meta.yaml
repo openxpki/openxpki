@@ -1,0 +1,83 @@
+head:
+    label: Change Certificate metadata
+    description: Change the persisted metadata of certificates
+    prefix: changemeta
+
+state: 
+    INITIAL:
+        label: ''
+        description: ''
+        action: load_data > DATA_UPDATE
+    
+    DATA_UPDATE:
+        action: update_context > CHOOSE_ACTION
+
+    CHOOSE_ACTION:        
+        action:
+          - load_form > DATA_UPDATE
+          - terminate > FAILURE
+          - persist > SUCCESS
+
+    FAILURE:
+        label: Changes have been discarded
+
+    SUCCESS:
+        label: Changes have been persisted
+        
+action: 
+    load_data:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata
+        description: I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_DATA
+        input: cert_identifier
+#        validator: global_cert_identifier
+
+    load_form:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        description: I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_FORM
+    
+    update_context:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        description: I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA
+        input:
+          - meta_email
+          - meta_requestor
+          - meta_system_id
+
+        validator:
+          - meta_email
+#         - meta_system_id
+
+    persist:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata
+        description: I18N_OPENXPKI_WF_ACTION_METADATA_SAVE_DATA
+
+    terminate:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        description: I18N_OPENXPKI_WF_ACTION_CHANGEMETA_ABORT
+
+
+validator:
+    meta_email:
+        class: OpenXPKI::Server::Workflow::Validator::Regex
+        param:
+            regex: email
+        arg:
+          - $meta_email
+
+field:
+    meta_email:
+        name: meta_email
+        label: eMail Address
+        type: email
+        min: 1 
+        max: 10
+
+    meta_requestor:
+        name: meta_requestor
+        type: text 
+
+    meta_system_id:
+        name: meta_system_id
+        type: text 
+
+

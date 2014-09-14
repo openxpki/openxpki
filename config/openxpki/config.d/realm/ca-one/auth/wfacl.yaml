@@ -108,6 +108,8 @@ RA Operator:
         - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2
         - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2
         - test
+        - crl_issue
+        - change_meta
 
     access:
         I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING:
@@ -157,6 +159,12 @@ RA Operator:
             creator: .*
         
         test:
+            creator: .*
+
+        crl_issue:
+            creator: .*
+
+        change_meta:
             creator: .*
 
 CA Operator:

@@ -143,7 +143,7 @@ sub get_action_info {
         # Fields can be defined local or global (only actions inside workflow)
         if ($wf_name) {
             @field_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
-            if (!$conn->exists( @field_path )) {
+            if (!$conn->exists( \@field_path )) {
                 @field_path = ( 'workflow', 'global', 'field', $field_name );
             }
         } else {

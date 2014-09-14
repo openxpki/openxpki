@@ -37,8 +37,8 @@ Each workflow is represented by a file or directory structure below ``workflow.d
             label: visible name
             description: the text for the page head
             action: 
-              - name_of_action > state_on_success
-              - name_of_other_action > other_state_on_success
+              - name_of_action > state_on_success ? condition_name
+              - name_of_other_action > other_state_on_success !condition_name
 
     action:
         name_of_action: (as used above)
@@ -48,10 +48,9 @@ Each workflow is represented by a file or directory structure below ``workflow.d
             class: Name of the implementation class
             abort: state to jump to on abort (UI button, optional) # not implemented yet
             resume: state to jump to on resume (after exception, optional) # not implemented yet
-            condition: scalar/list with names or inline definiton as hash
-            validator: same as condition
+            validator: scalar/list of validator names, defined in validator section
             input: list of field names for input, to be defined in field section 
-            params:
+            param:
                 key: value - passed as params to the action class
 
     field:
@@ -97,7 +96,7 @@ Below is a simple, but working workflow config (no conditions, no validators, th
         description: I am first!
         class: Workflow::Action::Null  
         input: comment
-        params:
+        param:
             message: "Hi, I am a log message"
  
     field:

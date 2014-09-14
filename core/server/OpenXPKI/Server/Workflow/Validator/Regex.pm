@@ -9,26 +9,36 @@ use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Serialization::Simple;
 
-__PACKAGE__->mk_accessors(qw(regex error));
+__PACKAGE__->mk_accessors(qw(regex error modifier));
 
 sub _init {
     my ( $self, $params ) = @_;
     $self->regex( $params->{regex} ) if ($params->{regex});
+
+    # Default modifier is /xi
+    $self->modifier( $params->{modifier} ? $params->{modifier} : 'xi') ;
     $self->error( 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REGEX_FAILED' );
     $self->error( $params->{error} ) if ($params->{error});
 }
 
 sub validate {
-    my ( $self, $wf, $field, $regex ) = @_;
+    my ( $self, $wf, $value, $regex, $modifier ) = @_;
 
     ##! 1: 'start'
 
-    my $value = $wf->context()->param($field);
-    return 1 if (!defined $value || $value eq '');
+    if (!defined $value || $value eq '') {
+         CTX('log')->log(
+            MESSAGE  => "Regex validator skipped - value is empty",
+            PRIORITY => 'info',
+            FACILITY => 'system',
+        );
+        return 1;
+    }
 
     $regex = $self->regex() unless($regex);
+    $modifier = $self->modifier() unless($modifier);
 
-    ##! 16: 'Value ' . $value
+    ##! 16: 'Value ' . Dumper $value
     ##! 16: 'Regex ' . $regex
 
     # replace named regexes
@@ -36,18 +46,31 @@ sub validate {
         $regex = qr/ \A [a-z0-9\.-]+\@([\w_-]+\.)+(\w+) \z /xi;
     # or quote the string if no named match
     } else {
-        $regex = qr/$regex/x;
+        # Extended Pattern notation, see http://perldoc.perl.org/perlre.html#Extended-Patterns
+        $modifier =~ s/\s//g;
+        if ($modifier =~ /[^alupimsx]/ ) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_VALIDATOR_REGEX_INVALID_MODIFIER",
+                params => {
+                    MODIFIER => $modifier,
+                },
+            );
+        }
+        $modifier = "(?$modifier)" if ($modifier);
+        $regex = m{$modifier};
     }
 
     # Array Magic
     my @errors;
     if (ref $value eq 'ARRAY' || $value =~ /^ARRAY/) {
+        ##! 8: 'Array mode'
         if (!ref $value) {
             $value = OpenXPKI::Serialization::Simple->new()->deserialize( $value );
         }
         foreach my $val (@{$value}) {
             # skip empty
             next if (!defined $val || $val eq '');
+            ##! 8: 'Failed on ' . $val
             push @errors, $val if ($val !~ $regex);
         }
     } else {

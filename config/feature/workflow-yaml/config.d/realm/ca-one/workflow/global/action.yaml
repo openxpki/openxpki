@@ -1,7 +1,10 @@
+noop:
+   class: OpenXPKI::Server::Workflow::Activity::Noop
+
 run_test2:
     label: The second Action
     description: I am only second!
-    class:  Workflow::Action::Null
+    class: OpenXPKI::Server::Workflow::Activity::Noop
     params:
         message: "Hi, I am a second log message"
 
