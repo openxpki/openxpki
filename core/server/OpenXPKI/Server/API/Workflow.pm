@@ -392,6 +392,21 @@ sub __get_workflow_ui_info {
     $result->{STATE} = CTX('config')->get_hash([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'state', $result->{WORKFLOW}->{STATE} ]);
     delete $result->{STATE}->{action};
 
+    # Add the possible options (=activity names) in the right order
+    my @options = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE},  'state', $result->{WORKFLOW}->{STATE}, 'action' ]);
+
+    # Check defined actions against possible ones, non global actions are prefixed
+    $result->{STATE}->{option} = [];
+    foreach my $option (@options) {
+        $option =~ m{ \A ((global_)?)([^\s>]+)}xs;
+        $option = $3;
+        if (!$2) {
+            $option = $head->{prefix}.'_'.$option;
+        }
+        if ($result->{ACTIVITY}->{$option}) {
+            push @{$result->{STATE}->{option}}, $option;
+        }
+    }
     return $result;
 
 }

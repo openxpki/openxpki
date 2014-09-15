@@ -91,6 +91,15 @@ sub init_load {
         return $self;
     }
 
+
+    # Set single action if not in result view and only single action is avail
+    if ((!$args->{VIEW} || $args->{VIEW} ne 'result') && !$wf_action) {
+        my @activities = @{$wf_info->{STATE}->{option}};
+        if (scalar @activities == 1) {
+            $wf_action = $activities[0];
+        }
+    }
+
     $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action, VIEW => $view });
 
     return $self;
@@ -660,13 +669,7 @@ sub __render_from_workflow {
         return $self->__delegate_call($wf_info->{STATE}->{uihandle}, $args);
     }
 
-    my @activities = keys %{$wf_info->{ACTIVITY}};
-
     my $wf_action;
-
-    #if (scalar @activities == 1) {
-    #    $wf_action = $activities[0];
-    #} els
     if($args->{WF_ACTION}) {
         $wf_action = $args->{WF_ACTION};
         if (!$wf_info->{ACTIVITY}->{$wf_action}) {
@@ -675,15 +678,23 @@ sub __render_from_workflow {
         }
     }
 
-    $self->_page({
-        label => i18nGettext($wf_info->{WORKFLOW}->{label} || $wf_info->{WORKFLOW}->{TYPE}),
-        shortlabel => i18nGettext($wf_info->{WORKFLOW}->{ID}),
-        description => i18nGettext($wf_info->{STATE}->{description} || $wf_info->{WORKFLOW}->{description}),
-    });
-
     # if there is one activity selected (or only one present), we render it now
     if ($wf_action) {
         my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
+
+        # Headline from action or state + Workflow Label, description from action if set
+        my $label = i18nGettext( $wf_action_info->{label} || $wf_info->{STATE}->{label} );
+        if ($label) {
+            $label .= ' / ' . i18nGettext( $wf_info->{WORKFLOW}->{label} );
+        } else {
+            $label = i18nGettext( $wf_info->{WORKFLOW}->{label} );
+        }
+        $self->_page({
+            label => $label,
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description => i18nGettext( $wf_action_info->{description} ),
+        });
+
         # delegation based on activity
         if ($wf_action_info->{uihandle}) {
             return $self->__delegate_call($wf_action_info->{uihandle}, $args, $wf_action);
@@ -736,8 +747,10 @@ sub __render_from_workflow {
                     if (ref $context->{$name}) {
                         $item->{value} = $context->{$name};
                     } elsif($context->{$name} =~ /^ARRAY/) {
-                        $item->{value} = $self->serializer()->deserialize($context->{$name});
-                    } else {
+                        my $val = $self->serializer()->deserialize($context->{$name});
+                        # The UI crashes on empty lists
+                        $item->{value} = $val if (scalar @{$val} && defined $val->[0]);
+                    } elsif ($context->{$name}) {
                         $item->{value} = [ $context->{$name} ];
                     }
                 } else {
@@ -765,13 +778,27 @@ sub __render_from_workflow {
             type => 'form',
             action => 'workflow',
             content => {
-                label => $wf_action_info->{label},
-                description => $wf_action_info->{description},
+                #label => $wf_action_info->{label},
+                #description => $wf_action_info->{description},
                 submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE'),
                 fields => \@fields
             }},
         ];
     } else {
+
+        # Headline from state + workflow
+        my $label = i18nGettext( $wf_info->{STATE}->{label} );
+        if ($label) {
+            $label .= ' / ' . i18nGettext( $wf_info->{WORKFLOW}->{label} );
+        } else {
+            $label = i18nGettext( $wf_info->{WORKFLOW}->{label} );
+        }
+
+        $self->_page({
+            label => $label,
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description => i18nGettext( $wf_info->{STATE}->{description} ),
+        });
 
         # more than one action available, so we offer some buttons to choose how to continue
 
@@ -884,10 +911,10 @@ sub __get_action_buttons {
     my $wf_info = shift;
 
     my @buttons;
-    foreach my $wf_action (keys %{$wf_info->{ACTIVITY}}) {
+    foreach my $wf_action (@{$wf_info->{STATE}->{option}}) {
        my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
        push @buttons, {
-            label => i18nGettext($wf_action_info->{LABEL} || $wf_action),
+            label => i18nGettext($wf_action_info->{label} || $wf_action),
             action => sprintf 'workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID},
         };
     }

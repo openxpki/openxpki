@@ -27,17 +27,19 @@ state:
 action: 
     load_data:
         class: OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata
-        description: I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_DATA
+        label: Load existing data
+        description: Please enter the certificate identifier or type your subject to find your certificate.
         input: cert_identifier
 #        validator: global_cert_identifier
 
     load_form:
+        label: Edit meta data
         class: OpenXPKI::Server::Workflow::Activity::Noop
-        description: I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_FORM
     
     update_context:
+        label: Update information
+        description: Enter/update the given information and press the continue button if you are done. Fields marked with the blue plus sign can be added more than once.
         class: OpenXPKI::Server::Workflow::Activity::Noop
-        description: I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA
         input:
           - meta_email
           - meta_requestor
@@ -48,13 +50,12 @@ action:
 #         - meta_system_id
 
     persist:
+        label: Persist data
         class: OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata
-        description: I18N_OPENXPKI_WF_ACTION_METADATA_SAVE_DATA
 
     terminate:
+        label: Discard changes
         class: OpenXPKI::Server::Workflow::Activity::Noop
-        description: I18N_OPENXPKI_WF_ACTION_CHANGEMETA_ABORT
-
 
 validator:
     meta_email:
@@ -68,16 +69,24 @@ field:
     meta_email:
         name: meta_email
         label: eMail Address
+        placeholder: Enter eMail Address of the system owner
+        tooltip: You can enter multiple address using the blue plus sign at the right
         type: email
         min: 1 
         max: 10
 
     meta_requestor:
         name: meta_requestor
+        label: Requestor Name
+        placeholder: The full name of the requestor, e.g. John Doe
         type: text 
 
     meta_system_id:
-        name: meta_system_id
+        name: meta_system_id        
+        label: System Id
+        required: 1
+        placeholder: The systems infrastructure id or change number
+        tooltip: If you do not know your systems id please ask the IT helpdesk.
         type: text 
 
 
