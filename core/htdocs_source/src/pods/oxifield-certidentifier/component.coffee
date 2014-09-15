@@ -15,8 +15,9 @@ Component = Em.Component.extend
         evt.stopPropagation()
         evt.preventDefault()
 
+    searchIndex: 0
     searchChanged: Em.observer "search", ->
-        return if @get "mutex"
+        searchIndex = @incrementProperty "searchIndex"
         search = @get "search"
         @set "content.value", search
         @container.lookup("route:openxpki").sendAjax
@@ -24,6 +25,7 @@ Component = Em.Component.extend
                 action: "certificate!autocomplete"
                 query: search
         .then (doc) =>
+            return if searchIndex isnt @get "searchIndex"
             @set "searchResults", doc
             @$().find(".drowdown").addClass "open"
 
