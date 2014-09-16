@@ -292,43 +292,47 @@ sub stop {
 
     # get all PIDs which belong to the current process group
     my @pids = OpenXPKI::Control::__get_processgroup_pids($process_group);
-    foreach my $p (@pids) {
-        print STDOUT "[$p] " if (not $silent);
-        my $attempts = 0;
+    my $attempts = 0;
+    my $process_count;
 
-        # wait for the process to terminate for a good amount of time
-        # by sending it SIGTERM
-        TERMINATE:
-        while ($attempts < $MAX_TERMINATE_ATTEMPTS) {
-            print STDOUT '.' if (not $silent);
+    # try a number of times to send them SIGTERM
+    while ($attempts < $MAX_TERMINATE_ATTEMPTS) {
+        $process_count = scalar @pids;
+        last if ($process_count <= 0);
+        print STDOUT "Stopping gracefully, $process_count (sub)processes remaining..." if (not $silent);
+        foreach my $p (@pids) {
             kill(15, $p);
-            sleep 2;
-            last TERMINATE if (kill(0, $p) == 0);
-            $attempts++;
         }
-
-        if (kill(0, $p) != 0) {
-            # if that did not help, kill it hard
-            $attempts = 0;
-            KILL:
-            while ($attempts < 5) {
-                print STDOUT '+' if (not $silent);
-                kill(9, $p);
-                sleep 1;
-                last KILL if (kill(0, $p) == 0);
-                $attempts++;
-            }
-        }
-        print STDOUT "\n" if (not $silent);
-
-        if (kill(0, $p)) {
-            print STDOUT "FAILED.\n" if (not $silent);
-            print STDERR "Could not terminate OpenXPKI process $p.\n";
-            return 2;
-        }
+        $attempts++;
+        sleep 2;
+        @pids = __still_alive(\@pids);    # find out which ones are still alive
     }
-    print STDOUT "DONE.\n" if (not $silent);
-    return 0;
+
+    # still processes left?
+    # slaughter them with SIGKILL
+    $attempts = 5;
+    while ($attempts > 0) {
+        $process_count = scalar @pids;
+        last if ($process_count <= 0);
+        print STDOUT "Killing un-cooperative process the hard way, $process_count (sub)processes remaining..." if (not $silent);
+        foreach my $p (@pids) {
+            kill(9, $p);
+        }
+        $attempts--;
+        sleep 1;
+        @pids = __still_alive(\@pids);    # find out which ones are still alive
+    }
+
+    @pids = __still_alive(\@pids);    # find out which ones are still alive
+    $process_count = scalar @pids;
+    if ($process_count <= 0) {
+        print STDOUT "DONE.\n" if (not $silent);
+        return 0;
+    } else {
+        print STDOUT "FAILED.\n" if (not $silent);
+        print STDERR "Could not terminate OpenXPKI process ".join(" ", @pids).".\n";
+        return 2;
+    }
 }
 
 =head2 status
@@ -533,6 +537,22 @@ sub __get_processgroup_pids {
         }
     }
     return @result;
+}
+
+# Take an array ref, array containing process IDs
+# Check which processes are still alive and return them in an array
+sub __still_alive {
+  my $pids = shift;
+  my @alive;
+  my $pid;
+
+  foreach $pid (@{$pids}) {
+    unless (kill(0, $pid) == 0) {
+      push @alive, $pid;   # process is still there
+    }
+  }
+
+  return @alive;
 }
 
 sub __probe_config {
