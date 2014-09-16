@@ -14,7 +14,8 @@ Component = Em.Component.extend
             if Em.isArray clonable.value
                 index = fields.indexOf clonable
                 fields.removeAt index
-                clones = clonable.value.forEach (value, i) ->
+                values = if clonable.value.length then clonable.value else [""]
+                clones = values.forEach (value, i) ->
                     clone = Em.copy clonable
                     clone.value = value
                     fields.insertAt index+i, clone
