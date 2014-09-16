@@ -21,7 +21,6 @@ sub new {
     my $class = ref($this) || $this;
     my $params = shift;
 
-
     # Set from ENV
     $params->{dbpath} = $ENV{OPENXPKI_CONF_DB} if ($ENV{OPENXPKI_CONF_DB});
     $params->{path} = [ split( /:/, $ENV{OPENXPKI_CONF_PATH} ) ] if ( $ENV{OPENXPKI_CONF_PATH} );
@@ -64,8 +63,9 @@ sub parser {
     # Incorporate the Workflow XML definitions
     # List the realms from the system.realms tree
     foreach my $realm (keys %{$tree->{system}->{realms}}) {
-        #my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => "$dir/realm/$realm/_workflow/workflow.xml");
-        #$tree->{realm}->{$realm}->{workflow} = $xml_cache->get_serialized();
+        # TODO - MIGRATION - We load the xml code now to workflow.xml
+        my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => "$dir/realm/$realm/_workflow/workflow.xml");
+        $tree->{realm}->{$realm}->{workflow}->{xml} = $xml_cache->get_serialized();
     }
     $params->{comment} = 'import from ' . $dir . ' using Config::Merge';
     $self->commit( $tree, @_, $params );

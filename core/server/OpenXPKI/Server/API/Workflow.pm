@@ -900,24 +900,10 @@ sub __get_workflow_factory {
     # In comparison to not being able to even view the workflow this seems
     # to be an acceptable tradeoff.
 
-    my $factory;
-    eval {
-        $factory = CTX('workflow_factory')->get_factory({
-            VERSION => $wf_session_info->{config_version}
-        });
-    };
-    my $exc = OpenXPKI::Exception->caught();
-    # We were unsuccessful in restoring the factory for an older version - try to get it for the head version
-    # FIXME Should perhaps better move into get_factory as it might be useful elsewhere
-    if (defined $exc && $exc->message() eq 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_FACTORY_UNKNOWN_VERSION_REQUESTED') {
-        $factory = CTX('workflow_factory')->get_factory();
-
-        CTX('log')->log(
-            MESSAGE  => 'Workflow ID ' . $arg_ref->{WORKFLOW_ID} . ' references unavailable config version ' . $wf_session_info->{config_version} . ' (falling back to current head ' . CTX('config')->get_head_version() . ')',
-            PRIORITY => 'warn',
-            FACILITY => 'workflow',
-        );
-    }
+    my $factory = CTX('workflow_factory')->get_factory({
+        VERSION => $wf_session_info->{config_version},
+        FALLBACK => 1
+    });
 
     ##! 64: 'factory: ' . Dumper $factory
     if (! defined $factory) {
