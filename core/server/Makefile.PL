@@ -334,6 +334,7 @@ WriteMakefile(
     'Math::BigInt'           => '1',
 #    'MIME::Base64'           => '1', # A core module since perl v5.7.3
     'Moose'                  => '1',
+    'NetAddr::IP'            => '0',
     'Net::IP'                => '1',
     'Net::LDAP'              => '0.32',
     'Net::HTTP'              => '6.0',
