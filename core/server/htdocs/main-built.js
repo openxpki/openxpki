@@ -22,7 +22,7 @@ var require = function (name) {
 define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
     var module = { exports: {} };
     (function (undefined) {
-        var moment, VERSION = '2.8.2', globalScope = typeof global !== 'undefined' ? global : this, oldGlobalMoment, round = Math.round, hasOwnProperty = Object.prototype.hasOwnProperty, i, YEAR = 0, MONTH = 1, DATE = 2, HOUR = 3, MINUTE = 4, SECOND = 5, MILLISECOND = 6, locales = {}, momentProperties = [], hasModule = typeof module !== 'undefined' && module.exports, aspNetJsonRegex = /^\/?Date\((\-?\d+)/i, aspNetTimeSpanJsonRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/, isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/, formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|X|zz?|ZZ?|.)/g, localFormattingTokens = /(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g, parseTokenOneOrTwoDigits = /\d\d?/, parseTokenOneToThreeDigits = /\d{1,3}/, parseTokenOneToFourDigits = /\d{1,4}/, parseTokenOneToSixDigits = /[+\-]?\d{1,6}/, parseTokenDigits = /\d+/, parseTokenWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i, parseTokenTimezone = /Z|[\+\-]\d\d:?\d\d/gi, parseTokenT = /T/i, parseTokenTimestampMs = /[\+\-]?\d+(\.\d{1,3})?/, parseTokenOrdinal = /\d{1,2}/, parseTokenOneDigit = /\d/, parseTokenTwoDigits = /\d\d/, parseTokenThreeDigits = /\d{3}/, parseTokenFourDigits = /\d{4}/, parseTokenSixDigits = /[+-]?\d{6}/, parseTokenSignedNumber = /[+-]?\d+/, isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/, isoFormat = 'YYYY-MM-DDTHH:mm:ssZ', isoDates = [
+        var moment, VERSION = '2.8.3', globalScope = typeof global !== 'undefined' ? global : this, oldGlobalMoment, round = Math.round, hasOwnProperty = Object.prototype.hasOwnProperty, i, YEAR = 0, MONTH = 1, DATE = 2, HOUR = 3, MINUTE = 4, SECOND = 5, MILLISECOND = 6, locales = {}, momentProperties = [], hasModule = typeof module !== 'undefined' && module.exports, aspNetJsonRegex = /^\/?Date\((\-?\d+)/i, aspNetTimeSpanJsonRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/, isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/, formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|X|zz?|ZZ?|.)/g, localFormattingTokens = /(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g, parseTokenOneOrTwoDigits = /\d\d?/, parseTokenOneToThreeDigits = /\d{1,3}/, parseTokenOneToFourDigits = /\d{1,4}/, parseTokenOneToSixDigits = /[+\-]?\d{1,6}/, parseTokenDigits = /\d+/, parseTokenWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i, parseTokenTimezone = /Z|[\+\-]\d\d:?\d\d/gi, parseTokenT = /T/i, parseTokenTimestampMs = /[\+\-]?\d+(\.\d{1,3})?/, parseTokenOrdinal = /\d{1,2}/, parseTokenOneDigit = /\d/, parseTokenTwoDigits = /\d\d/, parseTokenThreeDigits = /\d{3}/, parseTokenFourDigits = /\d{4}/, parseTokenSixDigits = /[+-]?\d{6}/, parseTokenSignedNumber = /[+-]?\d+/, isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/, isoFormat = 'YYYY-MM-DDTHH:mm:ssZ', isoDates = [
                 [
                     'YYYYYY-MM-DD',
                     /[+-]\d{6}-\d{2}-\d{2}/
@@ -1154,6 +1154,9 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
             for (i = 0; i < config._f.length; i++) {
                 currentScore = 0;
                 tempConfig = copyConfig({}, config);
+                if (config._useUTC != null) {
+                    tempConfig._useUTC = config._useUTC;
+                }
                 tempConfig._pf = defaultParsingFlags();
                 tempConfig._f = config._f[i];
                 makeDateFromStringAndFormat(tempConfig);
@@ -1201,6 +1204,13 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 moment.createFromInputFallback(config);
             }
         }
+        function map(arr, fn) {
+            var res = [], i;
+            for (i = 0; i < arr.length; ++i) {
+                res.push(fn(arr[i], i));
+            }
+            return res;
+        }
         function makeDateFromInput(config) {
             var input = config._i, matched;
             if (input === undefined) {
@@ -1212,7 +1222,9 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
             } else if (typeof input === 'string') {
                 makeDateFromString(config);
             } else if (isArray(input)) {
-                config._a = input.slice(0);
+                config._a = map(input.slice(0), function (obj) {
+                    return parseInt(obj, 10);
+                });
                 dateFromConfig(config);
             } else if (typeof input === 'object') {
                 dateFromObject(config);
@@ -1594,7 +1606,7 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                     this.zone(0, keepLocalTime);
                     this._isUTC = false;
                     if (keepLocalTime) {
-                        this.add(this._d.getTimezoneOffset(), 'm');
+                        this.add(this._dateTzOffset(), 'm');
                     }
                 }
                 return this;
@@ -1606,13 +1618,14 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
             add: createAdder(1, 'add'),
             subtract: createAdder(-1, 'subtract'),
             diff: function (input, units, asFloat) {
-                var that = makeAs(input, this), zoneDiff = (this.zone() - that.zone()) * 60000, diff, output;
+                var that = makeAs(input, this), zoneDiff = (this.zone() - that.zone()) * 60000, diff, output, daysAdjust;
                 units = normalizeUnits(units);
                 if (units === 'year' || units === 'month') {
                     diff = (this.daysInMonth() + that.daysInMonth()) * 43200000;
                     output = (this.year() - that.year()) * 12 + (this.month() - that.month());
-                    output += (this - moment(this).startOf('month') - (that - moment(that).startOf('month'))) / diff;
-                    output -= (this.zone() - moment(this).startOf('month').zone() - (that.zone() - moment(that).startOf('month').zone())) * 60000 / diff;
+                    daysAdjust = this - moment(this).startOf('month') - (that - moment(that).startOf('month'));
+                    daysAdjust -= (this.zone() - moment(this).startOf('month').zone() - (that.zone() - moment(that).startOf('month').zone())) * 60000;
+                    output += daysAdjust / diff;
                     if (units === 'year') {
                         output = output / 12;
                     }
@@ -1685,16 +1698,31 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 return this.startOf(units).add(1, units === 'isoWeek' ? 'week' : units).subtract(1, 'ms');
             },
             isAfter: function (input, units) {
-                units = typeof units !== 'undefined' ? units : 'millisecond';
-                return +this.clone().startOf(units) > +moment(input).startOf(units);
+                units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');
+                if (units === 'millisecond') {
+                    input = moment.isMoment(input) ? input : moment(input);
+                    return +this > +input;
+                } else {
+                    return +this.clone().startOf(units) > +moment(input).startOf(units);
+                }
             },
             isBefore: function (input, units) {
-                units = typeof units !== 'undefined' ? units : 'millisecond';
-                return +this.clone().startOf(units) < +moment(input).startOf(units);
+                units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');
+                if (units === 'millisecond') {
+                    input = moment.isMoment(input) ? input : moment(input);
+                    return +this < +input;
+                } else {
+                    return +this.clone().startOf(units) < +moment(input).startOf(units);
+                }
             },
             isSame: function (input, units) {
-                units = units || 'ms';
-                return +this.clone().startOf(units) === +makeAs(input, this).startOf(units);
+                units = normalizeUnits(units || 'millisecond');
+                if (units === 'millisecond') {
+                    input = moment.isMoment(input) ? input : moment(input);
+                    return +this === +input;
+                } else {
+                    return +this.clone().startOf(units) === +makeAs(input, this).startOf(units);
+                }
             },
             min: deprecate('moment().min is deprecated, use moment.min instead. https://github.com/moment/moment/issues/1548', function (other) {
                 other = moment.apply(null, arguments);
@@ -1714,7 +1742,7 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                         input = input * 60;
                     }
                     if (!this._isUTC && keepLocalTime) {
-                        localAdjust = this._d.getTimezoneOffset();
+                        localAdjust = this._dateTzOffset();
                     }
                     this._offset = input;
                     this._isUTC = true;
@@ -1731,7 +1759,7 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                         }
                     }
                 } else {
-                    return this._isUTC ? offset : this._d.getTimezoneOffset();
+                    return this._isUTC ? offset : this._dateTzOffset();
                 }
                 return this;
             },
@@ -1809,10 +1837,14 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 return this;
             },
             locale: function (key) {
+                var newLocaleData;
                 if (key === undefined) {
                     return this._locale._abbr;
                 } else {
-                    this._locale = moment.localeData(key);
+                    newLocaleData = moment.localeData(key);
+                    if (newLocaleData != null) {
+                        this._locale = newLocaleData;
+                    }
                     return this;
                 }
             },
@@ -1820,12 +1852,14 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
                 if (key === undefined) {
                     return this.localeData();
                 } else {
-                    this._locale = moment.localeData(key);
-                    return this;
+                    return this.locale(key);
                 }
             }),
             localeData: function () {
                 return this._locale;
+            },
+            _dateTzOffset: function () {
+                return Math.round(this._d.getTimezoneOffset() / 15) * 15;
             }
         });
         function rawMonthSetter(mom, value) {
@@ -1950,25 +1984,25 @@ define('vendor/moment/moment.es6', ['exports'], function (__exports__) {
             as: function (units) {
                 var days, months;
                 units = normalizeUnits(units);
-                days = this._days + this._milliseconds / 86400000;
                 if (units === 'month' || units === 'year') {
+                    days = this._days + this._milliseconds / 86400000;
                     months = this._months + daysToYears(days) * 12;
                     return units === 'month' ? months : months / 12;
                 } else {
-                    days += yearsToDays(this._months / 12);
+                    days = this._days + yearsToDays(this._months / 12);
                     switch (units) {
                     case 'week':
-                        return days / 7;
+                        return days / 7 + this._milliseconds / 604800000;
                     case 'day':
-                        return days;
+                        return days + this._milliseconds / 86400000;
                     case 'hour':
-                        return days * 24;
+                        return days * 24 + this._milliseconds / 3600000;
                     case 'minute':
-                        return days * 24 * 60;
+                        return days * 24 * 60 + this._milliseconds / 60000;
                     case 'second':
-                        return days * 24 * 60 * 60;
+                        return days * 24 * 60 * 60 + this._milliseconds / 1000;
                     case 'millisecond':
-                        return days * 24 * 60 * 60 * 1000;
+                        return Math.floor(days * 24 * 60 * 60 * 1000) + this._milliseconds;
                     default:
                         throw new Error('Unknown unit ' + units);
                     }
@@ -13427,10 +13461,10 @@ define('vendor/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.es
                     }, H = function () {
                         i.widget.off('click', '.datepicker *', i.click), i.widget.off('click', '[data-action]'), i.widget.off('mousedown', i.stopEvent), i.options.pickDate && i.options.pickTime && i.widget.off('click.togglePicker'), i.isInput ? i.element.off({
                             focus: i.show,
-                            change: i.change,
+                            change: D,
                             click: i.show,
                             blur: i.hide
-                        }) : (i.element.off({ change: i.change }, 'input'), i.component ? (i.component.off('click', i.show), i.component.off('mousedown', i.stopEvent)) : i.element.off('click', i.show));
+                        }) : (i.element.off({ change: D }, 'input'), i.component ? (i.component.off('click', i.show), i.component.off('mousedown', i.stopEvent)) : i.element.off('click', i.show));
                     }, I = function () {
                         a(window).off('resize.datetimepicker' + i.id), i.isInput || a(document).off('mousedown.datetimepicker' + i.id);
                     }, J = function () {
@@ -36232,7 +36266,7 @@ define('pods/oxisection-form/component', [
             return this.get('content.content.submit_label') || 'send';
         }.property('content.content.submit_label'),
         fields: function () {
-            var clonable, clonables, clone, clones, f, fields, index, name, names, _i, _j, _k, _len, _len1, _len2, _ref;
+            var clonable, clonables, clone, clones, f, fields, index, name, names, values, _i, _j, _k, _len, _len1, _len2, _ref;
             fields = this.get('content.content.fields');
             clonables = function () {
                 var _i, _len, _results;
@@ -36251,7 +36285,8 @@ define('pods/oxisection-form/component', [
                 if (Em.isArray(clonable.value)) {
                     index = fields.indexOf(clonable);
                     fields.removeAt(index);
-                    clones = clonable.value.forEach(function (value, i) {
+                    values = clonable.value.length ? clonable.value : [''];
+                    clones = values.forEach(function (value, i) {
                         var clone;
                         clone = Em.copy(clonable);
                         clone.value = value;
@@ -36792,11 +36827,10 @@ define('pods/oxifield-certidentifier/component', [
             evt.stopPropagation();
             return evt.preventDefault();
         },
+        searchIndex: 0,
         searchChanged: Em.observer('search', function () {
-            var search;
-            if (this.get('mutex')) {
-                return;
-            }
+            var search, searchIndex;
+            searchIndex = this.incrementProperty('searchIndex');
             search = this.get('search');
             this.set('content.value', search);
             return this.container.lookup('route:openxpki').sendAjax({
@@ -36806,6 +36840,9 @@ define('pods/oxifield-certidentifier/component', [
                 }
             }).then(function (_this) {
                 return function (doc) {
+                    if (searchIndex !== _this.get('searchIndex')) {
+                        return;
+                    }
                     _this.set('searchResults', doc);
                     return _this.$().find('.drowdown').addClass('open');
                 };

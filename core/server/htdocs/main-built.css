@@ -7630,7 +7630,7 @@ button.close {
 
 /*!
  * Datetimepicker for Bootstrap v3
-//! version : 3.1.2
+//! version : 3.1.3
  * https://github.com/Eonasdan/bootstrap-datetimepicker/
  */
 
@@ -7715,6 +7715,10 @@ button.close {
 
 .bootstrap-datetimepicker-widget a[data-action] {
   padding: 6px 0;
+}
+
+.bootstrap-datetimepicker-widget a[data-action]:active {
+  box-shadow: none;
 }
 
 .bootstrap-datetimepicker-widget .timepicker-hour,
