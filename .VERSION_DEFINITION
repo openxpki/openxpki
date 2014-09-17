@@ -79,6 +79,9 @@ branch_filter: master
 [git-commit-hash]
 keyword:          GIT_COMMIT_HASH
 
+[git-commit-date]
+keyword:          GIT_COMMIT_DATE
+
 [git-abbreviated-commit-hash]
 keyword:          GIT_ABBREVIATED_COMMIT_HASH
 

@@ -141,6 +141,14 @@ sub get_revision_info {
 	$branch_ref =~ s{ refs/heads/ }{}xms;
  	$result->{'git-branch'} = $branch_ref;
 
+    # obtain date of current head commit
+    my $head_commit_date = `$git show -s --format=%cD HEAD 2>/dev/null`;
+    if ($CHILD_ERROR != 0) {
+        $head_commit_date = '(unable to get commit date)';
+    }
+    chomp $head_commit_date;
+    $result->{'git-commit-date'} = $head_commit_date;
+
 	# get git tag information
 	my @git_tags;
 
@@ -352,6 +360,7 @@ foreach my $component (keys %config) {
                                 last-changed-revision |
                                 git-branch |
                                 git-commit-hash | 
+                                git-commit-date | 
                                 git-abbreviated-commit-hash |
                                 git-tag |
                                 git-tags |
@@ -707,6 +716,10 @@ version information (if current directory is inside a Git repository).
 =head4 git-commit-hash
 
 'git-commit-hash' expands to the Git commit hash for the current HEAD.
+
+=head4 git-commit-date
+
+'git-commit-date' expands to the Git commit date for the current HEAD.
 
 =head4 git-abbreviated-commit-hash
 
