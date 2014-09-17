@@ -48,7 +48,8 @@ collect:
 	mv $(RPMBASE)/RPMS/*/$(PACKAGE)-*.rpm .
 
 clean:
-	rm -f $(PACKAGE)-*.rpm $(PACKAGE).spec $(OXI_TARBALL)
+	rm -f $(PACKAGE)-*
+	rpm $(PACKAGE).spec $(OXI_TARBALL)
 
 $(OXI_TARBALL):
 	rm -rf $(OXI_TARBALL_DIR)

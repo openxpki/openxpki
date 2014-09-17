@@ -1,0 +1,7 @@
+The Debian Package myperl-dbd--mysql
+----------------------------
+
+This package build is just used for testing the build environment and for
+debugging purposes.
+
+ -- Scott Hardin <scott@hnsc.de>  Fri, 13 Jun 2014 12:16:34 +0000

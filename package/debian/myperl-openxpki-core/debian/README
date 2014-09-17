@@ -1,0 +1,6 @@
+The Debian Package myperl-openxpki-core
+----------------------------
+
+This package contains the core of OpenXPKI. It is based on 'myperl'.
+
+ -- Scott Hardin <scott@hnsc.de>  Fri, 13 Jun 2014 12:16:34 +0000

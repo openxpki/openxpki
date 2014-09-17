@@ -1,0 +1,6 @@
+myperl-dbd-mysql for Debian
+------------------------------
+
+This is a debian-ized package for the CPAN DBD::mysql module. 
+
+ -- Scott Hardin <scott@hnsc.de>  Fri, 13 Jun 2014 12:16:34 +0000

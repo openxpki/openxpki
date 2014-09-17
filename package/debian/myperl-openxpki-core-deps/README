@@ -1,0 +1,4 @@
+This is a debian packaging of the perl dependencies needed for
+the OpenXPKI core server. It depends on the 'myperl' package, which is
+packaged separately.
+

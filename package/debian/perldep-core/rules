@@ -1,0 +1,67 @@
+#!/usr/bin/make -f
+
+PERL ?= /usr/bin/perl
+
+arrange: arrange-stamp
+arrange-stamp: install
+	dh_testdir
+	touch arrange-stamp
+
+binary: binary-stamp
+binary-stamp: binary-indep binary-arch
+	dh_testdir
+	touch binary-stamp
+
+binary-arch: binary-arch-stamp
+binary-arch-stamp: arrange
+	dh_testdir
+	touch binary-arch-stamp
+
+binary-indep: binary-indep-stamp
+binary-indep-stamp: arrange
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installexamples
+	dh_installchangelogs
+	dh_compress
+	dh_fixperms
+	dh_strip
+	dh_installdeb
+	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+	touch binary-indep-stamp
+
+build: build-stamp
+build-stamp: config
+	dh_testdir
+	#OPENSSL_PREFIX=/usr $(PERL) Makefile.PL INSTALLDIRS=vendor
+	#$(MAKE) OPTIMIZE="-O2 -g -Wall"
+	# $(MAKE) test
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	if [ -e Makefile ]; then $(MAKE) -i distclean; fi
+	dh_clean arrange-stamp binary-stamp binary-arch-stamp binary-indep-stamp build-stamp config-stamp install-stamp build-arch-stamp build-indep-stamp patch-stamp `find -name '*.bak'`
+
+config: config-stamp
+config-stamp:
+	dh_testdir
+	touch config-stamp
+
+install: install-stamp
+install-stamp: build
+	dh_testdir
+	dh_install
+	dh_installdirs
+	$(MAKE) install PREFIX=$(CURDIR)/debian/openxpki-perldep-core/usr
+	dh_makeshlibs
+	touch install-stamp
+#	dh_installinit --no-start --no-restart-on-upgrade --noscripts --name=
+
+.PHONY: arrange binary binary-arch binary-indep build clean config install
