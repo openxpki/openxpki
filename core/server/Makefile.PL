@@ -306,7 +306,7 @@ WriteMakefile(
     'Config::Merge'          => '1',
 #    'Config::Versioned'      => '1.01', # A prerequisite for Connector, see below
     'Connector'              => '1.08',
-#    'Crypt::CBC'             => '2.29', # A prerequisite for Data::Serializer, see below
+    'Crypt::CBC'             => '2.29',
     'Crypt::OpenSSL::AES'    => '0.02',
     'DBD::Mock'              => '1.45',
 #    'DBI'                    => '1', # A prerequisite for Workflow, see below
