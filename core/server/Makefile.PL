@@ -125,7 +125,11 @@ close $fh;
 # determine OpenXPKI version
 
 my $openxpki_version;
-if ( -e($vergen) ) {
+if ( -s '../../VERSION' ) {
+    # this block is optimized for programmer efficiency
+    $openxpki_version = `cat ../../VERSION`;
+    chomp $openxpki_version;
+} elsif ( -e($vergen) ) {
     $openxpki_version = `$vergen --format version`;
 
     if ($CHILD_ERROR != 0) {
