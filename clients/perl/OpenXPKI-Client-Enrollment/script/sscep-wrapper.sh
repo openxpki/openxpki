@@ -359,7 +359,7 @@ getcert() {
     timeout $SCEP_TIMEOUT sscep getcert \
         -u $SCEP_URL -c "$CACERTFILE" \
         -k "$SIGNKEY" \
-        -s "$CERT_ID" \
+        -s "$CERT_SN" \
 	-w "$CERT_OUT_FILE" \
 	-l "$SCEP_SIGN_CERT" \
         $SSCEP_OPT > "$enroll_out" 2>&1

@@ -125,7 +125,11 @@ close $fh;
 # determine OpenXPKI version
 
 my $openxpki_version;
-if ( -e($vergen) ) {
+if ( -s '../../VERSION' ) {
+    # this block is optimized for programmer efficiency
+    $openxpki_version = `cat ../../VERSION`;
+    chomp $openxpki_version;
+} elsif ( -e($vergen) ) {
     $openxpki_version = `$vergen --format version`;
 
     if ($CHILD_ERROR != 0) {
@@ -334,6 +338,7 @@ WriteMakefile(
     'Math::BigInt'           => '1',
 #    'MIME::Base64'           => '1', # A core module since perl v5.7.3
     'Moose'                  => '1',
+    'NetAddr::IP'            => '0',
     'Net::IP'                => '1',
     'Net::LDAP'              => '0.32',
     'Net::HTTP'              => '6.0',

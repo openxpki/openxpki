@@ -8,7 +8,7 @@ use Proc::SafeExec;
 
 has 'sscep_conf' => ( lazy => 1, default => 'etc/sscep.conf' );
 
-my $csr_filename;    # this is for entire module so it is visible in END{}
+my $crt_filename;    # this is for entire module so it is visible in END{}
 
 # This action will render a template
 sub getcert {
@@ -50,8 +50,31 @@ sub getcert {
 
     my $output;
 
+    # Create the temporary file for the cert to be fetched
+    # (we really only need the filename)
+    # Try new temp filenames until we get one that didn't already exist
+    my $crt_fh;
+    do { $crt_filename = tmpnam() }
+        until $crt_fh = IO::File->new( $crt_filename, O_RDWR | O_CREAT | O_EXCL );
+
+    # install atexit-style handler so that when we exit or die,
+    # we automatically delete the temporary file
+    END {
+        if ($crt_filename) {
+            unlink($crt_filename) or warn "Couldn't unlink $crt_filename: $!";
+        }
+    }
+
+    my @exec_args = (
+        $sscep_cmd,
+        '-c' => $sscep_cfg,
+        '-w' => $crt_filename,
+        'getcert',
+        $certid,
+    );
+
     my $fwd = new Proc::SafeExec(
-        {   exec   => [ $sscep_cmd, $sscep_cfg, 'getcert', $certid ],
+        {   exec   => \@exec_args,
             stdout => 'new',
             stderr => 'new'
         }
@@ -66,30 +89,35 @@ sub getcert {
     $fwd->wait();
     my $exit_status = $fwd->exit_status() >> 8;
 
-    close $csr_fh;
+    close $fwd_stdout;
+    close $fwd_stderr;
 
     if ( $exit_status == 0 ) {
+        seek( $crt_fh, 0, 0 );
+        my $crt = join( '', <$crt_fh> );
+        close $crt_fh;
         $self->render(
             message => "Certificate has beeen issued.",
-            certsn  => "12345",
+            certpem  => $crt,
             details => 'The certificate for your request has been issued.',
         );
     }
-    elsif ( $exit_status == 3 ) {
-        $self->render(
-            message => "Accepted CSR for further processing. ",
-            details => <<EOF,
-Your CSR has been accepted and submitted for approval and you will
-be receiving an e-mail confirmation shortly. 
-EOF
-        );
-    }
+#    elsif ( $exit_status == 3 ) {
+#        $self->render(
+#            message => "Accepted CSR for further processing. ",
+#            details => <<EOF,
+#Your CSR has been accepted and submitted for approval and you will
+#be receiving an e-mail confirmation shortly. 
+#EOF
+#        );
+#    }
     else {
         $self->render(
             template => 'error',
-            message  => "Error processing CSR: ($exit_status) ",
+            message  => "Error getting certificate: ($exit_status) ",
             details  => join( '',
-                "\nCOMMAND:\n",  "\t$sscep_cmd $sscep_cfg $csr_filename\n",
+                "\nCOMMAND:\n",  "\t",
+                join(', ', @exec_args),
                 "\nSTDERR:\n",   @stderr,
                 "\n\nSTDOUT:\n", @stdout )
         );
