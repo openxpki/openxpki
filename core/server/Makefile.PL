@@ -324,7 +324,7 @@ WriteMakefile(
 #    'Exception::Class'       => '1.22', # A prerequisite for Workflow, see below
 #    'Filter::Util::Call'     => '1', # A core module since perl v5.7.3
     'IO::Prompt'             => '0.099004', # required for deployment tools
-#    'IO::Socket::SSL'        => '1.973', # A prerequisite for Net::HTTP, see below
+    'IO::Socket::SSL'        => '1.973', # A prerequisite for Net::HTTP, see below
     ## includes the version of libintl-perl which includes Locale::Messages
     'IPC::ShareLite'         => '0.09',
     'JSON'                   => '0',
