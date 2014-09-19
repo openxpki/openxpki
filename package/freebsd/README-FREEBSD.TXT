@@ -74,14 +74,14 @@ from the port directory before rebuilding the port.
 Note that any package, distributed by the FreeBSD project, is always 
 pre-built with DEFAULT answers of this type.
 
-Moreover, each FreeBSD version has its default version of perl. Pre-built 
-packages have exactly this version of perl in mind. If you install everything 
-from ports, you have full control on everything which you install, 
-version of perl including. Just install your favorite version of perl from 
-ports and BEFORE installing of the OpenXPKI and other perl-related software. 
-If you install something from ports, and something from packages, then 
-package manager will try to warn your against problems, but the mess is 
-your usual destiny in this case.
+Moreover, FreeBSD has its own vision about default version of perl (which 
+changes with time). Pre-built packages have exactly this version of perl 
+in mind. If you install everything from ports, you have full control of 
+everything which you install, version of perl including. Just install 
+your favorite version of perl BEFORE installing of the OpenXPKI and 
+other perl-related software. If you install something from ports, and 
+something from packages, then package manager will try to warn your 
+against problems, but the mess is your usual destiny in this case.
 
 By the way, FreeBSD has efficient automatic tools to substitute one version 
 of perl with another. This can be done without need of manual reinstall of
@@ -95,10 +95,13 @@ to update ports tree on your system in a regular way. Related reading:
 
 https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/ports-using.html
 
-It is a good idea to distinguish two different procedures: 
-1) update of ports tree on your system, and 
-2) update of ports/packages already installed on your system to their the 
-newest available versions.
+It is a good idea to distinguish between two different procedures: 
+
+1) update of ports tree on your system, main utility here can be portsnap,
+
+2) update of ports already installed on your system to their the 
+newest available versions. This makes use of updated ports tree. Main 
+utility here can be portmaster.
 
 That mentioned, security/p5-openxpki (either port or package) will install 
 about 130-150 other ports/packages, which are (direct/indirect/conditional) 
