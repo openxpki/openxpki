@@ -38,10 +38,10 @@ around BUILDARGS => sub {
 
     if (! -d $dbpath) {
         OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_INIT_TASK_GIT_DBPATH_DOES_NOT_EXIST",
-		params  => {
-		    dbpath => $dbpath,
-		});
+        message => "I18N_OPENXPKI_SERVER_INIT_TASK_GIT_DBPATH_DOES_NOT_EXIST",
+        params  => {
+            dbpath => $dbpath,
+        });
     }
 
     my $cv = Connector::Proxy::Config::Versioned->new(
@@ -52,10 +52,10 @@ around BUILDARGS => sub {
 
     if (!$cv) {
         OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_INIT_TASK_CONFIG_LAYER_NOT_INITIALISED",
-		params  => {
-		    dbpath => $dbpath,
-		});
+        message => "I18N_OPENXPKI_SERVER_INIT_TASK_CONFIG_LAYER_NOT_INITIALISED",
+        params  => {
+            dbpath => $dbpath,
+        });
     }
     ##! 16: "Init config system - head version " . $cv->version()
     return $class->$orig( { BASECONNECTOR => $cv, _head_version => $cv->version() } );
@@ -68,33 +68,21 @@ before '_route_call' => sub {
     my $location = shift;
 
     # Location can be a string or an array
-	if (ref $location eq "ARRAY") {
-		$location = @{$location}[0];
-		##! 8: 'Location was array - shifted: ' . Dumper $location
-	}
+    if (ref $location eq "ARRAY") {
+        $location = @{$location}[0];
+        ##! 8: 'Location was array - shifted: ' . Dumper $location
+    }
 
     ##! 16: "_route_call interception on $location "
-    # system is global and never has a prefix or version
-    if ( substr ($location, 0, 6) eq 'system' ) {
-        ##! 16: "_route_call: system value, reset connector offsets"
+    # system or realm acces - no prefix
+    if ( substr ($location, 0, 6) eq 'system' || substr($location, 0, 5) eq 'realm' ) {
+        ##! 16: "_route_call: system or explicit realm value, reset connector offsets"
         $self->_config()->{''}->PREFIX('');
-        $self->_config()->{''}->version( $self->_head_version() );
     } else {
         my $session = CTX('session');
-        my $cfg_ver = $session->get_config_version();
-        ##! 16: "_route_call: set config version to " . $cfg_ver
-        $cfg_ver = $self->_head_version() unless($cfg_ver);
-        $self->_config()->{''}->version( $cfg_ver );
-
-        # We also allow direct access to the realm tree
-        if ( substr ($location, 0, 5) eq 'realm' ) {
-            ##! 16: "_route_call: direct realm access "
-            $self->_config()->{''}->PREFIX( "" );
-        } else {
-            my $pki_realm = $session->get_pki_realm();
-            ##! 16: "_route_call: realm value, set prefix to " . $pki_realm
-            $self->_config()->{''}->PREFIX( "realm.$pki_realm" );
-        }
+        my $pki_realm = $session->get_pki_realm();
+        ##! 16: "_route_call: realm value, set prefix to " . $pki_realm
+        $self->_config()->{''}->PREFIX( "realm.$pki_realm" );
     }
 };
 
@@ -118,12 +106,6 @@ sub update_head {
     if ( $self->_head_version() ne $head_id ) {
         ##! 16: 'Advance to head commit ' . $head_id
         $self->_head_version( $head_id );
-
-        # Set new commit id in session for workflows
-        # is there ever a session in this context?
-        eval {
-            CTX('session')->set_config_version( $head_id );
-        };
 
         CTX('log')->log(
             MESSAGE  => "system config advanced to new head commit: $head_id",
@@ -187,43 +169,43 @@ sub get_scalar_as_list {
 
 sub get_inherit {
 
-	##! 1: 'start'
-	my $self = shift;
+    ##! 1: 'start'
+    my $self = shift;
     my $path = shift;
     my $val;
 
-	# Shortcut - check if the full path exists
+    # Shortcut - check if the full path exists
     $val = $self->get($path);
-	return $val if (defined $val);
+    return $val if (defined $val);
 
-	# Path does not exist - look for "inherit" keyword
-	my ($pre, $section, $key);
-	my @prefix;
+    # Path does not exist - look for "inherit" keyword
+    my ($pre, $section, $key);
+    my @prefix;
 
-	if (ref $path eq "") {
-    	$path =~ /^(.*)\.([\w-]+)\.([\w-]+)$/;
-    	$key = $3;
+    if (ref $path eq "") {
+        $path =~ /^(.*)\.([\w-]+)\.([\w-]+)$/;
+        $key = $3;
         $section = $2;
-    	@prefix = $self->_build_path( $1 );
-	} else {
-	    my @path = @{$path};
+        @prefix = $self->_build_path( $1 );
+    } else {
+        my @path = @{$path};
         $key = pop @path;
         $section = pop @path;
         @prefix = @path;
-	}
+    }
 
     ##! 16: "split path $prefix - $section - inherit"
 
-	$section = $self->get( [ @prefix , $section, 'inherit' ] );
-	while ($section) {
-		##! 16: 'Section ' . $section
-		$val = $self->get( [ @prefix , $section, $key ]);
-		return $val if (defined $val);
+    $section = $self->get( [ @prefix , $section, 'inherit' ] );
+    while ($section) {
+        ##! 16: 'Section ' . $section
+        $val = $self->get( [ @prefix , $section, $key ]);
+        return $val if (defined $val);
         $section = $self->get( [ @prefix , $section, 'inherit' ] );
    }
 
-	##! 8: 'nothing found'
-	return undef;
+    ##! 8: 'nothing found'
+    return undef;
 
 }
 
@@ -341,7 +323,7 @@ Fetch a single value from a block using inheritance (like the crypto config).
 
 The query
 
-	$conn->get_inherit('token.ca-one-signer.backend')
+    $conn->get_inherit('token.ca-one-signer.backend')
 
 will lookup the C<inherit> key and use the value to replace the next-to-last
 path component with it to look up the value again. It will finally return

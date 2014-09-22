@@ -83,26 +83,23 @@ sub init {
     if (!OpenXPKI::Server::Context::hascontext('session')) {
         my $session = OpenXPKI::Server::Session::Mock->new();
         OpenXPKI::Server::Context::setcontext({'session' => $session});
-        if (OpenXPKI::Server::Context::hascontext('config')) {
-            CTX('session')->set_config_version( CTX('config')->get_head_version() );
-        }
     }
 
     if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-	log_wrapper(
-	    {
-		MESSAGE  => "OpenXPKI initialization",
-		PRIORITY => "info",
-		FACILITY => "system",
-	    });
+    log_wrapper(
+        {
+        MESSAGE  => "OpenXPKI initialization",
+        PRIORITY => "info",
+        FACILITY => "system",
+        });
     }
 
     my @tasks;
 
     if (defined $keys->{TASKS} && (ref $keys->{TASKS} eq 'ARRAY')) {
-	@tasks = @{$keys->{TASKS}};
+    @tasks = @{$keys->{TASKS}};
     } else {
-	@tasks = @init_tasks;
+    @tasks = @init_tasks;
     }
 
     delete $keys->{TASKS};
@@ -112,75 +109,75 @@ sub init {
   TASK:
     foreach my $task (@tasks) {
         ##! 16: 'task: ' . $task
-	if (! exists $is_initialized{$task}) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
-		params  => {
-		    task => $task,
-		});
-	}
-	next TASK if $is_initialized{$task};
+    if (! exists $is_initialized{$task}) {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
+        params  => {
+            task => $task,
+        });
+    }
+    next TASK if $is_initialized{$task};
 
-	##! 16: 'do_init_' . $task
-	if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-	    log_wrapper(
-		{
-		    MESSAGE  => "Initialization task '$task'",
-		    PRIORITY => "info",
-		    FACILITY => "system",
-		});
-	}
+    ##! 16: 'do_init_' . $task
+    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+        log_wrapper(
+        {
+            MESSAGE  => "Initialization task '$task'",
+            PRIORITY => "info",
+            FACILITY => "system",
+        });
+    }
 
-	eval "__do_init_$task(\$keys);";
-	if (my $exc = OpenXPKI::Exception->caught())
-	{
-	    my $msg = $exc->message() || '<no message>';
-	    log_wrapper(
-		{
-		    MESSAGE  => "Exception during initialization task '$task': " . $msg,
-		    PRIORITY => "fatal",
-		    FACILITY => "system",
-		});
+    eval "__do_init_$task(\$keys);";
+    if (my $exc = OpenXPKI::Exception->caught())
+    {
+        my $msg = $exc->message() || '<no message>';
+        log_wrapper(
+        {
+            MESSAGE  => "Exception during initialization task '$task': " . $msg,
+            PRIORITY => "fatal",
+            FACILITY => "system",
+        });
         print "Exception during initialization task '$task': " . $msg;
-	    $exc->rethrow();
-	}
-	elsif ($EVAL_ERROR)
-	{
+        $exc->rethrow();
+    }
+    elsif ($EVAL_ERROR)
+    {
         my $error = $EVAL_ERROR;
-	    log_wrapper({
-		    MESSAGE  => "Eval error during initialization task '$task': " . $error,
-		    PRIORITY => "fatal",
-		    FACILITY => "system",
-		});
+        log_wrapper({
+            MESSAGE  => "Eval error during initialization task '$task': " . $error,
+            PRIORITY => "fatal",
+            FACILITY => "system",
+        });
 
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
-		params  => {
-		    task => $task,
-		    EVAL_ERROR => $error,
-		});
-	}
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
+        params  => {
+            task => $task,
+            EVAL_ERROR => $error,
+        });
+    }
 
-	$is_initialized{$task}++;
+    $is_initialized{$task}++;
 
-	# suppress informational output if SILENT is specified
-	if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-	    log_wrapper(
-		{
-		    MESSAGE  => "Initialization task '$task' finished",
-		    PRIORITY => "debug",
-		    FACILITY => "system",
-		});
-	}
+    # suppress informational output if SILENT is specified
+    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+        log_wrapper(
+        {
+            MESSAGE  => "Initialization task '$task' finished",
+            PRIORITY => "debug",
+            FACILITY => "system",
+        });
+    }
     }
 
     if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-	log_wrapper(
-	    {
-		MESSAGE  => "OpenXPKI initialization finished",
-		PRIORITY => "info",
-		FACILITY => "system",
-	    });
+    log_wrapper(
+        {
+        MESSAGE  => "OpenXPKI initialization finished",
+        PRIORITY => "info",
+        FACILITY => "system",
+        });
     }
 
     OpenXPKI::Server::Context::killsession();
@@ -193,20 +190,20 @@ sub log_wrapper {
     my $arg = shift;
 
     if ($is_initialized{'log'}) {
-	if (scalar @log_queue) {
-	    foreach my $entry (@log_queue) {
-		CTX('log')->log(
-		    %{$entry},
-		    );
-	    }
-	    @log_queue = ();
-	}
-	CTX('log')->log(
-	    %{$arg},
-	    );
+    if (scalar @log_queue) {
+        foreach my $entry (@log_queue) {
+        CTX('log')->log(
+            %{$entry},
+            );
+        }
+        @log_queue = ();
+    }
+    CTX('log')->log(
+        %{$arg},
+        );
     } else {
-	# log system not yet prepared, queue log statement
-	push @log_queue, $arg;
+    # log system not yet prepared, queue log statement
+    push @log_queue, $arg;
     }
     return 1;
 }
@@ -216,9 +213,9 @@ sub get_remaining_init_tasks {
     my @remaining_tasks;
 
     foreach my $task (@init_tasks) {
-	if (! $is_initialized{$task}) {
-	    push @remaining_tasks, $task;
-	}
+    if (! $is_initialized{$task}) {
+        push @remaining_tasks, $task;
+    }
     }
 
     return @remaining_tasks;
@@ -245,11 +242,11 @@ sub __do_init_config_versioned {
     ##! 1: "init OpenXPKI config"
     my $config = OpenXPKI::Config->new();
     OpenXPKI::Server::Context::setcontext(
-	{
-	    config => $config,
-	});
-	# Otherwise the init all routine tries to instantiate the test config
-	$is_initialized{config_test} = 1;
+    {
+        config => $config,
+    });
+    # Otherwise the init all routine tries to instantiate the test config
+    $is_initialized{config_test} = 1;
     return 1;
 }
 
@@ -288,9 +285,9 @@ sub __do_init_log {
 
     ### $log
     OpenXPKI::Server::Context::setcontext(
-	{
-	    log => $log,
-	});
+    {
+        log => $log,
+    });
     ##! 64: 'log during init: ' . ref $log
 }
 
@@ -300,14 +297,14 @@ sub __do_init_prepare_daemon {
 
     # create new session
     POSIX::setsid or
-	die "unable to create new session!: $!";
+    die "unable to create new session!: $!";
 
     # prepare daemonizing myself
     # redirect filehandles
     open STDOUT, ">/dev/null" or
-	die "unable to write to /dev/null!: $!";
+    die "unable to write to /dev/null!: $!";
     open STDIN, "/dev/null" or
-	die "unable to read from /dev/null!: $!";
+    die "unable to read from /dev/null!: $!";
 
     chdir '/';
 
@@ -319,9 +316,9 @@ sub __do_init_prepare_daemon {
 sub __do_init_crypto_layer {
     ##! 1: "init crypto layer"
     OpenXPKI::Server::Context::setcontext(
-	{
-	    crypto_layer => get_crypto_layer(),
-	});
+    {
+        crypto_layer => get_crypto_layer(),
+    });
 }
 
 sub __do_init_redirect_stderr {
@@ -340,25 +337,25 @@ sub __do_init_volatile_vault {
     }
 
     OpenXPKI::Server::Context::setcontext(
-	{
-	    volatile_vault => OpenXPKI::Crypto::VolatileVault->new(
-		{
-		    TOKEN => $token,
-		}),
-	});
+    {
+        volatile_vault => OpenXPKI::Crypto::VolatileVault->new(
+        {
+            TOKEN => $token,
+        }),
+    });
 }
 
 sub __do_init_dbi_backend {
     ### init backend dbi...
     my $dbi = get_dbi(
-	{
-	    PURPOSE => 'backend',
-	});
+    {
+        PURPOSE => 'backend',
+    });
 
     OpenXPKI::Server::Context::setcontext(
-	{
-	    dbi_backend => $dbi,
-	});
+    {
+        dbi_backend => $dbi,
+    });
     # delete leftover secrets
     CTX('dbi_backend')->connect();
     CTX('dbi_backend')->delete(
@@ -372,27 +369,27 @@ sub __do_init_dbi_backend {
 sub __do_init_dbi_workflow {
     ### init backend dbi...
     my $dbi = get_dbi(
-	{
-	    PURPOSE => 'workflow',
-	});
+    {
+        PURPOSE => 'workflow',
+    });
 
     OpenXPKI::Server::Context::setcontext(
-	{
-	    dbi_workflow => $dbi,
-	});
+    {
+        dbi_workflow => $dbi,
+    });
 }
 
 sub __do_init_dbi_log {
     ### init backend dbi...
     my $dbi = get_dbi(
-	{
-	    PURPOSE => 'log',
-	});
+    {
+        PURPOSE => 'log',
+    });
 
     OpenXPKI::Server::Context::setcontext(
-	{
-	    dbi_log => $dbi,
-	});
+    {
+        dbi_log => $dbi,
+    });
     CTX('dbi_log')->connect();
 }
 
@@ -400,17 +397,17 @@ sub __do_init_dbi_log {
 sub __do_init_acl {
     ### init acl...
     OpenXPKI::Server::Context::setcontext(
-	{
-	    acl => 1
-	});
+    {
+        acl => 1
+    });
 }
 
 sub __do_init_api {
     ### init api...
     OpenXPKI::Server::Context::setcontext(
-	{
-	    api => OpenXPKI::Server::API->new(),
-	});
+    {
+        api => OpenXPKI::Server::API->new(),
+    });
 }
 
 sub __do_init_authentication {
@@ -421,9 +418,9 @@ sub __do_init_authentication {
             message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_INSTANTIATION_FAILURE");
     }
     OpenXPKI::Server::Context::setcontext(
-	{
-	    authentication => $obj,
-	});
+    {
+        authentication => $obj,
+    });
 }
 
 sub __do_init_server {
@@ -431,10 +428,10 @@ sub __do_init_server {
     ### init server ref...
     ##! 16: '__do_init_server: ' . Dumper($keys)
     if (defined $keys->{SERVER}) {
-	OpenXPKI::Server::Context::setcontext(
-	    {
-		server => $keys->{SERVER},
-	    });
+    OpenXPKI::Server::Context::setcontext(
+        {
+        server => $keys->{SERVER},
+        });
     }
 }
 

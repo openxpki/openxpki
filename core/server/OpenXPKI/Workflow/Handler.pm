@@ -58,7 +58,7 @@ sub load_default_factories {
     my @realms = CTX('config')->get_keys('system.realms');
     foreach my $realm (@realms) {
         ##! 8: 'load realm $realm'
-        $self->_cache->{$realm} = {};
+        $self->_cache->{$realm} = undef;
         CTX('session')->set_pki_realm( $realm );
         $self->get_factory();
     }
@@ -107,7 +107,7 @@ sub get_workflow {
     }
 
     my $wf_session_info = CTX('session')->parse_serialized_info($wf->{WORKFLOW_SESSION});
-    if (!$wf_session_info || ref $wf_session_info ne 'HASH' || !$wf_session_info->{config_version}) {
+    if (!$wf_session_info || ref $wf_session_info ne 'HASH') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_WORKFLOW_UNABLE_TO_PARSE_WORKFLOW_INFO',
             params  => {
@@ -138,9 +138,7 @@ sub get_workflow {
     # In comparison to not being able to even view the workflow this seems
     # to be an acceptable tradeoff.
 
-    my $factory = $self->get_factory({
-        VERSION => $wf_session_info->{config_version}, FALLBACK => 1
-    });
+    my $factory = $self->get_factory();
 
     ##! 64: 'factory: ' . Dumper $factory
     if (! defined $factory) {
@@ -180,70 +178,21 @@ sub get_factory {
 
     # TODO - MIGRATION - remove xml stuff after migration is complete
 
-    # This is the old xml factory code
-
-    # Prepare version switch if necessary
-    my $oldversion;
-    my $version = CTX('session')->get_config_version();
-    if ( $args->{VERSION} && $args->{VERSION} ne $version ) {
-        $oldversion = $version;
-        $version = $args->{VERSION};
-    }
-
     my $pki_realm = CTX('session')->get_pki_realm();
-    ##! 16: "Probing realm $pki_realm version $version"
     # Check if we already have that factory in the cache
-    if ($self->_cache->{ $pki_realm }->{ $version }) {
-        return $self->_cache->{ $pki_realm }->{ $version };
+    if (defined $self->_cache->{ $pki_realm } ) {
+        return $self->_cache->{ $pki_realm };
     }
-
-    # Not found - if necessary make the session show the expected version
-    CTX('session')->set_config_version( $version ) if ($oldversion);
 
     # Fetch the serialized Workflow definition from the config layer
-    # MIGRATION - older revisions have the xml config in workflow and no yaml factory
     my $conn = CTX('config');
 
-    my $is_oldconfig = ($conn->get_meta('workflow')->{TYPE} eq 'scalar');
-    my $workflow_serialized_config;
-    # Scalar node, this is old config
-    if ($is_oldconfig) {
-        $workflow_serialized_config = $conn->get('workflow');
-    } else {
-        $workflow_serialized_config = $conn->get('workflow.xml');
-    }
+    my $workflow_serialized_config = $conn->get('workflow.xml');
 
     # Test if there is a yaml config to load
     my $yaml_config;
     if ($conn->exists('workflow.def')) {
         $yaml_config = OpenXPKI::Workflow::Config->new()->workflow_config();
-    }
-
-    # Set back the version, its no longer needed
-    # Must be done before exception as we stick with the old version otherwise!
-    CTX('session')->set_config_version( $oldversion ) if ($oldversion);
-
-    # There might be cases where we request unknown config version
-    # We dont care about missing XML config if we have a yaml config
-    if (!$yaml_config && !$workflow_serialized_config) {
-
-        # If FALLBACK is set, call myself without version
-        if ($args->{FALLBACK} && $oldversion) {
-            CTX('log')->log(
-                MESSAGE  => 'Unavailable config version ' . $version . ' requested (falling back to session version ' . $oldversion. ')',
-                PRIORITY => 'warn',
-                FACILITY => 'workflow',
-            );
-            return $self->get_factory();
-        }
-
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_FACTORY_UNKNOWN_VERSION_REQUESTED',
-            params => {
-                PKI_REALM => $pki_realm,
-                VERSION => $args->{VERSION}
-            }
-        );
     }
 
     my $workflow_factory;
@@ -261,7 +210,10 @@ sub get_factory {
         $workflow_factory->add_config( %{$yaml_config} );
     }
 
-    $self->_cache->{ $pki_realm }->{ $version } = $workflow_factory;
+    ##! 32: Dumper $workflow_factory
+
+
+    $self->_cache->{ $pki_realm } = $workflow_factory;
 
     return $workflow_factory;
 

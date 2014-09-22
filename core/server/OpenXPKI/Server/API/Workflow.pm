@@ -868,7 +868,7 @@ sub __get_workflow_factory {
     }
 
     my $wf_session_info = CTX('session')->parse_serialized_info($wf->{WORKFLOW_SESSION});
-    if (!$wf_session_info || ref $wf_session_info ne 'HASH' || !$wf_session_info->{config_version}) {
+    if (!$wf_session_info || ref $wf_session_info ne 'HASH') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_PARSE_WORKFLOW_INFO',
             params  => {
@@ -900,10 +900,7 @@ sub __get_workflow_factory {
     # In comparison to not being able to even view the workflow this seems
     # to be an acceptable tradeoff.
 
-    my $factory = CTX('workflow_factory')->get_factory({
-        VERSION => $wf_session_info->{config_version},
-        FALLBACK => 1
-    });
+    my $factory = CTX('workflow_factory')->get_factory({ });
 
     ##! 64: 'factory: ' . Dumper $factory
     if (! defined $factory) {

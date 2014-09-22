@@ -290,7 +290,7 @@ sub get_session_info {
         pki_realm => $session->get_pki_realm(),
         pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->get_pki_realm(), 'label' ]),
         lang => 'en',
-        version => $session->get_config_version(),
+        version => CTX('config')->get_version(),
     }
 
 }
@@ -369,8 +369,8 @@ sub get_chain {
     my %already_seen; # hash of identifiers that have already been seen
 
     if (! defined $arg_ref->{START_IDENTIFIER}) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
         );
     }
     my $start = $arg_ref->{START_IDENTIFIER};

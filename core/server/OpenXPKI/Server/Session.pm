@@ -93,9 +93,6 @@ sub new {
         }
         $self->{session}->param ("status" => "invalid");
 
-        $self->{session}->param ("config_version" => $keys->{VERSION} );
-        $self->{session}->param ("config_version" => CTX('config')->get_version() ) unless ($self->{session}->param ("config_version"));
-
     }
     $self->{session}->expire($self->{LIFETIME});
     $self->{session}->flush();
@@ -156,7 +153,7 @@ sub _get_serializer{
 }
 
 sub _get_persitence_keys{
-    return qw(user role config_version);
+    return qw(user role);
 }
 
 
@@ -331,19 +328,6 @@ sub get_state
     return $self->{session}->param ("state");
 }
 
-sub set_config_version
-{
-    my $self = shift;
-    $self->{session}->param ("config_version" => shift);
-    $self->{session}->flush();
-}
-
-sub get_config_version
-{
-    my $self = shift;
-    return $self->{session}->param ("config_version");
-}
-
 # For SCEP - FIXME - move whole Session to Moose
 sub set_profile {
     my $self = shift;
@@ -460,7 +444,7 @@ You can define what keys are persisted in C<_get_persitence_keys>.
 
 =head3 _get_persitence_keys
 Returns the keys that should be used when persisting the session.
-Currently the fields are user role config_version.
+Currently the fields are user role
 
 =head3 export_serialized_info
 Return a key/value hash with the keys named in _get_persitence_keys.
@@ -504,10 +488,6 @@ Parse a serialized session blob and return as hash.
 =item * get_state
 
 =item * set_state
-
-=item * get_config_version
-
-=item * set_config_version
 
 =item * delete_secret
 
