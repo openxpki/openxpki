@@ -1,0 +1,160 @@
+head:
+    prefix: 037e9b
+
+    label: I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
+
+    description: I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE_DESC
+
+
+state:
+    CREATE_QUEUE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_CREATE_QUEUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_CREATE_QUEUE_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_CREATE_QUEUE > LOAD_NEXT_CA
+
+    INITIAL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_INITIAL_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL > CREATE_QUEUE
+
+    ISSUE_CRL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_ISSUE_CRL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_ISSUE_CRL_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL > PUBLISH_CRL
+
+    LOAD_NEXT_CA: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_LOAD_NEXT_CA_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_LOAD_NEXT_CA_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_GET_NEXT_CA > ISSUE_CRL ? !I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > SUCCESS ? I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT
+
+    PUBLISH_CRL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_PUBLISH_CRL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_PUBLISH_CRL_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL > LOAD_NEXT_CA
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_037E9B_SUCCESS_DESC
+
+
+action:
+    I18N_OPENXPKI_WF_ACTION_CREATE_QUEUE: 
+        class: OpenXPKI::Server::Workflow::Activity::CRLIssuance::CreateQueue
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CREATE_QUEUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CREATE_QUEUE_DESC
+
+    I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL_DESC
+        input: 
+          - ca_alias
+        param: 
+            prefix: publishing.crl
+
+    I18N_OPENXPKI_WF_ACTION_DO_NOTHING: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING_DESC
+
+    I18N_OPENXPKI_WF_ACTION_GET_NEXT_CA: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_GET_NEXT_CA_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_GET_NEXT_CA_DESC
+        input: 
+          - ca_alias_list
+        param: 
+            array_name: ca_alias_list
+            context_key: ca_alias
+            function: shift
+
+    I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_INIT_ISSUE_CRL_DESC
+        input: 
+          - force_issue
+        validator: 
+          - I18N_OPENXPKI_WF_VAL_RELATIVEDATE
+
+    I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL: 
+        class: OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CRL_DESC
+        param: 
+            retry_count: 10
+            retry_interval: +0000000030
+
+
+condition:
+    I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: ca_alias_list
+            condition: is_empty
+
+
+validator:
+    I18N_OPENXPKI_WF_VAL_RELATIVEDATE: 
+        class: OpenXPKI::Server::Workflow::Validator::RelativeDate
+        param: 
+            emptyok: 1
+        arg: 
+          - $crl_validity
+
+
+field:
+    ca_alias: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL
+        name: ca_alias
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_TOOLTIP
+        required: 1
+        type: text
+
+    ca_alias_list: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LIST_LABEL
+        name: ca_alias_list
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LIST_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LIST_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LIST_TOOLTIP
+        type: text
+        required: 0
+
+    force_issue: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_LABEL
+        name: force_issue
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP
+        type: bool
+        required: 0
+
+
+acl:
+    Anonymous: 
+        creator: self
+
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    System: 
+        creator: self
+
+    User: 
+        creator: self
+

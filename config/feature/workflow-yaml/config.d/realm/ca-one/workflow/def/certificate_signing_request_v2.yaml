@@ -1,0 +1,734 @@
+head:
+    prefix: d5927d
+
+    label: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2
+
+    description: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2_DESC
+
+
+state:
+    APPROVED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_APPROVED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_APPROVED_DESC
+        action: 
+          - csr_load_key_password > KEY_PASSWORD_LOADED ? csr_cond_server_key_generation
+          - global_null > REQUEST_COMPLETE ? !csr_cond_server_key_generation
+
+    BUILD_SUBJECT: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_BUILD_SUBJECT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_BUILD_SUBJECT_DESC
+        action: 
+          - csr_render_subject > SUBJECT_COMPLETE
+
+    CANCEL_APPROVALS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_CANCEL_APPROVALS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_CANCEL_APPROVALS_DESC
+        action: 
+          - csr_cancel_approvals > UPDATE_SUBJECT
+
+    CHECK_APPROVALS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_CHECK_APPROVALS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_CHECK_APPROVALS_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING2 > NOTIFY_APPROVAL ? csr_cond_is_approved
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > NOTIFY_CSR_PENDING ? !csr_cond_is_approved
+
+    CLEANUP_KEY_PASSWORD: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_CLEANUP_KEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_CLEANUP_KEY_PASSWORD_DESC
+        action: 
+          - csr_cleanup_key_password > NICE_SEND_NOTIFICATION
+
+    ENTER_CERT_INFO: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_CERT_INFO_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_CERT_INFO_DESC
+        action: 
+          - csr_edit_cert_info > BUILD_SUBJECT
+
+    ENTER_KEY_PASSWORD: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_KEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_KEY_PASSWORD_DESC
+        action: 
+          - csr_retype_server_password > PERSIST_KEY_PASSWORD ? csr_key_password_server
+          - csr_ask_client_password > PERSIST_KEY_PASSWORD ? !csr_key_password_server
+
+    ENTER_SAN: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_SAN_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_SAN_DESC
+        action: 
+          - csr_edit_san > ENTER_CERT_INFO
+
+    ENTER_SUBJECT: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_SUBJECT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ENTER_SUBJECT_DESC
+        action: 
+          - csr_edit_subject > ENTER_SAN
+
+    EVAL_ELIGIBILITY: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_EVAL_ELIGIBILITY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_EVAL_ELIGIBILITY_DESC
+        action: 
+          - csr_eval_eligibility > CHECK_APPROVALS
+
+    FAILURE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_FAILURE_DESC
+
+    FLAG_NOTIFY_SEND: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_FLAG_NOTIFY_SEND_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_FLAG_NOTIFY_SEND_DESC
+        action: 
+          - csr_flag_pending_notification_send > PENDING
+
+    INITIAL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_INITIAL_DESC
+        action: 
+          - csr_select_profile > SETUP_REQUEST_TYPE
+
+    KEY_GENERATED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_KEY_GENERATED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_KEY_GENERATED_DESC
+        action: 
+          - csr_generate_pkcs10 > PKCS10_GENERATED
+
+    KEY_PASSWORD_LOADED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_KEY_PASSWORD_LOADED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_KEY_PASSWORD_LOADED_DESC
+        action: 
+          - csr_generate_key > KEY_GENERATED ? csr_cond_server_key_generation
+
+    NICE_CERTIFICATE_ISSUED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_CERTIFICATE_ISSUED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_CERTIFICATE_ISSUED_DESC
+        action: 
+          - csr_persist_metadata > NICE_METADATA_PERSISTED
+
+    NICE_ISSUE_CERTIFICATE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_ISSUE_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_ISSUE_CERTIFICATE_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE > NICE_PICKUP_CERTIFICATE
+
+    NICE_METADATA_PERSISTED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_METADATA_PERSISTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_METADATA_PERSISTED_DESC
+        action: 
+          - csr_rename_private_key > CLEANUP_KEY_PASSWORD ? csr_cond_server_key_generation
+          - global_null > NICE_SEND_NOTIFICATION ? !csr_cond_server_key_generation
+
+    NICE_PICKUP_CERTIFICATE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_PICKUP_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_PICKUP_CERTIFICATE_DESC
+        action: 
+          - global_null > NICE_CERTIFICATE_ISSUED ? I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED
+          - I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE > NICE_CERTIFICATE_ISSUED ? !I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED
+
+    NICE_PUBLISH_CERTIFICATE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_PUBLISH_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_PUBLISH_CERTIFICATE_DESC
+        action: 
+          - csr_publish_certificate > SUCCESS
+
+    NICE_SEND_NOTIFICATION: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_SEND_NOTIFICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NICE_SEND_NOTIFICATION_DESC
+        action: 
+          - csr_notify_issued > NICE_PUBLISH_CERTIFICATE
+
+    NOTIFY_APPROVAL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NOTIFY_APPROVAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NOTIFY_APPROVAL_DESC
+        action: 
+          - csr_notify_approval > APPROVED
+
+    NOTIFY_CSR_PENDING: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NOTIFY_CSR_PENDING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_NOTIFY_CSR_PENDING_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > PENDING ? csr_cond_pending_notification_send
+          - csr_send_pending_notification > PENDING ? !csr_cond_pending_notification_send
+
+    ONHOLD: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ONHOLD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_ONHOLD_DESC
+        action: 
+          - csr_release_on_hold > PENDING
+
+    PENDING: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_PENDING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_PENDING_DESC
+        action: 
+          - csr_edit_subject > CANCEL_APPROVALS
+          - csr_edit_san > CANCEL_APPROVALS
+          - csr_edit_cert_info > CANCEL_APPROVALS
+          - csr_edit_validity > CANCEL_APPROVALS
+          - csr_approve_csr > CHECK_APPROVALS ? csr_cond_acl_can_approve
+          - csr_reject_request > REJECTED ? csr_cond_acl_can_reject
+          - csr_put_request_on_hold > ONHOLD ? csr_cond_acl_can_approve
+
+    PERSIST_KEY_PASSWORD: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_PERSIST_KEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_PERSIST_KEY_PASSWORD_DESC
+        action: 
+          - csr_persist_key_password > ENTER_SUBJECT
+
+    PKCS10_GENERATED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_PKCS10_GENERATED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_PKCS10_GENERATED_DESC
+        action: 
+          - csr_move_key_to_dp > REQUEST_COMPLETE
+
+    REJECTED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_REJECTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_REJECTED_DESC
+        action: 
+          - csr_notify_rejected > FAILURE
+
+    REQUEST_COMPLETE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_REQUEST_COMPLETE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_REQUEST_COMPLETE_DESC
+        action: 
+          - csr_persist_csr > NICE_ISSUE_CERTIFICATE
+
+    SETUP_REQUEST_TYPE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_SETUP_REQUEST_TYPE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_SETUP_REQUEST_TYPE_DESC
+        action: 
+          - csr_provide_server_key_params > ENTER_KEY_PASSWORD
+          - csr_upload_pkcs10 > ENTER_SUBJECT
+          - csr_select_profile > SETUP_REQUEST_TYPE
+
+    SUBJECT_COMPLETE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_SUBJECT_COMPLETE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_SUBJECT_COMPLETE_DESC
+        action: 
+          - csr_submit > EVAL_ELIGIBILITY
+          - csr_edit_subject > BUILD_SUBJECT
+          - csr_edit_san > BUILD_SUBJECT
+          - csr_edit_cert_info > BUILD_SUBJECT
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_SUCCESS_DESC
+
+    UPDATE_SUBJECT: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_UPDATE_SUBJECT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_D5927D_UPDATE_SUBJECT_DESC
+        action: 
+          - csr_render_subject > PENDING
+
+
+action:
+    I18N_OPENXPKI_WF_ACTION_DO_NOTHING: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING_DESC
+
+    I18N_OPENXPKI_WF_ACTION_DO_NOTHING2: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING2_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING2_DESC
+
+    I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE: 
+        class: OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_FETCH_CERTIFICATE_DESC
+        param: 
+            retry_count: 20
+            retry_interval: +0000000003
+
+    I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE: 
+        class: OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_ISSUE_CERTIFICATE_DESC
+        param: 
+            retry_count: 10
+            retry_interval: +0000000030
+
+    csr_approve_csr: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_DESC
+        param: 
+            check_creator: 0
+            multi_role_approval: 0
+
+    csr_ask_client_password: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC
+        input: 
+          - _password
+
+    csr_cancel_approvals: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CANCEL_APPROVALS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CANCEL_APPROVALS_DESC
+
+    csr_cleanup_key_password: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CLEANUP_KEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CLEANUP_KEY_PASSWORD_DESC
+        param: 
+            ds_key_param: workflow_id
+            ds_namespace: workflow.csr.keygen_password
+
+    csr_edit_cert_info: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_DESC
+        input: 
+          - cert_info
+        param: 
+            uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form
+            source: USER
+
+    csr_edit_san: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SAN_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SAN_DESC
+        input: 
+          - cert_san_parts
+        param: 
+            uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form
+            source: USER
+
+    csr_edit_subject: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SUBJECT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SUBJECT_DESC
+        input: 
+          - cert_subject_parts
+        param: 
+            uihandle: OpenXPKI::Client::UI::Handle::Profile::render_subject_form
+            source: USER
+
+    csr_edit_validity: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_DESC
+        input: 
+          - notbefore
+          - notafter
+        param: 
+            source: USER
+        validator: 
+          - global_validity_window
+
+    csr_eval_eligibility: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EVAL_ELIGIBILITY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EVAL_ELIGIBILITY_DESC
+
+    csr_flag_pending_notification_send: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_FLAG_PENDING_NOTIFICATION_SEND_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_FLAG_PENDING_NOTIFICATION_SEND_DESC
+        param: 
+            flag_pending_notification_send: 1
+
+    csr_generate_key: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::GenerateKey
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_KEY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_KEY_DESC
+        param: 
+            _map_enc_alg: $enc_alg
+            _map_key_alg: $key_alg
+            _map_key_gen_params: $key_gen_params
+            _map_password: $_password
+
+    csr_generate_pkcs10: 
+        class: OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_PKCS10_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_PKCS10_DESC
+
+    csr_load_key_password: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_LOAD_KEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_LOAD_KEY_PASSWORD_DESC
+        param: 
+            ds_key_param: workflow_id
+            ds_namespace: workflow.csr.keygen_password
+            ds_value_param: _password
+
+    csr_move_key_to_dp: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_MOVE_KEY_TO_DP_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_MOVE_KEY_TO_DP_DESC
+        param: 
+            ds_encrypt: 1
+            ds_force: 1
+            ds_key_param: workflow_id
+            ds_namespace: certificate.privatekey
+            ds_unset_context_value: 1
+            ds_value_param: private_key
+
+    csr_notify_approval: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_APPROVAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_APPROVAL_DESC
+        param: 
+            message: csr_notify_approval
+
+    csr_notify_issued: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_ISSUED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_ISSUED_DESC
+        param: 
+            message: cert_issued
+
+    csr_notify_rejected: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_REJECTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_REJECTED_DESC
+        param: 
+            message: csr_rejected
+
+    csr_persist_csr: 
+        class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_DESC
+
+    csr_persist_key_password: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_KEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_KEY_PASSWORD_DESC
+        param: 
+            ds_encrypt: 1
+            ds_force: 1
+            ds_key_param: workflow_id
+            ds_namespace: workflow.csr.keygen_password
+            ds_unset_context_value: 1
+            ds_value_param: _password
+
+    csr_persist_metadata: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_METADATA_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_METADATA_DESC
+
+    csr_provide_server_key_params: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        uihandle: OpenXPKI::Client::UI::Handle::Profile::render_key_select
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_DESC
+        input: 
+          - key_alg
+          - enc_alg
+          - key_gen_params
+          - password_type
+          - csr_type
+        param: 
+            uihandle: OpenXPKI::Client::UI::Handle::Profile::render_key_select
+            source: USER
+
+    csr_publish_certificate: 
+        class: OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUBLISH_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUBLISH_CERTIFICATE_DESC
+        param: 
+            workflow_type: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING
+
+    csr_put_request_on_hold: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUT_REQUEST_ON_HOLD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUT_REQUEST_ON_HOLD_DESC
+        input: 
+          - onhold_comment
+
+    csr_reject_request: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_DESC
+
+    csr_release_on_hold: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_DESC
+        input: 
+          - onhold_comment
+
+    csr_rename_private_key: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENAME_PRIVATE_KEY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENAME_PRIVATE_KEY_DESC
+        param: 
+            ds_key: $workflow_id
+            ds_namespace: certificate.privatekey
+            ds_newkey: $cert_identifier
+
+    csr_render_subject: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENDER_SUBJECT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENDER_SUBJECT_DESC
+
+    csr_retype_server_password: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        uihandle: OpenXPKI::Client::UI::Handle::Profile::render_server_password
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RETYPE_SERVER_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RETYPE_SERVER_PASSWORD_DESC
+        input: 
+          - _password
+        param: 
+            uihandle: OpenXPKI::Client::UI::Handle::Profile::render_server_password
+
+    csr_select_profile: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        uihandle: OpenXPKI::Client::UI::Handle::Profile::render_profile_select
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_DESC
+        input: 
+          - cert_profile
+          - cert_subject_style
+        param: 
+            uihandle: OpenXPKI::Client::UI::Handle::Profile::render_profile_select
+            source: USER
+
+    csr_send_pending_notification: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SEND_PENDING_NOTIFICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SEND_PENDING_NOTIFICATION_DESC
+        param: 
+            message: csr_created
+
+    csr_submit: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC
+
+    csr_upload_pkcs10: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_DESC
+        input: 
+          - pkcs10
+          - csr_type
+
+    global_null: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_NULL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_NULL_DESC
+
+
+condition:
+    I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED: 
+        class: OpenXPKI::Server::Workflow::Condition::NICE::IsCertificateIssued
+
+    csr_cond_acl_can_approve: 
+        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        param: 
+            roles: CA Operator,RA Operator
+
+    csr_cond_acl_can_reject: 
+        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        param: 
+            roles: CA Operator,RA Operator
+
+    csr_cond_is_approved: 
+        class: OpenXPKI::Server::Workflow::Condition::Approved
+        param: 
+            role: 
+              - RA Operator
+
+    csr_cond_pending_notification_send: 
+        class: Workflow::Condition::Evaluate
+        param: 
+            test: $context->{flag_pending_notification_send}
+
+    csr_cond_server_key_generation: 
+        class: Workflow::Condition::Evaluate
+        param: 
+            test: defined $context->{key_gen_params}
+
+    csr_key_password_server: 
+        class: Workflow::Condition::Evaluate
+        param: 
+            test: $context->{password_type} eq 'server'
+
+
+validator:
+    global_validity_window: 
+        class: OpenXPKI::Server::Workflow::Validator::ValidityWindow
+        arg: 
+          - $notbefore
+          - $notafter
+
+
+field:
+    _password: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_LABEL
+        name: _password
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP
+        required: 1
+        type: passwordverify
+
+    cert_info: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_LABEL
+        name: cert_info
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP
+        type: cert_info
+        required: 0
+
+    cert_profile: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL
+        name: cert_profile
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP
+        type: text
+        required: 0
+
+    cert_san_parts: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_LABEL
+        name: cert_san_parts
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_TOOLTIP
+        type: cert_san
+        required: 0
+
+    cert_subject_parts: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_LABEL
+        name: cert_subject_parts
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP
+        type: cert_subject
+        required: 0
+
+    cert_subject_style: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_LABEL
+        name: cert_subject_style
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP
+        type: text
+        required: 0
+
+    csr_type: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_LABEL
+        name: csr_type
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP
+        type: hidden
+        required: 0
+
+    enc_alg: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL
+        name: enc_alg
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP
+        type: text
+        required: 0
+
+    key_alg: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_LABEL
+        name: key_alg
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP
+        type: text
+        required: 0
+
+    key_gen_params: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL
+        name: key_gen_params
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_TOOLTIP
+        type: text
+        required: 0
+
+    notafter: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_LABEL
+        name: notafter
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_TOOLTIP
+        type: datetime
+        required: 0
+
+    notbefore: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_LABEL
+        name: notbefore
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP
+        type: datetime
+        required: 0
+
+    onhold_comment: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_LABEL
+        name: onhold_comment
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_TOOLTIP
+        type: text
+        required: 0
+
+    password_type: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_LABEL
+        name: password_type
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_TOOLTIP
+        type: text
+        required: 0
+
+    pkcs10: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_LABEL
+        name: pkcs10
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP
+        required: 1
+        type: uploadarea
+
+
+acl:
+    Anonymous: 
+        creator: self
+
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    System: 
+        creator: self
+
+    User: 
+        creator: self
+

@@ -1,0 +1,163 @@
+head:
+    prefix: ca6f50
+
+    label: I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA
+
+    description: I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA_DESC
+
+
+state:
+    CHOOSE_ACTION: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_CHOOSE_ACTION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_CHOOSE_ACTION_DESC
+        action: 
+          - changemeta_load_form > DATA_UPDATE
+          - changemeta_terminate > FAILURE
+          - changemeta_persist > SUCCESS
+
+    DATA_UPDATE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_DATA_UPDATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_DATA_UPDATE_DESC
+        action: 
+          - changemeta_update_context > CHOOSE_ACTION
+
+    FAILURE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_FAILURE_DESC
+
+    INITIAL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_INITIAL_DESC
+        action: 
+          - changemeta_load_data > DATA_UPDATE
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA6F50_SUCCESS_DESC
+
+
+action:
+    changemeta_load_data: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC
+        input: 
+          - cert_identifier
+        param: 
+            description: I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_DATA
+        validator: 
+          - I18N_OPENXPKI_WF_VAL_CERT_IDENTIFIER_EXISTS
+
+    changemeta_load_form: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC
+        param: 
+            description: I18N_OPENXPKI_WF_ACTION_METADATA_LOAD_FORM
+
+    changemeta_persist: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC
+        param: 
+            description: I18N_OPENXPKI_WF_ACTION_METADATA_SAVE_DATA
+
+    changemeta_terminate: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_DESC
+        param: 
+            description: I18N_OPENXPKI_WF_ACTION_CHANGEMETA_ABORT
+
+    changemeta_update_context: 
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_DESC
+        input: 
+          - meta_email
+          - meta_requestor
+          - meta_system_id
+        param: 
+            description: I18N_OPENXPKI_WF_ACTION_METADATA_UPDATE_DATA
+        validator: 
+          - changemeta_validate_system_id
+          - global_validate_regex
+
+
+validator:
+    I18N_OPENXPKI_WF_VAL_CERT_IDENTIFIER_EXISTS: 
+        class: OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
+        param: 
+            emptyok: 1
+        arg: 
+          - $cert_identifier
+
+    changemeta_validate_system_id: 
+        class: OpenXPKI::Server::Workflow::Validator::Connector
+        param: 
+            error: I18N_OPENXPKI_WORKFLOW_METADATA_WRONG_SYSTEM_ID
+            path: metadata.systemid
+        arg: 
+          - meta_system_id
+
+    global_validate_regex: 
+        class: OpenXPKI::Server::Workflow::Validator::Regex
+        arg: 
+          - meta_email
+          - email
+
+
+field:
+    cert_identifier: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL
+        name: cert_identifier
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP
+        required: 1
+        type: cert_identifier
+
+    meta_email: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_LABEL
+        name: meta_email
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP
+        type: text
+        required: 0
+
+    meta_requestor: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL
+        name: meta_requestor
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP
+        type: text
+        required: 0
+
+    meta_system_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_LABEL
+        name: meta_system_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_TOOLTIP
+        type: text
+        required: 0
+
+
+acl:
+    Anonymous: 
+        creator: self
+
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    System: 
+        creator: self
+
+    User: 
+        creator: self
+

@@ -1,0 +1,329 @@
+head:
+    prefix: b46b08
+
+    label: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2
+
+    description: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2_DESC
+
+
+state:
+    CHECK_APPROVALS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > SUCCESS ? !I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING2 > CRR_CHECK_FOR_DELAYED_REVOKE ? crr_cond_is_approved I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > NOTIFY_CRR_PENDING ? !crr_cond_is_approved I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+
+    CHECK_FOR_REVOCATION: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION > SUCCESS
+
+    CRR_CHECK_FOR_DELAYED_REVOKE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION > CRR_PERSIST ? I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > CRR_PERSIST ? !I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION
+
+    CRR_PERSIST: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_PERSIST_CRR > NICE_DISPATCH_REVOKE ? I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > CHECK_FOR_REVOCATION ? !I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+
+    EDIT_REQUEST: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_DESC
+        action: 
+          - crr_update_request > PENDING
+
+    FAILURE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC
+
+    FLAG_NOTIFY_SEND: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_DESC
+        action: 
+          - crr_flag_pending_notification_send > PENDING
+
+    INITIAL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_CREATE_CRR > CHECK_APPROVALS
+
+    NICE_DISPATCH_REVOKE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_NICE_REVOKE_CERTIFICATE > CHECK_FOR_REVOCATION
+
+    NOTIFY_CRR_PENDING: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > PENDING ? crr_cond_pending_notification_send
+          - crr_send_pending_notification > PENDING ? !crr_cond_pending_notification_send
+
+    PENDING: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_DESC
+        action: 
+          - crr_edit_request > EDIT_REQUEST ? I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+          - I18N_OPENXPKI_WF_ACTION_APPROVE_CRR > CHECK_APPROVALS ? I18N_OPENXPKI_WF_ACL_CRR_APPROVE I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+          - I18N_OPENXPKI_WF_ACTION_REJECT_CRR > REJECTED ? I18N_OPENXPKI_WF_ACL_CRR_REJECT I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > SUCCESS ? !I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING
+
+    REJECTED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_DO_NOTHING > FAILURE
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_DESC
+
+
+action:
+    I18N_OPENXPKI_WF_ACTION_APPROVE_CRR: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_APPROVE_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_APPROVE_CRR_DESC
+        param: 
+            check_creator: 0
+            multi_role_approval: 0
+
+    I18N_OPENXPKI_WF_ACTION_CREATE_CRR: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CREATE_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CREATE_CRR_DESC
+        input: 
+          - cert_identifier
+          - reason_code
+          - comment
+          - invalidity_time
+          - flag_crr_auto_approval
+          - flag_delayed_revoke
+          - crr_info
+        validator: 
+          - I18N_OPENXPKI_WF_VAL_CREATOR
+          - I18N_OPENXPKI_WF_VAL_INVALIDITYTIME
+          - I18N_OPENXPKI_WF_VAL_REASONCODE
+
+    I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Pause
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DELAY_REVOCATION_DESC
+        param: 
+            _map_wakeup: $invalidity_time
+            reason: I18N_OPENXPKI_DELEAYED_REVOCATION_REQUESTED
+
+    I18N_OPENXPKI_WF_ACTION_DO_NOTHING: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING_DESC
+
+    I18N_OPENXPKI_WF_ACTION_DO_NOTHING2: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING2_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_DO_NOTHING2_DESC
+
+    I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION: 
+        class: OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_CHECK_FOR_REVOCATION_DESC
+        param: 
+            retry_count: 10
+            retry_interval: +0000000030
+
+    I18N_OPENXPKI_WF_ACTION_NICE_REVOKE_CERTIFICATE: 
+        class: OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_REVOKE_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_NICE_REVOKE_CERTIFICATE_DESC
+
+    I18N_OPENXPKI_WF_ACTION_PERSIST_CRR: 
+        class: OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_PERSIST_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_PERSIST_CRR_DESC
+
+    I18N_OPENXPKI_WF_ACTION_REJECT_CRR: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_REJECT_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_REJECT_CRR_DESC
+
+    crr_edit_request: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC
+
+    crr_flag_pending_notification_send: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND_DESC
+        param: 
+            flag_pending_notification_send: 1
+
+    crr_send_pending_notification: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SEND_PENDING_NOTIFICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SEND_PENDING_NOTIFICATION_DESC
+        param: 
+            message: crr_pending_approval
+
+    crr_update_request: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_DESC
+        input: 
+          - reason_code
+          - comment
+          - invalidity_time
+        param: 
+            description: Update
+        validator: 
+          - I18N_OPENXPKI_WF_VAL_INVALIDITYTIME
+          - I18N_OPENXPKI_WF_VAL_REASONCODE
+
+
+condition:
+    I18N_OPENXPKI_WF_ACL_CRR_APPROVE: 
+        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        param: 
+            roles: CA Operator,RA Operator
+
+    I18N_OPENXPKI_WF_ACL_CRR_REJECT: 
+        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        param: 
+            roles: CA Operator,RA Operator
+
+    I18N_OPENXPKI_WF_COND_CERTIFICATE_NOT_YET_REVOKED_OR_PENDING: 
+        class: OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked
+
+    I18N_OPENXPKI_WF_COND_DELAYED_REVOCATION: 
+        class: Workflow::Condition::Evaluate
+        param: 
+            test: $context->{flag_delayed_revoke}
+
+    crr_cond_is_approved: 
+        class: Workflow::Condition::LazyOR
+        param: 
+            condition1: I18N_OPENXPKI_WF_COND_IS_AUTOAPPROVAL
+            condition2: I18N_OPENXPKI_WF_COND_CHECK_CRR_APPROVALS
+
+    crr_cond_pending_notification_send: 
+        class: Workflow::Condition::Evaluate
+        param: 
+            test: $context->{flag_pending_notification_send}
+
+
+validator:
+    I18N_OPENXPKI_WF_VAL_CREATOR: 
+        class: OpenXPKI::Server::Workflow::Validator::Creator
+
+    I18N_OPENXPKI_WF_VAL_INVALIDITYTIME: 
+        class: OpenXPKI::Server::Workflow::Validator::InvalidityTime
+        arg: 
+          - $invalidity_time
+          - $cert_identifier
+
+    I18N_OPENXPKI_WF_VAL_REASONCODE: 
+        class: OpenXPKI::Server::Workflow::Validator::ReasonCode
+        arg: 
+          - $reason_code
+
+
+field:
+    cert_identifier: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL
+        name: cert_identifier
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP
+        required: 1
+        type: cert_identifier
+
+    comment: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_LABEL
+        name: comment
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP
+        type: text
+        required: 0
+
+    crr_info: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL
+        name: crr_info
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_TOOLTIP
+        type: server
+        required: 0
+
+    flag_crr_auto_approval: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL
+        name: flag_crr_auto_approval
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_TOOLTIP
+        type: server
+        required: 0
+
+    flag_delayed_revoke: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL
+        name: flag_delayed_revoke
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_TOOLTIP
+        type: server
+        required: 0
+
+    invalidity_time: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL
+        name: invalidity_time
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP
+        required: 1
+        type: datetime
+
+    reason_code: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_LABEL
+        name: reason_code
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP
+        required: 1
+        type: select
+
+
+acl:
+    Anonymous: 
+        creator: self
+
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    System: 
+        creator: self
+
+    User: 
+        creator: self
+

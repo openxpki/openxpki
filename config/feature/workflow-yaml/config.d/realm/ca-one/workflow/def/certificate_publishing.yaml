@@ -1,0 +1,84 @@
+head:
+    prefix: 9943ec
+
+    label: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING
+
+    description: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING_DESC
+
+
+state:
+    INITIAL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_INITIAL_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE > WAITING_FOR_START
+
+    PUBLISH: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_PUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_PUBLISH_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_PUBLISH > SUCCESS
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_SUCCESS_DESC
+
+    WAITING_FOR_START: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_WAITING_FOR_START_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_9943EC_WAITING_FOR_START_DESC
+        action: 
+          - I18N_OPENXPKI_WF_ACTION_TOOLS_DISCONNECT > PUBLISH
+
+
+action:
+    I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC
+        input: 
+          - cert_identifier
+
+    I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_PUBLISH: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_PUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CERTIFICATE_PUBLISHING_PUBLISH_DESC
+        input: 
+          - cert_identifier
+        param: 
+            prefix: publishing.entity
+
+    I18N_OPENXPKI_WF_ACTION_TOOLS_DISCONNECT: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Disconnect
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_TOOLS_DISCONNECT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_TOOLS_DISCONNECT_DESC
+
+
+field:
+    cert_identifier: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL
+        name: cert_identifier
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP
+        required: 1
+        type: text
+
+
+acl:
+    Anonymous: 
+        creator: self
+
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    System: 
+        creator: self
+
+    User: 
+        creator: self
+
