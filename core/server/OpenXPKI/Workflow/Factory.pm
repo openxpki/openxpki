@@ -173,7 +173,7 @@ sub __authorize_workflow {
     my $self     = shift;
     my $arg_ref  = shift;
 
-    my $config = CTX('config');
+    my $conn = CTX('config');
 
     # Action = create or access
     # Type = Name of the workflow
@@ -200,10 +200,21 @@ sub __authorize_workflow {
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
 
-        my %allowed_workflows = map { $_ => 1 } ($config->get_list("auth.wfacl.$role.create"));
+        my $is_allowed = 0;
+
+        # MIGRATION - yaml workflows have theirs acls now inside the config
+        # Fall back to old location for XML workflows
+        if (!$conn->exists([ 'workflow', 'def', $type ])) {
+            my %allowed_workflows = map { $_ => 1 } ($conn->get_list("auth.wfacl.$role.create"));
+            $is_allowed = exists $allowed_workflows{$type};
+        } else {
+            my $creator = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
+            # if creator is set to any value, access is allowed
+            $is_allowed = defined $creator;
+        }
 
         ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows
-        if (! exists $allowed_workflows{$type} ) {
+        if (! $is_allowed ) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED',
                 params  => {
@@ -216,11 +227,19 @@ sub __authorize_workflow {
         return 1;
     }
     elsif ($action eq 'access') {
+
         my $workflow = $arg_ref->{WORKFLOW};
         my $filter   = $arg_ref->{FILTER};
         my $type     = $workflow->type();
 
-        my $allowed_creator_re = $config->get("auth.wfacl.$role.access.$type.creator");
+        # MIGRATION - yaml workflows have theirs acls now inside the config
+        # Fall back to old location for XML workflows
+        my $allowed_creator_re;
+        if (!$conn->exists([ 'workflow', 'def', $type ])) {
+            $allowed_creator_re = $conn->get("auth.wfacl.$role.access.$type.creator");
+        } else {
+            $allowed_creator_re = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
+        }
 
         if (! defined $allowed_creator_re) {
             OpenXPKI::Exception->throw(
@@ -233,32 +252,56 @@ sub __authorize_workflow {
             );
         }
 
+        # get the workflow creator from the attributes table
+        my $wf_creator = $workflow->attrib('creator') || '';
+
+        # Creator can be self, any, others or a regex
+        my $is_allowed = 0;
+        # Access only to own workflows - check session user against creator
         if ($allowed_creator_re eq 'self') {
-            # this is a meta name, replace by current user name
-            $allowed_creator_re = $user;
-        }
-        if ($allowed_creator_re) {
-            ##! 16: 'allowed_creator_re: ' . $allowed_creator_re
-            # check it against the workflow creator
-            my $wf_creator = $workflow->context()->param('creator') || '';
-            #my $wf_creator = $workflow->attrib('creator') || '';
+            $is_allowed = ($allowed_creator_re eq $user);
 
-            ##! 16: 'wf_creator: ' . $wf_creator
-            if ($wf_creator !~ qr/$allowed_creator_re/ &&
-                $wf_creator ne $allowed_creator_re) {
-                ##! 16: 'workflow creator does not match allowed creator'
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE',
-                );
-            }
+        # No access to own workflows
+        } elsif ($allowed_creator_re eq 'others') {
+            $is_allowed = ($allowed_creator_re ne $user);
+
+        # access to any workflow
+        } elsif ($allowed_creator_re eq 'any') {
+            $is_allowed = 1;
+
+        # Access by Regex - check
+        } else {
+            $is_allowed = ($wf_creator =~ qr/$allowed_creator_re/);
         }
 
+        if (!$is_allowed) {
+            ##! 16: 'workflow creator does not match allowed creator'
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE',
+                params => {
+                    'REALM'   => $realm,
+                    'ROLE'    => $role,
+                    'WF_TYPE' => $type,
+                    'ALLOWED_CREATOR' => $allowed_creator_re,
+                    'WF_CREATOR' => $wf_creator,
+                }
+            );
+        }
 
-        my $context_filter = $config->get_hash("auth.wfacl.$role.access.$type.context");
+
+        # MIGRATION
+        my $context_filter;
+        if (!$conn->exists([ 'workflow', 'def', $type ])) {
+            $context_filter = $conn->get_hash("auth.wfacl.$role.access.$type.context");
+        } else {
+            $context_filter = $conn->get_hash([ 'workflow', 'def', $type, 'acl', $role, 'context' ] );
+        }
+
         if ($filter &&  $context_filter) {
             # context filtering is defined for this type, so
             # iterate over the context parameters and check them against
             # the show/hide configuration values
+
             my $show = $context_filter->{show};
             if (! defined $show) {
                 $show = ''; # will not filter anything!
