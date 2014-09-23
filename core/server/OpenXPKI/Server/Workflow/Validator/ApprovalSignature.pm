@@ -72,11 +72,11 @@ sub validate {
     if (! $sig =~ m{ \A [a-zA-Z\+/=]+ \z }xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_CONTAINS_INVALID_CHARACTERS',
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
+        log => {
+        logger => CTX('log'),
+        priority => 'warn',
+        facility => 'system',
+        },
         );
     }
 
@@ -124,7 +124,7 @@ sub validate {
 
 
     ##! 32: 'pkcs7: ' . $pkcs7
-    my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => 'DEFAULT' });
+    my $default_token = CTX('api')->get_default_token();
 
     $sig_text = encode('utf8', $sig_text);
     # Looks like CR is stripped by some browser which leads to a digest mismatch
@@ -180,7 +180,6 @@ sub validate {
 
     ##! 32: 'signer pem ' . $validate->{CHAIN}->[0]
 
-    my $default_token = CTX('api')->get_default_token();
     my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{CHAIN}->[0], TOKEN => $default_token );
     my $signer_subject = $x509_signer->get_subject();
     my $signer_identifier = $x509_signer->get_identifier();
