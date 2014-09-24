@@ -93,8 +93,8 @@ sub render_subject_form {
 
     # Parse out the field name and type, we required that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{ACTIVITY}})[0] unless($wf_action);
-    my $field_name = $wf_info->{ACTIVITY}->{$wf_action}->{FIELD}[0]->{name};
-    my $field_type = $wf_info->{ACTIVITY}->{$wf_action}->{FIELD}[0]->{type};
+    my $field_name = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{name};
+    my $field_type = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type};
 
     $self->logger()->debug( " Render subject for $field_name with type $field_type in $wf_action " );
 
