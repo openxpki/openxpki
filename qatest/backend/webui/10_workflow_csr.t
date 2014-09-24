@@ -57,7 +57,7 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'page' => 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2',
+    'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
 });
 
 is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
