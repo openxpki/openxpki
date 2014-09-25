@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use English;
 use Moose;
-use Connector::Proxy::Config::Versioned;
+use OpenXPKI::Config::Backend;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -27,38 +27,14 @@ has '_head_version' => (
     is => 'rw',
     isa => 'Str',
     required => 0,
+    default => '',
 );
 
 
 around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
-
-    my $dbpath = $ENV{OPENXPKI_CONF_DB} || '/etc/openxpki/config.git';
-
-    if (! -d $dbpath) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_INIT_TASK_GIT_DBPATH_DOES_NOT_EXIST",
-        params  => {
-            dbpath => $dbpath,
-        });
-    }
-
-    my $cv = Connector::Proxy::Config::Versioned->new(
-        {
-            LOCATION  => $dbpath,
-        }
-    );
-
-    if (!$cv) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_INIT_TASK_CONFIG_LAYER_NOT_INITIALISED",
-        params  => {
-            dbpath => $dbpath,
-        });
-    }
-    ##! 16: "Init config system - head version " . $cv->version()
-    return $class->$orig( { BASECONNECTOR => $cv, _head_version => $cv->version() } );
+    return $class->$orig( { BASECONNECTOR => OpenXPKI::Config::Backend->new() } );
 };
 
 before '_route_call' => sub {
@@ -88,17 +64,22 @@ before '_route_call' => sub {
 
 sub get_version {
     my $self = shift;
+    return '';
     ##! 16: 'Config version requested ' . Dumper( $self->BASECONNECTOR()->version() )
-    return $self->BASECONNECTOR()->version();
+    #return $self->BASECONNECTOR()->version();
 }
 
 sub get_head_version {
     my $self = shift;
-    return $self->_head_version();
+    return '';
+    #return $self->_head_version();
 }
 
 sub update_head {
     my $self = shift;
+
+    return '';
+
     my $head_id = $self->BASECONNECTOR()->fetch_head_commit();
 
     # if the head version has evolved, update the session context

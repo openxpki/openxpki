@@ -47,6 +47,7 @@ OpenXPKI/Client/UI/Handle/Profile.pm
 ## Config Layers
 OpenXPKI/Config/Merge.pm
 OpenXPKI/Config/Test.pm
+OpenXPKI/Config/Backend.pm
 
 # Config Connector
 OpenXPKI/Connector/FakeValidity.pm
