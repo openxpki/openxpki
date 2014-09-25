@@ -41,12 +41,15 @@ before '_route_call' => sub {
 
     my $self = shift;
     my $call = shift;
-    my $location = shift;
+    my $path = shift;
+    my $location;
 
     # Location can be a string or an array
-    if (ref $location eq "ARRAY") {
-        $location = @{$location}[0];
+    if (ref $path eq "ARRAY") {
+        $location = @{$path}[0];
         ##! 8: 'Location was array - shifted: ' . Dumper $location
+    } else {
+        $location = $path;
     }
 
     ##! 16: "_route_call interception on $location "
@@ -60,6 +63,8 @@ before '_route_call' => sub {
         ##! 16: "_route_call: realm value, set prefix to " . $pki_realm
         $self->_config()->{''}->PREFIX( "realm.$pki_realm" );
     }
+
+    ##! 8: 'Full path: ' . Dumper $path
 };
 
 sub get_version {

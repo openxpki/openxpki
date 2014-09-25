@@ -150,6 +150,8 @@ sub set_status_from_error_reply {
             $message = $reply->{'LIST'}->[0]->{LABEL};
         }
         $self->logger()->error($message);
+    } else {
+        $self->logger()->trace(Dumper $reply);
     }
     $self->_status({ level => 'error', message => i18nGettext($message) });
 

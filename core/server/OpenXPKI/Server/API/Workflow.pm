@@ -397,12 +397,15 @@ sub __get_workflow_ui_info {
 
     # Check defined actions against possible ones, non global actions are prefixed
     $result->{STATE}->{option} = [];
+
+    ##! 16: 'Testing actions ' .  Dumper \@options
     foreach my $option (@options) {
         $option =~ m{ \A ((global_)?)([^\s>]+)}xs;
         $option = $3;
         if (!$2) {
             $option = $head->{prefix}.'_'.$option;
         }
+        ##! 16: 'Activity ' . $option
         if ($result->{ACTIVITY}->{$option}) {
             push @{$result->{STATE}->{option}}, $option;
         }
