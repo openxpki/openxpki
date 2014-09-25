@@ -259,11 +259,11 @@ sub __authorize_workflow {
         my $is_allowed = 0;
         # Access only to own workflows - check session user against creator
         if ($allowed_creator_re eq 'self') {
-            $is_allowed = ($allowed_creator_re eq $user);
+            $is_allowed = ($wf_creator eq $user);
 
         # No access to own workflows
         } elsif ($allowed_creator_re eq 'others') {
-            $is_allowed = ($allowed_creator_re ne $user);
+            $is_allowed = ($wf_creator ne $user);
 
         # access to any workflow
         } elsif ($allowed_creator_re eq 'any') {
@@ -283,6 +283,7 @@ sub __authorize_workflow {
                     'ROLE'    => $role,
                     'WF_TYPE' => $type,
                     'ALLOWED_CREATOR' => $allowed_creator_re,
+                    'ACTIVE_USER' => $user,
                     'WF_CREATOR' => $wf_creator,
                 }
             );

@@ -191,7 +191,7 @@ sub __process_workflow {
 
     CTX('log')->log(
         MESSAGE  => "Adding workflow: $wf_name",
-        PRIORITY => 'debug',
+        PRIORITY => 'info',
         FACILITY => 'workflow',
     );
 
