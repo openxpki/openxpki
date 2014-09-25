@@ -1,5 +1,5 @@
 #!/usr/bin/perl
- 
+
 use strict;
 use warnings;
 use English;
@@ -30,17 +30,17 @@ my %params;
 my @options_spec = ('config=s');
 my $cmd = shift || 'help';
 my $ret = 255;
- 
+
 sub initdb {
 
     my @databases = qw( backend );
-    
+
     # Check if a seperate logging database is defined
-         
-    if (CTX('config')->get('system.database.logging.type')) {
+
+    if (CTX('config')->exists('system.database.logging')) {
         push @databases, 'log';
-    }     
-    
+    }
+
   DB:
     foreach my $db (@databases) {
         my $params = {};
@@ -79,41 +79,41 @@ sub initdb {
         }
     }
     return 0;
-} 
+}
 
 
 sub loadcfg {
-    
+
     if ($params{path}) {
         # we set the ENV as this
         # a) can split a string
         # b) otherwise an external set ENV will override the parameter
         $ENV{OPENXPKI_CONF_PATH} = $params{path};
-    }   
-    
+    }
+
     require OpenXPKI::Config::Merge;
-    my $config = OpenXPKI::Config::Merge->new();    
+    my $config = OpenXPKI::Config::Merge->new();
     printf "Current Tree Version: %s\n", $config->version();
-    
+
     if ($params{reload}) {
-        OpenXPKI::Control::reload(); 
-    }      
+        OpenXPKI::Control::reload();
+    }
     return;
-    
+
 }
- 
- 
+
+
 sub certificate_id {
-    
+
     my $format = $params{format} || 'openxpki';
-    
+
     my $filename = $params{file};
 
     if ( !-r $filename ) {
         print STDERR "ERROR: filename '$filename' is not readable\n";
         return 2;
     }
-    
+
     if ($format eq 'openssl') {
         my @exec = ('openssl','x509','-noout','-hash','-inform','PEM','-in', $filename);
         my ($id, undef) = Proc::SafeExec::backtick(@exec);
@@ -124,14 +124,14 @@ sub certificate_id {
         print STDERR "Invalid format - supported formats are openssl|openxpki\n";
         return 1;
     }
-    
+
     my $defaulttoken = CTX('crypto_layer')->get_system_token({TYPE => 'DEFAULT'});
 
     if ( !defined $defaulttoken ) {
         print STDERR "ERROR: Could not get default token\n";
         return 2;
     }
-    
+
     my $FileUtils = OpenXPKI::FileUtils->new();
     my $certdata  = $FileUtils->read_file($filename);
 
@@ -146,27 +146,27 @@ sub certificate_id {
         TOKEN => $defaulttoken,
         DATA  => $extracted_certdata,
     );
-  
+
     print $cert->get_identifier();
     print "\n";
-    
+
     return 0;
-  
+
  }
- 
+
 sub certificate_import {
 
     print STDERR "Starting import\n";
-    
+
     my $defaulttoken = CTX('crypto_layer')->get_system_token({TYPE => 'DEFAULT'});
 
     if ( !defined $defaulttoken ) {
         print STDERR "ERROR: Could not get default token\n";
         return 2;
     }
-    
+
     my $dbi = __get_dbi();
-  
+
     my $filename = $params{file};
 
     if ( !-r $filename ) {
@@ -311,7 +311,7 @@ sub certificate_import {
         # yes, in which format?
         $insert_hash{AUTHORITY_KEY_IDENTIFIER} =
           $cert->get_authority_key_id();
-    } 
+    }
 
     $insert_hash{NOTAFTER} = OpenXPKI::DateTime::convert_date(
         {
@@ -362,19 +362,19 @@ sub certificate_import {
     print "  Issuer:     " . $insert_hash{ISSUER_DN} . "\n";
     print "  Identifier: " . $insert_hash{IDENTIFIER} . "\n";
     return 0;
-    
+
 }
 
 
 sub certificate_remove {
-    
+
     my $name  = $params{name};
     my $realm = $params{realm};
 
     my $identifier = $name;
-    
+
     my $dbi = __get_dbi();
-    
+
     if ( defined $realm ) {
         $identifier = __resolve_alias(
             {
@@ -433,19 +433,19 @@ sub certificate_remove {
 }
 
 sub alias_add {
-    
+
     my %insert_hash = ();
 
     my $dbi = __get_dbi();
-    
+
     $insert_hash{PKI_REALM} = $params{realm};
 
     # Import of named tokens always ba group and generation
     if ( $params{token} ) {
-                
-        my $group = ($params{token} eq "root") ? 'root' : 
+
+        my $group = ($params{token} eq "root") ? 'root' :
             CTX('config')->get("realm.$params{realm}.crypto.type.$params{token}");
-        
+
         if (!$group) {
             print STDERR "There is no token of type $params{token} defined\n";
             return 2;
@@ -455,30 +455,30 @@ sub alias_add {
             TABLE   => 'ALIASES',
             DYNAMIC => {
                 PKI_REALM => $params{realm},
-                GROUP_ID => $group, 
+                GROUP_ID => $group,
             },
             'ORDER' => [ 'GENERATION' ],
-            'REVERSE' => 1,                       
-        );        
-        $insert_hash{GENERATION} = ($next_generation->{GENERATION} || 0) + 1; 
+            'REVERSE' => 1,
+        );
+        $insert_hash{GENERATION} = ($next_generation->{GENERATION} || 0) + 1;
         $insert_hash{GROUP_ID} = $group;
-        $insert_hash{ALIAS} = sprintf "%s-%01d", $group, $insert_hash{GENERATION};   
-             
+        $insert_hash{ALIAS} = sprintf "%s-%01d", $group, $insert_hash{GENERATION};
+
     } elsif ( $params{group} && $params{gen} ) {
-                
-        $insert_hash{GENERATION} = $params{gen}; 
+
+        $insert_hash{GENERATION} = $params{gen};
         $insert_hash{GROUP_ID} = $params{group};
         $insert_hash{ALIAS} = sprintf "%s-%01d", $params{group}, $params{gen};
-        
+
     } elsif ( !exists( $params{alias} ) || $params{alias} eq '' ) {
         print STDERR "Please specify an alias with --alias\n";
         return 1;
-        
+
     } else {
-        
+
         $insert_hash{ALIAS} = $params{alias};
     }
-    
+
     if ( !exists( $params{identifier} ) || $params{identifier} eq '' ) {
         print STDERR "Please specify an identifier with --identifier\n";
         return 1;
@@ -491,11 +491,11 @@ sub alias_add {
         TABLE   => 'ALIASES',
         DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, PKI_REALM => $params{realm}, 'GROUP_ID' => $insert_hash{GROUP_ID} },
     );
-      
+
     if ($duplicate_alias) {
         print STDERR "ERROR: certificate already exisits in group\n";
         print STDERR "Alias: " . $duplicate_alias->{ALIAS} . "\n";
-        return 2;    
+        return 2;
     }
 
     # query certificate table to check whether --identifer actually exists
@@ -504,88 +504,88 @@ sub alias_add {
         DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, },
     );
 
-    if ( !defined $certificate ) {   
+    if ( !defined $certificate ) {
         # there is no cert with given identifier
         print STDERR "ERROR: Could not find a certificate with "
-          . "identifier '$insert_hash{IDENTIFIER}', ";          
+          . "identifier '$insert_hash{IDENTIFIER}', ";
         return 2;
     }
-    
+
     if ($params{notbefore}) {
         if ($params{notbefore} =~ /^\d+$/) {
-            $insert_hash{NOTBEFORE} = $params{notbefore};    
+            $insert_hash{NOTBEFORE} = $params{notbefore};
         } else {
-        
+
             my $dt;
             eval {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
             };
             if ($EVAL_ERROR || !$dt) {
                 print STDERR "ERROR: Could not parse notbefore date";
-                return 1;    
+                return 1;
             }
-            
+
             $insert_hash{NOTBEFORE} = $dt->epoch();
-                        
+
             if ($insert_hash{NOTBEFORE} < $certificate->{NOTBEFORE}) {
                 print STDERR "ERROR: notbefore exceeds certificate validity";
                 return 1;
-            }           
-        }    
+            }
+        }
     } else {
         $insert_hash{NOTBEFORE} = $certificate->{NOTBEFORE};
     }
-    
-    
+
+
     if ($params{notafter}) {
         if ($params{notafter} =~ /^\d+$/) {
             $insert_hash{NOTAFTER} = $params{notafter};
         } else {
-            my $dt;        
+            my $dt;
             eval {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
             };
             if ($EVAL_ERROR || !$dt) {
                 print STDERR "ERROR: Could not parse notafter date";
-                return 1;    
-            }            
+                return 1;
+            }
             $insert_hash{NOTAFTER} = $dt->epoch();
-            
+
             if ($insert_hash{NOTAFTER} > $certificate->{NOTAFTER}) {
                 print STDERR "ERROR: notafter exceeds certificate validity";
                 return 1;
-            }                   
-        }    
+            }
+        }
     } else {
         $insert_hash{NOTAFTER} = $certificate->{NOTAFTER};
     }
-    
+
     #### insert_hash : Dumper(\%insert_hash)
     $dbi->insert(
         TABLE => 'ALIASES',
         HASH  => \%insert_hash,
     );
     $dbi->commit();
-    
+
     print "Successfully created alias in realm $params{realm}:\n";
     __alias_print( \%insert_hash, $certificate );
-    
-    
+
+
     # Check if the alias is for an issuing ca cert -> create root ca alias
-    my $cs_group = CTX('config')->get("realm.$params{realm}.crypto.type.certsign");    
+    my $cs_group = CTX('config')->get("realm.$params{realm}.crypto.type.certsign");
     if ( $insert_hash{ALIAS} =~ /^$cs_group-(\d+)/ ) {
         print "\nToken is certsign, looking for root...\n";
         my $gen = $1;
-        
+
         my $chain_ref = CTX('api')->get_chain({ 'START_IDENTIFIER' => $insert_hash{IDENTIFIER} });
-        
+
         if ($chain_ref->{COMPLETE} != 1) {
             print STDERR "ERROR: unable to find root certificate";
-            return 2;        
+            return 2;
         }
         my $root_identifier = pop @{$chain_ref->{IDENTIFIERS}};
-               
-        # check if this root is already definde  
+
+        # check if this root is already definde
         my $root_alias = $dbi->first(
             TABLE   => 'ALIASES',
             DYNAMIC => { IDENTIFIER => $root_identifier, PKI_REALM => $params{realm}, 'GROUP_ID' => 'root' },
@@ -600,48 +600,48 @@ sub alias_add {
                 COLUMNS => ['NOTBEFORE' , 'NOTAFTER' ],
                 DYNAMIC => { IDENTIFIER => $root_identifier },
             );
-            
+
             $root_alias = {
-                IDENTIFIER => $root_identifier, 
+                IDENTIFIER => $root_identifier,
                 PKI_REALM => $params{realm},
                 GROUP_ID => 'root',
                 GENERATION => $gen,
                 ALIAS => sprintf ('root-%01d', $gen),
                 NOTBEFORE => $certificate->{NOTBEFORE},
                 NOTAFTER => $certificate->{NOTAFTER},
-            };   
+            };
             $dbi->insert(
                 TABLE => 'ALIASES',
                 HASH  => $root_alias,
             );
             $dbi->commit();
         }
-              
+
         __alias_print( $root_alias );
-              
+
     }
-    
+
     return 0;
-    
-}    
+
+}
 
 sub alias_update {
-    
-    my %query_hash = (        
-        PKI_REALM =>  $params{realm}  
+
+    my %query_hash = (
+        PKI_REALM =>  $params{realm}
     );
-        
+
     if ($params{identifier}) {
-        $query_hash{IDENTIFIER} = $params{identifier};    
+        $query_hash{IDENTIFIER} = $params{identifier};
     } elsif ($params{alias}) {
         $query_hash{ALIAS} = $params{alias};
     } else {
         print STDERR "You must specify either --identifier or --alias\n";
         return 1;
     }
-        
+
     my $dbi = __get_dbi();
-    
+
     my $alias = $dbi->first(
         TABLE   => 'ALIASES',
         DYNAMIC => \%query_hash,
@@ -660,9 +660,9 @@ sub alias_update {
         DYNAMIC => { IDENTIFIER => $alias->{IDENTIFIER}, },
     );
 
-    if ($params{notbefore}) {    
+    if ($params{notbefore}) {
         if ($params{notbefore} =~ /^\d+$/) {
-            $update_hash{NOTBEFORE} = $params{notbefore};    
+            $update_hash{NOTBEFORE} = $params{notbefore};
         } else {
             my $dt;
             eval {
@@ -670,49 +670,49 @@ sub alias_update {
             };
             if ($EVAL_ERROR || !$dt) {
                 print STDERR "ERROR: Could not parse notbefore date";
-                return 2;    
-            }            
+                return 2;
+            }
             $update_hash{NOTBEFORE} = $dt->epoch();
-                        
+
             if ($update_hash{NOTBEFORE} < $certificate->{NOTBEFORE}) {
                 print STDERR "ERROR: notbefore exceeds certificate validity";
                 return 2;
-            }           
-        }    
+            }
+        }
     } elsif(defined $params{notbefore}) {
         $update_hash{NOTBEFORE} = $certificate->{NOTBEFORE};
     }
-    
+
     if ($params{notafter}) {
         if ($params{notafter} =~ /^\d+$/) {
             $update_hash{NOTAFTER} = $params{notafter};
         } else {
-            my $dt;        
+            my $dt;
             eval {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
             };
             if ($EVAL_ERROR || !$dt) {
                 print STDERR "ERROR: Could not parse notafter date";
-                return 2;    
-            }            
+                return 2;
+            }
             $update_hash{NOTAFTER} = $dt->epoch();
-            
+
             if ($update_hash{NOTAFTER} > $certificate->{NOTAFTER}) {
                 print STDERR "ERROR: notafter exceeds certificate validity";
                 return 2;
-            }                   
-        }    
+            }
+        }
     } elsif(defined $params{notafter}) {
         $update_hash{NOTAFTER} = $certificate->{NOTAFTER};
     }
 
     if (!%update_hash) {
         print STDERR "ERROR: please specify at least notbefore or notafter";
-        return 1;        
+        return 1;
     }
 
     $dbi->update(
-        TABLE => 'ALIASES', 
+        TABLE => 'ALIASES',
         DATA => \%update_hash,
         WHERE => {
             ALIAS =>  $alias->{ALIAS},
@@ -725,176 +725,176 @@ sub alias_update {
         TABLE   => 'ALIASES',
         DYNAMIC => \%query_hash,
     );
-    
-    print "Successfully updated alias:\n";    
+
+    print "Successfully updated alias:\n";
     __alias_print( $alias, $certificate );
 
-    
+
     return 0;
-    
-}    
+
+}
 
 sub alias_list {
 
     my $realm = $params{realm};
-    # get names of groups 
+    # get names of groups
     my $groups = CTX('config')->get_hash("realm.$realm.crypto.type");
-    
+
     my $dbi = __get_dbi();
     my $alias;
     my $cert;
-    
+
     # Load the list of exisiting aliased groups as there can be custom tokens
     # outside the main groups (e.g. alternative scep tokens)
     my $db_results = $dbi->select(
         TABLE   => 'ALIASES',
         DYNAMIC => {
-            'PKI_REALM' => { VALUE => $realm },                              
+            'PKI_REALM' => { VALUE => $realm },
             'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
         },
         'ORDER' => [ 'NOTBEFORE' ],
         'REVERSE' => 1,
     );
-        
+
     my %anon_groups;
     foreach my $entry (@{ $db_results }) {
         $anon_groups{ $entry->{GROUP_ID} } = 1;
     }
     # remove root from the list
     delete $anon_groups{'root'};
-    
-    print "=== functional token ===\n";    
+
+    print "=== functional token ===\n";
     foreach my $type (keys %{$groups}) {
-    
+
         my $group = $groups->{$type};
         print "$group ($type):\n";
-          
-        $alias = $dbi->first(    
-            TABLE   => 'ALIASES',            
+
+        $alias = $dbi->first(
+            TABLE   => 'ALIASES',
             DYNAMIC => {
                 'PKI_REALM' => { VALUE => $realm },
-                'GROUP_ID' => { VALUE => $group },              
+                'GROUP_ID' => { VALUE => $group },
                 'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
             },
             'ORDER' => [ 'NOTBEFORE' ],
             'REVERSE' => 1,
         );
-        
+
         $cert = $dbi->first(
             TABLE   => 'CERTIFICATE',
             DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
         );
-        
+
         __alias_print( $alias, $cert );
-    
+
        # unset in anon group list
        delete $anon_groups{$group};
-    
+
     }
-    
+
     print "=== anonymous groups ===\n" if (%anon_groups);
     foreach my $group (keys %anon_groups) {
-    
+
         print "$group:\n";
-          
-        $alias = $dbi->first(    
-            TABLE   => 'ALIASES',            
+
+        $alias = $dbi->first(
+            TABLE   => 'ALIASES',
             DYNAMIC => {
                 'PKI_REALM' => { VALUE => $realm },
-                'GROUP_ID' => { VALUE => $group },              
+                'GROUP_ID' => { VALUE => $group },
                 'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
             },
             'ORDER' => [ 'NOTBEFORE' ],
             'REVERSE' => 1,
         );
-        
+
         $cert = $dbi->first(
             TABLE   => 'CERTIFICATE',
             DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
         );
-        
+
         __alias_print( $alias, $cert );
-    
-    }     
-          
+
+    }
+
     # Check for root ca
-    $alias = $dbi->first(    
-        TABLE   => 'ALIASES',            
+    $alias = $dbi->first(
+        TABLE   => 'ALIASES',
         DYNAMIC => {
             'PKI_REALM' => { VALUE => $realm },
-            'GROUP_ID' => { VALUE => 'root' },              
+            'GROUP_ID' => { VALUE => 'root' },
             'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                                                
+            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
         },
         'ORDER' => [ 'NOTBEFORE' ],
         'REVERSE' => 1,
-    );    
+    );
     $cert = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE',
         DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
     );
-    
+
     print "=== root ca ===\ncurrent root ca:\n";
     __alias_print( $alias, $cert );
-    
+
     # Check for root ca
-    $alias = $dbi->first(    
-        TABLE   => 'ALIASES',            
+    $alias = $dbi->first(
+        TABLE   => 'ALIASES',
         DYNAMIC => {
             'PKI_REALM' => { VALUE => $realm },
-            'GROUP_ID' => { VALUE => 'root' },              
-            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                          
+            'GROUP_ID' => { VALUE => 'root' },
+            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
         },
-        'ORDER' => [ 'NOTBEFORE' ],        
-    );    
+        'ORDER' => [ 'NOTBEFORE' ],
+    );
 
     $cert = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE',
         DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
     );
-            
+
     print "upcoming root ca:\n";
     __alias_print( $alias, $cert );
-    
-    
+
+
     return 0;
-     
-     
+
+
 }
 
 sub __alias_print {
-    
+
     my $alias = shift;
     my $cert = shift;
-    
+
     if (!$alias || !$alias->{ALIAS}) {
-        print "  not set\n\n"; 
-        return; 
-    } 
-     
+        print "  not set\n\n";
+        return;
+    }
+
     print "  Alias     : $alias->{ALIAS}\n";
     print "  Identifier: $alias->{IDENTIFIER}\n";
     print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{NOTBEFORE} )->strftime("%F %T");
-        
+
     print DateTime->from_epoch( epoch => $cert->{NOTBEFORE} )->strftime(" (%F %T)")
-        if ($cert && $cert->{NOTBEFORE} != $alias->{NOTBEFORE});         
-    
+        if ($cert && $cert->{NOTBEFORE} != $alias->{NOTBEFORE});
+
     print "\n";
     print "  NotAfter  : " . DateTime->from_epoch( epoch => $alias->{NOTAFTER} )->strftime("%F %T");
-            
+
     print DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime(" (%F %T)")
         if ($cert && $cert->{NOTAFTER} != $alias->{NOTAFTER});
-                
+
     print "\n\n";
-            
+
 }
 
 
 sub certificate_chain {
-    
+
     my $cert_name;
     my $issuer_name;
     if ( !exists( $params{name} ) || $params{name} eq '' ) {
@@ -1004,11 +1004,11 @@ sub certificate_chain {
           . "correct?\n";
     }
     return 0;
-        
+
 }
 
 sub certificate_list {
-    
+
     my @realms;
     if ( defined $params{realm} ) {
         push @realms, $params{realm};
@@ -1165,22 +1165,22 @@ sub certificate_list {
 }
 
 sub alias_del {
-    
+
     my %delete_hash = ();
 
     $delete_hash{PKI_REALM} = $params{realm};
-    
+
     if ($params{identifier}) {
-        $delete_hash{IDENTIFIER} = $params{identifier};    
+        $delete_hash{IDENTIFIER} = $params{identifier};
     } elsif ($params{alias}) {
         $delete_hash{ALIAS} = $params{alias};
     } else {
         print STDERR "You must specify either --identifier or --alias\n";
         return 1;
     }
-    
+
     my $dbi = __get_dbi();
-    
+
     my $alias = $dbi->first(
         TABLE   => 'ALIASES',
         DYNAMIC => \%delete_hash,
@@ -1196,21 +1196,21 @@ sub alias_del {
         PKI_REALM => $alias->{PKI_REALM},
     });
     $dbi->commit();
-    
-    print "Successfully removed the alias $alias->{ALIAS}:\n";    
-    print "   Identifier: $alias->{IDENTIFIER}\n";    
+
+    print "Successfully removed the alias $alias->{ALIAS}:\n";
+    print "   Identifier: $alias->{IDENTIFIER}\n";
     print "   Realm:      $alias->{PKI_REALM}\n";
-    
+
     return 0;
-    
-}    
+
+}
 
 sub key_list {
-    
+
     my $dbi = __get_dbi();
     my $config = CTX('config');
     my $realm = $params{realm};
-    
+
     # TODO - Improve!
     # We use the alias table to find all keys in the realm
     # For the moment we assume the keys are defined explicit in the config
@@ -1230,10 +1230,10 @@ sub key_list {
         foreach my $entry (@{ $db_alias }) {
             my $alias = $entry->{ALIAS};
             my $key = $config->get("realm.$realm.crypto.token.$alias.key");
-            
+
             my $status_flag = '?';
             if (!$key) {
-                $status_flag = 'c';    
+                $status_flag = 'c';
             }elsif ( -e $key && ( !-s $key ) ) {
                 $status_flag = '0';    # file exists but is of size zero
             }   elsif ( -e $key ) {        # file exists and is non-zero
@@ -1241,7 +1241,7 @@ sub key_list {
             } else {                     # file does not exist (yet)
                 $status_flag = '!';
             }
-            print '    ' . $status_flag . ' ' . $alias . "\n";                        
+            print '    ' . $status_flag . ' ' . $alias . "\n";
         }
     }
 
@@ -1249,45 +1249,45 @@ sub key_list {
 }
 
 sub hash_password {
-    
-    print 'Please type your password, end with return: ';        
+
+    print 'Please type your password, end with return: ';
     my $passwd = prompt -echo => '*';
-    
-    print "Please re-type your password: ";        
+
+    print "Please re-type your password: ";
     my $retype = prompt -echo => '*';
-    
+
     chomp $passwd;
     chomp $retype;
-    
-    if (!$passwd) {        
+
+    if (!$passwd) {
         return 0;
     }
-        
+
     if ($passwd ne $retype) {
         print "Sorry, the passwords do not match\n";
         return 0;
     }
-    
-    # Use openssl to create the salt     
+
+    # Use openssl to create the salt
     my @exec = ('openssl','rand','-base64','3');
     my ($salt, undef) = Proc::SafeExec::backtick(@exec);
     chomp $salt;
-    
+
     my $computed_secret;
     if ($params{scheme} eq 'sha') {
         my $ctx = Digest::SHA->new();
         $ctx->add($passwd);
         $computed_secret = $ctx->b64digest();
     } elsif ($params{scheme} eq 'ssha') {
-        my $ctx = Digest::SHA->new();              
+        my $ctx = Digest::SHA->new();
         $ctx->add($passwd);
         $ctx->add($salt);
-        $computed_secret = encode_base64( $ctx->digest() . $salt, '');       
+        $computed_secret = encode_base64( $ctx->digest() . $salt, '');
     } elsif ($params{scheme} eq 'md5') {
         my $ctx = Digest::MD5->new();
         $ctx->add($passwd);
         $computed_secret = $ctx->b64digest();
-    } elsif ($params{scheme} eq 'smd5') {        
+    } elsif ($params{scheme} eq 'smd5') {
         my $ctx = Digest::MD5->new();
         $ctx->add($passwd);
         $ctx->add($salt);
@@ -1295,28 +1295,28 @@ sub hash_password {
     } elsif ($params{scheme} eq 'crypt') {
         $computed_secret = crypt($passwd, $salt);
     }
-    
+
     if (!$computed_secret) {
         die "Unable to compute hash\n";
     }
-    
+
     printf "Your hashed password is: {%s}%s\n", $params{scheme}, $computed_secret;
-    
+
     return 0;
 }
 
 sub __get_dbi {
-    
+
     my $dbi = CTX('dbi_backend');
     if ( !defined $dbi ) {
-        die "ERROR: Could not instantiate database backend\n";        
+        die "ERROR: Could not instantiate database backend\n";
     }
     $dbi->connect();
     return $dbi;
 }
 
 sub __resolve_alias {
- 
+
     my $arg_ref = shift;
     my $dbi     = $arg_ref->{DBI};
     my $name    = $arg_ref->{NAME};
@@ -1338,54 +1338,54 @@ sub __resolve_alias {
 }
 
 sub __init {
-    
+
     GetOptions( \%params, @options_spec ) or pod2usage( -verbose => 0 );
-        
+
     if ($params{config}) {
-        # we set the ENV here to outrule an external ENV setting and to have 
+        # we set the ENV here to outrule an external ENV setting and to have
         # it ready for the reload action (needed to find the correct pidfile)
         $ENV{OPENXPKI_CONF_DB} = $params{config};
     }
-        
+
 }
- 
+
 if ($cmd eq 'initdb') {
 
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned'], SILENT => 1,});
 
     push @options_spec, qw(dry-run force);
     __init();
-    $ret = initdb();       
-    
+    $ret = initdb();
+
 } elsif ($cmd eq 'loadcfg') {
 
     push @options_spec, qw(
-        path=s 
-        config|dbpath=s 
+        path=s
+        config|dbpath=s
         reload
-    );    
+    );
     __init();
-    $ret = loadcfg();    
+    $ret = loadcfg();
 
 } elsif ($cmd eq 'certificate') {
 
     my $subcmd = shift;
-    
+
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
-    
-    
-    
+
+
+
     if ($subcmd eq 'id') {
-        
-        push @options_spec, qw(        
+
+        push @options_spec, qw(
             file=s
             format=s
-        );       
-        __init(); 
+        );
+        __init();
         $ret = certificate_id();
-        
+
     } elsif ($subcmd eq 'import') {
-    
+
         push @options_spec, qw(
             realm=s
             file=s
@@ -1396,24 +1396,24 @@ if ($cmd eq 'initdb') {
             force-issuer-not-found
             force-certificate-already-exists
             );
-        
+
         __init();
         if (!$params{file}) {
-            die "You need to specify the certificate to import with --file\n";    
+            die "You need to specify the certificate to import with --file\n";
         }
-        
+
         if (!$params{issuer} && defined $params{realm}) {
             die "You must specify --issuer and --realm or leave both empty\n";
         }
-        
+
         if ((!$params{alias} && $params{group}) || ($params{alias} && !$params{group})) {
             die "You must always specify both --alias and --group \n";
         }
-                  
+
         $ret = certificate_import();
-        
+
     } elsif ($subcmd eq 'remove') {
-        
+
         push @options_spec, qw(
             realm=s
             name=s
@@ -1421,9 +1421,9 @@ if ($cmd eq 'initdb') {
         );
         __init();
         $ret = certificate_remove();
-        
+
     } elsif ($subcmd eq 'chain') {
-        
+
         push @options_spec, qw(
             issuer=s
             issuer-realm=s
@@ -1431,25 +1431,25 @@ if ($cmd eq 'initdb') {
             force-certificate-not-found
             force-issuer-certificate-not-found
         );
-        __init();        
-        $ret = certificate_chain();     
-           
+        __init();
+        $ret = certificate_chain();
+
     } elsif ($subcmd eq 'list') {
-        
+
         push @options_spec, qw(
             realm=s
             all
             v+
         );
-        __init();        
-        $ret = certificate_list();        
+        __init();
+        $ret = certificate_list();
     }
 
 
 } elsif ($cmd eq 'alias') {
-           
+
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend'], SILENT => 1, CLI => 1});
-           
+
     push @options_spec, qw(
       alias=s
       remove
@@ -1460,56 +1460,56 @@ if ($cmd eq 'initdb') {
       gen|generation=s
       group=s
       token=s
-      identifier=s      
+      identifier=s
     );
     __init();
-        
+
     if (!$params{realm}) {
         die "You must specify a realm using --realm\n";
     }
-        
+
     if ($params{remove}) {
         $ret = alias_del();
     } elsif ($params{update}) {
         $ret = alias_update();
-    } elsif (!$params{identifier}) {    
-        $ret = alias_list();            
-    } else {    
+    } elsif (!$params{identifier}) {
+        $ret = alias_list();
+    } else {
         $ret = alias_add();
     }
 } elsif ($cmd eq 'key') {
-    
+
     my $subcmd = shift;
-    
+
     if ($subcmd eq 'list') {
-        
+
         OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi_backend'], SILENT => 1,});
-               
+
         push @options_spec, qw(
-          realm=s          
+          realm=s
         );
         __init();
-            
+
         if (!$params{realm}) {
-            die "You must specify a realm using --realm\n";            
+            die "You must specify a realm using --realm\n";
         }
 
         $ret = key_list();
-            
+
     }
 } elsif ($cmd eq 'hashpwd') {
 
     push @options_spec, qw(
-          scheme|s=s          
+          scheme|s=s
     );
     __init();
-    
+
     if (!$params{scheme}) {
         $params{scheme} = 'ssha';
     } elsif ($params{scheme} !~ /^(sha|ssha|md5|smd5|crypt)$/) {
         die "Unsupported scheme - supported values: sha|ssha|md5|smd5|crypt\n";
     }
-    
+
     $ret = hash_password();
 }
 
@@ -1537,17 +1537,17 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
 
  Global options:
    --config DIR          Location of the configuration repository
-                         optional, defaults to /etc/openxpki/config.git   
+                         optional, defaults to /etc/openxpki/config.git
 
  Commands:
    help                  brief help message
    man                   full documentation
-   version               print program version and exit   
+   version               print program version and exit
    initdb                Initialize database
    key                   Manage keys
    certificate           Manage certificates
-   loadcfg               Import updated config from the filesystem 
-   hashpwd               Create the salted hash for a password     
+   loadcfg               Import updated config from the filesystem
+   hashpwd               Create the salted hash for a password
    alias                 Manage the token alias table
 
 =head1 ARGUMENTS
@@ -1579,7 +1579,7 @@ Command options:
 
 =item B<list>
 
-Shows token key information for the specified realm, including 
+Shows token key information for the specified realm, including
 key algorithm, key length and secret splitting information.
 TODO: Key info not implemented yet!
 
@@ -1590,12 +1590,12 @@ following:
   + - key exists and file is non-empty
   0 - key exists but file is empty
   ! - key files does not exist (yet)
-  
+
 
 Example:
 
-  openxpkiadm key list --realm 'Root CA' 
- 
+  openxpkiadm key list --realm 'Root CA'
+
 =back
 
 =head2 certificate
@@ -1620,7 +1620,7 @@ Subcommand options (optional):
    -v -v -v                 Show (nearly complete) database entry
    -v -v -v -v              Show pubkey and certificate data, too
 
-Lists certificates present in the database for 
+Lists certificates present in the database for
 the specified realm. If --all is not specified, only certificates
 that have an alias defined for them are listed. --all lists all
 certificates, regardless of whether they have an alias or not.
@@ -1640,10 +1640,10 @@ Mandatory:
 Optional:
   --issuer-realm            the realm where the issuer alias
                             is defined
-  --role                    the role of the certificate owner 
+  --role                    the role of the certificate owner
 
 Force options (use only if you exactly now what you are doing!):
-  --force-really-self-signed 
+  --force-really-self-signed
         The certificate is really self-signed
   --force-issuer-not-found
         Don't care that the issuer is not in the database
@@ -1665,9 +1665,9 @@ identifier which can be used to globally reference the certificate
 the identifier, look into openxpkiadm certificate alias to find out
 how to create a symbolic name for an identifier.
 
-Examples: 
+Examples:
 
-  openxpkiadm certificate import --file cacert.pem 
+  openxpkiadm certificate import --file cacert.pem
 
 Imports a self-signed CA certificate.
 
@@ -1692,20 +1692,20 @@ Force options (use only if you now what you are doing!):
 
 Removes a certificate from the database.
 
-Example: 
+Example:
 
   openxpkiadm certificate remove --realm 'Root CA' \
         --name 'Root CA 1'
 
 =item B<chain>
- 
+
 Subcommand options:
- 
+
  Mandatory:
   --realm               The PKI realm to operate in
   --name                The alias or identifier of the child
   --issuer              The alias or identifier of the parent
- 
+
 Optional:
   --issuer-realm        The realm in which the issuer alias
                         is defined
@@ -1717,10 +1717,10 @@ Force options (use only if you now what you are doing!):
   --force-issuer-certificate-not-found
         Ignore that the certificate of the parent was not found
         in the DB
- 
+
 Once again, only use these options if you actually have to (the
 occasions where this happens should be really, really rare).
- 
+
 Specifies subject/issuer relationship in order to set up certificate
 chains. The certificates to be connected must already be present in
 the database (see B<import>). As those connections are already set up
@@ -1728,25 +1728,25 @@ during --import, this command exists for changing the issuer if you
 made an error. It also allows to specify an issuer that does not
 agree with the information contained in the certificate (but outputs
 a warning)
- 
- Example: 
- 
+
+ Example:
+
 openxpkiadm certificate chain --realm 'Root CA' \
      --name 'Subordinate CA 1' --issuer 'root1'
- 
-=back 
- 
+
+=back
+
 =head2 alias
 
 An alias is a symbolic name for a certificate in a specific realm.
-OpenXPKI uses aliases to manage the crypto tokens for signer and 
-helper tokens. Several configs options and commands are able to 
-process aliases, too.  
+OpenXPKI uses aliases to manage the crypto tokens for signer and
+helper tokens. Several configs options and commands are able to
+process aliases, too.
 
 The selection of functional tokens is done based on the notbefore/notafter
 date. To force certain behaviour (e.g time of a ca rollover), you can force
 a custom notbefore/notafter date on the aliases.
-    
+
 Common options:
     --realm        PKI realm for the alias
     --identifier   The identifier of the certificate
@@ -1754,19 +1754,19 @@ Common options:
     --notafter     custom notafter date to set
                    accepted formats are epoch or yyyy-mm-dd hh:mm:ss
                    a literal 0 restores the certificates validity.
-    
+
 There are different ways to deal with aliases:
 
-=over 
+=over
 
 =item B<list active functional tokens>
 
-If you pass a realm but no identifier, you will receive the list of 
+If you pass a realm but no identifier, you will receive the list of
 active tokens for the functional token groups, the current root certificate
 and, if set, the upcoming root certificate as used by scep I<GetNexCACert>.
 
 For items with custom notbefore/notafter settings, the certificate's value
-is shown in brackets:  
+is shown in brackets:
 
     upcoming root ca:
         Alias     : root-2
@@ -1778,91 +1778,91 @@ is shown in brackets:
 =item B<add functional token with automatic group discovery>
 
 Looks up the name of the associated group and finds the next generation
-index by looking up the present aliases in the group. Recommended.    
-    
+index by looking up the present aliases in the group. Recommended.
+
   --token  The name of the token type you want to add,
            e.g. certsign or datasafe.
-          
-Example: 
 
-    openxpkiadm alias --realm server-realm \ 
-        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \ 
+Example:
+
+    openxpkiadm alias --realm server-realm \
+        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
         --token certsign
-      
+
 =item B<add functional token with manual group configuration>
 
 The alias for is automatically set to <group>-<generation>, e.g. server-ca-1.
-  
+
   --group           The name of the group (e.g. server-ca)
   --generation      The numeric index to use for this alias
 
-Example: 
+Example:
 
     openxpkiadm alias --realm server-realm \
-        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \ 
-        --group server-ca --gen 1 
+        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
+        --group server-ca --gen 1
 
 =item B<add non-functional alias>
 
 Adds the alias leaving group and generation empty.
-  
+
   --alias               The symbolic name for the certificate
 
-Example: 
+Example:
 
     openxpkiadm alias --realm server-realm \
-        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \ 
-        --alias my-very-important-certificate 
+        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
+        --alias my-very-important-certificate
 
 =item B<update alias>
 
 Update notebefore/notafter date of an existing alias.
 
-    --update        Indicates that you want to update anm existing entry 
-    --alias         You can select the alias by name rather than passing 
-                    the identifier.       
+    --update        Indicates that you want to update anm existing entry
+    --alias         You can select the alias by name rather than passing
+                    the identifier.
 
-Example: 
+Example:
 
      openxpkiadm alias --update --realm ca-one \
-         --alias ca-one-signer-1 
-         --notbefore "2014-01-01:00:00:00" 
+         --alias ca-one-signer-1
+         --notbefore "2014-01-01:00:00:00"
 
 This updates notbefore, notafter is not changed.
-  
+
 =item B<remove alias>
 
 Remove the entry from the alias table.
 
   --remove          Indicates that the alias should be removed.
-  --alias           You can select the alias by name rather than passing 
-                    the identifier.  
+  --alias           You can select the alias by name rather than passing
+                    the identifier.
 
-Example: 
+Example:
 
     openxpkiadm alias --remove --realm server-realm \
-        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \ 
-    
+        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
+
     openxpkiadm alias --remove --realm server-realm \
-        --alias server-ca-1 
- 
-=back 
- 
+        --alias server-ca-1
+
+=back
+
 =head2 loadcfg
 
 Load the YaML config into the internal git repository.
 
 Command options:
 
-  --path DIR    Path to the YaML files 
-  --dbpath DIR  Path to the internal repository 
+  --path DIR    Path to the YaML files
+  --dbpath DIR  Path to the internal repository
   --reload      Signal the running server to immediately use the new config.
-   
+
 Read the files found at the config directory given by I<path> (defaults to
 /etc/openxpki/config.d) and load them into the internal config repository at
 the directory given by I<dbpath> (default /etc/openxpki/config.git).
 If I<reload> is given and the openxpki daemon is running, the daemon is send
-a reload signal and will start using the new configuration for new requests.   
+a reload signal and will start using the new configuration for new requests.
 Note: Even if I<reload> is not passed, the config becomes active on the next
 server start! Some changes need a restart to become active, see the documentation!
 
@@ -1872,7 +1872,7 @@ Create the hash of a given password to be used with the internal user database.
 
 Command options:
 
-  --scheme   The hashing scheme to use, allowed values are 
+  --scheme   The hashing scheme to use, allowed values are
              ssha|sha|smd5|md5|crypt, default is ssha
              see also OpenXPKI::Server::Authentication::Password
 
@@ -1891,7 +1891,7 @@ error occurs.
 
 =back
 
- 
+
 
 
 

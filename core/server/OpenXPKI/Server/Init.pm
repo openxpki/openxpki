@@ -527,10 +527,9 @@ sub get_dbi
    $params{SERVER_SHIFT} = $xml_config->get('system.server.shift');
 
     # environment
-    my @env_names = $xml_config->get_keys("$dbpath.environment");
-
-    foreach my $env_name (@env_names) {
-        my $env_value = $xml_config->get_keys("$dbpath.environment.$env_name");
+    my $db_env = $xml_config->get_hash("$dbpath.environment");
+    foreach my $env_name (keys %{$db_env}) {
+        my $env_value = $db_env->{$env_name};
         $ENV{$env_name} = $env_value;
         ##! 4: "DBI Environment: $env_name => $env_value"
     }
