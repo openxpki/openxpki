@@ -786,6 +786,8 @@ sub __render_from_workflow {
         ];
     } else {
 
+        # more than one action available, so we offer some buttons to choose how to continue
+
         # Headline from state + workflow
         my $label = i18nGettext( $wf_info->{STATE}->{label} );
         if ($label) {
@@ -799,8 +801,6 @@ sub __render_from_workflow {
             shortlabel => $wf_info->{WORKFLOW}->{ID},
             description => i18nGettext( $wf_info->{STATE}->{description} ),
         });
-
-        # more than one action available, so we offer some buttons to choose how to continue
 
         my @fields;
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
@@ -822,7 +822,6 @@ sub __render_from_workflow {
             if ( $key =~ m{ (pkcs10) }x) {
                 $item->{format} = 'code';
             }
-
 
             # FIXME - will not work once we change serialization format
             if (ref $item->{value} eq '' &&  $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
