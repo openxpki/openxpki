@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="style/style.css" />
 {{/modules}}
 {{^modules}}
-    <link rel="stylesheet" href="main-built.css" />
+    <link rel="stylesheet" href="style/main-built.css" />
 {{/modules}}
 
     <!--[if lt IE 9]>
@@ -23,10 +23,10 @@
     <![endif]-->
 
 {{#modules}}
-    <script src="vendor/requirejs/require.js" data-main="build/main.js"></script>
+    <script src="vendor/requirejs/require.js" data-main="src/main.js"></script>
 {{/modules}}
 {{^modules}}
-    <script src="main-built.js"></script>
+    <script src="src/main-built.js"></script>
 {{/modules}}
     <script src="localconfig.js"></script>
   </head>
