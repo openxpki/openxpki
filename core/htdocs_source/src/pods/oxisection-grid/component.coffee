@@ -3,7 +3,7 @@
 
 Component = Em.Component.extend
     didInsertElement: ->
-        @$().find(".context")
+        @$()?.find(".context")
         .contextmenu
             target: @$().find(".dropdown")
             onItem: => @onItem.apply @, arguments
