@@ -25,7 +25,7 @@ my %params;
 GetOptions(\%params,
        qw(
           help|?
-          man          
+          man
           cfg|cfgfile|conf|config=s
           version
           debug=s@
@@ -34,9 +34,7 @@ GetOptions(\%params,
           )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
-    my ($vol, $dir, $file) = File::Spec->splitpath($0);
-    print "OpenXPKI Core Version: $OpenXPKI::VERSION::VERSION\n";
-    print "$file Version: $VERSION\n";
+    print "OpenXPKI Version: $OpenXPKI::VERSION::VERSION\n";
     exit 0;
 }
 
@@ -59,30 +57,30 @@ if ($params{quiet}) {
 if (defined $params{cfg}) {
     $args->{CONFIG} = File::Spec->rel2abs($params{cfg});
 }
- 
+
 my $cmd = shift;
 
 if ($cmd eq 'status') {
 
-    if (OpenXPKI::Control::status( $args )) {        
+    if (OpenXPKI::Control::status( $args )) {
         exit 3;
-    }         
-    exit 0;    
-    
+    }
+    exit 0;
+
 } elsif ($cmd eq 'start' || $cmd eq 'restart') {
 
-    if ($cmd eq 'restart') { 
-        $args->{RESTART} = 1;             
+    if ($cmd eq 'restart') {
+        $args->{RESTART} = 1;
     }
 
     if (defined $params{fg}) {
         $args->{FOREGROUND} = 1;
     }
-    
+
     if (defined $params{debug}) {
-    
+
         @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
-        
+
         $args->{DEBUG} = {};
         foreach my $param (@{$params{debug}}) {
             my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
@@ -90,26 +88,26 @@ if ($cmd eq 'status') {
                 $level = 1;
             }
             if ($module eq '') {
-                $args->{DEBUG} = $level;                
+                $args->{DEBUG} = $level;
             } else {
                 $args->{DEBUG}->{$module} = $level;
             }
         }
     }
-              
+
     exit OpenXPKI::Control::start( $args );
 
 } elsif ($cmd eq 'stop') {
 
-    exit OpenXPKI::Control::stop( $args );        
+    exit OpenXPKI::Control::stop( $args );
 
 } elsif ($cmd eq 'reload') {
-    
+
     exit OpenXPKI::Control::reload( $args );
-        
+
 }
 
-########################################################################### 
+###########################################################################
 
 print STDERR "Unknown command: $cmd.\n";
 exit 1;
@@ -128,12 +126,12 @@ openxpkictl [options] COMMAND
    --help                brief help message
    --man                 full documentation
    --config PATH         use configuration from path (config git repo)
-   --debug  MODULE:LEVEL set MODULE debug level to LEVEL 
+   --debug  MODULE:LEVEL set MODULE debug level to LEVEL
                          (positive integer value).
                          MODULE defaults to '.*'
                          LEVEL defaults to 1
    --foreground          Uses a non-forking server. This is only
-                         useful for debugging or profiling.                         
+                         useful for debugging or profiling.
 
  Commands:
    start            Start OpenXPKI daemon
@@ -170,7 +168,7 @@ Restarts the OpenXPKI daemon.
 =item B<status>
 
 Checks the OpenXPKI daemon status.
- 
+
 =back
 
 =head1 OPTIONS
@@ -187,7 +185,7 @@ Prints the manual page and exits.
 
 =item B<--config PATH>
 
-Use PATH to point to the configuration repository. 
+Use PATH to point to the configuration repository.
 Defaults to /etc/openxpki/config.git
 
 =item B<--version>
@@ -229,7 +227,7 @@ useful only for debugging and profiling.
 
 =head1 DESCRIPTION
 
-B<openxpkictl> is the start script for the OpenXPKI server process. 
+B<openxpkictl> is the start script for the OpenXPKI server process.
 
 =over 8
 

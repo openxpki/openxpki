@@ -50,8 +50,6 @@ Log::Log4perl->easy_init($ERROR);
 #use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 
-my $MAX_TERMINATE_ATTEMPTS = 300;
-
 =head2 start {CONFIG, SILENT, PID, FOREGROUND, DEBUG}
 
 Start the server.
@@ -292,18 +290,17 @@ sub stop {
 
     # get all PIDs which belong to the current process group
     my @pids = OpenXPKI::Control::__get_processgroup_pids($process_group);
-    my $attempts = 0;
+    my $attempts = 5;
     my $process_count;
 
     # try a number of times to send them SIGTERM
-    while ($attempts < $MAX_TERMINATE_ATTEMPTS) {
+    while ($attempts-- > 0) {
         $process_count = scalar @pids;
         last if ($process_count <= 0);
-        print STDOUT "Stopping gracefully, $process_count (sub)processes remaining..." if (not $silent);
+        print STDOUT "Stopping gracefully, $process_count (sub)processes remaining...\n" if (not $silent);
         foreach my $p (@pids) {
             kill(15, $p);
         }
-        $attempts++;
         sleep 2;
         @pids = __still_alive(\@pids);    # find out which ones are still alive
     }
@@ -311,14 +308,13 @@ sub stop {
     # still processes left?
     # slaughter them with SIGKILL
     $attempts = 5;
-    while ($attempts > 0) {
+    while ($attempts-- > 0) {
         $process_count = scalar @pids;
         last if ($process_count <= 0);
-        print STDOUT "Killing un-cooperative process the hard way, $process_count (sub)processes remaining..." if (not $silent);
+        print STDOUT "Killing un-cooperative process the hard way, $process_count (sub)processes remaining...\n" if (not $silent);
         foreach my $p (@pids) {
             kill(9, $p);
         }
-        $attempts--;
         sleep 1;
         @pids = __still_alive(\@pids);    # find out which ones are still alive
     }
