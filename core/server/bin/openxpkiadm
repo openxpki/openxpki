@@ -1516,7 +1516,7 @@ if ($cmd eq 'initdb') {
 
 if ($ret) {
     print "\n";
-    pod2usage( -verbose => 0 ) if ($ret == 1);
+    pod2usage( -verbose => 0 ) if ($ret == 1 || $ret == 255);
     exit $ret;
 }
 
