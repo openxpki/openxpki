@@ -402,10 +402,13 @@ sub __get_workflow_ui_info {
     foreach my $option (@options) {
         $option =~ m{ \A ((global_)?)([^\s>]+)}xs;
         $option = $3;
-        if (!$2) {
+        if ($2) { # global or not
+            $option = 'global_'.$option;
+        } else {
             $option = $head->{prefix}.'_'.$option;
         }
         ##! 16: 'Activity ' . $option
+        ##! 64: 'Available actions ' . Dumper keys %{$result->{ACTIVITY}}
         if ($result->{ACTIVITY}->{$option}) {
             push @{$result->{STATE}->{option}}, $option;
         }

@@ -13,11 +13,6 @@ It should not be necessary to touch those. These values are used as a default fo
 * ``persister`` holds the name of the used persister, it must be a scalar.
 * ``observer`` can hold a scalar or list of class names.
 
-Configuration Cache
--------------------
-
-``workflow.cache.<name>`` holds serialized perl structures of the merged workflow definitions. This node is visible only in the internal repository. 
-
 Workflow Definitions
 --------------------
 
@@ -122,6 +117,27 @@ seperated by the ``>`` sign (is greater than).
 
 Action
 ^^^^^^
+
+
+Field
+^^^^^
+
+*Select Field with options*
+
+    type: select
+    option:
+        item:
+          - unspecified
+          - keyCompromise
+          - CACompromise
+          - affiliationChanged
+          - superseded
+          - cessationOfOperation
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION
+
+If the label tag is given (below option!), the values in the drop down are
+i18n strings made from label + uppercase(key), e.g 
+I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED
 
 Global Entities
 ---------------

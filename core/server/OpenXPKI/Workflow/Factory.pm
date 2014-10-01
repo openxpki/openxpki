@@ -152,9 +152,19 @@ sub get_action_info {
 
         my $field = $conn->get_hash( \@field_path );
 
-        # Do an explicit get_hash call to check for recursion
-        if ($field->{options}) {
-            $field->{options} = $conn->get_list( [ @field_path, 'option' ] );
+        # Check for option tag and do explicit calls to ensure recursive resolve
+        if ($field->{option}) {
+            # option.item holds the items as list, this is mandatory
+            my @item = $conn->get_list( [ @field_path, 'option', 'item' ] );
+            my @option;
+            # if set, we generate the values from option.label + key
+            my $label = $conn->get( [ @field_path, 'option', 'label' ] );
+            if ($label) {
+                @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
+            } else {
+                @option = map { { value => $_, label => $_  } }  @item;
+            }
+            $field->{option} = \@option;
         }
 
         $field->{type} = 'text' unless ($field->{type});

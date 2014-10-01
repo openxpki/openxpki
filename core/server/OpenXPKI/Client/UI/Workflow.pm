@@ -729,7 +729,12 @@ sub __render_from_workflow {
             $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
             $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
 
-            $item->{options} = $field->{options} if ($field->{options});
+
+            if ($field->{option}) {
+                $item->{options} = $field->{option};
+                map {  $_->{label} = i18nGettext($_->{label}) } @{$item->{options}};
+            }
+
             if ($field->{clonable}) {
                 $item->{clonable} = 1;
                 $item->{name} .= '[]';
