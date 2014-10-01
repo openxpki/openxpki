@@ -1,82 +1,81 @@
+# This is a system workflow so we do not need much UI stuff
+
 head:
-    prefix: 19b773
-
+    prefix: export
     label: I18N_OPENXPKI_WF_TYPE_CERT_EXPORT
-
     description: I18N_OPENXPKI_WF_TYPE_CERT_EXPORT_DESC
-
 
 state:
     CHECK_EXPORT: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_EXPORT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_EXPORT_DESC
         action: 
           - cert_export_null1 > FAILURE? !cert_export_export_successful
           - cert_export_null2 > EXPORT_DONE? cert_export_export_successful
         autorun: 1
 
     CHECK_TAGGING: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TAGGING_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TAGGING_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TAGGING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TAGGING_DESC
         action: 
           - cert_export_null1 > READY_TO_PROCESS? cert_export_tagging_successful
           - cert_export_null2 > FAILURE? !cert_export_tagging_successful
         autorun: 1
 
     CHECK_TRANSFER: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TRANSFER_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TRANSFER_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TRANSFER_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TRANSFER_DESC
         action: 
           - cert_export_null1 > TRANSFER_DONE? cert_export_transfer_successful
           - cert_export_null2 > FAILURE? !cert_export_transfer_successful
         autorun: 1
 
     EXPORT_DONE: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_EXPORT_DONE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_EXPORT_DONE_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_EXPORT_DONE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_EXPORT_DONE_DESC
         action: 
           - cert_export_null1 > SUCCESS? !cert_export_have_certs_to_transfer
           - cert_export_null2 > READY_TO_TRANSFER? cert_export_have_certs_to_transfer
         autorun: 1
 
     FAILURE: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_FAILURE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_FAILURE_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC
 
     INITIAL: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIAL_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC
         action: 
           - cert_export_initialize > INITIALIZED
 
     INITIALIZED: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIALIZED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIALIZED_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIALIZED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIALIZED_DESC
         action: 
           - cert_export_get_config > READY_TO_PROCESS
         autorun: 1
 
     READY_TO_PROCESS: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_PROCESS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_PROCESS_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_PROCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_PROCESS_DESC
         action: 
           - cert_export_generate_export_file > CHECK_EXPORT
         autorun: 1
 
     READY_TO_TRANSFER: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_TRANSFER_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_TRANSFER_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_TRANSFER_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_TRANSFER_DESC
         action: 
           - cert_export_transfer_export_file > CHECK_TRANSFER
         autorun: 1
 
     SUCCESS: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_SUCCESS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_SUCCESS_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC
 
     TRANSFER_DONE: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_TRANSFER_DONE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_TRANSFER_DONE_DESC
         action: 
           - cert_export_tag_certs_as_exported > CHECK_TAGGING
         autorun: 1
@@ -151,39 +150,14 @@ condition:
             test: not $context->{error_code};
 
 
-field:
-    cert_identifier: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL
-        name: cert_identifier
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP
-        type: text
-        required: 0
-
+field: 
     config_path: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CONFIG_PATH_LABEL
         name: config_path
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CONFIG_PATH_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CONFIG_PATH_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CONFIG_PATH_TOOLTIP
         required: 1
         type: text
-
-    email: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_LABEL
-        name: email
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_TOOLTIP
-        type: text
-        required: 0
-
+ 
 
 acl:
-    Anonymous: 
-        creator: self
-
     CA Operator: 
         creator: any
 
@@ -191,8 +165,5 @@ acl:
         creator: any
 
     System: 
-        creator: self
-
-    User: 
         creator: self
 

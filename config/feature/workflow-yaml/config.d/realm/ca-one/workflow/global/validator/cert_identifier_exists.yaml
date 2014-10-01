@@ -1,0 +1,5 @@
+class: OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
+param: 
+    emptyok: 1
+arg: 
+  - $cert_identifier
