@@ -225,7 +225,7 @@
         "writer": {
             "description": "Write files to disk.",
             "type": "file-writer",
-            "pattern": "dist/{*.{html,js},**/main-*,style/img/**/*}",
+            "pattern": "dist/{*.{html,js},**/main-*,style/img/**/*,**/fonts/*}",
             "enabled": false,
             "inputs": ["dist"]
         },
