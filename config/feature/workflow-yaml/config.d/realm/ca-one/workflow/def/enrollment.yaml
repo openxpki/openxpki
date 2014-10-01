@@ -1,436 +1,424 @@
 head:
-    prefix: dd0ce3
-
-    label: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
-
-    description: I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC
-
+    prefix: scep
+    label: I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC
 
 state:
-    AFTER_REVOKE_QUEUE: 
+    AFTER_REVOKE_QUEUE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC
-        action: 
-          - enroll_null1 > CONTINUE_INITIAL_ENROLL
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC
+        action:
+          - global_noop > CONTINUE_INITIAL_ENROLL
 
-    APPROVAL: 
+    APPROVAL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_DESC
-        action: 
-          - enroll_calc_approvals > APPROVALS_CALCULATED
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_APPROVAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_APPROVAL_DESC
+        action:
+          - calc_approvals > APPROVALS_CALCULATED
 
-    APPROVALS_CALCULATED: 
+    APPROVALS_CALCULATED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_DESC
-        action: 
-          - enroll_null1 > FAILURE ? !enroll_allow_manual_approval !enroll_have_all_approvals
-          - enroll_notify_pending_approval > PENDING_APPROVAL ? enroll_allow_manual_approval !enroll_have_all_approvals
-          - enroll_null2 > APPROVED ? enroll_have_all_approvals
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_APPROVALS_CALCULATED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_APPROVALS_CALCULATED_DESC
+        action:
+          - global_noop > FAILURE ?  !allow_manual_approval  !have_all_approvals
+          - notify_pending_approval > PENDING_APPROVAL ? allow_manual_approval  !have_all_approvals
+          - global_noop2 > APPROVED ? have_all_approvals
 
-    APPROVED: 
+    APPROVED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_DESC
-        action: 
-          - enroll_null1 > ISSUANCE
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_APPROVED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_APPROVED_DESC
+        action:
+          - global_noop > ISSUANCE
 
-    AUTHENTICATED_REQUEST: 
+    AUTHENTICATED_REQUEST:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_DESC
-        action: 
-          - enroll_null1 > CA_POLICY_APPROVAL
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTHENTICATED_REQUEST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTHENTICATED_REQUEST_DESC
+        action:
+          - global_noop > CA_POLICY_APPROVAL
 
-    AUTHENTICATION: 
+    AUTHENTICATION:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_DESC
-        action: 
-          - enroll_null1 > CHECK_INITIAL_ENROLL_AUTHEN ? !enroll_signed_renewal
-          - enroll_null2 > AUTHENTICATED_REQUEST ? enroll_signed_renewal
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTHENTICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTHENTICATION_DESC
+        action:
+          - global_noop > CHECK_INITIAL_ENROLL_AUTHEN ?  !signed_renewal
+          - global_noop2 > AUTHENTICATED_REQUEST ? signed_renewal
 
-    AUTHENTICATION_MISSING: 
+    AUTHENTICATION_MISSING:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_DESC
-        action: 
-          - enroll_null1 > FAILURE ? !enroll_allow_manual_authentication
-          - enroll_null2 > PENDING_MANUAL_AUTHENTICATION ? enroll_allow_manual_authentication
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTHENTICATION_MISSING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTHENTICATION_MISSING_DESC
+        action:
+          - global_noop > FAILURE ?  !allow_manual_authentication
+          - global_noop2 > PENDING_MANUAL_AUTHENTICATION ? allow_manual_authentication
 
-    AUTO_REVOKE_EXISTING_CERTS: 
+    AUTO_REVOKE_EXISTING_CERTS:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_DESC
-        action: 
-          - enroll_revoke_existing_certs > QUEUED_FOR_REVOCATION
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTO_REVOKE_EXISTING_CERTS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AUTO_REVOKE_EXISTING_CERTS_DESC
+        action:
+          - revoke_existing_certs > QUEUED_FOR_REVOCATION
 
-    CA_KEY_NOT_USABLE: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_DESC
-        action: 
-          - enroll_continue_issuance > CHECK_CA_KEY
+    CA_KEY_NOT_USABLE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_DESC
+        action:
+          - continue_issuance > CHECK_CA_KEY
 
-    CA_KEY_USABLE: 
+    CA_KEY_USABLE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_DESC
-        action: 
-          - enroll_get_cert_profile > PREPARED
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_USABLE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_USABLE_DESC
+        action:
+          - get_cert_profile > PREPARED
 
-    CA_POLICY_APPROVAL: 
+    CA_POLICY_APPROVAL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_DESC
-        action: 
-          - enroll_null1 > FAILURE ? !enroll_key_policy_ok
-          - enroll_null2 > CHECK_RENEWAL_TYPE ? enroll_key_policy_ok
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_POLICY_APPROVAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_POLICY_APPROVAL_DESC
+        action:
+          - global_noop > FAILURE ?  !key_policy_ok
+          - global_noop2 > CHECK_RENEWAL_TYPE ? key_policy_ok
 
-    CERT_ISSUED: 
+    CERT_ISSUED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_DESC
-        action: 
-          - enroll_persist_cert_metadata > CERT_METADATA_PERSISTED
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CERT_ISSUED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CERT_ISSUED_DESC
+        action:
+          - persist_cert_metadata > CERT_METADATA_PERSISTED
 
-    CERT_METADATA_PERSISTED: 
+    CERT_METADATA_PERSISTED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_DESC
-        action: 
-          - enroll_notify_cert_issued > NOTIFIED_CERT_ISSUED
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CERT_METADATA_PERSISTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CERT_METADATA_PERSISTED_DESC
+        action:
+          - notify_cert_issued > NOTIFIED_CERT_ISSUED
 
-    CERT_TO_REVOKE: 
+    CERT_TO_REVOKE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_DESC
-        action: 
-          - enroll_next_cert_to_revoke > HAVE_CERT_TO_REVOKE
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CERT_TO_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CERT_TO_REVOKE_DESC
+        action:
+          - next_cert_to_revoke > HAVE_CERT_TO_REVOKE
 
-    CHECK_CA_KEY: 
+    CHECK_CA_KEY:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_DESC
-        action: 
-          - enroll_null1 > CA_KEY_NOT_USABLE ? !enroll_ca_key_usable
-          - enroll_null2 > CA_KEY_USABLE ? enroll_ca_key_usable
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_CA_KEY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_CA_KEY_DESC
+        action:
+          - global_noop > CA_KEY_NOT_USABLE ?  !ca_key_usable
+          - global_noop2 > CA_KEY_USABLE ? ca_key_usable
 
-    CHECK_FOR_CHALLENGE_PASSWORD: 
+    CHECK_FOR_CHALLENGE_PASSWORD:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_DESC
-        action: 
-          - enroll_null1 > EVAL_SIGNER_TRUST ? !enroll_have_challenge_password
-          - enroll_eval_challenge > EVAL_SIGNER_TRUST ? enroll_have_challenge_password
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_FOR_CHALLENGE_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_FOR_CHALLENGE_PASSWORD_DESC
+        action:
+          - global_noop > EVAL_SIGNER_TRUST ?  !have_challenge_password
+          - eval_challenge > EVAL_SIGNER_TRUST ? have_challenge_password
 
-    CHECK_FOR_VALID_REQUEST: 
+    CHECK_FOR_VALID_REQUEST:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_DESC
-        action: 
-          - enroll_null1 > FAILURE ? !enroll_valid_request
-          - enroll_null2 > HAVE_VALID_REQUEST ? enroll_valid_request
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_FOR_VALID_REQUEST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_FOR_VALID_REQUEST_DESC
+        action:
+          - global_noop > FAILURE ?  !valid_request
+          - global_noop2 > HAVE_VALID_REQUEST ? valid_request
 
-    CHECK_INITIAL_ENROLL_AUTHEN: 
+    CHECK_INITIAL_ENROLL_AUTHEN:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_DESC
-        action: 
-          - enroll_null1 > AUTHENTICATION_MISSING ? !enroll_trusted_initial_enroll
-          - enroll_null2 > AUTHENTICATED_REQUEST ? enroll_trusted_initial_enroll
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_INITIAL_ENROLL_AUTHEN_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_INITIAL_ENROLL_AUTHEN_DESC
+        action:
+          - global_noop > AUTHENTICATION_MISSING ?  !trusted_initial_scep
+          - global_noop2 > AUTHENTICATED_REQUEST ? trusted_initial_scep
 
-    CHECK_RENEWAL_ELIGIBILITY: 
+    CHECK_RENEWAL_ELIGIBILITY:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_DESC
-        action: 
-          - enroll_null1 > APPROVAL ? enroll_ca_policy_approval
-          - enroll_null2 > POLICY_PENDING ? !enroll_ca_policy_approval
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_RENEWAL_ELIGIBILITY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_RENEWAL_ELIGIBILITY_DESC
+        action:
+          - global_noop > APPROVAL ? ca_policy_approval
+          - global_noop2 > POLICY_PENDING ?  !ca_policy_approval
 
-    CHECK_RENEWAL_TYPE: 
+    CHECK_RENEWAL_TYPE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_DESC
-        action: 
-          - enroll_null1 > CHECK_RENEWAL_ELIGIBILITY ? enroll_signed_renewal
-          - enroll_null2 > ELIGIBLE_FOR_INITIAL_ENROLL ? !enroll_signed_renewal
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_RENEWAL_TYPE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_RENEWAL_TYPE_DESC
+        action:
+          - global_noop > CHECK_RENEWAL_ELIGIBILITY ? signed_renewal
+          - global_noop2 > ELIGIBLE_FOR_INITIAL_ENROLL ?  !signed_renewal
 
-    CLEANUP: 
+    CLEANUP:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_DESC
-        action: 
-          - enroll_invalidate_challenge_pass > SUCCESS
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CLEANUP_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CLEANUP_DESC
+        action:
+          - invalidate_challenge_pass > SUCCESS
 
-    CLEAR_APPROVALS: 
+    CLEAR_APPROVALS:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_DESC
-        action: 
-          - enroll_clear_approvals > APPROVAL
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CLEAR_APPROVALS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CLEAR_APPROVALS_DESC
+        action:
+          - clear_approvals > APPROVAL
 
-    CONTINUE_INITIAL_ENROLL: 
+    CONTINUE_INITIAL_ENROLL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_DESC
-        action: 
-          - enroll_null1 > POLICY_PENDING ? !enroll_num_active_certs_less_than_max_active_certs
-          - enroll_null2 > APPROVAL ? enroll_num_active_certs_less_than_max_active_certs
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CONTINUE_INITIAL_ENROLL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CONTINUE_INITIAL_ENROLL_DESC
+        action:
+          - global_noop > POLICY_PENDING ?  !num_active_certs_less_than_max_active_certs
+          - global_noop2 > APPROVAL ? num_active_certs_less_than_max_active_certs
 
-    ELIGIBLE_FOR_INITIAL_ENROLL: 
+    ELIGIBLE_FOR_INITIAL_ENROLL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_DESC
-        action: 
-          - enroll_null1 > CONTINUE_INITIAL_ENROLL ? !enroll_auto_revoke_existing_certs
-          - enroll_null2 > AUTO_REVOKE_EXISTING_CERTS ? enroll_auto_revoke_existing_certs
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ELIGIBLE_FOR_INITIAL_ENROLL_DESC
+        action:
+          - global_noop > CONTINUE_INITIAL_ENROLL ?  !auto_revoke_existing_certs
+          - global_noop2 > AUTO_REVOKE_EXISTING_CERTS ? auto_revoke_existing_certs
 
-    EVAL_ELIGIBILITY: 
+    EVAL_ELIGIBILITY:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_DESC
-        action: 
-          - enroll_eval_eligibility > CHECK_FOR_VALID_REQUEST
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_EVAL_ELIGIBILITY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_EVAL_ELIGIBILITY_DESC
+        action:
+          - eval_eligibility > CHECK_FOR_VALID_REQUEST
 
-    EVAL_SIGNER_TRUST: 
+    EVAL_SIGNER_TRUST:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_DESC
-        action: 
-          - enroll_eval_signer_trust > EVAL_ELIGIBILITY
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_EVAL_SIGNER_TRUST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_EVAL_SIGNER_TRUST_DESC
+        action:
+          - eval_signer_trust > EVAL_ELIGIBILITY
 
-    FAILURE: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_DESC
+    FAILURE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC
 
-    FINISHED_PERSIST: 
+    FINISHED_PERSIST:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_DESC
-        action: 
-          - enroll_null1 > AUTHENTICATION
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FINISHED_PERSIST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FINISHED_PERSIST_DESC
+        action:
+          - global_noop > AUTHENTICATION
 
-    HAVE_CERT_TO_REVOKE: 
+    HAVE_CERT_TO_REVOKE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_DESC
-        action: 
-          - enroll_revoke_cert > QUEUED_FOR_REVOCATION
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_HAVE_CERT_TO_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_HAVE_CERT_TO_REVOKE_DESC
+        action:
+          - revoke_cert > QUEUED_FOR_REVOCATION
 
-    HAVE_VALID_REQUEST: 
+    HAVE_VALID_REQUEST:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_DESC
-        action: 
-          - enroll_null1 > PERSISTENCE
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_HAVE_VALID_REQUEST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_HAVE_VALID_REQUEST_DESC
+        action:
+          - global_noop > PERSISTENCE
 
-    INITIAL: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_DESC
-        action: 
-          - enroll_initialize > INITIALIZED
+    INITIAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIAL_DESC
+        action:
+          - initialize > INITIALIZED
 
-    INITIALIZED: 
+    INITIALIZED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_DESC
-        action: 
-          - enroll_extract_csr > READY_TO_PROCESS
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIALIZED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIALIZED_DESC
+        action:
+          - extract_csr > READY_TO_PROCESS
 
-    ISSUANCE: 
+    ISSUANCE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_DESC
-        action: 
-          - enroll_persist_csr > CHECK_CA_KEY
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ISSUANCE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_ISSUANCE_DESC
+        action:
+          - persist_csr > CHECK_CA_KEY
 
-    NOTIFIED_CERT_ISSUED: 
+    NOTIFIED_CERT_ISSUED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC
-        action: 
-          - enroll_revoke_cert_after_replace > REVOKE_ON_REPLACE_DONE ? enroll_need_revoke_after_replace
-          - enroll_null1 > REVOKE_ON_REPLACE_DONE ? !enroll_need_revoke_after_replace
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_NOTIFIED_CERT_ISSUED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_NOTIFIED_CERT_ISSUED_DESC
+        action:
+          - revoke_cert_after_replace > REVOKE_ON_REPLACE_DONE ? need_revoke_after_replace
+          - global_noop > REVOKE_ON_REPLACE_DONE ?  !need_revoke_after_replace
 
-    PENDING_APPROVAL: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_DESC
-        action: 
-          - enroll_modify_metadata > CLEAR_APPROVALS
-          - I18N_OPENXPKI_WF_ACTION_APPROVE_CSR > APPROVAL
-          - enroll_disapprove > FAILURE
+    PENDING_APPROVAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC
+        action:
+          - modify_metadata > CLEAR_APPROVALS
+          - approve_csr > APPROVAL
+          - disapprove > FAILURE
 
-    PENDING_MANUAL_AUTHENTICATION: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_DESC
-        action: 
-          - enroll_add_authentication > AUTHENTICATED_REQUEST
-          - enroll_deny_authentication > FAILURE
+    PENDING_MANUAL_AUTHENTICATION:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_DESC
+        action:
+          - add_authentication > AUTHENTICATED_REQUEST
+          - deny_authentication > FAILURE
 
-    PERSISTENCE: 
+    PERSISTENCE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_DESC
-        action: 
-          - enroll_null1 > FINISHED_PERSIST ? !enroll_signed_renewal
-          - enroll_load_recent_certificate > FINISHED_PERSIST ? enroll_signed_renewal
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PERSISTENCE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PERSISTENCE_DESC
+        action:
+          - global_noop > FINISHED_PERSIST ?  !signed_renewal
+          - load_recent_certificate > FINISHED_PERSIST ? signed_renewal
 
-    POLICY_PENDING: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_DESC
-        action: 
-          - enroll_fail > FAILURE
-          - enroll_allow_retry > FAILURE
+    POLICY_PENDING:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_POLICY_PENDING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_POLICY_PENDING_DESC
+        action:
+          - fail > FAILURE
+          - allow_retry > FAILURE
 
-    PREPARED: 
+    PREPARED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_DESC
-        action: 
-          - enroll_issue_cert > CERT_ISSUED
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PREPARED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PREPARED_DESC
+        action:
+          - global_nice_issue_certificate > CERT_ISSUED
 
-    QUEUED_FOR_REVOCATION: 
+    QUEUED_FOR_REVOCATION:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_DESC
-        action: 
-          - enroll_null1 > CERT_TO_REVOKE ? !enroll_tmp_queue_is_empty
-          - enroll_revoke_existing_certs > AFTER_REVOKE_QUEUE ? enroll_tmp_queue_is_empty
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_QUEUED_FOR_REVOCATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_QUEUED_FOR_REVOCATION_DESC
+        action:
+          - global_noop > CERT_TO_REVOKE ?  !tmp_queue_is_empty
+          - revoke_existing_certs > AFTER_REVOKE_QUEUE ? tmp_queue_is_empty
 
-    READY_TO_PROCESS: 
+    READY_TO_PROCESS:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_DESC
-        action: 
-          - enroll_fetch_group_policy > CHECK_FOR_CHALLENGE_PASSWORD
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_READY_TO_PROCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_READY_TO_PROCESS_DESC
+        action:
+          - fetch_group_policy > CHECK_FOR_CHALLENGE_PASSWORD
 
-    REVOKE_ON_REPLACE_DONE: 
+    REVOKE_ON_REPLACE_DONE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_DESC
-        action: 
-          - enroll_fork_publish > CLEANUP ? enroll_use_ldap
-          - enroll_null1 > CLEANUP ? !enroll_use_ldap
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_REVOKE_ON_REPLACE_DONE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_REVOKE_ON_REPLACE_DONE_DESC
+        action:
+          - fork_publish > CLEANUP
 
-    SUCCESS: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_DESC
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_DESC
 
 
 action:
-    I18N_OPENXPKI_WF_ACTION_APPROVE_CSR: 
+    approve_csr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_APPROVE_CSR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_APPROVE_CSR_DESC
-        input: 
-          - _check_hash
-          - _signature
-          - _signature_text
-        param: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_approve_csr_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_approve_csr_DESC
+        param:
             check_creator: 0
             multi_role_approval: 0
-        validator: 
-          - I18N_OPENXPKI_WF_VAL_VALIDAPPROVALSIGNATURECSR
 
-    enroll_add_authentication: 
+    add_authentication:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADD_AUTHENTICATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADD_AUTHENTICATION_DESC
-        param: 
+        param:
             num_manual_authen: 1
 
-    enroll_allow_retry: 
+    allow_retry:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_DESC
-        param: 
+        param:
             _map_ds_key_name: "[% context.server %]:[% context.scep_tid %]"
             ds_namespace: scep.transaction_id
 
-    enroll_calc_approvals: 
+    calc_approvals:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::CalcApprovals
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CALC_APPROVALS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CALC_APPROVALS_DESC
-        input: 
-          - approval_points
 
-    enroll_clear_approvals: 
+    clear_approvals:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CLEAR_APPROVALS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CLEAR_APPROVALS_DESC
 
-    enroll_continue_issuance: 
+    continue_issuance:
         class: Workflow::Action::Null
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CONTINUE_ISSUANCE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CONTINUE_ISSUANCE_DESC
 
-    enroll_deny_authentication: 
+    deny_authentication:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DENY_AUTHENTICATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DENY_AUTHENTICATION_DESC
-        param: 
+        param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
             _map_scep_tid: $scep_tid
             message: scep_auth_denied
 
-    enroll_disapprove: 
+    disapprove:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DISAPPROVE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DISAPPROVE_DESC
-        param: 
+        param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
             _map_scep_tid: $scep_tid
             message: scep_approval_rejected
 
-    enroll_eval_challenge: 
+    eval_challenge:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateChallenge
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EVAL_CHALLENGE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EVAL_CHALLENGE_DESC
 
-    enroll_eval_eligibility: 
+    eval_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EVAL_ELIGIBILITY_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EVAL_ELIGIBILITY_DESC
 
-    enroll_eval_signer_trust: 
+    eval_signer_trust:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EVAL_SIGNER_TRUST_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EVAL_SIGNER_TRUST_DESC
 
-    enroll_extract_csr: 
+    extract_csr:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::ExtractCSR
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EXTRACT_CSR_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EXTRACT_CSR_DESC
 
-    enroll_fail: 
+    fail:
         class: Workflow::Action::Null
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_DESC
 
-    enroll_fetch_group_policy: 
+    fetch_group_policy:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::FetchGroupPolicy
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FETCH_GROUP_POLICY_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FETCH_GROUP_POLICY_DESC
 
-    enroll_fork_publish: 
+    fork_publish:
         class: Workflow::Action::Null
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_PUBLISH_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_PUBLISH_DESC
 
-    enroll_get_cert_profile: 
+    get_cert_profile:
         class: Workflow::Action::Null
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_GET_CERT_PROFILE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_GET_CERT_PROFILE_DESC
 
-    enroll_initialize: 
+    initialize:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_INITIALIZE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_INITIALIZE_DESC
-        input: 
+        input:
           - _pkcs7
           - _url_params
           - cert_profile
@@ -442,277 +430,311 @@ action:
           - signer_cert
           - t_signer_cert_crypt_ok
           - t_signer_validity_ok
-        param: 
+        param:
             source: SCEP
 
-    enroll_invalidate_challenge_pass: 
+    invalidate_challenge_pass:
         class: Workflow::Action::Null
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_INVALIDATE_CHALLENGE_PASS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_INVALIDATE_CHALLENGE_PASS_DESC
 
-    enroll_issue_cert: 
-        class: OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ISSUE_CERT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ISSUE_CERT_DESC
-        param: 
-            retry_count: 10
-            retry_interval: +0000000001
-
-    enroll_load_recent_certificate: 
+    load_recent_certificate:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::LoadRecentCertificate
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_LOAD_RECENT_CERTIFICATE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_LOAD_RECENT_CERTIFICATE_DESC
 
-    enroll_modify_metadata: 
+    modify_metadata:
         class: Workflow::Action::Null
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_MODIFY_METADATA_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_MODIFY_METADATA_DESC
 
-    enroll_next_cert_to_revoke: 
+    next_cert_to_revoke:
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NEXT_CERT_TO_REVOKE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NEXT_CERT_TO_REVOKE_DESC
-        input: 
+        input:
           - tmp_queue
-        param: 
+        param:
             array_name: tmp_queue
             context_key: cert_identifier
             function: shift
 
-    enroll_notify_cert_issued: 
+    notify_cert_issued:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NOTIFY_CERT_ISSUED_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NOTIFY_CERT_ISSUED_DESC
-        param: 
+        param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
             _map_scep_tid: $scep_tid
             message: scep_cert_issued
 
-    enroll_notify_pending_approval: 
+    notify_pending_approval:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NOTIFY_PENDING_APPROVAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NOTIFY_PENDING_APPROVAL_DESC
-        param: 
+        param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
             _map_scep_tid: $scep_tid
             message: scep_approval_pending
 
-    enroll_null1: 
-        class: Workflow::Action::Null
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NULL1_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NULL1_DESC
-
-    enroll_null2: 
-        class: Workflow::Action::Null
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NULL2_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_NULL2_DESC
-
-    enroll_persist_cert_metadata: 
+    persist_cert_metadata:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_PERSIST_CERT_METADATA_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_PERSIST_CERT_METADATA_DESC
-        param: 
+        param:
             _map_cust_id: $url_custid
             _map_server_id: $server
 
-    enroll_persist_csr: 
+    persist_csr:
         class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_PERSIST_CSR_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_PERSIST_CSR_DESC
 
-    enroll_revoke_cert: 
+    revoke_cert:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_CERT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_CERT_DESC
-        input: 
+        input:
           - cert_identifier
-        param: 
+        param:
             auto_approval: 1
             reason_code: superseded
 
-    enroll_revoke_cert_after_replace: 
+    revoke_cert_after_replace:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_CERT_AFTER_REPLACE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_CERT_AFTER_REPLACE_DESC
-        input: 
+        input:
           - replace_cert_identifier
           - reason_code
           - invalidity_time
-        param: 
+        param:
             _map_cert_identifier: $replace_cert_identifier
             auto_approval: 1
 
-    enroll_revoke_existing_certs: 
+    revoke_existing_certs:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_EXISTING_CERTS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_EXISTING_CERTS_DESC
 
 
 condition:
-    enroll_allow_manual_approval: 
+    allow_manual_approval:
         class: Workflow::Condition::Evaluate
-        param: 
+        param:
             test: $context->{p_allow_man_approv};
 
-    enroll_allow_manual_authentication: 
+    allow_manual_authentication:
         class: Workflow::Condition::Evaluate
-        param: 
+        param:
             test: $context->{p_allow_man_authen};
 
-    enroll_auto_revoke_existing_certs: 
+    auto_revoke_existing_certs:
         class: Workflow::Condition::Evaluate
-        param: 
+        param:
             test: $context->{p_auto_revoke_existing_certs}
 
-    enroll_ca_key_usable: 
+    ca_key_usable:
         class: OpenXPKI::Server::Workflow::Condition::Key
-        param: 
+        param:
             key: ca
             status: usable
 
-    enroll_ca_policy_approval: 
+    ca_policy_approval:
         class: Workflow::Condition::LazyAND
-        param: 
-            condition1: enroll_active_cert_count_ok
-            condition2: enroll_at_least_one_active_cert
+        param:
+            condition1: scep_active_cert_count_ok
+            condition2: scep_at_least_one_active_cert
 
-    enroll_have_all_approvals: 
+    have_all_approvals:
         class: Workflow::Condition::Evaluate
-        param: 
+        param:
             test: $context->{have_all_approvals};
 
-    enroll_have_challenge_password: 
+    have_challenge_password:
         class: Workflow::Condition::Evaluate
-        param: 
+        param:
             test: defined $context->{_challenge_password};
 
-    enroll_key_policy_ok: 
+    key_policy_ok:
         class: Workflow::Condition::LazyAND
-        param: 
-            condition1: enroll_csr_key_size_ok
-            condition2: enroll_csr_key_type_ok
-            condition3: enroll_csr_hash_type_ok
+        param:
+            condition1: scep_csr_key_size_ok
+            condition2: scep_csr_key_type_ok
+            condition3: scep_csr_hash_type_ok
 
-    enroll_need_revoke_after_replace: 
+    need_revoke_after_replace:
         class: Workflow::Condition::Evaluate
-        param: 
+        param:
             test: $context->{replace_cert_identifier};
 
-    enroll_num_active_certs_less_than_max_active_certs: 
+    num_active_certs_less_than_max_active_certs:
         class: Workflow::Condition::Evaluate
-        param: 
+        param:
             test: $context->{num_active_certs} < $context->{p_max_active_certs};
 
-    enroll_signed_renewal: 
+    signed_renewal:
         class: Workflow::Condition::LazyAND
-        param: 
-            condition1: enroll_signer_trusted
-            condition2: enroll_signer_sn_matches_csr
+        param:
+            condition1: scep_signer_trusted
+            condition2: scep_signer_sn_matches_csr
 
-    enroll_tmp_queue_is_empty: 
+    tmp_queue_is_empty:
         class: OpenXPKI::Server::Workflow::Condition::WFArray
-        param: 
+        param:
             array_name: tmp_queue
             condition: is_empty
 
-    enroll_trusted_initial_enroll: 
+    trusted_initial_scep:
         class: Workflow::Condition::LazyOR
-        param: 
-            condition1: enroll_trusted_self_sign
-            condition2: enroll_trusted_signer_on_behalf
+        param:
+            condition1: scep_trusted_self_sign
+            condition2: scep_trusted_signer_on_behalf
 
-    enroll_use_ldap: 
-        class: Workflow::Condition::Evaluate
-        param: 
-            test: 1 == 1
-
-    enroll_valid_request: 
+    valid_request:
         class: Workflow::Condition::LazyAND
-        param: 
-            condition2: enroll_valid_csr
-            condition3: enroll_signer_cert_active
-            condition5: enroll_transaction_id_given
-            condition6: enroll_signer_cert_crypt_ok
+        param:
+            condition2: scep_valid_csr
+            condition3: scep_signer_cert_active
+            condition5: scep_transaction_id_given
+            condition6: scep_signer_cert_crypt_ok
 
+    active_cert_count_ok:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition1: scep_num_active_certs_less_than_max
+            condition2: scep_in_renewal_window
+            condition3: scep_in_replace_window
 
-validator:
-    I18N_OPENXPKI_WF_VAL_VALIDAPPROVALSIGNATURECSR: 
-        class: OpenXPKI::Server::Workflow::Validator::ApprovalSignature
-        param: 
-            config_path: approval.csr.anchor
-            signature_required: 0
-        arg: 
-          - $_signature
-          - $_signature_text
+    at_least_one_active_cert:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{num_active_certs} > 0
 
+    csr_key_size_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{csr_key_size_ok}
+
+    csr_key_type_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{csr_key_type_ok}
+
+    csr_hash_type_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{csr_hash_type_ok}
+
+    signer_trusted:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_trusted}
+
+    signer_sn_matches_csr:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: not not $context->{signer_sn_matches_csr}
+
+    trusted_self_sign:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition2: scep_trusted_self_sign_details
+            condition1: scep_signer_sn_matches_csr
+
+    trusted_signer_on_behalf:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition1: scep_signer_trusted
+            condition2: value="scep_signer_on_behalf
+
+    valid_csr:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: length($context->{cert_subject})
+
+    signer_cert_active:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition2: scep_signer_validity_ok
+            condition1: scep_allow_expired_signer
+            condition3: scep_self_signed_initial_scep
+
+    transaction_id_given:
+        class: OpenXPKI::Server::Workflow::Condition::SCEPv2::ValidSCEPTID
+
+    signer_cert_crypt_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_signature_valid} == 1
+
+    num_active_certs_less_than_max_active_certs:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{num_active_certs} &lt; $context->{p_max_active_certs}
+
+    in_renewal_window:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{num_active_certs} <= $context->{p_max_active_certs}) and $context->{in_renew_window}
+
+    in_replace_window:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{num_active_certs} <= $context->{p_max_active_certs}) and $context->{in_replace_window} and $context->{renewal_mode} eq 'replace'
+
+    trusted_self_sign_details:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition1: scep_valid_challenge_password
+            condition3: scep_policy_allows_anon_scep
+            condition2: scep_valid_kerberos_authentication
+
+    policy_allows_anon_scep:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{p_allow_anon_scep}
+
+    valid_challenge_password:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: not not $context->{valid_chall_pass}
+
+    valid_kerberos_authentication:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{valid_kerb_authen}
+
+    signer_validity_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_validity_ok}
+
+    allow_expired_signer:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{p_allow_expired_signer}
+
+    self_signed_initial_scep:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition2: scep_signer_sn_matches_csr
+            condition3: scep_signer_is_self_signed
 
 field:
-    _check_hash: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__CHECK_HASH_LABEL
-        name: _check_hash
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__CHECK_HASH_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__CHECK_HASH_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__CHECK_HASH_TOOLTIP
-        type: text
-        required: 0
-
-    _pkcs7: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PKCS7_LABEL
+    _pkcs7:
         name: _pkcs7
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PKCS7_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PKCS7_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PKCS7_TOOLTIP
         required: 1
         type: text
 
-    _signature: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_LABEL
-        name: _signature
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_TOOLTIP
-        type: text
-        required: 0
-
-    _signature_text: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_TEXT_LABEL
-        name: _signature_text
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_TEXT_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_TEXT_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__SIGNATURE_TEXT_TOOLTIP
-        type: text
-        required: 0
-
-    _url_params: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__URL_PARAMS_LABEL
+    _url_params:
         name: _url_params
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__URL_PARAMS_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__URL_PARAMS_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__URL_PARAMS_TOOLTIP
         type: text
         required: 0
 
-    approval_points: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_POINTS_LABEL
-        name: approval_points
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_POINTS_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_POINTS_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_POINTS_TOOLTIP
-        type: text
-        required: 0
-
-    cert_identifier: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL
-        name: cert_identifier
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP
-        required: 1
-        type: text
-
-    cert_profile: 
+    cert_profile:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL
         name: cert_profile
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC
@@ -721,7 +743,7 @@ field:
         type: text
         required: 0
 
-    f_valid_csr: 
+    f_valid_csr:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL
         name: f_valid_csr
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC
@@ -730,7 +752,7 @@ field:
         type: text
         required: 0
 
-    f_valid_scep_tid: 
+    f_valid_scep_tid:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL
         name: f_valid_scep_tid
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC
@@ -739,34 +761,7 @@ field:
         type: text
         required: 0
 
-    invalidity_time: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL
-        name: invalidity_time
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP
-        type: text
-        required: 0
-
-    pkcs10: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_LABEL
-        name: pkcs10
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP
-        required: 1
-        type: text
-
-    reason_code: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_LABEL
-        name: reason_code
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP
-        required: 1
-        type: text
-
-    replace_cert_identifier: 
+    replace_cert_identifier:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL
         name: replace_cert_identifier
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC
@@ -775,7 +770,7 @@ field:
         required: 1
         type: text
 
-    scep_tid: 
+    scep_tid:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
         name: scep_tid
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC
@@ -784,7 +779,7 @@ field:
         required: 1
         type: text
 
-    server: 
+    server:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL
         name: server
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC
@@ -793,7 +788,7 @@ field:
         type: text
         required: 0
 
-    signer_cert: 
+    signer_cert:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL
         name: signer_cert
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC
@@ -802,7 +797,7 @@ field:
         required: 1
         type: text
 
-    t_signer_cert_crypt_ok: 
+    t_signer_cert_crypt_ok:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL
         name: t_signer_cert_crypt_ok
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC
@@ -811,7 +806,7 @@ field:
         type: text
         required: 0
 
-    t_signer_validity_ok: 
+    t_signer_validity_ok:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL
         name: t_signer_validity_ok
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC
@@ -820,7 +815,7 @@ field:
         type: text
         required: 0
 
-    tmp_queue: 
+    tmp_queue:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_LABEL
         name: tmp_queue
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_DESC
@@ -831,18 +826,18 @@ field:
 
 
 acl:
-    Anonymous: 
+    Anonymous:
         creator: self
 
-    CA Operator: 
+    CA Operator:
         creator: any
 
-    RA Operator: 
+    RA Operator:
         creator: any
 
-    System: 
+    System:
         creator: self
 
-    User: 
+    User:
         creator: self
 
