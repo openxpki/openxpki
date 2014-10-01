@@ -12,7 +12,7 @@ revoke_on_replace:
     reason_code: keyCompromise
     invalidity_time: +000014
 
-workflow_type: I18N_OPENXPKI_WF_TYPE_ENROLLMENT
+workflow_type: enrollment
 
 # allow rsa keys with 1020 to 2048 bit
 # the 1020 is necessary as some implementations can have
