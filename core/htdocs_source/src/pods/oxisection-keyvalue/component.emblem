@@ -4,22 +4,3 @@ table.table.table-bordered
       tr
         td = item.label
         td: oxivalue-format content=item
-
-div.oxi-button-container
-  if buttonsWithDescription
-      each btn in content.content.buttons
-        div.row.stacked-buttons
-          div.col-xs-4
-            if btn.href
-                a.btn.btn-block.btn-default href=btn.href target="_blank" title=btn.tooltip {{btn.label}}
-            else
-                button.btn.btn-block.btn-default click="execute btn" title=btn.tooltip {{btn.label}}
-          div.col-xs-8.btn-bt-margin
-            btn.description
-  else
-    div.btn-group
-      each btn in content.content.buttons
-        if btn.href
-            a.btn.btn-default href=btn.href target="_blank" title=btn.tooltip {{btn.label}}
-        else
-            button.btn.btn-default click="execute btn" title=btn.tooltip {{btn.label}}
