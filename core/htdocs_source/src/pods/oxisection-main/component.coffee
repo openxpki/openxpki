@@ -22,11 +22,28 @@ Component = Em.Component.extend
                 data:
                     page:evt.target.href.split("#")[1]
                     target:evt.target.target
-        else if evt.target.tagName is "BUTTON"
-            $(evt.target).addClass "btn-loading"
+
+    confirmButton: null
 
     actions:
         execute: (btn) ->
+            if event.target.tagName is "BUTTON"
+                $(event.target).addClass "btn-loading"
+
+            if btn.confirm
+                @set "confirmButton", btn
+                Em.run.scheduleOnce "afterRender", =>
+                    @$().find(".modal").on "hidden.bs.modal", =>
+                        if not @isDestroyed
+                            @set "confirmButton", null
+                    @$().find(".modal").modal "show"
+            else
+                @send "confirm", btn
+
+        cancel: ->
+            @$().find(".btn-loading").removeClass "btn-loading"
+
+        confirm: (btn) ->
             if btn.action
                 @container.lookup("route:openxpki").sendAjax
                     data:

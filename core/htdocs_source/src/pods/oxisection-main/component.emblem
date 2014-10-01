@@ -29,3 +29,17 @@ if content.content.buttons
               a.btn.btn-default href=btn.href target="_blank" title=btn.tooltip {{btn.label}}
           else
               button.btn.btn-default click="execute btn" title=btn.tooltip {{btn.label}}
+
+  if confirmButton
+    div class="modal fade"
+      div class="modal-dialog"
+        div class="modal-content"
+          div class="modal-header"
+            button class="close" data-dismiss="modal" aria-hidden="true" &times;
+            h4 class="modal-title"
+              confirmButton.confirm.label
+          div class="modal-body"
+            confirmButton.confirm.description
+          div class="modal-footer"
+            button.btn.btn-primary click="confirm confirmButton" = confirmButton.confirm.confirm_label
+            button.btn.btn-default click="cancel" data-dismiss="modal" = confirmButton.confirm.cancel_label
