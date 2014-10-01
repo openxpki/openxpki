@@ -142,12 +142,21 @@ sub get_scalar_as_list {
     my $path = shift;
     my @values;
     my $meta = $self->get_meta( $path );
+
+    return unless(defined $meta);
+
     ##! 16: 'node meta ' . Dumper $meta
-    if ($meta && $meta->{TYPE} eq 'list') {
+    if ($meta->{TYPE} eq 'list') {
         @values = $self->get_list( $path );
-    } else {
+    } elsif ($meta->{TYPE} eq 'scalar') {
         my $val = ( $self->get( $path ) );
         @values = ( $val ) if (defined $val);
+    } else {
+        CTX('log')->log(
+            MESSAGE  => "get_scalar_as_list got invalid node type",
+            PRIORITY => "error",
+            FACILITY => "system",
+        );
     }
     ##! 16: 'values ' . Dumper @values
     return @values;
