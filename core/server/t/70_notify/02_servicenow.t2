@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+# This test runs against the public available demo which might be down
+# and ruins the travis results
 
 use Data::Dumper;
 use OpenXPKI::Config::Test;
@@ -18,9 +20,9 @@ my $backend = OpenXPKI::Server::Notification::ServiceNow->new({ config => 'notif
 ok($backend);
 
 my $ret = $backend->notify( {
-	MESSAGE => 'test',
-	VARS => { data => { requestor_name => 'Albert Einstein' } },         
-  	TOKEN => {},    
+    MESSAGE => 'test',
+    VARS => { data => { requestor_name => 'Albert Einstein' } },
+      TOKEN => {},
 });
 
 my $sys_id = $ret->{default}->{sys_id};
@@ -33,8 +35,8 @@ sleep 2;
 
 $ret = $backend->notify( {
     MESSAGE => 'update',
-    VARS => { data => { requestor_name => 'Albert Einstein' } },         
-    TOKEN => $ret,    
+    VARS => { data => { requestor_name => 'Albert Einstein' } },
+    TOKEN => $ret,
 });
 
 ok(  scalar( @{$backend->failed()} ) == 0 );
@@ -43,8 +45,8 @@ sleep 2;
 
 $ret = $backend->notify( {
     MESSAGE => 'close',
-    VARS => { data => { requestor_name => 'Albert Einstein' } },         
-    TOKEN => $ret,    
+    VARS => { data => { requestor_name => 'Albert Einstein' } },
+    TOKEN => $ret,
 });
 
 ok(  scalar( @{$backend->failed()} ) == 0 );
@@ -55,4 +57,3 @@ ok( $resp->{'short_description'} eq 'ServiceNow Notification Test');
 ok( $resp->{state} == 7);
 ok( $resp->{closed_at} ne '');
 
- 

@@ -11,7 +11,6 @@ use strict;
 use warnings;
 
 use lib qw(
-  /usr/lib/perl5/
   ../../lib
 );
 

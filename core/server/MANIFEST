@@ -215,6 +215,8 @@ OpenXPKI/SOAP/Revoke.pm
 ## Workflow
 OpenXPKI/Workflow/Factory.pm
 OpenXPKI/Workflow/Handler.pm
+OpenXPKI/Workflow/Config.pm
+
 
 OpenXPKI/Server/Workflow.pm
 OpenXPKI/Server/Workflow/Pause.pm
@@ -382,7 +384,7 @@ OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
 OpenXPKI/Server/Workflow/Validator/CertIdentifierExists.pm
-
+OpenXPKI/Server/Workflow/Validator/ValidityWindow.pm
 OpenXPKI/Server/Workflow/Validator/Connector.pm
 OpenXPKI/Server/Workflow/Validator/Regex.pm
 
