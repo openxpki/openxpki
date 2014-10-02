@@ -15,21 +15,21 @@ Component = Em.Component.extend
     ).property "content.content.buttons.@each.description"
 
     click: (evt) ->
-        if evt.target.tagName is "A" and evt.target.target != '_blank'
+        target = evt.target
+        if target.tagName is "A" and target.target != '_blank'
             evt.stopPropagation()
             evt.preventDefault()
             @container.lookup("route:openxpki").sendAjax
                 data:
-                    page:evt.target.href.split("#")[1]
-                    target:evt.target.target
+                    page:target.href.split("#")[1]
+                    target:target.target
+        else if target.tagName is "BUTTON" and $(target).hasClass "load-button"
+            $(target).addClass "btn-loading"
 
     confirmButton: null
 
     actions:
         execute: (btn) ->
-            if event.target.tagName is "BUTTON"
-                $(event.target).addClass "btn-loading"
-
             if btn.confirm
                 @set "confirmButton", btn
                 Em.run.scheduleOnce "afterRender", =>
