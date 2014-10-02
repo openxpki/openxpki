@@ -18,3 +18,22 @@ window.Em.Application.initializer({
 });
 
  */
+
+
+
+/* Use the following template to change config options.
+ *
+ * The example replaces the default server url.
+
+window.Em.Application.initializer({
+    name: "oxi-localconfig",
+    initialize: function(container, application) {
+        var cc = application.ConfigController;
+
+        cc.reopen({
+            url: "http://demo.openxpki.org/cgi-bin/webui.fcgi"
+        });
+    }
+});
+
+ */
