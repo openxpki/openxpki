@@ -1,8 +1,0 @@
-
-<validators>
-    <validator name="changemeta_validate_system_id"
-      class="OpenXPKI::Server::Workflow::Validator::Connector">
-       <param name="path" value="metadata.systemid"/>
-       <param name="error" value="I18N_OPENXPKI_WORKFLOW_METADATA_WRONG_SYSTEM_ID"/>
-  </validator>
-</validators>

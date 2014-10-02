@@ -1,45 +1,30 @@
 <openxpki>
-	<workflow_config id="default">
-	  <workflows>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_signing_request.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_signing_request_v2.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_renewal_request.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_publishing.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request_v2.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_crl_issuance.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_enrollment.xml" />
-  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_change_metadata.xml"/>
-	  </workflows>
+    <workflow_config id="default">
+      <workflows>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_signing_request.xml"/>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_def_certificate_revocation_request.xml"/>
+      </workflows>
 
-	  <activities>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_signing_request.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_signing_request_v2.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_renewal_request.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_publishing.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_revocation_request.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_crl_issuance.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_nice.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_enrollment.xml" />
-  	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_change_metadata.xml"/>
-	  </activities>
+      <activities>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_signing_request.xml"/>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_certificate_revocation_request.xml"/>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity_nice.xml"/>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_activity.xml"/>
+      </activities>
 
-	  <validators>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_signing_request.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_revocation_request.xml"/>
-   	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_change_metadata.xml"/>
+      <validators>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_signing_request.xml"/>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator_certificate_revocation_request.xml"/>
         <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_validator.xml"/>
-	  </validators>
+      </validators>
 
-	  <conditions>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_acl.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_nice.xml"/>
-	    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_enrollment.xml" />
-	  </conditions>
+      <conditions>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition.xml"/>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_acl.xml"/>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="workflow_condition_nice.xml"/>
+      </conditions>
 
-	</workflow_config>
+    </workflow_config>
 </openxpki>
 
 

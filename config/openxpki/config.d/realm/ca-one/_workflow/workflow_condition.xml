@@ -65,35 +65,4 @@
     </condition>
 
 
-  <!-- CRL Issue -->
-  <condition name="I18N_OPENXPKI_WF_COND_CRL_SIGNING_NO_CAS_LEFT"
-        class="OpenXPKI::Server::Workflow::Condition::WFArray">
-    <param name="array_name" value="ca_alias_list"/>
-    <param name="condition" value="is_empty"/>
-  </condition>
-
-
-
-    <!-- CSR v2 -->
-    <condition name="csr_cond_is_approved"
-        class="OpenXPKI::Server::Workflow::Condition::Approved">
-        <param name="role" value="RA Operator"/>
-    </condition>
-
-    <condition name="csr_cond_pending_notification_send"
-        class="Workflow::Condition::Evaluate">
-        <param name="test" value="$context-&gt;{flag_pending_notification_send}" />
-    </condition>
-
-    <condition name="csr_cond_server_key_generation"
-        class="Workflow::Condition::Evaluate">
-        <param name="test" value="defined $context-&gt;{key_gen_params}" />
-    </condition>
-
-    <condition name="csr_key_password_server"
-        class="Workflow::Condition::Evaluate">
-        <param name="test" value="$context-&gt;{password_type} eq 'server'" />
-    </condition>
-
-
 </conditions>
