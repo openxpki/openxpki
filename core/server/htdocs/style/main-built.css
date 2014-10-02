@@ -320,8 +320,8 @@ th {
 
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url(style/'../fonts/glyphicons-halflings-regular.eot');
-  src: url(style/'../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url(style/'../fonts/glyphicons-halflings-regular.woff') format('woff'), url(style/'../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url(style/'../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+  src: url('../vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot');
+  src: url('../vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
 .glyphicon {
@@ -8001,11 +8001,11 @@ img.toplogo {
 }
 
 .clonable-icon.clonable-add {
-  background: url("img/add.png") no-repeat scroll left center;
+  background: url("../img/add.png") no-repeat scroll left center;
 }
 
 .clonable-icon.clonable-remove {
-  background: url("img/remove.png") no-repeat scroll left center;
+  background: url("../img/remove.png") no-repeat scroll left center;
 }
 
 /*
@@ -8238,6 +8238,9 @@ tr.gridrow-danger:hover > td {
   white-space: nowrap;
   vertical-align: middle;
   cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   background-image: none;
   border: 1px solid transparent;
@@ -8304,11 +8307,13 @@ div.header div.userinfo {
 
 div.loading {
   opacity: 0;
+  -webkit-transition: opacity 0.75s;
   transition: opacity 0.75s;
 }
 
 div.loading.in-progress {
   opacity: 1;
+  -webkit-transition: opacity 0.1s;
   transition: opacity 0.1s;
 }
 
