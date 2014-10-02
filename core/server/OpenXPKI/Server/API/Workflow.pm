@@ -1025,7 +1025,38 @@ sub __execute_workflow_activity {
 
     ##! 64: Dumper $workflow
     eval {
-        $workflow->execute_action($wf_activity);
+
+        # This is a hack to handle simple "autorun" actions which we use to
+        # create a bypass around optional actions
+
+        do {
+            my $last_state = $workflow->state();
+            $workflow->execute_action($wf_activity);
+
+            my @action = $workflow->get_current_actions();
+            # A single possible action with a name starting with global_skip indicates
+            # that we need the auto execute feature, the second part will (hopefully)
+            # prevent infinite loops in case something goes wrong when running execute
+            if (scalar @action == 1 && $action[0] =~ m{ \A global_skip }xs) {
+                if ($last_state eq $workflow->state() && $wf_activity eq $action[0]) {
+                    OpenXPKI::Exception->throw (
+                        message  => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_AUTO_BYPASS_FOUND_LOOP",
+                        params   => {
+                            STATE => $last_state, ACTION => $wf_activity, ID => $workflow->id(), TYPE => $workflow->type()
+                        }
+                    );
+                }
+                $wf_activity = $action[0];
+                CTX('log')->log(
+                    MESSAGE  => sprintf ("Found internal bypass action, leave state %s in workflow id %01d (type %s)",
+                        $workflow->state(), $workflow->id(), $workflow->type()),
+                    PRIORITY => 'info',
+                    FACILITY => 'workflow',
+                );
+            } else {
+                $wf_activity = '';
+            }
+        } while( $wf_activity );
     };
     if ($EVAL_ERROR) {
         my $eval = $EVAL_ERROR;

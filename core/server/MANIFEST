@@ -230,6 +230,7 @@ OpenXPKI/Server/Workflow/WFObject/WFArray.pm
 OpenXPKI/Server/Workflow/WFObject/WFHash.pm
 
 OpenXPKI/Server/Workflow/Activity.pm
+OpenXPKI/Server/Workflow/Activity/Skip.pm
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 
 OpenXPKI/Server/Workflow/Activity/Noop.pm
@@ -332,6 +333,7 @@ OpenXPKI/Server/Workflow/Observer/Log.pm
 
 # @todo  A lot of those are unused - check what is really needed
 #OpenXPKI/Server/Workflow/Condition/ACL.pm
+OpenXPKI/Server/Workflow/Condition.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysFalse.pm
 OpenXPKI/Server/Workflow/Condition/AlwaysTrue.pm
 OpenXPKI/Server/Workflow/Condition/Approved.pm
@@ -358,6 +360,7 @@ OpenXPKI/Server/Workflow/Condition/CertificateHasStatus.pm
 OpenXPKI/Server/Workflow/Condition/MaxIterationsNotReached.pm
 OpenXPKI/Server/Workflow/Condition/SubjectMatchesPKCS10.pm
 
+OpenXPKI/Server/Workflow/Condition/Connector/Exists.pm
 OpenXPKI/Server/Workflow/Condition/Connector/IsValue.pm
 
 OpenXPKI/Server/Workflow/Condition/SCEPv2/ValidSCEPTID.pm

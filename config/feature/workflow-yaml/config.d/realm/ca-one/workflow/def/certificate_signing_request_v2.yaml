@@ -45,7 +45,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC
         action:
-          - edit_cert_info > BUILD_SUBJECT
+          - edit_cert_info > BUILD_SUBJECT ? profile_has_info_section
+          - global_skip  > BUILD_SUBJECT ? !profile_has_info_section
 
     ENTER_KEY_PASSWORD:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL
@@ -58,7 +59,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC
         action:
-          - edit_san > ENTER_CERT_INFO
+          - edit_san > ENTER_CERT_INFO ? profile_has_san_section
+          - global_skip > ENTER_CERT_INFO ? !profile_has_san_section
 
     ENTER_SUBJECT:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL
@@ -526,6 +528,16 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{password_type} eq 'server'
+
+    profile_has_san_section:
+        class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
+        param:
+            _map_config_path: profile.[% context.cert_profile %].style.[% context.cert_subject_style %].ui.san
+
+    profile_has_info_section:
+        class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
+        param:
+            _map_config_path: profile.[% context.cert_profile %].style.[% context.cert_subject_style %].ui.info
 
 
 field:
