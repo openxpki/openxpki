@@ -19,13 +19,6 @@ sub render_profile_select {
 
     $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
 
-    $self->_page({
-        label => 'Select profile',
-        description => 'The certificate profile defines the key usage and other
-        properties of the issued certficate. The subject styles control the
-        structure of the certificates subject and subject alternative name items.'
-    });
-
     my $wf_info = $args->{WF_INFO};
 
     # Get the list of profiles from the backend - return is a hash with id => hash
@@ -39,7 +32,6 @@ sub render_profile_select {
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
 
     my $cert_profile = $context->{cert_profile} || '';
-    my $cert_subject_style = $context->{cert_subject_style} || '';;
 
     # If the profile is preselected, we need to fetch the options
     my @styles;
@@ -51,10 +43,28 @@ sub render_profile_select {
         @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
     }
 
-    my @fields = (
-        { name => "cert_profile", label => 'Profile', value => $cert_profile, type => 'select', 'options' => \@profiles, actionOnChange => 'profile!get_styles_for_profile', prompt => i18nGettext('I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE') },
-        { name => "cert_subject_style", label => 'Subject Style', value => $cert_subject_style, type => 'select', 'options' => \@styles, prompt => i18nGettext('I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST') },
-    );
+    my @fields;
+    foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
+        my $name = $field->{name};
+        my $item = $self->__render_input_field( $field, $context->{$name} );
+        if ($name eq 'cert_profile') {
+            $item = {
+                %{$item},
+                options => \@profiles,
+                actionOnChange => 'profile!get_styles_for_profile',
+                prompt => $item->{placeholder}, # todo - rename in UI
+            };
+        } elsif ($name eq 'cert_subject_style') {
+            $item = {
+                %{$item},
+                options => \@styles,
+                prompt => $item->{placeholder}, # todo - rename in UI
+            };
+        }
+
+        push @fields, $item;
+    }
+
 
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
@@ -66,7 +76,7 @@ sub render_profile_select {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'proceed',
+            submit_label => 'proceed',
             fields => \@fields
         }},
     ];
@@ -121,17 +131,11 @@ sub render_subject_form {
         wf_fields => $fields,
     });
 
-    $self->_page({
-        label => i18nGettext($wf_info->{WORKFLOW}->{TYPE}),
-        description => i18nGettext($wf_info->{STATE}->{DESCRIPTION}),
-    });
-
-
     $self->_result()->{main} = [{
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'proceed',
+            submit_label => 'proceed',
             fields => $fields
         }},
     ];
@@ -149,15 +153,8 @@ sub render_key_select {
 
     $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
 
-    $self->_page({
-        label => 'Set key parameters',
-        description => ''
-    });
-
     my $wf_info = $args->{WF_INFO};
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
-
-    # TODO - create fieldsets as macros and read names and labels from the Workflow
 
     # Get the list of allowed algorithms
     my $key_alg = $self->send_command( 'get_key_algs', { PROFILE => $context->{cert_profile} });
@@ -166,31 +163,51 @@ sub render_key_select {
        push @key_type, { label => i18nGettext('I18N_OPENXPKI_UI_KEY_ALG_'.uc($alg)) , value => $alg };
     }
 
-    my @fields = (
-        { name => "key_alg", label => i18nGettext('I18N_OPENXPKI_UI_KEY_ALG'), value => undef, type => 'select', 'options' => \@key_type, actionOnChange => 'profile!get_key_param' },
-    );
-
     my $key_gen_param_names = $self->send_command( 'get_key_params', { PROFILE => $context->{cert_profile} });
 
     # current values from context when changing values!
     my $key_gen_param_values = $context->{key_gen_params} ? $self->serializer()->deserialize( $context->{key_gen_params} ) : {};
 
-    foreach my $pn (@{$key_gen_param_names}) {
-        $pn = uc($pn);
-        # We create the label as I18 string from the param name
-        my $label = i18nGettext('I18N_OPENXPKI_UI_KEY_'.$pn);
-        push @fields, { name => "key_gen_params{$pn}", label => $label, value => $key_gen_param_values->{ $pn }, type => 'select', 'options' => [] };
-    }
-
     # Encryption
     my $key_enc = $self->send_command( 'get_key_enc', { PROFILE => $context->{cert_profile} });
     my @enc = map { { value => $_, label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_'.uc($_))  }  } @{$key_enc};
-    push @fields, { name => "enc_alg", label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC'), type => 'select', 'options' => \@enc };
-    push @fields, { name => "csr_type", type => 'hidden', 'value' => 'pkcs10' };
-    push @fields, { name => "password_type", type => 'select', 'options' => [
-        { value => 'server', label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER') },
-        { value => 'client', label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT') },
-    ] };
+
+    my @fields;
+    FIELDS:
+    foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
+        my $name = $field->{name};
+
+        if ($name eq 'key_gen_params') {
+            foreach my $pn (@{$key_gen_param_names}) {
+                $pn = uc($pn);
+                # We create the label as I18 string from the param name
+                my $label = i18nGettext('I18N_OPENXPKI_UI_KEY_'.$pn);
+                push @fields, {
+                    name => "key_gen_params{$pn}",
+                    label => $label,
+                    value => $key_gen_param_values->{ $pn },
+                    type => 'select',
+                    options => []
+                };
+            }
+            next FIELDS;
+        }
+
+        my $item = $self->__render_input_field( $field );
+        $item->{prompt} = $item->{placeholder}; # todo - rename in UI
+        if ($name eq 'key_alg') {
+            $item = {
+                %{$item},
+                options => \@key_type,
+                actionOnChange => 'profile!get_key_param'
+            };
+        } elsif ($name eq 'enc_alg') {
+            $item->{options} = \@enc;
+        } elsif ($name eq 'csr_type') {
+             $item->{value} = 'pkcs10';
+        }
+        push @fields, $item;
+    }
 
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
@@ -217,25 +234,24 @@ sub render_server_password {
     my $class = shift; # static call
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
+    my $wf_action = shift;
 
     $self->logger()->debug( 'render_server_password with args: ' . Dumper $args );
-
-    $self->_page({
-        label => 'The system has generated a password for you, please write it down in a secure place as you will need it to download your private key later.',
-        description => ''
-    });
 
     my $wf_info = $args->{WF_INFO};
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
 
-    # TODO - create fieldsets as macros and read names and labels from the Workflow
-
-    # Get the list of allowed algorithms
-    my $password = $self->send_command( 'get_random', { LENGTH => 16 });
-
-    my @fields = (
-        { name => "_password", label => i18nGettext('I18N_OPENXPKI_UI_PASSWORD'), type => 'passwordverify', 'value' => $password }
-    );
+    my @fields;
+    foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
+        my $value;
+        if ($field->{name} eq '_password') {
+            $value = $self->send_command( 'get_random', { LENGTH => 16 });
+        } else {
+            $value = $context->{$field->{name}};
+        }
+        my $item = $self->__render_input_field( $field, $value );
+        push @fields, $item;
+    }
 
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {

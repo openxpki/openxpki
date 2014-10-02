@@ -222,9 +222,23 @@ sub init_history {
                 { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION_LABEL') },
                 { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_USER_LABEL') },
             ],
-            data => \@result
-        }
+            data => \@result,
+        },
     });
+
+    # add continue button if workflow is not in a final state
+    my $last_state = pop @{$workflow_history};
+    if ($last_state->{'WORKFLOW_STATE'} !~ /(SUCCESS|FAILURE)/) {
+        $self->add_section({
+            type => 'text',
+            content => {
+                buttons => [{
+                    'action' => 'redirect!workflow!load!wf_id!'.$id,
+                    'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'), #'open workflow',
+                }]
+            }
+        });
+    }
 
     return $self;
 
@@ -712,64 +726,20 @@ sub __render_from_workflow {
             my $name = $field->{name};
             next if ($name =~ m{ \A workflow_id }x);
             next if ($name =~ m{ \A wf_ }x);
-            # _ fields are volatile but not hidden (e.g. password input)
-            #next if ($name =~ m{ \A _ }x);
-
-            my $type = $field->{type} || 'text';
-
-            # fields to be filled only by server sided workflows
-            next if ($type eq "server");
-
-            my $item = {
-                name => $name,
-                label => i18nGettext($field->{label}) || $name,
-                type => $type
-            };
-
-            $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
-            $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
-
-
-            if ($field->{option}) {
-                $item->{options} = $field->{option};
-                map {  $_->{label} = i18nGettext($_->{label}) } @{$item->{options}};
-            }
-
-            if ($field->{clonable}) {
-                $item->{clonable} = 1;
-                $item->{name} .= '[]';
-            }
+            next if ($field->{type} && $field->{type} eq "server");
 
             my $val = $self->param($name);
             if ($do_prefill && defined $val) {
                 # XSS prevention - very rude, but if you need to pass something
                 # more sophisticated use the wf_token technique
                 $val =~ s/[^A-Za-z0-9_=,-\. ]//;
-                $item->{value} = $val;
             } elsif (defined $context->{$name}) {
-                # clonables need array as value
-                if ($item->{clonable}) {
-                    if (ref $context->{$name}) {
-                        $item->{value} = $context->{$name};
-                    } elsif($context->{$name} =~ /^ARRAY/) {
-                        my $val = $self->serializer()->deserialize($context->{$name});
-                        # The UI crashes on empty lists
-                        $item->{value} = $val if (scalar @{$val} && defined $val->[0]);
-                    } elsif ($context->{$name}) {
-                        $item->{value} = [ $context->{$name} ];
-                    }
-                } else {
-                    $item->{value} = $context->{$name};
-                }
-            } elsif ($field->{default}) {
-                $item->{value} = $field->{default};
+                $val = $context->{$name};
+            } else {
+                $val = undef;
             }
 
-            if (!$field->{required}) {
-                $item->{is_optional} = 1;
-            }
-
-            push @fields, $item;
+            push @fields, $self->__render_input_field( $field, $val );
 
         }
 
@@ -844,16 +814,14 @@ sub __render_from_workflow {
         my $buttons;
         $buttons = $self->__get_action_buttons( $wf_info ) if (!$args->{VIEW} || $args->{VIEW} ne 'result');
 
-        my @section = {
+        $self->_result()->{main} = [{
             type => 'keyvalue',
             content => {
                 label => '',
                 description => '',
                 data => \@fields,
                 buttons => $buttons
-        }};
-
-        $self->_result()->{main} = \@section;
+        }}];
 
         # set status decorator on final states
         my $desc = $wf_info->{STATE}->{description};
@@ -924,6 +892,74 @@ sub __get_action_buttons {
     }
 
     return \@buttons;
+}
+
+=head2 __render_input_field
+
+Render the UI code for a input field from the server sided definition.
+Does translation of labels and mangles values for multi-valued componentes.
+
+=cut
+
+sub __render_input_field {
+
+    my $self = shift;
+    my $field = shift;
+    my $value = shift;
+
+    my $name = $field->{name};
+    next if ($name =~ m{ \A workflow_id }x);
+    next if ($name =~ m{ \A wf_ }x);
+
+    my $type = $field->{type} || 'text';
+
+    # fields to be filled only by server sided workflows
+    next if ($type eq "server");
+
+    my $item = {
+        name => $name,
+        label => i18nGettext($field->{label}) || $name,
+        type => $type
+    };
+
+    $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
+    $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
+
+    if ($field->{option}) {
+        $item->{options} = $field->{option};
+        map {  $_->{label} = i18nGettext($_->{label}) } @{$item->{options}};
+    }
+
+    if ($field->{clonable}) {
+        $item->{clonable} = 1;
+        $item->{name} .= '[]';
+    }
+
+    if (!$field->{required}) {
+        $item->{is_optional} = 1;
+    }
+
+    if (defined $value) {
+        # clonables need array as value
+        if ($item->{clonable}) {
+            if (ref $value) {
+                $item->{value} = $value;
+            } elsif($value =~ /^ARRAY/) {
+                my $val = $self->serializer()->deserialize($value);
+                # The UI crashes on empty lists
+                $item->{value} = $val if (scalar @{$val} && defined $val->[0]);
+            } elsif ($value) {
+                $item->{value} = [ $value ];
+            }
+        } else {
+            $item->{value} = $value;
+        }
+    } elsif ($field->{default}) {
+        $item->{value} = $field->{default};
+    }
+
+    return $item;
+
 }
 
 =head2 __delegate_call
