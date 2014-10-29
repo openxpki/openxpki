@@ -120,8 +120,6 @@ o:
     description: I18N_OPENXPKI_UI_PROFILE_O_DESC
     type: freetext
     source: O:(.+)
-    min: 0
-    max: 1
     width: 40
 
 ou:

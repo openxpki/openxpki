@@ -130,7 +130,7 @@ sub __fetch_input_element_definitions {
             $ucinput{KEYS} = \@keys;
         }
 
-        if (defined $ucinput{MIN} || $ucinput{MAX}) {
+        if ($ucinput{MIN} || $ucinput{MAX}) {
             $ucinput{CLONABLE} = 1;
         }
 
