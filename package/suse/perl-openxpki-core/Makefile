@@ -27,7 +27,10 @@ perl-dist: dist-clean
 		mv *.tar.gz $(RPMBASE)/SOURCES \
 	)
 
-$(PACKAGE).spec: $(PACKAGE).spec.template
+assert-packager:
+	$(call assert-packager)
+
+$(PACKAGE).spec: assert-packager $(PACKAGE).spec.template
 
 package: $(PACKAGE).spec
 	PERL_LOCAL_LIB_ROOT= PERL_MB_OPT= PERL_MM_OPT= rpmbuild -ba $(PACKAGE).spec
