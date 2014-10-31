@@ -149,25 +149,33 @@ sub execute
 
     # process additional information (user configurable in profile)
     if (defined $context->param('cert_info')) {
-	my $cert_info = $serializer->deserialize($context->param('cert_info'));
-	##! 16: 'additional certificate information: ' . Dumper $cert_info
+    my $cert_info = $serializer->deserialize($context->param('cert_info'));
+    ##! 16: 'additional certificate information: ' . Dumper $cert_info
 
-	foreach my $custom_key (keys %{$cert_info}) {
-	    my $attrib_serial = $dbi->get_new_serial(
-		TABLE => 'CSR_ATTRIBUTES',
-		);
-	    $dbi->insert(
-		TABLE => 'CSR_ATTRIBUTES',
-		HASH  => {
-		    'ATTRIBUTE_SERIAL' => $attrib_serial,
-		    'PKI_REALM'        => $pki_realm,
-		    'CSR_SERIAL'       => $csr_serial,
-		    'ATTRIBUTE_KEY'    => 'custom_' . $custom_key,
-		    'ATTRIBUTE_VALUE'  => $cert_info->{$custom_key},
-		    'ATTRIBUTE_SOURCE' => $source_ref->{'cert_info'},
-		},
-		);
-	}
+    foreach my $custom_key (keys %{$cert_info}) {
+        my $attrib_serial = $dbi->get_new_serial(
+        TABLE => 'CSR_ATTRIBUTES',
+        );
+
+        # We can have array/hash values from the input, need serialize
+        my $value = $cert_info->{$custom_key};
+        if (ref $value) {
+            ##! 32: 'Serializing non scalar item for key ' . $custom_key
+            $value= $serializer->serialize( $value );
+        }
+
+        $dbi->insert(
+        TABLE => 'CSR_ATTRIBUTES',
+        HASH  => {
+            'ATTRIBUTE_SERIAL' => $attrib_serial,
+            'PKI_REALM'        => $pki_realm,
+            'CSR_SERIAL'       => $csr_serial,
+            'ATTRIBUTE_KEY'    => 'custom_' . $custom_key,
+            'ATTRIBUTE_VALUE'  => $value,
+            'ATTRIBUTE_SOURCE' => $source_ref->{'cert_info'},
+        },
+        );
+    }
     }
 
     $dbi->commit();
