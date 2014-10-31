@@ -555,7 +555,7 @@ sub __probe_config {
 
     my $args = shift;
 
-    $ENV{OPENXPKI_CONF_DB} = $args->{CONFIG} if($args->{CONFIG});
+    $ENV{OPENXPKI_CONF_PATH} = $args->{CONFIG} if($args->{CONFIG});
 
     require OpenXPKI::Config;
     my $config = OpenXPKI::Config->new();

@@ -22,14 +22,21 @@ has '+LOCATION' => (
     default => '/etc/openxpki/config.d'
 );
 
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $class = shift;
+
+    my $param = {};
+    # Environment always wins
+    if ( $ENV{OPENXPKI_CONF_PATH} ) {
+        $param->{LOCATION} = $ENV{OPENXPKI_CONF_PATH};
+    }
+    return $class->$orig( $param );
+};
+
 sub _build_config {
 
     my $self = shift;
-
-    # Environment always wins
-    if ( $ENV{OPENXPKI_CONF_PATH} ) {
-        $self->LOCATION(  $ENV{OPENXPKI_CONF_PATH} );
-    }
 
     # Skip the workflow directories
     my $cm    = Config::Merge->new( path => $self->LOCATION(), skip => qr/realm\.\w+\._workflow/ );

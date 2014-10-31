@@ -28,24 +28,25 @@ my %params = (
 sub debug {
     my $arg = shift;
     if ($params{debug}) {
-	print $arg . "\n";
+    print $arg . "\n";
     }
 }
 
 GetOptions(\%params,
-	   qw(
-	        help|?
-		man
-		socketfile=s
-                realm=s
-                authstack=s
-                authuser=s
-                authpass=s
-                command|cmd|c=s
-                param|set=s@
-                arg=s@
-                debug
-	     )) or pod2usage(-verbose => 0);
+       qw(
+            help|?
+            man
+            socketfile=s
+            instance|i=s
+            realm=s
+            authstack=s
+            authuser=s
+            authpass=s
+            command|cmd|c=s
+            param|set=s@
+            arg=s@
+            debug
+         )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
@@ -64,9 +65,9 @@ my $params_is_array = 1;
 foreach my $entry (@parameters) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
     if (! defined $key) {
-		$key = $value = $entry;
+        $key = $value = $entry;
     } else {
-    	 $params_is_array = 0;
+         $params_is_array = 0;
     }
     $parameters{$key} = $value;
 }
@@ -76,16 +77,18 @@ my %args;
 foreach my $entry (@args) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
     if (defined $key) {
-		$args{uc($key)} = $value;
+        $args{uc($key)} = $value;
     } else {
-    	$args{uc($entry)} = 1;
+        $args{uc($entry)} = 1;
     }
 
 }
 
-if(!$params{socketfile}){
-	$params{socketfile} = '/var/openxpki/openxpki.socket';
-	printf("using default socket %s \n", $params{socketfile});
+if($params{instance}){
+    $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
+} elsif(!$params{socketfile}){
+    $params{socketfile} = '/var/openxpki/openxpki.socket';
+    printf("using default socket %s \n", $params{socketfile});
 }
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
@@ -93,7 +96,7 @@ debug(sprintf("Socketfile: %s", $params{socketfile}));
 my $reply;
 my $client = OpenXPKI::Client->new(
     {
-	SOCKETFILE => $params{socketfile},
+    SOCKETFILE => $params{socketfile},
     });
 
 
@@ -116,49 +119,49 @@ while (1) {
     my $status = $reply->{SERVICE_MSG};
 
     if ($status eq 'GET_PKI_REALM') {
-	if (! $params{realm}) {
-	    print "Available PKI realms:\n";
-	    foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
-		print "  $entry\n";
-	    }
-	    die "No --realm specified. Stopped";
-	}
-	$reply = $client->send_receive_service_msg('GET_PKI_REALM',
-						   {
-						       PKI_REALM => $params{realm},
-						   });
-	next SERVICE_MESSAGE;
+    if (! $params{realm}) {
+        print "Available PKI realms:\n";
+        foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
+        print "  $entry\n";
+        }
+        die "No --realm specified. Stopped";
+    }
+    $reply = $client->send_receive_service_msg('GET_PKI_REALM',
+                           {
+                               PKI_REALM => $params{realm},
+                           });
+    next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
-	if (! $params{authstack}) {
-	    print "Available authentication stacks:\n";
-	    foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
-		print "  $entry\n";
-	    }
-	    die "No --authstack specified. Stopped";
-	}
-	$reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
-						   {
-						       AUTHENTICATION_STACK => $params{authstack},
-						   });
-	next SERVICE_MESSAGE;
+    if (! $params{authstack}) {
+        print "Available authentication stacks:\n";
+        foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
+        print "  $entry\n";
+        }
+        die "No --authstack specified. Stopped";
+    }
+    $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
+                           {
+                               AUTHENTICATION_STACK => $params{authstack},
+                           });
+    next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_PASSWD_LOGIN') {
-	if (! $params{authuser}) {
-	    die "No --authuser specified. Stopped";
-	}
-	$reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
-						   {
-						       LOGIN => $params{authuser},
-						       PASSWD => $params{authpass},
-						   });
-	next SERVICE_MESSAGE;
+    if (! $params{authuser}) {
+        die "No --authuser specified. Stopped";
+    }
+    $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
+                           {
+                               LOGIN => $params{authuser},
+                               PASSWD => $params{authpass},
+                           });
+    next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'SERVICE_READY') {
-	last SERVICE_MESSAGE;
+    last SERVICE_MESSAGE;
     }
 
     print Dumper $reply;
@@ -169,7 +172,7 @@ while (1) {
 
 
 if (%parameters) {
-	if ($params_is_array) {
+    if ($params_is_array) {
         my @t = keys(%parameters);
         $args{PARAMS} = \@t;
     } else {
@@ -178,14 +181,14 @@ if (%parameters) {
 }
 
 $reply = $client->send_receive_service_msg('COMMAND', {
-	COMMAND => $command,
-	PARAMS => \%args
+    COMMAND => $command,
+    PARAMS => \%args
 });
 
 if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-	print Dumper $reply->{PARAMS};
-	print "done\n";
-	exit 0;
+    print Dumper $reply->{PARAMS};
+    print "done\n";
+    exit 0;
 } else {
     print "Error:\n";
     print Dumper $reply;
@@ -207,6 +210,7 @@ openxpkicli [options] command
     --help                brief help message
     --man                 full documentation
     --socketfile FILE     OpenXPKI daemon socket file
+    --instance  NAME      Shortcut to set socket on multi-instance configs
     --realm REALM         OpenXPKI realm
     --authstack STACK     authentication stack to use
     --authuser USER       authentication user

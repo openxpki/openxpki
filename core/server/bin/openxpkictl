@@ -27,6 +27,7 @@ GetOptions(\%params,
           help|?
           man
           cfg|cfgfile|conf|config=s
+          instance|i=s
           version
           debug=s@
           quiet
@@ -56,6 +57,8 @@ if ($params{quiet}) {
 
 if (defined $params{cfg}) {
     $args->{CONFIG} = File::Spec->rel2abs($params{cfg});
+} elsif (defined $params{instance}) {
+    $args->{CONFIG} = sprintf '/etc/openxpki/%s/config.d/', $params{instance};
 }
 
 my $cmd = shift;
@@ -125,7 +128,9 @@ openxpkictl [options] COMMAND
  Options:
    --help                brief help message
    --man                 full documentation
-   --config PATH         use configuration from path (config git repo)
+   --config PATH         use configuration from path (base of yaml tree)
+   --instance|i NAME     Shortcut to set the config path to
+                         /etc/openxpki/<instance>/config.d
    --debug  MODULE:LEVEL set MODULE debug level to LEVEL
                          (positive integer value).
                          MODULE defaults to '.*'
@@ -186,7 +191,12 @@ Prints the manual page and exits.
 =item B<--config PATH>
 
 Use PATH to point to the configuration repository.
-Defaults to /etc/openxpki/config.git
+Defaults to /etc/openxpki/config.d
+
+=item B<--instance NAME>
+
+Shortcut to set the config path when running multiple instances
+using the proposed config path layout.
 
 =item B<--version>
 

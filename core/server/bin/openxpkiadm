@@ -27,7 +27,7 @@ use OpenXPKI::VERSION;
 use Data::Dumper;
 
 my %params;
-my @options_spec = ('config=s');
+my @options_spec = ('config=s','instance|i=s');
 my $cmd = shift || 'help';
 my $ret = 255;
 
@@ -79,27 +79,6 @@ sub initdb {
         }
     }
     return 0;
-}
-
-
-sub loadcfg {
-
-    if ($params{path}) {
-        # we set the ENV as this
-        # a) can split a string
-        # b) otherwise an external set ENV will override the parameter
-        $ENV{OPENXPKI_CONF_PATH} = $params{path};
-    }
-
-    require OpenXPKI::Config::Merge;
-    my $config = OpenXPKI::Config::Merge->new();
-    printf "Current Tree Version: %s\n", $config->version();
-
-    if ($params{reload}) {
-        OpenXPKI::Control::reload();
-    }
-    return;
-
 }
 
 
@@ -1344,36 +1323,24 @@ sub __init {
     if ($params{config}) {
         # we set the ENV here to outrule an external ENV setting and to have
         # it ready for the reload action (needed to find the correct pidfile)
-        $ENV{OPENXPKI_CONF_DB} = $params{config};
+        $ENV{OPENXPKI_CONF_PATH} = $params{config};
+    } elsif ($params{instance}) {
+        $ENV{OPENXPKI_CONF_PATH} = sprintf '/etc/openxpki/%s/config.d', $params{instance};
+        print "config path " . $ENV{OPENXPKI_CONF_PATH};
     }
 
 }
 
 if ($cmd eq 'initdb') {
 
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned'], SILENT => 1,});
-
     push @options_spec, qw(dry-run force);
     __init();
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned'], SILENT => 1,});
     $ret = initdb();
-
-} elsif ($cmd eq 'loadcfg') {
-
-    push @options_spec, qw(
-        path=s
-        config|dbpath=s
-        reload
-    );
-    __init();
-    $ret = loadcfg();
 
 } elsif ($cmd eq 'certificate') {
 
     my $subcmd = shift;
-
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
-
-
 
     if ($subcmd eq 'id') {
 
@@ -1382,6 +1349,8 @@ if ($cmd eq 'initdb') {
             format=s
         );
         __init();
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+
         $ret = certificate_id();
 
     } elsif ($subcmd eq 'import') {
@@ -1398,6 +1367,9 @@ if ($cmd eq 'initdb') {
             );
 
         __init();
+
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+
         if (!$params{file}) {
             die "You need to specify the certificate to import with --file\n";
         }
@@ -1420,6 +1392,9 @@ if ($cmd eq 'initdb') {
             force-is-issuer
         );
         __init();
+
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+
         $ret = certificate_remove();
 
     } elsif ($subcmd eq 'chain') {
@@ -1432,6 +1407,9 @@ if ($cmd eq 'initdb') {
             force-issuer-certificate-not-found
         );
         __init();
+
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+
         $ret = certificate_chain();
 
     } elsif ($subcmd eq 'list') {
@@ -1442,13 +1420,14 @@ if ($cmd eq 'initdb') {
             v+
         );
         __init();
+
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+
         $ret = certificate_list();
     }
 
 
 } elsif ($cmd eq 'alias') {
-
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend'], SILENT => 1, CLI => 1});
 
     push @options_spec, qw(
       alias=s
@@ -1463,6 +1442,8 @@ if ($cmd eq 'initdb') {
       identifier=s
     );
     __init();
+
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend'], SILENT => 1, CLI => 1});
 
     if (!$params{realm}) {
         die "You must specify a realm using --realm\n";
@@ -1483,12 +1464,12 @@ if ($cmd eq 'initdb') {
 
     if ($subcmd eq 'list') {
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi_backend'], SILENT => 1,});
-
         push @options_spec, qw(
           realm=s
         );
         __init();
+
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi_backend'], SILENT => 1,});
 
         if (!$params{realm}) {
             die "You must specify a realm using --realm\n";
@@ -1537,7 +1518,9 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
 
  Global options:
    --config DIR          Location of the configuration repository
-                         optional, defaults to /etc/openxpki/config.git
+                         optional, defaults to /etc/openxpki/config.d
+   --instance|i NAME     Shortcut to set the config path to
+                         /etc/openxpki/<instance>/config.d
 
  Commands:
    help                  brief help message
