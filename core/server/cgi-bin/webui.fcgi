@@ -11,13 +11,34 @@ use Log::Log4perl qw(:easy);
 use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix);
 use OpenXPKI::Client::UI;
 
-Log::Log4perl->init('/etc/openxpki/webui/log.conf');
+my $configfile = '/etc/openxpki/webui/default.conf';
+
+# check for explicit file in env
+if ($ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE}
+    && -f $ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE}) {
+    $configfile = $ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE};
+}
+
+read_config $configfile => my %config;
+
+if ($config{global}{log_config} && -f $config{global}{log_config}) {
+    Log::Log4perl->init( $config{global}{log_config} );
+} else {
+    Log::Log4perl->easy_init({ level => $DEBUG });
+}
 
 # i18n
 set_locale_prefix ('/usr/share/locale');
 set_language      ('en_US');
 
 my $log = Log::Log4perl->get_logger();
+
+if (!$config{global}{socket}) {
+    $config{global}{socket} = '/var/openxpki/openxpki.socket';
+}
+if (!$config{global}{scripturl}) {
+    $config{global}{scripturl} = '/cgi-bin/webui.cgi';
+}
 
 $log->info('Start fcgi loop ' . $$);
 
@@ -34,10 +55,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $client = OpenXPKI::Client::UI->new({
             session => $session_front,
             logger => $log,
-            config => {
-                socket => '/var/openxpki/openxpki.socket',
-                scripturl => '/cgi-bin/webui.fcgi'
-            }
+            config => $config{global}
         });
         $result = $client->handle_request({ cgi => $cgi });
         $log->debug('request handled');
