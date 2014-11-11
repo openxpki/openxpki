@@ -1,9 +1,10 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use CGI;
 use CGI::Session;
 use JSON;
 use English;
+use strict;
 use warnings;
 use Data::Dumper;
 use Config::Std;

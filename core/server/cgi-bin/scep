@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 ## CGI script for the OpenXPKI SCEP server
 ##
 ## Written by Oliver Welter OpenXPKI Project

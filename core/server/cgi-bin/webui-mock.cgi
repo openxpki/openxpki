@@ -1,5 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+
 use strict;
+use warnings;
 
 use CGI;
 #use CGI::Carp qw (fatalsToBrowser);
@@ -312,40 +314,40 @@ sub handle {
                              label => 'WF Test 2',
                              target => 'tab',
                             },
-                            
+
                         ],
                         'columns' => [
-            						{ sTitle => "title" },
-            						{ sTitle => "description" },
-            						
-            						{ sTitle => "date_issued",format => 'timestamp'}
-            						
-            					] ,
-            	        'data' => [
-            	            ['Workflow 1','sldkjflsdjflksjd flkjsd f 1',1379587708],
-            	            ['Workflow 2','wertkwer ,sndf ksd f 2',1379587799],
-            	            ['Workflow 3','asldkhlsadkjf lkasjd  3',1312158770],
-            	            ['Workflow 4','wksghrkjqhwekjhqwkjeh 4',1376687708],
-            	        ],   
+                                    { sTitle => "title" },
+                                    { sTitle => "description" },
+
+                                    { sTitle => "date_issued",format => 'timestamp'}
+
+                                ] ,
+                        'data' => [
+                            ['Workflow 1','sldkjflsdjflksjd flkjsd f 1',1379587708],
+                            ['Workflow 2','wertkwer ,sndf ksd f 2',1379587799],
+                            ['Workflow 3','asldkhlsadkjf lkasjd  3',1312158770],
+                            ['Workflow 4','wksghrkjqhwekjhqwkjeh 4',1376687708],
+                        ],
                         }
             }
         ]};
-    
+
 }elsif($page eq 'my_certificates'){
-   
+
     return {page=>{'label' => 'My certificates','description'=>'only one action assigned to grid'},main=>[
             {type => 'grid',
                     processing_type => 'all',
                     content => {
                          actions => [
-                            
+
                             {path => 'test_text',target=>'modal',
                              label => 'Grid Main action',
                             },
-                            
+
                         ],
                         buttons => [
-                                
+
                                 {page => 'test_key_value',label=>'Key Value (in Tab)',target=>'tab'},
                                 {page => 'test_text',label=>'Plain text (in Tab)',target=>'tab'},
                                 {page => 'test_text',label=>'Plain text (no target)'},
