@@ -107,6 +107,7 @@ sub init_info {
     # TODO - Need to decide of we use buttons or links
     my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!$cert_identifier!format!";
     my @buttons = (
+        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_INSTALL'), 'href' => $base.'install' },
         { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM'), 'href' => $base.'pem' },
         { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER'), 'page' => $base.'der', target => '_blank' },
         # core bug see #185 { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT'), 'page' => $base.'txt', target => '_blank' },
@@ -128,6 +129,7 @@ sub init_info {
         sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
         sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
         $privkey.
+        sprintf ($pattern, 'install', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_INSTALL')).
         '</ul>'
     };
 
@@ -345,32 +347,34 @@ sub init_download {
 
     } else {
 
-        my $cert = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => uc($format) });
         my $cert_info = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
-
         $self->logger()->debug("cert info " . Dumper $cert_info );
-
 
         my $content_type = 'application/octet-string';
         my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
 
+        my $cert_format = 'DER';
+
         if ($format eq 'txt') {
             $content_type = 'text/plain';
+            $cert_format = 'TXT';
             $filename .= '.txt';
         } elsif ($format eq 'pem') {
-            $filename .= '.pem';
-        } elsif ($format eq 'der') {
             $filename .= '.crt';
-        }
-
-        if ($format eq 'pem' || $format eq 'der') {
-            # need special content type on ca certs
+            $cert_format = 'PEM';
+        } elsif ($format eq 'der') {
+            $filename .= '.cer';
+        } else {
+            # Default is to send the certifcate for install in binary / der form
+            $filename .= '.cer';
             if ($cert_info->{ISSUER_IDENTIFIER} eq $cert_info->{IDENTIFIER}) {
                 $content_type = 'application/x-x509-ca-cert';
             } else {
                 $content_type = 'application/x-x509-user-cert';
             }
         }
+
+        my $cert = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => $cert_format});
 
         print $self->cgi()->header( -type => $content_type, -expires => "1m", -attachment => $filename );
         print $cert;
@@ -518,11 +522,12 @@ sub action_search {
         content => {
             header => 'Grid-Headline',
             actions => [{
-                path => 'certificate!download!identifier!{identifier}',
+                path => 'certificate!info!identifier!{identifier}',
                 label => 'Download',
                 icon => 'download',
                 target => 'modal'
-            },{
+            }],
+            'noop' => [{
                 path => 'certificate!detail!identifier!{identifier}',
                 label => 'Detailed Information',
                 icon => 'view',
