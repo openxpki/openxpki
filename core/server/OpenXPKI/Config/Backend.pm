@@ -48,8 +48,11 @@ sub _build_config {
     # List the realms from the system.realms tree
     foreach my $realm (keys %{$tree->{system}->{realms}}) {
         # TODO - MIGRATION - We load the xml code now to workflow.xml
-        my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => $self->LOCATION()."/realm/$realm/_workflow/workflow.xml");
-        $tree->{realm}->{$realm}->{workflow}->{xml} = $xml_cache->get_serialized();
+        my $xml = $self->LOCATION()."/realm/$realm/_workflow/workflow.xml";
+        if (-e $xml) {
+            my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => $xml);
+            $tree->{realm}->{$realm}->{workflow}->{xml} = $xml_cache->get_serialized();
+        }
     }
 
     return $tree;

@@ -64,8 +64,11 @@ sub parser {
     # List the realms from the system.realms tree
     foreach my $realm (keys %{$tree->{system}->{realms}}) {
         # TODO - MIGRATION - We load the xml code now to workflow.xml
-        my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => "$dir/realm/$realm/_workflow/workflow.xml");
-        $tree->{realm}->{$realm}->{workflow}->{xml} = $xml_cache->get_serialized();
+        my $xml = "$dir/realm/$realm/_workflow/workflow.xml";
+        if (-e $xml) {
+            my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => $xml);
+            $tree->{realm}->{$realm}->{workflow}->{xml} = $xml_cache->get_serialized();
+        }
     }
     $params->{comment} = 'import from ' . $dir . ' using Config::Merge';
     $self->commit( $tree, @_, $params );

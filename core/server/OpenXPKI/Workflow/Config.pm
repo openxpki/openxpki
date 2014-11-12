@@ -25,6 +25,7 @@ has '_config' => (
     is => 'rw',
     isa => 'Object',
     required => 0,
+    lazy => 1, # This is fundamental! (race condition within loader -> empty ref)
     default => sub { return CTX('config'); }
 );
 
