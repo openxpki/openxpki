@@ -268,17 +268,18 @@ sub handle_login {
 
     # Special handling for pki_realm and stack params
     if ($action eq 'login!realm' && $cgi->param('pki_realm')) {
-        $session->{'pki_realm'} = $cgi->param('pki_realm');
-        $session->{'auth_stack'} = undef;
+        $session->param('pki_realm', $cgi->param('pki_realm'));
+        $session->param('auth_stack', undef);
         $self->logger()->debug('set realm in session: ' . $cgi->param('pki_realm') );
     }
     if($action eq 'login!stack' && $cgi->param('auth_stack')) {
-        $session->{'auth_stack'} = $cgi->param('auth_stack');
+        $session->param('auth_stack', $cgi->param('auth_stack'));
         $self->logger()->debug('set auth_stack in session: ' . $cgi->param('auth_stack') );
     }
 
-    my $pki_realm = $session->{'pki_realm'} || $ENV{OPENXPKI_PKI_REALM} || '';
-    my $auth_stack =  $session->{'auth_stack'} || $ENV{OPENXPKI_AUTH_STACK} || '';
+    my $pki_realm = $session->param('pki_realm') || $ENV{OPENXPKI_PKI_REALM} || '';
+    my $auth_stack =  $session->param('auth_stack') || $ENV{OPENXPKI_AUTH_STACK} || '';
+
 
     my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
 

@@ -41,6 +41,8 @@ $log->debug('check for cgi session');
 
 my $session_front = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
+our $cookie = { -name => 'CGISESSID', -value => $session_front->id };
+
 $log->debug('session id (front) is '. $session_front->id);
 
 if (!$config{global}{socket}) {
@@ -52,6 +54,34 @@ if (!$config{global}{scripturl}) {
 
 my $result;
 eval {
+
+    # Set the path to the directory component of the script, this
+    # automagically creates seperate cookies for path based realms
+    if ($config{global}{realm_mode} eq "path") {
+
+        my $script_path = $ENV{'REQUEST_URI'};
+        # Strip off last word of the path and discard query string
+        $script_path =~ s|\/([^\/]+)((\?.*)?)$||;
+        $cookie->{path} = $script_path;
+
+        $log->debug('script path is ' . $script_path);
+
+        # if the session has no realm set, try to get a realm from the map
+        if (!$session_front->param('pki_realm')) {
+            $script_path =~ qq|\/([^\/]+)\/|;
+            my $script_realm = $1;
+            if (!$config{realm}{$script_realm}) {
+                die "Url based realm requested but no realm found for $script_realm!";
+            }
+            $session_front->param('pki_realm', $config{realm}{$script_realm});
+            $log->debug('Path to realm: ' .$config{realm}{$script_realm});
+        }
+    } elsif ($config{global}{realm_mode} eq "fixed") {
+        # Fixed realm mode, mode must be defined in the config
+        $session_front->param('pki_realm', $config{global}{realm});
+    }
+
+
     my $client = OpenXPKI::Client::UI->new({
         session => $session_front,
         logger => $log,
@@ -77,10 +107,10 @@ if (!$result || ref $result !~ /OpenXPKI::Client::UI/) {
     my $accept = $cgi->http('HTTP_ACCEPT');
     my $xreq = $cgi->http('HTTP_X-REQUESTED-WITH');
     if ($accept =~ /json/ || $xreq) {
-        print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $session_front->id), -type => 'application/json' );
+        print $cgi->header( -cookie=> $cgi->cookie( $cookie ), -type => 'application/json' );
         print $json->encode( { status => { 'level' => 'error', 'message' => $error } });
     } else {
-        print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $session_front->id), -type => 'text/html' );
+        print $cgi->header( -cookie=> $cgi->cookie( $cookie ), -type => 'text/html' );
         print $cgi->start_html( -title => $error );
         print "<h1>An error occured</h1><p>$error</p>";
         print $cgi->end_html;

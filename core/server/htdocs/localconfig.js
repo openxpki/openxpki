@@ -23,17 +23,18 @@ window.Em.Application.initializer({
 
 /* Use the following template to change config options.
  *
- * The example replaces the default server url.
+ * The example replaces the default server url by a relative one  
+ * this is the recommended setting when using url path based realms 
 
 window.Em.Application.initializer({
     name: "oxi-localconfig",
     initialize: function(container, application) {
         var cc = application.ConfigController;
-
         cc.reopen({
-            url: "http://demo.openxpki.org/cgi-bin/webui.fcgi"
+            url: "cgi-bin/webui.fcgi"
         });
     }
 });
 
  */
+

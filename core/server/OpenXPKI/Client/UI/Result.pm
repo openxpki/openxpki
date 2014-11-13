@@ -326,7 +326,8 @@ sub render {
     } else {
         # Start output stream
         my $cgi = $self->cgi();
-        print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => 'application/json; charset=UTF-8' );
+
+        print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => 'application/json; charset=UTF-8' );
         print $body;
     }
 
@@ -360,7 +361,7 @@ sub init_fetch {
 
     # Start output stream
     my $cgi = $self->cgi();
-    print $cgi->header( -cookie=> $cgi->cookie(CGISESSID => $self->_client()->session()->id), -type => $data->{mime}, -attachment => $data->{attachment} );
+    print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => $data->{mime}, -attachment => $data->{attachment} );
     print $data->{data};
     exit;
 
