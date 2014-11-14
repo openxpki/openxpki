@@ -1492,6 +1492,9 @@ if ($cmd eq 'initdb') {
     }
 
     $ret = hash_password();
+} elsif ($cmd eq 'version') {
+    print "Version (core): " . $OpenXPKI::VERSION::VERSION . "\n";
+    $ret = 0;
 }
 
 
