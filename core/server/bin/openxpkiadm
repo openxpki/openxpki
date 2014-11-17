@@ -721,17 +721,30 @@ sub alias_list {
 
     my $dbi = __get_dbi();
     my $alias;
+    my $db_alias;
     my $cert;
+    my $filter = $params{filter} || 'current';
+
+    # Prepare template for where part based on filter
+    my $where = { 'PKI_REALM' => { VALUE => $realm } };
+    my $limit;
+    if ($filter ne 'all') {
+        # not all => active or current
+        my $now = time();
+        $where->{'NOTBEFORE'} = { VALUE => $now, OPERATOR => 'LESS_THAN' };
+        $where->{'NOTAFTER'}  = { VALUE => $now, OPERATOR => 'GREATER_THAN' };
+
+        # Current is only the latest one
+        if ($filter ne 'active') {
+            $limit = 1;
+        }
+    }
 
     # Load the list of exisiting aliased groups as there can be custom tokens
     # outside the main groups (e.g. alternative scep tokens)
     my $db_results = $dbi->select(
-        TABLE   => 'ALIASES',
-        DYNAMIC => {
-            'PKI_REALM' => { VALUE => $realm },
-            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
-        },
+        TABLE  => 'ALIASES',
+        'DYNAMIC' => $where,
         'ORDER' => [ 'NOTBEFORE' ],
         'REVERSE' => 1,
     );
@@ -749,27 +762,32 @@ sub alias_list {
         my $group = $groups->{$type};
         print "$group ($type):\n";
 
-        $alias = $dbi->first(
+        $where->{'GROUP_ID'} = { VALUE => $group };
+
+        $db_alias = $dbi->select(
             TABLE   => 'ALIASES',
-            DYNAMIC => {
-                'PKI_REALM' => { VALUE => $realm },
-                'GROUP_ID' => { VALUE => $group },
-                'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
-            },
+            DYNAMIC =>  $where,
+            LIMIT => $limit,
             'ORDER' => [ 'NOTBEFORE' ],
             'REVERSE' => 1,
         );
 
-        $cert = $dbi->first(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
-        );
+        foreach my $alias (@{$db_alias}) {
+            $cert = $dbi->first(
+                TABLE   => 'CERTIFICATE',
+                DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+            );
 
-        __alias_print( $alias, $cert );
+            __alias_print( $alias, $cert );
+        }
 
-       # unset in anon group list
-       delete $anon_groups{$group};
+        # print empty message if none found
+        if (!scalar @{$db_alias}) {
+            __alias_print( undef, undef );
+        }
+
+        # unset in anon group list
+        delete $anon_groups{$group};
 
     }
 
@@ -778,24 +796,24 @@ sub alias_list {
 
         print "$group:\n";
 
-        $alias = $dbi->first(
+        $where->{'GROUP_ID'} = { VALUE => $group };
+
+        $db_alias = $dbi->select(
             TABLE   => 'ALIASES',
-            DYNAMIC => {
-                'PKI_REALM' => { VALUE => $realm },
-                'GROUP_ID' => { VALUE => $group },
-                'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-                'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
-            },
+            DYNAMIC =>  $where,
+            LIMIT => $limit,
             'ORDER' => [ 'NOTBEFORE' ],
             'REVERSE' => 1,
         );
 
-        $cert = $dbi->first(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
-        );
+        foreach my $alias (@{$db_alias}) {
+            $cert = $dbi->first(
+                TABLE   => 'CERTIFICATE',
+                DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+            );
 
-        __alias_print( $alias, $cert );
+            __alias_print( $alias, $cert );
+        }
 
     }
 
@@ -1439,6 +1457,7 @@ if ($cmd eq 'initdb') {
       gen|generation=s
       group=s
       token=s
+      filter=s
       identifier=s
     );
     __init();
@@ -1745,7 +1764,7 @@ There are different ways to deal with aliases:
 
 =over
 
-=item B<list active functional tokens>
+=item B<list functional tokens>
 
 If you pass a realm but no identifier, you will receive the list of
 active tokens for the functional token groups, the current root certificate
@@ -1759,6 +1778,10 @@ is shown in brackets:
         Identifier: xGBSVo6N-9gpjB8UFll4TS-u-Eo
         NotBefore : 2014-01-01 00:00:00 (2013-06-17 13:54:34)
         NotAfter  : 2016-12-31 23:59:59 (2020-06-17 13:54:34)
+
+To show a list of all or all active tokens, you can add the filter parameter:
+
+   --filter all or --filter active
 
 
 =item B<add functional token with automatic group discovery>
