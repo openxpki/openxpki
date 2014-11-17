@@ -7,8 +7,8 @@ RewriteRule ^([a-z0-9-]+)$ http://%{HTTP_HOST}/$1/ [L,R=301,NC]
 # Redirect access to the cgi handler 
 RewriteRule ^([a-z0-9-]+)/cgi-bin/webui.fcgi /cgi-bin/webui.fcgi  [L,NC]
 # Map all other resources to the newoxi subdir 
-RewriteCond %{REQUEST_FILENAME} ! -f 
-RewriteCond %{REQUEST_FILENAME} ! -d
+RewriteCond %{REQUEST_FILENAME} !-f 
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([a-z0-9-]+)/(.*) /var/www/newoxi/$2 [L,NC]
 
 
