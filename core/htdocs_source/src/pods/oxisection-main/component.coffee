@@ -16,7 +16,10 @@ Component = Em.Component.extend
 
     click: (evt) ->
         target = evt.target
-        if target.tagName is "A" and target.target != '_blank'
+
+        return if $(target).hasClass "oxi-link-ignore"
+
+        if target.tagName is "A" and target.target isnt "_blank"
             evt.stopPropagation()
             evt.preventDefault()
             @container.lookup("route:openxpki").sendAjax
