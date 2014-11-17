@@ -139,10 +139,38 @@ WHAT ELSE IS NEEDED
 What neither port nor package installs (but what is crucially needed for 
 the OpenXPKI operation), is 
 
-- your favorite web server and its prerequisites,
-- your favorite database and its prerequisites.
-
-For a list of supported web servers and databases, have a look at 
-
-http://openxpki.org
+- Enable utf8 locale (e.g. en_US.utf8) for the translation staff to operate
+(translation is needed even for English language).
+- Install your favorite database (enable utf8 support),
+   e.g. databases/mysql56-server
+Install perl interface for your favorite database,
+   e.g. databases/p5-DBD-mysql
+- Install your favorite web server.
+(For a list of supported web servers and databases, have a look at 
+   http://openxpki.org )
+This port has created user:group as openxpki:openxpki
+Add a line: "User openxpki" to configuration of your OpenXPKI-related
+web server. Choose from two versions of the handler: based on CGI or FastCGI
+perl core modules.
+- Perform deployment procedure for OpenXPKI in a regular way,
+without this OpenXPKI server would not start.
+- Start daemons in this order:
+1) database server,
+2) OpenXPKI server (PREFIX/etc/rc.d/openxpki start)
+    (PREFIX defaults to "/usr/local"),
+3) web server.
+- Docs installed (if you opted so) into DOCSDIR
+    (DOCSDIR defaults to "PREFIX/share/doc/openxpki")
+- If you want your PKI server to play a role of the simplest CA,
+then copy sample configuration for this case with
+cp -R EXAMPLESDIR/openxpki/* %%PREFIX%%/etc/openxpki/
+    (EXAMPLESDIR defaults to "PREFIX/share/examples/openxpki")
+and follow advice at:
+https://openxpki.readthedocs.org/en/latest/quickstart.html
+- Mind FreeBSD specific file structure:
+PREFIX/etc/openxpki: server configuration, logs configuration.
+/var/openxpki: pid file, socket file, ...
+/var/openxpki/session: session files.
+/var/log/openxpki: server log files.
+/var/tmp: temporary directory.
 =============================================================
