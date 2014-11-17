@@ -209,10 +209,13 @@ sub param {
         # We need to fetch from cgi as array for multivalues
         if (wantarray) {
             my @raw = $cgi->param($key);
-            @raw = map { decode utf8 => $_ } @raw;
+            @raw = map { $_ =~ s/^\s+|\s+$//g; decode utf8 => $_ } @raw;
             return @raw;
         }
-        return decode utf8 => $cgi->param($key);
+
+        my $str = $cgi->param($key);
+        $str =~ s/^\s+|\s+$//g;
+        return $str;
 
     }
 
