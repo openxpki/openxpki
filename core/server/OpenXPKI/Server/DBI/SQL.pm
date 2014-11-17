@@ -907,13 +907,13 @@ sub select {
         );
     }
     if (exists $args->{DYNAMIC})
-    {         
+    {
         foreach my $dynamic_key (keys %{$args->{DYNAMIC}})
         {
             # To support the old syntax where only the value was passed as a scalar (or list),
             # we autoconvert it and issue a warning.
             if (ref $args->{DYNAMIC}->{$dynamic_key} ne 'HASH') {
-                ##! 1: ' UPDATE WARNING - autoconverting to new syntax, please fix! Key: ' .  $dynamic_key . ' - Dump ' . Dumper $args->{DYNAMIC}->{$dynamic_key}  
+                ##! 1: ' UPDATE WARNING - autoconverting to new syntax, please fix! Key: ' .  $dynamic_key . ' - Dump ' . Dumper $args->{DYNAMIC}->{$dynamic_key}
                 $args->{DYNAMIC}->{$dynamic_key} = { VALUE => $args->{DYNAMIC}->{$dynamic_key} };
                 CTX('log')->log(
                     MESSAGE  => "Old SQL DYNAMIC Syntax found - please fix!",
@@ -921,17 +921,17 @@ sub select {
                     FACILITY => 'system',
                 );
             }
-            
+
             # check the structure
             if (  not ref $args->{DYNAMIC}->{$dynamic_key}
                 or not ref $args->{DYNAMIC}->{$dynamic_key} eq "HASH" )
             {
                 OpenXPKI::Exception->throw (
-        	        message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_NO_HASH_REFERENCE",
-        	        params  => {
-        		    TABLE  => $table_args,
-        		    COLUMN => $dynamic_key,
-        	    });
+                    message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_DYNAMIC_PARAM_NO_HASH_REFERENCE",
+                    params  => {
+                    TABLE  => $table_args,
+                    COLUMN => $dynamic_key,
+                });
             }
             if ( not exists $args->{DYNAMIC}->{$dynamic_key}->{VALUE} ) {
                 OpenXPKI::Exception->throw(
@@ -1109,6 +1109,7 @@ sub select {
 
     if (@order_specs) {    # only order if we actually have columns by which
                            # we can order
+        my @real_order;
         if ( exists $args->{ORDER} ) {
             ##! 16: 'order argument exists ...'
             ##! 64: 'order specs: ' . Dumper \@order_specs
@@ -1117,7 +1118,6 @@ sub select {
             }
             my @order = @{ $args->{ORDER} };
             ##! 16: 'order: ' . Dumper \@order
-            my @real_order;
             foreach my $order_arg (@order) {
                 my ( $col, $tab ) = $self->__get_symbolic_column_and_table($order_arg);
                 $col = $self->{schema}->get_column($col);
@@ -1140,12 +1140,14 @@ sub select {
                 }
                 push @order_specs, $entry;
             }
+        } else {
+            @real_order = @order_specs;
         }
 
         if ( $args->{REVERSE} ) {
-            $query .= ' ORDER BY ' . join( ' DESC, ', reverse @order_specs ) . ' DESC';
+            $query .= ' ORDER BY ' . join( ' DESC, ', reverse @real_order ) . ' DESC';
         } else {
-            $query .= ' ORDER BY ' . join( ', ', reverse @order_specs );
+            $query .= ' ORDER BY ' . join( ', ', reverse @real_order );
         }
     }
 
@@ -1173,12 +1175,12 @@ sub select {
         push @result, [@tab];
     }
     if (defined $sth->err) {
-	OpenXPKI::Exception->throw(
-				   message => 'I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_FETCHROW_RETURNED_ERROR',
-				   params  => {
-				       ERROR => $sth->errstr,
-				   },
-				   );
+    OpenXPKI::Exception->throw(
+                   message => 'I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_FETCHROW_RETURNED_ERROR',
+                   params  => {
+                       ERROR => $sth->errstr,
+                   },
+                   );
     }
     $self->{DBH}->finish_sth();
 
@@ -1248,13 +1250,13 @@ MODE must be FORCE, otherwise this method will throw an exception.
 =head3 insert
 
 expects TABLE and DATA. DATA is a hash reference which includes the
-names and values of the used columns of the table. A column is 
+names and values of the used columns of the table. A column is
 NULL if the column is not present in the hash.
 
 =head3 update
 
 expects TABLE, WHERE and DATA. DATA is a hash reference which includes the
-names and values of the used columns of the table. A column is 
+names and values of the used columns of the table. A column is
 NULL if the column is not present in the hash. WHERE is a hash reference
 which includes the parameters for the where clause. All parameters
 are required. General updates are not allowed.
@@ -1298,8 +1300,8 @@ not implemented
 
 =head3 __get_symbolic_column_and_table
 
-Expects a string argument (arg). 
-Returns a two element array containing (arg, undef) if no '.' is 
+Expects a string argument (arg).
+Returns a two element array containing (arg, undef) if no '.' is
 contained in the string.
 Returns a two element array containing (first, second) if the string
 looks like 'first.second'.
@@ -1408,7 +1410,7 @@ The scalars contained in the array ref should have the form TABLE.COLUMN,
 with table being one of the tables specified in the TABLES argument.
 
 In the common invocation mode, TABLE is an arrayref containing scalar
-table names. In this case the join uses these as table names. 
+table names. In this case the join uses these as table names.
 
 Example:
 
@@ -1416,7 +1418,7 @@ Example:
 
 If you wish to reference one table more than once (e. g. for matching
 multiple tuples from one single table) you can assign a symbolic name
-to the table. In this case the TABLE arrayref should contain another 
+to the table. In this case the TABLE arrayref should contain another
 arrayref containing two entries, such as follows for the table 'bar'.
 
 Example:
@@ -1427,10 +1429,10 @@ Example:
 =item * JOIN
 
 Array reference containing array references specifying the join condition.
-The length of the inner arrayref (join condition) must be identical 
-to the number of the TABLEs to join. 
+The length of the inner arrayref (join condition) must be identical
+to the number of the TABLEs to join.
 Each scalar element in the join condition may be either undef (which means
-that the corresponding table will not be part of the join condition) or 
+that the corresponding table will not be part of the join condition) or
 a column name in the corresponding table. If the element
 is defined, an SQL AND statement will be formed between the previous
 defined element and the current one in order to form the join.
@@ -1448,32 +1450,32 @@ See the example below to get an idea how this is meant to work.
 
     # return these columns
     COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL', 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY', 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_VALUE' ],
-    
+
     JOIN => [
-	#  on first table     second table       third
-	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    #  on first table     second table       third
+    [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
         # a hypothetical additional join condition only using the columns
         # WORKFLOW_CONTEXT.FOO and WORKFLOW_HISTORY.BAR
         # (just for illustration purposes):
-	# [ undef, 'FOO', 'BAR' ],
+    # [ undef, 'FOO', 'BAR' ],
     ],
     DYNAMIC => {
-	'WORKFLOW_HISTORY.WORKFLOW_DESCRIPTION' => { VALUE => 'Added context value somekey-3->somevalue: 100043'},
+    'WORKFLOW_HISTORY.WORKFLOW_DESCRIPTION' => { VALUE => 'Added context value somekey-3->somevalue: 100043'},
     },
     );
 
 This results in the following query:
 
- SELECT 
-    workflow.workflow_id, 
-    workflow_context.workflow_context_key, 
-    workflow_context.workflow_context_value 
- FROM workflow, workflow_context, workflow_history 
- WHERE workflow.workflow_id=workflow_context.workflow_id 
-   AND workflow_context.workflow_id=workflow_history.workflow_id 
-   AND workflow_history.workflow_description like ? 
- ORDER BY workflow.workflow_id, 
-   workflow_context.workflow_context_key, 
+ SELECT
+    workflow.workflow_id,
+    workflow_context.workflow_context_key,
+    workflow_context.workflow_context_value
+ FROM workflow, workflow_context, workflow_history
+ WHERE workflow.workflow_id=workflow_context.workflow_id
+   AND workflow_context.workflow_id=workflow_history.workflow_id
+   AND workflow_history.workflow_description like ?
+ ORDER BY workflow.workflow_id,
+   workflow_context.workflow_context_key,
    workflow_context.workflow_context_value
 
 =head4 Join example 2
@@ -1484,40 +1486,40 @@ This results in the following query:
 
     # return these columns
     COLUMNS => [ 'WORKFLOW.WORKFLOW_SERIAL', 'context1.WORKFLOW_CONTEXT_VALUE', 'context2.WORKFLOW_CONTEXT_VALUE' ],
-    
+
     JOIN => [
-	#  on first table     second table       third
-	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    #  on first table     second table       third
+    [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'context1.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-5'},
-	'context1.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100045'},
-	'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-7'},
-	'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100047'},
+    'context1.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-5'},
+    'context1.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100045'},
+    'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'somekey-7'},
+    'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => 'somevalue: 100047'},
     },
     );
 
 This results in the following query:
 
- SELECT 
-    workflow.workflow_id, 
-    context1.workflow_context_value 
-    context2.workflow_context_value 
+ SELECT
+    workflow.workflow_id,
+    context1.workflow_context_value
+    context2.workflow_context_value
  FROM workflow, workflow_context as context1, workflow_context as context2
- WHERE workflow.workflow_id=context1.workflow_id 
-   AND context1.workflow_id=context2.workflow_id 
+ WHERE workflow.workflow_id=context1.workflow_id
+   AND context1.workflow_id=context2.workflow_id
    AND context1.workflow_context_key like ?
    AND context1.workflow_context_value like ?
    AND context2.workflow_context_key like ?
    AND context2.workflow_context_value like ?
- ORDER BY workflow.workflow_id, 
-   context1.workflow_context_value, 
+ ORDER BY workflow.workflow_id,
+   context1.workflow_context_value,
    context2.workflow_context_value
 
 
 =head4 Validity specification for single table queries
 
-Adding the named parameter VALID_AT limits the returned results to entries 
+Adding the named parameter VALID_AT limits the returned results to entries
 with a NOTBEFORE and a NOTAFTER date. Depending on if the query is
 a single-table query or a join, the argument of VALID_AT is interpreted
 differently.
@@ -1526,8 +1528,8 @@ For single-table queries the argument may either be a single scalar value
 or a arrayref. Each individual value of these may be either an
 integer number or a DateTime object.
 
-If an integer value is passed, the value is interpreted as seconds 
-since epoch. As an alternative, it is also possible to pass a 
+If an integer value is passed, the value is interpreted as seconds
+since epoch. As an alternative, it is also possible to pass a
 DateTime object instead of an epoch value.
 
 Only those entries are returned which match the validity specification.
@@ -1569,15 +1571,15 @@ Example:
 
     # return these columns
     COLUMNS => [ 'CERTIFICATE.SUBJECT' ],
-    
+
     JOIN => [
-	#  on first table second table
-	[ 'IDENTIFIER', 'IDENTIFIER' ],
+    #  on first table second table
+    [ 'IDENTIFIER', 'IDENTIFIER' ],
     ],
     #             first table            second table (no notbefore -> undef)
     VALID_AT => [ [ time, time + 3600 ], undef ],
     DYNAMIC => {
-	'CERTIFICATE_ATTRIBUTES.ATTRIBUTE_KEY' => { VALUE => 'somekey-5'},
+    'CERTIFICATE_ATTRIBUTES.ATTRIBUTE_KEY' => { VALUE => 'somekey-5'},
     },
     );
 
@@ -1599,31 +1601,31 @@ the column. In this case the value must be one of 'MIN', 'MAX', 'COUNT' or
     TABLE => [ 'WORKFLOW', 'WORKFLOW_CONTEXT' ],
 
     # return these columns
-    COLUMNS => [ 
-	{ 
-	    COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
-	    AGGREGATE => 'MAX',
-	},
-	'WORKFLOW.WORKFLOW_SERIAL', 
+    COLUMNS => [
+    {
+        COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
+        AGGREGATE => 'MAX',
+    },
+    'WORKFLOW.WORKFLOW_SERIAL',
     ],
     JOIN => [
-	#  on first table     second table   
-	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    #  on first table     second table
+    [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'WORKFLOW.WORKFLOW_SERIAL' => { VALUE => '10004'},
+    'WORKFLOW.WORKFLOW_SERIAL' => { VALUE => '10004'},
     },
     );
 
 results in the following query:
 
- SELECT 
+ SELECT
     MAX(workflow_context.workflow_context_key),
     workflow.workflow_id
  FROM workflow, workflow_context
- WHERE workflow.workflow_id=workflow_context.workflow_id 
+ WHERE workflow.workflow_id=workflow_context.workflow_id
    AND workflow_context.workflow_id=?
- ORDER BY workflow_context.workflow_context_key, 
+ ORDER BY workflow_context.workflow_context_key,
    workflow.workflow_id
 
 
@@ -1634,31 +1636,31 @@ results in the following query:
     TABLE => [ 'WORKFLOW', 'WORKFLOW_CONTEXT' ],
 
     # return these columns
-    COLUMNS => [ 
-	{ 
-	    COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
-	    DISTINCT => 1,
-	},
-	'WORKFLOW.WORKFLOW_SERIAL', 
+    COLUMNS => [
+    {
+        COLUMN   => 'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
+        DISTINCT => 1,
+    },
+    'WORKFLOW.WORKFLOW_SERIAL',
     ],
     JOIN => [
-	#  on first table     second table   
-	[ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
+    #  on first table     second table
+    [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
     ],
     DYNAMIC => {
-	'WORKFLOW.WORKFLOW_SERIAL' => { VALUE => '10004'},
+    'WORKFLOW.WORKFLOW_SERIAL' => { VALUE => '10004'},
     },
     );
 
 results in the query
 
- SELECT 
+ SELECT
     DISTINCT workflow_context.workflow_context_key
     workflow.workflow_id
  FROM workflow, workflow_context
- WHERE workflow.workflow_id=workflow_context.workflow_id 
+ WHERE workflow.workflow_id=workflow_context.workflow_id
    AND workflow_context.workflow_id=?
- ORDER BY workflow_context.workflow_context_key, 
+ ORDER BY workflow_context.workflow_context_key,
    workflow.workflow_id
 
 =head4 Distinct results
