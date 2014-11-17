@@ -595,6 +595,7 @@ field:
         placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_PLACEHOLDER
         tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP
         type: hidden
+        default: pkcs10
         required: 0
 
     enc_alg:
