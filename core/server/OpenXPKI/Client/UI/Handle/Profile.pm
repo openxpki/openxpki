@@ -47,6 +47,7 @@ sub render_profile_select {
     foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
         my $name = $field->{name};
         my $item = $self->__render_input_field( $field, $context->{$name} );
+
         if ($name eq 'cert_profile') {
             $item = {
                 %{$item},
@@ -286,7 +287,8 @@ sub __translate_form_def {
         my $new = {
             name => $field_name.'{'.$field->{ID}.'}',
             label => i18nGettext($field->{LABEL}),
-            default => $field->{DEFAULT},
+            tooltip => i18nGettext($field->{DESCRIPTION}),
+            default => $field->{DEFAULT}, # Default is used as placeholder!
             value => $values->{$field->{ID}}
         };
 

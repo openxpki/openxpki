@@ -922,8 +922,8 @@ sub __render_input_field {
         type => $type
     };
 
-    $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
-    $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
+    $item->{placeholder} = i18nGettext($field->{placeholder}) if ($field->{placeholder});
+    $item->{tooltip} = i18nGettext($field->{tooltip}) if ($field->{tooltip});
 
     if ($field->{option}) {
         $item->{options} = $field->{option};
