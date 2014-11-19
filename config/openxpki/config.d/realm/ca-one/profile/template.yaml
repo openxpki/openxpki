@@ -85,8 +85,8 @@ hostname:
 
 hostname2:
     id: hostname2
-    label: I18N_OPENXPKI_UI_PROFILE_HOSTNAME
-    description: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC
+    label: I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME
+    description: I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME_DESC
     type: freetext
     source: CN:([^:]+)
     match: \A [A-Za-z\d\-\.]+ \z

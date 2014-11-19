@@ -60,8 +60,8 @@ action:
 
     publish_crl:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_I18N_OPENXPKI_WF_ACTION_CRL_ISSUANCE_PUBLISH_CRL_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_DESC
         input:
           - ca_alias
         param:
