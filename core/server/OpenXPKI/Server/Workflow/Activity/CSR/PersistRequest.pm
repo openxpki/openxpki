@@ -44,13 +44,6 @@ sub execute
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDEFINED',
         );
     }
-    my $role    = $context->param('cert_role') || '';
-    # Role is no longer mandatory
-    #if (! defined $role) {
-    #    OpenXPKI::Exception->throw(
-    #        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_ROLE_UNDEFINED',
-    #    );
-    #}
 
     my $data;
     if ($type eq 'spkac') {
@@ -78,7 +71,6 @@ sub execute
             'DATA'       => $data,
             'PROFILE'    => $profile,
             'SUBJECT'    => $subject,
-            'ROLE'       => $role,
         },
     );
 

@@ -88,7 +88,6 @@ my %COLUMN_of = (
     LAST_UPDATE           => "last_update",
     NEXT_UPDATE           => "next_update",
     PUBLICATION_DATE      => "publication_date",
-    ROLE                  => "role",
     PROFILE               => "profile",
     PUBKEY                => "public_key",
     NOTAFTER              => "notafter",
@@ -96,7 +95,7 @@ my %COLUMN_of = (
     SCEP_TID              => "scep_tid",
     LOA                   => "loa",
     PUBLIC                => "public_cert",
-    
+
     STATUS                => "status",
     SERIAL                => "object_serial",
     TABLE                 => "object_type",
@@ -119,13 +118,13 @@ my %COLUMN_of = (
     WORKFLOW_TYPE         => "workflow_type",
     WORKFLOW_STATE        => "workflow_state",
     WORKFLOW_LAST_UPDATE  => "workflow_last_update",
-    
-    #columns for pause/resume-Feature: 
+
+    #columns for pause/resume-Feature:
     WORKFLOW_PROC_STATE   => "workflow_proc_state",
     WORKFLOW_WAKEUP_AT    => "workflow_wakeup_at",
     WORKFLOW_COUNT_TRY    => "workflow_count_try",
     WORKFLOW_REAP_AT      => "workflow_reap_at",
-        
+
     WORKFLOW_ACTION       => "workflow_action",
     WORKFLOW_DESCRIPTION  => "workflow_description",
     WORKFLOW_USER         => "workflow_user",
@@ -140,9 +139,9 @@ my %COLUMN_of = (
     DATAPOOL_VALUE        => "datapool_value",
     ENCRYPTION_KEY        => "encryption_key",
     DATAPOOL_LAST_UPDATE  => "last_update",
-    
+
     # generation id for alias groups
-    GENERATION          => "generation",     
+    GENERATION          => "generation",
     );
 
 
@@ -161,14 +160,13 @@ my %TABLE_of = (
         INDEX   => [ "PKI_REALM", "CSR_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "CSR_SERIAL",
                      "TYPE",  # SPKAC, PKCS#10, IE...
-		     "DATA",  # the pkcs#10/spkac request
-		     "PROFILE", 
-		     "LOA",
+             "DATA",  # the pkcs#10/spkac request
+             "PROFILE",
+             "LOA",
                      "SUBJECT",
-                     "ROLE",
-		     # "PUBKEY",
-		     # "RA",
-	    ]},
+             # "PUBKEY",
+             # "RA",
+        ]},
 
     # CSR attributes, e. g.
     # 'subject_alt_name'
@@ -178,10 +176,10 @@ my %TABLE_of = (
         NAME    => "csr_attributes",
         INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CSR_SERIAL" ],
         COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CSR_SERIAL",
-		     "ATTRIBUTE_KEY", 
-		     "ATTRIBUTE_VALUE",
+             "ATTRIBUTE_KEY",
+             "ATTRIBUTE_VALUE",
                      "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
-	    ],
+        ],
     },
     CRR => {
         NAME    => 'crr',
@@ -196,20 +194,20 @@ my %TABLE_of = (
 #        NAME    => "crr_attributes",
 #        INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL" ],
 #        COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL",
-#		     "ATTRIBUTE_KEY", 
+#		     "ATTRIBUTE_KEY",
 #		     "ATTRIBUTE_VALUE",
 #                     "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
 #	    ],
 #    },
-    
+
     CERTIFICATE => {
         NAME    => "certificate",
         INDEX   => [ "ISSUER_IDENTIFIER", "CERTIFICATE_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL",
-		     "ISSUER_IDENTIFIER", "IDENTIFIER", "DATA", 
+             "ISSUER_IDENTIFIER", "IDENTIFIER", "DATA",
                      # "GLOBAL_KEY_ID",
-                     "SUBJECT", "EMAIL",
-                     "STATUS", "ROLE", "PUBKEY",
+                     "SUBJECT",
+                     "STATUS", "PUBKEY",
                      "SUBJECT_KEY_IDENTIFIER", "AUTHORITY_KEY_IDENTIFIER",
                      "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL"
                    ]},
@@ -217,16 +215,16 @@ my %TABLE_of = (
     CERTIFICATE_ATTRIBUTES => {
         NAME    => "certificate_attributes",
         INDEX   => [ "ATTRIBUTE_SERIAL", "IDENTIFIER", ],
-        COLUMNS => [ "ATTRIBUTE_SERIAL", "IDENTIFIER", 
-		     "ATTRIBUTE_KEY", 
-		     "ATTRIBUTE_VALUE",
-	    ],
+        COLUMNS => [ "ATTRIBUTE_SERIAL", "IDENTIFIER",
+             "ATTRIBUTE_KEY",
+             "ATTRIBUTE_VALUE",
+        ],
     },
 
     ALIASES => {
-	   NAME    => 'aliases',
-	   INDEX   => [ 'PKI_REALM', 'ALIAS' ],
-	   COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', 'GROUP_ID','GENERATION', 'NOTAFTER', 'NOTBEFORE' ],
+       NAME    => 'aliases',
+       INDEX   => [ 'PKI_REALM', 'ALIAS' ],
+       COLUMNS => [ 'IDENTIFIER', 'PKI_REALM', 'ALIAS', 'GROUP_ID','GENERATION', 'NOTAFTER', 'NOTBEFORE' ],
     },
 
     CRL => {
@@ -234,10 +232,10 @@ my %TABLE_of = (
         INDEX   => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "ISSUER_IDENTIFIER", "CRL_SERIAL",
                      "DATA",
-                     "LAST_UPDATE", 
-		     "NEXT_UPDATE",
-		     "PUBLICATION_DATE",
-	    ]},
+                     "LAST_UPDATE",
+             "NEXT_UPDATE",
+             "PUBLICATION_DATE",
+        ]},
 
     AUDITTRAIL => {
         NAME    => "audittrail",
@@ -273,18 +271,18 @@ my %TABLE_of = (
         NAME    => "workflow",
         INDEX   => [ "WORKFLOW_SERIAL" ],
         COLUMNS => [ "WORKFLOW_SERIAL",
-		     "PKI_REALM",
-		     "WORKFLOW_TYPE",
-		     "WORKFLOW_STATE",
-		     "WORKFLOW_LAST_UPDATE",
+             "PKI_REALM",
+             "WORKFLOW_TYPE",
+             "WORKFLOW_STATE",
+             "WORKFLOW_LAST_UPDATE",
 
-		     "WORKFLOW_PROC_STATE",
+             "WORKFLOW_PROC_STATE",
              "WORKFLOW_WAKEUP_AT",
              "WORKFLOW_COUNT_TRY",
              "WORKFLOW_REAP_AT",
              "WORKFLOW_SESSION",
              "WATCHDOG_KEY",
-	    ]},
+        ]},
 
 #     WORKFLOW_VERSION => {
 #         NAME    => "workflow_version",
@@ -299,27 +297,27 @@ my %TABLE_of = (
         NAME    => "workflow_history",
         INDEX   => [ "WORKFLOW_HISTORY_SERIAL" ],
         COLUMNS => [ "WORKFLOW_HISTORY_SERIAL",
-		     "WORKFLOW_SERIAL",
-		     "WORKFLOW_ACTION",
-		     "WORKFLOW_DESCRIPTION",
-		     "WORKFLOW_STATE",
-		     "WORKFLOW_USER",
-		     "WORKFLOW_HISTORY_DATE",
-	    ]},
+             "WORKFLOW_SERIAL",
+             "WORKFLOW_ACTION",
+             "WORKFLOW_DESCRIPTION",
+             "WORKFLOW_STATE",
+             "WORKFLOW_USER",
+             "WORKFLOW_HISTORY_DATE",
+        ]},
 
     WORKFLOW_CONTEXT => {
         NAME    => "workflow_context",
         INDEX   => [ "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY", ],
         COLUMNS => [ "WORKFLOW_SERIAL", "WORKFLOW_CONTEXT_KEY",
-		     "WORKFLOW_CONTEXT_VALUE",
-	    ]},
+             "WORKFLOW_CONTEXT_VALUE",
+        ]},
 
 
     WORKFLOW_ATTRIBUTES => {
         NAME    => "workflow_attributes",
         INDEX   => [ "WORKFLOW_SERIAL", "ATTRIBUTE_KEY", ],
-        COLUMNS => [ "WORKFLOW_SERIAL", 
-             "ATTRIBUTE_KEY", 
+        COLUMNS => [ "WORKFLOW_SERIAL",
+             "ATTRIBUTE_KEY",
              "ATTRIBUTE_VALUE",
         ],
     },
@@ -328,13 +326,13 @@ my %TABLE_of = (
         NAME    => "datapool",
         INDEX   => [ "PKI_REALM", "NAMESPACE", "DATAPOOL_KEY", ],
         COLUMNS => [ "PKI_REALM",
-		     "NAMESPACE",
-		     "DATAPOOL_KEY",
-		     "DATAPOOL_VALUE",
-		     "ENCRYPTION_KEY",
-		     "NOTAFTER",
-		     "DATAPOOL_LAST_UPDATE",
-	    ]},
+             "NAMESPACE",
+             "DATAPOOL_KEY",
+             "DATAPOOL_VALUE",
+             "ENCRYPTION_KEY",
+             "NOTAFTER",
+             "DATAPOOL_LAST_UPDATE",
+        ]},
 
     );
 
@@ -351,10 +349,6 @@ my %INDEX_of = (
         NAME => "cert_csr_serial_index",
         TABLE => "CERTIFICATE",
         COLUMNS => [ "CSR_SERIAL" ]},
-    CERTIFICATE_ROLE => {
-        NAME => "cert_role_index",
-        TABLE => "CERTIFICATE",
-        COLUMNS => [ "ROLE" ]},
     CERTIFICATE_SUBJECT => {
         NAME => "cert_subject_index",
         TABLE => "CERTIFICATE",
@@ -379,15 +373,11 @@ my %INDEX_of = (
     CSR_SUBJECT => {
         NAME => "csr_subject_index",
         TABLE => "CSR",
-        COLUMNS => [ "SUBJECT" ]},        
+        COLUMNS => [ "SUBJECT" ]},
     CSR_PROFILE => {
         NAME => "csr_profile_index",
         TABLE => "CSR",
         COLUMNS => [ "PROFILE" ]},
-    CSR_ROLE => {
-        NAME => "csr_role_index",
-        TABLE => "CSR",
-        COLUMNS => [ "ROLE" ]},
     WORKFLOW_PKI_REALM => {
         NAME => "workflow_pki_realm_index",
         TABLE => "WORKFLOW",
@@ -429,31 +419,31 @@ my %INDEX_of = (
 #        NAME    => "data_column_string_index",
 #        TABLE   => "DATA",
 #        COLUMNS => [ "COLUMN_NAME", "STRING" ]},
-      
+
     CERTIFICATE_REALM => {
-		NAME  => 'cert_realm_index',
-		TABLE => 'CERTIFICATE',
-		COLUMNS => [ 'PKI_REALM' ],
+        NAME  => 'cert_realm_index',
+        TABLE => 'CERTIFICATE',
+        COLUMNS => [ 'PKI_REALM' ],
     },
     CERTIFICATE_CSRSERIAL_IDENTIFIER => {
-		NAME  => 'cert_csrid_index',
-		TABLE => 'CERTIFICATE',
-		COLUMNS => [ 'CSR_SERIAL' ],
-    },    
+        NAME  => 'cert_csrid_index',
+        TABLE => 'CERTIFICATE',
+        COLUMNS => [ 'CSR_SERIAL' ],
+    },
     WORKFLOW_HISTORY_WFSERIAL => {
-		NAME  => 'wf_hist_wfserial_index',
-		TABLE => 'WORKFLOW_HISTORY',
-		COLUMNS => [ 'WORKFLOW_SERIAL' ],
+        NAME  => 'wf_hist_wfserial_index',
+        TABLE => 'WORKFLOW_HISTORY',
+        COLUMNS => [ 'WORKFLOW_SERIAL' ],
     },
     WORKFLOW_REALM => {
-		NAME  => 'wf_realm_index',
-		TABLE => 'WORKFLOW',
-		COLUMNS => [ 'PKI_REALM' ],
-    },    
+        NAME  => 'wf_realm_index',
+        TABLE => 'WORKFLOW',
+        COLUMNS => [ 'PKI_REALM' ],
+    },
     WORKFLOW_CONTEXT_KEY => {
-		NAME  => 'wf_context_key_index',
-		TABLE => 'WORKFLOW_CONTEXT',
-		COLUMNS => [ 'WORKFLOW_CONTEXT_KEY' ],
+        NAME  => 'wf_context_key_index',
+        TABLE => 'WORKFLOW_CONTEXT',
+        COLUMNS => [ 'WORKFLOW_CONTEXT_KEY' ],
     },
     WORKFLOW_ATTRIBUTES_WORKFLOW_KEY => {
         NAME  => 'wf_attributes_key_index',
@@ -481,7 +471,7 @@ sub get_column
 {
     my $self = shift;
     my $column = shift;
-    
+
     __check_param($column);
 
     if (not exists $COLUMN_of{$column})
@@ -513,13 +503,13 @@ sub get_table_name
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_NAME_UNKNOWN_TABLE",
             params  => {
-		TABLE => $table,
-	    });
+        TABLE => $table,
+        });
     }
     if (defined $NAMESPACE) {
-	return $NAMESPACE . '.' . $TABLE_of{$table}->{NAME};
+    return $NAMESPACE . '.' . $TABLE_of{$table}->{NAME};
     } else {
-	return $TABLE_of{$table}->{NAME};
+    return $TABLE_of{$table}->{NAME};
     }
 }
 
@@ -535,8 +525,8 @@ sub get_table_index
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_INDEX_UNKNOWN_TABLE",
             params  => {
-		TABLE => $table,
-	    });
+        TABLE => $table,
+        });
     }
 
     return $TABLE_of{$table}->{INDEX};
@@ -554,8 +544,8 @@ sub get_table_columns
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_TABLE_COLUMNS_UNKNOWN_TABLE",
             params  => {
-		TABLE => $table,
-	    });
+        TABLE => $table,
+        });
     }
 
     return $TABLE_of{$table}->{COLUMNS};
@@ -580,14 +570,14 @@ sub get_sequence_name
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_SEQUENCE_NAME_UNKNOWN_SEQUENCE",
             params  => {
-		SEQUENCE => $sequence,
-	    });
+        SEQUENCE => $sequence,
+        });
     }
 
     if (defined $NAMESPACE) {
-	return $NAMESPACE . '.' . $SEQUENCE_of{$sequence};
+    return $NAMESPACE . '.' . $SEQUENCE_of{$sequence};
     } else {
-	return $SEQUENCE_of{$sequence};
+    return $SEQUENCE_of{$sequence};
     }
 }
 
@@ -610,8 +600,8 @@ sub get_index_name
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_NAME_UNKNOWN_INDEX",
             params  => {
-		INDEX => $index,
-	    });
+        INDEX => $index,
+        });
     }
 
     return $INDEX_of{$index}->{NAME};
@@ -629,8 +619,8 @@ sub get_index_table
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_TABLE_UNKNOWN_INDEX",
             params  => {
-		INDEX => $index,
-	    });
+        INDEX => $index,
+        });
     }
 
     return $INDEX_of{$index}->{TABLE};
@@ -648,8 +638,8 @@ sub get_index_columns
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_GET_INDEX_COLUMNS_UNKNOWN_INDEX",
             params  => {
-		INDEX => $index,
-	    });
+        INDEX => $index,
+        });
     }
 
     return $INDEX_of{$index}->{COLUMNS};
@@ -683,21 +673,21 @@ sub __check_param {
 
     # check if argument is specified
     if (! defined $arg || ($arg eq "")) {
-	$exception = "NOT_SET";
+    $exception = "NOT_SET";
     }
 
     # argument should be only alphanumeric
     if (! defined $exception &&
-	($arg !~ m{ \A \w+ \z }xms)) {
-	$exception = "NOT_ALPHANUMERIC";
+    ($arg !~ m{ \A \w+ \z }xms)) {
+    $exception = "NOT_ALPHANUMERIC";
     }
 
     # argument should be upper case only
     if (! defined $exception &&
-	($arg ne uc($arg))) {
-	$exception = "NOT_UPPERCASE_ONLY";
+    ($arg ne uc($arg))) {
+    $exception = "NOT_UPPERCASE_ONLY";
     }
-    
+
     # NOTE: in order to add more checks here follow this pattern:
     #if (! defined $exception &&
     #    CONDITION) {
@@ -706,21 +696,21 @@ sub __check_param {
 
     # checks passed
     if (! defined $exception) {
-	return 1;
+    return 1;
     }
 
     # throw exception with caller information
     my ($package, $filename, $line, $subroutine, $hasargs,
-	$wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
-    
+    $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
+
     OpenXPKI::Exception->throw (
-	message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_CHECK_PARAMETER_" . $exception,
-	params  => {
-	    PACKAGE => $package,
-	    CALLER  => $subroutine,
-	    PARAMETER => (defined $arg ? $arg : ""),
-	},
-	);
+    message => "I18N_OPENXPKI_SERVER_DBI_SCHEMA_CHECK_PARAMETER_" . $exception,
+    params  => {
+        PACKAGE => $package,
+        CALLER  => $subroutine,
+        PARAMETER => (defined $arg ? $arg : ""),
+    },
+    );
 }
 
 1;

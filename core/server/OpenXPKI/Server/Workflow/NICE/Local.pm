@@ -230,7 +230,6 @@ sub issueCertificate {
         {
             certificate => $certificate,
             ca_identifier => $ca_token->get_instance()->get_cert_identifier(),
-            cert_role => $csr->{ROLE},
             csr_serial  => $csr_serial
         },
         {}

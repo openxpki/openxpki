@@ -255,7 +255,6 @@ sub get_cert {
         $return_ref->{BODY}->{NOTBEFORE} = $return_ref->{BODY}->{NOTBEFORE}->epoch();
         $return_ref->{BODY}->{NOTAFTER}  = $return_ref->{BODY}->{NOTAFTER}->epoch();
         $return_ref->{STATUS}            = $hash->{STATUS};
-        $return_ref->{ROLE}              = $hash->{ROLE};
         $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
         $return_ref->{CSR_SERIAL}        = $hash->{CSR_SERIAL};
         $return_ref->{PKI_REALM}         = $hash->{PKI_REALM};
@@ -557,9 +556,7 @@ sub search_cert {
         'CERTIFICATE.ISSUER_IDENTIFIER',
         'CERTIFICATE.IDENTIFIER',
         'CERTIFICATE.SUBJECT',
-        'CERTIFICATE.EMAIL',
         'CERTIFICATE.STATUS',
-        'CERTIFICATE.ROLE',
         'CERTIFICATE.PUBKEY',
         'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
         'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
@@ -599,7 +596,7 @@ sub search_cert {
     $params{REVERSE} = 1;
     $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL'];
 
-	# PKI_REALM overwrites the session realm if it is present
+    # PKI_REALM overwrites the session realm if it is present
     foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS PKI_REALM SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
         if ( $args->{$key} ) {
             $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
@@ -632,7 +629,7 @@ sub search_cert {
 
     # FIXME - need this for trust anchor and cross realm search
     if ( $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'}->{VALUE} eq '_ANY' ) {
-    	delete $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'};
+        delete $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'};
     }
 
     # handle certificate attributes (such as SANs)
@@ -995,9 +992,9 @@ sub validate_certificate {
     # Single PEM certificate, try to load the chain from the database
     if ($arg_ref->{PEM} && !ref $arg_ref->{PEM}) {
 
-    	##! 8: 'PEM certificate'
-    	my $x509 = OpenXPKI::Crypto::X509->new( DATA => $arg_ref->{PEM}, TOKEN => $default_token );
-    	my $cert_identifier = $x509->get_identifier();
+        ##! 8: 'PEM certificate'
+        my $x509 = OpenXPKI::Crypto::X509->new( DATA => $arg_ref->{PEM}, TOKEN => $default_token );
+        my $cert_identifier = $x509->get_identifier();
 
         ##! 16: 'cert_identifier ' . $cert_identifier
         my $chain = CTX('api')->get_chain({
@@ -1017,16 +1014,16 @@ sub validate_certificate {
 
         if ($arg_ref->{PKCS7}) {
 
-	        ##! 8: 'PKCS7 container'
-	        # returns the certificate from the p7 in order, entity first
-	        @signer_chain = @{ $default_token->command({
-	            COMMAND => 'pkcs7_get_chain',
-	            PKCS7 => $arg_ref->{PKCS7},
-	        }) };
+            ##! 8: 'PKCS7 container'
+            # returns the certificate from the p7 in order, entity first
+            @signer_chain = @{ $default_token->command({
+                COMMAND => 'pkcs7_get_chain',
+                PKCS7 => $arg_ref->{PKCS7},
+            }) };
 
         } else {
-        	##! 8: 'PEM Array'
-        	@signer_chain = @{ $arg_ref->{PEM} };
+            ##! 8: 'PEM Array'
+            @signer_chain = @{ $arg_ref->{PEM} };
         }
 
         ##! 32: 'Chain ' . Dumper @signer_chain
@@ -1046,9 +1043,9 @@ sub validate_certificate {
                 PKI_REALM => '_ANY'
             });
         } else {
-        	my $issuer_subject = $last_in_chain->get_parsed('BODY','ISSUER');
-        	##! 16: ' Search issuer by subject ' .$issuer_subject
-        	$result = CTX('api')->search_cert({
+            my $issuer_subject = $last_in_chain->get_parsed('BODY','ISSUER');
+            ##! 16: ' Search issuer by subject ' .$issuer_subject
+            $result = CTX('api')->search_cert({
                 SUBJECT => $issuer_subject,
                 PKI_REALM => '_ANY'
             });
@@ -1057,47 +1054,47 @@ sub validate_certificate {
         # Nothing found - check if the issuer is already selfsigned
         if (!$result->[0]) {
             if ($last_in_chain->get_parsed('BODY','ISSUER') ne $last_in_chain->get_parsed('BODY','SUBJECT')) {
-            	##! 16: 'No issuer on top of pkcs7 found'
+                ##! 16: 'No issuer on top of pkcs7 found'
                 return { STATUS => 'NOROOT', CHAIN => \@signer_chain };
             } else {
-            	##! 16: 'Self-Signed pkcs7 chain'
-            	$chain_status = 'UNTRUSTED';
+                ##! 16: 'Self-Signed pkcs7 chain'
+                $chain_status = 'UNTRUSTED';
             }
         } else {
             ##! 32: 'Result ' . Dumper $result
-        	# Check if it is already a root certificate (most likely it is)
-        	if ($result->[0]->{'ISSUER_IDENTIFIER'} eq
-        	  $result->[0]->{'IDENTIFIER'}) {
-        	   	##! 16: 'Next issuer is already a trusted root'
+            # Check if it is already a root certificate (most likely it is)
+            if ($result->[0]->{'ISSUER_IDENTIFIER'} eq
+              $result->[0]->{'IDENTIFIER'}) {
+                   ##! 16: 'Next issuer is already a trusted root'
 
-        	    # Load the PEM from the database
-        	    my $issuer_cert = CTX('api')->get_cert({ IDENTIFIER => $result->[0]->{'IDENTIFIER'}, 'FORMAT' => 'PEM' });
-        	    ##! 32: 'Push PEM of root ca to chain ' . $issuer_cert
+                # Load the PEM from the database
+                my $issuer_cert = CTX('api')->get_cert({ IDENTIFIER => $result->[0]->{'IDENTIFIER'}, 'FORMAT' => 'PEM' });
+                ##! 32: 'Push PEM of root ca to chain ' . $issuer_cert
                 push @signer_chain, $issuer_cert;
 
-        	}  else {
+            }  else {
 
-        		# The first known certificate is an intermediate, so fetch the
-        		# remaining certs to complete the chain
-        		##! 16: 'cert_identifier ' . $cert_identifier
-		        my $chain = CTX('api')->get_chain({
-		            'START_IDENTIFIER' => $result->[0]->{'IDENTIFIER'},
-		            'OUTFORMAT'        => 'PEM',
-		        });
+                # The first known certificate is an intermediate, so fetch the
+                # remaining certs to complete the chain
+                ##! 16: 'cert_identifier ' . $cert_identifier
+                my $chain = CTX('api')->get_chain({
+                    'START_IDENTIFIER' => $result->[0]->{'IDENTIFIER'},
+                    'OUTFORMAT'        => 'PEM',
+                });
 
-		        push @signer_chain, @{$chain->{CERTIFICATES}};
+                push @signer_chain, @{$chain->{CERTIFICATES}};
 
-		        ##! 32: 'Chain ' . Dumper $chain
-		        if (!$chain->{COMPLETE}) {
-		            return { STATUS => 'NOROOT', CHAIN => \@signer_chain };
-		        };
+                ##! 32: 'Chain ' . Dumper $chain
+                if (!$chain->{COMPLETE}) {
+                    return { STATUS => 'NOROOT', CHAIN => \@signer_chain };
+                };
 
-        	}
+            }
 
         }
 
     } else {
-    	 OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_VALIDATE_CERTIFICATE_NO_DATA' );
+         OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_VALIDATE_CERTIFICATE_NO_DATA' );
     }
 
     my @work_chain = @signer_chain;
@@ -1119,17 +1116,17 @@ sub validate_certificate {
     $chain_status = 'BROKEN' unless($valid);
 
     if ($valid && $arg_ref->{ANCHOR}) {
-    	$chain_status = 'UNTRUSTED';
-    	my @trust_anchors = @{$arg_ref->{ANCHOR}};
-    	##! 16: 'Checking valid certificate against trust anchor list'
-    	##! 32: 'Anchors ' . Dumper @trust_anchors
+        $chain_status = 'UNTRUSTED';
+        my @trust_anchors = @{$arg_ref->{ANCHOR}};
+        ##! 16: 'Checking valid certificate against trust anchor list'
+        ##! 32: 'Anchors ' . Dumper @trust_anchors
         CHECK_CHAIN:
         foreach my $pem (@signer_chain) {
             my $x509 = OpenXPKI::Crypto::X509->new( DATA => $pem, TOKEN => $default_token );
             my $identifier = $x509->get_identifier();
             ##! 16: 'identifier: ' . $identifier
             if (grep {$identifier eq $_} @trust_anchors) {
-            	##! 16: 'Found on trust anchor list'
+                ##! 16: 'Found on trust anchor list'
                 $chain_status = 'TRUSTED';
                 last CHECK_CHAIN;
             }

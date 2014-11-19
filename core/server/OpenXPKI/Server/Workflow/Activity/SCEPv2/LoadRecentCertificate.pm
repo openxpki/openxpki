@@ -30,7 +30,6 @@ sub execute {
         TABLE   => 'CERTIFICATE',
         COLUMNS => [
             'SUBJECT',
-            'ROLE',
             'CSR_SERIAL',
         ],
         DYNAMIC => {
@@ -41,7 +40,6 @@ sub execute {
     );
 
     $context->param('cert_subject' => $cert->{SUBJECT});
-    $context->param('cert_role' => $cert->{ROLE});
 
     # select subject alt names from database
     my $sans = $dbi->select(
@@ -87,7 +85,6 @@ sub execute {
     $context->param( 'cert_profile' =>  $old_profile->{PROFILE} );
 
     my $sources = $serializer->deserialize( $context->param('sources') );
-    $sources->{'cert_role'} = 'SCEP-RENEWAL';
     $sources->{'cert_profile'} = 'SCEP-RENEWAL';
     $sources->{'cert_subject'} = 'SCEP-RENEWAL';
     $sources->{'cert_subject_alt_name_parts'}  = 'SCEP-RENEWAL';

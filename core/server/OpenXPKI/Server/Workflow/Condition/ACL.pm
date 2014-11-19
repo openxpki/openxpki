@@ -12,10 +12,10 @@ __PACKAGE__->mk_accessors( 'activity' );
 
 sub _init
 {
-    
+
     #FIXME - ACL
     configuration_error('ACL not implemented');
-    
+
     my ( $self, $params ) = @_;
     unless ( $params->{activity} )
     {
@@ -44,7 +44,6 @@ sub evaluate
 
     my $role = "";
     $role = $context->param ("role")      if ($context->param ("role"));
-    $role = $context->param ("cert_role") if ($context->param ("cert_role"));
 
     ##! 64: 'role: ' . $role
     eval
@@ -93,7 +92,7 @@ is covered by the configured ACL. The first argument is the name of the
 activity. You can use the activity argument to group actions.
 
 The affected role is taken from the context of the workflow. The
-parameters role and cert_role are interpreted as the affected role.
+parameter role is interpreted as the affected role.
 If the parameters are missing or empty then the role is interpreted
 as the CA itself. This makes sense for operations
 like access to CA certificates and generation of CRLs.
