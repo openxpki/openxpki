@@ -20,4 +20,4 @@ div.dropdown
   ul class="dropdown-menu" role="menu"
     each content.content.actions
       li
-        a tabindex="-1" href="#" = label
+        a class="oxi-link-ignore" tabindex="-1" href="#" = label
