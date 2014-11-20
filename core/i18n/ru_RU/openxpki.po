@@ -3725,10 +3725,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REGEX_FAILED"
-msgstr "SPKAC-строка пуста."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_RELATIVEDATE_WRONG_TIMESPEC"
 msgstr "IP адрес __IP__ противоречит требованиям стандартов IPv4 и IPv6."
 
@@ -4754,6 +4750,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
+msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_"
@@ -6045,6 +6045,30 @@ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_AFFILIATIONCHANGED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_CACOMPROMISE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_CESSATIONOFOPERATION"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_KEYCOMPROMISE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_SUPERSEDED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy

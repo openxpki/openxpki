@@ -3,6 +3,6 @@ name: invalidity_time
 description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC
 placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER
 tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP
-required: 1
+required: 0
 type: datetime
-
+default: now

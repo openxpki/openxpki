@@ -9,7 +9,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC
         action: 
           - load_form > DATA_UPDATE
-          - abort > FAILURE
+          - terminate > FAILURE
           - persist > SUCCESS
 
     DATA_UPDATE: 
@@ -83,7 +83,7 @@ validator:
     validate_email: 
         class: OpenXPKI::Server::Workflow::Validator::Regex
         arg: 
-          - meta_email
+          - $meta_email
           - email
 
 

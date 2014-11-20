@@ -87,18 +87,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CRR"
 msgstr ""
-"I approve the CRR for workflow __WFID__.\r\n"
-"ID of the certificate to be revoked:\r\n"
-"__CERT_IDENTIFIER__\r\n"
-"SHA1-Hash of the session ID:\r\n"
+"I approve the CRR for workflow __WFID__.\n"
+"ID of the certificate to be revoked:\n"
+"__CERT_IDENTIFIER__\n"
+"SHA1-Hash of the session ID:\n"
 "__HASHSESSIONID__"
 
 msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CSR"
 msgstr ""
-"I approve the CSR for workflow __WFID__.\r\n"
-"SHA1-Hash of the CSR data:\r\n"
-"__HASH__\r\n"
-"SHA1-Hash of the session ID:\r\n"
+"I approve the CSR for workflow __WFID__.\n"
+"SHA1-Hash of the CSR data:\n"
+"__HASH__\n"
+"SHA1-Hash of the session ID:\n"
 "__HASHSESSIONID__"
 
 msgid "I18N_OPENXPKI_BACKEND_OPENSSL_EVAL_ERROR"
@@ -3430,10 +3430,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID"
 msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REGEX_FAILED"
-msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REGEX_FAILED"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_RELATIVEDATE_WRONG_TIMESPEC"
 msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_RELATIVEDATE_WRONG_TIMESPEC"
 
@@ -4179,6 +4175,9 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
+msgstr "Validator failed on given expression"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_"
 msgstr "continue"
@@ -4246,34 +4245,38 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_TRANSFER_EXPORT_FILE_LABEL"
 msgstr "Transfer"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
-msgstr "Load the current data from the system"
+msgstr ""
+"Type the certificate identifier or use the autosearch function to find the "
+"certificate you want to change the meta data for. If you can not find/"
+"identify your certificate please select certificate serch from the main "
+"menu. The resultlist will contain a link to change the metadata."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL"
-msgstr "Load"
+msgstr "Select Certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
 msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
-msgstr "Load"
+msgstr "Edit Data"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC"
 msgstr "Persist the changed data to the database"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_LABEL"
-msgstr "persist"
+msgstr "Persist Data"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_DESC"
 msgstr "Abort this workflow. This will leave the metadata unchanged."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_LABEL"
-msgstr "abort"
+msgstr "Abort Change"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_DESC"
-msgstr "Validate form data"
+msgstr "Please update the information using the form below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_LABEL"
-msgstr "validate"
+msgstr "Update Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
 msgstr "Cleanup the workflow"
@@ -4288,7 +4291,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CA_LIST_LABEL"
 msgstr "Load CA List"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_DESC"
-msgstr "Create a revocation request"
+msgstr ""
+"Create a revocation request for your certificate. Please type the "
+"certificate identifier or use the autosearch function to find your "
+"certificate."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
 msgstr "Start revocation"
@@ -4715,10 +4721,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_EXISTING_CERTS_LABEL"
 msgstr "Revoke Existing Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
-msgstr "Issue CRL"
+msgstr ""
+"This process triggers the creation of new revocation lists for all active "
+"CAs in the current realm. A revocation list is created when there are new "
+"revocations or if the current list is near its expiry. You can always force "
+"the creation of new lists by ticking the checkbox below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
-msgstr "Issue CRL"
+msgstr "Trigger CRL Issue"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC"
 msgstr "Issue revocation list"
@@ -4727,10 +4737,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_LABEL"
 msgstr "Issue CRL"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
-msgstr "Check for revocation"
+msgstr "Your revocation request has been accept, the certificate will be included in the next revocation list. This workflow will be closed by the system after the crl was issued."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_LABEL"
-msgstr "Check for revocation"
+msgstr "Revocation Pending"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_DESC"
 msgstr "Revoke the certificate"
@@ -4768,9 +4778,9 @@ msgstr "Persist CRR"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
 msgstr "Reject CRR"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
-msgstr "Creator"
+msgstr "Reject Request"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_DESC"
@@ -4788,13 +4798,12 @@ msgstr "Edit the items in the main subject of the certification request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_TOOLS_DISCONNECT_LABEL"
 msgstr "Edit Subject"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_DESC"
-msgstr "Updated"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_DESC"
+msgstr "Please update / complete the information below."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
-msgstr "Updated"
+msgstr "Update Request"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -4808,17 +4817,17 @@ msgstr "Type"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr "I18N_OPENXPKI_WF_VAL_CERT_IDENTIFIER_EXISTS"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL"
-msgstr "Creator"
+msgstr "Certificate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER"
-msgstr "Creator"
+msgstr "Enter certificate identifier or type your subject to start autosearch!"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP"
-msgstr "Certificate ID"
+msgstr ""
+"The autosearch will search for certificates that contain the given words in "
+"the subject and will show them in a drop down list below. Select the needed "
+"certificate from the list by clicking on it."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_DESC"
@@ -4901,17 +4910,14 @@ msgstr "Certificate subject style"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
 msgstr "Comment"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_LABEL"
-msgstr "Workflow Id"
+msgstr "Comment"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_PLACEHOLDER"
-msgstr "Workflow Id"
+msgstr "additional comments to help us processing the request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
-msgstr "continue"
+msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC"
@@ -5012,9 +5018,8 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC"
 msgstr "continue"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_LABEL"
-msgstr "Workflow Id"
+msgstr "Enforce creation of revocation lists."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
@@ -5052,21 +5057,20 @@ msgstr "Serial"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_TOOLTIP"
 msgstr "Request invalid - no action"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC"
-msgstr "I18N_OPENXPKI_WF_VAL_INVALIDITYTIME"
+msgstr ""
+"Specify the invalidity time for the revocation, only necessary in special "
+"cases."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL"
-msgstr "Type"
+msgstr "Invalidity Time"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER"
-msgstr "Execution time"
+msgstr ""
+"usually not required, use the selector on the right or type a datetime"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
-msgstr "Request invalid - no action"
+msgstr "set this only if you know the implication!"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
@@ -5097,53 +5101,41 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_TOOLTIP"
 msgstr "Username"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
-msgstr "Workflow Id"
+msgstr "email address of the responsible person for this certificate."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_LABEL"
-msgstr "Workflow Id"
+msgstr "Email Address"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER"
-msgstr "Workflow Id"
+msgstr "certificate holders email address"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
-msgstr "Workflow Id"
+msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
-msgstr "Requestor email"
+msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
-msgstr "Creator"
+msgstr "Requestor/Owner"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_PLACEHOLDER"
-msgstr "Request invalid - no action"
+msgstr "Name of the Requestor/Owner"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
-msgstr "Request invalid - no action"
+msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
-msgstr "User ID"
+msgstr "System Identifier"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_LABEL"
-msgstr "State"
+msgstr "System Identifier"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_PLACEHOLDER"
-msgstr "State"
+msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_TOOLTIP"
-msgstr "I18N_OPENXPKI_WORKFLOW_METADATA_WRONG_SYSTEM_ID"
+msgstr " "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC"
@@ -5229,25 +5221,39 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "continue"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
-msgstr "Real name"
+msgstr "The reason code indicates the reason why the certificate was revoked."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_LABEL"
-msgstr "Workflow Id"
+msgstr "Reason Code"
 
-#, fuzzy
+# This is just a prefix
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION"
-msgstr "Request invalid - no action"
+msgstr ""
 
-#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_AFFILIATIONCHANGED"
+msgstr "affiliation has changed"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_CACOMPROMISE"
+msgstr "CA key was compromised"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_CESSATIONOFOPERATION"
+msgstr "cessation of operation"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_KEYCOMPROMISE"
+msgstr "certificates key was compromised"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_SUPERSEDED"
+msgstr "entity/certificate was superseded"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED"
+msgstr "unspecified / other reason"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_PLACEHOLDER"
-msgstr "Workflow Id"
+msgstr "Please set the reason for revocation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP"
-msgstr "Workflow Id"
+msgstr "Specify the reason why you want the certificate being revoked."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_DESC"
 msgstr ""
@@ -5741,13 +5747,13 @@ msgstr "Publish CRL"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_PUBLISH_CRL_LABEL"
 msgstr "Publish CRL"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr ""
+"This workflow has finished with success and can not be restarted. New "
+"revocation lists have been created (if necessary)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
-msgstr "SUCCESS"
+msgstr "CRLs issued"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CHECK_APPROVALS_DESC"
@@ -5817,17 +5823,16 @@ msgstr "State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_NOTIFY_CRR_PENDING_DESC"
 msgstr "PENDING"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_NOTIFY_CRR_PENDING_LABEL"
-msgstr "PENDING"
+msgstr "Approval Pending"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
-msgstr "PENDING"
+msgstr "This revocation request requires approval."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL"
-msgstr "PENDING"
+msgstr "Approval Pending"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_DESC"
@@ -5837,13 +5842,12 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL"
 msgstr "State"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr "The certificate has been revoked and a revocation list was issued."
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL"
-msgstr "SUCCESS"
+msgstr "Certificate Revoked"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_APPROVED_DESC"
@@ -6891,21 +6895,15 @@ msgstr "This workflow failed finally and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "State"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
 msgstr ""
-"Please choose from the actions below how to proceed. Terminate will "
-"terminate the workflow without writing the metadata back to the certificate, "
-"update will show the form again while save will persist the data and finish "
-"the workflow."
+"Below you see the new meta data for this certificate.Please choose from the "
+"actions below how to proceed. Abort will terminate the workflow without "
+"writing the metadata back to the database, update will show the form again "
+"while save will persist the data and finish the workflow."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
-msgstr ""
-"Please choose from the actions below how to proceed. Terminate will "
-"terminate the workflow without writing the metadata back to the certificate, "
-"update will show the form again while save will persist the data and finish "
-"the workflow."
+msgstr "Check Data"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
@@ -6934,13 +6932,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
 msgstr "State"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr "The changes have been persisted to the database."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
-msgstr "SUCCESS"
+msgstr "Metadata was updated"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
