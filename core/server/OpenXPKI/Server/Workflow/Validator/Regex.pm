@@ -17,7 +17,7 @@ sub _init {
 
     # Default modifier is /xi
     $self->modifier( $params->{modifier} ? $params->{modifier} : 'xi') ;
-    $self->error( 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REGEX_FAILED' );
+    $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
     $self->error( $params->{error} ) if ($params->{error});
 }
 
@@ -62,6 +62,7 @@ sub validate {
 
     # Array Magic
     my @errors;
+    ##! 32: 'ref of value ' . ref $value
     if (ref $value eq 'ARRAY' || $value =~ /^ARRAY/) {
         ##! 8: 'Array mode'
         if (!ref $value) {
@@ -74,13 +75,14 @@ sub validate {
             push @errors, $val if ($val !~ $regex);
         }
     } else {
+        ##! 8: 'scalar mode'
         push @errors, $value if ($value !~ $regex);
     }
 
     if (@errors) {
         # Need to implement this in New UI first
         #$wf->context()->param( '__error' => [ $self->error(), { FIELD => $field, VALUES => \@errors }]);
-        ##! 32: 'Regex errors on field ' . $field . ', values '  . Dumper \@errors
+        ##! 32: 'Regex errors with regex ' . $regex. ', values '  . Dumper \@errors
         CTX('log')->log(
             MESSAGE  => "Regex validator failed on regex $regex",
             PRIORITY => 'info',

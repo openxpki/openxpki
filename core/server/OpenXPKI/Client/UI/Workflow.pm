@@ -826,9 +826,9 @@ sub __render_from_workflow {
         # set status decorator on final states
         my $desc = $wf_info->{STATE}->{description};
         if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
-            $self->set_status( i18nGettext($desc || 'I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
+            $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
         } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
-            $self->set_status( i18nGettext($desc || 'I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
+            $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
         } elsif ( $wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') {
             $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'warning');
         }

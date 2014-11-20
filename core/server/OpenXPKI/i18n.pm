@@ -45,15 +45,15 @@ sub i18nGettext {
 
     # coerce arguments into a hashref
     if ($ref_of_first_argument eq "") {
-	# first argument is a scalar
-	my %arguments = @_;
-	$arg_ref = \%arguments;
+    # first argument is a scalar
+    my %arguments = @_;
+    $arg_ref = \%arguments;
     }
     elsif ($ref_of_first_argument eq "HASH") {
-	$arg_ref = $_[0];
+    $arg_ref = $_[0];
     }
     elsif ($ref_of_first_argument eq "REF") {
-	$arg_ref = ${$_[0]};
+    $arg_ref = ${$_[0]};
     }
 
     ## we need this for utf8
@@ -65,10 +65,14 @@ sub i18nGettext {
 
     if ($i18n_string ne $text)
     {
-	## there is a translation for this, so replace the parameters
-	## in the resulting string
 
-	for my $parameter (keys %{$arg_ref}) {
+        # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
+        if ($i18n_string eq ' ') { return ''; }
+
+    ## there is a translation for this, so replace the parameters
+    ## in the resulting string
+
+    for my $parameter (keys %{$arg_ref}) {
             my $key = $parameter;
             if ($parameter !~ m{\A __\w+__ \z}xm)
             {
@@ -81,9 +85,9 @@ sub i18nGettext {
         }
     } else {
         ## no translation found, output original string followed
-	## by all parameters (and values) passed to the function
+    ## by all parameters (and values) passed to the function
 
-	## append arguments passed to the function
+    ## append arguments passed to the function
         $i18n_string = join ("; ", $text,
                                    map { $_ . " => " . $arg_ref->{$_}  }
                                        keys %{$arg_ref});
@@ -100,7 +104,7 @@ sub set_language
     ## global scope intended
     $language = shift;
     if (! defined $language) {
-	$language = "";
+    $language = "";
     }
 
     ## erase environment to block libc's automatic environment detection
