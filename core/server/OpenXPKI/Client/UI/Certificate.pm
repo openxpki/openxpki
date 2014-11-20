@@ -40,14 +40,14 @@ sub init_search {
     my @profile_names = keys %{$profile};
     @profile_names = sort @profile_names;
 
-    my @profile_list = map { $_ = {'value' => $_, 'label' => $profile->{$_}->{label}} } @profile_names ;
+    my @profile_list = map { $_ = {'value' => $_, 'label' => i18nGettext($profile->{$_}->{label})} } @profile_names ;
 
     my @states = (
-        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_ISSUED', value => 'ISSUED'},
-        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_VALID', value => 'VALID'},
-        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED', value => 'EXPIRED'},
-        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_REVOKED', value => 'REVOKED'},
-        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING', value => 'CRL_ISSUANCE_PENDING'},
+        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_ISSUED'), value => 'ISSUED'},
+        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_VALID'), value => 'VALID'},
+        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED'), value => 'EXPIRED'},
+        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_REVOKED'), value => 'REVOKED'},
+        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING'), value => 'CRL_ISSUANCE_PENDING'},
     );
 
     $self->_result()->{main} = [
