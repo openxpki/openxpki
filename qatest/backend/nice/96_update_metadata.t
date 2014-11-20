@@ -40,7 +40,7 @@ $test->set_verbose($cfg{instance}{verbose});
 $test->plan( tests => 8 );
 
 my $buffer = do { # slurp
-	local $INPUT_RECORD_SEPARATOR;
+    local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<', $cfg{instance}{buffer};
     <$HANDLE>;
 };
@@ -63,23 +63,23 @@ $test->connect_ok(
 # First try an autoapproval request
 
 my %wfparam = (
-	cert_identifier => $cert_identifier,
+    cert_identifier => $cert_identifier,
 );
 
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA' , \%wfparam, 'Create Workflow')
+$test->create_ok( 'change_metadata' , \%wfparam, 'Create Workflow')
  or die "Workflow Create failed: $@";
 
 $test->state_is('DATA_UPDATE');
 
-$test->execute_ok( 'changemeta_update_context', {
-    'meta_email' => $serializer->serialize( ['uli.update@openxpki.local' ]),
+$test->execute_ok( 'metadata_update_context', {
+#    'meta_email' => '',# $serializer->serialize( ['uli.update@openxpki.de' ]),
     'meta_requestor' => 'Uli Update',
     'meta_system_id' => '',
 });
 
 $test->state_is('CHOOSE_ACTION');
 
-$test->execute_ok( 'changemeta_persist' );
+$test->execute_ok( 'metadata_persist' );
 
 $test->state_is('SUCCESS');
 

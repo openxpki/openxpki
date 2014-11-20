@@ -799,7 +799,7 @@ sub __render_from_workflow {
             }
 
             # FIXME - will not work once we change serialization format
-            if (ref $item->{value} eq '' &&  $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
+            if (ref $item->{value} eq '' && $item->{value} && $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
                 $item->{value} = $self->serializer()->deserialize( $context->{$key} );
                 if (ref $item->{value} eq 'HASH') {
                     $item->{format} = 'deflist';

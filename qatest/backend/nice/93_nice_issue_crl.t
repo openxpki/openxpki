@@ -54,11 +54,9 @@ $test->connect_ok(
 
 my %wfparam = (
     force_issue => 1,
-    #delta_crl => 0, # not supported yet
-    #crl_validity=>'+000014',
 );
 
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE' , \%wfparam, 'Create CRL Workflow')
+$test->create_ok( 'crl_issuance' , \%wfparam, 'Create CRL Workflow')
  or die "Workflow Create failed: $@";
 
 $test->state_is('SUCCESS');

@@ -29,6 +29,15 @@ my $session = new CGI::Session(undef, undef, {Directory=>'/tmp'});
 my $session_id = $session->id;
 ok ($session->id, 'Session id ok');
 
+my $buffer = do { # slurp
+    local $INPUT_RECORD_SEPARATOR;
+    open my $HANDLE, '<', '/tmp/webui.json';
+    <$HANDLE>;
+};
+
+$buffer = JSON->new->decode($buffer);
+
+my $cert_identifier = $buffer->{cert_identifier};
 
 my $result;
 my $client = MockUI->new({
@@ -57,16 +66,13 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
+    'page' => 'workflow!index!wf_type!change_metadata',
 });
-
-is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'cert_profile' => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
-    'cert_subject_style' => '00_basic_style'
+    'cert_identifier' => $cert_identifier,
 });
 
 like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
@@ -80,51 +86,24 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_upload_pkcs10!wf_id!'.$wf_id,
-});
-
-# Create a pkcs10
-my $pkcs10 = `openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=www.example.com" -config openssl.cnf -nodes -keyout /dev/null 2>/dev/null`;
-
-$result = $client->mock_request({
     'action' => 'workflow!index',
-    'pkcs10' => $pkcs10,
-    'csr_type' => 'pkcs10',
-    'wf_token' => undef
-});
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_subject_parts{hostname}' => 'www.example.de',
-    'cert_subject_parts{hostname2}[]' => 'www.example.com',
-    'wf_token' => undef
+    'wf_token' => undef,
+    'meta_email[]' => [ 'mail1@openxpki.org', 'mail2@openxpki.org' ],
 });
 
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    'cert_san_parts{dns}[]' => $result->{main}->[0]->{content}->{fields}->[0]->{value},
-    'wf_token' => undef
+    'wf_token' => undef,
+    'meta_email[]' => [ 'mail1@openxpki.org', 'mail2@openxpki.org' ],
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_info{requestor_email}' => 'mail@oliwel.de',
-    'wf_token' => undef
+    'action' => 'workflow!select!wf_action!metadata_persist!wf_id!' . $wf_id,
 });
 
-$result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_submit!wf_id!' . $wf_id,
-});
-
-$result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,
-});
 
 is ($result->{status}->{level}, 'success', 'Status is success');
 
-my $cert_identifier = $result->{main}->[0]->{content}->{data}->[1]->{value}->{label};
-open(CERT, ">/tmp/webui.json");
-print CERT JSON->new->encode({ cert_identifier => $cert_identifier  });
-close CERT;
+is( $result->{main}->[0]->{content}->{data}->[3]->{value}->[0], 'mail1@openxpki.org', 'data validated');
 
