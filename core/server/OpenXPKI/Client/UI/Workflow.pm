@@ -937,6 +937,7 @@ sub __render_input_field {
 
     if (!$field->{required}) {
         $item->{is_optional} = 1;
+        $item->{label} .= '*';
     }
 
     if (defined $value) {
