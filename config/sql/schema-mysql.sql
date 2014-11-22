@@ -291,7 +291,9 @@ CREATE TABLE IF NOT EXISTS `workflow_history` (
   KEY (`workflow_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-----------------------------
+
+-- --------------------------------------------------------
+
 
 --
 -- Table structure for table `seq_audittrail`

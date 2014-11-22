@@ -10,7 +10,6 @@ GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
 flush privileges;" | mysql -u root
 
 #Setup the database
-openxpkiadm loadcfg
 openxpkiadm initdb
 
 # create certificates 

@@ -25,11 +25,11 @@ set -e
 
 case "$1" in
     configure)
-	set +e
-	    # TODO - check for a running daemon
+    set +e
+        # TODO - check for a running daemon
         #invoke-rc.d --quiet openxpkid restart
         #if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
-	set -e
+    set -e
 
         # No config - load sample config - also includes/overwrites other
         # files in /etc/openxpki/ !
@@ -37,10 +37,8 @@ case "$1" in
            tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz -C /etc/openxpki
 
            chmod 750 /etc/openxpki/config.d
-           mkdir -p -m 750 /etc/openxpki/config.git
            chown -R openxpki:root /etc/openxpki/config.d/
-           chown -R openxpki:root /etc/openxpki/config.git/
-           openxpkiadm loadcfg 2>/dev/null
+
        fi
 
        # Ubuntu names it conf-enabled while wheezy has conf.d
@@ -65,7 +63,7 @@ case "$1" in
             chmod 640 /var/openxpki/$f
         done;
 
-	    # Create the pkiadm user
+        # Create the pkiadm user
         COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
         if [ $COUNT -eq 0 ]; then
             # Use useradd here as we need an additonal group
@@ -77,9 +75,9 @@ case "$1" in
             chmod 750 $HOME
         fi;
 
-	    # Create the sudo file to restart oxi from pkiadm
-	    if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
-	        echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
+        # Create the sudo file to restart oxi from pkiadm
+        if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
+            echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
         fi;
 
     ;;
