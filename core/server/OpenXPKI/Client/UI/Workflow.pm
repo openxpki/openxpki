@@ -721,6 +721,7 @@ sub __render_from_workflow {
 
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
         my @fields;
+        my @fielddesc;
         foreach my $field (@{$wf_action_info->{field}}) {
 
             my $name = $field->{name};
@@ -739,7 +740,14 @@ sub __render_from_workflow {
                 $val = undef;
             }
 
-            push @fields, $self->__render_input_field( $field, $val );
+            my $item = $self->__render_input_field( $field, $val );
+            push @fields, $item;
+
+            # if the field has a description text, push it to the @fielddesc list
+            if ($field->{description} !~ /^\s*$/) {
+                my $descr = i18nGettext($field->{description});
+                push @fielddesc, { label => $item->{label}, value => $descr } if ($descr);
+            }
 
         }
 
@@ -749,7 +757,7 @@ sub __render_from_workflow {
             wf_fields => \@fields,
         });
 
-        $self->_result()->{main} = [{
+        $self->add_section({
             type => 'form',
             action => 'workflow',
             content => {
@@ -757,8 +765,18 @@ sub __render_from_workflow {
                 #description => $wf_action_info->{description},
                 submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE'),
                 fields => \@fields
-            }},
-        ];
+        }});
+
+        if (@fielddesc) {
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST'),
+                    description => '',
+                    data => \@fielddesc
+            }});
+        }
+
     } else {
 
         # more than one action available, so we offer some buttons to choose how to continue
@@ -814,14 +832,14 @@ sub __render_from_workflow {
         my $buttons;
         $buttons = $self->__get_action_buttons( $wf_info ) if (!$args->{VIEW} || $args->{VIEW} ne 'result');
 
-        $self->_result()->{main} = [{
+        $self->add_section({
             type => 'keyvalue',
             content => {
                 label => '',
                 description => '',
                 data => \@fields,
                 buttons => $buttons
-        }}];
+        }});
 
         # set status decorator on final states
         my $desc = $wf_info->{STATE}->{description};
@@ -882,14 +900,21 @@ sub __get_action_buttons {
     my $self = shift;
     my $wf_info = shift;
 
+    # The text hints for the action is encoded in the state
+    my $hint = $wf_info->{STATE}->{hint} || {};
+
     my @buttons;
     foreach my $wf_action (@{$wf_info->{STATE}->{option}}) {
        my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
+
        push @buttons, {
             label => i18nGettext($wf_action_info->{label} || $wf_action),
-            action => sprintf 'workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID},
+            action => sprintf ('workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID}),
+            description => i18nGettext($hint->{$wf_action}),
         };
     }
+
+    $self->logger()->debug('Buttons are ' . Dumper \@buttons);
 
     return \@buttons;
 }

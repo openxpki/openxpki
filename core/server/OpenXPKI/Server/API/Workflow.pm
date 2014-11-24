@@ -390,7 +390,11 @@ sub __get_workflow_ui_info {
 
     # Add State UI Info
     $result->{STATE} = CTX('config')->get_hash([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'state', $result->{WORKFLOW}->{STATE} ]);
+
+    my $hint = $result->{STATE}->{hint};
+    $result->{STATE}->{hint} = {};
     delete $result->{STATE}->{action};
+
 
     # Add the possible options (=activity names) in the right order
     my @options = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE},  'state', $result->{WORKFLOW}->{STATE}, 'action' ]);
@@ -400,18 +404,23 @@ sub __get_workflow_ui_info {
 
     ##! 16: 'Testing actions ' .  Dumper \@options
     foreach my $option (@options) {
+
         $option =~ m{ \A ((global_)?)([^\s>]+)}xs;
         $option = $3;
+        my $action;
         if ($2) { # global or not
-            $option = 'global_'.$option;
+            $action = 'global_'.$option;
         } else {
-            $option = $head->{prefix}.'_'.$option;
+            $action = $head->{prefix}.'_'.$option;
         }
-        ##! 16: 'Activity ' . $option
+        ##! 16: 'Activity ' . $action
         ##! 64: 'Available actions ' . Dumper keys %{$result->{ACTIVITY}}
-        if ($result->{ACTIVITY}->{$option}) {
-            push @{$result->{STATE}->{option}}, $option;
+        if ($result->{ACTIVITY}->{$action}) {
+            push @{$result->{STATE}->{option}}, $action;
         }
+
+        # Add hint if available
+        $result->{STATE}->{hint}->{$action} = $hint->{$option} if ($hint->{$option});
     }
     return $result;
 

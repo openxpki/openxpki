@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2014-11-19 19:55+0100\n"
+"PO-Revision-Date: 2014-11-24 13:46+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -4737,7 +4737,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_LABEL"
 msgstr "Issue CRL"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
-msgstr "Your revocation request has been accept, the certificate will be included in the next revocation list. This workflow will be closed by the system after the crl was issued."
+msgstr ""
+"Your revocation request has been accept, the certificate will be included in "
+"the next revocation list. This workflow will be closed by the system after "
+"the crl was issued."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_LABEL"
 msgstr "Revocation Pending"
@@ -4778,7 +4781,6 @@ msgstr "Persist CRR"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
 msgstr "Reject CRR"
 
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
 msgstr "Reject Request"
 
@@ -4798,12 +4800,19 @@ msgstr "Edit the items in the main subject of the certification request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_TOOLS_DISCONNECT_LABEL"
 msgstr "Edit Subject"
 
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_DESC"
 msgstr "Please update / complete the information below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_DESC"
+msgstr "Workflow Id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_LABEL"
+msgstr "Key Encryption Method"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -4813,9 +4822,8 @@ msgstr "Comment"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "Type"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
-msgstr "I18N_OPENXPKI_WF_VAL_CERT_IDENTIFIER_EXISTS"
+msgstr "If known, you can enter the alphanumeric identifier of the certificate or just type the subject of the certificate to start a search. The results will be displayed below the field, select the expected one using the right mouse button."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL"
 msgstr "Certificate"
@@ -4890,25 +4898,21 @@ msgstr "State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP"
 msgstr "I18N_OPENXPKI_WF_VAL_CERTSUBJECTPARTS"
 
-#, fuzzy
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC"
-msgstr "Certificate subject style"
+msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_LABEL"
-msgstr "Type"
+msgstr "Subject Style"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_PLACEHOLDER"
-msgstr "Type"
+msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP"
-msgstr "Certificate subject style"
+msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
-msgstr "Comment"
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_LABEL"
 msgstr "Comment"
@@ -5057,6 +5061,9 @@ msgstr "Serial"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_TOOLTIP"
 msgstr "Request invalid - no action"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST"
+msgstr "Hints to fill in the form fields"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC"
 msgstr ""
 "Specify the invalidity time for the revocation, only necessary in special "
@@ -5066,8 +5073,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL"
 msgstr "Invalidity Time"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER"
-msgstr ""
-"usually not required, use the selector on the right or type a datetime"
+msgstr "usually not required, use the selector on the right or type a datetime"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "set this only if you know the implication!"
@@ -5382,6 +5388,15 @@ msgstr "Request invalid - no action"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP"
 msgstr "Workflow history"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
+msgstr "Change the selected profile for this request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD"
+msgstr "Upload your prepared certification request in PKCS10 format"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS"
+msgstr "Let the server generate the key for you"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_ACTION_LABEL"
 msgstr "Action"
@@ -5823,13 +5838,11 @@ msgstr "State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_NOTIFY_CRR_PENDING_DESC"
 msgstr "PENDING"
 
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_NOTIFY_CRR_PENDING_LABEL"
 msgstr "Approval Pending"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
 msgstr "This revocation request requires approval."
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL"
 msgstr "Approval Pending"
@@ -5844,7 +5857,6 @@ msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_DESC"
 msgstr "The certificate has been revoked and a revocation list was issued."
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL"
 msgstr "Certificate Revoked"

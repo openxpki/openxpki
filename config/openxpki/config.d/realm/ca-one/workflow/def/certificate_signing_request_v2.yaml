@@ -218,6 +218,10 @@ state:
           - provide_server_key_params > ENTER_KEY_PASSWORD
           - upload_pkcs10 > ENTER_SUBJECT
           - select_profile > SETUP_REQUEST_TYPE
+        hint:
+          provide_server_key_params: I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS
+          upload_pkcs10: I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD
+          select_profile: I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE
 
     SUBJECT_COMPLETE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL

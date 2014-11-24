@@ -38,7 +38,7 @@ sub action_get_styles_for_profile {
         _returnType => 'partial',
         fields => [{
             name => "cert_subject_style",
-            label => 'Subject Style',
+            label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_LABEL'),
             value => $cert_subject_style,
             type => 'select',
             options => \@styles
