@@ -1,6 +1,11 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
+    classNameBindings: [
+        "content.is_optional:optional:required"
+        "content.class"
+    ]
+
     isBool: Em.computed.equal "content.type", "bool"
     isCertIdentifier: Em.computed.equal "content.type", "cert_identifier"
     isCheckbox: Em.computed.equal "content.type", "checkbox"
