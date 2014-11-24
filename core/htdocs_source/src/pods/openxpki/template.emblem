@@ -35,7 +35,7 @@ div.container-fluid
       =status.message
 
   h2 = content.firstObject.page.label
-  div style="margin-bottom:6px;" = content.firstObject.page.description
+  div style="margin-bottom:6px;" == content.firstObject.page.description
 
   if showTabs
     ul.nav.nav-tabs
