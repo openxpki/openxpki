@@ -54,7 +54,7 @@ Component = Em.Component.extend
       keysize = @get("content.keysize")
 
       if keysize
-        return 'col-md-' + size
+        return 'col-md-' + keysize
       else
         return 'col-md-2'
 
