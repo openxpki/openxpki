@@ -34,6 +34,7 @@ Table of Contents:
    reference/configuration/introduction
    reference/configuration/server
    reference/configuration/realm
+   reference/configuration/workflow
    reference/configuration/workflows/certrequest
    reference/configuration/workflows/certrevocation
    reference/configuration/workflows/crlissuance
