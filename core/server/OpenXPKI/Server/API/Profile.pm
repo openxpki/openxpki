@@ -460,6 +460,8 @@ sub render_subject_from_template {
         );
     }
 
+    $self->__clean_vars( $vars );
+
     my $cert_subject;
     my $tt = Template->new();
     if (!$tt->process(\$dn_template, $vars, \$cert_subject)) {
@@ -487,6 +489,8 @@ sub render_san_from_template {
     my $style   = $args->{STYLE};
     my $vars    = $args->{VARS};
     my $items   = $args->{ADDITIONAL} || {};
+
+    $self->__clean_vars( $vars );
 
     my $config = CTX('config');
 
@@ -593,6 +597,8 @@ sub render_metadata_from_template {
     my $profile = $args->{PROFILE};
     my $style = $args->{STYLE};
     my $vars = $args->{VARS};
+
+    $self->__clean_vars( $vars );
 
     my $config = CTX('config');
 
@@ -759,6 +765,19 @@ sub get_key_params {
 
 }
 
+sub __clean_vars {
+
+    my $self = shift;
+    my $vars = shift;
+
+    # TT has issues with empty values so we delete keys without content
+    map {
+        delete $vars->{$_} if ( ref $vars->{$_} eq '' && !$vars->{$_} );
+        delete $vars->{$_} if ( ref $vars->{$_} eq 'HASH' && (!%{$vars->{$_}}) );
+        delete $vars->{$_} if ( ref $vars->{$_} eq 'ARRAY' && (!@{$vars->{$_}} || !$vars->{$_}->[0] ) );
+    } keys(%{$vars});
+
+}
 
 1;
 
