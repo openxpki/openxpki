@@ -179,11 +179,12 @@ clean:
 realclean: clean
 	echo -n "Delete '$(PERL_ROOT)'? " && read && sudo rm -rf "$(PERL_ROOT)"
 
-$(PERL_SOURCE_PREFIX):
-	mkdir -p $@
+#$(PERL_SOURCE_PREFIX):
+#	mkdir -p $@
 
 # Note: the copy from '/vagrant' is optional and allows for a local copy
-$(PERL_SOURCE_TARBALL_LONG): $(PERL_SOURCE_PREFIX)
+$(PERL_SOURCE_TARBALL_LONG):
+	mkdir -p $(PERL_SOURCE_PREFIX)
 	cp /mirrors/perl/$(PERL_SOURCE_TARBALL) $@ || echo "Need to fetch tarball"
 	test -f $@ || wget -O $@ $(PERL_SOURCE_URL)
 

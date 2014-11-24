@@ -1,0 +1,187 @@
+## Written 2006 by Martin Bartosch for the OpenXPKI project
+## Adapted for myperl-openxpki-enroll-deps by Scott Hardin
+## Copyright (C) 2005-2014 by The OpenXPKI Project
+
+%define pkgname myperl-openxpki-enroll-deps
+%define filelist %{pkgname}-%{version}-filelist
+%define NVR %{pkgname}-%{version}-%{release}
+%define maketest 0
+%define __perl /opt/myperl/bin/perl
+
+name:      %{pkgname}
+summary:   OpenXPKI Enrollment UI CPAN dependencies for myperl
+version:   [% version %]
+[% IF PKGREL %]
+release: [% PKGREL %]
+[% ELSE %]
+release:   1
+[% END %]
+vendor:    OpenXPKI Project
+packager:  Scott Hardin <scott@hnsc.de>
+license:   Apache
+group:     Applications/CPAN
+url:       http://www.openxpki.org
+buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
+prefix:    %(echo %{_prefix})
+BuildRequires: myperl
+Requires: myperl
+source:    %{pkgname}-%{version}.tar.gz
+
+%description
+OpenXPKI Enrollment UI CPAN dependencies for myperl
+
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git description:       [% GIT_DESCRIPTION %]
+Git tags:              [%- IF GIT_TAGS -%]
+[%- GIT_TAGS -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
+
+%prep
+%setup -q -n %{pkgname}-%{version} 
+
+%build
+
+%install
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+set -e
+
+PERL=%{__perl}
+
+SITELIB=`%{__perl} "-V:sitelib" | awk -F\' '{print $2}'`
+SITEARCH=`%{__perl} "-V:sitearch" | awk -F\' '{print $2}'`
+SITELIBEXP=%{buildroot}/`%{__perl} "-V:sitelibexp" | awk -F\' '{print $2}'`
+ARCHNAME=`%{__perl} "-V:archname" | awk -F\' '{print $2}'`
+ARCHLIB=`%{__perl} "-V:archlib" | awk -F\' '{print $2}'`
+SITEMAN1EXP=`%{__perl} "-V:siteman1direxp" | awk -F\' '{print $2}'`
+SITEMAN3EXP=`%{__perl} "-V:siteman3direxp" | awk -F\' '{print $2}'`
+SITESCRIPTEXP=`%{__perl} "-V:sitescriptexp" | awk -F\' '{print $2}'`
+PRIVLIB=`%{__perl} "-V:privlib" | awk -F\' '{print $2}'`
+CPANM="%{__perl} `pwd`/cpanm"
+CPANM_OPTS="--notest --skip-satisfied --skip-installed --verbose"
+
+# Environment vars neede for proper Perl module installation
+export PERL5LIB=%{buildroot}/$SITEARCH:%{buildroot}/$SITELIB
+export PERL_MB_OPT="--destdir '%{buildroot}' --installdirs site"
+export PERL_MM_OPT="INSTALLDIRS=site DESTDIR=%{buildroot}"
+export DESTDIR="%{buildroot}"
+
+curl -LO http://xrl.us/cpanm
+chmod +x cpanm
+
+$CPANM $CPANM_OPTS Class::Std Config::Std
+echo "DEBUG: current directory = `pwd`"
+echo "DEBUG: contents of current directory:"
+ls -la
+echo "DEBUG: end of list"
+echo "DEBUG: PATH=$PATH"
+(cd clients/perl/OpenXPKI-Client-Enrollment && $CPANM $CPANM_OPTS --installdeps .)
+
+cmd=/usr/share/spec-helper/compress_files
+[ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
+[ -x $cmd ] && $cmd
+
+## SuSE Linux
+#if [ -e /etc/SuSE-release -o -e /etc/UnitedLinux-release ]
+#then
+#    %{__mkdir_p} %{buildroot}/var/adm/perl-modules
+#    find %{buildroot} -name "perllocal.pod"  \
+#        -exec '%{__sed} -e s+%{buildroot}++g {}' \;                 \
+#        > %{buildroot}/var/adm/perl-modules/%{name}
+#fi
+
+# remove special files
+find %{buildroot} -name "perllocal.pod" \
+    -o -name ".packlist"                \
+    -o -name "*.bs"                     \
+    |xargs -i rm -f {}
+
+# myperl issue #2 - until I can get Pinto running, just remove the offending files
+# Note: since this is a nasty kludge, I'll leave the fail-on-error behavior.
+#
+# DESTDIR = %{buildroot}
+set -e
+rm -rf \
+		$DESTDIR/$SITEMAN3EXP/CGI.3 \
+		$DESTDIR/$SITEMAN3EXP/CGI::Apache.3 \
+		$DESTDIR/$SITEMAN3EXP/CGI::Carp.3 \
+		$DESTDIR/$SITEMAN3EXP/CGI::Cookie.3 \
+		$DESTDIR/$SITEMAN3EXP/CGI::Pretty.3 \
+		$DESTDIR/$SITEMAN3EXP/CGI::Push.3 \
+		$DESTDIR/$SITEMAN3EXP/CGI::Switch.3 \
+		$DESTDIR/$SITEMAN3EXP/CGI::Util.3 \
+		$DESTDIR/$SITELIB/CGI.pm \
+		$DESTDIR/$SITELIB/CGI/Apache.pm \
+		$DESTDIR/$SITELIB/CGI/Carp.pm \
+		$DESTDIR/$SITELIB/CGI/Cookie.pm \
+		$DESTDIR/$SITELIB/CGI/Pretty.pm \
+		$DESTDIR/$SITELIB/CGI/Push.pm \
+		$DESTDIR/$SITELIB/CGI/Switch.pm \
+		$DESTDIR/$SITELIB/CGI/Util.pm \
+		$DESTDIR/$SITEMAN3EXP/Module::Build* \
+		$DESTDIR/$SITELIB/Module/Build.pm \
+		$DESTDIR/$SITELIB/Module/Build \
+		$DESTDIR/$ARCHLIB/auto/Module/Build 
+# myperl issue #2 - let's just trash these for now
+rm -rf \
+		$DESTDIR/$SITESCRIPTEXP/config_data \
+		$DESTDIR/$SITEMAN1EXP/config_data.1 \
+		$DESTDIR/$SITEMAN3EXP/inc::latest.3 \
+		$DESTDIR/$SITELIB/inc
+
+# no empty directories
+#find %{buildroot}%{_prefix}             \
+#    -type d -depth                      \
+#    -exec rmdir {} \; 2>/dev/null
+
+%{__perl} -MFile::Find -le '
+    find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
+    #print "%doc  README.md";
+    for my $x (sort @dirs, @files) {
+        push @ret, $x unless indirs($x);
+        }
+    print join "\n", sort @ret;
+
+    sub wanted {
+        return if /auto$/;
+
+        local $_ = $File::Find::name;
+        my $f = $_; s|^\Q%{buildroot}\E||;
+        return unless length;
+        return $files[@files] = $_ if -f $f;
+
+        $d = $_;
+        /\Q$d\E/ && return for reverse sort @INC;
+        $d =~ /\Q$_\E/ && return
+            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /srv /var |;
+
+        $dirs[@dirs] = $_;
+        }
+
+    sub indirs {
+        my $x = shift;
+        $x =~ /^\Q$_\E\// && $x ne $_ && return 1 for @dirs;
+        }
+    ' > %filelist
+
+[ -z %filelist ] && {
+    echo "ERROR: empty %files listing"
+    exit -1
+    }
+
+%clean
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+
+%files -f %filelist
+%defattr(-,root,root)
+
+%changelog
+* Mon Aug 15 2011 m.bartosch@cynops.de
+- Fixed file permissions in package
+* Thu Feb 03 2011 m.bartosch@cynops.de
+- Renovated build process, using generic template mechanism
+* Mon Nov 27 2006 m.bartosch@cynops.de
+- Initial build.

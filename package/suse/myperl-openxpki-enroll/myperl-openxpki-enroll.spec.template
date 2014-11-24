@@ -1,0 +1,138 @@
+## Written 2006 by Martin Bartosch for the OpenXPKI project
+## Adapted for Enrollment UI by Scott Hardin
+## Copyright (C) 2005-2013 by The OpenXPKI Project
+
+#
+#   - OpenXPKI HTML Mason client package -
+#
+
+%define pkgname myperl-openxpki-enroll
+%define filelist %{pkgname}-%{version}-filelist
+%define NVR %{pkgname}-%{version}-%{release}
+%define maketest 0
+%define __perl /opt/myperl/bin/perl
+
+name:      %{pkgname}
+summary:   OpenXPKI Enrollment UI Client
+version:   [% version %]
+[% IF PKGREL %]
+release: [% PKGREL %]
+[% ELSE %]
+release:   1
+[% END %]
+vendor:    OpenXPKI Project
+packager:  Scott Hardin <scott@hnsc.de>
+license:   Apache
+group:     Applications/CPAN
+url:       http://www.openxpki.org
+buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
+prefix:    %(echo %{_prefix})
+BuildRequires: myperl
+Requires:  myperl
+source:    %{pkgname}-%{version}.tar.gz
+
+%description
+OpenXPKI client implementing a certificate enrollment. 
+
+Packaging information:
+OpenXPKI version       [% version %]
+Git commit hash:       [% GIT_COMMIT_HASH %]
+Git description:       [% GIT_DESCRIPTION %]
+Git tags:              [%- IF GIT_TAGS -%]
+[%- GIT_TAGS -%]
+[%- ELSE -%]
+<no tag set>
+[%- END %]
+
+%prep
+%setup -q -n %{pkgname}-%{version} 
+
+%build
+
+%install
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+set -o errexit
+
+# This next line does a regular CPAN-style install. Our Mojo app, however,
+# needs to go in /srv/www/enroller and *not* with the other Perl modules.
+# If you *do* decide to install CPAN-style, the Mojo app won't find its
+# templates and public directories.
+#%{makeinstall} `%{__perl} -MExtUtils::MakeMaker -e ' print \$ExtUtils::MakeMaker::VERSION <= 6.05 ? qq|PREFIX=%{buildroot}%{_prefix}| : qq|DESTDIR=%{buildroot}| '`
+
+install -d -D -m 755 %{buildroot}/srv/www/enroller
+tar cf - lib public script templates | tar -C %{buildroot}/srv/www/enroller/ -x -f -
+
+cmd=/usr/share/spec-helper/compress_files
+[ -x $cmd ] || cmd=/usr/lib/rpm/brp-compress
+[ -x $cmd ] && $cmd
+
+# SuSE Linux
+if [ -e /etc/SuSE-release -o -e /etc/UnitedLinux-release ]
+then
+    %{__mkdir_p} %{buildroot}/var/adm/perl-modules
+    find %{buildroot} -name "perllocal.pod"  \
+        -exec '%{__sed} -e s+%{buildroot}++g {}' \;                 \
+        > %{buildroot}/var/adm/perl-modules/%{name}
+fi
+
+# remove special files
+find %{buildroot} -name "perllocal.pod" \
+    -o -name ".packlist"                \
+    -o -name "*.bs"                     \
+    |xargs -i rm -f {}
+
+# no empty directories
+#find %{buildroot}%{_prefix}             \
+#    -type d -depth                      \
+#    -exec rmdir {} \; 2>/dev/null
+
+%{__perl} -MFile::Find -le '
+    find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
+#    print "%doc  README.md";
+    for my $x (sort @dirs, @files) {
+        push @ret, $x unless indirs($x);
+        }
+    print join "\n", sort @ret;
+
+    sub wanted {
+        return if /auto$/;
+
+        local $_ = $File::Find::name;
+        my $f = $_; s|^\Q%{buildroot}\E||;
+        return unless length;
+        return $files[@files] = $_ if -f $f;
+
+        $d = $_;
+        /\Q$d\E/ && return for reverse sort @INC;
+        $d =~ /\Q$_\E/ && return
+            for qw|/etc %_prefix/man %_prefix/bin %_prefix/share /srv /var |;
+
+        $dirs[@dirs] = $_;
+        }
+
+    sub indirs {
+        my $x = shift;
+        $x =~ /^\Q$_\E\// && $x ne $_ && return 1 for @dirs;
+        }
+    ' > %filelist
+
+[ -z %filelist ] && {
+    echo "ERROR: empty %files listing"
+    exit -1
+    }
+
+%clean
+[ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
+
+%files -f %filelist
+%defattr(-,root,root)
+
+#%attr(0755,root,openxpki) /srv/www/openxpki/mason-data
+
+%changelog
+* Mon Aug 15 2011 m.bartosch@cynops.de
+- Fixed file permissions in package
+* Thu Feb 03 2011 m.bartosch@cynops.de
+- Renovated build process, using generic template mechanism
+* Mon Nov 27 2006 m.bartosch@cynops.de
+- Initial build.
