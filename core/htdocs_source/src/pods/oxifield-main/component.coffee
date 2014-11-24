@@ -34,30 +34,24 @@ Component = Em.Component.extend
     isUploadarea: Em.computed.equal "content.type", "uploadarea"
 
     sFieldSize: (->
-      keys = @get("content.keys")
-      size = @get("content.size")
-      keysize = @get("content.keysize")
+        keys = @get "content.keys"
+        size = @get "content.size"
+        keysize = @get "content.keysize"
 
-      if not size
-        if keys
-            if not keysize
-                keysize = 2
-            size = 7 - keysize
-        else
-            size = 7
+        if not size
+            if keys
+                if not keysize
+                    keysize = 2
+                size = 7 - keysize
+            else
+                size = 7
 
-      return 'col-md-' + size
+        'col-md-' + size
     ).property "content.size", "content.keysize"
 
     sKeyFieldSize: (->
-
-      keysize = @get("content.keysize")
-
-      if keysize
-        return 'col-md-' + keysize
-      else
-        return 'col-md-2'
-
+        keysize = @get("content.keysize") || "2"
+        'col-md-' + keysize
     ).property "content.keysize"
 
     hasError: Em.computed.bool "content.error"
