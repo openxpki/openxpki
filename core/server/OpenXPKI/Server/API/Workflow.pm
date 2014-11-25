@@ -302,11 +302,15 @@ Return a hash with the information taken from the workflow engine plus
 additional information taken from the workflow config via connector.
 Expects one of:
 
+=over
+
 =item ID numeric workflow id
 
 =item TYPE workflow type
 
 =item WORKFLOW workflow object
+
+=back
 
 =cut
 sub __get_workflow_ui_info {

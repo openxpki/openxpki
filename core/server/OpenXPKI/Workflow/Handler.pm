@@ -161,9 +161,13 @@ sub get_workflow {
 
 Return a workflow factory using the versioned config.
 
+=over
+
 =item VERSION The config version hash to use
 
 =item FALLBACK 0|1 weather to fallback to current if version is not found
+
+=back
 
 =cut
 sub get_factory {

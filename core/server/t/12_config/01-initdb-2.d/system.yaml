@@ -1,5 +1,0 @@
-database:
-    user: openxpki
-    pass: oldpassword
-    
-otherbranch: none    
