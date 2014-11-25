@@ -30,14 +30,15 @@ Component = Em.Component.extend
             else
                 reader.readAsDataURL(evt.target.files[0])
         else
-            iframe = @$().find "iframe"
             window.legacyUploadDone = =>
-                resultStr = frames['upload_target'].document.body.innerText
+                body = frames['upload_target'].document.body
+                resultStr = body.textContent || body.innerText
                 res = JSON.parse resultStr
                 @$().find("textarea").val res.result
 
             file = @$().find "input[type=file]"
-            clone = file.clone()
+            fence = $("<div></div>")
+            fence.insertAfter file
 
             url = @container.lookup("controller:config").get ".url"
 
@@ -49,9 +50,11 @@ Component = Em.Component.extend
                     <input type="hidden" name="action" value="plain!upload">
                 </form>
             """
-            form.append clone
+            form.append file
             form.appendTo "body"
             form.submit()
+            file.insertAfter fence
+            fence.remove()
             form.remove()
 
 `export default Component`

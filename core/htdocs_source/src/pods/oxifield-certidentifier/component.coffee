@@ -17,9 +17,11 @@ Component = Em.Component.extend
 
     searchIndex: 0
     searchChanged: Em.observer "search", ->
-        searchIndex = @incrementProperty "searchIndex"
         search = @get "search"
+        return if search is @get "searchPrevious"
+        @set "searchPrevious", search
         @set "content.value", search
+        searchIndex = @incrementProperty "searchIndex"
         @container.lookup("route:openxpki").sendAjax
             data:
                 action: "certificate!autocomplete"
@@ -32,9 +34,8 @@ Component = Em.Component.extend
     actions:
         selectResult: (res) ->
             @set "content.value", res.value
-            @set "mutex", true
+            @set "searchPrevious", res.label
             @set "search", res.label
-            @set "mutex", false
             @$().find(".drowdown").removeClass "open"
 
 `export default Component`

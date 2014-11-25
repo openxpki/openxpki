@@ -1,5 +1,5 @@
 h3 = content.content.label
-div style="margin-bottom:6px;" {{{content.content.description}}}
+div style="margin-bottom:6px;" == content.content.description
 
 if isForm
   oxisection-form content=content
