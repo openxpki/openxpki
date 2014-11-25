@@ -7969,6 +7969,21 @@ label {
   width: 95%;
 }
 
+
+
+div.required input,
+div.required select,
+div.required textarea {
+  background-color: #fff3c2;
+  border: 1px solid #444;
+}
+
+div.optional input,
+div.optional select,
+div.optional textarea {
+  border: 1px #888 dashed;
+}
+
 div.section {
   padding: 0px !important;
 }

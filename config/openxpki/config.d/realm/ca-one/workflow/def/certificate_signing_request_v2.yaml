@@ -564,7 +564,7 @@ field:
         tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP
         type: select
         # The options are provided by the uihandle class!
-        required: 0
+        required: 1
 
     cert_san_parts:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_LABEL

@@ -22,3 +22,9 @@ copy all requried files into the dist/ directory.
 
 Warning: bungle 0.1.0 currently has a bug which shreds binary files. Please
 copy the fonts and images manually over to the dist after rebuild. 
+
+Uglification
+############
+
+To get plain code for debugging, set pipes.jscompressor.type = "passthrough" 
+in bungle.json (line 195)
