@@ -34,7 +34,7 @@ Component = Em.Component.extend
                 body = frames['upload_target'].document.body
                 resultStr = body.textContent || body.innerText
                 res = JSON.parse resultStr
-                @$().find("textarea").val res.result
+                @set "content.value", res.result
 
             file = @$().find "input[type=file]"
             fence = $("<div></div>")
