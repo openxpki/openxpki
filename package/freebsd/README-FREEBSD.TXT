@@ -50,6 +50,10 @@ Some of available versions of the package can be seen here:
 
 http://portsmon.freebsd.org/portoverview.py?category=security&portname=p5-openxpki
 
+Real time package build information is available on 
+http://beefy1.isc.freebsd.org/
+http://beefy2.isc.freebsd.org/
+
 but for more accurate information about package availability for your
 particular FreeBSD system just run from the console:
 
@@ -163,7 +167,7 @@ without this OpenXPKI server would not start.
     (DOCSDIR defaults to "PREFIX/share/doc/openxpki")
 - If you want your PKI server to play a role of the simplest CA,
 then copy sample configuration for this case with
-cp -R EXAMPLESDIR/openxpki/* %%PREFIX%%/etc/openxpki/
+cp -R EXAMPLESDIR/openxpki/* PREFIX/etc/openxpki/
     (EXAMPLESDIR defaults to "PREFIX/share/examples/openxpki")
 and follow advice at:
 https://openxpki.readthedocs.org/en/latest/quickstart.html
