@@ -447,19 +447,7 @@ t/08_debug/TestModule.pm
 t/08_debug/TestModuleUseWithout.pm
 
 t/10_exception/1.t
-
-t/12_config/01-initdb-2.d/realm.yaml
-t/12_config/01-initdb-2.d/system.yaml
-t/12_config/01-initdb-3.d/realm.yaml
-t/12_config/01-initdb-3.d/system.yaml
-t/12_config/01-initdb.d/realm.yaml
-t/12_config/01-initdb.d/system.yaml
-t/12_config/01-initdb.t
-t/12_config/02-readonly.t
-t/12_config/03-version.t
-t/12_config/04-update_head.t
-t/12_config/module.mk
-
+ 
 t/14_datetime/01.t
 t/14_datetime/02.t
 
@@ -668,14 +656,15 @@ cgi-bin/webui.cgi
 cgi-bin/webui.fcgi
 
 # Client UI
-htdocs/main-built.js
-htdocs/localconfig.js
-htdocs/readme.md
+htdocs/src/main-built.js
+htdocs/style/main-built.css
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg
 htdocs/style/img/logo.png
-htdocs/main-built.css
 htdocs/index.html
+htdocs/themed.html
+htdocs/localconfig.js
+htdocs/readme.md
 
