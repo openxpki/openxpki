@@ -265,6 +265,43 @@ sub get_cert {
     return $obj->get_converted($format);
 }
 
+
+=head2 get_profile_for_cert
+
+returns the name of the profile used during the certificate request.
+Supported argument is IDENTIFIER which is required.
+
+=cut
+
+sub get_profile_for_cert {
+
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+
+    ##! 2: "initialize arguments"
+    my $identifier = $args->{IDENTIFIER};
+
+
+    my %params = (
+        TABLE => [ 'CERTIFICATE', 'CSR' ],
+        COLUMNS => [ 'CSR.PROFILE' ],
+        JOIN => [ [ 'CSR_SERIAL', 'CSR_SERIAL' ] ],
+        DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
+    );
+    my $result = CTX('dbi_backend')->first(%params);
+    if ( ! defined $result ) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_PROFILE_FOR_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
+            params => { 'IDENTIFIER' => $identifier, },
+        );
+    }
+
+    return $result->{'CSR.PROFILE'};
+
+}
+
+
 =head2 get_crl
 
 returns a CRL. The possible parameters are SERIAL, FORMAT and PKI_REALM.

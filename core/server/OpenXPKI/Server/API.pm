@@ -346,6 +346,15 @@ sub BUILD {
                 },
             },
         },
+        'get_profile_for_cert' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                },
+            }
+        },
         'private_key_exists_for_cert' => {
             class  => 'Object',
             params => {
