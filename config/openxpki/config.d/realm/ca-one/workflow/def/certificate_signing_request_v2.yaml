@@ -421,11 +421,9 @@ action:
             source: USER
 
     publish_certificate:
-        class: OpenXPKI::Server::Workflow::Activity::CertIssuance::PublishCertificate
+        class: OpenXPKI::Server::Workflow::Activity::Tools::TriggerCertificatePublish
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUBLISH_CERTIFICATE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUBLISH_CERTIFICATE_DESC
-        param:
-            workflow_type: certificate_publishing
 
     put_request_on_hold:
         class: OpenXPKI::Server::Workflow::Activity::Noop

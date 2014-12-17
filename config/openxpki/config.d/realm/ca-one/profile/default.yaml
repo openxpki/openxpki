@@ -48,6 +48,8 @@ digest: sha1
 increasing_serials: 1
 randomized_serial_bytes: 8
 
+
+publish: queue 
  
 # Profile extensions - set 0/1 as needed
 extensions:
