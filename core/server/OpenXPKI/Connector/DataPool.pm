@@ -23,7 +23,7 @@ has value => (
 
 has encrypt => (
     is => 'ro',
-    isa => 'Bool'
+    isa => 'Bool',
     default => 0,
 );
 
@@ -42,7 +42,7 @@ sub get {
     };
 
     if (defined $params->{extra}) {
-        $ttarg->{EXTRA} => $params->{extra};
+        $ttarg->{EXTRA} = $params->{extra};
     }
 
     $self->log()->debug('Template args ' . Dumper $ttarg );
@@ -125,9 +125,9 @@ sub get_meta {
     if (!defined $res || ref $res eq '') {
         # Treat it as a scalar
         return {TYPE  => "scalar" };
-    } else if (ref $res eq 'ARRAY') {
+    } elsif (ref $res eq 'ARRAY') {
         return {TYPE  => "list" };
-    } else if (ref $res eq 'HASH') {
+    } elsif (ref $res eq 'HASH') {
         return {TYPE  => "hash" };
     }
 
@@ -153,7 +153,7 @@ sub set {
     };
 
     if (defined $params->{extra}) {
-        $ttarg->{EXTRA} => $params->{extra};
+        $ttarg->{EXTRA} = $params->{extra};
     }
 
     $self->log()->debug('Template args ' . Dumper $ttarg );
@@ -183,7 +183,7 @@ sub set {
         'NAMESPACE' => $self->LOCATION(),
         'KEY' => $parsed_key,
         'VALUE' => $dpval,
-        'ENCRYPT' => $self->encrypt()
+        'ENCRYPT' => $self->encrypt(),
         'FORCE' => 1
     });
 
