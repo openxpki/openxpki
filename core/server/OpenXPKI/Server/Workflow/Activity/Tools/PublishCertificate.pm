@@ -81,7 +81,7 @@ sub execute {
     }
 
     # If the data point does not exist, we get a one item undef array
-    return unless (defined @targets && $targets[0]);
+    return unless (@targets && $targets[0]);
 
 
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
@@ -136,28 +136,66 @@ sub execute {
         );
     }
 
+    # Check for publication key
+    my $publish_key = $self->param('publish_key');
+
+    # Defined but empty, stop publication
+    if (defined($publish_key) && !$publish_key) {
+        CTX('log')->log(
+            MESSAGE => 'Dont publish as publish_key is defined but empty for ' .$data->{subject},
+            PRIORITY => 'info',
+            FACILITY => [ 'application' ],
+        );
+        return 1;
+    }
+
+    # No publication key set, parse out CN
+    if (!$publish_key) {
+        # Strip the common name to be used as publishing key
+        my $dn_parser = OpenXPKI::DN->new( $data->{subject} );
+        my %rdn_hash = $dn_parser->get_hashed_content();
+
+        # something went wrong - no CN set?
+        if (!$rdn_hash{CN}[0]) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT',
+                log => {
+                logger => CTX('log'),
+                    priority => 'error',
+                    facility => 'system',
+                },
+            );
+        }
+        $publish_key = $rdn_hash{CN}[0];
+    }
+
+
     ##! 32: 'Data for publication '. Dumper ( $data )
 
     CTX('log')->log(
-        MESSAGE => 'Start publication for ' .$data->{subject},
+        MESSAGE => 'Start publication to '.$publish_key.' for ' .$data->{subject},
         PRIORITY => 'info',
         FACILITY => [ 'application' ],
     );
 
-    # Strip the common name to be used as publishing key
-    my $dn_parser = OpenXPKI::DN->new( $data->{subject} );
-
-    my %rdn_hash = $dn_parser->get_hashed_content();
-
+    # Required for special connectors (grabbing extended data from the workflow)
+    # TODO: should be replaced by e.g. a static factory
     my $param;
     if ($self->param('export_context')) {
-       $param->{context} = $workflow->context()->param();
+       $param->{extra} = $workflow->context()->param();
+       ##! 16: 'Export context to connector ' . Dumper $param
     }
 
+    # TODO - Handle exceptions / pause
     foreach my $target (@targets) {
         ##! 32: " $target . $rdn_hash{CN}[0] "
-        my $res = $config->set( [  @path, $target, $rdn_hash{CN}[0] ], $data, $param );
+        my $res = $config->set( [  @path, $target, $publish_key ], $data, $param );
         ##! 16 : 'Publish at target ' . $target . ' - Result: ' . $res
+        CTX('log')->log(
+            MESSAGE => "publish to $target to with $publish_key - result " . Dumper $res,
+            PRIORITY => 'debug',
+            FACILITY => [ 'application' ],
+        );
     }
 
     ##! 4: 'end'
@@ -181,9 +219,12 @@ definition. If unset, the class falls back to the context value of cert_identifi
 The publishing information is read from the connector at profile.<profile name>.publish
 which must be a list of names (scalar is also ok). If the node does not exists,
 profile.default.publish is used. Each name is expanded to the path
-publishing.entity.<name> which must be a connector reference. Each connector is
-called with the value of the certificates common name as location. The data portion
+publishing.entity.<name> which must be a connector reference. The publication
+target is taken from the parameter I<publish_key> or defaults to the certificates
+common name (CN attribute parsed from the final subject). The data portion
 contains a hash ref with the keys I<pem>, I<der> and I<subject> (full dn of the cert).
+Note: if the evaluation of I<publish_key> is empty but defined, the publication
+is stopped.
 
 To use profile independant publication, specify the parameter I<prefix> which must
 point to a scalar/list of connector references.
@@ -220,6 +261,12 @@ Enables publishing to a fixed set of connectors, disables per profile settings.
 
 Set the identifier of the cert to publish, optional, default is the value
 of the context key cert_identifier.
+
+=item publish_key
+
+The value to be used as key for the publication call, optional.
+E.g. to publish using the context value with key "user_email" set
+this to "$user_email".
 
 =item export_context
 

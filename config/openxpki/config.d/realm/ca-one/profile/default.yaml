@@ -49,7 +49,9 @@ increasing_serials: 1
 randomized_serial_bytes: 8
 
 
-publish: queue 
+publish: 
+  - queue 
+  - disk
  
 # Profile extensions - set 0/1 as needed
 extensions:

@@ -60,6 +60,8 @@ action:
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_PUBLISH_DESC
         input: 
           - cert_identifier
+        param:
+            export_context: 1
 
 condition:
     has_prefix:

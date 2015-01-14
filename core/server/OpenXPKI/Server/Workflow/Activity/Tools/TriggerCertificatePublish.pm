@@ -21,21 +21,23 @@ sub execute {
     my $workflow = shift;
     my $context = $workflow->context();
 
-    my $workflow_type = $self->param('workflow_type');
+    # Add any additional action parameters as context params
+    my $params = $self->param();
 
-    $workflow_type = 'certificate_publishing' unless($workflow_type);
+    my $workflow_type = 'certificate_publishing';
 
-    my $cert_identifier = $context->param('cert_identifier');
+    if ($params->{'workflow_type'}) {
+       $workflow_type = $params->{'workflow_type'};
+        delete $params->{'workflow_type'};
+    }
 
-    my $params = {
-        cert_identifier =>  $cert_identifier
-    };
+    # cert identifier is mandatory
+    if (!$params->{cert_identifier}) {
+        $params->{cert_identifier} = $context->param('cert_identifier');
+    }
 
-    # Check if a prefix is set in the action definition
-    my $prefix = $self->param('prefix');
-    if ($prefix) {
-        $params->{prefix} = $prefix;
-    } else {
+    # Check profile based publishing if no prefix is set in the action definition
+    if (!$params->{prefix}) {
         # Profile based publication, check for publication options
         my $cert_profile = $context->param('cert_profile');
         if (!CTX('config')->get_scalar_as_list(['profile', $cert_profile, 'publish' ] ) &&
@@ -110,13 +112,19 @@ Prefix to list of publishing connectors, default is profile based publishing.
 
 =back
 
+All other activity parameters are passed as parameters to the new workflow.
+Make sure that those parameters are listed in the initial action of the
+called workflow!
+
 =head2 Context parameters
 
 Expects the following context parameter:
 
 =over 12
 
-=item cert_identifier
+=item cert_identifier (can be overridden in the an activity definition)
+
+=item cert_profile (obsolete when using prefix)
 
 =back
 

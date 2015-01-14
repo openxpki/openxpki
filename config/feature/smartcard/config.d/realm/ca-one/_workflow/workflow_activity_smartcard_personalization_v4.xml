@@ -25,7 +25,7 @@
 
     <action name="scpers_issue_certificate"
             class="OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate"
-            retry_count="10" 
+            retry_count="10"
             retry_interval="+0000000030">
     </action>
 
@@ -87,7 +87,7 @@
     </action>
 
     <action name="scpers_publish_certificate"
-            class="OpenXPKI::Server::Workflow::Activity::SmartCard::PublishCertificate"
+            class="OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate"
             prefix="smartcard.publishing"
             publish_key="userinfo_mail">
             <description>Generic routine for publishing certificates to LDAP servers</description>

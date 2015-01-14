@@ -39,12 +39,12 @@ connectors:
     queue:
         class: OpenXPKI::Connector::DataPool
         LOCATION: export.smartcard.transfer
-        key: "[% CONTEXT.cert_identifier %]"
+        key: "[% EXTRA.cert_identifier %]"
         value: 
-            EmployeeID: "[% CONTEXT.userinfo_employee_id %]"
+            EmployeeID: "[% EXTRA.userinfo_employee_id %]"
             certType: enc
-            email: "[% CONTEXT.userinfo_mail %]"
-            creator: "[% CONTEXT.creator %]"
+            email: "[% EXTRA.userinfo_mail %]"
+            creator: "[% EXTRA.creator %]"
 
     cdp:
         class: Connector::Builtin::File::Path
