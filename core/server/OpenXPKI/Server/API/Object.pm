@@ -1540,6 +1540,18 @@ sub set_data_pool_entry {
 
     my $current_pki_realm = CTX('session')->get_pki_realm();
 
+    # Check if key and namespace exists
+    if (!$arg_ref->{NAMESPACE} || !$arg_ref->{KEY}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_NAMESPACE_AND_KEY_ARE_REQUIRED',
+            log => {
+                logger   => CTX('log'),
+                priority => 'error',
+                facility => [ 'system' ],
+            }
+        );
+    }
+
     if ( !defined $arg_ref->{PKI_REALM} ) {
         # modify arguments, as they are passed to the worker method
         $arg_ref->{PKI_REALM} = $current_pki_realm;
