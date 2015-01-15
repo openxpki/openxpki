@@ -51,6 +51,7 @@ OpenXPKI/Config/Backend.pm
 
 # Config Connector
 OpenXPKI/Connector/FakeValidity.pm
+OpenXPKI/Connector/DataPool.pm
 
 ## Crypto layer
 
@@ -270,6 +271,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Pause.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCRL.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RevokeCertificate.pm
+OpenXPKI/Server/Workflow/Activity/Tools/TriggerCertificatePublish.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/RenderSubject.pm
 
