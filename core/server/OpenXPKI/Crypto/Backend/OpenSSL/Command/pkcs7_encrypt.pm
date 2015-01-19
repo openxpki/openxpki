@@ -25,27 +25,27 @@ sub get_command
             ($engine_usage =~ m{ ALWAYS }xms));
 
     $self->{ENC_ALG}  = "aes256" if (not exists $self->{ENC_ALG});
-    
+
     $self->{OUTFORM}  = "PEM" if (not exists $self->{OUTFORM});
 
     if ($self->{CERT})
-    {    	
-	  	# Its possible to have a list of certs
-    	if (ref $self->{CERT} eq "ARRAY") {
-    		my $names = '';
-    		my $i=0;
-    		foreach my $cert (@{$self->{CERT}}) {
-    			$i++;
-    			$self->get_tmpfile('CERT'.$i);
-	        	$self->write_file (FILENAME => $self->{'CERT'.$i.'FILE'}, CONTENT  => $cert, FORCE    => 1);				
-				$names .= ' ' . $self->{'CERT'.$i.'FILE'};
-    		} 
-    		# Set CERTFILE to the list of tmpnames
-    		$self->{CERTFILE} = $names; 		
-    	} else {    	
-	        $self->get_tmpfile ('CERT');
-	        $self->write_file (FILENAME => $self->{CERTFILE}, CONTENT  => $self->{CERT}, FORCE    => 1);
-    	}    
+    {
+          # Its possible to have a list of certs
+        if (ref $self->{CERT} eq "ARRAY") {
+            my $names = '';
+            my $i=0;
+            foreach my $cert (@{$self->{CERT}}) {
+                $i++;
+                $self->get_tmpfile('CERT'.$i);
+                $self->write_file (FILENAME => $self->{'CERT'.$i.'FILE'}, CONTENT  => $cert, FORCE    => 1);
+                $names .= ' ' . $self->{'CERT'.$i.'FILE'};
+            }
+            # Set CERTFILE to the list of tmpnames
+            $self->{CERTFILE} = $names;
+        } else {
+            $self->get_tmpfile ('CERT');
+            $self->write_file (FILENAME => $self->{CERTFILE}, CONTENT  => $self->{CERT}, FORCE    => 1);
+        }
     } else {
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
     }
@@ -57,7 +57,7 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CONTENT");
     }
-    if (not $self->{CERT})
+    if (not $self->{CERTFILE})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_ENCRYPT_MISSING_CERT");
@@ -78,7 +78,7 @@ sub get_command
 
     $self->write_file (FILENAME => $self->{CONTENTFILE},
                        CONTENT  => $self->{CONTENT},
-	               FORCE    => 1);
+                   FORCE    => 1);
 
     ## build the command
 
