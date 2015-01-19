@@ -44,7 +44,7 @@ sub init_issuer {
             $self->_escape($cert->{SUBJECT}),
             $cert->{NOTBEFORE},
             $cert->{NOTAFTER},
-            $cert->{STATUS},
+            $cert->{VSTATUS},
             $cert->{IDENTIFIER}
         ];
     }

@@ -408,6 +408,9 @@ sub get_ca_list {
                 );
             }
         }
+
+        # Add translated status for frontend
+        $item->{VSTATUS} = OpenXPKI::i18n::i18nGettext($item->{STATUS});
         push @token, $item;
     }
     ##! 32: "Found tokens " . Dumper @token
