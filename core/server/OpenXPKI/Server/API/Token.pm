@@ -265,9 +265,9 @@ sub list_active_aliases {
 
     if (!$group) {
 
-    	if ($keys->{TYPE}) {
-    	   $group = CTX('config')->get("realm.$pki_realm.crypto.type.".$keys->{TYPE});
-    	}
+        if ($keys->{TYPE}) {
+           $group = CTX('config')->get("realm.$pki_realm.crypto.type.".$keys->{TYPE});
+        }
 
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
@@ -393,7 +393,7 @@ sub get_ca_list {
                         IDENTIFIER => $entry->{'CERTIFICATE.IDENTIFIER'},
                     }
                 } );
-                if ($token->key_usable()) {
+                if ($self->is_token_usable({ TOKEN => $token })) {
                     $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_ONLINE';
                 } else {
                     $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_OFFLINE';
@@ -434,10 +434,10 @@ Result is an arrayref of certificate identifiers.
 
 sub get_trust_anchors {
 
-	my $self = shift;
+    my $self = shift;
 
-	my $args = shift;
-	my $path = $args->{PATH};
+    my $args = shift;
+    my $path = $args->{PATH};
 
     OpenXPKI::Exception->throw (
         message => 'I18N_OPENXPKI_API_TOKEN_GET_TRUST_ANCHOR_NO_PATH',
@@ -466,5 +466,91 @@ sub get_trust_anchors {
    return \@trust_anchors;
 
 }
+
+
+=head2 is_token_usable ( { ALIAS | TOKEN, ENGINE })
+
+Check if the token with given alias is usable, when used inline you can
+directly pass the token object instead of the alias. By default, the method
+executes a pkcs7 encrypt / decrypt cycle to test if the token is working.
+If you pass ENGINE = 1, the engines key_usable method is used instead.
+Returns true or false.
+
+=cut
+sub is_token_usable {
+
+    my $self = shift;
+    my $keys = shift;
+
+    my $token;
+    if ($keys->{ALIAS}) {
+        my %types = reverse %{CTX('config')->get_hash('crypto.type')};
+        # strip of the generation
+        $keys->{ALIAS} =~ /^(.*)-(\d+)$/;
+        if (!$1 || !$types{$1}) {
+            OpenXPKI::Exception->throw (
+                message => 'I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_UNABLE_TO_GET_TOKEN_TYPE',
+            );
+        }
+        $token = CTX('crypto_layer')->get_token({ TYPE => $types{$1}, NAME => $keys->{ALIAS} });
+    } elsif ($keys->{TOKEN}) {
+        $token = $keys->{TOKEN};
+    } else {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_TOKEN_OR_ALIAS_REQURIED',
+        );
+    }
+
+    # Shortcut method, ask the token engine
+    if ($keys->{ENGINE}) {
+        CTX('log')->log(
+            MESSAGE  => 'Check if token is usable using engine',
+            PRIORITY => "debug",
+            FACILITY => 'application',
+        );
+        return $token->key_usable()
+    }
+
+    eval {
+
+        CTX('log')->log(
+            MESSAGE  => 'Check if token is usable using crypto operation',
+            PRIORITY => "debug",
+            FACILITY => 'application',
+        );
+
+        my $probe = 'OpenXPKI Encryption Test';
+
+        my $value = $token->command({
+            COMMAND => 'pkcs7_encrypt',
+            CONTENT => $probe,
+        });
+
+        ##! 16: 'encryption done'
+
+        $value = $token->command({
+            COMMAND => 'pkcs7_decrypt',
+            PKCS7   => $value,
+        });
+
+        ##! 16: 'decryption done'
+        if (!defined $probe || $value ne $probe) {
+            OpenXPKI::Exception->throw (
+                message => 'I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_VALUE_MISSMATCH',
+            );
+        }
+        ##! 16: 'probe matches'
+    };
+    if ($EVAL_ERROR) {
+        my $ee = $EVAL_ERROR;
+        ##! 16: 'got eval error ' . $ee
+        return 0;
+    }
+
+    ##! 16: 'key is online'
+    return 1;
+
+}
+
 
 1;

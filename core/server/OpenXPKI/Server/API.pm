@@ -197,6 +197,25 @@ sub BUILD {
                 },
             },
         },
+        'is_token_usable' => {
+            class  => 'Token',
+            params => {
+                'ALIAS' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'TYPE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1
+                },
+                'ENGINE' => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
+                    optional => 1
+                },
+            },
+        },
         'get_approval_message' => {
             class  => 'Default',
             params => {
