@@ -115,6 +115,28 @@ sub list_process {
 
 }
 
+sub get_menu {
+
+    ##! 1: 'start'
+
+    my $self = shift;
+
+    my $role = CTX('session')->get_role();
+
+    ##! 16: 'role is ' . $role
+    if (!CTX('config')->exists( ['uicontrol', $role ] )) {
+        ##! 16: 'no menu for role, use default '
+        $role = '_default';
+    }
+
+    # we silently assume that the config layer node can return a deep hash ;)
+    my $menu = CTX('config')->get_hash( [ 'uicontrol', $role ], { deep => 1 });
+
+    return $menu;
+
+}
+
+
 1,
 
 __END__;

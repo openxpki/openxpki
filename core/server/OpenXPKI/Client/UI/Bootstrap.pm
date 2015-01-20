@@ -17,7 +17,9 @@ sub init_structure {
 
     if ($session->param('is_logged_in') && $user) {
         $self->_result()->{user} = $user;
-        $self->_init_structure_for_user( $user );
+        my $menu = $self->send_command( 'get_menu' );
+        $self->logger()->trace('Menu ' . Dumper $menu);
+        $self->_result()->{structure} = $menu->{main};
     }
 
     if (!$self->_result()->{structure}) {
@@ -33,66 +35,6 @@ sub init_structure {
 
 }
 
-sub _init_structure_for_user {
-
-    my $self = shift;
-    my $user = shift;
-
-    $self->_result()->{structure} =
-    [{
-         key=> 'home',
-         label=>  'Home',
-         entries=>  [
-             {key=> 'home!index', label =>  "Home"},
-             {key=> 'home!task', label =>  "My tasks"},
-             {key=> 'home!workflow',label =>  "My workflows"},
-             {key=> 'home!certificate',label =>  "My certificates"} ,
-         ]
-      },
-
-      {
-         key=> 'request',
-         label=>  'Request',
-         entries=>  [
-              {key=> 'workflow!index!wf_type!certificate_signing_request_v2', label =>  "Request new certificate"},
-              #{key=> 'workflow!index!wf_type!certificate_renewal_request_v2', label =>  "Request renewal"},
-              {key=> 'workflow!index!wf_type!certificate_revocation_request_v2', label =>  "Request revocation"} ,
-         ]
-      },
-      {
-         key=> 'pkiadm',
-         label=>  'PKI Operation',
-         entries=>  [
-             {key=> 'workflow!index!wf_type!change_metadata', label =>  "Change metadata"},
-             {key=> 'workflow!index!wf_type!crl_issuance', label =>  "Issue CRL"},
-             {key=> 'secret!index', label =>  "Manage Secrets"},
-             {key=> 'information!process',label =>  "Process Information"}
-         ]
-      },
-      {
-         key=> 'info',
-         label=>  'Information',
-         entries=>  [
-             {key=> 'information!issuer', label =>  "CA certificates"},
-             {key=> 'information!crl',label =>  "Revocation lists"},
-             #{key=> 'information!policy',label =>  "Pollicy documents"}
-         ]
-      },
-      {
-          key=> 'certificate!search',
-          label =>  "Certificates",
-          entries=> []
-      },
-      {
-         key => 'workflow!search',
-         label =>  "Workflows",
-         entries=>  []
-      }
-   ];
-
-
-   return $self;
-}
 
 sub init_error {
 

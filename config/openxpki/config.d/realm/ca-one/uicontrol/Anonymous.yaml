@@ -1,0 +1,22 @@
+main:
+  - key: home
+    label: Home
+
+  - key: workflow!index!wf_type!certificate_signing_request_v2
+    label: Request new certificate
+
+  - key:   workflow!index!wf_type!certificate_revocation_request_v2
+    label: Request revocation
+ 
+  - key:   info
+    label: Information
+    entries: 
+      - key:   information!issuer
+        label: CA certificates
+      - key:   information!crl
+        label: Revocation lists
+
+  - key:   certificate!search
+    label: Certificates
+
+

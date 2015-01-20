@@ -14,12 +14,13 @@ Controller = Em.ArrayController.extend
         page = @get "page"
         for entry in @get "navEntries"
             Em.set entry, "active", false
-            for e in entry.entries
-                if e.key is page
-                    Em.set e, "active", true
-                    Em.set entry, "active", true
-                else
-                    Em.set e, "active", false
+            if entry.entries
+                for e in entry.entries
+                    if e.key is page
+                        Em.set e, "active", true
+                        Em.set entry, "active", true
+                    else
+                        Em.set e, "active", false
         null
 
 

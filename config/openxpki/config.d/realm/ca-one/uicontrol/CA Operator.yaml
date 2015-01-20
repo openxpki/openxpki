@@ -1,0 +1,23 @@
+main:
+  - key: home
+    label: Home
+
+  - key:   pkiadm
+    label: PKI Operation
+    entries:
+      - key:   workflow!index!wf_type!crl_issuance
+        label: Issue CRL
+      - key:   secret!index
+        label: Manage Secrets
+      - key:   information!process
+        label: Process Information
+
+  - key:   info
+    label: Information
+    entries: 
+      - key:   information!issuer
+        label: CA certificates
+      - key:   information!crl
+        label: Revocation lists
+ 
+

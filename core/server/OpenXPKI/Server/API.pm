@@ -1417,6 +1417,11 @@ sub BUILD {
             class  => 'UI',
             params => {
             }
+        },
+        'get_menu' => {
+            class  => 'UI',
+            params => {
+            }
         }
     };
 }
