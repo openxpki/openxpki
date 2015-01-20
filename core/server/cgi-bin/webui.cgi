@@ -2,6 +2,7 @@
 
 use CGI;
 use CGI::Session;
+use CGI::Carp qw (fatalsToBrowser);
 use JSON;
 use English;
 use strict;
