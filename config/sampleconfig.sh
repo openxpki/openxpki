@@ -54,7 +54,6 @@ x509_extensions = v3_ca
 
 [ req_distinguished_name ]
 domainComponent = Domain Component
-domainComponent_default = not allowed to be empty 
 commonName = Common Name
 
 [ usr_cert ]
@@ -62,6 +61,13 @@ commonName = Common Name
 basicConstraints=CA:FALSE
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid,issuer
+
+[ vault_cert ]
+basicConstraints=CA:FALSE
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+keyUsage = keyEncipherment
+extendedKeyUsage=emailProtection
 
 [ v3_ca ]
 
@@ -88,7 +94,8 @@ openssl req -verbose  -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one
  
 openssl ca -in csr.pem  -config openssl.cnf -keyfile "$BASE/ca-root-1.pem" -cert "$BASE/ca-root-1.crt" -out "$BASE/ca-one-signer-1.crt" -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=CA ONE" -batch -passin pass:root  -extensions v3_ca -days 1095 -outdir .
  
-openssl req -verbose  -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one-vault-1.pem" -out csr.pem -batch -passout pass:root
+# Data Vault is only used internally, use self signed
+openssl req -verbose -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one-vault-1.pem" -out "$BASE/ca-one-vault-1.crt" -batch -passout pass:root -x509 -days 365 -extensions vault_cert -subj "/DC=OpenXPKI Internal/CN=DataVault"
  
 openssl ca -in csr.pem  -config openssl.cnf -keyfile "$BASE/ca-root-1.pem" -cert "$BASE/ca-root-1.crt" -out "$BASE/ca-one-vault-1.crt" -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=DataVault" -batch -passin pass:root -outdir .
 
@@ -115,7 +122,7 @@ openxpkiadm certificate import --file $BASE/ca-one-signer-1.crt --realm ca-one -
 
 openxpkiadm alias --realm ca-one --token certsign --identifier `openxpkiadm certificate id --file $BASE/ca-one-signer-1.crt`
 
-openxpkiadm certificate import --file $BASE/ca-one-vault-1.crt --realm ca-one --issuer $ROOTID
+openxpkiadm certificate import --file $BASE/ca-one-vault-1.crt 
 openxpkiadm alias --realm ca-one --token datasafe --identifier `openxpkiadm certificate id --file $BASE/ca-one-vault-1.crt`
 
 openxpkiadm certificate import --file $BASE/ca-one-scep-1.crt --realm ca-one --issuer $ROOTID
