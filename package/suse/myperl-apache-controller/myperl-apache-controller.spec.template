@@ -1,15 +1,16 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Adapted for myperl-dbd-oracle by Scott Hardin
+## Adapted for myperl-dbd-mysql by Scott Hardin
 ## Copyright (C) 2005-2014 by The OpenXPKI Project
 
-%define pkgname myperl-dbd-oracle
+%define pkgname myperl-apache-controller
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
 %define __perl /opt/myperl/bin/perl
+%define __cpanm /opt/myperl/bin/cpanm
 
 name:      %{pkgname}
-summary:   DBD::Oracle packaged for myperl
+summary:   Apache Controller packaged for myperl
 version:   [% version %]
 [% IF PKGREL %]
 release: [% PKGREL %]
@@ -23,15 +24,13 @@ group:     Applications/CPAN
 url:       http://www.openxpki.org
 buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
-BuildRequires: myperl
+BuildRequires: myperl myperl-apache-mod-perl expat
 Requires: myperl
-# Some oracle installations are so complicated that they don't package the libcltsh.so directly,
-# but have some convoluted install script that unpacks it from somewhere else.
 AutoReqProv: no
 #source:    %{pkgname}-%{version}.tar.gz
 
 %description
-DBD::Oracle packaged for myperl
+Apache Controller packaged for myperl
 
 Packaging information:
 OpenXPKI version       [% version %]
@@ -68,8 +67,11 @@ VENDORARCH=`%{__perl} "-V:vendorarch" | awk -F\' '{print $2}'`
 VENDORLIBEXP=%{buildroot}/`%{__perl} "-V:vendorlibexp" | awk -F\' '{print $2}'`
 ARCHNAME=`%{__perl} "-V:archname" | awk -F\' '{print $2}'`
 ARCHLIB=`%{__perl} "-V:archlib" | awk -F\' '{print $2}'`
+VENDORMAN1EXP=`%{__perl} "-V:vendorman1direxp" | awk -F\' '{print $2}'`
+VENDORMAN3EXP=`%{__perl} "-V:vendorman3direxp" | awk -F\' '{print $2}'`
+VENDORSCRIPTEXP=`%{__perl} "-V:vendorscriptexp" | awk -F\' '{print $2}'`
 PRIVLIB=`%{__perl} "-V:privlib" | awk -F\' '{print $2}'`
-CPANM=/opt/myperl/bin/cpanm
+CPANM="%{__cpanm}"
 CPANM_OPTS="--notest --skip-satisfied --skip-installed --verbose $CPANM_MIRROR"
 
 # Environment vars neede for proper Perl module installation
@@ -78,8 +80,11 @@ export PERL_MB_OPT="--destdir '%{buildroot}' --installdirs vendor"
 export PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR=%{buildroot}"
 export DESTDIR="%{buildroot}"
 
-$CPANM $CPANM_OPTS Test::NoWarnings
-$CPANM $CPANM_OPTS Test::Tester Test::Deep DBD::Oracle
+#$CPANM $CPANM_OPTS Test::NoWarnings
+#$CPANM $CPANM_OPTS --installdeps Apache2::Request
+$CPANM $CPANM_OPTS Apache2::Request
+#(cd $HOME/.cpanm/latest-build/libapreq2-2.13 && %{__perl} Makefile.PL && ./configure --disable-static && make install)
+$CPANM $CPANM_OPTS Apache2::Cookie Apache2::Controller
 
 ## This next line does a regular CPAN-style install. Our Mojo app, however,
 ## needs to go in /srv/www/enroller and *not* with the other Perl modules.
@@ -108,6 +113,16 @@ find %{buildroot} -name "perllocal.pod" \
     -o -name ".packlist"                \
     -o -name "*.bs"                     \
     |xargs -i rm -f {}
+
+# myperl issue #2 kludge
+# Note: since this is a nasty kludge, leave the fail-on-error behavior of make.
+#
+# DESTDIR = %{buildroot}
+rm -rf \
+    $DESTDIR/opt/myperl/bin/config_data \
+    $DESTDIR/$VENDORMAN1EXP/config_data.1 \
+    $DESTDIR/$VENDORMAN3EXP/CGI* \
+    $DESTDIR/$VENDORMAN3EXP/Module::Build*
 
 # no empty directories
 #find %{buildroot}%{_prefix}             \
