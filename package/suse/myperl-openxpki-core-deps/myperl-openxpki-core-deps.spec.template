@@ -64,8 +64,8 @@ VENDORMAN1EXP=`%{__perl} "-V:vendorman1direxp" | awk -F\' '{print $2}'`
 VENDORMAN3EXP=`%{__perl} "-V:vendorman3direxp" | awk -F\' '{print $2}'`
 VENDORSCRIPTEXP=`%{__perl} "-V:vendorscriptexp" | awk -F\' '{print $2}'`
 PRIVLIB=`%{__perl} "-V:privlib" | awk -F\' '{print $2}'`
-CPANM="%{__perl} `pwd`/cpanm"
-CPANM_OPTS="--notest --skip-satisfied --skip-installed --verbose"
+CPANM=/opt/myperl/bin/cpanm
+CPANM_OPTS="--notest --skip-satisfied --skip-installed --verbose $CPANM_MIRROR"
 
 # Environment vars neede for proper Perl module installation
 export PERL5LIB=%{buildroot}/$VENDORARCH:%{buildroot}/$VENDORLIB
@@ -74,9 +74,6 @@ export PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR=%{buildroot}"
 # Keep Module::Install from trying to install stuff itself using cpanplus or cpan
 export PERL_AUTOINSTALL="--skip"
 export DESTDIR="%{buildroot}"
-
-curl -LO http://xrl.us/cpanm
-chmod +x cpanm
 
 $CPANM $CPANM_OPTS Class::Std Config::Std
 echo "DEBUG: current directory = `pwd`"
