@@ -194,6 +194,18 @@ sub certificate_import {
     print "  Identifier: " . $res->{IDENTIFIER} . "\n";
     print "  Realm:      " . ($res->{PKI_REALM} || 'none'). "\n";
 
+    # directly register alias
+    if ($params{alias} || $params{gen} || $params{token}) {
+        if (!$res->{PKI_REALM}) {
+            print "*Unable to register alias without realm!*\n";
+        } else {
+            $params{identifier} = $res->{IDENTIFIER};
+            $params{realm} = $res->{PKI_REALM};
+            print "\n";
+        }
+        alias_add();
+    }
+
     return 0;
 
 }
@@ -578,6 +590,7 @@ sub alias_list {
     my $db_alias;
     my $cert;
     my $filter = $params{filter} || 'current';
+    my $show_subject = $params{subject} ? 1 :0;
 
     # Prepare template for where part based on filter
     my $where = { 'PKI_REALM' => { VALUE => $realm } };
@@ -592,6 +605,35 @@ sub alias_list {
         if ($filter ne 'active') {
             $limit = 1;
         }
+    }
+
+    # No group list
+    if ($params{nogroup}) {
+        $where->{GROUP_ID} = { VALUE => undef };
+
+        $db_alias = $dbi->select(
+            TABLE   => 'ALIASES',
+            DYNAMIC =>  $where,
+            'ORDER' => [ 'ALIAS', 'NOTBEFORE' ],
+            'REVERSE' => 1,
+        );
+        print "=== alias without group ===\n" if (@{$db_alias});
+        foreach my $alias (@{$db_alias}) {
+
+            $cert = $dbi->first(
+                TABLE   => 'CERTIFICATE',
+                DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+            );
+
+            __alias_print( $alias, $cert, $show_subject);
+        }
+        return 0;
+    }
+
+    if ($params{group}) {
+        $where->{GROUP_ID} = { VALUE => $params{group} };
+    } else {
+        $where->{GROUP_ID} = { VALUE => '', OPERATOR => 'NOT_EQUAL' };
     }
 
     # Load the list of exisiting aliased groups as there can be custom tokens
@@ -610,10 +652,13 @@ sub alias_list {
     # remove root from the list
     delete $anon_groups{'root'};
 
-    print "=== functional token ===\n";
+    print "=== functional token ===\n" if (!$params{group});
     foreach my $type (keys %{$groups}) {
 
         my $group = $groups->{$type};
+
+        next if ($params{group} && $group ne $params{group});
+
         print "$group ($type):\n";
 
         $where->{'GROUP_ID'} = { VALUE => $group };
@@ -632,10 +677,10 @@ sub alias_list {
                 DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
             );
 
-            __alias_print( $alias, $cert );
+            __alias_print( $alias, $cert, $show_subject );
         }
 
-        # print empty message if none found
+        # print empty message if none found and not in group mode
         if (!scalar @{$db_alias}) {
             __alias_print( undef, undef );
         }
@@ -666,10 +711,13 @@ sub alias_list {
                 DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
             );
 
-            __alias_print( $alias, $cert );
+            __alias_print( $alias, $cert, $show_subject );
         }
 
     }
+
+    # do not proceed in group mode
+    return 0 if ($params{group});
 
     # Check for root ca
     $alias = $dbi->first(
@@ -689,7 +737,7 @@ sub alias_list {
     );
 
     print "=== root ca ===\ncurrent root ca:\n";
-    __alias_print( $alias, $cert );
+    __alias_print( $alias, $cert, $show_subject );
 
     # Check for root ca
     $alias = $dbi->first(
@@ -708,7 +756,7 @@ sub alias_list {
     );
 
     print "upcoming root ca:\n";
-    __alias_print( $alias, $cert );
+    __alias_print( $alias, $cert, $show_subject );
 
 
     return 0;
@@ -720,6 +768,7 @@ sub __alias_print {
 
     my $alias = shift;
     my $cert = shift;
+    my $subject = shift;
 
     if (!$alias || !$alias->{ALIAS}) {
         print "  not set\n\n";
@@ -728,8 +777,10 @@ sub __alias_print {
 
     print "  Alias     : $alias->{ALIAS}\n";
     print "  Identifier: $alias->{IDENTIFIER}\n";
-    print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{NOTBEFORE} )->strftime("%F %T");
 
+    print "  Subject   : $cert->{SUBJECT}\n" if ($subject);
+
+    print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{NOTBEFORE} )->strftime("%F %T");
     print DateTime->from_epoch( epoch => $cert->{NOTBEFORE} )->strftime(" (%F %T)")
         if ($cert && $cert->{NOTBEFORE} != $alias->{NOTBEFORE});
 
@@ -738,6 +789,8 @@ sub __alias_print {
 
     print DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime(" (%F %T)")
         if ($cert && $cert->{NOTAFTER} != $alias->{NOTAFTER});
+
+
 
     print "\n\n";
 
@@ -1251,7 +1304,14 @@ if ($cmd eq 'initdb') {
             force-issuer
             force-certificate-already-exists
             revoked
+
+            alias=s
+            gen|generation=s
+            group=s
+            token=s
         );
+
+        # alias, gen, group, token are for alias shortcut
 #            force-really-self-signed
 #            force-issuer-not-found
 #            force-certificate-already-exists
@@ -1267,9 +1327,9 @@ if ($cmd eq 'initdb') {
 
         __check_realm() if ($params{realm});
 
-#        if ((!$params{alias} && $params{group}) || ($params{alias} && !$params{group})) {
-#            die "You must always specify both --alias and --group \n";
-#        }
+#       if ((!$params{alias} && $params{group}) || ($params{alias} && !$params{group})) {
+#           die "You must always specify both --alias and --group \n";
+#       }
 
         $ret = certificate_import();
 
@@ -1334,6 +1394,9 @@ if ($cmd eq 'initdb') {
       token=s
       filter=s
       identifier=s
+      subject
+      group=s
+      nogroup
     );
     __init();
 
@@ -1558,6 +1621,10 @@ Import a certificate which issuer is not known in the "ServerCA" realm:
   openxpkiadm certificate import --file cacert.pem \
       --force-no-chain --realm ServerCA
 
+You can create an alias directly on import by adding either alias,
+generation/group or token to the command. This will execute the alias command
+with those paramters for the imported certificate inline.
+
 =item B<remove>
 
 Subcommand options:
@@ -1641,10 +1708,10 @@ There are different ways to deal with aliases:
 
 =over
 
-=item B<list functional tokens>
+=item B<list tokens>
 
 If you pass a realm but no identifier, you will receive the list of
-active tokens for the functional token groups, the current root certificate
+active tokens for all token groups, the current root certificate
 and, if set, the upcoming root certificate as used by scep I<GetNexCACert>.
 
 For items with custom notbefore/notafter settings, the certificate's value
@@ -1656,10 +1723,15 @@ is shown in brackets:
         NotBefore : 2014-01-01 00:00:00 (2013-06-17 13:54:34)
         NotAfter  : 2016-12-31 23:59:59 (2020-06-17 13:54:34)
 
+To show the certificates subject besides the identifier, add --subject.
+
 To show a list of all or all active tokens, you can add the filter parameter:
 
    --filter all or --filter active
 
+You can also filter by a certain group name with --group <groupname>.
+
+Specify --nogroup to list tokens that do not belong to a group.
 
 =item B<add functional token with automatic group discovery>
 
