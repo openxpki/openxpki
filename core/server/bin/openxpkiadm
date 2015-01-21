@@ -20,6 +20,7 @@ use Proc::SafeExec;
 use MIME::Base64;
 
 use OpenXPKI::Server::Init;
+use OpenXPKI::i18n;
 use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::VERSION;
@@ -137,15 +138,6 @@ sub certificate_import {
 
     print STDERR "Starting import\n";
 
-    my $defaulttoken = CTX('crypto_layer')->get_system_token({TYPE => 'DEFAULT'});
-
-    if ( !defined $defaulttoken ) {
-        print STDERR "ERROR: Could not get default token\n";
-        return 2;
-    }
-
-    my $dbi = __get_dbi();
-
     my $filename = $params{file};
 
     if ( !-r $filename ) {
@@ -161,185 +153,47 @@ sub certificate_import {
         return 2;
     }
 
-    if (   ( !defined $params{issuer} || $params{issuer} eq '' )
-        && ( defined $params{realm} ) )
-    {
-        print STDERR "ERROR: You have to specify an issuer (or leave "
-          . "out --realm for self-signed certificates).\n";
-        return 1;
-    }
-
     my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
 
-    my $cert = OpenXPKI::Crypto::X509->new(
-        TOKEN => $defaulttoken,
-        DATA  => $extracted_certdata,
-    );
-    #### cert : Dumper($cert)
+    my $dbi = __get_dbi();
 
-    my $realm;
-    my $issuer_identifier;
-    if ( !defined $params{realm} || $params{realm} eq '' ) {
+    my $api_param = { DATA => $extracted_certdata };
 
-        # user wants to import a self-signed
-        # cert, let's check if it really is one
-        ### subject key id : $cert->get_subject_key_id()
-        ### authority key id : $cert->get_authority_key_id()
-        if (
-               defined $cert->get_subject_key_id()
-            && defined $cert->get_authority_key_id()
-            && ref $cert->get_authority_key_id() eq '' # TODO: check if hash
-            && (
-                $cert->get_subject_key_id() ne $cert->get_authority_key_id()
-            )
-          )
-        {
-            if ( !defined $params{'force-really-self-signed'} ) {
-                print STDERR "ERROR: This is not a self-signed "
-                  . "certificate, "
-                  . "(subject key id and authority key id do not match) "
-                  . "please specify --realm if you want to import a "
-                  . "normal certificate.\n";
-                return 2;
-            }
-        }
-        if ( $cert->{PARSED}->{BODY}->{SUBJECT} ne
-            $cert->{PARSED}->{BODY}->{ISSUER} )
-        {
-            if ( !defined $params{'force-really-self-signed'} ) {
-                print STDERR "ERROR: This is not a self-signed "
-                  . "certificate, "
-                  . "(subject and issuer do not match) "
-                  . "please specify --realm if you want to import a "
-                  . "normal certificate.\n";
-                return 2;
-            }
-        }
-
-        # we are our own issuer
-        $issuer_identifier = $cert->get_identifier();
-    }
-    else {    # we have a "normal" certificate
-        if ( defined $params{'issuer-realm'} ) {
-            $realm = $params{'issuer-realm'};
-        }
-        else {
-            $realm = $params{realm};
-        }
-
-        # maybe the issuer name is an alias, try to resolve it
-        $issuer_identifier = __resolve_alias(
-            {
-                DBI   => $dbi,
-                NAME  => $params{issuer},
-                REALM => $realm,
-            }
-        );
-        ### issuer_identifier : $issuer_identifier
-        # check whether the certificate is in the DB
-        my $issuer = $dbi->first(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => { IDENTIFIER => $issuer_identifier, },
-        );
-        if (   !defined $issuer
-            && !defined $params{'force-issuer-not-found'} )
-        {
-            print STDERR "ERROR: Issuer '$params{issuer}' not found in "
-              . "the database.\n";
-            return 2;
-        }
+    if ($params{issuer}) {
+        $api_param->{ISSUER} = $params{issuer};
     }
 
-    # make sure the self-signed realm is specified as 'undef'
-    if ( defined $realm && ( $realm eq '' ) ) {
-        $realm = undef;
+    if ($params{realm}) {
+        $api_param->{PKI_REALM} = $params{realm};
     }
 
-    # compile all relevant data for the database
-    # TODO: use $cert->to_db_hash();
-    my %insert_hash;
-    $insert_hash{STATUS}             = 'ISSUED';
-    $insert_hash{PKI_REALM}          = $realm;
-    $insert_hash{CERTIFICATE_SERIAL} = $cert->get_serial();
-    $insert_hash{IDENTIFIER}         = $cert->get_identifier();
-    $insert_hash{DATA}               = $extracted_certdata;
-    $insert_hash{SUBJECT}            = $cert->{PARSED}->{BODY}->{SUBJECT};
-    $insert_hash{ISSUER_DN}          = $cert->{PARSED}->{BODY}->{ISSUER};
-    $insert_hash{ISSUER_IDENTIFIER}  = $issuer_identifier;
-
-    # combine email addresses
-    if ( exists $cert->{PARSED}->{BODY}->{EMAILADDRESSES} ) {
-        $insert_hash{EMAIL} = '';
-        foreach my $email ( @{ $cert->{PARSED}->{BODY}->{EMAILADDRESSES} } )
-        {
-            $insert_hash{EMAIL} .= "," if ( $insert_hash{EMAIL} ne '' );
-            $insert_hash{EMAIL} .= $email;
-        }
-    }
-    $insert_hash{PUBKEY} = $cert->{PARSED}->{BODY}->{PUBKEY};
-
-    # set subject key id and authority key id, if defined.
-    if ( defined $cert->get_subject_key_id() ) {
-        $insert_hash{SUBJECT_KEY_IDENTIFIER} = $cert->get_subject_key_id();
-    }
-    if ( defined $cert->get_authority_key_id()
-        && ref $cert->get_authority_key_id() eq '' )
-    {
-
-        # TODO: do we save if authority key id is hash, and if
-        # yes, in which format?
-        $insert_hash{AUTHORITY_KEY_IDENTIFIER} =
-          $cert->get_authority_key_id();
+    if ($params{"force-no-chain"}) {
+        $api_param->{FORCE_NOCHAIN} = 1;
     }
 
-    $insert_hash{NOTAFTER} = OpenXPKI::DateTime::convert_date(
-        {
-            DATE      => $cert->{PARSED}->{BODY}->{NOTAFTER},
-            OUTFORMAT => 'epoch',
+    if ($params{"force-issuer"}) {
+        if (!$params{issuer}) {
+            die "You need to specify the issuer with --issuer when using --force-issuer\n"
         }
-    );
-    $insert_hash{NOTBEFORE} = OpenXPKI::DateTime::convert_date(
-        {
-            DATE      => $cert->{PARSED}->{BODY}->{NOTBEFORE},
-            OUTFORMAT => 'epoch',
-        }
-    );
-
-    # fields which are explicitly NOT set:
-    # LOA          (we don't know it)
-    # CSR_SERIAL   ( " " )
-
-    # check whether there is already a certificate with the given
-    # identifier anywhere
-    my $certificate = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, },
-    );
-    if ( defined $certificate
-        && !defined $params{'force-certificate-already-exists'} )
-    {
-        if ( $certificate->{PKI_REALM} ) {
-            print STDERR "ERROR: The same certificate already exists "
-              . "in the $certificate->{PKI_REALM} realm. Use openxpkiadm "
-              . "certificate alias to reference it.\n";
-        }
-        else {
-            print STDERR "ERROR: The same certificate already exists  "
-              . "as a global self-signed certificate. Use openxpkiadm "
-              . "certificate alias to reference it.\n";
-        }
-        return 2;
+        $api_param->{FORCE_ISSUER} = 1;
     }
-    $dbi->insert(
-        TABLE => 'CERTIFICATE',    # use hash method
-        HASH  => \%insert_hash,
-    );
-    $dbi->commit();
+
+    if ($params{"force-certificate-already-exists"}) {
+        $api_param->{UPDATE} = 1;
+    }
+
+    if ($params{revoked}) {
+        $api_param->{REVOKED} = 1;
+    }
+
+    my $res = CTX('api')->import_certificate( $api_param );
 
     print "Successfully imported certificate into database:\n";
-    print "  Subject:    " . $insert_hash{SUBJECT} . "\n";
-    print "  Issuer:     " . $insert_hash{ISSUER_DN} . "\n";
-    print "  Identifier: " . $insert_hash{IDENTIFIER} . "\n";
+    print "  Subject:    " . $res->{SUBJECT} . "\n";
+    print "  Issuer:     " . $res->{ISSUER_DN} . "\n";
+    print "  Identifier: " . $res->{IDENTIFIER} . "\n";
+    print "  Realm:      " . ($res->{PKI_REALM} || 'none'). "\n";
+
     return 0;
 
 }
@@ -1344,10 +1198,26 @@ sub __init {
         $ENV{OPENXPKI_CONF_PATH} = $params{config};
     } elsif ($params{instance}) {
         $ENV{OPENXPKI_CONF_PATH} = sprintf '/etc/openxpki/%s/config.d', $params{instance};
-        print "config path " . $ENV{OPENXPKI_CONF_PATH};
     }
 
 }
+
+sub __check_realm {
+
+    my $realm = $params{realm};
+
+    if (!$realm) {
+         die "You must specify a realm using --realm\n";
+    }
+
+    if (!CTX('config')->exists(['system','realms',$params{realm}])) {
+        die  "The realm $realm does not exist!\n";
+    }
+
+    return 1;
+}
+
+eval {
 
 if ($cmd eq 'initdb') {
 
@@ -1377,12 +1247,15 @@ if ($cmd eq 'initdb') {
             realm=s
             file=s
             issuer=s
-            issuer-realm=s
-            role=s
-            force-really-self-signed
-            force-issuer-not-found
+            force-no-chain
+            force-issuer
             force-certificate-already-exists
-            );
+            revoked
+        );
+#            force-really-self-signed
+#            force-issuer-not-found
+#            force-certificate-already-exists
+
 
         __init();
 
@@ -1392,13 +1265,11 @@ if ($cmd eq 'initdb') {
             die "You need to specify the certificate to import with --file\n";
         }
 
-        if (!$params{issuer} && defined $params{realm}) {
-            die "You must specify --issuer and --realm or leave both empty\n";
-        }
+        __check_realm() if ($params{realm});
 
-        if ((!$params{alias} && $params{group}) || ($params{alias} && !$params{group})) {
-            die "You must always specify both --alias and --group \n";
-        }
+#        if ((!$params{alias} && $params{group}) || ($params{alias} && !$params{group})) {
+#            die "You must always specify both --alias and --group \n";
+#        }
 
         $ret = certificate_import();
 
@@ -1412,6 +1283,8 @@ if ($cmd eq 'initdb') {
         __init();
 
         OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+
+        __check_realm() if ($params{realm});
 
         $ret = certificate_remove();
 
@@ -1441,6 +1314,8 @@ if ($cmd eq 'initdb') {
 
         OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
 
+        __check_realm();
+
         $ret = certificate_list();
     }
 
@@ -1464,9 +1339,7 @@ if ($cmd eq 'initdb') {
 
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend'], SILENT => 1, CLI => 1});
 
-    if (!$params{realm}) {
-        die "You must specify a realm using --realm\n";
-    }
+    __check_realm();
 
     if ($params{remove}) {
         $ret = alias_del();
@@ -1490,9 +1363,7 @@ if ($cmd eq 'initdb') {
 
         OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi_backend'], SILENT => 1,});
 
-        if (!$params{realm}) {
-            die "You must specify a realm using --realm\n";
-        }
+        __check_realm();
 
         $ret = key_list();
 
@@ -1516,8 +1387,16 @@ if ($cmd eq 'initdb') {
     $ret = 0;
 }
 
+};
 
-if ($ret) {
+if (ref $EVAL_ERROR eq "OpenXPKI::Exception") {
+    print  OpenXPKI::i18n::gettext($EVAL_ERROR->message()) ."\n";
+    map { print "   $_: " . $EVAL_ERROR->params->{$_} ."\n";  } keys %{$EVAL_ERROR->params};
+    print "\n";
+} elsif ($EVAL_ERROR) {
+    die $EVAL_ERROR;
+    print "\n";
+} elsif ($ret) {
     print "\n";
     pod2usage( -verbose => 0 ) if ($ret == 1 || $ret == 255);
     exit $ret;
@@ -1638,33 +1517,33 @@ listed in which case).
 Subcommand options:
 
 Mandatory:
-  --realm                   PKI realm to import certificate to
   --file                    the PEM file to import from
-  --issuer                  the issuer alias or identifier
 
 Optional:
-  --issuer-realm            the realm where the issuer alias
-                            is defined
-  --role                    the role of the certificate owner
+  --revoked                 import with status "revoked"
+  --issuer                  the identifier of the issuer
+  --realm                   PKI realm to import certificate to
 
 Force options (use only if you exactly now what you are doing!):
-  --force-really-self-signed
-        The certificate is really self-signed
-  --force-issuer-not-found
-        Don't care that the issuer is not in the database
+  --force-no-chain (only without issuer)
+        Import even if the chain is incomplete, set NULL as issuer
+  --force-issuer
+        Force the issuer setting even if the chain validation fails
   --force-certificate-already-exists
-        Don't care that the certificate is already in database
+        Force update for an existing certificate
 
-Once again, only use these options if you actually have to (the
-occasions where this happens should be really, really rare).
+Once again, only use these options if you actually have to (the occasions
+where this happens should be really, really rare). Note that force-no-chain
+might result in a wrong issuers assignment if key identifiers or subjects are
+ambiguous. Consider using explicit issuer in that cases if possible.
 
-Adds a certificate to the database. There are two different ways to
-call it, depending on whether you have a self-signed certificate
-or not. With a self-signed certificate, the --realm and --issuer options
-are left out, with a "normal" certificate, they are mandatory.
+Adds a certificate to the database. The issuer is usually auto-detected and
+needs to be given only in rare cases. By default the certificates are imported
+into the global realm, if you want to add them to a specific one, you need to
+specify it. Note that a certificate always inherits the realm of its issuer!
 
-The command outputs the subject's DN and the issuer's DN for you to
-verify that you imported the correct certificate as well as a unique
+The command outputs the subject's DN, issuer's DN and the imported realm for
+you to verify that you imported the correct certificate as well as a unique
 identifier which can be used to globally reference the certificate
 (i.e. for configuration or as an issuer). If you don't want to remember
 the identifier, look into openxpkiadm certificate alias to find out
@@ -1674,12 +1553,10 @@ Examples:
 
   openxpkiadm certificate import --file cacert.pem
 
-Imports a self-signed CA certificate.
+Import a certificate which issuer is not known in the "ServerCA" realm:
 
-  openxpkiadm certificate import --realm 'Root CA' \
-        --file subca1.pem --issuer 'Root CA 1'
-
-Imports a Sub CA certificate which is signed by Root CA 1.
+  openxpkiadm certificate import --file cacert.pem \
+      --force-no-chain --realm ServerCA
 
 =item B<remove>
 

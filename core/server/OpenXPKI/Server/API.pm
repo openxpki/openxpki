@@ -312,6 +312,44 @@ sub BUILD {
                 },
             },
         },
+        'import_certificate' => {
+            class  => 'Default',
+            params => {
+                DATA => {
+                    type     => SCALAR,
+                },
+                ISSUER => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1
+                },
+                PKI_REALM => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1
+                },
+                UPDATE => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
+                FORCE_NOCHAIN => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
+                FORCE_ISSUER => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
+                REVOKED => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
+            }
+        },
         'get_ca_list' => {
             class  => 'Token',
             params => {
