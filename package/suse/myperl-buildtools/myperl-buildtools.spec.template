@@ -1,15 +1,15 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Adapted for myperl-dbd-oracle by Scott Hardin
+## Adapted for myperl-dbd-mysql by Scott Hardin
 ## Copyright (C) 2005-2014 by The OpenXPKI Project
 
-%define pkgname myperl-dbd-oracle
+%define pkgname myperl-buildtools
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
 %define __perl /opt/myperl/bin/perl
 
 name:      %{pkgname}
-summary:   DBD::Oracle packaged for myperl
+summary:   myperl build tools
 version:   [% version %]
 [% IF PKGREL %]
 release: [% PKGREL %]
@@ -25,13 +25,13 @@ buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
 BuildRequires: myperl
 Requires: myperl
-# Some oracle installations are so complicated that they don't package the libcltsh.so directly,
-# but have some convoluted install script that unpacks it from somewhere else.
+# The auto-prereq code picks up libexpat.so.0, but this is not explicitly
+# supplied by the libexpat1 SLES package.
 AutoReqProv: no
 #source:    %{pkgname}-%{version}.tar.gz
 
 %description
-DBD::Oracle packaged for myperl
+Various CPAN modules needed for building other myperl packages
 
 Packaging information:
 OpenXPKI version       [% version %]
@@ -78,8 +78,10 @@ export PERL_MB_OPT="--destdir '%{buildroot}' --installdirs vendor"
 export PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR=%{buildroot}"
 export DESTDIR="%{buildroot}"
 
-$CPANM $CPANM_OPTS Test::NoWarnings
-$CPANM $CPANM_OPTS Test::Tester Test::Deep DBD::Oracle
+# ExtUtils::MakeMaker needs to be 'forced' since an older version
+# is already installed
+$CPANM --notest --verbose ExtUtils::MakeMaker
+$CPANM $CPANM_OPTS Config::Std Test::NoWarnings Test::Tester Test::Deep
 
 ## This next line does a regular CPAN-style install. Our Mojo app, however,
 ## needs to go in /srv/www/enroller and *not* with the other Perl modules.
@@ -108,6 +110,21 @@ find %{buildroot} -name "perllocal.pod" \
     -o -name ".packlist"                \
     -o -name "*.bs"                     \
     |xargs -i rm -f {}
+
+# remove files that conflict with myperl base package
+echo "INFO: cleaning duplicate files from %{buildroot}%{_prefix}"
+(cd %{buildroot} && rm -f \
+    opt/myperl/bin/config_data \
+    opt/myperl/bin/instmodsh \
+    opt/myperl/man/man1/config_data.1 \
+    opt/myperl/man/man1/instmodsh.1 \
+    opt/myperl/man/man3/CPAN::*.3 \
+    opt/myperl/man/man3/ExtUtils::*.3 \
+    opt/myperl/man/man3/Module::Build*.3 \
+    opt/myperl/man/man3/Test::Builder*.3 \
+    opt/myperl/man/man3/Test::More.3 \
+    opt/myperl/man/man3/Test::Simple.3 \
+    opt/myperl/man/man3/Test::Tutorial.3 )
 
 # no empty directories
 #find %{buildroot}%{_prefix}             \

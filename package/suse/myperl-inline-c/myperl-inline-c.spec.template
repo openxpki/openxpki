@@ -1,15 +1,15 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Adapted for myperl-dbd-oracle by Scott Hardin
+## Adapted for myperl-inline-c by Scott Hardin
 ## Copyright (C) 2005-2014 by The OpenXPKI Project
 
-%define pkgname myperl-dbd-oracle
+%define pkgname myperl-inline-c
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
 %define __perl /opt/myperl/bin/perl
 
 name:      %{pkgname}
-summary:   DBD::Oracle packaged for myperl
+summary:   Inline packaged for myperl
 version:   [% version %]
 [% IF PKGREL %]
 release: [% PKGREL %]
@@ -25,13 +25,10 @@ buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
 BuildRequires: myperl
 Requires: myperl
-# Some oracle installations are so complicated that they don't package the libcltsh.so directly,
-# but have some convoluted install script that unpacks it from somewhere else.
-AutoReqProv: no
 #source:    %{pkgname}-%{version}.tar.gz
 
 %description
-DBD::Oracle packaged for myperl
+Inline packaged for myperl
 
 Packaging information:
 OpenXPKI version       [% version %]
@@ -70,7 +67,7 @@ ARCHNAME=`%{__perl} "-V:archname" | awk -F\' '{print $2}'`
 ARCHLIB=`%{__perl} "-V:archlib" | awk -F\' '{print $2}'`
 PRIVLIB=`%{__perl} "-V:privlib" | awk -F\' '{print $2}'`
 CPANM=/opt/myperl/bin/cpanm
-CPANM_OPTS="--notest --skip-satisfied --skip-installed --verbose $CPANM_MIRROR"
+CPANM_OPTS="--notest --skip-satisfied ExtUtils::MakeMaker --skip-installed --verbose $CPANM_MIRROR"
 
 # Environment vars neede for proper Perl module installation
 export PERL5LIB=%{buildroot}/$VENDORARCH:%{buildroot}/$VENDORLIB
@@ -78,8 +75,8 @@ export PERL_MB_OPT="--destdir '%{buildroot}' --installdirs vendor"
 export PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR=%{buildroot}"
 export DESTDIR="%{buildroot}"
 
-$CPANM $CPANM_OPTS Test::NoWarnings
-$CPANM $CPANM_OPTS Test::Tester Test::Deep DBD::Oracle
+#$CPANM $CPANM_OPTS Test::NoWarnings
+$CPANM $CPANM_OPTS Inline::C
 
 ## This next line does a regular CPAN-style install. Our Mojo app, however,
 ## needs to go in /srv/www/enroller and *not* with the other Perl modules.

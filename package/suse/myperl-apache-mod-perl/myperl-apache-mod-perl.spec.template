@@ -25,6 +25,9 @@ buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
 BuildRequires: myperl
 Requires: myperl
+# The auto-prereq code picks up libexpat.so.0, but this is not explicitly
+# supplied by the libexpat1 SLES package.
+AutoReqProv: no
 #source:    %{pkgname}-%{version}.tar.gz
 
 %description
@@ -66,8 +69,8 @@ VENDORLIBEXP=%{buildroot}/`%{__perl} "-V:vendorlibexp" | awk -F\' '{print $2}'`
 ARCHNAME=`%{__perl} "-V:archname" | awk -F\' '{print $2}'`
 ARCHLIB=`%{__perl} "-V:archlib" | awk -F\' '{print $2}'`
 PRIVLIB=`%{__perl} "-V:privlib" | awk -F\' '{print $2}'`
-CPANM="%{__perl} `pwd`/cpanm"
-CPANM_OPTS="--notest --skip-satisfied --skip-installed --verbose"
+CPANM=/opt/myperl/bin/cpanm
+CPANM_OPTS="--notest --skip-satisfied --skip-installed --verbose $CPANM_MIRROR"
 
 # Environment vars neede for proper Perl module installation
 export PERL5LIB=%{buildroot}/$VENDORARCH:%{buildroot}/$VENDORLIB
@@ -75,11 +78,7 @@ export PERL_MB_OPT="--destdir '%{buildroot}' --installdirs vendor"
 export PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR=%{buildroot}"
 export DESTDIR="%{buildroot}"
 
-curl -LO http://xrl.us/cpanm
-chmod +x cpanm
-
-$CPANM $CPANM_OPTS Test::NoWarnings
-$CPANM $CPANM_OPTS Test::Tester Test::Deep mod_perl2
+$CPANM $CPANM_OPTS mod_perl2
 
 ## This next line does a regular CPAN-style install. Our Mojo app, however,
 ## needs to go in /srv/www/enroller and *not* with the other Perl modules.

@@ -1,15 +1,15 @@
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
-## Adapted for myperl-dbd-oracle by Scott Hardin
+## Adapted for myperl-dbd-mysql by Scott Hardin
 ## Copyright (C) 2005-2014 by The OpenXPKI Project
 
-%define pkgname myperl-dbd-oracle
+%define pkgname myperl-fcgi
 %define filelist %{pkgname}-%{version}-filelist
 %define NVR %{pkgname}-%{version}-%{release}
 %define maketest 0
 %define __perl /opt/myperl/bin/perl
 
 name:      %{pkgname}
-summary:   DBD::Oracle packaged for myperl
+summary:   Apache fcgi packaged for myperl
 version:   [% version %]
 [% IF PKGREL %]
 release: [% PKGREL %]
@@ -25,13 +25,13 @@ buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 prefix:    %(echo %{_prefix})
 BuildRequires: myperl
 Requires: myperl
-# Some oracle installations are so complicated that they don't package the libcltsh.so directly,
-# but have some convoluted install script that unpacks it from somewhere else.
+# The auto-prereq code picks up libexpat.so.0, but this is not explicitly
+# supplied by the libexpat1 SLES package.
 AutoReqProv: no
 #source:    %{pkgname}-%{version}.tar.gz
 
 %description
-DBD::Oracle packaged for myperl
+Apache fcgi packaged for myperl
 
 Packaging information:
 OpenXPKI version       [% version %]
@@ -78,8 +78,7 @@ export PERL_MB_OPT="--destdir '%{buildroot}' --installdirs vendor"
 export PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR=%{buildroot}"
 export DESTDIR="%{buildroot}"
 
-$CPANM $CPANM_OPTS Test::NoWarnings
-$CPANM $CPANM_OPTS Test::Tester Test::Deep DBD::Oracle
+$CPANM $CPANM_OPTS FCGI
 
 ## This next line does a regular CPAN-style install. Our Mojo app, however,
 ## needs to go in /srv/www/enroller and *not* with the other Perl modules.
