@@ -345,6 +345,7 @@ OpenXPKI/Server/Workflow/Condition/HasRole.pm
 
 #OpenXPKI/Server/Workflow/Condition/ValidCSRSerialPresent.pm
 
+OpenXPKI/Server/Workflow/Condition/KeyGenerationMode.pm
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm

@@ -1,6 +1,8 @@
 # Definition of supported/accepted key algorithms
 # This is used as option list for key generation 
 # as well as validation list for uploaded keys
+# If you prefix a value with an underscore, is is accepted for validation 
+# but not presented on key generation
 # The frontend will prefix all values with I18N_OPENXPKI_UI_KEY_XX_YY
 # where XX is the key and yy is the value, so if you add new items make sure
 # you also add a translation for it.
@@ -16,6 +18,10 @@ key:
       - aes256
       - 3des
       - idea
+
+    # one of escrow, server, client, both
+    # escrow is not implemented in workflows, yet!
+    generate: both
 
     # Definition of key algorithms
     rsa:

@@ -215,8 +215,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_DESC
         action:
-          - provide_server_key_params > ENTER_KEY_PASSWORD
-          - upload_pkcs10 > ENTER_SUBJECT
+          - provide_server_key_params > ENTER_KEY_PASSWORD ? can_use_server_key 
+          - upload_pkcs10 > ENTER_SUBJECT ? can_use_client_key 
           - select_profile > SETUP_REQUEST_TYPE
         hint:
           provide_server_key_params: I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS
@@ -517,6 +517,16 @@ condition:
         class: OpenXPKI::Server::Workflow::Condition::Approved
         param:
             role: RA Operator
+
+    can_use_server_key:
+        class: OpenXPKI::Server::Workflow::Condition::KeyGenerationMode
+        param:
+            generate: server
+
+    can_use_client_key:
+        class: OpenXPKI::Server::Workflow::Condition::KeyGenerationMode
+        param:
+            generate: client
 
     pending_notification_send:
         class: Workflow::Condition::Evaluate
