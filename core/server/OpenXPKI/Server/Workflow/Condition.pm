@@ -11,7 +11,7 @@ use Data::Dumper;
 
 __PACKAGE__->mk_accessors( qw( workflow params _map ) );
 
-sub init {
+sub _init {
     my ( $self, $params ) = @_;
 
     # copy the source params
@@ -32,9 +32,6 @@ sub init {
         ##! 8: 'Found param ' . $name . ' - value : ' . $params->{$key}
 
     }
-
-    # call Workflow::Condition's init()
-    $self->SUPER::init( $self, $params_merged );
 
     $self->params( $params_merged );
     $self->_map( $_map );
