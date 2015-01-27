@@ -52,7 +52,13 @@ sub execute {
             PRIORITY => 'debug',
             FACILITY => 'application',
         );
-        return;
+
+        # Send a 404 header with a verbose explanation
+        return $self->command_response(
+            "Status: 404 NextCA not set\n".
+            "Content-Type: text/plain\n\n".
+            "NextCA not set");
+
     }
 
     my $scep_token =  $self->__get_token();
@@ -60,11 +66,8 @@ sub execute {
     ##! 16: 'Found nextca cert ' .  $next_ca->{'ALIASES.ALIAS'}
     ##! 32: 'nextca  ' . Dumper $next_ca
 
-    my $workflow_type = CTX('config')->get("scep.$server.workflow_type");
-
-
     my $result = $scep_token->command({
-    	COMMAND => 'create_nextca_reply',
+        COMMAND => 'create_nextca_reply',
         CHAIN   => $next_ca->{'CERTIFICATE.DATA'},
         HASH_ALG => CTX('session')->get_hash_alg(),
     });
