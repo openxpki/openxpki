@@ -16,7 +16,7 @@ key:
     # Supported encryption algorithms (as taken by openssl)
     enc:
       - aes256
-      - 3des
+      - _3des
       - idea
 
     # one of escrow, server, client, both
@@ -28,6 +28,7 @@ key:
         key_length:
           - 2048
           - 4096	
+          - _1024
 
     ec:
         curve_name:

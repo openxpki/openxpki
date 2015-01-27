@@ -671,9 +671,10 @@ sub list_supported_san {
     return \%san_names;
 }
 
-=head2 get_key_algs ( { PROFILE } )
+=head2 get_key_algs ( { PROFILE, NOHIDE } )
 
-Return a list of supported key algorithms for the given profile
+Return a list of supported key algorithms for the given profile.
+Items starting with an underscore are hidden unless NOHIDE is true.
 
 =cut
 
@@ -684,6 +685,7 @@ sub get_key_algs {
     my $args = shift;
 
     my $profile = $args->{PROFILE};
+    my $nohide = $args->{NOHIDE};
 
     my $config = CTX('config');
 
@@ -693,13 +695,19 @@ sub get_key_algs {
 
     my @alg = $config->get_list( [ 'profile', $profile, 'key', 'alg' ] );
 
+    # Filter argument starting with underscore
+    if (!$nohide) {
+        @alg = grep { $_ !~ /^_/ } @alg;
+    }
+
     return \@alg;
 
 }
 
-=head2 get_key_enc ( { PROFILE } )
+=head2 get_key_enc ( { PROFILE, NOHIDE } )
 
 Return a list of supported encryption algorithms for the given profile
+Items starting with an underscore are hidden unless NOHIDE is true.
 
 =cut
 
@@ -709,6 +717,8 @@ sub get_key_enc {
     my $args = shift;
 
     my $profile = $args->{PROFILE};
+    my $nohide = $args->{NOHIDE};
+
 
     my $config = CTX('config');
 
@@ -718,11 +728,16 @@ sub get_key_enc {
 
     my @enc = $config->get_list( [ 'profile', $profile, 'key', 'enc' ] );
 
+    # Filter argument starting with underscore
+    if (!$nohide) {
+        @enc = grep { $_ !~ /^_/ } @enc;
+    }
+
     return \@enc;
 
 }
 
-=head2 get_key_params ( { PROFILE, ALG } )
+=head2 get_key_params ( { PROFILE, ALG, NOHIDE } )
 
 Returns all input parameters accepted by the selected algorithm
 as defined for the given profile (or the default).
@@ -742,6 +757,7 @@ sub get_key_params {
 
     my $profile = $args->{PROFILE};
     my $algorithm = $args->{ALG};
+    my $nohide = $args->{NOHIDE};
 
     my $config = CTX('config');
 
@@ -758,7 +774,11 @@ sub get_key_params {
     my @keys = $config->get_keys( [ 'profile', $profile, 'key', $algorithm ] );
     my $params;
     foreach my $key (@keys) {
-       $params->{$key} = [ $config->get_list( [ 'profile', $profile, 'key', $algorithm, $key ] ) ];
+        my @param = $config->get_list( [ 'profile', $profile, 'key', $algorithm, $key ] );
+        if (!$nohide) {
+            @param = grep { $_ !~ /^_/ } @param;
+        }
+        $params->{$key} = \@param if (@param);
     }
 
     return $params;
