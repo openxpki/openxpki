@@ -9,9 +9,9 @@ Component = Em.Component.extend
     setup: (->
         value = @get "content.value"
         if value is "now"
-            @set "content.pickvalue", moment().format @get "format"
+            @set "content.pickvalue", moment().utc().format @get "format"
         else if value
-            @set "content.pickvalue", moment.unix(value).format @get "format"
+            @set "content.pickvalue", moment.unix(value).utc().format @get "format"
         Em.run.next =>
             @$().find(".date").datetimepicker
                 format: @get "format"
@@ -19,7 +19,7 @@ Component = Em.Component.extend
 
     propagate: Em.observer "content.pickvalue", ->
         if @get("content.pickvalue")
-            datetime = moment(@get("content.pickvalue"), @get("format")).unix()
+            datetime = moment.utc(@get("content.pickvalue"), @get("format")).unix()
         else
             dateimte = ""
         @set "content.value", datetime
