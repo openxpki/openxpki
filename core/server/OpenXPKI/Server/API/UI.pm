@@ -61,9 +61,17 @@ sub get_ui_system_status {
 
     # Offline Secrets
     my $offline = 0;
+
+    # Secret groups tend to have exceptions in unusual situations
+    # To not crash the whole method, we put an eval around until this is
+    # resolved, see #255
+
     my %secrets = $crypto->get_secret_groups();
     foreach my $secret (keys %secrets) {
-        my $status = $crypto->is_secret_group_complete( $secret ) || 0;
+        my $status;
+        eval {
+            $status = $crypto->is_secret_group_complete( $secret ) || 0;
+        };
         if (!$status) { $offline++ };
     }
 
