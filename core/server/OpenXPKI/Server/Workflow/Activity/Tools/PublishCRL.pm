@@ -24,6 +24,8 @@ sub execute {
     my $config        = CTX('config');
     my $pki_realm = CTX('session')->get_pki_realm();
 
+    my $dbi = CTX('dbi_backend');
+
     if (!$self->param('prefix')) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_NO_PREFIX'
@@ -61,7 +63,7 @@ sub execute {
     if ($crl_serial eq 'latest') {
 
         # Load the crl data
-        $crl = CTX('dbi_backend')->first(
+        $crl = $dbi->first(
             TABLE   => 'CRL',
             DYNAMIC => {
                 PKI_REALM => $pki_realm,
@@ -70,10 +72,13 @@ sub execute {
             ORDER => [ 'LAST_UPDATE' ],
             REVERSE => 1
         );
+
+        $crl_serial = $crl->{CRL_SERIAL};
+
     } else {
 
         # Load the crl data
-        $crl = CTX('dbi_backend')->first(
+        $crl = $dbi->first(
             TABLE   => 'CRL',
             KEY => $crl_serial
         );
@@ -156,18 +161,24 @@ sub execute {
         );
     }
 
-    # Set the publication date in the database
-    my $dbi = CTX('dbi_backend');
-    $dbi->update(
-        TABLE => 'CRL',
-        DATA  => {
-            'PUBLICATION_DATE' => DateTime->now()->epoch(),
-        },
-        WHERE => {
-            'CRL_SERIAL' => $crl_serial,
-        },
-    );
-    $dbi->commit();
+    # Set the publication date in the database, only if not set already
+    if (!$crl->{PUBLICATION_DATE}) {
+        $dbi->update(
+            TABLE => 'CRL',
+            DATA  => {
+                'PUBLICATION_DATE' => DateTime->now()->epoch(),
+            },
+            WHERE => {
+                'CRL_SERIAL' => $crl_serial,
+            },
+        );
+        $dbi->commit();
+        CTX('log')->log(
+            MESSAGE => "CRL pubication date set for crl $crl_serial",
+            PRIORITY => 'info',
+            FACILITY => [ 'system' ],
+        );
+    }
 
     ##! 4: 'end'
     return;

@@ -56,7 +56,7 @@ action:
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CA_LIST_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CA_LIST_DESC
         param:
-            group: ca-one-signer
+            token: certsign
 
     publish_cacert:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCA
