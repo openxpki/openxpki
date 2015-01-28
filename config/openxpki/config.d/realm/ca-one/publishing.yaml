@@ -6,7 +6,10 @@ entity:
     
 crl:
     crl@: connector:publishing.connectors.cdp
-    
+
+cacert:
+    disk@: connector:publishing.connectors.cacert
+
 connectors:
     ldap-ext:
         class: Connector::Proxy::Net::LDAP::Single
@@ -50,5 +53,12 @@ connectors:
         class: Connector::Builtin::File::Path
         LOCATION: /tmp/
         file: "[% ARGS.0 %].crl"
+        content: "[% pem %]"
+
+
+    cacert:
+        class: Connector::Builtin::File::Path
+        LOCATION: /tmp/
+        file: "[% ARGS.0 %].pem"
         content: "[% pem %]"
 
