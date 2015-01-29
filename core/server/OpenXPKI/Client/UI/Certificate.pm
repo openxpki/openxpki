@@ -110,6 +110,8 @@ sub init_detail {
         { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
     );
 
+    # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
+
     # was in info, bullet list for downloads
     my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!$cert_identifier!format!";
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
@@ -127,6 +129,7 @@ sub init_detail {
         # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
         sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
         sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+        sprintf ($pattern, 'pkcs7!root!true', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT')).
         sprintf ($pattern, 'bundle', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE')).
         $privkey.
         sprintf ($pattern, 'install', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_INSTALL')).
@@ -157,7 +160,7 @@ sub init_detail {
             label => '',
             description => '',
             data => \@fields,
-            buttons => \@buttons,
+            #buttons => \@buttons, # We need to fix this first
         }},
     ];
 
@@ -281,6 +284,7 @@ sub init_download {
                 #sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')). # core bug see #185
                 sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
                 sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+                sprintf ($pattern, 'pkcs7!root!1', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT')).
                 sprintf ($pattern, 'bundle', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE')).
                 $privkey.
                 '</ul>',
@@ -288,7 +292,8 @@ sub init_download {
 
     } elsif ($format eq 'pkcs7') {
 
-        my $pkcs7  = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, BUNDLE => 1 });
+        my $keeproot = $self->param('root') ? 1 : 0;
+        my $pkcs7  = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, BUNDLE => 1, KEEPROOT => $keeproot });
 
         my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
         my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};

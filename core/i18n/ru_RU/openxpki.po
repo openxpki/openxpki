@@ -79,6 +79,18 @@ msgstr "Русский"
 msgid "I18N_OPENXPKI_API_TOKEN_GET_TRUST_ANCHOR_NO_PATH"
 msgstr "Загрузка закрытого ключа и сертификата"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_TOKEN_OR_ALIAS_REQURIED"
+msgstr "Русский"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_UNABLE_TO_GET_TOKEN_TYPE"
+msgstr "Русский"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_VALUE_MISSMATCH"
+msgstr "Русский"
+
 msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CRR"
 msgstr ""
 "Я утверждаю заявку на отзыв сертификата для технологического процесса "
@@ -110,6 +122,18 @@ msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_"
+msgstr "Доступ к УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_EXPIRED"
+msgstr "Доступ к УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_ISSUED"
+msgstr "Доступ к УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_REVOKED"
 msgstr "Доступ к УЦ"
 
 #, fuzzy
@@ -1969,6 +1993,24 @@ msgstr ""
 "названия подразделения и двух компонентов доменного имени."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_ISSUER_QUERY_AMBIGIOUS_RESULT"
+msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_METHOD_OBSOLETE"
 msgstr ""
 "Произошло обращение к несуществующей функциональности сервера OpenXPKI. "
@@ -2083,6 +2125,10 @@ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_PRIVATE_KEY_FOR_CERT_COULD_NOT_DETERM
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_PROFILE_FOR_CERT_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM"
 msgstr "SPKAC строка пуста."
 
@@ -2131,6 +2177,12 @@ msgstr "SPKAC строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_VALUE_TYPE"
 msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_NAMESPACE_AND_KEY_ARE_REQUIRED"
+msgstr ""
+"Произошло обращение к несуществующей функциональности сервера OpenXPKI. "
+"Идентификатор функциональности -  __METHOD_NAME__."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_VALIDATE_CERTIFICATE_NO_DATA"
@@ -3072,6 +3124,24 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFI
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN"
+msgstr ""
+"Отсутствует токен для преобразования сертификата в DER-формат перед "
+"добавлением к LDAP-узлу"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_FOUND_FOR_TYPE"
+msgstr ""
+"Отсутствует токен для преобразования сертификата в DER-формат перед "
+"добавлением к LDAP-узлу"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_OR_TYPE_GIVEN"
+msgstr ""
+"Отсутствует токен для преобразования сертификата в DER-формат перед "
+"добавлением к LDAP-узлу"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_CERTEXPORT_GETCONFIG_NO_SUBJECT"
 msgstr "SPKAC-строка пуста."
 
@@ -3156,16 +3226,6 @@ msgstr "SPKAC строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PERSISTCSRS_CERT_ISSUANCE_DATA_UNDEFINED"
 msgstr "SPKAC строка пуста."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
-msgstr ""
-"Для выполнения следующего этапа технологическому процессу не хватает "
-"некоторых данных (__FIELDS__)."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE"
-msgstr "Сертификаты"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TEST_CRASHED"
@@ -3284,7 +3344,19 @@ msgstr ""
 "некоторых данных (__FIELDS__)."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CA_COULD_NOT_CONVERT_CERT_TO_DER"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
+msgstr ""
+"Для выполнения следующего этапа технологическому процессу не хватает "
+"некоторых данных (__FIELDS__)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT"
 msgstr ""
 "Для выполнения следующего этапа технологическому процессу не хватает "
 "некоторых данных (__FIELDS__)."
@@ -3513,6 +3585,10 @@ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_FETCH_WORKFLOW_NOT_POSSBILE_WITH_NULL_PERSISTER"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -4288,6 +4364,10 @@ msgid "I18N_OPENXPKI_UI_CRR_TIME"
 msgstr "Объекты отзыва "
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_DER"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
@@ -4301,6 +4381,10 @@ msgstr "Загрузка сертификата в форматах PEM или C
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PKCS7"
+msgstr "Загрузить цепочку сертифкатов"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT"
 msgstr "Загрузить цепочку сертифкатов"
 
 #, fuzzy
@@ -4768,6 +4852,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
 msgstr "Утвердить заявку на отзыв сертификата (CRR)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_PUBLISH_PUBLISH_CA_DESC"
+msgstr "Запустить технологический процесс LDAP-публикации сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_PUBLISH_PUBLISH_CA_LABEL"
+msgstr "Запустить технологический процесс LDAP-публикации сертификата"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Запустить технологический процесс LDAP-публикации сертификата"
 
@@ -4902,6 +4994,14 @@ msgstr "Отклонить заявку на отзыв сертификата"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
 msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
+msgstr "Список отзыва доступен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_LABEL"
+msgstr "Список отзыва доступен"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_DESC"
@@ -5439,6 +5539,14 @@ msgstr "Сохранить заявку в базе данных и выдать
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_PUBLISH_CA_DESC"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_PUBLISH_CA_LABEL"
 msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
 #, fuzzy
@@ -6621,6 +6729,14 @@ msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
@@ -8992,6 +9108,14 @@ msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "В состоянии ожидания запуска"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -9342,3 +9466,13 @@ msgstr "Пауза"
 #, fuzzy
 msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "Тестировщик"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
+#~ msgstr ""
+#~ "Для выполнения следующего этапа технологическому процессу не хватает "
+#~ "некоторых данных (__FIELDS__)."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE"
+#~ msgstr "Сертификаты"

@@ -77,6 +77,18 @@ msgstr "Deutsch"
 msgid "I18N_OPENXPKI_API_TOKEN_GET_TRUST_ANCHOR_NO_PATH"
 msgstr "Web-Schnittstelle des Trustcenters"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_TOKEN_OR_ALIAS_REQURIED"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_UNABLE_TO_GET_TOKEN_TYPE"
+msgstr "Deutsch"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_API_TOKEN_IS_TOKEN_USABLE_VALUE_MISSMATCH"
+msgstr "Deutsch"
+
 msgid "I18N_OPENXPKI_APPROVAL_MESSAGE_CRR"
 msgstr ""
 "Ich genehmige den CRR für Workflow __WFID__.\n"
@@ -107,6 +119,18 @@ msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_CERT_"
+msgstr "CA Informationszugang (Authority Information Access)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_EXPIRED"
+msgstr "CA Informationszugang (Authority Information Access)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_ISSUED"
+msgstr "CA Informationszugang (Authority Information Access)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_CERT_REVOKED"
 msgstr "CA Informationszugang (Authority Information Access)"
 
 #, fuzzy
@@ -2071,6 +2095,22 @@ msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN"
 msgstr "uid"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_ISSUER_QUERY_AMBIGIOUS_RESULT"
+msgstr "uid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_DEFAULT_METHOD_OBSOLETE"
 msgstr "Prozesse anzeigen"
 
@@ -2175,6 +2215,10 @@ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_PRIVATE_KEY_FOR_CERT_COULD_NOT_DETERM
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_PROFILE_FOR_CERT_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM"
 msgstr "uid"
 
@@ -2221,6 +2265,10 @@ msgstr "uid"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_VALUE_TYPE"
 msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_NAMESPACE_AND_KEY_ARE_REQUIRED"
+msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_VALIDATE_CERTIFICATE_NO_DATA"
@@ -3132,6 +3180,18 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFI
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_FOUND_FOR_TYPE"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_OR_TYPE_GIVEN"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_CERTEXPORT_GETCONFIG_NO_SUBJECT"
 msgstr "PKI Realm"
 
@@ -3209,14 +3269,6 @@ msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PERSISTCSRS_CERT_ISSUANCE_DATA_UNDEFINED"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -3316,7 +3368,15 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PERSIST_CERTIFICATE_METADATA
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CA_COULD_NOT_CONVERT_CERT_TO_DER"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
+msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -3522,6 +3582,10 @@ msgstr "Prozesse anzeigen"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE"
 msgstr "PKI Realm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_FETCH_WORKFLOW_NOT_POSSBILE_WITH_NULL_PERSISTER"
+msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_IS_STUB_ACTIVITY"
@@ -4237,6 +4301,10 @@ msgid "I18N_OPENXPKI_UI_CRR_TIME"
 msgstr "Einträge"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
+msgstr "PEM (CRT) Format"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_DER"
 msgstr "PEM (CRT) Format"
 
@@ -4250,6 +4318,10 @@ msgstr "PEM (CRT) Format"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PKCS7"
+msgstr "Herunterladen der kompletten Zertifizierungskette"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT"
 msgstr "Herunterladen der kompletten Zertifizierungskette"
 
 #, fuzzy
@@ -4713,6 +4785,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
 msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_PUBLISH_PUBLISH_CA_DESC"
+msgstr "Create a new workflow instance for publishing a certificate using LDAP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_PUBLISH_PUBLISH_CA_LABEL"
+msgstr "Create a new workflow instance for publishing a certificate using LDAP"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Create a new workflow instance for publishing a certificate using LDAP"
 
@@ -4847,6 +4927,14 @@ msgstr "Abweisen des Zertifizierungsantrages"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
 msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
+msgstr "CRL veröffentlicht"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_LABEL"
+msgstr "CRL veröffentlicht"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_DESC"
@@ -5382,6 +5470,14 @@ msgstr "Speichern des Zertifzierungsantrages"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_PUBLISH_CA_DESC"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_PUBLISH_CA_LABEL"
 msgstr "Speichern des Zertifzierungsantrages"
 
 #, fuzzy
@@ -6540,6 +6636,14 @@ msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
@@ -8882,6 +8986,14 @@ msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Auf Start wartend"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE_DESC"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Erstellen von CRLs"
 
@@ -9228,3 +9340,11 @@ msgstr "Warten"
 #, fuzzy
 msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "testuser"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE"
+#~ msgstr "PKI Realm"
