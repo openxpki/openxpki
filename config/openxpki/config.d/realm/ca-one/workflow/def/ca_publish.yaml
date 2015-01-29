@@ -98,9 +98,6 @@ field:
         type: text
 
 acl:
-    Anonymous:
-        creator: self
-
     CA Operator:
         creator: any
 
@@ -108,8 +105,5 @@ acl:
         creator: any
 
     System:
-        creator: self
-
-    User:
-        creator: self
+        creator: any
 

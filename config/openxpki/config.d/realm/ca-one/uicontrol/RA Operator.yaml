@@ -30,6 +30,9 @@ main:
         label: Manage Secrets
       - key:   information!process
         label: Process Information
+      - key:   workflow!start!wf_type!ca_publish
+        label: Publish CA/CRL
+
 
   - key:   info
     label: Information
