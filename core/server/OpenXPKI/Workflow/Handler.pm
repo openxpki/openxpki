@@ -381,20 +381,6 @@ sub __get_instance {
         }
     }
     ##! 64: 'config added completely'
-
-    my $workflow_table = 'WORKFLOW';
-    my $workflow_history_table = 'WORKFLOW_HISTORY';
-    # persister configuration should not be user-configurable and is
-    # static and identical throughout OpenXPKI
-    $workflow_factory->add_config(
-        persister => {
-            name           => 'OpenXPKI',
-            class          => 'OpenXPKI::Server::Workflow::Persister::DBI',
-            workflow_table => $workflow_table,
-            history_table  => $workflow_history_table,
-        },
-    );
-
     ##! 1: 'end'
     return $workflow_factory;
 }

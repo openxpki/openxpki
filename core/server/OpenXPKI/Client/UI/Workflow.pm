@@ -62,6 +62,52 @@ sub init_index {
 
 }
 
+=head2 init_start
+
+Same as init_index but directly creates the workflow and displays the result
+of the initial action. Normal workflows will result in a redirect using the
+workflow id, volatile workflows are displayed directly. This works only with
+workflows that do not require any initial parameters.
+
+=cut
+sub init_start {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $wf_info = $self->send_command( 'create_workflow_instance', {
+       WORKFLOW => $self->param('wf_type'), PARAMS   => {}, UIINFO => 1
+    });
+
+    if (!$wf_info) {
+        # todo - handle errors
+        $self->logger()->error("Create workflow failed");
+        return $self;
+    }
+
+    $self->logger()->trace("wf info on create: " . Dumper $wf_info );
+
+    $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_info->{WORKFLOW}->{TYPE}, $wf_info->{WORKFLOW}->{ID} );
+
+    # this duplicates code from action_index
+    if ($wf_info->{WORKFLOW}->{ID} > 0) {
+
+        my $redirect = 'workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
+        my @activity = keys %{$wf_info->{ACTIVITY}};
+        if (scalar @activity == 1) {
+            $redirect .= '!wf_action!'.$activity[0];
+        }
+        $self->redirect($redirect);
+
+    } else {
+        # one shot workflow
+        $self->__render_from_workflow({ WF_INFO => $wf_info });
+    }
+
+    return $self;
+
+}
+
 
 =head2 init_load
 
@@ -385,7 +431,8 @@ sub action_index {
         $self->__purge_wf_token( $wf_token );
 
         # always redirect after create to have the url pointing to the created workflow
-        $wf_args->{redirect} = 1;
+        # do not redirect for "one shot workflows"
+        $wf_args->{redirect} = ($wf_info->{WORKFLOW}->{ID} > 0);
 
     } else {
         $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');

@@ -107,6 +107,11 @@ sub __process_workflow {
 
     my $conn = $self->_config();
 
+    my $wf_persister = $conn->get( [ 'workflow', 'def', $wf_name , 'head', 'persister' ] );
+    if ($wf_persister) {
+        $workflow->{persister}  = $wf_persister;
+    }
+
     my $wf_prefix = $conn->get( [ 'workflow', 'def', $wf_name , 'head', 'prefix' ] );
 
     my @states = $conn->get_keys( ['workflow', 'def', $wf_name, 'state' ] );

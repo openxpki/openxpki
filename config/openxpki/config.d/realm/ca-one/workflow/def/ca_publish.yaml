@@ -2,7 +2,7 @@ head:
     prefix: capub
     label: I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE
     description: I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE_DESC
-
+    persister: Volatile
 
 state:
     CREATE_QUEUE:
