@@ -364,6 +364,7 @@ sub get_chain {
     my $return_ref;
     my @identifiers;
     my @certificates;
+    my @subject;
     my $finished = 0;
     my $complete = 0;
     my %already_seen; # hash of identifiers that have already been seen
@@ -399,6 +400,7 @@ sub get_chain {
             $finished = 1;
         }
         else {
+            push @subject, $cert->{SUBJECT};
             if ($inner_format) {
                 if ($inner_format eq 'PEM') {
                     push @certs, $cert->{DATA};
@@ -454,6 +456,7 @@ sub get_chain {
         return $result;
     }
 
+    $return_ref->{SUBJECT} = \@subject;
     $return_ref->{IDENTIFIERS} = \@identifiers;
     $return_ref->{COMPLETE}    = $complete;
     if (defined $arg_ref->{OUTFORMAT}) {
@@ -824,6 +827,7 @@ OUTFORMAT, which can be either 'PEM' or 'DER'.
 Returns a hash ref with the following entries:
 
     IDENTIFIERS   the chain of certificate identifiers as an array
+    SUBJECT       list of subjects for the returned certificates
     CERTIFICATES  the certificates as an array of data in outformat
                   (if requested)
     COMPLETE      1 if the complete chain was found in the database

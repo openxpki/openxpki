@@ -73,79 +73,6 @@ sub init_search {
     return $self;
 }
 
-
-sub init_info {
-
-
-    my $self = shift;
-    my $args = shift;
-
-    my $cert_identifier = $self->param('identifier');
-
-    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier });
-    $self->logger()->debug("result: " . Dumper $cert);
-
-    $self->_page({
-        label => 'Certificate Information',
-        shortlabel => $cert->{BODY}->{SUBJECT_HASH}->{CN}->[0],
-    });
-
-
-    if ($cert->{STATUS} eq 'ISSUED' && $cert->{BODY}->{NOTAFTER} < time()) {
-        $cert->{STATUS} = 'EXPIRED';
-    }
-
-    my @fields = (
-        { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
-        { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
-        { label => 'Issuer',  format=>'link', value => { label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER} } },
-        { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
-        { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
-        { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
-    );
-
-    # TODO - Need to decide of we use buttons or links
-    my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!$cert_identifier!format!";
-    my @buttons = (
-        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_INSTALL'), 'href' => $base.'install' },
-        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM'), 'href' => $base.'pem' },
-        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER'), 'page' => $base.'der', target => '_blank' },
-        # core bug see #185 { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT'), 'page' => $base.'txt', target => '_blank' },
-        { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7'), 'page' => $base.'pkcs7', target => '_blank' }
-    );
-
-    my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
-
-    my $privkey = '';
-    # check for private key
-    # TODO - add ACL, only owner should be allowed to dl key
-    if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-        $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
-    }
-
-    push @fields, { label => 'Download', value => '<ul>'.
-        sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
-        # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
-        sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
-        sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
-        $privkey.
-        sprintf ($pattern, 'install', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_INSTALL')).
-        '</ul>'
-    };
-
-    $self->_result()->{main} = [{
-        type => 'keyvalue',
-        content => {
-            label => '',
-            description => '',
-            data => \@fields,
-            #buttons => \@buttons
-        }},
-    ];
-
-}
-
-
 sub init_detail {
 
 
@@ -182,6 +109,30 @@ sub init_detail {
         { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
         { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
     );
+
+    # was in info, bullet list for downloads
+    my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!$cert_identifier!format!";
+    my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
+
+    my $privkey = '';
+    # check for private key
+    # TODO - add ACL, only owner should be allowed to dl key
+    if ($is_local_entity &&
+        $self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
+        $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
+    }
+
+    push @fields, { label => 'Download', value => '<ul>'.
+        sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
+        # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
+        sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
+        sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+        sprintf ($pattern, 'bundle', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE')).
+        $privkey.
+        sprintf ($pattern, 'install', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_INSTALL')).
+        '</ul>'
+    };
+
 
     my @buttons;
     push @buttons, {
@@ -330,6 +281,7 @@ sub init_download {
                 #sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')). # core bug see #185
                 sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
                 sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
+                sprintf ($pattern, 'bundle', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE')).
                 $privkey.
                 '</ul>',
         }});
@@ -344,6 +296,24 @@ sub init_download {
         print $self->cgi()->header( -type => 'application/pkcs7-mime', -expires => "1m", -attachment => "$filename.p7c" );
         print $pkcs7;
         exit;
+
+    } elsif ($format eq 'bundle') {
+
+        my $chain = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM', 'KEEPROOT' => 1 });
+        $self->logger()->debug("chain info " . Dumper $chain );
+
+        my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
+        my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
+
+        my $output = '';
+        for (my $i=0;$i<@{$chain->{CERTIFICATES}};$i++) {
+            $output .= $chain->{SUBJECT}->[$i]. "\n". $chain->{CERTIFICATES}->[$i]."\n\n";
+        }
+
+        print $self->cgi()->header( -type => 'application/octet-string', -expires => "1m", -attachment => "$filename.bundle" );
+        print $output;
+        exit;
+
 
     } else {
 
@@ -522,7 +492,7 @@ sub action_search {
         content => {
             header => 'Grid-Headline',
             actions => [{
-                path => 'certificate!info!identifier!{identifier}',
+                path => 'certificate!detail!identifier!{identifier}',
                 label => 'Download',
                 icon => 'download',
                 target => 'modal'

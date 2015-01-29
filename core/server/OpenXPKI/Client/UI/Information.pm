@@ -56,7 +56,7 @@ sub init_issuer {
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
-                target => 'tab',
+                target => 'modal',
             }],
             columns => [
                 { sTitle => "subject" },

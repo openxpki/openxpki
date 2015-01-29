@@ -855,7 +855,7 @@ sub __render_from_workflow {
             # create a link on cert_identifier fields
             if ( $key =~ m{ cert_identifier \z }x) {
                 $item->{format} = 'link';
-                $item->{value}  = { label => $context->{$key}, page => 'certificate!info!identifier!'. $context->{$key}, target => 'modal' };
+                $item->{value}  = { label => $context->{$key}, page => 'certificate!detail!identifier!'. $context->{$key}, target => 'modal' };
             }
 
             # Code format any PEM blocks
