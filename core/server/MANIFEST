@@ -327,6 +327,7 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/GenerateActivationCode.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GetOwnerByCardID.pm
 
 
+OpenXPKI/Server/Workflow/Persister/Null.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
