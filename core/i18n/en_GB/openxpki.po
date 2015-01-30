@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-01-30 11:08+0100\n"
+"PO-Revision-Date: 2015-01-30 14:55+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -130,19 +130,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INSTANTIATE_CLI_FAILED"
 msgstr "OpenXPKI::Crypto::Backend::OpenSSL::__init_cli() failed"
-
-# Delete this!!!
-msgid "I18N_OPENXPKI_CERT_"
-msgstr "This message should never be displayed. Please delete the translation."
-
-msgid "I18N_OPENXPKI_CERT_EXPIRED"
-msgstr "Expired"
-
-msgid "I18N_OPENXPKI_CERT_ISSUED"
-msgstr "Issued"
-
-msgid "I18N_OPENXPKI_CERT_REVOKED"
-msgstr "Revoked"
 
 # Should probably be deleted. It appears only in a commented-out block of code.
 #, fuzzy
@@ -3933,16 +3920,16 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING"
 msgstr "revocation pending"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED"
-msgstr "expired"
+msgstr "Expired"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_ISSUED"
-msgstr "issued"
+msgstr "Issued"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
-msgstr "revoked"
+msgstr "Revoked"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
-msgstr "valid"
+msgstr "Valid"
 
 msgid "I18N_OPENXPKI_UI_COMMENT"
 msgstr "Comment"
@@ -3987,7 +3974,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
-msgstr "TXT format"
+msgstr "Download text (TXT) format"
+
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_TXT"
+msgstr "Text (txt)"
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 msgstr "The entered date/time could not be validated."

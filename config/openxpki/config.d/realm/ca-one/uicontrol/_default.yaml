@@ -24,7 +24,7 @@ main:
     entries: 
       - key:   information!issuer
         label: CA certificates
-      - key:   information!crl
+      - key:   crl!index
         label: Revocation lists
 
   - key:   certificate!search

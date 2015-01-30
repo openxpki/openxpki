@@ -88,63 +88,6 @@ sub init_issuer {
     return $self;
 }
 
-=head2 init_crl
-
-Show list of crls with download options.
-
-=cut
-sub init_crl {
-
-    my $self = shift;
-    my $args = shift;
-
-    my $crl_list = $self->send_command( 'get_crl_list' , { FORMAT => 'HASH', VALID_AT => time() });
-
-    $self->logger()->debug("result: " . Dumper $crl_list);
-
-    $self->_page({
-        label => 'Revocation Lists of this realm',
-    });
-
-    my @result;
-    foreach my $crl (@{$crl_list}) {
-        push @result, [
-            $crl->{BODY}->{'SERIAL'},
-            $self->_escape($crl->{BODY}->{'ISSUER'}),
-            $crl->{BODY}->{'LAST_UPDATE'},
-            $crl->{BODY}->{'NEXT_UPDATE'},
-            (defined $crl->{LIST} ? scalar @{$crl->{LIST}} : 0),
-        ];
-    }
-
-    $self->add_section({
-        type => 'grid',
-        className => 'crl',
-        processing_type => 'all',
-        content => {
-            actions => [{
-                label => 'download as Text',
-                path => 'crl!download!serial!{serial}',
-                target => 'modal',
-            },{
-                label => 'view details in browser',
-                path => 'crl!detail!serial!{serial}',
-                target => 'tab',
-            }],
-            columns => [
-                { sTitle => "serial" },
-                { sTitle => "issuer" },
-                { sTitle => "created", format => 'timestamp'},
-                { sTitle => "expires", format => 'timestamp'},
-                { sTitle => "items"},
-            ],
-            data => \@result
-        }
-    });
-
-    return $self;
-}
-
 
 =head2 init_policy
 

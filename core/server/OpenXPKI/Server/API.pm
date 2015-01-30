@@ -584,6 +584,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_sql_string,
                 },
+                ENTITY_ONLY => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                }
             },
         },
         'search_cert' => {
@@ -673,6 +678,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_sql_string,
                 },
+                ENTITY_ONLY => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                }
             },
         },
         'control_watchdog' => {

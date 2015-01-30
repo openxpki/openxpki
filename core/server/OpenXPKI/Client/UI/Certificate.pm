@@ -107,7 +107,7 @@ sub init_detail {
         { label => 'Identifier', value => $cert_identifier },
         { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
-        { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
+        { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
         { label => 'Issuer',  format=>'link', value => { label => $cert->{BODY}->{ISSUER}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
@@ -469,7 +469,7 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
-    my $query = { LIMIT => 100 }; # Safety barrier
+    my $query = { ENTITY_ONLY => 1, LIMIT => 100 }; # Safety barrier
     foreach my $key (qw(subject issuer_dn profile)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
@@ -531,7 +531,7 @@ sub action_search {
         push @result, [
             $item->{CERTIFICATE_SERIAL},
             $self->_escape($item->{SUBJECT}),
-            $item->{EMAIL} || '',
+            { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}) , value => $item->{STATUS} },
             $item->{NOTBEFORE},
             $item->{NOTAFTER},
             $self->_escape($item->{ISSUER_DN}),
@@ -567,13 +567,13 @@ sub action_search {
                 target => 'tab',
             }],
             columns => [
-                { sTitle => "serial"},
-                { sTitle => "subject" },
-                { sTitle => "email"  },
-                { sTitle => "notbefore", format => 'timestamp' },
-                { sTitle => "notafter", format => 'timestamp' },
-                { sTitle => "issuer"},
-                { sTitle => "identifier"},
+                { sTitle => "Serial"},
+                { sTitle => "Subject" },
+                { sTitle => "Status", format => 'certstatus' },
+                { sTitle => "Notbefore", format => 'timestamp' },
+                { sTitle => "Notafter", format => 'timestamp' },
+                { sTitle => "Issuer"},
+                { sTitle => "Identifier"},
                 { sTitle => "_className"},
             ],
             data => \@result

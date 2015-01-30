@@ -9,7 +9,7 @@ tr.gridrow-issued > td {}
 tr.gridrow-issued:hover > td {background-color: #E7E7E7 !important;}
 tr.gridrow-expired > td {background-color:#fcf8e3 !important;}
 tr.gridrow-expired:hover > td {background-color: #E7E7E7 !important;}
-tr.gridrow-revoked > td {background-color: ##f2dede !important;}
+tr.gridrow-revoked > td {background-color: #f2dede !important;}
 tr.gridrow-revoked:hover > td {background-color: #e6c1c7 !important;}
 
 /* ca certificat/token specific classes: online, offline, upcomging */

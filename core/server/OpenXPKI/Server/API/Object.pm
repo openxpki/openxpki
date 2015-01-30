@@ -569,6 +569,8 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * NOTBEFORE/NOTAFTER (less/greater to match "other side" of validity)
 
+=item * ENTITY_ONLY (show only certificates issued by this ca)
+
 =back
 
 The result is an array of hashes. The hashes do not contain the data field
@@ -625,6 +627,11 @@ sub search_cert {
             AMOUNT => $args->{LIMIT},
             START  => $args->{START},
         };
+    }
+
+    # only list entities issued by this ca
+    if ($args->{ENTITY_ONLY}) {
+        $params{DYNAMIC}->{'CERTIFICATE.CSR_SERIAL'} = { VALUE => undef, OPERATOR => 'NOT_EQUAL' };
     }
 
     # only search in current realm
