@@ -334,8 +334,8 @@ WriteMakefile(
     'LWP::UserAgent'         => '6.05', # In LWP # Constituent of module  libwww-perl
     'LWP::Protocol::connect' => '6.09',
     'LWP::Protocol::https'    => '6.04',    
-    'Mail::RFC822::Address'  => '0.3',
-    'Math::BigInt'           => '1',
+    'Mail::RFC822::Address'  => '0.3',    
+    'Math::BigInt'           => '1.9993', # Make FreeBSD happy
 #    'MIME::Base64'           => '1', # A core module since perl v5.7.3
     'Moose'                  => '1',
     'NetAddr::IP'            => '0',
