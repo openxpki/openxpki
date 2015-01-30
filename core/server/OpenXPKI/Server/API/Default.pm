@@ -422,6 +422,10 @@ sub get_chain {
                         OUT     => 'DER',
                     });
                     push @certs, $utf8fix ;
+                } elsif ($inner_format eq 'HASH') {
+                    # unset DATA to save some bytes
+                    delete $cert->{DATA};
+                    push @certs, $cert;
                 }
             }
             if ($cert->{ISSUER_IDENTIFIER} eq $current_identifier) {
@@ -823,7 +827,7 @@ Return structure:
 Returns the certificate chain starting at a specified certificate.
 Expects a hash ref with the named parameter START_IDENTIFIER (the
 identifier from which to compute the chain) and optionally a parameter
-OUTFORMAT, which can be either 'PEM' or 'DER'.
+OUTFORMAT, which can be either 'PEM', 'DER' or 'HASH' (full db result).
 Returns a hash ref with the following entries:
 
     IDENTIFIERS   the chain of certificate identifiers as an array

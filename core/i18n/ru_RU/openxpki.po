@@ -4324,6 +4324,18 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
 msgstr "Идентификатор сертификата"
 
@@ -4376,6 +4388,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_INSTALL"
 msgstr "Загрузка сертификата в текстовом формате"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_LABEL"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PEM"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
@@ -4389,6 +4405,18 @@ msgstr "Загрузить цепочку сертифкатов"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL"
+msgstr "Загрузка сертификата в текстовом формате"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy

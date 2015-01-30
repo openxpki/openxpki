@@ -6,6 +6,7 @@ package OpenXPKI::Client::UI::Information;
 
 use Moose;
 use Data::Dumper;
+use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -15,6 +16,12 @@ sub BUILD {
     $self->_page ({'label' => 'Welcome to your OpenXPKI Trustcenter'});
 }
 
+
+=head2 init_index
+
+Not used yet, redirect to home screen
+
+=cut
 sub init_index {
 
     my $self = shift;
@@ -25,6 +32,13 @@ sub init_index {
     return $self;
 }
 
+=head2 init_issuer
+
+Show the list of all certificates in the "certsign" group including current
+token status (online, offline, expired). Each item is linked to cert_info
+popup.
+
+=cut
 sub init_issuer {
 
     my $self = shift;
@@ -44,15 +58,16 @@ sub init_issuer {
             $self->_escape($cert->{SUBJECT}),
             $cert->{NOTBEFORE},
             $cert->{NOTAFTER},
-            $cert->{VSTATUS},
-            $cert->{IDENTIFIER}
+            i18nGettext('I18N_OPENXPKI_UI_TOKEN_STATUS_'.$cert->{STATUS}),
+            $cert->{IDENTIFIER},
+            lc($cert->{STATUS})
         ];
     }
 
     $self->add_section({
         type => 'grid',
         processing_type => 'all',
-        className => 'certificate',
+        className => 'cacertificate',
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
@@ -64,14 +79,20 @@ sub init_issuer {
                 { sTitle => "notafter", format => 'timestamp'},
                 { sTitle => "state"},
                 { sTitle => "identifier", bVisible => 0 },
+                { sTitle => "_className" },
             ],
-            data => \@result
+            data => \@result,
         }
     });
 
     return $self;
 }
 
+=head2 init_crl
+
+Show list of crls with download options.
+
+=cut
 sub init_crl {
 
     my $self = shift;
@@ -124,6 +145,12 @@ sub init_crl {
     return $self;
 }
 
+
+=head2 init_policy
+
+Show policy documents, not implemented yet
+
+=cut
 sub init_policy {
 
     my $self = shift;
@@ -142,6 +169,12 @@ sub init_policy {
     });
 }
 
+
+=head2 init_process
+
+Show list of running system process, #TODO - move to a workflow or add acl!
+
+=cut
 sub init_process {
 
     my $self = shift;

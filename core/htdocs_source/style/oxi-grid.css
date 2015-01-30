@@ -7,10 +7,18 @@ tr.gridrow:hover > td {background-color: #E7E7E7 !important;}
 /* certificate specific classes: issued, expired, revoked */
 tr.gridrow-issued > td {}
 tr.gridrow-issued:hover > td {background-color: #E7E7E7 !important;}
-tr.gridrow-expired > td {color:silver;}
+tr.gridrow-expired > td {background-color:#fcf8e3 !important;}
 tr.gridrow-expired:hover > td {background-color: #E7E7E7 !important;}
-tr.gridrow-revoked > td {background-color: #ebcccc !important;}
+tr.gridrow-revoked > td {background-color: ##f2dede !important;}
 tr.gridrow-revoked:hover > td {background-color: #e6c1c7 !important;}
+
+/* ca certificat/token specific classes: online, offline, upcomging */
+tr.gridrow-online > td {background-color:#dff0d8 !important;}
+tr.gridrow-online:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-offline > td {background-color:#f2dede !important;}
+tr.gridrow-offline:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-upcoming > td {background-color:#d9edf7 !important;}
+tr.gridrow-upcoming:hover > td {background-color: #E7E7E7 !important;}
 
 /* workflow specific classes: success, failed, manual, paused */
 tr.gridrow-success > td {background-color: #dff0d8 !important;}

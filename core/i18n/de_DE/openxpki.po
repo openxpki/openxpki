@@ -4261,6 +4261,18 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Gültige"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
 msgstr "Zertifikats-ID"
 
@@ -4313,6 +4325,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_INSTALL"
 msgstr "Textformat (txt)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_LABEL"
+msgstr "PEM (CRT) Format"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PEM"
 msgstr "PEM (CRT) Format"
 
@@ -4326,6 +4342,18 @@ msgstr "Herunterladen der kompletten Zertifizierungskette"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY"
+msgstr "PEM (CRT) Format"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER"
+msgstr "PEM (CRT) Format"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL"
+msgstr "Textformat (txt)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT) Format"
 
 #, fuzzy

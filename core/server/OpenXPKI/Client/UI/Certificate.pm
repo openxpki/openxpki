@@ -50,25 +50,25 @@ sub init_search {
         { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING'), value => 'CRL_ISSUANCE_PENDING'},
     );
 
-    $self->_result()->{main} = [
-        {   type => 'form',
-            action => 'certificate!search',
-            content => {
-                title => '',
-                submit_label => 'search now',
-                fields => [
+    $self->add_section({
+        type => 'form',
+        action => 'certificate!search',
+        content => {
+           title => '',
+           submit_label => 'search now',
+           fields => [
                 { name => 'subject', label => 'Subject', type => 'text', is_optional => 1 },
                 { name => 'san', label => 'SAN', type => 'text', is_optional => 1 },
                 { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states },
                 { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list },
                 { name => 'meta', label => 'Metadata', 'keys' => [{ value => "meta_requestor", label=> "Requestor" },{ value => "meta_email", label => "eMail" }], type => 'text', is_optional => 1, 'clonable' => 1 },
-                ]
+           ]
         }},
         {   type => 'text', content => {
             headline => 'My little Headline',
             paragraphs => [{text=>'Paragraph 1'},{text=>'Paragraph 2'}]
         }},
-    ];
+    );
 
     return $self;
 }
@@ -104,10 +104,11 @@ sub init_detail {
     my @fields = (
         { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
         { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
-        { label => 'Issuer',  format=>'link', value => { label => $cert->{BODY}->{ISSUER}, page => 'certificate!detail!identifier!'. $cert->{ISSUER_IDENTIFIER} } },
+        { label => 'Identifier', value => $cert_identifier },
         { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
         { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_CERT_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
+        { label => 'Issuer',  format=>'link', value => { label => $cert->{BODY}->{ISSUER}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
@@ -124,7 +125,7 @@ sub init_detail {
         $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
     }
 
-    push @fields, { label => 'Download', value => '<ul>'.
+    push @fields, { label => 'Download', value => '<ul class="list-unstyled">'.
         sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
         # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
         sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
@@ -154,7 +155,7 @@ sub init_detail {
         label  => 'renew'
     } if ($is_local_entity && ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED'));
 
-    $self->_result()->{main} = [{
+    $self->add_section({
         type => 'keyvalue',
         content => {
             label => '',
@@ -162,10 +163,62 @@ sub init_detail {
             data => \@fields,
             #buttons => \@buttons, # We need to fix this first
         }},
-    ];
+    );
 
 }
 
+=head2 init_chain
+
+Show the full chain of a certificate (subjects only) with inline download
+options for PEM/DER or browser install for each item of the chain.
+
+=cut
+
+sub init_chain {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $cert_identifier = $self->param('identifier');
+
+    my $chain = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'HASH', 'KEEPROOT' => 1 });
+
+    $self->_page({
+        label => 'Certificate Chain',
+        shortlabel => 'Certificate Chain',
+    });
+
+    # Download links
+    my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!%s!format!%s";
+    my $pattern = '<li><a href="'.$base.'" target="_blank">%s</a></li>';
+
+    foreach my $cert (@{$chain->{CERTIFICATES}}) {
+
+        my $dl = '<ul class="list-inline">'.
+            sprintf ($pattern, $cert->{IDENTIFIER}, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM')).
+            sprintf ($pattern, $cert->{IDENTIFIER}, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER')).
+            sprintf ($pattern, $cert->{IDENTIFIER}, 'install', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL')).
+            '</ul>';
+
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => '',
+                description => '',
+                data => [
+                    { label => i18nGettext('I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT'), format => 'link', 'value' => {
+                       label => $cert->{SUBJECT}, page => 'certificate!detail!identifier!'.$cert->{IDENTIFIER} } },
+                    { label => i18nGettext('I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE'), value => $cert->{NOTBEFORE}, format => 'timestamp' },
+                    { label => i18nGettext('I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER'), value => $cert->{NOTAFTER}, format => 'timestamp' },
+                    { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_LABEL'), value => $dl },
+                ],
+            }},
+        );
+    }
+
+    return $self;
+
+}
 
 sub init_workflows {
 
@@ -253,7 +306,7 @@ sub init_privkey{
 
 }
 
-# TODO - either merge with info or make sub to build buttons
+# TODO - either merge the display part with info or make sub to build buttons
 sub init_download {
 
     my $self = shift;

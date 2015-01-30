@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-01-29 18:30+0100\n"
+"PO-Revision-Date: 2015-01-30 11:08+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -3794,23 +3794,19 @@ msgid "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
 msgstr "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
 
 # Thi probably should be removed
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_"
-msgstr "I18N_OPENXPKI_TOKEN_STATUS_"
-
-msgid "I18N_OPENXPKI_TOKEN_STATUS_EXPIRED"
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED"
 msgstr "Token expired"
 
-msgid "I18N_OPENXPKI_TOKEN_STATUS_OFFLINE"
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE"
 msgstr "Token offline"
 
-msgid "I18N_OPENXPKI_TOKEN_STATUS_ONLINE"
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_ONLINE"
 msgstr "Token online"
 
-msgid "I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN"
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN"
 msgstr "Unknown token status"
 
-msgid "I18N_OPENXPKI_TOKEN_STATUS_UPCOMING"
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "Token upcoming"
 
 #, fuzzy
@@ -3916,6 +3912,15 @@ msgstr "Unknown application error"
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Backend session terminated - please re-login"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER"
+msgstr "not after"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
+msgstr "not before"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
+msgstr "Subject"
+
 msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
 msgstr "Certificate ID"
 
@@ -3957,6 +3962,9 @@ msgstr "Download DER (CER) format"
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_INSTALL"
 msgstr "Install certificate to browser"
 
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_LABEL"
+msgstr "Download"
+
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PEM"
 msgstr "Download PEM (CRT) format"
 
@@ -3968,6 +3976,15 @@ msgstr "Download certificate chain (PKCS7), including root"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY"
 msgstr "Download private key"
+
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER"
+msgstr "DER (CER)"
+
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL"
+msgstr "Install"
+
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
+msgstr "PEM (CRT)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "TXT format"

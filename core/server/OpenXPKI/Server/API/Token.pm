@@ -320,8 +320,7 @@ List all items in the certsign group of the requested REALM.
 REALM is optional and defaults to the session realm.
 Each entry of the list is a hashref holding the full alias name (ALIAS),
 the certificate identifier (IDENTIFIER), the notbefore/notafter date,
-the subject and the verbose status of the token. The status is returned as
-I18 token I18N_OPENXPKI_TOKEN_STATUS_xxx, where xx is out of
+the subject and the verbose status of the token. Possbile status values are
 EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN.
 
 The list is sorted by notbefore date, starting with the newest date.
@@ -372,15 +371,15 @@ sub get_ca_list {
             SUBJECT => $entry->{'CERTIFICATE.SUBJECT'},
             NOTBEFORE => $entry->{'ALIASES.NOTBEFORE'},
             NOTAFTER => $entry->{'ALIASES.NOTAFTER'},
-            STATUS => 'I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN'
+            STATUS => 'UNKNOWN'
         };
 
         # Check if the token is still valid - dates are already unix timestamps
         my $now = time();
         if ($entry->{'ALIASES.NOTBEFORE'} > $now) {
-            $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_UPCOMING';
+            $item->{STATUS} = 'UPCOMING';
         } elsif ($entry->{'ALIASES.NOTAFTER'} < $now) {
-            $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_EXPIRED';
+            $item->{STATUS} = 'EXPIRED';
         } else {
             # Check if the key is usable
             my $token;
@@ -394,9 +393,9 @@ sub get_ca_list {
                     }
                 } );
                 if ($self->is_token_usable({ TOKEN => $token })) {
-                    $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_ONLINE';
+                    $item->{STATUS} = 'ONLINE';
                 } else {
-                    $item->{STATUS} = 'I18N_OPENXPKI_TOKEN_STATUS_OFFLINE';
+                    $item->{STATUS} = 'OFFLINE';
                 }
             };
             if ($EVAL_ERROR) {
@@ -409,8 +408,6 @@ sub get_ca_list {
             }
         }
 
-        # Add translated status for frontend
-        $item->{VSTATUS} = OpenXPKI::i18n::i18nGettext($item->{STATUS});
         push @token, $item;
     }
     ##! 32: "Found tokens " . Dumper @token
