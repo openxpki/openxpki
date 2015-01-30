@@ -90,18 +90,16 @@ exec 2>/dev/null
 
 openssl req -verbose -config openssl.cnf  -x509 -newkey rsa:2048 -keyout "$BASE/ca-root-1.pem" -out "$BASE/ca-root-1.crt" -days 1826 -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=Root CA" -batch -passout pass:root
  
-openssl req -verbose  -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one-signer-1.pem" -out csr.pem -batch -passout pass:root 
+openssl req -verbose  -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one-signer-1.pem" -out csr.pem -batch -passout pass:root -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=CA ONE"
  
-openssl ca -in csr.pem  -config openssl.cnf -keyfile "$BASE/ca-root-1.pem" -cert "$BASE/ca-root-1.crt" -out "$BASE/ca-one-signer-1.crt" -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=CA ONE" -batch -passin pass:root  -extensions v3_ca -days 1095 -outdir .
+openssl ca -in csr.pem  -config openssl.cnf -keyfile "$BASE/ca-root-1.pem" -cert "$BASE/ca-root-1.crt" -out "$BASE/ca-one-signer-1.crt"  -batch -passin pass:root  -extensions v3_ca -days 1095 -outdir .
  
 # Data Vault is only used internally, use self signed
 openssl req -verbose -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one-vault-1.pem" -out "$BASE/ca-one-vault-1.crt" -batch -passout pass:root -x509 -days 365 -extensions vault_cert -subj "/DC=OpenXPKI Internal/CN=DataVault"
  
-openssl ca -in csr.pem  -config openssl.cnf -keyfile "$BASE/ca-root-1.pem" -cert "$BASE/ca-root-1.crt" -out "$BASE/ca-one-vault-1.crt" -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=DataVault" -batch -passin pass:root -outdir .
-
-openssl req -verbose  -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one-scep-1.pem" -out csr.pem -batch -passout pass:root
+openssl req -verbose  -config openssl.cnf -newkey rsa:2048 -keyout "$BASE/ca-one-scep-1.pem" -out csr.pem -batch -passout pass:root  -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=SCEP"
  
-openssl ca -in csr.pem  -config openssl.cnf -keyfile "$BASE/ca-root-1.pem" -cert "$BASE/ca-root-1.crt" -out "$BASE/ca-one-scep-1.crt" -subj "/DC=ORG/DC=OpenXPKI/OU=Test CA/CN=SCEP" -batch -passin pass:root -outdir .
+openssl ca -in csr.pem  -config openssl.cnf -keyfile "$BASE/ca-root-1.pem" -cert "$BASE/ca-root-1.crt" -out "$BASE/ca-one-scep-1.crt" -batch -passin pass:root -outdir .
 
 cd $OLDPWD;
 rm $TMP/*;
@@ -116,17 +114,9 @@ chmod 444 $BASE/*.crt;
 echo "Starting import";
 
 openxpkiadm certificate import  --file $BASE/ca-root-1.crt
-ROOTID=`openxpkiadm certificate id --file $BASE/ca-root-1.crt`
-
-openxpkiadm certificate import --file $BASE/ca-one-signer-1.crt --realm ca-one --issuer $ROOTID
-
-openxpkiadm alias --realm ca-one --token certsign --identifier `openxpkiadm certificate id --file $BASE/ca-one-signer-1.crt`
-
-openxpkiadm certificate import --file $BASE/ca-one-vault-1.crt 
-openxpkiadm alias --realm ca-one --token datasafe --identifier `openxpkiadm certificate id --file $BASE/ca-one-vault-1.crt`
-
-openxpkiadm certificate import --file $BASE/ca-one-scep-1.crt --realm ca-one --issuer $ROOTID
-openxpkiadm alias --realm ca-one --token scep --identifier `openxpkiadm certificate id --file $BASE/ca-one-scep-1.crt`
+openxpkiadm certificate import --file $BASE/ca-one-signer-1.crt --realm ca-one --token certsign
+openxpkiadm certificate import --file $BASE/ca-one-vault-1.crt --realm ca-one --token datasafe
+openxpkiadm certificate import --file $BASE/ca-one-scep-1.crt --realm ca-one --token scep
 
 echo "Configuration should be done now, 'openxpkictl start' to fire up server'"
 echo ""

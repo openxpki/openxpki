@@ -13,7 +13,7 @@ minutes and will give you a ready to run OXI install available at http://localho
 Debian/Ubuntu Development Builds
 ---------------------------------
 
-**Starting with the 0.15 release we will no longer support the old mason ui, the current 0.18 release includes a useable but still a bit ugly version of the new ui component based on the Ember.js framework**
+**Starting with the 0.15 release we will no longer support the old mason ui, to new UI based on Ember.js should be mostly functional but still needs some work.**
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
 
@@ -76,61 +76,59 @@ Here is what you need to do:
 Move the key files to /etc/openxpki/ssl/ca-one/ and name them ca-one-signer-1.pem, ca-one-vault-1.pem, ca-one-scep-1.pem. 
 The key files must be readable by the openxpki user, so we recommend to make them owned by the openxpki user with mode 0400. 
 
-Now import the certificates to the database, the realm/issuer line is required if the certificate is not self signed.
+Now import the certificates to the database. The signer token is used exclusive in the current realm, 
+so we can use a shortcut and import and reference it with one command. 
 
 :: 
     
     openxpkiadm certificate import  --file ca-root-1.crt 
         
     openxpkiadm certificate import  --file ca-one-signer-1.crt \
-        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`
-        
-    openxpkiadm certificate import  --file ca-one-vault-1.crt \
-        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`
-           
-    openxpkiadm certificate import  --file ca-one-scep-1.crt \
-        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`     
-        
-To link these certificates to the internal tokens, you need to set a so called alias::         
+        --realm ca-one --token certsign
+                
+As we might want to reuse SCEP and Vault token across the realms, we import them in to the global 
+namespace and just create an alias in the current realm::         
      
-    openxpkiadm alias --realm ca-one --token certsign \
-        --identifier `openxpkiadm certificate id --file ca-one-signer-1.crt`
-        
+    openxpkiadm certificate import  --file ca-one-vault-1.crt            
+    openxpkiadm certificate import  --file ca-one-scep-1.crt 
+
     openxpkiadm alias --realm ca-one --token datasafe \
-        --identifier `openxpkiadm certificate id --file ca-one-vault-1.crt`  \        
+        --identifier `openxpkiadm certificate id --file ca-one-vault-1.crt`
 
     openxpkiadm alias --realm ca-one --token scep \
-        --identifier `openxpkiadm certificate id --file ca-one-scep-1.crt`  \
-        --realm ca-one --issuer `openxpkiadm certificate id --file ca-root-1.crt`
+        --identifier `openxpkiadm certificate id --file ca-one-scep-1.crt`
+
 
 If the import went smooth, you should see something like this (ids and times will vary)::
 
     $ openxpkiadm alias --realm ca-one
     
-    scep (ca-one-scep):
-      Alias     : ca-one-scep-1
-      Identifier: Xol0OArASuzS4bYiROxLvGKdl_4
-      NotBefore : 2013-09-20 08:41:05
-      NotAfter  : 2014-09-20 08:41:05
-    
-    datasafe (ca-one-vault):
-      Alias     : ca-one-vault-1
-      Identifier: ZnUjwmB4gqOtZagj2iSc8hLqJis
-      NotBefore : 2013-09-20 08:41:05
-      NotAfter  : 2014-09-20 08:41:05
-    
-    certsign (ca-one-signer):
-      Alias     : ca-one-signer-1
-      Identifier: She8R9sivQf_F7Rql7_Qph2Ec0U
-      NotBefore : 2013-09-20 08:41:04
-      NotAfter  : 2014-09-20 08:41:04
-    
+    === functional token ===
+    ca-one-scep (scep):
+    Alias     : ca-one-scep-1
+    Identifier: YsBNZ7JYTbx89F_-Z4jn_RPFFWo
+    NotBefore : 2015-01-30 20:44:40
+    NotAfter  : 2016-01-30 20:44:40
+
+    ca-one-vault (datasafe):
+    Alias     : ca-one-vault-1
+    Identifier: lZILS1l6Km5aIGS6pA7P7azAJic
+    NotBefore : 2015-01-30 20:44:40
+    NotAfter  : 2016-01-30 20:44:40
+
+    ca-one-signer (certsign):
+    Alias     : ca-one-signer-1
+    Identifier: Sw_IY7AdoGUp28F_cFEdhbtI9pE
+    NotBefore : 2015-01-30 20:44:40
+    NotAfter  : 2018-01-29 20:44:40
+
+    === root ca ===
     current root ca:
-      Alias     : root-1
-      Identifier: eGDjexhUDL60vzl4Se-DlIlhpUA
-      NotBefore : 2013-09-20 08:41:03
-      NotAfter  : 2018-08-25 08:41:03
-    
+    Alias     : root-1
+    Identifier: fVrqJAlpotPaisOAsnxa9cglXCc
+    NotBefore : 2015-01-30 20:44:39
+    NotAfter  : 2020-01-30 20:44:39
+
     upcoming root ca:
       not set
         

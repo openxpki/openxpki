@@ -12,12 +12,15 @@ flush privileges;" | mysql -u root
 #Setup the database
 openxpkiadm initdb
 
-# create certificates 
+# create certificates
+# example script might be packed
+test -f /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh.gz && \
+  gunzip /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh.gz
+
 bash /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh
 
-# Need to pickup new group 
+# Need to pickup new group
 /etc/init.d/apache2 restart
 
 # Start
 openxpkictl start
-
