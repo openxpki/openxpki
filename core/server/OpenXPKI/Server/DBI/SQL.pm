@@ -1030,11 +1030,19 @@ sub select {
                 } else {
 
                     # handle queries for NULL
-                    push @conditions, $lhs . ' IS NULL';
+                    # NOT_EQUAL undef -> IS NOT NULL
+                    if ($op_key eq 'NOT_EQUAL') {
+                        push @conditions, $lhs . ' IS NOT NULL';    
+                    } else {
+                        push @conditions, $lhs . ' IS NULL';
+                    }
+                    
                 }
             }
         }
     }
+    
+    ##! 64: 'Conditions ' . Dumper \@conditions 
 
     # sanity check: there must be a condition
     if ( scalar(@conditions) == 0 ) {
