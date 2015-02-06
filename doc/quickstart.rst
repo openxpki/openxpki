@@ -33,11 +33,15 @@ As the init script uses mysql as default, but does not force it as a dependency,
 
     aptitude install mysql-server libdbd-mysql-perl
 
+We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires the "non-free" repository to be present in your apt sources.
+
+    aptitude install libapache2-mod-fastcgi
+
 Now install the OpenXPKI core package and the translation package::
 
     aptitude install libopenxpki-perl openxpki-i18n
 
-We are fighting with a stupid debian build issue, if your install complains about a file collision in ``perllocal.pod``, add the force option::
+We are fighting with a debian build issue, if your install complains about a file collision in ``perllocal.pod``, add the force option::
 
     aptitude -o Dpkg::Options::="--force-overwrite" install libopenxpki-perl
 
