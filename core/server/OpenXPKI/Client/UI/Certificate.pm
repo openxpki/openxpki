@@ -7,6 +7,7 @@ package OpenXPKI::Client::UI::Certificate;
 use Moose;
 use Data::Dumper;
 use OpenXPKI::DN;
+use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
 
 
@@ -49,6 +50,14 @@ sub init_search {
         { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_REVOKED'), value => 'REVOKED'},
         { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING'), value => 'CRL_ISSUANCE_PENDING'},
     );
+    
+    my $preset;
+    if ($args->{preset}) {
+        $preset = $args->{preset};    
+    } elsif (my $queryid = $self->param('query')) {
+        my $result = $self->_client->session()->param('query_'.$queryid);
+        $preset = $result->{input};
+    }
 
     $self->add_section({
         type => 'form',
@@ -57,21 +66,122 @@ sub init_search {
            title => '',
            submit_label => 'search now',
            fields => [
-                { name => 'subject', label => 'Subject', type => 'text', is_optional => 1 },
-                { name => 'san', label => 'SAN', type => 'text', is_optional => 1 },
-                { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states },
-                { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list },
+                { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
+                { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
+                { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
+                { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
                 { name => 'meta', label => 'Metadata', 'keys' => [{ value => "meta_requestor", label=> "Requestor" },{ value => "meta_email", label => "eMail" }], type => 'text', is_optional => 1, 'clonable' => 1 },
            ]
-        }},
-        {   type => 'text', content => {
-            headline => 'My little Headline',
-            paragraphs => [{text=>'Paragraph 1'},{text=>'Paragraph 2'}]
-        }},
+        }},        
     );
 
     return $self;
 }
+
+=head2 init_result
+
+Load the result of a query, based on a query id and paging information
+ 
+=cut
+sub init_result {
+
+    my $self = shift;
+    my $args = shift;
+        
+    my $queryid = $self->param('id');
+    my $limit = sprintf('%01d', $self->param('limit'));
+    my $startat = sprintf('%01d', $self->param('startat')); 
+    
+    # Safety rule
+    if (!$limit) { $limit = 50; }
+    elsif ($limit > 500) {  $limit = 500; }
+
+    # Load query from session
+    my $result = $self->_client->session()->param('query_'.$queryid);
+
+    # Add limits
+    my $query = $result->{query};    
+    $query->{LIMIT} = $limit;
+    $query->{START} = $startat;
+
+    $self->logger()->debug( "query: " . Dumper $query);
+
+    my $search_result = $self->send_command( 'search_cert', $query );
+    
+    $self->logger()->debug( "search result: " . Dumper $search_result);
+
+    $self->_page({
+        label => 'Certificate Search - Results',
+        shortlabel => 'Results',
+        description => 'Results of your search:',
+    });
+
+    my $i = 1;
+    my @result;
+    foreach my $item (@{$search_result}) {
+        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+
+        push @result, [
+            $item->{CERTIFICATE_SERIAL},
+            $self->_escape($item->{SUBJECT}),
+            { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}) , value => $item->{STATUS} },
+            $item->{NOTBEFORE},
+            $item->{NOTAFTER},
+            $self->_escape($item->{ISSUER_DN}),
+            $item->{IDENTIFIER},
+            lc($item->{STATUS}),
+            $item->{IDENTIFIER},
+        ]
+    }
+
+    $self->logger()->trace( "dumper result: " . Dumper @result);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'certificate',
+        processing_type => 'all',
+        content => {
+            header => 'Grid-Headline',
+            actions => [{
+                path => 'certificate!detail!identifier!{identifier}',
+                label => 'Download',
+                icon => 'download',
+                target => 'modal'
+            }],
+            'noop' => [{
+                path => 'certificate!detail!identifier!{identifier}',
+                label => 'Detailed Information',
+                icon => 'view',
+                target => 'tab',
+            },{
+                path => 'certificate!workflows!identifier!{identifier}',
+                label => 'Related workflows',
+                icon => 'view',
+                target => 'tab',
+            }],
+            columns => [
+                { sTitle => "Serial"},
+                { sTitle => "Subject" },
+                { sTitle => "Status", format => 'certstatus' },
+                { sTitle => "Notbefore", format => 'timestamp' },
+                { sTitle => "Notafter", format => 'timestamp' },
+                { sTitle => "Issuer"},
+                { sTitle => "Identifier"},
+                { sTitle => "_className"},
+                { sTitle => "identifier", bVisible => 0 },
+            ],
+            data => \@result,
+            buttons => [
+                { label => 'reload search form', page => 'certificate!search!query!' .$queryid },
+                { label => 'new search', page => 'certificate!search'},
+            ]
+        }
+    });
+
+    return $self;
+
+}
+
 
 sub init_detail {
 
@@ -469,15 +579,18 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
-    my $query = { ENTITY_ONLY => 1, LIMIT => 100 }; # Safety barrier
+    my $query = { ENTITY_ONLY => 1 }; 
+    my $input = {}; # store the input data the reopen the form later
     foreach my $key (qw(subject issuer_dn profile)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
             $query->{uc($key)} = $val;
+            $input->{$key} = $val;
         }
     }
 
     if (my $status = $self->param('status')) {
+        $input->{'status'} = $status;
         if ($status eq 'EXPIRED') {
             $status = 'ISSUED';
             $query->{NOTAFTER} = time();
@@ -485,11 +598,12 @@ sub action_search {
             $status = 'ISSUED';
             $query->{VALID_AT} = time();
         }
-        $query->{STATUS} = $status;
+        $query->{STATUS} = $status;        
     }
 
     my @attr;
     if (my $val = $self->param('san')) {
+        $input->{'san'} = $val;
         push @attr, ['subject_alt_name', $val ];
     }
 
@@ -499,91 +613,39 @@ sub action_search {
     # are suffixed with array brackets
     foreach my $key (qw(meta_requestor meta_email)) {
         my @val = $self->param($key.'[]');
-        if (scalar @val > 0) {
+        if (scalar @val > 0) {                      
             while (my $val = shift @val) {
                 push @attr, [ $key , $val ];
-            }
+            }            
         }
     }
 
     if (scalar @attr) {
         $query->{CERT_ATTRIBUTES} = \@attr;
     }
-
+    
     $self->logger()->debug("query : " . Dumper $query);
-
-    my $search_result = $self->send_command( 'search_cert', $query );
-    return $self unless(defined $search_result);
-
-    $self->logger()->debug( "search result: " . Dumper $search_result);
-
-    $self->_page({
-        label => 'Certificate Search - Results',
-        shortlabel => 'Results',
-        description => 'Results of your search:',
-    });
-
-    my $i = 1;
-    my @result;
-    foreach my $item (@{$search_result}) {
-        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
-
-        push @result, [
-            $item->{CERTIFICATE_SERIAL},
-            $self->_escape($item->{SUBJECT}),
-            { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}) , value => $item->{STATUS} },
-            $item->{NOTBEFORE},
-            $item->{NOTAFTER},
-            $self->_escape($item->{ISSUER_DN}),
-            $item->{IDENTIFIER},
-            lc($item->{STATUS}),
-            $item->{IDENTIFIER},
-        ]
+    
+    
+    my $result_count = $self->send_command( 'search_cert_count', $query );
+    
+    # No results founds
+    if (!$result_count) {
+        $self->set_status('No results','error');
+        return $self->init_search({ preset => $input });
     }
-
-    $self->logger()->trace( "dumper result: " . Dumper @result);
-
-    $self->add_section({
-        type => 'grid',
-        className => 'certificate',
-        processing_type => 'all',
-        content => {
-            header => 'Grid-Headline',
-            actions => [{
-                path => 'certificate!detail!identifier!{identifier}',
-                label => 'Download',
-                icon => 'download',
-                target => 'modal'
-            }],
-            'noop' => [{
-                path => 'certificate!detail!identifier!{identifier}',
-                label => 'Detailed Information',
-                icon => 'view',
-                target => 'tab',
-            },{
-                path => 'certificate!workflows!identifier!{identifier}',
-                label => 'Related workflows',
-                icon => 'view',
-                target => 'tab',
-            }],
-            columns => [
-                { sTitle => "Serial"},
-                { sTitle => "Subject" },
-                { sTitle => "Status", format => 'certstatus' },
-                { sTitle => "Notbefore", format => 'timestamp' },
-                { sTitle => "Notafter", format => 'timestamp' },
-                { sTitle => "Issuer"},
-                { sTitle => "Identifier"},
-                { sTitle => "_className"},
-            ],
-            data => \@result
-        }
+    
+    my $queryid = sha1_base64(time.rand().$$);
+    $self->_client->session()->param('query_'.$queryid, {
+        'count' => $result_count,
+        'query' => $query,
+        'input' => $input 
     });
-
-    $self->redirect( $self->__persist_response( undef ) );
-
+ 
+    $self->redirect( 'certificate!result!id!'.$queryid  );
+    
     return $self;
-
+ 
 }
 
 =head2 action_privkey
@@ -656,6 +718,5 @@ sub action_privkey {
     return $self;
 
 }
-
 
 1;
