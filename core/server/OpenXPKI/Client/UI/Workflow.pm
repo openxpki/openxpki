@@ -170,6 +170,16 @@ sub init_search {
 
     my $workflows = $self->send_command( 'list_workflow_titles' );
     return $self unless(defined $workflows);
+    
+    my $preset;
+    if ($args->{preset}) {
+        $preset = $args->{preset};    
+    } elsif (my $queryid = $self->param('query')) {
+        my $result = $self->_client->session()->param('query_wfl_'.$queryid);
+        $preset = $result->{input};
+    }
+    
+    $self->logger()->debug('Preset ' . Dumper $preset);
 
     # TODO Sorting / I18
     my @wf_names = keys %{$workflows};
@@ -204,7 +214,8 @@ sub init_search {
                       label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL'),
                       type => 'select',
                       is_optional => 1,
-                      options => \@wfl_list
+                      options => \@wfl_list,
+                      value => $preset->{wf_type} 
                     },
                     { name => 'wf_state',
                       label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL'), #'State',
@@ -212,19 +223,119 @@ sub init_search {
                       is_optional => 1,
                       editable => 0,
                       prompt => '',
-                      options => \@states
+                      options => \@states,
+                      value => $preset->{wf_state}
                     },
                     { name => 'wf_creator',
                       label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL'), # 'Creator',
                       type => 'text',
-                      is_optional => 1
+                      is_optional => 1,
+                      value => $preset->{wf_creator}
                     },
-                ]
-        }}
+                ]               
+            }
+        }
     ];
 
     return $self;
 }
+
+
+=head2 init_result
+
+Load the result of a query, based on a query id and paging information
+ 
+=cut
+sub init_result {
+
+    my $self = shift;
+    my $args = shift;
+        
+    my $queryid = $self->param('id');
+    my $limit = sprintf('%01d', $self->param('limit'));
+    my $startat = sprintf('%01d', $self->param('startat')); 
+    
+    # Safety rule
+    if (!$limit) { $limit = 50; }
+    elsif ($limit > 500) {  $limit = 500; }
+
+    # Load query from session
+    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
+
+    # result expired or broken id
+    if (!$result || !$result->{count}) {        
+        $self->set_status('Search result expired or empty!','error');
+        return $self->init_search();               
+    }
+
+    # Add limits
+    my $query = $result->{query};    
+    $query->{LIMIT} = $limit;
+    $query->{START} = $startat;
+
+    $self->logger()->debug( "persisted query: " . Dumper $result);
+
+    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    
+    $self->logger()->trace( "search result: " . Dumper $search_result);
+
+    $self->_page({
+        label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE'),
+        description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION'),
+    });
+
+    my $i = 1;
+    my @result;
+    foreach my $item (@{$search_result}) {
+        push @result, [
+            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
+            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
+            $item->{'WORKFLOW.WORKFLOW_WAKEUP_AT'},
+            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
+        ];
+    }
+
+    $self->logger()->trace( "dumper result: " . Dumper @result);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'workflow',
+        processing_type => 'all',
+        content => {
+            header => 'Grid-Headline',
+            actions => [{
+                path => 'workflow!load!wf_id!{serial}!view!result',
+                label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'),
+                icon => 'view',
+                target => 'tab',
+            }],
+            columns => [
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL'), format => 'timestamp' },
+                { sTitle => 'serial', bVisible => 0 },
+            ],
+            data => \@result,
+            pager => { startat => $startat, limit => $limit, count => $result->{count} },
+            buttons => [
+                { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
+                { label => 'new search', page => 'workflow!search'},
+            ]            
+        }
+    });
+    
+
+    return $self;
+
+}
+
+
 
 sub init_history {
 
@@ -587,73 +698,41 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
-    my $query = { LIMIT => 100 }; # Safety barrier
+    my $query = { };
+    my $input;
     foreach my $key (qw(type state)) {
         my $val = $self->param("wf_$key");
         if (defined $val && $val ne '') {
             $query->{uc($key)} = $val;
+            $input->{'wf_'.$key} = $val;
         }
     }
 
     # creator via context (urgh... - needs change)
     if ($self->param('wf_creator')) {
+        $input->{wf_creator} = $self->param('wf_creator');
         $query->{CONTEXT} = [{ KEY => 'creator', VALUE => ~~ $self->param('wf_creator') }];
     }
 
     $self->logger()->debug("query : " . Dumper $query);
-
-    my $search_result = $self->send_command( 'search_workflow_instances', $query );
-    return $self unless(defined $search_result);
-
-    $self->logger()->debug( "search result: " . Dumper $search_result);
-
-    $self->_page({
-        label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE'),
-        description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION'),
-    });
-
-    my $i = 1;
-    my @result;
-    foreach my $item (@{$search_result}) {
-        push @result, [
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
-            $item->{'WORKFLOW.WORKFLOW_WAKEUP_AT'},
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-        ];
+ 
+    my $result_count = $self->send_command( 'search_workflow_instances_count', $query );
+    
+    # No results founds
+    if (!$result_count) {
+        $self->set_status('Your query did not return any matches.','error');
+        return $self->init_search({ preset => $input });
     }
-
-    $self->logger()->trace( "dumper result: " . Dumper @result);
-
-    $self->add_section({
-        type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
-        content => {
-            header => 'Grid-Headline',
-            actions => [{
-                path => 'workflow!load!wf_id!{serial}!view!result',
-                label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'),
-                icon => 'view',
-                target => 'tab',
-            }],
-            columns => [
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL'), format => 'timestamp' },
-                { sTitle => 'serial', bVisible => 0 },
-            ],
-            data => \@result
-        }
+    
+    my $queryid = $self->__generate_uid();
+    $self->_client->session()->param('query_wfl_'.$queryid, {
+        'count' => $result_count,
+        'query' => $query,
+        'input' => $input 
     });
-
-    $self->redirect( $self->__persist_response( undef ) );
+ 
+    $self->redirect( 'workflow!result!id!'.$queryid  );
+    
     return $self;
 
 }

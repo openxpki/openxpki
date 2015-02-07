@@ -55,7 +55,7 @@ sub init_search {
     if ($args->{preset}) {
         $preset = $args->{preset};    
     } elsif (my $queryid = $self->param('query')) {
-        my $result = $self->_client->session()->param('query_'.$queryid);
+        my $result = $self->_client->session()->param('query_cert_'.$queryid);
         $preset = $result->{input};
     }
 
@@ -97,7 +97,7 @@ sub init_result {
     elsif ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_'.$queryid);
+    my $result = $self->_client->session()->param('query_cert_'.$queryid);
 
     # result expired or broken id
     if (!$result || !$result->{count}) {        
@@ -643,7 +643,7 @@ sub action_search {
     }
     
     my $queryid = $self->__generate_uid();
-    $self->_client->session()->param('query_'.$queryid, {
+    $self->_client->session()->param('query_cert_'.$queryid, {
         'count' => $result_count,
         'query' => $query,
         'input' => $input 
