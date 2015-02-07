@@ -21,10 +21,6 @@ use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
 
-my $workflow_table = 'WORKFLOW';
-my $context_table  = 'WORKFLOW_CONTEXT';
-my $workflow_history_table = 'WORKFLOW_HISTORY';
-
 sub START {
     # somebody tried to instantiate us, but we are just an
     # utility class with static methods
@@ -153,7 +149,7 @@ sub list_workflow_instances {
     ##! 16: 'start: ' . $start
 
     my $instances = $dbi->select(
-    TABLE   => $workflow_table,
+    TABLE   => 'WORKFLOW',
     DYNAMIC => {
         PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
     },
@@ -183,7 +179,7 @@ sub get_number_of_workflow_instances {
     # TODO - wait for someone to implement aggregates without joins
     # and then use a simpler query (cf. feature request #1675572)
     my $instances = $dbi->select(
-    TABLE     => [ $workflow_table ],
+    TABLE     => [ 'WORKFLOW' ],
         JOIN      => [ [ 'WORKFLOW_SERIAL'] ],
     DYNAMIC   => {
         PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
@@ -217,20 +213,20 @@ sub list_context_keys {
         $arg_ref->{'WORKFLOW_TYPE'} = '%';
     }
     my $context_keys = $dbi->select(
-        TABLE    => [ $workflow_table, $context_table ],
+        TABLE    => [ 'WORKFLOW', 'WORKFLOW_CONTEXT' ],
         COLUMNS  => [
-             $context_table . '.WORKFLOW_CONTEXT_KEY',
+             'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY',
         ],
         DYNAMIC => {
-                "$workflow_table.WORKFLOW_TYPE" => {VALUE => $arg_ref->{'WORKFLOW_TYPE'}},
-                "$workflow_table.PKI_REALM"     => {VALUE => CTX('session')->get_pki_realm()},
+                "WORKFLOW.WORKFLOW_TYPE" => {VALUE => $arg_ref->{'WORKFLOW_TYPE'}},
+                "WORKFLOW.PKI_REALM"     => {VALUE => CTX('session')->get_pki_realm()},
         },
         JOIN => [ [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ] ],
         DISTINCT => 1,
     );
     ##! 16: 'context_keys: ' . Dumper $context_keys
 
-    my @context_keys = map { $_->{$context_table.'.WORKFLOW_CONTEXT_KEY'}  } @{$context_keys};
+    my @context_keys = map { $_->{'WORKFLOW_CONTEXT.WORKFLOW_CONTEXT_KEY'}  } @{$context_keys};
     return \@context_keys;
 }
 
@@ -254,7 +250,7 @@ sub get_workflow_type_for_id {
     $dbi->commit();
 
     my $db_result = $dbi->first(
-    TABLE    => $workflow_table,
+    TABLE    => 'WORKFLOW',
     DYNAMIC  => {
             'WORKFLOW_SERIAL' => {VALUE => $id},
         },
@@ -438,7 +434,7 @@ sub get_workflow_history {
     my $wf_id   = $arg_ref->{ID};
 
     my $history = CTX('dbi_workflow')->select(
-        TABLE => $workflow_history_table,
+        TABLE => 'WORKFLOW_HISTORY',
         DYNAMIC => {
             WORKFLOW_SERIAL => {VALUE => $wf_id},
         },
@@ -677,28 +673,60 @@ sub get_workflow_activities {
 }
 
 sub search_workflow_instances_count {
-    my $self    = shift;
-    my $arg_ref = shift;
 
-    my $result = $self->search_workflow_instances($arg_ref);
-
-    if (defined $result && ref $result eq 'ARRAY') {
-        return scalar @{$result};
+    my $self     = shift;
+    my $arg_ref  = shift;
+    
+    my $params = $self->__search_workflow_instances( $arg_ref );
+    
+    $params->{COLUMNS} = [{ COLUMN => 'WORKFLOW.WORKFLOW_SERIAL', AGGREGATE => 'COUNT' }];
+    
+    my $dbi = CTX('dbi_workflow');
+    $dbi->commit();
+        
+    my $result = $dbi->select( %{$params} );
+    
+    if (!(defined $result && ref $result eq 'ARRAY' && scalar @{$result} == 1)) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_COUNT_NOT_ARRAY',
+            params => { 'TYPE' => ref $result, },
+        );
     }
-    return 0;
+    
+    ##! 16: 'result: ' . Dumper $result
+    return $result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
+    
 }
 
 sub search_workflow_instances {
+    
+    my $self     = shift;
+    my $arg_ref  = shift;
+    
+    my $param = $self->__search_workflow_instances( $arg_ref );
+    
+    my $dbi = CTX('dbi_workflow');
+    $dbi->commit();
+        
+    my $result = $dbi->select( %{$param} );
+    
+    if (!(defined $result && ref $result eq 'ARRAY')) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_NOT_ARRAY',
+            params => { 'TYPE' => ref $result, },
+        );
+    }    
+    
+    ##! 16: 'result: ' . Dumper $result
+    return $result;
+    
+}
+    
+sub __search_workflow_instances {
+    
     my $self     = shift;
     my $arg_ref  = shift;
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
-
-    my $dbi = CTX('dbi_workflow');
-    # commit to get a current snapshot of the database in the
-    # highest isolation level.
-    # Without this, we will only see old data, especially if
-    # other processes are writing to the database at the same time
-    $dbi->commit();
 
     my $realm = CTX('session')->get_pki_realm();
 
@@ -750,9 +778,9 @@ sub search_workflow_instances {
         push @joins, 'WORKFLOW_SERIAL';
         $i++;
     }
-    push @tables, $workflow_table;
+    push @tables, 'WORKFLOW';
     push @joins, 'WORKFLOW_SERIAL';
-    $dynamic->{$workflow_table . '.PKI_REALM'} = {VALUE => $realm};
+    $dynamic->{'WORKFLOW.PKI_REALM'} = {VALUE => $realm};
 
     if (defined $arg_ref->{TYPE}) {
         # do parameter validation (here instead of the API because
@@ -779,7 +807,7 @@ sub search_workflow_instances {
                 }
             }
         }
-        $dynamic->{$workflow_table . '.WORKFLOW_TYPE'} = {VALUE => $arg_ref->{TYPE}};
+        $dynamic->{'WORKFLOW.WORKFLOW_TYPE'} = {VALUE => $arg_ref->{TYPE}};
     }
     if (defined $arg_ref->{STATE}) {
         if (! ref $arg_ref->{STATE}) {
@@ -804,7 +832,7 @@ sub search_workflow_instances {
                 }
             }
         }
-        $dynamic->{$workflow_table . '.WORKFLOW_STATE'} = {VALUE => $arg_ref->{STATE}};
+        $dynamic->{'WORKFLOW.WORKFLOW_STATE'} = {VALUE => $arg_ref->{STATE}};
     }
     my %limit;
     if (defined $arg_ref->{LIMIT} && !defined $arg_ref->{START}) {
@@ -819,29 +847,24 @@ sub search_workflow_instances {
 
     ##! 16: 'dynamic: ' . Dumper $dynamic
     ##! 16: 'tables: ' . Dumper(\@tables)
-    my $result = $dbi->select(
-    TABLE   => \@tables,
+    my %params = (
+        TABLE   => \@tables,
         COLUMNS  => [
-                         $workflow_table . '.WORKFLOW_LAST_UPDATE',
-                         $workflow_table . '.WORKFLOW_SERIAL',
-                         $workflow_table . '.WORKFLOW_TYPE',
-                         $workflow_table . '.WORKFLOW_STATE',
-                         $workflow_table . '.WORKFLOW_PROC_STATE',
-                         $workflow_table . '.WORKFLOW_WAKEUP_AT'
-                    ],
-        JOIN     => [
-                         \@joins,
-                    ],
+            'WORKFLOW.WORKFLOW_LAST_UPDATE',
+            'WORKFLOW.WORKFLOW_SERIAL',
+            'WORKFLOW.WORKFLOW_TYPE',
+            'WORKFLOW.WORKFLOW_STATE',
+            'WORKFLOW.WORKFLOW_PROC_STATE',
+            'WORKFLOW.WORKFLOW_WAKEUP_AT'
+        ],
+        JOIN     => [ \@joins, ],
         REVERSE  => 1,
         DYNAMIC  => $dynamic,
         DISTINCT => 1,
-        ORDER => [
-            $workflow_table . '.WORKFLOW_SERIAL',
-        ],
+        ORDER => [ 'WORKFLOW.WORKFLOW_SERIAL' ],
         %limit,
     );
-    ##! 16: 'result: ' . Dumper $result
-    return $result;
+    return \%params;
 }
 
 ###########################################################################

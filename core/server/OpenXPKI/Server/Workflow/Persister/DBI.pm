@@ -20,10 +20,6 @@ use DateTime::Format::Strptime;
 
 use Data::Dumper;
 
-my $workflow_table = 'WORKFLOW';
-my $context_table  = 'WORKFLOW_CONTEXT';
-my $history_table  = 'WORKFLOW_HISTORY';
-
 # limits
 my $context_value_max_length = 32768;
 
@@ -126,7 +122,7 @@ sub update_workflow {
 
         ##! 1: "inserting data into workflow table"
         $dbi->insert(
-            TABLE => $workflow_table,
+            TABLE => 'WORKFLOW',
             HASH  => \%data,
         );
 
@@ -143,7 +139,7 @@ sub update_workflow {
 
         # save workflow instance...
         $dbi->update(
-            TABLE  => $workflow_table,
+            TABLE  => 'WORKFLOW',
             DATA   => \%data,
             WHERE  => {
                 WORKFLOW_SERIAL => $id,
@@ -166,7 +162,7 @@ sub update_workflow {
             ##! 4: 'value for key ' . $key . ' is undef, try to delete'
             eval {
                 $dbi->delete(
-                    TABLE => $context_table,
+                    TABLE => 'WORKFLOW_CONTEXT',
                     DATA  => {
                         WORKFLOW_SERIAL        => $id,
                         WORKFLOW_CONTEXT_KEY   => $key,
@@ -222,7 +218,7 @@ sub update_workflow {
         ##! 2: "saving context for wf: $id"
         ##! 16: 'trying to update context entry'
         my $rows_changed = $dbi->update(
-            TABLE   => $context_table,
+            TABLE   => 'WORKFLOW_CONTEXT',
             DATA    => {
                 WORKFLOW_SERIAL        => $id,
                 WORKFLOW_CONTEXT_KEY   => $key,
@@ -238,7 +234,7 @@ sub update_workflow {
         if ($rows_changed == 0) {
             ##! 16: 'update did not work, possibly new key, try insert'
             $dbi->insert(
-                TABLE => $context_table,
+                TABLE => 'WORKFLOW_CONTEXT',
                 HASH => {
                     WORKFLOW_SERIAL        => $id,
                     WORKFLOW_CONTEXT_KEY   => $key,
@@ -270,7 +266,7 @@ sub fetch_workflow {
     my $dbi = CTX('dbi_workflow');
 
     my $result = $dbi->get(
-	TABLE => $workflow_table,
+	TABLE => 'WORKFLOW',
 	SERIAL => $id,
 	DYNAMIC => {
 	    PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
@@ -333,7 +329,7 @@ sub fetch_extra_workflow_data {
     my $dbi = CTX('dbi_workflow');
 
     my $result = $dbi->select(
-	TABLE   => $context_table,
+	TABLE   => 'WORKFLOW_CONTEXT',
 	DYNAMIC => {
 	    WORKFLOW_SERIAL => {VALUE => $id},
 	},
@@ -392,7 +388,7 @@ sub create_history {
 
 	##! 2: "inserting data into workflow history table"
 	$dbi->insert(
-	    TABLE => $history_table,
+	    TABLE => 'WORKFLOW_HISTORY',
 	    HASH => \%data,
 	    );
 	
@@ -439,7 +435,7 @@ sub fetch_history {
     my @history = ();
     
     my $entry = $dbi->last(
-	TABLE           => $history_table,
+	TABLE           => 'WORKFLOW_HISTORY',
 	WORKFLOW_SERIAL => $id,
 	);
 
@@ -467,7 +463,7 @@ sub fetch_history {
         push @history, $hist;     
 
 	$entry = $dbi->prev(
-	    TABLE           => $history_table,
+	    TABLE           => 'WORKFLOW_HISTORY',
 	    WORKFLOW_SERIAL => $id,
 	    );
 	
@@ -498,8 +494,8 @@ sub assign_generators {
 sub init_OpenXPKI_generators {
     my $self = shift;
     my $params = shift;
-    $params->{workflow_table} ||= $workflow_table;
-    $params->{history_table}  ||= $history_table;
+    $params->{workflow_table} ||= 'WORKFLOW';
+    $params->{history_table}  ||= 'WORKFLOW_HISTORY';
 
     return (
 	OpenXPKI::Server::Workflow::Persister::DBI::SequenceId->new( 

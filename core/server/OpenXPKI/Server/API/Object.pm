@@ -526,21 +526,6 @@ sub get_crl_list {
 }
 
 
-
-sub search_cert_count {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    my $result = $self->search_cert($arg_ref);
-
-    if ( defined $result && ref $result eq 'ARRAY' ) {
-        ##! 1: 'array result with ' . scalar @{$result} . ' elements'
-        return scalar @{$result};
-    }
-    return 0;
-}
-
 =head2 search_cert
 
 supports a facility to search certificates. It supports the following parameters:
@@ -578,8 +563,68 @@ of the database to reduce the transport costs an avoid parser implementations
 on the client.
 
 =cut
+sub search_cert {    
+    
+    my $self = shift;
+    my $args = shift;
+    
+    my $params = $self->__search_cert( $args );
+    
+    ##! 16: 'certificate search arguments: ' . Dumper $params
 
-sub search_cert {
+    my $result = CTX('dbi_backend')->select(%{$params});
+    if ( ref $result ne 'ARRAY' ) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
+            params => { 'TYPE' => ref $result, },
+        );
+    }
+    
+    ##! 1: 'Result ' . Dumper $result
+    
+    foreach my $item ( @{$result} ) {
+
+        # remove leading table name from result columns
+        map {
+            my $col = substr( $_, index( $_, '.' ) + 1 );
+            $item->{$col} = $item->{$_};
+            delete $item->{$_};
+        } keys %{$item};
+    }
+
+    ##! 1: "finished"
+    return $result;
+    
+}
+
+=head2 search_cert_count
+
+Same as cert_search, returns the number of matching rows
+
+=cut 
+sub search_cert_count {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $params = $self->__search_cert( $arg_ref );
+    
+    $params->{COLUMNS} = [{ COLUMN   => 'CERTIFICATE.IDENTIFIER', AGGREGATE => 'COUNT' }];
+
+    my $result = CTX('dbi_backend')->select(%{$params});
+   
+    if (!(defined $result && ref $result eq 'ARRAY' && scalar @{$result} == 1)) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_COUNT_SELECT_RESULT_NOT_ARRAY',
+            params => { 'TYPE' => ref $result, },
+        );
+    }
+    
+    return $result->[0]->{'CERTIFICATE.IDENTIFIER'};
+    
+}
+
+sub __search_cert {
     ##! 1: "start"
     my $self = shift;
     my $args = shift;
@@ -734,27 +779,8 @@ sub search_cert {
 
     }
 
-    ##! 16: 'certificate search arguments: ' . Dumper \%params
+    return \%params;
 
-    my $result = CTX('dbi_backend')->select(%params);
-    if ( ref $result ne 'ARRAY' ) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
-        );
-    }
-    foreach my $item ( @{$result} ) {
-
-        # remove leading table name from result columns
-        map {
-            my $col = substr( $_, index( $_, '.' ) + 1 );
-            $item->{$col} = $item->{$_};
-            delete $item->{$_};
-        } keys %{$item};
-    }
-
-    ##! 1: "finished"
-    return $result;
 }
 
 =head2 private_key_exists_for_cert
