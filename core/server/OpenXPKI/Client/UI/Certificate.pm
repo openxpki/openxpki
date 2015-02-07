@@ -99,16 +99,22 @@ sub init_result {
     # Load query from session
     my $result = $self->_client->session()->param('query_'.$queryid);
 
+    # result expired or broken id
+    if (!$result || !$result->{count}) {        
+        $self->set_status('Search result expired or empty!','error');
+        return $self->init_search();               
+    }
+
     # Add limits
     my $query = $result->{query};    
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
 
-    $self->logger()->debug( "query: " . Dumper $query);
+    $self->logger()->debug( "persisted query: " . Dumper $result);
 
     my $search_result = $self->send_command( 'search_cert', $query );
     
-    $self->logger()->debug( "search result: " . Dumper $search_result);
+    $self->logger()->trace( "search result: " . Dumper $search_result);
 
     $self->_page({
         label => 'Certificate Search - Results',
@@ -171,6 +177,7 @@ sub init_result {
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
+            pager => { startat => $startat, limit => $limit, count => $result->{count} },
             buttons => [
                 { label => 'reload search form', page => 'certificate!search!query!' .$queryid },
                 { label => 'new search', page => 'certificate!search'},
@@ -631,11 +638,11 @@ sub action_search {
     
     # No results founds
     if (!$result_count) {
-        $self->set_status('No results','error');
+        $self->set_status('Your query did not return any matches.','error');
         return $self->init_search({ preset => $input });
     }
     
-    my $queryid = sha1_base64(time.rand().$$);
+    my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_'.$queryid, {
         'count' => $result_count,
         'query' => $query,

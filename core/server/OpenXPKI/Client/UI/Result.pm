@@ -497,7 +497,7 @@ sub __persist_response {
 
     $expire = '+5m' unless defined $expire;
 
-    my $id = sha1_base64(time.rand().$$);
+    my $id = $self->__generate_uid();
     $self->logger()->debug('persist response ' . $id);
 
     # Auto Persist - use current result when no data is given
@@ -536,6 +536,14 @@ sub __fetch_response {
     }
     return $response;
 
+}
+
+sub __generate_uid {
+
+    my $self; 
+    my $queryid = sha1_base64(time.rand().$$);
+    $queryid =~ s{[+/]}{}g;
+    return $queryid; 
 }
 
 1;
