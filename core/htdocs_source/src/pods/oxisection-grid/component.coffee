@@ -2,6 +2,27 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 
 Component = Em.Component.extend
+    pages: Em.computed "count", "limit", ->
+        pager = @get "content.content.pager"
+        return [] if not pager or pager.count <= pager.limit
+
+        pages = Math.ceil pager.count/pager.limit
+        current = Math.floor pager.startat/pager.limit
+
+        o = []
+        for i in [0..pages-1]
+            o.push
+                num: i+1
+                active: i is current
+                startat: i * pager.limit
+        o.prev =
+            disabled: current is 0
+            startat:  (current-1) * pager.limit
+        o.next =
+            disabled: current is pages-1
+            startat:  (current+1) * pager.limit
+        o
+
     didInsertElement: ->
         @$()?.find(".context")
         .contextmenu
@@ -108,6 +129,14 @@ Component = Em.Component.extend
             event.preventDefault()
 
     actions:
+        changeStartat: (page) ->
+            return if page.disabled or page.active
+            pager = @get "content.content.pager"
+            @container.lookup("route:openxpki").transitionTo
+                queryParams:
+                    limit: pager.limit
+                    startat: page.startat
+
         sort: (key) ->
             sortNum = @get "sortNum"
             newSortNum = @get("columns").indexOf key

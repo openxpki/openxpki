@@ -1,6 +1,11 @@
 `import Em from "vendor/ember"`
 
 Controller = Em.ArrayController.extend
+    queryParams: [ "count", "limit", "startat" ]
+    count: null
+    startat: null
+    limit: null
+
     structure: null
 
     showTabs: (->
