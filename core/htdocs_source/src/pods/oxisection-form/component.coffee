@@ -8,6 +8,9 @@ Component = Em.Component.extend
     fields: (->
         fields = @get "content.content.fields"
 
+        for f in fields
+            f.placeholder = "" if typeof f.placeholder is "undefined"
+
         clonables = (f for f in fields when f.clonable)
         names = []
         for clonable in clonables
