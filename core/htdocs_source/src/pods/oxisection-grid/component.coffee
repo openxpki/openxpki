@@ -23,7 +23,7 @@ Component = Em.Component.extend
             startat:  (current+1) * pager.limit
         o
 
-    didInsertElement: ->
+    initializeContextmenu: Em.on "didInsertElement", ->
         @$()?.find(".context")
         .contextmenu
             target: @$().find(".dropdown")
@@ -84,7 +84,7 @@ Component = Em.Component.extend
             if @get("columns")[sortNum].get "isInverted"
                 data.reverseObjects()
 
-        Em.run.scheduleOnce "afterRender", => @didInsertElement()
+        Em.run.scheduleOnce "afterRender", => @initializeContextmenu()
 
         data
 

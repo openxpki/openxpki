@@ -16,7 +16,7 @@ Component = Em.Component.extend
                         label: ""
                         value: ""
 
-    didInsertElement: ->
+    initializeTypeahead: Em.on "didInsertElement", ->
         @$().find(".typeahead").typeahead
             source: @get("content.options").map (o) -> o.label
 
