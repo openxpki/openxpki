@@ -14,42 +14,30 @@ use OpenXPKI::Server::Workflow::WFObject::WFHash;
 
 #use Data::Dumper;
 
-my @REQ_PROPS = qw( hash_name function );
-my @OPT_PROPS = qw( context_key context_val_key );
-__PACKAGE__->mk_accessors( @REQ_PROPS, @OPT_PROPS );
-
-sub new {
-    my ( $class, $wf, $params ) = @_;
-    my $self = $class->SUPER::new( $wf, $params );
-
-    # set only our extra properties from action class def
-    foreach my $prop (@REQ_PROPS) {
-        if ( not defined $params->{$prop} ) { # These properties are mandatory
-            warn "ERR - MISSING PARAM '$prop'";
-            OpenXPKI::Exception->throw(
-                message =>
-                    'I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_WFHASH_MISSING_PARAM',
-                params => { name => $prop, },
-            );
-        }
-        $self->$prop( $params->{$prop} );
-    }
-    foreach my $prop (@OPT_PROPS) {
-        if ( defined $params->{$prop} ) {
-            $self->$prop( $params->{$prop} );
-        }
-    }
-    return $self;
-}
 
 sub execute {
     my ( $self, $wf ) = @_;
-    my $function    = lc($self->function());
-    my $context     = $wf->context();
-    my $context_key = $self->context_key();
 
-#    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
-#        { workflow => $wf, context_key => $self->hash_name } );
+
+    my $operation = $self->param('function');
+    
+    my $hash_name =  $self->param('hash_name');
+    
+    my $key =  $self->param('hash_key');
+    my $value =  $self->param('hash_value');
+    my $target =  $self->param('context_key');
+
+    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new(    
+        { workflow => $wf, context_key => $hash_name } );
+
+    # auto detect operation
+    if (defined $target) {
+        $hash->context->param( $target,  $wf->valueForKey($key, $value) );
+    } else {
+        $hash->setValueForKey($key, $value);
+    }
+
+    return 1;        
 #
 #    if ( $function eq 'valueForKey' ) {
 #        my $ret = $hash->$function( $context->param( $context_key ) );
