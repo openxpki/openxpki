@@ -5,14 +5,11 @@
 
 {{#if isForm}}
     {{oxisection-form content=content}}
-{{/if}}
-{{#if isGrid}}
+{{else if isGrid}}
     {{oxisection-grid content=content}}
-{{/if}}
-{{#if isKeyValue}}
+{{else if isKeyValue}}
     {{oxisection-keyvalue content=content}}
-{{/if}}
-{{#if isText}}
+{{else if isText}}
     {{oxisection-text content=content}}
 {{/if}}
 

@@ -2,12 +2,10 @@
     <div class="form-group {{if hasError "has-error"}}">
         {{#if isCheckbox}}
             <div class="col-md-2"></div>
+        {{else if isBool}}
+            <div class="col-md-2"></div>
         {{else}}
-            {{#if isBool}}
-                <div class="col-md-2"></div>
-            {{else}}
-                <label class="col-md-2 control-label">{{content.label}}</label>
-            {{/if}}
+            <label class="col-md-2 control-label">{{content.label}}</label>
         {{/if}}
         {{#if content.keys}}
             <div class="col-md-2">
@@ -17,35 +15,25 @@
         <div class="{{sFieldSize}}" title="{{content.tooltip}}">
             {{#if isBool}}
                 {{oxifield-bool content=content}}
-            {{/if}}
-            {{#if isCertIdentifier}}
+            {{else if isCertIdentifier}}
                 {{oxifield-certidentifier content=content}}
-            {{/if}}
-            {{#if isDate}}
+            {{else if isDate}}
                 {{oxifield-date content=content}}
-            {{/if}}
-            {{#if isDatetime}}
+            {{else if isDatetime}}
                 {{oxifield-datetime content=content}}
-            {{/if}}
-            {{#if isCheckbox}}
+            {{else if isCheckbox}}
                 {{oxifield-checkbox content=content}}
-            {{/if}}
-            {{#if isPassword}}
+            {{else if isPassword}}
                 {{oxifield-password content=content}}
-            {{/if}}
-            {{#if isPasswordVerify}}
+            {{else if isPasswordVerify}}
                 {{oxifield-passwordverify content=content}}
-            {{/if}}
-            {{#if isSelect}}
+            {{else if isSelect}}
                 {{oxifield-select content=content}}
-            {{/if}}
-            {{#if isText}}
+            {{else if isText}}
                 {{oxifield-text content=content}}
-            {{/if}}
-            {{#if isTextarea}}
+            {{else if isTextarea}}
                 {{oxifield-textarea content=content}}
-            {{/if}}
-            {{#if isUploadarea}}
+            {{else if isUploadarea}}
                 {{oxifield-uploadarea content=content}}
             {{/if}}
             {{#if content.error}}
