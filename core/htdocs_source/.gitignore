@@ -1,3 +1,4 @@
 .bungle.state
+*.swp
 /dist
 /vendor
