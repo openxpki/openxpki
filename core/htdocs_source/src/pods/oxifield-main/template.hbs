@@ -1,8 +1,6 @@
 {{#unless isHidden}}
     <div class="form-group {{if hasError "has-error"}}">
-        {{#if isCheckbox}}
-            <div class="col-md-2"></div>
-        {{else if isBool}}
+        {{#if isBool}}
             <div class="col-md-2"></div>
         {{else}}
             <label class="col-md-2 control-label">{{content.label}}</label>
@@ -13,29 +11,7 @@
             </div>
         {{/if}}
         <div class="{{sFieldSize}}" title="{{content.tooltip}}">
-            {{#if isBool}}
-                {{oxifield-bool content=content}}
-            {{else if isCertIdentifier}}
-                {{oxifield-certidentifier content=content}}
-            {{else if isDate}}
-                {{oxifield-date content=content}}
-            {{else if isDatetime}}
-                {{oxifield-datetime content=content}}
-            {{else if isCheckbox}}
-                {{oxifield-checkbox content=content}}
-            {{else if isPassword}}
-                {{oxifield-password content=content}}
-            {{else if isPasswordVerify}}
-                {{oxifield-passwordverify content=content}}
-            {{else if isSelect}}
-                {{oxifield-select content=content}}
-            {{else if isText}}
-                {{oxifield-text content=content}}
-            {{else if isTextarea}}
-                {{oxifield-textarea content=content}}
-            {{else if isUploadarea}}
-                {{oxifield-uploadarea content=content}}
-            {{/if}}
+            {{component type content=content}}
             {{#if content.error}}
                 <span class="help-block">{{content.error}}</span>
             {{/if}}
