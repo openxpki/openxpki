@@ -70,11 +70,7 @@
             {{#each content as |entry|}}
                 <li class="{{if entry.active "active"}}">
                     <a {{action "activateTab" entry}}>
-                        {{#if entry.page.shortlabel}}
-                            {{entry.page.shortlabel}}
-                        {{else}}
-                            {{entry.page.label}}
-                        {{/if}}
+                        {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
                         &nbsp;
                         <button {{action "closeTab" entry}} class="close">&times;</button>
                     </a>
@@ -133,11 +129,7 @@
             <div class="modal-header">
                 <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">
-                    {{#if modalContent.page.shortlabel}}
-                        {{modalContent.page.shortlabel}}
-                    {{else}}
-                        {{modalContent.page.label}}
-                    {{/if}}
+                    {{if modalContent.page.shortlabel modalContent.page.shortlabel modalContent.page.label}}
                 </h4>
             </div>
             <div class="modal-body">
