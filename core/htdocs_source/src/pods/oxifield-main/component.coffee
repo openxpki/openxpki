@@ -9,7 +9,7 @@ Component = Em.Component.extend
     type: Em.computed "content.type", -> "oxifield-" + @get "content.type"
     isBool: Em.computed.equal "content.type", "bool"
 
-    sFieldSize: (->
+    sFieldSize: Em.computed "content.size", "content.keysize", ->
         keys = @get "content.keys"
         size = @get "content.size"
         keysize = @get "content.keysize"
@@ -23,12 +23,10 @@ Component = Em.Component.extend
                 size = 7
 
         'col-md-' + size
-    ).property "content.size", "content.keysize"
 
-    sKeyFieldSize: (->
+    sKeyFieldSize: Em.computed "content.keysize", ->
         keysize = @get("content.keysize") || "2"
         'col-md-' + keysize
-    ).property "content.keysize"
 
     hasError: Em.computed.bool "content.error"
 

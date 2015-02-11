@@ -31,7 +31,7 @@ Component = Em.Component.extend
         .off "contextmenu"
 
     sortNum: -1
-    columns: (->
+    columns: Em.computed "content.content.columns", ->
         columns = @get "content.content.columns"
         res = []
         for column, i in columns
@@ -40,9 +40,8 @@ Component = Em.Component.extend
                 sTitle: column.sTitle
                 isSorted: i is @get "sortNum"
                 isInverted: false
-    ).property "content.content.columns"
 
-    data: (->
+    data: Em.computed "content.content.data", ->
         data = @get "content.content.data"
         columns = @get "content.content.columns"
 
@@ -61,13 +60,11 @@ Component = Em.Component.extend
                     format: columns[x].format
                     value: column
         res
-    ).property "content.content.data"
 
-    hasAction: (->
+    hasAction: Em.computed "content.content.actions", ->
         not not @get "content.content.actions"
-    ).property "content.content.actions"
 
-    sortedData: (->
+    sortedData: Em.computed "data", "sortNum", "columns.@each.isInverted", ->
         data = @get "data"
         data = data.toArray()
         sortNum = @get "sortNum"
@@ -90,7 +87,6 @@ Component = Em.Component.extend
         Em.run.scheduleOnce "afterRender", => @didInsertElement()
 
         data
-    ).property "data", "sortNum", "columns.@each.isInverted"
 
     contextIndex: null
 

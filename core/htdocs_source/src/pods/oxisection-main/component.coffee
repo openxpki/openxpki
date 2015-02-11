@@ -3,13 +3,12 @@
 Component = Em.Component.extend
     type: Em.computed "content.type", -> "oxisection-" + @get "content.type"
 
-    buttonsWithDescription: (->
+    hasDescription: Em.computed "content.content.buttons.@each.description", ->
         buttons = @get "content.content.buttons"
         if buttons
             buttons.isAny "description"
         else
             false
-    ).property "content.content.buttons.@each.description"
 
     click: (evt) ->
         target = evt.target

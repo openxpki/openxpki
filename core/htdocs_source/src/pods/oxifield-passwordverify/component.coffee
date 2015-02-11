@@ -13,9 +13,8 @@ Component = Em.Component.extend
             @set "isFixed", true
             @set "content.value", ""
 
-    showConfirm: (->
+    showConfirm: Em.computed "password", "confirm", "confirmFocus", ->
         @get("password") isnt @get("confirm") or @get "confirmFocus"
-    ).property "password", "confirm", "confirmFocus"
 
     valueSetter: Em.observer "password", "confirm", ->
         password = @get "password"
@@ -25,9 +24,8 @@ Component = Em.Component.extend
         else
             @set "content.value", null
 
-    placeholder: (->
+    placeholder: Em.computed "content.placeholder", ->
         @get("content.placeholder") or "Retype password"
-    ).property "content.placeholder"
 
     label: ""
     updateValue: Em.observer "label", ->

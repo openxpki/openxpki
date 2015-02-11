@@ -1,11 +1,10 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
-    submitLabel: (->
+    submitLabel: Em.computed "content.content.submit_label", ->
         @get("content.content.submit_label") or "send"
-    ).property "content.content.submit_label"
 
-    fields: (->
+    fields: Em.computed "content.content.fields.@each.name", ->
         fields = @get "content.content.fields"
 
         for f in fields
@@ -31,7 +30,6 @@ Component = Em.Component.extend
             Em.set clones[clones.length-1], "isLast", true
 
         fields
-    ).property "content.content.fields.@each.name"
 
     visibleFields: Em.computed "fields", ->
         (f for f in @get("fields") when f.type isnt "hidden")

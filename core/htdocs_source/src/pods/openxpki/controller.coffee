@@ -8,9 +8,7 @@ Controller = Em.ArrayController.extend
 
     structure: null
 
-    showTabs: (->
-        @get("content.length") > 1
-    ).property "content.length"
+    showTabs: Em.computed "content.length", -> @get("content.length") > 1
 
     navEntries: Em.computed.alias "structure.structure"
 
@@ -34,7 +32,7 @@ Controller = Em.ArrayController.extend
     hideLoader: ->  $('#ajaxLoadingModal').modal 'hide'
 
     status: null
-    statusClass: (->
+    statusClass: Em.computed "status.level", "status.message", ->
         level = @get "status.level"
         message = @get "status.message"
         return "hide" if not message
@@ -42,7 +40,6 @@ Controller = Em.ArrayController.extend
         return "alert-success" if level is "success"
         return "alert-warning" if level is "warn"
         return "alert-info"
-    ).property "status.level", "status.message"
 
     activeTab: null
     activateLast: Em.observer "content.length", ->
