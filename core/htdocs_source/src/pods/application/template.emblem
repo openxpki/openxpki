@@ -1,4 +1,0 @@
-div#application
-  partial "applicationHeader"
-  outlet
-partial "applicationFooter"

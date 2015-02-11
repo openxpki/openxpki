@@ -1,7 +1,0 @@
-div.drowdown
-  =input class="form-control" value=search placeholder=content.placeholder
-  ul.dropdown-menu role="menu"
-    each searchResults
-      li: a class="oxi-link-ignore" click="selectResult this" = this.label
-    else
-      li: a class="oxi-link-ignore" click="" No matches found

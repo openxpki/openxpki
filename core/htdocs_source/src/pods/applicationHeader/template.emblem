@@ -1,9 +1,0 @@
-div.container-fluid
-  div.page-header.header.row
-    div.col-xs-6
-      h2
-        img src="style/img/logo.png" class=toplogo
-        '
-        small Open Source Trustcenter
-    div.col-xs-6
-      partial "applicationHeaderUserinfo"

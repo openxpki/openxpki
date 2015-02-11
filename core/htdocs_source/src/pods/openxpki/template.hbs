@@ -1,0 +1,161 @@
+<div class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"></a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                {{#each navEntries as |navEntry|}}
+                    {{#if navEntry.entries.length}}
+                        <li class="dropdown {{navEntry.active}}">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                                {{navEntry.label}}
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                {{#each navEntry.entries as |entry|}}
+                                    <li>
+                                        {{#link-to "openxpki" entry.key}}
+                                            {{entry.label}}
+                                        {{/link-to}}
+                                    </li>
+                                {{/each}}
+                            </ul>
+                        </li>
+                    {{else}}
+                        <li class="{{navEntry.active}}">
+                            {{#link-to "openxpki" navEntry.key}}
+                                {{navEntry.label}}
+                            {{/link-to}}
+                        </li>
+                    {{/if}}
+                {{/each}}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {{#if user}}
+                    <li>
+                        {{#link-to "openxpki" "logout"}}
+                            Log out
+                        {{/link-to}}
+                    </li>
+                {{/if}}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="oxi-message">
+        <div class="alert {{statusClass}}">
+            {{status.message}}
+        </div>
+    </div>
+
+    <h2>{{content.firstObject.page.label}}</h2>
+    {{#if content.firstObject.page.description}}
+        <div style="margin-bottom:6px;">
+            {{content.firstObject.page.description}}
+        </div>
+    {{/if}}
+
+    {{#if showTabs}}
+        <ul class="nav nav-tabs">
+            {{#each content as |entry|}}
+                <li class="{{if entry.active "active"}}">
+                    <a {{action "activateTab" entry}}>
+                        {{#if entry.page.shortlabel}}
+                            {{entry.page.shortlabel}}
+                        {{else}}
+                            {{entry.page.label}}
+                        {{/if}}
+                        &nbsp;
+                        <button {{action "closeTab" entry}} class="close">&times;</button>
+                    </a>
+                </li>
+            {{/each}}
+        </ul>
+
+        <div class="tab-content">
+            {{#each content as |entry|}}
+                <div class="tab-pane {{if entry.active "active"}}">
+                    <div class="Xcontainer sections">
+                        <div class="row">
+                            <div class="{{if entry.right "col-md-8" "col-md-12"}}">
+                                {{#each entry.main as |mainEntry|}}
+                                    {{oxisection-main content=mainEntry}}
+                                {{/each}}
+                            </div>
+                            <div class="{{if entry.right "col-md-4" "hide"}}">
+                                {{#each entry.right as |rightEntry|}}
+                                    <h3></h3>
+                                    <div class="well">
+                                        {{oxisection-main content=rightEntry}}
+                                    </div>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="Xcontainer sections">
+            {{#each content as |entry|}}
+                <div class="row">
+                    <div class="{{if entry.right "col-md-8" "col-md-12"}}">
+                        {{#each entry.main as |mainEntry|}}
+                            {{oxisection-main content=mainEntry}}
+                        {{/each}}
+                    </div>
+                    <div class="{{if entry.right "col-md-4" "hide"}}">
+                        {{#each entry.right as |rightEntry|}}
+                            <div class="well">
+                                {{oxisection-main content=rightEntry}}
+                            </div>
+                        {{/each}}
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{/if}}
+</div>
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    {{#if modalContent.page.shortlabel}}
+                        {{modalContent.page.shortlabel}}
+                    {{else}}
+                        {{modalContent.page.label}}
+                    {{/if}}
+                </h4>
+            </div>
+            <div class="modal-body">
+                {{#each modalContent.main as |mainEntry|}}
+                    {{oxisection-main content=mainEntry}}
+                {{/each}}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading">
+    <div class="progress progress-striped active" style="width:100px; position:absolute; top:30px; right:20px;">
+        <div class="progress-bar" role="progressbar" style="width: 100%">
+            <p class="text-center">Loading ...</p>
+        </div>
+    </div>
+</div>

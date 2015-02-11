@@ -1,9 +1,0 @@
-if user
-  div.userinfo
-    ul.nav
-      li.text-right
-        'Signed in as:
-        strong {{user.name}} ({{user.role}})
-      li.text-right
-        'Realm:
-        strong {{user.pki_realm_label}} ({{user.pki_realm}})

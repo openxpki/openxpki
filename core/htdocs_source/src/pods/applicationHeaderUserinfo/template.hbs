@@ -1,0 +1,14 @@
+{{#if user}}
+    <div class="userinfo">
+        <ul class="nav">
+            <li class="text-right">
+                Signed in as:
+                <strong>{{user.name}} ({{user.role}})</strong>
+            </li>
+            <li class="text-right">
+                Realm:
+                <strong>{{user.pki_realm_label}} ({{user.pki_realm}})</strong>
+            </li>
+        </ul>
+    </div>
+{{/if}}
