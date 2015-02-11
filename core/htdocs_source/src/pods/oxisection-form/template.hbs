@@ -4,7 +4,7 @@
 
 <div class="container-fluid">
     <form class="form-horizontal" role="form" {{action "submit" content.action on="submit"}}>
-        {{#each fields as |field|}}
+        {{#each visibleFields as |field|}}
             {{oxifield-main content=field addClone="addClone" delClone="delClone" valueChange="valueChange"}}
         {{/each}}
         <div class="form-group">

@@ -33,6 +33,9 @@ Component = Em.Component.extend
         fields
     ).property "content.content.fields.@each.name"
 
+    visibleFields: Em.computed "fields", ->
+        (f for f in @get("fields") when f.type isnt "hidden")
+
     click: (evt) ->
         if evt.target.tagName is "BUTTON"
             $(evt.target).addClass "btn-loading"

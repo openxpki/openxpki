@@ -8,7 +8,6 @@ Component = Em.Component.extend
 
     type: Em.computed "content.type", -> "oxifield-" + @get "content.type"
     isBool: Em.computed.equal "content.type", "bool"
-    isHidden: Em.computed.equal "content.type", "hidden"
 
     sFieldSize: (->
         keys = @get "content.keys"
