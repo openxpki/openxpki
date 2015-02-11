@@ -3,10 +3,9 @@
     "dependencies": {
         "bootstrap": "",
         "bootstrap-contextmenu": "",
-        "bootstrap3-typeahead": "",
-        "eonasdan-bootstrap-datetimepicker": "",
-        "ember": "<1.6.0",
-        "emblem": "",
+        "bootstrap3-typeahead": "3.0.3",
+        "eonasdan-bootstrap-datetimepicker": "3.1.3",
+        "ember": "1.11.0-beta.1",
         "jquery": "<2.0.0",
         "moment": "2.8.3",
         "requirejs": ""
