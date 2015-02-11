@@ -4,7 +4,12 @@
 Component = Em.Component.extend
     pages: Em.computed "count", "limit", ->
         pager = @get "content.content.pager"
-        return [] if not pager or pager.count <= pager.limit
+        return [] if not pager
+
+        pager.count = parseInt pager.count, 10
+        pager.limit = parseInt pager.limit, 10
+        pager.startat = parseInt pager.startat, 10
+        return [] if pager.count <= pager.limit
 
         pages = Math.ceil pager.count/pager.limit
         current = Math.floor pager.startat/pager.limit
