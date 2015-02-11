@@ -6,8 +6,6 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 `import BootstrapTypeahead from 'vendor/bootstrap3-typeahead'`
 
-App = Em.Application.extend EmberApp,
-    LOG_TRANSITIONS: true
-    LOG_TRANSITIONS_INTERNAL: true
+App = Em.Application.extend EmberApp
 
 `export default App`
