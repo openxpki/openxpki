@@ -1,12 +1,12 @@
 {{partial "partial-pagination"}}
 
-<div class="table-responsive">
+<div class="table-responsive oxisection-grid">
     <table class="table table-striped table-bordered table-hover {{content.className}}">
         <thead>
             <tr>
                 {{#each columns as |column|}}
-                    <th style="cursor:pointer; -webkit-user-select:none" {{action "sort" column}}>
-                        <span Xstyle="user-select:none">{{column.sTitle}}</span>
+                    <th {{action "sort" column}}>
+                        <span>{{column.sTitle}}</span>
                         {{#if column.isSorted}}
                             {{#if column.isInverted}}
                                 <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt"></span>

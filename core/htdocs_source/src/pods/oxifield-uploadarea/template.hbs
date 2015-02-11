@@ -6,11 +6,11 @@
 
 {{#if canReadFile}}
     <div class="row">
-        <div class="col-md-offset-8 col-md-4" style="position:relative; padding-bottom:34px">
+        <div class="col-md-offset-8 col-md-4 oxifield-upload">
             {{input type="file" class="oxi-file-input"}}
         </div>
     </div>
 {{else}}
     <input name="file" id="file" size="27" type="file">
-    <iframe name="upload_target" src="" style="width:0;height:0;border:0px solid #fff;"></iframe>
+    <iframe class="oxifield-upload" name="upload_target" src=""></iframe>
 {{/if}}

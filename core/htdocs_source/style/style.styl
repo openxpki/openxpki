@@ -4,13 +4,22 @@
 @import "oxi.css"
 @import "oxi-grid.css"
 
-.oxi-file-input
+iframe.oxifield-upload
+    width 0
+    height 0
+    border 0px solid #fff
+
+div.oxifield-upload
+    position relative
+    padding-bottom 34px
+
+input.oxi-file-input
     width:100px
     position:absolute
     right:15px
     visibility:hidden
 
-.oxi-file-input::before
+input.oxi-file-input::before
     visibility:visible
     position:absolute
     width:100px
@@ -34,13 +43,13 @@
     background-color: #fff;
     border-color: #ccc;
 
-.oxi-file-input:hover::before
+input.oxi-file-input:hover::before
     color: #333;
     text-decoration: none;
     background-color: #ebebeb;
     border-color: #adadad;
 
-.oxi-file-input:active::before
+input.oxi-file-input:active::before
     outline: thin dotted;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px;
@@ -86,6 +95,14 @@ div.loading
         opacity 1
         transition opacity 0.1s
 
+    div.progress
+        position absolute
+        top 30px
+        right 20px
+        width 100px
+        div.progress-bar
+            width 100%
+
 div.waiting-for-ember
     margin-top 80px
 
@@ -96,3 +113,11 @@ div.stacked-buttons
     div.btn-bt-margin
         margin-top 6px
         margin-bottom 6px
+
+div.description
+    margin-bottom 6px
+
+div.oxisection-grid
+    th
+        cursor pointer
+        -webkit-user-select none
