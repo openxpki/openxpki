@@ -23,7 +23,12 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_ISSUE_CRL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_ISSUE_CRL_DESC
         action:
-          - global_nice_issue_crl > PUBLISH_CRL
+          - global_nice_issue_crl > REGISTER_CRL
+
+    REGISTER_CRL:
+        autorun: 1
+        action:
+          - add_serial_to_status_hash > PUBLISH_CRL
 
     LOAD_NEXT_CA:
         autorun: 1
@@ -43,6 +48,9 @@ state:
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC
+        output:
+          - crl_list
+          - force_issue
 
 
 action:
@@ -74,6 +82,14 @@ action:
             context_key: ca_alias
             function: shift
 
+    add_serial_to_status_hash:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFHash
+        param:
+            hash_name: crl_list
+            _map_hash_key:  $ca_alias
+            _map_hash_value: $crl_serial
+            function: add
+
 condition:
     is_ca_list_empty:
         class: OpenXPKI::Server::Workflow::Condition::WFArray
@@ -94,6 +110,12 @@ field:
         tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP
         type: bool
         required: 0
+
+    crl_list:
+        label: CRL Lists created
+        name: crl_list
+
+
 
 
 acl:

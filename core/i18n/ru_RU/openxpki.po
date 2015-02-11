@@ -121,10 +121,6 @@ msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INSTANTIATE_CLI_FAILED"
 msgstr "Веб-интерфейс Удостоверяющего Центра"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CERT_"
-msgstr "Доступ к УЦ"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_EXPIRED"
 msgstr "Доступ к УЦ"
 
@@ -2137,6 +2133,10 @@ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB"
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_COUNT_SELECT_RESULT_NOT_ARRAY"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_INVALID_CERT_ATTRIBUTES_ARGUMENTS"
 msgstr "SPKAC строка пуста."
 
@@ -2318,6 +2318,14 @@ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_COUNT_NOT_ARRAY"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_NOT_ARRAY"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -3081,10 +3089,6 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_NSARRAY_MISSING_PARAM"
-msgstr "Сброс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_WFHASH_MISSING_PARAM"
 msgstr "Сброс"
 
 #, fuzzy
@@ -4195,30 +4199,6 @@ msgid "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
 msgstr "Стандартная группа ключей"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_"
-msgstr "Статус сертификата УЦ"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_EXPIRED"
-msgstr "С истекшим сроком действия"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_OFFLINE"
-msgstr "Действителен"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_ONLINE"
-msgstr "Недействителен"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN"
-msgstr "Статус сертификата УЦ"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_UPCOMING"
-msgstr "Статус сертификата УЦ"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_TOOLKIT_BINARY_NOT_EXECUTABLE"
 msgstr "Номер факса"
 
@@ -4858,6 +4838,10 @@ msgstr ""
 "имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
 "пользователя, который следует использовать, если нет особых требований к "
 "сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
+msgstr "Статус сертификата УЦ"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
@@ -5676,6 +5660,10 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -6526,6 +6514,10 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
 msgstr "Последнее обновление"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
@@ -9496,6 +9488,14 @@ msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "Тестировщик"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_"
+#~ msgstr "Доступ к УЦ"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_WFHASH_MISSING_PARAM"
+#~ msgstr "Сброс"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
 #~ msgstr ""
 #~ "Для выполнения следующего этапа технологическому процессу не хватает "
@@ -9504,3 +9504,23 @@ msgstr "Тестировщик"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE"
 #~ msgstr "Сертификаты"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_EXPIRED"
+#~ msgstr "С истекшим сроком действия"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_OFFLINE"
+#~ msgstr "Действителен"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_ONLINE"
+#~ msgstr "Недействителен"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN"
+#~ msgstr "Статус сертификата УЦ"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UPCOMING"
+#~ msgstr "Статус сертификата УЦ"

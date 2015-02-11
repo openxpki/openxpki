@@ -389,7 +389,22 @@ sub __get_workflow_ui_info {
     $result->{WORKFLOW}->{description} = $head->{description};
 
     # Add State UI Info
-    $result->{STATE} = CTX('config')->get_hash([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'state', $result->{WORKFLOW}->{STATE} ]);
+    my $ui_state = CTX('config')->get_hash([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'state', $result->{WORKFLOW}->{STATE} ]);
+    my @ui_state_out;
+    if ($ui_state->{output}) {
+        if (ref $ui_state->{output} eq 'ARRAY') {
+            @ui_state_out = @{$ui_state->{output}};
+        } else {
+            @ui_state_out = CTX('config')->get_list([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'state', $result->{WORKFLOW}->{STATE}, 'output' ]);
+        }
+        
+        $ui_state->{output} = [];
+        foreach my $field (@ui_state_out) {           
+            # Load the field definitions
+            push @{$ui_state->{output}}, $factory->get_field_info($field, $result->{WORKFLOW}->{TYPE} );
+        }
+    }    
+    $result->{STATE} = $ui_state;
 
     my $hint = $result->{STATE}->{hint};
     $result->{STATE}->{hint} = {};

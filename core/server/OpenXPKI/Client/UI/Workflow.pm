@@ -139,7 +139,7 @@ sub init_load {
 
 
     # Set single action if not in result view and only single action is avail
-    if ((!$args->{VIEW} || $args->{VIEW} ne 'result') && !$wf_action) {
+    if (($view ne 'result') && !$wf_action) {
         my @activities = @{$wf_info->{STATE}->{option}};
         if (scalar @activities == 1) {
             $wf_action = $activities[0];
@@ -789,7 +789,10 @@ sub __render_from_workflow {
     my $self = shift;
     my $args = shift;
 
+    $self->logger()->debug( "render args: " . Dumper $args);
+
     my $wf_info = $args->{WF_INFO} || undef;
+    my $view = $args->{VIEW} || '';
 
     if (!$wf_info && $args->{WF_ID}) {
         $wf_info = $self->send_command( 'get_workflow_info', {
@@ -923,29 +926,70 @@ sub __render_from_workflow {
 
         my @fields;
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
-        foreach my $key (sort keys %{$context}) {
-            next if ($key =~ m{ \A wf_ }x);
-            next if ($key =~ m{ \A _ }x);
-            next if ($key =~ m{ \A workflow_id }x);
-            next if ($key =~ m{ \A sources }x);
+        
+        # in case we have output format rules, we just show the defined fields
+        # can be overriden with view = context
+        my $output = $wf_info->{STATE}->{output};
+        my @fields_to_render;
+        if ($output && $view ne 'context') {
+            @fields_to_render = @{$wf_info->{STATE}->{output}};
+            $self->logger()->debug('Render output rules: ' . Dumper  \@fields_to_render  );                        
+        } else {
+            foreach my $field (sort keys %{$context}) {                 
+                next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
+                push @fields_to_render, { name => $field };
+            }
+            $self->logger()->debug('No output rules, render plain context: ' . Dumper  \@fields_to_render  );            
+        }
+        
+        foreach my $field (@fields_to_render) {
+        
+            my $key = $field->{name};            
+            my $item = { value => $context->{$key} };
+        
+            # Always suppress key material
+            if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
+                $item->{value} = i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT');                
+            }
+            
+            # Label, Description, Tooltip
+            foreach my $prop (qw(label description tooltip)) {
+                if ($field->{$prop}) {
+                    $item->{$prop} = i18nGettext($field->{$prop});
+                }
+            }
+            
+            if (!$item->{label}) {
+                $item->{label} = $key;
+            }
+                 
+            # assign autoformat based on some assumptions if no format is set
+            if (!$item->{format}) {                
+                # create a link on cert_identifier fields
+                if ( $key =~ m{ cert_identifier \z }x || 
+                    $item->{type} eq 'cert_identifier') {
+                
+                    $item->{format} = 'cert_identifier';    
+                }
+                
+                # Code format any PEM blocks
+                if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
+                    $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
+                    $item->{format} = 'code';
+                }                
+            }
 
-            my $item = { label => $key, value => $context->{$key} };
-
-            # create a link on cert_identifier fields
-            if ( $key =~ m{ cert_identifier \z }x) {
+            # convert format cert_identifier into a link             
+            if ($item->{format} && $item->{format} eq 'cert_identifier') {        
                 $item->{format} = 'link';
-                $item->{value}  = { label => $context->{$key}, page => 'certificate!detail!identifier!'. $context->{$key}, target => 'modal' };
+                $item->{value}  = { label => $item->{value}, page => 'certificate!detail!identifier!'. $item->{value}, target => 'modal' };
             }
 
-            # Code format any PEM blocks
-            if ( $key =~ m{ (pkcs10) }x) {
-                $item->{format} = 'code';
-            }
-
+            # Auto detect serializes content
             # FIXME - will not work once we change serialization format
             if (ref $item->{value} eq '' && $item->{value} && $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
                 $item->{value} = $self->serializer()->deserialize( $context->{$key} );
-                if (ref $item->{value} eq 'HASH') {
+                if (ref $item->{value} eq 'HASH' && !$item->{format}) {
                     $item->{format} = 'deflist';
                 }
             }
@@ -956,7 +1000,7 @@ sub __render_from_workflow {
 
         # Add action buttons only if we are not in result view
         my $buttons;
-        $buttons = $self->__get_action_buttons( $wf_info ) if (!$args->{VIEW} || $args->{VIEW} ne 'result');
+        $buttons = $self->__get_action_buttons( $wf_info ) if ($view ne 'result');
 
         $self->add_section({
             type => 'keyvalue',
@@ -980,18 +1024,26 @@ sub __render_from_workflow {
     }
     if ($wf_info->{WORKFLOW}->{ID} ) {
 
-        my @buttons;
-        if ($args->{VIEW} && $args->{VIEW} eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/) {
+        my @buttons;        
+        if ($view eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/) {
             @buttons = ({
                 'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
                 'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'), #'open workflow',
             });
         }
 
+        if ($view ne 'context') {
+            push @buttons, {
+                'action' => 'redirect!workflow!load!view!context!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL'),
+            };
+        }
+        
         push @buttons, {
             'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
             'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL'),
         };
+        
 
         $self->_result()->{right} = [{
             type => 'keyvalue',
@@ -999,7 +1051,9 @@ sub __render_from_workflow {
                 label => '',
                 description => '',
                 data => [
+                # todo - i18n for values
                     { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL'), value => $wf_info->{WORKFLOW}->{ID} },
+                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL'), value => $wf_info->{WORKFLOW}->{TYPE} },
                     { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL'), value => $wf_info->{WORKFLOW}->{STATE} },
                     { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL'), value => $wf_info->{WORKFLOW}->{PROC_STATE} }
                 ],

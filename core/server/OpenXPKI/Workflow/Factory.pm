@@ -139,34 +139,8 @@ sub get_action_info {
     foreach my $field_name (@input) {
         ##! 64: 'Field info ' . Dumper $field
 
-        my @field_path;
-        # Fields can be defined local or global (only actions inside workflow)
-        if ($wf_name) {
-            @field_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
-            if (!$conn->exists( \@field_path )) {
-                @field_path = ( 'workflow', 'global', 'field', $field_name );
-            }
-        } else {
-            @field_path = ( 'workflow', 'global', 'field', $field_name );
-        }
-
-        my $field = $conn->get_hash( \@field_path );
-
-        # Check for option tag and do explicit calls to ensure recursive resolve
-        if ($field->{option}) {
-            # option.item holds the items as list, this is mandatory
-            my @item = $conn->get_list( [ @field_path, 'option', 'item' ] );
-            my @option;
-            # if set, we generate the values from option.label + key
-            my $label = $conn->get( [ @field_path, 'option', 'label' ] );
-            if ($label) {
-                @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
-            } else {
-                @option = map { { value => $_, label => $_  } }  @item;
-            }
-            $field->{option} = \@option;
-        }
-
+        my $field = $self->get_field_info( $field_name, $wf_name );
+        
         $field->{type} = 'text' unless ($field->{type});
         $field->{clonable} = ($field->{min} || $field->{max}) || 0;
 
@@ -176,6 +150,46 @@ sub get_action_info {
     $action->{field} = \@fields if (scalar @fields);
 
     return $action;
+}
+
+sub get_field_info {
+    
+    my $self = shift;
+    my $field_name = shift;
+    my $wf_name = shift;
+    
+    my $conn = CTX('config');
+    
+    my @field_path;
+    # Fields can be defined local or global (only actions inside workflow)
+    if ($wf_name) {
+        @field_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
+        if (!$conn->exists( \@field_path )) {
+            @field_path = ( 'workflow', 'global', 'field', $field_name );
+        }
+    } else {
+        @field_path = ( 'workflow', 'global', 'field', $field_name );
+    }
+
+    my $field = $conn->get_hash( \@field_path );
+
+    # Check for option tag and do explicit calls to ensure recursive resolve
+    if ($field->{option}) {
+        # option.item holds the items as list, this is mandatory
+        my @item = $conn->get_list( [ @field_path, 'option', 'item' ] );
+        my @option;
+        # if set, we generate the values from option.label + key
+        my $label = $conn->get( [ @field_path, 'option', 'label' ] );
+        if ($label) {
+            @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
+        } else {
+            @option = map { { value => $_, label => $_  } }  @item;
+        }
+        $field->{option} = \@option;
+    }
+    
+    return $field;
+    
 }
 
 sub __authorize_workflow {

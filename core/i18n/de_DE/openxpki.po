@@ -118,10 +118,6 @@ msgid "I18N_OPENXPKI_BACKEND_OPENSSL_INSTANTIATE_CLI_FAILED"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_CERT_"
-msgstr "CA Informationszugang (Authority Information Access)"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_CERT_EXPIRED"
 msgstr "CA Informationszugang (Authority Information Access)"
 
@@ -2227,6 +2223,10 @@ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB"
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_COUNT_SELECT_RESULT_NOT_ARRAY"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_INVALID_CERT_ATTRIBUTES_ARGUMENTS"
 msgstr "PKI Realm"
 
@@ -2400,6 +2400,14 @@ msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC"
+msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_COUNT_NOT_ARRAY"
+msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_NOT_ARRAY"
 msgstr "Mindestens ein Kontext-Eintrag wird benötigt"
 
 #, fuzzy
@@ -3137,10 +3145,6 @@ msgstr "PKI Realm"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_NSARRAY_MISSING_PARAM"
-msgstr "PKI Realm"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_WFHASH_MISSING_PARAM"
 msgstr "PKI Realm"
 
 #, fuzzy
@@ -4133,30 +4137,6 @@ msgid "I18N_OPENXPKI_TOKEN_CONFIG_HSM_AUTHENTICATION_GROUP"
 msgstr "Standardmäßig eingestellte Schlüsselgruppe"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_"
-msgstr "Status"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_EXPIRED"
-msgstr "abgelaufen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_OFFLINE"
-msgstr "Aktiv"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_ONLINE"
-msgstr "Nicht aktiv"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN"
-msgstr "Status"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_TOKEN_STATUS_UPCOMING"
-msgstr "Status"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_TOOLKIT_BINARY_NOT_EXECUTABLE"
 msgstr "Organisationseinheit"
 
@@ -4791,6 +4771,10 @@ msgstr ""
 "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
 "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
 "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
+msgstr "Status"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
@@ -5607,6 +5591,10 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
@@ -6469,6 +6457,10 @@ msgstr "Untergeordnete Workflows"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
 msgstr "Letzte Aktualisierung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
@@ -9370,9 +9362,37 @@ msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "testuser"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_CERT_"
+#~ msgstr "CA Informationszugang (Authority Information Access)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_WFHASH_MISSING_PARAM"
+#~ msgstr "PKI Realm"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER"
 #~ msgstr "PKI Realm"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PUBLISHCERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE"
 #~ msgstr "PKI Realm"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_EXPIRED"
+#~ msgstr "abgelaufen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_OFFLINE"
+#~ msgstr "Aktiv"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_ONLINE"
+#~ msgstr "Nicht aktiv"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN"
+#~ msgstr "Status"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UPCOMING"
+#~ msgstr "Status"
