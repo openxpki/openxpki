@@ -3,15 +3,7 @@
     <div style="margin-bottom:6px;">{{content.content.description}}</div>
 {{/if}}
 
-{{#if isForm}}
-    {{oxisection-form content=content}}
-{{else if isGrid}}
-    {{oxisection-grid content=content}}
-{{else if isKeyValue}}
-    {{oxisection-keyvalue content=content}}
-{{else if isText}}
-    {{oxisection-text content=content}}
-{{/if}}
+{{component type content=content}}
 
 {{#if content.content.buttons}}
     <div class="oxi-button-container">
