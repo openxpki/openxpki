@@ -5,13 +5,14 @@ Component = Em.Component.extend
         prompt = @get "content.prompt"
         if prompt
             options = @get "content.options"
-            options.unshift
-                label: prompt
-                value: ""
+            if prompt isnt options[0].label
+                options.unshift
+                    label: prompt
+                    value: ""
         else
             options = @get "content.options"
             if @get "content.is_optional"
-                if not @get "content.editable"
+                if options[0].label isnt "" and not @get "content.editable"
                     options.unshift
                         label: ""
                         value: ""
