@@ -13,7 +13,7 @@
             <ul class="nav navbar-nav">
                 {{#each navEntries as |navEntry|}}
                     {{#if navEntry.entries.length}}
-                        <li class="dropdown {{navEntry.active}}">
+                        <li class="dropdown {{if navEntry.active "active"}}">
                             <a class="dropdown-toggle" href="#" data-toggle="dropdown">
                                 {{navEntry.label}}
                                 <b class="caret"></b>
@@ -29,7 +29,7 @@
                             </ul>
                         </li>
                     {{else}}
-                        <li class="{{navEntry.active}}">
+                        <li class="{{if navEntry.active "active"}}">
                             {{#link-to "openxpki" navEntry.key}}
                                 {{navEntry.label}}
                             {{/link-to}}

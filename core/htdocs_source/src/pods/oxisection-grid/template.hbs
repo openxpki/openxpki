@@ -18,7 +18,7 @@
         </thead>
         <tbody>
             {{#each sortedData as |line|}}
-                <tr class="context {{line.className}} {{controller.hasAction}}">
+                <tr class="context {{line.className}} {{if controller.hasAction "has-action"}}">
                     {{#each line as |value|}}
                         <td>{{oxivalue-format content=value}}</td>
                     {{/each}}
