@@ -1,3 +1,6 @@
+landmark:
+  welcome: information!status
+
 main:
   - key: home
     label: Home
@@ -28,8 +31,6 @@ main:
         label: Issue CRL
       - key:   secret!index
         label: Manage Secrets
-      - key:   information!process
-        label: Process Information
       - key:   workflow!start!wf_type!ca_publish
         label: Publish CA/CRL
 
@@ -41,6 +42,11 @@ main:
         label: CA certificates
       - key:   crl!index
         label: Revocation lists
+      - key:   information!process
+        label: Process Information
+      - key:   information!status
+        label: System Status
+
 
   - key:   certificate!search
     label: Certificates

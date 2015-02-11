@@ -161,4 +161,77 @@ sub init_process {
 
     return $self;
 }
+
+
+sub init_status {
+    
+    my $self = shift;
+    my $args = shift;
+
+    my $status = $self->send_command("get_ui_system_status");
+
+    my @fields;
+
+    my $critical = 0;
+    if ($status->{secret_offline}) {
+        push @fields, {
+            label => 'Secret groups',
+            format=>'link',
+            value => {
+                label => sprintf ('%01d secret groups are NOT available',  $status->{secret_offline}),
+                page => 'secret!index',
+                target => '_top'
+            }
+        };
+        $critical = 1;
+    }
+
+    my $now = time();
+    if ($status->{crl_expiry} < $now + 5*86400) {
+        push @fields, {
+            label  => 'CRL update required',
+            format => 'timestamp',
+            value  => $status->{crl_expiry}
+        };
+        $critical = 1 if ($status->{crl_expiry} < $now);
+    }
+
+    if ($status->{dv_expiry} < $now + 30*86400) {
+        push @fields, {
+            label  => 'Encryption token expires',
+            format => 'timestamp',
+            value  => $status->{dv_expiry}
+        };
+        $critical = 1 if ($status->{dv_expiry} < $now);
+    }
+
+    if ($status->{watchdog} < 1) {
+        push @fields, {
+            label  => 'Watchdog',
+            value  => 'Not running!'
+        };
+        $critical = 1;
+    }
+
+    if (@fields) {
+        if ($critical) {
+            $self->set_status('Your system status is critical!','error');
+        } else {
+            $self->set_status('Your system status requires your attention!','warn');
+        }
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => 'OpenXPKI system status',
+                data => \@fields
+            }
+        });
+    } else {
+        $self->set_status('System status is good','success');
+        $self->init_index( $args );
+    }
+
+    return $self;
+}
+
 1;

@@ -20,8 +20,13 @@ sub init_structure {
         my $menu = $self->send_command( 'get_menu' );
         $self->logger()->trace('Menu ' . Dumper $menu);
         $self->_result()->{structure} = $menu->{main};
+        
+        # persist the landmark part of the menu, if any
+        $self->_client->session()->param('landmark', $menu->{landmark} || {});
+        $self->logger->debug('Got landmarks: ' . Dumper $menu->{landmark});
+        
     }
-
+    
     if (!$self->_result()->{structure}) {
         $self->_result()->{structure} =
         [{
