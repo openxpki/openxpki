@@ -12,7 +12,7 @@ Component = Em.Component.extend
         else
             options = @get "content.options"
             if @get "content.is_optional"
-                if options[0].label isnt "" and not @get "content.editable"
+                if !options[0] or (options[0].label isnt "" and not @get "content.editable")
                     options.unshift
                         label: ""
                         value: ""
