@@ -11,7 +11,8 @@ Component = Em.Component.extend
         text: (v) -> v
         code: (v) -> "<code>#{v.replace(/(\r\n|\n|\r)/gm,"<br>")}</code>"
         raw: (v) -> v
-        deflist: (v) -> "<dl>#{(for k, w of v then "<dt>#{k}</dt><dd>#{w}</dd>").join ""}</dl>"
+        defhash: (v) -> "<dl>#{(for k, w of v then "<dt>#{k}</dt><dd>#{w}</dd>").join ""}</dl>"
+        deflist: (v) -> "<dl>#{(for w in v then "<dt>#{w.label}</dt><dd>#{w.value}</dd>").join ""}</dl>"
 
     formatedValue: Em.computed "content.format", "content.value", ->
         @get("types")[@get("content.format")||"text"](@get "content.value")

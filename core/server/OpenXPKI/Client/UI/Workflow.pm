@@ -992,6 +992,9 @@ sub __render_from_workflow {
             if (ref $item->{value} eq '' && $item->{value} && $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
                 $item->{value} = $self->serializer()->deserialize( $context->{$key} );
                 if (ref $item->{value} eq 'HASH' && !$item->{format}) {
+                    # Sort by label
+                    my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                    $item->{value} = \@val; 
                     $item->{format} = 'deflist';
                 }
             }
