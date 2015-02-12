@@ -1,16 +1,23 @@
 `import Em from "vendor/ember"`
 
 Route = Em.Route.extend
+    queryParams:
+        startat:
+            refreshModel: true
+
     beforeModel: (req) ->
         if not @controllerFor("openxpki").get("structure") or req.params.openxpki.model_id in ["login","logout","welcome"]
             @sendAjax
                 data:
                     page: "bootstrap!structure"
     model: (req) ->
+        data =
+            page: req.model_id
+        data.limit = req.limit if req.limit
+        data.startat = req.startat if req.startat
         @controllerFor("openxpki").set "page", req.model_id
         @sendAjax
-            data:
-                page: req.model_id
+            data: data
         .then (doc) ->
             [doc]
 

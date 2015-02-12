@@ -13,8 +13,7 @@ Component = Em.Component.extend
         raw: (v) -> v
         deflist: (v) -> "<dl>#{(for k, w of v then "<dt>#{k}</dt><dd>#{w}</dd>").join ""}</dl>"
 
-    formatedValue: (->
+    formatedValue: Em.computed "content.format", "content.value", ->
         @get("types")[@get("content.format")||"text"](@get "content.value")
-    ).property "content.format", "content.value"
 
 `export default Component`

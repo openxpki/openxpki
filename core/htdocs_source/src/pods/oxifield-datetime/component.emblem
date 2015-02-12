@@ -1,3 +1,0 @@
-div.input-group
-  =input class="form-control date" value=content.pickvalue placeholder=content.placeholder
-  span.input-group-addon: span.glyphicon.glyphicon-calendar

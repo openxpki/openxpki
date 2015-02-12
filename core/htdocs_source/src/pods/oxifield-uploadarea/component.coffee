@@ -11,10 +11,9 @@ Component = Em.Component.extend
         "application/x-pkcs12"
     ]
 
-    canReadFile: (->
+    canReadFile: Em.computed ->
         !!window.FileReader
         false
-    ).property()
 
     change: (evt) ->
         return if evt.target.type isnt "file"

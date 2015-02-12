@@ -2,7 +2,33 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 
 Component = Em.Component.extend
-    didInsertElement: ->
+    pages: Em.computed "count", "limit", ->
+        pager = @get "content.content.pager"
+        return [] if not pager
+
+        pager.count = parseInt pager.count, 10
+        pager.limit = parseInt pager.limit, 10
+        pager.startat = parseInt pager.startat, 10
+        return [] if pager.count <= pager.limit
+
+        pages = Math.ceil pager.count/pager.limit
+        current = Math.floor pager.startat/pager.limit
+
+        o = []
+        for i in [0..pages-1]
+            o.push
+                num: i+1
+                active: i is current
+                startat: i * pager.limit
+        o.prev =
+            disabled: current is 0
+            startat:  (current-1) * pager.limit
+        o.next =
+            disabled: current is pages-1
+            startat:  (current+1) * pager.limit
+        o
+
+    initializeContextmenu: Em.on "didInsertElement", ->
         @$()?.find(".context")
         .contextmenu
             target: @$().find(".dropdown")
@@ -10,7 +36,7 @@ Component = Em.Component.extend
         .off "contextmenu"
 
     sortNum: -1
-    columns: (->
+    columns: Em.computed "content.content.columns", ->
         columns = @get "content.content.columns"
         res = []
         for column, i in columns
@@ -19,9 +45,8 @@ Component = Em.Component.extend
                 sTitle: column.sTitle
                 isSorted: i is @get "sortNum"
                 isInverted: false
-    ).property "content.content.columns"
 
-    data: (->
+    data: Em.computed "content.content.data", ->
         data = @get "content.content.data"
         columns = @get "content.content.columns"
 
@@ -40,13 +65,11 @@ Component = Em.Component.extend
                     format: columns[x].format
                     value: column
         res
-    ).property "content.content.data"
 
-    hasAction: (->
+    hasAction: Em.computed "content.content.actions", ->
         not not @get "content.content.actions"
-    ).property "content.content.actions"
 
-    sortedData: (->
+    sortedData: Em.computed "data", "sortNum", "columns.@each.isInverted", ->
         data = @get "data"
         data = data.toArray()
         sortNum = @get "sortNum"
@@ -66,10 +89,9 @@ Component = Em.Component.extend
             if @get("columns")[sortNum].get "isInverted"
                 data.reverseObjects()
 
-        Em.run.scheduleOnce "afterRender", => @didInsertElement()
+        Em.run.scheduleOnce "afterRender", => @initializeContextmenu()
 
         data
-    ).property "data", "sortNum", "columns.@each.isInverted"
 
     contextIndex: null
 
@@ -108,6 +130,14 @@ Component = Em.Component.extend
             event.preventDefault()
 
     actions:
+        changeStartat: (page) ->
+            return if page.disabled or page.active
+            pager = @get "content.content.pager"
+            @container.lookup("route:openxpki").transitionTo
+                queryParams:
+                    limit: pager.limit
+                    startat: page.startat
+
         sort: (key) ->
             sortNum = @get "sortNum"
             newSortNum = @get("columns").indexOf key

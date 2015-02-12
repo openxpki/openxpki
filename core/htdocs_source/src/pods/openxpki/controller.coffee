@@ -1,11 +1,14 @@
 `import Em from "vendor/ember"`
 
 Controller = Em.ArrayController.extend
+    queryParams: [ "count", "limit", "startat" ]
+    count: null
+    startat: null
+    limit: null
+
     structure: null
 
-    showTabs: (->
-        @get("content.length") > 1
-    ).property "content.length"
+    showTabs: Em.computed "content.length", -> @get("content.length") > 1
 
     navEntries: Em.computed.alias "structure.structure"
 
@@ -14,13 +17,12 @@ Controller = Em.ArrayController.extend
         page = @get "page"
         for entry in @get "navEntries"
             Em.set entry, "active", false
-            if entry.entries
-                for e in entry.entries
-                    if e.key is page
-                        Em.set e, "active", true
-                        Em.set entry, "active", true
-                    else
-                        Em.set e, "active", false
+            for e in entry.entries || []
+                if e.key is page
+                    Em.set e, "active", true
+                    Em.set entry, "active", true
+                else
+                    Em.set e, "active", false
         null
 
 
@@ -30,7 +32,7 @@ Controller = Em.ArrayController.extend
     hideLoader: ->  $('#ajaxLoadingModal').modal 'hide'
 
     status: null
-    statusClass: (->
+    statusClass: Em.computed "status.level", "status.message", ->
         level = @get "status.level"
         message = @get "status.message"
         return "hide" if not message
@@ -38,7 +40,6 @@ Controller = Em.ArrayController.extend
         return "alert-success" if level is "success"
         return "alert-warning" if level is "warn"
         return "alert-info"
-    ).property "status.level", "status.message"
 
     activeTab: null
     activateLast: Em.observer "content.length", ->

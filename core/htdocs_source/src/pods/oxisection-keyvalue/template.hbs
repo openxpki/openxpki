@@ -1,0 +1,10 @@
+<table class="table table-bordered">
+    <tbody>
+        {{#each content.content.data as |item|}}
+            <tr>
+                <td>{{item.label}}</td>
+                <td>{{oxivalue-format content=item}}</td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>

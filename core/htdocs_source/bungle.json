@@ -36,6 +36,7 @@
                 "es6": false
             },
             "passthrough": true,
+            "pattern": "*.hbs",
             "inputs": ["reader"]
         },
 
@@ -84,9 +85,8 @@
         },
 
         "src3": {
-            "description": "Compile Handlebars and Emblem templates into module.",
+            "description": "Compile HTMLBars templates to js.",
             "type": "ember-templates",
-            "filename": "templates/templates.js",
             "passthrough": true,
             "inputs": ["src2"]
         },
@@ -159,6 +159,7 @@
 
         "bower": {
             "description": "Menage vendor directory via bower",
+            "patches": "./patches.json",
             "type": "bower"
 
         },

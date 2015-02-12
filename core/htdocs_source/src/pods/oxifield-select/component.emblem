@@ -1,4 +1,0 @@
-if content.editable
-  =input class="typeahead form-control" data-provide="typeahead" value=label
-else
-  Em.Select class="form-control" content=content.options optionValuePath="content.value" optionLabelPath="content.label" value=content.value

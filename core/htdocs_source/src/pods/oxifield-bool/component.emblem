@@ -1,4 +1,0 @@
-div.checkbox
-  label
-    Ember.Checkbox checked=content.value
-    = content.label

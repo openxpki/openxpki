@@ -1,18 +1,14 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
-    isForm: Em.computed.equal "content.type", "form"
-    isGrid: Em.computed.equal "content.type", "grid"
-    isKeyValue: Em.computed.equal "content.type", "keyvalue"
-    isText: Em.computed.equal "content.type", "text"
+    type: Em.computed "content.type", -> "oxisection-" + @get "content.type"
 
-    buttonsWithDescription: (->
+    hasDescription: Em.computed "content.content.buttons.@each.description", ->
         buttons = @get "content.content.buttons"
         if buttons
             buttons.isAny "description"
         else
             false
-    ).property "content.content.buttons.@each.description"
 
     click: (evt) ->
         target = evt.target

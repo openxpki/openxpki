@@ -6,34 +6,10 @@ Component = Em.Component.extend
         "content.class"
     ]
 
+    type: Em.computed "content.type", -> "oxifield-" + @get "content.type"
     isBool: Em.computed.equal "content.type", "bool"
-    isCertIdentifier: Em.computed.equal "content.type", "cert_identifier"
-    isCheckbox: Em.computed.equal "content.type", "checkbox"
-    isDate: Em.computed.equal "content.type", "date"
-    isDatetime: Em.computed.equal "content.type", "datetime"
-    isHidden: Em.computed.equal "content.type", "hidden"
-    isPassword: Em.computed.equal "content.type", "password"
-    isPasswordVerify: Em.computed.equal "content.type", "passwordverify"
-    isSelect: Em.computed.equal "content.type", "select"
-    isText: (->
-        @get("content.type") not in [
-            "bool"
-            "cert_identifier"
-            "checkbox"
-            "date"
-            "datetime"
-            "hidden"
-            "password"
-            "passwordverify"
-            "select"
-            "textarea"
-            "uploadarea"
-        ]
-    ).property "content.type"
-    isTextarea: Em.computed.equal "content.type", "textarea"
-    isUploadarea: Em.computed.equal "content.type", "uploadarea"
 
-    sFieldSize: (->
+    sFieldSize: Em.computed "content.size", "content.keysize", ->
         keys = @get "content.keys"
         size = @get "content.size"
         keysize = @get "content.keysize"
@@ -47,12 +23,10 @@ Component = Em.Component.extend
                 size = 7
 
         'col-md-' + size
-    ).property "content.size", "content.keysize"
 
-    sKeyFieldSize: (->
+    sKeyFieldSize: Em.computed "content.keysize", ->
         keysize = @get("content.keysize") || "2"
         'col-md-' + keysize
-    ).property "content.keysize"
 
     hasError: Em.computed.bool "content.error"
 
