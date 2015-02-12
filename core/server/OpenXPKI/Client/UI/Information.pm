@@ -172,7 +172,9 @@ sub init_status {
 
     my @fields;
 
+    my $warning = 0;
     my $critical = 0;
+    
     if ($status->{secret_offline}) {
         push @fields, {
             label => 'Secret groups',
@@ -187,49 +189,77 @@ sub init_status {
     }
 
     my $now = time();
-    if ($status->{crl_expiry} < $now + 5*86400) {
+    if ($status->{crl_expiry} < $now) {
         push @fields, {
-            label  => 'CRL update required',
+            label  => 'CRL expired - update required!',
+            format => 'timestamp',
+            value  => $status->{crl_expiry},
+            className => 'danger'
+        };
+        $critical = 1;
+    } elsif ($status->{crl_expiry} < ($now + 5*86400)) {
+        push @fields, {
+            label  => 'CRL is near expiration - update recommended!',
+            format => 'timestamp',
+            value  => $status->{crl_expiry},
+            className => 'warning'
+        };
+        $warning = 1;
+    } else {                    
+        push @fields, {
+            label  => 'Next CRL update',
             format => 'timestamp',
             value  => $status->{crl_expiry}
-        };
-        $critical = 1 if ($status->{crl_expiry} < $now);
+        };        
     }
 
-    if ($status->{dv_expiry} < $now + 30*86400) {
-        push @fields, {
+    if ($status->{dv_expiry} < $now) {
+        $critical = 1;
+        push @fields, {            
+            label  => 'Encryption token is expired',
+            format => 'timestamp',
+            value  => $status->{dv_expiry},
+            className => 'danger',
+        };
+    } elsif ($status->{dv_expiry} < $now + 30*86400) {                
+        $warning = 1;        
+        push @fields, {            
             label  => 'Encryption token expires',
             format => 'timestamp',
-            value  => $status->{dv_expiry}
+            value  => $status->{dv_expiry},
+            className => 'warning',
         };
-        $critical = 1 if ($status->{dv_expiry} < $now);
     }
 
     if ($status->{watchdog} < 1) {
         push @fields, {
             label  => 'Watchdog',
-            value  => 'Not running!'
+            value  => 'Not running!',
+            className => 'danger',
         };
         $critical = 1;
     }
-
-    if (@fields) {
-        if ($critical) {
-            $self->set_status('Your system status is critical!','error');
-        } else {
-            $self->set_status('Your system status requires your attention!','warn');
-        }
-        $self->add_section({
-            type => 'keyvalue',
-            content => {
-                label => 'OpenXPKI system status',
-                data => \@fields
-            }
-        });
+    
+    push @fields, {
+        label  => 'System Version',
+        value  => $status->{version},        
+    };
+    
+    
+    if ($critical) {
+        $self->set_status('Your system status is critical!','error');
+    } elsif($warning) {
+        $self->set_status('Your system status requires your attention!','warn');
     } else {
-        $self->set_status('System status is good','success');
-        $self->init_index( $args );
+        $self->set_status('System status is good','success');     
     }
+    $self->add_section({
+        type => 'keyvalue',
+        content => {
+            label => 'OpenXPKI system status',
+            data => \@fields
+        }
+    });
 
     return $self;
 }

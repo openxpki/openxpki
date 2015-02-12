@@ -31,6 +31,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::FileUtils;
+use OpenXPKI::VERSION;
 use DateTime;
 use List::Util qw(first);
 
@@ -108,6 +109,8 @@ sub get_ui_system_status {
     $result->{watchdog} =  scalar @{$pids->{watchdog}};
     $result->{worker} =  scalar @{$pids->{worker}};
     $result->{workflow} =  scalar @{$pids->{workflow}};
+    
+    $result->{version} = $OpenXPKI::VERSION::VERSION; 
 
     return $result;
 
