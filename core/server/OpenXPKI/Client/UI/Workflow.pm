@@ -322,7 +322,7 @@ sub init_result {
                 { sTitle => 'serial', bVisible => 0 },
             ],
             data => \@result,
-            pager => { startat => $startat, limit => $limit, count => $result->{count} },
+            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1) },
             buttons => [
                 { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
                 { label => 'new search', page => 'workflow!search'},
