@@ -1,7 +1,7 @@
 <table class="table table-bordered">
     <tbody>
         {{#each content.content.data as |item|}}
-            <tr>
+            <tr class="{{item.className}}">
                 <td>{{item.label}}</td>
                 <td>{{oxivalue-format content=item}}</td>
             </tr>

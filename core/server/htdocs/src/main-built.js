@@ -5025,7 +5025,7 @@ define('pods/oxisection-keyvalue/template', [
                 },
                 render: function render(context, env, contextualElement, blockArguments) {
                     var dom = env.dom;
-                    var hooks = env.hooks, set = hooks.set, content = hooks.content, get = hooks.get, inline = hooks.inline;
+                    var hooks = env.hooks, set = hooks.set, get = hooks.get, concat = hooks.concat, attribute = hooks.attribute, content = hooks.content, inline = hooks.inline;
                     dom.detectNamespace(contextualElement);
                     var fragment;
                     if (env.useFragmentCache && dom.canClone) {
@@ -5044,9 +5044,11 @@ define('pods/oxisection-keyvalue/template', [
                         fragment = this.build(dom);
                     }
                     var element0 = dom.childAt(fragment, [1]);
+                    var attrMorph0 = dom.createAttrMorph(element0, 'class');
                     var morph0 = dom.createMorphAt(dom.childAt(element0, [1]), -1, -1);
                     var morph1 = dom.createMorphAt(dom.childAt(element0, [3]), -1, -1);
                     set(env, context, 'item', blockArguments[0]);
+                    attribute(env, attrMorph0, element0, 'class', concat(env, [get(env, context, 'item.className')]));
                     content(env, morph0, context, 'item.label');
                     inline(env, morph1, context, 'oxivalue-format', [], { 'content': get(env, context, 'item') });
                     return fragment;
@@ -5944,10 +5946,10 @@ define('pods/oxivalue-format/component', [
                 return '<a href=\'#' + v.page + '\' target=\'' + (v.target || 'modal') + '\'>' + v.label + '</a>';
             },
             timestamp: function (v) {
-                return __uDep2__['default'].unix(v).utc().format('YYYY-MM-YY HH:mm:ss UTC');
+                return __uDep2__['default'].unix(v).utc().format('YYYY-MM-DD HH:mm:ss UTC');
             },
             datetime: function (v) {
-                return __uDep2__['default']().utc(v).format('YYYY-MM-YY HH:mm:ss UTC');
+                return __uDep2__['default']().utc(v).format('YYYY-MM-DD HH:mm:ss UTC');
             },
             text: function (v) {
                 return v;
