@@ -1,0 +1,8 @@
+# at the moment this is used for display only
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_LABEL
+name: cert_subject_alt_name
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC
+#placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER
+#tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP
+type: cert_subject_alt_name
+

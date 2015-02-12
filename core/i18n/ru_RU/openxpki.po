@@ -5760,6 +5760,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP"
 msgstr "Субъект"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PLACEHOLDER"
+msgstr "Объекты отзыва"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC"
 msgstr "Способ формирования уникального имени "
 
@@ -5774,6 +5778,10 @@ msgstr "Способ формирования уникального имени 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP"
 msgstr "Способ формирования уникального имени "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
+msgstr "Субъект"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"

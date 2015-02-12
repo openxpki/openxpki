@@ -4749,6 +4749,23 @@ msgstr ""
 "Diesdient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_DESC"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+"müssenSie nur den Hostnamen und den Port des Servers angeben, für den Sie "
+"dasZertifikat ausgestellt bekommen möchten. Nutzen Sie diese Art, wenn "
+"Siekeine spezifischen Anforderungen haben, die die Verwendung der "
+"erweitertenBenennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
+msgstr "TLS-Server"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+msgstr "TLS-Server"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
 msgstr "Nutzer"
 
@@ -5659,6 +5676,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP"
 msgstr "Nutzer"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_DESC"
 msgstr ""
 "Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt wird"
@@ -5674,6 +5699,22 @@ msgstr "Seriennummer des Workflowprozesses"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_TOOLTIP"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_DESC"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_LABEL"
+msgstr "Name"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_DESC"
@@ -5692,6 +5733,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP"
 msgstr "Name"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PLACEHOLDER"
+msgstr "Name"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC"
 msgstr "Stil des Namens"
 
@@ -5706,6 +5751,10 @@ msgstr "Stil des Namens"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP"
 msgstr "Stil des Namens"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
+msgstr "Name"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"

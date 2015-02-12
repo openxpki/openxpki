@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-01-30 14:55+0100\n"
+"PO-Revision-Date: 2015-02-12 15:01+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -4240,6 +4240,22 @@ msgstr "URI"
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_DESC"
+msgstr ""
+"If you use this style, you will just have to enter the hostname and port of "
+"the server for which you want a certificate. This is the easiest way to "
+"obtain your certificate, use it if you have no specific requirement for "
+"which you would need the advanced style."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
+msgstr "TLS Server profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+msgstr "TLS Server profile"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
 msgstr "User ID"
 
@@ -4926,9 +4942,8 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_LABEL"
 msgstr "Key Encryption Method"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
-msgstr "Type"
+msgstr "Workflow Context"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -4961,9 +4976,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_DESC"
 msgstr "continue"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_LABEL"
-msgstr "Workflow Id"
+msgstr "Requestor Information"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_PLACEHOLDER"
@@ -4987,6 +5001,13 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP"
 msgstr "Select an appropriate profile based on the expected usage."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC"
+msgstr "continue"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_LABEL"
+msgstr "Subject Alternative Name"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_DESC"
 msgstr "Port number"
 
@@ -5001,6 +5022,21 @@ msgstr "State"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_TOOLTIP"
 msgstr "Request invalid - no action"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER"
+msgstr "Workflow Id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP"
+msgstr "Request invalid - no action"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_DESC"
+msgstr "I18N_OPENXPKI_WF_VAL_CERTSUBJECTPARTS"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_LABEL"
+msgstr "Certificate Subject"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_DESC"
@@ -5018,6 +5054,10 @@ msgstr "State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP"
 msgstr "I18N_OPENXPKI_WF_VAL_CERTSUBJECTPARTS"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PLACEHOLDER"
+msgstr "State"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC"
 msgstr " "
 
@@ -5029,6 +5069,10 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP"
 msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
+msgstr "I18N_OPENXPKI_WF_VAL_CERTSUBJECTPARTS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
 msgstr " "
@@ -8359,16 +8403,3 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 
 #~ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_TXT"
 #~ msgstr "Text (txt)"
-
-# Thi probably should be removed
-#~ msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED"
-#~ msgstr "Token expired"
-
-#~ msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE"
-#~ msgstr "Token offline"
-
-#~ msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN"
-#~ msgstr "Unknown token status"
-
-#~ msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
-#~ msgstr "Token upcoming"
