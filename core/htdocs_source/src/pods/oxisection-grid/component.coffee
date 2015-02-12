@@ -2,13 +2,20 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 
 Component = Em.Component.extend
-    pages: Em.computed "count", "limit", ->
+    pagesizes: Em.computed.alias "content.content.pager.pagesizes"
+
+    limit: Em.computed ->
+        @get "content.content.pager.limit"
+
+    limitChange: Em.observer "limit", ->
+        startat = @get "content.content.pager.startat"
+        limit = @get "limit"
+        @send "changeStartat",
+            startat: Math.floor(startat/limit) * limit
+
+    pages: Em.computed ->
         pager = @get "content.content.pager"
         return [] if not pager
-
-        pager.count = parseInt pager.count, 10
-        pager.limit = parseInt pager.limit, 10
-        pager.startat = parseInt pager.startat, 10
         return [] if pager.count <= pager.limit
 
         pages = Math.ceil pager.count/pager.limit
@@ -20,6 +27,23 @@ Component = Em.Component.extend
                 num: i+1
                 active: i is current
                 startat: i * pager.limit
+
+        pagersize = pager.pagersize
+        if o.length > pagersize
+            ellipsis =
+                num: "..."
+                disabled: true
+            pagersize = pagersize - 1
+            l = r = pagersize >> 1
+            r = r + (pagersize & 1)
+
+            if current <= l
+                o.splice pagersize-1, o.length-pagersize, ellipsis
+            else if current >= o.length-1-r
+                o.splice 1, o.length-pagersize, ellipsis
+            else
+                o.splice current+r-1, o.length-1-(current+r-1), ellipsis
+                o.splice 1, current-(l-1), ellipsis
         o.prev =
             disabled: current is 0
             startat:  (current-1) * pager.limit
@@ -132,10 +156,10 @@ Component = Em.Component.extend
     actions:
         changeStartat: (page) ->
             return if page.disabled or page.active
-            pager = @get "content.content.pager"
+            limit = @get "limit"
             @container.lookup("route:openxpki").transitionTo
                 queryParams:
-                    limit: pager.limit
+                    limit: limit
                     startat: page.startat
 
         sort: (key) ->

@@ -4,6 +4,8 @@ Route = Em.Route.extend
     queryParams:
         startat:
             refreshModel: true
+        limit:
+            refreshModel: true
 
     beforeModel: (req) ->
         if not @controllerFor("openxpki").get("structure") or req.params.openxpki.model_id in ["login","logout","welcome"]

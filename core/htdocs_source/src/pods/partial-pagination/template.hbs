@@ -1,6 +1,12 @@
 {{#if pages}}
-    <nav>
+    <nav class="text-right">
         <ul class="pagination">
+            <li class="form-inline" style="float:left">
+                Items per page
+                {{view "select" class="form-control" content=pagesizes value=limit}}
+                &nbsp;
+            </li>
+
             <li class="{{if pages.prev.disabled "disabled"}}">
                 <a class="oxi-link-ignore" aria-label="Previous" {{action "changeStartat" pages.prev}}>
                     <span aria-hidden="true">&laquo;</span>
