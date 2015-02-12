@@ -322,10 +322,12 @@ sub init_result {
                 { sTitle => 'serial', bVisible => 0 },
             ],
             data => \@result,
-            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1) },
+            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1), 
+                pagesizes => [25,50,100,250,500], pagersize => 20 },
             buttons => [
                 { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
                 { label => 'new search', page => 'workflow!search'},
+                { label => 'bulk edit', action => 'workflow!bulk', select => 'serial' }, # Draft for Bulk Edit
             ]            
         }
     });

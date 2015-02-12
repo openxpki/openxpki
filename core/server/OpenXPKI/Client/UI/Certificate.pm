@@ -177,7 +177,8 @@ sub init_result {
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
-            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1) },
+            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1),
+                pagesizes => [25,50,100,250,500], pagersize => 20 },
             buttons => [
                 { label => 'reload search form', page => 'certificate!search!query!' .$queryid },
                 { label => 'new search', page => 'certificate!search'},
