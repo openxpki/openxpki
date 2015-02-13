@@ -16,7 +16,9 @@ use OpenXPKI::Client::UI;
 
 my $configfile = '/etc/openxpki/webui/default.conf';
 
-# check for explicit file in env
+# check for explicit file in env, for fcgi
+# FcgidInitialEnv FcgidInitialEnv /etc/openxpki/<inst>/webui/default.conf
+# 
 if ($ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE}
     && -f $ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE}) {
     $configfile = $ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE};
@@ -43,11 +45,11 @@ if (!$config{global}{scripturl}) {
     $config{global}{scripturl} = '/cgi-bin/webui.cgi';
 }
 
-$log->info('Start fcgi loop ' . $$);
+$log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 
 while (my $cgi = CGI::Fast->new()) {
 
-    $log->debug('check for cgi session');
+    $log->debug('check for cgi session, fcgi pid '. $$ );
 
     my $session_front = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
