@@ -30,13 +30,13 @@ if ($config{global}{log_config} && -f $config{global}{log_config}) {
     Log::Log4perl->easy_init({ level => $DEBUG });
 }
 
-$log->info('Start single cgi  ' . $$. ', config: ' . $configfile);
-
 # i18n
 set_locale_prefix ('/usr/share/locale');
 set_language      ('en_US');
 
 my $log = Log::Log4perl->get_logger();
+
+$log->info('Start single cgi  ' . $$. ', config: ' . $configfile);
 
 my $cgi = CGI->new;
 
