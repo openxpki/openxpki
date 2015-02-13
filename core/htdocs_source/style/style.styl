@@ -90,9 +90,12 @@ div.header
 
 div.loading
     opacity 0
+    visibility hidden
+
     transition opacity 0.75s
     &.in-progress
         opacity 1
+        visibility visible
         transition opacity 0.1s
 
     div.progress

@@ -11,6 +11,12 @@ Component = Em.Component.extend
         "application/x-pkcs12"
     ]
 
+    cols: Em.computed "content.textAreaSize.width", ->
+        @get("content.textAreaSize.width") || 150
+
+    rows: Em.computed "content.textAreaSize.height", ->
+        @get("content.textAreaSize.height") || 10
+
     canReadFile: Em.computed ->
         !!window.FileReader
         false
