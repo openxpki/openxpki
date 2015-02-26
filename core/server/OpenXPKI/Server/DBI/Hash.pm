@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::DBI::SQL;
@@ -36,13 +37,25 @@ sub insert
 
     my $table = $keys->{TABLE};
     my $hash  = $keys->{HASH};
+    
+    # get the name of the serial column
+    my $sequence_column = $self->{schema}->get_sequence_column($table);
+    
+    if ($sequence_column) {
+        
+        # remap column KEY to serial
+        if (not exists $hash->{$table."_SERIAL"} and exists $keys->{HASH}->{KEY}) {
+            $hash->{$table."_SERIAL"} = $keys->{HASH}->{KEY};    
+        }
 
-    $hash->{$table."_SERIAL"} = $keys->{HASH}->{KEY}
-        if (not exists $hash->{$table."_SERIAL"} and
-            exists $keys->{HASH}->{KEY});
-    if (exists $hash->{$table."_SERIAL"})
-    {
-        ##! 4: "table: $table serial: ".$hash->{$table."_SERIAL"}
+        # auto generate next serial if necesary    
+        if (not $hash->{$sequence_column}) {
+            my $serial = CTX('dbi_backend')->get_new_serial( TABLE => $table );
+            $hash->{$sequence_column} = $serial;
+            ##! 4: "auto added serial number"
+        }
+
+        ##! 4: "table: $table serial: ".$hash->{$table."_SERIAL"}        
     } else {
         ##! 4: "table $table without serial"
     }
@@ -51,8 +64,10 @@ sub insert
 
     $self->__log_write_action (TABLE  => $table,
                                MODE   => "INSERT",
-                               HASH   => $hash);  
-    return 1;
+                               HASH   => $hash);
+                                 
+    # be "true" on tables wihout serial (e.g. context)
+    return $hash->{$table."_SERIAL"} ? $hash->{$table."_SERIAL"} : -1; 
 }
 
 ########################################################################
@@ -67,8 +82,18 @@ sub update
     my $where = undef;
        $where = $keys->{WHERE} if (exists $keys->{WHERE});
 
-    $data->{$table."_SERIAL"} = $data->{KEY}
-        if (not exists $data->{$table."_SERIAL"} and exists $data->{KEY});
+    # remap column KEY to serial
+    if (exists $data->{KEY}) {
+        # get the name of the serial column
+        my $sequence_column = $self->{schema}->get_sequence_column($table);        
+        if (!$sequence_column) {
+            # this should not happen, fall back to "by convention"
+            $sequence_column = $table.'_SERIAL';
+        }
+        if (not exists $data->{$sequence_column}) {
+            $data->{$sequence_column} = $data->{KEY};
+        }    
+    }
 
     if (not $where)
     {

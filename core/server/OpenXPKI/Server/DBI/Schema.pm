@@ -18,18 +18,10 @@ my %SEQUENCE_of = (
     CERTIFICATE    => "seq_certificate",
     CERTIFICATE_ATTRIBUTES => "seq_certificate_attributes",
     CRR            => "seq_crr",
-#    CRR_ATTRIBUTES => 'seq_crr_attributes',
-    # log entries must use auto_increment
-    # or whatever the name of this technology is on your database platform
     AUDITTRAIL     => "seq_audittrail",
-#    DATA           => "seq_data",
     GLOBAL_KEY_ID  => "seq_global_id",     # ??? FIXME - remove it?
-#    PRIVATE        => "seq_private",
-    SECRET         => "seq_secret",
-#    SIGNATURE      => "seq_signature",
     DATAEXCHANGE   => "seq_dataexchange",
-    WORKFLOW       => "seq_workflow",
-    WORKFLOW_VERSION => "seq_workflow_version",
+    WORKFLOW       => "seq_workflow",    
     WORKFLOW_HISTORY => "seq_workflow_history",
     );
 
@@ -148,12 +140,7 @@ my %COLUMN_of = (
 my $NAMESPACE;
 
 my %TABLE_of = (
-#     CA => {
-#         NAME    => "ca",
-#         INDEX   => [ "PKI_REALM", "CA" ],
-#         COLUMNS => [ "PKI_REALM", "CA",
-#                      "CERTIFICATE_SERIAL", "ISSUING_CA", "ISSUING_PKI_REALM"
-#                   ]},
+
     CSR => { # this table contains what is requested, which might not
              # necessarily match what is in the DATA column
         NAME    => "csr",
@@ -166,7 +153,9 @@ my %TABLE_of = (
                      "SUBJECT",
              # "PUBKEY",
              # "RA",
-        ]},
+        ],
+        KEY => 'CSR_SERIAL'
+    },
 
     # CSR attributes, e. g.
     # 'subject_alt_name'
@@ -180,7 +169,9 @@ my %TABLE_of = (
              "ATTRIBUTE_VALUE",
                      "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
         ],
+        KEY => 'ATRRIBUTE_SERIAL'
     },
+    
     CRR => {
         NAME    => 'crr',
         INDEX   => [ 'CRR_SERIAL', 'PKI_REALM', 'IDENTIFIER' ],
@@ -189,16 +180,8 @@ my %TABLE_of = (
                      'INVALIDITY_TIME', 'COMMENT', 'HOLD_CODE',
                      'REVOCATION_TIME',
                    ],
+        KEY => 'CRR_SERIAL'                   
     },
-#    CRR_ATTRIBUTES => {
-#        NAME    => "crr_attributes",
-#        INDEX   => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL" ],
-#        COLUMNS => [ "ATTRIBUTE_SERIAL", "PKI_REALM", "CRR_SERIAL",
-#		     "ATTRIBUTE_KEY",
-#		     "ATTRIBUTE_VALUE",
-#                     "ATTRIBUTE_SOURCE", # "USER" | "OPERATOR" | "EXTERNAL"
-#	    ],
-#    },
 
     CERTIFICATE => {
         NAME    => "certificate",
@@ -210,8 +193,10 @@ my %TABLE_of = (
                      "STATUS", "PUBKEY",
                      "SUBJECT_KEY_IDENTIFIER", "AUTHORITY_KEY_IDENTIFIER",
                      "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL"
-                   ]},
-
+                   ],
+        KEY => 'CERTIFICATE_SERIAL' # Automatic seq. generation on certificate might be a problem!                   
+    },
+    
     CERTIFICATE_ATTRIBUTES => {
         NAME    => "certificate_attributes",
         INDEX   => [ "ATTRIBUTE_SERIAL", "IDENTIFIER", ],
@@ -219,6 +204,7 @@ my %TABLE_of = (
              "ATTRIBUTE_KEY",
              "ATTRIBUTE_VALUE",
         ],
+        KEY => "ATTRIBUTE_SERIAL"
     },
 
     ALIASES => {
@@ -235,38 +221,24 @@ my %TABLE_of = (
                      "LAST_UPDATE",
              "NEXT_UPDATE",
              "PUBLICATION_DATE",
-        ]},
+        ],
+        KEY => "CRL_SERIAL"
+    },
 
     AUDITTRAIL => {
         NAME    => "audittrail",
         INDEX   => [ "AUDITTRAIL_SERIAL" ],
         COLUMNS => [ "AUDITTRAIL_SERIAL",
                      "TIMESTAMP",
-                     "CATEGORY", "LOGLEVEL", "MESSAGE" ]},
-#     PRIVATE => {
-#         NAME    => "private",
-#         INDEX   => [ "PRIVATE_SERIAL" ],
-#         COLUMNS => [ "PRIVATE_SERIAL",
-#                     "DATA", "TYPE", "GLOBAL_KEY_ID"]},
+                     "CATEGORY", "LOGLEVEL", "MESSAGE" ],
+        KEY => "AUDITTRAIL_SERIAL"
+    },
 
     SECRET => {
         NAME    => "secret",
         INDEX   => ["PKI_REALM", "GROUP_ID"],
         COLUMNS => ["PKI_REALM", "GROUP_ID", "DATA"]},
-
-#     SIGNATURE => {
-#         NAME    => "signature",
-#         INDEX   => [ "SIGNATURE_SERIAL" ],
-#         COLUMNS => [ "SIGNATURE_SERIAL",
-#                     "TABLE", "SERIAL",
-#                     "DATA", "TYPE" ]},
-#     LOCK => {
-#         NAME    => "lock_table",  ## because of a mysql bug we cannot create a table lock
-#         INDEX   => [ "LOCK_SERIAL" ],
-#         COLUMNS => [ "LOCK_SERIAL",
-#                      "TABLE", "SERIAL",
-#                      "UNTIL" ]},
-
+ 
     WORKFLOW => {
         NAME    => "workflow",
         INDEX   => [ "WORKFLOW_SERIAL" ],
@@ -282,16 +254,9 @@ my %TABLE_of = (
              "WORKFLOW_REAP_AT",
              "WORKFLOW_SESSION",
              "WATCHDOG_KEY",
-        ]},
-
-#     WORKFLOW_VERSION => {
-#         NAME    => "workflow_version",
-#         INDEX   => [ "WORKFLOW_VERSION_SERIAL" ],
-#         COLUMNS => [ "WORKFLOW_VERSION_SERIAL",
-#                      # TODO:
-#                      # - identify workflow configuration used for this instance
-#                      # - link it to workflow_config table (TODO: define table)
-#             ]},
+        ],
+        KEY => "WORKFLOW_SERIAL",
+    },
 
     WORKFLOW_HISTORY => {
         NAME    => "workflow_history",
@@ -303,7 +268,9 @@ my %TABLE_of = (
              "WORKFLOW_STATE",
              "WORKFLOW_USER",
              "WORKFLOW_HISTORY_DATE",
-        ]},
+        ],
+        KEY => "WORKFLOW_HISTORY_SERIAL",
+    },
 
     WORKFLOW_CONTEXT => {
         NAME    => "workflow_context",
@@ -579,6 +546,18 @@ sub get_sequence_name
     } else {
     return $SEQUENCE_of{$sequence};
     }
+}
+
+# return the name of the column used as sequence, can be undef
+sub get_sequence_column {
+
+    my $self = shift;
+    my $table = shift;
+
+    __check_param($table);
+    
+    return $TABLE_of{$table}->{KEY};
+    
 }
 
 ########################################################################
