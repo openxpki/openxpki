@@ -8,7 +8,7 @@ main:
         label:  My Tasks
       - key:    home!workflow
         label:  My Workflows
-      - key:    home!certificate
+      - key:    certificate!mine
         label:  My Certificates
 
   - key: request

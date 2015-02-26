@@ -190,6 +190,112 @@ sub init_result {
 
 }
 
+=head2 init_mine
+
+my certificates view, finds certificates based on the current logged in userid
+ 
+=cut
+sub init_mine {
+
+    my $self = shift;
+    my $args = shift;
+           
+    my $limit = sprintf('%01d', $self->param('limit'));
+    my $startat = sprintf('%01d', $self->param('startat')); 
+    
+    # Safety rule
+    if (!$limit) { $limit = 50; }
+    elsif ($limit > 500) {  $limit = 500; }
+
+    my $query = {  
+        LIMIT => $limit,
+        START => $startat,
+        CERT_ATTRIBUTES => [{ 
+            KEY => 'system_cert_owner', 
+            VALUE =>  $self->_client()->session()->param('user')->{name}, 
+            OPERATOR => 'EQUAL' 
+        }]
+    };
+
+    $self->logger()->debug( "search query: " . Dumper $query);
+
+    my $search_result = $self->send_command( 'search_cert', $query );
+    
+    my $result_count = scalar @{$search_result};
+    if ($result_count == $limit) {
+        $result_count = $self->send_command( 'search_cert_count', $query );    
+    } 
+    
+    $self->logger()->trace( "search result: " . Dumper $search_result);
+
+    $self->_page({
+        label => 'Certificate Search - Results',
+        shortlabel => 'Results',
+        description => 'Results of your search:',
+    });
+
+    my @result;
+    foreach my $item (@{$search_result}) {
+        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+
+        push @result, [
+            $item->{CERTIFICATE_SERIAL},
+            $self->_escape($item->{SUBJECT}),
+            { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}) , value => $item->{STATUS} },
+            $item->{NOTBEFORE},
+            $item->{NOTAFTER},
+            $self->_escape($item->{ISSUER_DN}),
+            $item->{IDENTIFIER},
+            lc($item->{STATUS}),
+            $item->{IDENTIFIER},
+        ]
+    }
+
+    $self->logger()->trace( "dumper result: " . Dumper @result);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'certificate',
+        processing_type => 'all',
+        content => {
+            header => 'Grid-Headline',
+            actions => [{
+                path => 'certificate!detail!identifier!{identifier}',
+                label => 'Download',
+                icon => 'download',
+                target => 'modal'
+            }],
+            'noop' => [{
+                path => 'certificate!detail!identifier!{identifier}',
+                label => 'Detailed Information',
+                icon => 'view',
+                target => 'tab',
+            },{
+                path => 'certificate!workflows!identifier!{identifier}',
+                label => 'Related workflows',
+                icon => 'view',
+                target => 'tab',
+            }],
+            columns => [
+                { sTitle => "Serial"},
+                { sTitle => "Subject" },
+                { sTitle => "Status", format => 'certstatus' },
+                { sTitle => "Notbefore", format => 'timestamp' },
+                { sTitle => "Notafter", format => 'timestamp' },
+                { sTitle => "Issuer"},
+                { sTitle => "Identifier"},
+                { sTitle => "_className"},
+                { sTitle => "identifier", bVisible => 0 },
+            ],
+            data => \@result,
+            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result_count*1),
+                pagesizes => [25,50,100,250,500], pagersize => 20 },
+        }
+    });
+
+    return $self;
+
+}
 
 sub init_detail {
 

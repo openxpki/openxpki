@@ -542,8 +542,6 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * CSR_SERIAL
 
-=item * EMAIL
-
 =item * SUBJECT
 
 =item * ISSUER
@@ -553,6 +551,8 @@ supports a facility to search certificates. It supports the following parameters
 =item * VALID_AT
 
 =item * NOTBEFORE/NOTAFTER (less/greater to match "other side" of validity)
+
+=item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR) 
 
 =item * ENTITY_ONLY (show only certificates issued by this ca)
 
@@ -732,7 +732,7 @@ sub __search_cert {
 
         # we need to join over the certificate_attributes table
         my $ii = 0;
-        foreach my $entry ( @{ $args->{CERT_ATTRIBUTES} } ) {
+        foreach my $attrib ( @{ $args->{CERT_ATTRIBUTES} } ) {
             ##! 16: 'certificate attribute: ' . Dumper $entry
             my $attr_alias = 'CERT_ATTR_' . $ii;
 
@@ -743,16 +743,20 @@ sub __search_cert {
             # add join statement
             push @{ $params{JOIN}->[0] }, 'IDENTIFIER';
 
+            my $key   = $attrib->{KEY};
+            my $value = $attrib->{VALUE};
+            my $operator = 'LIKE';
+            $operator = $attrib->{OPERATOR} if($attrib->{OPERATOR});
+
             # add search constraint
             $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_KEY' } =
-              { VALUE => $entry->[0] };
+              { VALUE => $key };
 
-            # sanitize wildcards (don't overdo it...)
-            my $val = $entry->[1];
-            $val =~ s/\*/%/g;
-            $val =~ s/%%+/%/g;
+            # sanitize wildcards (don't overdo it...)            
+            $value =~ s/\*/%/g;
+            $value =~ s/%%+/%/g;
             $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_VALUE' } =
-              { VALUE =>  $val, OPERATOR => 'LIKE' };
+                { VALUE =>  $value, OPERATOR => $operator };
             $ii++;
         }
     }

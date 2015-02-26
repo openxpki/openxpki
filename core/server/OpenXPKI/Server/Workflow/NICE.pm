@@ -211,13 +211,9 @@ sub __persistCertificateInformation {
     my @parsed_subject_alt_names = $x509->get_subject_alt_names();
     ##! 32: 'sans (parsed): ' . Dumper \@parsed_subject_alt_names
     foreach my $san (@parsed_subject_alt_names) {
-        my $serial = CTX('dbi_backend')->get_new_serial(
-            TABLE => 'CERTIFICATE_ATTRIBUTES',
-        );
         CTX('dbi_backend')->insert(
             TABLE => 'CERTIFICATE_ATTRIBUTES',
             HASH  => {
-                'ATTRIBUTE_SERIAL' => $serial,
                 'IDENTIFIER'       => $identifier,
                 'ATTRIBUTE_KEY'    => 'subject_alt_name',
                 'ATTRIBUTE_VALUE'  => $san->[0] . ':' . $san->[1],
@@ -227,11 +223,9 @@ sub __persistCertificateInformation {
 
     # if this originates from a workflow, register the workflow id in the attribute table
     if ($self->_get_workflow()) {
-        my $serial = CTX('dbi_backend')->get_new_serial( TABLE => 'CERTIFICATE_ATTRIBUTES' );
         CTX('dbi_backend')->insert(
             TABLE => 'CERTIFICATE_ATTRIBUTES',
             HASH => {
-                ATTRIBUTE_SERIAL => $serial,
                 IDENTIFIER => $identifier,
                 ATTRIBUTE_KEY => 'system_csr_workflow',
                 ATTRIBUTE_VALUE => $self->_get_workflow()->id
