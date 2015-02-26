@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 #
 # Written by Martin Bartosch for the OpenXPKI project 2006
 # Copyright (c) 2006-2011 by The OpenXPKI Project
