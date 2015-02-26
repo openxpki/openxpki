@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-02-12 15:01+0100\n"
+"PO-Revision-Date: 2015-02-26 11:34+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -4099,6 +4099,12 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "login failed"
 
+msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
+msgstr "This page shows a list of all workflows started by you."
+
+msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
+msgstr "My Workflows"
+
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
 
@@ -4241,18 +4247,6 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_DESC"
-msgstr ""
-"If you use this style, you will just have to enter the hostname and port of "
-"the server for which you want a certificate. This is the easiest way to "
-"obtain your certificate, use it if you have no specific requirement for "
-"which you would need the advanced style."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
-msgstr "TLS Server profile"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS Server profile"
 
@@ -4271,6 +4265,21 @@ msgstr "Username"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
 msgstr "Token online"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED"
+msgstr "Expired"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE"
+msgstr "offline"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_ONLINE"
+msgstr "online"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN"
+msgstr "unknown"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
+msgstr "upcoming"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
@@ -5600,7 +5609,23 @@ msgstr "continue"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Open Workflow"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+msgstr "Run State"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+msgstr "Run State"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
+msgstr "Run State"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+msgstr "Run State"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
 msgstr "Run State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
@@ -7134,9 +7159,6 @@ msgstr "Type"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
-msgstr "Wake Up"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Workflow information was updated"
 
@@ -8401,3 +8423,18 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 
 #~ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_TXT"
 #~ msgstr "Text (txt)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_DESC"
+#~ msgstr ""
+#~ "If you use this style, you will just have to enter the hostname and port "
+#~ "of the server for which you want a certificate. This is the easiest way "
+#~ "to obtain your certificate, use it if you have no specific requirement "
+#~ "for which you would need the advanced style."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
+#~ msgstr "TLS Server profile"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
+#~ msgstr "Wake Up"

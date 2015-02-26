@@ -4505,6 +4505,17 @@ msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Die Datei konnte nicht geöffnet werden"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+"oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "testuser"
 
@@ -4749,19 +4760,6 @@ msgstr ""
 "Diesdient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_DESC"
-msgstr ""
-"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
-"müssenSie nur den Hostnamen und den Port des Servers angeben, für den Sie "
-"dasZertifikat ausgestellt bekommen möchten. Nutzen Sie diese Art, wenn "
-"Siekeine spezifischen Anforderungen haben, die die Verwendung der "
-"erweitertenBenennungsart erfordern."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
-msgstr "TLS-Server"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS-Server"
 
@@ -4791,6 +4789,26 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED"
+msgstr "abgelaufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE"
+msgstr "Aktiv"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_ONLINE"
+msgstr "Nicht aktiv"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "Status"
 
 #, fuzzy
@@ -6423,7 +6441,23 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Letzte Aktualisierung"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
@@ -8000,10 +8034,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Letzte Aktualisierung"
 
@@ -9427,21 +9457,18 @@ msgstr "testuser"
 #~ msgstr "PKI Realm"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_EXPIRED"
-#~ msgstr "abgelaufen"
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_DESC"
+#~ msgstr ""
+#~ "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+#~ "müssenSie nur den Hostnamen und den Port des Servers angeben, für den Sie "
+#~ "dasZertifikat ausgestellt bekommen möchten. Nutzen Sie diese Art, wenn "
+#~ "Siekeine spezifischen Anforderungen haben, die die Verwendung der "
+#~ "erweitertenBenennungsart erfordern."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_OFFLINE"
-#~ msgstr "Aktiv"
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
+#~ msgstr "TLS-Server"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_ONLINE"
-#~ msgstr "Nicht aktiv"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN"
-#~ msgstr "Status"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UPCOMING"
-#~ msgstr "Status"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
+#~ msgstr "Untergeordnete Workflows"

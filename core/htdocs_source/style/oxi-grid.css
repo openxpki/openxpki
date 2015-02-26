@@ -20,15 +20,17 @@ tr.gridrow-offline:hover > td {background-color: #E7E7E7 !important;}
 tr.gridrow-upcoming > td {background-color:#d9edf7 !important;}
 tr.gridrow-upcoming:hover > td {background-color: #E7E7E7 !important;}
 
-/* workflow specific classes: success, failed, manual, paused */
-tr.gridrow-success > td {background-color: #dff0d8 !important;}
-tr.gridrow-success:hover > td {background-color: #c9e2b3 !important;}
+/* workflow specific classes: finished, exception, manual, pause, failed */
+tr.gridrow-finished > td {background-color: #e8f0e4!important;}
+tr.gridrow-finished:hover > td {background-color: #c9e2b3 !important;}
 tr.gridrow-failed > td {background-color: #ebcccc !important;}
 tr.gridrow-failed:hover > td {background-color: #e6c1c7 !important;}
-tr.gridrow-manual > td {color:silver;}
+tr.gridrow-manual > td { background-color: #ffff4c !important; }
 tr.gridrow-manual:hover > td {background-color: #E7E7E7 !important;}
-tr.gridrow-paused > td {background-color: #fbeed5 !important;}
-tr.gridrow-paused:hover > td {background-color: #faf2cc !important;}
+tr.gridrow-paused > td {background-color: silver !important;}
+tr.gridrow-paused:hover > td {background-color: #e7e7e7 !important;}
+tr.gridrow-exception > td {background-color: #ffc04d!important;}
+tr.gridrow-exception:hover > td {background-color: #ffe4b3!important;}
 
 
 /**general classes...*/

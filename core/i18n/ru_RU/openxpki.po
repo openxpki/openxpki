@@ -4570,6 +4570,14 @@ msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Процесс закончился с ошибкой"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Тестировщик"
 
@@ -4816,6 +4824,10 @@ msgstr ""
 "ссылку на источник информации. Например: www.openxpki.org/~testuser."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+msgstr "Профиль TLS сервера "
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
 msgstr "Профиль пользователя"
 
@@ -4841,6 +4853,26 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
+msgstr "Статус сертификата УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED"
+msgstr "С истекшим сроком действия"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE"
+msgstr "Действителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_ONLINE"
+msgstr "Недействителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN"
+msgstr "Статус сертификата УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "Статус сертификата УЦ"
 
 #, fuzzy
@@ -5728,6 +5760,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP"
 msgstr "Профиль пользователя"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_DESC"
 msgstr "TCP-порт, используемый с данным сертификатом"
 
@@ -5742,6 +5782,22 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_TOOLTIP"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_DESC"
+msgstr "Субъект"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_LABEL"
+msgstr "Субъект"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_DESC"
@@ -6448,7 +6504,23 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Последнее обновление"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -8082,10 +8154,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Последнее обновление"
 
@@ -9514,21 +9582,5 @@ msgstr "Тестировщик"
 #~ msgstr "Сертификаты"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_EXPIRED"
-#~ msgstr "С истекшим сроком действия"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_OFFLINE"
-#~ msgstr "Действителен"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_ONLINE"
-#~ msgstr "Недействителен"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UNKNOWN"
-#~ msgstr "Статус сертификата УЦ"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_TOKEN_STATUS_UPCOMING"
-#~ msgstr "Статус сертификата УЦ"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
+#~ msgstr "Дочерние технологические процессы"

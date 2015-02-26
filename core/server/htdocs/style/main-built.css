@@ -8636,13 +8636,13 @@ tr.gridrow-upcoming:hover > td {
   background-color: #E7E7E7 !important;
 }
 
-/* workflow specific classes: success, failed, manual, paused */
+/* workflow specific classes: finished, exception, manual, pause, failed */
 
-tr.gridrow-success > td {
-  background-color: #dff0d8 !important;
+tr.gridrow-finished > td {
+  background-color: #e8f0e4!important;
 }
 
-tr.gridrow-success:hover > td {
+tr.gridrow-finished:hover > td {
   background-color: #c9e2b3 !important;
 }
 
@@ -8655,7 +8655,8 @@ tr.gridrow-failed:hover > td {
 }
 
 tr.gridrow-manual > td {
-  color: silver;
+  background-color: #ffff4c !important;
+  color: orange;
 }
 
 tr.gridrow-manual:hover > td {
@@ -8663,11 +8664,19 @@ tr.gridrow-manual:hover > td {
 }
 
 tr.gridrow-paused > td {
-  background-color: #fbeed5 !important;
+  background-color: silver !important;
 }
 
 tr.gridrow-paused:hover > td {
-  background-color: #faf2cc !important;
+  background-color: #e7e7e7 !important;
+}
+
+tr.gridrow-exception > td {
+  background-color: #ffc04d!important;
+}
+
+tr.gridrow-exception:hover > td {
+  background-color: #ffe4b3!important;
 }
 
 /**general classes...*/

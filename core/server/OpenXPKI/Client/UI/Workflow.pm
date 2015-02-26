@@ -283,21 +283,9 @@ sub init_result {
         label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE'),
         description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION'),
     });
-
-    my $i = 1;
-    my @result;
-    foreach my $item (@{$search_result}) {
-        push @result, [
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
-            $item->{'WORKFLOW.WORKFLOW_WAKEUP_AT'},
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-        ];
-    }
-
+    
+    my @result = $self->__render_result_list( $search_result ); 
+        
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
     $self->add_section({
@@ -317,9 +305,8 @@ sub init_result {
                 { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL') },
                 { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL') },
                 { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL'), format => 'timestamp' },
                 { sTitle => 'serial', bVisible => 0 },
+                { sTitle => "_className"},
             ],
             data => \@result,
             pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1), 
@@ -332,11 +319,9 @@ sub init_result {
         }
     });
     
-
     return $self;
 
 }
-
 
 
 sub init_history {
@@ -403,6 +388,74 @@ sub init_history {
 
 }
 
+
+sub init_mine {
+    
+    my $self = shift;
+    my $args = shift;
+            
+    my $limit = sprintf('%01d', $self->param('limit'));
+    my $startat = sprintf('%01d', $self->param('startat')); 
+    
+    # Safety rule
+    if (!$limit) { $limit = 50; }
+    elsif ($limit > 500) {  $limit = 500; }
+
+    my $query = {
+        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name} }],
+        LIMIT => $limit,
+        START => $startat
+    };
+
+    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    
+    # if size of result is equal to limit, check for full result count
+    my $result_count = scalar @{$search_result};     
+    if ($result_count == $limit) {
+        $result_count = $self->send_command( 'search_workflow_instances_count', $query );        
+    } 
+    
+    $self->logger()->trace( "search result: " . Dumper $search_result);
+
+    $self->_page({
+        label => i18nGettext('I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE'),
+        description => i18nGettext('I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION'),
+    });
+
+    my $i = 1;
+    my @result = $self->__render_result_list( $search_result ); 
+        
+    $self->logger()->trace( "dumper result: " . Dumper @result);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'workflow',
+        processing_type => 'all',
+        content => {
+            header => 'Grid-Headline',
+            actions => [{
+                path => 'workflow!load!wf_id!{serial}!view!result',
+                label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'),
+                icon => 'view',
+                target => 'tab',
+            }],
+            columns => [
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL') },
+                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL') },
+                { sTitle => 'serial', bVisible => 0 },
+                { sTitle => "_className"},                
+            ],
+            data => \@result,
+            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result_count*1), 
+                pagesizes => [25,50,100,250,500], pagersize => 20 }                       
+        }
+    });
+
+    return $self;
+    
+}
 
 =head2 action_index
 
@@ -947,7 +1000,7 @@ sub __render_from_workflow {
         foreach my $field (@fields_to_render) {
         
             my $key = $field->{name};            
-            my $item = { value => $context->{$key} };
+            my $item = { value => $context->{$key}, type => '' };
         
             # Always suppress key material
             if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
@@ -1195,6 +1248,62 @@ sub __delegate_call {
     return $self;
 
 }
+
+
+=head2 __render_result_list
+
+Helper to render the output result list from a sql query result.
+adds exception/paused label to the state column and status class based on
+proc and wf state. 
+
+=cut
+sub __render_result_list {
+
+    my $self = shift;
+    my $search_result = shift;
+
+    $self->logger()->debug("search result " . Dumper $search_result);
+
+    my @result;
+    foreach my $item (@{$search_result}) {
+        
+        # Build state info from watchdog state and process state
+        my $state = $item->{'WORKFLOW.WORKFLOW_STATE'}; # TODO - translate
+                
+        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION
+        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED
+        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL
+        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE
+        if ($item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'exception') {
+            
+            $state .= " (" . i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION') . ")";
+            
+        } elsif ($item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'pause') {
+           
+           $state .= " (".i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION') .")";
+                  
+        }
+        
+        my $status = $item->{'WORKFLOW.WORKFLOW_PROC_STATE'};        
+        # special color for workflows in final failure
+        if ($status eq 'finished' && $item->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE') {
+            $status  = 'failure';
+        }
+        
+        push @result, [
+            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
+            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}), # todo - translate
+            $state,            
+            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
+            $status,
+        ];
+    }
+    
+    return @result;
+    
+}
+
 
 =head1 example workflow config
 

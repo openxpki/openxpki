@@ -6,10 +6,10 @@ main:
     label: Home
     entries: 
       - key:    home!index
-        label: Home
+        label:  Home
       - key:    home!task
         label:  My Tasks
-      - key:    home!workflow
+      - key:    workflow!mine
         label:  My Workflows
       - key:    certificate!mine
         label:  My Certificates

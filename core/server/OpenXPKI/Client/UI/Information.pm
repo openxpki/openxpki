@@ -64,6 +64,13 @@ sub init_issuer {
         ];
     }
 
+    # I18 Tags for scanner        
+    # I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED
+    # I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING
+    # I18N_OPENXPKI_UI_TOKEN_STATUS_ONLINE
+    # I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE 
+    # I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN
+
     $self->add_section({
         type => 'grid',
         processing_type => 'all',
