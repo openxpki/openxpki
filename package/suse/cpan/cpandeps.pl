@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 #
 # cpandeps.pl - Create include files for makefiles to set CPAN dependencies
 #
