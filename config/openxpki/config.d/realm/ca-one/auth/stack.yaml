@@ -10,9 +10,9 @@ Operator:
     description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_OPERATOR
     handler: Operator Password
 
-External Dynamic:
-    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC
-    handler: External Dynamic Role
+#External Dynamic:
+#    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC
+#    handler: External Dynamic Role
 
 #External Static:
 #    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_STATIC
