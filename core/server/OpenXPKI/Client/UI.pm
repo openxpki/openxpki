@@ -307,13 +307,21 @@ sub handle_login {
             $status = $reply->{SERVICE_MSG};
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
-            my $i=0;
+            
             # List stacks and hide those starting with an underscore
             my @stack_list = map {
                 ($stacks->{$_}->{NAME} !~ /^_/) ? ($_ = {'value' => $stacks->{$_}->{NAME}, 'label' => i18nGettext($stacks->{$_}->{LABEL})} ) : ()
-            }  keys %{$stacks} ;
-            $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
-            return $result->init_auth_stack( \@stack_list )->render();
+            } keys %{$stacks};
+              
+            # Directly load stack if there is only one
+            if (scalar @stack_list == 1)  {
+                $self->logger()->trace("Only one stacks avail - autoselect: " . Dumper $stacks );
+                $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $stack_list[0]->{value} } );
+                $status = $reply->{SERVICE_MSG};
+            } else {            
+                $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
+                return $result->init_auth_stack( \@stack_list )->render();
+            }
         }
     }
 
