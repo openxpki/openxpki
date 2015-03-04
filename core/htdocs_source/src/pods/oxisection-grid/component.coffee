@@ -2,7 +2,17 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 
 Component = Em.Component.extend
-    pagesizes: Em.computed.alias "content.content.pager.pagesizes"
+    pagesizes: Em.computed "content.content.pager.pagesizes", ->
+        pagesizes = @get "content.content.pager.pagesizes"
+        pager = @get "content.content.pager"
+        greater = pagesizes.filter (pagesize) -> pagesize >= pager.count
+        limit = Math.min.apply null, greater
+        pagesizes
+        .filter (pagesize) ->
+            pagesize <= limit
+        .map (pagesize) ->
+            num: pagesize
+            active: pagesize is pager.limit
 
     limit: Em.computed ->
         @get "content.content.pager.limit"
@@ -154,6 +164,13 @@ Component = Em.Component.extend
             event.preventDefault()
 
     actions:
+        changePagesize: (pagesize) ->
+            startat = @get "content.content.pager.startat"
+            @container.lookup("route:openxpki").transitionTo
+                queryParams:
+                    limit: pagesize.num
+                    startat: startat
+
         changeStartat: (page) ->
             return if page.disabled or page.active
             limit = @get "limit"
