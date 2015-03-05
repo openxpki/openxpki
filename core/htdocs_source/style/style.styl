@@ -61,6 +61,10 @@ input.oxi-file-input:active::before
 .input-group .twitter-typeahead
     display: table-cell !important;
 
+.oxi-no-input
+    padding-top 6px
+
+
 button.btn-loading
     color: #fff;
     background-color: #428bca;
@@ -99,7 +103,7 @@ div.loading
         transition opacity 0.1s
 
     div.progress
-        position absolute
+        position fixed
         top 30px
         right 20px
         width 100px
@@ -124,3 +128,8 @@ div.oxisection-grid
     th
         cursor pointer
         -webkit-user-select none
+
+span.pagination-label
+    float left
+    padding 6px 0
+

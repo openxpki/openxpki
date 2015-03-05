@@ -36,7 +36,8 @@ Component = Em.Component.extend
 
     click: (evt) ->
         if evt.target.tagName is "BUTTON"
-            $(evt.target).addClass "btn-loading"
+            if not $(evt.target).hasClass "oxi-button-ignore"
+                $(evt.target).addClass "btn-loading"
 
     actions:
         addClone: (field) ->

@@ -1,44 +1,37 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
-    initializeValue: Em.on "init", ->
+    options: Em.computed "content.{options,prompt,is_optional}", ->
         prompt = @get "content.prompt"
-        if prompt
-            options = @get "content.options"
-            if prompt isnt options[0].label
-                options.unshift
-                    label: prompt
-                    value: ""
+        prompt = "" if not prompt and @get "content.is_optional"
+        options = @get "content.options"
+
+        if typeof prompt is "string" and prompt isnt options[0]?.label
+            [ label: prompt, value: "" ].concat options
         else
-            options = @get "content.options"
-            if @get "content.is_optional"
-                if options[0]?.label isnt "" and not @get "content.editable"
-                    options.unshift
-                        label: ""
-                        value: ""
+            options
 
-    initializeTypeahead: Em.on "didInsertElement", ->
-        @$().find(".typeahead").typeahead
-            source: @get("content.options").map (o) -> o.label
+    isStatic: Em.computed "content.{options,editable,is_optional}", ->
+        options = @get "content.options"
+        isEditable = @get "editable"
+        isOptional = @get "is_optional"
 
-    label: ""
-    updateValue: Em.observer "label", ->
-        label = @get "label"
-        values = (i.value for i in @get("content.options") when i.label is label)
-        if values.length is 1
-            @set "content.value", values[0]
-        else
-            @set "content.value", label
+        options.length is 1 and not isEditable and not isOptional
 
-    sanitizeValue: Em.observer "content.options", ->
-        options = (o.value for o in @get "content.options")
+    isCustom: Em.computed "options", "content.value", ->
+        values = (o.value for o in @get "options")
         value = @get "content.value"
-        if value not in options
-            @set "content.value", options[0]
+        value = "" if value is null
+        value not in values
 
-    editing: true
+    customize: Em.computed "isCustom", -> @get "isCustom"
+
     actions:
-        toggleEdit: ->
-            @toggleProperty "editing"
+        customize: ->
+            @toggleProperty "customize"
+            if not @get "customize"
+                if @get "isCustom"
+                    @set "content.value", @get("options")[0].value
+            Em.run.next => @$("input,select")[0].focus()
 
 `export default Component`
