@@ -3,7 +3,7 @@
 
 TOPDIR=../../..
 
-PERL_VERSION=5.20.1
+PERL_VERSION=5.20.2
 MYPERL_RELEASE=1
 
 PACKAGE=myperl-buildtools
