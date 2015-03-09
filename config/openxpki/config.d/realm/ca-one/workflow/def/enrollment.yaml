@@ -144,7 +144,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CHECK_RENEWAL_ELIGIBILITY_DESC
         action:
           - global_noop > APPROVAL ? ca_policy_approval
-          - global_noop2 > POLICY_PENDING ?  !ca_policy_approval
+          - global_noop2 > PENDING_POLICY ?  !ca_policy_approval
 
     CHECK_RENEWAL_TYPE:
         autorun: 1
@@ -173,7 +173,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CONTINUE_INITIAL_ENROLL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CONTINUE_INITIAL_ENROLL_DESC
         action:
-          - global_noop > POLICY_PENDING ?  !num_active_certs_less_than_max_active_certs
+          - global_noop > PENDING_POLICY ?  !num_active_certs_less_than_max_active_certs
           - global_noop2 > APPROVAL ? num_active_certs_less_than_max_active_certs
 
     ELIGIBLE_FOR_INITIAL_ENROLL:
@@ -274,9 +274,9 @@ state:
           - global_noop > FINISHED_PERSIST ?  !signed_renewal
           - load_recent_certificate > FINISHED_PERSIST ? signed_renewal
 
-    POLICY_PENDING:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_POLICY_PENDING_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_POLICY_PENDING_DESC
+    PENDING_POLICY:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC
         action:
           - fail > FAILURE
           - allow_retry > FAILURE
