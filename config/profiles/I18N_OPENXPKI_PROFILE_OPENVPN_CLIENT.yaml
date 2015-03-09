@@ -18,7 +18,7 @@ style:
                 - comment
 
          subject: 
-            dn: CN=[% email %],DC=VPN,DC=Test Deployment,DC=OpenXPKI,DC=org
+            dn: CN=[% email.lower %],DC=VPN,DC=Test Deployment,DC=OpenXPKI,DC=org
 
     10_server_style:
         label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE
@@ -34,7 +34,7 @@ style:
                 - comment
 
          subject: 
-            dn: CN=[% hostname %],DC=VPN,DC=Test Deployment,DC=OpenXPKI,DC=org
+            dn: CN=[% hostname.lower %],DC=VPN,DC=Test Deployment,DC=OpenXPKI,DC=org
 
 
 # Profile extensions - set 0/1 as needed
