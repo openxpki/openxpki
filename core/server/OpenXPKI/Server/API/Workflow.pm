@@ -598,6 +598,10 @@ sub create_workflow_instance {
     $context->param( 'creator'  => $creator );
     $context->param( 'creator_role'  => CTX('session')->get_role() );
 
+    # This is crucial and must be done before the first execute as otherwise 
+    # workflow acl fails when the first non-initial action is autorun
+    $workflow->attrib({ creator => $creator });
+
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->log(
         MESSAGE  => "Workflow instance $wf_id created for $creator (type: '$wf_title')",
