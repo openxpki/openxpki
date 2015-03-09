@@ -227,7 +227,7 @@ sub __persistCertificateInformation {
             TABLE => 'CERTIFICATE_ATTRIBUTES',
             HASH => {
                 IDENTIFIER => $identifier,
-                ATTRIBUTE_KEY => 'system_csr_workflow',
+                ATTRIBUTE_KEY => 'system_workflow_csr',
                 ATTRIBUTE_VALUE => $self->_get_workflow()->id
             }
         );

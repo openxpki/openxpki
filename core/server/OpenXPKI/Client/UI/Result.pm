@@ -509,8 +509,7 @@ sub __persist_response {
 
     $self->_client->session()->param('response_'.$id, $data );
 
-    # Had problems with params expiring to early, needs to be checked
-    #$self->_client->session()->expire('response_'.$id, $expire) if ($expire) ;
+    $self->_client->session()->expire('response_'.$id, $expire) if ($expire);
 
     return  "result!fetch!id!$id";
 

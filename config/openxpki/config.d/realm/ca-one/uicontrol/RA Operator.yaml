@@ -54,4 +54,30 @@ main:
   - key:   workflow!search
     label: Workflows
 
+tasklist:
+  - label: Pending Requests
+    description: Requests awaiting approval
+    query:
+      TYPE:
+        - certificate_signing_request_v2
+      STATE:
+        - ONHOLD
+        - PENDING
 
+  - label: Pending Enrollments
+    description: Enrollment requests requiring attention
+    query:
+      TYPE:
+        - enrollment
+      STATE:
+        - PENDING_APPROVAL
+        - PENDING_MANUAL_AUTHENTICATION
+        - PENDING_POLICY
+
+  - label: Pending Revocations
+    description: Revocations awaiting approval
+    query:
+      TYPE:
+        - certificate_revocation_request_v2
+      STATE:
+        - PENDING

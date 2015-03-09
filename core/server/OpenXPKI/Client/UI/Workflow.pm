@@ -221,7 +221,7 @@ sub init_search {
                       label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL'), #'State',
                       type => 'select',
                       is_optional => 1,
-                      editable => 0,
+                      editable => 1,
                       prompt => '',
                       options => \@states,
                       value => $preset->{wf_state}
@@ -314,7 +314,7 @@ sub init_result {
             buttons => [
                 { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
                 { label => 'new search', page => 'workflow!search'},
-                { label => 'bulk edit', action => 'workflow!bulk', select => 'serial' }, # Draft for Bulk Edit
+                #{ label => 'bulk edit', action => 'workflow!bulk', select => 'serial' }, # Draft for Bulk Edit
             ]            
         }
     });
@@ -707,23 +707,7 @@ sub action_select {
             ACTIVITY => $wf_action,
             UIINFO => 1
         });
-
-        # in case we need access to volatile context values we store them away
-        # and merge them back later - this can be removed after refactoring the API
-        #my $org_context = $wf_info->{WORKFLOW}->{CONTEXT};
-
-        # TODO - change API
-        #$wf_info = $self->send_command( 'get_workflow_ui_info', {
-        #    ID => $wf_id
-        #});
-
-        # Merge back the private context values
-        #foreach my $key (keys %{$org_context}) {
-        #    if ($key =~ /^_/) {
-        #        $wf_info->{WORKFLOW}->{CONTEXT}->{$key} = $org_context->{$key};
-        #    }
-        #}
-
+ 
         my @activity = keys %{$wf_info->{ACTIVITY}};
         if (scalar @activity == 1) {
             $args->{WF_ACTION} = $activity[0];
@@ -763,10 +747,9 @@ sub action_search {
         }
     }
 
-    # creator via context (urgh... - needs change)
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
-        $query->{CONTEXT} = [{ KEY => 'creator', VALUE => ~~ $self->param('wf_creator') }];
+        $query->{ATTRIBUTE} = [{ KEY => 'creator', VALUE => ~~ $self->param('wf_creator') }];                         
     }
 
     $self->logger()->debug("query : " . Dumper $query);
@@ -901,7 +884,7 @@ sub __render_from_workflow {
         $self->logger()->debug('activity info ' . Dumper $wf_action_info );
 
         # we allow prefill of the form if the workflow is started
-        my $do_prefill = !defined $wf_info->{WORKFLOW}->{STATE};
+        my $do_prefill = $wf_info->{WORKFLOW}->{STATE} == 'INITIAL';
 
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
         my @fields;

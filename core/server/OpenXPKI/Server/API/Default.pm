@@ -134,6 +134,8 @@ sub get_cert_identifier {
     return $identifier;
 }
 
+
+# MASON - can be removed 
 sub get_workflow_ids_for_cert {
     my $self    = shift;
     my $arg_ref = shift;
@@ -157,7 +159,7 @@ sub get_workflow_ids_for_cert {
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
         DYNAMIC => {
             'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_csr_workflow',
+            ATTRIBUTE_KEY => 'system_workflow_csr',
         },
     );
     my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
@@ -174,7 +176,7 @@ sub get_workflow_ids_for_cert {
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
         DYNAMIC => {
             'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_crr_workflow',
+            ATTRIBUTE_KEY => 'system_workflow_crr',
         },
     );
     foreach my $line (@{$workflow_id_result}) {

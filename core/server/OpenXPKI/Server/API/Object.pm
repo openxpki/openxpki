@@ -210,6 +210,8 @@ following values:
 
 =item * HASH - the default value
 
+=item * DBINFO - information from the certificate and attributes table
+
 =back
 
 =cut
@@ -236,6 +238,37 @@ sub get_cert {
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
             params => { 'IDENTIFIER' => $identifier, },
         );
+    }
+    
+    if ( $format eq 'DBINFO' ) {        
+        delete $hash->{DATA};
+        my $res_attrib = CTX('dbi_backend')->select(
+            TABLE   => 'CERTIFICATE_ATTRIBUTES',
+            DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
+        );  
+        
+        # Hex Serial
+        my $serial = Math::BigInt->new( $hash->{CERTIFICATE_SERIAL} );
+        $hash->{CERTIFICATE_SERIAL_HEX} = $serial->as_hex();
+        $hash->{CERTIFICATE_SERIAL_HEX} =~ s{\A 0x}{}xms;
+        
+        # Expired Status   
+        if ($hash->{STATUS} eq 'ISSUED' && $hash->{NOTAFTER} < time()) {
+            $hash->{STATUS} = 'EXPIRED';
+        }
+        
+        my $attrib;
+        foreach my $item (@$res_attrib ) {
+            my $key = $item->{ATTRIBUTE_KEY};
+            my $val = $item->{ATTRIBUTE_VALUE};
+            if (!defined($attrib->{$key})) {
+                $attrib->{$key} = [];
+            }
+            push @{$attrib->{$key}}, $val;                       
+        }
+        
+        $hash->{CERT_ATTRIBUTES} = $attrib;
+        return $hash;
     }
 
     my $token = CTX('api')->get_default_token();
@@ -841,7 +874,7 @@ sub __get_private_key_from_db {
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
         DYNAMIC => {
             'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_csr_workflow',
+            ATTRIBUTE_KEY => 'system_workflow_csr',
         },
     );
 

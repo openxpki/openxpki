@@ -4316,8 +4316,32 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
+msgstr "Отозван"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
+msgstr "Отозван"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
+msgstr "Пауза"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
 msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
+msgstr "Статус"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_RELATED_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_"
@@ -4822,10 +4846,6 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr ""
 "Параметр URI (Uniform Resource Identifier) представляет собой адрес или "
 "ссылку на источник информации. Например: www.openxpki.org/~testuser."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
-msgstr "Профиль TLS сервера "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
@@ -7302,356 +7322,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_DESC"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_LABEL"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_DESC"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_LABEL"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_DESC"
-msgstr "Утвердить заявку на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_LABEL"
-msgstr "Утвердить заявку на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_DESC"
-msgstr "Список отзыва выдан"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_LABEL"
-msgstr "Список отзыва выдан"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_DESC"
-msgstr "Профиль пользователя общего назначения"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_LABEL"
-msgstr "Профиль пользователя общего назначения"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_DESC"
-msgstr "Отозвать сертификат"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_LABEL"
-msgstr "Отозвать сертификат"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_DESC"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_LABEL"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_DESC"
-msgstr "Изменить дополнительную информацию"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_LABEL"
-msgstr "Изменить дополнительную информацию"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_DESC"
-msgstr "Проверка существования DN в LDAP-дереве"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_LABEL"
-msgstr "Проверка существования DN в LDAP-дереве"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_DESC"
-msgstr "Идет запуск... "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_LABEL"
-msgstr "Идет запуск... "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_DESC"
-msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_LABEL"
-msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_DESC"
-msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_LABEL"
-msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_LABEL"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_DESC"
-msgstr "Идет запуск... "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_LABEL"
-msgstr "Идет запуск... "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_DESC"
-msgstr "Идет запуск... "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL"
-msgstr "Идет запуск... "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_DESC"
-msgstr "Технологические процессы отзыва сертификатов"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_LABEL"
-msgstr "Технологические процессы отзыва сертификатов"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_DESC"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_LABEL"
-msgstr "Отменить утверждение заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_DESC"
-msgstr "Стандартный способ аутентификации пользователя системы."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_LABEL"
-msgstr "Стандартный способ аутентификации пользователя системы."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_LABEL"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_DESC"
-msgstr "Изменить причину отзыва сертификата"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_LABEL"
-msgstr "Изменить причину отзыва сертификата"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_DESC"
-msgstr "Экспорт заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_LABEL"
-msgstr "Экспорт заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_DESC"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"
 msgstr "Прием заявок на сертификаты по протоколу SCEP"
 
@@ -7938,6 +7608,14 @@ msgstr "Стандартный способ аутентификации пол�
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL"
 msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC"
+msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL"
+msgstr "Отменить утверждение заявки на сертификат (CSR)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PERSISTENCE_DESC"
@@ -9302,10 +8980,6 @@ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT"
 msgstr "Прием заявок на сертификаты по протоколу SCEP"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
-msgstr "Прием заявок на сертификаты по протоколу SCEP"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -9582,5 +9256,363 @@ msgstr "Тестировщик"
 #~ msgstr "Сертификаты"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+#~ msgstr "Профиль TLS сервера "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_DESC"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_LABEL"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_DESC"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_LABEL"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_DESC"
+#~ msgstr "Утвердить заявку на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_LABEL"
+#~ msgstr "Утвердить заявку на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_DESC"
+#~ msgstr "Список отзыва выдан"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_LABEL"
+#~ msgstr "Список отзыва выдан"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_DESC"
+#~ msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_LABEL"
+#~ msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_DESC"
+#~ msgstr "Отозвать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_LABEL"
+#~ msgstr "Отозвать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_DESC"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_LABEL"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_DESC"
+#~ msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_LABEL"
+#~ msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_DESC"
+#~ msgstr "Проверка существования DN в LDAP-дереве"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_LABEL"
+#~ msgstr "Проверка существования DN в LDAP-дереве"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_DESC"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_LABEL"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_DESC"
+#~ msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_LABEL"
+#~ msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_DESC"
+#~ msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_LABEL"
+#~ msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_LABEL"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_DESC"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_LABEL"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_DESC"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_DESC"
+#~ msgstr "Технологические процессы отзыва сертификатов"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_LABEL"
+#~ msgstr "Технологические процессы отзыва сертификатов"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_DESC"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_LABEL"
+#~ msgstr "Отменить утверждение заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_DESC"
+#~ msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_LABEL"
+#~ msgstr "Стандартный способ аутентификации пользователя системы."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_LABEL"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_DESC"
+#~ msgstr "Изменить причину отзыва сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_LABEL"
+#~ msgstr "Изменить причину отзыва сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_DESC"
+#~ msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_LABEL"
+#~ msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_DESC"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
 #~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
+#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"

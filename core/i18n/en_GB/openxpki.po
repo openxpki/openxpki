@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-02-26 11:34+0100\n"
+"PO-Revision-Date: 2015-03-06 08:20+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -3912,8 +3912,26 @@ msgstr "not before"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"
 
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
+msgstr "Action"
+
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
+msgstr "Renew"
+
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
+msgstr "Revoke"
+
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
+msgstr "Update Metadata"
+
 msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
 msgstr "Certificate ID"
+
+msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
+msgstr "Show related workflows"
+
+msgid "I18N_OPENXPKI_UI_CERT_RELATED_LABEL"
+msgstr "Relations"
 
 # Remove?
 #, fuzzy
@@ -4245,10 +4263,6 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
-msgstr "TLS Server profile"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
 msgstr "User ID"
@@ -6323,350 +6337,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL"
 msgstr "Updated"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
-msgstr "After revoke queue"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_LABEL"
-msgstr "After revoke queue"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_DESC"
-msgstr "Approvals calculated"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_LABEL"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_DESC"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_LABEL"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_DESC"
-msgstr "Approved"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_LABEL"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_DESC"
-msgstr "Request authenticated"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_LABEL"
-msgstr "Request authenticated"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_LABEL"
-msgstr "Action"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_DESC"
-msgstr "Enrollment authentication missing"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_LABEL"
-msgstr "Enrollment authentication missing"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_DESC"
-msgstr "Auto-revoke existing certs"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_LABEL"
-msgstr "Auto-revoke existing certs"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_DESC"
-msgstr "CA key not usable"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_DESC"
-msgstr "CA policy approval"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_LABEL"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_LABEL"
-msgstr "SUCCESS"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_DESC"
-msgstr "Certificate metadata persisted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_LABEL"
-msgstr "Certificate metadata persisted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_LABEL"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_DESC"
-msgstr "Check for challenge password"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_LABEL"
-msgstr "Check for challenge password"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_DESC"
-msgstr "Check for valid request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_LABEL"
-msgstr "Check for valid request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_DESC"
-msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_INITIAL_ENROLL_AUTHEN"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_LABEL"
-msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_INITIAL_ENROLL_AUTHEN"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_DESC"
-msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_RENEWAL_ELIGIBILITY"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_LABEL"
-msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_RENEWAL_ELIGIBILITY"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_DESC"
-msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_RENEWAL_TYPE"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_LABEL"
-msgstr "Type"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_LABEL"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_DESC"
-msgstr "Continue initial enroll"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_LABEL"
-msgstr "Continue initial enroll"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_DESC"
-msgstr "Eligible for initial enroll"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL"
-msgstr "Eligible for initial enroll"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_DESC"
-msgstr "Eval eligibility"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_DESC"
-msgstr "Eval signer trust"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_LABEL"
-msgstr "FAILURE"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_DESC"
-msgstr "Enrollment finished persist"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_DESC"
-msgstr "Have certificate to revoke"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_LABEL"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_DESC"
-msgstr "Have valid request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_LABEL"
-msgstr "Have valid request"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC"
-msgstr "Notified certificate issuer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_LABEL"
-msgstr "Notified certificate issuer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_DESC"
-msgstr "PENDING"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_LABEL"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_DESC"
-msgstr "Manual authentication pending"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_LABEL"
-msgstr "Manual authentication pending"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_DESC"
-msgstr "PENDING"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_LABEL"
-msgstr "PENDING"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_DESC"
-msgstr "Queued for revocation"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_LABEL"
-msgstr "Queued for revocation"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_DESC"
-msgstr "Export ready to process"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_LABEL"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
-msgstr "SUCCESS"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"
 msgstr "After revoke queue"
 
@@ -6953,6 +6623,14 @@ msgstr "Manual authentication pending"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL"
 msgstr "Manual authentication pending"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC"
+msgstr "Approval pending"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL"
+msgstr "Approval pending"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PERSISTENCE_DESC"
@@ -8168,10 +7846,6 @@ msgstr "I18N_OPENXPKI_WF_TYPE_CYCLE_TOP"
 msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT"
 msgstr "Workflow: Enrollnment"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
-msgstr "Workflow: Enrollnment"
-
 msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
 msgstr "Workflow: Password safe"
 
@@ -8436,5 +8110,357 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
 #~ msgstr "TLS Server profile"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+#~ msgstr "TLS Server profile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
+#~ msgstr "After revoke queue"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_LABEL"
+#~ msgstr "After revoke queue"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_DESC"
+#~ msgstr "Approvals calculated"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_LABEL"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_DESC"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_LABEL"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_DESC"
+#~ msgstr "Approved"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_LABEL"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_DESC"
+#~ msgstr "Request authenticated"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_LABEL"
+#~ msgstr "Request authenticated"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_LABEL"
+#~ msgstr "Action"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_DESC"
+#~ msgstr "Enrollment authentication missing"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_LABEL"
+#~ msgstr "Enrollment authentication missing"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_DESC"
+#~ msgstr "Auto-revoke existing certs"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_LABEL"
+#~ msgstr "Auto-revoke existing certs"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_DESC"
+#~ msgstr "CA key not usable"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_DESC"
+#~ msgstr "CA policy approval"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_LABEL"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_LABEL"
+#~ msgstr "SUCCESS"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_DESC"
+#~ msgstr "Certificate metadata persisted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_LABEL"
+#~ msgstr "Certificate metadata persisted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_LABEL"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_DESC"
+#~ msgstr "Check for challenge password"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_LABEL"
+#~ msgstr "Check for challenge password"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_DESC"
+#~ msgstr "Check for valid request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_LABEL"
+#~ msgstr "Check for valid request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_DESC"
+#~ msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_INITIAL_ENROLL_AUTHEN"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_LABEL"
+#~ msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_INITIAL_ENROLL_AUTHEN"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_DESC"
+#~ msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_RENEWAL_ELIGIBILITY"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_LABEL"
+#~ msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_RENEWAL_ELIGIBILITY"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_DESC"
+#~ msgstr "I18N_OPENXPKI_WF_STATE_ENROLLMENT_CHECK_RENEWAL_TYPE"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_LABEL"
+#~ msgstr "Type"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_LABEL"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_DESC"
+#~ msgstr "Continue initial enroll"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_LABEL"
+#~ msgstr "Continue initial enroll"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_DESC"
+#~ msgstr "Eligible for initial enroll"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL"
+#~ msgstr "Eligible for initial enroll"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_DESC"
+#~ msgstr "Eval eligibility"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_DESC"
+#~ msgstr "Eval signer trust"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_LABEL"
+#~ msgstr "FAILURE"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_DESC"
+#~ msgstr "Enrollment finished persist"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_DESC"
+#~ msgstr "Have certificate to revoke"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_LABEL"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_DESC"
+#~ msgstr "Have valid request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_LABEL"
+#~ msgstr "Have valid request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC"
+#~ msgstr "Notified certificate issuer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_LABEL"
+#~ msgstr "Notified certificate issuer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_DESC"
+#~ msgstr "PENDING"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_LABEL"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_DESC"
+#~ msgstr "Manual authentication pending"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_LABEL"
+#~ msgstr "Manual authentication pending"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_DESC"
+#~ msgstr "PENDING"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_LABEL"
+#~ msgstr "PENDING"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_DESC"
+#~ msgstr "Queued for revocation"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_LABEL"
+#~ msgstr "Queued for revocation"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_DESC"
+#~ msgstr "Export ready to process"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_LABEL"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_DESC"
+#~ msgstr "This workflow is paused and will be continued by the watchdog"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
+#~ msgstr "SUCCESS"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
 #~ msgstr "Wake Up"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
+#~ msgstr "Workflow: Enrollnment"

@@ -4253,8 +4253,32 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Erstellen von CRLs"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
+msgstr "widerrufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
+msgstr "widerrufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
+msgstr "Warten"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
 msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_RELATED_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_"
@@ -4758,10 +4782,6 @@ msgstr ""
 "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
 "oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
 "Diesdient der sichern Identifikation von Personen oder Objekten."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
-msgstr "TLS-Server"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
@@ -7190,352 +7210,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_DESC"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_LABEL"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_DESC"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_LABEL"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_DESC"
-msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_LABEL"
-msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_DESC"
-msgstr "CRL erstellt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_LABEL"
-msgstr "CRL erstellt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_LABEL"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_DESC"
-msgstr "Einfache Benennungsart"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_LABEL"
-msgstr "Einfache Benennungsart"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_DESC"
-msgstr "Warten"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_LABEL"
-msgstr "Warten"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_LABEL"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_DESC"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_LABEL"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_LABEL"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_DESC"
-msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_LABEL"
-msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_DESC"
-msgstr "Checking if DN exists in LDAP tree"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_LABEL"
-msgstr "Checking if DN exists in LDAP tree"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_DESC"
-msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_LABEL"
-msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_DESC"
-msgstr "Zertifikatserstellung vorbereitet"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_LABEL"
-msgstr "Zertifikatserstellung vorbereitet"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_DESC"
-msgstr "Zertifikatserstellung vorbereitet"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_LABEL"
-msgstr "Zertifikatserstellung vorbereitet"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_LABEL"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_DESC"
-msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_LABEL"
-msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_DESC"
-msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL"
-msgstr "Start der CRL-Erstellung"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_DESC"
-msgstr ""
-"Dieser Workflow bearbeitet einen Antrag auf Widerrufung eines Zertifikats."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_LABEL"
-msgstr ""
-"Dieser Workflow bearbeitet einen Antrag auf Widerrufung eines Zertifikats."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_DESC"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_LABEL"
-msgstr "Löschen der Genehmigung(en)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_DESC"
-msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_LABEL"
-msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_LABEL"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_LABEL"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_DESC"
-msgstr "Ändern der Rolle"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_LABEL"
-msgstr "Ändern der Rolle"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_DESC"
-msgstr "Exportieren des Zertifzierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_LABEL"
-msgstr "Exportieren des Zertifzierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_DESC"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_LABEL"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"
 msgstr "SCEP-Zertifizierungsantrag"
 
@@ -7824,6 +7498,14 @@ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL"
 msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC"
+msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL"
+msgstr "Löschen der Genehmigung(en)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PERSISTENCE_DESC"
@@ -9186,10 +8868,6 @@ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT"
 msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE"
 msgstr "Erstellen von CRLs"
 
@@ -9470,5 +9148,359 @@ msgstr "testuser"
 #~ msgstr "TLS-Server"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+#~ msgstr "TLS-Server"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_DESC"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVALS_CALCULATED_LABEL"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_DESC"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVAL_LABEL"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_DESC"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_APPROVED_LABEL"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_DESC"
+#~ msgstr "CRL erstellt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATED_REQUEST_LABEL"
+#~ msgstr "CRL erstellt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_LABEL"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_DESC"
+#~ msgstr "Einfache Benennungsart"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTHENTICATION_MISSING_LABEL"
+#~ msgstr "Einfache Benennungsart"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_DESC"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AUTO_REVOKE_EXISTING_CERTS_LABEL"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_NOT_USABLE_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_KEY_USABLE_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_DESC"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CA_POLICY_APPROVAL_LABEL"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_ISSUED_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_METADATA_PERSISTED_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CERT_TO_REVOKE_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_CA_KEY_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_DESC"
+#~ msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_CHALLENGE_PASSWORD_LABEL"
+#~ msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_DESC"
+#~ msgstr "Checking if DN exists in LDAP tree"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_FOR_VALID_REQUEST_LABEL"
+#~ msgstr "Checking if DN exists in LDAP tree"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_DESC"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_INITIAL_ENROLL_AUTHEN_LABEL"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_DESC"
+#~ msgstr "Zertifikatserstellung vorbereitet"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_ELIGIBILITY_LABEL"
+#~ msgstr "Zertifikatserstellung vorbereitet"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_DESC"
+#~ msgstr "Zertifikatserstellung vorbereitet"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CHECK_RENEWAL_TYPE_LABEL"
+#~ msgstr "Zertifikatserstellung vorbereitet"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEANUP_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CLEAR_APPROVALS_LABEL"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_DESC"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_CONTINUE_INITIAL_ENROLL_LABEL"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_DESC"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ELIGIBLE_FOR_INITIAL_ENROLL_LABEL"
+#~ msgstr "Start der CRL-Erstellung"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_ELIGIBILITY_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_EVAL_SIGNER_TRUST_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FAILURE_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_FINISHED_PERSIST_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_CERT_TO_REVOKE_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_DESC"
+#~ msgstr ""
+#~ "Dieser Workflow bearbeitet einen Antrag auf Widerrufung eines Zertifikats."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_HAVE_VALID_REQUEST_LABEL"
+#~ msgstr ""
+#~ "Dieser Workflow bearbeitet einen Antrag auf Widerrufung eines Zertifikats."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIALIZED_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_INITIAL_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_DESC"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_APPROVAL_LABEL"
+#~ msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_DESC"
+#~ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PENDING_MANUAL_AUTHENTICATION_LABEL"
+#~ msgstr "Dies ist das Standardanmeldeverfahren für normale Nutzer."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PERSISTENCE_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_POLICY_PENDING_LABEL"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_PREPARED_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_DESC"
+#~ msgstr "Ändern der Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_QUEUED_FOR_REVOCATION_LABEL"
+#~ msgstr "Ändern der Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_DESC"
+#~ msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_READY_TO_PROCESS_LABEL"
+#~ msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_DESC"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_REVOKE_ON_REPLACE_DONE_LABEL"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
 #~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"

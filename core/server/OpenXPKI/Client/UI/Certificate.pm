@@ -153,18 +153,7 @@ sub init_result {
                 label => 'Download',
                 icon => 'download',
                 target => 'modal'
-            }],
-            'noop' => [{
-                path => 'certificate!detail!identifier!{identifier}',
-                label => 'Detailed Information',
-                icon => 'view',
-                target => 'tab',
-            },{
-                path => 'certificate!workflows!identifier!{identifier}',
-                label => 'Related workflows',
-                icon => 'view',
-                target => 'tab',
-            }],
+            }], 
             columns => [
                 { sTitle => "Serial"},
                 { sTitle => "Subject" },
@@ -264,18 +253,7 @@ sub init_mine {
                 label => 'Download',
                 icon => 'download',
                 target => 'modal'
-            }],
-            'noop' => [{
-                path => 'certificate!detail!identifier!{identifier}',
-                label => 'Detailed Information',
-                icon => 'view',
-                target => 'tab',
-            },{
-                path => 'certificate!workflows!identifier!{identifier}',
-                label => 'Related workflows',
-                icon => 'view',
-                target => 'tab',
-            }],
+            }], 
             columns => [
                 { sTitle => "Serial"},
                 { sTitle => "Subject" },
@@ -297,26 +275,30 @@ sub init_mine {
 
 }
 
-sub init_detail {
+=head2 init_detail 
 
+Show details on the certificate, includes basic certificate information,
+status, issuer and links to download chains and related workflow. Designed to 
+be shown in a modal popup.
+
+=cut
+
+sub init_detail {
 
     my $self = shift;
     my $args = shift;
 
     my $cert_identifier = $self->param('identifier');
 
-    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier });
+    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
     $self->logger()->debug("result: " . Dumper $cert);
-
+    
+    my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
+    
     $self->_page({
         label => 'Certificate Information',
-        shortlabel => $cert->{BODY}->{SUBJECT_HASH}->{CN}->[0],
+        shortlabel => $dn{CN}[0]
     });
-
-
-    if ($cert->{STATUS} eq 'ISSUED' && $cert->{BODY}->{NOTAFTER} < time()) {
-        $cert->{STATUS} = 'EXPIRED';
-    }
 
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
@@ -326,13 +308,13 @@ sub init_detail {
     }
 
     my @fields = (
-        { label => 'Subject', value => $cert->{BODY}->{SUBJECT} },
-        { label => 'Serial', value => $cert->{BODY}->{SERIAL_HEX} },
+        { label => 'Subject', value => $cert->{SUBJECT} },
+        { label => 'Serial', value => $cert->{CERTIFICATE_SERIAL_HEX} },
         { label => 'Identifier', value => $cert_identifier },
-        { label => 'not before', value => $cert->{BODY}->{NOTBEFORE}, format => 'timestamp'  },
-        { label => 'not after', value => $cert->{BODY}->{NOTAFTER}, format => 'timestamp' },
+        { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
+        { label => 'not after', value => $cert->{NOTAFTER}, format => 'timestamp' },
         { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
-        { label => 'Issuer',  format=>'link', value => { label => $cert->{BODY}->{ISSUER}, page => 'certificate!chain!identifier!'. $cert_identifier } },
+        { label => 'Issuer',  format=>'link', value => { label => $cert->{ISSUER_DN}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
@@ -349,7 +331,7 @@ sub init_detail {
         $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
     }
 
-    push @fields, { label => 'Download', value => '<ul class="list-unstyled">'.
+    push @fields, { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_LABEL'), value => '<ul class="list-unstyled">'.
         sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
         # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
         sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
@@ -361,23 +343,26 @@ sub init_detail {
         '</ul>'
     };
 
-
-    my @buttons;
-    push @buttons, {
-        action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA', { cert_identifier => $cert_identifier }),
-        label  => 'metadata',
-    } if ($is_local_entity);
-
-    push @buttons, {
-        #action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST', { cert_identifier => $cert_identifier }),
-        page => 'workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST!cert_identifier!'.$cert_identifier,
-        label  => 'revoke'
-    } if ($is_local_entity && $cert->{STATUS} eq 'ISSUED');
-
-    push @buttons, {
-        action => $self->__register_wf_token_initial('I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST', { org_cert_identifier => $cert_identifier }),
-        label  => 'renew'
-    } if ($is_local_entity && ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED'));
+    # TODO - add some magic to the API to determine if those actions are possible for the current user, etc.
+    $pattern = '<li><a href="#redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
+    
+    if ($is_local_entity) {   
+        my @actions;
+        if ($is_local_entity && ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED')) {        
+            push @actions, sprintf ($pattern, 'certificate_renewal_request', i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_RENEW'));
+        }
+        if ($cert->{STATUS} eq 'ISSUED') { 
+            push @actions, sprintf ($pattern, 'certificate_revocation_request_v2', i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_REVOKE'));
+        }
+        push @actions, sprintf ($pattern, 'change_metadata', i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA'));
+        
+        push @fields, { label => i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_LABEL'), value => '<ul class="list-unstyled">'.join("", @actions).'</ul>' };
+    }     
+    
+    push @fields, { label => i18nGettext('I18N_OPENXPKI_UI_CERT_RELATED_LABEL'), format => 'link', value => { 
+        page => 'certificate!related!identifier!'.$cert_identifier,
+        label => i18nGettext('I18N_OPENXPKI_UI_CERT_RELATED_HINT') 
+    }};
 
     $self->add_section({
         type => 'keyvalue',
@@ -385,7 +370,6 @@ sub init_detail {
             label => '',
             description => '',
             data => \@fields,
-            #buttons => \@buttons, # We need to fix this first
         }},
     );
 
@@ -444,7 +428,13 @@ sub init_chain {
 
 }
 
-sub init_workflows {
+=head2 init_related
+
+Show information related to the certificate, renders a key/value table with
+a list of related workflows, owner, and metadata
+
+=cut
+sub init_related {
 
 
     my $self = shift;
@@ -452,29 +442,48 @@ sub init_workflows {
 
     my $cert_identifier = $self->param('identifier');
 
-
-    my $workflows = $self->send_command( 'get_workflow_ids_for_cert', {  IDENTIFIER => $cert_identifier });
-
-    $self->logger()->debug("result: " . Dumper $workflows);
-
+    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
+    $self->logger()->debug("result: " . Dumper $cert);
+    
+    my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
+    
     $self->_page({
-        label => 'Workflows related to Certificate',
+        label => 'Certificate Relations',
+        shortlabel => $dn{CN}[0]
     });
 
+    # run a workflow search using the given ids from the cert attributes
+    my @wfid = ( 0 );
+    foreach my $key (keys %{$cert->{CERT_ATTRIBUTES}}) {
+        if ($key !~ m{ \A system_workflow }xs ) { 
+            next; 
+        }
+        push @wfid, @{$cert->{CERT_ATTRIBUTES}->{$key}};
+    }
+    
+    $self->logger()->debug("related workflows " . Dumper \@wfid);
+    
+    my $cert_workflows = $self->send_command( 'search_workflow_instances', {  SERIAL => \@wfid });
+
+    $self->logger()->trace("workflow results" . Dumper $cert_workflows);
+
+
     my @result;
-    foreach my $line (@{$workflows}) {
+    foreach my $line (@{$cert_workflows}) {
         push @result, [
             $line->{'WORKFLOW.WORKFLOW_SERIAL'},
             $line->{'WORKFLOW.WORKFLOW_TYPE'},
+            $line->{'WORKFLOW.WORKFLOW_STATE'},
         ];
     }
-
+    
     $self->add_section({
         type => 'grid',
         className => 'workflow',
         processing_type => 'all',
         content => {
             header => 'Grid-Headline',
+            label => 'Workflows related to this certificate',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}',
                 label => 'Open Workflow',
@@ -485,7 +494,7 @@ sub init_workflows {
                 { sTitle => "serial" },
                 #{ sTitle => "updated" },
                 { sTitle => "type"},
-                #{ sTitle => "state"},
+                { sTitle => "state"},
                 #{ sTitle => "procstate"},
                 #{ sTitle => "wake up"},
             ],
@@ -497,8 +506,13 @@ sub init_workflows {
 
 }
 
+=head2 init_privkey
 
-sub init_privkey{
+Prepare download of a private key, requests the password and export format
+via form fields.
+
+=cut
+sub init_privkey {
 
     my $self = shift;
     my $cert_identifier = $self->param('identifier');
@@ -530,7 +544,12 @@ sub init_privkey{
 
 }
 
-# TODO - either merge the display part with info or make sub to build buttons
+=head2 init_download 
+
+Handle download requests, required the cert_identifier and the expected format.
+Redirects to init_detail if no format is given.
+
+=cut
 sub init_download {
 
     my $self = shift;
@@ -539,34 +558,11 @@ sub init_download {
     my $cert_identifier = $self->param('identifier');
     my $format = $self->param('format');
 
-    # No format, draw a list
+    # No format, call detail
     if (!$format) {
 
-        my $pattern = '<li><a href="'.$self->_client()->_config()->{'scripturl'}.'?page=certificate!download!identifier!'.$cert_identifier.'!format!%s" target="_blank">%s</a></li>';
-
-
-        my $privkey = '';
-        # check for private key
-        # TODO - add ACL, only owner should be allowed to dl key
-        if ($self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-            $privkey = '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
-        }
-
-        $self->add_section({
-            type => 'text',
-            content => {
-                label => '',
-                description => '<ul>'.
-                sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
-                #sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')). # core bug see #185
-                sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
-                sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
-                sprintf ($pattern, 'pkcs7!root!1', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT')).
-                sprintf ($pattern, 'bundle', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE')).
-                $privkey.
-                '</ul>',
-        }});
-
+        return $self->init_detail();
+         
     } elsif ($format eq 'pkcs7') {
 
         my $keeproot = $self->param('root') ? 1 : 0;
@@ -637,6 +633,42 @@ sub init_download {
     return $self;
 }
 
+=head2 init_parse 
+
+not implemented 
+
+receive a PEM encoded x509/pkcs10/pkcs7 block and output information.
+
+=cut
+sub init_parse {
+    
+    my $self = shift;
+    my $args = shift;
+
+    my $pem = $self->param('body');
+    
+    my @fields = ({
+        label => 'Body',
+        value => $pem
+    });
+
+    $self->_page({
+        label => '',
+        description => ''
+    });
+
+    $self->add_section({
+        type => 'keyvalue',
+        content => {
+            label => 'Parsed Content',
+            description => '',
+            data => \@fields,
+        }},
+    );
+    
+    return $self;
+    
+}
 
 =head2 action_autocomplete
 
@@ -698,7 +730,7 @@ sub action_search {
     foreach my $key (qw(subject issuer_dn profile)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
-            $query->{uc($key)} = $val;
+            $query->{uc($key)} = '%'.$val.'%';
             $input->{$key} = $val;
         }
     }
@@ -717,8 +749,8 @@ sub action_search {
 
     my @attr;
     if (my $val = $self->param('san')) {
-        $input->{'san'} = $val;
-        push @attr, ['subject_alt_name', $val ];
+        $input->{'san'} = $val;        
+        push @attr, { KEY => 'subject_alt_name', VALUE => '%'.$val.'%' };
     }
 
     $self->logger()->debug("query : " . Dumper $self->cgi()->param());
@@ -728,8 +760,8 @@ sub action_search {
     foreach my $key (qw(meta_requestor meta_email)) {
         my @val = $self->param($key.'[]');
         if (scalar @val > 0) {                      
-            while (my $val = shift @val) {
-                push @attr, [ $key , $val ];
+            while (my $val = shift @val) {                
+                push @attr,  { KEY => $key, VALUE => '%'.$val.'%' };
             }            
         }
     }
@@ -790,7 +822,7 @@ sub action_privkey {
         return;
     }
 
-    $self->logger()->debug( "Request privkey for $cert_identifier, Passphrase " . $passphrase);
+    $self->logger()->debug( "Request privkey for $cert_identifier" );
 
     my $privkey  = $self->send_command ( "get_private_key_for_cert", { IDENTIFIER => $cert_identifier, FORMAT => $format, 'PASSWORD' => $passphrase });
 
@@ -814,7 +846,6 @@ sub action_privkey {
 
     # We need to send the redirect to a non-ember url to load outside ember
     my $link = $self->_client()->_config()->{'scripturl'}.'?page='.$page;
-    #$self->redirect( $link );
 
     $self->_page({
         label => 'Download private key for certificate.',
@@ -825,7 +856,7 @@ sub action_privkey {
         type => 'text',
         content => {
            title => '',
-           description => 'Password accepted - <a href="'.$link.'">click here to download your key</a>.<br>
+           description => 'Password accepted - <a href="'.$link.'" target="_blank">click here to download your key</a>.<br>
            <b>The link expires after 60 seconds.</b>'
     }});
 

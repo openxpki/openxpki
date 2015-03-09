@@ -399,7 +399,7 @@ sub BUILD {
                 FORMAT   => {
                     type     => SCALAR,
                     optional => 1,
-                    regex    => $re_cert_format,
+                    regex    => $re_alpha_string,
                 },
             },
         },
@@ -1281,6 +1281,10 @@ sub BUILD {
         'search_workflow_instances' => {
             class  => 'Workflow',
             params => {
+                SERIAL => {
+                    type     => ARRAYREF | UNDEF,
+                    optional => 1,
+                },
                 CONTEXT => {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
@@ -1318,6 +1322,10 @@ sub BUILD {
         'search_workflow_instances_count' => {
             class  => 'Workflow',
             params => {
+                SERIAL => {
+                    type     => ARRAYREF | UNDEF,
+                    optional => 1,
+                },
                 CONTEXT => {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,

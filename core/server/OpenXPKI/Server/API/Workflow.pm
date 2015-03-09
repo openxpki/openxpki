@@ -768,6 +768,13 @@ sub __search_workflow_instances {
     my $dynamic;
     my @tables;
     my @joins;
+    
+    
+    # Search for known serials, used e.g. for certificate relations
+    if ($arg_ref->{SERIAL} && ref $arg_ref->{SERIAL} eq 'ARRAY') {
+        $dynamic->{'WORKFLOW.WORKFLOW_SERIAL'} = {VALUE => $arg_ref->{SERIAL}  };
+    }
+    
     ## create complex select structures, similar to the following:
     # $dbi->select(
     #    TABLE    => [ { WORKFLOW_CONTEXT => WORKFLOW_CONTEXT_0},

@@ -8656,7 +8656,6 @@ tr.gridrow-failed:hover > td {
 
 tr.gridrow-manual > td {
   background-color: #ffff4c !important;
-  color: orange;
 }
 
 tr.gridrow-manual:hover > td {
@@ -8772,6 +8771,10 @@ input.oxi-file-input:active::before {
   display: table-cell !important;
 }
 
+.oxi-no-input {
+  padding-top: 6px;
+}
+
 button.btn-loading {
   color: #fff;
   background-color: #428bca;
@@ -8821,7 +8824,7 @@ div.loading.in-progress {
 }
 
 div.loading div.progress {
-  position: absolute;
+  position: fixed;
   top: 30px;
   right: 20px;
   width: 100px;
@@ -8852,4 +8855,9 @@ div.description {
 div.oxisection-grid th {
   cursor: pointer;
   -webkit-user-select: none;
+}
+
+span.pagination-label {
+  float: left;
+  padding: 6px 0;
 }

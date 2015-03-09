@@ -68,91 +68,63 @@ sub init_task {
         label => 'Outstanding tasks'
     });
 
-    # TODO - need to make enable filter for own workflows by configuration
-    # CSR
-    my $search_result = $self->send_command( 'search_workflow_instances', {
-        LIMIT => 100,  # Safety barrier
-        #ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
-        TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_V2',
-        STATE => [ 'PENDING', 'APPROVAL' ],
-    });
-
-    my @csr;
-    foreach my $item (@{$search_result}) {
-        push @csr, [
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
-        ]
+    my $tasklist = $self->_client->session()->param('tasklist');
+    
+    if (!$tasklist) {
+        return $self->_redirect('home');
     }
-
-    $self->logger()->trace( "dumper result: " . Dumper @csr);
-
-    $self->add_section({
-        type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
-        content => {
-            label => 'Certificate requests',
-            actions => [{
-                path => 'redirect!workflow!load!wf_id!{serial}',
-                icon => 'view',
-            }],
-            columns => [
-                { sTitle => "serial" },
-                { sTitle => "updated" },
-                { sTitle => "type"},
-                { sTitle => "state"},
-                { sTitle => "procstate"},
-            ],
-            data => \@csr
+    
+    $self->logger()->debug( "got tasklist: " . Dumper $tasklist);
+    
+    foreach my $item (@$tasklist) {
+        
+        my $query = $item->{query};
+        if (!$query->{LIMIT} || $query->{LIMIT} > 100) {
+            $query->{LIMIT} = 100;
         }
-    });
+        
+        my $search_result = $self->send_command( 'search_workflow_instances', $query);
+ 
+        my @data;
+        foreach my $item (@{$search_result}) {
+            # special color for workflows in final failure            
+            my $status = $item->{'WORKFLOW.WORKFLOW_PROC_STATE'};                    
+            if ($status eq 'finished' && $item->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE') {
+                $status  = 'failure';
+            }
+            push @data, [
+                $item->{'WORKFLOW.WORKFLOW_SERIAL'},
+                $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
+                i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
+                i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
+                $status
+            ]
+        }
+        
+        $self->logger()->trace( "dumper result: " . Dumper @data);
 
-
-    $search_result = $self->send_command( 'search_workflow_instances', {
-        LIMIT => 100,  # Safety barrier
-        #ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name}, OPERATOR => 'NOT_EQUAL' }],
-        TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2',
-        STATE => [ 'PENDING', 'ONHOLD' ],
-    });
-
-    my @crr = ();
-    foreach my $item (@{$search_result}) {
-        push @crr, [
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_PROC_STATE'}),
-        ]
+        $self->add_section({
+            type => 'grid',
+            className => 'workflow',
+            processing_type => 'all',
+            content => {
+                label => i18nGettext($item->{label}),
+                description => i18nGettext($item->{description}),
+                actions => [{
+                    path => 'redirect!workflow!load!wf_id!{serial}',
+                    icon => 'view',
+                }],
+                columns => [
+                    { sTitle => "serial" },
+                    { sTitle => "updated" },
+                    { sTitle => "type"},
+                    { sTitle => "state"},
+                    { sTitle => "_className"},
+                ],
+                data => \@data
+            }
+        });
     }
-
-    $self->logger()->trace( "dumper result: " . Dumper @crr);
-
-    $self->add_section({
-        type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
-        content => {
-            label => 'Revocation requests',
-            actions => [{
-                path => 'redirect!workflow!load!wf_id!{serial}',
-                icon => 'view',
-            }],
-            columns => [
-                { sTitle => "serial" },
-                { sTitle => "updated" },
-                { sTitle => "type"},
-                { sTitle => "state"},
-                { sTitle => "procstate"},
-            ],
-            data => \@crr
-        }
-    });
-
 
 }
 

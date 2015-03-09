@@ -23,7 +23,9 @@ sub init_structure {
         
         # persist the landmark part of the menu, if any
         $self->_client->session()->param('landmark', $menu->{landmark} || {});
+        $self->_client->session()->param('tasklist', $menu->{tasklist} || []);
         $self->logger->debug('Got landmarks: ' . Dumper $menu->{landmark});
+        $self->logger->debug('Got tasklist: ' . Dumper $menu->{tasklist});
         
     }
     

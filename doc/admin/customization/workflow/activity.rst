@@ -42,8 +42,28 @@ the normal operation. Such code should be placed into the *resume* method
 which gets executed after an exception was thrown.     
   
 
+Predefined context values and namespaces
+----------------------------------------
+
+The UI and workflow engine looks for certain context values to render error 
+and status messages. Those values *should* be used to provide information.
+You *must not* use such predefined keys for any other purpose.
+
+certificate / workflow relations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Please record workflows that change a certificates status in the certificate
+attributes table, using the prefix *system_workflow_XXXX*. The core uses
+system_workflow_csr, system_workflow_crr, system_workflow_crl to link a 
+certificate to the appropriate workflows for issue, revoke and crl creation.
+
+Those workflows are shown on the "related information" page.
+
+
 XML Configuration
 ------------------
+
+# TODO - Update for YAML! XML is gone!
 
 To use an activity in the workflow system, you must create a mapping between
 the perl class and a symbolic name. It is allowed to reuse the same class with
