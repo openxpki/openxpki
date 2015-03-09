@@ -50,13 +50,13 @@ is($result->{main}->[0]->{action}, 'login!stack');
 
 $result = $client->mock_request({
     'action' => 'login!stack',
-    'auth_stack' => "External Dynamic",
+    'auth_stack' => "Testing",
 });
 
 $result = $client->mock_request({
     'action' => 'login!password',
     'username' => 'raop',
-    'password' => 'RA Operator'
+    'password' => 'openxpki'
 });
 
 is($result->{goto}, 'welcome', 'Logged in');

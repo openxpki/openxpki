@@ -68,7 +68,7 @@ $test->diag("Found ".scalar(@certflat)." exisiting certificates");
 
 $test->connect_ok(
     user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    password => $cfg{user}{password},
 ) or die "Error - connect failed: $@";
   
 my %wfparam = (        

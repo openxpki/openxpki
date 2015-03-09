@@ -53,7 +53,7 @@ $test->plan( tests => 10 );
 
 $test->connect_ok(
     user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    password => $cfg{user}{password},
 ) or die "Error - connect failed: $@";
 
 my %cert_info = (
@@ -90,7 +90,7 @@ $test->disconnect();
 # Re-login with Operator for approval
 $test->connect_ok(
     user => $cfg{operator}{name},
-    password => $cfg{operator}{role},
+    password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
 

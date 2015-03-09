@@ -46,7 +46,7 @@ $test->plan( tests => 15 );
    
 $test->connect_ok(
     user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    password => $cfg{user}{password},
 ) or die "Error - connect failed: $@";
   
 my %wfparam = (                
@@ -89,7 +89,7 @@ $test->disconnect();
    
 $test->connect_ok(
     user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    password => $cfg{user}{password},
 ) or die "Error - connect failed: $@";
 
 $test->execute_ok('scunblock_post_codes', {  _auth1_code => 'wrong', _auth2_code => 'code'});

@@ -57,7 +57,7 @@ $test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier'
 # Login to use socket
 $test->connect_ok(
     user => $cfg{operator}{name},
-    password => $cfg{operator}{role},
+    password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
 # First try an autoapproval request

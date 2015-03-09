@@ -209,7 +209,7 @@ use Class::Std;
             $msg
                 = $client->send_receive_service_msg(
                 'GET_AUTHENTICATION_STACK',
-                { 'AUTHENTICATION_STACK' => 'External Dynamic', },
+                { 'AUTHENTICATION_STACK' => 'Testing', },
                 );
             $self->set_msg($msg);
             if ( $self->error ) {

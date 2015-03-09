@@ -48,7 +48,7 @@ $test->plan( tests => 7 );
 # Login to use socket
 $test->connect_ok(
     user => $cfg{operator}{name},
-    password => $cfg{operator}{role},
+    password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
 

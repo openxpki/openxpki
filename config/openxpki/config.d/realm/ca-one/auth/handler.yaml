@@ -99,4 +99,25 @@ Password Connector:
     role: User
     source@: connector:auth.connector.localuser
 
+# Accounts for testing, Password for all accounts is "openxpki"
+TestAccounts:
+    type: Password
+    label: Test Accounts
+    user:
+        caop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: CA Operator
+        raop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator
+        raop2:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator 
+        user:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: User 
+        user2:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: User
+
 

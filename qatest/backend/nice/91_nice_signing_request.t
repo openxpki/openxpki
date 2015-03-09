@@ -48,7 +48,7 @@ $test->plan( tests => 20 );
 
 $test->connect_ok(
     user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    password => $cfg{user}{password},
 ) or die "Error - connect failed: $@";
 
 my $serializer = OpenXPKI::Serialization::Simple->new();
@@ -110,7 +110,7 @@ $test->disconnect();
 # Re-login with Operator for approval
 $test->connect_ok(
     user => $cfg{operator}{name},
-    password => $cfg{operator}{role},
+    password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
 $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE', {  cert_role => $cfg{csr}{role}} );
@@ -129,7 +129,7 @@ $test->disconnect();
 
 $test->connect_ok(
     user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    password => $cfg{user}{password},
 ) or die "Error - connect failed: $@";
 
 my $cert_identifier = $test->param( 'cert_identifier' );
