@@ -24,11 +24,11 @@ style:
                 - comment
 
         subject: 
-            dn: CN=[% hostname %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
+            dn: CN=[% hostname.lower %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
             san: 
               DNS: 
-                  - "[% hostname %]"
-                  - "[% FOREACH entry = hostname2 %][% entry %] | [% END %]"
+                  - "[% hostname.lower %]"
+                  - "[% FOREACH entry = hostname2 %][% entry.lower %] | [% END %]"
 
         metadata:
             requestor: "[% requestor_gname %] [% requestor_name %]"
