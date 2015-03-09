@@ -61,8 +61,8 @@ PERL=%{__perl}
 
 install -d -D -m 755 %{buildroot}/opt/myperl/share/cgi-bin
 install -d -D -m 755 %{buildroot}/opt/myperl/share/htdocs
-tar cf - cgi-bin | tar -C %{buildroot}/opt/myperl/share/ -x -f -
-tar cf - htdocs | tar -C %{buildroot}/opt/myperl/share/ -x -f -
+tar cf - -C core/server cgi-bin | tar -C %{buildroot}/opt/myperl/share/ -x -f -
+tar cf - -C core/server htdocs | tar -C %{buildroot}/opt/myperl/share/ -x -f -
 
 VENDORLIB=`%{__perl} "-V:vendorlib" | awk -F\' '{print $2}'`
 VENDORARCH=`%{__perl} "-V:vendorarch" | awk -F\' '{print $2}'`
