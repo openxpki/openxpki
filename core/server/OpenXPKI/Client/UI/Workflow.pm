@@ -884,7 +884,7 @@ sub __render_from_workflow {
         $self->logger()->debug('activity info ' . Dumper $wf_action_info );
 
         # we allow prefill of the form if the workflow is started
-        my $do_prefill = $wf_info->{WORKFLOW}->{STATE} == 'INITIAL';
+        my $do_prefill = $wf_info->{WORKFLOW}->{STATE} eq 'INITIAL';
 
         my $context = $wf_info->{WORKFLOW}->{CONTEXT};
         my @fields;
@@ -983,7 +983,7 @@ sub __render_from_workflow {
         foreach my $field (@fields_to_render) {
         
             my $key = $field->{name};            
-            my $item = { value => $context->{$key}, type => '' };
+            my $item = { value => ($context->{$key} || ''), type => '' };
         
             # Always suppress key material
             if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
