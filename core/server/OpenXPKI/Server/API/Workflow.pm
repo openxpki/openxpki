@@ -356,6 +356,9 @@ sub __get_workflow_ui_info {
         } else {
             $workflow = $args->{WORKFLOW};
         }
+        
+        ##! 32: 'Workflow raw result ' . Dumper $workflow
+        
         $factory = $workflow->factory();
 
         $result->{WORKFLOW} = {

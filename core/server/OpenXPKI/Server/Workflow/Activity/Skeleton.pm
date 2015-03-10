@@ -21,7 +21,7 @@ sub execute {
   	# do some work
   	if ($need_to_wait) {
   		# The text is written to the logs and is optional
-  		$self->pause('Waiting');
+  		$self->pause('I18N_OPENXPKI_UI_PAUSED_WAITING');
   	}
   	
   	CTX('log')->log(

@@ -311,7 +311,9 @@ sub fetch_workflow {
 	       state       => $result->{WORKFLOW_STATE},
 	       last_update => $parser->parse_datetime($result->{WORKFLOW_LAST_UPDATE}),
 	       proc_state  => $result->{WORKFLOW_PROC_STATE},
-	       count_try  => $result->{WORKFLOW_COUNT_TRY},
+	       count_try   => $result->{WORKFLOW_COUNT_TRY},
+	       wakeup_at   => $result->{WORKFLOW_WAKEUP_AT},
+	       reap_at   => $result->{WORKFLOW_REAP_AT},
 	   };
     
     ##! 1: "return ".Dumper($return);

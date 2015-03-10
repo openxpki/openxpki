@@ -194,7 +194,7 @@ sub issueCertificate {
                 PRIORITY => 'info',
                 FACILITY => [ 'monitor', 'audit', 'application' ],
         );
-        $self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_CERTSIGN_TOKEN_NOT_USABLE');
+        $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
     }
 
     ##! 32: 'issuing certificate'
@@ -287,7 +287,7 @@ sub checkForRevocation{
 
     # If the certificate is not revoked, trigger pause
     ##! 32: 'Revocation is pending - going to pause'
-    $self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING');
+    $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_LOCAL_REVOCATION_PENDING');
 
     return;
 }
@@ -410,7 +410,7 @@ sub issueCRL {
             PRIORITY => 'info',
             FACILITY => [ 'monitor', 'audit', 'workflow' ],
         );
-        $self->_get_activity()->pause('I18N_OPENXPKI_SERVER_NICE_CRL_TOKEN_NOT_USABLE');
+        $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE');
     }
 
     my $crl = $ca_token->command({

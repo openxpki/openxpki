@@ -6,6 +6,7 @@ package OpenXPKI::Client::UI::Workflow;
 
 use Moose;
 use Data::Dumper;
+use Date::Parse;
 use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
@@ -859,8 +860,62 @@ sub __render_from_workflow {
         }
     }
 
+    # Check if the workflow is under control of the watchdog
+    if ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') { 
+        
+        my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
+        my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
+
+        my $label = i18nGettext( $wf_action_info->{label} || $wf_info->{STATE}->{label} );
+        if ($label) {
+            $label .= ' / ' . i18nGettext( $wf_info->{WORKFLOW}->{label} );
+        } else {
+            $label = i18nGettext( $wf_info->{WORKFLOW}->{label} );
+        }
+        
+        $self->_page({
+            label => $label,
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description => i18nGettext( $wf_action_info->{description} ),
+        });
+
+        $self->add_section({
+            type => 'keyvalue',
+             content => {
+                label => '',
+                description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION'),
+                data => [
+                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL'), 
+                        value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 'format' => 'timestamp' },
+                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL'), 
+                        value => $wf_info->{WORKFLOW}->{WAKE_UP_AT}, 'format' => 'timestamp' },                    
+                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL'), 
+                        value => $wf_info->{WORKFLOW}->{COUNT_TRY} },
+                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL'),
+                        value => i18nGettext($wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg}) },
+                ]
+        }});
+
+        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'info');
+                
+        # this should be available to raop only
+        if (0) {
+            my @fields;
+            push @fields, $self->__register_wf_token( $wf_info, {
+                wf_action => $wf_action            
+            });
+    
+            $self->add_section({
+                type => 'form',
+                action => 'workflow',
+                content => {
+                    submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON'),
+                    fields => \@fields
+            }});
+        }
+
     # if there is one activity selected (or only one present), we render it now
-    if ($wf_action) {
+    } elsif ($wf_action) {
         my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
 
         # Headline from action or state + Workflow Label, description from action if set
@@ -969,7 +1024,11 @@ sub __render_from_workflow {
         # can be overriden with view = context
         my $output = $wf_info->{STATE}->{output};
         my @fields_to_render;
-        if ($output && $view ne 'context') {
+        if ($view eq 'context') {
+            foreach my $field (sort keys %{$context}) {                              
+                push @fields_to_render, { name => $field };
+            }
+        } elsif ($output) {
             @fields_to_render = @{$wf_info->{STATE}->{output}};
             $self->logger()->debug('Render output rules: ' . Dumper  \@fields_to_render  );                        
         } else {
@@ -1058,11 +1117,10 @@ sub __render_from_workflow {
             $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
         } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
             $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
-        } elsif ( $wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') {
-            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'warning');
         }
 
     }
+    
     if ($wf_info->{WORKFLOW}->{ID} ) {
 
         my @buttons;        
@@ -1126,12 +1184,26 @@ sub __get_action_buttons {
 
     my @buttons;
     foreach my $wf_action (@{$wf_info->{STATE}->{option}}) {
-       my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
+        my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
+
+        my %extra;
+        # TODO - we should add some configuration option for this
+        if ($wf_action =~ /global_cancel/) {
+            $extra{confirm} = {
+                label => 'Cancel Request',
+                description => 'Press the confirm button to cancel this workflow. 
+                This will immediatley stop all actions on this workflow and 
+                mark it as canceled. This action can not be undone!  
+                If you want to keep this workflow, press the abort button to 
+                close this window without touching the workflow.',
+            };
+        }
 
        push @buttons, {
             label => i18nGettext($wf_action_info->{label} || $wf_action),
             action => sprintf ('workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID}),
             description => i18nGettext($hint->{$wf_action}),
+            %extra
         };
     }
 
@@ -1263,7 +1335,7 @@ sub __render_result_list {
             
         } elsif ($item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'pause') {
            
-           $state .= " (".i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION') .")";
+           $state .= " (".i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE') .")";
                   
         }
         

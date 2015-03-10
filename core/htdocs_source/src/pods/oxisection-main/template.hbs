@@ -49,8 +49,20 @@
                         {{confirmButton.confirm.description}}
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary" {{action "confirm" confirmButton}}>{{confirmButton.confirm.confirm_label}}</button>
-                        <button class="btn btn-default" {{action "cancel"}} data-dismiss="modal">{{confirmButton.confirm.cancel_label}}</button>
+                        <button class="btn btn-primary" {{action "confirm" confirmButton}}>
+                        {{#if confirmButton.confirm.confirm_label}}                    
+                            {{confirmButton.confirm.confirm_label}}
+                        {{else}}
+                            Confirm
+                        {{/if}}
+                        </button>
+                        <button class="btn btn-default" {{action "cancel"}} data-dismiss="modal">
+                        {{#if confirmButton.confirm.cancel_label}}
+                            {{confirmButton.confirm.cancel_label}}
+                        {{else}}
+                            Abort
+                        {{/if}}                            
+                        </button>
                     </div>
                 </div>
             </div>

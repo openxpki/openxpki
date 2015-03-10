@@ -76,6 +76,9 @@ sub init {
         # fetch additional infos from database:
         $count_try = $wf_info->{count_try} if ($wf_info->{count_try});
         $proc_state = $wf_info->{proc_state} if ($wf_info->{proc_state});
+        
+        $self->wakeup_at( $wf_info->{wakeup_at} );
+        $self->reap_at( $wf_info->{reap_at} );
     }
 
     ##! 16: 'count try: '.$count_try

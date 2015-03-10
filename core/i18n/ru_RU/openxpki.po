@@ -2874,20 +2874,8 @@ msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_CERTSIGN_TOKEN_NOT_USABLE"
-msgstr ""
-"Выбранный способ построения имени требует наличия, как минимум, одного "
-"названия подразделения и двух компонентов доменного имени."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID"
 msgstr "Идентифицирован следующий удостоверяющий центр"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_CRL_TOKEN_NOT_USABLE"
-msgstr ""
-"Выбранный способ построения имени требует наличия, как минимум, одного "
-"названия подразделения и двух компонентов доменного имени."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_CRR_NOT_FOUND_IN_DATABASE"
@@ -2918,10 +2906,6 @@ msgstr "Значение поля Country (c) - это просто назван
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUE_NOT_AFTER_NOT_SET"
 msgstr "Идентифицирован следующий удостоверяющий центр"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING"
-msgstr "Заявка находится в стадии редактирования"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_NOT_IMPLEMENTED_ERROR"
@@ -4606,6 +4590,30 @@ msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Тестировщик"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
+msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
+msgstr ""
+"Выбранный способ построения имени требует наличия, как минимум, одного "
+"названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_LOCAL_REVOCATION_PENDING"
+msgstr "Заявка находится в стадии редактирования"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_WAITING_FOR_GODOT"
+msgstr "В состоянии ожидания запуска"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 msgstr "Профиль пользователя"
 
@@ -5076,14 +5084,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL"
 msgstr "Список отзыва доступен"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC"
-msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_LABEL"
-msgstr "SPKAC-строка пуста."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND_DESC"
 msgstr "Последнее обновление"
 
@@ -5100,12 +5100,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SEND_PENDING_NOTIFICATION_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_DESC"
-msgstr "Отклонить заявку на отзыв сертификата"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC"
+msgstr "Технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_LABEL"
-msgstr "Отклонить заявку на отзыв сертификата"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_DESC"
@@ -5598,6 +5598,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_EXISTING_CERTS_LABEL"
 msgstr "Отозвать сертификат"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
@@ -5654,14 +5662,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CRL_LABEL"
 msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_DESC"
-msgstr "Отозвать сертификат"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
-msgstr "Отозвать сертификат"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PERSIST_CRR_DESC"
 msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
@@ -5716,6 +5716,10 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -5953,6 +5957,22 @@ msgstr "Родительский технологический процесс"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
+msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_LABEL"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_PLACEHOLDER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_TOOLTIP"
+msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC"
@@ -6456,6 +6476,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
 msgstr "Дочерние технологические процессы"
 
@@ -6520,8 +6544,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Последнее обновление"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
@@ -6617,10 +6649,6 @@ msgstr "Последнее обновление"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -6730,128 +6758,6 @@ msgstr ""
 "LDAP"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_DESC"
-msgstr "Изменить причину отзыва сертификата"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_LABEL"
-msgstr "Изменить причину отзыва сертификата"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_DESC"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_DESC"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_DESC"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
 msgstr "Технологические процессы"
 
@@ -6938,6 +6844,14 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CHECK_APPROVALS_DESC"
@@ -7033,6 +6947,14 @@ msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
@@ -7320,6 +7242,22 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL"
 msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"
@@ -7824,12 +7762,22 @@ msgstr ""
 "LDAP"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+msgstr ""
+"Начальное состояние технологического процесса публикации сертификатов через "
+"LDAP"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
@@ -9260,6 +9208,156 @@ msgstr "Тестировщик"
 #~ msgstr "Профиль TLS сервера "
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_LABEL"
+#~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_DESC"
+#~ msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_LABEL"
+#~ msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_DESC"
+#~ msgstr "Отозвать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
+#~ msgstr "Отозвать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_DESC"
+#~ msgstr "Изменить причину отзыва сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_LABEL"
+#~ msgstr "Изменить причину отзыва сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_DESC"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_DESC"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_DESC"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
 #~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
 
@@ -9608,10 +9706,6 @@ msgstr "Тестировщик"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Технологические процессы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
-#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"

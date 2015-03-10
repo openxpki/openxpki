@@ -2938,16 +2938,8 @@ msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_CERTSIGN_TOKEN_NOT_USABLE"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID"
 msgstr "Ausstellende CA für die CRL bestimmt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_CRL_TOKEN_NOT_USABLE"
-msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_CRR_NOT_FOUND_IN_DATABASE"
@@ -2976,10 +2968,6 @@ msgstr "Web-Schnittstelle des Trustcenters"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUE_NOT_AFTER_NOT_SET"
 msgstr "Ausstellende CA für die CRL bestimmt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING"
-msgstr "Zertifizierungsantrag in Bearbeitung"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_NOT_IMPLEMENTED_ERROR"
@@ -4544,6 +4532,29 @@ msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "testuser"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_LOCAL_REVOCATION_PENDING"
+msgstr "Zertifizierungsantrag in Bearbeitung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+"oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_WAITING_FOR_GODOT"
+msgstr "Auf Start wartend"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 msgstr "Nutzer"
 
@@ -5012,14 +5023,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL"
 msgstr "CRL veröffentlicht"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_LABEL"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND_DESC"
 msgstr "Letzte Aktualisierung"
 
@@ -5036,12 +5039,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SEND_PENDING_NOTIFICATION_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_DESC"
-msgstr "Abweisen des Zertifizierungsantrages"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC"
+msgstr "Arbeitsabläufe"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_LABEL"
-msgstr "Abweisen des Zertifizierungsantrages"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_DESC"
@@ -5532,6 +5535,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_EXISTING_CERTS_LABEL"
 msgstr "Warten"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr "Speichern des Zertifzierungsantrages"
 
@@ -5588,14 +5599,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CRL_LABEL"
 msgstr "Speichern des Zertifzierungsantrages"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_DESC"
-msgstr "Warten"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
-msgstr "Warten"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PERSIST_CRR_DESC"
 msgstr "Speichern des Zertifzierungsantrages"
 
@@ -5650,6 +5653,10 @@ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
@@ -5888,6 +5895,22 @@ msgstr "Übergeordneter Workflow"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
 msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
+msgstr "Ihr Name, z.B. 'Peter Müller'"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_LABEL"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_PLACEHOLDER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_TOOLTIP"
+msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC"
@@ -6387,6 +6410,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
 msgstr "Untergeordnete Workflows"
 
@@ -6457,8 +6484,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Letzte Aktualisierung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
@@ -6566,10 +6601,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC"
 msgstr "Arbeitsabläufe"
 
@@ -6656,110 +6687,6 @@ msgstr "Untergeordnete Workflows"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_LABEL"
 msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_LABEL"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_DESC"
-msgstr "Ändern der Rolle"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_LABEL"
-msgstr "Ändern der Rolle"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_DESC"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_LABEL"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_LABEL"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_DESC"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_LABEL"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_DESC"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_LABEL"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_LABEL"
-msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
-msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
@@ -6850,6 +6777,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CHECK_APPROVALS_DESC"
 msgstr "Arbeitsabläufe"
 
@@ -6935,6 +6870,14 @@ msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
@@ -7208,6 +7151,22 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL"
 msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"
@@ -7708,12 +7667,20 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
 msgstr "Initial state of the LDAP publishing workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
@@ -9152,6 +9119,138 @@ msgstr "testuser"
 #~ msgstr "TLS-Server"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_LABEL"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_DESC"
+#~ msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_LABEL"
+#~ msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_DESC"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
+#~ msgstr "Warten"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_LABEL"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_DESC"
+#~ msgstr "Ändern der Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_LABEL"
+#~ msgstr "Ändern der Rolle"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_DESC"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_LABEL"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_DESC"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_LABEL"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_DESC"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_LABEL"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_LABEL"
+#~ msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
 #~ msgstr "SCEP-Zertifizierungsantrag"
 
@@ -9496,10 +9595,6 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Arbeitsabläufe"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
-#~ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"

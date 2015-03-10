@@ -125,7 +125,7 @@ sub execute {
 	        PRIORITY => 'info',
 	        FACILITY => 'application',
 	    );
-		$self->pause('OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_TIMEOUT');	
+		$self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');
 	}
 	
 	alarm 0;

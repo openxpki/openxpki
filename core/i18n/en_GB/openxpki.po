@@ -2645,16 +2645,8 @@ msgid "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 msgstr "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_CERTSIGN_TOKEN_NOT_USABLE"
-msgstr "I18N_OPENXPKI_SERVER_NICE_CERTSIGN_TOKEN_NOT_USABLE"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID"
 msgstr "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_CRL_TOKEN_NOT_USABLE"
-msgstr "I18N_OPENXPKI_SERVER_NICE_CRL_TOKEN_NOT_USABLE"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_CRR_NOT_FOUND_IN_DATABASE"
@@ -2683,10 +2675,6 @@ msgstr "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT"
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUE_NOT_AFTER_NOT_SET"
 msgstr "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUE_NOT_AFTER_NOT_SET"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING"
-msgstr "I18N_OPENXPKI_SERVER_NICE_LOCAL_REVOCATION_PENDING"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_NICE_NOT_IMPLEMENTED_ERROR"
@@ -4126,6 +4114,22 @@ msgstr "My Workflows"
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
 
+msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
+msgstr "Certificate signing token is not online"
+
+msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
+msgstr "CRL signing token is not online"
+
+msgid "I18N_OPENXPKI_UI_PAUSED_LOCAL_REVOCATION_PENDING"
+msgstr "Revocation approved, waiting for next revocation list (CRL) update"
+
+msgid "I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT"
+msgstr "Network timeout on scp transfer request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_WAITING_FOR_GODOT"
+msgstr "Waiting"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 msgstr "Please select profile first"
 
@@ -4444,12 +4448,6 @@ msgstr "Publish CRL"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL"
 msgstr "Publish CRL"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC"
-msgstr "Edit request"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_LABEL"
-msgstr "Edit"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_FLAG_PENDING_NOTIFICATION_SEND_DESC"
 msgstr "Record message send flag"
 
@@ -4462,11 +4460,11 @@ msgstr "Send out mail notification for pending approval"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SEND_PENDING_NOTIFICATION_LABEL"
 msgstr "Send out mail notification for pending approval"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_DESC"
-msgstr "Change request data"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC"
+msgstr "Submit your revocation request to the certification office."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_LABEL"
-msgstr "Update"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_LABEL"
+msgstr "Submit request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_DESC"
 msgstr ""
@@ -4859,6 +4857,12 @@ msgstr "Revoke Existing Certificates"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REVOKE_EXISTING_CERTS_LABEL"
 msgstr "Revoke Existing Certificates"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
+msgstr "Cancel this workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
+msgstr "Cancel Request"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
 "This process triggers the creation of new revocation lists for all active "
@@ -4914,12 +4918,6 @@ msgstr "Issue CRL"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CRL_LABEL"
 msgstr "Issue CRL"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_DESC"
-msgstr "Revoke the certificate"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
-msgstr "Revoke the certificate"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PERSIST_CRR_DESC"
 msgstr "Persist CRR"
@@ -4967,6 +4965,9 @@ msgstr "Key Encryption Method"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Workflow Context"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
+msgstr "Retries"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -5171,6 +5172,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
 msgstr ""
 "This specifies the algorithm used to protect your key, AES is usually a good "
 "choice."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
+msgstr "The reason code indicates the reason why the certificate was revoked."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_LABEL"
+msgstr "Reason Code"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_PLACEHOLDER"
+msgstr "Please set the reason for revocation"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_TOOLTIP"
+msgstr "Specify the reason why you want the certificate being revoked."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC"
@@ -5575,6 +5592,9 @@ msgstr "Request invalid - no action"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP"
 msgstr "Workflow history"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON"
+msgstr "Force Wake Up"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
 msgstr "Change the selected profile for this request"
 
@@ -5620,27 +5640,29 @@ msgstr "Request invalid - no action"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
 msgstr "continue"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
+msgstr "Last Update"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Open Workflow"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "Run State"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
+msgstr "Pause Reason"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+msgstr "exception"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "Run State"
+msgstr "finished"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "Run State"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "Run State"
+msgstr "manual"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "Run State"
+msgstr "paused"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Requested action not available"
@@ -5698,10 +5720,6 @@ msgstr "Workflow Id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "This content is considered sensitive and therefore not shown."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
-msgstr "State"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC"
@@ -5792,110 +5810,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_LABEL"
 msgstr "State"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_LABEL"
-msgstr "APPROVAL"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_DESC"
-msgstr "Check for revocation"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_LABEL"
-msgstr "Action"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_LABEL"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_LABEL"
-msgstr "FAILURE"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_LABEL"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_DESC"
-msgstr "PENDING"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_LABEL"
-msgstr "PENDING"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_DESC"
-msgstr "PENDING"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_LABEL"
-msgstr "PENDING"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
-msgstr "SUCCESS"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -5983,6 +5897,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "CRLs issued"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
+msgstr "This workflow was canceled and can not be restarted"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL"
+msgstr "CANCELED"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CHECK_APPROVALS_DESC"
 msgstr "APPROVAL"
@@ -6060,13 +5980,21 @@ msgstr "This revocation request requires approval."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL"
 msgstr "Approval Pending"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr "Therevocation request was finally rejected and can not be restartet."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL"
-msgstr "State"
+msgstr "Revocation Rejected"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC"
+msgstr ""
+"You can see a summary of your revocation request below, please check the "
+"information for correctness and press the submit button to send the request "
+"the revocation of this certificate. Use the Edit button to change the given "
+"information, use the Cancel button to drop the request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL"
+msgstr "Confirm Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_DESC"
 msgstr "The certificate has been revoked and a revocation list was issued."
@@ -6335,6 +6263,22 @@ msgstr "This workflow has finished with success and can not be restarted"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL"
 msgstr "Updated"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
+msgstr "Edit information of the revocation request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
+msgstr "Edit request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
+msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
+msgstr "FAILURE"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"
@@ -6831,11 +6775,20 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
 msgstr "This workflow is paused and will be continued by the watchdog"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+msgstr ""
+"This workflow is currently handled by the system and will continue "
+"automagically. The reason for this pause and the time of the next scheduled "
+"execution is shown below for your information."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
+msgstr "Wake Up"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Workflow information was updated"
@@ -8114,6 +8067,132 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 #~ msgstr "TLS Server profile"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC"
+#~ msgstr "Edit request"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_LABEL"
+#~ msgstr "Edit"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_DESC"
+#~ msgstr "Change request data"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_UPDATE_REQUEST_LABEL"
+#~ msgstr "Update"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_DESC"
+#~ msgstr "Revoke the certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
+#~ msgstr "Revoke the certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_LABEL"
+#~ msgstr "APPROVAL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_DESC"
+#~ msgstr "Check for revocation"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_FOR_REVOCATION_LABEL"
+#~ msgstr "Action"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_DESC"
+#~ msgstr "This workflow is paused and will be continued by the watchdog"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_CHECK_FOR_DELAYED_REVOKE_LABEL"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CRR_PERSIST_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_LABEL"
+#~ msgstr "FAILURE"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FLAG_NOTIFY_SEND_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_INITIAL_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_DESC"
+#~ msgstr "This workflow is paused and will be continued by the watchdog"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NICE_DISPATCH_REVOKE_LABEL"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_DESC"
+#~ msgstr "PENDING"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_NOTIFY_CRR_PENDING_LABEL"
+#~ msgstr "PENDING"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_DESC"
+#~ msgstr "PENDING"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_PENDING_LABEL"
+#~ msgstr "PENDING"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_REJECTED_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_SUCCESS_LABEL"
+#~ msgstr "SUCCESS"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_AFTER_REVOKE_QUEUE_DESC"
 #~ msgstr "After revoke queue"
@@ -8457,9 +8536,6 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "SUCCESS"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKE_UP_LABEL"
-#~ msgstr "Wake Up"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
