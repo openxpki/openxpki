@@ -42,9 +42,6 @@ msgstr ""
 "Failed to render CSR subject when processing SCEP CSR (profile: __PROFILE__, "
 "style: __STYLE__)"
 
-msgid "I18N_OPENXPKI_ANONYMOUS_USER"
-msgstr "Anonymous"
-
 msgid "I18N_OPENXPKI_API_TOKEN_ALIAS_BY_TYPE_NO_GROUP_FOUND"
 msgstr ""
 "Token group not found for token type __TYPE__ (in call to OpenXPKI::Server::"
@@ -5468,7 +5465,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP"
 msgstr "Specify the reason why you want the certificate being revoked."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_DESC"
-msgstr ""
+msgstr "Reason for rejecting this request. This comment is visible to the user."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_LABEL"
 msgstr "Reason for Reject"
@@ -5812,6 +5809,10 @@ msgstr "This workflow failed finally and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_LABEL"
 msgstr "State"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
+msgstr ""
+"This workflow was canceled by user interaction and can not be restarted."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
@@ -6021,6 +6022,12 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_BUILD_SUBJECT_LABEL"
 msgstr "State"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
+msgstr "This workflow was canceled and can not be restarted"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
+msgstr "CANCELED"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCEL_APPROVALS_DESC"
 msgstr "Cancel Approvals"
@@ -6219,13 +6226,13 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PKCS10_GENERATED_LABEL"
 msgstr "Updated"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr "Your request has been rejected by the registration office. "
+"You may find a reason for the rejection in the comment field below. "
+"This decission is final, the workflow can not be restarted."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_LABEL"
-msgstr "State"
+msgstr "Request Rejected"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REQUEST_COMPLETE_DESC"
@@ -6635,6 +6642,11 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL"
 msgstr "SUCCESS"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
+msgstr ""
+"This workflow was interrupted by an unexpected event, please contact the "
+"support team!"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_EXPORT_DESC"
 msgstr "Check export"
@@ -6771,6 +6783,9 @@ msgstr "The changes have been persisted to the database."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "Metadata was updated"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
+msgstr "This workflow is in a final state and can not be restarted."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
@@ -8039,6 +8054,9 @@ msgstr "I18N_OPENXPKI_XML_CACHE_REPLACE_SUPER_LEVEL_TOO_DEEP_POSSIBLE_SUPER_LOOP
 msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 
+#~ msgid "I18N_OPENXPKI_ANONYMOUS_USER"
+#~ msgstr "Anonymous"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_WFHASH_MISSING_PARAM"
 #~ msgstr "I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_WFHASH_MISSING_PARAM"
@@ -8087,10 +8105,6 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
 #~ msgstr "Revoke the certificate"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
-#~ msgstr "State"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"

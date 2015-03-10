@@ -44,10 +44,6 @@ msgstr ""
 "некоторых данных (__FIELDS__)."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_ANONYMOUS_USER"
-msgstr "URI"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_API_TOKEN_ALIAS_BY_TYPE_NO_GROUP_FOUND"
 msgstr "Тестировщик"
 
@@ -6762,6 +6758,10 @@ msgstr ""
 "LDAP"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
 msgstr "Технологические процессы"
 
@@ -6983,6 +6983,14 @@ msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_BUILD_SUBJECT_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -7616,6 +7624,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_EXPORT_DESC"
 msgstr "Экспорт"
 
@@ -7754,6 +7766,10 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
@@ -9190,6 +9206,10 @@ msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "Тестировщик"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_ANONYMOUS_USER"
+#~ msgstr "URI"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CERT_"
 #~ msgstr "Доступ к УЦ"
 
@@ -9234,10 +9254,6 @@ msgstr "Тестировщик"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
 #~ msgstr "Отозвать сертификат"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
-#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"

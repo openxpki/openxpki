@@ -42,10 +42,6 @@ msgid "I18N_OPENXPKI_ACTIVITY_SCEP_EXTRACT_CSR_RENDER_SUBJECT_FAILED"
 msgstr "PKI Realm"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_ANONYMOUS_USER"
-msgstr "CA-ID"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_API_TOKEN_ALIAS_BY_TYPE_NO_GROUP_FOUND"
 msgstr "testuser"
 
@@ -6693,6 +6689,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_LABEL"
 msgstr "Initial state of the LDAP publishing workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC"
 msgstr "Arbeitsabläufe"
 
@@ -6906,6 +6906,14 @@ msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_BUILD_SUBJECT_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
@@ -7527,6 +7535,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_EXPORT_DESC"
 msgstr "Export"
 
@@ -7661,6 +7673,10 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
@@ -9090,6 +9106,10 @@ msgid "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 msgstr "testuser"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_ANONYMOUS_USER"
+#~ msgstr "CA-ID"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_CERT_"
 #~ msgstr "CA Informationszugang (Authority Information Access)"
 
@@ -9145,10 +9165,6 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
 #~ msgstr "Warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_"
-#~ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"

@@ -165,6 +165,11 @@ state:
           - global_noop > PENDING ? pending_notification_send
           - send_pending_notification > PENDING ?  !pending_notification_send
 
+    NOTIFY_REJECT:
+        autorun: 1
+        action:
+          - notify_rejected > REJECTED
+
     ONHOLD:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_DESC
@@ -180,8 +185,13 @@ state:
           - edit_cert_info > CANCEL_APPROVALS
           - edit_validity > CANCEL_APPROVALS
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
-          - reject_request > REJECTED ? acl_can_reject
+          - reject_request > NOTIFY_REJECT ? acl_can_reject
           - put_request_on_hold > ONHOLD ? acl_can_approve
+        output:
+          - cert_subject
+          - cert_subject_alt_name
+          - cert_profile
+          - cert_info
 
     PERSIST_KEY_PASSWORD:
         autorun: 1
@@ -198,11 +208,13 @@ state:
           - move_key_to_dp > REQUEST_COMPLETE
 
     REJECTED:
-        autorun: 1
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC
-        action:
-          - notify_rejected > FAILURE
+        output:
+          - cert_subject
+          - cert_profile
+          - cert_info
+          - reject_comment
 
     REQUEST_COMPLETE:
         autorun: 1
@@ -234,6 +246,7 @@ state:
           - edit_subject > BUILD_SUBJECT
           - edit_san > BUILD_SUBJECT
           - edit_cert_info > BUILD_SUBJECT
+          - global_cancel > CANCELED
         output:
           - cert_subject
           - cert_subject_alt_name
@@ -243,6 +256,12 @@ state:
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC
+        output:
+          - cert_identifier
+          - cert_subject
+          - cert_subject_alt_name
+          - cert_profile
+          - cert_info
 
     UPDATE_SUBJECT:
         autorun: 1
@@ -251,6 +270,13 @@ state:
         action:
           - render_subject > PENDING
 
+    CANCELED:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC
+        output:
+          - cert_subject
+          - cert_profile
+          - cert_info
 
 action:
     approve_csr:
