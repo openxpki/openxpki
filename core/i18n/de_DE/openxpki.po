@@ -4551,7 +4551,7 @@ msgstr ""
 "Diesdient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PAUSED_WAITING_FOR_GODOT"
+msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "Auf Start wartend"
 
 #, fuzzy
@@ -5657,6 +5657,10 @@ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy

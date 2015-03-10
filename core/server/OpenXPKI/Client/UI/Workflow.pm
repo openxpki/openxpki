@@ -1042,7 +1042,11 @@ sub __render_from_workflow {
         foreach my $field (@fields_to_render) {
         
             my $key = $field->{name};            
-            my $item = { value => ($context->{$key} || ''), type => '' };
+            my $item = { 
+                value => ($context->{$key} || ''), 
+                type => '', 
+                format =>  $field->{format} || ''  
+            };
         
             # Always suppress key material
             if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
@@ -1077,7 +1081,7 @@ sub __render_from_workflow {
             }
 
             # convert format cert_identifier into a link             
-            if ($item->{format} && $item->{format} eq 'cert_identifier') {        
+            if ($item->{format} eq 'cert_identifier') {        
                 $item->{format} = 'link';
                 $item->{value}  = { label => $item->{value}, page => 'certificate!detail!identifier!'. $item->{value}, target => 'modal' };
             }
@@ -1154,7 +1158,8 @@ sub __render_from_workflow {
                     { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL'), value => $wf_info->{WORKFLOW}->{ID} },
                     { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL'), value => $wf_info->{WORKFLOW}->{TYPE} },
                     { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL'), value => $wf_info->{WORKFLOW}->{STATE} },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL'), value => $wf_info->{WORKFLOW}->{PROC_STATE} }
+                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL'), value => $wf_info->{WORKFLOW}->{PROC_STATE} },
+                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL'), value => $wf_info->{WORKFLOW}->{CONTEXT}->{creator} },
                 ],
                 buttons => \@buttons,
         }}];
@@ -1193,7 +1198,7 @@ sub __get_action_buttons {
                 label => 'Cancel Request',
                 description => 'Press the confirm button to cancel this workflow. 
                 This will immediatley stop all actions on this workflow and 
-                mark it as canceled. This action can not be undone!  
+                mark it as canceled. <b>This action can not be undone!</b><br/><br/>  
                 If you want to keep this workflow, press the abort button to 
                 close this window without touching the workflow.',
             };

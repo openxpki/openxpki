@@ -4610,7 +4610,7 @@ msgid "I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT"
 msgstr "Описания пока нет"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PAUSED_WAITING_FOR_GODOT"
+msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "В состоянии ожидания запуска"
 
 #, fuzzy
@@ -5720,6 +5720,10 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy

@@ -46,22 +46,14 @@
                         </h4>
                     </div>
                     <div class="modal-body">
-                        {{confirmButton.confirm.description}}
+                        {{{confirmButton.confirm.description}}}
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary" {{action "confirm" confirmButton}}>
-                        {{#if confirmButton.confirm.confirm_label}}                    
-                            {{confirmButton.confirm.confirm_label}}
-                        {{else}}
-                            Confirm
-                        {{/if}}
+                            {{if confirmButton.confirm.confirm_label confirmButton.confirm.confirm_label "Confirm"}}
                         </button>
                         <button class="btn btn-default" {{action "cancel"}} data-dismiss="modal">
-                        {{#if confirmButton.confirm.cancel_label}}
-                            {{confirmButton.confirm.cancel_label}}
-                        {{else}}
-                            Abort
-                        {{/if}}                            
+                            {{if confirmButton.confirm.cancel_label confirmButton.confirm.cancel_label "Abort"}}                            
                         </button>
                     </div>
                 </div>

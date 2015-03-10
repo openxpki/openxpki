@@ -672,7 +672,7 @@ sub init_parse {
 
 =head2 action_autocomplete
 
-Handle searches via autocomplete
+Handle searches via autocomplete, shows only entity certificates
 
 =cut
 
@@ -688,9 +688,10 @@ sub action_autocomplete {
     my $query = {
         SUBJECT => "%$term%",
         VALID_AT => time(),
-        STATUS => 'ISSUED'
+        STATUS => 'ISSUED',
+        ENTITY_ONLY => 1        
     };
-
+   
     my $search_result = $self->send_command( 'search_cert', $query );
     $self->logger()->trace( "search result: " . Dumper $search_result);
 

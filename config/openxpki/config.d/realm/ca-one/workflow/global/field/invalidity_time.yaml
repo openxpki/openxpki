@@ -5,4 +5,5 @@ placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER
 tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP
 required: 0
 type: datetime
+format: timestamp
 default: now

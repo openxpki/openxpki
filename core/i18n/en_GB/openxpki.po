@@ -4127,7 +4127,7 @@ msgid "I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT"
 msgstr "Network timeout on scp transfer request"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PAUSED_WAITING_FOR_GODOT"
+msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "Waiting"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
@@ -4968,6 +4968,9 @@ msgstr "Workflow Context"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "Retries"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
+msgstr "Creator"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"

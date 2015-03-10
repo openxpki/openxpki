@@ -128,6 +128,11 @@ state:
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_DESC
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
 
     CANCELED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL
