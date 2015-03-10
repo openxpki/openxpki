@@ -1115,12 +1115,22 @@ sub __render_from_workflow {
                 buttons => $buttons
         }});
 
-        # set status decorator on final states
+        # set status decorator on final states, use proc state
         my $desc = $wf_info->{STATE}->{description};
-        if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
-            $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
-        } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
-            $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
+                
+        if ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'finished') {
+            # add special colors for success and failure       
+            if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
+                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
+            } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
+                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
+            } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'CANCELED') {
+                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED'),'warn');                
+            } else {
+                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL'),'warn');
+            }
+        } elsif ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'exception') {            
+            $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION'),'error');
         }
 
     }
@@ -1128,7 +1138,8 @@ sub __render_from_workflow {
     if ($wf_info->{WORKFLOW}->{ID} ) {
 
         my @buttons;        
-        if ($view eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/) {
+        if (($view eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/)
+            || $view eq 'context') {
             @buttons = ({
                 'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
                 'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'), #'open workflow',
