@@ -861,7 +861,7 @@ sub __render_from_workflow {
     }
 
     # Check if the workflow is under control of the watchdog
-    if ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') { 
+    if ($wf_info->{WORKFLOW}->{PROC_STATE} && $wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') { 
         
         my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
         my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
