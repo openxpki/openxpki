@@ -45,7 +45,7 @@ sub execute
         SUBJECT => $csr_subject
     });
         
-    if (scalar(@{$certs})) {        
+    if (scalar(@{$certs})) {
         my $certs_to_revoke_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
             {
             workflow    => $workflow,

@@ -173,8 +173,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CONTINUE_INITIAL_ENROLL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CONTINUE_INITIAL_ENROLL_DESC
         action:
-          - global_noop > PENDING_POLICY ?  !num_active_certs_less_than_max_active_certs
-          - global_noop2 > APPROVAL ? num_active_certs_less_than_max_active_certs
+          - global_noop > PENDING_POLICY ?  !num_active_certs_less_than_max_active_certs !auto_revoke_existing_certs
+          - global_noop2 > APPROVAL ? num_active_certs_less_than_max_active_certs auto_revoke_existing_certs
 
     ELIGIBLE_FOR_INITIAL_ENROLL:
         autorun: 1
@@ -499,7 +499,7 @@ action:
         input:
           - cert_identifier
         param:
-            auto_approval: 1
+            flag_auto_approval: 1
             reason_code: superseded
 
     revoke_cert_after_replace:
@@ -512,7 +512,7 @@ action:
           - invalidity_time
         param:
             _map_cert_identifier: $replace_cert_identifier
-            auto_approval: 1
+            flag_auto_approval: 1
 
     revoke_existing_certs:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts
@@ -569,11 +569,6 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{replace_cert_identifier};
-
-    num_active_certs_less_than_max_active_certs:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: $context->{num_active_certs} < $context->{p_max_active_certs};
 
     signed_renewal:
         class: Workflow::Condition::LazyAND
@@ -673,7 +668,7 @@ condition:
     num_active_certs_less_than_max_active_certs:
         class: Workflow::Condition::Evaluate
         param:
-             test: $context->{num_active_certs} &lt; $context->{p_max_active_certs}
+             test: $context->{num_active_certs} < $context->{p_max_active_certs}
 
     in_renewal_window:
         class: Workflow::Condition::Evaluate
