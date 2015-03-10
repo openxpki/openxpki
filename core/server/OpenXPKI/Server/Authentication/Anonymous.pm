@@ -42,7 +42,7 @@ sub login_step {
     my $msg     = $arg_ref->{MESSAGE};
 
     return (
-        'I18N_OPENXPKI_ANONYMOUS_USER',
+        'anonymous',
         $self->{ROLE},
         {
             SERVICE_MSG => 'SERVICE_READY',
