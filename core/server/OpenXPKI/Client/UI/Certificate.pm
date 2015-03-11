@@ -685,26 +685,47 @@ sub action_autocomplete {
 
     $self->logger()->debug( "autocomplete term: " . Dumper $term);
 
-    my $query = {
-        SUBJECT => "%$term%",
-        VALID_AT => time(),
-        STATUS => 'ISSUED',
-        ENTITY_ONLY => 1        
-    };
-   
-    my $search_result = $self->send_command( 'search_cert', $query );
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    my @result;    
+    # If we see a string with length of 25 to 27 with only base64 chars 
+    # we assume it is a cert identifier - this might fail in few cases
+    # Note - we replace + and / by - and _ in our base64 strings!
+    if ($term =~ /[a-zA-Z0-9-_]{25,27}/) {   
+        $self->logger()->debug( "search for identifier: $term ");
+        my $search_result = $self->send_command( 'get_cert', {
+            IDENTIFIER => $term,
+            FORMAT => 'DBINFO',
+        });
+        
+        if ($search_result) {
+            push @result, {
+                value => $search_result->{IDENTIFIER},
+                label => $self->_escape($search_result->{SUBJECT}),
+                notbefore => $search_result->{NOTBEFORE},
+                notafter => $search_result->{NOTAFTER}
+            };
+        }
+    } 
 
-    my @result;
-    foreach my $item (@{$search_result}) {
-        push @result, {
-            value => $item->{IDENTIFIER},
-            label => $self->_escape($item->{SUBJECT}),
-            notbefore => $item->{NOTBEFORE},
-            notafter => $item->{NOTAFTER}
-        };
+    if (!@result) {
+        my $search_result = $self->send_command( 'search_cert', {
+            SUBJECT => "%$term%",
+            VALID_AT => time(),
+            STATUS => 'ISSUED',
+            ENTITY_ONLY => 1        
+        });
+        
+        $self->logger()->trace( "search result: " . Dumper $search_result);
+    
+        foreach my $item (@{$search_result}) {
+            push @result, {
+                value => $item->{IDENTIFIER},
+                label => $self->_escape($item->{SUBJECT}),
+                notbefore => $item->{NOTBEFORE},
+                notafter => $item->{NOTAFTER}
+            };
+        }
     }
-
+    
     $self->logger()->debug( "search result: " . Dumper \@result);
 
     $self->_result()->{_raw} = \@result;
