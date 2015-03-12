@@ -104,7 +104,7 @@ sub i18nTokenizer {
     use Digest::SHA qw(sha1_base64);
     
     my $string = shift;    
-    my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_[A-Z0-9a-z\_-]+)/g);    
+    my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);    
     foreach my $token (keys %tokens) {
         my $replace = i18nGettext( $token );        
         $string =~ s/$token/$replace/g;
