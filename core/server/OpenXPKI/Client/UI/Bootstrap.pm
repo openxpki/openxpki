@@ -6,6 +6,7 @@ package OpenXPKI::Client::UI::Bootstrap;
 
 use Moose;
 use Data::Dumper;
+use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -19,13 +20,18 @@ sub init_structure {
         $self->_result()->{user} = $user;
         my $menu = $self->send_command( 'get_menu' );
         $self->logger()->trace('Menu ' . Dumper $menu);
+        
         $self->_result()->{structure} = $menu->{main};
         
-        # persist the landmark part of the menu, if any
+        # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
         $self->_client->session()->param('landmark', $menu->{landmark} || {});
         $self->_client->session()->param('tasklist', $menu->{tasklist} || []);
+        $self->_client->session()->param('wfsearch', $menu->{wfsearch} || []);
+        $self->_client->session()->param('certsearch', $menu->{certsearch} || []);
         $self->logger->debug('Got landmarks: ' . Dumper $menu->{landmark});
         $self->logger->debug('Got tasklist: ' . Dumper $menu->{tasklist});
+        $self->logger->debug('Got wfsearch: ' . Dumper $menu->{wfsearch});
+        $self->logger->debug('Got wfsearch: ' . Dumper $menu->{certsearch});
         
     }
     

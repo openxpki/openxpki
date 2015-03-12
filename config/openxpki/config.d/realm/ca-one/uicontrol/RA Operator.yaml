@@ -3,60 +3,58 @@ landmark:
 
 main:
   - key: home
-    label: Home
+    label: I18N_OPENXPKI_UI_MENU_HOME
     entries: 
-      - key:    home!index
-        label:  Home
       - key:    home!task
-        label:  My Tasks
+        label:  I18N_OPENXPKI_UI_MENU_MY_TASK
       - key:    workflow!mine
-        label:  My Workflows
+        label:  I18N_OPENXPKI_UI_MENU_MY_WORKFLOW
       - key:    certificate!mine
-        label:  My Certificates
+        label:  I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE
 
   - key: request
-    label: Request
+    label: I18N_OPENXPKI_UI_MENU_REQUEST
     entries: 
       - key:   workflow!index!wf_type!certificate_signing_request_v2
-        label: Request new certificate
+        label: I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE
       - key:   workflow!index!wf_type!certificate_revocation_request_v2
-        label: Request revocation
+        label: I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE
 
   - key:   pkiadm
-    label: PKI Operation
+    label: I18N_OPENXPKI_UI_MENU_PKI_OPERATION
     entries:
       - key:   workflow!index!wf_type!change_metadata
-        label: Change metadata
+        label: I18N_OPENXPKI_UI_MENU_CHANGE_METADATA
       - key:   workflow!index!wf_type!crl_issuance
-        label: Issue CRL
+        label: I18N_OPENXPKI_UI_MENU_CRL_ISSUE
       - key:   secret!index
-        label: Manage Secrets
+        label: I18N_OPENXPKI_UI_MENU_MANAGE_SECRET
       - key:   workflow!start!wf_type!ca_publish
-        label: Publish CA/CRL
+        label: I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL
 
 
   - key:   info
-    label: Information
+    label: I18N_OPENXPKI_UI_MENU_INFORMATION
     entries: 
       - key:   information!issuer
-        label: CA certificates
+        label: I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES
       - key:   crl!index
-        label: Revocation lists
+        label: I18N_OPENXPKI_UI_MENU_CRL
       - key:   information!process
-        label: Process Information
+        label: I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION
       - key:   information!status
-        label: System Status
+        label: I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS
 
 
   - key:   certificate!search
-    label: Certificates
+    label: I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH
 
   - key:   workflow!search
-    label: Workflows
+    label: I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH
 
 tasklist:
-  - label: Pending Requests
-    description: Requests awaiting approval
+  - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL
+    description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION
     query:
       TYPE:
         - certificate_signing_request_v2
@@ -64,8 +62,8 @@ tasklist:
         - ONHOLD
         - PENDING
 
-  - label: Pending Enrollments
-    description: Enrollment requests requiring attention
+  - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL
+    description: I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION
     query:
       TYPE:
         - enrollment
@@ -74,10 +72,21 @@ tasklist:
         - PENDING_MANUAL_AUTHENTICATION
         - PENDING_POLICY
 
-  - label: Pending Revocations
-    description: Revocations awaiting approval
+  - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL
+    description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION
     query:
       TYPE:
         - certificate_revocation_request_v2
       STATE:
         - PENDING
+
+wfsearch:
+   - label: Certificate Subject
+     key: cert_subject
+     pattern: '*%s*'
+     operator: like 
+
+   - label: Requestor
+     key: requestor  
+
+

@@ -694,6 +694,48 @@ sub get_workflow_activities {
     return \@list;
 }
 
+
+=head2 get_workflow_instance_types
+
+Load a list of workflow types present in the database for the current realm
+and add label and description from the configuration. 
+
+Return value is a hash with the type name as key and a hashref 
+with label/description as value.
+ 
+=cut
+
+sub get_workflow_instance_types {
+    
+    my $self  = shift;
+    my $args  = shift;
+    
+    my $cfg = CTX('config');
+    my $pki_realm = CTX('session')->get_pki_realm();    
+    
+    my $db_results = CTX('dbi_backend')->select(
+        TABLE   => 'WORKFLOW',
+        DISTINCT => 1,
+        COLUMNS => [ 'WORKFLOW_TYPE' ],        
+        DYNAMIC => { 'PKI_REALM' => $pki_realm }
+    );
+    
+    my $result = {};
+    while (my $line = shift @{$db_results}) {
+        my $type = $line->{WORKFLOW_TYPE}; 
+        my $label = $cfg->get([ 'workflow', 'def', $type, 'head', 'label' ]);
+        my $desc = $cfg->get([ 'workflow', 'def', $type, 'head', 'description' ]);        
+        $result->{$type} = { 
+            label => $label || $type,
+            description => $desc || $label || '',
+        };
+    }
+       
+    return $result;
+    
+}
+
+
 sub search_workflow_instances_count {
 
     my $self     = shift;
@@ -863,6 +905,11 @@ sub __search_workflow_instances {
         }
         $dynamic->{'WORKFLOW.WORKFLOW_STATE'} = {VALUE => $arg_ref->{STATE}};
     }
+    
+    if (defined $arg_ref->{PROC_STATE}) {
+        $dynamic->{'WORKFLOW.WORKFLOW_PROC_STATE'} = { VALUE => $arg_ref->{PROC_STATE} };
+    }
+    
     my %limit;
     if (defined $arg_ref->{LIMIT} && !defined $arg_ref->{START}) {
         $limit{'LIMIT'} = $arg_ref->{LIMIT};

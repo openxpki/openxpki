@@ -169,8 +169,10 @@ sub init_search {
         description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION'),
     });
 
-    my $workflows = $self->send_command( 'list_workflow_titles' );
+    my $workflows = $self->send_command( 'get_workflow_instance_types' );
     return $self unless(defined $workflows);
+    
+    $self->logger()->debug('Workflows ' . Dumper $workflows);
     
     my $preset;
     if ($args->{preset}) {
@@ -187,13 +189,61 @@ sub init_search {
     my @wfl_list = map { $_ = {'value' => $_, 'label' => i18nGettext($workflows->{$_}->{label})} } @wf_names ;
     @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
 
-    my @states = (
-        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL'), value => 'SUCCESS' },
-        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_FAILURE_LABEL'), value => 'FAILURE' },
-        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PENDING_LABEL'), value => 'PENDING' },
-        { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_APPROVAL_LABEL'), value => 'APPROVAL' },
-    );
-    @states = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @states;
+    my @proc_states = (        
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL', value => 'manual' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE', value => 'pause' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },        
+    );    
+    
+    my @fields = (
+        { name => 'wf_type',
+          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL'),
+          type => 'select',
+          is_optional => 1,
+          options => \@wfl_list,
+          value => $preset->{wf_type} 
+        },
+        { name => 'wf_proc_state',
+          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL'), 
+          type => 'select',
+          is_optional => 1,
+          prompt => '',
+          options => \@proc_states,
+          value => $preset->{wf_proc_state}
+        },
+        { name => 'wf_state',
+          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL'), #'State',
+          type => 'text',
+          is_optional => 1,
+          prompt => '',
+          value => $preset->{wf_state}
+        },
+        { name => 'wf_creator',
+          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL'), # 'Creator',
+          type => 'text',
+          is_optional => 1,
+          value => $preset->{wf_creator}
+        }
+    );   
+
+    # Searchable attributes are read from the menu bootstrap
+    
+    my $attributes = $self->_client->session()->param('wfsearch');    
+    if ($attributes) {
+        my @attrib;
+        foreach my $item (@{$attributes}) {
+            push @attrib, { value => $item->{key}, label=> $item->{label} };                    
+        }
+        push @fields, {
+            name => 'attributes', 
+            label => 'Metadata', 
+            'keys' => \@attrib,                  
+            type => 'text',
+            is_optional => 1, 
+            'clonable' => 1
+        };                            
+    }
 
     $self->_result()->{main} = [
         {   type => 'form',
@@ -210,30 +260,7 @@ sub init_search {
             content => {
                 title => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE'),
                 submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL'),
-                fields => [
-                    { name => 'wf_type',
-                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL'),
-                      type => 'select',
-                      is_optional => 1,
-                      options => \@wfl_list,
-                      value => $preset->{wf_type} 
-                    },
-                    { name => 'wf_state',
-                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL'), #'State',
-                      type => 'select',
-                      is_optional => 1,
-                      editable => 1,
-                      prompt => '',
-                      options => \@states,
-                      value => $preset->{wf_state}
-                    },
-                    { name => 'wf_creator',
-                      label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL'), # 'Creator',
-                      type => 'text',
-                      is_optional => 1,
-                      value => $preset->{wf_creator}
-                    },
-                ]               
+                fields => \@fields         
             }
         }
     ];
@@ -740,18 +767,45 @@ sub action_search {
 
     my $query = { };
     my $input;
-    foreach my $key (qw(type state)) {
-        my $val = $self->param("wf_$key");
-        if (defined $val && $val ne '') {
-            $query->{uc($key)} = $val;
-            $input->{'wf_'.$key} = $val;
-        }
+    
+    if ($self->param('wf_type')) {
+        $query->{TYPE} = $self->param('wf_type');
+        $input->{wf_type} = $self->param('wf_type');                                
     }
-
+    
+    if ($self->param('wf_state')) {
+        $query->{STATE} = $self->param('wf_state');
+        $input->{wf_state} = $self->param('wf_state');                                
+    }
+    
+    if ($self->param('wf_proc_state')) {
+        $query->{PROC_STATE} = $self->param('wf_proc_state');
+        $input->{wf_proc_state} = $self->param('wf_proc_state');                                
+    }
+    
+    my @attr;
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
-        $query->{ATTRIBUTE} = [{ KEY => 'creator', VALUE => ~~ $self->param('wf_creator') }];                         
+        push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };                         
     }
+    
+    # Read the query pattern for extra attributes from the session 
+    my $attributes = $self->_client->session()->param('wfsearch');        
+    foreach my $item (@{$attributes}) {
+        my $key = $item->{key};
+        my $pattern = $item->{pattern} || '';
+        my $operator = $item->{operator} || 'EQUAL';
+        my @val = $self->param($key.'[]');
+        while (my $val = shift @val) {
+            # embed into search pattern from config
+            $val = sprintf($pattern, $val) if ($pattern);
+            # replace asterisk as wildcard
+            $val =~ s/\*/%/g;
+            push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
+        }
+    }
+    
+    $query->{ATTRIBUTE} = \@attr;
 
     $self->logger()->debug("query : " . Dumper $query);
  
