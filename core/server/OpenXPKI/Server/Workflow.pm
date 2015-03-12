@@ -272,6 +272,16 @@ sub attrib {
         ##! 8: 'received hash - setting values'
         foreach my $key (keys %{$arg}) {
             if (defined $arg->{$key}) {
+                my $value = $arg->{$key};
+                
+                # non scalar values are not allowed
+                if (ref $value ne '') {
+                   OpenXPKI::Exception->throw(
+                       message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_GOT_NON_SCALAR_ATTRIBUTE_VALUE',
+                       params => { key => $key, type =>  ref $value }
+                   );
+                }
+                
                 ##! 16: 'set key ' . $key . ' to value ' .  $arg->{$key}
                 # check if the attribute is already in the table
                 my $result = CTX('dbi_backend')->select (
