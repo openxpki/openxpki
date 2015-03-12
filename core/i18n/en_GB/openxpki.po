@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-03-06 08:20+0100\n"
+"PO-Revision-Date: 2015-03-12 10:49+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -2870,6 +2870,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFI
 msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFINED"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_GOT_NON_SCALAR_ATTRIBUTE_VALUE"
+msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PARSE_CERT_INVALID_ATTRIBUTE"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN"
 msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_COMPUTEPUK_TOKEN_NOT_SUPPORTED"
 
@@ -4102,6 +4106,67 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "login failed"
 
+msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
+msgstr "CA Certificates"
+
+msgid "I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH"
+msgstr "Certificate Search"
+
+msgid "I18N_OPENXPKI_UI_MENU_CHANGE_METADATA"
+msgstr "Change Certificate Metadata"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_CRL"
+msgstr "Show Revocation Lists (CRL)"
+
+msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
+msgstr "Issue a certificate revocation list (CRL)"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_HOME"
+msgstr "Home"
+
+msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
+msgstr "Information"
+
+msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
+msgstr "Manage Secrets"
+
+msgid "I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE"
+msgstr "My Certificates"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_MY_TASK"
+msgstr "My Tasks"
+
+msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
+msgstr "My Workflows"
+
+msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr "PKI Operation"
+
+msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
+msgstr "Process Information"
+
+msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
+msgstr "Publish CA/CRL"
+
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST"
+msgstr "Request"
+
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE"
+msgstr "Request certificate"
+
+msgid "I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE"
+msgstr "Revoke certificate"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
+msgstr "System Status"
+
+msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
+msgstr "Workflow Search"
+
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
 msgstr "This page shows a list of all workflows started by you."
 
@@ -4123,7 +4188,6 @@ msgstr "Revocation approved, waiting for next revocation list (CRL) update"
 msgid "I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT"
 msgstr "Network timeout on scp transfer request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "Waiting"
 
@@ -4276,6 +4340,24 @@ msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
 msgstr "Username"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "SCEP Enrollment workflows awaiting approval."
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
+msgstr "Enrollments"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
+msgstr "Certificate requests awaiting approval."
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL"
+msgstr "Certification Requests"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION"
+msgstr "Revocation workflows awaiting approval."
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
+msgstr "Revocation Requests"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
@@ -5465,7 +5547,8 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP"
 msgstr "Specify the reason why you want the certificate being revoked."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_DESC"
-msgstr "Reason for rejecting this request. This comment is visible to the user."
+msgstr ""
+"Reason for rejecting this request. This comment is visible to the user."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_LABEL"
 msgstr "Reason for Reject"
@@ -6227,9 +6310,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PKCS10_GENERATED_LABEL"
 msgstr "Updated"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
-msgstr "Your request has been rejected by the registration office. "
-"You may find a reason for the rejection in the comment field below. "
-"This decission is final, the workflow can not be restarted."
+msgstr ""
+"Your request has been rejected by the registration office. You may find a "
+"reason for the rejection in the comment field below. This decission is "
+"final, the workflow can not be restarted."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_LABEL"
 msgstr "Request Rejected"
@@ -8143,10 +8227,6 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #~ msgstr "This workflow has finished with success and can not be restarted"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
 #~ msgstr "This workflow failed finally and can not be restarted"
 
@@ -8553,7 +8633,3 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "SUCCESS"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
-#~ msgstr "Workflow: Enrollnment"

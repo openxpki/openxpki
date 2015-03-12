@@ -3108,6 +3108,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFI
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_GOT_NON_SCALAR_ATTRIBUTE_VALUE"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN"
 msgstr ""
 "Отсутствует токен для преобразования сертификата в DER-формат перед "
@@ -4574,6 +4578,82 @@ msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Процесс закончился с ошибкой"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CHANGE_METADATA"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CRL"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
+msgstr "Технологические процессы выдачи новых списков отзыва"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HOME"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
+msgstr "Тестировщик"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MY_TASK"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST"
+msgstr "Комментарий"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE"
+msgstr "Отозвать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE"
+msgstr "Отозвать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
+msgstr "Статус"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
 msgstr "Описания пока нет"
 
@@ -4874,6 +4954,35 @@ msgstr ""
 "имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
 "пользователя, который следует использовать, если нет особых требований к "
 "сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION"
+msgstr ""
+"В это поле вы можете внести адрес электронной почты. Адрес электронной почты "
+"не следует включать в имя владельца сертификата. Этот адрес следует добавить "
+"в качестве альтернативного имени. Вы можете добавить к альтернативному "
+"имени  несколько  адресов, но в каждое поле формы вписывайте, пожалуйста, не "
+"более одного адреса."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
+msgstr "Пауза"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
@@ -9300,10 +9409,6 @@ msgstr "Тестировщик"
 #~ msgstr "Технологические процессы"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
-#~ msgstr "Дочерние технологические процессы"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
 #~ msgstr "Дочерние технологические процессы"
 
@@ -9726,7 +9831,3 @@ msgstr "Тестировщик"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Технологические процессы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
-#~ msgstr "Прием заявок на сертификаты по протоколу SCEP"

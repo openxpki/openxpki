@@ -3168,6 +3168,10 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFI
 msgstr "PKI Realm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_GOT_NON_SCALAR_ATTRIBUTE_VALUE"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN"
 msgstr "PKI Realm"
 
@@ -4513,6 +4517,85 @@ msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Die Datei konnte nicht geöffnet werden"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CHANGE_METADATA"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CRL"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
+msgstr "Dieser Workflow erstellt neue CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HOME"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
+msgstr "testuser"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MY_TASK"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+"oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST"
+msgstr "Kommentar"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
 msgstr ""
 "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
@@ -4813,6 +4896,33 @@ msgstr ""
 "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
 "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
 "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+"oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION"
+msgstr "Die E-Mailadresse, welche im Zertifikat enthalten ist."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
+msgstr "Warten"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_"
@@ -9203,10 +9313,6 @@ msgstr "testuser"
 #~ msgstr "Arbeitsabläufe"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_EDIT_REQUEST_LABEL"
-#~ msgstr "Untergeordnete Workflows"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_FAILURE_DESC"
 #~ msgstr "Untergeordnete Workflows"
 
@@ -9615,7 +9721,3 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Arbeitsabläufe"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_ENROLLMENT_DESC"
-#~ msgstr "SCEP-Zertifizierungsantrag"
