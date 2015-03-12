@@ -268,7 +268,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_DESC
         action:
-          - render_subject > PENDING
+          - render_subject set_workflow_attributes > PENDING
 
     CANCELED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL
@@ -520,10 +520,19 @@ action:
         param:
             message: csr_created
 
+    set_workflow_attributes:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        param:
+           _map_cert_subject: $cert_subject
+           _map_requestor: "[% cert_info.requestor_email %]"
+
     submit:
-        class: OpenXPKI::Server::Workflow::Activity::Noop
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC
+        param:
+           _map_cert_subject: $cert_subject
+           _map_requestor: "[% context.cert_info.requestor_email %]"
 
     upload_pkcs10:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
