@@ -129,7 +129,7 @@ sub param {
     if ( ref $name ne '' || defined $value ) {
         return $self->SUPER::param( $name, $value );
     }
-
+    
     if ( exists $self->{PARAMS}{$name} ) {
         return $self->{PARAMS}{$name};
     } else {
@@ -151,10 +151,27 @@ sub param {
                 return $ctx;
             }
         } else {
-            ##! 16: 'parse using tt ' . $map->{$name}->[1]
+            
+            ##! 16: 'parse using tt ' . $template
+            
+            my $tt_param  = $self->workflow()->context()->param();
+            
+            # We auto deserialize non-scalar context items if they are 
+            # referenced in the template string   
+            my @non_scalar_refs = ($template =~ m{ context\.([^\s\.]+)\.\S+ }xsg);            
+            foreach my $refkey (@non_scalar_refs) {
+                ##! 16: 'auto deserialize for ' . $refkey 
+                # this can happen if the context was not read from DB
+                if (!ref $tt_param->{$refkey}) {
+                    my $ser  = OpenXPKI::Serialization::Simple->new();
+                    $tt_param->{$refkey} = $ser->deserialize( $tt_param->{$refkey} );
+                    ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}                     
+                }
+            }
+            
             my $tt = Template->new();
             my $out;
-            if (!$tt->process( \$template, { context => $self->workflow()->context()->param() }, \$out )) {
+            if (!$tt->process( \$template, { context => $tt_param }, \$out )) {
                 OpenXPKI::Exception->throw({
                     MESSAGE => 'I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM',
                     PARAMS => {

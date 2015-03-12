@@ -180,6 +180,11 @@ sub update_workflow {
         # ignore "volatile" context parameters starting with an underscore
         next PARAMETER if ($key =~ m{ \A _ }xms);
 
+        # automatic serialization        
+        if (ref $value eq 'ARRAY' ||  ref $value eq 'HASH') {
+            my $ser = OpenXPKI::Serialization::Simple->new();
+            $value = $ser->serialize( $value );
+        }
         # context parameter sanity checks 
         if (length($value) > $context_value_max_length) {
             ##! 4: "parameter length exceeded"
