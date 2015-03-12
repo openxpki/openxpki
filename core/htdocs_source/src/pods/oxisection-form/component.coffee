@@ -97,7 +97,7 @@ Component = Em.Component.extend
 
             for name in names
                 clones = (f for f in fields when f.name is name)
-                if clones.length > 1
+                if clones[0].clonable
                     data[name] = (c.value for c in clones)
                 else
                     data[name] = clones[0].value

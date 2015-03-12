@@ -16,7 +16,11 @@ Component = Em.Component.extend
         isEditable = @get "editable"
         isOptional = @get "is_optional"
 
-        options.length is 1 and not isEditable and not isOptional
+        if options.length is 1 and not isEditable and not isOptional
+            @set "content.value", options[0].value
+            true
+        else
+            false
 
     isCustom: Em.computed "options", "content.value", ->
         values = (o.value for o in @get "options")
