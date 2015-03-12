@@ -921,7 +921,7 @@ sub __render_from_workflow {
 
         my $label =  $wf_action_info->{label} || $wf_info->{STATE}->{label} ;
         if ($label) {
-            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label} );
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
         } else {
             $label =  $wf_info->{WORKFLOW}->{label} ;
         }
@@ -949,7 +949,7 @@ sub __render_from_workflow {
                 ]
         }});
 
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'info');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
                 
         # this should be available to raop only
         if (0) {
@@ -1059,7 +1059,7 @@ sub __render_from_workflow {
         # Headline from state + workflow
         my $label =  $wf_info->{STATE}->{label};
         if ($label) {
-            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label} );
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
         } else {
             $label =  $wf_info->{WORKFLOW}->{label};
         }
@@ -1417,7 +1417,7 @@ sub __render_result_list {
         push @result, [
             $item->{'WORKFLOW.WORKFLOW_SERIAL'},
             $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            $item->{'WORKFLOW.WORKFLOW_TYPE'}), # todo - translate
+            $item->{'WORKFLOW.WORKFLOW_TYPE'}, # todo - translate
             $state,            
             $item->{'WORKFLOW.WORKFLOW_SERIAL'},
             $status,
