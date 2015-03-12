@@ -7,7 +7,6 @@ package OpenXPKI::Client::UI::Workflow;
 use Moose;
 use Data::Dumper;
 use Date::Parse;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -51,7 +50,7 @@ sub init_index {
     });
 
     if (!$wf_info) {
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
         return $self;
     }
 
@@ -134,7 +133,7 @@ sub init_load {
     });
 
     if (!$wf_info) {
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error') unless($self->_status());
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
         return $self;
     }
 
@@ -165,8 +164,8 @@ sub init_search {
     my $args = shift;
 
     $self->_page({
-        label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE'),
-        description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION'),
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION',
     });
 
     my $workflows = $self->send_command( 'get_workflow_instance_types' );
@@ -186,7 +185,7 @@ sub init_search {
 
     # TODO Sorting / I18
     my @wf_names = keys %{$workflows};
-    my @wfl_list = map { $_ = {'value' => $_, 'label' => i18nGettext($workflows->{$_}->{label})} } @wf_names ;
+    my @wfl_list = map { $_ = {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
     @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
 
     my @proc_states = (        
@@ -198,14 +197,14 @@ sub init_search {
     
     my @fields = (
         { name => 'wf_type',
-          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL'),
+          label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL',
           type => 'select',
           is_optional => 1,
           options => \@wfl_list,
           value => $preset->{wf_type} 
         },
         { name => 'wf_proc_state',
-          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL'), 
+          label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', 
           type => 'select',
           is_optional => 1,
           prompt => '',
@@ -213,14 +212,14 @@ sub init_search {
           value => $preset->{wf_proc_state}
         },
         { name => 'wf_state',
-          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL'), #'State',
+          label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL',
           type => 'text',
           is_optional => 1,
           prompt => '',
           value => $preset->{wf_state}
         },
         { name => 'wf_creator',
-          label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL'), # 'Creator',
+          label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL',
           type => 'text',
           is_optional => 1,
           value => $preset->{wf_creator}
@@ -249,17 +248,17 @@ sub init_search {
         {   type => 'form',
             action => 'workflow!load',
             content => {
-                title => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE'),
-                submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL'),
+                title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
+                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
                 fields => [
-                    { name => 'wf_id', label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL'), type => 'text' },
+                    { name => 'wf_id', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL', type => 'text' },
                 ]
         }},
         {   type => 'form',
             action => 'workflow!search',
             content => {
-                title => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE'),
-                submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL'),
+                title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
+                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
                 fields => \@fields         
             }
         }
@@ -308,8 +307,8 @@ sub init_result {
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
     $self->_page({
-        label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE'),
-        description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION'),
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
     });
     
     my @result = $self->__render_result_list( $search_result ); 
@@ -324,15 +323,15 @@ sub init_result {
             header => 'Grid-Headline',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
-                label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'),
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
                 target => 'tab',
             }],
             columns => [
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL') },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL' },
                 { sTitle => 'serial', bVisible => 0 },
                 { sTitle => "_className"},
             ],
@@ -360,8 +359,8 @@ sub init_history {
     my $id = $self->param('wf_id');
 
     $self->_page({
-        label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE'),
-        description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION'),
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
     });
 
     my $workflow_history = $self->send_command( 'get_workflow_history', { ID => $id } );
@@ -373,9 +372,9 @@ sub init_history {
     foreach my $item (@{$workflow_history}) {
         push @result, [
             $item->{'WORKFLOW_HISTORY_DATE'},
-            i18nGettext($item->{'WORKFLOW_STATE'}),
-            i18nGettext($item->{'WORKFLOW_ACTION'}),
-            i18nGettext($item->{'WORKFLOW_DESCRIPTION'}),
+            $item->{'WORKFLOW_STATE'},
+            $item->{'WORKFLOW_ACTION'},
+            $item->{'WORKFLOW_DESCRIPTION'},
             $item->{'WORKFLOW_USER'}
         ]
     }
@@ -388,11 +387,11 @@ sub init_history {
         processing_type => 'all',
         content => {
             columns => [
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_EXEC_TIME_LABEL') }, #, format => 'datetime'},
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_STATE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_ACTION_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_USER_LABEL') },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_EXEC_TIME_LABEL' }, #, format => 'datetime'},
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_STATE_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_ACTION_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_USER_LABEL' },
             ],
             data => \@result,
         },
@@ -406,7 +405,7 @@ sub init_history {
             content => {
                 buttons => [{
                     'action' => 'redirect!workflow!load!wf_id!'.$id,
-                    'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'), #'open workflow',
+                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
                 }]
             }
         });
@@ -446,8 +445,8 @@ sub init_mine {
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
     $self->_page({
-        label => i18nGettext('I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE'),
-        description => i18nGettext('I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION'),
+        label => 'I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE',
+        description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
     });
 
     my $i = 1;
@@ -463,15 +462,15 @@ sub init_mine {
             header => 'Grid-Headline',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
-                label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'),
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
                 target => 'tab',
             }],
             columns => [
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL') },
-                { sTitle => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL') },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL' },
                 { sTitle => 'serial', bVisible => 0 },
                 { sTitle => "_className"},                
             ],
@@ -545,7 +544,7 @@ sub action_index {
     my $wf_info;
     # wf_token found, so its a real action
     if (!$wf_token) {
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!'),'error');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!','error');
         return $self;
     }
 
@@ -583,7 +582,7 @@ sub action_index {
     if ($wf_args->{wf_id}) {
 
         if (!$wf_args->{wf_action}) {
-            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
             return $self;
         }
 
@@ -603,7 +602,7 @@ sub action_index {
             return $self;
         }
         $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED'),'success');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED','success');
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
@@ -629,7 +628,7 @@ sub action_index {
         $wf_args->{redirect} = ($wf_info->{WORKFLOW}->{ID} > 0);
 
     } else {
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!'),'error');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
         return $self;
     }
 
@@ -715,7 +714,7 @@ sub action_select {
     $self->logger()->debug('wf_info ' . Dumper  $wf_info);
 
     if (!$wf_info) {
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
         return $self;
     }
 
@@ -896,7 +895,7 @@ sub __render_from_workflow {
 
     $self->logger()->debug( "wf_info: " . Dumper $wf_info);
     if (!$wf_info) {
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION'),'error');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
         return $self;
     }
 
@@ -909,7 +908,7 @@ sub __render_from_workflow {
     if($args->{WF_ACTION}) {
         $wf_action = $args->{WF_ACTION};
         if (!$wf_info->{ACTIVITY}->{$wf_action}) {
-            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE'),'error');
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE','error');
             return $self;
         }
     }
@@ -920,37 +919,37 @@ sub __render_from_workflow {
         my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
         my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
 
-        my $label = i18nGettext( $wf_action_info->{label} || $wf_info->{STATE}->{label} );
+        my $label =  $wf_action_info->{label} || $wf_info->{STATE}->{label} ;
         if ($label) {
-            $label .= ' / ' . i18nGettext( $wf_info->{WORKFLOW}->{label} );
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label} );
         } else {
-            $label = i18nGettext( $wf_info->{WORKFLOW}->{label} );
+            $label =  $wf_info->{WORKFLOW}->{label} ;
         }
         
         $self->_page({
             label => $label,
             shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description => i18nGettext( $wf_action_info->{description} ),
+            description =>  $wf_action_info->{description} ,
         });
 
         $self->add_section({
             type => 'keyvalue',
              content => {
                 label => '',
-                description => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION'),
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION',
                 data => [
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL'), 
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL', 
                         value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 'format' => 'timestamp' },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL'), 
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL', 
                         value => $wf_info->{WORKFLOW}->{WAKE_UP_AT}, 'format' => 'timestamp' },                    
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL'), 
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL', 
                         value => $wf_info->{WORKFLOW}->{COUNT_TRY} },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL'),
-                        value => i18nGettext($wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg}) },
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL',
+                        value => $wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg} },
                 ]
         }});
 
-        $self->set_status(i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'info');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED'),'info');
                 
         # this should be available to raop only
         if (0) {
@@ -963,7 +962,7 @@ sub __render_from_workflow {
                 type => 'form',
                 action => 'workflow',
                 content => {
-                    submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON'),
+                    submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
                     fields => \@fields
             }});
         }
@@ -973,16 +972,16 @@ sub __render_from_workflow {
         my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
 
         # Headline from action or state + Workflow Label, description from action if set
-        my $label = i18nGettext( $wf_action_info->{label} || $wf_info->{STATE}->{label} );
+        my $label =  $wf_action_info->{label} || $wf_info->{STATE}->{label} ;
         if ($label) {
-            $label .= ' / ' . i18nGettext( $wf_info->{WORKFLOW}->{label} );
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label} ;
         } else {
-            $label = i18nGettext( $wf_info->{WORKFLOW}->{label} );
+            $label =  $wf_info->{WORKFLOW}->{label} ;
         }
         $self->_page({
             label => $label,
             shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description => i18nGettext( $wf_action_info->{description} ),
+            description =>  $wf_action_info->{description} ,
         });
 
         # delegation based on activity
@@ -1021,7 +1020,7 @@ sub __render_from_workflow {
 
             # if the field has a description text, push it to the @fielddesc list
             if ($field->{description} !~ /^\s*$/) {
-                my $descr = i18nGettext($field->{description});
+                my $descr = $field->{description};
                 push @fielddesc, { label => $item->{label}, value => $descr } if ($descr);
             }
 
@@ -1039,7 +1038,7 @@ sub __render_from_workflow {
             content => {
                 #label => $wf_action_info->{label},
                 #description => $wf_action_info->{description},
-                submit_label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE'),
+                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
                 fields => \@fields
         }});
 
@@ -1047,7 +1046,7 @@ sub __render_from_workflow {
             $self->add_section({
                 type => 'keyvalue',
                 content => {
-                    label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST'),
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
                     description => '',
                     data => \@fielddesc
             }});
@@ -1058,17 +1057,17 @@ sub __render_from_workflow {
         # more than one action available, so we offer some buttons to choose how to continue
 
         # Headline from state + workflow
-        my $label = i18nGettext( $wf_info->{STATE}->{label} );
+        my $label =  $wf_info->{STATE}->{label};
         if ($label) {
-            $label .= ' / ' . i18nGettext( $wf_info->{WORKFLOW}->{label} );
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label} );
         } else {
-            $label = i18nGettext( $wf_info->{WORKFLOW}->{label} );
+            $label =  $wf_info->{WORKFLOW}->{label};
         }
 
         $self->_page({
             label => $label,
             shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description => i18nGettext( $wf_info->{STATE}->{description} ),
+            description =>  $wf_info->{STATE}->{description},
         });
 
         my @fields;
@@ -1104,13 +1103,13 @@ sub __render_from_workflow {
         
             # Always suppress key material
             if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
-                $item->{value} = i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT');                
+                $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';                
             }
             
             # Label, Description, Tooltip
             foreach my $prop (qw(label description tooltip)) {
                 if ($field->{$prop}) {
-                    $item->{$prop} = i18nGettext($field->{$prop});
+                    $item->{$prop} = $field->{$prop};
                 }
             }
             
@@ -1175,16 +1174,16 @@ sub __render_from_workflow {
         if ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'finished') {
             # add special colors for success and failure       
             if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
-                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS'),'success');
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS','success');
             } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
-                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE'),'error');
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE','error');
             } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'CANCELED') {
-                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED'),'warn');                
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED','warn');                
             } else {
-                $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL'),'warn');
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL','warn');
             }
         } elsif ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'exception') {            
-            $self->set_status( i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION'),'error');
+            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
         }
 
     }
@@ -1196,20 +1195,20 @@ sub __render_from_workflow {
             || $view eq 'context') {
             @buttons = ({
                 'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-                'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL'), #'open workflow',
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
             });
         }
 
         if ($view ne 'context') {
             push @buttons, {
                 'action' => 'redirect!workflow!load!view!context!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-                'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL'),
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
             };
         }
         
         push @buttons, {
             'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-            'label' => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL'),
+            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
         };
         
 
@@ -1220,11 +1219,11 @@ sub __render_from_workflow {
                 description => '',
                 data => [
                 # todo - i18n for values
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL'), value => $wf_info->{WORKFLOW}->{ID} },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL'), value => $wf_info->{WORKFLOW}->{TYPE} },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL'), value => $wf_info->{WORKFLOW}->{STATE} },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL'), value => $wf_info->{WORKFLOW}->{PROC_STATE} },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL'), value => $wf_info->{WORKFLOW}->{CONTEXT}->{creator} },
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', value => $wf_info->{WORKFLOW}->{ID} },
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{WORKFLOW}->{TYPE} },
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{WORKFLOW}->{STATE} },
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{WORKFLOW}->{PROC_STATE} },
+                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', value => $wf_info->{WORKFLOW}->{CONTEXT}->{creator} },
                 ],
                 buttons => \@buttons,
         }}];
@@ -1270,9 +1269,9 @@ sub __get_action_buttons {
         }
 
        push @buttons, {
-            label => i18nGettext($wf_action_info->{label} || $wf_action),
+            label => $wf_action_info->{label} || $wf_action,
             action => sprintf ('workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID}),
-            description => i18nGettext($hint->{$wf_action}),
+            description => $hint->{$wf_action},
             %extra
         };
     }
@@ -1306,16 +1305,16 @@ sub __render_input_field {
 
     my $item = {
         name => $name,
-        label => i18nGettext($field->{label}) || $name,
+        label => $field->{label} || $name,
         type => $type
     };
 
-    $item->{placeholder} = i18nGettext($field->{placeholder}) if ($field->{placeholder});
-    $item->{tooltip} = i18nGettext($field->{tooltip}) if ($field->{tooltip});
+    $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
+    $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
 
     if ($field->{option}) {
         $item->{options} = $field->{option};
-        map {  $_->{label} = i18nGettext($_->{label}) } @{$item->{options}};
+        map {  $_->{label} = $_->{label} } @{$item->{options}};
     }
 
     if ($field->{clonable}) {
@@ -1401,11 +1400,11 @@ sub __render_result_list {
         # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE
         if ($item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'exception') {
             
-            $state .= " (" . i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION') . ")";
+            $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION )";
             
         } elsif ($item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'pause') {
            
-           $state .= " (".i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE') .")";
+           $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE )";
                   
         }
         
@@ -1418,7 +1417,7 @@ sub __render_result_list {
         push @result, [
             $item->{'WORKFLOW.WORKFLOW_SERIAL'},
             $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}), # todo - translate
+            $item->{'WORKFLOW.WORKFLOW_TYPE'}), # todo - translate
             $state,            
             $item->{'WORKFLOW.WORKFLOW_SERIAL'},
             $status,

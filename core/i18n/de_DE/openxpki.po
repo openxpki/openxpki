@@ -1948,12 +1948,6 @@ msgstr ""
 "oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
 "Diesdient der sichern Identifikation von Personen oder Objekten."
 
-msgid "I18N_OPENXPKI_SECRET_COMPLETE"
-msgstr "Vollständig"
-
-msgid "I18N_OPENXPKI_SECRET_INCOMPLETE"
-msgstr "Unvollständig"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_SERIALIZATION_FAST_DESERIALIZE_INCORRECT_SERIALIZATION_FORMAT"
 msgstr "TLS-Server"
@@ -4973,6 +4967,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
+msgstr "Vollständig"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
+msgstr "Unvollständig"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"

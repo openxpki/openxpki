@@ -8,8 +8,6 @@ use Moose;
 use Data::Dumper;
 use OpenXPKI::DN;
 use Digest::SHA qw(sha1_base64);
-use OpenXPKI::i18n qw( i18nGettext );
-
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -41,14 +39,14 @@ sub init_search {
     my @profile_names = keys %{$profile};
     @profile_names = sort @profile_names;
 
-    my @profile_list = map { $_ = {'value' => $_, 'label' => i18nGettext($profile->{$_}->{label})} } @profile_names ;
+    my @profile_list = map { $_ = {'value' => $_, 'label' => $profile->{$_}->{label}} } @profile_names ;
 
     my @states = (
-        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_ISSUED'), value => 'ISSUED'},
-        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_VALID'), value => 'VALID'},
-        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED'), value => 'EXPIRED'},
-        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_REVOKED'), value => 'REVOKED'},
-        { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING'), value => 'CRL_ISSUANCE_PENDING'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_ISSUED', value => 'ISSUED'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_VALID', value => 'VALID'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED', value => 'EXPIRED'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_REVOKED', value => 'REVOKED'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING', value => 'CRL_ISSUANCE_PENDING'},
     );
     
     my $preset;
@@ -130,7 +128,7 @@ sub init_result {
         push @result, [
             $item->{CERTIFICATE_SERIAL},
             $self->_escape($item->{SUBJECT}),
-            { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}) , value => $item->{STATUS} },
+            { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} },
             $item->{NOTBEFORE},
             $item->{NOTAFTER},
             $self->_escape($item->{ISSUER_DN}),
@@ -230,7 +228,7 @@ sub init_mine {
         push @result, [
             $item->{CERTIFICATE_SERIAL},
             $self->_escape($item->{SUBJECT}),
-            { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}) , value => $item->{STATUS} },
+            { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}, value => $item->{STATUS} },
             $item->{NOTBEFORE},
             $item->{NOTAFTER},
             $self->_escape($item->{ISSUER_DN}),
@@ -313,7 +311,7 @@ sub init_detail {
         { label => 'Identifier', value => $cert_identifier },
         { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{NOTAFTER}, format => 'timestamp' },
-        { label => 'Status', value => { label => i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS}) , value => $cert->{STATUS} }, format => 'certstatus' },
+        { label => 'Status', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS} , value => $cert->{STATUS} }, format => 'certstatus' },
         { label => 'Issuer',  format=>'link', value => { label => $cert->{ISSUER_DN}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
@@ -328,18 +326,18 @@ sub init_detail {
     # TODO - add ACL, only owner should be allowed to dl key
     if ($is_local_entity &&
         $self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-        $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">'.i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY').'</a></li>';
+        $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
     }
 
-    push @fields, { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_LABEL'), value => '<ul class="list-unstyled">'.
-        sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
-        # core bug see #185 sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
-        sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
-        sprintf ($pattern, 'pkcs7', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7')).
-        sprintf ($pattern, 'pkcs7!root!true', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT')).
-        sprintf ($pattern, 'bundle', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE')).
+    push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => '<ul class="list-unstyled">'.
+        sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM').
+        # core bug see #185 sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
+        sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER').
+        sprintf ($pattern, 'pkcs7', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7').
+        sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT').
+        sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE').
         $privkey.
-        sprintf ($pattern, 'install', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_INSTALL')).
+        sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL').
         '</ul>'
     };
 
@@ -349,19 +347,19 @@ sub init_detail {
     if ($is_local_entity) {   
         my @actions;
         if ($is_local_entity && ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED')) {        
-            push @actions, sprintf ($pattern, 'certificate_renewal_request', i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_RENEW'));
+            push @actions, sprintf ($pattern, 'certificate_renewal_request', 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW');
         }
         if ($cert->{STATUS} eq 'ISSUED') { 
-            push @actions, sprintf ($pattern, 'certificate_revocation_request_v2', i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_REVOKE'));
+            push @actions, sprintf ($pattern, 'certificate_revocation_request_v2', 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE');
         }
-        push @actions, sprintf ($pattern, 'change_metadata', i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA'));
+        push @actions, sprintf ($pattern, 'change_metadata', 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA');
         
-        push @fields, { label => i18nGettext('I18N_OPENXPKI_UI_CERT_ACTION_LABEL'), value => '<ul class="list-unstyled">'.join("", @actions).'</ul>' };
+        push @fields, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_LABEL', value => '<ul class="list-unstyled">'.join("", @actions).'</ul>' };
     }     
     
-    push @fields, { label => i18nGettext('I18N_OPENXPKI_UI_CERT_RELATED_LABEL'), format => 'link', value => { 
+    push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => { 
         page => 'certificate!related!identifier!'.$cert_identifier,
-        label => i18nGettext('I18N_OPENXPKI_UI_CERT_RELATED_HINT') 
+        label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT'
     }};
 
     $self->add_section({
@@ -403,9 +401,9 @@ sub init_chain {
     foreach my $cert (@{$chain->{CERTIFICATES}}) {
 
         my $dl = '<ul class="list-inline">'.
-            sprintf ($pattern, $cert->{IDENTIFIER}, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM')).
-            sprintf ($pattern, $cert->{IDENTIFIER}, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER')).
-            sprintf ($pattern, $cert->{IDENTIFIER}, 'install', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL')).
+            sprintf ($pattern, $cert->{IDENTIFIER}, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM').
+            sprintf ($pattern, $cert->{IDENTIFIER}, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER').
+            sprintf ($pattern, $cert->{IDENTIFIER}, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL').
             '</ul>';
 
         $self->add_section({
@@ -414,11 +412,11 @@ sub init_chain {
                 label => '',
                 description => '',
                 data => [
-                    { label => i18nGettext('I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT'), format => 'link', 'value' => {
+                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link', 'value' => {
                        label => $cert->{SUBJECT}, page => 'certificate!detail!identifier!'.$cert->{IDENTIFIER} } },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE'), value => $cert->{NOTBEFORE}, format => 'timestamp' },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER'), value => $cert->{NOTAFTER}, format => 'timestamp' },
-                    { label => i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_LABEL'), value => $dl },
+                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{NOTBEFORE}, format => 'timestamp' },
+                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{NOTAFTER}, format => 'timestamp' },
+                    { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => $dl },
                 ],
             }},
         );

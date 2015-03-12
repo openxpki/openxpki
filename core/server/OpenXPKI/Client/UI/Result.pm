@@ -6,7 +6,7 @@ package OpenXPKI::Client::UI::Result;
 
 use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
-use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
+use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
 use Encode;
 
@@ -153,7 +153,7 @@ sub set_status_from_error_reply {
     } else {
         $self->logger()->trace(Dumper $reply);
     }
-    $self->_status({ level => 'error', message => i18nGettext($message) });
+    $self->_status({ level => 'error', message => $message });
 
     return $self;
 }
@@ -317,7 +317,7 @@ sub render {
     if ($self->redirect()) {
         $body = $json->encode({ goto => $self->redirect() } );
     } elsif ($result->{_raw}) {
-        $body = $json->encode($result->{_raw});
+        $body = i18nTokenizer ( $json->encode($result->{_raw}) );
     } else {
         $result->{session_id} = $self->_client()->session()->id;        
         $body = i18nTokenizer ( $json->encode($result) );

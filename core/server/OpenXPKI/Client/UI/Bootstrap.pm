@@ -6,7 +6,7 @@ package OpenXPKI::Client::UI::Bootstrap;
 
 use Moose;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
+use OpenXPKI::i18n qw( i18nTokenizer );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -21,23 +21,7 @@ sub init_structure {
         my $menu = $self->send_command( 'get_menu' );
         $self->logger()->trace('Menu ' . Dumper $menu);
 
-        # We need to translate the labels
-        my $nav = $menu->{main};        
-        for (my $ii = 0; $ii < scalar (@{$nav}); $ii++) {
-                        
-            if ($nav->[$ii]->{label}) {
-                $nav->[$ii]->{label} = i18nGettext($nav->[$ii]->{label});
-            }
-            
-            if (ref $nav->[$ii]->{entries}) {
-                for (my $jj = 0; $jj < scalar (@{$nav->[$ii]->{entries}}); $jj++) {
-                    $nav->[$ii]->{entries}->[$jj]->{label} 
-                        = i18nGettext($nav->[$ii]->{entries}->[$jj]->{label});
-                }                
-            }           
-        }
-        
-        $self->_result()->{structure} = $nav;
+        $self->_result()->{structure} = $menu->{main};
         
         # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
         $self->_client->session()->param('landmark', $menu->{landmark} || {});

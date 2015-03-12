@@ -1840,12 +1840,6 @@ msgstr ""
 "Параметр URI (Uniform Resource Identifier) представляет собой адрес или "
 "ссылку на источник информации. Например: www.openxpki.org/~testuser."
 
-msgid "I18N_OPENXPKI_SECRET_COMPLETE"
-msgstr "Завершено"
-
-msgid "I18N_OPENXPKI_SECRET_INCOMPLETE"
-msgstr "Не завершено"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_SERIALIZATION_FAST_DESERIALIZE_INCORRECT_SERIALIZATION_FORMAT"
 msgstr "SPKAC-строка пуста."
@@ -5031,6 +5025,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
+msgstr "Завершено"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
+msgstr "Не завершено"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"

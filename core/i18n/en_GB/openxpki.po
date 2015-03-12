@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-03-12 16:14+0100\n"
+"PO-Revision-Date: 2015-03-12 16:37+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1665,12 +1665,6 @@ msgid "I18N_OPENXPKI_SAN_URI_DESCRIPTION"
 msgstr ""
 "Uniform Ressource Identifier (URI) can be any address or reference to an "
 "information source. Example: http://www.openxpki.org/~testuser/."
-
-msgid "I18N_OPENXPKI_SECRET_COMPLETE"
-msgstr "Ready"
-
-msgid "I18N_OPENXPKI_SECRET_INCOMPLETE"
-msgstr "Incomplete"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERIALIZATION_FAST_DESERIALIZE_INCORRECT_SERIALIZATION_FORMAT"
@@ -4393,6 +4387,12 @@ msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "People (Secure eMail / Authentication)"
+
+msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
+msgstr "Ready"
+
+msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
+msgstr "Incomplete"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."

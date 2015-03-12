@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Crl;
 
 use Moose;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -201,9 +200,9 @@ sub __print_detail {
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
 
     push @fields, { label => 'Download', value => '<ul class="list-unstyled">'.
-        sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
-        sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
-        sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
+        sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM').
+        sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER').
+        sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
         '</ul>'
     };
 

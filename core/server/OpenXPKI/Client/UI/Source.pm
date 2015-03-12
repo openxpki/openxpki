@@ -16,7 +16,6 @@ contain characters other then I<a-zA-Z0-9_->
 use Moose;
 use JSON;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 

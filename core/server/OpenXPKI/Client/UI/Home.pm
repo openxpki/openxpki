@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Home;
 
 use Moose;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -95,8 +94,8 @@ sub init_task {
             push @data, [
                 $item->{'WORKFLOW.WORKFLOW_SERIAL'},
                 $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-                i18nGettext($item->{'WORKFLOW.WORKFLOW_TYPE'}),
-                i18nGettext($item->{'WORKFLOW.WORKFLOW_STATE'}),
+                $item->{'WORKFLOW.WORKFLOW_TYPE'},
+                $item->{'WORKFLOW.WORKFLOW_STATE'},
                 $status
             ]
         }
@@ -108,8 +107,8 @@ sub init_task {
             className => 'workflow',
             processing_type => 'all',
             content => {
-                label => i18nGettext($item->{label}),
-                description => i18nGettext($item->{description}),
+                label => $item->{label},
+                description => $item->{description},
                 actions => [{
                     path => 'redirect!workflow!load!wf_id!{serial}',
                     icon => 'view',

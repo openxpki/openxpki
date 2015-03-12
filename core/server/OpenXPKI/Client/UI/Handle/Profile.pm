@@ -7,7 +7,6 @@ use Moose;
 use Data::Dumper;
 use English;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::i18n qw( i18nGettext );
 
 sub render_profile_select {
 
@@ -25,7 +24,7 @@ sub render_profile_select {
     my $profiles = $self->send_command( 'get_cert_profiles', {});
     # Transform hash into value/label list and sort it
     # Apply translation
-    map { $profiles->{$_}->{label} = i18nGettext($profiles->{$_}->{label}) } keys %{$profiles};
+    map { $profiles->{$_}->{label} = $profiles->{$_}->{label} } keys %{$profiles};
     # Sort
     my @profiles = sort { lc($a->{label}) cmp lc($b->{label}) } values %{$profiles};
 
@@ -39,7 +38,7 @@ sub render_profile_select {
         my $styles = $self->send_command( 'get_cert_subject_profiles', { PROFILE => $cert_profile });
         # TODO clean up API after Mason decomissioning
         # Transform hash into value/label list and sort it
-        @styles = map { { value => $_, label => i18nGettext($styles->{$_}->{LABEL}), i18nGettext(description => $styles->{$_}->{DESCRIPTION}) } } keys %{$styles};
+        @styles = map { { value => $_, label => $styles->{$_}->{LABEL}, description => $styles->{$_}->{DESCRIPTION} } } keys %{$styles};
         @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
     }
 
@@ -161,7 +160,7 @@ sub render_key_select {
     my $key_alg = $self->send_command( 'get_key_algs', { PROFILE => $context->{cert_profile} });
     my @key_type;
     foreach my $alg (@{$key_alg}) {
-       push @key_type, { label => i18nGettext('I18N_OPENXPKI_UI_KEY_ALG_'.uc($alg)) , value => $alg };
+       push @key_type, { label => 'I18N_OPENXPKI_UI_KEY_ALG_'.uc($alg) , value => $alg };
     }
 
     my $key_gen_param_names = $self->send_command( 'get_key_params', { PROFILE => $context->{cert_profile} });
@@ -171,7 +170,7 @@ sub render_key_select {
 
     # Encryption
     my $key_enc = $self->send_command( 'get_key_enc', { PROFILE => $context->{cert_profile} });
-    my @enc = map { { value => $_, label => i18nGettext('I18N_OPENXPKI_UI_KEY_ENC_'.uc($_))  }  } @{$key_enc};
+    my @enc = map { { value => $_, label => 'I18N_OPENXPKI_UI_KEY_ENC_'.uc($_)  }  } @{$key_enc};
 
     my @fields;
     FIELDS:
@@ -182,7 +181,7 @@ sub render_key_select {
             foreach my $pn (@{$key_gen_param_names}) {
                 $pn = uc($pn);
                 # We create the label as I18 string from the param name
-                my $label = i18nGettext('I18N_OPENXPKI_UI_KEY_'.$pn);
+                my $label = 'I18N_OPENXPKI_UI_KEY_'.$pn;
                 push @fields, {
                     name => "key_gen_params{$pn}",
                     label => $label,
@@ -286,8 +285,8 @@ sub __translate_form_def {
     foreach my $field (@{$fields}) {
         my $new = {
             name => $field_name.'{'.$field->{ID}.'}',
-            label => i18nGettext($field->{LABEL}),
-            tooltip => i18nGettext($field->{DESCRIPTION}),
+            label => $field->{LABEL},
+            tooltip => $field->{DESCRIPTION},
             default => $field->{DEFAULT}, # Default is used as placeholder!
             value => $values->{$field->{ID}}
         };
@@ -328,7 +327,7 @@ sub __translate_form_def {
 
             my @keys = map { {
                 value => sprintf ($format, $_->{value}),
-                label => i18nGettext($_->{label})
+                label => $_->{label}
             } } @{$field->{KEYS}};
             $new->{keys} = \@keys;
         }
