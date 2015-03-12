@@ -5504,9 +5504,9 @@ msgstr "PKCS10 Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER"
 msgstr ""
-"-----BEGIN CERTIFICATE REQUEST-----\n"
-".....\n"
-"-----END CERTIFICATE REQUEST-----"
+"Please paste your PEM encoded request here (must look like "
+" -----BEGIN CERTIFICATE REQUEST-----) or use the browse/upload "
+"button below to load a file from your computer."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
