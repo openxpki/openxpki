@@ -1,13 +1,13 @@
 # The name of the file equals the name of the profile
-label: I18N_OPENXPKI_PROFILE_TLS_SERVER
+label: I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL
 
 validity: 
     notafter: +0006
 
 style:
     00_basic_style:
-        label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE
-        description: I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC
+        label: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC
         ui:
             subject:
                 - hostname
@@ -36,8 +36,8 @@ style:
 
 
     05_advanced_style:
-        label: I18N_OPENXPKI_PROFILE_ADVANCED_STYLE
-        description: I18N_OPENXPKI_PROFILE_ADVANCED_DESC
+        label: I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC
         ui:
             subject:
                 - cn

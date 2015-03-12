@@ -1,7 +1,7 @@
 head:
     prefix: capub
-    label: I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE
-    description: I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE_DESC
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC
     persister: Volatile
 
 state:

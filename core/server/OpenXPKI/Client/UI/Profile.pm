@@ -29,7 +29,7 @@ sub action_get_styles_for_profile {
     if (scalar @styles == 0) {
         @styles = ({ value => '', label => i18nGettext('I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST') });
     } else {
-        @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
+        @styles = sort { lc($a->{value}) cmp lc($b->{value}) } @styles;
     }
 
     my $cert_subject_style = $styles[0]->{value};

@@ -1,12 +1,14 @@
 # The name of the file equals the name of the profile
 
+label: I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL
+
 validity:
     notafter: +01
 
 style:
     00_basic_style:
-        label: I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_STYLE
-        description: I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_DESC
+        label: I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_DESC
         ui:
             subject:
                 - hostname

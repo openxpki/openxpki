@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-03-12 10:49+0100\n"
+"PO-Revision-Date: 2015-03-12 16:14+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1500,13 +1500,6 @@ msgstr "Advanced naming style"
 msgid "I18N_OPENXPKI_PROFILE_OPENVPN_CLIENT"
 msgstr "OpenVPN client Profile"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_DESC"
-msgstr "I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_DESC"
-
-msgid "I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_STYLE"
-msgstr "Basic SCEP client naming style"
-
 msgid "I18N_OPENXPKI_PROFILE_SCEP_SIGNER"
 msgstr "SCEP signer profile"
 
@@ -1520,11 +1513,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
 msgstr "Basic TLS style"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
 msgstr "TLS Server profile"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_PROFILE_USER"
-msgstr "User profile"
+msgstr "User Certificate"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION"
@@ -3883,6 +3878,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 msgstr "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_"
+msgstr "I18N_OPENXPKI_UI_KEY_"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
 
@@ -4191,6 +4191,20 @@ msgstr "Network timeout on scp transfer request"
 msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "Waiting"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC"
+msgstr "Advanced naming style"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
+msgstr "Extended naming (expert use only)"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC"
+msgstr ""
+"The default style is usually the best choice if you do not have any special "
+"requirements."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
+msgstr "Default profile style"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 msgstr "Please select profile first"
 
@@ -4232,6 +4246,21 @@ msgstr "Hostname"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Enter the fully qualified hostname (domain name) of your system."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_LABEL"
+msgstr "OpenVPN client certificate"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_SERVER_DESC"
+msgstr "OpenVPN client profile for machines"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_SERVER_LABEL"
+msgstr "OpenVPN client profile for machines"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_USER_DESC"
+msgstr "OpenVPN client profile for natural persons."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_USER_LABEL"
+msgstr "OpenVPN client profile for people"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Organizational Unit"
@@ -4329,6 +4358,27 @@ msgstr "URI"
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_DESC"
+msgstr "I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_DESC"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL"
+msgstr "Basic SCEP client naming style"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
+msgstr "Use this profile for SCEP requests with \"signing on behalf\""
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
+msgstr "Certificate for SCEP Enrollment Authentitcation"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
+msgstr "TLS Server profile"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+msgstr "TLS/Web Server "
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USER"
+msgstr "User Certificate"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
 msgstr "User ID"
 
@@ -4340,6 +4390,9 @@ msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
 msgstr "Username"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
+msgstr "People (Secure eMail / Authentication)"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."
@@ -4433,18 +4486,6 @@ msgstr "Export initialized"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_INITIALIZE_LABEL"
 msgstr "Export initialized"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_NULL1_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_NULL1_LABEL"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_NULL2_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_NULL2_LABEL"
-msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_TAG_CERTS_AS_EXPORTED_DESC"
 msgstr "Export done"
@@ -5504,9 +5545,9 @@ msgstr "PKCS10 Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER"
 msgstr ""
-"Please paste your PEM encoded request here (must look like "
-" -----BEGIN CERTIFICATE REQUEST-----) or use the browse/upload "
-"button below to load a file from your computer."
+"Please paste your PEM encoded request here (must look like  -----BEGIN "
+"CERTIFICATE REQUEST-----) or use the browse/upload button below to load a "
+"file from your computer."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
@@ -5771,20 +5812,8 @@ msgstr "Search the database"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL"
 msgstr "Serial"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_APPROVAL_LABEL"
-msgstr "APPROVAL"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_FAILURE_LABEL"
-msgstr "FAILURE"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL"
 msgstr "State"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PENDING_LABEL"
-msgstr "PENDING"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL"
-msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL"
 msgstr "Search now"
@@ -5803,94 +5832,6 @@ msgstr "Workflow Id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "This content is considered sensitive and therefore not shown."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TAGGING_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TAGGING_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TRANSFER_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TRANSFER_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_EXPORT_DONE_DESC"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_EXPORT_DONE_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_FAILURE_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_FAILURE_LABEL"
-msgstr "FAILURE"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIALIZED_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIALIZED_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIAL_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIAL_LABEL"
-msgstr "State"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_PROCESS_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_PROCESS_LABEL"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_TRANSFER_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_TRANSFER_LABEL"
-msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_SUCCESS_LABEL"
-msgstr "SUCCESS"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_LABEL"
-msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr ""
@@ -6883,6 +6824,56 @@ msgstr ""
 "automagically. The reason for this pause and the time of the next scheduled "
 "execution is shown below for your information."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_ISSUANCE_DESC"
+msgstr "Certificate Revocation List (CRL) Issuance"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_ISSUANCE_LABEL"
+msgstr "Certificate Revocation List (CRL) Issuance"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
+msgstr ""
+"Publish CA information (CA certificates and CRLs) to defined repositories."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
+msgstr "Publish CA Information"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
+msgstr "Certificate Revocation Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESCRIPTION"
+msgstr ""
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_LABEL"
+msgstr "Certificate Revocation Request (CRR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
+msgstr "Certificate Signing Request (CSR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
+msgstr "Certificate Signing Request (CSR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
+msgstr "Certificate Signing Request (CSR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+msgstr "Certificate Export"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+msgstr "Certificate Export"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_DESC"
+msgstr "Change a certificates metadata."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
+msgstr "Change Metadata"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
+msgstr "Issue certificate revocation lists."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
+msgstr "CRL Issuance"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
 
@@ -7812,14 +7803,6 @@ msgstr "I18N_OPENXPKI_WF_STATE_VICE_INITIAL"
 msgid "I18N_OPENXPKI_WF_STATE_WAITING_FOR_START"
 msgstr "Waiting to start"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"
-msgstr "Certificate Revocation List (CRL) Issuance"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE_DESC"
-msgstr "Certificate Revocation List (CRL) Issuance"
-
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE"
 msgstr "Issue certificate"
 
@@ -7845,18 +7828,10 @@ msgstr "Offline part of a Certificate Revocation Request (CRR)"
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2"
 msgstr "Certificate Revocation Request (CRR v2)"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST_V2_DESC"
-msgstr "Certificate Revocation Request (CRR v2)"
-
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOKE"
 msgstr "Revoke certificate"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST"
-msgstr "Certificate Signing Request (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
 msgstr "Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST_OFFLINE_CA"
@@ -8164,14 +8139,6 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #~ "to obtain your certificate, use it if you have no specific requirement "
 #~ "for which you would need the advanced style."
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_LABEL"
-#~ msgstr "TLS Server profile"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
-#~ msgstr "TLS Server profile"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_EDIT_REQUEST_DESC"
 #~ msgstr "Edit request"
 
@@ -8189,6 +8156,106 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_REVOKE_CERTIFICATE_LABEL"
 #~ msgstr "Revoke the certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_APPROVAL_LABEL"
+#~ msgstr "APPROVAL"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_FAILURE_LABEL"
+#~ msgstr "FAILURE"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PENDING_LABEL"
+#~ msgstr "PENDING"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL"
+#~ msgstr "SUCCESS"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TAGGING_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TAGGING_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TRANSFER_DESC"
+#~ msgstr "This workflow is paused and will be continued by the watchdog"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TRANSFER_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_EXPORT_DONE_DESC"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_EXPORT_DONE_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_FAILURE_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_FAILURE_LABEL"
+#~ msgstr "FAILURE"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIALIZED_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIALIZED_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIAL_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_INITIAL_LABEL"
+#~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_PROCESS_DESC"
+#~ msgstr "This workflow is paused and will be continued by the watchdog"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_PROCESS_LABEL"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_TRANSFER_DESC"
+#~ msgstr "This workflow is paused and will be continued by the watchdog"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_READY_TO_TRANSFER_LABEL"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_SUCCESS_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_SUCCESS_LABEL"
+#~ msgstr "SUCCESS"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_TRANSFER_DONE_LABEL"
+#~ msgstr "State"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_B46B08_CHECK_APPROVALS_DESC"
@@ -8551,10 +8618,6 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #~ msgstr "This workflow has finished with success and can not be restarted"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_ISSUANCE_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_NOTIFIED_CERT_ISSUED_DESC"
 #~ msgstr "Notified certificate issuer"
 
@@ -8633,3 +8696,11 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "SUCCESS"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"
+#~ msgstr "Certificate Revocation List (CRL) Issuance"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE_DESC"
+#~ msgstr "Certificate Revocation List (CRL) Issuance"
