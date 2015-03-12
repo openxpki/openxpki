@@ -22,7 +22,7 @@ use vars qw (@ISA @EXPORT_OK);
 use base qw( Exporter );
 #require Exporter;
 #@ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language);
+@EXPORT_OK = qw (i18nGettext i18nTokenizer set_locale_prefix set_language get_language);
 
 sub set_locale_prefix
 {
@@ -97,6 +97,21 @@ sub i18nGettext {
     }
 
     return $i18n_string;
+}
+
+sub i18nTokenizer {
+    
+    use Digest::SHA qw(sha1_base64);
+    
+    my $string = shift;    
+    my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_[A-Z0-9a-z\_-]+)/g);    
+    foreach my $token (keys %tokens) {
+        my $replace = i18nGettext( $token );        
+        $string =~ s/$token/$replace/g;
+    }
+    
+    return $string;
+    
 }
 
 sub set_language

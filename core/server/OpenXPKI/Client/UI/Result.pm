@@ -6,7 +6,7 @@ package OpenXPKI::Client::UI::Result;
 
 use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
-use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
 use Encode;
 
@@ -319,8 +319,8 @@ sub render {
     } elsif ($result->{_raw}) {
         $body = $json->encode($result->{_raw});
     } else {
-        $result->{session_id} = $self->_client()->session()->id;
-        $body = $json->encode($result);
+        $result->{session_id} = $self->_client()->session()->id;        
+        $body = i18nTokenizer ( $json->encode($result) );
     }
 
     # Return the output into the given pointer
