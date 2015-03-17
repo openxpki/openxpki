@@ -10,7 +10,7 @@ include $(TOPDIR)/package/common/Makefile.inc
 
 # standard directory for RPM builds, to override this use Makefile.local
 # or by setting it in your shell environment
-RPMBASE?=`rpm --eval '%{_topdir}'`
+RPMBASE?=$(shell rpm --eval '%{_topdir}')
 RPMBASE?=/usr/src/packages
 
 ifdef PREFIX
