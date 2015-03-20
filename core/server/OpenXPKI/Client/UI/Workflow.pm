@@ -429,16 +429,15 @@ sub init_mine {
     elsif ($limit > 500) {  $limit = 500; }
 
     my $query = {
-        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name} }],
-        LIMIT => $limit,
-        START => $startat
+        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name} }]
     };
 
-    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    my $search_result = $self->send_command( 'search_workflow_instances', 
+        { %{$query}, ( LIMIT => $limit, START => $startat ) } );
     
     # if size of result is equal to limit, check for full result count
-    my $result_count = scalar @{$search_result};     
-    if ($result_count == $limit) {
+    my $result_count = scalar @{$search_result};
+    if ($result_count == $limit) {        
         $result_count = $self->send_command( 'search_workflow_instances_count', $query );        
     } 
     
