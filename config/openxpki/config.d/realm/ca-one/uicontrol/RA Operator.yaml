@@ -61,6 +61,17 @@ tasklist:
       STATE:
         - ONHOLD
         - PENDING
+    cols:
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
+        field: WORKFLOW_SERIAL
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL
+        field: WORKFLOW_LAST_UPDATE
+      - label: I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL
+        field: WORKFLOW_STATE
+      - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
+        field: context.cert_subject
+      - label: I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL
+        template: "[% context.creator %] / [% context.cert_info.requestor_email %]"
 
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION
@@ -71,6 +82,17 @@ tasklist:
         - PENDING_APPROVAL
         - PENDING_MANUAL_AUTHENTICATION
         - PENDING_POLICY
+    col:
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
+        field: WORKFLOW_SERIAL
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL
+        field: WORKFLOW_LAST_UPDATE
+      - label: I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL
+        field: WORKFLOW_STATE
+      - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
+        field: context.cert_subject
+      - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
+        template: "[% context.scep_tid %]"
 
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION
@@ -79,6 +101,7 @@ tasklist:
         - certificate_revocation_request_v2
       STATE:
         - PENDING
+
 
 wfsearch:
    - label: Certificate Subject

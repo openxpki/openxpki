@@ -1048,6 +1048,7 @@ sub __get_workflow_info {
         COUNT_TRY  => $workflow->count_try(),
         WAKE_UP_AT  => $workflow->wakeup_at(),
         REAP_AT  => $workflow->reap_at(),
+        ATTRIBUTE => $workflow->attrib(),
         CONTEXT => {
         %{$workflow->context()->param()}
         },

@@ -1133,9 +1133,16 @@ sub __render_from_workflow {
             }
 
             # convert format cert_identifier into a link             
-            if ($item->{format} eq 'cert_identifier') {        
+            if ($item->{format} =~ m{\A cert_identifier}x) {        
                 $item->{format} = 'link';
-                $item->{value}  = { label => $item->{value}, page => 'certificate!detail!identifier!'. $item->{value}, target => 'modal' };
+                
+                my $cert_info = $self->send_command( 'get_cert', { IDENTIFIER => $item->{value}, FORMAT => 'DBINFO' });
+                $self->logger()->debug( Dumper $cert_info );
+                $item->{value}  = { 
+                    label => sprintf "%s<br/>%s", $item->{value}, $cert_info->{SUBJECT}, 
+                    page => 'certificate!detail!identifier!'. $item->{value}, 
+                    target => 'modal' 
+                };
             }
 
             # Auto detect serializes content
