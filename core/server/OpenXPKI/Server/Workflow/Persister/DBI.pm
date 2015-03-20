@@ -16,6 +16,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
+use OpenXPKI::Serialization::Simple;
 use DateTime::Format::Strptime;
 
 use Data::Dumper;
@@ -172,13 +173,9 @@ sub update_workflow {
             next PARAMETER;
         }
 
-	##! 2: "persisting context parameter: $key"
-	# ignore "volatile" context parameters starting with an underscore
-	next PARAMETER if ($key =~ m{ \A _ }xms);
-
-        ##! 2: "persisting context parameter: $key"
-        # ignore "volatile" context parameters starting with an underscore
-        next PARAMETER if ($key =~ m{ \A _ }xms);
+    	##! 2: "persisting context parameter: $key"
+    	# ignore "volatile" context parameters starting with an underscore
+    	next PARAMETER if ($key =~ m{ \A _ }xms);
 
         # automatic serialization        
         if (ref $value eq 'ARRAY' ||  ref $value eq 'HASH') {
@@ -344,9 +341,19 @@ sub fetch_extra_workflow_data {
 
     # new empty context
     my $context = Workflow::Context->new();
+    
+    my $ser = OpenXPKI::Serialization::Simple->new();
+    
     foreach my $entry (@{$result}) {
-	$context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
-			$entry->{WORKFLOW_CONTEXT_VALUE});
+        
+        my $key = $entry->{WORKFLOW_CONTEXT_KEY};
+        my $val = $entry->{WORKFLOW_CONTEXT_VALUE};
+        
+        if ($ser->is_serialized( $val )) {
+            ##! 8: "auto deserialize $key"            
+            $val = $ser->deserialize($val);
+        }
+        $context->param( $key => $val );
     }
     
     # merge context to workflow instance
