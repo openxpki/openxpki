@@ -985,7 +985,7 @@ sub select {
             # We can use a "like" statement only if the column is a string.
             # Therefore we have to check the column type.
             my $operator = "=";
-            my $op_key = $args->{DYNAMIC}->{$dynamic_key}->{OPERATOR};
+            my $op_key = $args->{DYNAMIC}->{$dynamic_key}->{OPERATOR} || '';            
             if ( $op_key ) {
                 if ( $op_key eq "EQUAL" ) {
                     $operator = "=";

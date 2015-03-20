@@ -243,14 +243,13 @@ sub attrib {
         my $result = CTX('dbi_backend')->select(
             TABLE => 'WORKFLOW_ATTRIBUTES',
             COLUMNS => [ 'ATTRIBUTE_KEY', 'ATTRIBUTE_VALUE' ],
-            DYNAMIC => {
-                WORKFLOW_SERIAL => { VALUE => $wf_id },
-                ATTRIBUTE_KEY => { VALUE => $arg },
-        });
+            DYNAMIC => { WORKFLOW_SERIAL => { VALUE => $wf_id } }
+       );
         my $attribs = {};
         foreach my $line (@{$result}) {
            $attribs->{$line->{ATTRIBUTE_KEY}} = $line->{ATTRIBUTE_VALUE};
         }
+        ##! 32: 'Result ' . Dumper $attribs
         return $attribs;
 
     # arg is scalar - get value
