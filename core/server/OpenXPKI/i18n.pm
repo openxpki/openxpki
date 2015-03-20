@@ -105,7 +105,7 @@ sub i18nTokenizer {
     my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);    
     foreach my $token (keys %tokens) {
         my $replace = i18nGettext( $token );        
-        $string =~ s/$token/$replace/g;
+        $string =~ s/$token\b/$replace/g;
     }
     
     return $string;
