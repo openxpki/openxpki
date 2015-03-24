@@ -56,6 +56,30 @@ sub init_search {
         my $result = $self->_client->session()->param('query_cert_'.$queryid);
         $preset = $result->{input};
     }
+    
+    my @fields = (
+        { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
+        { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
+        { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
+        { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
+   );
+
+    my $attributes = $self->_client->session()->param('certsearch');
+    if ($attributes) {
+        my @attrib;
+        foreach my $item (@{$attributes}) {
+            push @attrib, { value => $item->{key}, label=> $item->{label} };                    
+        }
+        push @fields, {
+            name => 'attributes', 
+            label => 'Metadata', 
+            'keys' => \@attrib,                  
+            type => 'text',
+            is_optional => 1, 
+            'clonable' => 1
+        };      
+    }
+
 
     $self->add_section({
         type => 'form',
@@ -63,13 +87,7 @@ sub init_search {
         content => {
            title => '',
            submit_label => 'search now',
-           fields => [
-                { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
-                { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
-                { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
-                { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
-                { name => 'meta', label => 'Metadata', 'keys' => [{ value => "meta_requestor", label=> "Requestor" },{ value => "meta_email", label => "eMail" }], type => 'text', is_optional => 1, 'clonable' => 1 },
-           ]
+           fields => \@fields
         }},        
     );
 
@@ -810,14 +828,19 @@ sub action_search {
 
     $self->logger()->debug("query : " . Dumper $self->cgi()->param());
 
-    # the extended search attribtues are clonables and therefore
-    # are suffixed with array brackets
-    foreach my $key (qw(meta_requestor meta_email)) {
+    # Read the query pattern for extra attributes from the session 
+    my $attributes = $self->_client->session()->param('certsearch');        
+    foreach my $item (@{$attributes}) {
+        my $key = $item->{key};
+        my $pattern = $item->{pattern} || '';
+        my $operator = $item->{operator} || 'EQUAL';
         my @val = $self->param($key.'[]');
-        if (scalar @val > 0) {                      
-            while (my $val = shift @val) {                
-                push @attr, { KEY => $key, VALUE => '%'.$val.'%' };
-            }            
+        while (my $val = shift @val) {
+            # embed into search pattern from config
+            $val = sprintf($pattern, $val) if ($pattern);
+            # replace asterisk as wildcard
+            $val =~ s/\*/%/g;
+            push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
         }
     }
 
