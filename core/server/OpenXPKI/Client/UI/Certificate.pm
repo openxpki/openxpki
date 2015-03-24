@@ -87,12 +87,13 @@ sub init_result {
     my $args = shift;
         
     my $queryid = $self->param('id');
-    my $limit = sprintf('%01d', $self->param('limit'));
-    my $startat = sprintf('%01d', $self->param('startat')); 
+    my $limit = $self->param('limit') || 25;
+    
+    
+    my $startat = $self->param('startat') || 0; 
     
     # Safety rule
-    if (!$limit) { $limit = 50; }
-    elsif ($limit > 500) {  $limit = 500; }
+    if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
     my $result = $self->_client->session()->param('query_cert_'.$queryid);
@@ -100,7 +101,7 @@ sub init_result {
     # result expired or broken id
     if (!$result || !$result->{count}) {        
         $self->set_status('Search result expired or empty!','error');
-        return $self->init_search();               
+        return $self->init_search();        
     }
 
     # Add limits
@@ -120,24 +121,10 @@ sub init_result {
         description => 'Results of your search:',
     });
 
-    my $i = 1;
-    my @result;
-    foreach my $item (@{$search_result}) {
-        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
 
-        push @result, [
-            $item->{CERTIFICATE_SERIAL},
-            $self->_escape($item->{SUBJECT}),
-            { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} },
-            $item->{NOTBEFORE},
-            $item->{NOTAFTER},
-            $self->_escape($item->{ISSUER_DN}),
-            $item->{IDENTIFIER},
-            lc($item->{STATUS}),
-            $item->{IDENTIFIER},
-        ]
-    }
-
+    my @result = $self->__render_result_list( $search_result );
+    
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
     $self->add_section({
@@ -164,8 +151,7 @@ sub init_result {
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
-            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1),
-                pagesizes => [25,50,100,250,500], pagersize => 20 },
+            pager => $pager,
             buttons => [
                 { label => 'reload search form', page => 'certificate!search!query!' .$queryid },
                 { label => 'new search', page => 'certificate!search'},
@@ -177,6 +163,60 @@ sub init_result {
 
 }
 
+
+=head2 init_pager
+
+Similar to init_result but returns only the data portion of the table as
+partial result.
+
+=cut
+
+sub init_pager {
+    
+    my $self = shift;
+    my $args = shift;
+        
+    my $queryid = $self->param('id');
+    
+    # Load query from session
+    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
+
+    # result expired or broken id
+    if (!$result || !$result->{count}) {        
+        $self->set_status('Search result expired or empty!','error');
+        return $self->init_search();               
+    }
+
+    # will be removed once inline paging works
+    my $startat = $self->param('startat'); 
+
+    my $limit = $self->param('limit') || 25;  
+    if ($limit > 500) {  $limit = 500; }
+    
+    $startat = int($startat % $limit) * $limit;
+
+    # Add limits
+    my $query = $result->{query};
+    $query->{LIMIT} = $limit;
+    $query->{START} = $startat;
+
+    $self->logger()->debug( "persisted query: " . Dumper $result);
+
+    my $search_result = $self->send_command( 'search_cert', $query );
+    
+    $self->logger()->trace( "search result: " . Dumper $search_result);
+     
+    my @result = $self->__render_result_list( $search_result ); 
+        
+    $self->logger()->trace( "dumper result: " . Dumper @result);
+
+    $self->_result()->{_raw} = {
+        _returnType => 'partial',
+        data => \@result,
+    };
+    
+    return $self;
+}
 =head2 init_mine
 
 my certificates view, finds certificates based on the current logged in userid
@@ -187,16 +227,15 @@ sub init_mine {
     my $self = shift;
     my $args = shift;
            
-    my $limit = sprintf('%01d', $self->param('limit'));
-    my $startat = sprintf('%01d', $self->param('startat')); 
+    my $limit = $self->param('limit') || 25;
     
     # Safety rule
-    if (!$limit) { $limit = 50; }
-    elsif ($limit > 500) {  $limit = 500; }
-
-    my $query = {  
-        LIMIT => $limit,
-        START => $startat,
+    if ($limit > 500) {  $limit = 500; }
+    
+    # will be removed once inline paging works
+    my $startat = $self->param('startat') || 0; 
+    
+    my $query = {          
         CERT_ATTRIBUTES => [{ 
             KEY => 'system_cert_owner', 
             VALUE =>  $self->_client()->session()->param('user')->{name}, 
@@ -206,11 +245,23 @@ sub init_mine {
 
     $self->logger()->debug( "search query: " . Dumper $query);
 
-    my $search_result = $self->send_command( 'search_cert', $query );
+    my $search_result = $self->send_command( 'search_cert', { %$query, ( LIMIT => $limit, START => $startat ) } );
     
     my $result_count = scalar @{$search_result};
+    my $pager;
     if ($result_count == $limit) {
-        $result_count = $self->send_command( 'search_cert_count', $query );    
+        $result_count = $self->send_command( 'search_cert_count', $query );
+
+        my $queryid = $self->__generate_uid();
+        my $_query = {
+            'id' => $queryid,
+            'type' => 'certificate',
+            'count' => $result_count,
+            'query' => $query,
+        };
+        $self->_client->session()->param('query_cert_'.$queryid, $_query );
+        $pager = $self->__render_pager( $_query, { limit => $limit, startat => $startat } )
+
     } 
     
     $self->logger()->trace( "search result: " . Dumper $search_result);
@@ -220,26 +271,11 @@ sub init_mine {
         shortlabel => 'Results',
         description => 'Results of your search:',
     });
-
-    my @result;
-    foreach my $item (@{$search_result}) {
-        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
-
-        push @result, [
-            $item->{CERTIFICATE_SERIAL},
-            $self->_escape($item->{SUBJECT}),
-            { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS}, value => $item->{STATUS} },
-            $item->{NOTBEFORE},
-            $item->{NOTAFTER},
-            $self->_escape($item->{ISSUER_DN}),
-            $item->{IDENTIFIER},
-            lc($item->{STATUS}),
-            $item->{IDENTIFIER},
-        ]
-    }
-
+    
+    my @result = $self->__render_result_list( $search_result );
+     
     $self->logger()->trace( "dumper result: " . Dumper @result);
-
+    
     $self->add_section({
         type => 'grid',
         className => 'certificate',
@@ -264,8 +300,7 @@ sub init_mine {
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
-            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result_count*1),
-                pagesizes => [25,50,100,250,500], pagersize => 20 },
+            pager => $pager,
         }
     });
 
@@ -781,7 +816,7 @@ sub action_search {
         my @val = $self->param($key.'[]');
         if (scalar @val > 0) {                      
             while (my $val = shift @val) {                
-                push @attr,  { KEY => $key, VALUE => '%'.$val.'%' };
+                push @attr, { KEY => $key, VALUE => '%'.$val.'%' };
             }            
         }
     }
@@ -803,9 +838,12 @@ sub action_search {
     
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_cert_'.$queryid, {
+        'id' => $queryid,
+        'type' => 'certificate',
         'count' => $result_count,
         'query' => $query,
-        'input' => $input 
+        'input' => $input,
+        'column' =>[] 
     });
  
     $self->redirect( 'certificate!result!id!'.$queryid  );
@@ -884,4 +922,36 @@ sub action_privkey {
 
 }
 
+=head2 __render_result_list
+
+Helper to render the output result list from a sql query result.
+ 
+
+=cut
+sub __render_result_list {
+
+    my $self = shift;
+    my $search_result = shift;
+    #my $colums = shift;
+    
+    my @result;
+    foreach my $item (@{$search_result}) {
+        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+
+        push @result, [
+            $item->{CERTIFICATE_SERIAL},
+            $self->_escape($item->{SUBJECT}),
+            { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} },
+            $item->{NOTBEFORE},
+            $item->{NOTAFTER},
+            $self->_escape($item->{ISSUER_DN}),
+            $item->{IDENTIFIER},
+            lc($item->{STATUS}),
+            $item->{IDENTIFIER},
+        ]
+    }
+
+    return @result;    
+}
 1;
+ 

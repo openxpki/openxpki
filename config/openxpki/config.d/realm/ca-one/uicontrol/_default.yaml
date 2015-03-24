@@ -4,7 +4,7 @@ main:
     entries: 
       - key:    home!index
         label: I18N_OPENXPKI_UI_MENU_HOME
-      - key:    home!task
+      - key:    workflow!task
         label:  I18N_OPENXPKI_UI_MENU_MY_TASK
       - key:    workflow!mine
         label:  I18N_OPENXPKI_UI_MENU_MY_WORKFLOW

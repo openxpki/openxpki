@@ -537,12 +537,55 @@ sub __fetch_response {
 
 }
 
+=head2 __generate_uid
+
+Generate a random uid (base64 encoded with dangerours chars removed)
+ 
+=cut
 sub __generate_uid {
 
     my $self; 
     my $queryid = sha1_base64(time.rand().$$);
     $queryid =~ s{[+/]}{}g;
     return $queryid; 
+}
+
+=head __render_pager
+
+Return a pager definition hash with default settings, requires the query 
+result hash as argument. Defaults can be overriden passing a hash as second
+argument. 
+
+=cut
+sub __render_pager {
+    
+    my $self = shift;
+    my $result = shift;
+    my $args = shift;
+
+    my $limit = ($args->{limit} * 1); # cast to integer for json
+    if (!$limit) { $limit = 50; }
+    # Safety rule
+    elsif ($limit > 500) {  $limit = 500; }
+    
+    my $startat = ($args->{startat} *1) || 0;
+    
+    if (!$args->{pagesizes}) {
+        $args->{pagesizes} = [25,50,100,250,500];
+    }
+    
+    if (!$args->{pagersize}) {
+        $args->{pagersize} = 20;
+    }
+        
+    return { 
+        startat => $startat, 
+        limit =>  $limit,
+        count => $result->{count} * 1, 
+        pagesizes => $args->{pagesizes}, 
+        pagersize => $args->{pagersize},
+        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id} 
+    }
 }
 
 1;

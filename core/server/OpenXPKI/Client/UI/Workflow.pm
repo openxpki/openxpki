@@ -5,6 +5,7 @@
 package OpenXPKI::Client::UI::Workflow;
 
 use Moose;
+use Template;
 use Data::Dumper;
 use Date::Parse;
 
@@ -228,7 +229,7 @@ sub init_search {
 
     # Searchable attributes are read from the menu bootstrap
     
-    my $attributes = $self->_client->session()->param('wfsearch');    
+    my $attributes = $self->_client->session()->param('wfsearch');
     if ($attributes) {
         my @attrib;
         foreach my $item (@{$attributes}) {
@@ -279,12 +280,12 @@ sub init_result {
     my $args = shift;
         
     my $queryid = $self->param('id');
-    my $limit = sprintf('%01d', $self->param('limit'));
-    my $startat = sprintf('%01d', $self->param('startat')); 
     
-    # Safety rule
-    if (!$limit) { $limit = 50; }
-    elsif ($limit > 500) {  $limit = 500; }
+    # will be removed once inline paging works
+    my $startat = $self->param('startat') || 0; 
+
+    my $limit = $self->param('limit') || 25;  
+    if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
     my $result = $self->_client->session()->param('query_wfl_'.$queryid);
@@ -311,7 +312,9 @@ sub init_result {
         description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
     });
     
-    my @result = $self->__render_result_list( $search_result ); 
+    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    
+    my @result = $self->__render_result_list( $search_result, $result->{column} ); 
         
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
@@ -336,12 +339,11 @@ sub init_result {
                 { sTitle => "_className"},
             ],
             data => \@result,
-            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result->{count}*1), 
-                pagesizes => [25,50,100,250,500], pagersize => 20 },
+            pager => $pager, 
             buttons => [
                 { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
                 { label => 'new search', page => 'workflow!search'},
-                #{ label => 'bulk edit', action => 'workflow!bulk', select => 'serial' }, # Draft for Bulk Edit
+                #{ label => 'bulk edit', action => 'workflow!bulk', select => 'serial', 'selection' => 'serial' }, # Draft for Bulk Edit
             ]            
         }
     });
@@ -351,6 +353,65 @@ sub init_result {
 }
 
 
+=head2 init_pager
+
+Similar to init_result but returns only the data portion of the table as
+partial result.
+
+=cut
+
+sub init_pager {
+    
+    my $self = shift;
+    my $args = shift;
+        
+    my $queryid = $self->param('id');
+    
+    # Load query from session
+    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
+
+    # result expired or broken id
+    if (!$result || !$result->{count}) {        
+        $self->set_status('Search result expired or empty!','error');
+        return $self->init_search();               
+    }
+
+    my $startat = $self->param('startat'); 
+
+    my $limit = $self->param('limit') || 25;  
+    if ($limit > 500) {  $limit = 500; }
+    
+    # align startat to limit window
+    $startat = int($startat % $limit) * $limit; 
+
+    # Add limits
+    my $query = $result->{query};
+    $query->{LIMIT} = $limit;
+    $query->{START} = $startat;
+
+    $self->logger()->debug( "persisted query: " . Dumper $result);
+
+    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    
+    $self->logger()->trace( "search result: " . Dumper $search_result);
+     
+    my @result = $self->__render_result_list( $search_result, $result->{column} ); 
+        
+    $self->logger()->trace( "dumper result: " . Dumper @result);
+
+    $self->_result()->{_raw} = {
+        _returnType => 'partial',
+        data => \@result,
+    };
+    
+    return $self;
+}
+
+=head2 init_history
+
+Render the history as grid view (state/action/user/time)
+ 
+=cut
 sub init_history {
 
     my $self = shift;
@@ -415,18 +476,22 @@ sub init_history {
 
 }
 
+=head2 init_mine
 
+Filter workflows where the current user is the creator, similar to workflow
+search.
+ 
+=cut
 sub init_mine {
     
     my $self = shift;
     my $args = shift;
             
-    my $limit = sprintf('%01d', $self->param('limit'));
-    my $startat = sprintf('%01d', $self->param('startat')); 
+    my $limit = $self->param('limit') || 25;  
+    if ($limit > 500) {  $limit = 500; }
     
-    # Safety rule
-    if (!$limit) { $limit = 50; }
-    elsif ($limit > 500) {  $limit = 500; }
+    # will be removed once inline paging works
+    my $startat = $self->param('startat') || 0; 
 
     my $query = {
         ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name} }]
@@ -447,9 +512,31 @@ sub init_mine {
         label => 'I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE',
         description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
     });
-
-    my $i = 1;
-    my @result = $self->__render_result_list( $search_result ); 
+    
+    my @column = (
+        { source => 'workflow', field => 'WORKFLOW_SERIAL' },
+        { source => 'workflow', field => 'WORKFLOW_LAST_UPDATE' },
+        { source => 'workflow', field => 'WORKFLOW_TYPE' },
+        { source => 'workflow', field => 'WORKFLOW_STATE' },
+        { source => 'workflow', field => 'WORKFLOW_SERIAL' }
+    );
+        
+    # Store the query if we need to page
+    my $pager;
+    if ($result_count > $limit) {
+        my $queryid = $self->__generate_uid();
+        my $_query = {
+            'id' => $queryid,
+            'type' => 'workflow',
+            'count' => $result_count,
+            'query' => $query,
+            'column' => \@column, 
+        };
+        $self->_client->session()->param('query_wfl_'.$queryid, $_query );
+        $pager = $self->__render_pager( $_query, { limit => $limit, startat => $startat } );
+    }
+    
+    my @result = $self->__render_result_list( $search_result, \@column );  
         
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
@@ -474,14 +561,163 @@ sub init_mine {
                 { sTitle => "_className"},                
             ],
             data => \@result,
-            pager => { startat => ($startat*1), limit => ($limit*1), count => ($result_count*1), 
-                pagesizes => [25,50,100,250,500], pagersize => 20 }                       
+            pager => $pager,                       
         }
     });
 
     return $self;
     
 }
+
+ 
+=head2 init_task
+
+Outstanding tasks, filter definitions are read from the uicontrol file
+
+=cut
+
+sub init_task {
+
+    my $self = shift;
+    my $args = shift;
+
+    $self->_page({
+        label => 'Outstanding tasks'
+    });
+
+    my $tasklist = $self->_client->session()->param('tasklist');
+    
+    if (!$tasklist) {
+        return $self->_redirect('home');
+    }
+    
+    $self->logger()->debug( "got tasklist: " . Dumper $tasklist);
+    
+    foreach my $item (@$tasklist) {
+        
+        my $query = $item->{query};
+        if ($query->{LIMIT} && $query->{LIMIT} > 100) {
+            $query->{LIMIT} = 25;
+        }
+         
+        # Default columns
+        if (!$item->{cols}) {
+            $item->{cols} = [
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'WORKFLOW_SERIAL', },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'WORKFLOW_LAST_UPDATE', },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'WORKFLOW_TYPE', },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'WORKFLOW_STATE', },                
+            ];
+        }
+            
+        # create the header from the columns spec
+        my @columns;
+        my $wf_info_required = 0;
+        my $tt;
+        for (my $ii = 0; $ii < scalar @{$item->{cols}}; $ii++) {
+            my $col = $item->{cols}->[$ii];
+            push @columns, { sTitle => $col->{label} };
+            
+            if ($col->{template}) {
+                $wf_info_required = 1;
+                $tt = Template->new() unless($tt);                
+            } elsif ($col->{field} =~ m{\A (context|attribute)\.(\S+) }xi) {
+                $wf_info_required = 1;
+                # we use this later to avoid the pattern match
+                $col->{source} = $1;
+                $col->{field} = $2; 
+            } else {
+                $col->{source} = 'workflow';
+                $col->{field} = uc($col->{field}) 
+            }
+        }
+        
+        push @columns, { sTitle => 'serial', bVisible => 0 };
+        push @columns, { sTitle => "_className"}; 
+         
+        push @{$item->{cols}}, { source => 'workflow', field => 'WORKFLOW_SERIAL' };
+         
+        $self->logger()->debug( "columns : " . Dumper $item);
+         
+        my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => 25), %$query } );
+        
+        my @data = $self->__render_result_list( $search_result, $item->{cols} );   
+        $self->logger()->trace( "dumper result: " . Dumper @data);
+        
+        # pager only if no user supplied LIMIT and more results than our cut off
+        my $pager; 
+        if (!$query->{LIMIT} && scalar @$search_result == 25) {
+            my $result_count= $self->send_command( 'search_workflow_instances_count', $query );    
+            my $queryid = $self->__generate_uid();
+            my $_query = {
+                'id' => $queryid,
+                'type' => 'workflow',
+                'count' => $result_count,
+                'query' => $query,
+                'column' => $item->{cols} 
+            };
+            $self->_client->session()->param('query_wfl_'.$queryid, $_query );
+            $pager = $self->__render_pager( $_query );            
+        }
+
+        $self->add_section({
+            type => 'grid',
+            className => 'workflow',
+            processing_type => 'all',
+            content => {
+                label => $item->{label},
+                description => $item->{description},
+                actions => [{
+                    path => 'redirect!workflow!load!wf_id!{serial}',
+                    icon => 'view',
+                }],
+                columns => \@columns,
+                data => \@data,
+                pager => $pager 
+            }
+        });
+    }
+
+}
+
+
+
+=head2 init_bulk
+
+Receive a list of workflow serial ids, usually from a workflow search result, 
+for bulk editing. Bulk editing requires, that all workflows are of same type 
+and in the same state. If this is not the case, the method renders a 
+selection to let the user choose with which workflow/state he wants to 
+proceed. 
+
+=cut
+=cut
+sub init_bulk {
+    
+    my $self = shift;
+    
+    my @wf_id = $self->param('wf_id');
+    
+    my $search_result = $self->send_command( 'search_workflow_instances',  { SERIAL => @wf_id } );
+    
+    my $workflows;
+    foreach my $wf (@$search_result) {
+        my $wf_type = $wf->{"WORKFLOW.WORKFLOW_TYPE"};
+        if (!$workflows->{$wf_type}) {
+            $workflows->{$wf_type} = {};
+        }
+        my $wf_state = $wf->{"WORKFLOW.WORKFLOW_STATE"};
+        if (!$workflows->{$wf_type}->{$wf_state}) {
+            $workflows->{$wf_type}->{$wf_state} = [];
+        }         
+        push @{$workflows->{$wf_type}->{$wf_state}}, $wf->{"WORKFLOW.WORKFLOW_SERIAL"};
+    }
+    
+    $self->logger()->debug('Selected workflows : ' . Dumper $workflows);
+    
+    
+}
+=cut
 
 =head2 action_index
 
@@ -817,9 +1053,18 @@ sub action_search {
     
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_wfl_'.$queryid, {
+        'id' => $queryid,
+        'type' => 'workflow',
         'count' => $result_count,
         'query' => $query,
-        'input' => $input 
+        'input' => $input,
+        'column' =>[
+            { source => 'workflow', field => 'WORKFLOW_SERIAL' },
+            { source => 'workflow', field => 'WORKFLOW_LAST_UPDATE' },
+            { source => 'workflow', field => 'WORKFLOW_TYPE' },
+            { source => 'workflow', field => 'WORKFLOW_STATE' },
+            { source => 'workflow', field => 'WORKFLOW_SERIAL' },
+        ]    
     });
  
     $self->redirect( 'workflow!result!id!'.$queryid  );
@@ -1391,43 +1636,73 @@ sub __render_result_list {
 
     my $self = shift;
     my $search_result = shift;
+    my $colums = shift;
 
     $self->logger()->debug("search result " . Dumper $search_result);
 
     my @result;
-    foreach my $item (@{$search_result}) {
+    my $tt = Template->new();
+    
+    foreach my $wf_item (@{$search_result}) {
+                        
+        my @line;
+        my ($wf_info, $context, $attrib);
         
-        # Build state info from watchdog state and process state
-        my $state = $item->{'WORKFLOW.WORKFLOW_STATE'}; # TODO - translate
+        foreach my $col (@{$colums}) {
+            
+            # we need to load the wf info
+            if (!$wf_info && ($col->{template} || $col->{source} ne 'workflow')) {
+                $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'WORKFLOW.WORKFLOW_SERIAL'} });
+                $self->logger()->debug( "columns : " . Dumper $wf_info);
+                $context = $wf_info->{WORKFLOW}->{CONTEXT};
+                $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};     
+            } 
+                        
+            if ($col->{template}) {
+                my $out;                    
+                my $ttp = { 
+                    context => $context, 
+                    attribute => $attrib, 
+                    workflow => $wf_info->{WORKFLOW} 
+                };
+                if (!$tt->process( \$col->{template}, $ttp, \$out )) {
+                    $out = 'template error!';
+                    $self->logger()->error('Error processing template ->'.$col->{template}.'<- in workflow '. $wf_info->{WORKFLOW}->{ID});
+                }
+                push @line, $out;
+            } elsif ($col->{source} eq 'workflow') {
                 
-        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION
-        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED
-        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL
-        # I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE
-        if ($item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'exception') {
-            
-            $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION )";
-            
-        } elsif ($item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'pause') {
-           
-           $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE )";
-                  
-        }
+                # Special handling of the state field
+                if ($col->{field} eq "WORKFLOW_STATE") {
+                    my $state = $wf_item->{'WORKFLOW.WORKFLOW_STATE'}; 
+                    if ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'exception') {          
+                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION )";
+                    } elsif ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'pause') {
+                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE )";                  
+                    }
+                    push @line, $state;
+                } else {
+                    push @line, $wf_item->{ 'WORKFLOW.'.$col->{field} };    
+                }               
+            } elsif ($col->{source} eq 'context') {
+                push @line, $context->{ $col->{field} };
+            } elsif ($col->{source} eq 'attribute') {
+                # to be implemented if required                    
+            } else {
+                # hu ?
+            }
+        }    
         
-        my $status = $item->{'WORKFLOW.WORKFLOW_PROC_STATE'};        
-        # special color for workflows in final failure
-        if ($status eq 'finished' && $item->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE') {
+        # special color for workflows in final failure            
+        my $status = $wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'};                    
+        if ($status eq 'finished' && $wf_item->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE') {
             $status  = 'failure';
         }
-        
-        push @result, [
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $item->{'WORKFLOW.WORKFLOW_LAST_UPDATE'},
-            $item->{'WORKFLOW.WORKFLOW_TYPE'}, # todo - translate
-            $state,            
-            $item->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $status,
-        ];
+            
+        push @line, $status;
+            
+        push @result, \@line; 
+      
     }
     
     return @result;
