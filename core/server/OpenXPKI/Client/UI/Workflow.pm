@@ -600,48 +600,54 @@ sub init_task {
             $query->{LIMIT} = 25;
         }
          
-        # Default columns
-        if (!$item->{cols}) {
-            $item->{cols} = [
+        my @cols;
+        if ($item->{cols}) {
+            @cols = @{$item->{cols}};
+        } else {        
+            @cols = (
                 { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'WORKFLOW_SERIAL', },
                 { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'WORKFLOW_LAST_UPDATE', },
                 { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'WORKFLOW_TYPE', },
                 { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'WORKFLOW_STATE', },                
-            ];
+            );
         }
             
         # create the header from the columns spec
-        my @columns;
+        my @header;
+        my @column;
         my $wf_info_required = 0;
         my $tt;
-        for (my $ii = 0; $ii < scalar @{$item->{cols}}; $ii++) {
-            my $col = $item->{cols}->[$ii];
-            push @columns, { sTitle => $col->{label} };
+        
+        for (my $ii = 0; $ii < scalar @cols; $ii++) {
+            # we must create a copy as we change the hash in the session info otherwise
+            my %col = %{$cols[$ii]};
+            push @header, { sTitle => $col{label} };
             
-            if ($col->{template}) {
+            if ($col{template}) {
                 $wf_info_required = 1;
                 $tt = Template->new() unless($tt);                
-            } elsif ($col->{field} =~ m{\A (context|attribute)\.(\S+) }xi) {
+            } elsif ($col{field} =~ m{\A (context|attribute)\.(\S+) }xi) {
                 $wf_info_required = 1;
                 # we use this later to avoid the pattern match
-                $col->{source} = $1;
-                $col->{field} = $2; 
+                $col{source} = $1;
+                $col{field} = $2; 
             } else {
-                $col->{source} = 'workflow';
-                $col->{field} = uc($col->{field}) 
+                $col{source} = 'workflow';
+                $col{field} = uc($col{field}) 
             }
+            push @column, \%col;
         }
         
-        push @columns, { sTitle => 'serial', bVisible => 0 };
-        push @columns, { sTitle => "_className"}; 
+        push @header, { sTitle => 'serial', bVisible => 0 };
+        push @header, { sTitle => "_className"}; 
          
-        push @{$item->{cols}}, { source => 'workflow', field => 'WORKFLOW_SERIAL' };
+        push @column, { source => 'workflow', field => 'WORKFLOW_SERIAL' };
          
-        $self->logger()->debug( "columns : " . Dumper $item);
+        $self->logger()->debug( "columns : " . Dumper \@column);
          
         my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => 25), %$query } );
         
-        my @data = $self->__render_result_list( $search_result, $item->{cols} );   
+        my @data = $self->__render_result_list( $search_result, \@column );   
         $self->logger()->trace( "dumper result: " . Dumper @data);
         
         # pager only if no user supplied LIMIT and more results than our cut off
@@ -654,10 +660,10 @@ sub init_task {
                 'type' => 'workflow',
                 'count' => $result_count,
                 'query' => $query,
-                'column' => $item->{cols} 
+                'column' => \@column
             };
             $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-            $pager = $self->__render_pager( $_query );            
+            #$pager = $self->__render_pager( $_query )
         }
 
         $self->add_section({
@@ -671,7 +677,7 @@ sub init_task {
                     path => 'redirect!workflow!load!wf_id!{serial}',
                     icon => 'view',
                 }],
-                columns => \@columns,
+                columns => \@header,
                 data => \@data,
                 pager => $pager 
             }
@@ -1653,7 +1659,7 @@ sub __render_result_list {
             # we need to load the wf info
             if (!$wf_info && ($col->{template} || $col->{source} ne 'workflow')) {
                 $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'WORKFLOW.WORKFLOW_SERIAL'} });
-                $self->logger()->debug( "columns : " . Dumper $wf_info);
+                $self->logger()->debug( "fetch wf info : " . Dumper $wf_info);
                 $context = $wf_info->{WORKFLOW}->{CONTEXT};
                 $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};     
             } 
