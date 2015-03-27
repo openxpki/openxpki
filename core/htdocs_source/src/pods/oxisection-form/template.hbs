@@ -3,22 +3,18 @@
 </div>
 
 <div class="container-fluid">
-    <form class="form-horizontal" role="form" {{action "submit" content.action on="submit"}}>
+    <form class="form-horizontal" role="form">
         {{#each visibleFields as |field|}}
             {{oxifield-main content=field addClone="addClone" delClone="delClone" valueChange="valueChange"}}
         {{/each}}
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-7">
-                <button class="btn btn-default" type="submit">
+                <button class="btn btn-default {{if loading "btn-loading"}}" {{action "submit"}}>
                     {{submitLabel}}
                 </button>
-                <div class="btn-group">
-                    {{#each buttons as |btn|}}
-                        {{log "button"}}
-                        TODO: Show action buttons
-                    {{/each}}
-                </div>
             </div>
         </div>
     </form>
 </div>
+
+{{oxi-button-container buttons=content.content.buttons buttonClick="buttonClick"}}

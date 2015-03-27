@@ -5,21 +5,21 @@
         </span>
         <ul class="pagination">
             {{#each pagesizes as |pagesize|}}
-                <li class="{{if pagesize.active "active"}}"><a class="oxi-link-ignore" {{action "changePagesize" pagesize}}>{{pagesize.num}}</a></li>
+                <li class="{{if pagesize.active "active"}}"><a {{action "changePagesize" pagesize}}>{{pagesize.num}}</a></li>
             {{/each}}
         </ul>
         {{#if pages.length}}
             <ul class="pagination">
                 <li class="{{if pages.prev.disabled "disabled"}}">
-                    <a class="oxi-link-ignore" aria-label="Previous" {{action "changeStartat" pages.prev}}>
+                    <a aria-label="Previous" {{action "changeStartat" pages.prev}}>
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
                 {{#each pages as |page|}}
-                    <li class="{{if page.active "active"}}"><a class="oxi-link-ignore" {{action "changeStartat" page}}>{{page.num}}</a></li>
+                    <li class="{{if page.active "active"}}"><a {{action "changeStartat" page}}>{{page.num}}</a></li>
                 {{/each}}
                 <li class="{{if pages.next.disabled "disabled"}}">
-                    <a class="oxi-link-ignore" aria-label="Next" {{action "changeStartat" pages.next}}>
+                    <a aria-label="Next" {{action "changeStartat" pages.next}}>
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>

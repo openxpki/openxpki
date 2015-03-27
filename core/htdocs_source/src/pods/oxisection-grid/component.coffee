@@ -2,6 +2,19 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 
 Component = Em.Component.extend
+    isBulkable: Em.computed "content.content.buttons.@each.select", ->
+        @get("content.content.buttons")?.isAny "select"
+
+    allChecked: Em.computed "sortedData.@each.checked", ->
+        @get("sortedData").isEvery "checked", true
+
+    manageBulkButtons: Em.on "init", Em.observer "sortedData.@each.checked", ->
+        data = @get("sortedData").filterBy "checked"
+        buttons = @get "content.content.buttons"
+        return if not buttons
+        for button in buttons.filterBy "select"
+            Em.set button, "disabled", not data.length
+
     pagesizes: Em.computed "content.content.pager.pagesizes", ->
         pagesizes = @get "content.content.pager.pagesizes"
         pager = @get "content.content.pager"
@@ -87,15 +100,19 @@ Component = Em.Component.extend
         col = 0
         res = []
         for row, y in data
-            res[y] = []
-            res[y].set "originalIndex", y
+            res[y] =
+                originalData: row
+                data: []
+                checked: false
+                originalIndex: y
+
             for column, x in row
                 break if x > columns.length-1
                 if columns[x].sTitle in [ "_status", "_className" ]
                     Em.set res[y], "className", "gridrow-#{column}"
                 continue if columns[x].sTitle[0] is "_" or columns[x].bVisible is 0
                 col++
-                res[y][x] =
+                res[y].data[x] =
                     format: columns[x].format
                     value: column
         res
@@ -111,8 +128,8 @@ Component = Em.Component.extend
         if sortNum >= 0
             re = /^[0-9.]+$/
             data.sort (a,b) ->
-                a = a[sortNum].value
-                b = b[sortNum].value
+                a = a.data[sortNum].value
+                b = b.data[sortNum].value
 
                 if re.test(a) and re.test(b)
                     a = parseFloat(a, 10)
@@ -137,7 +154,7 @@ Component = Em.Component.extend
             action = (a for a in actions when a.label is $(e.target).text())[0]
 
         columns = @get "content.content.columns"
-        index = @get("sortedData")[@get("contextIndex")].get "originalIndex"
+        index = @get("sortedData")[@get("contextIndex")].originalIndex
         data = @get("content.content.data")[index]
         path = action.path
         for col, i in columns
@@ -148,22 +165,37 @@ Component = Em.Component.extend
                 page:path
                 target:action.target
 
-    click: (event) ->
-        tr = $(event.target).parents "tr"
-        index = @$().find("tr").index(tr) - 1
-        return if index < 0
-        @set "contextIndex", index
-
-        actions = @get "content.content.actions"
-        return if not actions
-        if actions.length is 1
-            @onItem()
-        else
-            tr.contextmenu "show", event
-            event.stopPropagation()
-            event.preventDefault()
-
     actions:
+        buttonClick: (button) ->
+            if button.select
+                columns = @get("content.content.columns").getEach "sTitle"
+                index = columns.indexOf button.select
+                if index is -1
+                    throw new Error "There is not column matching
+                        #{button.select}"
+
+                data = action: button.action
+
+                data[button.selection] = @get "sortedData"
+                .filterBy "checked"
+                .getEach "originalData"
+                .getEach ""+index
+
+                Em.set button, "loading", true
+                @container.lookup("route:openxpki").sendAjax
+                    type: "GET"
+                    data: data
+                .then ->
+                    Em.set button, "loading", false
+            else
+                @sendAction "buttonClick", button
+
+        select: (row) ->
+            if row
+                Em.set row, "checked", not row.checked
+            else
+                @get("sortedData").setEach "checked", not @get "allChecked"
+
         changePagesize: (pagesize) ->
             startat = @get "content.content.pager.startat"
             @container.lookup("route:openxpki").transitionTo
@@ -191,17 +223,19 @@ Component = Em.Component.extend
                 @set "sortNum", newSortNum
             else
                 column.toggleProperty "isInverted"
-        showContextmenu: (row) ->
+
+        rowClick: (index) ->
+            @set "contextIndex", index
             actions = @get "content.content.actions"
-            @set "contextIndex", @get("sortedData").indexOf row
+            return if not actions
             if actions.length is 1
                 @onItem()
             else
-                event = window.event;
-                $(@$().find("tr")[@get("contextIndex")+1]).contextmenu "show", event
-                alert $(@$().find("tr")[@get("contextIndex")+1]).innerHTML
-                event.returnValue = false;
-                event.stopPropagation() if event.stopPropagation
-                event.preventDefault() if event.preventDefault
+                currentTarget = event.currentTarget
+                clientX = event.clientX
+                clientY = event.clientY
+                Em.run.next =>
+                    @$("tbody tr:nth-child(#{index+1})").contextmenu "show",
+                        { currentTarget, clientX, clientY }
 
 `export default Component`
