@@ -190,6 +190,8 @@ state:
         output:
           - cert_subject
           - cert_subject_alt_name
+          - notbefore
+          - notafter
           - cert_profile
           - cert_info
 
@@ -260,8 +262,11 @@ state:
           - cert_identifier
           - cert_subject
           - cert_subject_alt_name
+          - notbefore
+          - notafter
           - cert_profile
           - cert_info
+
 
     UPDATE_SUBJECT:
         autorun: 1
@@ -597,16 +602,7 @@ condition:
             _map_config_path: profile.[% context.cert_profile %].style.[% context.cert_subject_style %].ui.info
 
 
-field:
-    cert_info:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_LABEL
-        name: cert_info
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP
-        type: cert_info
-        required: 0
-
+field:   
     cert_profile:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL
         name: cert_profile

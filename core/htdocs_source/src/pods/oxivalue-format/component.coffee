@@ -13,7 +13,8 @@ Component = Em.Component.extend
         raw: (v) -> v
         defhash: (v) -> "<dl>#{(for k, w of v then "<dt>#{k}</dt><dd>#{w}</dd>").join ""}</dl>"
         deflist: (v) -> "<dl>#{(for w in v then "<dt>#{w.label}</dt><dd>#{w.value}</dd>").join ""}</dl>"
-
+        ullist: (v) -> "<ul class=\"list-unstyled\">#{(for w in v then "<li>#{w}</li>").join ""}</ul>"
+        
     formatedValue: Em.computed "content.format", "content.value", ->
         @get("types")[@get("content.format")||"text"](@get "content.value")
 
