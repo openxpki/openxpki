@@ -26,7 +26,7 @@ Route = Em.Route.extend
     setupController: ->
 
     sendAjax: (data) ->
-        data.type = if data?.data?.action then "POST" else "GET"
+        data.type ?= if data?.data?.action then "POST" else "GET"
         data.url ?= @controllerFor("config").get "url"
         data.data._ = (new Date()).getTime()
         $(".loading").addClass "in-progress"
