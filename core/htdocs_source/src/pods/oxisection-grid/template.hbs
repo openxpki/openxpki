@@ -21,7 +21,7 @@
         <tbody>
             {{#each sortedData as |row index|}}
                 <tr class="context {{row.className}} {{if hasAction "has-action"}}">
-                    {{#each row as |value|}}
+                    {{#each row.data as |value|}}
                         <td {{action "rowClick" index}}>{{oxivalue-format content=value}}</td>
                     {{/each}}
                 </tr>

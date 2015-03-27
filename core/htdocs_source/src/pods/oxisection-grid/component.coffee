@@ -87,15 +87,19 @@ Component = Em.Component.extend
         col = 0
         res = []
         for row, y in data
-            res[y] = []
-            res[y].set "originalIndex", y
+            res[y] =
+                originalData: row
+                data: []
+                checked: false
+                originalIndex: y
+
             for column, x in row
                 break if x > columns.length-1
                 if columns[x].sTitle in [ "_status", "_className" ]
                     Em.set res[y], "className", "gridrow-#{column}"
                 continue if columns[x].sTitle[0] is "_" or columns[x].bVisible is 0
                 col++
-                res[y][x] =
+                res[y].data[x] =
                     format: columns[x].format
                     value: column
         res
@@ -111,8 +115,8 @@ Component = Em.Component.extend
         if sortNum >= 0
             re = /^[0-9.]+$/
             data.sort (a,b) ->
-                a = a[sortNum].value
-                b = b[sortNum].value
+                a = a.data[sortNum].value
+                b = b.data[sortNum].value
 
                 if re.test(a) and re.test(b)
                     a = parseFloat(a, 10)
@@ -137,7 +141,7 @@ Component = Em.Component.extend
             action = (a for a in actions when a.label is $(e.target).text())[0]
 
         columns = @get "content.content.columns"
-        index = @get("sortedData")[@get("contextIndex")].get "originalIndex"
+        index = @get("sortedData")[@get("contextIndex")].originalIndex
         data = @get("content.content.data")[index]
         path = action.path
         for col, i in columns
