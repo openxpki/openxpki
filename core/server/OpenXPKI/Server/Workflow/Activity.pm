@@ -152,35 +152,10 @@ sub param {
             }
         } else {
             
-            ##! 16: 'parse using tt ' . $template
+            ##! 16: 'parse using tt ' . $template            
+            my $oxtt = OpenXPKI::Template->new();
+            my $out = $oxtt->render( $template, $self->workflow()->context()->param() );
             
-            my $tt_param  = $self->workflow()->context()->param();
-            
-            # We auto deserialize non-scalar context items if they are 
-            # referenced in the template string   
-            my @non_scalar_refs = ($template =~ m{ context\.([^\s\.]+)\.\S+ }xsg);            
-            foreach my $refkey (@non_scalar_refs) {
-                ##! 16: 'auto deserialize for ' . $refkey 
-                # this can happen if the context was not read from DB
-                if (!ref $tt_param->{$refkey}) {
-                    my $ser  = OpenXPKI::Serialization::Simple->new();
-                    $tt_param->{$refkey} = $ser->deserialize( $tt_param->{$refkey} );
-                    ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}                     
-                }
-            }
-            
-            my $tt = Template->new();
-            my $out;
-            if (!$tt->process( \$template, { context => $tt_param }, \$out )) {
-                OpenXPKI::Exception->throw({
-                    MESSAGE => 'I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM',
-                    PARAMS => {
-                        'TEMPLATE' => $template,
-                        'PARAM'  => $name,
-                        'ERROR' => $tt->error()
-                    }
-                });
-            }
             ##! 32: 'tt result ' . $out
             return $out;
         }
