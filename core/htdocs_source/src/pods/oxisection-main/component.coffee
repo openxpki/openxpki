@@ -13,16 +13,7 @@ Component = Em.Component.extend
     click: (evt) ->
         target = evt.target
 
-        return if $(target).hasClass "oxi-link-ignore"
-
-        if target.tagName is "A" and target.target isnt "_blank"
-            evt.stopPropagation()
-            evt.preventDefault()
-            @container.lookup("route:openxpki").sendAjax
-                data:
-                    page:target.href.split("#")[1]
-                    target:target.target
-        else if target.tagName is "BUTTON" and $(target).hasClass "load-button"
+        if target.tagName is "BUTTON" and $(target).hasClass "load-button"
             $(target).addClass "btn-loading"
 
     confirmButton: null

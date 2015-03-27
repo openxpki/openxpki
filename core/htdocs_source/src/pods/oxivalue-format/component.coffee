@@ -3,6 +3,17 @@
 `import moment from "vendor/moment"`
 
 Component = Em.Component.extend
+    onAnchorClick: Em.on "click", (evt) ->
+        target = evt.target
+
+        if target.tagName is "A" and target.target isnt "_blank"
+            evt.stopPropagation()
+            evt.preventDefault()
+            @container.lookup("route:openxpki").sendAjax
+                data:
+                    page:target.href.split("#")[1]
+                    target:target.target
+
     types:
         certstatus: (v) -> "<span class='certstatus-#{(v.value||v.label).toLowerCase()}'>#{v.label}</span>"
         link: (v) -> "<a href='##{v.page}' target='#{v.target||"modal"}'>#{v.label}</a>"
