@@ -34,11 +34,6 @@ Component = Em.Component.extend
     visibleFields: Em.computed "fields", ->
         (f for f in @get("fields") when f.type isnt "hidden")
 
-    click: (evt) ->
-        if evt.target.tagName is "BUTTON"
-            if not $(evt.target).hasClass "oxi-button-ignore"
-                $(evt.target).addClass "btn-loading"
-
     actions:
         addClone: (field) ->
             fields = @get "content.content.fields"
@@ -75,7 +70,8 @@ Component = Em.Component.extend
                                 fields.replace idx, 1, [Em.copy newField]
                     null
 
-        submit: (action) ->
+        submit: ->
+            action = @get "content.action"
             fields = @get "content.content.fields"
             data =
                 action:action
@@ -102,9 +98,11 @@ Component = Em.Component.extend
                 else
                     data[name] = clones[0].value
 
+            @set "loading", true
             @container.lookup("route:openxpki").sendAjax
                 data:data
-            .then (res) ->
+            .then (res) =>
+                @set "loading", false
                 if res.error
                     console.log "Set errors not implemented"
 
