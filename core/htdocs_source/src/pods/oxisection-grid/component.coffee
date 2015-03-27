@@ -166,7 +166,29 @@ Component = Em.Component.extend
                 target:action.target
 
     actions:
-        buttonClick: (button) -> @sendAction "buttonClick", button
+        buttonClick: (button) ->
+            if button.select
+                columns = @get("content.content.columns").getEach "sTitle"
+                index = columns.indexOf button.select
+                if index is -1
+                    throw new Error "There is not column matching
+                        #{button.select}"
+
+                data = action: button.action
+
+                data[button.selection] = @get "sortedData"
+                .filterBy "checked"
+                .getEach "originalData"
+                .getEach ""+index
+
+                Em.set button, "loading", true
+                @container.lookup("route:openxpki").sendAjax
+                    data: data
+                .then ->
+                    Em.set button, "loading", false
+            else
+                @sendAction "buttonClick", button
+
         select: (row) ->
             if row
                 Em.set row, "checked", not row.checked
