@@ -189,30 +189,11 @@ sub deserialize {
             message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_DESERIALIZE_NO_ARG_GIVEN"
         );
     }
-    
-    # Some old code might want to try to deserialize values that have been
-    # handled by the auto-deserialize handler in the context, so we are nice
-    if (ref $msg) { 
-        return $msg; 
-    }
 
     my $ret = $self->__read_data( $msg );
 
     return $ret->{data};
 }
-
-# test if a given argument is a serialized string
-sub is_serialized {
-    
-    my $self = shift;
-    my $msg  = shift;
-    
-    return (defined $msg && 
-        ref $msg eq '' && 
-        $msg =~ /^(SCALAR|BASE64|ARRAY|HASH|UNDEF)/);
-    
-}
-
 
 sub __read_data {
     my $self = shift;
