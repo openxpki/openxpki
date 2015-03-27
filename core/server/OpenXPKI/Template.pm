@@ -7,8 +7,8 @@ use utf8;
 use base qw( Template );
 use Data::Dumper;
 
-#use OpenXPKI::Debug;
-#use OpenXPKI::Exception;
+use OpenXPKI::Debug;
+use OpenXPKI::Exception;
 #use OpenXPKI::Server::Context qw( CTX );
 
 sub new {
@@ -21,6 +21,51 @@ sub new {
     
     return $self;
 }
-    
 
+
+=head2 render 
+
+This wraps around the process method of the original Template class. It expects
+the parameter string as first argument (scalar, not reference!) and a hashref 
+with the params for template. The class tries to auto-deserialized parameters
+from the params error by evaluating the template string for sequences like
+I<context.upper.lower> (this is yet done for the context prefix only). The 
+result is returned as a string, if processing fails, an OpenXPKI::Exception is
+thrown. 
+
+=cut
+sub render {
+
+    my $self = shift;
+    my $template = shift;
+    my $tt_param = shift;
+
+    # Try to detect access to non-scalar values and check if those are deserialized
+    # Works only for stuff below the key context   
+    my @non_scalar_refs = ($template =~ m{ context\.([^\s\.]+)\.\S+ }xsg);            
+    foreach my $refkey (@non_scalar_refs) {
+        ##! 16: 'auto deserialize for ' . $refkey 
+        if (!ref $tt_param->{'context'}->{$refkey}) {
+            my $ser  = OpenXPKI::Serialization::Simple->new();
+            $tt_param->{$refkey} = $ser->deserialize( $tt_param->{'context'}->{$refkey} );
+            ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}                     
+        }
+    }
+
+    my $out;
+    if (!$self->process( \$template, $tt_param, \$out )) {
+         OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_TEMPLATE_ERROR_PARSING_TEMPLATE_FOR_PARAM',
+            params => {
+                'TEMPLATE' => $template,
+                'ERROR' => $self->error()
+            }
+        );
+    }
+    
+    return $out;
+    
+}
+    
+    
 1;
