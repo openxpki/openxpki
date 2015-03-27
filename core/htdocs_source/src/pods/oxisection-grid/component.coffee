@@ -149,6 +149,7 @@ Component = Em.Component.extend
                 target:action.target
 
     actions:
+        buttonClick: (button) -> @sendAction "buttonClick", button
         changePagesize: (pagesize) ->
             startat = @get "content.content.pager.startat"
             @container.lookup("route:openxpki").transitionTo

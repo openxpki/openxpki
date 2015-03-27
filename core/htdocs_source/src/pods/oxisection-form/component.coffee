@@ -35,6 +35,8 @@ Component = Em.Component.extend
         (f for f in @get("fields") when f.type isnt "hidden")
 
     actions:
+        buttonClick: (button) -> @sendAction "buttonClick", button
+
         addClone: (field) ->
             fields = @get "content.content.fields"
             index = fields.indexOf field
