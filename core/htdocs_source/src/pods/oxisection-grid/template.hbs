@@ -19,10 +19,10 @@
             </tr>
         </thead>
         <tbody>
-            {{#each sortedData as |line|}}
-                <tr class="context {{line.className}} {{if controller.hasAction "has-action"}}">
-                    {{#each line as |value|}}
-                        <td>{{oxivalue-format content=value}}</td>
+            {{#each sortedData as |row index|}}
+                <tr class="context {{row.className}} {{if hasAction "has-action"}}">
+                    {{#each row as |value|}}
+                        <td {{action "rowClick" index}}>{{oxivalue-format content=value}}</td>
                     {{/each}}
                 </tr>
             {{/each}}

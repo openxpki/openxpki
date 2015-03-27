@@ -51,11 +51,9 @@ Route = Em.Route.extend
             if not doc.structure and not doc.goto
                 Em.run.scheduleOnce "afterRender", ->
                     $(".loading").removeClass "in-progress"
-                    $(".btn-loading").removeClass "btn-loading"
             doc
         , (err) ->
             $(".loading").removeClass "in-progress"
-            $(".btn-loading").removeClass "btn-loading"
             console.log "Ajax error", err
 
 `export default Route`

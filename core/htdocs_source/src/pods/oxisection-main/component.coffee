@@ -10,12 +10,6 @@ Component = Em.Component.extend
         else
             false
 
-    click: (evt) ->
-        target = evt.target
-
-        if target.tagName is "BUTTON" and $(target).hasClass "load-button"
-            $(target).addClass "btn-loading"
-
     confirmButton: null
 
     actions:

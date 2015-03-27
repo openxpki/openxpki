@@ -148,21 +148,6 @@ Component = Em.Component.extend
                 page:path
                 target:action.target
 
-    click: (event) ->
-        tr = $(event.target).parents "tr"
-        index = @$().find("tr").index(tr) - 1
-        return if index < 0
-        @set "contextIndex", index
-
-        actions = @get "content.content.actions"
-        return if not actions
-        if actions.length is 1
-            @onItem()
-        else
-            tr.contextmenu "show", event
-            event.stopPropagation()
-            event.preventDefault()
-
     actions:
         changePagesize: (pagesize) ->
             startat = @get "content.content.pager.startat"
@@ -191,17 +176,19 @@ Component = Em.Component.extend
                 @set "sortNum", newSortNum
             else
                 column.toggleProperty "isInverted"
-        showContextmenu: (row) ->
+
+        rowClick: (index) ->
+            @set "contextIndex", index
             actions = @get "content.content.actions"
-            @set "contextIndex", @get("sortedData").indexOf row
+            return if not actions
             if actions.length is 1
                 @onItem()
             else
-                event = window.event;
-                $(@$().find("tr")[@get("contextIndex")+1]).contextmenu "show", event
-                alert $(@$().find("tr")[@get("contextIndex")+1]).innerHTML
-                event.returnValue = false;
-                event.stopPropagation() if event.stopPropagation
-                event.preventDefault() if event.preventDefault
+                currentTarget = event.currentTarget
+                clientX = event.clientX
+                clientY = event.clientY
+                Em.run.next =>
+                    @$("tbody tr:nth-child(#{index+1})").contextmenu "show",
+                        { currentTarget, clientX, clientY }
 
 `export default Component`
