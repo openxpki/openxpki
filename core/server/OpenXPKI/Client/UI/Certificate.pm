@@ -820,30 +820,18 @@ sub action_search {
         $query->{STATUS} = $status;        
     }
 
-    my @attr;
+    $self->logger()->debug("query : " . Dumper $self->cgi()->param());
+
+    # Read the query pattern for extra attributes from the session 
+    my $attributes = $self->_client->session()->param('certsearch');
+    my @attr = @{$self->__build_attribute_subquery( $attributes )};        
+
+    # Add san search to attributes
     if (my $val = $self->param('san')) {
         $input->{'san'} = $val;        
         push @attr, { KEY => 'subject_alt_name', VALUE => '%'.$val.'%' };
     }
-
-    $self->logger()->debug("query : " . Dumper $self->cgi()->param());
-
-    # Read the query pattern for extra attributes from the session 
-    my $attributes = $self->_client->session()->param('certsearch');        
-    foreach my $item (@{$attributes}) {
-        my $key = $item->{key};
-        my $pattern = $item->{pattern} || '';
-        my $operator = $item->{operator} || 'EQUAL';
-        my @val = $self->param($key.'[]');
-        while (my $val = shift @val) {
-            # embed into search pattern from config
-            $val = sprintf($pattern, $val) if ($pattern);
-            # replace asterisk as wildcard
-            $val =~ s/\*/%/g;
-            push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
-        }
-    }
-
+    
     if (scalar @attr) {
         $query->{CERT_ATTRIBUTES} = \@attr;
     }

@@ -9,6 +9,34 @@ use Template;
 use Data::Dumper;
 use Date::Parse;
 
+has __default_grid_head => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,    
+    default => sub { return [
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL' },
+        { sTitle => 'serial', bVisible => 0 },
+        { sTitle => "_className"},
+    ]; }
+);
+
+has __default_grid_row => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { return [
+        { source => 'workflow', field => 'WORKFLOW_SERIAL' },
+        { source => 'workflow', field => 'WORKFLOW_LAST_UPDATE' },
+        { source => 'workflow', field => 'WORKFLOW_TYPE' },
+        { source => 'workflow', field => 'WORKFLOW_STATE' },
+       { source => 'workflow', field => 'WORKFLOW_SERIAL' }
+    ]; }
+);
+
+
 extends 'OpenXPKI::Client::UI::Result';
 
 =head1 OpenXPKI::Client::UI::Workflow
@@ -245,25 +273,26 @@ sub init_search {
         };                            
     }
 
-    $self->_result()->{main} = [
-        {   type => 'form',
-            action => 'workflow!load',
-            content => {
-                title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
-                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-                fields => [
-                    { name => 'wf_id', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL', type => 'text' },
-                ]
-        }},
-        {   type => 'form',
-            action => 'workflow!search',
-            content => {
-                title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
-                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-                fields => \@fields         
-            }
+    $self->add_section({   
+        type => 'form',
+        action => 'workflow!load',
+        content => {
+            title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+            fields => [
+                { name => 'wf_id', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL', type => 'text' },
+            ]
+    }});
+    
+    $self->add_section({
+        type => 'form',
+        action => 'workflow!search',
+        content => {
+            title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+            fields => \@fields         
         }
-    ];
+    });
 
     return $self;
 }
@@ -330,14 +359,7 @@ sub init_result {
                 icon => 'view',
                 target => 'tab',
             }],
-            columns => [
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL' },
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL' },
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL' },
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL' },
-                { sTitle => 'serial', bVisible => 0 },
-                { sTitle => "_className"},
-            ],
+            columns => $self->__default_grid_head(),
             data => \@result,
             pager => $pager, 
             buttons => [
@@ -513,13 +535,7 @@ sub init_mine {
         description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
     });
     
-    my @column = (
-        { source => 'workflow', field => 'WORKFLOW_SERIAL' },
-        { source => 'workflow', field => 'WORKFLOW_LAST_UPDATE' },
-        { source => 'workflow', field => 'WORKFLOW_TYPE' },
-        { source => 'workflow', field => 'WORKFLOW_STATE' },
-        { source => 'workflow', field => 'WORKFLOW_SERIAL' }
-    );
+    my @column = @{$self->__default_grid_row()};
         
     # Store the query if we need to page
     my $pager;
@@ -552,14 +568,7 @@ sub init_mine {
                 icon => 'view',
                 target => 'tab',
             }],
-            columns => [
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL' },
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL' },
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL' },
-                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL' },
-                { sTitle => 'serial', bVisible => 0 },
-                { sTitle => "_className"},                
-            ],
+            columns => $self->__default_grid_head(),
             data => \@result,
             pager => $pager,                       
         }
@@ -687,42 +696,6 @@ sub init_task {
 }
 
 
-
-=head2 init_bulk
-
-Receive a list of workflow serial ids, usually from a workflow search result, 
-for bulk editing. Bulk editing requires, that all workflows are of same type 
-and in the same state. If this is not the case, the method renders a 
-selection to let the user choose with which workflow/state he wants to 
-proceed. 
-
-=cut
-=cut
-sub init_bulk {
-    
-    my $self = shift;
-    
-    my @wf_id = $self->param('wf_id');
-    
-    my $search_result = $self->send_command( 'search_workflow_instances',  { SERIAL => @wf_id } );
-    
-    my $workflows;
-    foreach my $wf (@$search_result) {
-        my $wf_type = $wf->{"WORKFLOW.WORKFLOW_TYPE"};
-        if (!$workflows->{$wf_type}) {
-            $workflows->{$wf_type} = {};
-        }
-        my $wf_state = $wf->{"WORKFLOW.WORKFLOW_STATE"};
-        if (!$workflows->{$wf_type}->{$wf_state}) {
-            $workflows->{$wf_type}->{$wf_state} = [];
-        }         
-        push @{$workflows->{$wf_type}->{$wf_state}}, $wf->{"WORKFLOW.WORKFLOW_SERIAL"};
-    }
-    
-    $self->logger()->debug('Selected workflows : ' . Dumper $workflows);
-    
-    
-}
 =cut
 
 =head2 action_index
@@ -1023,26 +996,13 @@ sub action_search {
         $input->{wf_proc_state} = $self->param('wf_proc_state');                                
     }
     
-    my @attr;
+    # Read the query pattern for extra attributes from the session
+    my $attributes = $self->_client->session()->param('wfsearch');
+    my @attr = @{$self->__build_attribute_subquery( $attributes )};
+    
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
         push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };                         
-    }
-    
-    # Read the query pattern for extra attributes from the session 
-    my $attributes = $self->_client->session()->param('wfsearch');        
-    foreach my $item (@{$attributes}) {
-        my $key = $item->{key};
-        my $pattern = $item->{pattern} || '';
-        my $operator = $item->{operator} || 'EQUAL';
-        my @val = $self->param($key.'[]');
-        while (my $val = shift @val) {
-            # embed into search pattern from config
-            $val = sprintf($pattern, $val) if ($pattern);
-            # replace asterisk as wildcard
-            $val =~ s/\*/%/g;
-            push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
-        }
     }
     
     $query->{ATTRIBUTE} = \@attr;
@@ -1064,13 +1024,7 @@ sub action_search {
         'count' => $result_count,
         'query' => $query,
         'input' => $input,
-        'column' =>[
-            { source => 'workflow', field => 'WORKFLOW_SERIAL' },
-            { source => 'workflow', field => 'WORKFLOW_LAST_UPDATE' },
-            { source => 'workflow', field => 'WORKFLOW_TYPE' },
-            { source => 'workflow', field => 'WORKFLOW_STATE' },
-            { source => 'workflow', field => 'WORKFLOW_SERIAL' },
-        ]    
+        'column' => $self->__default_grid_row()
     });
  
     $self->redirect( 'workflow!result!id!'.$queryid  );

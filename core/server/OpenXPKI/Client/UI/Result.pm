@@ -406,8 +406,7 @@ sub __register_wf_token {
     $token->{wf_type} = $wf_info->{WORKFLOW}->{TYPE};
     $token->{wf_last_update} = $wf_info->{WORKFLOW}->{LAST_UPDATE};
 
-    # poor mans random id
-    my $id = sha1_base64(time.$token.rand().$$);
+    my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
     $self->logger()->trace('token info ' . Dumper  $token);
     $self->_client->session()->param($id, $token);
@@ -435,8 +434,7 @@ sub __register_wf_token_initial {
         redirect => 1, # initial create always forces a reload of the page
     };
 
-    # poor mans random id
-    my $id = sha1_base64(time.$token.rand().$$);
+    my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
     $self->_client->session()->param($id, $token);
     return  "workflow!index!wf_token!$id";
@@ -587,5 +585,38 @@ sub __render_pager {
         pagerurl => $result->{'type'}.'!pager!id!'.$result->{id} 
     }
 }
+
+
+=head2 __build_attribute_subquery
+
+Expects an attribtue query definition hash (from uicontrol), returns arrayref 
+to be used as attribute subquery in certificate and workflow search.
+
+=cut 
+sub __build_attribute_subquery {
+
+    my $self = shift;
+    my $attributes = shift;
+   
+    my @attr;
+           
+    foreach my $item (@{$attributes}) {
+        my $key = $item->{key};
+        my $pattern = $item->{pattern} || '';
+        my $operator = $item->{operator} || 'EQUAL';
+        my @val = $self->param($key.'[]');
+        while (my $val = shift @val) {
+            # embed into search pattern from config
+            $val = sprintf($pattern, $val) if ($pattern);
+            # replace asterisk as wildcard
+            $val =~ s/\*/%/g;
+            push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
+        }
+    }
+    
+    return \@attr;
+    
+}
+
 
 1;
