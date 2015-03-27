@@ -1,7 +1,10 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
+    classNameBindings: ["type"]
+
     type: Em.computed "content.type", -> "oxisection-" + @get "content.type"
+
     actions:
         buttonClick: (button) ->
             Em.set button, "loading", true
