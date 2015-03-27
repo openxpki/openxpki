@@ -1492,6 +1492,19 @@ sub BUILD {
             class  => 'UI',
             params => {
             }
+        },
+        # this is a workaround and should be refactored, see #283
+        'render_template' => {
+            class  => 'UI',
+            params => {
+                'TEMPLATE' => { 
+                    type => SCALAR,
+                },
+                'PARAMS' => { 
+                    type => HASHREF,
+                    optional => 1,
+                },
+            }
         }
     };
 }
