@@ -6,7 +6,11 @@ Component = Em.Component.extend
     types:
         certstatus: (v) -> "<span class='certstatus-#{(v.value||v.label).toLowerCase()}'>#{v.label}</span>"
         link: (v) -> "<a href='##{v.page}' target='#{v.target||"modal"}'>#{v.label}</a>"
-        timestamp: (v) -> moment.unix(v).utc().format("YYYY-MM-DD HH:mm:ss UTC")
+        timestamp: (v) -> 
+          if v > 0 
+            moment.unix(v).utc().format("YYYY-MM-DD HH:mm:ss UTC")
+          else
+            "---"
         datetime: (v) -> moment().utc(v).format("YYYY-MM-DD HH:mm:ss UTC")
         text: (v) -> v
         code: (v) -> "<code>#{v.replace(/(\r\n|\n|\r)/gm,"<br>")}</code>"
