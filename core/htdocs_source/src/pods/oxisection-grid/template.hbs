@@ -4,6 +4,12 @@
     <table class="table table-striped table-bordered table-hover {{content.className}}">
         <thead>
             <tr>
+                {{#if isBulkable}}
+                    <th {{action "select"}}>
+                        <span class="oxi-checkbox {{if allChecked "checked"}}"></span>
+                        all
+                    </th>
+                {{/if}}
                 {{#each columns as |column|}}
                     <th {{action "sort" column}}>
                         <span>{{column.sTitle}}</span>
@@ -21,6 +27,11 @@
         <tbody>
             {{#each sortedData as |row index|}}
                 <tr class="context {{row.className}} {{if hasAction "has-action"}}">
+                    {{#if isBulkable}}
+                        <td {{action "select" row}}>
+                            <span class="oxi-checkbox {{if row.checked "checked"}}"></span>
+                        </td>
+                    {{/if}}
                     {{#each row.data as |value|}}
                         <td {{action "rowClick" index}}>{{oxivalue-format content=value}}</td>
                     {{/each}}

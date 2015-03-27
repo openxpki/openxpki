@@ -2,6 +2,19 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 
 Component = Em.Component.extend
+    isBulkable: Em.computed "content.content.buttons.@each.select", ->
+        @get("content.content.buttons")?.isAny "select"
+
+    allChecked: Em.computed "sortedData.@each.checked", ->
+        @get("sortedData").isEvery "checked", true
+
+    manageBulkButtons: Em.on "init", Em.observer "sortedData.@each.checked", ->
+        data = @get("sortedData").filterBy "checked"
+        buttons = @get "content.content.buttons"
+        return if not buttons
+        for button in buttons.filterBy "select"
+            Em.set button, "disabled", not data.length
+
     pagesizes: Em.computed "content.content.pager.pagesizes", ->
         pagesizes = @get "content.content.pager.pagesizes"
         pager = @get "content.content.pager"
@@ -154,6 +167,12 @@ Component = Em.Component.extend
 
     actions:
         buttonClick: (button) -> @sendAction "buttonClick", button
+        select: (row) ->
+            if row
+                Em.set row, "checked", not row.checked
+            else
+                @get("sortedData").setEach "checked", not @get "allChecked"
+
         changePagesize: (pagesize) ->
             startat = @get "content.content.pager.startat"
             @container.lookup("route:openxpki").transitionTo
