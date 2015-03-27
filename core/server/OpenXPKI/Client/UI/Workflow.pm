@@ -5,7 +5,7 @@
 package OpenXPKI::Client::UI::Workflow;
 
 use Moose;
-use Template;
+use OpenXPKI::Template;
 use Data::Dumper;
 use Date::Parse;
 
@@ -1298,11 +1298,11 @@ sub __render_from_workflow {
         
         foreach my $field (@fields_to_render) {
         
-            my $key = $field->{name};            
+            my $key = $field->{name};
             my $item = { 
                 value => ($context->{$key} || ''), 
                 type => '', 
-                format =>  $field->{format} || ''  
+                format =>  $field->{format} || ''
             };
         
             # Always suppress key material
@@ -1320,13 +1320,12 @@ sub __render_from_workflow {
             if (!$item->{label}) {
                 $item->{label} = $key;
             }
-                 
+            
             # assign autoformat based on some assumptions if no format is set
             if (!$item->{format}) {                
                 # create a link on cert_identifier fields
                 if ( $key =~ m{ cert_identifier \z }x || 
-                    $item->{type} eq 'cert_identifier') {
-                
+                    $item->{type} eq 'cert_identifier') {                
                     $item->{format} = 'cert_identifier';    
                 }
                 
@@ -1336,24 +1335,38 @@ sub __render_from_workflow {
                     $item->{format} = 'code';
                 }                
             }
-
-            # convert format cert_identifier into a link             
-            if ($item->{format} =~ m{\A cert_identifier}x) {        
-                $item->{format} = 'link';
-                
-                my $cert_info = $self->send_command( 'get_cert', { IDENTIFIER => $item->{value}, FORMAT => 'DBINFO' });
-                $self->logger()->debug( Dumper $cert_info );
-                $item->{value}  = { 
-                    label => sprintf "%s<br/>%s", $item->{value}, $cert_info->{SUBJECT}, 
-                    page => 'certificate!detail!identifier!'. $item->{value}, 
-                    target => 'modal' 
-                };
+            
+            # render output from Template
+            # TODO - might be usefull to do processing on the server to get access to Plugins
+            if ($field->{template}) {                
+                my $param;
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $param = $self->serializer()->deserialize( $item->{value} );
+                } else {
+                    $param = { field => $field, value => $item->{value} };
+                }
+                my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                
+                $item->{value} = $out;
             }
 
-            # Auto detect serializes content
-            # FIXME - will not work once we change serialization format
-            if (ref $item->{value} eq '' && $item->{value} && $item->{value} =~ m{ \A (HASH|ARRAY) }x) {
-                $item->{value} = $self->serializer()->deserialize( $context->{$key} );
+            # convert format cert_identifier into a link             
+            if ($item->{format} =~ m{\A cert_identifier}x) {
+                $item->{format} = 'link';
+                
+                # use bare context value in case we mangled value before using Template
+                my $cert_identifier = $context->{$key};
+                $item->{value}  = { 
+                    label => $item->{value}, 
+                    page => 'certificate!detail!identifier!'.$cert_identifier,
+                    target => 'modal' 
+                };
+                $self->logger()->debug( 'item ' . Dumper $item);
+            }            
+
+            # Auto detect serialized content          
+            if (ref $item->{value} eq '' && $item->{value} && 
+                OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                $item->{value} = $self->serializer()->deserialize( $item->{value} );
                 if (ref $item->{value} eq 'HASH' && !$item->{format}) {
                     # Sort by label
                     my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
@@ -1601,7 +1614,7 @@ sub __render_result_list {
     $self->logger()->debug("search result " . Dumper $search_result);
 
     my @result;
-    my $tt = Template->new();
+    my $oxtt = OpenXPKI::Template->new();
     
     foreach my $wf_item (@{$search_result}) {
                         
@@ -1624,12 +1637,8 @@ sub __render_result_list {
                     context => $context, 
                     attribute => $attrib, 
                     workflow => $wf_info->{WORKFLOW} 
-                };
-                if (!$tt->process( \$col->{template}, $ttp, \$out )) {
-                    $out = 'template error!';
-                    $self->logger()->error('Error processing template ->'.$col->{template}.'<- in workflow '. $wf_info->{WORKFLOW}->{ID});
-                }
-                push @line, $out;
+                };                                    
+                push @line, $oxtt->render( $col->{template}, $ttp);
             } elsif ($col->{source} eq 'workflow') {
                 
                 # Special handling of the state field
