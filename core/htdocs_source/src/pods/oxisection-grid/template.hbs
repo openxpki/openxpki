@@ -28,16 +28,16 @@
             {{/each}}
         </tbody>
     </table>
+    <div class="dropdown">
+        <ul class="dropdown-menu" role="menu">
+            {{#each content.content.actions as |action|}}
+                <li>
+                    <a tabindex="-1" href="#">{{action.label}}</a>
+                </li>
+            {{/each}}
+        </ul>
+    </div>
 </div>
 
 {{partial "partial-pagination"}}
 {{oxi-button-container buttons=content.content.buttons buttonClick="buttonClick"}}
-<div class="dropdown">
-    <ul class="dropdown-menu" role="menu">
-        {{#each content.content.actions as |action|}}
-            <li>
-                <a tabindex="-1" href="#">{{action.label}}</a>
-            </li>
-        {{/each}}
-    </ul>
-</div>
