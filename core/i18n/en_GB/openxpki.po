@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-03-12 16:37+0100\n"
+"PO-Revision-Date: 2015-03-29 15:17+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1753,10 +1753,6 @@ msgstr "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKF
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
 msgstr "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM"
-msgstr "I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_SERVER_ACTIVITY_EVALUATE_ELIGIBILITY_ERROR_PARSING_TEMPLATE"
@@ -3767,6 +3763,10 @@ msgid "I18N_OPENXPKI_SUBJECT_STYLE_UID_PLUS_CN"
 msgstr "The used suject style requires a UID plus a common name."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_TEMPLATE_ERROR_PARSING_TEMPLATE_FOR_PARAM"
+msgstr "I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION"
 msgstr "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION"
 
@@ -5074,6 +5074,40 @@ msgstr "Please update / complete the information below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
+msgstr ""
+"Please enter search criteria for the workflows to be included in your bulk "
+"action. You can pick indiviual items on the next page."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
+msgstr "The selected action succeeded on all workflows."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC"
+msgstr "See the result of your bulk action below."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC"
+msgstr ""
+"These workflows failed executing the selected action, check the error "
+"message for details."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL"
+msgstr "Failed Workflows"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS"
+msgstr "Some workflows failed!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_LABEL"
+msgstr "Result of your Bulk Action"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC"
+msgstr "These workflows finished execution of the selected action."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL"
+msgstr "Successful Workflows"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
+msgstr "Bulk handle workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_DESC"
@@ -6848,9 +6882,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_LABEL"
 msgstr "Certificate Revocation Request (CRR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
-msgstr "Certificate Signing Request (CSR)"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
 msgstr "Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
@@ -8696,6 +8727,9 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "SUCCESS"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
+#~ msgstr "Certificate Signing Request (CSR)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"

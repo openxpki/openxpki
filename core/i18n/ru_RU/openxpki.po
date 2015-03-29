@@ -1931,10 +1931,6 @@ msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM"
-msgstr "Сброс"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_ACTIVITY_EVALUATE_ELIGIBILITY_ERROR_PARSING_TEMPLATE"
 msgstr "SPKAC-строка пуста."
 
@@ -4148,6 +4144,10 @@ msgstr ""
 "имени -  common name."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_TEMPLATE_ERROR_PARSING_TEMPLATE_FOR_PARAM"
+msgstr "Сброс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION"
 msgstr ""
 "В поле Организация (o) просто вписывается название организации, которой "
@@ -5867,6 +5867,46 @@ msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -7867,10 +7907,6 @@ msgstr "Отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
-msgstr "Создание заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
 msgstr "Создание заявки на сертификат (CSR)"
 
 #, fuzzy
@@ -9946,6 +9982,10 @@ msgstr "Тестировщик"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
+#~ msgstr "Создание заявки на сертификат (CSR)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"

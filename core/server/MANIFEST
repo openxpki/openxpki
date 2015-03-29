@@ -32,6 +32,7 @@ OpenXPKI/Client/Simple.pm
 # New UI Client
 OpenXPKI/Client/UI.pm
 OpenXPKI/Client/UI/Bootstrap.pm
+OpenXPKI/Client/UI/Bulk.pm
 OpenXPKI/Client/UI/Certificate.pm
 OpenXPKI/Client/UI/Crl.pm
 OpenXPKI/Client/UI/Home.pm
@@ -41,6 +42,7 @@ OpenXPKI/Client/UI/Plain.pm
 OpenXPKI/Client/UI/Profile.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm
+OpenXPKI/Client/UI/Source.pm
 OpenXPKI/Client/UI/Workflow.pm
 OpenXPKI/Client/UI/Handle/Profile.pm
 

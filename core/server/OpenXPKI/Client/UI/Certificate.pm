@@ -150,7 +150,6 @@ sub init_result {
         className => 'certificate',
         processing_type => 'all',
         content => {
-            header => 'Grid-Headline',
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
                 label => 'Download',
@@ -299,7 +298,6 @@ sub init_mine {
         className => 'certificate',
         processing_type => 'all',
         content => {
-            header => 'Grid-Headline',
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
                 label => 'Download',
@@ -533,7 +531,6 @@ sub init_related {
         className => 'workflow',
         processing_type => 'all',
         content => {
-            header => 'Grid-Headline',
             label => 'Workflows related to this certificate',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}',

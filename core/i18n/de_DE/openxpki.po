@@ -2037,10 +2037,6 @@ msgid "I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM"
-msgstr "PKI Realm"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_ACTIVITY_EVALUATE_ELIGIBILITY_ERROR_PARSING_TEMPLATE"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -4095,6 +4091,10 @@ msgstr ""
 "Diesdient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_TEMPLATE_ERROR_PARSING_TEMPLATE_FOR_PARAM"
+msgstr "PKI Realm"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION"
 msgstr "Web-Schnittstelle des Trustcenters"
 
@@ -5805,6 +5805,49 @@ msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+"oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
@@ -7789,10 +7832,6 @@ msgstr "Zertifizierungsantrag"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
-msgstr "Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
 msgstr "Zertifizierungsantrag"
 
 #, fuzzy
@@ -9832,6 +9871,10 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
+#~ msgstr "Zertifizierungsantrag"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE"

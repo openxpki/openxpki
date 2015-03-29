@@ -366,7 +366,6 @@ sub init_result {
         className => 'workflow',
         processing_type => 'all',
         content => {
-            header => 'Grid-Headline',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
@@ -584,7 +583,6 @@ sub init_mine {
         className => 'workflow',
         processing_type => 'all',
         content => {
-            header => 'Grid-Headline',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
@@ -1025,7 +1023,6 @@ sub action_search {
     if ($self->param('wf_proc_state')) {
         $query->{PROC_STATE} = $self->param('wf_proc_state');
         $input->{wf_proc_state} = $self->param('wf_proc_state');
-
     }
 
     # Read the query pattern for extra attributes from the session
@@ -1061,10 +1058,121 @@ sub action_search {
     });
 
     $self->redirect( 'workflow!result!id!'.$queryid  );
-    
+
     return $self;
 
 }
+
+=head2 action_bulk
+
+Receive a list of workflow serials (I<wf_id>) plus a workflow action 
+(I<wf_action>) to execute on those workflows. For each given serial the given
+action is executed. The resulting state for each workflow is shown in a grid 
+table. Methods that require additional parameters are not supported yet. 
+
+=cut
+
+sub action_bulk {
+
+    my $self = shift;
+
+    my @serials = $self->param('wf_id[]');
+    my $action = $self->param('wf_action'); 
+    
+    $self->logger()->debug('Selected workflows : ' . join(", ", @serials));
+   
+    my @success; # list of wf_info results
+    my $errors; # hash with wf_id => error 
+    foreach my $id (@serials) {
+
+        my $wf_info = $self->send_command( 'execute_workflow_activity',  
+            { ID => $id, ACTIVITY => $action } );
+
+        # send_command returns undef if there is an error which usually means 
+        # that the action was not successful. We can slurp the verbose error 
+        # from the result status item and display it in the table  
+        if (!$wf_info) {
+            $errors->{$id} = $self->_status()->{message};         
+        } else {
+            push @success, $wf_info;
+            $self->logger()->debug('Result on '.$id.': '. Dumper $wf_info);
+        }
+               
+    }
+
+    $self->_page({
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_LABEL',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC',
+    });
+    
+    if ($errors) {
+
+        $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS', 'level' => 'error' });
+        
+        my @failed_id = keys %{$errors};
+        my $failed_result = $self->send_command( 'search_workflow_instances', { SERIAL => \@failed_id } );
+    
+        my @result_failed = $self->__render_result_list( $failed_result, $self->__default_grid_row );
+        
+        # push the error to the result
+        my $pos_serial = 4;
+        my $pos_state = 3;                  
+        map {            
+            my $serial = $_->[ $pos_serial ];        
+            $_->[ $pos_state ] = $errors->{$serial};
+        } @result_failed;
+
+        $self->logger()->debug('Mangled failed result: '. Dumper \@result_failed);
+            
+        my @fault_head = @{$self->__default_grid_head};
+        $fault_head[$pos_state] = { sTitle => 'Error' };
+            
+        $self->add_section({
+            type => 'grid',
+            className => 'workflow',
+            processing_type => 'all',
+            content => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL',
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC',
+                actions => [{
+                    path => 'workflow!load!wf_id!{serial}!view!result',
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
+                    icon => 'view',
+                    target => 'tab',
+                }],
+                columns => \@fault_head,
+                data => \@result_failed,
+            }
+        });
+    } else {
+        $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS', 'level' => 'error' });
+    }
+    
+    if (@success) {
+        
+        my @result_done = $self->__render_result_list( \@success, $self->__default_grid_row );
+        
+        $self->add_section({
+            type => 'grid',
+            className => 'workflow',
+            processing_type => 'all',
+            content => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL',
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC',
+                actions => [{
+                    path => 'workflow!load!wf_id!{serial}!view!result',
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
+                    icon => 'view',
+                    target => 'tab',
+                }],
+                columns => $self->__default_grid_head,
+                data => \@result_done,
+            }
+        });
+    }
+
+}
+=cut
 
 =head1 internal methods
 
@@ -1739,7 +1847,6 @@ adds exception/paused label to the state column and status class based on
 proc and wf state.
 
 =cut
-
 sub __render_result_list {
 
     my $self = shift;
@@ -1756,6 +1863,22 @@ sub __render_result_list {
         my @line;
         my ($wf_info, $context, $attrib);
 
+        # if we received a list of wf_info structures, we need to translate
+        # the workflow hash into the database table format
+        if ($wf_item->{WORKFLOW} && ref $wf_item->{WORKFLOW} eq 'HASH') {
+            $wf_info = $wf_item; 
+            $context = $wf_info->{WORKFLOW}->{CONTEXT};
+            $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};
+            $wf_item = {                
+                'WORKFLOW.WORKFLOW_LAST_UPDATE' => $wf_info->{WORKFLOW}->{LAST_UPDATE},
+                'WORKFLOW.WORKFLOW_SERIAL' => $wf_info->{WORKFLOW}->{ID},
+                'WORKFLOW.WORKFLOW_TYPE' => $wf_info->{WORKFLOW}->{TYPE},
+                'WORKFLOW.WORKFLOW_STATE' => $wf_info->{WORKFLOW}->{STATE},
+                'WORKFLOW.WORKFLOW_PROC_STATE' => $wf_info->{WORKFLOW}->{PROC_STATE},
+                'WORKFLOW.WORKFLOW_WAKEUP_AT' => $wf_info->{WORKFLOW}->{WAKE_UP_AT},
+            };            
+        }
+
         foreach my $col (@{$colums}) {
 
             # we need to load the wf info
@@ -1764,7 +1887,6 @@ sub __render_result_list {
                 $self->logger()->debug( "fetch wf info : " . Dumper $wf_info);
                 $context = $wf_info->{WORKFLOW}->{CONTEXT};
                 $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};
-
             }
 
             if ($col->{template}) {
