@@ -1,5 +1,3 @@
-## OpenXPKI::Server::Workflow::Validator::CertSubjectFields
-##
 package OpenXPKI::Server::Workflow::Validator::CertSubjectFields;
 
 use strict;
@@ -17,12 +15,13 @@ use Template;
 use Data::Dumper;
 use Encode;
 
-__PACKAGE__->mk_accessors( qw( section ) );
+__PACKAGE__->mk_accessors( qw( section basename ) );
 
 sub _init {
     
     my ( $self, $params ) = @_;            
-    $self->section( exists $params->{'section'} ? $params->{'section'} : 'subject' );    
+    $self->section( exists $params->{'section'} ? $params->{'section'} : 'subject' );
+    $self->basename( exists $params->{'basename'} ? $params->{'basename'} : 'cert_'.$self->section().'_parts' );    
     return 1;
 }
 
@@ -66,13 +65,13 @@ sub validate {
         my $min = $field->{MIN} || 0;
         my $max = $field->{MAX} || 0;
         my $match = $field->{MATCH} || '';
+        my $clonable =  $field->{CLONABLE} || 0;
         
         my @value;
         if ( !defined $subject_parts->{ $name } ) {
             # noop
-        } elsif (ref $subject_parts->{ $name } eq 'ARRAY') {            
-            # clean empty values
-            @value = grep { $_ ne '' } @{$subject_parts->{ $name }};
+        } elsif (ref $subject_parts->{ $name } eq 'ARRAY') {
+            @value = @{$subject_parts->{ $name }};
         } elsif ( $subject_parts->{ $name } ne '' ) {        
             @value = ( $subject_parts->{ $name } );
         }
@@ -80,23 +79,31 @@ sub validate {
         # remove from hash to see if all was check
         delete $subject_parts->{ $name };
         
-        if (!@value) {
-            if ($min > 0) {
-                push @fields_with_error, { name => $name, min => $min,
-                    error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT' };
-            }
+        # we need to form field name in the json reply
+        $name = sprintf "%s{%s}", $self->basename(), $name;
+        
+        # if the field is a cloneable, the name ends on square brackets
+        if ($clonable) {
+            $name .= '[]';
+        }
+        
+        my @nonempty = grep { $_ ne '' } @value;
+        if (@nonempty < $min) {
+            push @fields_with_error, { name => $name, min => $min,
+                error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT' };            
             next FIELD;
         }
         
-        if ($max && $max < scalar @value) {
+        if ($max && $max < scalar @nonempty) {
             push @fields_with_error, { name => $name, max => $max,
                 error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED' };
+            next FIELD;
         }
         
         if ($match) {
             my $ii = 0;
             foreach my $val (@value) {                                
-                if ($val !~ m{$match}xs) {
+                if ($val ne '' && $val !~ m{$match}xs) {
                     # should be a bit smarter to highlight the right one
                     push @fields_with_error, { name => $name, 
                         error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX', index => $ii };    
@@ -104,7 +111,6 @@ sub validate {
                 $ii++;    
             }
         }
-        
     }
     
     foreach my $name (keys %$subject_parts) {               
@@ -127,4 +133,54 @@ sub validate {
 1;
 
 __END__
+
+=head1 NAME
+ 
+OpenXPKI::Server::Workflow::Validator::CertSubjectFields
+
+=head1 SYNOPSIS
+
+  vaidate_san_parts:
+    class: OpenXPKI::Server::Workflow::Validator::CertSubjectFields
+    param:
+      section: san
+    arg: 
+      - $cert_profile
+      - $cert_subject_style
+      - $cert_san_parts
+  
+=head1 DESCRIPTION
+
+Validate input for certificate subject information as defined in the  
+profile definition.  
+
+=head2 Argument
+
+=item profile
+
+The name of the profile.
+
+=item style
+
+The name of the profile style.
+
+=item subject_parts
+
+The input parameters to perform the valdation on. 
+ 
+=head2 Parameter
+
+=item section
+
+The name of the section to perform checks on (B<subject>, san, info). 
+
+=item basename
+
+The name of the form parameter used for this information. This is used
+to generate the list of errornous fieldnames for the UI. If omitted the
+name is assumed to be as cert_I<section>_parts as used in the default
+workflows. 
+
+
+ 
  
