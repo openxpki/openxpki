@@ -841,9 +841,8 @@ sub action_index {
                 my $p = $reply->{LIST}->[0]->{PARAMS};
                 my $field_errors = $p->{__FIELDS__};
                 my $validator_msg = $p->{__ERROR__};
-                my @fields = keys%{$field_errors};
-                $self->_status({ level => 'error', message => 'Validation failed on fields: '. join (",", @fields), 
-                    field_error => $field_errors });
+                my @fields = map { $_->{name} } @$field_errors;
+                $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
                 $self->logger()->error("Input validation error on fields ". join ",", @fields);
                 $self->logger()->debug('validation details' . Dumper $field_errors );
             } else {

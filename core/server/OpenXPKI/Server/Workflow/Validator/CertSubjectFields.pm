@@ -38,7 +38,7 @@ sub validate {
     return if (not defined $style);
     return if (not defined $subject_parts);
     
-    my $fields_with_error;
+    my @fields_with_error;
 
     ##! 16: 'wf->id(): ' . $wf->id()
 
@@ -63,9 +63,9 @@ sub validate {
     foreach my $field (@$fields) {
         
         my $name = $field->{ID};
-        my $min = $field->{MIN};
-        my $max = $field->{MAX};
-        my $match = $field->{MATCH};
+        my $min = $field->{MIN} || 0;
+        my $max = $field->{MAX} || 0;
+        my $match = $field->{MATCH} || '';
         
         my @value;
         if ( !defined $subject_parts->{ $name } ) {
@@ -82,38 +82,43 @@ sub validate {
         
         if (!@value) {
             if ($min > 0) {
-                $fields_with_error->{ $name } = 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT';                
+                push @fields_with_error, { name => $name, min => $min,
+                    error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT' };
             }
             next FIELD;
         }
         
         if ($max && $max < scalar @value) {
-            $fields_with_error->{ $name } = 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED';
+            push @fields_with_error, { name => $name, max => $max,
+                error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED' };
         }
         
         if ($match) {
-            foreach my $val (@value) {
+            my $ii = 0;
+            foreach my $val (@value) {                                
                 if ($val !~ m{$match}xs) {
                     # should be a bit smarter to highlight the right one
-                    $fields_with_error->{ $name } = "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX";    
-                }    
+                    push @fields_with_error, { name => $name, 
+                        error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX', index => $ii };    
+                }
+                $ii++;    
             }
         }
         
     }
     
-    foreach my $field (keys %$subject_parts) {               
-        $fields_with_error->{ $field } = "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED";
+    foreach my $name (keys %$subject_parts) {               
+        push @fields_with_error, { name => $name, error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED' };
     }
 
     ## did we find any errors?
-    if ($fields_with_error) {
+    if (@fields_with_error) {
 	   CTX('log')->log(
     	    MESSAGE  => "Certificate subject validation error",
     	    PRIORITY => 'error',
     	    FACILITY => 'workflow',
     	);
-        validation_error ('I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_HAS_ERRORS', { invalid_fields => $fields_with_error } );
+        validation_error ('I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_HAS_ERRORS', { invalid_fields => \@fields_with_error } );
     }
  
     return 1;
