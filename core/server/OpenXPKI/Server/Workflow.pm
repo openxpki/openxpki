@@ -154,12 +154,14 @@ sub execute_action {
         if (ref $error eq 'Workflow::Exception::Validation') {
             # Set workflow status to manual
             $self->_set_proc_state( 'manual' );
-
+            ##! 32: 'validator exception: ' . Dumper $error
+            my $invalid_fields = $error->{invalid_fields} || {};
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE",
                 params => {
                     ACTION => $action_name,
                     ERROR => scalar $error,
+                    FIELDS => $invalid_fields
                 }
             );
         }

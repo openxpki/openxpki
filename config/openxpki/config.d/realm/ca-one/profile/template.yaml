@@ -242,6 +242,7 @@ san_dns:
     label: I18N_OPENXPKI_UI_PROFILE_SAN_DNS
     description: I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION
     type: freetext
+    match: \A [A-Za-z\d\-\.]+ \z
     width: 40
     min: 0
     max: 20
@@ -251,6 +252,7 @@ san_ipv4:
     label: I18N_OPENXPKI_UI_PROFILE_SAN_IP
     description: I18N_OPENXPKI_UI_PROFILE_SAN_IP_DESCRIPTION
     type: freetext
+    match: \A ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?) \z
     width: 40
     min: 0
     max: 20

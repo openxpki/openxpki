@@ -834,8 +834,22 @@ sub action_index {
         });
 
         if (!$wf_info) {
-            # todo - handle workflow errors
-            $self->logger()->error("workflow acton failed!");
+            
+            # Check for validation error by inspecting the raw command reply
+            my $reply = $self->_last_reply();
+            if ($reply->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE') {
+                my $p = $reply->{LIST}->[0]->{PARAMS};
+                my $field_errors = $p->{__FIELDS__};
+                my $validator_msg = $p->{__ERROR__};
+                my @fields = keys%{$field_errors};
+                $self->_status({ level => 'error', message => 'Validation failed on fields: '. join (",", @fields), 
+                    field_error => $field_errors });
+                $self->logger()->error("Input validation error on fields ". join ",", @fields);
+                $self->logger()->debug('validation details' . Dumper $field_errors );
+            } else {
+                # todo - handle workflow errors
+                $self->logger()->error("workflow acton failed!");
+            }
             return $self;
         }
         $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
@@ -1297,7 +1311,6 @@ sub __render_from_workflow {
             my @fields;
             push @fields, $self->__register_wf_token( $wf_info, {
                 wf_action => $wf_action
-
             });
 
             $self->add_section({
@@ -1571,9 +1584,7 @@ sub __render_from_workflow {
                 if ($item->{format} eq "deflist") {
 
                     foreach (@{$item->{value}}){
-
                         $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
-
                     }
 
                 # bullet list, but the full list to tt and split at the | as sep (as used in profile)

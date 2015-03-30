@@ -321,6 +321,8 @@ action:
           - cert_info
         param:
             source: USER
+        validator:
+          - global_cert_info_parts
 
     edit_san:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
@@ -331,6 +333,8 @@ action:
           - cert_san_parts
         param:
             source: USER
+        validator: 
+          - global_cert_san_parts
 
     edit_subject:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
@@ -341,6 +345,9 @@ action:
           - cert_subject_parts
         param:
             source: USER
+        validator: 
+          - global_cert_subject_parts
+
 
     edit_validity:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource

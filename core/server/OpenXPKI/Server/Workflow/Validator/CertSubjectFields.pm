@@ -103,7 +103,7 @@ sub validate {
     }
     
     foreach my $field (keys %$subject_parts) {               
-        $fields_with_error->{ $field->{ID} } = "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED";
+        $fields_with_error->{ $field } = "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED";
     }
 
     ## did we find any errors?
