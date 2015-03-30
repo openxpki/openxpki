@@ -36,7 +36,7 @@ sub init_index {
     });
             
     # Searchable attributes are read from the menu bootstrap   
-    my $attributes = $self->_client->session()->param('wfsearch');    
+    my $attributes = $self->_session->param('wfsearch')->{default};    
     if ($attributes) {
         my @attrib;
         foreach my $item (@{$attributes}) {
@@ -81,7 +81,7 @@ sub action_csr {
     my $args = shift;
 
     # Read the query pattern for extra attributes from the session
-    my $attributes = $self->_client->session()->param('wfsearch');
+    my $attributes = $self->_session->param('wfsearch')->{default};
     my @attr = @{$self->__build_attribute_subquery( $attributes )};
 
     my $query = {

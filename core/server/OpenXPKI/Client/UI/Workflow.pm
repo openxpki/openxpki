@@ -33,7 +33,7 @@ has __default_grid_row => (
         { source => 'workflow', field => 'WORKFLOW_LAST_UPDATE' },
         { source => 'workflow', field => 'WORKFLOW_TYPE' },
         { source => 'workflow', field => 'WORKFLOW_STATE' },
-       { source => 'workflow', field => 'WORKFLOW_SERIAL' }
+        { source => 'workflow', field => 'WORKFLOW_SERIAL' }
     ]; }
 );
 
@@ -259,8 +259,7 @@ sub init_search {
     );
 
     # Searchable attributes are read from the menu bootstrap
-
-    my $attributes = $self->_client->session()->param('wfsearch');
+    my $attributes = $self->_session->param('wfsearch')->{default};
     if ($attributes) {
         my @attrib;
         foreach my $item (@{$attributes}) {
@@ -269,14 +268,10 @@ sub init_search {
         }
         push @fields, {
             name => 'attributes',
-
             label => 'Metadata',
-
             'keys' => \@attrib,
-
             type => 'text',
             is_optional => 1,
-
             'clonable' => 1
         };
 
@@ -534,7 +529,7 @@ sub init_mine {
     my $startat = $self->param('startat') || 0;
 
     my $query = {
-        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_client()->session()->param('user')->{name} }]
+        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_session->param('user')->{name} }]
     };
 
     my $search_result = $self->send_command( 'search_workflow_instances',
@@ -615,7 +610,7 @@ sub init_task {
         label => 'Outstanding tasks'
     });
 
-    my $tasklist = $self->_client->session()->param('tasklist');
+    my $tasklist = $self->_client->session()->param('tasklist')->{default};
 
     if (!$tasklist) {
         return $self->_redirect('home');
@@ -1026,7 +1021,7 @@ sub action_search {
     }
 
     # Read the query pattern for extra attributes from the session
-    my $attributes = $self->_client->session()->param('wfsearch');
+    my $attributes = $self->_session->param('wfsearch')->{default};
     my @attr = @{$self->__build_attribute_subquery( $attributes )};
 
     if ($self->param('wf_creator')) {
@@ -1447,11 +1442,8 @@ sub __render_from_workflow {
 
             my $key = $field->{name};
             my $item = {
-
                 value => ($context->{$key} || ''),
-
                 type => '',
-
                 format =>  $field->{format} || ''
             };
 
@@ -1477,11 +1469,8 @@ sub __render_from_workflow {
 
                 # create a link on cert_identifier fields
                 if ( $key =~ m{ cert_identifier \z }x ||
-
                     $item->{type} eq 'cert_identifier') {
-
                     $item->{format} = 'cert_identifier';
-
                 }
 
                 # Code format any PEM blocks
@@ -1511,9 +1500,7 @@ sub __render_from_workflow {
                 my $cert_identifier = $item->{value};
 
                 $item->{value}  = {
-
                     label => $label,
-
                     page => 'certificate!detail!identifier!'.$cert_identifier,
                     target => 'modal'
 
@@ -1529,7 +1516,6 @@ sub __render_from_workflow {
                 my $raw = $item->{value};
                 if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
                     $raw = $self->serializer()->deserialize( $raw );
-
                 }
 
                 # this requires that we find the profile and subject in the context
@@ -1602,7 +1588,6 @@ sub __render_from_workflow {
 
                 } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
                     $item->{value}->{label} = $self->send_command( 'render_template', { TEMPLATE => $field->{template},
-
                         PARAMS => { value => $item->{value}->{label} }} );
                 } else {
                     $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);

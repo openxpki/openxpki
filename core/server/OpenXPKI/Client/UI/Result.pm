@@ -48,6 +48,18 @@ has _status => (
     isa => 'HashRef|Undef',
 );
 
+has _last_reply => (
+    is => 'rw',
+    isa => 'HashRef',
+);
+
+has _session => (
+    is => 'ro',
+    isa => 'Object',
+    lazy => 1,
+    builder => '_init_session',
+);
+
 has _result => (
     is => 'rw',
     isa => 'HashRef|Undef',
@@ -86,8 +98,16 @@ sub BUILD {
     if ($self->_client()->_status()) {
         $self->_status(  $self->_client()->_status() );
     }
-
+   
 }
+
+sub _init_session {
+   
+    my $self = shift;
+    return $self->_client()->session();
+   
+}
+
 sub add_section {
 
     my $self = shift;
@@ -122,11 +142,13 @@ sub send_command {
     my $reply = $backend->send_receive_service_msg(
         'COMMAND', { COMMAND => $command, PARAMS => $params }
     );
+    $self->_last_reply( $reply );
 
     $self->logger()->trace('send command raw reply: '. Dumper $reply);
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
         $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
+        $self->logger()->debug("command reply ". Dumper $reply);
         $self->set_status_from_error_reply( $reply );
         return undef;
     }
@@ -319,7 +341,7 @@ sub render {
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );
     } else {
-        $result->{session_id} = $self->_client()->session()->id;        
+        $result->{session_id} = $self->_session->id;        
         $body = i18nTokenizer ( $json->encode($result) );
     }
 
