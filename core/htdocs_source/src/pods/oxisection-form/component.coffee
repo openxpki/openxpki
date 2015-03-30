@@ -105,9 +105,14 @@ Component = Em.Component.extend
                 data:data
             .then (res) =>
                 @set "loading", false
-                if res.error
-                    console.log "Set errors not implemented"
-
-            # set errors from json.error
+                errors = res.status?.field_errors
+                if errors
+                    fields = @get "fields"
+                    for error in errors
+                        clones = fields.filter (f) -> f.name is error.name
+                        if typeof error.index is "undefined"
+                            clones.setEach "error", error.error
+                        else
+                            Em.set clones[error.index], "error", error.error
 
 `export default Component`
