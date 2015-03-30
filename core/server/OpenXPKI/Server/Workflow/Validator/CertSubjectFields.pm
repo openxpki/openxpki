@@ -95,8 +95,12 @@ sub validate {
         }
         
         if ($max && $max < scalar @nonempty) {
-            push @fields_with_error, { name => $name, max => $max,
-                error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED' };
+            # push an error to the fields that need to be removed
+            my $ii = scalar @nonempty;
+            do {
+                push @fields_with_error, { name => $name, max => $max, index => --$ii,
+                    error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_MAX_COUNT_EXCEEDED' };
+            } while ($ii > $max);
             next FIELD;
         }
         
