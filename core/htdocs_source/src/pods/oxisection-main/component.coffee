@@ -17,7 +17,7 @@ Component = Em.Component.extend
                 , ->
                     Em.set button, "loading", false
             else
-                console.log('Transition');
-                @container.lookup("route:openxpki").transitionTo "openxpki", btn.page
+                @container.lookup("route:openxpki").transitionTo "openxpki",
+                    button.page
 
 `export default Component`
