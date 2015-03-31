@@ -1,0 +1,9 @@
+id: requestor_affiliation
+label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION
+description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION_DESC
+type: select
+option:
+  - System Owner
+  - System Admin
+  - Other
+width: 20
