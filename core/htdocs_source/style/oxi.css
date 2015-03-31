@@ -192,10 +192,13 @@ img.toplogo{
   }
 }
 
+/* Status Labels inside key/value lists, e.g */
+span.dns-valid,
 span.certstatus-issued {
     color: green;
 }
 
+span.dns-failed,
 span.certstatus-revoked {
     color: red;
 }
@@ -203,3 +206,4 @@ span.certstatus-revoked {
 span.certstatus-expired {
     color: #444;
 }
+
