@@ -104,6 +104,13 @@ state:
           - approve_crr > CHECK_APPROVALS ? acl_can_approve is_not_yet_revoked_or_pending
           - reject_crr > REJECTED ? acl_can_reject is_not_yet_revoked_or_pending
           - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
+        output:
+          - cert_identifier
+          - creator
+          - notbefore
+          - invalidity_time
+          - reason_code
+          - comment
 
     PENDING_USER:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL
