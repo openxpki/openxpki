@@ -536,7 +536,7 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param:
            _map_cert_subject: $cert_subject
-           _map_requestor: "[% cert_info.requestor_email %]"
+           _map_requestor: "[% context.cert_info.requestor_email %]"
 
     submit:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute

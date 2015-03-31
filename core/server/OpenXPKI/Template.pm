@@ -46,9 +46,12 @@ sub render {
     foreach my $refkey (@non_scalar_refs) {
         ##! 16: 'auto deserialize for ' . $refkey 
         if (!ref $tt_param->{'context'}->{$refkey}) {
-            my $ser  = OpenXPKI::Serialization::Simple->new();
-            $tt_param->{$refkey} = $ser->deserialize( $tt_param->{'context'}->{$refkey} );
-            ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}                     
+            if (defined $tt_param->{'context'}->{$refkey} &&
+                OpenXPKI::Serialization::Simple::is_serialized( $tt_param->{'context'}->{$refkey} )) {
+                my $ser  = OpenXPKI::Serialization::Simple->new();
+                $tt_param->{$refkey} = $ser->deserialize( $tt_param->{'context'}->{$refkey} );
+                ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}        
+            }                                 
         }
     }
 

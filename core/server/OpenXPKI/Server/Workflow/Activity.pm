@@ -154,7 +154,7 @@ sub param {
             
             ##! 16: 'parse using tt ' . $template            
             my $oxtt = OpenXPKI::Template->new();
-            my $out = $oxtt->render( $template, $self->workflow()->context()->param() );
+            my $out = $oxtt->render( $template, {  context => $self->workflow()->context()->param() } );
             
             ##! 32: 'tt result ' . $out
             return $out;
