@@ -18,6 +18,7 @@ OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
 OpenXPKI/Template.pm
 OpenXPKI/Template/Plugin/Certificate.pm
+OpenXPKI/Template/Plugin/CheckDNS.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
 OpenXPKI/XML/Cache.pm
 OpenXPKI/i18n.pm
