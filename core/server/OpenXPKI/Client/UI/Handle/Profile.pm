@@ -72,14 +72,14 @@ sub render_profile_select {
         wf_fields => \@fields,
     });
 
-    $self->_result()->{main} = [{
+    $self->add_section({
         type => 'form',
         action => 'workflow',
         content => {
             submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => \@fields
-        }},
-    ];
+        }
+    });
 
     return $self;
 
@@ -101,14 +101,14 @@ sub render_subject_form {
     my $cert_profile = $context->{'cert_profile'};
     my $cert_subject_style = $context->{'cert_subject_style'};
 
-    # Parse out the field name and type, we required that there is only one activity with one field
+    # Parse out the field name and type, we assume that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{ACTIVITY}})[0] unless($wf_action);
     my $field_name = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{name};
     my $field_type = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type};
 
     $self->logger()->debug( " Render subject for $field_name with type $field_type in $wf_action " );
 
-    # Allowed types are cert_subjet, cert_san, cert_info
+    # Allowed types are cert_subject, cert_san, cert_info
     my $fields = $self->send_command( 'get_field_definition',
         { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  substr($field_type, 5) });
 
@@ -131,14 +131,14 @@ sub render_subject_form {
         wf_fields => $fields,
     });
 
-    $self->_result()->{main} = [{
+    $self->add_section({
         type => 'form',
         action => 'workflow',
         content => {
             submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => $fields
-        }},
-    ];
+        }
+    });
 
     return $self;
 
@@ -216,15 +216,15 @@ sub render_key_select {
         cert_profile => $context->{cert_profile}
     });
 
-    $self->_result()->{main} = [{
+    $self->add_section({
         type => 'form',
         action => 'workflow',
         content => {
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => \@fields
-        }},
-    ];
-
+        }
+    });
+    
     return $self;
 
 }
@@ -260,14 +260,14 @@ sub render_server_password {
         cert_profile => $context->{cert_profile}
     });
 
-    $self->_result()->{main} = [{
+    $self->add_section({
         type => 'form',
         action => 'workflow',
         content => {
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => \@fields
-        }},
-    ];
+        }
+    });
 
     return $self;
 

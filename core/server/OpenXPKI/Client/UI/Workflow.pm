@@ -278,7 +278,6 @@ sub init_search {
     }
 
     $self->add_section({
-
         type => 'form',
         action => 'workflow!load',
         content => {
@@ -1387,16 +1386,24 @@ sub __render_from_workflow {
             wf_fields => \@fields,
         });
 
-        $self->add_section({
+        my $section = {
             type => 'form',
-            action => 'workflow',
+            action => 'workflow',                       
             content => {
                 #label => $wf_action_info->{label},
                 #description => $wf_action_info->{description},
                 submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
                 fields => \@fields,
-            },            
-        });
+            }
+        };
+        
+        # Add reset button as link to the activity selection page
+        if ((scalar keys %$wf_info->{ACTIVITY}) > 1) {
+            $section->{reset} = 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
+            $section->{content}->{reset_label} = 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET';
+        }
+        
+        $self->add_section( $section );
 
         if (@fielddesc) {
             $self->add_section({

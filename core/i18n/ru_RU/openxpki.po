@@ -6834,6 +6834,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Дочерние технологические процессы"
 
