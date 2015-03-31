@@ -174,7 +174,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_DESC
         action:
-          - release_on_hold > PENDING
+          - release_on_hold > PENDING ? acl_can_approve
 
     PENDING:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL
@@ -183,7 +183,7 @@ state:
           - edit_subject > CANCEL_APPROVALS
           - edit_san > CANCEL_APPROVALS
           - edit_cert_info > CANCEL_APPROVALS
-          - edit_validity > CANCEL_APPROVALS
+          - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
           - put_request_on_hold > ONHOLD ? acl_can_approve
@@ -553,6 +553,8 @@ action:
         input:
           - pkcs10
           - csr_type
+        validator:
+          - global_key_reuse
 
 condition:
     is_certificate_issued:
