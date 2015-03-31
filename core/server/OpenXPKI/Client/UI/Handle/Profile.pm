@@ -76,7 +76,7 @@ sub render_profile_select {
         type => 'form',
         action => 'workflow',
         content => {
-            submit_label => 'proceed',
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => \@fields
         }},
     ];
@@ -135,7 +135,7 @@ sub render_subject_form {
         type => 'form',
         action => 'workflow',
         content => {
-            submit_label => 'proceed',
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => $fields
         }},
     ];
@@ -220,7 +220,7 @@ sub render_key_select {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'proceed',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => \@fields
         }},
     ];
@@ -264,7 +264,7 @@ sub render_server_password {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'proceed',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
             fields => \@fields
         }},
     ];

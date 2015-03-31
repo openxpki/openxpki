@@ -191,8 +191,8 @@ sub init_search {
     my $args = shift;
 
     $self->_page({
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE',
-        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC',
     });
 
     my $workflows = $self->send_command( 'get_workflow_instance_types' );
@@ -612,8 +612,8 @@ sub init_task {
 
     my $tasklist = $self->_client->session()->param('tasklist')->{default};
 
-    if (!$tasklist) {
-        return $self->_redirect('home');
+    if (!@$tasklist) {
+        return $self->redirect('home');
     }
 
     $self->logger()->debug( "got tasklist: " . Dumper $tasklist);
@@ -838,10 +838,10 @@ sub action_index {
             # Check for validation error by inspecting the raw command reply
             my $reply = $self->_last_reply();
             if ($reply->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE') {
-                my $p = $reply->{LIST}->[0]->{PARAMS};
-                my $field_errors = $p->{__FIELDS__};
+                my $p = $reply->{LIST}->[0]->{PARAMS};                
                 my $validator_msg = $p->{__ERROR__};
-                my @fields = map { $_->{name} } @$field_errors;
+                my $field_errors = $p->{__FIELDS__};
+                my @fields = (ref $field_errors eq 'ARRAY') ? map { $_->{name} } @$field_errors : ();
                 $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
                 $self->logger()->error("Input validation error on fields ". join ",", @fields);
                 $self->logger()->debug('validation details' . Dumper $field_errors );
@@ -1323,6 +1323,7 @@ sub __render_from_workflow {
 
     # if there is one activity selected (or only one present), we render it now
     } elsif ($wf_action) {
+        
         my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
 
         # Headline from action or state + Workflow Label, description from action if set
@@ -1373,7 +1374,7 @@ sub __render_from_workflow {
             push @fields, $item;
 
             # if the field has a description text, push it to the @fielddesc list
-            if ($field->{description} !~ /^\s*$/) {
+            if ($field->{description} !~ /^\s*$/ && $field->{type} ne 'hidden') {
                 my $descr = $field->{description};
                 push @fielddesc, { label => $item->{label}, value => $descr } if ($descr);
             }
@@ -1393,8 +1394,9 @@ sub __render_from_workflow {
                 #label => $wf_action_info->{label},
                 #description => $wf_action_info->{description},
                 submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
-                fields => \@fields
-        }});
+                fields => \@fields,
+            },            
+        });
 
         if (@fielddesc) {
             $self->add_section({
@@ -1586,11 +1588,13 @@ sub __render_from_workflow {
                         $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
                     }
 
-                # bullet list, but the full list to tt and split at the | as sep (as used in profile)
+                # bullet list, put the full list to tt and split at the | as sep (as used in profile)
                 } elsif ($item->{format} eq "ullist") {
 
-                    my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
-                    my @val = split "|", $out;
+                    my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                    
+                    $self->logger()->debug('Return from template ' . $out );                   
+                    my @val = split /\s*\|\s*/, $out;
+                    $self->logger()->debug('Split ' . Dumper \@val);
                     $item->{value} = \@val;
 
                 } elsif (ref $item->{value} eq '') {

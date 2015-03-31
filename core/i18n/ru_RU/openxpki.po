@@ -3743,10 +3743,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
-msgstr "SPKAC строка пуста."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 msgstr "SPKAC-строка пуста."
 
@@ -4274,12 +4270,60 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER"
 msgstr "Идентификатор сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
 msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
@@ -4340,6 +4384,14 @@ msgstr "Действителен"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_COMMENT"
 msgstr "Комментарий"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
+msgstr "Действителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
+msgstr "Имя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CRR_REASON"
@@ -5112,6 +5164,10 @@ msgstr "DNS-имя __DNS__  некорректно."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
+msgstr "SPKAC строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
@@ -6818,8 +6874,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC"
 msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
@@ -6847,10 +6907,6 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -9434,6 +9490,10 @@ msgstr "Тестировщик"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL"
 #~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
+#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC"

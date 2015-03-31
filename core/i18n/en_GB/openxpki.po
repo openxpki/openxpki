@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-03-30 19:14+0100\n"
+"PO-Revision-Date: 2015-03-31 08:25+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -3453,10 +3453,6 @@ msgstr ""
 "__MIN_LENGTH__ bits)"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
-msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 msgstr "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 
@@ -3886,11 +3882,52 @@ msgstr "Unknown application error"
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Backend session terminated - please re-login"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
+msgstr "Certificate Chain"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
+msgstr "Certificate Information"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
+msgstr "Please enter the key passphrase you set during certificate request."
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
+msgstr "Download private key for certificate"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
+msgstr "Find a list of your certificates below."
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL"
+msgstr "My Certificates"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER"
 msgstr "not after"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
 msgstr "not before"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
+msgstr "Related Workflows"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL"
+msgstr "Certificate Relations"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
+msgstr ""
+"Search for certificates here. The SAN requires the type of san to be "
+"prefixed with a colon, e.g. DNS:www2.openxpki.org.  The states VALID/EXPIRED "
+"are ISSUED plus a check if inside/outside their validity window."
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL"
+msgstr "Certificate Search"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC"
+msgstr ""
+"Certificates matching your search, click on a row to display detailed "
+"information."
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
+msgstr "Certificate Search Result"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"
@@ -3938,6 +3975,12 @@ msgstr "Valid"
 
 msgid "I18N_OPENXPKI_UI_COMMENT"
 msgstr "Comment"
+
+msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
+msgstr "show older revocation lists"
+
+msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
+msgstr "No CRLs have been issued by this authority, yet."
 
 msgid "I18N_OPENXPKI_UI_CRR_REASON"
 msgstr "Revocation reason"
@@ -4448,6 +4491,9 @@ msgstr "The number of fields exceeds the allowed count."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "This field is not defined in the profile settings."
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
+msgstr "A certificate with the same public key already exists!"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "Validator failed on given expression"
@@ -5298,13 +5344,11 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_TOOLTIP"
 msgstr "continue"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_DESC"
-msgstr "Type"
+msgstr "Type of CSR (PCKS10, server generated, SPKAC"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_LABEL"
-msgstr "Type"
+msgstr "CSR Type"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_PLACEHOLDER"
@@ -5518,9 +5562,11 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_TOOLTIP"
 msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr ""
+"Use the calendar or enter the notbefore date in the format <tt>DD.MM.YYYY HH:"
+"MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
+"auto, clear the field or type 0."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_LABEL"
 msgstr "Not Valid After"
@@ -5533,9 +5579,11 @@ msgstr ""
 "Use the calendar icon or enter a date in MM.DD.YYYY format, type 0 to use "
 "the default"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC"
-msgstr "Workflow Id"
+msgstr ""
+"Use the calendar or enter the notbefore date in the format <tt>DD.MM.YYYY HH:"
+"MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
+"auto, clear the field or type 0."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_LABEL"
 msgstr "Not Valid Before"
@@ -5548,9 +5596,8 @@ msgstr ""
 "Use the calendar icon or enter a date in MM.DD.YYYY format, type 0 to use "
 "the default"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
-msgstr "Comment"
+msgstr "Describe the reason why you want to set the request on hold."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_LABEL"
 msgstr "Reason for Hold"
@@ -5585,9 +5632,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_TOOLTIP"
 msgstr ""
 "You can either provide a password on your own or let the server create one."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC"
-msgstr "Country"
+msgstr ""
+"Paste your PKCS10 formated request directly into the field or use the upload "
+"button to load a file from your local computer"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_LABEL"
 msgstr "PKCS10 Request"
@@ -5843,8 +5891,13 @@ msgstr "Requested action not available"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
 msgstr "Creator"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC"
 msgstr "You can search for workflows here."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
+msgstr "Type"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Results of your search:"
@@ -5866,9 +5919,6 @@ msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL"
 msgstr "Search now"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
-msgstr "Workflow Search"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL"
 msgstr "Type"
@@ -8214,6 +8264,9 @@ msgstr "I18N_OPENXPKI_XML_CACHE_UNEXPECTED_DATA_STRUCTURE"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL"
 #~ msgstr "SUCCESS"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
+#~ msgstr "Workflow Search"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC"

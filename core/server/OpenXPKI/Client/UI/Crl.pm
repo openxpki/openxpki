@@ -30,41 +30,41 @@ sub init_index {
     my $empty = 1;
     foreach my $issuer (@$issuers) {
 
+        $self->logger()->debug("Issuer: " . Dumper $issuer);
+
         my $crl_list = $self->send_command( 'get_crl_list' , { FORMAT => 'HASH', VALID_AT => time(), LIMIT => 1, ISSUER => $issuer->{IDENTIFIER} });
 
-        if (!$crl_list) {
-            $self->logger()->debug("No crls for " . $issuer->{IDENTIFIER} );
-            next;
-        }
-
-        $empty = 0;
-
         my $crl_hash = $crl_list->[0];
-        $self->logger()->debug("result: " . Dumper $crl_hash);
+        $self->logger()->debug("result: " . Dumper $crl_list);
+        
+        if (!@$crl_list) {
+            
+            $self->add_section({
+                type => 'text',
+                content => {
+                    label => $self->_escape($issuer->{SUBJECT}),
+                    description => 'I18N_OPENXPKI_UI_CRL_NONE_FOR_CA'
+                }
+            });            
+            next;
+        } else {
 
-        my @fields = $self->__print_detail( $crl_hash );
-
-        $self->add_section({
-            type => 'keyvalue',
-            content => {
-                label => $self->_escape($issuer->{SUBJECT}),
-                description => '',
-                data => \@fields,
-                buttons => [{
-                    page => 'crl!list!issuer!'.$issuer->{IDENTIFIER},
-                    label  => 'show older revocation lists',
-                }]
-            }
-        });
-    }
-
-    if ($empty) {
-        $self->add_section({
-            type => 'text',
-            content => {
-                description => 'No revocation lists have been issued yet.'
-            }
-        });
+            my @fields = $self->__print_detail( $crl_hash );
+    
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => $self->_escape($issuer->{SUBJECT}),
+                    description => '',
+                    data => \@fields,
+                    buttons => [{
+                        page => 'crl!list!issuer!'.$issuer->{IDENTIFIER},
+                        label  => 'I18N_OPENXPKI_UI_CRL_LIST_OLD',
+                    }]
+                }
+            });
+            
+        }
     }
 
     return $self;

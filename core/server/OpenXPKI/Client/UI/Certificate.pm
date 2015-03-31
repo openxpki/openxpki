@@ -27,10 +27,8 @@ sub init_search {
     my $args = shift;
 
     $self->_page({
-        label => 'Certificate Search',
-        description => 'Search for certificates here, all fields are exact match but you can use asterisk or question mark as wildcard.
-        The SAN requires the type of san to be prefixed with a colon, e.g. DNS:www2.openxpki.org.
-        The states VALID/EXPIRED are ISSUED plus a check if inside/outside their validity window.',
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
+        description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',  
     });
 
     my $profile = $self->send_command( 'get_cert_profiles' );
@@ -134,9 +132,8 @@ sub init_result {
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
     $self->_page({
-        label => 'Certificate Search - Results',
-        shortlabel => 'Results',
-        description => 'Results of your search:',
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',       
+        description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC',
     });
 
     my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
@@ -284,9 +281,8 @@ sub init_mine {
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
     $self->_page({
-        label => 'Certificate Search - Results',
-        shortlabel => 'Results',
-        description => 'Results of your search:',
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL',        
+        description => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC',
     });
     
     my @result = $self->__render_result_list( $search_result );
@@ -345,7 +341,7 @@ sub init_detail {
     my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
     
     $self->_page({
-        label => 'Certificate Information',
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $dn{CN}[0]
     });
 
@@ -441,8 +437,8 @@ sub init_chain {
     my $chain = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'HASH', 'KEEPROOT' => 1 });
 
     $self->_page({
-        label => 'Certificate Chain',
-        shortlabel => 'Certificate Chain',
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
+        shortlabel => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
     });
 
     # Download links
@@ -497,7 +493,7 @@ sub init_related {
     my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
     
     $self->_page({
-        label => 'Certificate Relations',
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL',
         shortlabel => $dn{CN}[0]
     });
 
@@ -531,7 +527,7 @@ sub init_related {
         className => 'workflow',
         processing_type => 'all',
         content => {
-            label => 'Workflows related to this certificate',
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}',
                 label => 'Open Workflow',
@@ -566,8 +562,8 @@ sub init_privkey {
     my $cert_identifier = $self->param('identifier');
 
     $self->_page({
-        label => 'Download private key for certificate.',
-        description => 'Please enter the key passphrase you set during certificate request.'
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL',
+        description => 'I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC',
     });
 
     $self->add_section({

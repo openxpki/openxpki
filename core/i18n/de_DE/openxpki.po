@@ -3742,10 +3742,6 @@ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS"
-msgstr "Prozesse anzeigen"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 msgstr "Prozesse anzeigen"
 
@@ -4215,12 +4211,60 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Gültige"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
+msgstr "PEM (CRT) Format"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER"
 msgstr "Zertifikats-ID"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
 msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
+msgstr "Erstellen von CRLs"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
@@ -4281,6 +4325,14 @@ msgstr "gültig"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_COMMENT"
 msgstr "Kommentar"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
+msgstr "gültig"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
+msgstr "Name"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CRR_REASON"
@@ -5049,6 +5101,10 @@ msgstr "DNS"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -6760,11 +6816,15 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESCRIPTION"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC"
 msgstr ""
 "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
 "oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
 "Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
@@ -6798,10 +6858,6 @@ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
@@ -9361,6 +9417,10 @@ msgstr "testuser"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_SUCCESS_LABEL"
 #~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
+#~ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_EXPORT_DESC"
