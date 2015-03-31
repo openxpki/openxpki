@@ -72,6 +72,8 @@ Component = Em.Component.extend
                                 fields.replace idx, 1, [Em.copy newField]
                     null
 
+        reset: -> @sendAction "buttonClick", page: @get "content.reset"
+
         submit: ->
             action = @get "content.action"
             fields = @get "content.content.fields"

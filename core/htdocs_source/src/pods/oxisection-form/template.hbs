@@ -12,6 +12,11 @@
                 <button class="btn btn-default {{if loading "btn-loading"}}" {{action "submit"}}>
                     {{submitLabel}}
                 </button>
+                {{#if content.content.reset_label}}
+                    <button class="btn btn-default" {{action "reset"}}>
+                        {{content.content.reset_label}}
+                    </button>
+                {{/if}}
             </div>
         </div>
     </form>
