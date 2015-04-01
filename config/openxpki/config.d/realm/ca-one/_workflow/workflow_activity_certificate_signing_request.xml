@@ -23,9 +23,7 @@
       </validator>
 
       <validator name="I18N_OPENXPKI_WF_VAL_KEYREUSE">
-        <arg>$csr_type</arg>
         <arg>$pkcs10</arg>
-        <arg>$spkac</arg>
       </validator>
 
       <!-- do not use field with is_required                -->
