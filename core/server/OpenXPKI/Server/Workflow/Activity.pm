@@ -129,7 +129,7 @@ sub param {
     if ( ref $name ne '' || defined $value ) {
         return $self->SUPER::param( $name, $value );
     }
-
+    
     if ( exists $self->{PARAMS}{$name} ) {
         return $self->{PARAMS}{$name};
     } else {
@@ -142,8 +142,8 @@ sub param {
         if ($template =~ /^\$(\S+)/) {
             my $ctxkey = $1;
             ##! 16: 'load from context ' . $ctxkey
-            my $ctx = $self->workflow()->context()->param( $ctxkey );
-            if ($ctx =~ m{ \A HASH | \A ARRAY }xms) {
+            my $ctx = $self->workflow()->context()->param( $ctxkey );            
+            if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
                 ##! 32: ' needs deserialize '
                 my $ser  = OpenXPKI::Serialization::Simple->new();
                 return $ser->deserialize( $ctx );
@@ -151,19 +151,11 @@ sub param {
                 return $ctx;
             }
         } else {
-            ##! 16: 'parse using tt ' . $map->{$name}->[1]
-            my $tt = Template->new();
-            my $out;
-            if (!$tt->process( \$template, { context => $self->workflow()->context()->param() }, \$out )) {
-                OpenXPKI::Exception->throw({
-                    MESSAGE => 'I18N_OPENXPKI_SERVER_ACTIVITY_ERROR_PARSING_TEMPLATE_FOR_PARAM',
-                    PARAMS => {
-                        'TEMPLATE' => $template,
-                        'PARAM'  => $name,
-                        'ERROR' => $tt->error()
-                    }
-                });
-            }
+            
+            ##! 16: 'parse using tt ' . $template            
+            my $oxtt = OpenXPKI::Template->new();
+            my $out = $oxtt->render( $template, {  context => $self->workflow()->context()->param() } );
+            
             ##! 32: 'tt result ' . $out
             return $out;
         }

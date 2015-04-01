@@ -154,12 +154,14 @@ sub execute_action {
         if (ref $error eq 'Workflow::Exception::Validation') {
             # Set workflow status to manual
             $self->_set_proc_state( 'manual' );
-
+            ##! 32: 'validator exception: ' . Dumper $error
+            my $invalid_fields = $error->{invalid_fields} || {};
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE",
                 params => {
                     ACTION => $action_name,
                     ERROR => scalar $error,
+                    FIELDS => $invalid_fields
                 }
             );
         }
@@ -243,14 +245,13 @@ sub attrib {
         my $result = CTX('dbi_backend')->select(
             TABLE => 'WORKFLOW_ATTRIBUTES',
             COLUMNS => [ 'ATTRIBUTE_KEY', 'ATTRIBUTE_VALUE' ],
-            DYNAMIC => {
-                WORKFLOW_SERIAL => { VALUE => $wf_id },
-                ATTRIBUTE_KEY => { VALUE => $arg },
-        });
+            DYNAMIC => { WORKFLOW_SERIAL => { VALUE => $wf_id } }
+       );
         my $attribs = {};
         foreach my $line (@{$result}) {
            $attribs->{$line->{ATTRIBUTE_KEY}} = $line->{ATTRIBUTE_VALUE};
         }
+        ##! 32: 'Result ' . Dumper $attribs
         return $attribs;
 
     # arg is scalar - get value
@@ -272,6 +273,16 @@ sub attrib {
         ##! 8: 'received hash - setting values'
         foreach my $key (keys %{$arg}) {
             if (defined $arg->{$key}) {
+                my $value = $arg->{$key};
+                
+                # non scalar values are not allowed
+                if (ref $value ne '') {
+                   OpenXPKI::Exception->throw(
+                       message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_GOT_NON_SCALAR_ATTRIBUTE_VALUE',
+                       params => { key => $key, type =>  ref $value }
+                   );
+                }
+                
                 ##! 16: 'set key ' . $key . ' to value ' .  $arg->{$key}
                 # check if the attribute is already in the table
                 my $result = CTX('dbi_backend')->select (

@@ -8,7 +8,7 @@
             {{view "select" class="form-control" content=options optionValuePath="content.value" optionLabelPath="content.label" value=content.value}}
         {{/if}}
         <span class="input-group-btn">
-            <button class="btn btn-default oxi-button-ignore {{if customize "active"}}" {{action "customize"}}>Custom</button>
+            <button class="btn btn-default {{if customize "active"}}" {{action "customize"}}>Custom</button>
         </span>
     </div>
 {{else}}

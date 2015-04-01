@@ -26,7 +26,7 @@ Route = Em.Route.extend
     setupController: ->
 
     sendAjax: (data) ->
-        data.type = if data?.data?.action then "POST" else "GET"
+        data.type ?= if data?.data?.action then "POST" else "GET"
         data.url ?= @controllerFor("config").get "url"
         data.data._ = (new Date()).getTime()
         $(".loading").addClass "in-progress"
@@ -51,11 +51,9 @@ Route = Em.Route.extend
             if not doc.structure and not doc.goto
                 Em.run.scheduleOnce "afterRender", ->
                     $(".loading").removeClass "in-progress"
-                    $(".btn-loading").removeClass "btn-loading"
             doc
         , (err) ->
             $(".loading").removeClass "in-progress"
-            $(".btn-loading").removeClass "btn-loading"
             console.log "Ajax error", err
 
 `export default Route`

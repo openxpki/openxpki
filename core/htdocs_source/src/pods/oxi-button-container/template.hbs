@@ -1,0 +1,20 @@
+{{#if buttons}}
+    {{#if hasDescription}}
+        {{#each buttons as |btn|}}
+            <div class="row stacked-buttons">
+                <div class="col-xs-4">
+                    {{oxi-button button=btn klass="btn btn-block btn-default" click="click"}}
+                </div>
+                <div class="col-xs-8 btn-bt-margin">
+                    {{btn.description}}
+                </div>
+            </div>
+        {{/each}}
+    {{else}}
+        <div class="btn-group">
+            {{#each buttons as |btn|}}
+                {{oxi-button button=btn klass="btn btn-default" click="click"}}
+            {{/each}}
+        </div>
+    {{/if}}
+{{/if}}

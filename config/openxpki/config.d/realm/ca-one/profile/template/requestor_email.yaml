@@ -1,0 +1,6 @@
+id: requestor_email
+label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL
+description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL_DESC
+type: freetext
+width: 40
+match: .+@.+

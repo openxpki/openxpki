@@ -34,12 +34,9 @@ Component = Em.Component.extend
     visibleFields: Em.computed "fields", ->
         (f for f in @get("fields") when f.type isnt "hidden")
 
-    click: (evt) ->
-        if evt.target.tagName is "BUTTON"
-            if not $(evt.target).hasClass "oxi-button-ignore"
-                $(evt.target).addClass "btn-loading"
-
     actions:
+        buttonClick: (button) -> @sendAction "buttonClick", button
+
         addClone: (field) ->
             fields = @get "content.content.fields"
             index = fields.indexOf field
@@ -75,7 +72,10 @@ Component = Em.Component.extend
                                 fields.replace idx, 1, [Em.copy newField]
                     null
 
-        submit: (action) ->
+        reset: -> @sendAction "buttonClick", page: @get "content.reset"
+
+        submit: ->
+            action = @get "content.action"
             fields = @get "content.content.fields"
             data =
                 action:action
@@ -97,17 +97,24 @@ Component = Em.Component.extend
 
             for name in names
                 clones = (f for f in fields when f.name is name)
-                if clones.length > 1
+                if clones[0].clonable
                     data[name] = (c.value for c in clones)
                 else
                     data[name] = clones[0].value
 
+            @set "loading", true
             @container.lookup("route:openxpki").sendAjax
                 data:data
-            .then (res) ->
-                if res.error
-                    console.log "Set errors not implemented"
-
-            # set errors from json.error
+            .then (res) =>
+                @set "loading", false
+                errors = res.status?.field_errors
+                if errors
+                    fields = @get "fields"
+                    for error in errors
+                        clones = fields.filter (f) -> f.name is error.name
+                        if typeof error.index is "undefined"
+                            clones.setEach "error", error.error
+                        else
+                            Em.set clones[error.index], "error", error.error
 
 `export default Component`

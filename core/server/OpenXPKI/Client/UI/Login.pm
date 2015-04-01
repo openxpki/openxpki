@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Login;
 
 use Moose; 
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 

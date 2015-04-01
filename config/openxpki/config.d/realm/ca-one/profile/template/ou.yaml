@@ -1,0 +1,8 @@
+id: OU
+label: OU
+description: I18N_OPENXPKI_UI_PROFILE_OU_DESC
+type: freetext
+source: OU:(.+)
+width: 40
+min: 0
+max: 1000

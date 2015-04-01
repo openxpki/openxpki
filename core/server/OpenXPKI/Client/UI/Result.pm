@@ -6,7 +6,7 @@ package OpenXPKI::Client::UI::Result;
 
 use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
-use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
 use Encode;
 
@@ -48,6 +48,18 @@ has _status => (
     isa => 'HashRef|Undef',
 );
 
+has _last_reply => (
+    is => 'rw',
+    isa => 'HashRef',
+);
+
+has _session => (
+    is => 'ro',
+    isa => 'Object',
+    lazy => 1,
+    builder => '_init_session',
+);
+
 has _result => (
     is => 'rw',
     isa => 'HashRef|Undef',
@@ -86,8 +98,16 @@ sub BUILD {
     if ($self->_client()->_status()) {
         $self->_status(  $self->_client()->_status() );
     }
-
+   
 }
+
+sub _init_session {
+   
+    my $self = shift;
+    return $self->_client()->session();
+   
+}
+
 sub add_section {
 
     my $self = shift;
@@ -122,11 +142,13 @@ sub send_command {
     my $reply = $backend->send_receive_service_msg(
         'COMMAND', { COMMAND => $command, PARAMS => $params }
     );
+    $self->_last_reply( $reply );
 
     $self->logger()->trace('send command raw reply: '. Dumper $reply);
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
         $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
+        $self->logger()->debug("command reply ". Dumper $reply);
         $self->set_status_from_error_reply( $reply );
         return undef;
     }
@@ -153,7 +175,7 @@ sub set_status_from_error_reply {
     } else {
         $self->logger()->trace(Dumper $reply);
     }
-    $self->_status({ level => 'error', message => i18nGettext($message) });
+    $self->_status({ level => 'error', message => $message });
 
     return $self;
 }
@@ -317,10 +339,10 @@ sub render {
     if ($self->redirect()) {
         $body = $json->encode({ goto => $self->redirect() } );
     } elsif ($result->{_raw}) {
-        $body = $json->encode($result->{_raw});
+        $body = i18nTokenizer ( $json->encode($result->{_raw}) );
     } else {
-        $result->{session_id} = $self->_client()->session()->id;
-        $body = $json->encode($result);
+        $result->{session_id} = $self->_session->id;        
+        $body = i18nTokenizer ( $json->encode($result) );
     }
 
     # Return the output into the given pointer
@@ -406,8 +428,7 @@ sub __register_wf_token {
     $token->{wf_type} = $wf_info->{WORKFLOW}->{TYPE};
     $token->{wf_last_update} = $wf_info->{WORKFLOW}->{LAST_UPDATE};
 
-    # poor mans random id
-    my $id = sha1_base64(time.$token.rand().$$);
+    my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
     $self->logger()->trace('token info ' . Dumper  $token);
     $self->_client->session()->param($id, $token);
@@ -435,8 +456,7 @@ sub __register_wf_token_initial {
         redirect => 1, # initial create always forces a reload of the page
     };
 
-    # poor mans random id
-    my $id = sha1_base64(time.$token.rand().$$);
+    my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
     $self->_client->session()->param($id, $token);
     return  "workflow!index!wf_token!$id";
@@ -537,6 +557,11 @@ sub __fetch_response {
 
 }
 
+=head2 __generate_uid
+
+Generate a random uid (base64 encoded with dangerours chars removed)
+ 
+=cut
 sub __generate_uid {
 
     my $self; 
@@ -544,5 +569,76 @@ sub __generate_uid {
     $queryid =~ s{[+/]}{}g;
     return $queryid; 
 }
+
+=head __render_pager
+
+Return a pager definition hash with default settings, requires the query 
+result hash as argument. Defaults can be overriden passing a hash as second
+argument. 
+
+=cut
+sub __render_pager {
+    
+    my $self = shift;
+    my $result = shift;
+    my $args = shift;
+
+    my $limit = ($args->{limit} * 1); # cast to integer for json
+    if (!$limit) { $limit = 50; }
+    # Safety rule
+    elsif ($limit > 500) {  $limit = 500; }
+    
+    my $startat = ($args->{startat} *1) || 0;
+    
+    if (!$args->{pagesizes}) {
+        $args->{pagesizes} = [25,50,100,250,500];
+    }
+    
+    if (!$args->{pagersize}) {
+        $args->{pagersize} = 20;
+    }
+        
+    return { 
+        startat => $startat, 
+        limit =>  $limit,
+        count => $result->{count} * 1, 
+        pagesizes => $args->{pagesizes}, 
+        pagersize => $args->{pagersize},
+        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id} 
+    }
+}
+
+
+=head2 __build_attribute_subquery
+
+Expects an attribtue query definition hash (from uicontrol), returns arrayref 
+to be used as attribute subquery in certificate and workflow search.
+
+=cut 
+sub __build_attribute_subquery {
+
+    my $self = shift;
+    my $attributes = shift;
+   
+    my @attr;
+           
+    foreach my $item (@{$attributes}) {
+        my $key = $item->{key};
+        my $pattern = $item->{pattern} || '';
+        my $operator = $item->{operator} || 'EQUAL';
+        my @val = $self->param($key.'[]');
+        while (my $val = shift @val) {
+            # embed into search pattern from config
+            $val = sprintf($pattern, $val) if ($pattern);
+            # replace asterisk as wildcard
+            $val =~ s/\*/%/g;
+            push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
+        }
+    }
+    
+    return \@attr;
+    
+}
+
 
 1;

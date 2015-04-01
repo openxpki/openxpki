@@ -1,25 +1,29 @@
 main:
   - key: home
-    label: Home
+    label: I18N_OPENXPKI_UI_MENU_HOME
 
   - key:   pkiadm
-    label: PKI Operation
+    label: I18N_OPENXPKI_UI_MENU_PKI_OPERATION
     entries:
       - key:   workflow!index!wf_type!crl_issuance
-        label: Issue CRL
+        label: I18N_OPENXPKI_UI_MENU_CRL_ISSUE
       - key:   secret!index
-        label: Manage Secrets
-      - key:   information!process
-        label: Process Information
+        label: I18N_OPENXPKI_UI_MENU_MANAGE_SECRET
       - key:   workflow!start!wf_type!ca_publish
-        label: Publish CA/CRL
+        label: I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL
+
 
   - key:   info
-    label: Information
+    label: I18N_OPENXPKI_UI_MENU_INFORMATION
     entries: 
       - key:   information!issuer
-        label: CA certificates
+        label: I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES
       - key:   crl!index
-        label: Revocation lists
+        label: I18N_OPENXPKI_UI_MENU_CRL
+      - key:   information!process
+        label: I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION
+      - key:   information!status
+        label: I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS
+
  
 

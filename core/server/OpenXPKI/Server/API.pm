@@ -1120,6 +1120,10 @@ sub BUILD {
                 },
             },
         },
+        'get_workflow_instance_types' => {
+            class  => 'Workflow',
+            params => {}
+        },
         'list_workflow_instances' => {
             class  => 'Workflow',
             params => {
@@ -1307,6 +1311,11 @@ sub BUILD {
                 #    because we can't check the array ref entries here
                     optional => 1,
                 },
+                PROC_STATE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
                 LIMIT => {
                     type  => SCALAR,
                     regex => $re_integer_string,
@@ -1346,6 +1355,11 @@ sub BUILD {
                 #    regex    => $re_alpha_string,
                 #    parameter content is checked in the method itself
                 #    because we can't check the array ref entries here
+                    optional => 1,
+                },
+                PROC_STATE => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
                     optional => 1,
                 },
             },
@@ -1477,6 +1491,19 @@ sub BUILD {
         'get_menu' => {
             class  => 'UI',
             params => {
+            }
+        },
+        # this is a workaround and should be refactored, see #283
+        'render_template' => {
+            class  => 'UI',
+            params => {
+                'TEMPLATE' => { 
+                    type => SCALAR,
+                },
+                'PARAMS' => { 
+                    type => HASHREF,
+                    optional => 1,
+                },
             }
         }
     };

@@ -1,0 +1,7 @@
+id: upn
+label: I18N_OPENXPKI_UI_PROFILE_SAN_UPN
+description: I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION
+type: freetext
+width: 40
+min: 0
+max: 20

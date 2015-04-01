@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/perl -w
 #
 # ogflow.pl - Convert OmniGraffle File to Workflow Definition
 #

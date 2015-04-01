@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Crl;
 
 use Moose;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -31,41 +30,41 @@ sub init_index {
     my $empty = 1;
     foreach my $issuer (@$issuers) {
 
+        $self->logger()->debug("Issuer: " . Dumper $issuer);
+
         my $crl_list = $self->send_command( 'get_crl_list' , { FORMAT => 'HASH', VALID_AT => time(), LIMIT => 1, ISSUER => $issuer->{IDENTIFIER} });
 
-        if (!$crl_list) {
-            $self->logger()->debug("No crls for " . $issuer->{IDENTIFIER} );
-            next;
-        }
-
-        $empty = 0;
-
         my $crl_hash = $crl_list->[0];
-        $self->logger()->debug("result: " . Dumper $crl_hash);
+        $self->logger()->debug("result: " . Dumper $crl_list);
+        
+        if (!@$crl_list) {
+            
+            $self->add_section({
+                type => 'text',
+                content => {
+                    label => $self->_escape($issuer->{SUBJECT}),
+                    description => 'I18N_OPENXPKI_UI_CRL_NONE_FOR_CA'
+                }
+            });            
+            next;
+        } else {
 
-        my @fields = $self->__print_detail( $crl_hash );
-
-        $self->add_section({
-            type => 'keyvalue',
-            content => {
-                label => $self->_escape($issuer->{SUBJECT}),
-                description => '',
-                data => \@fields,
-                buttons => [{
-                    page => 'crl!list!issuer!'.$issuer->{IDENTIFIER},
-                    label  => 'show older revocation lists',
-                }]
-            }
-        });
-    }
-
-    if ($empty) {
-        $self->add_section({
-            type => 'text',
-            content => {
-                description => 'No revocation lists have been issued yet.'
-            }
-        });
+            my @fields = $self->__print_detail( $crl_hash );
+    
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => $self->_escape($issuer->{SUBJECT}),
+                    description => '',
+                    data => \@fields,
+                    buttons => [{
+                        page => 'crl!list!issuer!'.$issuer->{IDENTIFIER},
+                        label  => 'I18N_OPENXPKI_UI_CRL_LIST_OLD',
+                    }]
+                }
+            });
+            
+        }
     }
 
     return $self;
@@ -201,9 +200,9 @@ sub __print_detail {
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
 
     push @fields, { label => 'Download', value => '<ul class="list-unstyled">'.
-        sprintf ($pattern, 'pem', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_PEM')).
-        sprintf ($pattern, 'der', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_DER')).
-        sprintf ($pattern, 'txt', i18nGettext('I18N_OPENXPKI_UI_DOWNLOAD_TXT')).
+        sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM').
+        sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER').
+        sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
         '</ul>'
     };
 

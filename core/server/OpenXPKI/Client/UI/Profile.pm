@@ -7,8 +7,6 @@ use Moose;
 use Data::Dumper;
 use English;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::i18n qw( i18nGettext );
-
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -24,12 +22,12 @@ sub action_get_styles_for_profile {
 
     # TODO clean up API after Mason decomissioning
     # Transform hash into value/label list and sort it
-    my @styles = map { { value => $_, label => i18nGettext($styles->{$_}->{LABEL}), i18nGettext(description => $styles->{$_}->{DESCRIPTION}) } } keys %{$styles};
+    my @styles = map { { value => $_, label => $styles->{$_}->{LABEL}, description => $styles->{$_}->{DESCRIPTION} } } keys %{$styles};
 
     if (scalar @styles == 0) {
-        @styles = ({ value => '', label => i18nGettext('I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST') });
+        @styles = ({ value => '', label => 'I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST'});
     } else {
-        @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
+        @styles = sort { lc($a->{value}) cmp lc($b->{value}) } @styles;
     }
 
     my $cert_subject_style = $styles[0]->{value};
@@ -38,7 +36,7 @@ sub action_get_styles_for_profile {
         _returnType => 'partial',
         fields => [{
             name => "cert_subject_style",
-            label => i18nGettext('I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_LABEL'),
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_LABEL',
             value => $cert_subject_style,
             type => 'select',
             options => \@styles
@@ -75,7 +73,7 @@ sub action_get_key_param {
         my @param;
         my $param_name = lc($pn);
         if ($key_gen_param_supported->{$param_name}) {
-            @param = map { { value => $_, label => i18nGettext('I18N_OPENXPKI_UI_KEY_'.uc($param_name.'_'.$_)) } } @{$key_gen_param_supported->{$param_name}};
+            @param = map { { value => $_, label => 'I18N_OPENXPKI_UI_KEY_'.uc($param_name.'_'.$_) } } @{$key_gen_param_supported->{$param_name}};
 
             my $preset = $key_gen_params->{$pn};
 
@@ -87,7 +85,7 @@ sub action_get_key_param {
 
             push @fields, {
                 name => "key_gen_params{$pn}",
-                label => i18nGettext('I18N_OPENXPKI_UI_KEY_'.$pn),
+                label => 'I18N_OPENXPKI_UI_KEY_'.$pn,
                 value => $preset,
                 type => 'select',
                 options => \@param,

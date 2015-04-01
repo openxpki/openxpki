@@ -1,34 +1,30 @@
 main:
   - key: home
-    label: Home
+    label: I18N_OPENXPKI_UI_MENU_HOME
     entries: 
       - key:    home!index
-        label: Home
-      - key:    home!task
-        label:  My Tasks
+        label:  I18N_OPENXPKI_UI_MENU_HOME
       - key:    workflow!mine
-        label:  My Workflows
+        label:  I18N_OPENXPKI_UI_MENU_MY_WORKFLOW
       - key:    certificate!mine
-        label:  My Certificates
+        label:  I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE
 
-  - key: request
-    label: Request
-    entries: 
-      - key:   workflow!index!wf_type!certificate_signing_request_v2
-        label: Request new certificate
-      - key:   workflow!index!wf_type!certificate_revocation_request_v2
-        label: Request revocation
+  - key:   workflow!index!wf_type!certificate_signing_request_v2
+    label: I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE
+
+  - key:   workflow!index!wf_type!certificate_revocation_request_v2
+    label: I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE
  
   - key:   info
-    label: Information
+    label: I18N_OPENXPKI_UI_MENU_INFORMATION
     entries: 
       - key:   information!issuer
-        label: CA certificates
+        label: I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES
       - key:   crl!index
-        label: Revocation lists
+        label: I18N_OPENXPKI_UI_MENU_CRL
 
   - key:   certificate!search
-    label: Certificates
+    label: I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH
 
 
 

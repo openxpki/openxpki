@@ -2,37 +2,29 @@
 
 head:
     prefix: export
-    label: I18N_OPENXPKI_WF_TYPE_CERT_EXPORT
-    description: I18N_OPENXPKI_WF_TYPE_CERT_EXPORT_DESC
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC
 
 state:
     CHECK_EXPORT:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_EXPORT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_EXPORT_DESC
         action:
           - global_noop > FAILURE? !cert_export_export_successful
           - global_noop2 > EXPORT_DONE? cert_export_export_successful
         autorun: 1
 
     CHECK_TAGGING:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TAGGING_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TAGGING_DESC
         action:
           - global_noop > READY_TO_PROCESS? cert_export_tagging_successful
           - global_noop2 > FAILURE? !cert_export_tagging_successful
         autorun: 1
 
     CHECK_TRANSFER:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TRANSFER_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_CHECK_TRANSFER_DESC
         action:
           - global_noop > TRANSFER_DONE? cert_export_transfer_successful
           - global_noop2 > FAILURE? !cert_export_transfer_successful
         autorun: 1
 
     EXPORT_DONE:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_EXPORT_DONE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_EXPORT_DONE_DESC
         action:
           - global_noop > SUCCESS? !cert_export_have_certs_to_transfer
           - global_noop2 > READY_TO_TRANSFER? cert_export_have_certs_to_transfer
@@ -49,22 +41,16 @@ state:
           - cert_export_initialize > INITIALIZED
 
     INITIALIZED:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIALIZED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIALIZED_DESC
         action:
           - cert_export_get_config > READY_TO_PROCESS
         autorun: 1
 
     READY_TO_PROCESS:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_PROCESS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_PROCESS_DESC
         action:
           - cert_export_generate_export_file > CHECK_EXPORT
         autorun: 1
 
     READY_TO_TRANSFER:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_TRANSFER_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_TRANSFER_DESC
         action:
           - cert_export_transfer_export_file > CHECK_TRANSFER
         autorun: 1
@@ -74,8 +60,6 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC
 
     TRANSFER_DONE:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_TRANSFER_DONE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_TRANSFER_DONE_DESC
         action:
           - cert_export_tag_certs_as_exported > CHECK_TAGGING
         autorun: 1
@@ -84,18 +68,12 @@ state:
 action:
     cert_export_generate_export_file:
         class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::GenerateExportFile
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_GENERATE_EXPORT_FILE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_GENERATE_EXPORT_FILE_DESC
 
     cert_export_get_config:
         class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::GetConfig
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_GET_CONFIG_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_GET_CONFIG_DESC
 
     cert_export_initialize:
         class: Workflow::Action::Null
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_INITIALIZE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_INITIALIZE_DESC
         input:
           - config_path
           - cert_identifier
@@ -103,13 +81,9 @@ action:
 
     cert_export_tag_certs_as_exported:
         class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::TagAsExported
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_TAG_CERTS_AS_EXPORTED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_TAG_CERTS_AS_EXPORTED_DESC
 
     cert_export_transfer_export_file:
         class: OpenXPKI::Server::Workflow::Activity::Transfer::SCP
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_TRANSFER_EXPORT_FILE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_TRANSFER_EXPORT_FILE_DESC
         param:
             retry_count: 5
             retry_interval: +0000000005

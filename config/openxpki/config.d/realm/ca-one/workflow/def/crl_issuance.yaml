@@ -1,14 +1,12 @@
 head:
     prefix: crl
-    label: I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE
-    description: I18N_OPENXPKI_WF_TYPE_CRL_ISSUANCE_DESC
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC
 
 
 state:
     CREATE_QUEUE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_CREATE_QUEUE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_CREATE_QUEUE_DESC
         action:
           - create_ca_list > LOAD_NEXT_CA
 
@@ -20,8 +18,6 @@ state:
 
     ISSUE_CRL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_ISSUE_CRL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_ISSUE_CRL_DESC
         action:
           - global_nice_issue_crl > REGISTER_CRL
 
@@ -32,16 +28,12 @@ state:
 
     LOAD_NEXT_CA:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_LOAD_NEXT_CA_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_LOAD_NEXT_CA_DESC
         action:
           - get_next_ca > ISSUE_CRL ? !is_ca_list_empty
           - global_noop > SUCCESS ? is_ca_list_empty
 
     PUBLISH_CRL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_PUBLISH_CRL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_PUBLISH_CRL_DESC
         action:
           - publish_crl > LOAD_NEXT_CA
 
@@ -63,13 +55,9 @@ action:
 
     create_ca_list:
         class: OpenXPKI::Server::Workflow::Activity::CRLIssuance::CreateQueue
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CA_LIST_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CA_LIST_DESC
 
     publish_crl:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_DESC
         input:
           - ca_alias
         param:
