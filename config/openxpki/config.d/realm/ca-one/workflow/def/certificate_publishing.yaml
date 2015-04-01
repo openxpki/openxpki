@@ -1,8 +1,6 @@
 head:
     prefix: certpublish
-
     label: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING
-
     description: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING_DESC
 
 
@@ -15,8 +13,6 @@ state:
 
     PUBLISH: 
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_PUBLISH_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_PUBLISH_DESC
         action: 
           - publish_prefix > SUCCESS ? has_prefix
           - publish_profile > SUCCESS ? !has_prefix
@@ -27,8 +23,6 @@ state:
 
     WAITING_FOR_START: 
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_WAITING_FOR_START_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_WAITING_FOR_START_DESC
         action: 
           - global_disconnect > PUBLISH ? !run_sync
           - global_noop > PUBLISH ? run_sync
@@ -46,8 +40,6 @@ action:
 
     publish_prefix: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_PUBLISH_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_PUBLISH_DESC
         input: 
           - cert_identifier
         param: 
@@ -56,8 +48,6 @@ action:
 
     publish_profile: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_PUBLISH_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_PUBLISH_DESC
         input: 
           - cert_identifier
         param:

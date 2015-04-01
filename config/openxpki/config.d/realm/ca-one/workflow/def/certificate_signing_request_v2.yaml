@@ -6,38 +6,28 @@ head:
 state:
     APPROVED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_APPROVED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_APPROVED_DESC
         action:
           - load_key_password > KEY_PASSWORD_LOADED ? server_key_generation
           - global_noop > REQUEST_COMPLETE ?  !server_key_generation
 
     BUILD_SUBJECT:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_BUILD_SUBJECT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_BUILD_SUBJECT_DESC
         action:
           - render_subject > SUBJECT_COMPLETE
 
     CANCEL_APPROVALS:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCEL_APPROVALS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCEL_APPROVALS_DESC
         action:
           - cancel_approvals > UPDATE_SUBJECT
 
     CHECK_APPROVALS:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CHECK_APPROVALS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CHECK_APPROVALS_DESC
         action:
           - global_noop > NOTIFY_APPROVAL ? is_approved
           - global_noop2 > NOTIFY_CSR_PENDING ?  !is_approved
 
     CLEANUP_KEY_PASSWORD:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CLEANUP_KEY_PASSWORD_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CLEANUP_KEY_PASSWORD_DESC
         action:
           - cleanup_key_password > NICE_SEND_NOTIFICATION
 
@@ -70,8 +60,6 @@ state:
 
     EVAL_ELIGIBILITY:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_EVAL_ELIGIBILITY_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_EVAL_ELIGIBILITY_DESC
         action:
           - eval_eligibility > CHECK_APPROVALS
 
@@ -81,8 +69,6 @@ state:
 
     FLAG_NOTIFY_SEND:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FLAG_NOTIFY_SEND_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FLAG_NOTIFY_SEND_DESC
         action:
           - flag_pending_notification_send > PENDING
 
@@ -94,73 +80,53 @@ state:
 
     KEY_GENERATED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_KEY_GENERATED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_KEY_GENERATED_DESC
         action:
           - generate_pkcs10 > PKCS10_GENERATED
 
     KEY_PASSWORD_LOADED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_KEY_PASSWORD_LOADED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_KEY_PASSWORD_LOADED_DESC
         action:
           - generate_key > KEY_GENERATED ? server_key_generation
 
     NICE_CERTIFICATE_ISSUED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_CERTIFICATE_ISSUED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_CERTIFICATE_ISSUED_DESC
         action:
           - persist_metadata > NICE_METADATA_PERSISTED
 
     NICE_ISSUE_CERTIFICATE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_ISSUE_CERTIFICATE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_ISSUE_CERTIFICATE_DESC
         action:
           - global_nice_issue_certificate > NICE_PICKUP_CERTIFICATE
 
     NICE_METADATA_PERSISTED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_METADATA_PERSISTED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_METADATA_PERSISTED_DESC
         action:
           - rename_private_key > CLEANUP_KEY_PASSWORD ? server_key_generation
           - global_noop > NICE_SEND_NOTIFICATION ?  !server_key_generation
 
     NICE_PICKUP_CERTIFICATE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_PICKUP_CERTIFICATE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_PICKUP_CERTIFICATE_DESC
         action:
           - global_noop > NICE_CERTIFICATE_ISSUED ? is_certificate_issued
           - global_nice_fetch_certificate > NICE_CERTIFICATE_ISSUED ? !is_certificate_issued
 
     NICE_PUBLISH_CERTIFICATE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_PUBLISH_CERTIFICATE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_PUBLISH_CERTIFICATE_DESC
         action:
           - publish_certificate > SUCCESS
 
     NICE_SEND_NOTIFICATION:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_SEND_NOTIFICATION_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_SEND_NOTIFICATION_DESC
         action:
           - notify_issued > NICE_PUBLISH_CERTIFICATE
 
     NOTIFY_APPROVAL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NOTIFY_APPROVAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NOTIFY_APPROVAL_DESC
         action:
           - notify_approval > APPROVED
 
     NOTIFY_CSR_PENDING:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NOTIFY_CSR_PENDING_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NOTIFY_CSR_PENDING_DESC
         action:
           - global_noop > PENDING ? pending_notification_send
           - send_pending_notification > PENDING ?  !pending_notification_send
@@ -197,15 +163,11 @@ state:
 
     PERSIST_KEY_PASSWORD:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PERSIST_KEY_PASSWORD_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PERSIST_KEY_PASSWORD_DESC
         action:
           - persist_key_password > ENTER_SUBJECT
 
     PKCS10_GENERATED:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PKCS10_GENERATED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PKCS10_GENERATED_DESC
         action:
           - move_key_to_dp > REQUEST_COMPLETE
 
@@ -220,8 +182,6 @@ state:
 
     REQUEST_COMPLETE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REQUEST_COMPLETE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REQUEST_COMPLETE_DESC
         action:
           - persist_csr > NICE_ISSUE_CERTIFICATE
 
@@ -270,8 +230,6 @@ state:
 
     UPDATE_SUBJECT:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_UPDATE_SUBJECT_DESC
         action:
           - render_subject set_workflow_attributes > PENDING
 
@@ -301,13 +259,9 @@ action:
 
     cancel_approvals:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CANCEL_APPROVALS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CANCEL_APPROVALS_DESC
 
     cleanup_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CLEANUP_KEY_PASSWORD_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_CLEANUP_KEY_PASSWORD_DESC
         param:
             ds_key_param: workflow_id
             ds_namespace: workflow.csr.keygen_password
@@ -363,13 +317,9 @@ action:
 
     eval_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::Noop
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EVAL_ELIGIBILITY_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EVAL_ELIGIBILITY_DESC
 
     flag_pending_notification_send:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_FLAG_PENDING_NOTIFICATION_SEND_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_FLAG_PENDING_NOTIFICATION_SEND_DESC
         param:
             flag_pending_notification_send: 1
 
@@ -385,13 +335,9 @@ action:
 
     generate_pkcs10:
         class: OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_PKCS10_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_PKCS10_DESC
 
     load_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_LOAD_KEY_PASSWORD_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_LOAD_KEY_PASSWORD_DESC
         param:
             ds_key_param: workflow_id
             ds_namespace: workflow.csr.keygen_password
@@ -399,8 +345,6 @@ action:
 
     move_key_to_dp:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_MOVE_KEY_TO_DP_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_MOVE_KEY_TO_DP_DESC
         param:
             ds_encrypt: 1
             ds_force: 1
@@ -411,22 +355,16 @@ action:
 
     notify_approval:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_APPROVAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_APPROVAL_DESC
         param:
             message: csr_notify_approval
 
     notify_issued:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_ISSUED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_ISSUED_DESC
         param:
             message: csr_cert_issued
 
     notify_rejected:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_REJECTED_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_NOTIFY_REJECTED_DESC
         param:
             message: csr_rejected
 
@@ -437,8 +375,6 @@ action:
 
     persist_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_KEY_PASSWORD_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_KEY_PASSWORD_DESC
         param:
             ds_encrypt: 1
             ds_force: 1
@@ -449,8 +385,6 @@ action:
 
     persist_metadata:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_METADATA_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_METADATA_DESC
 
     provide_server_key_params:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
@@ -468,8 +402,6 @@ action:
 
     publish_certificate:
         class: OpenXPKI::Server::Workflow::Activity::Tools::TriggerCertificatePublish
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUBLISH_CERTIFICATE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUBLISH_CERTIFICATE_DESC
 
     put_request_on_hold:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -494,8 +426,6 @@ action:
 
     rename_private_key:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENAME_PRIVATE_KEY_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENAME_PRIVATE_KEY_DESC
         param:
             ds_key: $workflow_id
             ds_namespace: certificate.privatekey
@@ -503,8 +433,6 @@ action:
 
     render_subject:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENDER_SUBJECT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RENDER_SUBJECT_DESC
 
     retype_server_password:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -527,8 +455,6 @@ action:
 
     send_pending_notification:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SEND_PENDING_NOTIFICATION_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SEND_PENDING_NOTIFICATION_DESC
         param:
             message: csr_created
 
@@ -664,8 +590,6 @@ field:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL
         name: enc_alg
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP
         type: select
         # Options are generated by uiclass
         required: 1
@@ -674,8 +598,6 @@ field:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_LABEL
         name: key_alg
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP
         type: select
         # Options are generated by uiclass
         required: 1
@@ -684,8 +606,6 @@ field:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL
         name: key_gen_params
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_TOOLTIP
         type: text
         # This is expanded to a hash with profile dependent values
         required: 1
