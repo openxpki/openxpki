@@ -126,11 +126,13 @@ state:
           - comment
 
     REJECTED:
-        autorun: 1
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_DESC
-        action:
-          - global_noop > FAILURE
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL

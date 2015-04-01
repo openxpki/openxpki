@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use utf8;
 
-use base qw( Workflow::Validator );
+use Moose;
+
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
@@ -15,27 +16,20 @@ use Template;
 use Data::Dumper;
 use Encode;
 
-__PACKAGE__->mk_accessors( qw( section basename ) );
+extends 'OpenXPKI::Server::Workflow::Validator';
 
-sub _init {
+sub _validate {
     
-    my ( $self, $params ) = @_;            
-    $self->section( exists $params->{'section'} ? $params->{'section'} : 'subject' );
-    $self->basename( exists $params->{'basename'} ? $params->{'basename'} : 'cert_'.$self->section().'_parts' );    
-    return 1;
-}
+    my ( $self, $workflow, $profile, $style, $subject_parts ) = @_;
 
-sub validate {
-    
-    my ( $self, $wf, $profile, $style, $subject_parts ) = @_;
-
-    ## prepare the environment
-    my $context = $wf->context();
     my $api     = CTX('api');
     
     return if (not defined $profile);
     return if (not defined $style);
     return if (not defined $subject_parts);
+    
+    my $basename = $self->param('basename');
+    ##! 16: 'Basename ' . $basename
     
     my @fields_with_error;
 
@@ -44,11 +38,11 @@ sub validate {
     my $fields = $api->get_field_definition({
         PROFILE => $profile,
         STYLE   => $style,
-        SECTION => $self->section(),
+        SECTION => $self->param('section'),
     });
     
     ##! 64: 'fields: ' . Dumper $fields
-
+    
     Encode::_utf8_off ($subject_parts);
     my $ser = OpenXPKI::Serialization::Simple->new();
     $subject_parts = $ser->deserialize( $subject_parts );
@@ -80,7 +74,7 @@ sub validate {
         delete $subject_parts->{ $name };
         
         # we need to form field name in the json reply
-        $name = sprintf "%s{%s}", $self->basename(), $name;
+        $name = sprintf "%s{%s}", $basename, $name if ($basename);
         
         # if the field is a cloneable, the name ends on square brackets
         if ($clonable) {
@@ -181,9 +175,8 @@ The name of the section to perform checks on (B<subject>, san, info).
 =item basename
 
 The name of the form parameter used for this information. This is used
-to generate the list of errornous fieldnames for the UI. If omitted the
-name is assumed to be as cert_I<section>_parts as used in the default
-workflows. 
+to generate the list of errornous fieldnames for the UI. If omitted, the
+context keys are used. 
 
 
  

@@ -142,8 +142,8 @@ sub param {
         if ($template =~ /^\$(\S+)/) {
             my $ctxkey = $1;
             ##! 16: 'load from context ' . $ctxkey
-            my $ctx = $self->workflow()->context()->param( $ctxkey );
-            if ($ctx =~ m{ \A HASH | \A ARRAY }xms) {
+            my $ctx = $self->workflow()->context()->param( $ctxkey );            
+            if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
                 ##! 32: ' needs deserialize '
                 my $ser  = OpenXPKI::Serialization::Simple->new();
                 return $ser->deserialize( $ctx );

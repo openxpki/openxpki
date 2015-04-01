@@ -40,6 +40,8 @@ sub render {
     my $template = shift;
     my $tt_param = shift;
 
+    ##! 16: 'template: ' . $template
+    ##! 32: 'input params: ' . Dumper $tt_param
     # Try to detect access to non-scalar values and check if those are deserialized
     # Works only for stuff below the key context   
     my @non_scalar_refs = ($template =~ m{ context\.([^\s\.]+)\.\S+ }xsg);            
@@ -49,7 +51,7 @@ sub render {
             if (defined $tt_param->{'context'}->{$refkey} &&
                 OpenXPKI::Serialization::Simple::is_serialized( $tt_param->{'context'}->{$refkey} )) {
                 my $ser  = OpenXPKI::Serialization::Simple->new();
-                $tt_param->{$refkey} = $ser->deserialize( $tt_param->{'context'}->{$refkey} );
+                $tt_param->{'context'}->{$refkey} = $ser->deserialize( $tt_param->{'context'}->{$refkey} );
                 ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}        
             }                                 
         }
@@ -65,6 +67,8 @@ sub render {
             }
         );
     }
+    
+    ##! 32: 'output: ' . $out
     
     return $out;
     

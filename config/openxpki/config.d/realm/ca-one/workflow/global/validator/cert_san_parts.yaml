@@ -1,6 +1,7 @@
 class: OpenXPKI::Server::Workflow::Validator::CertSubjectFields
 param:
   section: san
+  basename: cert_san_parts
 arg: 
   - $cert_profile
   - $cert_subject_style

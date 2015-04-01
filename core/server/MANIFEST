@@ -377,6 +377,7 @@ OpenXPKI/Server/Workflow/Condition/SCEPv2/ValidSCEPTID.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/AuthCodesValid.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/AuthIdValid.pm
 
+OpenXPKI/Server/Workflow/Validator.pm
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
