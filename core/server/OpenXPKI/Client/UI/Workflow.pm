@@ -1398,7 +1398,7 @@ sub __render_from_workflow {
         };
         
         # Add reset button as link to the activity selection page
-        if ((scalar keys %$wf_info->{ACTIVITY}) > 1) {
+        if ((scalar keys %{$wf_info->{ACTIVITY}}) > 1) {
             $section->{reset} = 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
             $section->{content}->{reset_label} = 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET';
         }
