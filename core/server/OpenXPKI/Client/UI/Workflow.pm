@@ -1943,7 +1943,7 @@ sub __render_result_list {
         my $status = $wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'};
 
         if ($status eq 'finished' && $wf_item->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE') {
-            $status  = 'failure';
+            $status  = 'failed';
         }
 
         push @line, $status;

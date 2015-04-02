@@ -287,7 +287,7 @@ sub __translate_form_def {
             name => $field_name.'{'.$field->{ID}.'}',
             label => $field->{LABEL},
             tooltip => $field->{DESCRIPTION},
-            default => $field->{DEFAULT}, # Default is used as placeholder!
+            placeholder => $field->{DEFAULT}, # Default is used as placeholder!
             value => $values->{$field->{ID}}
         };
 
