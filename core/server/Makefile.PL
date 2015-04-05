@@ -84,7 +84,7 @@ print STDERR "OpenSSL binary:  $openssl_binary\n";
 # OpenSSL 1.0.0a 1 Jun 2010
 my $openssl_version_string = `$openssl_binary version`;
 my ($openssl_version_major, $openssl_version_minor, $openssl_version_fix, $openssl_version_patch);
-if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
+if ($openssl_version_string =~ m/\s*OpenSSL|LibreSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
     # OpenSSL 0.9
     $openssl_version_major = $1;
     $openssl_version_minor = $2;
@@ -108,7 +108,8 @@ unless ( (($openssl_version_major == 0) &&
           ($openssl_version_minor == 9) &&
           ($openssl_version_fix   == 8)) or
          ($openssl_version_major == 1 &&
-          $openssl_version_minor == 0)) {
+          $openssl_version_minor == 0) or
+          $openssl_version_major == 2 ) {
     print STDERR "\n";
     print STDERR "ERROR: OpenSSL 0.9.8  or 1.0 is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
