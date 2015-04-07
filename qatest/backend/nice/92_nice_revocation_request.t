@@ -43,7 +43,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 17 );
+$test->plan( tests => 20 );
  
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
@@ -73,14 +73,21 @@ my %wfparam = (
 	reason_code => 'unspecified',
     comment => 'Automated Test',
     invalidity_time => time(),
-    flag_crr_auto_approval => 0,
-    flag_delayed_revoke => 0,          
+    flag_auto_approval => 0,
+    flag_delayed_revoke => 0,
+    flag_batch_mode => 0             
 );
 
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Revoke Workflow')
+$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Revoke Workflow')
  or die "Workflow Create failed: $@";
 
+$test->state_is('PENDING_USER');
+
+$test->execute_ok( 'crr_submit' );
+
 $test->state_is('PENDING');
+
+$test->execute_nok( 'crr_approve_crr' );
 
 $test->disconnect();
  
@@ -90,44 +97,46 @@ $test->connect_ok(
     password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CRR_REASON', { reason_code => 'keyCompromise' } );
+$test->execute_ok( 'crr_edit_crr' ); # this need refactoring
+$test->execute_ok( 'crr_update_crr', { reason_code => 'keyCompromise' } );
  
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_APPROVE_CRR' );
+$test->state_is('PENDING');
+ 
+$test->execute_ok( 'crr_reject_crr' );
+ 
+$test->state_is('REJECTED'); 
 
-$test->state_is('APPROVAL');
- 
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_REJECT_CRR' );
- 
-$test->state_is('FAILURE'); 
 
 # Test delayed revoke
-$wfparam{flag_crr_auto_approval} = 1;
+$wfparam{flag_auto_approval} = 1;
 $wfparam{invalidity_time} = time() + 5;
 $wfparam{flag_delayed_revoke} = 1;
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create delayed Revoke Workflow')
+$wfparam{flag_batch_mode} = 1;
+$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create delayed Revoke Workflow')
    or die "Workflow Create failed: $@";
   
-$test->state_is('CRR_CHECK_FOR_DELAYED_REVOKE');
+$test->state_is('CHECK_FOR_DELAYED_REVOKE');
 my $delayed_revoke_id =  $test->get_wfid(); 
  
 # Test auto revoke
-$wfparam{flag_crr_auto_approval} = 1;
+$wfparam{flag_auto_approval} = 1;
 $wfparam{invalidity_time} = time();
 $wfparam{flag_delayed_revoke} = 0;
+$wfparam{flag_batch_mode} = 1;
 
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
+$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-Revoke Workflow')
  or die "Workflow Create failed: $@";
 
 # Go to pending
 $test->state_is('CHECK_FOR_REVOCATION');
 
-# Do a second test - should go to check as already approved
-$wfparam{flag_crr_auto_approval} = 0;     
+# Do a second test - should go to success as already approved
+$wfparam{flag_auto_approval} = 0;     
 
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' , \%wfparam, 'Create Auto-Revoke Workflow')
+$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-Revoke Workflow')
  or die "Workflow Create failed: $@";
 
-$test->state_is('CHECK_FOR_REVOCATION');
+$test->state_is('SUCCESS');
 
 # Finally, check if the delayed workflow has finished
 $test->set_wfid( $delayed_revoke_id );

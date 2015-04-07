@@ -72,7 +72,7 @@ $test->create_ok( 'change_metadata' , \%wfparam, 'Create Workflow')
 $test->state_is('DATA_UPDATE');
 
 $test->execute_ok( 'metadata_update_context', {
-#    'meta_email' => '',# $serializer->serialize( ['uli.update@openxpki.de' ]),
+    'meta_email' => $serializer->serialize( ['uli.update@openxpki.de' ]),
     'meta_requestor' => 'Uli Update',
     'meta_system_id' => '',
 });
