@@ -15,7 +15,7 @@ connectors:
         class: Connector::Proxy::Net::LDAP::Single
         LOCATION: ldap://localhost:389
         base: ou=people,dc=mycompany,dc=com
-        filter: (|(mail=[% ARGS.0 %]) (objectCategory=person))
+        filter: (&(mail=[% ARGS.0 %]) (objectCategory=person))
         binddn: cn=admin,dc=mycompany,dc=com
         password: admin
         attrmap:
