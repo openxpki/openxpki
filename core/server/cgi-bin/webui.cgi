@@ -30,9 +30,11 @@ if ($config{global}{log_config} && -f $config{global}{log_config}) {
     Log::Log4perl->easy_init({ level => $DEBUG });
 }
 
-# i18n
-set_locale_prefix ('/usr/share/locale');
-set_language      ('en_US');
+my $locale_directory = $config{global}{locale_directory} || '/usr/share/locale';  
+my $default_language = $config{global}{default_language} || 'en_US';
+
+set_locale_prefix ($locale_directory);
+set_language      ($default_language);
 
 my $log = Log::Log4perl->get_logger();
 
