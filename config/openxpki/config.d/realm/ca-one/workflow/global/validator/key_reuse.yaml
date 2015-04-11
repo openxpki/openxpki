@@ -1,0 +1,5 @@
+class: OpenXPKI::Server::Workflow::Validator::KeyReuse
+param:
+  realm_only: 0
+arg: 
+  - $pkcs10

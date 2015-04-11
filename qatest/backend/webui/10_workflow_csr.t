@@ -123,7 +123,8 @@ $result = $client->mock_request({
 
 is ($result->{status}->{level}, 'success', 'Status is success');
 
-my $cert_identifier = $result->{main}->[0]->{content}->{data}->[0]->{value}->{label}; 
+my $cert_identifier = $result->{main}->[0]->{content}->{data}->[0]->{value}->{label};
+$cert_identifier =~ s{ <.* \z }{}xms;
 open(CERT, ">/tmp/webui.json");
 print CERT JSON->new->encode({ cert_identifier => $cert_identifier  });
 close CERT;

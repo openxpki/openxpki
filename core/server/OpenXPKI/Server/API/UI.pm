@@ -32,6 +32,7 @@ use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::FileUtils;
 use OpenXPKI::VERSION;
+use OpenXPKI::Template;
 use DateTime;
 use List::Util qw(first);
 
@@ -145,6 +146,25 @@ sub get_menu {
 
     return $menu;
 
+}
+
+=head2 render_template 
+
+Wrapper around OpenXPKI::Template->render, expects TEMPLATE and PARAMS. 
+This is a workaround and should be refactored, see #283
+
+=cut
+sub render_template {
+    
+    my $self = shift;
+    my $args = shift;
+    
+    my $template = $args->{TEMPLATE};
+    my $param = $args->{PARAMS};
+    
+    my $oxtt = OpenXPKI::Template->new();    
+    return $oxtt->render( $template, $param );
+    
 }
 
 

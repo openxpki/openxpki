@@ -1,14 +1,12 @@
 head:
     prefix: capub
-    label: I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE
-    description: I18N_OPENXPKI_WF_TYPE_CA_ISSUANCE_DESC
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC
     persister: Volatile
 
 state:
     CREATE_QUEUE:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_CREATE_QUEUE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_CREATE_QUEUE_DESC
         action:
           - create_ca_list > LOAD_NEXT_CA
 
@@ -20,23 +18,17 @@ state:
 
     PUBLISH_CACERT:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CA_PUBLISH_CACERT_DESC
         action:
           - publish_cacert > PUBLISH_CRL
 
     LOAD_NEXT_CA:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_LOAD_NEXT_CA_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_LOAD_NEXT_CA_DESC
         action:
           - get_next_ca > PUBLISH_CACERT ? !is_ca_list_empty
           - global_noop > SUCCESS ? is_ca_list_empty
 
     PUBLISH_CRL:
         autorun: 1
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_PUBLISH_CRL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_PUBLISH_CRL_DESC
         action:
           - publish_crl > LOAD_NEXT_CA
 
@@ -48,20 +40,14 @@ state:
 action:
     initialize:
         class: OpenXPKI::Server::Workflow::Activity::Noop
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_PUBLISH_CA_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_PUBLISH_CA_DESC
 
     create_ca_list:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CA_LIST_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CA_LIST_DESC
         param:
             token: certsign
 
     publish_cacert:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCA
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_PUBLISH_PUBLISH_CA_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_PUBLISH_PUBLISH_CA_DESC
         input:
           - ca_alias
         param:
@@ -69,8 +55,6 @@ action:
 
     publish_crl:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CRL_DESC
         input:
           - ca_alias
         param:

@@ -2,12 +2,12 @@
     {{input class="form-control" value=search placeholder=content.placeholder}}
     <ul class="dropdown-menu" role="menu">
         {{#each searchResults as |result|}}
-        <li class="{{if result.active "active"}}">
-                <a class="oxi-link-ignore" {{action "selectResult" result}}>{{result.label}}</a>
+            <li class="{{if result.active "active"}}">
+                <a {{action "selectResult" result}}>{{result.label}}</a>
             </li>
         {{else}}
             <li>
-                <a class="oxi-link-ignore">No matches found</a>
+                <a>No matches found</a>
             </li>
         {{/each}}
     </ul>

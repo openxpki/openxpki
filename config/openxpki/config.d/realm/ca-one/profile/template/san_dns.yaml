@@ -1,0 +1,8 @@
+id: dns
+label: I18N_OPENXPKI_UI_PROFILE_SAN_DNS
+description: I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION
+type: freetext
+match: \A [A-Za-z\d\-\.]+ \z
+width: 40
+min: 0
+max: 20

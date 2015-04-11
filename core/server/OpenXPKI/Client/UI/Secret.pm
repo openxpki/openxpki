@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Secret;
 
 use Moose;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -21,9 +20,9 @@ sub init_index {
     foreach my $secret (keys %{$secrets}) {
         my $status = $self->send_command("is_secret_complete", {SECRET => $secret}) || 0;
         push @result, [
-            i18nGettext($secrets->{$secret}->{LABEL}),
-            i18nGettext($secrets->{$secret}->{TYPE}),
-            i18nGettext($status ? 'I18N_OPENXPKI_SECRET_COMPLETE' : 'I18N_OPENXPKI_SECRET_INCOMPLETE'),
+            $secrets->{$secret}->{LABEL},
+            $secrets->{$secret}->{TYPE},
+            $status ? 'I18N_OPENXPKI_UI_SECRET_COMPLETE' : 'I18N_OPENXPKI_UI_SECRET_INCOMPLETE',
             $secret
         ];
     }

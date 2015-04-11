@@ -129,8 +129,12 @@ sub __process_workflow {
         foreach my $action_item (@action_items) {
 
             my ($global, $action_name, $next_state, $nn, $conditions) =
-                ($action_item =~ m{ \A (global_)?(\w+)\s*>\s*(\w+)(\s*\?\s*([!\w\s]+))? }xs);
+                ($action_item =~ m{ \A (global_)?([\w\s]+\w)\s*>\s*(\w+)(\s*\?\s*([!\w\s]+))? }xs);
 
+            # Support for internal chaining of actions, sep. by space
+            my @inline_action = split /\s+/, $action_name;            
+            $action_name = shift @inline_action;
+                
             CTX('log')->log(
                 MESSAGE  => "Adding action: $action_name -> $next_state",
                 PRIORITY => 'debug',
@@ -141,12 +145,11 @@ sub __process_workflow {
             # As actions share a global namespace, we add a prefix to their names
             # except if the action has the "global" prefix
             if ($global) {
-                #@conditions = $conn->get_scalar_as_list( [ 'workflow', 'global', 'action', $action_name, 'condition' ] );
                 $prefix = 'global_';
             } else {
-                #@conditions = $conn->get_scalar_as_list( [ 'workflow', 'def', $wf_name, 'action', $action_name, 'condition' ] );
                 $prefix = $wf_prefix.'_';
             }
+
 
             my $item = {
                 name => $prefix.$action_name,
@@ -174,7 +177,41 @@ sub __process_workflow {
 
                 }
             }
+            
+            # TODO - this is experimental!
+            if (scalar @inline_action) {
+                
+                CTX('log')->log(
+                    MESSAGE  => "Auto append inline actions: " . join (" > ", @inline_action),
+                    PRIORITY => 'debug',
+                    FACILITY => 'workflow',
+                );
+                                
+                my $generator_name = uc($state_name.'_'.$item->{name}).'_%01d';
+                my $generator_index = 0;
+                                
+                # point the first action to the first auto generated state
+                $item->{resulting_state} = sprintf($generator_name, $generator_index);
+                
+                while (my $auto_action = shift @inline_action) {
+                    
+                    if ($auto_action !~ /^global_/) {
+                        $auto_action = $wf_prefix.'_'.$auto_action;
+                    }
+
+                    push @{$workflow->{state}}, {
+                        name => sprintf($generator_name, $generator_index++),
+                        autorun => 'yes',
+                        action => [{ 
+                            name => $auto_action,
+                            resulting_state => (scalar @inline_action ? sprintf($generator_name, $generator_index) : $next_state),
+                        }]
+                    };                   
+                }
+            }
+                        
             push @actions, $item;
+            
         } # end actions
 
         my $state = {

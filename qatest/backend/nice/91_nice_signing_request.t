@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 20 );
+$test->plan( tests => 31 );
 
 $test->connect_ok(
     user => $cfg{user}{name},
@@ -57,53 +57,66 @@ my $sSubject = sprintf "nicetest-%01x.openxpki.test", rand(10000000);
 my $sAlternateSubject = sprintf "nicetest-%01x.openxpki.test", rand(10000000);
 
 my %cert_subject_parts = (
-	cert_subject_hostname => $sSubject,
-	cert_subject_hostname2 => [ "www2.$sSubject" , "www3.$sSubject" ],
-	cert_subject_port => 8080,
+	hostname => $sSubject,
+	hostname2 => [ "www2.$sSubject" , "www3.$sSubject" ],
+	port => 8080,
 );
 
 my %cert_info = (
-    requestor_gname => "Andreäs",
-    requestor_name => "Andärs",
+    requestor_gname => "Andreas",
+    requestor_name => "Anders",
     requestor_email => "andreas.anders\@mycompany.local",
 );
 
 my %cert_subject_alt_name_parts = (
 );
 
-my %wfparam = (
-	cert_role => $cfg{csr}{role},
-	cert_profile => $cfg{csr}{profile},
-	cert_subject_style => "00_basic_style",
-	cert_subject_parts => $serializer->serialize( \%cert_subject_parts ),
-	cert_subject_alt_name_parts => $serializer->serialize( { %cert_subject_alt_name_parts } ),
-	cert_info => $serializer->serialize( \%cert_info ),
-	csr_type => "pkcs10",
-);
-
-
-
-
 print "CSR Subject: $sSubject\n";
 
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST' , \%wfparam, 'Create Issue Test Workflow')
+$test->create_ok( 'certificate_signing_request_v2' , {
+    cert_profile => $cfg{csr}{profile},
+    cert_subject_style => "00_basic_style",
+}, 'Create Issue Test Workflow')
  or die "Workflow Create failed: $@";
+ 
+$test->state_is('SETUP_REQUEST_TYPE');
 
-$test->state_is('SERVER_KEY_GENERATION');
+$test->execute_ok( 'csr_provide_server_key_params', {
+    key_alg => "rsa",
+    enc_alg => 'aes256',
+    key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
+    password_type => 'client',
+    csr_type => 'pkcs10'     
+});
+          
+$test->state_is('ENTER_KEY_PASSWORD');
+$test->execute_ok( 'csr_ask_client_password', {          
+    _password => "m4#bDf7m3abd",
+});
 
-# Trigger key generation
-my $param_serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+$test->state_is('ENTER_SUBJECT');
 
-$test->execute_ok( 'generate_key', {
-	_key_type => "RSA",
-    _key_gen_params => $param_serializer->serialize( { KEY_LENGTH => 2048, ENC_ALG => "aes128" } ),
-    _password => "m4#bDf7m3abd" } ) or die "Error - keygen failed: $@";
+$test->execute_ok( 'csr_edit_subject', {
+    cert_subject_parts => $serializer->serialize( \%cert_subject_parts )
+});
 
+$test->state_is('ENTER_SAN');
+$test->execute_ok( 'csr_edit_san', {
+    cert_san_parts => $serializer->serialize( { %cert_subject_alt_name_parts } )
+});
 
+$test->state_is('ENTER_CERT_INFO');
+$test->execute_ok( 'csr_edit_cert_info', {
+    cert_info => $serializer->serialize( \%cert_info )
+});
+
+$test->state_is('SUBJECT_COMPLETE');
+$test->execute_ok( 'csr_submit' );
+    
 $test->state_is('PENDING');
 
 # ACL Test - should not be allowed to user
-$test->execute_nok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE', {  cert_role => $cfg{csr}{role}}, 'Disallow change role' );
+$test->execute_nok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'}, 'Disallow on hold to user' );
 
 $test->disconnect();
 
@@ -113,17 +126,16 @@ $test->connect_ok(
     password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_ROLE', {  cert_role => $cfg{csr}{role}} );
+$test->execute_ok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'} );
+$test->state_is('ONHOLD');
 
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_APPROVE_CSR' );
+$test->execute_ok( 'csr_release_on_hold', { onhold_comment => 'Still no Comment'} );
+$test->state_is('PENDING');
 
-$test->state_is('APPROVAL');
-
-$test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR' );
+$test->execute_ok( 'csr_approve_csr' );
+$test->state_is('SUCCESS');
 
 $test->param_like( 'cert_subject', "/^CN=$sSubject:8080,.*/" , 'Certificate Subject');
-
-$test->state_is('SUCCESS');
 
 $test->disconnect();
 

@@ -18,6 +18,7 @@ OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
 OpenXPKI/Template.pm
 OpenXPKI/Template/Plugin/Certificate.pm
+OpenXPKI/Template/Plugin/CheckDNS.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
 OpenXPKI/XML/Cache.pm
 OpenXPKI/i18n.pm
@@ -32,6 +33,7 @@ OpenXPKI/Client/Simple.pm
 # New UI Client
 OpenXPKI/Client/UI.pm
 OpenXPKI/Client/UI/Bootstrap.pm
+OpenXPKI/Client/UI/Bulk.pm
 OpenXPKI/Client/UI/Certificate.pm
 OpenXPKI/Client/UI/Crl.pm
 OpenXPKI/Client/UI/Home.pm
@@ -41,6 +43,7 @@ OpenXPKI/Client/UI/Plain.pm
 OpenXPKI/Client/UI/Profile.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm
+OpenXPKI/Client/UI/Source.pm
 OpenXPKI/Client/UI/Workflow.pm
 OpenXPKI/Client/UI/Handle/Profile.pm
 
@@ -256,6 +259,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 
+OpenXPKI/Server/Workflow/Activity/Tools/SetAttribute.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notify.pm
@@ -373,6 +377,7 @@ OpenXPKI/Server/Workflow/Condition/SCEPv2/ValidSCEPTID.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/AuthCodesValid.pm
 OpenXPKI/Server/Workflow/Condition/Smartcard/AuthIdValid.pm
 
+OpenXPKI/Server/Workflow/Validator.pm
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
 OpenXPKI/Server/Workflow/Validator/CertRole.pm
@@ -388,6 +393,7 @@ OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm
 OpenXPKI/Server/Workflow/Validator/ReasonCode.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectParts.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectAltNameParts.pm
+OpenXPKI/Server/Workflow/Validator/CertSubjectFields.pm
 OpenXPKI/Server/Workflow/Validator/Bulk.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm

@@ -1,0 +1,6 @@
+id: department
+label: I18N_OPENXPKI_UI_PROFILE_DEPARTMENT
+description: I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC
+type: freetext
+match: .+
+width: 60

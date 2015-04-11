@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Information;
 
 use Moose;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -58,7 +57,7 @@ sub init_issuer {
             $self->_escape($cert->{SUBJECT}),
             $cert->{NOTBEFORE},
             $cert->{NOTAFTER},
-            i18nGettext('I18N_OPENXPKI_UI_TOKEN_STATUS_'.$cert->{STATUS}),
+            'I18N_OPENXPKI_UI_TOKEN_STATUS_'.$cert->{STATUS},
             $cert->{IDENTIFIER},
             lc($cert->{STATUS})
         ];

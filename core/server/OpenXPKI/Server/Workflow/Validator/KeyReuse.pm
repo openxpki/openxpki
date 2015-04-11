@@ -14,63 +14,66 @@ use OpenXPKI::Crypto::CSR;
 
 use Data::Dumper;
 
+__PACKAGE__->mk_accessors( qw( realm_only ) );
+
+sub _init {
+    
+    my ( $self, $params ) = @_;            
+    $self->realm_only( exists $params->{'realm_only'} ? $params->{'realm_only'} : 0 );        
+    return 1;
+}
+
 sub validate {
-    my ( $self, $wf, $csr_type, $pkcs10, $spkac ) = @_;
+    my ( $self, $wf, $pkcs10 ) = @_;
     ##! 1: 'start'
 
     ## prepare the environment
     my $context   = $wf->context();
-    my $errors  = $context->param ("__error");
-       $errors  = [] if (not defined $errors);
 
-    my $api       = CTX('api');
-    my $pki_realm = CTX('session')->get_pki_realm();
     my $default_token = CTX('api')->get_default_token();
 
     # if nothing is there to validate yet, we can return
-    return if (! defined $pkcs10 && ! defined $spkac);
+    return if (! defined $pkcs10 );
 
-    my $csr;
-    if ($csr_type eq 'pkcs10') {
-        $csr = OpenXPKI::Crypto::CSR->new(
-            DATA   => $pkcs10,
-            TOKEN  => $default_token,
-            FORMAT => 'PKCS10',
-        );
-    }
-    elsif ($csr_type eq 'spkac') {
-        $csr = OpenXPKI::Crypto::CSR->new(
-            DATA   => $spkac,
-            TOKEN  => $default_token,
-            FORMAT => 'SPKAC',
-        );
-    }
+    my $csr = OpenXPKI::Crypto::CSR->new(
+        DATA   => $pkcs10,
+        TOKEN  => $default_token,
+        FORMAT => 'PKCS10',
+    );
+    
     my $csr_info = $csr->get_info_hash();
     ##! 64: 'csr_info: ' . Dumper $csr_info
     my $pubkey   = $csr_info->{BODY}->{PUBKEY};
 
+
+    my $query = {
+        'PUBKEY' => { VALUE => $pubkey },
+    };
+    
+    if ($self->realm_only() ){
+       $query->{PKI_REALM} = CTX('session')->get_pki_realm(); 
+    }
+
     my $cert_with_same_pubkey = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE',
-        DYNAMIC => {
-            'PUBKEY' => {VALUE => $pubkey, OPERATOR => 'LIKE' },
-            # TODO - decide whether we want this to be globally unique
-            # or only unique to the PKI realm?
-        },
+        DYNAMIC => $query        
     );
+    
     if (defined $cert_with_same_pubkey) {
-        # someone is trying to reuse the same public key ...
-        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYREUSE_CERTIFICATE_WITH_KEY_ALREADY_EXISTS',
-                 {
-                   SUBJECT    => $cert_with_same_pubkey->{SUBJECT},
-                   IDENTIFIER => $cert_with_same_pubkey->{IDENTIFIER},
-                 } ];
-        $context->param ("__error" => $errors);
-	CTX('log')->log(
-	    MESSAGE => "Trying to reuse private key of certificate " . $cert_with_same_pubkey->{IDENTIFIER},
-	    PRIORITY => 'warn',
-	    FACILITY => 'system',
+        
+        # someone is trying to reuse the same public key ...        
+        $context->param ("__validation_error" => [{
+            error => 'I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS',
+            subject => $cert_with_same_pubkey->{SUBJECT},
+            identifier => $cert_with_same_pubkey->{IDENTIFIER},
+        }]);
+        
+	    CTX('log')->log(
+	        MESSAGE => "Trying to reuse private key of certificate " . $cert_with_same_pubkey->{IDENTIFIER},
+	        PRIORITY => 'warn',
+	        FACILITY => 'workflow',
 	    );
-        validation_error ($errors->[scalar @{$errors} -1]);
+        validation_error ( 'I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS' );
     }
     
     ##! 1: 'end'
@@ -82,22 +85,32 @@ sub validate {
 __END__
 
 =head1 NAME
-
+ 
 OpenXPKI::Server::Workflow::Validator::KeyReuse
 
 =head1 SYNOPSIS
 
-<action name="CreateCSR">
-  <validator name="KeyReuse"
-           class="OpenXPKI::Server::Workflow::Validator::KeyReuse">
-    <arg value="$csr_type"/>
-    <arg value="$pkcs10"/>
-    <arg value="$spkac"/>
-  </validator>
-</action>
-
+  vaidate_key_reuse:
+    class: OpenXPKI::Server::Workflow::Validator::KeyReuse
+    param:
+      realm_only: 0|1
+    arg: 
+      - $pkcs10
+  
 =head1 DESCRIPTION
 
 This validator checks whether a CSR is trying to reuse a key by
 checking the public key against those that are in the certificate
-database.
+database.  
+
+=head2 Argument
+
+=item pkcs10
+
+The PKCS10 encoded csr.
+ 
+=head2 Parameter
+
+=item realm_only
+
+Check key only against certificates in the same realm. 

@@ -69,6 +69,16 @@ sub serialize {
 
     return $self->__write_data($data);
 }
+ 
+# this is static!
+sub is_serialized {
+    
+    my $msg  = shift;    
+    return (defined $msg && 
+        ref $msg eq '' && 
+        $msg =~ /^(SCALAR|BASE64|ARRAY|HASH|UNDEF)/);
+    
+}
 
 sub __write_data {
     my $self = shift;
@@ -567,6 +577,10 @@ Returns the serialization of data passed as argument.
 =head2 deserialize
 
 Returns the deserialization of data passed as argument.
+
+=head2 is_serialized (static!)
+
+This checks if a given argument is a serialized string. This method is static! 
 
 =head1 Internal Functions
 

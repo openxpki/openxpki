@@ -1,0 +1,7 @@
+id: DC
+label: DC
+description: I18N_OPENXPKI_UI_PROFILE_DC_DESC
+type: freetext
+width: 40
+min: 0
+max: 1000

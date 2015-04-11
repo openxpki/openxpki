@@ -16,7 +16,6 @@ contain characters other then I<a-zA-Z0-9_->
 use Moose;
 use JSON;
 use Data::Dumper;
-use OpenXPKI::i18n qw( i18nGettext );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -130,7 +129,7 @@ sub _build_path {
         return $self;        
     }
     
-    my $realm_path = $self->_client()->session()->param('pki_realm').'/';
+    my $realm_path = $self->_session->param('pki_realm').'/';
     
     my $path = $self->_basepath(). $realm_path . $file. '.' . $ext;
 

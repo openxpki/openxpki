@@ -6,7 +6,6 @@ package OpenXPKI::Client::UI::Plain;
 
 use POSIX;
 use HTML::Entities;
-use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
 
 use Moose;

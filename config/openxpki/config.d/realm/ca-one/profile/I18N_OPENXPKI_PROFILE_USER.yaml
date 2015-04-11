@@ -1,15 +1,14 @@
 # The name of the file equals the name of the profile
 
-label: I18N_OPENXPKI_PROFILE_USER
+label: I18N_OPENXPKI_UI_PROFILE_USER_LABEL
 
 validity:
     notafter: +0006
  
 style:
     00_user_basic_style:
-        label: I18N_OPENXPKI_PROFILE_USER_BASIC_STYLE
-        description: I18N_OPENXPKI_PROFILE_USER_BASIC_DESC
-
+        label: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC
         ui:
             subject:
                 - username
