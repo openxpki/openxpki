@@ -160,6 +160,21 @@ state:
           - notafter
           - cert_profile
           - cert_info
+        button:
+          edit_subject: 
+            format: optional
+          edit_san:
+            format: optional
+          edit_cert_info:
+            format: optional
+          edit_validity:
+            format: optional
+          approve_csr:
+            format: expected
+          reject_request:
+            format: failure
+          put_request_on_hold:
+            format: alternative
 
     PERSIST_KEY_PASSWORD:
         autorun: 1
@@ -195,10 +210,19 @@ state:
         output:
           - cert_profile
           - cert_subject_style
-        hint:
-          provide_server_key_params: I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS
-          upload_pkcs10: I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD
-          select_profile: I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE
+        button:
+          _head: I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED
+          provide_server_key_params: 
+            description: I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS
+            format: expected
+          upload_pkcs10: 
+            description: I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD
+            format: expected
+          select_profile: 
+            label: I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE_LABEL
+            description: I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE
+            format: optional
+        
 
     SUBJECT_COMPLETE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL
@@ -214,6 +238,17 @@ state:
           - cert_subject_alt_name
           - cert_profile
           - cert_info
+        button:
+          submit:
+            format: expected
+          edit_subject: 
+            format: optional
+          edit_san:
+            format: optional
+          edit_cert_info:
+            format: optional
+          global_cancel:
+            format: failure
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL
@@ -547,6 +582,7 @@ field:
         type: select
         # The options are provided by the uihandle class!
         required: 1
+        template: "[% USE Profile %][% Profile.name(value) %]"
 
     cert_san_parts:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_LABEL

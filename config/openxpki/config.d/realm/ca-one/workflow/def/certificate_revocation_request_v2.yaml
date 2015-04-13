@@ -86,8 +86,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC
         action:
-          - edit_crr > EDIT_REQUEST ? is_not_yet_revoked_or_pending
           - approve_crr > CHECK_APPROVALS ? acl_can_approve is_not_yet_revoked_or_pending
+          - edit_crr > EDIT_REQUEST ? is_not_yet_revoked_or_pending
           - reject_crr > REJECTED ? acl_can_reject is_not_yet_revoked_or_pending
           - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
         output:
@@ -97,6 +97,15 @@ state:
           - invalidity_time
           - reason_code
           - comment
+        button:
+          edit_crr:
+            format: optional
+          approve_crr:
+            format: expected
+          reject_crr:
+            format: failure
+          cleanup:
+            format: expected
 
     PENDING_USER:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL
@@ -110,6 +119,14 @@ state:
           - reason_code
           - invalidity_time
           - comment
+        button:
+          submit:
+            format: expected
+          edit_crr:
+            format: optional
+          cancel:
+            format: failure
+
 
     REJECTED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL
