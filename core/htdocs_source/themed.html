@@ -19,6 +19,7 @@
 
     <script src="src/main-built.js"></script>
     <script src="localconfig.js"></script>
+    <script src="vendor/ember-template-compiler/index.js"></script>
 
     <script type="text/x-handlebars" data-template-name="_applicationHeader">
       <div class="container-fluid header">
@@ -39,5 +40,8 @@
   </head>
 
   <body>
+    <div class="waiting-for-ember">
+      <div class="alert alert-success" role="alert">OpenXPKI is loading ...</div>
+    </div>
   </body>
 </html>
