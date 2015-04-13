@@ -106,10 +106,6 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
 msgstr "Пауза"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
-msgstr "Идентификатор сертификата"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Статус"
 
@@ -142,24 +138,12 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Действителен"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_COMMENT"
-msgstr "Комментарий"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "Действителен"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "Имя"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CRR_REASON"
-msgstr "Изменить причину отзыва сертификата"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CRR_TIME"
-msgstr "Объекты отзыва "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
@@ -478,6 +462,19 @@ msgstr "Описания пока нет"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "В состоянии ожидания запуска"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_TITLE"
+msgstr "Объекты отзыва "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC"
@@ -1516,14 +1513,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
 msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
 
@@ -1615,14 +1604,6 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_LABEL"
 msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP"
-msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_DESC"
@@ -1943,8 +1924,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS"
@@ -6947,6 +6936,18 @@ msgstr "Последнее обновление"
 #~ msgstr "Имя учетной записи"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
+#~ msgstr "Идентификатор сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_COMMENT"
+#~ msgstr "Комментарий"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CRR_REASON"
+#~ msgstr "Изменить причину отзыва сертификата"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_"
 #~ msgstr "Имя учетной записи"
 
@@ -7468,6 +7469,14 @@ msgstr "Последнее обновление"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_PLACEHOLDER"
 #~ msgstr "Родительский технологический процесс"
 
@@ -7498,6 +7507,14 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_TOOLTIP"
 #~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP"
+#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_PLACEHOLDER"

@@ -83,6 +83,23 @@ div.section{
    /*margin:20px;   */
 }
 
+/* Button format from workflow defs */
+.oxi-button-container button.btn.expected {
+	background-color: #c9e2b3;
+}
+
+.oxi-button-container button.btn.optional {
+    background-color: #e4e4da;
+}
+
+.oxi-button-container button.btn.failure {
+    background-color: #e39f9f;
+}
+
+.oxi-button-container button.btn.alternative {
+    background-color: #ffd78c;
+}
+
 img.toplogo{
    padding-top:6px;
    padding-right:12px;

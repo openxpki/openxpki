@@ -1622,11 +1622,13 @@ sub __render_from_workflow {
                 push @fields, $item;
             }
         }
-
+        
         # Add action buttons only if we are not in result view
         my $buttons;
-        $buttons = $self->__get_action_buttons( $wf_info ) if ($view ne 'result');
-
+        if ($view ne 'result') {
+            $buttons = $self->__get_action_buttons( $wf_info ) ;        
+        }
+        
         $self->add_section({
             type => 'keyvalue',
             content => {
@@ -1635,6 +1637,7 @@ sub __render_from_workflow {
                 data => \@fields,
                 buttons => $buttons
         }});
+
 
         # set status decorator on final states, use proc state
         my $desc = $wf_info->{STATE}->{description};
@@ -1718,35 +1721,53 @@ sub __get_action_buttons {
     my $wf_info = shift;
 
     # The text hints for the action is encoded in the state
-    my $hint = $wf_info->{STATE}->{hint} || {};
+    my $btnhint = $wf_info->{STATE}->{button} || {};
 
     my @buttons;
+    
+    if ($btnhint->{_head}) {
+        push @buttons, { section => $btnhint->{_head} };
+    }
+    
     foreach my $wf_action (@{$wf_info->{STATE}->{option}}) {
         my $wf_action_info = $wf_info->{ACTIVITY}->{$wf_action};
 
-        my %extra;
+        my %button = (
+            label => $wf_action_info->{label} || $wf_action,
+            action => sprintf ('workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID}),
+        );
         # TODO - we should add some configuration option for this
         if ($wf_action =~ /global_cancel/) {
-            $extra{confirm} = {
+            $button{confirm} = {
                 label => 'Cancel Request',
                 description => 'Press the confirm button to cancel this workflow.
-
                 This will immediatley stop all actions on this workflow and
-
                 mark it as canceled. <b>This action can not be undone!</b><br/><br/>
-
                 If you want to keep this workflow, press the abort button to
-
                 close this window without touching the workflow.',
             };
         }
+        
+        if ($btnhint->{$wf_action}) {
+            my $hint = $btnhint->{$wf_action};
+            # a label at the button overrides the default label from the action
+            foreach my $key (qw(description tooltip label)) {
+                if ($hint->{$key}) {
+                    $button{$key} = $hint->{$key};
+                }
+            }
+            if ($hint->{format}) {
+                $button{className} = $hint->{format};
+            }
+            if ($hint->{confirm}) {
+                $button{confirm} = {
+                    label => $hint->{confirm}->{label} || 'I18N_OPENXPKI_UI_PLEASE_CONFIRM_TITLE',
+                    description => $hint->{confirm}->{description} || 'I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC',
+                }
+            }
+        }
 
-       push @buttons, {
-            label => $wf_action_info->{label} || $wf_action,
-            action => sprintf ('workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{WORKFLOW}->{ID}),
-            description => $hint->{$wf_action},
-            %extra
-        };
+       push @buttons, \%button;
     }
 
     $self->logger()->debug('Buttons are ' . Dumper \@buttons);

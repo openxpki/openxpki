@@ -106,10 +106,6 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
 msgstr "Warten"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
-msgstr "Zertifikats-ID"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Status"
 
@@ -142,24 +138,12 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "gültig"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_COMMENT"
-msgstr "Kommentar"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "gültig"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "Name"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CRR_REASON"
-msgstr "Ändern der Rolle"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CRR_TIME"
-msgstr "Einträge"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
@@ -481,6 +465,19 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "Auf Start wartend"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC"
+msgstr ""
+"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+"mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+"eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+"können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
+"beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_TITLE"
+msgstr "Einträge"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC"
@@ -1519,14 +1516,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
 msgstr "Ihr Name, z.B. 'Peter Müller'"
 
@@ -1618,14 +1607,6 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_LABEL"
 msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP"
-msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_DESC"
@@ -1944,8 +1925,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD"
 msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS"
@@ -6738,6 +6727,18 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr "Benutzername"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
+#~ msgstr "Zertifikats-ID"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_COMMENT"
+#~ msgstr "Kommentar"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CRR_REASON"
+#~ msgstr "Ändern der Rolle"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_"
 #~ msgstr "Benutzername"
 
@@ -7268,6 +7269,14 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_PLACEHOLDER"
 #~ msgstr "Übergeordneter Workflow"
 
@@ -7298,6 +7307,14 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_TOOLTIP"
 #~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP"
+#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_PLACEHOLDER"

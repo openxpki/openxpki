@@ -406,11 +406,13 @@ sub __get_workflow_ui_info {
             # Load the field definitions
             push @{$ui_state->{output}}, $factory->get_field_info($field, $result->{WORKFLOW}->{TYPE} );
         }
-    }    
+    } 
+    
+    # Info for buttons       
     $result->{STATE} = $ui_state;
 
-    my $hint = $result->{STATE}->{hint};
-    $result->{STATE}->{hint} = {};
+    my $button = $result->{STATE}->{button};
+    $result->{STATE}->{button} = {};
     delete $result->{STATE}->{action};
 
 
@@ -423,13 +425,15 @@ sub __get_workflow_ui_info {
     ##! 16: 'Testing actions ' .  Dumper \@options
     foreach my $option (@options) {
 
-        $option =~ m{ \A ((global_)?)([^\s>]+)}xs;
-        $option = $3;
+        $option =~ m{ \A (((global_)?)([^\s>]+))}xs;
+        $option = $1;
+        my $option_base = $4;
+        
         my $action;
-        if ($2) { # global or not
-            $action = 'global_'.$option;
+        if ($3) { # global or not
+            $action = 'global_'.$option_base;
         } else {
-            $action = $head->{prefix}.'_'.$option;
+            $action = $head->{prefix}.'_'.$option_base;
         }
         ##! 16: 'Activity ' . $action
         ##! 64: 'Available actions ' . Dumper keys %{$result->{ACTIVITY}}
@@ -437,9 +441,15 @@ sub __get_workflow_ui_info {
             push @{$result->{STATE}->{option}}, $action;
         }
 
-        # Add hint if available
-        $result->{STATE}->{hint}->{$action} = $hint->{$option} if ($hint->{$option});
+        # Add button config if available
+        $result->{STATE}->{button}->{$action} = $button->{$option} if ($button->{$option});
     }
+    
+    # Add button markup (Head)
+    if ($button->{_head}) {
+        $result->{STATE}->{button}->{_head} = $button->{_head};
+    } 
+    
     return $result;
 
 }

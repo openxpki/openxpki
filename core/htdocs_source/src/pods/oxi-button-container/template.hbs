@@ -1,19 +1,29 @@
 {{#if buttons}}
     {{#if hasDescription}}
         {{#each buttons as |btn|}}
-            <div class="row stacked-buttons">
-                <div class="col-xs-4">
-                    {{oxi-button button=btn klass="btn btn-block btn-default" click="click"}}
-                </div>
-                <div class="col-xs-8 btn-bt-margin">
-                    {{btn.description}}
-                </div>
+            <div class="row stacked-buttons">            
+                {{#if btn.section}}
+                    <div class="col-xs-12">
+                        <strong>{{btn.section}}</strong>
+                    </div>
+                {{else}}
+                    <div class="col-xs-4">
+                        {{oxi-button button=btn klass="btn btn-block btn-default" click="click"}}
+                    </div>
+                    <div class="col-xs-8 btn-bt-margin">
+                        {{btn.description}}
+                    </div>
+                {{/if}}
             </div>
         {{/each}}
     {{else}}
         <div class="btn-group">
             {{#each buttons as |btn|}}
-                {{oxi-button button=btn klass="btn btn-default" click="click"}}
+                {{#if btn.section}}
+                    <!-- Section are not supported yet -->
+                {{else}}
+                    {{oxi-button button=btn klass="btn btn-default" click="click"}}
+                {{/if}}
             {{/each}}
         </div>
     {{/if}}

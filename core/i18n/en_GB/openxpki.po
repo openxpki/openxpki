@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-04-01 09:13+0100\n"
+"PO-Revision-Date: 2015-04-13 15:44+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -90,9 +90,6 @@ msgstr "Revoke"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
 msgstr "Update Metadata"
 
-msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
-msgstr "Certificate ID"
-
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Show related workflows"
 
@@ -118,20 +115,11 @@ msgstr "Revoked"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valid"
 
-msgid "I18N_OPENXPKI_UI_COMMENT"
-msgstr "Comment"
-
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "show older revocation lists"
 
 msgid "I18N_OPENXPKI_UI_CRL_NONE_FOR_CA"
 msgstr "No CRLs have been issued by this authority, yet."
-
-msgid "I18N_OPENXPKI_UI_CRR_REASON"
-msgstr "Revocation reason"
-
-msgid "I18N_OPENXPKI_UI_CRR_TIME"
-msgstr "revocation time"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
 msgstr "Download chain as PEM bundle, including root"
@@ -356,6 +344,12 @@ msgstr "Network timeout on scp transfer request"
 
 msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "Waiting"
+
+msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC"
+msgstr "Please confirm that you really want to execute this action!"
+
+msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_TITLE"
+msgstr "Confirm Action"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC"
 msgstr "Advanced naming style"
@@ -642,7 +636,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL"
 msgstr "Select Certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
 msgstr "Edit Data"
@@ -995,10 +989,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_LABEL"
 msgstr "Requestor Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_PLACEHOLDER"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC"
 msgstr "The name of the certificate profile."
@@ -1025,16 +1019,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_LABEL"
 msgstr "SubjectAltName parts"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_PLACEHOLDER"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_DESC"
 msgstr "The certificate's subject."
@@ -1043,19 +1037,19 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_LABEL"
 msgstr "Certificate Subject"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_LABEL"
 msgstr "SubjectAltName Components"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_PLACEHOLDER"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PLACEHOLDER"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC"
 msgstr " "
@@ -1070,7 +1064,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP"
 msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
 msgstr " "
@@ -1082,7 +1076,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_PLACEHOLDER"
 msgstr "additional comments to help us processing the request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
 msgstr "Extra Information"
@@ -1100,7 +1094,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP"
 msgstr "The type of csr, usually PKCS10."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_LABEL"
 msgstr "eMail"
@@ -1117,14 +1111,6 @@ msgstr "The algorithm used to encrypt the private key for the download."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL"
 msgstr "Key Encryption Method"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER"
-msgstr "Please select the key encryption method"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
-msgstr ""
-"This specifies the algorithm used to protect your key, AES is usually a good "
-"choice."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
 msgstr ""
 "This flag indicates that the workflow is a batch process and should run "
@@ -1134,10 +1120,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_LABEL"
 msgstr "Batch Mode"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_PLACEHOLDER"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC"
 msgstr "If set, the workflow does not require a manual approval"
@@ -1166,13 +1152,13 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr "Check this box to force issuance."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
 msgstr "CSR Valid"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
 msgstr "SCEP TID"
@@ -1195,19 +1181,13 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "set this only if you know the implication!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_LABEL"
 msgstr "Key Algorithm"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER"
-msgstr "Please select the key algorithm"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP"
-msgstr "RSA is the standard for encryption and signature"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Key Params"
@@ -1292,10 +1272,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_PLACEHOLDER"
 msgstr "OnHold Reason, e.g. authorisation unclear, etc."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_TOOLTIP"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_LABEL"
 msgstr "Password"
@@ -1304,7 +1284,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_PLACEHOLDER"
 msgstr "Please retype the password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_DESC"
-msgstr ""
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_LABEL"
 msgstr "Password Method"
@@ -1314,19 +1294,19 @@ msgstr "Please select a method for the key protection password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_TOOLTIP"
 msgstr ""
-"You can either provide a password on your own or let the server create one."
+" You can either provide a password on your own or let the server create one."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC"
 msgstr ""
-"Paste your PKCS10 formated request directly into the field or use the upload "
-"button to load a file from your local computer"
+" Paste your PKCS10 formated request directly into the field or use the "
+"upload button to load a file from your local computer"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_LABEL"
 msgstr "PKCS10 Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER"
 msgstr ""
-"Please paste your PEM encoded request here (must look like  -----BEGIN "
+" Please paste your PEM encoded request here (must look like  -----BEGIN "
 "CERTIFICATE REQUEST-----) or use the browse/upload button below to load a "
 "file from your computer."
 
@@ -1432,8 +1412,14 @@ msgstr "Force Wake Up"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
 msgstr "Change the selected profile for this request"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE_LABEL"
+msgstr "back to profile selection"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD"
 msgstr "Upload your prepared certification request in PKCS10 format"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED"
+msgstr "Please select one action to proceed"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS"
 msgstr "Let the server generate the key for you"
@@ -1507,13 +1493,11 @@ msgstr "Requested action not available"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
 msgstr "Creator"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC"
-msgstr "You can search for workflows here."
+msgstr "Search for workflows using the filters below."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
-msgstr "Type"
+msgstr "Search for Workflows"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Results of your search:"
@@ -1727,7 +1711,7 @@ msgstr ""
 "for further processing</b>."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
-msgstr "Request Complete"
+msgstr "Review Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
@@ -1949,6 +1933,15 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Workflow information was updated"
 
+#~ msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
+#~ msgstr "Certificate ID"
+
+#~ msgid "I18N_OPENXPKI_UI_COMMENT"
+#~ msgstr "Comment"
+
+#~ msgid "I18N_OPENXPKI_UI_CRR_REASON"
+#~ msgstr "Revocation reason"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PERSIST_CRR_DESC"
 #~ msgstr "Persist CRR"
@@ -1960,3 +1953,17 @@ msgstr "Workflow information was updated"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC"
 #~ msgstr "Common Name"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER"
+#~ msgstr "Please select the key encryption method"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
+#~ msgstr ""
+#~ "This specifies the algorithm used to protect your key, AES is usually a "
+#~ "good choice."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_PLACEHOLDER"
+#~ msgstr "Please select the key algorithm"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_TOOLTIP"
+#~ msgstr "RSA is the standard for encryption and signature"
