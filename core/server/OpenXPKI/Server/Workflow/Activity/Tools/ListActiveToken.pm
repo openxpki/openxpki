@@ -29,7 +29,6 @@ sub execute {
         context_key => 'token_alias_list',
     });
 
-    my $token_list;
     my $group_name;
 
     # get group name from type

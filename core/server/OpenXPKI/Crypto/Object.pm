@@ -117,7 +117,7 @@ sub get_subject_alt_names {
         }
         my @sans = split q{, }, $all_sans;
         
-        if ($args->{FORMAT} eq 'HASH') {
+        if (defined $args->{FORMAT} && ($args->{FORMAT} eq 'HASH')) {
             my $ret = {};
             foreach my $san (@sans) {
                 ##! 64: 'san: ' . $san
