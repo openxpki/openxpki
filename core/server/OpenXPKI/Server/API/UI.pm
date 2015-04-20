@@ -80,14 +80,36 @@ sub get_ui_system_status {
     $result->{secret_offline} = $offline;
 
     # Expiring CRLs
-    my $crl_result = CTX('dbi_backend')->first(
-        TABLE   => 'CRL',
-        COLUMNS => [ 'NEXT_UPDATE' ],
-        DYNAMIC => { PKI_REALM => { VALUE => $pki_realm }, },
-        ORDER => [ 'NEXT_UPDATE' ],
-        REVERSE => 1,
+    
+    # find all active tokens    
+    my $group = CTX('config')->get("realm.$pki_realm.crypto.type.certsign");
+    my $db_results = CTX('dbi_backend')->select(
+        TABLE   => 'ALIASES',
+        COLUMNS => [ 'IDENTIFIER' ],
+        VALID_AT => time(),
+        DYNAMIC => {
+            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
+            'ALIASES.GROUP_ID' => { VALUE => $group },            
+        },
     );
-    $result->{crl_expiry} = $crl_result->{NEXT_UPDATE};
+    
+    my $crl_expiry = 0;
+    foreach my $ca (@{$db_results}) {
+        my $crl_result = CTX('dbi_backend')->first(
+            TABLE   => 'CRL',
+            COLUMNS => [ 'NEXT_UPDATE' ],
+            DYNAMIC => { 
+                PKI_REALM => { VALUE => $pki_realm },
+                ISSUER_IDENTIFIER => { VALUE => $ca->{IDENTIFIER} }, 
+            },
+            ORDER => [ 'NEXT_UPDATE' ],
+            REVERSE => 1,
+        );
+        if (($crl_expiry == 0) || ($crl_expiry > $crl_result->{NEXT_UPDATE})) {
+            $crl_expiry  = $crl_result->{NEXT_UPDATE};
+        }         
+    }    
+    $result->{crl_expiry} = $crl_expiry;
 
     # Vault Token
     my $dv_group = CTX('config')->get("crypto.type.datasafe");
