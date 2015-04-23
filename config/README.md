@@ -9,8 +9,8 @@ core configuration
 ------------------
 
 A basic configuration to run OpenXPKI with the core functionality is held
-in the openxpki directory. Copy it to /etc/openxpki and load it into the
-daemon using the "openxpkiadm loadcfg" command.
+in the openxpki directory. Copy it to /etc/openxpki and edit as needed 
+(minimal effort, setup database connection in system/database.yaml).
 
 Inside the feature directory, you will find more config files to use/enable
 certain features of OpenXPKI such as SCEP or SOAP Interfaces or advanced
