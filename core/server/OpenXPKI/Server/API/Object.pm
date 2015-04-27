@@ -740,12 +740,12 @@ sub __search_cert {
     # the validity interval, therefore the operators are fixed
     if ( defined $args->{NOTBEFORE} ) {
         $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
-              { VALUE => $args->{NOTBEFORE}, OPERATOR => "GREATER_THAN" };
+              { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
     }
 
     if ( defined $args->{NOTAFTER} ) {
         $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
-              { VALUE => $args->{NOTAFTER}, OPERATOR => "LESS_THAN" };
+              { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
     }
 
 
