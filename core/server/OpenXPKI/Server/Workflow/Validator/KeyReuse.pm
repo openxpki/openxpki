@@ -56,15 +56,7 @@ sub validate {
 
     my $cert_with_same_pubkey = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE',
-<<<<<<< HEAD
-        DYNAMIC => $query        
-=======
-        DYNAMIC => {
-            'PUBKEY' => {VALUE => $pubkey},
-            # TODO - decide whether we want this to be globally unique
-            # or only unique to the PKI realm?
-        },
->>>>>>> parent of c5ff50f... Fix old SQL Syntax
+        DYNAMIC => $query,        
     );
     
     if (defined $cert_with_same_pubkey) {
