@@ -751,14 +751,6 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL"
 msgstr "Профиль пользователя общего назначения"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
-msgstr ""
-"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
-"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
-"пользователя, который следует использовать, если нет особых требований к "
-"сертифкату. В противном случае следует использовать расширенный профиль."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 msgstr ""
 "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
@@ -1290,6 +1282,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -1300,6 +1300,14 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -1785,6 +1793,18 @@ msgstr "Последнее обновление"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
+msgstr "Это поле можно использовать для комментариев."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
+msgstr "Это поле можно использовать для комментариев."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
@@ -2442,6 +2462,14 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
@@ -6975,6 +7003,15 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_FREE_DESCRIPTION"
 #~ msgstr "Описания пока нет"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
+#~ msgstr ""
+#~ "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+#~ "имя Вашей учетной записи и адрес электронной почты. Это простейший "
+#~ "профиль пользователя, который следует использовать, если нет особых "
+#~ "требований к сертифкату. В противном случае следует использовать "
+#~ "расширенный профиль."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CA_PUBLISH_PUBLISH_CA_DESC"

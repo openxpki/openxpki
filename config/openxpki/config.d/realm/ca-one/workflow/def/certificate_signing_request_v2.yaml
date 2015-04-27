@@ -13,7 +13,7 @@ state:
     BUILD_SUBJECT:
         autorun: 1
         action:
-          - render_subject > SUBJECT_COMPLETE
+          - render_subject check_policy_dns check_policy_subject_duplicate > SUBJECT_COMPLETE
 
     CANCEL_APPROVALS:
         autorun: 1
@@ -25,6 +25,12 @@ state:
         action:
           - global_noop > NOTIFY_APPROVAL ? is_approved
           - global_noop2 > NOTIFY_CSR_PENDING ?  !is_approved
+
+    CHECK_POLICY_VIOLATION:
+        autorun: 1
+        action:
+          - global_noop > PENDING ? !has_policy_violation
+          - global_noop2 > PENDING_POLICY_VIOLATION ? has_policy_violation
 
     CLEANUP_KEY_PASSWORD:
         autorun: 1
@@ -70,7 +76,7 @@ state:
     FLAG_NOTIFY_SEND:
         autorun: 1
         action:
-          - flag_pending_notification_send > PENDING
+          - flag_pending_notification_send > CHECK_POLICY_VIOLATION
 
     INITIAL:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_LABEL
@@ -128,8 +134,8 @@ state:
     NOTIFY_CSR_PENDING:
         autorun: 1
         action:
-          - global_noop > PENDING ? pending_notification_send
-          - send_pending_notification > PENDING ?  !pending_notification_send
+          - global_noop > CHECK_POLICY_VIOLATION ? pending_notification_send
+          - send_pending_notification > CHECK_POLICY_VIOLATION ?  !pending_notification_send
 
     NOTIFY_REJECT:
         autorun: 1
@@ -140,7 +146,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_DESC
         action:
-          - release_on_hold > PENDING ? acl_can_approve
+          - release_on_hold > CHECK_POLICY_VIOLATION ? acl_can_approve
 
     PENDING:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL
@@ -156,6 +162,9 @@ state:
         output:
           - cert_subject
           - cert_subject_alt_name
+          - policy_comment
+          - check_policy_dns
+          - check_policy_subject_duplicate
           - notbefore
           - notafter
           - cert_profile
@@ -180,6 +189,47 @@ state:
         autorun: 1
         action:
           - persist_key_password > ENTER_SUBJECT
+
+    PENDING_POLICY_VIOLATION:
+        label:  I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC
+        action:
+          - edit_subject > CANCEL_APPROVALS
+          - edit_san > CANCEL_APPROVALS
+          - edit_cert_info > CANCEL_APPROVALS
+          - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
+          - global_noop > BUILD_SUBJECT ? has_policy_violation
+          - approve_csr > CHECK_APPROVALS ? acl_can_approve
+          - reject_request > NOTIFY_REJECT ? acl_can_reject
+          - put_request_on_hold > ONHOLD ? acl_can_approve
+        output:
+          - cert_subject
+          - cert_subject_alt_name
+          - policy_comment
+          - check_policy_dns
+          - check_policy_subject_duplicate
+          - notbefore
+          - notafter
+          - cert_profile
+          - cert_info
+        button:
+          approve_csr:
+            format: alternative
+          global_noop:
+            label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
+            format: expected
+          edit_subject: 
+            format: optional
+          edit_san:
+            format: optional
+          edit_cert_info:
+            format: optional
+          edit_validity:
+            format: optional
+          reject_request:
+            format: failure
+          put_request_on_hold:
+            format: alternative
 
     PKCS10_GENERATED:
         autorun: 1
@@ -228,7 +278,9 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_DESC
         action:
-          - submit > EVAL_ELIGIBILITY
+          - submit > EVAL_ELIGIBILITY ? !has_policy_violation
+          - enter_policy_violation_comment > PENDING_POLICY_VIOLATION ? has_policy_violation
+          - global_noop > BUILD_SUBJECT ? has_policy_violation
           - edit_subject > BUILD_SUBJECT
           - edit_san > BUILD_SUBJECT
           - edit_cert_info > BUILD_SUBJECT
@@ -236,10 +288,18 @@ state:
         output:
           - cert_subject
           - cert_subject_alt_name
+          - check_policy_dns
+          - check_policy_subject_duplicate
           - cert_profile
           - cert_info
         button:
-          submit:
+          submit:        
+            format: expected
+          enter_policy_violation_comment:
+            label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL
+            format: alternative
+          global_noop:
+            label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
             format: expected
           edit_subject: 
             format: optional
@@ -266,7 +326,7 @@ state:
     UPDATE_SUBJECT:
         autorun: 1
         action:
-          - render_subject set_workflow_attributes > PENDING
+          - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate > CHECK_POLICY_VIOLATION
 
     CANCELED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL
@@ -294,6 +354,16 @@ action:
 
     cancel_approvals:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
+
+
+    check_policy_dns:
+        class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS
+        param:
+            check_cn: AC
+            check_san: AC
+
+    check_policy_subject_duplicate:
+        class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicySubjectDuplicate
 
     cleanup_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
@@ -349,6 +419,11 @@ action:
             source: USER
         validator:
           - global_validity_window
+
+    enter_policy_violation_comment:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        input:
+          - policy_comment
 
     eval_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -546,6 +621,11 @@ condition:
         param:
             generate: client
 
+    has_policy_violation:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{check_policy_dns} || $context->{check_policy_subject_duplicate}
+
     pending_notification_send:
         class: Workflow::Condition::Evaluate
         param:
@@ -611,6 +691,26 @@ field:
         type: select
         # The options are provided by the uihandle class!
         required: 0
+
+    # output only, filled by check_policy activities
+    check_policy_dns:
+        label: Failed Policy Check DNS
+        name: check_policy_dns
+
+    check_policy_subject_duplicate:
+        label: Failed Policy Check Subject Duplicate
+        name: check_policy_subject_duplicate
+        format: ullist
+        template: >
+          [% USE Certificate %]
+          [% IF value %]
+            Expiry / Identifier |
+            [% FOREACH identifier = value %]
+              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
+                [% Certificate.notafter(identifier) %] / [% identifier %]</a>| 
+            [% END %]
+          [% END %]
+
 
     csr_type:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_LABEL
@@ -679,6 +779,15 @@ field:
               - client
             label: I18N_OPENXPKI_UI_KEY_ENC_PASSWORD
 # For i18n parser I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT
+
+
+    policy_comment: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER
+        name: policy_comment
+        type: textarea
+        required: 1
 
 acl:
     Anonymous:

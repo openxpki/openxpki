@@ -754,14 +754,6 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL"
 msgstr "Einfache Benennungsart"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
-msgstr ""
-"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
-"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
-"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
-"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 msgstr ""
 "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
@@ -1292,6 +1284,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Untergeordnete Workflows"
 
@@ -1302,6 +1302,14 @@ msgstr "Untergeordnete Workflows"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -1785,6 +1793,18 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
+msgstr "Weitere Informationen für die Registrierungssachbearbeiter."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
+msgstr "Weitere Informationen für die Registrierungssachbearbeiter."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
@@ -2450,6 +2470,14 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
@@ -6764,6 +6792,14 @@ msgstr "Letzte Aktualisierung"
 #~ "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
 #~ "oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
 #~ "Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
+#~ msgstr ""
+#~ "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+#~ "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+#~ "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+#~ "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_BASIC_DESC"
