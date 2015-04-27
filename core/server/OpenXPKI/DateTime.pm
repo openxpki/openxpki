@@ -278,8 +278,8 @@ terse date string.
 =item *
 
 'detect': tries to guess what it got, relativedate if it has a sign (+/-),
-epoch if it has between 8 and 10 digits and aboslutedate otherwise. Days
-can not be autodetected as the look like relativedate.
+epoch if it has between 8 and 10 digits and absolutedate otherwise. Days
+can not be autodetected as they look like relativedate.
 
 
 =back
