@@ -31,7 +31,7 @@ ok(1);
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok (1, 'TokenManager');
 
 my $ca_id = "INTERNAL_CA_GOST"; 
@@ -41,14 +41,18 @@ $cn =~ s{ INTERNAL_ }{}xms;
 my $dir = lc($cn);
 $dir =~ s{ _ }{}xms;
 
+TODO: {
+    todo_skip 'See Issue #188', 47;
 my $ca_token = $mgmt->get_token (
     {
         TYPE => "CA", 
-  		ID => $ca_id, 
-		PKI_REALM => "Test GOST Root CA",
+        NAME => 'test-ca',
+        ID => $ca_id, 
+        PKI_REALM => "Test GOST Root CA",
         CERTIFICATE => "dummy",
     }
 );
+
 ok (1, 'CA token');
 
 ## create CA GOST94 key (use passwd from token.xml)
@@ -368,6 +372,8 @@ foreach my $func ("version", "subject", "subject_hash", "fingerprint",
         ok(0);
         print STDERR "Error: function $func failed\n";
     }
+}
+
 }
 
 1;
