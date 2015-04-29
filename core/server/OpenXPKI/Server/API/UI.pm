@@ -185,7 +185,12 @@ sub render_template {
     my $param = $args->{PARAMS};
     
     my $oxtt = OpenXPKI::Template->new();    
-    return $oxtt->render( $template, $param );
+    my $res = $oxtt->render( $template, $param );
+    
+    # trim whitespace
+    $res =~ s{ \A (\s\n)+ }{}xms;
+    $res =~ s{ (\s\n)+ \z }{}xms;    
+    return $res;
     
 }
 

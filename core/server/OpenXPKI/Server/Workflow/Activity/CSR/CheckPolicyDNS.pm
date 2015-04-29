@@ -108,7 +108,7 @@ sub execute
         );
                 
     } else {
-        $context->param('check_policy_dns', '');
+        $context->param( { 'check_policy_dns' => undef } );        
     }
     
     return 1;

@@ -1599,10 +1599,14 @@ sub __render_from_workflow {
                 } elsif ($item->{format} eq "ullist") {
 
                     my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                    
-                    $self->logger()->debug('Return from template ' . $out );                   
-                    my @val = split /\s*\|\s*/, $out;
-                    $self->logger()->debug('Split ' . Dumper \@val);
-                    $item->{value} = \@val;
+                    $self->logger()->debug('Return from template ' . $out );
+                    if ($out) {                   
+                        my @val = split /\s*\|\s*/, $out;
+                        $self->logger()->debug('Split ' . Dumper \@val);
+                        $item->{value} = \@val;
+                    } else {
+                        $item->{value} = undef; # prevent pusing emtpy lists
+                    }
 
                 } elsif (ref $item->{value} eq '') {
                     $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
@@ -1618,7 +1622,7 @@ sub __render_from_workflow {
             }
 
             # do not push items that are empty
-            if (ref $item->{value} || $item->{value} ne '') {
+            if (defined $item->{value} && (ref $item->{value} || $item->{value} ne '')) {
                 push @fields, $item;
             }
         }

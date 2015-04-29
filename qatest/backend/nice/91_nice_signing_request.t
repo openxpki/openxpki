@@ -111,9 +111,15 @@ $test->execute_ok( 'csr_edit_cert_info', {
 });
 
 $test->state_is('SUBJECT_COMPLETE');
-$test->execute_ok( 'csr_submit' );
-    
-$test->state_is('PENDING');
+
+#$test->execute_ok( 'csr_submit' );
+#$test->state_is('PENDING');
+
+# As the nicetest FQDNs do not validate, we need a policy expcetion request
+
+$test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
+$test->state_is('PENDING_POLICY_VIOLATION');
+
 
 # ACL Test - should not be allowed to user
 $test->execute_nok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'}, 'Disallow on hold to user' );
@@ -130,7 +136,7 @@ $test->execute_ok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'} 
 $test->state_is('ONHOLD');
 
 $test->execute_ok( 'csr_release_on_hold', { onhold_comment => 'Still no Comment'} );
-$test->state_is('PENDING');
+$test->state_is('PENDING_POLICY_VIOLATION');
 
 $test->execute_ok( 'csr_approve_csr' );
 $test->state_is('SUCCESS');

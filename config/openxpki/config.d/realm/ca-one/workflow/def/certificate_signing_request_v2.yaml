@@ -198,7 +198,7 @@ state:
           - edit_san > CANCEL_APPROVALS
           - edit_cert_info > CANCEL_APPROVALS
           - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
-          - global_noop > BUILD_SUBJECT ? has_policy_violation
+          - global_noop > UPDATE_SUBJECT ? has_policy_violation
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
           - put_request_on_hold > ONHOLD ? acl_can_approve
@@ -364,6 +364,8 @@ action:
 
     check_policy_subject_duplicate:
         class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicySubjectDuplicate
+        param:
+           allow_renewal_period: "+0003"
 
     cleanup_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry

@@ -28,10 +28,12 @@ sub execute
     };
     
     if ($self->param('any_realm')) {
+        ##! 32: 'Any realm requested'
         $query->{PKI_REALM} = '_ANY';
     }
     
     if ($self->param('cn_only')) {
+        ##! 32: 'match cn only'        
         my $dn = new OpenXPKI::DN( $cert_subject );
         my %hash = $dn->get_hashed_content();
         $query->{SUBJECT} = 'CN='.$hash{CN}[0].',%';            
@@ -40,13 +42,13 @@ sub execute
     }
     
     if (my $renewal = $self->param('allow_renewal_period')) {
-        
+        ##! 16: 'Renewal allowed in period ' . $renewal        
         my $notafter = OpenXPKI::DateTime::get_validity({        
-            VALIDITY => '+0205',
+            VALIDITY => $renewal,
             VALIDITYFORMAT => 'detect',
-        });
+        });        
    
-        $query->{NOTAFTER} = $notafter;
+        $query->{NOTAFTER} = $notafter->epoch();
     } else {      
         $query->{NOTAFTER} = time();        
     }
@@ -71,7 +73,7 @@ sub execute
                   
     } else {
         
-        $context->param('check_policy_subject_duplicate', '' );
+        $context->param( { 'check_policy_subject_duplicate' => undef } );
         
     }
     
@@ -98,7 +100,7 @@ See the parameters section for other search options.
 
 Boolean, search certificates globally.
 
-=item match_profile
+=item match_profile (NOT IMPLEMENTED YET)
 
 Boolean, duplicate only if profile is the same (profile must be given in
 action parameter cert_profile). Hint: Use the _map_syntax to grab the 
