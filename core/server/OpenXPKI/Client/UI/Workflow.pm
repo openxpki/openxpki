@@ -617,6 +617,7 @@ sub init_task {
 
     $self->logger()->debug( "got tasklist: " . Dumper $tasklist);
 
+    TASKLIST:
     foreach my $item (@$tasklist) {
 
         my $query = $item->{query};
@@ -676,32 +677,46 @@ sub init_task {
 
         my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => 25), %$query } );
 
-        my @data = $self->__render_result_list( $search_result, \@column );
+        # empty message
+        my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';             
 
-        $self->logger()->trace( "dumper result: " . Dumper @data);
-
-        # pager only if no user supplied LIMIT and more results than our cut off
         my $pager;
-
-        if (!$query->{LIMIT} && scalar @$search_result == 25) {
-            my $result_count= $self->send_command( 'search_workflow_instances_count', $query );
-
-            my $queryid = $self->__generate_uid();
-            my $_query = {
-                'id' => $queryid,
-                'type' => 'workflow',
-                'count' => $result_count,
-                'query' => $query,
-                'column' => \@column
-            };
-            $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-            #$pager = $self->__render_pager( $_query )
+        my @data;
+        # No results
+        if (!@$search_result) {
+            
+            if ($empty eq 'hide') {
+                next TASKLIST;
+            }                            
+            
+        } else {
+    
+            @data = $self->__render_result_list( $search_result, \@column );
+            
+            $self->logger()->trace( "dumper result: " . Dumper @data);
+        
+         
+        
+            if (!$query->{LIMIT} && scalar @$search_result == 25) {
+                my $result_count= $self->send_command( 'search_workflow_instances_count', $query );
+    
+                my $queryid = $self->__generate_uid();
+                my $_query = {
+                    'id' => $queryid,
+                    'type' => 'workflow',
+                    'count' => $result_count,
+                    'query' => $query,
+                    'column' => \@column
+                };
+                $self->_client->session()->param('query_wfl_'.$queryid, $_query );
+                #$pager = $self->__render_pager( $_query )
+            }
+            
         }
-
+                    
         $self->add_section({
             type => 'grid',
             className => 'workflow',
-            processing_type => 'all',
             content => {
                 label => $item->{label},
                 description => $item->{description},
@@ -711,11 +726,15 @@ sub init_task {
                 }],
                 columns => \@header,
                 data => \@data,
-                pager => $pager
+                pager => $pager,
+                empty => $empty,
 
             }
         });
+ 
     }
+    
+    return $self;
 
 }
 
@@ -1924,15 +1943,10 @@ sub __render_result_list {
 
             if ($col->{template}) {
                 my $out;
-
                 my $ttp = {
-
                     context => $context,
-
                     attribute => $attrib,
-
                     workflow => $wf_info->{WORKFLOW}
-
                 };
 
                 push @line, $oxtt->render( $col->{template}, $ttp);

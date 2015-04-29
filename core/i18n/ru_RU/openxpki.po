@@ -836,6 +836,10 @@ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
 msgstr "Пауза"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Статус сертификата УЦ"
 
@@ -1300,14 +1304,6 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
-msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -7487,6 +7483,14 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_LABEL"
 #~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
+#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC"

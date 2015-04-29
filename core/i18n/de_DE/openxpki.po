@@ -837,6 +837,10 @@ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
 msgstr "Warten"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Status"
 
@@ -1302,14 +1306,6 @@ msgstr "Untergeordnete Workflows"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
-msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
@@ -7286,6 +7282,14 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_LABEL"
 #~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
+#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC"

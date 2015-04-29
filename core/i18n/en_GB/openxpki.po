@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-04-27 17:03+0100\n"
+"PO-Revision-Date: 2015-04-29 18:46+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -563,6 +563,9 @@ msgstr "Revocation workflows awaiting approval."
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
 msgstr "Revocation Requests"
 
+msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
+msgstr "No data available"
+
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token Status"
 
@@ -957,14 +960,6 @@ msgstr "Retries"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
-msgstr "CANCELED"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
-msgstr "Action"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
 msgstr ""
@@ -1982,6 +1977,14 @@ msgstr "Workflow information was updated"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PERSIST_CRR_LABEL"
 #~ msgstr "Persist CRR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
+#~ msgstr "CANCELED"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
+#~ msgstr "Action"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC"
