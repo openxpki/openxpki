@@ -373,7 +373,7 @@ sub init_detail {
     # TODO - add ACL, only owner should be allowed to dl key
     if ($is_local_entity &&
         $self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-        $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
+        $privkey = '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
     }
 
     push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => '<ul class="list-unstyled">'.
@@ -389,7 +389,7 @@ sub init_detail {
     };
 
     # TODO - add some magic to the API to determine if those actions are possible for the current user, etc.
-    $pattern = '<li><a href="#redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
+    $pattern = '<li><a href="#/openxpki/redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
     
     if ($is_local_entity) {   
         my @actions;

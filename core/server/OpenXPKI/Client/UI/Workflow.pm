@@ -1622,7 +1622,9 @@ sub __render_from_workflow {
             }
 
             # do not push items that are empty
-            if (defined $item->{value} && (ref $item->{value} || $item->{value} ne '')) {
+            if ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
+                (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
+                (ref $item->{value} eq '' && $item->{value} ne '')) {
                 push @fields, $item;
             }
         }
