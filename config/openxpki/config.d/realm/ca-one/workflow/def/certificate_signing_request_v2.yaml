@@ -359,7 +359,6 @@ action:
     check_policy_dns:
         class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS
         param:
-            check_cn: AC
             check_san: AC
 
     check_policy_subject_duplicate:
