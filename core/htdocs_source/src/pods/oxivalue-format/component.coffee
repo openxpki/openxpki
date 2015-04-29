@@ -11,12 +11,12 @@ Component = Em.Component.extend
             evt.preventDefault()
             @container.lookup("route:openxpki").sendAjax
                 data:
-                    page:target.href.split("#")[1]
+                    page:target.href.split("#")[1].replace /\/openxpki\//, ""
                     target:target.target
 
     types:
         certstatus: (v) -> "<span class='certstatus-#{(v.value||v.label).toLowerCase()}'>#{v.label}</span>"
-        link: (v) -> "<a href='##{v.page}' target='#{v.target||"modal"}'>#{v.label}</a>"
+        link: (v) -> "<a href='#/openxpki/#{v.page}' target='#{v.target||"modal"}'>#{v.label}</a>"
         timestamp: (v) -> 
           if v > 0 
             moment.unix(v).utc().format("YYYY-MM-DD HH:mm:ss UTC")
