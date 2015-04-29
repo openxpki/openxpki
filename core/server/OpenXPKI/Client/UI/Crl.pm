@@ -100,8 +100,7 @@ sub init_list {
 
     $self->add_section({
         type => 'grid',
-        className => 'crl',
-        processing_type => 'all',
+        className => 'crl',        
         content => {
             actions => [{
                 label => 'view details in browser',
@@ -115,6 +114,7 @@ sub init_list {
                 { sTitle => "items"},
             ],
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             buttons => [{
                 page => 'crl!index',
                 label  => 'back to overview',

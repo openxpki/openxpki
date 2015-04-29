@@ -110,8 +110,7 @@ sub action_csr {
 
     $self->add_section({
         type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
+        className => 'workflow',        
         content => {
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
@@ -121,6 +120,7 @@ sub action_csr {
             }],
             columns => $self->__default_grid_head,
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             buttons => [
                 { 
                     label => 'approve selected items', 

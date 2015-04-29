@@ -145,7 +145,6 @@ sub init_result {
     $self->add_section({
         type => 'grid',
         className => 'certificate',
-        processing_type => 'all',
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
@@ -165,6 +164,7 @@ sub init_result {
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
             buttons => [
                 { label => 'reload search form', page => 'certificate!search!query!' .$queryid },
@@ -292,7 +292,6 @@ sub init_mine {
     $self->add_section({
         type => 'grid',
         className => 'certificate',
-        processing_type => 'all',
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
@@ -312,6 +311,7 @@ sub init_mine {
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
             pager => $pager,
         }
     });
@@ -525,7 +525,6 @@ sub init_related {
     $self->add_section({
         type => 'grid',
         className => 'workflow',
-        processing_type => 'all',
         content => {
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL',
             actions => [{
@@ -542,7 +541,8 @@ sub init_related {
                 #{ sTitle => "procstate"},
                 #{ sTitle => "wake up"},
             ],
-            data => \@result
+            data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         }
     });
     return $self;

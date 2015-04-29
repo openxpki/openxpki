@@ -35,8 +35,7 @@ sub init_index {
 
     $self->add_section({
         type => 'grid',
-        className => 'secret',
-        processing_type => 'all',
+        className => 'secret',        
         content => {
             actions => [{
                 path => 'secret!manage!id!{_id}',
@@ -48,7 +47,8 @@ sub init_index {
                 { sTitle => "Status"},
                 { sTitle => "_id"},
             ],
-            data => \@result
+            data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
         }
     });
 

@@ -72,7 +72,6 @@ sub init_issuer {
 
     $self->add_section({
         type => 'grid',
-        processing_type => 'all',
         className => 'cacertificate',
         content => {
             actions => [{
@@ -88,6 +87,7 @@ sub init_issuer {
                 { sTitle => "_className" },
             ],
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         }
     });
 
@@ -152,8 +152,7 @@ sub init_process {
 
     $self->add_section({
         type => 'grid',
-        className => 'proc',
-        processing_type => 'all',
+        className => 'proc',        
         content => {
             columns => [
                 { sTitle => "PID" },
@@ -161,7 +160,8 @@ sub init_process {
                 { sTitle => "seconds" },
                 { sTitle => "info"},
             ],
-            data => \@result
+            data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         }
     });
 

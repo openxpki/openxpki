@@ -357,8 +357,7 @@ sub init_result {
 
     $self->add_section({
         type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
+        className => 'workflow',        
         content => {
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
@@ -368,8 +367,8 @@ sub init_result {
             }],
             columns => $self->__default_grid_head(),
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
-
             buttons => [
                 { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
                 { label => 'new search', page => 'workflow!search'},
@@ -478,7 +477,6 @@ sub init_history {
     $self->add_section({
         type => 'grid',
         className => 'workflow',
-        processing_type => 'all',
         content => {
             columns => [
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_EXEC_TIME_LABEL' }, #, format => 'datetime'},
@@ -574,8 +572,7 @@ sub init_mine {
 
     $self->add_section({
         type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
+        className => 'workflow',        
         content => {
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
@@ -585,6 +582,7 @@ sub init_mine {
             }],
             columns => $self->__default_grid_head(),
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
 
         }
@@ -1156,7 +1154,6 @@ sub action_bulk {
         $self->add_section({
             type => 'grid',
             className => 'workflow',
-            processing_type => 'all',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC',
@@ -1168,6 +1165,7 @@ sub action_bulk {
                 }],
                 columns => \@fault_head,
                 data => \@result_failed,
+                empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             }
         });
     } else {
@@ -1180,8 +1178,7 @@ sub action_bulk {
         
         $self->add_section({
             type => 'grid',
-            className => 'workflow',
-            processing_type => 'all',
+            className => 'workflow',            
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC',
@@ -1193,6 +1190,7 @@ sub action_bulk {
                 }],
                 columns => $self->__default_grid_head,
                 data => \@result_done,
+                empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             }
         });
     }
