@@ -697,6 +697,12 @@ field:
     check_policy_dns:
         label: Failed Policy Check DNS
         name: check_policy_dns
+        format: ullist
+        template: >
+          [% USE CheckDNS %]
+          [% FOREACH fqdn = value %]
+          [% CheckDNS.valid(fqdn, '(FAIL)', '(ok)') %]
+          [% END %]
 
     check_policy_subject_duplicate:
         label: Failed Policy Check Subject Duplicate
