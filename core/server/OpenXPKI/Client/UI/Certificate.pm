@@ -153,13 +153,13 @@ sub init_result {
                 target => 'modal'
             }], 
             columns => [
-                { sTitle => "Serial"},
-                { sTitle => "Subject" },
-                { sTitle => "Status", format => 'certstatus' },
-                { sTitle => "Notbefore", format => 'timestamp' },
-                { sTitle => "Notafter", format => 'timestamp' },
-                { sTitle => "Issuer"},
-                { sTitle => "Identifier"},
+                { sTitle => "Serial", sortkey => 'CERTIFICATE.CERTIFICATE_SERIAL' },
+                { sTitle => "Subject", sortkey => 'CERTIFICATE.SUBJECT' },
+                { sTitle => "Status", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
+                { sTitle => "Notbefore", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
+                { sTitle => "Notafter", format => 'timestamp', sortkey => 'CERTIFICATE.NOTAFTER' },
+                { sTitle => "Issuer", sortkey => 'CERTIFICATE.ISSUER_DN'},
+                { sTitle => "Identifier", sortkey => 'CERTIFICATE.IDENTIFIER'},
                 { sTitle => "_className"},
                 { sTitle => "identifier", bVisible => 0 },
             ],
@@ -193,10 +193,10 @@ sub init_pager {
     my $queryid = $self->param('id');
     
     # Load query from session
-    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
+    my $result = $self->_client->session()->param('query_cert_'.$queryid);
 
     # result expired or broken id
-    if (!$result || !$result->{count}) {        
+    if (!$result || !$result->{count}) {
         $self->set_status('Search result expired or empty!','error');
         return $self->init_search();               
     }
@@ -213,8 +213,17 @@ sub init_pager {
     my $query = $result->{query};
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
+    
+    if ($self->param('order')) {
+        $query->{ORDER} = uc($self->param('order'));
+    }
+    
+    if (defined  $self->param('reverse')) {
+        $query->{REVERSE} = $self->param('reverse');
+    }
 
     $self->logger()->debug( "persisted query: " . Dumper $result);
+    $self->logger()->debug( "executed query: " . Dumper $query);
 
     my $search_result = $self->send_command( 'search_cert', $query );
     

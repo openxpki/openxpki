@@ -15,10 +15,10 @@ has __default_grid_head => (
     lazy => 1,
 
     default => sub { return [
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', sortkey => 'WORKFLOW.WORKFLOW_SERIAL' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', sortkey => 'WORKFLOW.WORKFLOW_LAST_UPDATE' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', sortkey => 'WORKFLOW.WORKFLOW_TYPE'},
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', sortkey => 'WORKFLOW.WORKFLOW_STATE' },
         { sTitle => 'serial', bVisible => 0 },
         { sTitle => "_className"},
     ]; }
@@ -401,12 +401,10 @@ sub init_pager {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-
         $self->set_status('Search result expired or empty!','error');
         return $self->init_search();
-
     }
-
+   
     my $startat = $self->param('startat');
 
     my $limit = $self->param('limit') || 25;
@@ -420,8 +418,17 @@ sub init_pager {
     my $query = $result->{query};
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
+    
+    if ($self->param('order')) {
+        $query->{ORDER} = uc($self->param('order'));
+    }
+    
+    if (defined  $self->param('reverse')) {
+        $query->{REVERSE} = $self->param('reverse');
+    }
 
     $self->logger()->debug( "persisted query: " . Dumper $result);
+    $self->logger()->debug( "executed query: " . Dumper $query);    
 
     my $search_result = $self->send_command( 'search_workflow_instances', $query );
 
@@ -693,8 +700,6 @@ sub init_task {
             
             $self->logger()->trace( "dumper result: " . Dumper @data);
         
-         
-        
             if (!$query->{LIMIT} && scalar @$search_result == 25) {
                 my $result_count= $self->send_command( 'search_workflow_instances_count', $query );
     
@@ -707,7 +712,7 @@ sub init_task {
                     'column' => \@column
                 };
                 $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-                #$pager = $self->__render_pager( $_query )
+                $pager = $self->__render_pager( $_query )
             }
             
         }
