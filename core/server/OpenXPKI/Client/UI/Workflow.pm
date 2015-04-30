@@ -873,7 +873,7 @@ sub action_index {
             return $self;
         }
         $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED','success');
+        #$self->set_status('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED','success');
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
