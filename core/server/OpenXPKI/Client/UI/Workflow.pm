@@ -1402,254 +1402,6 @@ sub __render_from_workflow {
 
         }
 
-        # record the workflow info in the session
-        push @fields, $self->__register_wf_token( $wf_info, {
-            wf_action => $wf_action,
-            wf_fields => \@fields,
-        });
-
-        my $section = {
-            type => 'form',
-            action => 'workflow',                       
-            content => {
-                #label => $wf_action_info->{label},
-                #description => $wf_action_info->{description},
-                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
-                fields => \@fields,
-            }
-        };
-        
-        # Add reset button as link to the activity selection page
-        if ((scalar keys %{$wf_info->{ACTIVITY}}) > 1) {
-            $section->{reset} = 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
-            $section->{content}->{reset_label} = 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET';
-        }
-        
-        $self->add_section( $section );
-
-        if (@fielddesc) {
-            $self->add_section({
-                type => 'keyvalue',
-                content => {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
-                    description => '',
-                    data => \@fielddesc
-            }});
-        }
-
-    } else {
-
-        # more than one action available, so we offer some buttons to choose how to continue
-
-        # Headline from state + workflow
-        my $label =  $wf_info->{STATE}->{label};
-        if ($label) {
-            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
-        } else {
-            $label =  $wf_info->{WORKFLOW}->{label};
-        }
-
-        $self->_page({
-            label => $label,
-            shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description =>  $wf_info->{STATE}->{description},
-        });
-
-        my @fields;
-        my $context = $wf_info->{WORKFLOW}->{CONTEXT};
-
-        # in case we have output format rules, we just show the defined fields
-        # can be overriden with view = context
-        my $output = $wf_info->{STATE}->{output};
-        my @fields_to_render;
-        if ($view eq 'context') {
-            foreach my $field (sort keys %{$context}) {
-
-                push @fields_to_render, { name => $field };
-            }
-        } elsif ($output) {
-            @fields_to_render = @{$wf_info->{STATE}->{output}};
-            $self->logger()->debug('Render output rules: ' . Dumper  \@fields_to_render  );
-
-        } else {
-            foreach my $field (sort keys %{$context}) {
-
-                next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
-                push @fields_to_render, { name => $field };
-            }
-            $self->logger()->debug('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
-
-        }
-
-        foreach my $field (@fields_to_render) {
-
-            my $key = $field->{name};
-            my $item = {
-                value => ($context->{$key} || ''),
-                type => '',
-                format =>  $field->{format} || ''
-            };
-
-            # Always suppress key material
-            if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
-                $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
-
-            }
-
-            # Label, Description, Tooltip
-            foreach my $prop (qw(label description tooltip)) {
-                if ($field->{$prop}) {
-                    $item->{$prop} = $field->{$prop};
-                }
-            }
-
-            if (!$item->{label}) {
-                $item->{label} = $key;
-            }
-
-            # assign autoformat based on some assumptions if no format is set
-            if (!$item->{format}) {
-
-                # create a link on cert_identifier fields
-                if ( $key =~ m{ cert_identifier \z }x ||
-                    $item->{type} eq 'cert_identifier') {
-                    $item->{format} = 'cert_identifier';
-                }
-
-                # Code format any PEM blocks
-                if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
-                    $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
-                    $item->{format} = 'code';
-                }
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                    if (ref $item->{value} eq 'HASH') {
-                        $item->{format} = 'deflist';
-                    } elsif (ref $item->{value} eq 'ARRAY') {
-                        $item->{format} = 'ullist';
-                    }
-                }
-            }
-
-            # convert format cert_identifier into a link
-
-            if ($item->{format} eq "cert_identifier") {
-                $item->{format} = 'link';
-
-                # check for additional template
-                my $label = $item->{value};
-
-                my $cert_identifier = $item->{value};
-
-                $item->{value}  = {
-                    label => $label,
-                    page => 'certificate!detail!identifier!'.$cert_identifier,
-                    target => 'modal'
-
-                };
-
-                $self->logger()->debug( 'item ' . Dumper $item);
-
-            # format for cert_info block
-            } elsif ($item->{format} eq "cert_info") {
-                $item->{format} = 'deflist';
-
-                # its likely that we need to deserialize
-                my $raw = $item->{value};
-                if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
-                    $raw = $self->serializer()->deserialize( $raw );
-                }
-
-                # this requires that we find the profile and subject in the context
-                my @val;
-                my $cert_profile = $context->{cert_profile};
-                my $cert_subject_style = $context->{cert_subject_style};
-                if ($cert_profile && $cert_subject_style) {
-
-                    my $fields = $self->send_command( 'get_field_definition',
-                        { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
-                    $self->logger()->debug( 'Profile fields' . Dumper $fields );
-
-                    foreach my $field (@$fields) {
-                        # this still uses "old" syntax - adjust after API refactoring
-                        my $key = $field->{ID}; # Name of the context key
-                        if ($raw->{$key}) {
-                            push @val, { label => $field->{LABEL}, value => $raw->{$key}, key => $key };
-                        }
-                    }
-                } else {
-                    # if nothing is found, transform raw values to a deflist
-                    @val = map { { key => $_, label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
-
-                }
-
-                $item->{value} = \@val;
-
-            } elsif ($item->{format} eq "ullist") {
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-
-            } elsif ($item->{format} eq "deflist") {
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-                # Sort by label
-                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
-                $item->{value} = \@val;
-
-            }
-
-            if ($field->{template}) {
-
-                my $param = { value => $item->{value} };
-
-                $self->logger()->debug('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param);
-
-                # Rendering target depends on value format
-                # deflist iterates over each key/label pair and sets the return value into the label
-                if ($item->{format} eq "deflist") {
-
-                    foreach (@{$item->{value}}){
-                        $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
-                    }
-
-                # bullet list, put the full list to tt and split at the | as sep (as used in profile)
-                } elsif ($item->{format} eq "ullist") {
-
-                    my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                    
-                    $self->logger()->debug('Return from template ' . $out );
-                    if ($out) {                   
-                        my @val = split /\s*\|\s*/, $out;
-                        $self->logger()->debug('Split ' . Dumper \@val);
-                        $item->{value} = \@val;
-                    } else {
-                        $item->{value} = undef; # prevent pusing emtpy lists
-                    }
-
-                } elsif (ref $item->{value} eq '') {
-                    $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
-
-                } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
-                    $item->{value}->{label} = $self->send_command( 'render_template', { TEMPLATE => $field->{template},
-                        PARAMS => { value => $item->{value}->{label} }} );
-                } else {
-                    $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
-
-                }
-
-            }
-
-            # do not push items that are empty
-            if ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
-                (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
-                (ref $item->{value} eq '' && $item->{value} ne '')) {
-                push @fields, $item;
-            }
-        }
         
         # Add action buttons only if we are not in result view
         my $buttons;
@@ -1662,7 +1414,7 @@ sub __render_from_workflow {
             content => {
                 label => '',
                 description => '',
-                data => \@fields,
+                data => $self->__render_fields( $wf_info, $view ),
                 buttons => $buttons
         }});
 
@@ -1998,6 +1750,212 @@ sub __render_result_list {
 
     return @result;
 
+}
+
+sub __render_fields {
+    
+    my $self = shift;
+    my $wf_info = shift;
+    my $view = shift;
+    
+        my @fields;
+        my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+
+        # in case we have output format rules, we just show the defined fields
+        # can be overriden with view = context
+        my $output = $wf_info->{STATE}->{output};
+        my @fields_to_render;
+        if ($view eq 'context') {
+            foreach my $field (sort keys %{$context}) {
+
+                push @fields_to_render, { name => $field };
+            }
+        } elsif ($output) {
+            @fields_to_render = @{$wf_info->{STATE}->{output}};
+            $self->logger()->debug('Render output rules: ' . Dumper  \@fields_to_render  );
+
+        } else {
+            foreach my $field (sort keys %{$context}) {
+
+                next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
+                push @fields_to_render, { name => $field };
+            }
+            $self->logger()->debug('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
+
+        }
+
+        foreach my $field (@fields_to_render) {
+
+            my $key = $field->{name};
+            my $item = {
+                value => ($context->{$key} || ''),
+                type => '',
+                format =>  $field->{format} || ''
+            };
+
+            # Always suppress key material
+            if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
+                $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
+
+            }
+
+            # Label, Description, Tooltip
+            foreach my $prop (qw(label description tooltip)) {
+                if ($field->{$prop}) {
+                    $item->{$prop} = $field->{$prop};
+                }
+            }
+
+            if (!$item->{label}) {
+                $item->{label} = $key;
+            }
+
+            # assign autoformat based on some assumptions if no format is set
+            if (!$item->{format}) {
+
+                # create a link on cert_identifier fields
+                if ( $key =~ m{ cert_identifier \z }x ||
+                    $item->{type} eq 'cert_identifier') {
+                    $item->{format} = 'cert_identifier';
+                }
+
+                # Code format any PEM blocks
+                if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
+                    $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
+                    $item->{format} = 'code';
+                }
+
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                    if (ref $item->{value} eq 'HASH') {
+                        $item->{format} = 'deflist';
+                    } elsif (ref $item->{value} eq 'ARRAY') {
+                        $item->{format} = 'ullist';
+                    }
+                }
+            }
+
+            # convert format cert_identifier into a link
+
+            if ($item->{format} eq "cert_identifier") {
+                $item->{format} = 'link';
+
+                # check for additional template
+                my $label = $item->{value};
+
+                my $cert_identifier = $item->{value};
+
+                $item->{value}  = {
+                    label => $label,
+                    page => 'certificate!detail!identifier!'.$cert_identifier,
+                    target => 'modal'
+
+                };
+
+                $self->logger()->debug( 'item ' . Dumper $item);
+
+            # format for cert_info block
+            } elsif ($item->{format} eq "cert_info") {
+                $item->{format} = 'deflist';
+
+                # its likely that we need to deserialize
+                my $raw = $item->{value};
+                if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
+                    $raw = $self->serializer()->deserialize( $raw );
+                }
+
+                # this requires that we find the profile and subject in the context
+                my @val;
+                my $cert_profile = $context->{cert_profile};
+                my $cert_subject_style = $context->{cert_subject_style};
+                if ($cert_profile && $cert_subject_style) {
+
+                    my $fields = $self->send_command( 'get_field_definition',
+                        { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
+                    $self->logger()->debug( 'Profile fields' . Dumper $fields );
+
+                    foreach my $field (@$fields) {
+                        # this still uses "old" syntax - adjust after API refactoring
+                        my $key = $field->{ID}; # Name of the context key
+                        if ($raw->{$key}) {
+                            push @val, { label => $field->{LABEL}, value => $raw->{$key}, key => $key };
+                        }
+                    }
+                } else {
+                    # if nothing is found, transform raw values to a deflist
+                    @val = map { { key => $_, label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+
+                }
+
+                $item->{value} = \@val;
+
+            } elsif ($item->{format} eq "ullist") {
+
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                }
+
+            } elsif ($item->{format} eq "deflist") {
+
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                }
+                # Sort by label
+                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                $item->{value} = \@val;
+
+            }
+
+            if ($field->{template}) {
+
+                my $param = { value => $item->{value} };
+
+                $self->logger()->debug('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param);
+
+                # Rendering target depends on value format
+                # deflist iterates over each key/label pair and sets the return value into the label
+                if ($item->{format} eq "deflist") {
+
+                    foreach (@{$item->{value}}){
+                        $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
+                    }
+
+                # bullet list, put the full list to tt and split at the | as sep (as used in profile)
+                } elsif ($item->{format} eq "ullist") {
+
+                    my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                    
+                    $self->logger()->debug('Return from template ' . $out );
+                    if ($out) {                   
+                        my @val = split /\s*\|\s*/, $out;
+                        $self->logger()->debug('Split ' . Dumper \@val);
+                        $item->{value} = \@val;
+                    } else {
+                        $item->{value} = undef; # prevent pusing emtpy lists
+                    }
+
+                } elsif (ref $item->{value} eq '') {
+                    $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
+
+                } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
+                    $item->{value}->{label} = $self->send_command( 'render_template', { TEMPLATE => $field->{template},
+                        PARAMS => { value => $item->{value}->{label} }} );
+                } else {
+                    $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
+
+                }
+
+            }
+
+            # do not push items that are empty
+            if ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
+                (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
+                (ref $item->{value} eq '' && $item->{value} ne '')) {
+                push @fields, $item;
+            }
+        }
+        
+        return \@fields;
+    
 }
 
 =head1 example workflow config
