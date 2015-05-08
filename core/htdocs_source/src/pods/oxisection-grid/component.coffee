@@ -36,7 +36,7 @@ Component = Em.Component.extend
         @send "changeStartat",
             startat: Math.floor(startat/limit) * limit
 
-    pages: Em.computed ->
+    pages: Em.computed "content.content.pager.startat", ->
         pager = @get "content.content.pager"
         return [] if not pager
         return [] if pager.count <= pager.limit
@@ -206,10 +206,25 @@ Component = Em.Component.extend
         changeStartat: (page) ->
             return if page.disabled or page.active
             limit = @get "limit"
-            @container.lookup("route:openxpki").transitionTo
-                queryParams:
-                    limit: limit
-                    startat: page.startat
+
+            pager = @get "content.content.pager"
+            content = @get "content.content"
+            if pager.pagerurl
+                @container.lookup("route:openxpki").sendAjax
+                    data:
+                        page: pager.pagerurl
+                        limit: limit
+                        startat: page.startat
+
+                .then (res) =>
+                    #Em.set content, "data", res.data
+                    @set "content.content.data", res.data
+                    @set "content.content.pager.startat", page.startat
+            else
+                @container.lookup("route:openxpki").transitionTo
+                    queryParams:
+                        limit: limit
+                        startat: page.startat
 
         sort: (key) ->
             sortNum = @get "sortNum"
