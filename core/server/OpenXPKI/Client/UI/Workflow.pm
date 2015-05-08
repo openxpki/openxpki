@@ -412,7 +412,7 @@ sub init_pager {
     if ($limit > 500) {  $limit = 500; }
 
     # align startat to limit window
-    $startat = int($startat % $limit) * $limit;
+    $startat = int($startat / $limit) * $limit;
 
     # Add limits
     my $query = $result->{query};
