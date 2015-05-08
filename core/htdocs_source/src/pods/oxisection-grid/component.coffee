@@ -227,6 +227,9 @@ Component = Em.Component.extend
                         startat: page.startat
 
         sort: (key) ->
+            pages = @get "pages"
+            return if pages.length
+
             sortNum = @get "sortNum"
             newSortNum = @get("columns").indexOf key
             column = @get("columns")[sortNum]
