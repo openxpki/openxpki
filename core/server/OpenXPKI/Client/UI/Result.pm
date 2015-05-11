@@ -604,7 +604,8 @@ sub __render_pager {
         count => $result->{count} * 1, 
         pagesizes => $args->{pagesizes}, 
         pagersize => $args->{pagersize},
-        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id} 
+        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id}
+        # TODO order / reverse 
     }
 }
 
