@@ -14,7 +14,7 @@
                     <th {{action "sort" column}}>
                         <span>{{column.sTitle}}</span>
                         {{#if column.isSorted}}
-                            {{#if column.isInverted}}
+                            {{#if pager.reverse}}
                                 <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt"></span>
                             {{else}}
                                 <span class="pull-right glyphicon glyphicon-sort-by-attributes"></span>
@@ -24,7 +24,7 @@
                 {{/each}}
             </tr>
         </thead>
-        <tbody>            
+        <tbody>
             {{#each sortedData as |row index|}}
                 <tr class="context {{row.className}} {{if hasAction "has-action"}}">
                     {{#if isBulkable}}
@@ -44,7 +44,7 @@
             <tfoot>
                 <tr><td colspan="{{columns.size}}">{{content.content.footer}}</td></tr>
             </tfoot>
-        {{/if}}        
+        {{/if}}
     </table>
     <div class="dropdown">
         <ul class="dropdown-menu" role="menu">
