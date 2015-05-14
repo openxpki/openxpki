@@ -185,6 +185,7 @@ Render form for the workflow search.
 #TODO: Preset parameters
 
 =cut
+
 sub init_search {
 
     my $self = shift;
@@ -741,8 +742,6 @@ sub init_task {
 
 }
 
-=cut
-
 =head2 action_index
 
 =head3 instance creation
@@ -1201,7 +1200,6 @@ sub action_bulk {
     }
 
 }
-=cut
 
 =head1 internal methods
 
@@ -1247,6 +1245,7 @@ always be called regardless of the internal workflow state, a handler on the
 action level gets called only if the action is selected by above means.
 
 =cut
+
 sub __render_from_workflow {
 
     my $self = shift;

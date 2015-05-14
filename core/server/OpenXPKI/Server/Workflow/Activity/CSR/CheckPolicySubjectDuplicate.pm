@@ -96,6 +96,8 @@ See the parameters section for other search options.
 
 =head2 Configuration parameters
 
+=over 
+
 =item any_realm
 
 Boolean, search certificates globally.
@@ -116,3 +118,4 @@ Set to a OpenXPKI::DateTime validity specification (eg. +0003 for three
 month) to allow renewals within a defined period. Certificates which expire
 within the given period are not considered to trigger a duplicate error.
 
+=back

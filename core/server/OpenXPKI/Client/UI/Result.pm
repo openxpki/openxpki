@@ -570,7 +570,7 @@ sub __generate_uid {
     return $queryid; 
 }
 
-=head __render_pager
+=head2 __render_pager
 
 Return a pager definition hash with default settings, requires the query 
 result hash as argument. Defaults can be overriden passing a hash as second

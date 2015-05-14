@@ -154,6 +154,8 @@ profile definition.
 
 =head2 Argument
 
+=over 
+
 =item profile
 
 The name of the profile.
@@ -165,8 +167,12 @@ The name of the profile style.
 =item subject_parts
 
 The input parameters to perform the valdation on. 
+
+=back 
  
 =head2 Parameter
+
+=over 
 
 =item section
 
@@ -178,6 +184,6 @@ The name of the form parameter used for this information. This is used
 to generate the list of errornous fieldnames for the UI. If omitted, the
 context keys are used. 
 
-
+=back
  
  

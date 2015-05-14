@@ -105,12 +105,20 @@ database.
 
 =head2 Argument
 
+=over 
+
 =item pkcs10
 
 The PKCS10 encoded csr.
+
+=back 
  
 =head2 Parameter
+
+=over 
 
 =item realm_only
 
 Check key only against certificates in the same realm. 
+
+=back
