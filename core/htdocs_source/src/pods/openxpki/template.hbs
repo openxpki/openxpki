@@ -11,7 +11,7 @@
 
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                {{#each navEntries as |navEntry|}}
+                {{#each model.navEntries as |navEntry|}}
                     {{#if navEntry.entries.length}}
                         <li class="dropdown {{if navEntry.active "active"}}">
                             <a class="dropdown-toggle" href="#" data-toggle="dropdown">
@@ -39,7 +39,7 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                {{#if user}}
+                {{#if model.user}}
                     <li>
                         {{#link-to "openxpki" "logout"}}
                             Log out
@@ -54,20 +54,19 @@
 <div class="container-fluid">
     <div class="oxi-message">
         <div class="alert {{statusClass}}">
-            {{status.message}}
+            {{model.status.message}}
         </div>
     </div>
 
-    <h2>{{content.firstObject.page.label}}</h2>
-    {{#if content.firstObject.page.description}}
+    <h2>{{model.tabs.firstObject.page.label}}</h2>
+    {{#if model.tabs.firstObject.page.description}}
         <div class="description">
-            {{{content.firstObject.page.description}}}
+            {{{model.tabs.firstObject.page.description}}}
         </div>
     {{/if}}
-
     {{#if showTabs}}
         <ul class="nav nav-tabs">
-            {{#each content as |entry|}}
+            {{#each model.tabs as |entry|}}
                 <li class="{{if entry.active "active"}}">
                     <a {{action "activateTab" entry}}>
                         {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
@@ -77,50 +76,29 @@
                 </li>
             {{/each}}
         </ul>
-
-        <div class="tab-content">
-            {{#each content as |entry|}}
-                <div class="tab-pane {{if entry.active "active"}}">
-                    <div class="Xcontainer sections">
-                        <div class="row">
-                            <div class="{{if entry.right "col-md-8" "col-md-12"}}">
-                                {{#each entry.main as |mainEntry|}}
-                                    {{oxisection-main content=mainEntry}}
-                                {{/each}}
-                            </div>
-                            <div class="{{if entry.right "col-md-4" "hide"}}">
-                                {{#each entry.right as |rightEntry|}}
-                                    <h3></h3>
-                                    <div class="well">
-                                        {{oxisection-main content=rightEntry}}
-                                    </div>
-                                {{/each}}
-                            </div>
+    {{/if}}
+    <div class="tab-content">
+        {{#each model.tabs as |entry|}}
+            <div class="tab-pane {{if entry.active "active"}}">
+                <div class="Xcontainer sections">
+                    <div class="row">
+                        <div class="{{if entry.right "col-md-8" "col-md-12"}}">
+                            {{#each entry.main as |mainEntry|}}
+                                {{oxisection-main content=mainEntry}}
+                            {{/each}}
+                        </div>
+                        <div class="{{if entry.right "col-md-4" "hide"}}">
+                            {{#each entry.right as |rightEntry|}}
+                                <div class="well">
+                                    {{oxisection-main content=rightEntry}}
+                                </div>
+                            {{/each}}
                         </div>
                     </div>
                 </div>
-            {{/each}}
-        </div>
-    {{else}}
-        <div class="Xcontainer sections">
-            {{#each content as |entry|}}
-                <div class="row">
-                    <div class="{{if entry.right "col-md-8" "col-md-12"}}">
-                        {{#each entry.main as |mainEntry|}}
-                            {{oxisection-main content=mainEntry}}
-                        {{/each}}
-                    </div>
-                    <div class="{{if entry.right "col-md-4" "hide"}}">
-                        {{#each entry.right as |rightEntry|}}
-                            <div class="well">
-                                {{oxisection-main content=rightEntry}}
-                            </div>
-                        {{/each}}
-                    </div>
-                </div>
-            {{/each}}
-        </div>
-    {{/if}}
+            </div>
+        {{/each}}
+    </div>
 </div>
 
 <div class="modal fade oxi-main-modal">
@@ -129,11 +107,11 @@
             <div class="modal-header">
                 <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">
-                    {{if modalContent.page.shortlabel modalContent.page.shortlabel modalContent.page.label}}
+                    {{if model.model.page.shortlabel model.modal.page.shortlabel model.modal.page.label}}
                 </h4>
             </div>
             <div class="modal-body">
-                {{#each modalContent.main as |mainEntry|}}
+                {{#each model.modal.main as |mainEntry|}}
                     {{oxisection-main content=mainEntry}}
                 {{/each}}
             </div>

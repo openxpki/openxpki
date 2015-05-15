@@ -1,65 +1,54 @@
 `import Em from "vendor/ember"`
 
-Controller = Em.ArrayController.extend
+Controller = Em.Controller.extend
     queryParams: [ "count", "limit", "startat" ]
     count: null
     startat: null
     limit: null
 
-    structure: null
-
-    showTabs: Em.computed "content.length", -> @get("content.length") > 1
-
-    navEntries: Em.computed.alias "structure.structure"
-
-    manageActive: Em.observer "page", ->
-        return if not @get "navEntries"
-        page = @get "page"
-        for entry in @get "navEntries"
-            Em.set entry, "active", false
-            for e in entry.entries || []
-                if e.key is page
-                    Em.set e, "active", true
+    manageActive: Em.observer "model.page", ->
+        page = @get "model.page"
+        for entry in @get "model.navEntries"
+            Em.set entry, "active", entry.key is page
+            if entry.entries
+                entry.entries.setEach "active", false
+                subEntry = entry.entries.findBy "key", page
+                if subEntry
+                    Em.set subEntry, "active",true
                     Em.set entry, "active", true
-                else
-                    Em.set e, "active", false
         null
 
-
-    user: Em.computed.alias "structure.user"
-
-    showLoader: ->  $('#ajaxLoadingModal').modal {backdrop:'static'}
-    hideLoader: ->  $('#ajaxLoadingModal').modal 'hide'
-
-    status: null
-    statusClass: Em.computed "status.level", "status.message", ->
-        level = @get "status.level"
-        message = @get "status.message"
+    statusClass: Em.computed "model.status.level", "model.status.message", ->
+        level = @get "model.status.level"
+        message = @get "model.status.message"
         return "hide" if not message
         return "alert-danger" if level is "error"
         return "alert-success" if level is "success"
         return "alert-warning" if level is "warn"
         return "alert-info"
 
-    activeTab: null
-    activateLast: Em.observer "content.length", ->
-        @set "activeTab", @get("content.length")-1
-    markActive: Em.observer "activeTab", ->
-        activeTab = @get "activeTab"
-        for entry, i in @get("content")
-            Em.set entry, "active", i is activeTab
+    setupBootstrap: Em.on "didInsertElement", ->
+        $(".modal.oxi-main-modal").on "hidden.bs.modal", =>
+            @set "model.modal"
 
-    autoshowModal: Em.observer "modalContent", ->
-        if @get "modalContent"
-            $(".modal.oxi-main-modal")
-                .modal("show")
-                .on "hidden.bs.modal", =>
-                    @set "modalContent"
-        null
+    autoshowModal: Em.observer "model.modal", ->
+        $ ".modal.oxi-main-modal"
+        .modal if @get "model.modal" then "show" else "hide"
+
+    showTabs: Em.computed.gt "model.tabs.length", 1
 
     actions:
-        activate: (entry) -> @transitionToRoute "openxpki", entry
-        activateTab: (entry) -> @set "activeTab", @get("content").indexOf entry
-        closeTab: (entry) -> @get("content").removeObject entry
+        activateTab: (entry) ->
+            tabs = @get "model.tabs"
+            tabs.setEach "active", false
+            Em.set entry, "active", true
+            false
+
+        closeTab: (entry) ->
+            tabs = @get "model.tabs"
+            tabs.removeObject entry
+            if not tabs.findBy "active", true
+                tabs.set "lastObject.active", true
+            false
 
 `export default Controller`
