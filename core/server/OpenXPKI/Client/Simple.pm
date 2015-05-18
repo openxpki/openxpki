@@ -41,18 +41,11 @@ has 'session' => (
     lazy => 1,   
 );
 
-has realm => (
-    is => 'rw',
-    isa => 'Str',    
-    default => '',
-    lazy => 1,        
-);
-
-has socketfile => (
-    is => 'rw',
-    isa => 'Str',    
-    default => '/var/openxpki/openxpki.socket',
-    lazy => 1,        
+has '_config' => (
+    required => 1,
+    is => 'ro',
+    isa => 'HashRef',
+    init_arg => 'config',
 );
 
 has client => (
@@ -77,8 +70,10 @@ has last_reply => (
     default => undef,           
 );
 
-sub _build_logger { 
-    Log::Log4perl->easy_init();
+sub _build_logger {
+    if(!Log::Log4perl->initialized()) { 
+        Log::Log4perl->easy_init($ERROR);
+    }
     return Log::Log4perl->get_logger();
 };
 
@@ -87,7 +82,7 @@ sub _build_client {
     my $self = shift;
     
     my $client = OpenXPKI::Client->new({
-        SOCKETFILE => $self->socketfile(),
+        SOCKETFILE => $self->_config()->{'socket'},
     });
  
     if (! defined $client) {
@@ -114,7 +109,7 @@ sub _build_client {
     
     my $status = $reply->{SERVICE_MSG};  
     if ($status eq 'GET_PKI_REALM') {
-        my $realm = $self->realm();
+        my $realm = $self->_config()->{'realm'};
         if (! $realm ) {
             $log->fatal("Found more than one realm but no realm is specified");
             $log->debug("Realms found:" . Dumper (keys %{$reply->{PARAMS}->{PKI_REALMS}}));
@@ -171,9 +166,7 @@ sub run_command {
     });
     
     $self->last_reply( $reply );
-    if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-        return $reply->{PARAMS};        
-    } else {                   
+    if ($reply->{SERVICE_MSG} ne 'COMMAND') {                          
         my $message;
         if ($reply->{'LIST'} && ref $reply->{'LIST'} eq 'ARRAY') {            
             # Workflow errors            
@@ -189,8 +182,35 @@ sub run_command {
         $self->logger()->debug(Dumper $reply);
         die "Error running command: $message";
     }
+    return $reply->{PARAMS};
 }
 
+=head2 handle_workflow
+
+Combined method to interact with workflows. Action depends on the parameters
+given. Return value is always the workflow info structure.
+
+=over
+
+=item ID
+
+Returns the workflow info for the existing workflow with given id.
+
+=item ACTIVITY
+
+Only in combination with ID, executes the given action and returns the 
+workflow info after processing was done. Will die if execute fails.
+
+=item TYPE
+
+Create a new workflow of given type, only effective if ID is not given.
+
+=item PARAMS
+
+Parameter hash to be passed to create/execute method as input values.
+=back 
+
+=cut
 sub handle_workflow {
     
     my $self = shift;
@@ -206,16 +226,14 @@ sub handle_workflow {
             $params->{PARAMS}->{$key} = $serializer->serialize($params->{PARAMS}->{$key});
         }
     }
-        
-    if ($params->{ID}) {
-        if (!$params->{ACTION}) {
-            die "No action specified";
-        }
-        $self->logger()->info(sprintf('execute workflow action %s on %01d', $params->{ACTION}, $params->{ID}));
+            
+    if ($params->{ACTIVITY} && $params->{ID}) {
+                          
+        $self->logger()->info(sprintf('execute workflow action %s on %01d', $params->{ACTIVITY}, $params->{ID}));
         $self->logger()->debug('workflow params:  '. Dumper $params->{PARAMS});
         $reply = $self->run_command('execute_workflow_activity',{
             ID => $params->{ID},                
-            ACTIVITY => $params->{ACTION},
+            ACTIVITY => $params->{ACTIVITY},
             PARAMS => $params->{PARAMS},              
         });
                 
@@ -225,7 +243,22 @@ sub handle_workflow {
         }
         
         $self->logger()->debug('new Workflow State: ' . $reply->{WORKFLOW}->{STATE});               
-               
+    
+    } elsif ($params->{ID}) {
+        
+        $self->logger()->debug(sprintf('request for workflow info on %01d', $params->{ID}));
+        
+        $reply = $self->run_command('get_workflow_info',{
+            ID => $params->{ID},                
+        });
+                
+        if (!$reply || !$reply->{WORKFLOW}) {
+            $self->logger()->fatal("No workflow object received after execute!");
+            die "No workflow object received!";
+        }
+        
+        $self->logger()->trace($reply->{WORKFLOW});
+                   
     } elsif ($params->{TYPE}) { 
         $reply = $self->run_command('create_workflow_instance',{
             WORKFLOW => $params->{TYPE},
