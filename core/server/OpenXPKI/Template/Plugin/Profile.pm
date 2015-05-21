@@ -65,7 +65,7 @@ Return the verbose name of the certificate style. Returns the style name
 if no label is set.
  
 =cut
-sub description {
+sub style {
     
     my $self = shift;
     my $profile = shift;

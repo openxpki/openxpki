@@ -145,7 +145,6 @@ sub init_result {
     $self->add_section({
         type => 'grid',
         className => 'certificate',
-        processing_type => 'all',
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
@@ -154,17 +153,18 @@ sub init_result {
                 target => 'modal'
             }], 
             columns => [
-                { sTitle => "Serial"},
-                { sTitle => "Subject" },
-                { sTitle => "Status", format => 'certstatus' },
-                { sTitle => "Notbefore", format => 'timestamp' },
-                { sTitle => "Notafter", format => 'timestamp' },
-                { sTitle => "Issuer"},
-                { sTitle => "Identifier"},
+                { sTitle => "Serial", sortkey => 'CERTIFICATE.CERTIFICATE_SERIAL' },
+                { sTitle => "Subject", sortkey => 'CERTIFICATE.SUBJECT' },
+                { sTitle => "Status", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
+                { sTitle => "Notbefore", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
+                { sTitle => "Notafter", format => 'timestamp', sortkey => 'CERTIFICATE.NOTAFTER' },
+                { sTitle => "Issuer", sortkey => 'CERTIFICATE.ISSUER_DN'},
+                { sTitle => "Identifier", sortkey => 'CERTIFICATE.IDENTIFIER'},
                 { sTitle => "_className"},
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
             buttons => [
                 { label => 'reload search form', page => 'certificate!search!query!' .$queryid },
@@ -193,10 +193,10 @@ sub init_pager {
     my $queryid = $self->param('id');
     
     # Load query from session
-    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
+    my $result = $self->_client->session()->param('query_cert_'.$queryid);
 
     # result expired or broken id
-    if (!$result || !$result->{count}) {        
+    if (!$result || !$result->{count}) {
         $self->set_status('Search result expired or empty!','error');
         return $self->init_search();               
     }
@@ -207,14 +207,23 @@ sub init_pager {
     my $limit = $self->param('limit') || 25;  
     if ($limit > 500) {  $limit = 500; }
     
-    $startat = int($startat % $limit) * $limit;
+    $startat = int($startat / $limit) * $limit;
 
     # Add limits
     my $query = $result->{query};
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
+    
+    if ($self->param('order')) {
+        $query->{ORDER} = uc($self->param('order'));
+    }
+    
+    if (defined  $self->param('reverse')) {
+        $query->{REVERSE} = $self->param('reverse');
+    }
 
     $self->logger()->debug( "persisted query: " . Dumper $result);
+    $self->logger()->debug( "executed query: " . Dumper $query);
 
     my $search_result = $self->send_command( 'search_cert', $query );
     
@@ -292,7 +301,6 @@ sub init_mine {
     $self->add_section({
         type => 'grid',
         className => 'certificate',
-        processing_type => 'all',
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
@@ -312,6 +320,7 @@ sub init_mine {
                 { sTitle => "identifier", bVisible => 0 },
             ],
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
             pager => $pager,
         }
     });
@@ -373,7 +382,7 @@ sub init_detail {
     # TODO - add ACL, only owner should be allowed to dl key
     if ($is_local_entity &&
         $self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-        $privkey = '<li><a href="#certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
+        $privkey = '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
     }
 
     push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => '<ul class="list-unstyled">'.
@@ -389,7 +398,7 @@ sub init_detail {
     };
 
     # TODO - add some magic to the API to determine if those actions are possible for the current user, etc.
-    $pattern = '<li><a href="#redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
+    $pattern = '<li><a href="#/openxpki/redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
     
     if ($is_local_entity) {   
         my @actions;
@@ -525,7 +534,6 @@ sub init_related {
     $self->add_section({
         type => 'grid',
         className => 'workflow',
-        processing_type => 'all',
         content => {
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL',
             actions => [{
@@ -542,7 +550,8 @@ sub init_related {
                 #{ sTitle => "procstate"},
                 #{ sTitle => "wake up"},
             ],
-            data => \@result
+            data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
         }
     });
     return $self;

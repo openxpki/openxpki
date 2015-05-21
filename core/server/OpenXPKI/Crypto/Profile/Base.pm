@@ -78,7 +78,7 @@ sub load_extension
 
     	# Test for default settings
     	$path =~ /(profile|crl)/;
-    	$path = $1.'default';
+    	$path = $1.'.default.extensions.'.$ext;
     	if ($config->exists($path)) {
     		##! 16: 'Using default value for ' . $ext
     	} else {

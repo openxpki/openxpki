@@ -930,6 +930,17 @@ sub __search_workflow_instances {
             START  => $arg_ref->{START},
         };
     }
+    
+    # Custom ordering
+    my $order = 'WORKFLOW.WORKFLOW_SERIAL'; 
+    if ($arg_ref->{ORDER}) {
+       $order = $arg_ref->{ORDER}; 
+    }
+    
+    my $reverse = 1;
+    if (defined $arg_ref->{REVERSE}) {
+       $reverse = $arg_ref->{REVERSE};
+    }
 
     ##! 16: 'dynamic: ' . Dumper $dynamic
     ##! 16: 'tables: ' . Dumper(\@tables)
@@ -944,10 +955,10 @@ sub __search_workflow_instances {
             'WORKFLOW.WORKFLOW_WAKEUP_AT'
         ],
         JOIN     => [ \@joins, ],
-        REVERSE  => 1,
+        REVERSE  => $reverse,
         DYNAMIC  => $dynamic,
         DISTINCT => 1,
-        ORDER => [ 'WORKFLOW.WORKFLOW_SERIAL' ],
+        ORDER => [ $order ],
         %limit,
     );
     return \%params;

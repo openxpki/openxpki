@@ -35,6 +35,8 @@ use Template::Plugin;
 
 use Data::Dumper;
 
+use DateTime;
+use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -136,5 +138,43 @@ sub issuer {
     return $hash ? $hash->{ISSUER_IDENTIFIER} : '';
 }
 
+
+=head2 notbefore(cert_identifier)
+
+Return the notbefore date in UTC format. 
+ 
+=cut
+sub notbefore {
+    
+    my $self = shift;
+    my $cert_id = shift;
+    
+    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
+    
+    return OpenXPKI::DateTime::convert_date({
+        DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTBEFORE} ),
+        OUTFORMAT => 'iso8601'
+    });    
+
+}
+
+=head2 notafter(cert_identifier)
+
+Return the notafter date in UTC format. 
+ 
+=cut
+sub notafter {
+    
+    my $self = shift;
+    my $cert_id = shift;
+    
+    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
+    
+    return OpenXPKI::DateTime::convert_date({
+        DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTAFTER} ),
+        OUTFORMAT => 'iso8601'
+    });    
+
+}
 
 1;

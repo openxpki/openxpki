@@ -61,6 +61,7 @@ tasklist:
       STATE:
         - ONHOLD
         - PENDING
+        - PENDING_POLICY_VIOLATION
     cols:
       - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
         field: WORKFLOW_SERIAL
@@ -75,6 +76,7 @@ tasklist:
 
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION
+    ifempty: hide
     query:
       TYPE:
         - enrollment
@@ -96,6 +98,7 @@ tasklist:
 
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION
+    ifempty: hide
     query:
       TYPE:
         - certificate_revocation_request_v2

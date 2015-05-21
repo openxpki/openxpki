@@ -114,7 +114,13 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_submit!wf_id!' . $wf_id,
+    'action' => 'workflow!select!wf_action!csr_enter_policy_violation_comment!wf_id!' . $wf_id
+});
+
+$result = $client->mock_request({
+    'action' => 'workflow!index',
+    'policy_comment' => 'Reason for Exception',
+    'wf_token' => undef
 });
 
 $result = $client->mock_request({

@@ -14,7 +14,7 @@ sub update {
     return if ($event ne "execute");
 
     my $desc_start = "NEW_STATE: ";
-    if ($autorun == 1) {
+    if ($autorun) {
         $desc_start = "NEW_STATE_AUTORUN: ";
     };
     $workflow->add_history(

@@ -3,10 +3,12 @@
 use Test::More 'no_plan';
 eval "use Test::Pod::Coverage 1.00";
 
+my @files;
+
 SKIP: {
     skip "Test::Pod::Coverage 1.00 required for testing POD coverage" if $@;
 
-    my @files = Test::Pod::Coverage::all_modules();
+    @files = Test::Pod::Coverage::all_modules();
     diag "Check the POD coverage in ".scalar @files." files\n" if $ENV{VERBOSE};
 }
 

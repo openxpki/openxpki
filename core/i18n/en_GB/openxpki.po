@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-04-13 15:44+0100\n"
+"PO-Revision-Date: 2015-04-29 18:46+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -512,9 +512,6 @@ msgstr "I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_DESC"
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL"
 msgstr "Basic SCEP client naming style"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
-msgstr "Use this profile for SCEP requests with \"signing on behalf\""
-
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 msgstr "Certificate for SCEP Enrollment Authentitcation"
 
@@ -565,6 +562,9 @@ msgstr "Revocation workflows awaiting approval."
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
 msgstr "Revocation Requests"
+
+msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
+msgstr "No data available"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token Status"
@@ -946,6 +946,12 @@ msgstr "Successful Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
+msgstr "Proceed with Policy Exception"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
+msgstr "Re-Evaluate Policy"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Workflow Context"
 
@@ -1312,6 +1318,17 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Your PKCS10 encoded request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
+msgstr ""
+"Please explain in brief why your request should be processed even if it "
+"violates the policy of this service. "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL"
+msgstr "Explanation for Policy Violation"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
+msgstr "e.g. DNS still in setup, Certificate Replacement, etc."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
 msgstr "The reason code indicates the reason why the certificate was revoked."
@@ -1872,6 +1889,14 @@ msgstr "Metadata was updated"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "This workflow is in a final state and can not be restarted."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
+msgstr ""
+"This request fails one or more policy checks but the owner requested "
+"approval. See comment and result items below for details."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
+msgstr "Policy Violation Pending"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -1942,6 +1967,9 @@ msgstr "Workflow information was updated"
 #~ msgid "I18N_OPENXPKI_UI_CRR_REASON"
 #~ msgstr "Revocation reason"
 
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
+#~ msgstr "Use this profile for SCEP requests with \"signing on behalf\""
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PERSIST_CRR_DESC"
 #~ msgstr "Persist CRR"
@@ -1949,6 +1977,14 @@ msgstr "Workflow information was updated"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_PERSIST_CRR_LABEL"
 #~ msgstr "Persist CRR"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
+#~ msgstr "CANCELED"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
+#~ msgstr "Action"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC"

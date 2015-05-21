@@ -44,7 +44,7 @@ if (!$config{global}{socket}) {
     $config{global}{socket} = '/var/openxpki/openxpki.socket';
 }
 if (!$config{global}{scripturl}) {
-    $config{global}{scripturl} = '/cgi-bin/webui.cgi';
+    $config{global}{scripturl} = '/cgi-bin/webui.fcgi';
 }
 
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);

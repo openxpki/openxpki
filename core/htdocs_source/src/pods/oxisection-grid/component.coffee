@@ -2,42 +2,25 @@
 `import BootstrapContextmenu from 'vendor/bootstrap-contextmenu'`
 
 Component = Em.Component.extend
-    isBulkable: Em.computed "content.content.buttons.@each.select", ->
-        @get("content.content.buttons")?.isAny "select"
+    visibleColumns: Em.computed "content.content.columns", ->
+        @get "content.content.columns"
+        .map (col, index) ->
+            col.index = index
+            col
+        .filter (col) -> col.sTitle[0] isnt "_" and col.bVisible isnt 0
 
-    allChecked: Em.computed "sortedData.@each.checked", ->
-        @get("sortedData").isEvery "checked", true
+    pager: Em.computed "content.content.pager", "visibleColumns", ->
+        pager = @get("content.content.pager") || {}
+        columns = @get "visibleColumns"
 
-    manageBulkButtons: Em.on "init", Em.observer "sortedData.@each.checked", ->
-        data = @get("sortedData").filterBy "checked"
-        buttons = @get "content.content.buttons"
-        return if not buttons
-        for button in buttons.filterBy "select"
-            Em.set button, "disabled", not data.length
+        pager.count ?= 0
+        pager.startat ?= 0
+        pager.limit ?= Number.MAX_VALUE
+        pager.reverse ?= 0
+        pager
 
-    pagesizes: Em.computed "content.content.pager.pagesizes", ->
-        pagesizes = @get "content.content.pager.pagesizes"
-        pager = @get "content.content.pager"
-        greater = pagesizes.filter (pagesize) -> pagesize >= pager.count
-        limit = Math.min.apply null, greater
-        pagesizes
-        .filter (pagesize) ->
-            pagesize <= limit
-        .map (pagesize) ->
-            num: pagesize
-            active: pagesize is pager.limit
-
-    limit: Em.computed ->
-        @get "content.content.pager.limit"
-
-    limitChange: Em.observer "limit", ->
-        startat = @get "content.content.pager.startat"
-        limit = @get "limit"
-        @send "changeStartat",
-            startat: Math.floor(startat/limit) * limit
-
-    pages: Em.computed ->
-        pager = @get "content.content.pager"
+    pages: Em.computed "pager.{startat,limit,order,reverse}", ->
+        pager = @get "pager"
         return [] if not pager
         return [] if pager.count <= pager.limit
 
@@ -50,6 +33,9 @@ Component = Em.Component.extend
                 num: i+1
                 active: i is current
                 startat: i * pager.limit
+                limit: pager.limit
+                order: pager.order
+                reverse: pager.reverse
 
         pagersize = pager.pagersize
         if o.length > pagersize
@@ -70,79 +56,113 @@ Component = Em.Component.extend
         o.prev =
             disabled: current is 0
             startat:  (current-1) * pager.limit
+            limit: pager.limit
+            order: pager.order
+            reverse: pager.reverse
         o.next =
             disabled: current is pages-1
             startat:  (current+1) * pager.limit
+            limit: pager.limit
+            order: pager.order
+            reverse: pager.reverse
         o
 
-    initializeContextmenu: Em.on "didInsertElement", ->
-        @$()?.find(".context")
-        .contextmenu
-            target: @$().find(".dropdown")
-            onItem: => @onItem.apply @, arguments
-        .off "contextmenu"
+    pagesizes: Em.computed "pager.{pagesizes,limit,startat,order,reverse}", ->
+        pager = @get "pager"
+        greater = pager.pagesizes.filter (pagesize) -> pagesize >= pager.count
+        limit = Math.min.apply null, greater
+        pager.pagesizes
+        .filter (pagesize) ->
+            pagesize <= limit
+        .map (pagesize) ->
+            active: pagesize is pager.limit
+            limit: pagesize
+            startat: (pager.startat/pagesize>>0) * pagesize
+            order: pager.order
+            reverse: pager.reverse
 
-    sortNum: -1
-    columns: Em.computed "content.content.columns", ->
-        columns = @get "content.content.columns"
-        res = []
-        for column, i in columns
-            continue if column.sTitle[0] is "_" or column.bVisible is 0
-            res.pushObject Em.Object.create
-                sTitle: column.sTitle
-                isSorted: i is @get "sortNum"
-                isInverted: false
+    columns: Em.computed "visibleColumns",
+    "pager.{limit,startat,order,reverse}", ->
+        columns = @get "visibleColumns"
+        pager = @get "pager"
+
+        for column in columns
+            order = if pager.pagerurl
+                column.sortkey
+            else
+                column.sTitle
+            reverse = if order is pager.order then not pager.reverse else false
+
+            index: column.index
+            sTitle: column.sTitle
+            format: column.format
+            isSorted: pager.order and pager.order is order
+            limit: pager.limit
+            order: order
+            reverse: +reverse
+            startat: pager.startat
 
     data: Em.computed "content.content.data", ->
         data = @get "content.content.data"
-        columns = @get "content.content.columns"
+        columns = @get "columns"
 
-        col = 0
-        res = []
+        titles = @get("content.content.columns").getEach "sTitle"
+        classIndex = titles.indexOf "_status"
+        if classIndex is -1
+            classIndex = titles.indexOf "_className"
+
         for row, y in data
-            res[y] =
-                originalData: row
-                data: []
-                checked: false
-                originalIndex: y
+            className: "gridrow-#{row[classIndex]}"
+            originalData: row
+            data: for column in columns
+                format: column.format
+                value: row[column.index]
+            checked: false
+            originalIndex: y
 
-            for column, x in row
-                break if x > columns.length-1
-                if columns[x].sTitle in [ "_status", "_className" ]
-                    Em.set res[y], "className", "gridrow-#{column}"
-                continue if columns[x].sTitle[0] is "_" or columns[x].bVisible is 0
-                col++
-                res[y].data[x] =
-                    format: columns[x].format
-                    value: column
-        res
-
-    hasAction: Em.computed "content.content.actions", ->
-        not not @get "content.content.actions"
-
-    sortedData: Em.computed "data", "sortNum", "columns.@each.isInverted", ->
+    sortedData: Em.computed "data", "columns", "pager.reverse", ->
+        pager = @get "pager"
         data = @get "data"
-        data = data.toArray()
-        sortNum = @get "sortNum"
 
-        if sortNum >= 0
-            re = /^[0-9.]+$/
-            data.sort (a,b) ->
-                a = a.data[sortNum].value
-                b = b.data[sortNum].value
+        if pager.pagerurl
+            data
+        else
+            data = data.toArray()
+            columns = @get "columns"
+            column = columns.findBy "isSorted"
 
-                if re.test(a) and re.test(b)
-                    a = parseFloat(a, 10)
-                    b = parseFloat(b, 10)
+            sortNum = columns.indexOf column
+            if sortNum >= 0
+                re = /^[0-9.]+$/
+                data.sort (a,b) ->
+                    a = a.data[sortNum].value
+                    b = b.data[sortNum].value
 
-                if a > b then 1 else -1
+                    if re.test(a) and re.test(b)
+                        a = parseFloat(a, 10)
+                        b = parseFloat(b, 10)
 
-            if @get("columns")[sortNum].get "isInverted"
-                data.reverseObjects()
+                    if a > b then 1 else -1
 
-        Em.run.scheduleOnce "afterRender", => @initializeContextmenu()
+                data.reverseObjects() if pager.reverse
 
-        data
+            Em.run.scheduleOnce "afterRender", => @initializeContextmenu()
+            data
+
+    allChecked: Em.computed "sortedData.@each.checked", ->
+        @get("sortedData").isEvery "checked", true
+
+    manageBulkButtons: Em.on "init", Em.observer "sortedData.@each.checked", ->
+        data = @get("sortedData").filterBy "checked"
+        buttons = @get "content.content.buttons"
+        return if not buttons
+        for button in buttons.filterBy "select"
+            Em.set button, "disabled", not data.length
+
+    isBulkable: Em.computed "content.content.buttons.@each.select", ->
+        @get("content.content.buttons")?.isAny "select"
+
+    hasAction: Em.computed.bool "content.content.actions"
 
     contextIndex: null
 
@@ -164,6 +184,13 @@ Component = Em.Component.extend
             data:
                 page:path
                 target:action.target
+
+    initializeContextmenu: Em.on "didInsertElement", ->
+        @$()?.find(".context")
+        .contextmenu
+            target: @$().find(".dropdown")
+            onItem: => @onItem.apply @, arguments
+        .off "contextmenu"
 
     actions:
         buttonClick: (button) ->
@@ -196,33 +223,27 @@ Component = Em.Component.extend
             else
                 @get("sortedData").setEach "checked", not @get "allChecked"
 
-        changePagesize: (pagesize) ->
-            startat = @get "content.content.pager.startat"
-            @container.lookup("route:openxpki").transitionTo
-                queryParams:
-                    limit: pagesize.num
-                    startat: startat
-
-        changeStartat: (page) ->
+        page: (page) ->
             return if page.disabled or page.active
-            limit = @get "limit"
-            @container.lookup("route:openxpki").transitionTo
-                queryParams:
-                    limit: limit
+            pager = @get "pager"
+            @container.lookup("route:openxpki").sendAjax
+                data:
+                    page: pager.pagerurl
+                    limit: page.limit
                     startat: page.startat
+                    order: page.order
+                    reverse: page.reverse
+            .then (res) =>
+                @set "content.content.data", res.data
+                Em.setProperties pager, page
 
-        sort: (key) ->
-            sortNum = @get "sortNum"
-            newSortNum = @get("columns").indexOf key
-            column = @get("columns")[sortNum]
-            if newSortNum isnt sortNum
-                column.set "isSorted", false if column
-                column = @get("columns")[newSortNum]
-                column.set "isInverted", false
-                column.set "isSorted", true
-                @set "sortNum", newSortNum
+        sort: (page) ->
+            pager = @get "pager"
+            if pager.pagerurl
+                @send "page", page if page.order
             else
-                column.toggleProperty "isInverted"
+                pager = @get "pager"
+                Em.setProperties pager, page
 
         rowClick: (index) ->
             @set "contextIndex", index

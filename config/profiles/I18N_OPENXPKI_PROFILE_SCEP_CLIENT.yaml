@@ -35,7 +35,7 @@ style:
 # Profile extensions - set 0/1 as needed
 extensions: 
     key_usage:
-        critical: 0
+        critical:          1
         digital_signature: 1
         non_repudiation:   0
         key_encipherment:  0
@@ -47,7 +47,7 @@ extensions:
         decipher_only:     0
 
     extended_key_usage:
-        critical: 0   
+        critical:         1 	   
         client_auth:      1
         server_auth:      0
         email_protection: 0

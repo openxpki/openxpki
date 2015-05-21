@@ -128,18 +128,20 @@ sub __load_secret
             $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
         }
         case "plain"   {
+            my $total_shares = $config->get("crypto.secret.$group.total_shares");
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
-                    TYPE => "Plain",
-                    PARTS => $config->get("crypto.secret.$group.total_shares")
+                    TYPE => "Plain", PARTS => $total_shares
                 });
              }
         case "split"  {
 
+            my $total_shares = $config->get("crypto.secret.$group.total_shares");
+            my $required_shares = $config->get("crypto.secret.$group.required_shares");
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
                     TYPE => "Split",
                     QUORUM => {
-                        K => $config->get("crypto.secret.$group.required_shares"),
-                        N => $config->get("crypto.secret.$group.total_shares"),
+                        K => $required_shares,
+                        N => $total_shares,
                     },
                     TOKEN  => $self->get_system_token({ TYPE => 'default'}),
             });

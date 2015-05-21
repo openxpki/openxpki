@@ -14,7 +14,7 @@
                     <th {{action "sort" column}}>
                         <span>{{column.sTitle}}</span>
                         {{#if column.isSorted}}
-                            {{#if column.isInverted}}
+                            {{#if pager.reverse}}
                                 <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt"></span>
                             {{else}}
                                 <span class="pull-right glyphicon glyphicon-sort-by-attributes"></span>
@@ -36,8 +36,15 @@
                         <td {{action "rowClick" index}}>{{oxivalue-format content=value}}</td>
                     {{/each}}
                 </tr>
-            {{/each}}
+           {{else}}
+                <tr><td colspan="{{columns.size}}">{{#if content.content.empty}}{{content.content.empty}}{{else}}&nbsp;{{/if}}</td></tr>
+           {{/each}}
         </tbody>
+        {{#if content.content.footer}}
+            <tfoot>
+                <tr><td colspan="{{columns.size}}">{{content.content.footer}}</td></tr>
+            </tfoot>
+        {{/if}}
     </table>
     <div class="dropdown">
         <ul class="dropdown-menu" role="menu">

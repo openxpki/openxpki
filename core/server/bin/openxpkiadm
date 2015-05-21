@@ -1493,7 +1493,6 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
    initdb                Initialize database
    key                   Manage keys
    certificate           Manage certificates
-   loadcfg               Import updated config from the filesystem
    hashpwd               Create the salted hash for a password
    alias                 Manage the token alias table
 
@@ -1805,24 +1804,6 @@ Example:
         --alias server-ca-1
 
 =back
-
-=head2 loadcfg
-
-Load the YaML config into the internal git repository.
-
-Command options:
-
-  --path DIR    Path to the YaML files
-  --dbpath DIR  Path to the internal repository
-  --reload      Signal the running server to immediately use the new config.
-
-Read the files found at the config directory given by I<path> (defaults to
-/etc/openxpki/config.d) and load them into the internal config repository at
-the directory given by I<dbpath> (default /etc/openxpki/config.git).
-If I<reload> is given and the openxpki daemon is running, the daemon is send
-a reload signal and will start using the new configuration for new requests.
-Note: Even if I<reload> is not passed, the config becomes active on the next
-server start! Some changes need a restart to become active, see the documentation!
 
 =head2 hashpwd
 

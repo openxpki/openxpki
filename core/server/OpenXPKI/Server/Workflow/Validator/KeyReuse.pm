@@ -47,7 +47,7 @@ sub validate {
 
 
     my $query = {
-        'PUBKEY' => { VALUE => $pubkey },
+        'PUBKEY' => { VALUE => $pubkey, OPERATOR => 'LIKE' }
     };
     
     if ($self->realm_only() ){
@@ -56,7 +56,7 @@ sub validate {
 
     my $cert_with_same_pubkey = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE',
-        DYNAMIC => $query        
+        DYNAMIC => $query,        
     );
     
     if (defined $cert_with_same_pubkey) {
@@ -105,12 +105,20 @@ database.
 
 =head2 Argument
 
+=over 
+
 =item pkcs10
 
 The PKCS10 encoded csr.
+
+=back 
  
 =head2 Parameter
+
+=over 
 
 =item realm_only
 
 Check key only against certificates in the same realm. 
+
+=back

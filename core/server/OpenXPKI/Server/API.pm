@@ -74,6 +74,7 @@ sub BUILD {
     # that we can not search for unicode characters in certificate subjects,
     # for example ...
     my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*\+\=\,\:\ ]* \z }xms;
+    my $re_sql_field_name    = qr{ \A [A-Z0-9_\.]+ \z }xms;
     my $re_approval_msg_type = qr{ \A (CSR|CRR) \z }xms;
     my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
     my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
@@ -682,7 +683,17 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
-                }
+                },
+                ORDER => {
+                    type  => SCALAR,
+                    regex => $re_sql_field_name,
+                    optional => 1,
+                },
+                REVERSE => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
+                    optional => 1,
+                },
             },
         },
         'control_watchdog' => {
@@ -1324,6 +1335,16 @@ sub BUILD {
                 START => {
                     type  => SCALAR,
                     regex => $re_integer_string,
+                    optional => 1,
+                },
+                ORDER => {
+                    type  => SCALAR,
+                    regex => $re_sql_field_name,
+                    optional => 1,
+                },
+                REVERSE => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
                     optional => 1,
                 },
             },

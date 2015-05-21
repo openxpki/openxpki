@@ -58,7 +58,6 @@ Now, create the database user::
 
 It is now time to init the server::
 
-    openxpkiadm loadcfg
     openxpkiadm initdb
 
 Setup base certificates

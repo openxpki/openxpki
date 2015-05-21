@@ -713,11 +713,20 @@ sub __search_cert {
     }
 
     # only search in current realm
-    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} =
-      { VALUE => CTX('session')->get_pki_realm() };
+    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} = { VALUE => CTX('session')->get_pki_realm() };
+    
+    
+    # Custom ordering    
+    $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL']; 
+    if ($args->{ORDER}) {
+       $params{ORDER} = [ $args->{ORDER} ]; 
+    }
+        
     $params{REVERSE} = 1;
-    $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL'];
-
+    if (defined $args->{REVERSE}) {
+       $params{REVERSE} = $args->{REVERSE};
+    }
+    
     # PKI_REALM overwrites the session realm if it is present
     foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS PKI_REALM SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
         if ( $args->{$key} ) {
@@ -740,12 +749,12 @@ sub __search_cert {
     # the validity interval, therefore the operators are fixed
     if ( defined $args->{NOTBEFORE} ) {
         $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
-              { VALUE => $args->{NOTBEFORE}, OPERATOR => "GREATER_THAN" };
+              { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
     }
 
     if ( defined $args->{NOTAFTER} ) {
         $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
-              { VALUE => $args->{NOTAFTER}, OPERATOR => "LESS_THAN" };
+              { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
     }
 
 

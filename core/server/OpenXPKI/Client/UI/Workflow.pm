@@ -15,10 +15,10 @@ has __default_grid_head => (
     lazy => 1,
 
     default => sub { return [
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', sortkey => 'WORKFLOW.WORKFLOW_SERIAL' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', sortkey => 'WORKFLOW.WORKFLOW_LAST_UPDATE' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', sortkey => 'WORKFLOW.WORKFLOW_TYPE'},
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', sortkey => 'WORKFLOW.WORKFLOW_STATE' },
         { sTitle => 'serial', bVisible => 0 },
         { sTitle => "_className"},
     ]; }
@@ -185,6 +185,7 @@ Render form for the workflow search.
 #TODO: Preset parameters
 
 =cut
+
 sub init_search {
 
     my $self = shift;
@@ -357,8 +358,7 @@ sub init_result {
 
     $self->add_section({
         type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
+        className => 'workflow',        
         content => {
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
@@ -368,8 +368,8 @@ sub init_result {
             }],
             columns => $self->__default_grid_head(),
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
-
             buttons => [
                 { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
                 { label => 'new search', page => 'workflow!search'},
@@ -402,12 +402,10 @@ sub init_pager {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-
         $self->set_status('Search result expired or empty!','error');
         return $self->init_search();
-
     }
-
+   
     my $startat = $self->param('startat');
 
     my $limit = $self->param('limit') || 25;
@@ -415,14 +413,23 @@ sub init_pager {
     if ($limit > 500) {  $limit = 500; }
 
     # align startat to limit window
-    $startat = int($startat % $limit) * $limit;
+    $startat = int($startat / $limit) * $limit;
 
     # Add limits
     my $query = $result->{query};
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
+    
+    if ($self->param('order')) {
+        $query->{ORDER} = uc($self->param('order'));
+    }
+    
+    if (defined  $self->param('reverse')) {
+        $query->{REVERSE} = $self->param('reverse');
+    }
 
     $self->logger()->debug( "persisted query: " . Dumper $result);
+    $self->logger()->debug( "executed query: " . Dumper $query);    
 
     my $search_result = $self->send_command( 'search_workflow_instances', $query );
 
@@ -478,7 +485,6 @@ sub init_history {
     $self->add_section({
         type => 'grid',
         className => 'workflow',
-        processing_type => 'all',
         content => {
             columns => [
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_EXEC_TIME_LABEL' }, #, format => 'datetime'},
@@ -574,8 +580,7 @@ sub init_mine {
 
     $self->add_section({
         type => 'grid',
-        className => 'workflow',
-        processing_type => 'all',
+        className => 'workflow',        
         content => {
             actions => [{
                 path => 'workflow!load!wf_id!{serial}!view!result',
@@ -585,6 +590,7 @@ sub init_mine {
             }],
             columns => $self->__default_grid_head(),
             data => \@result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
 
         }
@@ -617,6 +623,7 @@ sub init_task {
 
     $self->logger()->debug( "got tasklist: " . Dumper $tasklist);
 
+    TASKLIST:
     foreach my $item (@$tasklist) {
 
         my $query = $item->{query};
@@ -676,32 +683,44 @@ sub init_task {
 
         my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => 25), %$query } );
 
-        my @data = $self->__render_result_list( $search_result, \@column );
+        # empty message
+        my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';             
 
-        $self->logger()->trace( "dumper result: " . Dumper @data);
-
-        # pager only if no user supplied LIMIT and more results than our cut off
         my $pager;
-
-        if (!$query->{LIMIT} && scalar @$search_result == 25) {
-            my $result_count= $self->send_command( 'search_workflow_instances_count', $query );
-
-            my $queryid = $self->__generate_uid();
-            my $_query = {
-                'id' => $queryid,
-                'type' => 'workflow',
-                'count' => $result_count,
-                'query' => $query,
-                'column' => \@column
-            };
-            $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-            #$pager = $self->__render_pager( $_query )
+        my @data;
+        # No results
+        if (!@$search_result) {
+            
+            if ($empty eq 'hide') {
+                next TASKLIST;
+            }                            
+            
+        } else {
+    
+            @data = $self->__render_result_list( $search_result, \@column );
+            
+            $self->logger()->trace( "dumper result: " . Dumper @data);
+        
+            if (!$query->{LIMIT} && scalar @$search_result == 25) {
+                my $result_count= $self->send_command( 'search_workflow_instances_count', $query );
+    
+                my $queryid = $self->__generate_uid();
+                my $_query = {
+                    'id' => $queryid,
+                    'type' => 'workflow',
+                    'count' => $result_count,
+                    'query' => $query,
+                    'column' => \@column
+                };
+                $self->_client->session()->param('query_wfl_'.$queryid, $_query );
+                $pager = $self->__render_pager( $_query )
+            }
+            
         }
-
+                    
         $self->add_section({
             type => 'grid',
             className => 'workflow',
-            processing_type => 'all',
             content => {
                 label => $item->{label},
                 description => $item->{description},
@@ -711,15 +730,17 @@ sub init_task {
                 }],
                 columns => \@header,
                 data => \@data,
-                pager => $pager
+                pager => $pager,
+                empty => $empty,
 
             }
         });
+ 
     }
+    
+    return $self;
 
 }
-
-=cut
 
 =head2 action_index
 
@@ -851,7 +872,7 @@ sub action_index {
             return $self;
         }
         $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED','success');
+        #$self->set_status('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED','success');
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
@@ -1137,7 +1158,6 @@ sub action_bulk {
         $self->add_section({
             type => 'grid',
             className => 'workflow',
-            processing_type => 'all',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC',
@@ -1149,6 +1169,7 @@ sub action_bulk {
                 }],
                 columns => \@fault_head,
                 data => \@result_failed,
+                empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             }
         });
     } else {
@@ -1161,8 +1182,7 @@ sub action_bulk {
         
         $self->add_section({
             type => 'grid',
-            className => 'workflow',
-            processing_type => 'all',
+            className => 'workflow',            
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC',
@@ -1174,12 +1194,12 @@ sub action_bulk {
                 }],
                 columns => $self->__default_grid_head,
                 data => \@result_done,
+                empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             }
         });
     }
 
 }
-=cut
 
 =head1 internal methods
 
@@ -1225,6 +1245,7 @@ always be called regardless of the internal workflow state, a handler on the
 action level gets called only if the action is selected by above means.
 
 =cut
+
 sub __render_from_workflow {
 
     my $self = shift;
@@ -1433,195 +1454,10 @@ sub __render_from_workflow {
             description =>  $wf_info->{STATE}->{description},
         });
 
-        my @fields;
-        my $context = $wf_info->{WORKFLOW}->{CONTEXT};
-
-        # in case we have output format rules, we just show the defined fields
-        # can be overriden with view = context
-        my $output = $wf_info->{STATE}->{output};
-        my @fields_to_render;
-        if ($view eq 'context') {
-            foreach my $field (sort keys %{$context}) {
-
-                push @fields_to_render, { name => $field };
-            }
-        } elsif ($output) {
-            @fields_to_render = @{$wf_info->{STATE}->{output}};
-            $self->logger()->debug('Render output rules: ' . Dumper  \@fields_to_render  );
-
-        } else {
-            foreach my $field (sort keys %{$context}) {
-
-                next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
-                push @fields_to_render, { name => $field };
-            }
-            $self->logger()->debug('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
-
-        }
-
-        foreach my $field (@fields_to_render) {
-
-            my $key = $field->{name};
-            my $item = {
-                value => ($context->{$key} || ''),
-                type => '',
-                format =>  $field->{format} || ''
-            };
-
-            # Always suppress key material
-            if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
-                $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
-
-            }
-
-            # Label, Description, Tooltip
-            foreach my $prop (qw(label description tooltip)) {
-                if ($field->{$prop}) {
-                    $item->{$prop} = $field->{$prop};
-                }
-            }
-
-            if (!$item->{label}) {
-                $item->{label} = $key;
-            }
-
-            # assign autoformat based on some assumptions if no format is set
-            if (!$item->{format}) {
-
-                # create a link on cert_identifier fields
-                if ( $key =~ m{ cert_identifier \z }x ||
-                    $item->{type} eq 'cert_identifier') {
-                    $item->{format} = 'cert_identifier';
-                }
-
-                # Code format any PEM blocks
-                if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
-                    $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
-                    $item->{format} = 'code';
-                }
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                    if (ref $item->{value} eq 'HASH') {
-                        $item->{format} = 'deflist';
-                    } elsif (ref $item->{value} eq 'ARRAY') {
-                        $item->{format} = 'ullist';
-                    }
-                }
-            }
-
-            # convert format cert_identifier into a link
-
-            if ($item->{format} eq "cert_identifier") {
-                $item->{format} = 'link';
-
-                # check for additional template
-                my $label = $item->{value};
-
-                my $cert_identifier = $item->{value};
-
-                $item->{value}  = {
-                    label => $label,
-                    page => 'certificate!detail!identifier!'.$cert_identifier,
-                    target => 'modal'
-
-                };
-
-                $self->logger()->debug( 'item ' . Dumper $item);
-
-            # format for cert_info block
-            } elsif ($item->{format} eq "cert_info") {
-                $item->{format} = 'deflist';
-
-                # its likely that we need to deserialize
-                my $raw = $item->{value};
-                if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
-                    $raw = $self->serializer()->deserialize( $raw );
-                }
-
-                # this requires that we find the profile and subject in the context
-                my @val;
-                my $cert_profile = $context->{cert_profile};
-                my $cert_subject_style = $context->{cert_subject_style};
-                if ($cert_profile && $cert_subject_style) {
-
-                    my $fields = $self->send_command( 'get_field_definition',
-                        { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
-                    $self->logger()->debug( 'Profile fields' . Dumper $fields );
-
-                    foreach my $field (@$fields) {
-                        # this still uses "old" syntax - adjust after API refactoring
-                        my $key = $field->{ID}; # Name of the context key
-                        if ($raw->{$key}) {
-                            push @val, { label => $field->{LABEL}, value => $raw->{$key}, key => $key };
-                        }
-                    }
-                } else {
-                    # if nothing is found, transform raw values to a deflist
-                    @val = map { { key => $_, label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
-
-                }
-
-                $item->{value} = \@val;
-
-            } elsif ($item->{format} eq "ullist") {
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-
-            } elsif ($item->{format} eq "deflist") {
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-                # Sort by label
-                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
-                $item->{value} = \@val;
-
-            }
-
-            if ($field->{template}) {
-
-                my $param = { value => $item->{value} };
-
-                $self->logger()->debug('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param);
-
-                # Rendering target depends on value format
-                # deflist iterates over each key/label pair and sets the return value into the label
-                if ($item->{format} eq "deflist") {
-
-                    foreach (@{$item->{value}}){
-                        $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
-                    }
-
-                # bullet list, put the full list to tt and split at the | as sep (as used in profile)
-                } elsif ($item->{format} eq "ullist") {
-
-                    my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                    
-                    $self->logger()->debug('Return from template ' . $out );                   
-                    my @val = split /\s*\|\s*/, $out;
-                    $self->logger()->debug('Split ' . Dumper \@val);
-                    $item->{value} = \@val;
-
-                } elsif (ref $item->{value} eq '') {
-                    $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
-
-                } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
-                    $item->{value}->{label} = $self->send_command( 'render_template', { TEMPLATE => $field->{template},
-                        PARAMS => { value => $item->{value}->{label} }} );
-                } else {
-                    $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
-
-                }
-
-            }
-
-            # do not push items that are empty
-            if (ref $item->{value} || $item->{value} ne '') {
-                push @fields, $item;
-            }
-        }
+        my $fields = $self->__render_fields( $wf_info, $view );
+        
+        $self->logger()->debug('Field data ' . Dumper $fields);
+        
         
         # Add action buttons only if we are not in result view
         my $buttons;
@@ -1634,7 +1470,7 @@ sub __render_from_workflow {
             content => {
                 label => '',
                 description => '',
-                data => \@fields,
+                data => $fields,
                 buttons => $buttons
         }});
 
@@ -1918,15 +1754,10 @@ sub __render_result_list {
 
             if ($col->{template}) {
                 my $out;
-
                 my $ttp = {
-
                     context => $context,
-
                     attribute => $attrib,
-
                     workflow => $wf_info->{WORKFLOW}
-
                 };
 
                 push @line, $oxtt->render( $col->{template}, $ttp);
@@ -1975,6 +1806,212 @@ sub __render_result_list {
 
     return @result;
 
+}
+
+sub __render_fields {
+    
+    my $self = shift;
+    my $wf_info = shift;
+    my $view = shift;
+    
+        my @fields;
+        my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+
+        # in case we have output format rules, we just show the defined fields
+        # can be overriden with view = context
+        my $output = $wf_info->{STATE}->{output};
+        my @fields_to_render;
+        if ($view eq 'context') {
+            foreach my $field (sort keys %{$context}) {
+
+                push @fields_to_render, { name => $field };
+            }
+        } elsif ($output) {
+            @fields_to_render = @{$wf_info->{STATE}->{output}};
+            $self->logger()->debug('Render output rules: ' . Dumper  \@fields_to_render  );
+
+        } else {
+            foreach my $field (sort keys %{$context}) {
+
+                next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
+                push @fields_to_render, { name => $field };
+            }
+            $self->logger()->debug('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
+
+        }
+
+        foreach my $field (@fields_to_render) {
+
+            my $key = $field->{name};
+            my $item = {
+                value => ($context->{$key} || ''),
+                type => '',
+                format =>  $field->{format} || ''
+            };
+
+            # Always suppress key material
+            if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
+                $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
+
+            }
+
+            # Label, Description, Tooltip
+            foreach my $prop (qw(label description tooltip)) {
+                if ($field->{$prop}) {
+                    $item->{$prop} = $field->{$prop};
+                }
+            }
+
+            if (!$item->{label}) {
+                $item->{label} = $key;
+            }
+
+            # assign autoformat based on some assumptions if no format is set
+            if (!$item->{format}) {
+
+                # create a link on cert_identifier fields
+                if ( $key =~ m{ cert_identifier \z }x ||
+                    $item->{type} eq 'cert_identifier') {
+                    $item->{format} = 'cert_identifier';
+                }
+
+                # Code format any PEM blocks
+                if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
+                    $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
+                    $item->{format} = 'code';
+                }
+
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                    if (ref $item->{value} eq 'HASH') {
+                        $item->{format} = 'deflist';
+                    } elsif (ref $item->{value} eq 'ARRAY') {
+                        $item->{format} = 'ullist';
+                    }
+                }
+            }
+
+            # convert format cert_identifier into a link
+
+            if ($item->{format} eq "cert_identifier") {
+                $item->{format} = 'link';
+
+                # check for additional template
+                my $label = $item->{value};
+
+                my $cert_identifier = $item->{value};
+
+                $item->{value}  = {
+                    label => $label,
+                    page => 'certificate!detail!identifier!'.$cert_identifier,
+                    target => 'modal'
+
+                };
+
+                $self->logger()->debug( 'item ' . Dumper $item);
+
+            # format for cert_info block
+            } elsif ($item->{format} eq "cert_info") {
+                $item->{format} = 'deflist';
+
+                # its likely that we need to deserialize
+                my $raw = $item->{value};
+                if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
+                    $raw = $self->serializer()->deserialize( $raw );
+                }
+
+                # this requires that we find the profile and subject in the context
+                my @val;
+                my $cert_profile = $context->{cert_profile};
+                my $cert_subject_style = $context->{cert_subject_style};
+                if ($cert_profile && $cert_subject_style) {
+
+                    my $fields = $self->send_command( 'get_field_definition',
+                        { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
+                    $self->logger()->debug( 'Profile fields' . Dumper $fields );
+
+                    foreach my $field (@$fields) {
+                        # this still uses "old" syntax - adjust after API refactoring
+                        my $key = $field->{ID}; # Name of the context key
+                        if ($raw->{$key}) {
+                            push @val, { label => $field->{LABEL}, value => $raw->{$key}, key => $key };
+                        }
+                    }
+                } else {
+                    # if nothing is found, transform raw values to a deflist
+                    @val = map { { key => $_, label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+
+                }
+
+                $item->{value} = \@val;
+
+            } elsif ($item->{format} eq "ullist") {
+
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                }
+
+            } elsif ($item->{format} eq "deflist") {
+
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                }
+                # Sort by label
+                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                $item->{value} = \@val;
+
+            }
+
+            if ($field->{template}) {
+
+                my $param = { value => $item->{value} };
+
+                $self->logger()->debug('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param);
+
+                # Rendering target depends on value format
+                # deflist iterates over each key/label pair and sets the return value into the label
+                if ($item->{format} eq "deflist") {
+
+                    foreach (@{$item->{value}}){
+                        $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
+                    }
+
+                # bullet list, put the full list to tt and split at the | as sep (as used in profile)
+                } elsif ($item->{format} eq "ullist") {
+
+                    my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                    
+                    $self->logger()->debug('Return from template ' . $out );
+                    if ($out) {                   
+                        my @val = split /\s*\|\s*/, $out;
+                        $self->logger()->debug('Split ' . Dumper \@val);
+                        $item->{value} = \@val;
+                    } else {
+                        $item->{value} = undef; # prevent pusing emtpy lists
+                    }
+
+                } elsif (ref $item->{value} eq '') {
+                    $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
+
+                } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
+                    $item->{value}->{label} = $self->send_command( 'render_template', { TEMPLATE => $field->{template},
+                        PARAMS => { value => $item->{value}->{label} }} );
+                } else {
+                    $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
+
+                }
+
+            }
+
+            # do not push items that are empty
+            if ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
+                (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
+                (ref $item->{value} eq '' && $item->{value} ne '')) {
+                push @fields, $item;
+            }
+        }
+        
+        return \@fields;
+    
 }
 
 =head1 example workflow config

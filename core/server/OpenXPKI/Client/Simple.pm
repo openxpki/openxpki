@@ -32,6 +32,15 @@ has auth => (
     default  => sub { return { stack => 'Anonymous', user => undef, pass => undef } }        
 );
 
+# ref to the cgi frontend session
+# if undef we behave as "one shot" client
+has 'session' => (
+    is => 'rw',
+    isa => 'Object|Undef',
+    default => undef,
+    lazy => 1,   
+);
+
 has realm => (
     is => 'rw',
     isa => 'Str',    
@@ -47,13 +56,14 @@ has socketfile => (
 );
 
 has client => (
-    is => 'ro',
-    isa => 'Object',
+    is => 'rw',
+    isa => 'Object|Undef',
     builder  => '_build_client',
-    lazy => 1,        
+    lazy => 1,
+    clearer => '_clear_client',
 );
 
-has log => (
+has logger => (
     is => 'rw',
     isa => 'Object',
     builder  => '_build_logger',
@@ -84,16 +94,22 @@ sub _build_client {
         die "Could not instantiate OpenXPKI client. Stopped";
     }
     
-    if (! $client->init_session()) {
-        die "Could not initiate OpenXPKI server session. Stopped";
-    }
-       
-    # run login
-           
-    my $session_id = $client->get_session_id();
-    my $log = $self->log();
-    $log->debug("Session id: $session_id");
+    my $log = $self->logger();
     
+    # if we have a frontend session object, we also create a backend session
+    if ($self->session()) {
+        $self->__reinit_session( $client );
+
+    # Init a fresh backend session        
+    } else {
+                
+        if (! $client->init_session()) {        
+            die "Could not initiate OpenXPKI server session. Stopped";
+        }
+        $log->debug("Started volatile session with id: " . $client->get_session_id() );    
+    }
+        
+    # check if we need a login and iterate the necessary steps
     my $reply = $client->send_receive_service_msg('PING');
     
     my $status = $reply->{SERVICE_MSG};  
@@ -121,8 +137,9 @@ sub _build_client {
             { AUTHENTICATION_STACK => $auth->{stack} });
         
     }
-    
-    if ($reply->{SERVICE_MSG} eq 'GET_PASSWD_LOGIN') {
+        
+    if ($reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/) {
+        my $login_type = $1;
         my $auth = $self->auth();
         if (! $auth || !$auth->{stack}) {
             $log->fatal("Login/Password required but not configured");            
@@ -147,7 +164,7 @@ sub run_command {
     my $self = shift;
     my $command = shift;
     my $params = shift || {};
- 
+  
     my $reply = $self->client()->send_receive_service_msg('COMMAND', {
         COMMAND => $command,
         PARAMS => $params
@@ -168,7 +185,8 @@ sub run_command {
         } else {
             $message = 'unknown error';
         }
-        $self->log()->error($message);
+        $self->logger()->error($message);
+        $self->logger()->debug(Dumper $reply);
         die "Error running command: $message";
     }
 }
@@ -193,40 +211,101 @@ sub handle_workflow {
         if (!$params->{ACTION}) {
             die "No action specified";
         }
-        $self->log()->info(sprintf('execute workflow action %s on %01d', $params->{ACTION}, $params->{ID}));
-        $self->log()->debug('workflow params:  '. Dumper $params->{PARAMS});
+        $self->logger()->info(sprintf('execute workflow action %s on %01d', $params->{ACTION}, $params->{ID}));
+        $self->logger()->debug('workflow params:  '. Dumper $params->{PARAMS});
         $reply = $self->run_command('execute_workflow_activity',{
             ID => $params->{ID},                
             ACTIVITY => $params->{ACTION},
             PARAMS => $params->{PARAMS},              
         });
                 
-        if ($reply && $reply->{SERVICE_MSG} eq 'COMMAND') {
-            $self->log()->debug('new Workflow State: ' . $reply->{PARAMS}->{WORKFLOW}->{STATE});
-        }        
+        if (!$reply || !$reply->{WORKFLOW}) {
+            $self->logger()->fatal("No workflow object received after execute!");
+            die "No workflow object received!";
+        }
+        
+        $self->logger()->debug('new Workflow State: ' . $reply->{WORKFLOW}->{STATE});               
                
     } elsif ($params->{TYPE}) { 
         $reply = $self->run_command('create_workflow_instance',{
             WORKFLOW => $params->{TYPE},
             PARAMS => $params->{PARAMS},           
         });
-        if ($reply) {
-            $self->log()->debug(sprintf('Workflow created (ID: %d), State: %s', 
-                $reply->{WORKFLOW}->{ID}, $reply->{WORKFLOW}->{STATE}));
+        
+        if (!$reply || !$reply->{WORKFLOW}) {
+            $self->logger()->fatal("No workflow object received after create!");
+            die "No workflow object received!";
         }
+        
+        $self->logger()->debug(sprintf('Workflow created (ID: %d), State: %s', 
+            $reply->{WORKFLOW}->{ID}, $reply->{WORKFLOW}->{STATE}));
+        
     } else {
-        $self->log()->fatal("Neither workflow id nor type given");
+        $self->logger()->fatal("Neither workflow id nor type given");
         die "Neither workflow id nor type given";
     }
-                      
-    return $reply;               
+
+    $self->logger()->debug('Result of workflow action: ' . Dumper $reply);
+    
+    return $reply->{WORKFLOW};
 }
 
 
 sub disconnect {
+    
     my $self = shift;
-    $self->execute('LOGOUT');
-    return;    
+
+    $self->logger()->info('Disconnect client');    
+    my $reply = $self->client->send_receive_service_msg('LOGOUT');
+    
+    $self->_clear_client();
+    return $self;    
+}
+
+sub __reinit_session {
+    
+    my $self = shift;
+    my $client = shift;
+    
+    my $session = $self->session();
+    if (!$session) {
+        die "Can not reinit backend session without frontend session!";
+    }
+    
+    my $old_session =  $session->param('backend_session_id') || undef;
+    $self->logger()->info('old backend session ' . $old_session) if ($old_session);
+
+    # Fetch errors on session init
+    eval {
+        $client->init_session({ SESSION_ID => $old_session });
+    };
+    if ($EVAL_ERROR) {
+        my $exc = OpenXPKI::Exception->caught();
+        if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
+            # The session has gone - start a new one - might happen if the client was idle too long
+            $client->init_session({ SESSION_ID => undef });
+            $self->logger()->info('Backend session was gone - start a new one');                
+        } else {
+            $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
+            $self->logger()->trace($EVAL_ERROR);
+            die "Backend communication problem";
+        }
+    }
+
+    my $client_session = $client->get_session_id();
+    # logging stuff only
+    if ($old_session && $client_session eq $old_session) {
+        $self->logger()->info('Resume backend session with id ' . $client_session);
+    } elsif ($old_session) {
+        $self->logger()->info('Re-Init backend session ' . $client_session . ' / ' . $old_session );
+    } else {
+        $self->logger()->info('New backend session with id ' . $client_session);
+    }
+    $session->param('backend_session_id', $client_session);
+    $self->logger()->trace( Dumper $session );
+    
+    return $self;
+    
 }
 
 1;

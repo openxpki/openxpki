@@ -51,7 +51,7 @@ Controller = Em.ArrayController.extend
 
     autoshowModal: Em.observer "modalContent", ->
         if @get "modalContent"
-            $(".modal")
+            $(".modal.oxi-main-modal")
                 .modal("show")
                 .on "hidden.bs.modal", =>
                     @set "modalContent"

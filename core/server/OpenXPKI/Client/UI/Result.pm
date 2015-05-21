@@ -570,7 +570,7 @@ sub __generate_uid {
     return $queryid; 
 }
 
-=head __render_pager
+=head2 __render_pager
 
 Return a pager definition hash with default settings, requires the query 
 result hash as argument. Defaults can be overriden passing a hash as second
@@ -604,7 +604,8 @@ sub __render_pager {
         count => $result->{count} * 1, 
         pagesizes => $args->{pagesizes}, 
         pagersize => $args->{pagersize},
-        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id} 
+        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id}
+        # TODO order / reverse 
     }
 }
 
