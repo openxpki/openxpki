@@ -20,8 +20,8 @@ afterwards. Use the "bungle" compiler, which is available using the Node.js
 package manager npm and run "bungle build" inside this directory. This will
 copy all requried files into the dist/ directory.
 
-Warning: bungle 0.1.0 currently has a bug which shreds binary files. Please
-copy the fonts and images manually over to the dist after rebuild. 
+Note: Bungle uses inotify, if you get an exception like "Error: watch ENOSPC"
+you need to raise fs.inotify.max_user_watches.
 
 Uglification
 ############
