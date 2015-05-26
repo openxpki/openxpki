@@ -762,21 +762,21 @@ action:
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC
         param: 
-            ds_namespace: certificate.privatekey
+            dp_namespace: certificate.privatekey
+            _map_dp_key: $token_id
+            key_alg: RSA
+            key_size: 1024
+            enc_alg: aes256
 
     create_pkcs12: 
         class: OpenXPKI::Server::Workflow::Activity::SmartCard::CreatePKCS12
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_PKCS12_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_PKCS12_DESC
-        input: 
-          - _keypassword
-          - _password
-          - _private_key
-          - certificate
         param: 
-            p12passwordcontextkey: _password
-            passwordcontextkey: _keypassword
-            pkcs12base64contextkey: _pkcs12base64
+            _map_passin: $_keypassword
+            _map_passout: $_password
+            _map_certificate: $certificate
+            _map_privatekey: $_private_key
 
     create_pkcs12_password: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword
@@ -1297,9 +1297,7 @@ condition:
     is_escrow_csr: 
         class: OpenXPKI::Server::Workflow::Condition::Connector::IsValue
         param: 
-            prefix: smartcard.policy.certs.type
-            context_key: csr_cert_type
-            property: escrow_key
+            _map_config_path: smartcard.policy.certs.type.[% context.csr_cert_type %].escrow_key
             value: 1
 
     policy_input_required: 

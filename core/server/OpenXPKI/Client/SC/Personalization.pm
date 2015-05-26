@@ -454,7 +454,7 @@ sub handle_server_personalization {
 
             $plugin_action = 'install_p12';
 
-            if ( ! $context->{_pkcs12base64} ) {
+            if ( ! $context->{_pkcs12} ) {
 
                 eval {    
                     $wf_info = $self->_client->handle_workflow( {
@@ -470,7 +470,7 @@ sub handle_server_personalization {
                 }
             }
             my $p12_pin = $wf_info->{CONTEXT}->{_password};
-            my $p12 = $wf_info->{CONTEXT}->{_pkcs12base64};
+            my $p12 = $wf_info->{CONTEXT}->{_pkcs12};
         
             $plugincommand =
                 'ImportP12;CardSerial='
