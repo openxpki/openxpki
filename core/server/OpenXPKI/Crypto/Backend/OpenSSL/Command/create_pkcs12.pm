@@ -90,13 +90,15 @@ sub get_command
     $self->write_file (FILENAME => $self->{CERTFILE},
                        CONTENT  => $self->{CERT},
 	               FORCE    => 1);
-    if (exists $self->{CHAIN}) {
+    if (exists $self->{CHAIN} && scalar @{$self->{CHAIN}}) {
         my $chain = join('', @{$self->{CHAIN}});
         $self->write_file(
             FILENAME => $self->{CHAINFILE},
             CONTENT  => $chain,
-	    FORCE    => 1
+	        FORCE    => 1
         );
+    } else {
+        $self->{CHAIN} = undef;
     }
 
     ## build the command
@@ -107,13 +109,14 @@ sub get_command
     $command .= " -in ".$self->{CERTFILE};
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -".$self->{ENC_ALG};
-    if (exists $self->{CSP}) {
+    if (defined $self->{CSP}) {
         $command .= " -CSP " . q{"} . $self->{CSP} . q{"};
     }
-    if (exists $self->{CHAIN})
+    if (defined $self->{CHAIN})
     {
         $command .= " -certfile ".$self->{CHAINFILE};
     }
+
 
     $command .= " -passin env:pwd";
     $self->set_env ("pwd" => $self->{PASSWD});
