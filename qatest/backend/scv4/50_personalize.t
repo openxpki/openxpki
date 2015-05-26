@@ -11,8 +11,6 @@
 # 3) The scripts needs a dummy csr to post - this is created on the first 
 #    run at "sctest.csr" by calling openssl. You need the openssl binary
 #    in the path and write access to the current directory
-# 4) Set the states CERT_PUBLISH_CHECK, CERTS_PUBLISHED to not autorun
-#
 
 use strict;
 use warnings;
@@ -95,7 +93,7 @@ my %wfparam = (
 );      
 
 	
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4' , \%wfparam, 'Create SCv4 Test Workflow')
+$test->create_ok( 'sc_personalization' , \%wfparam, 'Create SCv4 Test Workflow')
  or die "Workflow Create failed: $@";
 
  

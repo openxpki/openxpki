@@ -78,7 +78,7 @@ sub sc_parse_certificates {
 
 # named parameters:
 # SCMARTCARDID => scalar, token id read from token. format: TYPE_SERIAL
-#
+# SMARTCHIPID => scalar, chip id
 # CERTFORMAT => see sc_parse_certificates
 # CERTS => see sc_parse_certificates
 # USERID => scalar, authenticated user (optional, if present may be
@@ -812,7 +812,13 @@ sub sc_analyze_smartcard {
             $type_policy->{$key} = $policy->get("certs.type.$type.$key") || 0;
         }
         $type_policy->{max_count} ||= 1;
-        $type_policy->{preferred_profile} = $policy->get("certs.type.$type.allowed_profiles.0") || '';
+
+        my @profiles = $policy->get_list("certs.type.$type.allowed_profiles");
+        if (scalar @profiles) {        
+            $type_policy->{preferred_profile} = shift @profiles;
+        } else {
+            $type_policy->{preferred_profile} = '';
+        }
 
         ##! 32: "Policy Settings for $type: " . Dumper($type_policy)
 

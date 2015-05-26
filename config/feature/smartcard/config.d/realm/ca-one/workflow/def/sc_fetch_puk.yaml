@@ -1,0 +1,105 @@
+head:
+    prefix: scfp
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC
+
+
+state:
+    FAILURE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC
+
+    FETCHED_PUK: 
+        autorun: 1
+        action: 
+          - global_noop > MAIN
+
+    HAVE_OWNER: 
+        autorun: 1
+        action: 
+          - global_noop > FAILURE ? !wf_creator_owns_token
+          - fetch_puk > FETCHED_PUK ? wf_creator_owns_token
+
+    INITIAL: 
+        action: 
+          - initialize check_prereqs_via_api > HAVE_OWNER
+
+    MAIN: 
+        action: 
+          - puk_fetch_err > FAILURE
+          - ack_fetch_puk > SUCCESS
+
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC
+
+
+action:
+    ack_fetch_puk: 
+        class: Workflow::Action::Null
+
+    check_prereqs_via_api: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs
+
+    fetch_puk: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::FetchPUK
+        param: 
+            ds_default_value: $smartcard_default_puk
+            ds_key_param: token_id
+            ds_namespace: smartcard.puk
+            ds_value_param: _puk
+
+    initialize: 
+        class: Workflow::Action::Null
+        input: 
+          - token_id
+
+    global_noop: 
+        class: Workflow::Action::Null
+
+    null2: 
+        class: Workflow::Action::Null
+
+    puk_fetch_err: 
+        class: Workflow::Action::Null
+        input: 
+          - error_reason
+
+
+condition:
+    wf_creator_owns_token: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContextBulk
+        param: 
+            condition: equals
+            context_keys: userinfo_mail,creator
+
+
+field:
+    error_reason: 
+        name: error_reason
+        required: 1
+        type: text
+
+    token_id: 
+        name: token_id
+        type: text
+        required: 0
+
+
+acl:
+    Anonymous: 
+        creator: self
+
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    System: 
+        creator: self
+
+    User: 
+        creator: self
+

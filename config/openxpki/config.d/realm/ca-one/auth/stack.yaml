@@ -34,4 +34,6 @@ _System:
     description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_AUTH_SYSTEM
     handler: System
 
+_SmartCard:
+    handler: SmartCard
 

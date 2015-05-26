@@ -52,7 +52,7 @@ sub execute {
 
         # Convert to hex string
         my $puk_hex = unpack( 'H*', $puk_raw );
-	$puk_hex = substr($puk_hex . "00" x ($puk_length * 2), 
+        $puk_hex = substr($puk_hex . "00" x ($puk_length * 2), 
 			  0, 
 			  $puk_length * 2);
 

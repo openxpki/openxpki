@@ -1,4 +1,13 @@
-by_mail@: connector:users.connectors.by_mail
+by_mail: 
+    andi.auth@mycompany.local:
+        mail: andi.auth@mycompany.local
+        cn: Andi Auth
+
+    bob.builder@mycompany.local:
+        mail: bob.builder@mycompany.local
+        cn: Bob Builder
+
+#connector:users.connectors.by_mail
 
 connectors:                    
     by_mail:
