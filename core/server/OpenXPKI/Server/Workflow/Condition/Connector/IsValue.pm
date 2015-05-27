@@ -56,20 +56,13 @@ OpenXPKI::Server::Workflow::Condition::Connector::IsValue
 
 =head1 SYNOPSIS
 
-    <condition name="is_escrow_cert_type"
-            class="OpenXPKI::Server::Workflow::Condition::Connector::IsValue">        
-        <param name="prefix" value="smartcard.policy.certs.type"/>
-        <param name="property" value="escrow_key"/>
-        <param name="context_key" value="csr_cert_type"/>
-        <param name="value" value="1"/>
-    </condition>
-
-The condition implementation will assemble prefix, context value and property to the path and check the result against the given value.
+    config_path: path|of|the|node.with.dots    
+    delimiter: |
+    value: checkme
 
 
 =head1 DESCRIPTION
 
-This condition always returns false. This is mainly useful as a dummy
-condition that does not really check anything.
-
+This condition looks up the value at config_path from the connector and 
+checks weather the returned value is equal to the given value. 
 

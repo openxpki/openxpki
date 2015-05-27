@@ -52,7 +52,7 @@ OpenXPKI::Server::Workflow::Condition::Connector::Exists
         class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
         param:
             config_path: path.of.the.node.to.check
-
+            
 
 =head1 DESCRIPTION
 

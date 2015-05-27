@@ -115,16 +115,18 @@ action:
     get_auth1_id: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
         param: 
-            _map_ds_key: "[% context.auth1_id %]"
-            ds_key_prefix: smartcard.users.by_mail
-            ds_value_map: auth1_mail -> mail, auth1_cn -> cn
+            mode: map
+            config_prefix: smartcard.users.by_mail
+            _map_config_key: "[% context.auth1_id %]"        
+            attrmap: auth1_mail -> mail, auth1_cn -> cn
 
     get_auth2_id: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
         param: 
-            _map_ds_key: "[% context.auth2_id %]"
-            ds_key_prefix: smartcard.users.by_mail
-            ds_value_map: auth2_mail -> mail, auth2_cn -> cn
+            mode: map
+            config_prefix: smartcard.users.by_mail
+            _map_config_key: "[% context.auth2_id %]"        
+            attrmap: auth2_mail -> mail, auth2_cn -> cn
 
     get_user_data: 
         class: OpenXPKI::Server::Workflow::Activity::SmartCard::GetOwnerByCardID

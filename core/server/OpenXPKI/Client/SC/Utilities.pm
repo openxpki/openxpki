@@ -209,7 +209,7 @@ sub handle_get_card_status {
         
         $log->info( "ECDHPeerPubkey:\n " . $ECDHPubkey );
         
-        $cardData->{'rndPIN'} = undef;
+        $session->param('rndPIN', '');
         
         my $ecdhkey;
         eval { 
