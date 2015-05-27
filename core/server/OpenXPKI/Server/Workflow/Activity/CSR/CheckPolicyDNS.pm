@@ -129,6 +129,8 @@ item as one line. Empty/Non-Existing if all checks are ok.
 
 =head2 Configuration Parameters
 
+=over
+
 =item check_cn
 
 Check the value of the CN component of the subject. Possible values are 
@@ -140,3 +142,4 @@ Check the value of the CN component of the subject. Possible values are
 
 Check subject alternative name section, same values as check_cn. 
 
+=back

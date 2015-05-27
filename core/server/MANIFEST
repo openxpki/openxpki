@@ -48,6 +48,16 @@ OpenXPKI/Client/UI/Source.pm
 OpenXPKI/Client/UI/Workflow.pm
 OpenXPKI/Client/UI/Handle/Profile.pm
 
+# Client for SmartCard Frontend
+OpenXPKI/Client/SC.pm
+OpenXPKI/Client/SC/Changecardpolicy.pm
+OpenXPKI/Client/SC/Getauthcode.pm
+OpenXPKI/Client/SC/Personalization.pm
+OpenXPKI/Client/SC/Pinreset.pm
+OpenXPKI/Client/SC/Result.pm
+OpenXPKI/Client/SC/Utilities.pm
+
+
 ## Config Layers
 OpenXPKI/Config/Merge.pm
 OpenXPKI/Config/Test.pm
@@ -332,6 +342,7 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/GeneratePUK.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/RenameEscrowedKey.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GenerateActivationCode.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/GetOwnerByCardID.pm
+OpenXPKI/Server/Workflow/Activity/SmartCard/CheckServerStatus.pm
 
 
 OpenXPKI/Server/Workflow/Persister/Null.pm
@@ -668,12 +679,14 @@ bin/openxpkicmd
 cgi-bin/scep
 cgi-bin/webui.cgi
 cgi-bin/webui.fcgi
+cgi-bin/sc.fcgi
 
 # Client UI
 htdocs/src/main-built.js
 htdocs/style/main-built.css
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
+htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg
 htdocs/style/img/logo.png

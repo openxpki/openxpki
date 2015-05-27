@@ -71,11 +71,23 @@ OpenXPKI::Server::Workflow::Activity::Skeleton
 
 Implements the FIXME workflow action.
 
+=head1 Configuration
+
+=head2 Activity parameters
+
+=over 
+
+=item my_control_param
+
+Explain values and effects of my_control_param.
+
+=back 
+
 =head2 Context parameters
 
 Expects the following context parameters:
 
-=over 12
+=over 
 
 =item ...
 

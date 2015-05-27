@@ -30,7 +30,8 @@ sub execute {
     ##! 8: ' Prepare CSR for cert type ' . $cert_type
 
     # Get profile from certificate type
-    my $cert_profile = $config->get( "smartcard.policy.certs.type.$cert_type.allowed_profiles.0" );
+    my @cert_profiles = $config->get_list( "smartcard.policy.certs.type.$cert_type.allowed_profiles" ); 
+    my $cert_profile = shift @cert_profiles; 
     my $cert_role = $config->get( "smartcard.policy.certs.type.$cert_type.role" ) || 'User';
     ##! 8: ' Prepare CSR for profile '. $cert_profile .' with role '. $cert_role
     CTX('log')->log(

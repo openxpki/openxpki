@@ -5,6 +5,7 @@ use base qw( Workflow::Validator );
 use strict;
 use warnings;
 use English;
+use Moose;
 
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
@@ -14,16 +15,9 @@ use OpenXPKI::Crypto::CSR;
 
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( qw( realm_only ) );
+extends 'OpenXPKI::Server::Workflow::Validator';
 
-sub _init {
-    
-    my ( $self, $params ) = @_;            
-    $self->realm_only( exists $params->{'realm_only'} ? $params->{'realm_only'} : 0 );        
-    return 1;
-}
-
-sub validate {
+sub _validate {
     my ( $self, $wf, $pkcs10 ) = @_;
     ##! 1: 'start'
 
@@ -50,7 +44,7 @@ sub validate {
         'PUBKEY' => { VALUE => $pubkey, OPERATOR => 'LIKE' }
     };
     
-    if ($self->realm_only() ){
+    if ($self->param('realm_only') ){
        $query->{PKI_REALM} = CTX('session')->get_pki_realm(); 
     }
 
@@ -105,12 +99,20 @@ database.
 
 =head2 Argument
 
+=over 
+
 =item pkcs10
 
 The PKCS10 encoded csr.
+
+=back 
  
 =head2 Parameter
+
+=over 
 
 =item realm_only
 
 Check key only against certificates in the same realm. 
+
+=back

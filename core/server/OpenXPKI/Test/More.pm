@@ -22,6 +22,7 @@ use Class::Std;
     my %socketfile :
         ATTR(get => 'socketfile', set => 'socketfile', init_arg => 'socketfile' );
     my %realm : ATTR(get => 'realm', set => 'realm', init_arg => 'realm' );
+    my %stack : ATTR(get => 'stack', set => 'stack' );
     my %wfid : ATTR(get => 'wfid', set => 'wfid' );
     my %wftype : ATTR(get => 'wftype', set => 'wftype' );
     my %client : ATTR(get => 'client', set => 'client' );
@@ -204,12 +205,13 @@ use Class::Std;
                 return;
             }
         }
-
+        
         if ($user) {
+            my $stack = $self->get_stack || 'Testing';
             $msg
                 = $client->send_receive_service_msg(
                 'GET_AUTHENTICATION_STACK',
-                { 'AUTHENTICATION_STACK' => 'Testing', },
+                { 'AUTHENTICATION_STACK' => $stack, },
                 );
             $self->set_msg($msg);
             if ( $self->error ) {
@@ -231,6 +233,7 @@ use Class::Std;
             }
         }
         else {
+            my $stack = $self->get_stack || 'Anonymous';
             $msg
                 = $client->send_receive_service_msg(
                 'GET_AUTHENTICATION_STACK',
@@ -251,12 +254,12 @@ use Class::Std;
         my $self   = shift;
         my %params = @_;
         foreach my $k ( keys %params ) {
-            if ( not $k =~ m/^(user|password|socketfile|realm)$/ ) {
+            if ( not $k =~ m/^(user|password|socketfile|realm|stack)$/ ) {
                 croak "Invalid parameter '$k' to connect";
             }
         }
 
-        foreach my $k (qw( user password socketfile realm )) {
+        foreach my $k (qw( user password socketfile realm stack )) {
             if ( exists $params{$k} ) {
                 my $accessor = 'set_' . $k;
                 $self->$accessor( $params{$k} );
@@ -280,6 +283,7 @@ use Class::Std;
                     USER     => $self->get_user,
                     PASSWORD => $self->get_password,
                     REALM    => $self->get_realm,
+                    STACK    => $self->get_stack,                    
                 }
             ) or croak "Login as ", $self->get_user(), " failed: $@";
         }

@@ -91,6 +91,14 @@ System:
     label: System
     role: System
 
+SmartCard:
+    type: External
+    label: User
+    command: /bin/true
+    role: User
+    env:
+       LOGIN: __USER__
+
 # Sample using a Password "bind" connector
 Password Connector:
     type: Connector

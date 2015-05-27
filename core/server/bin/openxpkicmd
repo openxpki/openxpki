@@ -25,12 +25,34 @@ my %params = (
     wfaction => undef,
     param => [],
     nosplit => undef,
+    context => undef,
+    attribute => undef,
     );
 
 sub debug {
     my $arg = shift;
     if ($params{debug}) {
     print $arg . "\n";
+    }
+}
+
+sub dump_workflow {
+
+    my $reply = shift;
+    if ($params{context} && $reply->{PARAMS}->{WORKFLOW}->{CONTEXT}) {
+        print "\n===Context===\n";
+        my $context = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
+        foreach my $key (keys %{$context}) {
+            printf "=%-20s: %s\n", $key, $context->{$key};
+        } 
+    }
+    
+    if ($params{attribute} && $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE}) {
+        print "\n===Attributes===\n";
+        my $attr = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
+        foreach my $key (keys %{$attr}) {
+            printf "=%-20s: %s\n", $key, $attr->{$key};
+        } 
     }
 }
 
@@ -49,6 +71,8 @@ GetOptions(\%params,
             param|set=s@
             nosplit
             debug
+            context
+            attribute
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -185,6 +209,7 @@ if ($params{wfid}) {
 
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
             printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE};
+            dump_workflow( $reply );
         }
     } else {
         $reply = $client->send_receive_command_msg( 'get_workflow_activities',
@@ -193,11 +218,21 @@ if ($params{wfid}) {
                 WORKFLOW => $wf_type,
             }
         );
+        
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
             print "Possible Actions:\n";
             print join "\n", @{$reply->{PARAMS}};
             print "\n";
         }
+        
+        if ($params{context} || $params{attribute}) {
+            $reply = $client->send_receive_command_msg( 'get_workflow_info',
+                {
+                    ID => $params{wfid},                    
+                }
+            );
+            dump_workflow( $reply );
+        } 
 
 
     }
@@ -211,8 +246,10 @@ if ($params{wfid}) {
                            PARAMS => \%wf_parameters,
                            }
                        });
+                       
     if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE};
+        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE};      
+        dump_workflow( $reply );
     }
 
 }
@@ -247,6 +284,8 @@ openxpkicmd [options] WORKFLOW_TYPE
     --wfid                Pickup WF with this id at its current state
     --wfaction            Execute action on exisiting workflow
     --debug               enable debug mode
+    --context             show context data
+    --attribute           show attribute data
 
 =head1 INVOCATION
 

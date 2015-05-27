@@ -47,13 +47,14 @@ $test->plan( tests => 15 );
 $test->connect_ok(
     user => $cfg{user}{name},
     password => $cfg{user}{password},
+    stack => $cfg{user}{stack},
 ) or die "Error - connect failed: $@";
   
 my %wfparam = (                
     token_id =>  $cfg{carddata}{token_id}        
 );      
     
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK' , \%wfparam, 'Create PIN Unblock Workflow')
+$test->create_ok( 'sc_pin_unblock' , \%wfparam, 'Create PIN Unblock Workflow')
  or die "Workflow Create failed: $@";
  
 $test->state_is('HAVE_TOKEN_OWNER'); 

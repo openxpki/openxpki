@@ -11,8 +11,6 @@
 # 3) The scripts needs a dummy csr to post - this is created on the first 
 #    run at "sctest.csr" by calling openssl. You need the openssl binary
 #    in the path and write access to the current directory
-# 4) Set the states CERT_PUBLISH_CHECK, CERTS_PUBLISHED to not autorun
-#
 
 use strict;
 use warnings;
@@ -95,7 +93,7 @@ my %wfparam = (
 );      
 
 	
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4' , \%wfparam, 'Create SCv4 Test Workflow')
+$test->create_ok( 'sc_personalization' , \%wfparam, 'Create SCv4 Test Workflow')
  or die "Workflow Create failed: $@";
 
  
@@ -154,22 +152,25 @@ while ($test->state() =~ /TO_INSTALL/) {
 		
 	} elsif ($test->state() eq 'PKCS12_TO_INSTALL') {
  		$test->diag("PKCS12 to install");
- 		$number_of_tests += 6;		
+ 		$number_of_tests += 7;		
 		$test->state_is('PKCS12_TO_INSTALL');
 		$test->execute_ok('scpers_refetch_p12');
 		#$test->param_isnt('_keypassword','', 'Check for keypassword');
 		$test->param_isnt('_password','', 'Check for password');				
-		$test->param_isnt('_pkcs12base64','', 'Check for P12');           
+		$test->param_isnt('_pkcs12','', 'Check for P12');           
 		my $cert_identifier = $test->param('cert_identifier');		
 		
+		my $p12 = $test->param('_pkcs12');
+		$p12 =~ s/(\S{64})/$1\n/g;
+		
 		open P12, ">$cert_dir/$cert_identifier.p12";
-		print P12 $test->param('_pkcs12base64');
+		print P12 "-----BEGIN PKCS12-----\n$p12\n-----END PKCS12-----";
 		close P12;   					
 		
 		my $pass = $test->param('_password');
-$test->diag("Passwort " . $pass );
-	 	`cat $cert_dir/$cert_identifier.p12 | openssl base64 -d | openssl pkcs12  -passin pass:$pass -nodes -nocerts > $cert_dir/$cert_identifier.key`; 
-	
+        $test->diag("Passwort " . $pass );
+	 	`cat $cert_dir/$cert_identifier.p12 | openssl base64 -d | openssl pkcs12 -passin pass:$pass -nodes -nocerts > $cert_dir/$cert_identifier.key`;
+	 	$test->is( $?, 0, 'P12 unpack ok' );
 		$test->param_like('certificate','/-----BEGIN CERTIFICATE.*/','Check for PEM certificate');		 				
 		open PEM, ">$cert_dir/$cert_identifier.crt";
 		print PEM $test->param('certificate');

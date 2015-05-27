@@ -185,6 +185,7 @@ Render form for the workflow search.
 #TODO: Preset parameters
 
 =cut
+
 sub init_search {
 
     my $self = shift;
@@ -412,7 +413,7 @@ sub init_pager {
     if ($limit > 500) {  $limit = 500; }
 
     # align startat to limit window
-    $startat = int($startat % $limit) * $limit;
+    $startat = int($startat / $limit) * $limit;
 
     # Add limits
     my $query = $result->{query};
@@ -740,8 +741,6 @@ sub init_task {
     return $self;
 
 }
-
-=cut
 
 =head2 action_index
 
@@ -1201,7 +1200,6 @@ sub action_bulk {
     }
 
 }
-=cut
 
 =head1 internal methods
 
@@ -1247,6 +1245,7 @@ always be called regardless of the internal workflow state, a handler on the
 action level gets called only if the action is selected by above means.
 
 =cut
+
 sub __render_from_workflow {
 
     my $self = shift;
@@ -1402,6 +1401,63 @@ sub __render_from_workflow {
 
         }
 
+        # record the workflow info in the session
+        push @fields, $self->__register_wf_token( $wf_info, {
+            wf_action => $wf_action,
+            wf_fields => \@fields,
+        });
+
+        my $section = {
+            type => 'form',
+            action => 'workflow',                       
+            content => {
+                #label => $wf_action_info->{label},
+                #description => $wf_action_info->{description},
+                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+                fields => \@fields,
+            }
+        };
+        
+        # Add reset button as link to the activity selection page
+        if ((scalar keys %{$wf_info->{ACTIVITY}}) > 1) {
+            $section->{reset} = 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
+            $section->{content}->{reset_label} = 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET';
+        }
+        
+        $self->add_section( $section );
+
+        if (@fielddesc) {
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
+                    description => '',
+                    data => \@fielddesc
+            }});
+        }
+
+    } else {
+
+        # more than one action available, so we offer some buttons to choose how to continue
+
+        # Headline from state + workflow
+        my $label =  $wf_info->{STATE}->{label};
+        if ($label) {
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
+        } else {
+            $label =  $wf_info->{WORKFLOW}->{label};
+        }
+
+        $self->_page({
+            label => $label,
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description =>  $wf_info->{STATE}->{description},
+        });
+
+        my $fields = $self->__render_fields( $wf_info, $view );
+        
+        $self->logger()->debug('Field data ' . Dumper $fields);
+        
         
         # Add action buttons only if we are not in result view
         my $buttons;
@@ -1414,7 +1470,7 @@ sub __render_from_workflow {
             content => {
                 label => '',
                 description => '',
-                data => $self->__render_fields( $wf_info, $view ),
+                data => $fields,
                 buttons => $buttons
         }});
 

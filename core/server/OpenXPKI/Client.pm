@@ -262,6 +262,13 @@ sub send_receive_service_msg {
         $rc = $self->collect();
     };
     if ($EVAL_ERROR) {
+        
+        # TODO - server closes socket when getting the LOGOUT command
+        # which crahes the collect method, should be fixed in server, see #300
+        if ($cmd eq 'LOGOUT') {
+             return { 'SERVICE_MSG' => 'LOGOUT' };
+        }
+        
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT',
             params  => {

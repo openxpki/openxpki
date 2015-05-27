@@ -1,0 +1,33 @@
+head:
+    prefix: scload
+    persister: Volatile
+
+state:
+    INITIAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC
+        action:
+          - check_server_status > SUCCESS
+
+    SUCCESS:
+
+action:
+    check_server_status:
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::CheckServerStatus
+        param:
+            max_load: 5.0
+            proc_count: 5
+
+acl:
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+
+    System:
+        creator: any
+
+    Anonymous:
+        creator: any
+

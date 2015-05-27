@@ -207,7 +207,7 @@ sub init_pager {
     my $limit = $self->param('limit') || 25;  
     if ($limit > 500) {  $limit = 500; }
     
-    $startat = int($startat % $limit) * $limit;
+    $startat = int($startat / $limit) * $limit;
 
     # Add limits
     my $query = $result->{query};

@@ -79,7 +79,7 @@ sub execute {
             );
         }
 
-    foreach my $validity_param qw( notbefore notafter ) {
+    foreach my $validity_param (qw(notbefore notafter)) {
         if (defined $context->param($validity_param)) {
         #my $source = $source_ref->{$validity_param};
         my $attrib_serial = $dbi->get_new_serial(

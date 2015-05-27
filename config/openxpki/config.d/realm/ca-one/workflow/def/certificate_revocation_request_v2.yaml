@@ -176,6 +176,7 @@ action:
         validator:
           - validate_invalidity_time
           - validate_reason_code
+          - global_cert_identifier_exists
 
     delay_revocation:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Pause
