@@ -10,10 +10,6 @@ Component = Em.Component.extend
         for f in fields
             f.placeholder = "" if typeof f.placeholder is "undefined"
 
-            # needed for Firefox, see #303
-            if f.type is "select" and f.value is null
-                f.value = ""
-
         clonables = (f for f in fields when f.clonable)
         names = []
         for clonable in clonables
