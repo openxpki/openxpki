@@ -158,10 +158,8 @@ sub handle_get_card_status {
     WORKFLOW:
     foreach my $entry ( @workflows ) {
         
-        # we are interested in active workflows only
-        # TODO move this to the server
-        if ( $entry->{'WORKFLOW.WORKFLOW_STATE'} eq 'SUCCESS'
-            or $entry->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE' ) {
+        # Filter out failed workflows
+        if ( $entry->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE' ) {
                 
             next WORKFLOW;
         }
