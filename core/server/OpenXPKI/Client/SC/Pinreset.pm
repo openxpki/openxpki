@@ -39,6 +39,8 @@ Id of an existing unblock workflow, if not given, a new one is started
 
 =item auth1_ldap_mail, auth2_ldap_mail
         
+=back
+        
 =cut
         
 sub handle_start_pinreset {

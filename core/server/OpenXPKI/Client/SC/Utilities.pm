@@ -62,6 +62,8 @@ Calls the backend API to evaluate the status of the given card
 
 =head3 parameters
 
+=over 
+
 =item cardID                  
 
 cardSerialNumber
@@ -73,6 +75,8 @@ CardType String
 =item cert[int] (optional)
 
 certificates cert0 ,cert1 etc.
+
+=back 
 
 =head3 response
 
@@ -250,6 +254,8 @@ Write a log message to the log file
 
 =head3 parameters
 
+=over
+
 =item cardID                  
 
 cardSerialNumber
@@ -265,6 +271,8 @@ Message to write (String)
 =item level
 
 Log level, one of info|debug|error|warn
+
+=back 
 
 =head3 response
 

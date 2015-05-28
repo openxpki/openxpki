@@ -130,6 +130,7 @@ Public key algorithm to use. Default: 'RSA'
 
 Public key size in bits. Default: 2048
 
+=back 
 
 =head2 Context parameters
 

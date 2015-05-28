@@ -1,12 +1,14 @@
-# OpenXPKI::Client::Simple
-# An easy to use class to connect to the openxpki daemon and run commands
-# Designed as a kind of CLI interface for inline use within scripts
-# Will NOT handle sessions and create a new session using the given auth info
-# on each new instance (subsequent commands within one call are run on the same
-# session)   
-# 
-# Written by Oliver Welter for the OpenXPKI project 2014
-# Copyright (c) 2014 by The OpenXPKI Project
+
+=head1
+
+An easy to use class to connect to the openxpki daemon and run commands
+Designed as a kind of CLI interface for inline use within scripts. By 
+default, it will not handle sessions and create a new session using the 
+given auth info on each new instance (subsequent commands within one call
+are run on the same session). If you pass (and maintain) a session object to 
+the constructor, it is used to persist the backend session during requests.   
+
+=cut 
 
 package OpenXPKI::Client::Simple;
 
@@ -208,9 +210,11 @@ Create a new workflow of given type, only effective if ID is not given.
 =item PARAMS
 
 Parameter hash to be passed to create/execute method as input values.
+
 =back 
 
 =cut
+
 sub handle_workflow {
     
     my $self = shift;
@@ -345,5 +349,4 @@ sub __reinit_session {
 
 __END__
 
-=head1 NAME
  
