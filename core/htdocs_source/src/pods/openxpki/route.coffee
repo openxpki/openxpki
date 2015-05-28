@@ -33,7 +33,11 @@ Route = Em.Route.extend
         entries = navEntries.reduce (p, n) ->
             p.concat(n, n.entries||[])
         , []
-        data.target = "top" if entries.findBy "key", req.model_id
+
+        if entries.findBy "key", req.model_id
+            data.target = "top"
+        else if req.model_id is "login"
+            data.target = "top"
 
         source = @get "source"
         source.set "page", req.model_id
