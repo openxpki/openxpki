@@ -69,7 +69,7 @@ while (my $cgi = CGI::Fast->new()) {
         logger => $log,
         config => $config{global},
         card_config => \%card_config,
-        auth => { stack => '_System' }
+        auth => $config{auth}
     });
     
     my $result = $client->handle_request({ cgi => $cgi });

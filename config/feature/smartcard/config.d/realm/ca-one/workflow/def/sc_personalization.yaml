@@ -528,7 +528,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREREQS_AVAILABLE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREREQS_AVAILABLE_DESC
         action: 
-          - set_workflow_creator > OWNER_IDENTIFIED
+          - set_workflow_attributes > OWNER_IDENTIFIED
 
     PRE_ISSUANCE: 
         autorun: 1
@@ -700,8 +700,6 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CHECK_PREREQS_VIA_API_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CHECK_PREREQS_VIA_API_DESC
-        param: 
-            description: This reads the workflow context parameters set in initialize and sets flags that specify what the next steps will be.
 
     chip_id_mismatch_err: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
@@ -1157,7 +1155,7 @@ action:
         input: 
           - cert_identifier
         param: 
-            auto_approval: 1
+            flag_auto_approval: 1
             reason_code: superseded
 
     set_cert_type_to_x509: 
@@ -1177,15 +1175,11 @@ action:
             _keypassword: OpenXPKI
             cert_install_type: p12
 
-    set_workflow_creator: 
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_WORKFLOW_CREATOR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_WORKFLOW_CREATOR_DESC
-        input: 
-          - userinfo_workflow_creator
+    set_workflow_attributes: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param: 
-            SetContextParameters: overwritecontext,extendedsyntax
-            creator: $context->param('userinfo_workflow_creator')
+            _map_token_id: $token_id
+            _map_card_owner: $userinfo_card_owner
 
     status_err: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
@@ -1606,19 +1600,7 @@ field:
         required: 1
         type: text
 
-    userinfo_workflow_creator: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_LABEL
-        name: userinfo_workflow_creator
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_TOOLTIP
-        required: 1
-        type: text
-
-
 acl:
-    Anonymous: 
-        creator: self
 
     CA Operator: 
         creator: any
@@ -1626,9 +1608,7 @@ acl:
     RA Operator: 
         creator: any
 
-    System: 
+    SmartCard:
         creator: any
-
-    User: 
-        creator: any
+ 
 

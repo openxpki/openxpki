@@ -52,7 +52,7 @@ sub handle_start_pinreset {
     $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_STARTRESET_CALL");
   
     my $wf_info;
-    my $wf_type = $self->config()->{openxpki}->{pinunblock}; 
+    my $wf_type = $self->config()->{workflow}->{pinunblock}; 
     
     my $wf_id = $self->param("unblock_wfID");    
     if ( !$wf_id || ($wf_id !~ /^[0-9]+$/ )) {
@@ -331,7 +331,7 @@ sub handle_pinreset_confirm {
     my $log = $self->logger();
       
     my $wf_info;
-    my $wf_type = $self->config()->{openxpki}->{unblock}; 
+    my $wf_type = $self->config()->{workflow}->{unblock}; 
     my $wf_id = $self->param("unblock_wfID");    
     my $ui_result = $self->param("Result");
     my $ui_reason = $self->param("Reason") || '';
@@ -395,7 +395,7 @@ sub handle_pinreset_cancel {
     my $log = $self->logger();
       
     my $wf_info;
-    my $wf_type = $self->config()->{openxpki}->{unblock}; 
+    my $wf_type = $self->config()->{workflow}->{unblock}; 
     my $wf_id = $self->param("unblock_wfID");    
     my $ui_result = $self->param("Result");
     my $ui_reason = $self->param("Reason") || '';

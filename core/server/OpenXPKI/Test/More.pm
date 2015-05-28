@@ -237,7 +237,7 @@ use Class::Std;
             $msg
                 = $client->send_receive_service_msg(
                 'GET_AUTHENTICATION_STACK',
-                { 'AUTHENTICATION_STACK' => 'Anonymous', },
+                { 'AUTHENTICATION_STACK' => $stack, },
                 );
             $self->set_msg($msg);
             if ( $self->error ) {

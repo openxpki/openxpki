@@ -62,7 +62,7 @@ sub handle_server_personalization {
 
     my $self = shift;
 
-    my $wf_type = $self->config()->{openxpki}->{personalization};
+    my $wf_type = $self->config()->{workflow}->{personalization};
     my $keysize = $self->config()->{card}->{keysize} || 2048;
     my $session = $self->_session();
 

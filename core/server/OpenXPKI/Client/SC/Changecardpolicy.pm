@@ -41,7 +41,7 @@ sub handle_get_card_policy {
     
     my $self = shift;
 
-    my $wf_type = $self->config()->{openxpki}->{changecardpolicy};
+    my $wf_type = $self->config()->{workflow}->{changecardpolicy};
     my $wf_id; 
     my $wf_info;
     my $wf_state;

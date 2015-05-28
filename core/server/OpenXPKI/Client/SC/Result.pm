@@ -108,30 +108,6 @@ sub has_errors {
     return (scalar @{$self->_error}) > 0;
 }
 
-
-=head2 BUILD
-
-Do not overload this method as it does sanity checks and session 
-initialization. 
-
-=cut
-
-sub BUILD {
-    
-    my $self = shift;
-    
-    my $session = $self->_session();
-    # Manipulate the auth settings to log in as card owner
-    my $cardOwner = $session->param('cardOwner');
-    if ($cardOwner ) {
-        $self->logger()->info('Set session user to cardOwner:' . $cardOwner );
-        $self->_client()->auth({
-            stack => $self->config()->{openxpli}->{authstack} || '_SmartCard',
-            user => $cardOwner,
-        });
-    }
-}
-    
     
 sub _init_carddata { 
     

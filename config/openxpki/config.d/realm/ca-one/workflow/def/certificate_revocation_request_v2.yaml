@@ -320,6 +320,9 @@ acl:
     System:
         creator: self
 
+    SmartCard:
+        creator: self
+
     User:
         creator: self
 

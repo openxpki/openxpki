@@ -18,16 +18,7 @@ action:
             max_load: 5.0
             proc_count: 5
 
-acl:
-    CA Operator:
+acl: 
+    SmartCard:
         creator: any
-
-    RA Operator:
-        creator: any
-
-    System:
-        creator: any
-
-    Anonymous:
-        creator: any
-
+ 

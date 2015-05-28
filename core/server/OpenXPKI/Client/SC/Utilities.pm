@@ -101,8 +101,8 @@ sub handle_get_card_status {
     # Load the certificates from the request 
     my @certs;
     
-    my $wf_type_unblock = $config->{openxpki}->{pinunblock};
-    my $wf_type_pers = $config->{openxpki}->{personalization};
+    my $wf_type_unblock = $config->{workflow}->{pinunblock};
+    my $wf_type_pers = $config->{workflow}->{personalization};
     
     
   CERTS:
@@ -127,9 +127,8 @@ sub handle_get_card_status {
     
     $result->{'msg'} = { PARAMS => $reply };
     
-    # set card data from analyze result     
-    $cardData->{'creator_userID'} = $reply->{SMARTCARD}->{assigned_to}->{workflow_creator};
-    $cardData->{'cardOwner'} = $reply->{SMARTCARD}->{assigned_to}->{workflow_creator};
+    # set card data from analyze result         
+    $cardData->{'cardOwner'} = $reply->{SMARTCARD}->{assigned_to}->{card_owner};
     $cardData->{'dbntloginid'} = $reply->{SMARTCARD}->{assigned_to}->{loginids};
     
     # record the card owner to the session

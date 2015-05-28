@@ -39,13 +39,9 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 13 );
+$test->plan( tests => 10 );
 
-$test->connect_ok(
-    user => $cfg{carddata}{frontend_user},
-    stack => '_SmartCard',
-) or die "Error - connect failed: $@";
-
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@";
 	
 $test->create_ok( 'sc_fetch_puk' , { token_id => $cfg{carddata}{token_id}  }, 'Create SCv4 PUK Workflow')
  or die "Workflow Create failed: $@";
@@ -69,15 +65,3 @@ $test->execute_ok('scfp_puk_fetch_err', { error_reason => 'failed for testing' }
 $test->state_is('FAILURE');
 
 $test->disconnect();
-
-$test->connect_ok(
-    user => $cfg{unblock}{auth1},
-    stack => '_SmartCard',
-) or die "Error - connect failed: $@";
-
-
-$test->create_ok( 'sc_fetch_puk' , { token_id => $cfg{carddata}{token_id}  }, 'Create SCv4 PUK Workflow for invalid users')
- or die "Workflow Create failed: $@";
-
-$test->state_is('FAILURE');
- 

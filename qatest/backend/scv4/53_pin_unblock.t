@@ -43,13 +43,9 @@ my $test = OpenXPKI::Test::More->new(
 $test->set_verbose($cfg{instance}{verbose});
 
 $test->plan( tests => 21 );
-   
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-    stack => $cfg{user}{stack},
-) or die "Error - connect failed: $@";
-  
+    
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@";
+    
 my %wfparam = (
     token_id =>  $cfg{carddata}{token_id}        
 );      
@@ -67,8 +63,8 @@ $test->disconnect();
  
 # Login with auth1 and generate code
 $test->connect_ok(
-    user => $cfg{unblock}{auth1},
-    password => 'User',
+    user => $cfg{unblock}{auth1},    
+    stack => 'User'
 ) or die "Error - connect failed: $@";
  
 $test->execute_ok('scunblock_generate_activation_code');
@@ -80,8 +76,8 @@ $test->disconnect();
 
 # Login with auth2 and generate code
 $test->connect_ok(
-    user => $cfg{unblock}{auth2},
-    password => 'User',
+    user => $cfg{unblock}{auth2},    
+    stack => 'User'
 ) or die "Error - connect failed: $@";
  
 $test->execute_ok('scunblock_generate_activation_code'); 
@@ -94,7 +90,7 @@ $test->disconnect();
 # Login with auth1 again and regenerate code
 $test->connect_ok(
     user => $cfg{unblock}{auth1},
-    password => 'User',
+    stack => 'User'
 ) or die "Error - connect failed: $@";
  
 $test->execute_ok('scunblock_generate_activation_code'); 
@@ -106,10 +102,7 @@ $test->ok($new_auth1_password ne $auth1_password);
 
 $test->disconnect();
    
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-) or die "Error - connect failed: $@";
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@";
 
 $test->execute_ok('scunblock_post_codes', {  _auth1_code => $new_auth1_password, _auth2_code => $auth2_password});
 

@@ -92,12 +92,9 @@ System:
     role: System
 
 SmartCard:
-    type: External
-    label: User
-    command: /bin/true
-    role: User
-    env:
-       LOGIN: __USER__
+    type: Anonymous
+    label: SmartCard
+    role: SmartCard
 
 # Sample using a Password "bind" connector
 Password Connector:

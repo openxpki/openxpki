@@ -60,14 +60,18 @@ my $test = OpenXPKI::Test::More->new(
     }
 ) or die "Error creating new test instance: $@";
 
-my $number_of_tests = 3;
+my $number_of_tests = 6;
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-) or die "Error - connect failed: $@";
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@";
+
+# Test server load
+$test->create_ok( 'sc_server_load' , {}, 'Server Load')
+ or die "Workflow Create failed: $@";
+
+$test->state_is('SUCCESS');
+$test->param_is('server_status','OK');
 
 my $ser = OpenXPKI::Serialization::Simple->new();
 

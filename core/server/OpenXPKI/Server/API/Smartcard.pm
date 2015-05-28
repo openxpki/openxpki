@@ -386,8 +386,8 @@ sub sc_analyze_smartcard {
     );
 
     # We use the mail address for the workflows
-    my $workflow_creator = $employeeinfo->{VALUE}->{mail};
-    $result->{SMARTCARD}->{assigned_to}->{workflow_creator} = $workflow_creator;
+    my $card_owner = $employeeinfo->{VALUE}->{mail};
+    $result->{SMARTCARD}->{assigned_to}->{card_owner} = $card_owner;
 
     # If a person changes his name or mail adress, we want to issue new certificates
     # We have the relevant info into the datapool as smartcard.user.currentid
@@ -480,26 +480,27 @@ sub sc_analyze_smartcard {
 
 
     #### Step 6 #############################################################
-    # Search for active workflows for this user (only if WORKFLOW_TYPES was
+    # Search for active workflows for the given card (only of workflow list is
     # passed). This operation is a convenience shortcut for the frontend
     # which may wish to continue a stalled personalization workflow.
 
     # search workflows
     if (defined $wf_types) {
-    # get workflow information (existing workflows for user)
-    foreach my $wf_type (@{$wf_types}) {
-        $result->{WORKFLOWS}->{$wf_type} =
-        CTX('api')->search_workflow_instances(
-            {
-            TYPE => $wf_type,
-            CONTEXT => [
-                {
-                KEY => 'creator',
-                VALUE => $workflow_creator,
-                },
+        # get workflow information (existing workflows for card)
+        foreach my $wf_type (@{$wf_types}) {
+            $result->{WORKFLOWS}->{$wf_type} =
+            CTX('api')->search_workflow_instances({
+                TYPE => $wf_type,
+                ATTRIBUTE => [
+                    {
+                        KEY => 'token_id',
+                        VALUE => $tokenid,
+                    },
                 ],
+                ORDER => 'WORKFLOW.WORKFLOW_LAST_UPDATE',
+                REVERSE => 1,
             });
-    }
+        }
     }
 
     #### Step 7 ##############################################################

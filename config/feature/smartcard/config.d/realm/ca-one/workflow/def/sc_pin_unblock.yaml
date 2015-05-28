@@ -29,7 +29,7 @@ state:
     CHECK_TOKEN_OWNER: 
         autorun: 1
         action: 
-          - set_creator > HAVE_TOKEN_OWNER ? ldap_mail_set
+          - set_workflow_attributes > HAVE_TOKEN_OWNER ? ldap_mail_set
           - global_noop > FAILURE ? !ldap_mail_set
 
     FAILURE: 
@@ -130,8 +130,6 @@ action:
 
     get_user_data: 
         class: OpenXPKI::Server::Workflow::Activity::SmartCard::GetOwnerByCardID
-        param: 
-            description: Obtain user data by querying the connector.
 
     initialize: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
@@ -168,12 +166,11 @@ action:
         param: 
             error_code: ''
 
-    set_creator: 
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+    set_workflow_attributes: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param: 
-            description: Copy value in ldap_mail from LDAP and overwrite the creator parameter in the workflow
-            SetContextParameters: overwritecontext,extendedsyntax
-            _map_creator: $owner_mail
+            _map_token_id: $token_id
+            _map_card_owner: $owner_mail
 
     store_auth_ids: 
         class: Workflow::Action::Null
@@ -276,16 +273,13 @@ field:
 
 
 acl:
-    Anonymous: 
-        creator: self
-
     CA Operator: 
         creator: any
 
     RA Operator: 
         creator: any
 
-    System: 
+    SmartCard:
         creator: any
 
     User: 

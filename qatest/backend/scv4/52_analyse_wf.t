@@ -66,11 +66,8 @@ foreach my $cert_file (@paths) {
 
 $test->diag("Found ".scalar(@certflat)." exisiting certificates");
 
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-) or die "Error - connect failed: $@";
-  
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@"; 
+
 my %wfparam = (        
         user_id =>  $cfg{carddata}{frontend_user},
         token_id =>  $cfg{carddata}{token_id},
