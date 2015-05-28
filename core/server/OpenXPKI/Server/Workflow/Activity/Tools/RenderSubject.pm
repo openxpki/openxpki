@@ -50,6 +50,10 @@ sub execute {
     # Remove the "cert_subject" prefix (old ui only)
     ##! 16: 'Deserialized cert_subject_parts ' . Dumper $template_vars
     foreach my $key (keys %{$template_vars}) {
+        
+        # Skip undefined values         
+        next unless (defined $template_vars->{$key});
+        
         my $template_key;
         if ($key =~ m{ \A cert_subject_(.*) \z }xms) {
             $template_key = $1;
@@ -57,6 +61,7 @@ sub execute {
             $template_key = $key;
         }
         $subject_vars->{$template_key} = $template_vars->{$key};
+        
         # Escape Comma
         $subject_vars->{$template_key} =~ s{,}{\\,}xmsg;
     }

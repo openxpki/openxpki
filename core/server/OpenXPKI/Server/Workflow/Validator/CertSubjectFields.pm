@@ -81,7 +81,7 @@ sub _validate {
             $name .= '[]';
         }
         
-        my @nonempty = grep { $_ ne '' } @value;
+        my @nonempty = grep { (defined $_ && $_ ne '') } @value;
         if (@nonempty < $min) {
             push @fields_with_error, { name => $name, min => $min,
                 error => 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT' };            
@@ -100,7 +100,7 @@ sub _validate {
         
         if ($match) {
             my $ii = 0;
-            foreach my $val (@value) {                                
+            foreach my $val (@nonempty) {                                
                 if ($val ne '' && $val !~ m{$match}xs) {
                     # should be a bit smarter to highlight the right one
                     push @fields_with_error, { name => $name, 
