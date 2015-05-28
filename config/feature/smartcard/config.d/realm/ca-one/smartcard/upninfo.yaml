@@ -21,7 +21,8 @@ DOMAIN@: connector:smartcard.upninfo.connectors.branch1
 connectors:
     testing:
         class: Connector::Proxy::YAML
-        LOCATION: /home/pkiadm/ca-one/smartcard/upninfo.yaml
+        LOCATION: /home/pkiadm/ca-one/smartcard/carddata.yaml
+        PREFIX: upninfo
         
     branch1:
         class: Connector::Proxy::Net::LDAP::Simple

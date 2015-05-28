@@ -66,11 +66,8 @@ foreach my $cert_file (@paths) {
 
 $test->diag("Found ".scalar(@certflat)." exisiting certificates");
 
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-) or die "Error - connect failed: $@";
-  
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@"; 
+
 my %wfparam = (        
         user_id =>  $cfg{carddata}{frontend_user},
         token_id =>  $cfg{carddata}{token_id},
@@ -78,7 +75,7 @@ my %wfparam = (
         certs_on_card =>  join(";",  @certflat),
 );      
     
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V4' , \%wfparam, 'Create SCv4 Test Workflow')
+$test->create_ok( 'sc_personalization' , \%wfparam, 'Create SCv4 Test Workflow')
  or die "Workflow Create failed: $@";
  
 $test->state_is('SUCCESS'); 

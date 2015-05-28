@@ -1,0 +1,28 @@
+# This file contains dummy/test data for the smartcard workflows
+
+
+status-test-overrides:
+    gem2_12345678: activated
+
+users:
+    gem2_12345678: e0815
+
+defaultpuk:
+    lot123:
+        chip0815: 98765
+
+lotid:
+    gem2_12345678: lot123
+
+employees:
+    e0815:
+        cn: Thomas Tester
+        givenname: Thomas
+        initials: ''
+        sn: Tester
+        mail: thomas.tester@mycompany.local
+        loginids: tt4711
+
+upninfo: 
+    tt4711: tt4711\domain
+

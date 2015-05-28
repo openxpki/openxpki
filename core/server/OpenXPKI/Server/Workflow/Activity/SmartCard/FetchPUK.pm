@@ -62,5 +62,16 @@ __END__
 
 =head1 Description
 
+This fetches the currently-known PUKs from the datastore. If one entry is 
+returned, it is the current PUK on the card. If two are returned, it is 
+probable that the first is a new PUK to be written and the second is the 
+current PUK. Note to client: the returned string is probably a serialized 
+array, so the client needs to deserialize it before using it. Suggested 
+behavior of client: if more than one PUK is returned, try to change the PUK 
+to the first in the list using the second. On fail, the first is most likely 
+the correct PUK, on success, the first PUK is now correct.
+
+
+
 See OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
 

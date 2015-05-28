@@ -39,7 +39,6 @@ has 'logger' => (
     'default' => sub{ return Log::Log4perl->get_logger( ); }
 );
 
-# the OXI::Client object
 has '_config' => (
     required => 1,
     is => 'ro',

@@ -91,6 +91,11 @@ System:
     label: System
     role: System
 
+SmartCard:
+    type: Anonymous
+    label: SmartCard
+    role: SmartCard
+
 # Sample using a Password "bind" connector
 Password Connector:
     type: Connector

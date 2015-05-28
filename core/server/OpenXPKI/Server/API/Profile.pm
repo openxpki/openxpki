@@ -571,6 +571,7 @@ sub render_san_from_template {
         # Remove duplicates
         my %entry;
         foreach my $key ( @{$items->{$type}} ) {
+            next if (!defined $key);
             $key =~ s{ \A \s+ }{}xms;
             $key =~ s{ \s+ \z }{}xms;
             next if ($key eq '');

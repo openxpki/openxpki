@@ -2003,9 +2003,10 @@ sub __render_fields {
             }
 
             # do not push items that are empty
-            if ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
+            if (defined $item->{value} && 
+                ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
                 (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
-                (ref $item->{value} eq '' && $item->{value} ne '')) {
+                (ref $item->{value} eq '' && $item->{value} ne ''))) {
                 push @fields, $item;
             }
         }

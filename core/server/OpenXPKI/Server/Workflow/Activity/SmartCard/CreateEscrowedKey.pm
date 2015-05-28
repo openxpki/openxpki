@@ -20,70 +20,47 @@ sub execute {
     
     my $default_token = CTX('api')->get_default_token();
 
-    my $namespace = $self->param('ds_namespace');
-
-    my $ds_key_param = $self->param('ds_key_param') || 'token_id';
-    my $ds_key       = $context->param($ds_key_param);
-
+    my $dp_namespace = $self->param('dp_namespace');    
+    my $dp_key   = $self->param('dp_key');
     
-    my $keyalg    = $context->param('keyalg') || 'RSA';
-    my $keysize   = $context->param('keysize') || 1024;
+    my $key_alg    = $self->param('key_alg') || 'RSA';
+    my $key_size   = $self->param('key_size') || 2048;
+    my $enc_alg   = $self->param('enc_size') || 'aes256';
     
-    my $supported_algs = $default_token->command(
-	{
-	    'COMMAND'     => "list_algorithms",
-	    'FORMAT'      => "all_data",
-        }); 
+    my $key_param =  { KEY_LENGTH => $key_size };
     
-    # keytype check
-    if (! exists $supported_algs->{$keyalg}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_CREATEESCROWEDKEY_WRONG_KEYTYPE',
-            params => {
-                'KEYTYPE' => $keyalg,
-            },
-        );
-    }
-
-
     # use fixed password because the key will be stored encrypted in the
-    # datapool
+    # datapool, might move this to a config item / keynanny
     my $passwd = 'OpenXPKI';
-    my $command = {
-	COMMAND    => 'create_key',
-	TYPE       => $keyalg,
-	PASSWD     => $passwd,
-	PARAMETERS => {
-	    KEY_LENGTH => $keysize,
-	},
-    };
-    ##! 16: 'command: ' . Dumper $command
-
-    my $private_key = $default_token->command($command);
-
+        
+    # command definition
+    my $private_key = CTX('api')->generate_key({
+         KEY_ALG    => $key_alg,
+         ENC_ALG    => $enc_alg,
+         PASSWD     => $passwd,
+         PARAMS     => $key_param,
+    });
+        
     # ultimately we want to save the key under the corresponding certificate
     # identifier, but we don't know this yet. we use a temporary handle
     # and will later rename it.
     # Add some random if we have more than one escrow cert to create 
-    my $temp_handle = $ds_key . '_' . $workflow->id() . '_'. sprintf('%01d',rand()*100000);
+    my $temp_handle = $dp_key . '_' . $workflow->id() . '_'. sprintf('%01d',rand()*100000);
  
-    CTX('api')->set_data_pool_entry(
-	{
-	    NAMESPACE => $namespace,
+    CTX('api')->set_data_pool_entry({
+	    NAMESPACE => $dp_namespace,
 	    KEY       => $temp_handle,
 	    VALUE     => $private_key,
 	    # autocleanup of keys which are not crafted into certificates
 	    # later in this process
 	    EXPIRATION_DATE => time + 24 * 3600,
 	    FORCE     => 1,
-	    ENCRYPT   => 1,
+#	    ENCRYPT   => 1,
 	});
 
-    CTX('dbi_backend')->commit();
-    
     ##! 16: 'datapool entry saved to ' . $namespace . ':' . $temp_handle
     CTX('log')->log(
-    	MESSAGE => 'Created ' . $keyalg . ' private key for ' . $context->param('creator') . ', saved to datapool entry ' . $namespace . '/' . $temp_handle,
+    	MESSAGE => 'Created ' . $key_alg . ' private key for ' . $context->param('creator') . ', saved to datapool entry ' . $dp_namespace . '/' . $temp_handle,
     	PRIORITY => 'info',
     	FACILITY => ['audit','application']
 	);
@@ -110,6 +87,18 @@ __END__
 
 OpenXPKI::Server::Workflow::Activity::SmartCard::CreateEscrowedKey
 
+=head1 SYNOPSIS
+
+    class: OpenXPKI::Server::Workflow::Activity::SmartCard::CreateEscrowedKey
+    label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC
+    param: 
+        dp_namespace: certificate.privatekey
+        _map_dp_key: $token_id
+        key_alg: RSA
+        key_size: 2048
+        enc_alg: aes256
+
 =head1 Description
 
 Generates RSA private key, saves private key in datapool using a temporary
@@ -125,34 +114,33 @@ See the example that follows.
 
 =over 8
 
-=item ds_namespace
+=item dp_namespace
 
 Datapool namespace to use.
 
-=item ds_key_param
+=item dp_key
 
-The name of the context parameter that contains the key basename for this
-datastore entry. Default: 'token_id'
+Prefix used to build the temporary datapool handle.
 
-=back
-
-=head2 Context parameters
-
-=over 8 
-
-=item keyalg (input)
+=item key_alg
 
 Public key algorithm to use. Default: 'RSA'
 
-=item keysize (input)
+=item key_size
 
 Public key size in bits. Default: 2048
 
-=item pkcs10 (output)
+=back 
+
+=head2 Context parameters
+
+=over 
+
+=item pkcs10
 
 Generated PKCS#10 request.
 
-=item temp_datapool_key
+=item temp_key_handle
 
 Temporary datapool key used for storing the private key.
 

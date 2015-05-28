@@ -106,7 +106,7 @@ sub execute {
 	#TODO - improve handling of temporary errors 
     eval{
 		local $SIG{ALRM} = sub { die "alarm\n" };
-		alarm $config->{'timeout'} || 30;
+		alarm ($config->{'timeout'} || 30);
 		$command->wait();
 		
 		if ($command->exit_status() != 0) {

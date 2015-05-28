@@ -278,6 +278,12 @@ sub param {
     }
 
     foreach my $name (@keys) {
+        
+        if (ref $name) {
+            # This happens only with broken CGI implementations
+            die "Got reference where name was expected";
+        }
+        
         # for workflows - strip internal fields (start with wf_)
         next if ($name =~ m{ \A wf_ }xms);
 
