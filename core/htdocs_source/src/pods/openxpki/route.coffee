@@ -15,6 +15,7 @@ Route = Em.Route.extend
         structure: null
         status: null
         tabs: []
+        navEntries: []
 
     beforeModel: (req) ->
         source = @get "source"
@@ -24,9 +25,15 @@ Route = Em.Route.extend
             @sendAjax data: page: "bootstrap!structure"
 
     model: (req) ->
+        navEntries = @get "source.navEntries"
         data = page: req.model_id
         data.limit = req.limit if req.limit
         data.startat = req.startat if req.startat
+
+        entries = navEntries.reduce (p, n) ->
+            p.concat(n, n.entries||[])
+        , []
+        data.target = "top" if entries.findBy "key", req.model_id
 
         source = @get "source"
         source.set "page", req.model_id
