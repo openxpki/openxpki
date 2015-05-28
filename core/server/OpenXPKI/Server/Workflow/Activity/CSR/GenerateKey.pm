@@ -3,6 +3,10 @@
 # Rewritten by Julia Dubenskaya for the OpenXPKI project 2007
 # Copyright (c) 2006-2007 by The OpenXPKI Project
 
+# This is the OLD Activity which is used by the V1 CSR Workflows
+# The CSR v2 use Tools::GenerateKey which has a slighlty different parameter
+# format and does not validate the keygen parameters (that is done by the workflow)
+
 package OpenXPKI::Server::Workflow::Activity::CSR::GenerateKey;
 
 use strict;
@@ -22,10 +26,10 @@ sub execute
     my $context    = $workflow->context();
     my $default_token = CTX('api')->get_default_token();
 
-    my $key_type = $context->param('_key_type');
+    my $key_type = $context->param('_key_type') || uc($self->param('key_type'));
     ##! 16: 'key_type: ' . $key_type
 
-    my $password = $context->param('_password');
+    my $password = $context->param('_password') || $self->param('password');
     # password check
     if (! defined $password || $password eq '') {
         OpenXPKI::Exception->throw(
@@ -35,7 +39,7 @@ sub execute
 
     my $supported_algs = $default_token->command({COMMAND       => "list_algorithms",
                                                   FORMAT        => "all_data"});
-    
+
     # keytype check
     if (! exists $supported_algs->{$key_type}) {
         OpenXPKI::Exception->throw(
@@ -46,23 +50,35 @@ sub execute
         );
     }
 
-    my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
-    my $context_parameters = $context->param('_key_gen_params');
-    if (! defined $context_parameters) {
+    # TODO - can be cleaned up after removal of old workflows
+    # The old mason ui uses a custom sep, the new uses the default
+    my $parameters;
+    if (my $key_gen_params = $context->param('_key_gen_params')) {
+        my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
+        $parameters = $serializer->deserialize($key_gen_params);
+    } else {
+        # param auto deserializes!
+        $parameters = $self->param('key_gen_params');
+    }
+
+    if (! defined $parameters) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_PARAMETERS',
         );
     }
-    my $parameters = $serializer->deserialize($context_parameters);
 
     # parameters check
     my ($param, $value, $param_values) = ("","","undef");
     while (($param, $value) = each(%{$parameters})) {
+
+        # unset empty parameters
+        if ( !defined $value || $value eq '' ) { delete $parameters->{$param}; next; };
+
         if (! exists $supported_algs->{$key_type}->{$param}) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMNAME',
                 params => {
-                    'KEYTYPE'   => $key_type, 
+                    'KEYTYPE'   => $key_type,
                     'PARAMNAME' => $param,
                 }
             );
@@ -72,12 +88,12 @@ sub execute
                                                  FORMAT        => "param_values",
                                                  ALG           => $key_type,
                                                  PARAM         => $param});
-                                      
+
         if (! exists $param_values->{$value}) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_UNSUPPORTED_PARAMVALUE',
                 params => {
-                    'KEYTYPE'    => $key_type, 
+                    'KEYTYPE'    => $key_type,
                     'PARAMNAME'  => $param,
                     'PARAMVALUE' => $value,
                 }
@@ -98,9 +114,9 @@ sub execute
     ##! 16: 'key: ' . $key
 
     CTX('log')->log(
-	MESSAGE => 'Created ' . $key_type . ' private key for ' . $context->param('creator'),
-	PRIORITY => 'info',
-	FACILITY => 'audit',
+    	MESSAGE => 'Created ' . $key_type . ' private key for ' . $context->param('creator'),
+    	PRIORITY => 'info',
+    	FACILITY => 'audit',
 	);
 
     $context->param('private_key' => $key);

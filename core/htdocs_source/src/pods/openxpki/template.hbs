@@ -1,0 +1,131 @@
+<div class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"></a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                {{#each model.navEntries as |navEntry|}}
+                    {{#if navEntry.entries.length}}
+                        <li class="dropdown {{if navEntry.active "active"}}">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                                {{navEntry.label}}
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                {{#each navEntry.entries as |entry|}}
+                                    <li>
+                                        {{#link-to "openxpki" entry.key}}
+                                            {{entry.label}}
+                                        {{/link-to}}
+                                    </li>
+                                {{/each}}
+                            </ul>
+                        </li>
+                    {{else}}
+                        <li class="{{if navEntry.active "active"}}">
+                            {{#link-to "openxpki" navEntry.key}}
+                                {{navEntry.label}}
+                            {{/link-to}}
+                        </li>
+                    {{/if}}
+                {{/each}}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {{#if model.user}}
+                    <li>
+                        {{#link-to "openxpki" "logout"}}
+                            Log out
+                        {{/link-to}}
+                    </li>
+                {{/if}}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="oxi-message">
+        <div class="alert {{statusClass}}">
+            {{model.status.message}}
+        </div>
+    </div>
+
+    <h2>{{model.tabs.firstObject.page.label}}</h2>
+    {{#if model.tabs.firstObject.page.description}}
+        <div class="description">
+            {{{model.tabs.firstObject.page.description}}}
+        </div>
+    {{/if}}
+    {{#if showTabs}}
+        <ul class="nav nav-tabs">
+            {{#each model.tabs as |entry|}}
+                <li class="{{if entry.active "active"}}">
+                    <a {{action "activateTab" entry}}>
+                        {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
+                        &nbsp;
+                        <button {{action "closeTab" entry}} class="close">&times;</button>
+                    </a>
+                </li>
+            {{/each}}
+        </ul>
+    {{/if}}
+    <div class="tab-content">
+        {{#each model.tabs as |entry|}}
+            <div class="tab-pane {{if entry.active "active"}}">
+                <div class="Xcontainer sections">
+                    <div class="row">
+                        <div class="{{if entry.right "col-md-8" "col-md-12"}}">
+                            {{#each entry.main as |mainEntry|}}
+                                {{oxisection-main content=mainEntry}}
+                            {{/each}}
+                        </div>
+                        <div class="{{if entry.right "col-md-4" "hide"}}">
+                            {{#each entry.right as |rightEntry|}}
+                                <div class="well">
+                                    {{oxisection-main content=rightEntry}}
+                                </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>
+
+<div class="modal fade oxi-main-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    {{if model.model.page.shortlabel model.modal.page.shortlabel model.modal.page.label}}
+                </h4>
+            </div>
+            <div class="modal-body">
+                {{#each model.modal.main as |mainEntry|}}
+                    {{oxisection-main content=mainEntry}}
+                {{/each}}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading">
+    <div class="progress progress-striped active">
+        <div class="progress-bar" role="progressbar">
+            <p class="text-center">Loading ...</p>
+        </div>
+    </div>
+</div>

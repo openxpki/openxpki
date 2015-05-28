@@ -19,6 +19,7 @@ Table of Contents:
    architecture/workflows
    architecture/datapool
    architecture/subsystems/scep
+   architecture/subsystems/enroll-ui
    admin/installation/building
    admin/installation/packages
    admin/installation/deployment
@@ -33,6 +34,7 @@ Table of Contents:
    reference/configuration/introduction
    reference/configuration/server
    reference/configuration/realm
+   reference/configuration/workflow
    reference/configuration/workflows/certrequest
    reference/configuration/workflows/certrevocation
    reference/configuration/workflows/crlissuance
@@ -46,6 +48,7 @@ Table of Contents:
    reference/developer/conventions
    reference/developer/coding
    reference/developer/api
+   reference/developer/webui
    glossary
 
 

@@ -1,0 +1,9 @@
+
+# connector to check system ids againts 
+# must return 0/1
+systemid@: connector:metadata.connectors.systemid
+    
+connectors:
+    systemid:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/systemid.yaml

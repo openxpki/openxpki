@@ -34,12 +34,24 @@ sub execute {
 	
 	my $ser = OpenXPKI::Serialization::Simple->new();
 
+    # In case we want to deal with exisiting workflows we need to load them
+    # This is the case when using this activity from the admin wfl   
+    my $wf_types = $self->param('wf_types');    
+    if ($wf_types) {
+        CTX('log')->log(
+            MESSAGE => 'SmartCard will search for workflows of type : ' . $wf_types,
+            PRIORITY => 'info',
+            FACILITY => [ 'application' ],
+        );
+        my @wf_type_list = split /,/, $wf_types if ($wf_types);        
+        $params{WORKFLOW_TYPES} = \@wf_type_list;
+    }
+
 	my $result = CTX('api')->sc_analyze_smartcard(
 	    {
  		CERTS => \@certs,
 		CERTFORMAT => 'BASE64',
-		SMARTCARDID => $context->param('token_id'),
-		WORKFLOW_TYPES => [ qw( I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V2 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PERSONALIZATION_V3 I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK ) ],
+		SMARTCARDID => $context->param('token_id'),		
 		%params,
 	    });
 
@@ -50,6 +62,13 @@ sub execute {
     # prefix to surpress persisting.
 
     $context->param('_workflows', $result->{WORKFLOWS});
+    if ($wf_types) {
+        CTX('log')->log(
+            MESSAGE => 'SmartCard found existing workflows: ' . Dumper $result->{WORKFLOWS},
+            PRIORITY => 'trace',
+            FACILITY => [ 'application' ],
+        );
+    } 
 
 	# set cert ids in context
 	my $cert_ids = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
@@ -69,8 +88,6 @@ sub execute {
 	    } );
 	    	
     
-    my $config = CTX('config');       
-	
 	foreach my $type (keys %{$result->{CERT_TYPE}}) {
 	    $cert_types->push($type);
  
@@ -194,6 +211,12 @@ sub execute {
     } else {
         $context->param('max_validity' => 0);
     }
+
+    CTX('log')->log(
+        MESSAGE => 'SmartCard status: ' . $result->{SMARTCARD}->{status},
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );   
 
 	##! 1: 'Leaving Initialize::execute()'
 	return 1;

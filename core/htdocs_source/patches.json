@@ -1,0 +1,125 @@
+{
+    "bootstrap": {
+        "3.2.0": {
+            "dist/js/bootstrap.js": [{ "type": "jquery-plugin" }],
+            "_add": ["dist/css/bootstrap.css.map"]
+        }
+    },
+
+    "bootstrap-contextmenu": {
+        "0.0.0": {
+            "bootstrap-contextmenu.js": [{ "type": "jquery-plugin" }]
+        }
+    },
+
+    "bootstrap3-typeahead": {
+        "0.0.0": {
+            "bootstrap3-typeahead.js": [{ "type": "jquery-plugin" }]
+        }
+    },
+
+    "ember": {
+        "1.10.0": {
+            "ember.debug.js": [
+                {
+                    "type": "prepend",
+                    "parameters": "window.Ember = { imports: { jQuery: $ } };"
+                },
+                {
+                    "type": "es6-modules",
+                    "parameters": {
+                        "import": [
+                            { "var": "$", "module": "vendor/jquery" }
+                        ],
+                        "export": [{ "var": "Ember", "name": "default" }]
+                    }
+                }
+            ]
+        }
+    },
+
+    "eonasdan-bootstrap-datetimepicker": {
+        "3.1.3": {
+            "build/js/bootstrap-datetimepicker.min.js": [
+                {
+                    "type": "munge-ast",
+                    "parameters": [
+                        {
+                            "type": "assign",
+                            "left": "[0]",
+                            "right": "(function(){})($, moment)",
+                            "rightReplace": [
+                                {
+                                    "left": "[0].expression.callee",
+                                    "right": "[0].expression.argument.arguments[1]"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "es6-modules",
+                    "parameters": {
+                        "import": [
+                            { "var": "$", "module": "vendor/jquery" },
+                            { "var": "moment", "module": "vendor/moment" }
+                        ],
+                        "export": [
+                            { "var": "null", "name": "default" }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+
+    "jquery": {
+        "1.9.0": {
+            "dist/jquery.js": [
+                {
+                    "type": "es6-modules",
+                    "parameters": {
+                        "export": [
+                            { "var": "$", "name": "default" }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+
+    "moment": {
+        "2.9.0": {
+            "moment.js": [
+                {
+                    "type": "munge-ast",
+                    "parameters": [
+                        {
+                            "type": "assign",
+                            "left": "[0].expression.callee.object.body.body[ast.program.body[0].expression.callee.object.body.body.length-2]",
+                            "right": "__export = moment;"
+                        },
+                        {
+                            "type": "assign",
+                            "left": "[0].expression.callee.object.body.body[ast.program.body[0].expression.callee.object.body.body.length-1]",
+                            "right": ""
+                        },
+                        {
+                            "type": "unshift",
+                            "key": "",
+                            "value": "var __export;"
+                        }
+                    ]
+                },
+                {
+                    "type": "es6-modules",
+                    "parameters": {
+                        "export": [
+                            { "var": "__export", "name": "default" }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

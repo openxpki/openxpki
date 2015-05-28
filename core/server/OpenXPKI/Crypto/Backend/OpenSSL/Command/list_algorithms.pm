@@ -13,7 +13,7 @@ sub get_command
 {
     my $self = shift;
     OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_FORMAT" 
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_FORMAT"
         )
         if ( not exists $self->{FORMAT} );
 
@@ -40,7 +40,7 @@ sub get_result
 {
     my $self   = shift;
     my $result = shift;
-    
+
     my %standard_algs = map { $_ => 1 } qw( RSA DSA EC );
 
     my $supported_algs =  {
@@ -81,33 +81,47 @@ sub get_result
                             ["0", "A", "B", "C", "XA", "XB" ]
                          },
     };
- 
-    my ($alg, $param) = (undef, undef);    
+
+    # If you add new parameter names please add them here for the I18N parser
+    # Please use I18N_OPENXPKI_UI_KEYGEN_PARAM_ + param name
+    # I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG
+    # I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET
+    # I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME
+    # I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH
+
+    my ($alg, $param) = (undef, undef);
     $alg = $self->{ALG};
     $param = $self->{PARAM};
 
     my $key = "";
     foreach $key (keys(%{$supported_algs})) {
         if ( !exists($standard_algs{$key}) ) {
-            my $lc_key = lc($key);                                                                                                                                                 
+            my $lc_key = lc($key);
             if ( $result !~ m{ ${lc_key}\W }xms ) {
                  delete($supported_algs->{$key});
             }
         }
     }
 
-    my $format = $self->{FORMAT}; 
- 
+    my $format = $self->{FORMAT};
+
     if ( $format eq 'all_data' ) {
         return $supported_algs;
     }
     elsif ( $format eq 'alg_names' ) {
         my %alg_names = map { $_ => 1 } keys(%{$supported_algs});
         return \%alg_names;
+    } elsif ( $format eq 'param_names' && !$alg ) {
+        # All possible params
+        my $param_names;
+        foreach my $alg (keys %{$supported_algs}) {
+            map { $param_names->{$_} = 1 } keys(%{$supported_algs->{$alg}});
+        }
+        return $param_names;
     }
     else { # param names or values needed
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_ALGORITMN" ) 
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_ALGORITMN" )
                 if ( !$alg );
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_UNSUPPORTED_ALGORITHM",
@@ -122,7 +136,7 @@ sub get_result
         }
         elsif ( $format eq 'param_values' ) {
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_PARAM_NAME" ) 
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_NO_PARAM_NAME" )
                     if ( !$param );
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_LIST_ALGS_UNSUPPORTED_PARAM_NAME",
@@ -157,7 +171,7 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::list_algorithms
 
 =head2 get_command
 
-Forms command for openssl which answers the question: Do you support non-standard 
+Forms command for openssl which answers the question: Do you support non-standard
 public-key crypto algorithms, that is anything beyond usual set of RSA, DSA and EC?
 
 =head2 hide_output

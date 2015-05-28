@@ -1,0 +1,1614 @@
+head:
+    prefix: scpers
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PERSONALIZATION_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PERSONALIZATION_DESC
+
+state:
+    APPROVAL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_APPROVAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_APPROVAL_DESC
+        action: 
+          - approve_wf > all_approvals_present
+          - reject_wf > FAILURE
+
+    BEGIN_LOOP_NEED_CSR: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_BEGIN_LOOP_NEED_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_BEGIN_LOOP_NEED_CSR_DESC
+        action: 
+          - global_noop > GET_NEXT_NEED_CSR ? !temp_list_empty
+          - global_noop2 > CSR_DONE ? temp_list_empty
+
+    CAN_ISSUE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CAN_ISSUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CAN_ISSUE_DESC
+        action: 
+          - global_noop > NEXT_CSR_TO_ISSUE ? !all_certs_issued
+          - global_noop2 > CERTIFICATE_ISSUANCE_DONE ? all_certs_issued
+
+    CERTIFICATE_ISSUANCE_DONE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTIFICATE_ISSUANCE_DONE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTIFICATE_ISSUANCE_DONE_DESC
+        action: 
+          - global_noop > PREPARE_CERT_INST
+
+    CERTIFICATE_ISSUANCE_POSSIBLE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTIFICATE_ISSUANCE_POSSIBLE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTIFICATE_ISSUANCE_POSSIBLE_DESC
+        action: 
+          - global_noop > NEED_PUK ? !allow_user_PIN will_need_PIN
+          - global_noop2 > PIN_MISSING ? allow_user_PIN will_need_PIN
+          - global_noop3 > PIN_CONTINUE ? !will_need_PIN
+
+    CERTS_DELETED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_DELETED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_DELETED_DESC
+        action: 
+          - queue_certs_to_revoke > CERTS_QUEUED_FOR_REVOCATION
+
+    CERTS_PUBLISHED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_PUBLISHED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_PUBLISHED_DESC
+        action: 
+          - global_noop > PRE_SUCCESS
+
+    CERTS_QUEUED_FOR_DELETION: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_DELETION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_DELETION_DESC
+        action: 
+          - global_noop > CERT_TO_DELETE ? !all_certs_deleted
+          - global_noop2 > CERTS_DELETED ? all_certs_deleted
+
+    CERTS_QUEUED_FOR_DEPUBLICATION: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_DEPUBLICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_DEPUBLICATION_DESC
+        action: 
+          - global_noop > CERT_DELETE_CHECK ? all_certs_unpublished
+          - global_noop2 > CERT_TO_UNPUBLISH ? !all_certs_unpublished
+
+    CERTS_QUEUED_FOR_PUBLICATION: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_PUBLICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_PUBLICATION_DESC
+        action: 
+          - global_noop > CERT_TO_PUBLISH ? !all_certs_published
+          - global_noop2 > CERTS_PUBLISHED ? all_certs_published
+
+    CERTS_QUEUED_FOR_REVOCATION: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_REVOCATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERTS_QUEUED_FOR_REVOCATION_DESC
+        action: 
+          - cleanup_workflow > SUCCESS ? all_certs_revoked
+          - global_noop > CERT_TO_REVOKE ? !all_certs_revoked
+
+    CERT_DELETE_CHECK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_DELETE_CHECK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_DELETE_CHECK_DESC
+        action: 
+          - queue_certs_to_delete > CERTS_QUEUED_FOR_DELETION
+
+    CERT_ID_TO_PUBLISH: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_ID_TO_PUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_ID_TO_PUBLISH_DESC
+        action: 
+          - fetch_certificate_publish > HAVE_CERT_TO_PUBLISH
+
+    CERT_INST_CHECK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_INST_CHECK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_INST_CHECK_DESC
+        action: 
+          - global_noop > WHICH_CERT_TO_INSTALL ? !all_certs_installed
+          - global_noop2 > INSTALL_CERTIFICATE_DONE ? all_certs_installed
+
+    CERT_IN_DATAPOOL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_IN_DATAPOOL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_IN_DATAPOOL_DESC
+        action: 
+          - push_cert_to_issuance_queue > CERT_QUEUED
+
+    CERT_ISSUED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_ISSUED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_ISSUED_DESC
+        action: 
+          - register_cert_in_datapool > CERT_IN_DATAPOOL
+
+    CERT_PUBLISH_CHECK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_PUBLISH_CHECK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_PUBLISH_CHECK_DESC
+        action: 
+          - queue_certs_for_publication > CERTS_QUEUED_FOR_PUBLICATION
+
+    CERT_QUEUED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_QUEUED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_QUEUED_DESC
+        action: 
+          - global_noop > NEW_ESCROW_CERT_ISSUED ? has_escrow_key_to_rename
+          - global_noop2 > CAN_ISSUE ? !has_escrow_key_to_rename
+
+    CERT_RETRIEVED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_RETRIEVED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_RETRIEVED_DESC
+        action: 
+          - calculate_key_id > KEY_ID_COMPUTED
+
+    CERT_TO_DELETE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_DELETE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_DELETE_DESC
+        action: 
+          - next_cert_to_delete > HAVE_CERT_TO_DELETE
+
+    CERT_TO_INSTALL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_INSTALL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_INSTALL_DESC
+        action: 
+          - cert_inst_err > CERT_TO_INSTALL
+          - fetch_puk > CERT_TO_INSTALL
+          - cert_inst_ok > EXPORT_QUEUE_SIG
+          - fail_workflow > FAILURE
+
+    CERT_TO_PUBLISH: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_PUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_PUBLISH_DESC
+        action: 
+          - next_cert_to_publish > CERT_ID_TO_PUBLISH
+
+    CERT_TO_REVOKE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_REVOKE_DESC
+        action: 
+          - next_cert_to_revoke > HAVE_CERT_TO_REVOKE
+
+    CERT_TO_UNPUBLISH: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_UNPUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_TO_UNPUBLISH_DESC
+        action: 
+          - next_cert_to_unpublish > HAVE_CERT_TO_UNPUBLISH
+
+    CERT_UNPUB_CHECK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_UNPUB_CHECK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CERT_UNPUB_CHECK_DESC
+        action: 
+          - queue_certs_to_unpublish > CERTS_QUEUED_FOR_DEPUBLICATION
+
+    CSRS_TO_PROCESS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CSRS_TO_PROCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CSRS_TO_PROCESS_DESC
+        action: 
+          - global_noop > APPROVAL ? workflow_approval_needed
+          - global_noop2 > PERSIST_CSRS ? !workflow_approval_needed
+
+    CSR_AVAIL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CSR_AVAIL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CSR_AVAIL_DESC
+        action: 
+          - apply_csr_policy > QUEUE_CSR_TO_ISSUE
+
+    CSR_DONE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CSR_DONE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_CSR_DONE_DESC
+        action: 
+          - global_noop > PRE_ISSUANCE
+
+    ESCROW_CERT_TO_INSTALL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_ESCROW_CERT_TO_INSTALL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_ESCROW_CERT_TO_INSTALL_DESC
+        action: 
+          - global_noop > CERT_INST_CHECK ? !private_key_exists_in_datapool
+          - global_noop2 > PKCS12_TO_INSTALL ? private_key_exists_in_datapool
+
+    EXPORT_QUEUE_ENC: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_EXPORT_QUEUE_ENC_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_EXPORT_QUEUE_ENC_DESC
+        action: 
+          - add_to_queue_enc > CERT_INST_CHECK
+
+    EXPORT_QUEUE_SIG: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_EXPORT_QUEUE_SIG_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_EXPORT_QUEUE_SIG_DESC
+        action: 
+          - add_to_queue_sig > CERT_INST_CHECK
+
+    FAILURE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FAILURE_DESC
+
+    FETCH_CERTIFICATE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FETCH_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FETCH_CERTIFICATE_DESC
+        action: 
+          - fetch_certificate > CERT_RETRIEVED
+
+    GET_NEXT_NEED_CSR: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_GET_NEXT_NEED_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_GET_NEXT_NEED_CSR_DESC
+        action: 
+          - get_next_need_csr > HAVE_NEXT_NEED_CSR
+
+    HAVE_CERT_TO_DELETE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_DELETE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_DELETE_DESC
+        action: 
+          - fail_workflow > FAILURE
+          - fetch_puk > HAVE_CERT_TO_DELETE
+          - cert_del_ok > CERTS_QUEUED_FOR_DELETION
+          - cert_del_err > HAVE_CERT_TO_DELETE
+
+    HAVE_CERT_TO_PUBLISH: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_PUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_PUBLISH_DESC
+        action: 
+          - publish_certificate > CERTS_QUEUED_FOR_PUBLICATION
+
+    HAVE_CERT_TO_REVOKE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_REVOKE_DESC
+        action: 
+          - revoke_certificate > CERTS_QUEUED_FOR_REVOCATION
+
+    HAVE_CERT_TO_UNPUBLISH: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_UNPUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_CERT_TO_UNPUBLISH_DESC
+        action: 
+          - unpublish_certificate > CERTS_QUEUED_FOR_DEPUBLICATION
+
+    HAVE_COMPUTED_PUK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_COMPUTED_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_COMPUTED_PUK_DESC
+        action: 
+          - global_noop > HAVE_WRITABLE_PUK ? can_set_puk
+          - global_noop2 > FAILURE ? !can_set_puk
+
+    HAVE_GENERATED_PUK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_GENERATED_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_GENERATED_PUK_DESC
+        action: 
+          - global_noop > PUK_TO_INSTALL ? generated_puk_ok
+          - global_noop2 > FAILURE ? !generated_puk_ok
+
+    HAVE_NEXT_NEED_CSR: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_NEXT_NEED_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_NEXT_NEED_CSR_DESC
+        action: 
+          - global_noop > NEED_ESCROW_KEY ? is_escrow_csr
+          - global_noop2 > NEED_NON_ESCROW_CSR ? !is_escrow_csr
+
+    HAVE_PREREQS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_PREREQS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_PREREQS_DESC
+        action: 
+          - chip_id_mismatch_err > FAILURE ? smartchip_id_mismatch
+          - global_noop > CERTIFICATE_ISSUANCE_POSSIBLE ? smartcard_status_activated !smartchip_id_mismatch
+          - global_noop2 > CERTIFICATE_ISSUANCE_POSSIBLE ? is_badge_officer smartcard_status_initial !smartcard_status_activated !smartchip_id_mismatch
+          - auth_err > FAILURE ? !is_badge_officer smartcard_status_initial !smartcard_status_activated !smartchip_id_mismatch
+          - status_err > FAILURE ? !smartcard_status_initial !smartcard_status_activated !smartchip_id_mismatch
+
+    HAVE_PUK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_PUK_DESC
+        action: 
+          - global_noop > START_ACTIONS
+
+    HAVE_WRITABLE_PUK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_WRITABLE_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_HAVE_WRITABLE_PUK_DESC
+        action: 
+          - generate_puk > HAVE_GENERATED_PUK
+
+    INITIAL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_INITIAL_DESC
+        action: 
+          - initialize > INITIALIZED
+
+    INITIALIZED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_INITIALIZED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_INITIALIZED_DESC
+        action: 
+          - check_prereqs_via_api > PREREQS_AVAILABLE
+
+    INSTALL_CERTIFICATE_DONE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_INSTALL_CERTIFICATE_DONE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_INSTALL_CERTIFICATE_DONE_DESC
+        action: 
+          - global_noop > CERT_PUBLISH_CHECK
+
+    ISSUE_CERT: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_ISSUE_CERT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_ISSUE_CERT_DESC
+        action: 
+          - issue_certificate > CERT_ISSUED
+
+    KEY_ESCROWED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_KEY_ESCROWED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_KEY_ESCROWED_DESC
+        action: 
+          - create_pkcs12 > PKCS12_CREATED
+
+    KEY_ID_COMPUTED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_KEY_ID_COMPUTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_KEY_ID_COMPUTED_DESC
+        action: 
+          - global_noop > X509_PREPARED ? !is_escrow_cert
+          - global_noop2 > ESCROW_CERT_TO_INSTALL ? is_escrow_cert
+
+    NEED_ESCROW_CSR: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_ESCROW_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_ESCROW_CSR_DESC
+        action: 
+          - create_escrow_csr > CSR_AVAIL
+
+    NEED_ESCROW_KEY: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_ESCROW_KEY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_ESCROW_KEY_DESC
+        action: 
+          - create_escrowed_key > NEED_ESCROW_CSR
+
+    NEED_NON_ESCROW_CSR: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_NON_ESCROW_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_NON_ESCROW_CSR_DESC
+        action: 
+          - post_non_escrow_csr_err > NEED_NON_ESCROW_CSR
+          - fetch_puk > NEED_NON_ESCROW_CSR
+          - fail_workflow > FAILURE
+          - post_non_escrow_csr > CSR_AVAIL
+
+    NEED_PUK: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEED_PUK_DESC
+        action: 
+          - global_noop > HAVE_PUK ? puk_found_in_datapool
+          - global_noop2 > NO_STORED_PUK_AVAIL ? !puk_found_in_datapool
+
+    NEW_ESCROW_CERT_ISSUED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEW_ESCROW_CERT_ISSUED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEW_ESCROW_CERT_ISSUED_DESC
+        action: 
+          - rename_key > PRIVATE_KEY_RENAMED
+
+    NEXT_CSR_TO_ISSUE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEXT_CSR_TO_ISSUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NEXT_CSR_TO_ISSUE_DESC
+        action: 
+          - next_csr_to_issue > ISSUE_CERT
+
+    NO_STORED_PUK_AVAIL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NO_STORED_PUK_AVAIL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_NO_STORED_PUK_AVAIL_DESC
+        action: 
+          - compute_puk > HAVE_COMPUTED_PUK
+
+    OWNER_IDENTIFIED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_OWNER_IDENTIFIED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_OWNER_IDENTIFIED_DESC
+        action: 
+          - global_noop > HAVE_PREREQS
+
+    PERSIST_CSRS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PERSIST_CSRS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PERSIST_CSRS_DESC
+        action: 
+          - persist_csrs > PREPARE_CSRS_TO_PROCESS
+
+    PIN_CONTINUE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PIN_CONTINUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PIN_CONTINUE_DESC
+        action: 
+          - global_noop > START_ACTIONS
+
+    PIN_MISSING: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PIN_MISSING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PIN_MISSING_DESC
+        action: 
+          - fail_workflow > FAILURE
+          - gui_has_pin > PIN_CONTINUE
+          - user_abort > FAILURE
+
+    PKCS12_CREATED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_CREATED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_CREATED_DESC
+        action: 
+          - clear_passwords > PKCS12_TO_INSTALL
+
+    PKCS12_PARAMETERS_SET: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_PARAMETERS_SET_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_PARAMETERS_SET_DESC
+        action: 
+          - escrow_private_key > KEY_ESCROWED
+
+    PKCS12_PASSWORD_ENCRYPTED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_PASSWORD_ENCRYPTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_PASSWORD_ENCRYPTED_DESC
+        action: 
+          - set_p12_parameters > PKCS12_PARAMETERS_SET
+
+    PKCS12_TO_INSTALL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_TO_INSTALL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PKCS12_TO_INSTALL_DESC
+        action: 
+          - cert_inst_err > PKCS12_TO_INSTALL
+          - refetch_p12 > PREPARE_ESCROW_CERT_INSTALLATION
+          - fetch_puk > PKCS12_TO_INSTALL
+          - fail_workflow > FAILURE
+          - cert_inst_ok > EXPORT_QUEUE_ENC
+
+    POLICY_INPUT_REQUIRED: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_POLICY_INPUT_REQUIRED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_POLICY_INPUT_REQUIRED_DESC
+        action: 
+          - apply_csr_policy > QUEUE_CSR_TO_ISSUE
+          - fail_workflow > FAILURE
+          - fetch_puk > POLICY_INPUT_REQUIRED
+
+    PREPARE_CERT_INST: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREPARE_CERT_INST_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREPARE_CERT_INST_DESC
+        action: 
+          - register_user_information > USER_INFO_REGISTERED
+
+    PREPARE_CSRS_TO_PROCESS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREPARE_CSRS_TO_PROCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREPARE_CSRS_TO_PROCESS_DESC
+        action: 
+          - copy_csr_serials > CAN_ISSUE
+
+    PREPARE_ESCROW_CERT_INSTALLATION: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREPARE_ESCROW_CERT_INSTALLATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREPARE_ESCROW_CERT_INSTALLATION_DESC
+        action: 
+          - create_pkcs12_password > PKCS12_PASSWORD_ENCRYPTED
+
+    PREP_LOOP_NEED_CSR: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREP_LOOP_NEED_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREP_LOOP_NEED_CSR_DESC
+        action: 
+          - init_tmp_list_csr > BEGIN_LOOP_NEED_CSR
+
+    PREREQS_AVAILABLE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREREQS_AVAILABLE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PREREQS_AVAILABLE_DESC
+        action: 
+          - set_workflow_attributes > OWNER_IDENTIFIED
+
+    PRE_ISSUANCE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PRE_ISSUANCE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PRE_ISSUANCE_DESC
+        action: 
+          - global_noop > CSRS_TO_PROCESS ? csrs_to_process
+          - global_noop2 > CERTIFICATE_ISSUANCE_DONE ? !csrs_to_process
+
+    PRE_SUCCESS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PRE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PRE_SUCCESS_DESC
+        action: 
+          - global_noop > CERT_UNPUB_CHECK
+
+    PRIVATE_KEY_RENAMED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PRIVATE_KEY_RENAMED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PRIVATE_KEY_RENAMED_DESC
+        action: 
+          - add_escrow_cert_to_publish_queue > CAN_ISSUE
+
+    PUK_TO_INSTALL: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PUK_TO_INSTALL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_PUK_TO_INSTALL_DESC
+        action: 
+          - fail_workflow > FAILURE
+          - puk_write_err > PUK_TO_INSTALL
+          - fetch_puk > PUK_TO_INSTALL
+          - puk_write_ok > HAVE_PUK
+
+    QUEUE_CERTS_TO_RECOVER: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_QUEUE_CERTS_TO_RECOVER_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_QUEUE_CERTS_TO_RECOVER_DESC
+        action: 
+          - queue_certs_to_recover_for_installation > CERT_INST_CHECK
+
+    QUEUE_CSR_TO_ISSUE: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_QUEUE_CSR_TO_ISSUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_QUEUE_CSR_TO_ISSUE_DESC
+        action: 
+          - queue_csr_to_issue > BEGIN_LOOP_NEED_CSR ? !policy_input_required
+          - global_noop > POLICY_INPUT_REQUIRED ? policy_input_required
+
+    START_ACTIONS: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_START_ACTIONS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_START_ACTIONS_DESC
+        action: 
+          - global_noop > PREP_LOOP_NEED_CSR
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_SUCCESS_DESC
+
+    USER_INFO_REGISTERED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_USER_INFO_REGISTERED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_USER_INFO_REGISTERED_DESC
+        action: 
+          - queue_issued_certs_for_installation > QUEUE_CERTS_TO_RECOVER
+
+    WHICH_CERT_TO_INSTALL: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_WHICH_CERT_TO_INSTALL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_WHICH_CERT_TO_INSTALL_DESC
+        action: 
+          - fetch_cert_id_to_install > FETCH_CERTIFICATE
+
+    X509_PREPARED: 
+        autorun: 1
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_DESC
+        action: 
+          - set_cert_type_to_x509 > CERT_TO_INSTALL
+
+
+action:
+    add_escrow_cert_to_publish_queue: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC
+        input: 
+          - cert_identifier
+        param: 
+            array_name: certs_to_publish
+            context_key: cert_identifier
+            function: push
+
+    add_to_queue_enc: 
+        class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::AddToQueue
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_TO_QUEUE_ENC_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_TO_QUEUE_ENC_DESC
+        param: 
+            _map_EmployeeID: $userinfo_employee_id
+            _map_certType: enc
+            _map_email: $userinfo_mail
+            attribs: EmployeeID,certType,email
+            namespace: export.smartcard.transfer
+
+    add_to_queue_sig: 
+        class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::AddToQueue
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_TO_QUEUE_SIG_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_TO_QUEUE_SIG_DESC
+        param: 
+            _map_EmployeeID: $userinfo_employee_id
+            _map_certType: sig
+            _map_email: $userinfo_mail
+            attribs: EmployeeID,certType,email
+            namespace: export.smartcard.transfer
+
+    apply_csr_policy: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::ApplyCSRPolicy
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_APPLY_CSR_POLICY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_APPLY_CSR_POLICY_DESC
+        input: 
+          - login_ids
+          - pkcs10
+
+    approve_wf: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_APPROVE_WF_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_APPROVE_WF_DESC
+
+    auth_err: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_AUTH_ERR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_AUTH_ERR_DESC
+        param: 
+            error_code: Smartcard state requires badge officer to continue
+
+    calculate_key_id: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CalculateKeyId
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CALCULATE_KEY_ID_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CALCULATE_KEY_ID_DESC
+        input: 
+          - certificate
+        param: 
+            output_key: keyid
+
+    cert_del_err: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_DEL_ERR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_DEL_ERR_DESC
+        input: 
+          - sc_error_reason
+
+    cert_del_ok: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_DEL_OK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_DEL_OK_DESC
+
+    cert_inst_err: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_INST_ERR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_INST_ERR_DESC
+        input: 
+          - sc_error_reason
+
+    cert_inst_ok: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_INST_OK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CERT_INST_OK_DESC
+
+    check_prereqs_via_api: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CHECK_PREREQS_VIA_API_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CHECK_PREREQS_VIA_API_DESC
+
+    chip_id_mismatch_err: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CHIP_ID_MISMATCH_ERR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CHIP_ID_MISMATCH_ERR_DESC
+        param: 
+            error_code: Smartcard chip id mismatch
+
+    cleanup_workflow: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CLEANUP_WORKFLOW_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CLEANUP_WORKFLOW_DESC
+        param: 
+            SetContextParameters: overwritecontext
+            _keypassword: OpenXPKI
+            cert_install_type: 
+            certificate: 
+            pkcs10: 
+            temp_key_handle: 
+
+    clear_passwords: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CLEAR_PASSWORDS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CLEAR_PASSWORDS_DESC
+        param: 
+            SetContextParameters: overwritecontext
+            _keypassword: 
+
+    compute_puk: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::ComputePUK
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_COMPUTE_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_COMPUTE_PUK_DESC
+        input: 
+          - chip_id
+          - token_id
+        param: 
+            description: Obtain PUK for given Smartcard (possibly only a default value, or a computation based on token_id or chip_id)
+
+    copy_csr_serials: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_COPY_CSR_SERIALS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_COPY_CSR_SERIALS_DESC
+        input: 
+          - csr_serial
+        param: 
+            SetContextParameters: overwritecontext,extendedsyntax
+            tmp_queue: $context->param('csr_serial')
+
+    create_escrow_csr: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROW_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROW_CSR_DESC
+        input: 
+          - pkcs10
+
+    create_escrowed_key: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::CreateEscrowedKey
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC
+        param: 
+            dp_namespace: certificate.privatekey
+            _map_dp_key: $token_id
+            key_alg: RSA
+            key_size: 1024
+            enc_alg: aes256
+
+    create_pkcs12: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::CreatePKCS12
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_PKCS12_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_PKCS12_DESC
+        param: 
+            _map_passin: $_keypassword
+            _map_passout: $_password
+            _map_certificate: $certificate
+            _map_privatekey: $_private_key
+
+    create_pkcs12_password: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::GeneratePassword
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_PKCS12_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_PKCS12_PASSWORD_DESC
+        param: 
+            password_length: 20
+
+    escrow_private_key: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ESCROW_PRIVATE_KEY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ESCROW_PRIVATE_KEY_DESC
+        input: 
+          - cert_identifier
+        param: 
+            description: Retrieve encryption certificate from database
+            ds_key_param: cert_identifier
+            ds_namespace: certificate.privatekey
+            ds_value_param: _private_key
+
+    fail_workflow: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FAIL_WORKFLOW_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FAIL_WORKFLOW_DESC
+        param: 
+            error_code: failed_by_administrator
+
+    fetch_cert_id_to_install: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_CERT_ID_TO_INSTALL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_CERT_ID_TO_INSTALL_DESC
+        input: 
+          - tmp_queue
+        param: 
+            array_name: tmp_queue
+            context_key: cert_identifier
+            function: shift
+
+    fetch_certificate: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_CERTIFICATE_DESC
+        input: 
+          - cert_identifier
+        param: 
+            certstatus: ANY
+
+    fetch_certificate_publish: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_CERTIFICATE_PUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_CERTIFICATE_PUBLISH_DESC
+        input: 
+          - cert_identifier
+        param: 
+            certstatus: ANY
+
+    fetch_puk: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::FetchPUK
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_FETCH_PUK_DESC
+        param: 
+            description: >
+               This fetches the currently-known PUKs from the datastore. If one entry is returned, it is the current PUK on the card.
+               If two are returned, it is probable that the first is a new PUK to be written and the second is the current PUK.
+               Note to client: the returned string is probably a serialized array, so the client needs to deserialize it before using it.
+               Suggested behavior of client: if more than one PUK is returned, try to change the PUK to the first in the list using the second. On fail, the first is most likely the correct PUK, on success, the first PUK is now correct. If the state supports the action "puk_write_ok", it should be called when the PUK was successfuly set.
+            ds_default_value: $smartcard_default_puk
+            ds_key_param: token_id
+            ds_namespace: smartcard.puk
+            ds_value_param: _puk
+
+    generate_puk: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::GeneratePUK
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_GENERATE_PUK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_GENERATE_PUK_DESC
+        input: 
+          - _default_puk
+        param: 
+            description: This generates a new puk and shifts it to the front of the array stored in the smartcard.puk namespace that has the key that matches our token id.
+
+    get_next_need_csr: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_GET_NEXT_NEED_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_GET_NEXT_NEED_CSR_DESC
+        input: 
+          - tmp_queue
+        param: 
+            array_name: tmp_queue
+            context_key: csr_cert_type
+            function: shift
+
+    gui_has_pin: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_GUI_HAS_PIN_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_GUI_HAS_PIN_DESC
+        param: 
+            error_code: User would not enter password
+
+    init_tmp_list_csr: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INIT_TMP_LIST_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INIT_TMP_LIST_CSR_DESC
+        input: 
+          - certs_to_create
+        param: 
+            SetContextParameters: overwrite,extendedsyntax
+            tmp_queue: $context->param('certs_to_create')
+
+    initialize: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_DESC
+        input: 
+          - certs_on_card
+          - chip_id
+          - token_id
+          - user_id
+
+    issue_certificate: 
+        class: OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ISSUE_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ISSUE_CERTIFICATE_DESC
+        param: 
+            retry_count: 10
+            retry_interval: +0000000030
+
+    next_cert_to_delete: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_DELETE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_DELETE_DESC
+        input: 
+          - tmp_queue
+        param: 
+            array_name: tmp_queue
+            context_key: keyid
+            function: shift
+
+    next_cert_to_publish: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_PUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_PUBLISH_DESC
+        input: 
+          - tmp_queue
+        param: 
+            array_name: tmp_queue
+            context_key: cert_identifier
+            function: shift
+
+    next_cert_to_revoke: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_REVOKE_DESC
+        input: 
+          - tmp_queue
+        param: 
+            array_name: tmp_queue
+            context_key: cert_identifier
+            function: shift
+
+    next_cert_to_unpublish: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_UNPUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CERT_TO_UNPUBLISH_DESC
+        input: 
+          - tmp_queue
+        param: 
+            array_name: tmp_queue
+            context_key: cert_identifier
+            function: shift
+
+    next_csr_to_issue: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CSR_TO_ISSUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_NEXT_CSR_TO_ISSUE_DESC
+        input: 
+          - tmp_queue
+        param: 
+            array_name: tmp_queue
+            context_key: csr_serial
+            function: shift
+
+    global_noop: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_global_noop_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_global_noop_DESC
+
+    global_noop2: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_global_noop2_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_global_noop2_DESC
+
+    global_noop3: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_global_noop3_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_global_noop3_DESC
+
+    persist_csrs: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::PersistCSRs
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PERSIST_CSRS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PERSIST_CSRS_DESC
+        input: 
+          - cert_issuance_data
+
+    post_non_escrow_csr: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_POST_NON_ESCROW_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_POST_NON_ESCROW_CSR_DESC
+        input: 
+          - keyid
+          - pkcs10
+
+    post_non_escrow_csr_err: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_POST_NON_ESCROW_CSR_ERR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_POST_NON_ESCROW_CSR_ERR_DESC
+        input: 
+          - sc_error_reason
+
+    publish_certificate: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUBLISH_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUBLISH_CERTIFICATE_DESC
+        input: 
+          - cert_identifier
+        param: 
+            prefix: smartcard.publishing
+            description: Generic routine for publishing certificates to LDAP servers
+            publish_key: userinfo_mail
+
+    puk_write_err: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUK_WRITE_ERR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUK_WRITE_ERR_DESC
+        input: 
+          - sc_error_reason
+
+    puk_write_ok: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUK_WRITE_OK_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUK_WRITE_OK_DESC
+        param: 
+            description: At the moment, this activity is a no-op, but later, it should expire PUKs in the datapool that are known to be no longer valid.
+
+    push_cert_to_issuance_queue: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUSH_CERT_TO_ISSUANCE_QUEUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_PUSH_CERT_TO_ISSUANCE_QUEUE_DESC
+        param: 
+            array_name: certs_issued
+            context_key: cert_identifier
+            function: push
+
+    queue_certs_for_publication: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_FOR_PUBLICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_FOR_PUBLICATION_DESC
+        input: 
+          - certs_to_publish
+        param: 
+            array_name: tmp_queue
+            context_key: certs_to_publish
+            function: pusharray
+
+    queue_certs_to_delete: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_DELETE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_DELETE_DESC
+        input: 
+          - certs_to_delete
+        param: 
+            array_name: tmp_queue
+            context_key: certs_to_delete
+            function: pusharray
+
+    queue_certs_to_recover_for_installation: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_RECOVER_FOR_INSTALLATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_RECOVER_FOR_INSTALLATION_DESC
+        input: 
+          - certs_to_install
+        param: 
+            array_name: tmp_queue
+            context_key: certs_to_install
+            function: pusharray
+
+    queue_certs_to_revoke: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_REVOKE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_REVOKE_DESC
+        input: 
+          - certs_to_revoke
+        param: 
+            array_name: tmp_queue
+            context_key: certs_to_revoke
+            function: pusharray
+
+    queue_certs_to_unpublish: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_UNPUBLISH_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CERTS_TO_UNPUBLISH_DESC
+        input: 
+          - certs_to_unpublish
+        param: 
+            array_name: tmp_queue
+            context_key: certs_to_delete
+            function: pusharray
+
+    queue_csr_to_issue: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CSR_TO_ISSUE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_CSR_TO_ISSUE_DESC
+        input: 
+          - csr_id
+        param: 
+            array_name: csrs_to_issue
+            context_key: csr_id
+            function: pusharray
+
+    queue_issued_certs_for_installation: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_ISSUED_CERTS_FOR_INSTALLATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_QUEUE_ISSUED_CERTS_FOR_INSTALLATION_DESC
+        input: 
+          - certs_issued
+        param: 
+            array_name: tmp_queue
+            context_key: certs_issued
+            function: pusharray
+
+    refetch_p12: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REFETCH_P12_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REFETCH_P12_DESC
+
+    register_cert_in_datapool: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::AppendToEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REGISTER_CERT_IN_DATAPOOL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REGISTER_CERT_IN_DATAPOOL_DESC
+        param: 
+            ds_encrypt: 0
+            ds_force: 0
+            ds_key_param: userinfo_employee_id
+            ds_namespace: smartcard.user.certificate
+            ds_value_param: cert_identifier
+
+    register_user_information: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REGISTER_USER_INFORMATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REGISTER_USER_INFORMATION_DESC
+        input: 
+          - userinfo_currentid
+          - userinfo_employee_id
+        param: 
+            ds_encrypt: 0
+            ds_force: 1
+            ds_key_param: userinfo_employee_id
+            ds_namespace: smartcard.user.currentid
+            ds_value_param: userinfo_currentid
+
+    reject_wf: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REJECT_WF_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REJECT_WF_DESC
+
+    rename_key: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::RenameEscrowedKey
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_RENAME_KEY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_RENAME_KEY_DESC
+        input: 
+          - cert_identifier
+        param: 
+            ds_namespace: certificate.privatekey
+
+    revoke_certificate: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REVOKE_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_REVOKE_CERTIFICATE_DESC
+        input: 
+          - cert_identifier
+        param: 
+            flag_auto_approval: 1
+            reason_code: superseded
+
+    set_cert_type_to_x509: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_CERT_TYPE_TO_X509_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_CERT_TYPE_TO_X509_DESC
+        param: 
+            SetContextParameters: overwritecontext
+            cert_install_type: x509
+
+    set_p12_parameters: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_P12_PARAMETERS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_P12_PARAMETERS_DESC
+        param: 
+            SetContextParameters: overwritecontext
+            _keypassword: OpenXPKI
+            cert_install_type: p12
+
+    set_workflow_attributes: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        param: 
+            _map_token_id: $token_id
+            _map_card_owner: $userinfo_card_owner
+
+    status_err: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_STATUS_ERR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_STATUS_ERR_DESC
+        param: 
+            error_code: Smartcard state neither activated nor initial
+
+    unpublish_certificate: 
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_UNPUBLISH_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_UNPUBLISH_CERTIFICATE_DESC
+        input: 
+          - cert_identifier
+
+    user_abort: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_USER_ABORT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_USER_ABORT_DESC
+        param: 
+            error_code: User would not enter password
+
+
+condition:
+    all_certs_deleted: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: tmp_queue
+            condition: is_empty
+
+    all_certs_installed: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: tmp_queue
+            condition: is_empty
+
+    all_certs_issued: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: tmp_queue
+            condition: is_empty
+
+    all_certs_published: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: tmp_queue
+            condition: is_empty
+
+    all_certs_revoked: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: tmp_queue
+            condition: is_empty
+
+    all_certs_unpublished: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: tmp_queue
+            condition: is_empty
+
+    allow_user_PIN: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: flag_allow_user_pin
+            context_value: yes
+
+    can_set_puk: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: flag_puk_is_writable
+            context_value: yes
+
+    csrs_to_process: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: exists
+            context_key: cert_issuance_data
+
+    generated_puk_ok: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: generated_new_puk
+            context_value: yes
+
+    has_escrow_key_to_rename: 
+        class: OpenXPKI::Server::Workflow::Condition::WFHash
+        param: 
+            condition: key_nonempty
+            ds_key: $csr_serial
+            hash_name: cert_escrow_handle
+
+    is_badge_officer: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: flag_is_badge_officer
+            context_value: yes
+
+    is_escrow_cert: 
+        class: OpenXPKI::Server::Workflow::Condition::DatapoolEntry
+        param: 
+            condition: notnull
+            datapool_key: $cert_identifier
+            datapool_namespace: certificate.privatekey
+
+    is_escrow_csr: 
+        class: OpenXPKI::Server::Workflow::Condition::Connector::IsValue
+        param: 
+            _map_config_path: smartcard.policy.certs.type.[% context.csr_cert_type %].escrow_key
+            value: 1
+
+    policy_input_required: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: notnull
+            context_key: policy_input_required
+
+    private_key_exists_in_datapool: 
+        class: OpenXPKI::Server::Workflow::Condition::DatapoolEntry
+        param: 
+            condition: notnull
+            datapool_key: $cert_identifier
+            datapool_namespace: certificate.privatekey
+
+    puk_found_in_datapool: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: flag_puk_found_in_datapool
+            context_value: yes
+
+    smartcard_status_activated: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: smartcard_status
+            context_value: activated
+
+    smartcard_status_initial: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: smartcard_status
+            context_value: initial
+
+    smartchip_id_mismatch: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: smartcard_token_chipid_match
+            context_value: mismatch
+
+    temp_list_empty: 
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param: 
+            array_name: tmp_queue
+            condition: is_empty
+
+    will_need_PIN: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: flag_will_need_pin
+            context_value: yes
+
+    workflow_approval_needed: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: equals
+            context_key: flag_need_approval
+            context_value: yes
+
+
+field:
+    _default_puk: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_LABEL
+        name: _default_puk
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_TOOLTIP
+        type: text
+        required: 0
+
+    _keypassword: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__KEYPASSWORD_LABEL
+        name: _keypassword
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__KEYPASSWORD_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__KEYPASSWORD_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__KEYPASSWORD_TOOLTIP
+        required: 1
+        type: text
+
+    _password: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_LABEL
+        name: _password
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP
+        required: 1
+        type: text
+
+    _private_key: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_LABEL
+        name: _private_key
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP
+        required: 1
+        type: text
+
+    cert_identifier: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL
+        name: cert_identifier
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP
+        required: 1
+        type: text
+
+    cert_issuance_data: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_LABEL
+        name: cert_issuance_data
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_TOOLTIP
+        required: 1
+        type: text
+
+    certificate: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL
+        name: certificate
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_TOOLTIP
+        required: 1
+        type: text
+
+    certs_issued: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ISSUED_LABEL
+        name: certs_issued
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ISSUED_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ISSUED_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ISSUED_TOOLTIP
+        type: text
+        required: 0
+
+    certs_on_card: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ON_CARD_LABEL
+        name: certs_on_card
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ON_CARD_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ON_CARD_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ON_CARD_TOOLTIP
+        type: text
+        required: 0
+
+    certs_to_create: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_CREATE_LABEL
+        name: certs_to_create
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_CREATE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_CREATE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_CREATE_TOOLTIP
+        required: 1
+        type: text
+
+    certs_to_delete: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_DELETE_LABEL
+        name: certs_to_delete
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_DELETE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_DELETE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_DELETE_TOOLTIP
+        type: text
+        required: 0
+
+    certs_to_install: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_INSTALL_LABEL
+        name: certs_to_install
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_INSTALL_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_INSTALL_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_INSTALL_TOOLTIP
+        required: 1
+        type: text
+
+    certs_to_publish: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_PUBLISH_LABEL
+        name: certs_to_publish
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_PUBLISH_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_PUBLISH_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_PUBLISH_TOOLTIP
+        type: text
+        required: 0
+
+    certs_to_revoke: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_REVOKE_LABEL
+        name: certs_to_revoke
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_REVOKE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_REVOKE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_REVOKE_TOOLTIP
+        type: text
+        required: 0
+
+    certs_to_unpublish: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_UNPUBLISH_LABEL
+        name: certs_to_unpublish
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_UNPUBLISH_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_UNPUBLISH_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_UNPUBLISH_TOOLTIP
+        type: text
+        required: 0
+
+    chip_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_LABEL
+        name: chip_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_TOOLTIP
+        type: text
+        required: 0
+
+    csr_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_ID_LABEL
+        name: csr_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_ID_TOOLTIP
+        type: text
+        required: 0
+
+    csr_serial: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_LABEL
+        name: csr_serial
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP
+        required: 1
+        type: text
+
+    keyid: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_LABEL
+        name: keyid
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_TOOLTIP
+        required: 1
+        type: text
+
+    login_ids: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_LABEL
+        name: login_ids
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP
+        type: text
+        required: 0
+
+    pkcs10: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_LABEL
+        name: pkcs10
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP
+        required: 1
+        type: text
+
+    sc_error_reason: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL
+        name: sc_error_reason
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_TOOLTIP
+        required: 1
+        type: text
+
+    tmp_queue: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_LABEL
+        name: tmp_queue
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_TOOLTIP
+        required: 1
+        type: text
+
+    token_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_LABEL
+        name: token_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP
+        required: 1
+        type: text
+
+    user_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_LABEL
+        name: user_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_TOOLTIP
+        type: text
+        required: 0
+
+    userinfo_currentid: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_CURRENTID_LABEL
+        name: userinfo_currentid
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_CURRENTID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_CURRENTID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_CURRENTID_TOOLTIP
+        required: 1
+        type: text
+
+    userinfo_employee_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_EMPLOYEE_ID_LABEL
+        name: userinfo_employee_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_EMPLOYEE_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_EMPLOYEE_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_EMPLOYEE_ID_TOOLTIP
+        required: 1
+        type: text
+
+acl:
+
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    SmartCard:
+        creator: any
+ 
+

@@ -47,7 +47,7 @@ $dt = OpenXPKI::DateTime::get_validity(
 );
 
 $offset = $dt - $now;
-if (($then->is_leap_year() && $then->month < 3) || ($dt->is_leap_year() && $then->month >= 5)) {
+if (($then->is_leap_year() && $then->month < 3) || ($dt->is_leap_year() && $then->month >= 3)) {
     # cf above
     is($offset->in_units('months'), 13, 'get_validity() + 2m with leap years');
 }

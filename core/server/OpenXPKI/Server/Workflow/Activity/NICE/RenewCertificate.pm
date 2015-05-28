@@ -51,6 +51,12 @@ sub execute {
 	       params => { EXPECTED => 'pkcs10', TYPE => $csr->{TYPE} },
         );
     }   
+        
+    CTX('log')->log(
+        MESSAGE  => "start cert renewal for csr_serial $csr_serial, workflow " . $workflow->id,
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
     
     my $set_context = $nice_backend->renewCertificate( $csr, $context->param( 'org_cert_identifier' ) );
     	
@@ -60,6 +66,7 @@ sub execute {
         my $value = $set_context->{$key};
         $context->param( $key, $value );
     }
+     
 }
 
 1;

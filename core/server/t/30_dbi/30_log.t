@@ -9,6 +9,9 @@ if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
 
+TODO: {
+    todo_skip 'See Issue #188', 6;
+
 our $dbi;
 our $token;
 require 't/30_dbi/common.pl';
@@ -38,4 +41,5 @@ ok ($log->log (FACILITY => "audit",
 );
 is(scalar @{$result}, 1, 'Log entry found');
 
+}
 1;

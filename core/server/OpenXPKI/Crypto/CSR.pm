@@ -109,7 +109,8 @@ sub __init
     # attributes seperated by newline, key/value seperated by colon
     # Keys are shown as 25 char block (padded or truncated)
     # For the moment we are just interessted in the challengePassword
-    if ($self->{PARSED}->{BODY}->{'ATTRIBUTES'} =~ /challengePassword\s*?:(.*)/) {
+    if (defined $self->{PARSED}->{BODY}->{'ATTRIBUTES'} && 
+        $self->{PARSED}->{BODY}->{'ATTRIBUTES'} =~ /challengePassword\s*?:(.*)/) {
         $self->{PARSED}->{BODY}->{'CHALLENGEPASSWORD'} = $1;
     }    
     delete $self->{PARSED}->{BODY}->{'ATTRIBUTES'};
@@ -144,6 +145,10 @@ sub __init
         #}
         $ret->{VERSION}	= 1;
     }
+    
+    ## FIXME - Microsoft Enrollment has no Subject, so we do not choke on empty subject
+    ## Need to test if this has side effects!      
+    $ret->{SUBJECT} = '' unless defined $ret->{SUBJECT};
 
     ## the subject in the header is more important
     if ($self->{PARSED}->{HEADER}->{SUBJECT}) {
@@ -159,8 +164,10 @@ sub __init
         my $obj = OpenXPKI::DN->new ($ret->{SUBJECT});
         %{$ret->{SUBJECT_HASH}} = $obj->get_hashed_content();
     } else {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_CSR_INIT_MISSING_SUBJECT");
+        ## FIXME - Microsoft Enrollment has no Subject, so we do not choke on empty subject
+        ## Need to test if this has side effects!        
+        #OpenXPKI::Exception->throw (
+        #    message => "I18N_OPENXPKI_CRYPTO_CSR_INIT_MISSING_SUBJECT");
     }
 
     ##################################

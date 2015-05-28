@@ -1,4 +1,4 @@
-# OpenXPKI::Crypto::TokenManager.pm 
+# OpenXPKI::Crypto::TokenManager.pm
 ## Rewritten 2005 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2003-2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::TokenManager;
@@ -15,7 +15,6 @@ use Data::Dumper;
 use English;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
-use OpenXPKI::Crypto::Tool::PKCS7::API;
 use OpenXPKI::Crypto::Tool::CreateJavaKeystore::API;
 use OpenXPKI::Crypto::Secret;
 
@@ -25,7 +24,7 @@ sub new {
     my $class = ref($that) || $that;
 
     my $caller_package = caller;
-    
+
     my $self = {};
 
     bless $self, $class;
@@ -83,7 +82,7 @@ sub __load_secret_groups
     return $count;
 }
 
-=head2 __load_secret( {GROUP} ) 
+=head2 __load_secret( {GROUP} )
 
 Initialize the secret for the requested group
 
@@ -98,9 +97,9 @@ sub __load_secret
     ##! 2: "get the arguments"
     my $group  = $keys->{GROUP};
     my $realm = CTX('session')->get_pki_realm();
-    
+
     ##! 16: 'group: ' . $group
-    
+
     if (not $group)
     {
         OpenXPKI::Exception->throw (
@@ -112,7 +111,7 @@ sub __load_secret
         ##! 4: '__load_secret called even though secret is already loaded'
         return 1;
     }
- 
+
     my $config = CTX('config');
 
     ##! 2: "initialize secret object"
@@ -128,19 +127,21 @@ sub __load_secret
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
             $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
         }
-        case "plain"   {            
+        case "plain"   {
+            my $total_shares = $config->get("crypto.secret.$group.total_shares");
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
-                    TYPE => "Plain",
-                    PARTS => $config->get("crypto.secret.$group.total_shares") 
+                    TYPE => "Plain", PARTS => $total_shares
                 });
              }
         case "split"  {
-           
+
+            my $total_shares = $config->get("crypto.secret.$group.total_shares");
+            my $required_shares = $config->get("crypto.secret.$group.required_shares");
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
                     TYPE => "Split",
-                    QUORUM => { 
-                        K => $config->get("crypto.secret.$group.required_shares"), 
-                        N => $config->get("crypto.secret.$group.total_shares"),  
+                    QUORUM => {
+                        K => $required_shares,
+                        N => $total_shares,
                     },
                     TOKEN  => $self->get_system_token({ TYPE => 'default'}),
             });
@@ -156,8 +157,8 @@ sub __load_secret
              }
     }
 
-    $self->__set_secret_from_cache({        
-        GROUP     => $group,        
+    $self->__set_secret_from_cache({
+        GROUP     => $group,
     });
 
     ##! 1: "finish"
@@ -174,8 +175,8 @@ sub __set_secret_from_cache {
     my $self    = shift;
     my $arg_ref = shift;
 
-    my $group  = $arg_ref->{'GROUP'};    
-    my $realm = CTX('session')->get_pki_realm();    
+    my $group  = $arg_ref->{'GROUP'};
+    my $realm = CTX('session')->get_pki_realm();
 
     my $config = CTX('config');
     my $cache_config = $config->get("crypto.secret.$group.cache");
@@ -190,9 +191,9 @@ sub __set_secret_from_cache {
                       GROUP => $group
                   });
     }
-    
-    $self->{SECRET}->{$realm}->{$group}->{CACHE} = $cache_config; 
-        
+
+    $self->{SECRET}->{$realm}->{$group}->{CACHE} = $cache_config;
+
     ##! 2: "check for the cache"
     my $secret = "";
     if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
@@ -257,11 +258,11 @@ sub get_secret_groups
     return %result;
 }
 
-=head2 reload_all_secret_groups_from_cache 
+=head2 reload_all_secret_groups_from_cache
 
 Reload the secrets B<for the current pki realm>
 
-FIXME: I dont see any benefit in loading the secret groups from other realms 
+FIXME: I dont see any benefit in loading the secret groups from other realms
 than the one in the session and changed the behaviour of this method.
 
 =cut
@@ -275,10 +276,10 @@ sub reload_all_secret_groups_from_cache {
     foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
         ##! 16: 'group: ' . $group
         $self->__set_secret_from_cache({
-            GROUP     => $group,        
+            GROUP     => $group,
         });
-    }    
-    
+    }
+
     ##! 1: 'end'
     return 1;
 }
@@ -301,16 +302,16 @@ sub is_secret_group_complete
         if (not exists $self->{SECRET} or
             not exists $self->{SECRET}->{$realm} or
             not exists $self->{SECRET}->{$realm}->{$group});
-            
-    $self->__set_secret_from_cache({        
-        GROUP     => $group,        
+
+    $self->__set_secret_from_cache({
+        GROUP     => $group,
     });
 
     ##FIXME: Why the double return? - oliwel
-    
-    ##! 2: "return true if it is complete"    
+
+    ##! 2: "return true if it is complete"
     my $boolean = $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
-    return $boolean if ($boolean); 
+    return $boolean if ($boolean);
 
     ##! 1: "finished"
     return $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
@@ -434,19 +435,19 @@ sub clear_secret_group
 
 =head2 get_token( { TYPE, NAME, CERTIFICATE } )
 
-Get a crypto token to execute commands for the current realm 
+Get a crypto token to execute commands for the current realm
 
 =over
 
 =item TYPE
 
-Determines the used API, one of the values given in 
+Determines the used API, one of the values given in
 system.crypto.tokenapi (certsign, crlsign, datasafe....)
-   
+
 =item NAME
 
-The name of the token to initialize, for versioned tokens 
-including the generation identifier, e.g. server-ca-2.  
+The name of the token to initialize, for versioned tokens
+including the generation identifier, e.g. server-ca-2.
 
 =item CERTIFICATE
 
@@ -467,7 +468,7 @@ sub get_token
         croak("parameter must be hash ref, but got '$keys'");
     }
 
-    #my $name   = $keys->{ID};        
+    #my $name   = $keys->{ID};
     my $type   = $keys->{TYPE};
     my $name   = $keys->{NAME};
 
@@ -479,7 +480,7 @@ sub get_token
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE");
     }
-        
+
     if (not $name)
     {
         OpenXPKI::Exception->throw (
@@ -515,48 +516,48 @@ sub get_token
 Get a crypto token from the system namespace. This includes all non-realm
 dependend tokens which dont have key material attached.
 
-The tokens are defined in the system.crypto.token namespace. 
-Common tokens are default, pkcs7 and javaks.
+The tokens are defined in the system.crypto.token namespace.
+Common tokens are default and javaks.
 You neeed to specify at least C<api> and C<backend> for all tokens.
- 
+
 =cut
 
 sub get_system_token {
-    
+
     my $self = shift;
     my $keys = shift;
     ##! 1: "start"
 
     my $type   = lc($keys->{TYPE});
-       
+
     ##! 32: "Load token system of type $type"
     if (not $type)
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_MISSING_TYPE");
     }
-    
+
     my $config = CTX('config');
     my $backend = $config->get("system.crypto.token.$type.backend");
-    
-    if (not $backend) {    
+
+    if (not $backend) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_UNKNOWN_TYPE",
-            params => { TYPE => $type }    
-        );   
+            params => { TYPE => $type }
+        );
     }
-        
+
     if (not $self->{TOKEN}->{system}->{$type}) {
-        
+
         my $backend_api_class = CTX('config')->get("system.crypto.token.$type.api");
-        
-        ##! 16: 'instantiating token, API:' . $backend_api_class . ' - Backend: ' .$backend 
+
+        ##! 16: 'instantiating token, API:' . $backend_api_class . ' - Backend: ' .$backend
         $self->{TOKEN}->{system}->{$type} =
                 $backend_api_class->new ({
                     CLASS => $backend,
-                    TMP   => $self->{tmp},      
-                    TOKEN_TYPE => $type, 
-                });     
+                    TMP   => $self->{tmp},
+                    TOKEN_TYPE => $type,
+                });
     }
     ##! 2: "token added"
 
@@ -571,9 +572,9 @@ sub get_system_token {
     ##! 2: "token is usable"
 
     return $self->{TOKEN}->{system}->{$type};
-    
+
 }
- 
+
 sub __add_token
 {
     my $self = shift;
@@ -587,41 +588,41 @@ sub __add_token
 
     my $backend_class;
     my $secret;
-    
-    ##! 16: "add token type $type, name: $name" 
-    my $backend_api_class = $config->get("system.crypto.tokenapi.$type");    
+
+    ##! 16: "add token type $type, name: $name"
+    my $backend_api_class = $config->get("system.crypto.tokenapi.$type");
     $backend_api_class = "OpenXPKI::Crypto::Backend::API" unless ($backend_api_class);
-    
+
     my $config_name_group = $name;
     # Magic inheritance code
-    # tokens have generations and we want to map a generation identifier to its base group. 
+    # tokens have generations and we want to map a generation identifier to its base group.
     # The generation tag is always a suffix "-X" where X is a decimal
-    
-    # A token config must have at least a backend (inherit is done by the connector)    
+
+    # A token config must have at least a backend (inherit is done by the connector)
 	$backend_class = $config->get_inherit("crypto.token.$name.backend");
-    
-    # Nothing found with the full token name, so try to load from the group name    
-    if (!$backend_class) {				
+
+    # Nothing found with the full token name, so try to load from the group name
+    if (!$backend_class) {
 		$config_name_group =~ /^(.+)-(\d+)$/;
-		$config_name_group = $1;	
+		$config_name_group = $1;
 		##! 16: 'use group config ' . $config_name_group
 		$backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
     }
-	
+
 	if (not $backend_class)  {
         OpenXPKI::Exception->throw (
             message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_NO_BACKEND_CLASS",
             params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
         );
     }
-    
+
     $secret = $config->get_inherit("crypto.token.$config_name_group.secret");
-    
+
     ##! 16: "Token backend: $backend_class, Secret group: $secret"
-    
-    ##! 2: "determine secret group"    
+
+    ##! 2: "determine secret group"
     if ($secret) {
-        ##! 4: "secret is configured"        
+        ##! 4: "secret is configured"
         $self->__load_secret({ GROUP => $secret })
             if (not exists $self->{SECRET} or
                 not exists $self->{SECRET}->{$realm} or
@@ -631,7 +632,7 @@ sub __add_token
         ##! 4: "the secret is not configured"
         $secret = undef;
     }
-         
+
     eval {
         ##! 16: 'instantiating token, API class: ' . $backend_api_class . ' using backend ' . $backend_class
         $self->{TOKEN}->{$realm}->{$type}->{$name} =
@@ -672,7 +673,7 @@ sub __add_token
     ##! 2: "$type token $name for $realm successfully added"
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
 }
- 
+
 sub __use_token
 {
     ##! 16: 'start'
@@ -682,8 +683,8 @@ sub __use_token
     my $type  = $keys->{TYPE};
     my $name  = $keys->{NAME};
     my $realm = $keys->{PKI_REALM};
-    
-    my $instance; 
+
+    my $instance;
     if ($realm eq 'system') {
         $instance = $self->{TOKEN}->{system}->{$type};
     } else {
@@ -694,8 +695,8 @@ sub __use_token
     if (not $instance) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT");
-    } 
-    
+    }
+
     return $instance->login()
         if (not $instance->online());
 

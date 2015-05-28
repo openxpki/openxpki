@@ -1,0 +1,8 @@
+class: OpenXPKI::Server::Workflow::Validator::CertSubjectFields
+param:
+  section: info
+  basename: cert_info
+arg: 
+  - $cert_profile
+  - $cert_subject_style
+  - $cert_info

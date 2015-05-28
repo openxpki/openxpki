@@ -43,17 +43,14 @@ my $test = OpenXPKI::Test::More->new(
 $test->set_verbose($cfg{instance}{verbose});
 
 $test->plan( tests => 15 );
-   
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{role},
-) or die "Error - connect failed: $@";
-  
+    
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@";
+
 my %wfparam = (                
     token_id =>  $cfg{carddata}{token_id}        
 );      
     
-$test->create_ok( 'I18N_OPENXPKI_WF_TYPE_SMARTCARD_PIN_UNBLOCK' , \%wfparam, 'Create PIN Unblock Workflow')
+$test->create_ok( 'sc_pin_unblock' , \%wfparam, 'Create PIN Unblock Workflow')
  or die "Workflow Create failed: $@";
  
 $test->state_is('HAVE_TOKEN_OWNER'); 
@@ -67,7 +64,7 @@ $test->disconnect();
 # Login with auth1 and generate code
 $test->connect_ok(
     user => $cfg{unblock}{auth1},
-    password => 'User',
+    stack => 'User',
 ) or die "Error - connect failed: $@";
  
 $test->execute_ok('scunblock_generate_activation_code'); 
@@ -78,7 +75,7 @@ $test->disconnect();
 # Login with auth2 and generate code
 $test->connect_ok(
     user => $cfg{unblock}{auth2},
-    password => 'User',
+    stack  => 'User',
 ) or die "Error - connect failed: $@";
  
 $test->execute_ok('scunblock_generate_activation_code'); 
@@ -87,10 +84,7 @@ $test->param_like('_password', "/[a-zA-Z]+ [a-zA-Z]+/");
 $test->disconnect();
 
    
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{role},
-) or die "Error - connect failed: $@";
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@";
 
 $test->execute_ok('scunblock_post_codes', {  _auth1_code => 'wrong', _auth2_code => 'code'});
 

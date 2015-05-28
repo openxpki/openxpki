@@ -1,0 +1,133 @@
+# This is a system workflow so we do not need much UI stuff
+
+head:
+    prefix: export
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC
+
+state:
+    CHECK_EXPORT:
+        action:
+          - global_noop > FAILURE? !cert_export_export_successful
+          - global_noop2 > EXPORT_DONE? cert_export_export_successful
+        autorun: 1
+
+    CHECK_TAGGING:
+        action:
+          - global_noop > READY_TO_PROCESS? cert_export_tagging_successful
+          - global_noop2 > FAILURE? !cert_export_tagging_successful
+        autorun: 1
+
+    CHECK_TRANSFER:
+        action:
+          - global_noop > TRANSFER_DONE? cert_export_transfer_successful
+          - global_noop2 > FAILURE? !cert_export_transfer_successful
+        autorun: 1
+
+    EXPORT_DONE:
+        action:
+          - global_noop > SUCCESS? !cert_export_have_certs_to_transfer
+          - global_noop2 > READY_TO_TRANSFER? cert_export_have_certs_to_transfer
+        autorun: 1
+
+    FAILURE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC
+
+    INITIAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC
+        action:
+          - cert_export_initialize > INITIALIZED
+
+    INITIALIZED:
+        action:
+          - cert_export_get_config > READY_TO_PROCESS
+        autorun: 1
+
+    READY_TO_PROCESS:
+        action:
+          - cert_export_generate_export_file > CHECK_EXPORT
+        autorun: 1
+
+    READY_TO_TRANSFER:
+        action:
+          - cert_export_transfer_export_file > CHECK_TRANSFER
+        autorun: 1
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC
+
+    TRANSFER_DONE:
+        action:
+          - cert_export_tag_certs_as_exported > CHECK_TAGGING
+        autorun: 1
+
+
+action:
+    cert_export_generate_export_file:
+        class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::GenerateExportFile
+
+    cert_export_get_config:
+        class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::GetConfig
+
+    cert_export_initialize:
+        class: Workflow::Action::Null
+        input:
+          - config_path
+          - cert_identifier
+          - email
+
+    cert_export_tag_certs_as_exported:
+        class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::TagAsExported
+
+    cert_export_transfer_export_file:
+        class: OpenXPKI::Server::Workflow::Activity::Transfer::SCP
+        param:
+            retry_count: 5
+            retry_interval: +0000000005
+            source: $xml_filename
+            target: $xml_targetname
+            transfer: export.smartcard.transfer
+
+
+condition:
+    cert_export_export_successful:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: not $context->{error_code};
+
+    cert_export_have_certs_to_transfer:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{xml_filename} ne '';
+
+    cert_export_tagging_successful:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: not $context->{error_code};
+
+    cert_export_transfer_successful:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: not $context->{error_code};
+
+
+field:
+    config_path:
+        name: config_path
+        required: 1
+        type: text
+
+
+acl:
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+
+    System:
+        creator: self
+

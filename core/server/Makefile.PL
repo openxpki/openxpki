@@ -83,19 +83,22 @@ print STDERR "OpenSSL binary:  $openssl_binary\n";
 # OpenSSL 0.9.7l 28 Sep 2006
 # OpenSSL 1.0.0a 1 Jun 2010
 my $openssl_version_string = `$openssl_binary version`;
-my ($openssl_version_major, $openssl_version_minor, $openssl_version_fix, $openssl_version_patch);
-if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
+my ($openssl_version_major, $openssl_version_minor, $openssl_version_fix, $openssl_version_patch, $openssl_version_flavour);
+if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/i) {
     # OpenSSL 0.9
+    $openssl_version_flavour = 'OpenSSL';
     $openssl_version_major = $1;
     $openssl_version_minor = $2;
     $openssl_version_fix   = $3;
     $openssl_version_patch = $4;
-    print "OpenSSL version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix, patch=$openssl_version_patch\n";
-} elsif ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)\s+/) {
+    print "$openssl_version_flavour version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix, patch=$openssl_version_patch\n";
+    
+} elsif ($openssl_version_string =~ m/\s*(OpenSSL|LibreSSL)\s+(\d+)\.(\d+)\.(\d+)\s+/) {
     # OpenSSL 1.0
-    $openssl_version_major = $1;
-    $openssl_version_minor = $2;
-    $openssl_version_fix   = $3;
+    $openssl_version_flavour = $1;
+    $openssl_version_major = $2;
+    $openssl_version_minor = $3;
+    $openssl_version_fix   = $4;
     print "OpenSSL version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix\n";
 } else {
     print "Problem: malformed openssl version string!\n";
@@ -103,12 +106,22 @@ if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/) {
     exit 1;
 }
 
-# Now make sure version is 0.9.8
-unless ( (($openssl_version_major == 0) &&
-          ($openssl_version_minor == 9) &&
-          ($openssl_version_fix   == 8)) or
-         ($openssl_version_major == 1 &&
-          $openssl_version_minor == 0)) {
+# Warn on old openssl - should work but lacks support for some features 
+if ($openssl_version_major == 0 &&
+    $openssl_version_minor == 9 &&
+    $openssl_version_fix   == 8) {
+
+    print STDERR "Warning: openssl 0.9.8 found - this will work but lacks some features, e.g. server side key generation!";
+              
+} elsif ( $openssl_version_flavour =~ m/LibreSSL/i ) {
+    
+    print STDERR "Warning: LibreSSL found, support for LibreSSL is experimental!";
+    
+} elsif (not 
+    ($openssl_version_flavour =~ m/OpenSSL/i &&
+     $openssl_version_major == 1 &&
+     $openssl_version_minor == 0 )) {
+         
     print STDERR "\n";
     print STDERR "ERROR: OpenSSL 0.9.8  or 1.0 is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
@@ -125,7 +138,11 @@ close $fh;
 # determine OpenXPKI version
 
 my $openxpki_version;
-if ( -e($vergen) ) {
+if ( -s '../../VERSION' ) {
+    # this block is optimized for programmer efficiency
+    $openxpki_version = `cat ../../VERSION`;
+    chomp $openxpki_version;
+} elsif ( -e($vergen) ) {
     $openxpki_version = `$vergen --format version`;
 
     if ($CHILD_ERROR != 0) {
@@ -297,59 +314,88 @@ WriteMakefile(
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g '.$Config{ccflags},
     'PREREQ_PM' => {
-	'Class::Accessor::Fast'  => '0.31',
-	'Class::Accessor::Chained::Fast' => undef,
-	'Class::Std'             => '0.0.8',
-	'CGI::Session'           => '3.95',
-    'Config::Std'            => undef,
-	'Config::Merge'          => '1',
-	'Config::Versioned'      => '0.02',
-    'Connector'              => '1.0',
-	'Crypt::CBC'             => '2.29',
-	'Crypt::OpenSSL::AES'    => '0.02',
-	'DBI'                    => 1,
-	'Data::Password'         => '1.07',
-	'Data::Serializer'       => '0.44',
-	'DateTime'               => "0.22",
-	'DateTime::Format::DateParse' => '0.04',
-	'Digest::MD5'            => 1,
-	'Digest::SHA1'           => 1,
-	'English'                => 1, ## for broken Perl installations like on Ubuntu Drapper
-	'Exception::Class'       => "1.22",
-	'Filter::Util::Call'     => 1,
-        'IO::Prompt'             => '0.099004', # required for deployment tools
-	## includes the version of libintl-perl which includes Locale::Messages
-	'IPC::ShareLite'         => '0.09',
-	'Locale::TextDomain'     => 1,
-	'Log::Log4perl'          => '0.51',
-        'Mail::RFC822::Address'  => '0.3',
-	'Math::BigInt'           => 1,
-	'Moose'                  => 1,
-        'Net::IP'                => 1,
-	'Net::LDAP'              => "0.32",
-        'Net::Server'            => '0.94',
-	'Params::Validate'       => '0.77',
-	'Path::Class'            => '0.25',
-	'Proc::ProcessTable'     => '0.43',
-        'Proc::SafeExec'         => '1.4',
-	'Regexp::Common'         => 2,
-    'Switch'                 => 1,
-        'Sys::SigAction'         => '0.06',
-        'Template'               => '2.15',
-	'Test'                   => 1,
-	'Test::More'                   => '0.98',
-	'Test::Pod'              => "1.00",
-	'Test::Pod::Coverage'    => "1.00",
-	'Text::CSV_XS'           => "0.23",
-	'Time::HiRes'            => 1,
-	'Workflow'               => '0.27',
-	'XML::Filter::XInclude'  => 1,
-	'XML::Parser'            => 1,
-	'XML::SAX'               => '0.12',
-	'XML::SAX::Writer'       => '0.44',
-	'XML::Simple'            => 1,
-	'XML::Validator::Schema' => '1.08',
-	'XML::SAX::PurePerl'     => '0.90',
+#    'Class::Accessor::Fast'  => '0.31', # Constituent of module Class::Accessor
+#					 # which is a prerequisite of Class::Accessor::Chained, see below
+    'Class::Accessor::Chained::Fast' => '0', # Constituent of module Class::Accessor::Chained
+    'Class::Std'             => '0.0.8',
+    'CGI::Session'           => '3.95',
+    'Config::Std'            => '0',
+    'Config::Merge'          => '1',
+#    'Config::Versioned'      => '1.01', # A prerequisite for Connector, see below
+    'Connector'              => '1.08',
+    'Crypt::CBC'             => '2.29',
+    'Crypt::OpenSSL::AES'    => '0.02',
+    'DBD::Mock'              => '1.45',
+#    'DBI'                    => '1', # A prerequisite for Workflow, see below
+    'Data::Password'         => '1.07',
+    'Data::Serializer'       => '0.44',
+#    'DateTime'               => '0.22', # A prerequisite for Config::Versioned, see above
+    'DateTime::Format::DateParse' => '0.04',
+#    'Digest::MD5'            => '1', # A core module since perl v5.7.3
+#    'Digest::SHA'            => '1', # A core module since perl v5.9.3
+    'English'                => '1', ## for broken Perl installations like on Ubuntu Drapper
+#    'Exception::Class'       => '1.22', # A prerequisite for Workflow, see below
+#    'Filter::Util::Call'     => '1', # A core module since perl v5.7.3
+    'IO::Prompt'             => '0.099004', # required for deployment tools
+    'IO::Socket::SSL'        => '1.973', # A prerequisite for Net::HTTP, see below
+    ## includes the version of libintl-perl which includes Locale::Messages
+    'IPC::ShareLite'         => '0.09',
+    'JSON'                   => '0',
+    'Locale::TextDomain'     => '1', # Constituent of module libintl::perl
+    'Log::Log4perl'          => '0.51',
+    #'LWP'                    => '6',
+    'LWP::UserAgent'         => '6.05', # In LWP # Constituent of module  libwww-perl
+    'LWP::Protocol::connect' => '6.09',
+    'LWP::Protocol::https'    => '6.04',    
+    'Mail::RFC822::Address'  => '0.3',    
+    'Math::BigInt'           => '1.9993', # Make FreeBSD happy
+#    'MIME::Base64'           => '1', # A core module since perl v5.7.3
+    'Moose'                  => '1',
+    'NetAddr::IP'            => '0',
+    'Net::DNS'                => '0.83',
+    'Net::IP'                => '1',
+    'Net::LDAP'              => '0.32',
+    'Net::HTTP'              => '6.0',
+    'Net::Server'            => '0.94',
+    'Net::SSL'               => '2.85',    
+#    'Net::SMTP'              => '1', # A core module since perl v5.7.3
+    'Params::Validate'       => '0.77',
+    'Path::Class'            => '0.25',
+    'Proc::ProcessTable'     => '0.43',
+    'Proc::SafeExec'         => '1.4',
+    'Regexp::Common'         => '2',
+    'SOAP::Lite'             => '0',
+    'Switch'                 => '1',
+    'Sys::SigAction'         => '0.06',
+    'Template'               => '2.15',
+#    'Test'                   => '1', # A core module since perl 5.00405
+    'Test::More'                   => '0.98', # Constituent of module Test::Simple
+    'Test::Pod'              => '1.00',
+    'Test::Pod::Coverage'    => '1.00',
+    'Text::CSV_XS'           => '0.23',
+    'Time::HiRes'            => '1',
+    'Workflow'               => '0.27',
+    'XML::Filter::XInclude'  => '1',
+    'XML::Parser'            => '1',
+    'XML::SAX'               => '0.12',
+    'XML::SAX::Writer'       => '0.44',
+    'XML::Simple'            => '1',
+    'XML::Validator::Schema' => '1.08',
+    'XML::SAX::PurePerl'     => '0.90', # Constituent of module XML::SAX
+#    # Stuff for OpenXPKI-Client-HTML-Mason # Comment out as Mason has retired
+#    'HTML::Mason'           => '1',
+#    'HTTP::Server::Simple::Mason'   => '0',
+#    'Test::HTTP::Server::Simple'    => '0',
+#    'WWW::Mechanize'                => '0',
+#    'Data::Dumper'                  => '0',
+#    'CGI::Cookie'                   => '0',
+#    'URI::Escape'                   => '0',
+#    'HTML::Entities' => '0',
+#    'Data::SpreadPagination' => '0',
+#    'File::Spec' => '0',
+#    'Encode' => '0',
+#    'List::Util' => '0',
+#    'Digest::SHA1' => '0',
 
     },
     test       => {TESTS => 't/*/*.t',

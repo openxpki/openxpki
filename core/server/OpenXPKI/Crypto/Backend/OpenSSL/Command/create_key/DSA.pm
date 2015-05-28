@@ -34,7 +34,8 @@ sub verify_params
         $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} ne "des")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG",
+            params => { ENC_ALG => $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} });
     }
 
     if ($self->{PARENT_REF}->{PARAMETERS}->{KEY_LENGTH} != 512 and
@@ -44,7 +45,8 @@ sub verify_params
         $self->{PARENT_REF}->{PARAMETERS}->{KEY_LENGTH} != 4096)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_KEY_LENGTH");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_KEY_LENGTH",
+            params => { KEY_LENGTH => $self->{PARENT_REF}->{PARAMETERS}->{KEY_LENGTH} });
     }
 
     return 1;

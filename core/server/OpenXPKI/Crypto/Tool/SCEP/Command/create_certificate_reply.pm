@@ -19,6 +19,7 @@ my %pkcs7_of   :ATTR;
 my %cert_of    :ATTR;
 my %engine_of  :ATTR;
 my %enc_alg_of :ATTR;
+my %hash_alg_of  :ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -29,12 +30,14 @@ sub START {
     $pkcs7_of  {$ident} = $arg_ref->{PKCS7};
     $cert_of   {$ident} = $arg_ref->{CERTIFICATE};
     $enc_alg_of{$ident} = $arg_ref->{ENCRYPTION_ALG};
+    $hash_alg_of {$ident} = $arg_ref->{HASH_ALG};
+
 }
 
 sub get_command {
     my $self  = shift;
     my $ident = ident $self;
-    
+
     # keyfile, signcert, passin
     if (! defined $engine_of{$ident}) {
         OpenXPKI::Exception->throw(
@@ -75,14 +78,18 @@ sub get_command {
         CONTENT  => $cert_of{$ident},
         FORCE    => 1,
     });
-   
-    my $command = " -new -passin env:pwd -signcert $certfile -msgtype CertRep -status SUCCESS -keyfile $keyfile -inform DER -in $in_filename -outform DER -out $outfile_of{$ident} -issuedcert $issued_certfile "; 
+
+    my $command = " -new -passin env:pwd -signcert $certfile -msgtype CertRep -status SUCCESS -keyfile $keyfile -inform DER -in $in_filename -outform DER -out $outfile_of{$ident} -issuedcert $issued_certfile ";
 
     if ($enc_alg_of{$ident} eq 'DES') {
         # if the configured encryption algorithm is DES, append the
         # appropriate option. This is for example needed for
         # Netscreen devices
         $command .= " -des ";
+    }
+
+    if ($hash_alg_of{$ident}) {
+        $command .= ' -'.$hash_alg_of{$ident};
     }
     return $command;
 }

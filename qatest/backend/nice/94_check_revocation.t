@@ -11,7 +11,6 @@ use strict;
 use warnings;
 
 use lib qw(
-  /usr/lib/perl5/ 
   ../../lib
 );
 
@@ -44,10 +43,10 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 3 );
+$test->plan( tests => 4 );
  
 my $buffer = do { # slurp
-	local $INPUT_RECORD_SEPARATOR;
+    local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<', $cfg{instance}{buffer};
     <$HANDLE>;
 };
@@ -64,20 +63,19 @@ $test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier'
 
 # Login to use socket
 $test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{role},
+    user => $cfg{operator}{name},
+    password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
-$test->set_wftype ( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST' );
+$test->set_wftype ( 'certificate_revocation_request_v2' );
 $test->set_wfid ( $wf_id );
 
 $test->reset();
 
-# We might need to wait for the watchdog
-my $i = 25;
-while ($test->state() eq 'CHECK_FOR_REVOCATION' && $i--) {    
-    sleep 1;
-    $test->reset();
+if ($test->state() eq 'CHECK_FOR_REVOCATION') {
+    $test->execute_ok( 'global_check_for_revocation' );
+} else {
+    $test->ok(1);
 }
 
 $test->state_is('SUCCESS');

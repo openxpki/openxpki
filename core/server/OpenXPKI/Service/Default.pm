@@ -1,4 +1,4 @@
-## OpenXPKI::Service::Default.pm 
+## OpenXPKI::Service::Default.pm
 ##
 ## Written 2005-2006 by Michael Bell and Martin Bartosch for the OpenXPKI project
 ## Polished to use a state-machine like interface 2007 by Alexander Klink
@@ -30,7 +30,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::Default::Command;
 
 my %state_of :ATTR;                # the current state of the service
-        
+
 sub init {
     my $self  = shift;
     my $ident = ident $self;
@@ -39,11 +39,11 @@ sub init {
     ##! 1: "start"
 
     # timeout idle clients
-    
+
     my $timeout = CTX('config')->get("system.server.service.default.timeout") || 120;
-	
+
     $self->set_timeout($timeout);
-    
+
     $state_of{$ident} = 'NEW';
 
     # do session init, PKI realm selection and authentication
@@ -92,7 +92,7 @@ sub __is_valid_message : PRIVATE {
 
     ##! 32: 'message_name: ' . $message_name
     ##! 32: 'state: ' . $state_of{$ident}
-    
+
     # this is a table of valid messages that may be received from the
     # client in the different states
     my $valid_messages = {
@@ -137,7 +137,7 @@ sub __is_valid_message : PRIVATE {
             'CONTINUE_SESSION',
         ],
     };
-    
+
     my @valid_msgs_now = @{ $valid_messages->{$state_of{$ident}} };
     if (defined first { $_ eq $message_name } @valid_msgs_now) {
         # TODO - once could possibly check the content of the message
@@ -147,8 +147,8 @@ sub __is_valid_message : PRIVATE {
     }
     ##! 16: 'message is NOT valid'
     return;
-} 
-    
+}
+
 sub __handle_message : PRIVATE {
     ##! 1: 'start'
     my $self    = shift;
@@ -190,7 +190,7 @@ sub __handle_NEW_SESSION : PRIVATE {
     ##! 4: "new session"
     my $session = OpenXPKI::Server::Session->new({
         DIRECTORY => CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),                       
+        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
     });
 
     if (exists $msg->{LANGUAGE}) {
@@ -229,7 +229,7 @@ sub __handle_CONTINUE_SESSION {
     eval {
         $session = OpenXPKI::Server::Session->new({
             DIRECTORY => CTX('config')->get("system.server.session.directory"),
-            LIFETIME  => CTX('config')->get("system.server.session.lifetime"),                                            
+            LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
             ID        => $msg->{SESSION_ID}
         });
     };
@@ -248,15 +248,15 @@ sub __handle_CONTINUE_SESSION {
 	}
     }
     if (defined $session) {
-        
+
         # There might be an exisiting session if the child did some work before
-        # we therefore use force to overwrite exisiting entries        
+        # we therefore use force to overwrite exisiting entries
         OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-            
+
         # do not use __change_state here, as we want to have access
         # to the old session in __handle_SESSION_ID_ACCEPTED
         $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
-		
+
         return {
             SESSION_ID => $session->get_id(),
         };
@@ -276,12 +276,14 @@ sub __handle_PING : PRIVATE {
             SERVICE_MSG => 'SERVICE_READY',
         };
     }
-    elsif ($state_of{$ident} eq 'WAITING_FOR_PKI_REALM') {        
-        my @realm_names = CTX('config')->get_keys("system.realms");        
-        my %realms =();      
+    elsif ($state_of{$ident} eq 'WAITING_FOR_PKI_REALM') {
+        my @realm_names = CTX('config')->get_keys("system.realms");
+        my %realms =();
         foreach my $realm (sort @realm_names) {
+            my $label = CTX('config')->get("system.realms.$realm.label");
             $realms{$realm}->{NAME} = $realm;
-            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
+            $realms{$realm}->{LABEL} = $label;
+            $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.description") || $label;
         }
         return {
 	       SERVICE_MSG => 'GET_PKI_REALM',
@@ -315,7 +317,7 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     if ($state_of{$ident} eq 'SESSION_ID_SENT_FROM_CONTINUE') {
         ##! 4: 'existing session detected'
         my $session = CTX('session');
-        ##! 8: 'Session ' . Dumper $session   
+        ##! 8: 'Session ' . Dumper $session
         $self->__change_state({
             STATE => CTX('session')->get_state(),
         });
@@ -330,8 +332,8 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     if ($pki_realm_choice
         && $state_of{$ident} =~ m{\A SESSION_ID_SENT.* \z}xms) {
         ##! 2: "build hash with ID, name and description"
-        my @realm_names = CTX('config')->get_keys("system.realms");        
-        my %realms =();      
+        my @realm_names = CTX('config')->get_keys("system.realms");
+        my %realms =();
         foreach my $realm (sort @realm_names) {
             $realms{$realm}->{NAME} = $realm;
             $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.label");
@@ -427,7 +429,7 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
         $self->__change_state({
             STATE => 'WAITING_FOR_LOGIN',
         });
-        CTX('session')->start_authentication(); 
+        CTX('session')->start_authentication();
         CTX('session')->set_authentication_stack($requested_stack);
         my ($user, $role, $reply) = CTX('authentication')->login_step({
             STACK   => $requested_stack,
@@ -469,7 +471,7 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
 		message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_USERNAME_UNDEFINED',
 		);
 	}
-	
+
 	if ($message->{PARAMS}->{LOGIN} !~ m{ \A \p{IsASCII}+ \z }xms) {
 	    OpenXPKI::Exception->throw(
 		message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_NON_ASCII_USERNAME_BUG',
@@ -505,7 +507,7 @@ sub __handle_GET_CLIENT_SSO_LOGIN : PRIVATE {
     ##! 1: 'start'
     my $self = shift;
     my $msg  = shift;
-    
+
     # SSO login is basically handled in the same way as password login
     return $self->__handle_GET_PASSWD_LOGIN($msg);
 }
@@ -514,7 +516,7 @@ sub __handle_GET_CLIENT_X509_LOGIN : PRIVATE {
     ##! 1: 'start'
     my $self = shift;
     my $msg  = shift;
-    
+
     # client X509 login is basically handled in the same way as password login
     return $self->__handle_GET_PASSWD_LOGIN($msg);
 }
@@ -549,8 +551,8 @@ sub __handle_STATUS : PRIVATE {
     my $self    = shift;
     my $ident   = ident $self;
     my $message = shift;
-    
-    # SERVICE_MSG ? 
+
+    # SERVICE_MSG ?
     return {
 	SESSION => {
 	    ROLE => $self->get_API('Session')->get_role(),
@@ -675,7 +677,7 @@ sub __pki_realm_choice_available : PRIVATE {
     return $realm if defined $realm;
 
     ##! 2: "check if there is more than one realm"
-    
+
     my @list = CTX('config')->get_keys('system.realms');
     if (scalar @list < 1) {
         ##! 4: "no PKI realm configured"
@@ -692,7 +694,7 @@ sub __pki_realm_choice_available : PRIVATE {
     else { # more than one PKI realm available
         return 1;
     }
-    
+
     return 0;
 }
 
@@ -724,7 +726,7 @@ sub __is_valid_pki_realm : PRIVATE {
     my $ident   = ident $self;
     my $realm   = shift;
 
-    return defined CTX('config')->get_meta("system.realms.$realm");
+    return CTX('config')->exists("system.realms.$realm");
 }
 
 sub __change_state : PRIVATE {
@@ -745,7 +747,7 @@ sub __change_state : PRIVATE {
     CTX('session')->set_state($new_state);
 
     return 1;
-} 
+}
 
 sub run
 {
@@ -820,7 +822,7 @@ sub run
     }
     return 1;
 }
-	
+
 ##################################
 ##     begin error handling     ##
 ##################################
@@ -991,7 +993,7 @@ are multiple PKI realms defined. If so, it sends back the list
 and changes to state 'WAITING_FOR_PKI_REALM'. If not, it looks
 whether an authentication stack is present. If not, it sends the
 list of possible stacks and changes the state to
-'WAITING_FOR_AUTHENTICATION_STACK'. 
+'WAITING_FOR_AUTHENTICATION_STACK'.
 
 =item * __handle_GET_PKI_REALM
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 ## CGI script for the OpenXPKI SCEP server
 ##
 ## Written by Oliver Welter OpenXPKI Project
@@ -12,6 +12,7 @@ use CGI::Carp qw( fatalsToBrowser );
 use Config::Std;
 use NetAddr::IP;
 use English;
+use Log::Log4perl qw( :easy );
 
 require OpenXPKI::Client::SCEP;
 my $query = new CGI;
@@ -21,12 +22,12 @@ my $configfile = '';
 
 # check for explicit file in env
 if ($ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE}) {
-    -f $ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE} 
+    -f $ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE}
         || die sprintf "Config file not found (%s, from env)", $ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE};
     $configfile = $ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE};
 } else {
- 
-    # check for basedir in env  
+
+    # check for basedir in env
     if ( $ENV{OPENXPKI_SCEP_CLIENT_CONF_DIR} ) {
         -d $ENV{OPENXPKI_SCEP_CLIENT_CONF_DIR}
             || die sprintf "Config directory not found (%s, from env)", $ENV{OPENXPKI_SCEP_CLIENT_CONF_DIR};
@@ -35,12 +36,24 @@ if ($ENV{OPENXPKI_SCEP_CLIENT_CONF_FILE}) {
     }
 
     # Test for specific config file based on script name
-    $ENV{SCRIPT_NAME} =~ qq|/([^/]+)\$|;
-    $configfile = "$basedir/$1.conf";
-   
+    # SCRIPT_URL is only available with mod_rewrite
+    if (defined $ENV{SCRIPT_URL}) {
+        $ENV{SCRIPT_URL} =~ qq|scep/([^/]+)(/[^/]*)?\$|;
+        $configfile = "$basedir/$1.conf";
+
+    # Should always work
+    } elsif (defined $ENV{REQUEST_URI}) {
+        $ENV{REQUEST_URI} =~ qq|scep/([^/\?]+)(/[^/\\?]*)?(\\?.*)?\$|;
+        $configfile = "$basedir/$1.conf";
+
+    # Hopefully never seen
+    } else {
+        die "Unable to detect script name - please check the docs";
+    }
+
     # use default if no custom file
     $configfile = $basedir.'/default.conf' unless ( -f $configfile );
-   
+
     # oops, default file also not found
     die sprintf "No config file in basedir %s for script %s", $basedir, $1 unless ( -f $configfile );
 }
@@ -53,14 +66,30 @@ my $iprange = $config{global}{iprange};
 my $profile = $config{global}{profile};
 my $server  = $config{global}{servername};
 my $enc_alg = $config{global}{encryption_algorithm};
+my $hash_alg = $config{global}{hash_algorithm};
+
+my $log;
+my $log_config = $config{global}{log_config};
+if ($log_config) {
+    Log::Log4perl->init_once($log_config);
+    $log = Log::Log4perl->get_logger( $config{global}{log_facility} || 'scep' );
+} else {
+    Log::Log4perl->easy_init( $ERROR );
+    $log = Log::Log4perl->get_logger();
+}
 
 my $allowed_range = new NetAddr::IP $iprange; # the allowed IP range
                      # from the config file
 my $requesting_host = new NetAddr::IP $ENV{'REMOTE_ADDR'}; # the host
 
+$log->debug('Used configfile ' . $configfile);
+
 # Check if requesting host is allowed to talk to us
 if (!$requesting_host->within($allowed_range)) {
 # TODO: better response?
+
+    $log->info('Blocked request from ' . $requesting_host );
+
     print "Content-Type: text/plain\n\nGo away\n";
     die("Unauthorized access from $requesting_host");
 }
@@ -69,18 +98,22 @@ else {
     # http://www.ietf.org/internet-drafts/draft-nourse-scep-13.txt
     my $operation = $query->param('operation');
     my $message   = $query->param('message');
-   
+
     # Get additional parameters from the url
     my @extra_params = $query->param;
-       
+
     # TODO - Whitelist, Url-Decode?
     my $params = {};
     foreach my $param (@extra_params) {
         if ($param eq "operation" ||  $param eq "message") { next; }
         $params->{$param} = $query->param($param);
     }
-   
-   
+
+    # Append the remote address to the params hash
+    $params->{remote_addr} = $requesting_host->addr;
+
+    $log->info('Incoming request from ' . $requesting_host->addr . ' with ' . $operation );
+
     # OpenXPKI::Client::SCEP does the actual work
     my $scep_client = OpenXPKI::Client::SCEP->new(
         {
@@ -92,7 +125,8 @@ else {
         OPERATION  => $operation,
         MESSAGE    => $message,
         SERVER     => $server,
-        ENCRYPTION_ALGORITHM => $enc_alg
+        ENCRYPTION_ALGORITHM => $enc_alg,
+        HASH_ALGORITHM => $hash_alg
         });
     if (! defined $scep_client) {
         die "SCEP client not defined";
@@ -158,7 +192,7 @@ Encrpytion to use, supported values are I<DES> and I<3DES>.
 =head2 config file location
 
 =over
- 
+
 =item autodetected file
 
 The default location for config files is /etc/openxpki/scep, the script
@@ -185,4 +219,20 @@ script:
    </Location>
 
 =back
- 
+
+=head2 webserver setup
+
+If you use apache, the easiest way is a directory based wildcard alias.
+
+    ScriptAlias /scep  /usr/lib/cgi-bin/scep
+    <Directory "/usr/lib/cgi-bin/">
+            AllowOverride None
+            Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+            Order allow,deny
+            Allow from all
+    </Directory>
+
+Make your requests to C<http://server/scep/myserver> which will pull in
+the config from /etc/openxpki/scep/myserver.conf.
+
+Note: SCEP usually uses HTTP/1.0, so name based virtual hosts are not working.

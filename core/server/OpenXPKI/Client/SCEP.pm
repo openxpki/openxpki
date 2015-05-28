@@ -27,6 +27,7 @@ use Data::Dumper;
     my %profile_of   :ATTR( :init_arg<PROFILE>   ); # endentity profile to use
     my %server_of    :ATTR( :init_arg<SERVER>    ); # server to use
     my %enc_alg_of   :ATTR( :init_arg<ENCRYPTION_ALGORITHM> );
+    my %hash_alg_of  :ATTR( :init_arg<HASH_ALGORITHM> );
 
     my %allowed_op = map { $_ => 1 } qw(
         GetCACaps
@@ -39,7 +40,7 @@ use Data::Dumper;
 
     sub START {
         my ($self, $ident, $arg_ref) = @_;
-        
+
         # send configured realm, collect response
         ##! 4: "before talk"
         $self->talk('SELECT_PKI_REALM ' . $realm_of{$ident});
@@ -61,17 +62,24 @@ use Data::Dumper;
         $self->talk('SELECT_ENCRYPTION_ALGORITHM ' . $enc_alg_of{$ident});
         $message = $self->collect();
         if ($message eq 'NOTFOUND') {
-            die('The configured encryption algorithm (' . $enc_alg_of{$ident} 
+            die('The configured encryption algorithm (' . $enc_alg_of{$ident}
                 . ') was not found on the server');
         }
-                            
+        $self->talk('SELECT_HASH_ALGORITHM ' . $hash_alg_of{$ident});
+        $message = $self->collect();
+        if ($message eq 'NOTFOUND') {
+            die('The configured hash algorithm (' . $hash_alg_of{$ident}
+                . ') was not found on the server');
+        }
+
+
         #$self->talk('SET_PARAMETER ' . $serialization{$ident}->serialize($context_of{$ident}));
         #$message = $self->collect();
         #if ($message eq 'FAILED') {
         #    die('The passed parameters (' . Dumper $context_of{$ident} . ') could not be set');
         #}
-        
-        
+
+
     }
 
     sub send_request {
@@ -122,14 +130,14 @@ This document describes OpenXPKI::Client::SCEP version $VERSION
     my $query     = CGI->new();
     my $operation = $query->param('operation');
     my $message   = $query->param('message');
-    
+
     my $scep_client = OpenXPKI::Client::SCEP->new(
         {
         SERVICE    => 'SCEP',
         REALM      => $realm,
         SOCKETFILE => $socket,
         TIMEOUT    => 120, # TODO - make configurable?
-        PROFILE    => $profile, 
+        PROFILE    => $profile,
         OPERATION  => $operation,
         MESSAGE    => $message,
         SERVER     => $server,
@@ -143,7 +151,7 @@ OpenXPKI::Client::SCEP acts as a client that sends an SCEP request
 to the OpenXPKI server. It is typically called from within a CGI
 script that acts as the SCEP server.
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 =head2 START
 

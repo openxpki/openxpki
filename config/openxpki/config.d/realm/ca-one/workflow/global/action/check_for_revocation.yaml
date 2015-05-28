@@ -1,0 +1,6 @@
+class: OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation
+label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_LABEL
+description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC
+param:
+    retry_count: 10
+    retry_interval: +0000000030

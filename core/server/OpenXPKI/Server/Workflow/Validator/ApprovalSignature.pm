@@ -39,7 +39,7 @@ sub _init {
 sub validate {
     my ( $self, $wf, $role ) = @_;
     ## prepare the environment
-    my $pki_realm = CTX('session')->get_pki_realm(); 
+    my $pki_realm = CTX('session')->get_pki_realm();
     my $context = $wf->context();
     my $sig      = $context->param('_signature');
 
@@ -72,11 +72,11 @@ sub validate {
     if (! $sig =~ m{ \A [a-zA-Z\+/=]+ \z }xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVAL_SIGNATURE_SIGNATURE_CONTAINS_INVALID_CHARACTERS',
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
+        log => {
+        logger => CTX('log'),
+        priority => 'warn',
+        facility => 'system',
+        },
         );
     }
 
@@ -101,7 +101,7 @@ sub validate {
         if ($sig_text eq $match) {
             ##! 64: 'matches signature text'
             $matched = 1;
-            last CHECK_MATCH; 
+            last CHECK_MATCH;
         }
     }
     if (! $matched) {
@@ -124,18 +124,19 @@ sub validate {
 
 
     ##! 32: 'pkcs7: ' . $pkcs7
-    my $pkcs7_token = CTX('crypto_layer')->get_system_token({ TYPE => 'PKCS7' });
+    my $default_token = CTX('api')->get_default_token();
 
-    $sig_text = encode('utf8', $sig_text);        
+    $sig_text = encode('utf8', $sig_text);
     # Looks like CR is stripped by some browser which leads to a digest mismatch
     # when verifying the signature, so we strip \r here.
     $sig_text =~ s/\r//g;
-    
+
     eval {
-        $pkcs7_token->command({
-            COMMAND => 'verify',
+        $default_token->command({
+            COMMAND => 'pkcs7_verify',
+            NO_CHAIN => 1,
             PKCS7   => $pkcs7,
-            DATA    => $sig_text,
+            CONTENT => $sig_text,
         });
     };
     if ($EVAL_ERROR) {
@@ -150,21 +151,21 @@ sub validate {
         );
     }
     ##! 16: 'signature valid'
- 
- 
+
+
     # Load trust anchors from config
-    my $approval_config = $self->config_path();   
-    ##! 16: 'Load approval config from ' . $approval_config 
+    my $approval_config = $self->config_path();
+    ##! 16: 'Load approval config from ' . $approval_config
     my $trust_anchors =  CTX('api')->get_trust_anchors({ PATH => $approval_config });
-    
-  
+
+
     # Looks like firefox adds \r to the p7
     $pkcs7 =~ s/\r//g;
     my $validate = CTX('api')->validate_certificate({
-        PKCS7 => $pkcs7,                   
-        ANCHOR => $trust_anchors,    
+        PKCS7 => $pkcs7,
+        ANCHOR => $trust_anchors,
     });
-        
+
     ##! 32: 'validation result ' . Dumper $validate
     if ($validate->{STATUS}  ne 'TRUSTED') {
         OpenXPKI::Exception->throw(
@@ -173,19 +174,18 @@ sub validate {
                 'STATUS' => $validate->{STATUS}
             },
         );
-    } 
- 
+    }
+
     ##! 64: 'signer_chain_server: ' . Dumper $validate->{CHAIN}
-    
+
     ##! 32: 'signer pem ' . $validate->{CHAIN}->[0]
-    
-    my $default_token = CTX('api')->get_default_token();
-    my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{CHAIN}->[0], TOKEN => $default_token );         
+
+    my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{CHAIN}->[0], TOKEN => $default_token );
     my $signer_subject = $x509_signer->get_subject();
     my $signer_identifier = $x509_signer->get_identifier();
-               
-    ##! 32: 'signer cert pem: ' . $signer_subject     
-         
+
+    ##! 32: 'signer cert pem: ' . $signer_subject
+
     if (! defined $signer_identifier  || $signer_identifier  eq '') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_APPROVALSIGNATURE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER',
@@ -196,8 +196,8 @@ sub validate {
             },
         );
     }
-    
-   
+
+
     ##! 16: 'end'
     return 1;
 }

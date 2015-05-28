@@ -1,0 +1,115 @@
+# Sample config for good old email notifications                     
+backend:
+    class: OpenXPKI::Server::Notification::SMTP
+    host: localhost
+    port: 25
+    username: ~
+    password: ~
+    debug: 0
+    # You need to install MIME::Tools for html support
+    use_html: 1
+
+default:
+    to: "[% cert_info.requestor_email %]"
+    from: no-reply@mycompany.local
+    reply: helpdesk@mycompany.local
+    cc: helpdesk@mycompany.local
+    prefix: PKI [% meta_wf_id %]
+              
+# template settings
+template:
+    dir:   /etc/openxpki/notification/email/
+
+message:    
+    testmail: 
+        default:   # The internal handle for this thread
+            template: testmail
+            subject: SMTP Notification Test
+            to: "[% data.rcpt %]"
+            from: no-reply@mycompany.local
+            reply: ''
+            cc: ''
+            prefix: ''
+            images:
+                banner: head.png
+
+
+    csr_created:   # The message Id as referenced in the activity
+        default:   # The internal handle for this thread
+            template: csr_created_user
+            subject: CSR for [% cert_subject %]                
+            images:
+                banner: head.png
+                footer: foot.png
+        
+        raop:      # Another internal handle for a second thread
+            template: csr_created_raop  # Suffix .txt is always added!
+            to: reg-office@mycompany.local
+            cc: ''
+            reply: "[% cert_info.requestor_email %]"
+            subject: CSR for [% cert_subject %]
+                    
+    csr_rejected:
+        default:
+            template: csr_rejected
+            subject: CSR rejected for [% cert_subject %]
+        
+    cert_issued:
+        default:
+            template: cert_issued
+            subject: certificate issued for [% cert_subject %]                
+            
+    scpu_notify:
+        default: 
+            template: scpu_notify_user
+            subject: Smartcard Enrollment Verification Notice
+            to: "[% data.requestor_mail %]"
+
+        auth1: 
+            template: scpu_notify_authcontact
+            to: "[% data.auth1_mail %]"
+            reply: "[% data.requestor_mail %]"
+            subject: Smartcard Enrollment Verification Request for [% data.requestor_name %]
+                            
+        auth2: 
+            template: scpu_notify_authcontact
+            to: "[% data.auth2_mail %]"
+            reply: "[% data.requestor_mail %]"
+            subject: Smartcard Enrollment Verification Request for [% data.requestor_name %]
+                                    
+    # notifies for the scep server
+    scep_auth_denied:
+        requestor:
+            template: scep_auth_denied
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request REJECTED - [% cert_subject %]
+        
+    scep_approval_pending:
+        requestor:
+            template: scep_approval_pending_requestor
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request PENDING - [% cert_subject %]
+        
+        raop:
+            template: scep_approval_pending_raop
+            to: reg-office@mycompany.local
+            cc: ''                 
+            subject: SCEP request PENDING - [% cert_subject %]
+                
+    scep_approval_rejected:
+        requestor:
+            template: scep_approval_rejected
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request REJECTED - [% cert_subject %]
+        
+    scep_cert_issued:
+        requestor:
+            template: scep_cert_issued
+            to: "[% data.notify_to %]"
+            cc: "[% data.notify_cc %]"            
+            subject: SCEP request ISSUED - [% cert_subject %]
+                                
+        

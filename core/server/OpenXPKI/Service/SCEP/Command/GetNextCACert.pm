@@ -19,19 +19,19 @@ sub execute {
     my $self    = shift;
     my $arg_ref = shift;
     my $ident   = ident $self;
-    
+
     ##! 1: "start"
-    
+
     my $pki_realm = CTX('session')->get_pki_realm();
 
     my $next_ca = CTX('dbi_backend')->first(
         TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
-        COLUMNS => [             
-            'ALIASES.NOTBEFORE',            
+        COLUMNS => [
+            'ALIASES.NOTBEFORE',
             'ALIASES.NOTAFTER',
             'CERTIFICATE.DATA',
             'CERTIFICATE.SUBJECT',
-            'ALIASES.ALIAS',              
+            'ALIASES.ALIAS',
             'ALIASES.IDENTIFIER',
         ],
         JOIN => [
@@ -40,31 +40,36 @@ sub execute {
         DYNAMIC => {
             'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
             'ALIASES.GROUP_ID' => { VALUE => 'root' },
-            'ALIASES.NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },                                           
+            'ALIASES.NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
         },
-        'ORDER' => [ 'ALIASES.NOTBEFORE' ],        
+        'ORDER' => [ 'ALIASES.NOTBEFORE' ],
     );
 
-    if (!$next_ca) {            
+    if (!$next_ca) {
         ##! 16: 'No cert found'
         CTX('log')->log(
             MESSAGE => "SCEP GetNextCACert nothing found (realm $pki_realm).",
             PRIORITY => 'debug',
-            FACILITY => 'system',
-        );        
-        return;
+            FACILITY => 'application',
+        );
+
+        # Send a 404 header with a verbose explanation
+        return $self->command_response(
+            "Status: 404 NextCA not set\n".
+            "Content-Type: text/plain\n\n".
+            "NextCA not set");
+
     }
-     
-    # We need to create a signed reply, load scep token
-    my $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
-    my $scep_token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
-   
+
+    my $scep_token =  $self->__get_token();
+
     ##! 16: 'Found nextca cert ' .  $next_ca->{'ALIASES.ALIAS'}
-    ##! 32: 'nextca  ' . Dumper $next_ca      
-   
-    my $result = $scep_token->command({   
-    	COMMAND => 'create_nextca_reply',
-        CHAIN   => $next_ca->{'CERTIFICATE.DATA'},        
+    ##! 32: 'nextca  ' . Dumper $next_ca
+
+    my $result = $scep_token->command({
+        COMMAND => 'create_nextca_reply',
+        CHAIN   => $next_ca->{'CERTIFICATE.DATA'},
+        HASH_ALG => CTX('session')->get_hash_alg(),
     });
 
     $result = "Content-Type: application/x-x509-next-ca-cert\n\n" . $result;
@@ -72,7 +77,7 @@ sub execute {
     ##! 16: "result: $result"
     return $self->command_response($result);
 }
- 
+
 1;
 __END__
 
@@ -81,7 +86,7 @@ __END__
 OpenXPKI::Service::SCEP::Command::GetNextCACert
 
 =head1 Description
- 
+
 Return the certificate of an upcoming but still inactive root certificate.
 To be returned the root certificate must be in the alias table, group root
 with a notbefore date in the future.

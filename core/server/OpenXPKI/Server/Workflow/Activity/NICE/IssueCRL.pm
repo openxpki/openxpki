@@ -26,12 +26,19 @@ sub execute {
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
     
     my $ca_alias = $context->param( 'ca_alias' );
+        
     if (!$ca_alias) {
        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID",
         );
     }
        
+    CTX('log')->log(
+        MESSAGE  => "start crl issue for ca $ca_alias, workflow " . $workflow->id,
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
+    
     my $set_context = $nice_backend->issueCRL( $ca_alias );
         
     ##! 64: 'Setting Context ' . Dumper $set_context       

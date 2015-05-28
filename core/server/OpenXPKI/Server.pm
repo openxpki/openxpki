@@ -1,4 +1,4 @@
-## OpenXPKI::Server.pm 
+## OpenXPKI::Server.pm
 ##
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
@@ -59,22 +59,22 @@ sub new
 
     # we need to get a usable logger as soon as possible, hence:
     # initialize configuration, i18n and log
-    OpenXPKI::Server::Init::init({	    
+    OpenXPKI::Server::Init::init({
 	    TASKS  => [ 'config_versioned', 'i18n', 'log' ],
         SILENT => $keys->{SILENT},
 	});
-	
+
     # from now on we can assume that we have CTX('log') available
     # perform the rest of the initialization
-    
+
     eval
     {
 	    OpenXPKI::Server::Init::init(
-	    {		    
+	    {
             SILENT => $keys->{SILENT}
 	    });
-    };    
-    if ($EVAL_ERROR) {        
+    };
+    if ($EVAL_ERROR) {
         $self->__log_and_die($EVAL_ERROR, 'server initialization');
     }
 
@@ -98,7 +98,7 @@ sub new
     if ($EVAL_ERROR) {
         $self->__log_and_die($EVAL_ERROR, 'server daemon setup');
     }
-    
+
     # Net::Server does not provide a hook that lets us change the
     # ownership of the created socket properly: it chowns the socket
     # file itself just before set_uid/set_gid. hence we make Net::Server
@@ -114,8 +114,8 @@ sub new
 	    $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
 	    delete $self->{PARAMS}->{group};
     }
-    
-    
+
+
 
     unlink ($self->{PARAMS}->{socketfile});
     CTX('log')->log(
@@ -123,20 +123,20 @@ sub new
 	    PRIORITY => "info",
 	    FACILITY => "system",
 	);
-    
+
     CTX('dbi_workflow')->disconnect();
     CTX('dbi_backend')->disconnect();
     CTX('dbi_log')->disconnect();
-    
+
     $self->{PARAMS}->{no_client_stdout} = 1;
 
     CTX('log')->log(
 	    MESSAGE  => "Server is running",
 	    PRIORITY => "info",
 	    FACILITY => "monitor",
-	);	
+	);
     $self->run(%{$self->{PARAMS}});
-    
+
     return $self;
 }
 
@@ -149,7 +149,7 @@ sub pre_server_close_hook {
     ##! 8: 'unlink socketfile ' . $self->{PARAMS}->{socketfile}
     unlink ($self->{PARAMS}->{socketfile});
     ##! 4: 'socketfile removed'
-    ##! 8: 'unlink pid file ' . $self->{PARAMS}->{pid_file}    
+    ##! 8: 'unlink pid file ' . $self->{PARAMS}->{pid_file}
     unlink ($self->{PARAMS}->{pid_file});
     ##! 4: 'pid_file removed'
 
@@ -205,7 +205,7 @@ sub post_bind_hook {
             );
         }
     }
-    
+
     if (defined $self->{PARAMS}->{socket_group}) {
         $socket_group = __get_numerical_group_id($self->{PARAMS}->{socket_group});
         if (! defined $socket_group) {
@@ -252,21 +252,21 @@ sub post_bind_hook {
             );
         }
     }
- 
+
     # change the owner of the pidfile to the daemon user
-    my $pidfile = $self->{PARAMS}->{pid_file}; 
-    ##! 16: 'chown pidfile: ' .  $pidfile . ' user: ' . $self->{PARAMS}->{process_owner} . ' group: ' . $self->{PARAMS}->{process_group} 
-    if (! chown $self->{PARAMS}->{process_owner}, $self->{PARAMS}->{process_group}, $pidfile) {    
+    my $pidfile = $self->{PARAMS}->{pid_file};
+    ##! 16: 'chown pidfile: ' .  $pidfile . ' user: ' . $self->{PARAMS}->{process_owner} . ' group: ' . $self->{PARAMS}->{process_group}
+    if (! chown $self->{PARAMS}->{process_owner}, $self->{PARAMS}->{process_group}, $pidfile) {
         CTX('log')->log(
             MESSAGE => "Could not change ownership for pidfile '$pidfile' to '$socket_owner:$socket_group'",
             FACILITY => 'system',
             PRIORITY => 'error',
-        );        
-    } 
+        );
+    }
 
     my $env = CTX('config')->get_hash('system.server.environment');
     foreach my $var (keys %{$env}) {
-        my $value = $env->{$var};        
+        my $value = $env->{$var};
         ##! 16: "ENV{$var} = $value"
         $ENV{$var} = $value;
     }
@@ -284,20 +284,20 @@ sub pre_loop_hook {
     # Net::Server does not provide a hook that is executed BEFORE.
     # we are tricking Net::Server to believe that it should not change
     # owner and group of the process and do it ourselves shortly afterwards
-   
+
     ### drop privileges
     eval{
-        
-        # Set verbose process name        
-        $0 = "openxpkid server ( $self->{PARAMS}->{alias} )";
-        
+
+        # Set verbose process name
+        $0 = sprintf ('openxpkid (%s) server', $self->{PARAMS}->{alias});
+
         if( $self->{PARAMS}->{process_group} ne $) ){
             $self->log(
                 2,
                 "Setting gid to \"$self->{PARAMS}->{process_group}\""
             );
             CTX('log')->log(
-                MESSAGE  => "Setting gid to to " 
+                MESSAGE  => "Setting gid to to "
                             . $self->{PARAMS}->{process_group},
                 PRIORITY => "debug",
                 FACILITY => "system",
@@ -310,7 +310,7 @@ sub pre_loop_hook {
                 "Setting uid to \"$self->{PARAMS}->{process_owner}\""
             );
             CTX('log')->log(
-                MESSAGE  => "Setting uid to to " 
+                MESSAGE  => "Setting uid to to "
                     . $self->{PARAMS}->{process_owner},
                 PRIORITY => "debug",
                 FACILITY => "system",
@@ -349,7 +349,7 @@ sub pre_loop_hook {
         # (for example when doing external dynamic authentication) ...
         $SIG{CHLD} = 'DEFAULT';
     }
-    
+
 }
 
 sub sig_term {
@@ -365,9 +365,12 @@ sub sig_term {
         alarm(1);
     }
     $stop_soon = 1;
-    #terminate the watchdog
+    # terminate the watchdog
+    # This is obsolete for a "global shutdown" using the OpenXPKI::Control::stop
+    # method but should be kept in case somebody sends a term to the daemon which
+    # will stop spawning of new childs but should allow existing ones to finish
     CTX('watchdog')->terminate();
-    
+
     ##! 1: 'end'
 }
 
@@ -379,34 +382,34 @@ sub sig_hup {
         PRIORITY => "info",
         FACILITY => "system",
     );
-    
+
     ##! 8: 'forward head'
     CTX('config')->update_head();
-        
+
     # The notification layer also needs to be re-created
     # Note: You need to redo this in the watchdog!
     OpenXPKI::Server::Context::setcontext({
         notification => OpenXPKI::Server::Notification::Handler->new(),
         force => 1,
     });
-    
+
     # FIXME - reload authentication handlers (cached!)
-    
-        
+    # FIXME - should also reinit some of the services for speed (e.g. workflow)
+
     # Update head creates a session that blocks new sessions later
     OpenXPKI::Server::Context::killsession();
-    
+
     ##! 8: 'watchdog'
     CTX('watchdog')->reload();
-    
-    
+
+
 }
 
 sub process_request {
     my $rc;
     my $msg;
 
-    # Re-seed Perl random number generator (only used for temp file name creation, not for actual 
+    # Re-seed Perl random number generator (only used for temp file name creation, not for actual
     # cryptographic operation), otherwise children inherit common initialization from parent process.
     # Without this line the forked clients will very often generate temp file names clashing with
     # each other.
@@ -419,7 +422,7 @@ sub process_request {
     if (my $exc = OpenXPKI::Exception->caught()) {
 	    if ($exc->message() =~ m{ (?:
                 I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION
-                | I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT 
+                | I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT
             ) }xms) {
 	        # exit quietly
 	        return 1;
@@ -454,7 +457,7 @@ sub do_process_request
     ##! 2: "start"
     my $self = shift;
 
-    eval { 
+    eval {
         CTX('dbi_log')->new_dbh();
 	    CTX('dbi_log')->connect();
     };
@@ -476,7 +479,7 @@ sub do_process_request
     umask $self->{umask};
 
     # masquerade process...
-    $0 = 'openxpkid: idle';
+    $0 = sprintf ('openxpkid (%s) worker: idle', (CTX('config')->get('system.server.name') || 'main') );
 
     ##! 2: "transport protocol detector"
     my $transport = undef;
@@ -578,7 +581,7 @@ sub do_process_request
 
     ##! 2: "update pre-initialized variables"
 
-    eval { 
+    eval {
         CTX('dbi_backend')->new_dbh();
 	    CTX('dbi_backend')->connect();
     };
@@ -589,11 +592,11 @@ sub do_process_request
                    PRIORITY => "fatal",
                    FACILITY => "system");
         return;
-        
+
     }
     ##! 16: 'dbi_backend reconnected with new dbh'
 
-    eval { 
+    eval {
         CTX('dbi_workflow')->new_dbh();
 	    CTX('dbi_workflow')->connect();
     };
@@ -605,7 +608,7 @@ sub do_process_request
                            PRIORITY => "fatal",
                            FACILITY => "system");
         return;
-        
+
     }
     ##! 16: 'dbi_workflow reconnected with new dbh'
 
@@ -615,7 +618,7 @@ sub do_process_request
     CTX('crypto_layer')->reload_all_secret_groups_from_cache();
 
     ##! 16: 'secret groups reloaded from cache'
-    
+
     # masquerade process
     my $user = '';
     my $role = '';
@@ -623,9 +626,10 @@ sub do_process_request
 	    $user = CTX('session')->get_user();
     };
     eval {
-	    $role = '(' . CTX('session')->get_role() . ')';
+	    $role = CTX('session')->get_role();
+	    $role = 'no role' unless($role);
     };
-    $0 = 'openxpkid: ' . $user . $role;
+    $0 = sprintf ('openxpkid (%s) worker: %s (%s)', (CTX('config')->get('system.server.name') || 'main'), $user, $role);
 
     ## use user interface
     CTX('service')->run();
@@ -637,18 +641,18 @@ sub do_process_request
 sub __get_user_interfaces
 {
     my $self = shift;
-    
+
     ##! 1: "start"
-    
+
     my $config = CTX('config');
 
     ##! 2: "init transport protocols"
 
     my $transport = $config->get_hash("system.server.transport");
     foreach my $class (keys %{$transport}) {
-        
+
         next unless ($transport->{$class});
-            
+
         $class = "OpenXPKI::Transport::".$class;
         eval "use $class;";
         if ($EVAL_ERROR)
@@ -673,10 +677,10 @@ sub __get_user_interfaces
 
     my @services = $config->get_keys("system.server.service");
     foreach my $class (@services) {
-        
+
         next unless ($config->get("system.server.service.$class.enabled"));
 
-        ##! 4: "init $class"                
+        ##! 4: "init $class"
         $class = "OpenXPKI::Service::".$class;
         eval "use $class;";
         if ($EVAL_ERROR)
@@ -712,7 +716,7 @@ sub __get_numerical_user_id {
     my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
         $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
 	    getpwnam ($arg);
-    
+
     if (! defined $pw_uid && ($arg =~ m{ \A \d+ \z }xms)) {
 	($pw_name,$pw_passwd,$pw_uid,$pw_gid,
 	 $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
@@ -768,7 +772,7 @@ sub __get_server_config
     }
 
     my %params = ();
-    $params{alias} = $config->get('system.server.name') || 'main';    
+    $params{alias} = $config->get('system.server.name') || 'main';
     $params{socketfile} = $socketfile;
     $params{proto}      = "unix";
     if ($self->{TYPE} eq 'Simple') {
@@ -796,7 +800,7 @@ sub __get_server_config
     $params{group}      = $config->get('system.server.group');
     $params{port}       = $socketfile . '|unix';
     $params{pid_file}   = $config->get('system.server.pid_file');
-    
+
     ## check daemon user
 
     foreach my $param (qw( user group port pid_file )) {
@@ -862,7 +866,7 @@ sub __get_server_config
     if (defined $socket_owner) {
     	# convert user id to numerical
     	$params{socket_owner} = __get_numerical_user_id($socket_owner);
-    
+
     	if (! defined $params{socket_owner} || ($params{socket_owner} eq ''))
     	{
     	    OpenXPKI::Exception->throw (
@@ -878,15 +882,15 @@ sub __get_server_config
     		},
     		);
     	}
-    	$params{socket_owner} = $socket_owner;	
+    	$params{socket_owner} = $socket_owner;
     }
 
     my $socket_group = $config->get('system.server.socket_group');
-    
+
     if (defined $socket_group) {
     	# convert group id to numerical
     	$params{socket_group} = __get_numerical_group_id($socket_group);
-    
+
     	if (! defined $params{socket_group} || ($params{socket_group} eq ''))
     	{
     	    OpenXPKI::Exception->throw (
@@ -902,7 +906,7 @@ sub __get_server_config
     		},
     		);
     	}
-    	$params{socket_group} = $socket_group;	
+    	$params{socket_group} = $socket_group;
     };
 
     return \%params;
@@ -960,17 +964,17 @@ sub __log_and_die {
         PRIORITY => "fatal",
         FACILITY => "system",
     );
-    
+
     # Check if watchdog was already started and kill
     if (OpenXPKI::Server::Context::hascontext('watchdog')) {
     	CTX('watchdog')->terminate();
-    }    
+    }
 
  	# die gracefully
  	$ERRNO = 1;
     ##! 1: 'end, dying'
     die $log_message;
-    
+
     return 1;
 }
 
@@ -1070,7 +1074,7 @@ commands.
 =head3 __redirect_stderr
 
 Send all messages to STDERR directly to a file. The file is specified in
-the XML configuration. 
+the XML configuration.
 
 =head3 __get_user_interfaces
 

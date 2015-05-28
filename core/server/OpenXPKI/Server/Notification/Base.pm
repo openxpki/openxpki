@@ -26,7 +26,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
-use Template;
+use OpenXPKI::Template;
 
 use Moose;
 
@@ -87,7 +87,7 @@ sub _render_template_file {
     if (! -e $filename  ) {
         CTX('log')->log(
             MESSAGE  => "Template file missing $filename  ",
-            PRIORITY => "error",
+            PRIORITY => "warn",
             FACILITY => "system",
         );
         return undef;
@@ -97,7 +97,7 @@ sub _render_template_file {
     # Parse using TT
     my $output;
     
-    my $tt = Template->new();    
+    my $tt = OpenXPKI::Template->new();    
     if (!$tt->process(\$template, $vars, \$output)) {
         CTX('log')->log(
             MESSAGE  => "Error parsing templatefile ($filename): " . $tt->error(),
@@ -128,7 +128,7 @@ sub _render_template {
     # Parse using TT
     my $output;
     
-    my $tt = Template->new();        
+    my $tt = OpenXPKI::Template->new();        
     if (!$tt->process(\$template, $vars, \$output)) {
         CTX('log')->log(
             MESSAGE  => "Error parsing template ($template): " . $tt->error(),

@@ -173,12 +173,13 @@ sub _validation_result {
     # Ask connector    
     ##! 16: 'Rolehandler ' . Dumper $self->{ROLEHANDLER} 
     if ($self->{ROLEHANDLER}) {               
+        my $handler = $self->{ROLEHANDLER}.".";
         if ($self->{ROLEARG} eq "cn" || $self->{ROLEARG} eq "username") {
-            $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $user ]); 
+            $handler .= $user;            
         } elsif ($self->{ROLEARG} eq "subject") {    
-            $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509_signer->{PARSED}->{BODY}->{SUBJECT} ]);                    
+            $handler .= $x509_signer->{PARSED}->{BODY}->{SUBJECT};                    
         } elsif ($self->{ROLEARG} eq "serial") {
-            $role = CTX('config')->get( [ $self->{ROLEHANDLER},  $x509_signer->{PARSED}->{BODY}->{SERIAL} ]);            
+            $handler .= $x509_signer->{PARSED}->{BODY}->{SERIAL};            
         } else {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_UNKNOWN_ROLE_HANDLER_ARGUMENT',
@@ -186,11 +187,12 @@ sub _validation_result {
                     'ARGUMENT' => $self->{ROLEARG},
                 },
                 log => {
-                    PRIORTITY => 'error',
+                    PRIORTITY => 'fatal',
                     FACILITY => 'system',                        
                 }
             );
         }
+        $role = CTX('config')->get( $handler );
         ##! 16: 'role: ' . $role            
     }    
         

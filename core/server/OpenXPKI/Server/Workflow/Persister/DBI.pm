@@ -20,10 +20,6 @@ use DateTime::Format::Strptime;
 
 use Data::Dumper;
 
-my $workflow_table = 'WORKFLOW';
-my $context_table  = 'WORKFLOW_CONTEXT';
-my $history_table  = 'WORKFLOW_HISTORY';
-
 # limits
 my $context_value_max_length = 32768;
 
@@ -60,9 +56,9 @@ sub create_workflow {
     ##! 2: "BTW we shredder many workflow IDs here"
 
     CTX('log')->log(
-	MESSAGE  => "Created workflow ID $id.",
-	PRIORITY => "info",
-	FACILITY => "system"
+    	MESSAGE  => "Created workflow ID $id.",
+    	PRIORITY => "info",
+    	FACILITY => "workflow"
 	);
 
     return $id;
@@ -126,7 +122,7 @@ sub update_workflow {
 
         ##! 1: "inserting data into workflow table"
         $dbi->insert(
-            TABLE => $workflow_table,
+            TABLE => 'WORKFLOW',
             HASH  => \%data,
         );
 
@@ -143,7 +139,7 @@ sub update_workflow {
 
         # save workflow instance...
         $dbi->update(
-            TABLE  => $workflow_table,
+            TABLE  => 'WORKFLOW',
             DATA   => \%data,
             WHERE  => {
                 WORKFLOW_SERIAL => $id,
@@ -166,7 +162,7 @@ sub update_workflow {
             ##! 4: 'value for key ' . $key . ' is undef, try to delete'
             eval {
                 $dbi->delete(
-                    TABLE => $context_table,
+                    TABLE => 'WORKFLOW_CONTEXT',
                     DATA  => {
                         WORKFLOW_SERIAL        => $id,
                         WORKFLOW_CONTEXT_KEY   => $key,
@@ -180,28 +176,15 @@ sub update_workflow {
 	# ignore "volatile" context parameters starting with an underscore
 	next PARAMETER if ($key =~ m{ \A _ }xms);
 
-	# context parameter sanity checks 
-	if (length($value) > $context_value_max_length) {
-	    ##! 4: "parameter length exceeded"
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
-		params  => {
-		    WORKFLOW_ID => $id,
-		    CONTEXT_KEY => $key,
-		    CONTEXT_VALUE_LENGTH => length($value),
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
-
         ##! 2: "persisting context parameter: $key"
         # ignore "volatile" context parameters starting with an underscore
         next PARAMETER if ($key =~ m{ \A _ }xms);
 
+        # automatic serialization        
+        if (ref $value eq 'ARRAY' ||  ref $value eq 'HASH') {
+            my $ser = OpenXPKI::Serialization::Simple->new();
+            $value = $ser->serialize( $value );
+        }
         # context parameter sanity checks 
         if (length($value) > $context_value_max_length) {
             ##! 4: "parameter length exceeded"
@@ -240,7 +223,7 @@ sub update_workflow {
         ##! 2: "saving context for wf: $id"
         ##! 16: 'trying to update context entry'
         my $rows_changed = $dbi->update(
-            TABLE   => $context_table,
+            TABLE   => 'WORKFLOW_CONTEXT',
             DATA    => {
                 WORKFLOW_SERIAL        => $id,
                 WORKFLOW_CONTEXT_KEY   => $key,
@@ -256,7 +239,7 @@ sub update_workflow {
         if ($rows_changed == 0) {
             ##! 16: 'update did not work, possibly new key, try insert'
             $dbi->insert(
-                TABLE => $context_table,
+                TABLE => 'WORKFLOW_CONTEXT',
                 HASH => {
                     WORKFLOW_SERIAL        => $id,
                     WORKFLOW_CONTEXT_KEY   => $key,
@@ -272,7 +255,7 @@ sub update_workflow {
     CTX('log')->log(
         MESSAGE  => "Updated workflow $id",
         PRIORITY => "info",
-        FACILITY => "system"
+        FACILITY => "workflow"
 	);
 
     return 1;
@@ -288,7 +271,7 @@ sub fetch_workflow {
     my $dbi = CTX('dbi_workflow');
 
     my $result = $dbi->get(
-	TABLE => $workflow_table,
+	TABLE => 'WORKFLOW',
 	SERIAL => $id,
 	DYNAMIC => {
 	    PKI_REALM  => {VALUE => CTX('session')->get_pki_realm()},
@@ -301,8 +284,8 @@ sub fetch_workflow {
 	(! $result->{WORKFLOW_LAST_UPDATE})) {
 	CTX('log')->log(
 	    MESSAGE  => "Could not retrieve workflow entry $id",
-	    PRIORITY => "info",
-	    FACILITY => "system"
+	    PRIORITY => "warn",
+	    FACILITY => "workflow"
 	    );
 
 	OpenXPKI::Exception->throw (
@@ -333,7 +316,9 @@ sub fetch_workflow {
 	       state       => $result->{WORKFLOW_STATE},
 	       last_update => $parser->parse_datetime($result->{WORKFLOW_LAST_UPDATE}),
 	       proc_state  => $result->{WORKFLOW_PROC_STATE},
-	       count_try  => $result->{WORKFLOW_COUNT_TRY},
+	       count_try   => $result->{WORKFLOW_COUNT_TRY},
+	       wakeup_at   => $result->{WORKFLOW_WAKEUP_AT},
+	       reap_at   => $result->{WORKFLOW_REAP_AT},
 	   };
     
     ##! 1: "return ".Dumper($return);
@@ -351,7 +336,7 @@ sub fetch_extra_workflow_data {
     my $dbi = CTX('dbi_workflow');
 
     my $result = $dbi->select(
-	TABLE   => $context_table,
+	TABLE   => 'WORKFLOW_CONTEXT',
 	DYNAMIC => {
 	    WORKFLOW_SERIAL => {VALUE => $id},
 	},
@@ -410,7 +395,7 @@ sub create_history {
 
 	##! 2: "inserting data into workflow history table"
 	$dbi->insert(
-	    TABLE => $history_table,
+	    TABLE => 'WORKFLOW_HISTORY',
 	    HASH => \%data,
 	    );
 	
@@ -432,8 +417,8 @@ sub create_history {
 
 	CTX('log')->log(
 	    MESSAGE  => "Created workflow history entry $id",
-	    PRIORITY => "info",
-	    FACILITY => "system"
+	    PRIORITY => "debug",
+	    FACILITY => "workflow"
 	    );
     }
 
@@ -457,7 +442,7 @@ sub fetch_history {
     my @history = ();
     
     my $entry = $dbi->last(
-	TABLE           => $history_table,
+	TABLE           => 'WORKFLOW_HISTORY',
 	WORKFLOW_SERIAL => $id,
 	);
 
@@ -478,14 +463,14 @@ sub fetch_history {
 	CTX('log')->log(
 	    MESSAGE  => "Fetched history object '$histid'",
 	    PRIORITY => "debug",
-	    FACILITY => "system"
+	    FACILITY => "workflow"
 	    );
 	
         $hist->set_saved();
         push @history, $hist;     
 
 	$entry = $dbi->prev(
-	    TABLE           => $history_table,
+	    TABLE           => 'WORKFLOW_HISTORY',
 	    WORKFLOW_SERIAL => $id,
 	    );
 	
@@ -516,8 +501,8 @@ sub assign_generators {
 sub init_OpenXPKI_generators {
     my $self = shift;
     my $params = shift;
-    $params->{workflow_table} ||= $workflow_table;
-    $params->{history_table}  ||= $history_table;
+    $params->{workflow_table} ||= 'WORKFLOW';
+    $params->{history_table}  ||= 'WORKFLOW_HISTORY';
 
     return (
 	OpenXPKI::Server::Workflow::Persister::DBI::SequenceId->new( 

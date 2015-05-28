@@ -40,7 +40,7 @@ use Data::Dumper;
             		VALIDITY => $expected_diff,
                 	VALIDITYFORMAT => 'relativedate',
             	    },
-            	)->datetime();
+            	)->epoch();
         
         $self->is($timestamp,$timestamp_expected, $testname);
         

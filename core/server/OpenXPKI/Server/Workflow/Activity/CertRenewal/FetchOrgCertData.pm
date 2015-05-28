@@ -29,14 +29,13 @@ sub execute {
 
     my $certificate = $dbi->first(
         TABLE   => [ 'CERTIFICATE', 'CSR' ],
-    	COLUMNS => [
-    	    'CERTIFICATE.SUBJECT', 
-    	    'CERTIFICATE.ROLE',
-    	    'CSR.PROFILE' 
-    	],
-    	JOIN => [
-    	    [ 'CSR_SERIAL', 'CSR_SERIAL' ],
-    	],
+        COLUMNS => [
+            'CERTIFICATE.SUBJECT',
+            'CSR.PROFILE'
+        ],
+        JOIN => [
+            [ 'CSR_SERIAL', 'CSR_SERIAL' ],
+        ],
         DYNAMIC => {
             'CERTIFICATE.IDENTIFIER' => $cert_identifier,
             'CERTIFICATE.PKI_REALM'  => $pki_realm,
@@ -45,25 +44,24 @@ sub execute {
 
     $context->param( 'cert_profile' => $certificate->{'CSR.PROFILE'} );
     $context->param( 'cert_subject' => $certificate->{'CERTIFICATE.SUBJECT'} );
-    $context->param( 'cert_role'    => $certificate->{'CERTIFICATE.ROLE'} );
 
     my @subj_alt_names;
     my $cert_info = {};
 
     my $certificate_metadata = $dbi->select(
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => { 
-            'IDENTIFIER' => $cert_identifier, 
+        DYNAMIC => {
+            'IDENTIFIER' => $cert_identifier,
         },
     );
 
     foreach my $metadata ( @{$certificate_metadata} ) {
         my $key   = $metadata->{ATTRIBUTE_KEY};
-        my $value = $metadata->{ATTRIBUTE_VALUE};        
+        my $value = $metadata->{ATTRIBUTE_VALUE};
         if ( $key eq 'subject_alt_name' ) {
             ##! 16: 'Adding SAN ' . $value
-            # Type:Value            
-            my @t = split ":", $value;            
+            # Type:Value
+            my @t = split ":", $value;
             push @subj_alt_names, \@t;
         } else {
             ##! 16: 'Unknown certificate attribute ' . $key
@@ -81,7 +79,7 @@ sub execute {
         $source_ref = $serializer->deserialize(
             $context->param('sources')
         );
-    } 
+    }
     $source_ref->{'cert_subject_alt_name'} = 'renewal';
 
     $context->param( 'sources' => $serializer->serialize($source_ref) );
@@ -120,8 +118,6 @@ Writes the following context parameters:
 =item cert_subject
 
 =item cert_subject_alt_name
-
-=item cert_role
 
 =back
 

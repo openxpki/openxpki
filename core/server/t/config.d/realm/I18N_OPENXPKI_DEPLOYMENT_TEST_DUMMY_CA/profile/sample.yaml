@@ -81,7 +81,7 @@ style:
         subject_alternative_names: email=[% mail %]
 
 role:
-- Web Server
+    - Web Server
 
 # Profile extensions - set 0/1 as needed
 extensions:
@@ -130,8 +130,8 @@ extensions:
         critical: 0
         # uri can be scalar or list
         uri:
-        - http://localhost/cacrl.crt
-        - ldap://localhost/cn=[% ISSUER.CN.0 %],dc=OpenXPKI,dc=org
+            - http://localhost/cacrl.crt
+            - ldap://localhost/cn=[% ISSUER.CN.0 %],dc=OpenXPKI,dc=org
 
     authority_info_access:
         critical: 0

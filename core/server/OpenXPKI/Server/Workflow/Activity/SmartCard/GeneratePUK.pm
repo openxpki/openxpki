@@ -16,7 +16,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 use MIME::Base64;
 
 use Data::Dumper;
@@ -52,7 +52,7 @@ sub execute {
 
         # Convert to hex string
         my $puk_hex = unpack( 'H*', $puk_raw );
-	$puk_hex = substr($puk_hex . "00" x ($puk_length * 2), 
+        $puk_hex = substr($puk_hex . "00" x ($puk_length * 2), 
 			  0, 
 			  $puk_length * 2);
 
@@ -101,6 +101,12 @@ sub execute {
         $params->{ENCRYPT} = 1;
         $msg = CTX('api')->set_data_pool_entry($params);
         CTX('dbi_backend')->commit();
+
+        CTX('log')->log(
+            MESSAGE => 'SmartCard new puk generated for token ' . $context->param('token_id'),
+            PRIORITY => 'info',
+            FACILITY => ['audit','application']
+        );
 
 #        # set a flag in the context so the wf knows this was successful
         $context->param( 'generated_new_puk', 'yes' );
@@ -152,9 +158,9 @@ definition):
 
 =over 12
 
-B<Note:> Planned for future version. For now, 'gem2' is always used.
-
 =item puk_policy
+
+B<Note:> Planned for future version. For now, 'gem2' is always used.
 
 Specifies the name of the puk policy to use. Possible choices are:
 

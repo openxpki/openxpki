@@ -9,7 +9,7 @@ plan skip_all => 'No LDAP configured';
 
 use utf8;
 use Digest::MD5;
-use Digest::SHA1;
+use Digest::SHA;
 
 use Net::LDAP;
 use Net::LDAP::Util qw( ldap_error_text

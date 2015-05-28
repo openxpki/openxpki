@@ -1,0 +1,65 @@
+# By default, all scep endpoints wll use the default token defined
+# by the scep token group, if you pass a name here, it is considered
+# a group name from the alias table
+#token: ca-one-special-scep
+
+# Earliest time to create a renewal request
+renewal_period: 000014
+
+replace_period: 05
+
+revoke_on_replace:
+    reason_code: keyCompromise
+    invalidity_time: +000014
+
+workflow_type: enrollment
+
+# allow rsa keys with 1020 to 2048 bit
+# the 1020 is necessary as some implementations can have
+# leading 0 in the modulus which will reduce the bitcount
+key_size:
+    rsaEncryption: 1020-2048
+
+hash_type: 
+  - sha1
+
+authorized_signer_on_behalf:
+    rule1:
+        # Full DN
+        subject: CN=.+:scepclient,.*
+
+policy:         
+    allow_anon_enroll: 0
+    allow_man_authen: 1
+    allow_man_approv: 1        
+    max_active_certs: 1
+    allow_expired_signer: 0
+    auto_revoke_existing_certs: 1
+    approval_points: 1
+
+response:
+    # The scep standard is a bit unclear if the root should be in the chain or not
+    # We consider it a security risk (trust should be always set by hand) but
+    # as most clients seem to expect it, we include the root by default
+    # If you are sure your clients do not need the root, set this to 1
+    getcacert_strip_root: 0
+    
+# Mapping of names to OpenXPKI profiles to be used with the 
+# Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)       
+profile_map:
+    pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
+
+subject_style: enroll
+
+challenge:
+   value: SecretChallenge
+
+eligible:
+    initial:
+       value: 1
+
+    renewal:
+       value: 1
+
+ 
+

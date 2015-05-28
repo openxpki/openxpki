@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 #
 # Written by Martin Bartosch
 # extended by Oliver Welter
@@ -22,33 +22,58 @@ my %params = (
     authuser => undef,
     authpass => undef,
     wfid => undef,
-    wfaction => undef,        
+    wfaction => undef,
     param => [],
     nosplit => undef,
+    context => undef,
+    attribute => undef,
     );
 
 sub debug {
     my $arg = shift;
     if ($params{debug}) {
-	print $arg . "\n";
+    print $arg . "\n";
+    }
+}
+
+sub dump_workflow {
+
+    my $reply = shift;
+    if ($params{context} && $reply->{PARAMS}->{WORKFLOW}->{CONTEXT}) {
+        print "\n===Context===\n";
+        my $context = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
+        foreach my $key (keys %{$context}) {
+            printf "=%-20s: %s\n", $key, $context->{$key};
+        } 
+    }
+    
+    if ($params{attribute} && $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE}) {
+        print "\n===Attributes===\n";
+        my $attr = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
+        foreach my $key (keys %{$attr}) {
+            printf "=%-20s: %s\n", $key, $attr->{$key};
+        } 
     }
 }
 
 GetOptions(\%params,
-	   qw(
-	        help|?
-		man
-		socketfile=s
-                realm=s
-                authstack=s
-                authuser=s
-                authpass=s
-                wfid=i
-                wfaction=s
-                param|set=s@
-                nosplit
-                debug
-	     )) or pod2usage(-verbose => 0);
+       qw(
+            help|?
+            man
+            socketfile=s
+            instance|i=s
+            realm=s
+            authstack=s
+            authuser=s
+            authpass=s
+            wfid=i
+            wfaction=s
+            param|set=s@
+            nosplit
+            debug
+            context
+            attribute
+         )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
@@ -71,7 +96,7 @@ my %wf_parameters;
 foreach my $entry (@wf_parameters) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
     if (! defined $key) {
-	$key = $entry;
+    $key = $entry;
     }
     $wf_parameters{$key} = $value;
 }
@@ -82,9 +107,11 @@ if (! defined $wf_type) {
 
 
 
-if(!$params{socketfile}){
-	$params{socketfile} = '/var/openxpki/openxpki.socket';
-	printf("using default socket %s \n", $params{socketfile});
+if($params{instance}){
+    $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
+} elsif(!$params{socketfile}){
+    $params{socketfile} = '/var/openxpki/openxpki.socket';
+    printf("using default socket %s \n", $params{socketfile});
 }
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
@@ -92,7 +119,7 @@ debug(sprintf("Socketfile: %s", $params{socketfile}));
 my $reply;
 my $client = OpenXPKI::Client->new(
     {
-	SOCKETFILE => $params{socketfile},
+    SOCKETFILE => $params{socketfile},
     });
 
 
@@ -115,49 +142,49 @@ while (1) {
     my $status = $reply->{SERVICE_MSG};
 
     if ($status eq 'GET_PKI_REALM') {
-	if (! $params{realm}) {
-	    print "Available PKI realms:\n";
-	    foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
-		print "  $entry\n";
-	    }
-	    die "No --realm specified. Stopped";
-	}
-	$reply = $client->send_receive_service_msg('GET_PKI_REALM',
-						   {
-						       PKI_REALM => $params{realm},
-						   });
-	next SERVICE_MESSAGE;
+    if (! $params{realm}) {
+        print "Available PKI realms:\n";
+        foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
+        print "  $entry\n";
+        }
+        die "No --realm specified. Stopped";
+    }
+    $reply = $client->send_receive_service_msg('GET_PKI_REALM',
+                           {
+                               PKI_REALM => $params{realm},
+                           });
+    next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
-	if (! $params{authstack}) {
-	    print "Available authentication stacks:\n";
-	    foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
-		print "  $entry\n";
-	    }
-	    die "No --authstack specified. Stopped";
-	}
-	$reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
-						   {
-						       AUTHENTICATION_STACK => $params{authstack},
-						   });
-	next SERVICE_MESSAGE;
+    if (! $params{authstack}) {
+        print "Available authentication stacks:\n";
+        foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
+        print "  $entry\n";
+        }
+        die "No --authstack specified. Stopped";
+    }
+    $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
+                           {
+                               AUTHENTICATION_STACK => $params{authstack},
+                           });
+    next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_PASSWD_LOGIN') {
-	if (! $params{authuser}) {
-	    die "No --authuser specified. Stopped";
-	}
-	$reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
-						   {
-						       LOGIN => $params{authuser},
-						       PASSWD => $params{authpass},
-						   });
-	next SERVICE_MESSAGE;
+    if (! $params{authuser}) {
+        die "No --authuser specified. Stopped";
+    }
+    $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
+                           {
+                               LOGIN => $params{authuser},
+                               PASSWD => $params{authpass},
+                           });
+    next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'SERVICE_READY') {
-	last SERVICE_MESSAGE;
+    last SERVICE_MESSAGE;
     }
 
     print Dumper $reply;
@@ -168,50 +195,63 @@ while (1) {
 
 if ($params{wfid}) {
 
-	if ($params{wfaction}) {
-         
-		$reply = $client->send_receive_command_msg(	
-			'execute_workflow_activity',
-			{
-				ID => $params{wfid},
-				WORKFLOW => $wf_type,
-				ACTIVITY => $params{wfaction},
-				PARAMS => \%wf_parameters,				
-			}
-		);
-		
-		if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-			printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE};
-		}		
-	} else {
-		$reply = $client->send_receive_command_msg( 'get_workflow_activities',
-			{
-				ID => $params{wfid},
-				WORKFLOW => $wf_type,							
-			}
-		);
-		if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-			print "Possible Actions:\n";
-			print join "\n", @{$reply->{PARAMS}};
-			print "\n";
-		}
-		
-		
-	}		
+    if ($params{wfaction}) {
+
+        $reply = $client->send_receive_command_msg(
+            'execute_workflow_activity',
+            {
+                ID => $params{wfid},
+                WORKFLOW => $wf_type,
+                ACTIVITY => $params{wfaction},
+                PARAMS => \%wf_parameters,
+            }
+        );
+
+        if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+            printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE};
+            dump_workflow( $reply );
+        }
+    } else {
+        $reply = $client->send_receive_command_msg( 'get_workflow_activities',
+            {
+                ID => $params{wfid},
+                WORKFLOW => $wf_type,
+            }
+        );
+        
+        if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+            print "Possible Actions:\n";
+            print join "\n", @{$reply->{PARAMS}};
+            print "\n";
+        }
+        
+        if ($params{context} || $params{attribute}) {
+            $reply = $client->send_receive_command_msg( 'get_workflow_info',
+                {
+                    ID => $params{wfid},                    
+                }
+            );
+            dump_workflow( $reply );
+        } 
+
+
+    }
 } else {
 
-	$reply = $client->send_receive_service_msg('COMMAND',
-					   {
-					       COMMAND => 'create_workflow_instance',
-					       PARAMS => {
-						   WORKFLOW => $wf_type,
-						   PARAMS => \%wf_parameters,
-					       }
-					   });
-	if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-		printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE};
-	}				   
-					   
+    $reply = $client->send_receive_service_msg('COMMAND',
+                       {
+                           COMMAND => 'create_workflow_instance',
+                           PARAMS => {
+                           WORKFLOW => $wf_type,
+                           PARAMS => \%wf_parameters,
+                           }
+                       });
+                       
+    if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE};      
+        dump_workflow( $reply );
+    }
+
 }
 
 if ($reply->{SERVICE_MSG} ne 'COMMAND') {
@@ -244,6 +284,8 @@ openxpkicmd [options] WORKFLOW_TYPE
     --wfid                Pickup WF with this id at its current state
     --wfaction            Execute action on exisiting workflow
     --debug               enable debug mode
+    --context             show context data
+    --attribute           show attribute data
 
 =head1 INVOCATION
 
@@ -251,7 +293,7 @@ This command may be used to create OpenXPKI workflows to automate internal
 actions, e. g. issuance of CRLs..
 
 You can use wfid/wfaction to continue stopped or failed workflows. If you pass
-only wfid and no action, a list of possible actions is shown. 
+only wfid and no action, a list of possible actions is shown.
 
 =head1 EXAMPLES
 

@@ -42,8 +42,28 @@ the normal operation. Such code should be placed into the *resume* method
 which gets executed after an exception was thrown.     
   
 
+Predefined context values and namespaces
+----------------------------------------
+
+The UI and workflow engine looks for certain context values to render error 
+and status messages. Those values *should* be used to provide information.
+You *must not* use such predefined keys for any other purpose.
+
+certificate / workflow relations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Please record workflows that change a certificates status in the certificate
+attributes table, using the prefix *system_workflow_XXXX*. The core uses
+system_workflow_csr, system_workflow_crr, system_workflow_crl to link a 
+certificate to the appropriate workflows for issue, revoke and crl creation.
+
+Those workflows are shown on the "related information" page.
+
+
 XML Configuration
 ------------------
+
+# TODO - Update for YAML! XML is gone!
 
 To use an activity in the workflow system, you must create a mapping between
 the perl class and a symbolic name. It is allowed to reuse the same class with
@@ -86,3 +106,20 @@ loop, the workflow is stopped with an error. As we have the *autofail* flag set,
 the workflow is immediately send into the *FAILURE* state and set to finished.    
 Note that the autofail flag is only allowed in the <state> block, but not in
 the activity definition itself!
+
+Important Precondition
+^^^^^^^^^^^^^^^^^^^^^^
+
+Do not use activities with pause together with conditions that might change over
+time! Workflows are always resumed by state and if your paused activity is 
+linked with a condition, it gets re-evaluated. If the result is false now,
+the workflow layer will block access to the (formerly paused) activity so the 
+watchdog can not rerun it. 
+
+To solve such issues, either create two seperate states for the evaluation and the
+paused activity (using a NOOP activity) or write your condition in a way that it 
+will not change, e.g. by persisting the relevant parameters into the context on 
+the first run.
+
+
+

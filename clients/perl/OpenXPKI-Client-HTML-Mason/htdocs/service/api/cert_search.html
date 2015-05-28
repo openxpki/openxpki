@@ -120,11 +120,7 @@
 	VALUE => 'subject_alt_name',
 	LABEL => 'I18N_OPENXPKI_CLIENT_HTML_MASON_CREATE_CSR_GET_SUBJECT_ALT_NAME_TITLE',
     };
-
-    my $config_id = $context->{client}->send_receive_command_msg(
-	'get_current_config_id', 
-    )->{PARAMS};
-
+ 
     my $additional_info_fields = $context->{client}->send_receive_command_msg(
 	'get_additional_information_fields', 
 	{

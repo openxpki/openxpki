@@ -1,0 +1,4 @@
+class: OpenXPKI::Server::Workflow::Validator::ValidityWindow
+arg:
+  - $notbefore
+  - $notafter

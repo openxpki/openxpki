@@ -16,7 +16,7 @@ use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use Digest::SHA1;
+use Digest::SHA;
 use MIME::Base64;
 
 sub new {
@@ -55,7 +55,7 @@ sub generate {
 	    ) {
 	    $pool .= `$cmd 2>&1` || '';
 	}
-	my $ctx = Digest::SHA1->new();
+	my $ctx = Digest::SHA->new();
 	$ctx->add($pool);
 	$password = substr($ctx->b64digest, 0, 8);
 	$rv = "{PLAIN}$password";
@@ -68,7 +68,7 @@ sub generate {
 	    });
 	$password = substr($password, 7);
 
-	my $ctx = Digest::SHA1->new();
+	my $ctx = Digest::SHA->new();
 	$ctx->add($password);
 	$rv = '{SHA}' . $ctx->b64digest;
     }
@@ -86,7 +86,7 @@ sub generate {
 	    });
 	$password = substr($password, 7);
 
-	my $ctx = Digest::SHA1->new();
+	my $ctx = Digest::SHA->new();
 	$ctx->add($password);
 	$ctx->add($salt);
 	$rv = '{SSHA}' . MIME::Base64::encode_base64($ctx->digest . $salt, '');

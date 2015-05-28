@@ -1,0 +1,6 @@
+<h3>{{content.content.label}}</h3>
+{{#if content.content.description}}
+    <div class="description">{{{content.content.description}}}</div>
+{{/if}}
+
+{{component type content=content buttonClick="buttonClick"}}

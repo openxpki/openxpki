@@ -44,11 +44,17 @@ sub execute
     my $certificate = $context->param($contextentry_of{'certificatein'});
 
     my $x509 = OpenXPKI::Crypto::X509->new(
-	TOKEN => $default_token,
-	DATA  => $certificate,
+    	TOKEN => $default_token,
+    	DATA  => $certificate,
 	);
+    my $cert_identifier  = $x509->get_identifier();
 
-	$context->param($contextentry_of{'certidentifierout'} => $x509->get_identifier() );
+    CTX('log')->log(
+        MESSAGE => 'Identifier of certificate is ' . $cert_identifier,   
+        PRIORITY => 'debug',
+        FACILITY => [ 'application' ],
+    );  
+	$context->param($contextentry_of{'certidentifierout'} => $cert_identifier );
     
     return 1;
 }

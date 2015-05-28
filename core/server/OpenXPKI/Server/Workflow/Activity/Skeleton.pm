@@ -17,11 +17,19 @@ sub execute {
   
     my $context = $workflow->context();
   
+    my $need_to_wait;
   	# do some work
   	if ($need_to_wait) {
   		# The text is written to the logs and is optional
-  		$self->pause('Waiting');
+  		$self->pause('I18N_OPENXPKI_UI_PAUSED_WAITING');
   	}
+  	
+  	CTX('log')->log(
+        MESSAGE => "Please use the application facility to log your stuff, and please be verbose!",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    );         
+     
     
 }
 
@@ -63,11 +71,23 @@ OpenXPKI::Server::Workflow::Activity::Skeleton
 
 Implements the FIXME workflow action.
 
+=head1 Configuration
+
+=head2 Activity parameters
+
+=over 
+
+=item my_control_param
+
+Explain values and effects of my_control_param.
+
+=back 
+
 =head2 Context parameters
 
 Expects the following context parameters:
 
-=over 12
+=over 
 
 =item ...
 

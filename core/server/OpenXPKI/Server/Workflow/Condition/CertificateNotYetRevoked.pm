@@ -12,20 +12,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Debug;
 use English;
 use OpenXPKI::Exception;
-
-__PACKAGE__->mk_accessors( 'crl_issuance_pending_accept' );
-
-sub _init
-{
-    my ( $self, $params ) = @_;
-    unless ( defined $params->{'crl_issuance_pending_accept'}  )    
-    {
-        configuration_error
-             "You must define one value for 'crl_issuance_pending_accept' in ",
-             "declaration of condition ", $self->name;
-    }
-    $self->crl_issuance_pending_accept($params->{'crl_issuance_pending_accept'});
-}
+ 
 sub evaluate
 {
     ##! 1: 'start'
@@ -51,9 +38,15 @@ sub evaluate
             'PKI_REALM'  => {VALUE => $pki_realm},
         }
     );
+        
+    CTX('log')->log(
+        MESSAGE => "Cert status is ".$cert->{'STATUS'},
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+    
     ##! 16: 'status: ' . $cert->{'STATUS'}
-    if (! $self->crl_issuance_pending_accept()
-        && $cert->{'STATUS'} eq 'CRL_ISSUANCE_PENDING') {
+    if ($cert->{'STATUS'} eq 'CRL_ISSUANCE_PENDING') {
         # certificate is in state 'CRL_ISSUANCE_PENDING', throw
         # an exception if the crl_issuance_pending_accept config param
         # is not set

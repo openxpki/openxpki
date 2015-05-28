@@ -26,7 +26,7 @@ sub new {
     my $path = shift;
     ##! 1: "start" 
     
-    $self->{ROLE} = CTX('config')->get("$path.role");
+    $self->{ROLE} = CTX('config')->get("$path.role") || 'Anonymous';
 
     ##! 2: "role: ".$self->{ROLE}
 
@@ -42,7 +42,7 @@ sub login_step {
     my $msg     = $arg_ref->{MESSAGE};
 
     return (
-        '',
+        'anonymous',
         $self->{ROLE},
         {
             SERVICE_MSG => 'SERVICE_READY',

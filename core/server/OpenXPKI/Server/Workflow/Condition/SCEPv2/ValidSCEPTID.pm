@@ -54,8 +54,9 @@ sub evaluate {
         MESSAGE => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SCEPCLIENT_INVALID_TID',
         PARAMS => {
             SCEP_TID => (defined $scep_tid ? $scep_tid : '<undef>'),
-            SCEP_TIT_LEN => length($scep_tid),
-        }
+            SCEP_TIT_LEN => length($scep_tid),            
+        },
+        FACILITY => [ 'application', ],                     
     );
 
 }

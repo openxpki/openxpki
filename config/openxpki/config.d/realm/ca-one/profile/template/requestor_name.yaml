@@ -1,0 +1,5 @@
+id: requestor_name
+label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME
+description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC
+type: freetext
+width: 40

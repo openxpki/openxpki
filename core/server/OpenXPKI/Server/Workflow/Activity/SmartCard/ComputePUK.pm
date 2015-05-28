@@ -40,7 +40,7 @@ sub execute {
     }
     
     # Check Connector for Puk Id (Lot Id)
-    my $lot_id = $config->get(['smartcard.cardinfo.lotid', $token_id ]);
+    my $lot_id = $config->get( "smartcard.cardinfo.lotid.$token_id" );
             
     if (!$lot_id) {
         if ($chip_id eq '000000000000000000000000') {
@@ -52,7 +52,7 @@ sub execute {
     
     ##! 32: 'got lot id ' . $lot_id
     
-    my $puk = $config->get([ 'smartcard.cardinfo.defaultpuk', $lot_id, $chip_id ]);
+    my $puk = $config->get( "smartcard.cardinfo.defaultpuk.$lot_id.$chip_id" );
  
     if (!$puk) {
         OpenXPKI::Exception->throw(
@@ -72,6 +72,11 @@ sub execute {
 
     ##! 32: 'got puk ' . $puk
     
+    CTX('log')->log(
+        MESSAGE => "SmartCard $token_id from lot id $lot_id, puk was computed",
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );  
     $context->param({ _default_puk => $puk });
        
 }    

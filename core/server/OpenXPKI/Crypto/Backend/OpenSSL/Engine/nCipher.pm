@@ -243,6 +243,9 @@ sub key_usable {
 	    );
     }
 
+return 1;
+# TODO - this is not working when preload is off
+
     if (! exists $worldinfo->{preloadedobjects}) {
 	##! 4: "no preloaded objects found"
 	OpenXPKI::Exception->throw (

@@ -1,0 +1,48 @@
+If you want to try out OpenXPKI, you should use our prebuild packages at 
+http://packages.openxpki.org. Check out the quickstart how-to at
+https://openxpki.readthedocs.org/en/latest/quickstart.html
+
+These instuctions should work on debian wheezy and 
+Ubuntu 14.04 LTS server.
+
+Install required dependencies
+#############################
+
+Install all packages listed in debian-deps.lst
+(cat debian-deps.lst  | xargs aptitude install -y)
+
+# CPAN Modules
+The current version of the CPAN Workflow module requires Module::Build >0.40
+which is outdated in the debian/ubuntu archives. Install a suitable version
+from cpan and set PERL5LIB path accordingly.
+
+Connector and Test::utf8 also require a newer MakeMaker version, whereas 
+other packages have problem with it (esp. our core package). The Makefile
+adds local path "lib" for those packages, please put MM there before building.
+
+A simple "make" should now create the required packages in deb/cpan/. 
+Before you proceed, install them on your build system!
+
+Build OpenXPKI Modules
+#######################
+The OpenXPKI build scripts seems to have problems with MakeMaker >6.5
+If you have problems building (e.g. empty archives) check the version of
+your MakeMaker kit.
+
+The OpenXPKI system consists of three modules, the core, the webfrontend 
+and the i18n language files. There are individual make targets for them:
+
+   make core
+   make i18n                    
+   make mason-html-client 
+   
+About versions and tagging
+--------------------------
+
+The version numbers of the package are determined from the vergen tool.
+The main version (x.y.z) is always constructed from the values set in the 
+.VERSION_* files in the top level directory. If you build from a commit 
+that has a git tag associated, the value from VERSION_PKGREL is appended
+to the version, e.g. 0.11.2-1, if you build from an untagged commit, the
+appreviated commit hash is added, e.g. 0.11.2-1ca8e51.
+

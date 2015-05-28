@@ -1,0 +1,35 @@
+HOME			= .
+RANDFILE		= $ENV::HOME/.rnd
+
+[ req ]
+default_bits		= 2048
+default_keyfile 	= privkey.pem
+distinguished_name	= req_distinguished_name
+
+string_mask = utf8only
+
+req_extensions = v3_req # The extensions to add to a certificate request
+
+[ req_distinguished_name ]
+countryName                     = Country Name (2 letter code)
+countryName_default             = DE
+countryName_min                 = 2
+countryName_max                 = 2
+
+0.organizationName              = Organization Name (eg, company)
+0.organizationName_default      = Internet Widgits Pty Ltd
+
+commonName                      = Common Name (e.g. server FQDN or YOUR name)
+commonName_max                  = 64
+
+emailAddress                    = Email Address
+emailAddress_max                = 64
+
+
+[ v3_req ]
+
+# Extensions to add to a certificate request
+
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName=email:test2@openxpki.org,URI:http://my.url.here/,email:test@openxpki.org,DNS:www.example.com,DNS:www2.example.com

@@ -85,6 +85,12 @@ sub execute
     }
     print FD $msg;
     close FD;
+    
+    CTX('log')->log(
+        MESSAGE => 'serialized workflow for export in ' . $filename, 
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );   
 
     # workflow is now serialized in the export directory
 }
@@ -116,7 +122,7 @@ is the server_id of the destination server.
 
 is the state on the destination server.
 
-=over
+=back
 
 Additionally you must configure the export directory for the data
 exchange in config.xml and you must define the server id in the database

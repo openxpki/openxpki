@@ -1,0 +1,16 @@
+name: cert_info
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_LABEL
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_DESC
+placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_PLACEHOLDER
+tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP
+required: 0
+type: cert_info
+format: cert_info
+template: >
+  [% IF key == "requestor_email" %]
+    <a href="mailto:[% value %]" target="_blank">[% value %]</a>
+  [% ELSE %]
+    [% value %]
+  [% END %]
+
+

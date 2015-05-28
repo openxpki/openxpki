@@ -33,7 +33,8 @@ sub validate {
     return if (not defined $subject_alt_name_parts);
 
     ##! 16: 'wf->id(): ' . $wf->id()
-  
+
+    # TODO-UTF8 - needs fixing!
     Encode::_utf8_off ($subject_alt_name_parts);
     Encode::_utf8_off ($subject_parts);
     my $ser = OpenXPKI::Serialization::Simple->new();
@@ -77,11 +78,11 @@ sub validate {
 
     # delete entries with empty values from @sans
     @sans = grep { $_->[1] ne '' } @sans;
- 
+
     ## now check every subject alternative name component
     foreach my $pair (@sans) {
          my $type  = lc($pair->[0]);
-         
+
          my $value = $pair->[1];
 
          ## check existence of the fields
@@ -190,7 +191,7 @@ sub validate {
          }
          elsif ($type eq 'othername') {
             ## we have no checks for any OID, but we accept it
-            ## if the type is an OID 
+            ## if the type is an OID
          }
          else
          {

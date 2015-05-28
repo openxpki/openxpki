@@ -9,6 +9,15 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use English;
 
+__PACKAGE__->mk_accessors( 'allow_empty_subject' );
+
+
+sub _init {
+     my ( $self, $params ) = @_;
+     
+     $self->allow_empty_subject( ref $params->{empty_subject} && $params->{empty_subject} );     
+}
+
 sub validate {
     my ( $self, $wf, $csr_type, $pkcs10 ) = @_;
 
@@ -86,11 +95,14 @@ sub validate {
             );
     }
 
-    my $subject = $csr->get_parsed('SUBJECT');
-    if (! defined $subject) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
-            );
+    my $subject = $csr->get_parsed('SUBJECT');    
+    if (! defined $subject) {        
+        CTX('log')->log(
+            MESSAGE  => 'PKCS10 has no subject',
+            PRIORITY => $self->allow_empty_subject() ? "info" : "error",
+            FACILITY => "application"
+        );
+        validation_error('PKCS10 has no subject where it is required') unless($self->allow_empty_subject());               
     }
 
     # propagate fixed PKCS#10 request to workflow context
@@ -112,6 +124,7 @@ OpenXPKI::Server::Workflow::Validator::PKCS10
 <action name="CreateCSR">
   <validator name="PKCS10"
            class="OpenXPKI::Server::Workflow::Validator::PKCS10">
+    <param name="empty_subject" value="1" />
     <arg value="$csr_type"/>
     <arg value="$pkcs10"/>
   </validator>
@@ -129,3 +142,7 @@ B<NOTE>: If you pass an empty string (or no string) to this validator
 it will not throw an error. Why? If you want a value to be defined it
 is more appropriate to use the 'is_required' attribute of the input
 field to ensure it has a value.
+
+In case you are working with e.g. Microsoft Client enrollments the CSR
+holds only a key but no subject. To accept CSRs with empty subject, you 
+have to set the empty_subject param to a true value.

@@ -1,0 +1,8 @@
+OpenXPKI:
+    class: OpenXPKI::Server::Workflow::Persister::DBI
+    workflow_table: WORKFLOW
+    history_table: WORKFLOW_HISTORY
+
+Volatile:
+    class: OpenXPKI::Server::Workflow::Persister::Null
+

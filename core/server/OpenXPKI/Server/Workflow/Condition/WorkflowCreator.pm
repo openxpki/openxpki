@@ -22,6 +22,12 @@ sub evaluate
     ##! 16: 'workflow creator: ' . $wf_creator
     ##! 16: 'current user: ' . $current_user
 
+     CTX('log')->log(
+        MESSAGE => "Check workflow creator: $wf_creator ?= $current_user", 
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+
     if ($wf_creator ne $current_user) {
         condition_error ('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCREATOR_CREATOR_AND_USER_DIFFER');
     }

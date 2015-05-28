@@ -1,0 +1,6 @@
+class: OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate
+label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_LABEL
+description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_DESC
+param:
+    retry_count: 20
+    retry_interval: +0000000003

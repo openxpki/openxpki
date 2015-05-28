@@ -1,0 +1,702 @@
+head:
+    prefix: scep
+    label: I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC
+
+state:
+    AFTER_REVOKE_QUEUE:
+        autorun: 1
+        action:
+          - global_noop > CONTINUE_INITIAL_ENROLL
+
+    APPROVAL:
+        autorun: 1
+        action:
+          - calc_approvals > APPROVALS_CALCULATED
+
+    APPROVALS_CALCULATED:
+        autorun: 1
+        action:
+          - global_noop > FAILURE ?  !allow_manual_approval  !have_all_approvals
+          - notify_pending_approval > PENDING_APPROVAL ? allow_manual_approval  !have_all_approvals
+          - global_noop2 > APPROVED ? have_all_approvals
+
+    APPROVED:
+        autorun: 1
+        action:
+          - global_noop > ISSUANCE
+
+    AUTHENTICATED_REQUEST:
+        autorun: 1
+        action:
+          - global_noop > CA_POLICY_APPROVAL
+
+    AUTHENTICATION:
+        autorun: 1
+        action:
+          - global_noop > CHECK_INITIAL_ENROLL_AUTHEN ?  !signed_renewal
+          - global_noop2 > AUTHENTICATED_REQUEST ? signed_renewal
+
+    AUTHENTICATION_MISSING:
+        autorun: 1
+        action:
+          - global_noop > FAILURE ?  !allow_manual_authentication
+          - global_noop2 > PENDING_MANUAL_AUTHENTICATION ? allow_manual_authentication
+
+    AUTO_REVOKE_EXISTING_CERTS:
+        autorun: 1
+        action:
+          - revoke_existing_certs > QUEUED_FOR_REVOCATION
+
+    CA_KEY_NOT_USABLE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_DESC
+        action:
+          - continue_issuance > CHECK_CA_KEY
+
+    CA_KEY_USABLE:
+        autorun: 1
+        action:
+          - get_cert_profile > PREPARED
+
+    CA_POLICY_APPROVAL:
+        autorun: 1
+        action:
+          - global_noop > FAILURE ?  !key_policy_ok
+          - global_noop2 > CHECK_RENEWAL_TYPE ? key_policy_ok
+
+    CERT_ISSUED:
+        autorun: 1
+        action:
+          - persist_cert_metadata > CERT_METADATA_PERSISTED
+
+    CERT_METADATA_PERSISTED:
+        autorun: 1
+        action:
+          - notify_cert_issued > NOTIFIED_CERT_ISSUED
+
+    CERT_TO_REVOKE:
+        autorun: 1
+        action:
+          - next_cert_to_revoke > HAVE_CERT_TO_REVOKE
+
+    CHECK_CA_KEY:
+        autorun: 1
+        action:
+          - global_noop > CA_KEY_NOT_USABLE ?  !ca_key_usable
+          - global_noop2 > CA_KEY_USABLE ? ca_key_usable
+
+    CHECK_FOR_CHALLENGE_PASSWORD:
+        autorun: 1
+        action:
+          - global_noop > EVAL_SIGNER_TRUST ?  !have_challenge_password
+          - eval_challenge > EVAL_SIGNER_TRUST ? have_challenge_password
+
+    CHECK_FOR_VALID_REQUEST:
+        autorun: 1
+        action:
+          - global_noop > FAILURE ?  !valid_request
+          - global_noop2 > HAVE_VALID_REQUEST ? valid_request
+
+    CHECK_INITIAL_ENROLL_AUTHEN:
+        autorun: 1
+        action:
+          - global_noop > AUTHENTICATION_MISSING ?  !trusted_initial_scep
+          - global_noop2 > AUTHENTICATED_REQUEST ? trusted_initial_scep
+
+    CHECK_RENEWAL_ELIGIBILITY:
+        autorun: 1
+        action:
+          - global_noop > APPROVAL ? ca_policy_approval
+          - global_noop2 > PENDING_POLICY ?  !ca_policy_approval
+
+    CHECK_RENEWAL_TYPE:
+        autorun: 1
+        action:
+          - global_noop > CHECK_RENEWAL_ELIGIBILITY ? signed_renewal
+          - global_noop2 > ELIGIBLE_FOR_INITIAL_ENROLL ?  !signed_renewal
+
+    CLEANUP:
+        autorun: 1
+        action:
+          - invalidate_challenge_pass > SUCCESS
+
+    CLEAR_APPROVALS:
+        autorun: 1
+        action:
+          - clear_approvals > APPROVAL
+
+    CONTINUE_INITIAL_ENROLL:
+        autorun: 1
+        action:
+          - global_noop > PENDING_POLICY ?  !num_active_certs_less_than_max_active_certs !auto_revoke_existing_certs
+          - global_noop2 > APPROVAL ? num_active_certs_less_than_max_active_certs auto_revoke_existing_certs
+
+    ELIGIBLE_FOR_INITIAL_ENROLL:
+        autorun: 1
+        action:
+          - global_noop > CONTINUE_INITIAL_ENROLL ?  !auto_revoke_existing_certs
+          - global_noop2 > AUTO_REVOKE_EXISTING_CERTS ? auto_revoke_existing_certs
+
+    EVAL_ELIGIBILITY:
+        autorun: 1
+        action:
+          - eval_eligibility > CHECK_FOR_VALID_REQUEST
+
+    EVAL_SIGNER_TRUST:
+        autorun: 1
+        action:
+          - eval_signer_trust > EVAL_ELIGIBILITY
+
+    FAILURE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC
+
+    FINISHED_PERSIST:
+        autorun: 1
+        action:
+          - global_noop > AUTHENTICATION
+
+    HAVE_CERT_TO_REVOKE:
+        autorun: 1
+        action:
+          - revoke_cert > QUEUED_FOR_REVOCATION
+
+    HAVE_VALID_REQUEST:
+        autorun: 1
+        action:
+          - global_noop > PERSISTENCE
+
+    INITIAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIAL_DESC
+        action:
+          - initialize > INITIALIZED
+
+    INITIALIZED:
+        autorun: 1
+        action:
+          - extract_csr > READY_TO_PROCESS
+
+    ISSUANCE:
+        autorun: 1
+        action:
+          - persist_csr > CHECK_CA_KEY
+
+    NOTIFIED_CERT_ISSUED:
+        autorun: 1
+        action:
+          - revoke_cert_after_replace > REVOKE_ON_REPLACE_DONE ? need_revoke_after_replace
+          - global_noop > REVOKE_ON_REPLACE_DONE ?  !need_revoke_after_replace
+
+    PENDING_APPROVAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC
+        action:
+          - modify_metadata > CLEAR_APPROVALS
+          - approve_csr > APPROVAL
+          - disapprove > FAILURE
+
+    PENDING_MANUAL_AUTHENTICATION:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_DESC
+        action:
+          - add_authentication > AUTHENTICATED_REQUEST
+          - deny_authentication > FAILURE
+
+    PERSISTENCE:
+        autorun: 1
+        action:
+          - global_noop > FINISHED_PERSIST ?  !signed_renewal
+          - load_recent_certificate > FINISHED_PERSIST ? signed_renewal
+
+    PENDING_POLICY:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC
+        action:
+          - fail > FAILURE
+          - allow_retry > FAILURE
+
+    PREPARED:
+        autorun: 1
+        action:
+          - global_nice_issue_certificate > CERT_ISSUED
+
+    QUEUED_FOR_REVOCATION:
+        autorun: 1
+        action:
+          - global_noop > CERT_TO_REVOKE ?  !tmp_queue_is_empty
+          - revoke_existing_certs > AFTER_REVOKE_QUEUE ? tmp_queue_is_empty
+
+    READY_TO_PROCESS:
+        autorun: 1
+        action:
+          - fetch_group_policy > CHECK_FOR_CHALLENGE_PASSWORD
+
+    REVOKE_ON_REPLACE_DONE:
+        autorun: 1
+        action:
+          - fork_publish > CLEANUP
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_DESC
+
+
+action:
+    approve_csr:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_approve_csr_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_approve_csr_DESC
+        param:
+            check_creator: 0
+            multi_role_approval: 0
+
+    add_authentication:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADD_AUTHENTICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADD_AUTHENTICATION_DESC
+        param:
+            num_manual_authen: 1
+
+    allow_retry:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_DESC
+        param:
+            _map_ds_key_name: "[% context.server %]:[% context.scep_tid %]"
+            ds_namespace: scep.transaction_id
+
+    calc_approvals:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::CalcApprovals
+
+    clear_approvals:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
+
+    continue_issuance:
+        class: Workflow::Action::Null
+
+    deny_authentication:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DENY_AUTHENTICATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DENY_AUTHENTICATION_DESC
+        param:
+            _map_notify_cc: $url_notifycc
+            _map_notify_to: $url_requester
+            _map_scep_tid: $scep_tid
+            message: scep_auth_denied
+
+    disapprove:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DISAPPROVE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DISAPPROVE_DESC
+        param:
+            _map_notify_cc: $url_notifycc
+            _map_notify_to: $url_requester
+            _map_scep_tid: $scep_tid
+            message: scep_approval_rejected
+
+    eval_challenge:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateChallenge
+
+    eval_eligibility:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility
+
+    eval_signer_trust:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust
+
+    extract_csr:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::ExtractCSR
+
+    fail:
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_DESC
+
+    fetch_group_policy:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::FetchGroupPolicy
+
+    fork_publish:
+        class: Workflow::Action::Null
+
+    get_cert_profile:
+        class: Workflow::Action::Null
+
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        input:
+          - _pkcs7
+          - _url_params
+          - cert_profile
+          - f_valid_csr
+          - f_valid_scep_tid
+          - pkcs10
+          - scep_tid
+          - server
+          - signer_cert
+          - t_signer_cert_crypt_ok
+          - t_signer_validity_ok
+        param:
+            source: SCEP
+
+    invalidate_challenge_pass:
+        class: Workflow::Action::Null
+
+    load_recent_certificate:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::LoadRecentCertificate
+
+    modify_metadata:
+        class: Workflow::Action::Null
+
+    next_cert_to_revoke:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        input:
+          - tmp_queue
+        param:
+            array_name: tmp_queue
+            context_key: cert_identifier
+            function: shift
+
+    notify_cert_issued:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            _map_notify_cc: $url_notifycc
+            _map_notify_to: $url_requester
+            _map_scep_tid: $scep_tid
+            message: scep_cert_issued
+
+    notify_pending_approval:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            _map_notify_cc: $url_notifycc
+            _map_notify_to: $url_requester
+            _map_scep_tid: $scep_tid
+            message: scep_approval_pending
+
+    persist_cert_metadata:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
+        param:
+            _map_cust_id: $url_custid
+            _map_server_id: $server
+
+    persist_csr:
+        class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
+
+    revoke_cert:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
+        input:
+          - cert_identifier
+        param:
+            flag_auto_approval: 1
+            reason_code: superseded
+
+    revoke_cert_after_replace:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
+        input:
+          - replace_cert_identifier
+          - reason_code
+          - invalidity_time
+        param:
+            _map_cert_identifier: $replace_cert_identifier
+            flag_auto_approval: 1
+
+    revoke_existing_certs:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts
+
+
+condition:
+    allow_manual_approval:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_allow_man_approv};
+
+    allow_manual_authentication:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_allow_man_authen};
+
+    auto_revoke_existing_certs:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_auto_revoke_existing_certs}
+
+    ca_key_usable:
+        class: OpenXPKI::Server::Workflow::Condition::Key
+        param:
+            key: ca
+            status: usable
+
+    ca_policy_approval:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition1: scep_active_cert_count_ok
+            condition2: scep_at_least_one_active_cert
+
+    have_all_approvals:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{have_all_approvals};
+
+    have_challenge_password:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: defined $context->{_challenge_password};
+
+    key_policy_ok:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition1: scep_csr_key_size_ok
+            condition2: scep_csr_key_type_ok
+            condition3: scep_csr_hash_type_ok
+
+    need_revoke_after_replace:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{replace_cert_identifier};
+
+    signed_renewal:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition1: scep_signer_trusted
+            condition2: scep_signer_sn_matches_csr
+
+    tmp_queue_is_empty:
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param:
+            array_name: tmp_queue
+            condition: is_empty
+
+    trusted_initial_scep:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition1: scep_trusted_self_sign
+            condition2: scep_trusted_signer_on_behalf
+
+    valid_request:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition2: scep_valid_csr
+            condition3: scep_signer_cert_active
+            condition5: scep_transaction_id_given
+            condition6: scep_signer_cert_crypt_ok
+
+    active_cert_count_ok:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition1: scep_num_active_certs_less_than_max
+            condition2: scep_in_renewal_window
+            condition3: scep_in_replace_window
+
+    at_least_one_active_cert:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{num_active_certs} > 0
+
+    csr_key_size_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{csr_key_size_ok}
+
+    csr_key_type_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{csr_key_type_ok}
+
+    csr_hash_type_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{csr_hash_type_ok}
+
+    signer_trusted:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_trusted}
+
+    signer_sn_matches_csr:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: not not $context->{signer_sn_matches_csr}
+
+    trusted_self_sign:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition2: scep_trusted_self_sign_details
+            condition1: scep_signer_sn_matches_csr
+
+    trusted_signer_on_behalf:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition1: scep_signer_trusted
+            condition2: value="scep_signer_on_behalf
+
+    valid_csr:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: length($context->{cert_subject})
+
+    signer_cert_active:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition2: scep_signer_validity_ok
+            condition1: scep_allow_expired_signer
+            condition3: scep_self_signed_initial_scep
+
+    transaction_id_given:
+        class: OpenXPKI::Server::Workflow::Condition::SCEPv2::ValidSCEPTID
+
+    signer_cert_crypt_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_signature_valid} == 1
+
+    num_active_certs_less_than_max_active_certs:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{num_active_certs} < $context->{p_max_active_certs}
+
+    in_renewal_window:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{num_active_certs} <= $context->{p_max_active_certs}) and $context->{in_renew_window}
+
+    in_replace_window:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{num_active_certs} <= $context->{p_max_active_certs}) and $context->{in_replace_window} and $context->{renewal_mode} eq 'replace'
+
+    trusted_self_sign_details:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition1: scep_valid_challenge_password
+            condition3: scep_policy_allows_anon_scep
+            condition2: scep_valid_kerberos_authentication
+
+    policy_allows_anon_scep:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{p_allow_anon_scep}
+
+    valid_challenge_password:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: not not $context->{valid_chall_pass}
+
+    valid_kerberos_authentication:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{valid_kerb_authen}
+
+    signer_validity_ok:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_validity_ok}
+
+    allow_expired_signer:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{p_allow_expired_signer}
+
+    self_signed_initial_scep:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition2: scep_signer_sn_matches_csr
+            condition3: scep_signer_is_self_signed
+
+field:
+    _pkcs7:
+        name: _pkcs7
+        required: 1
+        type: text
+
+    _url_params:
+        name: _url_params
+        type: text
+        required: 0
+
+    cert_profile:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL
+        name: cert_profile
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP
+        type: text
+        required: 0
+
+    f_valid_csr:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL
+        name: f_valid_csr
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC
+        type: text
+        required: 0
+
+    f_valid_scep_tid:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL
+        name: f_valid_scep_tid
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC
+        type: text
+        required: 0
+
+    replace_cert_identifier:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL
+        name: replace_cert_identifier
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC
+        required: 1
+        type: text
+
+    scep_tid:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
+        name: scep_tid
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC
+        required: 1
+        type: text
+
+    server:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL
+        name: server
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC
+        type: text
+        required: 0
+
+    signer_cert:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL
+        name: signer_cert
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC
+        required: 1
+        type: text
+
+    t_signer_cert_crypt_ok:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL
+        name: t_signer_cert_crypt_ok
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC
+        type: text
+        required: 0
+
+    t_signer_validity_ok:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL
+        name: t_signer_validity_ok
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC
+        type: text
+        required: 0
+
+    tmp_queue:
+        name: tmp_queue
+        required: 1
+        type: text
+
+
+acl:
+    Anonymous:
+        creator: self
+
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+
+    System:
+        creator: self
+
+    User:
+        creator: self
+

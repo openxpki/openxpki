@@ -1,0 +1,60 @@
+#Sample Mockup Config for Token config of a single realm
+# The left side are fixed aliases used in the code, the right side
+# are aribtrary chosen names, referencing the tokens below.
+type:
+  certsign: ca-one-signer
+  datasafe: ca-one-vault
+  scep: ca-one-scep
+
+# The actual token setup, based on current token.xml  
+token:  
+  default:
+    backend: OpenXPKI::Crypto::Backend::OpenSSL
+    
+    # Template to create key, available vars are 
+    # ALIAS (ca-one-signer-1), GROUP (ca-one-signer), GENERATION (1)
+    key: /etc/openxpki/ssl/ca-one/[% ALIAS %].pem
+    
+    # possible values are OpenSSL, nCipher, LunaCA
+    engine: OpenSSL
+    engine_section: ''
+    engine_usage: ''
+    key_store: OPENXPKI
+
+    # OpenSSL binary location
+    shell: /usr/bin/openssl
+
+    # OpenSSL binary call gets wrapped with this command
+    wrapper: ''
+
+    # random file to use for OpenSSL
+    randfile: /var/openxpki/rand
+    
+    # Default value for import, recorded in database, can be overriden
+    secret: default
+
+  ca-one-signer:
+    inherit: default
+    
+  ca-one-vault:
+    inherit: default
+
+  ca-one-scep:
+    inherit: default
+    backend: OpenXPKI::Crypto::Tool::SCEP  
+    shell: /usr/bin/openca-scep
+
+  # A different scep token for another scep server
+  ca-one-special-scep:
+    inherit: ca-one-scep
+      
+# Define the secret groups. (TODO> The mapping between secret and token is done on 
+# key import and recorded in the alias table. Default value can be set in the
+# token config but can be overriden or changed via openxpkiadm <TODO)
+secret:
+  default:     
+    label: Default secret group of this realm
+    method: literal
+    value: root
+    cache: daemon
+

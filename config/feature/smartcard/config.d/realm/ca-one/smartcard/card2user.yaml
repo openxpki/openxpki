@@ -1,0 +1,38 @@
+# card2user.yaml
+# Map the smartcard token id to the primary employee identifier.
+# Used as resolver in scalar mode, MUST fail if there are multiple hits.
+
+resolvers:
+    - testing    
+    - legacy 
+    - legacyext
+ 
+testing@: connector:smartcard.card2user.connectors.testing
+soap@: connector:smartcard.card2user.connectors.soap
+legacy@: connector:smartcard.card2user.connectors.ldap
+legacyext@: connector:smartcard.card2user.connectors.ldap-ext
+
+connectors:
+    testing:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/ca-one/smartcard/carddata.yaml
+        PREFIX: users        
+
+    ldap:
+        class: Connector::Proxy::Net::LDAP::Simple
+        LOCATION: ldap://localhost:389
+        base: ou=people,dc=mycompany,dc=com
+        filter: (seealso=cn=[% ARGS.0 %],ou=smartcards,dc=mycompany,dc=com)
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrs: employeeNumber
+ 
+    ldap-ext:
+        class: Connector::Proxy::Net::LDAP::Simple
+        LOCATION: ldap://localhost:389
+        base: ou=externals,dc=mycompany,dc=com
+        filter: (seealso=cn=[% ARGS.0 %],ou=smartcards,dc=mycompany,dc=com)
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrs: employeeNumber
+ 

@@ -1,0 +1,146 @@
+# Definition of supported/accepted key algorithms
+# This is used as option list for key generation 
+# as well as validation list for uploaded keys
+# If you prefix a value with an underscore, is is accepted for validation 
+# but not presented on key generation
+# The frontend will prefix all values with I18N_OPENXPKI_UI_KEY_XX_YY
+# where XX is the key and yy is the value, so if you add new items make sure
+# you also add a translation for it.
+key:
+    # Supported key algorithms (details need to be defined below!)    
+    alg: 
+      - rsa
+      - ec
+      - dsa
+
+    # Supported encryption algorithms (as taken by openssl)
+    enc:
+      - aes256
+      - _3des
+      - idea
+
+    # one of escrow, server, client, both
+    # escrow is not implemented in workflows, yet!
+    generate: both
+
+    # Definition of key algorithms
+    rsa:
+        key_length:
+          - 2048
+          - 4096	
+          - _1024
+
+    ec:
+        curve_name:
+          - prime192v1
+          - c2tnb191v1
+          - prime239v1
+          - sect571r1
+
+    dsa:
+        key_length:
+          - 2048
+          - 4096	
+
+    # I18N_OPENXPKI_UI_KEY_ALG_GOST94
+#    gost94:
+    # I18N_OPENXPKI_UI_KEY_ALG_GOST2001
+#    gost2001:
+
+
+validity: 
+    notafter: +01
+
+digest: sha1
+increasing_serials: 1
+randomized_serial_bytes: 8
+
+
+publish: 
+  - queue 
+  - disk
+ 
+# Profile extensions - set 0/1 as needed
+extensions:
+    copy: copy
+
+    basic_constraints:
+        critical: 1
+        ca: 0
+ 
+    subject_key_identifier:
+        critical: 0
+        hash: 1
+
+    authority_key_identifier:
+        critical: 0
+        keyid:  1
+        issuer: 1
+
+    issuer_alt_name:
+        critical: 0
+        # If the issuer has no subject alternative name, copying returns
+        # an empty extension, which is problematic with both RSA SecurId
+        # tokens and Cisco devices!
+        copy: 1
+
+    crl_distribution_points:
+        critical: 0
+        uri:
+            - http://localhost/cacrl.crt
+            - ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org
+
+    authority_info_access:
+        critical: 0
+        ca_issuers: http://localhost/cacert.crt
+        ocsp: http://ocsp.openxpki.org/
+
+    policy_identifier:
+        critical: 0
+        # WARNING: if use_loa is set to yes, the policy_identifier
+        # will be extended by the values in the appropriate loa tag
+        oid: 1.2.3.4
+
+    cps:
+        critical: 0
+        # WARNING: if use_loa is set to yes, the cps will be
+        # extended by the values in the appropriate loa tag
+        uri: http://localhost/cps.html
+
+    netscape:
+        comment:
+            critical: 0
+            text: This is a generic certificate. Generated with OpenXPKI trustcenter software.
+        certificate_type:
+            critical: 0
+            ssl_client:        0
+            smime_client:      0
+            object_signing:    0
+            ssl_client_ca:     0
+            smime_client_ca:   0
+            object_signing_ca: 0
+
+        cdp:
+            critical: 0
+            uri: http://localhost/cacrl.crt
+            ca_uri: http://localhost/cacrl.crt
+     # end of netscape section 
+
+
+# I18N Placeholders for key settings
+# I18N_OPENXPKI_UI_KEY_ALG
+# I18N_OPENXPKI_UI_KEY_ALG_RSA
+# I18N_OPENXPKI_UI_KEY_ALG_EC
+# I18N_OPENXPKI_UI_KEY_ALG_DSA
+# I18N_OPENXPKI_UI_KEY_ENC
+# I18N_OPENXPKI_UI_KEY_ENC_AES256
+# I18N_OPENXPKI_UI_KEY_ENC_3DES
+# I18N_OPENXPKI_UI_KEY_ENC_IDEA
+# I18N_OPENXPKI_UI_KEY_KEY_LENGTH
+# I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048
+# I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096
+# I18N_OPENXPKI_UI_KEY_CURVE_NAME
+# I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME192V1
+# I18N_OPENXPKI_UI_KEY_CURVE_NAME_C2TNB191V1
+# I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1
+# I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1

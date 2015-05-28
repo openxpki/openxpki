@@ -171,7 +171,7 @@ sub set_cert_list
 		    CTX('log')->log(
 			MESSAGE => "Invalid reason code '" . $reason_code . "' specified",
 			PRIORITY => 'warn',
-			FACILITY => [ 'system' ],
+			FACILITY => [ 'application' ],
 			);
 		    $reason_code = 'unspecified';
 		}
@@ -420,6 +420,12 @@ sub __get_ca
                "string_mask       = utf8only\n".
                "\n";
 
+    # add the copy_extensions only if set, this prevents adding it to the CRL config
+    my $copy_ext = $self->{PROFILE}->get_copy_extensions();
+    if ($copy_ext && $copy_ext ne 'none') {
+        $config .= "copy_extensions = $copy_ext\n";
+    }
+    
     ##! 4: "end"
     return $config;
 }
@@ -632,6 +638,8 @@ sub __get_extensions
             $config .= "sslCA,"   if (grep /ssl_client_ca/, @bits);
             $config .= "objCA,"   if (grep /object_signing_ca/, @bits);
             $config .= "emailCA," if (grep /smime_client_ca/, @bits);
+            $config .= "server," if (grep /ssl_server/, @bits);
+            $config .= "reserved," if (grep /reserved/, @bits);
             $config = substr ($config, 0, length ($config)-1); ## remove trailing ,
             $config .= "\n";
         }
@@ -650,6 +658,12 @@ sub __get_extensions
                 params  => {NAME => $name});
         }
     }
+    
+    foreach my $oid(sort $profile->get_oid_extensions()) {        
+        my $string =  join ("", @{$profile->get_extension($oid)});        
+        $config .= "$oid=$string\n";        
+    }
+    
     $config .= "\n".$sections;
     ##! 16: "extensions ::= $config"
 

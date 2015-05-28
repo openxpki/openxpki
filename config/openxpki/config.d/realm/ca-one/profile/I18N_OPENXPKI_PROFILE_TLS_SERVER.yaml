@@ -1,0 +1,121 @@
+# The name of the file equals the name of the profile
+label: I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL
+
+validity: 
+    notafter: +0006
+
+style:
+    00_basic_style:
+        label: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC
+        ui:
+            subject:
+                - hostname
+                - hostname2
+                - port
+            san: 
+                - san_dns
+                - san_ipv4
+            info:
+                - requestor_gname
+                - requestor_name
+                - requestor_email
+                - requestor_affiliation
+                - comment
+
+        subject: 
+            dn: CN=[% hostname.lower %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
+            san: 
+              DNS: 
+                  - "[% hostname.lower %]"
+                  - "[% FOREACH entry = hostname2 %][% entry.lower %] | [% END %]"
+
+        metadata:
+            requestor: "[% requestor_gname %] [% requestor_name %]"
+            email: "[% requestor_email %]"
+
+
+    05_advanced_style:
+        label: I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC
+        ui:
+            subject:
+                - cn
+                - o
+                - ou
+                - dc
+                - c
+#            san:
+#                - san_choice
+#                - san_oid
+
+            info:
+                - requestor_gname
+                - requestor_name
+                - requestor_email
+                - requestor_affiliation
+                - comment
+
+        subject:
+            dn: CN=[% CN %][% IF OU %][% FOREACH entry = OU %],OU=[% entry %][% END %][% END %][% IF O %],O=[% O %][% END %][% FOREACH entry = DC %],DC=[% entry %][% END %][% IF C %],C=[% C %][% END %]
+  
+    enroll:
+        subject: 
+            dn: CN=[% CN.0 %],DC=Test Deployment,DC=OpenXPKI,DC=org
+        
+        metadata:
+            system_id: "[% data.cust_id %]"
+            server_id: "[% data.server_id %]"
+ 
+# Profile extensions - set 0/1 as needed
+# Also see sections defined in default.yaml
+extensions: 
+    key_usage:
+        critical: 1
+        digital_signature: 1
+        non_repudiation:   0
+        key_encipherment:  1
+        data_encipherment: 0
+        key_agreement:     0
+        key_cert_sign:     0
+        crl_sign:          0
+        encipher_only:     0
+        decipher_only:     0
+
+    extended_key_usage:
+        critical: 1
+        # these are OIDs, some OIDs are known and have names
+        client_auth:      0
+        server_auth:      1
+        email_protection: 0
+        codeSigning:      0
+        timeStamping:     0
+
+
+    # This is really outdated and should not be used unless really necessary
+    netscape:
+        comment:
+            critical: 0
+            text: This is a generic certificate. Generated with OpenXPKI trustcenter software.
+
+        certificate_type:
+            critical: 0
+            ssl_client:        0
+            smime_client:      0
+            object_signing:    0
+            ssl_client_ca:     0
+            smime_client_ca:   0
+            object_signing_ca: 0
+
+        cdp:
+            critical: 0
+            uri: http://localhost/cacrl.crt
+            ca_uri: http://localhost/cacrl.crt
+     # end of netscape section
+
+# end of extensions
+
+# Define the input fields you used below here
+#template:
+
+

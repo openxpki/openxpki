@@ -1,0 +1,14 @@
+The vagrant file provides four targets:
+
+test: 
+  The default test machine using debian wheezy
+  Grabs the current deb files from the package server,
+  installs them, runs the sample-setup and the 
+  nice qatest.
+
+test-trusty: 
+  as test, for ubuntu trusty
+
+build-wheezy: 
+  build cpan deps, core and i18 from the current tree.
+  Installs those packages, runs sample-setup and qatests.

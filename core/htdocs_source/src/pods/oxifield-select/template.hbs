@@ -1,0 +1,16 @@
+{{#if isStatic}}
+    <div class="oxi-no-input">{{content.options.firstObject.label}}</div>
+{{else if content.editable}}
+    <div class="input-group">
+        {{#if customize}}
+            {{input class="form-control" placeholder=content.placeholder value=content.value}}
+        {{else}}
+            {{view "select" class="form-control" content=options optionValuePath="content.value" optionLabelPath="content.label" value=content.value}}
+        {{/if}}
+        <span class="input-group-btn">
+            <button class="btn btn-default {{if customize "active"}}" {{action "customize"}}>Custom</button>
+        </span>
+    </div>
+{{else}}
+    {{view "select" class="form-control" content=options optionValuePath="content.value" optionLabelPath="content.label" value=content.value}}
+{{/if}}

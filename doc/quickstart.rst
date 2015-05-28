@@ -3,29 +3,47 @@
 Quickstart guide
 ================
 
+Vagrant
+-------
+
+We have a vagrant setup for debian wheezy and ubuntu trusty (currently disfuctional). If you have vagrant you can just 
+checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
+minutes and will give you a ready to run OXI install available at http://localhost:8080/newoxi/.
+
 Debian/Ubuntu Development Builds
 ---------------------------------
 
-**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the mason client will crash otherwise!**
+**Starting with the 0.15 release we will no longer support the old mason ui, to new UI based on Ember.js should be mostly functional but still needs some work.**
 
-You can find packages for Debian Squeeze and Ubuntu 12.04 at http://packages.openxpki.org/.
+**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
 
-Packages are build from the development head, it "should work" but some stuff might need a bit of manual tweaking.
+Current release is 0.18 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
 
-Add the repository to your source list (squeeze)::
+Add the repository to your source list (wheezy)::
 
-    echo "deb http://packages.openxpki.org/debian/ squeeze/binary/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/debian/ wheezy release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
-or ubuntu::
+or ubuntu **temporary discontinued due to package problems**::
 
-    echo "deb http://packages.openxpki.org/ubuntu/ precise/binary/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
 
-As the init script uses mysql as default, but does not force it as a dependancy, it is crucial that you have the mysql server installed before you pull the OpenXPKI package::
+As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
-    aptitude install mysql-server
-    aptitude install libopenxpki-perl
+    aptitude install mysql-server libdbd-mysql-perl
+
+We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires the "non-free" repository to be present in your apt sources.
+
+    aptitude install libapache2-mod-fastcgi
+
+Now install the OpenXPKI core package and the translation package::
+
+    aptitude install libopenxpki-perl openxpki-i18n
+
+We are fighting with a debian build issue, if your install complains about a file collision in ``perllocal.pod``, add the force option::
+
+    aptitude -o Dpkg::Options::="--force-overwrite" install libopenxpki-perl
 
 If the install was successful, you should see the result of the initial config import at the bottom of your install log (the hash value might vary)::
 
@@ -38,39 +56,89 @@ Now, create the database user::
     GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
     flush privileges;
 
-Create your ca certificate:: 
-    
-    cd /etc/openxpki/ssl/ca-one/
-    openssl req -newkey rsa:2048 -new -days 1830 -x509 -keyout ca-one-signer-1.pem -out ca-one-signer-1.crt  -passout pass:root
-    
-Create a key for the internal datasafe (not exposed externally)::    
+It is now time to init the server::
 
-    openssl req -newkey rsa:2048 -new -days 400 -x509 -keyout ca-one-vault-1.pem -out ca-one-vault-1.crt -passout pass:root
-
-If you plan to use the SCEP service, you need another certificate::    
-
-    openssl req -newkey rsa:2048 -new -days 400 -x509 -keyout ca-one-scep-1.pem -out ca-one-scep-1.crt -passout pass:root
-
-
-**Note:** The sample config uses the fixed passphrase *root* as password for both keys, please change this for your production deployment!
-
-The following creates the initial configuration repository, inits the database schema and imports the certificates into the database:: 
-       
-    openxpkiadm loadcfg
     openxpkiadm initdb
+
+Setup base certificates
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The debian package comes with a shell script ``sampleconfig.sh`` that does all the work for you 
+(look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two stage ca with 
+a root ca certificate and below your issuing ca and certs for SCEP and the internal datasafe.
+
+The sample script proves certs for a quickstart but should never be used for production systems 
+(it has the fixed passphrase *root* for all keys ;) and no policy/crl, etc config ).
+ 
+Here is what you need to do:
+
+#. Create a key/certificate as signer certificate (ca = true)
+#. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
+#. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
+
+Move the key files to /etc/openxpki/ssl/ca-one/ and name them ca-one-signer-1.pem, ca-one-vault-1.pem, ca-one-scep-1.pem. 
+The key files must be readable by the openxpki user, so we recommend to make them owned by the openxpki user with mode 0400. 
+
+Now import the certificates to the database. The signer token is used exclusive in the current realm, 
+so we can use a shortcut and import and reference it with one command. 
+
+:: 
     
-    openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-signer-1.crt 
-    openxpkiadm alias --realm ca-one --token certsign --identifier <identifier from import>
+    openxpkiadm certificate import  --file ca-root-1.crt 
+        
+    openxpkiadm certificate import  --file ca-one-signer-1.crt \
+        --realm ca-one --token certsign
+                
+As we might want to reuse SCEP and Vault token across the realms, we import them in to the global 
+namespace and just create an alias in the current realm::         
+     
+    openxpkiadm certificate import  --file ca-one-vault-1.crt            
+    openxpkiadm certificate import  --file ca-one-scep-1.crt 
+
+    openxpkiadm alias --realm ca-one --token datasafe \
+        --identifier `openxpkiadm certificate id --file ca-one-vault-1.crt`
+
+    openxpkiadm alias --realm ca-one --token scep \
+        --identifier `openxpkiadm certificate id --file ca-one-scep-1.crt`
+
+
+If the import went smooth, you should see something like this (ids and times will vary)::
+
+    $ openxpkiadm alias --realm ca-one
     
-    openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-vault-1.crt 
-    openxpkiadm alias --realm ca-one --token datasafe --identifier <identifier from import>
-    
-    openxpkiadm certificate import  --file /etc/openxpki/ssl/ca-one/ca-one-scep-1.crt 
-    openxpkiadm alias --realm ca-one --token scep --identifier <identifier from import>
+    === functional token ===
+    ca-one-scep (scep):
+    Alias     : ca-one-scep-1
+    Identifier: YsBNZ7JYTbx89F_-Z4jn_RPFFWo
+    NotBefore : 2015-01-30 20:44:40
+    NotAfter  : 2016-01-30 20:44:40
+
+    ca-one-vault (datasafe):
+    Alias     : ca-one-vault-1
+    Identifier: lZILS1l6Km5aIGS6pA7P7azAJic
+    NotBefore : 2015-01-30 20:44:40
+    NotAfter  : 2016-01-30 20:44:40
+
+    ca-one-signer (certsign):
+    Alias     : ca-one-signer-1
+    Identifier: Sw_IY7AdoGUp28F_cFEdhbtI9pE
+    NotBefore : 2015-01-30 20:44:40
+    NotAfter  : 2018-01-29 20:44:40
+
+    === root ca ===
+    current root ca:
+    Alias     : root-1
+    Identifier: fVrqJAlpotPaisOAsnxa9cglXCc
+    NotBefore : 2015-01-30 20:44:39
+    NotAfter  : 2020-01-30 20:44:39
+
+    upcoming root ca:
+      not set
+        
     
 Now it is time to see if anything is fine::
 
-    openxpkictl start
+    $ openxpkictl start
     
     Starting OpenXPKI...
     OpenXPKI Server is running and accepting requests.
@@ -86,46 +154,40 @@ If this is not the case, check */var/openxpki/stderr.log*.
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
 
-The webclient uses the Mason toolkit and mod_perl, get the package::
+The new webclient is included in the core packages now. Just open your browser and navigate to *http://yourhost/newoxi/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
 
-    aptitude install libopenxpki-client-html-mason-perl
-    
-If the install is done, point your webbrowser to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
-
-The test setup uses a fully insecure password handler *External Dynamic* - just enter any username and give one of
-
-* User
-* RA Operator
-* CA Operator
-
-as the password. You will be logged in with the username and the "password" is used as the default role (pay attention to the captial letters, it's case SenSitIve!).
+Login as user can be done with any password, there is a preconfigured operator account with user raop and password openxpki. Note that the UI does not recognize the backends acl and will render useless links and buttons for the user role.
 
 Testdrive
 ^^^^^^^^^
 
-#. Login as User (Username: bob, Password: User)
-#. Go to "Request", select "Certificate Signing Request"
-#. Follow the white rabbit
-#. Logout and re-login as RA Operator (Username: raop, Password: RA Operator)  
-#. Go to "Approval", select "Pending Signing Requests"
-#. Select your Request, use the button on the top to approve the request
+#. Login as User (Username: bob, Password: <any>)
+#. Go to "Request", select "Request new certificate"
+#. Complete the pages until you get to the status "PENDING" (gray box on the right)
+#. Logout and re-login as RA Operator (Username: raop, Password: openxpki )  
+#. Go to "Approval", select "Home / My tasks"
+#. Select your Request, change the request or use the "approve" button
 #. After some seconds, your first certificate is ready :)
 #. You can now login with your username and fetch the certificate 
 
 Enabling the SCEP service
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The SCEP logic is already included in the core distribution but you need to 
-setup a wrapper to access the service through your webserver.
-    
-The package installs a wrapper script into /usr/lib/cgi-bin/ and a config file
-at /etc/openxpki/scep/default.conf. For a testdrive, there is no need for any 
-configuration.
+**Note: You need to manually install the openca-tools package which is available from 
+our package server in order to use the scep service.**
+
+The SCEP logic is already included in the core distribution. The package installs
+a wrapper script into /usr/lib/cgi-bin/ and creates a suitable alias in the apache
+config redirecting all requests to `http://host/scep/<any value>` to the wrapper. 
+A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive, 
+there is no need for any configuration, just call ``http://host/scep/scep``.
 
 The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the 
-test workflow is configured to create a certificate on each enrollment request that 
-has a challenge password set (the value of the password is irrelevant) or is a self-
-signed renewal request (must be within configured renewal period).
+shipped workflow is configured to allow enrollment with password or signer on behalf.
+The password has to be set in ``scep.yaml``, the default is 'SecretChallenge'.
+For signing on behalf, use the UI to create a certificate with the 'SCEP Client'
+profile - there is no password necessary. Advanced configuration is described in the 
+scep workflow section. 
 
 The best way for testing the service is the sscep command line tool (available at
 e.g. https://github.com/certnanny/sscep).  
@@ -133,27 +195,28 @@ e.g. https://github.com/certnanny/sscep).
 Check if the service is working properly at all::
 
     mkdir tmp
-    ./sscep getca -c tmp/cacert -u http://yourhost/cgi-bin/scep
+    ./sscep getca -c tmp/cacert -u http://yourhost/scep/scep
     
 Should show and download a list of the root certificates to the tmp folder.
 
 To test an enrollment::
 
     openssl req -new -keyout tmp/scep-test.key -out tmp/scep-test.csr -newkey rsa:2048 -nodes
-    ./sscep enroll -u http://yourhost/cgi-bin/scep \
+    ./sscep enroll -u http://yourhost/scep/scep \
         -k tmp/scep-test.key -r tmp/scep-test.csr \
         -c tmp/cacert-0 \
         -l tmp/scep-test.crt \ 
         -t 10 -n 1
 
-Make sure you set any non empty value for the challenge password when prompted.
+Make sure you set the challenge password when prompted (default: 'SecretChallenge').
 On current desktop hardware the issue workflow will take approx. 15 seconds to 
 finish and you should end up with a certificate matching your request in the tmp 
 folder.      
 
-
 Starting from scratch
 ---------------------
+
+**This section is outdated - sorry**
 
 If you don't use debian or just like the hard way you can of course start from out github repo.
 The debian build file are the current "authorative source" regarding to dependencies, etc. so 

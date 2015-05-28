@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+my $csr_filename = shift @ARGV;
+
+
+
+if ( not length($csr_filename) ) {
+    die "$0: no CSR filename specified";
+}
+
+if ( not -f $csr_filename ) {
+    die "$0: $csr_filename does not exist";
+}
+
+
+die "admin must replace stub script with real one";
+#print "sscep-mock OK\n";
+

@@ -21,87 +21,108 @@ sub execute {
     my $workflow = shift;
     my $context = $workflow->context();
 
-    my %contextentry_of = 
-	(
-	 cert_identifier => 'cert_identifier',
-	 reason_code     => 'reason_code',
-	 comment         => 'comment',
-	 invalidity_time => 'invalidity_time',
-	 auto_approval   => 'flag_crr_auto_approval',
-	 );
-
-    foreach my $contextkey (keys %contextentry_of) {
-	my $tmp = $contextkey . 'contextkey';
-	if (defined $self->param($contextkey . 'contextkey')) {
-	    $contextentry_of{$contextkey} = $self->param($contextkey . 'contextkey');
-	}
-    }
-    ##! 16: 'contextentry mapping: ' . Dumper \%contextentry_of
-
-    my $cert_identifier = $context->param($contextentry_of{'cert_identifier'});
-    my $reason_code     = $context->param($contextentry_of{'reason_code'});
-    my $comment         = $context->param($contextentry_of{'comment'});
-    my $invalidity_time = $context->param($contextentry_of{'invalidity_time'});
-    my $auto_approval   = $context->param($contextentry_of{'auto_approval'});
-
-    # override from activity parameters (only if specified)
-    if (defined $self->param('reason_code')) {
-	$reason_code = $self->param('reason_code');
-    }
-
-    if (defined $self->param('comment')) {
-	$comment = $self->param('comment');
-    }
-
-    if (defined $self->param('auto_approval')) {
-	$auto_approval = $self->param('auto_approval');
-    }
-
-    # defaults
-    $reason_code     ||= 'unspecified';
-    $invalidity_time ||= time();
-    $comment         ||= '';
-    $auto_approval   ||= 0;
+    my $param = {
+        cert_identifier     => undef,
+        reason_code         => 'unspecified',
+        invalidity_time     => 0,
+        comment             => '',
+        flag_auto_approval  => 0,
+        flag_delayed_revoke => 0,
+        flag_batch_mode     => 1,
+    };
     
+    # Overwrite defaults from activity params  
+    foreach my $key (keys(%{$param})) {
+        my $val = $self->param($key);        
+        if (defined $val) {
+            $param->{$key} = $val; 
+        }        
+    }   
+    
+    # We read cert_identifier from context if none given in map
+    $param->{cert_identifier} = $context->param('cert_identifier') unless($param->{cert_identifier});    
+    
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_REVOKE_CERTIFICATE_NO_CERT_IDENTIFIER',    
+        log => {
+            logger   => CTX('log'),
+            priority => 'error',
+            facility => 'system',
+    }) unless($param->{cert_identifier});
+
     # Backward compatibility... Use 0|1 instead of no|yes for boolean value
-    if ( lc($auto_approval) eq 'yes' ) {
-        $auto_approval = 1;
-    } elsif ( lc($auto_approval) eq 'no' ) {
-        $auto_approval = 0;
+    if ( lc($param->{flag_auto_approval}) eq 'yes' ) {
+        $param->{flag_auto_approval} = 1;
+    } elsif ( lc($param->{flag_auto_approval}) eq 'no' ) {
+        $param->{flag_auto_approval} = 0;
+    }
+    
+    # Invalidity time must be epoch for the revocation workflow, we accept dates, too
+    if ($param->{invalidity_time}) {   
+        $param->{invalidity_time} = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $param->{invalidity_time},
+            VALIDITYFORMAT => 'detect'
+        })->epoch();
+    } else {
+        $param->{invalidity_time} = time();
+    }        
+
+    ##! 32: 'Prepare revocation with params: ' . Dumper $param
+    CTX('log')->log(
+        MESSAGE => 'Prepare revocation with params: ' . Dumper $param, 
+        PRIORITY => 'debug',
+        FACILITY => [ 'application' ],
+    );
+
+    # Accept delayed revoke - without this flag the crr workflow wont accept a date in the future 
+    if ($param->{invalidity_time} > time()) {
+        $param->{flag_delayed_revoke} = 1;
+      
+        CTX('log')->log(
+            MESSAGE => 'Invalidity time is in the future, use delayed revoke.', 
+            PRIORITY => 'info',
+            FACILITY => [ 'application' ],
+        );
+      
+        # Check if the invalidity_time is within the validity interval        
+        my $hash = CTX('dbi_backend')->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => { IDENTIFIER => { VALUE => $param->{cert_identifier} } },
+        );
+        if ($param->{invalidity_time} > $hash->{NOTAFTER}) {
+            $param->{invalidity_time} = $hash->{NOTAFTER};
+            CTX('log')->log(
+                MESSAGE => 'Invalidity time is larger than notafter - will align', 
+                PRIORITY => 'warn',
+                FACILITY => [ 'application' ],
+            );
+        }
     }
 
+
+    my $workflow_type = $self->param('workflow');
+    if (!$workflow_type) {
+        $workflow_type = 'certificate_revocation_request_v2';
+    }
+    
     # Create a new workflow
     my $wf_info = CTX('api')->create_workflow_instance({
-        WORKFLOW      => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST',
+        WORKFLOW      => $workflow_type,
         FILTER_PARAMS => 0,
-        PARAMS        => { 
-            cert_identifier        => $cert_identifier,
-            reason_code            => $reason_code,
-	    comment                => $comment,
-	    invalidity_time        => $invalidity_time,
-	    flag_crr_auto_approval => $auto_approval,
-        },
+        PARAMS        => $param
     });
         
     ##! 16: 'Revocation Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
 
     CTX('log')->log(
-		    MESSAGE => 'Revocation workflow #'
-		    . $wf_info->{WORKFLOW}->{ID}
-		    . ' (autoapprove: '
-		    . $auto_approval
-		    . ')'
-		    . ' created for certificate ID '
-		    . $cert_identifier
-		    . ' (reason code: '
-		    . $reason_code
-		    . ', invalidity time: '
-		    . OpenXPKI::DateTime::convert_date({
-			DATE => DateTime->from_epoch(epoch => $invalidity_time)})
-		    . ', comment: '
-		    . $comment,
+		    MESSAGE => 'Revocation workflow #'. $wf_info->{WORKFLOW}->{ID}. 
+		    ' (autoapprove: ' . $param->{flag_auto_approval} . ')' .
+		    ' created for certificate ID ' . $param->{cert_identifier} . 
+		    ' (reason code: ' . $param->{reason_code} . 
+		    ', invalidity time: ' . $param->{invalidity_time} . 
+		    ', comment: ' . $param->{comment},
 		    PRIORITY => 'info',
-		    FACILITY => [ 'system' ],
+		    FACILITY => [ 'application' ],
 		    );
 
     return 1;
@@ -120,18 +141,6 @@ OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate;
 
 Trigger revocation of a certificate by starting an unwatched
 workflow.
-
-=head2 Activity configuration parameters
-
-cert_identifiercontextkey: context key to use for certificate id (default: cert_identifier)
-reason_codecontextkey: context key to use for reason code (default: reason_code)commentcontextkey: context key to use for comment (default: comment)
-invalidity_time: context key to use for invalidity time (default: invalidity_time)
-auto_approval: context key to use for auto approval flag (default: flag_crr_auto_approval)
-
-reason_code: if set, defines static reason code (context not evaluated)
-comment: if set, defines static comment (context not evaluated)
-auto_approval: if set, sets auto approval flag (context not evaluated)
-
 
 =head2 Parameters
 
@@ -154,9 +163,24 @@ Revocation comment, defaults to ''
 
 Invalidity time (epoch seconds, defaults to now)
 
-=item flag_crr_auto_approval
+=item workflow
+
+The name of the workflow to start for revocation, usually not required, 
+default is certificate_revocation_request_v2.
+
+=item flag_auto_approval
 
 Set to '1' if request should be automatically approved.
+
+=item flag_batch_mode
+
+This flag is set to '1' by default, you can force it to '0'. When used with the
+default workflow, this is required to skip the user approval step.  
+
+=item flag_delayed_revoke
+
+This flag is added by the class if the invalidity time is in the future. It 
+can not be set from outside and is listed here for reference only.             
 
 =back
 

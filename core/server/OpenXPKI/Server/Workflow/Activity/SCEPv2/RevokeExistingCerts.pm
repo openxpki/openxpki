@@ -45,7 +45,7 @@ sub execute
         SUBJECT => $csr_subject
     });
         
-    if (scalar(@{$certs})) {        
+    if (scalar(@{$certs})) {
         my $certs_to_revoke_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
             {
             workflow    => $workflow,
@@ -55,15 +55,21 @@ sub execute
         foreach my $cert (@{$certs}) {        
             ##! 32: 'Add cert to revoke ' . $cert->{IDENTIFIER}
            CTX('log')->log(
-                MESSAGE => "certificate added for automated reocation " . $cert->{IDENTIFIER},
+                MESSAGE => "SCEP certificate added for automated revocation " . $cert->{IDENTIFIER},
                 PRIORITY => 'info',
-                FACILITY => ['audit','system'],
+                FACILITY => ['audit','application'],
             );            
             $certs_to_revoke_wf->push( $cert->{IDENTIFIER} );
         }
     } else {
         ##! 32: 'Unset queue - no certs to revoke'        
         $context->param('tmp_queue' =>  );
+        
+        CTX('log')->log(
+            MESSAGE => "SCEP autorevoke - no active certs", 
+            PRIORITY => 'info',
+            FACILITY => 'application',
+        );      
     }
     
        

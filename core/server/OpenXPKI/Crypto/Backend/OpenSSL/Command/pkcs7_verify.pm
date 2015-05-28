@@ -28,42 +28,37 @@ sub get_command
         if ($self->{ENGINE}->get_engine() and
             ($engine_usage =~ m{ ALWAYS }xms));
 
-# we do not want chains in tokens any longer
-#    $self->{CHAIN} = $self->{ENGINE}->get_chainfile()
-#       if (not $self->{CHAIN} and $self->{ENGINE}->get_chainfile());
-
-    if (! defined $self->{CHAIN}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CHAIN',
-        );
-    }
-
-    ## check parameters
-
-    if (not $self->{CONTENT})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CONTENT");
-    }
     if (not $self->{PKCS7})
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_PKCS7");
     }
 
-    ## prepare data
+    # Assemble chain
+    if (defined $self->{CHAIN} ) {
 
-    my $chain = join('', @{$self->{CHAIN}});
+        ## prepare data
+        my $chain = join('', @{$self->{CHAIN}});
+        $self->write_file(
+            FILENAME => $self->{CHAINFILE},
+            CONTENT  => $chain,
+            FORCE    => 1,
+        );
 
-    $self->write_file(
-        FILENAME => $self->{CHAINFILE},
-        CONTENT  => $chain,
-        FORCE    => 1,
-    );
+    # No chain is ok when no verify is given
+    } elsif (!$self->{NO_CHAIN}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_VERIFY_MISSING_CHAIN',
+        );
+    }
 
-    $self->write_file (FILENAME => $self->{CONTENTFILE},
-                       CONTENT  => $self->{CONTENT},
-	               FORCE    => 1);
+    # Content is also optional when just verifiy a signature
+    if ($self->{CONTENT}) {
+        $self->write_file (FILENAME => $self->{CONTENTFILE},
+                           CONTENT  => $self->{CONTENT},
+    	               FORCE    => 1);
+    }
+
     $self->write_file (FILENAME => $self->{PKCS7FILE},
                        CONTENT  => $self->{PKCS7},
 	               FORCE    => 1);
@@ -71,13 +66,14 @@ sub get_command
     ## build the command
 
     my $command  = "smime -verify";
-    $command .= " -inform PEM";
-    $command .= " -content ".$self->{CONTENTFILE};
-    $command .= " -in ".$self->{PKCS7FILE};
-    $command .= " -noverify" if ($self->{NO_VERIFY});
     $command .= " -engine $engine" if ($engine);
-    $command .= " -CAfile ".$self->{CHAINFILE};
+    $command .= " -inform PEM";
+    $command .= " -in ".$self->{PKCS7FILE};
     $command .= " -signer ".$self->{OUTFILE};
+    # Optional parts
+    $command .= " -content ".$self->{CONTENTFILE} if ($self->{CONTENT});
+    $command .= " -noverify" if ($self->{NO_CHAIN});
+    $command .= " -CAfile ".$self->{CHAINFILE} if ($self->{CHAIN});
 
     return [ $command ];
 }
@@ -122,7 +118,7 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
 
 =over
 
-=item * CONTENT (original data which was signed)
+=item * CONTENT (original data which was signed, optional)
 
 =item * PKCS7 (signature which should be verified)
 
@@ -130,9 +126,9 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
 
 =item * CHAIN
 
-is an array of PEM encoded certificates
+is an array of PEM encoded certificates, mandatory unless NO_CHAIN is set
 
-=item * NO_VERIFY (do not check the signer certificate)
+=item * NO_CHAIN (do not check the signer certificate)
 
 =back
 

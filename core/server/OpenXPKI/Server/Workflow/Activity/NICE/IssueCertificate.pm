@@ -53,6 +53,12 @@ sub execute {
         );
     }   
 
+    CTX('log')->log(
+        MESSAGE  => "start cert issue for serial $csr_serial, workflow " . $workflow->id,
+        PRIORITY => 'info',
+        FACILITY => [ 'application', 'audit' ]
+    );
+
     my $set_context = $nice_backend->issueCertificate( $csr );
 
     ##! 64: 'Setting Context ' . Dumper $set_context      
@@ -64,7 +70,25 @@ sub execute {
     }
 
     ##! 64: 'Context after issue ' .  Dumper $context
-    	
+    
+    # Record the certificate owner information, see
+    # https://github.com/openxpki/openxpki/issues/183   
+    my $owner = $self->param('cert_owner');
+    
+    ##! 64: 'Params ' . Dumper $self->param()
+    ##! 32: 'Owner ' . $owner 
+    if ($owner) {
+        CTX('dbi_backend')->insert(
+            TABLE => 'CERTIFICATE_ATTRIBUTES',
+            HASH => {
+                IDENTIFIER => $set_context->{cert_identifier},
+                ATTRIBUTE_KEY => 'system_cert_owner',
+                ATTRIBUTE_VALUE => $owner,
+            }
+        );
+    }
+    
+    		
 }
 
 1;

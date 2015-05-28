@@ -1,0 +1,35 @@
+<html><body>
+
+<img src="cid:banner" />
+
+<p>
+Dear Customer,
+</p>
+
+<p>We have received a certificate request via SCEP for a certificate
+with the following data:<br/><br/>
+
+Subject: [% cert_subject %]<br/>
+[% FOREACH san = cert_subject_alt_name  -%]
+Subject alternative name: [% san.0 %]: [% san.1 %]<br/>
+[% END -%]
+</p>
+<p>
+For this request, a new workflow has been created on the CA system
+with ID [% meta_wf_id %].
+</p>
+<p>
+If you have any questions or comments regarding this certificate
+request, please reply to this mail keeping the subject intact.
+</p>
+<p>
+We will notify you once the certificate has been issued and is
+ready for download.
+</p>
+<p><i>
+Regards,<br/>
+  PKI Team</i>
+</p>
+
+<img src="cid:footer" />
+</body></html>

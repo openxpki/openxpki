@@ -12,7 +12,7 @@ use English;
 
 use Class::Std;
 use Math::BigInt;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 use MIME::Base64;
 
 use base qw( OpenXPKI::Crypto::Secret );

@@ -61,7 +61,7 @@ sub init {
     }
 
     ## ensure that all relevant loggers are present
-    foreach my $facility ("auth", "audit", "monitor", "system", "workflow" )
+    foreach my $facility ("auth", "audit", "monitor", "system", "workflow", "application" )
     {
         ## get the relevant logger
         $self->{$facility} = Log::Log4perl->get_logger("openxpki.$facility");
@@ -112,7 +112,7 @@ sub log
 
     $facility = lc($keys->{FACILITY})
         if (exists $keys->{FACILITY} and
-            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system|workflow) \z }xms);
+            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system|workflow|application) \z }xms);
 
     $prio = uc($keys->{PRIORITY})
         if (exists $keys->{PRIORITY} and
@@ -172,7 +172,8 @@ sub log
     }
 
     ## get an ID for the message
-
+    
+    #FIXME - eval for logger prio is ugly 
     my $return = $self->{$facility}->log (eval ("\$${prio}"), $msg);
 
     return $return if (defined $keys->{MESSAGE} and length ($keys->{MESSAGE}));

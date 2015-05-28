@@ -23,45 +23,37 @@ sub execute {
 
     my $default_token = CTX('api')->get_default_token();
 
-    my %contextentry_of = (
-	password     => '_password',
-	p12password  => '_p12password',
-	certificate  => 'certificate',
-	privatekey   => '_private_key',
-	pkcs12base64 => 'pkcs12base64',
-	);
+    my $password    = $self->param('passin');
+    my $p12password = $self->param('passout');    
+    my $certificate = $self->param('certificate');
+    my $key         = $self->param('privatekey');
 
-    foreach my $contextkey (keys %contextentry_of) {
-	my $tmp = $contextkey . 'contextkey';
-	if (defined $self->param($contextkey . 'contextkey')) {
-	    $contextentry_of{$contextkey} = $self->param($contextkey . 'contextkey');
-	}
-    }
-    ##! 16: 'contextentry mapping: ' . Dumper \%contextentry_of
-
-    my $password    = $context->param($contextentry_of{'password'});
-    my $p12password = $context->param($contextentry_of{'p12password'});
     if (! defined $p12password || $p12password eq '') {
-	$p12password = $password;
+       $p12password = $password;
     }
-    my $certificate = $context->param($contextentry_of{'certificate'});
-    my $key         = $context->param($contextentry_of{'privatekey'});
-
+    
     my $command = {
-	COMMAND       => 'create_pkcs12',
-	PASSWD        => $password,
-	PKCS12_PASSWD => $p12password,
-	KEY           => $key,
-	CERT          => $certificate,
-	CHAIN         => [],
+	   COMMAND       => 'create_pkcs12',
+	   PASSWD        => $password,
+	   PKCS12_PASSWD => $p12password,
+	   KEY           => $key,
+	   CERT          => $certificate,
     };
+    
+    ##! 32: 'Command ' . Dumper $command 
     
     my $pkcs12 = $default_token->command($command);
     
     # convert to base64
     $pkcs12 = encode_base64($pkcs12, '');
     
-    $context->param($contextentry_of{'pkcs12base64'} => $pkcs12);
+    $context->param('_pkcs12' => $pkcs12 );
+    
+    CTX('log')->log(
+        MESSAGE => 'SmartCard created pkcs12 container',
+        PRIORITY => 'info',
+        FACILITY => ['audit','application']
+    );
     return 1;
 }
 1;
@@ -73,26 +65,29 @@ OpenXPKI::Server::Workflow::Activity::SmartCard::CreatePKCS12
 
 =head1 Description
 
-This class creates a PKCS12 structure.
+This class creates a PKCS12 structure from key and certificate. The pkcs12
+is put into the context with key I<_pkcs12> (volatile!).
 
-Input parameters (from context):
-_password         Passphrase of private key
-_p12password      Passphrase of the generated PKCS#12 
-                  (defaults to value of _password)
-certificate       Certificate to wrap
-_private_key      Private key to wrap
+=head1 Configuration
 
-Output parameters (to context):
-pkcs12base64      Base64 encoded PKCS12 structure
+=head2 Activity parameters
 
-These are the default context parameters. By setting the following activity
-parameters you can override these context parameters:
+=over 
 
+=item passin
 
-Activity configuration:
-passwordcontextkey            context parameter to use for password
-p12passwordcontextkey         context parameter to use for p12password
-certificatecontextkey         context parameter to use for certificate
-privatekeycontextkey          context parameter to use for private key
-pkcs12base64contextkey        context parameter to use for output data
+Passphrase of private key
 
+=item passout   
+
+Output passphrase for the generated PKCS#12 (defaults to value of _password)
+
+=item certificate       
+
+Certificate to wrap (PEM block)
+
+=item private_key      
+
+Private key to wrap (PEM formatted PKCS8)
+
+=back

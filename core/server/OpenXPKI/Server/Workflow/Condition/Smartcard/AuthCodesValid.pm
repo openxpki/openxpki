@@ -13,7 +13,7 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use OpenXPKI::DN;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 
 use English;
 
@@ -81,6 +81,12 @@ sub evaluate {
             'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SC_ACT_CODE_INVALID' );
         return -1;
     }
+
+    CTX('log')->log(
+        MESSAGE => "Auth codes checked.",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
 
     return 1
 

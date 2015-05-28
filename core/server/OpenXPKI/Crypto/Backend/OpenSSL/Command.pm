@@ -23,6 +23,9 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_decrypt;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkey;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params;
+
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI::Debug;
@@ -128,7 +131,7 @@ sub cleanup
 
     foreach my $file (@{$self->{CLEANUP}->{FILE}})
     {
-        if (-e $file) 
+        if (-e $file)
 	{
 	    unlink $file;
 	}
@@ -219,7 +222,7 @@ All temporary file are cleaned up automatically.
 
 =head2 get_tmpfile
 
-If called without arguments this method creates a temporary file and 
+If called without arguments this method creates a temporary file and
 returns its filename:
 
   my $tmpfile = $self->get_tmpfile();

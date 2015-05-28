@@ -63,6 +63,12 @@ sub execute
     );
     $dbi->commit();
     $context->param('crr_serial' => $crr_serial);
+    
+    CTX('log')->log(
+        MESSAGE  => "crr for $identifier persisted",
+        PRIORITY => 'debug',
+        FACILITY => 'application',
+    );
 }
 
 1;

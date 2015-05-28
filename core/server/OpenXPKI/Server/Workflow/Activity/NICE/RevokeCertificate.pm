@@ -41,8 +41,25 @@ sub execute {
 	       params => { crr_serial => $crr_serial }
        );
     }
-       
+      
+    CTX('log')->log(
+        MESSAGE  => "start cert revocation for crr_serial $crr_serial, workflow " . $workflow->id,
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
+           
     $nice_backend->revokeCertificate( $crr );
+
+    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier} 
+    CTX('dbi_backend')->insert(
+        TABLE => 'CERTIFICATE_ATTRIBUTES', 
+        HASH => {            
+            IDENTIFIER => $context->param('cert_identifier'),
+            ATTRIBUTE_KEY => 'system_workflow_crr',
+            ATTRIBUTE_VALUE => $workflow->id
+        }
+    );          
+    CTX('dbi_backend')->commit();       
     	
 }
 

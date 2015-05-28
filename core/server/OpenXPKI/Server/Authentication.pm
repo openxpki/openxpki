@@ -20,11 +20,11 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Server::Authentication::Anonymous;
 use OpenXPKI::Server::Authentication::External;
-#use OpenXPKI::Server::Authentication::LDAP;
 use OpenXPKI::Server::Authentication::Password;
 use OpenXPKI::Server::Authentication::ChallengeX509;
 use OpenXPKI::Server::Authentication::ClientSSO;
 use OpenXPKI::Server::Authentication::ClientX509;
+use OpenXPKI::Server::Authentication::Connector;
 
 ## constructor and destructor stuff
 
@@ -96,6 +96,9 @@ sub __load_pki_realm
         $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} = 
             $config->get("auth.stack.$stack.description");
     
+        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL} = 
+            $config->get("auth.stack.$stack.label") || $stack;
+    
         ##! 8: "determine all used handlers"
         my @supported_handler = $config->get_scalar_as_list("auth.stack.$stack.handler");
         ##! 32: " supported_handler " . Dumper @supported_handler
@@ -165,6 +168,7 @@ sub list_authentication_stacks {
     foreach my $stack (sort keys %{$self->{PKI_REALM}->{$realm}->{STACK}}) {
         $stacks{$stack}->{NAME}        = $stack;
         $stacks{$stack}->{DESCRIPTION} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION};
+        $stacks{$stack}->{LABEL} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL};
     }
     ##! 1: 'end'
     return \%stacks;
@@ -189,8 +193,8 @@ sub login_step {
 	    },
 	    log     => {
 		logger => CTX('log'),
-		priority => 'info',
-		facility => 'auth',
+		priority => 'warn',
+		facility => 'auth'
 	    },
         );
     }
@@ -214,7 +218,7 @@ sub login_step {
 		log => {
 		    logger => CTX('log'),
 		    priority => 'error',
-		    facility => 'system',
+		    facility => 'auth',
 		},
 		);
         }
@@ -262,14 +266,17 @@ sub login_step {
     }
 
     if (defined $user && defined $role) {
-	CTX('log')->log(
+	   CTX('log')->log(
 	    MESSAGE  => "Login successful using authentication stack '$stack' (user: '$user', role: '$role')",
 	    PRIORITY => 'info',
 	    FACILITY => 'auth',
-	    );
-    }
+	   );
+    
+        return ($user, $role, $return_msg);
+    } 
 
-    return ($user, $role, $return_msg); 
+    return (undef, undef, $return_msg);
+    
 };
 
 1;

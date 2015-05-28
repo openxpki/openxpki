@@ -6,13 +6,15 @@ INSTALL      = install
 LANGS         = en_US en_GB de_DE ru_RU
 PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
-#POT_SOURCES  = ../perl-modules/core/trunk ../clients/perl/OpenXPKI-Client ../clients/perl/OpenXPKI-Client-SCEP ../clients/perl/OpenXPKI-Client-HTML-Mason ../deployment
-POT_SOURCES  = ../server ../../clients/perl/OpenXPKI-Client-HTML-Mason
+POT_SOURCES  = ../server ../../config 
 VERSION_FILE    = ./VERSION
 
 #---- variable settings above, rules below ----
 
 .PHONY:	default test install clean clean.local distclean openxpki.pot
+
+# do not run parallel make on the target files (does not work properly, at least on FreeBSD)
+.NOTPARALLEL: $(MO_TRANSLATIONS)
 
 default::	$(MO_TRANSLATIONS)
 	@echo Languages: $(LANGS)

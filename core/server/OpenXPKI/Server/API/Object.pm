@@ -18,7 +18,7 @@ object must be set before instantiating the API.
 
 =head1 Functions
 
-=cut 
+=cut
 
 package OpenXPKI::Server::API::Object;
 
@@ -30,17 +30,18 @@ use English;
 use Data::Dumper;
 
 use Class::Std;
-use Encode;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::FileUtils;
+use OpenXPKI::Server::Watchdog;
+use OpenXPKI::Control;
 use DateTime;
 use List::Util qw(first);
 
-use MIME::Base64 qw( decode_base64 );
+use MIME::Base64 qw( encode_base64 decode_base64 );
 
 sub START {
 
@@ -51,12 +52,117 @@ sub START {
 }
 
 
+sub generate_key {
+
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+
+    my $pass = $args->{PASSWD};
+    if (!$pass) {
+        OpenXPKI::Exception->throw( message =>
+          'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_REQUIRES_PASSWORD' );
+    }
+
+    my $key_alg = lc($args->{KEY_ALG}) || 'rsa';
+    my $enc_alg = lc($args->{ENC_ALG});
+
+    my $params = $args->{PARAMS};
+
+    my $token = CTX('api')->get_default_token();
+
+
+    # prepare command definition
+    my $command = {
+         COMMAND    => 'create_pkey',
+         KEY_ALG    => $key_alg,
+         ENC_ALG    => $enc_alg,
+         PASSWD     => $pass,
+    };
+
+    my $pkeyopt;
+    # Handling of pkeyopts for standard algorithms
+    if ($params->{PKEYOPT} && ref $params->{PKEYOPT} eq 'HASH') {
+        $pkeyopt = $params->{PKEYOPT};
+    } elsif ($key_alg eq "rsa") {
+        if ($params->{KEY_LENGTH} && $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs) {
+            $pkeyopt->{rsa_keygen_bits} = $params->{KEY_LENGTH};
+        } else {
+            $pkeyopt->{rsa_keygen_bits} = 2048;
+        }
+    } elsif ($key_alg eq "ec") {
+
+        # With openssl <=1.0.1 you need to create EC the same way as DSA
+        # means params and key in two steps
+        # see http://openssl.6102.n7.nabble.com/EC-private-key-generation-problem-td47261.html
+        if (!$params->{ECPARAM}) {
+            if (!$params->{CURVE_NAME}) {
+                OpenXPKI::Exception->throw( message =>
+                    'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_EC_REQUIRES_CURVE_NAME' );
+            }
+            $params->{ECPARAM} = $token->command({
+                COMMAND => 'create_params',
+                TYPE    => 'EC',
+                PKEYOPT => { ec_paramgen_curve => $params->{CURVE_NAME} }
+            });
+        }
+
+        if (!$params->{ECPARAM}) {
+            OpenXPKI::Exception->throw( message =>
+                'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_EC_PARAM' );
+        }
+
+        delete $command->{KEY_ALG};
+        $command->{PARAM} = $params->{ECPARAM};
+
+    } elsif ($key_alg eq "dsa") {
+
+        if (!$params->{DSAPARAM}) {
+            # Generate Parameters
+            my $bits = 2048;
+            if ($params->{KEY_LENGTH} && $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs) {
+                $bits = $params->{KEY_LENGTH};
+            }
+            $params->{DSAPARAM} = $token->command({
+                COMMAND => 'create_params',
+                TYPE    => 'DSA',
+                PKEYOPT => { dsa_paramgen_bits => $bits }
+            });
+        }
+
+        if (!$params->{DSAPARAM}) {
+            OpenXPKI::Exception->throw( message =>
+                'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM' );
+        }
+
+        delete $command->{KEY_ALG};
+        $command->{PARAM} = $params->{DSAPARAM};
+    }
+
+    CTX('log')->log(
+        MESSAGE  => "Creating private $key_alg key with params " . Dumper $pkeyopt,
+        PRIORITY => 'debug',
+        FACILITY => 'application',
+    );
+
+    # append the pkeyopt if any
+    if ($pkeyopt) {
+        $command->{PKEYOPT} = $pkeyopt;
+    }
+    ##! 16: 'command: ' . Dumper $command
+
+    my $key = $token->command( $command );
+
+    return $key;
+
+}
+
 =head2 get_csr_info_hash_from_data
 
 return a hash reference which includes all parsed informations from
 the CSR. The only accepted parameter is DATA which includes the plain CSR.
 
-=cut 
+=cut
 
 sub get_csr_info_hash_from_data {
     ##! 1: "start"
@@ -69,24 +175,6 @@ sub get_csr_info_hash_from_data {
 
     ##! 1: "finished"
     return $obj->get_info_hash();
-}
-
-sub get_url_for_ticket {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    ##! 1: 'end'
-    return CTX('notification')->get_url_for_ticket($arg_ref);
-}
-
-sub get_ticket_info {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    ##! 1: 'end'
-    return CTX('notification')->get_ticket_info($arg_ref);
 }
 
 =head2 get_ca_cert
@@ -122,9 +210,11 @@ following values:
 
 =item * HASH - the default value
 
+=item * DBINFO - information from the certificate and attributes table
+
 =back
 
-=cut 
+=cut
 
 sub get_cert {
     ##! 1: "start"
@@ -149,6 +239,37 @@ sub get_cert {
             params => { 'IDENTIFIER' => $identifier, },
         );
     }
+    
+    if ( $format eq 'DBINFO' ) {        
+        delete $hash->{DATA};
+        my $res_attrib = CTX('dbi_backend')->select(
+            TABLE   => 'CERTIFICATE_ATTRIBUTES',
+            DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
+        );  
+        
+        # Hex Serial
+        my $serial = Math::BigInt->new( $hash->{CERTIFICATE_SERIAL} );
+        $hash->{CERTIFICATE_SERIAL_HEX} = $serial->as_hex();
+        $hash->{CERTIFICATE_SERIAL_HEX} =~ s{\A 0x}{}xms;
+        
+        # Expired Status   
+        if ($hash->{STATUS} eq 'ISSUED' && $hash->{NOTAFTER} < time()) {
+            $hash->{STATUS} = 'EXPIRED';
+        }
+        
+        my $attrib;
+        foreach my $item (@$res_attrib ) {
+            my $key = $item->{ATTRIBUTE_KEY};
+            my $val = $item->{ATTRIBUTE_VALUE};
+            if (!defined($attrib->{$key})) {
+                $attrib->{$key} = [];
+            }
+            push @{$attrib->{$key}}, $val;                       
+        }
+        
+        $hash->{CERT_ATTRIBUTES} = $attrib;
+        return $hash;
+    }
 
     my $token = CTX('api')->get_default_token();
     my $obj   = OpenXPKI::Crypto::X509->new(
@@ -164,31 +285,64 @@ sub get_cert {
         # NOTBEFORE and NOTAFTER are DateTime objects, which we do
         # not want to be serialized, so we just send out the stringified
         # version ...
-        $return_ref->{BODY}->{NOTBEFORE} = "$return_ref->{BODY}->{NOTBEFORE}";
-        $return_ref->{BODY}->{NOTAFTER}  = "$return_ref->{BODY}->{NOTAFTER}";
+        $return_ref->{BODY}->{NOTBEFORE} = $return_ref->{BODY}->{NOTBEFORE}->epoch();
+        $return_ref->{BODY}->{NOTAFTER}  = $return_ref->{BODY}->{NOTAFTER}->epoch();
         $return_ref->{STATUS}            = $hash->{STATUS};
-        $return_ref->{ROLE}              = $hash->{ROLE};
         $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
         $return_ref->{CSR_SERIAL}        = $hash->{CSR_SERIAL};
+        $return_ref->{PKI_REALM}         = $hash->{PKI_REALM};
         return $return_ref;
     }
 
     ##! 1: "finished"
-    
-    #FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"
-    my $utf8fix = $obj->get_converted($format);
-    Encode::_utf8_on($utf8fix );
-    return $utf8fix ;
+    return $obj->get_converted($format);
 }
+
+
+=head2 get_profile_for_cert
+
+returns the name of the profile used during the certificate request.
+Supported argument is IDENTIFIER which is required.
+
+=cut
+
+sub get_profile_for_cert {
+
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+
+    ##! 2: "initialize arguments"
+    my $identifier = $args->{IDENTIFIER};
+
+
+    my %params = (
+        TABLE => [ 'CERTIFICATE', 'CSR' ],
+        COLUMNS => [ 'CSR.PROFILE' ],
+        JOIN => [ [ 'CSR_SERIAL', 'CSR_SERIAL' ] ],
+        DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
+    );
+    my $result = CTX('dbi_backend')->first(%params);
+    if ( ! defined $result ) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_PROFILE_FOR_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
+            params => { 'IDENTIFIER' => $identifier, },
+        );
+    }
+
+    return $result->{'CSR.PROFILE'};
+
+}
+
 
 =head2 get_crl
 
-returns a CRL. The possible parameters are SERIAL, FORMAT and PKI_REALM. 
-SERIAL is the serial of the database table, the realm defaults to the 
-current realm and the default format is PEM. Other formats are DER, TXT 
-and HASH. HASH returns the result of OpenXPKI::Crypto::CRL::get_parsed_ref. 
- 
-=cut 
+returns a CRL. The possible parameters are SERIAL, FORMAT and PKI_REALM.
+SERIAL is the serial of the database table, the realm defaults to the
+current realm and the default format is PEM. Other formats are DER, TXT
+and HASH. HASH returns the result of OpenXPKI::Crypto::CRL::get_parsed_ref.
+
+=cut
 
 sub get_crl {
     ##! 1: "start"
@@ -199,28 +353,46 @@ sub get_crl {
     my $serial    = $args->{SERIAL};
     my $pki_realm = $args->{PKI_REALM};
     my $format   = "PEM";
-    
+
     $format = $args->{FORMAT} if ( exists $args->{FORMAT} );
     $pki_realm =  CTX('session')->get_pki_realm() unless( $args->{PKI_REALM} );
 
     ##! 16: 'Load crl by serial ' . $serial
 
-    my $db_results = CTX('dbi_backend')->first(
-        TABLE   => 'CRL',
-        COLUMNS => [ 
-            'DATA',
-            'PKI_REALM'
-        ],
-        KEY => $serial,        
-    );
-    
-    ##! 32: 'DB Result ' . Dumper $db_results 
-    
+
+    my $db_results;
+
+    if ($serial) {
+        $db_results = CTX('dbi_backend')->first(
+            TABLE   => 'CRL',
+            COLUMNS => [
+                'DATA',
+                'PKI_REALM'
+            ],
+            KEY => $serial,
+        );
+    } else {
+        $db_results = CTX('dbi_backend')->first(
+            TABLE   => 'CRL',
+            COLUMNS => [
+                'DATA',
+                'PKI_REALM'
+            ],
+            DYNAMIC => {
+                PKI_REALM => { VALUE => $pki_realm },
+            },
+            ORDER => [ 'LAST_UPDATE' ],
+            REVERSE => 1,
+        );
+    }
+
+    ##! 32: 'DB Result ' . Dumper $db_results
+
     if ( not $db_results ) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND', );
     }
-    
+
     if ($pki_realm ne $db_results->{PKI_REALM}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_IN_REALM', );
@@ -228,60 +400,62 @@ sub get_crl {
 
     # Is this really useful ?
     #OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC' );
-    
+
     my $pem_crl= $db_results->{DATA};
-  
-    my $output;     
+
+    my $output;
     if ($format eq 'PEM') {
         $output = $pem_crl;
-    } 
+    }
     elsif ( $format eq 'DER' || $format eq 'TXT' ) {
         # convert the CRL
-        my $default_token = CTX('api')->get_default_token();    
+        my $default_token = CTX('api')->get_default_token();
         $output = $default_token->command({
             COMMAND => 'convert_crl',
             OUT     => $format,
             IN      => 'PEM',
             DATA    => $pem_crl,
-        });        
+        });
         if (!$output) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_UNABLE_TO_CONVERT', 
+                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_UNABLE_TO_CONVERT',
             );
         }
-        # FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"
-        Encode::_utf8_on($output);
     }
     elsif ( $format eq 'HASH' ) {
         # parse CRL using OpenXPKI::Crypto::CRL
-        my $default_token = CTX('api')->get_default_token();            
+        my $default_token = CTX('api')->get_default_token();
         my $crl_obj = OpenXPKI::Crypto::CRL->new(
             TOKEN => $default_token,
             DATA  => $pem_crl,
         );
         $output = $crl_obj->get_parsed_ref();
-        
-    }   
+
+    }
     ##! 16: 'output: ' . Dumper $output
     return $output;
 }
 
-=head2 get_crl_list( { PKI_REALM, ISSUER, FORMAT } )
+=head2 get_crl_list( { PKI_REALM, ISSUER, FORMAT, LIMIT, VALID_AT } )
 
-List all CRL issued in the given realm. If no realm is given, use the 
+List all CRL issued in the given realm. If no realm is given, use the
 realm of the current session. You can add an ISSUER (cert_identifier)
 in which case you get only the CRLs issued by this issuer.
-The result is an arrayref of matching entries ordered by last_update, 
-newest first.
+The result is an arrayref of matching entries ordered by last_update,
+newest first. LIMIT has a default of 25.
+VALID_AT accepts a single timestamp and will match all crl which have been
+valid at this moment.
+(this might crash your server if used together with a FORMAT!)
+
 The FORMAT parameter determines the return format:
 
 =over
- 
+
 =item RAW
 
 Bare lines from the database
 
-=item HASH 
+=item HASH
 
 The result of OpenXPKI::Crypto::CRL::get_parsed_ref
 
@@ -289,34 +463,41 @@ The result of OpenXPKI::Crypto::CRL::get_parsed_ref
 
 The data blob in the requested format.
 
-=back 
+=back
 
-=cut 
+=cut
 
 sub get_crl_list {
     ##! 1: "start"
-        
+
     my $self = shift;
     my $keys = shift;
-    
+
     my $pki_realm = $keys->{PKI_REALM};
     $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
-    
-    
-    my $format = $keys->{FORMAT};                      
-             
+
+
+    my $format = $keys->{FORMAT};
+
+    my $limit = $keys->{LIMIT} || 25;
+
     my %dynamic = (
-        'PKI_REALM' => { VALUE => $pki_realm },      
-    );             
-    
-    if ($keys->{ISSUER}) {
-        $dynamic{'ISSUER_IDENTIFIER'} = { VALUE => $keys->{ISSUER} };        
+        'PKI_REALM' => { VALUE => $pki_realm },
+    );
+
+    if ($keys->{VALID_AT}) {
+        $dynamic{'LAST_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'LESS_THAN'};
+        $dynamic{'NEXT_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'GREATER_THAN'};
     }
-             
+
+    if ($keys->{ISSUER}) {
+        $dynamic{'ISSUER_IDENTIFIER'} = { VALUE => $keys->{ISSUER} };
+    }
+
     my $db_results = CTX('dbi_backend')->select(
         TABLE   => 'CRL',
-        COLUMNS => [ 
-            'ISSUER_IDENTIFIER',                        
+        COLUMNS => [
+            'ISSUER_IDENTIFIER',
             'DATA',
             'LAST_UPDATE',
             'NEXT_UPDATE',
@@ -325,72 +506,58 @@ sub get_crl_list {
         DYNAMIC => \%dynamic,
         'ORDER' => [ 'LAST_UPDATE' ],
         'REVERSE' => 1,
+        LIMIT => $limit,
     );
-    
+
     my @result;
-    
+
     if ($format eq 'HASH') {
-        my $default_token = CTX('api')->get_default_token();        
-        foreach my $entry (@{ $db_results }) {           
+        my $default_token = CTX('api')->get_default_token();
+        foreach my $entry (@{ $db_results }) {
             my $crl_obj = OpenXPKI::Crypto::CRL->new(
                 TOKEN => $default_token,
                 DATA  => $entry->{DATA},
-            );                        
+            );
             push @result, $crl_obj->get_parsed_ref();
         }
 
     } elsif ( $format eq 'DER' || $format eq 'TXT' ) {
         my $default_token = CTX('api')->get_default_token();
-        foreach my $entry (@{ $db_results }) {        
+        foreach my $entry (@{ $db_results }) {
             my $output = $default_token->command({
                 COMMAND => 'convert_crl',
                 OUT     => $format,
                 IN      => 'PEM',
                 DATA    => $entry->{DATA},
-            });                
+            });
             if (!$output) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_MISSING_CA_CONFIG',
                     params => { DATA => $entry->{DATA}, SERIAL => $entry->{SERIAL} }
-                        
+
                 );
             }
             push @result, $output;
         }
-                
+
     } elsif($format eq 'PEM') {
         foreach my $entry (@{ $db_results }) {
             push @result, $entry->{DATA};
         }
-              
+
     } else {
         foreach my $entry (@{ $db_results }) {
             push @result, $entry;
-        }    
-    }               
-        
-                  
+        }
+    }
+
+
     ##! 32: "Found crl " . Dumper @result
-    
+
     ##! 1: 'Finished'
     return \@result;
 }
 
-
-
-sub search_cert_count {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    my $result = $self->search_cert($arg_ref);
-
-    if ( defined $result && ref $result eq 'ARRAY' ) {
-        ##! 1: 'array result with ' . scalar @{$result} . ' elements'
-        return scalar @{$result};
-    }
-    return 0;
-}
 
 =head2 search_cert
 
@@ -408,8 +575,6 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * CSR_SERIAL
 
-=item * EMAIL
-
 =item * SUBJECT
 
 =item * ISSUER
@@ -418,6 +583,12 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * VALID_AT
 
+=item * NOTBEFORE/NOTAFTER (less/greater to match "other side" of validity)
+
+=item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR) 
+
+=item * ENTITY_ONLY (show only certificates issued by this ca)
+
 =back
 
 The result is an array of hashes. The hashes do not contain the data field
@@ -425,8 +596,68 @@ of the database to reduce the transport costs an avoid parser implementations
 on the client.
 
 =cut
+sub search_cert {    
+    
+    my $self = shift;
+    my $args = shift;
+    
+    my $params = $self->__search_cert( $args );
+    
+    ##! 16: 'certificate search arguments: ' . Dumper $params
 
-sub search_cert {
+    my $result = CTX('dbi_backend')->select(%{$params});
+    if ( ref $result ne 'ARRAY' ) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
+            params => { 'TYPE' => ref $result, },
+        );
+    }
+    
+    ##! 1: 'Result ' . Dumper $result
+    
+    foreach my $item ( @{$result} ) {
+
+        # remove leading table name from result columns
+        map {
+            my $col = substr( $_, index( $_, '.' ) + 1 );
+            $item->{$col} = $item->{$_};
+            delete $item->{$_};
+        } keys %{$item};
+    }
+
+    ##! 1: "finished"
+    return $result;
+    
+}
+
+=head2 search_cert_count
+
+Same as cert_search, returns the number of matching rows
+
+=cut 
+sub search_cert_count {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $params = $self->__search_cert( $arg_ref );
+    
+    $params->{COLUMNS} = [{ COLUMN   => 'CERTIFICATE.IDENTIFIER', AGGREGATE => 'COUNT' }];
+
+    my $result = CTX('dbi_backend')->select(%{$params});
+   
+    if (!(defined $result && ref $result eq 'ARRAY' && scalar @{$result} == 1)) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_COUNT_SELECT_RESULT_NOT_ARRAY',
+            params => { 'TYPE' => ref $result, },
+        );
+    }
+    
+    return $result->[0]->{'CERTIFICATE.IDENTIFIER'};
+    
+}
+
+sub __search_cert {
     ##! 1: "start"
     my $self = shift;
     my $args = shift;
@@ -442,9 +673,7 @@ sub search_cert {
         'CERTIFICATE.ISSUER_IDENTIFIER',
         'CERTIFICATE.IDENTIFIER',
         'CERTIFICATE.SUBJECT',
-        'CERTIFICATE.EMAIL',
         'CERTIFICATE.STATUS',
-        'CERTIFICATE.ROLE',
         'CERTIFICATE.PUBKEY',
         'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
         'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
@@ -478,13 +707,27 @@ sub search_cert {
         };
     }
 
-    # only search in current realm
-    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} =
-      { VALUE => CTX('session')->get_pki_realm() };
-    $params{REVERSE} = 1;
-    $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL'];
+    # only list entities issued by this ca
+    if ($args->{ENTITY_ONLY}) {
+        $params{DYNAMIC}->{'CERTIFICATE.CSR_SERIAL'} = { VALUE => undef, OPERATOR => 'NOT_EQUAL' };
+    }
 
-	# PKI_REALM overwrites the session realm if it is present	
+    # only search in current realm
+    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} = { VALUE => CTX('session')->get_pki_realm() };
+    
+    
+    # Custom ordering    
+    $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL']; 
+    if ($args->{ORDER}) {
+       $params{ORDER} = [ $args->{ORDER} ]; 
+    }
+        
+    $params{REVERSE} = 1;
+    if (defined $args->{REVERSE}) {
+       $params{REVERSE} = $args->{REVERSE};
+    }
+    
+    # PKI_REALM overwrites the session realm if it is present
     foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS PKI_REALM SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
         if ( $args->{$key} ) {
             $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
@@ -502,11 +745,23 @@ sub search_cert {
         $params{VALID_AT} = $args->{VALID_AT};
     }
 
+    # notbefore/notafter should only be used for timestamps outside
+    # the validity interval, therefore the operators are fixed
+    if ( defined $args->{NOTBEFORE} ) {
+        $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
+              { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
+    }
+
+    if ( defined $args->{NOTAFTER} ) {
+        $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
+              { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
+    }
+
+
     # FIXME - need this for trust anchor and cross realm search
     if ( $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'}->{VALUE} eq '_ANY' ) {
-    	delete $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'};
+        delete $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'};
     }
-    
 
     # handle certificate attributes (such as SANs)
     if ( defined $args->{CERT_ATTRIBUTES} ) {
@@ -519,7 +774,7 @@ sub search_cert {
 
         # we need to join over the certificate_attributes table
         my $ii = 0;
-        foreach my $entry ( @{ $args->{CERT_ATTRIBUTES} } ) {
+        foreach my $attrib ( @{ $args->{CERT_ATTRIBUTES} } ) {
             ##! 16: 'certificate attribute: ' . Dumper $entry
             my $attr_alias = 'CERT_ATTR_' . $ii;
 
@@ -530,36 +785,48 @@ sub search_cert {
             # add join statement
             push @{ $params{JOIN}->[0] }, 'IDENTIFIER';
 
+            my $key   = $attrib->{KEY};
+            my $value = $attrib->{VALUE};
+            my $operator = 'LIKE';
+            $operator = $attrib->{OPERATOR} if($attrib->{OPERATOR});
+
             # add search constraint
             $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_KEY' } =
-              { VALUE => $entry->[0] };
+              { VALUE => $key };
+
+            # sanitize wildcards (don't overdo it...)            
+            $value =~ s/\*/%/g;
+            $value =~ s/%%+/%/g;
             $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_VALUE' } =
-              { VALUE => $entry->[1] };
+                { VALUE =>  $value, OPERATOR => $operator };
             $ii++;
         }
     }
 
-    ##! 16: 'certificate search arguments: ' . Dumper \%params
+    if (  $args->{PROFILE} ) {
 
-    my $result = CTX('dbi_backend')->select(%params);
-    if ( ref $result ne 'ARRAY' ) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
-        );
+        my @join = ('CSR_SERIAL');
+        for (my $i=1; $i < scalar @{ $params{TABLE} }; $i++) {
+           push @join, undef;
+        }
+        push @join, 'CSR_SERIAL';
+
+        # add csr table
+        push @{ $params{TABLE} }, 'CSR';
+
+        # add join statement
+        push @{ $params{JOIN}->[0] }, undef;
+        push @{ $params{JOIN} }, \@join;
+
+        # add search constraint
+        $params{DYNAMIC}->{ 'CSR.PROFILE' } = { VALUE => $args->{PROFILE} };
+
+        $params{VALID_AT} = [ $params{VALID_AT}, undef ] if ($params{VALID_AT});
+
     }
-    foreach my $item ( @{$result} ) {
 
-        # remove leading table name from result columns
-        map {
-            my $col = substr( $_, index( $_, '.' ) + 1 );
-            $item->{$col} = $item->{$_};
-            delete $item->{$_};
-        } keys %{$item};
-    }
+    return \%params;
 
-    ##! 1: "finished"
-    return $result;
 }
 
 =head2 private_key_exists_for_cert
@@ -568,7 +835,7 @@ Checks whether a corresponding CA-generated private key exists for
 the given certificate identifier (named parameter IDENTIFIER).
 Returns true if there is a private key, false otherwise.
 
-=cut 
+=cut
 
 sub private_key_exists_for_cert {
     my $self       = shift;
@@ -588,55 +855,55 @@ extracting the private_key context parameter from the workflow
 with the CSR serial. Returns undef if no CA generated private key
 is available.
 
-=cut 
+=cut
 
 sub __get_private_key_from_db {
     my $self       = shift;
     my $arg_ref    = shift;
-    my $identifier = $arg_ref->{IDENTIFIER};
+    my $cert_identifier = $arg_ref->{IDENTIFIER};
 
     ##! 16: 'identifier: $identifier'
 
-    my $search_result = $self->search_cert( { IDENTIFIER => $identifier, } );
-    ##! 64: 'search result: ' . Dumper $search_result
+    # TODO-MIGRATION - the UI 2.0 workflow stores the key in the datapool
+    # The old workflows have them in the context
 
-    my $csr_serial = $search_result->[0]->{CSR_SERIAL};
-    ##! 64: 'csr_serial: ' . $csr_serial
+    # new workflows
+    my $datapool = CTX('api')->get_data_pool_entry({
+        NAMESPACE   =>  'certificate.privatekey',
+        KEY         =>  $cert_identifier
+    });
 
-    if ( defined $csr_serial ) {
+    if ($datapool) {
+        return $datapool->{VALUE};
+    }
 
-        # search workflows with given CSR serial
-        my $workflows = CTX('api')->search_workflow_instances(
-            {
-                CONTEXT => [
-                    {
-                        KEY   => 'csr_serial',
-                        VALUE => $csr_serial,
-                    },
-                ],
-                TYPE => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-            }
-        );
-        ##! 64: 'workflows: ' . Dumper $workflows
 
-        my @workflow_ids =
-          map { $_->{'WORKFLOW.WORKFLOW_SERIAL'} } @{$workflows};
-        my $workflow_id = $workflow_ids[0];
-        ##! 16: 'workflow_id: ' . Dumper $workflow_id
+    # No key found, check old format
+    my $workflow_id_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => {
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_workflow_csr',
+        },
+    );
 
-        if ( defined $workflow_id ) {
-            my $wf_info = CTX('api')->get_workflow_info(
-                {
-                    WORKFLOW =>
-                      'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-                    ID => $workflow_id,
-                }
-            );
-            ##! 64: 'wf_info: ' . Dumper $wf_info
+    ##! 64: 'workflow_id_result: ' . Dumper $workflow_id_result
+    if (!$workflow_id_result || scalar @{$workflow_id_result} == 0) {
+        return;
+    }
 
-            my $private_key = $wf_info->{WORKFLOW}->{CONTEXT}->{'private_key'};
-            return $private_key;
-        }
+    my $workflow_id = $workflow_id_result->[0]->{ATTRIBUTE_VALUE};
+
+    if ( defined $workflow_id ) {
+
+        my $wf_info = CTX('api')->get_workflow_info({
+            WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
+            ID => $workflow_id,
+        });
+        ##! 64: 'wf_info: ' . Dumper $wf_info
+
+        my $private_key = $wf_info->{WORKFLOW}->{CONTEXT}->{'private_key'};
+        return $private_key;
     }
     return;
 }
@@ -722,13 +989,7 @@ sub get_private_key_for_cert {
         $command_hashref->{OUT} = 'OPENSSL_' . $key_type;
     }
     elsif ( $format eq 'PKCS12' ) {
-        my $certificate = $self->get_cert(
-            {
-                IDENTIFIER => $identifier,
-                FORMAT     => 'PEM',
-            }
-        );
-        ##! 16: 'certificate: ' . $certificate
+        ##! 16: 'identifier: ' . $identifier
 
         my @chain = $self->__get_chain_certificates(
             {
@@ -737,6 +998,9 @@ sub get_private_key_for_cert {
             }
         );
         ##! 16: 'chain: ' . Dumper \@chain
+
+        # the first one is the entity certificate
+        my $certificate = shift @chain;
 
         $command_hashref = {
             COMMAND => 'create_pkcs12',
@@ -757,7 +1021,7 @@ sub get_private_key_for_cert {
             {
                 'IDENTIFIER' => $identifier,
                 'FORMAT'     => 'DER',
-                'COMPLETE'   => 1,
+                'KEEPROOT'   =>  1
             }
         );
         my $decrypted_pkcs8_pem = $default_token->command(
@@ -803,24 +1067,24 @@ sub get_private_key_for_cert {
 =head2 validate_certificate ( { PEM, PKCS7, NOCRL, ANCHOR } )
 
 Validate a certificate by creating the chain. Input can be either a
-single PEM encoded certificate or a PKCS7 container or PEM array with the entity 
-certificate including its chain. 
+single PEM encoded certificate or a PKCS7 container or PEM array with the entity
+certificate including its chain.
 
 if NOCRL is set to 1, no crl checks are done (certificate is marked valid) - *not implemented yet!*:
 
-ANCHOR is an optional list of trust anchors (cert identifiers). If given, the resulting 
-chain is tested against the list. If 
+ANCHOR is an optional list of trust anchors (cert identifiers). If given, the resulting
+chain is tested against the list. If
 
 The return value is a hashref:
 
-=over 
+=over
 
 =item STATUS
 
-The overall status of the validation which is one of: VALID, BROKEN, REVOKED, NOCRL, 
+The overall status of the validation which is one of: VALID, BROKEN, REVOKED, NOCRL,
 NOROOT, (incomplete chain/no root found), UNTRUSTED (got root certificate which is not known).
 
-If ANCHOR is given the result is never VALID but TRUSTED/UNTRUSTED is returned.  
+If ANCHOR is given the result is never VALID but TRUSTED/UNTRUSTED is returned.
 
 =item CHAIN
 
@@ -831,163 +1095,163 @@ The full certifiacte chain as array, starting with the entity.
 =cut
 
 sub validate_certificate {
-    
+
     my $self    = shift;
     my $arg_ref = shift;
     ##! 1: 'start'
 
     my $default_token = CTX('api')->get_default_token();
-    
+
     my @signer_chain;
-    my $chain_status = 'VALID';        
-    
+    my $chain_status = 'VALID';
+
     # Single PEM certificate, try to load the chain from the database
     if ($arg_ref->{PEM} && !ref $arg_ref->{PEM}) {
-    	
-    	##! 8: 'PEM certificate'
-    	my $x509 = OpenXPKI::Crypto::X509->new( DATA => $arg_ref->{PEM}, TOKEN => $default_token );
-    	my $cert_identifier = $x509->get_identifier();
 
-        ##! 16: 'cert_identifier ' . $cert_identifier    
+        ##! 8: 'PEM certificate'
+        my $x509 = OpenXPKI::Crypto::X509->new( DATA => $arg_ref->{PEM}, TOKEN => $default_token );
+        my $cert_identifier = $x509->get_identifier();
+
+        ##! 16: 'cert_identifier ' . $cert_identifier
         my $chain = CTX('api')->get_chain({
             'START_IDENTIFIER' => $cert_identifier,
             'OUTFORMAT'        => 'PEM',
         });
-        
-        ##! 32: 'Chain ' . Dumper $chain        
+
+        ##! 32: 'Chain ' . Dumper $chain
         if (!$chain->{COMPLETE}) {
             return { STATUS => 'NOROOT', CHAIN => $chain->{CERTIFICATES} };
         };
-        
+
         @signer_chain = @{$chain->{CERTIFICATES}};
-                               
+
     } elsif ($arg_ref->{PKCS7} || ref $arg_ref->{PEM} eq "ARRAY") {
 
 
         if ($arg_ref->{PKCS7}) {
-	
-	        ##! 8: 'PKCS7 container'     	           	
-	        # returns the certificate from the p7 in order, entity first           	
-	        @signer_chain = @{ $default_token->command({
-	            COMMAND => 'pkcs7_get_chain',
-	            PKCS7 => $arg_ref->{PKCS7},            
-	        }) };
+
+            ##! 8: 'PKCS7 container'
+            # returns the certificate from the p7 in order, entity first
+            @signer_chain = @{ $default_token->command({
+                COMMAND => 'pkcs7_get_chain',
+                PKCS7 => $arg_ref->{PKCS7},
+            }) };
 
         } else {
-        	##! 8: 'PEM Array'
-        	@signer_chain = @{ $arg_ref->{PEM} };        	
+            ##! 8: 'PEM Array'
+            @signer_chain = @{ $arg_ref->{PEM} };
         }
 
         ##! 32: 'Chain ' . Dumper @signer_chain
-        
-        # Get the topmost issuer from the chain        
+
+        # Get the topmost issuer from the chain
         my $last_in_chain = OpenXPKI::Crypto::X509->new( DATA => $signer_chain[-1], TOKEN => $default_token );
-        
+
 #        my %db_hash = $last_in_chain->to_db_hash();
-        
-        # We use the Authority Key or the Subject as a fallback 
+
+        # We use the Authority Key or the Subject as a fallback
         # to find the next matching certificate in our database
-        my $result; 
+        my $result;
         if (my $issuer_authority_key_id = $last_in_chain->get_authority_key_id()) {
-            ##! 16: ' Search issuer by authority key ' . $issuer_authority_key_id        	
+            ##! 16: ' Search issuer by authority key ' . $issuer_authority_key_id
             $result = CTX('api')->search_cert({
                 SUBJECT_KEY_IDENTIFIER => $issuer_authority_key_id,
-                PKI_REALM => '_ANY' 
-            });            
+                PKI_REALM => '_ANY'
+            });
         } else {
-        	my $issuer_subject = $last_in_chain->get_parsed('BODY','ISSUER');
-        	##! 16: ' Search issuer by subject ' .$issuer_subject  
-        	$result = CTX('api')->search_cert({
+            my $issuer_subject = $last_in_chain->get_parsed('BODY','ISSUER');
+            ##! 16: ' Search issuer by subject ' .$issuer_subject
+            $result = CTX('api')->search_cert({
                 SUBJECT => $issuer_subject,
                 PKI_REALM => '_ANY'
             });
         }
 
-        # Nothing found - check if the issuer is already selfsigned 
+        # Nothing found - check if the issuer is already selfsigned
         if (!$result->[0]) {
             if ($last_in_chain->get_parsed('BODY','ISSUER') ne $last_in_chain->get_parsed('BODY','SUBJECT')) {
-            	##! 16: 'No issuer on top of pkcs7 found'
+                ##! 16: 'No issuer on top of pkcs7 found'
                 return { STATUS => 'NOROOT', CHAIN => \@signer_chain };
             } else {
-            	##! 16: 'Self-Signed pkcs7 chain'            	
-            	$chain_status = 'UNTRUSTED';
-            }        	   	        	        	
+                ##! 16: 'Self-Signed pkcs7 chain'
+                $chain_status = 'UNTRUSTED';
+            }
         } else {
-            ##! 32: 'Result ' . Dumper $result                    
-        	# Check if it is already a root certificate (most likely it is)
-        	if ($result->[0]->{'ISSUER_IDENTIFIER'} eq
-        	  $result->[0]->{'IDENTIFIER'}) {
-        	   	##! 16: 'Next issuer is already a trusted root' 
-        	    
-        	    # Load the PEM from the database        	    
-        	    my $issuer_cert = CTX('api')->get_cert({ IDENTIFIER => $result->[0]->{'IDENTIFIER'}, 'FORMAT' => 'PEM' });
-        	    ##! 32: 'Push PEM of root ca to chain ' . $issuer_cert
+            ##! 32: 'Result ' . Dumper $result
+            # Check if it is already a root certificate (most likely it is)
+            if ($result->[0]->{'ISSUER_IDENTIFIER'} eq
+              $result->[0]->{'IDENTIFIER'}) {
+                   ##! 16: 'Next issuer is already a trusted root'
+
+                # Load the PEM from the database
+                my $issuer_cert = CTX('api')->get_cert({ IDENTIFIER => $result->[0]->{'IDENTIFIER'}, 'FORMAT' => 'PEM' });
+                ##! 32: 'Push PEM of root ca to chain ' . $issuer_cert
                 push @signer_chain, $issuer_cert;
-                
-        	}  else {
-        		
-        		# The first known certificate is an intermediate, so fetch the
-        		# remaining certs to complete the chain
-        		##! 16: 'cert_identifier ' . $cert_identifier    
-		        my $chain = CTX('api')->get_chain({
-		            'START_IDENTIFIER' => $result->[0]->{'IDENTIFIER'},
-		            'OUTFORMAT'        => 'PEM',
-		        });
-		        
-		        push @signer_chain, @{$chain->{CERTIFICATES}};
-		        				         
-		        ##! 32: 'Chain ' . Dumper $chain        
-		        if (!$chain->{COMPLETE}) {
-		            return { STATUS => 'NOROOT', CHAIN => \@signer_chain };
-		        };		        
-        		
-        	}
-        	
+
+            }  else {
+
+                # The first known certificate is an intermediate, so fetch the
+                # remaining certs to complete the chain
+                ##! 16: 'cert_identifier ' . $cert_identifier
+                my $chain = CTX('api')->get_chain({
+                    'START_IDENTIFIER' => $result->[0]->{'IDENTIFIER'},
+                    'OUTFORMAT'        => 'PEM',
+                });
+
+                push @signer_chain, @{$chain->{CERTIFICATES}};
+
+                ##! 32: 'Chain ' . Dumper $chain
+                if (!$chain->{COMPLETE}) {
+                    return { STATUS => 'NOROOT', CHAIN => \@signer_chain };
+                };
+
+            }
+
         }
-        
+
     } else {
-    	 OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_VALIDATE_CERTIFICATE_NO_DATA' );
-    }        
-            
+         OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_VALIDATE_CERTIFICATE_NO_DATA' );
+    }
+
     my @work_chain = @signer_chain;
-    ##! 32: 'Work Chain ' . Dumper @work_chain        
-                       
+    ##! 32: 'Work Chain ' . Dumper @work_chain
+
     my $root = pop @work_chain;
     my $entity = shift @work_chain;
-    
+
     ##! 32: 'Root ' . $root
-    ##! 32: 'Entity' . $entity            
-         
+    ##! 32: 'Entity' . $entity
+
     my $valid = $default_token->command({
         COMMAND => 'verify_cert',
         CERTIFICATE => $entity,
         TRUSTED => $root,
         CHAIN => join "\n", @work_chain
     });
-    
+
     $chain_status = 'BROKEN' unless($valid);
-    
+
     if ($valid && $arg_ref->{ANCHOR}) {
-    	$chain_status = 'UNTRUSTED';
-    	my @trust_anchors = @{$arg_ref->{ANCHOR}};
-    	##! 16: 'Checking valid certificate against trust anchor list'
-    	##! 32: 'Anchors ' . Dumper @trust_anchors  
+        $chain_status = 'UNTRUSTED';
+        my @trust_anchors = @{$arg_ref->{ANCHOR}};
+        ##! 16: 'Checking valid certificate against trust anchor list'
+        ##! 32: 'Anchors ' . Dumper @trust_anchors
         CHECK_CHAIN:
-        foreach my $pem (@signer_chain) {            
-            my $x509 = OpenXPKI::Crypto::X509->new( DATA => $pem, TOKEN => $default_token ); 
-            my $identifier = $x509->get_identifier();           
+        foreach my $pem (@signer_chain) {
+            my $x509 = OpenXPKI::Crypto::X509->new( DATA => $pem, TOKEN => $default_token );
+            my $identifier = $x509->get_identifier();
             ##! 16: 'identifier: ' . $identifier
             if (grep {$identifier eq $_} @trust_anchors) {
-            	##! 16: 'Found on trust anchor list'
+                ##! 16: 'Found on trust anchor list'
                 $chain_status = 'TRUSTED';
                 last CHECK_CHAIN;
             }
         }
     }
-                
+
     return { STATUS => $chain_status, CHAIN => \@signer_chain };
-            
-    
+
+
 }
 
 =head2 get_data_pool_entry
@@ -1010,7 +1274,7 @@ Named parameters:
 =back
 
 Example:
- $tmpval = 
+ $tmpval =
   CTX('api')->get_data_pool_entry(
   {
     PKI_REALM => $pki_realm,
@@ -1028,7 +1292,7 @@ The resulting data structure looks like:
    MTIME           => # date of last modification (epoch)
    EXPIRATION_DATE => # date of expiration (epoch)
    VALUE           => # value
- }; 
+ };
 
 
 
@@ -1094,7 +1358,7 @@ sub get_data_pool_entry {
         # no entry found, do not raise exception but simply return undef
         CTX('log')->log(
             MESSAGE => "Requested data pool entry [$requested_pki_realm:$namespace:$key] not available",
-            PRIORITY => 'info',
+            PRIORITY => 'debug',
             FACILITY => 'system',
         );
         return;
@@ -1112,9 +1376,9 @@ sub get_data_pool_entry {
         if ( $encryption_key =~ m{ \A p7:(.*) }xms ) {
 
             # asymmetric decryption
-            my $safe_id = $1; # This is the alias name of the token, e.g. server-vault-1            
+            my $safe_id = $1; # This is the alias name of the token, e.g. server-vault-1
             my $safe_token = CTX('crypto_layer')->get_token({ TYPE => 'datasafe', 'NAME' => $safe_id});
-            
+
             if ( !defined $safe_token ) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_PASSWORD_TOKEN_NOT_AVAILABLE',
@@ -1251,8 +1515,8 @@ sub get_data_pool_entry {
 
                 my $decrypted_key =
                   CTX('volatile_vault')->decrypt( $cached_key->{DATA} );
-                  
-               ##! 32: 'decrypted_key ' . $decrypted_key 
+
+               ##! 32: 'decrypted_key ' . $decrypted_key
                     ( $algorithm, $iv, $key ) = split( /:/, $decrypted_key );
             }
 
@@ -1287,7 +1551,7 @@ sub get_data_pool_entry {
         $return_value{EXPIRATION_DATE} = $result->{NOTAFTER};
     }
 
-    ##! 32: 'datapool value is ' . Dumper %return_value 
+    ##! 32: 'datapool value is ' . Dumper %return_value
     return \%return_value;
 }
 
@@ -1304,7 +1568,7 @@ Named parameters:
   from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
   session is accepted. If no realm is passed, the current realm is used.
 
-=item * NAMESPACE 
+=item * NAMESPACE
 
 =item * KEY
 
@@ -1314,7 +1578,14 @@ Named parameters:
 
 =item * FORCE - optional, set to 1 in order to force writing entry to database
 
-=item * EXPIRATION_DATE - optional, seconds since epoch. If entry is older than this value the server may delete the entry.
+=item * EXPIRATION_DATE
+
+optional, seconds since epoch. If entry is older than this value the server may delete the entry.
+Default is to keep the value for infinity.
+If you call set_data_pool_entry with the FORCE option to update an exisiting value,
+the (new) expiry date must be passed again or will be reset to inifity!
+To prevent unwanted deletion, a value of 0 is not accepted. Set value to undef
+to delete an entry.
 
 =back
 
@@ -1347,6 +1618,18 @@ sub set_data_pool_entry {
     my $arg_ref = shift;
 
     my $current_pki_realm = CTX('session')->get_pki_realm();
+
+    # Check if key and namespace exists
+    if (!$arg_ref->{NAMESPACE} || !$arg_ref->{KEY}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_NAMESPACE_AND_KEY_ARE_REQUIRED',
+            log => {
+                logger   => CTX('log'),
+                priority => 'error',
+                facility => [ 'system' ],
+            }
+        );
+    }
 
     if ( !defined $arg_ref->{PKI_REALM} ) {
         # modify arguments, as they are passed to the worker method
@@ -1408,12 +1691,12 @@ sub set_data_pool_entry {
     return 1;
 }
 
-=head2 list_data_pool_entries 
+=head2 list_data_pool_entries
 
-List all keys in the datapool in a given namespace. 
+List all keys in the datapool in a given namespace.
 
 
-=over 
+=over
 
 =item * NAMESPACE
 
@@ -1423,8 +1706,8 @@ List all keys in the datapool in a given namespace.
 
 =back
 
-Returns an arrayref of Namespace and key of all entries found. 
- 
+Returns an arrayref of Namespace and key of all entries found.
+
 =cut
 
 sub list_data_pool_entries {
@@ -1434,7 +1717,7 @@ sub list_data_pool_entries {
 
     my $namespace = $arg_ref->{NAMESPACE};
     my $limit = $arg_ref->{LIMIT};
-    
+
     my $current_pki_realm   = CTX('session')->get_pki_realm();
     my $requested_pki_realm = $arg_ref->{PKI_REALM};
 
@@ -1482,25 +1765,25 @@ sub list_data_pool_entries {
     ];
 }
 
-=head2 modify_data_pool_entry 
+=head2 modify_data_pool_entry
 
 This method has two purposes, both require NAMESPACE and KEY.
 B<This method does not modify the value of the entry>.
 
-=over 
+=over
 
-=item Change the entries key  
+=item Change the entries key
 
 Used to update the key of entry. Pass the name of the new key in NEWKEY.
-I<Commonly used to deal with temporary keys> 
+I<Commonly used to deal with temporary keys>
 
 =item Change expiration information
 
 Set the new EXPIRATION_DATE, if you set the parameter to undef, the expiration
-date is set to infity. 
+date is set to infity.
 
 =back
- 
+
 
 =cut
 
@@ -1597,9 +1880,71 @@ sub modify_data_pool_entry {
         WHERE => \%condition,
     );
     CTX('dbi_backend')->commit();
-    
+
     return 1;
 }
+
+
+=head2 control_watchdog { ACTION => (START|STOP) }
+
+Start ot stop the watchdog.
+
+=cut
+sub control_watchdog {
+
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $action = $arg_ref->{ACTION};
+
+    if ($action =~ /STOP/i) {
+
+        if (!OpenXPKI::Server::Context::hascontext('watchdog')) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_NO_WATCHDOG'
+            );
+        }
+
+        CTX('log')->log(
+            MESSAGE => "Watchdog termination requested via API",
+            PRIORITY => 'info',
+            FACILITY => 'system',
+        );
+
+        CTX('watchdog')->terminate();
+
+    } elsif ($action =~ /START/i) {
+
+        if (!OpenXPKI::Server::Context::hascontext('watchdog')) {
+            OpenXPKI::Server::Context::setcontext({
+                watchdog => OpenXPKI::Server::Watchdog->new()
+            });
+        }
+
+        my $worker = CTX('watchdog')->run();
+        return $worker;
+
+
+    } elsif ($action =~ /STATUS/i) {
+
+        my $result = OpenXPKI::Control::get_pids();
+
+        return {
+            pid => $result->{watchdog},
+            children => ref $result->{workflow} ? scalar @{$result->{workflow}} : 0
+        }
+
+    } else {
+
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_INVALID_ACTION',
+            params => {
+                ACTION => $action,
+        });
+
+    }
+}
+
 
 # internal worker function, accepts more parameters than the API function
 # named attributes:
@@ -1640,7 +1985,7 @@ sub __set_data_pool_entry : PRIVATE {
                 TABLE => 'DATAPOOL',
                 DATA  => { %key, },
             );
-            CTX('dbi_backend')->commit();            
+            CTX('dbi_backend')->commit();
         };
         return 1;
     }
@@ -1700,10 +2045,8 @@ sub __set_data_pool_entry : PRIVATE {
         }
     }
 
-    if ( defined $expiration_date ) {
-        if (   ( $expiration_date < 0 )
-            || ( $expiration_date > 0 && $expiration_date < time ) )
-        {
+    if ( defined $expiration_date
+        && $expiration_date < time ) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE',
                 params => {
@@ -1718,14 +2061,13 @@ sub __set_data_pool_entry : PRIVATE {
                     facility => [ 'system', ],
                 },
             );
-        }
     }
 
     my $encryption_key_id = '';
 
     if ($encrypt) {
         my $token = CTX('api')->get_default_token();
-        
+
         if ( $encrypt eq 'current_symmetric_key' ) {
 
             my $encryption_key = $self->__get_current_datapool_encryption_key($current_pki_realm);
@@ -1742,12 +2084,12 @@ sub __set_data_pool_entry : PRIVATE {
         elsif ( $encrypt eq 'password_safe' ) {
 
             # prefix 'p7' for PKCS#7 encryption
-            
+
             my $safe_id = CTX('api')->get_token_alias_by_type({ TYPE => 'datasafe' });
             $encryption_key_id = 'p7:' . $safe_id;
 
             my $cert = CTX('api')->get_certificate_for_alias({ ALIAS => $safe_id });
-              
+
             ##! 16: 'cert: ' . $cert
             if ( !defined $cert ) {
                 OpenXPKI::Exception->throw(
@@ -1792,19 +2134,21 @@ sub __set_data_pool_entry : PRIVATE {
 
     if ( defined $expiration_date ) {
         $values{NOTAFTER} = $expiration_date;
+    } else {
+        $values{NOTAFTER} = undef;
     }
 
     my $rows_updated;
     if ($force) {
 
-       # force means we can overwrite entries, so first try to update the value.
+        # force means we can overwrite entries, so first try to update the value.
         $rows_updated = CTX('dbi_backend')->update(
             TABLE => 'DATAPOOL',
-            DATA  => { %values, },
+            DATA  => { %values },
             WHERE => \%key,
         );
         if ($rows_updated) {
-            CTX('dbi_backend')->commit();            
+            CTX('dbi_backend')->commit();
             return 1;
         }
 
@@ -1816,7 +2160,7 @@ sub __set_data_pool_entry : PRIVATE {
             TABLE => 'DATAPOOL',
             HASH  => { %key, %values, },
         );
-        CTX('dbi_backend')->commit();        
+        CTX('dbi_backend')->commit();
     };
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         if ( $exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_EXECUTE_FAILED' )
@@ -1853,7 +2197,7 @@ sub __cleanup_data_pool : PRIVATE {
         TABLE => 'DATAPOOL',
         DATA  => { NOTAFTER => [ '<', time ], }
     );
-    CTX('dbi_backend')->commit();    
+    CTX('dbi_backend')->commit();
     return 1;
 }
 
@@ -1870,9 +2214,9 @@ sub __get_current_datapool_encryption_key : PRIVATE {
     my $token = CTX('api')->get_default_token();
 
     # FIXME - Realm Switch
-    # get symbolic name of current password safe (e. g. 'passwordsafe1')    
+    # get symbolic name of current password safe (e. g. 'passwordsafe1')
     my $safe_id = CTX('api')->get_token_alias_by_type({ TYPE => 'datasafe' });
-    
+
     ##! 16: 'current password safe id: ' . $safe_id
 
     # the password safe is only used to encrypt the key for a symmetric key
@@ -1990,7 +2334,7 @@ sub __get_current_datapool_encryption_key : PRIVATE {
                     },
                 );
             }
- 
+
             ( $algorithm, $iv, $key ) = split( /:/, $data->{VALUE} );
 
             # cache encryption key in volatile vault
@@ -2004,7 +2348,7 @@ sub __get_current_datapool_encryption_key : PRIVATE {
                         GROUP_ID  => $associated_vault_key_id,
                     },
                 );
-                CTX('dbi_backend')->commit();                
+                CTX('dbi_backend')->commit();
             };
 
         }
@@ -2027,16 +2371,21 @@ sub __get_chain_certificates {
     my $identifier = $arg_ref->{IDENTIFIER};
     my $format     = $arg_ref->{FORMAT};
 
-    my @chain = @{
-        CTX('api')->get_chain(
+    ##! 4: Dumper $arg_ref
+
+    my $chain_ref = CTX('api')->get_chain(
             {
                 'START_IDENTIFIER' => $identifier,
                 'OUTFORMAT'        => $format,
             }
-          )->{CERTIFICATES}
-      };
-    if ( !$arg_ref->{COMPLETE} ) {
-        shift @chain;    # we don't need the first element
+      );
+
+    my @chain = @{ $chain_ref->{CERTIFICATES} };
+    ##! 16: 'Chain ' . Dumper $chain_ref
+
+    # pop off root certificates
+    if ( $chain_ref->{COMPLETE} && scalar @chain > 1 && !$arg_ref->{KEEPROOT} ) {
+        pop @chain;    # we don't need the first element
     }
     ##! 1: 'end'
     return @chain;

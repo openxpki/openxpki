@@ -16,41 +16,31 @@ sub execute {
     ##! 1: 'execute'
     
     my $self       = shift;
-    my $workflow   = shift;
+    my $workflow   = shift;    
     my $context = $workflow->context();
-    	
-    my $params = $self->param();
     
     my $ser  = OpenXPKI::Serialization::Simple->new();
     
-    my $namespace = $params->{'namespace'};
+    my $namespace = $self->param('namespace');
     $namespace  = 'certificate.export.default' unless($namespace);
        
     ##! 16: 'namespace: ' . $namespace  
 
-    # Check for mapping params
-    my $vars = {};
-    foreach my $key (keys %{$params}) {
-        if ($key !~ /^_map_(.*)/) { next; }
-        my $name = $1;
-        my $val = $params->{$key};
-        ##! 8: 'Found param ' . $name . ' - value : ' . $val
-                
-        # copy from context?
-        if ($val =~ /^\$(\S+)/) {
-            my $ctx = $1;
-            ##! 16: 'resolve context key ' . $ctx 
-            $val = $context->param($ctx);             
-            $vars->{$name} = $val if($val);    
-        } else { 
-            $vars->{$name} = $val;
-        } 
-                
-    }
+    my @attrs = split /,/, $self->param('attribs');
+    my $export = {};
+    foreach my $key (@attrs) {
+       $export->{$key} = $self->param($key) || '';  
+    }    
 
-    ##! 16: 'Mapping attributes: ' . Dumper $vars  
+    CTX('log')->log(
+        MESSAGE  => "prepare cert ".$context->param( 'cert_identifier' )." for export",
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
+
+    ##! 16: 'Mapping attributes: ' . Dumper $export  
     
-    CTX('api')->set_data_pool_entry({'NAMESPACE' => $namespace, 'KEY' => $context->param( 'cert_identifier' ), 'VALUE' => $ser->serialize( $vars ), 'FORCE' => 1 });
+    CTX('api')->set_data_pool_entry({'NAMESPACE' => $namespace, 'KEY' => $context->param( 'cert_identifier' ), 'VALUE' => $ser->serialize( $export ), 'FORCE' => 1 });
 
     return 1;
 	

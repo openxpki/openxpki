@@ -16,6 +16,7 @@ my %outfile_of :ATTR;
 my %tmp_of     :ATTR;
 my %chain_of   :ATTR;
 my %engine_of  :ATTR;
+my %hash_alg_of  :ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -24,12 +25,13 @@ sub START {
     $engine_of{$ident} = $arg_ref->{ENGINE};
     $tmp_of   {$ident} = $arg_ref->{TMP};
     $chain_of {$ident} = $arg_ref->{CHAIN};
+    $hash_alg_of {$ident} = $arg_ref->{HASH_ALG};
 }
 
 sub get_command {
     my $self  = shift;
     my $ident = ident $self;
-    
+
     # keyfile, signcert, passin
     if (! defined $engine_of{$ident}) {
         OpenXPKI::Exception->throw(
@@ -49,7 +51,7 @@ sub get_command {
             message => 'I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_CREATE_NEXTCA_REPLY_CERTFILE_MISSING',
         );
     }
-   
+
     $ENV{pwd}    = $engine_of{$ident}->get_passwd();
 
     my $chain_filename = $fu_of{$ident}->get_safe_tmpfile({
@@ -62,9 +64,14 @@ sub get_command {
         FILENAME => $chain_filename,
         CONTENT  => $chain_of{$ident},
         FORCE    => 1,
-    }); 
-    
-    my $command = " -new -passin env:pwd -signcert $certfile -msgtype GetNextCACert -keyfile $keyfile -nextCAfile $chain_filename -inform PEM -outform DER -out $outfile_of{$ident} "; 
+    });
+
+    my $command = " -new -passin env:pwd -signcert $certfile -msgtype GetNextCACert -keyfile $keyfile -nextCAfile $chain_filename -inform PEM -outform DER -out $outfile_of{$ident} ";
+
+    if ($hash_alg_of{$ident}) {
+        $command .= ' -'.$hash_alg_of{$ident};
+    }
+
     ##! 16: 'scep cli ' . $command
     return $command;
 }

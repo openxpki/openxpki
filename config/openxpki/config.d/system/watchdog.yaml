@@ -1,0 +1,12 @@
+max_fork_redo: 5
+max_exception_threshhold: 10
+interval_sleep_exception: 60
+max_tries_hanging_workflows:  3
+
+interval_wait_initial: 30
+interval_loop_idle: 5
+interval_loop_run: 1
+
+# You should not change this unless you know what you are doing
+max_instance_count: 1
+disabled: 0

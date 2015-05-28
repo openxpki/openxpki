@@ -39,10 +39,16 @@ sub getHandler {
       		message => "I18N_OPENXPKI_SERVER_NICE_NO_SUCH_BACKEND",
       		params => { 
       		    backend => $backend,
-      		    class =>  $BackendClass
+      		    class =>  $BackendClass,
+      		    error => $EVAL_ERROR
       		}                  
     	);        
-    }	
+    }
+    CTX('log')->log(
+        MESSAGE => "NICE backend $backend loaded, execute $activity->name", 
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 	
     return $BackendClass->new( $activity );
 	 	
 }

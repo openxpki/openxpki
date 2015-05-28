@@ -10,7 +10,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 
 use Data::Dumper;
 
@@ -60,6 +60,12 @@ sub execute {
     # remove leading null bytes for hash computation
     $modulus =~ s/^(?:00)+//g;
     my $key_id = sha1_hex(pack('H*', $modulus));
+    
+    CTX('log')->log(
+        MESSAGE => 'calculated key id is ' . $key_id,
+        PRIORITY => 'debug',
+        FACILITY => [ 'application' ],
+    );
     
     ##! 16: 'pkcs11 plugin keyid hash: ' . $key_id
     

@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+my $csr_filename = shift @ARGV;
+
+if ( my $tmode = $ENV{SCEP_MOCK_TESTMODE} ) {
+    if ( $tmode eq 'ERR_NOTFOUND' ) {
+        die "$0: error - file not found";
+    }
+}
+
+if ( not length($csr_filename) ) {
+    die "$0: no CSR filename specified";
+}
+
+if ( not -f $csr_filename ) {
+    die "$0: $csr_filename does not exist";
+}
+
+print "sscep-mock OK\n";
+

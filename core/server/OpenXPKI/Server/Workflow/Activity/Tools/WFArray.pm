@@ -51,6 +51,13 @@ sub execute {
     my $array = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
         { workflow => $wf, context_key => $self->array_name } );
 
+    CTX('log')->log(
+        MESSAGE => "Mangling wf array ".$self->array_name." with $function",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    );         
+     
+
     # read operations that do not take a parameter
     if ( $function =~ m/^(pop|shift|count)$/ ) {
         my $ret = $array->$function;

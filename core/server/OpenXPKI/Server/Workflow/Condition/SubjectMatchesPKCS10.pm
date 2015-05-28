@@ -59,6 +59,12 @@ sub evaluate {
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
             );
     }
+    
+    CTX('log')->log(
+        MESSAGE => "Subject mismatch $subject != $parsed_subject",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
        
     condition_error( "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SUBJECT_MISMATCH_PKCS10" ) 
         if ( $subject != $parsed_subject );

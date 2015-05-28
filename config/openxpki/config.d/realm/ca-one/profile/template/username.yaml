@@ -1,0 +1,7 @@
+id: username
+label: I18N_OPENXPKI_UI_PROFILE_USERNAME
+description: I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC
+type: freetext
+match: \A [A-Za-z0-9\.]+ \z
+width: 20
+default: testuser

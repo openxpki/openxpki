@@ -1,0 +1,128 @@
+Certificate:
+    type: ClientX509
+    label: Certificate
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
+    role:
+        default: User
+        handler@: connector:auth.connector.role
+        argument: cn
+    cacert: Piv38gMblvOM5sTYqF0-LVhHag8
+        
+Signature:
+    type: ChallengeX509
+    label: Signature
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
+    challenge_length: 256
+    role: 
+        default: 'User'
+        handler@: connector:auth.connector.role
+        argument: cn
+    # define your trust anchors here
+    # Allows every known user of the realm to login
+    realm:
+        - ca-one 
+    cacert:
+        - list of extra cert identifiers
+        
+Anonymous:
+    type: Anonymous
+    label: Anonymous
+
+User NoAuth:
+    type: External
+    label: User
+    command: /bin/true
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_USER
+    role: User
+    env:
+       LOGIN: __USER__
+ 
+User Password:
+    type: Password
+    label: User Password
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
+    # Users are taken from a yaml file using a connector
+    user@: connector:auth.connector.userdb
+
+Operator Password:
+    type: Password
+    label: Operator Password
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
+    # The passwords can be generated with "openxpkiadm hashpwd"
+    # The password below is "openxpki" for all three users
+    user:
+        caop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: CA Operator
+        raop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator
+        raop2:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator 
+
+External Dynamic Role:
+    type: External
+    label: External Dynamic Role
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL
+    command: echo -n $PASSWD
+    # if this field is empty then the role is determined dynamically -->
+    role: ''
+    pattern: x
+    replacement: x
+    env:
+       LOGIN: __USER__
+       PASSWD: __PASSWD__
+
+External Static Role:
+    type: External
+    label: External Static Role
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL
+    command: echo -n $PASSWD
+    role: RA Operator
+    pattern: x
+    replacement: x
+    env:
+       LOGIN: __USER__
+       PASSWD: __PASSWD__
+
+System:
+    type: Anonymous
+    label: System
+    role: System
+
+SmartCard:
+    type: Anonymous
+    label: SmartCard
+    role: SmartCard
+
+# Sample using a Password "bind" connector
+Password Connector:
+    type: Connector
+    label: User Password
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD   
+    role: User
+    source@: connector:auth.connector.localuser
+
+# Accounts for testing, Password for all accounts is "openxpki"
+TestAccounts:
+    type: Password
+    label: Test Accounts
+    user:
+        caop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: CA Operator
+        raop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator
+        raop2:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator 
+        user:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: User 
+        user2:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: User
+
+

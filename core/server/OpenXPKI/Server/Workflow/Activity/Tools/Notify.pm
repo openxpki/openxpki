@@ -18,12 +18,14 @@ sub execute {
     ##! 1: 'start'
     my $self     = shift;
     my $workflow = shift;
+    
     my $context  = $workflow->context();
     my $params = $self->param();
     
     my $ser  = OpenXPKI::Serialization::Simple->new();
     
     my $message  = $params->{'message'};
+    delete $params->{'message'};
     ##! 16: 'message: ' . $message
 
     if (! defined $message) {
@@ -31,52 +33,28 @@ sub execute {
             'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_NOTIFY_MESSAGE_UNDEFINED',
         );
     }
+     
     
-    
-    
-    ##! 32: 'Params ' . Dumper $params
-    # Check for mapping params
-    my $vars = {};
-    foreach my $key (keys %{$params}) {
-        if ($key !~ /^_map_(.*)/) { next; }
-        my $name = $1;
-        my $val = $params->{$key};
-        ##! 8: 'Found param ' . $name . ' - value : ' . $val
-                
-        # copy from context?
-        if ($val =~ /^\$(\S+)/) {
-            my $ctx = $1;
-            ##! 16: 'resolve context key ' . $ctx              
-            if ($context->param($ctx) =~ m{ \A HASH | \A ARRAY }xms) {
-                # need deserialize
-                ##! 32: ' needs deserialize '                 
-                $vars->{$name} = $ser->deserialize( $context->param($ctx) );
-            } else {
-                $vars->{$name} = $context->param($ctx);    
-            }
-        } else { 
-            $vars->{$name} = $val;
-        } 
-        
-        
-    }
-    ##! 16: 'Extended vars: ' . Dumper $vars  
-    
+    ##! 16: 'Extended vars: ' . Dumper $params  
         
     # Look if there are stored notification handles
     my $handles;
-    if ($workflow) {
-        my $notify = $context->param('wfl_notify');
-        $handles = $ser->deserialize( $notify  ) if ($notify);
-        ##! 32: 'Found persisted data: ' . Dumper $handles  
-    }
+    my $notify = $context->param('wfl_notify');
+    $handles = $ser->deserialize( $notify  ) if ($notify);
+    ##! 32: 'Found persisted data: ' . Dumper $handles  
+        
+    CTX('log')->log(
+        MESSAGE => 'Trigger notification message ' .$message,    
+        PRIORITY => 'info',
+        FACILITY => [ 'application' ],
+    );  
     
     # Re-Assign the handles from the return value 
     $handles = CTX('notification')->notify({
         MESSAGE => $message,
         WORKFLOW => $workflow,         
         TOKEN => $handles,
-        DATA => $vars
+        DATA => $params
     });
         
     if (defined $handles) {

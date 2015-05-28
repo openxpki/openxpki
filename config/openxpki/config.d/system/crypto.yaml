@@ -1,0 +1,35 @@
+# API classs to be used for different types of *realm* tokens 
+# Undefined values default to OpenXPKI::Crypto::Backend::API
+tokenapi:
+  certsign:      OpenXPKI::Crypto::Backend::API
+  crlsign:       OpenXPKI::Crypto::Backend::API
+  datasafe:      OpenXPKI::Crypto::Backend::API
+  scep:          OpenXPKI::Crypto::Tool::SCEP::API
+
+
+# System wide token (non key based tokens)
+token:
+    default:
+        backend: OpenXPKI::Crypto::Backend::OpenSSL
+        api:     OpenXPKI::Crypto::Backend::API
+        engine:  OpenSSL
+        key_store: OPENXPKI
+
+        # OpenSSL binary location
+        shell: /usr/bin/openssl
+
+        # OpenSSL binary call gets wrapped with this command
+        wrapper: ''
+
+        # random file to use for OpenSSL
+        randfile: /var/openxpki/rand       
+     
+    javaks:
+        backend: OpenXPKI::Crypto::Tool::CreateJavaKeystore
+        api: OpenXPKI::Crypto::Tool::CreateJavaKeystore::API    
+        engine:  OpenSSL        
+        key_store: OPENXPKI
+        shell: /usr/bin/openssl
+        randfile: /var/openxpki/rand       
+
+

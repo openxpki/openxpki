@@ -1,0 +1,93 @@
+head:
+    prefix: capub
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC
+    persister: Volatile
+
+state:
+    CREATE_QUEUE:
+        autorun: 1
+        action:
+          - create_ca_list > LOAD_NEXT_CA
+
+    INITIAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC
+        action:
+          - initialize > CREATE_QUEUE
+
+    PUBLISH_CACERT:
+        autorun: 1
+        action:
+          - publish_cacert > PUBLISH_CRL
+
+    LOAD_NEXT_CA:
+        autorun: 1
+        action:
+          - get_next_ca > PUBLISH_CACERT ? !is_ca_list_empty
+          - global_noop > SUCCESS ? is_ca_list_empty
+
+    PUBLISH_CRL:
+        autorun: 1
+        action:
+          - publish_crl > LOAD_NEXT_CA
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC
+
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+
+    create_ca_list:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
+        param:
+            token: certsign
+
+    publish_cacert:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCA
+        input:
+          - ca_alias
+        param:
+            prefix: publishing.cacert
+
+    publish_crl:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
+        input:
+          - ca_alias
+        param:
+            prefix: publishing.crl
+            crl_serial: latest
+
+    get_next_ca:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: token_alias_list
+            context_key: ca_alias
+            function: shift
+
+condition:
+    is_ca_list_empty:
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param:
+            array_name: token_alias_list
+            condition: is_empty
+
+
+field:
+    ca_alias:
+        name: ca_alias
+        type: text
+
+acl:
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+
+    System:
+        creator: any
+

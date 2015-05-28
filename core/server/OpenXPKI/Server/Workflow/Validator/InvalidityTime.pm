@@ -20,6 +20,7 @@ sub validate {
     my $context = $wf->context();
     my $invalidity_time = $context->param('invalidity_time');
     my $identifier      = $context->param('cert_identifier');
+    my $flag_delayed_revoke = $context->param('flag_delayed_revoke');
     if (! $identifier =~ m{ [a-zA-Z\-_]+ }xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
@@ -86,7 +87,9 @@ sub validate {
 	    },
         );
     }
-    if ($invalidity_time > $now) {
+       
+    # We accept delayed requests if the "delayed_revoke" flag is set  
+    if ($invalidity_time > $now && not $flag_delayed_revoke) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE',
 	    log => {

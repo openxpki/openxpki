@@ -53,6 +53,13 @@ sub evaluate
     );
     ##! 16: 'status: ' . $cert->{'STATUS'}
     
+    CTX('log')->log(
+        MESSAGE => "Cert status check failed: ".$cert->{'STATUS'}. " != ".$self->expected_status,
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+    
+    
     if ($cert->{'STATUS'} ne $self->expected_status) {
         condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH';
     }

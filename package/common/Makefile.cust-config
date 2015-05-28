@@ -1,0 +1,63 @@
+#
+# package/common/Makefile-cust-config.inc
+#
+# USAGE:
+#
+# In a separate working repository, create a Makefile with
+# the following contents:
+#
+#   TOPDIR=../openxpki
+#   PKGNAME=xyz-openxpki-config
+#
+#   include $(TOPDIR)/package/common/Makefile-cust-config.inc
+#
+# NOTE:
+#
+# For local settings, the file Makefile.local is 'include'd by
+# this Makefile. For example, the Makefile would be managed by
+# the version control system while Makefile.local is not.
+#
+
+
+# Allow for local mods that aren't checked into git
+-include Makefile.local
+
+# More common stuff from OpenXPKI
+-include $(TOPDIR)/package/common/Makefile.inc
+
+VERGEN=$(TOPDIR)/tools/vergen
+
+# append additional symbols for the spec file generation
+TT_VERSION_SYMBOLS += --define PKGNAME=$(PKGNAME)
+
+config: check package/SPECS/$(PKGNAME).spec.template package/SPECS/$(PKGNAME).spec build-package
+
+check:
+	@if [ ! -d "$(TOPDIR)" ] ; then \
+		echo "ERROR: TOPDIR not set to directory" ; \
+		exit 1;\
+	fi ; \
+	for cmd in "$(VERGEN)" tpage; do \
+		if ! $$cmd </dev/null >/dev/null 2>&1; then \
+			echo "ERROR: executable '$$cmd' does not work properly." ; \
+			exit 1; \
+		fi ; \
+	done
+
+$(HOME)/rpmbuild/SOURCES/$(PKGNAME).tar.gz:
+	( cd files && git archive --format=tar HEAD ) | \
+		gzip -c > $@
+
+package/SPECS/$(PKGNAME).spec.template:
+	cp package/SPECS/system-config.spec $@
+
+build-package: $(HOME)/rpmbuild/SOURCES/$(PKGNAME).tar.gz package/SPECS/$(PKGNAME).spec
+	rpmbuild -ba package/SPECS/$(PKGNAME).spec
+	rm -f $(HOME)/rpmbuild/SOURCES/$(PKGNAME).tar.gz
+
+.PHONY:
+clean:
+	rm -f \
+		$(HOME)/rpmbuild/SOURCES/$(PKGNAME).tar.gz \
+		package/SPECS/$(PKGNAME).spec.template \
+		package/SPECS/$(PKGNAME).spec

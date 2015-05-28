@@ -23,11 +23,27 @@ ifneq (EXISTS, $(shell test -x $(VERGEN) && echo "EXISTS"))
 $(error Command 'vergen' not found at $(VERGEN). Hint: does TOPDIR really point to the top of this repository?)
 endif
 
+# For the Packager field in the RPM files
+ifndef GIT_AUTHOR_NAME
+GIT_AUTHOR_NAME := $(shell git config --get user.name)
+endif
+ifndef GIT_AUTHOR_EMAIL
+GIT_AUTHOR_EMAIL := $(shell git config --get user.email)
+endif
+
+PACKAGER := $(strip $(GIT_AUTHOR_NAME) <$(GIT_AUTHOR_EMAIL)>)
+
+# $(call assert-packager)
+define assert-packager
+  $(if $(subst <>,,$(PACKAGER)),,\
+      $(error ERROR: You must set GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL))
+endef
+
 # all vergen symbols in tpage(1) compatible format
 TT_VERSION_SYMBOLS = $(shell \
 	$(VERGEN) --dump --dumpformat "--define KEYWORD=\"VALUE\" " 2>/dev/null ; \
 	for i in `$(VERGEN) --list-formats` ; do value=`$(VERGEN) --format $$i 2>/dev/null` ; [ -n "$$value" ] && echo "--define $$i=\"$$value\"" ; done \
-)
+) --define PACKAGER="$(PACKAGER)"
 
 .SUFFIXES: .template
 

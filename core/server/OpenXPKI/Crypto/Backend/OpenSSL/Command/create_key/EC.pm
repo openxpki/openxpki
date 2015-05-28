@@ -20,7 +20,7 @@ sub new {
     return $self;
 }
 
-sub verify_params 
+sub verify_params
 {
     my $self = shift;
 
@@ -34,17 +34,19 @@ sub verify_params
         $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} ne "des")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_ENC_ALG",
+            params => { ENC_ALG => $self->{PARENT_REF}->{PARAMETERS}->{ENC_ALG} });
     }
 
-    if ($self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^(secp|prime|sect|c2pnb|c2tnb)[1-9][0-9]{2}?[krvw][1-3]$/i and
+    if ($self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^(secp|prime|sect|c2pnb|c2tnb)[1-9][0-9]{2}[krvw][1-3]$/i and
         #there is no default algorithm!!!
         #$self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^$/ and
         $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^Oakley-EC2N-[34]$/ and
         $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} !~ /^wap-wsg-idm-ecid-wtls[0-9]*$/)
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_EC_CURVE_NAME");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_KEY_WRONG_EC_CURVE_NAME",
+            params => { EC_CURVE_NAME => $self->{PARENT_REF}->{PARAMETERS}->{CURVE_NAME} });
     }
 
     return 1;
@@ -92,7 +94,7 @@ This function verifies EC-specific algorithm parameters.
 
 =head2 get_command
 
-This is an implementation of the 
+This is an implementation of the
 OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key::get_command
 for EC algorithm.
 

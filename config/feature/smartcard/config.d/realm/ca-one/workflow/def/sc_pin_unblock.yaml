@@ -1,0 +1,287 @@
+head:
+    prefix: scunblock
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PIN_UNBLOCK_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PIN_UNBLOCK_DESC
+
+state:
+    CAN_FETCH_PUK: 
+        action: 
+          - fetch_puk > CAN_WRITE_PIN
+
+    CAN_WRITE_PIN: 
+        action: 
+          - write_pin_nok > FAILURE
+          - write_pin_ok > SUCCESS
+          - initialize > HAVE_TOKEN_ID
+
+    CHECK_FOR_ACT_HASHES: 
+        autorun: 1
+        action: 
+          - global_noop > PEND_PIN_CHANGE ? have_both_hashes
+          - global_noop2 > PEND_ACT_CODE ? !have_both_hashes
+
+    CHECK_MAX_PIN_ITERAT: 
+        autorun: 1
+        action: 
+          - global_noop > FAILURE ? max_iterations_reached
+          - global_noop2 > PEND_PIN_CHANGE ? !max_iterations_reached
+
+    CHECK_TOKEN_OWNER: 
+        autorun: 1
+        action: 
+          - set_workflow_attributes > HAVE_TOKEN_OWNER ? ldap_mail_set
+          - global_noop > FAILURE ? !ldap_mail_set
+
+    FAILURE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC
+
+    HAVE_AUTH_IDS: 
+        autorun: 1
+        action: 
+          - auth_ldap_err > HAVE_TOKEN_OWNER ? !ids_found_in_LDAP
+          - scpu_notify_auth_contact > PEND_ACT_CODE ? ids_found_in_LDAP
+
+    HAVE_CODES: 
+        autorun: 1
+        action: 
+          - global_noop > CAN_FETCH_PUK ? auth_codes_valid
+          - global_noop2 > CHECK_MAX_PIN_ITERAT ? !auth_codes_valid
+
+    HAVE_TOKEN_ID: 
+        autorun: 1
+        action: 
+          - get_user_data > CHECK_TOKEN_OWNER
+
+    HAVE_TOKEN_OWNER: 
+        action: 
+          - initialize > HAVE_TOKEN_ID
+          - user_abort > FAILURE
+          - store_auth_ids reset_ldap_err get_auth1_id get_auth2_id > HAVE_AUTH_IDS
+
+    INITIAL: 
+        action: 
+          - initialize > HAVE_TOKEN_ID
+
+    PEND_ACT_CODE: 
+        action: 
+          - user_abort > FAILURE
+          - initialize > HAVE_TOKEN_ID
+          - generate_activation_code > CHECK_FOR_ACT_HASHES
+
+    PEND_PIN_CHANGE: 
+        action: 
+          - user_abort > FAILURE
+          - post_codes > HAVE_CODES
+          - initialize > HAVE_TOKEN_ID
+          - generate_activation_code > CHECK_FOR_ACT_HASHES
+
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC
+
+
+action:
+    scpu_notify_auth_contact: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param: 
+            _map_auth1_mail: $auth1_mail
+            _map_auth1_name: $auth1_cn
+            _map_auth2_mail: $auth2_mail
+            _map_auth2_name: $auth2_cn
+            _map_requestor_mail: $owner_mail
+            _map_requestor_name: $owner_cn
+            message: scpu_notify
+
+    auth_ldap_err: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        param: 
+            error_code: Auth persons not accepted
+
+    fetch_puk: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::FetchPUK
+        input: 
+          - token_id
+        param: 
+            description: Fetch PUK from datapool
+            ds_key_param: token_id
+            ds_namespace: smartcard.puk
+            ds_value_param: _puk
+
+    generate_activation_code: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::GenerateActivationCode
+
+    get_auth1_id: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+        param: 
+            mode: map
+            config_prefix: smartcard.users.by_mail
+            _map_config_key: "[% context.auth1_id %]"        
+            attrmap: auth1_mail -> mail, auth1_cn -> cn
+
+    get_auth2_id: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+        param: 
+            mode: map
+            config_prefix: smartcard.users.by_mail
+            _map_config_key: "[% context.auth2_id %]"        
+            attrmap: auth2_mail -> mail, auth2_cn -> cn
+
+    get_user_data: 
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::GetOwnerByCardID
+
+    initialize: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        input: 
+          - token_id
+        param: 
+            description: Initialize the Workflow
+            SetContextParameters: overwritecontext
+            _auth1_code: ''
+            _auth2_code: ''
+            _password: ''
+            _puk: ''
+            auth1_cn: ''
+            auth1_hash: ''
+            auth1_id: ''
+            auth1_mail: ''
+            auth2_cn: ''
+            auth2_hash: ''
+            auth2_id: ''
+            auth2_mail: ''
+            num_tries: ''
+            owner_cn: ''
+            owner_mail: ''
+            wfl_notify: ''
+ 
+    post_codes: 
+        class: Workflow::Action::Null
+        input: 
+          - _auth1_code
+          - _auth2_code
+
+    reset_ldap_err: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        param: 
+            error_code: ''
+
+    set_workflow_attributes: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        param: 
+            _map_token_id: $token_id
+            _map_card_owner: $owner_mail
+
+    store_auth_ids: 
+        class: Workflow::Action::Null
+        input: 
+          - auth1_id
+          - auth2_id
+
+    user_abort: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+        input: 
+          - error_code
+
+    write_pin_nok: 
+        class: Workflow::Action::Null
+        input: 
+          - error_code
+
+    write_pin_ok: 
+        class: Workflow::Action::Null
+
+
+condition:
+    auth_codes_valid: 
+        class: OpenXPKI::Server::Workflow::Condition::Smartcard::AuthCodesValid
+
+    have_both_hashes: 
+        class: Workflow::Condition::Evaluate
+        param: 
+            test: $context->{auth1_hash} && $context->{auth2_hash};
+
+    ids_found_in_LDAP: 
+        class: OpenXPKI::Server::Workflow::Condition::Smartcard::AuthIdValid
+
+    ldap_mail_set: 
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowContext
+        param: 
+            condition: notnull
+            context_key: owner_mail
+
+    max_iterations_reached: 
+        class: Workflow::Condition::Evaluate
+        param: 
+            test: $context->{num_tries} >= 3;
+ 
+
+field:
+    _auth1_code: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_LABEL
+        name: _auth1_code
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_TOOLTIP
+        required: 1
+        type: text
+
+    _auth2_code: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_LABEL
+        name: _auth2_code
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_TOOLTIP
+        required: 1
+        type: text
+
+    auth1_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_LABEL
+        name: auth1_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_TOOLTIP
+        required: 1
+        type: text
+
+    auth2_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_LABEL
+        name: auth2_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_TOOLTIP
+        required: 1
+        type: text
+
+    error_code: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_LABEL
+        name: error_code
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_TOOLTIP
+        required: 1
+        type: text
+
+    token_id: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_LABEL
+        name: token_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP
+        required: 1
+        type: text
+
+
+acl:
+    CA Operator: 
+        creator: any
+
+    RA Operator: 
+        creator: any
+
+    SmartCard:
+        creator: any
+
+    User: 
+        creator: any
+

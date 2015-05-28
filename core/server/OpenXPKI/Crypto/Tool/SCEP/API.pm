@@ -1,7 +1,7 @@
 ## OpenXPKI::Crypto::Tool::API
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-	
+
 use strict;
 use warnings;
 
@@ -36,18 +36,22 @@ sub __init_command_params : PRIVATE {
         },
         'create_pending_reply' => {
             'PKCS7' => 1,
+            'HASH_ALG' => 1,
         },
         'create_nextca_reply' => {
             'CHAIN' => 1,
+            'HASH_ALG' => 1,
         },
         'create_certificate_reply' => {
             'PKCS7'       => 1,
             'CERTIFICATE' => 1,
             'ENCRYPTION_ALG' => 1,
+            'HASH_ALG' => 1,
         },
         'create_error_reply' => {
             'PKCS7'      => 1,
             'ERROR_CODE' => 1,
+            'HASH_ALG' => 1,
         },
         'get_pkcs10' => {
             'PKCS7' => 1,
@@ -76,7 +80,7 @@ __END__
 
 OpenXPKI::Crypto::Tool::SCEP::API - API for the SCEP functions.
 
-=head1 Description   
-    
+=head1 Description
+
 This is the basic class for the SCEP tool API. It inherits from
 OpenXPKI::Crypto::API. It defines a hash of valid commands.

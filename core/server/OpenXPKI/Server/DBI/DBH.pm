@@ -348,8 +348,8 @@ sub rollback
     if ($self->{DBH}->rollback()) {
         ## if it is not used with the server (e.g. on database init)
         ## then there is no log object
-        $self->{log}->log (FACILITY => "audit",
-                           PRIORITY => "warn",
+        $self->{log}->log (FACILITY => "system",
+                           PRIORITY => "info",
                            MESSAGE  => "Rollback performed.".
                                        "\nsession=".CTX('session')->get_id(),
                            MODULE   => $package,
@@ -376,7 +376,7 @@ sub commit
         return 1;
     } else {
         if (defined $self->{log}) {
-            $self->{log}->log (FACILITY => "warn",
+            $self->{log}->log (FACILITY => "system",
                                PRIORITY => "error",
                                MESSAGE  => "Commit failed.".
                                           "\nsession=".CTX('session')->get_id(),

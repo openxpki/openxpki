@@ -1,0 +1,7 @@
+id: C
+label: C
+description: I18N_OPENXPKI_UI_PROFILE_C_DESC
+type: freetext
+width: 2
+source: C:(.+)
+min: 0

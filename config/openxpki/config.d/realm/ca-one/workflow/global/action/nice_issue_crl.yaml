@@ -1,0 +1,6 @@
+class: OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL
+label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_LABEL
+description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC
+param:
+    retry_count: 10
+    retry_interval: +0000000030

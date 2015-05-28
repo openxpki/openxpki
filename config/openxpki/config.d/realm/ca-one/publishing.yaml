@@ -1,0 +1,64 @@
+# Where to publish entity certificates
+entity:
+    queue@: connector:publishing.connectors.queue
+    ldap@: connector:publishing.connectors.ldap-ext
+    disk@: connector:publishing.connectors.local
+    
+crl:
+    crl@: connector:publishing.connectors.cdp
+
+cacert:
+    disk@: connector:publishing.connectors.cacert
+
+connectors:
+    ldap-ext:
+        class: Connector::Proxy::Net::LDAP::Single
+        LOCATION: ldap://localhost:389
+        base: ou=people,dc=mycompany,dc=com
+        filter: (&(mail=[% ARGS.0 %]) (objectCategory=person))
+        binddn: cn=admin,dc=mycompany,dc=com
+        password: admin
+        attrmap:
+            der: usercertificate;binary
+
+        create:
+            basedn: ou=people,dc=mycompany,dc=com            
+            rdnkey: cn
+            
+        schema:
+            cn: 
+                objectclass: inetOrgPerson    
+                values:
+                    sn: copy:self
+                    ou: IT Department
+
+    local:
+        class: Connector::Builtin::File::Path
+        LOCATION: /tmp/
+        file: "[% ARGS.0 %].crt"
+        content: "[% pem %]"
+
+
+    queue:
+        class: OpenXPKI::Connector::DataPool
+        LOCATION: export.smartcard.transfer
+        key: "[% EXTRA.cert_identifier %]"
+        value: 
+            EmployeeID: "[% EXTRA.userinfo_employee_id %]"
+            certType: enc
+            email: "[% EXTRA.userinfo_mail %]"
+            creator: "[% EXTRA.creator %]"
+
+    cdp:
+        class: Connector::Builtin::File::Path
+        LOCATION: /tmp/
+        file: "[% ARGS.0 %].crl"
+        content: "[% pem %]"
+
+
+    cacert:
+        class: Connector::Builtin::File::Path
+        LOCATION: /tmp/
+        file: "[% ARGS.0 %].pem"
+        content: "[% pem %]"
+

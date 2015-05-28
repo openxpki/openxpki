@@ -6,10 +6,13 @@
 TOPDIR=../..
 
 PACKAGES=\
+	openxpki-perldeps-core \
 	perl-openxpki-core \
 	perl-openxpki-client-html-mason \
-	openxpki-i18n \
-	perl-openxpki-client-html-sc 
+	openxpki-i18n 
+
+OPT_PACKAGES=\
+	openxpki-perldeps-enrollment
 
 # CPAN dependencies that we'd like packaged for the target 
 # distribution
@@ -102,7 +105,7 @@ endif
 
 .SUFFIXES:
 
-.PHONY : $(PACKAGES) cpan fetchcpan
+.PHONY : $(PACKAGES) $(OPT_PACKAGES) cpan fetchcpan
 
 # Makefile.inc contains common settings for all packages (checked in)
 include Makefile.inc
@@ -156,11 +159,14 @@ cleancpan:
 $(PACKAGES):
 	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET) $(PERL_MAKEPL_ARGS)
 
+$(OPT_PACKAGES):
+	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET) $(PERL_MAKEPL_ARGS)
+
 collect:
 	@mv */*.rpm .     || echo No suse package file found.
 
 clean:
 	rm -f *.rpm
-	make $(PACKAGES) SUBTARGET=clean
+	make $(PACKAGES) $(OPT_PACKAGES) SUBTARGET=clean
 
 distclean: clean

@@ -14,7 +14,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use Locale::gettext_pp qw (:locale_h :libintl_h nl_putenv);
 use POSIX qw (setlocale);
-use Encode;
 
 our $language = "";
 our $locale_prefix = "";
@@ -23,7 +22,7 @@ use vars qw (@ISA @EXPORT_OK);
 use base qw( Exporter );
 #require Exporter;
 #@ISA = qw (Exporter);
-@EXPORT_OK = qw (i18nGettext set_locale_prefix set_language get_language);
+@EXPORT_OK = qw (i18nGettext i18nTokenizer i18nNoop set_locale_prefix set_language get_language);
 
 sub set_locale_prefix
 {
@@ -46,15 +45,15 @@ sub i18nGettext {
 
     # coerce arguments into a hashref
     if ($ref_of_first_argument eq "") {
-	# first argument is a scalar
-	my %arguments = @_;
-	$arg_ref = \%arguments;
-    } 
+    # first argument is a scalar
+    my %arguments = @_;
+    $arg_ref = \%arguments;
+    }
     elsif ($ref_of_first_argument eq "HASH") {
-	$arg_ref = $_[0];
+    $arg_ref = $_[0];
     }
     elsif ($ref_of_first_argument eq "REF") {
-	$arg_ref = ${$_[0]};
+    $arg_ref = ${$_[0]};
     }
 
     ## we need this for utf8
@@ -62,14 +61,18 @@ sub i18nGettext {
     #my $i18n_string = pack "U0C*", unpack "C*", gettext ($text);
     my $i18n_string = gettext ($text);
 
-    Encode::_utf8_on ($i18n_string);
+    utf8::upgrade($i18n_string);
 
     if ($i18n_string ne $text)
     {
-	## there is a translation for this, so replace the parameters 
-	## in the resulting string
 
-	for my $parameter (keys %{$arg_ref}) {
+        # gettext does not support empty translations, we use a single whitespace which we dont want to show up.
+        if ($i18n_string eq ' ') { return ''; }
+
+    ## there is a translation for this, so replace the parameters
+    ## in the resulting string
+
+    for my $parameter (keys %{$arg_ref}) {
             my $key = $parameter;
             if ($parameter !~ m{\A __\w+__ \z}xm)
             {
@@ -82,13 +85,13 @@ sub i18nGettext {
         }
     } else {
         ## no translation found, output original string followed
-	## by all parameters (and values) passed to the function
+    ## by all parameters (and values) passed to the function
 
-	## append arguments passed to the function
+    ## append arguments passed to the function
         $i18n_string = join ("; ", $text,
-                                   map { $_ . " => " . $arg_ref->{$_}  } 
+                                   map { $_ . " => " . $arg_ref->{$_}  }
                                        keys %{$arg_ref});
-	
+
         #it's too slow, I try to use "use utf8;"
         #$i18n_string = pack "U0C*", unpack "C*", $untranslated;
     }
@@ -96,12 +99,25 @@ sub i18nGettext {
     return $i18n_string;
 }
 
+sub i18nTokenizer {
+    
+    my $string = shift;    
+    my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);    
+    foreach my $token (keys %tokens) {
+        my $replace = i18nGettext( $token );        
+        $string =~ s/$token\b/$replace/g;
+    }
+    
+    return $string;
+    
+}
+
 sub set_language
 {
     ## global scope intended
     $language = shift;
     if (! defined $language) {
-	$language = "";
+    $language = "";
     }
 
     ## erase environment to block libc's automatic environment detection
@@ -174,7 +190,7 @@ This module manages all i18n stuff for the L<OpenXPKi> system.
 The main job is the implementation of the translation function and
 the storage of the activated language.
 
-All functions work in static mode (static member functions). 
+All functions work in static mode (static member functions).
 This means that they are to be invoked directly and not via an object
 instance.
 
@@ -207,7 +223,7 @@ Examples:
 
     my $text;
     $text = i18nGettext("I18N_OPENXPKI_FOO_BAR");
-    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR", 
+    $text = i18nGettext("I18N_OPENXPKI_FOO_BAR",
                         "__COUNT__" => 1,
                         "__ORDER__" => "descending",
                         );

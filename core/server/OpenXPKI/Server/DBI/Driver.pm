@@ -26,7 +26,6 @@ our %COLUMN = (
     "format"           => "TEXT",
     "data"             => "LONGTEXT",
 
-    'config_identifier' => 'TEXT_KEY',
     "pki_realm"        => "TEXT_KEY",
     "ca_name"          => "TEXT_KEY",
     "issuing_ca"       => "TEXT_KEY",
@@ -79,7 +78,7 @@ our %COLUMN = (
     "scep_tid"         => "TEXT_KEY",
     "loa"              => "TEXT_KEY",
     "public_cert"      => "BIGINT",
-    
+
     "status"           => "TEXT_KEY",
     "reason"           => "TEXT_KEY",
     "object_id"        => "BIGINT", # FIXME: is this correct?
@@ -101,7 +100,7 @@ our %COLUMN = (
     "keyid"            => "TEXT_KEY",
     "ca_issuer_name"   => "TEXT_KEY",
     "ca_issuer_serial" => "NUMERIC",
-    
+
     "workflow_hist_id" => "BIGINT",
     "workflow_id"      => "BIGINT",
     "workflow_version_id" => "BIGINT",
@@ -109,24 +108,24 @@ our %COLUMN = (
     "workflow_state"   => "TEXT_KEY",
     "workflow_last_update" => "TIMESTAMP",
     "workflow_action"  => "TEXT_KEY",
-    "workflow_description" => "TEXT_KEY",
+    "workflow_description" => "LONGTEXT",
     "workflow_user"    => "TEXT_KEY",
     "workflow_history_date"  => "TIMESTAMP",
     "workflow_context_key"   => "TEXT_KEY",
     "workflow_context_value"   => "LONGTEXT",
-    
+
     "workflow_proc_state"  => "TEXT",
     "workflow_wakeup_at"  => "NUMERIC",
     "workflow_count_try"  => "BIGINT",
     "workflow_reap_at"  => "NUMERIC",
     "workflow_session"  => "LONGTEXT",
     "watchdog_key"  => "TEXT",
-        
+
     "namespace"                => "TEXT_KEY",
     "datapool_key"             => "TEXT_KEY",
     "datapool_value"           => "TEXT",
     "encryption_key"           => "TEXT_KEY",
-    
+
     "generation"        => "NUMERIC"
     );
 
@@ -147,12 +146,12 @@ sub new
     my %type = eval ("\%${driver}::TYPE");
 
     if ($EVAL_ERROR) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_DRIVER_LOAD_ERROR",
-	    params  => {
-		DRIVER => $driver,
-	    },
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_DBI_DRIVER_NEW_DRIVER_LOAD_ERROR",
+        params  => {
+        DRIVER => $driver,
+        },
+        );
     }
 
     foreach my $key (keys %COLUMN)
@@ -326,9 +325,9 @@ abstract types:
 A text data type that does not need to be indexed by the database.
 Cannot be ordered by.
 
-=item * LONGTEXT 
+=item * LONGTEXT
 A text data type that is capable of storing large amounts of text data and
-that does not need to be indexed by the database. 
+that does not need to be indexed by the database.
 Cannot be ordered by. May not be searchable via a where clause.
 
 =item * TEXT_KEY

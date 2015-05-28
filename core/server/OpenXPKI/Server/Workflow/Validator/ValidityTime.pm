@@ -60,7 +60,6 @@ OpenXPKI::Server::Workflow::Validator::ValidityTime
 <action name="CreateCSR">
   <validator name="ValidityTime"
            class="OpenXPKI::Server::Workflow::Validator::ValidityTime">
-    <arg value="$cert_role"/>
   </validator>
 </action>
 

@@ -45,6 +45,12 @@ sub execute
         },
     );
     $dbi->commit();    
+    
+    CTX('log')->log(
+        MESSAGE  => "mark certificate $identifier as revoked in database",
+        PRIORITY => 'debug',
+        FACILITY => 'application',
+    );   
 }
 
 1;

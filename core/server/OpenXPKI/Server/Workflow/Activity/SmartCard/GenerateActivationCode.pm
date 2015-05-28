@@ -14,7 +14,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Digest::SHA1 qw( sha1_hex );
+use Digest::SHA qw( sha1_hex );
 use MIME::Base64;
 
 use Data::Dumper;
@@ -266,6 +266,11 @@ sub execute {
     #
     if ($found) {
 
+        CTX('log')->log(
+            MESSAGE => 'SmartCard delivered activation code to ' . $user,
+            PRIORITY => 'info',
+            FACILITY => ['audit','application']
+        );
         # pass on the activation code back to the user interface
         $context->param( '_password', $code );
         return $self;
@@ -278,7 +283,7 @@ sub execute {
             log => {
                 logger => CTX('log'),
                 priority => 'warn',
-                facility => 'system',
+                facility => 'application',
             },
         );
         return;

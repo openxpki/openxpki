@@ -20,7 +20,7 @@ release: [% PKGREL %]
 release:   1
 [% END %]
 vendor:    OpenXPKI Project
-packager:  Martin Bartosch <m.bartosch@cynops.de>
+packager:  [% PACKAGER %]
 license:   Apache
 group:     Applications/CPAN
 url:       http://www.openxpki.org

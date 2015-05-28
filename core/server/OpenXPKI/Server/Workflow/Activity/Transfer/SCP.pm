@@ -106,7 +106,7 @@ sub execute {
 	#TODO - improve handling of temporary errors 
     eval{
 		local $SIG{ALRM} = sub { die "alarm\n" };
-		alarm $config->{'timeout'} || 30;
+		alarm ($config->{'timeout'} || 30);
 		$command->wait();
 		
 		if ($command->exit_status() != 0) {
@@ -123,9 +123,9 @@ sub execute {
 		CTX('log')->log(
 	        MESSAGE => 'Transfer failed, do pause' ,
 	        PRIORITY => 'info',
-	        FACILITY => 'system',
+	        FACILITY => 'application',
 	    );
-		$self->pause('OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_TIMEOUT');	
+		$self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');
 	}
 	
 	alarm 0;
@@ -137,7 +137,7 @@ sub execute {
     CTX('log')->log(
 		MESSAGE => 'Transfer of file successful' ,
 		PRIORITY => 'info',
-		FACILITY => 'system',
+		FACILITY => 'application',
 	);
     
     return 1;

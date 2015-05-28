@@ -4,9 +4,9 @@ Certificate:
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
     # list the roles that you want to allow to login via this handler here
     allowed_role:
-    - User
-    - RA Operator
-    - CA Operator
+        - User
+        - RA Operator
+        - CA Operator
 
 #FIXME - clarified syntax, need implementation
 Signature:
@@ -15,9 +15,9 @@ Signature:
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
     # define your trust anchors here
     realm:
-    - list of realm names 
+        - list of realm names 
     cacert:
-    - list of cacert identifiers
+        - list of cacert identifiers
     challenge_length: 256
 
 Anonymous:

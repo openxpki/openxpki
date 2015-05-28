@@ -51,7 +51,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => 'Certificate export - nothing to do',
             PRIORITY => 'info',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );               
         return 1;
     }
@@ -77,7 +77,7 @@ sub execute {
         CTX('log')->log(
             MESSAGE => 'No encryption targets given, wont search for private keys',
             PRIORITY => 'info',
-            FACILITY => [ 'system' ],
+            FACILITY => [ 'application' ],
         );
     }    
      
@@ -102,7 +102,7 @@ sub execute {
             if (ref $attributes eq "HASH") {
                  $cert_xml = $attributes;
             } 
-             #= { certType => "sig",  EmployeeID => "sb2130", email => "user\@db.com" };
+            # Someting like { certType => "sig",  EmployeeID => "sb2130", email => "user\@company.com" };
         }
 
         ##! 32: 'Basic attributes  ' . Dumper $cert_xml
@@ -148,6 +148,11 @@ sub execute {
                 ##! 32: 'Created P7 Keyfile ' . encode_base64( $p7_secrets )
                 $cert_xml->{'pkcs12-container'} = { "enc-password" => encode_base64( $p7_secrets, ''), content => encode_base64( $p12, '') }; 
                 
+                CTX('log')->log(
+                    MESSAGE  => "added private key to export for $cert_identifier",
+                    PRIORITY => 'info',
+                    FACILITY => ['application', 'audit']
+                );
             }
         }
         
@@ -185,7 +190,7 @@ sub execute {
     CTX('log')->log(
         MESSAGE => 'Certificate export file has been generated: ' . $fh->filename,
         PRIORITY => 'info',
-        FACILITY => [ 'audit', 'system' ],
+        FACILITY => [ 'audit', 'application' ],
     );
 
         
@@ -235,6 +240,8 @@ Array of certificate identifiers to enrypt the p12 passwords to
 
 The following parameters are written to the context
 
+=over
+
 =item * exported_cert_ids
 
 Array of certificate identifiers contained in the xml 
@@ -247,4 +254,5 @@ Name of the xml file on the local system (tempfile)
 
 Expected name of the file on the target system after transfer
 
+=back
             

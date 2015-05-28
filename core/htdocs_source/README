@@ -1,0 +1,30 @@
+
+The webui is a client centric application that uses ajax to retrieve structured
+data from the server and renders the pages using the Ember.js framework with the
+handlebars templating system. The code is written in coffee script using the 
+bungle compiler framework. This directory contains the developer code of the UI, 
+this MUST NOT go onto your webserver.
+
+Customization
+=============
+
+For moderate UI customization you can create your own index.html file based on 
+the themed.html sample file. You can customize header and footer section inside
+or add custom css to it. 
+
+Modification
+============
+
+To make major modifications, you can edit the source code and recompile it 
+afterwards. Use the "bungle" compiler, which is available using the Node.js
+package manager npm and run "bungle build" inside this directory. This will
+copy all requried files into the dist/ directory.
+
+Note: Bungle uses inotify, if you get an exception like "Error: watch ENOSPC"
+you need to raise fs.inotify.max_user_watches.
+
+Uglification
+############
+
+To get plain code for debugging, set pipes.jscompressor.type = "passthrough" 
+in bungle.json (line 195)

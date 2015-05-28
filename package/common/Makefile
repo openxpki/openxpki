@@ -7,7 +7,7 @@
 # Run make to see what this is doing and inspect the output file demo.
 #
 
-TOPDIR=../../..
+TOPDIR=../..
 
 # You simply need to
 include Makefile.inc

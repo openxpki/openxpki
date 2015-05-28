@@ -1,0 +1,14 @@
+<div class="drowdown">
+    {{input class="form-control" value=search placeholder=content.placeholder}}
+    <ul class="dropdown-menu" role="menu">
+        {{#each searchResults as |result|}}
+            <li class="{{if result.active "active"}}">
+                <a {{action "selectResult" result}}>{{result.label}}</a>
+            </li>
+        {{else}}
+            <li>
+                <a>No matches found</a>
+            </li>
+        {{/each}}
+    </ul>
+</div>

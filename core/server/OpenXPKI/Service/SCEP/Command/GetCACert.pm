@@ -53,9 +53,14 @@ sub __get_ca_certificate_chains : PRIVATE {
     my $pki_realm = CTX('session')->get_pki_realm();
     my $server = CTX('session')->get_server();
     
-    my $scep_cert_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'scep' });
+    my $strip_root;
+    if ($server) {
+        $strip_root = CTX('config')->get(['scep', $server, 'response', 'getcacert_strip_root']) ? 1 : 0;
+    }
+     
+    my $scep_cert_alias = $self->__get_token_alias( $server );
     my $scep_ca_cert_identifier = CTX('api')->get_certificate_for_alias({ ALIAS => $scep_cert_alias })->{IDENTIFIER};
-    
+        
     if (! defined $scep_ca_cert_identifier) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_GETCACERT_NO_IDENTIFIER_FOUND',
@@ -74,7 +79,7 @@ sub __get_ca_certificate_chains : PRIVATE {
     # if the chain has the complete flag, the root is included 
     # but we dont want it in the response, so pop it off the list
     # take care about scep server with a out-of-ca self signed cert
-    if ($scep_chain->{COMPLETE} && scalar @chain_result > 1) {
+    if ($scep_chain->{COMPLETE} && scalar @chain_result > 1 && $strip_root) {
         ##! 16: 'Strip of scep root'
         pop @chain_result;
     }
@@ -103,7 +108,7 @@ sub __get_ca_certificate_chains : PRIVATE {
     # if the chain has the complete flag, the root is included 
     # but we dont want it in the response, so pop it off the list
     my @issuer_chain = @{ $ca_chain->{CERTIFICATES} };
-    if ($ca_chain->{COMPLETE}) {
+    if ($ca_chain->{COMPLETE} && $strip_root) {
         ##! 16: 'Strip of issuer root'
         pop @issuer_chain;
     }

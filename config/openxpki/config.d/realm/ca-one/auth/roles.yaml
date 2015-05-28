@@ -1,0 +1,24 @@
+# This is a placeholder - list all AAA Roles here (no "profile roles")
+# These must be a superset of the roles used in wfacl
+# Default customer role
+User: 
+    label: User
+
+# operator personel
+RA Operator: 
+    label: RA Operator
+
+# operator with ca key access
+CA Operator: 
+    label: CA Operator
+
+# system user, anything which is running on the shell
+System: 
+    label: System
+
+# the anon role - anything unauth'd
+Anonymous: 
+    label: Anonymous
+
+SmartCard:
+    label: SmartCard

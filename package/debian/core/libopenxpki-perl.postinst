@@ -25,31 +25,61 @@ set -e
 
 case "$1" in
     configure)
-	set +e
-	    # TODO - check for a running daemon
+    set +e
+        # TODO - check for a running daemon
         #invoke-rc.d --quiet openxpkid restart
         #if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
-	set -e
-	
-	   # Fix directory permissions
-	   chown -R openxpki:openxpki /var/openxpki
-	   chown -R openxpki:root /etc/openxpki/ssl/
-	   chmod -R 750 /etc/openxpki/ssl/
-	   
-	   # log config
-	   test -e /etc/openxpki/log.conf || cp /usr/share/doc/libopenxpki-perl/examples/log.conf /etc/openxpki/ 
-	   
-	   # scep config
-       test -e /etc/openxpki/scep/default.conf || cp /usr/share/doc/libopenxpki-perl/examples/scep.conf /etc/openxpki/scep/default.conf 
-	   
-	   # No config - load sample config       
-	   if [ ! -e /etc/openxpki/config.d/ ]; then
-	       mkdir -m 750 /etc/openxpki/config.d	             
-	       tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/basic.tgz -C /etc/openxpki/config.d/ 
-	       chown -R openxpki:root /etc/openxpki/config.d/
-	       openxpkiadm loadcfg 2>/dev/null
-	   fi	   
-	
+    set -e
+
+        # No config - load sample config - also includes/overwrites other
+        # files in /etc/openxpki/ !
+        if [ ! -e /etc/openxpki/config.d/ ]; then
+           tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz -C /etc/openxpki
+
+           chmod 750 /etc/openxpki/config.d
+           chown -R openxpki:root /etc/openxpki/config.d/
+
+       fi
+
+       # Ubuntu names it conf-enabled while wheezy has conf.d
+       if [ -d /etc/apache2/conf-enabled/ ]; then
+           test -e /etc/apache2/conf-enabled/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf-enabled/openxpki-scep.conf
+       else
+           test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf
+       fi;
+
+       # Fix directory permissions
+       chown -R openxpki:openxpki /var/openxpki
+       chown -R openxpki:root /etc/openxpki/ssl/
+       chmod -R 750 /etc/openxpki/ssl/
+
+       # add apache user to openxpki group (to allow connecting the socket)
+       usermod -G openxpki www-data
+
+        # UI logfiles
+        for f in scep.log soap.log webui.log; do
+            touch /var/openxpki/$f
+            chown www-data:openxpki /var/openxpki/$f
+            chmod 640 /var/openxpki/$f
+        done;
+
+        # Create the pkiadm user
+        COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;
+        if [ $COUNT -eq 0 ]; then
+            # Use useradd here as we need an additonal group
+            useradd --create-home -G openxpki pkiadm;
+
+            # In case somebody decided to change the home base
+            HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
+            chown pkiadm:openxpki $HOME
+            chmod 750 $HOME
+        fi;
+
+        # Create the sudo file to restart oxi from pkiadm
+        if [ ! -e /etc/sudoers.d/pkiadm ] && [ -d /etc/sudoers.d ]; then
+            echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
+        fi;
+
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

@@ -19,27 +19,29 @@ use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 
 sub execute {
-	
+
     my $self    = shift;
     my $arg_ref = shift;
     my $ident   = ident $self;
-    
+
     ##! 8: 'start'
-    
+
     my $algs = CTX('api')->get_alg_names();
-    
+
     ##! 8: 'Algs ' . Dumper $algs
- 
+
     # we silently asume that all digests are supported and the server can handle post requests
     # which is true on current systems using the suggested toolchain
-    my @caps = qw(GetNextCACert POSTPKIOperation Renewal SHA-512 SHA-256 SHA-1 DES3);
- 
+    # post seems to be a bit more than just post (binary p7) - needs to be fixed
+#    my @caps = qw(GetNextCACert POSTPKIOperation Renewal SHA-512 SHA-256 SHA-1 DES3);
+    my @caps = qw(GetNextCACert Renewal SHA-512 SHA-384 SHA-256 SHA-224 SHA-1 DES3);
+
     $result = "Content-Type: text/plain\n\n" . join "\n", @caps;
-          
+
     ##! 16: "result: $result"
     return $self->command_response($result);
 }
- 
+
 1;
 __END__
 
@@ -52,7 +54,7 @@ OpenXPKI::Service::SCEP::Command::GetCACaps
 Return information on the certificates used by the scep server.
 Following certs are returned in order:
 
-=over 8 
+=over 8
 
 =item scep server certificate
 
@@ -61,14 +63,14 @@ entity certificate used by the scep server
 =item scep server chain
 
 the full chain including the root certificate for the scep entity certificate
- 
+
 =item current issuer certificate
 
-the certificate currently used for certificate issuance.    
+the certificate currently used for certificate issuance.
 
 =item issuer chain
 
-the full chain of the issuing ca, starting with the first intermediate certificate. 
+the full chain of the issuing ca, starting with the first intermediate certificate.
 
 =back
 

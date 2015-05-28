@@ -1,0 +1,21 @@
+# The name of the field how it appears in the workflow
+id: smpl
+# The short label besides the UI field
+label: O
+# Help/Description on the field
+description: I18N_OPENXPKI_UI_PROFILE_O_DESC
+# HTML type to use
+type: freetext
+# Regex to test the input against
+match: \A [A-Za-z\d\-\.]+ \z
+# A regexp how to get the data back from the subject
+source: O:(.+)
+# How often you must specify this field at minimum, default 1
+min: 1
+# How often you can specify that field at max, default 1, if >1 the data is passed as an arrayref
+max: 1
+# The dispay size of the html element
+width: 40
+# The dispay size of the html element (only with textarea)
+height: 10
+# Default value to be filled in the form

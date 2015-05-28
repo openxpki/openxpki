@@ -24,21 +24,25 @@ sub execute
     my $user = CTX('session')->get_user();
     my $role = CTX('session')->get_role();
     CTX('log')->log(
-	MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
-	PRIORITY => 'info',
-	FACILITY => 'audit',
+    MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
+    PRIORITY => 'info',
+    FACILITY => ['audit','application']
     );
-=cut
-    my $bulk = $context->param('bulk');
-    if (! $bulk) {
-        # only notify if this is not part of a bulk request - otherwise
-        # the user would get a huge number of tickets
-        CTX('notification')->notify({
-            MESSAGE  => 'csr_approvals_canceled',
-            WORKFLOW => $workflow,
-        });
-    }
-=cut    
+
+##=cut disabled-by-oli
+##
+##    my $bulk = $context->param('bulk');
+##    if (! $bulk) {
+##        # only notify if this is not part of a bulk request - otherwise
+##        # the user would get a huge number of tickets
+##        CTX('notification')->notify({
+##            MESSAGE  => 'csr_approvals_canceled',
+##            WORKFLOW => $workflow,
+##        });
+##    }
+##
+##=cut disabled-by-oli
+
     return 1;
 }
 

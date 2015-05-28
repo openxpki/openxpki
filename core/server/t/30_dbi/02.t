@@ -13,6 +13,9 @@ use Data::Dumper;
 
 ok(1);
 
+TODO: {
+    # Note: this whole test script needs refactoring to apply Better Perl Practices ;-)
+    todo_skip 'See Issue #188', 10;
 our $dbi;
 our $token;
 require 't/30_dbi/common.pl';
@@ -93,4 +96,5 @@ $dbi->commit();
 
 ok(1);
 
+}
 1;

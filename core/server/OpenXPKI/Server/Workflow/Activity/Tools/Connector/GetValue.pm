@@ -22,112 +22,114 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     
-    my $connector_key;
-                  
-    # Use value in ds_key_param as key in Connector
-    my $keyparam = $self->param('ds_key_param');
-
-    $self->param( 'DBG_keyparam', $keyparam );
+    my $mode = $self->param('mode') || 'scalar';
     
-    if ($keyparam) {
-        $connector_key = $context->param( $keyparam );
-    }
+    # simple mode, path is a single string
+    my $path = $self->param('config_path');
     
-    my $keytemplate = $self->param('ds_key_template');    
-    $self->param( 'DBG_keytemplate', $keytemplate );
-    # Template based key 
-    if ( not $connector_key && defined $keytemplate ) {
-
-        ##! 32: ' Use TT Template ' . $keytemplate
-                
-        # Get Issuer Info from selected ca 
-        my %template_vars = (
-            PKI_REALM => CTX('api')->get_pki_realm(),
-            CONTEXT => {}  
-        ); 
-        
-        # find all CONTEXT.* occurences in template and load them into template vars
-        # $template = ' [- CONTEXT.SUBJECT -].[- CONTEXT.token_id -] ';
-        my @keys = ($keytemplate =~ /\[% CONTEXT.([^\]]+) %\]/g);
-        
-        foreach my $key (@keys) {
-            ##! 32: ' Add key to template ' . $key
-            $template_vars{CONTEXT}->{$key} = $context->param( $key );
-        }   
-        
-        ##! 32: ' Template Vars ' . Dumper ( %template_vars )  
-        
-        #$keytemplate = '[% TAGS [- -] -%]' .  $keytemplate;
-        my $tt = Template->new();        
-        $tt->process(\$keytemplate, \%template_vars, \$connector_key);                    
-
-        if ( not defined $connector_key ) {
-            OpenXPKI::Exception->throw( message =>
-                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_TEMPLATE_FAILED'
-            )
-        }        
-    }
+    # for handling complex keys, split path into prefix, suffix and key
+     
+    my $path_prefix = $self->param('config_prefix') || '';
+    my $path_key = $self->param('config_key') || '';
+    my $path_suffix = $self->param('config_suffix') || '';
     
-    if ( not $connector_key ) {
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_MISSPARAM_KEY_PARAM'
-        )
-    }
-    ##! 32: 'Action params ' . Dumper $self->param() 
-    my $valparam = $self->param('ds_value_param');
-    my $valmap = $self->param('ds_value_map');           
-    ##! 32: 'Param ' . $valparam
-         ##! 32: 'Map ' . $valmap
-    if ( not ( $valparam || $valmap ) ) {
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_MISSPARAM_VALUE_PARAM_OR_MAP'
-        )
-    }
+    my $delimiter = $self->param('delimiter') || '\.';
+    
+    if ($delimiter eq '.') { $delimiter = '\.'; }
+    
+    my @path;
+    
+    if ($path) {
         
-    my $retval;
-
-
-    # Hash Mode 
-    if ($valmap) {
-        my %attrmap = map { split(/\s*[=-]>\s*/) }
-            split( /\s*,\s*/, $valmap );
-            
-        ##! : 16 'hash mode'
-        ##! : 32 'attr map ' . Dumper %attrmap        
-        my $hash = CTX('config')->get_hash( $connector_key );
+        @path = split $delimiter, $path;
         
-        foreach my $key (keys %attrmap) {
-        	##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
-        	$context->param( $key, $hash->{$attrmap{$key}});
+    } elsif($path_key) {
+        
+        if ($path_prefix) {
+            @path = split $delimiter, $path_prefix;
+        }
+        
+        push @path, $path_key;
+        
+        if ($path_suffix) {
+            push @path, (split $delimiter, $path_suffix);
         }
         
     } else {
-        # Array Mode
-	    if ($self->param('ds_wantarray')) {
-	    
-	        ##! : 16 'Array mode'
-	        my @retarray = CTX('config')->get_list( $connector_key );
-	        my $ser = OpenXPKI::Serialization::Simple->new();
-	        $retval = $ser->serialize( \@retarray );
-	               
-	    } else {
-	        $retval = CTX('config')->get( $connector_key );
-	    }
-	    
-	    # undef - fall back to default if configured
-	    if ( not defined $retval ) {
-	        my $default_value = $self->param('ds_default_value');        
-	        if ( defined $default_value ) {
-	            if ( $default_value =~ s/^\$// ) {
-	                $retval = $context->param($default_value);
-	            } else {
-	                $retval = $default_value;
-	            }                         
-	        } 
-	    }
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_PATH'
+        );
+    } 
+    
+    CTX('log')->log(
+        MESSAGE => "Calling Connector::GetValue in mode $mode with path " . join('|', @path),
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+     
+    my $config = CTX('config');
+    if ($mode eq 'map') {
+        
+        my $hash = $config->get_hash( \@path );
+        my $map = $self->param('attrmap');
+        
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_MAP'
+        ) unless ($map);
+                   
+        my %attrmap = map { split(/\s*[=-]>\s*/) } split( /\s*,\s*/, $map );                        
+        foreach my $key (keys %attrmap) {
+            ##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
+            $context->param( $key, $hash->{$attrmap{$key}});
+        }
+        
+    } elsif ($mode eq 'hash') {
+        
+        my $hash = $config->get_hash( \@path );                            
+        foreach my $key (keys %{$hash}) {                
+            if ($key !~ /^(wf_|workflow_|creator|_)/) { next; }                
+            ##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
+            $context->param( $key, $hash->{$key});
+        }         
+        
+    } elsif ($mode eq 'array') {
+        
+        ##! : 16 'Array mode'
+        my @retarray = $config->get_list( \@path );        
+        my $retval = OpenXPKI::Serialization::Simple->new()->serialize( \@retarray );        
+        
+        my $target_key = $self->param('target_key');
+                
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_TARGET_KEY'
+        ) unless ($target_key);
+        
+        $context->param( $target_key, $retval );
+        
+    } elsif ($mode eq 'scalar') {
+        
+        my $target_key = $self->param('target_key');
+        my $retval = $config->get( \@path );
 
-	    ##! 1: 'Ask for '.$connector_key.' and got '. Dumper ( $retval )
-	    $context->param($valparam, $retval);
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_VALUE_NOT_A_SCALAR'
+        ) if (ref $retval);
+            
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_TARGET_KEY'
+        ) unless ($target_key);
+
+        # Fall back to default        
+        if ( not defined $retval ) {
+            $retval = $self->param('default_value');
+        }
+        
+        $context->param( $target_key, $retval );
+        
+    } else {
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_UNKNOWN_MODE'
+        );
     }
 
     return 1;    
@@ -143,77 +145,88 @@ OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
 
 =head1 Description
 
-This activity reads a value from the config connector into the context. 
+This activity reads a (set of) values from the config connector into the 
+context. 
 
 =head1 Configuration
 
-=head2 Parameters
+=head2 Activity parameters
 
-In the activity definition, the following parameters must be set.
-See the example that follows.
+=over 
 
-=over 8
+=item mode (default: scalar)
 
-=item ds_key_param
+* scalar: return a single value, requires target_key
+* array:  return a single item which is a list, requires target_key
+* map: map multiple values from the result using a map, requires attrmap
+* hash: import the full result of the get_hash call, see note below!
 
-The name of the context parameter that contains the key for the connector
-lookup operation.
+=item delimiter (default: dot)
 
-=item ds_key_template
+The delimiter to split the path string, used in regex context! 
 
-A template toolkit pattern to create the the key for the connector lookup 
-from. You can refer to every value in the context with C<CONTEXT.<param name>>
-and the name of the current realm with C<PKI_REALM>.
-This is effective only if ds_key_param or the named context value is not set.
+=item config_path
 
-=item ds_value_param
+The path to the config item as string, split up at delimiter. 
+If set, config_key, config_prefix, config_suffix are B<not> used. 
 
-The name of the context parameter to which the determined value should be 
-written.
+=item config_key
 
-=item ds_default_value
+A single value to use as key when building the path using config_prefix
+and/or config_suffix. Use if your key might contain the delimiter character. 
+
+=item config_prefix, config_suffix
+
+String to be used around config_key to build the full path, see config_path.
+
+=item attrmap
+
+Mandatory in mode = map, defines the mapping rules in the format:
+
+    context_name1 => connector_name1, context_name2 => connector_name2   
+
+=item target_key
+
+The name of the context parameter to which the result should be written.
+Mandatory when mode is array or scalar.
+
+=item default_value
 
 The default value to be returned if the connector did not return a result. 
-If preceeded with a dollar symbol '$', then the workflow context variable 
-with the given name will be used. This is optional.
-
-=item ds_wantarray
-
-If you are asking the config tree for a node which returns a list of scalars,
-you need to set this to a true value.  
-
-=item ds_value_map
-
-If your connector returns a hash of values, you must use C<ds_value_map>
-instead of C<ds_value_param> to define a mapping. The syntax is:
-
-    context_name1 => connector_name1, context_name2 => connector_name2  
-
-Default value and wantarray are ignored.
+Only used with mode = scalar
 
 =back
+ 
+=head1 Examples
 
-=head2 Arguments
+=head2 scalar mode, simple path
 
-The workflow action requires two parameters that are passed via the
-workflow context. The names are set above with the I<ds_key_param> and
-I<ds_value_param> parameters. Instead of I<ds_key_param> you can also 
-set I<ds_key_template>. All other parameters are optional.
+    class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+    param:
+        _map_config_path: smartcard.policy.certs.type.[% context.cert_type %].escrow_key
+        target_key: flag_need_escrow
 
-=head2 Return Value
 
-The resulting value is written to the workflow context at the specified key.
+=head2 hash map mode with path assembly
 
-=head2 Example
+Creator usually contains the delimiter char, so we must use path assembly 
+(otherwise the username is split into path elements).  
 
-  <action name="set_context_from_config"
-    class="OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetEntry"        
-    ds_key_param="query"
- 	ds_key_template="smartcard.puk.default.[- CONTEXT.token_id -]"
-    ds_value_param="puk"
-    ds_value_map="puk"
-    ds_wantarray="0"> 	
-    
-    <field name="token_id" label="Serial number of Smartcard"/>
-  </action>
+    class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+    param:
+        mode: map
+        config_prefix: smartcard.users.by_mail
+        _map_config_key: "[% context.creator %]"        
+        attrmap: auth2_mail -> mail, auth2_cn -> cn
+                
+                               
+=head2 array mode with path assembly
 
+    class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+    param:
+        mode: array
+        config_prefix: smartcard.policy.certs.type
+        _map_config_key: "[% context.cert_type %]"
+        config_suffix: allowed_profiles        
+        target_key: buid_profiles
+        

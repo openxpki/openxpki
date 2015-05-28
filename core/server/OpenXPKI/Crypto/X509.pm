@@ -10,7 +10,7 @@ package OpenXPKI::Crypto::X509;
 use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use Math::BigInt;
-use Digest::SHA1 qw(sha1_base64);
+use Digest::SHA qw(sha1_base64);
 use OpenXPKI::DateTime;
 
 use base qw(OpenXPKI::Crypto::Object);
@@ -89,7 +89,7 @@ sub __init
     $self->{PARSED}->{HEADER} = $self->{header}->get_parsed();
     foreach my $attr ( "serial", "subject", "issuer", "notbefore", "notafter",
                        "alias", "modulus", "pubkey", "fingerprint", "emailaddress",
-                       "version", "pubkey_algorithm", "signature_algorithm", "exponent",
+                       "version", "pubkey_hash", "pubkey_algorithm", "signature_algorithm", "exponent",
                        "keysize", "extensions", "openssl_subject" )
     {
         $self->{PARSED}->{BODY}->{uc($attr)} 
@@ -179,7 +179,7 @@ sub __init
     ###############################
 
     ## load all extensions
-    $ret->{PLAIN_EXTENSIONS} = $ret->{EXTENSIONS};
+    $ret->{PLAIN_EXTENSIONS} = $ret->{EXTENSIONS} || '';
     delete $ret->{EXTENSIONS};
     $ret->{OPENSSL_EXTENSIONS} = {};
 

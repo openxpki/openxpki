@@ -47,6 +47,13 @@ sub evaluate {
     
     ##! 32: "Iterator check, Name: $iterator_name, Allowed: $max_count, Reached: $iterator_count " 
     
+        
+    CTX('log')->log(
+        MESSAGE => "Iterator check, Name: $iterator_name, Allowed: $max_count, Reached: $iterator_count ",
+        PRIORITY => 'debug',
+        FACILITY => [ 'application', ],
+    ); 
+    
 	if ($iterator_count >= $max_count) {
 	    condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_MAX_ITERATIONS_REACHED");         
 	}			

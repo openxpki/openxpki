@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use utf8;
+use JSON;
 
 package OpenXPKI::Serialization::Simple;
 
@@ -13,7 +14,8 @@ our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Encode;
+use Data::Dumper;
+use MIME::Base64;
 
 sub new {
     my $that = shift;
@@ -52,6 +54,13 @@ sub new {
 
 
 
+sub _json {
+    my $self = shift;
+    if (!$self->{JSON}) {
+        $self->{JSON} = new JSON()->allow_blessed();
+    }
+    return $self->{JSON};
+}
 
 
 sub serialize {
@@ -59,6 +68,16 @@ sub serialize {
     my $data = shift;
 
     return $self->__write_data($data);
+}
+ 
+# this is static!
+sub is_serialized {
+    
+    my $msg  = shift;    
+    return (defined $msg && 
+        ref $msg eq '' && 
+        $msg =~ /^(SCALAR|BASE64|ARRAY|HASH|UNDEF)/);
+    
 }
 
 sub __write_data {
@@ -72,10 +91,12 @@ sub __write_data {
     }
     elsif ( ref $data eq "ARRAY" && defined $data ) {
         # it's an array
+        #return "JSON".$self->{SEPARATOR}.$self->_json->encode($data);
         return $self->__write_array($data);
     }
     elsif ( ref $data eq "HASH" && defined $data ) {
         # it's a hash
+        #return "JSON".$self->{SEPARATOR}.$self->_json->encode($data);
         return $self->__write_hash($data);
     }
     elsif ( not defined $data ) {
@@ -92,7 +113,7 @@ sub __write_data {
     }
     else {
         # data type is not supported
-        OpenXPKI::Exception->throw ( 
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_WRITE_DATA_TYPE_NOT_SUPPORTED",
             params  => {
                 DATA      => $data,
@@ -109,11 +130,17 @@ sub __write_scalar {
     my $data = shift;
 
     my $separator = $self->{SEPARATOR};
- 
-    # downgrade unicode characters to bytes
-    $data = pack("C*", unpack("U0C*", $data));
 
-    return "SCALAR".$separator.
+    my $type = "SCALAR";
+    # encode data having control chars
+
+    if ($data =~ m{[\x00-\x09]}s) {
+        ##! 8: 'Found binary data - do base64'
+        $type = "BASE64";
+        $data  = encode_base64( $data );
+    }
+
+    return $type.$separator.
            length($data).$separator.
            $data.$separator;
 }
@@ -163,25 +190,17 @@ sub __write_undef {
 }
 
 
-
-
-
-
 sub deserialize {
     my $self = shift;
     my $msg  = shift;
-    
+
     unless(defined $msg){
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_DESERIALIZE_NO_ARG_GIVEN"
         );
     }
-    
-    
-    
-    Encode::_utf8_off($msg);
 
-    my $ret = $self->__read_data($msg);
+    my $ret = $self->__read_data( $msg );
 
     return $ret->{data};
 }
@@ -192,11 +211,11 @@ sub __read_data {
 
     my $separator = $self->{SEPARATOR};
 
-    if ( $msg =~ /^SCALAR$separator/ ) { 
+    if ( $msg =~ /^(SCALAR|BASE64)$separator/ ) {
         # it's a scalar
         return $self->__read_scalar($msg);
     }
-    elsif ( $msg =~ /^ARRAY$separator/ ) { 
+    elsif ( $msg =~ /^ARRAY$separator/ ) {
         # it's an array
         return $self->__read_array($msg);
     }
@@ -208,11 +227,17 @@ sub __read_data {
         # it's an undef
         return $self->__read_undef($msg);
     }
+    elsif ( $msg =~ /^JSON$separator(.*)/ ) {
+        # it's json
+        ##! 1: 'Its json'
+        return $self->__read_json($1);
+    }
     else {
         # data type is not supported
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_DATA_TYPE_NOT_SUPPORTED",
             params  => {
+                SEPARATOR => $separator,
                 MSG => $msg,
                 CALLER => [ caller(1) ],
             }
@@ -231,24 +256,25 @@ sub __read_scalar {
     my $returnmessage = "";
 
     # check for correct scalar format
-    if ( not $msg =~ /^SCALAR$separator[0-9]+$separator/ ) {
+    if ( not $msg =~ /^(SCALAR|BASE64)$separator[0-9]+$separator/ ) {
         # scalar is not formatted appropriately
         OpenXPKI::Exception->throw (
              message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_SCALAR_FORMAT_CORRUPTED",
              params  => {
                  MSG => $msg
              }
-        ); 
+        );
     }
-        
+
     # extract scalar length
-    $msg =~ /^SCALAR$separator([0-9]+)$separator/;
-    my $scalarlength = $1;
+    $msg =~ /^(SCALAR|BASE64)$separator([0-9]+)$separator/;
+    my $encoding = $1;
+    my $scalarlength = $2;
 
     # extract scalar value
     if ( ( length($msg) - length($scalarlength) - 8 ) < $scalarlength ) {
         # remaining msg is shorter than what would be interpreted as scalar value
-        OpenXPKI::Exception->throw ( 
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_SCALAR_DENOTED_LENGTH_TOO_LONG",
             params  => {
                 MSG => $msg,
@@ -256,14 +282,17 @@ sub __read_scalar {
                 REMAINING_MSG_LENGTH  => length($msg)
             }
         );
-    } 
+    }
     my $scalarvalue = substr ($msg, length($scalarlength) + 8, $scalarlength);
 
     # create return message used to extract scalar data
-    $returnmessage = "SCALAR$separator$scalarlength$separator$scalarvalue$separator";
+    $returnmessage = "$encoding$separator$scalarlength$separator$scalarvalue$separator";
 
-    # convert bytes to unicode characters
-    $scalarvalue = pack("U0C*", unpack("C*", $scalarvalue));
+    if ($encoding eq 'BASE64') {
+       ##! 8: 'Found base64 data - decode'
+       $scalarvalue = decode_base64($scalarvalue);
+    }
+
 
     return {
         data          => $scalarvalue,
@@ -295,7 +324,7 @@ sub __read_array {
     my $arraylength = $1;
 
     # create return message used to extract array
-    $msg =~ /^(ARRAY$separator[0-9]+$separator)/; 
+    $msg =~ /^(ARRAY$separator[0-9]+$separator)/;
     $returnmessage = $1;
 
     # isolate upcoming array elements in msg
@@ -350,7 +379,7 @@ sub __read_array {
              params  => {
                  REMAINING_ARRAY_LENGTH          => $arraylength,
                  EXPECTED_REMAINING_ARRAY_LENGTH => 0
-             } 
+             }
          );
     }
 
@@ -379,14 +408,14 @@ sub __read_hash {
                 MSG => $msg
             }
         );
-    }        
+    }
     $msg =~ /^HASH$separator([0-9]+)$separator/;
     my $hashlength = $1;
 
     # create return message used to extract hash
     $msg =~ /^(HASH$separator[0-9]+$separator)/;
-    $returnmessage = $1;    
-   
+    $returnmessage = $1;
+
     # isolate upcoming hash elements in msg
     $msg = substr ($msg, length($returnmessage));
 
@@ -396,8 +425,8 @@ sub __read_hash {
         if ( not $msg =~ /^[0-9]+$separator/ ) {
             # hash (hash length, respectively) is not formatted appropriately
             OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_HASH_KEY_LENGTH_FORMAT_CORRUPTED", 
-                params  => { 
+                message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_HASH_KEY_LENGTH_FORMAT_CORRUPTED",
+                params  => {
                     MSG => $msg
                 }
             );
@@ -441,7 +470,7 @@ sub __read_hash {
             );
         }
 
-        # read data 
+        # read data
         my $data = $self->__read_data ($msg);
 
         # process data (write data into hash)
@@ -485,9 +514,9 @@ sub __read_undef {
 
     if ( not $msg =~ /^UNDEF$separator/ ) {
         # undef is not formatted appropriately
-        OpenXPKI::Exception->throw (  
-            message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_UNDEF_FORMAT_CORRUPTED", 
-            params  => { 
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERIALIZATION_SIMPLE_READ_UNDEF_FORMAT_CORRUPTED",
+            params  => {
                 MSG => $msg
             }
         );
@@ -502,7 +531,22 @@ sub __read_undef {
     };
 }
 
+# Not used yet
+sub __read_json {
+    my $self   = shift;
+    my $msg    = shift;
 
+    # utf8::upgrade( $msg );
+    ##! 4: 'json data ' . $msg
+    my $json = JSON->new()->decode( $msg );
+
+    ##! 4: 'json decoded ' . Dumper $json
+
+    return {
+        data           => $json,
+        returnmessage  => $msg
+    };
+}
 
 
 
@@ -534,15 +578,19 @@ Returns the serialization of data passed as argument.
 
 Returns the deserialization of data passed as argument.
 
+=head2 is_serialized (static!)
+
+This checks if a given argument is a serialized string. This method is static! 
+
 =head1 Internal Functions
 
 =head2 Serialization
 
 =head3 __write_data
 
-This function returns the serialization of data passed as argument by 
-calling one or more of the following functions. Each of those functions 
-serializes a specific data type according to the syntax (see below). An 
+This function returns the serialization of data passed as argument by
+calling one or more of the following functions. Each of those functions
+serializes a specific data type according to the syntax (see below). An
 exception is thrown if the data type cannot be recognized.
 
 =head3 __write_scalar
@@ -557,17 +605,17 @@ exception is thrown if the data type cannot be recognized.
 
 =head3 __read_data
 
-This function returns the deserialization of data passed as argument by 
-calling one or more of the following functions. Each of those functions 
-deserializes a specific data type according to the syntax (see below). An 
+This function returns the deserialization of data passed as argument by
+calling one or more of the following functions. Each of those functions
+deserializes a specific data type according to the syntax (see below). An
 exception is thrown if the data type cannot be recognized.
 
-Basically, the deserialization works as follows: While scalars and undefs 
-are easily deserialized upon recognition, it's a bit more tricky with arrays 
-and hashes. Since they can possibly contain more (complex) data, each of the 
-functions below returns two values: "$data" holds the deserialized data, and 
-"$returnmessage" returns the (serialized) string that was used to deserialize 
-the data. The latter value is important to keep track of which part of the 
+Basically, the deserialization works as follows: While scalars and undefs
+are easily deserialized upon recognition, it's a bit more tricky with arrays
+and hashes. Since they can possibly contain more (complex) data, each of the
+functions below returns two values: "$data" holds the deserialized data, and
+"$returnmessage" returns the (serialized) string that was used to deserialize
+the data. The latter value is important to keep track of which part of the
 serialized string has already been deserialized.
 
 =head3 __read_scalar
@@ -580,7 +628,7 @@ serialized string has already been deserialized.
 
 =head1 Syntax
 
-We support scalars, array references and hash references 
+We support scalars, array references and hash references
 in any combination. The syntax is the following one:
 
 scalar        ::= 'SCALAR'.SEPARATOR.

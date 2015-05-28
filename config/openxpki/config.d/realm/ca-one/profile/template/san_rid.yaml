@@ -1,0 +1,7 @@
+id: rid
+label: I18N_OPENXPKI_UI_PROFILE_SAN_RID
+description: I18N_OPENXPKI_UI_PROFILE_SAN_RID_DESCRIPTION
+type: freetext
+width: 40
+min: 0
+max: 20

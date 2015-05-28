@@ -1,0 +1,7 @@
+{{#if isFixed}}
+    {{input class="form-control in-form-group" type="text" readonly="readonly" value=password}}
+    {{input class="form-control in-form-group" type="text" value=confirm placeholder=placeholder}}
+{{else}}
+    {{input class="form-control in-form-group" type="password" value=password}}
+    {{input class="form-control in-form-group" type="password" value=confirm focus-in="confirmFocusIn" focus-out="confirmFocusOut" placeholder=placeholder}}
+{{/if}}

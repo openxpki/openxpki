@@ -1,4 +1,4 @@
-## OpenXPKI::Server::API::Default.pm 
+## OpenXPKI::Server::API::Default.pm
 ## (was once the main part of OpenXPKI::Server::API)
 ##
 ## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
@@ -21,7 +21,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );
-use Digest::SHA1 qw( sha1_base64 );
+use Digest::SHA qw( sha1_base64 );
 use DateTime;
 
 use Workflow;
@@ -61,7 +61,7 @@ sub list_my_certificates {
     }
     my @results;
     my $db_results = CTX('dbi_backend')->select(
-        TABLE => [            
+        TABLE => [
             [ 'WORKFLOW_CONTEXT' => 'context2' ],
             [ 'WORKFLOW_CONTEXT' => 'context3' ],
             'CERTIFICATE',
@@ -74,13 +74,13 @@ sub list_my_certificates {
             'CERTIFICATE.STATUS',
             'CERTIFICATE.CERTIFICATE_SERIAL',
         ],
-        DYNAMIC => {            
+        DYNAMIC => {
             'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'creator'},
             'context3.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'cert_identifier'},
             'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => $user},
             'CERTIFICATE.PKI_REALM'           => {VALUE => $realm},
         },
-        JOIN => [            
+        JOIN => [
             [
                 undef,
                 'WORKFLOW_CONTEXT_VALUE',
@@ -134,27 +134,60 @@ sub get_cert_identifier {
     return $identifier;
 }
 
+
+# MASON - can be removed 
 sub get_workflow_ids_for_cert {
     my $self    = shift;
     my $arg_ref = shift;
     my $csr_serial = $arg_ref->{'CSR_SERIAL'};
+    my $cert_identifier = $arg_ref->{'IDENTIFIER'};
 
-    my $workflow_ids = CTX('api')->search_workflow_instances(
-        {
-            CONTEXT => [
-                {
-                    KEY   => 'csr_serial',
-                    VALUE => $csr_serial,
-                },
-            ],
-            TYPE => [
-                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-                'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_ISSUANCE'
-            ]
-        }
+    # Fallback for legacy calls with csr instead of identifier
+    if (!$cert_identifier && $csr_serial) {
+        my $cert_identifier_result = CTX('dbi_backend')->first(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => {
+                CSR_SERIAL => $csr_serial,
+            },
+        );
+        $cert_identifier = $cert_identifier_result->{IDENTIFIER};
+    }
+
+    my @result;
+    # CSR Workflow
+    my $workflow_id_result = CTX('dbi_backend')->first(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => {
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_workflow_csr',
+        },
     );
+    my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
+    # we fake the old return structure to satisfy the mason ui
+    # # FIXME - needs remodeling
+    push @result, {
+        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
+        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
+    } if ($workflow_id);
 
-    return $workflow_ids;
+
+    # CRR Workflow
+    $workflow_id_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => {
+            'IDENTIFIER' => $cert_identifier,
+            ATTRIBUTE_KEY => 'system_workflow_crr',
+        },
+    );
+    foreach my $line (@{$workflow_id_result}) {
+        $workflow_id = $line->{ATTRIBUTE_VALUE};
+        push @result, {
+            'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
+            'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
+        } if ($workflow_id);
+    }
+    return \@result;
+
 }
 
 sub get_head_version_id {
@@ -162,35 +195,6 @@ sub get_head_version_id {
     return CTX('config')->get_head_version();
 }
 
-sub get_current_config_id {
-    my $self = shift;
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CURRENT_CONFIG_ID',
-    );   
-}
-
-sub list_config_ids {
-    my $self = shift;
-    ##! 1: 'start'
-    my $config_entries = CTX('dbi_backend')->select(
-        TABLE   => 'CONFIG',
-        DYNAMIC => {
-            CONFIG_IDENTIFIER => {VALUE => '%', OPERATOR => "LIKE"},
-        },
-    );
-    if (! defined $config_entries
-        || ref $config_entries ne 'ARRAY'
-        || scalar @{ $config_entries } == 0) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_LIST_CONFIG_IDS_NO_CONFIG_IDS_IN_DB',
-        );
-    }
-    ##! 64: 'config_entries: ' . Dumper $config_entries
-
-    my @config_ids = map { $_->{CONFIG_IDENTIFIER} } @{ $config_entries };
-    return \@config_ids;
-}
-   
 sub get_approval_message {
     my $self      = shift;
     my $arg_ref   = shift;
@@ -201,7 +205,7 @@ sub get_approval_message {
 
     # temporarily change the I18N language
     ##! 16: 'changing language to: ' . $arg_ref->{LANG}
-    set_language($arg_ref->{LANG});            
+    set_language($arg_ref->{LANG});
 
     if (! defined $arg_ref->{TYPE}) {
         if ($arg_ref->{'WORKFLOW'} eq 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST') {
@@ -250,13 +254,13 @@ sub get_approval_message {
         my $cert_id = $wf_info->{WORKFLOW}->{CONTEXT}->{cert_identifier};
         # translate message
         $result = OpenXPKI::i18n::i18nGettext(
-            'I18N_OPENXPKI_APPROVAL_MESSAGE_CRR'                       
+            'I18N_OPENXPKI_APPROVAL_MESSAGE_CRR'
         );
     }
     # change back the language to the original session language
     ##! 16: 'changing back language to: ' . $sess_lang
     set_language($sess_lang);
-    
+
     ##! 16: 'result: ' . $result
     return $result;
 }
@@ -274,6 +278,23 @@ sub get_user {
 # get current user
 sub get_role {
     return CTX('session')->get_role();
+}
+
+sub get_session_info {
+
+    my $self    = shift;
+
+    my $session = CTX('session');
+    return {
+        name => $session->get_user(),
+        role => $session->get_role(),
+        role_label => CTX('config')->get([ 'auth', 'roles', $session->get_role(), 'label' ]),
+        pki_realm => $session->get_pki_realm(),
+        pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->get_pki_realm(), 'label' ]),
+        lang => 'en',
+        version => CTX('config')->get_version(),
+    }
+
 }
 
 sub get_random {
@@ -345,19 +366,27 @@ sub get_chain {
     my $return_ref;
     my @identifiers;
     my @certificates;
+    my @subject;
     my $finished = 0;
     my $complete = 0;
     my %already_seen; # hash of identifiers that have already been seen
 
     if (! defined $arg_ref->{START_IDENTIFIER}) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
         );
     }
     my $start = $arg_ref->{START_IDENTIFIER};
     my $current_identifier = $start;
     my $dbi = CTX('dbi_backend');
     my @certs;
+
+    my $inner_format = $arg_ref->{OUTFORMAT} || '';
+    if ($arg_ref->{BUNDLE}) {
+        $inner_format = 'PEM';
+    }
+
+
 
     while (! $finished) {
         ##! 128: '@identifiers: ' . Dumper(\@identifiers)
@@ -373,11 +402,12 @@ sub get_chain {
             $finished = 1;
         }
         else {
-            if (defined $arg_ref->{OUTFORMAT}) {
-                if ($arg_ref->{OUTFORMAT} eq 'PEM') {
+            push @subject, $cert->{SUBJECT};
+            if ($inner_format) {
+                if ($inner_format eq 'PEM') {
                     push @certs, $cert->{DATA};
                 }
-                elsif ($arg_ref->{OUTFORMAT} eq 'DER') {
+                elsif ($inner_format eq 'DER') {
                     if (! defined $default_token) {
                         OpenXPKI::Exception->throw(
                             message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN',
@@ -386,16 +416,18 @@ sub get_chain {
                             },
                         );
                     }
-                    
-                    #FIXME - this is stupid but at least on perl 5.10 it helps with the "double utf8 encoded downloads"                    
+
                     my $utf8fix = $default_token->command({
                         COMMAND => 'convert_cert',
                         DATA    => $cert->{DATA},
                         IN      => 'PEM',
                         OUT     => 'DER',
                     });
-                    Encode::_utf8_on($utf8fix );
                     push @certs, $utf8fix ;
+                } elsif ($inner_format eq 'HASH') {
+                    # unset DATA to save some bytes
+                    delete $cert->{DATA};
+                    push @certs, $cert;
                 }
             }
             if ($cert->{ISSUER_IDENTIFIER} eq $current_identifier) {
@@ -414,6 +446,23 @@ sub get_chain {
             }
         }
     }
+
+    # Return a pkcs7 structure instead of the hash
+    if ($arg_ref->{BUNDLE}) {
+
+        # we do NOT include the root in p7 bundles
+        pop @certs if ($complete && !$arg_ref->{KEEPROOT});
+
+        my $result = $default_token->command({
+            COMMAND          => 'convert_cert',
+            DATA             => \@certs,
+            OUT              =>  ($arg_ref->{OUTFORMAT} eq 'DER' ? 'DER' : 'PEM'),
+            CONTAINER_FORMAT => 'PKCS7',
+        });
+        return $result;
+    }
+
+    $return_ref->{SUBJECT} = \@subject;
     $return_ref->{IDENTIFIERS} = \@identifiers;
     $return_ref->{COMPLETE}    = $complete;
     if (defined $arg_ref->{OUTFORMAT}) {
@@ -431,8 +480,8 @@ sub list_ca_ids {
         params  => {
             METHOD => 'list_ca_ids ',
         },
-    );    
-} 
+    );
+}
 
 sub get_pki_realm_index {
      ##! 1: 'start'
@@ -441,14 +490,14 @@ sub get_pki_realm_index {
         params  => {
             METHOD => 'get_pki_realm_index',
         },
-    );    
+    );
 }
 
-sub get_roles {    
+sub get_roles {
     #FIXME-ACL - should go with the new acl system
     return CTX('config')->get_keys('auth.roles');
 }
- 
+
 
 # FIXME - needs migration
 sub get_export_destinations
@@ -459,7 +508,7 @@ sub get_export_destinations
     my $pki_realm = CTX('session')->get_pki_realm();
 
     ##! 2: "load destination numbers"
-    my $export = CTX('config')->get('system.server.data_exchange.export'); 
+    my $export = CTX('config')->get('system.server.data_exchange.export');
     my $import = CTX('config')->get('system.server.data_exchange.import');
     my @list = ();
     foreach my $dir ($import, $export)
@@ -514,7 +563,7 @@ sub convert_csr {
 sub convert_certificate {
     my $self    = shift;
     my $arg_ref = shift;
-    
+
     my $default_token = CTX('api')->get_default_token();
     my $data = $default_token->command({
         COMMAND => 'convert_cert',
@@ -525,46 +574,211 @@ sub convert_certificate {
     return $data;
 }
 
-sub create_bulk_request_ticket {
-    ##! 1: 'start'
-    my $self      = shift;
-    my $arg_ref   = shift;
-    my $workflows = $arg_ref->{WORKFLOWS};
-    my $ser       = OpenXPKI::Serialization::Simple->new();
-
-    my $dummy_workflow = Workflow->new();
-    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
-    $dummy_workflow->context->param('creator' => CTX('session')->get_user());
-
-    ##! 16: 'dummy_workflow: ' . Dumper $dummy_workflow
-    my $ticket = CTX('notification')->notify({
-        MESSAGE  => 'create_bulk_request',
-        WORKFLOW => $dummy_workflow,
-    });
-    $dummy_workflow->context->param('ticket' => $ser->serialize($ticket));
-    $dummy_workflow->context->param('workflows' => $ser->serialize($workflows));
-
-    CTX('notification')->notify({
-        MESSAGE  => 'create_bulk_request_workflows',
-        WORKFLOW => $dummy_workflow,
-    });
-
-    return $ticket;
-}
-
 sub send_notification {
     ##! 1: 'start'
     my $self      = shift;
     my $arg_ref   = shift;
-    
+
     my $message = $arg_ref->{MESSAGE};
-    my $vars = $arg_ref->{PARAMS}; 
-    
+    my $vars = $arg_ref->{PARAMS};
+
     return CTX('notification')->notify({
         MESSAGE => $message,
         DATA => $vars
     });
-	
+
+}
+
+=head2 import_certificate( { DATA, PKI_REALM, FORCE, REVOKED })
+
+=cut
+
+sub import_certificate {
+    my $self    = shift;
+    my $arg_ref = shift;
+
+    my $default_token = CTX('api')->get_default_token();
+    my $dbi = CTX('dbi_backend');
+
+    my $realm = $arg_ref->{PKI_REALM};
+    my $do_update = $arg_ref->{UPDATE};
+
+    my $cert = OpenXPKI::Crypto::X509->new(
+        TOKEN => $default_token,
+        DATA  => $arg_ref->{DATA},
+    );
+    my $cert_identifier = $cert->get_identifier();
+
+    # Check if the certificate is already in the PKI
+    my $db_hash = $dbi->first(
+        TABLE   => 'CERTIFICATE',
+        DYNAMIC => { IDENTIFIER => $cert_identifier }
+    );
+
+    if ($db_hash) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS',
+            params  => {
+                IDENTIFIER => $db_hash->{IDENTIFIER},
+                PKI_REALM => $db_hash->{PKI_REALM} || '',
+                STATUS => $db_hash->{STATUS},
+            },
+        ) if (!$do_update);
+    } else {
+        $do_update = 0;
+    }
+
+    $db_hash = { $cert->to_db_hash() };
+    $db_hash->{STATUS} = ($arg_ref->{REVOKED} ? 'REVOKED' : 'ISSUED');
+    $db_hash->{PKI_REALM} = $arg_ref->{PKI_REALM} if ($arg_ref->{PKI_REALM});
+
+    my $self_signed = 1;
+    my $issuer_query;
+    # Check if self-signed based on Key Ids, if set
+    if (defined $cert->get_subject_key_id()
+        && defined $cert->get_authority_key_id()) {
+
+        if ($cert->get_subject_key_id() ne $cert->get_authority_key_id()) {
+            $self_signed = 0;
+            $issuer_query = { SUBJECT_KEY_IDENTIFIER => $cert->get_authority_key_id() };
+        }
+
+    # certificates without AIK/SK set
+    } else {
+        if ($cert->{PARSED}->{BODY}->{SUBJECT} ne $cert->{PARSED}->{BODY}->{ISSUER}) {
+            $self_signed = 0;
+            $issuer_query = { SUBJECT => $cert->{PARSED}->{BODY}->{ISSUER} };
+        }
+    }
+
+    # Lookup issuer if not self-signed
+    my $issuer_identifier;
+    if ($self_signed) {
+        $db_hash->{ISSUER_IDENTIFIER} = $cert_identifier;
+    } else {
+
+        # Explicit issuer wins over issuer query
+        if ($arg_ref->{ISSUER}) {
+
+            if ($arg_ref->{FORCE_NOCHAIN}) {
+                OpenXPKI::Exception->throw(
+                    message => 'Option force-no-chain is not allowed witj explicit issuer, use force-issuer instead!'
+                ) ;
+            }
+            $issuer_query = { IDENTIFIER => $arg_ref->{ISSUER} };
+        }
+
+        # TODO - check for non-uniq subjects
+        my $db_result = $dbi->select(
+            TABLE   => 'CERTIFICATE',
+            DYNAMIC => $issuer_query,
+        );
+
+        if ((scalar @{$db_result}) > 1) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_ISSUER_QUERY_AMBIGIOUS_RESULT',
+                params  => {
+                    RESULTS => scalar @{$db_result},
+                    QUERY => Dumper $issuer_query,
+                },
+            )
+        }
+
+        if ((scalar @{$db_result}) == 1) {
+
+            my $issuer_cert = $db_result->[0];
+
+            my $valid;
+            # check if the issuer is already a root
+            if ($issuer_cert->{IDENTIFIER} eq $issuer_cert->{ISSUER_IDENTIFIER}) {
+                $valid = $default_token->command({
+                    COMMAND => 'verify_cert',
+                    CERTIFICATE => $cert->{DATA},
+                    TRUSTED => $issuer_cert->{DATA},
+                });
+            } else {
+                # get the chain starting from the issuer
+
+                #validate_certificate
+                my $chain = $self->get_chain({ START_IDENTIFIER => $issuer_cert->{IDENTIFIER}, OUTFORMAT => 'PEM' });
+                # we can only verify with a complete chain
+                if ($chain->{COMPLETE}) {
+                    my @work_chain = @{$chain->{CERTIFICATES}};
+                    my $root = pop @work_chain;
+
+                    $valid = $default_token->command({
+                        COMMAND => 'verify_cert',
+                        CERTIFICATE => $cert->{DATA},
+                        TRUSTED => $root,
+                        CHAIN => join "\n", @work_chain
+                    });
+                } elsif($arg_ref->{FORCE_NOCHAIN}) {
+                    # Accept an incomplete chain
+                    $valid = 1;
+                    CTX('log')->log(
+                        MESSAGE  => "Importing certificate with incomplete chain! $cert_identifier / " . $cert->get_subject(),
+                        PRIORITY => 'warn',
+                        FACILITY => ['audit','system']
+                    );
+                }
+            }
+
+            if (!$valid) {
+                # force the invalid issuer
+                if ($arg_ref->{FORCE_ISSUER}) {
+                    CTX('log')->log(
+                        MESSAGE  => "Importing certificate with invalid chain with force! $cert_identifier / " . $cert->get_subject(),
+                        PRIORITY => 'warn',
+                        FACILITY => ['audit','system']
+                    );
+                } else {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN',
+                        params  => { ISSUER_IDENTIFIER => $issuer_cert->{IDENTIFIER}, ISSUER_SUBJECT => $issuer_cert->get_subject() },
+                    ) ;
+                }
+            }
+
+            $db_hash->{ISSUER_IDENTIFIER} = $issuer_cert->{IDENTIFIER};
+
+            # if the issuer is in a realm, it forces the entity into the same one
+            if ($issuer_cert->{PKI_REALM}){
+                $db_hash->{PKI_REALM} = $issuer_cert->{PKI_REALM};
+            }
+
+        } elsif ($arg_ref->{FORCE_NOCHAIN}) {
+            CTX('log')->log(
+                MESSAGE  => "Importing certificate without issuer! $cert_identifier / " . $cert->get_subject(),
+                PRIORITY => 'warn',
+                FACILITY => ['audit','system']
+            );
+        } else {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER',
+                params  => { QUERY => Dumper $issuer_query },
+            );
+        }
+    } # end of issuer validation
+
+    # we now have a filled db_hash
+
+    if ($do_update) {
+        $dbi->update(
+            TABLE => 'CERTIFICATE',    # use hash method
+            DATA  => $db_hash,
+            WHERE => { IDENTIFIER => $db_hash->{IDENTIFIER} }
+        );
+    } else {
+        $dbi->insert(
+            TABLE => 'CERTIFICATE',    # use hash method
+            HASH  => $db_hash,
+        );
+    }
+    $dbi->commit();
+    # unset data to save bytes and return the remainder of the hash
+    delete $db_hash->{DATA};
+    return $db_hash;
+
 }
 
 1;
@@ -615,12 +829,17 @@ Return structure:
 Returns the certificate chain starting at a specified certificate.
 Expects a hash ref with the named parameter START_IDENTIFIER (the
 identifier from which to compute the chain) and optionally a parameter
-OUTFORMAT, which can be either 'PEM' or 'DER'.
+OUTFORMAT, which can be either 'PEM', 'DER' or 'HASH' (full db result).
 Returns a hash ref with the following entries:
 
     IDENTIFIERS   the chain of certificate identifiers as an array
+    SUBJECT       list of subjects for the returned certificates
     CERTIFICATES  the certificates as an array of data in outformat
                   (if requested)
     COMPLETE      1 if the complete chain was found in the database
                   0 otherwise
- 
+
+By setting "BUNDLE => 1" you will not get a hash but a PKCS7 encoded bundle
+holding the requested certificate and all intermediates (if found). Add
+"KEEPROOT => 1" to also have the root in PKCS7 container.
+

@@ -1,0 +1,328 @@
+head:
+    prefix: crr
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC
+
+state:
+    CHECK_APPROVALS:
+        autorun: 1
+        action:
+          - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
+          - global_noop > CHECK_FOR_DELAYED_REVOKE ? is_approved is_not_yet_revoked_or_pending
+          - global_noop2 > NOTIFY_CRR_PENDING ? !is_approved is_not_yet_revoked_or_pending
+
+    CHECK_BATCHMODE:
+        autorun: 1
+        action:
+          - global_noop > PENDING_USER ? !global_is_batch_mode
+          - global_noop2 > CHECK_APPROVALS ? global_is_batch_mode
+
+    CHECK_FOR_REVOCATION:
+        autorun: 1
+        action:
+          - global_check_for_revocation > SUCCESS
+
+    CHECK_FOR_DELAYED_REVOKE:
+        autorun: 1
+        action:
+          - delay_revocation > CRR_PERSIST ? is_delayed_revocation
+          - global_noop > CRR_PERSIST ? !is_delayed_revocation
+
+    CRR_PERSIST:
+        autorun: 1
+        action:
+          - persist_crr > NICE_DISPATCH_REVOKE ? is_not_yet_revoked_or_pending
+          - global_noop > CHECK_FOR_REVOCATION ? !is_not_yet_revoked_or_pending
+
+    EDIT_REQUEST:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC
+        action:
+          - update_crr > PENDING
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
+
+    EDIT_REQUEST_USER:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC
+        action:
+          - update_crr > PENDING_USER
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
+
+    FAILURE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC
+
+    FLAG_NOTIFY_SEND:
+        autorun: 1
+        action:
+          - flag_pending_notification_send > PENDING
+
+    INITIAL:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC
+        action:
+          - create_crr > CHECK_BATCHMODE
+
+    NICE_DISPATCH_REVOKE:
+        autorun: 1
+        action:
+          - global_nice_revoke_certificate > CHECK_FOR_REVOCATION
+
+    NOTIFY_CRR_PENDING:
+        autorun: 1
+        action:
+          - global_noop > PENDING ? pending_notification_send
+          - send_pending_notification > PENDING ? !pending_notification_send
+
+    PENDING:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC
+        action:
+          - approve_crr > CHECK_APPROVALS ? acl_can_approve is_not_yet_revoked_or_pending
+          - edit_crr > EDIT_REQUEST ? is_not_yet_revoked_or_pending
+          - reject_crr > REJECTED ? acl_can_reject is_not_yet_revoked_or_pending
+          - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
+        output:
+          - cert_identifier
+          - creator
+          - notbefore
+          - invalidity_time
+          - reason_code
+          - comment
+        button:
+          edit_crr:
+            format: optional
+          approve_crr:
+            format: expected
+          reject_crr:
+            format: failure
+          cleanup:
+            format: expected
+
+    PENDING_USER:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC
+        action:
+          - submit > CHECK_APPROVALS
+          - edit_crr > EDIT_REQUEST_USER
+          - global_cancel > CANCELED
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
+        button:
+          submit:
+            format: expected
+          edit_crr:
+            format: optional
+          cancel:
+            format: failure
+
+
+    REJECTED:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_DESC
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_DESC
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
+
+    CANCELED:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC
+
+
+action:
+    approve_crr:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC
+        param:
+            check_creator: 0
+            multi_role_approval: 0
+
+    create_crr:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_DESC
+        input:
+          - cert_identifier
+          - reason_code
+          - comment
+          - invalidity_time
+          - flag_auto_approval
+          - flag_delayed_revoke
+          - flag_batch_mode
+          - crr_info
+        validator:
+          - validate_invalidity_time
+          - validate_reason_code
+          - global_cert_identifier_exists
+
+    delay_revocation:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Pause
+        param:
+            _map_wakeup: $invalidity_time
+            reason: I18N_OPENXPKI_DELEAYED_REVOCATION_REQUESTED
+
+    cleanup:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC
+
+    persist_crr:
+        class: OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest
+
+    reject_crr:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC
+
+    edit_crr:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC
+
+    flag_pending_notification_send:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            flag_pending_notification_send: 1
+
+    send_pending_notification:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            message: crr_pending_approval
+
+    submit:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC
+
+    update_crr:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_DESC
+        input:
+          - reason_code
+          - comment
+          - invalidity_time
+        param:
+            description: Update
+        validator:
+          - validate_invalidity_time
+          - validate_reason_code
+
+
+condition:
+    acl_can_approve:
+        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        param:
+            roles: CA Operator,RA Operator
+
+    acl_can_reject:
+        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        param:
+            roles: CA Operator,RA Operator
+
+    is_not_yet_revoked_or_pending:
+        class: OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked
+
+    is_delayed_revocation:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{flag_delayed_revoke}
+
+    is_approved:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition1: crr_is_autoapproval
+            condition2: crr_has_approvals
+
+    has_approvals:
+        class: OpenXPKI::Server::Workflow::Condition::Approved
+        param:
+            role: RA Operator
+
+    is_autoapproval:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{flag_auto_approval}
+
+    pending_notification_send:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{flag_pending_notification_send}
+
+
+validator:
+    validate_invalidity_time:
+        class: OpenXPKI::Server::Workflow::Validator::InvalidityTime
+        arg:
+          - $invalidity_time
+          - $cert_identifier
+
+    validate_reason_code:
+        class: OpenXPKI::Server::Workflow::Validator::ReasonCode
+        arg:
+          - $reason_code
+
+
+field:
+    crr_info:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL
+        name: crr_info
+        type: server
+        required: 0
+
+    flag_auto_approval:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL
+        name: flag_auto_approval
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC
+        type: server
+        required: 0
+
+    flag_delayed_revoke:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL
+        name: flag_delayed_revoke
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC
+        type: server
+        required: 0
+
+acl:
+    Anonymous:
+        creator: self
+
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+
+    System:
+        creator: self
+
+    SmartCard:
+        creator: self
+
+    User:
+        creator: self
+

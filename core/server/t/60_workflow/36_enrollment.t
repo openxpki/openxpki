@@ -19,6 +19,15 @@
 #
 # Note: this uses the workflow directly and NOT the OpenXPKI API.
 #
+# !!!!!!!! IMPORTANT NOTE !!!!!!!!
+# !!
+# !! This test currently takes a *long* time to go through all the iterations.
+# !! To keep this from causing unnecessary global warming and delays in 
+# !! running tests (e.g. for travis-ci), this test *only* runs if the
+# !! environment variable FULL_TEST is set to a true value.
+# !!
+# !!!!!!!! IMPORTANT NOTE !!!!!!!!
+#
 # RUNNING THIS SCRIPT
 #
 # By default, this script just runs through the tests and tries _all_
@@ -73,6 +82,10 @@ eval { use lib ( $cfgbase . '/mocklib' ) };
 my $debug                = $ENV{TEST_DEBUG}         || 0;
 my $show_ok_with_no_rule = $ENV{CHECK_FALSE_OK}     || 0;
 my $xmldir               = $ENV{TEST_ENROLL_XMLDIR} || $cfgbase;
+my $do_wf_tests          = $ENV{FULL_TEST}          || 0;
+
+SKIP: {
+    skip 'Set FULL_TEST=1 to run full WF tests' unless $do_wf_tests;
 
 my $LOG_FILE  = 'workflow_tests.log';
 my $CONF_FILE = $cfgbase . '/log4perl.conf';
@@ -617,6 +630,9 @@ foreach my $policy (@policies) {
 
 done_testing;
 diag("Ran $total_iterations iteration(s)");
+}
+
+done_testing();
 
 0;
 

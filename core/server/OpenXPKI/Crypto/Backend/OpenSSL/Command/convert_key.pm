@@ -50,7 +50,8 @@ sub get_command
         $self->{ENC_ALG} ne "des")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_ENC_ALG");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_ENC_ALG",
+            params => { ENC_ALG => $self->{ENC_ALG} });
     }
     if (not exists $self->{PASSWD})
     {
@@ -67,7 +68,8 @@ sub get_command
         $self->{IN} ne "PKCS8")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_INPUT_FORMAT");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_INPUT_FORMAT",
+            params => { INPUT_FORMAT => $self->{IN} });
     }
     if (not exists $self->{OUT})
     {
@@ -82,7 +84,8 @@ sub get_command
         $self->{OUT} ne "OPENSSL_EC")
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_OUTPUT_FORMAT");
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_KEY_WRONG_OUTPUT_FORMAT",
+            params => { OUTPUT_FORMAT => $self->{OUT} });
     }
     if (not exists $self->{DATA})
     {

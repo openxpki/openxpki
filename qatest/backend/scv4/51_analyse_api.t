@@ -63,10 +63,7 @@ foreach my $cert_file (@paths) {
 
 $test->diag("Found ".scalar(@certflat)." exisiting certificates");
 
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{role},
-) or die "Error - connect failed: $@";
+$test->connect_ok( %{$cfg{auth}} ) or die "Error - connect failed: $@";
   
 $test->runcmd('sc_analyze_smartcard', {
     'CERTS' => \@certflat,

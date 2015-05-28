@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Session.pm 
+## OpenXPKI::Server::Session.pm
 ##
 ## Written 2006 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
@@ -10,7 +10,7 @@ use warnings;
 use utf8;
 
 use English;
- 
+
 use OpenXPKI::Exception;
 use OpenXPKI::i18n;
 use OpenXPKI::Serialization::Simple;
@@ -18,7 +18,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 ## switch off IP checks
 use CGI::Session qw/-ip-match/;
-use Digest::SHA1 qw( sha1_hex );;
+use Digest::SHA qw( sha1_hex );;
 
 ## constructor and destructor stuff
 
@@ -92,10 +92,7 @@ sub new {
                             DIRECTORY => $self->{DIRECTORY}});
         }
         $self->{session}->param ("status" => "invalid");
-        
-        $self->{session}->param ("config_version" => $keys->{VERSION} );
-        $self->{session}->param ("config_version" => CTX('config')->get_version() ) unless ($self->{session}->param ("config_version"));
-        
+
     }
     $self->{session}->expire($self->{LIFETIME});
     $self->{session}->flush();
@@ -116,13 +113,15 @@ sub export_serialized_info{
 sub import_serialized_info {
     my $self = shift;
     my $serialized_string = shift;
+    my $args = shift;
+
     unless($serialized_string){
         OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_SESSION_IMPORT_SERIALIZED_STRING_CAN_NOT_BE_EMPTY"
                 );
     }
     my $info = $self->_get_serializer()->deserialize($serialized_string);
-    
+
     unless(ref $info eq 'HASH'){
         OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_SESSION_IMPORT_SERIALIZED_STRING_MUST_BE_HASH",
@@ -130,19 +129,23 @@ sub import_serialized_info {
                 );
     }
     my @import_keys = $self->_get_persitence_keys();
-    
-    foreach my $key (@import_keys){
-        $self->{session}->param($key, $info->{$key});
+
+    foreach my $key (@import_keys) {
+        # We use the setter as there might be extra actions!
+        if (defined $info->{$key} && !$args->{'skip_'.$key}) {
+            my $call = "set_".$key;
+            $self->$call( $info->{$key} );
+        }
     }
 }
 
 sub parse_serialized_info {
-    
+
     my $self = shift;
     my $serialized_string = shift;
     return unless ($serialized_string);
-     
-    return $self->_get_serializer()->deserialize($serialized_string);    
+
+    return $self->_get_serializer()->deserialize($serialized_string);
 }
 
 sub _get_serializer{
@@ -150,7 +153,7 @@ sub _get_serializer{
 }
 
 sub _get_persitence_keys{
-    return qw(user role config_version);
+    return qw(user role);
 }
 
 
@@ -325,23 +328,10 @@ sub get_state
     return $self->{session}->param ("state");
 }
 
-sub set_config_version
-{
-    my $self = shift;
-    $self->{session}->param ("config_version" => shift);
-    $self->{session}->flush();
-}
-
-sub get_config_version
-{
-    my $self = shift;
-    return $self->{session}->param ("config_version");
-}
-
 # For SCEP - FIXME - move whole Session to Moose
 sub set_profile {
-    my $self = shift;    
-    $self->{profile} = shift;    
+    my $self = shift;
+    $self->{profile} = shift;
 }
 
 sub get_profile {
@@ -350,8 +340,8 @@ sub get_profile {
 }
 
 sub set_server {
-    my $self = shift;    
-    $self->{server} = shift;    
+    my $self = shift;
+    $self->{server} = shift;
 }
 
 sub get_server {
@@ -360,14 +350,25 @@ sub get_server {
 }
 
 sub set_enc_alg {
-    my $self = shift;    
-    $self->{enc_alg} = shift;    
+    my $self = shift;
+    $self->{enc_alg} = shift;
 }
 
 sub get_enc_alg {
     my $self = shift;
     return $self->{enc_alg};
 }
+
+sub set_hash_alg {
+    my $self = shift;
+    $self->{hash_alg} = shift;
+}
+
+sub get_hash_alg {
+    my $self = shift;
+    return $self->{hash_alg};
+}
+
 
 1;
 __END__
@@ -433,24 +434,26 @@ if the session is not valid.
 
 returns a challenge string if such a string was set in the past.
 
-=head2 Session persistence 
+=head2 Session persistence
 
 The session module supports persistence across the lifetime of the
 originating process. You can use C<export_serialized_info> to get a hash
 representing the current state of the session and  C<import_serialized_info>
 to make a new session impersonate those state.
 You can define what keys are persisted in C<_get_persitence_keys>.
-   
+
 =head3 _get_persitence_keys
 Returns the keys that should be used when persisting the session.
-Currently the fields are user role config_version.
+Currently the fields are user role
 
 =head3 export_serialized_info
-Return a key/value hash with the keys named in _get_persitence_keys.  
+Return a key/value hash with the keys named in _get_persitence_keys.
 
 =head3 import_serialized_info
-Reset the values of the current session to the values of the passed
-hash.
+
+Pass a string with the serialized info as obtained by export_serialized_info.
+The parameters overwrite the current session settings. You can add a hash a
+second parameter with I<skip_variable_name =\> 1> to skip certain values.
 
 =head3 parse_serialized_info
 
@@ -485,10 +488,6 @@ Parse a serialized session blob and return as hash.
 =item * get_state
 
 =item * set_state
-
-=item * get_config_version
-
-=item * set_config_version
 
 =item * delete_secret
 

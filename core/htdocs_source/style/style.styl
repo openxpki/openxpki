@@ -1,0 +1,156 @@
+
+@import "../vendor/bootstrap/dist/css/bootstrap.css"
+@import "../vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css"
+@import "oxi.css"
+@import "oxi-grid.css"
+
+iframe.oxifield-upload
+    width 0
+    height 0
+    border 0px solid #fff
+
+div.oxifield-upload
+    position relative
+    padding-bottom 34px
+
+input.oxi-file-input
+    width:100px
+    position:absolute
+    right:15px
+    visibility:hidden
+
+input.oxi-file-input::before
+    visibility:visible
+    position:absolute
+    width:100px
+    height:34px
+    content: 'Select a file'
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+
+input.oxi-file-input:hover::before
+    color: #333;
+    text-decoration: none;
+    background-color: #ebebeb;
+    border-color: #adadad;
+
+input.oxi-file-input:active::before
+    outline: thin dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+    color: #333;
+    background-color: #ebebeb;
+    border-color: #adadad;
+    background-image: none;
+
+.input-group .twitter-typeahead
+    display: table-cell !important;
+
+.oxi-no-input
+    padding-top 6px
+
+.oxi-checkbox
+    position: relative
+    top: 4px
+    display: inline-block
+    width 18px
+    height 18px
+    border 2px solid
+    border-radius 2px
+    border-color rgba(0, 0, 0, 0.54)
+
+.oxi-checkbox.checked:after
+    position absolute
+    left 2px
+    top 2px
+    //display table
+    width 10px
+    height 10px
+    border-radius 2px
+    opacity 0.54
+    background-color #000
+    content ' '
+
+button.btn-loading
+    color: #fff;
+    background-color: #428bca;
+    border-color: #357ebd;
+    &:hover,
+    &:focus,
+    &:active,
+    &.active
+      color: #fff;
+      background-color: #3276b1;
+      border-color: #285e8e;
+
+tr.has-action
+    cursor pointer
+
+input.in-form-group
+    margin-bottom 15px
+
+div.header
+    margin-top 0
+    margin-bottom 0
+
+    div.userinfo
+        font-size small
+        color #aaa
+        margin-top 20px
+
+div.loading
+    opacity 0
+    visibility hidden
+
+    transition opacity 0.75s
+    &.in-progress
+        opacity 1
+        visibility visible
+        transition opacity 0.1s
+
+    div.progress
+        position fixed
+        top 30px
+        right 20px
+        width 100px
+        div.progress-bar
+            width 100%
+
+div.waiting-for-ember
+    margin-top 80px
+
+div.stacked-buttons
+    margin-top 4px
+    margin-bottom 4px
+
+    div.btn-bt-margin
+        margin-top 6px
+        margin-bottom 6px
+
+div.description
+    margin-bottom 6px
+
+div.oxisection-grid
+    th
+        cursor pointer
+        -webkit-user-select none
+
+span.pagination-label
+    float left
+    padding 6px 0
+

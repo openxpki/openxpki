@@ -29,6 +29,9 @@
 # common includes for package builds
 include $(TOPDIR)/package/common/Makefile.inc
 
+TT_EXTRA_SYMBOLS = --define BUILD_DATE="`date --rfc-2822`"
+
+
 ifdef PREFIX
 PERL_MAKEPL_ARGS="PREFIX=$(PREFIX)"
 endif
@@ -88,21 +91,13 @@ package:
 	test -d $(PKGDIR) || mkdir $(PKGDIR)
 	mv /tmp/$(PACKAGE)_* $(PKGDIR)/
 
-changelog::
-	if [ ! -e changelog.org ]; then mv changelog changelog.org; fi
-	echo -n $(PACKAGE) > changelog
-	DATE=`date +'%Y%m%d'` && echo \ \($$DATE\) unstable\; urgency=low >> changelog
-	echo >> changelog
-	echo "  * Daily build." >> changelog
-	echo >> changelog
-	echo " -- OpenXPKI Foundation <debian@openxpki.org> " `date --rfc-2822` >> changelog
-
 source-clean:
 	rm -rf /tmp/$(PERLNAME)-*
 	rm -f /tmp/openxpki-debian.tar.gz
 
 clean:	source-clean
-	if [ -e changelog.org ]; then mv changelog.org changelog; fi
+	if [ -e changelog ]; then rm changelog; fi
+	if [ -e control ]; then rm control; fi
 	if [ -d ../examples ]; then rm -rf ../examples; fi
 	rm -f *.dsc *.dsc.asc *.tar.gz $(PKGDIR)/$(PACKAGE)_* *.changes
 

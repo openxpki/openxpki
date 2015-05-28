@@ -13,6 +13,8 @@ use OpenXPKI::Server::DBI;
 
 ok (1);
 
+TODO: {
+    todo_skip 'See Issue #188', 49;
 our %config;
 our $dbi;
 require 't/30_dbi/common.pl';
@@ -454,4 +456,5 @@ foreach my $spec (@validity_specs) {
 }
 
 
+}
 1;

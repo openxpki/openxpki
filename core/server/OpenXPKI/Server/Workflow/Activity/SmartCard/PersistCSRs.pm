@@ -11,7 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Workflow::WFObject::WFHash; 
+use OpenXPKI::Server::Workflow::WFObject::WFHash;
 
 use Data::Dumper;
 
@@ -29,15 +29,14 @@ sub execute {
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_PERSISTCSRS_CERT_ISSUANCE_DATA_UNDEFINED',
         );
     }
-    
+
     my @cert_iss_data = @{$serializer->deserialize($cert_iss_data)};
-    
+
     foreach my $csr_data (@cert_iss_data) {
         ##! 64: 'csr_data: ' . Dumper($csr_data)
         my $type    = $csr_data->{'csr_type'};
         my $profile = $csr_data->{'cert_profile'};
         my $subject = $csr_data->{'cert_subject'};
-        my $role    = $csr_data->{'cert_role'};
         my $subj_alt_names = $csr_data->{'cert_subject_alt_name'};
         my $data    = $csr_data->{'pkcs10'};
 
@@ -59,7 +58,6 @@ sub execute {
                     'DATA'       => $data,
                     'PROFILE'    => $profile,
                     'SUBJECT'    => $subject,
-                    'ROLE'       => $role,
                 },
         );
 
@@ -81,25 +79,25 @@ sub execute {
             );
         }
 
-	foreach my $validity_param qw( notbefore notafter ) {
-	    if (defined $context->param($validity_param)) {
-		#my $source = $source_ref->{$validity_param};
-		my $attrib_serial = $dbi->get_new_serial(
-		    TABLE => 'CSR_ATTRIBUTES',
-		    );
-		$dbi->insert(
-		    TABLE => 'CSR_ATTRIBUTES',
-		    HASH  => {
-			'ATTRIBUTE_SERIAL' => $attrib_serial,
-			'PKI_REALM'        => $pki_realm,
-			'CSR_SERIAL'       => $csr_serial,
-			'ATTRIBUTE_KEY'    => $validity_param,
-			'ATTRIBUTE_VALUE'  => $context->param($validity_param),
-			'ATTRIBUTE_SOURCE' => 'OPERATOR',
-		    },
-		    );
-	    }
-	}
+    foreach my $validity_param (qw(notbefore notafter)) {
+        if (defined $context->param($validity_param)) {
+        #my $source = $source_ref->{$validity_param};
+        my $attrib_serial = $dbi->get_new_serial(
+            TABLE => 'CSR_ATTRIBUTES',
+            );
+        $dbi->insert(
+            TABLE => 'CSR_ATTRIBUTES',
+            HASH  => {
+            'ATTRIBUTE_SERIAL' => $attrib_serial,
+            'PKI_REALM'        => $pki_realm,
+            'CSR_SERIAL'       => $csr_serial,
+            'ATTRIBUTE_KEY'    => $validity_param,
+            'ATTRIBUTE_VALUE'  => $context->param($validity_param),
+            'ATTRIBUTE_SOURCE' => 'OPERATOR',
+            },
+            );
+        }
+    }
 
 
         my @csr_serials;
@@ -113,17 +111,22 @@ sub execute {
         $context->param(
             'csr_serial' => $serializer->serialize(\@csr_serials),
         );
-                
-        # Link the escrow key handle to the csr_id 
+
+        # Link the escrow key handle to the csr_id
         if ($csr_data->{'escrow_key_handle'}) {
             ##! 16: 'Add escrow key handle ' . $csr_data->{'escrow_key_handle'}
             my $cert_escrow_handle_context = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
-                { workflow => $workflow , context_key => 'cert_escrow_handle' } );        
+                { workflow => $workflow , context_key => 'cert_escrow_handle' } );
             $cert_escrow_handle_context->setValueForKey( $csr_serial => $csr_data->{'escrow_key_handle'} );
         }
-        
-        
+
+        CTX('log')->log(
+            MESSAGE => "SmartCard persisted csrs serials " .join(", ",@csr_serials),
+            PRIORITY => 'info',
+            FACILITY => 'application'
+        );
     }
+
     return;
 }
 
