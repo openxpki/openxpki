@@ -27,4 +27,11 @@ main:
     label: I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH
 
 
+certsearch:
+   - label: Requestor Name
+     key: meta_requestor
+     pattern: '*%s*'
+     operator: like 
 
+   - label: Requestor eMail
+     key: meta_email
