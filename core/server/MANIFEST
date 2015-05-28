@@ -684,6 +684,7 @@ cgi-bin/sc.fcgi
 # Client UI
 htdocs/src/main-built.js
 htdocs/style/main-built.css
+htdocs/vendor/ember-template-compiler/index.js
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2
