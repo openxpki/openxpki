@@ -10,7 +10,7 @@ use Moose;
 use English;
 use Data::Dumper;
 use OpenXPKI::DateTime;
-use Crypt::ECDH;
+use OpenXPKI::Crypto::Backend::OpenSSL::ECDH;
 use Digest::SHA qw(sha256_hex);
 
 extends 'OpenXPKI::Client::SC::Result';
@@ -214,10 +214,10 @@ sub handle_get_card_status {
         
         my $ecdhkey;
         eval { 
-            $ecdhkey = Crypt::ECDH::get_ecdh_key($ECDHPubkey); 
+            $ecdhkey = OpenXPKI::Crypto::Backend::OpenSSL::ECDH::get_ecdh_key($ECDHPubkey); 
         };
         if ( $EVAL_ERROR || !$ecdhkey) {
-            $log->error( "Crypt::ECDH::get_ecdh_key:" . $EVAL_ERROR);
+            $log->error( "Error getting ECDH Key:" . $EVAL_ERROR);
             
         } else {
 
