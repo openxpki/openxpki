@@ -122,7 +122,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/XS.pm
 OpenXPKI/Crypto/Backend/OpenSSL/ECDH.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_random.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs10.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
 
@@ -145,14 +144,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_decrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
-
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/RSA.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/DSA.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/EC.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST2001.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST2001CP.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94.pm
-OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key/GOST94CP.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_params.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkey.pm
