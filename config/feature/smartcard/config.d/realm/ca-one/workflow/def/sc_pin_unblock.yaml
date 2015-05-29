@@ -63,19 +63,28 @@ state:
         action: 
           - initialize > HAVE_TOKEN_ID
 
+    # todo - remodel workflow or exted code to show output on 
+    # single action states, fix is_card_ui condtion afterwards
     PEND_ACT_CODE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC
         action: 
-          - user_abort > FAILURE
-          - initialize > HAVE_TOKEN_ID
+          - user_abort > FAILURE ? is_card_ui
+          - initialize > HAVE_TOKEN_ID ? is_card_ui
           - generate_activation_code > CHECK_FOR_ACT_HASHES
+        output: 
+          - act_code
 
-    PEND_PIN_CHANGE: 
+    PEND_PIN_CHANGE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC
         action: 
-          - user_abort > FAILURE
-          - post_codes > HAVE_CODES
-          - initialize > HAVE_TOKEN_ID
+          - user_abort > FAILURE  ? is_card_ui
+          - post_codes > HAVE_CODES  ? is_card_ui
+          - initialize > HAVE_TOKEN_ID  ? is_card_ui
           - generate_activation_code > CHECK_FOR_ACT_HASHES
-
+        output: 
+          - act_code
 
     SUCCESS: 
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
@@ -111,6 +120,7 @@ action:
 
     generate_activation_code: 
         class: OpenXPKI::Server::Workflow::Activity::SmartCard::GenerateActivationCode
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE
 
     get_auth1_id: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
@@ -214,63 +224,35 @@ condition:
         class: Workflow::Condition::Evaluate
         param: 
             test: $context->{num_tries} >= 3;
- 
+
+    is_card_ui:
+        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        param: 
+            roles: SmartCard, User
+
 
 field:
     _auth1_code: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_LABEL
         name: _auth1_code
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_TOOLTIP
-        required: 1
-        type: text
 
     _auth2_code: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_LABEL
         name: _auth2_code
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_TOOLTIP
-        required: 1
-        type: text
 
     auth1_id: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_LABEL
         name: auth1_id
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_TOOLTIP
-        required: 1
-        type: text
 
     auth2_id: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_LABEL
         name: auth2_id
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_TOOLTIP
-        required: 1
-        type: text
 
     error_code: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_LABEL
         name: error_code
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_TOOLTIP
-        required: 1
-        type: text
 
     token_id: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_LABEL
         name: token_id
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_DESC
-        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_PLACEHOLDER
-        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP
-        required: 1
-        type: text
 
+    act_code:
+       name: _password
+       label: Activation Code
 
 acl:
     CA Operator: 
