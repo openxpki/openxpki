@@ -1579,9 +1579,8 @@ sub __render_from_workflow {
                     });
                     push @buttons, {
                         label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
-                        action => 'workflow'
+                        action => 'workflow!index!wf_token!'.$token->{value},
                     }
-
                 }
             }
             
