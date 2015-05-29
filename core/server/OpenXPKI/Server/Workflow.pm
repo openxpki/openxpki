@@ -190,7 +190,7 @@ sub execute_action {
         my $autofail = $self->_get_workflow_state()->{_actions}->{$action_name}->{autofail};
         if (defined $autofail && $autofail =~ /(yes|1)/i) {
             ##! 16: 'execute failed and has autofail set'
-            $self->_autofail($error);
+            $self->_fail($error);
         }
 
         # Something unexpected went wrong inside the action, throw exception
@@ -215,6 +215,18 @@ sub execute_action {
 
     return $state;
 
+}
+
+sub set_failed {
+    
+    my $self = shift;
+    my $error = shift;
+    my $reason = shift;
+    
+    $self->_fail($error);
+    
+    return $self;
+    
 }
 
 # migrated from api - i have no idea what this is good for
@@ -403,6 +415,46 @@ sub set_reap_at_interval{
     #if the wf is already running, immediately save data to db:
     $self->_save() if $self->is_running();
 }
+
+=head2 get_global_actions
+
+Return an arrayref with the names of the global actions wakeup, resume, fail
+that are available to the session user on this workflow. 
+
+=cut
+
+sub get_global_actions {
+    
+    my $self = shift;
+    
+    my $role = CTX('session')->get_role() || 'Anonymous';
+    
+    my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type(), 'acl', $role ] );
+    
+    my @possible_action;
+    my $proc_state = $self->proc_state();
+    if ($proc_state eq 'exception') {
+        @possible_action = ('resume','fail');        
+
+    } elsif ($proc_state eq 'pause') {
+        @possible_action = ('wakeup','fail');
+        
+    } elsif ($proc_state ne 'finished') {
+        @possible_action = ('fail');
+        
+    }
+    
+    my @allowed;
+    foreach my $action (@possible_action) {
+        if ($acl->{$action}) {
+            push @allowed, $action;
+        }  
+    }
+    
+    return \@allowed;
+            
+}
+
 
 sub _handle_proc_state{
     my ( $self, $action_name ) = @_;
@@ -609,57 +661,43 @@ sub _proc_state_exception {
 
 }
 
-sub _autofail {
-
-    my $self      = shift;
-    my $error = shift;
-
-    eval{
-        $self->state('FAILURE');
-        $self->_set_proc_state('finished');
-        $self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);
-        $self->add_history(
-            Workflow::History->new(
-                {
-                    action      => $self->{_CURRENT_ACTION},
-                    description => 'AUTOFAIL',
-                    user        => CTX('session')->get_user(),
-                }
-            )
-        );
-        $self->_save();
-    };
-    CTX('log')->log(
-        MESSAGE  => "Autofail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." failed",
-        PRIORITY => "error",
-        FACILITY => "application"
-    );
-
-}
-
-## FIXME - is this used anywhere - looks like a duplicate leftover from autofail
-sub _skip {
+sub _fail {
 
     my $self = shift;
     my $error = shift;
+    my $reason = shift || 'autofail';
 
     eval{
         $self->state('FAILURE');
-        $self->_set_proc_state('finished');
-        $self->notify_observers( 'autofail', $self->state, $self->{_CURRENT_ACTION}, $error);
+        $self->_set_proc_state('finished');               
+        $self->notify_observers( $reason, $self->state, $self->{_CURRENT_ACTION}, $error);
         $self->add_history(
             Workflow::History->new(
                 {
                     action      => $self->{_CURRENT_ACTION},
-                    description => 'NEW_STATE: FAILURE',
+                    description => $reason,
                     user        => CTX('session')->get_user(),
                 }
             )
         );
         $self->_save();
     };
+    
+    if ($reason eq 'autofail') {        
+        CTX('log')->log(
+            MESSAGE  => "Auto-Fail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." with error " . $error,
+            PRIORITY => "error",
+            FACILITY => "application"
+        );
+    } else {
+        CTX('log')->log(
+            MESSAGE  => "Forced Fail for workflow ".$self->id." after action ".$self->{_CURRENT_ACTION},
+            PRIORITY => "info",
+            FACILITY => "application"
+        );
+    }
 
-}
+} 
 
 sub is_running(){
     my $self = shift;

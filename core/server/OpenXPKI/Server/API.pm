@@ -1267,6 +1267,31 @@ sub BUILD {
                 },
             },
         },
+        'fail_workflow' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
+                ID => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                    optional => 1,
+                },
+                REASON => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                ERROR => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            },
+        },
         'get_workflow_activities' => {
             class  => 'Workflow',
             params => {

@@ -40,7 +40,7 @@ sub evaluate
 
     my $session_role = CTX('session')->get_role();
 
-    my %roles = map { $_ => 1 } (split ",", $expected_roles);
+    my %roles = map { $_ => 1 } (split /,\s*/, $expected_roles);
     
     ##! 64: 'session role: ' . $session_role
 
@@ -59,14 +59,12 @@ OpenXPKI::Server::Workflow::Condition::HasRole
 
 =head1 SYNOPSIS
 
-<condition name="ACL::create_csr"
-    class="OpenXPKI::Server::Workflow::Condition::HasRole">
-    <param name="role" value="CA Operator,RA Operator"/>
-</condition>
+    class: OpenXPKI::Server::Workflow::Condition::HasRole
+    param:
+        roles: CA Operator,RA Operator
 
 =head1 DESCRIPTION
 
 The condition checks if the current session users role is in the list
 of expected roles given as parameter in the configuration.
-Multiple roles can be given as comma seperated list, note that there is 
-no whitespace allowed around the comma!
+Multiple roles can be given as comma seperated list.

@@ -2,6 +2,7 @@ INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/X509.xs
 INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/PKCS10.xs
 INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/SPKAC.xs
 INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/CRL.xs
+INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/ECDH.xs
 
 MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::Backend::OpenSSL
 

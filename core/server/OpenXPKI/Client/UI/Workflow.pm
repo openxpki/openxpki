@@ -940,6 +940,45 @@ Load a workflow given by wf_id, redirects to init_load
 
 =cut
 
+sub action_fail {
+    
+    my $self = shift;
+    my $args = shift;
+ 
+    my $wf_token = $self->param('wf_token') || '';
+
+    my $wf_info;
+    # wf_token found, so its a real action
+    if (!$wf_token) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!','error');
+        return $self;
+    }
+
+    my $wf_args = $self->__fetch_wf_token( $wf_token );
+    
+    if (!$wf_args->{wf_id}) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_FAIL_WITHOUT_ID!','error');
+        return $self;
+    }
+
+    $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
+
+    $wf_info = $self->send_command( 'fail_workflow', {
+        ID       => $wf_args->{wf_id},        
+    });
+
+    $self->__render_from_workflow({ WF_INFO => $wf_info });
+
+    return $self; 
+    
+}
+
+=head2 action_load
+
+Load a workflow given by wf_id, redirects to init_load
+
+=cut
+
 sub action_load {
 
     my $self = shift;
@@ -1325,22 +1364,6 @@ sub __render_from_workflow {
 
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
 
-        # this should be available to raop only
-        if (0) {
-            my @fields;
-            push @fields, $self->__register_wf_token( $wf_info, {
-                wf_action => $wf_action
-            });
-
-            $self->add_section({
-                type => 'form',
-                action => 'workflow',
-                content => {
-                    submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
-                    fields => \@fields
-            }});
-        }
-
     # if there is one activity selected (or only one present), we render it now
     } elsif ($wf_action) {
         
@@ -1497,7 +1520,7 @@ sub __render_from_workflow {
         }
 
     }
-
+    
     if ($wf_info->{WORKFLOW}->{ID} ) {
 
         my @buttons;
@@ -1521,6 +1544,51 @@ sub __render_from_workflow {
             'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
             'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
         };
+    
+        # The workflow info contains info about all control actions that
+        # can done on the workflow -> render appropriate buttons.
+        if ($wf_info->{HANDLES} && ref $wf_info->{HANDLES} eq 'ARRAY') {
+            
+            my @handles = @{$wf_info->{HANDLES}};            
+            
+            $self->logger()->debug('Adding global actions ' . join('/', @handles));
+            
+            if (grep /fail/, @handles) {
+                my $token = $self->__register_wf_token( $wf_info );                       
+                push @buttons, {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
+                    action => 'workflow!fail!wf_token!'.$token->{value},
+                    confirm => {
+                        label => 'Fail Workflow',
+                        description => 'Press the confirm button to mark this workflow as failed.
+                        This will immediatley stop all actions on this workflow and
+                        mark it as failed. <b>This action can not be undone!</b><br/><br/>
+                        If you want to keep this workflow, press the abort button to
+                        close this window without touching the workflow.'
+                    }
+                };                
+            }
+            
+            if (grep /wakeup/, @handles) {
+                # todo - create public "wakeup" method in workflow api to hide this away
+                my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
+                
+                if ($wf_action) {
+                    my $token = $self->__register_wf_token( $wf_info, {
+                        wf_action => $wf_action
+                    });
+                    push @buttons, {
+                        label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
+                        action => 'workflow!index!wf_token!'.$token->{value},
+                    }
+                }
+            }
+            
+            if (grep /resume/, @handles) {
+                # tbd   
+            }
+            
+        }
 
         $self->_result()->{right} = [{
             type => 'keyvalue',

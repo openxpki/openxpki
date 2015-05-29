@@ -165,6 +165,14 @@ sub handle_request {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
         return $self->handle_page( $args );
     }
+    
+    # Requests to pages can be redirected after login, store page in session
+    
+    if ($page && ($page !~ /^login/)) {
+        $self->logger()->debug("Page request without login " . $page);
+        $self->session()->param('redirect', $page);
+    }
+   
 
     # if the backend session logged out but did not terminate
     # we get the probleme that ui is logged in but backend is not
@@ -375,7 +383,16 @@ sub handle_login {
             $self->session()->param('pki_realm', $reply->{PARAMS}->{pki_realm});
             $self->session()->param('is_logged_in', 1);
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});
-            return $result->init_success()->render();
+
+            my $redirect = $self->session()->param('redirect');
+            if ($redirect) {                                
+                $result->reload(1);
+                $result->redirect( $redirect );    
+                $self->session()->param('redirect', undef );
+            } else {         
+                $result->init_index();
+            }
+            return $result->render();
         }
     }
 

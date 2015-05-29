@@ -1,6 +1,12 @@
 `import Em from "vendor/ember"`
 
 Component = Em.Component.extend
+    sanitizeValue: Em.on "init", ->
+        value = @get "content.value"
+        if typeof value isnt "string"
+            options = @get "options"
+            @set "content.value", options[0]?.value or ""
+
     options: Em.computed "content.{options,prompt,is_optional}", ->
         prompt = @get "content.prompt"
         prompt = "" if not prompt and @get "content.is_optional"
@@ -25,7 +31,6 @@ Component = Em.Component.extend
     isCustom: Em.computed "options", "content.value", ->
         values = (o.value for o in @get "options")
         value = @get "content.value"
-        value = "" if value is null
         value not in values
 
     customize: Em.computed "isCustom", -> @get "isCustom"

@@ -69,7 +69,7 @@ sub init_login_passwd {
     
 }
 
-sub init_success {
+sub init_index {
     
     my $self = shift;
     

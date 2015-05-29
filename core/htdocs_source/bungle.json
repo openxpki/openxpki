@@ -226,7 +226,7 @@
         "writer": {
             "description": "Write files to disk.",
             "type": "file-writer",
-            "pattern": "dist/{*.{html,js},**/main-*,style/img/**/*,**/fonts/*}",
+            "pattern": "dist/{*.{html,js},**/main-*,style/img/**/*,**/fonts/*,vendor/ember/ember-template-compiler.js}",
             "enabled": false,
             "inputs": ["dist"]
         },
@@ -234,6 +234,7 @@
         "webserver": {
             "description": "Serve build results via http. Index.html reloads automatically on change.",
             "type": "webserver",
+            "middleware": ["./middleware"],
             "inputs": ["everything"]
         }
     }
