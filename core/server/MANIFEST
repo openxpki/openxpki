@@ -119,6 +119,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Engine/PKCS11.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/SafeNetProtectServer.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
 OpenXPKI/Crypto/Backend/OpenSSL/XS.pm
+OpenXPKI/Crypto/Backend/OpenSSL/ECDH.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_random.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_key.pm
@@ -167,6 +168,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/XS/X509.xs
 OpenXPKI/Crypto/Backend/OpenSSL/XS/PKCS10.xs
 OpenXPKI/Crypto/Backend/OpenSSL/XS/SPKAC.xs
 OpenXPKI/Crypto/Backend/OpenSSL/XS/CRL.xs
+OpenXPKI/Crypto/Backend/OpenSSL/XS/ECDH.xs
 
 ## database interface of the server
 
@@ -684,7 +686,7 @@ cgi-bin/sc.fcgi
 # Client UI
 htdocs/src/main-built.js
 htdocs/style/main-built.css
-htdocs/vendor/ember-template-compiler/index.js
+htdocs/vendor/ember/ember-template-compiler.js
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2
