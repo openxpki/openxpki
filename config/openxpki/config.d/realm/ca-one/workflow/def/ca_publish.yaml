@@ -87,6 +87,8 @@ acl:
 
     RA Operator:
         creator: any
+        fail: 1
+        resume: 1
 
     System:
         creator: any

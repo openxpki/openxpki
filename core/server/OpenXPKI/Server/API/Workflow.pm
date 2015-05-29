@@ -372,6 +372,8 @@ sub __get_workflow_ui_info {
             REAP_AT     => $workflow->reap_at(),
             CONTEXT     => { %{$workflow->context()->param() } },
         };
+        
+        $result->{HANDLES} = $workflow->get_global_actions();   
 
         ##! 32: 'Workflow result ' . Dumper $result
         if ($args->{ACTIVITY}) {
@@ -449,7 +451,7 @@ sub __get_workflow_ui_info {
     if ($button->{_head}) {
         $result->{STATE}->{button}->{_head} = $button->{_head};
     } 
-    
+     
     return $result;
 
 }
@@ -530,6 +532,42 @@ sub execute_workflow_activity {
     } else {
         return __get_workflow_info($workflow);
     }
+}
+
+sub fail_workflow {
+    
+    my $self  = shift;
+    my $args  = shift;
+
+    ##! 1: "execute_workflow_activity"
+
+    my $wf_title  = $args->{WORKFLOW};
+    my $wf_id     = $args->{ID};
+    my $reason    = $args->{REASON};
+    my $error     = $args->{ERROR};
+    
+    if (! defined $wf_title) {
+        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
+    }
+
+    CTX('dbi_workflow')->commit();
+    ##! 2: "load workflow"
+    my $factory = __get_workflow_factory({
+        WORKFLOW_ID => $wf_id,
+    });
+    
+    my $workflow = $factory->fetch_workflow(
+        $wf_title,
+        $wf_id
+    );
+    
+    if (!$error) { $error = 'Failed by user'; }
+    if (!$reason) { $reason = 'userfail'; }
+    
+    $workflow->set_failed( $error, $reason );
+    
+    return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
+    
 }
 
 sub get_workflow_activities_params {

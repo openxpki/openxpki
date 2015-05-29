@@ -168,7 +168,7 @@ sub handle_request {
     
     # Requests to pages can be redirected after login, store page in session
     
-    if ($page) {
+    if ($page && ($page !~ /^login/)) {
         $self->logger()->debug("Page request without login " . $page);
         $self->session()->param('redirect', $page);
     }
@@ -390,7 +390,7 @@ sub handle_login {
                 $result->redirect( $redirect );    
                 $self->session()->param('redirect', undef );
             } else {         
-                $result->init_success()
+                $result->init_index();
             }
             return $result->render();
         }
