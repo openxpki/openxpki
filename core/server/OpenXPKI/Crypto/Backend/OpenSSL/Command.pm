@@ -6,7 +6,6 @@ use warnings;
 use utf8;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random;
-use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_key;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert;

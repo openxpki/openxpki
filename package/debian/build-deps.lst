@@ -2,3 +2,4 @@ dh-make-perl
 libssl-dev
 libconfig-std-perl
 libtemplate-perl
+libtest-exception-perl
