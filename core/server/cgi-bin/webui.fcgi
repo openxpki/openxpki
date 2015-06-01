@@ -1,5 +1,12 @@
 #!/usr/bin/perl -w
 
+# If you are unable to run under FastCGI, you can use this script unmodified
+# as long as you have the FastCGI perl module installed. If you do not have 
+# this module, you can just replace CGI::Fast->new with CGI->new and remove
+# the use CGI::Fast from the modules list. 
+# In either case, you might need to change the extension of the scripturl in
+# the webui config file.
+
 use CGI;
 use CGI::Fast;
 use CGI::Session;
@@ -64,18 +71,23 @@ while (my $cgi = CGI::Fast->new()) {
     if ($config{global}{realm_mode} eq "path") {
 
         my $script_path = $ENV{'REQUEST_URI'};
-        # Strip off last word of the path and discard query string
-        $script_path =~ s|\/([^\/]+)((\?.*)?)$||;
+        # Strip off cgi-bin, last word of the path and discard query string
+        $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
         $cookie->{path} = $script_path;
 
         $log->debug('script path is ' . $script_path);
 
         # if the session has no realm set, try to get a realm from the map
         if (!$session_front->param('pki_realm')) {
-            $script_path =~ qq|\/([^\/]+)\/|;
-            my $script_realm = $1;
-            if (!$config{realm}{$script_realm}) {
-                die "Url based realm requested but no realm found for $script_realm!";
+            # We use the last part of the script name for the realm
+            my $script_realm;
+            if ($script_path =~ qq|\/([^\/]+)\$|) {
+                $script_realm = $1;                
+                if (!$config{realm}{$script_realm}) {
+                    $log->fatal('No realm for ident: ' . $script_realm );
+                    die "Url based realm requested but no realm found for $script_realm!";
+                }
+                $log->debug('detected realm is ' . $config{realm}{$script_realm});
             }
             $session_front->param('pki_realm', $config{realm}{$script_realm});
             $log->debug('Path to realm: ' .$config{realm}{$script_realm});

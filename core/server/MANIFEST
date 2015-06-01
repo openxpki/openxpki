@@ -670,7 +670,6 @@ bin/openxpkicmd
 
 # cgi stuff
 cgi-bin/scep
-cgi-bin/webui.cgi
 cgi-bin/webui.fcgi
 cgi-bin/sc.fcgi
 
