@@ -287,7 +287,7 @@ sub handle_server_log {
     
     if (!$level) { 
         $level = 'info'; 
-    } elsif ( $message !~ /(info|debug|error|warn)/ ) {
+    } elsif ( $level !~ /(info|debug|error|warn)/ ) {
         $self->logger()->error(sprintf('Log request from frontend with improper level (%s)!', $message));
         $level = 'warn';
     } 

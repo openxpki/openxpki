@@ -47,7 +47,7 @@ sub _init_client {
         session => $self->session(),
         config => { socket => '/var/openxpki/openxpki.socket' },
         card_config => \%card_config,
-        auth => { stack => '_System' }
+        auth => { stack => '_SmartCard' }
     });
     
 }
