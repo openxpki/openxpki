@@ -25,16 +25,18 @@ Before you proceed, install them on your build system!
 
 Build OpenXPKI Modules
 #######################
+Install all packages listed in debian-deps.lst AND build-deps.lst
+(cat build-deps.lst debian-deps.lst | xargs aptitude install -y)
+
 The OpenXPKI build scripts seems to have problems with MakeMaker >6.5
 If you have problems building (e.g. empty archives) check the version of
 your MakeMaker kit.
 
-The OpenXPKI system consists of three modules, the core, the webfrontend 
-and the i18n language files. There are individual make targets for them:
+The OpenXPKI system consists of two modules, the core and the i18n language 
+files. There are individual make targets for them:
 
    make core
    make i18n                    
-   make mason-html-client 
    
 About versions and tagging
 --------------------------

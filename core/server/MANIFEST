@@ -684,7 +684,7 @@ htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf
 htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg
 htdocs/style/img/logo.png
-htdocs/index.html
+htdocs/default.html
 htdocs/themed.html
 htdocs/localconfig.js
 
