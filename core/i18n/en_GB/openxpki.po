@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-05-29 15:10+0100\n"
+"PO-Revision-Date: 2015-06-02 10:28+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -520,6 +520,18 @@ msgstr "TLS Server profile"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS/Web Server "
+
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_DESC"
+msgstr ""
+"An error occured while generating a new password for you. Please reload the "
+"page using the reload button of your browser. If the problem persists, "
+"please contact the helpdesk."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL"
+msgstr "An error occured while generating the password!"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL"
+msgstr "Something went wrong, we are unable to continue!"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 msgstr "User Certificate"

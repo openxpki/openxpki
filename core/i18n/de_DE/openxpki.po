@@ -770,6 +770,18 @@ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS-Server"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 msgstr "Nutzer"
 
