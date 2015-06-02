@@ -166,7 +166,7 @@ sub init_load {
     }
 
     # Set single action if not in result view and only single action is avail
-    if (($view ne 'result') && !$wf_action) {
+    if (($view ne 'result') && !$wf_action && !scalar(@{$wf_info->{STATE}->{output}})) {
         my @activities = @{$wf_info->{STATE}->{option}};
         if (scalar @activities == 1) {
             $wf_action = $activities[0];
@@ -1423,6 +1423,19 @@ sub __render_from_workflow {
             }
 
         }
+        
+        # Render the context values if there are no fields
+        if (!scalar @fields) {
+            my $fields = $self->__render_fields( $wf_info, $view );            
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => '',
+                    description => '',
+                    data => $fields,                    
+            }});
+        }
+        
 
         # record the workflow info in the session
         push @fields, $self->__register_wf_token( $wf_info, {
@@ -1549,7 +1562,7 @@ sub __render_from_workflow {
         # can done on the workflow -> render appropriate buttons.
         if ($wf_info->{HANDLES} && ref $wf_info->{HANDLES} eq 'ARRAY') {
             
-            my @handles = @{$wf_info->{HANDLES}};            
+            my @handles = @{$wf_info->{HANDLES}};
             
             $self->logger()->debug('Adding global actions ' . join('/', @handles));
             
