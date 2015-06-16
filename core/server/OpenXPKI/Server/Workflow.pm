@@ -222,7 +222,7 @@ sub set_failed {
     my $error = shift;
     my $reason = shift;
     
-    $self->_fail($error);
+    $self->_fail($error, $reason);
     
     return $self;
     
