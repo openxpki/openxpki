@@ -1323,7 +1323,7 @@ sub __render_from_workflow {
         }
     }
 
-    my $wf_proc_state = $wf_info->{WORKFLOW}->{PROC_STATE} || '';
+    my $wf_proc_state = $wf_info->{WORKFLOW}->{PROC_STATE} || 'init';
     
     # Check if the workflow is under control of the watchdog    
     if (grep /$wf_proc_state/, ('pause','retry_exceeded')) {
