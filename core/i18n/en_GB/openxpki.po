@@ -258,7 +258,7 @@ msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
-msgstr "login failed"
+msgstr "Login with the given credentials failed!"
 
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "CA Certificates"

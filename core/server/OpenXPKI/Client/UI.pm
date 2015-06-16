@@ -361,12 +361,6 @@ sub handle_login {
                     { LOGIN => $cgi->param('username'), PASSWD => $cgi->param('password') } );
                 $self->logger()->trace('Auth result ' . Dumper $reply);
 
-                # Failure here is most likely a wrong password
-                if ( $reply->{SERVICE_MSG} eq 'ERROR' &&
-                    $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {
-                    $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');
-                    return $result->render();
-                }
             } else {
                 $self->logger()->debug('No credentials, render form');
                 return $result->init_login_passwd()->render();
@@ -395,10 +389,18 @@ sub handle_login {
             return $result->render();
         }
     }
-
+    
     if ( $reply->{SERVICE_MSG} eq 'ERROR') {
+        
         $self->logger()->debug('Server Error Msg: '. Dumper $reply);
-        return $result->set_status_from_error_reply->render( $reply );
+        
+        # Failure here is likely a wrong password
+        if ($reply->{'LIST'} && $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {
+            $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');            
+        } else {
+            $result->set_status_from_error_reply($reply);
+        }
+        return $result->render();
     }
 
     $self->logger()->debug("unhandled error during auth");
