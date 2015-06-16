@@ -3055,6 +3055,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Родительский технологический процесс"
 
@@ -4208,6 +4212,18 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+msgstr ""
+"Начальное состояние технологического процесса публикации сертификатов через "
+"LDAP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED"
+msgstr ""
+"Начальное состояние технологического процесса публикации сертификатов через "
+"LDAP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
 msgstr ""
 "Начальное состояние технологического процесса публикации сертификатов через "
 "LDAP"

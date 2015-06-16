@@ -104,7 +104,6 @@ sub execute_action {
     ##! 32: 'session_info: '.$session_info
     $self->session_info($session_info);
 
-
     #set "reap at" info
     my $action = $self->_get_action($action_name);
 
@@ -434,9 +433,12 @@ sub get_global_actions {
     my @possible_action;
     my $proc_state = $self->proc_state();
     if ($proc_state eq 'exception') {
-        @possible_action = ('resume','fail');        
+        @possible_action = ('resume','fail');
 
     } elsif ($proc_state eq 'pause') {
+        @possible_action = ('wakeup','fail');
+
+    } elsif ($proc_state eq 'retry_exceeded') {
         @possible_action = ('wakeup','fail');
         
     } elsif ($proc_state ne 'finished') {

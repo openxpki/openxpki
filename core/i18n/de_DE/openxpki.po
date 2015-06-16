@@ -3054,6 +3054,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Übergeordneter Workflow"
 
@@ -4168,6 +4172,14 @@ msgstr "Initial state of the LDAP publishing workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED"
+msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
 msgstr "Initial state of the LDAP publishing workflow"
 
 #, fuzzy
