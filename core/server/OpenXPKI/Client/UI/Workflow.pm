@@ -2015,8 +2015,14 @@ sub __render_fields {
                 $item->{format} = 'extlink';
 
                 my $label = $item->{value};
+                my $basename;
+                if ($label =~ m{ ([^\/]+(\.\w+)?) \z }xms) {
+                   $basename = $1; 
+                }
+                
                 my $target = $self->__persist_response({
                     file => $item->{value},
+                    attachment =>  $basename, 
                     mime => $mime
                 });
                 

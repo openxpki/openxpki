@@ -32,9 +32,10 @@ action:
 
     generate:
         class: OpenXPKI::Server::Workflow::Activity::Reports::Detail
-        param:
-            valid_at: 20150701
+        param:            
             target_umask: 0644
+            _map_target_filename: "pki report [% USE date(format='%Y-%m-%dT%H:%M:%S') %][% date.format( context.valid_at ) %].csv"
+            target_dir: /tmp
   
 field:
     valid_at:
