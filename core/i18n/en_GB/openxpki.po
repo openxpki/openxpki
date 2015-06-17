@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-06-17 07:49+0100\n"
+"PO-Revision-Date: 2015-06-17 14:15+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -915,6 +915,9 @@ msgstr "Reject this revocation request."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
 msgstr "Reject Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
+msgstr "Define Report Options"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
 msgstr "Define Report Options"
@@ -2498,36 +2501,36 @@ msgstr "paused"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 msgstr "retry exceeded"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_NEAR_EXPIRY"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "Certificates near Expiration"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_RECENT_EXPIRY"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
 msgstr "Certificates recently expired"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_COUNT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
 msgstr "Overall Certificate Count"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_DISTINCT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT"
 msgstr "Overall Distinct Subjects"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_EXPIRED"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "Expired Certificates"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_REVOKED"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
 msgstr "Revoked Certificates"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_AT_DESCRIPTION"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION"
 msgstr ""
 "The reference date for calculating the validity/expiration status, by "
 "default now."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_AT_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_LABEL"
 msgstr "Reference Date"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_COUNT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
 msgstr "Valid Certificates"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_DISTINTCT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "Valid Distinct Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
@@ -3623,6 +3626,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Policy Violation Pending"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
+msgstr "Your report is ready, please click on the filename to download it."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_LABEL"
+msgstr "Report Result"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Report Result"
 
@@ -3697,6 +3706,13 @@ msgstr "CRL Issuance"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
+msgstr ""
+"Generate a detailed report about certificates in this realm for download."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_LABEL"
+msgstr "Certificate Detail Report "
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_DESC"
 msgstr "Report showing certificate count in several states."
 
@@ -3743,6 +3759,16 @@ msgstr "Workflow information was updated"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"
+#~ msgstr ""
+#~ "The reference date for calculating the validity/expiration status, by "
+#~ "default now."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
+#~ msgstr "Reference Date"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"

@@ -1246,6 +1246,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
 msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
+msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
 msgstr "Прием заявки по протоколу SCEP"
 
@@ -3063,27 +3067,27 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_NEAR_EXPIRY"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_RECENT_EXPIRY"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
 msgstr "Экспорт"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_COUNT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
 msgstr "Экспорт"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_DISTINCT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT"
 msgstr "Экспорт"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_EXPIRED"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "Экспорт заявки на сертификат (CSR)"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_REVOKED"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
 "представляете себе необходимую структуру имени субъекта сертификата, хорошо "
@@ -3092,19 +3096,19 @@ msgstr ""
 "также произвольный набор альтернативных имен."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_AT_DESCRIPTION"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION"
 msgstr "Экспорт"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_AT_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_LABEL"
 msgstr "Экспорт"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_COUNT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
 msgstr "Экспорт"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_DISTINTCT"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "Экспорт"
 
 #, fuzzy
@@ -4242,6 +4246,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Технологические процессы"
 
@@ -4332,6 +4344,14 @@ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_DESC"
@@ -9543,6 +9563,14 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_TOOLTIP"
 #~ msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"
+#~ msgstr "Экспорт"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
+#~ msgstr "Экспорт"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_APPROVAL_LABEL"

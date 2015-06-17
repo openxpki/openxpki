@@ -1990,7 +1990,6 @@ sub __render_fields {
             }
 
             # convert format cert_identifier into a link
-
             if ($item->{format} eq "cert_identifier") {
                 $item->{format} = 'link';
 
@@ -2007,6 +2006,24 @@ sub __render_fields {
                 };
 
                 $self->logger()->debug( 'item ' . Dumper $item);
+
+            # create a link to download the given filename
+            } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
+                
+                my $mime = $2 || 'application/octect-stream';
+                 
+                $item->{format} = 'extlink';
+
+                my $label = $item->{value};
+                my $target = $self->__persist_response({
+                    file => $item->{value},
+                    mime => $mime
+                });
+                
+                $item->{value}  = {
+                    label => $label,                    
+                    page => $self->_client()->_config()->{'scripturl'} . "?page=".$target
+                };
 
             # format for cert_info block
             } elsif ($item->{format} eq "cert_info") {
@@ -2055,9 +2072,9 @@ sub __render_fields {
                     $item->{value} = $self->serializer()->deserialize( $item->{value} );
                 }
                 # Sort by label
-                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};            
                 $item->{value} = \@val;
-
+                
             }
 
             if ($field->{template}) {

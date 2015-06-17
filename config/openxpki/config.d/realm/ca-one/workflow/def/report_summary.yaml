@@ -45,8 +45,8 @@ action:
 field:
     valid_at:
         name: valid_at
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_AT_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_AT_DESCRIPTION
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION
         required: 0
         type: datetime
         format: timestamp
@@ -54,35 +54,35 @@ field:
 
     total_count:
         name: total_count
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_COUNT
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT
 
     total_revoked:
         name: total_revoked
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_REVOKED
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED
 
     total_expired:
         name: total_expired
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_EXPIRED
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED
 
     total_distinct:
         name: total_distinct
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_TOTAL_DISTINCT
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT
 
     valid_count:
         name: valid_count
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_COUNT
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT
 
     valid_distinct:
         name: valid_distinct
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_VALID_DISTINTCT
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT
 
     near_expiry:
         name: near_expiry
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_NEAR_EXPIRY
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY
 
     recent_expiry:
         name: recent_expiry
-        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_FIELD_RECENT_EXPIRY
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY
 
 acl:
     CA Operator:
