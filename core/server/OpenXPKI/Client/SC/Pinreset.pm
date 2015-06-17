@@ -88,7 +88,7 @@ sub handle_start_pinreset {
         }    
         
         # Final state
-        if ( scalar @{$wf_info->{STATE}->{option}} == 0) {
+        if ( $wf_info->{PROC_STATE} eq 'finished' ) {
             $log->warn( 'Unblock workflow is in final state, removing' );
             $wf_id = 0;
             $wf_info = undef;   
@@ -111,6 +111,21 @@ sub handle_start_pinreset {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_CREATE_WORKFLOW_INSTANCE");
             return 1;
         }    
+    }
+
+    # Reset the auth persons, so we run an initialize before
+    if ($wf_info->{STATE} eq 'PEND_ACT_CODE') {
+
+        eval {
+            $wf_info = $self->_client->handle_workflow({
+                'ID'       => $wf_id,
+                'ACTIVITY' => 'scunblock_initialize'
+            });
+        };
+        if ($EVAL_ERROR) {
+            $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_PINRESET_START_PINRESET_ERROR_REINIT_WORKFLOW");
+            return 1;
+        }
     }
     
     if ($wf_info->{STATE} ne 'HAVE_TOKEN_OWNER' ) { 
