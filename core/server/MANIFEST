@@ -309,6 +309,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/ParsePKCS10.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
+OpenXPKI/Server/Workflow/Activity/Reports/Summary.pm
 OpenXPKI/Server/Workflow/Activity/Reports/CertExport/AddToQueue.pm
 OpenXPKI/Server/Workflow/Activity/Reports/CertExport/GenerateExportFile.pm
 OpenXPKI/Server/Workflow/Activity/Reports/CertExport/GetConfig.pm
