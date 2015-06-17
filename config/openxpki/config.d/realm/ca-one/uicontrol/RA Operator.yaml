@@ -44,6 +44,10 @@ main:
         label: I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION
       - key:   information!status
         label: I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS
+      - key:   workflow!index!wf_type!report_summary
+        label: I18N_OPENXPKI_UI_MENU_REPORT_SUMMARY
+      - key:   workflow!index!wf_type!report_full
+        label: I18N_OPENXPKI_UI_MENU_REPORT_FULL
 
 
   - key:   certificate!search
