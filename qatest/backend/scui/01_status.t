@@ -10,7 +10,7 @@ use JSON;
 use MockSC;
 use Log::Log4perl qw(:easy);
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 package main;
 
@@ -38,6 +38,12 @@ $result = $client->mock_request( 'utilities', 'get_card_status', { cardID => '12
 
 is($result->{'id_cardID'}, 'gem2_12345678', 'Card Id');
 like($result->{'msg'}->{'PARAMS'}->{'OVERALL_STATUS'}, qr/(red|amber|green)/, 'Status word');
+
+$result = $client->mock_request( 'utilities', 'get_card_status', { 
+    cardID => '12345678', cardtype => 'Gemalto .NET', ChipSerial => 'chip0815',
+    ECDHPubkey => "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAENVxl1lCA9wzW+wGGWwOGnHJvM8oT8NhS\nF4f3hdEWSVkI+01RGjOdBVBdea8CDwKQsjurVgFAn4Sg1GiAr+2A3g==\n-----END PUBLIC KEY-----" } );
+
+like($result->{'ecdhpubkey'}, qr/-----BEGIN PUBLIC KEY-----/, 'ECDH Session Key');
 
 $result = $client->mock_request( 'utilities', 'server_log', { level => 'info', message => 'Test Message' } );
 is($result->{"error"}, undef,'No errors');

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use OpenXPKI;
+
 package OpenXPKI::Crypto::Backend::OpenSSL::ECDH;
 
 sub new_ec_keypair{

@@ -44,7 +44,7 @@ sub init_search {
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_VALID', value => 'VALID'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED', value => 'EXPIRED'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_REVOKED', value => 'REVOKED'},
-        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING', value => 'CRL_ISSUANCE_PENDING'},
+        { label => 'I18N_OPENXPKI_UI_CERT_STATUS_CRL_ISSUANCE_PENDING', value => 'CRL_ISSUANCE_PENDING'},
     );
     
     my $preset;

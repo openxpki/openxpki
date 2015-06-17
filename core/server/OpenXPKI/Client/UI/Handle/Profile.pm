@@ -242,10 +242,22 @@ sub render_server_password {
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
 
     my @fields;
+    my $pwdfailed = 0;
     foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
         my $value;
         if ($field->{name} eq '_password') {
-            $value = $self->send_command( 'get_random', { LENGTH => 16 });
+            $value = $self->send_command( 'get_random', { LENGTH => 16 });            
+            if (!$value) {
+                $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
+                $self->add_section({
+                    type => 'text',                    
+                    content => {
+                        label => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL',                    
+                        description => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_DESC'
+                    }                    
+                });
+                return $self;
+            }            
         } else {
             $value = $context->{$field->{name}};
         }

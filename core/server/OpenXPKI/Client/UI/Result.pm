@@ -393,7 +393,16 @@ sub init_fetch {
     # Start output stream
     my $cgi = $self->cgi();
     print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => $data->{mime}, -attachment => $data->{attachment} );
-    print $data->{data};
+    
+    if ($data->{file}) {
+        open (my $fh, $data->{file}) || die 'Unable to open file';
+        while (my $line = <$fh>) {
+            print $line;
+        }
+        close $fh;
+    } else {
+        print $data->{data};
+    } 
     exit;
 
 }

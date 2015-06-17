@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-05-29 15:10+0100\n"
+"PO-Revision-Date: 2015-06-17 14:15+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -100,7 +100,7 @@ msgstr "Relations"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS"
 msgstr "Certificate Status"
 
-msgid "I18N_OPENXPKI_UI_CERT_STATUS_CRL_PENDING"
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_CRL_ISSUANCE_PENDING"
 msgstr "revocation pending"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_EXPIRED"
@@ -258,7 +258,7 @@ msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Username"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
-msgstr "login failed"
+msgstr "Login with the given credentials failed!"
 
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "CA Certificates"
@@ -304,6 +304,13 @@ msgstr "Process Information"
 
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "Publish CA/CRL"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"
+msgstr "Full Certificate Status Report"
+
+msgid "I18N_OPENXPKI_UI_MENU_REPORT_SUMMARY"
+msgstr "Certificate Status Summary"
 
 msgid "I18N_OPENXPKI_UI_MENU_REQUEST"
 msgstr "Request"
@@ -515,14 +522,20 @@ msgstr "Basic SCEP client naming style"
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 msgstr "Certificate for SCEP Enrollment Authentitcation"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
-msgstr "TLS Server profile"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS/Web Server "
 
-msgid "I18N_OPENXPKI_UI_PROFILE_USER"
-msgstr "User Certificate"
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_DESC"
+msgstr ""
+"An error occured while generating a new password for you. Please reload the "
+"page using the reload button of your browser. If the problem persists, "
+"please contact the helpdesk."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL"
+msgstr "An error occured while generating the password!"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL"
+msgstr "Something went wrong, we are unable to continue!"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
 msgstr "User ID"
@@ -902,6 +915,12 @@ msgstr "Reject this revocation request."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
 msgstr "Reject Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
+msgstr "Define Report Options"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
+msgstr "Define Report Options"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_DESC"
 msgstr "Schedule this certificate for revocation"
@@ -2479,6 +2498,41 @@ msgstr "manual"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
 msgstr "paused"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+msgstr "retry exceeded"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
+msgstr "Certificates near Expiration"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "Certificates recently expired"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
+msgstr "Overall Certificate Count"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT"
+msgstr "Overall Distinct Subjects"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
+msgstr "Expired Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
+msgstr "Revoked Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION"
+msgstr ""
+"The reference date for calculating the validity/expiration status, by "
+"default now."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_LABEL"
+msgstr "Reference Date"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
+msgstr "Valid Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
+msgstr "Valid Distinct Subjects"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Requested action not available"
 
@@ -3572,6 +3626,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Policy Violation Pending"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
+msgstr "Your report is ready, please click on the filename to download it."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_LABEL"
+msgstr "Report Result"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
+msgstr "Report Result"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -3591,6 +3654,17 @@ msgstr ""
 "This workflow is currently handled by the system and will continue "
 "automagically. The reason for this pause and the time of the next scheduled "
 "execution is shown below for your information."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED"
+msgstr ""
+"This workflow had looped to many times, automatic retries have been stopped!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
+msgstr ""
+"This task was planed to be automagically retried but did not succeed within "
+"the expected period of time. The reason for this pause and the time of the "
+"last execution is shown below, if you want this process to be continued, an "
+"operator needs to manually wake it up."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
@@ -3632,6 +3706,19 @@ msgstr "CRL Issuance"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
+msgstr ""
+"Generate a detailed report about certificates in this realm for download."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_LABEL"
+msgstr "Certificate Detail Report "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_DESC"
+msgstr "Report showing certificate count in several states."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL"
+msgstr "Certificates Status Report"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"
 msgstr ""
@@ -3667,387 +3754,50 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Workflow information was updated"
 
-#~ msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
-#~ msgstr "Certificate ID"
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
+#~ msgstr "TLS Server profile"
 
-#~ msgid "I18N_OPENXPKI_UI_COMMENT"
-#~ msgstr "Comment"
-
-#~ msgid "I18N_OPENXPKI_UI_CRR_REASON"
-#~ msgstr "Revocation reason"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_DESC"
-#~ msgstr "Use this profile for SCEP requests with \"signing on behalf\""
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
+#~ msgstr "User Certificate"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_AUTH_LDAP_ERR_DESC"
-#~ msgstr "Please update / complete the information below."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_AUTH_LDAP_ERR_LABEL"
-#~ msgstr "Update Request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_FETCH_PUK_DESC"
-#~ msgstr "Edit information of the revocation request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_FETCH_PUK_LABEL"
-#~ msgstr "Edit request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GENERATE_ACTIVATION_CODE_DESC"
-#~ msgstr "Generate key for this request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GENERATE_ACTIVATION_CODE_LABEL"
-#~ msgstr "Generate key"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_AUTH1_ID_DESC"
-#~ msgstr "Cleanup the workflow"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_AUTH1_ID_LABEL"
-#~ msgstr "Finish"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_AUTH2_ID_DESC"
-#~ msgstr "Cleanup the workflow"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_AUTH2_ID_LABEL"
-#~ msgstr "Finish"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_USER_DATA_DESC"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"
 #~ msgstr ""
-#~ "Edit the items in the subject alternative name section of your "
-#~ "certification request."
+#~ "The reference date for calculating the validity/expiration status, by "
+#~ "default now."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_USER_DATA_LABEL"
-#~ msgstr "Edit SAN"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
+#~ msgstr "Reference Date"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INITIALIZE_DESC"
-#~ msgstr ""
-#~ "This process triggers the creation of new revocation lists for all active "
-#~ "CAs in the current realm. A revocation list is created when there are new "
-#~ "revocations or if the current list is near its expiry. You can always "
-#~ "force the creation of new lists by ticking the checkbox below."
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"
+#~ msgstr "Certificate Export"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INITIALIZE_LABEL"
-#~ msgstr "Trigger CRL Issue"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_RECENT_EXPIRY"
+#~ msgstr "Certificate Export"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POST_CODES_DESC"
-#~ msgstr "Persist CRR"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_TOTAL_COUNT"
+#~ msgstr "Certificate Export"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POST_CODES_LABEL"
-#~ msgstr "Persist CRR"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_TOTAL_DISTINCT"
+#~ msgstr "Certificate Export"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESET_LDAP_ERR_DESC"
-#~ msgstr "Reject this revocation request."
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_TOTAL_EXPIRED"
+#~ msgstr "Certificate Export"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RESET_LDAP_ERR_LABEL"
-#~ msgstr "Reject Request"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_TOTAL_REVOKED"
+#~ msgstr "The name of the certificate profile."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_WORKFLOW_CREATOR_DESC"
-#~ msgstr "Persist CRR"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_VALID_COUNT"
+#~ msgstr "Certificate Export"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_SET_WORKFLOW_CREATOR_LABEL"
-#~ msgstr "Persist CRR"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_NOTIFY_AUTH_CONTACT_DESC"
-#~ msgstr "Please update the information using the form below."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_NOTIFY_AUTH_CONTACT_LABEL"
-#~ msgstr "Update Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_CREATOR_DESC"
-#~ msgstr "Edit information of the revocation request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_CREATOR_LABEL"
-#~ msgstr "Edit request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_STORE_AUTH_IDS_DESC"
-#~ msgstr ""
-#~ "Edit the items in the subject alternative name section of your "
-#~ "certification request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_STORE_AUTH_IDS_LABEL"
-#~ msgstr "Edit SAN"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_USER_ABORT_DESC"
-#~ msgstr "Submit request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_USER_ABORT_LABEL"
-#~ msgstr "Submit request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_WRITE_PIN_NOK_DESC"
-#~ msgstr ""
-#~ "This information does not go into the certificate but will assist our "
-#~ "registration officers when validating your request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_WRITE_PIN_NOK_LABEL"
-#~ msgstr "Edit Certificate Info"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_WRITE_PIN_OK_DESC"
-#~ msgstr ""
-#~ "This information does not go into the certificate but will assist our "
-#~ "registration officers when validating your request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_WRITE_PIN_OK_LABEL"
-#~ msgstr "Edit Certificate Info"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
-#~ msgstr "CANCELED"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_RECHECK_LABEL"
-#~ msgstr "Action"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_DESC"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_LABEL"
-#~ msgstr "eMail"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_PLACEHOLDER"
-#~ msgstr "my.name@mycompany.com"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH1_ID_TOOLTIP"
-#~ msgstr "Please enter a valid eMail address"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_DESC"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_LABEL"
-#~ msgstr "eMail"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_PLACEHOLDER"
-#~ msgstr "my.name@mycompany.com"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_AUTH2_ID_TOOLTIP"
-#~ msgstr "Please enter a valid eMail address"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_DESC"
-#~ msgstr "Common Name"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_PLACEHOLDER"
-#~ msgstr "Please select the key encryption method"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_TOOLTIP"
-#~ msgstr ""
-#~ "This specifies the algorithm used to protect your key, AES is usually a "
-#~ "good choice."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_DESC"
-#~ msgstr ""
-#~ "The reason code indicates the reason why the certificate was revoked."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_LABEL"
-#~ msgstr "Reason Code"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_PLACEHOLDER"
-#~ msgstr "Please set the reason for revocation"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_TOOLTIP"
-#~ msgstr "Specify the reason why you want the certificate being revoked."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_DESC"
-#~ msgstr "You can search for workflows here."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_LABEL"
-#~ msgstr "Creator"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_PLACEHOLDER"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_TOOLTIP"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_DESC"
-#~ msgstr ""
-#~ "This flag indicates that the workflow is a batch process and should run "
-#~ "without manual interaction."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_LABEL"
-#~ msgstr "Batch Mode"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_PLACEHOLDER"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH1_CODE_TOOLTIP"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_DESC"
-#~ msgstr ""
-#~ "This flag indicates that the workflow is a batch process and should run "
-#~ "without manual interaction."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_LABEL"
-#~ msgstr "Batch Mode"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_PLACEHOLDER"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__AUTH2_CODE_TOOLTIP"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CAN_FETCH_PUK_DESC"
-#~ msgstr "This workflow was canceled and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CAN_FETCH_PUK_LABEL"
-#~ msgstr "CANCELED"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CAN_WRITE_PIN_DESC"
-#~ msgstr "This revocation request requires approval."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CAN_WRITE_PIN_LABEL"
-#~ msgstr "Approval Pending"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CHECK_FOR_ACT_HASHES_DESC"
-#~ msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CHECK_FOR_ACT_HASHES_LABEL"
-#~ msgstr "SUCCESS"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CHECK_MAX_PIN_ITERAT_DESC"
-#~ msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CHECK_MAX_PIN_ITERAT_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CHECK_TOKEN_OWNER_DESC"
-#~ msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_CHECK_TOKEN_OWNER_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_FAILURE_DESC"
-#~ msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_FAILURE_LABEL"
-#~ msgstr "FAILURE"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_AUTH_IDS_DESC"
-#~ msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_AUTH_IDS_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_CODES_DESC"
-#~ msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_CODES_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_TOKEN_ID_DESC"
-#~ msgstr "This workflow was canceled and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_TOKEN_ID_LABEL"
-#~ msgstr "CANCELED"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_TOKEN_OWNER_DESC"
-#~ msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_HAVE_TOKEN_OWNER_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_INITIAL_DESC"
-#~ msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_INITIAL_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_PEND_ACT_CODE_DESC"
-#~ msgstr "Edit information of the revocation request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_PEND_ACT_CODE_LABEL"
-#~ msgstr "Edit request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_PEND_PIN_CHANGE_DESC"
-#~ msgstr "This revocation request requires approval."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_PEND_PIN_CHANGE_LABEL"
-#~ msgstr "Approval Pending"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_SUCCESS_DESC"
-#~ msgstr "The certificate has been revoked and a revocation list was issued."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_958708_SUCCESS_LABEL"
-#~ msgstr "Certificate Revoked"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_VALID_DISTINTCT"
+#~ msgstr "Certificate Export"

@@ -87,7 +87,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC
         action:
           - approve_crr > CHECK_APPROVALS ? acl_can_approve is_not_yet_revoked_or_pending
-          - edit_crr > EDIT_REQUEST ? is_not_yet_revoked_or_pending
+          - edit_crr > EDIT_REQUEST ? acl_can_approve is_not_yet_revoked_or_pending
           - reject_crr > REJECTED ? acl_can_reject is_not_yet_revoked_or_pending
           - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
         output:

@@ -1,0 +1,99 @@
+head:
+    prefix: summary
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_DESC
+    persister: Volatile
+
+state:
+    INITIAL:
+        action:
+          - initialize > GENERATE
+
+    GENERATE:
+        autorun: 1
+        action:
+          - generate > SUCCESS
+
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL
+        output:
+          - valid_at
+          - valid_count
+          - valid_distinct
+          - near_expiry
+          - recent_expiry
+          - total_count
+          - total_distinct
+          - total_revoked
+          - total_expired
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL
+        input:
+          - valid_at
+
+    generate:
+        class: OpenXPKI::Server::Workflow::Activity::Reports::Summary
+        param:
+            near_expiry: +0000045
+            recent_expiry: -0000030
+            valid_at: 20150701
+  
+field:
+    valid_at:
+        name: valid_at
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION
+        required: 0
+        type: datetime
+        format: timestamp
+        default: now
+
+    total_count:
+        name: total_count
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT
+
+    total_revoked:
+        name: total_revoked
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED
+
+    total_expired:
+        name: total_expired
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED
+
+    total_distinct:
+        name: total_distinct
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT
+
+    valid_count:
+        name: valid_count
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT
+
+    valid_distinct:
+        name: valid_distinct
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT
+
+    near_expiry:
+        name: near_expiry
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY
+
+    recent_expiry:
+        name: recent_expiry
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY
+
+acl:
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+        fail: 1
+        resume: 1
+        wakeup: 1
+
+    System:
+        creator: any
+

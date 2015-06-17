@@ -8716,6 +8716,14 @@ tr.gridrow-paused:hover > td {
   background-color: #e7e7e7 !important;
 }
 
+tr.gridrow-retry_exceeded > td {
+  background-color: #ffc04d!important;
+}
+
+tr.gridrow-retry_exceeded:hover > td {
+  background-color: #ffe4b3!important;
+}
+
 tr.gridrow-exception > td {
   background-color: #ffc04d!important;
 }

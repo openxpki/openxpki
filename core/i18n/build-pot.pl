@@ -36,6 +36,10 @@ sub extract_tags {
             # to be searched for tags
             return;
         }
+        # skip hidden files or backup files 
+        if ($filename =~ m{ \A \. }xms || $filename =~ m{ ~ \z }xms) {
+           return;
+        }
         open my $FILE, '<', $filename;
         while (my $line = <$FILE>) {
             while ($line =~ s{ ($prefix [A-Z0-9\_]+[A-Z0-9]) }{}xms) {

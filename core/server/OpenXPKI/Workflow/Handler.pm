@@ -110,17 +110,6 @@ sub get_workflow {
         );
     }
 
-    my $wf_session_info = CTX('session')->parse_serialized_info($wf->{WORKFLOW_SESSION});
-    if (!$wf_session_info || ref $wf_session_info ne 'HASH') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_WORKFLOW_UNABLE_TO_PARSE_WORKFLOW_INFO',
-            params  => {
-                WORKFLOW_ID => $wf_id,
-                WORKFLOW_SESSION => $wf->{WORKFLOW_SESSION}
-            },
-        );
-    }
-
     # We have now obtained the configuration id that was active during
     # creation of the workflow instance. However, if for some reason
     # the matching configuration is not available we have two options:

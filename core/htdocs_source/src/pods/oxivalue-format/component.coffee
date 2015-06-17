@@ -17,6 +17,7 @@ Component = Em.Component.extend
     types:
         certstatus: (v) -> "<span class='certstatus-#{(v.value||v.label).toLowerCase()}'>#{v.label}</span>"
         link: (v) -> "<a href='#/openxpki/#{v.page}' target='#{v.target||"modal"}'>#{v.label}</a>"
+        extlink: (v) -> "<a href='#{v.page}' target='#{v.target||"_blank"}'>#{v.label}</a>"
         timestamp: (v) -> 
           if v > 0 
             moment.unix(v).utc().format("YYYY-MM-DD HH:mm:ss UTC")

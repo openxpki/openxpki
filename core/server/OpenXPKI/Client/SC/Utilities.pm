@@ -180,13 +180,14 @@ sub handle_get_card_status {
         $log->debug( 'user workflow ' . Dumper $wf_info );
 
         if ($wf_info->{'TYPE'} eq $wf_type_unblock) {            
-            $newentry{'email_ldap1'} = $wf_info->{CONTEXT}->{auth1_ldap_mail};
-            $newentry{'email_ldap2'} = $wf_info->{CONTEXT}->{auth2_ldap_mail};
+            $newentry{'auth1_ldap_mail'} = $wf_info->{CONTEXT}->{auth1_mail};
+            $newentry{'auth2_ldap_mail'} = $wf_info->{CONTEXT}->{auth2_mail};             
             $newentry{'TOKEN_ID'} = $wf_info->{CONTEXT}->{token_id};
         } elsif ($wf_info->{'TYPE'} eq $wf_type_pers) {            
             $newentry{'TOKEN_ID'} = $wf_info->{CONTEXT}->{token_id};
         }
 
+        $log->debug( 'Workflow Item after process ' . Dumper \%newentry ); 
         push @mangled_workflows, \%newentry;
     }
     
@@ -287,7 +288,7 @@ sub handle_server_log {
     
     if (!$level) { 
         $level = 'info'; 
-    } elsif ( $message !~ /(info|debug|error|warn)/ ) {
+    } elsif ( $level !~ /(info|debug|error|warn)/ ) {
         $self->logger()->error(sprintf('Log request from frontend with improper level (%s)!', $message));
         $level = 'warn';
     } 

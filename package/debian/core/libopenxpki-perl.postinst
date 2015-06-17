@@ -56,6 +56,9 @@ case "$1" in
        # add apache user to openxpki group (to allow connecting the socket)
        usermod -G openxpki www-data
 
+       # create index.html as symlink to default.html  
+       test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html 
+
         # UI logfiles
         for f in scep.log soap.log webui.log; do
             touch /var/openxpki/$f

@@ -651,7 +651,13 @@ sub select {
                 $column = $entry->{COLUMN};
 
                 if ( defined $entry->{AGGREGATE} ) {
-                    $column_specification{AGGREGATE} = $entry->{AGGREGATE};
+                    
+                    if ($entry->{AGGREGATE} eq 'UNIQUE') {
+                        $column_specification{AGGREGATE} = 'COUNT';    
+                        $column_specification{AGGREGATEMOD} = 'DISTINCT';
+                    } else {
+                        $column_specification{AGGREGATE} = $entry->{AGGREGATE};
+                    }
 
                     if ( $column_specification{AGGREGATE} !~ m{ \A (?: MIN | MAX | AVG | COUNT ) \z }xms ) {
 
@@ -997,6 +1003,8 @@ sub select {
                         );
                     }
                     $operator = "like";
+                } elsif ( $op_key eq "BETWEEN" ) {
+                    $operator = "between";
                 } elsif($operator_of{$op_key}){
                     $operator = $operator_of{$op_key};
                 }else {
@@ -1014,6 +1022,20 @@ sub select {
                     # scalar case
                     push @conditions,  $lhs . ' ' . $operator . ' ?';
                     push @bind_values, $value;
+                    
+                } elsif ($operator eq 'between') {
+                    
+                    if (ref $value ne 'ARRAY' || scalar @{$value} != 2) {
+                        OpenXPKI::Exception->throw(
+                            message => "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_WRONG_PARAM_FOR_BETWEEN",
+                            params  => { VALUE => Dumper $value }                            
+                        );  
+                    }
+                    
+                    push @conditions,  $lhs . ' between ? and ?';
+                    push @bind_values, $value->[0];
+                    push @bind_values, $value->[1];
+                    
                 } elsif ( defined $value && ref $value eq 'ARRAY' ) {
 
                     # the value is an array reference, combine with OR
@@ -1058,8 +1080,10 @@ sub select {
     my @order_specs;
     foreach my $entry (@select_list) {
         my $select_column = $entry->{COLUMN};
-
-        if ( defined $entry->{AGGREGATE} ) {
+        
+        if ($entry->{AGGREGATEMOD}) {
+            $select_column = $entry->{AGGREGATE} . '(' . $entry->{AGGREGATEMOD} . ' ' . $select_column . ')';    
+        } elsif ( defined $entry->{AGGREGATE} ) {
             $select_column = $entry->{AGGREGATE} . '(' . $select_column . ')';
         }
 
@@ -1195,6 +1219,7 @@ sub select {
     ##! 1: "return ".scalar (@result)." results"
     return [@result];
 }
+ 
 
 1;
 __END__
@@ -1367,6 +1392,11 @@ creates the SQL filter C<${GREATER} <lt> PIVOT_COLUMN>.
 =item * LESS_THAN
 
 creates the SQL filter C<PIVOT_COLUMN <lt> ${FROM}>.
+
+=item * BETWEEN
+
+creates the SQL filter C<PIVOT_COLUMN between ${FROM} and ${TO}>.
+Value is expected to be a 2-element array ref.
 
 =item * LIMIT
 
@@ -1599,8 +1629,8 @@ by using a hash reference for the column specification instead of a scalar.
 In this case the hash key 'COLUMN' must be set to the desired column name.
 
 The key 'AGGREGATE' indicates that an aggregate function should be used on
-the column. In this case the value must be one of 'MIN', 'MAX', 'COUNT' or
-'AVG'.
+the column. In this case the value must be one of 'MIN', 'MAX', 'COUNT',
+'UNIQUE' or 'AVG'. UNIQUE is translated to count(distinct <*>column>).
 
 =head4 Aggregate example 1
 

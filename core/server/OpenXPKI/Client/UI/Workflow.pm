@@ -166,7 +166,8 @@ sub init_load {
     }
 
     # Set single action if not in result view and only single action is avail
-    if (($view ne 'result') && !$wf_action) {
+    if (($view ne 'result') && !$wf_action && 
+        (ref $wf_info->{STATE} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {
         my @activities = @{$wf_info->{STATE}->{option}};
         if (scalar @activities == 1) {
             $wf_action = $activities[0];
@@ -964,7 +965,7 @@ sub action_fail {
     $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
     $wf_info = $self->send_command( 'fail_workflow', {
-        ID       => $wf_args->{wf_id},        
+        ID => $wf_args->{wf_id},        
     });
 
     $self->__render_from_workflow({ WF_INFO => $wf_info });
@@ -1322,8 +1323,10 @@ sub __render_from_workflow {
         }
     }
 
-    # Check if the workflow is under control of the watchdog
-    if ($wf_info->{WORKFLOW}->{PROC_STATE} && $wf_info->{WORKFLOW}->{PROC_STATE} eq 'pause') {
+    my $wf_proc_state = $wf_info->{WORKFLOW}->{PROC_STATE} || 'init';
+    
+    # Check if the workflow is under control of the watchdog    
+    if (grep /$wf_proc_state/, ('pause','retry_exceeded')) {
 
         my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
         my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
@@ -1341,28 +1344,39 @@ sub __render_from_workflow {
             description =>  $wf_action_info->{description} ,
         });
 
+        my @fields = ({  
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
+                value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
+                'format' => 'timestamp' 
+            }, { 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL',
+                value => $wf_info->{WORKFLOW}->{WAKE_UP_AT}, 
+                'format' => 'timestamp' 
+            }, { 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL',
+                value => $wf_info->{WORKFLOW}->{COUNT_TRY} 
+            }, { 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL',
+                value => $wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg} 
+        });
+        
+        my $desc;
+        if ($wf_proc_state eq 'pause') {
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
+            $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION';
+        } else {
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
+            $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION';
+        }
+
         $self->add_section({
             type => 'keyvalue',
-             content => {
+            content => {
                 label => '',
-                description => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION',
-                data => [
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
-
-                        value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 'format' => 'timestamp' },
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL',
-
-                        value => $wf_info->{WORKFLOW}->{WAKE_UP_AT}, 'format' => 'timestamp' },
-
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL',
-
-                        value => $wf_info->{WORKFLOW}->{COUNT_TRY} },
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL',
-                        value => $wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg} },
-                ]
+                description => $desc,
+                data => \@fields
         }});
 
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
 
     # if there is one activity selected (or only one present), we render it now
     } elsif ($wf_action) {
@@ -1423,6 +1437,19 @@ sub __render_from_workflow {
             }
 
         }
+        
+        # Render the context values if there are no fields
+        if (!scalar @fields) {
+            my $fields = $self->__render_fields( $wf_info, $view );            
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => '',
+                    description => '',
+                    data => $fields,                    
+            }});
+        }
+        
 
         # record the workflow info in the session
         push @fields, $self->__register_wf_token( $wf_info, {
@@ -1549,7 +1576,7 @@ sub __render_from_workflow {
         # can done on the workflow -> render appropriate buttons.
         if ($wf_info->{HANDLES} && ref $wf_info->{HANDLES} eq 'ARRAY') {
             
-            my @handles = @{$wf_info->{HANDLES}};            
+            my @handles = @{$wf_info->{HANDLES}};
             
             $self->logger()->debug('Adding global actions ' . join('/', @handles));
             
@@ -1836,10 +1863,13 @@ sub __render_result_list {
                     my $state = $wf_item->{'WORKFLOW.WORKFLOW_STATE'};
 
                     if ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'exception') {
-
                         $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION )";
+                        
                     } elsif ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'pause') {
                         $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE )";
+
+                    } elsif ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'retry_exceeded') {
+                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED )";
 
                     }
                     push @line, $state;
@@ -1960,7 +1990,6 @@ sub __render_fields {
             }
 
             # convert format cert_identifier into a link
-
             if ($item->{format} eq "cert_identifier") {
                 $item->{format} = 'link';
 
@@ -1977,6 +2006,24 @@ sub __render_fields {
                 };
 
                 $self->logger()->debug( 'item ' . Dumper $item);
+
+            # create a link to download the given filename
+            } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
+                
+                my $mime = $2 || 'application/octect-stream';
+                 
+                $item->{format} = 'extlink';
+
+                my $label = $item->{value};
+                my $target = $self->__persist_response({
+                    file => $item->{value},
+                    mime => $mime
+                });
+                
+                $item->{value}  = {
+                    label => $label,                    
+                    page => $self->_client()->_config()->{'scripturl'} . "?page=".$target
+                };
 
             # format for cert_info block
             } elsif ($item->{format} eq "cert_info") {
@@ -2025,9 +2072,9 @@ sub __render_fields {
                     $item->{value} = $self->serializer()->deserialize( $item->{value} );
                 }
                 # Sort by label
-                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};            
                 $item->{value} = \@val;
-
+                
             }
 
             if ($field->{template}) {
