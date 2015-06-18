@@ -299,6 +299,44 @@ sub get_cert {
 }
 
 
+=head2 get_cert_attributes
+
+returns a hash with the attributes of the certificate. Requires the
+IDENTIFIER of the certificate.
+
+=cut
+
+sub get_cert_attributes {
+    
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+
+    ##! 2: "initialize arguments"
+    my $identifier = $args->{IDENTIFIER};
+
+    # get current DB state
+    CTX('dbi_backend')->commit();
+
+
+    my $res_attrib = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
+    );  
+        
+    my $attrib;
+    foreach my $item (@$res_attrib ) {
+        my $key = $item->{ATTRIBUTE_KEY};
+        my $val = $item->{ATTRIBUTE_VALUE};
+        if (!defined($attrib->{$key})) {
+            $attrib->{$key} = [];
+        }
+        push @{$attrib->{$key}}, $val;                       
+    }
+        
+    return $attrib;
+}
+
 =head2 get_profile_for_cert
 
 returns the name of the profile used during the certificate request.
