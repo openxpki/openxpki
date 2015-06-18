@@ -37,7 +37,7 @@ sub execute {
         if (-e $target_name) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_TARGET_FILE_EXISTS',
-                PARAMS => { FILENAME => $target_name }
+                params => { FILENAME => $target_name }
             );    
         }
                 
@@ -47,7 +47,7 @@ sub execute {
     if (!$fh || !$target_name) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_UNABLE_TO_WRITE_REPORT_FILE',
-            PARAMS => { FILENAME => $target_name, DIRNAME => $target_dir }            
+            params => { FILENAME => $target_name, DIRNAME => $target_dir }            
         );
     }
     
