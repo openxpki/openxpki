@@ -1,0 +1,7 @@
+cutoff_notafter: +000060
+include_expired: -000030
+
+cols:
+  - head: Requestor eMail
+    attribute: meta_email
+
