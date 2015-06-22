@@ -15,9 +15,9 @@ sub evaluate
 {
     ##! 1: 'start'
     my ($self, $workflow) = @_;
-    my $context           = $workflow->context();
+    
+    my $wf_creator = $workflow->attrib('creator') || '';
 
-    my $wf_creator        = $context->param('creator');
     my $current_user      = CTX('session')->get_user();
     ##! 16: 'workflow creator: ' . $wf_creator
     ##! 16: 'current user: ' . $current_user
@@ -44,11 +44,9 @@ OpenXPKI::Server::Workflow::Condition::WorkflowCreator
 
 =head1 SYNOPSIS
 
-<action name="do_something">
-  <condition name="workflow_creator"
-             class="OpenXPKI::Server::Workflow::Condition::WorkflowCreator">
-  </condition>
-</action>
+   is_workflow_creator"
+        class: OpenXPKI::Server::Workflow::Condition::WorkflowCreator
+  
 
 =head1 DESCRIPTION
 

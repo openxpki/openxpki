@@ -2071,6 +2071,22 @@ sub __render_fields {
                 if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
                     $item->{value} = $self->serializer()->deserialize( $item->{value} );
                 }
+                
+            } elsif ($item->{format} eq "itemcnt") {
+
+                my $list = $item->{value};
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $list = $self->serializer()->deserialize( $item->{value} );
+                }
+                
+                if (ref $list eq 'ARRAY') {
+                    $item->{value} = scalar @{$list};
+                } elsif (ref $list eq 'HASH') {
+                    $item->{value} = scalar keys %{$list};
+                } else {
+                    $item->{value} = '??';
+                }
+                $item->{format} = '';
 
             } elsif ($item->{format} eq "deflist") {
 
