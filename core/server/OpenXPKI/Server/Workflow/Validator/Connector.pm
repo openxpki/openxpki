@@ -2,7 +2,7 @@ package OpenXPKI::Server::Workflow::Validator::Connector;
 
 use strict;
 use warnings;
-use base qw( Workflow::Validator );
+use base qw( OpenXPKI::Server::Workflow::Validator );
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
@@ -22,14 +22,13 @@ sub _init {
     $self->error( $params->{error} ) if ($params->{error});
 }
 
-sub validate {
-    my ( $self, $wf, $field ) = @_;
+sub _validate {
+    my ( $self, $wf, $value ) = @_;
     
     ##! 1: 'start'
 
-    my $value = $wf->context()->param($field);
-    
     # empty value
+    ##! 16: ' value is ' . $value    
     return 1 if (!defined $value || $value eq '');
 
     ##! 16: 'Validating value ' . $value
@@ -42,8 +41,7 @@ sub validate {
     my $result = $cfg->get( \@path );
     
     ##! 32: 'Raw result is ' . (defined $result ? $result : 'undef')
-    if (!$result) {     
-        $wf->context()->param( '__error_field' => $field );        
+    if (!$result) {              
         CTX('log')->log(
             MESSAGE  => "Validator failed on path " . $self->path(),
             PRIORITY => 'info',
