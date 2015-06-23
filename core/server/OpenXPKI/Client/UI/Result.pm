@@ -74,7 +74,7 @@ has reload => (
 
 has redirect => (
     is => 'rw',
-    isa => 'Str',
+    isa => 'Str|HashRef',
     default => '',
 );
 
@@ -342,7 +342,9 @@ sub render {
 
     my $json = new JSON()->utf8;
     my $body;
-    if ($self->redirect()) {
+    if (ref $self->redirect() eq 'HASH') {
+        $body = $json->encode( $self->redirect() );
+    } elsif ($self->redirect()) {
         $body = $json->encode({ goto => $self->redirect() } );
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );

@@ -165,17 +165,9 @@ sub handle_request {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
         return $self->handle_page( $args );
     }
-    
-    # Requests to pages can be redirected after login, store page in session
-    
-    if ($page && ($page !~ /^login/)) {
-        $self->logger()->debug("Page request without login " . $page);
-        $self->session()->param('redirect', $page);
-    }
    
-
     # if the backend session logged out but did not terminate
-    # we get the probleme that ui is logged in but backend is not
+    # we get the problem that ui is logged in but backend is not
     $self->flush_session() if ($self->session()->param('is_logged_in'));
 
     # try to log in
@@ -283,15 +275,52 @@ sub handle_login {
         $session->param('auth_stack', $cgi->param('auth_stack'));
         $self->logger()->debug('set auth_stack in session: ' . $cgi->param('auth_stack') );
     }
+    
+    # ENV always overrides session, keep this after the above block to prevent
+    # people from hacking into the session parameters
+    if ($ENV{OPENXPKI_PKI_REALM}) {
+        $session->param('pki_realm', $ENV{OPENXPKI_PKI_REALM});
+    }
+    if ($ENV{OPENXPKI_AUTH_STACK}) {
+        $session->param('auth_stack', $ENV{OPENXPKI_AUTH_STACK});
+    }
 
-    my $pki_realm = $session->param('pki_realm') || $ENV{OPENXPKI_PKI_REALM} || '';
-    my $auth_stack =  $session->param('auth_stack') || $ENV{OPENXPKI_AUTH_STACK} || '';
-
+    my $pki_realm = $session->param('pki_realm') || '';
+    my $auth_stack =  $session->param('auth_stack') || '';
 
     my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
 
-    # force reload of structure if this is an initial request
-    ($result->reload(1) && $result->redirect('login'))  if ($action !~ /^login/ && $page !~ /^login/);
+    # if this is an initial request, force redirect to the login page
+    # will do an external redirect in case loginurl is set in config
+    if ($action !~ /^login/ && $page !~ /^login/) {
+                 
+        # Requests to pages can be redirected after login, store page in session       
+        if ($page) {
+            $self->logger()->debug("Store page request for later redirect" . $page);
+            $self->session()->param('redirect', $page);
+        }
+        
+        # Link to an internal method using the class!method 
+        if (my $loginpage = $self->_config()->{loginpage}) {
+            
+            # internal call to handle_page
+            return $self->handle_page({ action => '', page => $loginpage, cgi => $cgi });
+        
+        } elsif (my $loginurl = $self->_config()->{loginurl}) {
+                        
+            $self->logger()->debug("Redirect to external login page " . $loginurl );
+            $result->reload(1);
+            $result->redirect( { goto => $loginurl, target => '_blank' } );  
+            return $result->render();
+            # Do a real exit to skip the error handling of the script body
+            exit;
+                    
+        } else {
+            $self->logger()->debug('Redirect to login page');
+            $result->reload(1);
+            $result->redirect('login');
+        }
+    }  
 
     if ( $status eq 'GET_PKI_REALM' ) {
         if ($pki_realm) {
