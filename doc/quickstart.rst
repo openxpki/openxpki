@@ -178,9 +178,9 @@ our package server in order to use the scep service.**
 
 The SCEP logic is already included in the core distribution. The package installs
 a wrapper script into /usr/lib/cgi-bin/ and creates a suitable alias in the apache
-config redirecting all requests to `http://host/scep/<any value>` to the wrapper. 
+config redirecting all requests to ``http://host/cgi-bin/scep/<any value>` to the wrapper.
 A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive, 
-there is no need for any configuration, just call ``http://host/scep/scep``.
+there is no need for any configuration, just call ``http://host/cgi-bin/scep/scep``.
 
 The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the 
 shipped workflow is configured to allow enrollment with password or signer on behalf.
