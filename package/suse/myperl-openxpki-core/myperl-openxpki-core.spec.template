@@ -53,6 +53,9 @@ Git tags:              [%- IF GIT_TAGS -%]
 
 %build
 
+# Fix shebang for cgi scripts
+%{__perl} -i -pe 's{^#!/usr/bin/perl}{#!%{__perl}}' core/server/cgi-bin/*
+
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
 set -o errexit
