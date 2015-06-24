@@ -10,6 +10,8 @@ state:
           - check_server_status > SUCCESS
 
     SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC
 
 action:
     check_server_status:

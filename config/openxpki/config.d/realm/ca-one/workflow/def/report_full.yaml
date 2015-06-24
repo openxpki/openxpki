@@ -29,12 +29,18 @@ action:
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL
         input:
           - valid_at
+          - target_filename
+          - report_config
 
     generate:
         class: OpenXPKI::Server::Workflow::Activity::Reports::Detail
-        param:
-            valid_at: 20150701
+        param:            
             target_umask: 0644
+            _map_target_filename: >
+                [% IF context.target_filename %][% context.target_filename %]
+                [% ELSE %]pki report [% USE date(format='%Y-%m-%dT%H:%M:%S') %][% date.format( context.valid_at ) %].csv[% END %]
+            target_dir: /tmp
+            _map_report_config: $report_config
   
 field:
     valid_at:
@@ -53,7 +59,16 @@ field:
     report_filename:
         name: report_filename
         format: download/text/csv
- 
+        
+    target_filename:
+        name: target_filename
+        type: server 
+        required: 0
+
+    report_config:
+        name: report_config
+        type: server
+        required: 0
 
 acl:
     CA Operator:

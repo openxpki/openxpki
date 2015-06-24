@@ -1,0 +1,5 @@
+class: OpenXPKI::Server::Workflow::Condition::HasRole
+param:
+    roles: CA Operator,RA Operator
+
+

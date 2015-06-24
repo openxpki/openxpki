@@ -2015,8 +2015,14 @@ sub __render_fields {
                 $item->{format} = 'extlink';
 
                 my $label = $item->{value};
+                my $basename;
+                if ($label =~ m{ ([^\/]+(\.\w+)?) \z }xms) {
+                   $basename = $1; 
+                }
+                
                 my $target = $self->__persist_response({
                     file => $item->{value},
+                    attachment =>  $basename, 
                     mime => $mime
                 });
                 
@@ -2065,6 +2071,22 @@ sub __render_fields {
                 if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
                     $item->{value} = $self->serializer()->deserialize( $item->{value} );
                 }
+                
+            } elsif ($item->{format} eq "itemcnt") {
+
+                my $list = $item->{value};
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $list = $self->serializer()->deserialize( $item->{value} );
+                }
+                
+                if (ref $list eq 'ARRAY') {
+                    $item->{value} = scalar @{$list};
+                } elsif (ref $list eq 'HASH') {
+                    $item->{value} = scalar keys %{$list};
+                } else {
+                    $item->{value} = '??';
+                }
+                $item->{format} = '';
 
             } elsif ($item->{format} eq "deflist") {
 

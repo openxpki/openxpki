@@ -169,6 +169,7 @@ state:
           - notafter
           - cert_profile
           - cert_info
+#          - approval_count
         button:
           edit_subject: 
             format: optional
@@ -212,6 +213,8 @@ state:
           - notafter
           - cert_profile
           - cert_info
+#          - approval_count
+
         button:
           approve_csr:
             format: alternative
@@ -597,20 +600,27 @@ condition:
     is_certificate_issued:
         class: OpenXPKI::Server::Workflow::Condition::NICE::IsCertificateIssued
 
+    # If you want operators to approve their own certs
+    # just remove the second contions line
     acl_can_approve:
-        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        class: Workflow::Condition::LazyAND
         param:
-            roles: CA Operator,RA Operator
+            condition1: global_is_operator
+#           condition2: "!global_is_creator"
 
     acl_can_reject:
-        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        class: Workflow::Condition::LazyAND
         param:
-            roles: CA Operator,RA Operator
+            condition1: global_is_operator
+#            condition2: "!global_is_creator"
 
+    # If you want a 4-eyes approval, just add a second "RA Operator"
+    # e.g. "role: RA Operator, RA Operator" - you should add also 
+    # add current approval count to the output in the relevant states
     is_approved:
         class: OpenXPKI::Server::Workflow::Condition::Approved
         param:
-            role: RA Operator
+            role: RA Operator, RA Operator
 
     can_use_server_key:
         class: OpenXPKI::Server::Workflow::Condition::KeyGenerationMode

@@ -119,6 +119,10 @@ wfsearch:
    - label: Requestor
      key: requestor  
 
+   
+   - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
+     key: scep_tid 
+
 
 certsearch:
    - label: Requestor Name

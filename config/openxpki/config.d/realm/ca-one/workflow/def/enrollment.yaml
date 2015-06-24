@@ -95,7 +95,7 @@ state:
     CHECK_FOR_VALID_REQUEST:
         autorun: 1
         action:
-          - global_noop > FAILURE ?  !valid_request
+          - global_noop > FAILURE ? !valid_request
           - global_noop2 > HAVE_VALID_REQUEST ? valid_request
 
     CHECK_INITIAL_ENROLL_AUTHEN:
@@ -176,7 +176,7 @@ state:
     INITIALIZED:
         autorun: 1
         action:
-          - extract_csr > READY_TO_PROCESS
+          - extract_csr set_workflow_attributes > READY_TO_PROCESS
 
     ISSUANCE:
         autorun: 1
@@ -403,6 +403,12 @@ action:
     revoke_existing_certs:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts
 
+    set_workflow_attributes:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        param:
+           _map_cert_subject: $cert_subject
+           _map_scep_tid: $scep_tid
+
 
 condition:
     allow_manual_approval:
@@ -601,6 +607,11 @@ condition:
         param:
             condition2: scep_signer_sn_matches_csr
             condition3: scep_signer_is_self_signed
+
+    signer_is_self_signed:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_is_self_signed}
 
 field:
     _pkcs7:

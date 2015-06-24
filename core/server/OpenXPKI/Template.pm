@@ -68,7 +68,11 @@ sub render {
         );
     }
     
-    ##! 32: 'output: ' . $out
+    # trim spaces and newlines
+    $out =~ s{ \A \s* }{}xms;
+    $out =~ s{ \s* \z }{}xms;
+    
+    ##! 32: 'output: #' . $out . '#'
     
     return $out;
     

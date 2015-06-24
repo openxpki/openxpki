@@ -24,13 +24,15 @@ sub _init
              "declaration of condition ", $self->name;
     }
 
-    ## role can be an array
-    if (not ref $params->{role})
+    ## role can be comma sep. list
+    my $role = $params->{role};
+      
+    if ($role =~ /,/)
     {
-        ## only one role -> simplest case
-        $params->{role} = [ $params->{role} ];
+        my @roles = split /\s*,\s*/, $role; 
+        $role = \@roles;        
     }
-    $self->role($params->{role});
+    $self->role($role);
 }
 
 sub evaluate

@@ -8,6 +8,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use Data::Dumper;
 use OpenXPKI::DateTime;
+use OpenXPKI::Template;
 use DateTime;
 use Workflow::Exception qw(configuration_error);
 
@@ -18,7 +19,7 @@ sub execute {
     
     my $context = $workflow->context();
     my $pki_realm = CTX('session')->get_pki_realm(); 
-           
+                 
     my $target_dir = $self->param('target_dir');
     my $target_name = $self->param('target_filename');    
     my $umask = $self->param( 'target_umask' ) || "0640";  
@@ -36,7 +37,7 @@ sub execute {
         if (-e $target_name) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_TARGET_FILE_EXISTS',
-                PARAMS => { FILENAME => $target_name }
+                params => { FILENAME => $target_name }
             );    
         }
                 
@@ -46,7 +47,7 @@ sub execute {
     if (!$fh || !$target_name) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_UNABLE_TO_WRITE_REPORT_FILE',
-            PARAMS => { FILENAME => $target_name, DIRNAME => $target_dir }            
+            params => { FILENAME => $target_name, DIRNAME => $target_dir }            
         );
     }
     
@@ -72,42 +73,103 @@ sub execute {
         }
     };
     
-    my $notbefore = $self->param('cutoff_notbefore') || 0;
-    my $notafter = $self->param('cutoff_notafter') || 0;
-    my $revoked = $self->param('include_revoked') || 0; 
     
-    # no cutoff, use valid_at macro
-    if (!$notbefore && !$notafter) {
-        $query->{VALID_AT} = $epoch;
+    my $p = {
+        cutoff_notbefore => 0,
+        cutoff_notafter => 0,
+        include_revoked => 0,
+        include_expired => 0    
+    };
+    
+    # try to read those from the activity config
+    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired)) {
+        if (defined $self->param($key)) {
+            $p->{$key} = $self->param($key);
+        }        
+    }
+    
+
+    # Additional columns and override to the above configs
+    my $report_config = $self->param('report_config');
+    my @columns;
+    my @head;
+    my $tt;
+    if ($report_config) {
+        my $config = CTX('config');
         
-        # If include_revoke it not set, we filter on ISSUED status
-        if (!$revoked) {
-            $query->{DYNAMIC}->{'STATUS'} = 'ISSUED';
+        # override selector config
+        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired)) {
+            if ($config->exists(['report', $report_config, $key])) {
+                $p->{$key} = $config->get(['report', $report_config, $key]);
+            }        
+        }
+        
+        $tt = OpenXPKI::Template->new();
+        
+        @columns = $config->get_list(['report', $report_config, 'cols']);
+        @head = map { $_->{head} } @columns;
+        
+    }
+    
+    # If include_revoke it not set, we filter on ISSUED status
+    if (!$p->{include_revoked}) {
+        $query->{DYNAMIC}->{'STATUS'} = 'ISSUED';
+    }
+    
+    my $expiry_cutoff; 
+    if ($p->{include_expired}) {
+        $expiry_cutoff = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $valid_at,
+            VALIDITY => $p->{include_expired},
+            VALIDITYFORMAT => 'detect',
+        })->epoch();
+    }
+        
+    # no cutoff, use valid_at macro
+    if (!$p->{cutoff_notbefore} && !$p->{cutoff_notafter}) {
+        
+        if ($p->{include_expired}) {
+            $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $expiry_cutoff, $epoch  ] };
+        } else {
+            $query->{VALID_AT} = $epoch;
         }
         
     } else {
-                                
-        if ($notbefore) {                           
+        
+        if ($p->{cutoff_notbefore}) {                           
             my $cutoff = OpenXPKI::DateTime::get_validity({
                 REFERENCEDATE => $valid_at,
-                VALIDITY => $notbefore,
+                VALIDITY => $p->{cutoff_notbefore},
                 VALIDITYFORMAT => 'detect',
             })->epoch();
             
-            $query->{DYNAMIC}->{'NOTBEFORE'} = { OPERATOR => 'GREATER_THAN', VALUE => $cutoff };
-                        
+            if ($epoch > $cutoff) {
+                $query->{DYNAMIC}->{'NOTBEFORE'} = { OPERATOR => 'BETWEEN', VALUE => [ $cutoff, $epoch ] };
+            } else {
+                $query->{DYNAMIC}->{'NOTBEFORE'} = { OPERATOR => 'BETWEEN', VALUE => [ $epoch, $cutoff ] };            
+            }
         }
         
-        if ($notafter) {                           
+        if ($p->{cutoff_notafter}) {
             my $cutoff = OpenXPKI::DateTime::get_validity({
                 REFERENCEDATE => $valid_at,
-                VALIDITY => $notafter,
+                VALIDITY => $p->{cutoff_notafter},
                 VALIDITYFORMAT => 'detect',
             })->epoch();
             
-            $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'LESS_THAN', VALUE => $cutoff };
+            if ($p->{include_expired}) {
+                $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $expiry_cutoff, $cutoff  ] };
+            } elsif ($epoch > $cutoff) {
+                $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $cutoff, $epoch  ] };
+            } else {
+                $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $epoch, $cutoff ] };
+            }
                         
-        }        
+        } elsif ($p->{include_expired}) {
+            $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'GREATER_THAN', VALUE => $expiry_cutoff };
+        } else {
+            $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'GREATER_THAN', VALUE => $epoch };
+        }
         
     }
     
@@ -119,14 +181,14 @@ sub execute {
             params => { 'TYPE' => ref $result, },
         );
     }
-    
+       
     ##! 1: 'Result ' . Dumper $result
     
     my $cnt;
     
     print $fh "full certificate report, realm $pki_realm, validity date ".$valid_at->iso8601()." , export date ". DateTime->now()->iso8601 ."\n";
     
-    print $fh join("|", ("request id","subject","cert. serial", "notbefore", "notafter", "status", "issuer"))."\n";
+    print $fh join("|", @{[ ("request id","subject","cert. serial", "identifier", "notbefore", "notafter", "status", "issuer"), @head ] })."\n";
         
     foreach my $item ( @{$result} ) {
         
@@ -139,16 +201,42 @@ sub execute {
         }
        
         $cnt++;          
-        my $line = join("|", (
+        my @line = (
             $item->{CSR_SERIAL},
             $item->{SUBJECT},
             $serial,
+            $item->{IDENTIFIER},
             DateTime->from_epoch( epoch => $item->{NOTBEFORE} )->iso8601(),
             DateTime->from_epoch( epoch => $item->{NOTAFTER} )->iso8601(),
-            $status,           
-            $item->{ISSUER_DN}                      
-       ));      
-       print $fh "$line\n";
+            $status,
+            $item->{ISSUER_DN}
+        );      
+       
+        # add extra columns
+        if (@columns) {
+            my $attrib = CTX('api')->get_cert_attributes({ IDENTIFIER => $item->{IDENTIFIER} });
+       
+            foreach my $col (@columns) {
+               
+                if ($col->{template}) {
+                    my $out;
+                    my $ttp = {
+                        attribute => $attrib,
+                        cert => $item,
+                    };
+
+                    push @line, $tt->render( $col->{template}, $ttp );
+                } elsif ($col->{cert}) {
+                    push @line, $item->{ $col->{cert} };
+                } elsif ($col->{attribute} && ref $attrib->{ $col->{attribute} } eq 'ARRAY') {
+                    push @line, $attrib->{ $col->{attribute} }->[0];
+                } else {
+                    push @line, '';
+                }
+            }
+        }
+        
+        print $fh join("|", @line) . "\n";
     }
 
     close $fh;
@@ -173,9 +261,6 @@ Write a detailed report with certificate status information to a CSV file.
 Selection criteria and output format can be controlled by several activity
 parameters, the default is to print all currenty valid certificates.
 
-If at least one cutoff date is given, all certificates matching the cutoff
-range are added in the report, any include_* settings are ignored. 
-
 =head1 Configuration
 
 =head2 Activity parameters
@@ -199,7 +284,7 @@ owner is the user/group running the socket, if you want to download
 this file using the webserver, make sure that either the webserver has 
 permissions on the daemons group or set the umask to 644.
 
-=item include_expired
+=item include_expired  
 
 Parseable OpenXPKI::Datetime value (autodetected), certificates which are
 expired after the given date are included in the report. Default is not to
@@ -220,9 +305,52 @@ notebefore is greater than value.
 Parseable OpenXPKI::Datetime value (autodetected), show certificates where
 notafter is less then value.
 
+=item report_config
+
+Lookup extended specifications in the config system at report.<report_config>.
+The config can contain any of
+I<cutoff_notbefore, cutoff_notafter, include_revoked, include_expired>.
+which will override any given value from the activity if a true value is 
+given. Additional columns can also be specified, these are appended at the
+end of each line.
+
+   cols:
+     - head: Title put in the head columns
+       cert: issuer_identifier
+     - head: Just another title
+       attribute: meta_email
+     - head: Third column 
+       template: "[% attribute.meta_email %]"       
+       
+The I<cert> key takes the value from the named column from the certificate
+table, I<attribute> shows the value of the attribute. I<template> is passed           
+to OpenXPKI::Template with I<cert> and I<attribute> set. Note that all 
+attributes are lists, even if there are single valued! 
+
 =back 
 
-=head2 Context parameters
- 
+=head2 Full example
 
+Your activity definition:
+
+    generate_report:
+        class: OpenXPKI::Server::Workflow::Activity::Reports::Detail
+        param:            
+            target_umask: 0644
+            _map_target_filename: "expiry report [% USE date(format='%Y-%m-%dT%H:%M:%S') %][% date.format( context.valid_at ) %].csv"
+            target_dir: /tmp
+            report_config: expiry 
+  
+Content of report/expiry.yaml inside realms config directory: 
+
+   cutoff_notafter: +000060
+   include_expired: -000030
+    
+   cols:
+     - head: Requestor eMail
+       attribute: meta_email
+
+This gives you a nice report about certificates which have expired within
+the last 30 days or will expire in the next 60 days with the contact email
+used while the request process.     
 
