@@ -7,6 +7,10 @@ Route = Em.Route.extend
         limit:
             refreshModel: true
 
+    setupAjax: Em.on "init", ->
+        Em.$.ajaxSetup
+            beforeSend: (xhr) ->
+                xhr.setRequestHeader "X-OPENXPKI-Client", "1"
 
     needReboot: [ "login", "logout", "welcome" ]
 
@@ -62,7 +66,7 @@ Route = Em.Route.extend
             else
                 target = "top"
 
-        $.ajax(req).then (doc) =>
+        Em.$.ajax(req).then (doc) =>
             source.beginPropertyChanges()
 
             source.set "status", doc.status

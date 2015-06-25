@@ -2,6 +2,6 @@
 
 Controller = Em.ArrayController.extend
     needs: ["openxpki"]
-    user: Em.computed.alias "controllers.openxpki.user"
+    user: Em.computed.alias "controllers.openxpki.model.user"
 
 `export default Controller`

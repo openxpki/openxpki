@@ -37,12 +37,12 @@
                     {{/each}}
                 </tr>
            {{else}}
-                <tr><td colspan="{{columns.size}}">{{#if content.content.empty}}{{content.content.empty}}{{else}}&nbsp;{{/if}}</td></tr>
+                <tr><td colspan="{{columns.length}}">{{if content.content.empty content.content.empty "&nbsp;"}}</td></tr>
            {{/each}}
         </tbody>
         {{#if content.content.footer}}
             <tfoot>
-                <tr><td colspan="{{columns.size}}">{{content.content.footer}}</td></tr>
+                <tr><td colspan="{{columns.length}}">{{content.content.footer}}</td></tr>
             </tfoot>
         {{/if}}
     </table>
