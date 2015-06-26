@@ -211,7 +211,7 @@ if ($test->state() eq "HAVE_CERT_TO_DELETE") {
 			-f $modulus_map{$modulus} && unlink ($modulus_map{$modulus});
 			undef $modulus_map{$modulus};
 		} else {
-			$test->execute_ok('scpers_cert_del_err');
+			$test->execute_ok('scpers_cert_del_err', { 'sc_error_reason' => 'Failed' });
 		}
 		$number_of_tests += 2;		
 	}
