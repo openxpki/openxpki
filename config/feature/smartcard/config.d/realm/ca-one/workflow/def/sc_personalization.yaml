@@ -102,7 +102,7 @@ state:
           - calculate_key_id > KEY_ID_COMPUTED
 
 
-    CERT_TO_INSTALL: 
+    CERT_TO_INSTALL:
         action: 
           - cert_inst_err > CERT_TO_INSTALL
           - fetch_puk > CERT_TO_INSTALL
@@ -615,9 +615,11 @@ action:
         class: Workflow::Action::Null
         input: 
           - sc_error_reason
-
+  
     publish_certificate: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
+# if you want to fork a new workflow for each publication, use this class instead
+#       class: OpenXPKI::Server::Workflow::Activity::Tools::TriggerCertificatePublish
         input: 
           - cert_identifier
         param: 
