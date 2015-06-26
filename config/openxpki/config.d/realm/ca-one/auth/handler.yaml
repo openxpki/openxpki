@@ -95,6 +95,7 @@ SmartCard:
     type: Anonymous
     label: SmartCard
     role: SmartCard
+    user: scpers
 
 # Sample using a Password "bind" connector
 Password Connector:

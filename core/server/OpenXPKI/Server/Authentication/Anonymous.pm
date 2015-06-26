@@ -27,7 +27,8 @@ sub new {
     ##! 1: "start" 
     
     $self->{ROLE} = CTX('config')->get("$path.role") || 'Anonymous';
-
+    $self->{USER} = CTX('config')->get("$path.user") || 'anonymous';
+    
     ##! 2: "role: ".$self->{ROLE}
 
     return $self;
@@ -42,7 +43,7 @@ sub login_step {
     my $msg     = $arg_ref->{MESSAGE};
 
     return (
-        'anonymous',
+        $self->{USER},
         $self->{ROLE},
         {
             SERVICE_MSG => 'SERVICE_READY',
@@ -55,13 +56,13 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Authentication::Anonymous - anonymous authentication
-implementation.
+OpenXPKI::Server::Authentication::Anonymous 
 
 =head1 Description
 
-This is the class which supports OpenXPKI with an anonymous
-authentication method. The parameters are passed as a hash reference.
+This is the class which supports OpenXPKI with an anonymous authentication 
+method. The parameters are passed as a hash reference. You can give a role
+and a user name in the config, default is role = Anonymous, User = anonymous
 
 =head1 Functions
 
@@ -71,4 +72,4 @@ is the constructor. It requires the config prefix as single argument.
 
 =head2 login_step
 
-returns the tripe ('', $self->{ROLE}, and the service ready message)
+returns the triple (I<user>, I<role>, and the service ready message)
