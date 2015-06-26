@@ -27,7 +27,7 @@ sub execute {
     my $workflow_type = 'certificate_publishing';
 
     if ($params->{'workflow_type'}) {
-       $workflow_type = $params->{'workflow_type'};
+        $workflow_type = $params->{'workflow_type'};
         delete $params->{'workflow_type'};
     }
 
@@ -50,9 +50,9 @@ sub execute {
                 FACILITY => 'application',
             );
             return 1;
-        }
+        }        
     }
-
+    
     # Create publishing workflow
     my $wf_info = CTX('api')->create_workflow_instance({
         WORKFLOW      => $workflow_type,
