@@ -1,4 +1,4 @@
-package OpenXPKI::SOAP;
+#!/usr/bin/perl 
 
 use strict;
 use warnings;
@@ -42,11 +42,8 @@ foreach my $key (keys %{$config}) {
 
 $log->debug('Modules loaded: ' . join(", ", @soap_modules));
 
-sub handler {
-
-    #warn "Entered OpenXPKI::Server::SOAP::handler";
-    my $oSoapHandler = SOAP::Transport::HTTP::CGI
-        ->dispatch_to( @soap_modules )->handle;
-}
+#warn "Entered OpenXPKI::Server::SOAP::handler";
+my $oSoapHandler = SOAP::Transport::HTTP::FCGI
+    ->dispatch_to( @soap_modules )->handle;
 
 1;
