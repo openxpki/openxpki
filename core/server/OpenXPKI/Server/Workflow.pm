@@ -208,8 +208,15 @@ sub execute_action {
         $self->count_try(0);
 
         #determine proc_state: do we still hace actions to do?
-        my $proc_state = ( $self->get_current_actions ) ? 'manual' : 'finished';
-        $self->_set_proc_state($proc_state);    #if a follow-up action is executed, the state changes automatically to "running"
+        ##! 32: 'Workflow action ' . Dumper $self->_get_workflow_state()->{_actions} 
+        
+        # Check if there are actions, get_current_actions is not working 
+        # here as it will hide non available actions based on acl or volatile state
+        if ((ref $self->_get_workflow_state()->{_actions} eq 'HASH') && (keys %{$self->_get_workflow_state()->{_actions}}) ) {
+            $self->_set_proc_state('manual');    
+        } else {
+            $self->_set_proc_state('finished');
+        }
     }
 
     return $state;
