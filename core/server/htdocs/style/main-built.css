@@ -8618,6 +8618,10 @@ span.certstatus-revoked {
   color: red;
 }
 
+span.certstatus-crl_issuance_pending {
+  color: orange;
+}
+
 span.certstatus-expired {
   color: #444;
 }

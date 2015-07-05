@@ -1,0 +1,169 @@
+head:
+    prefix: screvoke
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_DESC
+
+state:
+    FAILURE: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC
+
+    SUCCESS: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC
+
+    INITIAL: 
+        action: 
+          - initialize > INITIALIZED
+
+    INITIALIZED:
+        autorun: 1
+        action:
+          - initialize_context_params > INITIALIZED_PARAMS
+
+
+    HAVE_CERT_TO_REVOKE:
+        autorun: 1
+        action:
+          - revoke_certificate > CERTS_QUEUED_FOR_REVOCATION
+
+    CERTS_QUEUED_FOR_REVOCATION:
+        autorun: 1
+        action:
+          - cleanup_workflow > SUCCESS ? all_certs_revoked
+          - global_noop > CERT_TO_REVOKE ? !all_certs_revoked
+
+    CERT_TO_REVOKE:
+        autorun: 1
+        action:
+           - next_cert_to_revoke > HAVE_CERT_TO_REVOKE
+
+    PREREQS_AVAILABLE:
+        autorun: 1
+        action:
+          - global_noop > REQUESTER_AUTHORIZED ? requester_authorized
+          - global_noop2 > AUTO_REVOKE_EXISTING_CERTIFICATES ? !requester_authorized
+
+    AUTO_REVOKE_EXISTING_CERTIFICATES:
+        autorun: 1
+        action:
+          - queue_certs_to_revoke > SET_REVOKE_PARAMS
+
+    INITIALIZED_PARAMS:
+        autorun: 1
+        action:
+          - check_prereqs_via_api > PREREQS_AVAILABLE
+
+    REQUESTER_AUTHORIZED:
+        autorun: 1
+        action:
+          - global_noop > AUTO_REVOKE_EXISTING_CERTIFICATES ? !policy_allows_auto_revoke
+          - set_auto_approval_to_true > AUTO_REVOKE_EXISTING_CERTIFICATES ? policy_allows_auto_revoke
+
+    SET_REVOKE_PARAMS:
+        autorun: 1
+        action:
+          - set_revoke_params > CERTS_QUEUED_FOR_REVOCATION
+
+action:
+    revoke_certificate:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
+
+    initialize:
+        class: Workflow::Action::Null
+        input:
+          - client_ip
+          - requester_authorized
+          - requester_sn
+          - token_id
+
+    check_prereqs_via_api:
+        class: OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs
+
+    next_cert_to_revoke:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: tmp_queue
+            context_key: cert_identifier
+            function: shift
+
+    cleanup_workflow:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            SetContextParameters: overwritecontext
+            _keypassword: OpenXPKI
+            tmp_queue: ''
+
+    queue_certs_to_revoke:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: tmp_queue
+            context_key: certs_to_revoke
+            function: pusharray
+
+    initialize_context_params:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            SetContextParameters: overwritecontext
+            flag_crr_auto_approval: 0
+            policy_allow_auto_revoke: 1
+
+    set_auto_approval_to_true:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            SetContextParameters: overwritecontext
+            flag_crr_auto_approval: 1
+
+    set_revoke_params:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            SetContextParameters: overwritecontext
+            comment: Automated revocation request
+            reason_code: cessationOfOperation
+
+condition:
+    all_certs_revoked:
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param:
+          array_name: tmp_queue
+          condition: is_empty
+    
+    requester_authorized:
+        class: Workflow::Condition::Evaluate
+        param: 
+          test: $context->{requester_authorized};
+    
+    policy_allows_auto_revoke:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{policy_allow_auto_revoke};
+
+
+field:
+    client_ip:
+        name: client_ip
+        type: text
+        required: 1
+
+    requester_authorized:
+        name: requester_authorized
+        type: text
+        required: 1
+
+    requester_sn:
+        name: requester_sn
+        type: text
+        required: 1
+
+    token_id: 
+        name: token_id
+        type: text
+        required: 1
+
+
+
+acl:
+    _System:
+        creator: any
+ 
+

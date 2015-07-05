@@ -22,10 +22,7 @@ sub BUILD {
     my $user = $ENV{'REMOTE_USER'};
     
     if ($user) {    
-        $self->_client()->auth({
-             stack => $self->config()->{openxpli}->{authstack} || '_SmartCard',
-             user => $user,
-        });
+        $self->_client()->auth()->{user} = $user;
         $self->logger()->debug('Set session user for getauthcode to ' . $user);
     } else {
         $self->_client()->auth({ stack => 'Anonymous', user => undef });
@@ -92,7 +89,7 @@ sub handle_getauthcode {
     }
            
     $self->_result({
-        forUser => $wf_info->{CONTEXT}->{creator},
+        foruser => $wf_info->{CONTEXT}->{creator},
         code =>  $wf_info->{CONTEXT}->{_password},
     });
     

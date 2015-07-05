@@ -131,7 +131,9 @@ Verbose reason in case of failure.
 =over
 
 =item state 
-        
+
+=back
+
 =cut
 
 sub handle_confirm_policy_change {

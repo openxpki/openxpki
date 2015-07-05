@@ -1,4 +1,4 @@
-package OpenXPKI::SOAP;
+#!/usr/bin/perl 
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use SOAP::Transport::HTTP;
 
 use Log::Log4perl qw(:easy);
 
-my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap/default.conf';
+my $configfile = $ENV{OPENXPKI_SOAP_CLIENT_CONF_FILE} || '/etc/openxpki/soap/default.conf';
 
 my $config;
 if (! read_config $configfile, $config) {
@@ -42,11 +42,7 @@ foreach my $key (keys %{$config}) {
 
 $log->debug('Modules loaded: ' . join(", ", @soap_modules));
 
-sub handler {
-
-    #warn "Entered OpenXPKI::Server::SOAP::handler";
-    my $oSoapHandler = SOAP::Transport::HTTP::CGI
-        ->dispatch_to( @soap_modules )->handle;
-}
+my $oSoapHandler = SOAP::Transport::HTTP::FCGI
+    ->dispatch_to( @soap_modules )->handle;
 
 1;

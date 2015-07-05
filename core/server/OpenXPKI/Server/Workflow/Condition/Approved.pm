@@ -31,8 +31,10 @@ sub _init
     {
         my @roles = split /\s*,\s*/, $role; 
         $role = \@roles;        
+    } else {
+        $role = [ $role ];
     }
-    $self->role($role);
+    $self->role( $role );
 }
 
 sub evaluate

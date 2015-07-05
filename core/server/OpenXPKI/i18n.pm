@@ -83,17 +83,19 @@ sub i18nGettext {
             }
             $i18n_string =~ s/$parameter/$arg_ref->{$key}/g;
         }
-    } else {
+    } elsif ($text) {
         ## no translation found, output original string followed
-    ## by all parameters (and values) passed to the function
+        ## by all parameters (and values) passed to the function
 
-    ## append arguments passed to the function
+        ## append arguments passed to the function
         $i18n_string = join ("; ", $text,
                                    map { $_ . " => " . $arg_ref->{$_}  }
                                        keys %{$arg_ref});
 
         #it's too slow, I try to use "use utf8;"
         #$i18n_string = pack "U0C*", unpack "C*", $untranslated;
+    } else {
+        $i18n_string = '';
     }
 
     return $i18n_string;

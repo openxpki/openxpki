@@ -533,7 +533,7 @@ condition:
         class: Workflow::Condition::LazyAND
         param:
             condition1: scep_signer_trusted
-            condition2: value="scep_signer_on_behalf
+            condition2: scep_signer_on_behalf
 
     valid_csr:
         class: Workflow::Condition::Evaluate

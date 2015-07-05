@@ -198,7 +198,7 @@ inside the configuration. The Username/Password is passed via the environment.
    label: My Auth Handler
    command: /path/to/your/script
    role: 'RA Operator'
-     env:
+   env:
         LOGIN: __USER__
         PASSWD: __PASSWD__
 
@@ -228,7 +228,7 @@ applied to the output.
    role: ''
    pattern: 'role_'
    replacement: ''
-     env:
+   env:
         LOGIN: __USER__
         PASSWD: __PASSWD__
 
