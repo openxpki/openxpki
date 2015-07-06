@@ -34,86 +34,7 @@ sub START {
     );
 }
 # API: simple retrieval functions
-
-sub count_my_certificates {
-    ##! 1: 'start'
-
-    my $certs = CTX('api')->list_my_certificates();
-    ##! 1: 'end'
-    return scalar @{ $certs };
-}
-
-sub list_my_certificates {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    my $user  = CTX('session')->get_user();
-    my $realm = CTX('session')->get_pki_realm();
-
-    my %limit = ();
-
-    if (exists $arg_ref->{LIMIT}) {
-        $limit{LIMIT}->{AMOUNT} = $arg_ref->{LIMIT};
-    }
-    if (exists $arg_ref->{START}) {
-        $limit{LIMIT}->{START}  = $arg_ref->{START};
-    }
-    my @results;
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE => [
-            [ 'WORKFLOW_CONTEXT' => 'context2' ],
-            [ 'WORKFLOW_CONTEXT' => 'context3' ],
-            'CERTIFICATE',
-        ],
-        COLUMNS => [
-            'CERTIFICATE.NOTBEFORE',
-            'CERTIFICATE.NOTAFTER',
-            'CERTIFICATE.IDENTIFIER',
-            'CERTIFICATE.SUBJECT',
-            'CERTIFICATE.STATUS',
-            'CERTIFICATE.CERTIFICATE_SERIAL',
-        ],
-        DYNAMIC => {
-            'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'creator'},
-            'context3.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'cert_identifier'},
-            'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => $user},
-            'CERTIFICATE.PKI_REALM'           => {VALUE => $realm},
-        },
-        JOIN => [
-            [
-                undef,
-                'WORKFLOW_CONTEXT_VALUE',
-                'IDENTIFIER',
-            ],
-            [
-                'WORKFLOW_SERIAL',
-                'WORKFLOW_SERIAL',
-                undef,
-            ],
-        ],
-        REVERSE => 1,
-        DISTINCT => 1,
-        %limit,
-    );
-    foreach my $entry (@{ $db_results }) {
-        ##! 16: 'entry: ' . Dumper \$entry
-        my $temp_hash = {};
-        foreach my $key (keys %{ $entry }) {
-            my $orig_key = $key;
-            ##! 16: 'key: ' . $key
-            $key =~ s{ \A CERTIFICATE\. }{}xms;
-            ##! 16: 'key: ' . $key
-            $temp_hash->{$key} = $entry->{$orig_key};
-        }
-        push @results, $temp_hash;
-    }
-    ##! 64: 'results: ' . Dumper \@results
-    ##! 1: 'end'
-
-    return \@results;
-}
-
+ 
 sub get_cert_identifier {
     ##! 1: 'start'
     my $self      = shift;
@@ -436,12 +357,7 @@ sub get_pki_realm_index {
         },
     );
 }
-
-sub get_roles {
-    #FIXME-ACL - should go with the new acl system
-    return CTX('config')->get_keys('auth.roles');
-}
-
+ 
 sub convert_csr {
     my $self    = shift;
     my $arg_ref = shift;
