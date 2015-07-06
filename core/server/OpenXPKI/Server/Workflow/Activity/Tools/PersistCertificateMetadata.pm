@@ -51,18 +51,8 @@ sub execute {
     my $cert_info  = $context->param('cert_info');
     my $subject_vars = $cert_info ? $ser->deserialize( $cert_info ) : {};
     my $template_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
-    # Remove the "cert_subject" prefix and append the subject info
-    # TODO - cleanup
-    foreach my $key (keys %{$template_vars}) {        
-      
-        # old workflow format  
-        my $template_key;
-        if ($key =~ m{ \A cert_subject_(.*) \z }xms) {
-            $template_key = $1;
-        } else {
-            $template_key = $key;
-        }        
-        $subject_vars->{$template_key} = $template_vars->{$key} unless(defined $subject_vars->{$template_key});
+    foreach my $key (keys %{$template_vars}) {              
+        $subject_vars->{$key} = $template_vars->{$key} unless(defined $subject_vars->{$key});
     }
     # Add params from the activity definition
     $subject_vars->{data} = $params;

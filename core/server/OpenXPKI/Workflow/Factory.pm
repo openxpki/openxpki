@@ -224,18 +224,9 @@ sub __authorize_workflow {
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
 
-        my $is_allowed = 0;
-
-        # MIGRATION - yaml workflows have theirs acls now inside the config
-        # Fall back to old location for XML workflows
-        if (!$conn->exists([ 'workflow', 'def', $type ])) {
-            my %allowed_workflows = map { $_ => 1 } ($conn->get_list("auth.wfacl.$role.create"));
-            $is_allowed = exists $allowed_workflows{$type};
-        } else {
-            my $creator = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
-            # if creator is set to any value, access is allowed
-            $is_allowed = defined $creator;
-        }
+        my $creator = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
+        # if creator is set to any value, access is allowed
+        my $is_allowed = defined $creator;
 
         ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows
         if (! $is_allowed ) {
@@ -256,14 +247,7 @@ sub __authorize_workflow {
         my $filter   = $arg_ref->{FILTER};
         my $type     = $workflow->type();
 
-        # MIGRATION - yaml workflows have theirs acls now inside the config
-        # Fall back to old location for XML workflows
-        my $allowed_creator_re;
-        if (!$conn->exists([ 'workflow', 'def', $type ])) {
-            $allowed_creator_re = $conn->get("auth.wfacl.$role.access.$type.creator");
-        } else {
-            $allowed_creator_re = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
-        }
+        my $allowed_creator_re = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
 
         if (! defined $allowed_creator_re) {
             OpenXPKI::Exception->throw(
@@ -314,14 +298,8 @@ sub __authorize_workflow {
         }
 
 
-        # MIGRATION
-        my $context_filter;
-        if (!$conn->exists([ 'workflow', 'def', $type ])) {
-            $context_filter = $conn->get_hash("auth.wfacl.$role.access.$type.context");
-        } else {
-            $context_filter = $conn->get_hash([ 'workflow', 'def', $type, 'acl', $role, 'context' ] );
-        }
-
+        my $context_filter = $conn->get_hash([ 'workflow', 'def', $type, 'acl', $role, 'context' ] );
+        
         if ($filter &&  $context_filter) {
             # context filtering is defined for this type, so
             # iterate over the context parameters and check them against

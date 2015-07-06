@@ -21,7 +21,6 @@ OpenXPKI/Template/Plugin/Certificate.pm
 OpenXPKI/Template/Plugin/CheckDNS.pm
 OpenXPKI/Template/Plugin/Profile.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
-OpenXPKI/XML/Cache.pm
 OpenXPKI/i18n.pm
 openxpki.xsd
 

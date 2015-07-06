@@ -32,105 +32,6 @@ sub START {
 ###########################################################################
 # lowlevel workflow functions
 
-sub get_cert_identifier_by_csr_wf {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-    my $wf_id   = $arg_ref->{WORKFLOW_ID};
-
-    my $factory = __get_workflow_factory({
-        WORKFLOW_ID => $wf_id,
-    });
-    if (! defined $factory) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_FACTORY_NOT_DEFINED',
-            params  => {
-                'WORKFLOW_ID' => $wf_id,
-            },
-        );
-    }
-    my $workflow = $factory->fetch_workflow(
-        'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-        $wf_id,
-    );
-    if (! defined $workflow) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_WORKFLOW_COULD_NOT_BE_FETCHED',
-            params  => {
-                'WORKFLOW_ID' => $wf_id,
-            },
-        );
-    }
-    my $wf_children_ser = $workflow->context->param('wf_children_instances');
-    if (! defined $wf_children_ser) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_NO_CHILDREN_INSTANCES_FOUND',
-            params  => {
-                'WORKFLOW_ID' => $wf_id,
-            },
-        );
-    }
-    my $wf_children;
-    eval {
-        $wf_children = OpenXPKI::Serialization::Simple->new()->deserialize($wf_children_ser);
-    };
-    if (! defined $wf_children) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_DESERIALIZING_WF_CHILDREN_CONTEXT_PARAMETER_FAILED',
-            params  => {
-                'WORKFLOW_ID' => $wf_id,
-                'SERIALIZED'  => $wf_children_ser,
-            },
-        );
-    }
-    my $child_type;
-    eval {
-        $child_type = $wf_children->[0]->{TYPE};
-    };
-    my $child_id;
-    eval {
-        $child_id = $wf_children->[0]->{ID};
-    };
-    if (! defined $child_id || ! defined $child_type) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_COULD_NOT_DETERMINE_CHILD_TYPE_AND_ID',
-            params  => {
-                'WORKFLOW_ID' => $wf_id,
-                'CHILDREN'    => $wf_children,
-            },
-        );
-    }
-    $factory = __get_workflow_factory({
-        WORKFLOW_ID => $child_id,
-    });
-    if (! defined $factory) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_CHILD_FACTORY_NOT_DEFINED',
-            params  => {
-                'WORKFLOW_CHILD_ID' => $child_id,
-            },
-        );
-    }
-    $workflow = $factory->fetch_workflow(
-        $child_type,
-        $child_id,
-    );
-    if (! defined $workflow) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_CERT_IDENTIFIER_BY_CSR_WF_CHILD_WORKFLOW_COULD_NOT_BE_FETCHED',
-            params  => {
-                'WORKFLOW_CHILD_ID'   => $child_id,
-                'WORKFLOW_CHILD_TYPE' => $child_type,
-            },
-        );
-    }
-    my $cert_identifier;
-    eval {
-        $cert_identifier = $workflow->context->param('cert_identifier');
-    };
-    return $cert_identifier;
-}
-
 sub list_workflow_instances {
     ##! 1: "start"
     my $self    = shift;
@@ -272,23 +173,8 @@ sub get_workflow_info {
     my $self  = shift;
     my $args  = shift;
 
-    ##! 1: "get_workflow_info"
-
-    ## NOTE - This breaks the API a bit, the "old" code passed id and type
-    ## to load a workflow which is no longer necessary. The attribute "WORKFLOW"
-    ## was used as workflow name, we now use it as workflow object!
-    ## The order ensures that calls with the old parameters are handled
-    ## After finally removing mason we can remove the old code branch
-
-    # All new call set UIINFO
-    if ($args->{UIINFO}) {
-
-        return $self->__get_workflow_ui_info( $args );
-
-    } else {
-        my $workflow = CTX('workflow_factory')->get_workflow({ ID => $args->{ID}} );
-        return __get_workflow_info($workflow);
-    }
+    ##! 1: "get_workflow_info" 
+    return $self->__get_workflow_ui_info( $args );
 }
 
 
@@ -1244,27 +1130,9 @@ sub __execute_workflow_activity {
             priority => 'error',
             facility => 'workflow',
         };
-
-        # FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID FIXME TODO STUPID
-        # The old ui validates requests by probing them against the create method
-        # and ignores the missing field error by string parsing
-        # we therefore need to keep that behaviour until decomissioning the old UI
-        # The string is from in Workflow::Validator::HasRequiredField
-        if (index ($eval , "The following fields require a value:") > -1) {
-            ## missing field(s) in workflow
-            $eval =~ s/^.*://;
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS",
-                params  => {FIELDS => $eval}
-            );
-        }
-
-        ## This MUST be after the compat block as our workflow  class
-        ## transforms any errors into OXI Exceptions now! (breaks mason otherwise)
-
+  
         ## normal OpenXPKI exception
         $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
-
 
         ## workflow exception
         my $error = $workflow->context->param('__error');

@@ -307,14 +307,8 @@ sub is_secret_group_complete
         GROUP     => $group,
     });
 
-    ##FIXME: Why the double return? - oliwel
-
-    ##! 2: "return true if it is complete"
-    my $boolean = $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
-    return $boolean if ($boolean);
-
     ##! 1: "finished"
-    return $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete();
+    return $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete() ? 1 : 0;
 }
 
 sub set_secret_group_part

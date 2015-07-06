@@ -889,9 +889,8 @@ sub private_key_exists_for_cert {
 
 Gets a private key from the database for a given certificate
 identifier by looking up the CSR serial of the certificate and
-extracting the private_key context parameter from the workflow
-with the CSR serial. Returns undef if no CA generated private key
-is available.
+extracting the private_key from the datapool. Returns undef if
+no key is available.
 
 =cut
 
@@ -901,9 +900,6 @@ sub __get_private_key_from_db {
     my $cert_identifier = $arg_ref->{IDENTIFIER};
 
     ##! 16: 'identifier: $identifier'
-
-    # TODO-MIGRATION - the UI 2.0 workflow stores the key in the datapool
-    # The old workflows have them in the context
 
     # new workflows
     my $datapool = CTX('api')->get_data_pool_entry({
@@ -915,34 +911,6 @@ sub __get_private_key_from_db {
         return $datapool->{VALUE};
     }
 
-
-    # No key found, check old format
-    my $workflow_id_result = CTX('dbi_backend')->select(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_workflow_csr',
-        },
-    );
-
-    ##! 64: 'workflow_id_result: ' . Dumper $workflow_id_result
-    if (!$workflow_id_result || scalar @{$workflow_id_result} == 0) {
-        return;
-    }
-
-    my $workflow_id = $workflow_id_result->[0]->{ATTRIBUTE_VALUE};
-
-    if ( defined $workflow_id ) {
-
-        my $wf_info = CTX('api')->get_workflow_info({
-            WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
-            ID => $workflow_id,
-        });
-        ##! 64: 'wf_info: ' . Dumper $wf_info
-
-        my $private_key = $wf_info->{WORKFLOW}->{CONTEXT}->{'private_key'};
-        return $private_key;
-    }
     return;
 }
 

@@ -916,12 +916,6 @@ sub action_index {
         return $self;
     }
 
-    # TODO - we need to refetch the ui info until we change the api
-    #$wf_info = $self->send_command( 'get_workflow_info', {
-    #    ID => $wf_info->{WORKFLOW}->{ID},
-    #    UIINFO => 1
-    #});
-
     # Check if we can auto-load the next available action
     my $wf_action;
     my @activity = keys %{$wf_info->{ACTIVITY}};

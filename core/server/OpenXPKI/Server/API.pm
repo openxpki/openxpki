@@ -716,17 +716,7 @@ sub BUILD {
         'get_roles' => {
             class  => 'Default',
             params => { },
-        },
-        'get_servers' => {
-            class  => 'Default',
-            params => { },
-            memoize => 1,
-        },
-        'get_export_destinations' => {
-            class  => 'Default',
-            params => { },
-            memoize => 1,
-        },
+        }, 
         'convert_csr' => {
             class  => 'Default',
             params => {
@@ -1121,15 +1111,6 @@ sub BUILD {
         },
 
         ### Workflow API
-        'get_cert_identifier_by_csr_wf' => {
-            class  => 'Workflow',
-            params => {
-                'WORKFLOW_ID' => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-            },
-        },
         'get_number_of_workflow_instances' => {
             class  => 'Workflow',
             params => {

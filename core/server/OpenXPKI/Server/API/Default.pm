@@ -134,62 +134,6 @@ sub get_cert_identifier {
     return $identifier;
 }
 
-
-# MASON - can be removed 
-sub get_workflow_ids_for_cert {
-    my $self    = shift;
-    my $arg_ref = shift;
-    my $csr_serial = $arg_ref->{'CSR_SERIAL'};
-    my $cert_identifier = $arg_ref->{'IDENTIFIER'};
-
-    # Fallback for legacy calls with csr instead of identifier
-    if (!$cert_identifier && $csr_serial) {
-        my $cert_identifier_result = CTX('dbi_backend')->first(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                CSR_SERIAL => $csr_serial,
-            },
-        );
-        $cert_identifier = $cert_identifier_result->{IDENTIFIER};
-    }
-
-    my @result;
-    # CSR Workflow
-    my $workflow_id_result = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_workflow_csr',
-        },
-    );
-    my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
-    # we fake the old return structure to satisfy the mason ui
-    # # FIXME - needs remodeling
-    push @result, {
-        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
-        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
-    } if ($workflow_id);
-
-
-    # CRR Workflow
-    $workflow_id_result = CTX('dbi_backend')->select(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_workflow_crr',
-        },
-    );
-    foreach my $line (@{$workflow_id_result}) {
-        $workflow_id = $line->{ATTRIBUTE_VALUE};
-        push @result, {
-            'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
-            'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
-        } if ($workflow_id);
-    }
-    return \@result;
-
-}
-
 sub get_head_version_id {
     my $self = shift;
     return CTX('config')->get_head_version();
@@ -496,54 +440,6 @@ sub get_pki_realm_index {
 sub get_roles {
     #FIXME-ACL - should go with the new acl system
     return CTX('config')->get_keys('auth.roles');
-}
-
-
-# FIXME - needs migration
-sub get_export_destinations
-{
-    ##! 1: "finished"
-    my $self = shift;
-    my $args = shift;
-    my $pki_realm = CTX('session')->get_pki_realm();
-
-    ##! 2: "load destination numbers"
-    my $export = CTX('config')->get('system.server.data_exchange.export');
-    my $import = CTX('config')->get('system.server.data_exchange.import');
-    my @list = ();
-    foreach my $dir ($import, $export)
-    {
-        opendir DIR, $dir;
-        my @filenames = grep /^[0-9]+/, readdir DIR;
-        close DIR;
-        foreach my $filename (@filenames)
-        {
-            next if (not length $filename);
-            $filename =~ s/^([0-9]+)(|[^0-9].*)$/$1/;
-            push @list, $filename if (length $filename);
-        }
-    }
-
-    ##! 2: "load all servers"
-    my %servers = %{ $self->get_servers()->{$pki_realm} };
-
-    ##! 2: "build hash with numbers and names of affected servers"
-    my %result = ();
-    my $last   = -1;
-    foreach my $item (sort @list)
-    {
-        next if ($last == $item);
-        $result{$item} = $servers{$item};
-        $last = $item;
-    }
-
-    ##! 1: "finished"
-    return \%result;
-}
-
-# FIXME - needs migration
-sub get_servers {
-    return {};
 }
 
 sub convert_csr {
