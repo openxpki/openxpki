@@ -202,7 +202,7 @@ state:
     INSTALL_CERTIFICATE_DONE: 
         autorun: 1
         action: 
-          - queue_certs_for_publication > CERTS_QUEUED_FOR_PUBLICATION
+          - queue_issued_certs_for_publication queue_installed_certs_for_publication > CERTS_QUEUED_FOR_PUBLICATION
 
     ISSUE_CERT: 
         autorun: 1
@@ -421,10 +421,17 @@ action:
         param: 
             SetContextParameters: overwritecontext
             _keypassword: OpenXPKI
-            cert_install_type: 
-            certificate: 
-            pkcs10: 
-            temp_key_handle: 
+            cert_install_type: "" 
+            certificate: "" 
+            pkcs10: ""
+            temp_key_handle: ""
+            cert_identifier: ""
+            cert_install_type: ""
+            cert_issuance_data: ""	
+            certificate: ""
+            csr_cert_type: ""
+            csr_serial: ""
+            certs_on_card: ""
 
     clear_passwords: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
@@ -641,12 +648,20 @@ action:
             context_key: cert_identifier
             function: push
 
-    queue_certs_for_publication: 
+    queue_issued_certs_for_publication: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
         param: 
             array_name: tmp_queue
             context_key: certs_issued
             function: pusharray
+
+    queue_installed_certs_for_publication: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param: 
+            array_name: tmp_queue
+            context_key: certs_to_install
+            function: pusharray
+
 
     queue_certs_to_delete: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray

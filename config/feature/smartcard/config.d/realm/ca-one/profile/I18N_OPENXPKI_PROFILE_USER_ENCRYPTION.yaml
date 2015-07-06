@@ -21,7 +21,9 @@ style:
             requestor: "[% givenname %] [% sn %]"
             email: "[% mail %]"
 
-        
+     
+publish: queue
+   
 role:
     - User
 
