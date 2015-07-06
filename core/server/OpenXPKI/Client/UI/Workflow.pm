@@ -1994,17 +1994,19 @@ sub __render_fields {
                 $item->{format} = 'link';
 
                 # check for additional template
-                my $label = $item->{value};
-
-                my $cert_identifier = $item->{value};
-
-                $item->{value}  = {
-                    label => $label,
-                    page => 'certificate!detail!identifier!'.$cert_identifier,
-                    target => 'modal'
-
-                };
-
+                if ($item->{value}) {
+                    my $label = $item->{value};
+    
+                    my $cert_identifier = $item->{value};
+    
+                    $item->{value}  = {
+                        label => $label,
+                        page => 'certificate!detail!identifier!'.$cert_identifier,
+                        target => 'modal'
+    
+                    };
+                }
+                
                 $self->logger()->debug( 'item ' . Dumper $item);
 
             # create a link to download the given filename
