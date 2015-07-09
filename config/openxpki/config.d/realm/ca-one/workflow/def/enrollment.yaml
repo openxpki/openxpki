@@ -129,8 +129,8 @@ state:
     CONTINUE_INITIAL_ENROLL:
         autorun: 1
         action:
-          - global_noop > PENDING_POLICY ?  !num_active_certs_less_than_max_active_certs !auto_revoke_existing_certs
-          - global_noop2 > APPROVAL ? num_active_certs_less_than_max_active_certs auto_revoke_existing_certs
+          - global_noop > PENDING_POLICY ?  !num_active_certs_less_than_max_active_certs
+          - global_noop2 > APPROVAL ? num_active_certs_less_than_max_active_certs
 
     ELIGIBLE_FOR_INITIAL_ENROLL:
         autorun: 1
@@ -246,8 +246,8 @@ state:
 action:
     approve_csr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_approve_csr_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_approve_csr_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC
         param:
             check_creator: 0
             multi_role_approval: 0

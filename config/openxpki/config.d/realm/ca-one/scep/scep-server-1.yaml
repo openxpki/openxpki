@@ -35,7 +35,7 @@ policy:
     max_active_certs: 1
     allow_expired_signer: 0
     auto_revoke_existing_certs: 1
-    approval_points: 1
+    approval_points: 2
 
 response:
     # The scep standard is a bit unclear if the root should be in the chain or not
@@ -56,7 +56,7 @@ challenge:
 
 eligible:
     initial:
-       value: 1
+       value: 0
 
     renewal:
        value: 1
