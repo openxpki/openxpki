@@ -87,8 +87,8 @@ action:
         param:
             retry_count: 5
             retry_interval: +0000000005
-            source: $xml_filename
-            target: $xml_targetname
+            _map_source: $xml_filename
+            _map_target: $xml_targetname
             transfer: export.smartcard.transfer
 
 
