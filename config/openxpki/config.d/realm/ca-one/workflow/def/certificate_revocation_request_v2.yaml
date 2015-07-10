@@ -225,8 +225,6 @@ action:
           - reason_code
           - comment
           - invalidity_time
-        param:
-            description: Update
         validator:
           - validate_invalidity_time
           - validate_reason_code
