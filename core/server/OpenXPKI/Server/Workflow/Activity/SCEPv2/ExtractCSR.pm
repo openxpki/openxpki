@@ -16,6 +16,7 @@ use OpenXPKI::DN;
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::X509;
 use OpenXPKI::Serialization::Simple;
+use Crypt::PKCS10;
 use Data::Dumper;
 
 sub execute {
@@ -242,7 +243,23 @@ sub execute {
     $context->param('cert_subject' => $cert_subject);
     $context->param('cert_subject_alt_name' => $serializer->serialize( \@subject_alt_names )) if (@subject_alt_names);
 
-    my $challenge = $csr_body->{'CHALLENGEPASSWORD'};
+
+    # test drive for new parser
+    my $decoded = Crypt::PKCS10->new( $pkcs10 );  
+    my %attrib = $decoded->attributes();
+
+    my $challenge;
+    if ($attrib{'challengePassword'}) {
+        # can be utf8string or printable 
+        my $ref = $attrib{'challengePassword'};        
+        if ($ref->{'printableString'}) {
+            $challenge = $ref->{'printableString'};
+        } elsif ($ref->{'utf8String'}) {
+            $challenge = $ref->{'utf8String'};
+        }
+        
+    }
+
     if ($challenge) {
         ##! 32: 'challenge: ' . Dumper $challenge
         $context->param('_challenge_password' => $challenge);
