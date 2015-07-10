@@ -143,7 +143,12 @@ if ( -s '../../VERSION' ) {
     $openxpki_version = `cat ../../VERSION`;
     chomp $openxpki_version;
 } elsif ( -e($vergen) ) {
-    $openxpki_version = `$vergen --format version`;
+    # Allow for travis to set PERL in order to use perlbrew perl from PATH
+    if ( $ENV{PERL} ) {
+        $openxpki_version = `$ENV{PERL} $vergen --format version`;
+    } else {
+        $openxpki_version = `$vergen --format version`;
+    }
 
     if ($CHILD_ERROR != 0) {
         $openxpki_version = undef;
