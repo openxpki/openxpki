@@ -216,6 +216,7 @@ state:
         action:
           - fail > FAILURE
           - allow_retry > FAILURE
+          - override_policy > APPROVAL
 
     PREPARED:
         autorun: 1
@@ -381,6 +382,13 @@ action:
 
     persist_csr:
         class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
+
+
+    override_policy:
+        class: Workflow::Action::Null
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC
+
 
     revoke_cert:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
@@ -646,6 +654,14 @@ field:
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC
         type: text
         required: 0
+
+    policy_comment: 
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER
+        name: policy_comment
+        type: textarea
+        required: 1
 
     replace_cert_identifier:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL
