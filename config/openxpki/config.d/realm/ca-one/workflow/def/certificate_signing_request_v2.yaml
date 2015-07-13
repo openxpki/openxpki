@@ -620,7 +620,7 @@ condition:
     is_approved:
         class: OpenXPKI::Server::Workflow::Condition::Approved
         param:
-            role: RA Operator, RA Operator
+            role: RA Operator
 
     can_use_server_key:
         class: OpenXPKI::Server::Workflow::Condition::KeyGenerationMode
