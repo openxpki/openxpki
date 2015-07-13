@@ -802,10 +802,18 @@ sub action_search {
 
     my $query = { ENTITY_ONLY => 1 }; 
     my $input = {}; # store the input data the reopen the form later
-    foreach my $key (qw(subject issuer_dn profile)) {
+    foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
             $query->{uc($key)} = '%'.$val.'%';
+            $input->{$key} = $val;
+        }
+    }
+    
+    foreach my $key (qw(profile)) {
+        my $val = $self->param($key);
+        if (defined $val && $val ne '') {
+            $query->{uc($key)} = $val;
             $input->{$key} = $val;
         }
     }
