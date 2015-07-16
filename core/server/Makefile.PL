@@ -330,7 +330,7 @@ WriteMakefile(
     'Connector'              => '1.08',
     'Crypt::CBC'             => '2.29',
     'Crypt::OpenSSL::AES'    => '0.02',
-    'Crypt::PKCS10'          => '1.1',
+    'Crypt::PKCS10'          => '1',
     'DBD::Mock'              => '1.45',
 #    'DBI'                    => '1', # A prerequisite for Workflow, see below
     'Data::Password'         => '1.07',
