@@ -71,7 +71,7 @@ sub execute {
             'CSR_SERIAL' => { VALUE => undef, OPERATOR => 'NOT_EQUAL' },
             'PKI_REALM' => { VALUE => $pki_realm }
         },
-        ORDER => [ 'NOTBEFORE' ],
+        ORDER => [ 'NOTBEFORE', 'CERTIFICATE_SERIAL' ],
         REVERSE => 1
     };
     
@@ -198,7 +198,7 @@ sub execute {
         
         if ($p->{unique_subject}) {
             next if ($subject_seen ->{ $item->{SUBJECT} });
-            $subject_seen ->{ $item->{SUBJECT} } = 1;           
+            $subject_seen ->{ $item->{SUBJECT} } = 1;
         }
         
         my $serial = Math::BigInt->new( $item->{CERTIFICATE_SERIAL} )->as_hex();
