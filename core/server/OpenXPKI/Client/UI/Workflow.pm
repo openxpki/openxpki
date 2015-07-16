@@ -423,6 +423,11 @@ sub init_pager {
     
     if ($self->param('order')) {
         $query->{ORDER} = uc($self->param('order'));
+    } else {
+        $query->{ORDER} = 'WORKFLOW_ID';
+        if (!defined $self->param('reverse')) {
+            $query->{REVERSE} = 1;
+        }
     }
     
     if (defined  $self->param('reverse')) {

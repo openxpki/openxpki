@@ -216,6 +216,11 @@ sub init_pager {
     
     if ($self->param('order')) {
         $query->{ORDER} = uc($self->param('order'));
+    } else {        
+        $query->{ORDER} = 'NOTBEFORE';
+        if (!defined $self->param('reverse')) {
+            $query->{REVERSE} = 1;
+        }
     }
     
     if (defined  $self->param('reverse')) {
