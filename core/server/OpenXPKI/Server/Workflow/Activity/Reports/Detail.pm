@@ -70,7 +70,9 @@ sub execute {
         DYNAMIC => { 
             'CSR_SERIAL' => { VALUE => undef, OPERATOR => 'NOT_EQUAL' },
             'PKI_REALM' => { VALUE => $pki_realm }
-        }
+        },
+        ORDER => [ 'NOTBEFORE' ],
+        REVERSE => 1
     };
     
     
@@ -78,11 +80,12 @@ sub execute {
         cutoff_notbefore => 0,
         cutoff_notafter => 0,
         include_revoked => 0,
-        include_expired => 0    
+        include_expired => 0,
+        unique_subject => 0        
     };
     
     # try to read those from the activity config
-    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired)) {
+    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject)) {
         if (defined $self->param($key)) {
             $p->{$key} = $self->param($key);
         }        
@@ -98,7 +101,7 @@ sub execute {
         my $config = CTX('config');
         
         # override selector config
-        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired)) {
+        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject)) {
             if ($config->exists(['report', $report_config, $key])) {
                 $p->{$key} = $config->get(['report', $report_config, $key]);
             }        
@@ -173,7 +176,6 @@ sub execute {
         
     }
     
-        
     my $result = CTX('dbi_backend')->select(%{$query});
     if ( ref $result ne 'ARRAY' ) {
         OpenXPKI::Exception->throw(
@@ -189,8 +191,15 @@ sub execute {
     print $fh "full certificate report, realm $pki_realm, validity date ".$valid_at->iso8601()." , export date ". DateTime->now()->iso8601 ."\n";
     
     print $fh join("|", @{[ ("request id","subject","cert. serial", "identifier", "notbefore", "notafter", "status", "issuer"), @head ] })."\n";
+    
+    my $subject_seen = {};
         
     foreach my $item ( @{$result} ) {
+        
+        if ($p->{unique_subject}) {
+            next if ($subject_seen ->{ $item->{SUBJECT} });
+            $subject_seen ->{ $item->{SUBJECT} } = 1;           
+        }
         
         my $serial = Math::BigInt->new( $item->{CERTIFICATE_SERIAL} )->as_hex();
         $serial =~ s{\A 0x}{}xms;
@@ -290,6 +299,12 @@ Parseable OpenXPKI::Datetime value (autodetected), certificates which are
 expired after the given date are included in the report. Default is not to
 include expired certificates.
 
+=item include_revoked
+
+If set to a true value, certificates which are not in ISSUED state 
+(revoked, crl pending, on hold) are also included in the report. Default
+is to show only issued certificates.
+
 =item valid_at
 
 Parseable OpenXPKI::Datetime value (autodetected) used as base for validity 
@@ -305,14 +320,21 @@ notebefore is greater than value.
 Parseable OpenXPKI::Datetime value (autodetected), show certificates where
 notafter is less then value.
 
+=item unique_subject
+
+If set to a true value, only the certiticate with the latest notbefore date
+for each subject is included in the report. Note that filtering on subject 
+is done AFTER the other filters, e.g. in case you do not include revoked
+certifiates you get the latest one that was not revoked.
+
 =item report_config
 
 Lookup extended specifications in the config system at report.<report_config>.
 The config can contain any of
 I<cutoff_notbefore, cutoff_notafter, include_revoked, include_expired>.
-which will override any given value from the activity if a true value is 
-given. Additional columns can also be specified, these are appended at the
-end of each line.
+which will override any given value from the activity if a value is given. 
+Additional columns can also be specified, these are appended at the end 
+of each line.
 
    cols:
      - head: Title put in the head columns
