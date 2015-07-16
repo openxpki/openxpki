@@ -148,23 +148,31 @@ sub execute {
 
         $context->param('cert_extension_name' => $cert_extension_name);
 
-        # Check if the extension has a profile mapping, defined in scep.<server>.profile_map
-        my $profile = $config->get("scep.$server.profile_map.$cert_extension_name");
-        if ($profile) {
-  	        # Move old profile name for reference
-            $context->param('cert_profile_default' => $context->param('cert_profile') );
-            $context->param('cert_profile' => $profile );
+        if (!$cert_extension_name) {
             CTX('log')->log(
-	            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile",
-	            PRIORITY => 'info',
-	            FACILITY => 'application',
-	        );
-        } else {
-        	CTX('log')->log(
-                MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile",
-                PRIORITY => 'warn',
+                MESSAGE => "SCEP found Microsoft Certificate Name Extension but was unable to parse it",
+                PRIORITY => 'error',
                 FACILITY => 'application',
             );
+        } else {
+            # Check if the extension has a profile mapping, defined in scep.<server>.profile_map        
+            my $profile = $config->get("scep.$server.profile_map.$cert_extension_name");
+            if ($profile) {
+      	        # Move old profile name for reference
+                $context->param('cert_profile_default' => $context->param('cert_profile') );
+                $context->param('cert_profile' => $profile );
+                CTX('log')->log(
+    	            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile",
+    	            PRIORITY => 'info',
+    	            FACILITY => 'application',
+    	        );
+            } else {
+            	CTX('log')->log(
+                    MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile",
+                    PRIORITY => 'warn',
+                    FACILITY => 'application',
+                );
+            }
         }
     }
 
