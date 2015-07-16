@@ -23,6 +23,7 @@ my %params = (
     wfaction => undef,
     param => [],
     arg => [],
+    timeout => 30,
     );
 
 sub debug {
@@ -45,6 +46,7 @@ GetOptions(\%params,
             command|cmd|c=s
             param|set=s@
             arg=s@
+            timeout|to=i
             debug
          )) or pod2usage(-verbose => 0);
 
@@ -97,6 +99,7 @@ my $reply;
 my $client = OpenXPKI::Client->new(
     {
     SOCKETFILE => $params{socketfile},
+    TIMEOUT  => $params{timeout},
     });
 
 
@@ -219,6 +222,7 @@ openxpkicli [options] command
     --param VALUE     	  stack VALUE onto methods PARAMS array
     --param KEY=VALUE     set VALUE in methods PARAMS hash using KEY
     --debug               enable debug mode
+    --timeout             socket timeout in seconds (default 30s)    
 
 =head1 INVOCATION
 
