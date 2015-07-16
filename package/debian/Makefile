@@ -35,7 +35,8 @@ EXTERNAL=				\
 	Config__Merge \
 	Config__Versioned \
 	Proc__SafeExec \
-	XML__Filter__XInclude 
+	XML__Filter__XInclude \
+	Crypt__PKCS10
 
 EXTERNAL2= \
 	Connector \

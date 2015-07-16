@@ -216,6 +216,11 @@ sub init_pager {
     
     if ($self->param('order')) {
         $query->{ORDER} = uc($self->param('order'));
+    } else {        
+        $query->{ORDER} = 'NOTBEFORE';
+        if (!defined $self->param('reverse')) {
+            $query->{REVERSE} = 1;
+        }
     }
     
     if (defined  $self->param('reverse')) {
@@ -802,10 +807,18 @@ sub action_search {
 
     my $query = { ENTITY_ONLY => 1 }; 
     my $input = {}; # store the input data the reopen the form later
-    foreach my $key (qw(subject issuer_dn profile)) {
+    foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
             $query->{uc($key)} = '%'.$val.'%';
+            $input->{$key} = $val;
+        }
+    }
+    
+    foreach my $key (qw(profile)) {
+        my $val = $self->param($key);
+        if (defined $val && $val ne '') {
+            $query->{uc($key)} = $val;
             $input->{$key} = $val;
         }
     }

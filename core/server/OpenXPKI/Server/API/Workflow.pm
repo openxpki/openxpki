@@ -549,15 +549,16 @@ sub get_workflow_instance_types {
     my $pki_realm = CTX('session')->get_pki_realm();    
     
     my $db_results = CTX('dbi_backend')->select(
-        TABLE   => 'WORKFLOW',
+        TABLE   => [ 'WORKFLOW' ],
         DISTINCT => 1,
-        COLUMNS => [ 'WORKFLOW_TYPE' ],        
-        DYNAMIC => { 'PKI_REALM' => $pki_realm }
+        COLUMNS => [ 'WORKFLOW.WORKFLOW_TYPE' ],
+        JOIN => [['WORKFLOW_ID']],        
+        DYNAMIC => { 'WORKFLOW.PKI_REALM' => $pki_realm }
     );
     
     my $result = {};
     while (my $line = shift @{$db_results}) {
-        my $type = $line->{WORKFLOW_TYPE}; 
+        my $type = $line->{'WORKFLOW.WORKFLOW_TYPE'}; 
         my $label = $cfg->get([ 'workflow', 'def', $type, 'head', 'label' ]);
         my $desc = $cfg->get([ 'workflow', 'def', $type, 'head', 'description' ]);        
         $result->{$type} = { 
