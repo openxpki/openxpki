@@ -1130,8 +1130,7 @@ sub select {
     }
     my $distinct = '';
     if ( $args->{DISTINCT} ) {
-        $distinct = 'DISTINCT';
-        @order_specs = ();
+        $distinct = 'DISTINCT';        
     }
     my $query =
         'SELECT '
@@ -1176,7 +1175,7 @@ sub select {
                 push @order_specs, $entry;
             }
         } else {
-            @real_order = @order_specs;
+            @real_order = ( shift @order_specs );
         }
 
         if ( $args->{REVERSE} ) {
