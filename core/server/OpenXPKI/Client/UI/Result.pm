@@ -611,9 +611,16 @@ sub __render_pager {
         $args->{pagesizes} = [25,50,100,250,500];
     }
     
+    if (!grep (/^$limit$/, @{$args->{pagesizes}}) ) {
+        push @{$args->{pagesizes}}, $limit;
+        $args->{pagesizes} = [ sort { $a <=> $b } @{$args->{pagesizes}} ];        
+    }
+    
     if (!$args->{pagersize}) {
         $args->{pagersize} = 20;
     }
+
+    $self->logger()->debug('pager query' . Dumper $args);
         
     return { 
         startat => $startat, 
@@ -621,8 +628,9 @@ sub __render_pager {
         count => $result->{count} * 1, 
         pagesizes => $args->{pagesizes}, 
         pagersize => $args->{pagersize},
-        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id}
-        # TODO order / reverse 
+        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id},
+        order => $result->{query}->{ORDER} || '', 
+        reverse => $result->{query}->{REVERSE} ? 1 : 0,  
     }
 }
 

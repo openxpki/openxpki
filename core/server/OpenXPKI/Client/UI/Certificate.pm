@@ -124,6 +124,13 @@ sub init_result {
     my $query = $result->{query};    
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
+    
+    if (!$query->{ORDER}) {
+        $query->{ORDER} = 'CERTIFICATE.NOTBEFORE';
+        if (!defined $query->{REVERSE}) {
+            $query->{REVERSE} = 1;
+        }
+    }
 
     $self->logger()->debug( "persisted query: " . Dumper $result);
 
@@ -136,7 +143,10 @@ sub init_result {
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC',
     });
 
-    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    my $pager;
+    if ($startat != 0 || @{$search_result} == $limit) {
+        $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    }
 
     my @result = $self->__render_result_list( $search_result );
     
@@ -216,14 +226,9 @@ sub init_pager {
     
     if ($self->param('order')) {
         $query->{ORDER} = uc($self->param('order'));
-    } else {        
-        $query->{ORDER} = 'NOTBEFORE';
-        if (!defined $self->param('reverse')) {
-            $query->{REVERSE} = 1;
-        }
     }
     
-    if (defined  $self->param('reverse')) {
+    if (defined $self->param('reverse')) {
         $query->{REVERSE} = $self->param('reverse');
     }
 
@@ -267,8 +272,10 @@ sub init_mine {
         CERT_ATTRIBUTES => [{ 
             KEY => 'system_cert_owner', 
             VALUE =>  $self->_session->param('user')->{name}, 
-            OPERATOR => 'EQUAL' 
-        }]
+            OPERATOR => 'EQUAL'
+        }],
+        ORDER => 'CERTIFICATE.NOTBEFORE',
+        REVERSE => 1,
     };
 
     $self->logger()->debug( "search query: " . Dumper $query);
@@ -278,7 +285,11 @@ sub init_mine {
     my $result_count = scalar @{$search_result};
     my $pager;
     if ($result_count == $limit) {
-        $result_count = $self->send_command( 'search_cert_count', $query );
+        my %count_query = %{$query};
+        delete $count_query{ORDER};
+        delete $count_query{REVERSE};
+        
+        $result_count = $self->send_command( 'search_cert_count', \%count_query );
 
         my $queryid = $self->__generate_uid();
         my $_query = {

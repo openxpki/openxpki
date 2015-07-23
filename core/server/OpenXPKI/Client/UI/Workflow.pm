@@ -339,6 +339,13 @@ sub init_result {
 
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
+    
+    if (!$query->{ORDER}) {
+        $query->{ORDER} = 'WORKFLOW.WORKFLOW_SERIAL';
+        if (!defined $query->{REVERSE}) {
+            $query->{REVERSE} = 1;
+        }
+    }
 
     $self->logger()->debug( "persisted query: " . Dumper $result);
 
@@ -351,7 +358,10 @@ sub init_result {
         description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
     });
 
-    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    my $pager;
+    if ($startat != 0 || @{$search_result} == $limit) {
+        $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    }
 
     my @result = $self->__render_result_list( $search_result, $result->{column} );
 
@@ -423,14 +433,9 @@ sub init_pager {
     
     if ($self->param('order')) {
         $query->{ORDER} = uc($self->param('order'));
-    } else {
-        $query->{ORDER} = 'WORKFLOW_ID';
-        if (!defined $self->param('reverse')) {
-            $query->{REVERSE} = 1;
-        }
-    }
+    } 
     
-    if (defined  $self->param('reverse')) {
+    if (defined $self->param('reverse')) {
         $query->{REVERSE} = $self->param('reverse');
     }
 
@@ -540,19 +545,22 @@ sub init_mine {
     my $startat = $self->param('startat') || 0;
 
     my $query = {
-        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_session->param('user')->{name} }]
+        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_session->param('user')->{name} }],
+        ORDER => 'WORKFLOW.WORKFLOW_SERIAL',
+        REVERSE => 1,
     };
 
     my $search_result = $self->send_command( 'search_workflow_instances',
-
         { %{$query}, ( LIMIT => $limit, START => $startat ) } );
 
     # if size of result is equal to limit, check for full result count
     my $result_count = scalar @{$search_result};
     if ($result_count == $limit) {
-
-        $result_count = $self->send_command( 'search_workflow_instances_count', $query );
-
+        # we need to remove order/reverse
+        my %count_query = %{$query};
+        delete $count_query{ORDER};
+        delete $count_query{REVERSE};
+        $result_count = $self->send_command( 'search_workflow_instances_count', \%count_query );
     }
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
@@ -574,7 +582,6 @@ sub init_mine {
             'count' => $result_count,
             'query' => $query,
             'column' => \@column,
-
         };
         $self->_client->session()->param('query_wfl_'.$queryid, $_query );
         $pager = $self->__render_pager( $_query, { limit => $limit, startat => $startat } );
@@ -633,21 +640,29 @@ sub init_task {
     foreach my $item (@$tasklist) {
 
         my $query = $item->{query};
-        if ($query->{LIMIT} && $query->{LIMIT} > 100) {
-            $query->{LIMIT} = 25;
+        my $limit = 25;
+                
+        if ($query->{LIMIT}) {
+            $limit = $query->{LIMIT};
+            delete $query->{LIMIT};
+        }
+        
+        if (!$query->{ORDER}) {
+            $query->{ORDER} = 'WORKFLOW.WORKFLOW_SERIAL';
+            if (!defined $query->{REVERSE}) {
+                $query->{REVERSE} = 1;
+            }
         }
 
         my @cols;
         if ($item->{cols}) {
             @cols = @{$item->{cols}};
         } else {
-
             @cols = (
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'WORKFLOW_SERIAL', },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'WORKFLOW_LAST_UPDATE', },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'WORKFLOW_TYPE', },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'WORKFLOW_STATE', },
-
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'WORKFLOW_SERIAL', sortkey => 'WORKFLOW.WORKFLOW_SERIAL' },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'WORKFLOW_LAST_UPDATE', sortkey => 'WORKFLOW.WORKFLOW_LAST_UPDATE' },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'WORKFLOW_TYPE' },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'WORKFLOW_STATE' },
             );
         }
 
@@ -660,7 +675,11 @@ sub init_task {
         for (my $ii = 0; $ii < scalar @cols; $ii++) {
             # we must create a copy as we change the hash in the session info otherwise
             my %col = %{$cols[$ii]};
-            push @header, { sTitle => $col{label} };
+            my $head = { sTitle => $col{label} };
+            if ($col{sortkey}) {
+                $head->{sortkey} = $col{sortkey};
+            }
+            push @header, $head; 
 
             if ($col{template}) {
                 $wf_info_required = 1;
@@ -687,7 +706,7 @@ sub init_task {
 
         $self->logger()->debug( "columns : " . Dumper \@column);
 
-        my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => 25), %$query } );
+        my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => $limit), %$query } );
 
         # empty message
         my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';             
@@ -707,9 +726,11 @@ sub init_task {
             
             $self->logger()->trace( "dumper result: " . Dumper @data);
         
-            if (!$query->{LIMIT} && scalar @$search_result == 25) {
-                my $result_count= $self->send_command( 'search_workflow_instances_count', $query );
-    
+            if ($limit == scalar @$search_result) {                
+                my %count_query = %{$query};
+                delete $count_query{ORDER};
+                delete $count_query{REVERSE};
+                my $result_count= $self->send_command( 'search_workflow_instances_count', \%count_query  );                
                 my $queryid = $self->__generate_uid();
                 my $_query = {
                     'id' => $queryid,
@@ -719,7 +740,7 @@ sub init_task {
                     'column' => \@column
                 };
                 $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-                $pager = $self->__render_pager( $_query )
+                $pager = $self->__render_pager( $_query, { limit => $limit } );
             }
             
         }
