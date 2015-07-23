@@ -224,8 +224,8 @@ sub render {
     } else {
         # Start output stream
         my $cgi = $self->cgi();
-
-        print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => 'application/json; charset=UTF-8' );
+        
+        print $cgi->header( @main::header );        
         print $body;
     }
 

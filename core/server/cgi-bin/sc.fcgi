@@ -47,12 +47,6 @@ my $cgi = CGI->new;
 
 $log->debug('check for cgi session');
 
-my $session_front = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
-
-our $cookie = { -name => 'CGISESSID', -value => $session_front->id };
-
-$log->debug('session id (front) is '. $session_front->id);
-
 if (!$config{global}{socket}) {
     $config{global}{socket} = '/var/openxpki/openxpki.socket';
 } 
@@ -60,10 +54,31 @@ if (!$config{global}{socket}) {
 my %card_config = %config;
 delete $card_config{realm};
 
+my @header_tpl;
+foreach my $key (keys ($config{header} || {})) {
+    my $val = $config{header}{$key};
+    $key =~ s/-/_/g;
+    push @header_tpl, ("-$key", $val);
+}
+
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 
 while (my $cgi = CGI::Fast->new()) {
- 
+
+    my $sess_id = $cgi->cookie('oxisess-sc') || undef;
+    my $session_front = new CGI::Session(undef, $sess_id, {Directory=>'/tmp'});
+    $log->debug('session id (front) is '. $session_front->id);
+    
+    our $cookie = { 
+        -name => 'oxisess-sc', 
+        -value => $session_front->id, 
+        -Secure => ($ENV{'HTTPS'} ? 1 : 0),
+        -HttpOnly => 1 
+    };
+    our @header = @header_tpl;    
+    push @header, ('-cookie', $cgi->cookie( $cookie ));
+    push @header, ('-type','application/json; charset=UTF-8');        
+  
     my $client = OpenXPKI::Client::SC->new({
         session => $session_front,
         logger => $log,

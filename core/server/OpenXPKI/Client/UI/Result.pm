@@ -359,8 +359,7 @@ sub render {
     } else {
         # Start output stream
         my $cgi = $self->cgi();
-
-        print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => 'application/json; charset=UTF-8' );
+        print $cgi->header( @main::header );        
         print $body;
     }
 
@@ -394,7 +393,8 @@ sub init_fetch {
 
     # Start output stream
     my $cgi = $self->cgi();
-    print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => $data->{mime}, -attachment => $data->{attachment} );
+    
+    print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
     
     if ($data->{file}) {
         open (my $fh, $data->{file}) || die 'Unable to open file';
