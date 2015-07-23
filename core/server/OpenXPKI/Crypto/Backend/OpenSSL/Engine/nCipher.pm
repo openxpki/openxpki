@@ -61,8 +61,8 @@ sub new {
         INTERNAL_CHAIN
         ENGINE_SECTION
         ENGINE_USAGE
-	KEY_STORE
-	WRAPPER
+    KEY_STORE
+    WRAPPER
         NFAST_HOME
         CHECKCMDTIMEOUT
         ONLINECHECKGRACEPERIOD
@@ -78,22 +78,22 @@ sub new {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_NFAST_HOME_NOT_ACCESSIBLE",
             params  => { 
-		NFAST_HOME => $self->{NFAST_HOME},
-	    },
+        NFAST_HOME => $self->{NFAST_HOME},
+        },
             );
     }
 
     foreach my $entry (qw( CHECKCMDTIMEOUT ONLINECHECKGRACEPERIOD )) {
-	if (! defined $self->{$entry} 
-	    || ($self->{$entry} !~ m{ \A \d+ \z }xms)) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_INVALID_VALUE",
-		params  => {
-		    PARAMETER => $entry,
-		    VALUE     => $self->{$entry},
-		},
-		);
-	}
+    if (! defined $self->{$entry} 
+        || ($self->{$entry} !~ m{ \A \d+ \z }xms)) {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_INVALID_VALUE",
+        params  => {
+            PARAMETER => $entry,
+            VALUE     => $self->{$entry},
+        },
+        );
+    }
     }
 
     return $self;
@@ -131,90 +131,91 @@ sub key_usable {
 
     # if the last check was performed successfully within our grace period
     # simply return the cached result
-    if ($self->cachestatus(
-	    {
-		ID => 'key_' . $self->{KEY},
-		TIMEOUT => $self->{ONLINECHECKGRACEPERIOD},
-		RETRIGGER => 1,
-	    })) {
-	##! 2: "Last key online check was performed less than " . $self->{ONLINECHECKGRACEPERIOD} . " seconds ago. Returning cached result."
-	return 1;
+    my $cachestatus = $self->cachestatus({
+        ID => 'key_' . $self->{KEY},
+        TIMEOUT => $self->{ONLINECHECKGRACEPERIOD},
+        RETRIGGER => 1,
+    });
+    
+    if ($cachestatus) {
+           ##! 2: "Last key online check was performed less than " . $self->{ONLINECHECKGRACEPERIOD} . " seconds ago. Returning cached result."
+        return 1;
     }
     
     # check security world and get information about preloaded objects
     my @cmd = ($self->{WRAPPER},
-		"$self->{NFAST_HOME}/bin/nfkminfo");
+        "$self->{NFAST_HOME}/bin/nfkminfo");
 
     my $section = '';
     my $worldinfo;
     eval {
         local $SIG{ALRM} = sub { die "alarm\n" };
-	alarm $self->{CHECKCMDTIMEOUT};
+        alarm $self->{CHECKCMDTIMEOUT};
 
-	##! 4: "keyOnline: exec: " . join (' ', @cmd)
-	my $handle;
-	if (! open $handle, join (' ', @cmd) . "|") {
-	    ##! 4: "nCipher nfkminfo: could not run command '" . join (' ', @cmd) . "'"
-	    alarm 0;
-	    OpenXPKI::Exception->throw(
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_EXEC_NFKMINFO_COMMAND_ERROR",
-		params  => { 
-		    EVAL_ERROR => $EVAL_ERROR,
-		},
-		);
-	}
-	
-	# parse nfkminfo output
-	while (<$handle>) {
-	    chomp;
-	    if (m{ \A \S }xms) {
-		s{ [: \#\-] }{}xmsg;
-		$section = lc($_);
-		##! 8: "section: $section"
-	    } else {
-		if (($section ne '')
-		    && (m{ \A \s+ (state) \s \s+ (.*) }xms)) {
-		    ##! 8: "property key: $1, value: $2"
-		    $worldinfo->{$section}->{lc($1)} = $2;
-		}
-		if ($section =~ m{ \A preloadedobjects }xms) {
-		    m{ \s+ ([0-9A-Fa-f]+) }xms;
-		    ##! 8: "hash: $1"
-		    $worldinfo->{preloadedobjects}->{$1}++;
-		}
-	    }
-	}
-	close $handle;
-	alarm 0;
+        ##! 4: "keyOnline: exec: " . join (' ', @cmd)
+        my $handle;
+        if (! open $handle, join (' ', @cmd) . "|") {
+            ##! 4: "nCipher nfkminfo: could not run command '" . join (' ', @cmd) . "'"
+            alarm 0;
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_EXEC_NFKMINFO_COMMAND_ERROR",
+                params  => { EVAL_ERROR => $EVAL_ERROR, },
+            );
+        }
+    
+        # parse nfkminfo output
+        while (<$handle>) {
+            chomp;
+            if (m{ \A \S }xms) {
+                s{ [: \#\-] }{}xmsg;
+                $section = lc($_);
+                ##! 8: "section: $section"
+            } else {
+                if (($section ne '')
+                    && (m{ \A \s+ (state) \s \s+ (.*) }xms)) {
+                    ##! 8: "property key: $1, value: $2"
+                    $worldinfo->{$section}->{lc($1)} = $2;
+                }
+                
+                if ($section =~ m{ \A preloadedobjects }xms) {
+                    m{ \s+ ([0-9A-Fa-f]+) }xms;
+                    ##! 8: "hash: $1"
+                    $worldinfo->{preloadedobjects}->{$1}++;
+                }
+            }
+        }
+        close $handle;
+        alarm 0;
     };
 
     # handle exceptions
     if ($EVAL_ERROR) {
         alarm 0;
-	if ($EVAL_ERROR ne "alarm\n") {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
-		params  => { 
-		    EVAL_ERROR => $EVAL_ERROR,
-		},
-		);
-	}
+        if ($EVAL_ERROR ne "alarm\n") {            
+            CTX('log')->log(
+                MESSAGE => 'nCipher key_usable failed with ' . $EVAL_ERROR,
+                PRIORITY => 'error',
+                FACILITY => 'system',
+            );            
+            return 0;            
+        }
         ##! 4: "nCipher nfkminfo did not terminate within timeout and was interrupted administratively"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_COMMAND_INVOCATION_TIMEOUT",
-	    params  => { 
-	    },
-	    );
+        CTX('log')->log(
+            MESSAGE => 'nCipher key_usable command timeout',
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        );
+        return 0;
     }
     
     if ($CHILD_ERROR != 0) {
-	##! 4: "nCipher nfkminfo returned error code $CHILD_ERROR"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_COMMAND_INVOCATION_ERROR",
-	    params  => { 
-		CHILD_ERROR => $CHILD_ERROR,
-	    },
-	    );
+        ##! 4: "nCipher nfkminfo returned error code $CHILD_ERROR"
+        CTX('log')->log(
+            MESSAGE => 'nCipher key_usable command returned with error: ' . $CHILD_ERROR,
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        );
+        return 0;
     }
 
     ##! 4: "nCipher security world information"
@@ -222,42 +223,45 @@ sub key_usable {
     my $initialized = 0;
     my $usable = 0;
     foreach (split(m{ \s+ }xms, $worldinfo->{world}->{state})) {
-	$initialized++ if ($_ eq 'Initialised');
-	$usable++ if ($_ eq 'Usable');
+        $initialized++ if ($_ eq 'Initialised');
+        $usable++ if ($_ eq 'Usable');
     }
 
     if (! $initialized) {
-	##! 4: "security world is not initialized"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_SECURITY_WORLD_NOT_INITIALIZED",
-	    params  => { 
-	    },
-	    );
+        ##! 4: "security world is not initialized"
+        CTX('log')->log(
+            MESSAGE => 'nCipher security world not initialized',
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        );
+        return 0;
     }
+    
     if (! $usable) {
-	##! 4: "security world is not usable"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_SECURITY_WORLD_NOT_USABLE",
-	    params  => { 
-	    },
-	    );
+        ##! 4: "security world is not usable"
+        CTX('log')->log(
+            MESSAGE => 'nCipher security world not usable',
+            PRIORITY => 'error',
+            FACILITY => 'system',
+        );
+        return 0;
     }
 
 return 1;
 # TODO - this is not working when preload is off
 
     if (! exists $worldinfo->{preloadedobjects}) {
-	##! 4: "no preloaded objects found"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_NO_PRELOADED_OBJECTS_FOUND",
-	    params  => { 
-	    },
-	    );
+    ##! 4: "no preloaded objects found"
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_NO_PRELOADED_OBJECTS_FOUND",
+        params  => { 
+        },
+        );
     }
 
     ##! 2: "preloaded objects:"
     foreach (keys %{$worldinfo->{preloadedobjects}}) {
-	##! 2: "  $_"
+    ##! 2: "  $_"
     } 
 
     # now we have got a list of preloaded objects. verify it against
@@ -267,13 +271,13 @@ return 1;
     my $ocshash = $self->__getKeyHash();
     ##! 1: "verify if key ocs object hash $ocshash is preloaded"
     if (! exists $worldinfo->{preloadedobjects}->{$ocshash}) {
-	##! 1: "object is not preloaded, key is not usable"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_OBJECT_NOT_PRELOADED",
-	    params  => {
-		OCSHASH => $ocshash,
-	    },
-	    );
+    ##! 1: "object is not preloaded, key is not usable"
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_KEY_USABLE_OBJECT_NOT_PRELOADED",
+        params  => {
+        OCSHASH => $ocshash,
+        },
+        );
     }
     ##! 1: "key seems to be usable"
 
@@ -310,13 +314,13 @@ sub online {
     # if the last check was performed successfully within our grace period
     # simply return the cached result
     if ($self->cachestatus(
-	    {
-		ID        => 'ncipher_module',
-		TIMEOUT   => $self->{ONLINECHECKGRACEPERIOD},
-		RETRIGGER => 1,
-	    })) {
-	##! 2: "Last HSM online check was performed less than " . $self->{ONLINECHECKGRACEPERIOD} . " seconds ago. Returning cached result."
-	return 1;
+        {
+        ID        => 'ncipher_module',
+        TIMEOUT   => $self->{ONLINECHECKGRACEPERIOD},
+        RETRIGGER => 1,
+        })) {
+    ##! 2: "Last HSM online check was performed less than " . $self->{ONLINECHECKGRACEPERIOD} . " seconds ago. Returning cached result."
+    return 1;
     }
 
     ##! 2: "Checking nCipher infrastructure"
@@ -327,79 +331,77 @@ sub online {
     my @modules;
 
     eval {
-	local $SIG{ALRM} = sub { die "alarm\n" };
-	alarm $self->{CHECKCMDTIMEOUT};
-	
-	my @cmd = (
-	    qq("$self->{NFAST_HOME}/bin/enquiry"),
-	    );
+        local $SIG{ALRM} = sub { die "alarm\n" };
+        alarm $self->{CHECKCMDTIMEOUT};
+    
+        my @cmd = (
+           qq("$self->{NFAST_HOME}/bin/enquiry"),
+        );
 
-	my $cmd = join(' ', @cmd);
+        my $cmd = join(' ', @cmd);
 
-	##! 4: "exec: $cmd"
-	my $handle;
-	if (! open $handle, $cmd . '|') {
-	    alarm 0;
-	    ##! 4: "nCipher enquiry: could not run command '$cmd'"
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_FAILED",
-		params  => { 
-		    COMMAND => $cmd,
-		},
-		);
-	}
-	
-	# parse enquiry output
-	while (my $line = <$handle>) {
-	    chomp $line;
-	    if ($line =~ m{ \A \S }xms) {
-		$line =~ s{ [: \#] }{}xms;
-		
-		$section = lc($line);
-		##! 4: "   section: $section"
-		if ($section =~ m{ \A module }xms) {
-		    push (@modules, $section);
-		}
-	    } else {
-		if (($section ne '')
-		    && ($line =~ m{ \A \s+ (mode|version) \s\s+ (\S+) }xms)) {
-		    ##! 4: "     property: $1, value: $2"
-		    $enquiry->{$section}->{lc($1)} = $2;
-		}
-	    }
-	}
-	close $handle;
-	alarm 0;
+        ##! 4: "exec: $cmd"
+       my $handle;
+       if (! open $handle, $cmd . '|') {
+            alarm 0;
+            ##! 4: "nCipher enquiry: could not run command '$cmd'"
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_FAILED",
+                params  => { COMMAND => $cmd },
+            );
+        }
+    
+        # parse enquiry output
+        while (my $line = <$handle>) {
+            chomp $line;
+            if ($line =~ m{ \A \S }xms) {
+            $line =~ s{ [: \#] }{}xms;
+        
+            $section = lc($line);
+            ##! 4: "   section: $section"
+               if ($section =~ m{ \A module }xms) {
+            push (@modules, $section);
+        }
+        } else {
+        if (($section ne '')
+            && ($line =~ m{ \A \s+ (mode|version) \s\s+ (\S+) }xms)) {
+            ##! 4: "     property: $1, value: $2"
+            $enquiry->{$section}->{lc($1)} = $2;
+        }
+        }
+    }
+    close $handle;
+    alarm 0;
     };
 
     # handle exceptions
     if ($EVAL_ERROR) {
         alarm 0;
-	if ($EVAL_ERROR ne "alarm\n") {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
-		params  => { 
-		    EVAL_ERROR => $EVAL_ERROR,
-		},
-		);
-	}
+    if ($EVAL_ERROR ne "alarm\n") {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
+        params  => { 
+            EVAL_ERROR => $EVAL_ERROR,
+        },
+        );
+    }
 
         ##! 4: "nCipher enquiry did not terminate within timeout and was interrupted administratively"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_TIMEOUT",
-	    params  => { 
-	    },
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_TIMEOUT",
+        params  => { 
+        },
+        );
     }
 
     if ($CHILD_ERROR != 0) {
-	##! 4: "nCipher enquiry: hardserver is not running (error code $CHILD_ERROR)"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_ERROR",
-	    params  => { 
-		CHILD_ERROR => $CHILD_ERROR,
-	    },
-	    );
+    ##! 4: "nCipher enquiry: hardserver is not running (error code $CHILD_ERROR)"
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_ERROR",
+        params  => { 
+        CHILD_ERROR => $CHILD_ERROR,
+        },
+        );
     }
 
     ##! 64: 'enquiry: ' . Dumper $enquiry
@@ -408,31 +410,31 @@ sub online {
     ##! 4: "nCipher hardserver information"
     my $operational_modules = 0;
     foreach my $entry ('server', @modules) {
-	##! 1: "   '$entry' (version: $enquiry->{$entry}->{version}) is $enquiry->{server}->{mode}"
-	if (($entry ne 'server') 
-	    && ($enquiry->{$entry}->{mode} eq 'operational')) { 
-	    $operational_modules++;
-	}
+    ##! 1: "   '$entry' (version: $enquiry->{$entry}->{version}) is $enquiry->{server}->{mode}"
+    if (($entry ne 'server') 
+        && ($enquiry->{$entry}->{mode} eq 'operational')) { 
+        $operational_modules++;
+    }
     }
     
     if ($enquiry->{server}->{mode} ne 'operational') {
-	##! 1: "nCipher hardserver process is not operational."
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_HARDSERVER_NOT_OPERATIONAL",
-	    params  => { 
-	    },
-	    );
+    ##! 1: "nCipher hardserver process is not operational."
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_HARDSERVER_NOT_OPERATIONAL",
+        params  => { 
+        },
+        );
     }
     ##! 4: 'nCipher hardserver process is operational'
     ##! 4: "number of operational nCipher modules: $operational_modules"
     
     if ($operational_modules < 1) {
-	##! 1: "No operational nCipher modules are online."
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_NO_OPERATIONAL_MODULES_ONLINE",
-	    params  => { 
-	    },
-	    );
+    ##! 1: "No operational nCipher modules are online."
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_NO_OPERATIONAL_MODULES_ONLINE",
+        params  => { 
+        },
+        );
      }
 
     $self->cachestatus(ID => 'ncipher_module');
@@ -449,72 +451,72 @@ sub __getKeyHash {
 
     ##! "get object hash for private key " . $self->{KEY}
     my @cmd = (
-	qq("$self->{NFAST_HOME}/bin/nfkminfo"),
-	'-k',
-	'hwcrhk',
-	qq("$self->{KEY}"),
-	);
+    qq("$self->{NFAST_HOME}/bin/nfkminfo"),
+    '-k',
+    'hwcrhk',
+    qq("$self->{KEY}"),
+    );
 
     my $keyhash;
     eval {
-	local $SIG{ALRM} = sub { die "alarm\n" };
-	alarm $self->{CHECKCMDTIMEOUT};
+    local $SIG{ALRM} = sub { die "alarm\n" };
+    alarm $self->{CHECKCMDTIMEOUT};
 
-	# call nfkmverify to get object hash for key
-	my $cmd = join (' ', @cmd);
-	##! 2: "exec: $cmd"
-	my $handle;
-	if (! open $handle, $cmd . '|') {
-	    alarm 0;
+    # call nfkmverify to get object hash for key
+    my $cmd = join (' ', @cmd);
+    ##! 2: "exec: $cmd"
+    my $handle;
+    if (! open $handle, $cmd . '|') {
+        alarm 0;
             ##! 4: "nCipher nfkminfo: could not run command '$cmd'"
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_FAILED",
-		params  => { 
-		    COMMAND => $cmd,
-		},
-		);
-	}
-	
-	# parse nfkminfo output
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_FAILED",
+        params  => { 
+            COMMAND => $cmd,
+        },
+        );
+    }
+    
+    # parse nfkminfo output
       INFO:
-	while (<$handle>) {
-	    chomp;
-	    if (m{ \A \s* hash \s+ (.*) }xms) {
-		$keyhash = $1;
-		last INFO;
-	    }
+    while (<$handle>) {
+        chomp;
+        if (m{ \A \s* hash \s+ (.*) }xms) {
+        $keyhash = $1;
+        last INFO;
+        }
         }
         close $handle;
 
-	alarm 0;
+    alarm 0;
     };
     # handle exceptions
     if ($EVAL_ERROR) {
         alarm 0;
-	if ($EVAL_ERROR ne "alarm\n") {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
-		params  => { 
-		    EVAL_ERROR => $EVAL_ERROR,
-		},
-		);
-	}
-	##! 2: "nCipher nfkmverify did not terminate within timeout and was interrupted administratively"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_TIMEOUT",
-	    params  => { 
-	    },
-	    );
+    if ($EVAL_ERROR ne "alarm\n") {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
+        params  => { 
+            EVAL_ERROR => $EVAL_ERROR,
+        },
+        );
+    }
+    ##! 2: "nCipher nfkmverify did not terminate within timeout and was interrupted administratively"
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_TIMEOUT",
+        params  => { 
+        },
+        );
     }
 
     if ($CHILD_ERROR != 0) {
         ##! 2: "nCipher nfkmverify returned error code $CHILD_ERROR"
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_ERROR",
-	    params  => { 
-		CHILD_ERROR => $CHILD_ERROR,
-	    },
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_ERROR",
+        params  => { 
+        CHILD_ERROR => $CHILD_ERROR,
+        },
+        );
     }
 
     return $keyhash;
