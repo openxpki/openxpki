@@ -153,8 +153,8 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_DESC
         action:
           - edit_subject > CANCEL_APPROVALS
-          - edit_san > CANCEL_APPROVALS
-          - edit_cert_info > CANCEL_APPROVALS
+          - edit_san > CANCEL_APPROVALS ? profile_has_san_section
+          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section
           - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
@@ -196,8 +196,8 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC
         action:
           - edit_subject > CANCEL_APPROVALS
-          - edit_san > CANCEL_APPROVALS
-          - edit_cert_info > CANCEL_APPROVALS
+          - edit_san > CANCEL_APPROVALS ? profile_has_san_section
+          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section
           - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
           - global_noop > UPDATE_SUBJECT ? has_policy_violation
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
@@ -285,8 +285,8 @@ state:
           - enter_policy_violation_comment > PENDING_POLICY_VIOLATION ? has_policy_violation
           - global_noop > BUILD_SUBJECT ? has_policy_violation
           - edit_subject > BUILD_SUBJECT
-          - edit_san > BUILD_SUBJECT
-          - edit_cert_info > BUILD_SUBJECT
+          - edit_san > BUILD_SUBJECT ? profile_has_san_section
+          - edit_cert_info > BUILD_SUBJECT ? profile_has_info_section
           - global_cancel > CANCELED
         output:
           - cert_subject
