@@ -20,9 +20,9 @@ main:
         label: I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES
       - key:   crl!index
         label: I18N_OPENXPKI_UI_MENU_CRL
-      - key:   information!process
+      - key:   workflow!index!wf_type!status_process
         label: I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION
-      - key:   information!status
+      - key:   workflow!index!wf_type!status_system
         label: I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS
 
  

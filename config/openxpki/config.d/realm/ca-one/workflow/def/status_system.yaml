@@ -1,0 +1,23 @@
+head:
+    prefix: statsys
+    persister: Volatile
+
+state:
+    INITIAL:      
+        uihandle: OpenXPKI::Client::UI::Handle::Status::render_system_status
+        action: 
+          - global_noop > SUCCESS
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+
+acl:
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+
+    System:
+        creator: any
+

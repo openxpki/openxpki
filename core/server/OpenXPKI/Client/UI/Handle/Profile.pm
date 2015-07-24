@@ -1,5 +1,3 @@
-# OpenXPKI::Client::UI::Workflow::Metadata
-# (C) Copyright 2014 by The OpenXPKI Project
 
 package OpenXPKI::Client::UI::Handle::Profile;
 

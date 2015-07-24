@@ -46,6 +46,7 @@ OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Source.pm
 OpenXPKI/Client/UI/Workflow.pm
 OpenXPKI/Client/UI/Handle/Profile.pm
+OpenXPKI/Client/UI/Handle/Status.pm
 
 # Client for SmartCard Frontend
 OpenXPKI/Client/SC.pm
