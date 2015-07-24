@@ -121,6 +121,14 @@ sub __get_workflow_ui_info {
         # TODO we might use the OpenXPKI::Workflow::Config object for this
         # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
         $factory = CTX('workflow_factory')->get_factory();
+        
+        if (!$factory->authorize_workflow({ ACTION => 'create', TYPE => $args->{TYPE} })) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NOT_AUTHORIZED',
+                params => { ARGS => $args }
+            );
+        }
+        
         my $wf_config = $factory->_get_workflow_config($args->{TYPE});
         # extract the action in the initial state from the config
         foreach my $state (@{$wf_config->{state}}) {

@@ -9,6 +9,7 @@ use warnings;
 
 use Workflow 1.36;
 use base qw( Workflow::Factory );
+use English;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -191,6 +192,29 @@ sub get_field_info {
     return $field;
     
 }
+
+=head2 authorize_workflow 
+
+Public wrapper around __authorize_workflow, boolean return (true if 
+access it granted).
+
+=cut
+ 
+sub authorize_workflow {
+
+    my $self     = shift;
+    my $arg_ref  = shift;
+    
+    eval {
+        $self->__authorize_workflow( $arg_ref );    
+    };
+    if ($EVAL_ERROR) {
+        return 0;
+    }    
+    return 1;
+    
+}
+
 
 sub __authorize_workflow {
 

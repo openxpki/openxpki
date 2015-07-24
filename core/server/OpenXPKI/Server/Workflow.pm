@@ -744,10 +744,10 @@ sub _save{
     # TODO - the state on the base Workflow seems to have some "lag" and sticks in INITIAL
     # even if the excpetion is somewhere later. Should be gone after moving to direct subclassing
     if ($self->state() eq 'INITIAL' &&
-        ($proc_state eq 'init' || $proc_state eq 'running'  || $proc_state eq'exception' )) {
+        ($proc_state eq 'init' || $proc_state eq'exception' )) {
 
          CTX('log')->log(
-            MESSAGE  => "Workflow crashed during startup  wont save!",
+            MESSAGE  => "Workflow crashed during startup  wont save! ($proc_state)",
             PRIORITY => "error",
             FACILITY => ["workflow","application"]
         );
