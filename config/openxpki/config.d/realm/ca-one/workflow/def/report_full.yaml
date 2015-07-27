@@ -36,6 +36,7 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Reports::Detail
         param:            
             target_umask: 0644
+            _map_valid_at: $valid_at
             _map_target_filename: >
                 [% IF context.target_filename %][% context.target_filename %]
                 [% ELSE %]pki report [% USE date(format='%Y-%m-%dT%H:%M:%S') %][% date.format( context.valid_at ) %].csv[% END %]

@@ -78,7 +78,7 @@ validator:
             error: I18N_OPENXPKI_WORKFLOW_METADATA_WRONG_SYSTEM_ID
             path: metadata.systemid
         arg: 
-          - meta_system_id
+          - $meta_system_id
 
     validate_email: 
         class: OpenXPKI::Server::Workflow::Validator::Regex
