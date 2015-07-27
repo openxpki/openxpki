@@ -21,7 +21,7 @@
                             <ul class="dropdown-menu">
                                 {{#each navEntry.entries as |entry|}}
                                     <li>
-                                        {{#link-to "openxpki" entry.key}}
+                                        {{#link-to "openxpki" entry.key (query-params force=navEntry.active)}}
                                             {{entry.label}}
                                         {{/link-to}}
                                     </li>
@@ -30,7 +30,7 @@
                         </li>
                     {{else}}
                         <li class="{{if navEntry.active "active"}}">
-                            {{#link-to "openxpki" navEntry.key}}
+                            {{#link-to "openxpki" navEntry.key (query-params force=navEntry.active)}}
                                 {{navEntry.label}}
                             {{/link-to}}
                         </li>

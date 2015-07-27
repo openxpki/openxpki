@@ -6,6 +6,8 @@ Route = Em.Route.extend
             refreshModel: true
         limit:
             refreshModel: true
+        force:
+            refreshModel: true
 
     setupAjax: Em.on "init", ->
         Em.$.ajaxSetup
@@ -22,10 +24,13 @@ Route = Em.Route.extend
         navEntries: []
 
     beforeModel: (req) ->
+        if req.queryParams.force
+            delete req.queryParams.force
+
         source = @get "source"
         model_id = req.params.openxpki.model_id
 
-        if not source.get("structure") or model_id in @needReboot
+        if not source.get("navEntries.length") or model_id in @needReboot
             @sendAjax data: page: "bootstrap!structure"
 
     model: (req) ->
