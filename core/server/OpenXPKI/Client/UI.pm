@@ -402,10 +402,25 @@ sub handle_login {
         # Fetch the user info from the server
         $reply = $self->backend()->send_receive_command_msg( 'get_session_info' );
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
-            $self->session()->param('user', $reply->{PARAMS});
-            $self->session()->param('pki_realm', $reply->{PARAMS}->{pki_realm});
-            $self->session()->param('is_logged_in', 1);
+            
+            # Generate a new frontend session to prevent session fixation
+            # The backend session remains the same but can not be used by an 
+            # adversary as the id is never exposed and we destroy the old frontend
+            # session so access to the old session is not possible
+            my $new_session_front = new CGI::Session(undef, undef, { Directory=>'/tmp' });
+            $new_session_front->param('backend_session_id', $self->backend()->get_session_id() );
+            $new_session_front->param('user', $reply->{PARAMS});
+            $new_session_front->param('pki_realm', $reply->{PARAMS}->{pki_realm});
+            $new_session_front->param('is_logged_in', 1);
+            $new_session_front->param('initialized', 1);   
+            $self->session()->delete();                                           
+            $self->session( $new_session_front );
+            
+            $main::cookie->{'-value'} = $new_session_front->id;
+            push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
+            
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});
+            $self->logger()->debug('CGI Header ' . Dumper \@main::header );
 
             my $redirect = $self->session()->param('redirect');
             if ($redirect) {                                

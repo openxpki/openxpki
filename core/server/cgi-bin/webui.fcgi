@@ -9,7 +9,7 @@
 
 use CGI;
 use CGI::Fast;
-use CGI::Session;
+use CGI::Session qw/-ip-match/;
 use CGI::Carp qw (fatalsToBrowser);
 use JSON;
 use English;
