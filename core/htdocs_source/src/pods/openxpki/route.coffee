@@ -51,6 +51,7 @@ Route = Em.Route.extend
             source
 
     sendAjax: (req) ->
+        req.dataType = "json"
         req.type ?= if req?.data?.action then "POST" else "GET"
         req.url ?= @controllerFor("config").get "url"
         req.data._ = new Date().getTime()
@@ -66,52 +67,59 @@ Route = Em.Route.extend
             else
                 target = "top"
 
-        Em.$.ajax(req).then (doc) =>
-            source.beginPropertyChanges()
+        new Em.RSVP.Promise (resolve, reject) =>
+            Em.$.ajax(req).then (doc) =>
+                source.beginPropertyChanges()
 
-            source.set "status", doc.status
-            source.set "modal", null
+                source.set "status", doc.status
+                source.set "modal", null
 
-            if doc.goto
-                if doc.target == '_blank' || /^(http|\/)/.test doc.goto
-                    window.location.href = doc.goto
+                if doc.goto
+                    if doc.target == '_blank' || /^(http|\/)/.test doc.goto
+                        window.location.href = doc.goto
+                    else
+                        @transitionTo "openxpki", doc.goto
+
+                else if doc.structure
+                    source.set "navEntries", doc.structure
+                    source.set "user", doc.user
+
                 else
-                    @transitionTo "openxpki", doc.goto
+                    if doc.page and doc.main
+                        tab =
+                            active: true
+                            page: doc.page
+                            main: doc.main
+                            right: doc.right
 
-            else if doc.structure
-                source.set "navEntries", doc.structure
-                source.set "user", doc.user
+                        if target is "modal"
+                            source.set "modal", tab
+                        else if target is "tab"
+                            tabs = source.get "tabs"
+                            tabs.setEach "active", false
+                            source.get("tabs").pushObject tab
+                        else if target is "active"
+                            tabs = source.get "tabs"
+                            index = tabs.indexOf tabs.findBy "active"
+                            tabs.replace index, 1, [tab]
+                        else # top
+                            source.get("tabs")
+                                .clear()
+                                .pushObject tab
 
-            else
-                if doc.page and doc.main
-                    tab =
-                        active: true
-                        page: doc.page
-                        main: doc.main
-                        right: doc.right
+                    Em.run.scheduleOnce "afterRender", ->
+                        $(".loading").removeClass "in-progress"
 
-                    if target is "modal"
-                        source.set "modal", tab
-                    else if target is "tab"
-                        tabs = source.get "tabs"
-                        tabs.setEach "active", false
-                        source.get("tabs").pushObject tab
-                    else if target is "active"
-                        tabs = source.get "tabs"
-                        index = tabs.indexOf tabs.findBy "active"
-                        tabs.replace index, 1, [tab]
-                    else # top
-                        source.get("tabs")
-                            .clear()
-                            .pushObject tab
+                source.endPropertyChanges()
+                resolve doc
+            , (err) ->
+                $(".loading").removeClass "in-progress"
+                console.log "Ajax error", err
+                source.set "status",
+                    level: "error"
+                    message: "Server did not return JSON data as expected.
+                        Authentication session expired?"
+                resolve {}
 
-                Em.run.scheduleOnce "afterRender", ->
-                    $(".loading").removeClass "in-progress"
-
-            source.endPropertyChanges()
-            doc
-        , (err) ->
-            $(".loading").removeClass "in-progress"
-            console.log "Ajax error", err
 
 `export default Route`
