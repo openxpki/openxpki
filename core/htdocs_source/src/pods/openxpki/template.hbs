@@ -121,6 +121,27 @@
     </div>
 </div>
 
+<div class="modal fade oxi-error-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    Application Error
+                </h4>
+            </div>
+            <div class="modal-body">
+                {{{model.error.message}}}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" {{action "reload"}}>Reload application</button>
+                <button class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="loading">
     <div class="progress progress-striped active">
         <div class="progress-bar" role="progressbar">

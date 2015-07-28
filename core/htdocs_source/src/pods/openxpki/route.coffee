@@ -119,12 +119,10 @@ Route = Em.Route.extend
                 resolve doc
             , (err) ->
                 $(".loading").removeClass "in-progress"
-                console.log "Ajax error", err
-                source.set "status",
-                    level: "error"
-                    message: "Server did not return JSON data as expected.
-                        Authentication session expired?"
-                resolve {}
+                source.set "error",
+                    message: "The server did not return JSON data as
+                    expected.\nMaybe your authentication session has expired."
+                    resolve {}
 
 
 `export default Route`
