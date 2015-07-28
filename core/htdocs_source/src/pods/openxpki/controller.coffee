@@ -35,6 +35,10 @@ Controller = Em.Controller.extend
         $ ".modal.oxi-main-modal"
         .modal if @get "model.modal" then "show" else "hide"
 
+    autoshowErrorModal: Em.observer "model.error", ->
+        $ ".modal.oxi-error-modal"
+        .modal if @get "model.error" then "show" else "hide"
+
     showTabs: Em.computed.gt "model.tabs.length", 1
 
     actions:
@@ -50,5 +54,7 @@ Controller = Em.Controller.extend
             if not tabs.findBy "active", true
                 tabs.set "lastObject.active", true
             false
+
+        reload: -> window.location.reload()
 
 `export default Controller`
