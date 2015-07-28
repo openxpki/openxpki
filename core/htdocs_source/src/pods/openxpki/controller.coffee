@@ -1,12 +1,12 @@
 `import Em from "vendor/ember"`
 
 Controller = Em.Controller.extend
-    queryParams: [ "count", "limit", "startat" ]
+    queryParams: [ "count", "limit", "startat", "force" ]
     count: null
     startat: null
     limit: null
 
-    manageActive: Em.observer "model.page", ->
+    manageActive: Em.observer "model.{navEntries,page}", ->
         page = @get "model.page"
         for entry in @get "model.navEntries"
             Em.set entry, "active", entry.key is page
