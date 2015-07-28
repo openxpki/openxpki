@@ -7,6 +7,7 @@ package OpenXPKI::Client::UI::Certificate;
 use Moose;
 use Data::Dumper;
 use OpenXPKI::DN;
+use Math::BigInt;
 use Digest::SHA qw(sha1_base64);
 
 extends 'OpenXPKI::Client::UI::Result';
@@ -58,6 +59,7 @@ sub init_search {
     my @fields = (
         { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
         { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
+        { name => 'cert_serial', label => 'Serial', type => 'text', is_optional => 1, value => $preset->{serial} },
         { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
         { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
    );
@@ -829,10 +831,26 @@ sub action_search {
     foreach my $key (qw(profile)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
-            $query->{uc($key)} = $val;
             $input->{$key} = $val;
+            $query->{uc($key)} = $val;
         }
     }
+    
+    # Special handling of cert_serial
+    my $val = $self->param('cert_serial');
+    if (defined $val && $val ne '') {            
+        $input->{'cert_serial'} = $val;
+        # convert hex to decimal
+        if ($val =~ /[a-f]/ && substr($val,0,2) ne '0x') {
+            $val = '0x' . $val;
+        }
+        if (substr($val,0,2) eq '0x') {
+            my $sn = Math::BigInt->new( $val );
+            $val = $sn->bstr();
+        }
+        $query->{'CERT_SERIAL'} = $val;
+    }
+    
 
     if (my $status = $self->param('status')) {
         $input->{'status'} = $status;
