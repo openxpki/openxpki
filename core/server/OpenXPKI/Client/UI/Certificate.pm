@@ -59,7 +59,7 @@ sub init_search {
     my @fields = (
         { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
         { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
-        { name => 'cert_serial', label => 'Serial', type => 'text', is_optional => 1, value => $preset->{serial} },
+        { name => 'cert_serial', label => 'Serial', type => 'text', is_optional => 1, value => $preset->{cert_serial} },
         { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
         { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
    );
