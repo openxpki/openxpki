@@ -381,7 +381,7 @@ sub init_detail {
 
     my @fields = (
         { label => 'Subject', value => $cert->{SUBJECT} },
-        { label => 'Serial', value => $cert->{CERTIFICATE_SERIAL_HEX} },
+        { label => 'Serial', value => '0x'.$cert->{CERTIFICATE_SERIAL_HEX} },
         { label => 'Identifier', value => $cert_identifier },
         { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{NOTAFTER}, format => 'timestamp' },
@@ -845,6 +845,8 @@ sub action_search {
             $val = '0x' . $val;
         }
         if (substr($val,0,2) eq '0x') {
+            # strip whitespace
+            $val =~ s/\s//g;
             my $sn = Math::BigInt->new( $val );
             $val = $sn->bstr();
         }
