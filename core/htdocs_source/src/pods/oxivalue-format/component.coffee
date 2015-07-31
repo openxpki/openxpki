@@ -47,6 +47,7 @@ Component = Em.Component.extend
         $el
             .html e
             .find ':cleanup'
+        $el.find('script').remove()
         return $el.html()
 
 
