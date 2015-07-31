@@ -765,6 +765,13 @@ sub __search_cert {
        $params{REVERSE} = $args->{REVERSE};
     }
     
+    # Handle status = 
+    if ($args->{'STATUS'} && $args->{'STATUS'} eq 'EXPIRED') {
+        $args->{'STATUS'} = 'ISSUED',
+        $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
+              { VALUE => time(), OPERATOR => "LESS_THAN" };
+    }
+    
     # PKI_REALM overwrites the session realm if it is present
     foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS PKI_REALM SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
         if ( $args->{$key} ) {

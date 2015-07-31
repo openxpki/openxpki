@@ -870,10 +870,7 @@ sub action_search {
 
     if (my $status = $self->param('status')) {
         $input->{'status'} = $status;
-        if ($status eq 'EXPIRED') {
-            $status = 'ISSUED';
-            $query->{NOTAFTER} = time();
-        } elsif ($status eq 'VALID') {
+        if ($status eq 'VALID') {
             $status = 'ISSUED';
             $query->{VALID_AT} = time();
         }
