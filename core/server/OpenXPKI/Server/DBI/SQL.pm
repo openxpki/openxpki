@@ -530,6 +530,8 @@ sub select {
         # use table index serial column as default selector
         $pivot_column = $table_args . '_SERIAL';
 
+        # FIXME - This does not obey COLUMN specs and fails together with 
+        # DISTINCT as all columns are in the select!
         @select_list =
           map { { COLUMN => $self->{schema}->get_column($_), } } @{ $self->{schema}->get_table_columns($table_args) };
 
@@ -1128,7 +1130,7 @@ sub select {
     }
     my $distinct = '';
     if ( $args->{DISTINCT} ) {
-        $distinct = 'DISTINCT';
+        $distinct = 'DISTINCT';        
     }
     my $query =
         'SELECT '
@@ -1173,7 +1175,7 @@ sub select {
                 push @order_specs, $entry;
             }
         } else {
-            @real_order = @order_specs;
+            @real_order = ( shift @order_specs );
         }
 
         if ( $args->{REVERSE} ) {

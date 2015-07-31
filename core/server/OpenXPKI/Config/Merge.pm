@@ -9,7 +9,6 @@
 
 use Config::Merge;
 use OpenXPKI::Exception;
-use OpenXPKI::XML::Cache;
 
 package OpenXPKI::Config::Merge;
 
@@ -59,17 +58,7 @@ sub parser {
     my $cmref = $cm->();
 
     my $tree = $self->cm2tree($cmref);
-
-    # Incorporate the Workflow XML definitions
-    # List the realms from the system.realms tree
-    foreach my $realm (keys %{$tree->{system}->{realms}}) {
-        # TODO - MIGRATION - We load the xml code now to workflow.xml
-        my $xml = "$dir/realm/$realm/_workflow/workflow.xml";
-        if (-e $xml) {
-            my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => $xml);
-            $tree->{realm}->{$realm}->{workflow}->{xml} = $xml_cache->get_serialized();
-        }
-    }
+ 
     $params->{comment} = 'import from ' . $dir . ' using Config::Merge';
     $self->commit( $tree, @_, $params );
 }

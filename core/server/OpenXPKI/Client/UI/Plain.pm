@@ -126,7 +126,7 @@ sub render {
 
     # Start output stream
     my $cgi = $self->cgi();
-    print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => 'text/html; charset=utf-8' );
+    print $cgi->header( @main::header, -type => 'text/html; charset=utf-8' );
 
     # we do it the old way...
     print '<!DOCTYPE html><html><head>'. $self->head() .'</head><body>'. $self->body() .'</body></html>';

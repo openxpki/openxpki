@@ -90,41 +90,7 @@ sub BUILD {
                     regex => $re_cert_string,
                 },
             },
-        },
-        'count_my_certificates' => {
-            class  => 'Default',
-            params => { },
-        },
-        'list_my_certificates' => {
-            class  => 'Default',
-            params => {
-                LIMIT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                START => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-            },
-        },
-        'get_workflow_ids_for_cert' => {
-            class => 'Default',
-            params => {
-                'CSR_SERIAL' => {
-                    type => SCALAR,
-                    regex => $re_integer_string,
-                    optional => 1,
-                 },
-                IDENTIFIER => {
-                    type     => SCALAR,
-                    regex    => $re_base64_string,
-                    optional => 1,
-                },
-            },
-        },
+        },  
         'get_default_token' => {
             class  => 'Token',
             params => {
@@ -713,20 +679,6 @@ sub BUILD {
                 }
             }
         },
-        'get_roles' => {
-            class  => 'Default',
-            params => { },
-        },
-        'get_servers' => {
-            class  => 'Default',
-            params => { },
-            memoize => 1,
-        },
-        'get_export_destinations' => {
-            class  => 'Default',
-            params => { },
-            memoize => 1,
-        },
         'convert_csr' => {
             class  => 'Default',
             params => {
@@ -773,32 +725,7 @@ sub BUILD {
             },
         },
 
-        ## Profile API
-         'get_possible_profiles_for_role' => {
-            class  => 'Profile',
-            params => {
-                'ROLE' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                },
-                'NOHIDE' => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_boolean,
-                },
-            },
-            memoize => 1,
-        },
-        'get_available_cert_roles' => {
-            class  => 'Profile',
-            params => {
-                PROFILES => {
-                    type     => ARRAYREF,
-                    optional => 1,
-                },
-            },
-            memoize => 1,
-        },
+        ## Profile API 
         'get_cert_profiles' => {
             class  => 'Profile',
             params => {
@@ -1120,63 +1047,16 @@ sub BUILD {
             },
         },
 
-        ### Workflow API
-        'get_cert_identifier_by_csr_wf' => {
-            class  => 'Workflow',
-            params => {
-                'WORKFLOW_ID' => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-            },
-        },
-        'get_number_of_workflow_instances' => {
-            class  => 'Workflow',
-            params => {
-                ACTIVE => {
-                    type     => SCALAR,
-                    regex    => $re_integer_string,
-                    optional => 1,
-                },
-            },
-        },
+        ### Workflow API 
         'get_workflow_instance_types' => {
             class  => 'Workflow',
             params => {}
-        },
-        'list_workflow_instances' => {
-            class  => 'Workflow',
-            params => {
-                LIMIT => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-                START => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-                ACTIVE => {
-                    type     => SCALAR,
-                    regex    => $re_integer_string,
-                    optional => 1,
-                },
-            },
-        },
+        }, 
         'list_workflow_titles' => {
             class  => 'Workflow',
             params => { },
             memoize => 1,
-        },
-        'list_context_keys' => {
-            class  => 'Workflow',
-            params => {
-                WORKFLOW_TYPE => {
-                    type     => SCALAR,
-                    regex    => $re_alpha_string,
-                    optional => 1,
-                },
-            },
-        },
+        }, 
         'get_workflow_type_for_id' => {
             class  => 'Workflow',
             params => {
@@ -1308,25 +1188,25 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
-            ID => {
-            type  => SCALAR,
-            regex => $re_integer_string,
+                ID => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
                 },
-        },
-        },
-    'get_workflow_activities_params' => {
-        class => 'Workflow',
-        params => {
-            WORKFLOW => {
-                type => SCALAR,
-                regex => $re_alpha_string,
-            },
-            ID => {
-                type => SCALAR,
-                regex => $re_integer_string,
             },
         },
-    },
+        'get_workflow_activities_params' => {
+            class => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                ID => {
+                    type => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
         'search_workflow_instances' => {
             class  => 'Workflow',
             params => {

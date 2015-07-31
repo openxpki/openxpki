@@ -56,7 +56,7 @@ challenge:
 
 eligible:
     initial:
-       value: 1
+       value: 0
 
     renewal:
        value: 1

@@ -34,86 +34,7 @@ sub START {
     );
 }
 # API: simple retrieval functions
-
-sub count_my_certificates {
-    ##! 1: 'start'
-
-    my $certs = CTX('api')->list_my_certificates();
-    ##! 1: 'end'
-    return scalar @{ $certs };
-}
-
-sub list_my_certificates {
-    ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    my $user  = CTX('session')->get_user();
-    my $realm = CTX('session')->get_pki_realm();
-
-    my %limit = ();
-
-    if (exists $arg_ref->{LIMIT}) {
-        $limit{LIMIT}->{AMOUNT} = $arg_ref->{LIMIT};
-    }
-    if (exists $arg_ref->{START}) {
-        $limit{LIMIT}->{START}  = $arg_ref->{START};
-    }
-    my @results;
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE => [
-            [ 'WORKFLOW_CONTEXT' => 'context2' ],
-            [ 'WORKFLOW_CONTEXT' => 'context3' ],
-            'CERTIFICATE',
-        ],
-        COLUMNS => [
-            'CERTIFICATE.NOTBEFORE',
-            'CERTIFICATE.NOTAFTER',
-            'CERTIFICATE.IDENTIFIER',
-            'CERTIFICATE.SUBJECT',
-            'CERTIFICATE.STATUS',
-            'CERTIFICATE.CERTIFICATE_SERIAL',
-        ],
-        DYNAMIC => {
-            'context2.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'creator'},
-            'context3.WORKFLOW_CONTEXT_KEY'   => {VALUE => 'cert_identifier'},
-            'context2.WORKFLOW_CONTEXT_VALUE' => {VALUE => $user},
-            'CERTIFICATE.PKI_REALM'           => {VALUE => $realm},
-        },
-        JOIN => [
-            [
-                undef,
-                'WORKFLOW_CONTEXT_VALUE',
-                'IDENTIFIER',
-            ],
-            [
-                'WORKFLOW_SERIAL',
-                'WORKFLOW_SERIAL',
-                undef,
-            ],
-        ],
-        REVERSE => 1,
-        DISTINCT => 1,
-        %limit,
-    );
-    foreach my $entry (@{ $db_results }) {
-        ##! 16: 'entry: ' . Dumper \$entry
-        my $temp_hash = {};
-        foreach my $key (keys %{ $entry }) {
-            my $orig_key = $key;
-            ##! 16: 'key: ' . $key
-            $key =~ s{ \A CERTIFICATE\. }{}xms;
-            ##! 16: 'key: ' . $key
-            $temp_hash->{$key} = $entry->{$orig_key};
-        }
-        push @results, $temp_hash;
-    }
-    ##! 64: 'results: ' . Dumper \@results
-    ##! 1: 'end'
-
-    return \@results;
-}
-
+ 
 sub get_cert_identifier {
     ##! 1: 'start'
     my $self      = shift;
@@ -132,62 +53,6 @@ sub get_cert_identifier {
 
     ##! 1: 'end'
     return $identifier;
-}
-
-
-# MASON - can be removed 
-sub get_workflow_ids_for_cert {
-    my $self    = shift;
-    my $arg_ref = shift;
-    my $csr_serial = $arg_ref->{'CSR_SERIAL'};
-    my $cert_identifier = $arg_ref->{'IDENTIFIER'};
-
-    # Fallback for legacy calls with csr instead of identifier
-    if (!$cert_identifier && $csr_serial) {
-        my $cert_identifier_result = CTX('dbi_backend')->first(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                CSR_SERIAL => $csr_serial,
-            },
-        );
-        $cert_identifier = $cert_identifier_result->{IDENTIFIER};
-    }
-
-    my @result;
-    # CSR Workflow
-    my $workflow_id_result = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_workflow_csr',
-        },
-    );
-    my $workflow_id = $workflow_id_result->{ATTRIBUTE_VALUE};
-    # we fake the old return structure to satisfy the mason ui
-    # # FIXME - needs remodeling
-    push @result, {
-        'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
-        'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
-    } if ($workflow_id);
-
-
-    # CRR Workflow
-    $workflow_id_result = CTX('dbi_backend')->select(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            'IDENTIFIER' => $cert_identifier,
-            ATTRIBUTE_KEY => 'system_workflow_crr',
-        },
-    );
-    foreach my $line (@{$workflow_id_result}) {
-        $workflow_id = $line->{ATTRIBUTE_VALUE};
-        push @result, {
-            'WORKFLOW.WORKFLOW_SERIAL' => $workflow_id,
-            'WORKFLOW.WORKFLOW_TYPE' => CTX('api')->get_workflow_type_for_id({ ID => $workflow_id })
-        } if ($workflow_id);
-    }
-    return \@result;
-
 }
 
 sub get_head_version_id {
@@ -492,60 +357,7 @@ sub get_pki_realm_index {
         },
     );
 }
-
-sub get_roles {
-    #FIXME-ACL - should go with the new acl system
-    return CTX('config')->get_keys('auth.roles');
-}
-
-
-# FIXME - needs migration
-sub get_export_destinations
-{
-    ##! 1: "finished"
-    my $self = shift;
-    my $args = shift;
-    my $pki_realm = CTX('session')->get_pki_realm();
-
-    ##! 2: "load destination numbers"
-    my $export = CTX('config')->get('system.server.data_exchange.export');
-    my $import = CTX('config')->get('system.server.data_exchange.import');
-    my @list = ();
-    foreach my $dir ($import, $export)
-    {
-        opendir DIR, $dir;
-        my @filenames = grep /^[0-9]+/, readdir DIR;
-        close DIR;
-        foreach my $filename (@filenames)
-        {
-            next if (not length $filename);
-            $filename =~ s/^([0-9]+)(|[^0-9].*)$/$1/;
-            push @list, $filename if (length $filename);
-        }
-    }
-
-    ##! 2: "load all servers"
-    my %servers = %{ $self->get_servers()->{$pki_realm} };
-
-    ##! 2: "build hash with numbers and names of affected servers"
-    my %result = ();
-    my $last   = -1;
-    foreach my $item (sort @list)
-    {
-        next if ($last == $item);
-        $result{$item} = $servers{$item};
-        $last = $item;
-    }
-
-    ##! 1: "finished"
-    return \%result;
-}
-
-# FIXME - needs migration
-sub get_servers {
-    return {};
-}
-
+ 
 sub convert_csr {
     my $self    = shift;
     my $arg_ref = shift;

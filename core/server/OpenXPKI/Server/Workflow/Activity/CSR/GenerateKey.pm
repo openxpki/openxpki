@@ -50,16 +50,7 @@ sub execute
         );
     }
 
-    # TODO - can be cleaned up after removal of old workflows
-    # The old mason ui uses a custom sep, the new uses the default
-    my $parameters;
-    if (my $key_gen_params = $context->param('_key_gen_params')) {
-        my $serializer = OpenXPKI::Serialization::Simple->new({SEPARATOR => "-"});
-        $parameters = $serializer->deserialize($key_gen_params);
-    } else {
-        # param auto deserializes!
-        $parameters = $self->param('key_gen_params');
-    }
+    my $parameters = $self->param('key_gen_params');
 
     if (! defined $parameters) {
         OpenXPKI::Exception->throw(

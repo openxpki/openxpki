@@ -90,7 +90,7 @@ OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicySubjectDuplicate
 
 Check if another certificate with the same subject already exists. The 
 default is to check against entity certificates in the same realm which
-are not expired and not revoked. Tthis includes certificates with a 
+are not expired and not revoked. This includes certificates with a 
 notbefore date in the future! 
 See the parameters section for other search options.
 

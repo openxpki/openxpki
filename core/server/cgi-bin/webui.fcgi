@@ -54,15 +54,27 @@ if (!$config{global}{scripturl}) {
     $config{global}{scripturl} = '/cgi-bin/webui.fcgi';
 }
 
+my @header_tpl;
+foreach my $key (keys ($config{header} || {})) {
+    my $val = $config{header}{$key};
+    $key =~ s/-/_/g;
+    push @header_tpl, ("-$key", $val);
+}
+   
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 
 while (my $cgi = CGI::Fast->new()) {
 
     $log->debug('check for cgi session, fcgi pid '. $$ );
 
-    my $session_front = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
-
-    our $cookie = { -name => 'CGISESSID', -value => $session_front->id };
+    my $sess_id = $cgi->cookie('oxisess-webui') || undef;
+    my $session_front = new CGI::Session(undef, $sess_id, {Directory=>'/tmp'});
+    our $cookie = { 
+        -name => 'oxisess-webui', 
+        -value => $session_front->id, 
+        -Secure => ($ENV{'HTTPS'} ? 1 : 0),
+        -HttpOnly => 1 
+    };
 
     $log->debug('session id (front) is '. $session_front->id);
 
@@ -95,7 +107,11 @@ while (my $cgi = CGI::Fast->new()) {
     } elsif ($config{global}{realm_mode} eq "fixed") {
         # Fixed realm mode, mode must be defined in the config
         $session_front->param('pki_realm', $config{global}{realm});
-    }
+    }   
+    
+    our @header = @header_tpl;    
+    push @header, ('-cookie', $cgi->cookie( $cookie ));
+    push @header, ('-type','application/json; charset=UTF-8');        
 
 
     my $result;
@@ -105,6 +121,7 @@ while (my $cgi = CGI::Fast->new()) {
             logger => $log,
             config => $config{global}
         });
+         
         $result = $client->handle_request({ cgi => $cgi });
         $log->debug('request handled');
         $log->trace( Dumper $result );

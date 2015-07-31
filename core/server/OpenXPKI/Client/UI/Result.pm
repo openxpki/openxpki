@@ -74,7 +74,7 @@ has reload => (
 
 has redirect => (
     is => 'rw',
-    isa => 'Str',
+    isa => 'Str|HashRef',
     default => '',
 );
 
@@ -342,7 +342,9 @@ sub render {
 
     my $json = new JSON()->utf8;
     my $body;
-    if ($self->redirect()) {
+    if (ref $self->redirect() eq 'HASH') {
+        $body = $json->encode( $self->redirect() );
+    } elsif ($self->redirect()) {
         $body = $json->encode({ goto => $self->redirect() } );
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );
@@ -357,8 +359,7 @@ sub render {
     } else {
         # Start output stream
         my $cgi = $self->cgi();
-
-        print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => 'application/json; charset=UTF-8' );
+        print $cgi->header( @main::header );        
         print $body;
     }
 
@@ -392,7 +393,8 @@ sub init_fetch {
 
     # Start output stream
     my $cgi = $self->cgi();
-    print $cgi->header( -cookie=> $cgi->cookie( $main::cookie ), -type => $data->{mime}, -attachment => $data->{attachment} );
+    
+    print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
     
     if ($data->{file}) {
         open (my $fh, $data->{file}) || die 'Unable to open file';
@@ -609,9 +611,16 @@ sub __render_pager {
         $args->{pagesizes} = [25,50,100,250,500];
     }
     
+    if (!grep (/^$limit$/, @{$args->{pagesizes}}) ) {
+        push @{$args->{pagesizes}}, $limit;
+        $args->{pagesizes} = [ sort { $a <=> $b } @{$args->{pagesizes}} ];        
+    }
+    
     if (!$args->{pagersize}) {
         $args->{pagersize} = 20;
     }
+
+    $self->logger()->debug('pager query' . Dumper $args);
         
     return { 
         startat => $startat, 
@@ -619,8 +628,9 @@ sub __render_pager {
         count => $result->{count} * 1, 
         pagesizes => $args->{pagesizes}, 
         pagersize => $args->{pagersize},
-        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id}
-        # TODO order / reverse 
+        pagerurl => $result->{'type'}.'!pager!id!'.$result->{id},
+        order => $result->{query}->{ORDER} || '', 
+        reverse => $result->{query}->{REVERSE} ? 1 : 0,  
     }
 }
 

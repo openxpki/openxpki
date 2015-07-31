@@ -8,6 +8,7 @@ PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
 POT_SOURCES  = ../server ../../config 
 VERSION_FILE    = ./VERSION
+PACKAGE      ?= openxpki-i18n
 
 #---- variable settings above, rules below ----
 
@@ -88,18 +89,18 @@ VERSION=$(shell cat $(VERSION_FILE))
 
 #dist:	VERSION=`$(VERGEN) --format version`
 dist: readversion
-	if (test -d openxpki-i18n-$(VERSION)) ; then \
-		rm -rf openxpki-i18n-$(VERSION)/ ; \
+	if (test -d $(PACKAGE)-$(VERSION)) ; then \
+		rm -rf $(PACKAGE)-$(VERSION)/ ; \
 	fi
-	mkdir openxpki-i18n-$(VERSION)
+	mkdir $(PACKAGE)-$(VERSION)
 	tar -c -p -f - \
 		--exclude "*.svn" \
-		--exclude "openxpki-i18n-*" \
+		--exclude "$(PACKAGE)-*" \
 		--exclude "*.1" \
 		--exclude "*~" \
 		. | \
-		tar -C openxpki-i18n-$(VERSION)/ -x -f -
-	tar cf openxpki-i18n-$(VERSION).tar openxpki-i18n-$(VERSION)
-	gzip --best --force openxpki-i18n-$(VERSION).tar
-	rm -rf openxpki-i18n-$(VERSION)/
+		tar -C $(PACKAGE)-$(VERSION)/ -x -f -
+	tar cf $(PACKAGE)-$(VERSION).tar $(PACKAGE)-$(VERSION)
+	gzip --best --force $(PACKAGE)-$(VERSION).tar
+	rm -rf $(PACKAGE)-$(VERSION)/
 

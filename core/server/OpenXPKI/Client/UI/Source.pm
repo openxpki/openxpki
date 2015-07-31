@@ -129,7 +129,8 @@ sub _build_path {
         return $self;        
     }
     
-    my $realm_path = $self->_session->param('pki_realm').'/';
+    my $realm_path = $self->_session->param('pki_realm') || 'default';
+    $realm_path .= '/';
     
     my $path = $self->_basepath(). $realm_path . $file. '.' . $ext;
 

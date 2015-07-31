@@ -56,14 +56,15 @@ sub execute {
     ##! 8: 'Check for certificates'
     # Check for fresh revocations    
     my $db_results = CTX('dbi_backend')->select(
-        TABLE   => 'CERTIFICATE',
+        TABLE   => [ 'CERTIFICATE' ],
         DISTINCT => 1,
+        JOIN => [[ 'IDENTIFIER' ]],
         COLUMNS => [ 
-            'ISSUER_IDENTIFIER',
+            'CERTIFICATE.ISSUER_IDENTIFIER',
         ],        
         DYNAMIC => {                                      
-            'PKI_REALM' => $pki_realm,
-            'STATUS' => 'CRL_ISSUANCE_PENDING',                                     
+            'CERTIFICATE.PKI_REALM' => $pki_realm,
+            'CERTIFICATE.STATUS' => 'CRL_ISSUANCE_PENDING',                                     
         }
     );   
     my %ca_identifier;
@@ -74,7 +75,7 @@ sub execute {
             PRIORITY => 'debug',
             FACILITY => 'application',
         );                    
-        $ca_identifier{$entry->{ISSUER_IDENTIFIER}} = 1;
+        $ca_identifier{$entry->{'CERTIFICATE.ISSUER_IDENTIFIER'}} = 1;
     }
     
     my $default_renew = $config->get("crl.default.validity.renewal");

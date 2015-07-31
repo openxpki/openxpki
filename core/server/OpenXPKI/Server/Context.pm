@@ -63,37 +63,6 @@ sub CTX {
 	    );
     }}
 
-# FIXME - I guess that is obsolte as pki_realm is no longer used
-    if (grep { $_ eq 'pki_realm' } @objects) {
-        # if pki_realm is requested, check whether it was from the
-        # workflow namespace. As workflows depend on config versioning
-        # to be working properly, they should only use the
-        # pki_realm_by_cfg context entry ...
-        my $i = 0;
-        # check if someone in the caller chain comes from the workflow
-        # namespace
-        my @callers = ();
-        while (my $caller = caller($i)) {
-            # get detailed caller information for debugging purposes
-            my ($package, $filename, $line, $subroutine, $hasargs,
-                $wantarray, $evaltext, $is_require, $hints, $bitmask)
-                = caller($i);
-            push @callers, "$package:$subroutine:$line";
-
-            ##! 64: 'caller: ' . $caller
-            if ($caller =~ m{ \A OpenXPKI::Server::Workflow }xms) {
-                # caller is from the Workflow namespace or from
-                # Server::Init, so he has to provide a config identifier
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_OPENXPKI_SERVER_CONTEXT_WORKFLOW_CLASS_USED_PKI_REALM',
-                    params  => {
-                        'CALLER_CHAIN' => join(q{, }, @callers),
-                    }
-                );
-            }
-            $i++;
-        }
-    }
     # TODO: add access control? (idea: limit access to this method to
     # authorized parts of the code only, explicity excluding interface
     # implementations...)

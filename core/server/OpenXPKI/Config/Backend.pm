@@ -11,7 +11,6 @@
 package OpenXPKI::Config::Backend;
 
 use Config::Merge;
-use OpenXPKI::XML::Cache;
 use Data::Dumper;
 
 use Moose;
@@ -43,17 +42,6 @@ sub _build_config {
     my $cmref = $cm->();
 
     my $tree = $self->cm2tree($cmref);
-
-    # Incorporate the Workflow XML definitions
-    # List the realms from the system.realms tree
-    foreach my $realm (keys %{$tree->{system}->{realms}}) {
-        # TODO - MIGRATION - We load the xml code now to workflow.xml
-        my $xml = $self->LOCATION()."/realm/$realm/_workflow/workflow.xml";
-        if (-e $xml) {
-            my $xml_cache = OpenXPKI::XML::Cache->new (CONFIG => $xml);
-            $tree->{realm}->{$realm}->{workflow}->{xml} = $xml_cache->get_serialized();
-        }
-    }
 
     return $tree;
 

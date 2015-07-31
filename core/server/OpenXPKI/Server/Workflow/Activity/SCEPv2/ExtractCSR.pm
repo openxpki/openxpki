@@ -16,6 +16,7 @@ use OpenXPKI::DN;
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::X509;
 use OpenXPKI::Serialization::Simple;
+use Crypt::PKCS10;
 use Data::Dumper;
 
 sub execute {
@@ -147,23 +148,31 @@ sub execute {
 
         $context->param('cert_extension_name' => $cert_extension_name);
 
-        # Check if the extension has a profile mapping, defined in scep.<server>.profile_map
-        my $profile = $config->get("scep.$server.profile_map.$cert_extension_name");
-        if ($profile) {
-  	        # Move old profile name for reference
-            $context->param('cert_profile_default' => $context->param('cert_profile') );
-            $context->param('cert_profile' => $profile );
+        if (!$cert_extension_name) {
             CTX('log')->log(
-	            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile",
-	            PRIORITY => 'info',
-	            FACILITY => 'application',
-	        );
-        } else {
-        	CTX('log')->log(
-                MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile",
-                PRIORITY => 'warn',
+                MESSAGE => "SCEP found Microsoft Certificate Name Extension but was unable to parse it",
+                PRIORITY => 'error',
                 FACILITY => 'application',
             );
+        } else {
+            # Check if the extension has a profile mapping, defined in scep.<server>.profile_map        
+            my $profile = $config->get("scep.$server.profile_map.$cert_extension_name");
+            if ($profile) {
+      	        # Move old profile name for reference
+                $context->param('cert_profile_default' => $context->param('cert_profile') );
+                $context->param('cert_profile' => $profile );
+                CTX('log')->log(
+    	            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile",
+    	            PRIORITY => 'info',
+    	            FACILITY => 'application',
+    	        );
+            } else {
+            	CTX('log')->log(
+                    MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile",
+                    PRIORITY => 'warn',
+                    FACILITY => 'application',
+                );
+            }
         }
     }
 
@@ -242,7 +251,23 @@ sub execute {
     $context->param('cert_subject' => $cert_subject);
     $context->param('cert_subject_alt_name' => $serializer->serialize( \@subject_alt_names )) if (@subject_alt_names);
 
-    my $challenge = $csr_body->{'CHALLENGEPASSWORD'};
+
+    # test drive for new parser
+    my $decoded = Crypt::PKCS10->new( $pkcs10 );  
+    my %attrib = $decoded->attributes();
+
+    my $challenge;
+    if ($attrib{'challengePassword'}) {
+        # can be utf8string or printable 
+        my $ref = $attrib{'challengePassword'};        
+        if ($ref->{'printableString'}) {
+            $challenge = $ref->{'printableString'};
+        } elsif ($ref->{'utf8String'}) {
+            $challenge = $ref->{'utf8String'};
+        }
+        
+    }
+
     if ($challenge) {
         ##! 32: 'challenge: ' . Dumper $challenge
         $context->param('_challenge_password' => $challenge);

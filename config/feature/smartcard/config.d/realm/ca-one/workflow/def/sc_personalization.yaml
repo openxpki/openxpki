@@ -25,7 +25,7 @@ state:
     CERTIFICATE_ISSUANCE_DONE: 
         autorun: 1
         action: 
-          - global_noop > PREPARE_CERT_INST
+          - register_user_information > USER_INFO_REGISTERED
 
     CERTIFICATE_ISSUANCE_POSSIBLE: 
         autorun: 1
@@ -34,49 +34,45 @@ state:
           - global_noop2 > PIN_MISSING ? allow_user_PIN will_need_PIN
           - global_noop3 > PIN_CONTINUE ? !will_need_PIN
 
-    CERTS_DELETED: 
+    CERTS_DELETED:
         autorun: 1
         action: 
-          - queue_certs_to_revoke > CERTS_QUEUED_FOR_REVOCATION
+          - global_noop > QUEUE_FOR_REVOCATION
 
     CERTS_PUBLISHED: 
         autorun: 1
         action: 
-          - global_noop > PRE_SUCCESS
+          - global_noop > QUEUE_FOR_DEPUBLICATION
+
 
     CERTS_QUEUED_FOR_DELETION: 
         autorun: 1
         action: 
-          - global_noop > CERT_TO_DELETE ? !all_certs_deleted
-          - global_noop2 > CERTS_DELETED ? all_certs_deleted
+          - global_noop > CERTS_DELETED ? all_certs_deleted
+          - next_cert_to_delete > HAVE_CERT_TO_DELETE ? !all_certs_deleted
 
     CERTS_QUEUED_FOR_DEPUBLICATION: 
         autorun: 1
         action: 
           - global_noop > CERT_DELETE_CHECK ? all_certs_unpublished
-          - global_noop2 > CERT_TO_UNPUBLISH ? !all_certs_unpublished
+          - next_cert_to_unpublish unpublish_certificate > CERTS_QUEUED_FOR_DEPUBLICATION ? !all_certs_unpublished
 
     CERTS_QUEUED_FOR_PUBLICATION: 
         autorun: 1
         action: 
-          - global_noop > CERT_TO_PUBLISH ? !all_certs_published
-          - global_noop2 > CERTS_PUBLISHED ? all_certs_published
+          - global_noop > CERTS_PUBLISHED ? all_certs_published
+          - next_cert_to_publish publish_certificate > CERTS_QUEUED_FOR_PUBLICATION ? !all_certs_published
 
-    CERTS_QUEUED_FOR_REVOCATION: 
+    CERTS_QUEUED_FOR_REVOCATION:
         autorun: 1
         action: 
           - cleanup_workflow > SUCCESS ? all_certs_revoked
-          - global_noop > CERT_TO_REVOKE ? !all_certs_revoked
+          - next_cert_to_revoke revoke_certificate > CERTS_QUEUED_FOR_REVOCATION ? !all_certs_revoked
 
     CERT_DELETE_CHECK: 
         autorun: 1
         action: 
           - queue_certs_to_delete > CERTS_QUEUED_FOR_DELETION
-
-    CERT_ID_TO_PUBLISH: 
-        autorun: 1
-        action: 
-          - fetch_certificate_publish > HAVE_CERT_TO_PUBLISH
 
     CERT_INST_CHECK: 
         autorun: 1
@@ -89,16 +85,11 @@ state:
         action: 
           - push_cert_to_issuance_queue > CERT_QUEUED
 
-    CERT_ISSUED: 
+    CERT_ISSUED:
         autorun: 1
         action: 
           - register_cert_in_datapool > CERT_IN_DATAPOOL
-
-    CERT_PUBLISH_CHECK: 
-        autorun: 1
-        action: 
-          - queue_certs_for_publication > CERTS_QUEUED_FOR_PUBLICATION
-
+ 
     CERT_QUEUED: 
         autorun: 1
         action: 
@@ -110,37 +101,13 @@ state:
         action: 
           - calculate_key_id > KEY_ID_COMPUTED
 
-    CERT_TO_DELETE: 
-        autorun: 1
-        action: 
-          - next_cert_to_delete > HAVE_CERT_TO_DELETE
 
-    CERT_TO_INSTALL: 
+    CERT_TO_INSTALL:
         action: 
           - cert_inst_err > CERT_TO_INSTALL
           - fetch_puk > CERT_TO_INSTALL
-          - cert_inst_ok > EXPORT_QUEUE_SIG
+          - cert_inst_ok > CERT_INST_CHECK
           - fail_workflow > FAILURE
-
-    CERT_TO_PUBLISH: 
-        autorun: 1
-        action: 
-          - next_cert_to_publish > CERT_ID_TO_PUBLISH
-
-    CERT_TO_REVOKE: 
-        autorun: 1
-        action: 
-          - next_cert_to_revoke > HAVE_CERT_TO_REVOKE
-
-    CERT_TO_UNPUBLISH: 
-        autorun: 1
-        action: 
-          - next_cert_to_unpublish > HAVE_CERT_TO_UNPUBLISH
-
-    CERT_UNPUB_CHECK: 
-        autorun: 1
-        action: 
-          - queue_certs_to_unpublish > CERTS_QUEUED_FOR_DEPUBLICATION
 
     CSRS_TO_PROCESS: 
         autorun: 1
@@ -156,23 +123,14 @@ state:
     CSR_DONE: 
         autorun: 1
         action: 
-          - global_noop > PRE_ISSUANCE
+          - global_noop > CSRS_TO_PROCESS ? csrs_to_process
+          - global_noop2 > CERTIFICATE_ISSUANCE_DONE ? !csrs_to_process
 
     ESCROW_CERT_TO_INSTALL: 
         autorun: 1
         action: 
           - global_noop > CERT_INST_CHECK ? !private_key_exists_in_datapool
           - global_noop2 > PKCS12_TO_INSTALL ? private_key_exists_in_datapool
-
-    EXPORT_QUEUE_ENC: 
-        autorun: 1
-        action: 
-          - add_to_queue_enc > CERT_INST_CHECK
-
-    EXPORT_QUEUE_SIG: 
-        autorun: 1
-        action: 
-          - add_to_queue_sig > CERT_INST_CHECK
 
     FAILURE: 
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL
@@ -194,21 +152,6 @@ state:
           - fetch_puk > HAVE_CERT_TO_DELETE
           - cert_del_ok > CERTS_QUEUED_FOR_DELETION
           - cert_del_err > HAVE_CERT_TO_DELETE
-
-    HAVE_CERT_TO_PUBLISH: 
-        autorun: 1
-        action: 
-          - publish_certificate > CERTS_QUEUED_FOR_PUBLICATION
-
-    HAVE_CERT_TO_REVOKE: 
-        autorun: 1
-        action: 
-          - revoke_certificate > CERTS_QUEUED_FOR_REVOCATION
-
-    HAVE_CERT_TO_UNPUBLISH: 
-        autorun: 1
-        action: 
-          - unpublish_certificate > CERTS_QUEUED_FOR_DEPUBLICATION
 
     HAVE_COMPUTED_PUK: 
         autorun: 1
@@ -259,7 +202,7 @@ state:
     INSTALL_CERTIFICATE_DONE: 
         autorun: 1
         action: 
-          - global_noop > CERT_PUBLISH_CHECK
+          - queue_issued_certs_for_publication queue_installed_certs_for_publication > CERTS_QUEUED_FOR_PUBLICATION
 
     ISSUE_CERT: 
         autorun: 1
@@ -303,7 +246,7 @@ state:
     NEW_ESCROW_CERT_ISSUED: 
         autorun: 1
         action: 
-          - rename_key > PRIVATE_KEY_RENAMED
+          - rename_key > CAN_ISSUE
 
     NEXT_CSR_TO_ISSUE: 
         autorun: 1
@@ -314,11 +257,6 @@ state:
         autorun: 1
         action: 
           - compute_puk > HAVE_COMPUTED_PUK
-
-    OWNER_IDENTIFIED: 
-        autorun: 1
-        action: 
-          - global_noop > HAVE_PREREQS
 
     PERSIST_CSRS: 
         autorun: 1
@@ -357,18 +295,13 @@ state:
           - refetch_p12 > PREPARE_ESCROW_CERT_INSTALLATION
           - fetch_puk > PKCS12_TO_INSTALL
           - fail_workflow > FAILURE
-          - cert_inst_ok > EXPORT_QUEUE_ENC
+          - cert_inst_ok > CERT_INST_CHECK
 
     POLICY_INPUT_REQUIRED: 
         action: 
           - apply_csr_policy > QUEUE_CSR_TO_ISSUE
           - fail_workflow > FAILURE
           - fetch_puk > POLICY_INPUT_REQUIRED
-
-    PREPARE_CERT_INST: 
-        autorun: 1
-        action: 
-          - register_user_information > USER_INFO_REGISTERED
 
     PREPARE_CSRS_TO_PROCESS: 
         autorun: 1
@@ -380,31 +313,10 @@ state:
         action: 
           - create_pkcs12_password > PKCS12_PASSWORD_ENCRYPTED
 
-    PREP_LOOP_NEED_CSR: 
-        autorun: 1
-        action: 
-          - init_tmp_list_csr > BEGIN_LOOP_NEED_CSR
-
     PREREQS_AVAILABLE: 
         autorun: 1
         action: 
-          - set_workflow_attributes > OWNER_IDENTIFIED
-
-    PRE_ISSUANCE: 
-        autorun: 1
-        action: 
-          - global_noop > CSRS_TO_PROCESS ? csrs_to_process
-          - global_noop2 > CERTIFICATE_ISSUANCE_DONE ? !csrs_to_process
-
-    PRE_SUCCESS: 
-        autorun: 1
-        action: 
-          - global_noop > CERT_UNPUB_CHECK
-
-    PRIVATE_KEY_RENAMED: 
-        autorun: 1
-        action: 
-          - add_escrow_cert_to_publish_queue > CAN_ISSUE
+          - set_workflow_attributes > HAVE_PREREQS
 
     PUK_TO_INSTALL: 
         action: 
@@ -423,11 +335,20 @@ state:
         action: 
           - queue_csr_to_issue > BEGIN_LOOP_NEED_CSR ? !policy_input_required
           - global_noop > POLICY_INPUT_REQUIRED ? policy_input_required
+    QUEUE_FOR_DEPUBLICATION:
+        autorun: 1
+        action: 
+          - queue_certs_to_unpublish > CERTS_QUEUED_FOR_DEPUBLICATION
+
+    QUEUE_FOR_REVOCATION: 
+        autorun: 1
+        action: 
+          - queue_certs_to_revoke > CERTS_QUEUED_FOR_REVOCATION
 
     START_ACTIONS: 
         autorun: 1
         action: 
-          - global_noop > PREP_LOOP_NEED_CSR
+          - init_tmp_list_csr > BEGIN_LOOP_NEED_CSR
 
     SUCCESS: 
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
@@ -450,33 +371,6 @@ state:
 
 
 action:
-    add_escrow_cert_to_publish_queue: 
-        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
-        input: 
-          - cert_identifier
-        param: 
-            array_name: certs_to_publish
-            context_key: cert_identifier
-            function: push
-
-    add_to_queue_enc: 
-        class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::AddToQueue
-        param: 
-            _map_EmployeeID: $userinfo_employee_id
-            _map_certType: enc
-            _map_email: $userinfo_mail
-            attribs: EmployeeID,certType,email
-            namespace: export.smartcard.transfer
-
-    add_to_queue_sig: 
-        class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::AddToQueue
-        param: 
-            _map_EmployeeID: $userinfo_employee_id
-            _map_certType: sig
-            _map_email: $userinfo_mail
-            attribs: EmployeeID,certType,email
-            namespace: export.smartcard.transfer
-
     apply_csr_policy: 
         class: OpenXPKI::Server::Workflow::Activity::SmartCard::ApplyCSRPolicy
         input: 
@@ -527,10 +421,17 @@ action:
         param: 
             SetContextParameters: overwritecontext
             _keypassword: OpenXPKI
-            cert_install_type: 
-            certificate: 
-            pkcs10: 
-            temp_key_handle: 
+            cert_install_type: "" 
+            certificate: "" 
+            pkcs10: ""
+            temp_key_handle: ""
+            cert_identifier: ""
+            cert_install_type: ""
+            cert_issuance_data: ""	
+            certificate: ""
+            csr_cert_type: ""
+            csr_serial: ""
+            certs_on_card: ""
 
     clear_passwords: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
@@ -606,13 +507,6 @@ action:
             function: shift
 
     fetch_certificate: 
-        class: OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate
-        input: 
-          - cert_identifier
-        param: 
-            certstatus: ANY
-
-    fetch_certificate_publish: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate
         input: 
           - cert_identifier
@@ -728,14 +622,16 @@ action:
         class: Workflow::Action::Null
         input: 
           - sc_error_reason
-
+  
     publish_certificate: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
+# if you want to fork a new workflow for each publication, use this class instead
+#       class: OpenXPKI::Server::Workflow::Activity::Tools::TriggerCertificatePublish
         input: 
           - cert_identifier
         param: 
-            prefix: smartcard.publishing
-            publish_key: userinfo_mail
+            export_context: 1
+            _map_publish_key: userinfo_mail
 
     puk_write_err: 
         class: Workflow::Action::Null
@@ -752,14 +648,20 @@ action:
             context_key: cert_identifier
             function: push
 
-    queue_certs_for_publication: 
+    queue_issued_certs_for_publication: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
-        input: 
-          - certs_to_publish
         param: 
             array_name: tmp_queue
-            context_key: certs_to_publish
+            context_key: certs_issued
             function: pusharray
+
+    queue_installed_certs_for_publication: 
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param: 
+            array_name: tmp_queue
+            context_key: certs_to_install
+            function: pusharray
+
 
     queue_certs_to_delete: 
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray

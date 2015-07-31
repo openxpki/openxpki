@@ -255,10 +255,10 @@ sub __do_init_config_versioned {
 sub __do_init_config_test {
     ##! 1: "init OpenXPKI config"
     require OpenXPKI::Config::Test;
-    my $xml_config = OpenXPKI::Config::Test->new();
+    my $config = OpenXPKI::Config::Test->new();
     OpenXPKI::Server::Context::setcontext(
     {
-        config => $xml_config,
+        config => $config,
     });
     return 1;
 }
@@ -499,14 +499,14 @@ sub get_dbi
 
     ##! 1: "start"
 
-    my $xml_config = CTX('config');
+    my $config = CTX('config');
     my %params;
 
     my $dbpath = 'system.database.main';
     if (exists $args->{PURPOSE} && $args->{PURPOSE} eq 'log') {
         ##! 16: 'purpose: log'
         # if there is a logging section we use it
-        if ($xml_config->exists('system.database.logging')) {
+        if ($config->exists('system.database.logging')) {
             ##! 16: 'use logging section'
             $dbpath = 'system.database.logging';
         }
@@ -516,18 +516,18 @@ sub get_dbi
         %params = (LOG => CTX('log'));
     }
 
-    my $db_config = $xml_config->get_hash($dbpath);
+    my $db_config = $config->get_hash($dbpath);
 
     foreach my $key (qw(type name namespace host port user passwd)) {
         ##! 16: "dbi: $key => " . $db_config->{$key}
         $params{uc($key)} = $db_config->{$key};
     }
 
-   $params{SERVER_ID} = $xml_config->get('system.server.node.id');
-   $params{SERVER_SHIFT} = $xml_config->get('system.server.shift');
+   $params{SERVER_ID} = $config->get('system.server.node.id');
+   $params{SERVER_SHIFT} = $config->get('system.server.shift');
 
     # environment
-    my $db_env = $xml_config->get_hash("$dbpath.environment");
+    my $db_env = $config->get_hash("$dbpath.environment");
     foreach my $env_name (keys %{$db_env}) {
         my $env_value = $db_env->{$env_name};
         $ENV{$env_name} = $env_value;
@@ -616,7 +616,7 @@ between steps by providing an array reference TASKS as a named argument:
 
   OpenXPKI::Server::Init::init({
          CONFIG => 't/config.xml',
-         TASKS  => [ 'xml_config', 'i18n', 'log' ],
+         TASKS  => [ 'config', 'i18n', 'log' ],
      });
 
 and later simply call
@@ -644,7 +644,7 @@ be processed.
 Returns a workflow factory which already has the configuration added
 from the configuration files and is ready for use.
 
-=head3 get_xml_config
+=head3 get_config
 
 expects as only parameter the option CONFIG. This must be a filename
 of an XML configuration file which is compliant with OpenXPKI's schema
@@ -670,7 +670,7 @@ Prepares a hash which has the following structure.
 
 $hash{PKI_REALM_NAME}->{"crypto"}->{"default"}
 
-Requires 'xml_config', 'log' and 'crypto_layer' in the Server Context.
+Requires 'config', 'log' and 'crypto_layer' in the Server Context.
 
 The hash also includes validity information as defined in the configuration
 in the following sample format:
@@ -730,7 +730,7 @@ The ID of CRL validities is the internal CA name.
 
 Initializes the database interface and returns the database object reference.
 
-Requires 'log' and 'xml_config' in the Server Context.
+Requires 'log' and 'config' in the Server Context.
 
 If database type is SQLite and the named parameter 'PURPOSE' exists,
 this parameter is appended to the SQLite database name.
@@ -741,7 +741,7 @@ open transactions on the same database.
 
 Returns an instance of the module OpenXPKI::Log.
 
-Requires 'xml_config' in the Server Context.
+Requires 'config' in the Server Context.
 
 =head3 get_log
 

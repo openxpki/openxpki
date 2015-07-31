@@ -45,7 +45,7 @@ $log->debug('Modules loaded: ' . join(", ", @soap_modules));
 sub handler {
 
     #warn "Entered OpenXPKI::Server::SOAP::handler";
-    my $oSoapHandler = SOAP::Transport::HTTP::Apache
+    my $oSoapHandler = SOAP::Transport::HTTP::CGI
         ->dispatch_to( @soap_modules )->handle;
 }
 

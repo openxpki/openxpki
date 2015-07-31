@@ -21,7 +21,6 @@ OpenXPKI/Template/Plugin/Certificate.pm
 OpenXPKI/Template/Plugin/CheckDNS.pm
 OpenXPKI/Template/Plugin/Profile.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
-OpenXPKI/XML/Cache.pm
 OpenXPKI/i18n.pm
 openxpki.xsd
 
@@ -389,7 +388,6 @@ OpenXPKI/Server/Workflow/Condition/Smartcard/AuthIdValid.pm
 OpenXPKI/Server/Workflow/Validator.pm
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
 OpenXPKI/Server/Workflow/Validator/Creator.pm
-OpenXPKI/Server/Workflow/Validator/CertRole.pm
 OpenXPKI/Server/Workflow/Validator/CertProfile.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
@@ -674,6 +672,8 @@ bin/openxpkicmd
 cgi-bin/scep
 cgi-bin/webui.fcgi
 cgi-bin/sc.fcgi
+cgi-bin/soap.fcgi
+cgi-bin/download.fcgi
 
 # Client UI
 htdocs/src/main-built.js

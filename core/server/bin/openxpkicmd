@@ -27,6 +27,7 @@ my %params = (
     nosplit => undef,
     context => undef,
     attribute => undef,
+    timeout => 30,
     );
 
 sub debug {
@@ -73,6 +74,7 @@ GetOptions(\%params,
             debug
             context
             attribute
+            timeout|to=i
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -120,6 +122,7 @@ my $reply;
 my $client = OpenXPKI::Client->new(
     {
     SOCKETFILE => $params{socketfile},
+    TIMEOUT  => $params{timeout},
     });
 
 
@@ -286,6 +289,7 @@ openxpkicmd [options] WORKFLOW_TYPE
     --debug               enable debug mode
     --context             show context data
     --attribute           show attribute data
+    --timeout             socket timeout in seconds (default 30s)
 
 =head1 INVOCATION
 

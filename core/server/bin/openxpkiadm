@@ -1395,7 +1395,6 @@ if ($cmd eq 'initdb') {
       filter=s
       identifier=s
       subject
-      group=s
       nogroup
     );
     __init();

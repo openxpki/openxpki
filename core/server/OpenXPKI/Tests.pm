@@ -37,6 +37,8 @@ use Exporter 'import';
     wfstate_is
 );
 
+
+## TODO - this uses only outdated stuff
 sub deploy_test_server {
     my $arg_ref     = shift;
     my $instancedir = $arg_ref->{DIRECTORY};
@@ -128,11 +130,6 @@ sub deploy_test_server {
 
     # and back
     chdir($dir);
-
-    if ( !-e "$instancedir/etc/openxpki/config.xml" ) {
-        diag("config.xml does not exist");
-        return 0;
-    }
 
     $args = '';
     if ( $ENV{DEBUG} ) {

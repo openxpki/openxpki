@@ -93,7 +93,6 @@ sub start {
     if (ref $debug eq '') {
         if ($debug > 0) {
             $OpenXPKI::Debug::LEVEL{'.*'} = $debug;
-            $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'}  = 0;
         }
     } elsif(ref $debug eq 'HASH') {
         foreach my $module (keys %{$debug}) {

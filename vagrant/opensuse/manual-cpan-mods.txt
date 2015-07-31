@@ -1,0 +1,15 @@
+indirect
+bareword::filehandles
+multidimensional
+Inline::C
+FCGI
+Net::SSL
+Net::LDAP
+Net::Server
+Variable::Magic
+Class::Accessor::Chained::Fast
+Text::CSV_XS
+SOAP::Lite
+JSON
+IO::Prompt
+Crypt::PKCS10

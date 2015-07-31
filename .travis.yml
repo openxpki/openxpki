@@ -18,13 +18,8 @@ before_install:
 # Try to get debug from inst stuff
 install:
     - cpanm --notest Config::Std Config::Merge Template Proc::SafeExec Module::Install YAML DBD::mysql
-#    - "(wget -O Config-Versioned.tar.gz https://github.com/mrscotty/Config-Versioned/tarball/master && tar xzf Config-Versioned.tar.gz)"
-## Install Config::Versioned prereqs with --notest before installing Config::Versioned itself
-#    - "(cd mrscotty-Config-Versioned-* && cpanm --quiet --installdeps --notest .)"
-#    - "(cd mrscotty-Config-Versioned-* && cpanm --quiet .)"
-#    - "(wget -O Connector.tar.gz https://github.com/mrscotty/connector/tarball/master && tar xzf Connector.tar.gz)"
-#    - "(cd mrscotty-connector-* && cpanm .)"
-    - "(cd core/server && cpanm --quiet --installdeps --notest .)"
+# Note: Setting PERL=perl causes Makefile.PL to use the perlbrew perl ifrom PATH
+    - "(cd core/server && PERL=perl cpanm --quiet --installdeps --notest .)"
 # The core tests depend on the client library - we install it in a separate perlbrew library space
 #    - "perlbrew lib delete oxi-client; perlbrew lib create oxi-client"
 #    - "(cd core/server && cpanm --quiet --notest .)"

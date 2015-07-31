@@ -124,6 +124,13 @@ sub init_result {
     my $query = $result->{query};    
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
+    
+    if (!$query->{ORDER}) {
+        $query->{ORDER} = 'CERTIFICATE.NOTBEFORE';
+        if (!defined $query->{REVERSE}) {
+            $query->{REVERSE} = 1;
+        }
+    }
 
     $self->logger()->debug( "persisted query: " . Dumper $result);
 
@@ -136,7 +143,10 @@ sub init_result {
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC',
     });
 
-    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    my $pager;
+    if ($startat != 0 || @{$search_result} == $limit) {
+        $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    }
 
     my @result = $self->__render_result_list( $search_result );
     
@@ -218,7 +228,7 @@ sub init_pager {
         $query->{ORDER} = uc($self->param('order'));
     }
     
-    if (defined  $self->param('reverse')) {
+    if (defined $self->param('reverse')) {
         $query->{REVERSE} = $self->param('reverse');
     }
 
@@ -262,8 +272,10 @@ sub init_mine {
         CERT_ATTRIBUTES => [{ 
             KEY => 'system_cert_owner', 
             VALUE =>  $self->_session->param('user')->{name}, 
-            OPERATOR => 'EQUAL' 
-        }]
+            OPERATOR => 'EQUAL'
+        }],
+        ORDER => 'CERTIFICATE.NOTBEFORE',
+        REVERSE => 1,
     };
 
     $self->logger()->debug( "search query: " . Dumper $query);
@@ -273,7 +285,11 @@ sub init_mine {
     my $result_count = scalar @{$search_result};
     my $pager;
     if ($result_count == $limit) {
-        $result_count = $self->send_command( 'search_cert_count', $query );
+        my %count_query = %{$query};
+        delete $count_query{ORDER};
+        delete $count_query{REVERSE};
+        
+        $result_count = $self->send_command( 'search_cert_count', \%count_query );
 
         my $queryid = $self->__generate_uid();
         my $_query = {
@@ -802,10 +818,18 @@ sub action_search {
 
     my $query = { ENTITY_ONLY => 1 }; 
     my $input = {}; # store the input data the reopen the form later
-    foreach my $key (qw(subject issuer_dn profile)) {
+    foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
             $query->{uc($key)} = '%'.$val.'%';
+            $input->{$key} = $val;
+        }
+    }
+    
+    foreach my $key (qw(profile)) {
+        my $val = $self->param($key);
+        if (defined $val && $val ne '') {
+            $query->{uc($key)} = $val;
             $input->{$key} = $val;
         }
     }

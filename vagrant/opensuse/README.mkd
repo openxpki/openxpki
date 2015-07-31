@@ -1,0 +1,29 @@
+# Building RPM Packages for (Open)SuSE
+
+This vagrant configuration is used for creating RPM packages on
+OpenSuSE and SuSE.
+
+# Prerequisites
+
+On your development workstation, you'll need the following
+
+* VirtualBox
+* Vagrant
+* Local Git repository clones:
+  * ~/git/myperl
+  * ~/git/openxpki
+
+# Quickstart
+
+TIP: The 'git clone' in the vagrant build instance will set the current
+branch to the one current in your working repository in ~/git/myperl and
+~/git/openxpki, so be sure you have the correct branch checked out there.
+
+To build myperl and the openxpki core packages, run the following:
+
+	vagrant up build
+	vagrant ssh build --command '/vagrant/build.mk git-clone'
+	vagrant ssh build --command '/vagrant/build.mk myperl'
+	vagrant ssh build --command '/vagrant/build.mk myperl-buildtools'
+	vagrant ssh build --command '/vagrant/build.mk myperl-openxpki-core-deps'
+	vagrant ssh build --command '/vagrant/build.mk myperl-openxpki-core'

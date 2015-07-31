@@ -295,75 +295,7 @@ sub get_field_definition {
 
 }
 
-sub get_possible_profiles_for_role {
-    my $self      = shift;
-    my $arg_ref   = shift;
-    my $req_role  = $arg_ref->{ROLE};
-
-    ##! 1: 'start'
-    ##! 16: 'Requested role ' . $req_role
-
-    my $config = CTX('config');
-    my @profiles = $config->get_keys('profile');
-    my @matching_profiles;
-
-    PROFILE:
-    foreach my $profile (@profiles) {
-        my @roles = $config->get_list("profile.$profile.role");
-        ##! 16: "Profile $profile, Roles " .join " ", @roles
-        if (grep /^$req_role$/,  @roles) {
-            ##! 16: 'Profile matches role'
-            if (!$arg_ref->{NOHIDE}) {
-                ##! 16: 'Test for ui profile'
-                my @style_names = $config->get_keys(['profile', $profile, 'style' ]);
-                foreach my $style (@style_names) {
-                    if ($config->exists(['profile', $profile, 'style', $style, 'ui' ])) {
-                        ##! 16: 'Found ui style ' . $style
-                        push @matching_profiles, $profile;
-                        next PROFILE;
-                    }
-                }
-            } else {
-                push @matching_profiles, $profile;
-            }
-        }
-    }
-
-
-
-
-    ##! 1: 'end'
-    return \@matching_profiles;
-}
-
-
-sub get_available_cert_roles {
-    my $self      = shift;
-    my $arg_ref   = shift;
-
-    my %available_roles = ();
-
-    ##! 1: 'start'
-    my $config = CTX('config');
-    my @profiles;
-    if ($arg_ref->{PROFILES}) {
-        @profiles = @{$arg_ref->{PROFILES}};
-    } else {
-        @profiles = $config->get_keys('profile');
-    }
-
-    ##! 16: 'Profiles ' .join " ", @profiles
-    foreach my $profile (@profiles) {
-        my @roles = $config->get_list("profile.$profile.role");
-        ##! 16: 'Roles ' .join " ", @roles
-        map { $available_roles{$_} = 1 if ($_); } @roles;
-    }
-
-    ##! 1: 'end'
-    my @roles = keys %available_roles;
-    return \@roles;
-}
-
+ 
 sub get_cert_profiles {
 
     my $self = shift;

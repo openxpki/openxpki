@@ -40,12 +40,6 @@ sub execute {
 	    
     my $source_file = $self->param('source');
     
-	##! 32: 'source (unparsed) ' . $source_file            
-    if ($source_file =~ /^\$(\w+)/) {    	
-		$source_file = $context->param( $1 );   			
-		##! 32: 'source (context) ' . $source_file
-    }
-    
     if (!$source_file) {
     	configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_SOURCEFILE' );    		    
     }
@@ -57,14 +51,7 @@ sub execute {
 		);	
 	}        
 
-
-    my $target_file = $self->param('target');
-    ##! 32: 'target (unparsed) ' . $target_file            
-    
-    if ($target_file =~ /^\$(\w+)/) {    	
-		$target_file = $context->param( $1 );
-	    ##! 32: 'target (context) ' . $target_file		   	
-    }
+    my $target_file = $self->param('target'); 
 
 	my %filehandles;        
     my $stdout = File::Temp->new();
@@ -159,19 +146,17 @@ Copy a local file to a remote host using scp with key authentication
 
 The configuration is twofold, you need to give some data in the action config
 
-    <action name="transfer_file"
-         class="OpenXPKI::Server::Workflow::Activity::Transfer::SCP"
-         transfer="export.transfer"
-         source="$source_filename">
-         target="$target_name">
-    </action>
-
+   class: OpenXPKI::Server::Workflow::Activity::Transfer::SCP
+    param:
+        retry_count: 5
+        retry_interval: +0000000005
+        _map_source: $sourcefile
+        _map_target: $targetfile
+        transfer: export.transfer
 
 Transfer points to a datapoint of the config where the connection information
-for scp is set (see below). Source is the name of the source file, when prefixed
-with a $, the actual file name is read from this context value.  
-Target is optional and appended to the target given in the transfer config,
-context expansion is available.
+for scp is set (see below). Source is the name of the source file, target is 
+optional and appended to the target given in the transfer config.
 
 The configuration of the transport layer is done via the config layer:
 
@@ -186,4 +171,3 @@ Target is mandatory and must contain the full target as expected by the scp comm
 As default command /usr/bin/scp is used, you might give an alternative here.
 All other options are optional and passed to the scp command using the 
 appropriate command line flags.    
-   

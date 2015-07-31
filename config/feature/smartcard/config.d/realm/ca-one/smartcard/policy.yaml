@@ -13,7 +13,6 @@ certs:
             allow_renewal: -0003
             force_renewal: -000014
             escrow_key: 0
-            publish: 0
             purge_invalid: 0
             renew_on_ownerchange: 0
             revoke_unused: 0
@@ -30,7 +29,6 @@ certs:
             allow_renewal: -0003
             force_renewal: -000014
             escrow_key: 0
-            publish: 0
             purge_invalid: 0
             renew_on_ownerchange: 1
             revoke_unused: 1
@@ -50,7 +48,6 @@ certs:
             force_renewal: -000014
             lead_validity: 1
             escrow_key: 1
-            publish: 1
             purge_invalid: 0
             renew_on_ownerchange: 1
 
