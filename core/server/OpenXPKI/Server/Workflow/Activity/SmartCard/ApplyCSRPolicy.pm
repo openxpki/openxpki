@@ -64,8 +64,11 @@ sub execute {
                 FACILITY => [ 'audit', 'application', ],
             );
         }  else {
-            # Fetch validity from profile if no testing value is set
+            # Fetch validity from profile/default if no testing value is set
             $validity = $config->get("profile.$cert_profile.validity.notafter");
+            if (!$validity) {
+                $validity = $config->get("profile.default.validity.notafter");    
+            }
             CTX('log')->log(
                 MESSAGE => "Certificate validity configured for profile '$cert_profile': $validity",
                 PRIORITY => 'info',
