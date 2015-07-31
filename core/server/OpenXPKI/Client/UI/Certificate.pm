@@ -59,7 +59,7 @@ sub init_search {
     my @fields = (
         { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
         { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
-#        { name => 'cert_serial', label => 'Serial', type => 'text', is_optional => 1, value => $preset->{cert_serial} },
+        { name => 'cert_serial', label => 'Serial', type => 'text', is_optional => 1, value => $preset->{cert_serial} },
         { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
         { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
    );
@@ -90,20 +90,6 @@ sub init_search {
            fields => \@fields
         }},        
     );
-
-
-    $self->add_section({
-        type => 'form',
-        action => 'certificate!search',
-        content => {
-            label => 'Direct search',
-            description => 'Search a single certificate by serial (hex or decimal) or identifier.',
-            submit_label => 'search now',
-            fields => [
-                { name => 'cert_serial', label => 'Serial', type => 'text', is_optional => 1, value => $preset->{cert_serial} },
-                { name => 'cert_identifier', label => 'Identifier', type => 'text', is_optional => 1, value => $preset->{cert_identifier} },
-            ]
-    }});
 
     return $self;
 }
@@ -395,7 +381,7 @@ sub init_detail {
 
     my @fields = (
         { label => 'Subject', value => $cert->{SUBJECT} },
-        { label => 'Serial', value => '0x'.$cert->{CERTIFICATE_SERIAL_HEX} },
+        { label => 'Serial', value => $cert->{CERTIFICATE_SERIAL_HEX} },
         { label => 'Identifier', value => $cert_identifier },
         { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{NOTAFTER}, format => 'timestamp' },
@@ -859,8 +845,6 @@ sub action_search {
             $val = '0x' . $val;
         }
         if (substr($val,0,2) eq '0x') {
-            # strip whitespace
-            $val =~ s/\s//g;
             my $sn = Math::BigInt->new( $val );
             $val = $sn->bstr();
         }
