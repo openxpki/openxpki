@@ -231,15 +231,18 @@ action:
 
 
 condition:
+
     acl_can_approve:
-        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        class: Workflow::Condition::LazyAND
         param:
-            roles: CA Operator,RA Operator
+            condition1: global_is_operator
+#           condition2: "!global_is_creator"
 
     acl_can_reject:
-        class: OpenXPKI::Server::Workflow::Condition::HasRole
+        class: Workflow::Condition::LazyAND
         param:
-            roles: CA Operator,RA Operator
+            condition1: global_is_operator
+#           condition2: "!global_is_creator"
 
     is_not_yet_revoked_or_pending:
         class: OpenXPKI::Server::Workflow::Condition::CertificateNotYetRevoked
