@@ -2,6 +2,16 @@
 `import Em from "vendor/ember"`
 `import moment from "vendor/moment"`
 
+jQuery.extend jQuery.expr[':'],
+    cleanup: (el) ->
+        ret = false
+        names = (attr.nodeName for attr in el.attributes \
+                    when /^on/.test(attr.nodeName) \
+                    or /javascript/.test attr.value)
+        for name in names
+            el.removeAttribute name
+        true
+
 Component = Em.Component.extend
     onAnchorClick: Em.on "click", (evt) ->
         target = evt.target
@@ -18,8 +28,8 @@ Component = Em.Component.extend
         certstatus: (v) -> "<span class='certstatus-#{(v.value||v.label).toLowerCase()}'>#{v.label}</span>"
         link: (v) -> "<a href='#/openxpki/#{v.page}' target='#{v.target||"modal"}'>#{v.label}</a>"
         extlink: (v) -> "<a href='#{v.page}' target='#{v.target||"_blank"}'>#{v.label}</a>"
-        timestamp: (v) -> 
-          if v > 0 
+        timestamp: (v) ->
+          if v > 0
             moment.unix(v).utc().format("YYYY-MM-DD HH:mm:ss UTC")
           else
             "---"
@@ -30,8 +40,14 @@ Component = Em.Component.extend
         defhash: (v) -> "<dl>#{(for k, w of v then "<dt>#{k}</dt><dd>#{w}</dd>").join ""}</dl>"
         deflist: (v) -> "<dl>#{(for w in v then "<dt>#{w.label}</dt><dd>#{w.value}</dd>").join ""}</dl>"
         ullist: (v) -> "<ul class=\"list-unstyled\">#{(for w in v then "<li>#{w}</li>").join ""}</ul>"
-        
+
     formatedValue: Em.computed "content.format", "content.value", ->
-        @get("types")[@get("content.format")||"text"](@get "content.value")
+        e = @get("types")[@get("content.format")||"text"](@get "content.value")
+        $el = $ '<div/>'
+        $el
+            .html e
+            .find ':cleanup'
+        return $el.html()
+
 
 `export default Component`
