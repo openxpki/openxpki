@@ -175,7 +175,7 @@ sub set_status_from_error_reply {
         $self->logger()->error($message);
         
         if ($message !~ /I18N_OPENXPKI_UI_/) {
-            $message = 'I18N_OPENXPKI_UI_UNKNOWN_ERROR';        
+            $message = 'I18N_OPENXPKI_UI_UNKNOWN_ERROR';
         }        
         
     } else {
