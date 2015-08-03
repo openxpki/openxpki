@@ -43,6 +43,12 @@ sub init_structure {
         
     }
     
+    # To issue redirects to the UI, we store the referrer
+    my $baseurl = $self->param('baseurl');
+    $baseurl =~ s|/$||;
+    $session->param('baseurl',  $baseurl.'/#/');
+    $self->logger->debug("Baseurl from referrer: " . $baseurl);
+    
     if (!$self->_result()->{structure}) {
         $self->_result()->{structure} =
         [{

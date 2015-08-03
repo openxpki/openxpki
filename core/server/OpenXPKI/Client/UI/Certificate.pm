@@ -969,7 +969,7 @@ sub action_privkey {
         content => {
            title => '',
            description => 'Password accepted - <a href="'.$link.'" target="_blank">click here to download your key</a>.<br>
-           <b>The link expires after 60 seconds.</b>'
+           Do not bookmark this link, it is temporary and will expire!'
     }});
 
     return $self;

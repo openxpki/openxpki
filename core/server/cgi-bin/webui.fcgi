@@ -139,9 +139,7 @@ while (my $cgi = CGI::Fast->new()) {
             $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR')
         }
 
-        my $accept = $cgi->http('HTTP_ACCEPT');
-        my $xreq = $cgi->http('HTTP_X-REQUESTED-WITH');
-        if ($accept =~ /json/ || $xreq) {
+        if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
             print $cgi->header( -type => 'application/json' );
             print $json->encode( { status => { 'level' => 'error', 'message' => $error } });
         } else {

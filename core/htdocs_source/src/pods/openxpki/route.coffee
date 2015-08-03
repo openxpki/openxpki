@@ -31,7 +31,9 @@ Route = Em.Route.extend
         model_id = req.params.openxpki.model_id
 
         if not source.get("navEntries.length") or model_id in @needReboot
-            @sendAjax data: page: "bootstrap!structure"
+            @sendAjax data: 
+                page: "bootstrap!structure"
+                baseurl: window.location.pathname
 
     model: (req) ->
         navEntries = @get "source.navEntries"

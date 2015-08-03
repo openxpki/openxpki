@@ -342,10 +342,13 @@ sub render {
 
     my $json = new JSON()->utf8;
     my $body;
-    if (ref $self->redirect() eq 'HASH') {
-        $body = $json->encode( $self->redirect() );
-    } elsif ($self->redirect()) {
-        $body = $json->encode({ goto => $self->redirect() } );
+    my $redirect;
+    
+    if ($redirect = $self->redirect()) {         
+        if (ref $redirect ne 'HASH') {
+            $redirect = { goto => $redirect };
+        }
+        $body = $json->encode( $redirect );        
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );
     } else {
@@ -353,16 +356,22 @@ sub render {
         $body = i18nTokenizer ( $json->encode($result) );
     }
 
+    my $cgi = $self->cgi();
     # Return the output into the given pointer
     if ($output && ref $output eq 'SCALAR') {
-        $$output = $body;
-    } else {
-        # Start output stream
-        my $cgi = $self->cgi();
+        $$output = $body;        
+    } elsif ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+        # Start output stream        
         print $cgi->header( @main::header );        
         print $body;
+    } else {
+        # Do a redirect to the baseurl
+        my $url = $self->_session()->param('baseurl');
+        if (ref $redirect eq 'HASH' && $redirect->{goto}) {
+            $url .= $redirect->{goto};
+        }
+        print $cgi->redirect($url);
     }
-
 
     return $self;
 }
