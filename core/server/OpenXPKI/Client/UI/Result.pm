@@ -171,7 +171,13 @@ sub set_status_from_error_reply {
         } elsif($reply->{'LIST'}->[0]->{LABEL}) {
             $message = $reply->{'LIST'}->[0]->{LABEL};
         }
+        
         $self->logger()->error($message);
+        
+        if ($message !~ /I18N_OPENXPKI_UI_/) {
+            $message = 'I18N_OPENXPKI_UI_UNKNOWN_ERROR';        
+        }        
+        
     } else {
         $self->logger()->trace(Dumper $reply);
     }
