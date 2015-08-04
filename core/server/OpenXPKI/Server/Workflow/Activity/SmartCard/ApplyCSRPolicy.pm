@@ -56,7 +56,7 @@ sub execute {
 		);
 
         # Check for testing override
-        my $validity = $config->get("testing.smartcard.max_validity");
+        my $validity = $config->get("smartcard.testing.max_validity");
         if ($validity) {
             CTX('log')->log(
                 MESSAGE => "Certificate validity override for testing: $validity",
