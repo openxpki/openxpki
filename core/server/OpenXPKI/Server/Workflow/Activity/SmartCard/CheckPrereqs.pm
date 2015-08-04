@@ -208,6 +208,8 @@ sub execute {
             OUTFORMAT => 'terse',
         });
         $context->param('max_validity' => $max_validity);
+        $context->param('notafter' => $max_validity);
+        
     } else {
         $context->param('max_validity' => 0);
     }
