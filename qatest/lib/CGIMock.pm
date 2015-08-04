@@ -54,5 +54,6 @@ sub url_param {
 
 sub header {}
 sub cookie {}
+sub http {  return 1; }
 
 1;
