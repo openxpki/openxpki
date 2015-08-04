@@ -563,14 +563,8 @@ t/50_auth/create_certs.pl
 
 t/60_workflow/00.t2
 t/60_workflow/01.t
-t/60_workflow/01_workflow_activity.xml
-t/60_workflow/01_workflow_persister.xml
-t/60_workflow/01_workflow.xml
-t/60_workflow/03_convert.t
 t/60_workflow/04_factory.t
 t/60_workflow/05_overlapping_factory.t
-t/60_workflow/05_workflow2.xml
-t/60_workflow/05_workflow.xml
 t/60_workflow/09_deploy_and_start_testserver.t
 t/60_workflow/10_certificate_signing_request.t
 t/60_workflow/15_csr_and_certificate_issuance.t
@@ -586,11 +580,6 @@ t/60_workflow/common.pl
 t/60_workflow/openssl.cnf
 t/60_workflow/password_safe_key
 t/60_workflow/start.pl
-t/60_workflow/test_action.xml
-t/60_workflow/test_workflow_configs/workflow_activity_cycle_test.xml
-t/60_workflow/test_workflow_configs/workflow_def_cycle_sub2.xml
-t/60_workflow/test_workflow_configs/workflow_def_cycle_sub.xml
-t/60_workflow/test_workflow_configs/workflow_def_cycle_top.xml
 
 t/65_ui/10_transport_simple.t
 t/65_ui/20_serialization_simple.t
