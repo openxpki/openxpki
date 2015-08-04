@@ -594,6 +594,7 @@ action:
           - pkcs10
           - csr_type
         validator:
+          - global_pkcs10_valid
           - global_key_reuse
 
 condition:

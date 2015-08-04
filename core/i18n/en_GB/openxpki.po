@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-08-03 15:38+0100\n"
+"PO-Revision-Date: 2015-08-04 11:25+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -627,11 +627,14 @@ msgstr "This field is not defined in the profile settings."
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "A certificate with the same public key already exists!"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
+msgstr "PKCS10 request is not properly formated"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR"
+msgstr "PKCS10 request can not be read"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "Validator failed on given expression"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
-msgstr "Action"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
 msgstr ""
@@ -639,6 +642,16 @@ msgstr ""
 "only if you are sure that this information is correct."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
+msgstr "Approve Revocation"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
+msgstr ""
+"Please validate the given information and approve the revocation request "
+"only if you are sure that this information is correct."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 msgstr "Approve Revocation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
@@ -865,6 +878,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_DESC"
 msgstr "Fail workflow"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
+msgstr "Fail"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
+msgstr "Fail workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "Fail"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
@@ -2118,6 +2139,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PIN_UNBLOCK_LABEL"
 msgstr "Card Unblock"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_DESC"
+msgstr ""
+"Publish CA information (CA certificates and CRLs) to defined repositories."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_LABEL"
+msgstr "Publish CA Information"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."
 
@@ -2132,6 +2162,9 @@ msgstr "Workflow information was updated"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
+#~ msgstr "Action"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"

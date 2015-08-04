@@ -2,7 +2,7 @@ package OpenXPKI::Server::Workflow::Validator::PKCS10;
 
 use strict;
 use warnings;
-use base qw( Workflow::Validator );
+use base qw( OpenXPKI::Server::Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Server::Context qw( CTX );
@@ -11,28 +11,21 @@ use English;
 
 __PACKAGE__->mk_accessors( 'allow_empty_subject' );
 
-
 sub _init {
-     my ( $self, $params ) = @_;
-     
-     $self->allow_empty_subject( ref $params->{empty_subject} && $params->{empty_subject} );     
+    my ( $self, $params ) = @_;
+    $self->allow_empty_subject( ref $params->{empty_subject} && $params->{empty_subject} );
 }
 
-sub validate {
-    my ( $self, $wf, $csr_type, $pkcs10 ) = @_;
-
-    ## prepare the environment
-    my $context = $wf->context();
-    my $errors  = $context->param ("__error");
-       $errors  = [] if (not defined $errors);
-    my $old_errors = scalar @{$errors};
-
-    return if (not defined $csr_type);
-    return if ($csr_type ne "pkcs10");
-
+sub _validate {
+    my ( $self, $wf, $pkcs10 ) = @_;
+    
     # allow non-defined PKCS10 for server-side key generation
-    if (not defined $pkcs10)
-    {
+    if (not defined $pkcs10) {
+        CTX('log')->log(
+            MESSAGE  => "PKCS#10 validaton: is empty",
+            PRIORITY => 'debug',
+            FACILITY => 'application',
+        );   
         return 1;
     }
 
@@ -59,18 +52,14 @@ sub validate {
                      -----END \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s*}xs     ## RFC 1421,2045 and 3548
        )
     {
-        ## PKCS#10 is base64 with some header and footer
-        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_DAMAGED',
-                           {'PKCS10' => $pkcs10} ];
-        $context->param ("__error" => $errors);
-
-	CTX('log')->log(
-	    MESSAGE  => "Invalid PKCS#10 request",
-	    PRIORITY => 'warn',
-	    FACILITY => 'system',
+        
+	    CTX('log')->log(
+	        MESSAGE  => "Invalid PKCS#10 request",
+	        PRIORITY => 'warn',
+	        FACILITY => 'application',
 	    );
 
-        validation_error ($errors->[scalar @{$errors} -1]);
+        validation_error( 'I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED' );
     }
 
     # parse PKCS#10 request 
@@ -79,20 +68,18 @@ sub validate {
     if (! defined $default_token) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_TOKEN_UNAVAILABLE",
-            );
+        );
     };
 
     my $csr;
     eval {
-	$csr = OpenXPKI::Crypto::CSR->new(
-	    TOKEN => $default_token, 
-	    DATA => $pkcs10,
+	    $csr = OpenXPKI::Crypto::CSR->new(
+            TOKEN => $default_token, 
+            DATA => $pkcs10,
 	    );
     };	
     if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
-            );
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR");
     }
 
     my $subject = $csr->get_parsed('SUBJECT');    
@@ -104,9 +91,6 @@ sub validate {
         );
         validation_error('PKCS10 has no subject where it is required') unless($self->allow_empty_subject());               
     }
-
-    # propagate fixed PKCS#10 request to workflow context
-    $context->param ('pkcs10' => $pkcs10);
 
     return 1;
 }
@@ -121,28 +105,18 @@ OpenXPKI::Server::Workflow::Validator::PKCS10
 
 =head1 SYNOPSIS
 
-<action name="CreateCSR">
-  <validator name="PKCS10"
-           class="OpenXPKI::Server::Workflow::Validator::PKCS10">
-    <param name="empty_subject" value="1" />
-    <arg value="$csr_type"/>
-    <arg value="$pkcs10"/>
-  </validator>
-</action>
+validator:
+  is_valid_pkcs10:
+      class: OpenXPKI::Server::Workflow::Validator::PKCS10
+      param:
+         empty_subject: 0|1
+      arg: 
+         - $pkcs10
 
 =head1 DESCRIPTION
+ 
+Check the incoming data to be a valid (parseable) pkcs10 request. By default, 
+the request must have a subject set, you can skip the subject check setting
+the parameter empty_subject to a true value. 
 
-This validator checks a PKCS#10 CSR. The only implemented check today
-is a base64 validation with integrated check for correct header and
-footer lines. The validator does not check the PKCS#10
-structure actually. If the CSR type is not "pkcs10" then the validator
-does nothing to alarm on SPKAC requests.
-
-B<NOTE>: If you pass an empty string (or no string) to this validator
-it will not throw an error. Why? If you want a value to be defined it
-is more appropriate to use the 'is_required' attribute of the input
-field to ensure it has a value.
-
-In case you are working with e.g. Microsoft Client enrollments the CSR
-holds only a key but no subject. To accept CSRs with empty subject, you 
-have to set the empty_subject param to a true value.
+ 

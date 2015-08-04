@@ -918,12 +918,16 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
-msgstr "Родительский технологический процесс"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
+msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
@@ -931,6 +935,14 @@ msgstr "Утвердить заявку на отзыв сертификата (
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
+msgstr "Утвердить заявку на отзыв сертификата (CRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
+msgstr "Утвердить заявку на отзыв сертификата (CRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 msgstr "Утвердить заявку на отзыв сертификата (CRR)"
 
 #, fuzzy
@@ -1187,6 +1199,14 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
+msgstr "Ожидание завершения технологического процесса"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -2727,6 +2747,14 @@ msgstr "Создание новой заявки на сертификат (CSR)
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PIN_UNBLOCK_LABEL"
 msgstr "Создание новой заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_LABEL"
+msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
@@ -6615,14 +6643,6 @@ msgstr "Последнее обновление"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_DAMAGED"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_TOKEN_UNAVAILABLE"
 #~ msgstr "SPKAC-строка пуста."
 
@@ -7207,6 +7227,10 @@ msgstr "Последнее обновление"
 #~ msgstr "Профиль пользователя"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_AUTH_LDAP_ERR_DESC"
 #~ msgstr "Технологические процессы"
 
@@ -7461,14 +7485,6 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EXTRACT_CSR_LABEL"
 #~ msgstr "Экспорт заявки на сертификат (CSR)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FETCH_GROUP_POLICY_DESC"
-#~ msgstr "Ожидание завершения технологического процесса"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FETCH_GROUP_POLICY_LABEL"
-#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_PUBLISH_DESC"

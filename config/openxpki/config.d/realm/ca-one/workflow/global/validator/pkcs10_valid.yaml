@@ -1,0 +1,5 @@
+class: OpenXPKI::Server::Workflow::Validator::PKCS10
+param:
+    empty_subject: 0|1
+arg: 
+  - $pkcs10

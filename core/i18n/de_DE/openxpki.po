@@ -917,12 +917,16 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
-msgstr "Übergeordneter Workflow"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
+msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
@@ -930,6 +934,14 @@ msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
@@ -1186,6 +1198,14 @@ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
+msgstr "Auf anderen Workflow warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -2727,6 +2747,14 @@ msgstr "Erstellen von CRLs"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PIN_UNBLOCK_LABEL"
 msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_DESC"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_LABEL"
+msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
@@ -6483,14 +6511,6 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_DAMAGED"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_TOKEN_UNAVAILABLE"
 #~ msgstr "Prozesse anzeigen"
 
@@ -7000,6 +7020,10 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr "Nutzer"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_AUTH_LDAP_ERR_DESC"
 #~ msgstr "Arbeitsabläufe"
 
@@ -7258,14 +7282,6 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_EXTRACT_CSR_LABEL"
 #~ msgstr "Exportieren des Zertifzierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FETCH_GROUP_POLICY_DESC"
-#~ msgstr "Auf anderen Workflow warten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FETCH_GROUP_POLICY_LABEL"
-#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FORK_PUBLISH_DESC"

@@ -617,6 +617,8 @@ action:
         input: 
           - keyid
           - pkcs10
+        validator:
+          - global_pkcs10_valid
 
     post_non_escrow_csr_err: 
         class: Workflow::Action::Null
