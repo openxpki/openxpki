@@ -30,14 +30,17 @@ sub execute
     }
     
     if (my $check = $self->param('check_san')) {
-        ##! 16: 'check_san ' . $check;        
-        my $sans = $ser->deserialize( $context->param('cert_subject_alt_name') );
-        ##! 32: 'found sans ' . Dumper @sans         
-        foreach my $pair (@{$sans}) {
-            ##! 32: 'Type is ' . $pair->[0] 
-            if ($pair->[0] eq 'DNS') {
-                $items{ $pair->[1] } = $check;
-            }            
+        ##! 16: 'check_san ' . $check;
+        my $san = $context->param('cert_subject_alt_name');
+        if ($san) {
+            my $sans = $ser->deserialize( $context->param('cert_subject_alt_name') );
+            ##! 32: 'found sans ' . Dumper @sans         
+            foreach my $pair (@{$sans}) {
+                ##! 32: 'Type is ' . $pair->[0] 
+                if ($pair->[0] eq 'DNS') {
+                    $items{ $pair->[1] } = $check;
+                }            
+            }
         }        
     }
     
