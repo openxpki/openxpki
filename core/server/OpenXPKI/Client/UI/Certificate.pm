@@ -386,7 +386,7 @@ sub init_detail {
         { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
         { label => 'not after', value => $cert->{NOTAFTER}, format => 'timestamp' },
         { label => 'Status', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS} , value => $cert->{STATUS} }, format => 'certstatus' },
-        { label => 'Issuer',  format=>'link', value => { label => $cert->{ISSUER_DN}, page => 'certificate!chain!identifier!'. $cert_identifier } },
+        { label => 'Issuer', format => 'link', value => { label => $cert->{ISSUER_DN}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
@@ -403,16 +403,16 @@ sub init_detail {
         $privkey = '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
     }
 
-    push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => '<ul class="list-unstyled">'.
-        sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM').
+    push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => [
+        sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM'),
         # core bug see #185 sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
-        sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER').
-        sprintf ($pattern, 'pkcs7', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7').
-        sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT').
-        sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE').
-        $privkey.
-        sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL').
-        '</ul>'
+        sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER'),
+        sprintf ($pattern, 'pkcs7', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7'),
+        sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT'),
+        sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE'),
+        $privkey,
+        sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL') ],        
+        format => 'rawlist'
     };
 
     # TODO - add some magic to the API to determine if those actions are possible for the current user, etc.
@@ -428,7 +428,11 @@ sub init_detail {
         }
         push @actions, sprintf ($pattern, 'change_metadata', 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA');
         
-        push @fields, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_LABEL', value => '<ul class="list-unstyled">'.join("", @actions).'</ul>' };
+        push @fields, { 
+            label => 'I18N_OPENXPKI_UI_CERT_ACTION_LABEL', 
+            value => \@actions,
+            format => 'rawlist'
+        };
     }     
     
     push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => { 
