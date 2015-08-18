@@ -167,10 +167,11 @@ sub init_load {
 
     # Set single action if not in result view and only single action is avail
     if (($view ne 'result') && !$wf_action && 
-        (ref $wf_info->{STATE} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {
+        (ref $wf_info->{STATE}->{output} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {
         my @activities = @{$wf_info->{STATE}->{option}};
         if (scalar @activities == 1) {
             $wf_action = $activities[0];
+            $self->logger()->debug('Autoselect action ' . $wf_action );
         }
     }
 
@@ -945,7 +946,8 @@ sub action_index {
     # Check if we can auto-load the next available action
     my $wf_action;
     my @activity = keys %{$wf_info->{ACTIVITY}};
-    if (scalar @activity == 1) {
+    if (scalar @activity == 1 && 
+        (ref $wf_info->{STATE}->{output} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {        
         $wf_action = $activity[0];
     }
 
