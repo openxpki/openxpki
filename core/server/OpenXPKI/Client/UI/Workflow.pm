@@ -2088,7 +2088,7 @@ sub __render_fields {
 
                 $item->{value} = \@val;
 
-            } elsif ($item->{format} eq "ullist") {
+            } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
 
                 if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
                     $item->{value} = $self->serializer()->deserialize( $item->{value} );
@@ -2118,7 +2118,7 @@ sub __render_fields {
                 # Sort by label
                 my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};            
                 $item->{value} = \@val;
-                
+
             }
 
             if ($field->{template}) {
@@ -2133,10 +2133,11 @@ sub __render_fields {
 
                     foreach (@{$item->{value}}){
                         $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
+                        $_->{format} = 'raw';
                     }
 
                 # bullet list, put the full list to tt and split at the | as sep (as used in profile)
-                } elsif ($item->{format} eq "ullist") {
+                } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
 
                     my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );                    
                     $self->logger()->debug('Return from template ' . $out );
@@ -2147,6 +2148,14 @@ sub __render_fields {
                     } else {
                         $item->{value} = undef; # prevent pusing emtpy lists
                     }
+
+                } elsif ($item->{format} eq "raw") {
+                    # try to deserialize
+                    my $param = $item->{value}; 
+                    if (!ref $param && OpenXPKI::Serialization::Simple::is_serialized( $param ) ) {
+                        $param = $self->serializer()->deserialize( $param );
+                    }
+                    $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => { value => $param } } );
 
                 } elsif (ref $item->{value} eq '') {
                     $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );

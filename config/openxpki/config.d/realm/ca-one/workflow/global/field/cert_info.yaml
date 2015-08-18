@@ -10,7 +10,7 @@ template: >
   [% IF key == "requestor_email" %]
     <a href="mailto:[% value %]" target="_blank">[% value %]</a>
   [% ELSE %]
-    [% value %]
+    [% FILTER html %][% value %][% END %]
   [% END %]
 
 

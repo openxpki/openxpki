@@ -5,7 +5,7 @@ description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC
 #placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER
 #tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP
 type: cert_subject_alt_name
-format: ullist
+format: rawlist
 template: >
   [% FOREACH san = value %][% san.0 %]: 
     [% IF san.0 == 'DNS' %]

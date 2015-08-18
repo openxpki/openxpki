@@ -23,6 +23,7 @@ use Template::Plugin;
 
 use Data::Dumper;
 
+use HTML::Entities;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
@@ -73,7 +74,7 @@ sub valid {
         $fqdn .= ' '.$failed if ($failed);
     }
     
-    return '<span class="'.$status.'">'.$fqdn.'</span>';
+    return '<span class="'.$status.'">'.encode_entities( $fqdn ).'</span>';
 
 }
 
@@ -115,9 +116,9 @@ sub resolve {
     }
     
     if ($result) {
-        return '<span class="dns-valid">'.$fqdn.' ('.$result.')</span>'; 
+        return '<span class="dns-valid">'. encode_entities( $fqdn ).' ('.encode_entities( $result ).')</span>'; 
     } else {
-        return '<span class="dns-failed">'.$fqdn.' (???)</span>';
+        return '<span class="dns-failed">'.encode_entities( $fqdn ).' (???)</span>';
     }
     
 }
