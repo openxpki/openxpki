@@ -144,7 +144,58 @@ sub render_system_status {
         value  => $status->{version},        
     };
     
-    
+    $self->add_section({
+        type => 'keyvalue',
+        content => {            
+            data => \@fields
+        }
+    });
+   
+    foreach my $type (qw(certsign datasafe scep)) {
+        
+        my $token = $self->send_command( 'list_active_aliases', { TYPE => $type, CHECK_ONLINE => 1 } );
+
+        $self->logger()->debug("result: " . Dumper $token );
+       
+        my @result;
+        foreach my $alias (@{$token}) {
+            
+            my $className = '';
+            if ($alias->{STATUS} ne 'ONLINE') {
+                $className = 'danger';
+                $critical = 1;
+            }
+            
+            push @result, [
+                $alias->{ALIAS},
+                $alias->{IDENTIFIER},
+                $alias->{STATUS},
+                $alias->{NOTBEFORE} + 0,
+                $alias->{NOTAFTER} + 0,
+                $className
+            ];
+        }
+
+        $self->add_section({
+            type => 'grid',
+            className => 'token',        
+            content => {
+                label => 'Tokens of type ' . $type,
+                columns => [
+                    { sTitle => "Token Alias" },                    
+                    { sTitle => "Identifier" },
+                    { sTitle => "Status" },                    
+                    { sTitle => "not Before", format => 'timestamp'},
+                    { sTitle => "not After", format => 'timestamp'},
+                    { sTitle => "_className"},                    
+                ],
+                data => \@result,
+                empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
+            }
+        });
+
+    } 
+
     if ($critical) {
         $self->set_status('Your system status is critical!','error');
     } elsif($warning) {
@@ -152,16 +203,10 @@ sub render_system_status {
     } else {
         $self->set_status('System status is good','success');     
     }
-    $self->add_section({
-        type => 'keyvalue',
-        content => {            
-            data => \@fields
-        }
-    });
-
+        
     return $self;
     
-}
+} 
 
 1;
 
