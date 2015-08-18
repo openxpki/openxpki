@@ -34,7 +34,7 @@ Component = Em.Component.extend
           else
             "---"
         datetime: (v) -> moment().utc(v).format("YYYY-MM-DD HH:mm:ss UTC")
-        text: (v) -> v
+        text: (v) -> Em.$('<div/>').text(v).html()
         code: (v) -> "<code>#{v.replace(/(\r\n|\n|\r)/gm,"<br>")}</code>"
         raw: (v) -> v
         defhash: (v) -> "<dl>#{(for k, w of v then "<dt>#{k}</dt><dd>#{w}</dd>").join ""}</dl>"
