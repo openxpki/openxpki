@@ -237,7 +237,7 @@ sub get_certificate_for_alias {
 
 }
 
-=head2 list_active_aliases( { GROUP, VALIDITY, REALM, TYPE } )
+=head2 list_active_aliases( { GROUP, VALIDITY, PKI_REALM, TYPE, CHECK_ONLINE } )
 
 Get an arrayref with all tokens from the given GROUP, which are/were valid within
 the validity period given by the VALIDITY parameter.
@@ -245,9 +245,11 @@ Each entry of the list is a hashref holding the full alias name and the
 certificate identifier. The list is sorted by notbefore date, starting with
 the newest date. See get_token_alias_by_group how validity works, dates are custom
 dates from the alias table!
-REALM is optional and defaults to the session's realm.
+PKI_REALM is optional and defaults to the session's realm.
 If you are looking for a predefined token, you can specify TYPE instead of GROUP.
 
+If you set CHECK_ONLINE the is_token_usable method will be called for each 
+alias and the result of the check is included in the key STATUS 
 
 =cut
 
@@ -259,9 +261,8 @@ sub list_active_aliases {
 
     my $group  = $keys->{GROUP};
 
-    my $pki_realm = $keys->{REALM};
+    my $pki_realm = $keys->{PKI_REALM};
     $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
-
 
     if (!$group) {
 
@@ -288,6 +289,7 @@ sub list_active_aliases {
         COLUMNS => [
             #  Necessary to use the column in ordering - FIXME: Pimp SQL Layer
             'ALIASES.NOTBEFORE',
+            'ALIASES.NOTAFTER',
             'ALIASES.ALIAS',
             'ALIASES.IDENTIFIER',
         ],
@@ -306,7 +308,21 @@ sub list_active_aliases {
 
     my @token;
     foreach my $entry (@{ $db_results }) {
-        push @token, { ALIAS => $entry->{'ALIASES.ALIAS'}, IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'}};
+        
+        my $item = { 
+            ALIAS => $entry->{'ALIASES.ALIAS'}, 
+            IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'},
+            NOTBEFORE => $entry->{'ALIASES.NOTBEFORE'},
+            NOTAFTER  => $entry->{ 'ALIASES.NOTAFTER'}, 
+        };
+        if ($keys->{CHECK_ONLINE}) {
+            if ($self->is_token_usable({ ALIAS => $entry->{'ALIASES.ALIAS'} })) {
+                $item->{STATUS} = 'ONLINE';
+            } else {
+                $item->{STATUS} = 'OFFLINE';
+            }
+        }
+        push @token, $item;
     }
     ##! 32: "Found tokens " . Dumper @token
 
@@ -457,7 +473,7 @@ sub get_trust_anchors {
     foreach my $trust_realm (@trust_realms) {
         ##! 16: 'Load ca signers from realm ' . $trust_realm
         next unless $trust_realm;
-        my $ca_certs = CTX('api')->list_active_aliases({ TYPE => 'certsign', REALM => $trust_realm });
+        my $ca_certs = CTX('api')->list_active_aliases({ TYPE => 'certsign', PKI_REALM => $trust_realm });
         ##! 16: 'ca cert in realm ' . Dumper $ca_certs
         if (!$ca_certs) { next; }
         push @trust_anchors, map { $_->{IDENTIFIER} } @{$ca_certs};

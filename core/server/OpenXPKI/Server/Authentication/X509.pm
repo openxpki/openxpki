@@ -108,7 +108,7 @@ sub _load_anchors {
     foreach my $trust_realm (@{$trusted_realms}) {
         # Look up the group name used for the ca certificates in the given realm
         ##! 16: 'Load ca signers from realm ' . $trust_realm        
-        my $ca_certs = CTX('api')->list_active_aliases({ TYPE => 'certsign', REALM => $trust_realm });
+        my $ca_certs = CTX('api')->list_active_aliases({ TYPE => 'certsign', PKI_REALM => $trust_realm });
         ##! 16: 'ca cert in realm ' . Dumper $ca_certs
         if (!$ca_certs) { next; }        
         push @trust_anchors, map { $_->{IDENTIFIER} } @{$ca_certs};

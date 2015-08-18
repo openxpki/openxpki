@@ -139,11 +139,16 @@ sub BUILD {
                     type  => HASHREF,
                     optional => 1,
                 },
-                'REALM' => {
+                'PKI_REALM' => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                     optional => 1,
                 },
+                'CHECK_ONLINE' => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
+                    optional => 1,
+                }
             },
         },
         'get_trust_anchors' => {
