@@ -331,6 +331,44 @@ sub get_cert_profiles {
     return $profiles;
 }
 
+=head2
+
+List profiles that are used for entity certificates in the current realm
+ 
+=cut
+
+sub list_used_profiles { 
+    
+    my $self = shift;
+    my $args = shift;
+        
+    my $cfg = CTX('config');
+    
+    my $pki_realm = $args->{PKI_REALM} ? $args->{PKI_REALM} : CTX('session')->get_pki_realm();    
+    
+    my $db_results = CTX('dbi_backend')->select(
+        TABLE   => [ 'CSR' ],
+        DISTINCT => 1,
+        COLUMNS => [ 'CSR.PROFILE' ],
+        JOIN => [['CSR_SERIAL']],        
+        DYNAMIC => { 'CSR.PKI_REALM' => $pki_realm }
+    );
+    
+    my @result;
+    while (my $line = shift @{$db_results}) {
+        my $profile = $line->{'CSR.PROFILE'}; 
+        my $label = $cfg->get([ 'profile', $profile, 'label' ]);
+        push @result, {
+            value => $profile,
+            label => $label || $profile,             
+        };
+    }
+       
+    return \@result;
+    
+}
+
+
 sub get_cert_subject_profiles {
     my $self = shift;
     my $args = shift;

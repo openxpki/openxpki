@@ -767,6 +767,16 @@ sub BUILD {
             },
             memoize => 1,
         },
+        'list_used_profiles' => {
+            class  => 'Profile',
+            params => {
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            }
+        },
         'get_additional_information_fields' => {
             class  => 'Profile',
             params => {
