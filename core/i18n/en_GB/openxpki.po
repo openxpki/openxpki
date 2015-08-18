@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-08-05 11:27+0100\n"
+"PO-Revision-Date: 2015-08-18 17:56+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -28,6 +28,12 @@ msgstr "Unknown application error"
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Backend session terminated - please re-login"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
+msgstr ""
+"Load a single certificates details for a known certificate identifier <b>or</"
+"b> serial number. You can give the serial number either in hexadecimal or in "
+"decimal notation."
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
 msgstr "Certificate Chain"
 
@@ -39,6 +45,9 @@ msgstr "Please enter the key passphrase you set during certificate request."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 msgstr "Download private key for certificate"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
+msgstr "Certificate Identifier"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
 msgstr "Find a list of your certificates below."
@@ -74,6 +83,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Certificate Search Result"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
+msgstr "Certificate Serial"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"

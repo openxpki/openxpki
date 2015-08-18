@@ -30,6 +30,10 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Gültige"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
 msgstr "Übergeordneter Workflow"
 
@@ -44,6 +48,10 @@ msgstr "Zertifikats-ID"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 msgstr "PEM (CRT) Format"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
+msgstr "Zertifikats-ID"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
@@ -83,6 +91,10 @@ msgstr "Erstellen von CRLs"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Erstellen von CRLs"
 
 #, fuzzy
@@ -6954,10 +6966,6 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_"
 #~ msgstr "Benutzername"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
-#~ msgstr "Zertifikats-ID"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_COMMENT"

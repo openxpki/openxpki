@@ -30,6 +30,10 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -44,6 +48,10 @@ msgstr "Идентификатор сертификата"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
+msgstr "Идентификатор сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
@@ -83,6 +91,10 @@ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
@@ -7167,10 +7179,6 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_"
 #~ msgstr "Имя учетной записи"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CERT_IDENTIFIER"
-#~ msgstr "Идентификатор сертификата"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_COMMENT"

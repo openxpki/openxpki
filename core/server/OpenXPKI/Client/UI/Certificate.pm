@@ -29,7 +29,7 @@ sub init_search {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
-        description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',  
+        description => '',  
     });
 
     my $profile = $self->send_command( 'get_cert_profiles' );
@@ -59,7 +59,6 @@ sub init_search {
     my @fields = (
         { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
         { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
-        { name => 'cert_serial', label => 'Serial', type => 'text', is_optional => 1, value => $preset->{cert_serial} },
         { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
         { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
    );
@@ -80,14 +79,28 @@ sub init_search {
         };      
     }
 
-
     $self->add_section({
         type => 'form',
         action => 'certificate!search',
         content => {
+           description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',
            title => '',
-           submit_label => 'search now',
+           submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
            fields => \@fields
+        }},        
+    );
+    
+    $self->add_section({
+        type => 'form',
+        action => 'certificate!find',
+        content => {
+           title => '',
+           description => 'I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL',
+           submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+           fields => [
+               { name => 'cert_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', type => 'text', is_optional => 1, value => $preset->{cert_identifier} },
+               { name => 'cert_serial', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', type => 'text', is_optional => 1, value => $preset->{cert_serial} },              
+           ]
         }},        
     );
 
@@ -494,7 +507,7 @@ sub init_chain {
                        label => $cert->{SUBJECT}, page => 'certificate!detail!identifier!'.$cert->{IDENTIFIER} } },
                     { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{NOTBEFORE}, format => 'timestamp' },
                     { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{NOTAFTER}, format => 'timestamp' },
-                    { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => $dl },
+                    { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => $dl, format => 'raw' },
                 ],
             }},
         );
@@ -809,6 +822,54 @@ sub action_autocomplete {
 
 }
 
+=head2 action_find
+
+Handle search requests for a single certificate by its identifier 
+
+=cut
+
+sub action_find {
+
+    my $self = shift;
+    my $args = shift;
+    
+    my $cert_identifier = $self->param('cert_identifier');
+    if ($cert_identifier) {
+        my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
+        if (!$cert) {
+            $self->set_status('Unable to find a certificate with this identifier.','error');
+            return $self->init_search();   
+        }
+    } elsif (my $serial = $self->param('cert_serial')) {
+        
+        if ($serial =~ /[a-f]/ && substr($serial,0,2) ne '0x') {
+            $serial = '0x' . $serial;
+        }
+        if (substr($serial,0,2) eq '0x') {
+            # strip whitespace
+            $serial =~ s/\s//g;
+            my $sn = Math::BigInt->new( $serial );
+            $serial = $sn->bstr();
+        }
+        my $search_result = $self->send_command( 'search_cert', {
+            CERT_SERIAL => $serial,
+            ENTITY_ONLY => 1    
+        });
+        if (scalar @{$search_result} == 1) {
+            $cert_identifier = $search_result->[0]->{"IDENTIFIER"};
+        } elsif (scalar @{$search_result} > 1) {
+            # this should not happen
+            $self->set_status('Query ambigous - got more than one result on this serial number?!.','error');
+            return $self->init_search();
+        } else {            
+            $self->set_status('Unable to find a certificate with this serial number.','error');
+            return $self->init_search();
+        }
+    }
+    
+    $self->redirect( 'certificate!detail!identifier!'.$cert_identifier );
+
+}
 
 =head2 action_search
 
@@ -840,24 +901,6 @@ sub action_search {
         }
     }
     
-    # Special handling of cert_serial
-    my $val = $self->param('cert_serial');
-    if (defined $val && $val ne '') {            
-        $input->{'cert_serial'} = $val;
-        # convert hex to decimal
-        if ($val =~ /[a-f]/ && substr($val,0,2) ne '0x') {
-            $val = '0x' . $val;
-        }
-        if (substr($val,0,2) eq '0x') {
-            # strip whitespace
-            $val =~ s/\s//g;
-            my $sn = Math::BigInt->new( $val );
-            $val = $sn->bstr();
-        }
-        $query->{'CERT_SERIAL'} = $val;
-    }
-    
-
     if (my $status = $self->param('status')) {
         $input->{'status'} = $status;
         if ($status eq 'VALID') {
