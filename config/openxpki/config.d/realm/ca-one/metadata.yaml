@@ -5,5 +5,5 @@ systemid@: connector:metadata.connectors.systemid
     
 connectors:
     systemid:
-        class: Connector::Proxy::YAML
-        LOCATION: /home/pkiadm/systemid.yaml
+        class: Connector::Builtin::Static
+        LOCATION: 1
