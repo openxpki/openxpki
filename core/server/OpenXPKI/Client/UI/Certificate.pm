@@ -392,8 +392,11 @@ sub init_detail {
         $is_local_entity = 1;
     }
 
+    my $cert_profile  = $self->send_command( 'get_profile_for_cert', {  IDENTIFIER => $cert_identifier });    
+
     my @fields = (
         { label => 'Subject', value => $cert->{SUBJECT} },
+        { label => 'Profile', value => $cert_profile },        
         { label => 'Serial', value => '0x'.$cert->{CERTIFICATE_SERIAL_HEX} },
         { label => 'Identifier', value => $cert_identifier },
         { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
