@@ -786,8 +786,11 @@ sub __search_cert {
         }
     }
 
-    if ( defined $args->{VALID_AT} ) {
-        $params{VALID_AT} = $args->{VALID_AT};
+    if ( defined $args->{VALID_AT} ) {                        
+        $params{VALID_AT} = $args->{VALID_AT};        
+        if (!ref $params{VALID_AT}) {            
+            $params{VALID_AT} = [ $params{VALID_AT} ];            
+        }        
     }
 
     # notbefore/notafter should only be used for timestamps outside
@@ -829,6 +832,9 @@ sub __search_cert {
 
             # add join statement
             push @{ $params{JOIN}->[0] }, 'IDENTIFIER';
+            
+            # push undef onto valid_at
+            push @{ $params{VALID_AT} }, undef if ($params{VALID_AT});
 
             my $key   = $attrib->{KEY};
             my $value = $attrib->{VALUE};
@@ -866,10 +872,10 @@ sub __search_cert {
         # add search constraint
         $params{DYNAMIC}->{ 'CSR.PROFILE' } = { VALUE => $args->{PROFILE} };
 
-        $params{VALID_AT} = [ $params{VALID_AT}, undef ] if ($params{VALID_AT});
+        push @{ $params{VALID_AT} }, undef if ($params{VALID_AT});
 
     }
-
+    
     return \%params;
 
 }
