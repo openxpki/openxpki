@@ -622,6 +622,8 @@ sub init_privkey {
                     { value => 'PKCS12', label => 'PKCS12' },
                     { value => 'PKCS8_PEM', label => 'PKCS8 (PEM)' },
                     { value => 'PKCS8_DER', label => 'PKCS8 (DER)' },
+                    # backend is broken for those, need fixing first
+                    #{ value => 'OPENSSL_PRIVKEY', label => 'OpenSSL native' },                    
                     #{ value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
                     ]
                 },
@@ -972,7 +974,8 @@ sub action_privkey {
         'PKCS12' => [ 'application/x-pkcs12', 'p12' ],
         'PKCS8_PEM' => [ 'application/pkcs8', 'key' ],
         'PKCS8_DER' => [ 'application/pkcs8', 'p8' ],
-        #'JAVA_KEYSTORE' => [ 'application/x-java-keystore', 'jks' ]
+        'OPENSSL_PRIVKEY' => [ 'application/x-pem-file', 'pem' ],
+        'JAVA_KEYSTORE' => [ 'application/x-java-keystore', 'jks' ]
     };
 
     if (!$format_mime->{$format}) {
