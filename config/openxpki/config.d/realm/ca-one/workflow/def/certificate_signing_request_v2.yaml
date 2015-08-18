@@ -147,6 +147,24 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_DESC
         action:
           - release_on_hold > CHECK_POLICY_VIOLATION ? acl_can_approve
+          - put_request_on_hold > ONHOLD ? acl_can_approve
+        output:
+          - onhold_comment
+          - cert_subject
+          - cert_subject_alt_name
+          - policy_comment
+          - check_policy_dns
+          - check_policy_subject_duplicate
+          - notbefore
+          - notafter
+          - cert_profile
+          - cert_info           
+        button:
+          release_on_hold:
+            format: expected
+          put_request_on_hold:
+            label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_ON_HOLD_LABEL
+            format: alternative
 
     PENDING:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL
@@ -535,8 +553,6 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_DESC
-        input:
-          - onhold_comment
 
     rename_private_key:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry
@@ -770,8 +786,8 @@ field:
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC
         placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_PLACEHOLDER
         tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_TOOLTIP
-        type: text
-        required: 0
+        type: textarea
+        required: 1
 
     reject_comment:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_LABEL

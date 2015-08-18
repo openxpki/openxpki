@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 31 );
+$test->plan( tests => 33 );
 
 $test->connect_ok(
     user => $cfg{user}{name},
@@ -135,7 +135,10 @@ $test->connect_ok(
 $test->execute_ok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'} );
 $test->state_is('ONHOLD');
 
-$test->execute_ok( 'csr_release_on_hold', { onhold_comment => 'Still no Comment'} );
+$test->execute_ok( 'csr_put_request_on_hold', { onhold_comment => 'Still on hold'} );
+$test->state_is('ONHOLD');
+
+$test->execute_ok( 'csr_release_on_hold' );
 $test->state_is('PENDING_POLICY_VIOLATION');
 
 $test->execute_ok( 'csr_approve_csr' );
