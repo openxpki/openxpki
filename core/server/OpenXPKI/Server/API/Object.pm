@@ -939,14 +939,27 @@ Supports the following parameters:
 
 =item * FORMAT - the output format
 
+One of PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
+(PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
+(OpenSSL native key format in PEM) JAVA_KEYSTORE (JKS including chain).
+
 =item * PASSWORD - the private key password
+
+Password that was used when the key was generated.
+
+=item * PASSOUT - the password for the exported key, default is PASSWORD
+
+The password to encrypt the exported key with, if empty the input password
+is used.
+
+=item * KEEPROOT
+
+Boolean, when set the root certifcate is included in the keystore.
+Obviously only useful with PKCS12 or Java Keystore.    
 
 =back
 
-The format can be either PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
-(PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
-(the OpenSSL encrypted key format in PEM), or JAVA_KEYSTORE (for a
-Java keystore).
+The format can be either 
 The password has to match the one used during the generation or nothing
 is returned at all.
 
@@ -1002,15 +1015,14 @@ sub get_private_key_for_cert {
         };     
 
     }
-    elsif ( $format eq 'PKCS12' ) {
+    elsif ( $format eq 'PKCS12' || $format eq 'JAVA_KEYSTORE' ) {
         ##! 16: 'identifier: ' . $identifier
 
-        my @chain = $self->__get_chain_certificates(
-            {
-                'IDENTIFIER' => $identifier,
-                'FORMAT'     => 'PEM',
-            }
-        );
+        my @chain = $self->__get_chain_certificates({
+            'KEEPROOT'   =>  $arg_ref->{KEEPROOT},
+            'IDENTIFIER' => $identifier,
+            'FORMAT'     => 'PEM',
+        });
         ##! 16: 'chain: ' . Dumper \@chain
 
         # the first one is the entity certificate
@@ -1027,47 +1039,24 @@ sub get_private_key_for_cert {
             $command_hashref->{CSP} = $arg_ref->{CSP};
         }
     }
-    elsif ( $format eq 'JAVA_KEYSTORE' ) {
+    
+    $result = $default_token->command($command_hashref);
+    
+    if ( $format eq 'JAVA_KEYSTORE' ) {
         
-        # BROKEN! - needs fix
         my $token = CTX('crypto_layer')->get_system_token({ TYPE => 'javaks' });
-
-        # get decrypted private key to pass on to create_keystore
-        my @chain = $self->__get_chain_certificates(
-            {
-                'IDENTIFIER' => $identifier,
-                'FORMAT'     => 'DER',
-                'KEEPROOT'   =>  1
-            }
-        );
-        my $decrypted_pkcs8_pem = $default_token->command(
-            {
-                COMMAND => 'convert_pkey',
-                PASSWD  => $password,
-                DATA    => $private_key,
-                IN      => 'PKCS8',
-                OUT     => 'PKCS8',
-                DECRYPT => 1,
-            }
-        );
-
-        # poor man's PEM -> DER converter:
-        $decrypted_pkcs8_pem =~ s{ -----BEGIN\ PRIVATE\ KEY-----\n }{}xms;
-        $decrypted_pkcs8_pem =~ s{ -----END\ PRIVATE\ KEY-----\n+ }{}xms;
-        my $decrypted_pkcs8_der = decode_base64($decrypted_pkcs8_pem);
-
+  
+        my $pkcs12 = $result;
         $result = $token->command(
             {
                 COMMAND      => 'create_keystore',
-                PKCS8        => $decrypted_pkcs8_der,
-                CERTIFICATES => \@chain,
-                PASSWORD     => $password,
+                PKCS12       => $pkcs12,          
+                PASSWD       => $password,
+                OUT_PASSWD   => $password,
             }
         );
     }
-    if ( !defined $result ) {
-        $result = $default_token->command($command_hashref);
-    }
+    
 
     CTX('log')->log(
         MESSAGE  => "Private key requested for certificate $identifier",

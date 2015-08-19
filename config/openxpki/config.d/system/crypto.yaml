@@ -29,7 +29,7 @@ token:
         api: OpenXPKI::Crypto::Tool::CreateJavaKeystore::API    
         engine:  OpenSSL        
         key_store: OPENXPKI
-        shell: /usr/bin/openssl
-        randfile: /var/openxpki/rand       
+        shell: /usr/bin/keytool
+        randfile: /var/openxpki/rand
 
 

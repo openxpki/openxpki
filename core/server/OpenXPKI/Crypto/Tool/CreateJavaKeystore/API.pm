@@ -28,9 +28,10 @@ sub __init_command_params : PRIVATE {
     my $self = shift;
 
     $self->set_command_params({
-        'create_keystore' => { 'PKCS8'        => 1,
+        'create_keystore' => { 'PKCS12'        => 1,
                                'CERTIFICATES' => 1,
-                               'PASSWORD'     => 1,
+                               'PASSWD'     => 1,
+                               'OUT_PASSWD'     => 0,
                              },
     });
 }

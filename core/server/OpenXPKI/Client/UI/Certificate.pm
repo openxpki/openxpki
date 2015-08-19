@@ -625,7 +625,7 @@ sub init_privkey {
                     { value => 'PKCS8_DER', label => 'PKCS8 (DER)' },
                     # backend is broken for those, need fixing first
                     { value => 'OPENSSL_PRIVKEY', label => 'OpenSSL native' },                    
-                    #{ value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
+                    { value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
                     ]
                 },
             ]
@@ -987,7 +987,11 @@ sub action_privkey {
 
     $self->logger()->debug( "Request privkey for $cert_identifier" );
 
-    my $privkey  = $self->send_command ( "get_private_key_for_cert", { IDENTIFIER => $cert_identifier, FORMAT => $format, 'PASSWORD' => $passphrase });
+    my $privkey  = $self->send_command ( "get_private_key_for_cert", { 
+        IDENTIFIER => $cert_identifier, 
+        FORMAT => $format, 
+        PASSWORD => $passphrase, 
+    });
 
     if (ref $privkey ne 'HASH' || !defined $privkey->{PRIVATE_KEY} )  {
         $self->logger()->error('Unable to get private key');

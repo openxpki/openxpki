@@ -417,6 +417,16 @@ sub BUILD {
                     type     => SCALAR,
                     # regex => ???
                 },
+                PASSOUT=> {
+                    type     => SCALAR,
+                    optional => 1,
+                    # regex => ???
+                },
+                KEEPROOT => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex => $re_boolean,
+                },
                 CSP      => {
                     type     => SCALAR,
                     regex    => $re_alpha_string,

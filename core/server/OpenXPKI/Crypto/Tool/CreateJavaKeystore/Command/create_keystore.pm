@@ -16,73 +16,64 @@ use English;
 my %fu_of       :ATTR; # a FileUtils instance
 my %outfile_of  :ATTR;
 my %tmp_of      :ATTR;
-my %pkcs8_of    :ATTR;
+my %pkcs12_of    :ATTR;
 my %password_of :ATTR;
-my %certs_of    :ATTR;
-my %engine_of   :ATTR;
+my %password_out_of :ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
 
+    # FileUtils and tmp
     $fu_of      {$ident} = OpenXPKI::FileUtils->new();
-    # the PKCS#8 (DER), unencrypted
-    $pkcs8_of   {$ident} = $arg_ref->{PKCS8};
-    # the password for the key in the store
-    $password_of{$ident} = $arg_ref->{PASSWORD};
-    # an arrayref of DER-encoded certificates
-    $certs_of   {$ident} = $arg_ref->{CERTIFICATES};
     $tmp_of     {$ident} = $arg_ref->{TMP};
+    
+    # the PKCS#12,  encrypted with PASS
+    $pkcs12_of   {$ident} = $arg_ref->{PKCS12};
+    $password_of{$ident} = $arg_ref->{PASSWD};
+    if ($arg_ref->{OUT_PASSWD}) {
+        $password_out_of{$ident} = $arg_ref->{OUT_PASSWD};
+    } else {
+        $password_out_of{$ident} = $arg_ref->{PASSWD};
+    }
+ 
+    if (length $password_out_of{$ident} < 6) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_JAVAKEYSTORE_COMMAND_CREATE_KEYSTORE_PASSWORD_TOO_SHORT",
+        );
+    }
+    
 }
 
 sub get_command {
     ##! 1: 'start'
     my $self  = shift;
-    my $ident = ident $self;
-    
-    my @certs;
-    my @cert_filenames;
-    eval {
-        @certs = @{$certs_of{$ident}};
-    };
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOL_MAKEJAVAKEYSTORE_COMMAND_CREATE_KEYSTORE_COULD_NOT_GET_CERTIFICATE_ARRAY',
-        );
-    }
-    foreach my $cert (@certs) {
-        push @cert_filenames, $fu_of{$ident}->get_safe_tmpfile({
-            'TMP' => $tmp_of{$ident},
-        });
-        ##! 16: 'filename for certificate: ' . $cert_filenames[-1]
-        $fu_of{$ident}->write_file({
-            FILENAME => $cert_filenames[-1],
-            CONTENT  => $cert,
-            FORCE    => 1,
-        });
-    }
-    my $certfiles = '-cert ';
-    $certfiles .= join ' -cert ', @cert_filenames;
-    ##! 16: 'certfiles: ' . $certfiles
+    my $ident = ident $self; 
 
     $outfile_of{$ident} = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
     });
     
-    my $stdin_data = 'keystore='  . $outfile_of{$ident}  . "\n";
-    $stdin_data   .= 'storepass=' . $password_of{$ident} . "\n";
-    $stdin_data   .= 'keypass='   . $password_of{$ident} . "\n";
-    $stdin_data   .= "key=key:\n" . $pkcs8_of{$ident}    . "\n";
+    my $pkcs12 = $fu_of{$ident}->get_safe_tmpfile({
+        'TMP' => $tmp_of{$ident},
+    });    
+    $fu_of{$ident}->write_file({
+        FILENAME => $pkcs12,
+        CONTENT  => $pkcs12_of{$ident},
+        FORCE    => 1,
+    });
+    
+    #$self->set_env ("jkspass" => $self->{PASSWD});
+    #$self->set_env ("p12pass" => $self->{PASSWD});
+    
+    $ENV{jkspass} = $password_out_of{$ident};
+    $ENV{p12pass} = $password_of{$ident};
 
-    ##! 1: 'end' 
-    return {
-        COMMAND => [ $certfiles . ' -' ],
-        PARAMS  => [
-            {
-                TYPE => 'STDIN',
-                DATA => $stdin_data,
-            },
-        ],
-    };
+    my $command = "-importkeystore ";
+    $command .= " -srcstoretype PKCS12 -srcstorepass:env p12pass -srckeystore " . $pkcs12;
+    $command .= " -deststoretype JKS -storepass:env jkspass -destkeystore ". $outfile_of{$ident};  
+
+    return [ $command ];
+    
 }
 
 sub hide_output
@@ -96,7 +87,9 @@ sub key_usage
 }
 
 sub cleanup
-{
+{    
+    delete $ENV{jkspass};
+    delete $ENV{p12pass};
     return 1;
 }
 

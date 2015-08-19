@@ -91,7 +91,7 @@ sub get_command
                        CONTENT  => $self->{CERT},
 	               FORCE    => 1);
     if (exists $self->{CHAIN} && scalar @{$self->{CHAIN}}) {
-        my $chain = join('', @{$self->{CHAIN}});
+        my $chain = join("\n", @{$self->{CHAIN}});
         $self->write_file(
             FILENAME => $self->{CHAINFILE},
             CONTENT  => $chain,
