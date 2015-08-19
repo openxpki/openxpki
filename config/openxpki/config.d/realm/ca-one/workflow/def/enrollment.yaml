@@ -429,6 +429,11 @@ condition:
         param:
             test: $context->{p_allow_man_authen};
 
+    allow_anonymous_enrollment:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_allow_anon_enroll};
+
     auto_revoke_existing_certs:
         class: Workflow::Condition::Evaluate
         param:
@@ -485,6 +490,7 @@ condition:
         param:
             condition1: scep_trusted_self_sign
             condition2: scep_trusted_signer_on_behalf
+            condition3: scep_allow_anonymous_enrollment
 
     valid_request:
         class: Workflow::Condition::LazyAND
