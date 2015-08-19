@@ -15,7 +15,6 @@ sub render_process_status {
 
     $self->logger()->debug( 'render_process_status: ' . Dumper $args );
 
-    my $wf_info = $args->{WF_INFO};
     
     my $process = $self->send_command( 'list_process' );
 
@@ -62,6 +61,8 @@ sub render_system_status {
     my $class = shift; # static call
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
+    
+    my $wf_info = $args->{WF_INFO};
     
     my $status = $self->send_command("get_ui_system_status");
 
@@ -151,7 +152,11 @@ sub render_system_status {
         }
     });
    
-    foreach my $type (qw(certsign datasafe scep)) {
+    # we fetch the list of tokens to display from the context
+    # this allows a user to configure this     
+    my @token = split /\s*,\s*/, $wf_info->{WORKFLOW}->{CONTEXT}->{token};
+   
+    foreach my $type (@token) {
         
         my $token = $self->send_command( 'list_active_aliases', { TYPE => $type, CHECK_ONLINE => 1 } );
 

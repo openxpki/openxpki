@@ -4,12 +4,12 @@ head:
 
 state:
     INITIAL:      
-        uihandle: OpenXPKI::Client::UI::Handle::Status::render_process_status
         action: 
           - global_noop > SUCCESS
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        uihandle: OpenXPKI::Client::UI::Handle::Status::render_process_status
 
 acl:
     CA Operator:

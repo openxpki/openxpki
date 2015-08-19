@@ -1,5 +1,5 @@
 landmark:
-  welcome: workflow!index!wf_type!status_system
+  welcome: workflow!start!wf_type!status_system
 
 main:
   - key: home
@@ -40,9 +40,9 @@ main:
         label: I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES
       - key:   crl!index
         label: I18N_OPENXPKI_UI_MENU_CRL
-      - key:   workflow!index!wf_type!status_process
+      - key:   workflow!start!wf_type!status_process
         label: I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION
-      - key:   workflow!index!wf_type!status_system
+      - key:   workflow!start!wf_type!status_system
         label: I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS
       - key:   workflow!index!wf_type!report_summary
         label: I18N_OPENXPKI_UI_MENU_REPORT_SUMMARY

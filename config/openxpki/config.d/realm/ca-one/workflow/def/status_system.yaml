@@ -4,12 +4,18 @@ head:
 
 state:
     INITIAL:      
-        uihandle: OpenXPKI::Client::UI::Handle::Status::render_system_status
         action: 
-          - global_noop > SUCCESS
+          - initalize > SUCCESS
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        uihandle: OpenXPKI::Client::UI::Handle::Status::render_system_status
+
+action:
+    initalize:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+          token: certsign,datasafe,scep
 
 acl:
     CA Operator:
