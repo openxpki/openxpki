@@ -460,6 +460,10 @@ msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Тестировщик"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
 msgstr ""
 "Выбранный способ построения имени требует наличия, как минимум, одного "
@@ -6652,10 +6656,6 @@ msgstr "Последнее обновление"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy

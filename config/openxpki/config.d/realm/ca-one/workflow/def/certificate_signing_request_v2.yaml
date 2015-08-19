@@ -372,6 +372,8 @@ action:
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC
         input:
           - password_retype
+        validator:
+          - global_password_quality
 
     cancel_approvals:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals

@@ -464,6 +464,10 @@ msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "testuser"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -6520,10 +6524,6 @@ msgstr "Letzte Aktualisierung"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy

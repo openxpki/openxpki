@@ -13,26 +13,26 @@ sub _init {
     my ( $self, $params ) = @_;
     # set up Data::Password options from validator configuration
     # file
-    if (exists $params->{DICTIONARY}) {
-        $DICTIONARY = $params->{DICTIONARY};
+    if (exists $params->{dictionary}) {
+        $DICTIONARY = $params->{dictionary};
     }
-    if (exists $params->{FOLLOWING}) {
-        $FOLLOWING = $params->{FOLLOWING};
+    if (exists $params->{following}) {
+        $FOLLOWING = $params->{following};
     }
-    if (exists $params->{'FOLLOWING_KEYBOARD'}) {
-        $FOLLOWING_KEYBOARD = $params->{'FOLLOWING_KEYBOARD'};
+    if (exists $params->{'following_keyboard'}) {
+        $FOLLOWING_KEYBOARD = $params->{'following_keyboard'};
     }
-    if (exists $params->{'GROUPS'}) {
-        $GROUPS = $params->{GROUPS};
+    if (exists $params->{'groups'}) {
+        $GROUPS = $params->{groups};
     }
-    if (exists $params->{'MINLEN'}) {
-        $MINLEN = $params->{MINLEN};
+    if (exists $params->{'minlen'}) {
+        $MINLEN = $params->{minlen};
     }
-    if (exists $params->{MAXLEN}) {
-        $MAXLEN = $params->{MAXLEN};
+    if (exists $params->{maxlen}) {
+        $MAXLEN = $params->{maxlen};
     }
-    if (exists $params->{DICTIONARIES}) {
-        @DICTIONARIES = split(/,/, $params->{DICTIONARIES});
+    if (exists $params->{dictionaries}) {
+        @DICTIONARIES = split(/,/, $params->{dictionaries});
     }
 }
 
@@ -42,7 +42,12 @@ sub validate {
     ## prepare the environment
     if (my $reason = IsBadPassword($password)) {
         ##! 16: 'bad password entered: ' . $reason
-        validation_error("I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PASSWORD_QUALITY_BAD_PASSWORD");
+        CTX('log')->log(
+            MESSAGE  => "Validator password quality failed: " . $reason ,
+            PRIORITY => 'info',
+            FACILITY => 'system',
+        );
+        validation_error("I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD");
     }
     return 1;
 }
@@ -57,12 +62,17 @@ OpenXPKI::Server::Workflow::Validator::PasswordQuality
 
 =head1 SYNOPSIS
 
-<action name="CreateCSR">
-  <validator name="PasswordQuality"
-           class="OpenXPKI::Server::Workflow::Validator::PasswordQuality">
-    <arg value="$_password"/>
-  </validator>
-</action>
+class: OpenXPKI::Server::Workflow::Validator::PasswordQuality
+arg:
+ - $_password
+param:
+   minlen: 8
+   maxlen: 64
+   groups: 2
+   dictionary: 4
+   following: 3
+   following_keyboard: 3
+
 
 =head1 DESCRIPTION
 
