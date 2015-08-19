@@ -33,7 +33,7 @@ As the init script uses mysql as default, but does not force it as a dependency,
 
     aptitude install mysql-server libdbd-mysql-perl
 
-We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires the "non-free" repository to be present in your apt sources.
+We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires the "non-free" repository to be present in your apt sources::
 
     aptitude install libapache2-mod-fastcgi
 
@@ -45,18 +45,30 @@ We are fighting with a debian build issue, if your install complains about a fil
 
     aptitude -o Dpkg::Options::="--force-overwrite" install libopenxpki-perl
 
-If the install was successful, you should see the result of the initial config import at the bottom of your install log (the hash value might vary)::
+use the openxpkiadm command to verify if the system was installed correctly::
 
-    Current Tree Version: 64f82c3479f5773536f9ff7d37da366ea49abae9
+    openxpkiadm version
+    Version (core): 0.34.0
 
-Now, create the database user::
+Now, create an empty database and assign a database user::
 
     CREATE database openxpki;
     CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
     GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
     flush privileges;
 
-It is now time to init the server::
+...and put the used credentials into /etc/openxpki/config.d/system/database.yaml::
+
+    main:
+        debug: 0
+       type: MySQL
+       name: openxpki
+       host: localhost
+       port: 3306
+       user: openxpki
+       passwd: openxpki
+
+Create the initial database schema with this command::
 
     openxpkiadm initdb
 
@@ -70,7 +82,7 @@ a root ca certificate and below your issuing ca and certs for SCEP and the inter
 The sample script proves certs for a quickstart but should never be used for production systems 
 (it has the fixed passphrase *root* for all keys ;) and no policy/crl, etc config ).
  
-Here is what you need to do:
+Here is what you need to do if you *dont* use the sampleconfig script.
 
 #. Create a key/certificate as signer certificate (ca = true)
 #. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
@@ -154,9 +166,9 @@ If this is not the case, check */var/openxpki/stderr.log*.
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
 
-The new webclient is included in the core packages now. Just open your browser and navigate to *http://yourhost/newoxi/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
+The new webclient is included in the core packages now. Just open your browser and navigate to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
 
-Login as user can be done with any password, there is a preconfigured operator account with user raop and password openxpki. Note that the UI does not recognize the backends acl and will render useless links and buttons for the user role.
+You can log in as user with any username/password combination, the operator login has two preconfigured operator accounts raop and raop2 with password openxpki.
 
 Testdrive
 ^^^^^^^^^
@@ -165,10 +177,11 @@ Testdrive
 #. Go to "Request", select "Request new certificate"
 #. Complete the pages until you get to the status "PENDING" (gray box on the right)
 #. Logout and re-login as RA Operator (Username: raop, Password: openxpki )  
-#. Go to "Approval", select "Home / My tasks"
-#. Select your Request, change the request or use the "approve" button
+#. Select "Home / My tasks", there should be a table with one request pending
+#. Select your Request by clicking the line, change the request or use the "approve" button
 #. After some seconds, your first certificate is ready :)
-#. You can now login with your username and fetch the certificate 
+#. You can download the certificate by clicking on the link in the first row field "certificate"
+#. You can now login with your username and fetch the certificate
 
 Enabling the SCEP service
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -178,9 +191,9 @@ our package server in order to use the scep service.**
 
 The SCEP logic is already included in the core distribution. The package installs
 a wrapper script into /usr/lib/cgi-bin/ and creates a suitable alias in the apache
-config redirecting all requests to ``http://host/cgi-bin/scep/<any value>` to the wrapper.
+config redirecting all requests to ``http://host/scep/<any value>` to the wrapper.
 A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive, 
-there is no need for any configuration, just call ``http://host/cgi-bin/scep/scep``.
+there is no need for any configuration, just call ``http://host/scep/scep``.
 
 The system supports getcacert, getcert, getcacaps, getnextca and enroll/renew - the 
 shipped workflow is configured to allow enrollment with password or signer on behalf.
