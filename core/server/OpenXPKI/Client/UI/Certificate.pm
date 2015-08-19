@@ -624,7 +624,7 @@ sub init_privkey {
                     { value => 'PKCS8_PEM', label => 'PKCS8 (PEM)' },
                     { value => 'PKCS8_DER', label => 'PKCS8 (DER)' },
                     # backend is broken for those, need fixing first
-                    #{ value => 'OPENSSL_PRIVKEY', label => 'OpenSSL native' },                    
+                    { value => 'OPENSSL_PRIVKEY', label => 'OpenSSL native' },                    
                     #{ value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
                     ]
                 },

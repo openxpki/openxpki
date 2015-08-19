@@ -11,7 +11,8 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl;
 
-use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_key;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkey;
+use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs8;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs10;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_crl;

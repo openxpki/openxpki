@@ -976,36 +976,31 @@ sub get_private_key_for_cert {
     }
     my $result;
 
-    my $command_hashref = {
-        COMMAND => 'convert_key',
-        PASSWD  => $password,
-        DATA    => $private_key,
-        IN      => 'PKCS8',
-    };
-    if ( $format eq 'PKCS8_PEM' ) {
+    ##! 16: 'pkey ' . $private_key
 
-        # native format, we still call convert_key to do
-        # the password checking for us
-        $command_hashref->{OUT} = 'PKCS8';
-    }
-    elsif ( $format eq 'PKCS8_DER' ) {
-        $command_hashref->{OUT} = 'DER';
+    # NB: The key in the database is in native openssl format
+    my $command_hashref;
+        
+    if ( $format =~ /PKCS8_(PEM|DER)/ ) {
+        $format = $1;
+        $command_hashref = {
+            PASSWD  => $password,
+            DATA    => $private_key,
+            COMMAND => 'convert_pkcs8',
+            OUT     => $format,
+            REVERSE => 1
+        };         
     }
     elsif ( $format eq 'OPENSSL_PRIVKEY' ) {
 
-        # we need to get the type of the key first
-        my $key_type = $default_token->command(
-            {
-                COMMAND => 'get_pkcs8_keytype',
-                PASSWD  => $password,
-                DATA    => $private_key,
-            }
-        );
-        if ( !defined $key_type ) {
-            OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_PRIVATE_KEY_FOR_CERT_COULD_NOT_DETERMINE_KEY_TYPE',
-            );
-        }
-        $command_hashref->{OUT} = 'OPENSSL_' . $key_type;
+        # we just need to spit out the blob from the database but we need to check
+        # if the password matches, so we do a 1:1 conversion        
+        $command_hashref = {
+            PASSWD  => $password,
+            DATA    => $private_key,
+            COMMAND => 'convert_pkey',
+        };     
+
     }
     elsif ( $format eq 'PKCS12' ) {
         ##! 16: 'identifier: ' . $identifier
@@ -1033,6 +1028,8 @@ sub get_private_key_for_cert {
         }
     }
     elsif ( $format eq 'JAVA_KEYSTORE' ) {
+        
+        # BROKEN! - needs fix
         my $token = CTX('crypto_layer')->get_system_token({ TYPE => 'javaks' });
 
         # get decrypted private key to pass on to create_keystore
@@ -1045,7 +1042,7 @@ sub get_private_key_for_cert {
         );
         my $decrypted_pkcs8_pem = $default_token->command(
             {
-                COMMAND => 'convert_key',
+                COMMAND => 'convert_pkey',
                 PASSWD  => $password,
                 DATA    => $private_key,
                 IN      => 'PKCS8',

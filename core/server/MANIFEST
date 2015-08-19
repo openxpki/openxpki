@@ -133,7 +133,8 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/is_prime.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/issue_cert.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/issue_crl.pm
 
-OpenXPKI/Crypto/Backend/OpenSSL/Command/convert_key.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/convert_pkey.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/convert_pkcs8.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/convert_pkcs10.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/convert_cert.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/convert_crl.pm
