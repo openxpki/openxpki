@@ -96,16 +96,16 @@ $result = $client->mock_request({
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    '_password' => '1234',
+    '_password' => 'OpenXPKI!',
     'wf_token' => undef
 });
 
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    'cert_subject_parts{username}' => 'oliwel',
-    'cert_subject_parts{realname}' => 'Oliver Welter',
-    'cert_subject_parts{email}' => 'mail@oliwel.de',
+    'cert_subject_parts{username}' => 'openxpki',
+    'cert_subject_parts{realname}' => 'Thomas Tester',
+    'cert_subject_parts{email}' => 'test@openxpki.org',
     'wf_token' => undef
 });
 
