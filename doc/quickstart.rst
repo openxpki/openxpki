@@ -8,7 +8,7 @@ Vagrant
 
 We have a vagrant setup for debian wheezy and ubuntu trusty (currently disfuctional). If you have vagrant you can just 
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
-minutes and will give you a ready to run OXI install available at http://localhost:8080/newoxi/.
+minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
 
 Debian/Ubuntu Development Builds
 ---------------------------------
@@ -17,7 +17,7 @@ Debian/Ubuntu Development Builds
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
 
-Current release is 0.18 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
+Current release is 0.34 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (wheezy)::
 
