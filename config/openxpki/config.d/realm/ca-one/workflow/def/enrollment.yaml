@@ -532,6 +532,11 @@ condition:
         param:
              test: $context->{signer_trusted}
 
+    signer_on_behalf:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_on_behalf}
+
     signer_sn_matches_csr:
         class: Workflow::Condition::Evaluate
         param:
