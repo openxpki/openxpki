@@ -296,6 +296,8 @@ OpenXPKI/Server/Workflow/Activity/Tools/Datapool/SetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/DeleteEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/AppendToEntry.pm
 
+OpenXPKI/Server/Workflow/Activity/Tools/EvaluateSignerTrust.pm
+
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 
@@ -319,7 +321,7 @@ OpenXPKI/Server/Workflow/Activity/Reports/CertExport/TagAsExported.pm
 
 
 OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateChallenge.pm
-OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateSignerTrust.pm
+
 OpenXPKI/Server/Workflow/Activity/SCEPv2/EvaluateEligibility.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/RevokeExistingCerts.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/LoadRecentCertificate.pm

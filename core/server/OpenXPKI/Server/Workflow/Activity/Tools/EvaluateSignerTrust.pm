@@ -1,33 +1,28 @@
-# OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust
-# Written by Scott Hardin for the OpenXPKI Project 2012
-# Copyright (c) 2012 by The OpenXPKI Project
-
-package OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust;
+package OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust;
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust
+OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
 
 =head1 SYNOPSIS
 
-    <action name="do_something">
-        <condition name="scep_signer_trusted"
-            class="OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust">
-        </condition>
-    </action>
+    class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+    param:
+      _map_rules: scep.[% context.server %].authorized_signer_on_behalf
 
 =head1 DESCRIPTION
 
 Evaluate the trust status of the signer. The result are two status flags,
 I<signer_trusted> if the certificate can be validated using the PKI 
-(complete chain available and not revoked) and I<signer_on_behalf>
-if the signer is authorized to perform request on behalf.
+(complete chain available and not revoked) and I<signer_authorized>
+if the signer is authorized (matches one of the given rules)
 If the chain can not be validated, the authorization check is skipped. 
 
 =head1 Configuration
 
-The check for authorization uses a list of rules configured at 
-I<scep.$server.authorized_signer_on_behalf>. 
+The check for authorization uses a list of rules below the path defined
+by the rules parameter. E.g. for the SCEP workflow this is   
+I<scep.[% context.server ].authorized_signer_on_behalf>. 
 The list is a hash of hashes, were each entry is a combination of one or more 
 matching rules. The name of the rule is just used for logging purpose:
 
@@ -57,7 +52,7 @@ sub execute {
 
     my $context = $workflow->context();
     my $config = CTX('config');
-    my $server = $context->param('server');
+    #my $server = $context->param('server');
 
     my $default_token = CTX('api')->get_default_token();
     
@@ -69,7 +64,7 @@ sub execute {
        
     # reset the context flags    
     $context->param('signer_trusted' => 0);    
-    $context->param('signer_on_behalf' => 0);              
+    $context->param('signer_authorized' => 0);              
        
        
     # Check the chain
@@ -106,13 +101,13 @@ sub execute {
     
     if ($signer_root) {
         CTX('log')->log(
-            MESSAGE => "SCEP Signer validated - trusted root is $signer_root", 
+            MESSAGE => "Trusted Signer validated - trusted root is $signer_root", 
             PRIORITY => 'info',
             FACILITY => ['application','audit']
         );        
     } else {
         CTX('log')->log(
-            MESSAGE => "SCEP Signer validation FAILED", 
+            MESSAGE => "Trusted Signer validation FAILED", 
             PRIORITY => 'info',
             FACILITY => ['application']
         );
@@ -123,13 +118,14 @@ sub execute {
     my $signer_subject = $x509->get_parsed('BODY', 'SUBJECT');
     ##! 32: 'Check signer '.$signer_subject.' against trustlist' 
     
-    my @rules = $config->get_keys("scep.$server.authorized_signer_on_behalf");
+    my $rules_prefix = $self->param('rules');    
+    my @rules = $config->get_keys( $rules_prefix );
     
     my $matched = 0;
     my $current_realm = CTX('session')->get_pki_realm();
     
     CTX('log')->log(
-        MESSAGE => "SCEP Signer Authorization $signer_profile / $signer_realm / $signer_subject",        
+        MESSAGE => "Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject",        
         PRIORITY => 'trace',
         FACILITY => 'application',
     );            
@@ -137,7 +133,7 @@ sub execute {
     TRUST_RULE:
     foreach my $rule (@rules) {
         ##! 32: 'Testing rule ' . $rule
-        my $trustrule = $config->get_hash("scep.$server.authorized_signer_on_behalf.$rule");        
+        my $trustrule = $config->get_hash("$rules_prefix.$rule");        
         $trustrule->{realm} = $current_realm if (!$trustrule->{realm});
         
         $matched = 0;
@@ -158,7 +154,7 @@ sub execute {
                                 
             } else {                
                 CTX('log')->log(
-                    MESSAGE => "SCEP Signer Authorization unknown ruleset $key:$match",
+                    MESSAGE => "Trusted Signer Authorization unknown ruleset $key:$match",
                     PRIORITY => 'error',
                     FACILITY => 'system',
                 );
@@ -167,7 +163,7 @@ sub execute {
             next TRUST_RULE if (!$matched);
 
             CTX('log')->log(
-                MESSAGE => "SCEP Signer Authorization matched subrule $rule/$match",
+                MESSAGE => "Trusted Signer Authorization matched subrule $rule/$match",
                 PRIORITY => 'debug',
                 FACILITY => 'application',
             );            
@@ -177,22 +173,22 @@ sub execute {
         if ($matched) {
             ##! 16: 'Passed validation rule #'.$rule,
             CTX('log')->log(
-                MESSAGE => "SCEP Signer Authorization matched rule $rule",
+                MESSAGE => "Trusted Signer Authorization matched rule $rule",
                 PRIORITY => 'info',
                 FACILITY => 'application',
             );            
-            $context->param('signer_on_behalf' => 1);
+            $context->param('signer_authorized' => 1);
             return 1;
         }       
     }
      
     CTX('log')->log(
-        MESSAGE => "SCEP Signer not found in trust list ($signer_subject).",
+        MESSAGE => "Trusted Signer not found in trust list ($signer_subject).",
         PRIORITY => 'info',
         FACILITY => ['application','audit']
     );
 
-    $context->param('signer_on_behalf' => 0);
+    $context->param('signer_authorized' => 0);
     return 1;
 }
 

@@ -304,7 +304,9 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility
 
     eval_signer_trust:
-        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateSignerTrust
+        class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+        param:
+            _map_rules: scep.[% context.server %].authorized_signer_on_behalf
 
     extract_csr:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::ExtractCSR
@@ -532,10 +534,10 @@ condition:
         param:
              test: $context->{signer_trusted}
 
-    signer_on_behalf:
+    signer_authorized:
         class: Workflow::Condition::Evaluate
         param:
-             test: $context->{signer_on_behalf}
+             test: $context->{signer_authorized}
 
     signer_sn_matches_csr:
         class: Workflow::Condition::Evaluate
@@ -552,7 +554,7 @@ condition:
         class: Workflow::Condition::LazyAND
         param:
             condition1: scep_signer_trusted
-            condition2: scep_signer_on_behalf
+            condition2: scep_signer_authorized
 
     valid_csr:
         class: Workflow::Condition::Evaluate

@@ -414,7 +414,7 @@ The internal request id is really unique across the whole system.
 
 The signer and the csr have the same public key. Note: If you allow key renewal this might also be a renewal!
 
-**signer_on_behalf**
+**signer_authorized**
 
 The signer certificate is recognized as an authorized signer on behalf. See *authorized_signer_on_behalf* in the configuration section.
 
