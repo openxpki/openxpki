@@ -15,8 +15,10 @@ OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
 Evaluate the trust status of the signer. The result are two status flags,
 I<signer_trusted> if the certificate can be validated using the PKI 
 (complete chain available and not revoked) and I<signer_authorized>
-if the signer is authorized (matches one of the given rules)
-If the chain can not be validated, the authorization check is skipped. 
+if the signer is authorized (matches one of the given rules).
+Authorization is done, even if the chain can not be validated, so you need 
+to check both context items or delegate the chain validation to another
+component (e.g. tls config of webserver). 
 
 =head1 Configuration
 
@@ -29,11 +31,14 @@ matching rules. The name of the rule is just used for logging purpose:
   rule1:
     subject: CN=scep-signer.*,dc=OpenXPKI,dc=org
     identifier: AhElV5GzgFhKalmF_yQq-b1TnWg
-    profile: I18N_OPENXPKI_PROFILE_SCEP_SIGNER    
+    profile: I18N_OPENXPKI_PROFILE_SCEP_SIGNER
+    realm: ca-one
 
-The subject is evaluated as a regexp, therefore any characters with a special meaning in 
-perl regexp need to be escaped! Identifier and profile are matched as is. The rules in one
-entry are ANDed together. If you want to provide alternatives, add multiple list items.
+The subject is evaluated as a regexp, therefore any characters with a 
+special meaning in perl regexp need to be escaped! Identifier, profile and
+realm are matched as is, realm is always the session realm if not set. 
+The rules in one entry are ANDed together. If you want to provide 
+alternatives, add multiple list items.
 
 =cut
 
@@ -53,18 +58,27 @@ sub execute {
     my $context = $workflow->context();
     my $config = CTX('config');
     #my $server = $context->param('server');
+    
+    # reset the context flags    
+    $context->param('signer_trusted' => 0);    
+    $context->param('signer_authorized' => 0);              
+       
+    my $signer_cert = $context->param('signer_cert');
+    
+    if (!$signer_cert) {
+        CTX('log')->log(
+            MESSAGE => "Trusted Signer validation skipped, no certificate found", 
+            PRIORITY => 'debug',
+            FACILITY => ['application']
+        );
+        return 1;
+    }
 
     my $default_token = CTX('api')->get_default_token();
-    
-    my $signer_cert = $context->param('signer_cert'); 
     my $x509 = OpenXPKI::Crypto::X509->new(
         DATA  => $signer_cert,        
         TOKEN => $default_token
     );       
-       
-    # reset the context flags    
-    $context->param('signer_trusted' => 0);    
-    $context->param('signer_authorized' => 0);              
        
        
     # Check the chain
@@ -88,7 +102,7 @@ sub execute {
 
     my $signer_trusted = 0;
     my $signer_root = '';
-    if ($signer_issuer) {          
+    if ($signer_issuer) {
         my $signer_chain = CTX('api')->get_chain({
             'START_IDENTIFIER' => $signer_issuer,        
         });                                    
@@ -125,7 +139,7 @@ sub execute {
     my $current_realm = CTX('session')->get_pki_realm();
     
     CTX('log')->log(
-        MESSAGE => "Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject",        
+        MESSAGE => "Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier",        
         PRIORITY => 'trace',
         FACILITY => 'application',
     );            
@@ -133,7 +147,7 @@ sub execute {
     TRUST_RULE:
     foreach my $rule (@rules) {
         ##! 32: 'Testing rule ' . $rule
-        my $trustrule = $config->get_hash("$rules_prefix.$rule");        
+        my $trustrule = $config->get_hash("$rules_prefix.$rule");
         $trustrule->{realm} = $current_realm if (!$trustrule->{realm});
         
         $matched = 0;

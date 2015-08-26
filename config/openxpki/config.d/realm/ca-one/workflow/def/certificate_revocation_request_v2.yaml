@@ -15,7 +15,7 @@ state:
         autorun: 1
         action:
           - global_noop > PENDING_USER ? !global_is_batch_mode
-          - global_noop2 > CHECK_APPROVALS ? global_is_batch_mode
+          - check_authorized_signer > CHECK_APPROVALS ? global_is_batch_mode
 
     CHECK_FOR_REVOCATION:
         autorun: 1
@@ -173,10 +173,17 @@ action:
           - flag_delayed_revoke
           - flag_batch_mode
           - crr_info
+          - server
+          - signer_cert
         validator:
           - validate_invalidity_time
           - validate_reason_code
           - global_cert_identifier_exists
+
+    check_authorized_signer:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+        param:
+            _map_rules: soap.[% context.server %].authorized_signer
 
     delay_revocation:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Pause
@@ -257,6 +264,7 @@ condition:
         param:
             condition1: crr_is_autoapproval
             condition2: crr_has_approvals
+            condition3: crr_is_requestor_authorized
 
     has_approvals:
         class: OpenXPKI::Server::Workflow::Condition::Approved
@@ -267,6 +275,12 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{flag_auto_approval}
+
+    is_requestor_authorized:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: ($context->{signer_trusted} and $context->{signer_authorized})
+
 
     pending_notification_send:
         class: Workflow::Condition::Evaluate
@@ -307,6 +321,20 @@ field:
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC
         type: server
         required: 0
+
+    server:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL
+        name: server
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC
+        type: server
+        required: 0
+
+    signer_cert:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL
+        name: signer_cert
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC
+        required: 0
+        type: server
 
 acl:
     Anonymous:
