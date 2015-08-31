@@ -17,7 +17,7 @@ Debian/Ubuntu Development Builds
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
 
-Current release is 0.34 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
+Current release is 0.35 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (wheezy)::
 
