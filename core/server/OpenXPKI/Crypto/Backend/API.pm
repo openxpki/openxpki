@@ -37,7 +37,7 @@ sub __init_command_params : PRIVATE {
     ## application of the crypto layer policy: names of crypto algorithms should be defined in the crypto backend
     ## now implemented for the public key algoriths only
 
-    ## define params for all the crypto commands except 'create_key'
+    ## define params for all the crypto commands
     my $command_params = {
     "list_algorithms" => {"FORMAT"        => 1,
                           "ALG"           => 0,
@@ -127,35 +127,8 @@ sub __init_command_params : PRIVATE {
     "create_params"   =>  {"TYPE"   => 1, # DSA or DH
                           "PKEYOPT" => 1,
                           },
-    };
-
-    ## assign the specified value to the command_params attribute
-    $self->set_command_params($command_params);
-
-    ## ask crypto backend for supported public key algorithms and their params
-    ## for this execute a command 'list_algorithms'
-    my $supported_algs;
-    $supported_algs = $self->command({COMMAND       => "list_algorithms",
-                                      FORMAT        => "all_data"});
-
-    ## extract public key algorithms names and appropriate params from the answer of the backend
-    my @types = ();
-    my $parameters;
-    while (my ($alg, $params) = each(%{$supported_algs})) {
-        push @types, $alg;
-        $parameters->{"TYPE:$alg"} = $params;
-    }
-
-    ## specify now params for the crypto command 'create_key'
-    my $create_key_params;
-    $create_key_params = {"PASSWD"     => 0,
-                          "TYPE"       => \@types,
-                          "PARAMETERS" => $parameters,
-                         };
-
-    ## insert 'create_key' params to the main definition of the crypto commands params
-    $command_params->{"create_key"} = $create_key_params;
-
+    }; 
+    
     ## reassign the updated value to the command_params attribute
     $self->set_command_params($command_params);
    ##! 16: 'end'
