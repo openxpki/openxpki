@@ -1,9 +1,9 @@
-# SOAP service implementing a certificate revocation interface
+# SOAP service implementing revocation interface for smartcard 
 
 use strict;
 use warnings;
 
-package OpenXPKI::SOAP::Revoke;
+package OpenXPKI::SOAP::Smartcard;
 
 use English;
 use Config::Std;
@@ -21,16 +21,16 @@ $log->info("SOAP interface NG initialized ");
 #$log->debug('Env ' . Dumper \%ENV);
 
 # Adjust path to binary!
-sub RevokeCertificate {
+sub RevokeSmartcard {
 
     my $class           = shift;
-    my $cert_identifier = shift;
-    my $reason          = shift || 'unspecified';
+    my $card_identifier = shift;
+    my $jobid           = shift || '<not defined>';
 
     $log->debug(
-        "SOAP: RevokeCertificate - ",
-        "certificate: $cert_identifier, ",
-        "reason: $reason"        
+        "SOAP: RevokeSmartcard - ",
+        "CardId: $card_identifier, ",
+        "RequestId: $jobid"        
     );
     
     my $config = $main::config->config();
@@ -41,7 +41,7 @@ sub RevokeCertificate {
    
     my $canonical_uri = $server_name . $request_uri;
 
-    $log->info("SOAP Revoke (uri: $canonical_uri, client ip=$client_ip, cert=$cert_identifier, reason=$reason");
+    $log->info("SOAP Revoke (uri: $canonical_uri, client ip=$client_ip, card=$card_identifier");
     
     my $auth_dn = '';
     my $auth_pem = '';
@@ -60,7 +60,7 @@ sub RevokeCertificate {
     else {
         $log->debug("calling context is http");
     }
-    
+     
     my $package = __PACKAGE__;
     
     # Workflow and endpoint name is held in the package config
@@ -68,7 +68,7 @@ sub RevokeCertificate {
     my $servername = $config->{$package}->{servername};
     
     if ( !defined $workflow_type ) {
-        $log->error("SOAP CertificateRevoke: no workflow_type set for requested URI $canonical_uri");
+        $log->error("SOAP SmartcardRevoke: no workflow_type set for requested URI $canonical_uri");
         return SOAP::Data->new( name => 'responseCode', value => 1 );
     }
     
@@ -88,17 +88,13 @@ sub RevokeCertificate {
         my $serializer = OpenXPKI::Serialization::Simple->new();
         
         my %param = (
-            cert_identifier => $cert_identifier,
-            reason_code     => $reason,
+            token_id => $card_identifier,            
             crr_info        => $serializer->serialize({
                 requester_sn    => $auth_dn || '',    # default to empty string (must not be undef)                
                 client_ip       => $client_ip,
             }),
             server => $servername,
-            signer_cert => $auth_pem,
-            flag_batch_mode => 1,        
-            comment                => 'via soap',
-            invalidity_time        => time(),
+            signer_cert => $auth_pem
         );
 
         $log->debug( "WF parameters: " . Dumper \%param );

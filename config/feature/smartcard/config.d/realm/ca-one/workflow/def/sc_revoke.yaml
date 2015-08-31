@@ -19,8 +19,13 @@ state:
     INITIALIZED:
         autorun: 1
         action:
-          - initialize_context_params > INITIALIZED_PARAMS
+          - check_authorized_signer > REQUESTOR_AUTHORIZATION_CHECKED
 
+    REQUESTOR_AUTHORIZATION_CHECKED:
+        autorun: 1
+        action:
+          - global_noop > FAILURE ? !is_requestor_authorized
+          - check_prereqs_via_api > PREREQS_AVAILABLE ? is_requestor_authorized
 
     HAVE_CERT_TO_REVOKE:
         autorun: 1
@@ -30,8 +35,8 @@ state:
     CERTS_QUEUED_FOR_REVOCATION:
         autorun: 1
         action:
-          - cleanup_workflow > SUCCESS ? all_certs_revoked
-          - global_noop > CERT_TO_REVOKE ? !all_certs_revoked
+          - global_noop > SUCCESS ? all_certs_revoked
+          - global_noop2 > CERT_TO_REVOKE ? !all_certs_revoked
 
     CERT_TO_REVOKE:
         autorun: 1
@@ -41,41 +46,29 @@ state:
     PREREQS_AVAILABLE:
         autorun: 1
         action:
-          - global_noop > REQUESTER_AUTHORIZED ? requester_authorized
-          - global_noop2 > AUTO_REVOKE_EXISTING_CERTIFICATES ? !requester_authorized
-
-    AUTO_REVOKE_EXISTING_CERTIFICATES:
-        autorun: 1
-        action:
-          - queue_certs_to_revoke > SET_REVOKE_PARAMS
-
-    INITIALIZED_PARAMS:
-        autorun: 1
-        action:
-          - check_prereqs_via_api > PREREQS_AVAILABLE
-
-    REQUESTER_AUTHORIZED:
-        autorun: 1
-        action:
-          - global_noop > AUTO_REVOKE_EXISTING_CERTIFICATES ? !policy_allows_auto_revoke
-          - set_auto_approval_to_true > AUTO_REVOKE_EXISTING_CERTIFICATES ? policy_allows_auto_revoke
-
-    SET_REVOKE_PARAMS:
-        autorun: 1
-        action:
-          - set_revoke_params > CERTS_QUEUED_FOR_REVOCATION
+          - queue_certs_to_revoke > CERTS_QUEUED_FOR_REVOCATION
 
 action:
     revoke_certificate:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
+        param:
+            reason_code: cessationOfOperation
+            comment: Revoked by SOAP Request
+            flag_auto_approval : 1
+            flag_batch_mode: 1
 
     initialize:
         class: Workflow::Action::Null
         input:
-          - client_ip
-          - requester_authorized
-          - requester_sn
+          - crr_info
+          - server
+          - signer_cert
           - token_id
+
+    check_authorized_signer:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+        param:
+            _map_rules: soap.[% context.server %].authorized_signer
 
     check_prereqs_via_api:
         class: OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs
@@ -87,39 +80,12 @@ action:
             context_key: cert_identifier
             function: shift
 
-    cleanup_workflow:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-        param:
-            SetContextParameters: overwritecontext
-            _keypassword: OpenXPKI
-            tmp_queue: ''
-
     queue_certs_to_revoke:
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
         param:
             array_name: tmp_queue
             context_key: certs_to_revoke
             function: pusharray
-
-    initialize_context_params:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-        param:
-            SetContextParameters: overwritecontext
-            flag_crr_auto_approval: 0
-            policy_allow_auto_revoke: 1
-
-    set_auto_approval_to_true:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-        param:
-            SetContextParameters: overwritecontext
-            flag_crr_auto_approval: 1
-
-    set_revoke_params:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-        param:
-            SetContextParameters: overwritecontext
-            comment: Automated revocation request
-            reason_code: cessationOfOperation
 
 condition:
     all_certs_revoked:
@@ -128,32 +94,33 @@ condition:
           array_name: tmp_queue
           condition: is_empty
     
-    requester_authorized:
-        class: Workflow::Condition::Evaluate
-        param: 
-          test: $context->{requester_authorized};
-    
-    policy_allows_auto_revoke:
+    is_requestor_authorized:
         class: Workflow::Condition::Evaluate
         param:
-            test: $context->{policy_allow_auto_revoke};
-
+            test: ($context->{signer_trusted} and $context->{signer_authorized})
+ 
 
 field:
-    client_ip:
-        name: client_ip
-        type: text
-        required: 1
 
-    requester_authorized:
-        name: requester_authorized
-        type: text
-        required: 1
+    crr_info:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL
+        name: crr_info
+        type: server
+        required: 0
+ 
+    server:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL
+        name: server
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC
+        type: server
+        required: 0
 
-    requester_sn:
-        name: requester_sn
-        type: text
-        required: 1
+    signer_cert:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL
+        name: signer_cert
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC
+        required: 0
+        type: server
 
     token_id: 
         name: token_id
@@ -163,7 +130,7 @@ field:
 
 
 acl:
-    _System:
+    System:
         creator: any
  
 
