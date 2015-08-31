@@ -61,8 +61,8 @@ sub new {
         INTERNAL_CHAIN
         ENGINE_SECTION
         ENGINE_USAGE
-    KEY_STORE
-    WRAPPER
+        KEY_STORE
+        WRAPPER
         NFAST_HOME
         CHECKCMDTIMEOUT
         ONLINECHECKGRACEPERIOD
@@ -162,32 +162,40 @@ sub key_usable {
                 params  => { EVAL_ERROR => $EVAL_ERROR, },
             );
         }
-    
-        # parse nfkminfo output
+
+
         while (<$handle>) {
             chomp;
-            if (m{ \A \S }xms) {
-                s{ [: \#\-] }{}xmsg;
-                $section = lc($_);
-                ##! 8: "section: $section"
-            } else {
-                if (($section ne '')
-                    && (m{ \A \s+ (state) \s \s+ (.*) }xms)) {
-                    ##! 8: "property key: $1, value: $2"
+            my $ll = $_;
+            ##! 16: 'Line ' . $ll
+            if (m{ \A \S }xims) {
+                ##! 8: 'Possible section header ' . $ll
+                if (m{ \A (\S .*)? (world) \z }xmsi) {
+                    ##! 8: 'Section world'
+                    $section = 'world';
+                } elsif (s{\W}{}xmsg && m{ \A preloadedobjects }xmsi) {
+                    ##! 8: 'Section preloadedobjects'
+                    $section = 'preloadedobjects';
+                } else {
+                    $section = '';
+                }
+            } elsif ($section eq 'world') {
+                ##! 8: 'adding to world ' . $ll
+                if (m{\A \s+ (\w+) \s+ (.*) \z }xms) {
                     $worldinfo->{$section}->{lc($1)} = $2;
                 }
-                
-                if ($section =~ m{ \A preloadedobjects }xms) {
-                    m{ \s+ ([0-9A-Fa-f]+) }xms;
-                    ##! 8: "hash: $1"
-                    $worldinfo->{preloadedobjects}->{$1}++;
-                }
+
+            } elsif ($section eq 'preloadedobjects' && m{ \s+ ([0-9A-Fa-f]{32,}) }xms) {
+                ##! 8: 'adding preload ' . $1
+                $worldinfo->{preloadedobjects}->{$1}++;
             }
         }
         close $handle;
         alarm 0;
     };
 
+    ##! 32: 'worldinfo ' . Dumper $worldinfo
+   
     # handle exceptions
     if ($EVAL_ERROR) {
         alarm 0;
@@ -247,8 +255,10 @@ sub key_usable {
         return 0;
     }
 
-return 1;
-# TODO - this is not working when preload is off
+    if (!$cmd[0] && !exists $worldinfo->{preloadedobjects}) {
+        ##! 4: "No wrapper, so no preload is ok"
+        return 1;
+    }
 
     if (! exists $worldinfo->{preloadedobjects}) {
     ##! 4: "no preloaded objects found"
