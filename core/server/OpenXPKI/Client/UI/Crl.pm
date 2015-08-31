@@ -203,7 +203,7 @@ sub __print_detail {
         sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM').
         sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER').
         sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
-        '</ul>'
+        '</ul>', format => 'raw' 
     };
 
     return @fields;
