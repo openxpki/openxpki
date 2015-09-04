@@ -88,10 +88,11 @@ sub attach_impl : PRIVATE {
 	##! 8: "loading class $class"
 	eval "use $class;";
 	if ($EVAL_ERROR) { # no module available that implements the command
-            ##! 8: "eval error $EVAL_ERROR"
+        ##! 8: "eval error $EVAL_ERROR"
 	    OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL",
-            );
+            message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL",
+            params => { EVAL_ERROR => $EVAL_ERROR }
+        );
 	} else {
 	    ##! 8: "instantiating class $class"
 	    $command_impl{$ident} = eval "$class->new(\$arg)";

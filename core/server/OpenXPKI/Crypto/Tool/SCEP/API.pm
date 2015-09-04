@@ -42,6 +42,12 @@ sub __init_command_params : PRIVATE {
             'CHAIN' => 1,
             'HASH_ALG' => 1,
         },
+        'create_crl_reply' => {
+            'PKCS7'       => 1,
+            'CRL' => 1,
+            'ENCRYPTION_ALG' => 1,
+            'HASH_ALG' => 1,
+        },
         'create_certificate_reply' => {
             'PKCS7'       => 1,
             'CERTIFICATE' => 1,
@@ -60,6 +66,9 @@ sub __init_command_params : PRIVATE {
             'PKCS7' => 1,
         },
         'get_getcert_serial' => {
+            'PKCS7' => 1,
+        },
+        'get_getcrl_issuer_serial' => {
             'PKCS7' => 1,
         },
     });

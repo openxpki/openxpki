@@ -76,7 +76,7 @@ sub RevokeCertificate {
     eval {
         my $client = OpenXPKI::Client::Simple->new({        
             logger => $log,
-            config => $config->{global}, # realm and locale        
+            config => $config->{global}, # realm and locale
             auth => $config->{auth}, # auth config
         });
         

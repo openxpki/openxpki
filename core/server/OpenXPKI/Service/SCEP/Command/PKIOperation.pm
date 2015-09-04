@@ -97,6 +97,16 @@ sub execute {
                 PARAMS => $url_params,
             }
         );
+    }
+    elsif ( $message_type_ref->{MESSAGE_TYPE_NAME} eq 'GetCRL' ) {
+        
+        ##! 32: 'PKCS7 GetCRL ' . $pkcs7_base64
+        $result = $self->__send_crl(
+            {   TOKEN => $token,
+                PKCS7 => $pkcs7_base64,
+                PARAMS => $url_params,
+            }
+        );
 
     }
     else {
@@ -217,6 +227,93 @@ sub __send_cert : PRIVATE {
     return $result;
 }
 
+
+=head2 __send_crl
+
+Create the response for the GetCRL request by extracting the used CA certificate
+from the request and returning its crl.
+
+=cut
+
+sub __send_crl : PRIVATE {
+    my $self      = shift;
+    my $arg_ref   = shift;
+
+    my $token = $arg_ref->{TOKEN};
+    my $pkcs7_base64 = $arg_ref->{PKCS7};
+    my $pkcs7_decoded = decode_base64($pkcs7_base64);
+    
+    my $requested_issuer_serial = $token->command({
+        COMMAND => 'get_getcrl_issuer_serial',
+        PKCS7   => $pkcs7_decoded
+    });
+    
+    ##! 16: 'Issuer Serial ' . Dumper $requested_issuer_serial
+    
+    # convert serial to decimal
+    my $mbi = Math::BigInt->from_hex( $requested_issuer_serial->{SERIAL} );
+    my $issuer_serial = scalar $mbi->bstr();
+    
+    # from scep draft (as of March 2015)
+    # ..containing the issuer name and serial number of
+    # the certificate whose revocation status is being checked.
+    # -> we search for this entity certificate and grab the issuer from the
+    # certificate table, this will also catch situations where the Issuer DN
+    # is reused over generations as the serial inside OXI is unique  
+   
+    my $res = CTX('api')->search_cert({
+        PKI_REALM => '_ANY',
+        ISSUER_DN => $requested_issuer_serial->{ISSUER},
+        CERT_SERIAL => $issuer_serial,
+    });
+    
+    if (!$res || scalar @{$res} != 1) {
+          CTX('log')->log(
+            MESSAGE => "SCEP getcrl - no issuer found for serial $issuer_serial and issuer " . $requested_issuer_serial->{ISSUER},
+            PRIORITY => 'error',
+            FACILITY => 'application',
+        );
+
+        return $token->command(
+            {   COMMAND      => 'create_error_reply',
+                PKCS7        => $pkcs7_decoded,
+                HASH_ALG     => CTX('session')->get_hash_alg(),
+                'ERROR_CODE' => 'badCertId',
+            }
+        );
+    }
+    
+    ##! 32: 'Issuer Info ' . Dumper $res
+    
+    my $crl_res = CTX('api')->get_crl_list({
+        ISSUER => $res->[0]->{ISSUER_IDENTIFIER},
+        FORMAT => 'PEM',
+        LIMIT => 1
+    });
+    
+    if (!scalar $crl_res) {
+        return $token->command(
+            {   COMMAND      => 'create_error_reply',
+                PKCS7        => $pkcs7_decoded,
+                HASH_ALG     => CTX('session')->get_hash_alg(),
+                'ERROR_CODE' => 'badCertId',
+            }
+        );
+    }
+
+    ##! 32: 'CRL Result ' . Dumper $crl_res
+    my $crl_pem = $crl_res->[0];  
+    
+    my $result = $token->command(
+        {   COMMAND        => 'create_crl_reply',
+            PKCS7          => $pkcs7_decoded,
+            CRL            => $crl_pem,
+            HASH_ALG       => CTX('session')->get_hash_alg(),
+            ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
+        }
+    );
+    return $result;
+}
 =head2 __pkcs_req
 
 Called by execute if the message type is 'PKCSReq' (19). This is the
