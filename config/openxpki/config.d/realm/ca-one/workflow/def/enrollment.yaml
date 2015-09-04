@@ -247,7 +247,7 @@ state:
 action:
     approve_csr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC
         param:
             check_creator: 0

@@ -728,9 +728,11 @@ field:
         name: check_policy_dns
         format: rawlist
         template: >
-          [% USE CheckDNS %]
-          [% FOREACH fqdn = value %]
-          [% CheckDNS.valid(fqdn, '(FAIL)', '(ok)') %]
+          [% IF value %]
+            [% USE CheckDNS %]
+            [% FOREACH fqdn = value %]
+              [% CheckDNS.valid(fqdn, '(FAIL)', '(ok)') %]
+            [% END %]
           [% END %]
 
     check_policy_subject_duplicate:
