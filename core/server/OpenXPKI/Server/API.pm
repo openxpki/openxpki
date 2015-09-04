@@ -516,10 +516,15 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_sql_string,
                 },
-                ISSUER => {
+                ISSUER_DN => {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_sql_string,
+                },
+                ISSUER_IDENTIFIER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
                 },
                 SUBJECT_KEY_IDENTIFIER => {
                     type  => SCALAR,
@@ -600,10 +605,15 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_sql_string,
                 },
-                ISSUER => {
+                ISSUER_DN => {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_sql_string,
+                },
+                ISSUER_IDENTIFIER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
                 },
                 CSR_SERIAL => {
                     type     => SCALAR,

@@ -380,6 +380,9 @@ SERIAL is the serial of the database table, the realm defaults to the
 current realm and the default format is PEM. Other formats are DER, TXT
 and HASH. HASH returns the result of OpenXPKI::Crypto::CRL::get_parsed_ref.
 
+If no serial is given, the most current crl of the active signer token is 
+returned.
+
 =cut
 
 sub get_crl {
@@ -395,12 +398,10 @@ sub get_crl {
     $format = $args->{FORMAT} if ( exists $args->{FORMAT} );
     $pki_realm =  CTX('session')->get_pki_realm() unless( $args->{PKI_REALM} );
 
-    ##! 16: 'Load crl by serial ' . $serial
-
-
     my $db_results;
 
-    if ($serial) {
+    if ($serial) {        
+        ##! 16: 'Load crl by serial ' . $serial       
         $db_results = CTX('dbi_backend')->first(
             TABLE   => 'CRL',
             COLUMNS => [
@@ -410,6 +411,11 @@ sub get_crl {
             KEY => $serial,
         );
     } else {
+        
+        my $ca_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'certsign' });
+        ##! 16: 'Load crl by date, ca alias ' . $ca_alias                
+        my $ca_hash = CTX('api')->get_certificate_for_alias({ ALIAS => $ca_alias });
+                
         $db_results = CTX('dbi_backend')->first(
             TABLE   => 'CRL',
             COLUMNS => [
@@ -418,6 +424,7 @@ sub get_crl {
             ],
             DYNAMIC => {
                 PKI_REALM => { VALUE => $pki_realm },
+                ISSUER_IDENTIFIER => $ca_hash->{IDENTIFIER}
             },
             ORDER => [ 'LAST_UPDATE' ],
             REVERSE => 1,
@@ -519,10 +526,8 @@ sub get_crl_list {
 
     my $limit = $keys->{LIMIT} || 25;
 
-    my %dynamic = (
-        'PKI_REALM' => { VALUE => $pki_realm },
-    );
-
+    my %dynamic = ();
+  
     if ($keys->{VALID_AT}) {
         $dynamic{'LAST_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'LESS_THAN'};
         $dynamic{'NEXT_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'GREATER_THAN'};
@@ -530,6 +535,8 @@ sub get_crl_list {
 
     if ($keys->{ISSUER}) {
         $dynamic{'ISSUER_IDENTIFIER'} = { VALUE => $keys->{ISSUER} };
+    } else {
+        $dynamic{'PKI_REALM'} = { VALUE => $pki_realm };
     }
 
     my $db_results = CTX('dbi_backend')->select(
@@ -615,7 +622,9 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * SUBJECT
 
-=item * ISSUER
+=item * ISSUER_DN
+
+=item * ISSUER_IDENTIFIER
 
 =item * PKI_REALM (default is the sessions realm)
 
@@ -773,13 +782,13 @@ sub __search_cert {
     }
     
     # PKI_REALM overwrites the session realm if it is present
-    foreach my $key (qw( IDENTIFIER CSR_SERIAL STATUS PKI_REALM SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
+    foreach my $key (qw( IDENTIFIER ISSUER_IDENTIFIER CSR_SERIAL STATUS PKI_REALM SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
         if ( $args->{$key} ) {
             $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
               { VALUE => $args->{$key} };
         }
     }
-    foreach my $key (qw( EMAIL SUBJECT ISSUER )) {
+    foreach my $key (qw( EMAIL SUBJECT ISSUER_DN )) {
         if ( $args->{$key} ) {
             $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
               { VALUE => $args->{$key}, OPERATOR => "LIKE" };
