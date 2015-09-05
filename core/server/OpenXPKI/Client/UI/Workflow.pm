@@ -2071,6 +2071,10 @@ sub __render_fields {
                 my $cert_subject_style = $context->{cert_subject_style};
                 if ($cert_profile && $cert_subject_style) {
 
+                    if (!$raw || ref $raw ne 'HASH') {
+                        $raw = {};
+                    }
+
                     my $fields = $self->send_command( 'get_field_definition',
                         { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
                     $self->logger()->debug( 'Profile fields' . Dumper $fields );
