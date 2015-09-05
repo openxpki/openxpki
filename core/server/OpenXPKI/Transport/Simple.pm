@@ -12,8 +12,10 @@ our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use English;
 use OpenXPKI::Exception;
-
 use OpenXPKI::Debug;
+# If you encounter problems with corrupted transports, try enabling 
+# the base64 encode/decode in the read/write methods
+#use MIME::Base64;
 
 $OUTPUT_AUTOFLUSH = 1;
 our $MAX_MSG_LENGTH = 1048576; # 1024^2
@@ -52,8 +54,12 @@ sub write
 
     my @list = ();
 
-    # We want utf8 encoding on the transport socket
-    utf8::upgrade( $data );
+    # The data string might have the utf8 flag set - to prevent messing with 
+    # wide chars / length issues on the transport, we do a "downgrade" which
+    # will make the string look like a sequence of 8-bit chars. 
+    # We will upgrade on the other side of the transport again
+    utf8::downgrade( $data );
+#    $data = encode_base64( $data );
 
     for (my $i=0; $i < length($data)/$MAX_MSG_LENGTH-1;$i++)
     {
@@ -184,7 +190,10 @@ sub read
         delete $self->{STDIN};
     }
 
-    # We silently assume that the transport socket is utf8
+  
+#    $msg = decode_base64( $msg );
+    # Transmission is done with plain 8-bit, we make the string "be" utf8
+    # again by calling upgrade. See docs for known issues
     utf8::upgrade( $msg );
 
     return $msg;
@@ -299,6 +308,11 @@ This is the interface specification for all common OpenXPKI
 transport protocol implementations. Please note that every
 read operation returns an interpretable answer. We do not
 return partial messages.
+
+To handle utf8 transparently, we assume that data stream are B<always>
+utf8 sequences. Therefore the transport will corrupt data that might
+be missinterpreted by the utf8::upgrade pragma and we strongly recommend
+to base64 encode all data that is neither UTF8 nor plain ASCII!
 
 =head1 Functions
 

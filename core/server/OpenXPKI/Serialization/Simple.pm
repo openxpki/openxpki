@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use utf8;
 use JSON;
+use Encode;
 
 package OpenXPKI::Serialization::Simple;
 
@@ -91,12 +92,10 @@ sub __write_data {
     }
     elsif ( ref $data eq "ARRAY" && defined $data ) {
         # it's an array
-        #return "JSON".$self->{SEPARATOR}.$self->_json->encode($data);
         return $self->__write_array($data);
     }
     elsif ( ref $data eq "HASH" && defined $data ) {
         # it's a hash
-        #return "JSON".$self->{SEPARATOR}.$self->_json->encode($data);
         return $self->__write_hash($data);
     }
     elsif ( not defined $data ) {
@@ -138,6 +137,8 @@ sub __write_scalar {
         ##! 8: 'Found binary data - do base64'
         $type = "BASE64";
         $data  = encode_base64( $data );
+    } else {
+        Encode::_utf8_on($data);
     }
 
     return $type.$separator.
@@ -175,6 +176,8 @@ sub __write_hash {
                 $self->__write_data($data->{$key});
     }
 
+    Encode::_utf8_on($msg);
+
     return "HASH".$separator.
            length ($msg).$separator.
            $msg;
@@ -210,6 +213,8 @@ sub __read_data {
     my $msg  = shift;
 
     my $separator = $self->{SEPARATOR};
+
+    Encode::_utf8_on($msg);
 
     if ( $msg =~ /^(SCALAR|BASE64)$separator/ ) {
         # it's a scalar
