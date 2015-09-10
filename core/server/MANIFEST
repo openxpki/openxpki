@@ -29,6 +29,7 @@ OpenXPKI/Client.pm
 OpenXPKI/Client/API.pm
 OpenXPKI/Client/SCEP.pm
 OpenXPKI/Client/Simple.pm
+OpenXPKI/Client/Config.pm
 
 # New UI Client
 OpenXPKI/Client/UI.pm
@@ -222,7 +223,7 @@ OpenXPKI/Server/Notification/SMTP.pm
 # SOAP
 OpenXPKI/SOAP.pm
 OpenXPKI/SOAP/Revoke.pm
-
+OpenXPKI/SOAP/Smartcard.pm
 
 ## Workflow
 OpenXPKI/Workflow/Factory.pm
