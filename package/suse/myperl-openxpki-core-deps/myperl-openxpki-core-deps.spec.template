@@ -117,23 +117,7 @@ find %{buildroot} -name "perllocal.pod" \
 # DESTDIR = %{buildroot}
 set -e
 rm -rf \
-		$DESTDIR/$VENDORMAN3EXP/CGI.3 \
-		$DESTDIR/$VENDORMAN3EXP/CGI::Apache.3 \
-		$DESTDIR/$VENDORMAN3EXP/CGI::Carp.3 \
-		$DESTDIR/$VENDORMAN3EXP/CGI::Cookie.3 \
-		$DESTDIR/$VENDORMAN3EXP/CGI::Pretty.3 \
-		$DESTDIR/$VENDORMAN3EXP/CGI::Push.3 \
-		$DESTDIR/$VENDORMAN3EXP/CGI::Switch.3 \
-		$DESTDIR/$VENDORMAN3EXP/CGI::Util.3 \
 		$DESTDIR/$VENDORMAN3EXP/CPAN::Meta* \
-		$DESTDIR/$VENDORLIB/CGI.pm \
-		$DESTDIR/$VENDORLIB/CGI/Apache.pm \
-		$DESTDIR/$VENDORLIB/CGI/Carp.pm \
-		$DESTDIR/$VENDORLIB/CGI/Cookie.pm \
-		$DESTDIR/$VENDORLIB/CGI/Pretty.pm \
-		$DESTDIR/$VENDORLIB/CGI/Push.pm \
-		$DESTDIR/$VENDORLIB/CGI/Switch.pm \
-		$DESTDIR/$VENDORLIB/CGI/Util.pm \
 		$DESTDIR/$VENDORMAN3EXP/Module::Build* \
 		$DESTDIR/$VENDORLIB/Module/Build.pm \
 		$DESTDIR/$VENDORLIB/Module/Build \
@@ -198,9 +182,5 @@ perl -i -p -e 's{#!/bin/env}{#!/usr/bin/env}' $DESTDIR/$VENDORSCRIPTEXP/SOAPsh.p
 #%attr(0755,root,openxpki) /srv/www/openxpki/mason-data
 
 %changelog
-* Mon Aug 15 2011 m.bartosch@cynops.de
-- Fixed file permissions in package
-* Thu Feb 03 2011 m.bartosch@cynops.de
-- Renovated build process, using generic template mechanism
-* Mon Nov 27 2006 m.bartosch@cynops.de
-- Initial build.
+Mon Sep 14 2015 scott@hnsc.de
+- update for myperl-5.22.0
