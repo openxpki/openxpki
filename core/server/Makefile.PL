@@ -323,6 +323,8 @@ WriteMakefile(
 #					 # which is a prerequisite of Class::Accessor::Chained, see below
     'Class::Accessor::Chained::Fast' => '0', # Constituent of module Class::Accessor::Chained
     'Class::Std'             => '0.0.8',
+    'CGI'                   => '4.21',
+    'CGI::Fast'             => '2.10',
     'CGI::Session'           => '3.95',
     'Config::Std'            => '0',
     'Config::Merge'          => '1',
