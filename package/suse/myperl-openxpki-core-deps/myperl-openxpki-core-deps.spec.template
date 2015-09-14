@@ -183,4 +183,4 @@ perl -i -p -e 's{#!/bin/env}{#!/usr/bin/env}' $DESTDIR/$VENDORSCRIPTEXP/SOAPsh.p
 
 %changelog
 Mon Sep 14 2015 scott@hnsc.de
-- update for myperl-5.22.0
+* update for myperl-5.22.0
