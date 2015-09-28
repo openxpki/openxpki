@@ -111,21 +111,25 @@ sub RevokeCertificate {
         $log->debug( 'Workflow info '  . Dumper $workflow );
     };
   
+    my $res;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $log->error("Unable to create workflow: ". $exc->message );
-        return SOAP::Data->new( name => 'responseCode', value => 1 );
+        $res = { error => $exc->message, pid => $$ };
     } elsif ($EVAL_ERROR) {
         $log->error("Unable to create workflow: ". $EVAL_ERROR );        
-        return SOAP::Data->new( name => 'responseCode', value => 1 );
+        $res = { error => 'uncaught error', pid => $$ };
     } elsif (!$workflow->{ID} || $workflow->{'PROC_STATE'} eq 'exception' || $workflow->{'STATE'} eq 'FAILURE') {
-        $log->error("Workflow terminated in unexpected state " );        
-        return SOAP::Data->new( name => 'responseCode', value => 1 );
+        $log->error("Workflow terminated in unexpected state" );
+        $res = { error => 'workflow terminated in unexpected state', pid => $$, id => $workflow->{id}, 'state' => $workflow->{'STATE'} };
+    } else {
+        $log->info(sprintf("Revocation request was processed properly (Workflow: %01d, State: %s", 
+            $workflow->{ID}, $workflow->{STATE}) );
+        $res = { error => '', id => $workflow->{ID}, 'state' => $workflow->{'STATE'} };
     }
     
-    $log->info(sprintf("Revocation request was processed properly (Workflow: %01d, State: %s", 
-        $workflow->{ID}, $workflow->{STATE}) );
+    return SOAP::Data->new( name => 'result', value => $res );
     
-    return SOAP::Data->new( name => 'responseCode', value => 0 );    
+    #return SOAP::Data->new( name => 'responseCode', value => 0 );    
 }
 
 sub true {
