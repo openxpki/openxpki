@@ -1,0 +1,9 @@
+id: application_name
+label: I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME
+description: I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC
+type: select
+option:
+  - scep
+  - soap
+  - generic
+width: 20

@@ -5,3 +5,5 @@
 authorized_signer:
     rule1:
         subject: CN=.+:soapclient,.*
+    rule2:    
+        subject: CN=.+:pkiclient,.*

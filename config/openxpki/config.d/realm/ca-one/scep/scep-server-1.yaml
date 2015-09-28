@@ -27,6 +27,9 @@ authorized_signer_on_behalf:
     rule1:
         # Full DN
         subject: CN=.+:scepclient,.*
+    rule2:
+        # Full DN
+        subject: CN=.+:pkiclient,.*
 
 policy:         
     allow_anon_enroll: 0

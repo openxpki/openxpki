@@ -1,0 +1,52 @@
+# The name of the file equals the name of the profile
+
+label: I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL
+
+validity:
+    notafter: +01
+
+style:
+    00_basic_style:
+        label: I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC
+        ui:
+            subject:
+                - hostname
+                - application_name
+            info:
+                - requestor_gname
+                - requestor_name
+                - requestor_email
+                - requestor_affiliation
+                - comment
+
+        subject: 
+            dn: CN=[% hostname %]:[% application_name %],DC=Test Deployment,DC=OpenXPKI,DC=org
+
+        metadata:
+            requestor: "[% requestor_gname %] [% requestor_name %]"
+            email: "[% requestor_email %]"
+
+
+# Profile extensions - set 0/1 as needed
+extensions: 
+    key_usage:
+        critical:          1
+        digital_signature: 1
+        non_repudiation:   0
+        key_encipherment:  0
+        data_encipherment: 0
+        key_agreement:     0
+        key_cert_sign:     0
+        crl_sign:          0
+        encipher_only:     0
+        decipher_only:     0
+
+    extended_key_usage:
+        critical:         1 	   
+        client_auth:      1
+        server_auth:      0
+        email_protection: 0
+        codeSigning:      0
+        timeStamping:     0
+ 
