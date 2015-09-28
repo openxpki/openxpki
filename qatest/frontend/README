@@ -1,0 +1,34 @@
+The tests in this directory are run agains the webserver, so it is not
+mandatory to run them on the pki server itself. The tests will work with
+an unmodified test system as it is created by the debian packages after
+setting up apache to use a server certificate issued by the PKI.
+
+The tests will cover SCEP, SOAP and WebUI doing the following:
+
+* Test the login 
+* Use UI to request a pkiclient certificate
+* Request an entity certificate with "scep on behalf" (approved via UI)
+* Use SOAP to create an anonymous revocation request for the entity
+* Use SOAP with SSL authentication / autoapproval (check status via UI)
+* Use UI to revoke the pkiclient certificate
+* Generate CRL via UI
+* Check cert status in database and on CRL
+
+The tests require some prepreqs:
+
+* There must be no valid certificates for the subject used for the 
+  pkiclient certificate (testbox.openxpki.org:pkiclient)
+* The modules given below must be in your Perl path
+* A copy of the sscep binary in your PATH or in this directory
+* IP/Name of the server in the config (if not localhost)
+* You client system time must match the server time
+
+
+# Required Modules
+Connector
+Moose
+Data::Dumper
+SOAP::Lite
+Log::Log4perl
+LWP::UserAgent
+URI::Escape

@@ -49,4 +49,34 @@ sub mock_request {
     return $json;
 }
 
+# Static call that generates a ready-to-use client
+sub factory {
+
+    my $log = Log::Log4perl->get_logger();
+
+    my $session = new CGI::Session(undef, undef, {Directory=>'/tmp'});
+
+    my $client = MockUI->new({
+        session => $session,
+        logger => $log,
+        config => { socket => '/var/openxpki/openxpki.socket' }
+    });
+    
+    $client ->mock_request({ page => 'login'});
+
+    $client ->mock_request({
+        'action' => 'login!stack',
+        'auth_stack' => "Testing",
+    });
+
+    $client ->mock_request({
+        'action' => 'login!password',
+        'username' => 'raop',
+        'password' => 'openxpki'
+    });
+    
+    return $client;
+}
+
+
 1;

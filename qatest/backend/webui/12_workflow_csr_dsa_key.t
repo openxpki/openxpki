@@ -96,7 +96,7 @@ $result = $client->mock_request({
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    '_password' => 'OpenXPKI!',
+    '_password' => 'Rg89T2ekApsV',
     'wf_token' => undef
 });
 
