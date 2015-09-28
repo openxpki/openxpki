@@ -28,8 +28,7 @@ sub get_command
              ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
     $self->{PKCS12_PASSWD} = $self->{PASSWD}
         if (not exists $self->{PKCS12_PASSWD});
-    $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
-
+                
     ## check parameters
 
     if (not $self->{KEY})
@@ -56,19 +55,8 @@ sub get_command
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_PASSWD_TOO_SHORT");
-    }
-    if ($self->{ENC_ALG} ne "aes256" and
-        $self->{ENC_ALG} ne "aes192" and
-        $self->{ENC_ALG} ne "aes128" and
-        $self->{ENC_ALG} ne "idea" and
-        $self->{ENC_ALG} ne "des3" and
-        $self->{ENC_ALG} ne "des")
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RSA_WRONG_ENC_ALG",
-            params => { ENC_ALG => $self->{ENC_ALG} });
-    }
-
+    } 
+    
     if (exists $self->{CSP}) {
         # input validation, as this will be passed on to the
         # command, i.e. a shell
@@ -108,7 +96,10 @@ sub get_command
     $command .= " -inkey ".$self->{KEYFILE};
     $command .= " -in ".$self->{CERTFILE};
     $command .= " -out ".$self->{OUTFILE};
-    $command .= " -".$self->{ENC_ALG};
+    
+    $command .= " -keypbe ".$self->{KEY_PBE} if ($self->{KEY_PBE});
+    $command .= " -certpbe ".$self->{CERT_PBE} if ($self->{CERT_PBE});
+
     if (defined $self->{CSP}) {
         $command .= " -CSP " . q{"} . $self->{CSP} . q{"};
     }
