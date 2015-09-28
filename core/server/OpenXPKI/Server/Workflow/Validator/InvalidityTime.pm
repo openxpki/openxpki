@@ -89,7 +89,7 @@ sub validate {
     }
        
     # We accept delayed requests if the "delayed_revoke" flag is set  
-    if ($invalidity_time > $now && not $flag_delayed_revoke) {
+    if ($invalidity_time > ($now + 60) && not $flag_delayed_revoke) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE',
 	    log => {
