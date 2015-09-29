@@ -62,6 +62,7 @@ sub BUILD {
     my $re_all               = qr{ \A .* \z }xms;
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
     my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
+    my $re_int_or_hex_string = qr{ \A ([0-9]+|0x[0-9a-fA-F]+) \z }xms;
     my $re_boolean           = qr{ \A [01] \z }xms;
     my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
     my $re_cert_string       = qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;
@@ -544,7 +545,7 @@ sub BUILD {
                 CERT_SERIAL => {
                     type     => SCALAR,
                     optional => 1,
-                    regex    => $re_integer_string,
+                    regex    => $re_int_or_hex_string,
                 },
                 'PKI_REALM' => {
                     type  => SCALAR,
@@ -623,7 +624,7 @@ sub BUILD {
                 CERT_SERIAL => {
                     type     => SCALAR,
                     optional => 1,
-                    regex    => $re_integer_string,
+                    regex    => $re_int_or_hex_string,
                 },
                 'PKI_REALM' => {
                     type  => SCALAR,

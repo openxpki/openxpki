@@ -30,6 +30,7 @@ use English;
 use Data::Dumper;
 
 use Class::Std;
+use Math::BigInt;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -742,7 +743,16 @@ sub __search_cert {
     }
 
     ##! 2: "initialize arguments"
-    $params{SERIAL} = $args->{CERT_SERIAL} if ( $args->{CERT_SERIAL} );
+    
+    if ( $args->{CERT_SERIAL} ) {
+        my $serial = $args->{CERT_SERIAL};
+        # autoconvert hexadecimal serial, needs to have 0x as prefix!
+        if (substr($serial,0,2) eq '0x') {
+            my $sn = Math::BigInt->new( $serial );
+            $serial = $sn->bstr();
+        }
+        $params{SERIAL} = $serial;
+    }
 
     if ( defined $args->{LIMIT} && !defined $args->{START} ) {
         $params{'LIMIT'} = $args->{LIMIT};
