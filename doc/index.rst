@@ -19,6 +19,7 @@ Table of Contents:
    architecture/workflows
    architecture/datapool
    architecture/subsystems/scep
+   architecture/subsystems/soap
    architecture/subsystems/enroll-ui
    admin/installation/building
    admin/installation/packages

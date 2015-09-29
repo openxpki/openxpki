@@ -31,6 +31,8 @@ my $cert_identifier = do { # slurp
     <$HANDLE>;
 };
 
+diag('Start revocation for ' . $cert_identifier);
+
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,

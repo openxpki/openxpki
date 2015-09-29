@@ -12,7 +12,7 @@ use TestCGI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 7;
+use Test::More tests => 4;
 
 package main;
 

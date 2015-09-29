@@ -27,7 +27,7 @@ print Dumper $result;
 my $soap = SOAP::Lite 
     ->uri('http://my.own.site.com/OpenXPKI/SOAP/Revoke')
     ->proxy('http://localhost/soap/ca-one')
-    ->RevokeCertificate('totallyrandomstring')
+    ->RevokeCertificateByIdentifier('totallyrandomstring')
     ->result;
 
 # This means the request failed (invalid cert identifier)

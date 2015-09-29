@@ -30,28 +30,31 @@ diag('Revocation test - cert identifier '  . $cert_identifier);
 my $soap = SOAP::Lite 
     ->uri('http://schema.openxpki.org/OpenXPKI/SOAP/Revoke')
     ->proxy('http://localhost/soap/ca-one')
-    ->RevokeCertificate($cert_identifier);
+    ->RevokeCertificateByIdentifier($cert_identifier);
 
 ok($soap, 'SOAP Client no Auth');
 is($soap->result->{error},'','No error');
 is($soap->result->{state}, 'PENDING','State pending without auth, Workflow ' . $soap->result->{id});
 
+# Use the ca certs from scep to create a chain file
+`cat tmp/cacert-* > tmp/chain.pem`; 
+
 # Now try with SSL Auth - should be autoapproved
 my $oSoap =  Connector::Proxy::SOAP::Lite->new({
     LOCATION => 'https://localhost/soap/ca-one',
     uri => 'http://schema.openxpki.org/OpenXPKI/SOAP/Revoke',
-    method => 'RevokeCertificate',
+    method => 'RevokeCertificateByIdentifier',
     certificate_file => 'tmp/pkiclient.crt',
     certificate_key_file => 'tmp/pkiclient.key',
-    ca_certificate_path => 'tmp',
+    ca_certificate_file => 'tmp/chain.pem',
     ssl_ignore_hostname => 1, # makes it easier
 });    
 
 my $res = $oSoap->get_hash($cert_identifier);
 
-ok($soap, 'SOAP Client with Auth');
-is($soap->result->{error},'','No error');
-is($soap->result->{state}, 'SUCCESS','State SUCCESS with auth,  Workflow ' . $soap->result->{id});
+ok($oSoap, 'SOAP Client with Auth');
+is($res->{error},'','No error');
+is($res->{state}, 'SUCCESS','State SUCCESS with auth,  Workflow ' . $res->{id});
 
 # Check the certificate status via webui
 $result = $client->mock_request({

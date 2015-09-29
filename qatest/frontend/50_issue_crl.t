@@ -40,9 +40,9 @@ $result = $client->mock_request({
 is ($result->{status}->{level}, 'success', 'Status is success');
 
 # get crl id
-my $crlid = $result->{main}->[0]->{content}->{data}->[0]->{value}->[0]->{value};
+my $crlid = $result->{main}->[0]->{content}->{data}->[0]->{value}->[0]->{value} || '';
 
-like($crlid, "/^\d+$/",'Got CRL Id');
+like($crlid, "/[0-9]+/",'Got CRL Id');
 
 # download crl as text
 $result = $client->mock_request({
