@@ -7,6 +7,7 @@ package OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use English;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -59,10 +60,31 @@ sub execute {
         FACILITY => [ 'application', 'audit' ]
     );
 
-    my $set_context = $nice_backend->issueCertificate( $csr );
+    my $set_context;
+    eval {
+        $set_context = $nice_backend->issueCertificate( $csr );
+    };
+    
+    if ($EVAL_ERROR) {
+        
+        # Catch exception as "pause" if configured
+        if ($self->param('pause_on_error')) {            
+            CTX('log')->log(
+                MESSAGE  => "NICE issueCertificate failed but pause_on_error is requested ",
+                PRIORITY => 'warn',
+                FACILITY => [ 'application' ]
+            );
+            $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
+        } 
+        
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            $exc->rethrow();
+        } else {
+            OpenXPKI::Exception->throw( message => $EVAL_ERROR );
+        }
+    }
 
     ##! 64: 'Setting Context ' . Dumper $set_context      
-#    while (my($key,$value) = each (%{$set_context})) {
     foreach my $key (keys %{$set_context} ) {
         my $value = $set_context->{$key};
         ##! 64: "Set key: $key to value $value";

@@ -3,5 +3,7 @@ label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL
 description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_DESC
 param:
     retry_count: 10
-    retry_interval: +0000000030
+    retry_interval: +0000000005
+    retry_random: 50
+    pause_on_error: 1
     _map_cert_owner: $creator
