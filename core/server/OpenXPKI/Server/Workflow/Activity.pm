@@ -52,23 +52,6 @@ sub init {
         $_map->{$name} = $params->{$key};
         ##! 8: 'Found param ' . $name . ' - value : ' . $params->{$key}
 
-##=cut disabled-by-oli
-##
-##        if ($val =~ /^\$(\S+)/) {
-##            # copy from context
-##            $_map->{$name} = ['ctx', $1];
-##
-##        } else { # }if ($val =~ /^\&(\S+)/) {
-##            # TT parser
-##            $_map->{$name} = ['tt', $val ];
-##        #} else {
-##        #
-##        #    # static value, add to plain params hash
-##        #    $params_merged->{$name} = $val;
-##        }
-##
-##=cut disabled-by-oli
-
     }
 
     # call Workflow::Action's init()
@@ -97,13 +80,24 @@ sub pause{
     $cause ||= '';
 
     if($self->workflow()){
+        
         # Workflow expects explicit wakeup as epoch
         my $dt_wakeup_at = OpenXPKI::DateTime::get_validity({
             VALIDITY => $retry_interval,
             VALIDITYFORMAT => 'detect',
         });
+        
+        my $wakeup = $dt_wakeup_at->epoch();         
+        # Spread the pause interval by a custom random factor        
+        if (my $rand = $self->param('retry_random')) {
+            my $now = time();
+            my $delta = $wakeup - $now;
+            my $diff = $delta * (rand($rand*2) - $rand) / 100;
+            ##! 1: "Add random $diff, when delta is $delta"   
+            $wakeup += $diff;
+        }
 
-        $self->workflow()->pause($cause, $max_retries, $dt_wakeup_at->epoch() );
+        $self->workflow()->pause($cause, $max_retries, $wakeup );
     }
     # disrupt the execution of the run-method:
     OpenXPKI::Server::Workflow::Pause->throw( cause => $cause);
@@ -422,6 +416,14 @@ Note that this is a minimum amount of time that needs to elapse, after which
 the watchdog is allowed to pick up the job. Depending on your load and watchdog
 settings, the actual time can be much greater!
 
+=item retry_random (optional)
+
+Integer value, interpreted as percentage value (e.g. 25 = 25%), spreads the
+wakeup time by the given percentage. E.g. the retry_interval is 20 Minutes 
+and the random_factor is 25%, the next wakeup is scheduled between 15 and 25 
+minutes.
+
+
 =item autofail
 
 If set to "yes", the workflow is moved directly to the FAILURE state and
@@ -487,38 +489,43 @@ Hook method. Will be called if Workflow::execute_action() is called with an proc
 
 =head1 Parameter mapping
 
-Parameters in the xml configuration of the activity that start with I<_map_>
+Parameters in the yaml configuration of the activity that start with I<_map_>
 are parsed using template toolkit and imported into the namespace of the
 action class.
 
 The prefix is stripped and the param is set to the result of the evaluation,
 the value is interpreted as template and filled with the context:
 
-  <action name=".." class="..."
-   _map_my_tt_param="my_prefix_[% context.my_context_key %]>
+  action_name:
+    class: .....
+    _map_my_tt_param: my_prefix_[% context.my_context_key %]
 
 If you just need a single context value, the dollar sign is a shortcut:
+  
+  action_name:
+    class: .....
+    _map_my_simple_param: $my_context_key 
 
-  <action name=".." class="..."
-    _map_my_simple_param="$my_context_key">
-
-The values are accessible thru the $self->param call using the basename.
+The values are accessible via the $self->param call using the basename.
 
 =head3 Activity configuration example
 
 If C<my_context_key> has a value of foo in the context, this configuration:
 
-  <action name="..." class="..."
-   _map_my_simple_param="$my_context_key"
-   _map_my_tt_param="my_prefix_[% context.my_context_key %]">
-  </action>
+  action_name:
+    class: .....
+    _map_my_simple_param: $my_context_key
+    _map_my_tt_param: my_prefix_[% context.my_context_key %]
 
 Is the same as:
 
-  <action name="..." class="..."
-   my_simple_param="foo"
-   my_tt_param="my_prefix_foo">
-  </action>
+  action_name:
+    class: .....
+    my_simple_param: foo
+    my_tt_param: my_prefix_foo
+    
+Note that the square bracket is a special char in YAML, if you place it 
+at the beginning of the string, you must put double quotes around, e.g.
 
-
+    _map_my_tt_param: "[% context.my_context_key %]"     
 
