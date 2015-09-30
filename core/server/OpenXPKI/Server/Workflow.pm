@@ -117,7 +117,7 @@ sub execute_action {
     $self->_handle_proc_state($action_name);
 
     my $reap_at_interval = (blessed( $action ) && $action->isa('OpenXPKI::Server::Workflow::Activity'))?
-                               $action->get_reap_at_intervall()
+                               $action->get_reap_at_interval()
                             :  $default_reap_at_interval;
 
     $self->set_reap_at_interval($reap_at_interval);
@@ -365,7 +365,7 @@ sub pause {
     $count_try++;
 
 
-    ##! 16: sprintf('pause because of %s, max retries %d, retry intervall %d, count try: %d ',$cause_description, $max_retries, $retry_interval, $wakeup_at)
+    ##! 16: sprintf('pause because of %s, max retries %d, retry interval %d, count try: %d ',$cause_description, $max_retries, $retry_interval, $wakeup_at)
 
     # maximum exceeded?
     if($count_try > $max_retries){
@@ -408,7 +408,7 @@ sub pause {
 sub set_reap_at_interval{
     my ($self, $interval) = @_;
 
-    ##! 16: sprintf('set retry intervall to %s',$interval )
+    ##! 16: sprintf('set retry interval to %s',$interval )
 
     my $reap_at = OpenXPKI::DateTime::get_validity(
             {

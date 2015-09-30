@@ -13,7 +13,7 @@ sub init {
     my ( $self, $workflow, $params ) = @_;
     $self->SUPER::init($workflow, $params);    
     $self->set_max_allowed_retries(1);
-    $self->set_retry_intervall('+000000000001');
+    $self->set_retry_interval('+000000000001');
     return;    
 }
 

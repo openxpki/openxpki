@@ -196,6 +196,7 @@ sub issueCertificate {
         );
         $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
     }
+    
 
     ##! 32: 'issuing certificate'
     ##! 64: 'certificate profile '. Dumper( $profile )
@@ -204,7 +205,7 @@ sub issueCertificate {
         COMMAND => "issue_cert",
         PROFILE => $profile,
         CSR     => $csr->{DATA},
-    });
+    });        
 
     # SPKAC Requests return binary format - so we need to convert that
     if ($certificate !~ m{\A -----BEGIN }xms) {

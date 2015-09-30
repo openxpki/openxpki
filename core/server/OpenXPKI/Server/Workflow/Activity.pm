@@ -89,7 +89,7 @@ sub pause{
     my ($cause, $retry_interval) = @_;
 
     # retry_interval can be modified via method arguments:
-    $retry_interval =  $self->get_retry_intervall() if !$retry_interval;
+    $retry_interval =  $self->get_retry_interval() if !$retry_interval;
 
     # max retries can NOT be modified via method arguments:
     my $max_retries = $self->get_max_allowed_retries();
@@ -171,15 +171,7 @@ sub get_max_allowed_retries{
         ##! 16: 'manual set: '.$self->{MAX_RETRIES}
         return int($self->{MAX_RETRIES});
     }
-
-    #set in action-def of current workflow?
-    my $val = $self->_get_wf_action_param('retry_count');
-    if(defined $val){
-        ##! 16: 'defined in workflow-action-xml: '.$val
-        return $val;
-    }
-
-    #then from xml-config:
+  
     if(defined($self->param('retry_count'))){
         ##! 16: 'defined in activity-xml: '.$self->param('retry_count')
         return $self->param('retry_count');
@@ -195,53 +187,45 @@ sub set_max_allowed_retries{
     $self->{MAX_RETRIES} = (defined $max)?int($max):undef;
 }
 
-sub get_reap_at_intervall{
+sub get_reap_at_interval{
     my $self     = shift;
 
     #manual set?
-    if(defined($self->{REAP_AT_INTERVALL})){
-        ##! 16: 'manual set: '.$self->{REAP_AT_INTERVALL}
-        return $self->{REAP_AT_INTERVALL};
+    if(defined($self->{REAP_AT_INTERVAL})){
+        ##! 16: 'manual set: '.$self->{REAP_AT_INTERVAL}
+        return $self->{REAP_AT_INTERVAL};
     }
     ##! 16: nothing defined, return default'
     return "+0000000005";
 }
 
-sub set_reap_at_intervall{
+sub set_reap_at_interval {
     my $self     = shift;
-    my $intervall = shift;
+    my $interval = shift;
     # TODO syntax validation (or sanitation), should be OpenXPKI DateTime String
-    $self->{REAP_AT_INTERVALL} = (defined $intervall)?$intervall:undef;
+    $self->{REAP_AT_INTERVAL} = (defined $interval) ? $interval : undef;
 
     #if execution of action already has begun, the workflow has already retrieved, set and stored the reap_at timestamp
-    ##! 16: sprintf('set reap at intervall to %s',$intervall)
+    ##! 16: sprintf('set reap at interval to %s',$interval)
 
     if($self->workflow() && $self->workflow()->is_running()){
         ##! 16: 'pass retry interval over to workflow!'
-        $self->workflow()->set_reap_at_interval($intervall);
+        $self->workflow()->set_reap_at_interval ($interval );
     }else{
          ##! 16: 'wf not running yet'
     }
 }
 
 
-sub get_retry_intervall{
+sub get_retry_interval {
     my $self     = shift;
 
     #manual set?
-    if(defined($self->{RETRY_INTERVALL})){
-        ##! 16: 'manual set: '.$self->{RETRY_INTERVALL}
-        return $self->{RETRY_INTERVALL};
+    if(defined($self->{RETRY_INTERVAL})){
+        ##! 16: 'manual set: '.$self->{RETRY_INTERVAL}
+        return $self->{RETRY_INTERVAL};
     }
-
-    #set in action-def of current workflow?
-    my $val = $self->_get_wf_action_param('retry_interval');
-    if(defined $val){
-        ##! 16: 'defined in workflow-action-xml: '.$val
-        return $val;
-    }
-
-    #then from xml-config:
+ 
     if(defined $self->param('retry_interval' )){
         ##! 16: 'defined in activity-xml: '.$self->param('retry_interval')
         return $self->param('retry_interval');
@@ -251,11 +235,11 @@ sub get_retry_intervall{
     return "+0000000005";
 }
 
-sub set_retry_intervall {
+sub set_retry_interval {
     my $self     = shift;
-    my $retry_intervall = shift;
+    my $retry_interval = shift;
     # TODO syntax validation (or sanitation), should be OpenXPKI DateTime String
-    $self->{RETRY_INTERVALL} = (defined $retry_intervall)?$retry_intervall:undef;
+    $self->{RETRY_INTERVAL} = (defined $retry_interval) ? $retry_interval : undef;
 }
 
 sub get_retry_count {
@@ -283,21 +267,6 @@ sub runtime_exception{
     my $workflow = shift;
     ##! 1: 'runtime_exception!'
 
-}
-
-sub _get_wf_action_param{
-    my $self     = shift;
-    my $key = shift;
-    my $value = undef;
-
-    if($self->workflow()){
-        my $wf_state = $self->workflow()->_get_workflow_state();
-        my $action = $wf_state->{_actions}->{$self->name};
-        if(defined $action->{$key}){
-            $value = $action->{$key};
-        }
-    }
-    return $value
 }
 
 sub setparams {
@@ -483,21 +452,21 @@ returns the number of max allowed retries (normally defined in xml-config). defa
 
 sets the number of max allowed retries
 
-=head2 get_retry_intervall
+=head2 get_retry_interval
 
-returns the retry intervall (relative OpenXPKI DateTime String, normally defined in xml-config). default: "+0000000005"
+returns the retry interval (relative OpenXPKI DateTime String, normally defined in xml-config). default: "+0000000005"
 
-=head2 set_retry_intervall($string)
+=head2 set_retry_interval($string)
 
-sets the retry intervall (relative OpenXPKI DateTime String e.g. "+0000000005")
+sets the retry interval (relative OpenXPKI DateTime String e.g. "+0000000005")
 
-=head2 get_reap_at_intervall
+=head2 get_reap_at_interval
 
-returns the reap_at intervall (relative OpenXPKI DateTime String). default: "+0000000005"
+returns the reap_at interval (relative OpenXPKI DateTime String). default: "+0000000005"
 
-=head2 set_reap_at_intervall($string)
+=head2 set_reap_at_interval($string)
 
-sets the reap_at intervall (relative OpenXPKI DateTime String, e.g. "+0000000005")
+sets the reap_at interval (relative OpenXPKI DateTime String, e.g. "+0000000005")
 
 =head2 get_retry_count
 

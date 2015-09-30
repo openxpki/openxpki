@@ -22,7 +22,7 @@ sub init {
     my $reap_at = $context->param('reap_at');
     if($reap_at){
         ##! 1: 'set given reap_at interval: ' .$reap_at; 
-        $self->set_reap_at_intervall( $reap_at );
+        $self->set_reap_at_interval( $reap_at );
         $context->param('reap_at','');
     }
     
@@ -50,14 +50,14 @@ sub execute {
 	my $retry_interval = $context->param('retry_interval');
     if($retry_interval){
         ##! 1: 'set given retry_interval: ' .$retry_interval; 
-        $self->set_retry_intervall( $retry_interval );
+        $self->set_retry_interval( $retry_interval );
         $context->param('retry_interval','');
     }
 	
 	my $reap_at_dyn = $context->param('reap_at_dyn');
     if($reap_at_dyn){
         ##! 1: 'set given reap_at interval: ' .$reap_at_dyn; 
-        $self->set_reap_at_intervall( $reap_at_dyn );
+        $self->set_reap_at_interval( $reap_at_dyn );
         $context->param('reap_at_dyn','');
     }
 	
@@ -153,23 +153,23 @@ optional cause for pausing, will be passed as argument to $self->pause($msg)
 
 =item reap_at
 
-OpenXPKI relative interval, ie. "+0000000012". is  checked in init phase and passed to $self->set_reap_at_intervall($interval).
+OpenXPKI relative interval, ie. "+0000000012". is  checked in init phase and passed to $self->set_reap_at_interval($interval).
 
 =item reap_at_dyn
 
 OpenXPKI relative interval, ie. "+0000000012". 
-is  checked in execution phase and passed to $self->set_reap_at_intervall($interval).
+is  checked in execution phase and passed to $self->set_reap_at_interval($interval).
 
 =item retry_interval
 
 OpenXPKI relative interval, ie. "+0000000012". 
-is  checked in execution phase and passed to $self->set_reap_at_intervall($interval).
+is  checked in execution phase and passed to $self->set_reap_at_interval($interval).
 
 =back
 
 =head2 init
 
-after super::init, the param "reap_at" is evaluated. if given, $self->set_reap_at_intervall() is called.
+after super::init, the param "reap_at" is evaluated. if given, $self->set_reap_at_interval() is called.
 
 =head2 execute
    
