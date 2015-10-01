@@ -10,6 +10,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
+use OpenXPKI::Template;
 use Data::Dumper;
 
 sub execute {
@@ -52,20 +53,11 @@ sub execute {
     # dynamic case - context is used in evaluation
     if (defined $attrib[0]) {
 
-        my $tt = Template->new();
+        my $tt = OpenXPKI::Template->new();
         my @path;
         my $param =  { context => $context->param() };
         foreach my $item (@attrib) {
-            my $out;
-            if (!$tt->process(\$item, $param , \$out)) {
-                OpenXPKI::Exception->throw({
-                    MESSAGE => 'I18N_OPENXPKI_SERVER_ACTIVITY_EVALUATE_ELIGIBILITY_ERROR_PARSING_TEMPLATE',
-                    PARAMS => {
-                        'TEMPLATE' => $item,
-                        'ERROR' => $tt->error()
-                    }
-                });
-            }
+            my $out = $tt->render($item, $param);
             push @path, $out if ($out);
         }
 

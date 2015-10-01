@@ -27,8 +27,8 @@ sub new {
 
 This wraps around the process method of the original Template class. It expects
 the parameter string as first argument (scalar, not reference!) and a hashref 
-with the params for template. The class tries to auto-deserialized parameters
-from the params error by evaluating the template string for sequences like
+with the params for template. The class tries to auto-deserialize parameters
+from the params array by evaluating the template string for sequences like
 I<context.upper.lower> (this is yet done for the context prefix only). The 
 result is returned as a string, if processing fails, an OpenXPKI::Exception is
 thrown. 
