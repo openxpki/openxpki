@@ -237,8 +237,8 @@ sub get_chain {
     my %already_seen; # hash of identifiers that have already been seen
 
     if (! defined $arg_ref->{START_IDENTIFIER}) {
-    OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
         );
     }
     my $start = $arg_ref->{START_IDENTIFIER};

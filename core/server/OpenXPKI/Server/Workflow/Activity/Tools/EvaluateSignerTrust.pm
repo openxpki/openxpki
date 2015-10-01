@@ -61,7 +61,8 @@ sub execute {
     
     # reset the context flags    
     $context->param('signer_trusted' => 0);    
-    $context->param('signer_authorized' => 0);              
+    $context->param('signer_authorized' => 0);
+    $context->param('signer_revoked' => 0);
        
     my $signer_cert = $context->param('signer_cert');
     
@@ -84,44 +85,64 @@ sub execute {
     # Check the chain
     my $signer_identifier = $x509->get_identifier();
            
-    # Get profile and realm of the signer certificate
+    # Get realm and issuer for signer certificate
     my $cert_hash = CTX('dbi_backend')->first(
-        TABLE    => [ 'CERTIFICATE','CSR' ],
-        JOIN => [ [ 'CSR_SERIAL', 'CSR_SERIAL', ], ],
-        COLUMNS  => ['CSR.PROFILE', 'CERTIFICATE.PKI_REALM', 'CERTIFICATE.ISSUER_IDENTIFIER'],
+        TABLE    => 'CERTIFICATE',
+        COLUMNS  => ['PKI_REALM', 'ISSUER_IDENTIFIER', 'CSR_SERIAL', 'STATUS' ],
         DYNAMIC  => { 'IDENTIFIER' => {VALUE => $signer_identifier }, }                            
     );
     
-    my $signer_profile = $cert_hash->{'CSR.PROFILE'} || 'unknown';
-    my $signer_realm = $cert_hash->{'CERTIFICATE.PKI_REALM'} || 'unknown';
-    my $signer_issuer = $cert_hash->{'CERTIFICATE.ISSUER_IDENTIFIER'};
+    my $signer_realm = $cert_hash->{'PKI_REALM'} || 'global';
+    my $signer_issuer = $cert_hash->{'ISSUER_IDENTIFIER'};
+    
+    my $signer_req_key = $cert_hash->{'CSR_SERIAL'};
+    
+    # Get the profile of the certificate, if it was issued from this CA
+    my $signer_profile = 'unknown';    
+    if ($signer_req_key) { 
+        my $csr_hash = CTX('dbi_backend')->first(
+            TABLE    => 'CSR',        
+            COLUMNS  => 'PROFILE',
+            DYNAMIC  => { 'CSR_SERIAL' => {VALUE => $signer_req_key } }                            
+        );
+        $signer_profile = $csr_hash->{'PROFILE'} if ($csr_hash->{'PROFILE'});
+    }
     
     ##! 32: 'Signer profile ' .$signer_profile
     ##! 32: 'Signer realm ' .  $signer_realm 
     ##! 32: 'Signer issuer ' . $signer_issuer   
 
-    my $signer_trusted = 0;
     my $signer_root = '';
-    if ($signer_issuer) {
+    if ($signer_issuer) {      
         my $signer_chain = CTX('api')->get_chain({
             'START_IDENTIFIER' => $signer_issuer,        
         });                                    
-        if ($signer_chain->{COMPLETE}) {
-            $signer_trusted = 1;
-            $context->param('signer_trusted' => 1);
-            $signer_root = pop @{$signer_chain->{IDENTIFIERS}}; 
+        if ($signer_chain->{COMPLETE}) {                        
+            $signer_root = pop @{$signer_chain->{IDENTIFIERS}};             
         }
     }
     
-    if ($signer_root) {
+    if ($cert_hash->{'STATUS'} ne 'ISSUED') {        
         CTX('log')->log(
-            MESSAGE => "Trusted Signer validated - trusted root is $signer_root", 
+            MESSAGE => "Trusted Signer certificate is revoked", 
             PRIORITY => 'info',
             FACILITY => ['application','audit']
-        );        
+        );
+        $context->param('signer_revoked' => 1);
+        
+    } elsif ($signer_root) {
+        
+        $context->param('signer_trusted' => 1);
+        
+        CTX('log')->log(
+            MESSAGE => "Trusted Signer chain validated - trusted root is $signer_root", 
+            PRIORITY => 'info',
+            FACILITY => ['application','audit']
+        );
+                
     } else {
         CTX('log')->log(
-            MESSAGE => "Trusted Signer validation FAILED", 
+            MESSAGE => "Trusted Signer chain validation FAILED", 
             PRIORITY => 'info',
             FACILITY => ['application']
         );
