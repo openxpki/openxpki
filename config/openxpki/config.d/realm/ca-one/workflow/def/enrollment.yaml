@@ -505,7 +505,7 @@ condition:
     active_cert_count_ok:
         class: Workflow::Condition::LazyOR
         param:
-            condition1: scep_num_active_certs_less_than_max
+            condition1: scep_num_active_certs_less_than_max_active_certs
             condition2: scep_in_renewal_window
             condition3: scep_in_replace_window
 
