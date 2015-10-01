@@ -59,10 +59,14 @@ challenge:
 
 eligible:
     initial:
-       value: 0
+       value@: connector:scep.scep-server-1.connector.initial
+       args: '[% context.cert_subject_parts.CN.0 %]'
 
     renewal:
        value: 1
 
  
-
+connector:
+    initial:
+        class: Connector::Proxy::YAML
+        LOCATION: /home/pkiadm/ca-one/enroll.yaml
