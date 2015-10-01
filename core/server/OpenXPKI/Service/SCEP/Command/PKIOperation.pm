@@ -122,30 +122,7 @@ sub execute {
     $result = "Content-Type: application/x-pki-message\n\n" . $result;
     return $self->command_response($result);
 }
-
-
-=head2 __get_workflow_type
-
-Read the workflow type that this server is configured for from the connector.
-
-=cut
-sub __get_workflow_type : PRIVATE {
-
-    my $self      = shift;
-    my $server    = CTX('session')->get_server();
-
-    my $workflow_type = CTX('config')->get("scep.$server.workflow_type");
-
-    OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_NO_WORKFLOW_TYPE_DEFINED",
-        params => {
-            SERVER => $server,
-            REALM =>  CTX('session')->get_pki_realm()
-        }
-    ) unless($workflow_type);
-
-    return $workflow_type;
-}
+ 
 
 =head2 __send_cert
 
@@ -353,8 +330,6 @@ sub __pkcs_req : PRIVATE {
     my $profile   = CTX('session')->get_profile();
     my $server    = CTX('session')->get_server();
 
-    my $workflow_type = $self->__get_workflow_type();
-
     my $url_params =  $arg_ref->{PARAMS};
 
     my $pkcs7_base64 = $arg_ref->{PKCS7};
@@ -404,7 +379,6 @@ sub __pkcs_req : PRIVATE {
 
         # Fetch the workflow
         $wf_info = $api->get_workflow_info({
-            WORKFLOW => $self->__get_workflow_type(),
             ID       => $workflow_id,
         });
 
@@ -418,11 +392,25 @@ sub __pkcs_req : PRIVATE {
 
         ##! 16: "no workflow was found, creating a new one"
 
+        # get workflow type and profile from config layer
+        my $workflow_type = CTX('config')->get(['scep', $server, 'workflow_type']);
+        
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_NO_WORKFLOW_TYPE_DEFINED",
+            params => {
+                SERVER => $server,
+                REALM =>  $pki_realm
+            }
+        ) unless($workflow_type);
+
+
+
         CTX('log')->log(
             MESSAGE => "SCEP try to start new workflow for $transaction_id",
             PRIORITY => 'info',
             FACILITY => 'application',
         );
+        
         # inject newlines if not already present
         # this is necessary for openssl / openca-scep to parse
         # the data correctly
@@ -488,7 +476,7 @@ sub __pkcs_req : PRIVATE {
         }
 
         $wf_info = $api->create_workflow_instance({
-                WORKFLOW => $self->__get_workflow_type(),
+                WORKFLOW => $workflow_type,
                 PARAMS   => {
                     'scep_tid'    => $transaction_id,
                     'signer_cert' => $signer_cert,
@@ -496,7 +484,7 @@ sub __pkcs_req : PRIVATE {
 
                     #'expires' => $expirydate->epoch(),
 
-                    # not sure if these need to be passed here
+                    # getting the profile should be moved into the workflow
                     'cert_profile' => $profile,
                     'server'       => $server,
 
