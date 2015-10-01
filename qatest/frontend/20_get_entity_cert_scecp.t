@@ -9,7 +9,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
   
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 package main;
 
@@ -57,6 +57,11 @@ my $cert_identifier = $result->{main}->[0]->{content}->{data}->[1]->{value}->{la
 
 ok($cert_identifier,'Cert Identifier found');
 diag($cert_identifier);
+
+# fetch cert with sscep
+`$sscep enroll -u http://localhost/scep/scep -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity.csr -k tmp/entity.key -c tmp/cacert-0 -l tmp/entity.crt  -t 1 -n 1`;
+
+ok(-e "tmp/entity.crt", "Cert exists");
 
 open(CERT, ">tmp/entity.id");
 print CERT $cert_identifier;
