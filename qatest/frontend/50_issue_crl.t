@@ -9,7 +9,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
   
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 package main;
 

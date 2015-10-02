@@ -9,46 +9,44 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
   
-use Test::More tests => 3;
+use Test::More tests => 9;
 
 package main;
 
 my $result;
 my $client = TestCGI::factory();
 
-$result = $client->mock_request({
-    'page' => 'workflow!index!wf_type!crl_issuance',
-});
+my $crl= do { # slurp
+    local $INPUT_RECORD_SEPARATOR;
+    open my $HANDLE, '<tmp/crl.txt';
+    <$HANDLE>;
+};
 
-is($result->{main}->[0]->{content}->{fields}->[1]->{name}, 'wf_token');
+for my $cert (('entity','entity2','pkiclient')) {
+ 
+    diag('Testing '  .$cert);       
+    # Load cert status page using cert identifier
+    my $cert_identifier = do { # slurp
+        local $INPUT_RECORD_SEPARATOR;
+        open my $HANDLE, "<tmp/$cert.id";
+        <$HANDLE>;
+    };
+    
+    $result = $client->mock_request({
+        'page' => 'certificate!detail!identifier!'.$cert_identifier 
+    });
+    
+    # check database status 
+    is($result->{main}->[0]->{content}->{data}->[6]->{value}->{value}, 'REVOKED');
+    
+    # extract serial for checking against crl
+    my $serial = $result->{main}->[0]->{content}->{data}->[2]->{value};
+    
+    diag($serial);
+    like( $serial, "/0x[0-9a-f]+/", 'Got serial');
+    
+    $serial = uc(substr($serial,2));
+    
+    ok($crl =~ /$serial/m, 'Serial found on CRL');
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'wf_token' => undef,
-});
-
-like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
-
-my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
-
-diag("Workflow Id is $wf_id");
-
-$result = $client->mock_request({
-    'page' => $result->{goto},
-}); 
-
-is ($result->{status}->{level}, 'success', 'Status is success');
-
-# get crl id
-my $crlid = $result->{main}->[0]->{content}->{data}->[0]->{value}->[0]->{value};
-
-like($crlid, "/^\d+$/",'Got CRL Id');
-
-# download crl as text
-$result = $client->mock_request({
-     'page' => "crl!download!serial!$crlid!format!txt"
-});
-
-open(CERT, ">tmp/crl.txt");
-print CERT $result ;
-close CERT;
+}

@@ -52,6 +52,12 @@ $result = $client->mock_request({
 my $workflow_id = $result->{main}->[0]->{content}->{data}->[0]->[0];
 diag('Found workflow ' . $workflow_id );
 
+
+$result = $client->mock_request({
+    'action' => 'workflow!fail',
+    'wf_token' => undef,
+});
+
 $result = $client->mock_request({
     'page' => 'workflow!load!wf_id!' . $workflow_id,
 });

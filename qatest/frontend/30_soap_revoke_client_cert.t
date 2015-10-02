@@ -20,7 +20,7 @@ my $client = TestCGI::factory();
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<tmp/entity.id';
+    open my $HANDLE, '<tmp/entity2.id';
     <$HANDLE>;
 };
 
@@ -54,7 +54,7 @@ my $res = $oSoap->get_hash($cert_identifier);
 
 ok($oSoap, 'SOAP Client with Auth');
 is($res->{error},'','No error');
-is($res->{state}, 'SUCCESS','State SUCCESS with auth,  Workflow ' . $res->{id});
+is($res->{state}, 'CHECK_FOR_REVOCATION','State CHECK_FOR_REVOCATION with auth,  Workflow ' . $res->{id});
 
 # Check the certificate status via webui
 $result = $client->mock_request({
@@ -65,3 +65,7 @@ while (my $line = shift @{$result->{main}->[0]->{content}->{data}}) {
     is( $line->{value}->{value} , 'CRL_ISSUANCE_PENDING', 'certifiacte status is CRL Pending') if ($line->{format} && $line->{format} eq 'certstatus');
 }
 
+# Cleanup first workflow
+$result = $client->mock_request({
+    'action' => 'workflow!select!wf_action!crr_cleanup!wf_id!'.$soap->result->{id}
+});

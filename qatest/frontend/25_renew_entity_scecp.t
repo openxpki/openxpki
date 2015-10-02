@@ -8,6 +8,7 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
+use Digest::SHA qw(sha1_base64);
   
 use Test::More tests => 3;
 
@@ -30,7 +31,13 @@ ok((-s "tmp/entity.csr"), 'csr present') || die;
 
 ok(-s "tmp/entity2.crt", "Renewed cert exists");
 
-#open(CERT, ">tmp/entity2.id");
-#print CERT $cert_identifier;
-#close CERT;
+my $data = `openssl  x509 -in tmp/entity2.crt -outform der`;
+my $cert_identifier = sha1_base64($data);
+$cert_identifier =~ tr/+\//-_/;
+
+diag('Cert Identifier '  . $cert_identifier);
+    
+open(CERT, ">tmp/entity2.id");
+print CERT $cert_identifier;
+close CERT;
 
