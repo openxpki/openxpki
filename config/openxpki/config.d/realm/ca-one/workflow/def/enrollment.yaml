@@ -403,11 +403,10 @@ action:
     revoke_cert_after_replace:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
         input:
-          - replace_cert_identifier
-          - reason_code
-          - invalidity_time
         param:
             _map_cert_identifier: $replace_cert_identifier
+            _map_reason_code:     $reason_code
+            _map_invalidity_time: $invalidity_time
             flag_auto_approval: 1
 
     revoke_existing_certs:
