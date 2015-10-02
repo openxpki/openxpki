@@ -229,6 +229,7 @@ OpenXPKI/SOAP/Smartcard.pm
 OpenXPKI/Workflow/Factory.pm
 OpenXPKI/Workflow/Handler.pm
 OpenXPKI/Workflow/Config.pm
+OpenXPKI/Workflow/Context.pm
 
 
 OpenXPKI/Server/Workflow.pm

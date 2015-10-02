@@ -14,6 +14,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow;
+use OpenXPKI::Workflow::Context;
 use Workflow::Exception qw( configuration_error workflow_error );
 use Data::Dumper;
 
@@ -40,6 +41,10 @@ sub create_workflow{
         TYPE   => $wf_type,
     });
 
+    if (!$context) {
+        $context = OpenXPKI::Workflow::Context->new();
+    }
+
     return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );
 }
 
@@ -59,6 +64,8 @@ sub fetch_workflow {
         WORKFLOW => $wf,
         FILTER   => 1,
     });
+
+    $wf->context()->reset_updated();
 
     return $wf;
 

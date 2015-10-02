@@ -13,6 +13,7 @@ use English;
 
 use OpenXPKI::Debug;
 
+use OpenXPKI::Workflow::Context;
 use OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
@@ -149,11 +150,17 @@ sub update_workflow {
     }
     
     # ... and write new context / update it
-    my $params = $workflow->context()->param();
+    my $context = $workflow->context();
+    my $params = $context->param();
+    
+    ##! 32: 'Context is ' . ref $context
+    
+    ##! 32: 'Params with updates ' . join(":", keys %{$context->{_updated}}) 
+    
 
     ##! 128: 'params from context: ' . Dumper $params
   PARAMETER:
-    foreach my $key (keys %{ $params }) {
+    foreach my $key (keys %{ $context->{_updated} }) {
         my $value = $params->{$key};
         # parameters with undefined values are not stored / deleted
         if (! defined $value) {
@@ -171,10 +178,6 @@ sub update_workflow {
             };
             next PARAMETER;
         }
-
-	##! 2: "persisting context parameter: $key"
-	# ignore "volatile" context parameters starting with an underscore
-	next PARAMETER if ($key =~ m{ \A _ }xms);
 
         ##! 2: "persisting context parameter: $key"
         # ignore "volatile" context parameters starting with an underscore
@@ -251,6 +254,9 @@ sub update_workflow {
     }
     
     $dbi->commit();
+
+    # Reset the update marker
+    $context->reset_updated();
     
     CTX('log')->log(
         MESSAGE  => "Updated workflow $id",
@@ -318,7 +324,8 @@ sub fetch_workflow {
 	       proc_state  => $result->{WORKFLOW_PROC_STATE},
 	       count_try   => $result->{WORKFLOW_COUNT_TRY},
 	       wakeup_at   => $result->{WORKFLOW_WAKEUP_AT},
-	       reap_at   => $result->{WORKFLOW_REAP_AT},
+	       reap_at     => $result->{WORKFLOW_REAP_AT},
+	       context     => OpenXPKI::Workflow::Context->new()
 	   };
     
     ##! 1: "return ".Dumper($return);
@@ -342,15 +349,15 @@ sub fetch_extra_workflow_data {
 	},
 	);
 
-    # new empty context
-    my $context = Workflow::Context->new();
+    # context was set in fetch_workflow
+    my $context = $workflow->context( );
     foreach my $entry (@{$result}) {
-	$context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
-			$entry->{WORKFLOW_CONTEXT_VALUE});
+        $context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
+            $entry->{WORKFLOW_CONTEXT_VALUE});
     }
     
-    # merge context to workflow instance
-    $workflow->context($context);
+    # clear the updated flag
+    $context->reset_updated();
 
     return 1; 
 }
