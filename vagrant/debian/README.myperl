@@ -1,0 +1,37 @@
+# README.myperl
+
+This is "work in progress"... your mileage may vary.
+
+# BUILD
+
+## Create Local CPAN Mirror
+
+    mkdir ~/mirrors
+    echo "local: $HOME/mirrors/minicpan"            >  ~/.minicpanrc
+    echo "remote: http://artfiles.org/cpan.org/"    >> ~/.minicpanrc
+    echo "exact_mirror: 1"                          >> ~/.minicpanrc
+    minicpan
+
+## Start Vagrant Instance
+
+This starts and provisions the Vagrant instance:
+
+    cd vagrant/debian
+    vagrant up build-myperl
+    
+## Build All myperl Packages From Clean Instance
+
+Using the fresh instance started above:
+
+    vagrant ssh build-myperl --command '/vagrant/myperl/build.sh all'
+    vagrant ssh build-myperl --command '/vagrant/myperl/build.sh collect'
+
+## Test myperl Packages
+
+    cd vagrant/debian
+    vagrant up test-myperl
+    vagrant ssh test-myperl --command 'sudo /vagrant/myperl/install-oxi.sh'
+    
+## Run Tests
+
+    vagrant ssh test-myperl --command 'sudo /vagrant/myperl/run-tests.sh'
