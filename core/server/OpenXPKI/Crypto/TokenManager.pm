@@ -260,24 +260,25 @@ sub get_secret_groups
 
 =head2 reload_all_secret_groups_from_cache
 
-Reload the secrets B<for the current pki realm>
+Reload the secrets for all realms.
 
-FIXME: I dont see any benefit in loading the secret groups from other realms
-than the one in the session and changed the behaviour of this method.
+FIXME: I think this is unnecessary or put in the wrong place (server init).
+See #333
 
 =cut
 
 sub reload_all_secret_groups_from_cache {
     ##! 1: 'start'
     my $self = shift;
-
-    my $realm = CTX('session')->get_pki_realm();
-
-    foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
-        ##! 16: 'group: ' . $group
-        $self->__set_secret_from_cache({
-            GROUP     => $group,
-        });
+   
+    my @realms = CTX('config')->get_keys('system.realms');
+    foreach my $realm (@realms) {
+        foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
+            ##! 16: 'group: ' . $group
+            $self->__set_secret_from_cache({
+                GROUP     => $group,
+            });
+        }
     }
 
     ##! 1: 'end'

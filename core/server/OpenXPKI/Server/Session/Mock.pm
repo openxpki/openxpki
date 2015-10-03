@@ -53,6 +53,10 @@ sub START {
     }
 } 
 
+sub is_valid {
+    return 0;
+}
+
 1;
 __END__
 

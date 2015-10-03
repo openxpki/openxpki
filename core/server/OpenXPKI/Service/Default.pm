@@ -29,7 +29,7 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::Default::Command;
 
-my %state_of :ATTR;                # the current state of the service
+my %state_of :ATTR;     # the current state of the service
 
 sub init {
     my $self  = shift;
@@ -46,6 +46,7 @@ sub init {
 
     $state_of{$ident} = 'NEW';
 
+    # TODO - this should be handled by the run method after some cleanup
     # do session init, PKI realm selection and authentication
     while ($state_of{$ident} ne 'MAIN_LOOP') {
         my $msg = $self->collect();
@@ -100,26 +101,33 @@ sub __is_valid_message : PRIVATE {
             'PING',
             'CONTINUE_SESSION',
             'NEW_SESSION',
+            'DETACH_SESSION',
         ],
         'SESSION_ID_SENT' => [
             'PING',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
+            'DETACH_SESSION',
         ],
         'SESSION_ID_SENT_FROM_CONTINUE' => [
             'PING',
             'SESSION_ID_ACCEPTED',
             'CONTINUE_SESSION',
+            'DETACH_SESSION',
         ],
         'WAITING_FOR_PKI_REALM' => [
             'PING',
             'GET_PKI_REALM',
+            'NEW_SESSION',
             'CONTINUE_SESSION',
+            'DETACH_SESSION',
         ],
         'WAITING_FOR_AUTHENTICATION_STACK' => [
             'PING',
             'GET_AUTHENTICATION_STACK',
+            'NEW_SESSION',
             'CONTINUE_SESSION',
+            'DETACH_SESSION',
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
@@ -127,14 +135,18 @@ sub __is_valid_message : PRIVATE {
             'GET_CLIENT_SSO_LOGIN',
             'GET_CLIENT_X509_LOGIN',
             'GET_X509_LOGIN',
+            'NEW_SESSION',
             'CONTINUE_SESSION',
+            'DETACH_SESSION',
         ],
         'MAIN_LOOP' => [
             'PING',
             'LOGOUT',
             'STATUS',
             'COMMAND',
+            'NEW_SESSION',
             'CONTINUE_SESSION',
+            'DETACH_SESSION',
         ],
     };
 
@@ -145,6 +157,12 @@ sub __is_valid_message : PRIVATE {
         ##! 16: 'message is valid'
         return 1;
     }
+    
+    CTX('log')->log(
+        MESSAGE  => 'Invalid message '.$message_name.' recevied in state ' . $state_of{$ident}, 
+        PRIORITY => 'warn',
+        FACILITY => 'system',
+    );
     ##! 16: 'message is NOT valid'
     return;
 }
@@ -200,7 +218,8 @@ sub __handle_NEW_SESSION : PRIVATE {
     } else {
         ##! 8: "no language specified"
     }
-    OpenXPKI::Server::Context::setcontext({'session' => $session});
+        
+    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
 
     CTX('log')->log(
 	MESSAGE  => 'New session created',
@@ -265,6 +284,26 @@ sub __handle_CONTINUE_SESSION {
     return;
 }
 
+sub __handle_DETACH_SESSION: PRIVATE {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $msg     = shift;
+
+    my $sessid = CTX('session')->get_id();
+    ##! 4: "detach session " . $sessid
+
+    OpenXPKI::Server::Context::killsession();
+
+    $self->__change_state({
+        STATE => 'NEW',
+    });
+
+    return { 'SERVICE_MSG' => 'DETACH' };
+
+}
+
+
 sub __handle_PING : PRIVATE {
     ##! 1: 'start'
     my $self    = shift;
@@ -305,7 +344,7 @@ sub __handle_PING : PRIVATE {
         });
         return $reply;
     }
-    return {};
+    return { SERVICE_MSG => 'START_SESSION' };
 }
 
 sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
@@ -536,14 +575,24 @@ sub __handle_LOGOUT : PRIVATE {
     my $ident   = ident $self;
     my $message = shift;
 
-    ##! 8: "logout received - killing session and connection"
+    my $old_session = CTX('session');
+
+    ##! 8: "logout received - terminate session " . $old_session->get_id(),
     CTX('log')->log(
-		MESSAGE  => 'Terminating session',
-		PRIORITY => 'info',
+		MESSAGE  => 'Terminating session ' . $old_session->get_id(),
+		PRIORITY => 'debug',
 		FACILITY => 'system',
 	);
-    CTX('session')->delete();
-    exit 0;
+	    
+    OpenXPKI::Server::Context::killsession();
+    
+    $self->__change_state({ STATE => 'NEW' });
+    
+    $old_session->delete()->flush();
+    
+    return { 'SERVICE_MSG' => 'LOGOUT' };
+
+    
 }
 
 sub __handle_STATUS : PRIVATE {
@@ -744,7 +793,19 @@ sub __change_state : PRIVATE {
 	);
     $state_of{$ident} = $new_state;
     # save the new state in the session
-    CTX('session')->set_state($new_state);
+    if (OpenXPKI::Server::Context::hascontext('session')) {
+        CTX('session')->set_state($new_state);
+    }
+    
+    # Set the daemon name after enterin MAIN_LOOP
+    
+    if ($new_state eq ' MAIN_LOOP') {
+        $0 = sprintf ('openxpkid (%s) worker: %s (%s)', 
+            (CTX('config')->get('system.server.name') || 'main'), 
+            CTX('session')->get_user(), CTX('session')->get_role());
+    } elsif ($new_state eq ' NEW') {
+        $0 = sprintf ('openxpkid (%s) worker: idle', (CTX('config')->get('system.server.name') || 'main'));
+    }
 
     return 1;
 }
@@ -783,14 +844,16 @@ sub run
         my $is_valid = $self->__is_valid_message({
             MESSAGE => $msg,
         });
-        if (! $is_valid) {
-	    $self->__send_error({
-	        ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
-	    });
+        if (! $is_valid) {            
+    	    $self->__send_error({
+	            ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
+	        });
+	        
         }
         else { # valid message received
             my $result;
-            if (! CTX('session')->is_valid()) {
+            # we dont need a valid session when we are not in main loop state
+            if ($state_of{$ident} eq 'MAIN_LOOP' && ! CTX('session')->is_valid()) {
                 # check whether we still have a valid session (someone
                 # might have logged out on a different forked server)
                 $self->__send_error({
@@ -1011,9 +1074,15 @@ if it is
 Handles the GET_PASSWD_LOGIN message by passing on the credentials
 to the Authentication modules 'login_step' method.
 
+=item * __handle_DETACH
+
+Removes the current session from this worker but does not delete 
+the session. The worker is now free to handle requests for other
+sessions.
+
 =item * __handle_LOGOUT
 
-Handles the LOGOUT message by logging the logout and exiting.
+Handles the LOGOUT message by deleting the session from the backend.
 
 =item * __handle_STATUS
 

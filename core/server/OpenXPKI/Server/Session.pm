@@ -161,6 +161,7 @@ sub delete
 {
     my $self = shift;
     $self->{session}->delete();
+    $self->{session}->flush();
     delete $self->{session};
 }
 

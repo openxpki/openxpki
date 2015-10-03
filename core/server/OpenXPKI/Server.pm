@@ -619,18 +619,6 @@ sub do_process_request
 
     ##! 16: 'secret groups reloaded from cache'
 
-    # masquerade process
-    my $user = '';
-    my $role = '';
-    eval {
-	    $user = CTX('session')->get_user();
-    };
-    eval {
-	    $role = CTX('session')->get_role();
-	    $role = 'no role' unless($role);
-    };
-    $0 = sprintf ('openxpkid (%s) worker: %s (%s)', (CTX('config')->get('system.server.name') || 'main'), $user, $role);
-
     ## use user interface
     CTX('service')->run();
 }
