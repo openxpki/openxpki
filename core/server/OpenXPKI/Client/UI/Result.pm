@@ -354,7 +354,7 @@ sub render {
         if (ref $redirect ne 'HASH') {
             $redirect = { goto => $redirect };
         }
-        $body = $json->encode( $redirect );        
+        $body = $json->encode( $redirect );
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );
     } else {
@@ -366,7 +366,7 @@ sub render {
     # Return the output into the given pointer
     if ($output && ref $output eq 'SCALAR') {
         $$output = $body;        
-    } elsif ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+    } elsif (ref $cgi && $cgi->http('HTTP_X-OPENXPKI-Client')) {
         # Start output stream        
         print $cgi->header( @main::header );        
         print $body;

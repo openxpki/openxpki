@@ -20,6 +20,7 @@ use Config::Std;
 use Log::Log4perl qw(:easy);
 use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix);
 use OpenXPKI::Client::UI;
+use OpenXPKI::Client;
 
 my $configfile = '/etc/openxpki/webui/default.conf';
 
@@ -63,9 +64,24 @@ foreach my $key (keys ($config{header} || {})) {
    
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 
+# We persist the client in the CGI *per session*
+# Sharing one client with multiple sessions requires some work on detach/
+# switching sessions in backend to prevent users from getting wrong sessions!
+
+my $backend_client;
+
 while (my $cgi = CGI::Fast->new()) {
 
     $log->debug('check for cgi session, fcgi pid '. $$ );
+
+    if (!$backend_client || !$backend_client->is_connected()) {
+        $backend_client = OpenXPKI::Client->new({ 
+            SOCKETFILE => $config{'global'}{'socket'}             
+        });
+    } else {
+        # Detach session from shared client, safety hook
+        $backend_client->detach();
+    }
 
     my $sess_id = $cgi->cookie('oxisess-webui') || undef;
     my $session_front = new CGI::Session(undef, $sess_id, {Directory=>'/tmp'});
@@ -80,7 +96,8 @@ while (my $cgi = CGI::Fast->new()) {
 
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
-    if ($config{global}{realm_mode} eq "path") {
+    my $realm_mode = $config{global}{realm_mode} || '';
+    if ($realm_mode eq "path") {
 
         my $script_path = $ENV{'REQUEST_URI'};
         # Strip off cgi-bin, last word of the path and discard query string
@@ -104,7 +121,7 @@ while (my $cgi = CGI::Fast->new()) {
             $session_front->param('pki_realm', $config{realm}{$script_realm});
             $log->debug('Path to realm: ' .$config{realm}{$script_realm});
         }
-    } elsif ($config{global}{realm_mode} eq "fixed") {
+    } elsif ($realm_mode eq "fixed") {
         # Fixed realm mode, mode must be defined in the config
         $session_front->param('pki_realm', $config{global}{realm});
     }   
@@ -116,12 +133,14 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $result;
     eval {
+                
         my $client = OpenXPKI::Client::UI->new({
+            backend => $backend_client,                   
             session => $session_front,
             logger => $log,
             config => $config{global}
         });
-         
+        
         $result = $client->handle_request({ cgi => $cgi });
         $log->debug('request handled');
         $log->trace( Dumper $result );
@@ -150,6 +169,9 @@ while (my $cgi = CGI::Fast->new()) {
         }
         $log->trace('result was ' . Dumper $result);
     }
+    
+    # Detach session 
+    $backend_client->detach();
 
 }
 

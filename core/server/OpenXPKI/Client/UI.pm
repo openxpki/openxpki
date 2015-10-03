@@ -28,6 +28,7 @@ has 'backend' => (
     is => 'rw',
     isa => 'Object',
     builder => '_init_backend',
+    trigger => \&_init_backend,
 );
 
 # should be passed by the ui script to be shared, if not we create it
@@ -59,32 +60,37 @@ has _status => (
 Builder that creates an instance of OpenXPKI::Client and cares about
 switching/creating the backend session
 
-=cut
+=cut 
 sub _init_backend {
-
-
+ 
     my $self = shift;
-    my $client = OpenXPKI::Client->new(
-        {
-             SOCKETFILE => $self->_config()->{'socket'},
+ 
+    # the trigger has the client as argument, the builder has not
+    my $client = shift;
+    
+    if (!$client) {
+        $client = OpenXPKI::Client->new({
+            SOCKETFILE => $self->_config()->{'socket'},
         });
-
-    # create new session
+        $self->logger()->debug('Create backend client instance');
+    } else {
+        $self->logger()->debug('Use provide client instance');
+    }
+    
     my $session = $self->session();
     my $old_session =  $session->param('backend_session_id') || undef;
-    $self->logger()->info('old backend session ' . $old_session) if ($old_session);
-
-    # Fetch errors on session init
     eval {
+        $self->logger()->debug('First session reinit with id ' . ($old_session || 'init'));        
         $client->init_session({ SESSION_ID => $old_session });
     };
+    
     if ($EVAL_ERROR) {
         my $exc = OpenXPKI::Exception->caught();
         if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
+            $self->logger()->info('Backend session was gone - start a new one');
             # The session has gone - start a new one - might happen if the gui
             # was idle too long or the server was flushed
-            $client->init_session({ SESSION_ID => undef });
-            $self->logger()->info('Backend session was gone - start a new one');
+            $client->init_session({ SESSION_ID => undef });            
             $self->_status({ level => 'warn', i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
         } else {
             $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
@@ -103,6 +109,7 @@ sub _init_backend {
         $self->logger()->info('New backend session with id ' . $client_session);
     }
     $session->param('backend_session_id', $client_session);
+    
     $self->logger()->trace( Dumper $session );
     return $client;
 }
@@ -141,19 +148,31 @@ sub handle_request {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
-    $self->flush_session() if ($page eq 'logout' || $action eq 'logout');
-
+    if ($page eq 'logout' || $action eq 'logout') {        
+        if ($self->backend()->is_logged_in()) {        
+            $self->backend()->logout();
+        }
+        $self->logger()->info('Logout from session');
+        $self->flush_session();
+    }    
 
     my $reply = $self->backend()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
     $self->logger()->trace('Ping replied ' . Dumper $reply);
     $self->logger()->debug('current session status ' . $status);
 
+    if ( $reply->{SERVICE_MSG} eq 'START_SESSION' ) {
+        $reply = $self->backend()->init_session();
+        $self->logger()->debug('Init new session');
+        $self->logger()->trace('Init replied ' . Dumper $reply);
+    }
+    
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });
         $self->logger()->debug("Got error from server");
         return $result->set_status_from_error_reply( $reply );
     }
+    
 
     # Call to bootstrap components
     if ($page =~ /^bootstrap!(.+)/) {
@@ -227,7 +246,7 @@ sub handle_page {
         eval "use $class;1";
         if ($EVAL_ERROR) {
             $self->logger()->error("Failed loading page class $class");
-            $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self });
+            $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self,  cgi => $cgi });
             $result->init_error();
             $result->set_status(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'),'error');
 
@@ -292,11 +311,10 @@ sub handle_login {
 
     # if this is an initial request, force redirect to the login page
     # will do an external redirect in case loginurl is set in config
-    if ($action !~ /^login/ && $page !~ /^login/) {
-                 
+    if ($action !~ /^login/ && $page !~ /^login/) {                 
         # Requests to pages can be redirected after login, store page in session       
-        if ($page) {
-            $self->logger()->debug("Store page request for later redirect" . $page);
+        if ($page && $page ne 'logout') {
+            $self->logger()->debug("Store page request for later redirect " . $page);
             $self->session()->param('redirect', $page);
         }
         
@@ -412,7 +430,11 @@ sub handle_login {
             $new_session_front->param('user', $reply->{PARAMS});
             $new_session_front->param('pki_realm', $reply->{PARAMS}->{pki_realm});
             $new_session_front->param('is_logged_in', 1);
-            $new_session_front->param('initialized', 1);   
+            $new_session_front->param('initialized', 1);
+            
+            # fetch redirect from old session before deleting it!
+            $new_session_front->param('redirect', $self->session()->param('redirect'));
+               
             $self->session()->delete();                                           
             $self->session( $new_session_front );
             
@@ -421,15 +443,8 @@ sub handle_login {
             
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});
             $self->logger()->debug('CGI Header ' . Dumper \@main::header );
-
-            my $redirect = $self->session()->param('redirect');
-            if ($redirect) {                                
-                $result->reload(1);
-                $result->redirect( $redirect );    
-                $self->session()->param('redirect', undef );
-            } else {         
-                $result->init_index();
-            }
+            
+            $result->init_index();            
             return $result->render();
         }
     }
@@ -456,7 +471,6 @@ sub flush_session {
 
     my $self = shift;
     $self->logger()->info("flush session");
-    # TODO - kill backend session, seems to be not implemented yet....
     $self->session()->delete();
     $self->session()->flush();
     $self->session( new CGI::Session(undef, undef, {Directory=>'/tmp'}) );

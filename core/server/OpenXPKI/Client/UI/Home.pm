@@ -15,22 +15,29 @@ sub BUILD {
     my $self = shift;
     $self->_page ({'label' => 'Welcome to your OpenXPKI Trustcenter'});
 }
-
+ 
 sub init_welcome {
-
 
     my $self = shift;
     my $args = shift;
 
-
-    # check if there are custom landmarks for this user
-    my $landmark = $self->_client->session()->param('landmark');    
-    if ($landmark && $landmark->{welcome}) {
-        $self->logger()->debug('Found welcome landmark - redirecting user to ' . $landmark->{welcome});
-        $self->redirect($landmark->{welcome});
+    # check for redirect
+    my $redirect = $self->_client->session()->param('redirect');
+    if ($redirect) {
+        $self->_client->session()->param('redirect','');
+        $self->logger()->debug('Found redirect - redirecting user to ' . $redirect);
+        $self->redirect($redirect);
         $self->reload(1);
     } else {
-        $self->init_index();        
+        # check if there are custom landmarks for this user
+        my $landmark = $self->_client->session()->param('landmark');    
+        if ($landmark && $landmark->{welcome}) {
+            $self->logger()->debug('Found welcome landmark - redirecting user to ' . $landmark->{welcome});
+            $self->redirect($landmark->{welcome});
+            $self->reload(1);
+        } else {
+            $self->init_index();        
+        }
     }
     
     return $self;

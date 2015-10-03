@@ -62,7 +62,7 @@ $result = $client->mock_request({
 });
 
 while (my $line = shift @{$result->{main}->[0]->{content}->{data}}) {
-    is( $line->{value}->{value} , 'CRL_ISSUANCE_PENDING', 'certifiacte status is CRL Pending') if ($line->{format} && $line->{format} eq 'certstatus');
+    is( $line->{value}->{value} , 'CRL_ISSUANCE_PENDING', 'certificate status is CRL Pending') if ($line->{format} && $line->{format} eq 'certstatus');
 }
 
 # Cleanup first workflow

@@ -344,15 +344,70 @@ sub init_session {
     
     # we want to be able to send after initialization, so collect a message!
     $msg = $self->collect();
-    return 1;
+    return $msg;
 }
+
+
+sub detach {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+ 
+
+    my $msg;
+    eval {
+        $msg = $self->send_receive_service_msg('DETACH_SESSION')
+    };
+    
+    $sessionid{$ident} = undef;
+    
+    if (defined $msg &&
+        ref $msg eq 'HASH' &&
+        $msg->{SERVICE_MSG} eq 'DETACH') {        
+        return 1;
+    }
+    
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CLIENT_DETACH_FAILED",
+        params  => {
+            MESSAGE_FROM_SERVER => Dumper $msg,
+    });
+    return undef;
+}
+
+
+sub logout {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+    my $msg;
+    
+    $msg = $self->send_receive_service_msg('LOGOUT');
+    
+    $sessionid{$ident} = undef;
+    
+    if (defined $msg &&
+        ref $msg eq 'HASH' &&
+        $msg->{SERVICE_MSG} eq 'LOGOUT') {        
+        return 1;
+    }
+    
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CLIENT_LOGOUT_FAILED",
+        params  => {
+            MESSAGE_FROM_SERVER => Dumper $msg,
+    });
+    
+}
+
 
 sub is_logged_in {
     my $self = shift;
 
     my $msg;
     eval {
-        $msg = $self->send_receive_service_msg('PING')
+        $msg = $self->send_receive_service_msg('PING');
     };
     if (defined $msg &&
         ref $msg eq 'HASH' &&
