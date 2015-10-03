@@ -462,7 +462,7 @@ sub _sig_term {
     $OpenXPKI::Server::Watchdog::terminate  = 1;
 
     CTX('log')->log(
-        MESSAGE  => 'Watchdog worker $$ got term signal - cleaning up.',
+        MESSAGE  => "Watchdog worker $$ got term signal - cleaning up.",
         PRIORITY => "info",
         FACILITY => "system",
     );
@@ -535,7 +535,7 @@ sub terminate {
 
          CTX('log')->log(
             MESSAGE  => 'Told watchdog to terminate',
-          PRIORITY => "info",
+            PRIORITY => "info",
             FACILITY => "system",
        );
     } else {

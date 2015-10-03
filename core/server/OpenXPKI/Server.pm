@@ -369,7 +369,9 @@ sub sig_term {
     # This is obsolete for a "global shutdown" using the OpenXPKI::Control::stop
     # method but should be kept in case somebody sends a term to the daemon which
     # will stop spawning of new childs but should allow existing ones to finish
-    CTX('watchdog')->terminate();
+    # FIXME - this will cause the watchdog to terminate if you kill a child, 
+    # so we remove this 
+    #CTX('watchdog')->terminate();
 
     ##! 1: 'end'
 }
