@@ -1,0 +1,26 @@
+Source: openxpki-perldep-core
+Maintainer: OpenXPKI Foundation <debian@openxpki.org>
+Priority: optional
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0-16), libversion-perl, libconfig-std-perl, libtemplate-perl
+
+Package: openxpki-perldep-core
+Architecture: any
+Recommends:
+Section: perl
+Priority: optional
+Depends: ${perl:Depends}, ${shlibs:Depends}, make, openssl (>= 0.9.8)
+Description: OpenXPKI Perl binary and CPAN module dependencies
+ OpenXPKI is an Open Source PKI project.
+ .
+ This package contains all Perl and CPAN modules which are required to run
+ an OpenXPKI trustcenter.
+ .
+ Packaging information:
+ OpenXPKI version       [% version %]
+ Git commit hash:       [% GIT_COMMIT_HASH %]
+ Git description:       [% GIT_DESCRIPTION %]
+ Git tags:              [%- IF GIT_TAGS -%]
+ [%- GIT_TAGS -%]
+[%- ELSE -%]
+ <no tag set>
+[%- END %]

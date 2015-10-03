@@ -1,0 +1,4 @@
+This is a debian packaging example for FCGI from CPAN.
+
+It's here as a small example for testing and debugging the Makefile and
+debian/ stuff.

@@ -68,7 +68,7 @@ endif
 
 openxpki-archive:
 	cd $(SRCBASE); \
-	perl Makefile.PL; \
+	$(PERL) Makefile.PL; \
 	make dist; \
 	mv $(PERLNAME)-*.tar.gz /tmp
 

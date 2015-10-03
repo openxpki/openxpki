@@ -1,6 +1,8 @@
 #!/bin/bash
 
 BASE="/etc/openxpki/ssl/ca-one/";
+PATH=/opt/myperl/bin:$PATH
+export PATH
 
 if [ ! -d "$BASE" ]; then 
     mkdir -p "$BASE";
