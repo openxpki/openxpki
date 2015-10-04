@@ -20,7 +20,7 @@ set -e
 # verbose execution
 #set -x
 
-CPAN_MIRROR="-M file:///mirrors/minicpan"
+#CPAN_MIRROR="-M file:///mirrors/minicpan"
 
 function pkg_installed {
     case $DISTNAME in
