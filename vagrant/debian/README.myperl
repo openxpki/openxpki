@@ -47,7 +47,8 @@ In the "build" instance, after running the full build process:
     git clone --quiet /code-repo ~/git/openxpki
     cd ~/git/openxpki/core/server
 
-    PERL=/opt/myperl/bin/perl /opt/myperl/bin/perl Makefile.PL
+    export PATH=/opt/myperl/bin:$PATH
+    PERL=/opt/myperl/bin/perl perl Makefile.PL
     # Run unit tests on modules
     make test
     make install
