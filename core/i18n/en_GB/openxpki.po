@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-08-19 17:40+0100\n"
+"PO-Revision-Date: 2015-10-05 12:47+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -355,6 +355,9 @@ msgstr "Password does not meet policy requirements!"
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
 msgstr "Certificate signing token is not online"
 
+msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED"
+msgstr "Certificate signing token is not online"
+
 msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 msgstr "CRL signing token is not online"
 
@@ -379,6 +382,12 @@ msgstr "Advanced naming style"
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "Extended naming (expert use only)"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
+msgstr "Application Name"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC"
+msgstr "The name of the application acting as client."
+
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC"
 msgstr ""
 "The default style is usually the best choice if you do not have any special "
@@ -401,6 +410,9 @@ msgstr "Comment"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
 msgstr "Country"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+msgstr "Datasafe Token"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr "Domain Component"
@@ -537,6 +549,15 @@ msgstr "Basic SCEP client naming style"
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 msgstr "Certificate for SCEP Enrollment Authentitcation"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC"
+msgstr "A profile for clients using TLS authentication."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
+msgstr "TLS Client / Default Naming"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
+msgstr "TLS Client"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS/Web Server "
 
@@ -659,15 +680,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
 msgstr "Approve Revocation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr ""
-"Please validate the given information and approve the revocation request "
-"only if you are sure that this information is correct."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
-msgstr "Approve Revocation"
+msgstr "Approve Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Initialize"
@@ -724,13 +741,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
 msgstr "Start revocation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
-msgstr "Publish CRL"
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_LABEL"
-msgstr "Publish CRL"
+msgstr "Publish CA Certs"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC"
 msgstr "Submit your revocation request to the certification office."
@@ -901,13 +916,12 @@ msgstr "Fail workflow"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
 msgstr "Fail"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
-msgstr "Fail workflow"
+msgstr ""
+"Override the automated policy decision and continue with the enrollment."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
-msgstr "Fail"
+msgstr "Override Policy"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancel this workflow."
@@ -970,16 +984,11 @@ msgstr "Schedule this certificate for revocation"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_LABEL"
 msgstr "Revoke Certificate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC"
 msgstr ""
-"Create a revocation request for your certificate. Please type the "
-"certificate identifier or use the autosearch function to find your "
-"certificate."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL"
-msgstr "Start revocation"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 msgstr "Generate Code"
@@ -1376,6 +1385,9 @@ msgstr "Password"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_PLACEHOLDER"
 msgstr "Please retype the password"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TOOLTIP"
+msgstr "Retype your password"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_DESC"
 msgstr " "
 
@@ -1482,33 +1494,23 @@ msgstr "Name of the SCEP endpoint receiving this request."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "SCEP Endpoint"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
-msgstr "You can search for workflows here."
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
-msgstr "Creator"
+msgstr "Requestor/Signer"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
-msgstr "Creator"
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
-msgstr "Creator"
+msgstr "Sigature Intact"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
-msgstr "User ID"
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
-msgstr "Serial"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP"
-msgstr "Workflow history"
+msgstr "Signer Validity"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Force Failure"
@@ -1561,9 +1563,8 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Request invalid - action without token"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_FAIL_WITHOUT_ID"
-msgstr "Request invalid - action without token"
+msgstr "Request invalid - action without workflow id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "Request invalid - no action"
@@ -1882,11 +1883,9 @@ msgstr "This workflow failed finally and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
 msgstr "FAILURE"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_DESC"
-msgstr "CA key not usable"
+msgstr "The CA signing token is not usable."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_LABEL"
 msgstr "CA key not usable"
 
@@ -1894,7 +1893,6 @@ msgstr "CA key not usable"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_LABEL"
 msgstr "FAILURE"
 
@@ -1910,7 +1908,6 @@ msgstr "State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC"
 msgstr "Approval pending"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL"
 msgstr "Approval pending"
 
@@ -1918,7 +1915,6 @@ msgstr "Approval pending"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_DESC"
 msgstr "Manual authentication pending"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL"
 msgstr "Manual authentication pending"
 
@@ -1926,7 +1922,6 @@ msgstr "Manual authentication pending"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC"
 msgstr "Approval pending"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL"
 msgstr "Approval pending"
 
@@ -1946,7 +1941,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
 msgstr "FAILURE"
 
@@ -1958,22 +1952,18 @@ msgstr "Export initial state"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "State"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL"
 msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE"
 msgstr "This workflow failed finally and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
 msgstr "FAILURE"
 
@@ -2054,13 +2044,11 @@ msgstr "Report Result"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
-msgstr "The certificate has been revoked and a revocation list was issued."
+msgstr "This workflow has finished with success and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
-msgstr "Certificate Revoked"
+msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
 msgstr "This workflow is paused and will be continued by the watchdog"

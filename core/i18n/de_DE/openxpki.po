@@ -472,6 +472,10 @@ msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -510,6 +514,14 @@ msgstr "Erweiterte Benennungsart"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
 msgstr "Erweiterte Benennungsart"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC"
+msgstr "Ihr Name, z.B. 'Peter Müller'"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC"
@@ -553,6 +565,10 @@ msgstr ""
 "eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
 "können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
 "beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+msgstr "TLS-Server"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
@@ -779,6 +795,26 @@ msgstr "Einfache Benennungsart"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
+msgstr "Einfache Benennungsart"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr ""
 "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
 "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
@@ -1841,6 +1877,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_PLACEHOLDER"
 msgstr "Letzte Aktualisierung"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TOOLTIP"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_DESC"
 msgstr ""
 "Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt wird"
@@ -2014,10 +2054,6 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_TOOLTIP"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
