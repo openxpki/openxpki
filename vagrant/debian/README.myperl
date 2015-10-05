@@ -35,3 +35,19 @@ Using the fresh instance started above:
 ## Run Tests
 
     vagrant ssh test-myperl --command 'sudo /vagrant/myperl/run-tests.sh'
+
+# DEVELOPING OPENXPKI WITH MYPERL INSTALLATION
+
+In the "build" instance, after running the full build process:
+
+    # de-install openxpki-core
+    sudo /opt/myperl/bin/openxpkictl stop
+    sudo dpkg -r myperl-openxpki-core
+
+    git clone --quiet /code-repo ~/git/openxpki
+    cd ~/git/openxpki/core/server
+
+    PERL=/opt/myperl/bin/perl /opt/myperl/bin/perl Makefile.PL
+    # Run unit tests on modules
+    make test
+    make install
