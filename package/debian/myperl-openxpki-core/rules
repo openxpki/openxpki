@@ -1,0 +1,95 @@
+#!/usr/bin/make -f
+
+PERL ?= /opt/myperl/bin/perl
+
+# Usage: $(call perlcfg,KEY)
+define perlcfg
+$(shell $(PERL) "-V:$1" | awk -F\' '{print $$2}')
+endef
+
+SITELIB			= $(call perlcfg,sitelib)
+SITEARCH		= $(call perlcfg,sitearch)
+SITELIBEXP		= $(DESTDIR)$(call perlcfg,sitelibexp)
+ARCHNAME		= $(call perlcfg,archname)
+SITEMAN1EXP		= $(call perlcfg,siteman1direxp)
+SITEMAN3EXP		= $(call perlcfg,siteman3direxp)
+SITESCRIPTEXP	= $(call perlcfg,sitescriptexp)
+ARCHLIB			= $(call perlcfg,archlib)
+PRIVLIB			= $(call perlcfg,privlib)
+
+# Environment vars needed for proper Perl module installation
+# The PERL5LIB has the lib/perl5 in it to work around a bug in cpanm
+export PERL5LIB		= $(DESTDIR)$(SITEARCH):$(DESTDIR)$(SITELIB):$(DESTDIR)/lib/perl5
+export PERL_MB_OPT	= "--destdir '$(DESTDIR)' --installdirs site"
+export PERL_MM_OPT	= "INSTALLDIRS=site"
+
+ifndef DESTDIR
+	DESTDIR = debian/libopenxpki-perl/
+endif
+
+.PHONY: build binary
+
+build: 
+	dh_testdir -O--sourcedirectory=core/server
+	# instead of dh_auto_configure
+	cd core/server && $(PERL) Makefile.PL --installdirs site --destdir $(DESTDIR)
+	dh_auto_build -O--sourcedirectory=core/server
+	dh_auto_test -O--sourcedirectory=core/server
+	
+binary:
+	dh_auto_test -O--sourcedirectory=core/server
+	dh_testroot -O--sourcedirectory=core/server
+	dh_prep -O--sourcedirectory=core/server
+	dh_installdirs -O--sourcedirectory=core/server
+	dh_auto_install -O--sourcedirectory=core/server
+	# Clean up stuff that conflicts with myperl package
+	rm $(DESTDIR)$(ARCHLIB)/perllocal.pod
+	rmdir $(DESTDIR)$(ARCHLIB) $(DESTDIR)$(PRIVLIB)
+	dh_install -O--sourcedirectory=core/server
+	dh_installdocs -O--sourcedirectory=core/server
+	dh_installchangelogs -O--sourcedirectory=core/server
+	dh_installexamples -O--sourcedirectory=core/server
+	dh_installman -O--sourcedirectory=core/server
+	dh_installcatalogs -O--sourcedirectory=core/server
+	dh_installcron -O--sourcedirectory=core/server
+	dh_installdebconf -O--sourcedirectory=core/server
+	dh_installemacsen -O--sourcedirectory=core/server
+	dh_installifupdown -O--sourcedirectory=core/server
+	dh_installinfo -O--sourcedirectory=core/server
+	dh_installinit -O--sourcedirectory=core/server
+	dh_installmenu -O--sourcedirectory=core/server
+	dh_installmime -O--sourcedirectory=core/server
+	dh_installmodules -O--sourcedirectory=core/server
+	dh_installlogcheck -O--sourcedirectory=core/server
+	dh_installlogrotate -O--sourcedirectory=core/server
+	dh_installpam -O--sourcedirectory=core/server
+	dh_installppp -O--sourcedirectory=core/server
+	dh_installudev -O--sourcedirectory=core/server
+	dh_installwm -O--sourcedirectory=core/server
+	dh_installxfonts -O--sourcedirectory=core/server
+	dh_installgsettings -O--sourcedirectory=core/server
+	dh_bugfiles -O--sourcedirectory=core/server
+	dh_ucf -O--sourcedirectory=core/server
+	dh_lintian -O--sourcedirectory=core/server
+	dh_gconf -O--sourcedirectory=core/server
+	dh_icons -O--sourcedirectory=core/server
+	dh_perl -O--sourcedirectory=core/server
+	dh_usrlocal -O--sourcedirectory=core/server
+	dh_link -O--sourcedirectory=core/server
+	dh_compress -O--sourcedirectory=core/server
+	dh_fixperms -O--sourcedirectory=core/server
+	dh_strip -O--sourcedirectory=core/server
+	dh_makeshlibs -O--sourcedirectory=core/server
+	dh_shlibdeps -O--sourcedirectory=core/server
+	dh_installdeb -O--sourcedirectory=core/server
+	dh_gencontrol -O--sourcedirectory=core/server
+	dh_md5sums -O--sourcedirectory=core/server
+	dh_builddeb -O--sourcedirectory=core/server
+
+# This rule is for debugging the dh_* process
+#clean:
+#	dh $@
+
+%:
+	dh --sourcedirectory=core/server $@
+

@@ -1,0 +1,11 @@
+Source: myperl-openxpki-i18n
+Section: perl
+Priority: extra
+Maintainer: Scott Hardin <scott@hnsc.de>
+Build-Depends: debhelper (>= 8.0.0)
+#Standards-Version: 3.9.3
+
+Package: myperl-openxpki-i18n
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: OpenXPKI i18n packaged for myperl

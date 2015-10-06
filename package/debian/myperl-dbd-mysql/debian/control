@@ -1,0 +1,11 @@
+Source: myperl-dbd-mysql
+Section: perl
+Priority: extra
+Maintainer: Scott Hardin <scott@hnsc.de>
+Build-Depends: debhelper (>= 8.0.0), libmysqlclient-dev
+Standards-Version: 3.9.3
+
+Package: myperl-dbd-mysql
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, mysql-server
+Description: DBD::mysql packaged for myperl

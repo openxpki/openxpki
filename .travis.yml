@@ -14,13 +14,24 @@ env:
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq expat libexpat-dev openssl libssl-dev language-pack-de
+    # stuff needed for mysql perl module
+    - sudo apt-get install -y -qq libmysqlclient-dev
+    # stuff needed for running oxi instance (TODO: check if these are already installed)
+    - sudo apt-get install -y -qq mysql-server apache2
+    - wget https://github.com/mrscotty/myperl/releases/download/v5.20.0.1/myperl_5.20.0.1_amd64.deb
+    - sudo dpkg -i myperl_5.20.0.1_amd64.deb
 
 # Try to get debug from inst stuff
 install:
     - cpanm --notest Config::Std Config::Merge Template Proc::SafeExec Module::Install YAML DBD::mysql
-# Note: Setting PERL=perl causes Makefile.PL to use the perlbrew perl ifrom PATH
-    - "(cd core/server && PERL=perl cpanm --quiet --installdeps --notest .)"
 # The core tests depend on the client library - we install it in a separate perlbrew library space
 #    - "perlbrew lib delete oxi-client; perlbrew lib create oxi-client"
 #    - "(cd core/server && cpanm --quiet --notest .)"
+    - "(cd package/debian/libdbd-mysql-myperl && make package)"
+    - ls -la package/debian package/debian/libdbd-mysql-myperl
+    - sudo dpkg -i package/debian/libdbd-mysql-myperl_*.deb
+    - "(cd package/debian/openxpki-core-deps-myperl && make package)"
+    - ls -la package/debian
+    - sudo dpkg -i package/debian/openxpki-core-deps-myperl_*.deb
+    #- cpanm --notest Config::Std Config::Merge Template Proc::SafeExec Module::Install YAML DBD::mysql
 

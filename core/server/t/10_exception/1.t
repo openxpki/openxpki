@@ -24,10 +24,10 @@ eval {
 };
 $exc = OpenXPKI::Exception->caught();
 ok(defined $exc, 'exception with params defined');
-TODO: {
-    local $TODO = 'Exception->as_string() needs sorting to be predictable';
-is($exc->as_string(), 'test; __param1__ => value1; __param2__ => value2', 'as_string() with params correct');
-}
+#TODO: {
+#    local $TODO = 'Exception->as_string() needs sorting to be predictable';
+#is($exc->as_string(), 'test; __param1__ => value1; __param2__ => value2', 'child as_string() with params correct');
+#}
 
 eval {
     OpenXPKI::Exception->throw(
@@ -44,9 +44,16 @@ eval {
 };
 my $parent_exc = OpenXPKI::Exception->caught();
 ok(defined $parent_exc, 'exception with child defined');
-TODO: {
-    local $TODO = 'Exception->as_string() needs sorting to be predictable';
-is($parent_exc->as_string(), 'parent; __parent_param1__ => parent_value1; __ERRVAL__ => test; __param1__ => value1; __param2__ => value2; __parent_param2__ => parent_value2', 'as_string() with child correct');
-}
+is($parent_exc->message(), 'parent', "parent attr of exception");
+my $params = $parent_exc->{params};
+delete $parent_exc->{params}->{__ERRVAL__}; # not guaranteed to be sorted
+is_deeply($parent_exc->{params}, {
+        __parent_param1__ => 'parent_value1',
+        __parent_param2__ => 'parent_value2',
+    }, "params attr of exception");
+
+#TODO: {
+#    local $TODO = 'Exception->as_string() needs sorting to be predictable';
+#}
 
 1;
