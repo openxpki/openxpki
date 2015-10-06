@@ -16,8 +16,7 @@
 # some packages have build dependencies
 PACKAGES=			\
 	core			\
-	i18n 			\
-	mason-html-client 
+	i18n 			
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
