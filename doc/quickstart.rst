@@ -52,7 +52,7 @@ use the openxpkiadm command to verify if the system was installed correctly::
 
 Now, create an empty database and assign a database user::
 
-    CREATE database openxpki;
+    CREATE DATABASE openxpki CHARSET utf8;
     CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
     GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
     flush privileges;
