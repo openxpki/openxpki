@@ -9,9 +9,14 @@ Vagrant.configure("2") do |config|
 
 #    config_values = {}
 
-    if File.file?('Vagrantfile.local')
-        external = File.read 'Vagrantfile.local'
-        eval external
+#    if File.file?('Vagrantfile.local')
+#        external = File.read 'Vagrantfile.local'
+#        eval external
+#    end
+    local_vagrantfile = 'Vagrantfile.local'
+    @localcfg = {}
+    if File.exist?(local_vagrantfile)
+        load local_vagrantfile
     end
 
   # Every Vagrant virtual environment requires a box to build off of.
@@ -42,6 +47,26 @@ Vagrant.configure("2") do |config|
       config.vm.hostname = "oxi-build-wheezy"
       config.vm.provision :shell, :path => "provision-build.sh"
       config.vm.synced_folder "../..", "/code-repo"
+  end
+
+  config.vm.define "build-myperl" do |buildmyperl|
+      config.vm.hostname = "oxi-build-myperl"
+      config.vm.box = "debian/jessie64"
+      config.vm.provision :shell, :path => "myperl/provision-build.sh"
+      config.vm.synced_folder "../..", "/code-repo"
+      config.vm.synced_folder "../../../myperl", "/myperl-repo"
+      if @localcfg["mirror"]
+          config.vm.synced_folder @localcfg["mirror"], "/mirrors"
+      end
+  end
+
+  config.vm.define "test-myperl" do |testmyperl|
+      config.vm.box = "debian/jessie64"
+      config.vm.hostname = "oxi-test-myperl"
+      config.vm.synced_folder "../..", "/code-repo"
+      config.vm.provision :shell, :path => "myperl/provision-test.sh"
+      config.vm.network :forwarded_port, guest: 80, host: 8080
+      config.vm.network :forwarded_port, guest: 443, host: 8443
   end
 
   config.vm.define "build-jessie" do |build|

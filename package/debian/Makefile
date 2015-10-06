@@ -49,10 +49,10 @@ cpan_dependency: $(EXTERNAL)
 cpan_dependency2: $(EXTERNAL2) 
 
 default:	clean
-	make $(EXTERNAL)
-	make $(PACKAGES)
-	make resultlocal
-	make check
+	$(MAKE) $(EXTERNAL)
+	$(MAKE) $(PACKAGES)
+	$(MAKE) resultlocal
+	$(MAKE) check
 
 # Fetch outdated version of Workflow because the newest isn't
 # compatible with OpenXPKI
@@ -72,9 +72,9 @@ DateTime__Format__DateParse:
 	cd deb/cpan/ &&  dh-make-perl --build --notest --depends 'libdatetime-timezone-perl, libdatetime-perl, libtimedate-perl' --cpan $(subst __,::,$@)
 
 
-$(PACKAGES):
+$(PACKAGES): info
 	test -d deb || mkdir deb	
-	cd $@ && PATH=$(PATH):/usr/sbin make $(SUBTARGET)
+	cd $@ && PATH=$(PATH):/usr/sbin $(MAKE) $(SUBTARGET)
 
 resultlocal:
 	mv */*.dsc .     || echo No dsc file present.
@@ -89,7 +89,7 @@ check:
 
 clean:
 	cd deb/cpan/ && rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
-	make $(PACKAGES) SUBTARGET=clean
+	$(MAKE) $(PACKAGES) SUBTARGET=clean
 	cd deb/cpan/ && for DIR in $(subst __,-,$(EXTERNAL)); do \
 		rm -rf $$DIR-*; \
 	done
@@ -99,3 +99,9 @@ distclean: clean
 scan:
 	dpkg-scanpackages deb | gzip > deb/Packages.gz
 
+.PHONY: info
+
+info:
+	@echo "CURDIR = $(CURDIR)"
+	@echo "MAKEFILE_LIST = $(MAKEFILE_LIST)"
+	@echo "PERL_SKIP_TEST = $(PERL_SKIP_TEST)"

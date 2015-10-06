@@ -44,7 +44,7 @@ sub full_message
     }
 
     ## enforce __NAME__ scheme
-    foreach my $param (keys %{$self->{params}})
+    foreach my $param (sort keys %{$self->{params}})
     {
         my $value = $self->{params}->{$param};
         delete $self->{params}->{$param};

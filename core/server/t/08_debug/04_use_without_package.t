@@ -9,7 +9,7 @@ use_ok('OpenXPKI::Debug');
 diag "Use without specifying package name" if $ENV{VERBOSE};
 # check that everything works the same without specifying our name in
 # use OpenXPKI::Debug ...
-my $stderr = `perl -It/08_debug t/08_debug/main.pl TestModuleUseWithout.pm 1 2>&1`;
+my $stderr = `$^X -It/08_debug t/08_debug/main.pl TestModuleUseWithout.pm 1 2>&1`;
 ok(! $CHILD_ERROR, 'main.pl execution');
 like($stderr,
      qr{ ^\d{4}-\d{2}-\d{2}\ \d{2}:\d{2}:\d{2} }xms,
@@ -25,7 +25,7 @@ like($stderr, qr{ loglevel\ 1 }xms, 'Debug contains literal log message');
 like($stderr, qr{ code:\ 2 }xms, 'Debug contains executed log message');
 
 # debug level 16
-$stderr = `perl -It/08_debug t/08_debug/main.pl TestModuleUseWithout.pm 16 2>&1`;
+$stderr = `$^X -It/08_debug t/08_debug/main.pl TestModuleUseWithout.pm 16 2>&1`;
 ok(! $CHILD_ERROR, 'main.pl execution');
 like($stderr,
      qr{ ^\d{4}-\d{2}-\d{2}\ \d{2}:\d{2}:\d{2} }xms,

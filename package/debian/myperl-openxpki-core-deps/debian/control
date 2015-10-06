@@ -1,0 +1,16 @@
+Source: myperl-openxpki-core-deps
+Section: perl
+Priority: extra
+Maintainer: Scott Hardin <scott@hnsc.de>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+#Homepage: 
+#Vcs-Git: git://git.debian.org/collab-maint/libclass-std-myperl.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/libclass-std-myperl.git;a=summary
+
+Package: myperl-openxpki-core-deps
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: CPAN dependencies for OpenXPKI core server
+ This contains the CPAN dependencies needed for the OpenXPKI
+ core server based on myperl.

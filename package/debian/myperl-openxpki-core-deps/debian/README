@@ -1,0 +1,7 @@
+The Debian Package myperl-openxpki-core-deps
+----------------------------
+
+This package build is just used to package all Perl dependencies
+of the OpenXPKI core server. It is based on 'myperl'.
+
+ -- Scott Hardin <scott@hnsc.de>  Fri, 13 Jun 2014 12:16:34 +0000
