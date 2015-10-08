@@ -2,8 +2,7 @@ id: hostname
 label: I18N_OPENXPKI_UI_PROFILE_HOSTNAME
 description: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC
 type: freetext
-source: CN:([^:]+)
-preset: CN
+preset: "[% CN.0.replace(':.*','') %]"
 match: \A [A-Za-z\d\-\.]+ \z
 width: 60
 default: fully.qualified.example.com

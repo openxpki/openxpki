@@ -1,6 +1,6 @@
 id: O
 label: O
 description: I18N_OPENXPKI_UI_PROFILE_O_DESC
+preset: O
 type: freetext
-source: O:(.+)
 width: 40

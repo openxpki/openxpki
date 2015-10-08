@@ -9,7 +9,6 @@ type: freetext
 # Regex to test the input against
 match: \A [A-Za-z\d\-\.]+ \z
 # A regexp how to get the data back from the subject
-source: O:(.+)
 # How often you must specify this field at minimum, default 1
 min: 1
 # How often you can specify that field at max, default 1, if >1 the data is passed as an arrayref

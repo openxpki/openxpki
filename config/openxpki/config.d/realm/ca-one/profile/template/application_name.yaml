@@ -1,6 +1,7 @@
 id: application_name
 label: I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME
 description: I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC
+preset: "[% CN.0.replace('^[^:]+:?','') %]"
 type: select
 option:
   - scep

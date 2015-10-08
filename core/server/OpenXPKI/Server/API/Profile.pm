@@ -43,6 +43,12 @@ sub __fetch_input_element_definitions {
     my $profile = shift;
     my $input_names = shift;
     my $csr_info = shift;
+    
+    if ($csr_info) {
+        OpenXPKI::Exception->throw(
+            message => 'input rendering with pkcs10 is deprecated',
+        );
+    }
 
     my $config = CTX('config');
 
@@ -82,34 +88,7 @@ sub __fetch_input_element_definitions {
 
         # Uppercase the keys and push it to the array
         my %ucinput = map { uc $_ => $input->{$_} } keys %{$input};
-        if (defined $csr_info) {
-
-            my $source = $input->{'source'};
-            ##! 16: 'source: ' . $source
-            # if source is defined, use it with $csr_info ...
-            if (defined $source) {
-                my ($part, $regex) = ($source =~ m{([^:]+) : (.+)}xms);
-                ##! 16: 'part: ' . $part
-                ##! 16: 'regex: ' . $regex
-                my $part_from_csr;
-                eval {
-                    # try to get data from csr info hash
-                    # currently, we only get the first entry
-                    # for the given part (so we can not deal
-                    # with multiple OUs, for example)
-                    $part_from_csr = $csr_info->{BODY}->{SUBJECT_HASH}->{$part}->[0];
-                };
-                ##! 16: 'part from csr: ' . $part_from_csr
-                if (defined $part_from_csr) {
-                    my ($match) = ($part_from_csr =~ m{$regex}xms);
-                    ##! 16: 'match: ' . $match
-                    # override default value with the result of the
-                    # regex matching
-                    $ucinput{DEFAULT} = $match;
-                }
-            }
-        }
-
+        
         # if type is select, add options array ref
         if ($ucinput{TYPE} eq 'select') {
             ##! 32: 'type is select'
@@ -169,22 +148,11 @@ sub get_cert_subject_styles {
     my $self      = shift;
     my $arg_ref   = shift;
     my $profile   = $arg_ref->{PROFILE};
-    my $pkcs10    = $arg_ref->{PKCS10};
+
     ##! 1: 'start'
 
     my $config = CTX('config');
-
-    my $csr_info;
-    if (defined $pkcs10) {
-        # if PKCS#10 data is passed, we need to get the info from
-        # the data ...
-        ##! 16: 'pkcs10 defined'
-        $csr_info = CTX('api')->get_csr_info_hash_from_data({
-            DATA => $pkcs10,
-        });
-        ##! 64: 'csr info: ' . Dumper $csr_info
-    }
-
+ 
     my $styles = {};
 
     my @style_names = $config->get_keys("profile.$profile.style");
@@ -211,14 +179,14 @@ sub get_cert_subject_styles {
         # The helper probes for the field definitions
         # and loads them into a suitable hash structure
         $styles->{$id}->{TEMPLATE}->{INPUT} =
-                $self->__fetch_input_element_definitions( $profile, \@input_names, $csr_info);
+                $self->__fetch_input_element_definitions( $profile, \@input_names);
 
 
         # Do the same for the additional info parts
         @input_names = $style_config->get_list('ui.info');
 
         $styles->{$id}->{ADDITIONAL_INFORMATION}->{INPUT} =
-            $self->__fetch_input_element_definitions( $profile, \@input_names, $csr_info );
+            $self->__fetch_input_element_definitions( $profile, \@input_names );
 
         # And again for SANs
         @input_names = $style_config->get_list('ui.san');
