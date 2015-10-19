@@ -141,9 +141,9 @@ sub execute {
         # FIXME - I dont have any idea what chars are possible within parsed bmpstring
         # so this probably chokes on some strings!
         $cert_extension_name =~ s/.(.)/$1/g;
-	# sometimes this heuristic does not work, resulting in leading dots in the extension name
-	# work around this by discarding them.
-	# TODO: do this right, i. e. use a real CSR parser!
+        # sometimes this heuristic does not work, resulting in leading dots in the extension name
+        # work around this by discarding them.
+        # TODO: do this right, i. e. use a real CSR parser!
         $cert_extension_name =~ s/^\.+//g;
 
         $context->param('cert_extension_name' => $cert_extension_name);
@@ -350,8 +350,9 @@ sub execute {
     ##! 64: 'signer issuer: ' . $signer_issuer
     ##! 64: 'signer subject: ' . $signer_subject
     ##! 64: 'csr subject: ' . $csr_subject
+    my $signer_sn_matches_csr = ($signer_subject eq $csr_subject) ? 1 : 0;
 
-    $context->param('signer_sn_matches_csr' => ($signer_subject eq $csr_subject) ? 1 : 0);
+    $context->param('signer_sn_matches_csr' => $signer_sn_matches_csr);
 
     # Validate the signature
     my $pkcs7 = $context->param('_pkcs7');
@@ -404,39 +405,68 @@ sub execute {
     }
     $context->param('_url_params' => undef);
 
-    # We do this search under the assumption, that a renewal request always has the correct subject
-    # If we have an initial request with a subject that needs preprocessing, we wont find any
-    # certificate with eiter subject.
-    # If we have an initial enrollment on an already used subject (replacement device)
-    # you need to revoke the old certificate manually before you can issue a new one!
+    # We search here on the preprocessed subject - otherwise the max_count 
+    # condition is useless.  
     my $certs = CTX('api')->search_cert({
         VALID_AT => time(),
         STATUS => 'ISSUED',
-        SUBJECT => $csr_subject
+        ORDER => 'CERTIFICATE.NOTBEFORE',
+        SUBJECT => $cert_subject
     });
 
     # number of active certs
+    ##! 64: 'certs found ' . Dumper $certs
     my $cert_count = scalar(@{$certs});
     $context->param('num_active_certs' => $cert_count );
-
+    
+    my $renewal_cert_notafter = 0;
+    my $renewal_cert_identifier = '';
+    
+    if ($is_self_signed) {
+       # nothing to do  
+    } elsif ($signer_sn_matches_csr) {
+        # real scep renewal (signed with old certificate)
+        $renewal_cert_notafter = $signer_hash->{NOTAFTER};
+        $renewal_cert_identifier = $signer_hash->{IDENTIFIER};
+        
+        CTX('log')->log(
+            MESSAGE => "SCEP signed renewal request for $signer_subject / $renewal_cert_identifier",
+            PRIORITY => 'info',
+            FACILITY => ['audit','application'],
+        );
+        
+    } elsif($cert_count) {
+        
+        # initial enrollment for subject of existing certificate
+        # check renewal on most recent active certificate
+        my $recent_cert = shift @{$certs};
+        ##! 32: 'recent cert ' . Dumper $recent_cert 
+        $renewal_cert_notafter = $recent_cert->{NOTAFTER};
+        $renewal_cert_identifier = $recent_cert->{IDENTIFIER};
+        
+        CTX('log')->log(
+            MESSAGE => "SCEP initial enrollment for existing subject $signer_subject / $renewal_cert_identifier",
+            PRIORITY => 'info',
+            FACILITY => ['audit','application'],
+        );
+    }
+     
+    $context->param('renewal_cert_identifier' => $renewal_cert_identifier) if ($renewal_cert_identifier);    
+     
     # Check if the request was received within the renewal window
-    # We check the validity of the signer certificate against the renewal window
-    # Note - the in_renew_window flag will become misslieading if we are not in an
-    # renewal case as we check the wrong certificate
     my $renewal = $config->get("scep.$server.renewal_period") || 0;
     $context->param('in_renew_window' => 0);
-
-    if ($renewal && $signer_hash) {
+    if ($renewal && $renewal_cert_notafter) {
         # Reverse calculation - the date wich must not be exceeded by notafter
         my $renewal_time = OpenXPKI::DateTime::get_validity({
             VALIDITY       => '+' . $renewal,
             VALIDITYFORMAT => 'relativedate',
         })->epoch();
 
-        if ($signer_hash->{NOTAFTER} <= $renewal_time) {
+        if ($renewal_cert_notafter <= $renewal_time) {
             CTX('log')->log(
-                MESSAGE => "SCEP Signer $signer_identifier is in renewal period",
-                PRIORITY => 'info',
+                MESSAGE => "SCEP for $signer_subject is in renewal period ($renewal_cert_identifier)",
+                PRIORITY => 'debug',
                 FACILITY => ['audit','application'],
             );
             $context->param('in_renew_window' => 1);
@@ -447,17 +477,17 @@ sub execute {
     my $replace = $config->get("scep.$server.replace_period") || 0;
     $context->param('in_replace_window' => 0);
 
-    if ($replace && $signer_hash) {
+    if ($replace && $renewal_cert_notafter) {
         # Reverse calculation - the date wich must not be exceeded by notafter
         my $replace_time = OpenXPKI::DateTime::get_validity({
             VALIDITY       => '+' . $replace,
             VALIDITYFORMAT => 'relativedate',
         })->epoch();
 
-        if ($signer_hash->{NOTAFTER} <= $replace_time) {
+        if ($renewal_cert_notafter <= $replace_time) {
             CTX('log')->log(
-                MESSAGE => "SCEP Signer $signer_identifier is in replace period",
-                PRIORITY => 'info',
+                MESSAGE => "SCEP for $signer_subject is in replace period ($renewal_cert_identifier)",
+                PRIORITY => 'debug',
                 FACILITY => ['audit','application'],
             );
             $context->param('in_replace_window' => 1);
