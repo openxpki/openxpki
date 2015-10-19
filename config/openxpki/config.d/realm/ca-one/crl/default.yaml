@@ -13,7 +13,7 @@ validity:
     # validity of last crl issued before ca is end of life    
     lastcrl: 20301231235900
 
-digest: sha1
+digest: sha256
 extensions:
     authority_info_access:
         critical: 0

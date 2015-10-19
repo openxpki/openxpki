@@ -22,6 +22,7 @@ key_size:
 
 hash_type: 
   - sha1
+  - sha256
 
 authorized_signer_on_behalf:
     rule1:

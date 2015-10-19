@@ -11,7 +11,7 @@ validity:
     notafter: +0006
 
 # digest to use
-digest: sha1
+digest: sha256
 # weather the serials must increase and how many bits of the serial are
 # made from a random source
 increasing_serials: 1

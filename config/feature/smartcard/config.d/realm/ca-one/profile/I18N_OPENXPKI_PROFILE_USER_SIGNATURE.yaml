@@ -3,7 +3,7 @@
 validity:
     notafter: +01
 
-digest: sha1
+digest: sha256
 increasing_serials: 1
 randomized_serial_bytes: 8
 

@@ -38,7 +38,7 @@ crl		= ./crl.pem
 private_key	= ./cakey.pem	
 RANDFILE	= ./.rand	
 
-default_md      = sha1       
+default_md      = sha256
 preserve        = no   
 policy          = policy_none
 default_days    = 365
