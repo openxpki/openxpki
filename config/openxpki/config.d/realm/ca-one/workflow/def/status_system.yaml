@@ -15,7 +15,7 @@ action:
     initalize:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
         param:
-          token: certsign,datasafe,scep
+          token: certsign,datasafe
 
 acl:
     CA Operator:
