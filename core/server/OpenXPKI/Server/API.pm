@@ -785,11 +785,6 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
-                PKCS10 => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_pkcs10,
-                },
             },
             memoize => 1,
         },

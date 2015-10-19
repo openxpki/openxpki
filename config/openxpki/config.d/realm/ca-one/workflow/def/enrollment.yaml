@@ -347,6 +347,9 @@ action:
 
     load_recent_certificate:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::LoadRecentCertificate
+        param:
+            _map_cert_identifier: $renewal_cert_identifier
+
 
     modify_metadata:
         class: Workflow::Action::Null

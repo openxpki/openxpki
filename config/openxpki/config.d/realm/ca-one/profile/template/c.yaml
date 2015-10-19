@@ -1,7 +1,7 @@
 id: C
 label: C
 description: I18N_OPENXPKI_UI_PROFILE_C_DESC
+preset: C
 type: freetext
 width: 2
-source: C:(.+)
 min: 0

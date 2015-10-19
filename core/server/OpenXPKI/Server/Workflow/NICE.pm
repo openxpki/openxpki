@@ -168,27 +168,27 @@ sub __persistCertificateInformation {
 
         my ($issuer_key, $issuer_value);
 
-         # based on aik
-         if (defined $insert_hash{'AUTHORITY_KEY_IDENTIFIER'} && $insert_hash{'AUTHORITY_KEY_IDENTIFIER'}) {
-             $issuer_value = $insert_hash{AUTHORITY_KEY_IDENTIFIER};
-             $issuer_key = 'AUTHORITY_KEY_IDENTIFIER';
-             ##! 16: "autodetected the ca_identifier using aki " . $issuer_value
-         } else {
-             # based on the issuer dn
+        # based on aik
+        if (defined $insert_hash{'AUTHORITY_KEY_IDENTIFIER'} && $insert_hash{'AUTHORITY_KEY_IDENTIFIER'}) {
+            $issuer_value = $insert_hash{AUTHORITY_KEY_IDENTIFIER};
+            $issuer_key = 'SUBJECT_KEY_IDENTIFIER';
+            ##! 16: "autodetected the ca_identifier using aki " . $issuer_value
+        } else {
+            # based on the issuer dn
             $issuer_value = $insert_hash{ISSUER_DN};
-             $issuer_key = 'SUBJECT';
-              ##! 16: "autodetected the ca_identifier using issuer dn " . $issuer_value
-         }
+            $issuer_key = 'SUBJECT';
+            ##! 16: "autodetected the ca_identifier using issuer dn " . $issuer_value
+        }
         my $issuer = CTX('dbi_backend')->first(
-           TABLE   => 'CERTIFICATE',
-           COLUMNS => [
+            TABLE   => 'CERTIFICATE',
+            COLUMNS => [
                 'IDENTIFIER'
             ],
             DYNAMIC => {
                 $issuer_key => $issuer_value,
                 'STATUS'    => 'ISSUED',
                 'PKI_REALM' => [ $pki_realm, undef ]
-           },
+            },
         );
         ##! 32: 'returned issuer ' . Dumper( $issuer )
         if ($issuer->{IDENTIFIER}) {
@@ -197,7 +197,7 @@ sub __persistCertificateInformation {
             $certificate_information->{'ca_identifier'} = 'unkown';
         }
 
-     }
+    }
 
     $insert_hash{'PKI_REALM'} = $pki_realm;
     $insert_hash{'ISSUER_IDENTIFIER'} = $certificate_information->{'ca_identifier'};

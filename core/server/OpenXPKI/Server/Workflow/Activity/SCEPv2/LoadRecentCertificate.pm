@@ -22,7 +22,9 @@ sub execute {
     my $pki_realm  = CTX('session')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $context    = $workflow->context();
-    my $cert_identifier = $context->param('signer_cert_identifier');
+    
+    my $cert_identifier = $self->param('cert_identifier');
+    
     my $dbi         = CTX('dbi_backend');
 
     # select current certificate from database
@@ -105,7 +107,7 @@ sub execute {
 
         $context->param( 'renewal_mode' => 'replace' );
 
-        # Check if we should to revoke the replaced certificate
+        # Check if we should revoke the replaced certificate
         my $revoke_on_replace = CTX('config')->get_hash( ['scep', $context->param('server'), 'revoke_on_replace' ] );
         if (ref $revoke_on_replace eq 'HASH') {
             CTX('log')->log(
