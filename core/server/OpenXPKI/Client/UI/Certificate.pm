@@ -373,9 +373,15 @@ sub init_detail {
 
     my $cert_identifier = $self->param('identifier');
 
+    # empty submission
+    if (!$cert_identifier) {
+        $self->redirect('certificate!search');                
+        return;        
+    }
+
     my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
     $self->logger()->debug("result: " . Dumper $cert);
-    
+            
     my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
     
     $self->_page({
@@ -841,7 +847,7 @@ sub action_find {
         my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
         if (!$cert) {
             $self->set_status('Unable to find a certificate with this identifier.','error');
-            return $self->init_search();   
+            return $self->init_search();
         }
     } elsif (my $serial = $self->param('cert_serial')) {
         
@@ -867,7 +873,10 @@ sub action_find {
         } else {            
             $self->set_status('Unable to find a certificate with this serial number.','error');
             return $self->init_search();
-        }
+        } 
+    } else {
+        $self->set_status('Please enter either certificate identifier or certificate serial number.','error');
+        return $self->init_search();
     }
     
     $self->redirect( 'certificate!detail!identifier!'.$cert_identifier );
