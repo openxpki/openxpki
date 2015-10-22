@@ -588,6 +588,18 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "People (Secure eMail / Authentication)"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY"
+msgstr "Validity"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_1Y"
+msgstr "1 year"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_2Y"
+msgstr "2 years"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
+msgstr "3 years"
+
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Ready"
 

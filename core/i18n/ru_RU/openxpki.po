@@ -865,6 +865,22 @@ msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "Профиль пользователя"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_1Y"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_2Y"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
+msgstr "Профиль пользователя"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Завершено"
 
