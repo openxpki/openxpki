@@ -4,7 +4,7 @@ This is "work in progress"... your mileage may vary.
 
 # BUILD
 
-## Create Local CPAN Mirror
+## Create Local CPAN Mirror (optional)
 
     mkdir ~/mirrors
     echo "local: $HOME/mirrors/minicpan"            >  ~/.minicpanrc
@@ -17,6 +17,10 @@ This is "work in progress"... your mileage may vary.
 This starts and provisions the Vagrant instance:
 
     cd vagrant/debian
+
+    # Add mirror to local Vagrantfile config (optional)
+    echo '@localcfg["mirror"] = ENV["HOME"] + "/mirrors"
+
     vagrant up build-myperl
     
 ## Build All myperl Packages From Clean Instance
