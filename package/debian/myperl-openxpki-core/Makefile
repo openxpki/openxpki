@@ -15,7 +15,7 @@ EXAMPLES := ../../../config
 examples:
 	mkdir -p examples
 	tar -cf - -C $(EXAMPLES) \
-		sampleconfig.sh sql apache/openxpki-scep.conf README.md | \
+		sampleconfig.sh sql apache/openxpki.conf README.md | \
 		tar -xf - -C examples
 	tar -czf examples/openxpki-etc.tgz -C $(EXAMPLES) openxpki
 	tar -czf examples/profiles-etc.tgz -C $(EXAMPLES) profiles
@@ -32,7 +32,7 @@ install: info
 	# Examples
 	mkdir -p $(DESTDIR)$(SHARE)/examples
 	tar -cf - -C $(EXAMPLES) \
-		sampleconfig.sh sql apache/openxpki-scep.conf README.md | \
+		sampleconfig.sh sql apache/openxpki.conf README.md | \
 		tar -xf - -C $(DESTDIR)$(SHARE)/examples
 	tar -czf $(DESTDIR)$(SHARE)/examples/openxpki-etc.tgz -C $(EXAMPLES) openxpki
 	tar -czf $(DESTDIR)$(SHARE)/examples/profiles-etc.tgz -C $(EXAMPLES) profiles

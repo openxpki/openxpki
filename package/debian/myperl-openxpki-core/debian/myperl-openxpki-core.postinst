@@ -51,13 +51,13 @@ case "$1" in
        if [ -d /etc/apache2 ]; then
            # Ubuntu names it conf-enabled while wheezy has conf.d
            if [ -d /etc/apache2/conf-enabled/ ]; then
-               test -e /etc/apache2/conf-enabled/openxpki-scep.conf ||  \
-                   cp /opt/myperl/share/examples/apache/openxpki-scep.conf \
-                   /etc/apache2/conf-enabled/openxpki-scep.conf
+               test -e /etc/apache2/conf-enabled/openxpki.conf ||  \
+                   cp /opt/myperl/share/examples/apache/openxpki.conf \
+                   /etc/apache2/conf-enabled/openxpki.conf
            else
-               test -e /etc/apache2/conf.d/openxpki-scep.conf ||  \
-                   cp /opt/myperl/share/examples/apache/openxpki-scep.conf \
-                    /etc/apache2/conf.d/openxpki-scep.conf
+               test -e /etc/apache2/conf.d/openxpki.conf ||  \
+                   cp /opt/myperl/share/examples/apache/openxpki.conf \
+                    /etc/apache2/conf.d/openxpki.conf
            fi;
        else
            echo "WARNING: Apache not found -- skipping installation of SCEP config" 1>&2

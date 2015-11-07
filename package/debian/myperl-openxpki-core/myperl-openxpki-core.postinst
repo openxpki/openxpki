@@ -49,9 +49,9 @@ case "$1" in
 
        # Ubuntu names it conf-enabled while wheezy has conf.d
        if [ -d /etc/apache2/conf-enabled/ ]; then
-           test -e /etc/apache2/conf-enabled/openxpki-scep.conf ||  cp $EXAMPLES/openxpki-scep.conf /etc/apache2/conf-enabled/openxpki-scep.conf
+           test -e /etc/apache2/conf-enabled/openxpki.conf ||  cp $EXAMPLES/openxpki-scep.conf /etc/apache2/conf-enabled/openxpki.conf
        else
-           test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp $EXAMPLES/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf
+           test -e /etc/apache2/conf.d/openxpki.conf ||  cp $EXAMPLES/openxpki-scep.conf /etc/apache2/conf.d/openxpki.conf
        fi;
 
        # Fix directory permissions

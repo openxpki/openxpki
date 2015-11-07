@@ -2,5 +2,5 @@ examples/openxpki-etc.tgz
 examples/openxpki-feature.tgz
 examples/profiles.tgz
 examples/sampleconfig.sh
-examples/apache/openxpki-scep.conf
+examples/apache/openxpki.conf
 examples/README.md

@@ -41,11 +41,11 @@ case "$1" in
 
        fi
 
-       # Ubuntu names it conf-enabled while wheezy has conf.d
+       # Ubuntu/Jessie names it conf-enabled while wheezy has conf.d
        if [ -d /etc/apache2/conf-enabled/ ]; then
-           test -e /etc/apache2/conf-enabled/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf-enabled/openxpki-scep.conf
+           test -e /etc/apache2/conf-enabled/openxpki.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf-enabled/openxpki.conf
        else
-           test -e /etc/apache2/conf.d/openxpki-scep.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki-scep.conf /etc/apache2/conf.d/openxpki-scep.conf
+           test -e /etc/apache2/conf.d/openxpki.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf.d/openxpki.conf
        fi;
 
        # Fix directory permissions
