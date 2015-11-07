@@ -128,6 +128,8 @@ sub __init_command_params : PRIVATE {
     "create_params"   =>  {"TYPE"   => 1, # DSA or DH
                           "PKEYOPT" => 1,
                           },
+    "asn1_genconf"    => {"DATA" => 1 },
+    
     }; 
     
     ## reassign the updated value to the command_params attribute

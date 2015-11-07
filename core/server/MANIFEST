@@ -124,6 +124,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
 OpenXPKI/Crypto/Backend/OpenSSL/XS.pm
 OpenXPKI/Crypto/Backend/OpenSSL/ECDH.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Command/asn1_genconf.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_random.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs10.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm

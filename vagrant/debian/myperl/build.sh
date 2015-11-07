@@ -20,8 +20,6 @@ set -e
 # verbose execution
 #set -x
 
-#CPAN_MIRROR="-M file:///mirrors/minicpan"
-
 function pkg_installed {
     case $DISTNAME in
         suse|sles)
@@ -128,7 +126,7 @@ if [ -d /code-repo ]; then
 fi
 
 if [ -d /mirrors/minicpan ]; then
-    export CPANM_MIRROR="-M file:///mirrors/minicpan"
+    export CPAN_MIRROR="-M file:///mirrors/minicpan"
 fi
 
 if [ "$DISTNAME" == "suse" ]; then

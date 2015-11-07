@@ -50,23 +50,25 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "build-myperl" do |buildmyperl|
-      config.vm.hostname = "oxi-build-myperl"
-      config.vm.box = "debian/jessie64"
-      config.vm.provision :shell, :path => "myperl/provision-build.sh"
-      config.vm.synced_folder "../..", "/code-repo"
-      config.vm.synced_folder "../../../myperl", "/myperl-repo"
+      buildmyperl.vm.hostname = "oxi-build-myperl"
+      buildmyperl.vm.box = "debian/jessie64"
+      buildmyperl.vm.provision :shell, :path => "myperl/provision-build.sh"
+      buildmyperl.vm.synced_folder "../..", "/code-repo"
+      buildmyperl.vm.synced_folder "../../../myperl", "/myperl-repo"
       if @localcfg["mirror"]
-          config.vm.synced_folder @localcfg["mirror"], "/mirrors"
+          buildmyperl.vm.synced_folder @localcfg["mirror"], "/mirrors"
       end
+      buildmyperl.vm.network "private_network", type: "dhcp"
   end
 
   config.vm.define "test-myperl" do |testmyperl|
-      config.vm.box = "debian/jessie64"
-      config.vm.hostname = "oxi-test-myperl"
-      config.vm.synced_folder "../..", "/code-repo"
-      config.vm.provision :shell, :path => "myperl/provision-test.sh"
-      config.vm.network :forwarded_port, guest: 80, host: 8080
-      config.vm.network :forwarded_port, guest: 443, host: 8443
+      testmyperl.vm.box = "debian/jessie64"
+      testmyperl.vm.hostname = "oxi-test-myperl"
+      testmyperl.vm.synced_folder "../..", "/code-repo"
+      testmyperl.vm.network "private_network", type: "dhcp"
+      testmyperl.vm.provision :shell, :path => "myperl/provision-test.sh"
+      testmyperl.vm.network :forwarded_port, guest: 80, host: 8080
+      testmyperl.vm.network :forwarded_port, guest: 443, host: 8443
   end
 
   config.vm.define "build-jessie" do |build|

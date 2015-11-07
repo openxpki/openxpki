@@ -1,0 +1,12 @@
+name: notafter
+label: Validity
+type: select
+required: 1
+option:
+    item:
+      - 1y
+      - 2y
+      - 3y
+    label: I18N_OPENXPKI_UI_PROFILE_VALIDITY
+
+# I18N_OPENXPKI_UI_PROFILE_VALIDITY_1Y I18N_OPENXPKI_UI_PROFILE_VALIDITY_2Y I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y

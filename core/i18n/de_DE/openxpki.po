@@ -866,6 +866,22 @@ msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "Nutzer"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_1Y"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_2Y"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
+msgstr "Nutzer"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Vollständig"
 
