@@ -25,11 +25,9 @@ set -e
 
 case "$1" in
     configure)
-    set +e
         # TODO - check for a running daemon
         #invoke-rc.d --quiet openxpkid restart
         #if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
-    set -e
 
         # No config - load sample config - also includes/overwrites other
         # files in /etc/openxpki/ !
@@ -43,9 +41,13 @@ case "$1" in
 
        # Ubuntu/Jessie names it conf-enabled while wheezy has conf.d
        if [ -d /etc/apache2/conf-enabled/ ]; then
-           test -e /etc/apache2/conf-enabled/openxpki.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf-enabled/openxpki.conf
+           if [ ! -e /etc/apache2/conf-available/openxpki.conf ]; then
+               cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf-available/openxpki.conf
+               # Activate module, this creates the symlink in conf-available
+               /usr/sbin/a2enconf openxpki               
+           fi;           
        else
-           test -e /etc/apache2/conf.d/openxpki.conf ||  cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf.d/openxpki.conf
+           test -e /etc/apache2/conf.d/openxpki.conf || cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf.d/openxpki.conf           
        fi;
 
        # Fix directory permissions

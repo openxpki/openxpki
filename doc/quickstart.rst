@@ -13,11 +13,9 @@ minutes and will give you a ready to run OXI install available at http://localho
 Debian/Ubuntu Development Builds
 ---------------------------------
 
-**Starting with the 0.15 release we will no longer support the old mason ui, to new UI based on Ember.js should be mostly functional but still needs some work.**
-
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
 
-Current release is 0.35 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.0.1 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (wheezy)::
 
@@ -35,20 +33,24 @@ As the init script uses mysql as default, but does not force it as a dependency,
 
 We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires the "non-free" repository to be present in your apt sources::
 
+    # This might be obsolete if you added the non-free repo during install
+    echo "deb http://httpredir.debian.org/debian jessie non-free" > /etc/apt/sources.list.d/non-free.list
+    aptitude update
+
     aptitude install libapache2-mod-fastcgi
 
 Now install the OpenXPKI core package and the translation package::
 
     aptitude install libopenxpki-perl openxpki-i18n
 
-We are fighting with a debian build issue, if your install complains about a file collision in ``perllocal.pod``, add the force option::
+You should now restart the apache server to activate the new config::
 
-    aptitude -o Dpkg::Options::="--force-overwrite" install libopenxpki-perl
+    service apache2 restart
 
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 0.34.0
+    Version (core): 1.0.0
 
 Now, create an empty database and assign a database user::
 
