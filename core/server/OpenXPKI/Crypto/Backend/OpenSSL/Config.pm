@@ -346,15 +346,15 @@ sub __get_oids
     my $self = shift;
     # we add the jOI OIDs as they are necessary for EV certs
     return "\n[ new_oids ]\n" .
-        "1.3.6.1.4.1.311.60.2.1.1 jurisdictionOfIncorporationLocalityName\n".
-        "1.3.6.1.4.1.311.60.2.1.1 jOILocalityName\n".
-        "1.3.6.1.4.1.311.60.2.1.1 joiL\n".
-        "1.3.6.1.4.1.311.60.2.1.2 jurisdictionOfIncorporationStateOrProvinceName\n".
-        "1.3.6.1.4.1.311.60.2.1.2 jOIStateOrProvinceName\n". 
-        "1.3.6.1.4.1.311.60.2.1.2 joiST\n".
-        "1.3.6.1.4.1.311.60.2.1.3 jurisdictionOfIncorporationCountryName\n".
-        "1.3.6.1.4.1.311.60.2.1.3 jOICountryName\n".
-        "1.3.6.1.4.1.311.60.2.1.3 joiC\n";
+        "jurisdictionOfIncorporationLocalityName = 1.3.6.1.4.1.311.60.2.1.1 \n".
+        "jOILocalityName = 1.3.6.1.4.1.311.60.2.1.1 \n".
+        "joiL = 1.3.6.1.4.1.311.60.2.1.1\n".
+        "jurisdictionOfIncorporationStateOrProvinceName = 1.3.6.1.4.1.311.60.2.1.2\n".
+        "jOIStateOrProvinceName = 1.3.6.1.4.1.311.60.2.1.2\n". 
+        "joiST = 1.3.6.1.4.1.311.60.2.1.2\n".
+        "jurisdictionOfIncorporationCountryName = 1.3.6.1.4.1.311.60.2.1.3 \n".
+        "jOICountryName = 1.3.6.1.4.1.311.60.2.1.3 \n".
+        "joiC = 1.3.6.1.4.1.311.60.2.1.3 \n";
 }
 
 sub __get_engine
