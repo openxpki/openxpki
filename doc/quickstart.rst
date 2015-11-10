@@ -6,23 +6,23 @@ Quickstart guide
 Vagrant
 -------
 
-We have a vagrant setup for debian wheezy and ubuntu trusty (currently disfuctional). If you have vagrant you can just 
+We have a vagrant setup for debian jessie and ubuntu trusty (currently disfuctional). If you have vagrant you can just 
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
 minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
 
-Debian/Ubuntu Development Builds
----------------------------------
+Debian/Ubuntu Builds
+----------------------
 
-**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff might crash otherwise!**
+**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff will crash otherwise!**
 
-Current release is 1.0.1 which is out for debian wheezy on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.0.1 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
 
-Add the repository to your source list (wheezy)::
+Add the repository to your source list (jessie)::
 
-    echo "deb http://packages.openxpki.org/debian/ wheezy release" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
-or ubuntu **temporary discontinued due to package problems**::
+or ubuntu trusty (available soon)::
 
     echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update

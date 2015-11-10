@@ -20,9 +20,8 @@ Vagrant.configure("2") do |config|
     end
 
   # Every Vagrant virtual environment requires a box to build off of.
-  #config.vm.box = "deb-wheezy-amd64"
-  config.vm.box = "sintec/wheezy64"
-  config.vm.box = "openxpki/wheezy-alldeps"
+  #config.vm.box = "openxpki/wheezy-alldeps"  
+  config.vm.box = "debian/jessie64"
 
 #  if config_values[:mirrors]
 #    config.vm.synced_folder config_values[:mirrors], "/mirrors"
@@ -34,8 +33,9 @@ Vagrant.configure("2") do |config|
  #     config.vm.synced_folder "../..", "/code-repo"
  # end
 
+  # Default VM - testing on debian jessie 
   config.vm.define "test", primary:true do |test|
-      config.vm.hostname = "test-wheezy"
+      config.vm.hostname = "oxi-test-jessie"
       config.vm.provision :shell, :path => "provision-test.sh"
       config.vm.network :forwarded_port, guest: 80, host: 8080
       config.vm.network :forwarded_port, guest: 443, host: 8443
@@ -43,12 +43,15 @@ Vagrant.configure("2") do |config|
       config.vm.synced_folder "../../package/debian/deb", "/packages"
   end
 
-  config.vm.define "build-wheezy" do |build|
-      config.vm.hostname = "oxi-build-wheezy"
+  # Build for Jessie / OS Perl
+  config.vm.define "build-jessie" do |build|
+      config.vm.box = "debian/jessie64"
+      config.vm.hostname = "oxi-build-jessie"
       config.vm.provision :shell, :path => "provision-build.sh"
       config.vm.synced_folder "../..", "/code-repo"
   end
 
+  # Build for Jessie / myperl 
   config.vm.define "build-myperl" do |buildmyperl|
       buildmyperl.vm.hostname = "oxi-build-myperl"
       buildmyperl.vm.box = "debian/jessie64"
@@ -61,6 +64,7 @@ Vagrant.configure("2") do |config|
       buildmyperl.vm.network "private_network", type: "dhcp"
   end
 
+  # Test for Jessie / myperl
   config.vm.define "test-myperl" do |testmyperl|
       testmyperl.vm.box = "debian/jessie64"
       testmyperl.vm.hostname = "oxi-test-myperl"
@@ -71,17 +75,10 @@ Vagrant.configure("2") do |config|
       testmyperl.vm.network :forwarded_port, guest: 443, host: 8443
   end
 
-  config.vm.define "build-jessie" do |build|
-      config.vm.box = "debian/jessie64"
-      config.vm.hostname = "oxi-build-jessie"
-      config.vm.provision :shell, :path => "provision-build.sh"
-      config.vm.synced_folder "../..", "/code-repo"
-  end
-
-
+  # Testing on Ubuntu Trusty 
   config.vm.define "test-trusty", primary:true do |test|
-      config.vm.box = "williamwu/ubuntu-14.04-server-x64-eng"
-      config.vm.hostname = "test-trusty"
+      config.vm.box = "ubuntu/trusty64"
+      config.vm.hostname = "oxi-test-trusty"
       config.vm.provision :shell, :path => "provision-test.sh", :args => "ubuntu"
       config.vm.network :forwarded_port, guest: 80, host: 8080
       config.vm.network :forwarded_port, guest: 443, host: 8443
@@ -89,6 +86,7 @@ Vagrant.configure("2") do |config|
       config.vm.synced_folder "../../package/debian/deb", "/packages"
   end
 
+  # Build on Ubuntu Trusty
   config.vm.define "build-trusty" do |build|
       config.vm.box = "ubuntu/trusty64"
       config.vm.hostname = "oxi-build-trusty"
