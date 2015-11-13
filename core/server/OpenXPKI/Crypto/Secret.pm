@@ -19,6 +19,8 @@ use OpenXPKI::Exception;
 
 {
     my %impl : ATTR;
+    my %exportable : ATTR( :default(0) );
+    
 
     sub START {
 	my ($self, $ident, $arg_ref) = @_;
@@ -40,6 +42,11 @@ use OpenXPKI::Exception;
 	    && (ref $arg_ref->{TYPE} eq '')) {
 	    $type = $arg_ref->{TYPE};
 	}
+
+    # Mark exportable
+    if (defined $arg_ref->{EXPORT} && $arg_ref->{EXPORT}) {
+        $exportable{$ident} = 1;
+    } 
 
 	my $base = 'OpenXPKI::Crypto::Secret';
 	my $class = $base . '::' . $type;
@@ -82,6 +89,13 @@ use OpenXPKI::Exception;
 	    return $impl{$ident}->$method(@other_args);
 	}
     }
+    
+    sub is_exportable {
+        ##! 1: 'start'
+        my $self = shift;
+        my $ident = ident $self;        
+        return $exportable{$ident} ? 1 : 0;
+    }
 
 }
 
@@ -118,6 +132,10 @@ See OpenXPKI::Crypto::Secret::Plain.
 
 Returns true once the secret is known.
 Must be implemented by subclasses.
+
+=head3 is_exportable
+
+If this secret value should be exposed outside the crypto manager. 
 
 =head3 get_secret
 

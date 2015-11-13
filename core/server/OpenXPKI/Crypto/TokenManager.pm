@@ -18,6 +18,25 @@ use OpenXPKI::Crypto::Tool::SCEP::API;
 use OpenXPKI::Crypto::Tool::CreateJavaKeystore::API;
 use OpenXPKI::Crypto::Secret;
 
+=head1 Name
+
+OpenXPKI::Crypto::TokenManager
+
+=head1 Description
+
+This modules manages all cryptographic tokens. You can use it to simply
+get tokens and to manage the state of a token.
+
+=head1 Functions
+
+=head2 new
+
+If you want to
+use an explicit temporary directory then you must specifiy this
+directory in the variable TMPDIR.
+
+=cut 
+
 sub new {
     ##! 1: 'start'
     my $that = shift;
@@ -115,20 +134,23 @@ sub __load_secret
     my $config = CTX('config');
 
     ##! 2: "initialize secret object"
-    my $method = $config->get("crypto.secret.$group.method");
-    my $label = $config->get("crypto.secret.$group.label");
+    my $method = $config->get(['crypto','secret',$group,'method']);
+    my $label = $config->get(['crypto','secret',$group,'label']);
+    my $export = $config->get(['crypto','secret',$group,'export']) || 0;
+    
     $self->{SECRET}->{$realm}->{$group}->{TYPE}  = $method;
     $self->{SECRET}->{$realm}->{$group}->{LABEL} = ($label ? $label : $method);
+    $self->{SECRET}->{$realm}->{$group}->{EXPORT}  = ($export ? 1 : 0);
 
     switch ($method)
     {
         case "literal" {
-            my $value = $config->get("crypto.secret.$group.value");
+            my $value = $config->get(['crypto','secret',$group,'value']);
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
             $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
         }
         case "plain"   {
-            my $total_shares = $config->get("crypto.secret.$group.total_shares");
+            my $total_shares = $config->get(['crypto','secret',$group,'total_shares']);
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
                     TYPE => "Plain", PARTS => $total_shares
                 });
@@ -312,6 +334,41 @@ sub is_secret_group_complete
     return $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete() ? 1 : 0;
 }
 
+=head2 get_secret( group )
+
+Get the plaintext value of the stored secret. This requires that the 
+secret was created with the "export" flag set, otherwise an exception 
+is thrown. Returns undef if the secret is not complete. 
+
+=cut
+
+sub get_secret
+{
+    ##! 1: "start"
+    my $self  = shift;
+    my $group = shift;
+
+    if (!$self->is_secret_group_complete($group)) {
+        return undef;
+    }
+    
+    my $realm = CTX('session')->get_pki_realm();
+
+    if (!$self->{SECRET}->{$realm}->{$group}->{EXPORT}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");       
+    }
+    
+    return $self->{SECRET}->{$realm}->{$group}->{REF}->get_secret();
+    
+}
+
+=head2 set_secret_group_part( { GROUP, VALUE, PART } )
+
+Set the secret value of the given group, for plain secrets ommit PART. 
+
+=cut
+
 sub set_secret_group_part
 {
     ##! 1: "start"
@@ -377,6 +434,12 @@ sub set_secret_group_part
     ##! 1: "finished"
     return 1;
 }
+
+=head2 clear_secret_group( group )
+
+Purge the secret for the given group.
+
+=cut
 
 sub clear_secret_group
 {
@@ -708,26 +771,3 @@ sub DESTROY {
 1;
 __END__
 
-=head1 Name
-
-OpenXPKI::Crypto::TokenManager
-
-=head1 Description
-
-This modules manages all cryptographic tokens. You can use it to simply
-get tokens and to manage the state of a token.
-
-=head1 Functions
-
-=head2 new
-
-If you want to
-use an explicit temporary directory then you must specifiy this
-directory in the variable TMPDIR.
-
-=head2 get_token
-
-needs TYPE, NAME and PKI_REALM of a token and will return a token which is ready to
-use. Please remember that all tokens inside of one PKI realm need
-distinguished names. The TYPE describes the use case of the token. This is required
-to find the token configuration. TYPE can be today only CA and DEFAULT.

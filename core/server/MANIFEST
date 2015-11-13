@@ -67,6 +67,7 @@ OpenXPKI/Config/Backend.pm
 # Config Connector
 OpenXPKI/Connector/FakeValidity.pm
 OpenXPKI/Connector/DataPool.pm
+OpenXPKI/Connector/Secret.pm
 
 ## Crypto layer
 

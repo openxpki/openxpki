@@ -116,7 +116,7 @@ use OpenXPKI::Server::Context qw( CTX );
         }
         return 1;
     }
-
+            
     sub get_secret {
         my $self = shift;
         my $ident = ident $self;

@@ -319,7 +319,9 @@ GENERATION (1) available for substitution.
 secret groups
 ^^^^^^^^^^^^^
 
-A secret group maintain the password cache for your keys and PINs. You need to setup at least one secret group for each realm. The most common version is the plain password::
+A secret group maintains the password cache for your keys and PINs. 
+You need to setup at least one secret group for each realm. The most 
+common version is the plain password::
 
     secret:
       default:
@@ -328,9 +330,12 @@ A secret group maintain the password cache for your keys and PINs. You need to s
         cache: daemon
 
 
-This tells the OpenXPKI daemon to ask for the default only once and then store it "forever". If you want to have the secret cleared at the end of the session, set *cache: session*.
+This tells the OpenXPKI daemon to ask for the default only once and then
+store it "forever". If you want to have the secret cleared at the end of 
+the session, set *cache: session*.
 
-To increase the security of your key material, you can configure secret splitting (k of n). ::
+To increase the security of your key material, you can configure secret 
+splitting (k of n). ::
 
     secret:
       ngkey:
@@ -342,7 +347,8 @@ To increase the security of your key material, you can configure secret splittin
 
 TODO: How to create the password segments?
 
-If you have a good reason to put your password into the configuration, use the *literal* type::
+If you have a good reason to put your password into the configuration, 
+use the *literal* type::
 
     secret:
       insecure:
@@ -350,6 +356,11 @@ If you have a good reason to put your password into the configuration, use the *
         method: literal
         value: my_not_so_secret_password
         cache: daemon
+
+You can also use the secret groups for other purposes, in this case you 
+need to add "export: 1" to the group. This allows you to use the get_secret
+method of the TokenManager (OpenXPKI::Crypto::TokenManager) to retrieve the 
+plain value of the secret.
 
 
 Profiles

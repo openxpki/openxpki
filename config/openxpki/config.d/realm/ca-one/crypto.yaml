@@ -48,13 +48,14 @@ token:
   ca-one-special-scep:
     inherit: ca-one-scep
       
-# Define the secret groups. (TODO> The mapping between secret and token is done on 
-# key import and recorded in the alias table. Default value can be set in the
-# token config but can be overriden or changed via openxpkiadm <TODO)
+# Define the secret groups
 secret:
   default:     
     label: Default secret group of this realm
+    export: 0
     method: literal
     value: root
     cache: daemon
+
+
 
