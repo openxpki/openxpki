@@ -18,6 +18,8 @@ rm -rf /etc/openxpki/
 DEBIAN_FRONTEND=noninteractive aptitude install --assume-yes mysql-server
 aptitude install --assume-yes --allow-untrusted libdbd-mysql-perl libopenxpki-perl openxpki-i18n  libapache2-mod-fastcgi
 
+a2enmod fastcgi
+
 service apache2 restart
 
 /vagrant/setup-dummy.sh
