@@ -323,6 +323,29 @@ sub BUILD {
                 },
             }
         },
+        'import_chain' => {
+            class  => 'Default',
+            params => {
+                DATA => {
+                    type     => SCALAR | ARRAYREF,
+                },
+                PKI_REALM => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1
+                },
+                IMPORT_ROOT => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
+                FORCE_NOCHAIN => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
+            }
+        },               
         'get_ca_list' => {
             class  => 'Token',
             params => {
