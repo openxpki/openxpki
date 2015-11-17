@@ -116,55 +116,34 @@ sub __persistCertificateInformation {
 
     ##! 64: 'certificate information: ' . Dumper ( $certificate_information )
 
-
-    my $x509;
-    ##! 16: 'Parse certificate data as x509 '
-    # Some external CAs deliver a PKCS7 container instead of a single x509..
-    eval {
-        $x509 = OpenXPKI::Crypto::X509->new(
-            TOKEN => $default_token,
-            DATA  => $certificate_information->{'certificate'},
-        );
-    };
-    if (!$x509) {
-        ##! 16: 'Parse certificate data as pkcs7 '
-        # FIXEM - Needs testing
-        my $x509data = $default_token->command({
-            COMMAND     => 'pkcs7_get_chain',
-            NOCHAIN     => 1,
-            PKCS7       => $certificate_information->{'certificate'},
-        });
-
-
-        ##! 16: 'Parse certificate data as x509 extracted from pkcs7 '
-        ##! 32: 'first x509 from chain: ' . $x509data
-        $x509 = OpenXPKI::Crypto::X509->new(
-            TOKEN => $default_token,
-            DATA  => $x509data,
-        );
-    }
-
+    my $x509 = OpenXPKI::Crypto::X509->new(
+        TOKEN => $default_token,
+        DATA  => $certificate_information->{'certificate'},
+    );
+    
     my %insert_hash = $x509->to_db_hash();
     my $identifier = $insert_hash{'IDENTIFIER'};
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    my $serialized_data = $serializer->serialize( $persist_data );
-
-    ##! 16: 'Persist certificate: ' . $identifier
-    ##! 32: 'persisted data: ' . Dumper( $persist_data )
-
-    CTX('api')->set_data_pool_entry({
-       PKI_REALM => $pki_realm,
-       NAMESPACE => 'nice.certificate.information',
-       KEY => $identifier,
-       VALUE => $serialized_data,
-       ENCRYPT => 0,
-       FORCE => 1,
-     });
-
-     # Try to autodetected the ca_identifier ....
-     if (!$certificate_information->{'ca_identifier'}) {
+    if ($persist_data) {
+        my $serialized_data = $serializer->serialize( $persist_data );
+    
+        ##! 16: 'Persist certificate: ' . $identifier
+        ##! 32: 'persisted data: ' . Dumper( $persist_data )
+    
+        CTX('api')->set_data_pool_entry({
+            PKI_REALM => $pki_realm,
+            NAMESPACE => 'nice.certificate.information',
+            KEY => $identifier,
+            VALUE => $serialized_data,
+            ENCRYPT => 0,
+            FORCE => 1,
+        });
+    }
+    
+    # Try to autodetected the ca_identifier ....
+    if (!$certificate_information->{'ca_identifier'}) {
 
         my ($issuer_key, $issuer_value);
 
@@ -194,7 +173,14 @@ sub __persistCertificateInformation {
         if ($issuer->{IDENTIFIER}) {
             $certificate_information->{'ca_identifier'} = $issuer->{IDENTIFIER};
         } else {
-            $certificate_information->{'ca_identifier'} = 'unkown';
+            $certificate_information->{'ca_identifier'} = 'unknown';
+            
+            CTX('log')->log(
+                MESSAGE => "NICE certificate issued with unknown issuer! ($identifier / ".$insert_hash{ISSUER_DN}.")",
+                PRIORITY => 'warn',
+                FACILITY => 'application'
+            );
+            
         }
 
     }
