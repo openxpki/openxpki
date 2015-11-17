@@ -313,7 +313,7 @@ sub handle_login {
     # will do an external redirect in case loginurl is set in config
     if ($action !~ /^login/ && $page !~ /^login/) {                 
         # Requests to pages can be redirected after login, store page in session       
-        if ($page && $page ne 'logout') {
+        if ($page && $page ne 'logout' && $page ne 'welcome') {
             $self->logger()->debug("Store page request for later redirect " . $page);
             $self->session()->param('redirect', $page);
         }

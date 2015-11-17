@@ -23,8 +23,13 @@ sub init_welcome {
 
     # check for redirect
     my $redirect = $self->_client->session()->param('redirect');
-    if ($redirect) {
-        $self->_client->session()->param('redirect','');
+    $self->_client->session()->param('redirect','');
+    if ($redirect eq 'welcome') {
+        # redirect to myself causes the UI to loop
+        $redirect = "";
+    }
+    
+    if ($redirect) {        
         $self->logger()->debug('Found redirect - redirecting user to ' . $redirect);
         $self->redirect($redirect);
         $self->reload(1);
