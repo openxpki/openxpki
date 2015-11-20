@@ -14,6 +14,27 @@
 #
 #       Or add the file /etc/ld.conf.d/openssl.conf with the following:
 #       /opt/mypler/ssl/lib/
+#
+# CONFIGURATION:
+#
+# Local ENV vars can be set manually or read from the file 'local.rc'. The
+# following variables are supported:
+#
+# MYPERL_URL    This is the URL used by 'git clone ...' to fetch a working
+#               copy of the myperl repo. When running in our oxi vagrant,
+#               it will look for a pre-configured shared folder. By
+#               default, it will just fetch directly from github.
+#
+# MYPERL_BRANCH This is the branch to switch to in the myperl repo before
+#               building. Only set this if you need to force a non-default
+#               branch.
+#
+# CPAN_MIRROR   This is used to pass the '-M' option to the cpanm command.
+#               In the vagrant instance, this should be automatically
+#               detected. If you override it, include the '-M' option in
+#               the string like this:
+#
+#                   CPAN_MIRROR="-M file:///mirrors/minicpan"
 
 # exit on error
 set -e
@@ -91,17 +112,24 @@ fi
 # BEGIN CONFIGURATION
 ############################################################
 
+# The VAG_*_REPO vars are the paths of the synced folders as
+# configured in the Vagrantfile and found in the guest instance.
+VAG_MYPERL_REPO=/myperl-repo
+VAG_CODE_REPO=/code-repo
+
+# The GH_*_GITURL vars are the 'default' locations of the repos
+# on github themlselves. Note: for local configuration override,
+# set MYPERL_GITURL and OPENXPKI_GITURL instead.
+GH_MYPERL_GITURL=https://github.com/mrscotty/myperl.git
+GH_OPENXPKI_GITURL=https://github.com/openxpki/openxpki.git
+
 #MYPERL_VERSION=5.20.2
 MYPERL_RELEASE=1
-MYPERL_GITURL=https://github.com/mrscotty/myperl.git
-MYPERL_BRANCH=feature/suse
 PERL_VERSION=
 
-#OPENXPKI_GITURL=https://github.com/openxpki/openxpki.git
-#OPENXPKI_GITURL=https://github.com/oliwel/openxpki.git
-OPENXPKI_GITURL=https://github.com/mrscotty/openxpki.git
+#OPENXPKI_GITURL=https://github.com/mrscotty/openxpki.git
 
-OPENXPKI_BRANCH=develop
+#OPENXPKI_BRANCH=develop
 #OPENXPKI_BRANCH=master
 #OPENXPKI_BRANCH=feature/suse
 
@@ -113,26 +141,62 @@ if [ -f local.rc ]; then
     . local.rc
 fi
 
-if [ -d /myperl-repo ]; then
-    # Smells like a vagrant instance, use the local /myperl-repo dir
-    MYPERL_GITURL=/myperl-repo
-    MYPERL_BRANCH=$(cd $MYPERL_GITURL && git branch | grep '^*' | cut -d\  -f 2)
+############################################################
+# Decide on value for MYPERL_GITURL from the following choices
+# in descending priority:
+#
+# - Value already set in ENV from local.rc or manually
+# - Vagrant shared folder (local clone folder was found during 'vagrant up ...')
+# - Github
+# 
+############################################################
+
+if [ -z "$MYPERL_GITURL" ] && [ -f $VAG_MYPERL_REPO/.git/config ]; then
+    echo "INFO: Found local myperl git repo in $VAG_MYPERL_REPO"
+    MYPERL_GITURL=$VAG_MYPERL_REPO
 fi
 
-if [ -d /code-repo ]; then
-    # Smells like a vagrant instance, use the local /code-repo dir
-    OPENXPKI_GITURL=/code-repo
-    OPENXPKI_BRANCH=$(cd $OPENXPKI_GITURL && git branch | grep '^*' | cut -d\  -f 2)
+if [ -z "$MYPERL_GITURL" ]; then
+    echo "INFO: will fetch myperl repo directly from github"
+    MYPERL_GITURL=$GH_MYPERL_GITURL
 fi
 
-if [ -d /mirrors/minicpan ]; then
+############################################################
+# Decide on value for OPENXPKI_GITURL from the following choices
+# in descending priority:
+#
+# - Value already set in ENV from local.rc or manually
+# - Vagrant shared folder (local clone folder was found during 'vagrant up ...')
+# - Github
+# 
+############################################################
+
+if [ -z "$OPENXPKI_GITURL" ] && [ -f $VAG_CODE_REPO/.git/config ]; then
+    echo "INFO: Found local openxpki git repo in $VAG_CODE_REPO"
+    OPENXPKI_GITURL=$VAG_CODE_REPO
+fi
+
+if [ -z "$OPENXPKI_GITURL" ]; then
+    echo "INFO: will fetch openxpki repo directly from github"
+    OPENXPKI_GITURL=$GH_OPENXPKI_GITURL
+fi
+
+
+#if [ -d /code-repo ]; then
+#    # Smells like a vagrant instance, use the local /code-repo dir
+#    OPENXPKI_GITURL=/code-repo
+#    OPENXPKI_BRANCH=$(cd $OPENXPKI_GITURL && git branch | grep '^*' | cut -d\  -f 2)
+#fi
+
+if [ -z "$CPAN_MIRROR" ] && [ -d /mirrors/minicpan ]; then
+    echo "INFO: detected CPAN mirror in /mirrors/minicpan"
     export CPAN_MIRROR="-M file:///mirrors/minicpan"
 fi
 
-if [ "$DISTNAME" == "suse" ]; then
-if [ -z "$ORACLE_HOME" ]; then
+if [ "$DISTNAME" == "suse" ] && [ -z "$ORACLE_HOME" ]; then
+    echo "INFO: detected suse OS, but no ORACLE_HOME"
+    echo "INFO: using default value for ORACLE_HOME for the tested vag box"
     ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe
-fi
 fi
 
 ############################################################
@@ -186,12 +250,24 @@ function run_git {
     test -d ~/git/myperl || git clone --quiet $MYPERL_GITURL ~/git/myperl
     test -d ~/git/openxpki || git clone --quiet $OPENXPKI_GITURL ~/git/openxpki
 
-    (cd ~/git/myperl && git checkout $MYPERL_BRANCH && git pull)
-    (cd ~/git/openxpki && git checkout $OPENXPKI_BRANCH && git pull)
+    if [ -n "$MYPERL_BRANCH" ]; then
+        echo "INFO: switching myperl repo branch to '$MYPERL_BRANCH'"
+        (cd ~/git/myperl && git checkout $MYPERL_BRANCH)
+    fi
+    (cd ~/git/myperl && git pull)
+
+    if [ -n "$OPENXPKI_BRANCH" ]; then
+        echo "INFO: switching openxpki repo branch to '$OPENXPKI_BRANCH'"
+        (cd ~/git/openxpki && git checkout $OPENXPKI_BRANCH)
+    fi
+    (cd ~/git/openxpki && git pull)
 
     if [ -n "$KEYNANNY_GITURL" ]; then
         test -d ~/git/keynanny || git clone $KEYNANNY_GITURL ~/git/keynanny
-        (cd ~/git/keynanny && git checkout $KEYNANNY_BRANCH && git pull)
+        if [ -n "$KEYNANNY_BRANCH" ]; then
+            (cd ~/git/keynanny && git checkout $KEYNANNY_BRANCH)
+        fi
+        (cd ~/git/keynanny && git pull)
     fi
 }
 
@@ -365,14 +441,6 @@ function run_buildtools
           ;;
     esac
 }
-
-#if ! rpm -q myperl-inline-c >/dev/null 2>&1; then
-#  cleantmp
-#(cd ~/git/openxpki/package/suse/myperl-inline-c && \
-#PERL5LIB=$HOME/perl5/lib/perl5/ make)
-#sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/myperl-inline-c-$OXI_VERSION-1.x86_64.rpm
-#  test $? == 0 || die "Error building myperl-inline-c"
-#fi
 
 function run_fcgi
 {
@@ -575,9 +643,11 @@ cmd="$1"
 
 case "$cmd" in
     info)
-        echo "MYPERL_VERSION = $(get_myperl_version)"
-        echo "PERL_VERSION   = $(get_perl_version)"
-        echo "BUILDTOOLS_VERSION=$(get_buildtools_version)"
+        echo "MYPERL_VERSION        = $(get_myperl_version)"
+        echo "PERL_VERSION          = $(get_perl_version)"
+        echo "BUILDTOOLS_VERSION    = $(get_buildtools_version)"
+        echo "OXI_VERSION           = $(get_oxi_version)"
+        echo "OXI_PKGREL            = $(get_oxi_pkgrel)"
         ;;
     git|cache|myperl|buildtools|fcgi|oxideps|oracle|mysql|oxi|oxii18n|keynanny)
         echo "Running 'run_$cmd' ..."
@@ -588,7 +658,7 @@ case "$cmd" in
         ;;
     realclean)
         if [ "$DISTNAME" == "debian" ]; then
-            for i in myperl-openxpki-i18n myperl-openxpki-core myperl-dbd-oracle myperl-openxpkki-core-deps myperl-fcgi myperl-buildtools myperl; do
+            for i in myperl-openxpki-i18n myperl-openxpki-core myperl-dbd-oracle myperl-openxpki-core-deps myperl-fcgi myperl-dbd-mysql myperl-buildtools myperl; do
                 if pkg_installed $i; then
                     sudo dpkg -r $i
                 fi

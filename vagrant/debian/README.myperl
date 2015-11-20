@@ -1,10 +1,22 @@
-# README.myperl
+# MYPERL OVERVIEW
 
-This is "work in progress"... your mileage may vary.
+With this guide, you should be able to build the myperl package 
+from https://github.com/mrscotty/myperl and the remaining packages
+needed for OpenXPKI.
 
-# BUILD
+The build script will use both myperl and openxpki git repositories.
+The location is configurable, with the following order of precedence:
 
-## Create Local CPAN Mirror (optional)
+- Locally specified in ENV (either manually or in local.rc)
+- Already checked out in the default shared folder location in Vagrantfile
+    (myperl is in ../../../myperl and openxpki is in ../..)
+- As last resort, directly from Github
+
+See myperl/build.sh for details.
+
+# BUILD STEPS
+
+## Create Local CPAN Mirror (optional, requires 'minicpan')
 
     mkdir ~/mirrors
     echo "local: $HOME/mirrors/minicpan"            >  ~/.minicpanrc
@@ -16,10 +28,8 @@ This is "work in progress"... your mileage may vary.
 
 This starts and provisions the Vagrant instance:
 
-    cd vagrant/debian
-
     # Add mirror to local Vagrantfile config (optional)
-    echo '@localcfg["mirror"] = ENV["HOME"] + "/mirrors"
+    echo '@localcfg["mirror"] = ENV["HOME"] + "/mirrors"' >> Vagrantfile.local
 
     vagrant up build-myperl
     
@@ -32,7 +42,6 @@ Using the fresh instance started above:
 
 ## Test myperl Packages
 
-    cd vagrant/debian
     vagrant up test-myperl
     vagrant ssh test-myperl --command 'sudo /vagrant/myperl/install-oxi.sh'
     

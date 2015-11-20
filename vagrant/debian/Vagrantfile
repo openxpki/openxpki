@@ -57,7 +57,12 @@ Vagrant.configure("2") do |config|
       buildmyperl.vm.box = "debian/jessie64"
       buildmyperl.vm.provision :shell, :path => "myperl/provision-build.sh"
       buildmyperl.vm.synced_folder "../..", "/code-repo"
-      buildmyperl.vm.synced_folder "../../../myperl", "/myperl-repo"
+      # If found, add the local myperl git clone as synced folder.
+      # This is expected at the same level as openxpki itself.
+      if File.exists?(File.expand_path('../../../myperl'))
+          buildmyperl.vm.synced_folder "../../../myperl", "/myperl-repo"
+      end
+      # The local mirror is specified in Vagrantfile.local
       if @localcfg["mirror"]
           buildmyperl.vm.synced_folder @localcfg["mirror"], "/mirrors"
       end
