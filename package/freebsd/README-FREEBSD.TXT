@@ -144,37 +144,50 @@ What neither port nor package installs (but what is crucially needed for
 the OpenXPKI operation), is 
 
 - Enable utf8 locale (e.g. en_US.utf8) for the translation staff to operate
-(translation is needed even for English language).
-- Install your favorite database (enable utf8 support),
-   e.g. databases/mysql56-server
-Install perl interface for your favorite database,
-   e.g. databases/p5-DBD-mysql
+  (translation is needed even for English language).
+- Install your favorite database (enable utf8 support), 
+  e.g. databases/mysql56-server
+- Install perl interface for your favorite database, 
+  e.g. databases/p5-DBD-mysql
 - Install your favorite web server.
-(For a list of supported web servers and databases, have a look at 
-   http://openxpki.org )
-This port has created user:group as openxpki:openxpki
-Add a line: "User openxpki" to configuration of your OpenXPKI-related
-web server. Choose from two versions of the handler: based on CGI or FastCGI
-perl core modules.
-- Perform deployment procedure for OpenXPKI in a regular way,
-without this OpenXPKI server would not start.
+  Choose from two versions of the handler: based on CGI or FastCGI
+  perl core modules.
+  Copy CGI or FastCGI scripts from /usr/local/share/examples/openxpki/cgi-bin to the location
+  where your web server can use them. Set executable permissions for them. 
+  Copy htdocs files from /usr/local/share/examples/openxpki/htdocs to the location 
+  where your web server can use them.
+  You can see some samples in /usr/local/share/examples/openxpki/config/apache.
+- If you want your server to act just as the simplest CA, 
+  then the basic deployment procedure is all you need:
+  copy sample configuration for this case with 
+    cp -R /usr/local/share/examples/openxpki/config/openxpki/* /usr/local/etc/openxpki/
+  and follow advice at:
+  https://openxpki.readthedocs.org/en/latest/quickstart.html
+  Without this deployment procedure OpenXPKI server would not start.
+- If you want more complex role for your server inside the PKI infrastructure,
+  then you need to perform further deployment procedure for your server atop 
+  the basic deployment. 
+- This port has created user:group as openxpki:openxpki, which owns 
+  the OpenXPKI server.
+- After first fresh installation, create empty log files as follows
+  (assuming your web server is owned by user www):
+
+install -m 660 -o openxpki -g openxpki /dev/null /var/log/openxpki/openxpki.log
+install -m 660 -o www -g www /dev/null /var/log/openxpki/webui.log
+install -m 660 -o www -g www /dev/null /var/log/openxpki/scep.log
+install -m 660 -o www -g www /dev/null /var/log/openxpki/soap.log
+
+- It is essential that www and openpki are two different users in your system.
+
 - Start daemons in this order:
-1) database server,
-2) OpenXPKI server (PREFIX/etc/rc.d/openxpki start)
-    (PREFIX defaults to "/usr/local"),
-3) web server.
-- Docs installed (if you opted so) into DOCSDIR
-    (DOCSDIR defaults to "PREFIX/share/doc/openxpki")
-- If you want your PKI server to play a role of the simplest CA,
-then copy sample configuration for this case with
-cp -R EXAMPLESDIR/openxpki/* PREFIX/etc/openxpki/
-    (EXAMPLESDIR defaults to "PREFIX/share/examples/openxpki")
-and follow advice at:
-https://openxpki.readthedocs.org/en/latest/quickstart.html
+    database server,
+    OpenXPKI server (/usr/local/etc/rc.d/openxpki start),
+    web server.
+- Docs installed (if you opted so) into /usr/local/share/doc/openxpki
 - Mind FreeBSD specific file structure:
-PREFIX/etc/openxpki: server configuration, logs configuration.
-/var/openxpki: pid file, socket file, ...
-/var/openxpki/session: session files.
-/var/log/openxpki: server log files.
-/var/tmp: temporary directory.
+    /usr/local/etc/openxpki: server configuration, logs configuration.
+    /var/openxpki: pid file, socket file, ...
+    /var/openxpki/session: session files.
+    /var/log/openxpki: server log files.
+    /var/tmp: temporary directory.
 =============================================================
