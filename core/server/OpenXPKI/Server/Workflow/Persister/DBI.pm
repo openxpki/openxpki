@@ -155,12 +155,14 @@ sub update_workflow {
     
     ##! 32: 'Context is ' . ref $context
     
-    ##! 32: 'Params with updates ' . join(":", keys %{$context->{_updated}}) 
+    my @updated = keys %{ $context->{_updated} }; 
+    
+    ##! 32: 'Params with updates ' . join(":", @updated ) 
     
 
     ##! 128: 'params from context: ' . Dumper $params
   PARAMETER:
-    foreach my $key (keys %{ $context->{_updated} }) {
+    foreach my $key (@updated) {
         my $value = $params->{$key};
         # parameters with undefined values are not stored / deleted
         if (! defined $value) {
@@ -351,6 +353,7 @@ sub fetch_extra_workflow_data {
 
     # context was set in fetch_workflow
     my $context = $workflow->context( );
+    
     foreach my $entry (@{$result}) {
         $context->param($entry->{WORKFLOW_CONTEXT_KEY} =>
             $entry->{WORKFLOW_CONTEXT_VALUE});

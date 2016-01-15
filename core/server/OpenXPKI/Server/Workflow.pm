@@ -92,6 +92,17 @@ sub init {
     return $self;
 }
 
+# we need to make sure that we always return a OXI::Context object
+sub context {
+    my ( $self, $context ) = @_;
+    if (!$context && !$self->{context} ) {
+        $self->{context} = OpenXPKI::Workflow::Context->new();
+    }
+    
+    return $self->SUPER::context( $context );
+}
+
+
 
 sub execute_action {
     my ( $self, $action_name, $autorun ) = @_;
