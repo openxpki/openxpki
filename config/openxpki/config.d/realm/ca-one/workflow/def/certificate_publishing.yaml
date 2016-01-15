@@ -54,7 +54,7 @@ action:
           - cert_identifier
         param:
             export_context: 1
-            _map_publish_key: publish_key
+            _map_publish_key: $publish_key
 
 condition:
     has_prefix:
