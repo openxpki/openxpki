@@ -77,7 +77,7 @@ sub get_workflow {
     CTX('dbi_workflow')->commit();
 
     # Fetch the workflow details from the workflow table
-    ##! 16: 'determine factory for workflow ' . $arg_ref->{WORKFLOW_ID}
+    ##! 16: 'determine factory for workflow ' . $wf_id
     my $wf = CTX('dbi_workflow')->first(
         TABLE   => 'WORKFLOW',
         KEY => $wf_id
