@@ -5,8 +5,8 @@ aptitude update
 
 # Install the deps
 export DEBIAN_FRONTEND=noninteractive
-#aptitude install --assume-yes  dh-make-perl mysql-server
-#cat /code-repo/package/debian/build-deps.lst | xargs aptitude install --assume-yes
+aptitude install --assume-yes  dh-make-perl mysql-server
+cat /code-repo/package/debian/build-deps.lst | xargs aptitude install --assume-yes
 
 # openca-tools is now only used for scep which we do not test for now
 # so there is no need to install it
