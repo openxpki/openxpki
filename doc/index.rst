@@ -15,12 +15,13 @@ Table of Contents:
 
    introduction
    quickstart
-   architecture/connectors
-   architecture/workflows
-   architecture/datapool
-   architecture/subsystems/scep
-   architecture/subsystems/soap
-   architecture/subsystems/enroll-ui
+
+Setup and Configuration
+
+.. toctree::
+   :maxdepth: 2
+
+   configuration/index.rst
    admin/installation/building
    admin/installation/packages
    admin/installation/deployment
@@ -30,8 +31,6 @@ Table of Contents:
    admin/configuration/smartcard
    admin/administration
    admin/bestpractices
-   admin/operation/maintenance
-   admin/operation/troubleshooting
    reference/configuration/introduction
    reference/configuration/server
    reference/configuration/realm
@@ -50,6 +49,37 @@ Table of Contents:
    reference/developer/coding
    reference/developer/api
    reference/developer/webui
+
+Operation
+
+.. toctree::
+   :maxdepth: 3
+
+   operation/index
+   operation/tokenconfig
+   operation/maintenance
+   operation/troubleshooting
+
+Architecture
+
+.. toctree::
+   :maxdepth: 2
+
+   architecture/connectors
+   architecture/workflows
+   architecture/datapool
+   architecture/subsystems/scep
+   architecture/subsystems/soap
+   architecture/subsystems/enroll-ui
+
+Developer
+
+.. toctree::
+   :maxdepth: 2
+
+   developer/index
+
+.. toctree::
    glossary
 
 

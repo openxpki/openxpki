@@ -15,7 +15,7 @@ Debian/Ubuntu Builds
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff will crash otherwise!**
 
-Current release is 1.0.1 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.2 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (jessie)::
 
@@ -86,7 +86,7 @@ The debian package comes with a shell script ``sampleconfig.sh`` that does all t
 (look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two stage ca with 
 a root ca certificate and below your issuing ca and certs for SCEP and the internal datasafe.
 
-The sample script proves certs for a quickstart but should never be used for production systems 
+The sample script provides certs for a quickstart but should never be used for production systems 
 (it has the fixed passphrase *root* for all keys ;) and no policy/crl, etc config ).
  
 Here is what you need to do if you *dont* use the sampleconfig script.
