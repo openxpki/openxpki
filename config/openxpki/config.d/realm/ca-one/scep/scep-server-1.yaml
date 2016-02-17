@@ -62,6 +62,9 @@ eligible:
     initial:
        value@: connector:scep.scep-server-1.connector.initial
        args: '[% context.cert_subject_parts.CN.0 %]'
+       expect: 
+         - Build
+         - New
 
     renewal:
        value: 1
