@@ -83,8 +83,12 @@ use Class::Std;
         if ( defined $raw_data ) {
             my $data;
 
-            # put this in eval to prevent complete blow-up
-            eval { $data = $ser->deserialize($raw_data); };
+            if (ref $raw_data) {
+                $data = $raw_data;
+            } else {
+                # put this in eval to prevent complete blow-up                
+                eval { $data = $ser->deserialize($raw_data); };
+            }
             if ( my $exc = OpenXPKI::Exception->caught() ) {
 
                 # append some details and re-throw exception
