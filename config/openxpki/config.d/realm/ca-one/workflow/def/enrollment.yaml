@@ -331,14 +331,10 @@ action:
           - _pkcs7
           - _url_params
           - cert_profile
-          - f_valid_csr
-          - f_valid_scep_tid
           - pkcs10
           - scep_tid
           - server
           - signer_cert
-          - t_signer_cert_crypt_ok
-          - t_signer_validity_ok
         param:
             source: SCEP
 
@@ -656,20 +652,6 @@ field:
         type: text
         required: 0
 
-    f_valid_csr:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL
-        name: f_valid_csr
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC
-        type: text
-        required: 0
-
-    f_valid_scep_tid:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL
-        name: f_valid_scep_tid
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC
-        type: text
-        required: 0
-
     policy_comment: 
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC
@@ -705,20 +687,6 @@ field:
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC
         required: 1
         type: text
-
-    t_signer_cert_crypt_ok:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL
-        name: t_signer_cert_crypt_ok
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC
-        type: text
-        required: 0
-
-    t_signer_validity_ok:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL
-        name: t_signer_validity_ok
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC
-        type: text
-        required: 0
 
     tmp_queue:
         name: tmp_queue

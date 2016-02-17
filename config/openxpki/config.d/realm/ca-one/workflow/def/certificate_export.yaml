@@ -76,8 +76,6 @@ action:
         class: Workflow::Action::Null
         input:
           - config_path
-          - cert_identifier
-          - email
 
     cert_export_tag_certs_as_exported:
         class: OpenXPKI::Server::Workflow::Activity::Reports::CertExport::TagAsExported
