@@ -67,11 +67,13 @@ sub execute {
         FACILITY => [ 'application', ],
     ); 
      
-    my $config = CTX('config');
+    my $config = CTX('config');   
     if ($mode eq 'map') {
         
         my $hash = $config->get_hash( \@path );
         my $map = $self->param('attrmap');
+
+        ##! 16: 'Result from connector ' . Dumper $hash
         
         OpenXPKI::Exception->throw( message =>
             'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_MAP'

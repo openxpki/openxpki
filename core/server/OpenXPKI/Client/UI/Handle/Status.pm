@@ -155,6 +155,9 @@ sub render_system_status {
     # we fetch the list of tokens to display from the context
     # this allows a user to configure this     
     my @token = split /\s*,\s*/, $wf_info->{WORKFLOW}->{CONTEXT}->{token};
+    
+    $self->logger()->debug("context: " . Dumper $wf_info->{WORKFLOW}->{CONTEXT} );
+    
    
     foreach my $type (@token) {
         
