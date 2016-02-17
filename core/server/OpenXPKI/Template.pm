@@ -9,6 +9,7 @@ use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Serialization::Simple;
 #use OpenXPKI::Server::Context qw( CTX );
 
 sub new {
