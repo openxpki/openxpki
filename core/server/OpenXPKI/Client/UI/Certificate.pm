@@ -62,7 +62,7 @@ sub init_search {
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default};
-    if ($attributes) {
+    if (defined $attributes->[0]) {
         my @attrib;
         foreach my $item (@{$attributes}) {
             push @attrib, { value => $item->{key}, label=> $item->{label} };                    
