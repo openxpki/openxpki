@@ -438,13 +438,20 @@ sub handle_login {
             $self->session()->delete();                                           
             $self->session( $new_session_front );
             
+            # Check for MOTD
+            my $motd = $self->backend()->send_receive_command_msg( 'get_motd' );
+            if (ref $motd->{PARAMS} eq 'HASH') {
+                $self->logger()->debug('Got MOTD: '. Dumper $motd->{PARAMS} );
+                $self->session()->param('motd', $motd->{PARAMS} );
+            }  
+            
             $main::cookie->{'-value'} = $new_session_front->id;
             push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
             
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});
             $self->logger()->debug('CGI Header ' . Dumper \@main::header );
-            
-            $result->init_index();            
+                        
+            $result->init_index(); 
             return $result->render();
         }
     }

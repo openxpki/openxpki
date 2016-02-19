@@ -17,7 +17,8 @@ use OpenXPKI::Server::Workflow::WFObject::WFHash;
 
 sub execute {
     my ( $self, $wf ) = @_;
-
+    
+    ##! 1: 'start';
 
     my $operation = $self->param('function');
     
@@ -27,8 +28,11 @@ sub execute {
     my $value =  $self->param('hash_value');
     my $target =  $self->param('context_key');
 
-    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new(    
-        { workflow => $wf, context_key => $hash_name } );
+    my $item = { workflow => $wf, context_key => $hash_name };
+    
+    ##! 16: 'item ' . Dumper $item;
+        
+    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new( $item );
 
     # auto detect operation
     if (defined $target) {

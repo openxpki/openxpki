@@ -124,8 +124,9 @@ sub set_status {
     my $self = shift;
     my $message = shift;
     my $level = shift || 'info';
+    my $href = shift || '';
 
-    $self->_status({ level => $level, message => $message });
+    $self->_status({ level => $level, message => $message, href => $href });
 
     return $self;
 
@@ -349,18 +350,25 @@ sub render {
     my $json = new JSON()->utf8;
     my $body;
     my $redirect;
-    
-    if ($redirect = $self->redirect()) {         
+       
+    if ($redirect = $self->redirect()) {
         if (ref $redirect ne 'HASH') {
             $redirect = { goto => $redirect };
         }
         $body = $json->encode( $redirect );
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );
-    } else {
-        $result->{session_id} = $self->_session->id;        
+    } else {        
+        $result->{session_id} = $self->_session->id;
+
+        # Add message of the day if set and we have a page section        
+        if ($result->{page} && (my $motd = $self->_session()->param('motd'))) {
+             $self->_session()->param('motd', undef);
+             $result->{status} = $motd; 
+        }        
         $body = i18nTokenizer ( $json->encode($result) );
     }
+        
 
     my $cgi = $self->cgi();
     # Return the output into the given pointer

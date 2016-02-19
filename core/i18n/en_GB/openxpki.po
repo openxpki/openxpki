@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2015-10-05 12:47+0100\n"
+"PO-Revision-Date: 2016-02-19 17:23+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -957,6 +957,19 @@ msgstr "Issue revocation list"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_LABEL"
 msgstr "Issue CRL"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION"
+msgstr ""
+"You can set a \\\"Message of the Day\\\" that is shown as a status bar on "
+"the top of main page each time a user logs in. You can create a MOTD per "
+"user role or for all users. If a general and a role specific message is "
+"defined, only the one for the role is shown. If you specify a link url, a "
+"new browser window opens with the given url when the user clicks on the "
+"message box. To delete an existing MOTD, just define a new one with the not "
+"valid after date set to now."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
+msgstr "Message of the Day"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
 msgstr ""
 "Your revocation request has been accept, the certificate will be included in "
@@ -1344,7 +1357,7 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC"
 msgstr ""
-"Use the calendar or enter the notbefore date in the format <tt>DD.MM.YYYY HH:"
+"Use the calendar or enter the notafter date in the format <tt>DD.MM.YYYY HH:"
 "MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
 "auto, clear the field or type 0."
 
@@ -1590,6 +1603,34 @@ msgstr "go back"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Last Update"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION"
+msgstr ""
+"The attention level of your message. This gets reflected in the color of the "
+"message box."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_LABEL"
+msgstr "Importance Level"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_DESCRIPTION"
+msgstr "The message that should be shown."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_LABEL"
+msgstr "Message of the Day"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_DESCRIPTION"
+msgstr ""
+"The user role that should see this message, _any will show it to all users."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_LABEL"
+msgstr "Userrole"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_DESCRIPTION"
+msgstr ""
+"A link for additional information, must be a proper URL including http://."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL"
+msgstr "Link"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Open Workflow"
 
@@ -1692,8 +1733,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "This content is considered sensitive and therefore not shown."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
-msgstr ""
-"This workflow was canceled by user interaction and can not be restarted."
+msgstr "This workflow was canceled by user interaction."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_DESC"
@@ -1705,7 +1745,7 @@ msgstr "State"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr "This workflow has finished with success."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL"
@@ -1721,21 +1761,21 @@ msgstr "Serial"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
 msgstr ""
-"This workflow has finished with success and can not be restarted. New "
-"revocation lists have been created (if necessary)."
+"This workflow has finished with success. New revocation lists have been "
+"created (if necessary)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "CRLs issued"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
-msgstr "This workflow was canceled and can not be restarted"
+msgstr "This workflow was canceled."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL"
 msgstr "CANCELED"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC"
-msgstr "This workflow failed finally and can not be restarted"
+msgstr "This workflow failed finally."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
@@ -2057,6 +2097,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
+msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESCRIPTION"
 msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
@@ -2449,14 +2493,6 @@ msgstr "Workflow information was updated"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_GUI_HAS_PIN_LABEL"
 #~ msgstr "Persist CRR"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_DESC"
-#~ msgstr "This workflow failed finally and can not be restarted"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_LABEL"
-#~ msgstr "State"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INIT_TMP_LIST_CSR_DESC"

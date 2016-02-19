@@ -1482,6 +1482,15 @@ sub BUILD {
             params => {
             }
         },
+        'get_motd' => {
+            class  => 'UI',
+            params => {
+                'ROLE' => { 
+                    type => SCALAR,
+                    optional => 1,
+                },
+            }
+        },
         # this is a workaround and should be refactored, see #283
         'render_template' => {
             class  => 'UI',

@@ -34,6 +34,7 @@ use OpenXPKI::FileUtils;
 use OpenXPKI::VERSION;
 use OpenXPKI::Template;
 use DateTime;
+use OpenXPKI::Serialization::Simple;
 use List::Util qw(first);
 
 use MIME::Base64 qw( encode_base64 decode_base64 );
@@ -168,6 +169,38 @@ sub get_menu {
 
     return $menu;
 
+}
+
+sub get_motd {
+
+    ##! 1: 'start'
+
+    my $self = shift;
+    my $args = shift;
+
+    my $role = $args->{ROLE} || CTX('session')->get_role();
+
+    # The role is used as DP Key, can also be "_any" 
+    my $datapool = CTX('api')->get_data_pool_entry({
+        NAMESPACE   =>  'webui.motd',
+        KEY         =>  $role   
+    });
+    ##! 16: 'Item for role ' . $role .': ' . Dumper $datapool
+    
+    # Nothing for role, so try _any
+    if (!$datapool) {
+        $datapool = CTX('api')->get_data_pool_entry({
+            NAMESPACE   =>  'webui.motd',
+            KEY         =>  '_any' 
+        });
+        ##! 16: 'Item for _any: ' . Dumper $datapool        
+    }
+
+    if ($datapool) {
+        return OpenXPKI::Serialization::Simple->new()->deserialize( $datapool->{VALUE} );        
+    }
+
+    return undef;
 }
 
 =head2 render_template 

@@ -29,7 +29,7 @@ sub init_welcome {
         $redirect = "";
     }
     
-    if ($redirect) {        
+    if ($redirect) {
         $self->logger()->debug('Found redirect - redirecting user to ' . $redirect);
         $self->redirect($redirect);
         $self->reload(1);
@@ -41,7 +41,7 @@ sub init_welcome {
             $self->redirect($landmark->{welcome});
             $self->reload(1);
         } else {
-            $self->init_index();        
+            $self->init_index();
         }
     }
     

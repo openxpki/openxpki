@@ -52,10 +52,18 @@
 </div>
 
 <div class="container-fluid">
-    <div class="oxi-message">
-        <div class="alert {{statusClass}}">
-            {{model.status.message}}
-        </div>
+    <div class="oxi-message">       
+        {{#if model.status.href}}
+            <a href="{{model.status.href}}" target="_blank">
+                <div class="alert {{statusClass}}" style="cursor:pointer;">
+                    {{model.status.message}}
+                </div>
+            </a>
+        {{else}}
+            <div class="alert {{statusClass}}">
+                {{model.status.message}}
+            </div>
+        {{/if}}
     </div>
 
     <h2>{{model.tabs.firstObject.page.label}}</h2>

@@ -1305,6 +1305,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_LABEL"
 msgstr "Speichern des Zertifzierungsantrages"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION"
+msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
 msgstr "Ändern der Rolle"
 
@@ -2171,6 +2179,38 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_DESCRIPTION"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_DESCRIPTION"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_DESCRIPTION"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Letzte Aktualisierung"
 
@@ -2706,6 +2746,10 @@ msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESCRIPTION"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
@@ -7473,14 +7517,6 @@ msgstr "Letzte Aktualisierung"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_USER_DATA_LABEL"
-#~ msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INITIALIZE_DESC"
-#~ msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INITIALIZE_LABEL"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy

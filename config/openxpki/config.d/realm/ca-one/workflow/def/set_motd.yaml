@@ -1,0 +1,112 @@
+head:
+    prefix: motd
+    persister: Volatile
+
+state:
+    INITIAL:      
+        action: 
+          - initialize > PERSIST
+
+    PERSIST:
+        autorun: 1
+        action: add_message add_level add_link set_motd > SUCCESS
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESCRIPTION
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION
+        input:
+          - message
+          - level
+          - link
+          - role          
+          - notafter
+
+    add_message:
+        class:  OpenXPKI::Server::Workflow::Activity::Tools::WFHash
+        param:
+            hash_name: motd
+            hash_key: message
+            _map_hash_value: $message
+
+    add_level:
+        class:  OpenXPKI::Server::Workflow::Activity::Tools::WFHash
+        param:
+            hash_name: motd
+            hash_key: level
+            _map_hash_value: $level
+
+    add_link:
+        class:  OpenXPKI::Server::Workflow::Activity::Tools::WFHash
+        param:
+            hash_name: motd
+            hash_key: href
+            _map_hash_value: $link
+
+    set_motd:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+        param:
+            ds_namespace: webui.motd
+            ds_key_param: role
+            ds_value_param: motd
+            ds_force: 1
+            ds_encrypt: 0
+            _map_ds_expiration_date: $notafter
+        
+field:
+    level:
+        name: level
+        label: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION
+        required: 1
+        type: text
+        default: info
+        type: select
+        option:
+            item:
+              - info
+              - success
+              - warn
+              - error
+    message:
+        name: message
+        label: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_DESCRIPTION
+        required: 1
+        type: text
+
+    link:
+        name: link
+        label: I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_DESCRIPTION
+        placeholder: http://www.openxpki.org/motd
+        required: 0
+        type: text
+
+    role:
+        name: role
+        label: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_DESCRIPTION
+        required: 1
+        type: select
+        option:
+            item:
+              - _any
+              - User
+              - RA Operator
+
+acl:
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+
+    System:
+        creator: any
+
