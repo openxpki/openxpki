@@ -48,7 +48,7 @@ sub execute {
 	    {
 		REFERENCEDATE  => DateTime->now(),
 		VALIDITY       => $params->{EXPIRATION_DATE},
-		VALIDITYFORMAT => 'relativedate',
+		VALIDITYFORMAT => 'detect',
 	    });
 	$params->{EXPIRATION_DATE} = $then->epoch();
     }
@@ -145,9 +145,9 @@ Causes the set action to overwrite an existing entry.
 =item ds_expiration_date
 
 Sets expiration date of the datapool entry to the specified value.
-The value should be a relative time specification (such as '+000001',
-which means one day). See OpenXPKI::DateTime::get_validity, section
-'relativedate' for details.
+The value should be a time specification recognized by OpenXPKI::DateTime
+autodetection. (such as '+000001', which means one day), a terse data or 
+epoch. See OpenXPKI::DateTime::get_validity for details.
 
 =item ds_unset_context_value
 
@@ -163,17 +163,15 @@ workflow context. The names are set above with the I<ds_key_param> and
 I<ds_value_param> parameters.
 
 =head2 Example
-
-  <action name="set_puk_in_datapool"
-    class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry"
-    ds_namespace="puk_namespace"
-    ds_key_param="token_id"
-    ds_value_param="_puk"
-    ds_encrypt="1"
-    ds_force="1"
-    ds_unset_context_value="1"
-    ds_expiration_date="+10" >
-    <field name="token_id" label="Serial number of Smartcard"/>
-    <field name="_puk" label="Smartcard PUK"/>
-  </action>
-
+  
+    set_puk_in_datapool:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+        param:
+            ds_namespace: puk_namespace
+            ds_key_param: token_id
+            ds_value_param: _puk
+            ds_encrypt: 1
+            ds_force: 1
+            ds_unset_context_value: 1
+            ds_expiration_date: "+10"
+        
