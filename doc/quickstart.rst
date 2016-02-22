@@ -41,8 +41,8 @@ We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires t
 
 Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text::
 
-    ln -s /etc/apche2/mods-available/fastcgi.conf /etc/apache2/mods-enabled/fastcgi.conf
-    ln -s /etc/apche2/mods-available/fastcgi.load /etc/apache2/mods-enabled/fastcgi.load
+    ln -s /etc/apache2/mods-available/fastcgi.conf /etc/apache2/mods-enabled/fastcgi.conf
+    ln -s /etc/apache2/mods-available/fastcgi.load /etc/apache2/mods-enabled/fastcgi.load
 
 Now install the OpenXPKI core package and the translation package::
 
