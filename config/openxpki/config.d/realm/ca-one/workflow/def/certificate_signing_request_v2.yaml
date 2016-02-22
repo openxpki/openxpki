@@ -446,6 +446,8 @@ action:
 
     enter_policy_violation_comment:
         class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC
         input:
           - policy_comment
 
