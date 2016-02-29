@@ -882,23 +882,10 @@ sub action_index {
         });
 
         if (!$wf_info) {
-            
-            # Check for validation error by inspecting the raw command reply
-            my $reply = $self->_last_reply();
-            if ($reply->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE') {
-                my $p = $reply->{LIST}->[0]->{PARAMS};                
-                my $validator_msg = $p->{__ERROR__};
-                my $field_errors = $p->{__FIELDS__};
-                my @fields = (ref $field_errors eq 'ARRAY') ? map { $_->{name} } @$field_errors : ();
-                $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
-                $self->logger()->error("Input validation error on fields ". join ",", @fields);
-                $self->logger()->debug('validation details' . Dumper $field_errors );
-            } else {
-                # todo - handle workflow errors
-                $self->logger()->error("workflow acton failed!");
-            }
+            $self->logger()->error("workflow acton failed!");
             return $self;
         }
+        
         $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
         #$self->set_status('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED','success');
         # purge the workflow token
