@@ -81,12 +81,10 @@ extends 'OpenXPKI::Server::Notification::Base';
 
 # Attribute Setup
 
-has 'transport' => (
-    is  => 'ro',
+has '_transport' => (
+    is  => 'rw',
     # Net::SMTP Object
     isa => 'Object|Undef',
-    builder => '_init_transport',
-    lazy => 1,
 );
 
 has 'default_envelope' => (
@@ -116,8 +114,24 @@ has 'is_smtp_open' => (
     isa => 'Bool',
 );
 
+sub transport {
+    
+    ##! 1: 'fetch transport'
+    
+    my $self = shift;
+    
+    # We call reset on an existing SMTP object to test if it is alive
+    if (!$self->_transport() || !$self->_transport()->reset()) {        
+        # No usable object, so we create a new one
+        $self->_transport( $self->_init_transport() );                       
+    }            
+    
+    return $self->_transport();
+    
+}
 
 sub _init_transport {
+    
     my $self = shift;
 
     ##! 8: 'creating Net::SMTP transport'
@@ -409,7 +423,16 @@ sub _send_plain {
     ##! 64: "SMTP Msg --------------------\n$smtpmsg\n ----------------------------------";
 
     my $smtp = $self->transport();
-    return 0 unless($smtp);
+    if (!$smtp) {
+        CTX('log')->log(
+            MESSAGE  => sprintf("Failed sending notification - no smtp transport"),
+            PRIORITY => "error",
+            FACILITY => "system",
+        );
+        return undef;
+    }   
+    
+     ##! 128: 'SMTP Transport ' . Dumper $smtp
 
     $smtp->mail( $cfg->{from} );
     $smtp->to( $vars->{to} );
@@ -566,8 +589,15 @@ sub _send_html {
     }
 
 	# a reusable Net::SMTP object
-    my $transport = $self->transport();
-    return 0 unless($transport);
+    my $transport = $self->transport();    
+    if (!$transport ) {
+        CTX('log')->log(
+            MESSAGE  => sprintf("Failed sending notification - no smtp transport"),
+            PRIORITY => "error",
+            FACILITY => "system",
+        );
+        return undef;
+    }   
 
     # Host accepts a Net::SMTP object
     # @res is the list of receipients processed, empty on error
@@ -596,8 +626,9 @@ sub _cleanup {
     my $self = shift;
 
     if ($self->is_smtp_open()) {
-        $self->transport()->quit();
+        $self->transport()->quit();        
     }
+    $self->_transport( undef );
 
     return;
 }
