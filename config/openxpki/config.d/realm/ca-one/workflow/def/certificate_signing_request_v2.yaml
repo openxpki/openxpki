@@ -300,7 +300,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_DESC
         action:
           - submit > EVAL_ELIGIBILITY ? !has_policy_violation
-          - enter_policy_violation_comment > PENDING_POLICY_VIOLATION ? has_policy_violation
+          - enter_policy_violation_comment send_pending_notification > PENDING_POLICY_VIOLATION ? has_policy_violation
           - global_noop > BUILD_SUBJECT ? has_policy_violation
           - edit_subject > BUILD_SUBJECT
           - edit_san > BUILD_SUBJECT ? profile_has_san_section
@@ -497,7 +497,7 @@ action:
     notify_issued:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         param:
-            message: csr_cert_issued
+            message: cert_issued
 
     notify_rejected:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
