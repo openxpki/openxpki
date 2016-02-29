@@ -44,6 +44,10 @@ sub validate {
     # replace named regexes
     if ($regex eq 'email') {
         $regex = qr/ \A [a-z0-9\.-]+\@([\w_-]+\.)+(\w+) \z /xi;
+
+    } elsif ($regex eq 'fqdn') {
+        $regex = qr/ \A (([\w\-]+\.)+)[\w\-]{2,} \z /xi;        
+        
     # or quote the string if no named match
     } else {
         # Extended Pattern notation, see http://perldoc.perl.org/perlre.html#Extended-Patterns
@@ -57,7 +61,7 @@ sub validate {
             );
         }
         $modifier = "(?$modifier)" if ($modifier);
-        $regex = m{$modifier};
+        $regex = m{$modifier$regex};
     }
 
     # Array Magic
@@ -88,7 +92,9 @@ sub validate {
             PRIORITY => 'info',
             FACILITY => 'system',
         );
-        validation_error( $self->error() );
+        my @fields_with_error = ({ name => 'link', error => $self->error() }); 
+        validation_error( $self->error(), { invalid_fields => \@fields_with_error } );
+        
         return 0;
     }
 
@@ -104,30 +110,33 @@ OpenXPKI::Server::Workflow::Validator::Regex
 
 =head1 SYNOPSIS
 
-    <action name="..." class="...">
-        <validator name="global_validate_regex">
-            <arg>meta_email</arg>
-            <arg>email</arg>
-        </validator>
-    </action>
-
+    class: OpenXPKI::Server::Workflow::Validator::Regex
+    arg: 
+     - $link
+    param:
+        regex: "\\A http(s)?://[a-zA-Z0-9-\\.]+"
+        modifier: xi
+        error: Please provide a well-formed URL starting with http://
+            
 =head1 DESCRIPTION
 
 Validates the context value referenced by argument against a regex. The regex
-can be given either as second argument inside the action definition as seen
-above. If only one argument is given, the pattern is read from the param name
-'regex' which must be set in the validator definition:
+can be passed either as second argument or specified in the param section.
+The value given as argument is always preferred.
 
-  <validator name="global_validate_regex"
-      class="OpenXPKI::Server::Workflow::Validator::Regex">
-      <param name="regex" value="email">
-      <param name="error" value="email has invalid format">
-  </validator>
+    class: OpenXPKI::Server::Workflow::Validator::Regex
+    arg: 
+     - $link
+     - email
 
 The error parameter is optional, if set this is shown in the UI if the validator
-fails.
+fails instead of the default message.
 
-The regex must be given as pattern without delimiters and modifiers.
+The regex must be given as pattern without delimiters and modifiers. The 
+default modifier is "xi" (case-insensitive, whitespace pattern), you can 
+override it using the key "modifier" in the param section. (@see 
+http://perldoc.perl.org/perlre.html#Modifiers).
+
 Some common formats can also be referenced by name:
 
 =over
@@ -135,5 +144,11 @@ Some common formats can also be referenced by name:
 =item email
 
 Basic check for valid email syntax
+
+=item fqdn
+
+A fully qualified domain name, must have at least one dot, all "word" 
+characters are accepted for the domain parts. Last domain part must have
+at least two characters
 
 =back
