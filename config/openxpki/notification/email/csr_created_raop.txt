@@ -9,7 +9,7 @@ Subject alternative name: [% san.0 %]: [% san.1 %]
 [% END -%]
 
 For this request, a new workflow has been created on the CA system
-with ID [% meta_wf_id %].
+with ID [% meta_wf_id %]: [% meta_baseurl %]#/openxpki/workflow!load!wf_id![% meta_wf_id %]
 
 Regards,
   PKI Team
