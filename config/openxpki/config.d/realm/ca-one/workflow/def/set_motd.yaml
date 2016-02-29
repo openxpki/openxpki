@@ -27,6 +27,9 @@ action:
           - role          
           - notafter
 
+        validator:
+         - full_uri
+
     add_message:
         class:  OpenXPKI::Server::Workflow::Activity::Tools::WFHash
         param:
@@ -57,6 +60,7 @@ action:
             ds_force: 1
             ds_encrypt: 0
             _map_ds_expiration_date: $notafter
+
         
 field:
     level:
@@ -99,6 +103,15 @@ field:
               - _any
               - User
               - RA Operator
+
+validator:
+    full_uri:
+        class: OpenXPKI::Server::Workflow::Validator::Regex
+        arg: 
+         - $link
+        param:
+            regex: "\\A http(s)?://[a-zA-Z0-9-\\.]+"
+            error: I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_LINK_FAILED
 
 acl:
     CA Operator:
