@@ -435,24 +435,27 @@ sub init_detail {
         format => 'rawlist'
     };
 
-    # TODO - add some magic to the API to determine if those actions are possible for the current user, etc.
-    $pattern = '<li><a href="#/openxpki/redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
     
-    if ($is_local_entity) {   
-        my @actions;
-        if ($is_local_entity && ($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED')) {        
-            push @actions, sprintf ($pattern, 'certificate_renewal_request', 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW');
-        }
-        if ($cert->{STATUS} eq 'ISSUED') { 
-            push @actions, sprintf ($pattern, 'certificate_revocation_request_v2', 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE');
-        }
-        push @actions, sprintf ($pattern, 'change_metadata', 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA');
+    if ($is_local_entity) {
         
+        $pattern = '<li><a href="#/openxpki/redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
+        
+        my @actions;
+        my $reply = $self->send_command ( "get_cert_actions", { IDENTIFIER => $cert_identifier });
+        
+        $self->logger()->debug("available actions for cert " . Dumper $reply);
+        
+        if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {           
+            foreach my $item (@{$reply->{workflow}}) {
+                push @actions, sprintf ($pattern, $item->{workflow}, $item->{label});
+            }
+        }
+                
         push @fields, { 
             label => 'I18N_OPENXPKI_UI_CERT_ACTION_LABEL', 
             value => \@actions,
             format => 'rawlist'
-        };
+        } if (@actions);
     }     
     
     push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => { 

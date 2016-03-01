@@ -408,6 +408,19 @@ sub BUILD {
                 },
             }
         },
+        'get_cert_actions' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                },
+                ROLE => {
+                    type     => SCALAR,
+                    optional => 1 
+                }
+            }
+        },
         'get_profile_for_cert' => {
             class  => 'Object',
             params => {

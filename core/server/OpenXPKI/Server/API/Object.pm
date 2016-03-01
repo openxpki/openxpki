@@ -373,6 +373,62 @@ sub get_profile_for_cert {
 
 }
 
+=head2 get_cert_actions
+
+Requires a certificate identifier (IDENTIFIER) and optional ROLE.
+Returns a list of actions that the given role (defaults to current 
+session role) can do with the given certificate. The return value is a 
+nested hash with options available for lifecyle actions. The list of 
+workflows is hardcoded for now, workflows which are not present or not 
+accessible by the current user are remove from the result.
+
+    {        
+        workflow => [
+            { label => I18N_OPENXPKI_UI_CERT_ACTION_REVOKE, workflow => certificate_revocation_request_v2 },
+            { label => I18N_OPENXPKI_UI_CERT_ACTION_RENEW, workflow => certificate_renewal_request_v2 },
+            { label => I18N_OPENXPKI_UI_CERT_ACTION_RENEW, workflow => certificate_renewal_request_v2 }
+        ]
+    }
+
+=cut
+
+sub get_cert_actions {
+    
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+
+    my $role = $args->{ROLE} || CTX('session')->get_role();
+
+    my $cert_identifier = $args->{IDENTIFIER};
+        
+    my $cert = CTX('api')->get_cert({ IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
+    
+    # check if this is a entity certificate from the current realm    
+    if (!$cert->{CSR_SERIAL} || $cert->{PKI_REALM} ne CTX('session')->get_pki_realm()) {
+        ##! 16: "cert is not local entity"        
+        return {};
+    }
+    
+    my $conn = CTX('config');
+    
+    my @actions;
+    if (($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED') 
+        && $conn->exists([ 'workflow', 'def', 'certificate_renewal_request', 'acl', $role, 'creator' ] )) {
+        push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW', workflow => 'certificate_renewal_request' };
+    }
+    if ($cert->{STATUS} eq 'ISSUED'
+        && $conn->exists([ 'workflow', 'def', 'certificate_revocation_request_v2', 'acl', $role, 'creator' ]) ) { 
+        push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE', workflow => 'certificate_revocation_request_v2' };        
+    }
+    if ($conn->exists([ 'workflow', 'def', 'change_metadata', 'acl', $role, 'creator' ] )) {
+        push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA', workflow => 'change_metadata' };        
+    }
+    
+    return { workflow => \@actions };
+        
+
+}
 
 =head2 get_crl
 
