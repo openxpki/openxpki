@@ -118,9 +118,6 @@ field:
 
 
 acl:
-    Anonymous: 
-        creator: self
-
     CA Operator: 
         creator: any
 
