@@ -6,7 +6,7 @@ Quickstart guide
 Vagrant
 -------
 
-We have a vagrant setup for debian jessie and ubuntu trusty (currently disfuctional). If you have vagrant you can just 
+We have a vagrant setup for debian jessie and ubuntu trusty. If you have vagrant you can just 
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
 minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
 
@@ -15,14 +15,14 @@ Debian/Ubuntu Builds
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff will crash otherwise!**
 
-Current release is 1.2 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.5 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (jessie)::
 
     echo "deb http://packages.openxpki.org/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
-or ubuntu trusty (available soon)::
+or ubuntu trusty::
 
     echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
@@ -40,6 +40,10 @@ We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires t
     aptitude install libapache2-mod-fastcgi
 
 Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text::
+
+    a2enmod fastcgi
+
+or if this does not work you can create the symlinks by hand::
 
     ln -s /etc/apache2/mods-available/fastcgi.conf /etc/apache2/mods-enabled/fastcgi.conf
     ln -s /etc/apache2/mods-available/fastcgi.load /etc/apache2/mods-enabled/fastcgi.load
