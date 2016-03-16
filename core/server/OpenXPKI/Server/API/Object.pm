@@ -430,6 +430,45 @@ sub get_cert_actions {
 
 }
 
+
+=head2 is_certificate_owner
+
+Requires a certificate identifier (IDENTIFIER) and user (USER). User is 
+optional and will default to the session user if not given. Checks if 
+USER is the owner of the certificate, based on the formerly recorded meta
+information.
+
+Returns true if the user is the owner, false if not and undef if the 
+ownership could not be determined.
+
+=cut
+
+sub is_certificate_owner {
+    
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+        
+    my $user = $args->{USER} || CTX('session')->get_user();
+    my $cert_identifier = $args->{IDENTIFIER};
+        
+    my $res_attrib = CTX('dbi_backend')->first(
+        TABLE   => 'CERTIFICATE_ATTRIBUTES',
+        DYNAMIC => { 
+            IDENTIFIER => { VALUE => $cert_identifier },
+            ATTRIBUTE_KEY => 'system_cert_owner',                
+        },
+    );  
+       
+    if (!$res_attrib) {
+        ##! 16: "no result"
+        return undef;
+    }
+    ##! 16: "compare $user ?= " . $res_attrib->{ATTRIBUTE_VALUE}      
+    return ($res_attrib->{ATTRIBUTE_VALUE} eq $user);
+    
+}
+
 =head2 get_crl
 
 returns a CRL. The possible parameters are SERIAL, FORMAT and PKI_REALM.

@@ -421,6 +421,19 @@ sub BUILD {
                 }
             }
         },
+        'is_certificate_owner' => {
+            class  => 'Object',
+            params => {
+                IDENTIFIER => {
+                    type     => SCALAR,
+                    regex    => $re_base64_string,
+                },
+                USER => {
+                    type     => SCALAR,
+                    optional => 1 
+                }
+            }            
+        },
         'get_profile_for_cert' => {
             class  => 'Object',
             params => {
