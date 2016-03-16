@@ -1024,6 +1024,8 @@ Password that was used when the key was generated.
 
 =item * PASSOUT - the password for the exported key, default is PASSWORD
 
+B<this option not supported, yet>
+
 The password to encrypt the exported key with, if empty the input password
 is used.
 
