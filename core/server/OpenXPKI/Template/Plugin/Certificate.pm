@@ -139,6 +139,39 @@ sub issuer {
 }
 
 
+=head2 dn
+
+Returns the DN of the certificate as parsed hash, if second parameter
+is given returns the named part as string. Note: In case the named 
+property has more than one item, only the first one is returned!
+
+=cut
+
+sub dn {    
+    my $self = shift;
+    my $cert_id = shift;
+    my $component = shift; 
+        
+    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });        
+    if (!$hash) {
+        return;
+    }
+    
+    my $dn = $hash->{BODY}->{SUBJECT_HASH};    
+        
+    if (!$component) {
+        return $hash;
+    }
+    
+    if (!$dn->{$component}) {
+        return;
+    }
+     
+    return $dn->{$component}->[0];
+    
+}
+
+
 =head2 notbefore(cert_identifier)
 
 Return the notbefore date in UTC format. 
