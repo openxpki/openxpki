@@ -69,6 +69,8 @@ in the secret's 'definition to use this connector.
 The name of the secret group to load. If set to the empty string, the name
 of the group is expected as path argument.
 
+=back 
+
 =head2 Example
 
 =head3 Static secret group
