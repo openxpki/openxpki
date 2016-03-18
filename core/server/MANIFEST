@@ -380,6 +380,7 @@ OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
+OpenXPKI/Server/Workflow/Condition/IsCertificateOwner.pm
 
 #OpenXPKI/Server/Workflow/Condition/CheckExistingCertificate.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
