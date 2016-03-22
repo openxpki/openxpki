@@ -68,7 +68,6 @@ field:
         label: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION
         required: 1
-        type: text
         default: info
         type: select
         option:

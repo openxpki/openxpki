@@ -2025,20 +2025,33 @@ sub __render_fields {
                  
                 $item->{format} = 'extlink';
 
-                my $label = $item->{value};
+                my $label;
                 my $basename;
-                if ($label =~ m{ ([^\/]+(\.\w+)?) \z }xms) {
+                my $file;
+                # value can be a hash with additional properties
+                if (ref $item->{value}) {
+                    my $t = $item->{value};
+                    $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';                    
+                    $file = $t->{file};
+                    $basename = $t->{filename} if ($t->{filename});
+                    $mime = $t->{mime} if ($t->{mime}); 
+                } else {
+                    $label = $item->{value};
+                    $file = $item->{value};
+                }
+                
+                if (!$basename && $file =~ m{ ([^\/]+(\.\w+)?) \z }xms) {
                    $basename = $1; 
                 }
                 
                 my $target = $self->__persist_response({
-                    file => $item->{value},
+                    file => $file,
                     attachment =>  $basename, 
                     mime => $mime
                 });
                 
                 $item->{value}  = {
-                    label => $label,                    
+                    label => $label,
                     page => $self->_client()->_config()->{'scripturl'} . "?page=".$target
                 };
 

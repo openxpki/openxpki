@@ -52,7 +52,7 @@ connectors:
     cdp:
         class: Connector::Builtin::File::Path
         LOCATION: /tmp/
-        file: "[% ARGS.0 %].crl"
+        file: "[% ARGS.0 %].pem"
         content: "[% pem %]"
 
 

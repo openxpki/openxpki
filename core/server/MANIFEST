@@ -283,6 +283,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
+OpenXPKI/Server/Workflow/Activity/Tools/SetContextHash.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Pause.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
@@ -293,6 +294,10 @@ OpenXPKI/Server/Workflow/Activity/Tools/RevokeCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/TriggerCertificatePublish.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/RenderSubject.pm
+
+OpenXPKI/Server/Workflow/Activity/Tools/CertificateExport.pm
+OpenXPKI/Server/Workflow/Activity/Tools/ExportToFile.pm
+OpenXPKI/Server/Workflow/Activity/Tools/InjectExtraParam.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
 

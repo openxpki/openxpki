@@ -170,9 +170,9 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_DESC
         action:
-          - edit_subject > CANCEL_APPROVALS
-          - edit_san > CANCEL_APPROVALS ? profile_has_san_section
-          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section
+          - edit_subject > CANCEL_APPROVALS ? acl_can_approve
+          - edit_san > CANCEL_APPROVALS ? profile_has_san_section acl_can_approve
+          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section acl_can_approve
           - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
@@ -213,11 +213,11 @@ state:
         label:  I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC
         action:
-          - edit_subject > CANCEL_APPROVALS
-          - edit_san > CANCEL_APPROVALS ? profile_has_san_section
-          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section
+          - edit_subject > CANCEL_APPROVALS ? acl_can_approve
+          - edit_san > CANCEL_APPROVALS ? profile_has_san_section acl_can_approve
+          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section acl_can_approve
           - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
-          - global_noop > UPDATE_SUBJECT ? has_policy_violation
+          - global_noop > UPDATE_SUBJECT ? has_policy_violation acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
           - put_request_on_hold > ONHOLD ? acl_can_approve

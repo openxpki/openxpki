@@ -87,8 +87,8 @@ extensions:
     crl_distribution_points:
         critical: 0
         uri:
-            - http://localhost/cacrl.crt
-            - ldap://localhost/cn=My%20CA,dc=OpenXPKI,dc=org
+            - http://localhost/crl/[% ISSUER.CN.0 %].pem
+            - ldap://localhost/[% ISSUER.DN %]
 
     authority_info_access:
         critical: 0

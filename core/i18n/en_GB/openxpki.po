@@ -784,7 +784,7 @@ msgstr "Enter a Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_DESC"
 msgstr ""
-"This information does not go into the certificate but will assist our "
+"This information does not go into the certificate, but will assist our "
 "registration officers when validating your request."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_LABEL"

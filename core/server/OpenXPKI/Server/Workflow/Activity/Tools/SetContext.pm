@@ -23,10 +23,13 @@ sub execute
 
     ##! 1: 'start'
   
-    ##! 16: ' parameters: ' . Dumper $self->{PARAMS}
+    my $params = $self->param();
+    ##! 16: ' parameters: ' . Dumper $params
+    
+    
     
   KEY:
-    foreach my $key (keys %{$self->{PARAMS}}) {
+    foreach my $key (keys %{$params}) {
 
         ##! 16: 'Key ' . $key
     	my $value = $self->param($key);
