@@ -259,8 +259,10 @@ sub execute {
     my $challenge;
     if ($attrib{'challengePassword'}) {
         # can be utf8string or printable 
-        my $ref = $attrib{'challengePassword'};        
-        if ($ref->{'printableString'}) {
+        my $ref = $attrib{'challengePassword'};    
+        if (ref $ref eq '') {
+            $challenge = $ref; 
+        } elsif ($ref->{'printableString'}) {
             $challenge = $ref->{'printableString'};
         } elsif ($ref->{'utf8String'}) {
             $challenge = $ref->{'utf8String'};
