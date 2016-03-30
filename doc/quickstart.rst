@@ -37,16 +37,11 @@ We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires t
     echo "deb http://httpredir.debian.org/debian jessie non-free" > /etc/apt/sources.list.d/non-free.list
     aptitude update
 
-    aptitude install libapache2-mod-fastcgi
+    aptitude install libapache2-mod-fcgid
 
-Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text::
+Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text (this is usually done by the installer already)::
 
-    a2enmod fastcgi
-
-or if this does not work you can create the symlinks by hand::
-
-    ln -s /etc/apache2/mods-available/fastcgi.conf /etc/apache2/mods-enabled/fastcgi.conf
-    ln -s /etc/apache2/mods-available/fastcgi.load /etc/apache2/mods-enabled/fastcgi.load
+    a2enmod fcgid
 
 Now install the OpenXPKI core package and the translation package::
 
@@ -71,7 +66,7 @@ Now, create an empty database and assign a database user::
 ...and put the used credentials into /etc/openxpki/config.d/system/database.yaml::
 
     main:
-        debug: 0
+       debug: 0
        type: MySQL
        name: openxpki
        host: localhost
