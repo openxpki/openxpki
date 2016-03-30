@@ -193,7 +193,6 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC
         action:
-          - modify_metadata > CLEAR_APPROVALS
           - approve_csr > APPROVAL
           - disapprove > FAILURE
 
