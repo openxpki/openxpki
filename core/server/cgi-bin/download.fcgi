@@ -50,43 +50,41 @@ $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 # Set the path to the directory component of the script, this
 # automagically creates seperate cookies for path based realms
 
-my $pki_realm;
-
-if ($config{global}{realm_mode} eq "path") {
-
-    my $script_path = $ENV{'REQUEST_URI'};
-    # Strip off cgi-bin, last word of the path and discard query string
-    $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
-
-    $log->debug('script path is ' . $script_path);
-
-    # if the session has no realm set, try to get a realm from the map
-
-    # We use the last part of the script name for the realm    
-    if ($script_path =~ qq|\/([^\/]+)\$|) {
-        my $script_realm = $1;                
-        if (!$config{realm}{$script_realm}) {
-            $log->fatal('No realm for ident: ' . $script_realm );
-            die "Url based realm requested but no realm found for $script_realm!";
-        }
-        $log->debug('detected realm is ' . $config{realm}{$script_realm});
-        $pki_realm = $config{realm}{$script_realm};    
-    } else {
-        $pki_realm = shift keys %{$config{realm}};
-    }
-    
-    $log->debug('Path to realm: ' . $pki_realm );
-
-} elsif ($config{global}{realm_mode} eq "fixed") {
-    # Fixed realm mode, mode must be defined in the config
-    $pki_realm = $config{global}{realm};
-}
-
 while (my $cgi = CGI::Fast->new()) {
-
-    $log->debug('check for cgi session, fcgi pid '. $$ );
-     
+    
+    my $pki_realm;
     my $result;
+    
+    if ($config{global}{realm_mode} eq "path") {
+    
+        my $script_path = $ENV{'REQUEST_URI'};
+        # Strip off cgi-bin, last word of the path and discard query string
+        $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
+    
+        $log->debug('script path is ' . $script_path);
+    
+        # if the session has no realm set, try to get a realm from the map
+    
+        # We use the last part of the script name for the realm    
+        if ($script_path =~ qq|\/([^\/]+)\$|) {
+            my $script_realm = $1;                
+            if (!$config{realm}{$script_realm}) {
+                $log->fatal('No realm for ident: ' . $script_realm );
+                die "Url based realm requested but no realm found for $script_realm!";
+            }
+            $log->debug('detected realm is ' . $config{realm}{$script_realm});
+            $pki_realm = $config{realm}{$script_realm};    
+        } else {
+            $pki_realm = shift keys %{$config{realm}};
+        }
+        
+        $log->debug('Path to realm: ' . $pki_realm );
+    
+    } elsif ($config{global}{realm_mode} eq "fixed") {
+        # Fixed realm mode, mode must be defined in the config
+        $pki_realm = $config{global}{realm};
+    }     
+    
     eval {
         
         my $cert_identifier = $cgi->param('cert_identifier');
@@ -96,13 +94,19 @@ while (my $cgi = CGI::Fast->new()) {
             die "No cert_identifier given";
         } 
         
-        my $client = OpenXPKI::Client::Simple->new({
+        my $opts = {
             logger => $log,
             config => {
                 socket => $config{global}{socket},
-                realm => $pki_realm  
+                realm => $pki_realm
             }
-        });
+        };
+        
+        if ($config{auth} && (ref $config{auth} eq 'HASH')) {
+            $opts->{auth} = $config{auth};
+        }
+        
+        my $client = OpenXPKI::Client::Simple->new( $opts );
         
         $log->debug('Looking for certificate ' . $cert_identifier );
         
