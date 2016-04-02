@@ -66,12 +66,17 @@ sub execute {
     };
     
     if ($EVAL_ERROR) {
-        
+        my $ee = $EVAL_ERROR; 
         # Catch exception as "pause" if configured
         if ($self->param('pause_on_error')) {            
             CTX('log')->log(
                 MESSAGE  => "NICE issueCertificate failed but pause_on_error is requested ",
                 PRIORITY => 'warn',
+                FACILITY => [ 'application' ]
+            );
+            CTX('log')->log(
+                MESSAGE  => "Original error: " . $ee,
+                PRIORITY => 'error',
                 FACILITY => [ 'application' ]
             );
             $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
@@ -80,7 +85,7 @@ sub execute {
         if (my $exc = OpenXPKI::Exception->caught()) {
             $exc->rethrow();
         } else {
-            OpenXPKI::Exception->throw( message => $EVAL_ERROR );
+            OpenXPKI::Exception->throw( message => $ee  );
         }
     }
 
