@@ -1174,6 +1174,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_boolean,
                 },
+                ATTRIBUTE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             },
         },
         'get_workflow_history' => {

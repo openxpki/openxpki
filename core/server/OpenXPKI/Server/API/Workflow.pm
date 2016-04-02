@@ -95,6 +95,16 @@ Expects one of:
 
 =back
 
+You can pass certain flags to turn on/off components in the returned hash:
+
+=over 
+
+=item ATTRIBUTE
+
+Boolean, set to get the extra attributes. 
+
+=back
+
 =cut
 sub __get_workflow_ui_info {
 
@@ -167,6 +177,10 @@ sub __get_workflow_ui_info {
             REAP_AT     => $workflow->reap_at(),
             CONTEXT     => { %{$workflow->context()->param() } },
         };
+        
+        if ($args->{ATTRIBUTE}) {
+            $result->{WORKFLOW}->{ATTRIBUTE} = $workflow->attrib();
+        }
         
         $result->{HANDLES} = $workflow->get_global_actions();   
 
