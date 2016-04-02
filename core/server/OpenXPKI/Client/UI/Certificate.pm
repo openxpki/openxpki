@@ -948,7 +948,7 @@ sub action_search {
     
     # No results founds
     if (!$result_count) {
-        $self->set_status('Your query did not return any matches.','error');
+        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
         return $self->init_search({ preset => $input });
     }
     

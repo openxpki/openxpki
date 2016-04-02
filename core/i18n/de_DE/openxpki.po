@@ -30,6 +30,41 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Gültige"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+"oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_DESCRIPTION"
+msgstr "Die E-Mailadresse, welche im Zertifikat enthalten ist."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
+msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
+msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
+msgstr "Abweisen des Zertifizierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
@@ -150,6 +185,10 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "gültig"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
+msgstr "PEM (CRT) Format"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "gültig"
 
@@ -206,7 +245,35 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Textformat (txt)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_FORMAT"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -362,6 +429,10 @@ msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Die Datei konnte nicht geöffnet werden"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_BULK"
+msgstr "Benutzername"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "Erstellen von CRLs"
 
@@ -458,6 +529,44 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
+msgstr "Nutzer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
+msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+msgstr ""
+"Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt wird"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+msgstr ""
+"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+"mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+"eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+"können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
+"beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
@@ -882,6 +991,30 @@ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
 msgstr "Nutzer"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Vollständig"
 
@@ -947,6 +1080,14 @@ msgstr "Status"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
@@ -1335,6 +1476,14 @@ msgstr "Warten"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Warten"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
@@ -2725,6 +2874,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr "Ihr Name, z.B. 'Peter Müller'"
 
@@ -2835,6 +2992,14 @@ msgstr "Erstellen von CRLs"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
@@ -6591,23 +6756,7 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -7186,10 +7335,6 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_GET_CONFIG_LABEL"
 #~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_INITIALIZE_DESC"
-#~ msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_NULL1_DESC"
@@ -7798,10 +7943,6 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_DESC"
 #~ msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_LABEL"
-#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INIT_TMP_LIST_CSR_DESC"
@@ -9834,10 +9975,6 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr "SCEP-Zertifizierungsantrag"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_PROCESS_LABEL"
-#~ msgstr "Exportieren des Zertifzierungsantrages"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_TRANSFER_DESC"
 #~ msgstr "Genehmigen eines Zertifizierungsantrages"
 
@@ -10681,10 +10818,6 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_PERSIST_CSR"
 #~ msgstr "Speichern des Zertifzierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACL_REJECT_CSR"
-#~ msgstr "Abweisen des Zertifizierungsantrages"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_RETRIEVE_PASSWORD"
@@ -11678,10 +11811,6 @@ msgstr "Letzte Aktualisierung"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_CERT_EXPORT"
-#~ msgstr "Export"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_CERT_EXPORT_DESC"
 #~ msgstr "Export"
 
 #, fuzzy

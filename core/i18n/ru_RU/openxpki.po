@@ -30,6 +30,43 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
+msgstr "Утвердить заявку на отзыв сертификата (CRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_DESCRIPTION"
+msgstr ""
+"В это поле вы можете внести адрес электронной почты. Адрес электронной почты "
+"не следует включать в имя владельца сертификата. Этот адрес следует добавить "
+"в качестве альтернативного имени. Вы можете добавить к альтернативному "
+"имени  несколько  адресов, но в каждое поле формы вписывайте, пожалуйста, не "
+"более одного адреса."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
+msgstr "Отклонить заявку на сертификат"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr "Изменить дополнительную информацию"
 
@@ -150,6 +187,10 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "Действителен"
 
@@ -206,7 +247,35 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Загрузка сертификата в текстовом формате"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_FORMAT"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -364,6 +433,10 @@ msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Процесс закончился с ошибкой"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_BULK"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -454,6 +527,43 @@ msgstr "Описания пока нет"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+msgstr "TCP-порт, используемый с данным сертификатом"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
@@ -881,6 +991,30 @@ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
 msgstr "Профиль пользователя"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
+msgstr "Субъект"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
+msgstr "Статус"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Завершено"
 
@@ -948,6 +1082,14 @@ msgstr "Статус сертификата УЦ"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND"
+msgstr "Изменить дополнительную информацию"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
@@ -1338,6 +1480,14 @@ msgstr "Отозвать сертификат"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Отозвать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
@@ -2719,6 +2869,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
 
@@ -2837,6 +2995,14 @@ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
@@ -6725,23 +6891,7 @@ msgstr "Последнее обновление"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -7393,10 +7543,6 @@ msgstr "Последнее обновление"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_INITIALIZE_DESC"
-#~ msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_EXPORT_NULL1_DESC"
 #~ msgstr "Экспорт заявки на сертификат (CSR)"
 
@@ -8005,10 +8151,6 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_DESC"
 #~ msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INITIALIZE_LABEL"
-#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_INIT_TMP_LIST_CSR_DESC"
@@ -10106,10 +10248,6 @@ msgstr "Последнее обновление"
 #~ msgstr "Прием заявки по протоколу SCEP"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_PROCESS_LABEL"
-#~ msgstr "Экспорт заявки на сертификат (CSR)"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_READY_TO_TRANSFER_DESC"
 #~ msgstr "Прием заявки по протоколу SCEP"
 
@@ -10981,10 +11119,6 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_PERSIST_CSR"
 #~ msgstr "Сохранить заявку в базе данных и выдать сертификат"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACL_REJECT_CSR"
-#~ msgstr "Отклонить заявку на сертификат"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_RETRIEVE_PASSWORD"
@@ -11971,10 +12105,6 @@ msgstr "Последнее обновление"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_TYPE_CERT_EXPORT"
-#~ msgstr "Экспорт"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_TYPE_CERT_EXPORT_DESC"
 #~ msgstr "Экспорт"
 
 #, fuzzy

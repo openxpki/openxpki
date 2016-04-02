@@ -56,6 +56,9 @@ main:
   - key:   workflow!search
     label: I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH
 
+  - key:   bulk
+    label: I18N_OPENXPKI_UI_MENU_BULK
+
 tasklist:
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION
@@ -110,26 +113,116 @@ tasklist:
         - PENDING
 
 
+bulk:
+  - label: I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_LABEL
+    description: I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION
+    attributes:
+     - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
+       key: cert_subject
+       pattern: '*%s*'
+       operator: like 
+
+     - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
+       key: requestor  
+
+     - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
+       key: scep_tid 
+
+    query:
+      TYPE:
+        - certificate_signing_request_v2
+      STATE:
+        - ONHOLD
+        - PENDING
+        - PENDING_POLICY_VIOLATION
+
+    cols:
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
+        field: WORKFLOW_SERIAL
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL
+        field: WORKFLOW_LAST_UPDATE
+      - label: I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL
+        field: WORKFLOW_STATE
+      - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
+        field: context.cert_subject
+      - label: I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL
+        template: "[% context.creator %] / [% context.cert_info.requestor_email %]"
+
+    buttons:
+      -  label: I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL
+         action: workflow!bulk!wf_action!csr_approve_csr
+         format: expected
+         # this is the string used as key 
+         select: serial
+         # this is the name of the object property used as value
+         selection: wf_id
+      -  label: I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL
+         format: failure
+         action: workflow!bulk!wf_action!csr_reject
+         select: serial
+         selection: wf_id
+
+  - label: I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL
+    description: I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_DESCRIPTION
+    attributes:
+     - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
+       key: cert_subject
+       pattern: '*%s*'
+       operator: like 
+
+    query:
+      TYPE:
+        - certificate_revocation_request_v2
+      STATE:
+        - PENDING
+
+    cols:
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
+        field: WORKFLOW_SERIAL
+      - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL
+        field: WORKFLOW_LAST_UPDATE
+      - label: I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL
+        field: WORKFLOW_STATE
+      - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
+        template: "[% USE Certificate %][% Certificate.dn(context.cert_identifier,'CN') %]"
+      - label: I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL
+        field: context.creator
+
+    buttons:
+      -  label: I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL
+         action: workflow!bulk!wf_action!crr_approve_crr
+         format: expected
+         # this is the string used as key 
+         select: serial
+         # this is the name of the object property used as value
+         selection: wf_id
+      -  label: I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL
+         format: failure
+         action: workflow!bulk!wf_action!crr_reject_crr
+         select: serial
+         selection: wf_id
+         
+         
 wfsearch:
-   - label: Certificate Subject
+   - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
      key: cert_subject
      pattern: '*%s*'
      operator: like 
 
-   - label: Requestor
-     key: requestor  
+   - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
+     key: requestor
 
    
-   - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
+   - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
      key: scep_tid 
 
 
 certsearch:
-   - label: Requestor Name
+   - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
      key: meta_requestor
      pattern: '*%s*'
      operator: like 
 
-   - label: Requestor eMail
+   - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL
      key: meta_email
 

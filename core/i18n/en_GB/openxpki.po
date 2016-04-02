@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-02-29 11:43+0100\n"
+"PO-Revision-Date: 2016-04-02 12:00+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -27,6 +27,30 @@ msgstr "Unknown application error"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Backend session terminated - please re-login"
+
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
+msgstr "Approve Revocation"
+
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL"
+msgstr "Approve Request"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
+msgstr "Bulk approve or reject outstanding certificate signing requests."
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_LABEL"
+msgstr "Certificate Signing Requests"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_DESCRIPTION"
+msgstr "Bulk approve or reject outstanding certificate revocation requests."
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
+msgstr "Certificate Revocation Requests"
+
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
+msgstr "Reject Selected"
+
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
+msgstr "Reject Selected"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
@@ -126,6 +150,9 @@ msgstr "Revoked"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valid"
+
+msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
+msgstr "Click here to download."
 
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "show older revocation lists"
@@ -294,6 +321,10 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Login with the given credentials failed!"
 
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_BULK"
+msgstr "Bulk Approve/Reject"
+
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "CA Certificates"
 
@@ -367,6 +398,38 @@ msgstr "This page shows a list of all workflows started by you."
 
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "My Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+msgstr "FAILURE"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+msgstr "Process Information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+msgstr "OpenVPN client profile for natural persons."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+msgstr "OpenVPN client profile for people"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
+msgstr "Process Information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
+msgstr "Process Information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+msgstr "Password"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
@@ -622,6 +685,21 @@ msgstr "2 years"
 msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
 msgstr "3 years"
 
+msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
+msgstr "Certificate Subject"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
+msgstr "Your query did not return any matches!"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
+msgstr "Requestor Email"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
+msgstr "Requestor"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
+msgstr "SCEP Transaction Id"
+
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Ready"
 
@@ -669,6 +747,12 @@ msgstr "upcoming"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
+
+msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
+msgstr "User is not the certificate owner!"
+
+msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND"
+msgstr "Certificate has no owner."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
 msgstr "Certificate is not an entity certificate."
@@ -1012,6 +1096,14 @@ msgstr "Issue certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Issue"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+msgstr "Export initial state"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+msgstr "Message of the Day"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
 msgstr ""
@@ -2101,6 +2193,14 @@ msgstr "Metadata was updated"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "This workflow is in a final state and can not be restarted."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+msgstr "SUCCESS"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr ""
 "Please push the 'generate code' button to create a set of activation codes. "
@@ -2198,6 +2298,14 @@ msgstr "CRL Issuance"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+msgstr "Certificate Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
+msgstr "Certificate Export"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""

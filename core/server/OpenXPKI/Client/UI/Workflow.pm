@@ -5,7 +5,6 @@
 package OpenXPKI::Client::UI::Workflow;
 
 use Moose;
-use OpenXPKI::Template;
 use Data::Dumper;
 use Date::Parse;
 
@@ -668,44 +667,9 @@ sub init_task {
         }
 
         # create the header from the columns spec
-        my @header;
-        my @column;
-        my $wf_info_required = 0;
-        my $tt;
-
-        for (my $ii = 0; $ii < scalar @cols; $ii++) {
-            # we must create a copy as we change the hash in the session info otherwise
-            my %col = %{$cols[$ii]};
-            my $head = { sTitle => $col{label} };
-            if ($col{sortkey}) {
-                $head->{sortkey} = $col{sortkey};
-            }
-            push @header, $head; 
-
-            if ($col{template}) {
-                $wf_info_required = 1;
-                $tt = Template->new() unless($tt);
-
-            } elsif ($col{field} =~ m{\A (context|attribute)\.(\S+) }xi) {
-                $wf_info_required = 1;
-                # we use this later to avoid the pattern match
-                $col{source} = $1;
-                $col{field} = $2;
-
-            } else {
-                $col{source} = 'workflow';
-                $col{field} = uc($col{field})
-
-            }
-            push @column, \%col;
-        }
-
-        push @header, { sTitle => 'serial', bVisible => 0 };
-        push @header, { sTitle => "_className"};
-
-        push @column, { source => 'workflow', field => 'WORKFLOW_SERIAL' };
-
-        $self->logger()->debug( "columns : " . Dumper \@column);
+        my ($header, $column) = $self->__render_list_spec( \@cols );
+        
+        $self->logger()->debug( "columns : " . Dumper $column);
 
         my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => $limit), %$query } );
 
@@ -723,7 +687,7 @@ sub init_task {
             
         } else {
     
-            @data = $self->__render_result_list( $search_result, \@column );
+            @data = $self->__render_result_list( $search_result, $column );
             
             $self->logger()->trace( "dumper result: " . Dumper @data);
         
@@ -738,7 +702,7 @@ sub init_task {
                     'type' => 'workflow',
                     'count' => $result_count,
                     'query' => $query,
-                    'column' => \@column
+                    'column' => $column
                 };
                 $self->_client->session()->param('query_wfl_'.$queryid, $_query );
                 $pager = $self->__render_pager( $_query, { limit => $limit } );
@@ -756,7 +720,7 @@ sub init_task {
                     path => 'redirect!workflow!load!wf_id!{serial}',
                     icon => 'view',
                 }],
-                columns => \@header,
+                columns => $header,
                 data => \@data,
                 pager => $pager,
                 empty => $empty,
@@ -1120,7 +1084,7 @@ sub action_search {
 
     # No results founds
     if (!$result_count) {
-        $self->set_status('Your query did not return any matches.','error');
+        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
         return $self->init_search({ preset => $input });
     }
 
@@ -1823,7 +1787,6 @@ sub __render_result_list {
     $self->logger()->debug("search result " . Dumper $search_result);
 
     my @result;
-    my $oxtt = OpenXPKI::Template->new();
 
     foreach my $wf_item (@{$search_result}) {
 
@@ -1850,7 +1813,7 @@ sub __render_result_list {
 
             # we need to load the wf info
             if (!$wf_info && ($col->{template} || $col->{source} ne 'workflow')) {
-                $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'WORKFLOW.WORKFLOW_SERIAL'} });
+                $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'WORKFLOW.WORKFLOW_SERIAL'}, ATTRIBUTE => 1 });
                 $self->logger()->debug( "fetch wf info : " . Dumper $wf_info);
                 $context = $wf_info->{WORKFLOW}->{CONTEXT};
                 $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};
@@ -1863,8 +1826,8 @@ sub __render_result_list {
                     attribute => $attrib,
                     workflow => $wf_info->{WORKFLOW}
                 };
-
-                push @line, $oxtt->render( $col->{template}, $ttp);
+                push @line, $self->send_command( 'render_template', { TEMPLATE => $col->{template}, PARAMS => $ttp } );
+                 
             } elsif ($col->{source} eq 'workflow') {
 
                 # Special handling of the state field
@@ -1891,7 +1854,7 @@ sub __render_result_list {
                 push @line, $context->{ $col->{field} };
             } elsif ($col->{source} eq 'attribute') {
                 # to be implemented if required
-
+                push @line, $attrib->{$col->{field}}
             } else {
                 # hu ?
             }
@@ -1915,6 +1878,54 @@ sub __render_result_list {
 
 }
 
+=head2 __render_list_head
+
+=cut 
+
+sub __render_list_spec {
+
+    my $self = shift;
+    my $cols = shift;
+    
+    my @header;
+    my @column;
+    
+    for (my $ii = 0; $ii < scalar @{$cols}; $ii++) {
+        
+        # we must create a copy as we change the hash in the session info otherwise
+        my %col = %{$cols->[$ii]};
+        my $head = { sTitle => $col{label} };
+        if ($col{sortkey}) {
+            $head->{sortkey} = $col{sortkey};
+        }
+        push @header, $head; 
+
+        if ($col{template}) {
+
+        } elsif ($col{field} =~ m{\A (context|attribute)\.(\S+) }xi) {
+            # we use this later to avoid the pattern match
+            $col{source} = $1;
+            $col{field} = $2;
+
+        } else {
+            $col{source} = 'workflow';
+            $col{field} = uc($col{field})
+
+        }
+        push @column, \%col;
+    }
+
+    push @header, { sTitle => 'serial', bVisible => 0 };
+    push @header, { sTitle => "_className"};
+
+    push @column, { source => 'workflow', field => 'WORKFLOW_SERIAL' };
+    
+    return ( \@header, \@column );
+}
+
+=head2 __render_fields 
+
+=cut
 sub __render_fields {
     
     my $self = shift;
