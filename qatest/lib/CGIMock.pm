@@ -27,10 +27,31 @@ sub param {
         return $val;
     }
     if (wantarray) {
+        warn "param in array context is deprecated - use multi_param";
         return keys %{$self->data()};    
     }
     return $self->data();
 
+}
+
+sub multi_param {
+    
+    my $self = shift;
+    my $name = shift;
+    
+    if (!wantarray) {
+        die "multi_param must not be used outside array context";    
+    }    
+     
+    if ($name) {
+        my $val = $self->data()->{$name};
+        if (!$val) { return (); }
+        if (ref $val ne 'ARRAY') {
+            die "Requested value is not an array!"
+        }
+        return @{$val};
+    }   
+    return keys %{$self->data()};   
 }
 
 sub url_param {

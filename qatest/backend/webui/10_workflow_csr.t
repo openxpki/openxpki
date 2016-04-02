@@ -66,7 +66,7 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'www.example.de',
-    'cert_subject_parts{hostname2}[]' => 'www.example.com',
+    'cert_subject_parts{hostname2}[]' => ['www.example.com'],
     'wf_token' => undef
 });
 
