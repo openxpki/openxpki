@@ -382,7 +382,6 @@ OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContext.pm
 OpenXPKI/Server/Workflow/Condition/IsCertificateOwner.pm
 
-#OpenXPKI/Server/Workflow/Condition/CheckExistingCertificate.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowContextBulk.pm
 
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
@@ -390,7 +389,6 @@ OpenXPKI/Server/Workflow/Condition/WFHash.pm
 OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 
 OpenXPKI/Server/Workflow/Condition/CertificateHasStatus.pm
-OpenXPKI/Server/Workflow/Condition/MaxIterationsNotReached.pm
 OpenXPKI/Server/Workflow/Condition/SubjectMatchesPKCS10.pm
 
 OpenXPKI/Server/Workflow/Condition/Connector/Exists.pm
@@ -403,8 +401,6 @@ OpenXPKI/Server/Workflow/Condition/Smartcard/AuthIdValid.pm
 
 OpenXPKI/Server/Workflow/Validator.pm
 OpenXPKI/Server/Workflow/Validator/ApprovalSignature.pm
-OpenXPKI/Server/Workflow/Validator/Creator.pm
-OpenXPKI/Server/Workflow/Validator/CertProfile.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
 OpenXPKI/Server/Workflow/Validator/KeyLength.pm

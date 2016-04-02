@@ -46,8 +46,11 @@ sub evaluate {
 
     # Keep track of count in num_tries 
     my ($num_tries) = $context->param('num_tries');
-    $num_tries++;    
-    $context->param( 'num_tries',      $num_tries );
+    $num_tries++;
+    
+    # @todo: manipulation the context is not allowed!
+    # need refactoring of the pin unblock workflow    
+    $context->param( 'num_tries', $num_tries );
 
     my %tmp = ();
     foreach (qw( _auth1_code _auth2_code )) {
