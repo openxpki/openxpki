@@ -1,1 +1,11 @@
 .DS_Store
+*~
+*.patch
+doc.html/
+doc/_build/
+doc/_themes/
+core/server/Makefile
+core/i18n/VERSION
+core/i18n/*/openxpki.mo
+core/i18n/openxpki.pot
+
