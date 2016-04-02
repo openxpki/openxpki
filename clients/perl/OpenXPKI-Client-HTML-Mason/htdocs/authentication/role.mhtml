@@ -1,9 +1,0 @@
-<%args>
-    $msg             => undef
-</%args>
-<%init>
-  return if (! defined $msg ||
-      (exists $msg->{SERVICE_MSG} && $msg->{SERVICE_MSG} ne "SERVICE_READY"));
-  my $api = $context->{client}->get_API();
-  $context->{role} = $api->get_role()->{PARAMS};
-</%init>

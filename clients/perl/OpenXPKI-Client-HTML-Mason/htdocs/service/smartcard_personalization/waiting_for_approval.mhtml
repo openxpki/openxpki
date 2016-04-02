@@ -1,9 +1,0 @@
-%    my $params = '';
-%    my %hash = $context->{menu}->get_menu_hash();
-%    foreach my $key (keys %hash)
-%    {
-%          $params .= $key . '=' . $hash{$key} . '&';
-%    }
-<meta http-equiv="refresh" content="600;url=index.html?<% $params %>">
-<H1>I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_APPROVAL_TITLE</H1>
-<p>I18N_OPENXPKI_HTML_MASON_SMARTCARD_WAITING_FOR_APPROVAL_DESC</p>

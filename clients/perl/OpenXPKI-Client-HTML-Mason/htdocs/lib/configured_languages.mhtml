@@ -1,8 +1,0 @@
-<%init>
-    if (exists $ENV{'OPENXPKI_LANGUAGES'}) {
-        return split q{,}, $ENV{'OPENXPKI_LANGUAGES'};
-    }
-    else {
-        return ();
-    }
-</%init>
