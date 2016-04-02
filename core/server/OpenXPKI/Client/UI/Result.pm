@@ -249,7 +249,7 @@ sub param {
 
         # We need to fetch from cgi as array for multivalues
         if (wantarray) {
-            my @raw = $cgi->param($key);
+            my @raw = $cgi->multi_param($key);
             @raw = map { $_ =~ s/^\s+|\s+$//g; decode utf8 => $_ } @raw if(defined $raw[0]);
             return @raw;
         }
@@ -616,7 +616,7 @@ Generate a random uid (base64 encoded with dangerours chars removed)
 =cut
 sub __generate_uid {
 
-    my $self; 
+    my $self = shift; 
     my $queryid = sha1_base64(time.rand().$$);
     $queryid =~ s{[+/]}{}g;
     return $queryid; 
