@@ -15,7 +15,7 @@ sub validate {
        $errors  = [] if (not defined $errors);
 
     if ($time !~ m{\A [0-9]{14} \z}xms) {
-        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_FORMAT',
+        push @{$errors}, [ 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_FORMAT',
                          {TIME => $time} ];
         $context->param ("__error" => $errors);
         CTX('log')->log(
@@ -33,7 +33,7 @@ sub validate {
                        ([0-9]{2})
                        ([0-9]{2}) }xms);
     if ($month > 12 || $day > 31 || $hour > 23 || $minute > 59 || $seconds > 59) {
-        push @{$errors}, [ 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_VALIDITYTIME_INVALID_CONTENT',
+        push @{$errors}, [ 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT',
                          {TIME => $time} ];
         $context->param ("__error" => $errors);
         CTX('log')->log(

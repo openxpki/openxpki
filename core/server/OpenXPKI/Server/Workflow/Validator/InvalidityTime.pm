@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Validator::InvalidityTime
-# Written by Alexander Klink for the OpenXPKI project 2007
-# Copyright (c) 2007 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Validator::InvalidityTime;
 
 use strict;
@@ -23,7 +19,7 @@ sub validate {
     my $flag_delayed_revoke = $context->param('flag_delayed_revoke');
     if (! $identifier =~ m{ [a-zA-Z\-_]+ }xms) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
+            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
 	    log => {
 		logger => CTX('log'),
 		priority => 'warn',
@@ -53,7 +49,7 @@ sub validate {
     );
     if (! defined $cert) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB',
+            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB',
 	    log => {
 		logger => CTX('log'),
 		priority => 'warn',
@@ -68,7 +64,7 @@ sub validate {
 
     if ($invalidity_time < $notbefore) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE',
+            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE',
 	    log => {
 		logger => CTX('log'),
 		priority => 'warn',
@@ -79,7 +75,7 @@ sub validate {
     }
     if ($invalidity_time > $notafter) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER',
+            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER',
 	    log => {
 		logger => CTX('log'),
 		priority => 'warn',
@@ -91,7 +87,7 @@ sub validate {
     # We accept delayed requests if the "delayed_revoke" flag is set  
     if ($invalidity_time > ($now + 60) && not $flag_delayed_revoke) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_IN_FUTURE',
+            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE',
 	    log => {
 		logger => CTX('log'),
 		priority => 'warn',
@@ -112,14 +108,26 @@ OpenXPKI::Server::Workflow::Validator::InvalidityTime
 
 =head1 SYNOPSIS
 
-<action name="create_crr">
-  <validator name="invalidity_time"
-           class="OpenXPKI::Server::Workflow::Validator::InvalidityTime">
-  </validator>
-</action>
+  action:
+      class: OpenXPKI::Server::Workflow::Validator::InvalidityTime
+  
 
 =head1 DESCRIPTION
 
 This validator checks whether a given invalidity time is valid
 for a certificate, i.e. it is not in the future and within the
-the certificate validity time.
+the certificate validity time. It uses the predefined context items: 
+
+=over 
+
+=item cert_identifier
+
+=item invalidity_time
+
+The invalidity time, format must be epoch!
+
+= flag_delayed_revoke
+
+If set, a validity time in the future is considered valid.
+
+=back

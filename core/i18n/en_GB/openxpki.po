@@ -169,8 +169,30 @@ msgstr "PEM (CRT)"
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Download text (TXT) format"
 
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
+msgstr "The entered invalidity time is after the certificates expiration date!"
+
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE"
+msgstr ""
+"The entered invalidity time is earlier than  the certificates notbefore date!"
+
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB"
+msgstr "The certificate given as reference was not found."
+
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
+msgstr "The given certificate identifier has an invalid format."
+
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE"
+msgstr "The entered invalidity time is in the future."
+
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_FAILED"
 msgstr "The entered date/time could not be validated."
+
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_CONTENT"
+msgstr "The entered invalidity time has invalid content."
+
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_FORMAT"
+msgstr "The entered invalidity time has invalid format."
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_INVALID_NOTAFTER"
 msgstr "The entered notafter date could not be validated."
