@@ -97,6 +97,7 @@ sub update_workflow {
 	   WATCHDOG_KEY         => '__CATCHME', 
 	);
     
+    ##! 64: 'WF Info ' . Dumper \%data
     
     ##! 2: "check if the workflow is in the database"
 
@@ -124,12 +125,11 @@ sub update_workflow {
     {
 	
         ##! 4: "we cannot get the workflow so we try to create it"
-        $data{PKI_REALM}          = CTX('session')->get_pki_realm();
+        $data{PKI_REALM}       = CTX('session')->get_pki_realm();
         $data{WORKFLOW_TYPE}   = $workflow->type();
         $data{WORKFLOW_SERIAL} = $id;
         
-
-        ##! 1: "inserting data into workflow table"
+        ##! 16: "inserting data into workflow table"
         $dbi->insert(
             TABLE => 'WORKFLOW',
             HASH  => \%data,
@@ -155,6 +155,13 @@ sub update_workflow {
             },
         );
         ##! 128: 'update done'
+    }
+    
+    # Do not persist context while we are doing "overhead" 
+    if (!$workflow->persist_context()) {
+        ##! 16: 'Workflow not executing - skip context'
+        $dbi->commit();
+        return 2;
     }
     
     # ... and write new context / update it
@@ -281,8 +288,7 @@ sub fetch_workflow {
     my $self = shift;
     my $id   = shift;
 
-    ##! 1: "fetch_workflow"
-    ##! 1: "workflow id: $id"
+    ##! 1: "fetch_workflow id: $id"
 
     my $dbi = CTX('dbi_workflow');
 
@@ -338,7 +344,7 @@ sub fetch_workflow {
 	       context     => OpenXPKI::Workflow::Context->new()
 	   };
     
-    ##! 1: "return ".Dumper($return);
+    ##! 64: "return ".Dumper($return);
     
     return $return;
 }

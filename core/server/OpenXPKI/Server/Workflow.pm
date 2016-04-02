@@ -19,7 +19,7 @@ use OpenXPKI::DateTime;
 
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info) );
+__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context) );
 
 my $default_reap_at_interval = '+0000000005';
 
@@ -61,13 +61,15 @@ sub init {
 
     my ( $self, $id, $current_state, $config, $wf_state_objects, $factory ) = @_;
 
+    $self->persist_context(0);
+
     $self->SUPER::init( $id, $current_state, $config, $wf_state_objects, $factory );
 
     $self->{_CURRENT_ACTION} = '';
 
     my $proc_state = 'init';
     my $count_try =  0;
-
+    
     # For existing workflows - check for the watchdog extra fields
     if ($id) {
         my $persister = $self->_factory()->get_persister( $config->{persister} );
@@ -83,11 +85,7 @@ sub init {
 
     ##! 16: 'count try: '.$count_try
     $self->count_try( $count_try );
-    $self->proc_state($proc_state);
-
-    if($proc_state eq 'init'){
-        $self->_set_proc_state( $proc_state ); #saves wf state to DB
-    }
+    $self->proc_state( $proc_state );
 
     return $self;
 }
@@ -103,12 +101,12 @@ sub context {
 }
 
 
-
 sub execute_action {
+    
     my ( $self, $action_name, $autorun ) = @_;
     ##! 1: 'execute_action '.$action_name
 
-     $self->set_reap_at_interval($default_reap_at_interval);
+    $self->persist_context(0);
 
     my $session =  CTX('session');
     my $session_info = $session->export_serialized_info();
@@ -127,14 +125,16 @@ sub execute_action {
     #check and handle current proc_state:
     $self->_handle_proc_state($action_name);
 
-    my $reap_at_interval = (blessed( $action ) && $action->isa('OpenXPKI::Server::Workflow::Activity'))?
-                               $action->get_reap_at_interval()
-                            :  $default_reap_at_interval;
+    my $reap_at_interval = $default_reap_at_interval;
+    if (blessed( $action ) && $action->isa('OpenXPKI::Server::Workflow::Activity')) {
+        $reap_at_interval = $action->get_reap_at_interval();
+    }
 
-    $self->set_reap_at_interval($reap_at_interval);
+    # skip auto-persist as this will happen on next call anyway
+    $self->set_reap_at_interval($reap_at_interval, 1); 
 
     ##! 16: 'set proc_state "running"'
-    $self->_set_proc_state('running'); # saves wf state and other infos to DB
+    $self->_set_proc_state('running'); # writes workflow metadata
 
     CTX('log')->log(
         MESSAGE  => "Execute action $action_name on workflow #" . $self->id,
@@ -148,23 +148,35 @@ sub execute_action {
 
     my $e;
 
-    eval{
-        $state = $self->SUPER::execute_action( $action_name, $autorun );
+    $self->persist_context(1);
+    ##! 16: 'Run super::execute_action'
+    eval{        
+        $state = $self->SUPER::execute_action( $action_name, $autorun );        
     };
+        
+    ##! 16: 'super::execute_action returned'
 
     # As pause comes up with an exception we can never have pause + an extra exception
     # so we just ignore any expcetions here
     if ($self->_has_paused()) {
+        ##! 16: 'action paused'
         # noop
     } elsif( $EVAL_ERROR ) {
 
         my $error = $EVAL_ERROR;
 
+        ##! 16: 'action failed with error: ' .$error 
         # Check for validation errors (dont set the workflow to exception)
         if (ref $error eq 'Workflow::Exception::Validation') {
+            
+            # We reset the flag to prevent the context to be persisted
+            # when we reset the status now, see #236
+            $self->persist_context(0);    
+            
+            ##! 32: 'validator exception: ' . Dumper $error
             # Set workflow status to manual
             $self->_set_proc_state( 'manual' );
-            ##! 32: 'validator exception: ' . Dumper $error
+
             my $invalid_fields = $error->{invalid_fields} || {};
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE",
@@ -193,7 +205,9 @@ sub execute_action {
             $e->rethrow;
         }
 
-
+        # Note: This will also persist the context in the "broken" state!
+        # This is reasonable as we might otherwise loose information on
+        # things which have been done in the meantime  
         $self->_proc_state_exception($error);
 
         # Look into the workflow definiton weather to autofail
@@ -416,8 +430,17 @@ sub pause {
     );
 }
 
-sub set_reap_at_interval{
-    my ($self, $interval) = @_;
+
+=head2 set_reap_at_interval
+
+Set the given argument as reap_at time in the database, calls the 
+persister if the workflow is already in run state. The interval must
+be in relativedate format (@see OpenXPKI::DateTime). Auto-Persist 
+can be skipped by passing a true value as second argument.    
+
+=cut
+sub set_reap_at_interval {
+    my ($self, $interval, $bNoSave) = @_;
 
     ##! 16: sprintf('set retry interval to %s',$interval )
 
@@ -429,8 +452,8 @@ sub set_reap_at_interval{
         )->epoch();
 
     $self->reap_at($reap_at);
-    #if the wf is already running, immediately save data to db:
-    $self->_save() if $self->is_running();
+    # if the wf is already running, immediately save data to db:
+    $self->_save() if (!$bNoSave && $self->is_running());
 }
 
 =head2 get_global_actions
@@ -521,7 +544,6 @@ sub _handle_proc_state{
         );
         $self->_runtime_exception($action_name);
     }else{
-
         OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE_ACTION",
                 params  => {DESCRIPTION => sprintf('unkown action "%s" for proc-state: %s',$action_needed, $self->proc_state)}
@@ -546,6 +568,7 @@ sub _wake_up {
             )
         );
         $self->_set_proc_state('wakeup');#saves wf data
+        $self->context->param( wf_pause_msg => '' );
         $action->wake_up($self);
     };
     if ($EVAL_ERROR) {
@@ -624,17 +647,13 @@ sub _set_proc_state{
     ##! 20: sprintf('_set_proc_state from %s to %s, Wfl State: %s', $self->proc_state(), $proc_state, $self->state());
 
     if(!$known_proc_states{$proc_state}){
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE",
-                params  => {DESCRIPTION => sprintf('unkown proc-state: %s',$proc_state)}
-            );
-
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE",
+            params  => {DESCRIPTION => sprintf('unkown proc-state: %s',$proc_state)}
+        );
     }
 
     $self->proc_state($proc_state);
-    # save current proc-state immediately to DB
-    # This also persists the (invalid) context of the current transaction
-    # into the database which should not be, see #236
     $self->_save();
 
 }
@@ -642,8 +661,6 @@ sub _set_proc_state{
 sub _proc_state_exception {
     my $self      = shift;
     my $error = shift;
-
-
 
     my ($error_code, $error_msg,  $next_proc_state);
 
@@ -752,14 +769,11 @@ sub _save{
     # parameters and we will get tons of init/exception entries
     my $proc_state = $self->proc_state;
 
-    # TODO - the state on the base Workflow seems to have some "lag" and sticks in INITIAL
-    # even if the excpetion is somewhere later. Should be gone after moving to direct subclassing
     if ($self->state() eq 'INITIAL' &&
-        ($proc_state eq 'init' || $proc_state eq'exception' )) {
-
+        ($proc_state eq 'init' || $proc_state eq 'running' || $proc_state eq 'exception' )) {
          CTX('log')->log(
             MESSAGE  => "Workflow save requested during startup - wont save! ($proc_state)",
-            PRIORITY => "debug",
+            PRIORITY => "trace",
             FACILITY => ["workflow","application"]
         );
         ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
