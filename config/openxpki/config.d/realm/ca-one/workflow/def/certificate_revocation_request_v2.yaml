@@ -69,7 +69,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC
         action:
-          - create_crr > CHECK_BATCHMODE
+          - create_crr set_workflow_attributes > CHECK_BATCHMODE
 
     NICE_DISPATCH_REVOKE:
         autorun: 1
@@ -218,6 +218,11 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         param:
             message: crr_pending_approval
+
+    set_workflow_attributes:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        param:
+           _map_cert_subject: "[% USE Certificate %][% Certificate.body(context.cert_identifier, 'subject') %]"
 
     submit:
         class: OpenXPKI::Server::Workflow::Activity::Noop
