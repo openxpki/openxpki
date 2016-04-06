@@ -1186,7 +1186,7 @@ sub action_bulk {
             }
         });
     } else {
-        $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS', 'level' => 'error' });
+        $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS', 'level' => 'success' });
     }
     
     if (@success) {
