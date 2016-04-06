@@ -923,11 +923,11 @@ sub select {
             if (ref $args->{DYNAMIC}->{$dynamic_key} ne 'HASH') {
                 ##! 1: ' UPDATE WARNING - autoconverting to new syntax, please fix! Key: ' .  $dynamic_key . ' - Dump ' . Dumper $args->{DYNAMIC}->{$dynamic_key}
                 $args->{DYNAMIC}->{$dynamic_key} = { VALUE => $args->{DYNAMIC}->{$dynamic_key} };
-                CTX('log')->log(
-                    MESSAGE  => "Old SQL DYNAMIC Syntax found - please fix!",
-                    PRIORITY => 'debug',
-                    FACILITY => 'system',
-                );
+                #CTX('log')->log(
+                #    MESSAGE  => "Old SQL DYNAMIC Syntax found - please fix!",
+                #    PRIORITY => 'debug',
+                #    FACILITY => 'system',
+                #);
             }
 
             # check the structure
