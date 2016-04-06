@@ -30,8 +30,9 @@ sub execute {
             MESSAGE => 'Prepate fork of inline workflow, id ' . $workflow->id,
             PRIORITY => 'info',
             FACILITY => [ 'workflow' ],
-        );        
-        $self->pause();
+        );
+        my $reason = $self->param('pause_info') || ''; 
+        $self->pause( $reason );
     }
     ##! 8: 'Resumed'
     CTX('log')->log(
@@ -57,3 +58,13 @@ from the current process and continue in the background.
 If invoked the first time, it just calls pause, the workflow
 gets picked up by the watchdog and is resumed.
  
+=head2 Activity parameters
+
+=over
+
+=item pause_info
+
+A string that is set as initial "pause reason". This is visible to the user 
+until the watchdog picks up the process and continues.
+
+=back
