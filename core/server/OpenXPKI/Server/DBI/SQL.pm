@@ -1179,9 +1179,9 @@ sub select {
         }
 
         if ( $args->{REVERSE} ) {
-            $query .= ' ORDER BY ' . join( ' DESC, ', reverse @real_order ) . ' DESC';
+            $query .= ' ORDER BY ' . join( ' DESC, ', @real_order ) . ' DESC';
         } else {
-            $query .= ' ORDER BY ' . join( ', ', reverse @real_order );
+            $query .= ' ORDER BY ' . join( ', ', @real_order );
         }
     }
 
