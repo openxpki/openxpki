@@ -1252,7 +1252,6 @@ sub BUILD {
                 ID => {
                     type     => SCALAR,
                     regex    => $re_integer_string,
-                    optional => 1,
                 },
                 REASON => {
                     type  => SCALAR,
@@ -1264,6 +1263,34 @@ sub BUILD {
                     regex => $re_alpha_string,
                     optional => 1,
                 },
+            },
+        },
+        'wakeup_workflow' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
+                ID => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                }
+            },
+        },
+        'resume_workflow' => {
+            class  => 'Workflow',
+            params => {
+                WORKFLOW => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
+                ID => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                }
             },
         },
         'get_workflow_activities' => {

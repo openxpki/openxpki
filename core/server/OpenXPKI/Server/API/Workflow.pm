@@ -374,9 +374,98 @@ sub fail_workflow {
     if (!$reason) { $reason = 'userfail'; }
     
     $workflow->set_failed( $error, $reason );
+        
+    CTX('log')->log(
+        MESSAGE  => "Failed workflow $wf_id (type '$wf_title') with error $error",
+        PRIORITY => 'info',
+        FACILITY => 'workflow',
+    );
     
     return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
     
+}
+
+=head2 wakeup_workflow 
+
+Only valid if the workflow is in pause state, reads the last action from
+the history and reruns it. This method is also used by the watchdog.
+
+=cut
+sub wakeup_workflow {
+    
+    my $self  = shift;
+    my $args  = shift;
+
+    ##! 1: "wakeup_workflow_activity"
+
+    my $wf_title  = $args->{WORKFLOW};
+    my $wf_id     = $args->{ID};
+    
+    if (! defined $wf_title) {
+        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
+    }
+
+    CTX('dbi_workflow')->commit();
+    
+    ##! 2: "load workflow"
+    my $factory = __get_workflow_factory({
+        WORKFLOW_ID => $wf_id,
+    });
+    
+    my $workflow = $factory->fetch_workflow(
+        $wf_title,
+        $wf_id
+    );
+    
+    if ($workflow->proc_state() ne 'pause') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_WAKEUP_NOT_IN_PAUSE',
+            params => { ID => $wf_id, PROC_STATE => $workflow->proc_state() }
+        );
+    }
+    
+    $workflow->reload_observer();
+    
+    # pull off the latest action from the history    
+    my $history = CTX('dbi_workflow')->first(        
+        TABLE => 'WORKFLOW_HISTORY',
+        DYNAMIC => {
+            WORKFLOW_SERIAL => {VALUE => $wf_id},
+        },
+        ORDER => [ 'WORKFLOW_HISTORY_DATE', 'WORKFLOW_HISTORY_SERIAL' ],
+        REVERSE => 1,
+    ); 
+    
+    my $wf_activity = $history->{WORKFLOW_ACTION};
+    
+    $self->__execute_workflow_activity( $workflow, $wf_activity );
+
+    CTX('log')->log(
+        MESSAGE  => "Wakeup workflow $wf_id (type '$wf_title') with activity $wf_activity",
+        PRIORITY => 'info',
+        FACILITY => 'workflow',
+    );
+    
+    return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
+    
+}
+
+
+=head2 wakeup_workflow 
+
+Only valid if the workflow is in pause state, does a wakeup in the same way
+the watchdog would do.
+
+=cut
+sub resume_workflow {
+    
+    my $self  = shift;
+    my $args  = shift;
+    
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_RESUME_NOT_IMPLEMENTED',
+        #params => { ID => $wf_id, PROC_STATE => $workflow->proc_state() }
+    );
 }
 
 sub get_workflow_activities_params {
