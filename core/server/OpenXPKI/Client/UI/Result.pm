@@ -132,12 +132,26 @@ sub set_status {
 
 }
 
+=head2 send_command
+
+Expects the name of the command as first and the parameter hash as second
+argument. Sends the named command to the backend and returned the result.
+If the command does not success, set_status_from_error_reply is called 
+and undef is returned. In case the command was a workflow action and the
+backend reports a validation error, the error from the validator is set 
+as status.
+
+If you set a true value for the third parameter, the global status is 
+B<not> set if an error occurs.
+
+=cut
 
 sub send_command {
 
     my $self = shift;
     my $command = shift;
     my $params = shift || {};
+    my $nostatus = shift || 0;
 
     my $backend = $self->_client()->backend();
     my $reply = $backend->send_receive_service_msg(
@@ -158,7 +172,7 @@ sub send_command {
             $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
             $self->logger()->error("Input validation error on fields ". join ",", @fields);
             $self->logger()->debug('validation details' . Dumper $field_errors );
-        } else {
+        } elsif (!$nostatus) {
             $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
             $self->logger()->debug("command reply ". Dumper $reply);
             $self->set_status_from_error_reply( $reply );
