@@ -389,18 +389,24 @@ sub init_detail {
         shortlabel => $dn{CN}[0]
     });
 
+
+    my @fields = ( { label => 'Subject', value => $cert->{SUBJECT} } );
+        
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
     if ($cert->{CSR_SERIAL} && $cert->{PKI_REALM} eq $self->_session->param('pki_realm')) {
         $self->logger()->debug("cert is local entity");
         $is_local_entity = 1;
     }
+    
+    if ($is_local_entity) {
+        my $cert_profile  = $self->send_command( 'get_profile_for_cert', {  IDENTIFIER => $cert_identifier }, 1);
+        if ($cert_profile) {
+            push @fields, { label => 'Profile', value => $cert_profile };    
+        }   
+    }
 
-    my $cert_profile  = $self->send_command( 'get_profile_for_cert', {  IDENTIFIER => $cert_identifier });    
-
-    my @fields = (
-        { label => 'Subject', value => $cert->{SUBJECT} },
-        { label => 'Profile', value => $cert_profile },        
+    push @fields, (
         { label => 'Serial', value => '0x'.$cert->{CERTIFICATE_SERIAL_HEX} },
         { label => 'Identifier', value => $cert_identifier },
         { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
