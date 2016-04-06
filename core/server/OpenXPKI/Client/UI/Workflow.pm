@@ -908,13 +908,14 @@ sub action_index {
 
 }
 
-=head2 action_load
+=head2 action_handle
 
-Load a workflow given by wf_id, redirects to init_load
+Execute a workflow internal action (fail, resume, wakeup). Requires the 
+workflow and action to be set in the wf_token info.
 
 =cut
 
-sub action_fail {
+sub action_handle {
     
     my $self = shift;
     my $args = shift;
@@ -931,16 +932,31 @@ sub action_fail {
     my $wf_args = $self->__fetch_wf_token( $wf_token );
     
     if (!$wf_args->{wf_id}) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_FAIL_WITHOUT_ID!','error');
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ID!','error');
         return $self;
     }
+    
+    if (!$wf_args->{wf_handle}) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
+        return $self;
+    }
+    
+    if ($wf_args->{wf_handle} eq 'fail') {
+        $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
-    $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
+        $wf_info = $self->send_command( 'fail_workflow', {
+            ID => $wf_args->{wf_id},        
+        });
+    } elsif ($wf_args->{wf_handle} eq 'wakeup') {
+        $self->logger()->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
 
-    $wf_info = $self->send_command( 'fail_workflow', {
-        ID => $wf_args->{wf_id},        
-    });
-
+        $wf_info = $self->send_command( 'wakeup_workflow', {
+            ID => $wf_args->{wf_id},        
+        });
+    } elsif ($wf_args->{wf_handle} eq 'resume') {        
+        #tbd
+    } 
+    
     $self->__render_from_workflow({ WF_INFO => $wf_info });
 
     return $self; 
@@ -1554,10 +1570,10 @@ sub __render_from_workflow {
             $self->logger()->debug('Adding global actions ' . join('/', @handles));
             
             if (grep /fail/, @handles) {
-                my $token = $self->__register_wf_token( $wf_info );                       
+                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );                       
                 push @buttons, {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
-                    action => 'workflow!fail!wf_token!'.$token->{value},
+                    action => 'workflow!handle!wf_token!'.$token->{value},
                     confirm => {
                         label => 'Fail Workflow',
                         description => 'Press the confirm button to mark this workflow as failed.
@@ -1570,17 +1586,11 @@ sub __render_from_workflow {
             }
             
             if (grep /wakeup/, @handles) {
-                # todo - create public "wakeup" method in workflow api to hide this away
-                my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
                 
-                if ($wf_action) {
-                    my $token = $self->__register_wf_token( $wf_info, {
-                        wf_action => $wf_action
-                    });
-                    push @buttons, {
-                        label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
-                        action => 'workflow!index!wf_token!'.$token->{value},
-                    }
+                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
+                push @buttons, {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
+                    action => 'workflow!handle!wf_token!'.$token->{value},
                 }
             }
             
