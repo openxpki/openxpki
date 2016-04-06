@@ -142,6 +142,7 @@ sub __wake_up_workflow {
     my $wf_type = $db_result->{WORKFLOW_TYPE};
     my $pki_realm = $db_result->{PKI_REALM};
     my $session_info = $db_result->{WORKFLOW_SESSION};
+    
     unless ($wf_id) {
         OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_ID_GIVEN' );
     }
@@ -157,50 +158,11 @@ sub __wake_up_workflow {
 
     CTX('session')->set_pki_realm($pki_realm);
 
-    # Config Version is handled by the factory and we dont want to
-    # have the whole session in the old version, see github #54
-    CTX('session')->import_serialized_info($session_info, { skip_config_version => 1 });
+    CTX('session')->import_serialized_info($session_info);
 
-    my $api = CTX('api');
-    ### get workflow and "manually autostart".
-    my $wf_info = $api->get_workflow_info(
-        {
-            WORKFLOW => $wf_type,
-            ID       => $wf_id,
-        }
-    );
-    ##! 16: 'child: wf_info fetched'
-    ##! 16: Dumper($wf_info)
-
-    my $wf_history = $api->get_workflow_history({ID => $wf_id});
-    ##! 80: Dumper($wf_history)
-
-    unless(@$wf_history){
-        OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_HISTORY_AVAILABLE',
-                params  => { WF_ID => $wf_id, WF_INFO => $wf_info }
-            );
-    }
-
-    my $last_history = pop(@$wf_history);
-    ##! 16: 'last history '.Dumper($last_history)
-    my $last_action = $last_history->{WORKFLOW_ACTION};
-    ##! 16: 'last action '.$last_action
-    unless($last_action){
-        OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_LAST_ACTIVITY',
-                params  => { WF_ID => $wf_id, WF_INFO => $wf_info }
-            );
-    }
-    my $new_wf_info = $api->execute_workflow_activity(
-        {
-            WORKFLOW => $wf_type,
-            ID       => $wf_id,
-            ACTIVITY => $last_action,
-        }
-    );
-    ##! 16: 'new wf info: ' .Dumper( $new_wf_info )
-
+    my $wf_info = CTX('api')->wakeup_workflow({ WORKFLOW => $wf_type, ID => $wf_id });
+    
+    ##! 16: 'wf info after wake up: ' .Dumper( $wf_info )
 
 }
 
