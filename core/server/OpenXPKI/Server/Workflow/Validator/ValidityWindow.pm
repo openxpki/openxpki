@@ -33,7 +33,10 @@ sub validate {
     }
 
     if ($notafter) {
-
+        if ($notbefore && $notafter == $notbefore) {
+            push @errors, 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_EQUAL_TO_NOTBEFORE';
+        }
+        
         if ($notbefore && $notafter < $notbefore) {
             push @errors, 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_EARLIER_THAN_NOTBEFORE';
         }
@@ -52,7 +55,7 @@ sub validate {
             PRIORITY => 'info',
             FACILITY => 'system',
         );
-        validation_error( $self->error() );
+        validation_error( sprintf "%s (%s)", $self->error(), join(",", @errors) );
         return 0;
     }
 

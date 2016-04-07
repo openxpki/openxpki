@@ -262,6 +262,12 @@ msgstr ""
 "La data inserita per il campo “non dopo il” precede quella del campo “non "
 "prima del”."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_EQUAL_TO_NOTBEFORE"
+msgstr ""
+"La data inserita per il campo “non dopo il” precede quella del campo “non "
+"prima del”."
+
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "La data inserita per il campo “non dopo il” è già passata."
 
@@ -1790,7 +1796,12 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Richiesta non valida - azione senza token"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_FAIL_WITHOUT_ID"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION"
+msgstr "Richiesta non valida - azione senza Workflow ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ID"
 msgstr "Richiesta non valida - azione senza Workflow ID"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
