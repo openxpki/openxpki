@@ -871,17 +871,17 @@ sub action_find {
         }
         my $search_result = $self->send_command( 'search_cert', {
             CERT_SERIAL => $serial,
-            ENTITY_ONLY => 1    
+            ENTITY_ONLY => 1
         });
-        if (scalar @{$search_result} == 1) {
-            $cert_identifier = $search_result->[0]->{"IDENTIFIER"};
-        } elsif (scalar @{$search_result} > 1) {
+        if (!$search_result) {
+            $self->set_status('Unable to find a certificate with this serial number.','error');
+            return $self->init_search();
+        } elsif (scalar @{$search_result} != 1) {
             # this should not happen
             $self->set_status('Query ambigous - got more than one result on this serial number?!.','error');
             return $self->init_search();
         } else {            
-            $self->set_status('Unable to find a certificate with this serial number.','error');
-            return $self->init_search();
+            $cert_identifier = $search_result->[0]->{"IDENTIFIER"};
         } 
     } else {
         $self->set_status('Please enter either certificate identifier or certificate serial number.','error');
