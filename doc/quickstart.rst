@@ -232,6 +232,16 @@ On current desktop hardware the issue workflow will take approx. 15 seconds to
 finish and you should end up with a certificate matching your request in the tmp 
 folder.      
 
+Support for Java Keystore
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+OpenXPKI can assemble server generated keys into java keystores for 
+immediate use with java based applications like tomcat. This requires
+a recent version of java ``keytool`` installed. On debian, this is 
+provided by the package ``openjdk-7-jre``. Note: You change set the 
+location of the keytool binary in ``system.crypto.token.javajks``, the
+default is /usr/bin/keytool.
+
 Starting from scratch
 ---------------------
 
