@@ -417,7 +417,8 @@ sub wakeup_workflow {
         $wf_id
     );
     
-    if ($workflow->proc_state() ne 'pause') {
+    my $proc_state = $workflow->proc_state(); 
+    if (!($proc_state eq 'pause' || $proc_state eq 'retry_exceeded')) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_WAKEUP_NOT_IN_PAUSE',
             params => { ID => $wf_id, PROC_STATE => $workflow->proc_state() }
