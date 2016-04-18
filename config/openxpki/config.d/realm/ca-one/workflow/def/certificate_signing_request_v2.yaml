@@ -15,10 +15,10 @@ state:
         action:
           - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate > SUBJECT_COMPLETE
 
-    CANCEL_APPROVALS:
+    UPDATE_REQUEST:
         autorun: 1
         action:
-          - cancel_approvals > UPDATE_SUBJECT
+          - cancel_approvals render_subject set_workflow_attributes > RUN_POLICY_CHECKS
 
     CHECK_APPROVALS:
         autorun: 1
@@ -170,13 +170,14 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_DESC
         action:
-          - edit_subject > CANCEL_APPROVALS ? acl_can_approve
-          - edit_san > CANCEL_APPROVALS ? profile_has_san_section acl_can_approve
-          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section acl_can_approve
-          - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
+          - edit_subject > UPDATE_REQUEST ? acl_can_approve
+          - edit_san > UPDATE_REQUEST ? profile_has_san_section acl_can_approve
+          - edit_cert_info > UPDATE_REQUEST ? profile_has_info_section acl_can_approve
+          - edit_validity > UPDATE_REQUEST  ? acl_can_approve
+          - global_noop > RUN_POLICY_CHECKS ? acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
-          - reject_request > NOTIFY_REJECT ? acl_can_reject
           - put_request_on_hold > ONHOLD ? acl_can_approve
+          - reject_request > NOTIFY_REJECT ? acl_can_reject
         output:
           - cert_subject
           - cert_subject_alt_name
@@ -199,6 +200,9 @@ state:
             format: optional
           approve_csr:
             format: expected
+          global_noop:
+            label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
+            format: alternative
           reject_request:
             format: failure
           put_request_on_hold:
@@ -215,14 +219,14 @@ state:
         label:  I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC
         action:
-          - edit_subject > CANCEL_APPROVALS ? acl_can_approve
-          - edit_san > CANCEL_APPROVALS ? profile_has_san_section acl_can_approve
-          - edit_cert_info > CANCEL_APPROVALS ? profile_has_info_section acl_can_approve
-          - edit_validity > CANCEL_APPROVALS  ? acl_can_approve
-          - global_noop > UPDATE_SUBJECT ? has_policy_violation acl_can_approve
+          - edit_subject > UPDATE_REQUEST ? acl_can_approve
+          - edit_san > UPDATE_REQUEST ? profile_has_san_section acl_can_approve
+          - edit_cert_info > UPDATE_REQUEST ? profile_has_info_section acl_can_approve
+          - edit_validity > UPDATE_REQUEST  ? acl_can_approve
+          - global_noop > RUN_POLICY_CHECKS ? has_policy_violation acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
-          - reject_request > NOTIFY_REJECT ? acl_can_reject
           - put_request_on_hold > ONHOLD ? acl_can_approve
+          - reject_request > NOTIFY_REJECT ? acl_can_reject
         output:
           - cert_subject
           - cert_subject_alt_name
@@ -345,11 +349,10 @@ state:
           - cert_profile
           - cert_info
 
-
-    UPDATE_SUBJECT:
+    RUN_POLICY_CHECKS:
         autorun: 1
         action:
-          - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate > CHECK_POLICY_VIOLATION
+          - check_policy_dns check_policy_subject_duplicate > CHECK_POLICY_VIOLATION
 
     CANCELED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL
