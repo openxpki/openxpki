@@ -195,6 +195,18 @@ state:
         action:
           - approve_csr > APPROVAL
           - disapprove > FAILURE
+        output:
+          - cert_profile 	
+          - cert_subject
+          - creator 	
+          - eligibility_result 	
+          - request_mode 	
+          - scep_tid 	
+          - signer_is_self_signed
+          - signer_revoked
+          - signer_signature_valid
+          - signer_sn_matches_csr
+          - signer_validity_ok
 
     PENDING_MANUAL_AUTHENTICATION:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL
@@ -202,6 +214,20 @@ state:
         action:
           - add_authentication > AUTHENTICATED_REQUEST
           - deny_authentication > FAILURE
+        output:
+          - cert_profile 	
+          - cert_subject
+          - creator
+          - signer_trusted
+          - signer_authorized
+          - valid_chall_pass
+          - scep_tid
+          - signer_is_self_signed
+          - signer_revoked
+          - signer_signature_valid
+          - signer_sn_matches_csr
+          - signer_validity_ok
+
 
     PERSISTENCE:
         autorun: 1
@@ -216,6 +242,22 @@ state:
           - fail > FAILURE
           - allow_retry > FAILURE
           - override_policy > APPROVAL
+        output:
+          - cert_profile 	
+          - cert_subject
+          - creator 	
+          - request_mode 	
+          - num_active_certs
+          - p_max_active_certs
+          - in_renewal_window
+          - in_replace_window
+          - eligibility_result 	
+          - scep_tid 	
+          - signer_is_self_signed
+          - signer_revoked
+          - signer_signature_valid
+          - signer_sn_matches_csr
+          - signer_validity_ok
 
     PREPARED:
         autorun: 1
@@ -691,6 +733,70 @@ field:
         name: tmp_queue
         required: 1
         type: text
+
+
+    # Fields used for display purposes only          
+    creator:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL
+        name: creator
+
+    eligibility_result:
+        label: I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL
+        name: eligibility_result
+
+    request_mode:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL
+        name: request_mode
+
+    signer_is_self_signed:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL
+        name: signer_is_self_signed
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
+
+    signer_revoked:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL
+        name: signer_revoked
+
+    signer_sn_matches_csr:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL
+        name: signer_sn_matches_csr
+
+    signer_validity_ok:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL
+        name: signer_validity_ok
+
+    num_active_certs:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL
+        name: num_active_certs
+
+    p_max_active_certs:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ALLOWED_CERT_COUNT_LABEL
+        name: p_max_active_certs
+
+    in_renewal_window:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_RENEWAL_WINDOW_LABEL
+        name: in_renewal_window
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
+
+    in_replace_window:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL
+        name: in_replace_window
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
+
+    signer_trusted:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_TRUSTED_LABEL
+        name: signer_trusted
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
+
+    signer_authorized:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_AUTHORIZED_LABEL
+        name: signer_authorized
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
+
+    valid_chall_pass:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL
+        name: valid_chall_pass
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
 
 
 acl:

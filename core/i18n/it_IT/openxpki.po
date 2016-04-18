@@ -438,6 +438,11 @@ msgstr "Questa pagina mostra una lista di tutti i workflow iniziati da te."
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Workflow"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NO"
+msgstr "Chiave"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 msgstr "FALLIMENTO"
@@ -828,6 +833,40 @@ msgstr "Il numero di campi eccede il massimo consentito."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "Questo campo non è definito nelle impostazioni del profilo."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
+msgstr "Uno o più campi Soggetto contengono errori."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
+msgstr ""
+"La data inserita per il campo “non dopo il” non può essere convalidata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
+msgstr "Uno o più campi Soggetto contengono errori."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
+msgstr ""
+"La data inserita per il campo “non dopo il” non può essere convalidata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
+msgstr "Esiste già un certificato con questa chiave pubblica!"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "Esiste già un certificato con questa chiave pubblica!"
@@ -1264,6 +1303,10 @@ msgstr "Retries"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Creator"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
+msgstr "Risultato della tua azione di massa."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
 msgstr ""
 "Questo Workflow gestisce le richieste di sottoscrizione dei certificati "
@@ -1271,6 +1314,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "Sottoscrizione SCEP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
+msgstr "Nome alternativo per il campo Soggetto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ALLOWED_CERT_COUNT_LABEL"
+msgstr "Nome alternativo per il campo Soggetto"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvazioni"
@@ -1397,6 +1448,10 @@ msgstr "Ulteriori commenti per aiutarci a valutare la tua richiesta"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
 msgstr " "
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL"
+msgstr "Creator"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
 msgstr "Ulteriori Informazioni"
 
@@ -1503,6 +1558,18 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "Imposta questo campo solo se sei ben consapevole delle implicazioni!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_RENEWAL_WINDOW_LABEL"
+msgstr "Ulteriori Informazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
+msgstr "Informazioni Richiedente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
+msgstr "SCEP TID"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
 msgstr " "
@@ -1715,6 +1782,10 @@ msgstr "Il certificato che viene sostituito con questo Workflow"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL"
 msgstr "Certificato sostituito"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
+msgstr "Codice Motivazione"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
 msgstr "Id Transazione di questa richiesta SCEP"
 
@@ -1733,6 +1804,26 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Richiedente / Firmatario"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_AUTHORIZED_LABEL"
+msgstr "Richiedente / Firmatario"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_TRUSTED_LABEL"
+msgstr "Richiedente / Firmatario"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
+msgstr "Richiedente / Firmatario"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
+msgstr "Componenti Subject"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
+msgstr "Validità Firmatario"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
 msgstr ""
 
@@ -1744,6 +1835,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Validità Firmatario"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
+msgstr "Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Forza Fallimento"
@@ -2443,6 +2538,11 @@ msgstr "Riavvia"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Le informazioni sul Workflow sono state aggiornate"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_YES"
+msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
@@ -3321,10 +3421,6 @@ msgstr "Le informazioni sul Workflow sono state aggiornate"
 #~ msgstr "Transaction Id of this SCEP request"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_LABEL"
-#~ msgstr "SCEP TID"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_PLACEHOLDER"
 #~ msgstr " "
 
@@ -3367,10 +3463,6 @@ msgstr "Le informazioni sul Workflow sono state aggiornate"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_DESC"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_LABEL"
-#~ msgstr "Password"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER"

@@ -533,6 +533,10 @@ msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NO"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -1130,6 +1134,38 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "SPKAC строка пуста."
 
@@ -1614,11 +1650,23 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
 msgstr "Это поле можно использовать для комментариев."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ALLOWED_CERT_COUNT_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -1775,6 +1823,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -1907,6 +1959,18 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_RENEWAL_WINDOW_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
@@ -2187,6 +2251,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
 msgstr ""
 "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
@@ -2224,6 +2292,26 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_AUTHORIZED_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_TRUSTED_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
+msgstr "Субъект"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
 msgstr "SPKAC-строка пуста."
 
@@ -2242,6 +2330,15 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
@@ -3071,6 +3168,10 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Последнее обновление"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_YES"
+msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_ACTION_UPDATE_METADATA"
@@ -6895,35 +6996,7 @@ msgstr "Последнее обновление"
 #~ "стандарты не поддерживаются."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CONNECTOR_CHECK_FAILED"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -7447,10 +7520,6 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 #~ msgstr "ОШИБКА! Соединение закрыто."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_"
-#~ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_COMMENT"
@@ -9041,10 +9110,6 @@ msgstr "Последнее обновление"
 #~ "расширенный профиль."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_LABEL"
-#~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_PLACEHOLDER"
 #~ msgstr ""
 #~ "Начальное состояние технологического процесса публикации сертификатов "
@@ -9126,15 +9191,6 @@ msgstr "Последнее обновление"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_DESC"
 #~ msgstr "TCP-порт, используемый с данным сертификатом"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_LABEL"
-#~ msgstr ""
-#~ "Используйте данный профиль сертификата только если Вы отчетливо "
-#~ "представляете себе необходимую структуру имени субъекта сертификата, "
-#~ "хорошо знаете компоненты этой структуры и соглашения об использовании "
-#~ "имен в Вашей части инфраструктуры открытых ключей. Данный профиль "
-#~ "позволяет использовать также произвольный набор альтернативных имен."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER"

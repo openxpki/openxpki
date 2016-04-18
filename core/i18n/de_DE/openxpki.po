@@ -535,6 +535,10 @@ msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NO"
+msgstr "Benutzername"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 msgstr "Untergeordnete Workflows"
 
@@ -1126,6 +1130,38 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "Prozesse anzeigen"
 
@@ -1613,11 +1649,23 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
 msgstr "Weitere Informationen für die Registrierungssachbearbeiter."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ALLOWED_CERT_COUNT_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -1775,6 +1823,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
 msgstr "Übergeordneter Workflow"
 
@@ -1907,6 +1959,18 @@ msgstr "Prozesse anzeigen"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_RENEWAL_WINDOW_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
@@ -2185,6 +2249,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
 msgstr ""
 "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
@@ -2222,6 +2290,26 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_AUTHORIZED_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_TRUSTED_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -2240,6 +2328,15 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
+msgstr ""
+"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+"mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+"eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+"können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
+"beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
@@ -3068,6 +3165,10 @@ msgstr "Untergeordnete Workflows"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Letzte Aktualisierung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_YES"
+msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_ACTION_UPDATE_METADATA"
@@ -6760,35 +6861,7 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr "Microsoft UPN"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CONNECTOR_CHECK_FAILED"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
@@ -7231,10 +7304,6 @@ msgstr "Letzte Aktualisierung"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK"
 #~ msgstr "Antrag im OU-Stil"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_"
-#~ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_COMMENT"
@@ -8821,10 +8890,6 @@ msgstr "Letzte Aktualisierung"
 #~ "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_LABEL"
-#~ msgstr "Übergeordneter Workflow"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_PLACEHOLDER"
 #~ msgstr "Initial state of the LDAP publishing workflow"
 
@@ -8908,15 +8973,6 @@ msgstr "Letzte Aktualisierung"
 #~ msgstr ""
 #~ "Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt "
 #~ "wird"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_LABEL"
-#~ msgstr ""
-#~ "Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
-#~ "mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
-#~ "eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
-#~ "können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die "
-#~ "Angabe beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER"

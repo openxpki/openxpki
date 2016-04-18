@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-04-07 10:44+0100\n"
+"PO-Revision-Date: 2016-04-18 11:59+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -402,6 +402,10 @@ msgstr "This page shows a list of all workflows started by you."
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "My Workflows"
 
+# Remove?
+msgid "I18N_OPENXPKI_UI_NO"
+msgstr "No"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 msgstr "FAILURE"
@@ -780,6 +784,30 @@ msgstr "The number of fields exceeds the allowed count."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "This field is not defined in the profile settings."
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
+msgstr "Unable to check value against given backend"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
+msgstr "An error occured during input validation"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
+msgstr "KeySize configuration contains invalid key specification"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
+msgstr "KeySize configuration does not specify a minimum keysize"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
+msgstr "KeySize configuration contains invalid algorithm"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
+msgstr "Invalid type of request passed to key validator"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
+msgstr "The provided key is too long"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
+msgstr "The provided key is too short"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "A certificate with the same public key already exists!"
@@ -1204,6 +1232,9 @@ msgstr "Retries"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Creator"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
+msgstr "Result of Eligibility Check"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
 msgstr ""
 "This workflow handles certificate enrollment requests using the SCEP "
@@ -1211,6 +1242,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "SCEP Enrollment"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
+msgstr "Active Certificate Count"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ALLOWED_CERT_COUNT_LABEL"
+msgstr "Allowed Certificate Count"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvals"
@@ -1330,6 +1367,9 @@ msgstr "additional comments to help us processing the request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
 msgstr " "
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL"
+msgstr "Creator"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
 msgstr "Extra Information"
 
@@ -1431,6 +1471,15 @@ msgstr "usually not required, use the selector on the right or type a datetime"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
 msgstr "set this only if you know the implication!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_RENEWAL_WINDOW_LABEL"
+msgstr "In Renewal Period"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
+msgstr "In Replace Period"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
+msgstr "Request is SelfSigned"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
 msgstr " "
@@ -1632,6 +1681,9 @@ msgstr "The certificate to be replaced by this workflow."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL"
 msgstr "Replaced Certificate"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
+msgstr "Request Mode"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
 msgstr "Transaction Id of this SCEP request"
 
@@ -1650,6 +1702,21 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Requestor/Signer"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_AUTHORIZED_LABEL"
+msgstr "Signer is Authorized"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_TRUSTED_LABEL"
+msgstr "Signer is Trusted"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
+msgstr "Signer is Revoked"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
+msgstr "Request Subject Matches"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
+msgstr "Signer is Valid"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
 msgstr ""
 
@@ -1661,6 +1728,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Signer Validity"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
+msgstr "Has Valid Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Force Failure"
@@ -2371,6 +2441,10 @@ msgstr "Wake Up"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 msgstr "Workflow information was updated"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_YES"
+msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
@@ -3249,10 +3323,6 @@ msgstr "Workflow information was updated"
 #~ msgstr "Transaction Id of this SCEP request"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_LABEL"
-#~ msgstr "SCEP TID"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_PLACEHOLDER"
 #~ msgstr " "
 
@@ -3295,10 +3365,6 @@ msgstr "Workflow information was updated"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_DESC"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_LABEL"
-#~ msgstr "Password"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER"
