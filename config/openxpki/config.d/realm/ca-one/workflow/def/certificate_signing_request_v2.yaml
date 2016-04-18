@@ -13,7 +13,7 @@ state:
     BUILD_SUBJECT:
         autorun: 1
         action:
-          - render_subject check_policy_dns check_policy_subject_duplicate > SUBJECT_COMPLETE
+          - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate > SUBJECT_COMPLETE
 
     CANCEL_APPROVALS:
         autorun: 1
@@ -599,12 +599,9 @@ action:
            _map_requestor: "[% context.cert_info.requestor_email %]"
 
     submit:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC
-        param:
-           _map_cert_subject: $cert_subject
-           _map_requestor: "[% context.cert_info.requestor_email %]"
 
     upload_pkcs10:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
