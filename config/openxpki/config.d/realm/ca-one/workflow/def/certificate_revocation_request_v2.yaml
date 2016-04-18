@@ -299,6 +299,7 @@ validator:
         arg:
           - $invalidity_time
           - $cert_identifier
+          - $flag_delayed_revoke
 
     validate_reason_code:
         class: OpenXPKI::Server::Workflow::Validator::ReasonCode
