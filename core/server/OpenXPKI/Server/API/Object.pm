@@ -1568,12 +1568,18 @@ sub get_data_pool_entry {
             my $algorithm;
             my $key;
             my $iv;
-
+            
+            # add the vaults ident to prevent collisions in DB 
+            # TODO: should be replaced by static server id
+            my $secret_id = $encryption_key. ':'. CTX('volatile_vault')->ident();
+            
+            ##! 16: 'Secret id ' . $secret_id 
+            
             my $cached_key = CTX('dbi_backend')->first(
                 TABLE   => 'SECRET',
                 DYNAMIC => {
                     PKI_REALM => { VALUE => $requested_pki_realm },
-                    GROUP_ID  => { VALUE => $encryption_key },
+                    GROUP_ID  => { VALUE => $secret_id },
                 }
             );
 
@@ -1616,13 +1622,13 @@ sub get_data_pool_entry {
                 ( $algorithm, $iv, $key ) = split( /:/, $key_data->{VALUE} );
 
                 # cache encryption key in volatile vault
-                eval {
+                eval {                    
                     CTX('dbi_backend')->insert(
                         TABLE => 'SECRET',
                         HASH  => {
                             DATA => CTX('volatile_vault')->encrypt( $key_data->{VALUE} ),
                             PKI_REALM => $requested_pki_realm,
-                            GROUP_ID  => $encryption_key,
+                            GROUP_ID  => $secret_id,
                         },
                     );
                     CTX('dbi_backend')->commit();
@@ -2407,11 +2413,13 @@ sub __get_current_datapool_encryption_key : PRIVATE {
         # symmetric key already exists, check if we have got a cached
         # version in the SECRET pool
 
+        my $secret_id = $associated_vault_key_id. ':'. CTX('volatile_vault')->ident();
+
         my $cached_key = CTX('dbi_backend')->first(
             TABLE   => 'SECRET',
             DYNAMIC => {
                 PKI_REALM => { VALUE => $realm },
-                GROUP_ID  => { VALUE => $associated_vault_key_id },
+                GROUP_ID  => { VALUE => $secret_id },
             }
         );
 
@@ -2466,7 +2474,7 @@ sub __get_current_datapool_encryption_key : PRIVATE {
                         DATA =>
                           CTX('volatile_vault')->encrypt( $data->{VALUE} ),
                         PKI_REALM => $realm,
-                        GROUP_ID  => $associated_vault_key_id,
+                        GROUP_ID  => $secret_id,
                     },
                 );
                 CTX('dbi_backend')->commit();
