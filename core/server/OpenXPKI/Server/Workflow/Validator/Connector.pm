@@ -18,11 +18,12 @@ sub _init {
     }
     
     $self->path( $params->{path} );
-    $self->error( 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_CONNECTOR_CHECK_FAILED' );
+    $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED' );
     $self->error( $params->{error} ) if ($params->{error});
 }
 
 sub _validate {
+    
     my ( $self, $wf, $value ) = @_;
     
     ##! 1: 'start'
@@ -44,8 +45,8 @@ sub _validate {
     if (!$result) {              
         CTX('log')->log(
             MESSAGE  => "Validator failed on path " . $self->path(),
-            PRIORITY => 'info',
-            FACILITY => 'system',
+            PRIORITY => 'error',
+            FACILITY => 'application',
         );
         validation_error( $self->error() );
         return 0;
@@ -56,38 +57,30 @@ sub _validate {
 
 1;
 
-
+__END__
 
 =head1 NAME
 
 OpenXPKI::Server::Workflow::Validator::Connector
 
 =head1 SYNOPSIS
-
-    <action name="..." class="...">
-        <validator name="validate_connector">                                    
-            <arg>meta_email</arg>            
-        </validator>
-    </action>        
-            
+ 
+Build path from path + argument and query the config backend using a
+I<get> call. Any true result is considered as "passed".   
+ 
 =head1 DESCRIPTION
 
 Validates the context value referenced by argument using a connector. The path to
 the connector must be given as parameter 'path' to the validator definition.
 
-  <validator name="global_validate_regex"
-      class="OpenXPKI::Server::Workflow::Validator::Regex">     
-      <param name="path" value="email">
-      <param name="error" value="email is unknown">
-  </validator>
- 
-The error parameter is optional, if set this is shown in the UI if the validator
-fails.  
- 
-=over
- 
-=item email
-
-Basic check for valid email syntax
-
-=back 
+  global_validate_regex:
+      class: OpenXPKI::Server::Workflow::Validator::Regex
+      param:     
+          path: metadata.systemid
+          error: SystemId is invalid
+      arg:
+       - $meta_system_id
+       
+The error parameter is optional, if set this is shown in the UI if the 
+validator fails.  
+  

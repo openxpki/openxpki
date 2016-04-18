@@ -120,7 +120,7 @@ sub _validate {
 	   CTX('log')->log(
     	    MESSAGE  => "Certificate subject validation error",
     	    PRIORITY => 'error',
-    	    FACILITY => 'workflow',
+    	    FACILITY => 'application',
     	);
         validation_error ('I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_HAS_ERRORS', { invalid_fields => \@fields_with_error } );
     }

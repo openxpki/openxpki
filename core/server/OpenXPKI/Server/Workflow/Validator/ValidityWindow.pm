@@ -52,10 +52,10 @@ sub validate {
         ##! 32: 'Regex errors on field ' . $field . ', values '  . Dumper \@errors
         CTX('log')->log(
             MESSAGE  => "Validity window validator failed ",
-            PRIORITY => 'info',
-            FACILITY => 'system',
+            PRIORITY => 'error',
+            FACILITY => 'application',
         );
-        validation_error( sprintf "%s (%s)", $self->error(), join(",", @errors) );
+        validation_error( sprintf "%s (%s)", $self->error(), join(" / ", @errors) );
         return 0;
     }
 
@@ -64,6 +64,7 @@ sub validate {
 
 1;
 
+__END__
 
 =head1 NAME
 
@@ -71,12 +72,11 @@ OpenXPKI::Server::Workflow::Validator::ValidityWindow
 
 =head1 SYNOPSIS
 
-    <action name="..." class="...">
-        <validator name="global_validity_window">
-            <arg>$notbefore</arg>
-            <arg>$notafter</arg>
-        </validator>
-    </action>
+  global_validity_window
+  param:
+    error: Error message
+  arg:
+    - $notbefore
 
 =head1 DESCRIPTION
 

@@ -137,7 +137,7 @@ sub validate {
         CTX('log')->log(
             MESSAGE  => "Errors valdiating authorizing persons",
             PRIORITY => 'error',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );
 
         #		validation_error($errors->[scalar @{$errors} -1]);

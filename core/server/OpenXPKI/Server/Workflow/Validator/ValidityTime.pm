@@ -7,6 +7,8 @@ use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 
+# @TODO: unused / untested 
+
 sub validate {
     my ( $self, $wf, $time ) = @_;
 
@@ -21,7 +23,7 @@ sub validate {
         CTX('log')->log(
             MESSAGE => "Invalid validity time '$time'",
             PRIORITY => 'error',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
@@ -39,7 +41,7 @@ sub validate {
         CTX('log')->log(
             MESSAGE => "Invalid validity time '$time'",
             PRIORITY => 'error',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );
         validation_error ($errors->[scalar @{$errors} -1]);
     }
@@ -57,12 +59,9 @@ OpenXPKI::Server::Workflow::Validator::ValidityTime
 
 =head1 SYNOPSIS
 
-<action name="CreateCSR">
-  <validator name="ValidityTime"
-           class="OpenXPKI::Server::Workflow::Validator::ValidityTime">
-  </validator>
-</action>
-
+  validate_validitytime"
+       class: OpenXPKI::Server::Workflow::Validator::ValidityTime
+  
 =head1 DESCRIPTION
 
 The validator verifies that a validity time input looks like an ISO-date

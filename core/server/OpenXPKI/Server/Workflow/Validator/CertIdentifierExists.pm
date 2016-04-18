@@ -10,6 +10,11 @@ use OpenXPKI::Server::Context qw( CTX );
 
 extends 'OpenXPKI::Server::Workflow::Validator';
 
+
+sub _preset_args {
+    return [ qw(cert_identifier) ];
+}
+
 sub _validate {
     my ( $self, $wf, $cert_identifier ) = @_;
 

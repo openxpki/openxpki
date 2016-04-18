@@ -8,6 +8,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
+use Workflow::Exception qw( validation_error );
+
 use Data::Dumper;
 
 __PACKAGE__->mk_accessors( 'min' );
@@ -25,9 +27,7 @@ sub _init {
     }
     else {
         # min is mandatory, throw exception if not present
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING',
-        );
+        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING');
     }
 
     # maximal key length
@@ -70,12 +70,7 @@ sub validate {
         $data = $context->param('spkac');
     }
     else {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE',
-            params  => {
-                CSR_TYPE => $csr_type,
-            },
-        );
+        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE');
     }
 
     return 1 if (! $data); # data is not available yet, ignore
@@ -91,35 +86,20 @@ sub validate {
     ##! 16: 'key_algorithm: ' . $key_algorithm
 
     if ($self->fail_on_unknown_algorithm && ! exists $self->min()->{$key_algorithm}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM',
-            params  => {
-                ALGORITHM => $key_algorithm,
-            },
-        );
+        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM');
     }
+    
     if (exists $self->min()->{$key_algorithm}) {
         ##! 16: 'min length: ' . $self->min()->{$key_algorithm}
         if ($key_length < $self->min()->{$key_algorithm}) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT',
-                params  => {
-                    GIVEN_LENGTH => $key_length,
-                    MIN_LENGTH   => $self->min()->{$key_algorithm},
-                },
-            );
+            validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT');
         }
     }
+    
     if (defined $self->max() && exists $self->max()->{$key_algorithm}) {
         ##! 16: 'max length: ' . $self->max()->{$key_algorithm}
         if ($key_length > $self->max()->{$key_algorithm}) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_KEY_TOO_LONG',
-                params  => {
-                    GIVEN_LENGTH => $key_length,
-                    MAX_LENGTH   => $self->max()->{$key_algorithm},
-                },
-            );
+            validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_LONG');
         }
     }
     
@@ -141,7 +121,7 @@ sub __parse_config_entry {
         my ($algorithm, $length) = split q{:}, $pair;
         if (! $algorithm || $length !~ m{ \A \d+ \z }xms) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH',
+                message => 'I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH',
             );
         }
         ##! 16: 'algorithm: ' . $algorithm;

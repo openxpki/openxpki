@@ -30,7 +30,7 @@ sub validate {
          CTX('log')->log(
             MESSAGE  => "Regex validator skipped - value is empty",
             PRIORITY => 'info',
-            FACILITY => 'system',
+            FACILITY => 'application',
         );
         return 1;
     }
@@ -89,8 +89,8 @@ sub validate {
         ##! 32: 'Regex errors with regex ' . $regex. ', values '  . Dumper \@errors
         CTX('log')->log(
             MESSAGE  => "Regex validator failed on regex $regex",
-            PRIORITY => 'info',
-            FACILITY => 'system',
+            PRIORITY => 'error',
+            FACILITY => 'application',
         );
         my @fields_with_error = ({ name => 'link', error => $self->error() }); 
         validation_error( $self->error(), { invalid_fields => \@fields_with_error } );

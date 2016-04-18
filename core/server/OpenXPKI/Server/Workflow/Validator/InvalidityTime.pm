@@ -2,31 +2,41 @@ package OpenXPKI::Server::Workflow::Validator::InvalidityTime;
 
 use strict;
 use warnings;
-use base qw( Workflow::Validator );
+
+use Moose;
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
+use Workflow::Exception qw( validation_error );
+
 use DateTime;
 
-sub validate {
-    my ( $self, $wf, $role ) = @_;
+extends 'OpenXPKI::Server::Workflow::Validator';
+
+sub _preset_args {
+    return [ qw(invalidity_time cert_identifier flag_delayed_revoke) ];
+}
+
+sub _validate {
+    
+    my ( $self, $wf, $invalidity_time, $identifier, $flag_delayed_revoke ) = @_;
 
     ## prepare the environment
     my $context = $wf->context();
-    my $invalidity_time = $context->param('invalidity_time');
-    my $identifier      = $context->param('cert_identifier');
-    my $flag_delayed_revoke = $context->param('flag_delayed_revoke');
-    if (! $identifier =~ m{ [a-zA-Z\-_]+ }xms) {
+     
+    if (!defined $identifier || $identifier !~ m{ [a-zA-Z\-_]+ }xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
+    	    log => {
+        		logger => CTX('log'),
+        		priority => 'warn',
+        		facility => 'application',
+	        },
         );
     }
+    
     ##! 16: 'invalidity time: ' . $invalidity_time
     ##! 16: 'identifier: ' . $identifier
 
@@ -48,14 +58,7 @@ sub validate {
         },
     );
     if (! defined $cert) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB',
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
-        );
+        validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB');
     }
     my $notbefore = $cert->{'NOTBEFORE'};
     my $notafter  = $cert->{'NOTAFTER'};
@@ -63,37 +66,16 @@ sub validate {
     ##! 16: 'notafter: ' . $notafter
 
     if ($invalidity_time < $notbefore) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE',
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
-        );
+        validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE');
         
     }
     if ($invalidity_time > $notafter) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER',
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
-        );
+        validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER');
     }
        
-    # We accept delayed requests if the "delayed_revoke" flag is set  
+    # We accept delayed requests if the "delayed_revoke" flag is set
     if ($invalidity_time > ($now + 60) && not $flag_delayed_revoke) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE',
-	    log => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'system',
-	    },
-        );
+        validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE');
     }
     return 1;
 }
@@ -110,13 +92,21 @@ OpenXPKI::Server::Workflow::Validator::InvalidityTime
 
   action:
       class: OpenXPKI::Server::Workflow::Validator::InvalidityTime
-  
+  arg:
+    $invalidity_time
+    $cert_identifier
+    $flag_delayed_revoke
 
 =head1 DESCRIPTION
 
-This validator checks whether a given invalidity time is valid
-for a certificate, i.e. it is not in the future and within the
-the certificate validity time. It uses the predefined context items: 
+This validator checks whether a given invalidity time is valid for a 
+certificate, i.e. it is not in the future and within the the certificate
+validity time. It expects the timestamp and certificate identifier as 
+arguments, pass a true value as third argument if you will accept a 
+timestamp in the future ("delayed revoke")
+
+The validator has a preset definiton using the context keys as given in 
+the example.
 
 =over 
 

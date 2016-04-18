@@ -44,8 +44,8 @@ sub validate {
         ##! 16: 'bad password entered: ' . $reason
         CTX('log')->log(
             MESSAGE  => "Validator password quality failed: " . $reason ,
-            PRIORITY => 'info',
-            FACILITY => 'system',
+            PRIORITY => 'error',
+            FACILITY => 'application',
         );
         validation_error("I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD");
     }

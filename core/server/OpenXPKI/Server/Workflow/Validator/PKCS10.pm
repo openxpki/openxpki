@@ -55,7 +55,7 @@ sub _validate {
         
 	    CTX('log')->log(
 	        MESSAGE  => "Invalid PKCS#10 request",
-	        PRIORITY => 'warn',
+	        PRIORITY => 'error',
 	        FACILITY => 'application',
 	    );
 
