@@ -207,7 +207,9 @@ state:
     PERSIST_KEY_PASSWORD:
         autorun: 1
         action:
-          - persist_key_password > ENTER_SUBJECT
+          - persist_key_password > ENTER_SUBJECT ? has_password_in_context
+          - global_noop > ENTER_KEY_PASSWORD ? !has_password_in_context
+          # the condition catches interrupted workflows when the vault was not avail
 
     PENDING_POLICY_VIOLATION:
         label:  I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL
@@ -654,6 +656,11 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{check_policy_dns} || $context->{check_policy_subject_duplicate}
+
+    has_password_in_context:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{_password}
 
     pending_notification_send:
         class: Workflow::Condition::Evaluate
