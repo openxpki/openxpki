@@ -1350,9 +1350,16 @@ sub __render_from_workflow {
         });
         
         my $desc;
+        my @buttons; 
         if ($wf_proc_state eq 'pause') {
             $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
             $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION';
+            
+            @buttons = ({
+                'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON'
+            });
+            
         } else {
             $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
             $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION';
@@ -1363,7 +1370,8 @@ sub __render_from_workflow {
             content => {
                 label => '',
                 description => $desc,
-                data => \@fields
+                data => \@fields,
+                buttons => \@buttons 
         }});
 
 

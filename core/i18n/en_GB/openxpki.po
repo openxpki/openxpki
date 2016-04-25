@@ -2326,6 +2326,9 @@ msgstr ""
 "automagically. The reason for this pause and the time of the next scheduled "
 "execution is shown below for your information."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON"
+msgstr "Recheck Status"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED"
 msgstr ""
 "This workflow had looped to many times, automatic retries have been stopped!"
