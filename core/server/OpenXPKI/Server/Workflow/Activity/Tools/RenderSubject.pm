@@ -97,19 +97,10 @@ sub execute {
     );
 
 
-
-    # This is a temporary hack to handle old ui workflows -
-    # we "blindly copy" the pkcs10 sans if the new cert_san_parts is not set
-    # The pkcs10 alternative path should be removed after UI change
     my $cert_san_parts  = $context->param('cert_san_parts');
-    my $pkcs10 = $context->param('pkcs10');
-
     my $extra_san = {};
     if ($cert_san_parts) {
-        $extra_san = $ser->deserialize( $cert_san_parts );
-    } elsif ($pkcs10) {
-        my $obj = OpenXPKI::Crypto::CSR->new( DATA => $pkcs10, TOKEN => CTX('api')->get_default_token() );
-        $extra_san = $obj->get_subject_alt_names({ FORMAT => 'HASH' });
+        $extra_san = $ser->deserialize( $cert_san_parts );    
     }
 
     ##! 32: 'extra san' . Dumper $extra_san
