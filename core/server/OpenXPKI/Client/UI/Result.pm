@@ -707,12 +707,20 @@ sub __build_attribute_subquery {
         my $key = $item->{key};
         my $pattern = $item->{pattern} || '';
         my $operator = $item->{operator} || 'EQUAL';
+        my $transform = $item->{transform} || '';
         my @val = $self->param($key.'[]');
         while (my $val = shift @val) {
             # embed into search pattern from config
             $val = sprintf($pattern, $val) if ($pattern);
             # replace asterisk as wildcard
             $val =~ s/\*/%/g;
+            
+            if ($transform =~ /lower/) {
+                $val = lc($val);
+            } elsif ($transform =~ /upper/) {
+                $val = uc($val);
+            }
+            
             push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
         }
     }
