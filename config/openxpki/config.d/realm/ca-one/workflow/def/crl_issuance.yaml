@@ -10,9 +10,16 @@ state:
         action:
           - create_ca_list > LOAD_NEXT_CA
 
+    # This is only required if you use CRL generation from the UI and you 
+    # are seeing timeouts due to too large CRLs. Change the action above to:
+    # "create_ca_list > BACKGROUNDING"
+    BACKGROUNDING:
+        autorun: 1
+        action:
+          - run_in_background > LOAD_NEXT_CA ? !is_ca_list_empty
+          - global_noop > SUCCESS ? is_ca_list_empty
+
     INITIAL:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC
         action:
           - initialize > CREATE_QUEUE
 
@@ -77,6 +84,13 @@ action:
             _map_hash_key:  $ca_alias
             _map_hash_value: $crl_serial
             function: add
+
+    run_in_background:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Disconnect
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC
+        param:
+            pause_info: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON
 
 condition:
     is_ca_list_empty:

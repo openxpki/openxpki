@@ -2066,6 +2066,18 @@ msgstr "Questo Workflow è terminato con successo."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL"
 msgstr "SUCCESSO"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC"
+msgstr "Inizializzo..."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_LABEL"
+msgstr "Seriale"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
+msgstr "Inizializzo..."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
 msgstr "Inizializzo..."
 
@@ -2413,6 +2425,13 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
 msgstr "Questo Workflow è in pausa e verrà continuato dal Watchdog"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+msgstr ""
+"Questo Workflow è al momento gestito dal sistema e continuerà il proprio "
+"iter in modo automatico. Il motivo della pausa e l’orario della prossima "
+"azione sono mostrati qui sotto per tua informazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON"
 msgstr ""
 "Questo Workflow è al momento gestito dal sistema e continuerà il proprio "
 "iter in modo automatico. Il motivo della pausa e l’orario della prossima "
