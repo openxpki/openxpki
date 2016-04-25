@@ -136,8 +136,6 @@ sub __wake_up_workflow {
 
     $self->__check_session();
 
-    CTX('dbi_workflow')->commit();
-
     my $wf_id   = $db_result->{WORKFLOW_SERIAL};
     my $wf_type = $db_result->{WORKFLOW_TYPE};
     my $pki_realm = $db_result->{PKI_REALM};

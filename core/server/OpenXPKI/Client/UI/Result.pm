@@ -721,6 +721,8 @@ sub __build_attribute_subquery {
                 $val = uc($val);
             }
             
+            $self->logger()->debug( "Query: $key $operator $val" );
+            
             push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
         }
     }

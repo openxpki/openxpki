@@ -243,10 +243,11 @@ sub run {
 
     # Reconnect the dbi
     CTX('dbi_log')->new_dbh();
-    CTX('dbi_workflow')->new_dbh();
     CTX('dbi_backend')->new_dbh();
-    CTX('dbi_log')->connect();
-    CTX('dbi_workflow')->connect();
+    # creates a new handle to free the ref but we dont need to connect
+    CTX('dbi_workflow')->new_dbh();
+    
+    CTX('dbi_log')->connect();    
     CTX('dbi_backend')->connect();
 
     if ( $pid != 0 ) {
@@ -271,7 +272,7 @@ sub run {
         # Re-seed Perl random number generator
         srand(time ^ $PROCESS_ID);
 
-        $self->{dbi}                      = CTX('dbi_workflow');
+        $self->{dbi}                      = CTX('dbi_backend');
         $self->{hanging_workflows}        = {};
         $self->{hanging_workflows_warned} = {};
         $self->{original_pid}             = $PID;
@@ -328,7 +329,10 @@ sub run {
             };
             my $error_msg;
             if ( my $exc = OpenXPKI::Exception->caught() ) {
+                ##! 16: 'Got OpenXPKI::Exception in watchdog - count is ' . $exception_count                 
                 my $em = $exc->message_code();
+                
+                ##! 32: 'Exception message is ' . $em
                 # Special handling of DBI errors - reconnect dbh and try again
                 # only if this is not the first exception
                 if ($exception_count > 0 && $em =~ /I18N_OPENXPKI_SERVER_DBI_DBH/) {
@@ -339,13 +343,11 @@ sub run {
                     );
                     # Ping the database
                     if (!$self->{dbi}->is_connected()) {
-                        # Todo need to refactor the handles and clean that up
-                        # imho the watchdog should use backend and not workflow
+
                         eval {
                             CTX('dbi_log')->connect();
-                            CTX('dbi_workflow')->connect();
                             CTX('dbi_backend')->connect();
-                            $self->{dbi} = CTX('dbi_workflow');
+                            $self->{dbi} = CTX('dbi_backend');
                         };
                     }
                     if (!$self->{dbi}->is_connected()) {
@@ -371,7 +373,7 @@ sub run {
 
                 my $sleep = $self->interval_sleep_exception();
                 CTX('log')->log(
-                    MESSAGE  => "Watchdog error, have a nap ($sleep sec, $error_msg)",
+                    MESSAGE  => "Watchdog error, have a nap ($sleep sec, $exception_count cnt, $error_msg)",
                     PRIORITY => "error",
                     FACILITY => "system"
                 );
