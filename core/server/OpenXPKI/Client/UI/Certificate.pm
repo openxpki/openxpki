@@ -429,14 +429,6 @@ sub init_detail {
     my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!$cert_identifier!format!";
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
 
-    my $privkey = '';
-    # check for private key
-    # TODO - add ACL, only owner should be allowed to dl key
-    if ($is_local_entity &&
-        $self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {
-        $privkey = '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
-    }
-
     push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => [
         sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM'),
         # core bug see #185 sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
@@ -444,17 +436,24 @@ sub init_detail {
         sprintf ($pattern, 'pkcs7', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7'),
         sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT'),
         sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE'),
-        $privkey,
         sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL') ],        
         format => 'rawlist'
     };
-
     
     if ($is_local_entity) {
         
         $pattern = '<li><a href="#/openxpki/redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
         
         my @actions;
+                
+        # check for private key
+        # TODO - add ACL, only owner and operator should be allowed to dl key
+        if ($is_local_entity &&
+            $self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {            
+            push @actions, 
+                '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
+        }    
+                
         my $reply = $self->send_command ( "get_cert_actions", { IDENTIFIER => $cert_identifier });
         
         $self->logger()->debug("available actions for cert " . Dumper $reply);
