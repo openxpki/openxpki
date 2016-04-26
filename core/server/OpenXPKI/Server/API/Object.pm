@@ -319,10 +319,15 @@ sub get_cert_attributes {
     # get current DB state
     CTX('dbi_backend')->commit();
 
-
+    my $query = { IDENTIFIER => { VALUE => $identifier } };
+    
+    if ($args->{ATTRIBUTE}) {
+        $query->{ATTRIBUTE_KEY} = { VALUE => $args->{ATTRIBUTE}, OPERATOR => 'LIKE' };
+    }
+    
     my $res_attrib = CTX('dbi_backend')->select(
         TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
+        DYNAMIC => $query  
     );  
         
     my $attrib;

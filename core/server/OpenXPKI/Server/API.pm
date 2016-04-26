@@ -406,6 +406,11 @@ sub BUILD {
                     type     => SCALAR,
                     regex    => $re_base64_string,
                 },
+                ATTRIBUTE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_sql_string,
+                },               
             }
         },
         'get_cert_actions' => {
