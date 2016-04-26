@@ -335,7 +335,7 @@ sub run {
                 ##! 32: 'Exception message is ' . $em
                 # Special handling of DBI errors - reconnect dbh and try again
                 # only if this is not the first exception
-                if ($exception_count > 0 && $em =~ /I18N_OPENXPKI_SERVER_DBI_DBH/) {
+                if (($exception_count > 0) && ($em =~ /I18N_OPENXPKI_SERVER_DBI_DBH/)) {
                     CTX('log')->log(
                         MESSAGE  => "DBI error in watchdog - trying reconnect",
                         PRIORITY => "warn",
@@ -369,6 +369,7 @@ sub run {
             }
             if ($error_msg) {
 
+                $exception_count++;
                 print STDERR $error_msg, "\n";
 
                 my $sleep = $self->interval_sleep_exception();
@@ -379,7 +380,7 @@ sub run {
                 );
 
                 my $threshold = $self->max_exception_threshhold();
-                if ($threshold > 0 && ++$exception_count > $threshold ) {
+                if (($threshold > 0) && ($exception_count > $threshold )) {
                     my $msg = 'Watchdog exception limit ($threshold) reached, exiting!';
                     print STDERR $msg, "\n";
                     OpenXPKI::Exception->throw(
