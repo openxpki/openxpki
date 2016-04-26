@@ -381,6 +381,9 @@ sub init_detail {
 
     my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
     $self->logger()->debug("result: " . Dumper $cert);
+    
+    my $cert_attribute = $self->send_command( 'get_cert_attributes', {  IDENTIFIER => $cert_identifier, ATTRIBUTE => 'subject_%' });
+    $self->logger()->debug("result: " . Dumper $cert_attribute);
             
     my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
     
@@ -391,6 +394,11 @@ sub init_detail {
 
 
     my @fields = ( { label => 'Subject', value => $cert->{SUBJECT} } );
+     
+    if ($cert_attribute && $cert_attribute->{subject_alt_name}) {        
+        #my $cert_attribute->{subject_alt_name};
+        push @fields, { label => 'Subject Alt. Name', value => $cert_attribute->{subject_alt_name}, 'format' => 'ullist' };
+    } 
         
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
