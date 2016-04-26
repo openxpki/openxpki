@@ -690,6 +690,33 @@ sub __render_pager {
 }
 
 
+=head2 __temp_param
+
+Get or set a temporary session parameter, the value is auto-destroyed after
+it was not being used for a given time period, default is 15 minutes.  
+
+=cut
+
+sub __temp_param {
+
+    my $self = shift;
+    my $key = shift;
+    my $data = shift;
+    my $expire = shift;
+
+    # one argument - get request
+    if (!defined $data) {
+        return $self->_client->session()->param( $key );        
+    }
+
+    $expire = '+15m' unless defined $expire;
+    $self->_client->session()->param($key, $data);
+    $self->_client->session()->expire($key, $expire) if ($expire);
+    
+    return $self;
+}    
+
+
 =head2 __build_attribute_subquery
 
 Expects an attribtue query definition hash (from uicontrol), returns arrayref 
