@@ -734,6 +734,54 @@ sub init_task {
 
 }
 
+
+=head2 init_log
+
+Load and display the technical log file of the workflow
+
+=cut
+
+sub init_log {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $wf_id = $self->param('wf_id');
+    
+    $self->_page({
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG'
+    });
+
+    my $result = $self->send_command( 'get_workflow_log', { ID => $wf_id } );
+
+    $self->logger()->trace( "dumper result: " . Dumper $result);
+
+    $self->add_section({
+        type => 'grid',
+        className => 'workflow',        
+        content => {            
+            columns => [
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_TIMESTAMP_LABEL', format => 'timestamp' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_PRIORITY_LABEL'},
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_MESSAGE_LABEL'},
+            ],
+            data => $result,
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
+        }
+    });
+    
+    $self->add_section({
+        type => 'text',
+        content => {
+            buttons => [{
+                'action' => 'redirect!workflow!load!wf_id!'.$wf_id,
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
+            }]
+        }
+    });
+
+}
+
 =head2 action_index
 
 =head3 instance creation
@@ -1567,6 +1615,11 @@ sub __render_from_workflow {
         push @buttons, {
             'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
             'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
+        };
+                       
+        push @buttons, {
+            'page' => 'redirect!workflow!log!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
         };
     
         # The workflow info contains info about all control actions that

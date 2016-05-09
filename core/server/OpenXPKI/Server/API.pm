@@ -1186,6 +1186,25 @@ sub BUILD {
                 },
             },
         },
+        'get_workflow_log' => {
+            class  => 'Workflow',
+            params => {
+                ID => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+                REVERSE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },            
+                LIMIT => {
+                    type  => SCALAR,
+                    optional => 1,
+                    regex => $re_integer_string,
+                },
+            },
+        },
         'get_workflow_history' => {
             class  => 'Workflow',
             params => {

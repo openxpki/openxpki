@@ -70,6 +70,64 @@ sub get_workflow_type_for_id {
     return $type;
 }
 
+
+=head2 get_workflow_log
+
+Return the workflow log for a given workflow id (ID), by default you get
+the last 50 items of the log sorted neweset first. Set LIMIT to the number
+of lines expected or 0 to get all lines (might be huge!). Set REVERSE = 1 
+to reverse sorting (oldest first). 
+
+The return value is a list of arrays with a fixed order of fields: 
+TIMESTAMP, PRIORITY, MESSAGE
+
+=over
+
+=item ID numeric workflow id
+
+=item LIMIT number of lines to return, 0 for all
+
+=item REVERSE set to 1 to reverse sorting
+
+=back
+
+=cut
+
+sub get_workflow_log {
+    
+    my $self  = shift;
+    my $args  = shift;
+
+    ##! 1: "get_workflow_log"
+    
+    my $wf_id = $args->{ID}; 
+    
+    my @log;
+    for (my $ii=0; $ii<50; $ii++) {
+       push @log, [ time(), 'INFO', 'This is message number ' . $ii ]; 
+    }
+    
+    @log = reverse @log;
+    
+    return \@log;
+        
+    #my $result = CTX('dbi_workflow')->select(
+    #    TABLE => 'APPLICATION_LOG',
+    #    DYNAMIC => {
+    #        WORKFLOW_SERIAL => {VALUE => $wf_id},
+    #    },
+    #    ORDER => [ 'WORKFLOW_HISTORY_DATE', 'WORKFLOW_HISTORY_SERIAL' ]
+    #);
+    
+}
+
+
+=head2 get_workflow_info
+
+This is a simple passthru to __get_workflow_ui_info
+
+=cut 
+
 sub get_workflow_info {
     my $self  = shift;
     my $args  = shift;
