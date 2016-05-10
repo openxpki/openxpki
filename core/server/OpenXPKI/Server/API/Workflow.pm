@@ -485,7 +485,7 @@ sub wakeup_workflow {
         $wf_title,
         $wf_id
     );
-    
+
     my $proc_state = $workflow->proc_state(); 
     if (!($proc_state eq 'pause' || $proc_state eq 'retry_exceeded')) {
         OpenXPKI::Exception->throw(
@@ -620,6 +620,12 @@ sub create_workflow_instance {
     # This is crucial and must be done before the first execute as otherwise 
     # workflow acl fails when the first non-initial action is autorun
     $workflow->attrib({ creator => $creator });
+
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    workflow_id => $wf_id,
+	    force       => 1,
+	});
 
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->log(
@@ -1025,6 +1031,11 @@ sub __get_workflow_factory {
         );
     }
 
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    workflow_id => $arg_ref->{WORKFLOW_ID},
+	    force       => 1,
+	});
 
     # We have now obtained the configuration id that was active during
     # creation of the workflow instance. However, if for some reason
