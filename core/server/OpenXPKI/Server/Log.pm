@@ -156,6 +156,12 @@ sub log
         };
     }
 
+    # get workflow instance information
+    my $wf_id;
+    if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
+	$wf_id = CTX('workflow_id');
+    }
+
     ## build and store message
     $msg = "[$package"
 	. " (" 
@@ -163,6 +169,7 @@ sub log
 	. "$line)"
 	. (defined $user          ? '; ' . $user . $role : '')
 	. (defined $session_short ? '@' . $session_short : '')
+	. (defined $wf_id         ? '#' . $wf_id : '')
         . "] $msg";
 
     # remove trailing newline characters
