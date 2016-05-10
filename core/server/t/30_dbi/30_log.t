@@ -2,15 +2,14 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 6;
+
+plan tests => 8;
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
 
-TODO: {
-    todo_skip 'See Issue #188', 6;
 
 our $dbi;
 our $token;
@@ -22,11 +21,10 @@ use OpenXPKI::Server::Log;
 OpenXPKI::Server::Context::setcontext({
     dbi_log => $dbi
 });
-my $log = OpenXPKI::Server::Log->new( CONFIG => 't/28_log/log4perl.conf' );
+my $log = OpenXPKI::Server::Log->new( CONFIG => 't/30_dbi/log4perl.conf' );
 
 my $msg = sprintf "DBI Log Test %01d", rand(10000000);
 
-# Workflow errors go to DBI
 ok ($log->log (FACILITY => "audit",
                PRIORITY => "info",
                MESSAGE  => $msg), 'Test message');
@@ -41,5 +39,24 @@ ok ($log->log (FACILITY => "audit",
 );
 is(scalar @{$result}, 1, 'Log entry found');
 
-}
+$msg = sprintf "DBI Log Workflow Test %01d", rand(10000000);
+OpenXPKI::Server::Context::setcontext({
+    workflow_id => 12345 
+});
+
+ok ($log->log (FACILITY => "workflow",
+               PRIORITY => "info",
+               MESSAGE  => $msg), 'Workflow Test message')
+           or diag "ERROR: log=$log";
+
+$result = $dbi->select(
+    TABLE => 'AUDITTRAIL',
+    DYNAMIC => 
+    {
+        CATEGORY => {VALUE => 'openxpki.workflow' },
+        MESSAGE => {VALUE => "%$msg", OPERATOR => 'LIKE'},
+    }
+);
+is(scalar @{$result}, 1, 'Log entry found');
+
 1;

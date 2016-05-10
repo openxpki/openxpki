@@ -69,16 +69,39 @@ sub log {
         }
     }
 
-    $dbi->insert(
-        TABLE => 'AUDITTRAIL',
-        HASH  => {
-            AUDITTRAIL_SERIAL => $serial,
-            TIMESTAMP         => $timestamp,
-            CATEGORY          => $category,
-            LOGLEVEL           => $loglevel,
-            MESSAGE           => $message,
-        },    
-    );
+    # TODO: If category IS '*.audit', write to the audittrail. Otherwise,
+    #       write to application_log and also put workflow_id into its
+    #       own column instead of in the message.
+    if ( $category =~ m{\.audit$} ) {
+        $dbi->insert(
+            TABLE => 'AUDITTRAIL',
+            HASH  => {
+                AUDITTRAIL_SERIAL => $serial,
+                TIMESTAMP         => $timestamp,
+                CATEGORY          => $category,
+                LOGLEVEL           => $loglevel,
+                MESSAGE           => $message,
+            },    
+        );
+    } else {
+        my $wf_id = 0;
+        if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
+            $wf_id = CTX('workflow_id');
+        }
+        $message = '(' . $wf_id . ') ' . $message;
+
+        $dbi->insert(
+            TABLE => 'AUDITTRAIL',
+            HASH  => {
+                AUDITTRAIL_SERIAL => $serial,
+                TIMESTAMP         => $timestamp,
+                CATEGORY          => $category,
+                LOGLEVEL          => $loglevel,
+                MESSAGE           => $message,
+            },    
+        );
+    }
+
     $dbi->commit();
 
     ##! 1: 'end'
