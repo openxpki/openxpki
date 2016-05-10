@@ -23,6 +23,7 @@ my %SEQUENCE_of = (
     DATAEXCHANGE   => "seq_dataexchange",
     WORKFLOW       => "seq_workflow",    
     WORKFLOW_HISTORY => "seq_workflow_history",
+    APPLICATION_LOG_SERIAL => "seq_application_log",
     );
 
 my %COLUMN_of = (
@@ -59,6 +60,7 @@ my %COLUMN_of = (
     CRR_SERIAL            => "crr_key",
     CRL_SERIAL            => "crl_key",
     AUDITTRAIL_SERIAL     => "audittrail_key",
+    APPLICATION_LOG_SERIAL  => "application_log_id",  
     DATA_SERIAL           => "data_key",
     PRIVATE_SERIAL        => "private_key",
     SIGNATURE_SERIAL      => "signature_key",
@@ -69,7 +71,7 @@ my %COLUMN_of = (
     WORKFLOW_HISTORY_SERIAL  => "workflow_hist_id",
     GROUP_ID              => "group_id",
     PART_ID               => "part_id",
-
+    
     ATTRIBUTE_SERIAL      => 'attribute_key',
     ATTRIBUTE_KEY         => 'attribute_contentkey',
     ATTRIBUTE_VALUE       => 'attribute_value',
@@ -102,6 +104,7 @@ my %COLUMN_of = (
     MESSAGE               => "message",
     CATEGORY              => "category",
     LOGLEVEL              => "loglevel",
+    PRIORITY              => "priority",
 
     KEYID                 => "keyid",
     CA_ISSUER_NAME        => "ca_issuer_name",
@@ -232,6 +235,15 @@ my %TABLE_of = (
                      "TIMESTAMP",
                      "CATEGORY", "LOGLEVEL", "MESSAGE" ],
         KEY => "AUDITTRAIL_SERIAL"
+    },
+    APPLICATION_LOG => {
+        NAME    => "application_log",
+        INDEX   => [ "APPLICATION_LOG_SERIAL" ],
+        COLUMNS => [ "APPLICATION_LOG_SERIAL",
+                     "TIMESTAMP",
+                     "WORKFLOW_SERIAL",
+                     "CATEGORY", "PRIORITY", "MESSAGE" ],
+        KEY => "APPLICATION_LOG_SERIAL"
     },
 
     SECRET => {
