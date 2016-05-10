@@ -100,24 +100,35 @@ sub get_workflow_log {
 
     ##! 1: "get_workflow_log"
     
-    my $wf_id = $args->{ID}; 
+    my $wf_id = $args->{ID};
+    
+    my $limit = 50;
+    if (defined $args->{LIMIT}) {
+        $limit = $args->{LIMIT};
+    } 
+    
+    # Reverse is inverted as we want to have reversed order by default
+    my $reverse = 1;
+    if ($args->{REVERSE}) {
+        $reverse = 0;
+    }
+     
+    my $result = CTX('dbi_workflow')->select(
+        TABLE => 'APPLICATION_LOG',
+        DYNAMIC => {
+            WORKFLOW_SERIAL => { VALUE => $wf_id },
+        },
+        ORDER => [ 'TIMESTAMP', 'APPLICATION_LOG_SERIAL' ],
+        REVERSE => $reverse,
+        LIMIT => $limit
+    );
     
     my @log;
-    for (my $ii=0; $ii<50; $ii++) {
-       push @log, [ time(), 'INFO', 'This is message number ' . $ii ]; 
+    while (my $line = shift @{$result}) {
+       push @log, [ $line->{TIMESTAMP}, $line->{PRIORITY}, $line->{MESSAGE} ]; 
     }
     
-    @log = reverse @log;
-    
     return \@log;
-        
-    #my $result = CTX('dbi_workflow')->select(
-    #    TABLE => 'APPLICATION_LOG',
-    #    DYNAMIC => {
-    #        WORKFLOW_SERIAL => {VALUE => $wf_id},
-    #    },
-    #    ORDER => [ 'WORKFLOW_HISTORY_DATE', 'WORKFLOW_HISTORY_SERIAL' ]
-    #);
     
 }
 
