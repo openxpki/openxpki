@@ -66,6 +66,7 @@ install: info
 		$(DESTDIR)$(SITELIB)/CGI/Push.pm \
 		$(DESTDIR)$(SITELIB)/CGI/Switch.pm \
 		$(DESTDIR)$(SITELIB)/CGI/Util.pm \
+		$(DESTDIR)$(SITEMAN3EXP)/Sub::Util* \
 		$(DESTDIR)$(SITEMAN3EXP)/Module::Build* \
 		$(DESTDIR)$(SITELIB)/Module/Build.pm \
 		$(DESTDIR)$(SITELIB)/Module/Build \

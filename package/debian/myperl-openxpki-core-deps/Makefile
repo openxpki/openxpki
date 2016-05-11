@@ -32,6 +32,8 @@ install: info
 	# of make.
 	rm -rf \
 		$(DESTDIR)$(SITEMAN3EXP)/CPAN::Meta*.3 \
+		$(DESTDIR)$(SITEMAN3EXP)/Sub::Util.3 \
+		$(DESTDIR)$(SITEMAN3EXP)/Scalar::Util.3 \
 		$(DESTDIR)$(SITEMAN3EXP)/Module::Build* \
 		$(DESTDIR)$(SITELIB)/Module/Build.pm \
 		$(DESTDIR)$(SITELIB)/Module/Build \

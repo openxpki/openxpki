@@ -16,7 +16,7 @@ apt-get install -y \
 
 # For rebuilding debian packages
 apt-get install -y \
-    devscripts build-essential:native devscripts fakeroot
+    devscripts build-essential:native devscripts fakeroot debhelper
 
 # Dependencies for building perl
 apt-get install -y \
