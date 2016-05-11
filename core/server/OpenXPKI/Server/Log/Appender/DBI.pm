@@ -109,9 +109,9 @@ sub log {
         $dbi->insert(
             TABLE => 'APPLICATION_LOG',
             HASH  => {
-                APPLICATION_LOG_ID => $serial,
-                LOGTIMESTAMP       => $timestamp,
-                WORKFLOW_ID        => $wf_id,
+                APPLICATION_LOG_SERIAL => $serial,
+                TIMESTAMP       => $timestamp,
+                WORKFLOW_SERIAL        => $wf_id,
                 CATEGORY           => $category,
                 PRIORITY           => $loglevel,
                 MESSAGE            => $message,

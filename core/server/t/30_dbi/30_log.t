@@ -3,7 +3,7 @@ use warnings;
 use English;
 use Test::More;
 
-plan tests => 8;
+plan tests => 11;
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -19,7 +19,8 @@ use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Log;
 
 OpenXPKI::Server::Context::setcontext({
-    dbi_log => $dbi
+    dbi_log => $dbi,
+    dbi_backend => $dbi
 });
 my $log = OpenXPKI::Server::Log->new( CONFIG => 't/30_dbi/log4perl.conf' );
 
@@ -44,7 +45,7 @@ OpenXPKI::Server::Context::setcontext({
     workflow_id => 12345 
 });
 
-ok ($log->log (FACILITY => "workflow",
+ok ($log->log (FACILITY => "application",
                PRIORITY => "info",
                MESSAGE  => $msg), 'Workflow Test message')
            or diag "ERROR: log=$log";
@@ -53,10 +54,13 @@ $result = $dbi->select(
     TABLE => 'APPLICATION_LOG',
     DYNAMIC => 
     {
-        CATEGORY => {VALUE => 'openxpki.workflow' },
+        CATEGORY => {VALUE => 'openxpki.application' },
         MESSAGE => {VALUE => "%$msg", OPERATOR => 'LIKE'},
     }
 );
 is(scalar @{$result}, 1, 'Log entry found');
+is($result->[0]->{WORKFLOW_SERIAL}, 12345, "Check that workflow id was set");
+isnt($result->[0]->{TIMESTAMP}, undef, "Check that timestamp was set");
+isnt($result->[0]->{PRIORITY}, 0, "Check that the priority isn't zero");
 
 1;
