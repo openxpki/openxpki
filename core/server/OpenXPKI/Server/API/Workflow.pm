@@ -107,6 +107,9 @@ sub get_workflow_log {
         $limit = $args->{LIMIT};
     } 
     
+    # we want to track the usage
+    CTX('log')->usage()->info("get_workflow_log"); 
+    
     # Reverse is inverted as we want to have reversed order by default
     my $reverse = 1;
     if ($args->{REVERSE}) {
