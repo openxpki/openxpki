@@ -30,6 +30,7 @@ use OpenXPKI::Server::API::Profile;
 use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Token;
 use OpenXPKI::Server::API::Visualization;
+use OpenXPKI::Server::API::Housekeeping;
 use OpenXPKI::Server::API::Workflow;
 use OpenXPKI::Server::API::Smartcard;
 use OpenXPKI::Server::API::UI;
@@ -1128,6 +1129,17 @@ sub BUILD {
                 },
                 LANGUAGE => {
                     type => SCALAR, # TODO: regexp?
+                },
+            },
+        },
+
+        ### Housekeeping API 
+        'purge_application_log' => {
+            class => 'Housekeeping',
+            params => {
+                MAXAGE => { 
+                    type => SCALAR,
+                    regex => $re_integer_string,
                 },
             },
         },
