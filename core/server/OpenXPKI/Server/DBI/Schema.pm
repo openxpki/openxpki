@@ -23,7 +23,7 @@ my %SEQUENCE_of = (
     DATAEXCHANGE   => "seq_dataexchange",
     WORKFLOW       => "seq_workflow",    
     WORKFLOW_HISTORY => "seq_workflow_history",
-    APPLICATION_LOG_SERIAL => "seq_application_log",
+    APPLICATION_LOG => "seq_application_log",
     );
 
 my %COLUMN_of = (

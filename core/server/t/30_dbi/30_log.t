@@ -50,7 +50,7 @@ ok ($log->log (FACILITY => "workflow",
            or diag "ERROR: log=$log";
 
 $result = $dbi->select(
-    TABLE => 'AUDITTRAIL',
+    TABLE => 'APPLICATION_LOG',
     DYNAMIC => 
     {
         CATEGORY => {VALUE => 'openxpki.workflow' },
