@@ -29,7 +29,7 @@ or ubuntu trusty::
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
-    aptitude install mysql-server libdbd-mysql-perl
+    aptitude -y install mysql-server libdbd-mysql-perl sudo
 
 We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires the "non-free" repository to be present in your apt sources::
 
@@ -37,7 +37,7 @@ We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires t
     echo "deb http://httpredir.debian.org/debian jessie non-free" > /etc/apt/sources.list.d/non-free.list
     aptitude update
 
-    aptitude install libapache2-mod-fcgid
+    aptitude -y install libapache2-mod-fcgid apache2.2-common
 
 Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text (this is usually done by the installer already)::
 
@@ -45,7 +45,7 @@ Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
 
 Now install the OpenXPKI core package and the translation package::
 
-    aptitude install libopenxpki-perl openxpki-i18n
+    aptitude -y install libopenxpki-perl openxpki-i18n
 
 You should now restart the apache server to activate the new config::
 
@@ -54,7 +54,7 @@ You should now restart the apache server to activate the new config::
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 1.0.0
+    Version (core): 1.9.0
 
 Now, create an empty database and assign a database user::
 
