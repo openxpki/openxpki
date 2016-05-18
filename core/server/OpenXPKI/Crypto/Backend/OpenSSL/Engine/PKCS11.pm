@@ -61,7 +61,7 @@ sub get_engine_section
             my $pin = $self->get_passwd();
             $text =~ s/__PIN__/$pin/;
         }
-        return $self->{ENGINE_SECTION};
+        return $text;
     } else {
         return "";
     }
