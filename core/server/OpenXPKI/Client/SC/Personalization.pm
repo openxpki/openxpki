@@ -442,7 +442,7 @@ sub handle_server_personalization {
 
             $plugincommand =
                 'DeleteUserData;CardSerial='
-              . $random_pin
+              . $cardData->{'cardID'}
               . ';KeyID='
               . $cert_to_delete_id
               . ';UserPIN='
