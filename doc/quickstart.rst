@@ -26,7 +26,7 @@ Add the repository to your source list (jessie)::
     
 or ubuntu trusty::
 
-    echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/ubuntu/dists/ trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::

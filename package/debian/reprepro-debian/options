@@ -1,0 +1,3 @@
+verbose
+basedir /packages.openxpki.org/debian/ 
+ask-passphrase
