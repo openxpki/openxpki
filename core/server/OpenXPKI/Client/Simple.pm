@@ -99,6 +99,8 @@ sub _build_client {
     
     my $log = $self->logger();
     
+    $log->debug("Initialize client");  
+    
     # if we have a frontend session object, we also create a backend session
     if ($self->session()) {
         $self->__reinit_session( $client );

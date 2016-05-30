@@ -20,8 +20,11 @@ sub BUILD {
     my $self = shift;
     
     my $user = $ENV{'REMOTE_USER'};
-    
-    if ($user) {    
+    # force invalidity of any exisiting frontend sessions to trigger auth
+    # with overridden information, might be a problem otherwise if 
+    # personalization was done while AuthPerson was logged in
+    $self->_client()->session(undef);
+    if ($user) {
         $self->_client()->auth()->{user} = $user;
         $self->logger()->debug('Set session user for getauthcode to ' . $user);
     } else {
@@ -89,7 +92,7 @@ sub handle_getauthcode {
     }
            
     $self->_result({
-        foruser => $wf_info->{CONTEXT}->{creator},
+        foruser => $wf_info->{CONTEXT}->{owner_cn},
         code =>  $wf_info->{CONTEXT}->{_password},
     });
     
