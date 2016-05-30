@@ -15,53 +15,37 @@ use Config::Std;
 use Log::Log4perl qw(:easy);
 use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix );
 use OpenXPKI::Client::SC;
+use OpenXPKI::Client::Config;
 
+our $config = OpenXPKI::Client::Config->new('sc');
+my $conf = $config->default();
+my $log = $config->logger();
 
-my $configfile = '/etc/openxpki/sc/default.conf';
+$log->info("SmartCard handler initialized, " . $$ );
 
-# check for explicit file in env
-if ($ENV{OPENXPKI_SC_CLIENT_CONF_FILE}
-    && -f $ENV{OPENXPKI_SC_CLIENT_CONF_FILE}) {
-    $configfile = $ENV{OPENXPKI_SC_CLIENT_CONF_FILE};
-}
-
-read_config $configfile => my %config;
-
-if ($config{global}{log_config} && -f $config{global}{log_config}) {
-    Log::Log4perl->init( $config{global}{log_config} );
+if ($conf->{global}->{log_config} && -f $conf->{global}->{log_config}) {
+    Log::Log4perl->init( $conf->{global}->{log_config} );
 } else {
     Log::Log4perl->easy_init({ level => $DEBUG });
 }
 
-my $locale_directory = $config{global}{locale_directory} || '/usr/share/locale';  
-my $default_language = $config{global}{default_language} || 'en_US';
+my $locale_directory = $conf->{global}->{locale_directory} || '/usr/share/locale';  
+my $default_language = $conf->{global}->{default_language} || 'en_US';
 
 set_locale_prefix ($locale_directory);
 set_language      ($default_language);
 
-my $log = Log::Log4perl->get_logger();
-
-$log->info('Start single cgi  ' . $$. ', config: ' . $configfile);
-
-my $cgi = CGI->new;
-
-$log->debug('check for cgi session');
-
-if (!$config{global}{socket}) {
-    $config{global}{socket} = '/var/openxpki/openxpki.socket';
-} 
-
-my %card_config = %config;
+my %card_config = %{$conf};
 delete $card_config{realm};
 
 my @header_tpl;
-foreach my $key (keys ($config{header} || {})) {
-    my $val = $config{header}{$key};
+foreach my $key (keys (%{$conf->{header}})) {
+    my $val = $conf->{header}->{$key};
     $key =~ s/-/_/g;
     push @header_tpl, ("-$key", $val);
 }
 
-$log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
+$log->info('Start fcgi loop ' . $$);
 
 while (my $cgi = CGI::Fast->new()) {
 
@@ -79,19 +63,24 @@ while (my $cgi = CGI::Fast->new()) {
     push @header, ('-cookie', $cgi->cookie( $cookie ));
     push @header, ('-type','application/json; charset=UTF-8');        
   
+    my %global = %{$conf->{global}};
+    my %auth   = %{$conf->{auth}};
+  
+    $log->debug('Global ' . Dumper \%global );
+    $log->debug('Auth ' . Dumper \%auth );
+  
     my $client = OpenXPKI::Client::SC->new({
         session => $session_front,
         logger => $log,
-        config => $config{global},
+        config => \%global,
         card_config => \%card_config,
-        auth => $config{auth}
+        auth => \%auth
     });
     
     my $result = $client->handle_request({ cgi => $cgi });
     if ($result) {
         $result->render();
     }
-    
  
 }
 
