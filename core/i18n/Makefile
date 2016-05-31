@@ -1,4 +1,3 @@
-VERGEN = ../../tools/vergen
 PREFIX?=	/usr
 LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
 MO_FILE      = openxpki.mo
@@ -10,7 +9,13 @@ POT_SOURCES  = ../server ../../config
 VERSION_FILE    = ./VERSION
 PACKAGE      ?= openxpki-i18n
 
+TOPDIR := ../..
+
+# In package build, tools/vergen isn't available
+-include $(TOPDIR)/package/common/vergen.mk
+
 #---- variable settings above, rules below ----
+
 
 .PHONY:	default test install clean clean.local distclean openxpki.pot
 
@@ -76,9 +81,9 @@ distclean:: clean
 	rm -f *.pot */*.mo
 
 writeversion:
-	@( if (test -f $(VERGEN)) ; then \
-		$(VERGEN) --format version > $(VERSION_FILE); \
-	fi )
+	@  if version=$$($(VERGEN) --format version 2>/dev/null); then \
+		echo "$$version" > $(VERSION_FILE); \
+		fi
 	@( if (test ! -f $(VERSION_FILE) ) ; then \
 		echo "Could not determine version" ; \
 		exit 1; \

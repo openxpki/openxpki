@@ -5,7 +5,6 @@ TOPDIR=../../..
 
 PERL_VERSION=5.20.0
 MYPERL_RELEASE=1
-OXI_VERSION = $(shell ../../../tools/vergen --format version)
 
 PACKAGE=myperl-openxpki-core-deps
 #SRCBASE=$(TOPDIR)/clients/perl/OpenXPKI-Client-Enrollment
@@ -51,6 +50,7 @@ clean:
 	rm -f $(PACKAGE)-*.rpm $(PACKAGE).spec $(OXI_TARBALL)
 
 $(OXI_TARBALL):
+	@test -n "$DEBUG" && echo "DEBUG: BEGIN target $@"
 	rm -rf $(OXI_TARBALL_DIR)
 	mkdir -p $(OXI_TARBALL_DIR)
 	(cd ../../.. && tar cf - \
@@ -58,6 +58,7 @@ $(OXI_TARBALL):
 		| tar xf - -C $(OXI_TARBALL_DIR)
 	echo $(OXI_VERSION) > $(OXI_TARBALL_DIR)/VERSION
 	tar czf $@ -C $(OXI_TARBALL_DIR)/.. .
+	@test -n "$DEBUG" && echo "DEBUG: END target $@"
 	
 #####
 # TODO: Move the following targets to a common makefile

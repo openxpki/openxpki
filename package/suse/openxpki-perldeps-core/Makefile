@@ -35,8 +35,6 @@ include ../Makefile.inc
 -include ../Makefile.local
 -include Makefile.local
 
-VERGEN := $(TOPDIR)/tools/vergen
-
 VERSION = $(shell $(VERGEN) --format version)
 PKGREL = $(shell $(VERGEN) --format PKGREL)
 
@@ -105,12 +103,6 @@ TT_EXTRA_SYMBOLS = --define CONFIGURE_ARGS="$(CONFIGURE_ARGS)" --define PREFIX="
 # 2. ensure that some perl vars have *not* been set
 .PHONY: check
 check:
-	@for cmd in $(VERGEN) tpage ; do \
-		if ! $$cmd </dev/null >/dev/null 2>&1 ; then \
-			echo "ERROR: executable '$$cmd' does not work properly." ;\
-			exit 1 ;\
-		fi ;\
-	 done
 	@if test -n "$$PERL_LOCAL_LIB_ROOT"; then \
 		echo "ERROR: var PERL_LOCAL_LIB must not be set" 1>&2; exit 1; \
 	fi
