@@ -15,7 +15,9 @@ Debian/Ubuntu Builds
 
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff will crash otherwise!**
 
-Current release is 1.5 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
+Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
+
+Current release is 1.9 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (jessie)::
 
@@ -24,18 +26,14 @@ Add the repository to your source list (jessie)::
     
 or ubuntu trusty::
 
-    echo "deb http://packages.openxpki.org/ubuntu/ trusty/release/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/ubuntu/dists/ trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
     aptitude install mysql-server libdbd-mysql-perl
 
-We strongly recommend to use mod_fastcgi as it speeds up the UI, this requires the "non-free" repository to be present in your apt sources::
-
-    # This might be obsolete if you added the non-free repo during install
-    echo "deb http://httpredir.debian.org/debian jessie non-free" > /etc/apt/sources.list.d/non-free.list
-    aptitude update
+We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend mod_fcgid as it is in the official main repository (mod_fastcgi will also work but is only available in the non-free repo)::
 
     aptitude install libapache2-mod-fcgid
 
@@ -43,9 +41,13 @@ Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
 
     a2enmod fcgid
 
+Some people reported that a2enmod is not available on their system, in this case try to install the apache2.2-common package.
+
 Now install the OpenXPKI core package and the translation package::
 
     aptitude install libopenxpki-perl openxpki-i18n
+
+*Note: We are currently facing issues with the package signing process, therefore the package signatures are not properly validated and you will get an "untrusted package" warning on debian and a "gpg error" on ubuntu. We are working on this issue (see #181).*
 
 You should now restart the apache server to activate the new config::
 

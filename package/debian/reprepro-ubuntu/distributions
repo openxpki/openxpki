@@ -1,0 +1,7 @@
+Origin: The OpenXPKI Project 
+Label: The OpenXPKI Project 
+Codename: trusty 
+Architectures: amd64
+Components: release 
+Description: Repository for the OpenXPKI core software and its dependencies.
+SignWith: 0xF4275E606FCDC826
