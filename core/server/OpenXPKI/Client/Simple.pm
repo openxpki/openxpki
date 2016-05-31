@@ -72,6 +72,12 @@ has last_reply => (
     default => undef,           
 );
 
+has last_error => (
+    is => 'rw',
+    isa => 'Str|Undef',
+    default => undef,           
+);
+
 sub _build_logger {
     if(!Log::Log4perl->initialized()) { 
         Log::Log4perl->easy_init($ERROR);
@@ -167,7 +173,7 @@ sub run_command {
         PARAMS => $params
     });
     
-    $self->last_reply( $reply );
+    $self->last_reply( $reply );    
     if ($reply->{SERVICE_MSG} ne 'COMMAND') {                          
         my $message;
         if ($reply->{'LIST'} && ref $reply->{'LIST'} eq 'ARRAY') {            
@@ -182,8 +188,10 @@ sub run_command {
         }
         $self->logger()->error($message);
         $self->logger()->debug(Dumper $reply);
+        $self->last_error($message);
         die "Error running command: $message";
     }
+    $self->last_error('');
     return $reply->{PARAMS};
 }
 

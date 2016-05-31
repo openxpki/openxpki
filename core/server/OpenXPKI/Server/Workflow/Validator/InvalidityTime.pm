@@ -23,6 +23,10 @@ sub _validate {
     
     my ( $self, $wf, $invalidity_time, $identifier, $flag_delayed_revoke ) = @_;
 
+    if (!$invalidity_time) {
+        return 1;
+    }
+
     ## prepare the environment
     my $context = $wf->context();
      
@@ -103,7 +107,8 @@ This validator checks whether a given invalidity time is valid for a
 certificate, i.e. it is not in the future and within the the certificate
 validity time. It expects the timestamp and certificate identifier as 
 arguments, pass a true value as third argument if you will accept a 
-timestamp in the future ("delayed revoke")
+timestamp in the future ("delayed revoke"). If invalidity time is a false
+value, the validator returns true.
 
 The validator has a preset definiton using the context keys as given in 
 the example.

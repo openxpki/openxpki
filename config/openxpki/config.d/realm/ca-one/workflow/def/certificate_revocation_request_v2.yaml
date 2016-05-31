@@ -14,8 +14,8 @@ state:
     CHECK_BATCHMODE:
         autorun: 1
         action:
-          - global_noop > PENDING_USER ? !global_is_batch_mode
-          - check_authorized_signer > CHECK_APPROVALS ? global_is_batch_mode
+          - global_noop > PENDING_USER ? !global_is_automated_request
+          - check_authorized_signer > CHECK_APPROVALS ? global_is_automated_request
 
     CHECK_FOR_REVOCATION:
         autorun: 1
