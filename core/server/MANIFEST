@@ -649,6 +649,7 @@ cgi-bin/webui.fcgi
 cgi-bin/sc.fcgi
 cgi-bin/soap.fcgi
 cgi-bin/download.fcgi
+cgi-bin/rpc.fcgi
 
 # Client UI
 htdocs/src/main-built.js
