@@ -291,6 +291,25 @@ CREATE TABLE IF NOT EXISTS `workflow_history` (
   KEY (`workflow_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `application_log`
+--
+
+DROP TABLE IF EXISTS `application_log`;
+CREATE TABLE IF NOT EXISTS `application_log` (
+  `application_log_id` bigint(20) unsigned NOT NULL,
+  `logtimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `workflow_id` decimal(49,0) NOT NULL,
+  `priority` int(3) DEFAULT 999,
+  `category` varchar(255) NOT NULL,
+  `message` longtext,
+  PRIMARY KEY (`application_log_id`),
+  KEY (`workflow_id`),
+  KEY (`workflow_id`,`priority`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
 
 -- --------------------------------------------------------
 
@@ -419,6 +438,19 @@ CREATE TABLE IF NOT EXISTS `seq_workflow` (
 DROP TABLE IF EXISTS `seq_workflow_history`;
 CREATE TABLE IF NOT EXISTS `seq_workflow_history` (
   `seq_number` bigint(20) NOT NULL AUTO_INCREMENT,
+  `dummy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`seq_number`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `seq_application_log`
+--
+
+DROP TABLE IF EXISTS `seq_application_log`;
+CREATE TABLE IF NOT EXISTS `seq_application_log` (
+  `seq_number` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `dummy` int(11) DEFAULT NULL,
   PRIMARY KEY (`seq_number`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

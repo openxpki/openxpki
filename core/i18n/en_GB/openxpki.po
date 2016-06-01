@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-04-25 11:26+0100\n"
+"PO-Revision-Date: 2016-05-09 19:19+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1803,6 +1803,21 @@ msgstr "go back"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Last Update"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG"
+msgstr "Technical Log"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL"
+msgstr "Technical Log"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_MESSAGE_LABEL"
+msgstr "Message"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_PRIORITY_LABEL"
+msgstr "Priority"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_TIMESTAMP_LABEL"
+msgstr "Timestamp"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION"
 msgstr ""
 "The attention level of your message. This gets reflected in the color of the "
@@ -2467,9 +2482,6 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
-#~ msgstr "Action"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"

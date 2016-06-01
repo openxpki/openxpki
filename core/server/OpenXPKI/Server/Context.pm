@@ -43,6 +43,7 @@ my $context = {
         session        => undef,
         authentication => undef,
         notification   => undef,
+        workflow_id    => undef,
     },
 };
 

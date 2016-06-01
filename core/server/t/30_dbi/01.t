@@ -8,8 +8,6 @@ diag "OpenXPKI::Server::DBI: Database Initialization\n" if $ENV{VERBOSE};
 
 use_ok('OpenXPKI::Server::DBI', 'Using OpenXPKI::Server::DBI');
 
-TODO: {
-    todo_skip 'See Issue #188', 8;
 our %config;
 our $dbi;
 require 't/30_dbi/common.pl';
@@ -28,5 +26,4 @@ if ($ENV{DEBUG}) {
 $sqlscript = eval { $dbi->init_schema (MODE => 'FORCE') };
 ok(! $EVAL_ERROR, 'init_schema') or diag $EVAL_ERROR;
 
-}
 1;

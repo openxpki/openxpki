@@ -30,6 +30,7 @@ use OpenXPKI::Server::API::Profile;
 use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Token;
 use OpenXPKI::Server::API::Visualization;
+use OpenXPKI::Server::API::Housekeeping;
 use OpenXPKI::Server::API::Workflow;
 use OpenXPKI::Server::API::Smartcard;
 use OpenXPKI::Server::API::UI;
@@ -1132,6 +1133,17 @@ sub BUILD {
             },
         },
 
+        ### Housekeeping API 
+        'purge_application_log' => {
+            class => 'Housekeeping',
+            params => {
+                MAXAGE => { 
+                    type => SCALAR,
+                    regex => $re_integer_string,
+                },
+            },
+        },
+
         ### Workflow API 
         'get_workflow_instance_types' => {
             class  => 'Workflow',
@@ -1183,6 +1195,25 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
+                },
+            },
+        },
+        'get_workflow_log' => {
+            class  => 'Workflow',
+            params => {
+                ID => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+                REVERSE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },            
+                LIMIT => {
+                    type  => SCALAR,
+                    optional => 1,
+                    regex => $re_integer_string,
                 },
             },
         },

@@ -11,6 +11,20 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 use English;
+use Log::Log4perl::Level;
+use Carp;
+
+my %LOGLEVELS = (
+    ALL     => 0,
+    TRACE   => 5000,
+    DEBUG   => 10000,
+    INFO    => 20000,
+    WARN    => 30000,
+    ERROR   => 40000,
+    FATAL   => 50000,
+    OFF     => (2 ** 31) - 1,
+);
+
 
 sub new {
     ##! 1: 'start'
@@ -50,35 +64,79 @@ sub log {
         return;
     }
 
-    my $serial;
-    eval {
-        $serial = $dbi->get_new_serial(
+    # TODO: If category IS '*.audit', write to the audittrail. Otherwise,
+    #       write to application_log and also put workflow_id into its
+    #       own column instead of in the message.
+    if ( $category =~ m{\.audit$} ) {
+        my $serial;
+        eval {
+            $serial = $dbi->get_new_serial(
+                TABLE => 'AUDITTRAIL',
+            );
+            ##! 64: 'serial: ' . $serial
+        };
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            ##! 16: 'exception caught'
+            if ($exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED') {
+                ##! 16: 'dbi_log not connected'
+                print STDERR "dbi_log not connected! (tried to log: $timestamp, $category, $loglevel, $message)\n";
+                return; 
+            }
+            else {
+                $exc->rethrow();
+            }
+        }
+        $dbi->insert(
             TABLE => 'AUDITTRAIL',
+            HASH  => {
+                AUDITTRAIL_SERIAL => $serial,
+                TIMESTAMP         => $timestamp,
+                CATEGORY          => $category,
+                LOGLEVEL           => $loglevel,
+                MESSAGE           => $message,
+            },    
         );
-        ##! 64: 'serial: ' . $serial
-    };
-    if (my $exc = OpenXPKI::Exception->caught()) {
-        ##! 16: 'exception caught'
-        if ($exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED') {
-            ##! 16: 'dbi_log not connected'
-            print STDERR "dbi_log not connected! (tried to log: $timestamp, $category, $loglevel, $message)\n";
-            return; 
+    } else {
+        my $serial;
+        my $wf_id = 0;
+        if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
+            $wf_id = CTX('workflow_id');
         }
-        else {
-            $exc->rethrow();
+        eval {
+            $serial = $dbi->get_new_serial(
+                TABLE => 'APPLICATION_LOG',
+            );
+            ##! 64: 'serial: ' . $serial
+        };
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            ##! 16: 'exception caught'
+            if ($exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED') {
+                ##! 16: 'dbi_log not connected'
+                print STDERR "dbi_log not connected! (tried to log: $timestamp, $category, $loglevel, $wf_id, $message)\n";
+                return; 
+            }
+            else {
+                $exc->rethrow();
+            }
         }
+        my $loglevel_int = 0;
+        if ( exists $LOGLEVELS{$loglevel} ) {
+            $loglevel_int = $LOGLEVELS{$loglevel};
+        }
+
+        $dbi->insert(
+            TABLE => 'APPLICATION_LOG',
+            HASH  => {
+                APPLICATION_LOG_SERIAL => $serial,
+                TIMESTAMP       => $timestamp,
+                WORKFLOW_SERIAL        => $wf_id,
+                CATEGORY           => $category,
+                PRIORITY           => $loglevel_int,
+                MESSAGE            => $message,
+            },    
+        );
     }
 
-    $dbi->insert(
-        TABLE => 'AUDITTRAIL',
-        HASH  => {
-            AUDITTRAIL_SERIAL => $serial,
-            TIMESTAMP         => $timestamp,
-            CATEGORY          => $category,
-            LOGLEVEL           => $loglevel,
-            MESSAGE           => $message,
-        },    
-    );
     $dbi->commit();
 
     ##! 1: 'end'
