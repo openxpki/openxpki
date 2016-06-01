@@ -187,12 +187,13 @@ my %TABLE_of = (
         NAME    => "certificate",
         INDEX   => [ "ISSUER_IDENTIFIER", "CERTIFICATE_SERIAL" ],
         COLUMNS => [ "PKI_REALM", "ISSUER_DN", "CERTIFICATE_SERIAL",
-             "ISSUER_IDENTIFIER", "IDENTIFIER", "DATA",
+             "ISSUER_IDENTIFIER", "IDENTIFIER",
                      # "GLOBAL_KEY_ID",
                      "SUBJECT",
-                     "STATUS", "PUBKEY",
+                     "STATUS",
                      "SUBJECT_KEY_IDENTIFIER", "AUTHORITY_KEY_IDENTIFIER",
-                     "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL"
+                     "NOTAFTER", "LOA", "NOTBEFORE", "CSR_SERIAL",
+                     "PUBKEY", "DATA"
                    ],
         KEY => 'CERTIFICATE_SERIAL' # Automatic seq. generation on certificate might be a problem!                   
     },
