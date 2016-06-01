@@ -11,6 +11,20 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 use English;
+use Log::Log4perl::Level;
+use Carp;
+
+my %LOGLEVELS = (
+    ALL     => 0,
+    TRACE   => 5000,
+    DEBUG   => 10000,
+    INFO    => 20000,
+    WARN    => 30000,
+    ERROR   => 40000,
+    FATAL   => 50000,
+    OFF     => (2 ** 31) - 1,
+);
+
 
 sub new {
     ##! 1: 'start'
@@ -105,6 +119,10 @@ sub log {
                 $exc->rethrow();
             }
         }
+        my $loglevel_int = 0;
+        if ( exists $LOGLEVELS{$loglevel} ) {
+            $loglevel_int = $LOGLEVELS{$loglevel};
+        }
 
         $dbi->insert(
             TABLE => 'APPLICATION_LOG',
@@ -113,7 +131,7 @@ sub log {
                 TIMESTAMP       => $timestamp,
                 WORKFLOW_SERIAL        => $wf_id,
                 CATEGORY           => $category,
-                PRIORITY           => $loglevel,
+                PRIORITY           => $loglevel_int,
                 MESSAGE            => $message,
             },    
         );
