@@ -117,6 +117,9 @@ find %{buildroot} -name "perllocal.pod" \
 # DESTDIR = %{buildroot}
 set -e
 rm -rf \
+		$DESTDIR/$VENDORMAN3EXP/List::Util* \
+		$DESTDIR/$VENDORMAN3EXP/Scalar::Util* \
+		$DESTDIR/$VENDORMAN3EXP/Sub::Util* \
 		$DESTDIR/$VENDORMAN3EXP/CPAN::Meta* \
 		$DESTDIR/$VENDORMAN3EXP/Module::Build* \
 		$DESTDIR/$VENDORLIB/Module/Build.pm \
