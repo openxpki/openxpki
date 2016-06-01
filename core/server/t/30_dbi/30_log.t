@@ -2,15 +2,14 @@ use strict;
 use warnings;
 use English;
 use Test::More;
-plan tests => 6;
+
+plan tests => 41;
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
 
-TODO: {
-    todo_skip 'See Issue #188', 6;
 
 our $dbi;
 our $token;
@@ -20,13 +19,13 @@ use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Log;
 
 OpenXPKI::Server::Context::setcontext({
-    dbi_log => $dbi
+    dbi_log => $dbi,
+    dbi_backend => $dbi
 });
-my $log = OpenXPKI::Server::Log->new( CONFIG => 't/28_log/log4perl.conf' );
+my $log = OpenXPKI::Server::Log->new( CONFIG => 't/30_dbi/log4perl.conf' );
 
 my $msg = sprintf "DBI Log Test %01d", rand(10000000);
 
-# Workflow errors go to DBI
 ok ($log->log (FACILITY => "audit",
                PRIORITY => "info",
                MESSAGE  => $msg), 'Test message');
@@ -41,5 +40,58 @@ ok ($log->log (FACILITY => "audit",
 );
 is(scalar @{$result}, 1, 'Log entry found');
 
+$msg = sprintf "DBI Log Workflow Test %01d", rand(10000000);
+OpenXPKI::Server::Context::setcontext({
+    workflow_id => 12345 
+});
+
+ok ($log->log (FACILITY => "application",
+               PRIORITY => "info",
+               MESSAGE  => $msg), 'Workflow Test message')
+           or diag "ERROR: log=$log";
+
+$result = $dbi->select(
+    TABLE => 'APPLICATION_LOG',
+    DYNAMIC => 
+    {
+        CATEGORY => {VALUE => 'openxpki.application' },
+        MESSAGE => {VALUE => "%$msg", OPERATOR => 'LIKE'},
+    }
+);
+is(scalar @{$result}, 1, 'Log entry found');
+is($result->[0]->{WORKFLOW_SERIAL}, 12345, "Check that workflow id was set");
+isnt($result->[0]->{TIMESTAMP}, undef, "Check that timestamp was set");
+is($result->[0]->{PRIORITY}, 20000, "Check that the priority 'info' is saved as 20000");
+
+my %levels = (
+    'fatal' => 50000,
+    'error' => 40000,
+    'warn'  => 30000,
+    'info'  => 20000,
+    'debug' => 10000,
+    'bogus' => 50000,
+);
+
+foreach my $level ( sort keys %levels ) {
+    # Check via our DBI.pm code
+    $msg = sprintf "DBI Log Workflow Test %01d", rand(10000000);
+    ok ($log->log (FACILITY => "application",
+            PRIORITY => $level,
+            MESSAGE  => $msg), '[' . $level . '] Workflow Test message')
+        or diag "ERROR: log=$log ($@)";
+
+    $result = $dbi->select(
+        TABLE => 'APPLICATION_LOG',
+        DYNAMIC => 
+        {
+            CATEGORY => {VALUE => 'openxpki.application' },
+            MESSAGE => {VALUE => "%$msg", OPERATOR => 'LIKE'},
+        }
+    );
+    is(scalar @{$result}, 1, '[' . $level . '] Log entry found');
+    is($result->[0]->{WORKFLOW_SERIAL}, 12345, "[$level] Check that workflow id was set");
+    isnt($result->[0]->{TIMESTAMP}, undef, "[$level] Check that timestamp was set");
+    is($result->[0]->{PRIORITY}, $levels{$level}, "[$level] Check the priority value");
 }
+
 1;

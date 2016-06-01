@@ -89,6 +89,33 @@ Certificates are revoked by specifying the certificate identifier.
         --data "reason_code=unspecified" \
         http://demo.openxpki.org/cgi-bin/rpc.cgi
 
+The response is in JSON format (http://www.jsonrpc.org/specification#response_object).
+Except for the "id", the result is identical to the SOAP call:
+
+    { result: { id: workflow_id, pid: process_id, state: workflow_state }}
+
+On error, the content returned is:
+
+    { error: { code: 1, message: "Verbose error", data: { id, pid, state } } }
+
+The following HTTP Response Codes are (to be) supported:
+
+* 200 OK - Request was successful
+
+* 400 Bad Request - Returned when the RPC method or required parameters
+  are missing.
+
+* 401 Unauthorized - No or invalid authentication details were provided
+
+* 403 Forbidden - Authentication succeeded, but the authenticated user does
+  not have access to the resource
+
+* 404 Not Found - A non-existent resource was requested
+
+* 500 Internal Server Error - Returned when there is an error creating an
+  instance of the client object or a new workflow, or the workflow terminates
+  in an unexpected state.
+
 See Also
 ========
 

@@ -96,6 +96,8 @@ our %COLUMN = (
     "message"          => "TEXT",
     "category"         => "TEXT_KEY",
     "loglevel"         => "TEXT_KEY",
+    "priority"         => "NUMERIC",
+    "application_log_id" => "BIGINT",
 
     "keyid"            => "TEXT_KEY",
     "ca_issuer_name"   => "TEXT_KEY",

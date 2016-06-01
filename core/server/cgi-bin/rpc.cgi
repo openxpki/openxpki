@@ -34,6 +34,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $method = $cgi->param('method');         
     if ( !$method ) {
+        # TODO: Return as "400 Bad Request"?
         $log->error("RPC no method set in request");
         print $json->encode( { error => {
             code => 42, 
@@ -45,6 +46,7 @@ while (my $cgi = CGI::Fast->new()) {
     
     my $workflow_type = $conf->{$method}->{workflow};    
     if ( !defined $workflow_type ) {
+        # TODO: Return as "400 Bad Request"?
         $log->error("RPC no workflow_type set for requested method $method");
         print $json->encode( { error => { 
             code => 42, 
@@ -125,6 +127,7 @@ while (my $cgi = CGI::Fast->new()) {
         });
         
         if ( !$client ) {
+            # TODO: Return as "500 Internal Server Error"?
             $log->error("Could not instantiate client object");
             print $json->encode( { error => { 
                 code => 42, 
@@ -144,10 +147,12 @@ while (my $cgi = CGI::Fast->new()) {
   
     my $res;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
+        # TODO: Return as "500 Internal Server Error"?
         $log->error("Unable to create workflow: ". $exc->message );
         $res = { error => { code => 42, message => $exc->message, data => { pid => $$ } } };
     } elsif ($EVAL_ERROR) {
         
+        # TODO: Return as "500 Internal Server Error"?
         my $error = $client->last_error();
         if ($error) {
             $log->error("Unable to create workflow: ". $error );
@@ -157,6 +162,7 @@ while (my $cgi = CGI::Fast->new()) {
         }        
         $res = { error => { code => 42, message => $error, data => { pid => $$ } } };                
     } elsif (!$workflow->{ID} || $workflow->{'PROC_STATE'} eq 'exception' || $workflow->{'STATE'} eq 'FAILURE') {
+        # TODO: Return as "500 Internal Server Error"?
         $log->error("workflow terminated in unexpected state" );
         $res = { error => { code => 42, message => 'workflow terminated in unexpected state', data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'STATE'} } } };        
     } else {

@@ -70,6 +70,78 @@ sub get_workflow_type_for_id {
     return $type;
 }
 
+
+=head2 get_workflow_log
+
+Return the workflow log for a given workflow id (ID), by default you get
+the last 50 items of the log sorted neweset first. Set LIMIT to the number
+of lines expected or 0 to get all lines (might be huge!). Set REVERSE = 1 
+to reverse sorting (oldest first). 
+
+The return value is a list of arrays with a fixed order of fields: 
+TIMESTAMP, PRIORITY, MESSAGE
+
+=over
+
+=item ID numeric workflow id
+
+=item LIMIT number of lines to return, 0 for all
+
+=item REVERSE set to 1 to reverse sorting
+
+=back
+
+=cut
+
+sub get_workflow_log {
+    
+    my $self  = shift;
+    my $args  = shift;
+
+    ##! 1: "get_workflow_log"
+    
+    my $wf_id = $args->{ID};
+    
+    my $limit = 50;
+    if (defined $args->{LIMIT}) {
+        $limit = $args->{LIMIT};
+    } 
+    
+    # we want to track the usage
+    CTX('log')->usage()->info("get_workflow_log"); 
+    
+    # Reverse is inverted as we want to have reversed order by default
+    my $reverse = 1;
+    if ($args->{REVERSE}) {
+        $reverse = 0;
+    }
+     
+    my $result = CTX('dbi_workflow')->select(
+        TABLE => 'APPLICATION_LOG',
+        DYNAMIC => {
+            WORKFLOW_SERIAL => { VALUE => $wf_id },
+        },
+        ORDER => [ 'TIMESTAMP', 'APPLICATION_LOG_SERIAL' ],
+        REVERSE => $reverse,
+        LIMIT => $limit
+    );
+    
+    my @log;
+    while (my $line = shift @{$result}) {
+       push @log, [ $line->{TIMESTAMP}, $line->{PRIORITY}, $line->{MESSAGE} ]; 
+    }
+    
+    return \@log;
+    
+}
+
+
+=head2 get_workflow_info
+
+This is a simple passthru to __get_workflow_ui_info
+
+=cut 
+
 sub get_workflow_info {
     my $self  = shift;
     my $args  = shift;
@@ -416,7 +488,7 @@ sub wakeup_workflow {
         $wf_title,
         $wf_id
     );
-    
+
     my $proc_state = $workflow->proc_state(); 
     if (!($proc_state eq 'pause' || $proc_state eq 'retry_exceeded')) {
         OpenXPKI::Exception->throw(
@@ -551,6 +623,12 @@ sub create_workflow_instance {
     # This is crucial and must be done before the first execute as otherwise 
     # workflow acl fails when the first non-initial action is autorun
     $workflow->attrib({ creator => $creator });
+
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    workflow_id => $wf_id,
+	    force       => 1,
+	});
 
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->log(
@@ -956,6 +1034,11 @@ sub __get_workflow_factory {
         );
     }
 
+    OpenXPKI::Server::Context::setcontext(
+	{
+	    workflow_id => $arg_ref->{WORKFLOW_ID},
+	    force       => 1,
+	});
 
     # We have now obtained the configuration id that was active during
     # creation of the workflow instance. However, if for some reason

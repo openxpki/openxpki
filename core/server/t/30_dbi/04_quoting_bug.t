@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-plan tests => 3;
+plan tests => 7;
 
 diag "OpenXPKI::Server::DBI: Quoting bug\n" if $ENV{VERBOSE};
 
@@ -11,8 +11,8 @@ use OpenXPKI::Crypto::CRL;
 
 use Data::Dumper;
 
-TODO: {
-    todo_skip 'See Issue #188', 3;
+#TODO: {
+#    todo_skip 'See Issue #188', 3;
 our $dbi;
 our $token;
 require 't/30_dbi/common.pl';
@@ -41,7 +41,7 @@ is(scalar @{$result}, 1, 'one entry returned (equal)');
 
 
 TODO: {
-    local $TODO = 'MySQL seems to have a problem with quoting, see #1951540';
+    todo_skip 'MySQL seems to have a problem with quoting, see #1951540', 1;
     my $result = $dbi->select(
         TABLE => 'CERTIFICATE',
         DYNAMIC => 
@@ -52,5 +52,5 @@ TODO: {
     is(scalar @{$result}, 1, 'one entry returned');
 }
 
-}
+#}
 1;

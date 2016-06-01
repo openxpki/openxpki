@@ -33,7 +33,7 @@ my $config = OpenXPKI::Config::Test->new();
 my %params = (LOG => $log);
 
 my $db_config = $config->get_hash('system.database.main');
-foreach my $key qw(type name namespace host port user passwd) {
+foreach my $key ( qw(type name namespace host port user passwd) ) {
     ##! 16: "dbi: $key => " . $db_config->{$key}
     $params{uc($key)} = $db_config->{$key}; 
 }    

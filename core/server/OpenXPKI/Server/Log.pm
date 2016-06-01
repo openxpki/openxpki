@@ -61,12 +61,19 @@ sub init {
     }
 
     ## ensure that all relevant loggers are present
-    foreach my $facility ("auth", "audit", "monitor", "system", "workflow", "application" )
+    foreach my $facility ("auth", "audit", "monitor", "system", "workflow", "application", "usage" )
     {
         ## get the relevant logger
         $self->{$facility} = Log::Log4perl->get_logger("openxpki.$facility");
         if (not $self->{$facility})
         {
+            # backwards compatibility
+            if ($facility eq "usage") {
+                $self->{'usage'} = $self->{'monitor'};
+                $self->{'system'}->warn("Log facility 'usage' is missing - falling back to monitor");
+                return 1;
+            } 
+            
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_LOG_NEW_MISSING_LOGGER",
                 params  => {"FACILITY" => $facility});
@@ -80,6 +87,14 @@ sub re_init {
     my $self = shift;
 
     return $self->init();
+}
+
+# todo - if this PoC is valuable, we should change all logger calls 
+sub usage {
+    
+    my $self = shift;
+    return $self->{'usage'};    
+    
 }
 
 sub log
@@ -112,7 +127,7 @@ sub log
 
     $facility = lc($keys->{FACILITY})
         if (exists $keys->{FACILITY} and
-            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system|workflow|application) \z }xms);
+            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system|workflow|application|usage) \z }xms);
 
     $prio = uc($keys->{PRIORITY})
         if (exists $keys->{PRIORITY} and
@@ -156,6 +171,12 @@ sub log
         };
     }
 
+    # get workflow instance information
+    my $wf_id;
+    if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
+	$wf_id = CTX('workflow_id');
+    }
+
     ## build and store message
     $msg = "[$package"
 	. " (" 
@@ -163,6 +184,7 @@ sub log
 	. "$line)"
 	. (defined $user          ? '; ' . $user . $role : '')
 	. (defined $session_short ? '@' . $session_short : '')
+	. (defined $wf_id         ? '#' . $wf_id : '')
         . "] $msg";
 
     # remove trailing newline characters

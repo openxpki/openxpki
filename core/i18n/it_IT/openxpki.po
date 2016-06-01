@@ -1911,6 +1911,26 @@ msgstr "torna indietro"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Ultimo Aggiornamento"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG"
+msgstr "Action"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL"
+msgstr "Workflow Id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_MESSAGE_LABEL"
+msgstr "Link"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_PRIORITY_LABEL"
+msgstr "Workflow History"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_TIMESTAMP_LABEL"
+msgstr "Contesto Workflow"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION"
 msgstr ""
 "Il livello di attenzione del tuo messaggio. Viene riflesso nel colore del "
@@ -2568,9 +2588,6 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION"
-#~ msgstr "Action"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"

@@ -3,12 +3,20 @@
 # Note: Travis will run through the 'before_install' and 'install' steps
 # before executing 'make test'
 
-language: perl
+# We use our own perl, so setting language to generic
+# allows us to use the stripped-down travis image
+language: generic
+
+sudo: required
+dist: trusty
 
 env:
     global:
         - PERL_CPANM_OPT="--mirror http://cpan.cpantesters.org/ --mirror http://search.cpan.org/CPAN --mirror http://cpan.mirrors.travis-ci.org --cascade-search"
         - PATH="/opt/myperl/bin:$PATH"
+        - MYPERLVER=5.22.0-1
+        - MYPERLVERS=5.22.0.1
+        - MYPERLDL=https://github.com/mrscotty/myperl/releases/download/v5.22.0.1
 
 # Note: language-pack-de is needed for the i18n test
 before_install:
@@ -18,8 +26,16 @@ before_install:
     - sudo apt-get install -y -qq libmysqlclient-dev
     # stuff needed for running oxi instance (TODO: check if these are already installed)
     - sudo apt-get install -y -qq mysql-server apache2
-    - wget https://github.com/mrscotty/myperl/releases/download/v5.20.0.1/myperl_5.20.0.1_amd64.deb
-    - sudo dpkg -i myperl_5.20.0.1_amd64.deb
+    - sudo apt-get install -y -qq libdb5.1
+    - wget $MYPERLDL/myperl_${MYPERLVER}_amd64.deb
+    - sudo dpkg -i myperl_${MYPERLVER}_amd64.deb
+    - wget $MYPERLDL/myperl-buildtools_${MYPERLVERS}_amd64.deb
+    - sudo dpkg -i myperl-buildtools_${MYPERLVERS}_amd64.deb
+    - wget $MYPERLDL/myperl-dbd-mysql_1.9.0.1_amd64.deb
+    - sudo dpkg -i myperl-dbd-mysql_1.9.0.1_amd64.deb
+    - wget $MYPERLDL/myperl-openxpki-core-deps_1.9.0.1_amd64.deb
+    - sudo dpkg -i myperl-openxpki-core-deps_1.9.0.1_amd64.deb
+
 
 # Try to get debug from inst stuff
 install:
@@ -27,11 +43,14 @@ install:
 # The core tests depend on the client library - we install it in a separate perlbrew library space
 #    - "perlbrew lib delete oxi-client; perlbrew lib create oxi-client"
 #    - "(cd core/server && cpanm --quiet --notest .)"
-    - "(cd package/debian/libdbd-mysql-myperl && make package)"
-    - ls -la package/debian package/debian/libdbd-mysql-myperl
-    - sudo dpkg -i package/debian/libdbd-mysql-myperl_*.deb
-    - "(cd package/debian/openxpki-core-deps-myperl && make package)"
-    - ls -la package/debian
-    - sudo dpkg -i package/debian/openxpki-core-deps-myperl_*.deb
+#    - "(cd package/debian/myperl-dbd-mysql && make package PACKAGE_VER=5.20.0 PACKAGE_REL=1)"
+#    - ls -la package/debian package/debian/mysql-dbd-mysql
+#    - sudo dpkg -i package/debian/mysql-dbd-mysql_*.deb
+#    - "(cd package/debian/myperl-openxpki-core-deps && make package)"
+#    - ls -la package/debian
+#    - sudo dpkg -i package/debian/myperl-openxpki-core-deps_*.deb
     #- cpanm --notest Config::Std Config::Merge Template Proc::SafeExec Module::Install YAML DBD::mysql
 
+# With 'language: generic', the 'script' must be specified...
+script:
+    - PATH=$PATH:/opt/myperl/bin PERL=/opt/myperl/bin/perl make test
