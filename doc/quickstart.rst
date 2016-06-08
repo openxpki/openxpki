@@ -17,7 +17,7 @@ Debian/Ubuntu Builds
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
 
-Current release is 1.9 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.10 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (jessie)::
 
@@ -26,8 +26,12 @@ Add the repository to your source list (jessie)::
     
 or ubuntu trusty::
 
-    echo "deb http://packages.openxpki.org/ubuntu/dists/ trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/ubuntu/ dists/trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
+
+To avoid an "untrusted package" warning, you should add our package signing key (works only on debian yet)::
+
+    wget http://packages.openxpki.org/debian/Release.key -O - | apt-key add -
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
@@ -47,7 +51,7 @@ Now install the OpenXPKI core package and the translation package::
 
     aptitude install libopenxpki-perl openxpki-i18n
 
-*Note: We are currently facing issues with the package signing process, therefore the package signatures are not properly validated and you will get an "untrusted package" warning on debian and a "gpg error" on ubuntu. We are working on this issue (see #181).*
+*Note: It looks like we solved this for debian but the ubuntu signatures are still "broken" and installing on ubuntu causes a "gpg error". We are still working on this issue (see #181).* 
 
 You should now restart the apache server to activate the new config::
 
