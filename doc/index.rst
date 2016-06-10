@@ -15,6 +15,7 @@ Table of Contents:
 
    introduction
    quickstart
+   upgrading
 
 Setup and Configuration
 
