@@ -9,7 +9,7 @@ DIST=$1
 if [ "$DIST" == "jessie" ]; then
     KEYID=`grep SignWith ../../../package/debian/reprepro-debian/distributions | cut -d ":" -f2`
 elif [ "$DIST" == "trusty" ]; then
-    KEYID=`grep SignWith ../../../package/debian/reprepro-debian/distributions | cut -d ":" -f2`
+    KEYID=`grep SignWith ../../../package/debian/reprepro-ubuntu/distributions | cut -d ":" -f2`
 else 
     echo "Unknown distro $DIST - allowed values are jessie or trusty"; exit 1;
 fi;
