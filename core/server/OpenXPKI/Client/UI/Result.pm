@@ -448,18 +448,35 @@ sub init_fetch {
 
     # Start output stream
     my $cgi = $self->cgi();
-    
-    print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
-    
-    if ($data->{file}) {
-        open (my $fh, $data->{file}) || die 'Unable to open file';
+           
+    if ($data->{data}) {
+        print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
+        print $data->{data};
+        exit;
+    }
+        
+    my ($type, $source) = split /:/, $data->{source};        
+    if ($type eq 'file') {
+        my $file = $1;
+        open (my $fh, $file) || die 'Unable to open file';
+        print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
         while (my $line = <$fh>) {
             print $line;
         }
-        close $fh;
-    } else {
-        print $data->{data};
-    } 
+        close $fh;        
+    } elsif ($type eq 'datapool') {
+        # todo - catch exceptions/not found
+        my $dp = $self->send_command( 'get_data_pool_entry', {            
+            NAMESPACE => 'workflow.download',
+            KEY => $source,
+        });
+        if (!$dp->{VALUE}) {
+            die "Requested data not found/expired";
+        }        
+        print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
+        print $dp->{VALUE};
+    }
+    
     exit;
 
 }
