@@ -2140,8 +2140,8 @@ sub __set_data_pool_entry : PRIVATE {
         );
     }
 
-    # check for illegal characters
-    if ( $value =~ m{ (?:\p{Unassigned}|\x00) }xms ) {
+    # check for illegal characters - not neccesary if we encrypt the value 
+    if ( !$encrypt && ($value =~ m{ (?:\p{Unassigned}|\x00) }xms )) {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ILLEGAL_DATA",
             params => {
