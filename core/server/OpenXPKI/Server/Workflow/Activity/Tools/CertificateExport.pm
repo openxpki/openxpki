@@ -62,7 +62,10 @@ sub execute {
     # shift/pop of the entity and ca from the ends of the list
     my $config = $tt->render( $template, $ttargs );
          
-    $context->param('certificate_export' , $config);  
+         
+    my $target_key = $self->param('target_key') || 'certificate_export';    
+         
+    $context->param( $target_key , $config);  
                
 }
 
@@ -91,7 +94,7 @@ The cert to be exported.
 =item template
 
 A template toolkit string to be used to render the output. The parser is 
-called with four parameters. Certificates are PEM encoded, keys might be
+called with five parameters. Certificates are PEM encoded, keys might be
 in binary format, depending on the key_format parameter! 
 
 =over
@@ -127,18 +130,13 @@ the exported key.
 
 =item key_format, optional
 
+ @see OpenXPKI::Server::API::Object::get_private_key_for_cert
 
+=item target_key, optional
 
-=back
-
-=head2 Context parameters
-
-After completion the following context parameters will be set:
-
-=over 12
-
-=item certificate_export
-
-The result of the template rendering.
+The context key to write the result to, default is I<certificate_export>.
+Note: If you export a key and use a persisted workflow, this will leave the
+(password protected) key readable in the context forever.  
 
 =back
+ 
