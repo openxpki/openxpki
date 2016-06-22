@@ -1,0 +1,194 @@
+head:
+    prefix: exportprivkey
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC
+    persister: Volatile
+
+state:
+    INITIAL:
+        action:
+          - initialize > CHECKACCESS
+
+    CHECKACCESS:
+        autorun: 1
+        action:
+          - make_uuid > SWITCHFORMAT ? global_is_certificate_owner
+          - global_noop2 > FAILURE ? !global_is_certificate_owner
+
+    GENERATE:
+        autorun: 1
+        action:
+          - generate export > SUCCESS
+
+    SWITCHFORMAT:
+        autorun: 1
+        action:
+            - setfile_pkcs12 > GENERATE ? is_pkcs12
+            - setfile_pkcs8_pem > GENERATE ? is_pkcs8_pem
+            - setfile_pkcs8_der > GENERATE ? is_pkcs8_der
+            - setfile_java_keystore > GENERATE ? is_java_keystore
+            - setfile_openssl_privkey > GENERATE ? is_openssl_privkey
+
+    FAILURE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC
+        output: 
+          - cert_identifier
+
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC
+        output: 
+         - download
+
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC
+        input:
+          - cert_identifier
+          - key_format
+          - _password
+          - alias
+        validator: 
+          - global_cert_identifier_exists
+
+    make_uuid:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            _map_uuid:  "[% USE Utils %][% Utils.uuid() %]"
+
+    generate:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport
+        param: 
+          target_key: _export
+          _map_key_format: $key_format
+          _map_cert_identifier: $cert_identifier
+          _map_key_password: $_password
+          _map_alias: $alias
+          template: "[% key %]"
+
+    export:  
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+        param:
+            namespace: workflow.download
+            _map_key: $uuid
+            _map_value: $_export
+            encrypt: 1
+            force: 1
+            expiration_date: "+00000003"
+
+    set_alias:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        input: 
+         - alias
+
+    setfile_pkcs12:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+        param:
+          target_key: download
+          _map_filename: "[% USE Certificate %][% Certificate.dn(context.cert_identifier, 'CN') %].p12"
+          mime: application/x-pkcs12
+          _map_source: datapool:[% context.uuid %]
+
+    setfile_pkcs8_pem:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+        param:
+          target_key: download
+          _map_filename: "[% USE Certificate %][% Certificate.dn(context.cert_identifier, 'CN') %].key"
+          mime: application/pkcs8
+          _map_source: datapool:[% context.uuid %]
+
+    setfile_pkcs8_der:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+        param:
+          target_key: download
+          _map_filename: "[% USE Certificate %][% Certificate.dn(context.cert_identifier, 'CN') %].p8"
+          mime: application/pkcs8
+          _map_source: datapool:[% context.uuid %]
+
+    setfile_openssl_privkey:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+        param:
+          target_key: download
+          _map_filename: "[% USE Certificate %][% Certificate.dn(context.cert_identifier, 'CN') %].pem"
+          mime: application/x-pem-file
+          _map_source: datapool:[% context.uuid %]
+
+    setfile_java_keystore:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+        param:
+          target_key: download
+          _map_filename: "[% USE Certificate %][% Certificate.dn(context.cert_identifier, 'CN') %].jks"
+          mime: application/x-java-keystore
+          _map_source: datapool:[% context.uuid %]
+
+condition:
+    is_pkcs12:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{key_format} eq 'PKCS12'
+
+    is_pkcs8_pem:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{key_format} eq 'PKCS8_PEM'
+
+    is_pkcs8_der:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{key_format} eq 'PKCS8_DER'
+
+    is_openssl_privkey:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{key_format} eq 'OPENSSL_PRIVKEY'
+
+    is_java_keystore:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{key_format} eq 'JAVA_KEYSTORE'
+
+field: 
+
+    cert_identifier:
+        name: cert_identifier
+        type: hidden
+
+    download:
+        label: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL
+        name: download
+        format: download
+
+    alias:
+        name: alias
+        type: text
+        label: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_LABEL
+        description: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_DESC
+        placeholder: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER
+
+    _password:
+        name: _password
+        type: password
+        required: 1
+        label: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC
+
+acl:
+    User:
+        creator: self
+
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+        fail: 1
+        resume: 1
+        wakeup: 1
+
+    System:
+        creator: any
+

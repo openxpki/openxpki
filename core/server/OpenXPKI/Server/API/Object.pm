@@ -418,6 +418,11 @@ sub get_cert_actions {
     my $conn = CTX('config');
     
     my @actions;
+    if (CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_identifier })
+        && $conn->exists([ 'workflow', 'def', 'certificate_privkey_export', 'acl', $role, 'creator' ] )) {
+        push @actions, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY', workflow => 'certificate_privkey_export' };
+    }
+    
     if (($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED') 
         && $conn->exists([ 'workflow', 'def', 'certificate_renewal_request', 'acl', $role, 'creator' ] )) {
         push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW', workflow => 'certificate_renewal_request' };
