@@ -1159,6 +1159,11 @@ sub get_private_key_for_cert {
         if ( exists $arg_ref->{CSP} ) {
             $command_hashref->{CSP} = $arg_ref->{CSP};
         }
+        
+        if ( $arg_ref->{ALIAS} ) {
+            $command_hashref->{ALIAS} = $arg_ref->{ALIAS};
+        }
+        
     }
     
     $result = $default_token->command($command_hashref);

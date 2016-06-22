@@ -22,7 +22,7 @@ sub execute {
     my $cert_identifier = $self->param('cert_identifier');
     my $key_format = $self->param('key_format') || 'OPENSSL_PRIVKEY';
     my $key_password = $self->param('key_password');
-    
+    my $alias = $self->param('alias') || '';
     my $template = $self->param('template');
     
     my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM'});
@@ -33,7 +33,8 @@ sub execute {
         my $privkey = CTX('api')->get_private_key_for_cert({ 
             IDENTIFIER =>  $cert_identifier, 
             FORMAT => $key_format, 
-            PASSWORD => $key_password 
+            PASSWORD => $key_password,
+            ALIAS => $alias, 
         });
         $key = $privkey->{PRIVATE_KEY};
         CTX('log')->log(
@@ -131,6 +132,12 @@ the exported key.
 =item key_format, optional
 
  @see OpenXPKI::Server::API::Object::get_private_key_for_cert
+
+=item alias, optional
+
+For PKCS12 sets the so called "friendly name" for the certificate.
+For Java Keystore sets the keystore alias.
+Parameter is ignored for any other key types.
 
 =item target_key, optional
 

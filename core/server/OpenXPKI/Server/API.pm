@@ -488,6 +488,11 @@ sub BUILD {
                     regex    => $re_alpha_string,
                     optional => 1,
                 },
+                ALIAS    => {
+                    type     => SCALAR,
+                    regex    => $re_alpha_string,
+                    optional => 1,
+                },
             },
         },
         'get_crl' => {
