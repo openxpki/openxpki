@@ -335,6 +335,7 @@ WriteMakefile(
     'Crypt::PKCS10'          => '1',
     'DBD::Mock'              => '1.45',
 #    'DBI'                    => '1', # A prerequisite for Workflow, see below
+    'Data::UUID'            => '0',
     'Data::Password'         => '1.07',
     'Data::Serializer'       => '0.44',
 #    'DateTime'               => '0.22', # A prerequisite for Config::Versioned, see above
