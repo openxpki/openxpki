@@ -1167,6 +1167,9 @@ sub get_private_key_for_cert {
         
         if ( $arg_ref->{ALIAS} ) {
             $command_hashref->{ALIAS} = $arg_ref->{ALIAS};
+        } elsif ( $format eq 'JAVA_KEYSTORE' ) {
+            # Java Keystore only: if no alias is specified, set to 'key'
+            $command_hashref->{ALIAS} = 'key';
         }
         
     }
