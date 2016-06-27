@@ -61,7 +61,7 @@ sub validate {
             );
         }
         $modifier = "(?$modifier)" if ($modifier);
-        $regex = m{$modifier$regex};
+        $regex = qr/$modifier$regex/;
     }
 
     # Array Magic
