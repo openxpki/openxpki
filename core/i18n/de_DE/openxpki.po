@@ -383,6 +383,10 @@ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
+msgstr "Alias enthält andere Zeichen als a-z A-Z 0-9 - _ ."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
 msgstr "Benutzername"
 

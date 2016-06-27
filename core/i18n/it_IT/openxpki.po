@@ -346,6 +346,10 @@ msgstr "Lunghezza della Chiave"
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Parametri"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
+msgstr "Uno o più campi Soggetto contengono errori."
+
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
 msgstr "Algoritmo della Chiave"
 

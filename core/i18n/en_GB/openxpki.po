@@ -303,6 +303,9 @@ msgstr "Key length"
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Parameters"
 
+msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
+msgstr "Alias does contain characters other than a-z A-Z 0-9 - _ ."
+
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
 msgstr "Key algorithm"
 

@@ -54,6 +54,7 @@ action:
           - alias
         validator: 
           - global_cert_identifier_exists
+          - keystore_alias
 
     make_uuid:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
@@ -175,6 +176,16 @@ field:
         required: 1
         label: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL
         description: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC
+
+validator:
+    keystore_alias:
+        class: OpenXPKI::Server::Workflow::Validator::Regex
+        arg:
+         - $alias
+        param:
+            regex: "\\A [a-zA-Z0-9-_\\.]+ \\z"
+            error: I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS
+
 
 acl:
     User:

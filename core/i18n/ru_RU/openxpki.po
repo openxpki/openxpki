@@ -386,6 +386,10 @@ msgstr ""
 "Идентификатор функциональности -  __METHOD_NAME__."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
+msgstr "Действителен"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
 msgstr "Имя учетной записи"
 
