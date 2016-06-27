@@ -1173,9 +1173,17 @@ sub get_private_key_for_cert {
         }
         
     }
-    
-    $result = $default_token->command($command_hashref);
-    
+   
+    eval { 
+        $result = $default_token->command($command_hashref);
+    };
+    if (!$result) { 
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_UNABLE_EXPORT_KEY',
+            params => { 'IDENTIFIER' => $identifier, },
+        );
+    }
+
     if ( $format eq 'JAVA_KEYSTORE' ) {
         
         my $token = CTX('crypto_layer')->get_system_token({ TYPE => 'javaks' });

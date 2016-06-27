@@ -297,6 +297,10 @@ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_DESC"
 msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
@@ -605,44 +609,6 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Benutzername"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
-msgstr "Nutzer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
-msgstr "Export"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
-msgstr "Nutzer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
-msgstr "Nutzer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
-msgstr "Exportieren des Zertifzierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
-msgstr ""
-"Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt wird"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
-msgstr ""
-"Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
-"mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
-"eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
-"können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
-"beliebigeralternativer Zertifikatsnamen."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "testuser"
 
@@ -748,10 +714,6 @@ msgstr ""
 "eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
 "können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
 "beliebigeralternativer Zertifikatsnamen."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-msgstr "TLS-Server"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
@@ -1256,10 +1218,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
-msgstr "Genehmigen eines Zertifizierungsantrages"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Create a new workflow instance for publishing a certificate using LDAP"
 
@@ -1590,14 +1548,6 @@ msgstr "Warten"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Warten"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
-msgstr "SCEP-Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
-msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
@@ -1999,22 +1949,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST"
 msgstr "Weitere Informationen für die Registrierungssachbearbeiter."
 
@@ -2381,26 +2315,6 @@ msgstr "Name"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
-msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
-msgstr ""
-"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
-"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
-"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
-"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -3093,14 +3007,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr "Ihr Name, z.B. 'Peter Müller'"
 
@@ -3173,14 +3079,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
-msgstr "Zertifizierungsantrag"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
-msgstr "Zertifizierungsantrag"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Zertifizierungsantrag"
 
@@ -3235,14 +3133,6 @@ msgstr "Untergeordnete Workflows"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
-msgstr "Export"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
-msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
@@ -7460,6 +7350,49 @@ msgstr "Benutzername"
 #~ msgstr "Benutzername"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+#~ msgstr "Nutzer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+#~ msgstr "Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+#~ msgstr "Nutzer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
+#~ msgstr "Nutzer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
+#~ msgstr "Exportieren des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+#~ msgstr ""
+#~ "Der TCP-Port, der bei der Authentifizierung mit dem Zertifikat genutzt "
+#~ "wird"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+#~ msgstr ""
+#~ "Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
+#~ "mussund Sie eine genaue Kenntnis der einzelnen Komponenten des "
+#~ "eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
+#~ "können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die "
+#~ "Angabe beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+#~ msgstr "TLS-Server"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_EMAIL"
 #~ msgstr "E-Mailadresse"
 
@@ -7502,6 +7435,10 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "Nutzer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
+#~ msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_AUTH_LDAP_ERR_DESC"
@@ -7902,6 +7839,14 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CRL_LABEL"
 #~ msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+#~ msgstr "SCEP-Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POST_CODES_DESC"
@@ -8814,11 +8759,27 @@ msgstr "Benutzername"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_PLACEHOLDER"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_TOOLTIP"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -8939,12 +8900,32 @@ msgstr "Benutzername"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
+#~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_PLACEHOLDER"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_TOOLTIP"
 #~ msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
+#~ msgstr ""
+#~ "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+#~ "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+#~ "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+#~ "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
+#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_PLACEHOLDER"
@@ -10831,6 +10812,14 @@ msgstr "Benutzername"
 #~ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_ISSUANCE_DESC"
 #~ msgstr "Erstellen von CRLs"
 
@@ -10839,12 +10828,28 @@ msgstr "Benutzername"
 #~ msgstr "Arbeitsabläufe"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
+#~ msgstr "Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
+#~ msgstr "Zertifizierungsantrag"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESCRIPTION"
 #~ msgstr "Zertifizierungsantrag"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESCRIPTION"
 #~ msgstr "Zertifizierungsantrag"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+#~ msgstr "Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
+#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"

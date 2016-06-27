@@ -30,12 +30,25 @@ sub execute {
         
     my $key;    
     if ($key_password) {
-        my $privkey = CTX('api')->get_private_key_for_cert({ 
-            IDENTIFIER =>  $cert_identifier, 
-            FORMAT => $key_format, 
-            PASSWORD => $key_password,
-            ALIAS => $alias, 
-        });
+        my $privkey;
+        eval {
+            $privkey = CTX('api')->get_private_key_for_cert({ 
+                IDENTIFIER =>  $cert_identifier, 
+                FORMAT => $key_format, 
+                PASSWORD => $key_password,
+                ALIAS => $alias, 
+            });
+        };
+        if (!$privkey) {
+            CTX('log')->log(
+                MESSAGE => "Export of private key failed for $cert_identifier",
+                PRIORITY => 'error',
+                FACILITY => [ 'application', 'audit' ],
+            );          
+            OpenXPKI::Exception->throw( 
+                message => 'I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY'
+            );
+        }
         $key = $privkey->{PRIVATE_KEY};
         CTX('log')->log(
             MESSAGE => "Export of private key to context for $cert_identifier",
