@@ -445,20 +445,11 @@ sub init_detail {
         $pattern = '<li><a href="#/openxpki/redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
         
         my @actions;
-                
-        # check for private key
-        # TODO - add ACL, only owner and operator should be allowed to dl key
-        if ($is_local_entity &&
-            $self->send_command ( "private_key_exists_for_cert", { IDENTIFIER => $cert_identifier })) {            
-            push @actions, 
-                '<li><a href="#/openxpki/certificate!privkey!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY</a></li>';
-        }    
-                
         my $reply = $self->send_command ( "get_cert_actions", { IDENTIFIER => $cert_identifier });
         
         $self->logger()->debug("available actions for cert " . Dumper $reply);
         
-        if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {           
+        if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {
             foreach my $item (@{$reply->{workflow}}) {
                 push @actions, sprintf ($pattern, $item->{workflow}, $item->{label});
             }

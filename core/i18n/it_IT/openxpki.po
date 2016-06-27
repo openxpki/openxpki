@@ -271,6 +271,67 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "La data inserita per il campo “non dopo il” è già passata."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
+msgstr ""
+"Inserisci la passphrase impostata durante la creazione del certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_DESC"
+msgstr "Una lista dei tuoi certificati è visualizzata qui sotto."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_LABEL"
+msgstr "Catena di certificazione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER"
+msgstr "Please select the key algorithm"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
+msgstr "FALLIMENTO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+msgstr "Informazioni Processi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
+msgstr "Descrizione del profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_JAVA_KEYSTORE"
+msgstr "Descrizione del profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_LABEL"
+msgstr "Profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_OPENSSL_PRIVKEY"
+msgstr "Descrizione del profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
+msgstr "Informazioni Processi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
+msgstr "Descrizione del profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_PEM"
+msgstr "Informazioni Processi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
+msgstr "Password"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Chiave"
@@ -289,6 +350,10 @@ msgstr "Lunghezza della Chiave"
 
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Parametri"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
+msgstr "Uno o più campi Soggetto contengono errori."
 
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
 msgstr "Algoritmo della Chiave"
@@ -443,38 +508,6 @@ msgstr "Workflow"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Chiave"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
-msgstr "FALLIMENTO"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
-msgstr "Informazioni Processi"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
-msgstr "Descrizione del profilo client OpenVPN per gli utenti"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
-msgstr "Profilo client OpenVPN per gli utenti"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
-msgstr "Informazioni Processi"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
-msgstr "Informazioni Processi"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
-msgstr " "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
-msgstr "Password"
-
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Pagina richiesta non trovata"
 
@@ -541,9 +574,6 @@ msgstr "Descrizione Commento"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
 msgstr "Paese"
-
-msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-msgstr "Token Datasafe"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr "Componente Dominio"
@@ -891,9 +921,6 @@ msgstr "Approva Revoca"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr ""
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
-msgstr "Approva Richiesta"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Inizializza"
 
@@ -1139,6 +1166,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "Scavalca Policy"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC"
+msgstr "Esporta lo stato iniziale"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
+msgstr "Specifica Opzioni Report"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancella questo workflow."
 
@@ -1196,14 +1231,6 @@ msgstr "Emetti Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Emissione Certificato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
-msgstr "Esporta lo stato iniziale"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
-msgstr "Messaggio del Giorno (MOTD)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
 msgstr ""
@@ -1528,18 +1555,6 @@ msgstr "Forza la creazione di Liste Revoche (CRL)"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr "Spunta questo box per forzare l’emissione."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-msgstr "CSR Valid"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
-msgstr "ID Transazione SCEP"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
-msgstr "ID Transazione SCEP"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST"
 msgstr "Suggerimenti per la compilazione dei campi del modulo:"
 
@@ -1822,18 +1837,6 @@ msgstr "Componenti Subject"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
-msgstr "Validità Firmatario"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
-msgstr "Firma Intatta"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Validità Firmatario"
 
 #, fuzzy
@@ -2335,6 +2338,14 @@ msgstr "Esporta lo stato iniziale"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "Stato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
+msgstr "SUCCESSO"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -2394,14 +2405,6 @@ msgstr "I Metadati sono stati aggiornati"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr ""
 "Questo Workflow ha raggiunto lo stadio finale e non può essere riavviato."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
-msgstr "SUCCESSO"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr ""
@@ -2508,16 +2511,16 @@ msgstr "Emetti le Liste Revoche (CRL)."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Emissione CRL"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
+msgstr "Name of the SCEP endpoint receiving this request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL"
+msgstr "SCEP Endpoint"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Tipo"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
-msgstr "Esporta il Certificato nel formato desiderato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
-msgstr "Esporta Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
@@ -2583,11 +2586,57 @@ msgstr "Le informazioni sul Workflow sono state aggiornate"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Chiave"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+#~ msgstr "FALLIMENTO"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+#~ msgstr "Informazioni Processi"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+#~ msgstr "Descrizione del profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+#~ msgstr "Profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
+#~ msgstr "Informazioni Processi"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
+#~ msgstr "Informazioni Processi"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+#~ msgstr " "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+#~ msgstr "Password"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+#~ msgstr "Token Datasafe"
+
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
+#~ msgstr "Approva Richiesta"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+#~ msgstr "Esporta lo stato iniziale"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+#~ msgstr "Messaggio del Giorno (MOTD)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"
@@ -3340,6 +3389,18 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
+#~ msgstr "CSR Valid"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
+#~ msgstr "ID Transazione SCEP"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
+#~ msgstr "ID Transazione SCEP"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_DESC"
 #~ msgstr " "
@@ -3419,6 +3480,12 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP"
 #~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
+#~ msgstr "Firma Intatta"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
+#~ msgstr "Validità Firmatario"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_CURRENTID_DESC"
@@ -3503,18 +3570,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER"
 #~ msgstr "Please retype the password"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_DESC"
-#~ msgstr "Name of the SCEP endpoint receiving this request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_LABEL"
-#~ msgstr "SCEP Endpoint"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_PLACEHOLDER"
-#~ msgstr "Please select the key algorithm"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
@@ -4220,6 +4275,30 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_LABEL"
 #~ msgstr "FAILURE"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+#~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+#~ msgstr "SUCCESSO"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
+#~ msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
+#~ msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+#~ msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
+#~ msgstr "Esporta Certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"

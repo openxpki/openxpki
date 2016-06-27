@@ -104,9 +104,8 @@ sub action_result {
         push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };
     }
     
-    if ($query->{LIMIT}) {
-        $limit = $query->{LIMIT};
-        delete $query->{LIMIT};
+    if (!$query->{LIMIT}) {
+        $query->{LIMIT} = 25;
     }
         
     if (!$query->{ORDER}) {

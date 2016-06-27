@@ -81,6 +81,7 @@ sub __init_command_params : PRIVATE {
                           "CERT"           => 1,
                           "CHAIN"          => 0,
                           "CSP"            => 0,
+                          "ALIAS"          => 0,
                          },
     "create_random"   => {"RETURN_LENGTH" => 0,
                           "RANDOM_LENGTH" => 0,

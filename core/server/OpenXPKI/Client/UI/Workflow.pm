@@ -2124,26 +2124,31 @@ sub __render_fields {
                 $item->{format} = 'extlink';
 
                 my $label;
-                my $basename;
-                my $file;
+                my $basename;                
+                my $source;
                 # value can be a hash with additional properties
                 if (ref $item->{value}) {
                     my $t = $item->{value};
-                    $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';                    
-                    $file = $t->{file};
+                    $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';
+                    
+                    # Fallback for legacy config                   
+                    if (!$t->{source} && $t->{file}) {
+                         $source = "file:".$t->{file};
+                    }
+                    $source = $t->{source};                    
                     $basename = $t->{filename} if ($t->{filename});
                     $mime = $t->{mime} if ($t->{mime}); 
                 } else {
                     $label = $item->{value};
-                    $file = $item->{value};
+                    $source = "file:".$item->{value};
                 }
                 
-                if (!$basename && $file =~ m{ ([^\/]+(\.\w+)?) \z }xms) {
-                   $basename = $1; 
+                if (!$basename && $source =~ m{ file:.*?([^\/]+(\.\w+)?) \z }xms) {
+                   $basename = $1;
                 }
                 
                 my $target = $self->__persist_response({
-                    file => $file,
+                    source => $source, 
                     attachment =>  $basename, 
                     mime => $mime
                 });

@@ -82,3 +82,4 @@ libyaml-libyaml-perl
 libmodule-install-perl
 libsoap-lite-perl
 dh-make-perl
+libossp-uuid-perl

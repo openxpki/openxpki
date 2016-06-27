@@ -60,11 +60,25 @@ sub get_command
     if (exists $self->{CSP}) {
         # input validation, as this will be passed on to the
         # command, i.e. a shell
-        if ($self->{CSP} !~ m{ \A [ \w \- \. : \s ]* \z }xms) {
+        # todo: Spaces are not working due to Proc::SafeExec, see #393
+        if ($self->{CSP} !~ m{ \A [ \w \- \. : ]* \z }xms) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_PKCS12_CSP_IS_NOT_ALPHANUMERIC',
                 params => {
                     CSP => $self->{CSP},
+                },
+            );
+        }
+    }
+        
+    if ($self->{ALIAS}) {
+        # input validation, as this will be passed on to the
+        # command, i.e. a shell
+        if ($self->{ALIAS} !~ m{ \A [ \w \- \. : ]* \z }xms) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_CREATE_PKCS12_ALIAS_NON_WORD_CHARACTERS',
+                params => {
+                    ALIAS => $self->{ALIAS},
                 },
             );
         }
@@ -99,6 +113,8 @@ sub get_command
     
     $command .= " -keypbe ".$self->{KEY_PBE} if ($self->{KEY_PBE});
     $command .= " -certpbe ".$self->{CERT_PBE} if ($self->{CERT_PBE});
+        
+    $command .= " -name " . $self->{ALIAS} if ($self->{ALIAS});
 
     if (defined $self->{CSP}) {
         $command .= " -CSP " . q{"} . $self->{CSP} . q{"};

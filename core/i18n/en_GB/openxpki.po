@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-05-09 19:19+0100\n"
+"PO-Revision-Date: 2016-06-22 10:48+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -236,6 +236,57 @@ msgstr "The specified notafter date must not be equal to the notbefore date."
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "The specified notafter date is in the past."
 
+msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
+msgstr "Failed to export private key (wrong password?)."
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_DESC"
+msgstr ""
+"When requesting a PKCS12 or JavaKeystore for download, you can set an "
+"optional alias here. Allowed characters are A-Z0-9 but no whitespace!"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_LABEL"
+msgstr "Keystore Alias"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER"
+msgstr "Alias for the Keystore, can be left empty for standard requests. "
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
+msgstr "Keystore Download"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+msgstr "Download Format"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
+msgstr ""
+"The format of the keystore, most applications will work with PKCS12 "
+"containers."
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_JAVA_KEYSTORE"
+msgstr "Java Keystore"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_LABEL"
+msgstr "Download Format"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_OPENSSL_PRIVKEY"
+msgstr "OpenSSL native"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
+msgstr "PKCS12"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
+msgstr "PKCS8 (DER)"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_PEM"
+msgstr "PKCS8 (PEM)"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC"
+msgstr ""
+"The password  you provided while creating the certificate request. This will "
+"also be set as password for the provided download."
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
+msgstr "Password"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Key"
@@ -254,6 +305,9 @@ msgstr "Key length"
 
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Parameters"
+
+msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
+msgstr "Alias does contain characters other than a-z A-Z 0-9 - _ ."
 
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
 msgstr "Key algorithm"
@@ -406,38 +460,6 @@ msgstr "My Workflows"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "No"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
-msgstr "FAILURE"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
-msgstr "Process Information"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
-msgstr "OpenVPN client profile for natural persons."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
-msgstr "OpenVPN client profile for people"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
-msgstr "Process Information"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
-msgstr "Process Information"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
-msgstr " "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
-msgstr "Password"
-
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
 
@@ -502,9 +524,6 @@ msgstr "Comment"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
 msgstr "Country"
-
-msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-msgstr "Datasafe Token"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr "Domain Component"
@@ -832,9 +851,6 @@ msgstr "Approve Revocation"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr ""
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
-msgstr "Approve Request"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Initialize"
 
@@ -1072,6 +1088,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "Override Policy"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
+msgstr "Specify Required Format"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancel this workflow."
 
@@ -1127,14 +1149,6 @@ msgstr "Issue certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Issue"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
-msgstr "Export initial state"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
-msgstr "Message of the Day"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
 msgstr ""
@@ -1443,18 +1457,6 @@ msgstr "Enforce creation of revocation lists."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr "Check this box to force issuance."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-msgstr "CSR Valid"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
-msgstr "SCEP Transaction Id"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST"
 msgstr "Hints to fill in the form fields"
 
@@ -1716,18 +1718,6 @@ msgstr "Request Subject Matches"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
 msgstr "Signer is Valid"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
-msgstr "Sigature Intact"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
-msgstr "Signer Validity"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr "Has Valid Password"
@@ -2235,6 +2225,15 @@ msgstr "Export initial state"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "State"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
+msgstr ""
+"Click on the link below to download your certificate/key bundle. Note that "
+"this link will only work from within this browser window and become invalid "
+"after 60 seconds."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
+msgstr "SUCCESS"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -2298,14 +2297,6 @@ msgstr "Metadata was updated"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 msgstr "This workflow is in a final state and can not be restarted."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
-msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr ""
@@ -2405,16 +2396,15 @@ msgstr "Issue certificate revocation lists."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "CRL Issuance"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
+msgstr "Name of the SCEP endpoint receiving this request."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL"
+msgstr "Private Key Download"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
-msgstr "Certificate Export"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
-msgstr "Certificate Export"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
@@ -2477,11 +2467,56 @@ msgstr "Workflow information was updated"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+#~ msgstr "Filename"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+#~ msgstr "Process Information"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+#~ msgstr "OpenVPN client profile for natural persons."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+#~ msgstr "OpenVPN client profile for people"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_OPENSSL_PRIVKEY"
+#~ msgstr "Process Information"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_PKCS8_PEM"
+#~ msgstr "Process Information"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+#~ msgstr " "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+#~ msgstr "Password"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+#~ msgstr "Datasafe Token"
+
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
+#~ msgstr "Approve Request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+#~ msgstr "Export initial state"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+#~ msgstr "Message of the Day"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"
@@ -3234,6 +3269,18 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
+#~ msgstr "CSR Valid"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
+#~ msgstr "SCEP Transaction Id"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_DESC"
 #~ msgstr " "
@@ -3313,6 +3360,12 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP"
 #~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
+#~ msgstr "Sigature Intact"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
+#~ msgstr "Signer Validity"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_CURRENTID_DESC"
@@ -3397,18 +3450,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PASSWORD_PLACEHOLDER"
 #~ msgstr "Please retype the password"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_DESC"
-#~ msgstr "Name of the SCEP endpoint receiving this request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_LABEL"
-#~ msgstr "SCEP Endpoint"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_PLACEHOLDER"
-#~ msgstr "Please select the key algorithm"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
@@ -4114,6 +4155,30 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_LABEL"
 #~ msgstr "FAILURE"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+#~ msgstr "SUCCESS"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
+#~ msgstr "Certificate Revocation Request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
+#~ msgstr "Certificate Revocation Request (CRR)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+#~ msgstr "Certificate Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
+#~ msgstr "Certificate Export"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"

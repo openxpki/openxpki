@@ -418,6 +418,11 @@ sub get_cert_actions {
     my $conn = CTX('config');
     
     my @actions;
+    if (CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_identifier })
+        && $conn->exists([ 'workflow', 'def', 'certificate_privkey_export', 'acl', $role, 'creator' ] )) {
+        push @actions, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY', workflow => 'certificate_privkey_export' };
+    }
+    
     if (($cert->{STATUS} eq 'ISSUED' || $cert->{STATUS} eq 'EXPIRED') 
         && $conn->exists([ 'workflow', 'def', 'certificate_renewal_request', 'acl', $role, 'creator' ] )) {
         push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW', workflow => 'certificate_renewal_request' };
@@ -1159,10 +1164,26 @@ sub get_private_key_for_cert {
         if ( exists $arg_ref->{CSP} ) {
             $command_hashref->{CSP} = $arg_ref->{CSP};
         }
+        
+        if ( $arg_ref->{ALIAS} ) {
+            $command_hashref->{ALIAS} = $arg_ref->{ALIAS};
+        } elsif ( $format eq 'JAVA_KEYSTORE' ) {
+            # Java Keystore only: if no alias is specified, set to 'key'
+            $command_hashref->{ALIAS} = 'key';
+        }
+        
     }
-    
-    $result = $default_token->command($command_hashref);
-    
+   
+    eval { 
+        $result = $default_token->command($command_hashref);
+    };
+    if (!$result) { 
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_UNABLE_EXPORT_KEY',
+            params => { 'IDENTIFIER' => $identifier, },
+        );
+    }
+
     if ( $format eq 'JAVA_KEYSTORE' ) {
         
         my $token = CTX('crypto_layer')->get_system_token({ TYPE => 'javaks' });
@@ -2140,8 +2161,8 @@ sub __set_data_pool_entry : PRIVATE {
         );
     }
 
-    # check for illegal characters
-    if ( $value =~ m{ (?:\p{Unassigned}|\x00) }xms ) {
+    # check for illegal characters - not neccesary if we encrypt the value 
+    if ( !$encrypt && ($value =~ m{ (?:\p{Unassigned}|\x00) }xms )) {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ILLEGAL_DATA",
             params => {
