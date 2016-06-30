@@ -52,6 +52,7 @@ case "$1" in
 
        # Fix directory permissions
        chown -R openxpki:openxpki /var/openxpki
+       chown -R openxpki:openxpki /var/log/openxpki
        chown -R openxpki:root /etc/openxpki/ssl/
        chmod -R 750 /etc/openxpki/ssl/
 
@@ -62,11 +63,16 @@ case "$1" in
        test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html 
 
         # UI logfiles
-        for f in scep.log soap.log webui.log; do
-            touch /var/openxpki/$f
-            chown www-data:openxpki /var/openxpki/$f
-            chmod 640 /var/openxpki/$f
+        for f in scep.log soap.log webui.log rpc.log; do
+            touch /var/log/openxpki/$f
+            chown www-data:openxpki /var/log/openxpki/$f
+            chmod 640 /var/log/openxpki/$f
         done;
+        
+        # Setup logrotate
+        if [ -e /etc/logrotate.d/ ] &&  [ ! -e /etc/logrotate.d/openxpki ]; then
+            cp /usr/share/doc/libopenxpki-perl/examples/logrotate.conf /etc/logrotate.d/openxpki
+        fi; 
 
         # Create the pkiadm user
         COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;

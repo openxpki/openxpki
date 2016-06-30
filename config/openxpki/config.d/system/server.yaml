@@ -14,7 +14,7 @@ user:         openxpki
 group:        openxpki
 socket_file:  /var/openxpki/openxpki.socket
 pid_file:     /var/run/openxpkid.pid
-stderr:       /var/openxpki/stderr.log
+stderr:       /var/log/openxpki/stderr.log
 tmpdir:       /var/tmp
 environment:
 #    key: value
