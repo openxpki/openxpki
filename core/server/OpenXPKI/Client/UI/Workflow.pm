@@ -2047,7 +2047,7 @@ sub __render_fields {
 
         foreach my $field (@fields_to_render) {
 
-            my $key = $field->{name};
+            my $key = $field->{name} || '';
             my $item = {
                 value => ($context->{$key} || ''),
                 type => '',
