@@ -213,6 +213,29 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Scarica in formato testo (TXT)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST"
+msgstr "Richiesta non valida - nessuna azione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
+msgstr "Scavalca Policy"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
+msgstr "Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
+msgstr ""
+"Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
+"proprietario ha richiesto lo stesso un’approvazione. Vedi i commenti e i "
+"risultati qui sotto."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr ""
 "La data inserita per il campo “non dopo il” non può essere convalidata."
@@ -331,6 +354,10 @@ msgstr " "
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
+msgstr "Paese"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
@@ -575,6 +602,9 @@ msgstr "Descrizione Commento"
 msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
 msgstr "Paese"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+msgstr "Token Datasafe"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr "Componente Dominio"
 
@@ -764,6 +794,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
 msgstr "3 anni"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
+msgstr "entità / certificato non più attivi"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Soggetto Certificato"
 
@@ -920,6 +954,9 @@ msgstr "Approva Revoca"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr ""
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
+msgstr "Approva Richiesta"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Inizializza"
@@ -1512,6 +1549,10 @@ msgstr "Algoritmo usato per cifrare la chiave privata per il download."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL"
 msgstr "Metodo Cifratura Chiave"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL"
+msgstr "Commento"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
 msgstr ""
 "Questo flag indica che il Workflow è un processo di tipo batch e pertanto "
@@ -1554,6 +1595,18 @@ msgstr "Forza la creazione di Liste Revoche (CRL)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr "Spunta questo box per forzare l’emissione."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
+msgstr "CSR Valid"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
+msgstr "ID Transazione SCEP"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
+msgstr "ID Transazione SCEP"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST"
 msgstr "Suggerimenti per la compilazione dei campi del modulo:"
@@ -1813,6 +1866,10 @@ msgstr "Nome del punto di utilizzo SCEP che riceve questa richiesta."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "Punto utilizzo SCEP"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
+msgstr "Richiedente / Firmatario"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
 msgstr ""
 
@@ -1832,11 +1889,37 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
 msgstr "Richiedente / Firmatario"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SIGNATURE_VALID_LABEL"
+msgstr "Validità Firmatario"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 msgstr "Componenti Subject"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_TRUSTED_LABEL"
+msgstr "Richiedente / Firmatario"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
+msgstr "Validità Firmatario"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
+msgstr "Validità Firmatario"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
+msgstr "Firma Intatta"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
+msgstr "Firma Intatta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
+msgstr "Validità Firmatario"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Validità Firmatario"
 
 #, fuzzy
@@ -2114,6 +2197,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "CRL Emesse"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_LABEL"
+msgstr "In Attesa di Approvazione"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
 msgstr "Questo Workflow è stato cancellato."
@@ -2423,6 +2514,16 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Violazione Policy Pendente"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
+msgstr ""
+"La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
+"riavviata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_LABEL"
+msgstr "Revoca Rifiutata"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
 msgstr "Il tuo report è pronto, clicca sul filename per scaricarlo."
 
@@ -2481,6 +2582,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Pubblica Informazioni CA"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
+msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
+msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Richiesta Revoca Certificato"
 
@@ -2510,6 +2619,16 @@ msgstr "Emetti le Liste Revoche (CRL)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Emissione CRL"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
+msgstr ""
+"Genera un report dettagliato sui certificati presenti in questo Realm per un "
+"successivo download."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
+msgstr "Report Completo Certificati"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
@@ -2618,17 +2737,11 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "Password"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-#~ msgstr "Token Datasafe"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
-#~ msgstr "Approva Richiesta"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
@@ -3389,18 +3502,6 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-#~ msgstr "CSR Valid"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
-#~ msgstr "ID Transazione SCEP"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
-#~ msgstr "ID Transazione SCEP"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_DESC"
 #~ msgstr " "
@@ -3480,12 +3581,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP"
 #~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
-#~ msgstr "Firma Intatta"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
-#~ msgstr "Validità Firmatario"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_CURRENTID_DESC"
@@ -4283,14 +4378,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
 #~ msgstr "SUCCESSO"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
-#~ msgstr "Richiesta Revoca Certificato"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
-#~ msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
