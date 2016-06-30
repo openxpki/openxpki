@@ -177,7 +177,7 @@ action:
           - signer_cert
         validator:
           - validate_invalidity_time
-          - validate_reason_code
+          - global_reason_code
           - global_cert_identifier_exists
 
     check_authorized_signer:
@@ -239,7 +239,7 @@ action:
           - invalidity_time
         validator:
           - validate_invalidity_time
-          - validate_reason_code
+          - global_reason_code
 
 
 condition:
@@ -300,11 +300,7 @@ validator:
           - $invalidity_time
           - $cert_identifier
           - $flag_delayed_revoke
-
-    validate_reason_code:
-        class: OpenXPKI::Server::Workflow::Validator::ReasonCode
-        arg:
-          - $reason_code
+ 
 
 
 field:

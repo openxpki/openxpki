@@ -1,0 +1,6 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL
+name: signer_cert
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC
+required: 0
+type: server
+
