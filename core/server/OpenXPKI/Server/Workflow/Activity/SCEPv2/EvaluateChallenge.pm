@@ -42,13 +42,13 @@ sub execute {
     foreach my $item (@attrib) {
         my $out;
         if (!$tt->process(\$item, $param, \$out)) {
-            OpenXPKI::Exception->throw({
-                MESSAGE => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EVALUATE_CHALLENGE_ERROR_PARSING_TEMPLATE',
-                PARAMS => {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EVALUATE_CHALLENGE_ERROR_PARSING_TEMPLATE',
+                params => {
                     'TEMPLATE' => $item,
                     'ERROR' => $tt->error()
                 }
-            });
+            );
         }
         push @path, $out if ($out);
     }

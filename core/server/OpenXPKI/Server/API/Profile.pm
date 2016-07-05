@@ -403,13 +403,13 @@ sub render_subject_from_template {
     my $cert_subject;
     my $tt = Template->new();
     if (!$tt->process(\$dn_template, $vars, \$cert_subject)) {
-        OpenXPKI::Exception->throw({
-            MESSAGE => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SUBJECT_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
-            PARAMS => {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SUBJECT_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
+            params => {
                 'TEMPLATE' => $dn_template,
                 'ERROR' => $tt->error()
             }
-        });
+        );
     }
 
     return $cert_subject;
@@ -480,13 +480,13 @@ sub render_san_from_template {
         foreach my $line_template (@values) {
             my $result;
             if (!$tt->process(\$line_template, $vars, \$result)) {
-                OpenXPKI::Exception->throw({
-                    MESSAGE => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SAN_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
-                    PARAMS => {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_SAN_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
+                    params => {
                         'TEMPLATE' => $line_template,
                         'ERROR' => $tt->error()
                     }
-                });
+                );
             }
             ##! 32: "Result of $line_template: $result\n";
 
@@ -567,12 +567,12 @@ sub render_metadata_from_template {
         foreach my $line_template (@values) {
             my $result;
             if (!$tt->process(\$line_template, $vars, \$result)) {
-                OpenXPKI::Exception->throw({
-                    MESSAGE => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_METADATA_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
-                    PARAMS => {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_PROFILE_RENDER_METADATA_FROM_TEMPLATE_ERROR_PARSING_TEMPLATE',
+                    params => {
                         'TEMPLATE' => $line_template,
                     }
-                });
+                );
             }
             ##! 32: "Result of $line_template: $result\n";
 

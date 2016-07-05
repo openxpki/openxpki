@@ -156,12 +156,12 @@ sub validate {
 sub _validate {
 
     my $self = shift;
-    OpenXPKI::Exception->throw({
-        MESSAGE => 'I18N_OPENXPKI_SERVER_VALIDATOR_SUB_NOT_IMPLEMENTED',
-        PARAMS => {
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_VALIDATOR_SUB_NOT_IMPLEMENTED',
+        params => {
             'CLASS' => ref $self,
         }
-    });
+    );
 
 }
 

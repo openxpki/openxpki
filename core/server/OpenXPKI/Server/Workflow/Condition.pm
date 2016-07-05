@@ -57,16 +57,16 @@ sub evaluate {
 
 }
 
-# Implement this (with the dash) in your subclass
+# Implement this (with the underscore) in your subclass
 sub _evaluate {
 
     my $self = shift;
-    OpenXPKI::Exception->throw({
-        MESSAGE => 'I18N_OPENXPKI_SERVER_CONDITION_EVAL_SUB_NOT_IMPLEMENTED',
-        PARAMS => {
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_CONDITION_EVAL_SUB_NOT_IMPLEMENTED',
+        params => {
             'CLASS' => ref $self,
         }
-    });
+    );
 
 }
 

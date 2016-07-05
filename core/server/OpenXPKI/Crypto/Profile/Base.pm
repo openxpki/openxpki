@@ -529,13 +529,13 @@ sub process_templates {
             my $output;
             #$template = '[% TAGS [- -] -%]' .  $template;
             if (!$tt->process(\$template, \%template_vars, \$output)) {
-                OpenXPKI::Exception->throw({
-                    MESSAGE => 'I18N_OPENXPKI_CRYPTO_PROFILE_BASE_ERROR_PARSING_TEMPLATE',
-                    PARAMS => {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_CRYPTO_PROFILE_BASE_ERROR_PARSING_TEMPLATE',
+                    params => {
                         'TEMPLATE' => $template,
                         'ERROR' => $tt->error()
                     }
-                });
+                );
             }
 
             ##! 32: ' Tags found - ' . $template . ' -> '. $output
