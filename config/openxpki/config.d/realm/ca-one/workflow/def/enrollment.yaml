@@ -195,7 +195,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC
         action:
-          - approve_csr clear_error_code > APPROVAL
+          - approve_csr global_clear_error_code > APPROVAL
           - reject_request set_error_not_approved > FAILURE
 
         output:
@@ -223,7 +223,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_DESC
         action:
-          - add_authentication clear_error_code > AUTHENTICATED_REQUEST
+          - add_authentication global_clear_error_code > AUTHENTICATED_REQUEST
           - deny_authentication set_error_not_authenticated > FAILURE
         output:
           - cert_profile 	
@@ -260,7 +260,7 @@ state:
         action:
           - set_error_policy_violated > FAILURE
           - allow_retry > FAILURE
-          - override_policy clear_error_code > APPROVAL
+          - override_policy global_clear_error_code > APPROVAL
         output:
           - cert_profile 	
           - cert_subject
