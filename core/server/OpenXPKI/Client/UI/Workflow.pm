@@ -1405,7 +1405,8 @@ sub __render_from_workflow {
             
             @buttons = ({
                 'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON'
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+                'className' => 'alternative'
             });
             
         } else {
@@ -1422,6 +1423,40 @@ sub __render_from_workflow {
                 buttons => \@buttons 
         }});
 
+    # if the workflow is currently runnig, show info without buttons
+    } elsif ($wf_proc_state eq 'running' && $view ne 'context') {
+
+        $self->_page({
+            label => $wf_info->{WORKFLOW}->{label},
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description =>  'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION',
+        });
+        
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
+     
+        my $action_running =  $wf_info->{STATE}->{option}->[0];
+        my @fields = ({  
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
+                value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
+                'format' => 'timestamp' 
+            }, { 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL',
+                value => ($wf_info->{ACTIVITY}->{$action_running}->{label} || $action_running)
+        });
+
+        my @buttons = ({
+            'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+            'className' => 'alternative'
+        });
+        
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => '',
+                data => \@fields,
+                buttons => \@buttons 
+        }});
 
     # if there is one activity selected (or only one present), we render it now
     } elsif ($wf_action) {

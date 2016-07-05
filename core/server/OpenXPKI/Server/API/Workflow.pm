@@ -389,6 +389,14 @@ sub execute_workflow_activity {
         $wf_id
     );
 
+    my $proc_state = $workflow->proc_state(); 
+    # should be prevented by the UI but can happen if workflow moves while UI shows old state
+    if (!grep /$proc_state/, (qw(manual pause retry_exceeded))) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_EXECUTE_NOT_IN_VALID_STATE',
+            params => { ID => $wf_id, PROC_STATE => $proc_state }
+        );
+    }
     $workflow->reload_observer();
 
     # check the input params
