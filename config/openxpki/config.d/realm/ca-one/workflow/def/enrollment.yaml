@@ -199,6 +199,7 @@ state:
           - reject_request set_error_not_approved > FAILURE
 
         output:
+          - error_code
           - cert_profile 	
           - cert_subject
           - creator 	
@@ -226,6 +227,7 @@ state:
           - add_authentication global_clear_error_code > AUTHENTICATED_REQUEST
           - deny_authentication set_error_not_authenticated > FAILURE
         output:
+          - error_code
           - cert_profile 	
           - cert_subject
           - creator
@@ -262,6 +264,7 @@ state:
           - allow_retry > FAILURE
           - override_policy global_clear_error_code > APPROVAL
         output:
+          - error_code
           - cert_profile 	
           - cert_subject
           - creator 	
