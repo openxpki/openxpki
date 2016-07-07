@@ -732,7 +732,9 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * ISSUER_IDENTIFIER
 
-=item * PKI_REALM (default is the sessions realm)
+=item * PKI_REALM (default is the sessions realm, _any for global search)
+
+=item * PROFILE 
 
 =item * VALID_AT
 
@@ -874,9 +876,12 @@ sub __search_cert {
         $params{DYNAMIC}->{'CERTIFICATE.CSR_SERIAL'} = { VALUE => undef, OPERATOR => 'NOT_EQUAL' };
     }
 
-    # only search in current realm
-    $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} = { VALUE => CTX('session')->get_pki_realm() };
-    
+    # pki realm
+    if (!$args->{PKI_REALM}) {
+        $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} = { VALUE => CTX('session')->get_pki_realm() };
+    } elsif ($args->{PKI_REALM} !~ /_any/i) {
+        $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} = { VALUE => $args->{PKI_REALM} };
+    }
     
     # Custom ordering    
     $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL']; 
@@ -896,8 +901,8 @@ sub __search_cert {
               { VALUE => time(), OPERATOR => "LESS_THAN" };
     }
     
-    # PKI_REALM overwrites the session realm if it is present
-    foreach my $key (qw( IDENTIFIER ISSUER_IDENTIFIER CSR_SERIAL STATUS PKI_REALM SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
+
+    foreach my $key (qw( IDENTIFIER ISSUER_IDENTIFIER CSR_SERIAL STATUS SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
         if ( $args->{$key} ) {
             $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
               { VALUE => $args->{$key} };
@@ -927,12 +932,6 @@ sub __search_cert {
     if ( defined $args->{NOTAFTER} ) {
         $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
               { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
-    }
-
-
-    # FIXME - need this for trust anchor and cross realm search
-    if ( $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'}->{VALUE} eq '_ANY' ) {
-        delete $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'};
     }
 
     # handle certificate attributes (such as SANs)
