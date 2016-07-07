@@ -11,7 +11,6 @@
 # use the target 'nocheck' instead.
 
 TOPDIR=../../..
-VERGEN = $(TOPDIR)/tools/vergen
 
 SRCBASE=$(TOPDIR)/perl
 PACKAGE=openxpki-perldep-core

@@ -338,8 +338,10 @@ WriteMakefile(
     'Data::UUID'            => '0',
     'Data::Password'         => '1.07',
     'Data::Serializer'       => '0.44',
+    'Data::UUID'             => 0,
 #    'DateTime'               => '0.22', # A prerequisite for Config::Versioned, see above
     'DateTime::Format::DateParse' => '0.04',
+    'Devel::NYTProf'          => 0,
 #    'Digest::MD5'            => '1', # A core module since perl v5.7.3
 #    'Digest::SHA'            => '1', # A core module since perl v5.9.3
     'English'                => '1', ## for broken Perl installations like on Ubuntu Drapper

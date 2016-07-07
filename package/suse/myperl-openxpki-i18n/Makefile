@@ -19,12 +19,13 @@ ifndef MYPERL_RELEASE
 MYPERL_RELEASE		:= 1
 endif
 
-OXI_VERSION 		:= $(shell ../../../tools/vergen --format version)
 
 # Makefile.inc contains common settings for all packages (checked in)
 include ../Makefile.inc
 # Makefile.local may be used locally to override settings (not checked in)
 -include ../Makefile.local
+
+OXI_VERSION 		:= $(shell $(VERGEN) --format version)
 
 SRC_TARBALL 		:= $(RPMBASE)/SOURCES/$(PACKAGE)-$(OXI_VERSION).tar.gz
 SRC_TARBALL_DIR 	:= $(RPMBASE)/BUILD/tmp/$(PACKAGE)-$(OXI_VERSION)
