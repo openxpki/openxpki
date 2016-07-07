@@ -109,10 +109,17 @@ sub param {
     my ( $self, $name, $value ) = @_;
 
     unless ( defined $name ) {
-        my $result = { %{ $self->{PARAMS} } };
 
-        # add mapped params
         my $map = $self->_map();
+                
+        if (wantarray) {
+            my @keys = keys %{ $self->{PARAMS} };
+            push @keys, (keys %{ $map });
+            return @keys;     
+        }
+        
+        my $result = { %{ $self->{PARAMS} } };
+        # add mapped params
         foreach my $key (keys %{ $map }) {
             $result->{$key} = $self->param( $key );
         }
