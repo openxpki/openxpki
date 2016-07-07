@@ -253,6 +253,7 @@ sub execute {
 
 
     # test drive for new parser
+    Crypt::PKCS10->setAPIversion(0);
     my $decoded = Crypt::PKCS10->new( $pkcs10 );  
     my %attrib = $decoded->attributes();
 

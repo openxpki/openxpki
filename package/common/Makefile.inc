@@ -23,6 +23,14 @@ ifneq (EXISTS, $(shell test -x $(VERGEN) && echo "EXISTS"))
 $(error Command 'vergen' not found at $(VERGEN). Hint: does TOPDIR really point to the top of this repository?)
 endif
 
+# After testing that VERGEN works, we prepend it with the PERL command
+VERGEN := $(PERL) $(VERGEN)
+
+# test if tpage is found and executable
+ifneq (EXISTS, $(shell tpage </dev/null >/dev/null 2>&1 && echo "EXISTS"))
+$(error Command 'tpage' not found.)
+endif
+
 # For the Packager field in the RPM files
 ifndef GIT_AUTHOR_NAME
 GIT_AUTHOR_NAME := $(shell git config --get user.name)
@@ -39,11 +47,14 @@ define assert-packager
       $(error ERROR: You must set GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL))
 endef
 
+OXI_VERSION := $(shell $(VERGEN) --format version)
+
 # all vergen symbols in tpage(1) compatible format
 TT_VERSION_SYMBOLS = $(shell \
 	$(VERGEN) --dump --dumpformat "--define KEYWORD=\"VALUE\" " 2>/dev/null ; \
 	for i in `$(VERGEN) --list-formats` ; do value=`$(VERGEN) --format $$i 2>/dev/null` ; [ -n "$$value" ] && echo "--define $$i=\"$$value\"" ; done \
 ) --define PACKAGER="$(PACKAGER)"
+$(warning DEBUG: TT_VERSION_SYMBOLS = $(TT_VERSION_SYMBOLS))
 
 .SUFFIXES: .template
 

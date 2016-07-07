@@ -1,0 +1,4 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL
+name: signer_authorized
+template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
+

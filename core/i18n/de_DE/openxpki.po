@@ -245,6 +245,26 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Textformat (txt)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
+msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
+msgstr "Einfache Benennungsart"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr "Prozesse anzeigen"
 
@@ -361,6 +381,10 @@ msgstr ""
 "eindeutigenZertifikatsnamens und der lokalen Namenskonventionen haben, "
 "können Sie dieseBenennungsart verwenden. Sie erlaubt Ihnen auch die Angabe "
 "beliebigeralternativer Zertifikatsnamen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
+msgstr "Ihr Name, z.B. 'Peter Müller'"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY"
@@ -716,6 +740,10 @@ msgstr ""
 "beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+msgstr "TLS-Server"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr ""
 "Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
@@ -1027,6 +1055,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
 msgstr "Nutzer"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Name"
 
@@ -1215,6 +1247,10 @@ msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
+msgstr "Genehmigen eines Zertifizierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
@@ -1905,6 +1941,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
 msgstr "Ihr Name, z.B. 'Peter Müller'"
 
@@ -1947,6 +1987,22 @@ msgstr "Übergeordneter Workflow"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST"
@@ -2285,6 +2341,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
 msgstr ""
 "Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
@@ -2310,11 +2370,43 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SIGNATURE_VALID_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 msgstr "Name"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_TRUSTED_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -2679,6 +2771,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_LABEL"
+msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
 msgstr "Untergeordnete Workflows"
 
@@ -3023,6 +3123,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_LABEL"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
 msgstr "Arbeitsabläufe"
 
@@ -3079,6 +3187,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
+msgstr "Zertifizierungsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
+msgstr "Zertifizierungsantrag"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Zertifizierungsantrag"
 
@@ -3117,6 +3233,14 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
@@ -4967,10 +5091,6 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_PROFILE_USER"
 #~ msgstr "Nutzer"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION"
-#~ msgstr "Einfache Benennungsart"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL"
@@ -7389,10 +7509,6 @@ msgstr "Benutzername"
 #~ "Angabe beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-#~ msgstr "TLS-Server"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_EMAIL"
 #~ msgstr "E-Mailadresse"
 
@@ -7435,10 +7551,6 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "Nutzer"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
-#~ msgstr "Genehmigen eines Zertifizierungsantrages"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_AUTH_LDAP_ERR_DESC"
@@ -8727,10 +8839,6 @@ msgstr "Benutzername"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_DESC"
-#~ msgstr "Ihr Name, z.B. 'Peter Müller'"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ERROR_CODE_LABEL"
 #~ msgstr "Prozesse anzeigen"
 
@@ -8759,27 +8867,11 @@ msgstr "Benutzername"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
-#~ msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-#~ msgstr "Untergeordnete Workflows"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_PLACEHOLDER"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_TOOLTIP"
-#~ msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
-#~ msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -8900,32 +8992,12 @@ msgstr "Benutzername"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_LABEL"
-#~ msgstr "Übergeordneter Workflow"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_PLACEHOLDER"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_TOOLTIP"
 #~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_DESC"
-#~ msgstr ""
-#~ "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
-#~ "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
-#~ "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
-#~ "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_LABEL"
-#~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_VALIDITY_OK_PLACEHOLDER"
@@ -9401,14 +9473,6 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_NICE_DISPATCH_REVOKE_LABEL"
-#~ msgstr "Initial state of the LDAP publishing workflow"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_NOTIFY_CRR_PENDING_DESC"
-#~ msgstr "Arbeitsabläufe"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_NOTIFY_CRR_PENDING_LABEL"
 #~ msgstr "Initial state of the LDAP publishing workflow"
 
 #, fuzzy
@@ -10828,14 +10892,6 @@ msgstr "Benutzername"
 #~ msgstr "Arbeitsabläufe"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
-#~ msgstr "Zertifizierungsantrag"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
-#~ msgstr "Zertifizierungsantrag"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESCRIPTION"
 #~ msgstr "Zertifizierungsantrag"
 
@@ -10957,10 +11013,6 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_CREATE_CSR"
 #~ msgstr "Abweisen des Zertifizierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACL_CRR_APPROVE"
-#~ msgstr "Löschen der Genehmigung(en)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_CRR_CANCEL_APPROVAL"

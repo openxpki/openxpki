@@ -47,6 +47,7 @@ sub execute {
     my $arg_ref = shift;
     my $ident   = ident $self;
     my $result;
+    my @extra_header;
 
     my $params = $self->get_PARAMS();
 
@@ -71,22 +72,27 @@ sub execute {
     ##! 32: 'PKI msg ' . Dumper $message_type_ref
 
     if ( $message_type_ref->{MESSAGE_TYPE_NAME} eq 'PKCSReq' ) {
-        $result = $self->__pkcs_req(
+        my $resp = $self->__pkcs_req(
             {   TOKEN => $token,
                 PKCS7 => $pkcs7_base64,
                 PARAMS => $url_params,
             }
-        );
+        );      
+        $result = $resp->[1];
+        if ($resp->[0] && (ref $resp->[0] eq 'ARRAY')) {
+            @extra_header = @{$resp->[0]};
+        }
     }
     elsif ( $message_type_ref->{MESSAGE_TYPE_NAME} eq 'GetCertInitial' ) {
 
         # used by sscep after sending first request for polling
-        $result = $self->__pkcs_req(
+        my $resp = $self->__pkcs_req(
             {   TOKEN => $token,
                 PKCS7 => $pkcs7_base64,
                 PARAMS => $url_params,
             }
         );
+        $result = $resp->[1];
     }
     elsif ( $message_type_ref->{MESSAGE_TYPE_NAME} eq 'GetCert' ) {
 
@@ -119,8 +125,9 @@ sub execute {
         );
     }
 
-    $result = "Content-Type: application/x-pki-message\n\n" . $result;
-    return $self->command_response($result);
+    push @extra_header, "Content-Type: application/x-pki-message"; 
+    my $header = join("\n", @extra_header );
+    return $self->command_response( $header . "\n\n" . $result);
 }
  
 
@@ -526,6 +533,8 @@ sub __pkcs_req : PRIVATE {
 
     ##! 16: 'Workflow state ' . $wf_state
 
+    my @extra_header = ( "X-OpenXPKI-WorkflowId: " . $wf_info->{WORKFLOW}->{ID} );
+
     if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {
         CTX('log')->log(
             MESSAGE => "SCEP $workflow_id in state $wf_state, send pending reply",
@@ -540,7 +549,12 @@ sub __pkcs_req : PRIVATE {
                 HASH_ALG => CTX('session')->get_hash_alg(),
             }
         );
-        return $pending_msg;
+        
+        if ($wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'}) {
+            push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
+        }
+        
+        return [ \@extra_header, $pending_msg ];
     }
 
     if ( $wf_state eq 'SUCCESS' ) {
@@ -600,24 +614,23 @@ sub __pkcs_req : PRIVATE {
             FACILITY => 'application',
         );
 
-        return $certificate_msg;
+        return [ '', $certificate_msg ];
     }
 
     ##! 32: 'FAILURE'
-    my $error_code = $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
-    if ( !defined $error_code ) {
-        #OpenXPKI::Exception->throw( message =>
-        #        'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_FAILURE_BUT_NO_ERROR_CODE',
-        #);
+    # must be one of the error codes defined in the SCEP protocol 
+    my $scep_error_code = $wf_info->{WORKFLOW}->{CONTEXT}->{'scep_error'};
+    
+    if ( !defined $scep_error_code || ($scep_error_code !~ m{ badAlg | badMessageCheck | badTime | badCertId }xms)) {
         CTX('log')->log(
             MESSAGE => "SCEP Request failed without error code set - default to badRequest",
             PRIORITY => 'error',
             FACILITY => 'application',
         );
-        $error_code = 'badRequest';
+        $scep_error_code = 'badRequest';
     } else {
         CTX('log')->log(
-            MESSAGE => "SCEP Request failed with error $error_code",
+            MESSAGE => "SCEP Request failed with error $scep_error_code",
             PRIORITY => 'error',
             FACILITY => 'application',
         );
@@ -626,10 +639,16 @@ sub __pkcs_req : PRIVATE {
         {   COMMAND      => 'create_error_reply',
             PKCS7        => $pkcs7_decoded,
             HASH_ALG     => CTX('session')->get_hash_alg(),
-            'ERROR_CODE' => $error_code,
+            'ERROR_CODE' => $scep_error_code,
         }
     );
-    return $error_msg;
+
+    if ($wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'}) {
+        push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
+    }
+            
+
+    return [ \@extra_header, $error_msg ];
 }
 
 1;    # magic one at the end of module

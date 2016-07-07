@@ -34,6 +34,12 @@ sub _validate {
         'removeFromCRL',
     );
     
+    CTX('log')->log(
+        MESSAGE  => 'Call to deprecated class OpenXPKI::Server::Workflow::Validator::ReasonCode',
+        PRIORITY => "warn",
+        FACILITY => "application"
+    );
+    
     my $codes = $self->param('valid_reason_codes');
     if ($codes) {
         @valid_reason_codes = split /,\s*/, $codes; 
@@ -58,6 +64,18 @@ __END__
 =head1 NAME
 
 OpenXPKI::Server::Workflow::Validator::ReasonCode
+
+=head1 DEPRECATION WARNING
+
+Class is deprecated - use the predefined global validator which is based 
+on OpenXPKI::Server::Workflow::Validator::Regex
+
+    class: OpenXPKI::Server::Workflow::Validator::Regex
+    arg:
+     - $reason_code
+    param:
+       regex: "\\A (unspecified|keyCompromise|CACompromise|affiliationChanged|superseded|cessationOfOperation) \\z"
+       error: I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED
 
 =head1 SYNOPSIS
 

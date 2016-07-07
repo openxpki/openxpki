@@ -1,0 +1,6 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL
+name: server
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC
+type: server
+required: 0
+

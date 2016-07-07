@@ -1,0 +1,6 @@
+class: OpenXPKI::Server::Workflow::Validator::Regex
+arg:
+ - $reason_code
+param:
+   regex: "\\A (unspecified|keyCompromise|CACompromise|affiliationChanged|superseded|cessationOfOperation) \\z"
+   error: I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED

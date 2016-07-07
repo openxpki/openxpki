@@ -1,0 +1,4 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SIGNATURE_VALID_LABEL
+name: signer_signature_valid
+template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
+
