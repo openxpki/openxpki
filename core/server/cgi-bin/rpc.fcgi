@@ -76,8 +76,9 @@ while (my $cgi = CGI::Fast->new()) {
     my $servername = $conf->{$method}->{servername} || '';
     if ($servername) {
         $param->{'server'} = $servername;
+        $param->{'interface'} = 'rpc';
     }
-        
+
     my %envkeys;
     if ($conf->{$method}->{env}) {
         %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$method}->{env});        
