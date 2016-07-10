@@ -1059,11 +1059,27 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
+msgstr "Warten"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Name"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REFRESH"
+msgstr "Kommentar"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Status"
 
 #, fuzzy

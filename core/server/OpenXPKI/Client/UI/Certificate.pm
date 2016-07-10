@@ -190,8 +190,9 @@ sub init_result {
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
             buttons => [
-                { label => 'reload search form', page => 'certificate!search!query!' .$queryid },
-                { label => 'new search', page => 'certificate!search'},
+                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', page => 'certificate!search!query!' .$queryid },
+                { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', page => 'redirect!certificate!result!id!' .$queryid },
+                { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', page => 'certificate!search'},
             ]
         }
     });

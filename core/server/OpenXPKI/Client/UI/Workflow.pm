@@ -382,8 +382,9 @@ sub init_result {
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
             buttons => [
-                { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
-                { label => 'new search', page => 'workflow!search'},
+                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', page => 'workflow!search!query!' .$queryid },
+                { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', page => 'redirect!workflow!result!id!' .$queryid },
+                { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', page => 'workflow!search'},
                 #{ label => 'bulk edit', action => 'workflow!bulk', select => 'serial', 'selection' => 'serial' }, # Draft for Bulk Edit
             ]
 

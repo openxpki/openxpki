@@ -798,12 +798,30 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "entità / certificato non più attivi"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Soggetto Certificato"
 
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
+msgstr "Stato del Certificato"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH"
+msgstr "Stato del Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REFRESH"
+msgstr "Richiesta"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Stato del Certificato"
 
 #, fuzzy
