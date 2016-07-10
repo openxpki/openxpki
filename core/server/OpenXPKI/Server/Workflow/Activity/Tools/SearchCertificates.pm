@@ -10,6 +10,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
 use OpenXPKI::Serialization::Simple;
+use Workflow::Exception qw( configuration_error );
 
 use Data::Dumper;
 
@@ -62,6 +63,10 @@ sub execute
         }   
     }
 
+    if (scalar (keys %{$query}) == 3 && scalar(@{$query->{CERT_ATTRIBUTES}}) == 0) {
+        configuration_error('I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY');
+    }
+ 
     ##! 32: 'Full query ' . Dumper $query;
     my $result = CTX('api')->search_cert($query);
     
