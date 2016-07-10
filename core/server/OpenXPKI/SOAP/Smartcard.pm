@@ -88,12 +88,13 @@ sub RevokeSmartcard {
         my $serializer = OpenXPKI::Serialization::Simple->new();
         
         my %param = (
-            token_id => $card_identifier,            
+            token_id => $card_identifier,
             crr_info        => $serializer->serialize({
                 requester_sn    => $auth_dn || '',    # default to empty string (must not be undef)                
                 client_ip       => $client_ip,
             }),
             server => $servername,
+            interface => 'soap',
             signer_cert => $auth_pem
         );
 
