@@ -1,0 +1,200 @@
+head:
+    prefix: crrentity
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC
+
+state:
+    INITIAL:
+        action: initialize > SEARCH_CERTIFICATE
+
+    SEARCH_CERTIFICATE: 
+        autorun: 1
+        action: search_certificate > CHECK_AUTHORIZATION
+
+    CHECK_AUTHORIZATION:
+        autorun: 1
+        action: 
+         - queue_certs_to_revoke > HANDLE_REVOCATION_QUEUE ? is_requestor_authorized
+         - global_noop > PENDING ? !is_requestor_authorized
+
+    PENDING:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC
+        action:
+          - approve_crr > APPROVED ? acl_can_approve 
+          - reject_crr > REJECTED ? acl_can_reject
+        output:
+          - entity
+          - reason_code
+          - cert_identifier_list
+          - comment
+
+        button:
+          approve_crr:
+            format: expected
+          reject_crr:
+            format: failure
+
+    APPROVED:
+        autorun: 1
+        action: queue_certs_to_revoke > HANDLE_REVOCATION_QUEUE 
+
+    HANDLE_REVOCATION_QUEUE:
+        autorun: 1
+        action: 
+         - fetch_cert_from_queue revoke_certificate > HANDLE_REVOCATION_QUEUE ? !is_queue_empty
+         - global_noop > SUCCESS ? is_queue_empty
+         
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC
+        output:
+          - entity
+          - reason_code
+          - cert_identifier_list
+          - comment
+
+    FAILURE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC
+        output:
+          - entity
+          - reason_code
+          - cert_identifier_list
+          - comment
+
+    REJECTED:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC
+        output:
+          - entity
+          - reason_code
+          - cert_identifier_list
+          - comment
+
+action: 
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_DESC
+        input:
+          - entity
+          - reason_code
+          - comment
+          - server
+          - interface
+          - signer_cert
+
+        validator:
+          - global_reason_code
+
+    search_certificate:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
+        param:
+            target_key: cert_identifier_list
+            _map_meta_entity: $entity
+
+    check_authorized_signer:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+        param:
+            _map_rules: "[% context.interface %].[% context.server %].authorized_signer"
+
+    approve_crr:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC
+        param:
+            check_creator: 0
+            multi_role_approval: 0
+
+    reject_crr:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC
+
+    revoke_certificate:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
+        param:
+            _map_reason_code: $reason_code
+            _map_comment: $comment
+            flag_auto_approval : 1
+            flag_batch_mode: 1
+  
+    fetch_cert_from_queue:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: tmp_queue
+            context_key: cert_identifier
+            function: shift
+
+    queue_certs_to_revoke:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: tmp_queue
+            context_key: cert_identifier_list
+            function: pusharray
+
+
+condition:
+
+    acl_can_approve:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition1: global_is_operator
+#           condition2: "!global_is_creator"
+
+    acl_can_reject:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition1: global_is_operator
+#           condition2: "!global_is_creator"
+
+    is_requestor_authorized:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: ($context->{signer_trusted} and $context->{signer_authorized})
+
+    is_queue_empty:
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param:
+          array_name: tmp_queue
+          condition: is_empty
+
+
+field:
+    entity:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
+        name: entity
+        required: 1
+
+    cert_identifier_list:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL
+        name: cert_identifier_list
+        format: rawlist
+        template: >
+          [% USE Certificate %]
+          [% IF value %]
+            Subject / Identifier |
+            [% FOREACH identifier = value %]
+              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
+                [% Certificate.dn(identifier, 'CN') %] / [% identifier %]</a>| 
+            [% END %]
+          [% END %]
+
+
+acl:
+    Anonymous:
+        creator: self
+
+    CA Operator:
+        creator: any
+
+    RA Operator:
+        creator: any
+        fail: 1
+        resume: 1
+        wakeup: 1
+
+    System:
+        creator: self
+

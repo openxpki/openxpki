@@ -1754,6 +1754,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr "Отклонить заявку на сертификат"
 
@@ -2357,6 +2361,18 @@ msgstr ""
 "имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
 "пользователя, который следует использовать, если нет особых требований к "
 "сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"

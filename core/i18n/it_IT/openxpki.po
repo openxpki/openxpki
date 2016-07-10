@@ -1412,6 +1412,10 @@ msgstr "Nome alternativo per il campo Soggetto"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvazioni"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Certificato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
 "Se lo conosci, puoi inserire l’identificatore alfanumerico del certificato "
@@ -1884,6 +1888,14 @@ msgstr "Id Transazione SCEP"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Nome del punto di utilizzo SCEP che riceve questa richiesta."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
+msgstr "Nome del punto di utilizzo SCEP che riceve questa richiesta."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
+msgstr "Punto utilizzo SCEP"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "Punto utilizzo SCEP"
