@@ -26,6 +26,7 @@ style:
         metadata:
             requestor: "[% requestor_gname %] [% requestor_name %]"
             email: "[% requestor_email %]"
+            entity: "[% hostname FILTER lower %]"
 
 
 # Profile extensions - set 0/1 as needed

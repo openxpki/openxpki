@@ -33,6 +33,7 @@ style:
         metadata:
             requestor: "[% requestor_gname %] [% requestor_name %]"
             email: "[% requestor_email %]"
+            entity: "[% hostname FILTER lower %]"
 
 
     05_advanced_style:
