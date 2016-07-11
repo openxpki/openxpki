@@ -1229,6 +1229,11 @@ sub BUILD {
                         type  => SCALAR,
                         regex => $re_integer_string,
                 },
+                NOACL => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },        
             },
         },
         'execute_workflow_activity' => {

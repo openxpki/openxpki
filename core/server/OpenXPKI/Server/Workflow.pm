@@ -467,6 +467,11 @@ sub get_global_actions {
     
     my $self = shift;
     
+    # volatile or non initial workflow do not have any actions
+    if ($self->id() < 1) {
+         return [];
+    }
+    
     my $role = CTX('session')->get_role() || 'Anonymous';
     
     my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type(), 'acl', $role ] );
@@ -486,6 +491,9 @@ sub get_global_actions {
         @possible_action = ('fail');
         
     }
+    
+    # always possible
+    push @possible_action, ('history', 'techlog', 'context');
     
     my @allowed;
     foreach my $action (@possible_action) {
