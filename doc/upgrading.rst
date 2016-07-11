@@ -15,6 +15,31 @@ For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
 
+Release v1.11
+-------------
+
+We put access to workflow log/history/context under access control. If 
+you want your users/operators to have access to those items, you MUST add
+the new acl items to your workflow definitions::
+
+  acl:
+    RA Operator:
+      creator: any
+      fail: 1
+      resume: 1  
+      wakeup: 1
+      history: 1
+      techlog: 1
+      context: 1
+
+If you are using the SOAP revocation interface or want to use the new RPC
+revocation interface, you MUST add a new field to the inital action.
+
+Add the file config.d/realm/ca-one/workflow/global/field/interface.yaml to
+your config tree.
+In config.d/realm/ca-one/workflow/def/certificate_revocation_request_v2.yaml
+add the field "interface" to the list of "input" fields of "create_crr".
+
 
 Release v1.10
 -------------
