@@ -62,6 +62,7 @@ action:
         input:
           - crr_info
           - server
+          - interface
           - signer_cert
           - token_id
 

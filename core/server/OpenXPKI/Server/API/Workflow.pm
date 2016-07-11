@@ -102,6 +102,25 @@ sub get_workflow_log {
     
     my $wf_id = $args->{ID};
     
+    # ACL check
+    my $wf_type = CTX('api')->get_workflow_type_for_id({ ID => $wf_id });
+    
+    
+    my $role = CTX('session')->get_role() || 'Anonymous';   
+    my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'techlog' ] );
+    
+    if (!$allowed) { 
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG',
+            params  => {
+                'ID' => $wf_id,
+                'TYPE' => $wf_type,
+                'USER' => CTX('session')->get_user(),
+                'ROLE' => $role
+            },
+        );
+    }
+    
     my $limit = 50;
     if (defined $args->{LIMIT}) {
         $limit = $args->{LIMIT};
@@ -344,6 +363,26 @@ sub get_workflow_history {
 
     my $wf_id   = $arg_ref->{ID};
 
+    my $noacl = $arg_ref->{NOACL};
+
+    if (!$noacl) {
+        my $role = CTX('session')->get_role() || 'Anonymous';   
+        my $wf_type = CTX('api')->get_workflow_type_for_id({ ID => $wf_id });
+        my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'history' ] );
+        
+        if (!$allowed) { 
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY',
+                params  => {
+                    'ID' => $wf_id,
+                    'TYPE' => $wf_type,
+                    'USER' => CTX('session')->get_user(),
+                    'ROLE' => $role
+                },
+            );
+        }
+    }
+
     my $history = CTX('dbi_workflow')->select(
         TABLE => 'WORKFLOW_HISTORY',
         DYNAMIC => {
@@ -389,6 +428,14 @@ sub execute_workflow_activity {
         $wf_id
     );
 
+    my $proc_state = $workflow->proc_state(); 
+    # should be prevented by the UI but can happen if workflow moves while UI shows old state
+    if (!grep /$proc_state/, (qw(manual pause retry_exceeded))) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_EXECUTE_NOT_IN_VALID_STATE',
+            params => { ID => $wf_id, PROC_STATE => $proc_state }
+        );
+    }
     $workflow->reload_observer();
 
     # check the input params

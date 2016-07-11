@@ -1059,11 +1059,27 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
+msgstr "Warten"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Name"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH"
+msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REFRESH"
+msgstr "Kommentar"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Status"
 
 #, fuzzy
@@ -1618,6 +1634,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_LABEL"
 msgstr "Warten"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC"
 msgstr "Abweisen des Zertifizierungsantrages"
 
@@ -1731,6 +1751,10 @@ msgstr "Übergeordneter Workflow"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Zertifikats-ID"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
@@ -2335,6 +2359,18 @@ msgstr ""
 "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
 "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
 "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
+msgstr ""
+"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
@@ -3141,6 +3177,14 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"

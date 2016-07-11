@@ -46,9 +46,9 @@ sub get_command
         ##! 16: "DATA is present"
         if (ref $self->{DATA} ne '') { # anything different from a scalar is
                                        # wrong here
-            OpenXPKI::Exception->throw({
+            OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_DATATYPE',
-            });
+            );
         }
         ##! 16: "DATA is scalar"
         ## build the command
@@ -88,9 +88,9 @@ sub get_command
         # anything else than an array is wrong here
         ##! 4: "PKCS7"
         if (ref $self->{DATA} ne 'ARRAY') {
-            OpenXPKI::Exception->throw({
+            OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_WRONG_DATATYPE',
-            });
+            );
         }
         my @certs = @{$self->{DATA}};
         my $command = 'crl2pkcs7 -nocrl';

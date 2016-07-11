@@ -58,14 +58,14 @@ into the workflow.
 =cut
 sub notify {
     
-    OpenXPKI::Exception->throw({
-        MESSAGE => 'I18N_OPENXPKI_SERVER_NOTIFICATION_BASE_NOTIFY_UNIMPLEMENTED',
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_BASE_NOTIFY_UNIMPLEMENTED',
         log => {
             logger   => CTX('log'),
             priority => 'error',
             facility => 'system',
         },        
-    });
+    );
     
 }
 

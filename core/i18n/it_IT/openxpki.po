@@ -798,12 +798,30 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "entità / certificato non più attivi"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Soggetto Certificato"
 
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
+msgstr "Stato del Certificato"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH"
+msgstr "Stato del Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REFRESH"
+msgstr "Richiesta"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Stato del Certificato"
 
 #, fuzzy
@@ -1295,6 +1313,10 @@ msgstr "Programma questo certificato per la revoca"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_LABEL"
 msgstr "Revoca Certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
+msgstr "Invia la richiesta"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC"
 msgstr ""
 
@@ -1389,6 +1411,10 @@ msgstr "Nome alternativo per il campo Soggetto"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -1862,6 +1888,14 @@ msgstr "Id Transazione SCEP"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Nome del punto di utilizzo SCEP che riceve questa richiesta."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
+msgstr "Nome del punto di utilizzo SCEP che riceve questa richiesta."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
+msgstr "Punto utilizzo SCEP"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "Punto utilizzo SCEP"
@@ -2532,6 +2566,14 @@ msgstr "Risultati Report"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Risultati Report"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
+msgstr "Invia la richiesta"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"

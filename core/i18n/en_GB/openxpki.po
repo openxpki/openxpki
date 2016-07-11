@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-06-30 13:23+0100\n"
+"PO-Revision-Date: 2016-07-10 22:57+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -735,11 +735,24 @@ msgstr "3 years"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
+msgstr "Unknown error"
+
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Certificate Subject"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
 msgstr "Your query did not return any matches!"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH"
+msgstr "New Search"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REFRESH"
+msgstr "Refresh Result"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
+msgstr "Reload Search Form"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
 msgstr "Requestor Email"
@@ -1203,6 +1216,9 @@ msgstr "Schedule this certificate for revocation"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_LABEL"
 msgstr "Revoke Certificate"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
+msgstr "Current Activity"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC"
 msgstr ""
 
@@ -1292,6 +1308,9 @@ msgstr "Allowed Certificate Count"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvals"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Certificate List"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -1737,6 +1756,14 @@ msgstr "SCEP Transaction Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Name of the SCEP endpoint receiving this request."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
+msgstr "Name of the SCEP endpoint receiving this request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
+msgstr "SCEP Endpoint"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "SCEP Endpoint"
 
@@ -2054,11 +2081,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "CRLs issued"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
 msgstr "This revocation request requires approval."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_LABEL"
 msgstr "Approval Pending"
 
@@ -2068,21 +2093,17 @@ msgstr "This workflow was canceled."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL"
 msgstr "CANCELED"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC"
 msgstr "This workflow failed finally."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FAILURE"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "This workflow failed finally and can not be restarted"
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
-msgstr "State"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
 msgstr "This revocation request requires approval."
@@ -2398,13 +2419,20 @@ msgstr "Report Result"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Report Result"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION"
+msgstr ""
+"This workflow is running in the background or at the attention of another "
+"user. Use the Recheck button to update the status and see when its finished."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
+msgstr "This workflow is currently running on the server."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESCRIPTION"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -2479,14 +2507,11 @@ msgstr "Issue certificate revocation lists."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "CRL Issuance"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
-msgstr ""
-"Generate a detailed report about certificates in this realm for download."
+msgstr "This workflow revokes all certificates that belong to a certain entity"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
-msgstr "Certificate Detail Report "
+msgstr "Revoke by Entity"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"

@@ -382,8 +382,9 @@ sub init_result {
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
             buttons => [
-                { label => 'reload search form', page => 'workflow!search!query!' .$queryid },
-                { label => 'new search', page => 'workflow!search'},
+                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', page => 'workflow!search!query!' .$queryid },
+                { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', page => 'redirect!workflow!result!id!' .$queryid },
+                { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', page => 'workflow!search'},
                 #{ label => 'bulk edit', action => 'workflow!bulk', select => 'serial', 'selection' => 'serial' }, # Draft for Bulk Edit
             ]
 
@@ -768,7 +769,7 @@ sub init_log {
             data => $result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
         }
-    });
+    })  if ($result);
     
     $self->add_section({
         type => 'text',
@@ -1405,7 +1406,8 @@ sub __render_from_workflow {
             
             @buttons = ({
                 'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON'
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+                'className' => 'alternative'
             });
             
         } else {
@@ -1422,6 +1424,40 @@ sub __render_from_workflow {
                 buttons => \@buttons 
         }});
 
+    # if the workflow is currently runnig, show info without buttons
+    } elsif ($wf_proc_state eq 'running' && $view ne 'context') {
+
+        $self->_page({
+            label => $wf_info->{WORKFLOW}->{label},
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description =>  'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION',
+        });
+        
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
+     
+        my $action_running =  $wf_info->{STATE}->{option}->[0];
+        my @fields = ({  
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
+                value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
+                'format' => 'timestamp' 
+            }, { 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL',
+                value => ($wf_info->{ACTIVITY}->{$action_running}->{label} || $action_running)
+        });
+
+        my @buttons = ({
+            'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+            'className' => 'alternative'
+        });
+        
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => '',
+                data => \@fields,
+                buttons => \@buttons 
+        }});
 
     # if there is one activity selected (or only one present), we render it now
     } elsif ($wf_action) {
@@ -1604,24 +1640,7 @@ sub __render_from_workflow {
                 'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
             });
         }
-
-        if ($view ne 'context') {
-            push @buttons, {
-                'action' => 'redirect!workflow!load!view!context!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
-            };
-        }
-
-        push @buttons, {
-            'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
-        };
-                       
-        push @buttons, {
-            'page' => 'redirect!workflow!log!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
-        };
-    
+        
         # The workflow info contains info about all control actions that
         # can done on the workflow -> render appropriate buttons.
         if ($wf_info->{HANDLES} && ref $wf_info->{HANDLES} eq 'ARRAY') {
@@ -1629,6 +1648,27 @@ sub __render_from_workflow {
             my @handles = @{$wf_info->{HANDLES}};
             
             $self->logger()->debug('Adding global actions ' . join('/', @handles));
+
+            if ($view ne 'context' && grep /context/, @handles) {
+                push @buttons, {
+                    'action' => 'redirect!workflow!load!view!context!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
+                };
+            }
+               
+            if (grep /history/, @handles) {
+                push @buttons, {
+                    'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
+                };
+            }
+                        
+            if (grep /techlog/, @handles) {
+                push @buttons, {
+                    'page' => 'redirect!workflow!log!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
+                };
+            }
             
             if (grep /fail/, @handles) {
                 my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );                       
@@ -2026,9 +2066,9 @@ sub __render_fields {
         # can be overriden with view = context
         my $output = $wf_info->{STATE}->{output};
         my @fields_to_render;
-        if ($view eq 'context') {
+                    
+        if ($view eq 'context' && (grep /context/, @{$wf_info->{HANDLES}})) {
             foreach my $field (sort keys %{$context}) {
-
                 push @fields_to_render, { name => $field };
             }
         } elsif ($output) {
@@ -2042,7 +2082,6 @@ sub __render_fields {
                 push @fields_to_render, { name => $field };
             }
             $self->logger()->debug('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
-
         }
 
         foreach my $field (@fields_to_render) {

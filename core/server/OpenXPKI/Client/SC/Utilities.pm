@@ -126,8 +126,17 @@ sub handle_get_card_status {
 
      
     # run analyze with default client (system user)
-    $log->info( "Analyze: " . Dumper(%params) );
-    my $reply = $self->_client()->run_command( 'sc_analyze_smartcard', \%params );
+    $log->info( "Analyze: " . Dumper(%params) );    
+    my $reply;
+    eval {
+        $reply = $self->_client()->run_command( 'sc_analyze_smartcard', \%params );
+    };
+    if ($EVAL_ERROR) {
+        my $err = $self->_client()->last_error();
+        if (!$err) { $err = 'I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR'; }
+        $self->_add_error($err);
+        return 1;
+    }
     
     $result->{'msg'} = { PARAMS => $reply };
     

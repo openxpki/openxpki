@@ -115,6 +115,7 @@ sub __dispatch_revoke {
             reason_code     => $arg->{reason},
             crr_info        => $serializer->serialize($crr_info),
             server          => $servername,
+            interface       => 'soap',
             signer_cert     => $auth_pem,
             flag_batch_mode => 1,        
             comment         => 'via soap',

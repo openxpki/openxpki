@@ -26,3 +26,6 @@ main:
   - key:   certificate!search
     label: I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH
  
+certsearch:
+   - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
+     key: meta_entity

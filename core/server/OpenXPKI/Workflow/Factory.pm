@@ -328,56 +328,6 @@ sub __authorize_workflow {
             );
         }
 
-
-        my $context_filter = $conn->get_hash([ 'workflow', 'def', $type, 'acl', $role, 'context' ] );
-        
-        if ($filter &&  $context_filter) {
-            # context filtering is defined for this type, so
-            # iterate over the context parameters and check them against
-            # the show/hide configuration values
-
-            my $show = $context_filter->{show};
-            if (! defined $show) {
-                $show = ''; # will not filter anything!
-            }
-            ##! 16: 'show: ' . $show
-
-            my $hide = $context_filter->{hide};
-            if (! defined $hide) {
-                $hide = ''; # liberal default: do not hide anything
-            }
-            my %original_params = %{ $workflow->context()->param() };
-            # clear workflow context so that we can add the ones
-            # that the user is allowed to see to it again ...
-            $workflow->context()->clear_params();
-
-            ##! 64: 'original_params before filtering: ' . Dumper \%original_params
-            foreach my $key (keys %original_params) {
-                ##! 64: 'key: ' . $key
-                my $add = 1;
-                if ($show) {
-                    ##! 16: 'show present, checking against it'
-                    if ($key !~ qr/$show/) {
-                        ##! 16: 'key ' . $key . ' did not match ' . $show
-                        $add = 0;
-                    }
-                }
-                if ($hide) {
-                    ##! 16: 'hide present, checking against it'
-                    if ($key =~ qr/$hide/) {
-                        ##! 16: 'key ' . $key . ' matches ' . $hide
-                        $add = 0;
-                    }
-                }
-                if ($add) {
-                    ##! 16: 'adding key: ' . $key
-                    $workflow->context()->param(
-                        $key => $original_params{$key},
-                    );
-                }
-            }
-            ##! 64: 'workflow_context after filtering: ' . Dumper $workflow->context->param()
-        }
         return 1;
     }
     else {
