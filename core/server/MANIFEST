@@ -648,6 +648,7 @@ bin/openxpkicmd
 
 # cgi stuff
 cgi-bin/scep
+cgi-bin/scep.fcgi
 cgi-bin/webui.fcgi
 cgi-bin/sc.fcgi
 cgi-bin/soap.fcgi
