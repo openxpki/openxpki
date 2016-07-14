@@ -191,6 +191,14 @@ msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "Действителен"
 
@@ -532,6 +540,10 @@ msgstr "Процесс закончился с ошибкой"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
 msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
+msgstr "Отозвать сертификат"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
@@ -1063,6 +1075,10 @@ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 msgstr "Пауза"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Субъект"
 
@@ -1162,6 +1178,14 @@ msgstr "Статус сертификата УЦ"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "Статус сертификата УЦ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
@@ -1754,7 +1778,15 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "Идентификатор сертификата"
 
 #, fuzzy
@@ -2794,6 +2826,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
 msgstr "Технологические процессы"
 
@@ -3284,6 +3324,14 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_LABEL"
+msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
@@ -6925,10 +6973,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_NOT_SET"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 #~ msgstr "SPKAC строка пуста."
 
 #, fuzzy

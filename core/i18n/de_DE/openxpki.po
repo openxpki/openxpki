@@ -189,6 +189,14 @@ msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "PEM (CRT) Format"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "gültig"
 
@@ -529,6 +537,10 @@ msgstr "Die Datei konnte nicht geöffnet werden"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
 msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
+msgstr "Warten"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
@@ -1063,6 +1075,10 @@ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 msgstr "Warten"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Name"
 
@@ -1160,6 +1176,14 @@ msgstr "Status"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "Status"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
@@ -1753,7 +1777,15 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "Zertifikats-ID"
 
 #, fuzzy
@@ -2807,6 +2839,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_LABEL"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
 msgstr "Arbeitsabläufe"
 
@@ -3277,6 +3317,14 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_LABEL"
+msgstr "Arbeitsabläufe"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
@@ -6790,10 +6838,6 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_NOT_SET"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
