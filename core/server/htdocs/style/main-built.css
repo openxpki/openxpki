@@ -8464,7 +8464,8 @@ div.section {
 
 /* Button format from workflow defs */
 
-.oxi-button-container button.btn.expected {
+.oxi-button-container button.btn.expected,
+.oxi-form-button button.btn.submit {
   background-color: #c9e2b3;
 }
 
@@ -8472,7 +8473,8 @@ div.section {
   background-color: #e4e4da;
 }
 
-.oxi-button-container button.btn.failure {
+.oxi-button-container button.btn.failure,
+.oxi-form-button button.btn.reset {
   background-color: #e39f9f;
 }
 
