@@ -21,6 +21,11 @@ state:
         autorun: 1
         action:
           - global_check_for_revocation > SUCCESS
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - comment
 
     CHECK_FOR_DELAYED_REVOKE:
         autorun: 1
