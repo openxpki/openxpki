@@ -5,7 +5,7 @@ package OpenXPKI::Server::Workflow::Condition::CertificateHasStatus;
 
 use strict;
 use warnings;
-use base qw( Workflow::Condition );
+use base qw( OpenXPKI::Server::Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
@@ -13,33 +13,31 @@ use OpenXPKI::Debug;
 use English;
 use OpenXPKI::Exception;
 
-__PACKAGE__->mk_accessors( 'expected_status' );
 
-sub _init
-{
-    my ( $self, $params ) = @_;
-    unless ( defined $params->{'expected_status'}  )    
-    {
-        configuration_error
-             "You must define one value for 'expected_status' in ",
-             "declaration of condition ", $self->name;
-    }
-    $self->expected_status($params->{'expected_status'});
-}
-
-sub evaluate
-{
+sub _evaluate {
     ##! 1: 'start'
     my ( $self, $workflow ) = @_;
     my $context     = $workflow->context();
-    my $identifier  = $context->param('cert_identifier');
     my $pki_realm   = CTX('session')->get_pki_realm();
+
+
+    my $identifier = $self->param('cert_identifier');
+    if (!defined $identifier) {
+        $identifier = $context->param('cert_identifier');
+    }
 
     if (! defined $identifier) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_IDENTIFIER_MISSING',
         );
     }
+        
+    my $expected_status = $self->param('expected_status');
+    ##! 16: "Expected status " . $expected_status
+    if ($expected_status !~ /\A(ISSUED|REVOKED|CRL_ISSUANCE_PENDING)\z/) {
+        configuration_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_EXPECTED_STATUS_MISSING_OR_INVALID');
+    }
+    
     CTX('dbi_backend')->commit();
     my $cert = CTX('dbi_backend')->first(
         TABLE   => 'CERTIFICATE',
@@ -51,17 +49,31 @@ sub evaluate
             'PKI_REALM'  => $pki_realm,
         }
     );
+    
+    ##! 16: 'cert not found '
+    
+    if (!$cert) {
+    
+        CTX('log')->log(
+            MESSAGE => "Cert status check failed, certificate not found " . $identifier,
+            PRIORITY => 'debug',
+            FACILITY => [ 'application', ],
+        ); 
+        condition_error 'I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND';
+        
+    }
+    
     ##! 16: 'status: ' . $cert->{'STATUS'}
     
     CTX('log')->log(
-        MESSAGE => "Cert status check failed: ".$cert->{'STATUS'}. " != ".$self->expected_status,
+        MESSAGE => "Cert status check failed: ".$cert->{'STATUS'}. " != ".$expected_status,
         PRIORITY => 'debug',
         FACILITY => [ 'application', ],
     ); 
     
     
-    if ($cert->{'STATUS'} ne $self->expected_status) {
-        condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH';
+    if ($cert->{'STATUS'} ne $expected_status) {
+        condition_error 'I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH';
     }
      
     return 1;
@@ -78,5 +90,31 @@ OpenXPKI::Server::Workflow::Condition::CertificateHasStatus
 =head1 DESCRIPTION
 
 The condition checks if the certificate identified by cert_identifier
-has the status given in the parameter expected_status
+has the status given in the parameter expected_status. Only certs in the 
+current realm are checked, if the certificate is not found, the condition
+behaves as the status does not match but sends another verbose error.
+
+
+=head1 Configuration
+
+    is_certificate_issued:
+        class: OpenXPKI::Server::Workflow::Condition::CertificateHasStatus
+        param:
+          expected_status: ISSUED 
+
+=head2 Parameters
+
+=over 
+
+=item expected_status
+
+The status to check against, expects a single status word, possible values
+are ISSUED, REVOKED, CRL_ISSUANCE_PENDING
+
+=item cert_identifier
+
+The certificate to check, if not present as explicit parameter the context
+value with same key will be used.
+
+=back
 
