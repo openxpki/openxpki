@@ -1398,6 +1398,11 @@ sub __render_from_workflow {
                 value => $wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg} 
         });
         
+        # if there are output rules defined, we add them now
+        if ( $wf_info->{STATE}->{output} ) {
+            push @fields, @{$self->__render_fields( $wf_info, $view )};
+        }
+        
         my $desc;
         my @buttons; 
         if ($wf_proc_state eq 'pause') {
