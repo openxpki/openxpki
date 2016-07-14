@@ -34,6 +34,8 @@ sub execute
         ##! 16: 'Key ' . $key
     	my $value = $self->param($key);
      
+        ##! 16: 'Value ' . Dumper $value
+     
     	if (defined $value) {
 		    $context->param($key => $value);
 	    }

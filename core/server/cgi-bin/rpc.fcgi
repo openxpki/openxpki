@@ -18,7 +18,6 @@ use OpenXPKI::Serialization::Simple;
 use Log::Log4perl;
 
 our $config = OpenXPKI::Client::Config->new('rpc');
-my $conf = $config->default();
 my $log = $config->logger();
 
 $log->info("RPC handler initialized");
@@ -26,6 +25,8 @@ $log->info("RPC handler initialized");
 my $json = new JSON();
 
 while (my $cgi = CGI::Fast->new()) {
+
+    my $conf = $config->config();
     
     my $error = '';
     

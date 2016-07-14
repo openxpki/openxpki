@@ -167,6 +167,19 @@ msgstr "Valido"
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Scarica in formato DER (CER)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
+msgstr "non prima del"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
+msgstr ""
+"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
+"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
+"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
+"viene eseguito un controllo relativo alla finestra di validità "
+"Non_prima_del / Non_dopo_il."
+
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "mostra le liste di revoca precedenti"
 
@@ -455,6 +468,10 @@ msgstr "Impossibile effettuare il Login con le credenziali fornite!"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
 msgstr "Mostra Liste Revoche (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
+msgstr "Revoca Certificato"
 
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "Certificati CA"
@@ -802,6 +819,10 @@ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 msgstr "Errore sconosciuto"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Soggetto Certificato"
 
@@ -880,6 +901,14 @@ msgstr "sconosciuto"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "in arrivo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
+msgstr "Workflow History"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
+msgstr "Action"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Errore sconosciuto"
@@ -1413,7 +1442,15 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvazioni"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
+msgstr "Certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
@@ -2233,6 +2270,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "CRL Emesse"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_LABEL"
+msgstr "In Attesa di Approvazione"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
 msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
 
@@ -2661,6 +2706,17 @@ msgstr "Emetti le Liste Revoche (CRL)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "Emissione CRL"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
+msgstr ""
+"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
+"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
+"predefiniti."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_LABEL"
+msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"

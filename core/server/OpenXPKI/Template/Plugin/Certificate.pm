@@ -51,6 +51,33 @@ sub new {
     }, $class;
 }
 
+
+=head2 get_hash(cert_identifier)
+
+Return the certificates database hash or undef if the identifier is 
+not found.
+ 
+=cut
+
+sub get_hash {
+    
+    my $self = shift;
+    my $cert_id = shift;
+    
+    # To prevent loading the same item again and again, we always cache
+    # the last hash and reuse it 
+
+    if ($self->{_hash} && $self->{_hash}->{IDENTIFIER} eq $cert_id) {
+        return $self->{_hash};
+    }
+
+    eval {
+        $self->{_hash} = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
+    };
+    return $self->{_hash};
+
+}
+
 =head2 body(cert_identifier, property)
 
 Return a selected property from the certificate body. All fields returned by
@@ -65,7 +92,7 @@ sub body {
     my $cert_id = shift;
     my $property = shift;
     
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });    
+    my $hash = $self->get_hash( $cert_id );    
     return $hash ? $hash->{BODY}->{uc($property)} : undef;
 
 }
@@ -79,7 +106,7 @@ sub csr_serial {
     my $self = shift;
     my $cert_id = shift; 
         
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });    
+    my $hash = $self->get_hash( $cert_id );    
     return $hash ? $hash->{CSR_SERIAL} : '';
 }
 
@@ -93,7 +120,7 @@ sub serial {
     my $self = shift;
     my $cert_id = shift; 
         
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });    
+    my $hash = $self->get_hash( $cert_id );    
     return $hash ? $hash->{BODY}->{SERIAL} : '';
 }
 
@@ -108,7 +135,7 @@ sub serial_hex {
     my $self = shift;
     my $cert_id = shift; 
         
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });    
+    my $hash = $self->get_hash( $cert_id );    
     return $hash ? $hash->{BODY}->{SERIAL_HEX} : '';
 }
 
@@ -121,7 +148,7 @@ sub status {
     my $self = shift;
     my $cert_id = shift; 
         
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });    
+    my $hash = $self->get_hash( $cert_id );    
     return $hash ? $hash->{STATUS} : '';
 }
 
@@ -134,7 +161,7 @@ sub issuer {
     my $self = shift;
     my $cert_id = shift; 
         
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });    
+    my $hash = $self->get_hash( $cert_id );    
     return $hash ? $hash->{ISSUER_IDENTIFIER} : '';
 }
 
@@ -152,7 +179,7 @@ sub dn {
     my $cert_id = shift;
     my $component = shift; 
         
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });        
+    my $hash = $self->get_hash( $cert_id );        
     if (!$hash) {
         return;
     }
@@ -182,7 +209,9 @@ sub notbefore {
     my $self = shift;
     my $cert_id = shift;
     
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
+    my $hash = $self->get_hash( $cert_id );
+    
+    return '' unless ($hash);
     
     return OpenXPKI::DateTime::convert_date({
         DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTBEFORE} ),
@@ -201,7 +230,9 @@ sub notafter {
     my $self = shift;
     my $cert_id = shift;
     
-    my $hash = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
+    my $hash = $self->get_hash( $cert_id );
+
+    return '' unless ($hash);
     
     return OpenXPKI::DateTime::convert_date({
         DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTAFTER} ),

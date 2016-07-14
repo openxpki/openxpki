@@ -286,6 +286,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContextHash.pm
+OpenXPKI/Server/Workflow/Activity/Tools/StringToArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParseCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Pause.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PublishCertificate.pm
@@ -647,6 +648,7 @@ bin/openxpkicmd
 
 # cgi stuff
 cgi-bin/scep
+cgi-bin/scep.fcgi
 cgi-bin/webui.fcgi
 cgi-bin/sc.fcgi
 cgi-bin/soap.fcgi

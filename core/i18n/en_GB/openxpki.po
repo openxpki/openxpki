@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-07-10 22:57+0100\n"
+"PO-Revision-Date: 2016-07-14 13:43+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -153,6 +153,12 @@ msgstr "Valid"
 
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Click here to download."
+
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
+msgstr "Unable to check certificates status as identifier was not found."
+
+msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
+msgstr "The certificates status does not match the expected one."
 
 msgid "I18N_OPENXPKI_UI_CRL_LIST_OLD"
 msgstr "show older revocation lists"
@@ -399,6 +405,9 @@ msgstr "Login with the given credentials failed!"
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
 msgstr "Bulk Approve/Reject"
+
+msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
+msgstr "Bulk Revoke"
 
 msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
 msgstr "CA Certificates"
@@ -735,9 +744,11 @@ msgstr "3 years"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
-msgstr "Unknown error"
+msgstr "Unknown error when analyzing card status"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY"
+msgstr "Search query is empty!"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Certificate Subject"
@@ -807,6 +818,12 @@ msgstr "unknown"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "upcoming"
+
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
+msgstr "You do not have the required privileges to access the workflow history"
+
+msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
+msgstr "You do not have the required privileges to access the workflow log"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
@@ -1309,8 +1326,14 @@ msgstr "Allowed Certificate Count"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvals"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
+msgstr "Ignored Certificate Identifiers"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
 msgstr "Certificate List"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
+msgstr "List of certificate identifiers, seperated by space or newline"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
@@ -1756,13 +1779,11 @@ msgstr "SCEP Transaction Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Name of the SCEP endpoint receiving this request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
-msgstr "Name of the SCEP endpoint receiving this request."
+msgstr "The type of interface used to send this request. "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
-msgstr "SCEP Endpoint"
+msgstr "Server Interface"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "SCEP Endpoint"
@@ -1866,13 +1887,11 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Request invalid - action without token"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION"
-msgstr "Request invalid - action without workflow id"
+msgstr "Request invalid - action without handle"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ID"
-msgstr "Request invalid - action without workflow id"
+msgstr "Request invalid - handle without workflow id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "Request invalid - no action"
@@ -2080,6 +2099,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
 msgstr "CRLs issued"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_DESC"
+msgstr "This revocation request requires approval."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_LABEL"
+msgstr "Approval Pending"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
 msgstr "This revocation request requires approval."
@@ -2506,6 +2531,14 @@ msgstr "Issue certificate revocation lists."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
 msgstr "CRL Issuance"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
+msgstr ""
+"This workflow allows the revocation of multiple certificates at once. You "
+"need to provide a list of VALID certificate identifiers."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_LABEL"
+msgstr "Bulk Revocation Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
 msgstr "This workflow revokes all certificates that belong to a certain entity"

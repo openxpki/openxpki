@@ -78,23 +78,7 @@ has 'default' => (
     builder => '__init_default',
 );
 
-
-has 'configfile' => (
-    required => 0,
-    is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    builder => '__init_configfile',
-);
-
-has 'config' => (
-    required => 0,
-    is => 'ro',
-    isa => 'HashRef',
-    lazy => 1,
-    builder => '__init_config',
-);
-
+ 
 has 'logger' => (
     required => 0,
     lazy => 1,
@@ -193,7 +177,7 @@ sub __init_default {
     
 }
     
-sub __init_configfile() {    
+sub config() {
     
     my $self = shift;
        
@@ -228,18 +212,9 @@ sub __init_configfile() {
             $configfile = $file;    
         }
     }
-    return $configfile;    
-}
-
-sub __init_config {
-    
-    my $self = shift;
-
-    my $configfile = $self->configfile();
     
     # if no config file is given, use the default
     if (!$configfile) {
-        $self->logger()->debug('No special config file - use default settings.');
         return $self->default();
     }
 

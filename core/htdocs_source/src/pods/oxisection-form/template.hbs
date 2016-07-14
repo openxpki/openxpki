@@ -8,12 +8,12 @@
             {{oxifield-main content=field addClone="addClone" delClone="delClone" valueChange="valueChange"}}
         {{/each}}
         <div class="form-group">
-            <div class="col-md-offset-2 col-sm-7">
-                <button class="btn btn-default {{if loading "btn-loading"}}" {{action "submit"}}>
+            <div class="col-md-offset-2 col-sm-7 oxi-form-button">
+                <button class="btn btn-default {{if loading "btn-loading"}} submit" {{action "submit"}}>
                     {{submitLabel}}
                 </button>
                 {{#if content.content.reset_label}}
-                    <button class="btn btn-default" {{action "reset"}}>
+                    <button class="btn btn-default reset" {{action "reset"}}>
                         {{content.content.reset_label}}
                     </button>
                 {{/if}}
