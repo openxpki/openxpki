@@ -1,14 +1,33 @@
-The vagrant file provides four targets:
+Package Mirror
+##############
 
+The vagrant files contain (where useful) a shared folder definition for
+the package mirror. Create an empty directory packages.openxpki.org next
+to the openxpki repository tree. This will be shared as /packages.openxpki.org
+and used as source for installing the openxpki packages. Its also used as 
+target for creating the upstream mirror in the build-jessie/build-trusty 
+machines.   
+
+Vagrant Machines
+################
 test: 
-  The default test machine using debian wheezy
-  Grabs the current deb files from the package server,
-  installs them, runs the sample-setup and the 
-  nice qatest.
+  The default test machine using debian jessie 
+  Grabs the current deb files from the package server/local mirror, 
+  installs them using aptitude and runs the sample-setup and some of the 
+  qatest.
 
-test-trusty: 
-  as test, for ubuntu trusty
-
-build-wheezy: 
+build-jessie: 
   build cpan deps, core and i18 from the current tree.
   Installs those packages, runs sample-setup and qatests.
+  If you want to create a copy of the public mirror, you need to create
+  the /packages.openxpki.org directory inside the vagrant machine, either
+  as local directory or as a shared folder as described above.
+  Then, after packages are built (which is done be the provisioning script
+  usually), call scripts/prepare.sh  from the host and afterwards
+  scripts/reprepro.sh from INSIDE the virtual machine. This will use the 
+  reprepro tool to create a repo structure. The signing key is defined in
+  package/debian/reprepro-debian/distributions and must be available
+  on your hosts gpg keyring.  
+
+test-trusty/build-trusty:
+  Same as test/build-jessie but for Ubuntu trusty (14.04 LTS)
