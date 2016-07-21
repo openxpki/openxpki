@@ -455,10 +455,11 @@ sub init_fetch {
         exit;
     }
         
-    my ($type, $source) = split /:/, $data->{source};        
+    my ($type, $source) = ($data->{source} =~ m{(\w+):(.*)});
+    $self->logger()->debug('Fetch source: '.$source.', Key: '.$source );
+    
     if ($type eq 'file') {
-        my $file = $1;
-        open (my $fh, $file) || die 'Unable to open file';
+        open (my $fh, $source) || die 'Unable to open file';
         print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
         while (my $line = <$fh>) {
             print $line;
