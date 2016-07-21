@@ -1,0 +1,7 @@
+authorized_signer:
+    rule1:
+        # Full DN
+        subject: CN=.+:scepclient,.*
+    rule2:
+        # Full DN
+        subject: CN=.+:pkiclient,.*

@@ -9,7 +9,7 @@ state:
 
     SEARCH_CERTIFICATE: 
         autorun: 1
-        action: search_certificate > CHECK_AUTHORIZATION
+        action: search_certificate check_authorized_signer > CHECK_AUTHORIZATION
 
     CHECK_AUTHORIZATION:
         autorun: 1
