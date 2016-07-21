@@ -105,7 +105,7 @@ sub BUILD {
     
     my $self = shift;
     
-    if ($self->service() !~ /\A[a-zA-Z0-9]+\z/) {
+    if ($self->service() !~ /\A[a-zA-Z0-9\-]+\z/) {
         die "Invalid service name: " . $self->service();
     }
     
