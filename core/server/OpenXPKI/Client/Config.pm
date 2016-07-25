@@ -161,14 +161,13 @@ sub __init_default {
             || die sprintf "Explicit config file not found (%s, from env %s)", $ENV{$env_file}, $env_file;
             
         $configfile = $ENV{$env_file};        
-        $self->configfile('');
     } else {
         $configfile = File::Spec->catfile( ( ($self->basepath), 'default.conf' ) );        
     }
     
     my $config;
     if (!read_config $configfile => $config) {
-        die "Could not read client config file " . $self->configfile() ;
+        die "Could not read client config file " . $configfile;
     }
     
     # cast to an unblessed hash 
