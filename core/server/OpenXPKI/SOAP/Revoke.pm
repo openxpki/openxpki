@@ -58,8 +58,10 @@ sub __dispatch_revoke {
     my $servername = $config->{$package}->{servername};
     
     if ( !defined $workflow_type ) {
-        $log->error("SOAP CertificateRevoke: no workflow_type set for requested URI $canonical_uri");
-        return SOAP::Data->new( name => 'responseCode', value => 1 );
+        $log->error("SOAP CertificateRevoke: Unable to read config / workflow type not set, url: $canonical_uri");
+        return SOAP::Data->new( name => 'result', value => { 
+            error => 'Unable to read config / workflow type not set', 
+        });
     }
     
     my $crr_info = {
@@ -68,9 +70,10 @@ sub __dispatch_revoke {
     };
     
     my $workflow;
+    my $client;
     eval {
                 
-        my $client = OpenXPKI::Client::Simple->new({        
+        $client = OpenXPKI::Client::Simple->new({        
             logger => $log,
             config => $config->{global}, # realm and locale
             auth => $config->{auth}, # auth config
@@ -78,7 +81,9 @@ sub __dispatch_revoke {
         
         if ( !$client ) {
             $log->error("Could not instantiate client object");
-            return SOAP::Data->new( name => 'responseCode', value => 1 );
+            return SOAP::Data->new( name => 'result', value => { 
+                error => 'Could not instantiate client object'
+            });
         }
         
         # if revoke by serial is requested, use API to resolve the identifier
@@ -137,8 +142,13 @@ sub __dispatch_revoke {
         $log->error("Unable to create workflow: ". $exc->message );
         $res = { error => $exc->message, pid => $$ };
     } elsif ($EVAL_ERROR) {
-        $log->error("Unable to create workflow: ". $EVAL_ERROR );        
-        $res = { error => 'uncaught error', pid => $$ };
+        my $ee = $client->last_error();
+        $log->error("Unable to create workflow: ". $EVAL_ERROR );
+        if ($ee) {
+            $res = { error => $ee, pid => $$ };
+        } else {
+            $res = { error => 'Uncaught error while processing request', pid => $$ };
+        }
     } elsif (!$workflow->{ID} || $workflow->{'PROC_STATE'} eq 'exception' || $workflow->{'STATE'} eq 'FAILURE') {
         $log->error("Workflow terminated in unexpected state" );
         $res = { error => 'workflow terminated in unexpected state', pid => $$, id => $workflow->{id}, 'state' => $workflow->{'STATE'} };
@@ -150,7 +160,6 @@ sub __dispatch_revoke {
     
     return SOAP::Data->new( name => 'result', value => $res );
     
-    #return SOAP::Data->new( name => 'responseCode', value => 0 );    
 }
 
 # Keep the old method intact
