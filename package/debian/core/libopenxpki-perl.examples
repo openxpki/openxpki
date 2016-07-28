@@ -5,3 +5,4 @@ examples/sampleconfig.sh
 examples/apache/openxpki.conf
 examples/logrotate.conf
 examples/README.md
+examples/sql/schema-mysql.sql
