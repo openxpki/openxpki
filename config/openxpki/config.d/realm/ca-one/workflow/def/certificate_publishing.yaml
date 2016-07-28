@@ -107,3 +107,6 @@ acl:
     User: 
         creator: self
 
+    Anonymous: 
+        creator: self
+
