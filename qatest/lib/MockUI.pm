@@ -2,6 +2,7 @@ package MockUI;
 use Moose;
 use JSON;
 use CGIMock;
+use CGI::Session;
 
 extends 'OpenXPKI::Client::UI';
 
