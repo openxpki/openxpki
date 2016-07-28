@@ -13,20 +13,24 @@ CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
 GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
 flush privileges;" | mysql -u root
 
-#Setup the database
-openxpkiadm initdb
-
-# create certificates
-# example script might be packed
-test -f /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh.gz && \
-  gunzip /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh.gz
-
-if [ -f /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh ]; then
-    bash /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh
+if [ -d /opt/myperl/share/examples/ ]; then
+    BASE=/opt/myperl/share/examples
+else
+    BASE=/usr/share/doc/libopenxpki-perl/examples
 fi
 
-if [ -f /opt/myperl/share/examples/sampleconfig.sh ]; then
-    bash /opt/myperl/share/examples/sampleconfig.sh
+# same for SQL dump
+if [ -f "$BASE/schema-mysql.sql.gz" ]; then
+    zcat "$BASE/schema-mysql.sql.gz" | mysql -u root openxpki
+else
+    mysql -u root openxpki < "$BASE/schema-mysql.sql"
+fi
+
+# example script might be packed or not
+if [ -f "$BASE/sampleconfig.sh.gz" ]; then
+    zcat "$BASE/sampleconfig.sh.gz" | /bin/bash  
+else
+    /bin/bash "$BASE/sampleconfig.sh"
 fi
 
 # Need to pickup new group
