@@ -36,7 +36,7 @@ sub init_search {
 
     # TODO Sorting / I18
 
-    my @profile_list = sort { $a->{label} <=> $b->{label} } @{$profile};
+    my @profile_list = sort { $a->{label} cmp $b->{label} } @{$profile};
 
     my @states = (
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_ISSUED', value => 'ISSUED'},
