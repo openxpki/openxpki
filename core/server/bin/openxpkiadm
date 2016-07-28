@@ -42,6 +42,8 @@ sub initdb {
         push @databases, 'log';
     }
 
+    print STDERR "WARNING: Usage if initdb is deprecated!\nPlease use the provided schema dumps to setup your database.";
+
   DB:
     foreach my $db (@databases) {
         my $params = {};

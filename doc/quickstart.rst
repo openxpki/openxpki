@@ -80,9 +80,16 @@ Now, create an empty database and assign a database user::
        user: openxpki
        passwd: openxpki
 
-Create the initial database schema with this command::
 
-    openxpkiadm initdb
+Starting with v1.10, the "initdb" command is deprecated, please create 
+the empty database schema from the provided schema file (currently only
+available for mysql). 
+
+Example call when debian packages are installed::
+
+    zcat /usr/share/doc/libopenxpki-perl/examples/schema-mysql.sql.gz | \
+        mysql -u root -p openxpki
+
 
 Setup base certificates
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -244,50 +251,8 @@ Support for Java Keystore
 OpenXPKI can assemble server generated keys into java keystores for 
 immediate use with java based applications like tomcat. This requires
 a recent version of java ``keytool`` installed. On debian, this is 
-provided by the package ``openjdk-7-jre``. Note: You change set the 
+provided by the package ``openjdk-7-jre``. Note: You can set the 
 location of the keytool binary in ``system.crypto.token.javajks``, the
 default is /usr/bin/keytool.
 
-Starting from scratch
----------------------
-
-**This section is outdated - sorry**
-
-If you don't use debian or just like the hard way you can of course start from out github repo.
-The debian build file are the current "authorative source" regarding to dependencies, etc. so 
-the dependencies in the Makefile might not be fully sufficient.
-  
-Clone the git repository to your box::
-
-    cd /usr/local/src/
-    git clone git://github.com/openxpki/openxpki.git
-    
-    cd openxpki/core/server
-    perl Makefile.PL
-    make
-
-Make test requires a running mysql server, so configure your database user first as described in the debian install above.
-       
-Now test and install, if you want to change the install location, see perldoc ExtUtils::MakeMaker how to change prefixes.          
-    
-    make test    
-    make install
-
-You should now have the necessary perl library files and the helper scripts in place. Now its time to create a user and group for the daemon, the default is *openxpki*. 
  
-Setup necessary filesystem ressources::
-
-    mkdir -p -m 0775 /var/openxpki/session 
-    chown -R root:openxpki /var/openxpki/
-    
-    mkdir -p /etc/openxpki/config.d/
-    
-    mkdir -p -m 0700 /etc/openxpki/ssl/ca-one/
-    chown -R openxpki:root /etc/openxpki/ssl/ca-one/
-
-...and copy an initial configuration from the examples directory::
-    
-    cp -r /usr/local/src/openxpki/core/config/log.conf /etc/openxpki/
-    cp -r /usr/local/src/openxpki/core/config/basic/* /etc/openxpki/config.d/
-     
-Continue with creating your certificates as mentioned above and follow the rest of the guide. 
