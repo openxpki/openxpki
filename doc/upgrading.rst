@@ -56,9 +56,9 @@ Please update your database schema::
   DROP TABLE IF EXISTS `application_log`;
   CREATE TABLE IF NOT EXISTS `application_log` (
     `application_log_id` bigint(20) unsigned NOT NULL,
-    `logtimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `logtimestamp` decimal(49,0) DEFAULT NULL,
     `workflow_id` decimal(49,0) NOT NULL,
-    `priority` int(3) DEFAULT 999,
+    `priority` int(11) DEFAULT 999,
     `category` varchar(255) NOT NULL,
     `message` longtext,
     PRIMARY KEY (`application_log_id`),
