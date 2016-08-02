@@ -14,6 +14,16 @@ not behave correctly or even wont start.
 For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
+Release v1.13
+-------------
+
+The default config now uses /var/log/openxpki/ as log directory. It is no
+problem to leave your log files where there are but you need to fix the 
+permissions on the frontend logs after running the update::
+   
+    cd /var/openxpki/; chown www-data webui.log scep.log soap.log rpc.log
+
+We will fix this in the debian update with the next release.
 
 Release v1.11
 -------------
@@ -56,7 +66,7 @@ Please update your database schema::
   DROP TABLE IF EXISTS `application_log`;
   CREATE TABLE IF NOT EXISTS `application_log` (
     `application_log_id` bigint(20) unsigned NOT NULL,
-    `logtimestamp` decimal(49,0) DEFAULT NULL,
+    `logtimestamp` bigint(20) unsigned DEFAULT NULL,
     `workflow_id` decimal(49,0) NOT NULL,
     `priority` int(11) DEFAULT 999,
     `category` varchar(255) NOT NULL,
