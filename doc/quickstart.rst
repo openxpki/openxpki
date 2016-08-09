@@ -17,7 +17,7 @@ Debian/Ubuntu Builds
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
 
-Current release is 1.10 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.13 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (jessie)::
 
@@ -81,7 +81,7 @@ Now, create an empty database and assign a database user::
        passwd: openxpki
 
 
-Starting with v1.10, the "initdb" command is deprecated, please create 
+Starting with v1.13, the "initdb" command is deprecated, please create 
 the empty database schema from the provided schema file (currently only
 available for mysql). 
 
@@ -89,6 +89,9 @@ Example call when debian packages are installed::
 
     zcat /usr/share/doc/libopenxpki-perl/examples/schema-mysql.sql.gz | \
         mysql -u root -p openxpki
+
+If you do not use debian packages, you can get a copy from the config/sql/
+folder of the repository.
 
 
 Setup base certificates
