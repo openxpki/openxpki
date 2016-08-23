@@ -1,47 +1,5 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust;
 
-=head1 NAME
-
-OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
-
-=head1 SYNOPSIS
-
-    class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
-    param:
-      _map_rules: scep.[% context.server %].authorized_signer_on_behalf
-
-=head1 DESCRIPTION
-
-Evaluate the trust status of the signer. The result are two status flags,
-I<signer_trusted> if the certificate can be validated using the PKI 
-(complete chain available and not revoked) and I<signer_authorized>
-if the signer is authorized (matches one of the given rules).
-Authorization is done, even if the chain can not be validated, so you need 
-to check both context items or delegate the chain validation to another
-component (e.g. tls config of webserver). 
-
-=head1 Configuration
-
-The check for authorization uses a list of rules below the path defined
-by the rules parameter. E.g. for the SCEP workflow this is   
-I<scep.[% context.server ].authorized_signer_on_behalf>. 
-The list is a hash of hashes, were each entry is a combination of one or more 
-matching rules. The name of the rule is just used for logging purpose:
-
-  rule1:
-    subject: CN=scep-signer.*,dc=OpenXPKI,dc=org
-    identifier: AhElV5GzgFhKalmF_yQq-b1TnWg
-    profile: I18N_OPENXPKI_PROFILE_SCEP_SIGNER
-    realm: ca-one
-
-The subject is evaluated as a regexp, therefore any characters with a 
-special meaning in perl regexp need to be escaped! Identifier, profile and
-realm are matched as is, realm is always the session realm if not set. 
-The rules in one entry are ANDed together. If you want to provide 
-alternatives, add multiple list items.
-
-=cut
-
 use strict;
 use warnings;
 
@@ -63,7 +21,8 @@ sub execute {
     $context->param('signer_trusted' => 0);    
     $context->param('signer_authorized' => 0);
     $context->param('signer_revoked' => 0);
-       
+    $context->param('signer_validity_ok' => 0);
+    
     my $signer_cert = $context->param('signer_cert');
     
     if (!$signer_cert) {
@@ -80,11 +39,23 @@ sub execute {
         DATA  => $signer_cert,        
         TOKEN => $default_token
     );       
-       
+
+    # Check if the certificate is valid       
+    my $now = DateTime->now();
+    my $notbefore = $x509->get_parsed('BODY', 'NOTBEFORE');
+    my $notafter = $x509->get_parsed('BODY', 'NOTAFTER');
+
+    if ( ( DateTime->compare( $notbefore, $now ) <= 0)  && ( DateTime->compare( $now,  $notafter) < 0) ) {
+        $context->param('signer_validity_ok' => '1');
+    } else {
+        $context->param('signer_validity_ok' => '0');
+    }
        
     # Check the chain
     my $signer_identifier = $x509->get_identifier();
-           
+
+    $context->param('signer_cert_identifier' => $signer_identifier);
+
     # Get realm and issuer for signer certificate
     my $cert_hash = CTX('dbi_backend')->first(
         TABLE    => 'CERTIFICATE',
@@ -228,3 +199,68 @@ sub execute {
 }
 
 1;
+
+=head1 NAME
+
+OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+
+=head1 SYNOPSIS
+
+    class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+    param:
+      _map_rules: scep.[% context.server %].authorized_signer_on_behalf
+
+=head1 DESCRIPTION
+
+Evaluate if the signer certificate can be trusted. Populates the result 
+into several context items, all values are boolean.
+
+=over
+
+=item signer_trusted
+
+true if the complete chain is available and certificate status is not 
+revoked. Does B<NOT> check for expiration.
+
+=item signer_authorized
+
+true if the signer matches one of the given rules. This does B<NOT> depend
+on the trust status of the certificate, so you need to check both flags or 
+delegate the chain validation to another component (e.g. tls config of 
+webserver). 
+
+=item signer_validity_ok
+
+true if the current date is within the notbefore/notafter window
+
+=item signer_revoked
+
+true if the certificate is marked revoked. 
+
+=item signer_cert_identifier
+
+the identifier of the signer certificate
+
+=back 
+
+=head1 Configuration
+
+The check for authorization uses a list of rules below the path defined
+by the rules parameter. E.g. for the SCEP workflow this is   
+I<scep.[% context.server ].authorized_signer_on_behalf>. 
+The list is a hash of hashes, were each entry is a combination of one or more 
+matching rules. The name of the rule is just used for logging purpose:
+
+  rule1:
+    subject: CN=scep-signer.*,dc=OpenXPKI,dc=org
+    identifier: AhElV5GzgFhKalmF_yQq-b1TnWg
+    profile: I18N_OPENXPKI_PROFILE_SCEP_SIGNER
+    realm: ca-one
+
+The subject is evaluated as a regexp, therefore any characters with a 
+special meaning in perl regexp need to be escaped! Identifier, profile and
+realm are matched as is, realm is always the session realm if not set. 
+The rules in one entry are ANDed together. If you want to provide 
+alternatives, add multiple list items.
+
+
