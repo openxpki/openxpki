@@ -1,0 +1,3 @@
+class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
+param:
+    _map_rules: "[% context.interface %].[% context.server %].authorized_signer"

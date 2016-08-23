@@ -1,0 +1,3 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL
+name: signer_cert_identifier
+type: cert_identifier

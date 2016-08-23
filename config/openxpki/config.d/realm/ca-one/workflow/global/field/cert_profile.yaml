@@ -1,0 +1,10 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL
+name: cert_profile
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC
+placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_PLACEHOLDER
+tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP
+type: select
+# The options are provided by the uihandle class!
+required: 1
+template: "[% USE Profile %][% Profile.name(value) %]"
+
