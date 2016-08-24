@@ -113,6 +113,14 @@ sub execute_action {
     ##! 32: 'session_info: '.$session_info
     $self->session_info($session_info);
 
+    # The workflow module internally caches conditions and does NOT clear 
+    # this cache if you just refetch a workflow! As the workflow state 
+    # object is shares, this leads to wrong states in the condition cache
+    # if you reopen two different workflows in the same state!
+    
+    my $wf_state = $self->_get_workflow_state->clear_condition_cache();
+
+
     #set "reap at" info
     my $action = $self->_get_action($action_name);
 
