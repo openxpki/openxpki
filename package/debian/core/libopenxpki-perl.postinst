@@ -51,7 +51,9 @@ case "$1" in
        fi;
 
        # Fix directory permissions
-       chown -R openxpki:openxpki /var/openxpki
+       chown openxpki:openxpki /var/openxpki
+       chown openxpki:openxpki /var/openxpki/session
+       
        chown -R openxpki:openxpki /var/log/openxpki
        chown -R openxpki:root /etc/openxpki/ssl/
        chmod -R 750 /etc/openxpki/ssl/

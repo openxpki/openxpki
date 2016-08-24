@@ -47,6 +47,8 @@ Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
 
 Some people reported that a2enmod is not available on their system, in this case try to install the apache2.2-common package.
 
+*Ubuntu*: The provided CGI.pm does not support para_multi, either install a recent version from CPAN or manually grab an install the package from our package server! 
+
 Now install the OpenXPKI core package and the translation package::
 
     aptitude install libopenxpki-perl openxpki-i18n
