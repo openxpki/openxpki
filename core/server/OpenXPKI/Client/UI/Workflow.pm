@@ -2160,6 +2160,11 @@ sub __render_fields {
                 
                 $self->logger()->debug( 'item ' . Dumper $item);
 
+            # add a redirect command to the page
+            } elsif ($item->{format} eq "redirect") {
+                
+                $self->redirect($item->{value});
+                
             # create a link to download the given filename
             } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
                 
@@ -2271,7 +2276,6 @@ sub __render_fields {
                 # Sort by label
                 my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};            
                 $item->{value} = \@val;
-
             }
 
             if ($field->{template}) {

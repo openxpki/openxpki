@@ -144,7 +144,7 @@ I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED
 UI Rendering
 ------------
 
-The UI uses information from the workflow definition to render display and input pages. There are two different kinds of pages,  switches and inputs. 
+The UI uses information from the workflow definition to render display and input pages. There are two different kinds of pages, switches and inputs. 
 
 Action Switch Page
 ^^^^^^^^^^^^^^^^^^
@@ -161,7 +161,7 @@ String as defined in state.description, can contain HTML tags
 
 *workflow context*
 
-Currently a plain dump of the context using key/values, array/hash values are converted to a html list/dd-list
+By default a plain dump of the context using key/values, array/hash values are converted to a html list/dd-list. You can define a custom output table with labels, formatted values and even links, etc - see the section "Workflow Output Formatting" fore details.
 
 *button bar / simple layout*
 
