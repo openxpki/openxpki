@@ -456,7 +456,7 @@ sub init_fetch {
     }
         
     my ($type, $source) = ($data->{source} =~ m{(\w+):(.*)});
-    $self->logger()->debug('Fetch source: '.$source.', Key: '.$source );
+    $self->logger()->debug('Fetch source: '.$type.', Key: '.$source );
     
     if ($type eq 'file') {
         open (my $fh, $source) || die 'Unable to open file';
