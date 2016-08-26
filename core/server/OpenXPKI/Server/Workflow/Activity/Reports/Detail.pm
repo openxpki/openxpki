@@ -20,39 +20,64 @@ sub execute {
     my $context = $workflow->context();
     my $pki_realm = CTX('session')->get_pki_realm(); 
                  
-    my $target_dir = $self->param('target_dir');
-    my $target_name = $self->param('target_filename');    
-    my $umask = $self->param( 'target_umask' ) || "0640";  
+    # write report to the context - WARNING: might eat up some memory
+    my $target_key = $self->param('target_key');
     
-    my $fh;    
-    if (!$target_name) {
-        $fh = File::Temp->new( UNLINK => 0, DIR => $target_dir );
-        $target_name = $fh->filename;
-    } elsif ($target_name !~ m{ \A \/ }xms) {        
-        if (!$target_dir) {
-            configuration_error('Full path for target_name or target_dir is required!');
-        }        
-        $target_name = $target_dir.'/'.$target_name;
+    my $target_name;
+    my $fh;
+    my $buffer;
+    
+    if ($target_key) {
         
-        if (-e $target_name) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_TARGET_FILE_EXISTS',
-                params => { FILENAME => $target_name }
-            );    
-        }
-                
-        open $fh, ">$target_name"; 
-    }
+        # create a in memory file handle
+        open( $fh, '>', \$buffer) or die "Can't open memory file: $!\n";
     
-    if (!$fh || !$target_name) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_UNABLE_TO_WRITE_REPORT_FILE',
-            params => { FILENAME => $target_name, DIRNAME => $target_dir }            
-        );
-    }
-    
-    chmod oct($umask), $target_name;
+    } else {
+        # Setup for write to disk
+        $target_name = $self->param('target_filename');
+        my $target_dir = $self->param('target_dir');
+        my $umask = $self->param( 'target_umask' ) || "0640";  
+        
+        if (!$target_name) {
+            $fh = File::Temp->new( UNLINK => 0, DIR => $target_dir );
+            $target_name = $fh->filename;
+        } else {
 
+            # relative path, prefix with directory
+            if ($target_name !~ m{ \A \/ }xms) {
+                if (!$target_dir) {
+                    configuration_error('Full path for target_name or target_dir is required!');
+                }
+                        
+                $target_name = $target_dir.'/'.$target_name;
+            }
+            
+            if (-e $target_name) {
+                
+                if ($self->param('target_overwrite')) {
+                    unlink($target_name);
+                } else {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_TARGET_FILE_EXISTS',
+                        params => { FILENAME => $target_name }
+                    );    
+                }
+            }
+                    
+            open $fh, ">", $target_name;
+        }
+        
+        if (!$fh || !$target_name) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_UNABLE_TO_WRITE_REPORT_FILE',
+                params => { FILENAME => $target_name, DIRNAME => $target_dir }            
+            );
+        }
+        
+        chmod oct($umask), $target_name;
+    }
+    
+    
     my $valid_at;
     if ($self->param('valid_at')) {
        $valid_at = OpenXPKI::DateTime::get_validity({        
@@ -249,9 +274,15 @@ sub execute {
     }
 
     close $fh;
-          
+
     $context->param('total_count', $cnt);
-    $context->param('report_filename' ,  $target_name );    
+    
+    if ($target_key) {
+        $context->param( $target_key => $buffer );
+    } else {
+        $context->param('report_filename' =>  $target_name );    
+    }
+        
     
     return 1;
       
@@ -266,7 +297,12 @@ OpenXPKI::Server::Workflow::Activity::Reports::Detail
 
 =head1 Description
 
-Write a detailed report with certificate status information to a CSV file.
+Write a detailed report with certificate status information in CSV format.
+Data can be written to a file or into the workflow context. If you have a
+large report make sure your database settings can handle the report size!
+It might also be wise to either use a volatile context item or clean up 
+after you are done to free the database space.
+
 Selection criteria and output format can be controlled by several activity
 parameters, the default is to print all currenty valid certificates.
 
@@ -276,15 +312,25 @@ parameters, the default is to print all currenty valid certificates.
 
 =over 
 
+=item target_key
+
+Write the report data into the workflow context using this key. The 
+filesystem is not used in this case, so all file related settings are
+ignored.
+
+
 =item target_filename
 
 Filename to write the report to, if relative (no slash), target_dir must
-be set and will be prepended. If not given, a random filename  is set.
+be set and will be prepended. If not given, a random filename is set.
 
 =item target_dir
 
-Mandatory if target_filename is relative. If either one is set, the system
-temp dir is used.
+Mandatory if target_filename is relative or not set.
+
+=item target_overwrite
+
+boolean, overwrite the target file if it exists.
 
 =item target_umask
 
