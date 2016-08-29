@@ -73,7 +73,8 @@ sub init_search {
             'keys' => \@attrib,                  
             type => 'text',
             is_optional => 1, 
-            'clonable' => 1
+            'clonable' => 1,
+            'value' => $preset->{attributes} || [],
         } if (@attrib);
     }
 
@@ -933,8 +934,12 @@ sub action_search {
     $self->logger()->debug("query : " . Dumper $self->cgi()->param());
 
     # Read the query pattern for extra attributes from the session 
-    my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
-    my @attr = @{$self->__build_attribute_subquery( $attributes )};        
+    my $spec = $self->_client->session()->param('certsearch')->{default};
+    my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};        
+
+    if (@attr) {
+        $input->{attributes} = $self->__build_attribute_preset( $spec->{attributes} );
+    }
 
     # Add san search to attributes
     if (my $val = $self->param('san')) {

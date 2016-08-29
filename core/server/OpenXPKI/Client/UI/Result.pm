@@ -780,5 +780,34 @@ sub __build_attribute_subquery {
     
 }
 
+=head2 __build_attribute_preset
+
+Expects an attribtue query definition hash (from uicontrol), returns arrayref 
+to be used as preset when reloading the search form
+
+=cut 
+sub __build_attribute_preset {
+
+    my $self = shift;
+    my $attributes = shift;
+   
+    if (!$attributes || ref $attributes ne 'ARRAY') {
+        return [];
+    }
+   
+    my @attr;
+           
+    foreach my $item (@{$attributes}) {
+        my $key = $item->{key};
+        my @val = $self->param($key.'[]');
+        while (my $val = shift @val) {
+            push @attr,  { key => $key, value => $val };
+        }
+    }
+    
+    return \@attr;
+    
+}
+
 
 1;

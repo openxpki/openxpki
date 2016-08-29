@@ -273,7 +273,8 @@ sub init_search {
             'keys' => \@attrib,
             type => 'text',
             is_optional => 1,
-            'clonable' => 1
+            'clonable' => 1,
+            'value' => $preset->{attributes} || [],
         } if (@attrib);
 
     }
@@ -1147,6 +1148,10 @@ sub action_search {
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_session->param('wfsearch')->{default};
     my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};
+
+    if (@attr) {
+        $input->{attributes} = $self->__build_attribute_preset(  $spec->{attributes} );
+    }
 
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
