@@ -24,6 +24,11 @@ Component = Em.Component.extend
             if clonable.name not in names
                 names.push clonable.name
 
+        for field in fields
+            if field.value and typeof field.value is "object"
+                field.name = field.value.key
+                field.value = field.value.value
+
         for name in names
             clones = (f for f in fields when f.name is name)
             Em.set clone, "isLast", false for clone in clones
