@@ -18,6 +18,7 @@ Route = Em.Route.extend
 
     source: Em.computed -> Em.Object.create
         page: null
+        refresh: null
         structure: null
         status: null
         tabs: []
@@ -74,12 +75,22 @@ Route = Em.Route.extend
             else
                 target = "top"
 
+        if source.get "refresh"
+            Em.run.cancel source.get "refresh"
+            source.set "refresh", null
+
         new Em.RSVP.Promise (resolve, reject) =>
             Em.$.ajax(req).then (doc) =>
                 source.beginPropertyChanges()
 
                 source.set "status", doc.status
                 source.set "modal", null
+
+                if doc.refresh
+                    source.set "refresh", Em.run.later(@, ->
+                        @sendAjax
+                            url: doc.refresh.href
+                    , doc.refresh.timeout)
 
                 if doc.goto
                     if doc.target == '_blank' || /^(http|\/)/.test doc.goto
