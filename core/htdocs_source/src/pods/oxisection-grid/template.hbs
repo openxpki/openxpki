@@ -11,16 +11,24 @@
                     </th>
                 {{/if}}
                 {{#each columns as |column|}}
-                    <th {{action "sort" column}}>
-                        <span>{{column.sTitle}}</span>
-                        {{#if column.isSorted}}
-                            {{#if pager.reverse}}
-                                <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt"></span>
+                    {{#if column.sortable}}
+                        <th {{action "sort" column}} class="sortable">
+                            <span>{{column.sTitle}}</span>
+                            {{#if column.isSorted}}
+                                {{#if pager.reverse}}
+                                    <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt"></span>
+                                {{else}}
+                                    <span class="pull-right glyphicon glyphicon-sort-by-attributes"></span>
+                                {{/if}}
                             {{else}}
-                                <span class="pull-right glyphicon glyphicon-sort-by-attributes"></span>
+                                <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt text-muted"></span>
                             {{/if}}
-                        {{/if}}
-                    </th>
+                        </th>
+                    {{else}}
+                        <th>
+                            <span>{{column.sTitle}}</span>
+                        </th>
+                    {{/if}}
                 {{/each}}
             </tr>
         </thead>
