@@ -61,8 +61,8 @@ sub init_search {
         { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
    );
 
-    my $attributes = $self->_client->session()->param('certsearch')->{default};
-    if (defined $attributes->[0]) {
+    my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
+    if (defined $attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
         foreach my $item (@{$attributes}) {
             push @attrib, { value => $item->{key}, label=> $item->{label} };                    
@@ -74,7 +74,7 @@ sub init_search {
             type => 'text',
             is_optional => 1, 
             'clonable' => 1
-        };      
+        } if (@attrib);
     }
 
     $self->add_section({
@@ -933,7 +933,7 @@ sub action_search {
     $self->logger()->debug("query : " . Dumper $self->cgi()->param());
 
     # Read the query pattern for extra attributes from the session 
-    my $attributes = $self->_client->session()->param('certsearch')->{default};
+    my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
     my @attr = @{$self->__build_attribute_subquery( $attributes )};        
 
     # Add san search to attributes

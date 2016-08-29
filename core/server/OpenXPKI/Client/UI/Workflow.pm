@@ -261,12 +261,11 @@ sub init_search {
     );
 
     # Searchable attributes are read from the menu bootstrap
-    my $attributes = $self->_session->param('wfsearch')->{default};
-    if ($attributes) {
+    my $attributes = $self->_session->param('wfsearch')->{default}->{attributes};
+    if ($attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
         foreach my $item (@{$attributes}) {
             push @attrib, { value => $item->{key}, label=> $item->{label} };
-
         }
         push @fields, {
             name => 'attributes',
@@ -275,7 +274,7 @@ sub init_search {
             type => 'text',
             is_optional => 1,
             'clonable' => 1
-        };
+        } if (@attrib);
 
     }
 
@@ -1146,8 +1145,8 @@ sub action_search {
     }
 
     # Read the query pattern for extra attributes from the session
-    my $attributes = $self->_session->param('wfsearch')->{default};
-    my @attr = @{$self->__build_attribute_subquery( $attributes )};
+    my $spec = $self->_session->param('wfsearch')->{default};
+    my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};
 
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
@@ -1167,6 +1166,15 @@ sub action_search {
         return $self->init_search({ preset => $input });
     }
 
+    # check if there is a custom column set defined
+    my ($header,  $body);    
+    if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
+        ($header, $body) = $self->__render_list_spec( $spec->{cols} );
+    } else {
+        $body = $self->__default_grid_row;
+        $header = $self->__default_grid_head;
+    }
+        
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_wfl_'.$queryid, {
         'id' => $queryid,
@@ -1174,7 +1182,8 @@ sub action_search {
         'count' => $result_count,
         'query' => $query,
         'input' => $input,
-        'column' => $self->__default_grid_row()
+        'header' => $header,
+        'column' => $body,
     });
 
     $self->redirect( 'workflow!result!id!'.$queryid  );

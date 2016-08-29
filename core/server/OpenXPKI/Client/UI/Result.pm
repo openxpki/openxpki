@@ -746,6 +746,10 @@ sub __build_attribute_subquery {
     my $self = shift;
     my $attributes = shift;
    
+    if (!$attributes || ref $attributes ne 'ARRAY') {
+        return [];
+    }
+   
     my @attr;
            
     foreach my $item (@{$attributes}) {

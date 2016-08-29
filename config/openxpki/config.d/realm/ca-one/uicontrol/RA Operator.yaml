@@ -206,18 +206,31 @@ bulk:
          
          
 wfsearch:
-   - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
-     key: cert_subject
-     pattern: '*%s*'
-     operator: like 
+    default:
+        cols:
+          - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
+            field: WORKFLOW_SERIAL
+          - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL
+            field: WORKFLOW_LAST_UPDATE
+          - label: I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL
+            field: WORKFLOW_STATE
+          - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
+            field: context.cert_subject
+          - label: I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL
+            template: "[% context.creator %] / [% context.cert_info.requestor_email %]"
+            
+        attributes:
+          - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
+            key: cert_subject
+            pattern: '*%s*'
+            operator: like 
 
-   - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
-     key: requestor
-
-   
-   - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
-     key: scep_tid 
-
+          - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
+            key: requestor
+           
+          - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
+            key: scep_tid 
+ 
 
 certsearch:
    - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
