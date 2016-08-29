@@ -353,19 +353,39 @@ sub init_result {
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
-    $self->_page({
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
-        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
-    });
+    # Add page header from result - optional
+    if ($result->{page} && ref $result->{page} ne 'HASH') {
+        $self->_page($result->{page});
+    } else {
+        $self->_page({
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
+            description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
+        });
+    }
 
     my $pager;
     if ($startat != 0 || @{$search_result} == $limit) {
         $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
     }
 
-    my @result = $self->__render_result_list( $search_result, $result->{column} );
+    my @lines = $self->__render_result_list( $search_result, $result->{column} );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result);
+    $self->logger()->trace( "dumper result: " . Dumper @lines);
+
+    my $header = $result->{header};
+    $header = $self->__default_grid_head() if(!$header);
+    
+    # buttons - from result (used in bulk) or default
+    my @buttons;
+    if ($result->{button} && ref $result->{button} eq 'ARRAY') {
+        @buttons = @{$result->{button}};
+    } else {
+        @buttons = (
+            { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', page => 'workflow!search!query!' .$queryid },
+            { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', page => 'redirect!workflow!result!id!' .$queryid },
+            { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', page => 'workflow!search'},
+        );
+    }
 
     $self->add_section({
         type => 'grid',
@@ -377,24 +397,18 @@ sub init_result {
                 icon => 'view',
                 target => 'tab',
             }],
-            columns => $self->__default_grid_head(),
-            data => \@result,
+            columns => $header,
+            data => \@lines,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
-            buttons => [
-                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', page => 'workflow!search!query!' .$queryid },
-                { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', page => 'redirect!workflow!result!id!' .$queryid },
-                { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', page => 'workflow!search'},
-                #{ label => 'bulk edit', action => 'workflow!bulk', select => 'serial', 'selection' => 'serial' }, # Draft for Bulk Edit
-            ]
-
+            buttons => \@buttons
         }
     });
 
     return $self;
 
 }
-
+ 
 =head2 init_pager
 
 Similar to init_result but returns only the data portion of the table as
