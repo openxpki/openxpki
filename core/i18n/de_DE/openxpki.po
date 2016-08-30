@@ -1737,6 +1737,13 @@ msgstr ""
 "Diesdient der sichern Identifikation von Personen oder Objekten."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON"
+msgstr ""
+"Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+"oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+"Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
 msgstr "Arbeitsabläufe"
 

@@ -1738,6 +1738,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr "Описания пока нет"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON"
+msgstr "Описания пока нет"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
 msgstr "Технологические процессы"
 

@@ -99,7 +99,6 @@ sub action_result {
     @attr = @{$self->__build_attribute_subquery( $attributes )} if ($attributes);
 
     my $query = $spec->{query};
-    my $limit = 25;
 
     if ($self->param('wf_creator')) {        
         push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };

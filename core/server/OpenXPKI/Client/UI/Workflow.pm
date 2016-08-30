@@ -319,7 +319,7 @@ sub init_result {
     # will be removed once inline paging works
     my $startat = $self->param('startat') || 0;
 
-    my $limit = $self->param('limit') || 25;
+    my $limit = $self->param('limit') || 0;
 
     if ($limit > 500) {  $limit = 500; }
 
@@ -337,7 +337,12 @@ sub init_result {
     # Add limits
     my $query = $result->{query};
 
-    $query->{LIMIT} = $limit;
+    if ($limit) {
+        $query->{LIMIT} = $limit;
+    } elsif (!$query->{LIMIT}) {
+        $query->{LIMIT} = 25;
+    }
+        
     $query->{START} = $startat;
     
     if (!$query->{ORDER}) {
@@ -364,11 +369,15 @@ sub init_result {
     }
 
     my $pager;
-    if ($startat != 0 || @{$search_result} == $limit) {
-        $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    if ($startat != 0 || @{$search_result} == $query->{LIMIT}) {
+        $pager = $self->__render_pager( $result, { limit => $query->{LIMIT}, startat => $query->{START} } );
     }
 
-    my @lines = $self->__render_result_list( $search_result, $result->{column} );
+
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+
+    my @lines = $self->__render_result_list( $search_result, $body );
 
     $self->logger()->trace( "dumper result: " . Dumper @lines);
 
@@ -380,11 +389,20 @@ sub init_result {
     if ($result->{button} && ref $result->{button} eq 'ARRAY') {
         @buttons = @{$result->{button}};
     } else {
-        @buttons = (
-            { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', page => 'workflow!search!query!' .$queryid },
-            { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', page => 'redirect!workflow!result!id!' .$queryid },
-            { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', page => 'workflow!search'},
-        );
+        
+        push @buttons, { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', 
+            page => 'redirect!workflow!result!id!' .$queryid,
+            className => 'expected' };
+            
+        push @buttons, { 
+            label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', 
+            page => 'workflow!search!query!' .$queryid,
+            className => 'alternative',
+        } if ($result->{input});
+        
+        push @buttons,{ label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', 
+            page => 'workflow!search',
+            className => 'failure'};
     }
 
     $self->add_section({
@@ -461,7 +479,11 @@ sub init_pager {
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
-    my @result = $self->__render_result_list( $search_result, $result->{column} );
+
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+
+    my @result = $self->__render_result_list( $search_result, $body );
 
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
@@ -1304,6 +1326,26 @@ sub action_bulk {
             }
         });
     }
+    
+    # persist the selected ids and add button to recheck the status
+    my $queryid = $self->__generate_uid();
+    $self->_client->session()->param('query_wfl_'.$queryid, {
+        'id' => $queryid,
+        'type' => 'workflow',
+        'count' => scalar @serials,
+        'query' => { SERIAL => \@serials },
+    });
+
+    $self->add_section({
+        type => 'text',
+        content => {
+            buttons => [{ 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON', 
+                page => 'redirect!workflow!result!id!' .$queryid,
+                className => 'expected',
+            }]
+        }
+    });
 
 }
 
@@ -1500,7 +1542,7 @@ sub __render_from_workflow {
 
         my @buttons = ({
             'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
             'className' => 'alternative'
         });
         

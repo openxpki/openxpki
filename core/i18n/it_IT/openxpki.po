@@ -1413,6 +1413,13 @@ msgstr ""
 "tua azione di massa. Puoi selezionare i singoli elementi nella pagina "
 "successiva."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON"
+msgstr ""
+"Inserisci i criteri di ricerca per selezionare i Workflow da includere nella "
+"tua azione di massa. Puoi selezionare i singoli elementi nella pagina "
+"successiva."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
 msgstr ""
 "L’azione selezionata è stata eseguita con successo su tutti i Workflow."
