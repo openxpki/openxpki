@@ -66,10 +66,9 @@ has _result => (
     default => sub { return {}; }
 );
 
-has reload => (
+has _refresh => (
     is => 'rw',
-    isa => 'Bool',
-    default => 0,
+    isa => 'HashRef|Undef',
 );
 
 has redirect => (
@@ -130,6 +129,18 @@ sub set_status {
 
     return $self;
 
+}
+
+sub refresh() {
+    
+    my $self = shift;
+    my $location = shift;
+    my $timeout = shift || 60;
+    
+    $self->_refresh({ href => $location, timeout => $timeout * 1000 });
+    
+    return $self;
+    
 }
 
 =head2 send_command
@@ -377,7 +388,7 @@ sub render {
     $result->{error} = $self->_error() if $self->_error();
     $result->{status} = $self->_status() if $self->_status();
     $result->{page} = $self->_page() if $self->_page();
-    $result->{reloadTree} = 1 if $self->reload();
+    $result->{refresh} = $self->_refresh() if ($self->_refresh());
 
     my $json = new JSON()->utf8;
     my $body;
