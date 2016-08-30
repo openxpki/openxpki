@@ -102,8 +102,8 @@ Route = Em.Route.extend
 
                 if doc.refresh
                     source.set "refresh", Em.run.later(@, ->
-                        @sendAjax
-                            url: doc.refresh.href
+                        @sendAjax data:
+                            page: doc.refresh.href
                     , doc.refresh.timeout)
 
                 if doc.goto
