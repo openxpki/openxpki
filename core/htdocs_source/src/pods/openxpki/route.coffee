@@ -87,6 +87,7 @@ Route = Em.Route.extend
         if source.get "refresh"
             Em.run.cancel source.get "refresh"
             source.set "refresh", null
+            $(".refresh").removeClass "in-progress"
 
         new Em.RSVP.Promise (resolve, reject) =>
             Em.$.ajax(req).then (doc) =>
@@ -105,6 +106,8 @@ Route = Em.Route.extend
                         @sendAjax data:
                             page: doc.refresh.href
                     , doc.refresh.timeout)
+                    Em.run.scheduleOnce "afterRender", =>
+                        $(".refresh").addClass "in-progress"
 
                 if doc.goto
                     if doc.target == '_blank' || /^(http|\/)/.test doc.goto
