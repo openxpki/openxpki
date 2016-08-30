@@ -251,6 +251,7 @@ OpenXPKI/Server/Workflow/Activity/Skip.pm
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 
 OpenXPKI/Server/Workflow/Activity/Noop.pm
+OpenXPKI/Server/Workflow/Activity/Sleep.pm
 
 # FIXME: Remove for production
 OpenXPKI/Server/Workflow/Activity/Test.pm
