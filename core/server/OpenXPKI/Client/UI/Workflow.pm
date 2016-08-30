@@ -1416,7 +1416,7 @@ sub __render_from_workflow {
                 'format' => 'timestamp' 
             }, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL',
-                value => $wf_info->{WORKFLOW}->{WAKE_UP_AT}, 
+                value => $wf_info->{WORKFLOW}->{WAKE_UP_AT},
                 'format' => 'timestamp' 
             }, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL',
@@ -1470,23 +1470,32 @@ sub __render_from_workflow {
 
     # if the workflow is currently runnig, show info without buttons
     } elsif ($wf_proc_state eq 'running' && $view ne 'context') {
-
-        $self->_page({
-            label => $wf_info->{WORKFLOW}->{label},
-            shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description =>  'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION',
-        });
-        
+     
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
      
-        my $action_running =  $wf_info->{STATE}->{option}->[0];
+        my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
+        my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
+
+        my $label =  $wf_action_info->{label} || $wf_info->{STATE}->{label} ;
+        if ($label) {
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
+        } else {
+            $label =  $wf_info->{WORKFLOW}->{label} ;
+        }
+
+        $self->_page({
+            label => $label,
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description =>  $wf_action_info->{description} ,
+        });
+                
         my @fields = ({  
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
                 value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
                 'format' => 'timestamp' 
             }, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL',
-                value => ($wf_info->{ACTIVITY}->{$action_running}->{label} || $action_running)
+                value => ($wf_info->{ACTIVITY}->{$wf_action}->{label} || $wf_action)
         });
 
         my @buttons = ({
