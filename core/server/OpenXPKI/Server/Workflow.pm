@@ -106,7 +106,7 @@ sub execute_action {
     my ( $self, $action_name, $autorun ) = @_;
     ##! 1: 'execute_action '.$action_name
 
-    $self->persist_context(0);
+    $self->persist_context(1);
 
     my $session =  CTX('session');
     my $session_info = $session->export_serialized_info();
@@ -127,10 +127,10 @@ sub execute_action {
     $self->{_CURRENT_ACTION} = $action_name;
     $self->context->param( wf_current_action => $action_name );
 
-    #reset kontext-key exception
-    $self->context->param( wf_exception => '' ) if $self->context->param('wf_exception');
+    # reset context-key exception
+    $self->context->param( wf_exception => undef ) if $self->context->param('wf_exception');
 
-    #check and handle current proc_state:
+    # check and handle current proc_state
     $self->_handle_proc_state($action_name);
 
     my $reap_at_interval = $default_reap_at_interval;
@@ -156,7 +156,7 @@ sub execute_action {
 
     my $e;
 
-    $self->persist_context(1);
+    $self->persist_context(2);
     ##! 16: 'Run super::execute_action'
     eval{        
         $state = $self->SUPER::execute_action( $action_name, $autorun );        
@@ -909,10 +909,17 @@ true, if the workflow has paused (i.e. the proc state is "pause")
 
 true, if the workflow is running(i.e. the proc state is "running")
 
-
 =head2 _get_next_state
 
 overwritten from parent Workflow class. handles the special case "pause", otherwise it calls super::_get_next_state()
+
+=head2 persist_context
+
+Internal flag to control the behaviour of the context persister:
+
+  0: do not persist anything
+  1: persist only the internal flags (starting with wf_)
+  2: persist all updated values
 
 =head2 factory
 
