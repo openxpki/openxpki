@@ -1426,11 +1426,22 @@ sub __render_from_workflow {
                 value => $wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg} 
         });
         
+        # If wakeup is less than 300 seconds away, we schedule an 
+        # automated reload of the page 
+        if ( $wf_info->{WORKFLOW}->{WAKE_UP_AT} ) {
+            my $to_sleep = $wf_info->{WORKFLOW}->{WAKE_UP_AT} - time();
+            if ($to_sleep < 30) {
+                $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, 30);
+            } elsif ($to_sleep < 300) {
+                $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $to_sleep + 15);
+            }
+        }
+             
         # if there are output rules defined, we add them now
         if ( $wf_info->{STATE}->{output} ) {
             push @fields, @{$self->__render_fields( $wf_info, $view )};
         }
-        
+
         my $desc;
         my @buttons; 
         if ($wf_proc_state eq 'pause') {
@@ -1483,6 +1494,23 @@ sub __render_from_workflow {
             'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
             'className' => 'alternative'
         });
+        
+        # we use the time elapsed to calculate the next update
+        my $timeout = 120;
+        if ( $wf_info->{WORKFLOW}->{LAST_UPDATE} ) {
+            # elapsed time in MINUTES
+            my $elapsed = (time() - str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT')) / 60;
+            if ($elapsed > 240) {
+                $timeout = 15 * 60;
+            } elsif ($elapsed > 4) {
+                # 4 hours = 15 min delay, 4 min = 2 min delay
+                $timeout = int sqrt( $elapsed ) * 60;
+            }
+            $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
+            
+        }
+        
+        $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $timeout);
         
         $self->add_section({
             type => 'keyvalue',
