@@ -2282,7 +2282,11 @@ sub __render_fields {
                 my $label;
                 my $basename;                
                 my $source;
-                # value can be a hash with additional properties
+                # value can be a hash with additional properties - likely serialized
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                }
+                    
                 if (ref $item->{value}) {
                     my $t = $item->{value};
                     $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';
