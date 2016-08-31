@@ -93,7 +93,7 @@ sub execute {
         }
     }
     
-    if ($cert_hash->{'STATUS'} ne 'ISSUED') {        
+    if ($cert_hash->{'STATUS'} && ($cert_hash->{'STATUS'} ne 'ISSUED')) {        
         CTX('log')->log(
             MESSAGE => "Trusted Signer certificate is revoked", 
             PRIORITY => 'info',
