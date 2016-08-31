@@ -255,6 +255,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Загрузка сертификата в текстовом формате"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
+msgstr "Здесь Вы можете просмотреть список заявок, ожидающих утверждения"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST"
 msgstr "SPKAC-строка пуста."
 
@@ -3683,10 +3687,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_INFINITE_LOOP_DETECTED"
 #~ msgstr "Сертификаты "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNEXPECTED_MESSAGE"
-#~ msgstr "Здесь Вы можете просмотреть список заявок, ожидающих утверждения"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"

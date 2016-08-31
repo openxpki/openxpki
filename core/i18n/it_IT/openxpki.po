@@ -226,6 +226,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Scarica in formato testo (TXT)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
+msgstr "Risultato della tua azione di massa."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST"
 msgstr "Richiesta non valida - nessuna azione"
 

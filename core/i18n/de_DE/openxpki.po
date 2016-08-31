@@ -253,6 +253,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Textformat (txt)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
+msgstr "Wählen Sie einen der Menüeinträge, um einen neuen Antrag zu erstellen."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST"
 msgstr "Seriennummer des Workflowprozesses"
 
@@ -3679,11 +3683,6 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_INFINITE_LOOP_DETECTED"
 #~ msgstr "Zertifikat #__SERIAL__"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNEXPECTED_MESSAGE"
-#~ msgstr ""
-#~ "Wählen Sie einen der Menüeinträge, um einen neuen Antrag zu erstellen."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG"

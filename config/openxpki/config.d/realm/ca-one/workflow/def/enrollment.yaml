@@ -383,6 +383,10 @@ action:
 
     eval_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility
+        param:
+            pause_on_error: 1
+            retry_count: 5
+            retry_interval: +0000000000015
 
     eval_signer_trust:
         class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
