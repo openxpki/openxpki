@@ -37,7 +37,6 @@ sub execute {
         FACILITY => 'application',
     );       
 
-
     return 1;
 }
 
@@ -58,6 +57,8 @@ setting the key I<config_path>.
 
 The given path is expected to return a hash, each key/value pair is read 
 into  the context with the I<p_> prefix added to each key! 
+
+=head1 Configuration 
 
 =head2 Activity Parameter
 
