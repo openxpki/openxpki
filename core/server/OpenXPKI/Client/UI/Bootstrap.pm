@@ -59,6 +59,17 @@ sub init_structure {
             $self->logger->debug("Got $key: " . Dumper $menu->{$key});    
         }
         
+        if ($menu->{ping}) {
+            my $ping;
+            if (ref $menu->{ping} eq 'HASH') {
+                $ping = $menu->{ping};
+                $ping->{timeout} *= 1000; # timeout is expected in ms 
+            } else {
+                $ping = { href => $menu->{ping}, timeout => 120000 };
+            }
+            $self->_result()->{ping} = $ping;
+        }
+        
     }
     
     # To issue redirects to the UI, we store the referrer

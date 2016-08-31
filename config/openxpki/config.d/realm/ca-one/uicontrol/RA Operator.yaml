@@ -1,6 +1,10 @@
 landmark:
   welcome: workflow!start!wf_type!status_system
 
+#ping:
+#    href: ../cgi-bin/ping.fcgi
+#    timeout: 120
+
 main:
   - key: home
     label: I18N_OPENXPKI_UI_MENU_HOME
