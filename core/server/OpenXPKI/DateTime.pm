@@ -178,7 +178,7 @@ sub get_validity {
           "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT",
         params => {
             VALIDITYFORMAT => $validityformat,
-            VALIDITY       => $validity,
+            VALIDITY       => $params->{VALIDITY},
         },
     );
 }
