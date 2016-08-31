@@ -60,10 +60,10 @@ Route = Em.Route.extend
             source
 
     doPing: (cfg) ->
-        @set "source.ping", Em.run.later(@, ->
+        @set "source.ping", Em.run.later(@, =>
             Em.$.ajax
                 url: cfg.href
-            doPing cfg
+            @doPing cfg
         , cfg.timeout)
 
 
