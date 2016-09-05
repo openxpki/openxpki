@@ -2,7 +2,8 @@ head:
     prefix: capub
     label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL
     description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC
-    persister: Volatile
+# error handling / requeueing does not work with volatile!
+#    persister: Volatile
 
 state:
     CREATE_QUEUE:
@@ -52,6 +53,9 @@ action:
           - ca_alias
         param:
             prefix: publishing.cacert
+            retry_count: 3
+            retry_interval: +000000000015
+            on_error: queue
 
     publish_crl:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
@@ -60,6 +64,9 @@ action:
         param:
             prefix: publishing.crl
             crl_serial: latest
+            retry_count: 3
+            retry_interval: +000000000015
+            on_error: queue
 
     get_next_ca:
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
