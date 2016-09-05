@@ -1,0 +1,81 @@
+# This workflow renders a simple search form to find SCEP workflows based
+# on the SCEP TID and the user server endpoint. If a result is found, the
+# actual scep workflow found is loaded, therefore the user need to have 
+# access rights on it!
+
+head:
+    prefix: searchscep
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC
+    persister: Volatile
+    
+state:
+    INITIAL:
+        action:
+          - initialize > RESULT
+
+    RESULT:
+        autorun: 1
+        action:
+            - create_redirect > SUCCESS ? has_result
+            - global_set_error_search_has_no_matches > NORESULT ? !has_result
+
+    SUCCESS:
+        output:
+          - redirect_result
+
+    NORESULT:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC
+        output:
+          - error_code
+          - scep_tid
+        
+action: 
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchWorkflow
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL
+        input:
+            - scep_tid
+#            - endpoint
+        param:
+            wf_type: enrollment
+            _map_wf_creator: $endpoint
+            _map_attr_scep_tid: $scep_tid
+            
+    create_redirect:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            _map_redirect: workflow!load!wf_id![% context.search_result %]
+            
+field:       
+    # If you want to add the endpoint as a search criteria uncomment 
+    # it in the action definiton above and extend the options list below     
+    endpoint:
+        name: endpoint   
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENDPOINT_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENDPOINT_DESC
+        type: select
+        option:
+          item:
+           - scep-server-1    
+           - scep-server-2 
+        required: 1
+        
+    redirect_result:
+        format: redirect
+        name: redirect    
+        
+condition:
+    has_result:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: ($context->{search_result})
+            
+acl:
+    User:
+        creator: any
+
+    RA Operator:
+        creator: any
+

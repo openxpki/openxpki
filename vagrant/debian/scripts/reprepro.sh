@@ -14,7 +14,7 @@ if [ "$DIST" == "jessie" ]; then
     SOURCE="deb http://packages.openxpki.org/debian/ jessie release"
 elif [ "$DIST" == "trusty" ]; then
     PACKAGE=ubuntu
-    SOURCE="deb http://packages.openxpki.org/ubuntu/ trusty/release/"
+    SOURCE="deb http://packages.openxpki.org/ubuntu/ dists/trusty/release/binary-amd64/"
 else
     echo "Unknown distro $DIST"; exit 1;
 fi;

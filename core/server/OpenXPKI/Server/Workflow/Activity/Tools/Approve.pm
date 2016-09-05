@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::Approve.pm
-# Written by Michael Bell for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::Approve;
 
 use strict;
@@ -11,6 +7,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Debug;
+use Workflow::Exception qw(configuration_error);
 
 use English;
 use Data::Dumper;
@@ -30,6 +27,7 @@ sub execute
     my $role      = CTX('session')->get_role();
     my $pki_realm = CTX('session')->get_pki_realm();
 
+    # not supported / used at the moment
     if (defined $context->param('_check_hash')) {
         # compute SHA1 hash over the serialization of the context,
         # skipping volatile entries
@@ -74,16 +72,13 @@ sub execute
         ##! 16: 'approvals: ' . Dumper \@approvals
     }
 
+    # moved to condition, does no longer work this way as creator is not necessariyl in context
     if ($self->param('check_creator')) {
-        # if this config option is set, we check that the user is
-        # not the creator
-        if ($context->param('creator') eq $user) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_NOT_ALLOWED_TO_APPROVE_YOURSELF',
-            );
-        }
+        configuration_error('The check_creator option is no longer supported - use conditions instead');
     }
-
+    
+    # not used and needs rework
+=cut    
     if (defined $context->param('_signature')) {
         # we have a signature
         ##! 16: 'signature present'
@@ -164,30 +159,49 @@ sub execute
     }
     # Unsigned Approvals
     else {
-        # look for already present approval by this user with this
-        # role
+=cut        
+
+    my $mode = $self->param('mode') || 'session';
+    
+    # read the approval info from the activity parameter
+    if ($self->param('mode') eq 'generated') {
+        
+        my $comment = $self->param('comment');
+        
+        configuration_error('The comment parameter is mandatory in generated mode') unless ($comment);
+        push @approvals, {
+            'mode'      => 'generated',
+            'comment'   => $comment,
+        };
+            
+    } elsif ($mode eq 'session') {
+        # look for already present approval by this user with this role
         if ($self->param('multi_role_approval') &&
           (! grep {$_->{session_user} eq $user &&
                    $_->{session_role} eq $role} @approvals)) {
             ##! 64: 'multi role approval enabled and (user, role) pair not found in present approvals'
             push @approvals, {
+                'mode'              => 'session',
                 'session_user'      => $user,
                 'session_role'      => $role,
-            },
+            };
         }
         elsif (! $self->param('multi_role_approval') &&
                ! grep {$_->{session_user} eq $user} @approvals) {
             ##! 64: 'multi role approval disabled and user not found in present approvals'
             push @approvals, {
+                'mode'              => 'session',
                 'session_user'      => $user,
                 'session_role'      => $role,
-            },
+            };
         }
         CTX('log')->log(
 		    MESSAGE => 'Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role",
 		    PRIORITY => 'info',
 		    FACILITY => ['audit', 'application' ],
         );
+    } else {
+        configuration_error('Unsuported mode given');
     }
 
     ##! 64: 'approvals: ' . Dumper \@approvals
@@ -215,23 +229,61 @@ OpenXPKI::Server::Workflow::Activity::Tools::Approve
 
 =head1 Description
 
-This class implements simple possibility to store approvals and
-(if available) their signatures. The approvals are stored in the
-workflow context in a serialized array. This allows for easy
-evaluation of needed approvals in the condition class Condition::Approved.
+This class implements simple possibility to store approvals as a 
+serialized array. This allows for easy evaluation of needed approvals 
+in the condition class Condition::Approved.
 
-The activity uses no parameters. All parameters will be taken from the
-session and the context of the workflow directly. Please note that you
-should never a user to directly modify the context parameter
-approvals if you use this module and the referenced condition.
+The activity has several operational modes, that are determined by the 
+I<mode> parameter. 
+
+=head2 Session Based Approval
+
+This is the default mode, it adds the user and role from the current 
+session to the list of approvals. Only one approval by the same user is 
+allowed, if the action is called by the same user mutliple times, the 
+activity will not update the list of approvals.
+
+If you set the I<mutli_role_approval> parameter to a true value, a user 
+can approve one time with each role he can impersonate.
+
+=head2 Generated Approval
+
+Adds the information passed via the I<comment> parameter as approval. 
+Note that there is no duplicate check like in the session approval, if
+you call this multiple times you will end up with multiple valid 
+approvals.
+
+The comment is mandatory, if not given the action will exit with a 
+workflow configuration error.
 
 =head1 Configuration
+ 
+=head2 Activity Parameters
 
-The parameter check_creator can be defined in the workflow activity
-definition to forbid that the creator of the workflow approves his
-own workflow.
-If the parameter multi_role is set, a user is allowed to approve the
-workflow in different role. If the parameter is not set, the user
-can only do one approval in total.
-If used with signatures, the parameter pkcs7tool has to be set to
-a valid pkcs7tool identifier from config.xml
+=over
+
+=item mode
+
+Operation mode, possible values are I<session> or I<generated>
+
+=item mutli_role_approval
+
+Boolean, allow multiple approvals by same user with differen roles
+
+=item comment
+
+The approval comment to add for generated approvals, mandatory in 
+generated mode.
+
+=back 
+
+=head2 Context Parameters
+
+=over
+
+=approvals
+
+The serialized array of given approvals, each item is a hash holding the
+approval information.
+
+=back

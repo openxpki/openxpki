@@ -327,7 +327,6 @@ sub handle_login {
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
                         
             $self->logger()->debug("Redirect to external login page " . $loginurl );
-            $result->reload(1);
             $result->redirect( { goto => $loginurl, target => '_blank' } );  
             return $result->render();
             # Do a real exit to skip the error handling of the script body
@@ -335,7 +334,6 @@ sub handle_login {
                     
         } else {
             $self->logger()->debug('Redirect to login page');
-            $result->reload(1);
             $result->redirect('login');
         }
     }  

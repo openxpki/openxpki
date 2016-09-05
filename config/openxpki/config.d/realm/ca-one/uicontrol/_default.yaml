@@ -26,6 +26,9 @@ main:
   - key:   certificate!search
     label: I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH
  
+  - key:   workflow!index!wf_type!search_scep_workflow
+    label: I18N_OPENXPKI_UI_MENU_SCEP_SEARCH
+ 
 certsearch:
    - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
      key: meta_entity

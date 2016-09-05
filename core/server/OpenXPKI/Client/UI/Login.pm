@@ -73,7 +73,6 @@ sub init_index {
     
     my $self = shift;
     
-    $self->reload(1);
     $self->redirect('welcome');
     
     return $self;

@@ -12,8 +12,8 @@ state:
     GENERATE:
         autorun: 1
         action:
-          - generate > SUCCESS
-
+          - generate_to_context global_uuid store_in_datapool create_download_link > SUCCESS ? use_datapool
+          - generate_to_disk create_download_link > SUCCESS ? !use_datapool
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_LABEL
@@ -21,7 +21,7 @@ state:
         output: 
           - valid_at
           - total_count
-          - report_filename
+          - download
 
 action:
     initialize:
@@ -32,17 +32,48 @@ action:
           - target_filename
           - report_config
 
-    generate:
+    generate_to_context:
+        class: OpenXPKI::Server::Workflow::Activity::Reports::Detail
+        param:            
+            target_key: _report_data
+            _map_report_config: $report_config
+             
+    generate_to_disk:
         class: OpenXPKI::Server::Workflow::Activity::Reports::Detail
         param:            
             target_umask: 0644
             _map_valid_at: $valid_at
-            _map_target_filename: >
-                [% IF context.target_filename %][% context.target_filename %]
-                [% ELSE %]pki report [% USE date(format='%Y-%m-%dT%H:%M:%S') %][% date.format( context.valid_at ) %].csv[% END %]
+            _map_target_filename: $target_filename
             target_dir: /tmp
             _map_report_config: $report_config
   
+    store_in_datapool:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+        param:
+            namespace: workflow.download
+            _map_key: $uuid
+            _map_value: $_report_data
+            encrypt: 0
+            force: 1
+            expiration_date: "+000001"
+            
+    create_download_link:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+        param:
+          target_key: download
+          _map_filename: "Certificate Detail Report [% USE date(format='%Y-%m-%dT%H:%M:%S') %][% date.format( context.valid_at ) %].csv"
+          mime: application/csv
+          _map_source: >
+              [% IF context.report_filename %]file:[% context.report_filename %]
+              [% ELSE %]datapool:[% context.uuid %][% END %]
+  
+
+condition:
+    use_datapool:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: not $context->{target_filename}
+          
 field:
     valid_at:
         name: valid_at
@@ -56,10 +87,6 @@ field:
     total_count:
         name: total_count
         label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT
-
-    report_filename:
-        name: report_filename
-        format: download/text/csv
         
     target_filename:
         name: target_filename
@@ -70,6 +97,11 @@ field:
         name: report_config
         type: server
         required: 0
+        
+    download:
+        label: I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL
+        name: download
+        format: download/text/csv        
 
 acl:
     CA Operator:
@@ -80,7 +112,7 @@ acl:
         fail: 1
         resume: 1
         wakeup: 1
-
+        context: 1
     System:
         creator: any
 

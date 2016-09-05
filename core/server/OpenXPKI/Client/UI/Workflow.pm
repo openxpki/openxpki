@@ -261,12 +261,11 @@ sub init_search {
     );
 
     # Searchable attributes are read from the menu bootstrap
-    my $attributes = $self->_session->param('wfsearch')->{default};
-    if ($attributes) {
+    my $attributes = $self->_session->param('wfsearch')->{default}->{attributes};
+    if ($attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
         foreach my $item (@{$attributes}) {
             push @attrib, { value => $item->{key}, label=> $item->{label} };
-
         }
         push @fields, {
             name => 'attributes',
@@ -274,8 +273,9 @@ sub init_search {
             'keys' => \@attrib,
             type => 'text',
             is_optional => 1,
-            'clonable' => 1
-        };
+            'clonable' => 1,
+            'value' => $preset->{attributes} || [],
+        } if (@attrib);
 
     }
 
@@ -319,7 +319,7 @@ sub init_result {
     # will be removed once inline paging works
     my $startat = $self->param('startat') || 0;
 
-    my $limit = $self->param('limit') || 25;
+    my $limit = $self->param('limit') || 0;
 
     if ($limit > 500) {  $limit = 500; }
 
@@ -337,7 +337,12 @@ sub init_result {
     # Add limits
     my $query = $result->{query};
 
-    $query->{LIMIT} = $limit;
+    if ($limit) {
+        $query->{LIMIT} = $limit;
+    } elsif (!$query->{LIMIT}) {
+        $query->{LIMIT} = 25;
+    }
+        
     $query->{START} = $startat;
     
     if (!$query->{ORDER}) {
@@ -353,19 +358,52 @@ sub init_result {
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
-    $self->_page({
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
-        description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
-    });
-
-    my $pager;
-    if ($startat != 0 || @{$search_result} == $limit) {
-        $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
+    # Add page header from result - optional
+    if ($result->{page} && ref $result->{page} ne 'HASH') {
+        $self->_page($result->{page});
+    } else {
+        $self->_page({
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
+            description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
+        });
     }
 
-    my @result = $self->__render_result_list( $search_result, $result->{column} );
+    my $pager;
+    if ($startat != 0 || @{$search_result} == $query->{LIMIT}) {
+        $pager = $self->__render_pager( $result, { limit => $query->{LIMIT}, startat => $query->{START} } );
+    }
 
-    $self->logger()->trace( "dumper result: " . Dumper @result);
+
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+
+    my @lines = $self->__render_result_list( $search_result, $body );
+
+    $self->logger()->trace( "dumper result: " . Dumper @lines);
+
+    my $header = $result->{header};
+    $header = $self->__default_grid_head() if(!$header);
+    
+    # buttons - from result (used in bulk) or default
+    my @buttons;
+    if ($result->{button} && ref $result->{button} eq 'ARRAY') {
+        @buttons = @{$result->{button}};
+    } else {
+        
+        push @buttons, { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', 
+            page => 'redirect!workflow!result!id!' .$queryid,
+            className => 'expected' };
+            
+        push @buttons, { 
+            label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', 
+            page => 'workflow!search!query!' .$queryid,
+            className => 'alternative',
+        } if ($result->{input});
+        
+        push @buttons,{ label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', 
+            page => 'workflow!search',
+            className => 'failure'};
+    }
 
     $self->add_section({
         type => 'grid',
@@ -377,24 +415,18 @@ sub init_result {
                 icon => 'view',
                 target => 'tab',
             }],
-            columns => $self->__default_grid_head(),
-            data => \@result,
+            columns => $header,
+            data => \@lines,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
-            buttons => [
-                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', page => 'workflow!search!query!' .$queryid },
-                { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', page => 'redirect!workflow!result!id!' .$queryid },
-                { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', page => 'workflow!search'},
-                #{ label => 'bulk edit', action => 'workflow!bulk', select => 'serial', 'selection' => 'serial' }, # Draft for Bulk Edit
-            ]
-
+            buttons => \@buttons
         }
     });
 
     return $self;
 
 }
-
+ 
 =head2 init_pager
 
 Similar to init_result but returns only the data portion of the table as
@@ -447,7 +479,11 @@ sub init_pager {
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
-    my @result = $self->__render_result_list( $search_result, $result->{column} );
+
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+
+    my @result = $self->__render_result_list( $search_result, $body );
 
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
@@ -1132,8 +1168,12 @@ sub action_search {
     }
 
     # Read the query pattern for extra attributes from the session
-    my $attributes = $self->_session->param('wfsearch')->{default};
-    my @attr = @{$self->__build_attribute_subquery( $attributes )};
+    my $spec = $self->_session->param('wfsearch')->{default};
+    my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};
+
+    if (@attr) {
+        $input->{attributes} = $self->__build_attribute_preset(  $spec->{attributes} );
+    }
 
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
@@ -1153,6 +1193,15 @@ sub action_search {
         return $self->init_search({ preset => $input });
     }
 
+    # check if there is a custom column set defined
+    my ($header,  $body);    
+    if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
+        ($header, $body) = $self->__render_list_spec( $spec->{cols} );
+    } else {
+        $body = $self->__default_grid_row;
+        $header = $self->__default_grid_head;
+    }
+        
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_wfl_'.$queryid, {
         'id' => $queryid,
@@ -1160,7 +1209,8 @@ sub action_search {
         'count' => $result_count,
         'query' => $query,
         'input' => $input,
-        'column' => $self->__default_grid_row()
+        'header' => $header,
+        'column' => $body,
     });
 
     $self->redirect( 'workflow!result!id!'.$queryid  );
@@ -1276,6 +1326,26 @@ sub action_bulk {
             }
         });
     }
+    
+    # persist the selected ids and add button to recheck the status
+    my $queryid = $self->__generate_uid();
+    $self->_client->session()->param('query_wfl_'.$queryid, {
+        'id' => $queryid,
+        'type' => 'workflow',
+        'count' => scalar @serials,
+        'query' => { SERIAL => \@serials },
+    });
+
+    $self->add_section({
+        type => 'text',
+        content => {
+            buttons => [{ 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON', 
+                page => 'redirect!workflow!result!id!' .$queryid,
+                className => 'expected',
+            }]
+        }
+    });
 
 }
 
@@ -1388,7 +1458,7 @@ sub __render_from_workflow {
                 'format' => 'timestamp' 
             }, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL',
-                value => $wf_info->{WORKFLOW}->{WAKE_UP_AT}, 
+                value => $wf_info->{WORKFLOW}->{WAKE_UP_AT},
                 'format' => 'timestamp' 
             }, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL',
@@ -1398,11 +1468,22 @@ sub __render_from_workflow {
                 value => $wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg} 
         });
         
+        # If wakeup is less than 300 seconds away, we schedule an 
+        # automated reload of the page 
+        if ( $wf_info->{WORKFLOW}->{WAKE_UP_AT} ) {
+            my $to_sleep = $wf_info->{WORKFLOW}->{WAKE_UP_AT} - time();
+            if ($to_sleep < 30) {
+                $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, 30);
+            } elsif ($to_sleep < 300) {
+                $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $to_sleep + 15);
+            }
+        }
+             
         # if there are output rules defined, we add them now
         if ( $wf_info->{STATE}->{output} ) {
             push @fields, @{$self->__render_fields( $wf_info, $view )};
         }
-        
+
         my $desc;
         my @buttons; 
         if ($wf_proc_state eq 'pause') {
@@ -1431,30 +1512,56 @@ sub __render_from_workflow {
 
     # if the workflow is currently runnig, show info without buttons
     } elsif ($wf_proc_state eq 'running' && $view ne 'context') {
-
-        $self->_page({
-            label => $wf_info->{WORKFLOW}->{label},
-            shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description =>  'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION',
-        });
-        
+     
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
      
-        my $action_running =  $wf_info->{STATE}->{option}->[0];
+        my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
+        my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
+
+        my $label =  $wf_action_info->{label} || $wf_info->{STATE}->{label} ;
+        if ($label) {
+            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
+        } else {
+            $label =  $wf_info->{WORKFLOW}->{label} ;
+        }
+
+        $self->_page({
+            label => $label,
+            shortlabel => $wf_info->{WORKFLOW}->{ID},
+            description =>  $wf_action_info->{description} ,
+        });
+                
         my @fields = ({  
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
                 value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
                 'format' => 'timestamp' 
             }, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL',
-                value => ($wf_info->{ACTIVITY}->{$action_running}->{label} || $action_running)
+                value => ($wf_info->{ACTIVITY}->{$wf_action}->{label} || $wf_action)
         });
 
         my @buttons = ({
             'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
             'className' => 'alternative'
         });
+        
+        # we use the time elapsed to calculate the next update
+        my $timeout = 120;
+        if ( $wf_info->{WORKFLOW}->{LAST_UPDATE} ) {
+            # elapsed time in MINUTES
+            my $elapsed = (time() - str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT')) / 60;
+            if ($elapsed > 240) {
+                $timeout = 15 * 60;
+            } elsif ($elapsed > 4) {
+                # 4 hours = 15 min delay, 4 min = 2 min delay
+                $timeout = int sqrt( $elapsed ) * 60;
+            }
+            $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
+            
+        }
+        
+        $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $timeout);
         
         $self->add_section({
             type => 'keyvalue',
@@ -2160,6 +2267,11 @@ sub __render_fields {
                 
                 $self->logger()->debug( 'item ' . Dumper $item);
 
+            # add a redirect command to the page
+            } elsif ($item->{format} eq "redirect") {
+                
+                $self->redirect($item->{value});
+                
             # create a link to download the given filename
             } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
                 
@@ -2170,7 +2282,11 @@ sub __render_fields {
                 my $label;
                 my $basename;                
                 my $source;
-                # value can be a hash with additional properties
+                # value can be a hash with additional properties - likely serialized
+                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                }
+                    
                 if (ref $item->{value}) {
                     my $t = $item->{value};
                     $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';
@@ -2271,7 +2387,6 @@ sub __render_fields {
                 # Sort by label
                 my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};            
                 $item->{value} = \@val;
-
             }
 
             if ($field->{template}) {

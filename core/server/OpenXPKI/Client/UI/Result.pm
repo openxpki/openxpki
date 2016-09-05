@@ -66,10 +66,9 @@ has _result => (
     default => sub { return {}; }
 );
 
-has reload => (
+has _refresh => (
     is => 'rw',
-    isa => 'Bool',
-    default => 0,
+    isa => 'HashRef|Undef',
 );
 
 has redirect => (
@@ -130,6 +129,18 @@ sub set_status {
 
     return $self;
 
+}
+
+sub refresh() {
+    
+    my $self = shift;
+    my $location = shift;
+    my $timeout = shift || 60;
+    
+    $self->_refresh({ href => $location, timeout => $timeout * 1000 });
+    
+    return $self;
+    
 }
 
 =head2 send_command
@@ -377,7 +388,7 @@ sub render {
     $result->{error} = $self->_error() if $self->_error();
     $result->{status} = $self->_status() if $self->_status();
     $result->{page} = $self->_page() if $self->_page();
-    $result->{reloadTree} = 1 if $self->reload();
+    $result->{refresh} = $self->_refresh() if ($self->_refresh());
 
     my $json = new JSON()->utf8;
     my $body;
@@ -456,7 +467,7 @@ sub init_fetch {
     }
         
     my ($type, $source) = ($data->{source} =~ m{(\w+):(.*)});
-    $self->logger()->debug('Fetch source: '.$source.', Key: '.$source );
+    $self->logger()->debug('Fetch source: '.$type.', Key: '.$source );
     
     if ($type eq 'file') {
         open (my $fh, $source) || die 'Unable to open file';
@@ -746,6 +757,10 @@ sub __build_attribute_subquery {
     my $self = shift;
     my $attributes = shift;
    
+    if (!$attributes || ref $attributes ne 'ARRAY') {
+        return [];
+    }
+   
     my @attr;
            
     foreach my $item (@{$attributes}) {
@@ -769,6 +784,35 @@ sub __build_attribute_subquery {
             $self->logger()->debug( "Query: $key $operator $val" );
             
             push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
+        }
+    }
+    
+    return \@attr;
+    
+}
+
+=head2 __build_attribute_preset
+
+Expects an attribtue query definition hash (from uicontrol), returns arrayref 
+to be used as preset when reloading the search form
+
+=cut 
+sub __build_attribute_preset {
+
+    my $self = shift;
+    my $attributes = shift;
+   
+    if (!$attributes || ref $attributes ne 'ARRAY') {
+        return [];
+    }
+   
+    my @attr;
+           
+    foreach my $item (@{$attributes}) {
+        my $key = $item->{key};
+        my @val = $self->param($key.'[]');
+        while (my $val = shift @val) {
+            push @attr,  { key => $key, value => $val };
         }
     }
     

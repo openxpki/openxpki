@@ -26,12 +26,8 @@ sub execute
         TABLE => 'CSR',
     );
 
-    my $type    = $context->param('csr_type');
-    if (! defined $type) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_TYPE_UNDEFINED',
-        );
-    }
+    my $type = $self->param('csr_type') || 'pkcs10';
+
     my $profile = $context->param('cert_profile');
     if (! defined $profile) {
         OpenXPKI::Exception->throw(

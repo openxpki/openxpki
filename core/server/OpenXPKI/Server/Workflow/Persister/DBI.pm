@@ -170,9 +170,14 @@ sub update_workflow {
     
     ##! 32: 'Context is ' . ref $context
     
-    my @updated = keys %{ $context->{_updated} }; 
-    
+    my @updated = keys %{ $context->{_updated} };
+   
     ##! 32: 'Params with updates ' . join(":", @updated ) 
+    # persist only the internal context values 
+    if ($workflow->persist_context() == 1) {
+        @updated = grep { /^wf_/ } @updated;
+        ##! 32: 'Only update internals ' . join(":", @updated )
+    }    
     
 
     ##! 128: 'params from context: ' . Dumper $params
@@ -268,12 +273,17 @@ sub update_workflow {
             );
             ##! 128: 'insert done, key: ' . $key . ', value: ' . $value
         }
+        
+        delete $self->{_updated}->{$key};
+        
     }
     
     $dbi->commit();
 
-    # Reset the update marker
-    $context->reset_updated();
+    # Reset the update marker - only if full update was requested
+    if ($workflow->persist_context() > 1) {
+        $context->reset_updated();
+    }
     
     CTX('log')->log(
         MESSAGE  => "Updated workflow $id",

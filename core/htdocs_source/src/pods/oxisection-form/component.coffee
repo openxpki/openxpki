@@ -29,6 +29,11 @@ Component = Em.Component.extend
             Em.set clone, "isLast", false for clone in clones
             Em.set clones[clones.length-1], "isLast", true
 
+        for field in fields
+            if field.value and typeof field.value is "object"
+                field.name = field.value.key
+                field.value = field.value.value
+
         fields
 
     visibleFields: Em.computed "fields", ->

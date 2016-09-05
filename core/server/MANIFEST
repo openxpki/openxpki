@@ -251,6 +251,7 @@ OpenXPKI/Server/Workflow/Activity/Skip.pm
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 
 OpenXPKI/Server/Workflow/Activity/Noop.pm
+OpenXPKI/Server/Workflow/Activity/Sleep.pm
 
 # FIXME: Remove for production
 OpenXPKI/Server/Workflow/Activity/Test.pm
@@ -273,7 +274,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
-
+OpenXPKI/Server/Workflow/Activity/Tools/LoadPolicy.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetAttribute.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
@@ -324,6 +325,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/PersistCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParsePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SearchCertificates.pm
+OpenXPKI/Server/Workflow/Activity/Tools/SearchWorkflow.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 

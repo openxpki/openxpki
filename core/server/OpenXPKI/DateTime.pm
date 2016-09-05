@@ -41,6 +41,7 @@ sub convert_date {
     return $date->epoch()                   if ( $outformat eq 'epoch' );
     return $date->iso8601()                 if ( $outformat eq 'iso8601' );
     return $date->strftime("%y%m%d%H%M%SZ") if ( $outformat eq 'openssltime' );
+    return $date->strftime("%Y%m%d%H%M%SZ") if ( $outformat eq 'generalizedtime' );
     return $date->strftime("%Y%m%d%H%M%S")  if ( $outformat eq 'terse' );
     return $date->strftime("%F %T")         if ( $outformat eq 'printable' );
 
@@ -178,7 +179,7 @@ sub get_validity {
           "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY_FORMAT",
         params => {
             VALIDITYFORMAT => $validityformat,
-            VALIDITY       => $validity,
+            VALIDITY       => $params->{VALIDITY},
         },
     );
 }
@@ -235,6 +236,7 @@ Possible output formats:
   iso8601:     ISO 8601 formatted date (YYYY-MM-DDTHH:MM:SS), default
   epoch:       seconds since the epoch
   openssltime: time format used in OpenSSL index files (YYMMDDHHMMSSZ)
+  generalizedtime: time format used in OpenSSL index files (YYYYMMDDHHMMSSZ)
   terse:       terse time format (YYYYMMDDHHMMSS)
   printable:   human readable ISO-like time format (YYYY-MM-DD HH:MM:SS)
 

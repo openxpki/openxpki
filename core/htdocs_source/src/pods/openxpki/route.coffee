@@ -18,6 +18,8 @@ Route = Em.Route.extend
 
     source: Em.computed -> Em.Object.create
         page: null
+        ping: null
+        refresh: null
         structure: null
         status: null
         tabs: []
@@ -31,7 +33,7 @@ Route = Em.Route.extend
         model_id = req.params.openxpki.model_id
 
         if not source.get("navEntries.length") or model_id in @needReboot
-            @sendAjax data: 
+            @sendAjax data:
                 page: "bootstrap!structure"
                 baseurl: window.location.pathname
 
@@ -57,6 +59,14 @@ Route = Em.Route.extend
         .then (doc) ->
             source
 
+    doPing: (cfg) ->
+        @set "source.ping", Em.run.later(@, =>
+            Em.$.ajax
+                url: cfg.href
+            @doPing cfg
+        , cfg.timeout)
+
+
     sendAjax: (req) ->
         req.dataType = "json"
         req.type ?= if req?.data?.action then "POST" else "GET"
@@ -74,12 +84,30 @@ Route = Em.Route.extend
             else
                 target = "top"
 
+        if source.get "refresh"
+            Em.run.cancel source.get "refresh"
+            source.set "refresh", null
+            $(".refresh").removeClass "in-progress"
+
         new Em.RSVP.Promise (resolve, reject) =>
             Em.$.ajax(req).then (doc) =>
                 source.beginPropertyChanges()
 
                 source.set "status", doc.status
                 source.set "modal", null
+
+                if doc.ping
+                    if source.get "ping"
+                        Em.run.cancel source.get "ping"
+                    @doPing doc.ping
+
+                if doc.refresh
+                    source.set "refresh", Em.run.later(@, ->
+                        @sendAjax data:
+                            page: doc.refresh.href
+                    , doc.refresh.timeout)
+                    Em.run.scheduleOnce "afterRender", =>
+                        $(".refresh").addClass "in-progress"
 
                 if doc.goto
                     if doc.target == '_blank' || /^(http|\/)/.test doc.goto
