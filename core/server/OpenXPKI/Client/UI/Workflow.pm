@@ -165,7 +165,7 @@ sub init_load {
     }
 
     # Set single action if not in result view and only single action is avail
-    if (($view ne 'result') && !$wf_action && 
+    if (($view ne 'result') && !$wf_action && $wf_info->{PROC_STATE} eq 'manual' &&
         (ref $wf_info->{STATE}->{output} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {
         my @activities = @{$wf_info->{STATE}->{option}};
         if (scalar @activities == 1) {
@@ -1039,7 +1039,11 @@ sub action_handle {
             ID => $wf_args->{wf_id},        
         });
     } elsif ($wf_args->{wf_handle} eq 'resume') {        
-        #tbd
+        
+        $self->logger()->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
+        $wf_info = $self->send_command( 'resume_workflow', {
+            ID => $wf_args->{wf_id},        
+        });
     } 
     
     $self->__render_from_workflow({ WF_INFO => $wf_info });
@@ -1433,9 +1437,11 @@ sub __render_from_workflow {
 
     my $wf_proc_state = $wf_info->{WORKFLOW}->{PROC_STATE} || 'init';
     
-    # Check if the workflow is under control of the watchdog    
-    if ((grep /$wf_proc_state/, ('pause','retry_exceeded')) && $view ne 'context') {
+    # check if the workflow is in a "non-regular" state
+    if ((grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) 
+        && $view ne 'context') {
 
+        # same page head for all proc states
         my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
         my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
 
@@ -1451,8 +1457,14 @@ sub __render_from_workflow {
             shortlabel => $wf_info->{WORKFLOW}->{ID},
             description =>  $wf_action_info->{description} ,
         });
+            
+        my $desc;
+        my @buttons;
+        my @fields; 
+        # Check if the workflow is in pause or exceeded
+        if (grep /$wf_proc_state/, ('pause','retry_exceeded')) {
 
-        my @fields = ({  
+            @fields = ({  
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
                 value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
                 'format' => 'timestamp' 
@@ -1466,107 +1478,136 @@ sub __render_from_workflow {
             }, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL',
                 value => $wf_info->{WORKFLOW}->{CONTEXT}->{wf_pause_msg} 
-        });
+            });
         
-        # If wakeup is less than 300 seconds away, we schedule an 
-        # automated reload of the page 
-        if ( $wf_info->{WORKFLOW}->{WAKE_UP_AT} ) {
-            my $to_sleep = $wf_info->{WORKFLOW}->{WAKE_UP_AT} - time();
-            if ($to_sleep < 30) {
-                $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, 30);
-            } elsif ($to_sleep < 300) {
-                $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $to_sleep + 15);
+            # If wakeup is less than 300 seconds away, we schedule an 
+            # automated reload of the page 
+            if ( $wf_info->{WORKFLOW}->{WAKE_UP_AT} ) {
+                my $to_sleep = $wf_info->{WORKFLOW}->{WAKE_UP_AT} - time();
+                if ($to_sleep < 30) {
+                    $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, 30);
+                } elsif ($to_sleep < 300) {
+                    $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $to_sleep + 15);
+                }
             }
-        }
-             
-        # if there are output rules defined, we add them now
-        if ( $wf_info->{STATE}->{output} ) {
-            push @fields, @{$self->__render_fields( $wf_info, $view )};
-        }
-
-        my $desc;
-        my @buttons; 
-        if ($wf_proc_state eq 'pause') {
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
-            $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION';
-            
+                     
+            # if there are output rules defined, we add them now
+            if ( $wf_info->{STATE}->{output} ) {
+                push @fields, @{$self->__render_fields( $wf_info, $view )};
+            }
+    
+            if ($wf_proc_state eq 'pause') {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
+                $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION';
+                
+                @buttons = ({
+                    'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+                    'className' => 'alternative'
+                });                
+            } else {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
+                $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION';
+            }
+    
+            if (grep /wakeup/, @{$wf_info->{HANDLES}}) {
+                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
+                push @buttons, {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
+                    action => 'workflow!handle!wf_token!'.$token->{value},
+                    'className' => 'exceptional'
+                };
+            }
+    
+        # if the workflow is currently runnig, show info without buttons
+        } elsif ($wf_proc_state eq 'running') {
+         
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
+         
+            my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
+            my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
+    
+            my $label =  $wf_action_info->{label} || $wf_info->{STATE}->{label} ;
+            if ($label) {
+                $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
+            } else {
+                $label =  $wf_info->{WORKFLOW}->{label} ;
+            }
+    
+            $self->_page({
+                label => $label,
+                shortlabel => $wf_info->{WORKFLOW}->{ID},
+                description =>  $wf_action_info->{description} ,
+            });
+                    
+            @fields = ({  
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
+                    value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
+                    'format' => 'timestamp' 
+                }, { 
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL',
+                    value => ($wf_info->{ACTIVITY}->{$wf_action}->{label} || $wf_action)
+            });
+    
             @buttons = ({
                 'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
                 'className' => 'alternative'
             });
             
-        } else {
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
-            $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION';
-        }
+            # we use the time elapsed to calculate the next update
+            my $timeout = 120;
+            if ( $wf_info->{WORKFLOW}->{LAST_UPDATE} ) {
+                # elapsed time in MINUTES
+                my $elapsed = (time() - str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT')) / 60;
+                if ($elapsed > 240) {
+                    $timeout = 15 * 60;
+                } elsif ($elapsed > 4) {
+                    # 4 hours = 15 min delay, 4 min = 2 min delay
+                    $timeout = int sqrt( $elapsed ) * 60;
+                }
+                $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
+                
+            }
+            
+            $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $timeout);
+    
+        # workflow halted by exception
+        } elsif ( $wf_proc_state eq 'exception') {
+
+            @fields = ({  
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
+                value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
+                'format' => 'timestamp' 
+            }, { 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL',
+                value => ($wf_action_info->{label} || $wf_action)
+            });
+                 
+            # if there are output rules defined, we add them now
+            if ( $wf_info->{STATE}->{output} ) {
+                push @fields, @{$self->__render_fields( $wf_info, $view )};
+            }
+            
+            if (grep /resume/, @{$wf_info->{HANDLES}}) {
+                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'resume' } );
+                push @buttons, {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
+                    action => 'workflow!handle!wf_token!'.$token->{value},
+                    'className' => 'exceptional'
+                };
+            }
+                    
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
+            $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION';
+            
+        } # end proc_state switch
 
         $self->add_section({
             type => 'keyvalue',
             content => {
                 label => '',
                 description => $desc,
-                data => \@fields,
-                buttons => \@buttons 
-        }});
-
-    # if the workflow is currently runnig, show info without buttons
-    } elsif ($wf_proc_state eq 'running' && $view ne 'context') {
-     
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
-     
-        my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
-        my $wf_action_info = $wf_info->{ACTIVITY}->{ $wf_action };
-
-        my $label =  $wf_action_info->{label} || $wf_info->{STATE}->{label} ;
-        if ($label) {
-            $label .= ' / ' .  $wf_info->{WORKFLOW}->{label};
-        } else {
-            $label =  $wf_info->{WORKFLOW}->{label} ;
-        }
-
-        $self->_page({
-            label => $label,
-            shortlabel => $wf_info->{WORKFLOW}->{ID},
-            description =>  $wf_action_info->{description} ,
-        });
-                
-        my @fields = ({  
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
-                value => str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT'), 
-                'format' => 'timestamp' 
-            }, { 
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL',
-                value => ($wf_info->{ACTIVITY}->{$wf_action}->{label} || $wf_action)
-        });
-
-        my @buttons = ({
-            'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
-            'label' => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
-            'className' => 'alternative'
-        });
-        
-        # we use the time elapsed to calculate the next update
-        my $timeout = 120;
-        if ( $wf_info->{WORKFLOW}->{LAST_UPDATE} ) {
-            # elapsed time in MINUTES
-            my $elapsed = (time() - str2time($wf_info->{WORKFLOW}->{LAST_UPDATE}.' GMT')) / 60;
-            if ($elapsed > 240) {
-                $timeout = 15 * 60;
-            } elsif ($elapsed > 4) {
-                # 4 hours = 15 min delay, 4 min = 2 min delay
-                $timeout = int sqrt( $elapsed ) * 60;
-            }
-            $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
-            
-        }
-        
-        $self->refresh('workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID}, $timeout);
-        
-        $self->add_section({
-            type => 'keyvalue',
-            content => {
-                label => '',
                 data => \@fields,
                 buttons => \@buttons 
         }});
