@@ -430,7 +430,7 @@ sub execute_workflow_activity {
 
     my $proc_state = $workflow->proc_state(); 
     # should be prevented by the UI but can happen if workflow moves while UI shows old state
-    if (!grep /$proc_state/, (qw(manual pause retry_exceeded))) {
+    if (!grep /$proc_state/, (qw(manual))) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_EXECUTE_NOT_IN_VALID_STATE',
             params => { ID => $wf_id, PROC_STATE => $proc_state }
@@ -515,8 +515,47 @@ sub wakeup_workflow {
     my $self  = shift;
     my $args  = shift;
 
-    ##! 1: "wakeup_workflow_activity"
+    ##! 1: "wakeup workflow"
 
+    return $self->__wakeup_resume_workflow( 'wakeup', $args );
+}
+
+
+=head2 resume_workflow 
+
+Only valid if the workflow is in exception state, same as wakeup
+
+=cut
+sub resume_workflow {
+    
+    my $self  = shift;
+    my $args  = shift;
+    
+    ##! 1: "resume workflow"
+    
+    return $self->__wakeup_resume_workflow( 'resume', $args );
+}
+
+=head2 __wakeup_resume_workflow 
+
+Does the work for resume and wakeup, pulls the last action from the history
+and executes it. 
+
+=cut 
+
+sub __wakeup_resume_workflow {
+    
+    my $self  = shift;
+    my $mode  = shift; # resume or wakeup
+    my $args  = shift;
+    
+    if ($mode ne 'wakeup' && $mode ne 'resume') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_WAKEUP_RESUME_WRONG_MODE',
+            params => { MODE => $mode }
+        );
+    }
+    
     my $wf_title  = $args->{WORKFLOW};
     my $wf_id     = $args->{ID};
     
@@ -536,8 +575,15 @@ sub wakeup_workflow {
         $wf_id
     );
 
-    my $proc_state = $workflow->proc_state(); 
-    if (!($proc_state eq 'pause' || $proc_state eq 'retry_exceeded')) {
+    my $proc_state = $workflow->proc_state();
+    
+    # check if the workflow is in the correct proc state to get handled
+    if ($mode eq 'wakeup' && $proc_state ne 'pause' && $proc_state ne 'retry_exceeded') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_WAKEUP_NOT_IN_PAUSE',
+            params => { ID => $wf_id, PROC_STATE => $workflow->proc_state() }
+        );
+    } elsif ($mode eq 'resume' && $proc_state ne 'exception') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_WAKEUP_NOT_IN_PAUSE',
             params => { ID => $wf_id, PROC_STATE => $workflow->proc_state() }
@@ -558,34 +604,16 @@ sub wakeup_workflow {
     
     my $wf_activity = $history->{WORKFLOW_ACTION};
     
-    $self->__execute_workflow_activity( $workflow, $wf_activity );
-
     CTX('log')->log(
-        MESSAGE  => "Wakeup workflow $wf_id (type '$wf_title') with activity $wf_activity",
+        MESSAGE  => "$mode workflow $wf_id (type '$wf_title') with activity $wf_activity",
         PRIORITY => 'info',
         FACILITY => 'workflow',
     );
+   
+    $self->__execute_workflow_activity( $workflow, $wf_activity );
     
     return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
     
-}
-
-
-=head2 wakeup_workflow 
-
-Only valid if the workflow is in pause state, does a wakeup in the same way
-the watchdog would do.
-
-=cut
-sub resume_workflow {
-    
-    my $self  = shift;
-    my $args  = shift;
-    
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_RESUME_NOT_IMPLEMENTED',
-        #params => { ID => $wf_id, PROC_STATE => $workflow->proc_state() }
-    );
 }
 
 sub get_workflow_activities_params {
