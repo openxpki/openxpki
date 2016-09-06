@@ -180,6 +180,46 @@ sub init_load {
 
 }
 
+=head2 init_context 
+
+Requires parameter I<wf_id> which is the id of an existing workflow.
+Shows the context as plain key/value pairs - usually called in a modal.
+
+=cut
+
+sub init_context {
+    
+    my $self = shift;
+
+    # re-instance existing workflow
+    my $id = $self->param('wf_id');
+
+    my $wf_info = $self->send_command( 'get_workflow_info', {
+        ID => $id,
+    });
+
+    if (!$wf_info) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
+        return $self;
+    }
+    
+    $self->_page({
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL #' . $wf_info->{WORKFLOW}->{ID},
+        className => 'modal-lg'
+    });
+
+    $self->add_section({
+        type => 'keyvalue',
+        content => {
+            label => '',
+            data => $self->__render_fields( $wf_info, 'context'),
+    }});
+
+    return $self;
+    
+}
+
+
 =head2
 
 Render form for the workflow search.
@@ -511,6 +551,7 @@ sub init_history {
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
+        className => 'modal-lg'
     });
 
     my $workflow_history = $self->send_command( 'get_workflow_history', { ID => $id } );
@@ -544,21 +585,7 @@ sub init_history {
             ],
             data => \@result,
         },
-    });
-
-    # add continue button if workflow is not in a final state
-    my $last_state = pop @{$workflow_history};
-    if ($last_state->{'WORKFLOW_STATE'} !~ /(SUCCESS|FAILURE)/) {
-        $self->add_section({
-            type => 'text',
-            content => {
-                buttons => [{
-                    'action' => 'redirect!workflow!load!wf_id!'.$id,
-                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
-                }]
-            }
-        });
-    }
+    }); 
 
     return $self;
 
@@ -787,10 +814,12 @@ sub init_log {
     my $wf_id = $self->param('wf_id');
     
     $self->_page({
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG'
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG',
+        className => 'modal-lg'
     });
 
     my $result = $self->send_command( 'get_workflow_log', { ID => $wf_id } );
+    $result = [] unless($result);
 
     $self->logger()->trace( "dumper result: " . Dumper $result);
 
@@ -805,16 +834,6 @@ sub init_log {
             ],
             data => $result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
-        }
-    })  if ($result);
-    
-    $self->add_section({
-        type => 'text',
-        content => {
-            buttons => [{
-                'action' => 'redirect!workflow!load!wf_id!'.$wf_id,
-                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
-            }]
         }
     });
 
@@ -1438,9 +1457,51 @@ sub __render_from_workflow {
 
     my $wf_proc_state = $wf_info->{WORKFLOW}->{PROC_STATE} || 'init';
     
+    
+    # add buttons for manipulative handles (wakeup, fail, resume) 
+    # to be added to the default button list
+
+    my @handles;
+    my @buttons_handle;
+    if ($wf_info->{HANDLES} && ref $wf_info->{HANDLES} eq 'ARRAY') {
+        @handles = @{$wf_info->{HANDLES}};
+            
+        $self->logger()->debug('Adding global actions ' . join('/', @handles));
+        
+        if (grep /wakeup/, @handles) {
+            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
+            push @buttons_handle, {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
+                action => 'workflow!handle!wf_token!'.$token->{value},
+                className => 'exceptional'
+            }
+        }
+        
+        if (grep /resume/, @handles) {
+            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'resume' } );
+            push @buttons_handle, {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
+                action => 'workflow!handle!wf_token!'.$token->{value},
+                'className' => 'exceptional'
+            };
+        }
+        
+        if (grep /fail/, @handles) {
+            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );                       
+            push @buttons_handle, {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
+                action => 'workflow!handle!wf_token!'.$token->{value},
+                className => 'failure',
+                confirm => {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL Fail Workflow',
+                    description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',                   
+                }
+            };                
+        }
+    }
+
     # check if the workflow is in a "non-regular" state
-    if ((grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) 
-        && $view ne 'context') {
+    if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) {
 
         # same page head for all proc states
         my $wf_action = $wf_info->{WORKFLOW}->{CONTEXT}->{wf_current_action};
@@ -1509,15 +1570,6 @@ sub __render_from_workflow {
             } else {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
                 $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION';
-            }
-    
-            if (grep /wakeup/, @{$wf_info->{HANDLES}}) {
-                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
-                push @buttons, {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
-                    action => 'workflow!handle!wf_token!'.$token->{value},
-                    'className' => 'exceptional'
-                };
             }
     
         # if the workflow is currently runnig, show info without buttons
@@ -1589,16 +1641,7 @@ sub __render_from_workflow {
             if ( $wf_info->{STATE}->{output} ) {
                 push @fields, @{$self->__render_fields( $wf_info, $view )};
             }
-            
-            if (grep /resume/, @{$wf_info->{HANDLES}}) {
-                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'resume' } );
-                push @buttons, {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
-                    action => 'workflow!handle!wf_token!'.$token->{value},
-                    'className' => 'exceptional'
-                };
-            }
-                    
+                 
             $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
             $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION';
             
@@ -1610,7 +1653,7 @@ sub __render_from_workflow {
                 label => '',
                 description => $desc,
                 data => \@fields,
-                buttons => \@buttons 
+                buttons => [ @buttons, @buttons_handle ]
         }});
 
     # if there is one activity selected (or only one present), we render it now
@@ -1738,6 +1781,7 @@ sub __render_from_workflow {
             label => $label,
             shortlabel => $wf_info->{WORKFLOW}->{ID},
             description =>  $wf_info->{STATE}->{description},
+            className => 'modal-lg'
         });
 
         my $fields = $self->__render_fields( $wf_info, $view );
@@ -1745,11 +1789,8 @@ sub __render_from_workflow {
         $self->logger()->debug('Field data ' . Dumper $fields);
         
         
-        # Add action buttons only if we are not in result view
-        my $buttons;
-        if ($view ne 'result') {
-            $buttons = $self->__get_action_buttons( $wf_info ) ;        
-        }
+        # Add action buttons 
+        my $buttons = $self->__get_action_buttons( $wf_info ) ;        
         
         $self->add_section({
             type => 'keyvalue',
@@ -1784,12 +1825,12 @@ sub __render_from_workflow {
 
     }
     
+    # Right block
     if ($wf_info->{WORKFLOW}->{ID} ) {
 
         my @buttons;
 
-        if (($view eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/)
-            || $view eq 'context') {
+        if ($view eq 'result' && $wf_info->{WORKFLOW}->{STATE} !~ /(SUCCESS|FAILURE)/) {
             @buttons = ({
                 'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
                 'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
@@ -1798,62 +1839,38 @@ sub __render_from_workflow {
         
         # The workflow info contains info about all control actions that
         # can done on the workflow -> render appropriate buttons.
-        if ($wf_info->{HANDLES} && ref $wf_info->{HANDLES} eq 'ARRAY') {
-            
-            my @handles = @{$wf_info->{HANDLES}};
-            
-            $self->logger()->debug('Adding global actions ' . join('/', @handles));
-
-            if ($view ne 'context' && grep /context/, @handles) {
-                push @buttons, {
-                    'action' => 'redirect!workflow!load!view!context!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+        my $extra_handles;
+        if (@handles) {
+                
+            my @extra_links;            
+            if (grep /context/, @handles) {
+                push @extra_links, {
+                    'page' => 'workflow!context!wf_id!'.$wf_info->{WORKFLOW}->{ID},
                     'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
                 };
             }
                
             if (grep /history/, @handles) {
-                push @buttons, {
-                    'action' => 'redirect!workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                push @extra_links, {
+                    'page' => 'workflow!history!wf_id!'.$wf_info->{WORKFLOW}->{ID},
                     'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
                 };
             }
                         
             if (grep /techlog/, @handles) {
-                push @buttons, {
-                    'page' => 'redirect!workflow!log!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                push @extra_links, {
+                    'page' => 'workflow!log!wf_id!'.$wf_info->{WORKFLOW}->{ID},
                     'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
                 };
             }
             
-            if (grep /fail/, @handles) {
-                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );                       
-                push @buttons, {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
-                    action => 'workflow!handle!wf_token!'.$token->{value},
-                    confirm => {
-                        label => 'Fail Workflow',
-                        description => 'Press the confirm button to mark this workflow as failed.
-                        This will immediatley stop all actions on this workflow and
-                        mark it as failed. <b>This action can not be undone!</b><br/><br/>
-                        If you want to keep this workflow, press the abort button to
-                        close this window without touching the workflow.'
-                    }
-                };                
-            }
-            
-            if (grep /wakeup/, @handles) {
-                
-                my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
-                push @buttons, {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
-                    action => 'workflow!handle!wf_token!'.$token->{value},
-                }
-            }
-            
-            if (grep /resume/, @handles) {
-                # tbd   
-            }
-            
+            $extra_handles = { 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL', 
+                format => 'linklist', 
+                value => \@extra_links
+            } if (@extra_links);
+
+
         }
 
         # create a "blind" query to generate an initial search form
@@ -1867,14 +1884,13 @@ sub __render_from_workflow {
             },
         };
         $self->__temp_param('query_wfl_'.$queryid, $_query );
-
+        
         $self->_result()->{right} = [{
             type => 'keyvalue',
             content => {
                 label => '',
                 description => '',
                 data => [
-                # todo - i18n for values
                     { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', value => $wf_info->{WORKFLOW}->{ID} },
                     { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{WORKFLOW}->{TYPE} },
                     { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{WORKFLOW}->{STATE} },
@@ -1884,8 +1900,9 @@ sub __render_from_workflow {
                         'page' => 'workflow!search!query!'.$queryid,
                         'target' => '_blank',
                     }},
+                    $extra_handles,
                 ],
-                buttons => \@buttons,
+                buttons => \@buttons_handle,
         }}];
     }
 
