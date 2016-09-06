@@ -8482,6 +8482,10 @@ div.section {
   background-color: #ffd78c;
 }
 
+.oxi-button-container button.btn.exceptional {
+    background-color: #51c0ea;
+}
+
 img.toplogo {
   padding-top: 6px;
   padding-right: 12px;
