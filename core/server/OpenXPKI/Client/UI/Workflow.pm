@@ -221,8 +221,9 @@ sub init_search {
     my @proc_states = (
 
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL', value => 'manual' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE', value => 'pause' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED', value => 'retry_exceeded' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },
 
     );
@@ -1624,6 +1625,7 @@ sub __render_from_workflow {
         } else {
             $label =  $wf_info->{WORKFLOW}->{label} ;
         }
+        
         $self->_page({
             label => $label,
             shortlabel => $wf_info->{WORKFLOW}->{ID},
