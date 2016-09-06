@@ -338,7 +338,12 @@ Tells the ui to process the data before rendering with a special formatter. Avai
 timestamp
 ^^^^^^^^^
 
-Expects a unix timestamp and outputs a readable date.
+Expects a unix timestamp and outputs a full UTC timestamp.
+
+datetime
+^^^^^^^^
+
+Expects a parseable date, outputs a full UTC timestamp.
 
 certstatus
 ^^^^^^^^^^
@@ -350,8 +355,49 @@ Colorizes the given status word using css tags, e.g. ``issued`` becomes::
 link
 ^^^^
 
-Create an internal framework link to a page or action, expects a hash with a ``label`` and either ``page`` or ``action``.
+Create an internal framework link to a page or action, expects a hash with ``label`` and ``page`` and optional ``target``, default is to open the link in a modal.
 
+extlink
+^^^^^^^
+
+Similar to link but expects href to be an external target, default target is blank.
+ 
+text
+^^^^
+
+Readable text without html syntax (will be escaped)
+
+raw
+^^^
+
+Displayed as is.
+
+code
+^^^^
+
+Rendered with fixed-with typo, unix linebreaks are converted to html linebreaks. 
+ 
+defhash/deflist
+^^^^^^^^^^^^^^^
+
+Outputs a key/value list (dl/dt/dd) - defhash expects a hash where keys are 
+labels. deflist expects an array where each item is a hash with keys key and 
+value. 
+
+ullist
+^^^^^^
+
+Array of values, each item becomes a <li> in the list, values are html-escaped. 
+
+rawlist
+^^^^^^^
+
+Like ullist but displays the items "as is" (can contain HTML markup)
+
+linklist 
+^^^^^^^^
+
+Array, where each item is a hash describing a link
 
 Customization
 =============
