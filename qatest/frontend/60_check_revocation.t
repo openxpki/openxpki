@@ -36,11 +36,17 @@ for my $cert (('entity','entity2','pkiclient')) {
         'page' => 'certificate!detail!identifier!'.$cert_identifier 
     });
     
-    # check database status 
-    is($result->{main}->[0]->{content}->{data}->[6]->{value}->{value}, 'REVOKED');
+    my $serial;
+    my $status;
     
-    # extract serial for checking against crl
-    my $serial = $result->{main}->[0]->{content}->{data}->[2]->{value};
+    foreach my $item (@{$result->{main}->[0]->{content}->{data}}) {
+        # check database status
+        $status = $item->{value}->{value} if ($item->{label} eq 'Status');
+        $serial = $item->{value} if ($item->{label} eq 'Serial');
+    
+    }
+    
+    is($status, 'REVOKED');
     
     diag($serial);
     like( $serial, "/0x[0-9a-f]+/", 'Got serial');
