@@ -216,6 +216,8 @@ wfsearch:
             field: WORKFLOW_SERIAL
           - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL
             field: WORKFLOW_LAST_UPDATE
+          - label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL
+            field: WORKFLOW_TYPE
           - label: I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL
             field: WORKFLOW_STATE
           - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
