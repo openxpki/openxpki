@@ -67,6 +67,7 @@ style:
         metadata:
             system_id: "[% data.cust_id %]"
             server_id: "[% data.server_id %]"
+            entity: "[% CN.0 FILTER lower %]"
  
 # Profile extensions - set 0/1 as needed
 # Also see sections defined in default.yaml
