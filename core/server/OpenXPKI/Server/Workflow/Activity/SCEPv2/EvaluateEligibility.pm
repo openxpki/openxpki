@@ -7,11 +7,13 @@ package OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use English;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Template;
 use Data::Dumper;
+use Workflow::Exception qw(configuration_error);
 
 sub execute {
     ##! 1: 'execute'
@@ -63,7 +65,30 @@ sub execute {
 
         ##! 16: 'Lookup at path ' . Dumper @path
         if (@path) {
-            my $plain_result = $config->get( [ @prefix, 'value', @path ] );
+            
+            my $plain_result;
+            if ($self->param('pause_on_error')) {
+                
+                if (!$self->param('retry_count')) {
+                    configuration_error('pause_on_error also requires a non-zero retry_count to be set');
+                }
+                
+                # run connector in eval to catch error
+                eval {
+                    $plain_result = $config->get( [ @prefix, 'value', @path ] );
+                };
+                if ($EVAL_ERROR) {
+                    CTX('log')->log(
+                        MESSAGE => "SCEP eligibility check chrashed - do pause",
+                        PRIORITY => 'warn',
+                        FACILITY => 'application',
+                    );
+                    ##! 32: 'Doing pause'
+                    $self->pause('I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR');
+                }
+            } else {
+                $plain_result = $config->get( [ @prefix, 'value', @path ] );
+            }
             ##! 32: 'result is ' . $plain_result        
     
             CTX('log')->log(
@@ -115,7 +140,7 @@ sub execute {
 
     }
 
-    $context->param($flag => $res );
+    $context->param( $flag => $res );
 
     CTX('log')->log(
         MESSAGE => "SCEP eligibility for " .
@@ -141,7 +166,24 @@ Check the eligability to perform initial enrollment or renewal against the
 connector. The activity detects if we are in initial or renewal mode and
 writes the decission to "request_mode".
 
-=head2 Configuration 
+=head1 Configuration 
+
+=head2 Activity Configuration
+
+=over
+
+=item pause_on_error
+
+Set this if you have connectors that might cause exceptions. You also
+need to set a useful value for retry_count. Effective only in attribute 
+mode! (see also OpenXPKI::Server::Workflow::Activity). If not set, 
+connector errors will bubble up as exceptions to the workflow handler.
+
+=back 
+
+=head2 Data Source Configuration
+ 
+=head3 Dynamic using a Connector
 
 The data source must be configured in the config of the running scep
 server:
@@ -164,7 +206,7 @@ subject and mac address (gathered by url parameter), e.g.:
 If the connector returns a true value, the enrollment is granted. 
 Renewal is disabled as the path is empty. 
 
-=head2 Configuration alternatives
+=head3 Dynamic with a return-value whitelist
 
 If you need to make the decission based on the return value, you can add 
 a list of expected values to the definition: 
@@ -181,6 +223,7 @@ a list of expected values to the definition:
 The check will succeed, if the value returned be the connector has a literal
 match in the given list. 
 
+=head3 Static
 
 To globally enable a feature without taking the request into account, omit the
 args and set value to a literal 1:

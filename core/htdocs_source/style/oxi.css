@@ -102,6 +102,10 @@ div.section{
     background-color: #ffd78c;
 }
 
+.oxi-button-container button.btn.exceptional {
+    background-color: #79d1f3;
+}
+
 img.toplogo{
    padding-top:6px;
    padding-right:12px;

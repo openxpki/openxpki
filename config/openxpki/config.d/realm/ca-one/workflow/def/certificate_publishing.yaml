@@ -3,7 +3,6 @@ head:
     label: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING
     description: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING_DESC
 
-
 state:
     INITIAL: 
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL
@@ -46,6 +45,9 @@ action:
         param: 
             _map_prefix: $prefix
             export_context: 1
+            retry_count: 3
+            retry_interval: +000000000015
+            on_error: queue
 
 
     publish_profile: 
@@ -55,6 +57,9 @@ action:
         param:
             export_context: 1
             _map_publish_key: $publish_key
+            retry_count: 3
+            retry_interval: +000000000015
+            on_error: queue
 
 condition:
     has_prefix:

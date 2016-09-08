@@ -19,6 +19,7 @@ sub execute {
     ##! 1: 'start'
     my $self     = shift;
     my $workflow = shift;
+    my $context = $workflow->context();
 
     my $default_token = CTX('api')->get_default_token();
     my $config        = CTX('config');
@@ -26,7 +27,7 @@ sub execute {
     my $cert_identifier = $self->param('cert_identifier');
 
     if (!$cert_identifier) {
-        $cert_identifier = $workflow->context()->param('cert_identifier');
+        $cert_identifier = $context->param('cert_identifier');
     }
 
     if (!$cert_identifier) {
@@ -35,7 +36,7 @@ sub execute {
         );
     }
 
-    my @targets;
+    my @target;
     my @path;
     # Detect if we are in profile or prefix mode
     my $prefix = $self->param('prefix');
@@ -51,7 +52,7 @@ sub execute {
 
         @path = split /\./, $prefix;
         # Get the list of targets from prefix
-        @targets = $config->get_keys( $prefix );
+        @target = $config->get_keys( $prefix );
 
     } else {
 
@@ -70,9 +71,9 @@ sub execute {
         # Check if the node exists inside the profile
 
         if ($config->exists([ 'profile', $profile, 'publish'])) {
-            @targets = $config->get_scalar_as_list( [ 'profile', $profile, 'publish'] );
+            @target = $config->get_scalar_as_list( [ 'profile', $profile, 'publish'] );
         } else {
-            @targets = $config->get_scalar_as_list( [ 'profile', 'default', 'publish'] );
+            @target = $config->get_scalar_as_list( [ 'profile', 'default', 'publish'] );
         }
 
         # Reuse the prefix value to build the full path
@@ -81,7 +82,7 @@ sub execute {
     }
 
     # If the data point does not exist, we get a one item undef array
-    return unless (@targets && $targets[0]);
+    return unless (@target && $target[0]);
 
 
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
@@ -108,7 +109,7 @@ sub execute {
     }
 
     CTX('log')->log(
-        MESSAGE => 'Publication for ' . $hash->{SUBJECT} . ', targets ' . join(",", @targets),
+        MESSAGE => 'Publication for ' . $hash->{SUBJECT} . ', targets ' . join(",", @target),
         PRIORITY => 'debug',
         FACILITY => [ 'application' ],
     );
@@ -186,17 +187,60 @@ sub execute {
        ##! 16: 'Export context to connector ' . Dumper $param
     }
 
-    # TODO - Handle exceptions / pause
-    foreach my $target (@targets) {
-        ##! 32: " $target . $rdn_hash{CN}[0] "
-        my $res = $config->set( [  @path, $target, $publish_key ], $data, $param );
-        ##! 16 : 'Publish at target ' . $target . ' - Result: ' . $res
-        CTX('log')->log(
-            MESSAGE => "publish to $target to with $publish_key - result " . Dumper $res,
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+    # overwrite targets when we are in the wake up loop
+    if ( $context->param( 'tmp_publish_queue' ) ) {
+        my $queue =  $context->param( 'tmp_publish_queue' );
+        ##! 16: 'Load targets from context queue'
+        if (!ref $queue) {
+            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue ); 
+        }
+        @target = @{$queue};
     }
+    
+    my $on_error = $self->param('on_error') || '';
+    my @failed;
+    ##! 32: 'Targets ' . Dumper \@target
+    foreach my $target (@target) {
+        eval{ $config->set( [ @path, $target, $publish_key ], $data, $param ); };
+        if ($EVAL_ERROR) {
+            if ($on_error eq 'queue') {
+                push @failed, $target;
+                CTX('log')->log(
+                    MESSAGE => "Entity pubication failed for target $target, requeuing",
+                    PRIORITY => 'info',
+                    FACILITY => [ 'application' ],
+                );
+            } elsif ($on_error eq 'skip') {
+                CTX('log')->log(
+                    MESSAGE => "Entity pubication failed for target $target and skip is set",
+                    PRIORITY => 'warn',
+                    FACILITY => [ 'application' ],
+                );
+            } else {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
+                    params => {
+                        TARGET => $target,
+                        ERROR => $EVAL_ERROR 
+                    }
+                );
+            }
+        } else {
+            CTX('log')->log(
+                MESSAGE => "Entity pubication to $target for ". $publish_key." done",
+                PRIORITY => 'debug',
+                FACILITY => [ 'application' ],
+            );
+        }
+    }
+  
+    if (@failed) {
+        $context->param( 'tmp_publish_queue' => \@failed );
+        $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
+        # pause stops execution of the remaining code
+    }
+    
+    $context->param( { 'tmp_publish_queue' => undef });
 
     ##! 4: 'end'
     return 1;
@@ -271,5 +315,28 @@ this to "$user_email".
 =item export_context
 
 Boolean, if set the full context is passed to the connector in the third argument.
+
+=item on_error
+
+Define what to do on problems with the publication connectors. One of:
+
+=over
+
+=item exception (default)
+
+The connector exception bubbles up and the workflow terminates.
+
+=item skip
+
+Skip the publication target and continue with the next one.
+
+=item queue
+
+Similar to skip, but failed targets are added to a queue. As long as
+the queue is not empty, pause/wake_up is used to retry those targets
+with the retry parameters set. This obvioulsy requires I<retry_count>
+to be set.
+
+=back 
 
 =back

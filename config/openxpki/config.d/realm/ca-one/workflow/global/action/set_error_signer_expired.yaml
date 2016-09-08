@@ -1,0 +1,3 @@
+class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
+param:
+    error_code: I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_EXPIRED

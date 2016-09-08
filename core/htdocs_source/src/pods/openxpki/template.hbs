@@ -109,12 +109,12 @@
 </div>
 
 <div class="modal fade oxi-main-modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog {{model.modal.page.className}}">
         <div class="modal-content">
             <div class="modal-header">
                 <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">
-                    {{if model.model.page.shortlabel model.modal.page.shortlabel model.modal.page.label}}
+                    {{if model.modal.page.shortlabel model.modal.page.shortlabel model.modal.page.label}}
                 </h4>
             </div>
             <div class="modal-body">
@@ -149,6 +149,14 @@
     </div>
 </div>
 
+
+<div class="refresh">
+    <div class="progress progress-striped active">
+        <div class="progress-bar progress-bar-success" role="progressbar">
+            <p class="text-center">Autorefresh</p>
+        </div>
+    </div>
+</div>
 
 <div class="loading">
     <div class="progress progress-striped active">

@@ -1619,6 +1619,7 @@ sub AUTOMETHOD {
     ##! 16: 'method name: ' . $method_name
     return sub {
         if (!exists $method_info_of{$ident}->{$method_name}) {
+             
             ##! 16: 'exception'
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED',
@@ -1727,6 +1728,19 @@ sub AUTOMETHOD {
         }
         return $result;
     };
+}
+
+sub can {
+    
+    ##! 1: 'Start'
+    
+    # WARNING - we just do not support "can" for autoloaded methods for 
+    # now. This is a workaround to fix an interference between Carp
+    # and the automethod in this API, see github ticket #415
+    
+    # TODO: API handling should be improved
+    
+    return undef;
 }
 
 ###########################################################################

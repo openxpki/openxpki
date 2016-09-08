@@ -405,6 +405,12 @@ use Class::Std;
         
     }
     
+    sub runcmd_ok {
+        my ( $self, $action, $params, $testname ) = @_;
+        $testname ||= 'Executing command ' . $action;
+        return $self->ok( scalar( $self->runcmd( $action, $params ) ),
+            $testname );
+    }
 
     sub param {
         my ( $self, $name ) = @_;

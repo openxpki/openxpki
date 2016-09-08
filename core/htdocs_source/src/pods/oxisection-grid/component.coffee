@@ -96,6 +96,7 @@ Component = Em.Component.extend
             index: column.index
             sTitle: column.sTitle
             format: column.format
+            sortable: not not column.sortkey
             isSorted: pager.order and pager.order is order
             limit: pager.limit
             order: order
