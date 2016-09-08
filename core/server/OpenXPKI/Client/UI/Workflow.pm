@@ -1837,6 +1837,31 @@ sub __render_from_workflow {
             });
         }
         
+        # create a "blind" query to generate an initial search form
+        my $queryid = $self->__generate_uid();
+        my $_query = {
+            'id' => $queryid,
+            'type' => 'workflow',
+            'input' => { 
+                wf_creator => $wf_info->{WORKFLOW}->{CONTEXT}->{creator},
+                wf_type => $wf_info->{WORKFLOW}->{TYPE},
+            },
+        };
+        $self->__temp_param('query_wfl_'.$queryid, $_query );
+        
+        my @data = (
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', value => $wf_info->{WORKFLOW}->{ID} },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{WORKFLOW}->{TYPE} },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{WORKFLOW}->{STATE} },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{WORKFLOW}->{PROC_STATE} },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', 'format' => 'link', value => {
+                'label' => $wf_info->{WORKFLOW}->{CONTEXT}->{creator}, 
+                'page' => 'workflow!search!query!'.$queryid,
+                'target' => '_blank',
+            }}
+        );
+        
+        
         # The workflow info contains info about all control actions that
         # can done on the workflow -> render appropriate buttons.
         my $extra_handles;
@@ -1864,44 +1889,20 @@ sub __render_from_workflow {
                 };
             }
             
-            $extra_handles = { 
+            push @data, { 
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL', 
                 format => 'linklist', 
                 value => \@extra_links
-            } if (@extra_links);
-
+            } if (scalar @extra_links);
 
         }
-
-        # create a "blind" query to generate an initial search form
-        my $queryid = $self->__generate_uid();
-        my $_query = {
-            'id' => $queryid,
-            'type' => 'workflow',
-            'input' => { 
-                wf_creator => $wf_info->{WORKFLOW}->{CONTEXT}->{creator},
-                wf_type => $wf_info->{WORKFLOW}->{TYPE},
-            },
-        };
-        $self->__temp_param('query_wfl_'.$queryid, $_query );
         
         $self->_result()->{right} = [{
             type => 'keyvalue',
             content => {
                 label => '',
                 description => '',
-                data => [
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', value => $wf_info->{WORKFLOW}->{ID} },
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{WORKFLOW}->{TYPE} },
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{WORKFLOW}->{STATE} },
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{WORKFLOW}->{PROC_STATE} },
-                    { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', 'format' => 'link', value => {
-                        'label' => $wf_info->{WORKFLOW}->{CONTEXT}->{creator}, 
-                        'page' => 'workflow!search!query!'.$queryid,
-                        'target' => '_blank',
-                    }},
-                    $extra_handles,
-                ],
+                data => \@data,
                 buttons => \@buttons_handle,
         }}];
     }
