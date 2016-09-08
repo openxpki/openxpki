@@ -53,7 +53,15 @@ $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!scep_approve_csr!wf_id!' . $workflow_id
 });
 
-my $cert_identifier = $result->{main}->[0]->{content}->{data}->[1]->{value}->{label};
+# load raw context to find certificate id
+my $cert_identifier;
+$result = $client->mock_request({
+    'page' => 'workflow!context!wf_id!' . $workflow_id
+});
+
+foreach my $item (@{$result->{main}->[0]->{content}->{data}}) {
+    $cert_identifier = $item->{value}->{label} if ($item->{label} eq 'cert_identifier');
+}
 
 ok($cert_identifier,'Cert Identifier found');
 diag($cert_identifier);

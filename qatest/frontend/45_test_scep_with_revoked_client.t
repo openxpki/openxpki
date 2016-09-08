@@ -59,11 +59,11 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'page' => 'workflow!load!wf_id!' . $workflow_id,
+    'page' => 'workflow!context!wf_id!' . $workflow_id,
 });
  
 # Search for signer_revoked flag
 
 foreach my $line (@{$result->{main}->[0]->{content}->{data}}) {
-    ok($line->{value}, 'signer_revoked is set') if ($line->{label} eq 'signer_revoked');
+    ok($line->{value}, 'signer_revoked is set') if ($line->{label} =~ 'signer_revoked');
 }

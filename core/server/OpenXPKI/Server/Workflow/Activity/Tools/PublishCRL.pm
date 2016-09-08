@@ -14,7 +14,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
-use OpenXPKI::Connector::Iterator;
 use Data::Dumper;
 
 

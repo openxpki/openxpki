@@ -269,6 +269,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
 msgstr "Errore sconosciuto"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
+msgstr "Nome Applicazione"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr ""
 "La data inserita per il campo “non dopo il” non può essere convalidata."
@@ -1482,6 +1486,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "Sottoscrizione SCEP"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
+msgstr "Termina Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
+msgstr "Ulteriori Informazioni"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
 msgstr "Nome alternativo per il campo Soggetto"
 
@@ -2067,6 +2079,18 @@ msgstr "Password"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Forza Fallimento"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL"
+msgstr "FALLIMENTO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT"
+msgstr "Forza Fallimento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON"
+msgstr "Forza Ripristino"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON"
 msgstr "Forza Ripristino"
 
@@ -2583,6 +2607,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr ""
 "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
 "favore il team di supporto!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
