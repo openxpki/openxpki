@@ -650,6 +650,10 @@ msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "Статус"
 
@@ -1312,6 +1316,10 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
@@ -2870,6 +2878,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_DESCRIPTION"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr "Дочерние технологические процессы"
 
@@ -3345,10 +3361,6 @@ msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESCRIPTION"
 msgstr "Технологические процессы"
 
 #, fuzzy

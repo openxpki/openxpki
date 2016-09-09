@@ -563,6 +563,11 @@ msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
 msgstr "Ricerca Certificato"
 
 # Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
+msgstr "Home"
+
+# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "Stato del Sistema"
 
@@ -1022,6 +1027,10 @@ msgstr "La richiesta PKCS10 non può essere letta"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "Tipo"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
 msgstr ""
@@ -2323,6 +2332,14 @@ msgstr ""
 "Questo è considerato un contenuto sensibile e pertanto non viene "
 "visualizzato."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_DESCRIPTION"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
+msgstr "SUCCESSO"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr "Questo Workflow è stato cancellato da un’azione dell’utente."
 
@@ -2744,9 +2761,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESCRIPTION"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"

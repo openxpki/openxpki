@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-09-06 14:47+0100\n"
+"PO-Revision-Date: 2016-09-09 11:35+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -492,6 +492,10 @@ msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
 msgstr "SCEP Workflow Search"
 
 # Remove?
+msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
+msgstr "Set Message of the Day"
+
+# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "System Status"
 
@@ -918,6 +922,9 @@ msgstr "PKCS10 request can not be read"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "Validator failed on given expression"
 
+msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "Message of the Day"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
 msgstr ""
 "Please validate the given information and approve the revocation request "
@@ -1216,7 +1223,7 @@ msgstr ""
 "valid after date set to now."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
-msgstr "Message of the Day"
+msgstr "Set Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
 msgstr ""
@@ -1607,8 +1614,9 @@ msgstr "Hints to fill in the form fields"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC"
 msgstr ""
-"Specify the invalidity time for the revocation, only necessary in special "
-"cases."
+"Specify the invalidity time for the revocation, this is only used in case of "
+"KeyCompromise and if the actual date of the compromise is known. Leave blank "
+"otherwise."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL"
 msgstr "Invalidity Time"
@@ -2129,6 +2137,14 @@ msgstr "Workflow Id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "This content is considered sensitive and therefore not shown."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_DESCRIPTION"
+msgstr ""
+"The Message of day given below has been set for the intended user group and "
+"will appear on next login for them."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
+msgstr "Message set"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr "This workflow was canceled by user interaction."
 
@@ -2555,9 +2571,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESCRIPTION"
 msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
