@@ -95,10 +95,14 @@ sub execute {
                 $context->param( $self->param('raw_result') => $plain_result );  
             }
             
+            
+            if (!defined $plain_result) {
+                $res = 0;
+            
             # If a list of expected values is given, we check the return value 
-            my @expect = $config->get_scalar_as_list( [ @prefix, 'expect' ] );
-            if (defined $plain_result && defined $expect[0]) {
-
+            } elsif ( $config->exists( [ @prefix, 'expect' ] ) ) {
+                my @expect = $config->get_scalar_as_list( [ @prefix, 'expect' ] );
+            
                 ##! 32: 'Check against list of expected values'
                 foreach my $valid (@expect) {
                     ##! 64: 'Probe ' .$valid                     
@@ -114,6 +118,26 @@ sub execute {
                     PRIORITY => 'debug',
                     FACILITY => 'application',
                 );
+            # Evaluate return value using regex
+            } elsif ( $config->exists( [ @prefix, 'match' ] ) ) {
+
+                my $regex = $config->get( [ @prefix, 'match', 'regex' ] );
+                my $modifier = $config->get( [ @prefix, 'match', 'modifier' ] ) || '';
+                
+                $modifier =~ s/\s//g;
+                if ($modifier =~ /[^alupimsx]/ ) {
+                    configuration_error('Unexpected characters in modifier');
+                }
+                $modifier = "(?$modifier)" if ($modifier);
+                $regex = qr/$modifier$regex/;
+                
+                $res = ($plain_result =~ $regex) ? 1 : 0;
+        
+		        CTX('log')->log(
+		            MESSAGE => "Eligibility check using regex $regex " . ($res ? 'succeeded' : 'failed'),
+		            PRIORITY => 'debug',
+		            FACILITY => 'application',
+		        );
                 
             } else {       
                 # Evaluate whatever comes back to a boolean 0/1 f                
@@ -210,15 +234,29 @@ Put this configutation into your server configuration:
         args:
          - "[% context.cert_subject %]"
          - "[% context.url_mac %]"
-      expected:
+      expect:
         - Active
         - Build
 
 The check will succeed, if the value returned be the connector has a 
-literal match in the given list. 
+literal match in the given list.  
  
 If you do not specify an I<expected> list, the return value is mapped to
 a boolean result by perl magic.
+
+=head3 Compare result using a RegEx
+
+Instead of a static I<expect> list, you can also define a regex to evaluate:
+
+    eligible:   
+      value@: connector:your.connector
+        args:
+         - "[% context.cert_subject %]"
+         - "[% context.url_mac %]"
+      match:
+        regex: (Active|Build)
+        modifier: ''
+
  
 =head3 Static
 
