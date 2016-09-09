@@ -274,6 +274,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
+OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
 OpenXPKI/Server/Workflow/Activity/Tools/LoadPolicy.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetAttribute.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
