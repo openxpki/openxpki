@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Helper to load the gpg signing key from "outside" into the vagrant machine 
+# called from prepare.sh - do not call directly
+
 KEY=$(</dev/stdin)
 
 # Let .gpg directory be a memory-fs

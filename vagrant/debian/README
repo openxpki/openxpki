@@ -16,6 +16,12 @@ test:
   installs them using aptitude and runs the sample-setup and some of the 
   qatest.
 
+develop:
+  Installs the current packages from the repos and creates a default config
+  The /code-repo tree is shared with the host, change code on the host 
+  machine and use scripts/deploy.sh inside the guest to copy it over to 
+  the actual code base.
+
 build-jessie: 
   build cpan deps, core and i18 from the current tree.
   Installs those packages, runs sample-setup and qatests.
