@@ -7,7 +7,7 @@
 # In either case, you might need to change the extension of the scripturl in
 # the webui config file.
 
-use CGI;
+use CGI 4.08;
 use CGI::Fast;
 use CGI::Session qw/-ip-match/;
 use CGI::Carp qw (fatalsToBrowser);
