@@ -104,11 +104,6 @@ state:
         action:
           - invalidate_challenge_pass > SUCCESS
 
-    CLEAR_APPROVALS:
-        autorun: 1
-        action:
-          - clear_approvals > APPROVAL
-
     CONTINUE_INITIAL_ENROLL:
         autorun: 1
         action:
@@ -124,7 +119,7 @@ state:
     EVAL_ELIGIBILITY:
         autorun: 1
         action:
-          - eval_eligibility > CHECK_FOR_VALID_REQUEST
+          - set_request_mode eval_eligibility > CHECK_FOR_VALID_REQUEST
 
     EVAL_SIGNER_TRUST:
         autorun: 1
@@ -355,9 +350,6 @@ action:
     calc_approvals:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::CalcApprovals
 
-    clear_approvals:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
-
     deny_authentication:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DENY_AUTHENTICATION_LABEL
@@ -382,8 +374,11 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateChallenge
 
     eval_eligibility:
-        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility
+        class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateEligibility
         param:
+            _map_config_path: scep.[% context.server %].eligible.[% context.request_mode %]
+            _map_target_key: "[% IF context.request_mode == 'initial' %]eligible_for_initial_enroll[% ELSE %]eligible_for_renewal[% END %]"
+            raw_result: eligibility_result
             pause_on_error: 1
             retry_count: 5
             retry_interval: +0000000000015
@@ -489,6 +484,14 @@ action:
 
     revoke_existing_certs:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts
+
+
+    # Required to replace SCEPv2::EvalEligibility with generic one
+    set_request_mode:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+           _map_request_mode: >
+              [% IF context.signer_trusted && context.signer_sn_matches_csr %]renewal[% ELSE %]initial[% END %]
 
     set_workflow_attributes:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
