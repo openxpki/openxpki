@@ -28,7 +28,7 @@ fi
 
 if [ "$DIST" == "ubuntu" ]; then
     wget http://$PKGHOST/ubuntu/Release.key -O - | apt-key add -
-    echo "deb http://$PKGHOST/ubuntu/ dists/trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/ubuntu/ dists/trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
 else
    wget http://$PKGHOST/debian/Release.key -O - | apt-key add -
    echo "deb http://$PKGHOST/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list

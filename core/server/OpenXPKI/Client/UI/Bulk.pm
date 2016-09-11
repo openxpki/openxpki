@@ -86,19 +86,19 @@ sub action_result {
     my $self = shift;
     my $args = shift;
 
+    my $queryid = $self->param('formid');
+
     # Read query pattern and list info from persisted data    
-    my $spec = $self->_client->session()->param('bulk_'.$self->param('formid'));
+    my $spec = $self->_client->session()->param('bulk_'.$queryid);
     if (!$spec) {
         return $self->redirect('bulk!index');
     }
         
     my @attr;
-    my @fielddesc;
     my $attributes = $spec->{attributes};    
     @attr = @{$self->__build_attribute_subquery( $attributes )} if ($attributes);
 
     my $query = $spec->{query};
-    my $limit = 25;
 
     if ($self->param('wf_creator')) {        
         push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };
@@ -119,32 +119,28 @@ sub action_result {
 
     $self->logger()->debug("query : " . Dumper $query);
     
-    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    my $result_count = $self->send_command( 'search_workflow_instances_count',  {
+        'STATE' => $query->{STATE},
+        'TYPE' => $query->{TYPE},
+        'ATTRIBUTE' => $query->{ATTRIBUTE},
+    });
 
     # No results founds
-    if (!$search_result) {
+    if (!$result_count) {
         $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
         return $self->init_index();
     }
     
-    $self->_page({
-        label => $spec->{label} || 'I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE',
-        description =>  $spec->{description},
-    });
-    
+     
     # check if there is a custom column set defined
     my ($header,  $body);    
     if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
         ($header, $body) = $self->__render_list_spec( $spec->{cols} );
     } else {
          $body = $self->__default_grid_row;
-         $header = self->__default_grid_head;
+         $header = $self->__default_grid_head;
     }
     
-    my @result = $self->__render_result_list( $search_result, $body ); 
-        
-    $self->logger()->trace( "dumper result: " . Dumper @result);
-
     my @buttons;
     foreach my $btn (@{$spec->{buttons}}) {
         # Copy required to not change the data in the session!
@@ -157,40 +153,31 @@ sub action_result {
     }
     
     push @buttons, {
-        label => 'back to list',
+        label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH',
         page => 'bulk!index!' . $self->__generate_uid(), 
     };
-
-    $self->add_section({
-        type => 'grid',
-        className => 'workflow',        
-        content => {
-            actions => [{
-                path => 'workflow!load!wf_id!{serial}!view!result',
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
-                icon => 'view',
-                target => 'tab',
-            }],
-            columns => $header,
-            data => \@result,
-            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
-            buttons => \@buttons         
-        }
-    });
     
-    if (@fielddesc) {
-        $self->add_section({
-            type => 'keyvalue',
-            content => {
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
-                description => '',
-                data => \@fielddesc
-        }});
-    }
+    $self->_client->session()->param('query_wfl_'.$queryid, {
+        'id' => $queryid,
+        'type' => 'bulk',
+        'count' => $result_count,
+        'query' => $query,
+        'input' => {},
+        'header' => $header,
+        'column' => $body,
+        'page' => {
+            label => $spec->{label} || 'I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE',
+            description =>  $spec->{description},
+        },
+        'button' => \@buttons, 
+    });
+
+    $self->redirect( 'bulk!result!id!'.$queryid  );
+
+    return $self;    
         
 }
-
-
+ 
 1; 
          
                      

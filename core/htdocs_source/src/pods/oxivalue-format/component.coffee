@@ -41,6 +41,7 @@ Component = Em.Component.extend
         deflist: (v) -> "<dl>#{(for w in v then "<dt>#{w.label}</dt><dd>#{(if w.format is "raw" then w.value else Em.$('<div/>').text(w.value).html())}</dd>").join ""}</dl>"        
         ullist: (v) -> "<ul class=\"list-unstyled\">#{(for w in v then "<li>#{Em.$('<div/>').text(w).html()}</li>").join ""}</ul>"
         rawlist: (v) -> "<ul class=\"list-unstyled\">#{(for w in v then "<li>#{w}</li>").join ""}</ul>"
+        linklist: (v) -> "<ul class=\"list-unstyled\">#{(for w in v then "<li><a href='#/openxpki/#{w.page}' target='#{w.target||"modal"}'>#{w.label}</a></li>").join ""}</ul>"
 
     formatedValue: Em.computed "content.format", "content.value", ->
         e = @get("types")[@get("content.format")||"text"](@get "content.value")

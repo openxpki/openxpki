@@ -75,27 +75,69 @@ sub execute {
         );
     }
 
-    # Get the list of targets
-    my @targets = $config->get_keys( $prefix );
-
-    # If the data point does not exist, we get a one item undef array
-    return unless ($targets[0]);
-
-    ##! 16: 'Publish targets at prefix '. $prefix .' -  ' . Dumper ( @targets )
-
-    # FIXME - Use exception handling to compensate failures
-    ##! 32: 'Data for publication '. Dumper ( $data )
-    foreach my $target (@targets) {
-        ##! 32: " $prefix.$target . " . $data->{dn}{CN}[0]
-        my $res = $config->set( [ "$prefix.$target.", $data->{dn}{CN}[0] ], $data );
-        ##! 16 : 'Publish at target ' . $target . ' - Result: ' . $res
-
-        CTX('log')->log(
-            MESSAGE => "CA published at $prefix.$target with CN ".$data->{dn}{CN}[0]." for CA $ca_alias in realm $pki_realm",
-            PRIORITY => 'info',
-            FACILITY => [ 'system' ],
-        );
+    my @target;
+    my @prefix = split /\./, $prefix;
+        
+    # overwrite targets when we are in the wake up loop
+    if ( $context->param( 'tmp_publish_queue' ) ) {
+        my $queue =  $context->param( 'tmp_publish_queue' );
+        ##! 16: 'Load targets from context queue'
+        if (!ref $queue) {
+            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue ); 
+        }
+        @target = @{$queue};
+    } else {
+        @target = $config->get_keys( \@prefix );
     }
+    
+    # If the data point does not exist, we get a one item undef array
+    return unless ($target[0]);
+    
+    my $on_error = $self->param('on_error') || '';
+    my @failed;
+    ##! 32: 'Targets ' . Dumper \@target
+    foreach my $target (@target) {
+        eval{ $config->set( [ @prefix, $target, $data->{dn}{CN}[0] ], $data ); };
+        if ($EVAL_ERROR) {
+            if ($on_error eq 'queue') {
+                push @failed, $target;
+                CTX('log')->log(
+                    MESSAGE => "CA pubication failed for target $target, requeuing",
+                    PRIORITY => 'info',
+                    FACILITY => [ 'application' ],
+                );
+            } elsif ($on_error eq 'skip') {
+                CTX('log')->log(
+                    MESSAGE => "CA pubication failed for target $target and skip is set",
+                    PRIORITY => 'warn',
+                    FACILITY => [ 'application' ],
+                );
+            } else {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
+                    params => {
+                        TARGET => $target,
+                        ERROR => $EVAL_ERROR 
+                    }
+                );
+            }
+        } else {
+            CTX('log')->log(
+                MESSAGE => "CA pubication to $target for ". $data->{dn}{CN}[0]." done",
+                PRIORITY => 'debug',
+                FACILITY => [ 'application' ],
+            );
+        }
+    }
+  
+    if (@failed) {
+        $context->param( 'tmp_publish_queue' => \@failed );
+        $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
+        # pause stops execution of the remaining code
+    }
+    
+    $context->param( { 'tmp_publish_queue' => undef });
+    
 
     ##! 4: 'end'
     return;
@@ -118,6 +160,8 @@ and I<subject> holding the appropriate strings and I<dn> which is the subject
 parsed into a hash as used in the template processing when issuing the certificates.
 
 =head1 Configuration
+
+=head2 Example
 
 Set the C<prefix> paramater to tell the activity where to find the connector
 
@@ -158,4 +202,54 @@ here is an example connector:
         schema:
             cn:
                 objectclass: top organizationalRole pkiCA crlDistributionPoint
+
+=head2 Activity parameters
+
+=over 
+
+=item prefix
+
+The config path where the connector configuration resides, in the default
+configuration this is I<publishing.cacert>.
+
+=item on_error
+
+Define what to do on problems with the publication connectors. One of:
+
+=over
+
+=item exception (default)
+
+The connector exception bubbles up and the workflow terminates.
+
+=item skip
+
+Skip the publication target and continue with the next one.
+
+=item queue
+
+Similar to skip, but failed targets are added to a queue. As long as
+the queue is not empty, pause/wake_up is used to retry those targets
+with the retry parameters set. This obvioulsy requires I<retry_count>
+to be set.
+
+=back 
+
+=back 
+
+=head2 Context parameters
+
+=over 
+
+=item ca_alias
+
+The alias name of the CA
+ 
+=item tmp_publish_queue
+
+Used to temporary store unpublished targets when on_error is set.
+
+=back
+     
+                
 

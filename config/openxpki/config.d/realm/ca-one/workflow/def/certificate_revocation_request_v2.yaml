@@ -102,6 +102,9 @@ state:
           - invalidity_time
           - reason_code
           - comment
+          - signer_revoked
+          - signer_trusted
+          - signer_authorized
         button:
           edit_crr:
             format: optional
@@ -189,7 +192,7 @@ action:
     check_authorized_signer:
         class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
         param:
-            _map_rules: soap.[% context.server %].authorized_signer
+            _map_rules: "[% context.interface %].[% context.server %].authorized_signer"
 
     delay_revocation:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Pause

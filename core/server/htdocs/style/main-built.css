@@ -8482,6 +8482,10 @@ div.section {
   background-color: #ffd78c;
 }
 
+.oxi-button-container button.btn.exceptional {
+  background-color: #79d1f3;
+}
+
 img.toplogo {
   padding-top: 6px;
   padding-right: 12px;
@@ -8892,6 +8896,7 @@ div.header div.userinfo {
   margin-top: 20px;
 }
 
+div.refresh,
 div.loading {
   opacity: 0;
   visibility: hidden;
@@ -8899,6 +8904,7 @@ div.loading {
   transition: opacity 0.75s;
 }
 
+div.refresh.in-progress,
 div.loading.in-progress {
   opacity: 1;
   visibility: visible;
@@ -8906,6 +8912,7 @@ div.loading.in-progress {
   transition: opacity 0.1s;
 }
 
+div.refresh div.progress,
 div.loading div.progress {
   position: fixed;
   top: 30px;
@@ -8913,6 +8920,7 @@ div.loading div.progress {
   width: 100px;
 }
 
+div.refresh div.progress div.progress-bar,
 div.loading div.progress div.progress-bar {
   width: 100%;
 }
@@ -8935,7 +8943,7 @@ div.description {
   margin-bottom: 6px;
 }
 
-div.oxisection-grid th {
+div.oxisection-grid th.sortable {
   cursor: pointer;
   -webkit-user-select: none;
 }

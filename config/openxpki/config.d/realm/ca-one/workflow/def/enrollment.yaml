@@ -195,8 +195,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC
         action:
-          - approve_csr global_clear_error_code > APPROVAL
-          - reject_request set_error_not_approved > FAILURE
+          - approve_csr global_clear_error_code > APPROVAL ? global_is_operator
+          - reject_request set_error_not_approved > FAILURE ? global_is_operator
 
         output:
           - error_code
@@ -224,8 +224,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_DESC
         action:
-          - add_authentication global_clear_error_code > AUTHENTICATED_REQUEST
-          - deny_authentication set_error_not_authenticated > FAILURE
+          - add_authentication global_clear_error_code > AUTHENTICATED_REQUEST ? global_is_operator
+          - deny_authentication set_error_not_authenticated > FAILURE ? global_is_operator
         output:
           - error_code
           - cert_profile 	
@@ -260,9 +260,9 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC
         action:
-          - set_error_policy_violated > FAILURE
-          - allow_retry > FAILURE
-          - override_policy global_clear_error_code > APPROVAL
+          - set_error_policy_violated > FAILURE ? global_is_operator
+          - allow_retry > FAILURE 
+          - override_policy global_clear_error_code > APPROVAL ? global_is_operator
         output:
           - error_code
           - cert_profile 	
@@ -383,6 +383,10 @@ action:
 
     eval_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::EvaluateEligibility
+        param:
+            pause_on_error: 1
+            retry_count: 5
+            retry_interval: +0000000000015
 
     eval_signer_trust:
         class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
@@ -809,10 +813,12 @@ field:
     signer_sn_matches_csr:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL
         name: signer_sn_matches_csr
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
 
     signer_validity_ok:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL
         name: signer_validity_ok
+        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
 
     num_active_certs:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL
@@ -864,10 +870,9 @@ acl:
         techlog: 1
         context: 1
 
-
     System:
         creator: self
 
     User:
-        creator: self
+        creator: any
 

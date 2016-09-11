@@ -73,7 +73,7 @@ $test->set_wfid ( $wf_id );
 $test->reset();
 
 if ($test->state() eq 'CHECK_FOR_REVOCATION') {
-    $test->execute_ok( 'global_check_for_revocation' );
+    $test->runcmd_ok( 'wakeup_workflow', { ID => $wf_id } );
 } else {
     $test->ok(1);
 }

@@ -1,0 +1,4 @@
+class: OpenXPKI::Server::Workflow::Activity::Sleep
+label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL
+param:
+    period: 15

@@ -1,0 +1,5 @@
+name: scep_tid
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC
+required: 1
+type: text     

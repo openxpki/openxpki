@@ -67,7 +67,10 @@ sub init {
 }
 
 
-sub pause{
+sub pause {
+    
+    ##! 1: 'start pause'
+    
     my $self = shift;
     my ($cause, $retry_interval) = @_;
 
@@ -77,29 +80,36 @@ sub pause{
     # max retries can NOT be modified via method arguments:
     my $max_retries = $self->get_max_allowed_retries();
 
-    $cause ||= '';
+    $cause = '' unless($cause);
 
+    ##! 64: 'Check for workflow object'
     if($self->workflow()){
         
+        ##! 16: 'calc wakeup - $retry_interval ' . $retry_interval
         # Workflow expects explicit wakeup as epoch
         my $dt_wakeup_at = OpenXPKI::DateTime::get_validity({
             VALIDITY => $retry_interval,
             VALIDITYFORMAT => 'detect',
         });
         
-        my $wakeup = $dt_wakeup_at->epoch();         
+        ##! 32: 'Wakeup is ' . Dumper $dt_wakeup_at 
+        
+        my $wakeup = $dt_wakeup_at->epoch();
         # Spread the pause interval by a custom random factor        
+        ##! 32: 'check rand offset '
         if (my $rand = $self->param('retry_random')) {
             my $now = time();
             my $delta = $wakeup - $now;
             my $diff = $delta * (rand($rand*2) - $rand) / 100;
-            ##! 1: "Add random $diff, when delta is $delta"   
+            ##! 16: "Add random $diff, when delta is $delta"   
             $wakeup += $diff;
         }
-
+        
+        ##! 32: 'Dispatch workflow->pause'
         $self->workflow()->pause($cause, $max_retries, $wakeup );
     }
-    # disrupt the execution of the run-method:
+    # disrupt the execution of the run-method
+    ##! 64: 'Throw pause exception'
     OpenXPKI::Server::Workflow::Pause->throw( cause => $cause);
 }
 
@@ -155,7 +165,10 @@ sub param {
             
             ##! 16: 'parse using tt ' . $template            
             my $oxtt = OpenXPKI::Template->new();
-            my $out = $oxtt->render( $template, {  context => $self->workflow()->context()->param() } );
+            my $out = $oxtt->render( $template, {  
+                context => $self->workflow()->context()->param(), 
+                workflow => { id => $self->workflow()->{ID} } 
+            });
             
             ##! 32: 'tt result ' . $out
             return $out;
@@ -165,15 +178,16 @@ sub param {
 }
 
 sub get_max_allowed_retries{
-    my $self     = shift;
+    
+    my $self = shift;
 
     #manual set?
-    if(defined($self->{MAX_RETRIES})){
+    if(defined($self->{MAX_RETRIES})) {
         ##! 16: 'manual set: '.$self->{MAX_RETRIES}
         return int($self->{MAX_RETRIES});
     }
   
-    if(defined($self->param('retry_count'))){
+    if (defined($self->param('retry_count'))) {
         ##! 16: 'defined in activity-xml: '.$self->param('retry_count')
         return $self->param('retry_count');
     }

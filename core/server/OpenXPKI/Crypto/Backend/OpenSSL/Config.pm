@@ -80,80 +80,83 @@ sub set_cert_list
         # i.e. 01/01/1970 00:00:00
         my ($cert, $timestamp) = (undef, '700101000000Z');
 
-	# Set dummy values for index.txt. These values are not used during
-	# CRL generation.
-	my $subject = '/DC=org/DC=openxpki/CN=Dummy';
-	my $start = '700101000000Z';
-	my $serial;
+        # Set dummy values for index.txt. These values are not used during
+        # CRL generation.
+        my $subject = '/DC=org/DC=openxpki/CN=Dummy';
+        my $start = '700101000000Z';
+        my $serial;
 
         if (ref($arrayref) ne 'ARRAY')
         {
             $cert      = $arrayref;
         } else {
             $cert      = $arrayref->[0];
-	}
-
-        if (ref($cert) eq '')
-        {
-	    # scalar string, it may either be a PEM encoded cert or the
-	    # raw certificate serial number (decimal)
-	    
-	    if ($cert =~ m{ \A \d+ \z }xms) {
-		# passed argument is numeric only and hence is the serial
-		# number of the certificate to revoke
-		$serial = $cert;
-		$cert = '';
-	    } else {
-		# PEM encoded certificate, instantiate object
-		eval {
-		    ##! 1: "FIXME: where is the related free_object call?"
-		    ##! 1: "FIXME: this is a memory leak"
-		    $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
-		};
-		if (my $exc = OpenXPKI::Exception->caught())
-		{
-		    OpenXPKI::Exception->throw (
-			message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
-			children => [ $exc ]);
-		} elsif ($EVAL_ERROR) {
-		    $EVAL_ERROR->rethrow();
-		}
-	    }
         }
 
-	if (ref($cert)) {
-	    # cert is available as an object, obtain necessary data from it
+        if (ref($cert) eq '') {
+    	    # scalar string, it may either be a PEM encoded cert or the
+    	    # raw certificate serial number (decimal)
+    	    
+    	    if ($cert =~ m{ \A \d+ \z }xms) {
+        		# passed argument is numeric only and hence is the serial
+        		# number of the certificate to revoke
+        		$serial = $cert;
+        		$cert = '';
+    	    } else {
+        		# PEM encoded certificate, instantiate object
+        		eval {
+        		    ##! 1: "FIXME: where is the related free_object call?"
+        		    ##! 1: "FIXME: this is a memory leak"
+        		    $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
+        		};
+        		if (my $exc = OpenXPKI::Exception->caught())
+        		{
+        		    OpenXPKI::Exception->throw (
+        			message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
+        			children => [ $exc ]);
+        		} elsif ($EVAL_ERROR) {
+        		    $EVAL_ERROR->rethrow();
+        		}
+    	    }
+        }
 
+        if (ref($cert)) {
+            # cert is available as an object, obtain necessary data from it
+        
             # $timestamp = [ gmtime ($timestamp) ];
             # $timestamp = POSIX::strftime ("%y%m%d%H%M%S",@{$timestamp})."Z";
-	    ##! 4: "timestamp = $timestamp"
-
-	    ##! 4: "create start time - notbefore"
-	    $start = $self->{XS}->get_object_function ({
-		OBJECT   => $cert,
-		FUNCTION => "notbefore"});
-	    $start = OpenXPKI::DateTime::convert_date(
-		{
-		    DATE      => $start,
-		    OUTFORMAT => 'openssltime',
-		});
-	    ##! 4: "OpenSSL notbefore date: $start"
-
-	    ##! 4: "create OpenSSL subject"
-	    $subject = $self->{XS}->get_object_function ({
-		OBJECT   => $cert,
-		FUNCTION => "subject"});
-	    $subject = OpenXPKI::DN->new ($subject);
-	    $subject = $subject->get_openssl_dn ();
-
-	    ##! 4: "create serials"
-	    $serial = $self->{XS}->get_object_function ({
-		OBJECT   => $cert,
-		FUNCTION => "serial"});
-	}
+            ##! 4: "timestamp = $timestamp"
+    
+            ##! 4: "create start time - notbefore"
+            $start = $self->{XS}->get_object_function ({
+                OBJECT   => $cert,
+                FUNCTION => "notbefore"});
+    	    
+            $start = OpenXPKI::DateTime::convert_date(
+            {
+                DATE      => $start,
+                OUTFORMAT => 'openssltime',
+            });
+    	    
+    	    ##! 4: "OpenSSL notbefore date: $start"
+    
+    	    ##! 4: "create OpenSSL subject"
+    	    $subject = $self->{XS}->get_object_function ({
+                OBJECT   => $cert,
+                FUNCTION => "subject"});
+                
+    	    $subject = OpenXPKI::DN->new ($subject);
+    	    $subject = $subject->get_openssl_dn ();
+    
+    
+            ##! 4: "create serials"
+            $serial = $self->{XS}->get_object_function ({
+                    OBJECT   => $cert,
+                    FUNCTION => "serial"});
+        }
 	
 
-	if (ref($arrayref) eq 'ARRAY') {
+    	if (ref($arrayref) eq 'ARRAY') {
             if (scalar @{$arrayref} > 1) {
                 $timestamp = $arrayref->[1];
                 ##! 4: "create timestamp"
@@ -165,36 +168,46 @@ sub set_cert_list
                 ##! 16: 'revocation date is present: ' . $timestamp
             }
             if (scalar @{$arrayref} > 2) {
-		my $reason_code = $arrayref->[2];
-		
-		if ($reason_code !~ m{ \A (?: unspecified | keyCompromise | CACompromise | affiliationChanged | superseded | cessationOfOperation | certificateHold | removeFromCRL ) \z }xms) {
-		    CTX('log')->log(
-			MESSAGE => "Invalid reason code '" . $reason_code . "' specified",
-			PRIORITY => 'warn',
-			FACILITY => [ 'application' ],
-			);
-		    $reason_code = 'unspecified';
-		}
-                # append reasonCode
-                $timestamp .= ',' . $arrayref->[2];
-                ##! 16: 'reason code is present: ' . $timestamp
-            }
-            if (scalar @{$arrayref} > 3) {
-                # append invalidity date / Hold instruction OID
-                # FIXME - implement code that treats hold instruction
-                # correctly
-                my $invalidity_date = $arrayref->[3];
-                $invalidity_date = DateTime->from_epoch(epoch => $invalidity_date);
-                $invalidity_date = OpenXPKI::DateTime::convert_date({
-                    DATE      => $invalidity_date,
-                    OUTFORMAT => 'openssltime',
-                });
-                $timestamp .= ',' . $invalidity_date;
-                ##! 16: 'invalidity date is present: ' . $timestamp
-            }
-        }
+                my $reason_code = $arrayref->[2];
+    	
+                if ($reason_code !~ m{ \A (?: unspecified | keyCompromise | CACompromise | affiliationChanged | superseded | cessationOfOperation | certificateHold | removeFromCRL ) \z }xms) {
+                    CTX('log')->log(
+                        MESSAGE => "Invalid reason code '" . $reason_code . "' specified",
+                        PRIORITY => 'warn',
+                        FACILITY => [ 'application' ],
+                    );
+                    $reason_code = 'unspecified';
+                } 
 
-
+                ##! 16: 'reason code is present: ' . $reason_code 
+        
+                # invaldity time is only expected when the reason is keyCompromise
+                if ( ($arrayref->[2] eq 'keyCompromise') && (scalar @{$arrayref} > 3) && $arrayref->[3]) {
+                    eval {         
+                        my $invalidity_date = OpenXPKI::DateTime::convert_date({
+                            DATE      => DateTime->from_epoch( epoch => $arrayref->[3] ),
+                            OUTFORMAT => 'generalizedtime',
+                        });
+                        ##! 16: 'invalidity date is present: ' . $invalidity_date . ' / ' . $arrayref->[3] 
+                        
+                        # openssl needs a special reason code keyword to pickup 
+                        # the invalidity time parameter
+                        $reason_code = 'keyTime,'.$invalidity_date;
+                    };
+                    if ($EVAL_ERROR) {
+                        CTX('log')->log(
+                            MESSAGE => "Unparsable invalidity_date given: " . $arrayref->[3],
+                            PRIORITY => 'warn',
+                            FACILITY => [ 'application' ],
+                        );    
+                    }
+                }
+                
+                # append reasonCode, includes invalidity time if set
+                $timestamp .= ',' . $reason_code;
+                
+            }
+	    }
         $serial = Math::BigInt->new ($serial);
         my $hex = substr ($serial->as_hex(), 2);
         $hex    = "0".$hex if (length ($hex) % 2);

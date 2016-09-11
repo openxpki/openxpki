@@ -28,8 +28,11 @@ sub init_structure {
         $self->logger->debug('Got landmarks: ' . Dumper $menu->{landmark});
         
         # tasklist, wfsearch, certsearch and bulk can have multiple branches
-        # using named keys. If a list is returned, we map this as "default"
-        foreach my $key (qw(wfsearch certsearch tasklist bulk)) {
+        # using named keys. We try to autodetect legacy formats and map
+        # those to a "default" key
+        
+        # config items are a list of hashes
+        foreach my $key (qw(tasklist bulk)) {
             
             if (ref $menu->{$key} eq 'ARRAY') {
                 $session->param($key, { 'default' => $menu->{$key} });
@@ -39,6 +42,32 @@ sub init_structure {
                 $session->param($key, { 'default' => [] });
             }
             $self->logger->debug("Got $key: " . Dumper $menu->{$key});    
+        }
+       
+        # top level is a hash that must have a "attributes" node
+        # legacy format was a single list of attributes 
+        foreach my $key (qw(wfsearch certsearch)) {
+            
+            # plain attributes
+            if (ref $menu->{$key} eq 'ARRAY') {
+                $session->param($key, { 'default' => { attributes => $menu->{$key} } } );
+            } elsif (ref $menu->{$key} eq 'HASH') {
+                $session->param($key, $menu->{$key} );
+            } else {
+                $session->param($key, { 'default' => {} });
+            }
+            $self->logger->debug("Got $key: " . Dumper $menu->{$key});    
+        }
+        
+        if ($menu->{ping}) {
+            my $ping;
+            if (ref $menu->{ping} eq 'HASH') {
+                $ping = $menu->{ping};
+                $ping->{timeout} *= 1000; # timeout is expected in ms 
+            } else {
+                $ping = { href => $menu->{ping}, timeout => 120000 };
+            }
+            $self->_result()->{ping} = $ping;
         }
         
     }

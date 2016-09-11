@@ -287,36 +287,61 @@ sub alias_add {
 
     $insert_hash{PKI_REALM} = $params{realm};
 
-    # Import of named tokens always ba group and generation
-    if ( $params{token} ) {
+    # Import is possible with symbolic token or group name
+    if ( $params{token} || $params{group} ) {
 
-        my $group = ($params{token} eq "root") ? 'root' :
-            CTX('config')->get("realm.$params{realm}.crypto.type.$params{token}");
+        my $group;  
+        if ($params{group}) {
+            $group = $params{group};
+        } else {
+            $group = ($params{token} eq "root") ? 'root' :
+                CTX('config')->get("realm.$params{realm}.crypto.type.$params{token}");
 
-        if (!$group) {
-            print STDERR "There is no token of type $params{token} defined\n";
-            return 2;
+            if (!$group) {
+                print STDERR "There is no token of type $params{token} defined\n";
+                return 2;
+            }
         }
-        # query aliases to get next generation id
-        my $next_generation = $dbi->first(
-            TABLE   => 'ALIASES',
-            DYNAMIC => {
-                PKI_REALM => $params{realm},
-                GROUP_ID => $group,
-            },
-            'ORDER' => [ 'GENERATION' ],
-            'REVERSE' => 1,
-        );
-        $insert_hash{GENERATION} = ($next_generation->{GENERATION} || 0) + 1;
+                
+        # explicit generation
+        if ($params{gen} && $params{gen} =~ m{\A \d+ \z}x) {
+        
+            # check for duplicate
+            my $check_duplicate = $dbi->first(
+                TABLE   => 'ALIASES',
+                DYNAMIC => {
+                    PKI_REALM => $params{realm},
+                    GROUP_ID => $group,
+                    GENERATION => $params{gen}
+                }
+            );
+            if ($check_duplicate) {
+                print STDERR sprintf("A token with generation %01d for group %s already exists:\n",
+                    $params{gen}, $params{token}, $check_duplicate->{IDENTIFIER});
+                __alias_print($check_duplicate);
+                return 2;
+            }
+        
+           $insert_hash{GENERATION} = $params{gen};
+           
+        # no generation, autodetected
+        } else {
+        
+            # query aliases to get next generation id
+            my $next_generation = $dbi->first(
+                TABLE   => 'ALIASES',
+                DYNAMIC => {
+                    PKI_REALM => $params{realm},
+                    GROUP_ID => $group,
+                },
+                'ORDER' => [ 'GENERATION' ],
+                'REVERSE' => 1,
+            );
+            $insert_hash{GENERATION} = ($next_generation->{GENERATION} || 0) + 1;
+        }
         $insert_hash{GROUP_ID} = $group;
         $insert_hash{ALIAS} = sprintf "%s-%01d", $group, $insert_hash{GENERATION};
-
-    } elsif ( $params{group} && $params{gen} ) {
-
-        $insert_hash{GENERATION} = $params{gen};
-        $insert_hash{GROUP_ID} = $params{group};
-        $insert_hash{ALIAS} = sprintf "%s-%01d", $params{group}, $params{gen};
-
+        
     } elsif ( !exists( $params{alias} ) || $params{alias} eq '' ) {
         print STDERR "Please specify an alias with --alias\n";
         return 1;
@@ -1622,8 +1647,8 @@ Import a certificate which issuer is not known in the "ServerCA" realm:
       --force-no-chain --realm ServerCA
 
 You can create an alias directly on import by adding either alias,
-generation/group or token to the command. This will execute the alias command
-with those paramters for the imported certificate inline.
+generation/group or token to the command. This will execute the alias 
+command with those paramters for the imported certificate inline.
 
 =item B<remove>
 
@@ -1749,16 +1774,32 @@ Example:
 
 =item B<add functional token with manual group configuration>
 
-The alias for is automatically set to <group>-<generation>, e.g. server-ca-1.
+The alias is automatically set to <group>-<generation>, e.g. server-ca-1.
+The generation identifier is increased by one from the latest one found 
+in the same group. 
 
-  --group           The name of the group (e.g. server-ca)
-  --generation      The numeric index to use for this alias
+  --group   The name of the group (e.g. server-ca)
+ 
+Example:
+
+    openxpkiadm alias --realm server-realm \
+        --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
+        --group server-ca 
+        
+=item B<explicit generation>
+
+If you need to force a certain generation identifier, you can skip the
+autodetection and provide the wanted index:
+        
+    --generation  The numeric index to use for this alias
+
+This works with both methods above, token and group. 
 
 Example:
 
     openxpkiadm alias --realm server-realm \
         --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
-        --group server-ca --gen 1
+        --group server-ca --generation 42 
 
 =item B<add non-functional alias>
 
