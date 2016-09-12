@@ -731,7 +731,7 @@ sub __clean_vars {
 
     # TT has issues with empty values so we delete keys without content
     map {
-        delete $vars->{$_} if ( ref $vars->{$_} eq '' && !$vars->{$_} );
+        delete $vars->{$_} if ( ref $vars->{$_} eq '' && (!defined $vars->{$_} || $vars->{$_} eq '') );
         delete $vars->{$_} if ( ref $vars->{$_} eq 'HASH' && (!%{$vars->{$_}}) );
         delete $vars->{$_} if ( ref $vars->{$_} eq 'ARRAY' && (!@{$vars->{$_}} || !$vars->{$_}->[0] ) );
     } keys(%{$vars});

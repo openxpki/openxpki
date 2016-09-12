@@ -45,26 +45,16 @@ sub execute {
     }
 
     # Render the DN - get the input data from the context
-    my $template_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
-    my $subject_vars = {};
-    # Remove the "cert_subject" prefix (old ui only)
-    ##! 16: 'Deserialized cert_subject_parts ' . Dumper $template_vars
-    foreach my $key (keys %{$template_vars}) {
-        
-        # Skip undefined values         
-        next unless (defined $template_vars->{$key});
-        
-        my $template_key;
-        if ($key =~ m{ \A cert_subject_(.*) \z }xms) {
-            $template_key = $1;
-        } else {
-            $template_key = $key;
-        }
-        $subject_vars->{$template_key} = $template_vars->{$key};
-        
-        # Escape Comma
-        $subject_vars->{$template_key} =~ s{,}{\\,}xmsg;
-    }
+    my $subject_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
+    
+    ##! 16: 'Deserialized cert_subject_parts ' . Dumper $subject_vars
+    
+    # TODO - this does not work! Will fail with non-scalar items and 
+    # crashes the search_cert method used in csr workflow!
+    map { 
+        $subject_vars->{$_} =~ s{,}{\\,}xmsg; 
+    } keys %{$subject_vars};
+    
 
     ##! 16: 'Cleaned subject_vars' . Dumper $subject_vars
 
