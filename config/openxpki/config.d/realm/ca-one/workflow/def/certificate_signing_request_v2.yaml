@@ -435,6 +435,7 @@ action:
             source: USER
         validator: 
           - global_cert_subject_parts
+          - global_common_name_length
 
 
     edit_validity:
