@@ -27,13 +27,11 @@ Controller = Em.Controller.extend
         return "alert-warning" if level is "warn"
         return "alert-info"
 
-    setupBootstrap: Em.on "didInsertElement", ->
-        $(".modal.oxi-main-modal").on "hidden.bs.modal", =>
-            @set "model.modal"
-
     autoshowModal: Em.observer "model.modal", ->
         $ ".modal.oxi-main-modal"
         .modal if @get "model.modal" then "show" else "hide"
+        .one "hidden.bs.modal", =>
+            @set "model.modal"
 
     autoshowErrorModal: Em.observer "model.error", ->
         $ ".modal.oxi-error-modal"
