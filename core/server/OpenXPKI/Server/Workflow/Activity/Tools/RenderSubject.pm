@@ -52,7 +52,7 @@ sub execute {
     # TODO - this does not work! Will fail with non-scalar items and 
     # crashes the search_cert method used in csr workflow!
     map { 
-        $subject_vars->{$_} =~ s{,}{\\,}xmsg; 
+        $subject_vars->{$_} =~ s{,}{\\,}xmsg if ($subject_vars->{$_} && !ref $subject_vars->{$_}); 
     } keys %{$subject_vars};
     
 
