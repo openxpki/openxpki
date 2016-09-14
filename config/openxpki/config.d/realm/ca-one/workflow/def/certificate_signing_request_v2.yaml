@@ -13,7 +13,7 @@ state:
     BUILD_SUBJECT:
         autorun: 1
         action:
-          - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate > SUBJECT_COMPLETE
+          - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate check_policy_key_duplicate > SUBJECT_COMPLETE
 
     UPDATE_REQUEST:
         autorun: 1
@@ -155,6 +155,7 @@ state:
           - policy_comment
           - check_policy_dns
           - check_policy_subject_duplicate
+          - check_policy_key_duplicate
           - notbefore
           - notafter
           - cert_profile
@@ -184,6 +185,7 @@ state:
           - policy_comment
           - check_policy_dns
           - check_policy_subject_duplicate
+          - check_policy_key_duplicate
           - notbefore
           - notafter
           - cert_profile
@@ -233,6 +235,7 @@ state:
           - policy_comment
           - check_policy_dns
           - check_policy_subject_duplicate
+          - check_policy_key_duplicate
           - notbefore
           - notafter
           - cert_profile
@@ -317,6 +320,7 @@ state:
           - cert_subject_alt_name
           - check_policy_dns
           - check_policy_subject_duplicate
+          - check_policy_key_duplicate
           - cert_profile
           - cert_info
         button:
@@ -352,7 +356,7 @@ state:
     RUN_POLICY_CHECKS:
         autorun: 1
         action:
-          - check_policy_dns check_policy_subject_duplicate > CHECK_POLICY_VIOLATION
+          - check_policy_dns check_policy_subject_duplicate check_policy_key_duplicate > CHECK_POLICY_VIOLATION
 
     CANCELED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL
@@ -393,6 +397,9 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicySubjectDuplicate
         param:
            allow_renewal_period: "+0003"
+
+    check_policy_key_duplicate:
+        class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyKeyDuplicate
 
     cleanup_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
@@ -618,7 +625,7 @@ action:
           - csr_type
         validator:
           - global_pkcs10_valid
-          - global_key_reuse
+#          - global_key_reuse
           - global_key_params
 
 condition:
@@ -660,7 +667,7 @@ condition:
     has_policy_violation:
         class: Workflow::Condition::Evaluate
         param:
-            test: $context->{check_policy_dns} || $context->{check_policy_subject_duplicate}
+            test: $context->{check_policy_dns} || $context->{check_policy_subject_duplicate} || $context->{check_policy_key_duplicate}
 
     has_password_in_context:
         class: Workflow::Condition::Evaluate
@@ -760,6 +767,19 @@ field:
             [% END %]
           [% END %]
 
+    check_policy_key_duplicate:
+        label: Failed Policy Check Key Duplicate
+        name: check_policy_key_duplicate
+        format: rawlist
+        template: >
+          [% USE Certificate %]
+          [% IF value %]
+            CN / Identifier |
+            [% FOREACH identifier = value %]
+              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
+                [% Certificate.dn(identifier,'CN') %] / [% identifier %]</a>| 
+            [% END %]
+          [% END %]
 
     csr_type:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_LABEL

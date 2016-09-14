@@ -31,6 +31,7 @@ use Data::Dumper;
 
 use Class::Std;
 use Math::BigInt;
+use Crypt::PKCS10;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -42,6 +43,7 @@ use OpenXPKI::Control;
 use DateTime;
 use List::Util qw(first);
 
+use Digest::SHA qw(sha1_hex);
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
 sub START {
@@ -155,6 +157,46 @@ sub generate_key {
     my $key = $token->command( $command );
 
     return $key;
+
+}
+
+=head2 get_key_identifier_from_data
+
+returns the key identifier (sha1 hash of the public key bit string) of the
+given data as string, uppercased hex with colons. 
+
+=over
+
+=item DATA
+
+Data, encoded as given by FORMAT parameter.
+
+=item FORMAT
+
+* PKCS10: PEM encoded PKCS10 block
+
+=back
+
+=cut
+
+sub get_key_identifier_from_data {
+    
+    ##! 1: "start"
+    my $self = shift;
+    my $args = shift;
+
+    # as we currently only support PKCS10 and the parameter is checked
+    # by the API, we dont need any ifs here.
+    
+    Crypt::PKCS10::setAPIversion(1);
+    my $decoded = Crypt::PKCS10->new( $args->{DATA} );
+    
+    if (!$decoded) {
+      OpenXPKI::Exception->throw( message => 'Unable to parse data in get_key_identifier_from_data' );
+    }
+    
+    return uc(join ':', (unpack '(A2)*', sha1_hex( 
+        $decoded->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0] )));
 
 }
 
@@ -744,6 +786,10 @@ supports a facility to search certificates. It supports the following parameters
 =item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR) 
 
 =item * ENTITY_ONLY (show only certificates issued by this ca)
+
+=item * SUBJECT_KEY_IDENTIFIER
+ 
+=item * AUTHORITY_KEY_IDENTIFIER
 
 =back
 

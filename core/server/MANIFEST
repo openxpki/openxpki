@@ -264,6 +264,7 @@ OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicyDNS.pm
 OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicySubjectDuplicate.pm
+OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicyKeyDuplicate.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm

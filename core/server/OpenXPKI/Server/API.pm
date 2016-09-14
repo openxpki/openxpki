@@ -1001,7 +1001,19 @@ sub BUILD {
                 },
             },
         },
-
+        'get_key_identifier_from_data' => {
+            class  => 'Object',
+            params => {
+                DATA => {
+                    type    => SCALAR,
+                },
+                FORMAT => {
+                    type    => SCALAR,
+                    regex   => qr{ \A (PKCS10) \z }xms, 
+                }
+                
+            },
+        },
         'set_data_pool_entry' => {
             class  => 'Object',
             params => {
