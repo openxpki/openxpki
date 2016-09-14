@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-09-12 15:30+0100\n"
+"PO-Revision-Date: 2016-09-14 13:32+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -847,6 +847,10 @@ msgstr "unknown"
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "upcoming"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
+msgstr "PKCS10 request is not properly formated"
+
 msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
 msgstr "You do not have the required privileges to access the workflow history"
 
@@ -917,6 +921,24 @@ msgstr "The provided key is too short"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "A certificate with the same public key already exists!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED"
+msgstr "PKCS10 request is not properly formated"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED"
+msgstr "The provided key is too short"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10"
+msgstr "PKCS10 request can not be read"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED"
+msgstr ""
+"The common name which will be created from the information below exceeds the "
+"allowed length of 64 characters."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 msgstr "PKCS10 request is not properly formated"
@@ -1343,6 +1365,9 @@ msgstr "Successful Workflows"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
+msgstr "Recheck Eligibility"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Submit with Policy Exception"

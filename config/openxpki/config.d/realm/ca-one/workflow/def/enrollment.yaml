@@ -17,10 +17,10 @@ state:
     APPROVALS_CALCULATED:
         autorun: 1
         action:
-          - set_error_not_approved > FAILURE ?  !allow_manual_approval  !have_all_approvals
-          - notify_pending_approval set_error_not_approved > PENDING_APPROVAL ? allow_manual_approval  !have_all_approvals
+          - set_error_not_approved > FAILURE ?  !allow_manual_approval_or_eligibility_recheck  !have_all_approvals
+          - notify_pending_approval set_error_not_approved > PENDING_APPROVAL ? allow_manual_approval_or_eligibility_recheck !have_all_approvals 
           - global_noop2 > APPROVED ? have_all_approvals
-
+          
     APPROVED:
         autorun: 1
         action:
@@ -190,7 +190,8 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC
         action:
-          - approve_csr global_clear_error_code > APPROVAL ? global_is_operator
+          - eval_eligibility global_clear_error_code > APPROVAL ? allow_eligibility_recheck
+          - approve_csr global_clear_error_code > APPROVAL ? global_is_operator allow_manual_approval
           - reject_request set_error_not_approved > FAILURE ? global_is_operator
 
         output:
@@ -212,6 +213,9 @@ state:
         button:
           approve_csr:
             format: expected
+          eval_eligibility:
+            format: alternative
+            label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL
           reject_request:
             format: failure
 
@@ -534,6 +538,18 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{p_allow_man_authen};
+
+    allow_eligibility_recheck:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_allow_eligibility_recheck};
+            
+    allow_manual_approval_or_eligibility_recheck:
+        class: Workflow::Condition::LazyOR
+        param:
+            condition1: scep_allow_manual_approval
+            condition2: scep_allow_eligibility_recheck
+
 
     allow_anonymous_enrollment:
         class: Workflow::Condition::Evaluate
