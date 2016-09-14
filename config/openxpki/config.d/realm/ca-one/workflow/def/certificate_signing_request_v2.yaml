@@ -619,6 +619,7 @@ action:
         validator:
           - global_pkcs10_valid
           - global_key_reuse
+          - global_key_params
 
 condition:
     is_certificate_issued:

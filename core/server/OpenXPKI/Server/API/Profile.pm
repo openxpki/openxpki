@@ -637,6 +637,8 @@ sub get_key_algs {
     # Filter argument starting with underscore
     if (!$nohide) {
         @alg = grep { $_ !~ /^_/ } @alg;
+    } else {
+        map { $_ =~ s/\A_// } @alg;
     }
 
     return \@alg;
@@ -670,6 +672,8 @@ sub get_key_enc {
     # Filter argument starting with underscore
     if (!$nohide) {
         @enc = grep { $_ !~ /^_/ } @enc;
+    } else {
+        map { $_ =~ s/\A_// } @enc;
     }
 
     return \@enc;
@@ -716,6 +720,8 @@ sub get_key_params {
         my @param = $config->get_list( [ 'profile', $profile, 'key', $algorithm, $key ] );
         if (!$nohide) {
             @param = grep { $_ !~ /^_/ } @param;
+        } else {
+            map { $_ =~ s/\A_// } @param;
         }
         $params->{$key} = \@param if (@param);
     }

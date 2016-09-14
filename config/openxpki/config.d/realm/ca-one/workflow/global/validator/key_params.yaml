@@ -1,0 +1,4 @@
+class: OpenXPKI::Server::Workflow::Validator::KeyParams
+arg:
+   - $cert_profile
+   - $pkcs10
