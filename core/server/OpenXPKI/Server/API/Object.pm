@@ -289,6 +289,7 @@ sub get_cert {
         $return_ref->{BODY}->{NOTBEFORE} = $return_ref->{BODY}->{NOTBEFORE}->epoch();
         $return_ref->{BODY}->{NOTAFTER}  = $return_ref->{BODY}->{NOTAFTER}->epoch();
         $return_ref->{STATUS}            = $hash->{STATUS};
+        $return_ref->{IDENTIFIER}        = $hash->{IDENTIFIER};
         $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
         $return_ref->{CSR_SERIAL}        = $hash->{CSR_SERIAL};
         $return_ref->{PKI_REALM}         = $hash->{PKI_REALM};
