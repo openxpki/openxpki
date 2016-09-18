@@ -334,6 +334,7 @@ WriteMakefile(
     'Crypt::OpenSSL::AES'    => '0.02',
     'Crypt::PKCS10'          => '1',
     'DBD::Mock'              => '1.45',
+    'DBIx::Handler'          => '0.14', # for OpenXPKI::Server::Database
 #    'DBI'                    => '1', # A prerequisite for Workflow, see below
     'Data::UUID'            => '0',
     'Data::Password'         => '1.07',
@@ -363,6 +364,7 @@ WriteMakefile(
 #    'MIME::Base64'           => '1', # A core module since perl v5.7.3
     'MIME::Entity'           => 0,
     'Moose'                  => '1',
+    'MooseX::Params::Validate' => '0.21', # for OpenXPKI::Server::Database
     'NetAddr::IP'            => '0',
     'Net::DNS'                => '0.83',
     'Net::IP'                => '1',
@@ -377,6 +379,7 @@ WriteMakefile(
     'Proc::SafeExec'         => '1.4',
     'Regexp::Common'         => '2',
     'SOAP::Lite'             => '0',
+    'SQL::Abstract::More'    => '1.28', # for OpenXPKI::Server::Database
     'Switch'                 => '1',
     'Sys::SigAction'         => '0.06',
     'Template'               => '2.15',
