@@ -182,6 +182,11 @@ OpenXPKI/Server/DBI/Driver/Oracle.pm
 OpenXPKI/Server/DBI/Driver/PostgreSQL.pm
 OpenXPKI/Server/DBI/Driver/SQLite.pm
 
+## new database interface of the server
+
+OpenXPKI/Server/Database.pm
+OpenXPKI/Server/Database/Query.pm
+
 ## logging interface
 
 OpenXPKI/Server/Log.pm
