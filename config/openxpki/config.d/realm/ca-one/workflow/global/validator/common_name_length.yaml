@@ -1,0 +1,5 @@
+class: OpenXPKI::Server::Workflow::Validator::CommonNameLength
+arg: 
+  - $cert_profile
+  - $cert_subject_style
+  - $cert_subject_parts

@@ -10,6 +10,42 @@ use OpenXPKI::DN;
 use Math::BigInt;
 use Digest::SHA qw(sha1_base64);
 
+
+has __default_grid_head => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    
+    default => sub { return [
+        { sTitle => "Serial", sortkey => 'CERTIFICATE.CERTIFICATE_SERIAL' },
+        { sTitle => "Subject", sortkey => 'CERTIFICATE.SUBJECT' },
+        { sTitle => "Status", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
+        { sTitle => "Notbefore", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
+        { sTitle => "Notafter", format => 'timestamp', sortkey => 'CERTIFICATE.NOTAFTER' },
+        { sTitle => "Issuer", sortkey => 'CERTIFICATE.ISSUER_DN'},
+        { sTitle => "Identifier", sortkey => 'CERTIFICATE.IDENTIFIER'},
+        { sTitle => 'identifier', bVisible => 0 },
+        { sTitle => "_className"},
+    ]; }
+);
+
+has __default_grid_row => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { return [
+        { source => 'certificate', field => 'CERTIFICATE_SERIAL' },
+        { source => 'certificate', field => 'SUBJECT' },
+        { source => 'certificate', field => 'STATUS' },
+        { source => 'certificate', field => 'NOTBEFORE' },
+        { source => 'certificate', field => 'NOTAFTER' },
+        { source => 'certificate', field => 'ISSUER_DN' },
+        { source => 'certificate', field => 'IDENTIFIER' },
+        { source => 'certificate', field => 'IDENTIFIER' },
+        { source => 'certificate', field => 'CERTSTATUS' },
+    ]; }
+);
+
 extends 'OpenXPKI::Client::UI::Result';
 
 sub BUILD {
@@ -162,7 +198,13 @@ sub init_result {
         $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
     }
 
-    my @result = $self->__render_result_list( $search_result );
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+    
+    my $header = $result->{header};
+    $header = $self->__default_grid_head() if(!$header);
+
+    my @result = $self->__render_result_list( $search_result, $body );
     
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
@@ -176,17 +218,7 @@ sub init_result {
                 icon => 'download',
                 target => 'modal'
             }], 
-            columns => [
-                { sTitle => "Serial", sortkey => 'CERTIFICATE.CERTIFICATE_SERIAL' },
-                { sTitle => "Subject", sortkey => 'CERTIFICATE.SUBJECT' },
-                { sTitle => "Status", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
-                { sTitle => "Notbefore", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
-                { sTitle => "Notafter", format => 'timestamp', sortkey => 'CERTIFICATE.NOTAFTER' },
-                { sTitle => "Issuer", sortkey => 'CERTIFICATE.ISSUER_DN'},
-                { sTitle => "Identifier", sortkey => 'CERTIFICATE.IDENTIFIER'},
-                { sTitle => "_className"},
-                { sTitle => "identifier", bVisible => 0 },
-            ],
+            columns => $header,
             data => \@result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
@@ -254,7 +286,10 @@ sub init_pager {
     
     $self->logger()->trace( "search result: " . Dumper $search_result);
      
-    my @result = $self->__render_result_list( $search_result ); 
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+     
+    my @result = $self->__render_result_list( $search_result, $body ); 
         
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
@@ -325,7 +360,7 @@ sub init_mine {
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC',
     });
     
-    my @result = $self->__render_result_list( $search_result );
+    my @result = $self->__render_result_list( $search_result, $self->__default_grid_row() );
      
     $self->logger()->trace( "dumper result: " . Dumper @result);
     
@@ -339,17 +374,7 @@ sub init_mine {
                 icon => 'download',
                 target => 'modal'
             }], 
-            columns => [
-                { sTitle => "Serial"},
-                { sTitle => "Subject" },
-                { sTitle => "Status", format => 'certstatus' },
-                { sTitle => "Notbefore", format => 'timestamp' },
-                { sTitle => "Notafter", format => 'timestamp' },
-                { sTitle => "Issuer"},
-                { sTitle => "Identifier"},
-                { sTitle => "_className"},
-                { sTitle => "identifier", bVisible => 0 },
-            ],
+            columns => $self->__default_grid_head(),
             data => \@result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
             pager => $pager,
@@ -589,17 +614,14 @@ sub init_related {
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL',
             actions => [{
                 path => 'workflow!load!wf_id!{serial}',
-                label => 'Open Workflow',
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
                 target => 'tab',
             }],
             columns => [
-                { sTitle => "serial" },
-                #{ sTitle => "updated" },
-                { sTitle => "type"},
-                { sTitle => "state"},
-                #{ sTitle => "procstate"},
-                #{ sTitle => "wake up"},
+                { sTitle => "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL" },
+                { sTitle => "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"},
+                { sTitle => "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"},
             ],
             data => \@result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
@@ -962,6 +984,15 @@ sub action_search {
         return $self->init_search({ preset => $input });
     }
     
+    # check if there is a custom column set defined
+    my ($header,  $body);    
+    if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
+        ($header, $body) = $self->__render_list_spec( $spec->{cols} );
+    } else {
+        $body = $self->__default_grid_row;
+        $header = $self->__default_grid_head;
+    }
+    
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_cert_'.$queryid, {
         'id' => $queryid,
@@ -969,7 +1000,8 @@ sub action_search {
         'count' => $result_count,
         'query' => $query,
         'input' => $input,
-        'column' =>[] 
+        'header' => $header,
+        'column' => $body,
     });
  
     $self->redirect( 'certificate!result!id!'.$queryid  );
@@ -1063,26 +1095,81 @@ sub __render_result_list {
 
     my $self = shift;
     my $search_result = shift;
-    #my $colums = shift;
+    my $colums = shift;
     
     my @result;
     foreach my $item (@{$search_result}) {
-        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
 
-        push @result, [
-            $item->{CERTIFICATE_SERIAL},
-            $self->_escape($item->{SUBJECT}),
-            { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} },
-            $item->{NOTBEFORE},
-            $item->{NOTAFTER},
-            $self->_escape($item->{ISSUER_DN}),
-            $item->{IDENTIFIER},
-            lc($item->{STATUS}),
-            $item->{IDENTIFIER},
-        ]
+        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+            
+        my @line;
+        foreach my $col (@{$colums}) {
+            if ($col->{field} eq 'STATUS') {
+                push @line, { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} };        
+            } elsif ($col->{field} eq 'STATUSCLASS') {
+                push @line, lc($item->{STATUS});
+            } else {
+                push @line, lc($item->{  $col->{field} });
+            }
+        }
+        push @result, \@line;
+
     }
 
-    return @result;    
+    return @result;
+
+}
+
+
+=head2 __render_list_spec
+
+Create array to pass to UI from specification in config file
+
+=cut 
+
+sub __render_list_spec {
+
+    my $self = shift;
+    my $cols = shift;
+    
+    my @header;
+    my @column;
+    
+    for (my $ii = 0; $ii < scalar @{$cols}; $ii++) {
+        
+        # we must create a copy as we change the hash in the session info otherwise
+        my %col = %{$cols->[$ii]};
+        my $head = { sTitle => $col{label} };
+        if ($col{sortkey}) {
+            $head->{sortkey} = $col{sortkey};
+        }
+        if ($col{format}) {
+            $head->{format} = $col{format};
+        }
+        push @header, $head; 
+
+        if ($col{template}) {
+
+        } elsif ($col{field} =~ m{\A (csr|attribute)\.(\S+) }xi) {
+            # we use this later to avoid the pattern match
+            $col{source} = $1;
+            $col{field} = $2;
+
+        } else {
+            $col{source} = 'certificate';
+            $col{field} = uc($col{field})
+
+        }
+        push @column, \%col;
+    }
+
+    push @header, { sTitle => 'serial', bVisible => 0 };
+    push @header, { sTitle => "_className"};
+
+    push @column, { source => 'certificate', field => 'IDENTIFIER' };
+    push @column, { source => 'certificate', field => 'STATUSCLASS' };
+    
+    return ( \@header, \@column );
 }
 1;
  

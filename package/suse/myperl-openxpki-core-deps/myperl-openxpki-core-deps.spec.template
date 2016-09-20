@@ -112,25 +112,12 @@ find %{buildroot} -name "perllocal.pod" \
     |xargs -i rm -f {}
 
 # myperl issue #2 - until I can get Pinto running, just remove the offending files
-# Note: since this is a nasty kludge, I'll leave the fail-on-error behavior.
-#
 # DESTDIR = %{buildroot}
-set -e
-rm -rf \
-		$DESTDIR/$VENDORMAN3EXP/List::Util* \
-		$DESTDIR/$VENDORMAN3EXP/Scalar::Util* \
-		$DESTDIR/$VENDORMAN3EXP/Sub::Util* \
-		$DESTDIR/$VENDORMAN3EXP/CPAN::Meta* \
-		$DESTDIR/$VENDORMAN3EXP/Module::Build* \
-		$DESTDIR/$VENDORLIB/Module/Build.pm \
-		$DESTDIR/$VENDORLIB/Module/Build \
-		$DESTDIR/$ARCHLIB/auto/Module/Build 
-# myperl issue #2 - let's just trash these for now
-rm -rf \
-		$DESTDIR/$VENDORSCRIPTEXP/config_data \
-		$DESTDIR/$VENDORMAN1EXP/config_data.1 \
-		$DESTDIR/$VENDORMAN3EXP/inc::latest.3 \
-		$DESTDIR/$VENDORLIB/inc
+
+# This kludge automates the above explicit listing of files...
+rpm -ql myperl myperl-buildtools \
+    | perl -ne "chomp; print \"$DESTDIR/\$_\\n\" if -f \"$DESTDIR\$_\";" \
+    | xargs rm -v
 
 # TODO: SOAPsh.pl has /bin/env in shebang, which causes a dependency
 # problem when rpm searches for automatic dependencies

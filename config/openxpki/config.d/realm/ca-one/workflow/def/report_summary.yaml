@@ -40,7 +40,7 @@ action:
         param:
             near_expiry: +0000045
             recent_expiry: -0000030
-            valid_at: 20150701
+            _map_valid_at: $valid_at
   
 field:
     valid_at:

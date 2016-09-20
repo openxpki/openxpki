@@ -67,7 +67,7 @@ sub get_hash {
     # To prevent loading the same item again and again, we always cache
     # the last hash and reuse it 
 
-    if ($self->{_hash} && $self->{_hash}->{IDENTIFIER} eq $cert_id) {
+    if ($self->{_hash} && ($self->{_hash}->{IDENTIFIER} eq $cert_id)) {
         return $self->{_hash};
     }
 

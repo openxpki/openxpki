@@ -9,6 +9,7 @@ use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
 use Encode;
+use CGI 4.08;
 
 use Data::Dumper;
 

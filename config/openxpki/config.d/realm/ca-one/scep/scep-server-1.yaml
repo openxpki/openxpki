@@ -35,7 +35,8 @@ authorized_signer_on_behalf:
 policy:         
     allow_anon_enroll: 0
     allow_man_authen: 1
-    allow_man_approv: 1        
+    allow_man_approv: 1
+    allow_eligibility_recheck: 0
     max_active_certs: 1
     allow_expired_signer: 0
     auto_revoke_existing_certs: 1

@@ -57,13 +57,17 @@ sub execute {
         return 1;
     }
 
-    my $csr_key_size = $csr_body->{KEYSIZE};
     my $csr_key_type = $csr_body->{PUBKEY_ALGORITHM};
 
-    $context->param('csr_subject' => $csr_subject);
-    $context->param('csr_key_size' => $csr_key_size );
-    $context->param('csr_key_type' => $csr_key_type );
+    if ($csr_key_type eq 'rsaEncryption') {
+        $context->param('csr_key_alg' => 'rsa' );
+        $context->param('csr_key_params' => { key_length =>  $csr_body->{KEYSIZE} });
+    } else {
+        # tbd ecc, dsa
+        $context->param('csr_key_alg' => $csr_key_type );
+    }
 
+    $context->param('csr_subject' => $csr_subject);
 
     my $cert_profile = $context->param( 'cert_profile' );
     my $cert_subject_style = $context->param( 'cert_subject_style' );

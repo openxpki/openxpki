@@ -182,6 +182,11 @@ OpenXPKI/Server/DBI/Driver/Oracle.pm
 OpenXPKI/Server/DBI/Driver/PostgreSQL.pm
 OpenXPKI/Server/DBI/Driver/SQLite.pm
 
+## new database interface of the server
+
+OpenXPKI/Server/Database.pm
+OpenXPKI/Server/Database/Query.pm
+
 ## logging interface
 
 OpenXPKI/Server/Log.pm
@@ -264,6 +269,7 @@ OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicyDNS.pm
 OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicySubjectDuplicate.pm
+OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicyKeyDuplicate.pm
 
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
@@ -274,6 +280,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
+OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
 OpenXPKI/Server/Workflow/Activity/Tools/LoadPolicy.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetAttribute.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
@@ -408,8 +415,10 @@ OpenXPKI/Server/Workflow/Condition/Smartcard/AuthIdValid.pm
 OpenXPKI/Server/Workflow/Validator.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
+OpenXPKI/Server/Workflow/Validator/CommonNameLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyReuse.pm
+OpenXPKI/Server/Workflow/Validator/KeyParams.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/PasswordQuality.pm
 OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm

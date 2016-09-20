@@ -37,6 +37,8 @@ main:
         label: I18N_OPENXPKI_UI_MENU_MANAGE_SECRET
       - key:   workflow!start!wf_type!ca_publish
         label: I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL
+      - key:   workflow!index!wf_type!set_motd
+        label: I18N_OPENXPKI_UI_MENU_SET_MOTD
 
 
   - key:   info
