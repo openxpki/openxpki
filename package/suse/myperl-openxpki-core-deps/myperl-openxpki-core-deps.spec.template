@@ -116,7 +116,7 @@ find %{buildroot} -name "perllocal.pod" \
 
 # This kludge automates the above explicit listing of files...
 rpm -ql myperl myperl-buildtools \
-    | perl -ne "chomp; print \"$DESTDIR/\$_\\n\" if -f \"$DESTDIR\$_\";" \
+    | perl -ne "chomp; print \"$DESTDIR/\$_ \" if -f \"$DESTDIR\$_\";" \
     | xargs rm -v
 
 # TODO: SOAPsh.pl has /bin/env in shebang, which causes a dependency
