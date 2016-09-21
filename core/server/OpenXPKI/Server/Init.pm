@@ -24,6 +24,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server;
 use OpenXPKI::Server::DBI;
+use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Log::CLI;
@@ -59,6 +60,7 @@ my @init_tasks = qw(
   prepare_daemon
   dbi_backend
   dbi_workflow
+  dbi
   crypto_layer
   api
   workflow_factory
@@ -393,6 +395,45 @@ sub __do_init_dbi_log {
     CTX('dbi_log')->connect();
 }
 
+
+sub __do_init_dbi {
+
+    my $args = shift;
+
+    ##! 1: "start"
+
+    my $config = CTX('config');
+    my %params;
+
+    my $dbpath = [ 'system','database','main' ];
+
+    %params = (
+        log => CTX('log')
+    );
+
+    my $db_config = $config->get_hash( $dbpath );
+
+    foreach my $key (qw(type name namespace host port user passwd)) {
+        ##! 16: "dbi: $key => " . $db_config->{$key}
+        $params{'db_'.$key} = $db_config->{$key} || '';
+    }
+
+    # db_type is lowercased in dbd but CamelCased in the current config
+    $params{db_type} = lc($params{db_type});
+    
+    # environment
+    my $db_env = $config->get_hash("$dbpath.environment");
+    foreach my $env_name (keys %{$db_env}) {
+        my $env_value = $db_env->{$env_name};
+        $ENV{$env_name} = $env_value;
+        ##! 4: "DBI Environment: $env_name => $env_value"
+    }
+
+   OpenXPKI::Server::Context::setcontext({
+        dbi => OpenXPKI::Server::Database->new(\%params),
+    });
+    
+}
 
 sub __do_init_acl {
     ### init acl...

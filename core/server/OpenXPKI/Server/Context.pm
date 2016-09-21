@@ -31,6 +31,7 @@ my $context = {
         pki_realm_by_cfg => undef,
     	volatile_vault   => undef,
     	log              => undef,
+    	dbi              => undef, # v2.0 sql layer!
     	dbi_backend      => undef,
     	dbi_workflow     => undef,
     	dbi_log          => undef,
