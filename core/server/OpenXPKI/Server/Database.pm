@@ -24,7 +24,7 @@ has 'db_table_prefix' => ( is => 'ro', isa => 'Str' );
 has 'db_host'         => ( is => 'ro', isa => 'Str' );
 has 'db_port'         => ( is => 'ro', isa => 'Int' );
 has 'db_user'         => ( is => 'ro', isa => 'Str' );
-has 'db_password'     => ( is => 'ro', isa => 'Str' );
+has 'db_passwd'     => ( is => 'ro', isa => 'Str' );
 
 #
 # Other attributes
@@ -70,7 +70,7 @@ sub _build_connector {
     };
     ##! 4: "DSN: $dsn"
     ##! 4: "Attributes: " . join " | ", map { $_." = ".$attr_hash->{$_} } keys %$attr_hash
-    return DBIx::Handler->new($dsn, $self->db_user, $self->db_password, $attr_hash);
+    return DBIx::Handler->new($dsn, $self->db_user, $self->db_passwd, $attr_hash);
 }
 
 #
@@ -173,7 +173,7 @@ OpenXPKI::Server::Database - Entry point for database related functions
         db_name     => 'openxpki',
         db_host     => '127.0.0.1',
         db_user     => 'oxi',
-        db_password => 'gen',
+        db_passwd => 'gen',
     });
 
     # total count
@@ -211,7 +211,7 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 =item * B<db_user> - Database username (I<Str>)
 
-=item * B<db_password> - Database password (I<Str>)
+=item * B<db_passwd> - Database password (I<Str>)
 
 =back
 
