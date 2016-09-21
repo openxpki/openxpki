@@ -83,3 +83,5 @@ libmodule-install-perl
 libsoap-lite-perl
 dh-make-perl
 libossp-uuid-perl
+libdbix-handler-perl
+libmoosex-params-validate-perl
