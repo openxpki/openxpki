@@ -2313,6 +2313,10 @@ msgstr "Certificati Validi"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "Soggetti Distinti Validi"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
+msgstr "Certificati Revocati"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Azione richiesta non disponibile"
 
