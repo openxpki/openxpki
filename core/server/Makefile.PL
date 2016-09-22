@@ -335,6 +335,7 @@ WriteMakefile(
     'Crypt::PKCS10'          => '1',
     'DBD::Mock'              => '1.45',
     'DBIx::Handler'          => '0.14', # for OpenXPKI::Server::Database
+    'DBIx::TransactionManager' => '1.13',
 #    'DBI'                    => '1', # A prerequisite for Workflow, see below
     'Data::UUID'            => '0',
     'Data::Password'         => '1.07',
