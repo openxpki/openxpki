@@ -951,6 +951,11 @@ sub BUILD {
                     type     => SCALAR,
                     regex    => $re_alpha_string
                 },
+                NOHIDE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             }
         },
         'get_key_enc' => {
@@ -959,7 +964,12 @@ sub BUILD {
                 PROFILE => {
                     type     => SCALAR,
                     regex    => $re_alpha_string
-                }
+                },
+                NOHIDE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             }
         },
         'get_key_params' => {
@@ -974,6 +984,11 @@ sub BUILD {
                     regex    => $re_alpha_string,
                     optional => 1,
                 },
+                NOHIDE => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_boolean,
+                },
             }
         },
 
@@ -986,7 +1001,19 @@ sub BUILD {
                 },
             },
         },
-
+        'get_key_identifier_from_data' => {
+            class  => 'Object',
+            params => {
+                DATA => {
+                    type    => SCALAR,
+                },
+                FORMAT => {
+                    type    => SCALAR,
+                    regex   => qr{ \A (PKCS10) \z }xms, 
+                }
+                
+            },
+        },
         'set_data_pool_entry' => {
             class  => 'Object',
             params => {

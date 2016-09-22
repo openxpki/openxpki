@@ -2078,6 +2078,7 @@ adds exception/paused label to the state column and status class based on
 proc and wf state.
 
 =cut
+
 sub __render_result_list {
 
     my $self = shift;
@@ -2178,7 +2179,9 @@ sub __render_result_list {
 
 }
 
-=head2 __render_list_head
+=head2 __render_list_spec
+
+Create array to pass to UI from specification in config file
 
 =cut 
 
@@ -2197,6 +2200,9 @@ sub __render_list_spec {
         my $head = { sTitle => $col{label} };
         if ($col{sortkey}) {
             $head->{sortkey} = $col{sortkey};
+        }
+        if ($col{format}) {
+            $head->{format} = $col{format};
         }
         push @header, $head; 
 

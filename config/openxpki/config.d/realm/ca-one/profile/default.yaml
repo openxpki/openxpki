@@ -36,6 +36,10 @@ key:
           - c2tnb191v1
           - prime239v1
           - sect571r1
+          
+        key_length:
+          - _192
+          - _256
 
     dsa:
         key_length:
