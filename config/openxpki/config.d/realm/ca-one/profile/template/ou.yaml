@@ -1,6 +1,7 @@
 id: OU
 label: OU
 description: I18N_OPENXPKI_UI_PROFILE_OU_DESC
+preset: OU.X 
 type: freetext
 width: 40
 min: 0

@@ -75,6 +75,23 @@ sub execute {
     my %hashed_dn = OpenXPKI::DN->new( $csr_subject )->get_hashed_content();
     ##! 32: 'DN ' . Dumper \%hashed_dn
 
+    my $csr_san = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });
+    ##! 16: 'Found san in csr :' . Dumper $csr_san
+    
+    # Merge SANs into DN hash
+    if ($csr_san) {
+        foreach my $san_type (keys %{$csr_san}) {
+            # to make it easier for the user, we uppercase all names
+            # as some SAN items can be part of the DN, we add a SAN_ prefix
+            if (defined $csr_san->{$san_type} && 
+                ref $csr_san->{$san_type} eq 'ARRAY' && 
+                scalar @{$csr_san->{$san_type}}) {
+             
+                $hashed_dn{'SAN_'.uc($san_type)} = $csr_san->{$san_type};
+            }
+        } 
+    }
+
     # Load the field spec for the subject
     my $fields = CTX('api')->get_field_definition( { PROFILE => $cert_profile, STYLE => $cert_subject_style, SECTION => 'subject' });
 
@@ -86,37 +103,67 @@ sub execute {
         my $preset = $field->{PRESET};
         next FIELDS unless ($preset);
 
-        my $val;
-        # Fast path, copy from DN
-        if ($preset =~ m{ \A \s* (\w+)(\.(\d+))? \s* \z }xs) {
+        # clonable field with iteration marker "X"
+        my @val;
+        if ($preset =~ m{ \A \s* (\w+)\.X \s* \z }xs) {
+            my $comp = $1;
+            ##! 32: 'Hashed DN Component ' . Dumper $hashed_dn{$comp}
+            for my $v (@{$hashed_dn{$comp}}) {
+                ##! 16: 'clonable iterator value ' . $v
+                push @val, $v if (defined $v && $v ne '');
+            }
+            
+        # Fast path, copy from DN     
+        } elsif ($preset =~ m{ \A \s* (\w+)(\.(\d+))? \s* \z }xs) {
             my $comp = $1;
             my $pos = $3 || 0;
-            $val = $hashed_dn{$comp}[$pos];
-            if ($val) {
-                $cert_subject_parts->{ $field->{ID} } = $val;
+            my $val = $hashed_dn{$comp}[$pos];
+            ##! 16: "Fixed dn component $comp/$pos: $val"
+            if (defined $val && $val ne '') {
+                @val = ($val);
             }
         # Should be a TT string
         } else {
+            my $val;
             $tt->process(\$preset, \%hashed_dn, \$val) || OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_ACTIVITY_PARSE_PKCS10_TT_DIED',
-                params => { PROFILE => $cert_profile, STYLE => $cert_subject_style, FIELD => $field, PATTERN => $preset, 'ERROR' => $tt->error() }
+                params => { PROFILE => $cert_profile, STYLE => $cert_subject_style, 
+                    FIELD => $field, PATTERN => $preset, 'ERROR' => $tt->error() }
             );
-            if ($val) {
-                $cert_subject_parts->{ $field->{ID} } = $val;
+            
+            ##! 16: "Template result: $val"
+            # cloneable fields cn return multiple values using a pipe as seperator
+            if ($field->{CLONABLE} && ($val =~ /\|/)) {
+                @val = split /\|/, $val;
+                @val = grep { defined $_ && ($_ =~ /\S/) } @val;
+            } elsif (defined $val && $val ne '') {
+                @val = ($val);
             }
         }
-
-        CTX('log')->log(
-            MESSAGE => "subject preset - field $field, pattern $preset, value $val",
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );
+        
+        ##! 16: 'Result ' . Dumper \@val
+        if (scalar @val) {
+            if ($field->{CLONABLE}) {
+                $cert_subject_parts->{ $field->{ID} } = \@val;
+                CTX('log')->log(
+                    MESSAGE => "subject preset - field $field, pattern $preset, values " . join('|', @val),
+                    PRIORITY => 'debug',
+                    FACILITY => 'application',
+                );
+            } else {
+                $cert_subject_parts->{ $field->{ID} } = $val[0];
+            
+                CTX('log')->log(
+                    MESSAGE => "subject preset - field $field, pattern $preset, value " . $val[0],
+                    PRIORITY => 'debug',
+                    FACILITY => 'application',
+                );
+            }
+        }
 
     }
     $context->param('cert_subject_parts' => $serializer->serialize( $cert_subject_parts ) );
 
-    my $csr_san = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });
-    ##! 16: 'Found san in csr :' . Dumper $csr_san
     # Load the field spec for the san
     if ($csr_san) {
         my $san_names = CTX('api')->list_supported_san();

@@ -118,6 +118,8 @@ sub render_subject_form {
         $values = $self->serializer()->deserialize( $context->{$field_name} );
     }
 
+    $self->logger()->debug( 'Preset ' . Dumper $values );
+
     # Map the old notation for the new UI
     $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values );
 
