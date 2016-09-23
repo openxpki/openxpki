@@ -34,7 +34,7 @@ $(OXI_TARBALL):
 	rm -rf $(OXI_TARBALL_DIR)
 	mkdir -p $(OXI_TARBALL_DIR)
 	(cd ../../.. && tar cf - \
-		ISSUES LICENSE README.pod clients config core doc package qatest tools) \
+		ISSUES LICENSE README.md clients config core doc package qatest tools) \
 		| tar xf - -C $(OXI_TARBALL_DIR)
 	echo $(OXI_VERSION) > $(OXI_TARBALL_DIR)/VERSION
 	tar czf $@ -C $(OXI_TARBALL_DIR)/.. .
