@@ -104,18 +104,24 @@ sub query {
     );
 }
 
-# SELECT - Return first result row
-# Returns: HashRef containing the result columns (C<$sth-E<gt>fetchrow_hashref>)
-sub select_one {
+# SELECT - Return all rows
+# Returns: A DBI::st statement handle
+sub select {
     my $self = shift;
     my $query = $self->query->select(@_);
     ##! 4: "Query: " . $query->sql_str;
 
-    my $sth = $self->run($query);
-    return unless $sth;
+    return $self->run($query);
+}
+
+# SELECT - Return first result row
+# Returns: HashRef containing the result columns (C<$sth-E<gt>fetchrow_hashref>)
+sub select_one {
+    my $self = shift;
+    my $sth = $self->select(@_) or return;
 
     my $tuple = $sth->fetchrow_hashref
-        or die "Query had no results: ".$query->sql_str."\n";
+        or die "Query had no results\n";
     return $tuple;
 }
 
@@ -236,6 +242,15 @@ Named parameters:
 =item * See L<attributes section above|/"Set via constructor">
 
 =back
+
+=head2 select
+
+Selects rows from the database and returns the results as a I<DBI::st> statement
+handle.
+
+Please note that C<NULL> will be returned as C<undef>.
+
+For parameters see L<OpenXPKI::Server::Database::Query/select>.
 
 =head2 select_one
 
