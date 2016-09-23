@@ -3,9 +3,6 @@
 
 TOPDIR=../../..
 
-PERL_VERSION=5.20.0
-MYPERL_RELEASE=1
-
 PACKAGE=myperl-openxpki-core
 SRCNAME=$(PACKAGE)
 
@@ -20,6 +17,8 @@ include ../Makefile.inc
 all: clean package
 
 $(PACKAGE).spec: $(PACKAGE).spec.template
+
+tarball: $(OXI_TARBALL)
 
 package: $(PACKAGE).spec $(OXI_TARBALL)
 	PERL_LOCAL_LIB_ROOT= PERL_MB_OPT= PERL_MM_OPT= rpmbuild -ba $(PACKAGE).spec

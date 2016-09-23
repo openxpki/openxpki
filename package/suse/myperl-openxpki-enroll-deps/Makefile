@@ -3,9 +3,6 @@
 
 TOPDIR=../../..
 
-PERL_VERSION=5.20.0
-MYPERL_RELEASE=1
-
 # Makefile.inc contains common settings for all packages (checked in)
 include ../Makefile.inc
 # Makefile.local may be used locally to override settings (not checked in)

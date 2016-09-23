@@ -11,15 +11,6 @@ PACKAGE			:= myperl-openxpki-i18n
 SRCBASE			:= $(TOPDIR)/core/i18n
 SRCNAME			:= $(PACKAGE)
 
-ifndef PERL_VERSION
-PERL_VERSION		:= 5.20.0
-endif
-
-ifndef MYPERL_RELEASE
-MYPERL_RELEASE		:= 1
-endif
-
-
 # Makefile.inc contains common settings for all packages (checked in)
 include ../Makefile.inc
 # Makefile.local may be used locally to override settings (not checked in)

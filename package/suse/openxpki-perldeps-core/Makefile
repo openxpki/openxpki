@@ -39,7 +39,6 @@ VERSION = $(shell $(VERGEN) --format version)
 PKGREL = $(shell $(VERGEN) --format PKGREL)
 
 PERL_ROOT=/usr/share/$(PERLNAME)
-PERL_VERSION=5.18.2
 PERL_5_BASEURL=http://ftp.gwdg.de/pub/languages/perl/CPAN/src/5.0
 PERL_SOURCE_TARBALL=perl-$(PERL_VERSION).tar.bz2
 PERL_SOURCE_URL=$(PERL_5_BASEURL)/$(PERL_SOURCE_TARBALL)

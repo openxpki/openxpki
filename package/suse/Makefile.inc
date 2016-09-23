@@ -8,6 +8,9 @@
 # common includes for package builds
 include $(TOPDIR)/package/common/Makefile.inc
 
+# include perl version
+include $(TOPDIR)/PERL_VERSION.inc
+
 # standard directory for RPM builds, to override this use Makefile.local
 # or by setting it in your shell environment
 RPMBASE?=$(shell rpm --eval '%{_topdir}')

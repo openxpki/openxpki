@@ -3,11 +3,7 @@
 
 TOPDIR=../../..
 
-PERL_VERSION=5.20.0
-MYPERL_RELEASE=1
-
 PACKAGE=myperl-openxpki-core-deps
-#SRCBASE=$(TOPDIR)/clients/perl/OpenXPKI-Client-Enrollment
 SRCNAME=$(PACKAGE)
 
 OXI_TARBALL = $(shell rpm --eval '%{_topdir}')/SOURCES/$(PACKAGE)-$(OXI_VERSION).tar.gz
