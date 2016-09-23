@@ -67,21 +67,42 @@ sub _build_sqlam {
 
 sub select {
     my %valid_param = (
-        columns  => { isa => 'ArrayRef[Str]' },
-        from     => { isa => 'Str | ArrayRef[Str]' },
-        where    => { isa => 'Str | ArrayRef | HashRef', optional => 1 },
-        group_by => { isa => 'Str | ArrayRef', optional => 1 },
-        having   => { isa => 'Str | ArrayRef | HashRef', optional => 1, depends => ['group_by'] },
-        order_by => { isa => 'Str | ArrayRef', optional => 1 },
-        limit    => { isa => 'Int', optional => 1 },
-        offset   => { isa => 'Int', optional => 1 },
+        columns   => { isa => 'ArrayRef[Str]' },
+        from      => { isa => 'Str | ArrayRef[Str]', optional => 1 },
+        from_join => { isa => 'Str', optional => 1 },
+        where     => { isa => 'Str | ArrayRef | HashRef', optional => 1 },
+        group_by  => { isa => 'Str | ArrayRef', optional => 1 },
+        having    => { isa => 'Str | ArrayRef | HashRef', optional => 1, depends => ['group_by'] },
+        order_by  => { isa => 'Str | ArrayRef', optional => 1 },
+        limit     => { isa => 'Int', optional => 1 },
+        offset    => { isa => 'Int', optional => 1 },
     );
     my ($self, %params) = validated_hash(\@_, %valid_param); # MooseX::Params::Validate
-    my %sqlam_param = map { '-'.$_ => $params{$_} } keys %params;
 
     # FIXME order_by: if ArrayRef then check for "asc" and "desc" as they are reserved words (https://metacpan.org/pod/SQL::Abstract::More#select)
 
-    my ($sql, @bind) = $self->sqlam->select(%sqlam_param);
+    my (%sqlam_param, $sql, @bind);
+
+    die "You must provide either 'from' or 'from_join'"
+        unless ($params{'from'} or $params{'from_join'});
+
+    # Provide nicer syntax for joins than SQL::Abstract::More
+    if ($params{'from_join'}) {
+        die "You cannot specify 'from' and 'from_join' at the same time"
+            if $params{'from'};
+        # Translate JOIN spec into SQL syntax - taken from SQL::Abstract::More->select.
+        # (string is converted into the list that SQL::Abstract::More->join expects)
+        my $join_info = $self->sqlam->join(split /\s+/, $params{'from_join'});
+        $params{'from'} = \($join_info->{sql});
+        push @bind, @{$join_info->{bind}} if $join_info;
+        delete $params{'from_join'};
+    }
+
+    # Add function arguments prefixed by dash "-"
+    %sqlam_param = (%sqlam_param, map { '-'.$_ => $params{$_} } keys %params);
+
+    # Translate query syntax into SQL
+    ($sql, @bind) = $self->sqlam->select(%sqlam_param);
     $self->sql_str($sql);
     $self->sql_params(\@bind);
     return $self;
@@ -156,6 +177,12 @@ Named parameters:
 =item * B<columns> - List of column names (I<ArrayRef[Str]>, required)
 
 =item * B<from> - Table name (or list of) (I<Str | ArrayRef[Str]>, required)
+
+=item * B<from_join> - A B<string> to describe table relations for FROM .. JOIN following the spec in L<SQL::Abstract::More/join> (I<Str>)
+
+    from_join => "certificate  req_key=req_key  csr"
+
+Please note that you cannot specify C<from> and C<from_join> at the same time.
 
 =item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
 
