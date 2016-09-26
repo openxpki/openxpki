@@ -12,7 +12,7 @@ types =
             "---"
         datetime: (v) -> moment().utc(v).format("YYYY-MM-DD HH:mm:ss UTC")
         text: (v) -> Em.$('<div/>').text(v).html()
-        code: (v) -> "<code>#{ Em.$('<div/>').text(v).html().replace(/(\r\n|\n|\r)/gm,"<br>")}</code>"
+        code: (v) -> "<code>#{ Em.$('<div/>').text(v).html().replace(/\r/gm,"")}</code>"
         raw: (v) -> v
         defhash: (v) -> "<dl>#{(for k, w of v then "<dt>#{k}</dt><dd>#{ Em.$('<div/>').text(w).html() }</dd>").join ""}</dl>"
         deflist: (v) -> "<dl>#{(for w in v then "<dt>#{w.label}</dt><dd>#{(if w.format is "raw" then w.value else Em.$('<div/>').text(w.value).html())}</dd>").join ""}</dl>"
