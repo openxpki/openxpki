@@ -89,28 +89,24 @@ sub execute {
     }
     
     my $epoch = $valid_at->epoch();
-                  
-    my $query = {
-        TABLE => 'CERTIFICATE',        
-        DYNAMIC => { 
-            'CSR_SERIAL' => { VALUE => undef, OPERATOR => 'NOT_EQUAL' },
-            'PKI_REALM' => { VALUE => $pki_realm }
-        },
-        ORDER => [ 'NOTBEFORE', 'CERTIFICATE_SERIAL' ],
-        REVERSE => 1
-    };
-    
+                       
+    my %where = (
+        'certificate.req_key' => { '!=' => undef },
+        'certificate.pki_realm' => $pki_realm,
+    );
     
     my $p = {
         cutoff_notbefore => 0,
         cutoff_notafter => 0,
         include_revoked => 0,
         include_expired => 0,
-        unique_subject => 0        
+        unique_subject => 0,
+        profile => '',
+        subject => '',
     };
     
     # try to read those from the activity config
-    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject)) {
+    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject)) {
         if (defined $self->param($key)) {
             $p->{$key} = $self->param($key);
         }        
@@ -126,10 +122,17 @@ sub execute {
         my $config = CTX('config');
         
         # override selector config
-        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject)) {
+        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject)) {
             if ($config->exists(['report', $report_config, $key])) {
-                $p->{$key} = $config->get(['report', $report_config, $key]);
-            }        
+                
+                # profile and subject can be a list
+                if ($key eq 'profile' || $key eq 'subject') {
+                    my @opt = $config->get_scalar_as_list(['report', $report_config, $key]);
+                    $p->{$key} = \@opt;
+                } else {
+                    $p->{$key} = $config->get(['report', $report_config, $key]);
+                }
+            }
         }
         
         $tt = OpenXPKI::Template->new();
@@ -139,12 +142,32 @@ sub execute {
         
     }
     
+    ##! 16: 'Params ' . Dumper $p    
+    
+    
     # If include_revoke it not set, we filter on ISSUED status
     if (!$p->{include_revoked}) {
-        $query->{DYNAMIC}->{'STATUS'} = 'ISSUED';
+        $where{'status'} = 'ISSUED';
     }
     
-    my $expiry_cutoff; 
+    # if cutoff is set, we filter on notbefore between valid_at and cutoff
+    if ($p->{cutoff_notbefore}) {
+        my $cutoff = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $valid_at,
+            VALIDITY => $p->{cutoff_notbefore},
+            VALIDITYFORMAT => 'detect',
+        })->epoch();
+
+        $where{'notbefore'} = ($epoch > $cutoff)
+            ? { -between => [ $cutoff, $epoch  ] }
+            : { -between => [ $epoch, $cutoff  ] };
+    } else {
+        $where{'notbefore'} = { '<=', $epoch };
+    }
+    
+        
+    my $expiry_cutoff = $epoch;
+    # if expired certs should be included, we just move the notafter limit 
     if ($p->{include_expired}) {
         $expiry_cutoff = OpenXPKI::DateTime::get_validity({
             REFERENCEDATE => $valid_at,
@@ -152,64 +175,76 @@ sub execute {
             VALIDITYFORMAT => 'detect',
         })->epoch();
     }
-        
-    # no cutoff, use valid_at macro
-    if (!$p->{cutoff_notbefore} && !$p->{cutoff_notafter}) {
-        
-        if ($p->{include_expired}) {
-            $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $expiry_cutoff, $epoch  ] };
-        } else {
-            $query->{VALID_AT} = $epoch;
-        }
-        
+    
+    # if notafter cutoff is set, we use it as upper limit
+    # we always expect this to be a positive offset
+    if ($p->{cutoff_notafter}) {
+        my $cutoff = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $valid_at,
+            VALIDITY => $p->{cutoff_notafter},
+            VALIDITYFORMAT => 'detect',
+        })->epoch();
+        $where{'notafter'} = { -between => [ $expiry_cutoff, $cutoff  ] };
     } else {
-        
-        if ($p->{cutoff_notbefore}) {                           
-            my $cutoff = OpenXPKI::DateTime::get_validity({
-                REFERENCEDATE => $valid_at,
-                VALIDITY => $p->{cutoff_notbefore},
-                VALIDITYFORMAT => 'detect',
-            })->epoch();
-            
-            if ($epoch > $cutoff) {
-                $query->{DYNAMIC}->{'NOTBEFORE'} = { OPERATOR => 'BETWEEN', VALUE => [ $cutoff, $epoch ] };
-            } else {
-                $query->{DYNAMIC}->{'NOTBEFORE'} = { OPERATOR => 'BETWEEN', VALUE => [ $epoch, $cutoff ] };            
-            }
-        }
-        
-        if ($p->{cutoff_notafter}) {
-            my $cutoff = OpenXPKI::DateTime::get_validity({
-                REFERENCEDATE => $valid_at,
-                VALIDITY => $p->{cutoff_notafter},
-                VALIDITYFORMAT => 'detect',
-            })->epoch();
-            
-            if ($p->{include_expired}) {
-                $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $expiry_cutoff, $cutoff  ] };
-            } elsif ($epoch > $cutoff) {
-                $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $cutoff, $epoch  ] };
-            } else {
-                $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'BETWEEN', VALUE => [ $epoch, $cutoff ] };
-            }
-                        
-        } elsif ($p->{include_expired}) {
-            $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'GREATER_THAN', VALUE => $expiry_cutoff };
-        } else {
-            $query->{DYNAMIC}->{'NOTAFTER'} = { OPERATOR => 'GREATER_THAN', VALUE => $epoch };
-        }
-        
+        $where{'notafter'} = { '>=', $expiry_cutoff };    
     }
     
-    my $result = CTX('dbi_backend')->select(%{$query});
-    if ( ref $result ne 'ARRAY' ) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_DETAIL_DB_RESULT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
+    
+    # Allow pattern search with *Subject* and %Subject%
+    if ($p->{subject}) {
+        my $subject = ref $p->{subject} ? $p->{subject} : [ $p->{subject} ];
+        @$subject = map { s/\*/%/g; $_ } @$subject;
+        $where{'certificate.subject'} = { 'like' => $subject };
+    }
+
+ 
+    my $need_csr;
+    
+    # csr field requested in column list
+    if (grep { $_->{csr} } @columns) {
+        $need_csr = 1;
+    }
+    
+    if ($p->{profile}) {
+        my $profile = ref $p->{profile} ? $p->{profile} : [ $p->{profile} ];
+        $where{'csr.profile'} = $profile;
+        $need_csr = 1;
+    }
+    
+    ##! 16: 'Query' . Dumper \%where  
+    
+    my $sth;
+    my $cols = [
+        'certificate.subject as SUBJECT',
+        'certificate.cert_key as CERTIFICATE_SERIAL',
+        'certificate.req_key as CSR_SERIAL',
+        'certificate.identifier as IDENTIFIER',
+        'certificate.status as STATUS',
+        'certificate.notafter as NOTAFTER',
+        'certificate.notbefore as NOTBEFORE',
+        'certificate.issuer_dn as ISSUER_DN',
+        'certificate.identifier as ISSUER_IDENTIFIER',
+        'certificate.subject_key_identifier as SUBJECT_KEY_IDENTIFIER',
+        'certificate.authority_key_identifier as AUTHORITY_KEY_IDENTIFIER'
+    ];
+    
+    if ($need_csr) {
+        $sth = CTX('dbi')->select(
+            from_join => 'certificate  req_key=req_key  csr',
+            order_by => [ '-notbefore', '-cert_key' ],
+            columns  => [ @{$cols}, 'csr.profile AS PROFILE' ],
+            where => { %where }
+        );
+        'csr.profile as PROFILE',
+    } else {
+        $sth = CTX('dbi')->select(
+            from=> 'certificate',
+            order_by => [ '-notbefore', '-cert_key' ],
+            columns  => $cols,
+            where => { %where }
         );
     }
-       
-    ##! 1: 'Result ' . Dumper $result
+ 
     
     my $cnt;
     
@@ -219,11 +254,14 @@ sub execute {
     
     my $subject_seen = {};
         
-    foreach my $item ( @{$result} ) {
+    while (my $item = $sth->fetchrow_hashref) {
+
+        ##! 64: 'Item ' . Dumper $item
         
         if ($p->{unique_subject}) {
-            next if ($subject_seen ->{ $item->{SUBJECT} });
-            $subject_seen ->{ $item->{SUBJECT} } = 1;
+            my $subject = lc($item->{SUBJECT});
+            next if ($subject_seen ->{ $subject });
+            $subject_seen ->{ $subject } = 1;
         }
         
         my $serial = Math::BigInt->new( $item->{CERTIFICATE_SERIAL} )->as_hex();
@@ -261,7 +299,9 @@ sub execute {
 
                     push @line, $tt->render( $col->{template}, $ttp );
                 } elsif ($col->{cert}) {
-                    push @line, $item->{ $col->{cert} };
+                    push @line, $item->{ uc($col->{cert}) };
+                } elsif ($col->{csr}) {
+                    push @line, $item->{ uc($col->{csr}) };
                 } elsif ($col->{attribute} && ref $attrib->{ $col->{attribute} } eq 'ARRAY') {
                     push @line, $attrib->{ $col->{attribute} }->[0];
                 } else {
@@ -339,7 +379,7 @@ owner is the user/group running the socket, if you want to download
 this file using the webserver, make sure that either the webserver has 
 permissions on the daemons group or set the umask to 644.
 
-=item include_expired  
+=item include_expired
 
 Parseable OpenXPKI::Datetime value (autodetected), certificates which are
 expired after the given date are included in the report. Default is not to
@@ -358,27 +398,39 @@ calculation. Default is now.
 
 =item cutoff_notbefore
 
-Parseable OpenXPKI::Datetime value (autodetected), show certificates where
-notebefore is greater than value. 
+Parseable OpenXPKI::Datetime value (autodetected), show only certificates 
+where notebefore is between valid_at and this value. 
 
 =item cutoff_notafter 
 
 Parseable OpenXPKI::Datetime value (autodetected), show certificates where
-notafter is less then value.
+notafter is less then value. The requested valid_at or, if set, the expiry 
+cutoff date is added as lower border.
 
 =item unique_subject
 
 If set to a true value, only the certiticate with the latest notbefore date
 for each subject is included in the report. Note that filtering on subject 
 is done AFTER the other filters, e.g. in case you do not include revoked
-certifiates you get the latest one that was not revoked.
+certifiates you get the latest one that was not revoked. Subjects are 
+compared case insensitive!
+
+=item subject
+
+Expression to use as filter on the I<subject> of the certificate. This
+is passed with a "like" operator to the sql layer, the asterisk can be 
+used as wildcard. Mutiple expressions are possible and or'ed together.
+
+=item profile
+
+Only include certificates with this profile in the report, mutliple
+profiles can be passed as list.
 
 =item report_config
 
 Lookup extended specifications in the config system at report.<report_config>.
-The config can contain any of
-I<cutoff_notbefore, cutoff_notafter, include_revoked, include_expired>.
-which will override any given value from the activity if a value is given. 
+The config can contain any of the filter controls which will override any 
+given value from the activity if a value is given. 
 Additional columns can also be specified, these are appended at the end 
 of each line.
 
@@ -388,12 +440,44 @@ of each line.
      - head: Just another title
        attribute: meta_email
      - head: Third column 
-       template: "[% attribute.meta_email %]"       
+       template: "[% attribute.meta_email %]"
+     - head: The profile given in the CSR
+       csr: profile       
        
 The I<cert> key takes the value from the named column from the certificate
 table, I<attribute> shows the value of the attribute. I<template> is passed           
 to OpenXPKI::Template with I<cert> and I<attribute> set. Note that all 
-attributes are lists, even if there are single valued! 
+attributes are lists, even if there are single valued!
+
+Available columns are: 
+
+=over 
+
+=item SUBJECT
+
+=item CERTIFICATE_SERIAL
+
+=item CSR_SERIAL
+                
+=item IDENTIFIER
+
+=item STATUS
+
+=item NOTAFTER
+
+=item NOTBEFORE
+
+=item ISSUER_DN
+
+=item ISSUER_IDENTIFIER
+
+=item SUBJECT_KEY_IDENTIFIER
+
+=item AUTHORITY_KEY_IDENTIFIER
+
+=item PROFILE (from csr)
+
+=back 
 
 =back 
 
