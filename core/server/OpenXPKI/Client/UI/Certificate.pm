@@ -463,7 +463,8 @@ sub init_detail {
         sprintf ($pattern, 'pkcs7', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7'),
         sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT'),
         sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE'),
-        sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL') ],        
+        sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL'),
+        '<li><a href="#/openxpki/certificate!text!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT</a></li>', ],        
         format => 'rawlist'
     };
     
@@ -503,6 +504,41 @@ sub init_detail {
         }},
     );
 
+}
+
+=head2 init_text 
+
+Show the PEM block as text in a modal
+
+=cut
+
+sub init_text {
+    
+    my $self = shift;
+    my $args = shift;
+
+    my $cert_identifier = $self->param('identifier');
+    
+    my $pem = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'PEM' });
+    
+    $self->logger()->debug("Cert data: " . Dumper $pem);
+    
+    $self->_page({
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
+        shortlabel => $cert_identifier,
+    });
+    
+    $self->add_section({
+        type => 'text',
+        content => {
+            label => '',
+            description => '<code>'  . $pem . '</code>',
+        }},
+    );
+    
+    return $self;
+    
+    
 }
 
 =head2 init_chain

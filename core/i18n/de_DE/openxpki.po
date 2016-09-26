@@ -249,6 +249,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT) Format"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
+msgstr "Textformat (txt)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Textformat (txt)"
 

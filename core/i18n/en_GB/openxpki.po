@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-09-21 09:49+0100\n"
+"PO-Revision-Date: 2016-09-26 20:35+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -198,6 +198,9 @@ msgstr "Install"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT)"
+
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
+msgstr "Display certificate on screen (PEM) "
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Download text (TXT) format"
