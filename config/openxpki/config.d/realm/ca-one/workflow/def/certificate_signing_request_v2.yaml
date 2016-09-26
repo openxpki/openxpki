@@ -548,6 +548,8 @@ action:
           - csr_type
         param:
             source: USER
+        validator:
+          - global_key_gen_params
 
     publish_certificate:
         class: OpenXPKI::Server::Workflow::Activity::Tools::TriggerCertificatePublish

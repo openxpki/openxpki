@@ -419,6 +419,7 @@ OpenXPKI/Server/Workflow/Validator/CommonNameLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyReuse.pm
 OpenXPKI/Server/Workflow/Validator/KeyParams.pm
+OpenXPKI/Server/Workflow/Validator/KeyGenerationParams.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/PasswordQuality.pm
 OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm

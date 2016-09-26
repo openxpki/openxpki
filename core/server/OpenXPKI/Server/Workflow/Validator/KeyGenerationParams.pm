@@ -1,4 +1,4 @@
-package OpenXPKI::Server::Workflow::Validator::KeyParams;
+package OpenXPKI::Server::Workflow::Validator::KeyGenerationParams;
 
 use strict;
 use warnings;
@@ -8,49 +8,34 @@ use OpenXPKI::Debug;
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
- 
- 
+
 sub _preset_args {
-    return [ qw(cert_profile pkcs10) ];
+    return [ qw(cert_profile key_alg key_gen_params enc_alg) ];
 }
- 
- 
+  
 sub _validate {
     
     ##! 1: 'start'
-    my ( $self, $wf, $cert_profile, $pkcs10 ) = @_;
+    my ( $self, $wf, $cert_profile, $key_alg, $key_gen_params, $enc_alg ) = @_;
     
-    if (!$pkcs10) {
-        ##! 8: 'skip - no data' 
+    if (!$key_alg) {
+        ##! 8: 'skip - no algorithm' 
         return 1; 
     }
-        
-    my $default_token = CTX('api')->get_default_token();
-    my $csr_obj = OpenXPKI::Crypto::CSR->new(
-        DATA  => $pkcs10,
-        TOKEN => $default_token 
-    );
     
-    my $csr_body = $csr_obj->get_parsed_ref()->{BODY};
-    ##! 32: 'csr_parsed: ' . Dumper $csr_body
-    if (!$csr_body) {
-        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10');
+    # might be serialized
+    if (!ref $key_gen_params) {
+        $key_gen_params = OpenXPKI::Serialization::Simple->new()->deserialize( $key_gen_params );
     }
-      
-    ##! 32: 'CSR body ' . Dumper $csr_body
-    
-    my $key_alg;
+          
     my $key_params = {};
     
-    if ($csr_body->{PUBKEY_ALGORITHM} eq 'rsaEncryption') {
-        $key_alg = 'rsa';
-        $key_params = { key_length =>  $csr_body->{KEYSIZE} };
-    } elsif ($csr_body->{PUBKEY_ALGORITHM} eq 'dsaEncryption') {
-        $key_alg = 'dsa';
-        $key_params = { key_length =>  $csr_body->{KEYSIZE} };
-    } elsif ($csr_body->{PUBKEY_ALGORITHM} eq 'id-ecPublicKey') {
-        $key_alg = 'ec';
-        $key_params = { key_length =>  $csr_body->{KEYSIZE}, curve_name => '_any' };
+    if ($key_alg eq 'rsa') {
+        $key_params = { key_length =>  $key_gen_params->{KEY_LENGTH} };
+    } elsif ($key_alg eq 'dsa') {
+        $key_params = { key_length =>  $key_gen_params->{KEY_LENGTH} };
+    } elsif ($key_alg eq 'ec') {
+        $key_params = { key_length =>  '_any', curve_name => $key_gen_params->{CURVE_NAME} };
         # not yet defined
     } else {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
@@ -95,6 +80,18 @@ sub _validate {
             validation_error("I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED ($param)");
         }
     }
+    
+    my $enc_algs = CTX('api')->get_key_enc({ PROFILE => $cert_profile, NOHIDE => 1 });
+    if ($enc_alg && !grep(/$enc_alg/, @{$enc_algs})) {
+        ##! 32: 'Failed on ' . $enc_alg
+        CTX('log')->log(
+            MESSAGE  => "KeyParam validation failed on enc_alg with value $enc_alg",
+            PRIORITY => 'error',
+            FACILITY => 'application',
+        );
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED (enc_alg)");
+    }
+    
 
     ##! 1: 'Validation succeeded'
     CTX('log')->log(
@@ -112,20 +109,21 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Validator::KeyParams
+OpenXPKI::Server::Workflow::Validator::KeyGenerationParams
 
 =head1 Description
 
-Extracts the key parameters form the passed PKCS10 and checks them 
-againstthe one of the profile.
+Check if the key specification passed fits the requirements of the profile.
 
 =head1 Configuration
 
   global_validate_key_param:
-      class: OpenXPKI::Server::Workflow::Validator::KeyParams
+      class: OpenXPKI::Server::Workflow::Validator::KeyGenerationParams
       arg:
        - $cert_profile
-       - $pkcs10
+       - $key_alg
+       - $key_gen_params
+       - $enc_alg
       
 =head2 Arguments
 
@@ -135,8 +133,17 @@ againstthe one of the profile.
 
 Name of the certificate profile
 
-=item pkcs10
+=item key_alg
 
-PEM encoded PKCS10
+The selected key algorithm
+
+=item key_gen_params
+
+Hash holding the key generation params, must fit the list given in the
+profile definition.
+
+=item enc_alg
+
+The encryption algorithm, can be emtpy.
 
 =back
