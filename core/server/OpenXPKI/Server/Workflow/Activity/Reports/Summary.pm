@@ -48,28 +48,28 @@ sub execute {
     
     # total count
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+        columns  => [ 'COUNT(identifier)|AMOUNT' ],
         where => {
             %base_conditions
         }
     );
-    $result->{total_count} = sprintf "%01d", $tuple->{amount};
+    $result->{total_count} = sprintf "%01d", $tuple->{AMOUNT};
     
     
     # Revoked
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+        columns  => [ 'COUNT(identifier)|AMOUNT' ],
         where => {
             %base_conditions,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         }
     );
-    $result->{total_revoked} = sprintf "%01d", $tuple->{amount} + 0;
+    $result->{total_revoked} = sprintf "%01d", $tuple->{AMOUNT} + 0;
     
     
     # valid revoked
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+        columns  => [ 'COUNT(identifier)|AMOUNT' ],
         where => {
             %base_conditions,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
@@ -77,34 +77,34 @@ sub execute {
             notafter  => { '>' => $epoch },
         }
     );
-    $result->{valid_revoked} = sprintf "%01d", $tuple->{amount} + 0;
+    $result->{valid_revoked} = sprintf "%01d", $tuple->{AMOUNT} + 0;
     
     
     # Distinct
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
+        columns  => [ 'COUNT(DISTINCT subject)|AMOUNT' ],
         where => {
             %base_conditions,
         }
     );
-    $result->{total_distinct} = sprintf "%01d", $tuple->{amount} + 0;
+    $result->{total_distinct} = sprintf "%01d", $tuple->{AMOUNT} + 0;
     
     
     # Expired
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+        columns  => [ 'COUNT(identifier)|AMOUNT' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
             notafter => { '<' => $epoch },
         }
     );
-    $result->{total_expired} = sprintf "%01d", $tuple->{amount} + 0;
+    $result->{total_expired} = sprintf "%01d", $tuple->{AMOUNT} + 0;
     
     
     # Valid
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+        columns  => [ 'COUNT(identifier)|AMOUNT' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
@@ -112,12 +112,12 @@ sub execute {
             notafter  => { '>' => $epoch },
         }
     );
-    $result->{valid_count} = sprintf "%01d", $tuple->{amount} + 0;
+    $result->{valid_count} = sprintf "%01d", $tuple->{AMOUNT} + 0;
     
     
     # Valid distinct
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
+        columns  => [ 'COUNT(DISTINCT subject)|AMOUNT' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
@@ -125,7 +125,7 @@ sub execute {
             notafter  => { '>' => $epoch },
         }
     );
-    $result->{valid_distinct} = sprintf "%01d", $tuple->{amount} + 0;
+    $result->{valid_distinct} = sprintf "%01d", $tuple->{AMOUNT} + 0;
     
     
     # Near expiry
@@ -137,14 +137,14 @@ sub execute {
     })->epoch();
     
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+        columns  => [ 'COUNT(identifier)|AMOUNT' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
             notafter  => { -between => [ $epoch, $expiry_cutoff  ] },
         }
     );
-    $result->{near_expiry} = sprintf "%01d", $tuple->{amount} + 0;
+    $result->{near_expiry} = sprintf "%01d", $tuple->{AMOUNT} + 0;
     
     
     # Recent expiry
@@ -156,14 +156,14 @@ sub execute {
     })->epoch();    
     
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|amount' ],
+        columns  => [ 'COUNT(identifier)|AMOUNT' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
             notafter  => { -between => [ $expiry_cutoff, $epoch ] },
         }
     );
-    $result->{recent_expiry} = sprintf "%01d", $tuple->{amount};
+    $result->{recent_expiry} = sprintf "%01d", $tuple->{AMOUNT};
       
       
     ##! 32: 'Report result ' . Dumper $result  
