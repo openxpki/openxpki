@@ -415,11 +415,17 @@ sub __do_init_dbi {
 
     foreach my $key (qw(type name namespace host port user passwd)) {
         ##! 16: "dbi: $key => " . $db_config->{$key}
-        $params{'db_'.$key} = $db_config->{$key} || '';
+        if (defined $db_config->{$key}) {
+            $params{'db_'.$key} = $db_config->{$key};
+        }
     }
 
-    # db_type is lowercased in dbd but CamelCased in the current config
-    $params{db_type} = lc($params{db_type});
+    # adjust CamelCasing for DBD names
+    if ($params{db_type} =~ /mysql/i) {
+        $params{db_type} = 'mysql';    
+    } elsif ($params{db_type} =~ /oracle/i) {
+        $params{db_type} = 'Oracle';
+    }
     
     # environment
     my $db_env = $config->get_hash("$dbpath.environment");
