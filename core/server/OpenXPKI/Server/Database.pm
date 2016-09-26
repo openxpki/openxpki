@@ -222,9 +222,10 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 =head1 Methods
 
-=head2 new
+=head2 factory
 
-Class method that creates the database object.
+Static call that creates a driver specific child of this class. 
+Do B<not> call new on this class directly.
 
 Named parameters:
 
