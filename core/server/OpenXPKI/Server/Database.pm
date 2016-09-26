@@ -3,10 +3,12 @@ package OpenXPKI::Server::Database;
 use strict;
 use warnings;
 use utf8;
+use English;
 
 use Moose;
 
 use OpenXPKI::Debug;
+use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Query;
 use DBIx::Handler;
 use DBI::Const::GetInfoType;
@@ -53,48 +55,37 @@ has '_connector' => (
 
 sub _build_connector {
     my $self = shift;
-    # map DBI param names to our object attributes
-    my %param_map = (
-        database => $self->db_name,
-        host => $self->db_host,
-        port => $self->db_port,
+
+    OpenXPKI::Exception->throw (
+        message => "OpenXPKI::Server::Database is an abstract class - please use the driver specific class instead!",
     );
-    # only add defined attributes
-    my $dsn_params = join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
-    # compose DSN and attributes
-    my $dsn = sprintf("dbi:%s:%s", $self->db_type, $dsn_params);
-    my $attr_hash = {
-        RaiseError => 1,
-        AutoCommit => 0,
-        $self->_driver_specific_attrs
-    };
-    ##! 4: "DSN: $dsn"
-    ##! 4: "Attributes: " . join " | ", map { $_." = ".$attr_hash->{$_} } keys %$attr_hash
-    return DBIx::Handler->new($dsn, $self->db_user, $self->db_passwd, $attr_hash);
+
 }
 
-#
-# Methods
-#
-
-sub _driver_specific_attrs {
-    my $self = shift;
-    # DBI driver names are case sensitive, so no need for regexes here
-    if ('mysql' eq $self->db_type) {
-        return (
-            mysql_enable_utf8 => 1,
-            mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
-            mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+# This is a static method, the init hash is expected as single argument!
+sub factory {
+    
+    my $params = shift;
+    
+    if (!$params->{db_type}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DATABASE_INIT_DB_TYPE_IS_MANDATORY",
         );
     }
-    #if ('Oracle' eq $self->db_type) {
-    #    return ();
-    #}
-
-    # ... pg_enable_utf8 => 1,
-    return ();
+    
+    my $db_class = "OpenXPKI::Server::Database::Driver::".$params->{db_type};
+    eval "use $db_class;1;";
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_DBI_UNABLE_TO_LOAD_DRIVER",
+            params => { db_type => $params->{db_type} }
+        );
+    }
+    
+    return $db_class->new($params);
+    
 }
-
+ 
 # Returns a new L<OpenXPKI::Server::Database::Query> object.
 sub query {
     my $self = shift;

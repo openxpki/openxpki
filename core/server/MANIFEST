@@ -186,6 +186,9 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 
 OpenXPKI/Server/Database.pm
 OpenXPKI/Server/Database/Query.pm
+OpenXPKI/Server/Database/Driver/MySQL.pm
+OpenXPKI/Server/Database/Driver/Oracle.pm
+
 
 ## logging interface
 

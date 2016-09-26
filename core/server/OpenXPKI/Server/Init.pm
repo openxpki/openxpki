@@ -408,7 +408,8 @@ sub __do_init_dbi {
     my $dbpath = [ 'system','database','main' ];
 
     %params = (
-        log => CTX('log')
+        log => CTX('log'),
+        db_type => 'MySQL',
     );
 
     my $db_config = $config->get_hash( $dbpath );
@@ -419,13 +420,6 @@ sub __do_init_dbi {
             $params{'db_'.$key} = $db_config->{$key};
         }
     }
-
-    # adjust CamelCasing for DBD names
-    if ($params{db_type} =~ /mysql/i) {
-        $params{db_type} = 'mysql';    
-    } elsif ($params{db_type} =~ /oracle/i) {
-        $params{db_type} = 'Oracle';
-    }
     
     # environment
     my $db_env = $config->get_hash("$dbpath.environment");
@@ -435,8 +429,8 @@ sub __do_init_dbi {
         ##! 4: "DBI Environment: $env_name => $env_value"
     }
 
-   OpenXPKI::Server::Context::setcontext({
-        dbi => OpenXPKI::Server::Database->new(\%params),
+    OpenXPKI::Server::Context::setcontext({
+        dbi => OpenXPKI::Server::Database::factory(\%params),
     });
     
 }
