@@ -531,7 +531,12 @@ sub get_crypto_layer
 {
     ##! 1: "start"
 
-    return OpenXPKI::Crypto::TokenManager->new();
+    my $tmpdir = CTX('config')->get(['system','server','tmpdir']);
+    if ($tmpdir) {
+        return OpenXPKI::Crypto::TokenManager->new({ TMPDIR => $tmpdir });
+    } else {
+        return OpenXPKI::Crypto::TokenManager->new();
+    }
 }
 
 sub get_dbi
