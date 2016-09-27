@@ -16,13 +16,18 @@ use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (
 has 'db_type' => (
     is => 'ro',
     isa => 'Str',
-    required => 1
+    required => 1,
 );
 
 has 'db_version' => (
     is => 'ro',
     isa => 'Str',
-    required => 1
+    required => 1,
+);
+
+has 'db_namespace' => ( # = schema
+    is => 'ro',
+    isa => 'Str',
 );
 
 #
@@ -65,6 +70,23 @@ sub _build_sqlam {
 # Methods
 #
 
+# Prefixes the given DB table name with a namespace (if there's not already
+# one part of the table name)
+sub _add_namespace_to {
+    my $self = shift;
+    my ($obj_param) = pos_validated_list(\@_,
+        { isa => 'Str | ArrayRef[Str]' },
+    );
+    # no namespace defined
+    return $obj_param unless $self->db_namespace;
+    # make sure we always have an ArrayRef
+    my $obj_list = ref $obj_param eq 'ARRAY' ? $obj_param : [ $obj_param ];
+    # add namespace if there's not already a namespace in the object name
+    $obj_list = [ map { m/\./ ? $_ : $self->db_namespace.'.'.$_ } @$obj_list ];
+    # return same type as argument was (ArrayRef or scalar)
+    return ref $obj_param eq 'ARRAY' ? $obj_list : $obj_list->[0];
+}
+
 sub select {
     my %valid_param = (
         columns   => { isa => 'ArrayRef[Str]' },
@@ -86,19 +108,29 @@ sub select {
     die "You must provide either 'from' or 'from_join'"
         unless ($params{'from'} or $params{'from_join'});
 
+    # Add namespace to table name
+    $params{'from'} = $self->_add_namespace_to($params{'from'}) if $params{'from'};
+
     # Provide nicer syntax for joins than SQL::Abstract::More
     if ($params{'from_join'}) {
         die "You cannot specify 'from' and 'from_join' at the same time"
             if $params{'from'};
+        my @join_spec = split(/\s+/, $params{'from_join'});
+        # Add namespace to table names (= all even indexes in join spec list)
+        for (my $i=0; $i<scalar(@join_spec); $i+=2) {
+            my @parts = split /\|/, $join_spec[$i];   # "table" / "table|alias"
+            $parts[0] = $self->_add_namespace_to($parts[0]);
+            $join_spec[$i] = join '|', @parts;
+        }
         # Translate JOIN spec into SQL syntax - taken from SQL::Abstract::More->select.
         # (string is converted into the list that SQL::Abstract::More->join expects)
-        my $join_info = $self->sqlam->join(split /\s+/, $params{'from_join'});
+        my $join_info = $self->sqlam->join(@join_spec);
         $params{'from'} = \($join_info->{sql});
         push @bind, @{$join_info->{bind}} if $join_info;
         delete $params{'from_join'};
     }
 
-    # Add function arguments prefixed by dash "-"
+    # Prefix arguments with dash "-"
     %sqlam_param = (%sqlam_param, map { '-'.$_ => $params{$_} } keys %params);
 
     # Translate query syntax into SQL
@@ -114,6 +146,11 @@ sub insert {
         values   => { isa => 'HashRef' },
     );
     my ($self, %params) = validated_hash(\@_, %valid_param); # MooseX::Params::Validate
+
+    # Add namespace to table name
+    $params{'into'} = $self->_add_namespace_to($params{'into'}) if $params{'into'};
+
+    # Prefix arguments with dash "-"
     my %sqlam_param = map { '-'.$_ => $params{$_} } keys %params;
 
     my ($sql, @bind) = $self->sqlam->insert(%sqlam_param);
@@ -163,6 +200,8 @@ Named parameters:
 =item * B<db_type> - DBI compliant case sensitive driver name (I<Str>, required)
 
 =item * B<db_version> - Database version as returned by C<$dbh-E<gt>get_version(...)> (I<Str>, required)
+
+=item * B<db_namespace> - Schema/namespace that will be added as table prefix in all queries. Could e.g. be used to store multiple OpenXPKI installations in one database (I<Str>)
 
 =back
 
