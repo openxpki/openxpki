@@ -86,9 +86,9 @@ $result = $client->mock_request({
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    'key_alg' => 'DSA',
+    'key_alg' => 'dsa',
     'enc_alg' => 'aes256',
-    'key_gen_params{KEY_LENGTH}' => 1024,
+    'key_gen_params{KEY_LENGTH}' => 2048,
     'csr_type' => 'pkcs10',
     'password_type' => 'client',
     'wf_token' => undef

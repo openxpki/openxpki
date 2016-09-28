@@ -86,7 +86,7 @@ $result = $client->mock_request({
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    'key_alg' => 'EC',
+    'key_alg' => 'ec',
     'enc_alg' => 'aes256',
     'key_gen_params{CURVE_NAME}' => 'prime192v1',
     'csr_type' => 'pkcs10',
