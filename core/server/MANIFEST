@@ -438,6 +438,7 @@ OpenXPKI/Server/Workflow/Validator/Regex.pm
 
 ## Packages for new NICE API
 OpenXPKI/Server/Workflow/NICE.pm
+OpenXPKI/Server/Workflow/NICE/Null.pm
 OpenXPKI/Server/Workflow/NICE/Factory.pm
 OpenXPKI/Server/Workflow/NICE/Local.pm
 
