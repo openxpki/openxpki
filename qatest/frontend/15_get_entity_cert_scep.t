@@ -22,6 +22,9 @@ my $sscep = -e "./sscep" ? './sscep' : 'sscep';
  
 ok((-s "tmp/cacert-0"),'CA certs present') || die;
  
+# Chain for TLS based requests later
+`cat tmp/cacert-* > tmp/chain.pem`; 
+ 
 # Create the pkcs10
 `openssl req -new -subj "/CN=entity.openxpki.org" -nodes -keyout tmp/entity.key -out tmp/entity.csr 2>/dev/null`;
  
