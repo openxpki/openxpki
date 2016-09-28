@@ -14,7 +14,7 @@ use LWP::UserAgent;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 2;
+use Test::More tests => 4;
 
 package main;
 
@@ -44,10 +44,16 @@ my $response = $ua->post('https://localhost/rpc/request', [
 );
 
 ok($response->is_success);
-print Dumper $response->decoded_content;
 
 my $json = JSON->new->decode($response->decoded_content);
 
+ok($json->{result}->{data}->{cert_identifier});
+
+print Dumper $json;
+
+
 diag('Workflow Id ' . $json->{result}->{id} );
 
-is($json->{result}->{state}, 'CHECK_FOR_REVOCATION');
+diag('Cert Identifier' . $json->{result}->{data}->{cert_identifier} );
+
+is($json->{result}->{state}, 'SUCCESS');

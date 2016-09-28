@@ -181,12 +181,12 @@ while (my $cgi = CGI::Fast->new()) {
             $log->debug("Raw context: ". Dumper $workflow->{CONTEXT});
             foreach my $key (@keys) {
                 my $val = $workflow->{CONTEXT}->{$key};
-                if (defined $val) {
-                    if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
-                        $val = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
-                    }
-                    $res->{result}->{data}->{$key} = $val;
+                next unless (defined $val);
+                next unless ($val ne '' || ref $val);
+                if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
+                    $val = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
                 }
+                $res->{result}->{data}->{$key} = $val;
             }
         }
     }
@@ -281,7 +281,7 @@ response:
     [RequestCertificate]
     workflow = certificate_enroll
     param = pkcs10, comment
-    output = cert_identifier error_code
+    output = cert_identifier, error_code
 
 This will add a new section I<data> to the response with the value of the
 named context item. Items are only included if they exist.
