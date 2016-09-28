@@ -49,7 +49,7 @@ sub _validate {
     
     ##! 32: 'Alg expected ' . Dumper $algs
     
-    if (!grep(/$key_alg/, @{$algs})) {
+    if (!grep(/\A$key_alg\z/, @{$algs})) {
         ##! 8: "KeyParam validation failed on algo $key_alg"
         CTX('log')->log(
             MESSAGE  => "KeyParam validation failed on algo $key_alg",
@@ -82,7 +82,7 @@ sub _validate {
     }
     
     my $enc_algs = CTX('api')->get_key_enc({ PROFILE => $cert_profile, NOHIDE => 1 });
-    if ($enc_alg && !grep(/$enc_alg/, @{$enc_algs})) {
+    if ($enc_alg && !grep(/\A$enc_alg\z/, @{$enc_algs})) {
         ##! 32: 'Failed on ' . $enc_alg
         CTX('log')->log(
             MESSAGE  => "KeyParam validation failed on enc_alg with value $enc_alg",
