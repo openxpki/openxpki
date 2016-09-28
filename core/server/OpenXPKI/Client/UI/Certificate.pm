@@ -1145,7 +1145,7 @@ sub __render_result_list {
             } elsif ($col->{field} eq 'STATUSCLASS') {
                 push @line, lc($item->{STATUS});
             } else {
-                push @line, lc($item->{  $col->{field} });
+                push @line, $item->{  $col->{field} };
             }
         }
         push @result, \@line;
