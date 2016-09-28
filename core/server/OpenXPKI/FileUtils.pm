@@ -179,6 +179,20 @@ sub __get_safe_template
     return File::Spec->catfile($arg_ref->{TMP}, "openxpki${PID}XXXXXXXX");
 }
 
+sub cleanup {
+
+    my $self = shift;
+    my $ident = ident $self;
+    
+    foreach my $file (keys %{$safe_filename_of{$ident}}) {
+        if (-e $file) {
+            unlink($file);
+            delete $safe_filename_of{$ident}->{$file};
+        }
+    }
+    return 1;    
+}
+
 1;
 
 __END__

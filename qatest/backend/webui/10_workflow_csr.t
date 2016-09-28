@@ -83,15 +83,22 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-$result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_enter_policy_violation_comment!wf_id!' . $wf_id
-});
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'policy_comment' => 'Reason for Exception',
-    'wf_token' => undef
-});
+# Use submit or policy violation depending on current status
+if ($result->{main}->[0]->{content}->{buttons}->[0]->{action} =~ /csr_submit/) {
+    $result = $client->mock_request({
+        'action' => 'workflow!select!wf_action!csr_submit!wf_id!' . $wf_id
+    });
+} else {
+    $result = $client->mock_request({
+        'action' => 'workflow!select!wf_action!csr_enter_policy_violation_comment!wf_id!' . $wf_id
+    });
+    
+    $result = $client->mock_request({
+        'action' => 'workflow!index',
+        'policy_comment' => 'Reason for Exception',
+        'wf_token' => undef
+    });
+}
 
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,

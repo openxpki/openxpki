@@ -186,6 +186,9 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 
 OpenXPKI/Server/Database.pm
 OpenXPKI/Server/Database/Query.pm
+OpenXPKI/Server/Database/Driver/MySQL.pm
+OpenXPKI/Server/Database/Driver/Oracle.pm
+
 
 ## logging interface
 
@@ -278,6 +281,7 @@ OpenXPKI/Server/Workflow/Activity/Transfer/SCP.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CalculateApprovalPoints.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
@@ -333,6 +337,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParsePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SearchCertificates.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SearchWorkflow.pm
+OpenXPKI/Server/Workflow/Activity/Tools/VerifySignature.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
@@ -419,6 +424,7 @@ OpenXPKI/Server/Workflow/Validator/CommonNameLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyReuse.pm
 OpenXPKI/Server/Workflow/Validator/KeyParams.pm
+OpenXPKI/Server/Workflow/Validator/KeyGenerationParams.pm
 OpenXPKI/Server/Workflow/Validator/PKCS10.pm
 OpenXPKI/Server/Workflow/Validator/PasswordQuality.pm
 OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm
@@ -434,6 +440,7 @@ OpenXPKI/Server/Workflow/Validator/Regex.pm
 
 ## Packages for new NICE API
 OpenXPKI/Server/Workflow/NICE.pm
+OpenXPKI/Server/Workflow/NICE/Null.pm
 OpenXPKI/Server/Workflow/NICE/Factory.pm
 OpenXPKI/Server/Workflow/NICE/Local.pm
 

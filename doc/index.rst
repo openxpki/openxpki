@@ -37,6 +37,7 @@ Setup and Configuration
    reference/configuration/realm
    reference/configuration/workflow
    reference/configuration/output
+   reference/configuration/profile
    reference/configuration/workflows/certrequest
    reference/configuration/workflows/certrevocation
    reference/configuration/workflows/crlissuance

@@ -165,7 +165,7 @@ sub init_load {
     }
 
     # Set single action if not in result view and only single action is avail
-    if (($view ne 'result') && !$wf_action && $wf_info->{PROC_STATE} eq 'manual' &&
+    if (($view ne 'result') && !$wf_action && $wf_info->{WORKFLOW}->{PROC_STATE} eq 'manual' &&
         (ref $wf_info->{STATE}->{output} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {
         my @activities = @{$wf_info->{STATE}->{option}};
         if (scalar @activities == 1) {

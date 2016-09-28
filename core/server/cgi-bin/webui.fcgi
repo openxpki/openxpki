@@ -56,7 +56,7 @@ if (!$config{global}{scripturl}) {
 }
 
 my @header_tpl;
-foreach my $key (keys ($config{header} || {})) {
+foreach my $key (keys %{$config{header}}) {
     my $val = $config{header}{$key};
     $key =~ s/-/_/g;
     push @header_tpl, ("-$key", $val);

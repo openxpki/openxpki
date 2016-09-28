@@ -1,0 +1,6 @@
+# at the moment this is used for display only
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_LABEL
+name: csr_subject
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_DESC
+type: cert_subject
+

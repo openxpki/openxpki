@@ -251,6 +251,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
+msgstr "Загрузка сертификата в текстовом формате"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Загрузка сертификата в текстовом формате"
 
@@ -2844,6 +2848,15 @@ msgstr "Экспорт"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"

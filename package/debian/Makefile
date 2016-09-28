@@ -35,7 +35,9 @@ EXTERNAL=				\
 	Config__Versioned \
 	Proc__SafeExec \
 	XML__Filter__XInclude \
-	Crypt__PKCS10
+	Crypt__PKCS10 \
+	DBIx__Handler \
+    DBIx__TransactionManager
 
 EXTERNAL2= \
 	Connector \

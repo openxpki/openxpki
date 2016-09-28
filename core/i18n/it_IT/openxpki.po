@@ -222,6 +222,10 @@ msgstr "Installa"
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
+msgstr "Scarica in formato testo (TXT)"
+
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Scarica in formato testo (TXT)"
 
@@ -2312,6 +2316,10 @@ msgstr "Certificati Validi"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
 msgstr "Soggetti Distinti Validi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
+msgstr "Certificati Revocati"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Azione richiesta non disponibile"

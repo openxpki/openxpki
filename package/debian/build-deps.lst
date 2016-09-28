@@ -4,3 +4,4 @@ libconfig-std-perl
 libtemplate-perl
 libtest-exception-perl
 build-essential
+libmodule-build-tiny-perl

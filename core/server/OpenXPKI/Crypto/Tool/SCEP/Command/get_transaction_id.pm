@@ -74,6 +74,13 @@ sub get_result
 }
 
 sub cleanup {
+    
+    my $self = shift;
+    my $ident = ident $self;
+    
+    $ENV{pwd} = '';
+    $fu_of{$ident}->cleanup();
+    
 }
 
 1;

@@ -168,9 +168,27 @@ while (my $cgi = CGI::Fast->new()) {
         $log->error("workflow terminated in unexpected state" );
         $res = { error => { code => 42, message => 'workflow terminated in unexpected state', data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'STATE'} } } };        
     } else {
-        $log->info(sprintf("Revocation request was processed properly (Workflow: %01d, State: %s", 
+        $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s", 
             $workflow->{ID}, $workflow->{STATE}) );
         $res = { result => { id => $workflow->{ID}, 'state' => $workflow->{'STATE'},  pid => $$ }};
+       
+        # Map context parameters to the response if requested
+        if ($conf->{$method}->{output}) {
+            $res->{result}->{data} = {}; 
+            my @keys;
+            @keys = split /\s*,\s*/, $conf->{$method}->{output};
+            $log->debug("Keys " . join(", ", @keys));
+            $log->debug("Raw context: ". Dumper $workflow->{CONTEXT});
+            foreach my $key (@keys) {
+                my $val = $workflow->{CONTEXT}->{$key};
+                next unless (defined $val);
+                next unless ($val ne '' || ref $val);
+                if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
+                    $val = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
+                }
+                $res->{result}->{data}->{$key} = $val;
+            }
+        }
     }
 
     print $json->encode( $res );
@@ -237,4 +255,50 @@ name of the server using the I<servername> key.
   param = cert_identifier, reason_code, comment, invalidity_time
   env = signer_cert, signer_dn, client_ip
   servername  = myserver
+  
+=head2 Response
+
+=head3 Success
+
+The default response does not include any data from the workflow itself, 
+it just returns the meta information of workflow:
+
+  {"result":{"id":"300287","pid":4375,"state":"SUCCESS"}}';
+  
+I<id> is the workflow id, which can be used in the workflow search to 
+access this workflow, I<state> is the current state of the workflow.
+I<pid> is the internal process id and only relevant for extended debug.
+
+Note: A successfull RPC response does not tell you anything about the 
+status of the requested business process! It just says that the workflow
+ran in a technical expected manner. 
+
+=head3 Process Information
+
+You can add a list of workflow context items to be exported with the 
+response:
+    
+    [RequestCertificate]
+    workflow = certificate_enroll
+    param = pkcs10, comment
+    output = cert_identifier, error_code
+
+This will add a new section I<data> to the response with the value of the
+named context item. Items are only included if they exist.
+
+    {"result":{"id":"300287","pid":4375,"state":"SUCCESS",
+        "data":{"cert_identifier":"i7Dvxp7fz_9WZlzf9hW_9tlbF6M"},
+    }}
+
+=head3 Error Response
+
+In case the workflow can not be created or terminates with an unexpected 
+error, the return structure looks different:
+
+ {"error":{"data":{"pid":4567,"id":12345},"code":42,
+     "message":"I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED"
+ }}
+
+ The message gives a verbose description on what happend, the data node will  
+ contain the workflow id only in case it was started.
  

@@ -9,6 +9,12 @@ use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
  
+ 
+sub _preset_args {
+    return [ qw(cert_profile pkcs10) ];
+}
+ 
+ 
 sub _validate {
     
     ##! 1: 'start'
@@ -110,8 +116,8 @@ OpenXPKI::Server::Workflow::Validator::KeyParams
 
 =head1 Description
 
-Check if the key specification imported from the context matches the one
-of the profile.
+Extracts the key parameters form the passed PKCS10 and checks them 
+againstthe one of the profile.
 
 =head1 Configuration
 

@@ -36,9 +36,6 @@ ok($soap, 'SOAP Client no Auth');
 is($soap->result->{error},'','No error');
 is($soap->result->{state}, 'PENDING','State pending without auth, Workflow ' . $soap->result->{id});
 
-# Use the ca certs from scep to create a chain file
-`cat tmp/cacert-* > tmp/chain.pem`; 
-
 # Now try with SSL Auth - should be autoapproved
 my $oSoap =  Connector::Proxy::SOAP::Lite->new({
     LOCATION => 'https://localhost/soap/ca-one',

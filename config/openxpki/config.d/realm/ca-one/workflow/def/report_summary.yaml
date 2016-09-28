@@ -21,6 +21,7 @@ state:
           - valid_at
           - valid_count
           - valid_distinct
+          - valid_revoked
           - near_expiry
           - recent_expiry
           - total_count
@@ -75,6 +76,10 @@ field:
     valid_distinct:
         name: valid_distinct
         label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT
+
+    valid_revoked:
+        name: valid_revoked
+        label: I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED
 
     near_expiry:
         name: near_expiry

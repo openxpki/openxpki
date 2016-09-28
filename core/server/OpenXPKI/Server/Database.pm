@@ -3,10 +3,12 @@ package OpenXPKI::Server::Database;
 use strict;
 use warnings;
 use utf8;
+use English;
 
 use Moose;
 
 use OpenXPKI::Debug;
+use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Query;
 use DBIx::Handler;
 use DBI::Const::GetInfoType;
@@ -16,15 +18,13 @@ use DBI::Const::GetInfoType;
 #
 
 has 'log'             => ( is => 'ro', isa => 'Object', required => 1 );
-# DBI compliant case sensitive driver name
-has 'db_type'         => ( is => 'ro', isa => 'Str', required => 1 );
+has 'db_type'         => ( is => 'ro', isa => 'Str', required => 1 ); # DBI compliant case sensitive driver name
 has 'db_name'         => ( is => 'ro', isa => 'Str', required => 1 );
-# FIXME Process NAMESPACE
-has 'db_table_prefix' => ( is => 'ro', isa => 'Str' );
+has 'db_namespace'    => ( is => 'ro', isa => 'Str' );                # = schema
 has 'db_host'         => ( is => 'ro', isa => 'Str' );
 has 'db_port'         => ( is => 'ro', isa => 'Int' );
 has 'db_user'         => ( is => 'ro', isa => 'Str' );
-has 'db_password'     => ( is => 'ro', isa => 'Str' );
+has 'db_passwd'       => ( is => 'ro', isa => 'Str' );
 
 #
 # Other attributes
@@ -53,46 +53,35 @@ has '_connector' => (
 
 sub _build_connector {
     my $self = shift;
-    # map DBI param names to our object attributes
-    my %param_map = (
-        database => $self->db_name,
-        host => $self->db_host,
-        port => $self->db_port,
+
+    OpenXPKI::Exception->throw (
+        message => "OpenXPKI::Server::Database is an abstract class - please use the driver specific class instead!",
     );
-    # only add defined attributes
-    my $dsn_params = join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
-    # compose DSN and attributes
-    my $dsn = sprintf("dbi:%s:%s", $self->db_type, $dsn_params);
-    my $attr_hash = {
-        RaiseError => 1,
-        AutoCommit => 0,
-        $self->_driver_specific_attrs
-    };
-    ##! 4: "DSN: $dsn"
-    ##! 4: "Attributes: " . join " | ", map { $_." = ".$attr_hash->{$_} } keys %$attr_hash
-    return DBIx::Handler->new($dsn, $self->db_user, $self->db_password, $attr_hash);
+
 }
 
-#
-# Methods
-#
+# This is a static method, the init hash is expected as single argument!
+sub factory {
 
-sub _driver_specific_attrs {
-    my $self = shift;
-    # DBI driver names are case sensitive, so no need for regexes here
-    if ('mysql' eq $self->db_type) {
-        return (
-            mysql_enable_utf8 => 1,
-            mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
-            mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+    my $params = shift;
+
+    if (!$params->{db_type}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_DATABASE_INIT_DB_TYPE_IS_MANDATORY",
         );
     }
-    #if ('Oracle' eq $self->db_type) {
-    #    return ();
-    #}
 
-    # ... pg_enable_utf8 => 1,
-    return ();
+    my $db_class = "OpenXPKI::Server::Database::Driver::".$params->{db_type};
+    eval "use $db_class;1;";
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_DBI_UNABLE_TO_LOAD_DRIVER",
+            params => { db_type => $params->{db_type} }
+        );
+    }
+
+    return $db_class->new($params);
+
 }
 
 # Returns a new L<OpenXPKI::Server::Database::Query> object.
@@ -101,6 +90,7 @@ sub query {
     return OpenXPKI::Server::Database::Query->new(
         db_type => $self->db_type,
         db_version => $self->db_version,
+        $self->db_namespace ? (db_namespace => $self->db_namespace) : (),
     );
 }
 
@@ -179,7 +169,7 @@ OpenXPKI::Server::Database - Entry point for database related functions
         db_name     => 'openxpki',
         db_host     => '127.0.0.1',
         db_user     => 'oxi',
-        db_password => 'gen',
+        db_passwd => 'gen',
     });
 
     # total count
@@ -209,7 +199,7 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 =item * B<db_name> - Database name (I<Str>, required)
 
-=item * B<db_table_prefix> - Table prefix for all queries. Can be used to store multiple OpenXPKI installations in one database (I<Str>)
+=item * B<db_namespace> - Schema/namespace that will be added as table prefix in all queries. Could e.g. be used to store multiple OpenXPKI installations in one database (I<Str>)
 
 =item * B<db_host> - Database host: IP or hostname (I<Str>)
 
@@ -217,7 +207,7 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 =item * B<db_user> - Database username (I<Str>)
 
-=item * B<db_password> - Database password (I<Str>)
+=item * B<db_passwd> - Database password (I<Str>)
 
 =back
 
@@ -231,9 +221,10 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 =head1 Methods
 
-=head2 new
+=head2 factory
 
-Class method that creates the database object.
+Static call that creates a driver specific child of this class.
+Do B<not> call new on this class directly.
 
 Named parameters:
 

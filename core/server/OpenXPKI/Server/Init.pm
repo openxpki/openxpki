@@ -24,6 +24,7 @@ use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server;
 use OpenXPKI::Server::DBI;
+use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Log::CLI;
@@ -59,6 +60,7 @@ my @init_tasks = qw(
   prepare_daemon
   dbi_backend
   dbi_workflow
+  dbi
   crypto_layer
   api
   workflow_factory
@@ -394,6 +396,45 @@ sub __do_init_dbi_log {
 }
 
 
+sub __do_init_dbi {
+
+    my $args = shift;
+
+    ##! 1: "start"
+
+    my $config = CTX('config');
+    my %params;
+
+    my $dbpath = [ 'system','database','main' ];
+
+    %params = (
+        log => CTX('log'),
+        db_type => 'MySQL',
+    );
+
+    my $db_config = $config->get_hash( $dbpath );
+
+    foreach my $key (qw(type name namespace host port user passwd)) {
+        ##! 16: "dbi: $key => " . $db_config->{$key}
+        if (defined $db_config->{$key}) {
+            $params{'db_'.$key} = $db_config->{$key};
+        }
+    }
+    
+    # environment
+    my $db_env = $config->get_hash("$dbpath.environment");
+    foreach my $env_name (keys %{$db_env}) {
+        my $env_value = $db_env->{$env_name};
+        $ENV{$env_name} = $env_value;
+        ##! 4: "DBI Environment: $env_name => $env_value"
+    }
+
+    OpenXPKI::Server::Context::setcontext({
+        dbi => OpenXPKI::Server::Database::factory(\%params),
+    });
+    
+}
+
 sub __do_init_acl {
     ### init acl...
     OpenXPKI::Server::Context::setcontext(
@@ -490,7 +531,12 @@ sub get_crypto_layer
 {
     ##! 1: "start"
 
-    return OpenXPKI::Crypto::TokenManager->new();
+    my $tmpdir = CTX('config')->get(['system','server','tmpdir']);
+    if ($tmpdir) {
+        return OpenXPKI::Crypto::TokenManager->new({ TMPDIR => $tmpdir });
+    } else {
+        return OpenXPKI::Crypto::TokenManager->new();
+    }
 }
 
 sub get_dbi
