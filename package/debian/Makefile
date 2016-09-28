@@ -37,7 +37,7 @@ EXTERNAL=				\
 	XML__Filter__XInclude \
 	Crypt__PKCS10 \
 	DBIx__Handler \
-        DBIx__TransactionManager
+    DBIx__TransactionManager
 
 EXTERNAL2= \
 	Connector \
