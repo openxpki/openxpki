@@ -336,6 +336,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ParsePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SearchCertificates.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SearchWorkflow.pm
+OpenXPKI/Server/Workflow/Activity/Tools/VerifySignature.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 
