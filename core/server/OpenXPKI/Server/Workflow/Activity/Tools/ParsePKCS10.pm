@@ -99,7 +99,7 @@ sub execute {
     }
     
     # If the profile has NO ui section, we write the parsed hash and the SANs "as is" to the context
-    if (!$config->exists(['profile', $cert_profile, $cert_subject_style, 'ui' ])) {
+    if (!$config->exists(['profile', $cert_profile, 'style', $cert_subject_style, 'ui' ])) {
         
         $context->param('cert_subject_parts' => $serializer->serialize( \%hashed_dn ) );
         
@@ -124,7 +124,7 @@ sub execute {
             if ($preset =~ m{ \A \s* (\w+)\.X \s* \z }xs) {
                 my $comp = $1;
                 ##! 32: 'Hashed DN Component ' . Dumper $hashed_dn{$comp}
-                for my $v (@{$hashed_dn{$comp}}) {
+                foreach my $v (@{$hashed_dn{$comp}}) {
                     ##! 16: 'clonable iterator value ' . $v
                     push @val, $v if (defined $v && $v ne '');
                 }
