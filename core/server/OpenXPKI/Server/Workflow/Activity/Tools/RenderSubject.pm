@@ -31,8 +31,11 @@ sub execute {
 
 
     # Get the profile name and style
-    my $profile = $context->param('cert_profile');
-    my $style = $context->param('cert_subject_style');
+    my $profile = $self->param('cert_profile');
+    $profile = $context->param('cert_profile') unless($profile);
+    
+    my $style = $self->param('cert_subject_style');
+    $style = $context->param('cert_subject_style') unless($style);
 
     if (!$profile  || !$style) {
         OpenXPKI::Exception->throw(
@@ -246,6 +249,22 @@ Example:
 The above code will present the user up to 20 fields each to enter IPs or DNS
 names. Each entry will show up "as is" as a single san entry.
 
+=head1 Configuration
+
+=head2 Activity Parameters
+
+=over
+
+=item cert_profile
+
+Determines the used profile, has priority over context key.
+
+=item cert_subject_style
+
+Determines the used profile substyle, has priority over context key.
+
+=back 
+
 =head2 context values
 
 =over
@@ -255,13 +274,13 @@ names. Each entry will show up "as is" as a single san entry.
 The main subject parameters, used for rendering the subject dn and in template
 mode for the san. The "cert_subject_" prefix is removed from the keys name.
 
-=item cert_profile
+=item cert_profile (deprecated, use activity parameter)
 
-Determines the used profile.
+Determines the used profile, activity parameter has priority!
 
-=item cert_subject_style
+=item cert_subject_style (deprecated, use activity parameter)
 
-Determines the used profile substyle-
+Determines the used profile substyle, activity parameter has priority!
 
 =item cert_subject
 
