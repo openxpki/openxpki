@@ -281,6 +281,7 @@ OpenXPKI/Server/Workflow/Activity/Transfer/SCP.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CalculateApprovalPoints.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Export.pm
 OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
