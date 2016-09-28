@@ -23,20 +23,35 @@ sub execute {
     } else {
         my $server = $context->param('server');
         my $interface = $context->param('interface');
-        ##! 8: 'Load for server ' . $interface .  ' / ' .  $server
-        $policy_params = $config->get_hash([ $interface, $server, 'policy' ]);
+        if ($server && $interface) {
+            ##! 8: 'Load for server ' . $interface .  ' / ' .  $server
+            $policy_params = $config->get_hash([ $interface, $server, 'policy' ]);
+        } else {
+            CTX('log')->log(
+                MESSAGE => "Server or interface not set in LoadPolicy",            
+                PRIORITY => 'warn',
+                FACILITY => 'application',
+            );
+        }
     }
 
-    foreach my $key (keys (%{$policy_params})) {
-        $context->param( "p_$key" => $policy_params->{$key} );
+    if (!$policy_params) {
+        CTX('log')->log(
+            MESSAGE => "No policy params set in LoadPolicy",            
+            PRIORITY => 'warn',
+            FACILITY => 'application',
+        );
+    } else {
+        foreach my $key (keys (%{$policy_params})) {
+            $context->param( "p_$key" => $policy_params->{$key} );
+        }
+    
+        CTX('log')->log(
+            MESSAGE => "Server policy loaded",            
+            PRIORITY => 'debug',
+            FACILITY => 'application',
+        );
     }
-
-    CTX('log')->log(
-        MESSAGE => "Server policy loaded",            
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );       
-
     return 1;
 }
 
@@ -56,7 +71,7 @@ and server are read from the context. You can override the full path by
 setting the key I<config_path>.
 
 The given path is expected to return a hash, each key/value pair is read 
-into  the context with the I<p_> prefix added to each key! 
+into the context with the I<p_> prefix added to each key! 
 
 =head1 Configuration 
 
