@@ -20,18 +20,30 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
     
+    ##! 1: 'Start' 
     my $cert_subject = $self->param('cert_subject');
     my $realm = $self->param('realm');
     my $profile = $self->param('profile');
     my $issuer = $self->param('issuer');
+    my $order = $self->param('order');
+    my $limit = $self->param('limit');
+    my $include_revoked = $self->param('include_revoked');
+    my $include_expired = $self->param('include_expired');
 
     my @param = $self->param();
 
     my $query = {
-        STATUS => 'ISSUED',
         ENTITY_ONLY => 1,
         CERT_ATTRIBUTES => [] 
     };
+    
+    if (!$include_revoked) {
+        $query->{STATUS} = 'ISSUED';
+    };
+    
+    if (!$include_expired) {
+        $query->{VALID_AT} = time();
+    }
     
     if ($cert_subject) {
         ##! 16: 'Adding subject ' . $cert_subject
@@ -51,6 +63,17 @@ sub execute
     if ($issuer) {
         ##! 16: 'Adding issuer ' . $issuer
         $query->{ISSUER_IDENTIFIER} = $issuer;
+    }
+    
+    if ($order && ($order =~ /\A ([a-z0-9]+)(\s+(asc|desc))? \z/xms)) {
+        my $col = uc($1);
+        my $reverse = lc($3) || '';
+        $query->{ORDER} = "CERTIFICATE." . $col;
+        $query->{REVERSE} = ($reverse eq 'desc') ? 1 : 0;
+    }
+    
+    if ($limit && ($limit =~ /\A\d+\z/)) {
+        $query->{LIMIT} = $limit;
     }
    
     
@@ -154,5 +177,25 @@ Lets you search for any certificate attribute having a listed prefix.
 
 Name of the context value to write the result to, the default is 
 I<cert_identifier_list>.
+
+=item order
+
+Sort the result, accepts a single column name, optionally 
+prefixed by "asc" (default) or "desc" (reversed sorting)
+
+=item limit
+
+Limit the size of the result set
+
+=item include_expired
+
+If set to a true value, also expired certificate are included. By default
+only certificate which are valid at the time of the query are found.
+
+=item include_revoked
+
+If set to a true value, certificates which are not in ISSUED state 
+(revoked, crl pending, on hold) are also included in the report. Default
+is to show only issued certificates.
 
 =back
