@@ -235,7 +235,6 @@ sub execute {
             columns  => [ @{$cols}, 'csr.profile AS PROFILE' ],
             where => { %where }
         );
-        'csr.profile as PROFILE',
     } else {
         $sth = CTX('dbi')->select(
             from=> 'certificate',
