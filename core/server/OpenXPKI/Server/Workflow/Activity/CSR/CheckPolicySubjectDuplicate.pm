@@ -19,8 +19,21 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
     
-    my $cert_subject = $context->param('cert_subject');
+    my $target_key = $self->param('target_key') || 'check_policy_subject_duplicate';
+    
+    my $cert_subject = $self->param('cert_subject');
+    $cert_subject = $context->param('cert_subject') unless(defined $cert_subject);
 
+    # prevent creating havoc (subject is empty = no where query!)
+    if (!$cert_subject) {
+        $context->param( { $target_key => undef } );
+         CTX('log')->log(
+            MESSAGE => "Policy subject duplicate check skipped due to empty subject",
+            PRIORITY => 'debug',
+            FACILITY => [ 'application', ],
+        );
+        return 1;
+    }
 
     my $query = {
         STATUS => 'ISSUED',
@@ -53,6 +66,10 @@ sub execute
         $query->{NOTAFTER} = time();        
     }
     
+    if (my $profile = $self->param('profile')) {
+        $query->{PROFILE} = $profile; 
+    }
+
     ##! 32: 'Search duplicate with query ' . Dumper $query
     
     my $result = CTX('api')->search_cert($query);
@@ -63,7 +80,7 @@ sub execute
     if (@identifier) {
 
         my $ser = OpenXPKI::Serialization::Simple->new();
-        $context->param('check_policy_subject_duplicate', $ser->serialize(\@identifier) );
+        $context->param( $target_key , $ser->serialize(\@identifier) );
                 
         CTX('log')->log(
             MESSAGE => "Policy subject duplicate check failed, found certs " . Dumper \@identifier,
@@ -73,7 +90,7 @@ sub execute
                   
     } else {
         
-        $context->param( { 'check_policy_subject_duplicate' => undef } );
+        $context->param( { $target_key => undef } );
         
     }
     
@@ -94,19 +111,24 @@ are not expired and not revoked. This includes certificates with a
 notbefore date in the future! 
 See the parameters section for other search options.
 
-=head2 Configuration parameters
+=head1 Configuration 
+
+=head2 Activity Parameters
 
 =over 
+
+=item target_key 
+
+Default is check_policy_subject_duplicate, holds list of identifiers found.
 
 =item any_realm
 
 Boolean, search certificates globally.
 
-=item match_profile (NOT IMPLEMENTED YET)
+=item profile 
 
-Boolean, duplicate only if profile is the same (profile must be given in
-action parameter cert_profile). Hint: Use the _map_syntax to grab the 
-profile from the workflow.
+Only search for certificates with this profile. Hint: Use the _map_syntax
+to grab the profile from the workflow.
 
 =item cn_only
 
