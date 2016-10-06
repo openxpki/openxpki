@@ -26,23 +26,30 @@ sub execute {
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $params     = { PKI_REALM => CTX('api')->get_pki_realm(), };
 
-
-    if (!$self->param('ds_namespace')) {
-        OpenXPKI::Exception->throw( message =>
-                    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_NAMESPACE');
-    };
-
-    $params->{NAMESPACE} = $self->param('ds_namespace');
-
-    if (!$self->param('ds_key_name') && !$self->param('ds_key_param')) {
-        OpenXPKI::Exception->throw( message =>
-                    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_KEY');
-    };
-    
-    if ($self->param('ds_key_param')) {   
-        $params->{KEY} = $context->param( $self->param('ds_key_param') );
+    # New format
+    if ($self->param('namespace')) {
+        $params->{NAMESPACE} = $self->param('namespace');
+        $params->{KEY} = $self->param('key');
     } else {
-        $params->{KEY} = $self->param('ds_key_name');
+
+        if (!$self->param('ds_namespace')) {
+            OpenXPKI::Exception->throw( message =>
+                        'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_NAMESPACE');
+        };
+    
+        $params->{NAMESPACE} = $self->param('ds_namespace');
+    
+        if (!$self->param('ds_key_name') && !$self->param('ds_key_param')) {
+            OpenXPKI::Exception->throw( message =>
+                        'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_KEY');
+        };
+        
+        if ($self->param('ds_key_param')) {   
+            $params->{KEY} = $context->param( $self->param('ds_key_param') );
+        } else {
+            $params->{KEY} = $self->param('ds_key_name');
+        }
+        
     }
      
     $params->{VALUE} = undef;
@@ -68,11 +75,21 @@ OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
 
 =head1 Description
 
-This class deletes an entry from the Datapool.
+This class deletes an entry from the Datapool, defined by namespace and key.
 
 =head1 Configuration
 
-=head2 Parameters
+=head2 Activity Paramaters
+
+=over
+
+=item namespace
+
+=item key 
+
+=back
+
+=head2 Activity Parameters (old format, deprecated)
 
 In the activity definition, ds_namespace and one of the ds_key* parameters must be set.
 See the example that follows.
@@ -94,21 +111,4 @@ datastore entry.
 
 The name of the key for the datastore entry.
  
-=back
-
-=head2 Arguments
-
-The workflow action requires one parameter that is passed via the
-workflow context. The name is set above with the I<ds_key_param> 
-parameter.
-
-=head2 Example
-
-  <action name="set_puk_in_datapool"
-    class="OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry"
-    ds_namespace="puk_namespace"
-    ds_key_param="token_id">
-    ds_key_name="abc123"
-    <field name="token_id" label="Serial number of Smartcard"/>
-  </action>
-
+=back 
