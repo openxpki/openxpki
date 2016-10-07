@@ -17,7 +17,7 @@ sub get_command
     ## compensate missing parameters
 
     $self->{OUT_PASSWD} = $self->{PASSWD}
-        if (not exists $self->{OUT_PASSWD} and exists $self->{PASSWD});
+        if (not exists $self->{OUT_PASSWD} and exists $self->{PASSWD} and not $self->{NOPASSWD});
         
     $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
     
@@ -88,9 +88,7 @@ sub get_command
     if ($self->{OUT} eq "DER") {
         $command .= "-outform der ";
     }
-    
-    $command .= " -v2 ".$self->{ENC_ALG};
-    
+       
     $command .= " -engine $engine" if ($engine);
     
     $command .= " -out ".$self->{OUTFILE};
@@ -105,6 +103,11 @@ sub get_command
     {
         $command .= " -passout env:outpwd";
         $self->set_env ('outpwd' => $self->{OUT_PASSWD});
+        
+        $command .= " -v2 ".$self->{ENC_ALG};
+        
+    } else {
+        $command .= " -nocrypt"
     }
 
     return [ $command ];
@@ -138,6 +141,8 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkcs8
 
 Convert a key between openssl native and pkcs8 format.
 
+To export the key without password, you must explicitly set NOPASSWD to 1.
+
 =head1 Functions
 
 =head2 get_command
@@ -155,6 +160,8 @@ Convert a key between openssl native and pkcs8 format.
 =item * OUT_PASSWD (optional)
 
 =item * ENC_ALG (optional)
+
+=item * NOPASSWD
 
 =back
 

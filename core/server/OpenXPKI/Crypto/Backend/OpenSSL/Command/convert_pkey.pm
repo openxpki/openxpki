@@ -13,10 +13,7 @@ sub get_command
     ##! 1: 'start' 
     my $self = shift;
 
-    ## compensate missing parameters
-
-    $self->{OUT_PASSWD} = $self->{PASSWD};
-        
+    ## compensate missing parameters 
     $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
     
     $self->{IN} = 'PEM' if (not $self->{IN});
@@ -39,7 +36,7 @@ sub get_command
 
     ## check parameters
 
-    if ($self->{ENC_ALG} && $self->{ENC_ALG} !~ /\A(aes(128|192|256)|des3|idea)\z/) {
+    if ($self->{ENC_ALG} !~ /\A(aes(128|192|256)|des3|idea)\z/) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKEY_WRONG_ENC_ALG",
             params => { ENC_ALG => $self->{ENC_ALG} });
@@ -92,7 +89,7 @@ sub get_command
         $command .= "-outform der ";
     }
     
-    if ($self->{ENC_ALG}) {
+    if ($self->{ENC_ALG} && !$self->{NOPASSWD}) {
         $command .= " -".$self->{ENC_ALG};
         $command .= " -passout env:outpwd";
         
@@ -105,7 +102,7 @@ sub get_command
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKEY_MISSING_OUTPUT_PASSWORD");
         }
     }
-    
+     
     $command .= " -engine $engine" if ($engine);
     
     $command .= " -out ".$self->{OUTFILE};
@@ -142,6 +139,8 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_pkey
 Do transformations on openssl native key format. Can be used to change/strip
 the password or convert between PEM and DER format or test a given password.
 
+To export the key without password, you must explicitly set NOPASSWD to 1.
+
 =head1 Functions
 
 =head2 get_command
@@ -159,6 +158,8 @@ the password or convert between PEM and DER format or test a given password.
 =item * OUT_PASSWD (optional)
 
 =item * ENC_ALG (optional)
+
+=item * NOPASSWD (optional)
 
 =back
 

@@ -26,8 +26,10 @@ sub get_command
         if ($self->{ENGINE}->get_engine() and                                                  
             (($engine_usage =~ m{ ALWAYS }xms) or
              ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
-    $self->{PKCS12_PASSWD} = $self->{PASSWD}
+             
+    $self->{PKCS12_PASSWD} = $self->{PASSWD} 
         if (not exists $self->{PKCS12_PASSWD});
+    
                 
     ## check parameters
 
@@ -51,6 +53,7 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_EMPTY_PASSWD");
     }
+    
     if (length ($self->{PKCS12_PASSWD}) < 4)
     {
         OpenXPKI::Exception->throw (
@@ -124,13 +127,16 @@ sub get_command
         $command .= " -certfile ".$self->{CHAINFILE};
     }
 
-
     $command .= " -passin env:pwd";
     $self->set_env ("pwd" => $self->{PASSWD});
-
+    
     $command .= " -passout env:p12pwd";
-    $self->set_env ('p12pwd' => $self->{PKCS12_PASSWD});
-
+    if ($self->{PKCS12_PASSWD} && !$self->{NOPASSWD}) {
+        $self->set_env ('p12pwd' => $self->{PKCS12_PASSWD});
+    } else {
+        $self->set_env ('p12pwd' => '');
+    }
+    
     return [ $command ];
 }
 
@@ -180,9 +186,14 @@ not designed for the tokens themselves.
 =item * PKCS12_PASSWD (optional)
 
 If you do not specify this option then we use PASSWD to encrypt the new
-PKCS#12 file.
+PKCS#12 file.  To export the key without password, you must explicitly 
+set NOPASSWD to 1.
 
-=item * ENC_ALG (optional)
+=item * NOPASSWD (optional)
+
+=item * KEY_PBE, CERT_PBE, CSP (optional)
+
+Passed as is to the openssl options with the same name.
 
 =back
 

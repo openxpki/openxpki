@@ -52,6 +52,7 @@ sub __init_command_params : PRIVATE {
                           "OUT"  => ['DER', 'PEM', 'TXT']},
     "convert_pkey"     => {"PASSWD"     => 1,
                           "OUT_PASSWD" => 0,
+                          "NOPASSWD"       => ["__undef",0,1],
                           "ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "IN"         => ["PEM","DER"],
                           "OUT"        => ["PEM","DER"],
@@ -60,6 +61,7 @@ sub __init_command_params : PRIVATE {
     "convert_pkcs8"   => {
                           "PASSWD"     => 1,
                           "OUT_PASSWD" => 0,
+                          "NOPASSWD"       => ["__undef",0,1],
                           "ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "IN"         => ["PEM","DER"],
                           "OUT"        => ["PEM","DER"],
@@ -75,6 +77,7 @@ sub __init_command_params : PRIVATE {
                           "SUBJECT" => 1},
     "create_pkcs12"   => {"PKCS12_PASSWD"  => 0,
                           "PASSWD"         => 1,
+                          "NOPASSWD"       => ["__undef",0,1],
                           "CERT_PBE"        => ["__undef","PBE-MD2-DES","PBE-MD5-DES","PBE-SHA1-RC2-64","PBE-MD2-RC2-64","PBE-MD5-RC2-64","PBE-SHA1-DES","PBE-SHA1-RC4-128","PBE-SHA1-RC4-40","PBE-SHA1-3DES","PBE-SHA1-2DES","PBE-SHA1-RC2-128","PBE-SHA1-RC2-40"],
                           "KEY_PBE"        => ["__undef","PBE-MD2-DES","PBE-MD5-DES","PBE-SHA1-RC2-64","PBE-MD2-RC2-64","PBE-MD5-RC2-64","PBE-SHA1-DES","PBE-SHA1-RC4-128","PBE-SHA1-RC4-40","PBE-SHA1-3DES","PBE-SHA1-2DES","PBE-SHA1-RC2-128","PBE-SHA1-RC2-40"],
                           "KEY"            => 1,
