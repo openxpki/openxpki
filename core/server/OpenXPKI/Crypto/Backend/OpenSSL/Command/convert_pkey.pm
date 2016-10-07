@@ -15,6 +15,7 @@ sub get_command
 
     ## compensate missing parameters 
     $self->{ENC_ALG} = "aes256" if (not exists $self->{ENC_ALG});
+    $self->{KEYTYPE} = "pkey" if (not $self->{KEYTYPE});
     
     $self->{IN} = 'PEM' if (not $self->{IN});
     $self->{OUT} = 'PEM' if (not $self->{OUT});
@@ -35,6 +36,12 @@ sub get_command
 	                   FORCE    => 1);
 
     ## check parameters
+
+    if ($self->{KEYTYPE} !~ /\A(pkey|rsa)\z/) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_PKEY_WRONG_KEYTYPE",
+            params => { KEYTYPE => $self->{KEYTYPE} });
+    }
 
     if ($self->{ENC_ALG} !~ /\A(aes(128|192|256)|des3|idea)\z/) {
         OpenXPKI::Exception->throw (
@@ -74,7 +81,8 @@ sub get_command
 
     ## build the command
 
-    my $command  = "pkey -in ".$self->{KEYFILE}." ";
+    my $command  = $self->{KEYTYPE} .  " -in ".$self->{KEYFILE}." ";
+    
     if ($self->{IN} eq "DER") {
         $command .= "-inform der ";
     }

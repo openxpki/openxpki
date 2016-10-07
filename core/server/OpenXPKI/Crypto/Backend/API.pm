@@ -54,6 +54,7 @@ sub __init_command_params : PRIVATE {
                           "OUT_PASSWD" => 0,
                           "NOPASSWD"       => ["__undef",0,1],
                           "ENC_ALG"    => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
+                          "KEYTYPE"    => ["pkey","rsa"],
                           "IN"         => ["PEM","DER"],
                           "OUT"        => ["PEM","DER"],
                           "DATA"       => 1,

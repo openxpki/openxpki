@@ -1111,7 +1111,8 @@ Supports the following parameters:
 
 One of PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
 (PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
-(OpenSSL native key format in PEM) JAVA_KEYSTORE (JKS including chain).
+(OpenSSL native key format in PEM), OPENSSL_RSA (OpenSSL RSA with 
+DEK-Info Header), JAVA_KEYSTORE (JKS including chain).
 
 =item * PASSWORD - the private key password
 
@@ -1205,7 +1206,7 @@ sub get_private_key_for_cert {
             $command_hashref->{OUT_PASSWD} = $pass_out;
         }
     }
-    elsif ( $format eq 'OPENSSL_PRIVKEY' ) {
+    elsif ( $format =~ /OPENSSL_(PRIVKEY|RSA)/ ) {
 
         # we just need to spit out the blob from the database but we need to check
         # if the password matches, so we do a 1:1 conversion        
@@ -1214,6 +1215,10 @@ sub get_private_key_for_cert {
             DATA    => $private_key,
             COMMAND => 'convert_pkey',
         };     
+        
+        if ($format eq 'OPENSSL_RSA') {
+            $command_hashref->{KEYTYPE} = 'rsa';
+        }
         
         if ($nopassword) {
             $command_hashref->{NOPASSWD} = 1;
