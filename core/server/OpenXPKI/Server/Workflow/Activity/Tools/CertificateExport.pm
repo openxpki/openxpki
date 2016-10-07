@@ -32,12 +32,22 @@ sub execute {
     if ($key_password) {
         my $privkey;
         eval {
-            $privkey = CTX('api')->get_private_key_for_cert({ 
+            my $p = { 
                 IDENTIFIER =>  $cert_identifier, 
                 FORMAT => $key_format, 
                 PASSWORD => $key_password,
                 ALIAS => $alias, 
-            });
+            };
+            my $export_password = $self->param('export_password');
+            if (defined $export_password) {
+                if ($export_password ne '') {
+                    $p->{PASSOUT} = $export_password;
+                } elsif ($self->param('unencrypted')) {
+                    $p->{PASSOUT} = '';
+                    $p->{NOPASSWD} = 1;
+                }
+            }
+            $privkey = CTX('api')->get_private_key_for_cert($p);
         };
         if (!$privkey) {
             CTX('log')->log(
@@ -140,11 +150,21 @@ An ARRAY of PEM encoded intermediates, might be empty.
 =item key_password
 
 The password which was used to persist the key, also used for encrypting
-the exported key.
+the exported key if export_password is not set.
 
 =item key_format, optional
 
  @see OpenXPKI::Server::API::Object::get_private_key_for_cert
+ 
+=item export_password, optional
+
+Encrypt the key with this password instead of the input password. Ignored
+if empty, to export unencrypted, you must also set the I<unencrypted> flag.
+
+=item unencrypted, optional
+
+Set this to a boolean true value AND set I<export_password> to the empty 
+string to export the key unencrypted.
 
 =item alias, optional
 

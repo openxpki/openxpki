@@ -1119,10 +1119,15 @@ Password that was used when the key was generated.
 
 =item * PASSOUT - the password for the exported key, default is PASSWORD
 
-B<this option not supported, yet>
-
 The password to encrypt the exported key with, if empty the input password
 is used.
+
+This option is only supported with format OPENSSL_PRIVKEY, PKCS12 and JKS!
+
+=item * NOPASSWD 
+
+If set to a true value, the B<key is exported without a password!>.
+You must also set PASSOUT to the empty string.
 
 =item * KEEPROOT
 
@@ -1145,6 +1150,24 @@ sub get_private_key_for_cert {
     my $identifier = $arg_ref->{IDENTIFIER};
     my $format     = $arg_ref->{FORMAT};
     my $password   = $arg_ref->{PASSWORD};
+    my $pass_out   = $arg_ref->{PASSOUT};
+    my $nopassword = $arg_ref->{NOPASSWD};
+
+
+    if ($nopassword && (!defined $pass_out || $pass_out ne '')) {
+        OpenXPKI::Exception->throw(
+            message =>
+              'I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOPASSWD_REQUIRES_EMPTY_PASSOUT'
+        );
+    }
+
+    if ($nopassword) {
+        CTX('log')->log(
+            MESSAGE  => "Private key export without password for certificate $identifier",
+            PRIORITY => 'warn',
+            FACILITY => 'audit',
+        );
+    }
 
     my $default_token = CTX('api')->get_default_token();
     ##! 4: 'identifier: ' . $identifier
@@ -1175,16 +1198,28 @@ sub get_private_key_for_cert {
             OUT     => $format,
             REVERSE => 1
         };         
+        
+        if ($nopassword) {
+            $command_hashref->{NOPASSWD} = 1;
+        } elsif ($pass_out) {
+            $command_hashref->{OUT_PASSWD} = $pass_out;
+        }
     }
     elsif ( $format eq 'OPENSSL_PRIVKEY' ) {
 
         # we just need to spit out the blob from the database but we need to check
         # if the password matches, so we do a 1:1 conversion        
         $command_hashref = {
-            PASSWD  => $password,
+            PASSWD  => $password,           
             DATA    => $private_key,
             COMMAND => 'convert_pkey',
         };     
+        
+        if ($nopassword) {
+            $command_hashref->{NOPASSWD} = 1;
+        } elsif ($pass_out) {
+            $command_hashref->{OUT_PASSWD} = $pass_out;
+        }
 
     }
     elsif ( $format eq 'PKCS12' || $format eq 'JAVA_KEYSTORE' ) {
@@ -1207,6 +1242,15 @@ sub get_private_key_for_cert {
             CERT    => $certificate,
             CHAIN   => \@chain,
         };
+               
+        if ($nopassword) {
+            $command_hashref->{NOPASSWD} = 1;
+        } elsif ($pass_out) {
+            $command_hashref->{PKCS12_PASSWD} = $pass_out;
+            # set password for JKS export
+            $password = $pass_out;
+        }
+        
         if ( exists $arg_ref->{CSP} ) {
             $command_hashref->{CSP} = $arg_ref->{CSP};
         }
@@ -1219,14 +1263,14 @@ sub get_private_key_for_cert {
         }
         
     }
-   
+     
     eval { 
         $result = $default_token->command($command_hashref);
     };
     if (!$result) { 
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_UNABLE_EXPORT_KEY',
-            params => { 'IDENTIFIER' => $identifier, },
+            params => { 'IDENTIFIER' => $identifier, ERROR => $EVAL_ERROR },
         );
     }
 
