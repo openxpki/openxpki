@@ -27,9 +27,11 @@ sub execute {
     
     my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM'});
     my @certs = @{$chain->{CERTIFICATES}};
+         
+    my $target_key = $self->param('target_key') || 'certificate_export';    
         
     my $key;    
-    if ($key_password) {
+    if (defined $key_password) {
         my $privkey;
         eval {
             my $p = { 
@@ -54,10 +56,16 @@ sub execute {
                 MESSAGE => "Export of private key failed for $cert_identifier",
                 PRIORITY => 'error',
                 FACILITY => [ 'application', 'audit' ],
-            );          
-            OpenXPKI::Exception->throw( 
-                message => 'I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY'
             );
+            
+            if ($self->param('die_on_error')) {          
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY'
+                );
+            }
+            $context->param( $target_key  => '');
+            return;
+
         }
         $key = $privkey->{PRIVATE_KEY};
         CTX('log')->log(
@@ -85,12 +93,10 @@ sub execute {
     
     # shift/pop of the entity and ca from the ends of the list
     my $config = $tt->render( $template, $ttargs );
-         
-         
-    my $target_key = $self->param('target_key') || 'certificate_export';    
-         
-    $context->param( $target_key , $config);  
-               
+             
+    $context->param( $target_key , $config);
+
+    return 1;               
 }
 
 1;
@@ -171,6 +177,12 @@ string to export the key unencrypted.
 For PKCS12 sets the so called "friendly name" for the certificate.
 For Java Keystore sets the keystore alias.
 Parameter is ignored for any other key types.
+
+=item die_on_error
+
+Boolean, if true the activity will throw an exception if the private key
+could not be restored (which usually means that the wrong password was 
+provided). If false/not set, the target_key is just empty on error.
 
 =item target_key, optional
 
