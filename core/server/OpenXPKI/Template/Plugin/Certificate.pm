@@ -241,4 +241,27 @@ sub notafter {
 
 }
 
+=head2 chain
+
+Return the chain of the certificate as array.
+The first element is the certificate issuer, the root ca is the last.
+
+=cut
+
+sub chain {
+
+    my $self = shift;
+    my $cert_id = shift;
+                
+    my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_id, OUTFORMAT => 'PEM'});
+    my @certs = @{$chain->{CERTIFICATES}};
+        
+    # strip the end entity
+    shift @certs;
+
+    return \@certs;
+    
+}    
+
+
 1;
