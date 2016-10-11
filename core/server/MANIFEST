@@ -311,6 +311,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/TriggerCertificatePublish.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RenderSubject.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/CertificateExport.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CertificateExportArchive.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ExportToFile.pm
 OpenXPKI/Server/Workflow/Activity/Tools/InjectExtraParam.pm
 

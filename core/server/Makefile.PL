@@ -319,6 +319,8 @@ WriteMakefile(
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g '.$Config{ccflags},
     'PREREQ_PM' => {
+        
+    'Archive::Zip' => 0, 
 #    'Class::Accessor::Fast'  => '0.31', # Constituent of module Class::Accessor
 #					 # which is a prerequisite of Class::Accessor::Chained, see below
     'Class::Accessor::Chained::Fast' => '0', # Constituent of module Class::Accessor::Chained
