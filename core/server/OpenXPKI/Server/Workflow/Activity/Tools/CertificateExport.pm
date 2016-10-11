@@ -20,26 +20,33 @@ sub execute {
     my $context = $workflow->context();
     
     my $cert_identifier = $self->param('cert_identifier');
-    my $key_format = $self->param('key_format') || 'OPENSSL_PRIVKEY';
     my $key_password = $self->param('key_password');
-    my $alias = $self->param('alias') || '';
     my $template = $self->param('template');
-    
-    my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM'});
-    my @certs = @{$chain->{CERTIFICATES}};
          
-    my $target_key = $self->param('target_key') || 'certificate_export';    
-        
-    my $key;    
-    if (defined $key_password) {
+    my $target_key = $self->param('target_key') || 'certificate_export';
+
+    my $key;
+
+    # no template, no key, just export the plain certificate    
+    if (!$template && !defined $key_password) {
+
+        my $cert = CTX('api')->get_cert({ IDENTIFIER => $cert_identifier, FORMAT => 'PEM'});
+        $context->param( $target_key  => $cert );
+
+    } elsif (defined $key_password) {
         my $privkey;
         eval {
+            
+            my $key_format = $self->param('key_format') || 'OPENSSL_PRIVKEY';
+            my $alias = $self->param('alias') || '';
+                
             my $p = { 
                 IDENTIFIER =>  $cert_identifier, 
                 FORMAT => $key_format, 
                 PASSWORD => $key_password,
                 ALIAS => $alias, 
             };
+            
             my $export_password = $self->param('export_password');
             if (defined $export_password) {
                 if ($export_password ne '') {
@@ -64,38 +71,52 @@ sub execute {
                 );
             }
             $context->param( $target_key  => '');
-            return;
-
+           
+        } else {
+             
+            CTX('log')->log(
+                MESSAGE => "Export of private key to context for $cert_identifier",
+                PRIORITY => 'info',
+                FACILITY => [ 'application', 'audit' ],
+            );
+            
+            # If no template is given, we export only the private key 
+            if (!$template) {
+                $context->param( $target_key  => $privkey->{PRIVATE_KEY} );
+            } else {
+                $key = $privkey->{PRIVATE_KEY};        
+            }
         }
-        $key = $privkey->{PRIVATE_KEY};
-        CTX('log')->log(
-            MESSAGE => "Export of private key to context for $cert_identifier",
-            PRIORITY => 'info',
-            FACILITY => [ 'application', 'audit' ],
-        );          
     }
     
-    ##! 64: 'chain ' . Dumper $chain
-    ##! 64: 'key' . $key
+    # the "no template" case was already handled above
+    if ($template) {
             
-    my $tt = OpenXPKI::Template->new();
+        my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM'});
+        my @certs = @{$chain->{CERTIFICATES}};
+        
+        ##! 64: 'chain ' . Dumper $chain
+        ##! 64: 'key' . $key
+                
+        my $tt = OpenXPKI::Template->new();
+        
+        my $ca = pop @certs if ($chain->{COMPLETE});
+        
+        my $ttargs = {
+            subject => ($chain->{SUBJECT}->[0]),
+            certificate => shift @certs,
+            ca => $ca,
+            chain => \@certs,
+            key =>  $key,
+        };
+        ##! 32: 'values ' . Dumper $ttargs          
+        
+        # shift/pop of the entity and ca from the ends of the list
+        my $config = $tt->render( $template, $ttargs );
+                 
+        $context->param( $target_key , $config);
+    }
     
-    my $ca = pop @certs if ($chain->{COMPLETE});
-    
-    my $ttargs = {
-        subject => ($chain->{SUBJECT}->[0]),
-        certificate => shift @certs, 
-        ca => $ca, 
-        chain => \@certs, 
-        key =>  $key,
-    };
-    ##! 32: 'values ' . Dumper $ttargs          
-    
-    # shift/pop of the entity and ca from the ends of the list
-    my $config = $tt->render( $template, $ttargs );
-             
-    $context->param( $target_key , $config);
-
     return 1;               
 }
 
