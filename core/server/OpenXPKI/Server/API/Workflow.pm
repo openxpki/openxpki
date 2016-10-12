@@ -147,6 +147,8 @@ sub get_workflow_log {
     
     my @log;
     while (my $line = shift @{$result}) {
+       # remove the package and session info from the message 
+       $line->{MESSAGE} =~ s/\A\[OpenXPKI::.*\]//; 
        push @log, [ $line->{TIMESTAMP}, $line->{PRIORITY}, $line->{MESSAGE} ]; 
     }
     
