@@ -41,6 +41,8 @@ state:
           - global_set_error_export_private_key_failed > FAILED ? !key_exists
 
     FAILED:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC
         action: 
          - retry_password > GENERATE
          - global_noop > CANCELED
