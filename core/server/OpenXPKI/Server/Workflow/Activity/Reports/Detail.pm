@@ -103,10 +103,11 @@ sub execute {
         unique_subject => 0,
         profile => '',
         subject => '',
+        delimiter => '|',
     };
     
     # try to read those from the activity config
-    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject)) {
+    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter)) {
         if (defined $self->param($key)) {
             $p->{$key} = $self->param($key);
         }        
@@ -117,12 +118,12 @@ sub execute {
     my $report_config = $self->param('report_config');
     my @columns;
     my @head;
-    my $tt;
+    my $tt = OpenXPKI::Template->new();
     if ($report_config) {
         my $config = CTX('config');
         
         # override selector config
-        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject)) {
+        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter)) {
             if ($config->exists(['report', $report_config, $key])) {
                 
                 # profile and subject can be a list
@@ -134,8 +135,6 @@ sub execute {
                 }
             }
         }
-        
-        $tt = OpenXPKI::Template->new();
         
         @columns = $config->get_list(['report', $report_config, 'cols']);
         @head = map { $_->{head} } @columns;
@@ -246,10 +245,22 @@ sub execute {
  
     
     my $cnt;
+    my $delim = $p->{delimiter} || '|';
     
-    print $fh "full certificate report, realm $pki_realm, validity date ".$valid_at->iso8601()." , export date ". DateTime->now()->iso8601 ."\n";
+    if (!$p->{head}) {
+        $p->{head} = "Full Certificate Report, Realm [% pki_realm %], Validity Date: [% valid_at %], Export Date: [% export_date %][% IF report_config %], Report Config [% report_config %][% END %]"; 
+    }
+
+    my $head = $tt->render($p->{head}, { 
+        pki_realm => $pki_realm, 
+        valid_at => $valid_at->iso8601(), 
+        export_date => DateTime->now()->iso8601,
+        report_config => $report_config
+    }); 
+
+    if ($head) { print $fh $head."\n"; }
     
-    print $fh join("|", @{[ ("request id","subject","cert. serial", "identifier", "notbefore", "notafter", "status", "issuer"), @head ] })."\n";
+    print $fh join($delim, @{[ ("request id","subject","cert. serial", "identifier", "notbefore", "notafter", "status", "issuer"), @head ] })."\n";
     
     my $subject_seen = {};
         
@@ -309,7 +320,7 @@ sub execute {
             }
         }
         
-        print $fh join("|", @line) . "\n";
+        print $fh join($delim, @line) . "\n";
     }
 
     close $fh;
@@ -377,6 +388,31 @@ The umask to set on the generated file, default is 640. Note that the
 owner is the user/group running the socket, if you want to download 
 this file using the webserver, make sure that either the webserver has 
 permissions on the daemons group or set the umask to 644.
+
+=item delimiter
+
+A single char which is used as delimiter. Default is the pipe symbol |. Be
+aware that no escaping or quoting of values is done, so you can only use a
+symbol that will not occur in the data fields! Good choices beside the pipe
+is a tab (\t), semicolon (;) or hash (#);
+
+=item head
+
+A string or template toolkit pattern to put into the first line of the report
+file. If not set, a default header is added. Available template vars are 
+(both dates are in ISO8601 format):
+
+=over 
+
+=item export_date
+
+=item valid_at
+
+=item pki_realm
+
+=item report_config
+
+=back
 
 =item include_expired
 

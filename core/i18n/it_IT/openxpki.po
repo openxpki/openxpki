@@ -397,6 +397,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
+msgstr "Catena di certificazione"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Paese"
 
@@ -850,6 +854,24 @@ msgstr "3 anni"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "entità / certificato non più attivi"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
+msgstr "Scarica"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
+msgstr "Certificato in Scadenza"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
+msgstr "Report Completo"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
@@ -1335,6 +1357,10 @@ msgstr "Esporta lo stato iniziale"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
 msgstr "Specifica Opzioni Report"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
+msgstr "Specifica Opzioni Report"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancella questo workflow."
 
@@ -1529,6 +1555,10 @@ msgstr "Sottoscrizione SCEP"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Termina Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
+msgstr "Password"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
@@ -2384,6 +2414,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr "Questo Workflow è stato cancellato da un’azione dell’utente."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
+msgstr "Questo Workflow è stato cancellato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
+msgstr "CANCELLATO"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr ""
 "Il certificato è stato emesso e verrà inviato al client SCEP su richiesta."
@@ -2687,6 +2725,14 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL"
+msgstr "SUCCESSO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
 msgstr "SUCCESSO"
 
 #, fuzzy
