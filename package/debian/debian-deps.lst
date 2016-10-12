@@ -86,4 +86,5 @@ libossp-uuid-perl
 libdbix-handler-perl
 libsql-abstract-more-perl
 libmoosex-params-validate-perl
-libdbix-transactionmanager-perl.
+libdbix-transactionmanager-perl
+libarchive-zip-perl
