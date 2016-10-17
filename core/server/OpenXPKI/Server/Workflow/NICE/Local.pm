@@ -196,7 +196,7 @@ sub issueCertificate {
         );
         $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
     }
-    
+
 
     ##! 32: 'issuing certificate'
     ##! 64: 'certificate profile '. Dumper( $profile )
@@ -205,7 +205,7 @@ sub issueCertificate {
         COMMAND => "issue_cert",
         PROFILE => $profile,
         CSR     => $csr->{DATA},
-    });        
+    });
 
     # SPKAC Requests return binary format - so we need to convert that
     if ($certificate !~ m{\A -----BEGIN }xms) {
@@ -306,31 +306,26 @@ sub issueCRL {
     my $crl_validity = $self->_get_context_param('crl_validity');
     my $delta_crl = $self->_get_context_param('delta_crl');
 
-    if ($delta_crl) {
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT",
-        );
-    }
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT",
+    ) if $delta_crl;
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
-
-    # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
-    my %profile = (
-        CA  => $ca_alias,
-    );
-    $profile{VALIDITY} = { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity } if($crl_validity);
 
     # Load meta data of CA from the database
     my $ca_info = CTX('api')->get_certificate_for_alias( { ALIAS => $ca_alias } );
 
-    # We need the validity to check for the necessity of a "End of Life" CRL
-    $profile{CA_VALIDITY} = { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{NOTAFTER} };
-
     # Get the certificate identifier to filter in the database
     my $ca_identifier = $ca_info->{IDENTIFIER};
 
-
-    my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new( %profile );
+    # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
+    my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
+        CA  => $ca_alias,
+        $crl_validity
+         ? VALIDITY => { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity } : (),
+        # We need the validity to check for the necessity of a "End of Life" CRL
+        CA_VALIDITY => { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{NOTAFTER} }
+    );
     ##! 16: 'profile: ' . Dumper( $crl_profile )
 
     my $ca_token = CTX('crypto_layer')->get_token({
@@ -338,12 +333,9 @@ sub issueCRL {
         NAME => $ca_alias
     });
 
-    if (!defined $ca_token) {
-        OpenXPKI::Exception->throw(
-           message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
-        );
-    }
-
+    OpenXPKI::Exception->throw(
+       message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
+    ) unless defined $ca_token;
 
     # we want all identifiers and data for certificates that are
     # already in the certificate database with status 'REVOKED'
@@ -374,10 +366,7 @@ sub issueCRL {
         },
     );
 
-    if (defined $already_revoked_certs) {
-        push @cert_timestamps,
-                $self->__prepare_crl_data($already_revoked_certs);
-    }
+    push @cert_timestamps, $self->__prepare_crl_data($already_revoked_certs);
     ##! 16: 'cert_timestamps after first step: ' . Dumper(\@cert_timestamps)
 
     my $certs_to_be_revoked = $dbi->select(
@@ -393,15 +382,10 @@ sub issueCRL {
             'STATUS'            => 'CRL_ISSUANCE_PENDING',
         },
     );
-    if (defined $certs_to_be_revoked) {
-        push @cert_timestamps,
-                $self->__prepare_crl_data($certs_to_be_revoked);
-    }
+    push @cert_timestamps, $self->__prepare_crl_data($certs_to_be_revoked);
     ##! 32: 'cert_timestamps after 2nd step: ' . Dumper \@cert_timestamps
 
-    my $serial = $dbi->get_new_serial(
-            TABLE => 'CRL',
-    );
+    my $serial = $dbi->get_new_serial(TABLE => 'CRL');
     $crl_profile->set_serial($serial);
 
     ##! 16: 'performing key online test'
@@ -453,18 +437,15 @@ sub __prepare_crl_data {
     my $self = shift;
     my $certs_to_be_revoked = shift;
 
-    my @cert_timestamps;
+    my @cert_timestamps = ();
     my $dbi       = CTX('dbi_backend');
     my $pki_realm = CTX('session')->get_pki_realm();
 
     foreach my $cert (@{$certs_to_be_revoked}) {
         ##! 32: 'cert to be revoked: ' . Dumper $cert
-        #my $data       = $cert->{'DATA'};
         my $serial      = $cert->{'CERTIFICATE_SERIAL'};
-        my $revocation_timestamp  = 0; # default if no approval date found
+        my $identifier  = $cert->{'IDENTIFIER'};
         my $reason_code = '';
-        my $invalidity_timestamp = '';
-        my $identifier = $cert->{'IDENTIFIER'};
         my $crr = $dbi->last(
            TABLE => 'CRR',
             COLUMNS => [
@@ -478,23 +459,17 @@ sub __prepare_crl_data {
             },
         );
         if (defined $crr) {
-            $revocation_timestamp = $crr->{'REVOCATION_TIME'};
-            $reason_code          = $crr->{'REASON_CODE'};
-            $invalidity_timestamp = $crr->{'INVALIDITY_TIME'};
-            ##! 32: 'last approved crr present: ' . $revocation_timestamp
-            push @cert_timestamps, [ $serial, $revocation_timestamp, $reason_code, $invalidity_timestamp ];
+            $reason_code = $crr->{'REASON_CODE'};
+            ##! 32: 'last approved crr present: ' . $crr->{'REVOCATION_TIME'}
+            push @cert_timestamps, [ $serial, $crr->{'REVOCATION_TIME'}, $reason_code, $crr->{'INVALIDITY_TIME'} ];
         }
         else {
             push @cert_timestamps, [ $serial ];
         }
         # update certificate database:
         my $status = 'REVOKED';
-        if ($reason_code eq 'certificateHold') {
-            $status = 'HOLD';
-        }
-        if ($reason_code eq 'removeFromCRL') {
-            $status = 'ISSUED';
-        }
+        $status = 'HOLD'   if $reason_code eq 'certificateHold';
+        $status = 'ISSUED' if $reason_code eq 'removeFromCRL';
         $dbi->update(
             TABLE => 'CERTIFICATE',
             DATA  => {
@@ -551,4 +526,3 @@ Queries the certifictes status from the local certificate datasbase.
 
 Creates a crl for the given ca and pushes it into the database for publication.
 Incremental CRLs are not supported.
-
