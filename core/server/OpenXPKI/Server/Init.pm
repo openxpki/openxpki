@@ -420,7 +420,7 @@ sub __do_init_dbi {
             $params{'db_'.$key} = $db_config->{$key};
         }
     }
-    
+
     # environment
     my $db_env = $config->get_hash("$dbpath.environment");
     foreach my $env_name (keys %{$db_env}) {
@@ -430,9 +430,9 @@ sub __do_init_dbi {
     }
 
     OpenXPKI::Server::Context::setcontext({
-        dbi => OpenXPKI::Server::Database::factory(\%params),
+        dbi => OpenXPKI::Server::Database->new(\%params),
     });
-    
+
 }
 
 sub __do_init_acl {

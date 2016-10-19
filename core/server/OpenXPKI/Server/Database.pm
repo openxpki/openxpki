@@ -16,10 +16,9 @@ use DBI::Const::GetInfoType;
 #
 # Constructor arguments
 #
-
 has 'log'             => ( is => 'ro', isa => 'Object', required => 1 );
-has 'db_type'         => ( is => 'ro', isa => 'Str', required => 1 ); # DBI compliant case sensitive driver name
-has 'db_name'         => ( is => 'ro', isa => 'Str', required => 1 );
+has 'db_type'         => ( is => 'rw', isa => 'Str',    required => 1 ); # DBI compliant case sensitive driver name
+has 'db_name'         => ( is => 'ro', isa => 'Str',    required => 1 );
 has 'db_namespace'    => ( is => 'ro', isa => 'Str' );                # = schema
 has 'db_host'         => ( is => 'ro', isa => 'Str' );
 has 'db_port'         => ( is => 'ro', isa => 'Int' );
@@ -53,10 +52,17 @@ has '_connector' => (
 
 sub _build_connector {
     my $self = shift;
+    ##! 4: "DSN: ".$self->_dsn
+    ##! 4: "DSN attributes: " . join " | ", map { $_." = ".$self->_dsn_attrs->{$_} } keys %{$self->_dsn_attrs}
+    return DBIx::Handler->new($self->_dsn, $self->db_user, $self->db_passwd, $self->_dsn_attrs);
+}
 
-    my $dsn = $self->_driver_hook('dsn');
-    # default DSN
-    unless ($dsn) {
+has '_dsn' => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
         my %param_map = (
             database => $self->db_name,
             host => $self->db_host,
@@ -65,69 +71,55 @@ sub _build_connector {
         # only add defined attributes
         my $dsn_params = join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
         # compose DSN and attributes
-        $dsn = sprintf("dbi:%s:%s", $self->db_type, $dsn_params);
-    }
-    ##! 4: "DSN: $dsn"
-
-    my $attr_hash = {
-        RaiseError => 1,
-        AutoCommit => 0,
-        $self->_driver_hook('dbi_attributes'),
-    };
-    ##! 4: "Attributes: " . join " | ", map { $_." = ".$attr_hash->{$_} } keys %$attr_hash
-
-    return DBIx::Handler->new($dsn, $self->db_user, $self->db_passwd, $attr_hash);
-}
-
-# FIXME Document driver_hooks attribute
-# Possible hooks:
-#  - dsn (Str)
-#  - dbi_attributes (List)
-has 'driver_hooks' => (
-    is => 'ro',
-    isa => 'HashRef',
-    default => sub { {
-        #******************************
-        # MYSQL
-        mysql => {
-            dbi_attributes => sub { (
-                mysql_enable_utf8 => 1,
-                mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
-                mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
-            ) },
-        },
-        #******************************
-        # ORACLE
-        Oracle => {
-            dsn => sub {
-                my $self = shift;
-                return sprintf("dbi:%s:%s", $self->db_type, $self->db_name);
-            },
-            dbi_attributes => sub {
-                (LongReadLen => 10_000_000)
-            },
-        }
-        # TODO Use PostgreSQL DB option: pg_enable_utf8 => 1
-    } },
+        return sprintf("dbi:%s:%s", $self->db_type, $dsn_params);
+    },
 );
 
-# Returns the hook of the given name that fits the current DB type
-# If no hook is found it returns () in list context and undef in scalar context.
-sub _driver_hook {
-    my ($self, $hook_name) = @_;
-    ##! 8: "_driver_hook('$hook_name')"
-    my $hook = $self->driver_hooks->{$self->db_type}->{$hook_name}
-        if $self->driver_hooks->{$self->db_type}
-        and $self->driver_hooks->{$self->db_type}->{$hook_name};
-    # no hook - return empty list or undef
-    return wantarray ? () : undef unless $hook;
-    # fail if hook is no subroutine
-    OpenXPKI::Exception->throw(
-        message => "A hook must be a subroutine",
-        params => { db_type => $self->db_type, hook_name => $hook_name }
-    ) unless ref $hook eq 'CODE';
-    # execute hook and return result
-    return $hook->($self);
+has '_dsn_attrs' => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { {
+        RaiseError => 1,
+        AutoCommit => 0,
+    } },
+    traits  => ['Hash'],
+    handles => {
+        _add_dsn_attr => 'set',
+    },
+);
+
+# Constructor
+sub BUILD {
+    my $self = shift;
+
+    # FIXME Drop support for legacy DB driver configuration (= not DBI compliant)
+    $self->db_type('mysql')  if $self->db_type =~ /mysql/i;
+    $self->db_type('Oracle') if $self->db_type =~ /oracle/i;
+
+    #******************************
+    # MYSQL
+    if ('mysql' eq $self->db_type) {
+        $self->_add_dsn_attr(
+            mysql_enable_utf8 => 1,
+            mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
+            mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+        );
+    }
+    #******************************
+    # ORACLE
+    elsif ('Oracle' eq $self->db_type) {
+        OpenXPKI::Exception->throw(
+            message => "Only named connections via TNS are supported for Oracle databases (please remove host and port specifications from your configuration)",
+        ) if ($self->db_host or $self->db_port);
+
+        $self->_dsn(sprintf("dbi:%s:%s", $self->db_type, $self->db_name));
+        $self->_add_dsn_attr(
+            LongReadLen => 10_000_000,
+        );
+    }
+
+    # TODO Use PostgreSQL DB option: pg_enable_utf8 => 1
 }
 
 # Returns a new L<OpenXPKI::Server::Database::Query> object.
