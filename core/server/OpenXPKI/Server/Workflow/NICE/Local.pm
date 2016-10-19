@@ -322,7 +322,7 @@ sub issueCRL {
     my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
         CA  => $ca_alias,
         $crl_validity
-         ? VALIDITY => { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity } : (),
+         ? (VALIDITY => { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity }) : (),
         # We need the validity to check for the necessity of a "End of Life" CRL
         CA_VALIDITY => { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{NOTAFTER} }
     );
