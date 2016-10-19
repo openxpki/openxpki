@@ -54,34 +54,80 @@ has '_connector' => (
 sub _build_connector {
     my $self = shift;
 
-    OpenXPKI::Exception->throw (
-        message => "OpenXPKI::Server::Database is an abstract class - please use the driver specific class instead!",
-    );
+    my $dsn = $self->_driver_hook('dsn');
+    # default DSN
+    unless ($dsn) {
+        my %param_map = (
+            database => $self->db_name,
+            host => $self->db_host,
+            port => $self->db_port,
+        );
+        # only add defined attributes
+        my $dsn_params = join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
+        # compose DSN and attributes
+        $dsn = sprintf("dbi:%s:%s", $self->db_type, $dsn_params);
+    }
+    ##! 4: "DSN: $dsn"
 
+    my $attr_hash = {
+        RaiseError => 1,
+        AutoCommit => 0,
+        $self->_driver_hook('dbi_attributes'),
+    };
+    ##! 4: "Attributes: " . join " | ", map { $_." = ".$attr_hash->{$_} } keys %$attr_hash
+
+    return DBIx::Handler->new($dsn, $self->db_user, $self->db_passwd, $attr_hash);
 }
 
-# This is a static method, the init hash is expected as single argument!
-sub factory {
+# FIXME Document driver_hooks attribute
+# Possible hooks:
+#  - dsn (Str)
+#  - dbi_attributes (List)
+has 'driver_hooks' => (
+    is => 'ro',
+    isa => 'HashRef',
+    default => sub { {
+        #******************************
+        # MYSQL
+        mysql => {
+            dbi_attributes => sub { (
+                mysql_enable_utf8 => 1,
+                mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
+                mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+            ) },
+        },
+        #******************************
+        # ORACLE
+        Oracle => {
+            dsn => sub {
+                my $self = shift;
+                return sprintf("dbi:%s:%s", $self->db_type, $self->db_name);
+            },
+            dbi_attributes => sub {
+                (LongReadLen => 10_000_000)
+            },
+        }
+        # TODO Use PostgreSQL DB option: pg_enable_utf8 => 1
+    } },
+);
 
-    my $params = shift;
-
-    if (!$params->{db_type}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_DATABASE_INIT_DB_TYPE_IS_MANDATORY",
-        );
-    }
-
-    my $db_class = "OpenXPKI::Server::Database::Driver::".$params->{db_type};
-    eval "use $db_class;1;";
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_DBI_UNABLE_TO_LOAD_DRIVER",
-            params => { db_type => $params->{db_type} }
-        );
-    }
-
-    return $db_class->new($params);
-
+# Returns the hook of the given name that fits the current DB type
+# If no hook is found it returns () in list context and undef in scalar context.
+sub _driver_hook {
+    my ($self, $hook_name) = @_;
+    ##! 8: "_driver_hook('$hook_name')"
+    my $hook = $self->driver_hooks->{$self->db_type}->{$hook_name}
+        if $self->driver_hooks->{$self->db_type}
+        and $self->driver_hooks->{$self->db_type}->{$hook_name};
+    # no hook - return empty list or undef
+    return wantarray ? () : undef unless $hook;
+    # fail if hook is no subroutine
+    OpenXPKI::Exception->throw(
+        message => "A hook must be a subroutine",
+        params => { db_type => $self->db_type, hook_name => $hook_name }
+    ) unless ref $hook eq 'CODE';
+    # execute hook and return result
+    return $hook->($self);
 }
 
 # Returns a new L<OpenXPKI::Server::Database::Query> object.
@@ -186,6 +232,9 @@ OpenXPKI::Server::Database - Entry point for database related functions
 =head1 Description
 
 This class contains the API to interact with the configured OpenXPKI database.
+
+For Oracle databases only named connections via TNS names are supported
+(no host/port setup).
 
 =head1 Attributes
 
