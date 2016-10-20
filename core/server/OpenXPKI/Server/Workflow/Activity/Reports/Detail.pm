@@ -220,9 +220,13 @@ sub execute {
         'certificate.notafter',
         'certificate.notbefore',
         'certificate.issuer_dn',
-        'certificate.identifier',
+        'certificate.issuer_identifier',
         'certificate.subject_key_identifier',
-        'certificate.authority_key_identifier'
+        'certificate.authority_key_identifier',
+
+        # FIXME Remove the following legacy column names (custom reports)
+        'certificate.cert_key|certificate_serial',
+        'certificate.req_key|csr_serial',
     ];
 
     if ($need_csr) {
