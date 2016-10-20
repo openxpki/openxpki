@@ -78,15 +78,12 @@ has '_dsn' => (
 has '_dsn_attrs' => (
     is => 'rw',
     isa => 'HashRef',
-    lazy => 1,
     default => sub { {
         RaiseError => 1,
         AutoCommit => 0,
     } },
     traits  => ['Hash'],
-    handles => {
-        _add_dsn_attr => 'set',
-    },
+    handles => { _add_dsn_attr => 'set' },
 );
 
 # Constructor
@@ -98,7 +95,7 @@ sub BUILD {
     $self->db_type('Oracle') if $self->db_type =~ /oracle/i;
 
     #******************************
-    # MYSQL
+    # MYSQL - custom behaviour
     if ('mysql' eq $self->db_type) {
         $self->_add_dsn_attr(
             mysql_enable_utf8 => 1,
@@ -107,7 +104,7 @@ sub BUILD {
         );
     }
     #******************************
-    # ORACLE
+    # ORACLE - custom behaviour
     elsif ('Oracle' eq $self->db_type) {
         OpenXPKI::Exception->throw(
             message => "Only named connections via TNS are supported for Oracle databases (please remove host and port specifications from your configuration)",
