@@ -16,10 +16,9 @@ use DBI::Const::GetInfoType;
 #
 # Constructor arguments
 #
-
 has 'log'             => ( is => 'ro', isa => 'Object', required => 1 );
-has 'db_type'         => ( is => 'ro', isa => 'Str', required => 1 ); # DBI compliant case sensitive driver name
-has 'db_name'         => ( is => 'ro', isa => 'Str', required => 1 );
+has 'db_type'         => ( is => 'rw', isa => 'Str',    required => 1 ); # DBI compliant case sensitive driver name
+has 'db_name'         => ( is => 'ro', isa => 'Str',    required => 1 );
 has 'db_namespace'    => ( is => 'ro', isa => 'Str' );                # = schema
 has 'db_host'         => ( is => 'ro', isa => 'Str' );
 has 'db_port'         => ( is => 'ro', isa => 'Int' );
@@ -48,40 +47,86 @@ has '_connector' => (
     is => 'rw',
     isa => 'DBIx::Handler',
     lazy => 1,
-    builder => '_build_connector'
+    builder => '_build_connector',
 );
 
 sub _build_connector {
     my $self = shift;
-
-    OpenXPKI::Exception->throw (
-        message => "OpenXPKI::Server::Database is an abstract class - please use the driver specific class instead!",
-    );
-
+    ##! 4: "DSN: ".$self->_dsn
+    ##! 4: "DSN attributes: " . join " | ", map { $_." = ".$self->_dsn_attrs->{$_} } keys %{$self->_dsn_attrs}
+    my $conn = DBIx::Handler->new($self->_dsn, $self->db_user, $self->db_passwd, $self->_dsn_attrs);
 }
 
-# This is a static method, the init hash is expected as single argument!
-sub factory {
+has '_dsn' => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        my %param_map = (
+            database => $self->db_name,
+            host => $self->db_host,
+            port => $self->db_port,
+        );
+        # only add defined attributes
+        my $dsn_params = join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
+        # compose DSN and attributes
+        return sprintf("dbi:%s:%s", $self->db_type, $dsn_params);
+    },
+);
 
-    my $params = shift;
+has '_dsn_attrs' => (
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub { {
+        RaiseError => 1,
+        AutoCommit => 0,
+    } },
+    traits  => ['Hash'],
+    handles => { _add_dsn_attr => 'set' },
+);
 
-    if (!$params->{db_type}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_DATABASE_INIT_DB_TYPE_IS_MANDATORY",
+# Constructor
+sub BUILD {
+    my $self = shift;
+
+    # FIXME Drop support for legacy DB driver configuration (= not DBI compliant)
+    $self->db_type('mysql')  if $self->db_type =~ /mysql/i;
+    $self->db_type('Oracle') if $self->db_type =~ /oracle/i;
+
+    #******************************
+    # MYSQL - custom behaviour
+    if ('mysql' eq $self->db_type) {
+        $self->_add_dsn_attr(
+            mysql_enable_utf8 => 1,
+            mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
+            mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+        );
+    }
+    #******************************
+    # ORACLE - custom behaviour
+    elsif ('Oracle' eq $self->db_type) {
+        OpenXPKI::Exception->throw(
+            message => "Only named connections via TNS are supported for Oracle databases (please remove host and port specifications from your configuration)",
+        ) if ($self->db_host or $self->db_port);
+
+        $self->_dsn(sprintf("dbi:%s:%s", $self->db_type, $self->db_name));
+        $self->_add_dsn_attr(
+            LongReadLen => 10_000_000,
         );
     }
 
-    my $db_class = "OpenXPKI::Server::Database::Driver::".$params->{db_type};
-    eval "use $db_class;1;";
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_DBI_UNABLE_TO_LOAD_DRIVER",
-            params => { db_type => $params->{db_type} }
-        );
-    }
+    # TODO Use PostgreSQL DB option: pg_enable_utf8 => 1
+}
 
-    return $db_class->new($params);
-
+# Returns a fork safe DBI handle
+sub dbh {
+    my $self = shift;
+    # If this is too slow due to DB pings, we could pass "no_ping" attribute to
+    # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
+    my $dbh = $self->_connector->dbh;        # fork safe DBI handle
+    $dbh->{FetchHashKeyName} = 'NAME_lc';    # enforce lowercase names
+    return $dbh;
 }
 
 # Returns a new L<OpenXPKI::Server::Database::Query> object.
@@ -129,11 +174,7 @@ sub insert {
 sub run {
     my ($self, $query) = @_;
 
-    # If this is too slow due to DB pings, we could pass "no_ping" attribute to
-    # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
-    my $dbh = $self->_connector->dbh;        # fork safe DBI handle
-
-    my $sth = $dbh->prepare($query->sql_str);
+    my $sth = $self->dbh->prepare($query->sql_str);
     $query->bind_params_to($sth);           # let SQL::Abstract::More do some magic
     $sth->execute;
 
@@ -186,6 +227,9 @@ OpenXPKI::Server::Database - Entry point for database related functions
 =head1 Description
 
 This class contains the API to interact with the configured OpenXPKI database.
+
+For Oracle databases only named connections via TNS names are supported
+(no host/port setup).
 
 =head1 Attributes
 
@@ -290,9 +334,15 @@ the nesting level counter.
 
 The following methods allow more fine grained control over the query processing.
 
+=head2 dbh
+
+Returns a fork safe L<DBI> database handle.
+
 =head2 query
 
 Starts a new query by returning an L<OpenXPKI::Server::Database::Query> object.
+
+Usage:
 
     my $query = $db->query->select(
         from => 'certificate',
