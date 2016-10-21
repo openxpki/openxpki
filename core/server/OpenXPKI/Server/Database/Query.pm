@@ -6,6 +6,7 @@ use utf8;
 
 use Moose;
 
+use OpenXPKI::Debug;
 use MooseX::Params::Validate;
 use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
 
@@ -42,6 +43,10 @@ has 'sql_str' => (
 has 'sql_params' => (
     is => 'rw',
     isa => 'ArrayRef',
+    traits  => ['Array'],
+    handles => {
+        add_sql_params => 'push',
+    },
 );
 
 has 'sqlam' => ( # SQL query builder
@@ -87,8 +92,23 @@ sub _add_namespace_to {
     return ref $obj_param eq 'ARRAY' ? $obj_list : $obj_list->[0];
 }
 
+# Calls the given SQL::Abstract::More method after converting the parameters.
+# Sets $self->sql_str and $self->sql_params
+sub _call_sqlam {
+    my ($self, $method, $params) = @_;
+
+    # Prefix arguments with dash "-"
+    my %sqlam_param = map { '-'.$_ => $params->{$_} } keys %$params;
+    ##! 2: "SQL::Abstract::More->$method(" . join(", ", map { sprintf "%s = %s", $_, Data::Dumper->new([$sqlam_param{$_}])->Indent(0)->Terse(1)->Dump } sort keys %sqlam_param) . ")"
+
+    # Call SQL::Abstract::More method and store results
+    my ($sql, @bind) = $self->sqlam->$method(%sqlam_param);
+    $self->sql_str($sql);
+    $self->add_sql_params(@bind); # there might already be bind values from a JOIN
+}
+
 sub select {
-    my %valid_param = (
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
         columns   => { isa => 'ArrayRef[Str]' },
         from      => { isa => 'Str | ArrayRef[Str]', optional => 1 },
         from_join => { isa => 'Str', optional => 1 },
@@ -99,11 +119,8 @@ sub select {
         limit     => { isa => 'Int', optional => 1 },
         offset    => { isa => 'Int', optional => 1 },
     );
-    my ($self, %params) = validated_hash(\@_, %valid_param); # MooseX::Params::Validate
 
     # FIXME order_by: if ArrayRef then check for "asc" and "desc" as they are reserved words (https://metacpan.org/pod/SQL::Abstract::More#select)
-
-    my (%sqlam_param, $sql, @bind);
 
     die "You must provide either 'from' or 'from_join'"
         unless ($params{'from'} or $params{'from_join'});
@@ -112,6 +129,7 @@ sub select {
     $params{'from'} = $self->_add_namespace_to($params{'from'}) if $params{'from'};
 
     # Provide nicer syntax for joins than SQL::Abstract::More
+    # TODO Test JOIN syntax (especially ON conditions, see https://metacpan.org/pod/SQL::Abstract::More#join)
     if ($params{'from_join'}) {
         die "You cannot specify 'from' and 'from_join' at the same time"
             if $params{'from'};
@@ -126,36 +144,24 @@ sub select {
         # (string is converted into the list that SQL::Abstract::More->join expects)
         my $join_info = $self->sqlam->join(@join_spec);
         $params{'from'} = \($join_info->{sql});
-        push @bind, @{$join_info->{bind}} if $join_info;
+        $self->add_sql_params( @{$join_info->{bind}} ) if $join_info;
         delete $params{'from_join'};
     }
 
-    # Prefix arguments with dash "-"
-    %sqlam_param = (%sqlam_param, map { '-'.$_ => $params{$_} } keys %params);
-
-    # Translate query syntax into SQL
-    ($sql, @bind) = $self->sqlam->select(%sqlam_param);
-    $self->sql_str($sql);
-    $self->sql_params(\@bind);
+    $self->_call_sqlam('select', \%params);
     return $self;
 }
 
 sub insert {
-    my %valid_param = (
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
         into     => { isa => 'Str' },
         values   => { isa => 'HashRef' },
     );
-    my ($self, %params) = validated_hash(\@_, %valid_param); # MooseX::Params::Validate
 
     # Add namespace to table name
     $params{'into'} = $self->_add_namespace_to($params{'into'}) if $params{'into'};
 
-    # Prefix arguments with dash "-"
-    my %sqlam_param = map { '-'.$_ => $params{$_} } keys %params;
-
-    my ($sql, @bind) = $self->sqlam->insert(%sqlam_param);
-    $self->sql_str($sql);
-    $self->sql_params(\@bind);
+    $self->_call_sqlam('insert', \%params);
     return $self;
 }
 
