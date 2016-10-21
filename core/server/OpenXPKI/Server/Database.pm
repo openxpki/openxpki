@@ -109,19 +109,16 @@ sub query {
 sub select {
     my $self = shift;
     my $query = $self->query->select(@_);
-    ##! 4: "Query: " . $query->sql_str;
-
     return $self->run($query);
 }
 
 # SELECT - Return first result row
 # Returns: HashRef containing the result columns (C<$sth-E<gt>fetchrow_hashref>)
+# or C<undef> if query had no results.
 sub select_one {
     my $self = shift;
-    my $sth = $self->select(@_) or return;
-
-    my $tuple = $sth->fetchrow_hashref
-        or die "Query had no results\n";
+    my $sth = $self->select(@_);
+    my $tuple = $sth->fetchrow_hashref or return;
     return $tuple;
 }
 
@@ -139,6 +136,7 @@ sub insert {
 sub run {
     my ($self, $query) = @_;
 
+    ##! 2: "Query: " . $query->sql_str;
     my $sth = $self->dbh->prepare($query->sql_str);
     $query->bind_params_to($sth);           # let SQL::Abstract::More do some magic
     $sth->execute;
@@ -245,16 +243,16 @@ Named parameters:
 Selects rows from the database and returns the results as a I<DBI::st> statement
 handle.
 
-Please note that C<NULL> will be returned as C<undef>.
+Please note that C<NULL> values will be converted to Perl C<undef>.
 
 For parameters see L<OpenXPKI::Server::Database::Query/select>.
 
 =head2 select_one
 
 Selects one row from the database and returns the results as a I<HashRef>
-(column name => value).
+(column name => value). Returns C<undef> if the query had no results.
 
-Please note that C<NULL> will be returned as C<undef>.
+Please note that C<NULL> values will be converted to Perl C<undef>.
 
 For parameters see L<OpenXPKI::Server::Database::Query/select>.
 
