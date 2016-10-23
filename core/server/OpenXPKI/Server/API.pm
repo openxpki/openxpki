@@ -317,6 +317,11 @@ sub BUILD {
                     regex    => $re_boolean,
                     optional => 1
                 },
+                FORCE_NOVERIFY => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
                 REVOKED => {
                     type     => SCALAR,
                     regex    => $re_boolean,

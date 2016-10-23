@@ -173,6 +173,10 @@ sub certificate_import {
         $api_param->{FORCE_NOCHAIN} = 1;
     }
 
+    if ($params{"force-no-verify"}) {
+        $api_param->{FORCE_NOVERIFY} = 1;
+    }
+    
     if ($params{"force-issuer"}) {
         if (!$params{issuer}) {
             die "You need to specify the issuer with --issuer when using --force-issuer\n"
@@ -1326,6 +1330,7 @@ if ($cmd eq 'initdb') {
             force-no-chain
             force-issuer
             force-certificate-already-exists
+            force-no-verify
             revoked
 
             alias=s
@@ -1615,6 +1620,8 @@ Force options (use only if you exactly now what you are doing!):
         Force the issuer setting even if the chain validation fails
   --force-certificate-already-exists
         Force update for an existing certificate
+  --force-no-verify
+        Build the chain but skip cryptographic verification
 
 Once again, only use these options if you actually have to (the occasions
 where this happens should be really, really rare). Note that force-no-chain
