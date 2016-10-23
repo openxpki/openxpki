@@ -975,9 +975,7 @@ sub certificate_list {
                     'CERTIFICATE.CERTIFICATE_SERIAL',
                     'CERTIFICATE.ISSUER_IDENTIFIER',
                     'CERTIFICATE.DATA',
-                    'CERTIFICATE.EMAIL',
                     'CERTIFICATE.STATUS',
-                    'CERTIFICATE.ROLE',
                     'CERTIFICATE.PUBKEY',
                     'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
                     'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
@@ -1066,9 +1064,7 @@ sub certificate_list {
                   AUTHORITY_KEY_IDENTIFIER
                   CERTIFICATE_SERIAL
                   ISSUER_IDENTIFIER
-                  EMAIL
                   STATUS
-                  ROLE
                   NOTAFTER
                   NOTBEFORE
                   CSR_SERIAL
