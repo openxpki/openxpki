@@ -93,17 +93,22 @@ sub select {
 sub select_one {
     my $self = shift;
     my $sth = $self->select(@_);
-    my $tuple = $sth->fetchrow_hashref or return;
-    return $tuple;
+    return $sth->fetchrow_hashref;
 }
 
 # INSERT
 sub insert {
     my $self = shift;
     my $query = $self->query->insert(@_);
-    ##! 4: "Query: " . $query->sql_str;
-    my $sth = $self->run($query);
-    return $sth;
+    return $self->run($query);
+}
+
+# UPDATE
+# Returns: The statement handle
+sub update {
+    my $self = shift;
+    my $query = $self->query->update(@_);
+    return $self->run($query);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -213,6 +218,24 @@ For parameters see L<OpenXPKI::Server::Database::Query/insert>.
 Returns the statement handle.
 
 Please note that Perl C<undef> will be converted to C<NULL>.
+
+=head2 insert
+
+Inserts rows into the database and returns the results as a I<DBI::st> statement
+handle.
+
+Please note that C<NULL> values will be converted to Perl C<undef>.
+
+For parameters see L<OpenXPKI::Server::Database::Query/insert>.
+
+=head2 update
+
+Updates rows in the database and returns the results as a I<DBI::st> statement
+handle.
+
+Please note that C<NULL> values will be converted to Perl C<undef>.
+
+For parameters see L<OpenXPKI::Server::Database::Query/update>.
 
 =head2 start_txn
 

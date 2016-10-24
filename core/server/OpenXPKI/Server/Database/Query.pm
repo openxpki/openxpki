@@ -150,6 +150,19 @@ sub insert {
     return $self;
 }
 
+sub update {
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+        table => { isa => 'Str' },
+        set   => { isa => 'HashRef' },
+        where => { isa => 'Str | ArrayRef | HashRef' }, # require WHERE clause to prevent accidential updates on all rows
+    );
+    # Add namespace to table name
+    $params{'table'} = $self->_add_namespace_to($params{'table'});
+
+    $self->_call_sqlam('update', \%params);
+    return $self;
+}
+
 # Binds the parameters to the given statement handle
 sub bind_params_to {
     my ($self, $sth) = @_;
@@ -239,6 +252,24 @@ Named parameters:
 =item * B<into> - Table name (I<Str>, required)
 
 =item * B<values> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=back
+
+=head2 update
+
+Builds an UPDATE query and stores SQL string and bind parameters internally.
+
+A WHERE clause is required to prevent accidential updates of all rows in a table.
+
+Named parameters:
+
+=over
+
+=item * B<table> - Table name (I<Str>, required)
+
+=item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
 
 =back
 
