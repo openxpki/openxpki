@@ -11,26 +11,25 @@ use OpenXPKI::DateTime;
 use DateTime;
 
 sub execute {
-    
-    ##! 1: 'Start'
     my $self = shift;
     my $workflow = shift;
-    
+
+    ##! 1: 'Start'
     my $context = $workflow->context();
-    my $pki_realm = CTX('session')->get_pki_realm(); 
-    
+    my $pki_realm = CTX('session')->get_pki_realm();
+
     my $valid_at;
     if ($self->param('valid_at')) {
-       $valid_at = OpenXPKI::DateTime::get_validity({        
+       $valid_at = OpenXPKI::DateTime::get_validity({
             VALIDITY =>  $self->param('valid_at'),
             VALIDITYFORMAT => 'detect',
         });
     } else {
        $valid_at = DateTime->now();
     }
-    
+
     my $epoch = $valid_at->epoch();
-             
+
     # For special data types see:
     #  - https://metacpan.org/pod/SQL::Abstract::More#BIND-VALUES-WITH-TYPES
     #  - https://metacpan.org/pod/DBI#bind_param
@@ -41,35 +40,35 @@ sub execute {
         req_key => { '!=' => undef },
         pki_realm => $pki_realm,
     );
-    
+
     my $db = CTX('dbi');
     my $tuple;
     my $result = {};
-    
+
     # total count
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|AMOUNT' ],
+        columns  => [ 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions
         }
     );
-    $result->{total_count} = sprintf "%01d", $tuple->{AMOUNT};
-    
-    
+    $result->{total_count} = sprintf "%01d", $tuple->{amount};
+
+
     # Revoked
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|AMOUNT' ],
+        columns  => [ 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         }
     );
-    $result->{total_revoked} = sprintf "%01d", $tuple->{AMOUNT} + 0;
-    
-    
+    $result->{total_revoked} = sprintf "%01d", $tuple->{amount} + 0;
+
+
     # valid revoked
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|AMOUNT' ],
+        columns  => [ 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
@@ -77,34 +76,34 @@ sub execute {
             notafter  => { '>' => $epoch },
         }
     );
-    $result->{valid_revoked} = sprintf "%01d", $tuple->{AMOUNT} + 0;
-    
-    
+    $result->{valid_revoked} = sprintf "%01d", $tuple->{amount} + 0;
+
+
     # Distinct
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|AMOUNT' ],
+        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
         where => {
             %base_conditions,
         }
     );
-    $result->{total_distinct} = sprintf "%01d", $tuple->{AMOUNT} + 0;
-    
-    
+    $result->{total_distinct} = sprintf "%01d", $tuple->{amount} + 0;
+
+
     # Expired
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|AMOUNT' ],
+        columns  => [ 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
             notafter => { '<' => $epoch },
         }
     );
-    $result->{total_expired} = sprintf "%01d", $tuple->{AMOUNT} + 0;
-    
-    
+    $result->{total_expired} = sprintf "%01d", $tuple->{amount} + 0;
+
+
     # Valid
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|AMOUNT' ],
+        columns  => [ 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
@@ -112,12 +111,12 @@ sub execute {
             notafter  => { '>' => $epoch },
         }
     );
-    $result->{valid_count} = sprintf "%01d", $tuple->{AMOUNT} + 0;
-    
-    
+    $result->{valid_count} = sprintf "%01d", $tuple->{amount} + 0;
+
+
     # Valid distinct
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(DISTINCT subject)|AMOUNT' ],
+        columns  => [ 'COUNT(DISTINCT subject)|amount' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
@@ -125,52 +124,52 @@ sub execute {
             notafter  => { '>' => $epoch },
         }
     );
-    $result->{valid_distinct} = sprintf "%01d", $tuple->{AMOUNT} + 0;
-    
-    
+    $result->{valid_distinct} = sprintf "%01d", $tuple->{amount} + 0;
+
+
     # Near expiry
-    my $near_expiry_validity = $self->param('near_expiry') || '+000030';    
+    my $near_expiry_validity = $self->param('near_expiry') || '+000030';
     my $expiry_cutoff = OpenXPKI::DateTime::get_validity({
         REFERENCEDATE => $valid_at,
         VALIDITY => $near_expiry_validity,
         VALIDITYFORMAT => 'detect',
     })->epoch();
-    
+
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|AMOUNT' ],
+        columns  => [ 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
             notafter  => { -between => [ $epoch, $expiry_cutoff  ] },
         }
     );
-    $result->{near_expiry} = sprintf "%01d", $tuple->{AMOUNT} + 0;
-    
-    
+    $result->{near_expiry} = sprintf "%01d", $tuple->{amount} + 0;
+
+
     # Recent expiry
     my $recent_expiry_validity = $self->param('recent_expiry') || '-000030';
     $expiry_cutoff = OpenXPKI::DateTime::get_validity({
         REFERENCEDATE => $valid_at,
         VALIDITY => $recent_expiry_validity,
         VALIDITYFORMAT => 'detect',
-    })->epoch();    
-    
+    })->epoch();
+
     $tuple = $db->select_one(%base_query,
-        columns  => [ 'COUNT(identifier)|AMOUNT' ],
+        columns  => [ 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions,
             status => 'ISSUED',
             notafter  => { -between => [ $expiry_cutoff, $epoch ] },
         }
     );
-    $result->{recent_expiry} = sprintf "%01d", $tuple->{AMOUNT};
-      
-      
-    ##! 32: 'Report result ' . Dumper $result  
-    $context->param( $result );    
-      
-} 
- 
+    $result->{recent_expiry} = sprintf "%01d", $tuple->{amount};
+
+
+    ##! 32: 'Report result ' . Dumper $result
+    $context->param( $result );
+
+}
+
 1;
 __END__
 
@@ -180,14 +179,14 @@ OpenXPKI::Server::Workflow::Activity::Reports::Summary
 
 =head1 Description
 
-Collect statistics about certificate counts, the resulting numbers are 
-written into the context, see below. 
+Collect statistics about certificate counts, the resulting numbers are
+written into the context, see below.
 
 =head1 Configuration
 
 =head2 Activity parameters
 
-=over 
+=over
 
 =item near_expiry
 
@@ -216,7 +215,7 @@ notbefore is below given date.
 Parseable OpenXPKI::Datetime value (autodetected), hide certificates where
 notafter is above given date.
 
-=back 
+=back
 
 =head2 Context parameters
 
@@ -254,15 +253,12 @@ Number of certificates that are in validity window but revoked.
 
 =item near_expiry
 
-Number of valid (not revoked) certificates that will expiry within 
+Number of valid (not revoked) certificates that will expiry within
 the given window.
 
 =item recent_expiry
 
-Number of valid (not revoked) certificates that have been expired 
+Number of valid (not revoked) certificates that have been expired
 within the given window.
 
 =back
- 
-
-
