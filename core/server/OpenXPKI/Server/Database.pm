@@ -48,7 +48,7 @@ has '_connector' => (
     is => 'rw',
     isa => 'DBIx::Handler',
     lazy => 1,
-    builder => '_build_connector'
+    builder => '_build_connector',
 );
 
 sub _build_connector {
@@ -82,6 +82,16 @@ sub factory {
 
     return $db_class->new($params);
 
+}
+
+# Returns a fork safe DBI handle
+sub dbh {
+    my $self = shift;
+    # If this is too slow due to DB pings, we could pass "no_ping" attribute to
+    # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
+    my $dbh = $self->_connector->dbh;        # fork safe DBI handle
+    $dbh->{FetchHashKeyName} = 'NAME_lc';    # enforce lowercase names
+    return $dbh;
 }
 
 # Returns a new L<OpenXPKI::Server::Database::Query> object.
@@ -129,11 +139,7 @@ sub insert {
 sub run {
     my ($self, $query) = @_;
 
-    # If this is too slow due to DB pings, we could pass "no_ping" attribute to
-    # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
-    my $dbh = $self->_connector->dbh;        # fork safe DBI handle
-
-    my $sth = $dbh->prepare($query->sql_str);
+    my $sth = $self->dbh->prepare($query->sql_str);
     $query->bind_params_to($sth);           # let SQL::Abstract::More do some magic
     $sth->execute;
 
@@ -290,9 +296,15 @@ the nesting level counter.
 
 The following methods allow more fine grained control over the query processing.
 
+=head2 dbh
+
+Returns a fork safe L<DBI> database handle.
+
 =head2 query
 
 Starts a new query by returning an L<OpenXPKI::Server::Database::Query> object.
+
+Usage:
 
     my $query = $db->query->select(
         from => 'certificate',
