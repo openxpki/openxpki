@@ -43,11 +43,18 @@ EXTERNAL2= \
 	Connector \
 	Workflow 
 
+CORE = \
+    CGI \
+    Module__Build__Tiny
+
+
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) CGI DateTime__Format__DateParse
 
 cpan_dependency: $(EXTERNAL) 
 
 cpan_dependency2: $(EXTERNAL2) 
+
+trusty: CGI Module__Build__Tiny
 
 default:	clean
 	$(MAKE) $(EXTERNAL)
@@ -67,7 +74,7 @@ $(EXTERNAL2):
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && PERL5LIB=`pwd`"/../../lib/:$PERL5LIB" DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
 
-CGI:
+$(CORE):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --core-ok --build --cpan $(subst __,::,$@)
