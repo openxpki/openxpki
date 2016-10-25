@@ -14,21 +14,10 @@ use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (
 # Constructor arguments
 #
 
-has 'db_type' => (
+has 'driver' => (
     is => 'ro',
-    isa => 'Str',
+    does => 'OpenXPKI::Server::Database::DriverRole',
     required => 1,
-);
-
-has 'db_version' => (
-    is => 'ro',
-    isa => 'Str',
-    required => 1,
-);
-
-has 'db_namespace' => ( # = schema
-    is => 'ro',
-    isa => 'Str',
 );
 
 #
@@ -61,7 +50,7 @@ sub _build_sqlam {
     # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
     # TODO Support LIMIT for other DBs by giving a custom sub to "limit_offset"
     my %attrs = do {
-        if ('Oracle' eq $self->db_type) {
+        if ('Oracle' eq $self->driver->dbi_driver) {
             (sql_dialect => 'Oracle');
         }
         else {
@@ -83,11 +72,11 @@ sub _add_namespace_to {
         { isa => 'Str | ArrayRef[Str]' },
     );
     # no namespace defined
-    return $obj_param unless $self->db_namespace;
+    return $obj_param unless $self->driver->namespace;
     # make sure we always have an ArrayRef
     my $obj_list = ref $obj_param eq 'ARRAY' ? $obj_param : [ $obj_param ];
     # add namespace if there's not already a namespace in the object name
-    $obj_list = [ map { m/\./ ? $_ : $self->db_namespace.'.'.$_ } @$obj_list ];
+    $obj_list = [ map { m/\./ ? $_ : $self->driver->namespace.'.'.$_ } @$obj_list ];
     # return same type as argument was (ArrayRef or scalar)
     return ref $obj_param eq 'ARRAY' ? $obj_list : $obj_list->[0];
 }

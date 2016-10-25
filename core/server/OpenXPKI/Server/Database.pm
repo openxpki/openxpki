@@ -1,106 +1,94 @@
 package OpenXPKI::Server::Database;
-
-use strict;
-use warnings;
-use utf8;
-use English;
-
 use Moose;
+use utf8;
+=head1 Name
+
+OpenXPKI::Server::Database::DriverRole - Common database functions and role
+that every DB specific driver has to fulfill.
+
+=head1 Synopsis
+
+    package OpenXPKI::Server::Database::Driver::ExoticDb;
+    use Moose;
+    with 'OpenXPKI::Server::Database::DriverRole';
+    ...
+
+Then e.g. in your database.yaml:
+
+    main:
+        type: ExoticDb
+        ...
+
+=head1 Description
+
+This class contains the API to interact with the configured OpenXPKI database.
+
+=cut
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Server::Database::Driver;
 use OpenXPKI::Server::Database::Query;
 use DBIx::Handler;
-use DBI::Const::GetInfoType;
+
+
+## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
+# if ($params{TYPE} eq "SQLite") {
+#     if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne "")) {
+#         $params{NAME} .= "._" . $args->{PURPOSE} . "_";
+#         ##! 16: 'SQLite, name: ' . $params{NAME}
+#     }
+# }
+
+
 
 #
 # Constructor arguments
 #
 
-has 'log'             => ( is => 'ro', isa => 'Object', required => 1 );
-has 'db_type'         => ( is => 'ro', isa => 'Str', required => 1 ); # DBI compliant case sensitive driver name
-has 'db_name'         => ( is => 'ro', isa => 'Str', required => 1 );
-has 'db_namespace'    => ( is => 'ro', isa => 'Str' );                # = schema
-has 'db_host'         => ( is => 'ro', isa => 'Str' );
-has 'db_port'         => ( is => 'ro', isa => 'Int' );
-has 'db_user'         => ( is => 'ro', isa => 'Str' );
-has 'db_passwd'       => ( is => 'ro', isa => 'Str' );
+has 'log' => (
+    is => 'ro',
+    isa => 'Object',
+    required => 1,
+);
+
+has 'dsn_params' => (
+    is => 'ro',
+    isa => 'HashRef',
+    required => 1,
+);
 
 #
 # Other attributes
 #
-
-has 'db_version' => (
-    is => 'rw',
-    isa => 'Str',
+has 'driver' => (
+    is => 'ro',
+    does => 'OpenXPKI::Server::Database::DriverRole',
     lazy => 1,
-    builder => '_build_db_version'
+    builder => '_build_driver',
 );
-
-sub _build_db_version {
+sub _build_driver {
     my $self = shift;
-    my $db_version = $self->_connector->dbh->get_info($GetInfoType{SQL_DBMS_VER});
-    ##! 4: "Database version: $db_version"
-    return $db_version;
-}
-
-has '_connector' => (
-    is => 'rw',
-    isa => 'DBIx::Handler',
-    lazy => 1,
-    builder => '_build_connector',
-);
-
-sub _build_connector {
-    my $self = shift;
-
-    OpenXPKI::Exception->throw (
-        message => "OpenXPKI::Server::Database is an abstract class - please use the driver specific class instead!",
-    );
-
-}
-
-# This is a static method, the init hash is expected as single argument!
-sub factory {
-
-    my $params = shift;
-
-    if (!$params->{db_type}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_DATABASE_INIT_DB_TYPE_IS_MANDATORY",
-        );
-    }
-
-    my $db_class = "OpenXPKI::Server::Database::Driver::".$params->{db_type};
-    eval "use $db_class;1;";
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_DBI_UNABLE_TO_LOAD_DRIVER",
-            params => { db_type => $params->{db_type} }
-        );
-    }
-
-    return $db_class->new($params);
-
+    return OpenXPKI::Server::Database::Driver->instance(%{$self->dsn_params});
 }
 
 # Returns a fork safe DBI handle
+# TODO Move to driver / connector class
 sub dbh {
     my $self = shift;
     # If this is too slow due to DB pings, we could pass "no_ping" attribute to
     # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
-    my $dbh = $self->_connector->dbh;        # fork safe DBI handle
+    my $dbh = $self->driver->connector->dbh;        # fork safe DBI handle
     $dbh->{FetchHashKeyName} = 'NAME_lc';    # enforce lowercase names
     return $dbh;
 }
 
 # Returns a new L<OpenXPKI::Server::Database::Query> object.
+# TODO Move to driver / connector class
 sub query {
     my $self = shift;
     return OpenXPKI::Server::Database::Query->new(
-        db_type => $self->db_type,
-        db_version => $self->db_version,
-        $self->db_namespace ? (db_namespace => $self->db_namespace) : (),
+        driver => $self->driver,
     );
 }
 
@@ -146,20 +134,21 @@ sub run {
 
 sub start_txn {
     my $self = shift;
-    $self->_connector->txn_begin;
+    $self->driver->connector->txn_begin;
 }
 
 sub commit {
     my $self = shift;
-    $self->_connector->txn_commit;
+    $self->driver->connector->txn_commit;
 }
 
 sub rollback {
     my $self = shift;
-    $self->_connector->txn_rollback;
+    $self->driver->connector->txn_rollback;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 
 =head1 Name
 

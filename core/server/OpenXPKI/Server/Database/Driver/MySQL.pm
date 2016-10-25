@@ -1,48 +1,44 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
-
-use strict;
-use warnings;
-use utf8;
-
 use Moose;
+use utf8;
+=head1 Name
 
-extends 'OpenXPKI::Server::Database';
+OpenXPKI::Server::Database::Driver::MySQL;
 
-use OpenXPKI::Debug;
-use DBIx::Handler;
-  
-sub _build_connector {
-    my $self = shift;
-    # map DBI param names to our object attributes
-    my %param_map = (
-        database => $self->db_name,
-        host => $self->db_host,
-        port => $self->db_port,
-    );
-    # only add defined attributes
-    my $dsn_params = join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
-    # compose DSN and attributes
-    my $dsn = sprintf("dbi:mysql:%s", $dsn_params);
-    my $attr_hash = {
-        RaiseError => 1,
-        AutoCommit => 0,
+=head1 Description
+
+Driver for MySQL/mariaDB databases.
+
+=cut
+
+with 'OpenXPKI::Server::Database::DriverRole';
+
+has 'host' => ( is => 'ro', isa => 'Str' );
+has 'port' => ( is => 'ro', isa => 'Int' );
+
+#
+# Methods required by OpenXPKI::Server::Database::DriverRole
+#
+sub dbi_driver { 'mysql' };
+
+sub dbi_connect_attrs {
+    {
         mysql_enable_utf8 => 1,
         mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
         mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
-    };
-    ##! 4: "DSN: $dsn"
-    ##! 4: "Attributes: " . join " | ", map { $_." = ".$attr_hash->{$_} } keys %$attr_hash
-    return DBIx::Handler->new($dsn, $self->db_user, $self->db_passwd, $attr_hash);
+    }
+};
+
+sub dbi_dsn_params {
+    my $self = shift;
+    # map DBI parameter names to our object attributes
+    my %param_map = (
+        database => $self->name, # from OpenXPKI::Server::Database::DriverRole
+        host => $self->host,
+        port => $self->port,
+    );
+    # only add defined attributes
+    return join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
 }
- 
- 1;
- 
-__END__;
 
-=head1 Name
- 
-OpenXPKI::Server::Database::Driver::MySQL;
- 
-=head1 Description
-
-Implementation of OpenXPKI::Server::Database for the MySQL/mariaDB database.
+__PACKAGE__->meta->make_immutable;
