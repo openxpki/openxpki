@@ -480,29 +480,29 @@ Available columns are:
 
 =over
 
-=item SUBJECT
+=item subject
 
-=item CERTIFICATE_SERIAL
+=item certificate_serial
 
-=item CSR_SERIAL
+=item csr_serial
 
-=item IDENTIFIER
+=item identifier
 
-=item STATUS
+=item status
 
-=item NOTAFTER
+=item notafter
 
-=item NOTBEFORE
+=item notbefore
 
-=item ISSUER_DN
+=item issuer_dn
 
-=item ISSUER_IDENTIFIER
+=item issuer_identifier
 
-=item SUBJECT_KEY_IDENTIFIER
+=item subject_key_identifier
 
-=item AUTHORITY_KEY_IDENTIFIER
+=item authority_key_identifier
 
-=item PROFILE (from csr)
+=item profile (from csr)
 
 =back
 
