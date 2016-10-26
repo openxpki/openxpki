@@ -27,7 +27,7 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Database::Driver;
+use OpenXPKI::Server::Database::Connector;
 use OpenXPKI::Server::Database::Query;
 use DBIx::Handler;
 
@@ -52,6 +52,19 @@ has 'log' => (
     required => 1,
 );
 
+=head2 dsn_params
+
+Required parameters:
+
+=over
+
+=item * B<db_type> - last part of a package in the OpenXPKI::Server::Database::Driver::* namespace. (I<Str>, required)
+
+=item * All parameters required by the specific driver class
+
+=back
+
+=cut
 has 'dsn_params' => (
     is => 'ro',
     isa => 'HashRef',
@@ -61,35 +74,22 @@ has 'dsn_params' => (
 #
 # Other attributes
 #
-has 'driver' => (
+has 'connector' => (
     is => 'ro',
-    does => 'OpenXPKI::Server::Database::DriverRole',
+    does => 'OpenXPKI::Server::Database::Connector',
     lazy => 1,
-    builder => '_build_driver',
+    builder => '_build_connector',
+    handles => [
+        'dbh',
+        'query',
+        'start_txn',
+        'commit',
+        'rollback',
+    ],
 );
-sub _build_driver {
+sub _build_connector {
     my $self = shift;
-    return OpenXPKI::Server::Database::Driver->instance(%{$self->dsn_params});
-}
-
-# Returns a fork safe DBI handle
-# TODO Move to driver / connector class
-sub dbh {
-    my $self = shift;
-    # If this is too slow due to DB pings, we could pass "no_ping" attribute to
-    # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
-    my $dbh = $self->driver->connector->dbh;        # fork safe DBI handle
-    $dbh->{FetchHashKeyName} = 'NAME_lc';    # enforce lowercase names
-    return $dbh;
-}
-
-# Returns a new L<OpenXPKI::Server::Database::Query> object.
-# TODO Move to driver / connector class
-sub query {
-    my $self = shift;
-    return OpenXPKI::Server::Database::Query->new(
-        driver => $self->driver,
-    );
+    return OpenXPKI::Server::Database::Connector->new(dsn_params => $self->dsn_params);
 }
 
 # SELECT - Return all rows
@@ -130,21 +130,6 @@ sub run {
     $sth->execute;
 
     return $sth;
-}
-
-sub start_txn {
-    my $self = shift;
-    $self->driver->connector->txn_begin;
-}
-
-sub commit {
-    my $self = shift;
-    $self->driver->connector->txn_commit;
-}
-
-sub rollback {
-    my $self = shift;
-    $self->driver->connector->txn_rollback;
 }
 
 __PACKAGE__->meta->make_immutable;

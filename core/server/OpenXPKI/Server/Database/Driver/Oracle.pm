@@ -1,38 +1,41 @@
 package OpenXPKI::Server::Database::Driver::Oracle;
-
-use strict;
-use warnings;
-use utf8;
-
 use Moose;
+use utf8;
+with 'OpenXPKI::Server::Database::DriverRole';
+=head1 Name
 
-extends 'OpenXPKI::Server::Database';
+OpenXPKI::Server::Database::Driver::Oracle;
 
-use OpenXPKI::Debug;
-use DBIx::Handler;
-  
-sub _build_connector {
-    
-    my $self = shift; 
+=head1 Description
 
-    my $attr_hash = {
+Driver for Oracle databases.
+
+Supports only named connection via TNS names (no host/port setup).
+
+=cut
+
+# DBI compliant driver name
+sub dbi_driver { 'Oracle' };
+
+# DSN string including all parameters.
+sub dbi_dsn {
+    my $self = shift;
+    return sprintf("dbi:%s:%s",
+        $self->dbi_driver,
+        $self->name,
+    );
+}
+
+# Additional parameters for DBI's connect()
+sub dbi_connect_params {
+    {
         RaiseError => 1,
         AutoCommit => 0,
         LongReadLen => 10_000_000,
-    };
-    ##! 4: "DSN: $dsn"
-    return DBIx::Handler->new("dbi:Oracle:".$self->db_name, $self->db_user, $self->db_passwd, $attr_hash);
-}
- 
- 1;
- 
-__END__;
+    }
+};
 
-=head1 Name
- 
-OpenXPKI::Server::Database::Driver::Oracle;
- 
-=head1 Description
+# Parameters for SQL::Abstract::More
+sub sqlam_params { {} };
 
-Implementation of OpenXPKI::Server::Database for Oracle database.
-Supports only named connection via TNS names (no host/port setup).
+__PACKAGE__->meta->make_immutable;
