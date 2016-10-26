@@ -37,6 +37,8 @@ sub dbi_connect_params {
 };
 
 # Parameters for SQL::Abstract::More
-sub sqlam_params { {} };
+sub sqlam_params { {
+    sql_dialect => 'Oracle',
+} };
 
 __PACKAGE__->meta->make_immutable;

@@ -53,15 +53,7 @@ sub _build_sqlam {
     my $self = shift;
     # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
     # TODO Support LIMIT for other DBs by giving a custom sub to "limit_offset"
-    my %attrs = do {
-        if ('Oracle' eq $self->driver->dbi_driver) {
-            (sql_dialect => 'Oracle');
-        }
-        else {
-            ()
-        }
-    };
-    return SQL::Abstract::More->new(%attrs);
+    return SQL::Abstract::More->new(%{$self->driver->sqlam_params});
 }
 
 ################################################################################
