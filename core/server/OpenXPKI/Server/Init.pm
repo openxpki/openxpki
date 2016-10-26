@@ -403,36 +403,31 @@ sub __do_init_dbi {
     ##! 1: "start"
 
     my $config = CTX('config');
-    my %params;
-
     my $dbpath = [ 'system','database','main' ];
-
-    %params = (
-        log => CTX('log'),
-        db_type => 'MySQL',
-    );
-
     my $db_config = $config->get_hash( $dbpath );
 
-    foreach my $key (qw(type name namespace host port user passwd)) {
-        ##! 16: "dbi: $key => " . $db_config->{$key}
-        if (defined $db_config->{$key}) {
-            $params{'db_'.$key} = $db_config->{$key};
-        }
-    }
-    
-    # environment
+    # Set environment variables
     my $db_env = $config->get_hash("$dbpath.environment");
     foreach my $env_name (keys %{$db_env}) {
-        my $env_value = $db_env->{$env_name};
-        $ENV{$env_name} = $env_value;
-        ##! 4: "DBI Environment: $env_name => $env_value"
+        $ENV{$env_name} = $db_env->{$env_name};
+        ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
     }
 
+    # Read database driver/DSN parameters
+    my %params = (
+        db_type => 'MySQL', # default
+        %{$db_config},
+    );
+    delete $params{environment};
+    delete $params{log};
+    delete $params{debug};         # TODO Legacy: remove treatment of DB parameter "debug" (occurs in example database.yaml)
+
     OpenXPKI::Server::Context::setcontext({
-        dbi => OpenXPKI::Server::Database::factory(\%params),
+        dbi => OpenXPKI::Server::Database->new(
+            log => CTX('log'),
+            db_params => \%params,
+        ),
     });
-    
 }
 
 sub __do_init_acl {

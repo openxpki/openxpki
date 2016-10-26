@@ -1,38 +1,29 @@
 package OpenXPKI::Server::Database::Query;
-
-use strict;
-use warnings;
-use utf8;
-
 use Moose;
+use utf8;
+=head1 Name
 
+OpenXPKI::Server::Database::Query - Represents an SQL query
+
+=cut
+
+use OpenXPKI::Debug;
 use MooseX::Params::Validate;
 use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
 
+################################################################################
+# Attributes
 #
+
 # Constructor arguments
-#
 
-has 'db_type' => (
+has 'driver' => (
     is => 'ro',
-    isa => 'Str',
+    does => 'OpenXPKI::Server::Database::DriverRole',
     required => 1,
 );
 
-has 'db_version' => (
-    is => 'ro',
-    isa => 'Str',
-    required => 1,
-);
-
-has 'db_namespace' => ( # = schema
-    is => 'ro',
-    isa => 'Str',
-);
-
-#
 # Other attributes
-#
 
 has 'sql_str' => (
     is => 'rw',
@@ -42,6 +33,10 @@ has 'sql_str' => (
 has 'sql_params' => (
     is => 'rw',
     isa => 'ArrayRef',
+    traits  => ['Array'],
+    handles => {
+        add_sql_params => 'push',
+    },
 );
 
 has 'sqlam' => ( # SQL query builder
@@ -51,22 +46,17 @@ has 'sqlam' => ( # SQL query builder
     builder => '_build_sqlam',
 );
 
+################################################################################
+# Builders
+#
 sub _build_sqlam {
     my $self = shift;
     # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
     # TODO Support LIMIT for other DBs by giving a custom sub to "limit_offset"
-    my %attrs = do {
-        if ('Oracle' eq $self->db_type) {
-            (sql_dialect => 'Oracle');
-        }
-        else {
-            ()
-        }
-    };
-    return SQL::Abstract::More->new(%attrs);
+    return SQL::Abstract::More->new(%{$self->driver->sqlam_params});
 }
 
-#
+################################################################################
 # Methods
 #
 
@@ -78,17 +68,32 @@ sub _add_namespace_to {
         { isa => 'Str | ArrayRef[Str]' },
     );
     # no namespace defined
-    return $obj_param unless $self->db_namespace;
+    return $obj_param unless $self->driver->namespace;
     # make sure we always have an ArrayRef
     my $obj_list = ref $obj_param eq 'ARRAY' ? $obj_param : [ $obj_param ];
     # add namespace if there's not already a namespace in the object name
-    $obj_list = [ map { m/\./ ? $_ : $self->db_namespace.'.'.$_ } @$obj_list ];
+    $obj_list = [ map { m/\./ ? $_ : $self->driver->namespace.'.'.$_ } @$obj_list ];
     # return same type as argument was (ArrayRef or scalar)
     return ref $obj_param eq 'ARRAY' ? $obj_list : $obj_list->[0];
 }
 
+# Calls the given SQL::Abstract::More method after converting the parameters.
+# Sets $self->sql_str and $self->sql_params
+sub _call_sqlam {
+    my ($self, $method, $params) = @_;
+
+    # Prefix arguments with dash "-"
+    my %sqlam_param = map { '-'.$_ => $params->{$_} } keys %$params;
+    ##! 2: "SQL::Abstract::More->$method(" . join(", ", map { sprintf "%s = %s", $_, Data::Dumper->new([$sqlam_param{$_}])->Indent(0)->Terse(1)->Dump } sort keys %sqlam_param) . ")"
+
+    # Call SQL::Abstract::More method and store results
+    my ($sql, @bind) = $self->sqlam->$method(%sqlam_param);
+    $self->sql_str($sql);
+    $self->add_sql_params(@bind); # there might already be bind values from a JOIN
+}
+
 sub select {
-    my %valid_param = (
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
         columns   => { isa => 'ArrayRef[Str]' },
         from      => { isa => 'Str | ArrayRef[Str]', optional => 1 },
         from_join => { isa => 'Str', optional => 1 },
@@ -99,11 +104,8 @@ sub select {
         limit     => { isa => 'Int', optional => 1 },
         offset    => { isa => 'Int', optional => 1 },
     );
-    my ($self, %params) = validated_hash(\@_, %valid_param); # MooseX::Params::Validate
 
     # FIXME order_by: if ArrayRef then check for "asc" and "desc" as they are reserved words (https://metacpan.org/pod/SQL::Abstract::More#select)
-
-    my (%sqlam_param, $sql, @bind);
 
     die "You must provide either 'from' or 'from_join'"
         unless ($params{'from'} or $params{'from_join'});
@@ -112,6 +114,7 @@ sub select {
     $params{'from'} = $self->_add_namespace_to($params{'from'}) if $params{'from'};
 
     # Provide nicer syntax for joins than SQL::Abstract::More
+    # TODO Test JOIN syntax (especially ON conditions, see https://metacpan.org/pod/SQL::Abstract::More#join)
     if ($params{'from_join'}) {
         die "You cannot specify 'from' and 'from_join' at the same time"
             if $params{'from'};
@@ -126,36 +129,24 @@ sub select {
         # (string is converted into the list that SQL::Abstract::More->join expects)
         my $join_info = $self->sqlam->join(@join_spec);
         $params{'from'} = \($join_info->{sql});
-        push @bind, @{$join_info->{bind}} if $join_info;
+        $self->add_sql_params( @{$join_info->{bind}} ) if $join_info;
         delete $params{'from_join'};
     }
 
-    # Prefix arguments with dash "-"
-    %sqlam_param = (%sqlam_param, map { '-'.$_ => $params{$_} } keys %params);
-
-    # Translate query syntax into SQL
-    ($sql, @bind) = $self->sqlam->select(%sqlam_param);
-    $self->sql_str($sql);
-    $self->sql_params(\@bind);
+    $self->_call_sqlam('select', \%params);
     return $self;
 }
 
 sub insert {
-    my %valid_param = (
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
         into     => { isa => 'Str' },
         values   => { isa => 'HashRef' },
     );
-    my ($self, %params) = validated_hash(\@_, %valid_param); # MooseX::Params::Validate
 
     # Add namespace to table name
     $params{'into'} = $self->_add_namespace_to($params{'into'}) if $params{'into'};
 
-    # Prefix arguments with dash "-"
-    my %sqlam_param = map { '-'.$_ => $params{$_} } keys %params;
-
-    my ($sql, @bind) = $self->sqlam->insert(%sqlam_param);
-    $self->sql_str($sql);
-    $self->sql_params(\@bind);
+    $self->_call_sqlam('insert', \%params);
     return $self;
 }
 
@@ -165,11 +156,7 @@ sub bind_params_to {
     $self->sqlam->bind_params($sth, @{$self->sql_params});
 }
 
-1;
-
-=head1 Name
-
-OpenXPKI::Server::Database::Query - Represents an SQL query
+__PACKAGE__->meta->make_immutable;
 
 =head1 Description
 
@@ -179,31 +166,35 @@ Most of the work is delegated to L<SQL::Abstract::More>.
 
 =head1 Attributes
 
-=head2 sql_str
+=head2 Constructor parameters
 
-The SQL I<string> that is generated after a query method is called.
+=over
 
-=head2 sql_params
+=item * B<driver> - database specific driver instance (consumer of L<OpenXPKI::Server::Database::DriverRole>, required)
 
-An I<ArrayRef> containing all SQL bind parameters after a query method is called.
+=back
+
+=head2 Others
+
+=over
+
+=item * B<sql_str> - the SQL I<string> that is generated after a query method is
+called
+
+=item * B<sql_params> - an I<ArrayRef> containing all SQL bind parameters after
+a query method is called
+
+=item * B<sqlam> - SQL query builder (an instance of L<SQL::Abstract::More>)
+
+=back
 
 =head1 Methods
 
 =head2 new
 
-Class method that creates an empty query object.
+Constructor.
 
-Named parameters:
-
-=over
-
-=item * B<db_type> - DBI compliant case sensitive driver name (I<Str>, required)
-
-=item * B<db_version> - Database version as returned by C<$dbh-E<gt>get_version(...)> (I<Str>, required)
-
-=item * B<db_namespace> - Schema/namespace that will be added as table prefix in all queries. Could e.g. be used to store multiple OpenXPKI installations in one database (I<Str>)
-
-=back
+Named parameters: see L<attributes section above|/"Constructor parameters">.
 
 =head2 select
 

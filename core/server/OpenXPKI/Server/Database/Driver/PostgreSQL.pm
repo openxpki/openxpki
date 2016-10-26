@@ -1,10 +1,10 @@
-package OpenXPKI::Server::Database::Driver::MySQL;
+package OpenXPKI::Server::Database::Driver::PostgreSQL;
 use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::DriverRole';
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL/mariaDB databases
+OpenXPKI::Server::Database::Driver::PostgreSQL - Driver for PostgreSQL databases
 
 =head1 Description
 
@@ -14,13 +14,14 @@ Use L<OpenXPKI::Server::Database/new> instead.
 =cut
 
 # DBI compliant driver name
-sub dbi_driver { 'mysql' }
+sub dbi_driver { 'Pg' }
 
 # DSN string including all parameters.
 sub dbi_dsn {
     my $self = shift;
     # map DBI parameter names to our object attributes
     my %args = (
+        sslmode => 'allow',
         database => $self->name,
         host => $self->host,
         port => $self->port,
@@ -32,13 +33,9 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params {
-    {
-        mysql_enable_utf8 => 1,
-        mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
-        mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
-    }
-}
+sub dbi_connect_params { {
+    pg_enable_utf8 => 1,
+} }
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params { {
