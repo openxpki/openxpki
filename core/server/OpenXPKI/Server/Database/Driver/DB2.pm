@@ -1,10 +1,10 @@
-package OpenXPKI::Server::Database::Driver::SQLite;
+package OpenXPKI::Server::Database::Driver::DB2;
 use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::DriverRole';
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::SQLite - Driver for SQLite databases
+OpenXPKI::Server::Database::Driver::DB2 - Driver for IBM DB2 databases
 
 =head1 Description
 
@@ -14,7 +14,7 @@ Use L<OpenXPKI::Server::Database/new> instead.
 =cut
 
 # DBI compliant driver name
-sub dbi_driver { 'SQLite' }
+sub dbi_driver { 'DB2' }
 
 # DSN string including all parameters.
 sub dbi_dsn {
@@ -30,7 +30,7 @@ sub dbi_connect_params { {} }
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params { {
-    limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
+    limit_offset => 'FetchFirst',    # see SQL::Abstract::Limit source code
 } }
 
 __PACKAGE__->meta->make_immutable;
