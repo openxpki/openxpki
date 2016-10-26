@@ -48,6 +48,20 @@ lives_ok { $dbi = OpenXPKI::Server::Database->new(
 
 my $query;
 lives_ok { $query = $dbi->query } "fetch query object";
+
+my $sql;
+lives_ok {
+    $sql = $query->select(
+        from => 'flora',
+        columns => [ qw ( name color ) ],
+        where => { fruits => 'forbidden' },
+        limit => 5,
+        offset => 10,
+    )->sql_str
+} "create SELECT query with LIMIT and OFFSET";
+
+like $sql, qr/SELECT\s*name,\s*color\s*FROM\s*flora\s*WHERE.*LIMIT.*OFFSET/i, "correct SQL string";
+
 lives_ok { $conn = $dbi->_connector } "fetch connector object";
 lives_ok { $conn->driver } "fetch driver object";
 

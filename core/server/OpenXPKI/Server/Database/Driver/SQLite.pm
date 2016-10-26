@@ -29,6 +29,8 @@ sub dbi_dsn {
 sub dbi_connect_params { {} }
 
 # Parameters for SQL::Abstract::More
-sub sqlam_params { {} }
+sub sqlam_params { {
+    limit_offset => 'LimitOffset',
+} }
 
 __PACKAGE__->meta->make_immutable;
