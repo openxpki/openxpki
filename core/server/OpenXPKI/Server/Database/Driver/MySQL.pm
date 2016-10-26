@@ -4,16 +4,14 @@ use utf8;
 with 'OpenXPKI::Server::Database::DriverRole';
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MySQL;
+OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL/mariaDB databases
 
 =head1 Description
 
-Driver for MySQL/mariaDB databases.
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
 
 =cut
-
-has 'host' => ( is => 'ro', isa => 'Str' );
-has 'port' => ( is => 'ro', isa => 'Int' );
 
 # DBI compliant driver name
 sub dbi_driver { 'mysql' }

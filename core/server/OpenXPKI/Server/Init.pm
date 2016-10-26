@@ -425,7 +425,7 @@ sub __do_init_dbi {
     OpenXPKI::Server::Context::setcontext({
         dbi => OpenXPKI::Server::Database->new(
             log => CTX('log'),
-            dsn_params => \%params
+            db_params => \%params,
         ),
     });
 }

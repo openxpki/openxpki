@@ -1,18 +1,21 @@
 package OpenXPKI::Server::Database::Query;
-
-use strict;
-use warnings;
-use utf8;
-
 use Moose;
+use utf8;
+=head1 Name
+
+OpenXPKI::Server::Database::Query - Represents an SQL query
+
+=cut
 
 use OpenXPKI::Debug;
 use MooseX::Params::Validate;
 use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
 
+################################################################################
+# Attributes
 #
+
 # Constructor arguments
-#
 
 has 'driver' => (
     is => 'ro',
@@ -20,9 +23,7 @@ has 'driver' => (
     required => 1,
 );
 
-#
 # Other attributes
-#
 
 has 'sql_str' => (
     is => 'rw',
@@ -45,6 +46,9 @@ has 'sqlam' => ( # SQL query builder
     builder => '_build_sqlam',
 );
 
+################################################################################
+# Builders
+#
 sub _build_sqlam {
     my $self = shift;
     # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
@@ -60,7 +64,7 @@ sub _build_sqlam {
     return SQL::Abstract::More->new(%attrs);
 }
 
-#
+################################################################################
 # Methods
 #
 
@@ -160,11 +164,7 @@ sub bind_params_to {
     $self->sqlam->bind_params($sth, @{$self->sql_params});
 }
 
-1;
-
-=head1 Name
-
-OpenXPKI::Server::Database::Query - Represents an SQL query
+__PACKAGE__->meta->make_immutable;
 
 =head1 Description
 
@@ -174,31 +174,35 @@ Most of the work is delegated to L<SQL::Abstract::More>.
 
 =head1 Attributes
 
-=head2 sql_str
+=head2 Constructor parameters
 
-The SQL I<string> that is generated after a query method is called.
+=over
 
-=head2 sql_params
+=item * B<driver> - database specific driver instance (consumer of L<OpenXPKI::Server::Database::DriverRole>, required)
 
-An I<ArrayRef> containing all SQL bind parameters after a query method is called.
+=back
+
+=head2 Others
+
+=over
+
+=item * B<sql_str> - the SQL I<string> that is generated after a query method is
+called
+
+=item * B<sql_params> - an I<ArrayRef> containing all SQL bind parameters after
+a query method is called
+
+=item * B<sqlam> - SQL query builder (an instance of L<SQL::Abstract::More>)
+
+=back
 
 =head1 Methods
 
 =head2 new
 
-Class method that creates an empty query object.
+Constructor.
 
-Named parameters:
-
-=over
-
-=item * B<db_type> - DBI compliant case sensitive driver name (I<Str>, required)
-
-=item * B<db_version> - Database version as returned by C<$dbh-E<gt>get_version(...)> (I<Str>, required)
-
-=item * B<db_namespace> - Schema/namespace that will be added as table prefix in all queries. Could e.g. be used to store multiple OpenXPKI installations in one database (I<Str>)
-
-=back
+Named parameters: see L<attributes section above|/"Constructor parameters">.
 
 =head2 select
 

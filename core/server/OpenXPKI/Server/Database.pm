@@ -3,25 +3,7 @@ use Moose;
 use utf8;
 =head1 Name
 
-OpenXPKI::Server::Database::DriverRole - Common database functions and role
-that every DB specific driver has to fulfill.
-
-=head1 Synopsis
-
-    package OpenXPKI::Server::Database::Driver::ExoticDb;
-    use Moose;
-    with 'OpenXPKI::Server::Database::DriverRole';
-    ...
-
-Then e.g. in your database.yaml:
-
-    main:
-        type: ExoticDb
-        ...
-
-=head1 Description
-
-This class contains the API to interact with the configured OpenXPKI database.
+OpenXPKI::Server::Database - Entry point for database related functions
 
 =cut
 
@@ -29,7 +11,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Connector;
 use OpenXPKI::Server::Database::Query;
-use DBIx::Handler;
 
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
@@ -41,83 +22,52 @@ use DBIx::Handler;
 # }
 
 
-
+################################################################################
+# Attributes
 #
-# Constructor arguments
-#
-
 has 'log' => (
     is => 'ro',
     isa => 'Object',
     required => 1,
 );
 
-=head2 dsn_params
-
-Required parameters:
-
-=over
-
-=item * B<db_type> - last part of a package in the OpenXPKI::Server::Database::Driver::* namespace. (I<Str>, required)
-
-=item * All parameters required by the specific driver class
-
-=back
-
-=cut
-has 'dsn_params' => (
+# Parameters to construct DSN
+has 'db_params' => (
     is => 'ro',
     isa => 'HashRef',
     required => 1,
 );
 
-#
-# Other attributes
-#
-has 'connector' => (
+# Connection handler
+has '_connector' => (
     is => 'ro',
     does => 'OpenXPKI::Server::Database::Connector',
     lazy => 1,
     builder => '_build_connector',
     handles => [
         'dbh',
-        'query',
         'start_txn',
         'commit',
         'rollback',
     ],
 );
+
+################################################################################
+# Builders
+#
 sub _build_connector {
     my $self = shift;
-    return OpenXPKI::Server::Database::Connector->new(dsn_params => $self->dsn_params);
+    return OpenXPKI::Server::Database::Connector->new(db_params => $self->db_params);
 }
 
-# SELECT - Return all rows
-# Returns: A DBI::st statement handle
-sub select {
-    my $self = shift;
-    my $query = $self->query->select(@_);
-    return $self->run($query);
-}
+################################################################################
+# Methods
+#
 
-# SELECT - Return first result row
-# Returns: HashRef containing the result columns (C<$sth-E<gt>fetchrow_hashref>)
-# or C<undef> if query had no results.
-sub select_one {
+# Create query object
+sub query {
     my $self = shift;
-    my $sth = $self->select(@_);
-    my $tuple = $sth->fetchrow_hashref or return;
-    return $tuple;
-}
-
-# INSERT
-# Returns: The statement handle
-sub insert {
-    my $self = shift;
-    my $query = $self->query->insert(@_);
-    ##! 4: "Query: " . $query->sql_str;
-    my $sth = $self->run($query);
-    return $sth;
+    return OpenXPKI::Server::Database::Query->new(driver => $self->_connector->driver);
 }
 
 # Execute given query
@@ -126,29 +76,50 @@ sub run {
 
     ##! 2: "Query: " . $query->sql_str;
     my $sth = $self->dbh->prepare($query->sql_str);
-    $query->bind_params_to($sth);           # let SQL::Abstract::More do some magic
+    $query->bind_params_to($sth);    # let SQL::Abstract::More do some magic
     $sth->execute;
 
     return $sth;
 }
 
+# SELECT - Return all rows (eturns a DBI::st statement handle)
+sub select {
+    my $self = shift;
+    my $query = $self->query->select(@_);
+    return $self->run($query);
+}
+
+# SELECT - return first row
+sub select_one {
+    my $self = shift;
+    my $sth = $self->select(@_);
+    my $tuple = $sth->fetchrow_hashref or return;
+    return $tuple;
+}
+
+# INSERT
+sub insert {
+    my $self = shift;
+    my $query = $self->query->insert(@_);
+    ##! 4: "Query: " . $query->sql_str;
+    my $sth = $self->run($query);
+    return $sth;
+}
+
 __PACKAGE__->meta->make_immutable;
-
-
-=head1 Name
-
-OpenXPKI::Server::Database - Entry point for database related functions
 
 =head1 Synopsis
 
-    my $db = OpenXPKI::Server::Database->new({
-        log         => $log_object,
-        db_type     => 'mysql',
-        db_name     => 'openxpki',
-        db_host     => '127.0.0.1',
-        db_user     => 'oxi',
-        db_passwd => 'gen',
-    });
+    my $db = OpenXPKI::Server::Database->new(
+        log => $log_object,
+        db_params => {
+            type   => 'MySQL',
+            name   => 'openxpki',
+            host   => '127.0.0.1',
+            user   => 'oxi',
+            passwd => 'gen',
+        }
+    );
 
     # total count
     my $tuple = $db->select_one(
@@ -165,52 +136,53 @@ OpenXPKI::Server::Database - Entry point for database related functions
 
 This class contains the API to interact with the configured OpenXPKI database.
 
+While OpenXPKI supports several database types out of the box it still allows
+you to include new DBMS specific drivers without the need to change existing
+code. This can be achieved by:
+
+=over
+
+=item 1. Writing a driver class in the C<OpenXPKI::Server::Database::*>
+namespace that consumes the Moose role L<OpenXPKI::Server::Database::DriverRole>
+
+=item 2. Referencing this class in your config.
+
+=back
+
+For details see L<OpenXPKI::Server::Database::DriverRole>.
+
 =head1 Attributes
 
-=head2 Set via constructor
+=head2 Constructor parameters
 
 =over
 
 =item * B<log> - Log object (I<OpenXPKI::Server::Log>, required)
 
-=item * B<db_type> - DBI compliant case sensitive driver name (I<Str>, required)
+=item * B<db_params> - I<HashRef> with parameters for the DBI data source name
+string.
 
-=item * B<db_name> - Database name (I<Str>, required)
-
-=item * B<db_namespace> - Schema/namespace that will be added as table prefix in all queries. Could e.g. be used to store multiple OpenXPKI installations in one database (I<Str>)
-
-=item * B<db_host> - Database host: IP or hostname (I<Str>)
-
-=item * B<db_port> - Database TCP port (I<Int>)
-
-=item * B<db_user> - Database username (I<Str>)
-
-=item * B<db_passwd> - Database password (I<Str>)
-
-=back
-
-=head2 Others
+Required keys in this hash:
 
 =over
 
-=item * B<db_version> - Database version, automatically set to the result of C<$dbh-E<gt>get_version(...)>' (I<Str>)
+=item * B<type> - last part of a package in the C<OpenXPKI::Server::Database::Driver::*> namespace. (I<Str>, required)
+
+=item * Any of the L<OpenXPKI::Server::Database::DriverRole/Constructor parameters>
+
+=item * Additional parameters required by the specific driver
+
+=back
 
 =back
 
 =head1 Methods
 
-=head2 factory
+=head2 new
 
-Static call that creates a driver specific child of this class.
-Do B<not> call new on this class directly.
+Constructor.
 
-Named parameters:
-
-=over
-
-=item * See L<attributes section above|/"Set via constructor">
-
-=back
+Named parameters: see L<attributes section above|/"Constructor parameters">.
 
 =head2 select
 
@@ -224,11 +196,23 @@ For parameters see L<OpenXPKI::Server::Database::Query/select>.
 =head2 select_one
 
 Selects one row from the database and returns the results as a I<HashRef>
-(column name => value). Returns C<undef> if the query had no results.
+(column name => value) by calling C<$sth-E<gt>fetchrow_hashref>.
+
+For parameters see L<OpenXPKI::Server::Database::Query/select>.
+
+Returns C<undef> if the query had no results.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
-For parameters see L<OpenXPKI::Server::Database::Query/select>.
+=head2 insert
+
+Inserts the given data into the database.
+
+For parameters see L<OpenXPKI::Server::Database::Query/insert>.
+
+Returns the statement handle.
+
+Please note that Perl C<undef> will be converted to C<NULL>.
 
 =head2 start_txn
 
@@ -268,13 +252,9 @@ the nesting level counter.
 
 The following methods allow more fine grained control over the query processing.
 
-=head2 dbh
-
-Returns a fork safe L<DBI> database handle.
-
 =head2 query
 
-Starts a new query by returning an L<OpenXPKI::Server::Database::Query> object.
+Returns an L<OpenXPKI::Server::Database::Query> object to start a new SQL query.
 
 Usage:
 
@@ -286,7 +266,7 @@ Usage:
 
 =head2 run
 
-Runs the given query and returns a DBI statement handle.
+Executes the given query and returns a DBI statement handle.
 
     my $sth = $db->run($query) or die "Error executing query: $@";
 
@@ -297,5 +277,9 @@ Parameters:
 =item * B<$query> - Query to run (I<OpenXPKI::Server::Database::Query>)
 
 =back
+
+=head2 dbh
+
+Returns a fork safe L<DBI> database handle.
 
 =cut

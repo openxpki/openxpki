@@ -4,11 +4,12 @@ use utf8;
 with 'OpenXPKI::Server::Database::DriverRole';
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::SQLite;
+OpenXPKI::Server::Database::Driver::SQLite - Driver for SQLite databases
 
 =head1 Description
 
-Driver for SQLite databases.
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
 
 =cut
 

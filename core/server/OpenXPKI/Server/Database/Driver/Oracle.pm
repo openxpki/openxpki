@@ -4,13 +4,14 @@ use utf8;
 with 'OpenXPKI::Server::Database::DriverRole';
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::Oracle;
+OpenXPKI::Server::Database::Driver::Oracle - Driver for Oracle databases
 
 =head1 Description
 
-Driver for Oracle databases.
+This driver supports only named connection via TNS names (no host/port setup).
 
-Supports only named connection via TNS names (no host/port setup).
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
 
 =cut
 

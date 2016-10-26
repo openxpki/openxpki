@@ -29,26 +29,26 @@ my $dbi;
 # create faulty instance
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
     log => $log,
-    dsn_params => {
+    db_params => {
         %params,
         type => undef,
     }
 ) };
 
 my $conn;
-lives_ok { $conn = $dbi->connector } "Fetch connector object";
+lives_ok { $conn = $dbi->_connector } "Fetch connector object";
 
 throws_ok { $conn->driver } qr/\btype\b.*missing/, "Complain about missing 'type' parameter";
 
 # create correct instance
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
     log => $log,
-    dsn_params => \%params,
+    db_params => \%params,
 ) } "create instance";
 
 my $query;
 lives_ok { $query = $dbi->query } "fetch query object";
-lives_ok { $conn = $dbi->connector } "fetch connector object";
+lives_ok { $conn = $dbi->_connector } "fetch connector object";
 lives_ok { $conn->driver } "fetch driver object";
 
 my $dbh;

@@ -4,57 +4,25 @@ use utf8;
 =head1 Name
 
 OpenXPKI::Server::Database::Connector - Handles database connections and
-encapsulates the database specific drivers/functions.
-
-=head1 Synopsis
-
-=head1 Description
-
-By returning an instance for a given driver name this class allows you to
-include new DBMS specific drivers without the need to change existing code. All
-you need to do is writing a driver class that consumes the Moose role
-L<OpenXPKI::Server::Database::DriverRole> and then reference it in your config.
+encapsulates DB specific drivers/functions.
 
 =cut
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 
-#
-# Constructor arguments
+################################################################################
+# Attributes
 #
 
-has 'dsn_params' => (
+has 'db_params' => (
     is => 'ro',
     isa => 'HashRef',
     required => 1,
 );
 
-#
-# Other attributes
-#
-
-=head1 Methods
-
-=head2 instance
-
-Returns a DBMS specific driver instance, NOT an instance of this class.
-
-This functions passes all (named) parameters except for C<db_type> on to the
-specific driver class.
-
-Required parameters:
-
-=over
-
-=item * B<db_type> - last part of a package in the OpenXPKI::Server::Database::Driver::* namespace. (I<Str>, required)
-
-=item * All parameters required by the specific driver class
-
-=back
-
-=cut
 has 'driver' => (
     is => 'ro',
     does => 'OpenXPKI::Server::Database::DriverRole',
@@ -81,9 +49,13 @@ has '_dbix_handler' => (
     },
 );
 
+################################################################################
+# Builders
+#
+
 sub _build_driver {
     my $self = shift;
-    my %args = %{$self->dsn_params}; # copy hash
+    my %args = %{$self->db_params}; # copy hash
 
     my $driver = $args{type};
     OpenXPKI::Exception->throw (
@@ -143,8 +115,10 @@ sub _build_dbix_handler {
     );
 }
 
-# Returns a fork safe DBI handle
-# DO NOT CACHE this (i.e. convert into a lazy attribute) to remain fork safe!
+################################################################################
+# Methods
+#
+
 sub dbh {
     my $self = shift;
     # If this is too slow due to DB pings, we could pass "no_ping" attribute to
@@ -154,10 +128,43 @@ sub dbh {
     return $dbh;
 }
 
-# Returns a new L<OpenXPKI::Server::Database::Query> object.
-sub query {
-    my $self = shift;
-    return OpenXPKI::Server::Database::Query->new(driver => $self->driver);
-}
+__PACKAGE__->meta->make_immutable;
 
-1;
+=head1 Synopsis
+
+=head1 Description
+
+By returning an instance for a given driver name this class allows you to
+include new DBMS specific drivers without the need to change existing code. All
+you need to do is writing a driver class that consumes the Moose role
+L<OpenXPKI::Server::Database::DriverRole> and then reference it in your config.
+
+=head1 Attributes
+
+=head2 Constructor parameters
+
+=over
+
+=item * B<db_params> - all parameters required by the specific driver class (I<HashRef>, required)
+
+=back
+
+=head2 Others
+
+=over
+
+=item * B<driver> - database specific driver instance (consumer of L<OpenXPKI::Server::Database::DriverRole>)
+
+=item * B<db_version> - Database version, automatically set to the result of C<$dbh-E<gt>get_version(...)>' (I<Str>)
+
+=back
+
+=head2 Methods
+
+=head2 dbh
+
+Returns a fork safe DBI handle.
+
+To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute).
+
+=cut
