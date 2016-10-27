@@ -10,7 +10,7 @@ OpenXPKI::Server::Database - Entry point for database related functions
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Connector;
-use OpenXPKI::Server::Database::Query;
+use OpenXPKI::Server::Database::QueryBuilder;
 
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
@@ -67,7 +67,7 @@ sub _build_connector {
 # Create query object
 sub query {
     my $self = shift;
-    return OpenXPKI::Server::Database::Query->new(driver => $self->_connector->driver);
+    return OpenXPKI::Server::Database::QueryBuilder->new(driver => $self->_connector->driver);
 }
 
 # Execute given query
@@ -75,7 +75,7 @@ sub run {
     my ($self, $query) = @_;
 
     ##! 2: "Query: " . $query->sql_str;
-    my $sth = $self->dbh->prepare($query->sql_str);
+    my $sth = $self->dbh->prepare($query->string);
     $query->bind_params_to($sth);    # let SQL::Abstract::More do some magic
     $sth->execute;
 
@@ -196,14 +196,14 @@ handle.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
-For parameters see L<OpenXPKI::Server::Database::Query/select>.
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/select>.
 
 =head2 select_one
 
 Selects one row from the database and returns the results as a I<HashRef>
 (column name => value) by calling C<$sth-E<gt>fetchrow_hashref>.
 
-For parameters see L<OpenXPKI::Server::Database::Query/select>.
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/select>.
 
 Returns C<undef> if the query had no results.
 
@@ -213,7 +213,7 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 Inserts the given data into the database.
 
-For parameters see L<OpenXPKI::Server::Database::Query/insert>.
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
 
 Returns the statement handle.
 
@@ -226,7 +226,7 @@ handle.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
-For parameters see L<OpenXPKI::Server::Database::Query/insert>.
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
 
 =head2 update
 
@@ -235,7 +235,7 @@ handle.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
-For parameters see L<OpenXPKI::Server::Database::Query/update>.
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/update>.
 
 =head2 start_txn
 
@@ -277,7 +277,7 @@ The following methods allow more fine grained control over the query processing.
 
 =head2 query
 
-Returns an L<OpenXPKI::Server::Database::Query> object to start a new SQL query.
+Returns an L<OpenXPKI::Server::Database::QueryBuilder> object to start a new SQL query.
 
 Usage:
 
@@ -297,7 +297,7 @@ Parameters:
 
 =over
 
-=item * B<$query> - Query to run (I<OpenXPKI::Server::Database::Query>)
+=item * B<$query> - Query to run (I<OpenXPKI::Server::Database::QueryBuilder>)
 
 =back
 
