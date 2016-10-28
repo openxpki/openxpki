@@ -3,14 +3,20 @@ use Moose;
 use utf8;
 =head1 Name
 
-OpenXPKI::Server::Database - Entry point for database related functions
+OpenXPKI::Server::Database - Handles database connections and encapsulates DB
+specific drivers/functions.
 
 =cut
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Database::Connector;
-
+use OpenXPKI::Server::Database::DriverRole;
+use OpenXPKI::Server::Database::QueryBuilder;
+use OpenXPKI::Server::Database::Query;
+use DBIx::Handler;
+use DBI::Const::GetInfoType; # provides %GetInfoType hash
+use MooseX::Params::Validate;
+use SQL::Abstract::More;
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
 # if ($params{TYPE} eq "SQLite") {
@@ -20,10 +26,10 @@ use OpenXPKI::Server::Database::Connector;
 #     }
 # }
 
-
 ################################################################################
 # Attributes
 #
+
 has 'log' => (
     is => 'ro',
     isa => 'Object',
@@ -37,33 +43,146 @@ has 'db_params' => (
     required => 1,
 );
 
-# Connection handler
-has '_connector' => (
+has 'driver' => (
     is => 'ro',
-    does => 'OpenXPKI::Server::Database::Connector',
+    does => 'OpenXPKI::Server::Database::DriverRole',
     lazy => 1,
-    builder => '_build_connector',
-    handles => [
-        'dbh',
-        'start_txn',
-        'commit',
-        'rollback',
-        'query_builder',
-        'run',
-    ],
+    builder => '_build_driver',
 );
-    
+
+has 'query_builder' => (
+    is => 'ro',
+    isa => 'OpenXPKI::Server::Database::QueryBuilder',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return OpenXPKI::Server::Database::QueryBuilder->new(
+            sqlam => $self->sqlam,
+            $self->driver->namespace ? (namespace => $self->driver->namespace) : (),
+        );
+    },
+);
+
+has 'sqlam' => ( # SQL query builder
+    is => 'rw',
+    isa => 'SQL::Abstract::More',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return SQL::Abstract::More->new(%{$self->driver->sqlam_params});
+    },
+    # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
+    # TODO Support LIMIT for other DBs by giving a custom sub to "limit_offset"
+);
+
+has 'db_version' => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->dbh->get_info($GetInfoType{SQL_DBMS_VER});
+    },
+);
+
+has '_dbix_handler' => (
+    is => 'rw',
+    isa => 'DBIx::Handler',
+    lazy => 1,
+    builder => '_build_dbix_handler',
+    handles => {
+        start_txn => 'txn_begin',
+        commit => 'txn_commit',
+        rollback => 'txn_rollback',
+    },
+    predicate => '_dbix_handler_initialized', # for test cases
+);
+
 ################################################################################
 # Builders
 #
-sub _build_connector {
+
+sub _build_driver {
     my $self = shift;
-    return OpenXPKI::Server::Database::Connector->new(db_params => $self->db_params);
+    my %args = %{$self->db_params}; # copy hash
+
+    my $driver = $args{type};
+    OpenXPKI::Exception->throw (
+        message => "Parameter 'type' missing: it must equal the last part of a package in the OpenXPKI::Server::Database::Driver::* namespace.",
+    ) unless $driver;
+    delete $args{type};
+
+    my $class = "OpenXPKI::Server::Database::Driver::".$driver;
+
+    eval { use Module::Load; autoload($class) };
+    OpenXPKI::Exception->throw (
+        message => "Unable to require() database driver package",
+        params => { class_name => $class, message => $@ }
+    ) if $@;
+
+    my $instance;
+    eval { $instance = $class->new(%args) };
+    OpenXPKI::Exception->throw (
+        message => "Unable to instantiate database driver class",
+        params => { class_name => $class, message => $@ }
+    ) if $@;
+
+    OpenXPKI::Exception->throw (
+        message => "Database driver class does not seem to be a Moose class",
+        params => { class_name => $class }
+    ) unless $instance->can('does');
+
+    OpenXPKI::Exception->throw (
+        message => "Database driver class does not consume role OpenXPKI::Server::Database::DriverRole",
+        params => { class_name => $class }
+    ) unless $instance->does('OpenXPKI::Server::Database::DriverRole');
+
+    return $instance;
+}
+
+sub _build_dbix_handler {
+    my $self = shift;
+    ##! 4: "DSN: ".$self->_dsn
+    ##! 4: "User: ".$self->user
+    ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$self->dbi_connect_attrs->{$_} } keys %{$self->dbi_connect_attrs}
+    return DBIx::Handler->new(
+        $self->driver->dbi_dsn,
+        $self->driver->user,
+        $self->driver->passwd,
+        {
+            RaiseError => 1,
+            AutoCommit => 0,
+            %{$self->driver->dbi_connect_params},
+        }
+    );
 }
 
 ################################################################################
 # Methods
 #
+
+sub dbh {
+    my $self = shift;
+    # If this is too slow due to DB pings, we could pass "no_ping" attribute to
+    # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
+    my $dbh = $self->_dbix_handler->dbh;     # fork safe DBI handle
+    $dbh->{FetchHashKeyName} = 'NAME_lc';    # enforce lowercase names
+    return $dbh;
+}
+
+# Execute given query
+sub run {
+    my $self = shift;
+    my ($query) = pos_validated_list(\@_,
+        { isa => 'OpenXPKI::Server::Database::Query' },
+    );
+    ##! 2: "Query: " . $query->string;
+    my $sth = $self->dbh->prepare($query->string);
+    # bind parameters via SQL::Abstract::More to do some magic
+    $self->sqlam->bind_params($sth, @{$query->params});
+    $sth->execute;
+    return $sth;
+}
 
 # SELECT
 # Returns: DBI statement handle
@@ -99,30 +218,6 @@ sub update {
 
 __PACKAGE__->meta->make_immutable;
 
-=head1 Synopsis
-
-    my $db = OpenXPKI::Server::Database->new(
-        log => $log_object,
-        db_params => {
-            type   => 'MySQL',
-            name   => 'openxpki',
-            host   => '127.0.0.1',
-            user   => 'oxi',
-            passwd => 'gen',
-        }
-    );
-
-    # total count
-    my $tuple = $db->select_one(
-        from => 'certificate',
-        columns  => [ 'COUNT(identifier)|amount' ],
-        where => {
-            req_key => { '!=' => undef },
-            pki_realm => 'ca-one',
-        }
-    );
-    printf "Total count: %i\n", $tuple->{amount};
-
 =head1 Description
 
 This class contains the API to interact with the configured OpenXPKI database.
@@ -144,25 +239,27 @@ For a short example see L<OpenXPKI::Server::Database::DriverRole/Synopsis>.
 
 =head2 Class structure
 
+=cut
+
+# The diagram was drawn using http://asciiflow.com
+
+=pod
+
     +-------------+
     | *::Database |
-    +--+----------+
-       |
-       |  +------------------------+
-       +-^+ *::Database::Connector |
-          +--+-+-+-----------------+
-             | | |
-             | | |  +---------------------------+
-             | | +--> *::Database::DriverRole   |
-             | |    +---------------------------+
-             | |
-             | |    +---------------------------+
-             | +----> *::Database::QueryBuilder +---+
-             |      +---------------------------+   |
-             |                                      |
-             |      +---------------------------+   |
-             +------> *::Database::Query        <---+
-                    +---------------------------+
+    +--+-+-+------+
+       | | |
+       | | |  +---------------------------+
+       | | +--> *::Database::DriverRole   |
+       | |    +---------------------------+
+       | |
+       | |    +---------------------------+
+       | +----> *::Database::QueryBuilder +---+
+       |      +---------------------------+   |
+       |                                      |
+       |      +---------------------------+   |
+       +------> *::Database::Query        <---+
+              +---------------------------+
 
 =head1 Attributes
 
@@ -186,6 +283,29 @@ Required keys in this hash:
 =item * Additional parameters required by the specific driver
 
 =back
+
+=back
+
+=head2 Others
+
+=over
+
+=item * B<driver> - database specific driver instance (consumer of L<OpenXPKI::Server::Database::DriverRole>)
+
+=item * B<query_builder> - OpenXPKI query builder to create abstract SQL queries (L<OpenXPKI::Server::Database::QueryBuilder>)
+
+Usage:
+
+    my $query = $db->query_builder->select(
+        from => 'certificate',
+        columns  => [ 'identifier' ],
+        where => { pki_realm => 'ca-one' },
+    );
+    # returns an OpenXPKI::Server::Database::Query object
+
+=item * B<db_version> - database version, equals the result of C<$dbh-E<gt>get_version(...)> (I<Str>)
+
+=item * B<sqlam> - low level SQL query builder (internal work horse, an instance of L<SQL::Abstract::More>)
 
 =back
 
@@ -287,19 +407,11 @@ the nesting level counter.
 
 The following methods allow more fine grained control over the query processing.
 
-=head2 query_builder
+=head2 dbh
 
-Returns an L<OpenXPKI::Server::Database::QueryBuilder> object which allows to
-start build new abstract SQL queries.
+Returns a fork safe DBI handle.
 
-Usage:
-
-    my $query = $db->query_builder->select(
-        from => 'certificate',
-        columns  => [ 'identifier' ],
-        where => { pki_realm => 'ca-one' },
-    );
-    # returns an OpenXPKI::Server::Database::Query object
+To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute).
 
 =head2 run
 
@@ -314,9 +426,5 @@ Parameters:
 =item * B<$query> - query to run (I<OpenXPKI::Server::Database::Query>)
 
 =back
-
-=head2 dbh
-
-Returns a fork safe L<DBI> database handle.
 
 =cut

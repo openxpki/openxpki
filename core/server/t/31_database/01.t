@@ -35,10 +35,7 @@ lives_ok { $dbi = OpenXPKI::Server::Database->new(
     }
 ) };
 
-my $conn;
-lives_ok { $conn = $dbi->_connector } "Fetch connector object";
-
-throws_ok { $conn->driver } qr/\btype\b.*missing/, "Complain about missing 'type' parameter";
+throws_ok { $dbi->driver } qr/\btype\b.*missing/, "Complain about missing 'type' parameter";
 
 # create correct instance
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
@@ -46,8 +43,12 @@ lives_ok { $dbi = OpenXPKI::Server::Database->new(
     db_params => \%params,
 ) } "create instance";
 
+lives_ok { $dbi->driver } "fetch driver object";
+
 my $builder;
 lives_ok { $builder = $dbi->query_builder } "fetch query builder object";
+
+ok !$dbi->_dbix_handler_initialized, "dont connect to DB if not necessary";
 
 my $sql;
 
@@ -89,10 +90,10 @@ like $sql,
         WHERE
     /xmsi, "correct SQL string";
 
-lives_ok { $conn = $dbi->_connector } "fetch connector object";
-lives_ok { $conn->driver } "fetch driver object";
 
 my $dbh;
 lives_ok { $dbh = $dbi->dbh } "fetch database handle";
+
+ok $dbi->_dbix_handler_initialized, "connect to DB (init DBIx::Handler)";
 
 done_testing;
