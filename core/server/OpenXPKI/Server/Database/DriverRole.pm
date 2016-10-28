@@ -27,6 +27,9 @@ requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract:
 
 =head1 Synopsis
 
+To create a new driver for your "Exotic" DBMS just write a L<Moose> class that
+consumes C<OpenXPKI::Server::Database::DriverRole>:
+
     package OpenXPKI::Server::Database::Driver::ExoticDb;
     use Moose;
     with 'OpenXPKI::Server::Database::DriverRole';

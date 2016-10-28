@@ -15,12 +15,6 @@ use OpenXPKI::Debug;
 
 # Constructor arguments
 
-has 'sqlam' => ( # SQL query builder
-    is => 'ro',
-    isa => 'SQL::Abstract::More',
-    required => 1,
-);
-
 has 'string' => (
     is => 'rw',
     isa => 'Str',
@@ -38,12 +32,6 @@ has 'params' => (
 sub is_ready {
     my $self = shift;
     return length($self->string) ? 1 : 0;
-}
-
-# Binds the parameters to the given statement handle
-sub bind_params_to {
-    my ($self, $sth) = @_;
-    $self->sqlam->bind_params($sth, @{$self->params});
 }
 
 __PACKAGE__->meta->make_immutable;

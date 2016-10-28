@@ -10,7 +10,6 @@ OpenXPKI::Server::Database - Entry point for database related functions
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Connector;
-use OpenXPKI::Server::Database::QueryBuilder;
 
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
@@ -49,9 +48,11 @@ has '_connector' => (
         'start_txn',
         'commit',
         'rollback',
+        'query_builder',
+        'run',
     ],
 );
-
+    
 ################################################################################
 # Builders
 #
@@ -64,32 +65,16 @@ sub _build_connector {
 # Methods
 #
 
-# Create query object
-sub query {
-    my $self = shift;
-    return OpenXPKI::Server::Database::QueryBuilder->new(driver => $self->_connector->driver);
-}
-
-# Execute given query
-sub run {
-    my ($self, $query) = @_;
-
-    ##! 2: "Query: " . $query->sql_str;
-    my $sth = $self->dbh->prepare($query->string);
-    $query->bind_params_to($sth);    # let SQL::Abstract::More do some magic
-    $sth->execute;
-
-    return $sth;
-}
-
-# SELECT - Return all rows (eturns a DBI::st statement handle)
+# SELECT
+# Returns: DBI statement handle
 sub select {
     my $self = shift;
-    my $query = $self->query->select(@_);
+    my $query = $self->query_builder->select(@_);
     return $self->run($query);
 }
 
 # SELECT - return first row
+# Returns: DBI statement handle
 sub select_one {
     my $self = shift;
     my $sth = $self->select(@_);
@@ -97,17 +82,18 @@ sub select_one {
 }
 
 # INSERT
+# Returns: DBI statement handle
 sub insert {
     my $self = shift;
-    my $query = $self->query->insert(@_);
+    my $query = $self->query_builder->insert(@_);
     return $self->run($query);
 }
 
 # UPDATE
-# Returns: The statement handle
+# Returns: DBI statement handle
 sub update {
     my $self = shift;
-    my $query = $self->query->update(@_);
+    my $query = $self->query_builder->update(@_);
     return $self->run($query);
 }
 
@@ -147,14 +133,36 @@ code. This can be achieved by:
 
 =over
 
-=item 1. Writing a driver class in the C<OpenXPKI::Server::Database::*>
+=item 1. Writing a driver class in the C<OpenXPKI::Server::Database::Driver::*>
 namespace that consumes the Moose role L<OpenXPKI::Server::Database::DriverRole>
 
 =item 2. Referencing this class in your config.
 
 =back
 
-For details see L<OpenXPKI::Server::Database::DriverRole>.
+For a short example see L<OpenXPKI::Server::Database::DriverRole/Synopsis>.
+
+=head2 Class structure
+
+    +-------------+
+    | *::Database |
+    +--+----------+
+       |
+       |  +------------------------+
+       +-^+ *::Database::Connector |
+          +--+-+-+-----------------+
+             | | |
+             | | |  +---------------------------+
+             | | +--> *::Database::DriverRole   |
+             | |    +---------------------------+
+             | |
+             | |    +---------------------------+
+             | +----> *::Database::QueryBuilder +---+
+             |      +---------------------------+   |
+             |                                      |
+             |      +---------------------------+   |
+             +------> *::Database::Query        <---+
+                    +---------------------------+
 
 =head1 Attributes
 
@@ -271,21 +279,27 @@ Rolls back a transaction.
 If currently in a nested transaction, notes the rollback for later and decreases
 the nesting level counter.
 
+=cut
+
+################################################################################
+
 =head1 Low level methods
 
 The following methods allow more fine grained control over the query processing.
 
-=head2 query
+=head2 query_builder
 
-Returns an L<OpenXPKI::Server::Database::QueryBuilder> object to start a new SQL query.
+Returns an L<OpenXPKI::Server::Database::QueryBuilder> object which allows to
+start build new abstract SQL queries.
 
 Usage:
 
-    my $query = $db->query->select(
+    my $query = $db->query_builder->select(
         from => 'certificate',
         columns  => [ 'identifier' ],
         where => { pki_realm => 'ca-one' },
     );
+    # returns an OpenXPKI::Server::Database::Query object
 
 =head2 run
 
@@ -297,7 +311,7 @@ Parameters:
 
 =over
 
-=item * B<$query> - Query to run (I<OpenXPKI::Server::Database::QueryBuilder>)
+=item * B<$query> - query to run (I<OpenXPKI::Server::Database::Query>)
 
 =back
 

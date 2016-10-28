@@ -47,7 +47,7 @@ lives_ok { $dbi = OpenXPKI::Server::Database->new(
 ) } "create instance";
 
 my $builder;
-lives_ok { $builder = $dbi->query } "fetch query builder object";
+lives_ok { $builder = $dbi->query_builder } "fetch query builder object";
 
 my $sql;
 

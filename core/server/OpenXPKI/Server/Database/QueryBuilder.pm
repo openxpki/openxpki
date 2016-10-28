@@ -18,30 +18,16 @@ use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (
 
 # Constructor arguments
 
-has 'driver' => (
-    is => 'ro',
-    does => 'OpenXPKI::Server::Database::DriverRole',
-    required => 1,
-);
-
-# Other attributes
-
 has 'sqlam' => ( # SQL query builder
     is => 'rw',
     isa => 'SQL::Abstract::More',
-    lazy => 1,
-    builder => '_build_sqlam',
+    required => 1,
 );
 
-################################################################################
-# Builders
-#
-sub _build_sqlam {
-    my $self = shift;
-    # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
-    # TODO Support LIMIT for other DBs by giving a custom sub to "limit_offset"
-    return SQL::Abstract::More->new(%{$self->driver->sqlam_params});
-}
+has 'namespace' => ( # database namespace (i.e. schema) to prepend to tables
+    is => 'rw',
+    isa => 'String',
+);
 
 ################################################################################
 # Methods
@@ -55,11 +41,11 @@ sub _add_namespace_to {
         { isa => 'Str | ArrayRef[Str]' },
     );
     # no namespace defined
-    return $obj_param unless $self->driver->namespace;
+    return $obj_param unless $self->namespace;
     # make sure we always have an ArrayRef
     my $obj_list = ref $obj_param eq 'ARRAY' ? $obj_param : [ $obj_param ];
     # add namespace if there's not already a namespace in the object name
-    $obj_list = [ map { m/\./ ? $_ : $self->driver->namespace.'.'.$_ } @$obj_list ];
+    $obj_list = [ map { m/\./ ? $_ : $self->namespace.'.'.$_ } @$obj_list ];
     # return same type as argument was (ArrayRef or scalar)
     return ref $obj_param eq 'ARRAY' ? $obj_list : $obj_list->[0];
 }
@@ -74,7 +60,7 @@ sub _make_query {
     );
     my $method = $args{method};
     my $method_args = $args{args};
-    my $query = $args{query_obj} // OpenXPKI::Server::Database::Query->new(sqlam => $self->sqlam);
+    my $query = $args{query_obj} // OpenXPKI::Server::Database::Query->new;
 
     # Prefix arguments with dash "-"
     my %sqlam_args = map { '-'.$_ => $method_args->{$_} } keys %$method_args;
@@ -128,7 +114,7 @@ sub select {
         $params{'from'} = \($join_info->{sql});
 
         if ($join_info) {
-            $query = OpenXPKI::Server::Database::Query->new(sqlam => $self->sqlam);
+            $query = OpenXPKI::Server::Database::Query->new;
             $query->add_params( @{$join_info->{bind}} );
         }
     }
@@ -171,7 +157,8 @@ __PACKAGE__->meta->make_immutable;
 This class provides methods to create DBMS specific SQL queries that can be
 executed later on.
 
-Most of the work is delegated to L<SQL::Abstract::More>.
+It delegates most of the work to L<SQL::Abstract::More> but offers a slightly
+modified and stripped down interface (customized for OpenXPKI).
 
 =head1 Attributes
 
@@ -179,21 +166,9 @@ Most of the work is delegated to L<SQL::Abstract::More>.
 
 =over
 
-=item * B<driver> - database specific driver instance (consumer of L<OpenXPKI::Server::Database::DriverRole>, required)
-
-=back
-
-=head2 Others
-
-=over
-
-=item * B<sql_str> - the SQL I<string> that is generated after a query method is
-called
-
-=item * B<sql_params> - an I<ArrayRef> containing all SQL bind parameters after
-a query method is called
-
 =item * B<sqlam> - SQL query builder (an instance of L<SQL::Abstract::More>)
+
+=item * B<namespace> - namespace (i.e. schema) to prepend to table names (I<Str>, optional)
 
 =back
 
@@ -269,18 +244,6 @@ Named parameters:
 =item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
 
 =item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
-
-=back
-
-=head2 bind_params_to
-
-Binds the (internally stored) SQL parameters to the given statement handle.
-
-Parameters:
-
-=over
-
-=item * B<$sth> - DBI statement handle (I<DBI::sth>, required)
 
 =back
 
