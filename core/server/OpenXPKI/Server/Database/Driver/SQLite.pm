@@ -33,4 +33,13 @@ sub sqlam_params { {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 } }
 
+sub last_auto_id {
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+        dbi   => { isa => 'OpenXPKI::Server::Database' },
+    );
+    my $id = $params{dbi}->dbh->func("last_insert_rowid")
+        or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
+    return $id;
+}
+
 __PACKAGE__->meta->make_immutable;

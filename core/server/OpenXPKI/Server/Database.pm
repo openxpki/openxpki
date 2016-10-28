@@ -15,6 +15,7 @@ use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
 use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
+use Math::BigInt;
 use MooseX::Params::Validate;
 use SQL::Abstract::More;
 
@@ -214,6 +215,27 @@ sub update {
     my $self = shift;
     my $query = $self->query_builder->update(@_);
     return $self->run($query);
+}
+
+# Create a new insert ID ("serial")
+sub next_id {
+    my ($self, $table) = @_;
+
+    # get new serial number from DBMS (sql sequence or special table)
+    my $id_int = $self->driver->next_id(
+        dbi => $self,
+        table => $table,
+    );
+    my $id = Math::BigInt->new($id_int);
+    ##! 16: 'new serial no.: ' . $id->bstr()
+
+    # shift bitwise left and add server id (default: 255)
+    my $nodeid_bits = $self->db_params->{server_shift} // 8;
+    my $nodeid      = $self->db_params->{server_id} // 2 ** $nodeid_bits - 1;
+    $id->blsft($nodeid_bits);
+    $id->bior(Math::BigInt->new($nodeid));
+
+    return $id->bstr();
 }
 
 __PACKAGE__->meta->make_immutable;

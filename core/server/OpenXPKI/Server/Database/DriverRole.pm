@@ -3,9 +3,14 @@ use Moose::Role;
 use utf8;
 =head1 Name
 
-OpenXPKI::Server::Database::DriverRole - Moose role that every database driver has to consume
+OpenXPKI::Server::Database::DriverRole - Moose role that every database driver
+has to consume
 
 =cut
+
+################################################################################
+# Attributes
+#
 
 # Standardize some connection parameters names for all drivers
 has 'name'         => ( is => 'ro', isa => 'Str', required => 1 );
@@ -15,13 +20,37 @@ has 'port'         => ( is => 'ro', isa => 'Int' );
 has 'user'         => ( is => 'ro', isa => 'Str' );
 has 'passwd'       => ( is => 'ro', isa => 'Str' );
 
-#
-# Methods required in driver classes consuming this role
+################################################################################
+# Required in drivers classes that consume this role
 #
 requires 'dbi_driver';         # String: DBI compliant case sensitive driver name
 requires 'dbi_dsn';            # String: DSN parameters after "dbi:<driver>:"
 requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect()
 requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
+requires 'last_auto_id';       # Int: must return the last id of auto increment columns
+
+################################################################################
+# Methods
+#
+
+# Fetches the next insert ID for the given table
+sub next_id {
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+        dbi   => { isa => 'OpenXPKI::Server::Database' },
+        table => { isa => 'Str' },
+    );
+    $params{dbi}->insert(
+        into => $self->sequence_for($params{table}),
+        values => { dummy => 0 },
+    );
+    return $self->last_auto_id(dbi => $params{dbi});
+}
+
+# Return the sequence name for the given table
+sub sequence_for {
+    my ($self, $table) = @_;
+    return "seq_$table";
+}
 
 1;
 
