@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Database::Driver::DB2;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::DriverRole';
+with 'OpenXPKI::Server::Database::Role::Driver';
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::DB2 - Driver for IBM DB2 databases

@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::DriverRole';
+with 'OpenXPKI::Server::Database::Role::Driver';
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL/mariaDB databases

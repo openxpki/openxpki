@@ -1,9 +1,9 @@
-package OpenXPKI::Server::Database::DriverRole;
+package OpenXPKI::Server::Database::Role::Driver;
 use Moose::Role;
 use utf8;
 =head1 Name
 
-OpenXPKI::Server::Database::DriverRole - Moose role that every database driver
+OpenXPKI::Server::Database::Role::Driver - Moose role that every database driver
 has to consume
 
 =cut
@@ -57,11 +57,11 @@ sub sequence_for {
 =head1 Synopsis
 
 To create a new driver for your "Exotic" DBMS just write a L<Moose> class that
-consumes C<OpenXPKI::Server::Database::DriverRole>:
+consumes C<OpenXPKI::Server::Database::Role::Driver>:
 
     package OpenXPKI::Server::Database::Driver::ExoticDb;
     use Moose;
-    with 'OpenXPKI::Server::Database::DriverRole';
+    with 'OpenXPKI::Server::Database::Role::Driver';
     ...
 
 Then e.g. in your database.yaml:

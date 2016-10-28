@@ -10,7 +10,7 @@ specific drivers/functions.
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Database::DriverRole;
+use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
 use DBIx::Handler;
@@ -46,7 +46,7 @@ has 'db_params' => (
 
 has 'driver' => (
     is => 'ro',
-    does => 'OpenXPKI::Server::Database::DriverRole',
+    does => 'OpenXPKI::Server::Database::Role::Driver',
     lazy => 1,
     builder => '_build_driver',
 );
@@ -134,9 +134,9 @@ sub _build_driver {
     ) unless $instance->can('does');
 
     OpenXPKI::Exception->throw (
-        message => "Database driver class does not consume role OpenXPKI::Server::Database::DriverRole",
+        message => "Database driver class does not consume role OpenXPKI::Server::Database::Role::Driver",
         params => { class_name => $class }
-    ) unless $instance->does('OpenXPKI::Server::Database::DriverRole');
+    ) unless $instance->does('OpenXPKI::Server::Database::Role::Driver');
 
     return $instance;
 }
@@ -251,13 +251,13 @@ code. This can be achieved by:
 =over
 
 =item 1. Writing a driver class in the C<OpenXPKI::Server::Database::Driver::*>
-namespace that consumes the Moose role L<OpenXPKI::Server::Database::DriverRole>
+namespace that consumes the Moose role L<OpenXPKI::Server::Database::Role::Driver>
 
 =item 2. Referencing this class in your config.
 
 =back
 
-For a short example see L<OpenXPKI::Server::Database::DriverRole/Synopsis>.
+For a short example see L<OpenXPKI::Server::Database::Role::Driver/Synopsis>.
 
 =head2 Class structure
 
@@ -272,7 +272,7 @@ For a short example see L<OpenXPKI::Server::Database::DriverRole/Synopsis>.
     +--+-+-+------+
        | | |
        | | |  +---------------------------+
-       | | +--> *::Database::DriverRole   |
+       | | +--> *::Database::Role::Driver   |
        | |    +---------------------------+
        | |
        | |    +---------------------------+
@@ -300,7 +300,7 @@ Required keys in this hash:
 
 =item * B<type> - last part of a package in the C<OpenXPKI::Server::Database::Driver::*> namespace. (I<Str>, required)
 
-=item * Any of the L<OpenXPKI::Server::Database::DriverRole/Constructor parameters>
+=item * Any of the L<OpenXPKI::Server::Database::Role::Driver/Constructor parameters>
 
 =item * Additional parameters required by the specific driver
 
@@ -312,7 +312,7 @@ Required keys in this hash:
 
 =over
 
-=item * B<driver> - database specific driver instance (consumer of L<OpenXPKI::Server::Database::DriverRole>)
+=item * B<driver> - database specific driver instance (consumer of L<OpenXPKI::Server::Database::Role::Driver>)
 
 =item * B<query_builder> - OpenXPKI query builder to create abstract SQL queries (L<OpenXPKI::Server::Database::QueryBuilder>)
 

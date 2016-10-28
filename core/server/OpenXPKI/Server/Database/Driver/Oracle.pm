@@ -1,7 +1,7 @@
 package OpenXPKI::Server::Database::Driver::Oracle;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::DriverRole';
+with 'OpenXPKI::Server::Database::Role::Driver';
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::Oracle - Driver for Oracle databases
