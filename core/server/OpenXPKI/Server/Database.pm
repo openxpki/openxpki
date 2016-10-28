@@ -254,44 +254,53 @@ __PACKAGE__->meta->make_immutable;
 
 This class contains the API to interact with the configured OpenXPKI database.
 
+=head2 Database drivers
+
 While OpenXPKI supports several database types out of the box it still allows
 you to include new DBMS specific drivers without the need to change existing
-code. This can be achieved by:
+code.
 
-=over
-
-=item 1. Writing a driver class in the C<OpenXPKI::Server::Database::Driver::*>
-namespace that consumes the Moose role L<OpenXPKI::Server::Database::Role::Driver>
-
-=item 2. Referencing this class in your config.
-
-=back
-
-For a short example see L<OpenXPKI::Server::Database::Role::Driver/Synopsis>.
+For more details see L<OpenXPKI::Server::Database::Role::Driver>.
 
 =head2 Class structure
 
 =cut
 
-# The diagram was drawn using http://asciiflow.com
+# The diagram was drawn using App::Asciio
 
 =pod
 
-    +-------------+
-    | *::Database |
-    +--+-+-+------+
-       | | |
-       | | |  +---------------------------+
-       | | +--> *::Database::Role::Driver   |
-       | |    +---------------------------+
-       | |
-       | |    +---------------------------+
-       | +----> *::Database::QueryBuilder +---+
-       |      +---------------------------+   |
-       |                                      |
-       |      +---------------------------+   |
-       +------> *::Database::Query        <---+
-              +---------------------------+
+         .----------------------------.
+    .----| OpenXPKI::Server::Database |---.--------------------.
+    |    '----------------------------'   |                    |
+    |                   |                 |                    |
+    |                   |                 v                    v
+    |                   |      .---------------------. .---------------.
+    |             .-----'      | SQL::Abstract::More | | DBIx::Handler |
+    |             |            '---------------------' '---------------'
+    |             |                       .
+    |             v                   injected
+    |  .---------------------.            .
+    |  | O:S:D::QueryBuilder |<...........'
+    |  '---------------------'
+    |             |     .--------------.
+    |             '---->| O:S:D::Query |
+    |                   '--------------'
+    |
+    |  .------------------.
+    '->| O:S:D::Driver::* |
+       '------------------'
+                 .
+              consumes
+                 .      .---------------------.
+                 ......>| O:S:D::Role::Driver |
+                 .      '---------------------'
+                 .      .------------------------------.
+                 ......>| O:S:D::Role::SequenceSupport |
+                 .      '------------------------------'
+                 .      .--------------------------------.
+                 '.....>| O:S:D::Role::SequenceEmulation |
+                        '--------------------------------'
 
 =head1 Attributes
 
