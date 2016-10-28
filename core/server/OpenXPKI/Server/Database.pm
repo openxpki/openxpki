@@ -175,13 +175,26 @@ sub dbh {
 sub run {
     my $self = shift;
     my ($query) = pos_validated_list(\@_,
-        { isa => 'OpenXPKI::Server::Database::Query' },
+        { isa => 'OpenXPKI::Server::Database::Query|Str' },
     );
-    ##! 2: "Query: " . $query->string;
-    my $sth = $self->dbh->prepare($query->string);
+    my $query_string;
+    my $query_params;
+    if (ref $query) {
+        $query_string = $query->string;
+        $query_params = $query->params;
+    }
+    else {
+        $query_string = $query;
+    }
+    ##! 2: "Query: " . $query_string;
+    my $sth = $self->dbh->prepare($query_string);
     # bind parameters via SQL::Abstract::More to do some magic
-    $self->sqlam->bind_params($sth, @{$query->params});
-    $sth->execute;
+    $self->sqlam->bind_params($sth, @{$query_params}) if $query_params;
+    $sth->execute
+        or OpenXPKI::Exception->throw(
+            message => "Could not execute SQL query",
+            params => { dbi_error => $sth->errstr },
+        );
     return $sth;
 }
 
@@ -445,7 +458,8 @@ Parameters:
 
 =over
 
-=item * B<$query> - query to run (I<OpenXPKI::Server::Database::Query>)
+=item * B<$query> - query to run (either a I<OpenXPKI::Server::Database::Query>
+or a literal SQL string)
 
 =back
 
