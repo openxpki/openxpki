@@ -3,16 +3,10 @@ use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::Role::SequenceSupport';
 with 'OpenXPKI::Server::Database::Role::Driver';
+
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::Oracle - Driver for Oracle databases
-
-=head1 Description
-
-This driver supports only named connection via TNS names (no host/port setup).
-
-This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
 
 =cut
 
@@ -56,3 +50,12 @@ sub nextval_query {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+=head1 Description
+
+This driver supports only named connection via TNS names (no host/port setup).
+
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
+
+=cut

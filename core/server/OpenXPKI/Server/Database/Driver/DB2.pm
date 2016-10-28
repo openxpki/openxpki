@@ -3,14 +3,10 @@ use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::Role::SequenceSupport';
 with 'OpenXPKI::Server::Database::Role::Driver';
+
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::DB2 - Driver for IBM DB2 databases
-
-=head1 Description
-
-This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
 
 =cut
 
@@ -48,3 +44,10 @@ sub nextval_query {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+=head1 Description
+
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
+
+=cut

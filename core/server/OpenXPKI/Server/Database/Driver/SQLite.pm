@@ -8,12 +8,9 @@ with 'OpenXPKI::Server::Database::Role::Driver';
 
 OpenXPKI::Server::Database::Driver::SQLite - Driver for SQLite databases
 
-=head1 Description
-
-This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
-
 =cut
+
+use OpenXPKI::Exception;
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::Driver
@@ -51,3 +48,10 @@ sub last_auto_id {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+=head1 Description
+
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
+
+=cut
