@@ -27,30 +27,7 @@ requires 'dbi_driver';         # String: DBI compliant case sensitive driver nam
 requires 'dbi_dsn';            # String: DSN parameters after "dbi:<driver>:"
 requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect()
 requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
-requires 'last_auto_id';       # Int: must return the last id of auto increment columns
-
-################################################################################
-# Methods
-#
-
-# Fetches the next insert ID for the given table
-sub next_id {
-    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
-        dbi   => { isa => 'OpenXPKI::Server::Database' },
-        table => { isa => 'Str' },
-    );
-    $params{dbi}->insert(
-        into => $self->sequence_for($params{table}),
-        values => { dummy => 0 },
-    );
-    return $self->last_auto_id(dbi => $params{dbi});
-}
-
-# Return the sequence name for the given table
-sub sequence_for {
-    my ($self, $table) = @_;
-    return "seq_$table";
-}
+requires 'next_id';            # Int: next insert ID ("serial")
 
 1;
 
@@ -94,22 +71,39 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 =back
 
-=head1 Required methods in the consuming driver class
+=head1 Methods
+
+Please note that the following methods are implemented in the driver class that
+consumes this Moose role.
 
 =head2 dbi_driver
 
-Must return the DBI compliant case sensitive driver name (I<Str>).
+Returns the DBI compliant case sensitive driver name (I<Str>).
 
 =head2 dbi_dsn
 
-Must return the DSN as expected by L<DBI/connect> (I<Str>).
+Returns the DSN as expected by L<DBI/connect> (I<Str>).
 
 =head2 dbi_connect_params
 
-Must return optional parameters to pass to L<DBI/connect> (I<HashRef>).
+Return optional parameters to pass to L<DBI/connect> (I<HashRef>).
 
 =head2 sqlam_params
 
-Must return optional parameters to pass to L<SQL::Abstract::More/new> (I<HashRef>).
+Returns optional parameters to pass to L<SQL::Abstract::More/new> (I<HashRef>).
+
+=head2 next_id
+
+Returns the next insert ID for the given sequence (I<Int>).
+
+Parameters:
+
+=over
+
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+
+=item * B<$seq> - SQL sequence for which an ID shall be returned (I<Str>, required)
+
+=back
 
 =cut

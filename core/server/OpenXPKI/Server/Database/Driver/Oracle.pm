@@ -1,6 +1,7 @@
 package OpenXPKI::Server::Database::Driver::Oracle;
 use Moose;
 use utf8;
+with 'OpenXPKI::Server::Database::Role::SequenceSupport';
 with 'OpenXPKI::Server::Database::Role::Driver';
 =head1 Name
 
@@ -14,6 +15,10 @@ This class is not meant to be instantiated directly.
 Use L<OpenXPKI::Server::Database/new> instead.
 
 =cut
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
 
 # DBI compliant driver name
 sub dbi_driver { 'Oracle' };
@@ -40,5 +45,14 @@ sub dbi_connect_params {
 sub sqlam_params { {
     sql_dialect => 'Oracle',
 } };
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::SequenceSupport
+#
+
+sub nextval_query {
+    my ($self, $seq) = @_;
+    return "SELECT $seq.NEXTVAL FROM DUAL";
+}
 
 __PACKAGE__->meta->make_immutable;

@@ -234,11 +234,8 @@ sub update {
 sub next_id {
     my ($self, $table) = @_;
 
-    # get new serial number from DBMS (sql sequence or special table)
-    my $id_int = $self->driver->next_id(
-        dbi => $self,
-        table => $table,
-    );
+    # get new serial number from DBMS (SQL sequence or emulation via table)
+    my $id_int = $self->driver->next_id($self, "seq_$table");
     my $id = Math::BigInt->new($id_int);
     ##! 16: 'new serial no.: ' . $id->bstr()
 

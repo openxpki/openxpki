@@ -96,4 +96,22 @@ lives_ok { $dbh = $dbi->dbh } "fetch database handle";
 
 ok $dbi->_dbix_handler_initialized, "connect to DB (init DBIx::Handler)";
 
+#
+# auto increment
+#
+lives_ok {
+    $dbi->run("CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT, text VARCHAR(100))")
+} "create test table with auto increment column";
+
+lives_ok {
+    $dbi->insert(into => "test", values => { text => "Litfasssaeule" })
+} "insert test data #1";
+is $dbi->driver->last_auto_id($dbi), 1, "fetch last auto increment id #1";
+
+lives_ok {
+    $dbi->insert(into => "test", values => { text => "Stoffetzen" })
+} "insert test data #2";
+is $dbi->driver->last_auto_id($dbi), 2, "fetch last auto increment id #2";
+
+
 done_testing;

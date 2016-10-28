@@ -1,7 +1,9 @@
 package OpenXPKI::Server::Database::Driver::SQLite;
 use Moose;
 use utf8;
+with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
 with 'OpenXPKI::Server::Database::Role::Driver';
+
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::SQLite - Driver for SQLite databases
@@ -12,6 +14,10 @@ This class is not meant to be instantiated directly.
 Use L<OpenXPKI::Server::Database/new> instead.
 
 =cut
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
 
 # DBI compliant driver name
 sub dbi_driver { 'SQLite' }
@@ -33,11 +39,13 @@ sub sqlam_params { {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 } }
 
+################################################################################
+# required by OpenXPKI::Server::Database::Role::SequenceEmulation
+#
+
 sub last_auto_id {
-    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
-        dbi   => { isa => 'OpenXPKI::Server::Database' },
-    );
-    my $id = $params{dbi}->dbh->func("last_insert_rowid")
+    my ($self, $dbi) = @_;
+    my $id = $dbi->dbh->func("last_insert_rowid")
         or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
     return $id;
 }

@@ -1,7 +1,9 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
 use Moose;
 use utf8;
+with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
 with 'OpenXPKI::Server::Database::Role::Driver';
+
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL/mariaDB databases
@@ -16,6 +18,10 @@ Use L<OpenXPKI::Server::Database/new> instead.
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Database::Query;
 use MooseX::Params::Validate;
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
 
 # DBI compliant driver name
 sub dbi_driver { 'mysql' }
@@ -49,18 +55,15 @@ sub sqlam_params { {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 } }
 
+################################################################################
+# required by OpenXPKI::Server::Database::Role::SequenceEmulation
+#
+
 sub last_auto_id {
-    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
-        dbi   => { isa => 'OpenXPKI::Server::Database' },
-    );
-    my $sth = $params{dbi}->run(
-        OpenXPKI::Server::Database::Query->new(
-            string => 'select last_insert_id()'
-        )
-    );
+    my ($self, $dbi) = @_;
+    my $sth = $dbi->run('select last_insert_id()');
     my $row = $sth->fetchrow_arrayref
         or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
-    
     return $row->[0];
 }
 
