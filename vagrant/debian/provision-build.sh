@@ -1,12 +1,12 @@
 #!/bin/bash
 #wget http://packages.openxpki.org/debian/openxpki.list -O /etc/apt/sources.list.d/openxpki.list
 
-aptitude update
+apt-get update
 
 # Install the deps
 export DEBIAN_FRONTEND=noninteractive
-aptitude install --assume-yes  dh-make-perl mysql-server
-cat /code-repo/package/debian/build-deps.lst | xargs aptitude install --assume-yes
+apt-get install --assume-yes  dh-make-perl mysql-server libdbd-mysql-perl
+cat /code-repo/package/debian/build-deps.lst | xargs apt-get install --assume-yes
 
 # openca-tools is now only used for scep which we do not test for now
 # so there is no need to install it
