@@ -3,10 +3,19 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
-use File::Spec;
+use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
+
+my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
 
 use_ok "OpenXPKI::Server::Database::Role::SequenceEmulation";
 use_ok "OpenXPKI::Server::Database::Role::Driver";
+
+#
+# setup
+#
+use_ok "OpenXPKI::Server::Log";
+my $log;
+lives_ok { $log = OpenXPKI::Server::Log->new(CONFIG => catfile($basedir, "log4perl.conf")) };
 
 #
 # database driver classes
@@ -37,15 +46,8 @@ sub dbi_connect_params { [] }
 package main;
 
 #
-# Tests
+# tests
 #
-my $basedir = File::Spec->catdir((File::Spec->splitpath(File::Spec->rel2abs(__FILE__)))[0,1]);
-
-## prepare log system
-use OpenXPKI::Server::Log;
-my $log = OpenXPKI::Server::Log->new(CONFIG => File::Spec->catfile($basedir, "log4perl.conf"));
-ok($log, "log object initialized");
-
 use_ok("OpenXPKI::Server::Database");
 
 my $dbi;
