@@ -70,7 +70,14 @@ has 'sqlam' => ( # SQL query builder
     lazy => 1,
     default => sub {
         my $self = shift;
-        return SQL::Abstract::More->new(%{$self->driver->sqlam_params});
+        my @return = $self->driver->sqlam_params; # use array to get list context
+        # tolerate different return values: undef, list, HashRef
+        return SQL::Abstract::More->new(
+            $self->_driver_return_val_to_list(
+                \@return,
+                ref($self->driver)."::sqlam_params",
+            )
+        );
     },
     # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
     # TODO Support LIMIT for other DBs by giving a custom sub to "limit_offset"
@@ -146,6 +153,7 @@ sub _build_dbix_handler {
     ##! 4: "DSN: ".$self->_dsn
     ##! 4: "User: ".$self->user
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$self->dbi_connect_attrs->{$_} } keys %{$self->dbi_connect_attrs}
+    my @params = $self->driver->dbi_connect_params; # use array to get list context
     return DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
@@ -153,7 +161,10 @@ sub _build_dbix_handler {
         {
             RaiseError => 1,
             AutoCommit => 0,
-            %{$self->driver->dbi_connect_params},
+            $self->_driver_return_val_to_list(
+                \@params,
+                ref($self->driver)."::dbi_connect_params",
+            )
         }
     );
 }
@@ -161,6 +172,26 @@ sub _build_dbix_handler {
 ################################################################################
 # Methods
 #
+
+sub _driver_return_val_to_list {
+    my ($self, $return, $method) = @_;
+    my $params;
+    if (scalar @$return == 0) {             # undef
+        $params = {};
+    }
+    elsif (scalar @$return > 1) {           # list
+        $params = { @$return };
+    }
+    elsif (ref $return->[0] eq 'HASH') {    # HashRef
+        $params = $return->[0];
+    }
+    else {
+        OpenXPKI::Exception->throw (
+            message => "Faulty driver implementation: '$method' did not return undef, a HashRef or a list",
+        );
+    }
+    return %$params;
+}
 
 sub dbh {
     my $self = shift;

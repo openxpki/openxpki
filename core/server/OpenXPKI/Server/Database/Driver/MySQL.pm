@@ -36,17 +36,15 @@ sub dbi_dsn {
 
 # Additional parameters for DBI's connect()
 sub dbi_connect_params {
-    {
-        mysql_enable_utf8 => 1,
-        mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
-        mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
-    }
+    mysql_enable_utf8 => 1,
+    mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
+    mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
 }
 
 # Parameters for SQL::Abstract::More
-sub sqlam_params { {
+sub sqlam_params {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
-} }
+}
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceEmulation
