@@ -9,6 +9,8 @@ Vagrant.configure("2") do |config|
       dev.vm.hostname = "oxi-dev-jessie-oracle"
       dev.vm.synced_folder "../../..", "/code-repo"
 
+      dev.vm.provision :shell, :path => "check.sh"
+
       # Build and start Docker image in the docker/ subdir
       dev.vm.provision "docker" do |d|
           d.build_image "/vagrant/docker",
