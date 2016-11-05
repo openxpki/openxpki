@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/jessie64"
+
+  # Default VM - testing on debian jessie 
+  config.vm.define "develop", primary:true do |dev|
+      dev.vm.hostname = "oxi-dev-jessie-oracle"
+      dev.vm.synced_folder "../../..", "/code-repo"
+
+      # Build and start Docker image in the docker/ subdir
+      dev.vm.provision "docker" do |d|
+          d.build_image "/vagrant/docker",
+              args: "-t oracle-image"
+          d.run "oracle-image",
+              args: "--name oracle -p 1521:1521 -p 1080:8080"
+      end
+
+      # Oracle client etc.
+      dev.vm.provision :shell, :path => "assets/provision.sh"
+      
+      # OpenXPKI
+      dev.vm.network :forwarded_port, guest: 80, host: 8080
+      dev.vm.network :forwarded_port, guest: 443, host: 8443
+
+      # Oracle database
+      dev.vm.network :forwarded_port, guest: 1080, host: 1080
+      dev.vm.network :forwarded_port, guest: 1521, host: 1521
+  end
+
+  config.vm.provider :virtualbox do |vb|
+      # increase memory (Virtualbox)
+      vb.customize ["modifyvm", :id, "--memory", "2048"]
+  end
+
+  config.ssh.forward_agent = true
+end
