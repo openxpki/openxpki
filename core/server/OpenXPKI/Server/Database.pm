@@ -150,10 +150,13 @@ sub _build_driver {
 
 sub _build_dbix_handler {
     my $self = shift;
-    ##! 4: "DSN: ".$self->_dsn
-    ##! 4: "User: ".$self->user
-    ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$self->dbi_connect_attrs->{$_} } keys %{$self->dbi_connect_attrs}
-    my @params = $self->driver->dbi_connect_params; # use array to get list context
+    ##! 4: "DSN: ".$self->driver->dbi_dsn
+    ##! 4: "User: ".($self->driver->user // '(none)')
+    my %params = $self->_driver_return_val_to_list(
+        [ $self->driver->dbi_connect_params ], # driver might return a list so we enforce list context
+        ref($self->driver)."::dbi_connect_params",
+    );
+    ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
     return DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
@@ -161,10 +164,7 @@ sub _build_dbix_handler {
         {
             RaiseError => 1,
             AutoCommit => 0,
-            $self->_driver_return_val_to_list(
-                \@params,
-                ref($self->driver)."::dbi_connect_params",
-            )
+            %params,
         }
     );
 }
