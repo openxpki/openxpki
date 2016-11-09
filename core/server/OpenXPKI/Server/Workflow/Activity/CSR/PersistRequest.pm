@@ -7,6 +7,7 @@ package OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use Crypt::PKCS10 1.8;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -47,6 +48,17 @@ sub execute
     }
     elsif ($type eq 'pkcs10') {
         $data = $context->param('pkcs10');
+        
+        if (!$self->param('keepformat')) {
+            Crypt::PKCS10->setAPIversion(1);
+            my $csr = Crypt::PKCS10->new( $data, ignoreNonBase64 => 1, verifySignature => 0  );
+            if (!$csr) {
+                OpenXPKI::Exception->throw(
+                    message => 'Unable to parse PKCS10 container in CSR::PersistRequest'
+                );
+            }
+            $data = $csr->csrRequest(1);
+        }        
     }
     else {
         OpenXPKI::Exception->throw(
@@ -187,3 +199,25 @@ OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
 
 persists the Certificate Signing Request into the database, so that
 it can then be used by the certificate issuance workflow.
+
+=head2 Activity Parameters
+
+=over 
+
+=item csr_type
+
+pkcs10 (default) or spkac (not used currrently)
+
+=item keepformat
+
+By default, PKCS10 requests are reformatted to a normalized format, which
+is removal of all whitespace and non-base64 characters and proper line wrap.
+This is very important as current openssl version choke when handling
+requests that are not formated as expected.
+
+If you want to persist the CSR "as is", set this to a true value and we 
+wont touch it.
+
+
+
+
