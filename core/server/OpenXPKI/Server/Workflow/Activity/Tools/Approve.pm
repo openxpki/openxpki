@@ -164,7 +164,7 @@ sub execute
     my $mode = $self->param('mode') || 'session';
     
     # read the approval info from the activity parameter
-    if ($self->param('mode') eq 'generated') {
+    if ($mode eq 'generated') {
         
         my $comment = $self->param('comment');
         

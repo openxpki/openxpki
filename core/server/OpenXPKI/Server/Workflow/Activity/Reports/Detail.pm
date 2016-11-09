@@ -240,7 +240,6 @@ sub execute {
         );
     }
     
-    my $cnt;
     my $delim = $p->{delimiter} || '|';
     
     if (!defined $p->{head}) {
