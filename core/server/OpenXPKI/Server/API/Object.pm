@@ -31,7 +31,7 @@ use Data::Dumper;
 
 use Class::Std;
 use Math::BigInt;
-use Crypt::PKCS10;
+use Crypt::PKCS10 1.8;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -188,9 +188,9 @@ sub get_key_identifier_from_data {
     # as we currently only support PKCS10 and the parameter is checked
     # by the API, we dont need any ifs here.
     
-    Crypt::PKCS10::setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new( $args->{DATA} );
-    
+    Crypt::PKCS10->setAPIversion(1);
+    my $decoded = Crypt::PKCS10->new( $args->{DATA}, ignoreNonBase64 => 1, verifySignature => 0  );
+            
     if (!$decoded) {
       OpenXPKI::Exception->throw( message => 'Unable to parse data in get_key_identifier_from_data' );
     }
