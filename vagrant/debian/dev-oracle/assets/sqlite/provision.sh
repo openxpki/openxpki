@@ -14,7 +14,7 @@ echo "export OXI_TEST_DB_SQLITE_NAME=$SQLITE_PATH" >  /etc/profile.d/openxpki-te
 installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'sqlite3' 2>&1 | grep -ci installed)
 if [ $installed -eq 0 ]; then
     echo "SQLite: installing client"
-    DEBIAN_FRONTEND=noninteractive apt-get -q=2 install sqlite3 libdbd-sqlite-perl
+    DEBIAN_FRONTEND=noninteractive apt-get -q=2 install sqlite3 libdbd-sqlite3-perl
     test $? -ne 0 && exit $?
 fi
 

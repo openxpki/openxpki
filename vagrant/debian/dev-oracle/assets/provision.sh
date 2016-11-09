@@ -18,17 +18,12 @@ if [ $installed -eq 0 ]; then
 fi
 
 #
-# Install CPANminus and modules
+# Install CPANminus
 #
 if ! which cpanm; then
     echo "Installing cpanm"
-    curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >/dev/null
-    test $? -ne 0 && exit $?
+    curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >/dev/null || exit 1
 fi
-
-echo "Installing Perl modules"
-cpanm --quiet DBD::SQLite
-test $? -ne 0 && exit $?
 
 #
 # Configure OpenXPKI

@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 #
 Vagrant.configure("2") do |config|
-  config.vm.box = "debian/jessie64"
+  config.vm.box = "debian/contrib-jessie64"
 
   # Default VM - testing on debian jessie 
   config.vm.define "develop", primary:true do |dev|

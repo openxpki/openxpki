@@ -1,7 +1,7 @@
 #!/bin/bash
 # Provision a Vagrant box (VirtualBox VM) for testing and development:
 # Install Oracle XE client and set up database
-SCRIPT_DIR=$(dirname $0)
+SCRIPT_DIR=/vagrant/assets/oracle
 
 echo "export OXI_TEST_DB_ORACLE_NAME=XE"           >  /etc/profile.d/openxpki-test.sh
 echo "export OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/profile.d/openxpki-test.sh
@@ -11,14 +11,14 @@ echo "export OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/profile.d/openxpki-te
 #
 # Check if installation package exists
 #
-if [ ! -f /vagrant/docker-oracle/setup/packages/oracle-xe-11.2*.rpm.zip ]; then
+if [ ! -f $SCRIPT_DIR/docker/setup/packages/oracle-xe-11.2*.rpm.zip ]; then
     cat <<__ERROR >&2
 ================================================================================
 ERROR - Missing Oracle XE setup file
 
 Please download the Oracle XE 11.2 setup for Linux from
 http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html
-and place it in <vagrant>/docker/setup/packages/
+and place it in <vagrant>/assets/oracle/docker/setup/packages/
 
 This file cannot be put into the OpenXPKI repository due to license restrictions.
 ================================================================================
@@ -33,7 +33,7 @@ echo "Oracle: building and starting Docker container with database"
 
 docker --log-level=warn rm -f oracle >/dev/null
 set -e
-docker --log-level=warn build /vagrant/docker-oracle -t oracle-image
+docker --log-level=warn build $SCRIPT_DIR/docker -t oracle-image
 docker --log-level=warn run --name oracle -d -p 1521:1521 -p 1080:8080 oracle-image
 set +e
 
@@ -98,10 +98,12 @@ __SQL
 sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@XE @/code-repo/config/sql/schema-oracle.sql
 set +e
 
-
 #
-# Perl module
+# Install CPANminus and modules
 #
+if ! which cpanm; then
+    echo "Installing cpanm"
+    curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >/dev/null || exit 1
+fi
 echo "Oracle: installing Perl module"
-cpanm --quiet DBD::Oracle
-test $? -ne 0 && exit $?
+cpanm --quiet DBD::Oracle || exit 1
