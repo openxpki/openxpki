@@ -5,7 +5,7 @@
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI
 #
-cpanm PPI;
+cpanm --quiet --notest PPI
 
 perl -e '
 use PPI;
@@ -45,7 +45,7 @@ my @modlist =
 
 if (@modlist) {
     print "cpanm: installing ".scalar(@modlist)." missing OpenXPKI dependencies\n";
-    system("cpanm --quiet ".join(" ", @modlist));
+    system("cpanm --quiet --notest ".join(" ", @modlist));
 }
 '
 

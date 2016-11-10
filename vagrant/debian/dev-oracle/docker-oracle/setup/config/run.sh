@@ -19,8 +19,8 @@ sed -ri 's/^sessions\s*=.*$/processes=500\nsessions=555\ntransactions=610/' \
 #
 # Setup database (takes a long time)
 #
-echo "Configuring and starting database"
-printf 8080\\n1521\\noracle\\noracle\\nn\\n | /etc/init.d/oracle-xe configure
+echo "Configuring and starting database (might take some minutes)"
+printf 8080\\n1521\\noracle\\noracle\\nn\\n | /etc/init.d/oracle-xe configure >/dev/null
 
 #
 # Enable remote access

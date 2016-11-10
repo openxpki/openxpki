@@ -6,29 +6,27 @@ Vagrant.configure("2") do |config|
 
   # Default VM - testing on debian jessie 
   config.vm.define "develop", primary:true do |dev|
-      dev.vm.hostname = "oxi-dev-jessie-oracle"
+      dev.vm.hostname = "oxi-dev-alldb"
       dev.vm.synced_folder "../../..", "/code-repo"
 
-      dev.vm.provision :shell, :path => "check.sh"
-
-      # Build and start Docker image in the docker/ subdir
+      # Install Docker runtime but don't do anything through Vagrant
       dev.vm.provision "docker" do |d|
-          d.build_image "/vagrant/docker",
-              args: "-t oracle-image"
-          d.run "oracle-image",
-              args: "--name oracle -p 1521:1521 -p 1080:8080"
       end
 
-      # Oracle client etc.
+      # Install databases (partly as Docker images)
+      dev.vm.provision :shell, :path => "assets/oracle/provision.sh"
+      dev.vm.provision :shell, :path => "assets/mysql/provision.sh"
+      dev.vm.provision :shell, :path => "assets/sqlite/provision.sh"
+
+      # Install OpenXPKI etc.
       dev.vm.provision :shell, :path => "assets/provision.sh"
 
-      # OpenXPKI
+      # TCP ports - OpenXPKI
       dev.vm.network :forwarded_port, guest: 80, host: 8080
       dev.vm.network :forwarded_port, guest: 443, host: 8443
 
-      # Oracle database
+      # TCP ports - Oracle WebUI (http://127.0.0.1:1080/apex)
       dev.vm.network :forwarded_port, guest: 1080, host: 1080
-      dev.vm.network :forwarded_port, guest: 1521, host: 1521
   end
 
   config.vm.provider :virtualbox do |vb|

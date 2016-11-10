@@ -2,6 +2,9 @@ FROM centos:6
 
 #
 # Configuration
+# Inspiration taken from:
+# - https://github.com/UKHomeOffice/docker-oracle-database-express-edition-11g
+# - https://github.com/wnameless/docker-oracle-xe-11g/
 #
 ENV ORACLE_HOME /u01/app/oracle/product/11.2.0/xe
 ENV PATH $ORACLE_HOME/bin:$PATH

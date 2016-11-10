@@ -8,14 +8,14 @@ SCRIPT_DIR=$(dirname $0)
 #
 # "initscripts" provides /etc/init.d/functions which is needed by /etc/init.d/oracle-xe
 echo "Installing basic dependencies"
-rpm --rebuilddb && yum -q -y install unzip bc initscripts
+rpm --quiet --rebuilddb && yum -q -y install unzip bc initscripts
 
 cd $SCRIPT_DIR
-unzip oracle-xe-11*.zip
+unzip -qq oracle-xe-11*.zip
 
 cd Disk1
 echo "Installing Oracle dependencies"
-rpm --rebuilddb && (yum deplist *.rpm | awk '/provider/ {print $2}' | sort -u | xargs yum -q -y install)
+rpm --quiet --rebuilddb && (yum deplist *.rpm | awk '/provider/ {print $2}' | sort -u | xargs yum -q -y install)
 
 #
 # Install Oracle DB
