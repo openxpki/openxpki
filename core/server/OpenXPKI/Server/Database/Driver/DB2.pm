@@ -1,4 +1,4 @@
-package OpenXPKI::Server::Database::Driver::PostgreSQL;
+package OpenXPKI::Server::Database::Driver::DB2;
 use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::Role::SequenceSupport';
@@ -6,7 +6,7 @@ with 'OpenXPKI::Server::Database::Role::Driver';
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::PostgreSQL - Driver for PostgreSQL databases
+OpenXPKI::Server::Database::Driver::DB2 - Driver for IBM DB2 databases
 
 =cut
 
@@ -15,32 +15,23 @@ OpenXPKI::Server::Database::Driver::PostgreSQL - Driver for PostgreSQL databases
 #
 
 # DBI compliant driver name
-sub dbi_driver { 'Pg' }
+sub dbi_driver { 'DB2' }
 
 # DSN string including all parameters.
 sub dbi_dsn {
     my $self = shift;
-    # map DBI parameter names to our object attributes
-    my %args = (
-        sslmode => 'allow',
-        database => $self->name,
-        host => $self->host,
-        port => $self->port,
-    );
-    return sprintf("dbi:%s:%s",
+    return sprintf("dbi:%s:dbname=%s",
         $self->dbi_driver,
-        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } keys %args), # only add defined attributes
+        $self->name,
     );
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params { {
-    pg_enable_utf8 => 1,
-} }
+sub dbi_connect_params { {} }
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params { {
-    limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
+    limit_offset => 'FetchFirst',    # see SQL::Abstract::Limit source code
 } }
 
 ################################################################################
@@ -49,7 +40,7 @@ sub sqlam_params { {
 
 sub nextval_query {
     my ($self, $seq) = @_;
-    return "SELECT NEXTVAL('$seq')";
+    return "VALUES NEXTVAL FOR $seq";
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -1,48 +1,70 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
-
-use strict;
-use warnings;
-use utf8;
-
 use Moose;
+use utf8;
+with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
+with 'OpenXPKI::Server::Database::Role::Driver';
 
-extends 'OpenXPKI::Server::Database';
+=head1 Name
 
-use OpenXPKI::Debug;
-use DBIx::Handler;
-  
-sub _build_connector {
+OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL/mariaDB databases
+
+=cut
+
+use OpenXPKI::Exception;
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
+
+# DBI compliant driver name
+sub dbi_driver { 'mysql' }
+
+# DSN string including all parameters.
+sub dbi_dsn {
     my $self = shift;
-    # map DBI param names to our object attributes
-    my %param_map = (
-        database => $self->db_name,
-        host => $self->db_host,
-        port => $self->db_port,
+    # map DBI parameter names to our object attributes
+    my %args = (
+        database => $self->name,
+        host => $self->host,
+        port => $self->port,
     );
-    # only add defined attributes
-    my $dsn_params = join ";", map { $_."=".$param_map{$_} } grep { defined $param_map{$_} } keys %param_map;
-    # compose DSN and attributes
-    my $dsn = sprintf("dbi:mysql:%s", $dsn_params);
-    my $attr_hash = {
-        RaiseError => 1,
-        AutoCommit => 0,
+    return sprintf("dbi:%s:%s",
+        $self->dbi_driver,
+        join(";", map { "$_=$args{$_}" } grep { defined $args{$_} } keys %args), # only add defined attributes
+    );
+}
+
+# Additional parameters for DBI's connect()
+sub dbi_connect_params {
+    {
         mysql_enable_utf8 => 1,
         mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
         mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
-    };
-    ##! 4: "DSN: $dsn"
-    ##! 4: "Attributes: " . join " | ", map { $_." = ".$attr_hash->{$_} } keys %$attr_hash
-    return DBIx::Handler->new($dsn, $self->db_user, $self->db_passwd, $attr_hash);
+    }
 }
- 
- 1;
- 
-__END__;
 
-=head1 Name
- 
-OpenXPKI::Server::Database::Driver::MySQL;
- 
+# Parameters for SQL::Abstract::More
+sub sqlam_params { {
+    limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
+} }
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::SequenceEmulation
+#
+
+sub last_auto_id {
+    my ($self, $dbi) = @_;
+    my $sth = $dbi->run('select last_insert_id()');
+    my $row = $sth->fetchrow_arrayref
+        or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
+    return $row->[0];
+}
+
+__PACKAGE__->meta->make_immutable;
+
 =head1 Description
 
-Implementation of OpenXPKI::Server::Database for the MySQL/mariaDB database.
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
+
+=cut
