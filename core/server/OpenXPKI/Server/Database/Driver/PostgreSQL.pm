@@ -1,17 +1,18 @@
 package OpenXPKI::Server::Database::Driver::PostgreSQL;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::DriverRole';
+with 'OpenXPKI::Server::Database::Role::SequenceSupport';
+with 'OpenXPKI::Server::Database::Role::Driver';
+
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::PostgreSQL - Driver for PostgreSQL databases
 
-=head1 Description
-
-This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
-
 =cut
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
 
 # DBI compliant driver name
 sub dbi_driver { 'Pg' }
@@ -42,4 +43,20 @@ sub sqlam_params { {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 } }
 
+################################################################################
+# required by OpenXPKI::Server::Database::Role::SequenceSupport
+#
+
+sub nextval_query {
+    my ($self, $seq) = @_;
+    return "SELECT NEXTVAL('$seq')";
+}
+
 __PACKAGE__->meta->make_immutable;
+
+=head1 Description
+
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
+
+=cut

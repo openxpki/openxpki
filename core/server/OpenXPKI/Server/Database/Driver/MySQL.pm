@@ -1,17 +1,20 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::DriverRole';
+with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
+with 'OpenXPKI::Server::Database::Role::Driver';
+
 =head1 Name
 
 OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL/mariaDB databases
 
-=head1 Description
-
-This class is not meant to be instantiated directly.
-Use L<OpenXPKI::Server::Database/new> instead.
-
 =cut
+
+use OpenXPKI::Exception;
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
 
 # DBI compliant driver name
 sub dbi_driver { 'mysql' }
@@ -45,4 +48,23 @@ sub sqlam_params { {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 } }
 
+################################################################################
+# required by OpenXPKI::Server::Database::Role::SequenceEmulation
+#
+
+sub last_auto_id {
+    my ($self, $dbi) = @_;
+    my $sth = $dbi->run('select last_insert_id()');
+    my $row = $sth->fetchrow_arrayref
+        or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
+    return $row->[0];
+}
+
 __PACKAGE__->meta->make_immutable;
+
+=head1 Description
+
+This class is not meant to be instantiated directly.
+Use L<OpenXPKI::Server::Database/new> instead.
+
+=cut

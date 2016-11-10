@@ -26,6 +26,7 @@ sub execute {
     my $pki_realm = CTX('session')->get_pki_realm();
 
     my $dbi = CTX('dbi_backend');
+    $dbi->commit;  # make sure we see data inserted by new DB layer 
 
     if (!$self->param('prefix')) {
         OpenXPKI::Exception->throw(

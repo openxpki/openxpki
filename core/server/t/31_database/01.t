@@ -35,10 +35,7 @@ lives_ok { $dbi = OpenXPKI::Server::Database->new(
     }
 ) };
 
-my $conn;
-lives_ok { $conn = $dbi->_connector } "Fetch connector object";
-
-throws_ok { $conn->driver } qr/\btype\b.*missing/, "Complain about missing 'type' parameter";
+throws_ok { $dbi->driver } qr/\btype\b.*missing/, "Complain about missing 'type' parameter";
 
 # create correct instance
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
@@ -46,26 +43,75 @@ lives_ok { $dbi = OpenXPKI::Server::Database->new(
     db_params => \%params,
 ) } "create instance";
 
-my $query;
-lives_ok { $query = $dbi->query } "fetch query object";
+lives_ok { $dbi->driver } "fetch driver object";
+
+my $builder;
+lives_ok { $builder = $dbi->query_builder } "fetch query builder object";
+
+ok !$dbi->_dbix_handler_initialized, "dont connect to DB if not necessary";
 
 my $sql;
+
+# LIMIT ... OFFSET
 lives_ok {
-    $sql = $query->select(
+    $sql = $builder->select(
         from => 'flora',
         columns => [ qw ( name color ) ],
         where => { fruits => 'forbidden' },
         limit => 5,
         offset => 10,
-    )->sql_str
+    )->string
 } "create SELECT query with LIMIT and OFFSET";
 
-like $sql, qr/SELECT\s*name,\s*color\s*FROM\s*flora\s*WHERE.*LIMIT.*OFFSET/i, "correct SQL string";
+like $sql,
+    qr/ ^
+        SELECT \W+ name, \W+ color \W+
+        FROM \W+ flora \W
+        WHERE .*
+        LIMIT .* OFFSET
+    /xmsi, "correct SQL string";
 
-lives_ok { $conn = $dbi->_connector } "fetch connector object";
-lives_ok { $conn->driver } "fetch driver object";
+# JOIN
+lives_ok {
+    $sql = $builder->select(
+        from_join => 'fruit id=id flora',
+        columns => [ qw ( name color ) ],
+        where => { fruits => 'forbidden' },
+    )->string
+} "create SELECT query with JOIN";
+
+
+like $sql,
+    qr/ ^
+        SELECT \W+ name, \W+ color \W+
+        FROM \W+ fruit \W
+        .*? JOIN \W+ flora \W+
+        ON \W+ fruit\.id \W+ = \W+ flora\.id \W+
+        WHERE
+    /xmsi, "correct SQL string";
+
 
 my $dbh;
 lives_ok { $dbh = $dbi->dbh } "fetch database handle";
+
+ok $dbi->_dbix_handler_initialized, "connect to DB (init DBIx::Handler)";
+
+#
+# auto increment
+#
+lives_ok {
+    $dbi->run("CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT, text VARCHAR(100))")
+} "create test table with auto increment column";
+
+lives_ok {
+    $dbi->insert(into => "test", values => { text => "Litfasssaeule" })
+} "insert test data #1";
+is $dbi->driver->last_auto_id($dbi), 1, "fetch last auto increment id #1";
+
+lives_ok {
+    $dbi->insert(into => "test", values => { text => "Stoffetzen" })
+} "insert test data #2";
+is $dbi->driver->last_auto_id($dbi), 2, "fetch last auto increment id #2";
+
 
 done_testing;

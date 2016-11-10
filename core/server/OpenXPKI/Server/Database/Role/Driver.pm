@@ -1,11 +1,16 @@
-package OpenXPKI::Server::Database::DriverRole;
+package OpenXPKI::Server::Database::Role::Driver;
 use Moose::Role;
 use utf8;
 =head1 Name
 
-OpenXPKI::Server::Database::DriverRole - Moose role that every database driver has to consume
+OpenXPKI::Server::Database::Role::Driver - Moose role that every database driver
+has to consume
 
 =cut
+
+################################################################################
+# Attributes
+#
 
 # Standardize some connection parameters names for all drivers
 has 'name'         => ( is => 'ro', isa => 'Str', required => 1 );
@@ -15,21 +20,25 @@ has 'port'         => ( is => 'ro', isa => 'Int' );
 has 'user'         => ( is => 'ro', isa => 'Str' );
 has 'passwd'       => ( is => 'ro', isa => 'Str' );
 
-#
-# Methods required in driver classes consuming this role
+################################################################################
+# Required in drivers classes that consume this role
 #
 requires 'dbi_driver';         # String: DBI compliant case sensitive driver name
 requires 'dbi_dsn';            # String: DSN parameters after "dbi:<driver>:"
 requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect()
 requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
+requires 'next_id';            # Int: next insert ID ("serial")
 
 1;
 
 =head1 Synopsis
 
+To create a new driver for your "Exotic" DBMS just write a L<Moose> class that
+consumes C<OpenXPKI::Server::Database::Role::Driver>:
+
     package OpenXPKI::Server::Database::Driver::ExoticDb;
     use Moose;
-    with 'OpenXPKI::Server::Database::DriverRole';
+    with 'OpenXPKI::Server::Database::Role::Driver';
     ...
 
 Then e.g. in your database.yaml:
@@ -62,22 +71,39 @@ This class contains the API to interact with the configured OpenXPKI database.
 
 =back
 
-=head1 Required methods in the consuming driver class
+=head1 Methods
+
+Please note that the following methods are implemented in the driver class that
+consumes this Moose role.
 
 =head2 dbi_driver
 
-Must return the DBI compliant case sensitive driver name (I<Str>).
+Returns the DBI compliant case sensitive driver name (I<Str>).
 
 =head2 dbi_dsn
 
-Must return the DSN as expected by L<DBI/connect> (I<Str>).
+Returns the DSN as expected by L<DBI/connect> (I<Str>).
 
 =head2 dbi_connect_params
 
-Must return optional parameters to pass to L<DBI/connect> (I<HashRef>).
+Return optional parameters to pass to L<DBI/connect> (I<HashRef>).
 
 =head2 sqlam_params
 
-Must return optional parameters to pass to L<SQL::Abstract::More/new> (I<HashRef>).
+Returns optional parameters to pass to L<SQL::Abstract::More/new> (I<HashRef>).
+
+=head2 next_id
+
+Returns the next insert ID for the given sequence (I<Int>).
+
+Parameters:
+
+=over
+
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+
+=item * B<$seq> - SQL sequence for which an ID shall be returned (I<Str>, required)
+
+=back
 
 =cut
