@@ -1,0 +1,10 @@
+# Oracle network configuration file
+# (default location: $ORACLE_HOME/network/admin/)
+XE =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = %hostname%)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = XE)
+    )
+  )

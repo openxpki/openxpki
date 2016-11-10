@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/contrib-jessie64"
+
+  # Default VM - testing on debian jessie 
+  config.vm.define "develop", primary:true do |dev|
+      dev.vm.hostname = "oxi-dev-alldb"
+      dev.vm.synced_folder "../../..", "/code-repo"
+
+      # Install Docker runtime but don't do anything through Vagrant
+      dev.vm.provision "docker" do |d|
+      end
+
+      # prevent Vagrant error "stdin: is not a tty"
+      dev.vm.provision :shell, :inline => "sed -ri 's/^(mesg.*)/# \\1/' /root/.profile"
+
+      # Install databases (partly as Docker images)
+      dev.vm.provision :shell, :path => "assets/oracle/provision.sh"
+      dev.vm.provision :shell, :path => "assets/mysql/provision.sh"
+      dev.vm.provision :shell, :path => "assets/sqlite/provision.sh"
+
+      # Install OpenXPKI etc.
+      #dev.vm.provision :shell, :path => "assets/provision.sh"
+
+      # TCP ports - OpenXPKI
+      dev.vm.network :forwarded_port, guest: 80, host: 8080
+      dev.vm.network :forwarded_port, guest: 443, host: 8443
+
+      # TCP ports - Oracle WebUI (http://127.0.0.1:1080/apex)
+      dev.vm.network :forwarded_port, guest: 1080, host: 1080
+  end
+
+  config.vm.provider :virtualbox do |vb|
+      # increase memory (Virtualbox)
+      vb.customize ["modifyvm", :id, "--memory", "2048"]
+  end
+
+  config.ssh.forward_agent = true
+end
