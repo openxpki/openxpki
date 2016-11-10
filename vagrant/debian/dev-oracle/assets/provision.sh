@@ -6,6 +6,11 @@ set -e
 # Installs the latest release + initial config from the public repo 
 # as starting point
 
+echo "export OXI_TEST_DB_ORACLE_NAME=XE"           >  /etc/profile.d/openxpki-test.sh
+echo "export OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/profile.d/openxpki-test.sh
+echo "export OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/profile.d/openxpki-test.sh
+. /etc/profile
+
 #
 # Install Oracle
 #
@@ -20,12 +25,12 @@ if [ $installed -eq 0 ]; then
 
     # Oracle database connection id
     sed "s/%hostname%/$HOSTNAME/g" /vagrant/assets/tnsnames.ora > /etc/tnsnames.ora
-    
+
     # Set TNS_ADMIN for sqlplus64 to find tnsnames.ora, ORACLE_HOME for Perl module DBD::Oracle
     echo "export TNS_ADMIN=/etc"                             > /etc/profile.d/oracle.sh
     echo "export ORACLE_HOME=/usr/lib/oracle/12.1/client64" >> /etc/profile.d/oracle.sh
     . /etc/profile
-    
+
     # DBD::Oracle searches demo.mk there
     ln -s /usr/share/oracle/12.1/client64/demo/demo.mk /usr/share/oracle/12.1/client64/
 fi
@@ -47,18 +52,24 @@ if [ $error -ne 0 ]; then
 fi
 
 echo "Creating OpenXPKI user and database schema"
-sqlplus64 system/oracle@XE     @/vagrant/assets/create-user.sql
-sqlplus64 openxpki/openxpki@XE @/code-repo/config/sql/schema-oracle.sql
+cat /vagrant/assets/create-user.sql \
+   | sed "s/%user%/$OXI_TEST_DB_ORACLE_USER/g; s/%password%/$OXI_TEST_DB_ORACLE_PASSWORD/g" \
+   | sqlplus64 -s system/oracle@XE
+sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@XE @/code-repo/config/sql/schema-oracle.sql
 
 #
 # Install CPANminus
 #
-curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus
+if ! which cpanm >/dev/null; then
+    echo "Installing cpanm"
+    curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >/dev/null
+fi
 
 #
 # Install DBD::Oracle
 #
-cpanm DBD::Oracle
+echo "Installing Perl modules"
+cpanm --quiet DBD::Oracle DBD::SQLite
 
 #
 # Configure Apache
@@ -69,11 +80,15 @@ a2enmod fcgid
 #
 # Install OpenXPKI
 #
-PKGHOST=packages.openxpki.org
-curl -s -L http://$PKGHOST/debian/Release.key | apt-key add -
-echo "deb http://$PKGHOST/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
-apt update
-apt-get install -q=2 libopenxpki-perl openxpki-i18n libapache2-mod-fcgid
+installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'libopenxpki-perl' 2>&1 | grep -ci installed)
+if [ $installed -eq 0 ]; then
+    echo "Installing OpenXPKI"
+    PKGHOST=packages.openxpki.org
+    curl -s -L http://$PKGHOST/debian/Release.key | apt-key add -
+    echo "deb http://$PKGHOST/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
+    apt update
+    apt-get install -q=2 libopenxpki-perl openxpki-i18n libapache2-mod-fcgid
+fi
 
 #
 # Configure OpenXPKI
