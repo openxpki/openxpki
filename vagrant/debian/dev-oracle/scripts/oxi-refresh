@@ -1,17 +1,34 @@
 #!/bin/bash
+## <info> Copy latest code from /code-repo, install dependencies and restart OpenXPKI
+test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
+set -o pipefail
 
-# Copy latest OpenXPKI code from host into Vagrant box
+#
+# Exit handler
+#
+LOG=$(mktemp)
+function _exit () {
+    if [ $1 -ne 0 -a $1 -ne 333 ]; then
+        echo "$0: ERROR - last command exited with code $1, output:" && cat $LOG
+    fi
+    rm -f $LOG
+    exit $1
+}
+trap '_exit $?' EXIT
+
+set -e
 
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI
 #
-cpanm --quiet --notest PPI
+echo "Checking for new Perl dependencies in latest code"
+cpanm --notest PPI                                                    >$LOG 2>&1
 
 perl -e '
 use PPI;
 use PPI::Dumper;
 
-$doc = PPI::Document->new("/code-repo/core/server/Makefile.PL");
+$doc = PPI::Document->new("/code-repo/core/server/Makefile.PL") or die "Makefile.PL not found";
 $doc->prune("PPI::Token::Whitespace");
 $doc->prune("PPI::Token::Comment");
 
@@ -47,20 +64,22 @@ if (@modlist) {
     print "cpanm: installing ".scalar(@modlist)." missing OpenXPKI dependencies\n";
     system("cpanm --quiet --notest ".join(" ", @modlist));
 }
-'
+' 2>$LOG
 
 #
 # Copy current code
 #
 echo "Copying current code and binaries from repo"
-rsync -q -c -P -a  /code-repo/core/server/OpenXPKI/* /usr/lib/x86_64-linux-gnu/perl5/5.20/OpenXPKI/
+rsync -c -P -a  \
+ /code-repo/core/server/OpenXPKI/* \
+ /usr/lib/x86_64-linux-gnu/perl5/5.20/OpenXPKI/                       >$LOG 2>&1
 
 if [ "$1" != "--no-restart" ]; then
     echo "Restarting OpenXPKI"
-    openxpkictl restart >/dev/null
+    openxpkictl restart >/dev/null                                    >$LOG 2>&1
 
     if [[ $(openxpkictl status 2>&1) == *"not running"* ]]; then
         echo "Error starting OpenXPKI"
-        exit 1
+        exit 333
     fi
 fi

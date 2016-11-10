@@ -3,6 +3,22 @@
 # Install Oracle XE client and set up database
 SCRIPT_DIR=/vagrant/assets/oracle
 
+#
+# Exit handler
+#
+LOG=$(mktemp)
+function _exit () {
+    if [ $1 -ne 0 -a $1 -ne 333 ]; then
+        echo "$0: ERROR - last command exited with code $1, output:" && cat $LOG
+    fi
+    rm -f $LOG
+    exit $1
+}
+trap '_exit $?' EXIT
+
+#
+# Config
+#
 echo "export OXI_TEST_DB_ORACLE_NAME=XE"           >  /etc/profile.d/openxpki-test.sh
 echo "export OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/profile.d/openxpki-test.sh
 echo "export OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/profile.d/openxpki-test.sh
@@ -20,21 +36,21 @@ Please download the Oracle XE 11.2 setup for Linux from
 http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html
 and place it in <vagrant>/assets/oracle/docker/setup/packages/
 
-This file cannot be put into the OpenXPKI repository due to license restrictions.
+When you are done, run "vagrant provision" to continue.
 ================================================================================
 __ERROR
-    exit 1
+    exit 333
 fi
 
 #
 # Run Docker container
 #
-echo "Oracle: building and starting Docker container with database"
+echo "Oracle: building and starting Docker container - have a break, this will take a while :)"
 
-docker --log-level=warn rm -f oracle >/dev/null
+docker rm -f oracle >/dev/null 2>&1
 set -e
-docker --log-level=warn build $SCRIPT_DIR/docker -t oracle-image
-docker --log-level=warn run --name oracle -d -p 1521:1521 -p 1080:8080 oracle-image
+docker build $SCRIPT_DIR/docker -t oracle-image                       >$LOG 2>&1
+docker run --name oracle -d -p 1521:1521 -p 1080:8080 oracle-image    >$LOG 2>&1
 set +e
 
 #
@@ -45,10 +61,10 @@ if [ $installed -eq 0 ]; then
     set -e
     # quiet mode -q=2 implies -y
     echo "Oracle: building and installing client (and required packages)"
-    apt-get -q=2 install fakeroot alien libaio1
-    fakeroot alien -i $SCRIPT_DIR/oracle-instantclient12.1-*.rpm
+    apt-get -q=2 install fakeroot alien libaio1                       >$LOG 2>&1
+    fakeroot alien -i $SCRIPT_DIR/oracle-instantclient12.1-*.rpm      >$LOG 2>&1
     echo "/usr/lib/oracle/12.1/client64/lib/" > /etc/ld.so.conf.d/oracle.conf
-    ldconfig
+    ldconfig                                                          >$LOG 2>&1
     set +e
 
     # Oracle database connection id
@@ -59,7 +75,7 @@ if [ $installed -eq 0 ]; then
     echo "export ORACLE_HOME=/usr/lib/oracle/12.1/client64" >> /etc/profile.d/oracle.sh
     . /etc/profile
 
-    # DBD::Oracle searches demo.mk there
+    # DBD::Oracle expects demo.mk there
     ln -s /usr/share/oracle/12.1/client64/demo/demo.mk /usr/share/oracle/12.1/client64/
 fi
 
@@ -76,16 +92,16 @@ done
 if [ $error -ne 0 ]; then
     echo "It seems that the Oracle database was not started. Output:"
     echo "quit;" | sqlplus64 -s system/oracle@XE
-    exit 1
+    exit 333
 fi
 
 #
 # Database setup
 #
 set -e
-echo "Oracle: setting up database"
+echo "Oracle: setting up database (user + schema)"
 
-cat <<__SQL | sqlplus64 -s system/oracle@XE >/dev/null
+cat <<__SQL | sqlplus64 -s system/oracle@XE                           >$LOG 2>&1
 DROP USER $OXI_TEST_DB_ORACLE_USER;
 CREATE USER $OXI_TEST_DB_ORACLE_USER IDENTIFIED BY "$OXI_TEST_DB_ORACLE_PASSWORD"
   DEFAULT TABLESPACE users
@@ -95,15 +111,16 @@ GRANT connect, resource TO $OXI_TEST_DB_ORACLE_USER;
 QUIT;
 __SQL
 
-sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@XE @/code-repo/config/sql/schema-oracle.sql
+sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@XE \
+ @/code-repo/config/sql/schema-oracle.sql                             >$LOG 2>&1
 set +e
 
 #
 # Install CPANminus and modules
 #
-if ! which cpanm; then
+if ! which cpanm >/dev/null; then
     echo "Installing cpanm"
-    curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >/dev/null || exit 1
+    curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >$LOG 2>&1 || _exit $?
 fi
 echo "Oracle: installing Perl module"
-cpanm --quiet DBD::Oracle || exit 1
+cpanm --notest DBD::Oracle >$LOG 2>&1 || _exit $?

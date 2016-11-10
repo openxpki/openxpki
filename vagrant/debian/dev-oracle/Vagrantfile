@@ -13,13 +13,16 @@ Vagrant.configure("2") do |config|
       dev.vm.provision "docker" do |d|
       end
 
+      # prevent Vagrant error "stdin: is not a tty"
+      dev.vm.provision :shell, :inline => "sed -ri 's/^(mesg.*)/# \\1/' /root/.profile"
+
       # Install databases (partly as Docker images)
       dev.vm.provision :shell, :path => "assets/oracle/provision.sh"
       dev.vm.provision :shell, :path => "assets/mysql/provision.sh"
       dev.vm.provision :shell, :path => "assets/sqlite/provision.sh"
 
       # Install OpenXPKI etc.
-      dev.vm.provision :shell, :path => "assets/provision.sh"
+      #dev.vm.provision :shell, :path => "assets/provision.sh"
 
       # TCP ports - OpenXPKI
       dev.vm.network :forwarded_port, guest: 80, host: 8080

@@ -1,0 +1,32 @@
+#!/bin/bash
+# <info> Show this help screen
+
+cat <<'__HEADER'
+.-==[ Happy coding ]==--
+|
+| Welcome to the OpenXPKI development VM!
+|
+| OpenXPKI should now be running with a set of test certificates.
+|
+| The source code on your host is directly available in this VM via mount point
+| /code-repo. You can either edit your files there or on the host.
+| After a code update the latest files can be copied to the appropriate
+| locations in the VM using the script listed below.
+|
+| Available helper scripts (remember to use sudo):
+__HEADER
+
+for SCRIPT in $(dirname $0)/*; do
+  if [ ! -d "$SCRIPT" ]; then
+    MY_INFO=`cat "$SCRIPT" | grep "[[:blank:]]#*[[:blank:]]*<info>" | cut -d ">" -f2 | sed s/'^[[:blank:]]*'//`
+    FILENAME=`basename $SCRIPT`
+    MYBUF=`printf "%-15s" $FILENAME|tr " " "."|sed "s/\./ /"`
+    test "$MY_INFO" != "" && echo "|   ${MYBUF} ${MY_INFO}"
+  fi
+done
+
+cat <<'__FOOTER'
+|
+^--
+
+__FOOTER
