@@ -150,6 +150,34 @@ sub update {
     return $self->_make_query(method => 'update', args => \%params);
 }
 
+sub delete {
+    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+        from      => { isa => 'Str' },
+        where     => { isa => 'Str | ArrayRef | HashRef', optional => 1 },
+        all       => { isa => 'Bool', optional => 1 },
+    );
+    OpenXPKI::Exception->throw (message => "You must provide either 'where' or 'all' parameter")
+        unless ($params{'where'} or $params{'all'});
+
+    OpenXPKI::Exception->throw (message => "Empty parameter 'where' not allowed, use 'all' to enforce deletion of all rows")
+        if ($params{'where'} and (
+            ( ref $params{'where'} eq "ARRAY" and not scalar @{$params{'where'}} )
+            or
+            ( ref $params{'where'} eq "HASH" and not scalar keys %{$params{'where'}} )
+        ));
+
+    # Add namespace to table name
+    $params{'from'} = $self->_add_namespace_to($params{'from'}) if $params{'from'};
+
+    # Delete all rows
+    if ($params{'all'}) {
+        $params{'where'} = {};
+        delete $params{'all'};
+    }
+
+    return $self->_make_query(method => 'delete', args => \%params);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 Description
@@ -244,6 +272,31 @@ Named parameters:
 =item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
 
 =item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+
+=back
+
+=head2 delete
+
+Builds a DELETE query and returns an L<OpenXPKI::Server::Database::Query> object
+which contains SQL string and bind parameters.
+
+To prevent accidential deletion of all rows of a table you must specify
+parameter C<all> if you want to do that:
+
+    $dbi->delete(
+        from => "mytab",
+        all => 1,
+    );
+
+Named parameters:
+
+=over
+
+=item * B<from> - Table name (I<Str>, required)
+
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+
+=item * B<all> - Set this to 1 instead of specifying C<where> to delete all rows (I<Bool>)
 
 =back
 

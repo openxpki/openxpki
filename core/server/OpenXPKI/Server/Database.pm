@@ -262,9 +262,18 @@ sub update {
 }
 
 # MERGE
+# Returns: DBI statement handle
 sub merge {
     my $self = shift;
     return $self->driver->merge($self, @_);
+}
+
+# DELETE
+# Returns: DBI statement handle
+sub delete {
+    my $self = shift;
+    my $query = $self->query_builder->delete(@_);
+    return $self->run($query);
 }
 
 # Create a new insert ID ("serial")
@@ -463,6 +472,13 @@ The values from the WHERE clause are also inserted if the row does not exist
 (together with those from C<set_once>)!
 
 =back
+
+=head2 delete
+
+Deletes rows in the database and returns the results as a I<DBI::st> statement
+handle.
+
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/delete>.
 
 =head2 start_txn
 
