@@ -40,17 +40,19 @@ if ! which cpanm >/dev/null; then
     curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >$LOG 2>&1 || _exit $?
 fi
 
-set -e
-
 #
 # Configure OpenXPKI
 #
 #
 echo "Configuring OpenXPKI"
 
-echo "export PATH=$PATH:/vagrant/scripts"         >> /root/.bashrc
-echo "export PATH=$PATH:/vagrant/scripts"         >> /home/vagrant/.bash_profile
-echo "/vagrant/scripts/oxi-help"                  >> /home/vagrant/.bash_profile
+if [ $(grep -c '/vagrant/scripts' /root/.bashrc) -eq 0 ]; then
+    echo "export PATH=$PATH:/vagrant/scripts"              >> /root/.bashrc
+    echo "export PATH=$PATH:/vagrant/scripts"              >> /home/vagrant/.profile
+    echo "/vagrant/scripts/oxi-help"                       >> /home/vagrant/.profile
+fi
+
+set -e
 
 cat <<__DB > /etc/openxpki/config.d/system/database.yaml
 main:

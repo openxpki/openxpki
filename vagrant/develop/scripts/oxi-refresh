@@ -1,5 +1,5 @@
 #!/bin/bash
-## <info> Copy latest code from /code-repo, install dependencies and restart OpenXPKI
+## <info> Copy latest code (/code-repo), install dependencies, restart OpenXPKI
 test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
 set -o pipefail
 

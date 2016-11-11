@@ -19,10 +19,10 @@ trap '_exit $?' EXIT
 #
 # Config
 #
-echo "export OXI_TEST_DB_ORACLE_NAME=XE"           >  /etc/profile.d/openxpki-test.sh
-echo "export OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/profile.d/openxpki-test.sh
-echo "export OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/profile.d/openxpki-test.sh
-. /etc/profile
+echo "OXI_TEST_DB_ORACLE_NAME=XE"           >> /etc/environment
+echo "OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/environment
+echo "OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/environment
+cat /etc/environment | while read def; do export $def; done
 
 #
 # Check if installation package exists

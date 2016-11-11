@@ -18,10 +18,10 @@ trap '_exit $?' EXIT
 #
 # Config
 #
-echo "export OXI_TEST_DB_MYSQL_NAME=openxpki"     >  /etc/profile.d/openxpki-test-mysql.sh
-echo "export OXI_TEST_DB_MYSQL_USER=oxitest"      >> /etc/profile.d/openxpki-test-mysql.sh
-echo "export OXI_TEST_DB_MYSQL_PASSWORD=openxpki" >> /etc/profile.d/openxpki-test-mysql.sh
-. /etc/profile
+echo "OXI_TEST_DB_MYSQL_NAME=openxpki"     >> /etc/environment
+echo "OXI_TEST_DB_MYSQL_USER=oxitest"      >> /etc/environment
+echo "OXI_TEST_DB_MYSQL_PASSWORD=openxpki" >> /etc/environment
+cat /etc/environment | while read def; do export $def; done
 
 #
 # Run Docker container

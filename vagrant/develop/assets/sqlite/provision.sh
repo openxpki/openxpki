@@ -21,8 +21,8 @@ trap '_exit $?' EXIT
 SQLITE_PATH=$(mktemp)
 chmod 0666 $SQLITE_PATH
 
-echo "export OXI_TEST_DB_SQLITE_NAME=$SQLITE_PATH" > /etc/profile.d/openxpki-test-sqlite.sh
-. /etc/profile
+echo "OXI_TEST_DB_SQLITE_NAME=$SQLITE_PATH" >> /etc/environment
+cat /etc/environment | while read def; do export $def; done
 
 #
 # Install SQLite client (sqlite3)
