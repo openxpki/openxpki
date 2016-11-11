@@ -1,6 +1,6 @@
 #!/bin/bash
 # Provision a Vagrant box (VirtualBox VM) for testing and development:
-# Install MySQL client and set up database
+# Install SQLite client and set up database
 
 #
 # Exit handler
@@ -8,7 +8,7 @@
 LOG=$(mktemp)
 function _exit () {
     if [ $1 -ne 0 -a $1 -ne 333 ]; then
-        echo "$0: ERROR - last command exited with code $1, output:" && cat $LOG
+        echo "$0: ERROR - last command exited with code $1, output:" >&2 && cat $LOG >&2
     fi
     rm -f $LOG
     exit $1

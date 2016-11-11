@@ -13,7 +13,7 @@ cat <<'__HEADER'
 | After a code update the latest files can be copied to the appropriate
 | locations in the VM using the script listed below.
 |
-| Available helper scripts (remember to use sudo):
+| Available helper scripts:
 __HEADER
 
 for SCRIPT in $(dirname $0)/*; do
@@ -26,6 +26,8 @@ for SCRIPT in $(dirname $0)/*; do
 done
 
 cat <<'__FOOTER'
+|
+| Most actions need root rights, so you better do "sudo su" first.
 |
 ^--
 
