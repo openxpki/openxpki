@@ -29,7 +29,10 @@ sub execute
     my $limit = $self->param('limit');
     my $include_revoked = $self->param('include_revoked');
     my $include_expired = $self->param('include_expired');
-
+    my $cutoff_notbefore = $self->param('cutoff_notbefore');
+    my $cutoff_notafter = $self->param('cutoff_notafter');
+    my $entity_only = $self->param('entity_only');
+    
     my @param = $self->param();
 
     my $query = {
@@ -41,9 +44,67 @@ sub execute
         $query->{STATUS} = 'ISSUED';
     };
     
-    if (!$include_expired) {
-        $query->{VALID_AT} = time();
+    if ($entity_only) {
+        $query->{ENTITY_ONLY} = 1;
     }
+    
+    my $valid_at;
+    if (my $v_at = $self->param('valid_at')) {
+        ##! 16: 'valid_At ' . $v_at
+       $valid_at = OpenXPKI::DateTime::get_validity({
+            VALIDITY =>  $v_at,
+            VALIDITYFORMAT => 'detect',
+        });
+    } else {
+       $valid_at = DateTime->now();
+    }
+ 
+    my $epoch = $valid_at->epoch();
+ 
+    # if cutoff is set, we filter on notbefore between valid_at and cutoff
+    if ($cutoff_notbefore) {
+        my $cutoff = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $valid_at,
+            VALIDITY => $cutoff_notbefore,
+            VALIDITYFORMAT => 'detect',
+        })->epoch();
+
+        if ($epoch > $cutoff) {
+             $query->{NOTBEFORE} = { VALUE => [ $cutoff, $epoch ], OPERATOR => "BETWEEN" };
+        } else {
+            $query->{NOTBEFORE} = { VALUE => [ $epoch, $cutoff ], OPERATOR => "BETWEEN" };
+        }
+    } else {
+        $query->{NOTBEFORE} = { VALUE => $epoch, OPERATOR => "LESS_THAN" };
+    }
+
+
+    my $expiry_cutoff = 0;
+    # if expired certs should be included, we just move the notafter limit
+    if (!$include_expired) {
+        $expiry_cutoff = $epoch;
+    } elsif (!($include_expired eq '1' || $include_expired =~ /[a-z]/)) {
+        $expiry_cutoff = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $valid_at,
+            VALIDITY => $include_expired,
+            VALIDITYFORMAT => 'detect',
+        })->epoch();
+    }
+
+    # if notafter cutoff is set, we use it as upper limit
+    # we always expect this to be a positive offset
+    if ($cutoff_notafter) {
+        my $cutoff = OpenXPKI::DateTime::get_validity({
+            REFERENCEDATE => $valid_at,
+            VALIDITY => $cutoff_notafter,
+            VALIDITYFORMAT => 'detect',
+        })->epoch();
+
+        $query->{NOTAFTER} = { VALUE => [ $expiry_cutoff, $cutoff ], OPERATOR => "BETWEEN" };
+    } elsif($expiry_cutoff) {
+        $query->{NOTAFTER} = { VALUE => $expiry_cutoff, OPERATOR => "GREATER_THAN" };
+    }
+    
     
     if ($cert_subject) {
         ##! 16: 'Adding subject ' . $cert_subject
@@ -155,6 +216,10 @@ The realm to search in, default is the current realm, I<_any> searches globally
 
 The profile of the certificate, default is all profiles.
 
+=item entity_only
+
+Boolean, find only certificates issued within this realm. Default is no.
+
 =item cert_subject
 
 Searches the full DN for an exact match! The '*' as wildcard is supported.
@@ -189,13 +254,31 @@ Limit the size of the result set
 
 =item include_expired
 
-If set to a true value, also expired certificate are included. By default
-only certificate which are valid at the time of the query are found.
+Parseable OpenXPKI::Datetime value (autodetected), certificates which are
+expired after the given date are included in the report. Default is not to
+include expired certificates.
 
 =item include_revoked
 
 If set to a true value, certificates which are not in ISSUED state 
 (revoked, crl pending, on hold) are also included in the report. Default
 is to show only issued certificates.
+
+=item valid_at
+
+Parseable OpenXPKI::Datetime value (autodetected) used as base for validity
+calculation. Default is now.
+
+=item cutoff_notbefore
+
+Parseable OpenXPKI::Datetime value (autodetected), show only certificates
+where notebefore is before this value. Relative intervals are calculated
+against the given valid_at date!
+
+=item cutoff_notafter
+
+Parseable OpenXPKI::Datetime value (autodetected), show certificates where
+notafter is less then value.  Relative intervals are calculated
+against the given valid_at date!
 
 =back
