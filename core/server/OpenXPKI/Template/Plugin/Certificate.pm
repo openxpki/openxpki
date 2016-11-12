@@ -241,7 +241,7 @@ sub notafter {
 
 }
 
-=head2 chain
+=head2 chain(cert_identifier)
 
 Return the chain of the certificate as array.
 The first element is the certificate issuer, the root ca is the last.
@@ -261,7 +261,31 @@ sub chain {
 
     return \@certs;
     
-}    
+}
+
+=head2 attr(cert_identifier, attribute_name)
+
+Return the value(s) of the requested attribute. 
+Note that the return value is always an array ref.
+
+=cut
+
+sub attr {
+
+    my $self = shift;
+    my $cert_id = shift;
+    my $attr = shift;
+
+    my $hash = CTX('api')->get_cert_attributes({
+        IDENTIFIER => $cert_id, ATTRIBUTE => $attr
+    });
+
+    if ($hash->{$attr}) {
+        return $hash->{$attr};
+    }
+    return [];
+
+}
 
 
 1;
