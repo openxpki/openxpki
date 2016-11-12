@@ -1,0 +1,54 @@
+#!/bin/bash
+# <info> Show this help screen
+
+cat <<'__HEADER'
+.-==[ Happy coding ]==--
+|
+| Welcome to the OpenXPKI development VM!
+|
+| OpenXPKI should now be running with a set of test certificates.
+|
+| The source code on your host is directly available in this VM via mount point
+| /code-repo. You can either edit your files there or on the host.
+|
+| Available helper scripts:
+__HEADER
+
+for SCRIPT in $(dirname $0)/*; do
+  if [ ! -d "$SCRIPT" ]; then
+    MY_INFO=`cat "$SCRIPT" | grep "[[:blank:]]#*[[:blank:]]*<info>" | cut -d ">" -f2 | sed s/'^[[:blank:]]*'//`
+    FILENAME=`basename $SCRIPT`
+    MYBUF=`printf "%-15s" $FILENAME|tr " " "."|sed "s/\./ /"`
+    test "$MY_INFO" != "" && echo "|     ${MYBUF} ${MY_INFO}"
+  fi
+done
+
+cat <<'__DB'
+|
+| Database clients:
+__DB
+
+if [ ! -z $OXI_TEST_DB_SQLITE_NAME ]; then
+    echo "|     SQLite:   sqlite3 $OXI_TEST_DB_SQLITE_NAME"
+fi
+if [ ! -z $OXI_TEST_DB_MYSQL_NAME ]; then
+    echo "|     MySQL:    mysql -u$OXI_TEST_DB_MYSQL_USER -p$OXI_TEST_DB_MYSQL_PASSWORD -h127.0.0.1 $OXI_TEST_DB_MYSQL_NAME"
+fi
+if [ ! -z $OXI_TEST_DB_ORACLE_NAME ]; then
+    echo "|     Oracle:   sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@$OXI_TEST_DB_ORACLE_NAME"
+fi
+
+cat <<'__RESTART'
+|
+| After restarting this VM:
+__RESTART
+test ! -z $OXI_TEST_DB_MYSQL_NAME  && echo "|     docker start mariadb"
+test ! -z $OXI_TEST_DB_ORACLE_NAME && echo "|     docker start oracle"
+
+cat <<'__FOOTER'
+|     openxpkictl start
+|
+| Most actions need root rights, so you better do "sudo su" first.
+^--
+
+__FOOTER

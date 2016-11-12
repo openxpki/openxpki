@@ -28,17 +28,15 @@ sub dbi_dsn {
 
 # Additional parameters for DBI's connect()
 sub dbi_connect_params {
-    {
-        RaiseError => 1,
-        AutoCommit => 0,
-        LongReadLen => 10_000_000,
-    }
+    RaiseError => 1,
+    AutoCommit => 0,
+    LongReadLen => 10_000_000,
 };
 
 # Parameters for SQL::Abstract::More
-sub sqlam_params { {
+sub sqlam_params {
     sql_dialect => 'Oracle',
-} };
+};
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceSupport

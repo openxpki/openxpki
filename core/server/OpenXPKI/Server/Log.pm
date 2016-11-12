@@ -207,6 +207,20 @@ sub log
                     "LINE"     => $line});
 }
 
+# install wrapper / helper subs
+no strict 'refs';
+for my $prio (qw/ debug info warn error fatal /) {
+    *{$prio} = sub {
+        my ($self, $message, $facility) = @_;
+        $self->log(
+            MESSAGE  => $message,
+            PRIORITY => $prio,
+            CALLERLEVEL => 1,
+            FACILITY => $facility // "monitor",
+        );
+    };
+}
+
 1;
 __END__
 
@@ -264,3 +278,40 @@ reference here.
 
 Default is C<system.fatal: [OpenXPKI] undefined message>.
 
+=head2 debug
+
+Shortcut to L</log> that logs a message with C<< PRIORITY => "debug" >>.
+
+Positional parameters:
+
+=over
+
+=item * B<$message> log message
+
+=item * B<$facility> the logging facility - optional, default: C<monitor>
+
+=back
+
+=head2 info
+
+Shortcut to L</log> that logs a message with C<< PRIORITY => "info" >>.
+
+Similar to L</debug>.
+
+=head2 warn
+
+Shortcut to L</log> that logs a message with C<< PRIORITY => "warn" >>.
+
+Similar to L</debug>.
+
+=head2 error
+
+Shortcut to L</log> that logs a message with C<< PRIORITY => "error" >>.
+
+Similar to L</debug>.
+
+=head2 fatal
+
+Shortcut to L</log> that logs a message with C<< PRIORITY => "fatal" >>.
+
+Similar to L</debug>.

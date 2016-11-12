@@ -10,5 +10,6 @@ core/i18n/*/openxpki.mo
 core/i18n/openxpki.pot
 core/htdocs_source/node_modules/
 vagrant/*/.vagrant/
+vagrant/**/oracle-xe-*.rpm.zip
 package/debian/deb
 package/debian/lib

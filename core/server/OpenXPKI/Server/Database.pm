@@ -70,7 +70,14 @@ has 'sqlam' => ( # SQL query builder
     lazy => 1,
     default => sub {
         my $self = shift;
-        return SQL::Abstract::More->new(%{$self->driver->sqlam_params});
+        my @return = $self->driver->sqlam_params; # use array to get list context
+        # tolerate different return values: undef, list, HashRef
+        return SQL::Abstract::More->new(
+            $self->_driver_return_val_to_list(
+                \@return,
+                ref($self->driver)."::sqlam_params",
+            )
+        );
     },
     # TODO Support Oracle 12c LIMIT syntax: OFFSET 4 ROWS FETCH NEXT 4 ROWS ONLY
     # TODO Support LIMIT for other DBs by giving a custom sub to "limit_offset"
@@ -146,6 +153,7 @@ sub _build_dbix_handler {
     ##! 4: "DSN: ".$self->_dsn
     ##! 4: "User: ".$self->user
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$self->dbi_connect_attrs->{$_} } keys %{$self->dbi_connect_attrs}
+    my @params = $self->driver->dbi_connect_params; # use array to get list context
     return DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
@@ -153,7 +161,10 @@ sub _build_dbix_handler {
         {
             RaiseError => 1,
             AutoCommit => 0,
-            %{$self->driver->dbi_connect_params},
+            $self->_driver_return_val_to_list(
+                \@params,
+                ref($self->driver)."::dbi_connect_params",
+            )
         }
     );
 }
@@ -161,6 +172,26 @@ sub _build_dbix_handler {
 ################################################################################
 # Methods
 #
+
+sub _driver_return_val_to_list {
+    my ($self, $return, $method) = @_;
+    my $params;
+    if (scalar @$return == 0) {             # undef
+        $params = {};
+    }
+    elsif (scalar @$return > 1) {           # list
+        $params = { @$return };
+    }
+    elsif (ref $return->[0] eq 'HASH') {    # HashRef
+        $params = $return->[0];
+    }
+    else {
+        OpenXPKI::Exception->throw (
+            message => "Faulty driver implementation: '$method' did not return undef, a HashRef or a list",
+        );
+    }
+    return %$params;
+}
 
 sub dbh {
     my $self = shift;
@@ -254,44 +285,53 @@ __PACKAGE__->meta->make_immutable;
 
 This class contains the API to interact with the configured OpenXPKI database.
 
+=head2 Database drivers
+
 While OpenXPKI supports several database types out of the box it still allows
 you to include new DBMS specific drivers without the need to change existing
-code. This can be achieved by:
+code.
 
-=over
-
-=item 1. Writing a driver class in the C<OpenXPKI::Server::Database::Driver::*>
-namespace that consumes the Moose role L<OpenXPKI::Server::Database::Role::Driver>
-
-=item 2. Referencing this class in your config.
-
-=back
-
-For a short example see L<OpenXPKI::Server::Database::Role::Driver/Synopsis>.
+For more details see L<OpenXPKI::Server::Database::Role::Driver>.
 
 =head2 Class structure
 
 =cut
 
-# The diagram was drawn using http://asciiflow.com
+# The diagram was drawn using App::Asciio
 
 =pod
 
-    +-------------+
-    | *::Database |
-    +--+-+-+------+
-       | | |
-       | | |  +---------------------------+
-       | | +--> *::Database::Role::Driver   |
-       | |    +---------------------------+
-       | |
-       | |    +---------------------------+
-       | +----> *::Database::QueryBuilder +---+
-       |      +---------------------------+   |
-       |                                      |
-       |      +---------------------------+   |
-       +------> *::Database::Query        <---+
-              +---------------------------+
+         .----------------------------.
+    .----| OpenXPKI::Server::Database |---.--------------------.
+    |    '----------------------------'   |                    |
+    |                   |                 |                    |
+    |                   |                 v                    v
+    |                   |      .---------------------. .---------------.
+    |             .-----'      | SQL::Abstract::More | | DBIx::Handler |
+    |             |            '---------------------' '---------------'
+    |             |                       .
+    |             v                   injected
+    |  .---------------------.            .
+    |  | O:S:D::QueryBuilder |<...........'
+    |  '---------------------'
+    |             |     .--------------.
+    |             '---->| O:S:D::Query |
+    |                   '--------------'
+    |
+    |  .------------------.
+    '->| O:S:D::Driver::* |
+       '------------------'
+                 .
+              consumes
+                 .      .---------------------.
+                 ......>| O:S:D::Role::Driver |
+                 .      '---------------------'
+                 .      .------------------------------.
+                 ......>| O:S:D::Role::SequenceSupport |
+                 .      '------------------------------'
+                 .      .--------------------------------.
+                 '.....>| O:S:D::Role::SequenceEmulation |
+                        '--------------------------------'
 
 =head1 Attributes
 

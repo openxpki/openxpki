@@ -1,0 +1,85 @@
+#!/bin/bash
+## <info> Copy latest code (/code-repo), install dependencies, restart OpenXPKI
+test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
+set -o pipefail
+
+#
+# Exit handler
+#
+LOG=$(mktemp)
+function _exit () {
+    if [ $1 -ne 0 -a $1 -ne 333 ]; then
+        echo "$0: ERROR - last command exited with code $1, output:" && cat $LOG
+    fi
+    rm -f $LOG
+    exit $1
+}
+trap '_exit $?' EXIT
+
+set -e
+
+#
+# Grab and install Perl module dependencies from Makefile.PL using PPI
+#
+echo "Checking for new Perl dependencies in latest code"
+cpanm --notest PPI                                                    >$LOG 2>&1
+
+perl -e '
+use PPI;
+use PPI::Dumper;
+
+$doc = PPI::Document->new("/code-repo/core/server/Makefile.PL") or die "Makefile.PL not found";
+$doc->prune("PPI::Token::Whitespace");
+$doc->prune("PPI::Token::Comment");
+
+my $sub = $doc->find_first(sub {                         # find
+    $_[1]->parent == $_[0]                               # at root level
+    and $_[1]->isa("PPI::Statement")                     # a statement
+    and $_[1]->first_element->content eq "WriteMakefile" # called "WriteMakefile"
+}) or die "Subroutine call WriteMakefile() not found\n";
+
+$key = $sub->find_first(sub {                            # below that find
+    $_[1]->isa("PPI::Token::Quote")                      # a quoted string
+    and $_[1]->content =~ /PREREQ_PM/                    # called "PREREQ_PM"
+}) or die "Argument PREREQ_PM not found in WriteMakefile()\n";
+
+$list = $key->next_sibling->next_sibling; # skip "=>" and go to HashRef "{}"
+$list->prune("PPI::Token::Operator");     # remove all "=>"
+%modmap = map { s/(\x27|\x22)//g; $_ }    # remove single or double quotes
+    map { $_->content }
+    @{$list->find("PPI::Token")};
+
+use version;
+my @modlist =
+    map { "$_~".$modmap{$_} }
+    grep {
+        ! (
+            eval "require $_;" and
+            eval "version->parse($_->VERSION) >= version->parse($modmap{$_})"
+        )
+    }
+    keys %modmap;
+
+if (@modlist) {
+    print "cpanm: installing ".scalar(@modlist)." missing OpenXPKI dependencies\n";
+    system("cpanm --quiet --notest ".join(" ", @modlist));
+}
+' 2>$LOG
+
+#
+# Copy current code
+#
+echo "Copying current code and binaries from repo"
+rsync -c -P -a  \
+ /code-repo/core/server/OpenXPKI/* \
+ /usr/lib/x86_64-linux-gnu/perl5/5.20/OpenXPKI/                       >$LOG 2>&1
+
+if [ "$1" != "--no-restart" ]; then
+    echo "Restarting OpenXPKI"
+    openxpkictl restart >/dev/null                                    >$LOG 2>&1
+
+    if [[ $(openxpkictl status 2>&1) == *"not running"* ]]; then
+        echo "Error starting OpenXPKI"
+        exit 333
+    fi
+fi

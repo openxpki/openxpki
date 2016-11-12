@@ -33,27 +33,72 @@ requires 'next_id';            # Int: next insert ID ("serial")
 
 =head1 Synopsis
 
-To create a new driver for your "Exotic" DBMS just write a L<Moose> class that
-consumes C<OpenXPKI::Server::Database::Role::Driver>:
-
-    package OpenXPKI::Server::Database::Driver::ExoticDb;
+    package OpenXPKI::Server::Database::Driver::MyDB2;
     use Moose;
+    with 'OpenXPKI::Server::Database::Role::SequenceSupport';
     with 'OpenXPKI::Server::Database::Role::Driver';
-    ...
+
+    # required by OpenXPKI::Server::Database::Role::Driver    
+    sub dbi_driver { 'DB2' }           # DBI compliant driver name
+    sub dbi_dsn {                      # DSN string including all parameters.
+        my $self = shift;
+        return sprintf("dbi:%s:dbname=%s",
+            $self->dbi_driver,
+            $self->name,
+        );
+    }
+    sub dbi_connect_params { {} }      # Additional parameters for DBI's connect()
+    sub sqlam_params { {               # Parameters for SQL::Abstract::More
+        limit_offset => 'FetchFirst',
+    } }
+    
+    # required by OpenXPKI::Server::Database::Role::SequenceSupport
+    sub nextval_query {                # SQL query to retrieve next sequence value
+        my ($self, $seq) = @_;
+        return "VALUES NEXTVAL FOR $seq";
+    }
+    
+    __PACKAGE__->meta->make_immutable;
 
 Then e.g. in your database.yaml:
 
     main:
-        type: ExoticDb
+        type: MyDB2
         ...
+
+The above code is actually the current driver for IBM DB2 databases.
 
 =head1 Description
 
-This class contains the API to interact with the configured OpenXPKI database.
+This Moose role must be consumed by every OpenXPKI database driver. It defines
+some standard attributes which represent database connection parameters of the
+same name (not all are required for every DBMS). Furthermore it requires the
+consuming class to implement certain methods.
+
+=head2 Writing an own driver
+
+If you have a DBMS that is not yet supported by OpenXPKI you can write and use
+a new driver without changing existing code. The only requirement is that there
+is a L<DBI> driver for your DBMS (look for it on
+L<MetaCPAN|https://metacpan.org/search?q=DBD%3A%3A&search_type=modules>).
+
+To connect OpenXPKI to your (not yet supported) DBMS follow these steps:
+
+=over
+
+=item 1. Write a driver class in the C<OpenXPKI::Server::Database::Driver::*>
+namespace that consumes the Moose role L<OpenXPKI::Server::Database::Role::Driver>
+and one of the roles L<OpenXPKI::Server::Database::Role::SequenceEmulation> or
+L<OpenXPKI::Server::Database::Role::SequenceSupport>.
+
+=item 2. Reference your driver class by it's driver name (the last part after
+C<*::Driver::>, case sensitive) in your configuration file.
+
+=item 3. Submit your code to the OpenXPKI team :)
+
+=back
 
 =head1 Attributes
-
-=head2 Constructor parameters
 
 =over
 
@@ -82,19 +127,19 @@ Returns the DBI compliant case sensitive driver name (I<Str>).
 
 =head2 dbi_dsn
 
-Returns the DSN as expected by L<DBI/connect> (I<Str>).
+Returns the DSN that is passed to L<DBI/connect> (I<Str>).
 
 =head2 dbi_connect_params
 
-Return optional parameters to pass to L<DBI/connect> (I<HashRef>).
+Returns optional parameters that are passed to L<DBI/connect> (I<HashRef>).
 
 =head2 sqlam_params
 
-Returns optional parameters to pass to L<SQL::Abstract::More/new> (I<HashRef>).
+Returns optional parameters that are passed to L<SQL::Abstract::More/new> (I<HashRef>).
 
 =head2 next_id
 
-Returns the next insert ID for the given sequence (I<Int>).
+Returns the next insert id, i.e. the value of the given sequence (I<Int>).
 
 Parameters:
 
@@ -102,7 +147,7 @@ Parameters:
 
 =item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
 
-=item * B<$seq> - SQL sequence for which an ID shall be returned (I<Str>, required)
+=item * B<$seq> - SQL sequence whose next value shall be returned (I<Str>, required)
 
 =back
 
