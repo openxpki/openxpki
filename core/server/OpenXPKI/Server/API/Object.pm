@@ -781,7 +781,7 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * VALID_AT
 
-=item * NOTBEFORE/NOTAFTER (less/greater to match "other side" of validity)
+=item * NOTBEFORE/NOTAFTER (with SCALAR searches "other side" of validity or pass HASH with operator)
 
 =item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR) 
 
@@ -972,13 +972,22 @@ sub __search_cert {
     # notbefore/notafter should only be used for timestamps outside
     # the validity interval, therefore the operators are fixed
     if ( defined $args->{NOTBEFORE} ) {
-        $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
-              { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
+        
+        if (ref $args->{NOTBEFORE} eq 'HASH') {
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } = $args->{NOTBEFORE}
+        } else {
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
+                { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
+        }
     }
 
     if ( defined $args->{NOTAFTER} ) {
-        $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
-              { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
+        if (ref $args->{NOTAFTER} eq 'HASH') {
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } = $args->{NOTAFTER};
+        } else {        
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
+                { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
+        }
     }
 
     # handle certificate attributes (such as SANs)

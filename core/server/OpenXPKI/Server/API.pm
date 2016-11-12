@@ -712,14 +712,12 @@ sub BUILD {
                     optional => 1,
                 },
                 NOTBEFORE => {
-                    type     => SCALAR,
+                    type     => SCALAR|HASHREF,
                     optional => 1,
-                    regex    => $re_integer_string,
                 },
                 NOTAFTER => {
-                    type     => SCALAR,
+                    type     => SCALAR|HASHREF,
                     optional => 1,
-                    regex    => $re_integer_string,
                 },
                 PROFILE => {
                     type  => SCALAR,
