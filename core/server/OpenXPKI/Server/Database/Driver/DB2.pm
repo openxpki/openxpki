@@ -27,12 +27,12 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params { {} }
+sub dbi_connect_params { }
 
 # Parameters for SQL::Abstract::More
-sub sqlam_params { {
+sub sqlam_params {
     limit_offset => 'FetchFirst',    # see SQL::Abstract::Limit source code
-} }
+}
 
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceSupport
