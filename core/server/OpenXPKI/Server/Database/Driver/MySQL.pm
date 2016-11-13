@@ -2,7 +2,7 @@ package OpenXPKI::Server::Database::Driver::MySQL;
 use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
-with 'OpenXPKI::Server::Database::Role::MergeEmulation';
+with 'OpenXPKI::Server::Database::Role::MergeSupport';
 with 'OpenXPKI::Server::Database::Role::Driver';
 
 =head1 Name
@@ -57,6 +57,30 @@ sub last_auto_id {
     my $row = $sth->fetchrow_arrayref
         or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
     return $row->[0];
+}
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::MergeSupport
+#
+
+sub merge_query {
+    my ($self, $dbi, $params) = @_;
+    my $table = $dbi->query_builder->_add_namespace_to($params->{into});
+    my %set      = %{ $params->{set} };
+    my %set_once = %{ $params->{set_once} };
+    my %where    = %{ $params->{where} };
+    my %all_val  = ( %set, %set_once, %where );
+
+    # this special query avoids binding/typing the values twice
+    # TODO Is it really OK that we also quote numbers here (DB performance)?
+    return OpenXPKI::Server::Database::Query->new(string =>
+        sprintf(" INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
+            $table,
+            join(", ", keys %all_val),
+            join(", ", map { "'$_'" } values %all_val),
+            join(", ", map { "$_='$set{$_}'" } keys %set),
+        )
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

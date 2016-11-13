@@ -2,7 +2,7 @@ package OpenXPKI::Server::Database::Driver::Oracle;
 use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::Role::SequenceSupport';
-with 'OpenXPKI::Server::Database::Role::MergeEmulation';
+with 'OpenXPKI::Server::Database::Role::MergeSupport';
 with 'OpenXPKI::Server::Database::Role::Driver';
 
 =head1 Name
@@ -46,6 +46,36 @@ sub sqlam_params {
 sub nextval_query {
     my ($self, $seq) = @_;
     return "SELECT $seq.NEXTVAL FROM DUAL";
+}
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::MergeSupport
+#
+
+sub merge_query {
+    my ($self, $dbi, $params) = @_;
+    my $table = $dbi->query_builder->_add_namespace_to($params->{into});
+    my %set      = %{ $params->{set} };
+    my %set_once = %{ $params->{set_once} };
+    my %where    = %{ $params->{where} };
+    my %all_val  = ( %set, %set_once, %where );
+
+    # create subquery "SELECT ... FROM dual"
+    # TODO Is it really OK that we also quote numbers here (DB performance)?
+    my $query = $dbi->query_builder->select(
+        from => "dual",
+        columns => [ map { sprintf("'%s'|%s", $all_val{$_}, $_) } keys %all_val ],
+    );
+    # this special query avoids binding/typing the values twice
+    return OpenXPKI::Server::Database::Query->new(string =>
+        "MERGE INTO $table"
+        ." USING (".$query->string.")"
+        ." valuesfromdual ON (".join(" and ", map { "$table.$_=valuesfromdual.$_" } keys %where).")"
+        ." WHEN MATCHED THEN"
+        ." UPDATE SET ".join(", ", map { "$table.$_=valuesfromdual.$_" } keys %set)
+        ." WHEN NOT MATCHED THEN"
+        ." INSERT (".join(", ", keys %all_val).") VALUES (".join(", ", map { "valuesfromdual.$_" } keys %all_val).")"
+    );
 }
 
 __PACKAGE__->meta->make_immutable;
