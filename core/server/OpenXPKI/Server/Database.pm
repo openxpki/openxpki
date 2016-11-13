@@ -99,6 +99,7 @@ has '_dbix_handler' => (
     lazy => 1,
     builder => '_build_dbix_handler',
     handles => {
+        # FIXME Create methods and handle exceptions
         start_txn => 'txn_begin',
         commit => 'txn_commit',
         rollback => 'txn_rollback',
@@ -157,16 +158,25 @@ sub _build_dbix_handler {
         ref($self->driver)."::dbi_connect_params",
     );
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
-    return DBIx::Handler->new(
+    my $dbix = DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
         $self->driver->passwd,
         {
-            RaiseError => 1,
+            RaiseError => 0,
+            PrintError => 0,
             AutoCommit => 0,
             %params,
         }
+    ) or OpenXPKI::Exception->throw(
+        message => "Could not connect to database",
+        params => {
+            dbi_error => $DBI::errstr,
+            dsn => $self->driver->dbi_dsn,
+            user => $self->driver->user,
+        },
     );
+    return $dbix;
 }
 
 ################################################################################
@@ -217,14 +227,24 @@ sub run {
     else {
         $query_string = $query;
     }
-    ##! 2: "Query: " . $query_string;
-    my $sth = $self->dbh->prepare($query_string);
+    ##! 16: "Query: " . $query_string;
+    my $sth = $self->dbh->prepare($query_string)
+        or OpenXPKI::Exception->throw(
+            message => "Could not prepare SQL query",
+            params => {
+                query => $query_string,
+                dbi_error => $self->dbh->errstr,
+            },
+        );
     # bind parameters via SQL::Abstract::More to do some magic
     $self->sqlam->bind_params($sth, @{$query_params}) if $query_params;
     $sth->execute
         or OpenXPKI::Exception->throw(
             message => "Could not execute SQL query",
-            params => { dbi_error => $sth->errstr },
+            params => {
+                query => $query_string,
+                dbi_error => $sth->errstr,
+            },
         );
     return $sth;
 }
@@ -283,7 +303,7 @@ sub next_id {
     # get new serial number from DBMS (SQL sequence or emulation via table)
     my $id_int = $self->driver->next_id($self, "seq_$table");
     my $id = Math::BigInt->new($id_int);
-    ##! 16: 'new serial no.: ' . $id->bstr()
+    ##! 32: 'Next ID: ' . $id->bstr()
 
     # shift bitwise left and add server id (default: 255)
     my $nodeid_bits = $self->db_params->{server_shift} // 8;
@@ -403,7 +423,6 @@ Usage:
 Constructor.
 
 Named parameters: see L<attributes section above|/"Constructor parameters">.
-
 
 =head2 select
 

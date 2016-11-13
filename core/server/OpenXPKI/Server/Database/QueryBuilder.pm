@@ -88,7 +88,7 @@ sub select {
 
     # FIXME order_by: if ArrayRef then check for "asc" and "desc" as they are reserved words (https://metacpan.org/pod/SQL::Abstract::More#select)
 
-    die "You must provide either 'from' or 'from_join'"
+    OpenXPKI::Exception->throw (message => "You must provide either 'from' or 'from_join'")
         unless ($params{'from'} or $params{'from_join'});
 
     # Add namespace to table name
