@@ -2,6 +2,7 @@ package OpenXPKI::Server::Database::Driver::DB2;
 use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::Role::SequenceSupport';
+with 'OpenXPKI::Server::Database::Role::MergeEmulation';
 with 'OpenXPKI::Server::Database::Role::Driver';
 
 =head1 Name

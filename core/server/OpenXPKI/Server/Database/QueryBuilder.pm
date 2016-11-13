@@ -64,7 +64,7 @@ sub _make_query {
 
     # Prefix arguments with dash "-"
     my %sqlam_args = map { '-'.$_ => $method_args->{$_} } keys %$method_args;
-    ##! 2: "SQL::Abstract::More->$method(" . join(", ", map { sprintf "%s = %s", $_, Data::Dumper->new([$sqlam_args{$_}])->Indent(0)->Terse(1)->Dump } sort keys %sqlam_args) . ")"
+    ##! 4: "SQL::Abstract::More->$method(" . join(", ", map { sprintf "%s = %s", $_, Data::Dumper->new([$sqlam_args{$_}])->Indent(0)->Terse(1)->Dump } sort keys %sqlam_args) . ")"
 
     # Call SQL::Abstract::More method and store results
     my ($sql, @bind) = $self->sqlam->$method(%sqlam_args);

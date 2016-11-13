@@ -261,6 +261,12 @@ sub update {
     return $self->run($query);
 }
 
+# MERGE
+sub merge {
+    my $self = shift;
+    return $self->driver->merge($self, @_);
+}
+
 # Create a new insert ID ("serial")
 sub next_id {
     my ($self, $table) = @_;
@@ -321,17 +327,17 @@ For more details see L<OpenXPKI::Server::Database::Role::Driver>.
     |  .------------------.
     '->| O:S:D::Driver::* |
        '------------------'
-                 .
-              consumes
-                 .      .---------------------.
-                 ......>| O:S:D::Role::Driver |
-                 .      '---------------------'
-                 .      .------------------------------.
-                 ......>| O:S:D::Role::SequenceSupport |
-                 .      '------------------------------'
-                 .      .--------------------------------.
-                 '.....>| O:S:D::Role::SequenceEmulation |
-                        '--------------------------------'
+         .
+       consumes
+         .    .---------------------.
+         ....>| O:S:D::Role::Driver |
+         .    '---------------------'
+         .    .------------------------------.    .--------------------------------.
+         ....>| O:S:D::Role::SequenceSupport | or | O:S:D::Role::SequenceEmulation |
+         .    '------------------------------'    '--------------------------------'
+         .    .------------------------------.    .--------------------------------.
+         '...>| O:S:D::Role::MergeSupport    | or | O:S:D::Role::MergeEmulation    |
+              '------------------------------'    '--------------------------------'
 
 =head1 Attributes
 
@@ -389,6 +395,7 @@ Constructor.
 
 Named parameters: see L<attributes section above|/"Constructor parameters">.
 
+
 =head2 select
 
 Selects rows from the database and returns the results as a I<DBI::st> statement
@@ -411,16 +418,6 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 =head2 insert
 
-Inserts the given data into the database.
-
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
-
-Returns the statement handle.
-
-Please note that Perl C<undef> will be converted to C<NULL>.
-
-=head2 insert
-
 Inserts rows into the database and returns the results as a I<DBI::st> statement
 handle.
 
@@ -436,6 +433,36 @@ handle.
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
 For parameters see L<OpenXPKI::Server::Database::QueryBuilder/update>.
+
+=head2 merge
+
+Either directly executes or emulates an SQL MERGE (you could also call it
+REPLACE) function and returns the results as a I<DBI::st> statement handle.
+
+Named parameters:
+
+=over
+
+=item * B<into> - Table name (I<Str>, required)
+
+=item * B<set> - Columns that are always set (INSERT or UPDATE). Hash with
+column name / value pairs.
+
+Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=item * B<set_once> - Columns that are only set on INSERT (additional to those
+in the C<where> parameter. Hash with column name / value pairs.
+
+Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=item * B<where> - WHERE clause specification that must contain the PRIMARY KEY
+columns and only allows "AND" and "equal" operators:
+C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
+
+The values from the WHERE clause are also inserted if the row does not exist
+(together with those from C<set_once>)!
+
+=back
 
 =head2 start_txn
 
