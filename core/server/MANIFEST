@@ -186,9 +186,16 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 
 OpenXPKI/Server/Database.pm
 OpenXPKI/Server/Database/Query.pm
+OpenXPKI/Server/Database/QueryBuilder.pm
 OpenXPKI/Server/Database/Driver/MySQL.pm
 OpenXPKI/Server/Database/Driver/Oracle.pm
 OpenXPKI/Server/Database/Driver/PostgreSQL.pm
+OpenXPKI/Server/Database/Driver/DB2.pm
+OpenXPKI/Server/Database/Driver/SQLite.pm
+OpenXPKI/Server/Database/Role/Driver.pm
+OpenXPKI/Server/Database/Role/SequenceEmulation.pm
+OpenXPKI/Server/Database/Role/SequenceSupport.pm
+
 
 ## logging interface
 
