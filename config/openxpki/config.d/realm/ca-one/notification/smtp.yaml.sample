@@ -59,6 +59,11 @@ message:
             template: cert_issued
             subject: certificate issued for [% cert_subject %]                
             
+    cert_expiry:
+        default:
+            template: cert_expiry
+            subject: Certificate Expiry Warning for [% cert_subject %] 
+
     scpu_notify:
         default: 
             template: scpu_notify_user
