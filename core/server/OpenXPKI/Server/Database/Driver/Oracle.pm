@@ -60,21 +60,21 @@ sub merge_query {
     my %where    = %{ $params->{where} };
     my %all_val  = ( %set, %set_once, %where );
 
-    # create subquery "SELECT ... FROM dual"
-    # TODO Is it really OK that we also quote numbers here (DB performance)?
-    my $query = $dbi->query_builder->select(
-        from => "dual",
-        columns => [ map { sprintf("'%s'|%s", $all_val{$_}, $_) } keys %all_val ],
-    );
-    # this special query avoids binding/typing the values twice
-    return OpenXPKI::Server::Database::Query->new(string =>
-        "MERGE INTO $table"
-        ." USING (".$query->string.")"
-        ." valuesfromdual ON (".join(" and ", map { "$table.$_=valuesfromdual.$_" } keys %where).")"
-        ." WHEN MATCHED THEN"
-        ." UPDATE SET ".join(", ", map { "$table.$_=valuesfromdual.$_" } keys %set)
-        ." WHEN NOT MATCHED THEN"
-        ." INSERT (".join(", ", keys %all_val).") VALUES (".join(", ", map { "valuesfromdual.$_" } keys %all_val).")"
+    return OpenXPKI::Server::Database::Query->new(
+        # this special query avoids binding/typing the values twice
+        string => sprintf(
+            "MERGE INTO %s"
+            ." USING (SELECT %s FROM dual) valuesfromdual ON (%s)"
+            ." WHEN MATCHED THEN UPDATE SET %s"
+            ." WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)",
+            $table,
+            join (", ", map { "? AS $_" } keys %all_val),                     # SELECT .. FROM dual
+            join(" AND ", map { "$table.$_=valuesfromdual.$_" } keys %where), # ON (..)
+            join(", ", map { "$table.$_=valuesfromdual.$_" } keys %set),      # UPDATE SET ..
+            join(", ", keys %all_val),                                        # INSERT (..)
+            join(", ", map { "valuesfromdual.$_" } keys %all_val),            # VALUES (..)
+        ),
+        params => [ values %all_val ],
     );
 }
 

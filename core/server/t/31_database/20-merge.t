@@ -5,7 +5,7 @@ use Test::More;
 use Test::Exception;
 use File::Spec::Functions qw( catdir splitpath rel2abs );
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 2;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
 
 #
 # setup
@@ -105,7 +105,7 @@ $db->run("SQL MERGE", 6, sub {
 
     # do not accept complex WHERE clause (as it also serves as source for insert values)
     dies_ok {
-        $dbi->replace(
+        $dbi->merge(
             table => "test",
             values => { text => "Rathaus" },
             where => { id => { '>=', 3 }, entropy => 42 },

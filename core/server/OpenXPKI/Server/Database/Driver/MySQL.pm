@@ -73,13 +73,18 @@ sub merge_query {
 
     # this special query avoids binding/typing the values twice
     # TODO Is it really OK that we also quote numbers here (DB performance)?
-    return OpenXPKI::Server::Database::Query->new(string =>
-        sprintf(" INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
+    return OpenXPKI::Server::Database::Query->new(
+        string => sprintf(
+            "INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
             $table,
             join(", ", keys %all_val),
-            join(", ", map { "'$_'" } values %all_val),
-            join(", ", map { "$_='$set{$_}'" } keys %set),
-        )
+            join(", ", map { "?" } (1..scalar keys %all_val)),
+            join(", ", map { "$_=?" } keys %set),
+        ),
+        params => [
+            values %all_val,
+            values %set,
+        ]
     );
 }
 
