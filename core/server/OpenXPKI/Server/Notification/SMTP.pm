@@ -1,9 +1,3 @@
-## OpenXPKI::Server::Notification::SMTP
-## SMTP Notifier
-##
-## Written 2012 by Oliver Welter for the OpenXPKI project
-## (C) Copyright 2012 by The OpenXPKI Project
-
 =head1 Name
 
 OpenXPKI::Server::Notification::SMTP - Notification via SMTP
@@ -54,6 +48,22 @@ message and reused for each subsequent message on the same channel, so you can
 gurantee that each message in a thread is sent to the same people. All settings
 from default can be overriden in the local definition. Defaults can be blanked
 using an empty string.
+
+=head2 Sign outgoing mails using SMIME
+
+Outgoing emails can be signed using SMIME, add this section on the top
+
+level:
+
+    smime:
+        certificate_key_file: /etc/openxpki/local/smime.key
+        certificate_file: /etc/openxpki/local/smime.crt
+        certificate_key_password: secret
+
+Key and certificate must be PEM encoded, password can be omitted if the
+key is not encrypted. Key/cert can be provided by a PKCS12 file using
+certificate_p12_file (PKCS12 support requires Crypt::SMIME 0.17!).
+
 =cut
 
 package OpenXPKI::Server::Notification::SMTP;
@@ -64,6 +74,7 @@ use English;
 
 use Data::Dumper;
 
+use Crypt::SMIME;
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
@@ -94,7 +105,6 @@ has 'default_envelope' => (
     lazy => 1,
 );
 
-
 has 'template_dir' => (
     is  => 'ro',
     isa => 'Str',
@@ -114,24 +124,33 @@ has 'is_smtp_open' => (
     isa => 'Bool',
 );
 
+has '_smime' => (
+    is  => 'rw',
+    isa => 'Object|Undef',
+    builder => '_init_smime',
+    lazy => 1,
+);
+
 sub transport {
-    
+
     ##! 1: 'fetch transport'
-    
+
     my $self = shift;
-    
+
     # We call reset on an existing SMTP object to test if it is alive
-    if (!$self->_transport() || !$self->_transport()->reset()) {        
+    if (!$self->_transport() || !$self->_transport()->reset()) {
+
         # No usable object, so we create a new one
-        $self->_transport( $self->_init_transport() );                       
-    }            
-    
+        $self->_transport( $self->_init_transport() );
+
+    }
+
     return $self->_transport();
-    
+
 }
 
 sub _init_transport {
-    
+
     my $self = shift;
 
     ##! 8: 'creating Net::SMTP transport'
@@ -209,10 +228,48 @@ sub _init_use_html {
     return 0;
 }
 
+sub _init_smime {
+
+    my $self = shift;
+
+    my $cfg = CTX('config')->get_hash( $self->config() . '.smime' );
+
+    my $smime;
+    if ($cfg->{certificate_p12_file}) {
+
+        my $pkcs12 = OpenXPKI::FileUtils->read_file( $cfg->{certificate_p12_file} );
+        $smime = Crypt::SMIME->new()->setPrivateKeyPkcs12($pkcs12, $cfg->{certificate_key_password});
+
+        CTX('log')->log(
+            MESSAGE  => "Enable SMIME signer for notification backend (PKCS12)",
+            PRIORITY => "debug",
+            FACILITY => "application",
+        );
+
+    } elsif( $cfg->{certificate_key_file} )  {
+
+        my $key= OpenXPKI::FileUtils->read_file( $cfg->{certificate_key_file} );
+        my $cert = OpenXPKI::FileUtils->read_file( $cfg->{certificate_file} );
+        $smime = Crypt::SMIME->new()->setPrivateKey( $key, $cert, $cfg->{certificate_key_password} );
+
+        CTX('log')->log(
+            MESSAGE  => "Enable SMIME signer for notification backend",
+            PRIORITY => "debug",
+            FACILITY => "application",
+        );
+
+    }
+
+    return $smime;
+
+}
 
 =head1 Functions
+
 =head2 notify
+
 see @OpenXPKI::Server::Notification::Base
+
 =cut
 sub notify {
 
@@ -348,6 +405,7 @@ sub notify {
 =head2
 
 =cut
+
 sub _render_receipient {
 
     ##! 1: 'Start'
@@ -373,7 +431,6 @@ sub _render_receipient {
     return $mail;
 
 }
-
 
 =head2 _send_plain
 
@@ -419,7 +476,6 @@ sub _send_plain {
     $smtpmsg .= "Subject: $vars->{prefix} $subject\n";
     $smtpmsg .= "\n$output";
 
-
     ##! 64: "SMTP Msg --------------------\n$smtpmsg\n ----------------------------------";
 
     my $smtp = $self->transport();
@@ -430,8 +486,8 @@ sub _send_plain {
             FACILITY => "system",
         );
         return undef;
-    }   
-    
+    }
+
      ##! 128: 'SMTP Transport ' . Dumper $smtp
 
     $smtp->mail( $cfg->{from} );
@@ -442,9 +498,16 @@ sub _send_plain {
     }
 
     $smtp->data();
+
+    # Sign if SMIME is set up
+
+    if (my $smime = $self->_smime()) {
+        $smtpmsg = $smime->sign($smtpmsg);
+    }
+
     $smtp->datasend($smtpmsg);
 
-    if( $smtp->dataend() ) {
+    if( !$smtp->dataend() ) {
         CTX('log')->log(
             MESSAGE  => sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject),
             PRIORITY => "error",
@@ -468,7 +531,6 @@ Send the message using MIME::Tools
 
 =cut
 
-
 sub _send_html {
 
     my $self = shift;
@@ -481,7 +543,6 @@ sub _send_html {
     my $plain = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
     my $html = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.html', $vars );
 
-
     if (!$plain && !$html) {
         CTX('log')->log(
             MESSAGE  => "Both mail parts are empty ($cfg->{template})",
@@ -490,7 +551,6 @@ sub _send_html {
         );
         return 0;
     }
-
 
     # Parse the subject
     my $subject = $self->_render_template($cfg->{subject}, $vars);
@@ -510,7 +570,6 @@ sub _send_html {
         Type    =>'multipart/alternative',
     );
 
-
     push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
     push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
 
@@ -526,7 +585,6 @@ sub _send_html {
         	Data     => $plain
 	    );
     }
-
 
     ##! 16: 'base created'
 
@@ -589,20 +647,39 @@ sub _send_html {
     }
 
 	# a reusable Net::SMTP object
-    my $transport = $self->transport();    
-    if (!$transport ) {
+    my $smtp = $self->transport();
+
+    if (!$smtp) {
         CTX('log')->log(
             MESSAGE  => sprintf("Failed sending notification - no smtp transport"),
             PRIORITY => "error",
             FACILITY => "system",
         );
         return undef;
-    }   
+    }
 
-    # Host accepts a Net::SMTP object
-    # @res is the list of receipients processed, empty on error
-    my @res = $msg->smtpsend( Host => $transport, MailFrom => $cfg->{from} );
-    if(!scalar @res) {
+    my $res;
+    # Sign if SMIME is set up
+
+    if (my $smime = $self->_smime()) {
+
+        $smtp->mail( $cfg->{from} );
+        $smtp->to( $vars->{to} );
+        foreach my $cc (@{$vars->{cc}}) {
+            $smtp->to( $cc );
+        }
+        $smtp->data();
+        $smtp->datasend( $smime->sign( $msg->as_string() ) );
+        $res = $smtp->dataend();
+
+    } else {
+
+        # Host accepts a Net::SMTP object
+        # @res is the list of receipients processed, empty on error
+        $res = $msg->smtpsend( Host => $smtp, MailFrom => $cfg->{from} );
+    }
+
+    if(!$res) {
         CTX('log')->log(
             MESSAGE  => sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject),
             PRIORITY => "error",
@@ -626,13 +703,13 @@ sub _cleanup {
     my $self = shift;
 
     if ($self->is_smtp_open()) {
-        $self->transport()->quit();        
+        $self->transport()->quit();
+
     }
     $self->_transport( undef );
 
     return;
 }
-
 
 1;
 

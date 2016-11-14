@@ -1,3 +1,4 @@
+
 # Sample config for good old email notifications                     
 backend:
     class: OpenXPKI::Server::Notification::SMTP
@@ -8,6 +9,14 @@ backend:
     debug: 0
     # You need to install MIME::Tools for html support
     use_html: 1
+
+smime:
+    certificate_key_file: /etc/openxpki/local/smime.key
+    certificate_file: /etc/openxpki/local/smime.crt
+    certificate_key_password: test
+    
+    # alternative to key/certificate, requires Crypt::SMIME 0.17 or newer!
+    # certificate_p12_file: /etc/openxpki/local/smime.p12
 
 default:
     to: "[% cert_info.requestor_email %]"

@@ -335,6 +335,7 @@ WriteMakefile(
     'Crypt::CBC'             => '2.29',
     'Crypt::OpenSSL::AES'    => '0.02',
     'Crypt::PKCS10'          => '1.8',
+    'Crypt::SMIME'           =>  '0.15',
     'DBD::Mock'              => '1.45',
     'DBIx::Handler'          => '0.14', # for OpenXPKI::Server::Database
     'DBIx::TransactionManager' => '1.13',
