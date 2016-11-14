@@ -71,7 +71,7 @@ sub BUILD {
     my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
     my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7|HASH) \z }xms;
     my $re_crl_format        = qr{ \A (PEM|DER|TXT|HASH|RAW) \z }xms;
-    my $re_privkey_format    = qr{ \A (PKCS8_PEM|PKCS8_DER|OPENSSL_PRIVKEY|PKCS12|JAVA_KEYSTORE) \z }xms;
+    my $re_privkey_format    = qr{ \A (PKCS8_PEM|PKCS8_DER|OPENSSL_(PRIVKEY|RSA)|PKCS12|JAVA_KEYSTORE) \z }xms;
     # TODO - consider opening up re_sql_string even more, currently this means
     # that we can not search for unicode characters in certificate subjects,
     # for example ...
@@ -317,6 +317,11 @@ sub BUILD {
                     regex    => $re_boolean,
                     optional => 1
                 },
+                FORCE_NOVERIFY => {
+                    type     => SCALAR,
+                    regex    => $re_boolean,
+                    optional => 1
+                },
                 REVOKED => {
                     type     => SCALAR,
                     regex    => $re_boolean,
@@ -477,6 +482,11 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     # regex => ???
+                },
+                NOPASSWD => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex => $re_boolean,
                 },
                 KEEPROOT => {
                     type     => SCALAR,
@@ -702,14 +712,12 @@ sub BUILD {
                     optional => 1,
                 },
                 NOTBEFORE => {
-                    type     => SCALAR,
+                    type     => SCALAR|HASHREF,
                     optional => 1,
-                    regex    => $re_integer_string,
                 },
                 NOTAFTER => {
-                    type     => SCALAR,
+                    type     => SCALAR|HASHREF,
                     optional => 1,
-                    regex    => $re_integer_string,
                 },
                 PROFILE => {
                     type  => SCALAR,

@@ -32,7 +32,7 @@ sub execute {
         $password_length = 16;
     }
 
-    my $password_policy = $self->param('password_policy');
+    my $password_policy = $self->param('password_policy') || '';
 
     my $password  = '';
     my $policy_ok = 0;

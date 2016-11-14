@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-09-26 20:35+0100\n"
+"PO-Revision-Date: 2016-11-14 12:09+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -328,6 +328,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
+msgstr "Keystore Alias"
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"
@@ -772,6 +776,21 @@ msgstr "3 years"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
+msgstr "Full Certificate Status Report"
+
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
+msgstr "Valid Certificates"
+
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
+msgstr "Expiry Report"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
+msgstr "Report Configuration"
+
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Download"
 
@@ -964,7 +983,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
 msgstr "Approve Revocation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
-msgstr ""
+msgstr "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 msgstr "Approve Request"
@@ -1220,6 +1239,10 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
 msgstr "Specify Required Format"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
+msgstr "Specify Required Format"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancel this workflow."
 
@@ -1401,6 +1424,10 @@ msgstr "SCEP Enrollment"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Failed Action"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
+msgstr "Password"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
 msgstr "Technical Information"
 
@@ -1453,6 +1480,9 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP"
 msgstr " "
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_NOTIFIED_LIST_LABEL"
+msgstr "Notifications send"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC"
 msgstr "The name of the certificate profile."
 
@@ -1464,6 +1494,9 @@ msgstr "Please select the certificate profile"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP"
 msgstr "Select an appropriate profile based on the expected usage."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_RENEWED_LIST_LABEL"
+msgstr "Certificates already renewed"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC"
 msgstr "The subject alternative name of the certificate."
@@ -1896,6 +1929,9 @@ msgstr "Signer is Authorized"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
 msgstr ""
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
+msgstr "Signer Certificate"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Requestor/Signer"
 
@@ -2183,6 +2219,14 @@ msgstr "Message set"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr "This workflow was canceled by user interaction."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
+msgstr "This workflow was canceled."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
+msgstr "CANCELED"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
@@ -2490,6 +2534,25 @@ msgstr "Export initial state"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "State"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC"
+msgstr ""
+"Export for the private key failed because you are not authorized. Only the "
+"certificate owner has access to the key."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL"
+msgstr "Export Failed"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC"
+msgstr ""
+"Click on the link below to download your certificate/key bundle. Note that "
+"this link will only work from within this browser window and become invalid "
+"after 60 seconds."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
+msgstr "SUCCESS"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
 msgstr ""
 "Click on the link below to download your certificate/key bundle. Note that "
@@ -2711,6 +2774,14 @@ msgstr "Private Key Download"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
+msgstr ""
+"Send out expiry notifications via email for all certs expiring within the "
+"next 30 days."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
+msgstr "Certificate Expiry Notification"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
@@ -3622,10 +3693,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_TOOLTIP"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
-#~ msgstr "Certificate"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_DESC"

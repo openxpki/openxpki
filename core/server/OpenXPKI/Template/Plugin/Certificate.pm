@@ -199,15 +199,17 @@ sub dn {
 }
 
 
-=head2 notbefore(cert_identifier)
+=head2 notbefore(cert_identifier, format)
 
-Return the notbefore date in UTC format. 
+Return the notbefore date in given format. Format can be any string accepted 
+by OpenXPKI::DateTime, default is UTC format (iso8601). 
  
 =cut
 sub notbefore {
     
     my $self = shift;
     my $cert_id = shift;
+    my $format = shift || 'iso8601';
     
     my $hash = $self->get_hash( $cert_id );
     
@@ -215,20 +217,22 @@ sub notbefore {
     
     return OpenXPKI::DateTime::convert_date({
         DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTBEFORE} ),
-        OUTFORMAT => 'iso8601'
-    });    
+        OUTFORMAT => $format
+    });
 
 }
 
-=head2 notafter(cert_identifier)
+=head2 notafter(cert_identifier, format)
 
-Return the notafter date in UTC format. 
- 
+Return the notafter date in given format. Format can be any string accepted 
+by OpenXPKI::DateTime, default is UTC format (iso8601). 
+
 =cut
 sub notafter {
     
     my $self = shift;
     my $cert_id = shift;
+    my $format = shift || 'iso8601';
     
     my $hash = $self->get_hash( $cert_id );
 
@@ -236,9 +240,56 @@ sub notafter {
     
     return OpenXPKI::DateTime::convert_date({
         DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTAFTER} ),
-        OUTFORMAT => 'iso8601'
-    });    
+        OUTFORMAT => $format
+    });
 
 }
+
+=head2 chain(cert_identifier)
+
+Return the chain of the certificate as array.
+The first element is the certificate issuer, the root ca is the last.
+
+=cut
+
+sub chain {
+
+    my $self = shift;
+    my $cert_id = shift;
+                
+    my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_id, OUTFORMAT => 'PEM'});
+    my @certs = @{$chain->{CERTIFICATES}};
+        
+    # strip the end entity
+    shift @certs;
+
+    return \@certs;
+    
+}
+
+=head2 attr(cert_identifier, attribute_name)
+
+Return the value(s) of the requested attribute. 
+Note that the return value is always an array ref.
+
+=cut
+
+sub attr {
+
+    my $self = shift;
+    my $cert_id = shift;
+    my $attr = shift;
+
+    my $hash = CTX('api')->get_cert_attributes({
+        IDENTIFIER => $cert_id, ATTRIBUTE => $attr
+    });
+
+    if ($hash->{$attr}) {
+        return $hash->{$attr};
+    }
+    return [];
+
+}
+
 
 1;

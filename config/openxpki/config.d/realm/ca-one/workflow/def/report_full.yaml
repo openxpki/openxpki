@@ -95,8 +95,17 @@ field:
 
     report_config:
         name: report_config
-        type: server
-        required: 0
+        label: I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL
+        type: select
+        option:
+           item:
+             - default
+             - expiry
+           label: I18N_OPENXPKI_UI_REPORT_CONFIG
+        required: 1
+
+#I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT
+#I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY
         
     download:
         label: I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL

@@ -1,0 +1,78 @@
+head:
+    prefix: certsearch
+    persister: Volatile
+
+state:
+    INITIAL:
+        action:
+          - initialize pop_identifier > RESULT
+
+    RESULT:
+        autorun: 1
+        action:
+          - get_certificate_data > SUCCESS ? has_result
+          - global_noop > NORESULT ? !has_result
+
+    NORESULT: ~
+
+    SUCCESS: ~
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
+        param:
+            _map_cert_subject: "CN=[% context.common_name %],*" 
+            order: notbefore desc
+            include_revoked: 1
+            include_expired: 1
+            limit: 1
+
+            
+        input:
+          - common_name
+          
+        validator:
+          - common_name
+          
+    pop_identifier:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: cert_identifier_list
+            context_key: cert_identifier
+            function: shift
+          
+    get_certificate_data:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            _map_notbefore: "[% USE Certificate %][% Certificate.notbefore(context.cert_identifier) %]"
+            _map_notafter: "[% USE Certificate %][% Certificate.notafter(context.cert_identifier) %]"
+            _map_status: "[% USE Certificate %][% Certificate.status(context.cert_identifier) %]"
+
+condition:
+    has_result:
+         class: Workflow::Condition::Evaluate
+         param:
+             test: $context->{cert_identifier}
+
+validator:
+    common_name:
+        class: OpenXPKI::Server::Workflow::Validator::Regex
+        arg: 
+          - $common_name
+        param:
+            regex: "\\A [a-zA-Z0-9-\\.\\:]+"
+            modifier: xi
+            
+field:
+    common_name:
+        name: common_name
+        required: 1
+        type: server
+                    
+                    
+acl:
+    System:
+        creator: any
+
+    Anonymous:
+        creator: any

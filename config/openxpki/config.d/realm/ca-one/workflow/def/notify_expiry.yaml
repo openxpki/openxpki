@@ -1,0 +1,121 @@
+head:
+    prefix: expiry
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC
+
+state:
+    INITIAL:
+        action:
+          - initialize > LOOP
+          
+    LOOP:
+        autorun: 1
+        action: 
+          - global_get_next_cert_identifier search_renewed > CHECK_IF_RENEWED ? !global_is_tmp_queue_empty
+          - cleanup > SUCCESS ? global_is_tmp_queue_empty
+
+    CHECK_IF_RENEWED:
+        autorun: 1
+        action: 
+         - send_notification log_notified > LOOP  ? !is_renewed
+         - log_renewed > LOOP ? is_renewed
+
+    SUCCESS:
+        label: ""
+        output: 
+         - cert_notified_list
+         - cert_renewed_list
+
+action: 
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
+        param:
+          entity_only: 1
+          target_key: tmp_queue
+          cutoff_notafter: +000030
+
+    search_renewed:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
+        param: 
+          _map_cutoff_notbefore: "[% USE Certificate %][% Certificate.notbefore( context.cert_identifier, 'epoch') + 1 %]" 
+          _map_cert_subject: "[% USE Certificate %][% Certificate.body( context.cert_identifier, 'subject') %]" 
+          entity_only: 1
+          target_key: renewed_identifier
+          
+    send_notification:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            _map_notify_to: "[% USE Certificate %][% Certificate.attr( context.cert_identifier, 'meta_email').0 %]"
+            _map_requestor: "[% USE Certificate %][% Certificate.attr( context.cert_identifier, 'meta_requestor').0 %]"
+            message: cert_expiry
+            target_key: ''
+            
+    log_notified:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: cert_notified_list
+            function: push
+            context_key: cert_identifier    
+            
+    log_renewed:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: cert_renewed_list
+            function: push
+            context_key: cert_identifier
+
+    cleanup:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+          renewed_identifier: ''
+          cert_identifier: ''
+          
+field:
+    cert_notified_list:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_NOTIFIED_LIST_LABEL
+        name: cert_notified_list
+        format: rawlist
+        template: >
+          [% USE Certificate %]
+          [% IF value %]
+            Identifier / Subject |
+            [% FOREACH identifier = value %]
+              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
+                [% identifier %] / [% Certificate.body(identifier, 'subject') %]</a>| 
+            [% END %]
+          [% END %]
+
+    cert_renewed_list:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_RENEWED_LIST_LABEL
+        name: cert_renewed_list
+        format: rawlist
+        template: >
+          [% USE Certificate %]
+          [% IF value %]
+            Identifier / Subject |
+            [% FOREACH identifier = value %]
+              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
+                [% identifier %] / [% Certificate.body(identifier, 'subject') %]</a>| 
+            [% END %]
+          [% END %]
+            
+condition:
+    is_renewed:
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param:
+            array_name: renewed_identifier
+            condition: is_empty
+
+acl:
+    RA Operator:
+        creator: any
+        context: 1
+        history: 1
+        techlog: 1
+        fail: 1
+        resume: 1
+        wakeup: 1
+
+
+    System:
+        creator: any

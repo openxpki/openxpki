@@ -77,7 +77,9 @@ sub execute
     	FACILITY => 'audit',
 	);
 
-    $context->param('private_key' => $pkcs8);
+    my $target_key = $self->param('target_key') || 'private_key';
+
+    $context->param($target_key => $pkcs8);
 
     return 1;
 }
@@ -96,3 +98,25 @@ password. key_type is a symbolic name for a given key configuration, the
 details of which are defined in key_gen_params. The encrypted private key is
 written to the context parameter private_key.
 
+=head1 Configuration
+
+=head2 Activity Parameters
+
+The key specification parameters are not validated and handed over to the 
+generate_key method of the crypto token.
+
+=over 
+
+=item key_alg
+
+=item enc_alg
+
+=item key_gen_params
+
+=item password
+
+=item target_key
+
+The context value to write the encrypted key to. Default is private_key.
+
+=back

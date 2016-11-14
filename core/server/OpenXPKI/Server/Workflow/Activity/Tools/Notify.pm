@@ -34,15 +34,24 @@ sub execute {
         );
     }
      
+    my $target_key;
+    if (!defined $params->{'target_key'}) {
+        $target_key = 'wfl_notify';
+    } elsif ($params->{'target_key'}) {
+        $target_key = $params->{'target_key'};
+    }
     
     ##! 16: 'Extended vars: ' . Dumper $params  
         
     # Look if there are stored notification handles
     my $handles;
-    my $notify = $context->param('wfl_notify');
-    $handles = $ser->deserialize( $notify  ) if ($notify);
-    ##! 32: 'Found persisted data: ' . Dumper $handles  
-        
+    
+    if ($target_key) {
+        my $notify = $context->param($target_key);
+        $handles = $ser->deserialize( $notify  ) if ($notify);
+        ##! 32: 'Found persisted data: ' . Dumper $handles  
+    }
+    
     CTX('log')->log(
         MESSAGE => 'Trigger notification message ' .$message,    
         PRIORITY => 'info',
@@ -57,8 +66,8 @@ sub execute {
         DATA => $params
     });
         
-    if (defined $handles) {
-        ##! 32: 'Write back persisted data: ' . Dumper $handles          
+    if ($target_key && defined $handles) {
+        ##! 32: 'Write back persisted data: ' . Dumper $handles
         $context->param( 'wfl_notify' => $ser->serialize( $handles ) );
     }
     
@@ -75,24 +84,42 @@ OpenXPKI::Server::Workflow::Activity::Tools::Notify
 
 =head1 Description
 
-Trigger notifications using the configured notifcation backends.
+Trigger notifications using the configured notification backends.
 
-=head2 Message 
+The workflow context is used to persist information from the handlers 
+over mulitple workflow steps. This is required e.g. with  the RT/ServiceNow 
+backend to hold the session/ticket reference or to hold the receipient 
+information for emails. You must turn off this behaviour if you do e.g.
+bulk notifications to multiple receipients from one worklflow!
 
-Specifiy the name of the message template to send using the I<message> parameter.
+=head2 Activity Parameters
 
-=head2 Additional parameters
+=over 
 
-To make arbitrary value available for the templates, you can specify additional 
-parameters to be mapped into the notififer. Example:
+=item message 
+
+The name of the message template to use.
+
+=item target_key
+
+The context key to use for the persister, default is wfl_notify.
+
+Set this to an empty string to turn of persistance - this is required
+if you want to communicate with different  tickets/receipients during
+the workflow, as it is the case e.g. when doing bulk notifications.
+
+=back 
+
+=head2 Pass information to the notifier
+
+To make arbitrary values available in the templates, you can specify 
+additional  parameters to be mapped into the notififer:
     
-    <action name="I18N_OPENXPKI_WF_ACTION_TEST_NOTIFY1"
-        class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"    
-        message="csr_created"
-        _map_fixed_value="a fixed value"
-        _map_from_context="$my_context_key">           
-     </action>
-     
-The I<_map_> prefix is stripped, the remainder is used as key. 
-Values starting with a $ sign are interpreted as context keys. 
+    send_notification:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            _map_notify_to: $value_from_context
+            fixed_value: This can be used in the template as I<data.fixed_value> 
+            message: cert_expiry
+          
      

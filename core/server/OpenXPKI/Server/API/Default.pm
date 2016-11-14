@@ -501,13 +501,24 @@ sub import_certificate {
             my $issuer_cert = $db_result->[0];
 
             my $valid;
+            
+            # No verfiy requested ?
+            if($arg_ref->{FORCE_NOVERIFY})  {
+                $valid = 1;
+                CTX('log')->log(
+                    MESSAGE  => "Importing certificate without chain verification! $cert_identifier / " . $cert->get_subject(),
+                    PRIORITY => 'warn',
+                    FACILITY => ['audit','system']
+                );
+              
             # check if the issuer is already a root
-            if ($issuer_cert->{IDENTIFIER} eq $issuer_cert->{ISSUER_IDENTIFIER}) {
+            } elsif ($issuer_cert->{IDENTIFIER} eq $issuer_cert->{ISSUER_IDENTIFIER}) {
                 $valid = $default_token->command({
                     COMMAND => 'verify_cert',
                     CERTIFICATE => $cert->{DATA},
                     TRUSTED => $issuer_cert->{DATA},
                 });
+
             } else {
                 # get the chain starting from the issuer
 

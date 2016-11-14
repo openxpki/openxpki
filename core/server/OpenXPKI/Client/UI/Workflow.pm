@@ -1850,7 +1850,11 @@ sub __render_from_workflow {
         $self->__temp_param('query_wfl_'.$queryid, $_query );
         
         my @data = (
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', value => $wf_info->{WORKFLOW}->{ID} },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', 'format' => 'link', value => {
+                'label' => $wf_info->{WORKFLOW}->{ID}, 
+                'page' => 'workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+                'target' => '_blank',
+            }},
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{WORKFLOW}->{TYPE} },
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{WORKFLOW}->{STATE} },
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{WORKFLOW}->{PROC_STATE} },

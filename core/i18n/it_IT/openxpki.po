@@ -397,6 +397,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
+msgstr "Catena di certificazione"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Paese"
 
@@ -850,6 +854,24 @@ msgstr "3 anni"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "entità / certificato non più attivi"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
+msgstr "Report Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
+msgstr "Scarica"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
+msgstr "Certificato in Scadenza"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
+msgstr "Report Completo"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
@@ -1335,6 +1357,10 @@ msgstr "Esporta lo stato iniziale"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
 msgstr "Specifica Opzioni Report"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
+msgstr "Specifica Opzioni Report"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancella questo workflow."
 
@@ -1531,6 +1557,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Termina Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
+msgstr "Password"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
 msgstr "Ulteriori Informazioni"
 
@@ -1590,6 +1620,10 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP"
 msgstr " "
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_NOTIFIED_LIST_LABEL"
+msgstr "Certificato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC"
 msgstr "Il nome del profilo del certificato."
 
@@ -1602,6 +1636,10 @@ msgstr "Seleziona il profilo del certificato che intendi richiedere"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP"
 msgstr ""
 "Seleziona un profilo adeguato secondo l’utilizzo previsto per il certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_RENEWED_LIST_LABEL"
+msgstr "Nome alternativo per il campo Soggetto"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC"
 msgstr ""
@@ -2064,6 +2102,10 @@ msgstr "Richiedente / Firmatario"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
 msgstr ""
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
+msgstr "Certificato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Richiedente / Firmatario"
 
@@ -2380,6 +2422,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr "Questo Workflow è stato cancellato da un’azione dell’utente."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
+msgstr "Questo Workflow è stato cancellato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
+msgstr "CANCELLATO"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr ""
 "Il certificato è stato emesso e verrà inviato al client SCEP su richiesta."
@@ -2678,6 +2728,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "Stato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL"
+msgstr "SUCCESSO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
+msgstr "SUCCESSO"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -2916,6 +2982,14 @@ msgstr "SCEP Endpoint"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Tipo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
+msgstr "Esporta Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
@@ -3833,10 +3907,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_TOOLTIP"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
-#~ msgstr "Certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_DESC"

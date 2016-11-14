@@ -319,6 +319,8 @@ WriteMakefile(
     'INC'       => "-I. -I$openssl_inc_dir",
     'CCFLAGS'   => '-O2 -g '.$Config{ccflags},
     'PREREQ_PM' => {
+        
+    'Archive::Zip' => 0, 
 #    'Class::Accessor::Fast'  => '0.31', # Constituent of module Class::Accessor
 #					 # which is a prerequisite of Class::Accessor::Chained, see below
     'Class::Accessor::Chained::Fast' => '0', # Constituent of module Class::Accessor::Chained
@@ -332,7 +334,7 @@ WriteMakefile(
     'Connector'              => '1.08',
     'Crypt::CBC'             => '2.29',
     'Crypt::OpenSSL::AES'    => '0.02',
-    'Crypt::PKCS10'          => '1.5',
+    'Crypt::PKCS10'          => '1.8',
     'DBD::Mock'              => '1.45',
     'DBIx::Handler'          => '0.14', # for OpenXPKI::Server::Database
     'DBIx::TransactionManager' => '1.13',

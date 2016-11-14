@@ -88,7 +88,12 @@ sub get_validity {
         # so it should be safe to distinguish between terse date and epoch
         elsif ($validity =~ m{\A \d{9,10} \z }xms ) {
             $validityformat = 'epoch';
+
         } else {
+            # strip non-digits from iso date            
+            if($validity =~ m{\A \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2} \z}) {    
+                $validity =~ s/[^0-9]//g;
+            }
             $validityformat = 'absolutedate';
         }
     }
@@ -280,9 +285,9 @@ terse date string.
 =item *
 
 'detect': tries to guess what it got, relativedate if it has a sign (+/-),
-epoch if it has between 8 and 10 digits and absolutedate otherwise. Days
-can not be autodetected as they look like relativedate.
-
+epoch if it has between 8 and 10 digits and absolutedate otherwise. Also
+consumes iso8601 formated strings. Days can not be autodetected as they 
+look like relativedate.
 
 =back
 

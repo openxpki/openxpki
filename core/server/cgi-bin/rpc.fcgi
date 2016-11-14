@@ -163,10 +163,10 @@ while (my $cgi = CGI::Fast->new()) {
             $error = 'uncaught error';
         }        
         $res = { error => { code => 42, message => $error, data => { pid => $$ } } };                
-    } elsif (!$workflow->{ID} || $workflow->{'PROC_STATE'} eq 'exception' || $workflow->{'STATE'} eq 'FAILURE') {
+    } elsif (( $workflow->{'PROC_STATE'} ne 'finished' && !$workflow->{ID} ) || $workflow->{'PROC_STATE'} eq 'exception') {
         # TODO: Return as "500 Internal Server Error"?
         $log->error("workflow terminated in unexpected state" );
-        $res = { error => { code => 42, message => 'workflow terminated in unexpected state', data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'STATE'} } } };        
+        $res = { error => { code => 42, message => 'workflow terminated in unexpected state', data => { pid => $$, id => $workflow->{ID}, 'state' => $workflow->{'STATE'} } } };        
     } else {
         $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s", 
             $workflow->{ID}, $workflow->{STATE}) );

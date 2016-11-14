@@ -203,6 +203,12 @@ sub deserialize {
         );
     }
 
+    # Catch situations where the value is already deserialized, this can 
+    # happens when the workflow context is handed over via memory
+    if ($msg && (ref $msg eq 'HASH') || (ref $msg eq 'ARRAY')) {
+        return $msg;
+    }
+
     my $ret = $self->__read_data( $msg );
 
     return $ret->{data};

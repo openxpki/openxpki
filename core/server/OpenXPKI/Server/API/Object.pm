@@ -31,7 +31,7 @@ use Data::Dumper;
 
 use Class::Std;
 use Math::BigInt;
-use Crypt::PKCS10;
+use Crypt::PKCS10 1.8;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -188,9 +188,9 @@ sub get_key_identifier_from_data {
     # as we currently only support PKCS10 and the parameter is checked
     # by the API, we dont need any ifs here.
     
-    Crypt::PKCS10::setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new( $args->{DATA} );
-    
+    Crypt::PKCS10->setAPIversion(1);
+    my $decoded = Crypt::PKCS10->new( $args->{DATA}, ignoreNonBase64 => 1, verifySignature => 0  );
+            
     if (!$decoded) {
       OpenXPKI::Exception->throw( message => 'Unable to parse data in get_key_identifier_from_data' );
     }
@@ -781,7 +781,7 @@ supports a facility to search certificates. It supports the following parameters
 
 =item * VALID_AT
 
-=item * NOTBEFORE/NOTAFTER (less/greater to match "other side" of validity)
+=item * NOTBEFORE/NOTAFTER (with SCALAR searches "other side" of validity or pass HASH with operator)
 
 =item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR) 
 
@@ -972,13 +972,22 @@ sub __search_cert {
     # notbefore/notafter should only be used for timestamps outside
     # the validity interval, therefore the operators are fixed
     if ( defined $args->{NOTBEFORE} ) {
-        $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
-              { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
+        
+        if (ref $args->{NOTBEFORE} eq 'HASH') {
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } = $args->{NOTBEFORE}
+        } else {
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
+                { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
+        }
     }
 
     if ( defined $args->{NOTAFTER} ) {
-        $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
-              { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
+        if (ref $args->{NOTAFTER} eq 'HASH') {
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } = $args->{NOTAFTER};
+        } else {        
+            $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
+                { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
+        }
     }
 
     # handle certificate attributes (such as SANs)
@@ -1111,7 +1120,8 @@ Supports the following parameters:
 
 One of PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
 (PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
-(OpenSSL native key format in PEM) JAVA_KEYSTORE (JKS including chain).
+(OpenSSL native key format in PEM), OPENSSL_RSA (OpenSSL RSA with 
+DEK-Info Header), JAVA_KEYSTORE (JKS including chain).
 
 =item * PASSWORD - the private key password
 
@@ -1119,10 +1129,15 @@ Password that was used when the key was generated.
 
 =item * PASSOUT - the password for the exported key, default is PASSWORD
 
-B<this option not supported, yet>
-
 The password to encrypt the exported key with, if empty the input password
 is used.
+
+This option is only supported with format OPENSSL_PRIVKEY, PKCS12 and JKS!
+
+=item * NOPASSWD 
+
+If set to a true value, the B<key is exported without a password!>.
+You must also set PASSOUT to the empty string.
 
 =item * KEEPROOT
 
@@ -1145,6 +1160,24 @@ sub get_private_key_for_cert {
     my $identifier = $arg_ref->{IDENTIFIER};
     my $format     = $arg_ref->{FORMAT};
     my $password   = $arg_ref->{PASSWORD};
+    my $pass_out   = $arg_ref->{PASSOUT};
+    my $nopassword = $arg_ref->{NOPASSWD};
+
+
+    if ($nopassword && (!defined $pass_out || $pass_out ne '')) {
+        OpenXPKI::Exception->throw(
+            message =>
+              'I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOPASSWD_REQUIRES_EMPTY_PASSOUT'
+        );
+    }
+
+    if ($nopassword) {
+        CTX('log')->log(
+            MESSAGE  => "Private key export without password for certificate $identifier",
+            PRIORITY => 'warn',
+            FACILITY => 'audit',
+        );
+    }
 
     my $default_token = CTX('api')->get_default_token();
     ##! 4: 'identifier: ' . $identifier
@@ -1175,16 +1208,32 @@ sub get_private_key_for_cert {
             OUT     => $format,
             REVERSE => 1
         };         
+        
+        if ($nopassword) {
+            $command_hashref->{NOPASSWD} = 1;
+        } elsif ($pass_out) {
+            $command_hashref->{OUT_PASSWD} = $pass_out;
+        }
     }
-    elsif ( $format eq 'OPENSSL_PRIVKEY' ) {
+    elsif ( $format =~ /OPENSSL_(PRIVKEY|RSA)/ ) {
 
         # we just need to spit out the blob from the database but we need to check
         # if the password matches, so we do a 1:1 conversion        
         $command_hashref = {
-            PASSWD  => $password,
+            PASSWD  => $password,           
             DATA    => $private_key,
             COMMAND => 'convert_pkey',
         };     
+        
+        if ($format eq 'OPENSSL_RSA') {
+            $command_hashref->{KEYTYPE} = 'rsa';
+        }
+        
+        if ($nopassword) {
+            $command_hashref->{NOPASSWD} = 1;
+        } elsif ($pass_out) {
+            $command_hashref->{OUT_PASSWD} = $pass_out;
+        }
 
     }
     elsif ( $format eq 'PKCS12' || $format eq 'JAVA_KEYSTORE' ) {
@@ -1207,6 +1256,15 @@ sub get_private_key_for_cert {
             CERT    => $certificate,
             CHAIN   => \@chain,
         };
+               
+        if ($nopassword) {
+            $command_hashref->{NOPASSWD} = 1;
+        } elsif ($pass_out) {
+            $command_hashref->{PKCS12_PASSWD} = $pass_out;
+            # set password for JKS export
+            $password = $pass_out;
+        }
+        
         if ( exists $arg_ref->{CSP} ) {
             $command_hashref->{CSP} = $arg_ref->{CSP};
         }
@@ -1219,14 +1277,14 @@ sub get_private_key_for_cert {
         }
         
     }
-   
+     
     eval { 
         $result = $default_token->command($command_hashref);
     };
     if (!$result) { 
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_UNABLE_EXPORT_KEY',
-            params => { 'IDENTIFIER' => $identifier, },
+            params => { 'IDENTIFIER' => $identifier, ERROR => $EVAL_ERROR },
         );
     }
 

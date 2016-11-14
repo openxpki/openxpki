@@ -75,7 +75,9 @@ while (my $cgi = CGI::Fast->new()) {
             $log->debug('detected realm is ' . $config{realm}{$script_realm});
             $pki_realm = $config{realm}{$script_realm};    
         } else {
-            $pki_realm = shift keys %{$config{realm}};
+            # Fall back - only valid with single realm config!
+            my @realms = keys %{$config{realm}};
+            $pki_realm = shift @realms;
         }
         
         $log->debug('Path to realm: ' . $pki_realm );

@@ -69,21 +69,20 @@ sub execute {
 
     $context->param('csr_subject' => $csr_subject);
 
-
-
     # Get the profile name and style
     my $cert_profile = $self->param('cert_profile');
     $cert_profile = $context->param('cert_profile') unless($cert_profile);
-    
+
     my $cert_subject_style = $self->param('cert_subject_style');
     $cert_subject_style = $context->param('cert_subject_style') unless($cert_subject_style);
-    
+
     my %hashed_dn = OpenXPKI::DN->new( $csr_subject )->get_hashed_content();
     ##! 32: 'DN ' . Dumper \%hashed_dn
 
     my $csr_san = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });
     ##! 16: 'Found san in csr :' . Dumper $csr_san
-    
+
+    my @san_list;
     # Merge SANs into DN hash
     if ($csr_san) {
         foreach my $san_type (keys %{$csr_san}) {
@@ -92,25 +91,41 @@ sub execute {
             if (defined $csr_san->{$san_type} && 
                 ref $csr_san->{$san_type} eq 'ARRAY' && 
                 scalar @{$csr_san->{$san_type}}) {
-             
+
                 $hashed_dn{'SAN_'.uc($san_type)} = $csr_san->{$san_type};
+
+                # push items to @san_list in the nested array format 
+                # required by the csr persister
+                foreach my $value (@{$csr_san->{$san_type}}) {
+                    push @san_list, [ $san_type, $value ] if ($value);
+                }
             }
         } 
     }
-    
+
+    # Update the source hash
+    my $source_ref = {};
+    my $ctx_source = $context->param('sources');
+    if ($ctx_source) {
+        $source_ref = $serializer->deserialize( $ctx_source );
+    } 
+
     # If the profile has NO ui section, we write the parsed hash and the SANs "as is" to the context
     if (!$config->exists(['profile', $cert_profile, 'style', $cert_subject_style, 'ui' ])) {
-        
+
         $context->param('cert_subject_parts' => $serializer->serialize( \%hashed_dn ) );
-        
-        # TODO - check required format
-        #$context->param('cert_san_parts' => $serializer->serialize( $cert_san_parts ) ) if ($cert_san_parts);
-         
+        $source_ref->{'cert_subject_parts'} = 'PKCS10';
+
+        if (scalar @san_list) {
+            $context->param('cert_subject_alt_name' => $serializer->serialize( \@san_list ) );
+            $source_ref->{'cert_subject_alt_name'} = 'PKCS10';
+        }
+
     } else {
-    
+
         # Load the field spec for the subject
         my $fields = CTX('api')->get_field_definition( { PROFILE => $cert_profile, STYLE => $cert_subject_style, SECTION => 'subject' });
-    
+
         my $tt = Template->new();
         my $cert_subject_parts;
         FIELDS:
@@ -118,7 +133,7 @@ sub execute {
             # Check if there is a preset template
             my $preset = $field->{PRESET};
             next FIELDS unless ($preset);
-    
+
             # clonable field with iteration marker "X"
             my @val;
             if ($preset =~ m{ \A \s* (\w+)\.X \s* \z }xs) {
@@ -128,7 +143,7 @@ sub execute {
                     ##! 16: 'clonable iterator value ' . $v
                     push @val, $v if (defined $v && $v ne '');
                 }
-                
+
             # Fast path, copy from DN     
             } elsif ($preset =~ m{ \A \s* (\w+)(\.(\d+))? \s* \z }xs) {
                 my $comp = $1;
@@ -146,7 +161,7 @@ sub execute {
                     params => { PROFILE => $cert_profile, STYLE => $cert_subject_style, 
                         FIELD => $field, PATTERN => $preset, 'ERROR' => $tt->error() }
                 );
-                
+
                 ##! 16: "Template result: $val"
                 # cloneable fields cn return multiple values using a pipe as seperator
                 if ($field->{CLONABLE} && ($val =~ /\|/)) {
@@ -156,7 +171,7 @@ sub execute {
                     @val = ($val);
                 }
             }
-            
+
             ##! 16: 'Result ' . Dumper \@val
             if (scalar @val) {
                 if ($field->{CLONABLE}) {
@@ -168,7 +183,7 @@ sub execute {
                     );
                 } else {
                     $cert_subject_parts->{ $field->{ID} } = $val[0];
-                
+
                     CTX('log')->log(
                         MESSAGE => "subject preset - field $field, pattern $preset, value " . $val[0],
                         PRIORITY => 'debug',
@@ -176,10 +191,11 @@ sub execute {
                     );
                 }
             }
-    
+
         }
         $context->param('cert_subject_parts' => $serializer->serialize( $cert_subject_parts ) );
-    
+        $source_ref->{'cert_subject_parts'} = 'Parser';
+
         # Load the field spec for the san
         # FIXME: this implies that the id of the field matches the san types name
         # Evaluate: Replace with data from hashed_dn and preset? 
@@ -209,9 +225,14 @@ sub execute {
                 }
             }
             ##! 16: 'san preset:' . Dumper $cert_san_parts
-            $context->param('cert_san_parts' => $serializer->serialize( $cert_san_parts ) ) if ($cert_san_parts);
+            if ($cert_san_parts) {
+                $context->param( 'cert_san_parts' => $serializer->serialize( $cert_san_parts ) );
+                $source_ref->{'cert_san_parts'} = 'Parser';
+            }
         }
     }
+
+    $context->param('sources' => $serializer->serialize( $source_ref) );
 
     return 1;
 }

@@ -188,7 +188,7 @@ OpenXPKI/Server/Database.pm
 OpenXPKI/Server/Database/Query.pm
 OpenXPKI/Server/Database/Driver/MySQL.pm
 OpenXPKI/Server/Database/Driver/Oracle.pm
-
+OpenXPKI/Server/Database/Driver/PostgreSQL.pm
 
 ## logging interface
 
@@ -311,6 +311,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/TriggerCertificatePublish.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RenderSubject.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/CertificateExport.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CertificateExportArchive.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ExportToFile.pm
 OpenXPKI/Server/Workflow/Activity/Tools/InjectExtraParam.pm
 

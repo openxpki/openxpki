@@ -127,6 +127,7 @@ sub validate {
                                   
     if (scalar @args) {            
         foreach my $arg (@args) {
+            next unless ($arg);
             if (ref $arg eq '' && $arg =~ m{ \A \s* \[%.+%\] }xsm) {
                 ##! 16: 'Found template ' . $arg
                 $arg = $oxtt->render( $arg, {  context => $workflow->context()->param() } );
