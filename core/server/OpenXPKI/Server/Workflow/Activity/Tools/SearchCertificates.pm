@@ -272,13 +272,13 @@ calculation. Default is now.
 =item cutoff_notbefore
 
 Parseable OpenXPKI::Datetime value (autodetected), show only certificates
-where notebefore is before this value. Relative intervals are calculated
-against the given valid_at date!
+where notebefore is between valid_at and this value. Relative intervals 
+are calculated against the given valid_at date!
 
 =item cutoff_notafter
 
 Parseable OpenXPKI::Datetime value (autodetected), show certificates where
-notafter is less then value.  Relative intervals are calculated
+notafter is less than value.  Relative intervals are calculated
 against the given valid_at date!
 
 =back

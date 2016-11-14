@@ -131,13 +131,12 @@ definitions using a single implementation class.
 
 =head1 Examples
 
-  <action name="add_cert_to_publish"
-    class="OpenXPKI::Server::Workflow::Activity::Tools::WFArray"
-    array_name="cert_publish_queue"
-    function="push"
-    context_key="next_cert_to_publish">
-  </action>
-
+  add_cert_to_publish:
+    class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+      param:
+        array_name: cert_publish_queue
+        function: push
+        context_key: next_cert_to_publish
 
 =head1 Parameters
 
