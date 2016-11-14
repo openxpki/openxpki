@@ -53,26 +53,22 @@ sub nextval_query {
 #
 
 sub merge_query {
-    my ($self, $dbi, $params) = @_;
-    my $table = $dbi->query_builder->_add_namespace_to($params->{into});
-    my %set      = %{ $params->{set} };
-    my %set_once = %{ $params->{set_once} };
-    my %where    = %{ $params->{where} };
-    my %all_val  = ( %set, %set_once, %where );
+    my ($self, $dbi, $into, $set, $set_once, $where) = @_;
+    my %all_val  = ( %$set, %$set_once, %$where );
 
     return OpenXPKI::Server::Database::Query->new(
         # this special query avoids binding/typing the values twice
         string => sprintf(
             "MERGE INTO %s"
-            ." USING (SELECT %s FROM dual) valuesfromdual ON (%s)"
+            ." USING (SELECT %s FROM dual) zzzdual ON (%s)"
             ." WHEN MATCHED THEN UPDATE SET %s"
             ." WHEN NOT MATCHED THEN INSERT (%s) VALUES (%s)",
-            $table,
-            join (", ", map { "? AS $_" } keys %all_val),                     # SELECT .. FROM dual
-            join(" AND ", map { "$table.$_=valuesfromdual.$_" } keys %where), # ON (..)
-            join(", ", map { "$table.$_=valuesfromdual.$_" } keys %set),      # UPDATE SET ..
-            join(", ", keys %all_val),                                        # INSERT (..)
-            join(", ", map { "valuesfromdual.$_" } keys %all_val),            # VALUES (..)
+            $into,
+            join (", ", map { "? AS $_" } keys %all_val),              # SELECT .. FROM dual
+            join(" AND ", map { "$into.$_=zzzdual.$_" } keys %$where), # ON (..)
+            join(", ", map { "$into.$_=zzzdual.$_" } keys %$set),      # UPDATE SET ..
+            join(", ", keys %all_val),                                 # INSERT (..)
+            join(", ", map { "zzzdual.$_" } keys %all_val),            # VALUES (..)
         ),
         params => [ values %all_val ],
     );

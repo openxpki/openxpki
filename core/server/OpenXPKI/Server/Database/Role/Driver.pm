@@ -28,7 +28,7 @@ requires 'dbi_dsn';            # String: DSN parameters after "dbi:<driver>:"
 requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect()
 requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
 requires 'next_id';            # Int: next insert ID ("serial")
-requires 'merge';              # Execute a MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
+requires 'merge_query';        # OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
 
 1;
 
@@ -167,7 +167,7 @@ Parameters:
 
 =back
 
-=head2 merge
+=head2 merge_query
 
 Builds a MERGE query (or emulates it by either an INSERT or an UPDATE query)
 and returns a L<OpenXPKI::Server::Database::Query> object which contains SQL
@@ -179,14 +179,17 @@ Parameters:
 
 =item * B<$dbi> - the L<OpenXPKI::Server::Database> instance
 
-=item * B<$params> - I<HashRef> with the query parameters:
+=item * B<$into> - Table name including schema (if applicable) (I<Str>, required)
 
-    {
-        into     => $table,
-        set      => { column => "val", column2 => "val" },
-        set_once => { keycolumn => "val", insertdate => "2016-11-12" },
-        where    => { idcolumn => "val" },
-    }
+=item * B<$set> - Columns that are always set (INSERT or UPDATE). Hash with
+column name / value pairs.
+
+=item * B<$set_once> - Columns that are only set on INSERT (additional to those
+in the C<where> parameter. Hash with column name / value pairs.
+
+=item * B<$where> - WHERE clause specification that must contain the PRIMARY KEY
+columns and only allows "AND" and "equal" operators:
+C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
 
 =back
 

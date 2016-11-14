@@ -284,8 +284,24 @@ sub update {
 # MERGE
 # Returns: DBI statement handle
 sub merge {
-    my $self = shift;
-    return $self->driver->merge($self, @_);
+    my ($self, %args) = validated_hash(\@_,   # MooseX::Params::Validate
+        into     => { isa => 'Str' },
+        set      => { isa => 'HashRef' },
+        set_once => { isa => 'HashRef', optional => 1, default => {} },
+        # The WHERE specification contains the primary key columns.
+        # In case of an INSERT these will be used as normal values. Therefore
+        # we only allow scalars as hash values (which are translated to AND
+        # connected "equals" conditions by SQL::Abstract::More).
+        where    => { isa => 'HashRef[Value]' },
+    );
+    my $query = $self->driver->merge_query(
+        $self,
+        $self->query_builder->_add_namespace_to($args{into}),
+        $args{set},
+        $args{set_once},
+        $args{where},
+    );
+    return $self->run($query);
 }
 
 # DELETE

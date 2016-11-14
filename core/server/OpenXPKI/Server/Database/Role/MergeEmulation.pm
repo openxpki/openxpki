@@ -21,40 +21,30 @@ use MooseX::Params::Validate;
 #
 
 # SQL MERGE emulation
-sub merge {
-    my ($self, $dbi, @param_list) = @_;
-    my (undef, %params) = validated_hash([$self, @param_list],   # MooseX::Params::Validate
-        into     => { isa => 'Str' },
-        set      => { isa => 'HashRef' },
-        set_once => { isa => 'HashRef', optional => 1, default => {} },
-        # The WHERE specification contains the primary key columns.
-        # In case of an INSERT these will be used as normal values. Therefore
-        # we only allow scalars as hash values (which are translated to AND
-        # connected "equals" conditions by SQL::Abstract::More).
-        where    => { isa => 'HashRef[Value]' },
-    );
+sub merge_query {
+    my ($self, $dbi, $into, $set, $set_once, $where) = @_;
 
     my $sth = $dbi->select(
-        from => $params{'into'},
-        columns => [ keys %{ $params{'where'} } ],
-        where => $params{'where'},
+        from => $into,
+        columns => [ keys %$where ],
+        where => $where,
     );
     # UPDATE if data exists
     if ($sth->fetchrow_arrayref) {
-        return $dbi->update(
-            table => $params{'into'},
-            set   => $params{'set'},
-            where => $params{'where'},
+        return $dbi->query_builder->update(
+            table => $into,
+            set   => $set,
+            where => $where,
         );
     }
     # INSERT otherwise
     else {
-        return $dbi->insert(
-            into   => $params{'into'},
+        return $dbi->query_builder->insert(
+            into   => $into,
             values => {
-                %{ $params{'set'} },
-                %{ $params{'set_once'} },
-                %{ $params{'where'} },
+                %$set,
+                %$set_once,
+                %$where,
             },
         );
     }

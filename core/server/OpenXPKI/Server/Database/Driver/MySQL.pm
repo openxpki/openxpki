@@ -64,26 +64,20 @@ sub last_auto_id {
 #
 
 sub merge_query {
-    my ($self, $dbi, $params) = @_;
-    my $table = $dbi->query_builder->_add_namespace_to($params->{into});
-    my %set      = %{ $params->{set} };
-    my %set_once = %{ $params->{set_once} };
-    my %where    = %{ $params->{where} };
-    my %all_val  = ( %set, %set_once, %where );
+    my ($self, $dbi, $into, $set, $set_once, $where) = @_;
+    my %all_val  = ( %$set, %$set_once, %$where );
 
-    # this special query avoids binding/typing the values twice
-    # TODO Is it really OK that we also quote numbers here (DB performance)?
     return OpenXPKI::Server::Database::Query->new(
         string => sprintf(
             "INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
-            $table,
+            $into,
             join(", ", keys %all_val),
             join(", ", map { "?" } (1..scalar keys %all_val)),
-            join(", ", map { "$_=?" } keys %set),
+            join(", ", map { "$_=?" } keys %$set),
         ),
         params => [
             values %all_val,
-            values %set,
+            values %$set,
         ]
     );
 }
