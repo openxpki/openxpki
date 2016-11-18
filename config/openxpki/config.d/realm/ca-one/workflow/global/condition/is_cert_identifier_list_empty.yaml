@@ -1,0 +1,4 @@
+class: OpenXPKI::Server::Workflow::Condition::WFArray
+param:
+    array_name: cert_identifier_list
+    condition: is_empty

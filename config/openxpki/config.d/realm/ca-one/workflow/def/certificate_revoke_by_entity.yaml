@@ -5,17 +5,20 @@ head:
 
 state:
     INITIAL:
-        action: initialize > SEARCH_CERTIFICATE
+        action: initialize global_load_policy > SEARCH_CERTIFICATE
 
     SEARCH_CERTIFICATE: 
         autorun: 1
-        action: search_certificate check_authorized_signer > CHECK_AUTHORIZATION
+        action: 
+         - search_certificate check_authorized_signer > CHECK_AUTHORIZATION ? is_policy_loaded
+         - global_set_error_policy_not_found > FAILURE ? !is_policy_loaded
 
     CHECK_AUTHORIZATION:
         autorun: 1
         action: 
-         - queue_certs_to_revoke > HANDLE_REVOCATION_QUEUE ? is_requestor_authorized
-         - global_noop > PENDING ? !is_requestor_authorized
+         - global_set_error_search_has_no_matches > FAILURE ? global_is_cert_identifier_list_empty
+         - queue_certs_to_revoke > HANDLE_REVOCATION_QUEUE ? is_requestor_authorized !global_is_cert_identifier_list_empty
+         - global_set_error_signer_not_authorized > PENDING ? !is_requestor_authorized !global_is_cert_identifier_list_empty
 
     PENDING:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_LABEL
@@ -24,6 +27,7 @@ state:
           - approve_crr > APPROVED ? acl_can_approve 
           - reject_crr > REJECTED ? acl_can_reject
         output:
+          - error_code
           - entity
           - reason_code
           - cert_identifier_list
@@ -42,8 +46,8 @@ state:
     HANDLE_REVOCATION_QUEUE:
         autorun: 1
         action: 
-         - fetch_cert_from_queue revoke_certificate > HANDLE_REVOCATION_QUEUE ? !is_queue_empty
-         - global_noop > SUCCESS ? is_queue_empty
+         - fetch_cert_from_queue revoke_certificate > HANDLE_REVOCATION_QUEUE ? !global_is_tmp_queue_empty
+         - global_noop > SUCCESS ? global_is_tmp_queue_empty
          
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
@@ -58,6 +62,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC
         output:
+          - error_code
           - entity
           - reason_code
           - cert_identifier_list
@@ -93,6 +98,8 @@ action:
         param:
             target_key: cert_identifier_list
             _map_meta_entity: $entity
+            _map_cert_subject: $p_subject
+            _map_profile: $p_profile
 
     check_authorized_signer:
         class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
@@ -154,12 +161,10 @@ condition:
         param:
             test: ($context->{signer_trusted} and $context->{signer_authorized})
 
-    is_queue_empty:
-        class: OpenXPKI::Server::Workflow::Condition::WFArray
+    is_policy_loaded:
+        class: Workflow::Condition::Evaluate
         param:
-          array_name: tmp_queue
-          condition: is_empty
-
+            test: ($context->{p_subject} || $context->{p_profile})
 
 field:
     entity:

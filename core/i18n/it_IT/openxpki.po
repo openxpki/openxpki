@@ -250,6 +250,13 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Revoca Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
+msgstr ""
+"Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
+"proprietario ha richiesto lo stesso un’approvazione. Vedi i commenti e i "
+"risultati qui sotto."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
 msgstr ""
 "Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "

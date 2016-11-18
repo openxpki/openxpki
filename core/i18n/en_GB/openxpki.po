@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-11-14 12:09+0100\n"
+"PO-Revision-Date: 2016-11-18 12:25+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -220,6 +220,9 @@ msgstr "Request was not approved"
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Request was not authenticated"
 
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
+msgstr "Policy definition not found/loaded."
+
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
 msgstr "Policy failed (too many valid certificates)"
 
@@ -329,9 +332,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
-msgstr "Keystore Alias"
+msgstr "Private key could not be decrpyted/loaded."
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"
@@ -869,9 +871,8 @@ msgstr "unknown"
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "upcoming"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
-msgstr "PKCS10 request is not properly formated"
+msgstr "Unable to parse PKCS10 request"
 
 msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
 msgstr "You do not have the required privileges to access the workflow history"
@@ -944,23 +945,17 @@ msgstr "The provided key is too short"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS"
 msgstr "A certificate with the same public key already exists!"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED"
-msgstr "PKCS10 request is not properly formated"
+msgstr "Used key algorithm is not allowed by policy"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED"
-msgstr "The provided key is too short"
+msgstr "Used key algorithm is not supported"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10"
-msgstr "PKCS10 request can not be read"
+msgstr "Unable to parse PKCS10 request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED"
-msgstr ""
-"The common name which will be created from the information below exceeds the "
-"allowed length of 64 characters."
+msgstr "Used key parameter is not allowed by policy"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 msgstr "PKCS10 request is not properly formated"
@@ -1239,9 +1234,8 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
 msgstr "Specify Required Format"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
-msgstr "Specify Required Format"
+msgstr "Re-enter password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancel this workflow."
@@ -1424,9 +1418,8 @@ msgstr "SCEP Enrollment"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Failed Action"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
-msgstr "Password"
+msgstr "Re-Enter Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
 msgstr "Technical Information"
@@ -2220,13 +2213,11 @@ msgstr "Message set"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 msgstr "This workflow was canceled by user interaction."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "This workflow was canceled."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
-msgstr "CANCELED"
+msgstr "Canceled by User"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
@@ -2542,16 +2533,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL"
 msgstr "Export Failed"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC"
 msgstr ""
-"Click on the link below to download your certificate/key bundle. Note that "
-"this link will only work from within this browser window and become invalid "
-"after 60 seconds."
+"Generating the export file failed as the private key could not be loaded. "
+"This usually means you gave the wrong password. Click retry and enter the "
+"password again or cancel the request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
-msgstr "SUCCESS"
+msgstr "Unable to load Key"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
 msgstr ""
@@ -2765,9 +2754,8 @@ msgstr "This workflow revokes all certificates that belong to a certain entity"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
 msgstr "Revoke by Entity"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
-msgstr "Name of the SCEP endpoint receiving this request."
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL"
 msgstr "Private Key Download"
@@ -2849,6 +2837,9 @@ msgstr "Workflow information was updated"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
+
+#~ msgid "I18N_OPENXPKI_UI_ERROR_NOT_CERTIFICATE_OWNER"
+#~ msgstr "Only the certificate owner is allowed to perform this action"
 
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 #~ msgstr "Filename"
