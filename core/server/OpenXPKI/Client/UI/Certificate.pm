@@ -640,6 +640,7 @@ sub init_related {
             $line->{'WORKFLOW.WORKFLOW_SERIAL'},
             $line->{'WORKFLOW.WORKFLOW_TYPE'},
             $line->{'WORKFLOW.WORKFLOW_STATE'},
+            $line->{'WORKFLOW.WORKFLOW_SERIAL'},
         ];
     }
     
@@ -658,6 +659,7 @@ sub init_related {
                 { sTitle => "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL" },
                 { sTitle => "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"},
                 { sTitle => "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"},
+                { sTitle => "serial", bVisible => 0 },
             ],
             data => \@result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
