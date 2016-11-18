@@ -98,13 +98,12 @@ has '_dbix_handler' => (
     isa => 'DBIx::Handler',
     lazy => 1,
     builder => '_build_dbix_handler',
-    handles => {
-        # FIXME Create methods and handle exceptions
-        start_txn => 'txn_begin',
-        commit => 'txn_commit',
-        rollback => 'txn_rollback',
-    },
     predicate => '_dbix_handler_initialized', # for test cases
+);
+
+has '_txn_starter' => (
+    is => 'rw',
+    isa => 'Any',
 );
 
 ################################################################################
@@ -330,6 +329,35 @@ sub next_id {
     return $id->bstr();
 }
 
+sub start_txn {
+    my $self = shift;
+    if ($self->_txn_starter) {
+        $self->log->error(
+            sprintf "start_txn() was called during a running transaction (started in %s, line %i). Most likely this error is caused by a missing commit() or exception handling without rollback()",
+            $self->_txn_starter->[1],
+            $self->_txn_starter->[2],
+        );
+        $self->rollback;
+    }
+    $self->_txn_starter([ caller ]);
+}
+
+sub commit {
+    my $self = shift;
+    $self->log->warn("commit() was called without indicating a transaction start via start_txn() first")
+        unless $self->_txn_starter;
+    $self->dbh->commit;
+    $self->_txn_starter(undef);
+}
+
+sub rollback {
+    my $self = shift;
+    $self->log->warn("rollback() was called without indicating a transaction start via start_txn() first")
+        unless $self->_txn_starter;
+    $self->dbh->rollback;
+    $self->_txn_starter(undef);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 Description
@@ -517,37 +545,24 @@ For parameters see L<OpenXPKI::Server::Database::QueryBuilder/delete>.
 
 =head2 start_txn
 
-Starts a new transaction via C<$dbh-E<gt>begin_work>.
+Checks if there is a running transaction and records the start of a new
+transaction.
 
-Transactions can be virtually nested, i.e. code with C<start_txn> and C<commit>
-can later be surrounded by another pair of these functions. The result is that
-only the outermost method calls will have any (database) effect.
-
-In other words: if this method is called again before any rollback or commit
-then:
-
-=over
-
-=item 1. the nesting level counter will be increased
-
-=item 2. B<no> action will be performed on the database
-
-=back
+This method normally does not do any database interaction. Only if there already
+is a running transcation then a warning will be logged and a C<ROLLBACK>
+performed.
 
 =head2 commit
 
 Commits a transaction.
 
-If currently in a nested transaction, decreases the nesting level counter.
-
-croaks if there was a rollback in a nested transaction.
+Logs an error if L</start_txn> was not called first.
 
 =head2 rollback
 
 Rolls back a transaction.
 
-If currently in a nested transaction, notes the rollback for later and decreases
-the nesting level counter.
+Logs an error if L</start_txn> was not called first.
 
 =cut
 
