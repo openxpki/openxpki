@@ -6,10 +6,16 @@ use Test::More;
 use Test::Exception;
 use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
 use MooseX::Params::Validate;
+use Log::Log4perl;
+
+################################################################################
+# Constructor attributes
+#
 
 has 'columns' => (
     is => 'rw',
     isa => 'ArrayRef',
+    required => 1,
 );
 has '_col_info' => (
     is => 'rw',
@@ -31,10 +37,21 @@ has '_col_info' => (
         };
     },
 );
+# if not set: do not create table / insert data
 has 'data' => (
     is => 'rw',
     isa => 'ArrayRef',
 );
+# if not set: use SQLite in-memory DB
+has 'sqlite_db' => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+################################################################################
+# Other attributes
+#
+
 has 'dbi' => (
     is => 'rw',
     isa => 'OpenXPKI::Server::Database',
@@ -68,7 +85,7 @@ sub set_dbi {
 
     lives_ok {
         $self->_create_table;
-    } $args{params}->{type}.": insert test data";
+    } $args{params}->{type}.": insert test data" if $self->data;
 }
 
 sub BUILD {
@@ -76,7 +93,14 @@ sub BUILD {
     use_ok "OpenXPKI::Server::Database"; $self->count_test;
     use_ok "OpenXPKI::Server::Log";      $self->count_test;
     $self->_log( OpenXPKI::Server::Log->new(
-        CONFIG => catfile((splitpath(rel2abs(__FILE__)))[0,1], "log4perl.conf")
+        CONFIG => \"
+# Catch-all root logger
+log4perl.rootLogger = DEBUG, Everything
+
+log4perl.appender.Everything          = Log::Log4perl::Appender::String
+log4perl.appender.Everything.layout   = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
+"
     ) );
 }
 
@@ -88,23 +112,24 @@ sub run {
         { isa => 'CodeRef' },
     );
 
-    # SQLite
-    subtest "$name (SQLite)" => sub {
-        plan tests => $plan + 2; # 2 from set_dbi()
+    # SQLite - runs always
+    my $sqlite_db = $self->sqlite_db || ":memory:";
+    subtest "$name (SQLite '$sqlite_db')" => sub {
+        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
                 type => "SQLite",
-                name => ":memory:"
+                name => $sqlite_db,
             }
         );
         $tests->($self);
     };
     $self->count_test;
 
-    # Oracle
+    # Oracle - runs if OXI_TEST_DB_ORACLE_NAME is set
     subtest "$name (Oracle)" => sub {
         plan skip_all => "No Oracle database found / OXI_TEST_DB_ORACLE_NAME not set" unless $ENV{OXI_TEST_DB_ORACLE_NAME};
-        plan tests => $plan + 2; # 2 from set_dbi()
+        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
                 type => "Oracle",
@@ -117,10 +142,10 @@ sub run {
     };
     $self->count_test;
 
-    # MySQL
+    # MySQL - runs if OXI_TEST_DB_MYSQL_NAME is set
     subtest "$name (MySQL)" => sub {
         plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
-        plan tests => $plan + 2; # 2 from set_dbi()
+        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
                 type => "MySQL",
@@ -141,8 +166,18 @@ sub get_data {
     return $sth->fetchall_arrayref;
 }
 
+# Returns all log messages since the last call of this method
+sub get_log {
+    my $appender = Log::Log4perl->appender_by_name("Everything")
+        or BAIL_OUT("Could not access Log4perl appender");
+    my $messages = $appender->string;
+    $appender->string("");
+    return $messages;
+}
+
 sub clear_data {
     my $self = shift;
+    BAIL_OUT("Cannot re-init data because attribute 'data' was not set") unless $self->data;
     lives_ok {
         $self->_drop_table;
         $self->_create_table;
@@ -159,12 +194,13 @@ sub _create_table {
         my %values = map { $col_names->[$_] => $row->[$_] } 0..$#{ $col_names };
         $self->dbi->insert(into => "test", values => \%values);
     }
+    $self->dbi->run("COMMIT");
 }
 
 sub _drop_table {
     my $self = shift;
     $self->dbi->run("DROP TABLE test");
-    $self->dbi->commit;
+    $self->dbi->run("COMMIT");
 }
 
 __PACKAGE__->meta->make_immutable;
