@@ -752,6 +752,135 @@ sub get_crl_list {
     return \@result;
 }
 
+=head2 import_crl( { DATA, ISSUER } )
+
+Import a CRL into the current realm. This should be used only within 
+realms that work as a proxy to external CA system or use external CRL 
+signer tokens. Expects the PEM formated CRL in the DATA parameter. If not
+given, the issuer is extracted from the CRL. Note that the issuer must be
+defined as alias in the certsign group!
+
+A duplicate check is done based on issuer, last_update and next_update. 
+
+The content of the CRL is NOT parsed, therefore the certificate status
+of revoked certificates is NOT changed in the database!
+
+=over
+
+=item DATA
+
+PEM formated CRL
+
+=item ISSUER
+
+certificate identifier of the CRL issuer
+
+=back
+
+=cut
+
+sub import_crl {
+    
+
+    ##! 1: "start"
+
+    my $self = shift;
+    my $keys = shift;
+    
+    my $pki_realm = CTX('session')->get_pki_realm();
+
+    my $dbi = CTX('dbi');
+    
+    my $crl = $keys->{DATA};
+
+    my $crl_obj = OpenXPKI::Crypto::CRL->new(
+        TOKEN => CTX('api')->get_default_token(),
+        DATA  => $crl,
+    );
+
+    my $data = { $crl_obj->to_db_hash() };
+    
+    # Find the issuer certificate 
+    my $issuer_dn = $crl_obj->{PARSED}->{BODY}->{ISSUER};
+    
+    # We need the group name for the alias group
+        
+    my $group = CTX('config')->get(['crypto', 'type', 'certsign']);
+    
+    ##! 16: 'Look for issuer_dn ' . $issuer_dn . ' in group ' . $group
+    
+    my $issuer = $dbi->select_one(
+        from_join => 'certificate  identifier=identifier,pki_realm=pki_realm aliases',
+        columns => [ 'certificate.identifier' ],
+        where => {
+            'certificate.pki_realm' => $pki_realm,
+            'certificate.subject' => $issuer_dn,
+            'aliases.group_id' => $group
+        },
+    );
+    
+    if (!$issuer) {
+       OpenXPKI::Exception->throw(
+            message => 'Unable to find issuer certificate for CRL',
+            params => { 'ISSUER_DN' => $issuer_dn , 'GROUP' => $group },
+        );   
+    }
+    
+    ##! 32: 'Issuer ' . Dumper $issuer
+        
+    $dbi->start_txn;
+    
+    my $serial = $dbi->next_id('crl');
+    
+    my $ca_identifier = $issuer->{identifier};
+    $data = {
+        # FIXME Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
+        ( map { lc($_) => $data->{$_} } keys %$data ),
+        pki_realm         => $pki_realm,
+        issuer_identifier => $ca_identifier,
+        crl_key           => $serial,
+        publication_date  => -1,
+    };
+    
+    my $duplicate = $dbi->select_one(
+        from => 'crl',
+        columns => [ 'crl_key' ],
+        where => {
+            'pki_realm' => $pki_realm,
+            'issuer_identifier' => $ca_identifier,
+            'last_update' => $data->{last_update},
+            'next_update' => $data->{next_update},
+        },
+    );
+    
+    if ($duplicate) {
+        OpenXPKI::Exception->throw(
+            message => 'A crl for this issuer with the same last/next update information exists!',
+            params => { 
+                'issuer_identifier' => $ca_identifier,
+                'last_update' => $data->{last_update},
+                'next_update' => $data->{next_update},
+                'crl_key' => $duplicate->{crl_key},
+            },
+        );
+    }
+    
+    ##! 32: 'CRL Data ' . Dumper $data
+    
+    $dbi->insert( into => 'crl', values => $data );
+    
+    $dbi->commit;
+    
+    CTX('log')->log(
+        MESSAGE  => "Imported CRL for issuer $issuer_dn",
+        PRIORITY => 'info',
+        FACILITY => 'application',
+    );
+    
+    delete $data->{data};
+    return $data;
+    
+}
 
 =head2 search_cert
 

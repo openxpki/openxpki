@@ -560,6 +560,19 @@ sub BUILD {
                 },
             },
         },
+        'import_crl' => {
+            class  => 'Object',
+            params => {
+                'DATA' => {
+                    type     => SCALAR,
+                },
+                ISSUER => {
+                    type     => SCALAR,
+                    optional => 1,
+                    regex    => $re_base64_string,
+                },
+            },
+        },
         'get_random' => {
             class  => 'Default',
             params => {

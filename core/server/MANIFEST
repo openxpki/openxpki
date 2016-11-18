@@ -348,6 +348,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/SearchWorkflow.pm
 OpenXPKI/Server/Workflow/Activity/Tools/VerifySignature.pm
 
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
+OpenXPKI/Server/Workflow/Activity/CRLIssuance/ImportCRL.pm
 
 OpenXPKI/Server/Workflow/Activity/Reports/Summary.pm
 OpenXPKI/Server/Workflow/Activity/Reports/Detail.pm
