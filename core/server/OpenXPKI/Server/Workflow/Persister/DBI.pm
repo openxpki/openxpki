@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Persister::DBI
-# Written by Martin Bartosch for the OpenXPKI project 2005
-# Copyright (c) 2005 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Persister::DBI;
 
 use strict;
@@ -9,17 +5,17 @@ use base qw( Workflow::Persister );
 use utf8;
 use English;
 
-# use Smart::Comments;
-
 use OpenXPKI::Debug;
 
 use OpenXPKI::Workflow::Context;
-use OpenXPKI::Server::Workflow::Persister::DBI::SequenceId;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use DateTime::Format::Strptime;
 
 use Data::Dumper;
+
+my @FIELDS = qw( workflow_table history_table );
+__PACKAGE__->mk_accessors(@FIELDS);
 
 # limits
 my $context_value_max_length = 32768;
@@ -38,20 +34,11 @@ my $parser = DateTime::Format::Strptime->new(
 );
 
 sub init {
-    my $self   = shift;
-    my $params = shift;
-
+    my ($self, $params) = @_;
+    for (@FIELDS) {
+        $self->$_( $params->{$_} ) if $params->{$_};
+    }
     $self->SUPER::init($params);
-    $self->assign_generators($params);
-    CTX('log')->info(
-        sprintf(
-            "Assigned workflow generator '%s'; history generator '%s'",
-            ref $self->workflow_id_generator,
-            ref $self->history_id_generator,
-        ),
-        "system"
-    );
-
     return;    # no useful return value
 }
 
@@ -60,7 +47,7 @@ sub create_workflow {
     my $workflow = shift;
     ##! 1: "create workflow (only id)"
 
-    my $id = $self->workflow_id_generator->pre_fetch_id();
+    my $id = CTX('dbi')->next_id(lc($self->workflow_table // 'workflow'));
 
     ##! 2: "BTW we shredder many workflow IDs here"
 
@@ -293,41 +280,28 @@ sub create_history {
     my @history  = @_;
 
     ##! 1: "create_history"
-    my $generator = $self->history_id_generator();
     my $dbi       = CTX('dbi');
 
     foreach my $entry (@history) {
         next if $entry->is_saved;
 
-        my $id = $generator->pre_fetch_id;
+        my $id = $dbi->next_id(lc($self->history_table // 'workflow_history'));
         ##! 2: "workflow history id: $id"
-
-        my $values = {
-            $id ? (workflow_hist_id => $id) : (),
-            workflow_id           => $workflow->id(),
-            workflow_action       => $entry->action(),
-            workflow_description  => $entry->description(),
-            workflow_state        => $entry->state(),
-            ## user set by workflow factory class
-            workflow_user         => ($entry->user ne 'n/a' ? $entry->user : CTX('session')->get_user()),
-            workflow_history_date => DateTime->now->strftime('%Y-%m-%d %H:%M:%S'),
-        };
 
         ##! 2: "inserting data into workflow history table"
         $dbi->insert(
             into => 'workflow_history',
-            values => $values,
+            values => {
+                workflow_hist_id      => $id,
+                workflow_id           => $workflow->id(),
+                workflow_action       => $entry->action(),
+                workflow_description  => $entry->description(),
+                workflow_state        => $entry->state(),
+                ## user set by workflow factory class
+                workflow_user         => ($entry->user ne 'n/a' ? $entry->user : CTX('session')->get_user()),
+                workflow_history_date => DateTime->now->strftime('%Y-%m-%d %H:%M:%S'),
+            },
         );
-
-        if (not $id) {
-            $id = $generator->post_fetch_id;
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_NO_ID_FROM_SEQUENCE",
-                params => {
-                    GENERATOR => ref( $self->workflow_id_generator ),
-                },
-            ) unless $id;
-        }
 
         $entry->id($id);
         $entry->set_saved;
@@ -384,33 +358,6 @@ sub fetch_history {
     }
 
     return @history;
-}
-
-sub assign_generators {
-    my $self   = shift;
-    my $params = shift;
-
-    # FIXME Remove? we don't want UUID or random generators as set in parent class
-    $self->SUPER::assign_generators($params);
-    return if ($self->workflow_id_generator and $self->history_id_generator);
-
-    ##! 2: "assigning ID generators for OpenXPKI DBI"
-    my ( $wf_gen, $history_gen ) = $self->init_OpenXPKI_generators($params);
-    $self->workflow_id_generator($wf_gen);
-    $self->history_id_generator($history_gen);
-}
-
-sub init_OpenXPKI_generators {
-    my ($self, $params) = @_;
-    return (
-        # TODO Legacy: lc() neccessary because of old persister.yaml config - this should be fixed centrally
-        OpenXPKI::Server::Workflow::Persister::DBI::SequenceId->new(
-            table_name => lc($params->{workflow_table}) // 'workflow',
-        ),
-        OpenXPKI::Server::Workflow::Persister::DBI::SequenceId->new(
-            table_name => lc($params->{history_table}) // 'workflow_history',
-        ),
-    );
 }
 
 1;
@@ -481,13 +428,5 @@ Creates a workflow history entry.
 =head2 fetch_history
 
 Fetches a workflow history object from the persistant storage.
-
-=head2 assign_generators
-
-Assigns sequence generators for workflow and history objects.
-
-=head2 init_OpenXPKI_generators
-
-Fetches sequence generators from the OpenXPKI database abstraction layer.
 
 
