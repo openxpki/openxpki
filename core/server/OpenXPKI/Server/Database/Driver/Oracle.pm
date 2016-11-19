@@ -28,11 +28,7 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params {
-    RaiseError => 1,
-    AutoCommit => 0,
-    LongReadLen => 10_000_000,
-};
+sub dbi_connect_params { };
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params {

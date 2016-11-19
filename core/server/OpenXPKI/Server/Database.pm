@@ -171,6 +171,7 @@ sub _build_dbix_handler {
             RaiseError => 0,
             PrintError => 0,
             AutoCommit => 0,
+            LongReadLen => 10_000_000,
             # on_connect_do is (also) called after fork():
             # then we get a new DBI handle and a previous transaction is invalid
             on_connect_do => sub { shift->_clear_txn_starter },
