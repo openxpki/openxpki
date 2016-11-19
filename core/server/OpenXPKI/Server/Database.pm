@@ -99,11 +99,17 @@ has '_dbix_handler' => (
     lazy => 1,
     builder => '_build_dbix_handler',
     predicate => '_dbix_handler_initialized', # for test cases
+    handles => {
+        disconnect => 'disconnect',
+    },
 );
 
+# stores the caller() information about the code that started a transaction
 has '_txn_starter' => (
     is => 'rw',
     isa => 'Any',
+    clearer => '_clear_txn_starter',
+    predicate => 'in_txn',
 );
 
 ################################################################################
@@ -165,6 +171,9 @@ sub _build_dbix_handler {
             RaiseError => 0,
             PrintError => 0,
             AutoCommit => 0,
+            # on_connect_do is (also) called after fork():
+            # then we get a new DBI handle and a previous transaction is invalid
+            on_connect_do => sub { shift->_clear_txn_starter },
             %params,
         }
     ) or OpenXPKI::Exception->throw(
@@ -331,7 +340,7 @@ sub next_id {
 
 sub start_txn {
     my $self = shift;
-    if ($self->_txn_starter) {
+    if ($self->in_txn) {
         $self->log->error(
             sprintf "start_txn() was called during a running transaction (started in %s, line %i). Most likely this error is caused by a missing commit() or exception handling without rollback()",
             $self->_txn_starter->[1],
@@ -339,23 +348,26 @@ sub start_txn {
         );
         $self->rollback;
     }
+    ##! 16: "Flagging a transaction start"
     $self->_txn_starter([ caller ]);
 }
 
 sub commit {
     my $self = shift;
     $self->log->warn("commit() was called without indicating a transaction start via start_txn() first")
-        unless $self->_txn_starter;
+        unless $self->in_txn;
+    ##! 16: "Commit of changes"
     $self->dbh->commit;
-    $self->_txn_starter(undef);
+    $self->_clear_txn_starter;
 }
 
 sub rollback {
     my $self = shift;
     $self->log->warn("rollback() was called without indicating a transaction start via start_txn() first")
-        unless $self->_txn_starter;
+        unless $self->in_txn;
+    ##! 16: "Rollback of changes"
     $self->dbh->rollback;
-    $self->_txn_starter(undef);
+    $self->_clear_txn_starter;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -545,12 +557,19 @@ For parameters see L<OpenXPKI::Server::Database::QueryBuilder/delete>.
 
 =head2 start_txn
 
-Checks if there is a running transaction and records the start of a new
-transaction.
+Records the start of a new transaction (i.e. sets a flag) without database
+interaction.
 
-This method normally does not do any database interaction. Only if there already
-is a running transcation then a warning will be logged and a C<ROLLBACK>
-performed.
+If the flag was already set (= another transaction is running), a C<ROLLBACK> is
+performed first and an error message is logged.
+
+Please note that after a C<fork()> the flag is be reset as the C<DBI> handle
+is also reset (so there cannot be a running transaction).
+
+=head2 in_txn
+
+Returns C<true> if a transaction is currently running, i.e. after L</start_txn>
+was called but before L</commit> or L</rollback> where called.
 
 =head2 commit
 
@@ -574,7 +593,7 @@ The following methods allow more fine grained control over the query processing.
 
 =head2 dbh
 
-Returns a fork safe DBI handle.
+Returns a fork safe DBI handle. Connects to the database if neccessary.
 
 To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute).
 
@@ -592,5 +611,10 @@ Parameters:
 or a literal SQL string)
 
 =back
+
+=head2 disconnect
+
+Disconnects from the database. Might be useful to e.g. remove file locks when
+using SQLite.
 
 =cut

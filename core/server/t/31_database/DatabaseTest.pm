@@ -123,6 +123,8 @@ sub run {
             }
         );
         $tests->($self);
+        # prevent deadlocks (SQLite file locking) if a second instance of DatabaseTest is used later on
+        $self->dbi->disconnect;
     };
     $self->count_test;
 

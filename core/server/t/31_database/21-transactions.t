@@ -115,10 +115,25 @@ $db->run("Transactions", 12, sub {
     #
     # start transaction while other not finished
     #
-    lives_ok {
+    lives_and {
+        # transaction #1
         $dbi->start_txn;
+        $dbi->delete(
+            from => "test",
+            where => { id => 2 },
+        );
+        # transaction #2
         $dbi->start_txn;
-    } "start transaction twice";
+        $dbi->delete(
+            from => "test",
+            where => { id => 3 },
+        );
+        $dbi->commit;
+        is_deeply $t->get_data, [
+            [ 1, "Litfasssaeule" ],
+            [ 2, "Buergersteig" ],
+        ];
+    } "start transaction twice, pending changes from #1 should be discarded";
     like $t->get_log, qr/running/, "warn about starting a transaction while another one is not finished";
 });
 
@@ -132,7 +147,6 @@ $db_check->run("Data verification", 1, sub {
     is_deeply $t->get_data, [
         [ 1, "Litfasssaeule" ],
         [ 2, "Buergersteig" ],
-        [ 3, "Rathaus" ],
     ], "correct data in other handle";
 });
 
