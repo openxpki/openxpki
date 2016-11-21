@@ -32,25 +32,30 @@ sub init_index {
 
         $self->logger()->debug("Issuer: " . Dumper $issuer);
 
-        my $crl_list = $self->send_command( 'get_crl_list' , { FORMAT => 'HASH', VALID_AT => time(), LIMIT => 1, ISSUER => $issuer->{IDENTIFIER} });
+        my $crl_list = $self->send_command( 'get_crl_list' , {
+            FORMAT => 'HASH',
+            VALID_AT => time(),
+            LIMIT => 1,
+            ISSUER => $issuer->{IDENTIFIER}
+        });
 
         my $crl_hash = $crl_list->[0];
         $self->logger()->debug("result: " . Dumper $crl_list);
-        
+
         if (!@$crl_list) {
-            
+
             $self->add_section({
                 type => 'text',
                 content => {
                     label => $self->_escape($issuer->{SUBJECT}),
                     description => 'I18N_OPENXPKI_UI_CRL_NONE_FOR_CA'
                 }
-            });            
+            });
             next;
         } else {
 
             my @fields = $self->__print_detail( $crl_hash );
-    
+
             $self->add_section({
                 type => 'keyvalue',
                 content => {
@@ -63,7 +68,7 @@ sub init_index {
                     }]
                 }
             });
-            
+
         }
     }
 
@@ -80,7 +85,10 @@ sub init_list {
     my $self = shift;
     my $args = shift;
 
-    my $crl_list = $self->send_command( 'get_crl_list' , { FORMAT => 'HASH', 'ISSUER' => $self->param('issuer') });
+    my $crl_list = $self->send_command( 'get_crl_list' , {
+        FORMAT => 'HASH',
+        ISSUER => $self->param('issuer')
+    });
 
     $self->logger()->debug("result: " . Dumper $crl_list);
 
@@ -94,13 +102,13 @@ sub init_list {
             $crl->{BODY}->{'SERIAL'},
             $crl->{BODY}->{'LAST_UPDATE'},
             $crl->{BODY}->{'NEXT_UPDATE'},
-            (defined $crl->{LIST} ? scalar @{$crl->{LIST}} : 0),
+            $crl->{BODY}->{'ITEMCNT'},
         ];
     }
 
     $self->add_section({
         type => 'grid',
-        className => 'crl',        
+        className => 'crl',
         content => {
             actions => [{
                 label => 'view details in browser',
@@ -133,7 +141,10 @@ sub init_detail {
 
     my $crl_serial = $self->param('serial');
 
-    my $crl_hash = $self->send_command( 'get_crl', {  SERIAL => $crl_serial, FORMAT => 'HASH' });
+    my $crl_hash = $self->send_command( 'get_crl', {
+        SERIAL => $crl_serial,
+        FORMAT => 'HASH'
+    });
     $self->logger()->debug("result: " . Dumper $crl_hash);
 
     $self->_page({
@@ -165,11 +176,14 @@ sub init_download {
     my $crl_serial = $self->param('serial');
 
      # No format, draw a list
-    if (!$format) {
+    if (!$format || $format !~ /(pem|txt|der)/i) {
         $self->redirect('crl!detail!serial'.$crl_serial);
     }
 
-    my $data = $self->send_command( 'get_crl', {  SERIAL => $crl_serial, FORMAT => uc($format) });
+    my $data = $self->send_command( 'get_crl', {
+        SERIAL => $crl_serial,
+        FORMAT => uc($format)
+    });
 
     my $content_type = 'application/pkcs7-crl';
 
@@ -191,8 +205,8 @@ sub __print_detail {
         { label => 'Serial', value => $crl_hash->{BODY}->{'SERIAL'} },
         { label => 'Issuer',  value => $crl_hash->{BODY}->{'ISSUER'} } ,
         { label => 'Created', value => $crl_hash->{BODY}->{'LAST_UPDATE'}, format => 'timestamp'  },
-        { label => 'Expires', value => $crl_hash->{BODY}->{'NEXT_UPDATE'},format => 'timestamp' },
-        { label => 'Items', value => (defined $crl_hash->{LIST} ? scalar @{$crl_hash->{LIST}} : 0)},
+        { label => 'Expires', value => $crl_hash->{BODY}->{'NEXT_UPDATE'} ,format => 'timestamp' },
+        { label => 'Items', value => $crl_hash->{BODY}->{'ITEMCNT'} },
     );
 
     my $crl_serial = $crl_hash->{BODY}->{'SERIAL'};
@@ -203,7 +217,7 @@ sub __print_detail {
         sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM').
         sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER').
         sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
-        '</ul>', format => 'raw' 
+        '</ul>', format => 'raw'
     };
 
     return @fields;
