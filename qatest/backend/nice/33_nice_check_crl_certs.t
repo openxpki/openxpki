@@ -160,7 +160,7 @@ $test->state_is('SUCCESS');
 # Check CRL contents
 
 # Fetch the most recent CRL
-my $data = $test->runcmd('get_crl', { FORMAT => 'HASH' });
+my $data = $test->runcmd('get_crl', { FORMAT => 'FULLHASH' });
 
 # See if our certificate is included in the CRL
 # (maybe along with other certificates from previous tests)

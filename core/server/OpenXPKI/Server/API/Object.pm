@@ -527,7 +527,11 @@ sub is_certificate_owner {
 returns a CRL. The possible parameters are SERIAL, FORMAT and PKI_REALM.
 SERIAL is the serial of the database table, the realm defaults to the
 current realm and the default format is PEM. Other formats are DER, TXT
-and HASH. HASH returns the result of OpenXPKI::Crypto::CRL::get_parsed_ref.
+HASH, FULLHASH or DBINFO. DBINFO returns the fields directly from the 
+database without parsing the CRL. HASH returns the result of 
+OpenXPKI::Crypto::CRL::get_parsed_ref, FULLHASH also adds the list of 
+revocation entries (this might become a very expensive task if your CRL 
+is large!).
 
 If no serial is given, the most current crl of the active signer token is 
 returned.
@@ -549,34 +553,33 @@ sub get_crl {
 
     my $db_results;
 
-    if ($serial) {        
+    my $columns = ($format eq 'DBINFO') ? 
+        [ 'pki_realm', 'last_update', 'next_update', 'crl_key', 'publication_date', 'issuer_identifier' ] : 
+        [ 'pki_realm', 'data' ];
+
+    if ($serial) {
         ##! 16: 'Load crl by serial ' . $serial       
-        $db_results = CTX('dbi_backend')->first(
-            TABLE   => 'CRL',
-            COLUMNS => [
-                'DATA',
-                'PKI_REALM'
-            ],
-            KEY => $serial,
+        $db_results = CTX('dbi')->select_one(
+            from => 'crl',
+            columns => $columns,
+            where => {
+                'crl_key' => $serial,
+            },
         );
+        
     } else {
         
         my $ca_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'certsign' });
         ##! 16: 'Load crl by date, ca alias ' . $ca_alias                
         my $ca_hash = CTX('api')->get_certificate_for_alias({ ALIAS => $ca_alias });
-                
-        $db_results = CTX('dbi_backend')->first(
-            TABLE   => 'CRL',
-            COLUMNS => [
-                'DATA',
-                'PKI_REALM'
-            ],
-            DYNAMIC => {
-                PKI_REALM => { VALUE => $pki_realm },
-                ISSUER_IDENTIFIER => $ca_hash->{IDENTIFIER}
+        
+        $db_results = CTX('dbi')->select_one(
+            from => 'crl',
+            columns => $columns,
+            where => {
+                issuer_identifier => $ca_hash->{IDENTIFIER}
             },
-            ORDER => [ 'LAST_UPDATE' ],
-            REVERSE => 1,
+            order_by => '-last_update'
         );
     }
 
@@ -587,7 +590,7 @@ sub get_crl {
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND', );
     }
 
-    if ($pki_realm ne $db_results->{PKI_REALM}) {
+    if ($pki_realm ne $db_results->{pki_realm}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_IN_REALM', );
     }
@@ -595,11 +598,11 @@ sub get_crl {
     # Is this really useful ?
     #OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_PUBLIC' );
 
-    my $pem_crl= $db_results->{DATA};
+    my $pem_crl= $db_results->{data};
 
     my $output;
-    if ($format eq 'PEM') {
-        $output = $pem_crl;
+    if ($format eq 'DBINFO') {
+        $output = $db_results;
     }
     elsif ( $format eq 'DER' || $format eq 'TXT' ) {
         # convert the CRL
@@ -616,15 +619,19 @@ sub get_crl {
             );
         }
     }
-    elsif ( $format eq 'HASH' ) {
+    elsif ( $format eq 'HASH' || $format eq 'FULLHASH' ) {
         # parse CRL using OpenXPKI::Crypto::CRL
         my $default_token = CTX('api')->get_default_token();
         my $crl_obj = OpenXPKI::Crypto::CRL->new(
             TOKEN => $default_token,
             DATA  => $pem_crl,
+            REVOKED => ($format eq 'FULLHASH') ,
         );
         $output = $crl_obj->get_parsed_ref();
+        $output->{ISSUER_IDENTIFIER} = $db_results->{issuer_identifier};
 
+    } else {
+        $output = $pem_crl;
     }
     ##! 16: 'output: ' . Dumper $output
     return $output;
@@ -796,6 +803,7 @@ sub import_crl {
     my $crl_obj = OpenXPKI::Crypto::CRL->new(
         TOKEN => CTX('api')->get_default_token(),
         DATA  => $crl,
+        EXTENSIONS => 1,
     );
 
     my $data = { $crl_obj->to_db_hash() };
