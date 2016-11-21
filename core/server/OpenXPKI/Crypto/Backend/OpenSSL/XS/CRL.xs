@@ -266,4 +266,18 @@ revoked(crl)
 	BIO_free(out);
     OUTPUT:
 	RETVAL
-
+	
+int
+itemcnt(crl)
+    OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
+    PREINIT:
+    BIO *out;
+    char *ext;
+    int n,i;
+    STACK_OF(X509_REVOKED) *rev;
+    X509_REVOKED *r;
+    CODE:
+    rev = X509_CRL_get_REVOKED(crl);
+    RETVAL = sk_X509_REVOKED_num(rev);
+    OUTPUT:
+    RETVAL

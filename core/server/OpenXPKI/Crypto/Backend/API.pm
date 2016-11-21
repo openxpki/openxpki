@@ -299,7 +299,7 @@ sub get_object_function {
     else ## CRL
     {
         @functions = ("version", "issuer", "next_update", "last_update",
-                      "signature_algorithm", "revoked", "serial");
+                      "signature_algorithm", "revoked", "serial", "itemcnt", "extensions");
     }
 
     if (not grep (/$keys->{FUNCTION}/, @functions))

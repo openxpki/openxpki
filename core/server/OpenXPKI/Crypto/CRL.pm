@@ -22,6 +22,8 @@ sub new
     my $keys = { @_ };
     $self->{DATA}  = $keys->{DATA};
     $self->{TOKEN} = $keys->{TOKEN};
+    $self->{REVOKED} = $keys->{REVOKED};
+    $self->{EXTENSIONS} = $keys->{EXTENSIONS};
 
     if (not $self->{DATA})
     {
@@ -57,8 +59,13 @@ sub __init
     ##########################
 
     $self->{PARSED}->{HEADER} = $self->{header}->get_parsed();
-    foreach my $attr ("version", "issuer", "next_update", "last_update",
-                      "signature_algorithm", "revoked", "serial")
+
+    my @attr = ("version", "issuer", "next_update", "last_update","signature_algorithm", "itemcnt", "serial");
+
+    push @attr, "revoked" if ($self->{REVOKED});
+    push @attr, "extensions" if ($self->{EXTENSIONS});
+
+    foreach my $attr (@attr)
     {
         $self->{PARSED}->{BODY}->{uc($attr)} = $self->{TOKEN}->get_object_function ({
                                                    OBJECT   => $self->{crl},
@@ -73,6 +80,23 @@ sub __init
     delete $self->{crl};
     ##! 2: "loaded crl attributes"
     my $ret = $self->{PARSED}->{BODY};
+
+    # parse AKI
+    my $ext = {};
+    if ($ret->{EXTENSIONS}) {
+        my @lines = split(/\n/, $ret->{EXTENSIONS});
+        while (my $line = shift @lines) {
+            if ($line =~ /X509v3 Authority Key Identifier/) {
+                my $item = shift @lines;
+                my ($value) = ($item =~ /^[^:]+:(.*)$/);
+                if ($value) {
+                    $ext->{AUTHORITY_KEY_IDENTIFIER} = $value;
+                }
+                last;
+            }
+        }
+        $ret->{EXTENSIONS} = $ext;
+    }
 
     #################################
     ##     parse revoked certs     ##
@@ -93,7 +117,7 @@ sub __init
             }
             my $entry = {SERIAL     => $serial,
                          DATE       => $date,
-                         EXTENSIONS => $ext}; 
+                         EXTENSIONS => $ext};
             @list = ( @list, $entry );
         }
         $self->{PARSED}->{LIST} = \@list;
@@ -165,9 +189,14 @@ OpenXPKI::Crypto::Object several functions.
 
 =head2 new
 
-The constructor supports two options - DATA and TOKEN.
+The constructor requires two parameters - DATA and TOKEN.
 DATA is a PEM encoded CRL. TOKEN is a token from the token manager
 (OpenXPKI::TokenManager). The token is needed to parse the CRL.
+
+You can optionally pass EXTENSIONS and REVOKED as boolean flags.
+EXTENSIONS parses the extension section and looks for the Authority Key 
+Identifier. REVOKED reads the list of revoked certificates from the
+CRL and adds it to the return structure.
 
 =head2 get_serial
 
