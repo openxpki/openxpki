@@ -359,24 +359,22 @@ sub get_cert_attributes {
     ##! 2: "initialize arguments"
     my $identifier = $args->{IDENTIFIER};
 
-    # get current DB state
-    CTX('dbi_backend')->commit();
-
-    my $query = { IDENTIFIER => { VALUE => $identifier } };
+    my $query = { identifier => $identifier };
     
     if ($args->{ATTRIBUTE}) {
-        $query->{ATTRIBUTE_KEY} = { VALUE => $args->{ATTRIBUTE}, OPERATOR => 'LIKE' };
+        $query->{attribute_contentkey} = { -like => $args->{ATTRIBUTE} };
     }
     
-    my $res_attrib = CTX('dbi_backend')->select(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => $query  
+    my $sth_attrib = CTX('dbi')->select(
+        from => 'certificate_attributes',
+        columns => [ 'attribute_contentkey', 'attribute_value' ],
+        where => $query
     );  
         
     my $attrib;
-    foreach my $item (@$res_attrib ) {
-        my $key = $item->{ATTRIBUTE_KEY};
-        my $val = $item->{ATTRIBUTE_VALUE};
+    while (my $item = $sth_attrib->fetchrow_hashref) {
+        my $key = $item->{attribute_contentkey};
+        my $val = $item->{attribute_value};
         if (!defined($attrib->{$key})) {
             $attrib->{$key} = [];
         }
