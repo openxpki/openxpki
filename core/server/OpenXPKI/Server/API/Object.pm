@@ -759,12 +759,12 @@ sub get_crl_list {
     return \@result;
 }
 
-=head2 import_crl( { DATA, ISSUER } )
+=head2 import_crl( { DATA } )
 
 Import a CRL into the current realm. This should be used only within 
 realms that work as a proxy to external CA system or use external CRL 
-signer tokens. Expects the PEM formated CRL in the DATA parameter. If not
-given, the issuer is extracted from the CRL. Note that the issuer must be
+signer tokens. Expects the PEM formated CRL in the DATA parameter.
+The issuer is extracted from the CRL. Note that the issuer must be
 defined as alias in the certsign group!
 
 A duplicate check is done based on issuer, last_update and next_update. 
@@ -788,7 +788,6 @@ certificate identifier of the CRL issuer
 
 sub import_crl {
     
-
     ##! 1: "start"
 
     my $self = shift;
@@ -809,29 +808,36 @@ sub import_crl {
     my $data = { $crl_obj->to_db_hash() };
     
     # Find the issuer certificate 
+    my $issuer_aik = $crl_obj->{PARSED}->{BODY}->{EXTENSIONS}->{AUTHORITY_KEY_IDENTIFIER};
     my $issuer_dn = $crl_obj->{PARSED}->{BODY}->{ISSUER};
     
     # We need the group name for the alias group
-        
     my $group = CTX('config')->get(['crypto', 'type', 'certsign']);
     
-    ##! 16: 'Look for issuer_dn ' . $issuer_dn . ' in group ' . $group
+    ##! 16: 'Look for issuer ' . $issuer_aik . '/' . $issuer_dn . ' in group ' . $group
+
+    my $where = {
+        'certificate.pki_realm' => $pki_realm,
+        'aliases.group_id' => $group
+    };
+
+    if ($issuer_aik) {
+        $where ->{'certificate.subject_key_identifier'} = $issuer_aik;
+    } else {
+        $where ->{'certificate.subject'} = $issuer_dn;
+    }
     
     my $issuer = $dbi->select_one(
         from_join => 'certificate  identifier=identifier,pki_realm=pki_realm aliases',
         columns => [ 'certificate.identifier' ],
-        where => {
-            'certificate.pki_realm' => $pki_realm,
-            'certificate.subject' => $issuer_dn,
-            'aliases.group_id' => $group
-        },
+        where => $where
     );
     
     if (!$issuer) {
        OpenXPKI::Exception->throw(
             message => 'Unable to find issuer certificate for CRL',
-            params => { 'ISSUER_DN' => $issuer_dn , 'GROUP' => $group },
-        );   
+            params => { 'ISSUER_DN' => $issuer_dn , 'GROUP' => $group, 'ISSUER_AIK' => $issuer_aik },
+        );
     }
     
     ##! 32: 'Issuer ' . Dumper $issuer
