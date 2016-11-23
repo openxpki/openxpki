@@ -150,6 +150,7 @@ sub update_workflow {
         # context parameter sanity checks
         if ( length($value) > $context_value_max_length ) {
             ##! 4: "parameter length exceeded"
+            $dbi->rollback;
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
                 params => {
@@ -168,6 +169,7 @@ sub update_workflow {
         # check for illegal characters
         if ( $value =~ m{ (?:\p{Unassigned}|\x00) }xms ) {
             ##! 4: "parameter contains illegal characters"
+            $dbi->rollback;
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA",
                 params => {
