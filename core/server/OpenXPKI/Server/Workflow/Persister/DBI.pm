@@ -68,6 +68,9 @@ sub update_workflow {
     my $dbi = CTX('dbi');
 
     ##! 1: "WF #$id: update_workflow"
+
+    $dbi->start_txn;
+
     ##! 16: sprintf "WF #$id: saving workflow, state: %s, proc_state: %s", $workflow->state(), $workflow->proc_state()
     $dbi->merge(
         into => 'workflow',
@@ -97,6 +100,7 @@ sub update_workflow {
     # Do not persist context while we are doing "overhead"
     if ( !$workflow->persist_context() ) {
         ##! 16: "WF #$id: Workflow not executing - skipping context"
+        $dbi->commit();
         return 2;
     }
 
@@ -191,6 +195,8 @@ sub update_workflow {
 
         delete $self->{_updated}->{$key};
     }
+
+    $dbi->commit;
 
     # Reset the update marker - only if full update was requested
     $context->reset_updated if $workflow->persist_context > 1;
@@ -308,6 +314,8 @@ sub create_history {
 
         CTX('log')->debug("Created workflow history entry $id", "workflow");
     }
+
+    $dbi->commit;
 
     return @history;
 }
