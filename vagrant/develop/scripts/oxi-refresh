@@ -67,12 +67,28 @@ if (@modlist) {
 ' 2>$LOG
 
 #
-# Copy current code
+# Copy current code and realm CA-ONE config
 #
 echo "Copying current code and binaries from repo"
 rsync -c -P -a  \
+ /code-repo/core/server/OpenXPKI.* \
+ /usr/lib/x86_64-linux-gnu/perl5/5.20/                                >$LOG 2>&1
+rsync -c -P -a  \
  /code-repo/core/server/OpenXPKI/* \
  /usr/lib/x86_64-linux-gnu/perl5/5.20/OpenXPKI/                       >$LOG 2>&1
+rsync -c -P -a  \
+ /code-repo/config/openxpki/config.d/realm/ca-one/* \
+ /etc/openxpki/config.d/realm/ca-one/                                 >$LOG 2>&1
+
+#
+# Compile OpenXPKI.so
+#
+echo "Compiling OpenXPKI.so"
+cd /code-repo/core/server
+perl Makefile.PL                                                      >$LOG 2>&1
+make dynamic                                                          >$LOG 2>&1
+cp blib/arch/auto/OpenXPKI/OpenXPKI.so /usr/lib/x86_64-linux-gnu/perl5/5.20/auto/OpenXPKI/
+
 
 if [ "$1" != "--no-restart" ]; then
     echo "Restarting OpenXPKI"
