@@ -867,7 +867,7 @@ sub import_crl {
     
     if ($duplicate) {
         OpenXPKI::Exception->throw(
-            message => 'A crl for this issuer with the same last/next update information exists!',
+            message => 'A CRL for this issuer with the same last/next update information exists!',
             params => { 
                 'issuer_identifier' => $ca_identifier,
                 'last_update' => $data->{last_update},

@@ -326,14 +326,14 @@ msgstr "PKCS8 (PEM)"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC"
 msgstr ""
-"The password  you provided while creating the certificate request. This will "
-"also be set as password for the provided download."
+"The password  you provided while creating the certificate request. This will also be set as "
+"password for the provided download."
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
-msgstr "Private key could not be decrpyted/loaded."
+msgstr "Private key could not be decrypted/loaded."
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"

@@ -7,7 +7,7 @@ at *[% Certificate.notafter( cert_identifier, 'printable') %]*!
 For further details of this certificate, check the certificate status page 
 at the PKI service portal: [% meta_baseurl %]#/openxpki/certificate!detail!identifier![% cert_identifier %]
 
-Services depending on this certificate might becom unavailable after this date!
+Services depending on this certificate might become unavailable after this date!
 If the service is still in use, please make sure to request a new certificate 
 in time. If you already renewed the certificate or the service is no longer in 
 use, you can silently ignore this mail.

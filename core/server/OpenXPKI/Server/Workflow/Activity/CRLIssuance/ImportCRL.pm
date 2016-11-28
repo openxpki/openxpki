@@ -44,7 +44,7 @@ OpenXPKI::Server::Workflow::Activity::CRLIssuance::ImportCRL
 =head1 Description
  
 This activity can be used to import CRLs into the system. It should be 
-used for external controlled realms only.
+used for externally controlled realms only.
  
 =head2 Activity Configuration 
 
@@ -52,12 +52,12 @@ used for external controlled realms only.
 
 =item data
 
-Must hold the PEM encoded crl to import, activity will return without error
+Must hold the PEM encoded CRL to import, activity will return without error
 if this is empty.
 
 =item target_key
 
-Name of context key to write the serial number of the imported crl to. 
+Name of context key to write the serial number of the imported CRL to. 
 Optional, default is crl_serial.
  
 =back
