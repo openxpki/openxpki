@@ -10,9 +10,7 @@
 use strict;
 use warnings;
 
-use lib qw(
-  ../../lib
-);
+use lib qw(../../lib);
 
 use Carp;
 use English;
@@ -23,24 +21,19 @@ use File::Basename;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
+use Test::More;
 use OpenXPKI::Test::More;
 use TestCfg;
 use utf8;
 
-my $dirname = dirname($0);
-
-our @cfgpath = ( $dirname );
 our %cfg = ();
-
 my $testcfg = new TestCfg;
-$testcfg->read_config_path( '9x_nice.cfg', \%cfg, @cfgpath );
+$testcfg->read_config_path( '9x_nice.cfg', \%cfg, dirname($0) );
 
-my $test = OpenXPKI::Test::More->new(
-    {
-        socketfile => $cfg{instance}{socketfile},
-        realm => $cfg{instance}{realm},
-    }
-) or die "Error creating new test instance: $@";
+my $test = OpenXPKI::Test::More->new({
+    socketfile => $cfg{instance}{socketfile},
+    realm      => $cfg{instance}{realm},
+}) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg{instance}{verbose});
 
@@ -71,14 +64,14 @@ my %cert_info = (
 my %cert_subject_alt_name_parts = (
 );
 
-print "CSR Subject: $sSubject\n";
+diag "CSR Subject: $sSubject\n";
 
 $test->create_ok( 'certificate_signing_request_v2' , {
     cert_profile => $cfg{csr}{profile},
     cert_subject_style => "00_basic_style",
 }, 'Create Issue Test Workflow')
  or die "Workflow Create failed: $@";
- 
+
 $test->state_is('SETUP_REQUEST_TYPE');
 
 $test->execute_ok( 'csr_provide_server_key_params', {
@@ -86,11 +79,11 @@ $test->execute_ok( 'csr_provide_server_key_params', {
     enc_alg => 'aes256',
     key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
     password_type => 'client',
-    csr_type => 'pkcs10'     
+    csr_type => 'pkcs10'
 });
-          
+
 $test->state_is('ENTER_KEY_PASSWORD');
-$test->execute_ok( 'csr_ask_client_password', {          
+$test->execute_ok( 'csr_ask_client_password', {
     _password => "m4#bDf7m3abd",
 });
 
@@ -112,14 +105,22 @@ $test->execute_ok( 'csr_edit_cert_info', {
 
 $test->state_is('SUBJECT_COMPLETE');
 
-#$test->execute_ok( 'csr_submit' );
-#$test->state_is('PENDING');
-
-# As the nicetest FQDNs do not validate, we need a policy expcetion request
-
-$test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
-$test->state_is('PENDING_POLICY_VIOLATION');
-
+# Nicetest FQDNs should not validate so we need a policy expcetion request
+# (on rare cases the responsible router might return a valid address, so we check)
+my $msg = $test->get_client->send_receive_command_msg('get_workflow_info', { ID => $test->get_wfid });
+my $actions = $msg->{PARAMS}->{STATE}->{option};
+my $intermediate_state;
+if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
+    diag "Test FQDNs do not resolve - handling policy violation";
+    $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
+    $intermediate_state ='PENDING_POLICY_VIOLATION';
+}
+else {
+    diag "For whatever reason test FQDNs do resolve - submitting request";
+    $test->execute_ok( 'csr_submit' );
+    $intermediate_state ='PENDING';
+}
+$test->state_is($intermediate_state);
 
 # ACL Test - should not be allowed to user
 $test->execute_nok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'}, 'Disallow on hold to user' );
@@ -139,7 +140,7 @@ $test->execute_ok( 'csr_put_request_on_hold', { onhold_comment => 'Still on hold
 $test->state_is('ONHOLD');
 
 $test->execute_ok( 'csr_release_on_hold' );
-$test->state_is('PENDING_POLICY_VIOLATION');
+$test->state_is($intermediate_state);
 
 $test->execute_ok( 'csr_approve_csr' );
 $test->state_is('SUCCESS');
