@@ -2,6 +2,7 @@ package OpenXPKI::Server::Database::Driver::MySQL;
 use Moose;
 use utf8;
 with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
+with 'OpenXPKI::Server::Database::Role::MergeSupport';
 with 'OpenXPKI::Server::Database::Role::Driver';
 
 =head1 Name
@@ -56,6 +57,29 @@ sub last_auto_id {
     my $row = $sth->fetchrow_arrayref
         or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
     return $row->[0];
+}
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::MergeSupport
+#
+
+sub merge_query {
+    my ($self, $dbi, $into, $set, $set_once, $where) = @_;
+    my %all_val  = ( %$set, %$set_once, %$where );
+
+    return OpenXPKI::Server::Database::Query->new(
+        string => sprintf(
+            "INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s",
+            $into,
+            join(", ", keys %all_val),
+            join(", ", map { "?" } (1..scalar keys %all_val)),
+            join(", ", map { "$_=?" } keys %$set),
+        ),
+        params => [
+            values %all_val,
+            values %$set,
+        ]
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

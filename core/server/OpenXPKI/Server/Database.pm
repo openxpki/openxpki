@@ -98,12 +98,18 @@ has '_dbix_handler' => (
     isa => 'DBIx::Handler',
     lazy => 1,
     builder => '_build_dbix_handler',
-    handles => {
-        start_txn => 'txn_begin',
-        commit => 'txn_commit',
-        rollback => 'txn_rollback',
-    },
     predicate => '_dbix_handler_initialized', # for test cases
+    handles => {
+        disconnect => 'disconnect',
+    },
+);
+
+# stores the caller() information about the code that started a transaction
+has '_txn_starter' => (
+    is => 'rw',
+    isa => 'Any',
+    clearer => '_clear_txn_starter',
+    predicate => 'in_txn',
 );
 
 ################################################################################
@@ -150,23 +156,36 @@ sub _build_driver {
 
 sub _build_dbix_handler {
     my $self = shift;
-    ##! 4: "DSN: ".$self->_dsn
-    ##! 4: "User: ".$self->user
-    ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$self->dbi_connect_attrs->{$_} } keys %{$self->dbi_connect_attrs}
-    my @params = $self->driver->dbi_connect_params; # use array to get list context
-    return DBIx::Handler->new(
+    ##! 4: "DSN: ".$self->driver->dbi_dsn
+    ##! 4: "User: ".($self->driver->user // '(none)')
+    my %params = $self->_driver_return_val_to_list(
+        [ $self->driver->dbi_connect_params ], # driver might return a list so we enforce list context
+        ref($self->driver)."::dbi_connect_params",
+    );
+    ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
+    my $dbix = DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
         $self->driver->passwd,
         {
-            RaiseError => 1,
+            RaiseError => 0,
+            PrintError => 0,
             AutoCommit => 0,
-            $self->_driver_return_val_to_list(
-                \@params,
-                ref($self->driver)."::dbi_connect_params",
-            )
+            LongReadLen => 10_000_000,
+            # on_connect_do is (also) called after fork():
+            # then we get a new DBI handle and a previous transaction is invalid
+            on_connect_do => sub { shift->_clear_txn_starter },
+            %params,
         }
+    ) or OpenXPKI::Exception->throw(
+        message => "Could not connect to database",
+        params => {
+            dbi_error => $DBI::errstr,
+            dsn => $self->driver->dbi_dsn,
+            user => $self->driver->user,
+        },
     );
+    return $dbix;
 }
 
 ################################################################################
@@ -217,14 +236,24 @@ sub run {
     else {
         $query_string = $query;
     }
-    ##! 2: "Query: " . $query_string;
-    my $sth = $self->dbh->prepare($query_string);
+    ##! 16: "Query: " . $query_string;
+    my $sth = $self->dbh->prepare($query_string)
+        or OpenXPKI::Exception->throw(
+            message => "Could not prepare SQL query",
+            params => {
+                query => $query_string,
+                dbi_error => $self->dbh->errstr,
+            },
+        );
     # bind parameters via SQL::Abstract::More to do some magic
     $self->sqlam->bind_params($sth, @{$query_params}) if $query_params;
     $sth->execute
         or OpenXPKI::Exception->throw(
             message => "Could not execute SQL query",
-            params => { dbi_error => $sth->errstr },
+            params => {
+                query => $query_string,
+                dbi_error => $sth->errstr,
+            },
         );
     return $sth;
 }
@@ -261,6 +290,37 @@ sub update {
     return $self->run($query);
 }
 
+# MERGE
+# Returns: DBI statement handle
+sub merge {
+    my ($self, %args) = validated_hash(\@_,   # MooseX::Params::Validate
+        into     => { isa => 'Str' },
+        set      => { isa => 'HashRef' },
+        set_once => { isa => 'HashRef', optional => 1, default => {} },
+        # The WHERE specification contains the primary key columns.
+        # In case of an INSERT these will be used as normal values. Therefore
+        # we only allow scalars as hash values (which are translated to AND
+        # connected "equals" conditions by SQL::Abstract::More).
+        where    => { isa => 'HashRef[Value]' },
+    );
+    my $query = $self->driver->merge_query(
+        $self,
+        $self->query_builder->_add_namespace_to($args{into}),
+        $args{set},
+        $args{set_once},
+        $args{where},
+    );
+    return $self->run($query);
+}
+
+# DELETE
+# Returns: DBI statement handle
+sub delete {
+    my $self = shift;
+    my $query = $self->query_builder->delete(@_);
+    return $self->run($query);
+}
+
 # Create a new insert ID ("serial")
 sub next_id {
     my ($self, $table) = @_;
@@ -268,7 +328,7 @@ sub next_id {
     # get new serial number from DBMS (SQL sequence or emulation via table)
     my $id_int = $self->driver->next_id($self, "seq_$table");
     my $id = Math::BigInt->new($id_int);
-    ##! 16: 'new serial no.: ' . $id->bstr()
+    ##! 32: 'Next ID: ' . $id->bstr()
 
     # shift bitwise left and add server id (default: 255)
     my $nodeid_bits = $self->db_params->{server_shift} // 8;
@@ -277,6 +337,38 @@ sub next_id {
     $id->bior(Math::BigInt->new($nodeid));
 
     return $id->bstr();
+}
+
+sub start_txn {
+    my $self = shift;
+    if ($self->in_txn) {
+        $self->log->error(
+            sprintf "start_txn() was called during a running transaction (started in %s, line %i). Most likely this error is caused by a missing commit() or exception handling without rollback()",
+            $self->_txn_starter->[1],
+            $self->_txn_starter->[2],
+        );
+        $self->rollback;
+    }
+    ##! 16: "Flagging a transaction start"
+    $self->_txn_starter([ caller ]);
+}
+
+sub commit {
+    my $self = shift;
+    $self->log->warn("commit() was called without indicating a transaction start via start_txn() first")
+        unless $self->in_txn;
+    ##! 16: "Commit of changes"
+    $self->dbh->commit;
+    $self->_clear_txn_starter;
+}
+
+sub rollback {
+    my $self = shift;
+    $self->log->warn("rollback() was called without indicating a transaction start via start_txn() first")
+        unless $self->in_txn;
+    ##! 16: "Rollback of changes"
+    $self->dbh->rollback;
+    $self->_clear_txn_starter;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -321,17 +413,17 @@ For more details see L<OpenXPKI::Server::Database::Role::Driver>.
     |  .------------------.
     '->| O:S:D::Driver::* |
        '------------------'
-                 .
-              consumes
-                 .      .---------------------.
-                 ......>| O:S:D::Role::Driver |
-                 .      '---------------------'
-                 .      .------------------------------.
-                 ......>| O:S:D::Role::SequenceSupport |
-                 .      '------------------------------'
-                 .      .--------------------------------.
-                 '.....>| O:S:D::Role::SequenceEmulation |
-                        '--------------------------------'
+         .
+       consumes
+         .    .---------------------.
+         ....>| O:S:D::Role::Driver |
+         .    '---------------------'
+         .    .------------------------------.    .--------------------------------.
+         ....>| O:S:D::Role::SequenceSupport | or | O:S:D::Role::SequenceEmulation |
+         .    '------------------------------'    '--------------------------------'
+         .    .------------------------------.    .--------------------------------.
+         '...>| O:S:D::Role::MergeSupport    | or | O:S:D::Role::MergeEmulation    |
+              '------------------------------'    '--------------------------------'
 
 =head1 Attributes
 
@@ -411,16 +503,6 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 =head2 insert
 
-Inserts the given data into the database.
-
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
-
-Returns the statement handle.
-
-Please note that Perl C<undef> will be converted to C<NULL>.
-
-=head2 insert
-
 Inserts rows into the database and returns the results as a I<DBI::st> statement
 handle.
 
@@ -437,39 +519,70 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 For parameters see L<OpenXPKI::Server::Database::QueryBuilder/update>.
 
-=head2 start_txn
+=head2 merge
 
-Starts a new transaction via C<$dbh-E<gt>begin_work>.
+Either directly executes or emulates an SQL MERGE (you could also call it
+REPLACE) function and returns the results as a I<DBI::st> statement handle.
 
-Transactions can be virtually nested, i.e. code with C<start_txn> and C<commit>
-can later be surrounded by another pair of these functions. The result is that
-only the outermost method calls will have any (database) effect.
-
-In other words: if this method is called again before any rollback or commit
-then:
+Named parameters:
 
 =over
 
-=item 1. the nesting level counter will be increased
+=item * B<into> - Table name (I<Str>, required)
 
-=item 2. B<no> action will be performed on the database
+=item * B<set> - Columns that are always set (INSERT or UPDATE). Hash with
+column name / value pairs.
+
+Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=item * B<set_once> - Columns that are only set on INSERT (additional to those
+in the C<where> parameter. Hash with column name / value pairs.
+
+Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=item * B<where> - WHERE clause specification that must contain the PRIMARY KEY
+columns and only allows "AND" and "equal" operators:
+C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
+
+The values from the WHERE clause are also inserted if the row does not exist
+(together with those from C<set_once>)!
 
 =back
+
+=head2 delete
+
+Deletes rows in the database and returns the results as a I<DBI::st> statement
+handle.
+
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/delete>.
+
+=head2 start_txn
+
+Records the start of a new transaction (i.e. sets a flag) without database
+interaction.
+
+If the flag was already set (= another transaction is running), a C<ROLLBACK> is
+performed first and an error message is logged.
+
+Please note that after a C<fork()> the flag is be reset as the C<DBI> handle
+is also reset (so there cannot be a running transaction).
+
+=head2 in_txn
+
+Returns C<true> if a transaction is currently running, i.e. after L</start_txn>
+was called but before L</commit> or L</rollback> where called.
 
 =head2 commit
 
 Commits a transaction.
 
-If currently in a nested transaction, decreases the nesting level counter.
-
-croaks if there was a rollback in a nested transaction.
+Logs an error if L</start_txn> was not called first.
 
 =head2 rollback
 
 Rolls back a transaction.
 
-If currently in a nested transaction, notes the rollback for later and decreases
-the nesting level counter.
+Logs an error if L</start_txn> was not called first.
 
 =cut
 
@@ -481,7 +594,7 @@ The following methods allow more fine grained control over the query processing.
 
 =head2 dbh
 
-Returns a fork safe DBI handle.
+Returns a fork safe DBI handle. Connects to the database if neccessary.
 
 To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute).
 
@@ -499,5 +612,10 @@ Parameters:
 or a literal SQL string)
 
 =back
+
+=head2 disconnect
+
+Disconnects from the database. Might be useful to e.g. remove file locks when
+using SQLite.
 
 =cut

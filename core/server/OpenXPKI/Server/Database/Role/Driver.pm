@@ -28,6 +28,7 @@ requires 'dbi_dsn';            # String: DSN parameters after "dbi:<driver>:"
 requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect()
 requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
 requires 'next_id';            # Int: next insert ID ("serial")
+requires 'merge_query';        # OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
 
 1;
 
@@ -36,9 +37,10 @@ requires 'next_id';            # Int: next insert ID ("serial")
     package OpenXPKI::Server::Database::Driver::MyDB2;
     use Moose;
     with 'OpenXPKI::Server::Database::Role::SequenceSupport';
+    with 'OpenXPKI::Server::Database::Role::MergeEmulation';
     with 'OpenXPKI::Server::Database::Role::Driver';
 
-    # required by OpenXPKI::Server::Database::Role::Driver    
+    # required by OpenXPKI::Server::Database::Role::Driver
     sub dbi_driver { 'DB2' }           # DBI compliant driver name
     sub dbi_dsn {                      # DSN string including all parameters.
         my $self = shift;
@@ -51,13 +53,13 @@ requires 'next_id';            # Int: next insert ID ("serial")
     sub sqlam_params { {               # Parameters for SQL::Abstract::More
         limit_offset => 'FetchFirst',
     } }
-    
+
     # required by OpenXPKI::Server::Database::Role::SequenceSupport
     sub nextval_query {                # SQL query to retrieve next sequence value
         my ($self, $seq) = @_;
         return "VALUES NEXTVAL FOR $seq";
     }
-    
+
     __PACKAGE__->meta->make_immutable;
 
 Then e.g. in your database.yaml:
@@ -87,9 +89,23 @@ To connect OpenXPKI to your (not yet supported) DBMS follow these steps:
 =over
 
 =item 1. Write a driver class in the C<OpenXPKI::Server::Database::Driver::*>
-namespace that consumes the Moose role L<OpenXPKI::Server::Database::Role::Driver>
-and one of the roles L<OpenXPKI::Server::Database::Role::SequenceEmulation> or
-L<OpenXPKI::Server::Database::Role::SequenceSupport>.
+namespace that consumes the following Moose roles:
+
+=over
+
+=item * L<OpenXPKI::Server::Database::Role::SequenceSupport> if your DBMS has native support for sequences,
+
+=item * L<OpenXPKI::Server::Database::Role::SequenceEmulation> otherwise.
+
+=item * L<OpenXPKI::Server::Database::Role::MergeSupport> if your DBMS has native support for some form of an SQL MERGE query (="REPLACE" = "UPSERT" = "INSERT or UPDATE"),
+
+=item * L<OpenXPKI::Server::Database::Role::MergeEmulation> otherwise.
+
+=item * L<OpenXPKI::Server::Database::Role::Driver>
+
+=back
+
+... and implement the methods that these roles require.
 
 =item 2. Reference your driver class by it's driver name (the last part after
 C<*::Driver::>, case sensitive) in your configuration file.
@@ -148,6 +164,32 @@ Parameters:
 =item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
 
 =item * B<$seq> - SQL sequence whose next value shall be returned (I<Str>, required)
+
+=back
+
+=head2 merge_query
+
+Builds a MERGE query (or emulates it by either an INSERT or an UPDATE query)
+and returns a L<OpenXPKI::Server::Database::Query> object which contains SQL
+string and bind parameters.
+
+Parameters:
+
+=over
+
+=item * B<$dbi> - the L<OpenXPKI::Server::Database> instance
+
+=item * B<$into> - Table name including schema (if applicable) (I<Str>, required)
+
+=item * B<$set> - Columns that are always set (INSERT or UPDATE). Hash with
+column name / value pairs.
+
+=item * B<$set_once> - Columns that are only set on INSERT (additional to those
+in the C<where> parameter. Hash with column name / value pairs.
+
+=item * B<$where> - WHERE clause specification that must contain the PRIMARY KEY
+columns and only allows "AND" and "equal" operators:
+C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
 
 =back
 

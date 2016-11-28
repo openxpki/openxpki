@@ -30,10 +30,6 @@ sub next_id {
 
 1;
 
-=head1 Synopsis
-
-=head1 Description
-
 =head1 Required methods in the consuming driver class
 
 =head2 last_auto_id

@@ -22,6 +22,7 @@ lives_ok { $log = OpenXPKI::Server::Log->new(CONFIG => catfile($basedir, "log4pe
 #
 package OpenXPKI::Server::Database::Driver::Oxitestdb;
 use Moose;
+with 'OpenXPKI::Server::Database::Role::MergeEmulation';
 with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
 with 'OpenXPKI::Server::Database::Role::Driver';
 sub dbi_driver { 'SQLite' }
