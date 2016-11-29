@@ -120,7 +120,7 @@ if ($openssl_version_major == 0 &&
 } elsif (not 
     ($openssl_version_flavour =~ m/OpenSSL/i &&
      $openssl_version_major == 1 &&
-     $openssl_version_minor == 0 )) {
+     $openssl_version_minor >= 0 )) {
          
     print STDERR "\n";
     print STDERR "ERROR: OpenSSL 0.9.8  or 1.0 is required.\n";
