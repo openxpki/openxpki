@@ -241,8 +241,6 @@ following values:
 
 =item * DER
 
-=item * PKCS7 - without the usual hash mark
-
 =item * TXT
 
 =item * HASH - the default value
@@ -253,6 +251,7 @@ following values:
 
 =cut
 
+# Test: qatest/backend/nice/10_nice_signing_request.t
 sub get_cert {
     ##! 1: "start"
     my ($self, $args) = @_;
