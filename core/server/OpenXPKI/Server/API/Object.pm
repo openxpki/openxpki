@@ -56,7 +56,6 @@ sub START {
 
 
 sub generate_key {
-
     ##! 1: "start"
     my $self = shift;
     my $args = shift;
@@ -80,26 +79,27 @@ sub generate_key {
          PASSWD     => $pass,
     };
 
-    my $pkeyopt;
     # Handling of pkeyopts for standard algorithms
     if ($params->{PKEYOPT} and ref $params->{PKEYOPT} eq 'HASH') {
-        $pkeyopt = $params->{PKEYOPT};
-    } elsif ($key_alg eq "rsa") {
-        if ($params->{KEY_LENGTH} and $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs) {
-            $pkeyopt->{rsa_keygen_bits} = $params->{KEY_LENGTH};
-        } else {
-            $pkeyopt->{rsa_keygen_bits} = 2048;
-        }
-    } elsif ($key_alg eq "ec") {
-
+        $command->{PKEYOPT} = $params->{PKEYOPT};
+    }
+    # RSA
+    elsif ($key_alg eq "rsa") {
+        my $rsa_bits = ($params->{KEY_LENGTH} and $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs)
+            ? $params->{KEY_LENGTH}
+            : 2048;
+        $command->{PKEYOPT} = { rsa_keygen_bits => $rsa_bits };
+    }
+    # EC
+    elsif ($key_alg eq "ec") {
         # With openssl <=1.0.1 you need to create EC the same way as DSA
         # means params and key in two steps
         # see http://openssl.6102.n7.nabble.com/EC-private-key-generation-problem-td47261.html
         if (!$params->{ECPARAM}) {
-            if (!$params->{CURVE_NAME}) {
-                OpenXPKI::Exception->throw( message =>
-                    'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_EC_REQUIRES_CURVE_NAME' );
-            }
+            OpenXPKI::Exception->throw(message =>
+                'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_EC_REQUIRES_CURVE_NAME')
+                unless $params->{CURVE_NAME};
+
             $params->{ECPARAM} = $token->command({
                 COMMAND => 'create_params',
                 TYPE    => 'EC',
@@ -107,48 +107,41 @@ sub generate_key {
             });
         }
 
-        if (!$params->{ECPARAM}) {
-            OpenXPKI::Exception->throw( message =>
-                'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_EC_PARAM' );
-        }
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_EC_PARAM' )
+            unless $params->{ECPARAM};
 
         delete $command->{KEY_ALG};
         $command->{PARAM} = $params->{ECPARAM};
-
-    } elsif ($key_alg eq "dsa") {
-
+    }
+    # DSA
+    elsif ($key_alg eq "dsa") {
         if (!$params->{DSAPARAM}) {
             # Generate Parameters
-            my $bits = 2048;
-            if ($params->{KEY_LENGTH} and $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs) {
-                $bits = $params->{KEY_LENGTH};
-            }
+            my $dsa_bits = ($params->{KEY_LENGTH} and $params->{KEY_LENGTH} =~ m{\A \d+ \z}xs)
+                ? $params->{KEY_LENGTH}
+                : 2048;
             $params->{DSAPARAM} = $token->command({
                 COMMAND => 'create_params',
                 TYPE    => 'DSA',
-                PKEYOPT => { dsa_paramgen_bits => $bits }
+                PKEYOPT => { dsa_paramgen_bits => $dsa_bits }
             });
         }
 
-        if (!$params->{DSAPARAM}) {
-            OpenXPKI::Exception->throw( message =>
-                'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM' );
-        }
+        OpenXPKI::Exception->throw( message =>
+            'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM' )
+            unless $params->{DSAPARAM};
 
         delete $command->{KEY_ALG};
         $command->{PARAM} = $params->{DSAPARAM};
     }
 
     CTX('log')->log(
-        MESSAGE  => "Creating private $key_alg key with params " . Dumper $pkeyopt,
+        MESSAGE  => "Creating private $key_alg key with params " . Dumper $command->{PKEYOPT},
         PRIORITY => 'debug',
         FACILITY => 'application',
     );
 
-    # append the pkeyopt if any
-    if ($pkeyopt) {
-        $command->{PKEYOPT} = $pkeyopt;
-    }
     ##! 16: 'command: ' . Dumper $command
 
     my $key = $token->command( $command );
