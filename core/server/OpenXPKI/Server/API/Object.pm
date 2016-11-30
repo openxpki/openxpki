@@ -448,41 +448,33 @@ sub get_cert_actions {
     ##! 1: "start"
     my ($self, $args) = @_;
 
-    my $role = $args->{ROLE} || CTX('session')->get_role();
-
-    my $cert_identifier = $args->{IDENTIFIER};
-
-    my $cert = CTX('api')->get_cert({ IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
+    my $role    = $args->{ROLE} || CTX('session')->get_role();
+    my $cert_id = $args->{IDENTIFIER};
+    my $cert    = CTX('api')->get_cert({ IDENTIFIER => $cert_id, FORMAT => 'DBINFO' });
+    ##! 2: "cert $cert_id, role $role"
 
     # check if this is a entity certificate from the current realm
-    if (!$cert->{CSR_SERIAL} or $cert->{PKI_REALM} ne CTX('session')->get_pki_realm()) {
-        ##! 16: "cert is not local entity"
-        return {};
-    }
+    return {} unless $cert->{CSR_SERIAL} and $cert->{PKI_REALM} eq CTX('session')->get_pki_realm();
 
     my $conn = CTX('config');
 
     my @actions;
-    if (CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_identifier })
-        and $conn->exists([ 'workflow', 'def', 'certificate_privkey_export', 'acl', $role, 'creator' ] )) {
-        push @actions, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY', workflow => 'certificate_privkey_export' };
-    }
+    push @actions, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY', workflow => 'certificate_privkey_export' }
+        if CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_id })
+        and $conn->exists([ 'workflow', 'def', 'certificate_privkey_export', 'acl', $role, 'creator' ] );
 
-    if (($cert->{STATUS} eq 'ISSUED' or $cert->{STATUS} eq 'EXPIRED')
-        and $conn->exists([ 'workflow', 'def', 'certificate_renewal_request', 'acl', $role, 'creator' ] )) {
-        push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW', workflow => 'certificate_renewal_request' };
-    }
-    if ($cert->{STATUS} eq 'ISSUED'
-        and $conn->exists([ 'workflow', 'def', 'certificate_revocation_request_v2', 'acl', $role, 'creator' ]) ) {
-        push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE', workflow => 'certificate_revocation_request_v2' };
-    }
-    if ($conn->exists([ 'workflow', 'def', 'change_metadata', 'acl', $role, 'creator' ] )) {
-        push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA', workflow => 'change_metadata' };
-    }
+    push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW', workflow => 'certificate_renewal_request' }
+        if ($cert->{STATUS} eq 'ISSUED' or $cert->{STATUS} eq 'EXPIRED')
+        and $conn->exists([ 'workflow', 'def', 'certificate_renewal_request', 'acl', $role, 'creator' ] );
+
+    push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE', workflow => 'certificate_revocation_request_v2' }
+        if $cert->{STATUS} eq 'ISSUED'
+        and $conn->exists([ 'workflow', 'def', 'certificate_revocation_request_v2', 'acl', $role, 'creator' ]);
+
+    push @actions, { label => 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA', workflow => 'change_metadata' }
+        if $conn->exists([ 'workflow', 'def', 'change_metadata', 'acl', $role, 'creator' ] );
 
     return { workflow => \@actions };
-
-
 }
 
 

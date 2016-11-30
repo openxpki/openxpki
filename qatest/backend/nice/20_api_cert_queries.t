@@ -24,6 +24,7 @@ Log::Log4perl->easy_init($WARN);
 
 use OpenXPKI::Test::More;
 use Test::More;
+use Test::Deep;
 use TestCfg;
 use utf8;
 
@@ -49,7 +50,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 3 );
+$test->plan( tests => 5 );
 
 $test->connect_ok(user => $cfg{user}{name}, password => $cfg{user}{password})
     or die "Error - connect failed: $@";
@@ -59,7 +60,26 @@ $test->connect_ok(user => $cfg{user}{name}, password => $cfg{user}{password})
 #
 
 # Fetch certificate profile
-$test->runcmd_ok('get_profile_for_cert', { IDENTIFIER => $cert_id }, "Get profile for certificate");
-$test->is($test->get_msg()->{PARAMS}, $cfg{csr}{profile}, "Certificate profile match");
+$test->runcmd_ok('get_profile_for_cert', { IDENTIFIER => $cert_id }, "Query profile for certificate");
+$test->is($test->get_msg()->{PARAMS}, $cfg{csr}{profile}, "Profile match");
+
+# Fetch possible certificate actions
+$test->runcmd_ok('get_cert_actions', { IDENTIFIER => $cert_id, ROLE => "User" }, "Query actions for certificate (role 'User')");
+cmp_deeply($test->get_msg()->{PARAMS}, superhashof({
+    workflow => superbagof(
+        {
+            'label' => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY',
+            'workflow' => 'certificate_privkey_export',
+        },
+        {
+            'label' => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE',
+            'workflow' => 'certificate_revocation_request_v2',
+        },
+        {
+            'label' => 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA',
+            'workflow' => 'change_metadata',
+        },
+    ),
+}), "Default actions exist");
 
 $test->disconnect();
