@@ -411,22 +411,17 @@ sub get_profile_for_cert {
     ##! 2: "initialize arguments"
     my $identifier = $args->{IDENTIFIER};
 
-
-    my %params = (
-        TABLE => [ 'CERTIFICATE', 'CSR' ],
-        COLUMNS => [ 'CSR.PROFILE' ],
-        JOIN => [ [ 'CSR_SERIAL', 'CSR_SERIAL' ] ],
-        DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
-    );
-    my $result = CTX('dbi_backend')->first(%params);
-    if ( ! defined $result ) {
-        OpenXPKI::Exception->throw(
+    my $result = CTX('dbi')->select_one(
+        from_join => 'certificate req_key=req_key csr',
+        columns => [ 'csr.profile' ],
+        where => { 'certificate.identifier' => $identifier },
+    )
+        or OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_PROFILE_FOR_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
-            params => { 'IDENTIFIER' => $identifier, },
+            params => { 'IDENTIFIER' => $identifier },
         );
-    }
 
-    return $result->{'CSR.PROFILE'};
+    return $result->{'profile'};
 
 }
 
