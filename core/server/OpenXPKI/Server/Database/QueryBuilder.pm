@@ -9,7 +9,7 @@ OpenXPKI::Server::Database::QueryBuilder - Programmatic interface to SQL queries
 
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Database::Query;
-use MooseX::Params::Validate;
+use OpenXPKI::Server::Database::Util;
 use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
 
 ################################################################################
@@ -37,7 +37,7 @@ has 'namespace' => ( # database namespace (i.e. schema) to prepend to tables
 # one part of the table name)
 sub _add_namespace_to {
     my $self = shift;
-    my ($obj_param) = pos_validated_list(\@_,
+    my ($obj_param) = positional_args(\@_, # OpenXPKI::Server::Database::Util
         { isa => 'Str | ArrayRef[Str]' },
     );
     # no namespace defined
@@ -53,7 +53,7 @@ sub _add_namespace_to {
 # Calls the given SQL::Abstract::More method after converting the parameters.
 # Sets $self->sql_str and $self->sql_params
 sub _make_query {
-    my ($self, %args) = validated_hash(\@_,   # MooseX::args::Validate
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::Server::Database::Util
         method    => { isa => 'Str' },
         args      => { isa => 'HashRef' },
         query_obj => { isa => 'OpenXPKI::Server::Database::Query', optional => 1 },
@@ -74,7 +74,7 @@ sub _make_query {
 }
 
 sub select {
-    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
         columns   => { isa => 'ArrayRef[Str]' },
         from      => { isa => 'Str | ArrayRef[Str]', optional => 1 },
         from_join => { isa => 'Str', optional => 1 },
@@ -88,7 +88,10 @@ sub select {
 
     # FIXME order_by: if ArrayRef then check for "asc" and "desc" as they are reserved words (https://metacpan.org/pod/SQL::Abstract::More#select)
 
-    OpenXPKI::Exception->throw (message => "You must provide either 'from' or 'from_join'")
+    OpenXPKI::Exception->throw(message => "There must be at least one column name in 'columns'")
+        unless scalar @{$params{'columns'}} > 0;
+
+    OpenXPKI::Exception->throw(message => "Either 'from' or 'from_join' must be specified")
         unless ($params{'from'} or $params{'from_join'});
 
     # Add namespace to table name
@@ -127,7 +130,7 @@ sub select {
 }
 
 sub insert {
-    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
         into     => { isa => 'Str' },
         values   => { isa => 'HashRef' },
     );
@@ -139,7 +142,7 @@ sub insert {
 }
 
 sub update {
-    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
         table => { isa => 'Str' },
         set   => { isa => 'HashRef' },
         where => { isa => 'Str | ArrayRef | HashRef' }, # require WHERE clause to prevent accidential updates on all rows
@@ -151,15 +154,15 @@ sub update {
 }
 
 sub delete {
-    my ($self, %params) = validated_hash(\@_,   # MooseX::Params::Validate
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
         from      => { isa => 'Str' },
         where     => { isa => 'Str | ArrayRef | HashRef', optional => 1 },
         all       => { isa => 'Bool', optional => 1 },
     );
-    OpenXPKI::Exception->throw (message => "You must provide either 'where' or 'all' parameter")
+    OpenXPKI::Exception->throw(message => "Either 'where' or 'all' must be specified")
         unless ($params{'where'} or $params{'all'});
 
-    OpenXPKI::Exception->throw (message => "Empty parameter 'where' not allowed, use 'all' to enforce deletion of all rows")
+    OpenXPKI::Exception->throw(message => "Empty parameter 'where' not allowed, use 'all' to enforce deletion of all rows")
         if ($params{'where'} and (
             ( ref $params{'where'} eq "ARRAY" and not scalar @{$params{'where'}} )
             or

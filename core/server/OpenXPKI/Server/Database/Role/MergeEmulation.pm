@@ -9,8 +9,6 @@ query
 
 =cut
 
-use MooseX::Params::Validate;
-
 ################################################################################
 # Required in drivers classes that consume this role
 #
