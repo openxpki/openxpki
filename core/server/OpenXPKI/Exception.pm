@@ -15,37 +15,32 @@ use Log::Log4perl qw( get_logger );
 
 use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (
-    "OpenXPKI::Exception" =>
-    {
+    "OpenXPKI::Exception" => {
         fields => [ "children", "params" ],
     }
 );
 
 my $log4perl_logger;
 
-sub full_message
-{
+sub full_message {
     my ($self) = @_;
 
     ## respect child errors
-    if (ref $self->{children})
-    {
-        foreach my $child (@{$self->{children}})
-        {
+    if (ref $self->{children}) {
+        foreach my $child (@{$self->{children}}) {
             next if (not $child); ## empty array
             $self->{params}->{"ERRVAL"} .= " " if ($self->{params}->{"ERRVAL"});
-            if (ref $child)
-            {
+            if (ref $child) {
                 $self->{params}->{"ERRVAL"} .= $child->as_string();
-            } else {
+            }
+            else {
                 $self->{params}->{"ERRVAL"} = $self->{child};
             }
         }
     }
 
     ## enforce __NAME__ scheme
-    foreach my $param (sort keys %{$self->{params}})
-    {
+    foreach my $param (sort keys %{$self->{params}}) {
         my $value = $self->{params}->{$param};
         delete $self->{params}->{$param};
         $param =~s/^_*/__/;
@@ -55,15 +50,12 @@ sub full_message
 
     ## put together and translate message
     my $msg = OpenXPKI::i18n::i18nGettext ($self->{message}, %{$self->{params}});
-    if ($msg eq $self->{message})
-    {
+    if ($msg eq $self->{message}) {
         # the message was not translated
-        if (scalar keys %{$self->{params}})
-        {
+        if (scalar keys %{$self->{params}}) {
             # normalize the output => sort keys
             # otherwise the output is not predictable
-            foreach my $key (sort keys %{$self->{params}})
-            {
+            foreach my $key (sort keys %{$self->{params}}) {
                 $msg = $msg.", ".$key." => ".$self->{params}->{$key};
             }
         }
@@ -77,7 +69,7 @@ sub full_message
     return $msg;
 }
 
-sub message_code{
+sub message_code {
     my $self = shift;
     return $self->{message};
 }
@@ -87,66 +79,53 @@ sub throw {
 
     $proto->rethrow if ref $proto;
 
-    my %args = ( @_ );
+    my %args           = (@_);
     my %exception_args = %args;
     delete $exception_args{log};
-    
-#    # This is a bit of an evil hack until Exception::Class supports
-#    # turning off stack traces, see
-#    # http://rt.cpan.org/Ticket/Display.html?id=26489
-#    # for a bug report and patch
-#    # It fakes the Devel::StackTrace calls that are used in
-#    # Exception::Class to be nearly empty, which massively speeds up
-#    # Exception throwing
-#    local *Devel::StackTrace::new
-#        = *OpenXPKI::Exception::__fake_stacktrace_new;
-#    local *Devel::StackTrace::frame
-#        = *OpenXPKI::Exception::__fake_stacktrace_frame;
+
+    #    # This is a bit of an evil hack until Exception::Class supports
+    #    # turning off stack traces, see
+    #    # http://rt.cpan.org/Ticket/Display.html?id=26489
+    #    # for a bug report and patch
+    #    # It fakes the Devel::StackTrace calls that are used in
+    #    # Exception::Class to be nearly empty, which massively speeds up
+    #    # Exception throwing
+    #    local *Devel::StackTrace::new
+    #        = *OpenXPKI::Exception::__fake_stacktrace_new;
+    #    local *Devel::StackTrace::frame
+    #        = *OpenXPKI::Exception::__fake_stacktrace_frame;
 
     my $self = $proto->new(%exception_args);
 
-
     my %logger_args = (
-	MESSAGE     => 'Exception: ' . $self->full_message(%args),
-	FACILITY    => 'system',
-	PRIORITY    => 'debug',
-	CALLERLEVEL => 1,
-	);
+        MESSAGE     => 'Exception: ' . $self->full_message(%args),
+        FACILITY    => 'system',
+        PRIORITY    => 'debug',
+        CALLERLEVEL => 1,
+    );
 
-    
-    if (exists $args{log}) {
-	# log => undef means: do not log at all
-	if (defined $args{log}) {
-	    if (exists $args{log}->{message}) {
-		$logger_args{MESSAGE} = $args{log}->{message};
-	    }
-	    
-	    if (exists $args{log}->{facility}) {
-		$logger_args{FACILITY} = $args{log}->{facility};
-	    }
-	    
-	    if (exists $args{log}->{priority}) {
-		$logger_args{PRIORITY} = $args{log}->{priority};
-	    }
+    # exceptions get logged by default if no "log" given
+    unless (exists $args{log}) {
+        __log(%logger_args);
+        die $self;
+    }
+    # suppress logging if "log => undef"
+    unless (defined $args{log}) {
+        die $self;
+    }
 
-	    # logger object was explicitly specified
-	    if (exists $args{log}->{logger}
-		&& (ref $args{log}->{logger} eq 'OpenXPKI::Server::Log')) {
-		
-		$args{log}->{logger}->log(
-		    %logger_args,
-		    );
-		
-		delete $args{log};
-	    } else {
-                __log(%logger_args);
-	    }
-	} else {
-	    # no OpenXPKI logger specified, do not log at all
-	    ##! 1: 'suppressed log message: ' . $logger_args{MESSAGE}
-	}
-    } else {
-	# exceptions get logged by default
+    $logger_args{MESSAGE}  = $args{log}->{message}  if exists $args{log}->{message};
+    $logger_args{FACILITY} = $args{log}->{facility} if exists $args{log}->{facility};
+    $logger_args{PRIORITY} = $args{log}->{priority} if exists $args{log}->{priority};
+
+    # logger object was explicitly specified
+    if ( exists $args{log}->{logger}
+        and ( ref $args{log}->{logger} eq 'OpenXPKI::Server::Log' ) ) {
+        $args{log}->{logger}->log(%logger_args);
+        delete $args{log};
+    }
+    # standard logging
+    else {
         __log(%logger_args);
     }
 
@@ -164,7 +143,8 @@ sub __log {
     if (defined $logger) {
         # we have an OpenXPKI logger available
         $logger->log(%logger_args);
-    } else {
+    }
+    else {
         # no system logger found, falling back to Log4perl
         $log4perl_logger ||= get_logger('openxpki.system');
         $log4perl_logger->debug($logger_args{MESSAGE});
@@ -186,24 +166,6 @@ sub __fake_stacktrace_frame {
     ##! 16: 'fake_stacktrace_frame called'
     return 0;
 }
-
-#sub get_errno
-#{
-#    ## the normal name errno is not possible
-#    ## errno results in a redefinition warning
-#    my $self = shift;
-#    if ($self->{errno})
-#    {
-#        return $self->{errno};
-#    } else {
-#        if ($self->{child} and ref $self->{child})
-#        {
-#            return $self->{child}->errno();
-#        } else {
-#            return;
-#        }
-#    }
-#}
 
 1;
 __END__
