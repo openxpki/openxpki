@@ -448,7 +448,7 @@ sub get_cert_actions {
     ##! 1: "start"
     my ($self, $args) = @_;
 
-    my $role = $args->{ROLE} or CTX('session')->get_role();
+    my $role = $args->{ROLE} || CTX('session')->get_role();
 
     my $cert_identifier = $args->{IDENTIFIER};
 
@@ -502,7 +502,7 @@ sub is_certificate_owner {
     ##! 1: "start"
     my ($self, $args) = @_;
 
-    my $user = $args->{USER} or CTX('session')->get_user();
+    my $user = $args->{USER} || CTX('session')->get_user();
     my $cert_identifier = $args->{IDENTIFIER};
 
     my $res_attrib = CTX('dbi_backend')->first(
