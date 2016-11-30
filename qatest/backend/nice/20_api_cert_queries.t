@@ -50,7 +50,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 5 );
+$test->plan( tests => 9 );
 
 $test->connect_ok(user => $cfg{user}{name}, password => $cfg{user}{password})
     or die "Error - connect failed: $@";
@@ -81,5 +81,11 @@ cmp_deeply($test->get_msg()->{PARAMS}, superhashof({
         },
     ),
 }), "Default actions exist");
+
+# Check owner
+$test->runcmd_ok('is_certificate_owner', { IDENTIFIER => $cert_id, USER => "user" }, "Query certificate owner");
+$test->ok($test->get_msg()->{PARAMS}, "Identify correct user as owner");
+$test->runcmd_ok('is_certificate_owner', { IDENTIFIER => $cert_id, USER => "nero" }, "Query certificate owner");
+$test->nok($test->get_msg()->{PARAMS}, "Do not identify wrong user as owner");
 
 $test->disconnect();

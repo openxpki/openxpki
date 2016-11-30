@@ -495,23 +495,21 @@ sub is_certificate_owner {
     my ($self, $args) = @_;
 
     my $user = $args->{USER} || CTX('session')->get_user();
-    my $cert_identifier = $args->{IDENTIFIER};
+    my $cert_id = $args->{IDENTIFIER};
 
-    my $res_attrib = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            IDENTIFIER => { VALUE => $cert_identifier },
-            ATTRIBUTE_KEY => 'system_cert_owner',
+    my $result = CTX('dbi')->select_one(
+        from => 'certificate_attributes',
+        columns => [ 'attribute_value' ],
+        where => {
+            identifier => $cert_id,
+            attribute_contentkey => 'system_cert_owner',
         },
     );
 
-    if (!$res_attrib) {
-        ##! 16: "no result"
-        return undef;
-    }
-    ##! 16: "compare $user ?= " . $res_attrib->{ATTRIBUTE_VALUE}
-    return ($res_attrib->{ATTRIBUTE_VALUE} eq $user);
+    return undef unless $result;
 
+    ##! 16: "compare $user ?= " . $result->{attribute_value}
+    return ($result->{attribute_value} eq $user);
 }
 
 =head2 get_crl
