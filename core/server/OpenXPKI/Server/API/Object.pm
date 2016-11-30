@@ -255,82 +255,112 @@ following values:
 sub get_cert {
     ##! 1: "start"
     my ($self, $args) = @_;
+    my $dbi = CTX('dbi');
 
-    ##! 2: "initialize arguments"
     my $identifier = $args->{IDENTIFIER};
-    my $format     = "HASH";
-    $format = $args->{FORMAT} if exists $args->{FORMAT};
+    my $format     = $args->{FORMAT} // "HASH";
+    ##! 2: "Requested output format: $format"
 
-    ##! 2: "load hash and serialize it"
-    # get current DB state
-    CTX('dbi_backend')->commit();
-    my $hash = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
-    );
-    if ( !defined $hash ) {
-        OpenXPKI::Exception->throw(
+    ##! 2: "Fetching certificate from database"
+    $dbi->commit;
+    my $cert = $dbi->select_one(
+        columns => [ '*' ],
+        from => 'certificate',
+        where => { 'identifier' => $identifier },
+    )
+        or OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
             params => { 'IDENTIFIER' => $identifier, },
         );
-    }
 
+    #
+    # Format: "DBINFO"
+    #
     if ( $format eq 'DBINFO' ) {
-        delete $hash->{DATA};
-        my $res_attrib = CTX('dbi_backend')->select(
-            TABLE   => 'CERTIFICATE_ATTRIBUTES',
-            DYNAMIC => { IDENTIFIER => { VALUE => $identifier }, },
-        );
+        ##! 2: "Preparing output for DBINFO format"
+        delete $cert->{data};
 
         # Hex Serial
-        my $serial = Math::BigInt->new( $hash->{CERTIFICATE_SERIAL} );
-        $hash->{CERTIFICATE_SERIAL_HEX} = $serial->as_hex();
-        $hash->{CERTIFICATE_SERIAL_HEX} =~ s{\A 0x}{}xms;
+        my $serial = Math::BigInt->new($cert->{cert_key});
+        $cert->{cert_key_hex} = $serial->as_hex;
+        $cert->{cert_key_hex} =~ s{\A 0x}{}xms;
 
         # Expired Status
-        if ($hash->{STATUS} eq 'ISSUED' and $hash->{NOTAFTER} < time()) {
-            $hash->{STATUS} = 'EXPIRED';
+        $cert->{status} = 'EXPIRED' if $cert->{status} eq 'ISSUED' and $cert->{notafter} < time();
+
+        # Fetch certificate attributes
+        $cert->{cert_attributes} = {};
+        my $cert_attr = $dbi->select(
+            columns => [ qw(
+                attribute_contentkey
+                attribute_value
+            ) ],
+            from => 'certificate_attributes',
+            where => { identifier => $identifier },
+        );
+        while (my $attr = $cert_attr->fetchrow_hashref) {
+            my $key = $attr->{attribute_contentkey};
+            my $val = $attr->{attribute_value};
+            $cert->{cert_attributes}->{$key} //= [];
+            push @{$cert->{cert_attributes}->{$key}}, $val;
         }
 
-        my $attrib;
-        foreach my $item (@$res_attrib ) {
-            my $key = $item->{ATTRIBUTE_KEY};
-            my $val = $item->{ATTRIBUTE_VALUE};
-            if (!defined($attrib->{$key})) {
-                $attrib->{$key} = [];
-            }
-            push @{$attrib->{$key}}, $val;
-        }
 
-        $hash->{CERT_ATTRIBUTES} = $attrib;
-        return $hash;
+        # TODO #legacydb Mapping for compatibility to old DB layer
+        $cert = {
+            'AUTHORITY_KEY_IDENTIFIER'  => $cert->{authority_key_identifier},
+            'CERT_ATTRIBUTES'           => $cert->{cert_attributes},
+            'CERTIFICATE_SERIAL'        => $cert->{cert_key},
+            'CERTIFICATE_SERIAL_HEX'    => $cert->{cert_key_hex},
+            'CSR_SERIAL'                => $cert->{req_key},
+            'IDENTIFIER'                => $cert->{identifier},
+            'ISSUER_DN'                 => $cert->{issuer_dn},
+            'ISSUER_IDENTIFIER'         => $cert->{issuer_identifier},
+            'LOA'                       => $cert->{loa},
+            'NOTAFTER'                  => $cert->{notafter},
+            'NOTBEFORE'                 => $cert->{notbefore},
+            'PKI_REALM'                 => $cert->{pki_realm},
+            'PUBKEY'                    => $cert->{public_key},
+            'STATUS'                    => $cert->{status},
+            'SUBJECT'                   => $cert->{subject},
+            'SUBJECT_KEY_IDENTIFIER'    => $cert->{subject_key_identifier},
+        };
+
+
+        return $cert;
     }
 
+    ##! 2: "Requesting crypto token via API and creating X509 object"
     my $token = CTX('api')->get_default_token();
     my $obj   = OpenXPKI::Crypto::X509->new(
         TOKEN => $token,
-        DATA  => $hash->{DATA}
+        DATA  => $cert->{data},
     );
 
-    ##! 2: "return if a HASH reference was requested"
+    #
+    # Format: "HASH"
+    #
     if ( $format eq 'HASH' ) {
-        ##! 16: 'status: ' . $hash->{STATUS}
-        my $return_ref = $obj->get_parsed_ref();
+        ##! 2: "Preparing output for HASH format"
+        my $result = $obj->get_parsed_ref;
 
         # NOTBEFORE and NOTAFTER are DateTime objects, which we do
         # not want to be serialized, so we just send out the stringified
         # version ...
-        $return_ref->{BODY}->{NOTBEFORE} = $return_ref->{BODY}->{NOTBEFORE}->epoch();
-        $return_ref->{BODY}->{NOTAFTER}  = $return_ref->{BODY}->{NOTAFTER}->epoch();
-        $return_ref->{STATUS}            = $hash->{STATUS};
-        $return_ref->{IDENTIFIER}        = $hash->{IDENTIFIER};
-        $return_ref->{ISSUER_IDENTIFIER} = $hash->{ISSUER_IDENTIFIER};
-        $return_ref->{CSR_SERIAL}        = $hash->{CSR_SERIAL};
-        $return_ref->{PKI_REALM}         = $hash->{PKI_REALM};
-        return $return_ref;
+        $result->{BODY}->{NOTBEFORE} = $result->{BODY}->{NOTBEFORE}->epoch();
+        $result->{BODY}->{NOTAFTER}  = $result->{BODY}->{NOTAFTER}->epoch();
+        $result->{STATUS}            = $cert->{status};
+        $result->{IDENTIFIER}        = $cert->{identifier};
+        $result->{ISSUER_IDENTIFIER} = $cert->{issuer_identifier};
+        $result->{CSR_SERIAL}        = $cert->{req_key};
+        $result->{PKI_REALM}         = $cert->{pki_realm};
+        return $result;
     }
 
-    ##! 1: "finished"
+    #
+    # Format: "PEM", "DER", "TXT"
+    #
+    ##! 2: "Converting X509 object into target format"
     return $obj->get_converted($format);
 }
 

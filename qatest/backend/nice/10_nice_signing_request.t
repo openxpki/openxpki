@@ -162,6 +162,8 @@ $test->connect_ok(
 my $cert_id = $test->param( 'cert_identifier' );
 my ($tmp, $tmp_name);
 
+diag "Test certificate ID: $cert_id";
+
 # Fetch certificate - HASH Format
 $test->runcmd_ok('get_cert', { IDENTIFIER => $cert_id, FORMAT => 'HASH' }, "Fetch certificate (HASH)");
 my $params = $test->get_msg()->{PARAMS};
