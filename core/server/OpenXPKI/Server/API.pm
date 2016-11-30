@@ -513,6 +513,11 @@ sub BUILD {
                     regex    => $re_integer_string,
                     optional => 1,
                 },
+                CRL_KEY => {
+                    type     => SCALAR,
+                    regex    => $re_integer_string,
+                    optional => 1,
+                },
                 FORMAT => {
                     type     => SCALAR,
                     optional => 1,

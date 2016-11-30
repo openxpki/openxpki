@@ -93,7 +93,7 @@ sub init_list {
     $self->logger()->debug("result: " . Dumper $crl_list);
 
     $self->_page({
-        label => 'Revocation Lists for ' . $self->_escape($crl_list->[0]->{BODY}->{'ISSUER'}),
+        label => 'I18N_OPENXPKI_UI_CRL_LIST_FOR_ISSUER ' . $self->_escape($crl_list->[0]->{BODY}->{'ISSUER'}),
     });
 
     my @result;
@@ -103,6 +103,7 @@ sub init_list {
             $crl->{BODY}->{'LAST_UPDATE'},
             $crl->{BODY}->{'NEXT_UPDATE'},
             $crl->{BODY}->{'ITEMCNT'},
+            $crl->{'crl_key'},
         ];
     }
 
@@ -111,21 +112,22 @@ sub init_list {
         className => 'crl',
         content => {
             actions => [{
-                label => 'view details in browser',
-                path => 'crl!detail!serial!{serial}',
+                label => 'I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER',
+                path => 'crl!detail!crl_key!{crl_key}',
                 target => 'modal',
             }],
             columns => [
-                { sTitle => "serial" },
-                { sTitle => "created", format => 'timestamp'},
-                { sTitle => "expires", format => 'timestamp'},
-                { sTitle => "items"},
+                { sTitle => "I18N_OPENXPKI_UI_CRL_SERIAL" },
+                { sTitle => "I18N_OPENXPKI_UI_CRL_LAST_UPDATE", format => 'timestamp'},
+                { sTitle => "I18N_OPENXPKI_UI_CRL_NEXT_UPDATE", format => 'timestamp'},
+                { sTitle => "I18N_OPENXPKI_UI_CRL_ITEMCNT"},
+                { sTitle => 'crl_key', bVisible =>  0 }
             ],
             data => \@result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             buttons => [{
                 page => 'crl!index',
-                label  => 'back to overview',
+                label  => 'I18N_OPENXPKI_UI_CRL_BACK_TO_LIST',
             }]
         },
     });
@@ -139,16 +141,16 @@ sub init_detail {
     my $self = shift;
     my $args = shift;
 
-    my $crl_serial = $self->param('serial');
+    my $crl_key = $self->param('crl_key');
 
     my $crl_hash = $self->send_command( 'get_crl', {
-        SERIAL => $crl_serial,
+        CRL_KEY => $crl_key,
         FORMAT => 'HASH'
     });
     $self->logger()->debug("result: " . Dumper $crl_hash);
 
     $self->_page({
-        label => 'Certificate Revocation List #' . $crl_hash->{SERIAL},
+        label => 'I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL #' . $crl_hash->{SERIAL},
         shortlabel => 'CRL #' . $crl_hash->{BODY}->{SERIAL},
     });
 
@@ -173,15 +175,15 @@ sub init_download {
 
     my $cert_identifier = $self->param('identifier');
     my $format = $self->param('format');
-    my $crl_serial = $self->param('serial');
+    my $crl_key = $self->param('crl_key');
 
      # No format, draw a list
     if (!$format || $format !~ /(pem|txt|der)/i) {
-        $self->redirect('crl!detail!serial'.$crl_serial);
+        $self->redirect('crl!detail!crl_key!'.$crl_key);
     }
 
     my $data = $self->send_command( 'get_crl', {
-        SERIAL => $crl_serial,
+        CRL_KEY => $crl_key,
         FORMAT => uc($format)
     });
 
@@ -202,15 +204,15 @@ sub __print_detail {
     my $crl_hash = shift;
 
     my @fields = (
-        { label => 'Serial', value => $crl_hash->{BODY}->{'SERIAL'} },
-        { label => 'Issuer',  value => $crl_hash->{BODY}->{'ISSUER'} } ,
-        { label => 'Created', value => $crl_hash->{BODY}->{'LAST_UPDATE'}, format => 'timestamp'  },
-        { label => 'Expires', value => $crl_hash->{BODY}->{'NEXT_UPDATE'} ,format => 'timestamp' },
-        { label => 'Items', value => $crl_hash->{BODY}->{'ITEMCNT'} },
+        { label => 'I18N_OPENXPKI_UI_CRL_SERIAL', value => $crl_hash->{BODY}->{'SERIAL'} },
+        { label => 'I18N_OPENXPKI_UI_CRL_ISSUER',  value => $crl_hash->{BODY}->{'ISSUER'} } ,
+        { label => 'I18N_OPENXPKI_UI_CRL_LAST_UPDATE', value => $crl_hash->{BODY}->{'LAST_UPDATE'}, format => 'timestamp'  },
+        { label => 'I18N_OPENXPKI_UI_CRL_NEXT_UPDATE', value => $crl_hash->{BODY}->{'NEXT_UPDATE'} ,format => 'timestamp' },
+        { label => 'I18N_OPENXPKI_UI_CRL_ITEMCNT', value => $crl_hash->{BODY}->{'ITEMCNT'} },
     );
 
-    my $crl_serial = $crl_hash->{BODY}->{'SERIAL'};
-    my $base =  $self->_client()->_config()->{'scripturl'} . "?page=crl!download!serial!$crl_serial!format!";
+    my $crl_key = $crl_hash->{crl_key};
+    my $base =  $self->_client()->_config()->{'scripturl'} . "?page=crl!download!crl_key!$crl_key!format!";
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
 
     push @fields, { label => 'Download', value => '<ul class="list-unstyled">'.

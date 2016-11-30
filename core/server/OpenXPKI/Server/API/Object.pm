@@ -522,8 +522,8 @@ sub is_certificate_owner {
 
 =head2 get_crl
 
-returns a CRL. The possible parameters are SERIAL, FORMAT and PKI_REALM.
-SERIAL is the serial of the database table, the realm defaults to the
+returns a CRL. The possible parameters are CRL_KEY, FORMAT and PKI_REALM.
+CRL_KEY is the serial of the database table, the realm defaults to the
 current realm and the default format is PEM. Other formats are DER, TXT
 HASH, FULLHASH or DBINFO. DBINFO returns the fields directly from the 
 database without parsing the CRL. HASH returns the result of 
@@ -542,7 +542,8 @@ sub get_crl {
     my $args = shift;
 
     ##! 2: "initialize arguments"
-    my $serial    = $args->{SERIAL};
+    my $serial    = $args->{SERIAL}; # deprecates, use crl_key instead!
+    my $crl_key    = $args->{CRL_KEY};
     my $pki_realm = $args->{PKI_REALM};
     my $format   = "PEM";
 
@@ -553,15 +554,25 @@ sub get_crl {
 
     my $columns = ($format eq 'DBINFO') ? 
         [ 'pki_realm', 'last_update', 'next_update', 'crl_key', 'publication_date', 'issuer_identifier' ] : 
-        [ 'pki_realm', 'data' ];
+        [ 'pki_realm', 'data','crl_key' ];
 
     if ($serial) {
+        $crl_key = $serial;
+            
+        CTX('log')->log(
+            MESSAGE  => "Call to get_crl using deprecated parameter 'serial', please use 'crl_key'!",
+            PRIORITY => 'warn',
+            FACILITY => 'application',
+        );
+    }
+
+    if ($crl_key) {
         ##! 16: 'Load crl by serial ' . $serial       
         $db_results = CTX('dbi')->select_one(
             from => 'crl',
             columns => $columns,
             where => {
-                'crl_key' => $serial,
+                'crl_key' => $crl_key,
             },
         );
         
@@ -627,6 +638,7 @@ sub get_crl {
         );
         $output = $crl_obj->get_parsed_ref();
         $output->{ISSUER_IDENTIFIER} = $db_results->{issuer_identifier};
+        $output->{crl_key} = $db_results->{crl_key};
 
     } else {
         $output = $pem_crl;
@@ -680,54 +692,48 @@ sub get_crl_list {
 
     my $limit = $keys->{LIMIT} || 25;
 
-    my %dynamic = ();
+    my %where = ();
   
     if ($keys->{VALID_AT}) {
-        $dynamic{'LAST_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'LESS_THAN'};
-        $dynamic{'NEXT_UPDATE'} = { VALUE => $keys->{VALID_AT}, OPERATOR => 'GREATER_THAN'};
+        $where{'last_update'} = { '<', $keys->{VALID_AT} };
+        $where{'next_update'} = {  '>', $keys->{VALID_AT} };
     }
 
     if ($keys->{ISSUER}) {
-        $dynamic{'ISSUER_IDENTIFIER'} = { VALUE => $keys->{ISSUER} };
+        $where{'issuer_identifier'} = $keys->{ISSUER};
     } else {
-        $dynamic{'PKI_REALM'} = { VALUE => $pki_realm };
+        $where{'pki_realm'} = $pki_realm;
     }
 
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE   => 'CRL',
-        COLUMNS => [
-            'ISSUER_IDENTIFIER',
-            'DATA',
-            'LAST_UPDATE',
-            'NEXT_UPDATE',
-            'PUBLICATION_DATE',
-        ],
-        DYNAMIC => \%dynamic,
-        'ORDER' => [ 'LAST_UPDATE' ],
-        'REVERSE' => 1,
-        LIMIT => $limit,
+    my $db_results = CTX('dbi')->select(
+        from => 'crl',
+        columns => ['issuer_identifier','data','last_update','next_update','publication_date','crl_key'],
+        where => \%where,
+        order_by => '-last_update',
+        limit => $limit,
     );
 
     my @result;
 
     if ($format eq 'HASH') {
         my $default_token = CTX('api')->get_default_token();
-        foreach my $entry (@{ $db_results }) {
+        
+        while (my $entry = $db_results->fetchrow_hashref) {
             my $crl_obj = OpenXPKI::Crypto::CRL->new(
                 TOKEN => $default_token,
-                DATA  => $entry->{DATA},
+                DATA  => $entry->{data},
             );
-            push @result, $crl_obj->get_parsed_ref();
+            push @result, { %{$crl_obj->get_parsed_ref()}, 'crl_key' => $entry->{crl_key} };
         }
 
     } elsif ( $format eq 'DER' || $format eq 'TXT' ) {
         my $default_token = CTX('api')->get_default_token();
-        foreach my $entry (@{ $db_results }) {
+        while (my $entry = $db_results->fetchrow_hashref) {
             my $output = $default_token->command({
                 COMMAND => 'convert_crl',
                 OUT     => $format,
                 IN      => 'PEM',
-                DATA    => $entry->{DATA},
+                DATA    => $entry->{data},
             });
             if (!$output) {
                 OpenXPKI::Exception->throw(
@@ -740,12 +746,14 @@ sub get_crl_list {
         }
 
     } elsif($format eq 'PEM') {
-        foreach my $entry (@{ $db_results }) {
-            push @result, $entry->{DATA};
+        while (my $entry = $db_results->fetchrow_hashref) {
+            push @result, $entry->{data};
         }
 
     } else {
-        foreach my $entry (@{ $db_results }) {
+        while (my $entry = $db_results->fetchrow_hashref) {
+            # TODO Remove after SQL Layer migration is complete
+            %{$entry} = map { uc($_) => $entry->{$_} }  keys %{$entry};
             push @result, $entry;
         }
     }
