@@ -46,7 +46,7 @@ sub START {
 
 # API: simple retrieval functions
 
-=head2 get_default_token( { PKI_REALM } )
+=head2 get_default_token()
 
 Return the default token from the system namespace.
 
