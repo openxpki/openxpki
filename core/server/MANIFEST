@@ -188,14 +188,16 @@ OpenXPKI/Server/Database.pm
 OpenXPKI/Server/Database/Query.pm
 OpenXPKI/Server/Database/QueryBuilder.pm
 OpenXPKI/Server/Database/Driver/MySQL.pm
+OpenXPKI/Server/Database/Util.pm
 OpenXPKI/Server/Database/Driver/Oracle.pm
 OpenXPKI/Server/Database/Driver/PostgreSQL.pm
 OpenXPKI/Server/Database/Driver/DB2.pm
 OpenXPKI/Server/Database/Driver/SQLite.pm
 OpenXPKI/Server/Database/Role/Driver.pm
+OpenXPKI/Server/Database/Role/MergeEmulation.pm
+OpenXPKI/Server/Database/Role/MergeSupport.pm
 OpenXPKI/Server/Database/Role/SequenceEmulation.pm
 OpenXPKI/Server/Database/Role/SequenceSupport.pm
-
 
 ## logging interface
 
@@ -383,7 +385,6 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/CheckServerStatus.pm
 
 OpenXPKI/Server/Workflow/Persister/Null.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
-OpenXPKI/Server/Workflow/Persister/DBI/SequenceId.pm
 
 OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
 OpenXPKI/Server/Workflow/Observer/Debug.pm
