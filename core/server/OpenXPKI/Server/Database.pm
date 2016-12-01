@@ -10,13 +10,13 @@ specific drivers/functions.
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Server::Database::Util;
 use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
 use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;
-use MooseX::Params::Validate;
 use SQL::Abstract::More;
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
@@ -224,7 +224,7 @@ sub dbh {
 # Execute given query
 sub run {
     my $self = shift;
-    my ($query) = pos_validated_list(\@_,
+    my ($query) = positional_args(\@_,
         { isa => 'OpenXPKI::Server::Database::Query|Str' },
     );
     my $query_string;
@@ -245,8 +245,19 @@ sub run {
                 dbi_error => $self->dbh->errstr,
             },
         );
+
     # bind parameters via SQL::Abstract::More to do some magic
-    $self->sqlam->bind_params($sth, @{$query_params}) if $query_params;
+    if ($query_params) {
+        $self->sqlam->bind_params($sth, @{$query_params}); # can't use "or ..." here
+        OpenXPKI::Exception->throw(
+            message => "Could not bind parameters to SQL statement",
+            params => {
+                query => $query_string,
+                dbi_error => $sth->errstr,
+            },
+        ) if $sth->err;
+    }
+
     $sth->execute
         or OpenXPKI::Exception->throw(
             message => "Could not execute SQL query",
@@ -255,6 +266,7 @@ sub run {
                 dbi_error => $sth->errstr,
             },
         );
+
     return $sth;
 }
 
@@ -293,7 +305,7 @@ sub update {
 # MERGE
 # Returns: DBI statement handle
 sub merge {
-    my ($self, %args) = validated_hash(\@_,   # MooseX::Params::Validate
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::Server::Database::Util
         into     => { isa => 'Str' },
         set      => { isa => 'HashRef' },
         set_once => { isa => 'HashRef', optional => 1, default => {} },

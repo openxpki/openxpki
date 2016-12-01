@@ -34,7 +34,7 @@ sub START {
     );
 }
 # API: simple retrieval functions
- 
+
 sub get_cert_identifier {
     ##! 1: 'start'
     my $self      = shift;
@@ -357,7 +357,7 @@ sub get_pki_realm_index {
         },
     );
 }
- 
+
 sub convert_csr {
     my $self    = shift;
     my $arg_ref = shift;
@@ -501,7 +501,7 @@ sub import_certificate {
             my $issuer_cert = $db_result->[0];
 
             my $valid;
-            
+
             # No verfiy requested ?
             if($arg_ref->{FORCE_NOVERIFY})  {
                 $valid = 1;
@@ -510,7 +510,7 @@ sub import_certificate {
                     PRIORITY => 'warn',
                     FACILITY => ['audit','system']
                 );
-              
+
             # check if the issuer is already a root
             } elsif ($issuer_cert->{IDENTIFIER} eq $issuer_cert->{ISSUER_IDENTIFIER}) {
                 $valid = $default_token->command({
@@ -608,22 +608,22 @@ sub import_certificate {
 =head2 import_chain( { DATA, FORMAT, PKI_REALM, IMPORT_ROOT, FORCE_NOCHAIN })
 
 Expects a set of certificates as PKCS7 container, concated PEM or array
-of PEM blocks - expected sorting is "entity first". For security reasons 
-the root is not imported by default, set IMPORT_ROOT => 1 to import root 
-certificates. If the chain can not be build, the import will fail unless 
-you set FORCE_NOCHAIN => 1, which will import the chain as far as it can 
-be built. Certificates from the chain that are already in the database 
-are ignored. If the data contain certs from different chains, all chains 
+of PEM blocks - expected sorting is "entity first". For security reasons
+the root is not imported by default, set IMPORT_ROOT => 1 to import root
+certificates. If the chain can not be build, the import will fail unless
+you set FORCE_NOCHAIN => 1, which will import the chain as far as it can
+be built. Certificates from the chain that are already in the database
+are ignored. If the data contain certs from different chains, all chains
 are built (works only with PEM array/block yet!)
 
-Return value is a hash with keys imported and failed. Imported contains 
+Return value is a hash with keys imported and failed. Imported contains
 the db_hash of the successful imports, failed contains the cert_identifier
-and error message of failed imports ([{cert_identifier, error}]). 
+and error message of failed imports ([{cert_identifier, error}]).
 
 =cut
 
 sub import_chain {
-    
+
     my $self    = shift;
     my $arg_ref = shift;
 
@@ -631,7 +631,7 @@ sub import_chain {
     my $dbi = CTX('dbi_backend');
 
     my $realm = $arg_ref->{PKI_REALM};
-    
+
     if (!$realm) {
         $realm = CTX('session')->get_pki_realm();
     }
@@ -639,31 +639,31 @@ sub import_chain {
     my @chain;
     if (ref $arg_ref->{DATA} eq 'ARRAY') {
         @chain = @{$arg_ref->{DATA}};
-        
+
         CTX('log')->log(
             MESSAGE  => "Importing chain from array",
             PRIORITY => 'debug',
             FACILITY => 'system'
         );
-        
+
     } elsif ( $arg_ref->{DATA} =~ /-----BEGIN PKCS7-----/ ) {
-    # extract the entity certificate from the pkcs7     
+    # extract the entity certificate from the pkcs7
         my $chainref = $default_token->command({
-            COMMAND     => 'pkcs7_get_chain',        
+            COMMAND     => 'pkcs7_get_chain',
             PKCS7       => $arg_ref->{DATA},
         });
         @chain = @{$chainref};
-        
+
         CTX('log')->log(
             MESSAGE  => "Importing chain from pkcs7",
             PRIORITY => 'debug',
             FACILITY => 'system'
         );
-                
+
     } else {
-        
-        @chain = ($arg_ref->{DATA} =~ m/(-----BEGIN CERTIFICATE-----[^-]+-----END CERTIFICATE-----)/gm);        
-        
+
+        @chain = ($arg_ref->{DATA} =~ m/(-----BEGIN CERTIFICATE-----[^-]+-----END CERTIFICATE-----)/gm);
+
         CTX('log')->log(
             MESSAGE  => "Importing chain from pem block",
             PRIORITY => 'debug',
@@ -682,7 +682,7 @@ sub import_chain {
             TOKEN => $default_token,
             DATA  => $pem,
         );
-    
+
         my $cert_identifier = $cert->get_identifier();
 
         # Check if the certificate is already in the PKI
@@ -698,38 +698,38 @@ sub import_chain {
                 FACILITY => 'system'
             );
             push @exist, $db_hash;
-            delete $db_hash->{DATA};  
+            delete $db_hash->{DATA};
             next CERT;
         }
-        
+
         # Check if it is a root certificate
         my $self_signed = 0;
         if (defined $cert->get_subject_key_id()
             && defined $cert->get_authority_key_id()) {
             if ($cert->get_subject_key_id() eq $cert->get_authority_key_id()) {
                 $self_signed = 1;
-            }    
+            }
         # certificates without AIK/SK set
         } else {
             if ($cert->{PARSED}->{BODY}->{SUBJECT} ne $cert->{PARSED}->{BODY}->{ISSUER}) {
-                $self_signed = 1;                
+                $self_signed = 1;
             }
         }
-        
-        # Handle root certs 
+
+        # Handle root certs
         if ($self_signed && !$arg_ref->{IMPORT_ROOT}) {
             # do not import root
             CTX('log')->log(
                 MESSAGE  => "Certificate $cert_identifier is self-signed, skipping",
                 PRIORITY => 'debug',
                 FACILITY => 'system'
-            ); 
+            );
             next CERT;
         }
-        
-        # If we are here, we know that the cert does not exist and is 
-        # either not a root or root import is allowed, we now call the 
-        # import_certificate method for this item which also does the 
+
+        # If we are here, we know that the cert does not exist and is
+        # either not a root or root import is allowed, we now call the
+        # import_certificate method for this item which also does the
         # chain validation
         eval {
             my $db_insert = $self->import_certificate({ DATA => $pem, PKI_REALM => $realm, FORCE_NOCHAIN => $arg_ref->{FORCE_NOCHAIN}});
@@ -738,7 +738,7 @@ sub import_chain {
                 MESSAGE  => "Certificate $cert_identifier imported with success",
                 PRIORITY => 'info',
                 FACILITY => 'system'
-            ); 
+            );
         };
         if ($EVAL_ERROR) {
             my $ee = $EVAL_ERROR;
@@ -746,12 +746,12 @@ sub import_chain {
                 MESSAGE  => "Certificate $cert_identifier imported failed with " . $ee,
                 PRIORITY => 'error',
                 FACILITY => 'system'
-            ); 
+            );
             push @failed, { cert_identifier => $cert_identifier, error => "$ee" };
         }
 
     }
-    
+
     return { imported => \@imported, failed => \@failed, existed => \@exist };
 
 }

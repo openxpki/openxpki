@@ -28,7 +28,7 @@ if [ $installed -eq 0 ]; then
     apt update                                                        >$LOG 2>&1
     DEBIAN_FRONTEND=noninteractive \
      apt-get -q=2 install libopenxpki-perl openxpki-i18n \
-                        libapache2-mod-fcgid                          >$LOG 2>&1
+                          libapache2-mod-fcgid libssl-dev             >$LOG 2>&1
     set +e
 fi
 
