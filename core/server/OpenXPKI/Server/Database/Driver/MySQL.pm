@@ -28,6 +28,7 @@ sub dbi_dsn {
         database => $self->name,
         host => $self->host,
         port => $self->port,
+        mysql_init_command => "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
     );
     return sprintf("dbi:%s:%s",
         $self->dbi_driver,
