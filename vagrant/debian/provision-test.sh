@@ -9,8 +9,8 @@ if [ -d /packages.openxpki.org ]; then
 
     # install apache if it is not already
     if [ ! -d /etc/apache2/sites-enabled ]; then
-        aptitude update
-        aptitude install --assume-yes apache2   
+        apt-get update
+        apt-get install --assume-yes apache2   
     fi
 
     # remove all virtual hosts and put the repo config in
@@ -34,13 +34,16 @@ else
    echo "deb http://$PKGHOST/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
 fi;
 
-aptitude update
+apt-get update
 
 rm -rf /etc/openxpki/
 
 # Install mysql without password (no prompt)
-DEBIAN_FRONTEND=noninteractive aptitude install --assume-yes mysql-server
-aptitude install --assume-yes libdbd-mysql-perl libopenxpki-perl openxpki-i18n libapache2-mod-fcgid
+DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mysql-server
+apt-get install --assume-yes libdbd-mysql-perl libopenxpki-perl openxpki-i18n libapache2-mod-fcgid
+
+# packages required for testing only
+apt-get install --assume-yes libtest-deep-perl
 
 a2enmod cgid
 a2enmod fcgid
