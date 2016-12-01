@@ -172,10 +172,12 @@ sub _build_dbix_handler {
             PrintError => 0,
             AutoCommit => 0,
             LongReadLen => 10_000_000,
+            %params,
+        },
+        {
             # on_connect_do is (also) called after fork():
             # then we get a new DBI handle and a previous transaction is invalid
-            on_connect_do => sub { shift->_clear_txn_starter },
-            %params,
+            on_connect_do => sub { $self->_clear_txn_starter },
         }
     ) or OpenXPKI::Exception->throw(
         message => "Could not connect to database",
