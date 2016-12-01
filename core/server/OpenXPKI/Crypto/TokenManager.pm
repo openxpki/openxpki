@@ -5,7 +5,6 @@ package OpenXPKI::Crypto::TokenManager;
 
 use strict;
 use warnings;
-use Switch;
 
 use Carp;
 use OpenXPKI::Debug;
@@ -35,7 +34,7 @@ If you want to
 use an explicit temporary directory then you must specifiy this
 directory in the variable TMPDIR.
 
-=cut 
+=cut
 
 sub new {
     ##! 1: 'start'
@@ -137,26 +136,27 @@ sub __load_secret
     my $method = $config->get(['crypto','secret',$group,'method']);
     my $label = $config->get(['crypto','secret',$group,'label']);
     my $export = $config->get(['crypto','secret',$group,'export']) || 0;
-    
+
     $self->{SECRET}->{$realm}->{$group}->{TYPE}  = $method;
     $self->{SECRET}->{$realm}->{$group}->{LABEL} = ($label ? $label : $method);
     $self->{SECRET}->{$realm}->{$group}->{EXPORT}  = ($export ? 1 : 0);
 
-    switch ($method)
-    {
-        case "literal" {
+    # one Perl version of a switch statement ;-)
+    for ($method) {
+        /^literal$/ and do {
             my $value = $config->get(['crypto','secret',$group,'value']);
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
             $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
-        }
-        case "plain"   {
+            last;
+        };
+        /^plain$/ and do {
             my $total_shares = $config->get(['crypto','secret',$group,'total_shares']);
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
-                    TYPE => "Plain", PARTS => $total_shares
-                });
-             }
-        case "split"  {
-
+                TYPE => "Plain", PARTS => $total_shares
+            });
+            last;
+        };
+        /^split$/ and do {
             my $total_shares = $config->get("crypto.secret.$group.total_shares");
             my $required_shares = $config->get("crypto.secret.$group.required_shares");
             $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
@@ -167,16 +167,16 @@ sub __load_secret
                     },
                     TOKEN  => $self->get_system_token({ TYPE => 'default'}),
             });
-        }
-        else {
-              OpenXPKI::Exception->throw (
-                  message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD",
-                  params  => {
-                      REALM => $realm,
-                      GROUP => $group,
-                      METHOD => $method
-                  });
-             }
+            last;
+        };
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD",
+            params  => {
+                REALM => $realm,
+                GROUP => $group,
+                METHOD => $method
+            },
+        );
     }
 
     $self->__set_secret_from_cache({
@@ -292,7 +292,7 @@ See #333
 sub reload_all_secret_groups_from_cache {
     ##! 1: 'start'
     my $self = shift;
-   
+
     my @realms = CTX('config')->get_keys('system.realms');
     foreach my $realm (@realms) {
         foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
@@ -336,9 +336,9 @@ sub is_secret_group_complete
 
 =head2 get_secret( group )
 
-Get the plaintext value of the stored secret. This requires that the 
-secret was created with the "export" flag set, otherwise an exception 
-is thrown. Returns undef if the secret is not complete. 
+Get the plaintext value of the stored secret. This requires that the
+secret was created with the "export" flag set, otherwise an exception
+is thrown. Returns undef if the secret is not complete.
 
 =cut
 
@@ -351,21 +351,21 @@ sub get_secret
     if (!$self->is_secret_group_complete($group)) {
         return undef;
     }
-    
+
     my $realm = CTX('session')->get_pki_realm();
 
     if (!$self->{SECRET}->{$realm}->{$group}->{EXPORT}) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");       
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");
     }
-    
+
     return $self->{SECRET}->{$realm}->{$group}->{REF}->get_secret();
-    
+
 }
 
 =head2 set_secret_group_part( { GROUP, VALUE, PART } )
 
-Set the secret value of the given group, for plain secrets ommit PART. 
+Set the secret value of the given group, for plain secrets ommit PART.
 
 =cut
 
