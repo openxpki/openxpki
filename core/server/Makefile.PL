@@ -384,7 +384,6 @@ WriteMakefile(
     'Regexp::Common'         => '2',
     'SOAP::Lite'             => '0',
     'SQL::Abstract::More'    => '1.28', # for OpenXPKI::Server::Database
-    'Switch'                 => '1',
     'Sys::SigAction'         => '0.06',
     'Template'               => '2.15',
 #    'Test'                   => '1', # A core module since perl 5.00405
