@@ -245,7 +245,7 @@ TODO: {
 $test->runcmd_ok('get_cert', { IDENTIFIER => $cert_id, FORMAT => 'DBINFO' }, "Fetch certificate (DBINFO)");
 $params = $test->get_msg()->{PARAMS};
 cmp_deeply($params, superhashof({
-    'AUTHORITY_KEY_IDENTIFIER'  => '9A:1D:9E:0A:03:95:91:26:5C:42:5F:90:0C:2E:02:C1:6B:29:14:5C',
+    'AUTHORITY_KEY_IDENTIFIER'  => re(qr/^.+$/),            # '9A:1D:9E:0A:03:95:91:26:5C:42:5F:90:0C:2E:02:C1:6B:29:14:5C',
     'CERT_ATTRIBUTES' => {
         'meta_email'            => [ re(qr/^.+$/) ],        # [ 'andreas.anders@mycompany.local' ],
         'meta_entity'           => [ re(qr/^.+$/) ],        # [ 'nicetest-63a0ee.openxpki.test' ]
