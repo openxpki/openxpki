@@ -46,23 +46,14 @@ sub START {
 
 # API: simple retrieval functions
 
-=head2 get_default_token( { PKI_REALM } )
+=head2 get_default_token()
 
-Return the default token for the given realm, if omitted the current realm.
+Return the default token from the system namespace.
 
 =cut
 
 sub get_default_token {
-
     ##! 1: 'start'
-    my $self = shift;
-    my $keys = shift;
-
-    my $pki_realm = $keys->{PKI_REALM};
-    if ( !$pki_realm ) {
-        $pki_realm = CTX('session')->get_pki_realm();
-    }
-
     return CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });
 }
 
@@ -248,8 +239,8 @@ dates from the alias table!
 PKI_REALM is optional and defaults to the session's realm.
 If you are looking for a predefined token, you can specify TYPE instead of GROUP.
 
-If you set CHECK_ONLINE the is_token_usable method will be called for each 
-alias and the result of the check is included in the key STATUS 
+If you set CHECK_ONLINE the is_token_usable method will be called for each
+alias and the result of the check is included in the key STATUS
 
 =cut
 
@@ -308,12 +299,12 @@ sub list_active_aliases {
 
     my @token;
     foreach my $entry (@{ $db_results }) {
-        
-        my $item = { 
-            ALIAS => $entry->{'ALIASES.ALIAS'}, 
+
+        my $item = {
+            ALIAS => $entry->{'ALIASES.ALIAS'},
             IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'},
             NOTBEFORE => $entry->{'ALIASES.NOTBEFORE'},
-            NOTAFTER  => $entry->{ 'ALIASES.NOTAFTER'}, 
+            NOTAFTER  => $entry->{ 'ALIASES.NOTAFTER'},
         };
         if ($keys->{CHECK_ONLINE}) {
             if ($self->is_token_usable({ ALIAS => $entry->{'ALIASES.ALIAS'} })) {
