@@ -48,7 +48,7 @@ sub execute
     }
     elsif ($type eq 'pkcs10') {
         $data = $context->param('pkcs10');
-        
+
         if (!$self->param('keepformat')) {
             Crypt::PKCS10->setAPIversion(1);
             my $csr = Crypt::PKCS10->new( $data, ignoreNonBase64 => 1, verifySignature => 0  );
@@ -58,7 +58,7 @@ sub execute
                 );
             }
             $data = $csr->csrRequest(1);
-        }        
+        }
     }
     else {
         OpenXPKI::Exception->throw(
@@ -202,7 +202,7 @@ it can then be used by the certificate issuance workflow.
 
 =head2 Activity Parameters
 
-=over 
+=over
 
 =item csr_type
 
@@ -215,9 +215,7 @@ is removal of all whitespace and non-base64 characters and proper line wrap.
 This is very important as current openssl version choke when handling
 requests that are not formated as expected.
 
-If you want to persist the CSR "as is", set this to a true value and we 
+If you want to persist the CSR "as is", set this to a true value and we
 wont touch it.
 
-
-
-
+=back
