@@ -28,7 +28,7 @@ SKIP: {
                 'Workflow::Exception',
                 'Workflow::Factory',
                 'Workflow::History',
-                'XML::SAX::ParserFactory', # installed with XML::Sax
+                't/common/dbi.pl',
                 't/05_base/fix_config.pl', # test prereqs, no modules ...
                 't/25_crypto/common.pl',
                 't/28_log/common.pl',
