@@ -19,12 +19,9 @@ RUN apt-get -qq -y install \
         openssl libssl-dev \
         language-pack-de \
         libmysqlclient-dev \
-        apache2
-RUN apt-get -qq -y install \
-        mysql-server
-RUN apt-get -qq -y install \
-        curl
-RUN apt-get -qq -y install \
+        apache2 \
+        mysql-server \
+        curl \
         pkg-config
 RUN apt-get clean
 
@@ -37,11 +34,8 @@ RUN cpanm --quiet --notest --installdeps /
 
 
 #
-# Setup - files and locales
+# Setup - locales
 #
-COPY startup.sh /
-RUN chmod 0755 startup.sh
-
 ENV LANG en_US.UTF-8
 RUN locale-gen en_US.utf8
 
@@ -52,5 +46,8 @@ ENV OXI_TEST_DB_MYSQL_NAME openxpki
 ENV OXI_TEST_DB_MYSQL_USER openxpki
 ENV OXI_TEST_DB_MYSQL_PASSWORD openxpki
 
+COPY startup.sh /
+RUN chmod 0755 startup.sh
 ENTRYPOINT ["/startup.sh"]
-CMD ["openxpki/openxpki", "develop"]
+# Defaults for "user+repo" and "branch" to test:
+CMD ["develop", "openxpki/openxpki"]
