@@ -279,5 +279,8 @@ itemcnt(crl)
     CODE:
     rev = X509_CRL_get_REVOKED(crl);
     RETVAL = sk_X509_REVOKED_num(rev);
+    if (RETVAL < 0) {
+        RETVAL = 0;
+    }
     OUTPUT:
     RETVAL
