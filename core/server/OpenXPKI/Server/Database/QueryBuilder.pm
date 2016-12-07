@@ -26,7 +26,7 @@ has 'sqlam' => ( # SQL query builder
 
 has 'namespace' => ( # database namespace (i.e. schema) to prepend to tables
     is => 'rw',
-    isa => 'String',
+    isa => 'Str',
 );
 
 ################################################################################

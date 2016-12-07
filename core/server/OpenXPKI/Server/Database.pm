@@ -370,7 +370,9 @@ sub next_id {
     my ($self, $table) = @_;
 
     # get new serial number from DBMS (SQL sequence or emulation via table)
-    my $id_int = $self->driver->next_id($self, "seq_$table");
+    
+    my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
+    my $id_int = $self->driver->next_id($self, $seq_table );
     my $id = Math::BigInt->new($id_int);
     ##! 32: 'Next ID: ' . $id->bstr()
 
