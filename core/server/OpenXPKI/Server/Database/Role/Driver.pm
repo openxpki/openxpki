@@ -26,6 +26,7 @@ has 'passwd'       => ( is => 'ro', isa => 'Str' );
 requires 'dbi_driver';         # String: DBI compliant case sensitive driver name
 requires 'dbi_dsn';            # String: DSN parameters after "dbi:<driver>:"
 requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect()
+requires 'dbi_on_connect_do';  # ArrayRef or Str: commands to execute after connecting
 requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
 requires 'next_id';            # Int: next insert ID ("serial")
 requires 'merge_query';        # OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
@@ -148,6 +149,11 @@ Returns the DSN that is passed to L<DBI/connect> (I<Str>).
 =head2 dbi_connect_params
 
 Returns optional parameters that are passed to L<DBI/connect> (I<HashRef>).
+
+=head2 dbi_on_connect_do
+
+Returns optional commands to be executed after connecting to the database
+(I<ArrayRef> or I<Str>).
 
 =head2 sqlam_params
 

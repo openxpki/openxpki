@@ -73,7 +73,7 @@ has 'sqlam' => ( # SQL query builder
         my @return = $self->driver->sqlam_params; # use array to get list context
         # tolerate different return values: undef, list, HashRef
         return SQL::Abstract::More->new(
-            $self->_driver_return_val_to_list(
+            $self->_driver_return_val_to_hash(
                 \@return,
                 ref($self->driver)."::sqlam_params",
             )
@@ -158,11 +158,16 @@ sub _build_dbix_handler {
     my $self = shift;
     ##! 4: "DSN: ".$self->driver->dbi_dsn
     ##! 4: "User: ".($self->driver->user // '(none)')
-    my %params = $self->_driver_return_val_to_list(
+    my %params = $self->_driver_return_val_to_hash(
         [ $self->driver->dbi_connect_params ], # driver might return a list so we enforce list context
         ref($self->driver)."::dbi_connect_params",
     );
+    my @on_connect_do = $self->_driver_return_val_to_list(
+        [ $self->driver->dbi_on_connect_do ], # driver might return a list so we enforce list context
+        ref($self->driver)."::dbi_on_connect_do",
+    );
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
+    ##! 4: "SQL commands after each connect: ".join("; ", @on_connect_do);
     my $dbix = DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
@@ -172,10 +177,17 @@ sub _build_dbix_handler {
             PrintError => 0,
             AutoCommit => 0,
             LongReadLen => 10_000_000,
-            # on_connect_do is (also) called after fork():
-            # then we get a new DBI handle and a previous transaction is invalid
-            on_connect_do => sub { shift->_clear_txn_starter },
             %params,
+        },
+        {
+            on_connect_do => sub {
+                my $dbh = shift;
+                # execute custom statements
+                $dbh->do($_) for @on_connect_do;
+                # on_connect_do is (also) called after fork():
+                # then we get a new DBI handle and a previous transaction is invalid
+                $self->_clear_txn_starter;
+            },
         }
     ) or OpenXPKI::Exception->throw(
         message => "Could not connect to database",
@@ -192,24 +204,44 @@ sub _build_dbix_handler {
 # Methods
 #
 
-sub _driver_return_val_to_list {
-    my ($self, $return, $method) = @_;
-    my $params;
-    if (scalar @$return == 0) {             # undef
-        $params = {};
+sub _driver_return_val_to_hash {
+    my ($self, $params, $method) = @_;
+    my $normalized;
+    if (scalar @$params == 0) {             # undef
+        $normalized = {};
     }
-    elsif (scalar @$return > 1) {           # list
-        $params = { @$return };
+    elsif (scalar @$params > 1) {           # list
+        $normalized = { @$params };
     }
-    elsif (ref $return->[0] eq 'HASH') {    # HashRef
-        $params = $return->[0];
+    elsif (ref $params->[0] eq 'HASH') {    # HashRef
+        $normalized = $params->[0];
     }
     else {
         OpenXPKI::Exception->throw (
-            message => "Faulty driver implementation: '$method' did not return undef, a HashRef or a list",
+            message => "Faulty driver implementation: '$method' did not return undef, a HashRef or a plain hash (list)",
         );
     }
-    return %$params;
+    return %$normalized;
+}
+
+sub _driver_return_val_to_list {
+    my ($self, $params, $method) = @_;
+    my $normalized;
+    if (scalar @$params == 0) {             # undef
+        $normalized = [];
+    }
+    elsif (ref $params->[0] eq 'ARRAY') {   # ArrayRef
+        $normalized = $params->[0];
+    }
+    elsif (scalar(grep { /.+/ } map { ref } @$params) > 0) { # some elements are not scalars
+        OpenXPKI::Exception->throw (
+            message => "Faulty driver implementation: '$method' did not return undef, an ArrayRef or a plain list",
+        );
+    }
+    else {                                  # list of scalars (or single scalar)
+        $normalized = [ @$params ];
+    }
+    return @$normalized;
 }
 
 sub dbh {

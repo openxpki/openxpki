@@ -28,7 +28,6 @@ sub dbi_dsn {
         database => $self->name,
         host => $self->host,
         port => $self->port,
-        mysql_init_command => "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
     );
     return sprintf("dbi:%s:%s",
         $self->dbi_driver,
@@ -41,6 +40,11 @@ sub dbi_connect_params {
     mysql_enable_utf8 => 1,
     mysql_auto_reconnect => 0, # stolen from DBIx::Connector::Driver::mysql::_connect()
     mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+}
+
+# Commands to execute after connecting
+sub dbi_on_connect_do {
+    "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
 }
 
 # Parameters for SQL::Abstract::More

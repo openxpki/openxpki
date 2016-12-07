@@ -39,6 +39,11 @@ sub dbi_connect_params {
     pg_enable_utf8 => 1,
 }
 
+# Commands to execute after connecting
+sub dbi_on_connect_do {
+    "SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED"
+}
+
 # Parameters for SQL::Abstract::More
 sub sqlam_params {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code

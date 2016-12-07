@@ -30,9 +30,12 @@ sub dbi_dsn {
 }
 
 # Additional parameters for DBI's connect()
-sub dbi_connect_params { 
+sub dbi_connect_params {
     sqlite_unicode => 1,
 }
+
+# Commands to execute after connecting
+sub dbi_on_connect_do { }
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params {
