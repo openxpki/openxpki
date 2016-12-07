@@ -76,9 +76,10 @@ sub execute
     if ($self->param('check_creator')) {
         configuration_error('The check_creator option is no longer supported - use conditions instead');
     }
-    
+
     # not used and needs rework
-=cut    
+=pod
+
     if (defined $context->param('_signature')) {
         # we have a signature
         ##! 16: 'signature present'
@@ -159,21 +160,21 @@ sub execute
     }
     # Unsigned Approvals
     else {
-=cut        
+=cut
 
     my $mode = $self->param('mode') || 'session';
-    
+
     # read the approval info from the activity parameter
     if ($mode eq 'generated') {
-        
+
         my $comment = $self->param('comment');
-        
+
         configuration_error('The comment parameter is mandatory in generated mode') unless ($comment);
         push @approvals, {
             'mode'      => 'generated',
             'comment'   => $comment,
         };
-            
+
     } elsif ($mode eq 'session') {
         # look for already present approval by this user with this role
         if ($self->param('multi_role_approval') &&
@@ -229,35 +230,35 @@ OpenXPKI::Server::Workflow::Activity::Tools::Approve
 
 =head1 Description
 
-This class implements simple possibility to store approvals as a 
-serialized array. This allows for easy evaluation of needed approvals 
+This class implements simple possibility to store approvals as a
+serialized array. This allows for easy evaluation of needed approvals
 in the condition class Condition::Approved.
 
-The activity has several operational modes, that are determined by the 
-I<mode> parameter. 
+The activity has several operational modes, that are determined by the
+I<mode> parameter.
 
 =head2 Session Based Approval
 
-This is the default mode, it adds the user and role from the current 
-session to the list of approvals. Only one approval by the same user is 
-allowed, if the action is called by the same user mutliple times, the 
+This is the default mode, it adds the user and role from the current
+session to the list of approvals. Only one approval by the same user is
+allowed, if the action is called by the same user mutliple times, the
 activity will not update the list of approvals.
 
-If you set the I<mutli_role_approval> parameter to a true value, a user 
+If you set the I<mutli_role_approval> parameter to a true value, a user
 can approve one time with each role he can impersonate.
 
 =head2 Generated Approval
 
-Adds the information passed via the I<comment> parameter as approval. 
+Adds the information passed via the I<comment> parameter as approval.
 Note that there is no duplicate check like in the session approval, if
-you call this multiple times you will end up with multiple valid 
+you call this multiple times you will end up with multiple valid
 approvals.
 
-The comment is mandatory, if not given the action will exit with a 
+The comment is mandatory, if not given the action will exit with a
 workflow configuration error.
 
 =head1 Configuration
- 
+
 =head2 Activity Parameters
 
 =over
@@ -272,16 +273,16 @@ Boolean, allow multiple approvals by same user with differen roles
 
 =item comment
 
-The approval comment to add for generated approvals, mandatory in 
+The approval comment to add for generated approvals, mandatory in
 generated mode.
 
-=back 
+=back
 
 =head2 Context Parameters
 
 =over
 
-=approvals
+=item approvals
 
 The serialized array of given approvals, each item is a hash holding the
 approval information.
