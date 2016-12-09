@@ -17,13 +17,13 @@ has __default_grid_head => (
     lazy => 1,
     
     default => sub { return [
-        { sTitle => "Serial", sortkey => 'CERTIFICATE.CERTIFICATE_SERIAL' },
-        { sTitle => "Subject", sortkey => 'CERTIFICATE.SUBJECT' },
-        { sTitle => "Status", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
-        { sTitle => "Notbefore", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
-        { sTitle => "Notafter", format => 'timestamp', sortkey => 'CERTIFICATE.NOTAFTER' },
-        { sTitle => "Issuer", sortkey => 'CERTIFICATE.ISSUER_DN'},
-        { sTitle => "Identifier", sortkey => 'CERTIFICATE.IDENTIFIER'},
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL", sortkey => 'CERTIFICATE.CERTIFICATE_SERIAL' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT", sortkey => 'CERTIFICATE.SUBJECT' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_STATUS", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp', sortkey => 'CERTIFICATE.NOTAFTER' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER", sortkey => 'CERTIFICATE.ISSUER_DN'},
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER", sortkey => 'CERTIFICATE.IDENTIFIER'},
         { sTitle => 'identifier', bVisible => 0 },
         { sTitle => "_className"},
     ]; }
@@ -91,10 +91,10 @@ sub init_search {
     }
     
     my @fields = (
-        { name => 'subject', label => 'Subject', type => 'text', is_optional => 1, value => $preset->{subject} },
-        { name => 'san', label => 'SAN', type => 'text', is_optional => 1, value => $preset->{san} },
-        { name => 'status', label => 'status', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
-        { name => 'profile', label => 'Profile', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
+        { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', type => 'text', is_optional => 1, value => $preset->{subject} },
+        { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', type => 'text', is_optional => 1, value => $preset->{san} },
+        { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
+        { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
@@ -105,7 +105,7 @@ sub init_search {
         }
         push @fields, {
             name => 'attributes', 
-            label => 'Metadata', 
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', 
             'keys' => \@attrib,                  
             type => 'text',
             is_optional => 1, 
@@ -214,7 +214,7 @@ sub init_result {
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
-                label => 'Download',
+                label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
                 target => 'modal'
             }], 
@@ -370,7 +370,7 @@ sub init_mine {
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
-                label => 'Download',
+                label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
                 target => 'modal'
             }], 
@@ -403,10 +403,32 @@ sub init_detail {
     # empty submission
     if (!$cert_identifier) {
         $self->redirect('certificate!search');                
-        return;        
+        return;
     }
 
-    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
+    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' }, 1);
+    
+    if (!$cert) {
+        $self->_page({
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
+            shortlabel => 'I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN'
+        });
+            
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => '',
+                description => '',
+                data => [
+                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', value => $cert_identifier },
+                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN' , value => 'unknown' }, format => 'certstatus' },
+                ],
+            }},
+        );
+        
+        return;
+    }
+    
     $self->logger()->debug("result: " . Dumper $cert);
     
     my $cert_attribute = $self->send_command( 'get_cert_attributes', {  IDENTIFIER => $cert_identifier, ATTRIBUTE => 'subject_%' });
@@ -420,11 +442,11 @@ sub init_detail {
     });
 
 
-    my @fields = ( { label => 'Subject', value => $cert->{SUBJECT} } );
+    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', value => $cert->{SUBJECT} } );
      
     if ($cert_attribute && $cert_attribute->{subject_alt_name}) {        
         #my $cert_attribute->{subject_alt_name};
-        push @fields, { label => 'Subject Alt. Name', value => $cert_attribute->{subject_alt_name}, 'format' => 'ullist' };
+        push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => $cert_attribute->{subject_alt_name}, 'format' => 'ullist' };
     } 
         
     # check if this is a entity certificate from the current realm
@@ -437,17 +459,17 @@ sub init_detail {
     if ($is_local_entity) {
         my $cert_profile  = $self->send_command( 'get_profile_for_cert', {  IDENTIFIER => $cert_identifier }, 1);
         if ($cert_profile) {
-            push @fields, { label => 'Profile', value => $cert_profile };    
+            push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', value => $cert_profile };    
         }   
     }
 
     push @fields, (
-        { label => 'Serial', value => '0x'.$cert->{CERTIFICATE_SERIAL_HEX} },
-        { label => 'Identifier', value => $cert_identifier },
-        { label => 'not before', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
-        { label => 'not after', value => $cert->{NOTAFTER}, format => 'timestamp' },
-        { label => 'Status', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS} , value => $cert->{STATUS} }, format => 'certstatus' },
-        { label => 'Issuer', format => 'link', value => { label => $cert->{ISSUER_DN}, page => 'certificate!chain!identifier!'. $cert_identifier } },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', value => '0x'.$cert->{CERTIFICATE_SERIAL_HEX} },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', value => $cert_identifier },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{NOTAFTER}, format => 'timestamp' },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS} , value => $cert->{STATUS} }, format => 'certstatus' },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', value => { label => $cert->{ISSUER_DN}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
@@ -674,6 +696,8 @@ sub init_related {
 
 Prepare download of a private key, requests the password and export format
 via form fields.
+
+Deprecated - moved to workflow, will be removed with next major release
 
 =cut
 sub init_privkey {
@@ -1052,6 +1076,8 @@ sub action_search {
 
 Retrieve the key passphrase and - if matches - send the key as pkcs12
 binary to the client.
+
+Deprecated - moved to workflow, will be removed with next major release
 
 =cut
 sub action_privkey {

@@ -89,6 +89,14 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Zertifikats-ID"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
 msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
@@ -105,12 +113,20 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
 msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL"
 msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
+msgstr "Erstellen von CRLs"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
@@ -131,6 +147,10 @@ msgstr "Erstellen von CRLs"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
+msgstr "Zertifikats-ID"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
@@ -179,6 +199,10 @@ msgstr "Status"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "widerrufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
+msgstr "Status"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
@@ -465,6 +489,14 @@ msgstr "Übergeordneter Workflow"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Ihr Name, z.B. 'Peter Müller'"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
+msgstr "gültig"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
+msgstr "testuser"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY"

@@ -91,6 +91,14 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Идентификатор сертификата"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
 msgstr "Изменить дополнительную информацию"
 
@@ -107,12 +115,20 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
 msgstr "Изменить дополнительную информацию"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
@@ -133,6 +149,10 @@ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
+msgstr "Идентификатор сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
@@ -181,6 +201,10 @@ msgstr "Статус"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "Отозван"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
+msgstr "Статус сертификата УЦ"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
@@ -466,6 +490,14 @@ msgstr "Родительский технологический процесс"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
+msgstr "Действителен"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
+msgstr "Тестировщик"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY"

@@ -773,10 +773,6 @@ of revoked certificates is NOT changed in the database!
 
 PEM formated CRL
 
-=item ISSUER
-
-certificate identifier of the CRL issuer
-
 =back
 
 =cut
@@ -824,7 +820,7 @@ sub import_crl {
         columns => [ 'certificate.identifier' ],
         where => $where
     ) or OpenXPKI::Exception->throw(
-        message => 'Unable to find issuer certificate for CRL',
+        message => 'I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND',
         params => { 'ISSUER_DN' => $issuer_dn , 'GROUP' => $group, 'ISSUER_AIK' => $issuer_aik },
     );
 
@@ -857,7 +853,7 @@ sub import_crl {
 
     if ($duplicate) {
         OpenXPKI::Exception->throw(
-            message => 'A CRL for this issuer with the same last/next update information exists!',
+            message => 'I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE',
             params => {
                 'issuer_identifier' => $ca_identifier,
                 'last_update' => $data->{last_update},

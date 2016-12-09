@@ -234,5 +234,9 @@ span.certstatus-expired {
     color: #444;
 }
 
+span.certstatus-unknown {
+    color: #79d1f3;
+}
+
 /* keep line wraps in code */
 code { white-space: pre; }

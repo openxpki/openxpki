@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-11-30 17:06+0100\n"
+"PO-Revision-Date: 2016-12-08 12:25+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -73,6 +73,12 @@ msgstr "Download private key for certificate"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Certificate Identifier"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
+msgstr "Issuer"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
+msgstr "Metadata"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
 msgstr "Find a list of your certificates below."
 
@@ -85,11 +91,17 @@ msgstr "not after"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
 msgstr "not before"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
+msgstr "Profile"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Related Workflows"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL"
 msgstr "Certificate Relations"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
+msgstr "Subject Alt. Name"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
 msgstr ""
@@ -110,6 +122,9 @@ msgstr "Certificate Search Result"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Certificate Serial"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
+msgstr "Status"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"
@@ -147,6 +162,9 @@ msgstr "Issued"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "Revoked"
+
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
+msgstr "unknown"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valid"
@@ -364,6 +382,13 @@ msgstr "Private key could not be decrypted/loaded."
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"
+
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
+msgstr ""
+"A CRL for this issuer with the same last/next update information exists!"
+
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
+msgstr "Unable to find issuer certificate for CRL!"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
@@ -806,9 +831,8 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
 # Remove?
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
-msgstr "Full Certificate Status Report"
+msgstr "Report"
 
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
 msgstr "Valid Certificates"
@@ -1063,7 +1087,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
 msgstr "Start revocation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
-msgstr ""
+msgstr "Publish CA Certificate and CRLs to defined targets."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_LABEL"
 msgstr "Publish CA Certs"

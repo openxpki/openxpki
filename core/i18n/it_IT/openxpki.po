@@ -83,6 +83,14 @@ msgstr "Scarica la chiave privata del certificato"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identificatore del certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
+msgstr "non dopo il"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC"
 msgstr "Una lista dei tuoi certificati è visualizzata qui sotto."
 
@@ -95,11 +103,19 @@ msgstr "non dopo il"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE"
 msgstr "non prima del"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
+msgstr "Numero di serie del certificato"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Workflow correlati"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL"
 msgstr "Relazioni del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
+msgstr "Numero di serie del certificato"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
 msgstr ""
@@ -122,6 +138,10 @@ msgstr "Risultati Ricerca Certificati"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
+msgstr "non dopo il"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Soggetto"
@@ -159,6 +179,10 @@ msgstr "Emesso"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "Revocato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
+msgstr "sconosciuto"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valido"
@@ -446,6 +470,14 @@ msgstr "Catena di certificazione"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Paese"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
+msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
+msgstr "Pagina richiesta non trovata"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
