@@ -23,10 +23,10 @@ sub execute {
 	my $token_id = $context->param('token_id');
 
 	my %params;
-	if ($context->param('user_id') ne '') {
+	if ($context->param('user_id')) {
 	    $params{USERID} = $context->param('user_id');
 	}
-	if ($context->param('chip_id') ne '') {
+	if ($context->param('chip_id')) {
 	    $params{SMARTCHIPID} = $context->param('chip_id');
 	}
 

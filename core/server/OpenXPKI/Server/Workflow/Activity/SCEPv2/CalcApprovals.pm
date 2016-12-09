@@ -96,7 +96,7 @@ sub execute {
     if ($approvals < $approval_points) {
         $context->param('have_all_approvals' => '0');    
         CTX('log')->log(
-            MESSAGE => sprintf ('SCEP insufficient approval points (%01d/%01d) for %s ', 
+            MESSAGE => sprintf ('SCEP insufficient approval points (%01d/%01d) for %s',
               $approvals, $approval_points, $context->param('cert_subject')),
             PRIORITY => 'info',
             FACILITY => 'application',
@@ -104,7 +104,7 @@ sub execute {
     } else {
         $context->param('have_all_approvals' => '1');    
         CTX('log')->log(
-            MESSAGE => sprintf ('SCEP got required approval points (%01d/%01d) for  ', 
+            MESSAGE => sprintf ('SCEP got required approval points (%01d/%01d) for %s',
                $approvals, $approval_points, $context->param('cert_subject')),
             PRIORITY => 'info',
             FACILITY => ['audit','application']

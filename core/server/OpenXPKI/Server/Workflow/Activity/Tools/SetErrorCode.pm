@@ -17,7 +17,7 @@ sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $error_code = $self->param('error_code');
+    my $error_code = $self->param('error_code') || '';
 
     $context->param('error_code' => $error_code);
 

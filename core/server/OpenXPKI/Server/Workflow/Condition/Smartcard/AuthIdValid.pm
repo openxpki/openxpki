@@ -20,9 +20,9 @@ sub evaluate {
 	my ( $self, $workflow ) = @_;
 	my $context = $workflow->context();
 
-	my $auth1 = lc( $context->param('auth1_mail') );
-	my $auth2 = lc( $context->param('auth2_mail') );
-	my $owner = lc( $context->param('owner_mail') );
+	my $auth1 = lc( $context->param('auth1_mail') || '' );
+	my $auth2 = lc( $context->param('auth2_mail') || '' );
+	my $owner = lc( $context->param('owner_mail') || '' );
 	##! 16: 'start'
 	##! 128: 'auth1_mail  = ' . $auth1
 	##! 128: 'auth2_mail  = ' . $auth2

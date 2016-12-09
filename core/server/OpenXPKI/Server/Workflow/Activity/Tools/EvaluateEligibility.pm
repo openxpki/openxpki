@@ -85,7 +85,7 @@ sub execute {
             ##! 32: 'result is ' . $plain_result        
     
             CTX('log')->log(
-                MESSAGE => "Eligibility check raw result " . $plain_result . ' using path ' . join('|', @path),
+                MESSAGE => "Eligibility check raw result " . (defined $plain_result ? $plain_result : 'undef') . ' using path ' . join('|', @path),
                 PRIORITY => 'debug',
                 FACILITY => 'application',
             );

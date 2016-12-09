@@ -64,6 +64,8 @@ sub get_hash {
     my $self = shift;
     my $cert_id = shift;
     
+    return unless ($cert_id);
+    
     # To prevent loading the same item again and again, we always cache
     # the last hash and reuse it 
 

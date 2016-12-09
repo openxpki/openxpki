@@ -89,11 +89,9 @@ sub i18nGettext {
 
         ## append arguments passed to the function
         $i18n_string = join ("; ", $text,
-                                   map { $_ . " => " . $arg_ref->{$_}  }
-                                       keys %{$arg_ref});
+            map { $_ . " => " . (defined $arg_ref->{$_} ? $arg_ref->{$_} : '')  }
+            keys %{$arg_ref});
 
-        #it's too slow, I try to use "use utf8;"
-        #$i18n_string = pack "U0C*", unpack "C*", $untranslated;
     } else {
         $i18n_string = '';
     }

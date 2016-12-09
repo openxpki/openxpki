@@ -246,7 +246,8 @@ sub get_chain {
     my $dbi = CTX('dbi_backend');
     my @certs;
 
-    my $inner_format = $arg_ref->{OUTFORMAT} || '';
+    my $outer_format = $arg_ref->{OUTFORMAT} || '';   
+    my $inner_format = $outer_format;
     if ($arg_ref->{BUNDLE}) {
         $inner_format = 'PEM';
     }
@@ -321,7 +322,7 @@ sub get_chain {
         my $result = $default_token->command({
             COMMAND          => 'convert_cert',
             DATA             => \@certs,
-            OUT              =>  ($arg_ref->{OUTFORMAT} eq 'DER' ? 'DER' : 'PEM'),
+            OUT              =>  ($outer_format eq 'DER' ? 'DER' : 'PEM'),
             CONTAINER_FORMAT => 'PKCS7',
         });
         return $result;
@@ -330,7 +331,7 @@ sub get_chain {
     $return_ref->{SUBJECT} = \@subject;
     $return_ref->{IDENTIFIERS} = \@identifiers;
     $return_ref->{COMPLETE}    = $complete;
-    if (defined $arg_ref->{OUTFORMAT}) {
+    if ($outer_format) {
         $return_ref->{CERTIFICATES} = \@certs;
     }
     return $return_ref;

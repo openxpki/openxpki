@@ -106,6 +106,7 @@ sub get_ui_system_status {
             ORDER => [ 'NEXT_UPDATE' ],
             REVERSE => 1,
         );
+        next unless ($crl_result);
         if (($crl_expiry == 0) || ($crl_expiry > $crl_result->{NEXT_UPDATE})) {
             $crl_expiry  = $crl_result->{NEXT_UPDATE};
         }         

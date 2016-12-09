@@ -497,7 +497,9 @@ sub list_process {
             next;
         }
 
-        if ($p->cmndline =~ m{ ((worker|workflow): .*) \z }x) {
+        if (!$p->cmndline) { 
+            push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => '' };
+        } elsif ($p->cmndline =~ m{ ((worker|workflow): .*) \z }x) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => $1 };
         } else {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => $p->cmndline };
