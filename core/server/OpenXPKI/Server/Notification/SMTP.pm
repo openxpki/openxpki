@@ -74,7 +74,6 @@ use English;
 
 use Data::Dumper;
 
-use Crypt::SMIME;
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
@@ -233,6 +232,23 @@ sub _init_smime {
     my $self = shift;
 
     my $cfg = CTX('config')->get_hash( $self->config() . '.smime' );
+
+    if (!$cfg) {
+        return;
+    }
+    
+    eval "use Crypt::SMIME;1";
+    if ($EVAL_ERROR) {
+        CTX('log')->log(
+            MESSAGE  => "Initialization of Crypt::SMIME failed!",
+            PRIORITY => "error",
+            FACILITY => [ "system", "monitor" ]
+        );
+        OpenXPKI::Exception->throw(
+            message => "Initialization of Crypt::SMIME failed!",
+        );
+    }
+    require Crypt::SMIME;
 
     my $smime;
     if ($cfg->{certificate_p12_file}) {
