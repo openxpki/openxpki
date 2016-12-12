@@ -25,7 +25,7 @@ sub execute {
     my $target_key = $self->param('target_key') || 'crl_serial';
         
     if ($data) {
-        my $crl = CTX('api')->import_crl({ DATA => $data }]);
+        my $crl = CTX('api')->import_crl({ DATA => $data });
         $workflow->context()->param( { $target_key => $crl->{crl_key} } );
     } else {
         $workflow->context()->param( { $target_key => undef } );
