@@ -5,7 +5,6 @@ package OpenXPKI::Crypto::TokenManager;
 
 use strict;
 use warnings;
-use Switch;
 
 use Carp;
 use OpenXPKI::Debug;
@@ -142,41 +141,38 @@ sub __load_secret
     $self->{SECRET}->{$realm}->{$group}->{LABEL} = ($label ? $label : $method);
     $self->{SECRET}->{$realm}->{$group}->{EXPORT}  = ($export ? 1 : 0);
 
-    switch ($method)
-    {
-        case "literal" {
-            my $value = $config->get(['crypto','secret',$group,'value']);
-            $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
-            $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
-        }
-        case "plain"   {
-            my $total_shares = $config->get(['crypto','secret',$group,'total_shares']);
-            $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
-                    TYPE => "Plain", PARTS => $total_shares
-                });
-             }
-        case "split"  {
+    if ($method eq "literal") {
+        my $value = $config->get(['crypto','secret',$group,'value']);
+        $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
+        $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
+    }
+    elsif ($method eq "plain") {
+        my $total_shares = $config->get(['crypto','secret',$group,'total_shares']);
+        $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
+            TYPE => "Plain", PARTS => $total_shares
+        });
+    }
+    elsif ($method eq "split") {
 
-            my $total_shares = $config->get("crypto.secret.$group.total_shares");
-            my $required_shares = $config->get("crypto.secret.$group.required_shares");
-            $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
-                    TYPE => "Split",
-                    QUORUM => {
-                        K => $required_shares,
-                        N => $total_shares,
-                    },
-                    TOKEN  => $self->get_system_token({ TYPE => 'default'}),
-            });
-        }
-        else {
-              OpenXPKI::Exception->throw (
-                  message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD",
-                  params  => {
-                      REALM => $realm,
-                      GROUP => $group,
-                      METHOD => $method
-                  });
-             }
+        my $total_shares = $config->get("crypto.secret.$group.total_shares");
+        my $required_shares = $config->get("crypto.secret.$group.required_shares");
+        $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
+                TYPE => "Split",
+                QUORUM => {
+                    K => $required_shares,
+                    N => $total_shares,
+                },
+                TOKEN  => $self->get_system_token({ TYPE => 'default'}),
+        });
+    }
+    else {
+      OpenXPKI::Exception->throw (
+          message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD",
+          params  => {
+              REALM => $realm,
+              GROUP => $group,
+              METHOD => $method
+          });
     }
 
     $self->__set_secret_from_cache({
