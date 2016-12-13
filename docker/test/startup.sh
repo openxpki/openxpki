@@ -7,9 +7,9 @@ echo -e "\n====[ MySQL ]===="
 nohup sh -c mysqld >/tmp/mysqld.log &
 
 #
-# Wait for database initialization
+# Wait for DBMS to start
 #
-echo "Waiting for DB initialize (max. 120 seconds)"
+echo "Waiting for MySQL to initialize (max. 60 seconds)"
 sec=0; error=1
 while [ $error -ne 0 -a $sec -lt 60 ]; do
     error=$(echo "quit" | mysql -h 127.0.0.1 -uroot --connect_timeout=1 2>&1 | grep -c ERROR)
@@ -27,7 +27,7 @@ set -e
 #
 # Database setup
 #
-echo "Preparing database for OpenXPKI (user + schema)"
+echo "Creating database for unit tests (db + user)"
 
 cat <<__SQL | mysql -h 127.0.0.1 -uroot
 DROP database IF EXISTS $OXI_TEST_DB_MYSQL_NAME;
@@ -113,8 +113,8 @@ echo -e "\n====[ Compile and test OpenXPKI ]===="
 export USER=dummy
 
 cd /opt/openxpki/core/server
-perl Makefile.PL
-make
+perl Makefile.PL    > /dev/null
+make                > /dev/null
 make test
 
 #
@@ -143,13 +143,36 @@ main:
     passwd: $OXI_TEST_DB_MYSQL_PASSWORD
 __DB
 
+#
+# Database re-init
+#
+echo "Re-creating database for qa tests (db + user + schema)"
+
+cat <<__SQL | mysql -h 127.0.0.1 -uroot
+DROP database IF EXISTS $OXI_TEST_DB_MYSQL_NAME;
+CREATE database $OXI_TEST_DB_MYSQL_NAME CHARSET utf8;
+__SQL
+
+mysql -h 127.0.0.1 \
+    -u$OXI_TEST_DB_MYSQL_USER \
+    -p$OXI_TEST_DB_MYSQL_PASSWORD \
+    $OXI_TEST_DB_MYSQL_NAME \
+    < /opt/openxpki/config/sql/schema-mysql.sql
+
+#
+# Sample config (CA certificates etc.)
+#
 /bin/bash /opt/openxpki/config/sampleconfig.sh
 
+#
+# Start OpenXPKI
+#
 /usr/local/bin/openxpkictl start
 
 #
 # QA tests
 #
+# (testing /api/ before /nice/ leads to errors)
 cd /opt/openxpki/qatest/backend/nice/  && prove .
 cd /opt/openxpki/qatest/backend/api/   && prove .
 cd /opt/openxpki/qatest/backend/webui/ && prove .
