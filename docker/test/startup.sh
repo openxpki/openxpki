@@ -106,7 +106,7 @@ if (@modlist) {
 '
 
 #
-# Testing
+# Unit tests
 #
 echo -e "\n====[ Compile and test OpenXPKI ]===="
 # Config::Versioned reads USER env variable
@@ -116,3 +116,40 @@ cd /opt/openxpki/core/server
 perl Makefile.PL
 make
 make test
+
+#
+# OpenXPKI installation
+#
+echo -e "\n====[ Install OpenXPKI ]===="
+make install > /dev/null
+
+# directory list borrowed from /package/debian/core/libopenxpki-perl.dirs
+mkdir -p /var/openxpki/session
+mkdir -p /var/log/openxpki
+
+# copy config
+cp -R /opt/openxpki/config/openxpki /etc
+
+# customize config
+sed -ri 's/^((user|group):\s+)\w+/\1root/' /etc/openxpki/config.d/system/server.yaml
+
+cat <<__DB > /etc/openxpki/config.d/system/database.yaml
+main:
+    debug: 0
+    type: MySQL
+    host: 127.0.0.1
+    name: $OXI_TEST_DB_MYSQL_NAME
+    user: $OXI_TEST_DB_MYSQL_USER
+    passwd: $OXI_TEST_DB_MYSQL_PASSWORD
+__DB
+
+/bin/bash /opt/openxpki/config/sampleconfig.sh
+
+/usr/local/bin/openxpkictl start
+
+#
+# QA tests
+#
+cd /opt/openxpki/qatest/backend/nice/  && prove .
+cd /opt/openxpki/qatest/backend/api/   && prove .
+cd /opt/openxpki/qatest/backend/webui/ && prove .
