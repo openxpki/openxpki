@@ -79,7 +79,12 @@ sub execute {
             'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_MAP'
         ) unless ($map);
                    
-        my %attrmap = map { split(/\s*[=-]>\s*/) } split( /\s*,\s*/, $map );                        
+        my %attrmap;
+        if (ref $map eq 'HASH') {
+            %attrmap = %{$map};
+        } else {
+            %attrmap = map { split(/\s*[=-]>\s*/) } split( /\s*,\s*/, $map );
+        }                        
         foreach my $key (keys %attrmap) {
             ##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
             $context->param( $key, $hash->{$attrmap{$key}});
@@ -89,7 +94,7 @@ sub execute {
         
         my $hash = $config->get_hash( \@path );                            
         foreach my $key (keys %{$hash}) {                
-            if ($key !~ /^(wf_|workflow_|creator|_)/) { next; }                
+            if ($key =~ /^(wf_|workflow_|creator|_)/) { next; }
             ##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
             $context->param( $key, $hash->{$key});
         }         
