@@ -370,10 +370,18 @@ sub notify {
 
             # CC-Receipient
             my @cclist;
+
             ##! 32: 'Building new cc list'
             # explicit from configuration, can be a comma sep. list
             my @ccrcpt;
-            @ccrcpt = split(/,/, $cfg->{cc}) if($cfg->{cc});
+            if(!$cfg->{cc}) {
+                # noop
+            } elsif (ref $cfg->{cc} eq '') {
+                @ccrcpt = split(/,/, $cfg->{cc});
+            } elsif (ref $cfg->{cc} eq 'ARRAY') {
+                @ccrcpt = @{$cfg->{cc}};
+            }
+
             foreach my $cc (@ccrcpt) {
                 my $rcpt = $self->_render_receipient( $cc, \%vars );
                 ##! 32: 'New cc rcpt: ' . $cc . ' -> ' . $rcpt
