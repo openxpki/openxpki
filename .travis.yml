@@ -49,6 +49,8 @@ before_install:
 # Dependencies / modules
 #
 install:
+    - cpanm --quiet --notest PPI
+    - ./tools/scripts/makefile2cpanfile.pl > ./cpanfile
     - cpanm --quiet --notest --installdeps ./
 
 #
