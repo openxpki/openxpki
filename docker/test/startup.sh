@@ -11,25 +11,21 @@ echo -e "\n====[ MySQL ]===="
 nohup sh -c mysqld >/tmp/mysqld.log &
 
 echo "Waiting for MySQL to initialize (max. 60 seconds)"
+DBPASS=""
+test ! -z "$OXI_TEST_DB_MYSQL_DBPASSWORD" && DBPASS="-p $OXI_TEST_DB_MYSQL_DBPASSWORD"
 sec=0; error=1
 while [ $error -ne 0 -a $sec -lt 60 ]; do
-    error=$(echo "quit" | mysql -h 127.0.0.1 -uroot --connect_timeout=1 2>&1 | grep -c ERROR)
+    error=$(echo "quit" | mysql -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u $OXI_TEST_DB_MYSQL_DBUSER $DBPASS --connect_timeout=1 2>&1 | grep -c ERROR)
     sec=$[$sec+1]
     sleep 1
 done
 if [ $error -ne 0 ]; then
     echo "It seems that the MySQL database was not started. Output:"
-    echo "quit" | mysql -h 127.0.0.1 -uroot --connect_timeout=1
+    echo "quit" | mysql -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u $OXI_TEST_DB_MYSQL_DBUSER $DBPASS --connect_timeout=1
     exit 333
 fi
 
 set -e
-
-#
-# Database setup
-#
-$CLONE_DIR/tools/scripts/mysql-create-db.sh
-$CLONE_DIR/tools/scripts/mysql-create-user.sh
 
 #
 # Repository clone
@@ -58,6 +54,12 @@ echo -e "\n====[ Scanning Makefile.PL for new Perl dependencies ]===="
 cpanm --quiet --notest PPI
 $CLONE_DIR/tools/scripts/makefile2cpanfile.pl > $CLONE_DIR/cpanfile
 cpanm --quiet --notest --installdeps $CLONE_DIR/
+
+#
+# Database setup
+#
+$CLONE_DIR/tools/scripts/mysql-create-db.sh
+$CLONE_DIR/tools/scripts/mysql-create-user.sh
 
 #
 # Unit tests
@@ -91,7 +93,8 @@ cat <<__DB > /etc/openxpki/config.d/system/database.yaml
 main:
     debug: 0
     type: MySQL
-    host: 127.0.0.1
+    host: $OXI_TEST_DB_MYSQL_DBHOST
+    port: $OXI_TEST_DB_MYSQL_DBPORT
     name: $OXI_TEST_DB_MYSQL_NAME
     user: $OXI_TEST_DB_MYSQL_USER
     passwd: $OXI_TEST_DB_MYSQL_PASSWORD
