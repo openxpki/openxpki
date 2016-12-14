@@ -1,10 +1,4 @@
-# .travis.yml
-#
-# Note: Travis will run through the 'before_install' and 'install' steps
-# before executing 'make test'
-
-# We use our own perl, so setting language to generic
-# allows us to use the stripped-down travis image
+# We use our own Perl setup (language "generic" uses a stripped-down TravisCI image)
 language: generic
 
 # Ubuntu 14.04 "Trusty"
@@ -28,6 +22,9 @@ cache:
     directories:
         - $HOME/perl5
 
+#
+# OS packages
+#
 addons:
   apt:
     packages:
@@ -36,23 +33,31 @@ addons:
     - libmysqlclient-dev
     - pkg-config
 
+#
+# Service setup
+#
 services:
     - mysql
 
-# Note: language-pack-de is needed for the i18n test
 before_install:
-    - which perl
-    - perl -v
     - ./tools/scripts/mysql-create-db.sh
     - ./tools/scripts/mysql-create-user.sh
     - curl -s -L https://cpanmin.us | perl - App::cpanminus
     - cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
+#
+# Dependencies / modules
+#
 install:
     - cpanm --quiet --notest --installdeps ./
 
-# With 'language: generic', the 'script' must be specified...
+#
+# Build
+#
+# (must be specified if "language" is "generic")
 script:
+    - which perl
+    - perl -v
     - cd core/server
     - perl Makefile.PL
     - make test
