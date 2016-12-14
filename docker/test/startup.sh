@@ -62,22 +62,28 @@ $CLONE_DIR/tools/scripts/mysql-create-db.sh
 $CLONE_DIR/tools/scripts/mysql-create-user.sh
 
 #
-# Unit tests
+# OpenXPKI compilation
 #
-echo -e "\n====[ Compile and test OpenXPKI ]===="
+echo -e "\n====[ Compile OpenXPKI ]===="
 # Config::Versioned reads USER env variable
 export USER=dummy
 
 cd $CLONE_DIR/core/server
-perl Makefile.PL    > /dev/null
-make                > /dev/null
+perl Makefile.PL                                        > /dev/null
+make                                                    > /dev/null
+
+#
+# Unit tests
+#
+echo -e "\n====[ Testing part 1: unit tests ]===="
 make test
 
 #
 # OpenXPKI installation
 #
 echo -e "\n====[ Install OpenXPKI ]===="
-make install > /dev/null
+echo "Copying files"
+make install                                            > /dev/null
 
 # directory list borrowed from /package/debian/core/libopenxpki-perl.dirs
 mkdir -p /var/openxpki/session
@@ -109,7 +115,8 @@ $CLONE_DIR/tools/scripts/mysql-create-schema.sh
 #
 # Sample config (CA certificates etc.)
 #
-/bin/bash $CLONE_DIR/config/sampleconfig.sh
+echo "Creating sample config (CA certificates etc.)"
+/bin/bash $CLONE_DIR/config/sampleconfig.sh             > /dev/null
 
 #
 # Start OpenXPKI
@@ -120,6 +127,9 @@ $CLONE_DIR/tools/scripts/mysql-create-schema.sh
 # QA tests
 #
 # (testing /api/ before /nice/ leads to errors)
-cd $CLONE_DIR/qatest/backend/nice/  && prove .
-cd $CLONE_DIR/qatest/backend/api/   && prove .
-cd $CLONE_DIR/qatest/backend/webui/ && prove .
+echo -e "\n====[ Testing part 2: QA tests (#1) ]===="
+cd $CLONE_DIR/qatest/backend/nice/  && prove -q .
+echo -e "\n====[ Testing part 2: QA tests (#2) ]===="
+cd $CLONE_DIR/qatest/backend/api/   && prove -q .
+echo -e "\n====[ Testing part 2: QA tests (#3) ]===="
+cd $CLONE_DIR/qatest/backend/webui/ && prove -q .
