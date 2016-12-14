@@ -28,6 +28,7 @@ root="$(readlink -e "$(dirname $0)/../")"
 set -e
 echo -e "\n====[ Build Docker image ]===="
 docker build $(dirname $0)/test -t oxi-test
+
 echo -e "\n====[ Run tests ]===="
 test ! -z "$repo" && echo " - Github repo: $repo" || echo " - local repo"
 echo " - branch: $branch"

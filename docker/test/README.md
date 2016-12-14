@@ -1,7 +1,6 @@
 # Docker image for OpenXPKI test suite
 
-The Docker image provides an easy way to run the OpenXPKI test suite on any Git
-branch of OpenXPKI.
+This is an easy way to run the OpenXPKI test suite on any Git branch.
 
 Image specifications:
 

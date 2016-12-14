@@ -10,7 +10,6 @@ requires 'Connector'                     => '1.08';
 requires 'Crypt::CBC'                    => '2.29';
 requires 'Crypt::OpenSSL::AES'           => '0.02';      # for e.g. OpenXPKI::Crypto::VolatileVault
 requires 'Crypt::PKCS10'                 => '1.8';
-requires 'Crypt::SMIME'                  => '0.15';
 requires 'Data::Password'                => '1.07';
 requires 'Data::Serializer'              => '0.44';
 requires 'Data::UUID'                    => 0;           # for OpenXPKI::Template::Plugin::Utils and CPAN

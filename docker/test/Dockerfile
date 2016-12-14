@@ -11,8 +11,8 @@ FROM ubuntu:14.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 # language-pack-de is needed for the i18n test
-RUN apt-get update
-RUN apt-get -qq -y install \
+RUN apt-get update && \
+    apt-get -qq -y install \
         build-essential \
         git \
         expat libexpat-dev \
@@ -22,8 +22,8 @@ RUN apt-get -qq -y install \
         apache2 \
         mysql-server \
         curl \
-        pkg-config
-RUN apt-get clean
+        pkg-config && \
+    apt-get clean
 
 #
 # Setup - cpanm and "default" modules
@@ -31,7 +31,6 @@ RUN apt-get clean
 RUN curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus
 COPY cpanfile /
 RUN cpanm --quiet --notest --installdeps /
-
 
 #
 # Setup - locales
