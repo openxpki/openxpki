@@ -7,50 +7,48 @@
 # allows us to use the stripped-down travis image
 language: generic
 
-sudo: required
+# Ubuntu 14.04 "Trusty"
 dist: trusty
+# Run in Docker container instead of VM - currently (2016-12-14) beta for "trusty"
+sudo: false
 
 env:
     global:
-        - PERL_CPANM_OPT="--mirror http://cpan.cpantesters.org/ --mirror http://search.cpan.org/CPAN --mirror http://cpan.mirrors.travis-ci.org --cascade-search"
-        - PATH="/opt/myperl/bin:$PATH"
-        - MYPERLVER=5.22.0-1
-        - MYPERLVERS=5.22.0.1
-        - MYPERLDL=https://github.com/mrscotty/myperl/releases/download/v5.22.0.1
+        - OXI_TEST_DB_MYSQL_NAME=openxpki
+        - OXI_TEST_DB_MYSQL_USER=openxpki
+        - OXI_TEST_DB_MYSQL_PASSWORD=openxpki
+        - OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1
+        - OXI_TEST_DB_MYSQL_DBPORT=3306
+        - OXI_TEST_DB_MYSQL_DBUSER=root
+        - OXI_TEST_DB_MYSQL_DBPASSWORD=
+        # Config::Versioned reads USER env variable
+        - USER=dummy
+
+addons:
+  apt:
+    packages:
+    - openssl
+    - libssl-dev
+    - libmysqlclient-dev
+    - pkg-config
+
+services:
+    - mysql
 
 # Note: language-pack-de is needed for the i18n test
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq expat libexpat-dev openssl libssl-dev language-pack-de
-    # stuff needed for mysql perl module
-    - sudo apt-get install -y -qq libmysqlclient-dev
-    # stuff needed for running oxi instance (TODO: check if these are already installed)
-    - sudo apt-get install -y -qq mysql-server apache2
-    - sudo apt-get install -y -qq libdb5.1
-    - wget $MYPERLDL/myperl_${MYPERLVER}_amd64.deb
-    - sudo dpkg -i myperl_${MYPERLVER}_amd64.deb
-    - wget $MYPERLDL/myperl-buildtools_${MYPERLVERS}_amd64.deb
-    - sudo dpkg -i myperl-buildtools_${MYPERLVERS}_amd64.deb
-    - wget $MYPERLDL/myperl-dbd-mysql_1.9.0.1_amd64.deb
-    - sudo dpkg -i myperl-dbd-mysql_1.9.0.1_amd64.deb
-    - wget $MYPERLDL/myperl-openxpki-core-deps_1.9.0.1_amd64.deb
-    - sudo dpkg -i myperl-openxpki-core-deps_1.9.0.1_amd64.deb
+    - which perl
+    - perl -v
+    - ./tools/scripts/mysql-create-db.sh
+    - ./tools/scripts/mysql-create-user.sh
+    - curl -s -L https://cpanmin.us | perl - App::cpanminus
+    - cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
-
-# Try to get debug from inst stuff
 install:
-    - cpanm --notest Config::Std Config::Merge Template Proc::SafeExec Module::Install YAML DBD::mysql
-# The core tests depend on the client library - we install it in a separate perlbrew library space
-#    - "perlbrew lib delete oxi-client; perlbrew lib create oxi-client"
-#    - "(cd core/server && cpanm --quiet --notest .)"
-#    - "(cd package/debian/myperl-dbd-mysql && make package PACKAGE_VER=5.20.0 PACKAGE_REL=1)"
-#    - ls -la package/debian package/debian/mysql-dbd-mysql
-#    - sudo dpkg -i package/debian/mysql-dbd-mysql_*.deb
-#    - "(cd package/debian/myperl-openxpki-core-deps && make package)"
-#    - ls -la package/debian
-#    - sudo dpkg -i package/debian/myperl-openxpki-core-deps_*.deb
-    #- cpanm --notest Config::Std Config::Merge Template Proc::SafeExec Module::Install YAML DBD::mysql
+    - cpanm --quiet --notest --installdeps ./
 
 # With 'language: generic', the 'script' must be specified...
 script:
-    - PATH=$PATH:/opt/myperl/bin PERL=/opt/myperl/bin/perl make test
+    - cd core/server
+    - perl Makefile.PL
+    - make test
