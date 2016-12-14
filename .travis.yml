@@ -24,6 +24,10 @@ env:
         # Config::Versioned reads USER env variable
         - USER=dummy
 
+cache:
+    directories:
+        - $HOME/perl5
+
 addons:
   apt:
     packages:
