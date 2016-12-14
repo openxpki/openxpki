@@ -2,13 +2,14 @@
 
 BRANCH="$1"
 GITHUB_USER_REPO="$2"
+CLONE_DIR=/opt/openxpki
 
+#
+# MySQL
+#
 echo -e "\n====[ MySQL ]===="
 nohup sh -c mysqld >/tmp/mysqld.log &
 
-#
-# Wait for DBMS to start
-#
 echo "Waiting for MySQL to initialize (max. 60 seconds)"
 sec=0; error=1
 while [ $error -ne 0 -a $sec -lt 60 ]; do
@@ -27,15 +28,8 @@ set -e
 #
 # Database setup
 #
-echo "Creating database for unit tests (db + user)"
-
-cat <<__SQL | mysql -h 127.0.0.1 -uroot
-DROP database IF EXISTS $OXI_TEST_DB_MYSQL_NAME;
-CREATE database $OXI_TEST_DB_MYSQL_NAME CHARSET utf8;
-CREATE USER '$OXI_TEST_DB_MYSQL_USER'@'%' IDENTIFIED BY '$OXI_TEST_DB_MYSQL_PASSWORD';
-GRANT ALL ON $OXI_TEST_DB_MYSQL_NAME.* TO '$OXI_TEST_DB_MYSQL_USER'@'%';
-flush privileges;
-__SQL
+$CLONE_DIR/tools/scripts/mysql-create-db.sh
+$CLONE_DIR/tools/scripts/mysql-create-user.sh
 
 #
 # Repository clone
@@ -55,55 +49,15 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 set -e
-git clone --depth=1 --branch=$BRANCH $REPO /opt/openxpki
+git clone --depth=1 --branch=$BRANCH $REPO $CLONE_DIR
 
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI
 #
 echo -e "\n====[ Scanning Makefile.PL for new Perl dependencies ]===="
 cpanm --quiet --notest PPI
-
-perl -e '
-use PPI;
-use PPI::Dumper;
-
-$doc = PPI::Document->new("/opt/openxpki/core/server/Makefile.PL") or die "Makefile.PL not found";
-$doc->prune("PPI::Token::Whitespace");
-$doc->prune("PPI::Token::Comment");
-
-my $sub = $doc->find_first(sub {                         # find
-    $_[1]->parent == $_[0]                               # at root level
-    and $_[1]->isa("PPI::Statement")                     # a statement
-    and $_[1]->first_element->content eq "WriteMakefile" # called "WriteMakefile"
-}) or die "Subroutine call WriteMakefile() not found\n";
-
-$key = $sub->find_first(sub {                            # below that find
-    $_[1]->isa("PPI::Token::Quote")                      # a quoted string
-    and $_[1]->content =~ /PREREQ_PM/                    # called "PREREQ_PM"
-}) or die "Argument PREREQ_PM not found in WriteMakefile()\n";
-
-$list = $key->next_sibling->next_sibling; # skip "=>" and go to HashRef "{}"
-$list->prune("PPI::Token::Operator");     # remove all "=>"
-%modmap = map { s/(\x27|\x22)//g; $_ }    # remove single or double quotes
-    map { $_->content }
-    @{$list->find("PPI::Token")};
-
-use version;
-my @modlist =
-    map { "$_~".$modmap{$_} }
-    grep {
-        ! (
-            eval "require $_;" and
-            eval "version->parse($_->VERSION) >= version->parse($modmap{$_})"
-        )
-    }
-    keys %modmap;
-
-if (@modlist) {
-    print "installing missing dependencies\n";
-    system("cpanm --quiet --notest ".join(" ", @modlist));
-}
-'
+$CLONE_DIR/tools/scripts/makefile2cpanfile.pl > $CLONE_DIR/cpanfile
+cpanm --quiet --notest --installdeps $CLONE_DIR/
 
 #
 # Unit tests
@@ -112,7 +66,7 @@ echo -e "\n====[ Compile and test OpenXPKI ]===="
 # Config::Versioned reads USER env variable
 export USER=dummy
 
-cd /opt/openxpki/core/server
+cd $CLONE_DIR/core/server
 perl Makefile.PL    > /dev/null
 make                > /dev/null
 make test
@@ -128,7 +82,7 @@ mkdir -p /var/openxpki/session
 mkdir -p /var/log/openxpki
 
 # copy config
-cp -R /opt/openxpki/config/openxpki /etc
+cp -R $CLONE_DIR/config/openxpki /etc
 
 # customize config
 sed -ri 's/^((user|group):\s+)\w+/\1root/' /etc/openxpki/config.d/system/server.yaml
@@ -146,23 +100,13 @@ __DB
 #
 # Database re-init
 #
-echo "Re-creating database for qa tests (db + user + schema)"
-
-cat <<__SQL | mysql -h 127.0.0.1 -uroot
-DROP database IF EXISTS $OXI_TEST_DB_MYSQL_NAME;
-CREATE database $OXI_TEST_DB_MYSQL_NAME CHARSET utf8;
-__SQL
-
-mysql -h 127.0.0.1 \
-    -u$OXI_TEST_DB_MYSQL_USER \
-    -p$OXI_TEST_DB_MYSQL_PASSWORD \
-    $OXI_TEST_DB_MYSQL_NAME \
-    < /opt/openxpki/config/sql/schema-mysql.sql
+$CLONE_DIR/tools/scripts/mysql-create-db.sh
+$CLONE_DIR/tools/scripts/mysql-create-schema.sh
 
 #
 # Sample config (CA certificates etc.)
 #
-/bin/bash /opt/openxpki/config/sampleconfig.sh
+/bin/bash $CLONE_DIR/config/sampleconfig.sh
 
 #
 # Start OpenXPKI
@@ -173,6 +117,6 @@ mysql -h 127.0.0.1 \
 # QA tests
 #
 # (testing /api/ before /nice/ leads to errors)
-cd /opt/openxpki/qatest/backend/nice/  && prove .
-cd /opt/openxpki/qatest/backend/api/   && prove .
-cd /opt/openxpki/qatest/backend/webui/ && prove .
+cd $CLONE_DIR/qatest/backend/nice/  && prove .
+cd $CLONE_DIR/qatest/backend/api/   && prove .
+cd $CLONE_DIR/qatest/backend/webui/ && prove .
