@@ -69,9 +69,9 @@ sub execute {
     );   
     my %ca_identifier;
     foreach my $entry (@{ $db_results }) {
-        ##! 16: ' ca has revoked certificates pending ' . $entry->{ISSUER_IDENTIFIER}           
+        ##! 16: ' ca has revoked certificates pending ' . $entry->{'CERTIFICATE.ISSUER_IDENTIFIER'}
         CTX('log')->log(
-            MESSAGE  => 'ca has revoked certificates pending ' . $entry->{ISSUER_IDENTIFIER},
+            MESSAGE  => 'ca has revoked certificates pending ' . $entry->{'CERTIFICATE.ISSUER_IDENTIFIER'},
             PRIORITY => 'debug',
             FACILITY => 'application',
         );                    
