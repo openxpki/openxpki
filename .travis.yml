@@ -20,7 +20,7 @@ env:
 
 cache:
     directories:
-        - $HOME/perl5
+        - $HOME/perl5/lib/perl5
 
 #
 # OS packages
