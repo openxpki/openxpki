@@ -256,8 +256,9 @@ sub dbh {
 # Execute given query
 sub run {
     my $self = shift;
-    my ($query) = positional_args(\@_,
+    my ($query, $return_rownum) = positional_args(\@_,
         { isa => 'OpenXPKI::Server::Database::Query|Str' },
+        { isa => 'Bool', optional => 1, default => 0 },
     );
     my $query_string;
     my $query_params;
@@ -290,7 +291,7 @@ sub run {
         ) if $sth->err;
     }
 
-    $sth->execute
+    my $rownum = $sth->execute
         or OpenXPKI::Exception->throw(
             message => "Could not execute SQL query",
             params => {
@@ -299,7 +300,7 @@ sub run {
             },
         );
 
-    return $sth;
+    return $return_rownum ? $rownum : $sth;
 }
 
 # SELECT
@@ -323,7 +324,7 @@ sub select_one {
 sub insert {
     my $self = shift;
     my $query = $self->query_builder->insert(@_);
-    return $self->run($query);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
 
 # UPDATE
@@ -331,7 +332,7 @@ sub insert {
 sub update {
     my $self = shift;
     my $query = $self->query_builder->update(@_);
-    return $self->run($query);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
 
 # MERGE
@@ -354,7 +355,7 @@ sub merge {
         $args{set_once},
         $args{where},
     );
-    return $self->run($query);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
 
 # DELETE
@@ -362,7 +363,7 @@ sub merge {
 sub delete {
     my $self = shift;
     my $query = $self->query_builder->delete(@_);
-    return $self->run($query);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
 
 # Create a new insert ID ("serial")
@@ -370,7 +371,7 @@ sub next_id {
     my ($self, $table) = @_;
 
     # get new serial number from DBMS (SQL sequence or emulation via table)
-    
+
     my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
     my $id_int = $self->driver->next_id($self, $seq_table );
     my $id = Math::BigInt->new($id_int);
@@ -549,8 +550,7 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 =head2 insert
 
-Inserts rows into the database and returns the results as a I<DBI::st> statement
-handle.
+Inserts rows into the database and returns the number of affected rows.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
@@ -558,8 +558,7 @@ For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
 
 =head2 update
 
-Updates rows in the database and returns the results as a I<DBI::st> statement
-handle.
+Updates rows in the database and rreturns the number of affected rows.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
@@ -568,7 +567,10 @@ For parameters see L<OpenXPKI::Server::Database::QueryBuilder/update>.
 =head2 merge
 
 Either directly executes or emulates an SQL MERGE (you could also call it
-REPLACE) function and returns the results as a I<DBI::st> statement handle.
+REPLACE) function and returns the number of affected rows.
+
+Please note that e.g. MySQL returns 2 (not 1) if an update was performed. So
+you should only use the return value to test for 0 / FALSE.
 
 Named parameters:
 
@@ -646,9 +648,19 @@ To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute
 
 =head2 run
 
-Executes the given query and returns a DBI statement handle.
+Executes the given query and returns a DBI statement handle. Throws an exception
+in case of errors.
 
-    my $sth = $db->run($query) or die "Error executing query: $@";
+    my $sth;
+    eval {
+        $sth = $db->run($query);
+    };
+    if (my $e = OpenXPKI::Exception->caught) {
+        die "OpenXPKI exception executing query: $e";
+    }
+    elsif ($@) {
+        die "Unknown error: $e";
+    };
 
 Parameters:
 
@@ -656,6 +668,12 @@ Parameters:
 
 =item * B<$query> - query to run (either a I<OpenXPKI::Server::Database::Query>
 or a literal SQL string)
+
+=item * B<$return_rownum> - return number of affected rows instead of DBI
+statement handle (optional, default: 0).
+
+If no rows were affected, then "0E0" is returned which Perl will treat as 0 but
+will regard as true.
 
 =back
 
