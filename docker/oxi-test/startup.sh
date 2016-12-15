@@ -5,6 +5,20 @@ GITHUB_USER_REPO="$2"
 CLONE_DIR=/opt/openxpki
 
 #
+# Exit handler - run bash on errors to allow inspection of log files
+#
+function _exit () {
+    if [ $1 -ne 0 ]; then
+        echo -e "\n==========[ ERROR ]==========" >&2
+        echo "There was an error, you can now inspect the log files under /var/log/openxpki/" >&2
+        echo "and then finally stop the Docker container with 'exit'." >&2
+        /bin/bash
+    fi
+    exit $1
+}
+trap '_exit $?' EXIT
+
+#
 # MySQL
 #
 echo -e "\n====[ MySQL ]===="
