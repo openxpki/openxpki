@@ -539,14 +539,14 @@ sub __scan_for_paused_workflows {
     );
 
     eval{
-        #this command effectively creates a forked child process which "wakes up the workflow"
-        my $instance = OpenXPKI::Server::Watchdog::WorkflowInstance->new();
-        $instance->run({
-            WORKFLOW_SERIAL     => $workflow->{workflow_id},
-            WORKFLOW_TYPE       => $workflow->{workflow_type},
-            WORKFLOW_SESSION    => $workflow->{workflow_session},
-            PKI_REALM           => $workflow->{pki_realm},
-        });
+        # create a forked child process which "wakes up the workflow"
+        my $instance = OpenXPKI::Server::Watchdog::WorkflowInstance->new(
+            workflow_id         => $workflow->{workflow_id},
+            workflow_type       => $workflow->{workflow_type},
+            workflow_session    => $workflow->{workflow_session},
+            pki_realm           => $workflow->{pki_realm},
+        );
+        $instance->run;
     };
     # all exceptions/fatals which occur in the forked child will be handled there
     # if an error/exception occurs here, it must be within the main (watchdog) process, so we log it as "system" error
