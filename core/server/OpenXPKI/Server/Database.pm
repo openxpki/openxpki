@@ -10,7 +10,7 @@ specific drivers/functions.
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Database::Util;
+use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
@@ -338,7 +338,7 @@ sub update {
 # MERGE
 # Returns: DBI statement handle
 sub merge {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         into     => { isa => 'Str' },
         set      => { isa => 'HashRef' },
         set_once => { isa => 'HashRef', optional => 1, default => {} },
