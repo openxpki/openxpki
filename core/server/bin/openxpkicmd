@@ -6,6 +6,7 @@
 # Copyright (c) 2012 by The OpenXPKI Project
 #
 
+use JSON;
 use strict;
 use warnings;
 use English;
@@ -27,6 +28,7 @@ my %params = (
     nosplit => undef,
     context => undef,
     attribute => undef,
+    json => undef,
     timeout => 30,
     );
 
@@ -40,20 +42,38 @@ sub debug {
 sub dump_workflow {
 
     my $reply = shift;
+    my $json = shift || {};
+
     if ($params{context} && $reply->{PARAMS}->{WORKFLOW}->{CONTEXT}) {
-        print "\n===Context===\n";
-        my $context = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
-        foreach my $key (keys %{$context}) {
-            printf "=%-20s: %s\n", $key, $context->{$key};
+
+        if ($params{json}) {
+            $json->{context} = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
+        } else {
+            print "\n===Context===\n";
+            my $context = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
+            foreach my $key (keys %{$context}) {
+                printf "=%-20s: %s\n", $key, $context->{$key};
+            }
         } 
     }
-    
+
     if ($params{attribute} && $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE}) {
-        print "\n===Attributes===\n";
-        my $attr = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
-        foreach my $key (keys %{$attr}) {
-            printf "=%-20s: %s\n", $key, $attr->{$key};
-        } 
+        if ($params{json}) {
+            $json->{attribute} = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
+        } else {
+            print "\n===Attributes===\n";
+            my $attr = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
+            foreach my $key (keys %{$attr}) {
+                printf "=%-20s: %s\n", $key, $attr->{$key};
+            }
+        }
+    }
+
+    if ($params{json}) {
+        $json->{workflow} = { id => $reply->{PARAMS}->{WORKFLOW}->{ID}, 
+            state => $reply->{PARAMS}->{WORKFLOW}->{STATE} };
+        print JSON::to_json($json);
+        print "\n";
     }
 }
 
@@ -74,6 +94,7 @@ GetOptions(\%params,
             debug
             context
             attribute
+            json
             timeout|to=i
          )) or pod2usage(-verbose => 0);
 
@@ -113,7 +134,6 @@ if($params{instance}){
     $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
 } elsif(!$params{socketfile}){
     $params{socketfile} = '/var/openxpki/openxpki.socket';
-    printf("using default socket %s \n", $params{socketfile});
 }
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
@@ -211,7 +231,7 @@ if ($params{wfid}) {
         );
 
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-            printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE};
+            printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE} unless($params{json});
             dump_workflow( $reply );
         }
     } else {
@@ -223,20 +243,25 @@ if ($params{wfid}) {
         );
         
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-            print "Possible Actions:\n";
-            print join "\n", @{$reply->{PARAMS}};
-            print "\n";
-        }
         
-        if ($params{context} || $params{attribute}) {
-            $reply = $client->send_receive_command_msg( 'get_workflow_info',
-                {
-                    ID => $params{wfid},                    
-                }
-            );
-            dump_workflow( $reply );
-        } 
+            my $json = {};
+            if (!$params{json}) {
+                print "Possible Actions:\n";
+                print join "\n", @{$reply->{PARAMS}};
+                print "\n";
+            } else {
+                $json = { actions => $reply->{PARAMS} };
+            }
 
+            if ($params{context} || $params{attribute} || $params{json}) {
+                $reply = $client->send_receive_command_msg( 'get_workflow_info',
+                    {
+                        ID => $params{wfid},
+                    }
+                );
+                dump_workflow( $reply, $json );
+            }
+        }
 
     }
 } else {
@@ -251,7 +276,8 @@ if ($params{wfid}) {
                        });
                        
     if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE};      
+        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE}
+            unless($params{json});
         dump_workflow( $reply );
     }
 
@@ -289,6 +315,7 @@ openxpkicmd [options] WORKFLOW_TYPE
     --debug               enable debug mode
     --context             show context data
     --attribute           show attribute data
+    --json                dump data using json (experimental)
     --timeout             socket timeout in seconds (default 30s)
 
 =head1 INVOCATION
