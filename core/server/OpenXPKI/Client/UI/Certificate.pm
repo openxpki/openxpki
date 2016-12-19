@@ -691,49 +691,7 @@ sub init_related {
 
 
 }
-
-=head2 init_privkey
-
-Prepare download of a private key, requests the password and export format
-via form fields.
-
-Deprecated - moved to workflow, will be removed with next major release
-
-=cut
-sub init_privkey {
-
-    my $self = shift;
-    my $cert_identifier = $self->param('identifier');
-
-    $self->_page({
-        label => 'I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL',
-        description => 'I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC',
-    });
-
-    $self->add_section({
-        type => 'form',
-        action => 'certificate!privkey!identifier!' . $cert_identifier,
-        content => {
-           title => '',
-           submit_label => 'download',
-           fields => [
-                { name => 'passphrase', label => 'Passphrase', type => 'password' },
-                { name => 'format', label => 'Format', type => 'select', options => [
-                    { value => 'PKCS12', label => 'PKCS12' },
-                    { value => 'PKCS8_PEM', label => 'PKCS8 (PEM)' },
-                    { value => 'PKCS8_DER', label => 'PKCS8 (DER)' },
-                    # backend is broken for those, need fixing first
-                    { value => 'OPENSSL_PRIVKEY', label => 'OpenSSL native' },                    
-                    { value => 'JAVA_KEYSTORE', label => 'Java Keystore' }
-                    ]
-                },
-            ]
-        }});
-
-    return $self;
-
-}
-
+ 
 =head2 init_download 
 
 Handle download requests, required the cert_identifier and the expected format.
@@ -1071,84 +1029,7 @@ sub action_search {
     return $self;
  
 }
-
-=head2 action_privkey
-
-Retrieve the key passphrase and - if matches - send the key as pkcs12
-binary to the client.
-
-Deprecated - moved to workflow, will be removed with next major release
-
-=cut
-sub action_privkey {
-
-    my $self = shift;
-    my $args = shift;
-
-    my $cert_identifier = $self->param('identifier');
-    my $passphrase = $self->param('passphrase');
-    my $format = $self->param('format');
-
-    my $format_mime = {
-        'PKCS12' => [ 'application/x-pkcs12', 'p12' ],
-        'PKCS8_PEM' => [ 'application/pkcs8', 'key' ],
-        'PKCS8_DER' => [ 'application/pkcs8', 'p8' ],
-        'OPENSSL_PRIVKEY' => [ 'application/x-pem-file', 'pem' ],
-        'JAVA_KEYSTORE' => [ 'application/x-java-keystore', 'jks' ]
-    };
-
-    if (!$format_mime->{$format}) {
-        $self->logger()->error( "Invalid key format requested ($format)" );
-        $self->set_status('Invalid key format requested','error');
-        return;
-    }
-
-    $self->logger()->debug( "Request privkey for $cert_identifier" );
-
-    my $privkey  = $self->send_command ( "get_private_key_for_cert", { 
-        IDENTIFIER => $cert_identifier, 
-        FORMAT => $format, 
-        PASSWORD => $passphrase, 
-    });
-
-    if (ref $privkey ne 'HASH' || !defined $privkey->{PRIVATE_KEY} )  {
-        $self->logger()->error('Unable to get private key');
-        $self->set_status('Unable to get key - wrong password?','error');
-        return;
-    }
-
-    $self->logger()->debug( "Got private key " );
-    my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
-    my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
-
-    $self->logger()->trace( "Cert Info:  " . Dumper $cert_info );
-
-    my $page = $self->__persist_response({
-        'mime' => $format_mime->{$format}->[0],
-        'attachment' => "$filename." . $format_mime->{$format}->[1],
-        'data' => $privkey->{PRIVATE_KEY}
-    }, '+3m');
-
-    # We need to send the redirect to a non-ember url to load outside ember
-    my $link = $self->_client()->_config()->{'scripturl'}.'?page='.$page;
-
-    $self->_page({
-        label => 'Download private key for certificate.',
-        description => ''
-    });
-
-    $self->add_section({
-        type => 'text',
-        content => {
-           title => '',
-           description => 'Password accepted - <a href="'.$link.'" target="_blank">click here to download your key</a>.<br>
-           Do not bookmark this link, it is temporary and will expire!'
-    }});
-
-    return $self;
-
-}
-
+ 
 =head2 __render_result_list
 
 Helper to render the output result list from a sql query result.
