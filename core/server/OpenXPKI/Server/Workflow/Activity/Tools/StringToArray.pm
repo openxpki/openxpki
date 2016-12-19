@@ -37,7 +37,7 @@ sub execute {
     my $regex = $self->param('regex');
     $regex = '\s+' unless (defined $regex);
     
-    my $modifier = $self->param('modifier');
+    my $modifier = $self->param('modifier') || '';
     $modifier =~ s/\s//g;
     if ($modifier =~ /[^alupimsx]/ ) {
         OpenXPKI::Exception->throw(
