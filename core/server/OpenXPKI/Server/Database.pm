@@ -128,7 +128,7 @@ sub _build_driver {
 
     my $class = "OpenXPKI::Server::Database::Driver::".$driver;
 
-    eval { use Module::Load; autoload($class) };
+    eval { use Module::Load 0.32; autoload($class) };
     OpenXPKI::Exception->throw (
         message => "Unable to require() database driver package",
         params => { class_name => $class, message => $@ }

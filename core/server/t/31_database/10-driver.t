@@ -28,6 +28,7 @@ with 'OpenXPKI::Server::Database::Role::Driver';
 sub dbi_driver { 'SQLite' }
 sub dbi_dsn { my $self = shift; sprintf("dbi:%s:dbname=%s", $self->dbi_driver, $self->name) }
 sub dbi_connect_params { }
+sub dbi_on_connect_do { }
 sub sqlam_params { limit_offset => 'LimitOffset' }
 sub last_auto_id { 1; } # dummy
 __PACKAGE__->meta->make_immutable;

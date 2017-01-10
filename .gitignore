@@ -13,3 +13,7 @@ vagrant/*/.vagrant/
 vagrant/**/oracle-xe-*.rpm.zip
 package/debian/deb
 package/debian/lib
+.ignorepath
+.includepath
+.project
+.settings/
