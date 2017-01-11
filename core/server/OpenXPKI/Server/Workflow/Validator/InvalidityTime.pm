@@ -16,21 +16,24 @@ use DateTime;
 extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _preset_args {
-    return [ qw(invalidity_time cert_identifier flag_delayed_revoke) ];
+    return [ qw(invalidity_time cert_identifier) ];
 }
 
 sub _validate {
     
-    my ( $self, $wf, $invalidity_time, $identifier, $flag_delayed_revoke ) = @_;
+    ##! 1: 'start'
+    
+    my ( $self, $wf, $invalidity_time, $identifier ) = @_;
+
+    ##! 16: 'invalidity_time ' . $invalidity_time
 
     if (!$invalidity_time) {
         return 1;
     }
 
-    ## prepare the environment
-    my $context = $wf->context();
-     
-    if (!defined $identifier || $identifier !~ m{ [a-zA-Z\-_]+ }xms) {
+    ##! 16: 'Identifier ' . $identifier
+
+    if (!defined $identifier || $identifier !~ m{\A [a-zA-Z0-9\-_]+ \z}xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
     	    log => {
@@ -44,28 +47,22 @@ sub _validate {
     ##! 16: 'invalidity time: ' . $invalidity_time
     ##! 16: 'identifier: ' . $identifier
 
-    my $dbi = CTX('dbi_backend');
     my $pki_realm = CTX('session')->get_pki_realm();
-    my $dt = DateTime->now;
-    my $now = $dt->epoch();
+    my $now = time();
     ##! 16: 'now: ' . $now
 
-    my $cert = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        COLUMNS => [
-            'NOTBEFORE',
-            'NOTAFTER',
-        ],
-        DYNAMIC => {
-            'IDENTIFIER' => {VALUE => $identifier},
-            'PKI_REALM'  => {VALUE => $pki_realm},
-        },
+    my $cert = CTX('dbi')->select_one(
+        columns => [ 'notbefore', 'notafter' ],
+        from => 'certificate',
+        where => { 'identifier' => $identifier, 'pki_realm' => $pki_realm },
     );
+
     if (! defined $cert) {
         validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB');
     }
-    my $notbefore = $cert->{'NOTBEFORE'};
-    my $notafter  = $cert->{'NOTAFTER'};
+    
+    my $notbefore = $cert->{'notbefore'};
+    my $notafter  = $cert->{'notafter'};
     ##! 16: 'notbefore: ' . $notbefore
     ##! 16: 'notafter: ' . $notafter
 
@@ -77,8 +74,8 @@ sub _validate {
         validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER');
     }
        
-    # We accept delayed requests if the "delayed_revoke" flag is set
-    if ($invalidity_time > ($now + 60) && not $flag_delayed_revoke) {
+    # Add some grace interval for clock skews
+    if ($invalidity_time > ($now + 60)) {
         validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE');
     }
     return 1;
@@ -97,18 +94,15 @@ OpenXPKI::Server::Workflow::Validator::InvalidityTime
   action:
       class: OpenXPKI::Server::Workflow::Validator::InvalidityTime
   arg:
-    $invalidity_time
-    $cert_identifier
-    $flag_delayed_revoke
+    - $invalidity_time
+    - $cert_identifier
 
 =head1 DESCRIPTION
 
 This validator checks whether a given invalidity time is valid for a 
 certificate, i.e. it is not in the future and within the the certificate
 validity time. It expects the timestamp and certificate identifier as 
-arguments, pass a true value as third argument if you will accept a 
-timestamp in the future ("delayed revoke"). If invalidity time is a false
-value, the validator returns true.
+arguments. If invalidity time is a false value, the validator returns true.
 
 The validator has a preset definiton using the context keys as given in 
 the example.
@@ -120,9 +114,5 @@ the example.
 =item invalidity_time
 
 The invalidity time, format must be epoch!
-
-= flag_delayed_revoke
-
-If set, a validity time in the future is considered valid.
 
 =back

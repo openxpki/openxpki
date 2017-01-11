@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-12-08 12:25+0100\n"
+"PO-Revision-Date: 2017-01-11 12:29+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1011,6 +1011,9 @@ msgstr "PKCS10 request can not be read"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "Validator failed on given expression"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
+msgstr "The entered date/time could not be validated."
+
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Message of the Day"
 
@@ -1448,6 +1451,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "SCEP Enrollment"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
+msgstr "The time given for delayed revocation is not in the future."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Failed Action"
 
@@ -1622,6 +1628,14 @@ msgstr "CSR Type"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP"
 msgstr "The type of csr, usually PKCS10."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC"
+msgstr ""
+"With delayed revocation you can schedule a revocation for a date in the "
+"future."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL"
+msgstr "Delayed Revocation"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr " "
 
@@ -1669,14 +1683,6 @@ msgstr "If set, the workflow does not require a manual approval"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL"
 msgstr "Auto-Approve"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC"
-msgstr ""
-"With delayed revocation you can schedule a revocation for a date in the "
-"future."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
-msgstr "Delayed Revoke"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC"
 msgstr ""
 "Check this box to force the creation of new revocation lists. By default, a "
@@ -1694,9 +1700,10 @@ msgstr "Hints to fill in the form fields"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC"
 msgstr ""
-"Specify the invalidity time for the revocation, this is only used in case of "
-"KeyCompromise and if the actual date of the compromise is known. Leave blank "
-"otherwise."
+"This value must only be set together with a reason code of keyCompromise and "
+"should be set if the actual date of the compromise is known. Leave blank for "
+"all other cases. Hint: This field can not be used to request a revocation "
+"date in the future."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL"
 msgstr "Invalidity Time"
@@ -2109,7 +2116,6 @@ msgstr "Process was moved to a background process."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Open Workflow"
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL"
 msgstr "Outstanding Tasks"
@@ -3654,6 +3660,9 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
+#~ msgstr "Delayed Revoke"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
 #~ msgstr " "
