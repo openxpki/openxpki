@@ -1,7 +1,7 @@
-FROM ubuntu:14.04
+FROM debian:8.6
 
 #
-# Scripts are split to be able to change something in the config and still
+# RUN commands are split to be able to change something in the config and still
 # have Docker cache the FS layers with the earlier commands.
 #
 
@@ -13,11 +13,11 @@ ARG DEBIAN_FRONTEND=noninteractive
 # language-pack-de is needed for the i18n test
 RUN apt-get update && \
     apt-get -qq -y install \
+        locales \
         build-essential \
         git \
         expat libexpat-dev \
         openssl libssl-dev \
-        language-pack-de \
         libmysqlclient-dev \
         apache2 \
         mysql-server \
@@ -28,15 +28,16 @@ RUN apt-get update && \
 #
 # Setup - cpanm and "default" modules
 #
-RUN curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus
+COPY cpanminus /
+RUN cat /cpanminus | perl - App::cpanminus && rm /cpanminus
 COPY cpanfile /
 RUN cpanm --quiet --notest --installdeps /
 
 #
 # Setup - locales
 #
+RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.UTF-8
-RUN locale-gen en_US.utf8
 
 #
 # Configuration
