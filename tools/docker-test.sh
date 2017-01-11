@@ -3,13 +3,13 @@
 # Run unit and QA tests for OpenXPKI in a Docker container.
 #
 # SYNOPSIS
-#   ./run-tests.sh
+#   ./docker-test.sh
 #       Test latest commit (!) of the current Git branch in your local repo
 #
-#   ./run-tests.sh myfix
+#   ./docker-test.sh myfix
 #       Test latest commit of branch "myfix" in your local repo
 #
-#   ./run-tests.sh develop openxpki/openxpki
+#   ./docker-test.sh develop openxpki/openxpki
 #       Test latest commit of branch "develop" in the Github repo "openxpki/openxpki"
 #
 # DESCRIPTION
@@ -29,7 +29,8 @@ root="$(readlink -e "$(dirname "$0")/../")"
 
 set -e
 echo -e "\n====[ Build Docker image ]===="
-docker build $(dirname $0)/oxi-test -t oxi-test
+echo "(This might take more than 10 minutes on first execution)"
+docker build $(dirname $0)/docker-test -t oxi-test
 
 echo -e "\n====[ Run tests ]===="
 test ! -z "$repo" && echo " - Github repo: $repo" || echo " - local repo"
