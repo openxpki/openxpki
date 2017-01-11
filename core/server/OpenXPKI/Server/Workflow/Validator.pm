@@ -117,7 +117,7 @@ sub validate {
     
     $self->workflow( $workflow );
     
-    my @args_parsed = ( $workflow );
+    my @args_parsed = ();
     
     # evaluate the arguments, $context escaping is already done by the 
     # workflow factory, now we look for TT strings and parse them.
@@ -125,10 +125,12 @@ sub validate {
     
     my $oxtt = OpenXPKI::Template->new();
                                   
-    if (scalar @args) {            
+    if (scalar @args) {
+        ##! 32: 'validator args are ' . Dumper \@args
         foreach my $arg (@args) {
-            next unless ($arg);
-            if (ref $arg eq '' && $arg =~ m{ \A \s* \[%.+%\] }xsm) {
+            if (!defined $arg) {
+                $arg = '';
+            } elsif (ref $arg eq '' && $arg =~ m{ \A \s* \[%.+%\] }xsm) {
                 ##! 16: 'Found template ' . $arg
                 $arg = $oxtt->render( $arg, {  context => $workflow->context()->param() } );
                 ##! 16: 'render result ' . $arg                        
@@ -145,7 +147,9 @@ sub validate {
         }        
     }
 
-    ##! 32: 'Validator argument values: ' . join("#", @args_parsed)            
+    ##! 32: 'Validator argument values: ' . Dumper \@args_parsed
+
+    unshift @args_parsed, $workflow;
     
     $self->_validate( @args_parsed );
 
