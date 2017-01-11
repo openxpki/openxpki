@@ -89,8 +89,11 @@ make                                                    > /dev/null
 #
 # Unit tests
 #
-echo -e "\n====[ Testing part 1: unit tests ]===="
-make test
+if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "unit" ]; then
+    echo -e "\n====[ Testing part 1: unit tests ]===="
+    make test
+    test "$OXI_TEST_ONLY" == "unit" && exit
+fi
 
 #
 # OpenXPKI installation
@@ -141,9 +144,23 @@ echo "Creating sample config (CA certificates etc.)"
 # QA tests
 #
 # (testing /api/ before /nice/ leads to errors)
-echo -e "\n====[ Testing part 2: QA tests (#1) ]===="
-cd $CLONE_DIR/qatest/backend/nice/  && prove -q .
-echo -e "\n====[ Testing part 2: QA tests (#2) ]===="
-cd $CLONE_DIR/qatest/backend/api/   && prove -q .
-echo -e "\n====[ Testing part 2: QA tests (#3) ]===="
-cd $CLONE_DIR/qatest/backend/webui/ && prove -q .
+if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "nice" ]; then
+    echo -e "\n====[ Testing part 2: QA tests ("nice") ]===="
+    echo "cd $CLONE_DIR/qatest/backend/nice/ && prove -q ."
+    cd $CLONE_DIR/qatest/backend/nice/  && prove -q .
+    test "$OXI_TEST_ONLY" == "nice" && exit
+fi
+
+if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "api" ]; then
+    echo -e "\n====[ Testing part 2: QA tests ("api") ]===="
+    echo "cd $CLONE_DIR/qatest/backend/api/ && prove -q ."
+    cd $CLONE_DIR/qatest/backend/api/   && prove -q .
+    test "$OXI_TEST_ONLY" == "api" && exit
+fi
+
+if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "webui" ]; then
+    echo -e "\n====[ Testing part 2: QA tests ("webui") ]===="
+    echo "cd $CLONE_DIR/qatest/backend/webui/ && prove -q ."
+    cd $CLONE_DIR/qatest/backend/webui/ && prove -q .
+    test "$OXI_TEST_ONLY" == "webui" && exit
+fi
