@@ -119,11 +119,22 @@ sub create_cert {
 
         $test->state_is('SUBJECT_COMPLETE');
 
-        # As the nicetest FQDNs do not validate, we need a policy exception request
-        $test->execute_ok('csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' });
-        $test->state_is('PENDING_POLICY_VIOLATION');
-
-        # Approve certificate request
+        # Test FQDNs should not validate so we need a policy exception request
+        # (on rare cases the responsible router might return a valid address, so we check)
+        my $msg = $test->get_client->send_receive_command_msg('get_workflow_info', { ID => $test->get_wfid });
+        my $actions = $msg->{PARAMS}->{STATE}->{option};
+        my $intermediate_state;
+        if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
+            diag "Test FQDNs do not resolve - handling policy violation";
+            $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
+            $intermediate_state ='PENDING_POLICY_VIOLATION';
+        }
+        else {
+            diag "For whatever reason test FQDNs do resolve - submitting request";
+            $test->execute_ok( 'csr_submit' );
+            $intermediate_state ='PENDING';
+        }
+        $test->state_is($intermediate_state);
 
         $test->execute_ok('csr_approve_csr');
         $test->state_is('SUCCESS');
