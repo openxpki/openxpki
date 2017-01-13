@@ -320,6 +320,7 @@ state:
         output:
           - cert_profile 	
           - cert_identifier
+          - renewal_cert_identifier
           - creator 	
           - request_mode 	
           - in_renewal_window

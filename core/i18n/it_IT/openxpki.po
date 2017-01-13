@@ -2119,6 +2119,27 @@ msgstr "Motivo del Rifiuto, ad es. autorizzazione mancante, duplicazione, ecc."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_TOOLTIP"
 msgstr "Il commento è salvato con il Workflow e inviato all’utente"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_DESC"
+msgstr "Il certificato che viene sostituito con questo Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_LABEL"
+msgstr "Certificato sostituito"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_PLACEHOLDER"
+msgstr ""
+"Inserisci l’identificatore del certificato oppure digita una parte del campo "
+"Soggetto per avviare l’autoricerca!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
+msgstr ""
+"La funzione di autoricerca ricercherà i certificati che i contengono i "
+"termini inseriti e li mostrerà in una lista a scorrimento verticale. "
+"Seleziona il certificato cliccando sull’elemento della lista."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "Il certificato che viene sostituito con questo Workflow"
 
