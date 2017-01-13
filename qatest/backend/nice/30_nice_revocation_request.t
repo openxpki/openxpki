@@ -133,7 +133,7 @@ $wfparam{flag_auto_approval} = 0;
 $test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-Revoke Workflow')
  or die "Workflow Create failed: $@";
 
-$test->state_is('SUCCESS');
+$test->state_is('CHECK_FOR_REVOCATION');
 
 # Finally, check if the delayed workflow has finished
 $test->set_wfid( $delayed_revoke_id );
