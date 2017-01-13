@@ -340,6 +340,8 @@ field:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL
         name: delay_revocation_time
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP
         type: datetime
         format: timestamp
         required: 0
