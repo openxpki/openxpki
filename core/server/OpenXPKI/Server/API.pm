@@ -1318,12 +1318,7 @@ sub BUILD {
                 WORKFLOW => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                },
-                FILTER_PARAMS => {
-                    type    => SCALAR,
-                    regex   => $re_alpha_string,
-                    default => 0,
-                },
+                }, 
                 PARAMS => {
                     type     => HASHREF,
                     optional => 1,
