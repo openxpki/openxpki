@@ -401,7 +401,7 @@ sub start_txn {
 
 sub commit {
     my $self = shift;
-    $self->log->warn("commit() was called without indicating a transaction start via start_txn() first")
+    $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
         unless $self->in_txn;
     ##! 16: "Commit of changes"
     $self->dbh->commit;
