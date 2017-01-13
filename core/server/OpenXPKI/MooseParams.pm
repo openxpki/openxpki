@@ -1,10 +1,12 @@
-package OpenXPKI::Server::Database::Util;
+package OpenXPKI::MooseParams;
 use strict;
 use warnings;
 use utf8;
+
 =head1 Name
 
-OpenXPKI::Server::Database::Util - Collection of common internal utility methods.
+OpenXPKI::MooseParams - Wrapper around some of L<MooseX::Params::Validate>'s
+functions.
 
 =cut
 

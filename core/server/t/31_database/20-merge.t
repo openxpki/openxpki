@@ -28,80 +28,86 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("SQL MERGE", 6, sub {
+$db->run("SQL MERGE", 11, sub {
     my $t = shift;
     my $dbi = $t->dbi;
+    my $rownum;
 
     # update existing row
     lives_and {
-        $dbi->merge(
+        $rownum = $dbi->merge(
             into => "test",
             set => { text => "Digital Signage" },
             where => { id => 1, entropy => "5" },
         );
-        is_deeply $t->get_data, [
-            [ 1, "Digital Signage", 5],
-            [ 2, "Buergersteig",  3],
-        ];
+        ok $rownum > 0; # MySQL returns 2 on update
     } "replace existing data";
+    is_deeply $t->get_data, [
+        [ 1, "Digital Signage", 5],
+        [ 2, "Buergersteig",  3],
+    ], "verify data";
 
     # update two values existing row
     lives_and {
-        $dbi->merge(
+        $rownum = $dbi->merge(
             into => "test",
             set => { text => "Elektroschild", entropy => 27 },
             where => { id => 1 },
         );
-        is_deeply $t->get_data, [
-            [ 1, "Elektroschild", 27],
-            [ 2, "Buergersteig",  3],
-        ];
+        ok $rownum > 0; # MySQL returns 2 on update
     } "replace existing data (two values)";
+    is_deeply $t->get_data, [
+        [ 1, "Elektroschild", 27],
+        [ 2, "Buergersteig",  3],
+    ], "verify data";
 
     # insert new row
     lives_and {
-        $dbi->merge(
+        $rownum = $dbi->merge(
             into => "test",
             set => { text => "Rathaus" },
             where => { id => 3, entropy => 42 },
         );
-        is_deeply $t->get_data, [
-            [ 1, "Elektroschild", 27],
-            [ 2, "Buergersteig",  3],
-            [ 3, "Rathaus",       42],
-        ];
+        is $rownum, 1;
     } "replace non-existing data (i.e. insert)";
+    is_deeply $t->get_data, [
+        [ 1, "Elektroschild", 27],
+        [ 2, "Buergersteig",  3],
+        [ 3, "Rathaus",       42],
+    ], "verify data";
 
     # partly update row ignoring 'set_once'
     lives_and {
-        $dbi->merge(
+        $rownum = $dbi->merge(
             into => "test",
             set => { text => "Saftladen" },
             set_once => { entropy => 50 },
             where => { id => 3 },
         );
-        is_deeply $t->get_data, [
-            [ 1, "Elektroschild", 27],
-            [ 2, "Buergersteig",  3],
-            [ 3, "Saftladen",     42],
-        ];
+        ok $rownum > 0;
     } "partly update row ignoring 'set_once'";
+    is_deeply $t->get_data, [
+        [ 1, "Elektroschild", 27],
+        [ 2, "Buergersteig",  3],
+        [ 3, "Saftladen",     42],
+    ], "verify data";
 
     # insert new row obeying 'set_once'
     lives_and {
-        $dbi->merge(
+        $rownum = $dbi->merge(
             into => "test",
             set => { text => "Schwimmhalle" },
             set_once => { entropy => 99 },
             where => { id => 4 },
         );
-        is_deeply $t->get_data, [
-            [ 1, "Elektroschild", 27],
-            [ 2, "Buergersteig",  3],
-            [ 3, "Saftladen",     42],
-            [ 4, "Schwimmhalle",  99],
-        ];
+        is $rownum, 1;
     } "insert new row obeying 'set_once'";
+    is_deeply $t->get_data, [
+        [ 1, "Elektroschild", 27],
+        [ 2, "Buergersteig",  3],
+        [ 3, "Saftladen",     42],
+        [ 4, "Schwimmhalle",  99],
+    ], "verify data";
 
     # do not accept complex WHERE clause (as it also serves as source for insert values)
     dies_ok {
