@@ -213,128 +213,131 @@ sub get_param_values {
     return $param_values;
 }
 
+# Test: qatest/backend/api/12_get_chain.t
 sub get_chain {
-    my $self    = shift;
-    my $arg_ref = shift;
+    my ($self, $args) = @_;
 
     my $default_token;
-
     eval {
+        # ignore if this fails, as this is only needed within the
+        # server if a user is connected. openxpkiadm -v -v uses this
+        # method to show the chain (but not to convert the certificates)
+        # we check later where the default token is needed whether it is
+        # available
         $default_token = CTX('api')->get_default_token();
     };
-    # ignore if this fails, as this is only needed within the
-    # server if a user is connected. openxpkiadm -v -v uses this
-    # method to show the chain (but not to convert the certificates)
-    # we check later where the default token is needed whether it is
-    # available
 
-    my $return_ref;
-    my @identifiers;
-    my @certificates;
-    my @subject;
+    my $cert_list = [];
+    my $id_list = [];
+    my $subject_list = [];
     my $finished = 0;
     my $complete = 0;
     my %already_seen; # hash of identifiers that have already been seen
 
-    if (! defined $arg_ref->{START_IDENTIFIER}) {
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
-        );
-    }
-    my $start = $arg_ref->{START_IDENTIFIER};
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_SERVER_API_GET_CHAIN_START_IDENTIFIER_MISSING",
+    ) unless $args->{START_IDENTIFIER};
+    my $start = $args->{START_IDENTIFIER};
     my $current_identifier = $start;
-    my $dbi = CTX('dbi_backend');
-    my @certs;
+    my $dbi = CTX('dbi');
 
-    my $outer_format = $arg_ref->{OUTFORMAT} || '';   
-    my $inner_format = $outer_format;
-    if ($arg_ref->{BUNDLE}) {
-        $inner_format = 'PEM';
-    }
-
-
+    my $outer_format = $args->{OUTFORMAT} || '';
+    my $inner_format = $args->{BUNDLE} ? 'PEM' : $outer_format;
 
     while (! $finished) {
         ##! 128: '@identifiers: ' . Dumper(\@identifiers)
         ##! 128: '@certs: ' . Dumper(\@certs)
-        push @identifiers, $current_identifier;
-        my $cert = $dbi->first(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => {
-                IDENTIFIER => {VALUE => $current_identifier},
+        push @$id_list, $current_identifier;
+        my $cert = $dbi->select_one(
+            from => 'certificate',
+            columns => [ '*' ],
+            where => {
+                identifier => $current_identifier,
             },
         );
-        if (! defined $cert) { #certificate not found
-            $finished = 1;
-        }
-        else {
-            push @subject, $cert->{SUBJECT};
-            if ($inner_format) {
-                if ($inner_format eq 'PEM') {
-                    push @certs, $cert->{DATA};
-                }
-                elsif ($inner_format eq 'DER') {
-                    if (! defined $default_token) {
-                        OpenXPKI::Exception->throw(
-                            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN',
-                            log     => {
-                                logger => CTX('log'),
-                            },
-                        );
-                    }
+        # stop if certificate was not found
+        last unless $cert;
 
-                    my $utf8fix = $default_token->command({
-                        COMMAND => 'convert_cert',
-                        DATA    => $cert->{DATA},
-                        IN      => 'PEM',
-                        OUT     => 'DER',
-                    });
-                    push @certs, $utf8fix ;
-                } elsif ($inner_format eq 'HASH') {
-                    # unset DATA to save some bytes
-                    delete $cert->{DATA};
-                    push @certs, $cert;
+        push @$subject_list, $cert->{subject};
+
+        if ($inner_format) {
+            if ($inner_format eq 'PEM') {
+                push @$cert_list, $cert->{data};
+            }
+            elsif ($inner_format eq 'DER') {
+                if (! defined $default_token) {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN',
+                        log     => { logger => CTX('log') },
+                    );
                 }
+                my $utf8fix = $default_token->command({
+                    COMMAND => 'convert_cert',
+                    DATA    => $cert->{data},
+                    IN      => 'PEM',
+                    OUT     => 'DER',
+                });
+                push @$cert_list, $utf8fix;
             }
-            if ($cert->{ISSUER_IDENTIFIER} eq $current_identifier) {
-                # self-signed, this is the end of the chain
-                $finished = 1;
-                $complete = 1;
+            elsif ($inner_format eq 'HASH') {
+                # remove data to save some bytes
+                delete $cert->{data};
+
+                # TODO #legacydb Mapping for compatibility to old DB layer
+                my $cert_legacy = {
+                    'AUTHORITY_KEY_IDENTIFIER'  => $cert->{authority_key_identifier},
+                    'CERTIFICATE_SERIAL'        => $cert->{cert_key},
+                    'CSR_SERIAL'                => $cert->{req_key},
+                    'IDENTIFIER'                => $cert->{identifier},
+                    'ISSUER_DN'                 => $cert->{issuer_dn},
+                    'ISSUER_IDENTIFIER'         => $cert->{issuer_identifier},
+                    'LOA'                       => $cert->{loa},
+                    'NOTAFTER'                  => $cert->{notafter},
+                    'NOTBEFORE'                 => $cert->{notbefore},
+                    'PKI_REALM'                 => $cert->{pki_realm},
+                    'PUBKEY'                    => $cert->{public_key},
+                    'STATUS'                    => $cert->{status},
+                    'SUBJECT'                   => $cert->{subject},
+                    'SUBJECT_KEY_IDENTIFIER'    => $cert->{subject_key_identifier},
+                };
+
+                push @$cert_list, $cert_legacy;
             }
-            else { # go to parent
-                $current_identifier = $cert->{ISSUER_IDENTIFIER};
-                ##! 64: 'issuer: ' . $current_identifier
-                if (defined $already_seen{$current_identifier}) {
-                    # we've run into a loop!
-                    $finished = 1;
-                }
-                $already_seen{$current_identifier} = 1;
-            }
+        }
+        if ($cert->{issuer_identifier} eq $current_identifier) {
+            # self-signed, this is the end of the chain
+            $complete = 1;
+            last;
+        }
+        else { # go to parent
+            $current_identifier = $cert->{issuer_identifier};
+            ##! 64: 'issuer: ' . $current_identifier
+            last if $already_seen{$current_identifier}; # we've run into a loop!
+            $already_seen{$current_identifier} = 1;
         }
     }
 
     # Return a pkcs7 structure instead of the hash
-    if ($arg_ref->{BUNDLE}) {
+    if ($args->{BUNDLE}) {
 
         # we do NOT include the root in p7 bundles
-        pop @certs if ($complete && !$arg_ref->{KEEPROOT});
+        pop @$cert_list if ($complete and !$args->{KEEPROOT});
 
         my $result = $default_token->command({
             COMMAND          => 'convert_cert',
-            DATA             => \@certs,
-            OUT              =>  ($outer_format eq 'DER' ? 'DER' : 'PEM'),
+            DATA             => $cert_list,
+            OUT              => ($outer_format eq 'DER' ? 'DER' : 'PEM'),
             CONTAINER_FORMAT => 'PKCS7',
         });
         return $result;
     }
 
-    $return_ref->{SUBJECT} = \@subject;
-    $return_ref->{IDENTIFIERS} = \@identifiers;
-    $return_ref->{COMPLETE}    = $complete;
-    if ($outer_format) {
-        $return_ref->{CERTIFICATES} = \@certs;
-    }
-    return $return_ref;
+    return {
+        SUBJECT     => $subject_list,
+        IDENTIFIERS => $id_list,
+        COMPLETE    => $complete,
+        $outer_format ? (CERTIFICATES => $cert_list) : (),
+    };
 }
 
 sub list_ca_ids {
