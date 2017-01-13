@@ -17,14 +17,14 @@ Debian/Ubuntu Builds
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
 
-Current release is 1.13 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.16 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (jessie)::
 
     echo "deb http://packages.openxpki.org/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
-or ubuntu trusty::
+or ubuntu trusty (still on 1.13 due to compatiblity issues)::
 
     echo "deb http://packages.openxpki.org/ubuntu/ dists/trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
