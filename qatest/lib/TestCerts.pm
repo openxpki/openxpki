@@ -75,7 +75,7 @@ sub create_cert {
         port => 8080,
     );
 
-    subtest "Create certificate (hostname $args{hostname}" => sub {
+    subtest "Create certificate (hostname $args{hostname})" => sub {
         plan tests => 16;
 
         $test->create_ok('certificate_signing_request_v2', {
