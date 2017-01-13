@@ -69,12 +69,10 @@ $test->connect_ok(
 # First try an autoapproval request
 
 my %wfparam = (
-	cert_identifier => $cert_identifier,
-	reason_code => 'unspecified',
+    cert_identifier => $cert_identifier,
+    reason_code => 'unspecified',
     comment => 'Automated Test',
-    invalidity_time => time(),
     flag_auto_approval => 0,
-    flag_delayed_revoke => 0,
     flag_batch_mode => 0             
 );
 
@@ -109,20 +107,19 @@ $test->state_is('REJECTED');
 
 # Test delayed revoke
 $wfparam{flag_auto_approval} = 1;
-$wfparam{invalidity_time} = time() + 5;
-$wfparam{flag_delayed_revoke} = 1;
+$wfparam{delay_revocation_time} = time() + 5;
 $wfparam{flag_batch_mode} = 1;
 $test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create delayed Revoke Workflow')
    or die "Workflow Create failed: $@";
   
 $test->state_is('CHECK_FOR_DELAYED_REVOKE');
 my $delayed_revoke_id =  $test->get_wfid(); 
- 
+
 # Test auto revoke
+delete $wfparam{delay_revocation_time};
 $wfparam{flag_auto_approval} = 1;
-$wfparam{invalidity_time} = time();
-$wfparam{flag_delayed_revoke} = 0;
 $wfparam{flag_batch_mode} = 1;
+$wfparam{invalidity_time} = time();
 
 $test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-Revoke Workflow')
  or die "Workflow Create failed: $@";

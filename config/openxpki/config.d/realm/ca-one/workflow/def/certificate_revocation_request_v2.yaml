@@ -7,7 +7,7 @@ state:
     CHECK_APPROVALS:
         autorun: 1
         action:
-          - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
+          - cleanup > CHECK_FOR_REVOCATION ? !is_not_yet_revoked_or_pending
           - global_noop > CHECK_FOR_DELAYED_REVOKE ? is_approved is_not_yet_revoked_or_pending
           - global_noop2 > NOTIFY_CRR_PENDING ? !is_approved is_not_yet_revoked_or_pending
 

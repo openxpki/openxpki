@@ -24,13 +24,14 @@ my $crl= do { # slurp
 
 for my $cert (('entity','entity2','pkiclient')) {
  
-    diag('Testing '  .$cert);       
     # Load cert status page using cert identifier
     my $cert_identifier = do { # slurp
         local $INPUT_RECORD_SEPARATOR;
         open my $HANDLE, "<tmp/$cert.id";
         <$HANDLE>;
     };
+
+    diag('Testing '  .$cert . ' / ' .$cert_identifier );       
     
     $result = $client->mock_request({
         'page' => 'certificate!detail!identifier!'.$cert_identifier 
@@ -42,8 +43,7 @@ for my $cert (('entity','entity2','pkiclient')) {
     foreach my $item (@{$result->{main}->[0]->{content}->{data}}) {
         # check database status
         $status = $item->{value}->{value} if ($item->{label} eq 'Status');
-        $serial = $item->{value} if ($item->{label} eq 'Serial');
-    
+        $serial = $item->{value} if ($item->{label} eq 'Certificate Serial');
     }
     
     is($status, 'REVOKED');
