@@ -37,6 +37,9 @@ sub execute {
             cert_identifier     => undef,
             reason_code         => 'unspecified',
             flag_batch_mode     => 1,
+            invalidity_time     => '',
+            comment             => '',
+            flag_auto_approval  => 0,
         };
         
         # Overwrite defaults from activity params  
@@ -88,9 +91,25 @@ sub execute {
         PRIORITY => 'debug',
         FACILITY => [ 'application' ],
     );
-    
+
+    # Parse invalidity_time if set - workflow requires epoch
+    if ($param->{invalidity_time}) {
+        $param->{invalidity_time} = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $param->{invalidity_time},
+            VALIDITYFORMAT => 'detect'
+        })->epoch();
+    }
+
     # check if delay_revoked is requested and in the future
     if ($param->{delay_revocation_time}) {
+        
+        # parse and convert it
+        $param->{delay_revocation_time} = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $param->{delay_revocation_time},
+            VALIDITYFORMAT => 'detect'
+        })->epoch();
+
+
         CTX('log')->log(
             MESSAGE => 'Delayed revoke requested', 
             PRIORITY => 'info',
@@ -152,6 +171,9 @@ activity definition will be used as input parameters for the workflow,
 except of the I<workflow> and I<target_key> parameter (system namespace
 I<wf_> is obviously also filtered).
 
+The parameters I<invalidity_time> and I<delay_revocation_time> are parsed
+using OpenXPKI::DateTime and passed as epoch to the workflow.
+
 To support legacy configurations, the class assumes the default workflow 
 and presets reason_code and flag_batch_mode to default values when the 
 I<workflow> parameter is not given.
@@ -185,10 +207,13 @@ Based on the legacy workflow, some parameters are preprocessed:
 
 The verbose I<no> and I<yes> are converted to 0/1.
 
-Checked to be parsable by OpenXPKI::Datetime and if its in the 
+=item invalidity_time
+
+Parsed using OpenXPKI::DateTime and coverted to epoch.
 
 =item delay_revocation_time
 
+Parsed using OpenXPKI::DateTime and coverted to epoch.
 If the requested time is in the past, the argument is ignored.
 
 =back
