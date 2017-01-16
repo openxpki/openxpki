@@ -21,12 +21,25 @@ state:
         autorun: 1
         action:
           - global_check_for_revocation > SUCCESS 
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - delay_revocation_time
+          - comment
 
     CHECK_FOR_DELAYED_REVOKE:
         autorun: 1
         action:
           - delay_revocation > CRR_PERSIST ? is_delayed_revocation
           - global_noop > CRR_PERSIST ? !is_delayed_revocation
+        output:
+          - cert_identifier
+          - reason_code
+          - invalidity_time
+          - delay_revocation_time
+          - comment
+
 
     CRR_PERSIST:
         autorun: 1
