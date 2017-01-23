@@ -8,6 +8,9 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get install --assume-yes  dh-make-perl mysql-server libdbd-mysql-perl
 cat /code-repo/package/debian/build-deps.lst | xargs apt-get install --assume-yes
 
+# packages required for testing only
+apt-get install --assume-yes libtest-deep-perl
+
 # openca-tools is now only used for scep which we do not test for now
 # so there is no need to install it
 # We still need openca-tools and I dont want to bother with that now
