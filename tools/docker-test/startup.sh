@@ -19,29 +19,6 @@ function _exit () {
 trap '_exit $?' EXIT
 
 #
-# MySQL
-#
-echo -e "\n====[ MySQL ]===="
-nohup sh -c mysqld >/tmp/mysqld.log &
-
-echo "Waiting for MySQL to initialize (max. 60 seconds)"
-DBPASS=""
-test ! -z "$OXI_TEST_DB_MYSQL_DBPASSWORD" && DBPASS="-p $OXI_TEST_DB_MYSQL_DBPASSWORD"
-sec=0; error=1
-while [ $error -ne 0 -a $sec -lt 60 ]; do
-    error=$(echo "quit" | mysql -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u $OXI_TEST_DB_MYSQL_DBUSER $DBPASS --connect_timeout=1 2>&1 | grep -c ERROR)
-    sec=$[$sec+1]
-    sleep 1
-done
-if [ $error -ne 0 ]; then
-    echo "It seems that the MySQL database was not started. Output:"
-    echo "quit" | mysql -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u $OXI_TEST_DB_MYSQL_DBUSER $DBPASS --connect_timeout=1
-    exit 333
-fi
-
-set -e
-
-#
 # Repository clone
 #
 set +e
@@ -72,6 +49,11 @@ cpanm --quiet --notest --installdeps $CLONE_DIR/
 #
 # Database setup
 #
+echo -e "\n====[ MySQL ]===="
+nohup sh -c mysqld >/tmp/mysqld.log &
+set +e
+$CLONE_DIR/tools/scripts/mysql-wait-for-db.sh
+set -e
 $CLONE_DIR/tools/scripts/mysql-create-db.sh
 $CLONE_DIR/tools/scripts/mysql-create-user.sh
 
@@ -164,4 +146,3 @@ if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "webui" ]; then
     cd $CLONE_DIR/qatest/backend/webui/ && prove -q .
     test "$OXI_TEST_ONLY" == "webui" && exit || true
 fi
-
