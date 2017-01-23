@@ -9,7 +9,7 @@ CLONE_DIR=/opt/openxpki
 #
 function _exit () {
     if [ $1 -ne 0 ]; then
-        echo -e "\n==========[ ERROR ]==========" >&2
+        echo -e "\n==========[ ERROR CODE $1 ]==========" >&2
         echo "There was an error, you can now inspect the log files under /var/log/openxpki/" >&2
         echo "and then finally stop the Docker container with 'exit'." >&2
         /bin/bash
@@ -17,29 +17,6 @@ function _exit () {
     exit $1
 }
 trap '_exit $?' EXIT
-
-#
-# MySQL
-#
-echo -e "\n====[ MySQL ]===="
-nohup sh -c mysqld >/tmp/mysqld.log &
-
-echo "Waiting for MySQL to initialize (max. 60 seconds)"
-DBPASS=""
-test ! -z "$OXI_TEST_DB_MYSQL_DBPASSWORD" && DBPASS="-p $OXI_TEST_DB_MYSQL_DBPASSWORD"
-sec=0; error=1
-while [ $error -ne 0 -a $sec -lt 60 ]; do
-    error=$(echo "quit" | mysql -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u $OXI_TEST_DB_MYSQL_DBUSER $DBPASS --connect_timeout=1 2>&1 | grep -c ERROR)
-    sec=$[$sec+1]
-    sleep 1
-done
-if [ $error -ne 0 ]; then
-    echo "It seems that the MySQL database was not started. Output:"
-    echo "quit" | mysql -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u $OXI_TEST_DB_MYSQL_DBUSER $DBPASS --connect_timeout=1
-    exit 333
-fi
-
-set -e
 
 #
 # Repository clone
@@ -72,6 +49,11 @@ cpanm --quiet --notest --installdeps $CLONE_DIR/
 #
 # Database setup
 #
+echo -e "\n====[ MySQL ]===="
+nohup sh -c mysqld >/tmp/mysqld.log &
+set +e
+$CLONE_DIR/tools/scripts/mysql-wait-for-db.sh
+set -e
 $CLONE_DIR/tools/scripts/mysql-create-db.sh
 $CLONE_DIR/tools/scripts/mysql-create-user.sh
 
@@ -89,7 +71,7 @@ make                                                    > /dev/null
 #
 # Unit tests
 #
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "unit" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "unit" ]; then
     echo -e "\n====[ Testing part 1: unit tests ]===="
     make test
     test "$OXI_TEST_ONLY" == "unit" && exit
@@ -144,23 +126,23 @@ echo "Creating sample config (CA certificates etc.)"
 # QA tests
 #
 # (testing /api/ before /nice/ leads to errors)
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "nice" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "nice" ]; then
     echo -e "\n====[ Testing part 2: QA tests ("nice") ]===="
     echo "cd $CLONE_DIR/qatest/backend/nice/ && prove -q ."
     cd $CLONE_DIR/qatest/backend/nice/  && prove -q .
-    test "$OXI_TEST_ONLY" == "nice" && exit
+    test "$OXI_TEST_ONLY" == "nice" && exit || true
 fi
 
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "api" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "api" ]; then
     echo -e "\n====[ Testing part 2: QA tests ("api") ]===="
     echo "cd $CLONE_DIR/qatest/backend/api/ && prove -q ."
     cd $CLONE_DIR/qatest/backend/api/   && prove -q .
-    test "$OXI_TEST_ONLY" == "api" && exit
+    test "$OXI_TEST_ONLY" == "api" && exit || true
 fi
 
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "webui" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "webui" ]; then
     echo -e "\n====[ Testing part 2: QA tests ("webui") ]===="
     echo "cd $CLONE_DIR/qatest/backend/webui/ && prove -q ."
     cd $CLONE_DIR/qatest/backend/webui/ && prove -q .
-    test "$OXI_TEST_ONLY" == "webui" && exit
+    test "$OXI_TEST_ONLY" == "webui" && exit || true
 fi

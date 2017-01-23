@@ -36,10 +36,15 @@ addons:
 #
 # Service setup
 #
-services:
-    - mysql
+
+# "MySQL is started by default [... for Docker containers]."
+# "You could remove the `services: mysql` part [...] without any functional change."
+# (according to Joep van Delft from TravisCI)
+##services:
+##    - mysql
 
 before_install:
+    - ./tools/scripts/mysql-wait-for-db.sh
     - ./tools/scripts/mysql-create-db.sh
     - ./tools/scripts/mysql-create-user.sh
     - curl -s -L https://cpanmin.us | perl - App::cpanminus
