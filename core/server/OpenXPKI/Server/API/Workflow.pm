@@ -920,9 +920,7 @@ sub __search_workflow_instances {
     my $self     = shift;
     my $arg_ref  = shift;
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
-
-    my $realm = CTX('session')->get_pki_realm();
-
+ 
     my @attrib;
 
     # We want to drop searches in context, so log a deprecation warning if context is used
@@ -980,7 +978,12 @@ sub __search_workflow_instances {
     }
     push @tables, 'WORKFLOW';
     push @joins, 'WORKFLOW_SERIAL';
-    $dynamic->{'WORKFLOW.PKI_REALM'} = {VALUE => $realm};
+    
+    if (!$arg_ref->{PKI_REALM}) {
+        $dynamic->{'WORKFLOW.PKI_REALM'} = { VALUE => CTX('session')->get_pki_realm() };
+    } elsif ($arg_ref->{PKI_REALM} !~ /_any/i) {
+        $dynamic->{'WORKFLOW.PKI_REALM'} = { VALUE => $dynamic->{'WORKFLOW.PKI_REALM'} };    
+    }
 
     if (defined $arg_ref->{TYPE}) {
         # do parameter validation (here instead of the API because
@@ -1071,7 +1074,8 @@ sub __search_workflow_instances {
             'WORKFLOW.WORKFLOW_TYPE',
             'WORKFLOW.WORKFLOW_STATE',
             'WORKFLOW.WORKFLOW_PROC_STATE',
-            'WORKFLOW.WORKFLOW_WAKEUP_AT'
+            'WORKFLOW.WORKFLOW_WAKEUP_AT',
+            'WORKFLOW.PKI_REALM',
         ],
         JOIN     => [ \@joins, ],
         REVERSE  => $reverse,

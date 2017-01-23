@@ -1471,6 +1471,11 @@ sub BUILD {
                     regex => $re_boolean,
                     optional => 1,
                 },
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
             },
         },
         'search_workflow_instances_count' => {
@@ -1505,6 +1510,11 @@ sub BUILD {
                 PROC_STATE => {
                     type     => SCALAR,
                     regex    => $re_alpha_string,
+                    optional => 1,
+                },
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
                     optional => 1,
                 },
             },
