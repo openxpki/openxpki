@@ -399,6 +399,32 @@ sub get_workflow_history {
     return $history;
 }
 
+=head2 get_workflow_creator 
+
+Returns the name of the workflow creator as given in the attributes table.
+This method does NOT use the factory and therefore does not check the acl
+rules or matching realm.
+
+=cut
+
+sub get_workflow_creator {
+
+    my $self  = shift;
+    my $args  = shift;
+    
+    my $result = CTX('dbi')->select_one(
+        from => 'workflow_attributes',
+        columns => [ 'attribute_value' ],
+        where => { 'attribute_contentkey' => 'creator', 'workflow_id' => $args->{ID} },
+    );
+    
+    if (!$result) {
+        return ''; 
+    }
+    return $result->{attribute_value};
+    
+}
+
 sub execute_workflow_activity {
     my $self  = shift;
     my $args  = shift;

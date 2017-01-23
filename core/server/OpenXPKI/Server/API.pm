@@ -1270,6 +1270,15 @@ sub BUILD {
                 },
             },
         },
+        'get_workflow_creator' =>{
+            class  => 'Workflow',
+            params => {
+                ID => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            }
+        }, 
         'get_workflow_history' => {
             class  => 'Workflow',
             params => {
