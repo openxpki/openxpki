@@ -327,7 +327,7 @@ sub init_search {
             title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
             submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
             fields => [
-                { name => 'wf_id', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL', type => 'text' },
+                { name => 'wf_id', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', type => 'text' },
             ]
     }});
 
@@ -690,7 +690,7 @@ sub init_task {
     my $args = shift;
 
     $self->_page({
-        label => 'Outstanding tasks'
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL'
     });
 
     my $tasklist = $self->_client->session()->param('tasklist')->{default};
@@ -1712,7 +1712,7 @@ sub __render_from_workflow {
             # if the field has a description text, push it to the @fielddesc list
             if ($field->{description} !~ /^\s*$/ && $field->{type} ne 'hidden') {
                 my $descr = $field->{description};
-                push @fielddesc, { label => $item->{label}, value => $descr } if ($descr);
+                push @fielddesc, { label => $item->{label}, value => $descr, format => 'raw' } if ($descr);
             }
 
         }

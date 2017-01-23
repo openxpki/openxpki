@@ -7,7 +7,7 @@ state:
     CHECK_APPROVALS:
         autorun: 1
         action:
-          - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
+          - cleanup > CHECK_FOR_REVOCATION ? !is_not_yet_revoked_or_pending
           - global_noop > CHECK_FOR_DELAYED_REVOKE ? is_approved is_not_yet_revoked_or_pending
           - global_noop2 > NOTIFY_CRR_PENDING ? !is_approved is_not_yet_revoked_or_pending
 
@@ -20,12 +20,7 @@ state:
     CHECK_FOR_REVOCATION:
         autorun: 1
         action:
-          - global_check_for_revocation > SUCCESS
-        output:
-          - cert_identifier
-          - reason_code
-          - invalidity_time
-          - comment
+          - global_check_for_revocation > SUCCESS 
 
     CHECK_FOR_DELAYED_REVOKE:
         autorun: 1
@@ -48,6 +43,7 @@ state:
           - cert_identifier
           - reason_code
           - invalidity_time
+          - delay_revocation_time
           - comment
 
     EDIT_REQUEST_USER:
@@ -59,6 +55,7 @@ state:
           - cert_identifier
           - reason_code
           - invalidity_time
+          - delay_revocation_time
           - comment
 
     FAILURE:
@@ -74,7 +71,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC
         action:
-          - create_crr set_workflow_attributes > CHECK_BATCHMODE
+          - initialize set_workflow_attributes > CHECK_BATCHMODE
 
     NICE_DISPATCH_REVOKE:
         autorun: 1
@@ -100,6 +97,7 @@ state:
           - creator
           - notbefore
           - invalidity_time
+          - delay_revocation_time
           - reason_code
           - comment
           - signer_revoked
@@ -126,6 +124,7 @@ state:
           - cert_identifier
           - reason_code
           - invalidity_time
+          - delay_revocation_time
           - comment
         button:
           submit:
@@ -143,6 +142,7 @@ state:
           - cert_identifier
           - reason_code
           - invalidity_time
+          - delay_revocation_time
           - comment
 
     SUCCESS:
@@ -152,6 +152,7 @@ state:
           - cert_identifier
           - reason_code
           - invalidity_time
+          - delay_revocation_time
           - comment
 
     CANCELED:
@@ -168,7 +169,7 @@ action:
             check_creator: 0
             multi_role_approval: 0
 
-    create_crr:
+    initialize:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_DESC
@@ -177,8 +178,8 @@ action:
           - reason_code
           - comment
           - invalidity_time
+          - delay_revocation_time
           - flag_auto_approval
-          - flag_delayed_revoke
           - flag_batch_mode
           - crr_info
           - server
@@ -186,6 +187,7 @@ action:
           - signer_cert
         validator:
           - validate_invalidity_time
+          - validate_delay_revocation_time
           - global_reason_code
           - global_cert_identifier_exists
 
@@ -197,7 +199,7 @@ action:
     delay_revocation:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Pause
         param:
-            _map_wakeup: $invalidity_time
+            _map_wakeup: $delay_revocation_time
             reason: I18N_OPENXPKI_DELEAYED_REVOCATION_REQUESTED
 
     cleanup:
@@ -246,8 +248,10 @@ action:
           - reason_code
           - comment
           - invalidity_time
+          - delay_revocation_time
         validator:
           - validate_invalidity_time
+          - validate_delay_revocation_time
           - global_reason_code
 
 
@@ -271,7 +275,7 @@ condition:
     is_delayed_revocation:
         class: Workflow::Condition::Evaluate
         param:
-            test: $context->{flag_delayed_revoke}
+            test: $context->{delay_revocation_time}
 
     is_approved:
         class: Workflow::Condition::LazyOR
@@ -308,10 +312,16 @@ validator:
         arg:
           - $invalidity_time
           - $cert_identifier
-          - $flag_delayed_revoke
- 
 
-
+    validate_delay_revocation_time:
+        class: OpenXPKI::Server::Workflow::Validator::ValidityString
+        param:
+            format: detect
+            condition: gte
+            error: I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE
+        arg:
+          - $delay_revocation_time
+        
 field:
     crr_info:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL
@@ -326,11 +336,14 @@ field:
         type: server
         required: 0
 
-    flag_delayed_revoke:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL
-        name: flag_delayed_revoke
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC
-        type: server
+    delay_revocation_time:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL
+        name: delay_revocation_time
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC
+        placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_PLACEHOLDER
+        tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP
+        type: datetime
+        format: timestamp
         required: 0
 
     server:

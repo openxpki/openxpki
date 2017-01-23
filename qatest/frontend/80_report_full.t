@@ -19,12 +19,12 @@ my $client = TestCGI::factory();
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!report_full',
 });
-
-is($result->{main}->[0]->{content}->{fields}->[1]->{name}, 'wf_token');
+is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
+    'report_config' => '',
     'valid_at' => time(),
 });
 
@@ -41,5 +41,5 @@ $result = $client->mock_request({
     'page' => $page
 });
 
-like( $result, "/^full certificate report, realm ca-one/", 'Report header ok' );
+like( $result, "/^Full Certificate Report, Realm ca-one/", 'Report header ok' );
 

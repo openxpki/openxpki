@@ -79,14 +79,6 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
-msgstr "Идентификатор сертификата"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
-msgstr "Загрузка сертификата в форматах PEM или CRT"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Идентификатор сертификата"
 
@@ -1438,6 +1430,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -1938,6 +1934,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
+msgstr "Пауза"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -2173,6 +2173,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_PLACEHOLDER"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
+msgstr "Пауза"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr "Дочерние технологические процессы"
 
@@ -2236,14 +2252,6 @@ msgstr "Родительский технологический процесс"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL"
 msgstr "Родительский технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
-msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC"
@@ -2560,6 +2568,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_DESC"
+msgstr "TCP-порт, используемый с данным сертификатом"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_PLACEHOLDER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "TCP-порт, используемый с данным сертификатом"
 
@@ -2842,6 +2866,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Последнее обновление"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -2974,10 +3002,6 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL"
 msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
-msgstr "Последнее обновление"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
@@ -8024,6 +8048,14 @@ msgstr "Имя учетной записи"
 #~ msgstr "ОШИБКА! Соединение закрыто."
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
+#~ msgstr "Идентификатор сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
+#~ msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
 #~ msgstr "Действителен"
 
@@ -8305,14 +8337,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SEND_PENDING_NOTIFICATION_LABEL"
 #~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_DELAY_REVOCATION_DESC"
-#~ msgstr "Пауза"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_DELAY_REVOCATION_LABEL"
-#~ msgstr "Пауза"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CALC_APPROVALS_DESC"
@@ -9434,6 +9458,14 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_PLACEHOLDER"
 #~ msgstr "SPKAC-строка пуста."
 
@@ -9524,14 +9556,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_PLACEHOLDER"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_TOOLTIP"
-#~ msgstr "SPKAC строка пуста."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_DESC"
@@ -9819,6 +9843,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TITLE"
 #~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
+#~ msgstr "Последнее обновление"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_19B773_CHECK_TAGGING_DESC"

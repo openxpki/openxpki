@@ -9,7 +9,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
   
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 package main;
 
@@ -41,13 +41,15 @@ is ($result->{status}->{level}, 'success', 'Status is success');
 
 # get crl id
 my $crlid = $result->{main}->[0]->{content}->{data}->[0]->{value}->[0]->{value} || '';
-
+ 
 like($crlid, "/[0-9]+/",'Got CRL Id');
 
 # download crl as text
 $result = $client->mock_request({
-     'page' => "crl!download!serial!$crlid!format!txt"
+     'page' => "crl!download!crl_key!$crlid!format!txt"
 });
+
+ok($result, 'CRL is not empty');
 
 open(CERT, ">tmp/crl.txt");
 print CERT $result ;

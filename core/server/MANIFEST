@@ -441,6 +441,7 @@ OpenXPKI/Server/Workflow/Validator/InvalidityTime.pm
 OpenXPKI/Server/Workflow/Validator/ReasonCode.pm
 OpenXPKI/Server/Workflow/Validator/CertSubjectFields.pm
 OpenXPKI/Server/Workflow/Validator/ValidityTime.pm
+OpenXPKI/Server/Workflow/Validator/ValidityString.pm
 OpenXPKI/Server/Workflow/Validator/SmartcardPINUnblockAuthIDs.pm
 OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
 OpenXPKI/Server/Workflow/Validator/CertIdentifierExists.pm

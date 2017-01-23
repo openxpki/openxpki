@@ -156,6 +156,17 @@ the configuration (same for all users handled by this item)::
         role: User
         source@: connector:auth.connector.localuser
 
+An example config to authenticate RA Operators against ActiveDirectory using their company mail address and windows password including check of a group membership (this is just the authentication, set the role in the handler config)::
+
+    raop-ad:
+        class: Connector::Builtin::Authentication::LDAP
+        LOCATION: ldap://ad.company.com
+        base: dc=company,dc=loc
+        binddn@: cn=binduser
+        password@: secret
+        filter: "(&(mail=[% LOGIN %])(memberOf=CN=RA Operator,OU=SecurityGroups,DC=company,DC=loc))"
+
+
 **external authentication**
 
 If you have a proxy or sso system in front of your OpenXPKI server that authenticates your users, the external handler can be used to set the user information::

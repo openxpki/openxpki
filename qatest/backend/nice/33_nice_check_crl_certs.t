@@ -137,7 +137,6 @@ for my $certno (0..3) {
         comment => 'Automated Test',
         invalidity_time => time(),
         flag_auto_approval => 1,
-        flag_delayed_revoke => 0,
         flag_batch_mode => 1,
     };
 

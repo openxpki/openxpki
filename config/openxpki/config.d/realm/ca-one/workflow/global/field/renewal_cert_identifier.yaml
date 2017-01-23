@@ -1,0 +1,8 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_LABEL
+name: renewal_cert_identifier
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_DESC
+placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_PLACEHOLDER
+tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP
+type: cert_identifier
+required: 0
+template: "[% IF value %][% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %][% END %]"

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2016-12-08 12:25+0100\n"
+"PO-Revision-Date: 2017-01-13 15:26+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -63,12 +63,6 @@ msgstr "Certificate Chain"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Certificate Information"
-
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
-msgstr "Please enter the key passphrase you set during certificate request."
-
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
-msgstr "Download private key for certificate"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Certificate Identifier"
@@ -1017,6 +1011,9 @@ msgstr "PKCS10 request can not be read"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "Validator failed on given expression"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
+msgstr "The entered date/time could not be validated."
+
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Message of the Day"
 
@@ -1147,7 +1144,8 @@ msgstr "Edit Subject"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_DESC"
 msgstr ""
 "If you like to change the validity of the certificate, enter a custom "
-"notbefore/notafter date into the fields."
+"notbefore/notafter date into the fields. Note that all dates are handled in "
+"UTC timezone!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_LABEL"
 msgstr "Edit Validity"
@@ -1454,6 +1452,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "SCEP Enrollment"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
+msgstr "The time given for delayed revocation is not in the future."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Failed Action"
 
@@ -1628,6 +1629,20 @@ msgstr "CSR Type"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP"
 msgstr "The type of csr, usually PKCS10."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC"
+msgstr ""
+"With delayed revocation you can schedule a revocation for a date in the "
+"future."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL"
+msgstr "Delayed Revocation"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_PLACEHOLDER"
+msgstr "usually not required, use the selector on the right or type a datetime"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
+msgstr "the revocation will be scheduled after the given date"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr " "
 
@@ -1675,14 +1690,6 @@ msgstr "If set, the workflow does not require a manual approval"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL"
 msgstr "Auto-Approve"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC"
-msgstr ""
-"With delayed revocation you can schedule a revocation for a date in the "
-"future."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
-msgstr "Delayed Revoke"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC"
 msgstr ""
 "Check this box to force the creation of new revocation lists. By default, a "
@@ -1700,9 +1707,10 @@ msgstr "Hints to fill in the form fields"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC"
 msgstr ""
-"Specify the invalidity time for the revocation, this is only used in case of "
-"KeyCompromise and if the actual date of the compromise is known. Leave blank "
-"otherwise."
+"This value must only be set together with a reason code of keyCompromise and "
+"should be set if the actual date of the compromise is known. Leave blank for "
+"all other cases. Hint: This field can not be used to request a revocation "
+"date in the future. The date is handled in UTC timezone!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL"
 msgstr "Invalidity Time"
@@ -1774,7 +1782,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC"
 msgstr ""
 "Use the calendar or enter the notafter date in the format <tt>DD.MM.YYYY HH:"
 "MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
-"auto, clear the field or type 0."
+"auto, clear the field or type 0. All dates are handled in UTC timezone!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_LABEL"
 msgstr "Not Valid After"
@@ -1791,7 +1799,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC"
 msgstr ""
 "Use the calendar or enter the notbefore date in the format <tt>DD.MM.YYYY HH:"
 "MM</tt>. If you omit daytime, midnight is assumed. To reset the date to "
-"auto, clear the field or type 0."
+"auto, clear the field or type 0.  All dates are handled in UTC timezone!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_LABEL"
 msgstr "Not Valid Before"
@@ -1802,7 +1810,7 @@ msgstr "Enter expected notbefore date, empty for default"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr ""
 "Use the calendar icon or enter a date in MM.DD.YYYY format, type 0 to use "
-"the default"
+"the default. Dates are in UTC timezone!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
 msgstr "Describe the reason why you want to set the request on hold."
@@ -1915,6 +1923,21 @@ msgstr "Reason for Rejection, e.g. missing authorization, duplicate, etc."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_TOOLTIP"
 msgstr "The comment is saved with the workflow and send to the user"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_DESC"
+msgstr "The certificate to be renewed by this workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_LABEL"
+msgstr "Renewed Certificate"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_PLACEHOLDER"
+msgstr "Enter certificate identifier or type your subject to start autosearch!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
+msgstr ""
+"The autosearch will search for certificates that contain the given words in "
+"the subject and will show them in a drop down list below. Select the needed "
+"certificate from the list by clicking on it."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "The certificate to be replaced by this workflow."
@@ -2116,6 +2139,9 @@ msgstr "Process was moved to a background process."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Open Workflow"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL"
+msgstr "Outstanding Tasks"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Pause Reason"
 
@@ -2197,7 +2223,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE"
 msgstr "Search the database"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL"
-msgstr "Serial"
+msgstr "Workflow Id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL"
 msgstr "State"
@@ -2210,9 +2236,6 @@ msgstr "Type"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL"
 msgstr "Updated"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
-msgstr "Workflow Id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "This content is considered sensitive and therefore not shown."
@@ -2838,6 +2861,12 @@ msgstr "Workflow information was updated"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
+
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
+#~ msgstr "Please enter the key passphrase you set during certificate request."
+
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
+#~ msgstr "Download private key for certificate"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
@@ -3653,6 +3682,9 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
+#~ msgstr "Delayed Revoke"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
 #~ msgstr " "

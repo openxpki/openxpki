@@ -119,7 +119,7 @@ sub execute {
             # so the activity can just pick them up
             $context->param( 'replace_cert_identifier' => $cert->{IDENTIFIER} );
             $context->param( 'reason_code' => $revoke_on_replace->{reason_code} );
-            $context->param( 'invalidity_time' => $revoke_on_replace->{invalidity_time} || 0 );
+            $context->param( 'revocation_time' => $revoke_on_replace->{invalidity_time} || 0 );
         }
 
         CTX('log')->log(

@@ -124,7 +124,7 @@ sub __dispatch_revoke {
             signer_cert     => $auth_pem,
             flag_batch_mode => 1,        
             comment         => 'via soap',
-            invalidity_time => time(),
+            invalidity_time => 0,
         );
 
         $log->debug( "WF parameters: " . Dumper \%param );

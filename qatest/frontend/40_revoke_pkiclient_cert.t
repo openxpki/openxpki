@@ -23,7 +23,7 @@ $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_revocation_request_v2',
 });
 
-is($result->{main}->[0]->{content}->{fields}->[4]->{name}, 'wf_token');
+is($result->{main}->[0]->{content}->{fields}->[5]->{name}, 'wf_token');
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
@@ -38,7 +38,6 @@ $result = $client->mock_request({
     'wf_token' => undef,
     'cert_identifier' => $cert_identifier,
     'reason_code' => 'unspecified',
-    'invalidity_time' => time()
 });
 
 like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
@@ -49,6 +48,19 @@ diag("Revoking pkiclient, cert identifier $cert_identifier, Workflow Id $wf_id")
 
 $result = $client->mock_request({
     'page' => $result->{goto},
+});
+
+$result = $client->mock_request({
+    'action' => 'workflow!select!wf_action!crr_edit_crr!wf_id!'.$wf_id,
+});
+
+$result = $client->mock_request({
+    'action' => 'workflow!index',
+    'wf_token' => undef,
+    'cert_identifier' => $cert_identifier,
+    'reason_code' => 'unspecified',
+    'invalidity_time' => time(),
+    'comment' => 'Extra comment',
 });
 
 $result = $client->mock_request({

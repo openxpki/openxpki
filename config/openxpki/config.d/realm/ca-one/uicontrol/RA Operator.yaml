@@ -223,7 +223,7 @@ wfsearch:
           - label: I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL
             field: WORKFLOW_STATE
           - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
-            field: context.cert_subject
+            template: "[% IF context.cert_subject %][% context.cert_subject %][% ELSIF context.cert_identifier %][% USE Certificate %][% Certificate.body(context.cert_identifier, 'subject') %][% ELSE %]-[% END %]"
           - label: I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL
             template: "[% context.creator %] / [% context.cert_info.requestor_email %]"
             

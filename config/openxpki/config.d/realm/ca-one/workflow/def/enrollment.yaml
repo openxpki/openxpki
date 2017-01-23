@@ -320,6 +320,7 @@ state:
         output:
           - cert_profile 	
           - cert_identifier
+          - renewal_cert_identifier
           - creator 	
           - request_mode 	
           - in_renewal_window
@@ -471,20 +472,24 @@ action:
 
     revoke_cert:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
-        input:
-          - cert_identifier
         param:
+            workflow: certificate_revocation_request_v2
+            target_key: workflow_revoke_id
+            _map_cert_identifier: $cert_identifier
             flag_auto_approval: 1
+            flag_batch_mode: 1
             reason_code: superseded
 
     revoke_cert_after_replace:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
-        input:
         param:
+            workflow2: certificate_revocation_request_v2
+            target_key: workflow_revoke_id
             _map_cert_identifier: $replace_cert_identifier
             _map_reason_code:     $reason_code
-            _map_invalidity_time: $invalidity_time
+            _map_delay_revocation_time: $revocation_time
             flag_auto_approval: 1
+            flag_batch_mode: 1
 
     revoke_existing_certs:
         class: OpenXPKI::Server::Workflow::Activity::SCEPv2::RevokeExistingCerts

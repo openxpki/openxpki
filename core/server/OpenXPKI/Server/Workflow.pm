@@ -614,6 +614,7 @@ sub _resume {
                 }
             )
         );
+        $self->context->param( wf_exception => undef ) if $self->context->param('wf_exception');
         $self->_set_proc_state('resume');#saves wf data
         $action->resume($self,$old_state);
 

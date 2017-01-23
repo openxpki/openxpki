@@ -17,10 +17,14 @@ Component = Em.Component.extend
                 format: @get "format"
 
     propagate: Em.observer "content.pickvalue", ->
-        if @get("content.pickvalue")
+        if @get("content.pickvalue") and not  @get("content.value")
+           @set "content.pickvalue", moment().utc().format @get "format"
+           @$().find(".date").data("DateTimePicker").setDate(@get("content.pickvalue"))
+
+        if @get("content.pickvalue") and @get("content.pickvalue") isnt "0"
             datetime = moment.utc(@get("content.pickvalue"), @get("format")).unix()
         else
-            dateimte = ""
+            datetime = ""
         @set "content.value", datetime
 
 `export default Component`

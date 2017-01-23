@@ -73,13 +73,6 @@ msgstr "Catena di certificazione"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Informazioni Certificato"
 
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
-msgstr ""
-"Inserisci la passphrase impostata durante la creazione del certificato."
-
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
-msgstr "Scarica la chiave privata del certificato"
-
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identificatore del certificato"
 
@@ -1154,6 +1147,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
+msgstr "Il valore date/time inserito non è stato convalidato."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Tipo"
 
@@ -1616,6 +1613,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 msgstr "Sottoscrizione SCEP"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
+msgstr "Certificato scaduto di recente"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Termina Workflow"
 
@@ -1807,6 +1808,24 @@ msgstr "Tipo di CSR"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP"
 msgstr "Il tipo di richiesta CSR, di solito PKCS10."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC"
+msgstr ""
+"Con la Revoca ritardata, puoi programmare la revoca di un certificato in una "
+"data futura."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL"
+msgstr "Creator"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_PLACEHOLDER"
+msgstr "Creator"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
+msgstr "Creator"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
 msgstr "Email"
 
@@ -1858,14 +1877,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL"
 msgstr "Auto-Approva"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_DESC"
-msgstr ""
-"Con la Revoca ritardata, puoi programmare la revoca di un certificato in una "
-"data futura."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
-msgstr "Revoca Ritardata"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC"
 msgstr ""
@@ -2116,6 +2127,27 @@ msgstr "Motivo del Rifiuto, ad es. autorizzazione mancante, duplicazione, ecc."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_TOOLTIP"
 msgstr "Il commento è salvato con il Workflow e inviato all’utente"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_DESC"
+msgstr "Il certificato che viene sostituito con questo Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_LABEL"
+msgstr "Certificato sostituito"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_PLACEHOLDER"
+msgstr ""
+"Inserisci l’identificatore del certificato oppure digita una parte del campo "
+"Soggetto per avviare l’autoricerca!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
+msgstr ""
+"La funzione di autoricerca ricercherà i certificati che i contengono i "
+"termini inseriti e li mostrerà in una lista a scorrimento verticale. "
+"Seleziona il certificato cliccando sull’elemento della lista."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "Il certificato che viene sostituito con questo Workflow"
 
@@ -2341,6 +2373,10 @@ msgstr "Inizializzo..."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "Workflow Aperto"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL"
+msgstr "Stato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Motivo Sospensione"
 
@@ -2438,9 +2474,6 @@ msgstr "Tipo"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL"
 msgstr "Aggiornato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
-msgstr "ID Workflow"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr ""
@@ -3085,6 +3118,13 @@ msgstr "Le informazioni sul Workflow sono state aggiornate"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Chiave"
+
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
+#~ msgstr ""
+#~ "Inserisci la passphrase impostata durante la creazione del certificato."
+
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
+#~ msgstr "Scarica la chiave privata del certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
@@ -3899,6 +3939,9 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
+#~ msgstr "Revoca Ritardata"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
 #~ msgstr " "
 
@@ -4102,6 +4145,9 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
+#~ msgstr "ID Workflow"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_DESC"
 #~ msgstr "Il token di firma della CA è inutilizzabile."
