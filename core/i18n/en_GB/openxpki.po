@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2017-01-13 15:26+0100\n"
+"PO-Revision-Date: 2017-01-24 09:09+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -60,6 +60,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
 msgstr "Certificate Chain"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
+msgstr "Common Name"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Certificate Information"
@@ -590,6 +593,9 @@ msgstr "Network timeout on scp transfer request"
 
 msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "Waiting"
+
+msgid "I18N_OPENXPKI_UI_PKI_REALM_LABEL"
+msgstr "CA Realm"
 
 msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC"
 msgstr "Please confirm that you really want to execute this action!"
@@ -1866,6 +1872,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Your PKCS10 encoded request"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
+msgstr "Duplicated Key Certificates"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
 msgstr ""
 "Please explain in brief why your request should be processed even if it "
@@ -1876,6 +1885,9 @@ msgstr "Explanation for Policy Violation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
 msgstr "e.g. DNS still in setup, Certificate Replacement, etc."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID"
+msgstr "Duplicated Key Workflow Ids"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
 msgstr "The reason code indicates the reason why the certificate was revoked."
@@ -2597,6 +2609,28 @@ msgstr "This workflow failed finally and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
 msgstr "FAILURE"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC"
+msgstr ""
+"The uploaded key was found to be used already by another certificate, which "
+"is not allowed. Please use the buttons below to either upload a new "
+"certificate request or cancel the workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_LABEL"
+msgstr "Duplicate Key Error (Certificate)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_DESC"
+msgstr ""
+"The uploaded key was found to be used already by another certificate request "
+"but it is not allowed to certify the same key twice. Use the buttons below "
+"to either upload a new key to the request or cancel the process. If you have "
+"control about the blocking workflow listed below, you can also decide to "
+"cancel the other workflow and use the recheck button below to proceed. As we "
+"are unable to decide if you have control about the blocking workflow, this "
+"option might not be available!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
+msgstr "Duplicate Key Error (Request)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "State"
@@ -3473,14 +3507,6 @@ msgstr "Yes"
 #~ msgstr "Persist CRR"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
-#~ msgstr "Information about the Request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
-#~ msgstr "Requestor Information"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
 #~ msgstr " "
 
@@ -3729,10 +3755,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Check this box to force issuance."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_DESC"
-#~ msgstr "The subject alternative name of the certificate."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL"
@@ -4160,10 +4182,6 @@ msgstr "Yes"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FETCH_CERTIFICATE_DESC"
-#~ msgstr "Revoke the certificate"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FETCH_CERTIFICATE_LABEL"
 #~ msgstr "Revoke the certificate"
 
 #, fuzzy

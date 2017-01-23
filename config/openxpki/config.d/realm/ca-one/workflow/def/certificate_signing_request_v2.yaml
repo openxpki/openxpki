@@ -36,7 +36,22 @@ state:
         autorun: 1
         action:
           - cleanup_key_password > NICE_SEND_NOTIFICATION
-
+    
+    CLEANUP_BEFORE_CANCEL:
+        autorun: 1
+        action: remove_public_key_identifier > CANCELED
+        
+    CHECK_FOR_DUPLICATE_KEY:
+        autorun: 1
+        action: initialize_duplicate_key_check set_public_key_identifier search_key_duplicate_workflow search_key_duplicate_certificate > CHECK_DUPLICATE_KEY_POLICY
+          
+    CHECK_DUPLICATE_KEY_POLICY:
+        autorun: 1
+        action:
+          - global_noop > KEY_DUPLICATE_ERROR_CERTIFICATE ? has_duplicate_key_certificate
+          - global_noop2 > KEY_DUPLICATE_ERROR_WORKFLOW ? has_duplicate_key_workflow !has_duplicate_key_certificate
+          - global_noop3 > ENTER_SUBJECT ? !has_duplicate_key_workflow !has_duplicate_key_certificate
+    
     ENTER_CERT_INFO:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC
@@ -83,6 +98,38 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC
         action:
           - select_profile > SETUP_REQUEST_TYPE
+
+    KEY_DUPLICATE_ERROR_WORKFLOW:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_DESC
+        action:
+          - upload_pkcs10 > CHECK_FOR_DUPLICATE_KEY
+          - global_noop > CHECK_FOR_DUPLICATE_KEY
+          - global_cancel > CLEANUP_BEFORE_CANCEL
+        output:
+          - key_duplicate_workflow_id
+        button:
+          upload_pkcs10:
+            format: expected
+          global_noop:
+            label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
+            format: alternative
+          global_cancel:
+            format: failure
+
+    KEY_DUPLICATE_ERROR_CERTIFICATE:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC
+        action:
+          - upload_pkcs10 > CHECK_FOR_DUPLICATE_KEY
+          - global_cancel > CLEANUP_BEFORE_CANCEL
+        output: 
+          - key_duplicate_certificate
+        button:
+          upload_pkcs10:
+            format: expected
+          global_cancel:
+            format: failure
 
     KEY_GENERATED:
         autorun: 1
@@ -285,7 +332,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_DESC
         action:
           - provide_server_key_params > ENTER_KEY_PASSWORD ? can_use_server_key 
-          - upload_pkcs10 > ENTER_SUBJECT ? can_use_client_key 
+          - upload_pkcs10 > CHECK_FOR_DUPLICATE_KEY ? can_use_client_key 
           - select_profile > SETUP_REQUEST_TYPE
         output:
           - cert_profile
@@ -314,7 +361,7 @@ state:
           - edit_subject > BUILD_SUBJECT
           - edit_san > BUILD_SUBJECT ? profile_has_san_section
           - edit_cert_info > BUILD_SUBJECT ? profile_has_info_section
-          - global_cancel > CANCELED
+          - global_cancel > CLEANUP_BEFORE_CANCEL
         output:
           - cert_subject
           - cert_subject_alt_name
@@ -627,8 +674,39 @@ action:
           - csr_type
         validator:
           - global_pkcs10_valid
-#          - global_key_reuse
           - global_key_params
+
+    initialize_duplicate_key_check:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            _map__request_subject_key_identifier: "[% USE PKCS10 %][% PKCS10.subject_key_identifier(context.pkcs10) %]"
+            check_policy_key_duplicate_workflow: ''
+            check_policy_key_duplicate_certificate: ''
+            
+    set_public_key_identifier:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        param:
+            _map_subject_key_identifier: $_request_subject_key_identifier
+            
+    remove_public_key_identifier:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+        param:
+            subject_key_identifier: ''
+            
+    search_key_duplicate_workflow:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchWorkflow
+        param:
+            realm: _any
+            mode: list
+            _map_attr_subject_key_identifier: $_request_subject_key_identifier
+            target_key: check_policy_key_duplicate_workflow
+                        
+    search_key_duplicate_certificate:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
+        param:
+            realm: _any
+            _map_subject_key_identifier: $_request_subject_key_identifier
+            target_key: check_policy_key_duplicate_certificate
 
 condition:
     is_certificate_issued:
@@ -676,6 +754,16 @@ condition:
         param:
             test: $context->{_password}
 
+    has_duplicate_key_certificate:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{check_policy_key_duplicate_certificate}
+        
+    has_duplicate_key_workflow:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{check_policy_key_duplicate_workflow}
+        
     pending_notification_send:
         class: Workflow::Condition::Evaluate
         param:
@@ -770,7 +858,7 @@ field:
           [% END %]
 
     check_policy_key_duplicate:
-        label: Failed Policy Check Key Duplicate
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE
         name: check_policy_key_duplicate
         format: rawlist
         template: >
@@ -816,6 +904,33 @@ field:
         type: text
         # This is expanded to a hash with profile dependent values
         required: 1
+        
+    key_duplicate_certificate:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE
+        name: check_policy_key_duplicate_certificate
+        format: rawlist
+        template: >
+          [% USE Certificate %]
+          [% IF value %]
+            I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME / I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER / I18N_OPENXPKI_UI_PKI_REALM_LABEL |
+            [% FOREACH identifier = value %]
+              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
+                [% Certificate.dn(identifier,'CN') %] / [% identifier %] / [% Certificate.realm(identifier) %]</a>| 
+            [% END %]
+          [% END %]
+          
+    key_duplicate_workflow_id:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID
+        name: check_policy_key_duplicate_workflow
+        format: rawlist
+        template: >
+          [% USE Workflow %]
+          [% IF value %]
+            I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL / I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL / I18N_OPENXPKI_UI_PKI_REALM_LABEL |
+            [% FOREACH wf_id = value %]
+                [% wf_id %] / [% Workflow.creator(wf_id) %] / [% Workflow.realm(wf_id) %] | 
+            [% END %]
+          [% END %]
 
     onhold_comment:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_LABEL
