@@ -9,7 +9,7 @@ CLONE_DIR=/opt/openxpki
 #
 function _exit () {
     if [ $1 -ne 0 ]; then
-        echo -e "\n==========[ ERROR ]==========" >&2
+        echo -e "\n==========[ ERROR CODE $1 ]==========" >&2
         echo "There was an error, you can now inspect the log files under /var/log/openxpki/" >&2
         echo "and then finally stop the Docker container with 'exit'." >&2
         /bin/bash
@@ -89,7 +89,7 @@ make                                                    > /dev/null
 #
 # Unit tests
 #
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "unit" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "unit" ]; then
     echo -e "\n====[ Testing part 1: unit tests ]===="
     make test
     test "$OXI_TEST_ONLY" == "unit" && exit
@@ -144,23 +144,24 @@ echo "Creating sample config (CA certificates etc.)"
 # QA tests
 #
 # (testing /api/ before /nice/ leads to errors)
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "nice" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "nice" ]; then
     echo -e "\n====[ Testing part 2: QA tests ("nice") ]===="
     echo "cd $CLONE_DIR/qatest/backend/nice/ && prove -q ."
     cd $CLONE_DIR/qatest/backend/nice/  && prove -q .
-    test "$OXI_TEST_ONLY" == "nice" && exit
+    test "$OXI_TEST_ONLY" == "nice" && exit || true
 fi
 
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "api" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "api" ]; then
     echo -e "\n====[ Testing part 2: QA tests ("api") ]===="
     echo "cd $CLONE_DIR/qatest/backend/api/ && prove -q ."
     cd $CLONE_DIR/qatest/backend/api/   && prove -q .
-    test "$OXI_TEST_ONLY" == "api" && exit
+    test "$OXI_TEST_ONLY" == "api" && exit || true
 fi
 
-if [ -z $OXI_TEST_ONLY -o "$OXI_TEST_ONLY" == "webui" ]; then
+if [ -z "$OXI_TEST_ONLY" -o "$OXI_TEST_ONLY" == "webui" ]; then
     echo -e "\n====[ Testing part 2: QA tests ("webui") ]===="
     echo "cd $CLONE_DIR/qatest/backend/webui/ && prove -q ."
     cd $CLONE_DIR/qatest/backend/webui/ && prove -q .
-    test "$OXI_TEST_ONLY" == "webui" && exit
+    test "$OXI_TEST_ONLY" == "webui" && exit || true
 fi
+
