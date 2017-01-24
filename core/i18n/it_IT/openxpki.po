@@ -70,6 +70,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
 msgstr "Catena di certificazione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
+msgstr "I miei certificati"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Informazioni Certificato"
 
@@ -687,6 +691,10 @@ msgstr "Errore timeout di rete nella richiesta di trasferimento scp"
 msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "In attesa"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PKI_REALM_LABEL"
+msgstr "Tipo"
+
 msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC"
 msgstr "Per favore conferma che vuoi realmente eseguire questa azione!"
 
@@ -983,6 +991,11 @@ msgstr "Descrizione Indirizzo Email"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
 msgstr "Creatore"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
+msgstr "Stato del Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
@@ -2065,6 +2078,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "La tua richiesta codificata in formato PKCS10"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
+msgstr "Requestor Information"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
 msgstr ""
 "Inserisci per favore una spiegazione del perché hai bisogno di inviare una "
@@ -2076,6 +2093,10 @@ msgstr "Spiegazione della violazione della Policy"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
 msgstr ""
 "ad es. DNS ancora in fase di impostazione, sostituzione di certificato, ecc."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID"
+msgstr "Spiegazione della violazione della Policy"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
 msgstr "Il codice motivazione spiega il motivo della revoca del certificato."
@@ -2829,6 +2850,22 @@ msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
 msgstr "FALLIMENTO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC"
+msgstr "Information about the Request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_LABEL"
+msgstr "Revoke the certificate"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_DESC"
+msgstr "The subject alternative name of the certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
+msgstr "Modifica Richiesta"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "Stato"
@@ -3729,14 +3766,6 @@ msgstr "Chiave"
 #~ msgstr "Persist CRR"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
-#~ msgstr "Information about the Request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
-#~ msgstr "Requestor Information"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
 #~ msgstr " "
 
@@ -3985,10 +4014,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Check this box to force issuance."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_DESC"
-#~ msgstr "The subject alternative name of the certificate."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL"
@@ -4421,10 +4446,6 @@ msgstr "Chiave"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FETCH_CERTIFICATE_DESC"
-#~ msgstr "Revoke the certificate"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_FETCH_CERTIFICATE_LABEL"
 #~ msgstr "Revoke the certificate"
 
 #, fuzzy

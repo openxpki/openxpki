@@ -1,9 +1,7 @@
 {{#if content.content.pager}}
     <nav class="text-right">
-        <span class="pagination">
-            <span class="pagination-label">Items per page</span>
-        </span>
         <ul class="pagination">
+            <li class="disabled pagination-label"><a>Items per page</a></li>
             {{#each pagesizes as |pagesize|}}
                 <li class="{{if pagesize.active "active"}}"><a {{action "page" pagesize}}>{{pagesize.limit}}</a></li>
             {{/each}}
@@ -25,5 +23,8 @@
                 </li>
             </ul>
         {{/if}}
+        <ul class="pagination">
+            <li class="disabled total"><a>{{content.content.pager.count}} Items</a></li>
+        </ul>
     </nav>
 {{/if}}

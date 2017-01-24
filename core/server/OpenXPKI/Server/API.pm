@@ -1270,6 +1270,15 @@ sub BUILD {
                 },
             },
         },
+        'get_workflow_creator' =>{
+            class  => 'Workflow',
+            params => {
+                ID => {
+                    type  => SCALAR,
+                    regex => $re_integer_string,
+                },
+            }
+        }, 
         'get_workflow_history' => {
             class  => 'Workflow',
             params => {
@@ -1462,6 +1471,11 @@ sub BUILD {
                     regex => $re_boolean,
                     optional => 1,
                 },
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
             },
         },
         'search_workflow_instances_count' => {
@@ -1496,6 +1510,11 @@ sub BUILD {
                 PROC_STATE => {
                     type     => SCALAR,
                     regex    => $re_alpha_string,
+                    optional => 1,
+                },
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
                     optional => 1,
                 },
             },

@@ -75,6 +75,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -784,6 +788,10 @@ msgid "I18N_OPENXPKI_UI_PAUSED_WAITING"
 msgstr "В состоянии ожидания запуска"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PKI_REALM_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
@@ -1233,6 +1241,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
+msgstr "Статус"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
@@ -2496,6 +2508,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
 msgstr "Это поле можно использовать для комментариев."
 
@@ -2506,6 +2522,15 @@ msgstr "Родительский технологический процесс"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
 msgstr "Это поле можно использовать для комментариев."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
@@ -3400,6 +3425,22 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_DESC"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
@@ -9178,14 +9219,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
-#~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
-#~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
 #~ msgstr "SPKAC-строка пуста."
 
@@ -9558,10 +9591,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_DESC"
-#~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL"
 #~ msgstr "Родительский технологический процесс"
 
@@ -9694,15 +9723,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_EMPLOYEE_ID_TOOLTIP"
 #~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_DESC"
-#~ msgstr ""
-#~ "Используйте данный профиль сертификата только если Вы отчетливо "
-#~ "представляете себе необходимую структуру имени субъекта сертификата, "
-#~ "хорошо знаете компоненты этой структуры и соглашения об использовании "
-#~ "имен в Вашей части инфраструктуры открытых ключей. Данный профиль "
-#~ "позволяет использовать также произвольный набор альтернативных имен."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_WORKFLOW_CREATOR_LABEL"
@@ -10246,10 +10266,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_PICKUP_CERTIFICATE_DESC"
-#~ msgstr "Технологические процессы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_NICE_PICKUP_CERTIFICATE_LABEL"
 #~ msgstr "Технологические процессы"
 
 #, fuzzy

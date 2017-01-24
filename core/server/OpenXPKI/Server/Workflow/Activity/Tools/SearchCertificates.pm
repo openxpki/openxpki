@@ -144,7 +144,12 @@ sub execute
             my $value = $self->param($key);
             ##! 16: 'Add key with value ' . $value 
             push @{$query->{CERT_ATTRIBUTES}},  { KEY => $key, VALUE => $value };
-        }   
+        }
+    }
+    
+    if ($self->param('subject_key_identifier')) {
+        # uppercase the value to match the database format
+        $query->{'SUBJECT_KEY_IDENTIFIER'} = uc($self->param('subject_key_identifier'));
     }
 
     if (scalar (keys %{$query}) == 3 && scalar(@{$query->{CERT_ATTRIBUTES}}) == 0) {
@@ -233,6 +238,10 @@ with non-ascii strings/encodings.
 =item issuer
 
 The certificate identifier of the issuer
+
+=item subject_key_identifier
+
+The certificate subject_key_identifier (hex notation with colon)
 
 =item meta_*, system_*
 

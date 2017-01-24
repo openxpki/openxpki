@@ -110,6 +110,7 @@ action:
     revoke_certificate:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
         param:
+            workflow: certificate_revocation_request_v2
             _map_reason_code: $reason_code
             _map_comment: $comment
             flag_auto_approval : 1

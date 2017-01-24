@@ -189,7 +189,7 @@ sub dn {
     my $dn = $hash->{BODY}->{SUBJECT_HASH};    
         
     if (!$component) {
-        return $hash;
+        return $dn;
     }
     
     if (!$dn->{$component}) {
@@ -230,6 +230,7 @@ Return the notafter date in given format. Format can be any string accepted
 by OpenXPKI::DateTime, default is UTC format (iso8601). 
 
 =cut
+
 sub notafter {
     
     my $self = shift;
@@ -247,6 +248,24 @@ sub notafter {
 
 }
 
+=head2 pki_realm
+
+Return the verbose label of the workflow realm
+
+=cut 
+
+sub realm {
+    
+    my $self = shift;
+    my $cert_id = shift;
+    
+    my $hash = $self->get_hash( $cert_id );
+    return '' unless ($hash);
+    
+    return CTX('config')->get(['system','realms',$hash->{'PKI_REALM'},'label']);
+    
+}
+ 
 =head2 chain(cert_identifier)
 
 Return the chain of the certificate as array.

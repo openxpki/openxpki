@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `aliases` (
 
 CREATE TABLE IF NOT EXISTS `application_log` (
   `application_log_id` bigint(20) unsigned NOT NULL,
-  `logtimestamp` bigint(20) unsigned DEFAULT NULL,
+  `logtimestamp` decimal(20,0) unsigned DEFAULT NULL,
   `workflow_id` decimal(49,0) NOT NULL,
   `priority` int(11) DEFAULT '0',
   `category` varchar(255) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `application_log` (
 
 CREATE TABLE IF NOT EXISTS `audittrail` (
   `audittrail_key` bigint(20) unsigned NOT NULL,
-  `logtimestamp` bigint(20) unsigned DEFAULT NULL,
+  `logtimestamp` decimal(20,0) unsigned DEFAULT NULL,
   `category` varchar(255) DEFAULT NULL,
   `loglevel` varchar(255) DEFAULT NULL,
   `message` text

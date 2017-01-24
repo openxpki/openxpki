@@ -370,7 +370,7 @@ sub init_result {
     # result expired or broken id
     if (!$result || !$result->{count}) {
 
-        $self->set_status('Search result expired or empty!','error');
+        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
         return $self->init_search();
 
     }
