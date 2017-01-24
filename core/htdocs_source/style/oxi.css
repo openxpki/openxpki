@@ -215,6 +215,11 @@ img.toplogo{
   }
 }
 
+/* Fix pointer on bootstrap navbars */
+ul.pagination li:not(.disabled) > a {
+    cursor: pointer;
+}
+ 
 /* Status Labels inside key/value lists, e.g */
 span.dns-valid,
 span.certstatus-issued {
