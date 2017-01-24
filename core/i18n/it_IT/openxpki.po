@@ -992,6 +992,11 @@ msgstr "Descrizione Indirizzo Email"
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
 msgstr "Creatore"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
+msgstr "Stato del Certificato"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 msgstr "Azione"

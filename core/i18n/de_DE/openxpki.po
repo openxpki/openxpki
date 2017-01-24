@@ -1243,6 +1243,10 @@ msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
+msgstr "Status"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 msgstr "Übergeordneter Workflow"
 
