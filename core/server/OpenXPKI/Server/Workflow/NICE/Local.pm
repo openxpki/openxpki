@@ -402,7 +402,7 @@ sub issueCRL {
         FACILITY => [ 'audit', 'system' ],
     );
     #
-    # publish_crl can then publish all those with a PUBLICATION_DATE of -1
+    # publish_crl can then publish all those with a PUBLICATION_DATE of 0
     # and set it accordingly
     my $data = { $crl_obj->to_db_hash() };
     $data = {
@@ -411,7 +411,7 @@ sub issueCRL {
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
-        publication_date  => -1,
+        publication_date  => 0,
     };
     $dbi->insert( into => 'crl', values => $data );
     
