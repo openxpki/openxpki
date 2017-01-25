@@ -22,6 +22,7 @@ echo "OXI_TEST_DB_MYSQL_NAME=openxpki"     >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_USER=oxitest"      >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_PASSWORD=openxpki" >> /etc/environment
 cat /etc/environment | while read def; do export $def; done
+. /etc/environment
 
 #
 # Run Docker container
@@ -61,8 +62,8 @@ fi
 # Database setup
 #
 set -e
-echo "MySQL: setting up database (user + schema)"
 
+echo "MySQL: setting up database user"
 cat <<__SQL | mysql -h 127.0.0.1 -uroot -proot                        >$LOG 2>&1
 DROP database IF EXISTS $OXI_TEST_DB_MYSQL_NAME;
 CREATE database $OXI_TEST_DB_MYSQL_NAME CHARSET utf8;
@@ -71,6 +72,7 @@ GRANT ALL ON $OXI_TEST_DB_MYSQL_NAME.* TO '$OXI_TEST_DB_MYSQL_USER'@'%';
 flush privileges;
 __SQL
 
+echo "MySQL: setting up database schema"
 mysql -h 127.0.0.1 \
       -u$OXI_TEST_DB_MYSQL_USER \
       -p$OXI_TEST_DB_MYSQL_PASSWORD \
