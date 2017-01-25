@@ -19,6 +19,7 @@ use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
+use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );
 use Digest::SHA qw( sha1_base64 );
@@ -405,13 +406,45 @@ sub send_notification {
 
 }
 
-=head2 import_certificate( { DATA, PKI_REALM, FORCE_NOCHAIN, FORCE_ISSUER, REVOKED })
+=head2 import_certificate
+
+Parameters:
+
+=over
+
+=item * B<DATA>, certificate data (PEM encoded)
+
+=item * B<PKI_REALM> (optional), set the PKI realm to this value (might be overridden by an
+issuer's realm)
+
+=item * B<FORCE_NOCHAIN> (optional), 1 = import certificate even if issuer is
+unknown (then I<issuer_identifier> will not be set) or has an incomplete
+signature chain.
+
+=item * B<FORCE_ISSUER> (optional), 1 = enforce import even if it has an invalid
+signature chain (i.e. verification failed).
+
+=item * B<FORCE_NOVERIFY> (optional), 1 = do not validate signature chain (e.g.
+if one of the certificates' CA has expired)
+
+=item * B<REVOKED> (optional), Set to 1 to set the certificate status to "REVOKED"
+
+=item * B<UPDATE> (optional), Do not throw an exception if certificate already exists, update it instead
+
+=back
 
 =cut
 
 sub import_certificate {
     my $self    = shift;
     my $arg_ref = shift;
+
+    if ($arg_ref->{ISSUER} and $arg_ref->{FORCE_NOCHAIN}) {
+        # TODO Use unique exception id instead of text and output command line specific hints in openxpkiadm
+        OpenXPKI::Exception->throw(
+            message => 'Option force-no-chain is not allowed with explicit issuer, use force-issuer instead!'
+        );
+    }
 
     my $default_token = CTX('api')->get_default_token();
     my $dbi = CTX('dbi_backend');
@@ -425,7 +458,9 @@ sub import_certificate {
     );
     my $cert_identifier = $cert->get_identifier();
 
+    #
     # Check if the certificate is already in the PKI
+    #
     my $db_hash = $dbi->first(
         TABLE   => 'CERTIFICATE',
         DYNAMIC => { IDENTIFIER => $cert_identifier }
@@ -439,7 +474,7 @@ sub import_certificate {
                 PKI_REALM => $db_hash->{PKI_REALM} || '',
                 STATUS => $db_hash->{STATUS},
             },
-        ) if (!$do_update);
+        ) unless $do_update;
     } else {
         $do_update = 0;
     }
@@ -448,144 +483,47 @@ sub import_certificate {
     $db_hash->{STATUS} = ($arg_ref->{REVOKED} ? 'REVOKED' : 'ISSUED');
     $db_hash->{PKI_REALM} = $arg_ref->{PKI_REALM} if ($arg_ref->{PKI_REALM});
 
-    my $self_signed = 1;
-    my $issuer_query;
-    # Check if self-signed based on Key Ids, if set
-    if (defined $cert->get_subject_key_id()
-        && defined $cert->get_authority_key_id()) {
+    # Query issuer certificate
+    my $issuer_cert = $self->_get_issuer(
+        cert            => $cert,
+        explicit_issuer => $arg_ref->{ISSUER},
+        force_nochain   => $arg_ref->{FORCE_NOCHAIN},
+    );
 
-        if ($cert->get_subject_key_id() ne $cert->get_authority_key_id()) {
-            $self_signed = 0;
-            $issuer_query = { SUBJECT_KEY_IDENTIFIER => $cert->get_authority_key_id() };
-        }
-
-    # certificates without AIK/SK set
-    } else {
-        if ($cert->{PARSED}->{BODY}->{SUBJECT} ne $cert->{PARSED}->{BODY}->{ISSUER}) {
-            $self_signed = 0;
-            $issuer_query = { SUBJECT => $cert->{PARSED}->{BODY}->{ISSUER} };
-        }
-    }
-
-    # Lookup issuer if not self-signed
-    my $issuer_identifier;
-    if ($self_signed) {
+    # cert is self signed
+    if ($issuer_cert eq "SELF") {
         $db_hash->{ISSUER_IDENTIFIER} = $cert_identifier;
-    } else {
-
-        # Explicit issuer wins over issuer query
-        if ($arg_ref->{ISSUER}) {
-
-            if ($arg_ref->{FORCE_NOCHAIN}) {
-                OpenXPKI::Exception->throw(
-                    message => 'Option force-no-chain is not allowed with explicit issuer, use force-issuer instead!'
-                ) ;
-            }
-            $issuer_query = { IDENTIFIER => $arg_ref->{ISSUER} };
-        }
-
-        # TODO - check for non-uniq subjects
-        my $db_result = $dbi->select(
-            TABLE   => 'CERTIFICATE',
-            DYNAMIC => $issuer_query,
+    }
+    # cert has known issuer
+    elsif ($issuer_cert) {
+        my $valid = $self->_is_issuer_valid(
+            default_token  => $default_token,
+            cert           => $cert,
+            issuer_cert    => $issuer_cert,
+            force_noverify => $arg_ref->{FORCE_NOVERIFY},
+            force_nochain  => $arg_ref->{FORCE_NOCHAIN},
         );
 
-        if ((scalar @{$db_result}) > 1) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_ISSUER_QUERY_AMBIGIOUS_RESULT',
-                params  => {
-                    RESULTS => scalar @{$db_result},
-                    QUERY => Dumper $issuer_query,
-                },
-            )
-        }
-
-        if ((scalar @{$db_result}) == 1) {
-
-            my $issuer_cert = $db_result->[0];
-
-            my $valid;
-
-            # No verfiy requested ?
-            if($arg_ref->{FORCE_NOVERIFY})  {
-                $valid = 1;
+        if (!$valid) {
+            # force the invalid issuer
+            if ($arg_ref->{FORCE_ISSUER}) {
                 CTX('log')->log(
-                    MESSAGE  => "Importing certificate without chain verification! $cert_identifier / " . $cert->get_subject(),
+                    MESSAGE  => "Importing certificate with invalid chain with force! $cert_identifier / " . $cert->get_subject(),
                     PRIORITY => 'warn',
                     FACILITY => ['audit','system']
                 );
-
-            # check if the issuer is already a root
-            } elsif ($issuer_cert->{IDENTIFIER} eq $issuer_cert->{ISSUER_IDENTIFIER}) {
-                $valid = $default_token->command({
-                    COMMAND => 'verify_cert',
-                    CERTIFICATE => $cert->{DATA},
-                    TRUSTED => $issuer_cert->{DATA},
-                });
-
             } else {
-                # get the chain starting from the issuer
-
-                #validate_certificate
-                my $chain = $self->get_chain({ START_IDENTIFIER => $issuer_cert->{IDENTIFIER}, OUTFORMAT => 'PEM' });
-                # we can only verify with a complete chain
-                if ($chain->{COMPLETE}) {
-                    my @work_chain = @{$chain->{CERTIFICATES}};
-                    my $root = pop @work_chain;
-
-                    $valid = $default_token->command({
-                        COMMAND => 'verify_cert',
-                        CERTIFICATE => $cert->{DATA},
-                        TRUSTED => $root,
-                        CHAIN => join "\n", @work_chain
-                    });
-                } elsif($arg_ref->{FORCE_NOCHAIN}) {
-                    # Accept an incomplete chain
-                    $valid = 1;
-                    CTX('log')->log(
-                        MESSAGE  => "Importing certificate with incomplete chain! $cert_identifier / " . $cert->get_subject(),
-                        PRIORITY => 'warn',
-                        FACILITY => ['audit','system']
-                    );
-                }
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN',
+                    params  => { ISSUER_IDENTIFIER => $issuer_cert->{IDENTIFIER}, ISSUER_SUBJECT => $issuer_cert->{SUBJECT} },
+                );
             }
-
-            if (!$valid) {
-                # force the invalid issuer
-                if ($arg_ref->{FORCE_ISSUER}) {
-                    CTX('log')->log(
-                        MESSAGE  => "Importing certificate with invalid chain with force! $cert_identifier / " . $cert->get_subject(),
-                        PRIORITY => 'warn',
-                        FACILITY => ['audit','system']
-                    );
-                } else {
-                    OpenXPKI::Exception->throw(
-                        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN',
-                        params  => { ISSUER_IDENTIFIER => $issuer_cert->{IDENTIFIER}, ISSUER_SUBJECT => $issuer_cert->{SUBJECT} },
-                    ) ;
-                }
-            }
-
-            $db_hash->{ISSUER_IDENTIFIER} = $issuer_cert->{IDENTIFIER};
-
-            # if the issuer is in a realm, it forces the entity into the same one
-            if ($issuer_cert->{PKI_REALM}){
-                $db_hash->{PKI_REALM} = $issuer_cert->{PKI_REALM};
-            }
-
-        } elsif ($arg_ref->{FORCE_NOCHAIN}) {
-            CTX('log')->log(
-                MESSAGE  => "Importing certificate without issuer! $cert_identifier / " . $cert->get_subject(),
-                PRIORITY => 'warn',
-                FACILITY => ['audit','system']
-            );
-        } else {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER',
-                params  => { QUERY => Dumper $issuer_query },
-            );
         }
-    } # end of issuer validation
+
+        $db_hash->{ISSUER_IDENTIFIER} = $issuer_cert->{IDENTIFIER};
+        # if the issuer is in a realm, it forces the entity into the same one
+        $db_hash->{PKI_REALM} = $issuer_cert->{PKI_REALM} if $issuer_cert->{PKI_REALM};
+    }
 
     # we now have a filled db_hash
 
@@ -605,9 +543,152 @@ sub import_certificate {
     # unset data to save bytes and return the remainder of the hash
     delete $db_hash->{DATA};
     return $db_hash;
-
 }
 
+# Returns the certificate issuer DB hash or C<"SELF"> if it's self signed or
+# C<undef> if no issuer was found (and force_nochain = 1).
+sub _get_issuer {
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
+        cert            => { isa => 'OpenXPKI::Crypto::X509' },
+        explicit_issuer => { isa => 'Maybe[Str]' },
+        force_nochain   => { isa => 'Maybe[Bool]' },
+    );
+    my $cert            = $args{cert};
+    my $cert_identifier = $cert->get_identifier;
+    my $explicit_issuer = $args{explicit_issuer};
+    my $force_nochain   = $args{force_nochain};
+
+    my $issuer_query;
+
+
+    #
+    # Check for self signed certificate
+    #
+
+    # Check if self-signed based on Key Ids, if set
+    if (defined $cert->get_subject_key_id and defined $cert->get_authority_key_id) {
+        $issuer_query = { SUBJECT_KEY_IDENTIFIER => $cert->get_authority_key_id() };
+        # self signed
+        return "SELF" if $cert->get_subject_key_id() eq $cert->get_authority_key_id;
+
+    # certificates without AIK/SK set
+    } else {
+        $issuer_query = { SUBJECT => $cert->{PARSED}->{BODY}->{ISSUER} };
+        # self signed
+        return "SELF" if $cert->{PARSED}->{BODY}->{SUBJECT} eq $cert->{PARSED}->{BODY}->{ISSUER};
+    }
+
+    #
+    # Lookup issuer if not self-signed
+    #
+
+    # Explicit issuer wins over issuer query
+    $issuer_query = { IDENTIFIER => $explicit_issuer } if $explicit_issuer;
+
+    # TODO - check for non-uniq subjects
+    my $db_result = CTX('dbi_backend')->select(
+        TABLE   => 'CERTIFICATE',
+        DYNAMIC => $issuer_query,
+    );
+
+    # More than 1 query result
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_ISSUER_QUERY_AMBIGIOUS_RESULT',
+        params  => {
+            RESULTS => scalar @{$db_result},
+            QUERY => Dumper $issuer_query,
+        },
+    ) if (scalar @{$db_result}) > 1;
+
+    # No issuer found
+    if ((scalar @{$db_result}) == 0) {
+        if ($force_nochain) {
+            CTX('log')->log(
+                MESSAGE  => "Importing certificate without issuer! $cert_identifier / " . $cert->get_subject(),
+                PRIORITY => 'warn',
+                FACILITY => ['audit','system']
+            );
+            return;
+        }
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER',
+            params  => { QUERY => Dumper $issuer_query },
+        );
+    }
+
+    return $db_result->[0];
+}
+
+sub _is_issuer_valid  {
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
+        default_token  => { isa => 'Object' },
+        cert           => { isa => 'OpenXPKI::Crypto::X509' },
+        issuer_cert    => { isa => 'HashRef' },
+        force_noverify => { isa => 'Maybe[Bool]' },
+        force_nochain  => { isa => 'Maybe[Bool]' },
+    );
+    my $default_token   = $args{default_token};
+    my $cert            = $args{cert};
+    my $cert_identifier = $cert->get_identifier;
+    my $issuer_cert     = $args{issuer_cert};
+    my $force_noverify  = $args{force_noverify};
+    my $force_nochain   = $args{force_nochain};
+
+    #
+    # No verfication requested ?
+    #
+    if ($force_noverify) {
+        CTX('log')->log(
+            MESSAGE  => "Importing certificate without chain verification! $cert_identifier / " . $cert->get_subject,
+            PRIORITY => 'warn',
+            FACILITY => ['audit','system']
+        );
+        return 1;
+    }
+
+    #
+    # If issuer is already a root
+    #
+    if ($issuer_cert->{IDENTIFIER} eq $issuer_cert->{ISSUER_IDENTIFIER}) {
+        return $default_token->command({
+            COMMAND => 'verify_cert',
+            CERTIFICATE => $cert->{DATA},
+            TRUSTED => $issuer_cert->{DATA},
+        });
+    }
+
+    #
+    # If issuer is no root, get the chain starting from the issuer
+    #
+
+    # validate_certificate
+    my $chain = $self->get_chain({ START_IDENTIFIER => $issuer_cert->{IDENTIFIER}, OUTFORMAT => 'PEM' });
+
+    # verify a complete chain
+    if ($chain->{COMPLETE}) {
+        my @work_chain = @{$chain->{CERTIFICATES}};
+        my $root = pop @work_chain;
+
+        return $default_token->command({
+            COMMAND => 'verify_cert',
+            CERTIFICATE => $cert->{DATA},
+            TRUSTED => $root,
+            CHAIN => join "\n", @work_chain
+        });
+    }
+
+    # Accept an incomplete chain
+    if ($force_nochain) {
+        CTX('log')->log(
+            MESSAGE  => "Importing certificate with incomplete chain! $cert_identifier / " . $cert->get_subject(),
+            PRIORITY => 'warn',
+            FACILITY => ['audit','system']
+        );
+        return 1;
+    }
+
+    return 0;
+}
 
 =head2 import_chain( { DATA, FORMAT, PKI_REALM, IMPORT_ROOT, FORCE_NOCHAIN })
 
