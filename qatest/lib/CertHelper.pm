@@ -60,19 +60,16 @@ sub opensslconf {
     my %params = @_;
 
     # Default values for params...
-    foreach my $key (
+    for my $key (
         qw( stateOrProvinceName localityName 0_organizationName organizationUnitName commonName emailAddress countryName)
-      )
-    {
-        $params{$key} ||= $self->$key();
+    ) {
+        $params{$key} ||= $self->$key;
     }
 
     my @opensslconf = ();
 
     my @opensslconffiles = qw( /opt/local/etc/openssl/openssl.cnf /usr/lib/ssl/openssl.cnf );
-    if ( $ENV{OPENSSL_CONF} ) {
-        unshift @opensslconffiles, $ENV{OPENSSL_CONF};
-    }
+    unshift @opensslconffiles, $ENV{OPENSSL_CONF} if $ENV{OPENSSL_CONF};
 
     foreach my $file ( @opensslconffiles ) {
         if ( open( my $fh, $file ) ) {
@@ -164,7 +161,7 @@ sub createcert {
         '-out',     $config->{crt_pem},
         '-outform', 'PEM',
     );
-    warn "createcert() - ", join(', ', @cmd);
+
     $rc = system(@cmd);
     $rc >>= 8;
     if ($rc) {
