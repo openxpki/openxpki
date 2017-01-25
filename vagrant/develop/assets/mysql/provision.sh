@@ -27,7 +27,7 @@ echo "OXI_TEST_DB_MYSQL_DBUSER=root"       >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_DBPASSWORD=root"   >> /etc/environment
 
 cat /etc/environment | while read def; do export $def; done
-. /etc/environment
+source /etc/environment
 
 #
 # Run Docker container
