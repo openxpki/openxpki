@@ -30,33 +30,54 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("SQL DELETE", 10, sub {
+$db->run("SQL DELETE", 12, sub {
     my $t = shift;
     my $dbi = $t->dbi;
+    my $rownum;
+
+    # no delete with non-matching where clause
+    lives_and {
+        $rownum = $dbi->delete(
+            from => "test",
+            where => { entropy => 99 },
+        );
+        ok $rownum == 0;
+    } "no update with non-matching where clause";
+
+    is_deeply $t->get_data, [
+        [ 1, "Litfasssaeule", 1 ],
+        [ 2, "Buergersteig",  1 ],
+        [ 3, "Rathaus",       42 ],
+        [ 4, "Kindergarten",  3 ],
+    ], "all rows are still there";
 
     # delete one existing row
-    lives_ok {
-        $dbi->delete(
+    lives_and {
+        $rownum = $dbi->delete(
             from => "test",
             where => [ -and => { text => "Rathaus" }, { entropy => 42 } ],
         );
-        is_deeply $t->get_data, [
-            [ 1, "Litfasssaeule", 1],
-            [ 2, "Buergersteig",  1],
-            [ 4, "Kindergarten",  3],
-        ];
+        is $rownum, 1;
     } "delete one row";
 
+    is_deeply $t->get_data, [
+        [ 1, "Litfasssaeule", 1],
+        [ 2, "Buergersteig",  1],
+        [ 4, "Kindergarten",  3],
+    ], "deleted rows are really gone";
+
     # delete two existing rows
-    lives_ok {
-        $dbi->delete(
+    lives_and {
+        $rownum = $dbi->delete(
             from => "test",
             where => { entropy => 1 },
         );
-        is_deeply $t->get_data, [
-            [ 4, "Kindergarten",  3],
-        ];
+        is $rownum, 2;
     } "delete multiple rows";
+
+    is_deeply $t->get_data, [
+        [ 4, "Kindergarten",  3],
+    ], "deleted rows are really gone";
 
     # prevent accidential deletion of all rows
     dies_ok {

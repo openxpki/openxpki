@@ -6,7 +6,7 @@ use DateTime;
 
 BEGIN {
 TODO: {
-    todo_skip 'See Issue #188';
+    todo_skip 'See Issue #188', 1;
 use_ok('OpenXPKI::Server::Workflow::Condition::CorrectTiming');
 }
 }
@@ -31,15 +31,15 @@ $hash{difference} = "10";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
 is($ct->difference(), "10", "difference parsing: 10 seconds");
 
-#    
+#
 # 2
 #
 $hash{difference} = "20m";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
 is($ct->difference(), "1200", "difference parsing: 20 minutes (1200 seconds)");
 
-#    
-# 3 
+#
+# 3
 #
 $hash{difference} = "30h";
 $ct = OpenXPKI::Server::Workflow::Condition::CorrectTiming->new(\%hash);
