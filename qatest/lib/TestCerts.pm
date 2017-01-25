@@ -10,7 +10,7 @@ TestCerts - Helper class for tests to quickly create certificates etc.
 
 use Test::More;
 use Test::Exception;
-use OpenXPKI::Server::Database::Util;
+use OpenXPKI::MooseParams;
 use OpenXPKI::Serialization::Simple;
 
 ################################################################################
@@ -55,7 +55,7 @@ Named parameters:
 =cut
 
 sub create_cert {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParam
         tester          => { isa => 'OpenXPKI::Test::More' },
         hostname        => { isa => 'Str' },
         hostname2       => { isa => 'ArrayRef[Str]', optional => 1, default => [] },

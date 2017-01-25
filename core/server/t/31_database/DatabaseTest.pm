@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use Test::Exception;
 use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-use OpenXPKI::Server::Database::Util;
+use OpenXPKI::MooseParams;
 use Log::Log4perl;
 use Moose::Util::TypeConstraints;
 
@@ -91,7 +91,7 @@ has '_log' => (
 );
 
 sub set_dbi {
-    my ($self, %args) = validated_hash(\@_,   # MooseX::args::Validate
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         params => { isa => 'HashRef' },
     );
 
@@ -125,8 +125,7 @@ log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
 }
 
 sub run {
-    my $self = shift;
-    my ($name, $plan, $tests) = pos_validated_list(\@_,
+    my ($self, $name, $plan, $tests) = positional_args(\@_,
         { isa => 'Str'},
         { isa => 'Int'},
         { isa => 'CodeRef' },
