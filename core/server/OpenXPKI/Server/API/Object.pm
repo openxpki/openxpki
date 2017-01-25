@@ -837,7 +837,7 @@ sub import_crl {
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
-        publication_date  => -1,
+        publication_date  => 0,
     };
 
     my $duplicate = $dbi->select_one(
