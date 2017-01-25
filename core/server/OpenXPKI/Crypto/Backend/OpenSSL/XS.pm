@@ -2,7 +2,7 @@
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
-	
+
 use strict;
 use warnings;
 use utf8; ## pack/unpack is too slow
@@ -97,13 +97,14 @@ sub get_object
     } else {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_UNKNOWN_TYPE",
-            params  => {"TYPE" => $type});
+            params  => { TYPE => $type }
+        );
     }
-    if (not $object)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF");
-    }
+
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF",
+        params  => { FORMAT => $format, TYPE => $type },
+    ) unless $object;
 
     ##! 2: "returning object"
     return $object;
@@ -168,7 +169,7 @@ sub get_object_function
         }
         $result = $dt_object;
     }
-    
+
     return $result;
 }
 
