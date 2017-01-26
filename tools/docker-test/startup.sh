@@ -27,7 +27,7 @@ set +e
 REPO=https://dummy:nope@github.com/$GITHUB_USER_REPO.git
 
 # Local repo from host (if Docker volume is mounted)
-mountpoint -q /repo && REPO=file:///repo
+mountpoint -q /repo && test -z "$GITHUB_USER_REPO" && REPO=file:///repo
 
 echo -e "\n====[ Git checkout: $BRANCH from $REPO ]===="
 git ls-remote -h $REPO >/dev/null 2>&1
