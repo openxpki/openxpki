@@ -14,9 +14,6 @@ if [ -e "$BASE/ca-root-1.crt" ] ||  [ -e "$BASE/ca-root-1.pem" ]; then
 fi
 
 cp $(dirname $0)/certificates/* $BASE/
-chown openxpki:root $BASE/*
-chmod 400 $BASE/*.pem
-chmod 444 $BASE/*.crt
 
 #
 # Database entries

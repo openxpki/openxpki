@@ -114,8 +114,7 @@ $CLONE_DIR/tools/scripts/mysql-create-schema.sh
 #
 # Sample config (CA certificates etc.)
 #
-echo "Creating sample config (CA certificates etc.)"
-/bin/bash $CLONE_DIR/config/sampleconfig.sh             > /dev/null
+$CLONE_DIR/tools/testdata/insert-test-certificates.sh
 
 #
 # Start OpenXPKI
