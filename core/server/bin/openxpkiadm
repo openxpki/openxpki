@@ -157,8 +157,6 @@ sub certificate_import {
 
     my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
 
-    my $dbi = __get_dbi();
-
     my $api_param = { DATA => $extracted_certdata };
 
     if ($params{issuer}) {
@@ -176,7 +174,7 @@ sub certificate_import {
     if ($params{"force-no-verify"}) {
         $api_param->{FORCE_NOVERIFY} = 1;
     }
-    
+
     if ($params{"force-issuer"}) {
         if (!$params{issuer}) {
             die "You need to specify the issuer with --issuer when using --force-issuer\n"
@@ -294,7 +292,7 @@ sub alias_add {
     # Import is possible with symbolic token or group name
     if ( $params{token} || $params{group} ) {
 
-        my $group;  
+        my $group;
         if ($params{group}) {
             $group = $params{group};
         } else {
@@ -306,10 +304,10 @@ sub alias_add {
                 return 2;
             }
         }
-                
+
         # explicit generation
         if ($params{gen} && $params{gen} =~ m{\A \d+ \z}x) {
-        
+
             # check for duplicate
             my $check_duplicate = $dbi->first(
                 TABLE   => 'ALIASES',
@@ -325,12 +323,12 @@ sub alias_add {
                 __alias_print($check_duplicate);
                 return 2;
             }
-        
+
            $insert_hash{GENERATION} = $params{gen};
-           
+
         # no generation, autodetected
         } else {
-        
+
             # query aliases to get next generation id
             my $next_generation = $dbi->first(
                 TABLE   => 'ALIASES',
@@ -345,7 +343,7 @@ sub alias_add {
         }
         $insert_hash{GROUP_ID} = $group;
         $insert_hash{ALIAS} = sprintf "%s-%01d", $group, $insert_hash{GENERATION};
-        
+
     } elsif ( !exists( $params{alias} ) || $params{alias} eq '' ) {
         print STDERR "Please specify an alias with --alias\n";
         return 1;
@@ -1317,7 +1315,7 @@ if ($cmd eq 'initdb') {
             format=s
         );
         __init();
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
 
         $ret = certificate_id();
 
@@ -1347,7 +1345,7 @@ if ($cmd eq 'initdb') {
 
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
 
         if (!$params{file}) {
             die "You need to specify the certificate to import with --file\n";
@@ -1370,7 +1368,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
 
         __check_realm() if ($params{realm});
 
@@ -1387,7 +1385,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
 
         $ret = certificate_chain();
 
@@ -1400,7 +1398,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
 
         __check_realm();
 
@@ -1427,7 +1425,7 @@ if ($cmd eq 'initdb') {
     );
     __init();
 
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend'], SILENT => 1, CLI => 1});
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','dbi_log','log','api','dbi_backend','dbi'], SILENT => 1, CLI => 1});
 
     __check_realm();
 
@@ -1451,7 +1449,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi_backend'], SILENT => 1,});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi_backend','dbi'], SILENT => 1,});
 
         __check_realm();
 
@@ -1650,7 +1648,7 @@ Import a certificate which issuer is not known in the "ServerCA" realm:
       --force-no-chain --realm ServerCA
 
 You can create an alias directly on import by adding either alias,
-generation/group or token to the command. This will execute the alias 
+generation/group or token to the command. This will execute the alias
 command with those paramters for the imported certificate inline.
 
 =item B<remove>
@@ -1778,31 +1776,31 @@ Example:
 =item B<add functional token with manual group configuration>
 
 The alias is automatically set to <group>-<generation>, e.g. server-ca-1.
-The generation identifier is increased by one from the latest one found 
-in the same group. 
+The generation identifier is increased by one from the latest one found
+in the same group.
 
   --group   The name of the group (e.g. server-ca)
- 
+
 Example:
 
     openxpkiadm alias --realm server-realm \
         --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
-        --group server-ca 
-        
+        --group server-ca
+
 =item B<explicit generation>
 
 If you need to force a certain generation identifier, you can skip the
 autodetection and provide the wanted index:
-        
+
     --generation  The numeric index to use for this alias
 
-This works with both methods above, token and group. 
+This works with both methods above, token and group.
 
 Example:
 
     openxpkiadm alias --realm server-realm \
         --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
-        --group server-ca --generation 42 
+        --group server-ca --generation 42
 
 =item B<add non-functional alias>
 
