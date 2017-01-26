@@ -24,8 +24,9 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );
 use Digest::SHA qw( sha1_base64 );
 use DateTime;
-
 use Workflow;
+
+use OpenXPKI::Server::Database::Legacy;
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -446,11 +447,8 @@ sub import_certificate {
         );
     }
 
+    my $dbi = CTX('dbi');
     my $default_token = CTX('api')->get_default_token();
-    my $dbi = CTX('dbi_backend');
-
-    my $realm = $arg_ref->{PKI_REALM};
-    my $do_update = $arg_ref->{UPDATE};
 
     my $cert = OpenXPKI::Crypto::X509->new(
         TOKEN => $default_token,
@@ -458,30 +456,26 @@ sub import_certificate {
     );
     my $cert_identifier = $cert->get_identifier();
 
-    #
     # Check if the certificate is already in the PKI
-    #
-    my $db_hash = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => $cert_identifier }
+    my $existing_cert = $dbi->select_one(
+        from => 'certificate',
+        columns => [ qw( identifier pki_realm status ) ],
+        where => { identifier => $cert_identifier },
     );
 
-    if ($db_hash) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS',
-            params  => {
-                IDENTIFIER => $db_hash->{IDENTIFIER},
-                PKI_REALM => $db_hash->{PKI_REALM} || '',
-                STATUS => $db_hash->{STATUS},
-            },
-        ) unless $do_update;
-    } else {
-        $do_update = 0;
-    }
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS',
+        params  => {
+            IDENTIFIER => $existing_cert->{identifier},
+            PKI_REALM => $existing_cert->{pki_realm} || '',
+            STATUS => $existing_cert->{status},
+        },
+    ) if ($existing_cert and not $arg_ref->{UPDATE});
 
-    $db_hash = { $cert->to_db_hash() };
-    $db_hash->{STATUS} = ($arg_ref->{REVOKED} ? 'REVOKED' : 'ISSUED');
-    $db_hash->{PKI_REALM} = $arg_ref->{PKI_REALM} if ($arg_ref->{PKI_REALM});
+    # Prepare hash to be inserted into DB
+    my $cert_legacy = { $cert->to_db_hash() };
+    $cert_legacy->{STATUS} = ($arg_ref->{REVOKED} ? 'REVOKED' : 'ISSUED');
+    $cert_legacy->{PKI_REALM} = $arg_ref->{PKI_REALM} if ($arg_ref->{PKI_REALM});
 
     # Query issuer certificate
     my $issuer_cert = $self->_get_issuer(
@@ -492,7 +486,7 @@ sub import_certificate {
 
     # cert is self signed
     if ($issuer_cert eq "SELF") {
-        $db_hash->{ISSUER_IDENTIFIER} = $cert_identifier;
+        $cert_legacy->{ISSUER_IDENTIFIER} = $cert_identifier;
     }
     # cert has known issuer
     elsif ($issuer_cert) {
@@ -520,29 +514,25 @@ sub import_certificate {
             }
         }
 
-        $db_hash->{ISSUER_IDENTIFIER} = $issuer_cert->{IDENTIFIER};
+        $cert_legacy->{ISSUER_IDENTIFIER} = $issuer_cert->{IDENTIFIER};
         # if the issuer is in a realm, it forces the entity into the same one
-        $db_hash->{PKI_REALM} = $issuer_cert->{PKI_REALM} if $issuer_cert->{PKI_REALM};
+        $cert_legacy->{PKI_REALM} = $issuer_cert->{PKI_REALM} if $issuer_cert->{PKI_REALM};
     }
 
-    # we now have a filled db_hash
+    # TODO #legacydb Mapping for compatibility to old DB layer
+    my $cert_hash = OpenXPKI::Server::Database::Legacy->certificate_from_legacy($cert_legacy);
 
-    if ($do_update) {
-        $dbi->update(
-            TABLE => 'CERTIFICATE',    # use hash method
-            DATA  => $db_hash,
-            WHERE => { IDENTIFIER => $db_hash->{IDENTIFIER} }
-        );
-    } else {
-        $dbi->insert(
-            TABLE => 'CERTIFICATE',    # use hash method
-            HASH  => $db_hash,
-        );
-    }
+    $dbi->merge(
+        into => 'certificate',
+        set => $cert_hash,
+        where => { identifier => $cert_hash->{identifier} },
+    );
     $dbi->commit();
+
     # unset data to save bytes and return the remainder of the hash
-    delete $db_hash->{DATA};
-    return $db_hash;
+    delete $cert_legacy->{DATA};
+
+    return $cert_legacy;
 }
 
 # Returns the certificate issuer DB hash or C<"SELF"> if it's self signed or
