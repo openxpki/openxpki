@@ -509,14 +509,14 @@ sub import_certificate {
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN',
-                    params  => { ISSUER_IDENTIFIER => $issuer_cert->{IDENTIFIER}, ISSUER_SUBJECT => $issuer_cert->{SUBJECT} },
+                    params  => { ISSUER_IDENTIFIER => $issuer_cert->{identifier}, ISSUER_SUBJECT => $issuer_cert->{subject} },
                 );
             }
         }
 
-        $cert_legacy->{ISSUER_IDENTIFIER} = $issuer_cert->{IDENTIFIER};
+        $cert_legacy->{ISSUER_IDENTIFIER} = $issuer_cert->{identifier};
         # if the issuer is in a realm, it forces the entity into the same one
-        $cert_legacy->{PKI_REALM} = $issuer_cert->{PKI_REALM} if $issuer_cert->{PKI_REALM};
+        $cert_legacy->{PKI_REALM} = $issuer_cert->{pki_realm} if $issuer_cert->{pki_realm};
     }
 
     # TODO #legacydb Mapping for compatibility to old DB layer
@@ -548,8 +548,7 @@ sub _get_issuer {
     my $explicit_issuer = $args{explicit_issuer};
     my $force_nochain   = $args{force_nochain};
 
-    my $issuer_query;
-
+    my $condition;
 
     #
     # Check for self signed certificate
@@ -557,13 +556,13 @@ sub _get_issuer {
 
     # Check if self-signed based on Key Ids, if set
     if (defined $cert->get_subject_key_id and defined $cert->get_authority_key_id) {
-        $issuer_query = { SUBJECT_KEY_IDENTIFIER => $cert->get_authority_key_id() };
+        $condition = { subject_key_identifier => $cert->get_authority_key_id() };
         # self signed
         return "SELF" if $cert->get_subject_key_id() eq $cert->get_authority_key_id;
 
     # certificates without AIK/SK set
     } else {
-        $issuer_query = { SUBJECT => $cert->{PARSED}->{BODY}->{ISSUER} };
+        $condition = { subject => $cert->{PARSED}->{BODY}->{ISSUER} };
         # self signed
         return "SELF" if $cert->{PARSED}->{BODY}->{SUBJECT} eq $cert->{PARSED}->{BODY}->{ISSUER};
     }
@@ -573,25 +572,18 @@ sub _get_issuer {
     #
 
     # Explicit issuer wins over issuer query
-    $issuer_query = { IDENTIFIER => $explicit_issuer } if $explicit_issuer;
+    $condition = { identifier => $explicit_issuer } if $explicit_issuer;
 
     # TODO - check for non-uniq subjects
-    my $db_result = CTX('dbi_backend')->select(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => $issuer_query,
+    my $db_result = CTX('dbi')->select(
+        from  => 'certificate',
+        columns => [ '*' ],
+        where => $condition,
     );
-
-    # More than 1 query result
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_ISSUER_QUERY_AMBIGIOUS_RESULT',
-        params  => {
-            RESULTS => scalar @{$db_result},
-            QUERY => Dumper $issuer_query,
-        },
-    ) if (scalar @{$db_result}) > 1;
+    my $issuer_cert = $db_result->fetchrow_hashref;
 
     # No issuer found
-    if ((scalar @{$db_result}) == 0) {
+    if (not $issuer_cert) {
         if ($force_nochain) {
             CTX('log')->log(
                 MESSAGE  => "Importing certificate without issuer! $cert_identifier / " . $cert->get_subject(),
@@ -602,11 +594,20 @@ sub _get_issuer {
         }
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER',
-            params  => { QUERY => Dumper $issuer_query },
+            params  => { QUERY => Dumper $condition },
         );
     }
 
-    return $db_result->[0];
+    # More than 1 query result
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_ISSUER_QUERY_AMBIGIOUS_RESULT',
+        params  => {
+            RESULT_COUNT => scalar @{$db_result},
+            QUERY => Dumper $condition,
+        },
+    ) if $db_result->fetchrow_arrayref;
+
+    return $issuer_cert;
 }
 
 sub _is_issuer_valid  {
@@ -639,11 +640,11 @@ sub _is_issuer_valid  {
     #
     # If issuer is already a root
     #
-    if ($issuer_cert->{IDENTIFIER} eq $issuer_cert->{ISSUER_IDENTIFIER}) {
+    if ($issuer_cert->{identifier} eq $issuer_cert->{issuer_identifier}) {
         return $default_token->command({
             COMMAND => 'verify_cert',
             CERTIFICATE => $cert->{DATA},
-            TRUSTED => $issuer_cert->{DATA},
+            TRUSTED => $issuer_cert->{data},
         });
     }
 
@@ -652,7 +653,7 @@ sub _is_issuer_valid  {
     #
 
     # validate_certificate
-    my $chain = $self->get_chain({ START_IDENTIFIER => $issuer_cert->{IDENTIFIER}, OUTFORMAT => 'PEM' });
+    my $chain = $self->get_chain({ START_IDENTIFIER => $issuer_cert->{identifier}, OUTFORMAT => 'PEM' });
 
     # verify a complete chain
     if ($chain->{COMPLETE}) {
