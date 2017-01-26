@@ -72,7 +72,7 @@ sub __init
     ###############################################
     ##  compute SHA1 hash of DER representation  ##
     ###############################################
-    
+
     my $cert_der = $self->{TOKEN}->command({
                         COMMAND => 'convert_cert',
                         DATA    => $self->get_body(),
@@ -81,7 +81,7 @@ sub __init
     $self->{SHA1} = sha1_base64($cert_der);
     ## RFC 3548 URL and filename safe base64
     $self->{SHA1} =~ tr/+\//-_/;
-    
+
     ##########################
     ##     core parsing     ##
     ##########################
@@ -92,7 +92,7 @@ sub __init
                        "version", "pubkey_hash", "pubkey_algorithm", "signature_algorithm", "exponent",
                        "keysize", "extensions", "openssl_subject" )
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} 
+        $self->{PARSED}->{BODY}->{uc($attr)}
 	= $self->{TOKEN}->get_object_function (
 	    {
 		OBJECT   => $self->{x509},
@@ -258,7 +258,7 @@ sub __init
             if ($item =~ /^keyid:/);
         $ret->{EXTENSIONS}->{AUTHORITY_KEY_IDENTIFIER}->{CA_ISSUER_NAME} = $value
             if ($item =~ /^DirName:/);
-            
+
         if ($item =~ /^serial:/)
         {
             $value =~ s/://g;
@@ -344,7 +344,7 @@ sub get_subject {
         );
     }
     return $self->{PARSED}->{BODY}->{SUBJECT};
-    
+
 }
 
 sub get_status {
@@ -402,14 +402,6 @@ sub to_db_hash {
     $insert_hash{DATA}               = $self->{DATA};
     $insert_hash{SUBJECT}            = $self->{PARSED}->{BODY}->{SUBJECT};
     $insert_hash{ISSUER_DN}          = $self->{PARSED}->{BODY}->{ISSUER};
-    # combine email addresses
-    if (exists $self->{PARSED}->{BODY}->{EMAILADDRESSES}) {
-        $insert_hash{EMAIL} = '';
-        foreach my $email (@{$self->{PARSED}->{BODY}->{EMAILADDRESSES}}) {
-            $insert_hash{EMAIL} .= "," if ($insert_hash{EMAIL} ne '');
-            $insert_hash{EMAIL} .= $email;
-        }
-    }
     $insert_hash{PUBKEY}             = $self->{PARSED}->{BODY}->{PUBKEY};
     # set subject key id and authority key id, if defined.
     if (defined $self->get_subject_key_id()) {
@@ -423,7 +415,7 @@ sub to_db_hash {
             = $self->get_authority_key_id();
     }
 
-    $insert_hash{NOTAFTER}           
+    $insert_hash{NOTAFTER}
         = OpenXPKI::DateTime::convert_date({
             DATE      => $self->{PARSED}->{BODY}->{NOTAFTER},
             OUTFORMAT => 'epoch',
