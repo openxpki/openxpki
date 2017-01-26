@@ -26,6 +26,6 @@ set -e
 /code-repo/tools/scripts/mysql-create-schema.sh
 
 rm -rf /etc/openxpki/ssl/
-/code-repo/config/sampleconfig.sh
+/code-repo/tools/testdata/insert-test-certificates.sh
 
 openxpkictl start
