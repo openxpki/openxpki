@@ -52,13 +52,17 @@ if [ $(grep -c '/vagrant/scripts' /root/.bashrc) -eq 0 ]; then
     echo "/vagrant/scripts/oxi-help"                       >> /home/vagrant/.profile
 fi
 
+# Read configuration written by MySQL provisioning script
+while read def; do export $def; done < /etc/environment
+
 set -e
 
 cat <<__DB > /etc/openxpki/config.d/system/database.yaml
 main:
     debug: 0
     type: MySQL
-    host: 127.0.0.1
+    host: $OXI_TEST_DB_MYSQL_DBHOST
+    port: $OXI_TEST_DB_MYSQL_DBPORT
     name: $OXI_TEST_DB_MYSQL_NAME
     user: $OXI_TEST_DB_MYSQL_USER
     passwd: $OXI_TEST_DB_MYSQL_PASSWORD
@@ -67,7 +71,7 @@ __DB
 /bin/bash /vagrant/scripts/oxi-refresh --no-restart              2>&1 | tee $LOG
 
 rm -rf /etc/openxpki/ssl/
-/bin/bash /code-repo/config/sampleconfig.sh                           >$LOG 2>&1
+/code-repo/config/sampleconfig.sh                                     >$LOG 2>&1
 
 /usr/bin/openxpkictl start                                            >$LOG 2>&1
 

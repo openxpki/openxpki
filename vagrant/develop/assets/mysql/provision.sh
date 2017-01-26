@@ -25,9 +25,7 @@ echo "OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1"  >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_DBPORT=3306"       >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_DBUSER=root"       >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_DBPASSWORD=root"   >> /etc/environment
-
-cat /etc/environment | while read def; do export $def; done
-source /etc/environment
+while read def; do export $def; done < /etc/environment
 
 #
 # Run Docker container
