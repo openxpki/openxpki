@@ -188,6 +188,7 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 ## new database interface of the server
 
 OpenXPKI/Server/Database.pm
+OpenXPKI/Server/Database/Legacy.pm
 OpenXPKI/Server/Database/Query.pm
 OpenXPKI/Server/Database/QueryBuilder.pm
 OpenXPKI/Server/Database/Driver/MySQL.pm
