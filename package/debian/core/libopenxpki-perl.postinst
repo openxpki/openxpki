@@ -32,10 +32,13 @@ case "$1" in
         # No config - load sample config - also includes/overwrites other
         # files in /etc/openxpki/ !
         if [ ! -e /etc/openxpki/config.d/ ]; then
-           tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz -C /etc/openxpki
+            tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz -C /etc/openxpki
 
-           chmod 750 /etc/openxpki/config.d
-           chown -R openxpki:root /etc/openxpki/config.d/
+            # chmod the "inner" config to protect sensitive data
+            # do NOT chmod the top folder as e.g. apache needs access 
+            chmod 750 /etc/openxpki/config.d
+            # Apply chown to main folder
+            chown -R openxpki:root /etc/openxpki/
 
        fi
 
