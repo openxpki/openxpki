@@ -10,6 +10,7 @@ use English;
 use Data::Dumper;
 use Config::Std;
 use File::Basename;
+use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
 use File::Temp qw( tempdir );
 
 use Log::Log4perl qw(:easy);
@@ -22,6 +23,16 @@ use TestCfg;
 use TestCerts;
 use CertHelper;
 
+sub _slurp {
+    my $filename = shift;
+    my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
+    return do { # slurp
+        local $INPUT_RECORD_SEPARATOR;
+        open my $fh, '<', catfile($basedir, $filename) or die "Could not open file $filename: $!";
+        <$fh>;
+    };
+}
+
 our %cfg = ();
 my $testcfg = new TestCfg;
 $testcfg->read_config_path( 'api.cfg', \%cfg, dirname($0) );
@@ -32,7 +43,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg{instance}{verbose});
-$test->plan( tests => 9 );
+$test->plan( tests => 14 );
 
 $test->connect_ok(
     user => $cfg{operator}{name},
@@ -62,26 +73,42 @@ $test->runcmd('import_certificate', { DATA => $cert_pem, });
 $test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS", "Fail importing same certificate twice");
 
 # ...except if we want to update
-$test->runcmd_ok('import_certificate', { DATA => $cert_pem, UPDATE => 1 }, "Import same certificate if UPDATE = 1");
+$test->runcmd_ok('import_certificate', { DATA => $cert_pem, UPDATE => 1 }, "Import same certificate with UPDATE = 1");
 
 # Import second certificate as "REVOKED"
 $test->runcmd_ok('import_certificate', { DATA => $cert_pem2, REVOKED => 1 }, "Import certificate 2 as REVOKED")
     or diag "ERROR: ".$test->error;
 $test->is($test->get_msg->{PARAMS}->{STATUS}, "REVOKED", "Certificate should be marked as REVOKED");
 
-# Import expired cert
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
-my $alien_cert_pem = do { # slurp
-    local $INPUT_RECORD_SEPARATOR;
-    open my $fh, '<', catfile($basedir, "acme-client-1.crt") or die "Could not open expired_cert_pem: $!";
-    <$fh>;
-};
+# Import test cert with unknown CA
+my $orphan_cert_pem = _slurp("test-orphan-cert.crt");
 
-$test->runcmd('import_certificate', { DATA => $alien_cert_pem  });
-$test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER", "Import certificate with unknown issuer should fail");
+$test->runcmd('import_certificate', { DATA => $orphan_cert_pem  });
+$test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER", "Import certificate with unknown issuer: should fail");
 
-$test->runcmd_ok('import_certificate', { DATA => $alien_cert_pem, FORCE_NOCHAIN => 1 }, "Forced import of certificate with unknown issuer")
+$test->runcmd_ok('import_certificate', { DATA => $orphan_cert_pem, FORCE_NOCHAIN => 1 }, "Import same certificate with FORCE_NOCHAIN = 1")
+    or diag "ERROR: ".$test->error;
+
+# Import other (root) CA
+my $acme_root_cert_pem = _slurp("test-acme-root.crt");
+$test->runcmd_ok('import_certificate', { DATA => $acme_root_cert_pem }, "Import ACME root CA")
+    or diag "ERROR: ".$test->error;
+
+# Import other signed certificate
+my $acme_signer_cert_pem = _slurp("test-acme-signer.crt");
+$test->runcmd_ok('import_certificate', { DATA => $acme_signer_cert_pem }, "Import ACME signed certificate")
+    or diag "ERROR: ".$test->error;
+
+# Import expired other (root) CA
+my $expired_root_cert_pem = _slurp("test-expired-root.crt");
+$test->runcmd_ok('import_certificate', { DATA => $expired_root_cert_pem }, "Import expired root CA")
+    or diag "ERROR: ".$test->error;
+
+# Import expired other signed certificate
+my $expired_signer_cert_pem = _slurp("test-expired-signer.crt");
+$test->runcmd('import_certificate', { DATA => $expired_signer_cert_pem });
+$test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN", "Import certificate signed by expired root CA: should fail");
+$test->runcmd_ok('import_certificate', { DATA => $expired_signer_cert_pem, FORCE_ISSUER=>1 }, "Import same certificate with FORCE_ISSUER = 1")
     or diag "ERROR: ".$test->error;
 
 $test->disconnect;
