@@ -16,19 +16,15 @@ function _exit () {
 trap '_exit $?' EXIT
 
 #
-# Install OpenXPKI and Apache
+# Install package dependencies
 #
-installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'libopenxpki-perl' 2>&1 | grep -ci installed)
+installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'libapache2-mod-fcgid' 2>&1 | grep -ci installed)
 if [ $installed -eq 0 ]; then
     set -e
-    echo "Installing OpenXPKI"
-    PKGHOST=packages.openxpki.org
-    curl -s -L http://$PKGHOST/debian/Release.key | apt-key add -     >$LOG 2>&1
-    echo "deb http://$PKGHOST/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
+    echo "Installing OpenXPKI package dependencies"
     apt update                                                        >$LOG 2>&1
     DEBIAN_FRONTEND=noninteractive \
-     apt-get -q=2 install libopenxpki-perl openxpki-i18n \
-                          libapache2-mod-fcgid libssl-dev             >$LOG 2>&1
+     apt-get -q=2 install libapache2-mod-fcgid libssl-dev             >$LOG 2>&1
     set +e
 fi
 
@@ -46,16 +42,83 @@ fi
 #
 echo "Configuring OpenXPKI"
 
+set -e
+
+# ENVIRONMENT
+
 if [ $(grep -c '/vagrant/scripts' /root/.bashrc) -eq 0 ]; then
     echo "export PATH=$PATH:/vagrant/scripts"              >> /root/.bashrc
     echo "export PATH=$PATH:/vagrant/scripts"              >> /home/vagrant/.profile
     echo "/vagrant/scripts/oxi-help"                       >> /home/vagrant/.profile
 fi
 
-# Read configuration written by MySQL provisioning script
+OXI_COMPILE_DIR=$(mktemp -d)
+echo "OXI_COMPILE_DIR=$OXI_COMPILE_DIR" >> /etc/environment
+
+# Read our configuration and the one written by MySQL provisioning script
 while read def; do export $def; done < /etc/environment
 
-set -e
+# STARTUP SCRIPT
+## Disables because it expects mysql package and is not needed in dev env (?)
+## cp /code-repo/package/debian/core/libopenxpki-perl.openxpkid.init /etc/init.d/openxpkid
+
+# USERS AND GROUPS
+
+# openxpki
+addgroup --quiet --system openxpki
+adduser  --quiet --system --no-create-home --disabled-password --ingroup openxpki openxpki
+
+# add apache user to openxpki group (to allow connecting the socket)
+usermod -G openxpki www-data
+
+# pkiadm
+adduser --quiet --system --disabled-password --group pkiadm
+usermod pkiadm -G openxpki
+# In case somebody decided to change the home base
+HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
+chown pkiadm:openxpki $HOME
+chmod 750 $HOME
+
+# Create the sudo file to restart oxi from pkiadm
+if [ -d /etc/sudoers.d ]; then
+    echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
+fi
+
+# DIRECTORIES
+
+mkdir -p /etc/openxpki
+
+mkdir -p /var/openxpki/session
+chown -R openxpki:openxpki /var/openxpki
+
+mkdir -p /var/log/openxpki
+chown openxpki:openxpki /var/log/openxpki
+
+mkdir -p /var/www/openxpki
+chown www-data:www-data /var/www/openxpki
+
+# LOG FILES
+
+for f in scep.log soap.log webui.log rpc.log; do
+    touch /var/log/openxpki/$f
+    chown www-data:openxpki /var/log/openxpki/$f
+    chmod 640 /var/log/openxpki/$f
+done
+
+# logrotate
+if [ -e /etc/logrotate.d/ ]; then
+    cp /code-repo/config/logrotate.conf /etc/logrotate.d/openxpki
+fi
+
+# CONFIGURATION
+
+rsync -a /code-repo/config/openxpki/* /etc/openxpki/                  >$LOG 2>&1
+chmod 750              /etc/openxpki/config.d
+chmod 750              /etc/openxpki/ssl/
+chown -R openxpki:root /etc/openxpki/config.d
+chown -R openxpki:root /etc/openxpki/ssl/
+
+# DATABASE SETUP
 
 cat <<__DB > /etc/openxpki/config.d/system/database.yaml
 main:
@@ -73,21 +136,32 @@ __DB
 rm -rf /etc/openxpki/ssl/
 /code-repo/config/sampleconfig.sh                                     >$LOG 2>&1
 
-/usr/bin/openxpkictl start                                            >$LOG 2>&1
+openxpkictl start                                                     >$LOG 2>&1
 
 #
-# Configure Apache
+# Apache configuration
 #
-echo "Configuring Apache"
-a2enmod cgid                                                          >$LOG 2>&1
-a2enmod fcgid                                                         >$LOG 2>&1
-# Need to pickup new group
-/etc/init.d/apache2 restart                                           >$LOG 2>&1
+if [ -e /etc/init.d/apache2 ]; then
+    echo "Configuring Apache"
+    # Ubuntu/Jessie
+    if [ -d /etc/apache2/conf-available ]; then
+        cp /code-repo/config/apache/openxpki.conf /etc/apache2/conf-available/
+        /usr/sbin/a2enconf openxpki
+    fi
+    # Wheezy etc.
+    if [ -d /etc/apache2/conf.d ]; then
+        cp /code-repo/config/apache/openxpki.conf /etc/apache2/conf.d/
+    fi
+
+    a2enmod cgid                                                      >$LOG 2>&1
+    a2enmod fcgid                                                     >$LOG 2>&1
+    # Need to pickup new group
+    /etc/init.d/apache2 restart                                       >$LOG 2>&1
+fi
 
 #
 # Cleanup
 #
-
 echo "Cleaning up Docker"
 # Remove orphaned volumes - whose container does not exist (anymore)
 docker volume ls -qf dangling=true \

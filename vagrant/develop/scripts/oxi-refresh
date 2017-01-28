@@ -1,5 +1,5 @@
 #!/bin/bash
-## <info> Copy latest code (/code-repo), install dependencies, restart OpenXPKI
+## <info> Copy latest code from /code-repo, compile, install dependencies, restart OpenXPKI
 test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
 set -o pipefail
 
@@ -23,28 +23,46 @@ set -e
 #
 # fix problems with newer Net::DNS:
 rm -f /usr/lib/x86_64-linux-gnu/perl5/5.20/Net/DNS.pm
-cpanm --notest Net::DNS
+cpanm --notest Net::DNS                                               >$LOG 2>&1
 
 echo "Checking for new Perl dependencies in latest code"
 cpanm --notest PPI                                                    >$LOG 2>&1
 /code-repo/tools/scripts/makefile2cpanfile.pl > /cpanfile
-cpanm --notest --installdeps /                                        >$LOG 2>&1
+cpanm --quiet --notest --installdeps /
 
 #
 # Copy current code and realm CA-ONE config
 #
 echo "Copying current code and binaries from repo"
-rsync -c -P -a  \
+
+rsync -a /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/           >$LOG 2>&1
+rsync -a /code-repo/core/server/htdocs/*  /var/www/openxpki/          >$LOG 2>&1
+test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
+
+rsync -a  \
   /code-repo/config/openxpki/config.d/realm/ca-one/* \
   /etc/openxpki/config.d/realm/ca-one/                                >$LOG 2>&1
+chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
 
 #
-# Compile OpenXPKI.so
+# Compile OpenXPKI
 #
-echo "Compiling and installing OpenXPKI"
-cd /code-repo/core/server
+OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
+echo "Compiling OpenXPKI $OXI_VERSION in $OXI_COMPILE_DIR"
+rsync -a --exclude=.git/ /code-repo/core/server/ $OXI_COMPILE_DIR
+
+# Set version so Makefile.PL does not need "vergen" (which we did not copy to $OXI_COMPILE_DIR)
+cat <<__VERSION > $OXI_COMPILE_DIR/OpenXPKI/VERSION.pm
+package OpenXPKI::VERSION;
+our \$VERSION = '$OXI_VERSION';
+1;
+__VERSION
+
+cd $OXI_COMPILE_DIR
 perl Makefile.PL                                                      >$LOG 2>&1
 make                                                                  >$LOG 2>&1
+
+echo "Installing OpenXPKI"
 make install                                                          >$LOG 2>&1
 
 if [ "$1" != "--no-restart" ]; then
