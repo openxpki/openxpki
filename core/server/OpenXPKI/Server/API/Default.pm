@@ -490,11 +490,23 @@ sub import_certificate {
     }
     # cert has known issuer
     elsif ($issuer_cert) {
+
+        #
+        # No verfication requested ?
+        #
+        if ($arg_ref->{FORCE_NOVERIFY}) {
+            CTX('log')->log(
+                MESSAGE  => "Importing certificate without chain verification! $cert_identifier / " . $cert->get_subject,
+                PRIORITY => 'warn',
+                FACILITY => ['audit','system']
+            );
+            return 1;
+        }
+
         my $valid = $self->_is_issuer_valid(
             default_token  => $default_token,
             cert           => $cert,
             issuer_cert    => $issuer_cert,
-            force_noverify => $arg_ref->{FORCE_NOVERIFY},
             force_nochain  => $arg_ref->{FORCE_NOCHAIN},
         );
 
@@ -615,27 +627,13 @@ sub _is_issuer_valid  {
         default_token  => { isa => 'Object' },
         cert           => { isa => 'OpenXPKI::Crypto::X509' },
         issuer_cert    => { isa => 'HashRef' },
-        force_noverify => { isa => 'Maybe[Bool]' },
         force_nochain  => { isa => 'Maybe[Bool]' },
     );
     my $default_token   = $args{default_token};
     my $cert            = $args{cert};
     my $cert_identifier = $cert->get_identifier;
     my $issuer_cert     = $args{issuer_cert};
-    my $force_noverify  = $args{force_noverify};
     my $force_nochain   = $args{force_nochain};
-
-    #
-    # No verfication requested ?
-    #
-    if ($force_noverify) {
-        CTX('log')->log(
-            MESSAGE  => "Importing certificate without chain verification! $cert_identifier / " . $cert->get_subject,
-            PRIORITY => 'warn',
-            FACILITY => ['audit','system']
-        );
-        return 1;
-    }
 
     #
     # If issuer is already a root
