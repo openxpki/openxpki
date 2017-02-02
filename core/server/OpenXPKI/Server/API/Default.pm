@@ -703,6 +703,7 @@ sub import_chain {
 
     my $default_token = CTX('api')->get_default_token();
     my $dbi = CTX('dbi_backend');
+    $dbi->commit; # TODO Remove after migration to new DB layer
 
     my $realm = $arg_ref->{PKI_REALM};
 
