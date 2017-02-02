@@ -22,6 +22,7 @@ use Test::Deep;
 use TestCfg;
 use TestCerts;
 use CertHelper;
+use DbHelper;
 
 sub _slurp {
     my $filename = shift;
@@ -49,6 +50,30 @@ $test->connect_ok(
     user => $cfg{operator}{name},
     password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
+
+my $certs = {
+    acme_root => {
+        pem => _slurp("test-acme-root.crt"),
+        id => "39:D5:86:02:69:BC:E1:3D:7A:25:88:A9:B9:CD:F5:EB:DE:6F:91:7B",
+    },
+    acme_signer => {
+        pem => _slurp("test-acme-signer.crt"),
+        id => "DA:1B:CD:D2:00:A9:71:82:05:E7:79:FC:A3:AD:10:5D:8F:39:1B:AC",
+    },
+    expired_root => {
+        pem => _slurp("test-expired-root.crt"),
+        id => "94:3A:81:EF:5C:58:88:A8:97:CD:34:FF:35:DD:EB:71:B6:FE:FA:2E",
+    },
+    expired_signer => {
+        pem => _slurp("test-expired-signer.crt"),
+        id => "E7:36:F6:3A:B4:1E:50:3E:B0:C7:A9:D7:D5:9A:E2:AA:80:A6:0F:BC",
+    },
+    orphan => {
+        pem => _slurp("test-orphan-cert.crt"),
+        id => "05:A2:ED:0E:C6:00:AB:27:6A:71:F9:63:8D:95:69:E4:D2:AD:37:11",
+    },
+};
+my $all_ids = [ map { $certs->{$_}->{id}  } keys %$certs ];
 
 # Create certificate on disk
 my $dir = tempdir( CLEANUP => 1 );
@@ -81,34 +106,31 @@ $test->runcmd_ok('import_certificate', { DATA => $cert_pem2, REVOKED => 1 }, "Im
 $test->is($test->get_msg->{PARAMS}->{STATUS}, "REVOKED", "Certificate should be marked as REVOKED");
 
 # Import test cert with unknown CA
-my $orphan_cert_pem = _slurp("test-orphan-cert.crt");
-
-$test->runcmd('import_certificate', { DATA => $orphan_cert_pem  });
+$test->runcmd('import_certificate', { DATA => $certs->{orphan}->{pem} });
 $test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER", "Import certificate with unknown issuer: should fail");
 
-$test->runcmd_ok('import_certificate', { DATA => $orphan_cert_pem, FORCE_NOCHAIN => 1 }, "Import same certificate with FORCE_NOCHAIN = 1")
+$test->runcmd_ok('import_certificate', { DATA => $certs->{orphan}->{pem}, FORCE_NOCHAIN => 1 }, "Import same certificate with FORCE_NOCHAIN = 1")
     or diag "ERROR: ".$test->error;
 
 # Import other (root) CA
-my $acme_root_cert_pem = _slurp("test-acme-root.crt");
-$test->runcmd_ok('import_certificate', { DATA => $acme_root_cert_pem }, "Import ACME root CA")
+$test->runcmd_ok('import_certificate', { DATA => $certs->{acme_root}->{pem} }, "Import ACME root CA")
     or diag "ERROR: ".$test->error;
 
 # Import other signed certificate
-my $acme_signer_cert_pem = _slurp("test-acme-signer.crt");
-$test->runcmd_ok('import_certificate', { DATA => $acme_signer_cert_pem }, "Import ACME signed certificate")
+$test->runcmd_ok('import_certificate', { DATA => $certs->{acme_signer}->{pem} }, "Import ACME signer certificate")
     or diag "ERROR: ".$test->error;
 
 # Import expired other (root) CA
-my $expired_root_cert_pem = _slurp("test-expired-root.crt");
-$test->runcmd_ok('import_certificate', { DATA => $expired_root_cert_pem }, "Import expired root CA")
+$test->runcmd_ok('import_certificate', { DATA => $certs->{expired_root}->{pem} }, "Import expired root CA")
     or diag "ERROR: ".$test->error;
 
 # Import expired other signed certificate
-my $expired_signer_cert_pem = _slurp("test-expired-signer.crt");
-$test->runcmd('import_certificate', { DATA => $expired_signer_cert_pem });
+$test->runcmd('import_certificate', { DATA => $certs->{expired_signer}->{pem} });
 $test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN", "Import certificate signed by expired root CA: should fail");
-$test->runcmd_ok('import_certificate', { DATA => $expired_signer_cert_pem, FORCE_ISSUER=>1 }, "Import same certificate with FORCE_ISSUER = 1")
+$test->runcmd_ok('import_certificate', { DATA => $certs->{expired_signer}->{pem}, FORCE_ISSUER=>1 }, "Import same certificate with FORCE_ISSUER = 1")
     or diag "ERROR: ".$test->error;
+
+# Cleanup database
+DbHelper->new->delete_certificate($all_ids);
 
 $test->disconnect;
