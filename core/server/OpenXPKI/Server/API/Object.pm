@@ -1514,6 +1514,7 @@ sub validate_certificate {
         # We use the Authority Key or the Subject as a fallback
         # to find the next matching certificate in our database
         my $result;
+        # TODO Handle case where get_authority_key_id() returns HashRef
         if (my $issuer_authority_key_id = $last_in_chain->get_authority_key_id()) {
             ##! 16: ' Search issuer by authority key ' . $issuer_authority_key_id
             $result = CTX('api')->search_cert({

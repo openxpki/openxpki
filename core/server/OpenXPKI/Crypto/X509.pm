@@ -373,6 +373,7 @@ sub get_subject_key_id {
     }
 }
 
+# TODO Fix return values (can be Scalar or HashRef!)
 sub get_authority_key_id {
     my $self = shift;
 

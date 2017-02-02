@@ -568,7 +568,8 @@ sub _get_issuer {
 
     # Check if self-signed based on Key Ids, if set
     if (defined $cert->get_subject_key_id and defined $cert->get_authority_key_id) {
-        $condition = { subject_key_identifier => $cert->get_authority_key_id() };
+        # TODO Handle case where get_authority_key_id() returns HashRef
+        $condition = { subject_key_identifier => $cert->get_authority_key_id };
         # self signed
         return "SELF" if $cert->get_subject_key_id() eq $cert->get_authority_key_id;
 
