@@ -286,24 +286,7 @@ sub get_chain {
                 delete $cert->{data};
 
                 # TODO #legacydb Mapping for compatibility to old DB layer
-                my $cert_legacy = {
-                    'AUTHORITY_KEY_IDENTIFIER'  => $cert->{authority_key_identifier},
-                    'CERTIFICATE_SERIAL'        => $cert->{cert_key},
-                    'CSR_SERIAL'                => $cert->{req_key},
-                    'IDENTIFIER'                => $cert->{identifier},
-                    'ISSUER_DN'                 => $cert->{issuer_dn},
-                    'ISSUER_IDENTIFIER'         => $cert->{issuer_identifier},
-                    'LOA'                       => $cert->{loa},
-                    'NOTAFTER'                  => $cert->{notafter},
-                    'NOTBEFORE'                 => $cert->{notbefore},
-                    'PKI_REALM'                 => $cert->{pki_realm},
-                    'PUBKEY'                    => $cert->{public_key},
-                    'STATUS'                    => $cert->{status},
-                    'SUBJECT'                   => $cert->{subject},
-                    'SUBJECT_KEY_IDENTIFIER'    => $cert->{subject_key_identifier},
-                };
-
-                push @$cert_list, $cert_legacy;
+                push @$cert_list, OpenXPKI::Server::Database::Legacy->certificate_to_legacy($cert);
             }
         }
         if ($cert->{issuer_identifier} eq $current_identifier) {

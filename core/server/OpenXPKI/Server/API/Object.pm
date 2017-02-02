@@ -46,6 +46,8 @@ use List::Util qw(first);
 use Digest::SHA qw(sha1_hex);
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
+use OpenXPKI::Server::Database::Legacy;
+
 sub START {
 
     # somebody tried to instantiate us, but we are just an
@@ -272,17 +274,18 @@ sub get_cert {
     if ( $format eq 'DBINFO' ) {
         ##! 2: "Preparing output for DBINFO format"
         delete $cert->{data};
+        my $extended_info = {};
 
         # Hex Serial
         my $serial = Math::BigInt->new($cert->{cert_key});
-        $cert->{cert_key_hex} = $serial->as_hex;
-        $cert->{cert_key_hex} =~ s{\A 0x}{}xms;
+        $extended_info->{cert_key_hex} = $serial->as_hex;
+        $extended_info->{cert_key_hex} =~ s{\A 0x}{}xms;
 
         # Expired Status
         $cert->{status} = 'EXPIRED' if $cert->{status} eq 'ISSUED' and $cert->{notafter} < time();
 
         # Fetch certificate attributes
-        $cert->{cert_attributes} = {};
+        $extended_info->{cert_attributes} = {};
         my $cert_attr = $dbi->select(
             columns => [ qw(
                 attribute_contentkey
@@ -294,33 +297,16 @@ sub get_cert {
         while (my $attr = $cert_attr->fetchrow_hashref) {
             my $key = $attr->{attribute_contentkey};
             my $val = $attr->{attribute_value};
-            $cert->{cert_attributes}->{$key} //= [];
-            push @{$cert->{cert_attributes}->{$key}}, $val;
+            $extended_info->{cert_attributes}->{$key} //= [];
+            push @{$extended_info->{cert_attributes}->{$key}}, $val;
         }
 
-
         # TODO #legacydb Mapping for compatibility to old DB layer
-        $cert = {
-            'AUTHORITY_KEY_IDENTIFIER'  => $cert->{authority_key_identifier},
-            'CERT_ATTRIBUTES'           => $cert->{cert_attributes},
-            'CERTIFICATE_SERIAL'        => $cert->{cert_key},
-            'CERTIFICATE_SERIAL_HEX'    => $cert->{cert_key_hex},
-            'CSR_SERIAL'                => $cert->{req_key},
-            'IDENTIFIER'                => $cert->{identifier},
-            'ISSUER_DN'                 => $cert->{issuer_dn},
-            'ISSUER_IDENTIFIER'         => $cert->{issuer_identifier},
-            'LOA'                       => $cert->{loa},
-            'NOTAFTER'                  => $cert->{notafter},
-            'NOTBEFORE'                 => $cert->{notbefore},
-            'PKI_REALM'                 => $cert->{pki_realm},
-            'PUBKEY'                    => $cert->{public_key},
-            'STATUS'                    => $cert->{status},
-            'SUBJECT'                   => $cert->{subject},
-            'SUBJECT_KEY_IDENTIFIER'    => $cert->{subject_key_identifier},
+        return {
+            %{ OpenXPKI::Server::Database::Legacy->certificate_to_legacy($cert) },
+            'CERT_ATTRIBUTES'        => $extended_info->{cert_attributes},
+            'CERTIFICATE_SERIAL_HEX' => $extended_info->{cert_key_hex},
         };
-
-
-        return $cert;
     }
 
     ##! 2: "Requesting crypto token via API and creating X509 object"
