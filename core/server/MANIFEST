@@ -688,8 +688,6 @@ t/tests.mk
 
 # Helpers for workflow tests
 OpenXPKI/Tests.pm
-## New testing environment
-OpenXPKI/Test/More.pm
 
 # Control Scripts
 bin/openxpkiadm

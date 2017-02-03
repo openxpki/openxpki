@@ -19,7 +19,7 @@ use OpenXPKI::Test::More;
 use Test::More;
 use Test::Deep;
 use TestCfg;
-use TestCerts;
+use OpenXPKI::Test::CertHelper;
 
 our %cfg = ();
 my $testcfg = new TestCfg;
@@ -39,11 +39,8 @@ $test->connect_ok(
 ) or die "Error - connect failed: $@";
 
 # Create certificate
-my $test_certs = TestCerts->new;
-my $cert_id = $test_certs->create_cert(
-    tester   => $test,
-    hostname => "127.0.0.1",
-);
+my $test_certs = OpenXPKI::Test::CertHelper->new(tester => $test);
+my $cert_id = $test_certs->create_cert(hostname => "127.0.0.1");
 
 # Fetch certificate - HASH Format
 $test->runcmd_ok('get_chain', { START_IDENTIFIER => $cert_id, OUTFORMAT => 'HASH' }, "Fetch certificate chain");

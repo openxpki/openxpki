@@ -53,7 +53,7 @@ sub BUILD {
 
 =cut
 
-=head2 delete_certificate
+=head2 delete_cert_by_id
 
 Delete the certificate(s) with the given subject_key_identifier(s) and return
 the number of deleted table rows.
@@ -62,8 +62,8 @@ Expects either a string or an ArrayRef of strings.
 
 Example:
 
-    $db_helper->delete_certificate("39:D5:86:02:69:BC:E1:3D:7A:25:88:A9:B9:CD:F5:EB:DE:6F:91:7B");
-    $db_helper->delete_certificate(
+    $db_helper->delete_cert_by_id("39:D5:86:02:69:BC:E1:3D:7A:25:88:A9:B9:CD:F5:EB:DE:6F:91:7B");
+    $db_helper->delete_cert_by_id(
         [
             "39:D5:86:02:69:BC:E1:3D:7A:25:88:A9:B9:CD:F5:EB:DE:6F:91:7B",
             "DA:1B:CD:D2:00:A9:71:82:05:E7:79:FC:A3:AD:10:5D:8F:39:1B:AC",
@@ -71,7 +71,7 @@ Example:
     );
 
 =cut
-sub delete_certificate {
+sub delete_cert_by_id {
     my ($self, $cert_ids) = @_;
     $cert_ids = [ $cert_ids ] unless ref $cert_ids eq 'ARRAY';
 
@@ -82,6 +82,33 @@ sub delete_certificate {
     );
     $self->dbi->commit;
     return $count;
+}
+
+sub insert_test_cert {
+    my ($self, $attributes) = @_;
+    $self->dbi->start_txn;
+    $self->dbi->insert(into => "certificate", values => $attributes);
+    $self->dbi->commit;
+}
+
+sub print_certs_as_inserts {
+    my ($self) = @_;
+    my $dbh = $self->dbi->select(
+        from => 'certificate',
+        columns => [ '*' ],
+    );
+    while (my $data = $dbh->fetchrow_hashref) {
+        print 'database => {'."\n    ";
+        print join "\n    ",
+            map {
+                my $val = $data->{$_};
+                $val =~ s/\r?\n/\\n/g if ($val and m/^(data|public_key)$/);
+                my $qc = m/^(data|public_key)$/ ? '"' : "'";
+                $_." => ".(defined $val ? "$qc$val$qc" : "undef").","
+            }
+            sort keys %$data;
+        print "\n},\n);\n\n";
+    };
 }
 
 1;
