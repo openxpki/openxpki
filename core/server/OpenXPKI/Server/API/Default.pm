@@ -473,7 +473,7 @@ sub import_certificate {
     }
     # cert has known issuer
     elsif ($issuer_cert) {
-
+        my $valid;
         #
         # No verfication requested ?
         #
@@ -483,15 +483,16 @@ sub import_certificate {
                 PRIORITY => 'warn',
                 FACILITY => ['audit','system']
             );
-            return 1;
+            $valid = 1;
         }
-
-        my $valid = $self->_is_issuer_valid(
-            default_token  => $default_token,
-            cert           => $cert,
-            issuer_cert    => $issuer_cert,
-            force_nochain  => $arg_ref->{FORCE_NOCHAIN},
-        );
+        else {
+            $valid = $self->_is_issuer_valid(
+                default_token  => $default_token,
+                cert           => $cert,
+                issuer_cert    => $issuer_cert,
+                force_nochain  => $arg_ref->{FORCE_NOCHAIN},
+            );
+        }
 
         if (!$valid) {
             # force the invalid issuer

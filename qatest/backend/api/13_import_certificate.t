@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg{instance}{verbose});
-$test->plan( tests => 14 );
+$test->plan( tests => 16 );
 
 $test->connect_ok(
     user => $cfg{operator}{name},
@@ -127,8 +127,14 @@ $test->runcmd_ok('import_certificate', { DATA => $certs->{expired_root}->{pem} }
 # Import expired other signed certificate
 $test->runcmd('import_certificate', { DATA => $certs->{expired_signer}->{pem} });
 $test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN", "Import certificate signed by expired root CA: should fail");
+
 $test->runcmd_ok('import_certificate', { DATA => $certs->{expired_signer}->{pem}, FORCE_ISSUER=>1 }, "Import same certificate with FORCE_ISSUER = 1")
     or diag "ERROR: ".$test->error;
+
+DbHelper->new->delete_certificate($certs->{expired_signer}->{id});
+$test->runcmd_ok('import_certificate', { DATA => $certs->{expired_signer}->{pem}, FORCE_NOVERIFY=>1 }, "Import same certificate with FORCE_NO_VERIFY = 1")
+    or diag "ERROR: ".$test->error;
+$test->is(ref $test->get_msg->{PARAMS} eq 'HASH' ? $test->get_msg->{PARAMS}->{SUBJECT_KEY_IDENTIFIER} : "", $certs->{expired_signer}->{id}, "Correctly list imported certificate");
 
 # Cleanup database
 DbHelper->new->delete_certificate($all_ids);
