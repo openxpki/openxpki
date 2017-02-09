@@ -571,6 +571,7 @@ t/31_database/15-select.t
 t/31_database/17-update.t
 t/31_database/19-delete.t
 t/31_database/20-merge.t
+t/31_database/21-merge-clob.t
 t/31_database/21-transactions.t
 t/31_database/22-transactions-isolation.t
 t/31_database/DatabaseTest.pm
