@@ -7,6 +7,7 @@ use Test::Exception;
 use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
 use MooseX::Params::Validate;
 use Log::Log4perl;
+use Moose::Util::TypeConstraints;
 
 ################################################################################
 # Constructor attributes
@@ -42,6 +43,25 @@ has 'data' => (
     is => 'rw',
     isa => 'ArrayRef',
 );
+
+enum 'DBMS', [qw( sqlite mysql oracle )];
+
+# restrict tests to certain dbms
+has 'test_only' => (
+    is => 'rw',
+    isa => 'ArrayRef[DBMS]',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => {
+        test_all_dbs => 'is_empty',
+        _test_db => 'first',
+    },
+);
+# Returns true if the given DB type shall be tested
+sub shall_test {
+    my ($self, $dbtype) = @_;
+    return ($self->test_all_dbs or $self->_test_db(sub {/^\Q$dbtype\E$/}));
+}
 # if not set: use SQLite in-memory DB
 has 'sqlite_db' => (
     is => 'rw',
@@ -115,6 +135,7 @@ sub run {
     # SQLite - runs always
     my $sqlite_db = $self->sqlite_db || ":memory:";
     subtest "$name (SQLite '$sqlite_db')" => sub {
+        plan skip_all => "SQLite test disabled" unless $self->shall_test('sqlite');
         plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
@@ -131,6 +152,7 @@ sub run {
     # Oracle - runs if OXI_TEST_DB_ORACLE_NAME is set
     subtest "$name (Oracle)" => sub {
         plan skip_all => "No Oracle database found / OXI_TEST_DB_ORACLE_NAME not set" unless $ENV{OXI_TEST_DB_ORACLE_NAME};
+        plan skip_all => "Oracle test disabled" unless $self->shall_test('oracle');
         plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
@@ -147,6 +169,7 @@ sub run {
     # MySQL - runs if OXI_TEST_DB_MYSQL_NAME is set
     subtest "$name (MySQL)" => sub {
         plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
+        plan skip_all => "MySQL test disabled" unless $self->shall_test('mysql');
         plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
