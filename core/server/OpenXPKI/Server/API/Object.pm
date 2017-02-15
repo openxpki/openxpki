@@ -996,7 +996,7 @@ sub __search_cert {
     $params{JOIN} = [ ['IDENTIFIER'] ];
 
     ##! 2: "fix arguments"
-    foreach my $key (qw( EMAIL SUBJECT ISSUER )) {
+    foreach my $key (qw( SUBJECT ISSUER_DN )) {
         if ( defined $args->{$key} ) {
             $args->{$key} =~ s/\*/%/g;
 
@@ -1064,7 +1064,7 @@ sub __search_cert {
               { VALUE => $args->{$key} };
         }
     }
-    foreach my $key (qw( EMAIL SUBJECT ISSUER_DN )) {
+    foreach my $key (qw( SUBJECT ISSUER_DN )) {
         if ( $args->{$key} ) {
             $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
               { VALUE => $args->{$key}, OPERATOR => "LIKE" };
