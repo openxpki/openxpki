@@ -293,8 +293,8 @@ sub _build_certs {
                 issuer_dn => 'CN=ACME Root CA,OU=ACME CA,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'ig29xFOKRNUpPh8spF6hyCWgExA',
                 loa => undef,
-                notafter => '1424909701',
-                notbefore => '1422317701',
+                notafter => '1424909701',  # 2015-02-26T00:15:01
+                notbefore => '1422317701', # 2015-01-27T00:15:01
                 pki_realm => undef,
                 public_key => "Public-Key: (2048 bit)\nModulus:\n    00:e7:1d:5d:16:66:7b:17:e0:b0:59:34:8f:62:32:\n    88:9d:3a:10:71:fd:f3:93:44:21:e3:3b:fe:f7:9a:\n    cd:7a:6d:e8:2f:0d:2a:9b:87:00:d9:9a:ce:4e:84:\n    2f:41:60:09:a6:99:88:c9:22:f9:4f:90:e4:7f:22:\n    25:3a:6c:bb:60:0e:4f:56:66:32:1b:2b:0d:bc:82:\n    33:38:0b:a1:19:b4:23:da:da:fc:70:5c:95:11:e6:\n    f7:03:65:ea:dd:37:7f:fd:20:00:26:d2:f3:07:80:\n    5c:c3:c4:2d:2d:e3:bd:b2:51:11:7d:07:8a:11:5d:\n    b3:76:47:14:35:f7:b4:8c:9a:5f:b6:5e:59:d6:73:\n    a6:c1:48:d4:95:59:f0:96:54:76:d3:95:4d:34:5b:\n    89:d6:a8:8a:0f:70:69:36:31:c7:8c:82:8f:6d:e1:\n    36:bf:8e:97:d7:8a:f3:16:44:9d:d2:1b:0f:87:1f:\n    a1:13:b4:99:88:f0:1a:50:37:36:ab:6b:0b:0e:10:\n    a2:8d:d7:30:b2:e5:6c:9a:e1:4e:f6:2b:08:ad:66:\n    9a:f5:41:ca:f5:77:e9:0b:7b:93:4b:18:f5:6b:42:\n    96:01:1e:39:b1:5d:65:f3:6b:b5:71:54:45:bb:f5:\n    32:ad:ce:ed:a0:f2:34:4c:a6:46:0a:7d:dd:13:95:\n    c6:37\nExponent: 65537 (0x10001)\n",
                 req_key => undef,
@@ -313,8 +313,8 @@ sub _build_certs {
                 issuer_dn => 'CN=ACME Root CA,OU=ACME CA,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'ig29xFOKRNUpPh8spF6hyCWgExA',
                 loa => undef,
-                notafter => '1422404102',
-                notbefore => '1422317702',
+                notafter => '1422404102',  # 2015-01-28T00:15:02
+                notbefore => '1422317702', # 2015-01-27T00:15:02
                 pki_realm => undef,
                 public_key => "Public-Key: (2048 bit)\nModulus:\n    00:c7:08:24:69:c1:1d:52:56:6c:c7:32:50:ab:3e:\n    7c:00:98:2e:ea:29:0f:21:bd:f3:59:ba:ff:05:a1:\n    be:ba:c8:e6:54:2f:96:69:ba:a6:52:23:c7:96:56:\n    c4:ef:f4:df:06:7e:13:e2:ec:6d:5c:f0:5a:c6:62:\n    15:b9:ea:17:6c:68:5e:c6:04:e8:ac:63:c0:45:e4:\n    2a:85:43:d9:e4:a9:44:19:5a:9b:d3:68:5c:d2:e2:\n    09:d5:f7:fc:7a:24:65:8a:da:9e:3b:41:9b:08:8c:\n    e8:25:7b:18:c3:7d:b7:9b:76:18:7e:dc:65:6c:52:\n    2d:db:a8:05:8a:4b:e2:f7:36:a8:79:aa:31:0c:5c:\n    a4:cb:e7:c4:ac:19:2f:95:ee:89:19:5e:74:f1:a6:\n    41:a6:1f:d2:06:bd:f1:9b:3c:a5:ad:51:28:3b:86:\n    e4:78:f0:c8:69:00:73:75:43:51:87:a1:43:1b:b2:\n    0d:1b:e6:1b:8e:d6:5f:62:04:b6:52:33:f7:82:0e:\n    3b:e0:47:b3:b5:bb:47:80:fc:30:d9:a5:1f:9e:52:\n    18:b5:7a:aa:b7:d6:d7:4a:b6:f2:c0:9e:04:33:f3:\n    af:4a:bd:ba:4b:54:f1:ba:1f:2d:a7:97:c2:f6:d9:\n    e0:4e:66:f5:ca:99:e5:52:73:ad:9e:50:35:24:af:\n    fd:a1\nExponent: 65537 (0x10001)\n",
                 req_key => undef,
@@ -333,8 +333,8 @@ sub _build_certs {
                 issuer_dn => 'CN=ACME Signing CA,OU=Test CA,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => '',
                 loa => undef,
-                notafter => '1516825771',
-                notbefore => '1485289771',
+                notafter => '1516825771',  # 2018-01-24T20:29:31
+                notbefore => '1485289771', # 2017-01-24T20:29:31
                 pki_realm => undef,
                 public_key => "Public-Key: (2048 bit)\nModulus:\n    00:ab:87:dd:4d:ca:6d:21:e7:e1:69:15:dc:e4:1b:\n    61:5d:39:4d:08:36:e9:2c:35:13:97:8f:70:25:f5:\n    a0:cf:35:f0:ae:a3:ee:4c:75:67:c2:b3:38:06:3d:\n    29:14:33:2e:70:52:04:7d:8a:34:8c:af:56:fa:98:\n    d1:40:e9:a8:50:b2:a6:1e:92:1e:89:01:a5:3d:49:\n    e6:90:f0:14:bd:1f:c0:33:7f:4d:90:17:06:c2:20:\n    82:00:d6:25:e7:09:df:a5:a9:9e:ea:dc:b9:e3:bf:\n    26:8e:89:21:2f:16:90:eb:19:d3:1e:aa:f9:18:dc:\n    a1:8b:ff:fc:09:c5:ab:3a:6a:05:2d:02:d8:7e:26:\n    bf:a1:94:e1:2f:e5:0a:fb:45:67:a1:80:7e:cc:76:\n    29:13:e9:1f:fb:3d:8c:92:3c:ad:1b:19:04:39:d4:\n    94:9e:78:29:1a:65:5f:4b:60:32:f3:dc:46:85:bb:\n    fc:d4:9e:5f:c6:f1:43:c8:99:6e:2f:7d:77:41:e7:\n    3a:21:c2:9f:9d:a8:c2:85:db:3d:76:28:b9:a1:f0:\n    4a:b7:9e:0b:33:23:ec:77:43:87:5b:0f:fa:ee:ce:\n    dc:e0:78:3f:25:a0:84:f8:aa:7e:f6:64:e7:15:d3:\n    dd:e0:80:b2:7d:3c:21:38:bc:55:f7:fd:4e:cb:5d:\n    40:ff\nExponent: 65537 (0x10001)\n",
                 req_key => undef,
