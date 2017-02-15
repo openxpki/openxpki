@@ -35,11 +35,11 @@ To avoid an "untrusted package" warning, you should add our package signing key 
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
-    aptitude install mysql-server libdbd-mysql-perl
+    aptitude -y install mysql-server libdbd-mysql-perl sudo
 
 We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend mod_fcgid as it is in the official main repository (mod_fastcgi will also work but is only available in the non-free repo)::
 
-    aptitude install libapache2-mod-fcgid
+    aptitude -y install libapache2-mod-fcgid apache2.2-common
 
 Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text (this is usually done by the installer already)::
 
@@ -51,7 +51,7 @@ Some people reported that a2enmod is not available on their system, in this case
 
 Now install the OpenXPKI core package and the translation package::
 
-    aptitude install libopenxpki-perl openxpki-i18n
+    aptitude -y install libopenxpki-perl openxpki-i18n
 
 *Note: It looks like we solved this for debian but the ubuntu signatures are still "broken" and installing on ubuntu causes a "gpg error". We are still working on this issue (see #181).* 
 
@@ -62,7 +62,7 @@ You should now restart the apache server to activate the new config::
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 1.0.0
+    Version (core): 1.9.0
 
 Now, create an empty database and assign a database user::
 
