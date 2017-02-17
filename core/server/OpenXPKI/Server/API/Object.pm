@@ -897,6 +897,8 @@ supports a facility to search certificates. It supports the following parameters
 =item * NOTBEFORE/NOTAFTER (with SCALAR searches "other side" of validity or pass HASH with operator)
 
 =item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)
+Operator can be "EQUAL", "LIKE" or "BETWEEN" and any other value will lead to
+error "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_UNKNOWN_OPERATOR".
 
 =item * ENTITY_ONLY (show only certificates issued by this ca)
 
