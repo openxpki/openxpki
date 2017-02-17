@@ -59,16 +59,15 @@ my $test_certs = OpenXPKI::Test::CertHelper->new(tester => $test);
 
 my $certs = $test_certs->certs;
 
-my $acme2_pkcs7 = _slurp("test-acme2.p7b");
-my @acme_list =  qw( acme_signer acme_root );
+my @acme_list =  qw( acme_client  acme_signer  acme_root );
 my @acme2_list = qw( acme2_client acme2_signer acme2_root );
 my $acme_pem = [ map { $certs->{$_}->data }  @acme_list ];
-my $acme_ids = [ map { $certs->{$_}->id }   @acme_list ];
-my $acme_pem_string = sprintf "%s\n%s", @$acme_pem;
+my $acme_ids = [ map { $certs->{$_}->id }    @acme_list ];
+my $acme_pem_string = join "\n", @$acme_pem;
 my $acme2_pem = [ map { $certs->{$_}->data } @acme2_list ];
-my $acme2_ids = [ map { $certs->{$_}->id }  @acme2_list ];
+my $acme2_ids = [ map { $certs->{$_}->id }   @acme2_list ];
 my $all_pem =  [ map { $certs->{$_}->data }  @acme_list, @acme2_list ];
-my $all_ids =  [ map { $certs->{$_}->id  }  @acme_list, @acme2_list ];
+my $all_ids =  [ map { $certs->{$_}->id  }   @acme_list, @acme2_list ];
 
 
 # Array import: Try chain with root cert (should fail)
@@ -122,12 +121,12 @@ cmp_bag $test->get_msg->{PARAMS}->{imported}, [
 $db_helper->delete_cert_by_id($acme_ids);
 
 # PKCS7 import
-$test->runcmd_ok('import_chain', { DATA => $acme2_pkcs7, IMPORT_ROOT => 1 }, "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)");
+$test->runcmd_ok('import_chain', { DATA => $test_certs->acme1_pkcs7, IMPORT_ROOT => 1 }, "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)");
 cmp_bag $test->get_msg->{PARAMS}->{imported}, [
-    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$acme2_ids
+    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$acme_ids
 ], "List imported certs";
 
-$db_helper->delete_cert_by_id($acme2_ids);
+$db_helper->delete_cert_by_id($acme_ids);
 
 
 $test->disconnect;
