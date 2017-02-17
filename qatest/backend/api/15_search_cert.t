@@ -96,28 +96,35 @@ ENTITY_ONLY     Bool: show only certificates issued by this ca (where CSR_SERIAL
 
 # Checks if the given DB result ArrayRef contains the test certificates with
 # the given names.
-sub certlist_is {
-    my ($list, @expected_names) = @_;
-    cmp_bag $list, [
+sub search_cert_ok {
+    my ($message, $conditions, @expected_names) = @_;
+
+    $test->runcmd_ok('search_cert', $conditions, "Search cert $message");
+
+    cmp_bag $test->get_msg->{PARAMS}, [
         map { superhashof({ SUBJECT_KEY_IDENTIFIER => $dbdata->cert($_)->id }) } @expected_names
     ], "Correct result";
 }
 
-# By CERT_SERIAL and PKI_REALM
-$test->runcmd_ok('search_cert', { CERT_SERIAL => $dbdata->cert("acme_root")->db->{cert_key} }, "Search cert without giving PKI realm");
+$test->runcmd_ok('search_cert', {
+    CERT_SERIAL => $dbdata->cert("acme_root")->db->{cert_key}
+}, "Search cert without giving PKI realm");
 is scalar(@{ $test->get_msg->{PARAMS} }), 0, "Should not return any results";
 
-$test->runcmd_ok('search_cert', { CERT_SERIAL => $dbdata->cert("acme_root")->db->{cert_key}, PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm} }, "Search cert by serial (decimal) and PKI realm _ANY");
-certlist_is $test->get_msg->{PARAMS}, qw( acme_root );
+search_cert_ok "by serial (decimal) and PKI realm _ANY", {
+    CERT_SERIAL => $dbdata->cert("acme_root")->db->{cert_key},
+    PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm}
+}, qw( acme_root );
 
-$test->runcmd_ok('search_cert', { CERT_SERIAL => $dbdata->cert("acme_root")->db->{cert_key}, PKI_REALM => "_ANY" }, "Search cert by serial (decimal) and PKI realm");
-certlist_is $test->get_msg->{PARAMS}, qw( acme_root );
+search_cert_ok "by serial (decimal) and PKI realm", {
+    CERT_SERIAL => $dbdata->cert("acme_root")->db->{cert_key},
+    PKI_REALM => "_ANY"
+}, qw( acme_root );
 
-$test->runcmd_ok('search_cert', {
+search_cert_ok "by serial (hex) and specific PKI realm", {
     CERT_SERIAL => Math::BigInt->new($dbdata->cert("acme_root")->db->{cert_key})->as_hex,
     PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm}
-}, "Search cert by serial (hex) and specific PKI realm");
-certlist_is $test->get_msg->{PARAMS}, qw( acme_root );
+}, qw( acme_root );
 
 # Custom ORDER
 $test->runcmd_ok('search_cert', { ORDER => "CERTIFICATE.NOTBEFORE" }, "Search and order by NOTBEFORE descending (default)");
@@ -138,43 +145,55 @@ while (my $cert = shift @{ $test->get_msg->{PARAMS} } and $sort_ok) {
 }
 ok($sort_ok, "Certificates are sorted correctly");
 
-# By STATUS: "EXPIRED"
-$test->runcmd_ok('search_cert', { STATUS => "EXPIRED", PKI_REALM => "_ANY" }, "Search expired certificates");
-certlist_is $test->get_msg->{PARAMS}, qw( expired_root expired_signer expired_client );
+search_cert_ok "by expired status", {
+    STATUS => "EXPIRED",
+    PKI_REALM => "_ANY"
+}, qw( expired_root expired_signer expired_client );
 
-# By IDENTIFIER
-$test->runcmd_ok('search_cert', { IDENTIFIER => $dbdata->cert("acme2_client")->db->{identifier}, PKI_REALM => "_ANY" }, "Search certificates by identifier");
-certlist_is $test->get_msg->{PARAMS}, qw( acme2_client );
+search_cert_ok "by identifier", {
+    IDENTIFIER => $dbdata->cert("acme2_client")->db->{identifier},
+    PKI_REALM => "_ANY"
+}, qw( acme2_client );
 
-# By ISSUER_IDENTIFIER
-$test->runcmd_ok('search_cert', { ISSUER_IDENTIFIER => $dbdata->cert("acme_root")->db->{issuer_identifier}, PKI_REALM => "_ANY" }, "Search certificates by issuer");
-certlist_is $test->get_msg->{PARAMS}, qw( acme_root acme_signer );
+search_cert_ok "by issuer", {
+    ISSUER_IDENTIFIER => $dbdata->cert("acme_root")->db->{issuer_identifier},
+    PKI_REALM => "_ANY"
+}, qw( acme_root acme_signer );
 
-# By SUBJECT_KEY_IDENTIFIER
-$test->runcmd_ok('search_cert', { SUBJECT_KEY_IDENTIFIER => $dbdata->cert("acme_root")->db->{subject_key_identifier}, PKI_REALM => "_ANY" }, "Search certificates by subject key id");
-certlist_is $test->get_msg->{PARAMS}, qw( acme_root );
+search_cert_ok "by subject key id", {
+    SUBJECT_KEY_IDENTIFIER => $dbdata->cert("acme_root")->db->{subject_key_identifier},
+    PKI_REALM => "_ANY"
+}, qw( acme_root );
 
-# By AUTHORITY_KEY_IDENTIFIER
-$test->runcmd_ok('search_cert', { AUTHORITY_KEY_IDENTIFIER => $dbdata->cert("acme2_root")->db->{authority_key_identifier}, PKI_REALM => "_ANY" }, "Search certificates by authority key id");
-certlist_is $test->get_msg->{PARAMS}, qw( acme2_root acme2_signer );
+search_cert_ok "by authority key id", {
+    AUTHORITY_KEY_IDENTIFIER => $dbdata->cert("acme2_root")->db->{authority_key_identifier},
+    PKI_REALM => "_ANY"
+}, qw( acme2_root acme2_signer );
 
-# By SUBJECT (Suche mit LIKE)
-$test->runcmd_ok('search_cert', { SUBJECT => $dbdata->cert("acme2_client")->db->{subject}, PKI_REALM => "_ANY" }, "Search certificates by subject (exact match)");
-certlist_is $test->get_msg->{PARAMS}, qw( acme2_client );
+search_cert_ok "by subject (exact match)", {
+    SUBJECT => $dbdata->cert("acme2_client")->db->{subject},
+    PKI_REALM => "_ANY"
+}, qw( acme2_client );
 
-$test->runcmd_ok('search_cert', { SUBJECT => "*OU=ACME,DC=OpenXPKI*", PKI_REALM => "_ANY" }, "Search certificates by subject (with wildcards)");
-certlist_is $test->get_msg->{PARAMS}, @{ $dbdata->all_cert_names };
+search_cert_ok "by subject (with wildcards)", {
+    SUBJECT => "*OU=ACME,DC=OpenXPKI*",
+    PKI_REALM => "_ANY"
+}, @{ $dbdata->all_cert_names };
 
-# By ISSUER_DN (Suche mit LIKE)
-$test->runcmd_ok('search_cert', { ISSUER_DN => $dbdata->cert("orphan")->db->{issuer_dn}, PKI_REALM => "_ANY" }, "Search certificates by issuer DN (exact match)");
-certlist_is $test->get_msg->{PARAMS}, qw( orphan );
+search_cert_ok "by issuer DN (exact match)", {
+    ISSUER_DN => $dbdata->cert("orphan")->db->{issuer_dn},
+    PKI_REALM => "_ANY"
+}, qw( orphan );
 
-$test->runcmd_ok('search_cert', { ISSUER_DN => "*ACME-2 Signing CA*", PKI_REALM => "_ANY" }, "Search certificates by issuer DN (with wildcards)");
-certlist_is $test->get_msg->{PARAMS}, qw( acme2_client );
+search_cert_ok "by issuer DN (with wildcards)", {
+    ISSUER_DN => "*ACME-2 Signing CA*",
+    PKI_REALM => "_ANY"
+}, qw( acme2_client );
 
-# By VALID_AT (Int: epoch)
-$test->runcmd_ok('search_cert', { VALID_AT => $dbdata->cert("expired_root")->db->{notbefore}+10, PKI_REALM => "_ANY" }, "Search certificates by date");
-certlist_is $test->get_msg->{PARAMS}, qw( expired_root expired_signer expired_client );
+search_cert_ok "by validity date", {
+    VALID_AT => $dbdata->cert("expired_root")->db->{notbefore} + 10,
+    PKI_REALM => "_ANY"
+}, qw( expired_root expired_signer expired_client );
 
 # By CSR_SERIAL
 
