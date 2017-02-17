@@ -17,10 +17,10 @@ use Test::Deep;
 
 # Project modules
 use lib qw(../../lib);
-use OpenXPKI::Test::More;
-use DbHelper;
 use TestCfg;
+use OpenXPKI::Test::More;
 use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::CertHelper::Database;
 
 =pod
 
@@ -30,7 +30,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::PEM>, required)
 
 =item * B<%args> - Arguments to pass to "import_certificate" (I<Hash>, optional)
 
@@ -65,7 +65,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::PEM>, required)
 
 =item * B<$error> - Expected error string returned by API (I<Str>, required)
 
@@ -108,10 +108,7 @@ $test->connect_ok(
 #
 # Init helpers
 #
-my $db_helper = DbHelper->new;
-my $test_certs = OpenXPKI::Test::CertHelper->new(tester => $test);
-
-my $certs = $test_certs->certs;
+my $dbdata = OpenXPKI::Test::CertHelper::Database->new;
 
 #
 # Create new test certificates on disk
@@ -140,19 +137,17 @@ $test->runcmd_ok('import_certificate', { DATA => $cert_pem2, REVOKED => 1 }, "Im
     or diag "ERROR: ".$test->error;
 $test->is($test->get_msg->{PARAMS}->{STATUS}, "REVOKED", "Certificate should be marked as REVOKED");
 
-import_failsok($test, $certs->{orphan}, "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER");
-import_ok     ($test, $certs->{orphan}, FORCE_NOCHAIN => 1);
+import_failsok($test, $dbdata->cert("orphan"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER");
+import_ok     ($test, $dbdata->cert("orphan"), FORCE_NOCHAIN => 1);
 
-import_ok     ($test, $certs->{acme_root});
-import_ok     ($test, $certs->{acme_signer});
-import_ok     ($test, $certs->{expired_root});
-import_failsok($test, $certs->{expired_signer}, "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN");
-import_ok     ($test, $certs->{expired_signer}, FORCE_ISSUER=>1);
-
-$db_helper->delete_cert_by_id($certs->{expired_signer}->id);
-import_ok     ($test, $certs->{expired_signer}, FORCE_NOVERIFY=>1);
+import_ok     ($test, $dbdata->cert("acme_root"));
+import_ok     ($test, $dbdata->cert("acme_signer"));
+import_ok     ($test, $dbdata->cert("expired_root"));
+import_failsok($test, $dbdata->cert("expired_signer"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN");
+import_ok     ($test, $dbdata->cert("expired_signer"), FORCE_ISSUER=>1);
+import_ok     ($test, $dbdata->cert("expired_client"), FORCE_NOVERIFY=>1);
 
 # Cleanup database
-$db_helper->delete_cert_by_id($test_certs->all_cert_ids);
+$dbdata->delete_all;
 
 $test->disconnect;
