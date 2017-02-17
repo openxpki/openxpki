@@ -22,7 +22,7 @@ OpenXPKI::Test::CertHelper::PEM - Represents a test certificate (PEM + meta data
 
 =cut
 
-has database => (
+has db => (
     is => "rw",
     isa => "HashRef",
     required => 1,
@@ -36,12 +36,12 @@ has label => (
 
 sub id {
     my $self = shift;
-    return $self->database->{subject_key_identifier};
+    return $self->db->{subject_key_identifier};
 }
 
 sub data {
     my $self = shift;
-    return $self->database->{data};
+    return $self->db->{data};
 }
 
 __PACKAGE__->meta->make_immutable;

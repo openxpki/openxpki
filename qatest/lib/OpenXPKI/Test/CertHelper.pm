@@ -163,7 +163,7 @@ sub _build_certs {
     return {
         acme_root => OpenXPKI::Test::CertHelper::PEM->new(
             label => "ACME Root CA",
-            database => {
+            db => {
                 authority_key_identifier => '2F:B1:CC:C4:B9:9E:1C:1C:EC:8A:51:3B:BA:E8:19:13:15:BE:D8:BF',
                 cert_key => '10137952561889812311',
                 data => "-----BEGIN CERTIFICATE-----\nMIIDkzCCAnugAwIBAgIJAIyxPiRRNB9XMA0GCSqGSIb3DQEBCwUAMFcxEzARBgoJ\nkiaJk/IsZAEZFgNPUkcxGDAWBgoJkiaJk/IsZAEZFghPcGVuWFBLSTENMAsGA1UE\nCwwEQUNNRTEXMBUGA1UEAwwOQUNNRS0xIFJvb3QgQ0EwIBcNMTcwMjE2MTY1ODQy\nWhgPMjExNzAxMjMxNjU4NDJaMFcxEzARBgoJkiaJk/IsZAEZFgNPUkcxGDAWBgoJ\nkiaJk/IsZAEZFghPcGVuWFBLSTENMAsGA1UECwwEQUNNRTEXMBUGA1UEAwwOQUNN\nRS0xIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDBqJBO\nGHI3xMpwZ96As29rblcGdzlYY17cvg4AVcznfH0clxiFBHug3kcaqjyZum7MoWjH\n+u3P2s+xc1c/AEvWEsiCWmZQD3vFRCBzYD/H4hXWID0M9nEkh4jAiDmN4xkgCgm1\nOyCu4IiKK1mOoKLem2qdm6FXRJZfRGaklUtXbnu0WbQxkeDCgXERj3o2ZoKzU/ZP\nzuhyiT8dQEDDFqBUK/0uc1ZCktcwd++N9fCzMmzFF6n5czRoNYqD32vLEMj0fwlJ\nnovOPhO90vjzBTUTxqWUetCKZ8n1MOoeOlbkdDwy6nh5Df0D/UfNY3Xvx1xZL2Am\n08iQcfCwTJXBY66JAgMBAAGjYDBeMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYE\nFC+xzMS5nhwc7IpRO7roGRMVvti/MB8GA1UdIwQYMBaAFC+xzMS5nhwc7IpRO7ro\nGRMVvti/MAsGA1UdDwQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEAqdTxzJdI8ed/\nhHU1ok0ZnIKmRRH0gdRlYpn35mAlAjJHnyb/SZMWtV6mhzHfD18IFT7phI4Ykly1\nk482rH8inf6X08ztDh2bc528mXf32XyAa0Fo8eRXeuaYBDY/NoKS/d/YrRJfjvYA\nsZHnMq5+p6BYeID9P9yz+DiLJVT24M6+SRCiZotHvN+01sy/zVadCB0sZUsQJr+y\nhvY4lG516j5AhZ815k9kNQX0fDvwcPffvLRDx+ireNkvBbIT1JwpK0a7T08n8NrT\nFJx0sBlPlbv7FD5Wi4Vob2LcGk4/jnRxyGMrRBUF6bUCnq1TYqUWQZlCvz5CfLIr\nIoEjHNtZXQ==\n-----END CERTIFICATE-----\n",
@@ -183,7 +183,7 @@ sub _build_certs {
         ),
         acme_signer => OpenXPKI::Test::CertHelper::PEM->new(
             label => "ACME Signing CA",
-            database => {
+            db => {
                 authority_key_identifier => '2F:B1:CC:C4:B9:9E:1C:1C:EC:8A:51:3B:BA:E8:19:13:15:BE:D8:BF',
                 cert_key => '1',
                 data => "-----BEGIN CERTIFICATE-----\nMIIDjjCCAnagAwIBAgIBATANBgkqhkiG9w0BAQsFADBXMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nFzAVBgNVBAMMDkFDTUUtMSBSb290IENBMCAXDTE3MDIxNjE2NTg0MloYDzIxMTcw\nMTIzMTY1ODQyWjBaMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPyLGQB\nGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxGjAYBgNVBAMMEUFDTUUtMSBTaWdu\naW5nIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuoK7FgQLvbf4\nY51zw0UCUSvLCewqnYyRW40NbbyhccaU4lzGGJfhHz6tCjmuJ8V4rss8AuYCVAc6\n4xoMSaQeC+UXoAepSFPwqOGYNg/RC47yMlwmEqSxfI4poMBvV0L2XWY/t7HVhDNj\n868eC/9ob2+Q1jFt75R8Sc9+TAM8thv0MgLAiqdpVtuiNhGkF4gnSG9EpGkzG2uO\nKxR+veShRy0MX/U2CY1cgDX90fa4mlncJS3AYPvoFidHj+AJNZWY6w4ljRM5BlP6\npZj/ES68sL7FcZc8h8BtOjinrkgy90KCG4ZqD0Xc8NN0tPSUV+eavv78SsrV8HGM\n1QNRKb5nIwIDAQABo2AwXjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBT0RN8k\nD1xPDiPXX5kxBxdeGSG7eTAfBgNVHSMEGDAWgBQvsczEuZ4cHOyKUTu66BkTFb7Y\nvzALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQELBQADggEBABAmIIGvt34DUWFEHPOu\nw+a4KAXrjkBAVCWWXL8eFQQ1F61i5opQvCOw3VPFtByISFxBX3dI7JhydPbIJJvR\n8cufqijd3hIm9gxa9Ye6fA84xOz855t7niNaJY55kxAGnxC3Csqwx0oicjbz94rp\nDv9OgtZHWSwR/rjzrYhCF96/AkkVQVhDwWjGVLMDcUemcM4IMsPu0gl8qln8Xv7b\n6IrWeRz4rFvwSMDLQEE2YSZjFcU99WA+JB+NnmAK5oIRITpJbNm08yoQYe23Q8ag\n9BeT/2ngAgLwZ7jEVFUD77Md5HKIr2NecxfhXxLnC5qnTiRKaVtr/QYzXSRCkShe\nOmo=\n-----END CERTIFICATE-----\n",
@@ -203,7 +203,7 @@ sub _build_certs {
         ),
         acme_client => OpenXPKI::Test::CertHelper::PEM->new(
             label => "ACME Client",
-            database => {
+            db => {
                 authority_key_identifier => 'F4:44:DF:24:0F:5C:4F:0E:23:D7:5F:99:31:07:17:5E:19:21:BB:79',
                 cert_key => '2',
                 data => "-----BEGIN CERTIFICATE-----\nMIIDejCCAmKgAwIBAgIBAjANBgkqhkiG9w0BAQsFADBaMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nGjAYBgNVBAMMEUFDTUUtMSBTaWduaW5nIENBMCAXDTE3MDIxNjE2NTg0MloYDzIx\nMTcwMTIzMTY1ODQyWjBWMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPy\nLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxFjAUBgNVBAMMDUFDTUUtMSBD\nbGllbnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDf8zUPAysGj3gH\nVBL2JFREjzS7sCQ6sI44fxCkePQz7mWhMbfJCrtuU2saLcsNMBbVYnDTstWbDJdl\nDdxw1XPJYxZulf/BGiV0taD7HcCV9Fo9emoA1Oi3qAwTAh24L/DUAI8oT5jubodO\nqDzvspIhXnFV3m68+0G47XJCFS7Dp4DRcf/S2DK6Jf/JWiCCFtrWWusK//QxPSkc\nvd6OqHKUkp37p9qvfS6l72TMPfjDxkm8hJt1RH2EgoS5JbXP24AatlyY83kY0KF1\njKJGrjRhyoKCWTUVnuqIz1Ki3W2S4toRL/rYzO8aaO1StRvpyxrkfI9tnqQ7fSYy\nSMJ0sU/lAgMBAAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYEFIkTF/rxFBuMBB+l\naRY/ulgRXRg2MB8GA1UdIwQYMBaAFPRE3yQPXE8OI9dfmTEHF14ZIbt5MA0GCSqG\nSIb3DQEBCwUAA4IBAQBvXvvJZoAcH659yi+V2lgRGo3jpkyn+qShtg+xJUTMisZ6\nB893yg10XXvPmAh2ccbGLZdlGmAG6qtOTCB7v/rDq0ZSktgj7MvaBk4bYVVeDgGa\nXr7P9NpWN/KN4jZnsbdhKfQUUBNx15peOB890QxQRyhdPe0NTt6Lsj59L77mS13W\n0KPHKNlozPTAjc+3taIoX6maHH4efWeXZ1O593EMyProhidr4OLg4WS3aHNgdyj2\nB2oQRekpZjh1jLI1xOSJkmhjl20TpI3icwAUKoef2x5vouZMdBRfc4NZmbtvfJWQ\nMgt5gguh6rZSJozLLNYIF1q3nwmvHAjZM5tlrFH+\n-----END CERTIFICATE-----\n",
@@ -223,7 +223,7 @@ sub _build_certs {
         ),
         acme2_root => OpenXPKI::Test::CertHelper::PEM->new(
             label => "ACME-2 Root CA",
-            database => {
+            db => {
                 authority_key_identifier => '99:08:1D:F2:0B:53:49:28:F0:29:37:CA:88:97:2D:92:A0:68:2B:89',
                 cert_key => '11310484291401902951',
                 data => "-----BEGIN CERTIFICATE-----\nMIIDkzCCAnugAwIBAgIJAJz26YmapWtnMA0GCSqGSIb3DQEBCwUAMFcxEzARBgoJ\nkiaJk/IsZAEZFgNPUkcxGDAWBgoJkiaJk/IsZAEZFghPcGVuWFBLSTENMAsGA1UE\nCwwEQUNNRTEXMBUGA1UEAwwOQUNNRS0yIFJvb3QgQ0EwIBcNMTcwMjE2MTY1NzU5\nWhgPMjExNzAxMjMxNjU3NTlaMFcxEzARBgoJkiaJk/IsZAEZFgNPUkcxGDAWBgoJ\nkiaJk/IsZAEZFghPcGVuWFBLSTENMAsGA1UECwwEQUNNRTEXMBUGA1UEAwwOQUNN\nRS0yIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCx3iYv\nFj6DLUlWyCNJhIFgJ3jbQo/chOU//PsoYDmmFnFus0GV0CHXDAa+RTZsEoRmDJuq\nJH4TfS7VwrCiCMcXONnyP3bJa/dpfAA4sEWSTmKK/czaEAjpISrScAY6StC4H2Sy\nBCEegLfGTHw1cZoE5BAqsPTZzQf3NXKlzaUyXmgZohgXPoQr2s4QupCVSXAz3sDs\nCpFL/nWLnkxjD4Pi72g+WkE9BuV96mUCF0nNXcngRXx60e9sGjcCtqjfC5DkyZhK\n+yQ4uLTrhPkf93IILQ4teYERZRSSzfxRLwMwhDJR6BXD5AaODqjLNFN/5w0oh+I7\nUcwMRfrz4JutlvhJAgMBAAGjYDBeMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYE\nFJkIHfILU0ko8Ck3yoiXLZKgaCuJMB8GA1UdIwQYMBaAFJkIHfILU0ko8Ck3yoiX\nLZKgaCuJMAsGA1UdDwQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEAfeuD7nsFVpZd\n7MqLYPbHJL+zG8hUNeJqiJI4AQBdF2RuFsqVKnhJaQxHiHI++oPKRrKgj4atUYRn\nraehZzVi9g1qc3ZHH2E4jAll8FoAyXreKc9rMUYuLX/np+jSAewfzH/iGAvz8/Yn\ny59UxFwzmxz5NkIMHm8NMC6l4oMgPAF0CWexkARUdoKFOk75kR5JC+SDEmdXoeec\nujgYSFmN0o9arR1JXKaaeXkLWQ48UFeIHfEiMWgerpZsO/4KliLp7BHF7FTnD3pl\nRvk/YUgjZVtGzSahvXOE0pyF9fMFff+ry+7uw9AclOEXmOq96h6BrdP4PeWZNY4R\nD2TQMcpx5A==\n-----END CERTIFICATE-----\n",
@@ -243,7 +243,7 @@ sub _build_certs {
         ),
         acme2_signer => OpenXPKI::Test::CertHelper::PEM->new(
             label => "ACME-2 Signing CA",
-            database => {
+            db => {
                 authority_key_identifier => '99:08:1D:F2:0B:53:49:28:F0:29:37:CA:88:97:2D:92:A0:68:2B:89',
                 cert_key => '1',
                 data => "-----BEGIN CERTIFICATE-----\nMIIDjjCCAnagAwIBAgIBATANBgkqhkiG9w0BAQsFADBXMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nFzAVBgNVBAMMDkFDTUUtMiBSb290IENBMCAXDTE3MDIxNjE2NTc1OVoYDzIxMTcw\nMTIzMTY1NzU5WjBaMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPyLGQB\nGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxGjAYBgNVBAMMEUFDTUUtMiBTaWdu\naW5nIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0sFK8eR/AyvT\nDZ7UwNmaFxPQzgVVa/6eYomRDJP85O/SrkLgeYFSBQ4BSs8j4t1I51rGUnCAsybd\n+RhspoeapRAY4+Caqbjnuc39B2A5s5qiolaYkcwoxIPUbP2k1+BNSKWeLoRESX+2\nU2lfWb2gsvCETq2kWV55qFO5Q2b1YIbvbGttIPRGw7r2n6X8tA60BJ4kH1CmMRnU\ntLdv7pOLLcnIACNof8XCKYKiyepT2UrvqWG5y2CxPC77UhhuJCvjlzilGjGq7y1S\nJIwkyrqca+UVec1Sn3KUmR9Qk6LpVbfWmbwjl3/PEKVhlYY1chNA+zPdFx10VfrT\nZ5jET2qiUwIDAQABo2AwXjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQO9JSb\n8YjiWC12bNYlYmmID36AKjAfBgNVHSMEGDAWgBSZCB3yC1NJKPApN8qIly2SoGgr\niTALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQELBQADggEBAJSE9Kcjd/sXtN+DsYI2\nZ9Oeqx1LYlQdCz8SHA80RzRP2A+bLB/EqwBoEAgk++f7UhEymbPBE4oqrv8VW2FV\nbjoYXc1ab8yQlEcMlY8np/rxn9W9vrjr7lALts++AwBCQL0XEDcAk3IlVQdadJQu\npxJgyro3XKQXRl9bVbBpWI7GG7eFyC9hq58USSdxCsm1VzTXwAUPRpwOzENmeYg2\nnqMOXMK34PuRAFhO7RlaN+HHtKoIvqRFLGIeP42j5vqLpA4YXD1z8zqUDVYk78Yb\nUjwOSUo6s03TiNWCnVgA9V0nxycnXUsj7fMeXYUliVDyToAWUpRDKuikSjusYn8c\nfEI=\n-----END CERTIFICATE-----\n",
@@ -263,7 +263,7 @@ sub _build_certs {
         ),
         acme2_client => OpenXPKI::Test::CertHelper::PEM->new(
             label => "ACME-2 Client",
-            database => {
+            db => {
                 authority_key_identifier => '0E:F4:94:9B:F1:88:E2:58:2D:76:6C:D6:25:62:69:88:0F:7E:80:2A',
                 cert_key => '2',
                 data => "-----BEGIN CERTIFICATE-----\nMIIDejCCAmKgAwIBAgIBAjANBgkqhkiG9w0BAQsFADBaMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nGjAYBgNVBAMMEUFDTUUtMiBTaWduaW5nIENBMCAXDTE3MDIxNjE2NTc1OVoYDzIx\nMTcwMTIzMTY1NzU5WjBWMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPy\nLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxFjAUBgNVBAMMDUFDTUUtMiBD\nbGllbnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC6ApC820jCHUFt\npejJITJUhSAg/cbShMvvnKwazH3L8elt2uN3AwwjPtAfSQHsQVM/mxOtgjrK4KV4\n8z1PcSVcFm+Lwt27SjkU38dJ2ehK1tnVACfoanxv/lwtamrrVAzsKuTHMAoeh8CZ\nBS0PgHtPUEIApZJAWl7CaiudrlgjPZEMX4STDuoPVpa7O3y+6g4G/va3Gdxug2h1\nLuM3dzapau2Frqo64WExOj+r8pCsV3l/5B27sGwciGPBRvYJLenbnrJs9m0g8sRt\nE1TMJMUEkHz3bOmU1fk2W4TpY2saXCb9uREg9zTCzs1ImiS6wtzCEGV6Z7H0nF/U\nsOeLSWklAgMBAAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYEFDmhB9M1fFyQhU5E\n31rF16f5wiECMB8GA1UdIwQYMBaAFA70lJvxiOJYLXZs1iViaYgPfoAqMA0GCSqG\nSIb3DQEBCwUAA4IBAQBqSCig4XC8Z9RUrICTQNHqi+987JmiNbOnI6TfjrUD2dIf\nDK5RKO7jdpiuoHbTb0sbEPyYmyIDG7p/y7RgU49QcrW+31axAJInRwzal7jKVrEY\nVPzMDwfqvG8yUq2z4zkLhjVuyeHgTHvdrGTe1GuTsjXyYTQY6lTKn+Bm64Ul4M08\ns844fDMzsjT7GFXkdKP5wWNMVAX/+PfPQs/aE3AacaaCQ32P6q4ohtWxXucF7fT9\nLCSvh8/1dBnZ7XDj/eph/8HvHa/dPWaBKzHkbKsETEF84eiOfoxdvji0S3RUSAPd\nrqpx2zkkC45eyTZGNiPm2TK1nJkb1BTjbE4xa2iH\n-----END CERTIFICATE-----\n",
@@ -283,47 +283,67 @@ sub _build_certs {
         ),
         expired_root => OpenXPKI::Test::CertHelper::PEM->new(
             label => "Expired Root CA",
-            database => {
-                authority_key_identifier => '94:3A:81:EF:5C:58:88:A8:97:CD:34:FF:35:DD:EB:71:B6:FE:FA:2E',
-                cert_key => '11692266029049298850',
-                data => "-----BEGIN CERTIFICATE-----\nMIIDkzCCAnugAwIBAgIJAKJDRgFQ2b+iMA0GCSqGSIb3DQEBCwUAMFgxEzARBgoJ\nkiaJk/IsZAEZFgNPUkcxGDAWBgoJkiaJk/IsZAEZFghPcGVuWFBLSTEQMA4GA1UE\nCwwHQUNNRSBDQTEVMBMGA1UEAwwMQUNNRSBSb290IENBMB4XDTE1MDEyNzAwMTUw\nMVoXDTE1MDIyNjAwMTUwMVowWDETMBEGCgmSJomT8ixkARkWA09SRzEYMBYGCgmS\nJomT8ixkARkWCE9wZW5YUEtJMRAwDgYDVQQLDAdBQ01FIENBMRUwEwYDVQQDDAxB\nQ01FIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDnHV0W\nZnsX4LBZNI9iMoidOhBx/fOTRCHjO/73ms16begvDSqbhwDZms5OhC9BYAmmmYjJ\nIvlPkOR/IiU6bLtgDk9WZjIbKw28gjM4C6EZtCPa2vxwXJUR5vcDZerdN3/9IAAm\n0vMHgFzDxC0t472yURF9B4oRXbN2RxQ197SMml+2XlnWc6bBSNSVWfCWVHbTlU00\nW4nWqIoPcGk2MceMgo9t4Ta/jpfXivMWRJ3SGw+HH6ETtJmI8BpQNzarawsOEKKN\n1zCy5Wya4U72KwitZpr1Qcr1d+kLe5NLGPVrQpYBHjmxXWXza7VxVEW79TKtzu2g\n8jRMpkYKfd0TlcY3AgMBAAGjYDBeMB0GA1UdDgQWBBSUOoHvXFiIqJfNNP813etx\ntv76LjAfBgNVHSMEGDAWgBSUOoHvXFiIqJfNNP813etxtv76LjAPBgNVHRMBAf8E\nBTADAQH/MAsGA1UdDwQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEABLiqD5BzqFCK\nB7aqWZs29Xc42DlofJN3i0NXTWcM0bNuQJqOJMR96seyNPZZu41pHnJV0WDPhuNL\nD0tXku1TSGpf6fmmuPSfxksXjNG9HXivmPA89u6DfPA4+BZ+Q+yOIKQeciHkODUQ\n+g8kWASmMH4zWXxQpZQ9iI7LdZxRRmuwpCATuyth/yU6aa6aJsg4Juuf4P5OO4vs\nvC1kqgUWNc/OIHzgu6NBLv2XUr0mka3iRT4hsZcFBgyKJhf4b1hmC24WakuWqSaS\n/hx42PNwpbirUlNVrHWIm50z3jRCKgJHfJwrpWIWxMkEz6Rn9AeY2AEUpy5RGjPU\nfvP239/QKg==\n-----END CERTIFICATE-----\n",
-                identifier => 'ig29xFOKRNUpPh8spF6hyCWgExA',
-                issuer_dn => 'CN=ACME Root CA,OU=ACME CA,DC=OpenXPKI,DC=ORG',
-                issuer_identifier => 'ig29xFOKRNUpPh8spF6hyCWgExA',
+            db => {
+                authority_key_identifier => '0B:42:5E:FD:D9:FA:B7:BD:70:9D:A9:9C:32:FC:48:1A:D5:DA:A9:2B',
+                cert_key => '10610044628722553795',
+                data => "-----BEGIN CERTIFICATE-----\nMIIDkTCCAnmgAwIBAgIJAJM+c2AaDJPDMA0GCSqGSIb3DQEBCwUAMFcxEzARBgoJ\nkiaJk/IsZAEZFgNPUkcxGDAWBgoJkiaJk/IsZAEZFghPcGVuWFBLSTENMAsGA1UE\nCwwEQUNNRTEXMBUGA1UEAwwOQUNNRS00IFJvb3QgQ0EwHhcNMTAwMjE3MTYwNzE0\nWhcNMTEwMjE3MTYwNzE0WjBXMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZIm\niZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxFzAVBgNVBAMMDkFDTUUt\nNCBSb290IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2u3lKlo3\n9LlcWR6j0YqD3kq//KMn6ESERYefmRiCcE7VthoqnSvie7IWiqdhbX6Jwi8kYDG+\nW6gJ6QggFIe5tspvh8oAqkltaLg6yvqp0HZRADtiF2WbsUvC5R5U0wJ5ZJIYA186\n88lCt9FztgiiRZ8bL+zA3v9ON+24uH/eLJLh1Z7YJaS76fcOyNLfwiJGZ1b4XdLx\nQtkmb3vMQLVSAMsOem2/+FFNpYaIwWqoR8zBhnXWjGXi3FG0gHZ/512Pvw27uo4u\nRnj3rKv0S1BBxbpnAJgN140ePKwfki6xwZUNS5PKd/lRmISLOQXVa+Gicwa/LNIv\nFm5kzxDTkYkvmwIDAQABo2AwXjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQL\nQl792fq3vXCdqZwy/Ega1dqpKzAfBgNVHSMEGDAWgBQLQl792fq3vXCdqZwy/Ega\n1dqpKzALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQELBQADggEBADTIt+4PzJcbxnFv\nTfTeeWjy7ttUMLNtT+jbHrSPfhgXk2sEA2g11f+giahMFysLVBZ9w9+Z+cZvDS+N\n8/yz8KoCtbJIPusrgfwb67wC+XMGtnaRPnOUZj/bgv2FD7fFSph/S3MUsXcFJomv\nizkqURiar38bSFzbPSs1eyVysltCcWqt6FmNiFZzBk54Jkh9sHipJcEG5dlEichJ\ne+DMd8QChCQHM8XDnY44emMu1EqjEZxZROzd88nJurJhvVVBMqHvFh55SHv53UZs\neJPDHVsFl/KzV66YFD8+AkYr8qpo98aC+XEXWEpen3K57XDxTyUvaN2zRGyrCTm6\n0GHrWWU=\n-----END CERTIFICATE-----\n",
+                identifier => 'pp2WoAH3leE0sHaamHzXA61ASWA',
+                issuer_dn => 'CN=ACME-4 Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
+                issuer_identifier => 'pp2WoAH3leE0sHaamHzXA61ASWA',
                 loa => undef,
-                notafter => '1424909701',  # 2015-02-26T00:15:01
-                notbefore => '1422317701', # 2015-01-27T00:15:01
+                notafter => '1297958834',  # 2011-02-17T16:07:14
+                notbefore => '1266422834', # 2010-02-17T16:07:14
                 pki_realm => 'acme-expired',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:e7:1d:5d:16:66:7b:17:e0:b0:59:34:8f:62:32:\n    88:9d:3a:10:71:fd:f3:93:44:21:e3:3b:fe:f7:9a:\n    cd:7a:6d:e8:2f:0d:2a:9b:87:00:d9:9a:ce:4e:84:\n    2f:41:60:09:a6:99:88:c9:22:f9:4f:90:e4:7f:22:\n    25:3a:6c:bb:60:0e:4f:56:66:32:1b:2b:0d:bc:82:\n    33:38:0b:a1:19:b4:23:da:da:fc:70:5c:95:11:e6:\n    f7:03:65:ea:dd:37:7f:fd:20:00:26:d2:f3:07:80:\n    5c:c3:c4:2d:2d:e3:bd:b2:51:11:7d:07:8a:11:5d:\n    b3:76:47:14:35:f7:b4:8c:9a:5f:b6:5e:59:d6:73:\n    a6:c1:48:d4:95:59:f0:96:54:76:d3:95:4d:34:5b:\n    89:d6:a8:8a:0f:70:69:36:31:c7:8c:82:8f:6d:e1:\n    36:bf:8e:97:d7:8a:f3:16:44:9d:d2:1b:0f:87:1f:\n    a1:13:b4:99:88:f0:1a:50:37:36:ab:6b:0b:0e:10:\n    a2:8d:d7:30:b2:e5:6c:9a:e1:4e:f6:2b:08:ad:66:\n    9a:f5:41:ca:f5:77:e9:0b:7b:93:4b:18:f5:6b:42:\n    96:01:1e:39:b1:5d:65:f3:6b:b5:71:54:45:bb:f5:\n    32:ad:ce:ed:a0:f2:34:4c:a6:46:0a:7d:dd:13:95:\n    c6:37\nExponent: 65537 (0x10001)\n",
+                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:da:ed:e5:2a:5a:37:f4:b9:5c:59:1e:a3:d1:8a:\n    83:de:4a:bf:fc:a3:27:e8:44:84:45:87:9f:99:18:\n    82:70:4e:d5:b6:1a:2a:9d:2b:e2:7b:b2:16:8a:a7:\n    61:6d:7e:89:c2:2f:24:60:31:be:5b:a8:09:e9:08:\n    20:14:87:b9:b6:ca:6f:87:ca:00:aa:49:6d:68:b8:\n    3a:ca:fa:a9:d0:76:51:00:3b:62:17:65:9b:b1:4b:\n    c2:e5:1e:54:d3:02:79:64:92:18:03:5f:3a:f3:c9:\n    42:b7:d1:73:b6:08:a2:45:9f:1b:2f:ec:c0:de:ff:\n    4e:37:ed:b8:b8:7f:de:2c:92:e1:d5:9e:d8:25:a4:\n    bb:e9:f7:0e:c8:d2:df:c2:22:46:67:56:f8:5d:d2:\n    f1:42:d9:26:6f:7b:cc:40:b5:52:00:cb:0e:7a:6d:\n    bf:f8:51:4d:a5:86:88:c1:6a:a8:47:cc:c1:86:75:\n    d6:8c:65:e2:dc:51:b4:80:76:7f:e7:5d:8f:bf:0d:\n    bb:ba:8e:2e:46:78:f7:ac:ab:f4:4b:50:41:c5:ba:\n    67:00:98:0d:d7:8d:1e:3c:ac:1f:92:2e:b1:c1:95:\n    0d:4b:93:ca:77:f9:51:98:84:8b:39:05:d5:6b:e1:\n    a2:73:06:bf:2c:d2:2f:16:6e:64:cf:10:d3:91:89:\n    2f:9b\nExponent: 65537 (0x10001)\n",
                 req_key => undef,
                 status => 'ISSUED',
-                subject => 'CN=ACME Root CA,OU=ACME CA,DC=OpenXPKI,DC=ORG',
-                subject_key_identifier => '94:3A:81:EF:5C:58:88:A8:97:CD:34:FF:35:DD:EB:71:B6:FE:FA:2E',
+                subject => 'CN=ACME-4 Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
+                subject_key_identifier => '0B:42:5E:FD:D9:FA:B7:BD:70:9D:A9:9C:32:FC:48:1A:D5:DA:A9:2B',
             },
         ),
         expired_signer => OpenXPKI::Test::CertHelper::PEM->new(
-            label => "Cert signed by expired Root CA",
-            database => {
-                authority_key_identifier => '94:3A:81:EF:5C:58:88:A8:97:CD:34:FF:35:DD:EB:71:B6:FE:FA:2E',
+            label => "Expired Signing CA cert",
+            db => {
+                authority_key_identifier => '0B:42:5E:FD:D9:FA:B7:BD:70:9D:A9:9C:32:FC:48:1A:D5:DA:A9:2B',
                 cert_key => '1',
-                data => "-----BEGIN CERTIFICATE-----\nMIIDjjCCAnagAwIBAgIBATANBgkqhkiG9w0BAQsFADBYMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxEDAOBgNVBAsMB0FDTUUg\nQ0ExFTATBgNVBAMMDEFDTUUgUm9vdCBDQTAeFw0xNTAxMjcwMDE1MDJaFw0xNTAx\nMjgwMDE1MDJaMFsxEzARBgoJkiaJk/IsZAEZFgNPUkcxGDAWBgoJkiaJk/IsZAEZ\nFghPcGVuWFBLSTEQMA4GA1UECwwHQUNNRSBDQTEYMBYGA1UEAwwPQUNNRSBTaWdu\naW5nIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxwgkacEdUlZs\nxzJQqz58AJgu6ikPIb3zWbr/BaG+usjmVC+WabqmUiPHllbE7/TfBn4T4uxtXPBa\nxmIVueoXbGhexgTorGPAReQqhUPZ5KlEGVqb02hc0uIJ1ff8eiRlitqeO0GbCIzo\nJXsYw323m3YYftxlbFIt26gFikvi9zaoeaoxDFyky+fErBkvle6JGV508aZBph/S\nBr3xmzylrVEoO4bkePDIaQBzdUNRh6FDG7ING+YbjtZfYgS2UjP3gg474EeztbtH\ngPww2aUfnlIYtXqqt9bXSrbywJ4EM/OvSr26S1Txuh8tp5fC9tngTmb1ypnlUnOt\nnlA1JK/9oQIDAQABo2AwXjAdBgNVHQ4EFgQU5zb2OrQeUD6wx6nX1ZriqoCmD7ww\nHwYDVR0jBBgwFoAUlDqB71xYiKiXzTT/Nd3rcbb++i4wDwYDVR0TAQH/BAUwAwEB\n/zALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQELBQADggEBANQpf3CrUNOc2XD5cvJV\nIbS4zE1pxRq/bsxkK3nj9th9OdseAqsiWwKuLz1j8KkFN+2eqjvisH5UCzcW/n4k\nJFjFJ+hq0UKkqiGv6KtdMIhdM8rODDnwLQGMCD8vKqNZk3vI1lFbEuTmlz9a95d8\nVkWfgz4/8a7PmIcMp87jFiepweobeHoq+081sHwQnUMgjLujLscfJevHWSrbtFD9\nOPWyyp62FbHQckU5tn6dQYgJsLCJp7jJ8jf5RCQaXKwV+Q0qhDOyaCVIhCzP5gW2\n+BylcwN+rNmBH0RP0QzurBU0PrR2xrlAzXZYuMAB8D0cAsziyvPZtV5fDn9RZG7G\nvW0=\n-----END CERTIFICATE-----\n",
-                identifier => 'fcE0MpW-8xXvb5gZTiVYkNMHP30',
-                issuer_dn => 'CN=ACME Root CA,OU=ACME CA,DC=OpenXPKI,DC=ORG',
-                issuer_identifier => 'ig29xFOKRNUpPh8spF6hyCWgExA',
+                data => "-----BEGIN CERTIFICATE-----\nMIIDjDCCAnSgAwIBAgIBATANBgkqhkiG9w0BAQsFADBXMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nFzAVBgNVBAMMDkFDTUUtNCBSb290IENBMB4XDTEwMDIxNzE2MDcxNFoXDTExMDIx\nNzE2MDcxNFowWjETMBEGCgmSJomT8ixkARkWA09SRzEYMBYGCgmSJomT8ixkARkW\nCE9wZW5YUEtJMQ0wCwYDVQQLDARBQ01FMRowGAYDVQQDDBFBQ01FLTQgU2lnbmlu\nZyBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALiov1MAxJv60PV1\nr9Q+o94773qaOHa40kFr6+rx5gCDrr82YsxGfPXEji7Er5ubsArhdLyOTXxzlRxZ\nBo9txw03F+fA3u2Bpa5XVt3NnFdk/wLlxn+QdLKdoEbWMS2msWjS274lwRGSw67E\nt4IgeZBTj7+muKxS/zjc2b4RvKydK8xNuxtlDYPLU/w8veV+oUK7v0W7w5Ecgyxj\n6bDFmkdunwWodsLOzXOQ/FPyuc6Nqa3OoimlUX9B9dMmndD5eWqO6efCWKb/0CFq\nr4Ez9uE6wziKH55SK620Juw8ayIfVPPHM8a98sX3P55YAo2Uz5Uccxi4yHNk0sbN\nLpuUzEUCAwEAAaNgMF4wDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQU1VO8GT9y\n4gCPGIS7GooLxFzchqcwHwYDVR0jBBgwFoAUC0Je/dn6t71wnamcMvxIGtXaqSsw\nCwYDVR0PBAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IBAQDBsmHgrGqUyo103fPQBZj7\nwIMMw/NRN/ZlBK0Ur4cRfmxM/Ii5wFOOG3rBN3OLYLcpYZqdlkSvqTMb+GarTBFS\nrED8/wKF8VKbnzoYVwwf6eeqYtD1RRI0BDrn4gcUA2cDJgLVpMOtMBc0bj9ktydS\nOUGzfJb77g60XlllQ8EpsCIMYNFf7vWmeS0YGfu2p1JcMMqq6lm9mCm1C7AT4SK1\n9ox8ECLhboWzcchZqZ1b8P7sJMlNM8gargo020FAJLPwSySycwt1nTTEOo5qlR8I\nrG3jdZeywO6MdLOoRqsI56EkE5RpZDNUhTckT/o/9qNOBD21+th1tfTxCqs+cSTB\n-----END CERTIFICATE-----\n",
+                identifier => 'WdsEj95LKDzZV6rWvy12Up5GEOY',
+                issuer_dn => 'CN=ACME-4 Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
+                issuer_identifier => 'pp2WoAH3leE0sHaamHzXA61ASWA',
                 loa => undef,
-                notafter => '1422404102',  # 2015-01-28T00:15:02
-                notbefore => '1422317702', # 2015-01-27T00:15:02
+                notafter => '1297958834',  # 2011-02-17T16:07:14
+                notbefore => '1266422834', # 2010-02-17T16:07:14
                 pki_realm => 'acme-expired',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:c7:08:24:69:c1:1d:52:56:6c:c7:32:50:ab:3e:\n    7c:00:98:2e:ea:29:0f:21:bd:f3:59:ba:ff:05:a1:\n    be:ba:c8:e6:54:2f:96:69:ba:a6:52:23:c7:96:56:\n    c4:ef:f4:df:06:7e:13:e2:ec:6d:5c:f0:5a:c6:62:\n    15:b9:ea:17:6c:68:5e:c6:04:e8:ac:63:c0:45:e4:\n    2a:85:43:d9:e4:a9:44:19:5a:9b:d3:68:5c:d2:e2:\n    09:d5:f7:fc:7a:24:65:8a:da:9e:3b:41:9b:08:8c:\n    e8:25:7b:18:c3:7d:b7:9b:76:18:7e:dc:65:6c:52:\n    2d:db:a8:05:8a:4b:e2:f7:36:a8:79:aa:31:0c:5c:\n    a4:cb:e7:c4:ac:19:2f:95:ee:89:19:5e:74:f1:a6:\n    41:a6:1f:d2:06:bd:f1:9b:3c:a5:ad:51:28:3b:86:\n    e4:78:f0:c8:69:00:73:75:43:51:87:a1:43:1b:b2:\n    0d:1b:e6:1b:8e:d6:5f:62:04:b6:52:33:f7:82:0e:\n    3b:e0:47:b3:b5:bb:47:80:fc:30:d9:a5:1f:9e:52:\n    18:b5:7a:aa:b7:d6:d7:4a:b6:f2:c0:9e:04:33:f3:\n    af:4a:bd:ba:4b:54:f1:ba:1f:2d:a7:97:c2:f6:d9:\n    e0:4e:66:f5:ca:99:e5:52:73:ad:9e:50:35:24:af:\n    fd:a1\nExponent: 65537 (0x10001)\n",
+                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:b8:a8:bf:53:00:c4:9b:fa:d0:f5:75:af:d4:3e:\n    a3:de:3b:ef:7a:9a:38:76:b8:d2:41:6b:eb:ea:f1:\n    e6:00:83:ae:bf:36:62:cc:46:7c:f5:c4:8e:2e:c4:\n    af:9b:9b:b0:0a:e1:74:bc:8e:4d:7c:73:95:1c:59:\n    06:8f:6d:c7:0d:37:17:e7:c0:de:ed:81:a5:ae:57:\n    56:dd:cd:9c:57:64:ff:02:e5:c6:7f:90:74:b2:9d:\n    a0:46:d6:31:2d:a6:b1:68:d2:db:be:25:c1:11:92:\n    c3:ae:c4:b7:82:20:79:90:53:8f:bf:a6:b8:ac:52:\n    ff:38:dc:d9:be:11:bc:ac:9d:2b:cc:4d:bb:1b:65:\n    0d:83:cb:53:fc:3c:bd:e5:7e:a1:42:bb:bf:45:bb:\n    c3:91:1c:83:2c:63:e9:b0:c5:9a:47:6e:9f:05:a8:\n    76:c2:ce:cd:73:90:fc:53:f2:b9:ce:8d:a9:ad:ce:\n    a2:29:a5:51:7f:41:f5:d3:26:9d:d0:f9:79:6a:8e:\n    e9:e7:c2:58:a6:ff:d0:21:6a:af:81:33:f6:e1:3a:\n    c3:38:8a:1f:9e:52:2b:ad:b4:26:ec:3c:6b:22:1f:\n    54:f3:c7:33:c6:bd:f2:c5:f7:3f:9e:58:02:8d:94:\n    cf:95:1c:73:18:b8:c8:73:64:d2:c6:cd:2e:9b:94:\n    cc:45\nExponent: 65537 (0x10001)\n",
                 req_key => undef,
                 status => 'ISSUED',
-                subject => 'CN=ACME Signing CA,OU=ACME CA,DC=OpenXPKI,DC=ORG',
-                subject_key_identifier => 'E7:36:F6:3A:B4:1E:50:3E:B0:C7:A9:D7:D5:9A:E2:AA:80:A6:0F:BC',
-            },
+                subject => 'CN=ACME-4 Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
+                subject_key_identifier => 'D5:53:BC:19:3F:72:E2:00:8F:18:84:BB:1A:8A:0B:C4:5C:DC:86:A7',
+            }
+        ),
+        expired_client => OpenXPKI::Test::CertHelper::PEM->new(
+            label => "Expired Client cert",
+            db => {
+                authority_key_identifier => 'D5:53:BC:19:3F:72:E2:00:8F:18:84:BB:1A:8A:0B:C4:5C:DC:86:A7',
+                cert_key => '2',
+                data => "-----BEGIN CERTIFICATE-----\nMIIDeDCCAmCgAwIBAgIBAjANBgkqhkiG9w0BAQsFADBaMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nGjAYBgNVBAMMEUFDTUUtNCBTaWduaW5nIENBMB4XDTEwMDIxNzE2MDcxNFoXDTEx\nMDIxNzE2MDcxNFowVjETMBEGCgmSJomT8ixkARkWA09SRzEYMBYGCgmSJomT8ixk\nARkWCE9wZW5YUEtJMQ0wCwYDVQQLDARBQ01FMRYwFAYDVQQDDA1BQ01FLTQgQ2xp\nZW50MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtPZuUycYeGTn01K8\nQsL/76RkHJvxAKESQoi1/wRdPFx8N0LlMkxx+10qZbX46Pupf+vwrJ96DhfyjVrn\nqle66Yc1O6NV7LGN6kLOkXzl9zqHTh12PNOi5urZu6TdmqlP7Qa1cadrAypMYyIm\n4wWgt1+dmTXDRIsBI3gpEh2VfdRb5zFCJE0E5JlgXMwkfmYDQ2ykfVSUbCeHUUlF\n7jKhvHbVP9NNA8pnzsOLqO6pTJ+uNnw8N1vfKBfIxbX2YI132NK2S5SOoUuQoOXm\npcoTeCKoOq0Qt8oX9ENIxFWWOxoNPMerRn7tzfacGQ4/fR0VLoxln8hWGivyx3MS\nx+eEDQIDAQABo00wSzAJBgNVHRMEAjAAMB0GA1UdDgQWBBT+EZDbmBKocso0yrkE\n7vtuChcCSDAfBgNVHSMEGDAWgBTVU7wZP3LiAI8YhLsaigvEXNyGpzANBgkqhkiG\n9w0BAQsFAAOCAQEAoPBwdAQq4/db7VjYpdSF4cpRlWx9m/maubHMjuH4HR98OFMd\ny1NOdvYnSovsHLUOYWIHK3L+HWqWdAm48iRo4mfTwCE/olx2aMC39qjIex0kTFCL\n3lCK4i/CLveMt9gYMrb0McZadkxA+6zAyzUwFfbLTBakPG66X0sF6UNX/5CDlRQF\nj4udhaXiKz4qNP6q0tEUtKjj2rYYjgqEyjlD/++GbjJXa8zKZZkkZlum5uj5fcgi\nevewJ/2NnhWuUHZuio8ceQ5964XYTX+hUICBLMquHKaAvfp+YmMP8CEievG6D+YS\nysLxpRXg8AGQDerL6SKshBsfQiv+c0+auC22KA==\n-----END CERTIFICATE-----\n",
+                identifier => '2KEPBWHVallRrfapK7GuDq3ygSQ',
+                issuer_dn => 'CN=ACME-4 Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
+                issuer_identifier => 'WdsEj95LKDzZV6rWvy12Up5GEOY',
+                loa => undef,
+                notafter => '1297958834',  # 2011-02-17T16:07:14
+                notbefore => '1266422834', # 2010-02-17T16:07:14
+                pki_realm => 'acme-expired',
+                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:b4:f6:6e:53:27:18:78:64:e7:d3:52:bc:42:c2:\n    ff:ef:a4:64:1c:9b:f1:00:a1:12:42:88:b5:ff:04:\n    5d:3c:5c:7c:37:42:e5:32:4c:71:fb:5d:2a:65:b5:\n    f8:e8:fb:a9:7f:eb:f0:ac:9f:7a:0e:17:f2:8d:5a:\n    e7:aa:57:ba:e9:87:35:3b:a3:55:ec:b1:8d:ea:42:\n    ce:91:7c:e5:f7:3a:87:4e:1d:76:3c:d3:a2:e6:ea:\n    d9:bb:a4:dd:9a:a9:4f:ed:06:b5:71:a7:6b:03:2a:\n    4c:63:22:26:e3:05:a0:b7:5f:9d:99:35:c3:44:8b:\n    01:23:78:29:12:1d:95:7d:d4:5b:e7:31:42:24:4d:\n    04:e4:99:60:5c:cc:24:7e:66:03:43:6c:a4:7d:54:\n    94:6c:27:87:51:49:45:ee:32:a1:bc:76:d5:3f:d3:\n    4d:03:ca:67:ce:c3:8b:a8:ee:a9:4c:9f:ae:36:7c:\n    3c:37:5b:df:28:17:c8:c5:b5:f6:60:8d:77:d8:d2:\n    b6:4b:94:8e:a1:4b:90:a0:e5:e6:a5:ca:13:78:22:\n    a8:3a:ad:10:b7:ca:17:f4:43:48:c4:55:96:3b:1a:\n    0d:3c:c7:ab:46:7e:ed:cd:f6:9c:19:0e:3f:7d:1d:\n    15:2e:8c:65:9f:c8:56:1a:2b:f2:c7:73:12:c7:e7:\n    84:0d\nExponent: 65537 (0x10001)\n",
+                req_key => undef,
+                status => 'ISSUED',
+                subject => 'CN=ACME-4 Client,OU=ACME,DC=OpenXPKI,DC=ORG',
+                subject_key_identifier => 'FE:11:90:DB:98:12:A8:72:CA:34:CA:B9:04:EE:FB:6E:0A:17:02:48',
+            }
         ),
         orphan => OpenXPKI::Test::CertHelper::PEM->new(
             label => "Orphan cert with unknown issuer",
-            database => {
+            db => {
                 authority_key_identifier => 'AA:06:FF:AE:29:6B:C0:E2:A3:D1:64:D6:25:25:45:95:B4:2A:BE:8F',
                 cert_key => '2',
                 data => "-----BEGIN CERTIFICATE-----\nMIIDejCCAmKgAwIBAgIBAjANBgkqhkiG9w0BAQsFADBaMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nGjAYBgNVBAMMEUFDTUUtMyBTaWduaW5nIENBMCAXDTE3MDIxNjE3MzcxNloYDzIx\nMTcwMTIzMTczNzE2WjBWMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPy\nLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxFjAUBgNVBAMMDUFDTUUtMyBD\nbGllbnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDGZegxNEy+cYf9\nYtMzjF96mUv2t6OpfWMlbGWvvzjpDegGBgL1a9fB1UWK+0UTELOzeAMjlR62+Mzk\nBdPZhHe7w1MtP3hAFaUTA99RN8Rdguabffe94wJ/Q6pwM7dyncqMK8NiNilcUwq/\n5osKDVLr59c1TCitfqASShJALD0zxrecBGnMTn4e0QnjEAy6gtFDKDO1VEaZXbGh\nYXfomwniOFPkUqsjqqssG1a5UrUVNqk01KH8CgxtB7O5+gZpcVTXhGcsHS/jWcCm\nvTkmKqXZWNLTfTcfcS32bXdbghIDC7gC1fTRUyNFFIjiiDqmjsOZIiX2MbJS0fg4\nREnF1fqzAgMBAAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYEFDJxmLK7HBuQcP1M\nh76eeqJm6fz2MB8GA1UdIwQYMBaAFKoG/64pa8Dio9Fk1iUlRZW0Kr6PMA0GCSqG\nSIb3DQEBCwUAA4IBAQCfF54YSziI0AW1ORFm3ziJsLz0HL7M3Xc4rMFQzk25chuL\ny095ste87qu1Nfw4jloP8sT3P5XsU1AV3ip/5shzewHsKP7fQSnygx/MyempCH/V\nGN0cz6RvQjVJ10CgZfAjvOBaqK5DBTv5zPq4/SkyQtC1dnezS+TheJKSAZv7CYld\nPksfJ3Xa7T9oMDyp69aw119SVNKxgsRjpJyYkg4aYlf77ZtnPu/3TYkVYvrA/+7F\nb4yOqRn3O7dbDnCcgpbZUq4Cfls3mLVI3wLzbhC1DvNzhHAtkIVZ3YucU2AMhYLo\n5M5DoXH9sC7ZoNVwDpk/Ej0M8NSuWKxr22kzCuco\n-----END CERTIFICATE-----\n",
