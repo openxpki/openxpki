@@ -1,14 +1,14 @@
-package OpenXPKI::Test::PEM;
+package OpenXPKI::Test::CertHelper::PEM;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::PEM - Represents a test certificate (PEM + meta data)
+OpenXPKI::Test::CertHelper::PEM - Represents a test certificate (PEM + meta data)
 
 =head1 SYNOPSIS
 
-    my $pem = OpenXPKI::Test::PEM->new(
+    my $pem = OpenXPKI::Test::CertHelper::PEM->new(
         label => "ACME Root CA",
         database => {
             authority_key_identifier => 'C6:17:6E:AC:2E:7F:3C:9B:B0:AB:83:B6:5A:C2:F0:14:6C:A9:A4:4A',

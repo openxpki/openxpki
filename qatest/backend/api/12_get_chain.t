@@ -39,8 +39,10 @@ $test->connect_ok(
 ) or die "Error - connect failed: $@";
 
 # Create certificate
-my $test_certs = OpenXPKI::Test::CertHelper->new(tester => $test);
-my $cert_id = $test_certs->create_cert(hostname => "127.0.0.1");
+my $cert_id = OpenXPKI::Test::CertHelper->via_workflow(
+    tester => $test,
+    hostname => "127.0.0.1",
+);
 
 # Fetch certificate - HASH Format
 $test->runcmd_ok('get_chain', { START_IDENTIFIER => $cert_id, OUTFORMAT => 'HASH' }, "Fetch certificate chain");

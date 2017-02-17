@@ -9,17 +9,6 @@
 
 DbHelper
 
-=head1 SYNOPSIS
-
-    use DbHelper;
-
-    my $ch = CertHelper->new(
-        commonName => 'my.commonname.org',
-        basedir => 't/mycert.d',
-    );
-
-    $ch->createcert;
-
 =cut
 
 package DbHelper;
@@ -91,12 +80,13 @@ sub insert_test_cert {
     $self->dbi->commit;
 }
 
-sub print_certs_as_inserts {
+sub print_certs_as_dbhash {
     my ($self) = @_;
     my $dbh = $self->dbi->select(
         from => 'certificate',
         columns => [ '*' ],
     );
+    use DateTime;
     while (my $data = $dbh->fetchrow_hashref) {
         print 'database => {'."\n    ";
         print join "\n    ",
@@ -104,10 +94,15 @@ sub print_certs_as_inserts {
                 my $val = $data->{$_};
                 $val =~ s/\r?\n/\\n/g if ($val and m/^(data|public_key)$/);
                 my $qc = m/^(data|public_key)$/ ? '"' : "'";
-                $_." => ".(defined $val ? "$qc$val$qc" : "undef").","
+                sprintf(
+                    "%s => %s,%s",
+                    $_,
+                    (defined $val ? "$qc$val$qc" : "undef"),
+                    ($_ =~ /^not(before|after)$/ ? " # ".DateTime->from_epoch(epoch => $val)->datetime : ""),
+                )
             }
             sort keys %$data;
-        print "\n},\n);\n\n";
+        print "\n}\n\n";
     };
 }
 

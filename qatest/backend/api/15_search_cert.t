@@ -20,7 +20,6 @@ use lib qw(../../lib);
 use OpenXPKI::Test::More;
 use TestCfg;
 use OpenXPKI::Test::CertHelper;
-use CertHelper;
 use DbHelper;
 
 #
@@ -176,16 +175,6 @@ certlist_is $test->get_msg->{PARAMS}, qw( acme2_client );
 # By VALID_AT (Int: epoch)
 $test->runcmd_ok('search_cert', { VALID_AT => 1422792000, PKI_REALM => "_ANY" }, "Search certificates by date");
 certlist_is $test->get_msg->{PARAMS}, qw( expired_root );
-
-
-my $dir = tempdir( CLEANUP => 1 );
-my $fh;
-open($fh, '>', "$dir/key.pas") or die "Error opening $dir/key.pas: $!";
-print($fh 'mysecrettestpassword') or die "Error writing $dir/key.pas: $!";
-close($fh) or die "Error closing $dir/key.pas: $!";
-
-my $ch = CertHelper->new(basedir => $dir)->createcert;
-my $cert_pem = do { local $/; open my $fh, '<', "$dir/crt.pem"; <$fh> }; # slurp
 
 # By CSR_SERIAL
 

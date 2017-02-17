@@ -48,12 +48,12 @@ $test->connect_ok(
     password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
-my $test_certs = OpenXPKI::Test::CertHelper->new(tester => $test);
 my @cert_serials = ();
 
 for my $certno (1..$certs_to_create) {
     # Create certificate
-    my $cert_identifier = $test_certs->create_cert(
+    my $cert_identifier = OpenXPKI::Test::CertHelper->via_workflow(
+        tester          => $test,
         hostname        => "127.0.0.".(1+$certno*3),
         hostname2       => [ "127.0.0.".(2+$certno*3) , "127.0.0.".(3+$certno*3) ],
         profile         => $cfg{csr}{profile},

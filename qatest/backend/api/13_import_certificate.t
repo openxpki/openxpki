@@ -18,7 +18,6 @@ use Test::Deep;
 # Project modules
 use lib qw(../../lib);
 use OpenXPKI::Test::More;
-use CertHelper;
 use DbHelper;
 use TestCfg;
 use OpenXPKI::Test::CertHelper;
@@ -31,7 +30,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::PEM>, required)
 
 =item * B<%args> - Arguments to pass to "import_certificate" (I<Hash>, optional)
 
@@ -66,7 +65,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::PEM>, required)
 
 =item * B<$error> - Expected error string returned by API (I<Str>, required)
 
@@ -117,17 +116,8 @@ my $certs = $test_certs->certs;
 #
 # Create new test certificates on disk
 #
-my $dir = tempdir( CLEANUP => 1 );
-my $fh;
-open($fh, '>', "$dir/key.pas") or die "Error opening $dir/key.pas: $!";
-print($fh 'mysecrettestpassword') or die "Error writing $dir/key.pas: $!";
-close($fh) or die "Error closing $dir/key.pas: $!";
-
-my $ch = CertHelper->new(basedir => $dir)->createcert;
-my $cert_pem = do { local $/; open my $fh, '<', "$dir/crt.pem"; <$fh> }; # slurp
-
-my $ch2 = CertHelper->new(basedir => $dir, commonName => 'test2.openxpki.org')->createcert;
-my $cert_pem2 = do { local $/; open my $fh, '<', "$dir/crt.pem"; <$fh> }; # slurp
+my $cert_pem = OpenXPKI::Test::CertHelper->via_openssl->cert_pem;
+my $cert_pem2 = OpenXPKI::Test::CertHelper->via_openssl(commonName => 'test2.openxpki.org')->cert_pem;
 
 #
 # Tests
