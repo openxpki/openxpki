@@ -114,13 +114,13 @@ certificate in OpenXPKI via workflows.
 
 Possible arguments are all attributes of L<OpenXPKI::Test::CertHelper::Workflow>.
 
-Returns the ID of the created certificate.
+Returns a HashRef containing some info about the created certificate.
 
 =cut
 sub via_workflow {
     my $class = shift;
     my $helper = OpenXPKI::Test::CertHelper::Workflow->new(@_);
-    return $helper->create_cert; # returns the certificate ID
+    return $helper->create_cert; # returns certificate info HashRef
 }
 
 __PACKAGE__->meta->make_immutable;

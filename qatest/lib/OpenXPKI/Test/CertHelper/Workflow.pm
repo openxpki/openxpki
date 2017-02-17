@@ -201,8 +201,9 @@ sub create_cert {
     };
 
     return {
-        identifier => $test->param('cert_identifier'),
         req_key    => $test->param('csr_serial'),
+        identifier => $test->param('cert_identifier'),
+        profile    => $test->param('cert_profile'),
     };
 }
 

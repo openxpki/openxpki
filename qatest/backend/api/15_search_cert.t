@@ -15,12 +15,14 @@ Log::Log4perl->easy_init($WARN);
 use Test::More;
 use Test::Deep;
 use Math::BigInt;
+use Data::UUID;
 
 # Project modules
 use lib qw(../../lib);
 use TestCfg;
 use OpenXPKI::Test::More;
 use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::CertHelper::Database;
 
 #
 # Init client
@@ -34,7 +36,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 33 );
+$test->plan( tests => 44 );
 
 $test->connect_ok(
     user => $cfg->{operator}{name},
@@ -95,7 +97,7 @@ ENTITY_ONLY     Bool: show only certificates issued by this ca (where CSR_SERIAL
 =cut
 
 # Checks if the given DB result ArrayRef contains the test certificates with
-# the given names.
+# the given internal test certificate names.
 sub search_cert_ok {
     my ($message, $conditions, @expected_names) = @_;
 
@@ -191,25 +193,65 @@ search_cert_ok "by issuer DN (with wildcards)", {
 }, qw( acme2_client );
 
 search_cert_ok "by validity date", {
-    VALID_AT => $dbdata->cert("expired_root")->db->{notbefore} + 10,
+    VALID_AT => $dbdata->cert("expired_root")->db->{notbefore} + 100,
     PKI_REALM => "_ANY"
 }, qw( expired_root expired_signer expired_client );
 
-# By CSR_SERIAL
+# By CSR serial
+my $uuid = Data::UUID->new->create_str;
+my $cert_info = OpenXPKI::Test::CertHelper->via_workflow(
+    tester => $test,
+    hostname => "acme-$uuid.local",
+    requestor_gname => 'Till',
+    requestor_name => $uuid,
+    requestor_email => 'tilltom@morning',
+);
 
-#
+$test->runcmd_ok('search_cert', {
+    CSR_SERIAL => $cert_info->{req_key},
+    PKI_REALM => "_ANY"
+}, "Search cert by CSR serial");
+
+cmp_bag $test->get_msg->{PARAMS}, [
+    superhashof({ IDENTIFIER => $cert_info->{identifier} })
+], "Correct result";
+
+
 # By PROFILE
-# By NOTBEFORE/NOTAFTER          Int|HashRef: with SCALAR searches "other side" of validity or pass HASH with operator
-#    --> HashRef with BETWEEN, LESS_THAN, GREATER_THAN used in OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
-#
+$test->runcmd_ok('search_cert', {
+    IDENTIFIER => $cert_info->{identifier},
+    PROFILE => $cert_info->{profile},
+}, "Search cert by profile");
+
+cmp_bag $test->get_msg->{PARAMS}, [
+    superhashof({ IDENTIFIER => $cert_info->{identifier} })
+], "Correct result";
+
+# By NOTBEFORE/NOTAFTER (Int: searches "other side" of validity)
+search_cert_ok "that is/was valid before given date", {
+    NOTBEFORE => $dbdata->cert("expired_root")->db->{notafter} + 100,
+    PKI_REALM => "_ANY"
+}, qw( expired_root expired_signer expired_client );
+
+search_cert_ok "that is will be valid after given date", {
+    NOTAFTER => $dbdata->cert("acme_root")->db->{notbefore} + 100,
+    PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm}
+}, qw( acme_root acme_signer acme_client );
+
 # By CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)
+# OPERATOR = [ EQUAL | LIKE | BETWEEN ]
+# Note that the $uuid is used both in requestor name and hostname (subject)
+$test->runcmd_ok('search_cert', {
+    CERT_ATTRIBUTES => [
+        { KEY => 'meta_requestor', VALUE => "*$uuid*" }, # default operator is LIKE
+        { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
+    ],
+    PKI_REALM => "_ANY"
+}, "Search cert by attributes");
 
-#use Data::Dumper;
-#diag Dumper($test->get_msg);
-#cmp_bag $test->get_msg->{PARAMS}->{imported}, [
-#    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$all_ids
-#], "Correctly list imported certs";
-
+cmp_deeply $test->get_msg->{PARAMS}, [
+    superhashof({ SUBJECT => re(qr/$uuid/i) })
+], "Correct result";
 
 $dbdata->delete_all;
 
