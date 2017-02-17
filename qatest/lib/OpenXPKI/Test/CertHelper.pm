@@ -101,8 +101,7 @@ sub via_openssl {
 Class method (does not require instantiation) that creates a CSR and the
 certificate in OpenXPKI via workflows.
 
-    my $ch =
-    my $cert_id = OpenXPKI::Test::CertHelper-E<gt>via_workflow(
+    my $cert_info = OpenXPKI::Test::CertHelper-E<gt>via_workflow(
         tester => $test,                      # Instance of L<OpenXPKI::Test::More> (required)
         hostname => "myhost",                 # Hostname for certificate (I<Str>, required)
         hostname2 => [],                      # List of additional hostnames (I<ArrayRef[Str]>, optional)
@@ -111,6 +110,7 @@ certificate in OpenXPKI via workflows.
         requestor_name => "table",            # Name of person requesting cert (I<Str>, optional)
         requestor_email => "tom@table.local", #  Email of person requesting cert (I<Str>, optional)
     );
+    diag $cert_info->{identifier};
 
 Possible arguments are all attributes of L<OpenXPKI::Test::CertHelper::Workflow>.
 

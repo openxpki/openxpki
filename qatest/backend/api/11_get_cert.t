@@ -40,13 +40,13 @@ $test->connect_ok(
 
 # Create certificate
 use DateTime;
-my $cert_id = OpenXPKI::Test::CertHelper->via_workflow(
+my $cert_info = OpenXPKI::Test::CertHelper->via_workflow(
     tester => $test,
     hostname => "127.0.0.1",
 );
 
 # Fetch certificate - HASH Format
-$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_id, FORMAT => 'HASH' }, "Fetch certificate (HASH)");
+$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_info->{identifier}, FORMAT => 'HASH' }, "Fetch certificate (HASH)");
 my $params = $test->get_msg()->{PARAMS};
 
 cmp_deeply($params, superhashof({
@@ -95,7 +95,7 @@ diag "Certificate serial: $serial_f";
 
 # Fetch certificate - PEM Format
 my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
-$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_id, FORMAT => 'PEM' }, 'Fetch certificate (PEM)');
+$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_info->{identifier}, FORMAT => 'PEM' }, 'Fetch certificate (PEM)');
 my $pem = $test->get_msg()->{PARAMS};
 print $tmp $pem;
 close $tmp;
@@ -103,7 +103,7 @@ my $cmp_serial = `openssl x509 -in $tmp_name -inform PEM -serial`;
 like $cmp_serial, qr/$serial/i, "PEM matches serial $cmp_serial";
 
 # Fetch certificate - DER Format
-$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_id, FORMAT => 'DER' }, 'Fetch certificate (DER)');
+$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_info->{identifier}, FORMAT => 'DER' }, 'Fetch certificate (DER)');
 ($tmp, $tmp_name) = tempfile(UNLINK => 1);
 print $tmp $test->get_msg()->{PARAMS};
 close $tmp;
@@ -119,12 +119,12 @@ $test->is( $pem, $pem2, 'DER matches PEM' );
 TODO: {
     local $TODO = "TXT does not work (issue #185)";
 
-    ok scalar( $test->runcmd('get_cert', { IDENTIFIER => $cert_id, FORMAT => 'TXT' }) ), "Fetch certificate (TXT)";
+    ok scalar( $test->runcmd('get_cert', { IDENTIFIER => $cert_info->{identifier}, FORMAT => 'TXT' }) ), "Fetch certificate (TXT)";
     like $test->get_msg()->{PARAMS}, qr/$serial_f/i, "TXT matches serial";
 }
 
 # Fetch certificate - DBINFO Format
-$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_id, FORMAT => 'DBINFO' }, "Fetch certificate (DBINFO)");
+$test->runcmd_ok('get_cert', { IDENTIFIER => $cert_info->{identifier}, FORMAT => 'DBINFO' }, "Fetch certificate (DBINFO)");
 $params = $test->get_msg()->{PARAMS};
 cmp_deeply($params, superhashof({
     'AUTHORITY_KEY_IDENTIFIER'  => re(qr/^([[:alnum:]]{2}:)+[[:alnum:]]{2}$/), # '9A:1D:9E:0A:03:95:91:26:5C:42:5F:90:0C:2E:02:C1:6B:29:14:5C',

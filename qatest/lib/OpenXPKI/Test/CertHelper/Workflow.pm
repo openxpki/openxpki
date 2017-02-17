@@ -110,7 +110,8 @@ has notafter => (
 =head2 create_cert
 
 Runs a L<subtest|Test::More/subtest> that creates a certificate via workflow
-I<certificate_signing_request_v2> and returns the certificate identifier.
+I<certificate_signing_request_v2> and returns a HashRef with some certificate
+info.
 
 =cut
 sub create_cert {
@@ -199,7 +200,10 @@ sub create_cert {
         $test->state_is('SUCCESS');
     };
 
-    return $test->param('cert_identifier');
+    return {
+        identifier => $test->param('cert_identifier'),
+        req_key    => $test->param('csr_serial'),
+    };
 }
 
 __PACKAGE__->meta->make_immutable;

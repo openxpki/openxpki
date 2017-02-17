@@ -52,7 +52,7 @@ my @cert_serials = ();
 
 for my $certno (1..$certs_to_create) {
     # Create certificate
-    my $cert_identifier = OpenXPKI::Test::CertHelper->via_workflow(
+    my $cert_info = OpenXPKI::Test::CertHelper->via_workflow(
         tester          => $test,
         hostname        => "127.0.0.".(1+$certno*3),
         hostname2       => [ "127.0.0.".(2+$certno*3) , "127.0.0.".(3+$certno*3) ],
@@ -60,13 +60,13 @@ for my $certno (1..$certs_to_create) {
     );
 
     # Fetch certificate info as hash
-    $test->runcmd('get_cert', { IDENTIFIER => $cert_identifier, FORMAT => 'HASH' });
+    $test->runcmd('get_cert', { IDENTIFIER => $cert_info->{identifier}, FORMAT => 'HASH' });
 
     push @cert_serials, $test->get_msg()->{PARAMS}->{BODY}->{SERIAL_HEX};
 
     # Revoke certificate
     my $wfparam = {
-    	cert_identifier => $cert_identifier,
+        cert_identifier => $cert_info->{identifier},
     	reason_code => 'keyCompromise',
         comment => 'Automated Test',
         invalidity_time => time(),

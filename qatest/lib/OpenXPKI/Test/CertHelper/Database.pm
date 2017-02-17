@@ -102,7 +102,11 @@ Inserts all test certificates into the database.
 sub insert_all {
     my ($self) = @_;
     $self->dbi->start_txn;
-    $self->dbi->insert(into => "certificate", values => $self->cert($_)->db) for @{ $self->all_cert_names };
+    $self->dbi->merge(
+        into => "certificate",
+        set => $self->cert($_)->db,
+        where => { subject_key_identifier => $self->cert($_)->id },
+    ) for @{ $self->all_cert_names };
     $self->dbi->commit;
 }
 
