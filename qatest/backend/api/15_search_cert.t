@@ -36,7 +36,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 44 );
+$test->plan( tests => 50 );
 
 $test->connect_ok(
     user => $cfg->{operator}{name},
@@ -54,7 +54,6 @@ my $dbdata = OpenXPKI::Test::CertHelper->via_database;
 
 CERT_SERIAL                 Int|Str: decimal serial or hex (starting with "0x")
 PKI_REALM                   Str: default is the sessions realm, _any for global search
-ORDER                       Str: column to order by (default: cert_key) --> remove "CERTIFICATE."
 STATUS                      Str: cert status, special status "EXPIRED"
 IDENTIFIER                  Str
 ISSUER_IDENTIFIER           Str
@@ -72,10 +71,9 @@ NOTBEFORE/NOTAFTER          Int|HashRef: with SCALAR searches "other side" of va
 
 CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)
 
+ORDER           Str: column to order by (default: cert_key) --> remove "CERTIFICATE."
 LIMIT           Int: limit results
 START           Int: offset for results
-LAST            Bool: show only last found cert
-FIRST           Bool: show only first found cert
 REVERSE         Bool: Reverse ordering
 ENTITY_ONLY     Bool: show only certificates issued by this ca (where CSR_SERIAL is set)
 
@@ -98,14 +96,19 @@ ENTITY_ONLY     Bool: show only certificates issued by this ca (where CSR_SERIAL
 
 # Checks if the given DB result ArrayRef contains the test certificates with
 # the given internal test certificate names.
+# If the last parameter is "ORDERED" then the order of the results will be
+# considered, otherwise not.
 sub search_cert_ok {
     my ($message, $conditions, @expected_names) = @_;
 
-    $test->runcmd_ok('search_cert', $conditions, "Search cert $message");
+    my $val;
+    # Only extract last element if it equals "ORDERED" (otherwise put it back)
+    my $respect_order = (($val = pop @expected_names) eq "ORDERED") ? 1 : push(@expected_names, $val);
+    my @hashes = map { superhashof({ SUBJECT_KEY_IDENTIFIER => $dbdata->cert($_)->id }) } @expected_names;
 
-    cmp_bag $test->get_msg->{PARAMS}, [
-        map { superhashof({ SUBJECT_KEY_IDENTIFIER => $dbdata->cert($_)->id }) } @expected_names
-    ], "Correct result";
+    $test->runcmd_ok('search_cert', $conditions, "Search cert $message")
+        or die Dumper($test->get_msg);
+    cmp_bag $test->get_msg->{PARAMS}, ($respect_order ? \@hashes : bag(@hashes)), "Correct result";
 }
 
 $test->runcmd_ok('search_cert', {
@@ -197,6 +200,22 @@ search_cert_ok "by validity date", {
     PKI_REALM => "_ANY"
 }, qw( expired_root expired_signer expired_client );
 
+search_cert_ok "and limit results", {
+    ORDER => "CERTIFICATE.SUBJECT",
+    REVERSE => 0,
+    LIMIT => 1,
+    PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm},
+}, qw( acme_client );
+
+# LIMIT and START
+search_cert_ok "limit results and use offset", {
+    ORDER => "CERTIFICATE.SUBJECT",
+    REVERSE => 0,
+    LIMIT => 2,
+    START => 1,
+    PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm},
+}, qw( acme_root acme_signer ), "ORDERED";
+
 # By CSR serial
 my $uuid = Data::UUID->new->create_str;
 my $cert_info = OpenXPKI::Test::CertHelper->via_workflow(
@@ -253,6 +272,17 @@ cmp_deeply $test->get_msg->{PARAMS}, [
     superhashof({ SUBJECT => re(qr/$uuid/i) })
 ], "Correct result";
 
-$dbdata->delete_all;
+# ENTITY_ONLY     Bool: show only certificates issued by this ca (where CSR_SERIAL is set)
+$test->runcmd_ok('search_cert', {
+    ENTITY_ONLY => 1,
+    PKI_REALM => "_ANY",
+}, "Search cert only from this CA entity");
 
+cmp_deeply $test->get_msg->{PARAMS}, array_each(
+    superhashof({ CSR_SERIAL => re(qr/^\d+$/) })
+), "Correct result";
+
+
+
+$dbdata->delete_all; # only deletes those from OpenXPKI::Test::CertHelper::Database
 $test->disconnect;
