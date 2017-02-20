@@ -736,9 +736,6 @@ msgstr "Descrizione Commento"
 msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
 msgstr "Paese"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-msgstr "Token Datasafe"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr "Componente Dominio"
 
@@ -1150,10 +1147,15 @@ msgstr "La richiesta PKCS10 non può essere letta"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED"
 msgstr "Fallita convalida dell’espressione data"
 
-msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
-msgstr "La richiesta di tipo PKCS10 non è impostata correttamente"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR"
+msgstr "La richiesta PKCS10 non può essere letta"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR"
+msgstr "La richiesta PKCS10 non può essere letta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR"
 msgstr "La richiesta PKCS10 non può essere letta"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
@@ -3199,11 +3201,17 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "Password"
 
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+#~ msgstr "Token Datasafe"
+
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
+#~ msgstr "La richiesta di tipo PKCS10 non è impostata correttamente"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "Approva Richiesta"
