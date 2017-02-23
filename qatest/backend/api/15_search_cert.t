@@ -36,7 +36,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 50 );
+$test->plan( tests => 54 );
 
 $test->connect_ok(
     user => $cfg->{operator}{name},
@@ -240,19 +240,25 @@ cmp_bag $test->get_msg->{PARAMS}, [
 $test->runcmd_ok('search_cert', {
     IDENTIFIER => $cert_info->{identifier},
     PROFILE => $cert_info->{profile},
-}, "Search cert by profile");
+}, "Search cert by profile") or diag Dumper($test->get_msg);
 
 cmp_bag $test->get_msg->{PARAMS}, [
     superhashof({ IDENTIFIER => $cert_info->{identifier} })
 ], "Correct result";
 
 # By NOTBEFORE/NOTAFTER (Int: searches "other side" of validity)
-search_cert_ok "that is/was valid before given date", {
+search_cert_ok "whose validity period started before given date (NOTBEFORE < x)", {
     NOTBEFORE => $dbdata->cert("expired_root")->db->{notafter} + 100,
     PKI_REALM => "_ANY"
 }, qw( expired_root expired_signer expired_client );
 
-search_cert_ok "that is will be valid after given date", {
+search_cert_ok "that was not yet valid at given date (NOTBEFORE > x)", {
+    # TODO #legacydb Using old DB layer syntax in "search_cert"
+    NOTBEFORE => { OPERATOR => "GREATER_THAN", VALUE => $dbdata->cert("expired_root")->db->{notbefore} - 100 },
+    PKI_REALM => $dbdata->cert("expired_root")->db->{pki_realm}
+}, qw( expired_root expired_signer expired_client );
+
+search_cert_ok "whose validity period ends after given date (NOTAFTER < x)", {
     NOTAFTER => $dbdata->cert("acme_root")->db->{notbefore} + 100,
     PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm}
 }, qw( acme_root acme_signer acme_client );
@@ -271,6 +277,20 @@ $test->runcmd_ok('search_cert', {
 cmp_deeply $test->get_msg->{PARAMS}, [
     superhashof({ SUBJECT => re(qr/$uuid/i) })
 ], "Correct result";
+
+# Test NOT_EQUAL operator
+$test->runcmd_ok('search_cert', {
+    CERT_ATTRIBUTES => [
+        { KEY => 'meta_requestor', VALUE => "Till $uuid", OPERATOR => 'NOT_EQUAL' },
+    ],
+    PKI_REALM => "_ANY"
+}, "Search cert by attributes");
+
+cmp_deeply $test->get_msg->{PARAMS}, array_each(
+    # Make sure the UUID does NOT match
+    superhashof({ SUBJECT => code(sub { (shift !~ /$uuid/i) or (0, "UUID matched") } ) })
+), "Correct result";
+
 
 # ENTITY_ONLY     Bool: show only certificates issued by this ca (where CSR_SERIAL is set)
 $test->runcmd_ok('search_cert', {

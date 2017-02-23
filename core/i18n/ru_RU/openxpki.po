@@ -5957,10 +5957,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_CERT_NOT_AVAILABLE"
 #~ msgstr "SPKAC строка пуста."
 
