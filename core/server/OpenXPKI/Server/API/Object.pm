@@ -921,7 +921,10 @@ sub search_cert {
     my $params = $self->__search_cert_db_query( $args );
     ##! 1: 'database search arguments: ' . Dumper $params
 
-    my $result = CTX('dbi')->select(%{$params})->fetchall_arrayref({});
+    my $result = CTX('dbi')->select(
+        %{$params},
+        columns => [ 'certificate.*' ],
+    )->fetchall_arrayref({});
     ##! 1: scalar(@$result)." certificates found"
     ##! 16: 'Result ' . Dumper $result
 
@@ -943,19 +946,14 @@ sub search_cert_count {
     my $params = $self->__search_cert_db_query( $args );
     ##! 1: 'database search arguments: ' . Dumper $params
 
-    $params->{COLUMNS} = [{ COLUMN   => 'CERTIFICATE.IDENTIFIER', AGGREGATE => 'COUNT' }];
+    my $result = CTX('dbi')->select(
+        %{$params},
+        columns => [ 'COUNT(certificate.identifier)|amount' ],
+    )->fetchall_arrayref({});
+    ##! 16: 'Result ' . Dumper $result
 
-    my $result = CTX('dbi_backend')->select(%{$params});
-
-    unless (defined $result and ref $result eq 'ARRAY' and scalar @{$result} == 1) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_COUNT_SELECT_RESULT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
-        );
-    }
-
-    return $result->[0]->{'CERTIFICATE.IDENTIFIER'};
-
+    ##! 1: "finished"
+    return $result->[0]->{amount};
 }
 
 sub __search_cert_db_query {
@@ -964,7 +962,6 @@ sub __search_cert_db_query {
 
     my $where = {};
     my $params = {
-        columns => [ 'certificate.*' ],
         where => $where,
     };
 
