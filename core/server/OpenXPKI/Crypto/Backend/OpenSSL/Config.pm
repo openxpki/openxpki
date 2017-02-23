@@ -682,9 +682,16 @@ sub __get_extensions
         }
     }
     
-    foreach my $oid(sort $profile->get_oid_extensions()) {        
-        my $string =  join ("", @{$profile->get_extension($oid)});        
-        $config .= "$oid=$string\n";        
+    foreach my $oid(sort $profile->get_oid_extensions()) {
+
+        # Single line OIDs have only one element in the array
+        # Additional lines define a sequence
+        my @val = @{$profile->get_extension($oid)};
+        my $string = shift @val;
+        $config .= "$oid=$string\n";
+
+        # if there are lines left, it goes into the section part
+        $sections .= join ("\n", @val)."\n\n";
     }
     
     $config .= "\n".$sections;
