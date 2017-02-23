@@ -16,6 +16,7 @@ OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
+OpenXPKI/MooseParams.pm
 OpenXPKI/Template.pm
 OpenXPKI/Template/Plugin/Certificate.pm
 OpenXPKI/Template/Plugin/PKCS10.pm
@@ -187,10 +188,10 @@ OpenXPKI/Server/DBI/Driver/SQLite.pm
 ## new database interface of the server
 
 OpenXPKI/Server/Database.pm
+OpenXPKI/Server/Database/Legacy.pm
 OpenXPKI/Server/Database/Query.pm
 OpenXPKI/Server/Database/QueryBuilder.pm
 OpenXPKI/Server/Database/Driver/MySQL.pm
-OpenXPKI/Server/Database/Util.pm
 OpenXPKI/Server/Database/Driver/Oracle.pm
 OpenXPKI/Server/Database/Driver/PostgreSQL.pm
 OpenXPKI/Server/Database/Driver/DB2.pm
@@ -529,6 +530,7 @@ t/25_crypto/20_xs_pkcs10.t
 t/25_crypto/21_xs_spkac.t
 t/25_crypto/22_xs_x509.t
 t/25_crypto/23_xs_crl.t
+t/25_crypto/24_xs_ecdh.t
 t/25_crypto/30_object_header.t
 t/25_crypto/31_object_x509.t
 t/25_crypto/32_object_csr.t
@@ -554,10 +556,26 @@ t/30_dbi/02.t
 t/30_dbi/03.t
 t/30_dbi/04_quoting_bug.t
 t/30_dbi/30_log.t
+t/30_dbi/31_purge_applog.t
 t/30_dbi/70.t2
 t/30_dbi/99.t2
 t/30_dbi/common.pl
+t/30_dbi/log4perl.conf
 t/30_dbi/README
+
+t/31_database/01-base.t
+t/31_database/02-querybuilder.t
+t/31_database/03-autoincrement.t
+t/31_database/10-driver.t
+t/31_database/15-select.t
+t/31_database/17-update.t
+t/31_database/19-delete.t
+t/31_database/20-merge.t
+t/31_database/21-merge-clob.t
+t/31_database/21-transactions.t
+t/31_database/22-transactions-isolation.t
+t/31_database/DatabaseTest.pm
+t/31_database/log4perl.conf
 
 t/40_context/01.t
 t/40_context/02.t2
@@ -603,6 +621,7 @@ t/60_workflow/start.pl
 t/65_ui/10_transport_simple.t
 t/65_ui/20_serialization_simple.t
 t/65_ui/21_serialization_json.t
+t/65_ui/25_serialization_base64.t
 
 t/80_config_versioning/01.t2
 t/80_config_versioning/99_cleanup.t2
@@ -623,10 +642,12 @@ t/common/dbi.pl
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/handler.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/roles.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/stack.yaml
+t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/wfacl.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/crl/default.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/crl/testdummyca1.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/crypto.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/nice.yaml
+t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/notification.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/profile/I18N_OPENXPKI_PROFILE_OPENVPN_CLIENT.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/profile/I18N_OPENXPKI_PROFILE_TLS_SERVER.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/profile/I18N_OPENXPKI_PROFILE_USER.yaml
@@ -668,8 +689,6 @@ t/tests.mk
 
 # Helpers for workflow tests
 OpenXPKI/Tests.pm
-## New testing environment
-OpenXPKI/Test/More.pm
 
 # Control Scripts
 bin/openxpkiadm

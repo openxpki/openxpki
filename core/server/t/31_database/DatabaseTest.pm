@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use Test::Exception;
 use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-use MooseX::Params::Validate;
+use OpenXPKI::MooseParams;
 use Log::Log4perl;
 use Moose::Util::TypeConstraints;
 
@@ -91,7 +91,7 @@ has '_log' => (
 );
 
 sub set_dbi {
-    my ($self, %args) = validated_hash(\@_,   # MooseX::args::Validate
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         params => { isa => 'HashRef' },
     );
 
@@ -125,8 +125,7 @@ log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
 }
 
 sub run {
-    my $self = shift;
-    my ($name, $plan, $tests) = pos_validated_list(\@_,
+    my ($self, $name, $plan, $tests) = positional_args(\@_,
         { isa => 'Str'},
         { isa => 'Int'},
         { isa => 'CodeRef' },
@@ -174,7 +173,8 @@ sub run {
         $self->set_dbi(
             params => {
                 type => "MySQL",
-                host => "127.0.0.1", # if not specified, the driver tries socket connection
+                host => $ENV{OXI_TEST_DB_MYSQL_DBHOST}, # if not specified, the driver tries socket connection
+                port => $ENV{OXI_TEST_DB_MYSQL_DBPORT}, # if not specified, the driver tries socket connection
                 name => $ENV{OXI_TEST_DB_MYSQL_NAME},
                 user => $ENV{OXI_TEST_DB_MYSQL_USER},
                 passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},

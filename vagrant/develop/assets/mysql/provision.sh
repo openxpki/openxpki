@@ -21,7 +21,11 @@ trap '_exit $?' EXIT
 echo "OXI_TEST_DB_MYSQL_NAME=openxpki"     >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_USER=oxitest"      >> /etc/environment
 echo "OXI_TEST_DB_MYSQL_PASSWORD=openxpki" >> /etc/environment
-cat /etc/environment | while read def; do export $def; done
+echo "OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1"  >> /etc/environment
+echo "OXI_TEST_DB_MYSQL_DBPORT=3306"       >> /etc/environment
+echo "OXI_TEST_DB_MYSQL_DBUSER=root"       >> /etc/environment
+echo "OXI_TEST_DB_MYSQL_DBPASSWORD=root"   >> /etc/environment
+while read def; do export $def; done < /etc/environment
 
 #
 # Run Docker container
@@ -42,38 +46,11 @@ if [ $installed -eq 0 ]; then
 fi
 
 #
-# Wait for database initialization
-#
-echo "MySQL: waiting for DB in Docker container to initialize (max. 120 seconds)"
-sec=0; error=1
-while [ $error -ne 0 -a $sec -lt 60 ]; do
-    error=$(echo "quit" | mysql -h 127.0.0.1 -uroot -proot --connect_timeout=1 2>&1 | grep -c ERROR)
-    sec=$[$sec+1]
-    sleep 1
-done
-if [ $error -ne 0 ]; then
-    echo "It seems that the MySQL database was not started. Output:"
-    echo "quit" | mysql -h 127.0.0.1 -uroot -proot --connect_timeout=1
-    _exit 333
-fi
-
-#
 # Database setup
 #
 set -e
-echo "MySQL: setting up database (user + schema)"
-
-cat <<__SQL | mysql -h 127.0.0.1 -uroot -proot                        >$LOG 2>&1
-DROP database IF EXISTS $OXI_TEST_DB_MYSQL_NAME;
-CREATE database $OXI_TEST_DB_MYSQL_NAME CHARSET utf8;
-CREATE USER '$OXI_TEST_DB_MYSQL_USER'@'%' IDENTIFIED BY '$OXI_TEST_DB_MYSQL_PASSWORD';
-GRANT ALL ON $OXI_TEST_DB_MYSQL_NAME.* TO '$OXI_TEST_DB_MYSQL_USER'@'%';
-flush privileges;
-__SQL
-
-mysql -h 127.0.0.1 \
-      -u$OXI_TEST_DB_MYSQL_USER \
-      -p$OXI_TEST_DB_MYSQL_PASSWORD \
-      $OXI_TEST_DB_MYSQL_NAME \
-      < /code-repo/config/sql/schema-mysql.sql                        >$LOG 2>&1
+/code-repo/tools/scripts/mysql-wait-for-db.sh
+/code-repo/tools/scripts/mysql-create-db.sh
+/code-repo/tools/scripts/mysql-create-user.sh
+/code-repo/tools/scripts/mysql-create-schema.sh
 set +e

@@ -1,53 +1,71 @@
-## OpenXPKI::Server::Watchdog::WorkflowInstance.pm
-##
-## Written 2013 by Dieter Siebeck and Oliver Welter for the OpenXPKI project
-## Copyright (C) 2012-2013 by The OpenXPKI Project
-
+package OpenXPKI::Server::Watchdog::WorkflowInstance;
 
 =head1 NAME
 
-The workflow instance thread
+OpenXPKI::Server::Watchdog::WorkflowInstance - The workflow instance handler
 
 =head1 DESCRIPTION
 
-This class is responsible for waking up paused workflows. Its run-method is called from OpenXPKI::Server::Watchdog and
-recieves the db resultset as only argument. Immediately a child process will be created via fork() and _wake_up_workflow is called within the child.
+This class is responsible for waking up paused workflows. Its L</run> method is
+called from L<OpenXPKI::Server::Watchdog>. Immediately a child process will be
+created via C<fork()> and L</__wake_up_workflow> is called within the child.
 
-_wake_up_workflow reads all necessary infos from the resultset (representing one row from workflow table)
-the serialized session infos are imported in the current (watchdog's) session, so that the wqorkflow is executed within its original environment.
+L</__wake_up_workflow> imports the given serialized session infos into the
+current (watchdog's) session, so that the workflow is executed within its
+original environment.
 
-the last performed action is retrieved from workflow history, than executed again (via OpenXPKI::Server::API::Workflow)
+The last performed action is retrieved from workflow history, then executed
+again (via L<OpenXPKI::Server::API::Workflow>).
 
 =cut
 
-package OpenXPKI::Server::Watchdog::WorkflowInstance;
-use strict;
+use Moose;
+
 use English;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
+use OpenXPKI::MooseParams;
 
 use Data::Dumper;
 
-sub new {
-    my $that  = shift;
-    my $class = ref($that) || $that;
-    my $self  = {};
-    bless $self, $class;
-    return $self;
-}
+################################################################################
+# Attributes
+#
+
+# Constructor arguments
+
+has 'workflow_id' => (
+    is => 'rw',
+    isa => 'Str',
+    required => 1,
+);
+
+has 'workflow_type' => (
+    is => 'rw',
+    isa => 'Str',
+    required => 1,
+);
+
+has 'workflow_session' => (
+    is => 'rw',
+    isa => 'Str',
+    required => 1,
+);
+
+has 'pki_realm' => (
+    is => 'rw',
+    isa => 'Str',
+    required => 1,
+);
+
+################################################################################
+# Methods
+#
 
 sub run {
     my $self = shift;
-
-    my ($db_result) = @_;
-
-    my $wf_id = $db_result->{WORKFLOW_SERIAL};
-    unless ($wf_id) {
-        OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_ID_GIVEN' );
-    }
-
 
     my $pid;
     my $redo_count = 0;
@@ -85,110 +103,89 @@ sub run {
     if ( $pid != 0 ) {
     	##! 16: ' Workflow instance succesfully forked - I am the watchdog'
     	# parent here - noop
-    } else {
-
-        ##! 16: ' Workflow instance succesfully forked - I am the workflow'
-        # We need to unset the child reaper (waitpid) as the universal waitpid
-        # causes problems with Proc::SafeExec
-        $SIG{CHLD} = 'DEFAULT';
-
-        # Re-seed Perl random number generator
-        srand(time ^ $PROCESS_ID);
-
-        # append fork info to process name
-        $0 = sprintf('openxpkid (%s) workflow: id %d', (CTX('config')->get('system.server.name') || 'main'), $wf_id);
-
-
-        # the wf instance child processs should ALWAYS exit properly and not
-        # let its exceptions bubble up to Watchdog
-        eval { $self->__wake_up_workflow($db_result); };
-        my $error_msg;
-        if ( my $exc = OpenXPKI::Exception->caught() ) {
-
-            $exc->show_trace(1);
-            $error_msg = "OpenXPKI::Server::Watchdog::WorkflowInstance: Exception caught while executing _wake_up_workflow: $exc";
-
-        } elsif ($EVAL_ERROR) {
-            $error_msg = "OpenXPKI::Server::Watchdog::WorkflowInstance: Fatal error while executing _wake_up_workflow:" . $EVAL_ERROR;
-        }
-        if ($error_msg) {
-            CTX('log')->log(
-                MESSAGE  => $error_msg,
-                PRIORITY => "fatal",
-                FACILITY => "workflow"
-            );
-        }
-        #ALWAYS exit child process
-        exit;
+    	return;
     }
+
+    #
+    # Child process from here on
+    #
+
+    ##! 16: ' Workflow instance succesfully forked - I am the workflow'
+    # We need to unset the child reaper (waitpid) as the universal waitpid
+    # causes problems with Proc::SafeExec
+    $SIG{CHLD} = 'DEFAULT';
+
+    # Re-seed Perl random number generator
+    srand(time ^ $PROCESS_ID);
+
+    # append fork info to process name
+    $0 = sprintf('openxpkid (%s) workflow: id %d', (CTX('config')->get('system.server.name') || 'main'), $self->workflow_id);
+
+    # the wf instance child processs should ALWAYS exit properly and not
+    # let its exceptions bubble up to Watchdog
+    eval { $self->__wake_up_workflow; };
+    my $error_msg;
+    if ( my $exc = OpenXPKI::Exception->caught() ) {
+        $exc->show_trace(1);
+        $error_msg = "OpenXPKI::Server::Watchdog::WorkflowInstance: Exception caught while executing _wake_up_workflow: $exc";
+    }
+    elsif ($EVAL_ERROR) {
+        $error_msg = "OpenXPKI::Server::Watchdog::WorkflowInstance: Fatal error while executing _wake_up_workflow:" . $EVAL_ERROR;
+    }
+    if ($error_msg) {
+        CTX('log')->log(
+            MESSAGE  => $error_msg,
+            PRIORITY => "fatal",
+            FACILITY => "workflow"
+        );
+    }
+    # ALWAYS exit child process
+    exit;
 }
 
 
 =head1 __wake_up_workflow
 
-Re-Instantiate the workflow and re-run the paused activity
+Re-instantiates the workflow and re-runs the paused activity.
 
 =cut
 
 sub __wake_up_workflow {
     my $self = shift;
-    my ($db_result) = @_;
 
     $self->__check_session();
 
-    my $wf_id   = $db_result->{WORKFLOW_SERIAL};
-    my $wf_type = $db_result->{WORKFLOW_TYPE};
-    my $pki_realm = $db_result->{PKI_REALM};
-    my $session_info = $db_result->{WORKFLOW_SESSION};
-    
-    unless ($wf_id) {
-        OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_ID_GIVEN' );
-    }
-    unless ($wf_type) {
-        OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_WFTYPE_GIVEN' );
-    }
-    unless ($pki_realm) {
-        OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_PKI_REALM_GIVEN' );
-    }
-    unless ($session_info) {
-        OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_NO_SESSION_INFO_GIVEN' );
-    }
+    CTX('session')->set_pki_realm($self->pki_realm);
+    CTX('session')->import_serialized_info($self->workflow_session);
 
-    CTX('session')->set_pki_realm($pki_realm);
-
-    CTX('session')->import_serialized_info($session_info);
-
-    my $wf_info = CTX('api')->wakeup_workflow({ WORKFLOW => $wf_type, ID => $wf_id });
-    
+    my $wf_info = CTX('api')->wakeup_workflow({
+        WORKFLOW => $self->workflow_type,
+        ID => $self->workflow_id
+    });
     ##! 16: 'wf info after wake up: ' .Dumper( $wf_info )
-
 }
 
 =head2 __check_session
 
-Make sure that the session context is set
+Returns the session from the context (if existing) or creates a new one.
 
 =cut
 
 sub __check_session {
-
     my $self = shift;
+
     my $session;
-    eval{
-       $session = CTX('session');
-    };
-    if($session ){
-        return $session;
-    }
+    eval { $session = CTX('session') };
+    return $session if $session;
+
     ##! 4: "create new session"
     $session = OpenXPKI::Server::Session->new({
-                   DIRECTORY => CTX('config')->get("system.server.session.directory"),
-                   LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
-   });
-   OpenXPKI::Server::Context::setcontext({'session' => $session});
-   ##! 4: sprintf(" session %s created" , $session->get_id())
-   return $session;
-
+        DIRECTORY => CTX('config')->get("system.server.session.directory"),
+        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
+    });
+    OpenXPKI::Server::Context::setcontext({'session' => $session});
+    ##! 4: sprintf(" session %s created" , $session->get_id())
+    return $session;
 }
 
 1;
