@@ -368,7 +368,7 @@ WriteMakefile(
         ## 'RT::Client::REST'              => '0', CURRENTLY OPTIONAL
         'SOAP::Lite'                    => 0,
         'SQL::Abstract::More'           => '1.28',      # for OpenXPKI::Server::Database
-        'Sub::Exporter'                 => 0,           # for OpenXPKI::Server::Database::Util
+        'Sub::Exporter'                 => 0,           # for OpenXPKI::MooseParams
         'Sys::SigAction'                => '0.06',
         'Template'                      => '2.15',
         'Test::More'                    => '0.98',

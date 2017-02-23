@@ -22,7 +22,7 @@ trap '_exit $?' EXIT
 echo "OXI_TEST_DB_ORACLE_NAME=XE"           >> /etc/environment
 echo "OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/environment
 echo "OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/environment
-cat /etc/environment | while read def; do export $def; done
+while read def; do export $def; done < /etc/environment
 
 #
 # Check if installation package exists

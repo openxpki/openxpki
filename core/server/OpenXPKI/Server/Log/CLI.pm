@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Log::CLI.pm 
+## OpenXPKI::Server::Log::CLI.pm
 ##
 ## Logger class to be used in CLI scripts, logs to stdout
 ## Written in 2013 by Olvier Welter for the OpenXPKI Project
@@ -19,12 +19,12 @@ sub new {
     my $class = ref($that) || $that;
 
     my $self = {};
-    
+
     Log::Log4perl->easy_init( $OpenXPKI::Server::Log::CLI::LEVEL || $ERROR );
 
     bless $self, $class;
 
-    $self->{logger} = Log::Log4perl->get_logger();       
+    $self->{logger} = Log::Log4perl->get_logger();
 
     return $self;
 }
@@ -40,13 +40,27 @@ sub log
 {
     my $self = shift;
     my $keys = { @_ };
-   
+
     if ($keys->{PRIORITY} =~ / \A (debug|info|warn|error|fatal) \z /i) {
-        my $prio = $1;        
+        my $prio = $1;
         $self->{logger}->$prio( $keys->{MESSAGE} );
     }
 
     return 1;
+}
+
+# install wrapper / helper subs
+no strict 'refs';
+for my $prio (qw/ debug info warn error fatal /) {
+    *{$prio} = sub {
+        my ($self, $message, $facility) = @_;
+        $self->log(
+            MESSAGE  => $message,
+            PRIORITY => $prio,
+            CALLERLEVEL => 1,
+            FACILITY => $facility // "monitor",
+        );
+    };
 }
 
 1;

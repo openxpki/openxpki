@@ -1,0 +1,49 @@
+Original output of "openxpkiadm certificate import ..."
+
+    Successfully imported certificate into database:
+      Subject:    CN=Root CA,OU=Test CA,DC=OpenXPKI,DC=ORG
+      Issuer:     CN=Root CA,OU=Test CA,DC=OpenXPKI,DC=ORG
+      Identifier: iBAq6FOll0nqgIvHx3ocq2TZg94
+      Realm:      none
+
+    Successfully imported certificate into database:
+      Subject:    CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG
+      Issuer:     CN=Root CA,OU=Test CA,DC=OpenXPKI,DC=ORG
+      Identifier: mIqp8XGxjquD0MtxsiFhv7JFfGk
+      Realm:      ca-one
+
+    Successfully created alias in realm ca-one:
+      Alias     : ca-one-signer-1
+      Identifier: mIqp8XGxjquD0MtxsiFhv7JFfGk
+      NotBefore : 2017-01-26 22:29:06
+      NotAfter  : 2106-02-07 06:28:15
+
+    Creating alias for root ca:
+      Alias     : root-1
+      Identifier: iBAq6FOll0nqgIvHx3ocq2TZg94
+      NotBefore : 2017-01-26 22:29:06
+      NotAfter  : 2106-02-07 06:28:15
+
+    Successfully imported certificate into database:
+      Subject:    CN=DataVault,DC=OpenXPKI Internal
+      Issuer:     CN=DataVault,DC=OpenXPKI Internal
+      Identifier: IPkm4dSkDn1oPuWIRZjIxvvpsno
+      Realm:      ca-one
+
+    Successfully created alias in realm ca-one:
+      Alias     : ca-one-vault-1
+      Identifier: IPkm4dSkDn1oPuWIRZjIxvvpsno
+      NotBefore : 2017-01-26 22:29:06
+      NotAfter  : 2106-02-07 06:28:15
+
+    Successfully imported certificate into database:
+      Subject:    CN=SCEP,OU=Test CA,DC=OpenXPKI,DC=ORG
+      Issuer:     CN=Root CA,OU=Test CA,DC=OpenXPKI,DC=ORG
+      Identifier: NZA-k3-yaMBQdsiAkbcfAeo8vQo
+      Realm:      ca-one
+
+    Successfully created alias in realm ca-one:
+      Alias     : ca-one-scep-1
+      Identifier: NZA-k3-yaMBQdsiAkbcfAeo8vQo
+      NotBefore : 2017-01-26 22:29:06
+      NotAfter  : 2106-02-07 06:28:15

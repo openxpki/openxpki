@@ -22,7 +22,7 @@ SQLITE_PATH=$(mktemp)
 chmod 0666 $SQLITE_PATH
 
 echo "OXI_TEST_DB_SQLITE_NAME=$SQLITE_PATH" >> /etc/environment
-cat /etc/environment | while read def; do export $def; done
+while read def; do export $def; done < /etc/environment
 
 #
 # Install SQLite client (sqlite3)
