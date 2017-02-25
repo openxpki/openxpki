@@ -1,9 +1,11 @@
 package OpenXPKI::Server::Database::Driver::SQLite;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
-with 'OpenXPKI::Server::Database::Role::MergeEmulation';
-with 'OpenXPKI::Server::Database::Role::Driver';
+with qw(
+    OpenXPKI::Server::Database::Role::SequenceEmulation
+    OpenXPKI::Server::Database::Role::MergeEmulation
+    OpenXPKI::Server::Database::Role::Driver
+);
 
 =head1 Name
 

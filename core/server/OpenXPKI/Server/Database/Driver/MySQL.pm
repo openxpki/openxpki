@@ -1,9 +1,11 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
-with 'OpenXPKI::Server::Database::Role::MergeSupport';
-with 'OpenXPKI::Server::Database::Role::Driver';
+with qw(
+    OpenXPKI::Server::Database::Role::SequenceEmulation
+    OpenXPKI::Server::Database::Role::MergeSupport
+    OpenXPKI::Server::Database::Role::Driver
+);
 
 =head1 Name
 
