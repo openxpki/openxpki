@@ -41,6 +41,25 @@ sub sqlam_params {
 }
 
 ################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
+
+sub sequence_create_query {
+    my ($self, $dbi, $seq) = @_;
+    return OpenXPKI::Server::Database::Query->new(
+        string => "CREATE SEQUENCE $seq START WITH 0 INCREMENT BY 1 MINVALUE 0 NO MAXVALUE ORDER",
+    );
+}
+
+sub table_drop_query {
+    my ($self, $dbi, $table) = @_;
+    # TODO For DB2 check if table exists before dropping to avoid errors
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP TABLE $table",
+    );
+}
+
+################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceSupport
 #
 

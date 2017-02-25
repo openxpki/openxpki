@@ -385,6 +385,29 @@ sub next_id {
     return $id->bstr();
 }
 
+# Create a new sequence
+sub create_sequence {
+    my ($self, $table) = @_;
+    my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
+    my $query = $self->driver->sequence_create_query($self, $seq_table);
+    return $self->run($query, 0);
+}
+
+# Drop a sequence
+sub drop_sequence {
+    my ($self, $table) = @_;
+    my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
+    my $query = $self->driver->sequence_drop_query($self, $seq_table);
+    return $self->run($query, 0);
+}
+
+# Drop a table
+sub drop_table {
+    my ($self, $table) = @_;
+    my $query = $self->driver->table_drop_query($self, $self->query_builder->_add_namespace_to($table));
+    return $self->run($query, 0);
+}
+
 sub start_txn {
     my $self = shift;
     if ($self->in_txn) {
@@ -551,9 +574,27 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 Inserts rows into the database and returns the number of affected rows.
 
-Please note that C<NULL> values will be converted to Perl C<undef>.
+    $db->insert(
+        into => "certificate",
+        values => {
+            identifier => $id,
+            cert_key => $key,
+            ...
+        }
+    );
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
+Throws an L<OpenXPKI::Exception> if there are errors in the query or during
+it's execution.
+
+Named parameters:
+
+=over
+
+=item * B<into> - Table name (I<Str>, required)
+
+=item * B<values> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=back
 
 =head2 update
 

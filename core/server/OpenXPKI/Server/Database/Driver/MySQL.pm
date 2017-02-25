@@ -55,6 +55,17 @@ sub sqlam_params {
 }
 
 ################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
+
+sub table_drop_query {
+    my ($self, $dbi, $table) = @_;
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP TABLE IF EXISTS $table",
+    );
+}
+
+################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceEmulation
 #
 
