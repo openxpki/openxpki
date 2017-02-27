@@ -15,6 +15,7 @@ use OpenXPKI::Server::Database::Query;
 #
 requires 'last_auto_id';   # String: SQL query to fetch NEXTVAL from sequence
 requires 'table_drop_query';
+requires 'sql_autoinc_column';
 
 ################################################################################
 # Methods
@@ -24,8 +25,9 @@ requires 'table_drop_query';
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
     ## my $info = $dbi->dbh->type_info( [ SQL_SMALLINT, SQL_INTEGER, SQL_DECIMAL ] ); # Does not work for SQlite
+    my $autoinc = $self->sql_autoinc_column; # implemented by driver class
     return OpenXPKI::Server::Database::Query->new(
-        string => "CREATE TABLE $seq (seq_number BIGINT NOT NULL, dummy SMALLINT DEFAULT NULL)",
+        string => "CREATE TABLE $seq (seq_number $autoinc, dummy SMALLINT DEFAULT NULL)",
     );
 }
 

@@ -59,6 +59,8 @@ sub table_drop_query {
 # required by OpenXPKI::Server::Database::Role::SequenceEmulation
 #
 
+sub sql_autoinc_column { return "INTEGER PRIMARY KEY AUTOINCREMENT" }
+
 sub last_auto_id {
     my ($self, $dbi) = @_;
     my $id = $dbi->dbh->func("last_insert_rowid")
