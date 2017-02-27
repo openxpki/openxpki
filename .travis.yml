@@ -4,14 +4,14 @@ language: generic
 # Ubuntu 14.04 "Trusty"
 dist: trusty
 # Run in Docker container instead of VM - currently (2016-12-14) beta for "trusty"
-sudo: false
+sudo: required
 
 env:
     global:
         - OXI_TEST_DB_MYSQL_NAME=openxpki
         - OXI_TEST_DB_MYSQL_USER=openxpki
         - OXI_TEST_DB_MYSQL_PASSWORD=openxpki
-        - OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1
+        - OXI_TEST_DB_MYSQL_DBHOST=localhost
         - OXI_TEST_DB_MYSQL_DBPORT=3306
         - OXI_TEST_DB_MYSQL_DBUSER=root
         - OXI_TEST_DB_MYSQL_DBPASSWORD=
@@ -28,20 +28,15 @@ cache:
 addons:
   apt:
     packages:
+    - libmysqlclient-dev
     - openssl
     - libssl-dev
-    - libmysqlclient-dev
     - pkg-config
+  mariadb: '10.1'
 
 #
 # Service setup
 #
-
-# "MySQL is started by default [... for Docker containers]."
-# "You could remove the `services: mysql` part [...] without any functional change."
-# (according to Joep van Delft from TravisCI)
-##services:
-##    - mysql
 
 before_install:
     - ./tools/scripts/mysql-wait-for-db.sh
