@@ -18,6 +18,11 @@ use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;
 use SQL::Abstract::More;
+use Moose::Exporter;
+
+# Export AUTO_ID
+Moose::Exporter->setup_import_methods(with_meta => [ 'AUTO_ID' ]);
+sub AUTO_ID { return bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT" }
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
 # if ($params{TYPE} eq "SQLite") {
@@ -321,8 +326,18 @@ sub select_one {
 # INSERT
 # Returns: DBI statement handle
 sub insert {
-    my $self = shift;
-    my $query = $self->query_builder->insert(@_);
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        into     => { isa => 'Str' },
+        values   => { isa => 'HashRef' },
+    );
+
+    # Replace AUTO_ID with value of next_id()
+    for (keys %{ $params{values} }) {
+        $params{values}->{$_} = $self->next_id($params{into})
+            if (ref $params{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT");
+    }
+
+    my $query = $self->query_builder->insert(%params);
     return $self->run($query, 1); # 1 = return number of affected rows
 }
 
@@ -577,11 +592,15 @@ Inserts rows into the database and returns the number of affected rows.
     $db->insert(
         into => "certificate",
         values => {
-            identifier => $id,
+            identifier => AUTO_ID, # use the sequence associated with this table
             cert_key => $key,
             ...
         }
     );
+
+To automatically set a primary key to the next serial number (i.e. sequence
+associated with this table) set it to C<AUTO_ID>. C<AUTO_ID> is a function that
+is exported by C<OpenXPKI::Server::Database>.
 
 Throws an L<OpenXPKI::Exception> if there are errors in the query or during
 it's execution.
@@ -592,7 +611,8 @@ Named parameters:
 
 =item * B<into> - Table name (I<Str>, required)
 
-=item * B<values> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+=item * B<values> - Hash with column name / value pairs. Please note that
+C<undef> is interpreted as C<NULL> (I<HashRef>, required).
 
 =back
 
