@@ -15,8 +15,6 @@ env:
         - OXI_TEST_DB_MYSQL_DBPORT=3306
         - OXI_TEST_DB_MYSQL_DBUSER=root
         - OXI_TEST_DB_MYSQL_DBPASSWORD=
-        # Config::Versioned reads USER env variable
-        - USER=dummy
 
 cache:
     directories:
@@ -60,6 +58,41 @@ install:
 script:
     - which perl
     - perl -v
-    - cd core/server
+# Compilation
+    - pushd core/server
+    - sed -ri 's/^(WriteMakefile.*)/\1\nMAN1PODS=>{},\nMAN3PODS=>{},/' Makefile.PL
     - perl Makefile.PL
+    - make
+# Unit tests
     - make test
+# Installation
+    - make install
+    - popd
+# Configuration
+    - 'export TRAVIS_USER=$(whoami)'
+    - 'export TRAVIS_USERGROUP=$(getent group $TRAVIS_USER | cut -d: -f1)'
+    - sudo echo "$TRAVIS_USER / $TRAVIS_USERGROUP"
+    - sudo mkdir -p              /var/openxpki/session
+    - sudo chown -R $TRAVIS_USER /var/openxpki
+    - sudo mkdir -p              /var/log/openxpki
+    - sudo chown -R $TRAVIS_USER /var/log/openxpki
+    - sudo cp -R ./config/openxpki /etc
+    - sudo sed -ri 's/^(user:\s+)\S+/\1'$TRAVIS_USER'/'       /etc/openxpki/config.d/system/server.yaml
+    - sudo sed -ri 's/^(group:\s+)\S+/\1'$TRAVIS_USERGROUP'/' /etc/openxpki/config.d/system/server.yaml
+    - sudo sed -ri 's/^(pid_file:\s+)\S+/\1\/var\/openxpki\/openxpkid.pid/' /etc/openxpki/config.d/system/server.yaml
+    - sudo cat /etc/openxpki/config.d/system/server.yaml
+    - sudo ./tools/scripts/mysql-oxi-config.sh
+    - sudo chown -R $(whoami) /etc/openxpki
+# Database re-init and sample config (CA certificates etc.)
+    - ./tools/scripts/mysql-create-db.sh
+    - ./tools/scripts/mysql-create-schema.sh
+    - ./tools/testdata/insert-test-certificates.sh
+# Start OpenXPKI (is in PATH)
+    - openxpkictl start || cat /var/log/openxpki/*
+# QA tests
+    - pushd ./qatest/backend/nice/  && prove -q .
+    - popd
+    - pushd ./qatest/backend/api/   && prove -q .
+    - popd
+    - pushd ./qatest/backend/webui/ && prove -q .
+    - popd
