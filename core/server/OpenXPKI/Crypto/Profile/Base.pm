@@ -276,11 +276,12 @@ sub load_extension
 
             # Special case, Sequences needs to be written to a new section
             if ($attr->{encoding} eq 'SEQUENCE') {
-                my $section = 'oid_section_'.$name;
-                $section =~ s/\./_/g;
-                @values = ( 'ASN1:SEQUENCE:'.$section, "[ $section ]" );
-                my @section = split /\r?\n/g, $attr->{value};
-                push @values, @section;
+                
+                $self->set_oid_extension_sequence(
+                    NAME => $name,
+                    CRITICAL => $attr->{critical} ? 'true' : 'false',
+                    VALUES   => $attr->{value}
+                );
 
             } else {
 
@@ -295,10 +296,11 @@ sub load_extension
                 }
                 $val .= $attr->{value};
                 @values = ( $val );
+            
+                $self->set_extension(NAME => $name,
+                    CRITICAL => $attr->{critical} ? 'true' : 'false',
+                    VALUES   => [@values]);
             }
-            $self->set_extension (NAME     => $name,
-                                  CRITICAL => $attr->{critical} ? 'true' : 'false',
-                                  VALUES   => [@values]);
         }
     }
     elsif ($ext eq "netscape.comment")
@@ -362,6 +364,8 @@ sub set_extension
     my $name     = $keys->{NAME};
     my $critical = $keys->{CRITICAL};
     my $value    = $keys->{VALUES};
+    my $force    = $keys->{FORCE};
+
 
     if (! defined $name) {
 	OpenXPKI::Exception->throw(
@@ -369,8 +373,18 @@ sub set_extension
 	    );
     }
 
+    if ($self->{PROFILE}->{EXTENSIONS}->{$name}) {
+        if (!$force) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_ALREADY_SET",
+                params => { NAME => $name }
+            );
+        }
+        $self->{PROFILE}->{EXTENSIONS}->{$name} = {};
+    }
+
     if (! defined $value) {
-	OpenXPKI::Exception->throw (
+    	OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_VALUE_NOT_SPECIFIED",
 	    );
     }
@@ -400,14 +414,10 @@ sub set_extension
     $critical = 1 if ($critical eq "true");
     $self->{PROFILE}->{EXTENSIONS}->{$name}->{CRITICAL} = $critical;
 
-    if (ref $value->[0])
-    {
-        ## these are value pairs (e.g. subject alt name)
-        ## WARNING this is no clean copy by value
-        $self->{PROFILE}->{EXTENSIONS}->{$name}->{PAIRS} = [ @{$value} ];
-    }
-    else
-    {
+
+    if (!ref $value) {    
+        $self->{PROFILE}->{EXTENSIONS}->{$name}->{VALUE} = [ $value ];
+    } else {
         ## copy by value (normal array)
         $self->{PROFILE}->{EXTENSIONS}->{$name}->{VALUE} = [ @{$value} ];
     }
@@ -415,6 +425,31 @@ sub set_extension
     return 1;
 }
 
+=head2 generate_oid_extension_section
+
+Wrapper around set_extension to prepare oid extensions with sequence
+
+=cut
+
+sub set_oid_extension_sequence {
+
+    my $self = shift;
+    my $keys = { @_ };
+    my $name     = $keys->{NAME};
+    my $critical = $keys->{CRITICAL};
+    my $value    = $keys->{VALUES};
+
+    my $section = 'oid_section_'.$name;
+    $section =~ s/\./_/g;
+    my @values = ( 'ASN1:SEQUENCE:'.$section, "[ $section ]" );
+    my @section = split /\r?\n/, $value;
+    push @values, @section;
+
+    return $self->set_extension(NAME => $name,        
+        CRITICAL => $critical ? 'true' : 'false',
+        VALUES   => [@values]);
+    
+}
 
 sub is_critical_extension
 {
@@ -444,13 +479,19 @@ sub get_extension
             },
         );
     }
-
-    if (exists $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE})
+    
+    if (not defined $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE})
     {
-        return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE};
-    } else {
-        return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{PAIRS};
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NO_VALUE",
+            params  => {
+                "EXTENSION" => $ext,
+            },
+        );
     }
+
+    return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE};
+    
 }
 
 sub set_serial

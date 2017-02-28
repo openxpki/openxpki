@@ -46,30 +46,38 @@ sub issueCertificate {
     # Requries that we load the CSR attributes
     my ($notbefore, $notafter);
     my @subject_alt_names;
+    my @extension;
 
-    my $csr_metadata = CTX('dbi_backend')->select(
-        TABLE   => 'CSR_ATTRIBUTES',
-        DYNAMIC => {
-            'CSR_SERIAL' => $csr_serial,
-        },
+    my $cert_attr = CTX('dbi')->select(
+        columns => [ qw(
+            attribute_contentkey
+            attribute_value
+        ) ],
+        from => 'csr_attributes',
+        where => { req_key => $csr_serial },
     );
-    ##! 50: ' Size of csr_metadata '. scalar( @{$csr_metadata} )
-
-    foreach my $metadata (@{$csr_metadata}) {
-        ##! 51: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
-        if ($metadata->{ATTRIBUTE_KEY} eq 'subject_alt_name') {
-            push @subject_alt_names,  $serializer->deserialize($metadata->{ATTRIBUTE_VALUE});
-        } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notbefore') {
+    
+    while (my $attr = $cert_attr->fetchrow_hashref) {
+        my $key = $attr->{attribute_contentkey};
+        my $val = $attr->{attribute_value};
+        
+        if ($key eq 'subject_alt_name') {
+            push @subject_alt_names,  $serializer->deserialize($val);
+        } elsif ($key eq 'x509v3_extension') {
+            push @extension, $serializer->deserialize($val);
+        } elsif ($key eq 'notbefore') {
             $notbefore = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
-                VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
+                VALIDITY        => $val,
             });
-       } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notafter') {
+        } elsif ($key eq 'notafter') {
             $notafter = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
-                VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
+                VALIDITY        => $val,
             });
         }
+        
+        
     }
 
     # Set notbefore/notafter according to profile settings if it was not set in csr
@@ -152,6 +160,45 @@ sub issueCertificate {
         ##! 64: 'propagating subject alternative names: ' . Dumper @subject_alt_names
        $profile->set_subject_alt_name(\@subject_alt_names);
     }
+
+    ## 64: 'Extensions ' . Dumper \@extension
+    if (scalar @extension) {
+        foreach my $ext (@extension) {
+            # we only support oids for the moment
+            my $oid = $ext->{oid};
+            if (!$oid || $oid !~ /\A(\d+\.)+\d+\z/) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_UNSUPPORTED_EXTENSION',
+                    param => { NAME => $oid }
+                );   
+            }
+            
+            # We dont want those to be set from external 
+            # (might be used to overwrite essential settings like CA:true ) 
+            if ($oid =~ /^0?2\.0?5\.0?29\./) {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_EXTENSION_NOT_ALLOWED",
+                    params => { NAME => $oid }
+                );
+            }
+             
+            # scalar case
+            if ($ext->{value}) {
+                $profile->set_extension(
+                    NAME     => $oid,
+                    CRITICAL => $ext->{critical} ? 'true' : 'false', 
+                    VALUES   => $ext->{value},
+                );
+            } elsif ($ext->{section}) {
+                $profile->set_oid_extension_sequence(
+                    NAME     => $oid,
+                    CRITICAL => $ext->{critical} ? 'true' : 'false', 
+                    VALUES   => $ext->{section},
+                );
+            }
+        }
+    }
+        
 
     my $rand_length = $profile->get_randomized_serial_bytes();
     my $increasing  = $profile->get_increasing_serials();
