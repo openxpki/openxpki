@@ -43,6 +43,25 @@ are read from the filesystem.
 Calling the notifier with C<MESSAGE=csr_created> will send out two mails.
 One to the requestor and one to the ra-officer, both are CC'ed to helpdesk.
 
+=head2 Recipients
+
+=over
+
+=item to
+
+Must be a single address, can be a template toolkit string.
+
+=item cc
+
+Can be a single address or a list of address seperated by a single comma.
+The string is processed by template toolkit and afterwards splitted into
+a list at the comma, so you can use loop/join to create multiple recipients.
+
+If you directly pass an array, each item is processed using template toolkit
+but must return a single address.
+
+=back
+
 B<Note>: The settings To, Cc and Prefix are stored in the workflow on the first
 message and reused for each subsequent message on the same channel, so you can
 gurantee that each message in a thread is sent to the same people. All settings
@@ -373,20 +392,23 @@ sub notify {
 
             ##! 32: 'Building new cc list'
             # explicit from configuration, can be a comma sep. list
-            my @ccrcpt;
             if(!$cfg->{cc}) {
                 # noop
             } elsif (ref $cfg->{cc} eq '') {
-                @ccrcpt = split(/,/, $cfg->{cc});
+                my $cc = $self->_render_template( $cfg->{cc}, \%vars );
+                ##! 32: 'Parsed cc ' . $cc
+                # split at comma with optional whitespace and filter out
+                # strings that do not look like a mail address 
+                @cclist = map { $_ =~ /^[\w\.-]+\@[\w\.-]+$/ ? $_ : () } split(/\s*,\s*/, $cc);
             } elsif (ref $cfg->{cc} eq 'ARRAY') {
-                @ccrcpt = @{$cfg->{cc}};
+                ##! 32: 'CC from array ' . Dumper $cfg->{cc} 
+                foreach my $cc (@{$cfg->{cc}}) {
+                    my $rcpt = $self->_render_receipient( $cc, \%vars );
+                    ##! 32: 'New cc rcpt: ' . $cc . ' -> ' . $rcpt
+                    push @cclist, $rcpt if($rcpt);
+                }
             }
-
-            foreach my $cc (@ccrcpt) {
-                my $rcpt = $self->_render_receipient( $cc, \%vars );
-                ##! 32: 'New cc rcpt: ' . $cc . ' -> ' . $rcpt
-                push @cclist, $rcpt if($rcpt);
-            }
+            
             $pi->{cc} = \@cclist;
             ##! 32: 'New cclist ' . Dumper $pi->{cc}
 
