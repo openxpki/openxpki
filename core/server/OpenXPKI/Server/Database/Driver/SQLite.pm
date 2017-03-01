@@ -1,9 +1,11 @@
 package OpenXPKI::Server::Database::Driver::SQLite;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
-with 'OpenXPKI::Server::Database::Role::MergeEmulation';
-with 'OpenXPKI::Server::Database::Role::Driver';
+with qw(
+    OpenXPKI::Server::Database::Role::SequenceEmulation
+    OpenXPKI::Server::Database::Role::MergeEmulation
+    OpenXPKI::Server::Database::Role::Driver
+);
 
 =head1 Name
 
@@ -43,8 +45,21 @@ sub sqlam_params {
 }
 
 ################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
+
+sub table_drop_query {
+    my ($self, $dbi, $table) = @_;
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP TABLE IF EXISTS $table",
+    );
+}
+
+################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceEmulation
 #
+
+sub sql_autoinc_column { return "INTEGER PRIMARY KEY AUTOINCREMENT" }
 
 sub last_auto_id {
     my ($self, $dbi) = @_;

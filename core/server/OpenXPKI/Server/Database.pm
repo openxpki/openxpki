@@ -18,6 +18,11 @@ use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;
 use SQL::Abstract::More;
+use Moose::Exporter;
+
+# Export AUTO_ID
+Moose::Exporter->setup_import_methods(with_meta => [ 'AUTO_ID' ]);
+sub AUTO_ID { return bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT" }
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
 # if ($params{TYPE} eq "SQLite") {
@@ -321,8 +326,18 @@ sub select_one {
 # INSERT
 # Returns: DBI statement handle
 sub insert {
-    my $self = shift;
-    my $query = $self->query_builder->insert(@_);
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        into     => { isa => 'Str' },
+        values   => { isa => 'HashRef' },
+    );
+
+    # Replace AUTO_ID with value of next_id()
+    for (keys %{ $params{values} }) {
+        $params{values}->{$_} = $self->next_id($params{into})
+            if (ref $params{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT");
+    }
+
+    my $query = $self->query_builder->insert(%params);
     return $self->run($query, 1); # 1 = return number of affected rows
 }
 
@@ -383,6 +398,29 @@ sub next_id {
     $id->bior(Math::BigInt->new($nodeid));
 
     return $id->bstr();
+}
+
+# Create a new sequence
+sub create_sequence {
+    my ($self, $table) = @_;
+    my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
+    my $query = $self->driver->sequence_create_query($self, $seq_table);
+    return $self->run($query, 0);
+}
+
+# Drop a sequence
+sub drop_sequence {
+    my ($self, $table) = @_;
+    my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
+    my $query = $self->driver->sequence_drop_query($self, $seq_table);
+    return $self->run($query, 0);
+}
+
+# Drop a table
+sub drop_table {
+    my ($self, $table) = @_;
+    my $query = $self->driver->table_drop_query($self, $self->query_builder->_add_namespace_to($table));
+    return $self->run($query, 0);
 }
 
 sub start_txn {
@@ -551,9 +589,32 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 Inserts rows into the database and returns the number of affected rows.
 
-Please note that C<NULL> values will be converted to Perl C<undef>.
+    $db->insert(
+        into => "certificate",
+        values => {
+            identifier => AUTO_ID, # use the sequence associated with this table
+            cert_key => $key,
+            ...
+        }
+    );
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
+To automatically set a primary key to the next serial number (i.e. sequence
+associated with this table) set it to C<AUTO_ID>. C<AUTO_ID> is a function that
+is exported by C<OpenXPKI::Server::Database>.
+
+Throws an L<OpenXPKI::Exception> if there are errors in the query or during
+it's execution.
+
+Named parameters:
+
+=over
+
+=item * B<into> - Table name (I<Str>, required)
+
+=item * B<values> - Hash with column name / value pairs. Please note that
+C<undef> is interpreted as C<NULL> (I<HashRef>, required).
+
+=back
 
 =head2 update
 
