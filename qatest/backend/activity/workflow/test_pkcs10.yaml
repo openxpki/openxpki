@@ -1,0 +1,40 @@
+head:
+    prefix: csr
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC
+    persister: Volatile
+
+state:
+    INITIAL:
+        action: parse_pkcs10 > SUCCESS
+        
+    SUCCESS: ~
+            
+action:
+    parse_pkcs10:        
+        class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_DESC
+        input:
+          - pkcs10
+          - cert_profile
+          - cert_subject_style
+        param:
+          req_extensions: certificateTemplate certificateTemplateName 
+          req_attributes: challengePassword
+          key_params: 1
+        validator:
+          - global_pkcs10_valid
+          - global_key_params        
+
+field:
+    cert_subject_style:
+        name: cert_subject_style
+        type: text
+
+
+acl: 
+    RA Operator:
+        creator: any 
+        context: 1
+

@@ -21,7 +21,7 @@ use File::Path qw(make_path);
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../../../qatest/lib";
 
-use CertHelper;
+use OpenXPKI::Test::CertHelper;
 
 #my $config = plugin 'Config';
 my $config = {};
@@ -121,15 +121,11 @@ sleep 2;
 # 3. Create cert used by scep client (i.e.: on behalf)
 ############################################################
 {
-    $ENV{KEYPASS} = 'my-onbehalf-passphrase';
-    my $ch = CertHelper->new(
+    OpenXPKI::Test::CertHelper->via_openssl(
         basedir    => 't/sscep-wrapper.d/onbehalf',
         commonName => 'onbehalf.test.openxpki.org',
-        pass_type => 'env',
-        pass_val => 'KEYPASS',
-    ) or die "Error creating CertHelper instance: $@";
-
-    $ch->createcert() or die "Error creating certs for on-behalf: $@";
+        password => 'my-onbehalf-passphrase',
+    );
 }
 
 ############################################################

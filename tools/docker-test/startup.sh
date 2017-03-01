@@ -27,7 +27,7 @@ set +e
 REPO=https://dummy:nope@github.com/$GITHUB_USER_REPO.git
 
 # Local repo from host (if Docker volume is mounted)
-mountpoint -q /repo && REPO=file:///repo
+mountpoint -q /repo && test -z "$GITHUB_USER_REPO" && REPO=file:///repo
 
 echo -e "\n====[ Git checkout: $BRANCH from $REPO ]===="
 git ls-remote -h $REPO >/dev/null 2>&1
@@ -114,8 +114,7 @@ $CLONE_DIR/tools/scripts/mysql-create-schema.sh
 #
 # Sample config (CA certificates etc.)
 #
-echo "Creating sample config (CA certificates etc.)"
-/bin/bash $CLONE_DIR/config/sampleconfig.sh             > /dev/null
+$CLONE_DIR/tools/testdata/insert-test-certificates.sh
 
 #
 # Start OpenXPKI

@@ -26,7 +26,7 @@ use Moose;
 use File::Temp();
 use MIME::Base64;
 
-use CertHelper;
+use OpenXPKI::Test::CertHelper;
 
 has 'config' => (is => 'rw');
 
@@ -106,7 +106,7 @@ sub handle {
             text => "ERROR: pki operation '$operation' not supported" );
     }
 };
- 
+
 sub BUILD {
     my $self = shift;
     my $config = $self->config;
@@ -121,16 +121,12 @@ sub BUILD {
     $config->{crt_der} ||= $config->{basedir} . '/crt.der';
     $config->{crt_pem} ||= $config->{basedir} . '/crt.pem';
 
-    $ENV{KEYPASS} = 'my-scep-server-passphrase';
-        my $ch = CertHelper->new(
+    OpenXPKI::Test::CertHelper->via_openssl(
         basedir    => $config->{basedir},
         commonName => 'scepserver.test.openxpki.org',
-        pass_type => 'env',
-        pass_val => 'KEYPASS',
+        password => 'my-scep-server-passphrase',
         verbose => 1,
-    ) or die "Error creating CertHelper instance: $@";
-
-    $ch->createcert() or die "Error creating certs for scep server: $@";
+    );
 }
 
 

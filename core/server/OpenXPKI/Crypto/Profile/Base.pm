@@ -257,23 +257,46 @@ sub load_extension
     elsif ($ext eq "oid")
     {
 
-
         my @oids = $config->get_keys("$path");
 
-        # TODO - fix Config::Version and simplify!
-        # we need the array syntax if we want to use the oid directly as key
-        # this is currently not working as Config::Versioned does not handle
-        # the dots in the path correctly, so we offer setting the oid as
-        # attribute as a fallback
         my  @basepath = split /\./, $path;
         foreach my $name (@oids) {
 
             my $attr = $config->get_hash( [ @basepath, $name ] );
             ##! 32: 'oid attributes, name ' . $name. ', attr: ' . Dumper $attr
 
-            # For the moment we just use a single predefined value
-            @values = ( $attr->{value} );
-            $self->set_extension (NAME     => $attr->{oid} ? $attr->{oid} : $name,
+            if (!$attr->{value}) {
+                next;
+            }
+
+            # OID can be either the name or given as attribute "oid"
+            if ($attr->{oid}) {
+                $name = $attr->{oid};
+            }
+
+            # Special case, Sequences needs to be written to a new section
+            if ($attr->{encoding} eq 'SEQUENCE') {
+                my $section = 'oid_section_'.$name;
+                $section =~ s/\./_/g;
+                @values = ( 'ASN1:SEQUENCE:'.$section, "[ $section ]" );
+                my @section = split /\r?\n/g, $attr->{value};
+                push @values, @section;
+
+            } else {
+
+                my $val = '';
+                # format and encoding can be given as extra parameters but 
+                # finally just end up concatenated with the value
+                if ($attr->{format}) {
+                    $val .= $attr->{format}.':';
+                } 
+                if ($attr->{encoding}) {
+                    $val .= $attr->{encoding}.':';
+                }
+                $val .= $attr->{value};
+                @values = ( $val );
+            }
+            $self->set_extension (NAME     => $name,
                                   CRITICAL => $attr->{critical} ? 'true' : 'false',
                                   VALUES   => [@values]);
         }

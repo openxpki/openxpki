@@ -32,14 +32,12 @@ sub param {
     my @arg = @_;
     
     my $name = shift @arg;
-    my $value = shift @arg;
-       
     if ( ref $name eq 'HASH' ) {
         ##! 1: 'Mark updated from hash ' . join (",", keys %{$name})
         map { $self->{_updated}->{$_} = 1; } keys %{$name};
                 
-    } elsif ( defined $value ) {
-        ##! 1: 'Mark updated from scalar ' . $name         
+    } elsif ( exists $arg[0] ) {
+        ##! 1: 'Mark updated from scalar ' . $name
         $self->{_updated}->{$name} = 1;
     } else {
         ##! 1: 'Call without value'

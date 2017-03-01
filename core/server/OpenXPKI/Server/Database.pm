@@ -255,8 +255,7 @@ sub dbh {
 
 # Execute given query
 sub run {
-    my $self = shift;
-    my ($query, $return_rownum) = positional_args(\@_,
+    my ($self, $query, $return_rownum) = positional_args(\@_,
         { isa => 'OpenXPKI::Server::Database::Query|Str' },
         { isa => 'Bool', optional => 1, default => 0 },
     );

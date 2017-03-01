@@ -4,6 +4,9 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/contrib-jessie64"
 
+  # Do not try to update VirtualBox Guest Additions (which fails anyway)
+  config.vbguest.auto_update = false
+
   # Default VM - testing on debian jessie
   config.vm.define "develop", primary:true do |dev|
       dev.vm.hostname = "oxi-dev-alldb"

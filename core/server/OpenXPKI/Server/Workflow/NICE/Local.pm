@@ -406,7 +406,7 @@ sub issueCRL {
     # and set it accordingly
     my $data = { $crl_obj->to_db_hash() };
     $data = {
-        # FIXME Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
+        # FIXME #legacydb Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
         ( map { lc($_) => $data->{$_} } keys %$data ),
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
@@ -414,7 +414,7 @@ sub issueCRL {
         publication_date  => 0,
     };
     $dbi->insert( into => 'crl', values => $data );
-    
+
     $dbi->commit;
 
     return { crl_serial => $serial };

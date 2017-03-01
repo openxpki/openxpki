@@ -151,19 +151,33 @@ extensions:
         # will be extended by the values in the appropriate loa tag
         oid: 1.2.3.4
         
-     # Not implemented in ssl code!
+    # Not implemented in ssl code!
     cps:
         critical: 0
         # WARNING: if use_loa is set to yes, the cps will be
         # extended by the values in the appropriate loa tag
         uri: http://localhost/cps.html
 
+    # You can add arbitrary oid to extensions, for single line items
+    # format, encoding and value are simply concatenated using a colon
+    # you can also omit format/encoding and pass the full string as value
+    # if the encoding is set to sequence, the value is copied to a section
+    # which allows nested items like Microsoft certificateTemplate v2
     oid:
         1.3.6.1.4.1.311.20.2:
             critical: 0
-            format: DER
-            encoding: HEX
-            value: 1e:1a:00:53:00:6d:00:61:00:72:00:74:00:63:00:61:00:72:00:64:00:55:00:73:00:65:00:72
+            format: ASN1
+            encoding: UTF8String
+            value: Machine
+
+        1.3.6.1.4.1.311.21.7:
+            critical: 0
+            format: ASN1
+            encoding: SEQUENCE
+            value: |
+               field1=OID:1.3.6.1.4.1.311.21.8.15138236.9849362.7818410.4518060.12563386.22.5003942.7882920
+               field2=INT:100
+               field3=INT:0
 
     # This must be scalar or list of names 
     # FIXME: How is this defined?

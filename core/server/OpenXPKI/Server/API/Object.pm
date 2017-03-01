@@ -46,6 +46,8 @@ use List::Util qw(first);
 use Digest::SHA qw(sha1_hex);
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
+use OpenXPKI::Server::Database::Legacy;
+
 sub START {
 
     # somebody tried to instantiate us, but we are just an
@@ -272,17 +274,18 @@ sub get_cert {
     if ( $format eq 'DBINFO' ) {
         ##! 2: "Preparing output for DBINFO format"
         delete $cert->{data};
+        my $extended_info = {};
 
         # Hex Serial
         my $serial = Math::BigInt->new($cert->{cert_key});
-        $cert->{cert_key_hex} = $serial->as_hex;
-        $cert->{cert_key_hex} =~ s{\A 0x}{}xms;
+        $extended_info->{cert_key_hex} = $serial->as_hex;
+        $extended_info->{cert_key_hex} =~ s{\A 0x}{}xms;
 
         # Expired Status
         $cert->{status} = 'EXPIRED' if $cert->{status} eq 'ISSUED' and $cert->{notafter} < time();
 
         # Fetch certificate attributes
-        $cert->{cert_attributes} = {};
+        $extended_info->{cert_attributes} = {};
         my $cert_attr = $dbi->select(
             columns => [ qw(
                 attribute_contentkey
@@ -294,33 +297,16 @@ sub get_cert {
         while (my $attr = $cert_attr->fetchrow_hashref) {
             my $key = $attr->{attribute_contentkey};
             my $val = $attr->{attribute_value};
-            $cert->{cert_attributes}->{$key} //= [];
-            push @{$cert->{cert_attributes}->{$key}}, $val;
+            $extended_info->{cert_attributes}->{$key} //= [];
+            push @{$extended_info->{cert_attributes}->{$key}}, $val;
         }
 
-
         # TODO #legacydb Mapping for compatibility to old DB layer
-        $cert = {
-            'AUTHORITY_KEY_IDENTIFIER'  => $cert->{authority_key_identifier},
-            'CERT_ATTRIBUTES'           => $cert->{cert_attributes},
-            'CERTIFICATE_SERIAL'        => $cert->{cert_key},
-            'CERTIFICATE_SERIAL_HEX'    => $cert->{cert_key_hex},
-            'CSR_SERIAL'                => $cert->{req_key},
-            'IDENTIFIER'                => $cert->{identifier},
-            'ISSUER_DN'                 => $cert->{issuer_dn},
-            'ISSUER_IDENTIFIER'         => $cert->{issuer_identifier},
-            'LOA'                       => $cert->{loa},
-            'NOTAFTER'                  => $cert->{notafter},
-            'NOTBEFORE'                 => $cert->{notbefore},
-            'PKI_REALM'                 => $cert->{pki_realm},
-            'PUBKEY'                    => $cert->{public_key},
-            'STATUS'                    => $cert->{status},
-            'SUBJECT'                   => $cert->{subject},
-            'SUBJECT_KEY_IDENTIFIER'    => $cert->{subject_key_identifier},
+        return {
+            %{ OpenXPKI::Server::Database::Legacy->certificate_to_legacy($cert) },
+            'CERT_ATTRIBUTES'        => $extended_info->{cert_attributes},
+            'CERTIFICATE_SERIAL_HEX' => $extended_info->{cert_key_hex},
         };
-
-
-        return $cert;
     }
 
     ##! 2: "Requesting crypto token via API and creating X509 object"
@@ -832,7 +818,7 @@ sub import_crl {
 
     my $ca_identifier = $issuer->{identifier};
     $data = {
-        # FIXME Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
+        # FIXME #legacydb Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
         ( map { lc($_) => $data->{$_} } keys %$data ),
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
@@ -911,6 +897,8 @@ supports a facility to search certificates. It supports the following parameters
 =item * NOTBEFORE/NOTAFTER (with SCALAR searches "other side" of validity or pass HASH with operator)
 
 =item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)
+Operator can be "EQUAL", "LIKE" or "BETWEEN" and any other value will lead to
+error "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_UNKNOWN_OPERATOR".
 
 =item * ENTITY_ONLY (show only certificates issued by this ca)
 
@@ -926,35 +914,23 @@ on the client.
 
 =cut
 sub search_cert {
+    ##! 1: "start"
     my ($self, $args) = @_;
 
-    my $params = $self->__search_cert( $args );
+    ##! 1: 'search_cert arguments: ' . Dumper $args
+    my $params = $self->__search_cert_db_query( $args );
+    ##! 1: 'database search arguments: ' . Dumper $params
 
-    ##! 16: 'certificate search arguments: ' . Dumper $params
-
-    my $result = CTX('dbi_backend')->select(%{$params});
-    if ( ref $result ne 'ARRAY' ) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
-        );
-    }
-
-    ##! 1: 'Result ' . Dumper $result
-
-    foreach my $item ( @{$result} ) {
-
-        # remove leading table name from result columns
-        map {
-            my $col = substr( $_, index( $_, '.' ) + 1 );
-            $item->{$col} = $item->{$_};
-            delete $item->{$_};
-        } keys %{$item};
-    }
+    my $result = CTX('dbi')->select(
+        %{$params},
+        columns => [ 'certificate.*' ],
+    )->fetchall_arrayref({});
+    ##! 1: scalar(@$result)." certificates found"
+    ##! 16: 'Result ' . Dumper $result
 
     ##! 1: "finished"
-    return $result;
-
+    my $result_legacy = [ map { OpenXPKI::Server::Database::Legacy->certificate_to_legacy($_) } @$result ];
+    return $result_legacy;
 }
 
 =head2 search_cert_count
@@ -963,155 +939,113 @@ Same as cert_search, returns the number of matching rows
 
 =cut
 sub search_cert_count {
-    ##! 1: 'start'
-    my ($self, $args) = @_;
-
-    my $params = $self->__search_cert( $args );
-
-    $params->{COLUMNS} = [{ COLUMN   => 'CERTIFICATE.IDENTIFIER', AGGREGATE => 'COUNT' }];
-
-    my $result = CTX('dbi_backend')->select(%{$params});
-
-    unless (defined $result and ref $result eq 'ARRAY' and scalar @{$result} == 1) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_COUNT_SELECT_RESULT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
-        );
-    }
-
-    return $result->[0]->{'CERTIFICATE.IDENTIFIER'};
-
-}
-
-sub __search_cert {
     ##! 1: "start"
     my ($self, $args) = @_;
 
-    ##! 16: 'search_cert arguments: ' . Dumper $args
+    ##! 1: 'search_cert_count arguments: ' . Dumper $args
+    my $params = $self->__search_cert_db_query( $args );
+    ##! 1: 'database search arguments: ' . Dumper $params
 
-    my %params;
-    $params{TABLE} = [ 'CERTIFICATE', ];
+    my $result = CTX('dbi')->select(
+        %{$params},
+        columns => [ 'COUNT(certificate.identifier)|amount' ],
+    )->fetchall_arrayref({});
+    ##! 16: 'Result ' . Dumper $result
 
-    $params{COLUMNS} = [
-        'CERTIFICATE.ISSUER_DN',
-        'CERTIFICATE.CERTIFICATE_SERIAL',
-        'CERTIFICATE.ISSUER_IDENTIFIER',
-        'CERTIFICATE.IDENTIFIER',
-        'CERTIFICATE.SUBJECT',
-        'CERTIFICATE.STATUS',
-        'CERTIFICATE.PUBKEY',
-        'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
-        'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
-        'CERTIFICATE.NOTAFTER',
-        'CERTIFICATE.LOA',
-        'CERTIFICATE.NOTBEFORE',
-        'CERTIFICATE.CSR_SERIAL',
-    ];
-    $params{JOIN} = [ ['IDENTIFIER'] ];
+    ##! 1: "finished"
+    return $result->[0]->{amount};
+}
 
-    ##! 2: "fix arguments"
-    foreach my $key (qw( EMAIL SUBJECT ISSUER )) {
-        if ( defined $args->{$key} ) {
-            $args->{$key} =~ s/\*/%/g;
+sub __search_cert_db_query {
+    ##! 1: "start"
+    my ($self, $args) = @_;
 
-            # sanitize wildcards (don't overdo it...)
-            $args->{$key} =~ s/%%+/%/g;
-        }
-    }
+    my $where = {};
+    my $params = {
+        where => $where,
+    };
 
     ##! 2: "initialize arguments"
 
     if ( $args->{CERT_SERIAL} ) {
         my $serial = $args->{CERT_SERIAL};
         # autoconvert hexadecimal serial, needs to have 0x as prefix!
-        if (substr($serial,0,2) eq '0x') {
+        if ($serial =~ /^0x/i) {
             my $sn = Math::BigInt->new( $serial );
             $serial = $sn->bstr();
         }
-        $params{SERIAL} = $serial;
+        $where->{'certificate.cert_key'} = $serial;
     }
 
-    if ( defined $args->{LIMIT} and !defined $args->{START} ) {
-        $params{'LIMIT'} = $args->{LIMIT};
-    }
-    elsif ( defined $args->{LIMIT} and defined $args->{START} ) {
-        $params{'LIMIT'} = {
-            AMOUNT => $args->{LIMIT},
-            START  => $args->{START},
-        };
+    if ( defined $args->{LIMIT} ) {
+        $params->{limit} = $args->{LIMIT};
+        $params->{offset} = $args->{START} if $args->{START};
     }
 
     # only list entities issued by this ca
     if ($args->{ENTITY_ONLY}) {
-        $params{DYNAMIC}->{'CERTIFICATE.CSR_SERIAL'} = { VALUE => undef, OPERATOR => 'NOT_EQUAL' };
+        $where->{'certificate.req_key'} = { "!=" => undef };
     }
 
     # pki realm
-    if (!$args->{PKI_REALM}) {
-        $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} = { VALUE => CTX('session')->get_pki_realm() };
+    if (not $args->{PKI_REALM}) {
+        $where->{'certificate.pki_realm'} = CTX('session')->get_pki_realm();
     } elsif ($args->{PKI_REALM} !~ /_any/i) {
-        $params{DYNAMIC}->{'CERTIFICATE.PKI_REALM'} = { VALUE => $args->{PKI_REALM} };
+        $where->{'certificate.pki_realm'} = $args->{PKI_REALM};
     }
 
     # Custom ordering
-    $params{ORDER}   = ['CERTIFICATE.CERTIFICATE_SERIAL'];
-    if ($args->{ORDER}) {
-       $params{ORDER} = [ $args->{ORDER} ];
+    my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
+    $desc = "" if defined $args->{REVERSE} and $args->{REVERSE} == 0;
+    # TODO #legacydb Code that removes table name prefix
+    $args->{ORDER} =~ s/^CERTIFICATE\.// if $args->{ORDER};
+    $params->{order_by} = sprintf "%s%s", $desc, ($args->{ORDER} // 'cert_key');
+
+    # Handle status
+    if ($args->{STATUS} and $args->{STATUS} eq 'EXPIRED') {
+        delete $args->{STATUS};
+        $where->{'certificate.status'} = 'ISSUED';
+        $where->{'certificate.notafter'} = { '<', time() };
     }
 
-    $params{REVERSE} = 1;
-    if (defined $args->{REVERSE}) {
-       $params{REVERSE} = $args->{REVERSE};
-    }
+    $where->{'certificate.identifier'}                = $args->{IDENTIFIER} if $args->{IDENTIFIER};
+    $where->{'certificate.issuer_identifier'}         = $args->{ISSUER_IDENTIFIER} if $args->{ISSUER_IDENTIFIER};
+    $where->{'certificate.req_key'}                   = $args->{CSR_SERIAL} if $args->{CSR_SERIAL};
+    $where->{'certificate.status'}                    = $args->{STATUS} if $args->{STATUS};
+    $where->{'certificate.subject_key_identifier'}    = $args->{SUBJECT_KEY_IDENTIFIER} if $args->{SUBJECT_KEY_IDENTIFIER};
+    $where->{'certificate.authority_key_identifier'}  = $args->{AUTHORITY_KEY_IDENTIFIER} if $args->{AUTHORITY_KEY_IDENTIFIER};
 
-    # Handle status =
-    if ($args->{'STATUS'} and $args->{'STATUS'} eq 'EXPIRED') {
-        $args->{'STATUS'} = 'ISSUED',
-        $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
-              { VALUE => time(), OPERATOR => "LESS_THAN" };
+    # sanitize wildcards (don't overdo it...)
+    for my $key (qw( SUBJECT ISSUER_DN )) {
+        next unless defined $args->{$key};
+        $args->{$key} =~ s/\*/%/g;
+        $args->{$key} =~ s/%%+/%/g;
     }
-
-
-    foreach my $key (qw( IDENTIFIER ISSUER_IDENTIFIER CSR_SERIAL STATUS SUBJECT_KEY_IDENTIFIER AUTHORITY_KEY_IDENTIFIER )) {
-        if ( $args->{$key} ) {
-            $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
-              { VALUE => $args->{$key} };
-        }
-    }
-    foreach my $key (qw( EMAIL SUBJECT ISSUER_DN )) {
-        if ( $args->{$key} ) {
-            $params{DYNAMIC}->{ 'CERTIFICATE.' . $key } =
-              { VALUE => $args->{$key}, OPERATOR => "LIKE" };
-        }
-    }
+    $where->{'certificate.subject'}                   = { -like => $args->{SUBJECT} } if $args->{SUBJECT};
+    $where->{'certificate.issuer_dn'}                 = { -like => $args->{ISSUER_DN} } if $args->{ISSUER_DN};
 
     if ( defined $args->{VALID_AT} ) {
-        $params{VALID_AT} = $args->{VALID_AT};
-        if (!ref $params{VALID_AT}) {
-            $params{VALID_AT} = [ $params{VALID_AT} ];
-        }
+        $where->{'certificate.notbefore'} = { '<=', $args->{VALID_AT} };
+        $where->{'certificate.notafter'} =  { '>=', $args->{VALID_AT} };
     }
 
     # notbefore/notafter should only be used for timestamps outside
     # the validity interval, therefore the operators are fixed
-    if ( defined $args->{NOTBEFORE} ) {
-
-        if (ref $args->{NOTBEFORE} eq 'HASH') {
-            $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } = $args->{NOTBEFORE}
-        } else {
-            $params{DYNAMIC}->{ 'CERTIFICATE.NOTBEFORE' } =
-                { VALUE => $args->{NOTBEFORE}, OPERATOR => "LESS_THAN" };
-        }
+    if ($args->{NOTBEFORE} ) {
+        # TODO #legacydb search_cert's NOTBEFORE allows old DB layer syntax
+        $where->{'certificate.notbefore'} = ref $args->{NOTBEFORE} eq 'HASH'
+            ? OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($args->{NOTBEFORE})
+            : { '<', $args->{NOTBEFORE} };
     }
 
-    if ( defined $args->{NOTAFTER} ) {
-        if (ref $args->{NOTAFTER} eq 'HASH') {
-            $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } = $args->{NOTAFTER};
-        } else {
-            $params{DYNAMIC}->{ 'CERTIFICATE.NOTAFTER' } =
-                { VALUE => $args->{NOTAFTER}, OPERATOR => "GREATER_THAN" };
-        }
+    if ($args->{NOTAFTER} ) {
+        # TODO #legacydb search_cert's NOTAFTER allows old DB layer syntax
+        $where->{'certificate.notafter'} = ref $args->{NOTAFTER} eq 'HASH'
+            ? OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($args->{NOTAFTER})
+            : { '>', $args->{NOTAFTER} };
     }
+
+    my @join_spec = ();
 
     # handle certificate attributes (such as SANs)
     if ( defined $args->{CERT_ATTRIBUTES} ) {
@@ -1126,60 +1060,41 @@ sub __search_cert {
         my $ii = 0;
         foreach my $attrib ( @{ $args->{CERT_ATTRIBUTES} } ) {
             ##! 16: 'certificate attribute: ' . Dumper $entry
-            my $attr_alias = 'CERT_ATTR_' . $ii;
+            my $table_alias = "certattr$ii";
 
             # add join table
-            push @{ $params{TABLE} },
-              [ 'CERTIFICATE_ATTRIBUTES' => $attr_alias ];
-
-            # add join statement
-            push @{ $params{JOIN}->[0] }, 'IDENTIFIER';
-
-            # push undef onto valid_at
-            push @{ $params{VALID_AT} }, undef if ($params{VALID_AT});
-
-            my $key   = $attrib->{KEY};
-            my $value = $attrib->{VALUE};
-            my $operator = 'LIKE';
-            $operator = $attrib->{OPERATOR} if($attrib->{OPERATOR});
+            push @join_spec, ( 'identifier=identifier', "certificate_attributes|$table_alias" );
 
             # add search constraint
-            $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_KEY' } =
-              { VALUE => $key };
+            $where->{ "$table_alias.attribute_contentkey" } = $attrib->{KEY};
 
+            $attrib->{OPERATOR} //= 'LIKE';
             # sanitize wildcards (don't overdo it...)
-            $value =~ s/\*/%/g;
-            $value =~ s/%%+/%/g;
-            $params{DYNAMIC}->{ $attr_alias . '.ATTRIBUTE_VALUE' } =
-                { VALUE =>  $value, OPERATOR => $operator };
+            if ($attrib->{OPERATOR} eq 'LIKE') {
+                $attrib->{VALUE} =~ s/\*/%/g;
+                $attrib->{VALUE} =~ s/%%+/%/g;
+            }
+            # TODO #legacydb search_cert's CERT_ATTRIBUTES allows old DB layer syntax
+            $where->{ "$table_alias.attribute_value" } =
+                OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($attrib);
+
             $ii++;
         }
     }
 
-    if (  $args->{PROFILE} ) {
-
-        my @join = ('CSR_SERIAL');
-        for (my $i=1; $i < scalar @{ $params{TABLE} }; $i++) {
-           push @join, undef;
-        }
-        push @join, 'CSR_SERIAL';
-
-        # add csr table
-        push @{ $params{TABLE} }, 'CSR';
-
-        # add join statement
-        push @{ $params{JOIN}->[0] }, undef;
-        push @{ $params{JOIN} }, \@join;
-
-        # add search constraint
-        $params{DYNAMIC}->{ 'CSR.PROFILE' } = { VALUE => $args->{PROFILE} };
-
-        push @{ $params{VALID_AT} }, undef if ($params{VALID_AT});
-
+    if ( $args->{PROFILE} ) {
+        push @join_spec, qw( req_key=req_key csr );
+        $where->{ 'csr.profile' } = $args->{PROFILE};
     }
 
-    return \%params;
+    if (scalar @join_spec) {
+        $params->{from_join} = join " ", 'certificate', @join_spec;
+    }
+    else {
+        $params->{from} = 'certificate',
+    };
 
+    return $params;
 }
 
 =head2 private_key_exists_for_cert
@@ -1514,6 +1429,7 @@ sub validate_certificate {
         # We use the Authority Key or the Subject as a fallback
         # to find the next matching certificate in our database
         my $result;
+        # TODO Handle case where get_authority_key_id() returns HashRef
         if (my $issuer_authority_key_id = $last_in_chain->get_authority_key_id()) {
             ##! 16: ' Search issuer by authority key ' . $issuer_authority_key_id
             $result = CTX('api')->search_cert({

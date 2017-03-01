@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Log::NOOP.pm 
+## OpenXPKI::Server::Log::NOOP.pm
 ##
 ## a dummy class that behaves like OpenXPKI::Server::Log, but does
 ## not log anything (used during server startup where dbi_log is noy
@@ -36,6 +36,20 @@ sub log
     my $keys = { @_ };
 
     return 1;
+}
+
+# install wrapper / helper subs
+no strict 'refs';
+for my $prio (qw/ debug info warn error fatal /) {
+    *{$prio} = sub {
+        my ($self, $message, $facility) = @_;
+        $self->log(
+            MESSAGE  => $message,
+            PRIORITY => $prio,
+            CALLERLEVEL => 1,
+            FACILITY => $facility // "monitor",
+        );
+    };
 }
 
 1;

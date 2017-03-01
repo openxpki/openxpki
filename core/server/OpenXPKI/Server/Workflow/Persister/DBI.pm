@@ -146,26 +146,7 @@ sub update_workflow {
         if ( ref $value eq 'ARRAY' or ref $value eq 'HASH' ) {
             $value = OpenXPKI::Serialization::Simple->new->serialize($value);
         }
-
-        # context parameter sanity checks
-        if ( length($value) > $context_value_max_length ) {
-            ##! 4: "parameter length exceeded"
-            $dbi->rollback;
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_TOO_BIG",
-                params => {
-                    workflow_id          => $id,
-                    context_key          => $key,
-                    context_value_length => length($value),
-                },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => 'system',
-                },
-            );
-        }
-
+ 
         # check for illegal characters
         if ( $value =~ m{ (?:\p{Unassigned}|\x00) }xms ) {
             ##! 4: "parameter contains illegal characters"

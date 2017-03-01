@@ -36,8 +36,7 @@ has 'namespace' => ( # database namespace (i.e. schema) to prepend to tables
 # Prefixes the given DB table name with a namespace (if there's not already
 # one part of the table name)
 sub _add_namespace_to {
-    my $self = shift;
-    my ($obj_param) = positional_args(\@_, # OpenXPKI::MooseParams
+    my ($self, $obj_param) = positional_args(\@_, # OpenXPKI::MooseParams
         { isa => 'Str | ArrayRef[Str]' },
     );
     # no namespace defined
