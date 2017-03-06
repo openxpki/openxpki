@@ -51,7 +51,9 @@ OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Source.pm
 OpenXPKI/Client/UI/Workflow.pm
 OpenXPKI/Client/UI/Handle/Profile.pm
+OpenXPKI/Client/UI/Handle/Report.pm
 OpenXPKI/Client/UI/Handle/Status.pm
+
 
 # Client for SmartCard Frontend
 OpenXPKI/Client/SC.pm
@@ -356,6 +358,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/VerifySignature.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/CreateQueue.pm
 OpenXPKI/Server/Workflow/Activity/CRLIssuance/ImportCRL.pm
 
+OpenXPKI/Server/Workflow/Activity/Reports/GetList.pm
 OpenXPKI/Server/Workflow/Activity/Reports/Summary.pm
 OpenXPKI/Server/Workflow/Activity/Reports/Detail.pm
 OpenXPKI/Server/Workflow/Activity/Reports/CertExport/AddToQueue.pm

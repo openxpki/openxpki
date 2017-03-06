@@ -456,6 +456,20 @@ sub init_fetch {
 
     $self->logger()->debug('Got response ' . Dumper $data);
 
+    # support multi-valued responses (persisted as array ref)
+    if (ref $data eq 'ARRAY') {
+        my $idx = $self->param('idx');
+        $self->logger()->debug('Found mulitvalued response, index is  ' . $idx);
+        if (!defined $idx || ($idx > scalar @{$data})) {
+            die "Invalid index";
+        }
+        $data = $data->[$idx];
+    }
+    
+    if (ref $data ne 'HASH') {
+        die "Invalid, incomplete or expired fetch statement";
+    }
+
     $data->{mime} = "application/json; charset=UTF-8" unless($data->{mime});
 
     # Start output stream
@@ -488,6 +502,20 @@ sub init_fetch {
         }        
         print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
         print $dp->{VALUE};
+    
+    } elsif ($type eq 'report') {
+        # todo - catch exceptions/not found
+        my $report = $self->send_command( 'get_report', {
+            NAME => $source,
+            FORMAT => 'ALL',
+        });
+        if (!$report) {
+            die "Requested data not found/expired";
+        }        
+        
+        print $cgi->header( @main::header, -type => $report->{mime_type}, -attachment => $report->{report_name} );
+        print $report->{report_value};
+    
     }
     
     exit;

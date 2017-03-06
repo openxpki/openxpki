@@ -951,6 +951,18 @@ msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Scarica"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
+msgstr "Nessun dato disponibile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_DESCRIPTION"
+msgstr "Usa la history del workflow per auditing o per la ricerca di errori"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
+msgstr "Nessun dato disponibile"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 msgstr "Errore sconosciuto"
 
@@ -3092,6 +3104,16 @@ msgstr ""
 "successivo download."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_LABEL"
+msgstr "Report Completo Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_DESC"
+msgstr ""
+"Genera un report dettagliato sui certificati presenti in questo Realm per un "
+"successivo download."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_LABEL"
 msgstr "Report Completo Certificati"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_DESC"
