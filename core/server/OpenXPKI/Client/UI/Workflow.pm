@@ -1787,20 +1787,41 @@ sub __render_from_workflow {
         my $fields = $self->__render_fields( $wf_info, $view );
         
         $self->logger()->debug('Field data ' . Dumper $fields);
-        
-        
+                
         # Add action buttons 
         my $buttons = $self->__get_action_buttons( $wf_info ) ;        
         
-        $self->add_section({
-            type => 'keyvalue',
-            content => {
-                label => '',
-                description => '',
-                data => $fields,
-                buttons => $buttons
-        }});
-
+        # Workflows can render grids -> only one field with format = grid
+        if (scalar @{$fields} == 1 && $fields->[0]->{format} eq 'grid') {
+            
+            my $grid = $fields->[0];
+            $self->add_section({
+                type => 'grid',
+                className => 'workflow',        
+                content => {
+                    actions => ($grid->{action} ? [{
+                        path => $grid->{action},
+                        label => '',
+                        icon => 'view',
+                        target => ($grid->{target} ? $grid->{target} : 'tab'),
+                    }] : undef),
+                    columns =>  $grid->{header},
+                    data => $grid->{value},
+                    empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
+                    buttons => $buttons
+                }
+            });
+        # Standard case - render key/value
+        } else {
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => '',
+                    description => '',
+                    data => $fields,
+                    buttons => $buttons
+            }});
+        }
 
         # set status decorator on final states, use proc state
         my $desc = $wf_info->{STATE}->{description};
@@ -2458,6 +2479,20 @@ sub __render_fields {
                 # Sort by label
                 my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};            
                 $item->{value} = \@val;
+                
+            } elsif ($item->{format} eq "grid") {
+                
+                my @head;
+                # Create the required header structure
+                if ($field->{header}) {
+                    @head = map { { 'sTitle' => $_ } } @{$field->{header}}; 
+                } else {
+                    # just create empty headers for the number of columns
+                    @head = map { { 'sTitle' => '' } } @{$field->{value}->[0]}; 
+                }
+                $item->{header} = \@head;
+                $item->{action} = $field->{action};
+                $item->{target} = $field->{target} ?  $field->{target} : 'tab';
             }
 
             if ($field->{template}) {
