@@ -2236,7 +2236,7 @@ sub get_report_list {
     my $args = shift;
     
     
-    my $where = { };
+    my $where = { pki_realm => CTX('session')->get_pki_realm() };
     
     if ($args->{NAME}) {
         $where->{report_name} = { -like => $args->{NAME} };
