@@ -105,6 +105,15 @@ CREATE TABLE IF NOT EXISTS `datapool` (
   `last_update` int(10) unsigned DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `report` (
+  `report_name` varchar(63) NOT NULL,
+  `pki_realm` varchar(255) NOT NULL,
+  `created` int(11) NOT NULL,
+  `mime_type` varchar(63) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `report_value` longblob NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+
 CREATE TABLE IF NOT EXISTS `secret` (
   `pki_realm` varchar(255) NOT NULL,
   `group_id` varchar(255) NOT NULL,
@@ -233,6 +242,9 @@ ALTER TABLE `csr_attributes`
 ALTER TABLE `datapool`
  ADD PRIMARY KEY (`pki_realm`,`namespace`,`datapool_key`), ADD KEY `pki_realm` (`pki_realm`,`namespace`), ADD KEY `notafter` (`notafter`);
 
+ALTER TABLE `report`
+ ADD PRIMARY KEY (`report_name`,`pki_realm`);
+ 
 ALTER TABLE `secret`
  ADD PRIMARY KEY (`pki_realm`,`group_id`);
 

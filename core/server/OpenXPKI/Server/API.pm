@@ -1144,6 +1144,39 @@ sub BUILD {
                 },
             },
         },
+        'get_report_list' => {
+            class  => 'Object',
+            params => {
+                'NAME' => {
+                    type  => SCALAR,
+                    regex => $re_sql_string,
+                    optional => 1,
+                },
+                'MAXAGE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'COLUMNS' => {
+                    type  => SCALAR | ARRAYREF,
+                    optional => 1,
+                }
+            }
+        },
+        'get_report' => {
+            class  => 'Object',
+            params => {
+                'NAME' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'FORMAT' => {
+                    type  => SCALAR,
+                    regex => qr{ ALL|HASH|DATA }xms,
+                    optional => 1,
+                },
+            }
+        },
         'validate_certificate' => {
             class  => 'Object',
             params => {

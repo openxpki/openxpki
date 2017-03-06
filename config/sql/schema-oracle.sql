@@ -181,6 +181,20 @@ CREATE TABLE datapool (
 );
 
 --
+-- Table: report
+--;
+
+create table REPORT (
+  report_name varchar2(63),
+  pki_realm varchar2(255),
+  created number(38), -- unix timestamp
+  mime_type varchar2(63), -- advisory, e.g. text/csv, text/plain, application/pdf, ...
+  description varchar2(255),
+  report_value clob,
+  primary key ("report_name", "pki_realm")
+);
+
+--
 -- Table: secret
 --;
 

@@ -173,6 +173,19 @@ CREATE TABLE datapool (
 );
 
 --
+-- Name: report; Type: TABLE; Schema: public; Tablespace:
+--
+
+CREATE TABLE report (
+    report_name text NOT NULL,
+    pki_realm text NOT NULL,
+    created numeric(49,0),
+    mime_type text NOT NULL,
+    description text NOT NULL,
+    report_value bytea NOT NULL,
+);
+
+--
 -- Name: secret; Type: TABLE; Schema: public; Tablespace:
 --
 

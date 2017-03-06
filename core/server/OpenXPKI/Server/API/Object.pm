@@ -2158,6 +2158,131 @@ sub modify_data_pool_entry {
 }
 
 
+=head2 get_report { NAME, FORMAT => { HASH|DATA|ALL }  }
+
+retrieve data from the report table, name is mandatory, realm is always
+the session realm. By default, only the meta-information of the report is 
+returned (report_name, description, mime_type, created). With I<FORMAT=DATA> 
+only the data blob is given (might be binary!), I<FORMAT=ALL> is the same
+as HASH with the data added in the "report_value" column.
+
+=cut
+
+sub get_report {
+    
+    my $self = shift;
+    my $args = shift;
+    
+    if (!$args->{NAME}) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_REPORT_NAME_MISSING'
+        );
+    }
+    
+    my $name = $args->{NAME};
+    
+    my $retval;
+    my $format = $args->{FORMAT} || '';
+    
+
+    my $columns;
+    if ($format eq 'ALL') {
+        $columns = ['*'];
+    } elsif ($format eq 'DATA') {
+        $columns = ['report_value'];
+    } else {
+        $columns = ['report_name','created','mime_type','description'];
+    }
+
+    ##! 16: 'Search for ' . $name
+            
+    my $report = CTX('dbi')->select_one(
+        columns => $columns,
+        from => 'report',
+        where => { report_name => $name, pki_realm => CTX('session')->get_pki_realm() },
+    ) or OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_REPORT_NOT_FOUND_IN_DB',
+        params => { name => $name },
+    );
+    
+    ##! 64: 'Return value ' . Dumper $report
+    
+    if ($format eq 'DATA') {
+        return $report->{report_value};
+    } else {
+        return $report;
+    }
+    
+}
+
+
+=head2 get_report_list { NAME, MAXAGE, COLUMNS }
+
+Return a list of reports, both parameters are optionsal. 
+I<NAME> is evaluated using SQL Like so it can be used to filter for a 
+name pattern. I<MAXAGE> must be a definition parsable by 
+OpenXPKI::DateTime, items older than MAXAGE or not returned. 
+
+The default is to return a list of hashes with the metadata for each
+item. If you specify a list of column names, you will receive a list of
+the selected columns in given order as list of arrays! The I<COLUMNS> 
+parameter expects either an arrayref or a comma seperated string. 
+
+=cut
+
+sub get_report_list {
+    
+    my $self = shift;
+    my $args = shift;
+    
+    
+    my $where = { };
+    
+    if ($args->{NAME}) {
+        $where->{report_name} = { -like => $args->{NAME} };
+    }
+    if ($args->{MAXAGE}) {
+        my $maxage = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $args->{MAXAGE},
+            VALIDITYFORMAT => 'detect',
+        });
+        $where->{created} = { '>=', $maxage->epoch() };
+    }
+    
+    ##! 32: 'Search report ' . Dumper $where
+    
+    my $col;
+    if ($args->{COLUMNS}) {
+        $col = $args->{COLUMNS};
+        if (!ref $col) {
+            my @t = split(/,/, $col);
+            $col = \@t;
+        }
+        ##! 32: 'Custom columns ' . Dumper $col
+    } else {
+        $col = [ 'report_name', 'created', 'description', 'mime_type' ];
+    }; 
+    
+    my $sth = CTX('dbi')->select(
+        from => 'report',
+        order_by => [ 'report_name' ],
+        columns  => $col,
+        where => $where,
+    );
+    
+    my @items;
+    if ($args->{COLUMNS}) {
+        while (my @item = $sth->fetchrow_array) {
+           push @items, \@item;
+        }
+    } else {
+        while (my $item = $sth->fetchrow_hashref) {
+           push @items, $item;
+        }
+    }
+    return \@items;
+}
+
 =head2 control_watchdog { ACTION => (START|STOP) }
 
 Start ot stop the watchdog.
