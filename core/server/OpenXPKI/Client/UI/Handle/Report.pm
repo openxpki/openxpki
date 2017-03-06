@@ -25,7 +25,7 @@ sub render_report_list {
     # use a multivalued fetchid to prevent unauthorized download
     map {
         push @source, { source => 'report:'.$_->[0] };
-        push $_, $i++;
+        push @{$_}, $i++;
     } @data;
         
     my $fetchid = $self->__persist_response( \@source );
