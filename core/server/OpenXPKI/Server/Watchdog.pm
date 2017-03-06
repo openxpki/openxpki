@@ -238,6 +238,15 @@ sub run {
         }
     ) unless (defined $pid);
 
+
+    # Reconnect the dbi
+    CTX('dbi_log')->new_dbh();
+    CTX('dbi_log')->connect();
+    CTX('dbi_backend')->new_dbh();
+    CTX('dbi_backend')->connect();
+    CTX('dbi_workflow')->new_dbh();
+    CTX('dbi_workflow')->connect();
+    
     # parent process returns
     return $pid unless $pid == 0;
 
@@ -247,9 +256,6 @@ sub run {
     $SIG{'HUP'} = \&OpenXPKI::Server::Watchdog::_sig_hup;
     $SIG{'TERM'} = \&OpenXPKI::Server::Watchdog::_sig_term;
 
-    # Reconnect the dbi
-    CTX('dbi_log')->new_dbh();
-    CTX('dbi_log')->connect();
 
     # The caller sets the watchdog only in the global context
     # we reuse the context to set a pointer to ourselves for signal handling
