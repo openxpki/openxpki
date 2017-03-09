@@ -8638,6 +8638,7 @@ span.certstatus-expired {
   color: #444;
 }
 
+span.dns-timeout,
 span.certstatus-unknown {
   color: #79d1f3;
 }

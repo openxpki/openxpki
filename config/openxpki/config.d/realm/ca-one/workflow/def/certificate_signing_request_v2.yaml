@@ -839,7 +839,7 @@ field:
           [% IF value %]
             [% USE CheckDNS %]
             [% FOREACH fqdn = value %]
-              [% CheckDNS.valid(fqdn, '(FAIL)', '(ok)') %]
+              [% CheckDNS.valid(fqdn, '(FAIL)', '(ok)','(unknown)') %]
             [% END %]
           [% END %]
 

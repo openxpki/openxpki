@@ -3,13 +3,15 @@ package OpenXPKI::Template::Plugin::CheckDNS;
 =head1 NAME
  
 OpenXPKI::Template::Plugin::CheckDNS
-
-=head1 SYNOPSIS
-
   
 =head1 DESCRIPTION
 
 Plugin for Template::Toolkit to check FQDNs against DNS.
+
+You can pass a timeout in seconds and a comma seperated list of servers
+to the "USE" statement:
+
+    [% USE CheckDNS(timeout => 10, servers => '1.2.3.4,5.6.7.8') %]
 
 =cut 
 
@@ -36,9 +38,53 @@ has 'resolver' => (
     builder => '_init_dns',
 );
 
+has 'timeout' => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => 5,
+);
+
+has 'servers' => (
+    is => 'rw',
+    isa => 'ArrayRef|Undef',
+    lazy => 1,
+    default => undef
+);
+
+sub new {
+    
+    my ($class, $context, $args) = @_;
+    $args ||= { };
+    
+    my $self = bless {
+        _CONTEXT => $context,
+    }, $class;           # returns blessed MyPlugin object   
+    
+    if ($args->{timeout}) {
+        $self->timeout($args->{timeout});
+        warn "set timeout " . $self->timeout();
+    }
+    if ($args->{servers}) {
+        my @s = split /,/, $args->{servers};
+        $self->servers( \@s );
+        warn "set servers " . Dumper $self->servers();
+    }
+    return $self;    
+    
+}
+
 
 sub _init_dns {
-    return Net::DNS::Resolver->new; 
+    
+    my $self = shift;
+    
+    my $rr = Net::DNS::Resolver->new();
+    $rr->udp_timeout($self->timeout());
+    if ($self->servers()) {
+        $rr->nameservers( @{$self->servers()} );
+    }
+    return $rr; 
 }
 
 =head2 Methods
@@ -46,9 +92,10 @@ sub _init_dns {
 =head3 valid
 
 Expects the fqdn to check as argument. Returns the fqdn wrapped into a
-span element with css class I<dns-valid> or I<dns-failed>. You can pass
-strings to append to the fqdn for failure or success as second/third 
-argument.
+span element with css class I<dns-failed>, I<dns-valid> or I<dns-timeout>.
+You can pass strings to append to the fqdn for failure, success or timeout 
+as second/third/fourth argument. Timeout falls back to the string given for
+failed if it was not given (can be turned off by setting an empty value).
 
   Example: CheckDNS.valid(fqdn,'(FAILED!)','(ok)')
   Valid: <span class="dns-valid">www.openxpki.org (ok)</span>
@@ -62,6 +109,7 @@ sub valid {
     my $fqdn = shift;
     my $failed = shift || '';
     my $valid = shift || '';
+    my $timeout = shift;
     
     my $reply = $self->resolver->search( $fqdn );
     
@@ -69,6 +117,10 @@ sub valid {
     if ($reply && $reply->answer) {
         $status = 'dns-valid';
         $fqdn .= ' '.$valid if ($valid);
+    } elsif ($self->resolver->errorstring() =~ /query timed out/) {
+        $status = 'dns-timeout';
+        $timeout = $failed unless (defined $timeout);
+        $fqdn .= ' '.$timeout if ($timeout);
     } else {
         $status = 'dns-failed';
         $fqdn .= ' '.$failed if ($failed);
