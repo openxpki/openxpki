@@ -55,7 +55,7 @@ sub login_step {
 
         foreach my $name (keys %{$self->{ENV}})
         {
-            my $value = $self->{ENV}->{$name};
+            my $value = $self->{ENV}->{$name} || '';
             # we don't want to see expanded credentials in the log file,
             # so we just replace the credentials after logging it
             $value =~ s/__USER__/$account/g;
