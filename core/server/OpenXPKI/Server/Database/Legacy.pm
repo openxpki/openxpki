@@ -44,11 +44,10 @@ sub _convert {
     if ($new_to_old) {
         return {
             map {
-                my $key = $attr_map->{$_} or OpenXPKI::Exception->throw(
-                    message => 'Unknown field name while trying to convert to legacy database attributes',
-                    params  => { fieldname => $_ },
-                    log => { logger => CTX('log'), priority => 'fatal', facility => [ 'system', ] },
-                );
+                my $key = $attr_map->{$_};
+                # keep old keys - installation with extra fields or 
+                # meta columns like oracle rownum will break otherwise! 
+                if (!$key) { $key = $_; }
                 ( $key => $data->{$_} )
             }
             keys %$data
