@@ -34,7 +34,7 @@ sub execute
         my $san = $context->param('cert_subject_alt_name');
         if ($san) {
             my $sans = $ser->deserialize( $context->param('cert_subject_alt_name') );
-            ##! 32: 'found sans ' . Dumper @sans         
+            ##! 32: 'found sans ' . Dumper $sans
             foreach my $pair (@{$sans}) {
                 ##! 32: 'Type is ' . $pair->[0] 
                 if ($pair->[0] eq 'DNS') {
@@ -47,7 +47,7 @@ sub execute
     ##! 32: 'Items to check ' . Dumper \%items    
     if (!%items) {        
         $context->param('check_policy_dns','');
-        return 1;   
+        return 1;
     }
     
     
@@ -59,42 +59,50 @@ sub execute
      
     my $resolver = Net::DNS::Resolver->new; 
     
+    my $timeout = $self->param('timeout') || 30;
+    $resolver->udp_timeout( $timeout );
+    
+    if ($self->param('servers')) {
+        my @server = split /,/, $self->param('servers');
+        $resolver->nameservers( @server );
+    }
+    
     my @errors;
     FQDN:
     foreach my $fqdn (keys %items) {
         my $reply = $resolver->search( $fqdn );
 
-        #! 64: 'resolv for ' . $fqdn . Dumper $reply        
+        ##! 64: 'resolv for ' . $fqdn . Dumper $reply
         if (!$reply || !$reply->answer) {
-            #! 32: 'No answer for ' . $fqdn             
+            ##! 32: 'No answer for ' . $fqdn . ' error: ' . $resolver->errorstring()
             push @errors, $fqdn;
             next FQDN;     
         }
         
         if ($items{$fqdn} eq 'AC') {
-            #! 32: 'Valid answer for ' . $fqdn            
+            ##! 32: 'Valid answer for ' . $fqdn            
             next;            
         }
         
         if ($items{$fqdn} eq 'A') {
             foreach my $rr ($reply->answer) {
                 if ($rr->type eq "A") {      
-                    #! 32: 'Valid a-record for ' . $fqdn                                          
+                    ##! 32: 'Valid a-record for ' . $fqdn                                          
                     next FQDN;
                 }
             }
-            #! 16: 'no a-record found for ' . $fqdn
+            ##! 16: 'no a-record found for ' . $fqdn
             push @errors, $fqdn;
             
         } elsif ($items{$fqdn} eq 'A') {
             
             foreach my $rr ($reply->answer) {
                 if ($rr->cname) {            
-                    #! 32: 'Valid c-record for ' . $fqdn                                                                                      
+                    ##! 32: 'Valid c-record for ' . $fqdn                                                                                      
                     next FQDN;
                 }
             }
-            #! 16: 'no c-record found for ' . $fqdn
+            ##! 16: 'no c-record found for ' . $fqdn
             push @errors, $fqdn;
         }
             
@@ -144,5 +152,14 @@ Check the value of the CN component of the subject. Possible values are
 =item check_san
 
 Check subject alternative name section, same values as check_cn. 
+
+=item timeout
+
+The timeout (per query) in seconds, default is 30 seconds.
+
+=item servers
+
+comma seperated list of nameserver addresses. 
+Default is to use system settings.
 
 =back
