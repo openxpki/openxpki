@@ -1584,33 +1584,12 @@ sub get_data_pool_entry {
     my $key       = $args->{KEY};
 
     my $current_pki_realm   = CTX('session')->get_pki_realm();
-    my $requested_pki_realm = $args->{PKI_REALM};
-
-    if ( !defined $requested_pki_realm ) {
-        $requested_pki_realm = $current_pki_realm;
-    }
+    my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
 
     # when called from a workflow we only allow the current realm
     # NOTE: only check direct caller. if workflow is deeper in the caller
     # chain we assume it's ok.
-    my @caller = caller(1);
-    if ( $caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms ) {
-        if ( $requested_pki_realm ne $current_pki_realm ) {
-            OpenXPKI::Exception->throw(
-                message =>
-                    'I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_INVALID_PKI_REALM',
-                params => {
-                    REQUESTED_REALM => $requested_pki_realm,
-                    CURRENT_REALM   => $current_pki_realm,
-                },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => [ 'audit', 'system', ],
-                },
-            );
-        }
-    }
+    $self->__assert_current_pki_realm_within_workflow($requested_pki_realm);
 
     CTX('log')->log(
         MESSAGE =>
@@ -1630,9 +1609,8 @@ sub get_data_pool_entry {
         DYNAMIC => \%key,
     );
 
+    # no entry found, do not raise exception but simply return undef
     if ( !defined $result ) {
-
-        # no entry found, do not raise exception but simply return undef
         CTX('log')->log(
             MESSAGE => "Requested data pool entry [$requested_pki_realm:$namespace:$key] not available",
             PRIORITY => 'debug',
@@ -1901,7 +1879,10 @@ sub set_data_pool_entry {
     ##! 1: 'start'
     my ($self, $args) = @_;
 
-    my $current_pki_realm = CTX('session')->get_pki_realm();
+    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
+    # modify arguments, as they are passed to the worker method
+    $args->{PKI_REALM} = $requested_pki_realm;
 
     # Check if key and namespace exists
     if (!$args->{NAMESPACE} or !$args->{KEY}) {
@@ -1915,43 +1896,24 @@ sub set_data_pool_entry {
         );
     }
 
-    if ( !defined $args->{PKI_REALM} ) {
-        # modify arguments, as they are passed to the worker method
-        $args->{PKI_REALM} = $current_pki_realm;
-    }
-    my $requested_pki_realm = $args->{PKI_REALM};
-
     # when called from a workflow we only allow the current realm
     # NOTE: only check direct caller. if workflow is deeper in the caller
     # chain we assume it's ok.
-    my @caller = caller(1);
-    if ( $caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms ) {
-        if ( $requested_pki_realm ne $current_pki_realm ) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_PKI_REALM',
-                params => {
-                    REQUESTED_REALM => $requested_pki_realm,
-                    CURRENT_REALM   => $current_pki_realm,
-                },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => [ 'audit', 'system', ],
-                },
-            );
-        }
-        if ( $args->{NAMESPACE} =~ m{ \A sys\. }xms ) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_NAMESPACE',
-                params => { NAMESPACE => $args->{NAMESPACE}, },
-                log    => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => [ 'audit', 'system', ],
-                },
-            );
+    $self->__assert_current_pki_realm_within_workflow($requested_pki_realm);
 
-        }
+    if ( scalar(caller(1)) =~ m{ \A OpenXPKI::Server::Workflow }xms
+        and $args->{NAMESPACE} =~ m{ \A sys\. }xms
+    ) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_NAMESPACE',
+            params => { NAMESPACE => $args->{NAMESPACE}, },
+            log    => {
+                logger   => CTX('log'),
+                priority => 'error',
+                facility => [ 'audit', 'system', ],
+            },
+        );
+
     }
 
     # forward encryption request to the worker function, use symmetric
@@ -2002,30 +1964,12 @@ sub list_data_pool_entries {
     my $limit = $args->{LIMIT};
 
     my $current_pki_realm   = CTX('session')->get_pki_realm();
-    my $requested_pki_realm = $args->{PKI_REALM};
-
-    $requested_pki_realm //= $current_pki_realm;
+    my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
 
     # when called from a workflow we only allow the current realm
     # NOTE: only check direct caller. if workflow is deeper in the caller
     # chain we assume it's ok.
-    my @caller = caller(1);
-    if ( $caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms ) {
-        if ( $requested_pki_realm ne $current_pki_realm ) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM',
-                params => {
-                    REQUESTED_REALM => $requested_pki_realm,
-                    CURRENT_REALM   => $current_pki_realm,
-                },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => [ 'audit', 'system', ],
-                },
-            );
-        }
-    }
+    $self->__assert_current_pki_realm_within_workflow($requested_pki_realm);
 
     my %condition = ( 'PKI_REALM' => { VALUE => $requested_pki_realm }, );
 
@@ -2081,32 +2025,12 @@ sub modify_data_pool_entry {
     #my $expiration_date     = $args->{EXPIRATION_DATE};
 
     my $current_pki_realm   = CTX('session')->get_pki_realm();
-    my $requested_pki_realm = $args->{PKI_REALM};
-
-    if ( !defined $requested_pki_realm ) {
-        $requested_pki_realm = $current_pki_realm;
-    }
+    my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
 
     # when called from a workflow we only allow the current realm
     # NOTE: only check direct caller. if workflow is deeper in the caller
     # chain we assume it's ok.
-    my @caller = caller(1);
-    if ( $caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms ) {
-        if ( $args->{PKI_REALM} ne $current_pki_realm ) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM',
-                params => {
-                    REQUESTED_REALM => $requested_pki_realm,
-                    CURRENT_REALM   => $current_pki_realm,
-                },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => [ 'audit', 'system', ],
-                },
-            );
-        }
-    }
+    $self->__assert_current_pki_realm_within_workflow($requested_pki_realm);
 
     my %condition = (
         'PKI_REALM'    => $requested_pki_realm,
@@ -2632,6 +2556,31 @@ sub __get_current_datapool_encryption_key : PRIVATE {
     }
 
     return $associated_vault_key;
+}
+
+
+# Check whether the requested PKI realm matches the current one (only if calling
+# code is within OpenXPKI::Server::Workflow namespace).
+sub __assert_current_pki_realm_within_workflow : PRIVATE {
+    my ($self, $requested_pki_realm) = @_;
+
+    return 1 unless scalar(caller(2)) =~ m{ \A OpenXPKI::Server::Workflow }xms;
+
+    my $current_pki_realm = CTX('session')->get_pki_realm;
+    return 1 if $requested_pki_realm eq $current_pki_realm;
+
+    OpenXPKI::Exception->throw(
+        message => 'Requested PKI realm must match the current one if datapool is accessed from within OpenXPKI::Server::Workflow namespace',
+        params => {
+            REQUESTED_REALM => $requested_pki_realm,
+            CURRENT_REALM   => $current_pki_realm,
+        },
+        log => {
+            logger   => CTX('log'),
+            priority => 'error',
+            facility => [ 'audit', 'system', ],
+        },
+    );
 }
 
 sub __get_chain_certificates {
