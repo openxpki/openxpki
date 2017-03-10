@@ -1863,12 +1863,14 @@ Named parameters:
 
 =item * EXPIRATION_DATE
 
-optional, seconds since epoch. If entry is older than this value the server may delete the entry.
-Default is to keep the value for infinity.
-If you call set_data_pool_entry with the FORCE option to update an exisiting value,
-the (new) expiry date must be passed again or will be reset to inifity!
-To prevent unwanted deletion, a value of 0 is not accepted. Set value to undef
-to delete an entry.
+optional, seconds since epoch. If current time passes this date the server will
+delete the entry. Default is to keep the value for infinity.
+
+If you call C<set_data_pool_entry> with the C<FORCE> option to update an
+existing value, the (new) expiry date must be passed again or will be reset to
+inifity!
+
+To prevent unwanted deletion, a value of C<0> is not accepted.
 
 =back
 
@@ -1882,16 +1884,16 @@ password safe key is available during the first access to the symmetric key.
 
 
 Example:
- CTX('api')->set_data_pool_entry(
- {
-   PKI_REALM => $pki_realm,
-   NAMESPACE => 'workflow.foo.bar',
-   KEY => 'myvariable',
-   VALUE => $tmpval,
-   ENCRYPT => 1,
-   FORCE => 1,
-   EXPIRATION_DATE => time + 3600 * 24 * 7,
- });
+
+    CTX('api')->set_data_pool_entry( {
+        PKI_REALM => $pki_realm,
+        NAMESPACE => 'workflow.foo.bar',
+        KEY => 'myvariable',
+        VALUE => $tmpval,
+        ENCRYPT => 1,
+        FORCE => 1,
+        EXPIRATION_DATE => time + 3600 * 24 * 7,
+    } );
 
 =cut
 
@@ -1966,6 +1968,7 @@ sub set_data_pool_entry {
     # erase expired entries
     $self->__cleanup_data_pool();
 
+    # TODO #legacydb Check if forced DB commit can be removed (introduced in https://github.com/openxpki/openxpki/commit/a46909dcb347450677dbe3c8c34d9657d77de7b8)
     if ($self->__set_data_pool_entry($args) and $args->{COMMIT}) {
         CTX('dbi_backend')->commit();
     }
@@ -1983,7 +1986,7 @@ List all keys in the datapool in a given namespace.
 
 =item * PKI_REALM, optional, see get_data_pool_entry for details.
 
-=item * MAXCOUNT, optional, max number of entries returned
+=item * LIMIT, optional, max number of entries returned
 
 =back
 
