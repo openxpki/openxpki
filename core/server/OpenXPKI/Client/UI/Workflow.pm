@@ -2088,7 +2088,7 @@ sub __delegate_call {
     my $args = shift;
     my $wf_action = shift || '';
 
-    my ($class, $method) = $call =~ /(.+)::([^:]+)/;
+    my ($class, $method) = $call =~ /([\w\:\_]+)::([\w\_]+)/;
     $self->logger()->debug("deletegating render to $class, $method" );
     eval "use $class; 1;";
     $class->$method( $self, $args, $wf_action );

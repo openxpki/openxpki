@@ -194,6 +194,52 @@ sub handle_request {
 
 }
 
+=head2 __load_class 
+
+Expect the page/action string and a reference to the cgi object
+Extracts the expected class and method name and extra params encoded in
+the given parameter and tries to instantiate the class. On success, the
+class instance and the extracted method name is returned (two element
+array). On error, both elements in the array are set to undef. 
+
+=cut
+
+sub __load_class {
+
+    my $self = shift;
+    my $call = shift;
+    my $cgi = shift;
+
+    my ($class, $method, $param) = ($call =~ /\A (\w+)\!? (\w+)? \!?(.*) \z/xms);
+
+    if (!$class) {
+        $self->logger()->error("Failed to parse page load string $call");
+        return (undef, undef);
+    }
+
+    $method  = 'index' if (!$method );
+
+    my %extra;
+    if ($param) {
+        %extra = split /!/, $param;
+        $self->logger()->debug("Found extra params " . Dumper \%extra );
+    }
+
+    $self->logger()->debug("Loading handler class $class");
+
+    $class = "OpenXPKI::Client::UI::".ucfirst($class);
+    eval "use $class;1";
+    if ($EVAL_ERROR) {
+        $self->logger()->error("Failed loading handler class $class");
+        return (undef, undef);
+    } 
+
+    my $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });
+
+    return ($result, $method);
+
+}
+
 sub handle_page {
 
     my $self = shift;
@@ -210,53 +256,39 @@ sub handle_page {
     if ($action) {
         $self->logger()->info('handle action ' . $action);
 
-        my ($class, $method, %extra) = split /!/, $action;
+        my $method;
+        ($result, $method) = $self->__load_class( $action, $cgi );
 
-        $self->logger()->debug("Loading action handler class $class, extra params " . Dumper \%extra );
-
-        $class = "OpenXPKI::Client::UI::".ucfirst($class);
-        $self->logger()->debug("Loading page action class $class");
-        eval "use $class;1";
-        if ($EVAL_ERROR) {
-            $self->logger()->error("Failed loading action class $class");
-            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND')});
-        } else {
-            $method  = 'index' if (!$method );
+        if ($result) {
             $method  = "action_$method";
             $self->logger()->debug("Method is $method");
-            $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });
             $result->$method( $method_args );
+        } else {
+            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND')});
         }
     }
 
-    # Render a page only if  there is no action result
+    # Render a page only if there is no action result
     if (!$result) {
 
-        my ($class, $method, %extra);
         # Handling of special page requests - to be replaced by hash if it grows
         if ($page eq 'welcome') {
-            $class = 'home';
-            $method = 'welcome';
-        } else {
-            ($class, $method, %extra) = split /!/, $page;
+            $page = 'home!welcome';
         }
-        $class = "OpenXPKI::Client::UI::".ucfirst($class);
-        $self->logger()->debug("Loading page handler class $class, extra params " . Dumper \%extra );
 
-        eval "use $class;1";
-        if ($EVAL_ERROR) {
-            $self->logger()->error("Failed loading page class $class");
+        my $method;
+        ($result, $method) = $self->__load_class( $page, $cgi );
+
+        if (!$result) {
+            $self->logger()->error("Failed loading page class");
             $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self,  cgi => $cgi });
             $result->init_error();
             $result->set_status(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'),'error');
 
         } else {
-            $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });
-            $method  = 'index' if (!$method );
             $method  = "init_$method";
             $self->logger()->debug("Method is $method");
             $result->$method( $method_args );
-
         }
     }
 
@@ -481,5 +513,6 @@ sub flush_session {
     $self->session( new CGI::Session(undef, undef, {Directory=>'/tmp'}) );
 
 }
+
 
 1;
