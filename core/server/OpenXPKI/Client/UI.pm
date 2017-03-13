@@ -133,7 +133,10 @@ sub handle_request {
     my $args = shift;
     my $cgi = $args->{cgi};
 
-    my $action = $cgi->param('action') || '';
+    my $action = '';
+    if (($cgi->request_method() eq 'POST') && $cgi->param('action')) {
+        $action = $cgi->param('action');
+    }
     my $page = $cgi->param('page') || '';
 
     # Check for goto redirection first
@@ -249,7 +252,15 @@ sub handle_page {
     my $cgi = $args->{cgi};
 
     # set action and page - args always wins about cgi
-    my $action = (defined $args->{action} ? $args->{action} : $cgi->param('action')) || '';
+    
+    my $action = '';
+    # action is only valid explicit or within a post request
+    if (defined $args->{action}) {
+       $action = $args->{action};
+    } elsif ($cgi->request_method() eq 'POST' && $cgi->param('action')) {
+        $action = $cgi->param('action');
+    }
+    
     my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
 
     my $result;
@@ -312,8 +323,13 @@ sub handle_login {
 
     my $session = $self->session();
     my $page = $cgi->param('page') || '';
-    my $action = $cgi->param('action') || '';
-
+    
+    # action is only valid within a post request
+    my $action = '';
+    if ($cgi->request_method() eq 'POST' && $cgi->param('action')) {
+        $action = $cgi->param('action');
+    }
+    
     $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
     # Special handling for pki_realm and stack params
