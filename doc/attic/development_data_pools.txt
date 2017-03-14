@@ -219,10 +219,9 @@ Returns: true on success, throws exception on error.
 safe certificate). Retrieving encrypted information will only work if the password safe key is available during the first access to the symmetric key.
 
 Exceptions:
-; OpenXPKI::Exception : Invalid PKI Realm was specified.
+; OpenXPKI::Exception : Various causes (invalid PKI realm specified, key already exists).
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_NAMESPACE : Invalid (e. g. reserved) namespace was specified.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_READ_ONLY_DATA : Attempt to modify read-only data.
-; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENTRY_EXISTS : Specified key already exists.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENCRYPTION_NOT_CONFIGURED : Encryption is not set up properly.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENCRYPTION_KEY_UNAVAILABLE : Encryption key is currently not available (e. g. not logged in), cannot encrypt value.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_VALUE_DATA_TYPE : Value data type is not supported.

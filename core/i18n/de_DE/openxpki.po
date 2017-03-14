@@ -5932,10 +5932,6 @@ msgstr "Benutzername"
 #~ msgstr "Web-Schnittstelle des Trustcenters"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENTRY_EXISTS"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ILLEGAL_DATA"
 #~ msgstr "PKI Realm"
 

@@ -1585,6 +1585,7 @@ sub get_data_pool_entry {
 
     my $current_pki_realm   = CTX('session')->get_pki_realm();
     my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
+    my $dbi = CTX('dbi');
 
     # when called from a workflow we only allow the current realm
     # NOTE: only check direct caller. if workflow is deeper in the caller
@@ -1598,19 +1599,20 @@ sub get_data_pool_entry {
         FACILITY => 'system',
     );
 
-    my %key = (
-        'PKI_REALM'    => { VALUE => $requested_pki_realm },
-        'NAMESPACE'    => { VALUE => $namespace },
-        'DATAPOOL_KEY' => { VALUE => $key },
-    );
+    my $where = {
+        pki_realm    => $requested_pki_realm,
+        namespace    => $namespace,
+        datapool_key => $key,
+    };
 
-    my $result = CTX('dbi_backend')->first(
-        TABLE   => 'DATAPOOL',
-        DYNAMIC => \%key,
+    my $result = $dbi->select_one(
+        from  => 'datapool',
+        columns => [ '*' ],
+        where => $where,
     );
 
     # no entry found, do not raise exception but simply return undef
-    if ( !defined $result ) {
+    unless ($result) {
         CTX('log')->log(
             MESSAGE => "Requested data pool entry [$requested_pki_realm:$namespace:$key] not available",
             PRIORITY => 'debug',
@@ -1619,8 +1621,8 @@ sub get_data_pool_entry {
         return;
     }
 
-    my $value          = $result->{DATAPOOL_VALUE};
-    my $encryption_key = $result->{ENCRYPTION_KEY};
+    my $value          = $result->{datapool_value};
+    my $encryption_key = $result->{encryption_key};
 
     my $encrypted = 0;
     if ( defined $encryption_key and ( $encryption_key ne '' ) ) {
@@ -1706,20 +1708,29 @@ sub get_data_pool_entry {
             # add the vaults ident to prevent collisions in DB
             # TODO: should be replaced by static server id
             my $secret_id = $encryption_key. ':'. CTX('volatile_vault')->ident();
-
             ##! 16: 'Secret id ' . $secret_id
 
-            my $cached_key = CTX('dbi_backend')->first(
-                TABLE   => 'SECRET',
-                DYNAMIC => {
-                    PKI_REALM => { VALUE => $requested_pki_realm },
-                    GROUP_ID  => { VALUE => $secret_id },
+            my $cached_key = $dbi->select_one(
+                from => 'secret',
+                columns => [ 'data' ],
+                where => {
+                    pki_realm => $requested_pki_realm,
+                    group_id  => $secret_id,
                 }
             );
-
             ##! 32: 'Cache result ' . Dumper $cached_key
 
-            if ( !defined $cached_key ) {
+            if ($cached_key) {
+                # key was cached by volatile vault
+                ##! 16: 'encryption key cache hit'
+
+                my $decrypted_key =
+                  CTX('volatile_vault')->decrypt( $cached_key->{data} );
+
+                ##! 32: 'decrypted_key ' . $decrypted_key
+                ( $algorithm, $iv, $key ) = split( /:/, $decrypted_key );
+            }
+            else {
                 ##! 16: 'encryption key cache miss'
                 # key was not cached by volatile vault, obtain it the hard
                 # way
@@ -1733,7 +1744,7 @@ sub get_data_pool_entry {
                     }
                 );
 
-                if ( !defined $key_data ) {
+                if (not defined $key_data) {
 
                     # should not happen, we have no decryption key for this
                     # encrypted value
@@ -1757,28 +1768,17 @@ sub get_data_pool_entry {
 
                 # cache encryption key in volatile vault
                 eval {
-                    CTX('dbi_backend')->insert(
-                        TABLE => 'SECRET',
-                        HASH  => {
-                            DATA => CTX('volatile_vault')->encrypt( $key_data->{VALUE} ),
-                            PKI_REALM => $requested_pki_realm,
-                            GROUP_ID  => $secret_id,
+                    $dbi->start_txn;
+                    $dbi->insert(
+                        into => 'secret',
+                        values => {
+                            data => CTX('volatile_vault')->encrypt( $key_data->{VALUE} ),
+                            pki_realm => $requested_pki_realm,
+                            group_id  => $secret_id,
                         },
                     );
-                    CTX('dbi_backend')->commit();
+                    $dbi->commit;
                 };
-
-            }
-            else {
-
-                # key was cached by volatile vault
-                ##! 16: 'encryption key cache hit'
-
-                my $decrypted_key =
-                  CTX('volatile_vault')->decrypt( $cached_key->{DATA} );
-
-               ##! 32: 'decrypted_key ' . $decrypted_key
-                    ( $algorithm, $iv, $key ) = split( /:/, $decrypted_key );
             }
 
             ##! 16: 'setting up volatile vault for symmetric decryption'
@@ -1796,20 +1796,20 @@ sub get_data_pool_entry {
     }
 
     my %return_value = (
-        PKI_REALM => $result->{PKI_REALM},
-        NAMESPACE => $result->{NAMESPACE},
-        KEY       => $result->{DATAPOOL_KEY},
+        PKI_REALM => $result->{pki_realm},
+        NAMESPACE => $result->{namespace},
+        KEY       => $result->{datapool_key},
         ENCRYPTED => $encrypted,
-        MTIME     => $result->{DATAPOOL_LAST_UPDATE},
+        MTIME     => $result->{last_update},
         VALUE     => $value,
     );
 
     if ($encrypted) {
-        $return_value{ENCRYPTION_KEY} = $result->{ENCRYPTION_KEY};
+        $return_value{ENCRYPTION_KEY} = $result->{encryption_key};
     }
 
-    if ( defined $result->{NOTAFTER} and ( $result->{NOTAFTER} ne '' ) ) {
-        $return_value{EXPIRATION_DATE} = $result->{NOTAFTER};
+    if ( defined $result->{notafter} and ( $result->{notafter} ne '' ) ) {
+        $return_value{EXPIRATION_DATE} = $result->{notafter};
     }
 
     ##! 32: 'datapool value is ' . Dumper %return_value
@@ -1928,12 +1928,10 @@ sub set_data_pool_entry {
     }
 
     # erase expired entries
-    $self->__cleanup_data_pool();
+    $self->__cleanup_data_pool;
+    # TODO #legacydb DB commit is always done in __set_data_pool_entry so we can remove COMMIT parameter (introduced in https://github.com/openxpki/openxpki/commit/a46909dcb347450677dbe3c8c34d9657d77de7b8)
+    $self->__set_data_pool_entry($args);
 
-    # TODO #legacydb Check if forced DB commit can be removed (introduced in https://github.com/openxpki/openxpki/commit/a46909dcb347450677dbe3c8c34d9657d77de7b8)
-    if ($self->__set_data_pool_entry($args) and $args->{COMMIT}) {
-        CTX('dbi_backend')->commit();
-    }
     return 1;
 }
 
@@ -2158,6 +2156,7 @@ sub __set_data_pool_entry : PRIVATE {
     my ($self, $args) = @_;
 
     my $current_pki_realm = CTX('session')->get_pki_realm();
+    my $dbi = CTX('dbi');
 
     my $requested_pki_realm = $args->{PKI_REALM};
     my $namespace           = $args->{NAMESPACE};
@@ -2168,20 +2167,18 @@ sub __set_data_pool_entry : PRIVATE {
     my $value               = $args->{VALUE};
 
     # primary key for database
-    my %key = (
-        'PKI_REALM'    => $requested_pki_realm,
-        'NAMESPACE'    => $namespace,
-        'DATAPOOL_KEY' => $key,
-    );
+    my $key_values = {
+        'pki_realm'    => $requested_pki_realm,
+        'namespace'    => $namespace,
+        'datapool_key' => $key,
+    };
 
     # undefined or missing value: delete entry
-    if ( !defined($value) or $value eq '' ) {
+    if ( not defined($value) or $value eq '' ) {
         eval {
-            CTX('dbi_backend')->delete(
-                TABLE => 'DATAPOOL',
-                DATA  => { %key, },
-            );
-            CTX('dbi_backend')->commit();
+            $dbi->start_txn;
+            $dbi->delete(from => 'datapool', where => $key_values );
+            $dbi->commit;
         };
         return 1;
     }
@@ -2314,70 +2311,31 @@ sub __set_data_pool_entry : PRIVATE {
         }
     }
 
-    CTX('log')->log(
-        MESSAGE =>
-          "Writing data pool entry [$requested_pki_realm:$namespace:$key]",
-        PRIORITY => 'debug',
-        FACILITY => 'system',
-    );
+    CTX('log')->debug("Writing data pool entry [$requested_pki_realm:$namespace:$key]", 'system');
 
-    my %values = (
-        'DATAPOOL_VALUE'       => $value,
-        'ENCRYPTION_KEY'       => $encryption_key_id,
-        'DATAPOOL_LAST_UPDATE' => time,
-    );
-
-    if ( defined $expiration_date ) {
-        $values{NOTAFTER} = $expiration_date;
-    } else {
-        $values{NOTAFTER} = undef;
-    }
-
-    my $rows_updated;
-    if ($force) {
-
-        # force means we can overwrite entries, so first try to update the value.
-        $rows_updated = CTX('dbi_backend')->update(
-            TABLE => 'DATAPOOL',
-            DATA  => { %values },
-            WHERE => \%key,
-        );
-        if ($rows_updated) {
-            CTX('dbi_backend')->commit();
-            return 1;
-        }
-
-        # no rows updated, so no data existed before, continue with insert
-    }
-
-    eval {
-        CTX('dbi_backend')->insert(
-            TABLE => 'DATAPOOL',
-            HASH  => { %key, %values, },
-        );
-        CTX('dbi_backend')->commit();
+    my $data_values = {
+        datapool_value  => $value,
+        encryption_key  => $encryption_key_id,
+        last_update     => time,
+        notafter        => $expiration_date // undef,
     };
-    if ( my $exc = OpenXPKI::Exception->caught() ) {
-        if ( $exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_EXECUTE_FAILED' )
-        {
 
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENTRY_EXISTS',
-                params => {
-                    PKI_REALM => $requested_pki_realm,
-                    NAMESPACE => $namespace,
-                    KEY       => $key,
-                },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'info',
-                    facility => [ 'system', ],
-                },
-            );
-        }
-
-        $exc->rethrow();
+    $dbi->start_txn;
+    if ($force) {
+        # force = allow overwriting entries
+        $dbi->merge(
+            into    => 'datapool',
+            set     => $data_values,
+            where   => $key_values,
+        );
     }
+    else {
+        $dbi->insert(
+            into    => 'datapool',
+            values  => { %$key_values, %$data_values },
+        );
+    }
+    $dbi->commit;
 
     return 1;
 }
