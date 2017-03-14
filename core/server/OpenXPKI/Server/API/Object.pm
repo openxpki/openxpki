@@ -1625,7 +1625,7 @@ sub get_data_pool_entry {
     my $encryption_key = $result->{encryption_key};
 
     my $encrypted = 0;
-    if ( defined $encryption_key and ( $encryption_key ne '' ) ) {
+    if ($encryption_key) {
         $encrypted = 1;
 
         my $token = CTX('api')->get_default_token();
@@ -1795,25 +1795,19 @@ sub get_data_pool_entry {
         }
     }
 
-    my %return_value = (
+    ##! 32: 'datapool value is ' . Dumper %return_value
+    return {
         PKI_REALM => $result->{pki_realm},
         NAMESPACE => $result->{namespace},
         KEY       => $result->{datapool_key},
         ENCRYPTED => $encrypted,
         MTIME     => $result->{last_update},
         VALUE     => $value,
-    );
-
-    if ($encrypted) {
-        $return_value{ENCRYPTION_KEY} = $result->{encryption_key};
-    }
-
-    if ( defined $result->{notafter} and ( $result->{notafter} ne '' ) ) {
-        $return_value{EXPIRATION_DATE} = $result->{notafter};
-    }
-
-    ##! 32: 'datapool value is ' . Dumper %return_value
-    return \%return_value;
+        $encrypted
+            ? ( ENCRYPTION_KEY => $result->{encryption_key} ) : (),
+        $result->{notafter}
+            ? ( EXPIRATION_DATE => $result->{notafter} ) : (),
+    };
 }
 
 =head2 set_data_pool_entry
