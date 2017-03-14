@@ -500,12 +500,18 @@ sub handle_login {
             # The backend session remains the same but can not be used by an 
             # adversary as the id is never exposed and we destroy the old frontend
             # session so access to the old session is not possible
-            my $new_session_front = new CGI::Session(undef, undef, { Directory=>'/tmp' });
+           
+            my $sess_path = $self->_config()->{session_path} || '/tmp';
+            my $new_session_front = new CGI::Session(undef, undef, { Directory => $sess_path });
             $new_session_front->param('backend_session_id', $self->backend()->get_session_id() );
             $new_session_front->param('user', $reply->{PARAMS});
             $new_session_front->param('pki_realm', $reply->{PARAMS}->{pki_realm});
             $new_session_front->param('is_logged_in', 1);
             $new_session_front->param('initialized', 1);
+            
+            if ($self->_config()->{session_timeout}) {
+                $new_session_front->expire( $self->_config()->{session_timeout} );
+            }
             
             # fetch redirect from old session before deleting it!
             $new_session_front->param('redirect', $self->session()->param('redirect'));

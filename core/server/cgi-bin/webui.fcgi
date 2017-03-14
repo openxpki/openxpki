@@ -84,13 +84,18 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     my $sess_id = $cgi->cookie('oxisess-webui') || undef;
-    my $session_front = new CGI::Session(undef, $sess_id, {Directory=>'/tmp'});
+    my $sess_path = $config{global}{session_path} || '/tmp';
+    my $session_front = new CGI::Session(undef, $sess_id, { Directory => $sess_path });
     our $cookie = { 
         -name => 'oxisess-webui', 
         -value => $session_front->id, 
         -Secure => ($ENV{'HTTPS'} ? 1 : 0),
         -HttpOnly => 1 
     };
+    
+    if (defined $config{global}{session_timeout}) {
+        $session_front->expire( $config{global}{session_timeout} );
+    }
 
     $log->debug('session id (front) is '. $session_front->id);
 
@@ -129,7 +134,6 @@ while (my $cgi = CGI::Fast->new()) {
     our @header = @header_tpl;    
     push @header, ('-cookie', $cgi->cookie( $cookie ));
     push @header, ('-type','application/json; charset=UTF-8');        
-
 
     my $result;
     eval {
