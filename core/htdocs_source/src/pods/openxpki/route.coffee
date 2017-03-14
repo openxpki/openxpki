@@ -21,6 +21,7 @@ Route = Em.Route.extend
         ping: null
         refresh: null
         structure: null
+        rtoken: null
         status: null
         tabs: []
         navEntries: []
@@ -75,6 +76,10 @@ Route = Em.Route.extend
         $(".loading").addClass "in-progress"
 
         source = @get "source"
+        
+        if req.type is "POST" 
+            req.data._rtoken = source.rtoken
+        
         target = req.data.target or "self"
         if target is "self"
             if source.get "modal"
@@ -118,6 +123,7 @@ Route = Em.Route.extend
                 else if doc.structure
                     source.set "navEntries", doc.structure
                     source.set "user", doc.user
+                    source.set "rtoken", doc.rtoken
 
                 else
                     if doc.page and doc.main

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2017-01-24 10:21+0100\n"
+"PO-Revision-Date: 2017-03-14 14:56+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -638,9 +638,6 @@ msgstr "Comment"
 msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
 msgstr "Country"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-msgstr "Datasafe Token"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr "Domain Component"
 
@@ -846,6 +843,9 @@ msgstr "Report Configuration"
 
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Download"
+
+msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
+msgstr "Unable to perform action -  security token was invalid!"
 
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 msgstr "Unknown error when analyzing card status"
@@ -2943,11 +2943,29 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "Password"
 
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+#~ msgstr "Datasafe Token"
+
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
+#~ msgstr "Last Update"
+
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_DESCRIPTION"
+#~ msgstr "Report Details"
+
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
+#~ msgstr "Report Name"
+
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR"
+#~ msgstr "PKCS10 request has no subject set"
+
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR"
+#~ msgstr "PKCS10 signature is not valid"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "Approve Request"
@@ -4635,6 +4653,12 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_DESC"
+#~ msgstr "Please click on a line to download the report."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_LABEL"
+#~ msgstr "Available Reports"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"

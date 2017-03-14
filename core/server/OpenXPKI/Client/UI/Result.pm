@@ -419,14 +419,16 @@ sub render {
     if ($output && ref $output eq 'SCALAR') {
         $$output = $body;        
     } elsif (ref $cgi && $cgi->http('HTTP_X-OPENXPKI-Client')) {
-        # Start output stream        
-        print $cgi->header( @main::header );        
+        # Start output stream
+        print $cgi->header( @main::header );
         print $body;
     } else {
         # Do a redirect to the baseurl
         my $url = $self->_session()->param('baseurl');
         if (ref $redirect eq 'HASH' && $redirect->{goto}) {
             $url .= $redirect->{goto};
+        } elsif ($body) {
+            $url .= 'openxpki/'.$self->__persist_response( { data => $body } );
         }
         print $cgi->redirect($url);
     }

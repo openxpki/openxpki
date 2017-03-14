@@ -864,10 +864,6 @@ msgstr ""
 "beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-msgstr "TLS-Server"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr ""
 "Wenn Sie genau wissen, wie der eindeutige Name des Zertifikats aussehen "
@@ -1201,6 +1197,10 @@ msgstr "Benutzername"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "PEM (CRT) Format"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
+msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
@@ -5932,15 +5932,7 @@ msgstr "Benutzername"
 #~ msgstr "PKI Realm"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_COUNT_SELECT_RESULT_NOT_ARRAY"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_INVALID_CERT_ATTRIBUTES_ARGUMENTS"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SEARCH_CERT_SELECT_RESULT_NOT_ARRAY"
 #~ msgstr "PKI Realm"
 
 #, fuzzy
@@ -7938,6 +7930,10 @@ msgstr "Benutzername"
 #~ "Angabe beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+#~ msgstr "TLS-Server"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_EMAIL"
 #~ msgstr "E-Mailadresse"
 
@@ -7980,6 +7976,29 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "Nutzer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_DESCRIPTION"
+#~ msgstr ""
+#~ "Der eindeutige Bezeichner (UID) wird normalerweise benutzt um Account "
+#~ "oderauch andere Seriennummern in eindeutigen Namen (DN) unterzubringen. "
+#~ "Diesdient der sichern Identifikation von Personen oder Objekten."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR"
+#~ msgstr "Prozesse anzeigen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR"
+#~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
@@ -11377,6 +11396,14 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_DESC"
+#~ msgstr "Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_LABEL"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy

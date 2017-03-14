@@ -736,9 +736,6 @@ msgstr "Descrizione Commento"
 msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
 msgstr "Paese"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-msgstr "Token Datasafe"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
 msgstr "Componente Dominio"
 
@@ -952,6 +949,10 @@ msgstr "Report Completo"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
 msgstr "Scarica"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
+msgstr "Il token di firma della CRL non è online"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
@@ -3199,11 +3200,34 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
 #~ msgstr "Password"
 
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
+#~ msgstr "Token Datasafe"
+
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
+#~ msgstr "Nessun dato disponibile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_DESCRIPTION"
+#~ msgstr "Usa la history del workflow per auditing o per la ricerca di errori"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
+#~ msgstr "Nessun dato disponibile"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR"
+#~ msgstr "La richiesta PKCS10 non può essere letta"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR"
+#~ msgstr "La richiesta PKCS10 non può essere letta"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "Approva Richiesta"
@@ -4894,6 +4918,16 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Esporta Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_DESC"
+#~ msgstr ""
+#~ "Genera un report dettagliato sui certificati presenti in questo Realm per "
+#~ "un successivo download."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_LABEL"
+#~ msgstr "Report Completo Certificati"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"

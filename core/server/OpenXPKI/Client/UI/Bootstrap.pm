@@ -6,6 +6,7 @@ package OpenXPKI::Client::UI::Bootstrap;
 
 use Moose;
 use Data::Dumper;
+use Digest::SHA qw(sha1_hex);
 use OpenXPKI::i18n qw( i18nTokenizer );
 
 extends 'OpenXPKI::Client::UI::Result';
@@ -15,6 +16,12 @@ sub init_structure {
     my $self = shift;
     my $session = $self->_session;
     my $user = $session->param('user') || undef;
+
+    if (!$session->param('rtoken')) {
+        $self->logger()->debug('Generate rtoken');
+        $session->param('rtoken', sha1_hex( $$. $session->id() . rand(2**32) ) );
+    }
+    $self->_result()->{rtoken} = $session->param('rtoken');
 
     if ($session->param('is_logged_in') && $user) {
         $self->_result()->{user} = $user;

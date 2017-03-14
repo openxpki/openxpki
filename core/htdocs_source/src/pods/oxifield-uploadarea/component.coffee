@@ -45,7 +45,8 @@ Component = Em.Component.extend
             fence = $("<div></div>")
             fence.insertAfter file
 
-            url = @container.lookup("controller:config").get ".url"
+            url = @container.lookup("controller:config").get "url"
+            rtoken = @container.lookup("route:openxpki").get "source.rtoken"
 
             form = $ """
                 <form method='post'
@@ -53,6 +54,7 @@ Component = Em.Component.extend
                       action='#{url}'
                       target='upload_target'>
                     <input type="hidden" name="action" value="plain!upload">
+                    <input type="hidden" name="_rtoken" value="#{rtoken}">
                 </form>
             """
             form.append file
