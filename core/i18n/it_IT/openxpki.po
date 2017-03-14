@@ -963,6 +963,10 @@ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "Nessun dato disponibile"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
+msgstr "Il token di firma della CRL non è online"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 msgstr "Errore sconosciuto"
 

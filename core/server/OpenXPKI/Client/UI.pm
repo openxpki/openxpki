@@ -243,6 +243,36 @@ sub __load_class {
 
 }
 
+
+=head2 __get_action 
+
+Expect a reference to the cgi object. Returns the value of 
+cgi->param('action') if set and the XSRFtoken is valid. If the token is 
+invalid, returns undef and sets the global status to error. If parameter 
+is empty or not set returns undef.
+
+=cut
+
+sub __get_action {
+
+    my $self = shift;
+    my $cgi = shift;
+    
+    my $rtoken_session = $self->session()->param('rtoken') || '';
+    my $rtoken_request = $cgi->param('_rtoken') || '';
+    # check XSRF token
+    if ($cgi->param('action')) {
+        if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {        
+            return $cgi->param('action');
+        } else {
+            $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
+            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID')});
+        }
+    }
+    return;
+    
+}
+
 sub handle_page {
 
     my $self = shift;
@@ -253,17 +283,17 @@ sub handle_page {
 
     # set action and page - args always wins about cgi
     
+    my $result;
     my $action = '';
     # action is only valid explicit or within a post request
     if (defined $args->{action}) {
        $action = $args->{action};
-    } elsif ($cgi->request_method() eq 'POST' && $cgi->param('action')) {
-        $action = $cgi->param('action');
+    } else {
+        $action = $self->__get_action( $cgi );
     }
     
     my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
 
-    my $result;
     if ($action) {
         $self->logger()->info('handle action ' . $action);
 
@@ -288,7 +318,9 @@ sub handle_page {
         }
 
         my $method;
-        ($result, $method) = $self->__load_class( $page, $cgi );
+        if ($page) {
+            ($result, $method) = $self->__load_class( $page, $cgi );
+        }
 
         if (!$result) {
             $self->logger()->error("Failed loading page class");
@@ -325,10 +357,7 @@ sub handle_login {
     my $page = $cgi->param('page') || '';
     
     # action is only valid within a post request
-    my $action = '';
-    if ($cgi->request_method() eq 'POST' && $cgi->param('action')) {
-        $action = $cgi->param('action');
-    }
+    my $action = $self->__get_action( $cgi );
     
     $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
