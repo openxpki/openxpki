@@ -395,7 +395,7 @@ sub __do_init_dbi_log {
     CTX('dbi_log')->connect();
 }
 
-
+# TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
 sub __do_init_dbi {
 
     my $args = shift;
