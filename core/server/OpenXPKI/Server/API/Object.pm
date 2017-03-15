@@ -1963,22 +1963,24 @@ sub list_data_pool_entries {
     # chain we assume it's ok.
     $self->__assert_current_pki_realm_within_workflow($requested_pki_realm);
 
-    my %condition = ( 'PKI_REALM' => { VALUE => $requested_pki_realm }, );
-
-    if ( defined $namespace ) {
-        $condition{NAMESPACE} = { VALUE => $namespace };
-    }
-
-    my $result = CTX('dbi_backend')->select(
-        TABLE   => 'DATAPOOL',
-        DYNAMIC => \%condition,
-        ORDER   => [ 'DATAPOOL_KEY', 'NAMESPACE' ],
-        LIMIT	=> $limit
-    );
+    my $result = CTX('dbi')->select(
+        from   => 'datapool',
+        columns => [ qw( namespace datapool_key ) ],
+        where => {
+            pki_realm => $requested_pki_realm,
+            $namespace
+                ? (namespace => $namespace) : (),
+        },
+        order_by => [ 'datapool_key', 'namespace' ],
+        $limit
+            ? ( limit => $limit ) : (),
+    )->fetchall_arrayref({});
 
     return [
-        map { { 'NAMESPACE' => $_->{NAMESPACE}, 'KEY' => $_->{DATAPOOL_KEY}, } }
-          @{$result}
+        map { {
+            NAMESPACE => $_->{namespace},
+            KEY       => $_->{datapool_key},
+        } } @$result
     ];
 }
 
@@ -2337,13 +2339,14 @@ sub __set_data_pool_entry : PRIVATE {
 # private worker function: clean up data pool (delete expired entries)
 sub __cleanup_data_pool : PRIVATE {
     ##! 1: 'start'
-    my ($self, $args) = @_;
+    my ($self) = @_;
 
-    CTX('dbi_backend')->delete(
-        TABLE => 'DATAPOOL',
-        DATA  => { NOTAFTER => [ '<', time ], }
+    CTX('dbi')->start_txn;
+    CTX('dbi')->delete(
+        from  => 'datapool',
+        where => { notafter => { '<' => time } },
     );
-    CTX('dbi_backend')->commit();
+    CTX('dbi')->commit;
     return 1;
 }
 
