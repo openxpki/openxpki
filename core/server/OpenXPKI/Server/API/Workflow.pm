@@ -772,7 +772,6 @@ sub create_workflow_instance {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
             log =>  {
-                logger => CTX('log'),
                 priority => 'error',
                 facility => [ 'system', 'workflow' ]
             }
@@ -1268,7 +1267,6 @@ sub __validate_input_param {
                     VALUE    => $wf_params->{$key}
                 },
                 log => {
-                    logger => CTX('log'),
                     priority => 'error',
                     facility => 'workflow',
                 },

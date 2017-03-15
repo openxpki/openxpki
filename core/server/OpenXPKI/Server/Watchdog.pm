@@ -199,7 +199,6 @@ sub run {
                 'max_instance_count' =>  $self->max_instance_count()
             },
             log => {
-                logger => CTX('log'),
                 priority => 'error',
                 facility => 'system',
         });
@@ -220,7 +219,6 @@ sub run {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED_UNRECOVERABLE',
                     log => {
-                        logger => CTX('log'),
                         priority => 'fatal',
                         facility => 'system',
                     }
@@ -232,7 +230,6 @@ sub run {
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED_MAX_REDO',
         log => {
-            logger => CTX('log'),
             priority => 'fatal',
             facility => 'system',
         }
@@ -336,7 +333,6 @@ sub run {
                 OpenXPKI::Exception->throw(
                     message => $msg,
                     log => {
-                        logger => CTX('log'),
                         priority => 'fatal',
                         facility => 'system',
                 });

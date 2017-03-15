@@ -197,7 +197,6 @@ sub post_bind_hook {
                     SOCKET_OWNER => $self->{PARAMS}->{socket_owner},
                 },
 		log => {
-		    logger => CTX('log'),
 		    message => "Incorrect socket owner '$self->{PARAMS}->{socket_owner}'",
 		    facility => 'system',
 		    priority => 'fatal',
@@ -215,7 +214,6 @@ sub post_bind_hook {
                     SOCKET_GROUP => $self->{PARAMS}->{socket_group},
                 },
 		log => {
-		    logger => CTX('log'),
 		    message => "Incorrect socket group '$self->{PARAMS}->{socket_group}'",
 		    facility => 'system',
 		    priority => 'fatal',
@@ -244,7 +242,6 @@ sub post_bind_hook {
                     SOCKET_GROUP => $socket_group,
                 },
 		log => {
-		    logger => CTX('log'),
 		    message => "Could not change ownership for socket '$socketfile' to '$socket_owner:$socket_group'",
 		    facility => 'system',
 		    priority => 'fatal',
@@ -654,7 +651,6 @@ sub __get_user_interfaces
 		    MODULE     => $class
 		},
 		log => {
-		    logger => CTX('log'),
 		    message => "Could not initialize configured transport layer '$class': $EVAL_ERROR",
 		    facility => 'system',
 		    priority => 'fatal',
@@ -683,7 +679,6 @@ sub __get_user_interfaces
 		    MODULE     => $class
 		},
 		log => {
-		    logger => CTX('log'),
 		    message => "Could not initialize configured service layer '$class': $EVAL_ERROR",
 		    facility => 'system',
 		    priority => 'fatal',
@@ -753,7 +748,6 @@ sub __get_server_config
 		"SOCKETFILE" => $socketfile
 	    },
 	    log => {
-		logger => CTX('log'),
 		message => "Socket file '$socketfile' path length exceeds system limits",
 		facility => 'system',
 		priority => 'fatal',
@@ -779,7 +773,6 @@ sub __get_server_config
                 TYPE => $self->{TYPE},
             },
 	    log => {
-		logger => CTX('log'),
 		message => "Unknown Net::Server type '$self->{TYPE}'",
 		facility => 'system',
 		priority => 'fatal',
@@ -801,7 +794,6 @@ sub __get_server_config
 		    "PARAMETER" => $param,
 		},
 		log => {
-		    logger => CTX('log'),
 		    message => "Missing server configuration parameter '$param'",
 		    facility => 'system',
 		    priority => 'fatal',
@@ -819,7 +811,6 @@ sub __get_server_config
 		"USER" => $params{"user"},
 	    },
 	    log => {
-		logger => CTX('log'),
 		message => "Incorrect system user '$params{user}'",
 		facility => 'system',
 		priority => 'fatal',
@@ -839,7 +830,6 @@ sub __get_server_config
 		"GROUP" => $params{"group"},
 	    },
 	    log => {
-		logger => CTX('log'),
 		message => "Incorrect system group '$params{group}'",
 		facility => 'system',
 		priority => 'fatal',
@@ -865,7 +855,6 @@ sub __get_server_config
     		    "SOCKET_OWNER" => $socket_owner,
     		},
     		log => {
-    		    logger => CTX('log'),
     		    message => "Incorrect socket owner '$socket_owner'",
     		    facility => 'system',
     		    priority => 'fatal',
@@ -889,7 +878,6 @@ sub __get_server_config
     		    "SOCKET_GROUP" => $socket_group,
     		},
     		log => {
-    		    logger => CTX('log'),
     		    message => "Incorrect socket group '$socket_group'",
     		    facility => 'system',
     		    priority => 'fatal',

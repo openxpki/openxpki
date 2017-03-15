@@ -26,7 +26,6 @@ my $parser = DateTime::Format::Strptime->new(
     on_error => sub { OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_PARSE_DATE_ERROR",
         log => {
-            logger   => CTX('log'),
             priority => 'error',
             facility => 'system',
         }
@@ -158,7 +157,6 @@ sub update_workflow {
                     context_key => $key,
                 },
                 log => {
-                    logger   => CTX('log'),
                     priority => 'error',
                     facility => [ 'audit', 'system', ],
                 },

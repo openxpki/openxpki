@@ -1646,7 +1646,6 @@ sub get_data_pool_entry {
                         SAFE_ID   => $safe_id,
                     },
                     log => {
-                        logger   => CTX('log'),
                         priority => 'error',
                         facility => [ 'system', ],
                     },
@@ -1674,7 +1673,6 @@ sub get_data_pool_entry {
                             SAFE_ID   => $safe_id,
                         },
                         log => {
-                            logger   => CTX('log'),
                             priority => 'error',
                             facility => [ 'system', ],
                         },
@@ -1756,7 +1754,6 @@ sub get_data_pool_entry {
                             KEY             => $encryption_key,
                         },
                         log => {
-                            logger   => CTX('log'),
                             priority => 'fatal',
                             facility => [ 'system', ],
                         },
@@ -1883,7 +1880,6 @@ sub set_data_pool_entry {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_NAMESPACE_AND_KEY_ARE_REQUIRED',
             log => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => [ 'system' ],
             }
@@ -1902,7 +1898,6 @@ sub set_data_pool_entry {
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_NAMESPACE',
             params => { NAMESPACE => $args->{NAMESPACE}, },
             log    => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => [ 'audit', 'system', ],
             },
@@ -2038,7 +2033,6 @@ sub modify_data_pool_entry {
                         EXPIRATION_DATE => $expiration_date,
                     },
                     log => {
-                        logger   => CTX('log'),
                         priority => 'error',
                         facility => [ 'system', ],
                     },
@@ -2180,7 +2174,6 @@ sub __set_data_pool_entry : PRIVATE {
                 VALUE_TYPE => ref $value,
             },
             log => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => [ 'system', ],
             },
@@ -2197,7 +2190,6 @@ sub __set_data_pool_entry : PRIVATE {
                 KEY       => $key,
             },
             log => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => [ 'system', ],
             },
@@ -2216,7 +2208,6 @@ sub __set_data_pool_entry : PRIVATE {
                     ENCRYPTION_MODE => $encrypt,
                 },
                 log => {
-                    logger   => CTX('log'),
                     priority => 'error',
                     facility => [ 'system', ],
                 },
@@ -2234,7 +2225,6 @@ sub __set_data_pool_entry : PRIVATE {
                 EXPIRATION_DATE => $expiration_date,
             },
             log => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => [ 'system', ],
             },
@@ -2279,7 +2269,6 @@ sub __set_data_pool_entry : PRIVATE {
                         SAFE_ID   => $safe_id,
                     },
                     log => {
-                        logger   => CTX('log'),
                         priority => 'error',
                         facility => [ 'system', ],
                     },
@@ -2454,7 +2443,6 @@ sub __get_current_datapool_encryption_key : PRIVATE {
                         KEY             => $associated_vault_key_id,
                     },
                     log => {
-                        logger   => CTX('log'),
                         priority => 'fatal',
                         facility => [ 'system', ],
                     },
@@ -2508,7 +2496,6 @@ sub __assert_current_pki_realm_within_workflow : PRIVATE {
             CURRENT_REALM   => $current_pki_realm,
         },
         log => {
-            logger   => CTX('log'),
             priority => 'error',
             facility => [ 'audit', 'system', ],
         },

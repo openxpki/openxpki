@@ -61,7 +61,6 @@ sub notify {
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_BASE_NOTIFY_UNIMPLEMENTED',
         log => {
-            logger   => CTX('log'),
             priority => 'error',
             facility => 'system',
         },        

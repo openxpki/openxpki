@@ -37,7 +37,6 @@ sub _validate {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
     	    log => {
-        		logger => CTX('log'),
         		priority => 'warn',
         		facility => 'application',
 	        },

@@ -101,7 +101,6 @@ sub execute {
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE',
             params => { 'CERT_IDENTIFIER' => $cert_identifier },
             log => {
-                logger => CTX('log'),
                 priority => 'error',
                 facility => 'system',
             },
@@ -130,7 +129,6 @@ sub execute {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER',
             log => {
-            logger => CTX('log'),
                 priority => 'error',
                 facility => 'system',
             },
@@ -161,7 +159,6 @@ sub execute {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT',
                 log => {
-                logger => CTX('log'),
                     priority => 'error',
                     facility => 'system',
                 },

@@ -49,7 +49,6 @@ sub sc_parse_certificates {
         CERTFORMAT => $arg_ref->{CERTFORMAT},
         },
         log => {
-        logger => CTX('log'),
         priority => 'error',
         facility => [ 'application', ],
         },
@@ -104,7 +103,6 @@ sub sc_analyze_smartcard {
         DATA_TYPE => ref $wf_types,
         },
         log => {
-        logger => CTX('log'),
         priority => 'error',
         facility => [ 'application', ],
         },
@@ -204,7 +202,6 @@ sub sc_analyze_smartcard {
                 TOKENID => $tokenid,
             },
             log => {
-                logger => CTX('log'),
                 priority => 'error',
                 facility => [ 'application', ],
             },
@@ -223,7 +220,6 @@ sub sc_analyze_smartcard {
             STATUS  => $cardstatus,
         },
         log => {
-            logger => CTX('log'),
             priority => 'error',
             facility => [ 'application', ],
         },
@@ -248,7 +244,6 @@ sub sc_analyze_smartcard {
             TOKENID => $tokenid,
         },
         log => {
-            logger => CTX('log'),
             priority => 'error',
             facility => [ 'application', ],
         },
@@ -341,7 +336,6 @@ sub sc_analyze_smartcard {
             EMPLOYEEID => $holder_employee_id
         },
         log => {
-            logger => CTX('log'),
             priority => 'error',
             facility => [ 'application', ],
         },
@@ -355,7 +349,6 @@ sub sc_analyze_smartcard {
             EMPLOYEEINFO =>  $employeeinfo->{VALUE}
         },
         log => {
-            logger => CTX('log'),
             priority => 'error',
             facility => [ 'application', ],
         },
@@ -443,7 +436,6 @@ sub sc_analyze_smartcard {
                     #SMARTCARDS => join(';', map { $_->get_value('seealso') } @smartcard_entries),
                 },
                 log => {
-                    logger => CTX('log'),
                     priority => 'error',
                     facility => [ 'application', ],
                 },
@@ -556,7 +548,6 @@ sub sc_analyze_smartcard {
         TOKEN_ID => $tokenid,
         },
         log => {
-        logger => CTX('log'),
         priority => 'error',
         facility => [ 'application', ],
         },
@@ -1423,7 +1414,6 @@ sub sc_analyze_certificate {
                 CERTFORMAT => $certformat,
             },
             log => {
-                logger => CTX('log'),
                 priority => 'error',
                 facility => [ 'application', ],
            },
@@ -1441,7 +1431,6 @@ sub sc_analyze_certificate {
               CERT => $data,
             },
            log => {
-              logger => CTX('log'),
               priority => 'error',
               facility => [ 'application', ],
            },
@@ -1481,7 +1470,6 @@ sub sc_analyze_certificate {
             CERTFORMAT => $arg_ref->{CERTFORMAT},
            },
            log => {
-              logger => CTX('log'),
               priority => 'error',
               facility => [ 'application' ],
            },

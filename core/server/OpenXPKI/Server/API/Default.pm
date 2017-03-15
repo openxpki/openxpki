@@ -95,9 +95,6 @@ sub get_approval_message {
         if (! defined $spkac && ! defined $pkcs10) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_APPROVAL_MESSAGE_NEITHER_SPKAC_NOR_PKCS10_PRESENT_IN_CONTEXT',
-                log     => {
-                    logger => CTX('log'),
-                },
             );
         }
         elsif (defined $spkac) {

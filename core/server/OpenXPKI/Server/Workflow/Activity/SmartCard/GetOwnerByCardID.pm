@@ -40,7 +40,6 @@ sub execute {
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID',
             params => { TOKEN_ID => $tokenid, },
             log    => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => ['application'],
             },
@@ -58,7 +57,6 @@ sub execute {
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID_SEARCH_PERSON_FAILED',
             params => { EMPLOYEEID => $holder_id },
             log    => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => ['application'],
             },
@@ -70,7 +68,6 @@ sub execute {
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID_PERSON_ENTRY_DOES_NOT_HAVE_MAIL_ATTRIBUTE',
             params => { EMPLOYEEINFO => $employeeinfo->{VALUE} },
             log    => {
-                logger   => CTX('log'),
                 priority => 'error',
                 facility => [ 'application', ],
             },

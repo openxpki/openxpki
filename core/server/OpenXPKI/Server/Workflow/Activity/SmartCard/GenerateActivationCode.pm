@@ -282,7 +282,6 @@ sub execute {
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENACTCODE_USER_NOT_AUTH_PERS',
             params => {},
             log => {
-                logger => CTX('log'),
                 priority => 'warn',
                 facility => 'application',
             },

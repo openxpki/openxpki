@@ -102,7 +102,6 @@ sub execute {
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_UNABLE_TO_LOAD_CRL',
             params => { 'CRL_SERIAL' => $crl_serial },
             log => {
-                logger => CTX('log'),
                 priority => 'error',
                 facility => 'system',
             });
@@ -129,7 +128,6 @@ sub execute {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_COULD_NOT_CONVERT_CRL_TO_DER',
             log => {
-            logger => CTX('log'),
                 priority => 'error',
                 facility => 'system',
             },

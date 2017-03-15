@@ -71,7 +71,6 @@ sub execute {
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_REVOKE_CERTIFICATE_NO_CERT_IDENTIFIER',    
         log => {
-            logger   => CTX('log'),
             priority => 'error',
             facility => 'system',
     }) unless($param->{cert_identifier});

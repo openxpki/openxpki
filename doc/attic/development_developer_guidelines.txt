@@ -112,7 +112,6 @@ Here's an example of logging an exception in the server core:
 		RETURNED_ID  => $result->{WORKFLOW_SERIAL},
 	    },
 	    log => {
-		logger => CTX('log'),
 		priority => 'warn',
 		facility => 'system',
 	    },
@@ -128,7 +127,6 @@ In this case the log message is automatically composed by the OpenPKI::Exception
 		RETURNED_ID  => $result->{WORKFLOW_SERIAL},
 	    },
 	    log => {
-		logger => CTX('log'),
                 message => 'System botched completely',
 		priority => 'warn',
 		facility => 'system',

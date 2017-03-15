@@ -32,7 +32,6 @@ sub execute {
             TOKEN_ID => $token_id,
             },
         log => {
-            logger => CTX('log'),
             priority => 'error',
             facility => [ 'system', ],
         },
@@ -63,7 +62,6 @@ sub execute {
             LOT_ID => $lot_id,
             },
         log => {
-            logger => CTX('log'),
             priority => 'error',
             facility => [ 'system', ],
         },
