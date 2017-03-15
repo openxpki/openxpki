@@ -2372,27 +2372,21 @@ sub __get_current_datapool_encryption_key : PRIVATE {
 
     # check if we already have a symmetric key for this password safe
     ##! 16: 'fetch associated symmetric key for password safe: ' . $safe_id
-    my $data = $self->get_data_pool_entry(
-        {
-            PKI_REALM => $realm,
-            NAMESPACE => 'sys.datapool.pwsafe',
-            KEY       => 'p7:' . $safe_id,
-        }
-    );
+    my $data = $self->get_data_pool_entry( {
+        PKI_REALM => $realm,
+        NAMESPACE => 'sys.datapool.pwsafe',
+        KEY       => 'p7:' . $safe_id,
+    } );
 
-    if ( defined $data ) {
-        $associated_vault_key_id = $data->{VALUE};
-        ##! 16: 'got associated vault key: ' . $associated_vault_key_id
-    }
+    $associated_vault_key_id = $data->{VALUE} if defined $data;
+    ##! 16: 'got associated vault key: ' . $associated_vault_key_id
 
     if ( !defined $associated_vault_key_id ) {
         ##! 16: 'first use of this password safe, generate a new symmetric key'
-        my $associated_vault = OpenXPKI::Crypto::VolatileVault->new(
-            {
-                TOKEN      => $token,
-                EXPORTABLE => 1,
-            }
-        );
+        my $associated_vault = OpenXPKI::Crypto::VolatileVault->new( {
+            TOKEN      => $token,
+            EXPORTABLE => 1,
+        } );
 
         $associated_vault_key = $associated_vault->export_key();
         $associated_vault_key_id = $associated_vault->get_key_id( { LONG => 1 } );
@@ -2401,53 +2395,46 @@ sub __get_current_datapool_encryption_key : PRIVATE {
         $associated_vault_key->{KEY_ID} = $associated_vault_key_id;
 
         # save password safe -> key id mapping
-        $self->__set_data_pool_entry(
-            {
-                PKI_REALM => $realm,
-                NAMESPACE => 'sys.datapool.pwsafe',
-                KEY       => 'p7:' . $safe_id,
-                VALUE     => $associated_vault_key_id,
-            }
-        );
+        $self->__set_data_pool_entry( {
+            PKI_REALM => $realm,
+            NAMESPACE => 'sys.datapool.pwsafe',
+            KEY       => 'p7:' . $safe_id,
+            VALUE     => $associated_vault_key_id,
+        } );
 
         # save this key for future use
-        $self->__set_data_pool_entry(
-            {
-                PKI_REALM => $realm,
-                NAMESPACE => 'sys.datapool.keys',
-                KEY       => $associated_vault_key_id,
-                ENCRYPT   => 'password_safe',
-                VALUE     => join( ':',
-                    $associated_vault_key->{ALGORITHM},
-                    $associated_vault_key->{IV},
-                    $associated_vault_key->{KEY} ),
-            }
-        );
-
+        $self->__set_data_pool_entry( {
+            PKI_REALM => $realm,
+            NAMESPACE => 'sys.datapool.keys',
+            KEY       => $associated_vault_key_id,
+            ENCRYPT   => 'password_safe',
+            VALUE     => join( ':',
+                $associated_vault_key->{ALGORITHM},
+                $associated_vault_key->{IV},
+                $associated_vault_key->{KEY}
+            ),
+        } );
     }
     else {
-
         # symmetric key already exists, check if we have got a cached
         # version in the SECRET pool
-
         my $secret_id = $associated_vault_key_id. ':'. CTX('volatile_vault')->ident();
 
-        my $cached_key = CTX('dbi_backend')->first(
-            TABLE   => 'SECRET',
-            DYNAMIC => {
-                PKI_REALM => { VALUE => $realm },
-                GROUP_ID  => { VALUE => $secret_id },
+        my $cached_key = CTX('dbi')->select_one(
+            from => 'secret',
+            columns => [ '*' ],
+            where => {
+                pki_realm => $realm,
+                group_id  => $secret_id,
             }
         );
 
-        my $algorithm;
-        my $iv;
-        my $key;
+        my ($algorithm, $iv, $key);
 
-        if ( defined $cached_key ) {
+        if ($cached_key) {
             ##! 16: 'decryption key cache hit'
             # get key from secret cache
-            my $decrypted_key = CTX('volatile_vault')->decrypt( $cached_key->{DATA} );
+            my $decrypted_key = CTX('volatile_vault')->decrypt( $cached_key->{data} );
             ( $algorithm, $iv, $key ) = split( /:/, $decrypted_key );
         }
         else {
@@ -2485,16 +2472,16 @@ sub __get_current_datapool_encryption_key : PRIVATE {
 
             # cache encryption key in volatile vault
             eval {
-                CTX('dbi_backend')->insert(
-                    TABLE => 'SECRET',
-                    HASH  => {
-                        DATA =>
-                          CTX('volatile_vault')->encrypt( $data->{VALUE} ),
-                        PKI_REALM => $realm,
-                        GROUP_ID  => $secret_id,
+                CTX('dbi')->start_txn;
+                CTX('dbi')->insert(
+                    into => 'secret',
+                    values => {
+                        data => CTX('volatile_vault')->encrypt($data->{VALUE}),
+                        pki_realm => $realm,
+                        group_id  => $secret_id,
                     },
                 );
-                CTX('dbi_backend')->commit();
+                CTX('dbi')->commit;
             };
 
         }
