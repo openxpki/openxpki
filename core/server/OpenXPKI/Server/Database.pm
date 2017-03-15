@@ -380,6 +380,21 @@ sub delete {
     return $self->run($query, 1); # 1 = return number of affected rows
 }
 
+#
+sub _run_and_commit {
+    my ($self, $method, @args) = @_;
+    $self->start_txn;
+    my $result = $self->$method(@args);
+    $self->commit;
+    return $result;
+}
+
+#
+sub insert_and_commit { shift->_run_and_commit("insert", @_); }
+sub update_and_commit { shift->_run_and_commit("update", @_); }
+sub merge_and_commit  { shift->_run_and_commit("merge",  @_); }
+sub delete_and_commit { shift->_run_and_commit("delete", @_); }
+
 # Create a new insert ID ("serial")
 sub next_id {
     my ($self, $table) = @_;
@@ -693,6 +708,46 @@ Rolls back a transaction.
 Logs an error if L</start_txn> was not called first.
 
 =cut
+
+=head2 insert_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->insert(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/insert>.
+
+=head2 update_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->update(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/update>.
+
+=head2 merge_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->merge(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/merge>.
+
+=head2 delete_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->delete(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/delete>.
 
 ################################################################################
 
