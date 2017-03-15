@@ -104,7 +104,8 @@ certificate in OpenXPKI via workflows.
     my $cert_info = OpenXPKI::Test::CertHelper-E<gt>via_workflow(
         tester => $test,                      # Instance of L<OpenXPKI::Test::More> (required)
         hostname => "myhost",                 # Hostname for certificate (I<Str>, required)
-        hostname2 => [],                      # List of additional hostnames (I<ArrayRef[Str]>, optional)
+        application_name => "myapp",          # Name of the application (I<Str>, required for client profile)
+        hostname2 => [],                      # List of additional hostnames (I<ArrayRef[Str]>, optional for server profile)
         profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER", # Certificate profile (I<Str>, optional, default: "I18N_OPENXPKI_PROFILE_TLS_SERVER")
         requestor_gname => "tom",             # Surname of person requesting cert (I<Str>, optional)
         requestor_name => "table",            # Name of person requesting cert (I<Str>, optional)
