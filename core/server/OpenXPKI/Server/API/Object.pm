@@ -2003,7 +2003,6 @@ date is set to infity.
 
 =back
 
-
 =cut
 
 sub modify_data_pool_entry {
@@ -2013,11 +2012,6 @@ sub modify_data_pool_entry {
     my $namespace = $args->{NAMESPACE};
     my $oldkey    = $args->{KEY};
 
-    # optional parameters
-    my $newkey = $args->{NEWKEY};
-
-    #my $expiration_date     = $args->{EXPIRATION_DATE};
-
     my $current_pki_realm   = CTX('session')->get_pki_realm();
     my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
 
@@ -2026,21 +2020,15 @@ sub modify_data_pool_entry {
     # chain we assume it's ok.
     $self->__assert_current_pki_realm_within_workflow($requested_pki_realm);
 
-    my %condition = (
-        'PKI_REALM'    => $requested_pki_realm,
-        'DATAPOOL_KEY' => $oldkey,
-    );
-
-    $condition{NAMESPACE} = $namespace if $namespace;
-
-    my %values = ( 'DATAPOOL_LAST_UPDATE' => time, );
+    my %values = ( 'last_update' => time );
 
     if ( exists $args->{EXPIRATION_DATE} ) {
-        if ( defined $args->{EXPIRATION_DATE} ) {
-            my $expiration_date = $args->{EXPIRATION_DATE};
+        my $expiration_date = $args->{EXPIRATION_DATE};
+        $values{notafter} = $expiration_date; # may be undef
+
+        if ( defined $expiration_date ) {
             if (   ( $expiration_date < 0 )
-                or ( $expiration_date > 0 and $expiration_date < time ) )
-            {
+                or ( $expiration_date > 0 and $expiration_date < time ) ) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE',
                     params => {
@@ -2056,24 +2044,26 @@ sub modify_data_pool_entry {
                     },
                 );
             }
-            $values{NOTAFTER} = $expiration_date;
-        }
-        else {
-            $values{NOTAFTER} = undef;
         }
     }
 
-    $values{DATAPOOL_KEY} = $newkey if $newkey;
+    $values{datapool_key} = $args->{NEWKEY} if $args->{NEWKEY};
 
     ##! 16: 'update database condition: ' . Dumper \%condition
     ##! 16: 'update database values: ' . Dumper \%values
 
-    my $result = CTX('dbi_backend')->update(
-        TABLE => 'DATAPOOL',
-        DATA  => \%values,
-        WHERE => \%condition,
+    CTX('dbi')->start_txn;
+    my $result = CTX('dbi')->update(
+        table => 'datapool',
+        set   => \%values,
+        where => {
+            pki_realm    => $requested_pki_realm,
+            datapool_key => $oldkey,
+            $namespace
+                ? ( namespace => $namespace ) : (),
+        },
     );
-    CTX('dbi_backend')->commit();
+    CTX('dbi')->commit;
 
     return 1;
 }
