@@ -279,17 +279,17 @@ sub load_extension
                 my $section = 'oid_section_'.$name;
                 $section =~ s/\./_/g;
                 @values = ( 'ASN1:SEQUENCE:'.$section, "[ $section ]" );
-                my @section = split /\r?\n/g, $attr->{value};
+                my @section = split /\r?\n/, $attr->{value};
                 push @values, @section;
 
             } else {
 
                 my $val = '';
-                # format and encoding can be given as extra parameters but 
+                # format and encoding can be given as extra parameters but
                 # finally just end up concatenated with the value
                 if ($attr->{format}) {
                     $val .= $attr->{format}.':';
-                } 
+                }
                 if ($attr->{encoding}) {
                     $val .= $attr->{encoding}.':';
                 }
