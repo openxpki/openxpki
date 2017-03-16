@@ -90,6 +90,7 @@ $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,
 });
 
+
 is ($result->{status}->{level}, 'success', 'Status is success');
 
 my $cert_identifier = $result->{main}->[0]->{content}->{data}->[0]->{value}->{label};

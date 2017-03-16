@@ -37,8 +37,9 @@ my $client = MockUI->new({
     config => { socket => '/var/openxpki/openxpki.socket' }
 });
 
+$client->update_rtoken();
 
-$result = $client->mock_request({});
+$result = $client->mock_request({});    
 is($result->{goto}, 'login');
 
 $result = $client->mock_request({

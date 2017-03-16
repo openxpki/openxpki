@@ -73,6 +73,13 @@ sub url_param {
 
 }
 
+sub request_method {
+    
+    # always return POST to allow retrival of the action parameter
+    return 'POST';
+    
+}
+
 sub header {}
 sub cookie {}
 sub http {  return 1; }
