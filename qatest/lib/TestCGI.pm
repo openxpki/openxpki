@@ -26,6 +26,24 @@ has session_id => (
     default => ''
 );
 
+
+sub update_rtoken {
+
+    my $self = shift;    
+    my $result = $self->mock_request({'page' => 'bootstrap!structure'});
+    my $rtoken = $result->{rtoken};
+    $self->rtoken( $rtoken );
+    return $rtoken;
+    
+}
+
+has rtoken => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => ''
+);
+
 sub mock_request {
 
     my $self = shift;
@@ -45,14 +63,18 @@ sub mock_request {
         $ua->default_header( 'Cookie' => 'oxisess-webui='.$self->session_id() );
     }
 
-    # we always use post as the backend does not care about GET/POST
+    # always use POST for actions
     my $res;
     if ($data->{action}) {
+        # add XSRF token
+        if (!exists $data->{_rtoken}) {
+            $data->{_rtoken} = $self->rtoken();
+        }
         $ua->default_header( 'content-type' => 'application/x-www-form-urlencoded');
         $res = $ua->post($server_endpoint, $data);    
     } else {        
         my $qsa = '?';
-        map { $qsa .= sprintf "%s=%s", $_, uri_escape($data->{$_}); } keys %{$data};
+        map { $qsa .= sprintf "%s=%s&", $_, uri_escape($data->{$_}); } keys %{$data};
         $res = $ua->get( $server_endpoint.$qsa );
     }
     
@@ -85,6 +107,8 @@ sub factory {
 
     my $client = TestCGI->new();
     
+    $client->update_rtoken();
+    
     $client ->mock_request({ page => 'login'});
 
     $client ->mock_request({
@@ -98,8 +122,8 @@ sub factory {
         'password' => 'openxpki'
     });
     
-    # we need to call bootstrap to init some session params
-    $client ->mock_request({ page => 'bootstrap!structure'});
+    # refetch new rtoken, also inits session via bootstrap
+    $client->update_rtoken();
     
     return $client;
 }

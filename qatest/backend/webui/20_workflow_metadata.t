@@ -13,7 +13,7 @@ use MockUI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 8;
+use Test::More tests => 6;
 
 package main;
 
@@ -40,30 +40,7 @@ $buffer = JSON->new->decode($buffer);
 my $cert_identifier = $buffer->{cert_identifier};
 
 my $result;
-my $client = MockUI->new({
-    session => $session,
-    logger => $log,
-    config => { socket => '/var/openxpki/openxpki.socket' }
-});
-
-
-$result = $client->mock_request({
-    page => 'login'
-});
-
-is($result->{page}->{label}, 'Please log in');
-is($result->{main}->[0]->{action}, 'login!stack');
-
-$result = $client->mock_request({
-    'action' => 'login!stack',
-    'auth_stack' => "Testing",
-});
-
-$result = $client->mock_request({
-    'action' => 'login!password',
-    'username' => 'raop',
-    'password' => 'openxpki'
-});
+my $client = MockUI::factory();
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!change_metadata',

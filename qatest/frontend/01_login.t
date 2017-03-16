@@ -20,12 +20,14 @@ package main;
 my $client = TestCGI->new();
 
 my $result = $client->mock_request({});
+
+$client->update_rtoken();
+
 is($result->{goto}, 'login');
 
 $result = $client->mock_request({
     page => 'login'
 });
-
 
 is($result->{page}->{label}, 'Please log in');
 is($result->{main}->[0]->{action}, 'login!stack');
@@ -42,3 +44,4 @@ $result = $client->mock_request({
 });
 
 is($result->{goto}, 'welcome', 'Logged in');
+
