@@ -262,7 +262,7 @@ sub __authorize_workflow {
         ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows
         if (! $is_allowed ) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED',
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED',
                 params  => {
                     'REALM'   => $realm,
                     'ROLE'    => $role,
@@ -282,7 +282,7 @@ sub __authorize_workflow {
 
         if (! defined $allowed_creator_re) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE',
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE',
                 params  => {
                     'REALM'   => $realm,
                     'ROLE'    => $role,
@@ -316,7 +316,7 @@ sub __authorize_workflow {
         if (!$is_allowed) {
             ##! 16: 'workflow creator does not match allowed creator'
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE',
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER',
                 params => {
                     'REALM'   => $realm,
                     'ROLE'    => $role,

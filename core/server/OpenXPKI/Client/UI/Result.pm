@@ -148,7 +148,7 @@ sub refresh() {
 
 Expects the name of the command as first and the parameter hash as second
 argument. Sends the named command to the backend and returned the result.
-If the command does not success, set_status_from_error_reply is called 
+If the command does not succeed, set_status_from_error_reply is called 
 and undef is returned. In case the command was a workflow action and the
 backend reports a validation error, the error from the validator is set 
 as status.

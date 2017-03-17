@@ -150,7 +150,9 @@ sub init_load {
     my $args = shift;
 
     # re-instance existing workflow
-    my $id = $self->param('wf_id');
+    my $id = $self->param('wf_id') || 0;
+    $id =~ s/[^\d]//g;
+
     my $wf_action = $self->param('wf_action') || '';
     my $view = $self->param('view') || '';
 
@@ -161,7 +163,7 @@ sub init_load {
 
     if (!$wf_info) {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
-        return $self;
+        return $self->init_search({ preset => { wf_id => $id } });
     }
 
     # Set single action if not in result view and only single action is avail
@@ -242,7 +244,7 @@ sub init_search {
 
     $self->logger()->debug('Workflows ' . Dumper $workflows);
 
-    my $preset;
+    my $preset = {};
     if ($args->{preset}) {
         $preset = $args->{preset};
 
@@ -326,9 +328,12 @@ sub init_search {
         content => {
             title => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
             submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-            fields => [
-                { name => 'wf_id', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', type => 'text' },
-            ]
+            fields => [{ 
+                name => 'wf_id', 
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', 
+                type => 'text',
+                value => $preset->{wf_id} || '', 
+            }]
     }});
 
     $self->add_section({

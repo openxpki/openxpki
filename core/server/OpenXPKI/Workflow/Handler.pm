@@ -69,7 +69,7 @@ sub get_workflow {
     );
     if (! defined $wf) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFO',
+            message => 'I18N_OPENXPKI_UI_WORKFLOW_HANDLER_ID_NOT_FOUND',
             params  => {
                 WORKFLOW_ID => $wf_id,
             },
@@ -80,7 +80,7 @@ sub get_workflow {
     # The watchdog switches the session realm before instantiating a new factory
     if (CTX('session')->get_pki_realm ne $wf->{pki_realm}) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_WORKFLOW_HANDLER_GET_WORKFLOW_REALM_MISSMATCH',
+            message => 'I18N_OPENXPKI_UI_WORKFLOW_HANDLER_NOT_IN_CURRENT_REALM',
             params  => {
                 WORKFLOW_ID => $wf_id,
                 WORKFLOW_REALM => $wf->{pki_realm},
