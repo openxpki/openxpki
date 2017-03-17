@@ -153,7 +153,7 @@ sub execute {
         $res = (ref $plain_result eq '' && $plain_result eq '1');
 
         CTX('log')->log(
-            MESSAGE => "Eligibility check without path - result " . $plain_result,
+            MESSAGE => "Eligibility check without path - result " . (defined $plain_result ? $plain_result : undef),
             PRIORITY => 'debug',
             FACILITY => 'application',
         );

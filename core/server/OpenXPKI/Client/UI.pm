@@ -360,12 +360,12 @@ sub handle_login {
 
     # Special handling for pki_realm and stack params
     if ($action eq 'login!realm' && $cgi->param('pki_realm')) {
-        $session->param('pki_realm', $cgi->param('pki_realm'));
+        $session->param('pki_realm', scalar $cgi->param('pki_realm'));
         $session->param('auth_stack', undef);
         $self->logger()->debug('set realm in session: ' . $cgi->param('pki_realm') );
     }
     if($action eq 'login!stack' && $cgi->param('auth_stack')) {
-        $session->param('auth_stack', $cgi->param('auth_stack'));
+        $session->param('auth_stack', scalar $cgi->param('auth_stack'));
         $self->logger()->debug('set auth_stack in session: ' . $cgi->param('auth_stack') );
     }
     
@@ -477,7 +477,7 @@ sub handle_login {
                 $self->logger()->debug('Seems to be an auth try - validating');
                 ##FIXME - Input validation, dynamic config (alternate logins)!
                 $reply = $self->backend()->send_receive_service_msg( $status,
-                    { LOGIN => $cgi->param('username'), PASSWD => $cgi->param('password') } );
+                    { LOGIN => scalar $cgi->param('username'), PASSWD =>  scalar $cgi->param('password') } );
                 $self->logger()->trace('Auth result ' . Dumper $reply);
 
             } else {

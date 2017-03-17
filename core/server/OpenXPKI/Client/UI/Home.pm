@@ -22,7 +22,7 @@ sub init_welcome {
     my $args = shift;
 
     # check for redirect
-    my $redirect = $self->_client->session()->param('redirect');
+    my $redirect = $self->_client->session()->param('redirect') || '';
     $self->_client->session()->param('redirect','');
     if ($redirect eq 'welcome') {
         # redirect to myself causes the UI to loop
