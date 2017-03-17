@@ -1,9 +1,11 @@
 package OpenXPKI::Server::Database::Driver::PostgreSQL;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::Role::SequenceSupport';
-with 'OpenXPKI::Server::Database::Role::MergeEmulation';
-with 'OpenXPKI::Server::Database::Role::Driver';
+with qw(
+    OpenXPKI::Server::Database::Role::SequenceSupport
+    OpenXPKI::Server::Database::Role::MergeEmulation
+    OpenXPKI::Server::Database::Role::Driver
+);
 
 =head1 Name
 
@@ -47,6 +49,25 @@ sub dbi_on_connect_do {
 # Parameters for SQL::Abstract::More
 sub sqlam_params {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
+}
+
+################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
+
+sub sequence_create_query {
+    my ($self, $dbi, $seq) = @_;
+
+    return OpenXPKI::Server::Database::Query->new(
+        string => "CREATE SEQUENCE $seq START WITH 0 INCREMENT BY 1 MINVALUE 0 NO MAXVALUE ORDER",
+    );
+}
+
+sub table_drop_query {
+    my ($self, $dbi, $table) = @_;
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP TABLE IF EXISTS $table",
+    );
 }
 
 ################################################################################

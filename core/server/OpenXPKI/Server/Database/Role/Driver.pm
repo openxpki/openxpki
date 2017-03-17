@@ -29,6 +29,7 @@ requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect
 requires 'dbi_on_connect_do';  # ArrayRef or Str: commands to execute after connecting
 requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
 requires 'next_id';            # Int: next insert ID ("serial")
+requires 'sequence_create_query';     # OpenXPKI::Server::Database::Query: query to create a new sequence
 requires 'merge_query';        # OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
 
 1;
@@ -159,6 +160,38 @@ Returns optional commands to be executed after connecting to the database
 
 Returns optional parameters that are passed to L<SQL::Abstract::More/new> (I<HashRef>).
 
+=head2 sequence_create_query
+
+Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
+that creates a new sequence (or a table emulating a sequence, if the driver has
+got the role L<OpenXPKI::Server::Database::Role::SequenceEmulation>).
+
+Parameters:
+
+=over
+
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+
+=item * B<$seq> - Name of SQL sequence to be created (I<Str>, required)
+
+=back
+
+=head2 sequence_drop_query
+
+Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
+that removes a sequence (or a table emulating a sequence, if the driver has
+got the role L<OpenXPKI::Server::Database::Role::SequenceEmulation>).
+
+Parameters:
+
+=over
+
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+
+=item * B<$seq> - Name of SQL sequence to be removed (I<Str>, required)
+
+=back
+
 =head2 next_id
 
 Returns the next insert id, i.e. the value of the given sequence (I<Int>).
@@ -169,7 +202,7 @@ Parameters:
 
 =item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
 
-=item * B<$seq> - SQL sequence whose next value shall be returned (I<Str>, required)
+=item * B<$seq> - Name of SQL sequence whose next value shall be returned (I<Str>, required)
 
 =back
 
@@ -183,7 +216,7 @@ Parameters:
 
 =over
 
-=item * B<$dbi> - the L<OpenXPKI::Server::Database> instance
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
 
 =item * B<$into> - Table name including schema (if applicable) (I<Str>, required)
 
@@ -196,6 +229,22 @@ in the C<where> parameter. Hash with column name / value pairs.
 =item * B<$where> - WHERE clause specification that must contain the PRIMARY KEY
 columns and only allows "AND" and "equal" operators:
 C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
+
+=back
+
+=head2 table_drop_query
+
+Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
+that removes a table. If possible the query should contain something like
+C<IF EXISTS> so that the DMBS does not complain about non-existing tables.
+
+Parameters:
+
+=over
+
+=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+
+=item * B<$table> - Name of table to be dropped (I<Str>, required)
 
 =back
 
