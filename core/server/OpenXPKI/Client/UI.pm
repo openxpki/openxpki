@@ -354,11 +354,7 @@ sub handle_login {
     my $page = $cgi->param('page') || '';
     
     # action is only valid within a post request
-<<<<<<< HEAD
-    my $action = $self->__get_action( $cgi );
-=======
     my $action = $self->__get_action( $cgi ) || '';
->>>>>>> master
     
     $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
