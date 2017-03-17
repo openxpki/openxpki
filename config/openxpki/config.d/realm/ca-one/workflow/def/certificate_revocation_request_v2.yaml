@@ -46,31 +46,7 @@ state:
         action:
           - persist_crr > NICE_DISPATCH_REVOKE ? is_not_yet_revoked_or_pending
           - global_noop > CHECK_FOR_REVOCATION ? !is_not_yet_revoked_or_pending
-
-    EDIT_REQUEST:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC
-        action:
-          - update_crr > PENDING
-        output:
-          - cert_identifier
-          - reason_code
-          - invalidity_time
-          - delay_revocation_time
-          - comment
-
-    EDIT_REQUEST_USER:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC
-        action:
-          - update_crr > PENDING_USER
-        output:
-          - cert_identifier
-          - reason_code
-          - invalidity_time
-          - delay_revocation_time
-          - comment
-
+ 
     FAILURE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC
@@ -102,7 +78,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC
         action:
           - approve_crr > CHECK_APPROVALS ? acl_can_approve is_not_yet_revoked_or_pending
-          - edit_crr > EDIT_REQUEST ? acl_can_approve is_not_yet_revoked_or_pending
+          - update_crr > PENDING ? acl_can_approve is_not_yet_revoked_or_pending
           - reject_crr > REJECTED ? acl_can_reject is_not_yet_revoked_or_pending
           - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
         output:
@@ -117,7 +93,7 @@ state:
           - signer_trusted
           - signer_authorized
         button:
-          edit_crr:
+          update_crr:
             format: optional
           approve_crr:
             format: expected
@@ -131,7 +107,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC
         action:
           - submit > CHECK_APPROVALS
-          - edit_crr > EDIT_REQUEST_USER
+          - update_crr > PENDING_USER
           - global_cancel > CANCELED
         output:
           - cert_identifier
@@ -142,7 +118,7 @@ state:
         button:
           submit:
             format: expected
-          edit_crr:
+          update_crr:
             format: optional
           cancel:
             format: failure
@@ -227,11 +203,6 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC
-
-    edit_crr:
-        class: OpenXPKI::Server::Workflow::Activity::Noop
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC
 
     flag_pending_notification_send:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
