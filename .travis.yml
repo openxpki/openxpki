@@ -4,19 +4,17 @@ language: generic
 # Ubuntu 14.04 "Trusty"
 dist: trusty
 # Run in Docker container instead of VM - currently (2016-12-14) beta for "trusty"
-sudo: false
+sudo: required
 
 env:
     global:
         - OXI_TEST_DB_MYSQL_NAME=openxpki
         - OXI_TEST_DB_MYSQL_USER=openxpki
         - OXI_TEST_DB_MYSQL_PASSWORD=openxpki
-        - OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1
+        - OXI_TEST_DB_MYSQL_DBHOST=localhost
         - OXI_TEST_DB_MYSQL_DBPORT=3306
         - OXI_TEST_DB_MYSQL_DBUSER=root
         - OXI_TEST_DB_MYSQL_DBPASSWORD=
-        # Config::Versioned reads USER env variable
-        - USER=dummy
 
 cache:
     directories:
@@ -28,20 +26,15 @@ cache:
 addons:
   apt:
     packages:
+    - libmysqlclient-dev
     - openssl
     - libssl-dev
-    - libmysqlclient-dev
     - pkg-config
+  mariadb: '10.1'
 
 #
 # Service setup
 #
-
-# "MySQL is started by default [... for Docker containers]."
-# "You could remove the `services: mysql` part [...] without any functional change."
-# (according to Joep van Delft from TravisCI)
-##services:
-##    - mysql
 
 before_install:
     - ./tools/scripts/mysql-wait-for-db.sh
@@ -65,6 +58,40 @@ install:
 script:
     - which perl
     - perl -v
-    - cd core/server
+# Compilation
+    - pushd core/server
+    - sed -ri 's/^(WriteMakefile.*)/\1\nMAN1PODS=>{},\nMAN3PODS=>{},/' Makefile.PL
     - perl Makefile.PL
+    - make
+# Unit tests
     - make test
+# Installation
+    - make install
+    - popd
+# Copy config and create directories
+    - 'export TRAVIS_USER=$(whoami)'
+    - 'export TRAVIS_USERGROUP=$(getent group $TRAVIS_USER | cut -d: -f1)'
+    - sudo cp -R ./config/openxpki /etc
+    - sudo chown -R $TRAVIS_USER /etc/openxpki
+    - sudo mkdir -p              /var/openxpki/session
+    - sudo chown -R $TRAVIS_USER /var/openxpki
+    - sudo mkdir -p              /var/log/openxpki
+    - sudo chown -R $TRAVIS_USER /var/log/openxpki
+# Custom configuration for TravisCI
+    - sed -ri 's/^(user:\s+)\S+/\1'$TRAVIS_USER'/'       /etc/openxpki/config.d/system/server.yaml
+    - sed -ri 's/^(group:\s+)\S+/\1'$TRAVIS_USERGROUP'/' /etc/openxpki/config.d/system/server.yaml
+    - sed -ri 's/^(pid_file:\s+)\S+/\1\/var\/openxpki\/openxpkid.pid/' /etc/openxpki/config.d/system/server.yaml
+    - ./tools/scripts/mysql-oxi-config.sh
+# Database re-init and sample config (CA certificates etc.)
+    - ./tools/scripts/mysql-create-db.sh
+    - ./tools/scripts/mysql-create-schema.sh
+    - ./tools/testdata/insert-test-certificates.sh
+# Start OpenXPKI (is in PATH)
+    - openxpkictl start || cat /var/log/openxpki/*
+# QA tests
+    - pushd ./qatest/backend/nice/  && prove -q .
+    - popd
+    - pushd ./qatest/backend/api/   && prove -q .
+    - popd
+    - pushd ./qatest/backend/webui/ && prove -q .
+    - popd

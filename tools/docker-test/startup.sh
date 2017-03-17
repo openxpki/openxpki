@@ -93,17 +93,7 @@ cp -R $CLONE_DIR/config/openxpki /etc
 
 # customize config
 sed -ri 's/^((user|group):\s+)\w+/\1root/' /etc/openxpki/config.d/system/server.yaml
-
-cat <<__DB > /etc/openxpki/config.d/system/database.yaml
-main:
-    debug: 0
-    type: MySQL
-    host: $OXI_TEST_DB_MYSQL_DBHOST
-    port: $OXI_TEST_DB_MYSQL_DBPORT
-    name: $OXI_TEST_DB_MYSQL_NAME
-    user: $OXI_TEST_DB_MYSQL_USER
-    passwd: $OXI_TEST_DB_MYSQL_PASSWORD
-__DB
+$CLONE_DIR/tools/scripts/mysql-oxi-config.sh
 
 #
 # Database re-init
