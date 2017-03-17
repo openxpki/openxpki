@@ -16,7 +16,6 @@ use OpenXPKI::Serialization::Simple;
 
 use Data::Dumper;
 
-
 sub execute {
     ##! 1: 'start'
     my $self     = shift;
@@ -25,9 +24,8 @@ sub execute {
     my $config        = CTX('config');
     my $pki_realm = CTX('session')->get_pki_realm();
 
-    my $dbi = CTX('dbi_backend');
-    $dbi->commit;  # make sure we see data inserted by new DB layer 
-
+    my $dbi = CTX('dbi');
+    
     if (!$self->param('prefix')) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_NO_PREFIX'
@@ -65,31 +63,44 @@ sub execute {
     if ($crl_serial eq 'latest') {
 
         # Load the crl data
-        $crl = $dbi->first(
-            TABLE   => 'CRL',
-            DYNAMIC => {
-                PKI_REALM => $pki_realm,
-                ISSUER_IDENTIFIER => $ca_identifier
+        $crl = $dbi->select_one(
+            from => 'crl',
+            columns => [ '*' ],
+            where => {
+                pki_realm => $pki_realm,
+                issuer_identifier => $ca_identifier
             },
-            ORDER => [ 'LAST_UPDATE' ],
-            REVERSE => 1
+            order_by => '-last_update',
         );
+        
+        # can happen for external CAs or if new tokens did not create a crl yet
+        if (!$crl && $self->param('empty_ok')) {
+            CTX('log')->log(
+                MESSAGE => "CRL publication skipped for $ca_identifier - no crl found",
+                PRIORITY => 'info',
+                FACILITY => [ 'system' ],
+            );
+            return;
+        }
 
-        $crl_serial = $crl->{CRL_SERIAL};
+        $crl_serial = $crl->{crk_key};
 
     } else {
 
         # Load the crl data
-        $crl = $dbi->first(
-            TABLE   => 'CRL',
-            KEY => $crl_serial
+        $crl = $dbi->select_one(
+            from => 'crl',
+            columns => [ '*' ],
+            where => {
+                crl_key => $crl_serial
+            }
         );
-
-        if ($crl && $crl->{ISSUER_IDENTIFIER} ne $ca_identifier) {
+        
+        if ($crl && $crl->{issuer_identifier} ne $ca_identifier) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_SERIAL_DOES_NOT_MATCH_ISSUER',
                 params => {  CRL_SERIAL => $crl_serial, PKI_REALM => $pki_realm,
-                    ISSUER => $crl->{ISSUER_IDENTIFIER}, EXPECTED_ISSUER => $ca_identifier }
+                    ISSUER => $crl->{issuer_identifier}, EXPECTED_ISSUER => $ca_identifier }
             );
         }
 
@@ -97,7 +108,7 @@ sub execute {
 
     ##! 16: "Start publishing - CRL Serial $crl_serial , ca alias $ca_alias"
 
-    if (!$crl || !$crl->{DATA}) {
+    if (!$crl || !$crl->{data}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_UNABLE_TO_LOAD_CRL',
             params => { 'CRL_SERIAL' => $crl_serial },
@@ -112,7 +123,7 @@ sub execute {
     $ca_alias =~ /^(.*)-(\d+)$/;
 
     my $data = {
-        pem => $crl->{DATA},
+        pem => $crl->{data},
         alias => $ca_alias,
         group => $1,
         generation => $2,
@@ -121,7 +132,7 @@ sub execute {
     # Convert to DER
     $data->{der} = $default_token->command({
         COMMAND => 'convert_crl',
-        DATA    => $crl->{DATA},
+        DATA    => $crl->{data},
         OUT     => 'DER',
     });
 
@@ -201,17 +212,13 @@ sub execute {
     $context->param( { 'tmp_publish_queue' => undef });
     
     # Set the publication date in the database, only if not set already
-    if (!$crl->{PUBLICATION_DATE}) {
+    if (!$crl->{publication_date}) {
         $dbi->update(
-            TABLE => 'CRL',
-            DATA  => {
-                'PUBLICATION_DATE' => DateTime->now()->epoch(),
-            },
-            WHERE => {
-                'CRL_SERIAL' => $crl_serial,
-            },
+            table => 'crl',
+            set => { publication_date => DateTime->now()->epoch() },
+            where => { crl_key => $crl_serial }
         );
-        $dbi->commit();
+        
         CTX('log')->log(
             MESSAGE => "CRL pubication date set for crl $crl_serial",
             PRIORITY => 'info',
@@ -291,6 +298,11 @@ to be set.
 The serial of the crl to publish or the keyword "latest" which pulls the
 CRL with the latest last_update date for the given issuer. Only effective
 if B<NOT> set in the context.
+
+=item empty_ok
+
+Boolean, only used in conjunction with crl_serial = latest. Will silently 
+skip publication of no CRL is found for the given issuer.
 
 =back 
 
