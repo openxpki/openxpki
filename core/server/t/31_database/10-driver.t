@@ -31,6 +31,8 @@ sub dbi_connect_params { }
 sub dbi_on_connect_do { }
 sub sqlam_params { limit_offset => 'LimitOffset' }
 sub last_auto_id { 1; } # dummy
+sub sql_autoinc_column { return "INTEGER PRIMARY KEY AUTOINCREMENT" }
+sub table_drop_query { }
 __PACKAGE__->meta->make_immutable;
 
 package OpenXPKI::Server::Database::Driver::OxitestdbList;

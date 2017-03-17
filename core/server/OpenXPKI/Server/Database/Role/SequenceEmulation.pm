@@ -8,14 +8,34 @@ drivers to indicate that they have to emulate sequences through a standard table
 
 =cut
 
+use OpenXPKI::Server::Database::Query;
+
 ################################################################################
 # Required in drivers classes that consume this role
 #
 requires 'last_auto_id';   # String: SQL query to fetch NEXTVAL from sequence
+requires 'table_drop_query';
+requires 'sql_autoinc_column';
 
 ################################################################################
 # Methods
 #
+
+# Returns a query that creates an SQL sequence
+sub sequence_create_query {
+    my ($self, $dbi, $seq) = @_;
+    ## my $info = $dbi->dbh->type_info( [ SQL_SMALLINT, SQL_INTEGER, SQL_DECIMAL ] ); # Does not work for SQlite
+    my $autoinc = $self->sql_autoinc_column; # implemented by driver class
+    return OpenXPKI::Server::Database::Query->new(
+        string => "CREATE TABLE $seq (seq_number $autoinc, dummy SMALLINT DEFAULT NULL)",
+    );
+}
+
+# Returns a query that removes an SQL sequence
+sub sequence_drop_query {
+    my ($self, $dbi, $seq) = @_;
+    return $self->table_drop_query($dbi, $seq);
+}
 
 # Fetches the next insert ID for the given table
 sub next_id {

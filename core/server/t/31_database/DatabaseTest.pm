@@ -57,6 +57,7 @@ has 'test_only' => (
         _test_db => 'first',
     },
 );
+
 # Returns true if the given DB type shall be tested
 sub shall_test {
     my ($self, $dbtype) = @_;
@@ -211,7 +212,7 @@ sub clear_data {
 
 sub _create_table {
     my $self = shift;
-    eval { $self->dbi->run("DROP TABLE test") };
+    eval { $self->dbi->drop_table("test") };
     $self->dbi->run("CREATE TABLE test (".join(", ", @{ $self->_col_info->{fulldef} }).")");
     # Create a hash with the column names and the data
     my $col_names = $self->_col_info->{names};
@@ -219,12 +220,17 @@ sub _create_table {
         my %values = map { $col_names->[$_] => $row->[$_] } 0..$#{ $col_names };
         $self->dbi->insert(into => "test", values => \%values);
     }
+
+    eval { $self->dbi->drop_sequence("test") };
+    $self->dbi->create_sequence("test");
+
     $self->dbi->run("COMMIT");
 }
 
 sub _drop_table {
     my $self = shift;
-    $self->dbi->run("DROP TABLE test");
+    $self->dbi->drop_table("test");
+    $self->dbi->drop_sequence("test");
     $self->dbi->run("COMMIT");
 }
 
