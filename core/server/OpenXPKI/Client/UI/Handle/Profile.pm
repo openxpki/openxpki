@@ -74,7 +74,7 @@ sub render_profile_select {
         type => 'form',
         action => 'workflow',
         content => {
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
             fields => \@fields
         }
     });
@@ -130,16 +130,17 @@ sub render_subject_form {
         wf_action => $wf_action,
         wf_fields => $fields,
     });
-
+          
     $self->add_section({
         type => 'form',
         action => 'workflow',
         content => {
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
-            fields => $fields
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+            fields => $fields,
+            buttons => $self->__get_form_buttons( $wf_info ),
         }
     });
-
+    
     return $self;
 
 }
@@ -220,7 +221,7 @@ sub render_key_select {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
             fields => \@fields
         }
     });
@@ -276,7 +277,7 @@ sub render_server_password {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
             fields => \@fields
         }
     });

@@ -1948,6 +1948,18 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_DESCRIPTION"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -2853,14 +2865,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -3017,6 +3021,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
@@ -3621,6 +3629,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
 msgstr ""
 "Начальное состояние технологического процесса публикации сертификатов через "
 "LDAP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
@@ -9225,6 +9237,14 @@ msgstr "Имя учетной записи"
 #~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTINUE_BUTTON"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
 #~ msgstr "Дочерние технологические процессы"
 
@@ -9876,6 +9896,18 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CANCEL"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy

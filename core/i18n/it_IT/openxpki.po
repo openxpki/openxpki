@@ -1630,6 +1630,20 @@ msgstr "Invia con Eccezione alla Policy"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Ri-Valuta la Policy"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
+msgstr "Forza Ripristino"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_DESCRIPTION"
+msgstr ""
+"Il livello di attenzione del tuo messaggio. Viene riflesso nel colore del "
+"box del messaggio."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_LABEL"
+msgstr "Cancella Richiesta"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Contesto Workflow"
 
@@ -2361,12 +2375,6 @@ msgstr "Richiesta non valida - azione senza Workflow ID"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "Richiesta non valida - nessuna azione"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
-msgstr "continua"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
-msgstr "torna indietro"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Ultimo Aggiornamento"
 
@@ -2497,6 +2505,10 @@ msgstr "Certificati Revocati"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Azione richiesta non disponibile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
+msgstr "Forza Ripristino"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
 msgstr "Creatore"
@@ -3034,6 +3046,10 @@ msgstr ""
 "tempo previsto. Il motivo della messa in pausa e l’orario dell’ultima azione "
 "sono mostrati qui sotto, se vuoi che il processo venga continuato, è "
 "necessario che un operatore lo riavvii manualmente."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
+msgstr "Forza Ripristino"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
@@ -3820,6 +3836,14 @@ msgstr "Chiave"
 #~ msgstr "Persist CRR"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
+#~ msgstr "Retries"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTINUE_BUTTON"
+#~ msgstr "Forza Ripristino"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
 #~ msgstr " "
 
@@ -4210,6 +4234,16 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
 #~ msgstr "RSA is the standard for encryption and signature"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CANCEL"
+#~ msgstr "continua"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
+#~ msgstr "continua"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
+#~ msgstr "torna indietro"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"

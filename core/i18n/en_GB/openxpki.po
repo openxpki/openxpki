@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2017-03-17 09:07+0100\n"
+"PO-Revision-Date: 2017-03-17 12:47+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1459,6 +1459,19 @@ msgstr "Submit with Policy Exception"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Re-Evaluate Policy"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
+msgstr "Cancel Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_DESCRIPTION"
+msgstr ""
+"Press the confirm button to cancel this workflow. This will immediatley stop "
+"all actions on this workflow and mark it as canceled. <b>This action can not "
+"be undone!</b><br><br>If you want to keep this workflow, press the abort "
+"button to close this window without touching the workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_LABEL"
+msgstr "Confirm Cancelation!"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Workflow Context"
 
@@ -2120,12 +2133,6 @@ msgstr "Request invalid - handle without workflow id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "Request invalid - no action"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
-msgstr "continue"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
-msgstr "go back"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Last Update"
 
@@ -2242,6 +2249,9 @@ msgstr "In Validity but Revoked Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Requested action not available"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
+msgstr "Go Back"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
 msgstr "Creator"
@@ -2782,6 +2792,9 @@ msgstr ""
 "the expected period of time. The reason for this pause and the time of the "
 "last execution is shown below, if you want this process to be continued, an "
 "operator needs to manually wake it up."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
+msgstr "Continue"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
@@ -3549,6 +3562,10 @@ msgstr "Yes"
 #~ msgstr "Persist CRR"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
+#~ msgstr "Retries"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
 #~ msgstr " "
 
@@ -3937,6 +3954,10 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
 #~ msgstr "RSA is the standard for encryption and signature"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
+#~ msgstr "continue"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"

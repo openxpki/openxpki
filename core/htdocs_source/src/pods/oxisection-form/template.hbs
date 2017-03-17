@@ -17,9 +17,13 @@
                         {{content.content.reset_label}}
                     </button>
                 {{/if}}
+                {{#each content.content.buttons as |btn|}}
+                    {{oxi-button button=btn klass="btn btn-default" click="buttonClick"}}
+                {{/each}}
+                
             </div>
         </div>
     </form>
 </div>
 
-{{oxi-button-container buttons=content.content.buttons buttonClick="buttonClick"}}
+

@@ -94,10 +94,12 @@ div.section{
 }
 
 .oxi-button-container button.btn.failure,
-.oxi-form-button button.btn.reset {
+.oxi-form-button button.btn.failure,
+.oxi-form-button button.btn.cancel {
     background-color: #e39f9f;
 }
 
+.oxi-form-button button.btn.reset,
 .oxi-button-container button.btn.alternative {
     background-color: #ffd78c;
 }

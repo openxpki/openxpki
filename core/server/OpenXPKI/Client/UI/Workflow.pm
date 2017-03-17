@@ -166,11 +166,13 @@ sub init_load {
         return $self->init_search({ preset => { wf_id => $id } });
     }
 
-    # Set single action if not in result view and only single action is avail
-    if (($view ne 'result') && !$wf_action && $wf_info->{WORKFLOW}->{PROC_STATE} eq 'manual' &&
+    # Set single action if no special view is requested and only single action is avail
+    if (!$view && !$wf_action && $wf_info->{WORKFLOW}->{PROC_STATE} eq 'manual' &&
         (ref $wf_info->{STATE}->{output} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {
         my @activities = @{$wf_info->{STATE}->{option}};
-        if (scalar @activities == 1) {
+        
+        # Do not count global_cancel as alternative selection
+        if (scalar @activities == 1 || (scalar @activities == 2 && $activities[1] == 'global_cancel')) {
             $wf_action = $activities[0];
             $self->logger()->debug('Autoselect action ' . $wf_action );
         }
@@ -1498,7 +1500,7 @@ sub __render_from_workflow {
                 action => 'workflow!handle!wf_token!'.$token->{value},
                 className => 'failure',
                 confirm => {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL Fail Workflow',
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL',
                     description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',                   
                 }
             };                
@@ -1741,24 +1743,17 @@ sub __render_from_workflow {
             wf_fields => \@fields,
         });
 
-        my $section = {
+        $self->add_section({
             type => 'form',
             action => 'workflow',                       
             content => {
                 #label => $wf_action_info->{label},
                 #description => $wf_action_info->{description},
-                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
                 fields => \@fields,
+                buttons => $self->__get_form_buttons( $wf_info ),
             }
-        };
-        
-        # Add reset button as link to the activity selection page
-        if ((scalar keys %{$wf_info->{ACTIVITY}}) > 1) {
-            $section->{reset} = 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
-            $section->{content}->{reset_label} = 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET';
-        }
-        
-        $self->add_section( $section );
+        });
 
         if (@fielddesc) {
             $self->add_section({
@@ -1973,12 +1968,8 @@ sub __get_action_buttons {
         # TODO - we should add some configuration option for this
         if ($wf_action =~ /global_cancel/) {
             $button{confirm} = {
-                label => 'Cancel Request',
-                description => 'Press the confirm button to cancel this workflow.
-                This will immediatley stop all actions on this workflow and
-                mark it as canceled. <b>This action can not be undone!</b><br/><br/>
-                If you want to keep this workflow, press the abort button to
-                close this window without touching the workflow.',
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_LABEL',
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_DESCRIPTION',                
             };
         }
         
@@ -2006,6 +1997,50 @@ sub __get_action_buttons {
 
     $self->logger()->debug('Buttons are ' . Dumper \@buttons);
 
+    return \@buttons;
+}
+
+sub __get_form_buttons {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my @buttons;
+ 
+    my $activity_count = scalar keys %{$wf_info->{ACTIVITY}};
+    if ($wf_info->{ACTIVITY}->{global_cancel}) {
+        push @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON', 
+            action => 'workflow!select!wf_action!global_cancel!wf_id!'. $wf_info->{WORKFLOW}->{ID},
+            className => 'cancel',
+            confirm => { 
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_DESCRIPTION',
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_LABEL',
+        }};
+        $activity_count--; 
+    }
+
+    # if there is another activity besides global_cancel, we add a go back button
+    if ($activity_count > 1) {
+        unshift @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON',
+            page => 'redirect!workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID},
+            className => 'reset',
+        };
+    }
+
+    if ($wf_info->{HANDLES} && ref $wf_info->{HANDLES} eq 'ARRAY' && (grep /fail/, @{$wf_info->{HANDLES}})) {
+        my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );
+        push @buttons, {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
+            action => 'workflow!handle!wf_token!'.$token->{value},
+            className => 'failure',
+            confirm => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL Fail Workflow',
+                description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',          
+            }
+        };
+    }
+            
     return \@buttons;
 }
 

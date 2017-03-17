@@ -1951,6 +1951,18 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
+msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_DESCRIPTION"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
 msgstr "Untergeordnete Workflows"
 
@@ -2862,14 +2874,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Untergeordnete Workflows"
 
@@ -3026,6 +3030,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
@@ -3619,6 +3627,10 @@ msgstr "Initial state of the LDAP publishing workflow"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
 msgstr "Initial state of the LDAP publishing workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
@@ -9022,6 +9034,14 @@ msgstr "Benutzername"
 #~ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTINUE_BUTTON"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_POLICY_VIOLATION_PROCEED_LABEL"
 #~ msgstr "Untergeordnete Workflows"
 
@@ -9662,6 +9682,18 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CANCEL"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
