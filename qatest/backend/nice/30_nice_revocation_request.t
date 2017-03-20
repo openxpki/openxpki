@@ -44,7 +44,7 @@ my $test = OpenXPKI::Test::More->new(
 $test->set_verbose($cfg{instance}{verbose});
 
 $test->plan( tests => 20 );
- 
+
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<', $cfg{instance}{buffer};
@@ -58,7 +58,7 @@ my $cert_identifier = $input_data->{'cert_identifier'};
 
 $test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier')
  || die "Unable to proceed without Certificate Identifier: $@";
- 
+
 
 # Login to use socket
 $test->connect_ok(
@@ -73,7 +73,7 @@ my %wfparam = (
     reason_code => 'unspecified',
     comment => 'Automated Test',
     flag_auto_approval => 0,
-    flag_batch_mode => 0             
+    flag_batch_mode => 0
 );
 
 $test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Revoke Workflow')
@@ -88,7 +88,7 @@ $test->state_is('PENDING');
 $test->execute_nok( 'crr_approve_crr' );
 
 $test->disconnect();
- 
+
 # Re-login with Operator for approval
 $test->connect_ok(
     user => $cfg{operator}{name},
@@ -97,12 +97,12 @@ $test->connect_ok(
 
 $test->execute_ok( 'crr_edit_crr' ); # this need refactoring
 $test->execute_ok( 'crr_update_crr', { reason_code => 'keyCompromise' } );
- 
+
 $test->state_is('PENDING');
- 
+
 $test->execute_ok( 'crr_reject_crr' );
- 
-$test->state_is('REJECTED'); 
+
+$test->state_is('REJECTED');
 
 
 # Test delayed revoke
@@ -111,9 +111,9 @@ $wfparam{delay_revocation_time} = time() + 5;
 $wfparam{flag_batch_mode} = 1;
 $test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create delayed Revoke Workflow')
    or die "Workflow Create failed: $@";
-  
+
 $test->state_is('CHECK_FOR_DELAYED_REVOKE');
-my $delayed_revoke_id =  $test->get_wfid(); 
+my $delayed_revoke_id =  $test->get_wfid();
 
 # Test auto revoke
 delete $wfparam{delay_revocation_time};
@@ -128,7 +128,7 @@ $test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-
 $test->state_is('CHECK_FOR_REVOCATION');
 
 # Do a second test - should go to success as already approved
-$wfparam{flag_auto_approval} = 0;     
+$wfparam{flag_auto_approval} = 0;
 
 $test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-Revoke Workflow')
  or die "Workflow Create failed: $@";
@@ -138,18 +138,18 @@ $test->state_is('CHECK_FOR_REVOCATION');
 # Finally, check if the delayed workflow has finished
 $test->set_wfid( $delayed_revoke_id );
 
-$test->diag('Switch back to delayed workflow #'.$delayed_revoke_id);
+$test->diag('Switch back to delayed workflow #'.$delayed_revoke_id) if $ENV{TEST_VERBOSE};
 my $i = 0;
 do {
     sleep 5;
-    $test->reset();    
+    $test->reset();
     $i++;
 } while($test->state() ne 'CHECK_FOR_REVOCATION' && $i < 6);
 $test->state_is('CHECK_FOR_REVOCATION');
 
 open(CERT, ">$cfg{instance}{buffer}");
-print CERT $serializer->serialize({ cert_identifier => $test->param( 'cert_identifier' ), wf_id => $test->get_wfid() }); 
-close CERT; 
+print CERT $serializer->serialize({ cert_identifier => $test->param( 'cert_identifier' ), wf_id => $test->get_wfid() });
+close CERT;
 
 $test->disconnect();
- 
+

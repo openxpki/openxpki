@@ -18,6 +18,7 @@ L<OpenXPKI::Test::CertHelper> instead.
 use File::Temp qw( tempdir );
 use File::Path qw( make_path );
 use MIME::Base64;
+use IPC::Open3 qw( open3 );
 
 ################################################################################
 # Constructor attributes
@@ -134,7 +135,10 @@ sub create_cert {
     }
 
     warn "createcert() - ", join(', ', @cmd) if $self->verbose;
-    my $rc = system(@cmd); $rc >>= 8;
+    # Silence STDOUT unless we are in verbose mode
+    my ($pid, $rc);
+    $pid = open3(0, $ENV{TEST_VERBOSE} ? ">&1" : 0, 0, @cmd); waitpid($pid, 0);
+    $rc = $? >> 8;
     die "Error running " . join(' ', @cmd) if $rc;
 
     delete $ENV{OXI_TEST_OPENSSL_PASSWORD} if $self->password;
@@ -148,7 +152,8 @@ sub create_cert {
         '-outform', 'PEM',
     );
 
-    $rc = system(@cmd); $rc >>= 8;
+    $pid = open3(0, $ENV{TEST_VERBOSE} ? ">&1" : 0, 0, @cmd); waitpid($pid, 0);
+    $rc = $? >> 8;
     die "Error running " . join(' ', @cmd) if $rc;
 
     return $self;

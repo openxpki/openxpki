@@ -194,12 +194,12 @@ sub create_cert {
         my $actions = $msg->{PARAMS}->{STATE}->{option};
         my $intermediate_state;
         if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
-            diag "Test FQDNs do not resolve - handling policy violation";
+            diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
             $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
             $intermediate_state ='PENDING_POLICY_VIOLATION';
         }
         else {
-            diag "For whatever reason test FQDNs do resolve - submitting request";
+            diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
             $test->execute_ok( 'csr_submit' );
             $intermediate_state ='PENDING';
         }

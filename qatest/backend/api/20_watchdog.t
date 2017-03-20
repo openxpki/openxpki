@@ -51,4 +51,3 @@ $test->runcmd('control_watchdog', { ACTION => 'status' });
 $test->ok(@{$test->get_msg->{PARAMS}->{pid}} > 0);
 
 $test->disconnect();
-$test->diag("done");

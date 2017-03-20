@@ -91,7 +91,7 @@ cmp_deeply($params, superhashof({
 my $serial = uc($params->{BODY}->{SERIAL_HEX});
 $serial = "0$serial" if length($serial) % 2 == 1; # prepend 0 if uneven amount of hex digits
 my $serial_f = join ":", unpack("(A2)*", $serial);
-diag "Certificate serial: $serial_f";
+diag "Certificate serial: $serial_f" if $ENV{TEST_VERBOSE};
 
 # Fetch certificate - PEM Format
 my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
