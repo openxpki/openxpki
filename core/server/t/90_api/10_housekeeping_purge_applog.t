@@ -2,8 +2,13 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
+use Cwd 'abs_path';
 
-plan tests => 15;
+use lib abs_path(catdir((splitpath(rel2abs(__FILE__)))[0,1], '..', 'lib'));
+
+plan skip_all => "No MySQL test database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
+plan tests => 14;
 
 my $maxage = 60*60*24;  # 1 day
 
@@ -31,23 +36,20 @@ if ($ENV{DEBUG_LEVEL}) {
 }
 
 
-our $dbi;
-our $token;
-require 't/30_dbi/common.pl';
+use OpenXPKI::Test::Context;
+my $test_ctx = OpenXPKI::Test::Context->new;
+$test_ctx->init_db;
+$test_ctx->init_api;
 
-use OpenXPKI::Server::Context;
-use OpenXPKI::Server::Log;
+use_ok "OpenXPKI::Server::Context", qw( CTX );
 
-OpenXPKI::Server::Context::setcontext({
-    dbi_log => $dbi,
-    dbi_backend => $dbi
-});
-my $log = OpenXPKI::Server::Log->new( CONFIG => 't/30_dbi/log4perl.conf' );
+my $dbi = CTX('dbi_backend');
+my $log = CTX('log');
 
 my $wf_id = int(rand(10000000));
 my $msg = sprintf "DBI Log Workflow Test %01d", rand(10000000);
 OpenXPKI::Server::Context::setcontext({
-    workflow_id => $wf_id 
+    workflow_id => $wf_id
 });
 
 ok ($log->log (FACILITY => "application",
@@ -57,7 +59,7 @@ ok ($log->log (FACILITY => "application",
 
 my $result = $dbi->select(
     TABLE => 'APPLICATION_LOG',
-    DYNAMIC => 
+    DYNAMIC =>
     {
         CATEGORY => {VALUE => 'openxpki.application' },
         MESSAGE => {VALUE => "%$msg", OPERATOR => 'LIKE'},
@@ -103,7 +105,7 @@ ok($dbi->commit(), "Commit insert of old test message");
 
 $result = $dbi->select(
     TABLE => 'APPLICATION_LOG',
-    DYNAMIC => 
+    DYNAMIC =>
     {
         CATEGORY => {VALUE => 'openxpki.application' },
         WORKFLOW_SERIAL => {VALUE => $wf_id, OPERATOR => 'EQUAL'},
@@ -115,9 +117,11 @@ is(scalar @{$result}, 3, "Log entries found for WFID $wf_id");
 my $maxutc = get_utc_time( time - $maxage );
 ok(CTX('api')->purge_application_log( { MAXAGE => $maxage } ), "exec purge_application_log for $maxutc");
 
+$dbi->commit; # needed for interaction between legacy db and new db
+
 $result = $dbi->select(
     TABLE => 'APPLICATION_LOG',
-    DYNAMIC => 
+    DYNAMIC =>
     {
         CATEGORY => {VALUE => 'openxpki.application' },
         WORKFLOW_SERIAL => {VALUE => $wf_id, OPERATOR => 'EQUAL'},

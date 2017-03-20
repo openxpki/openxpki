@@ -556,7 +556,6 @@ t/30_dbi/02.t
 t/30_dbi/03.t
 t/30_dbi/04_quoting_bug.t
 t/30_dbi/30_log.t
-t/30_dbi/31_purge_applog.t
 t/30_dbi/70.t2
 t/30_dbi/99.t2
 t/30_dbi/common.pl
@@ -628,6 +627,8 @@ t/65_ui/25_serialization_base64.t
 t/80_config_versioning/01.t2
 t/80_config_versioning/99_cleanup.t2
 t/80_config_versioning/config.patch
+
+t/90_api/10_housekeeping_purge_applog.t
 
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
