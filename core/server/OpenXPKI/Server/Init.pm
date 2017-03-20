@@ -420,7 +420,7 @@ sub __do_init_dbi {
     );
     delete $params{environment};
     delete $params{log};
-    delete $params{debug};         # TODO Legacy: remove treatment of DB parameter "debug" (occurs in example database.yaml)
+    delete $params{debug};         # TODO #legacydb Remove treatment of DB parameter "debug" (occurs in example database.yaml)
 
     OpenXPKI::Server::Context::setcontext({
         dbi => OpenXPKI::Server::Database->new(
