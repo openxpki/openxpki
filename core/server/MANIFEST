@@ -686,6 +686,8 @@ t/config.d/system/realms.yaml
 t/config.d/system/server.yaml
 t/config.d/system/watchdog.yaml
 
+t/lib/OpenXPKI/Test/Context.pm
+
 t/config.xml
 t/tests.mk
 
