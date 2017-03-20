@@ -8,7 +8,7 @@ use Cwd 'abs_path';
 use lib abs_path(catdir((splitpath(rel2abs(__FILE__)))[0,1], '..', 'lib'));
 
 plan skip_all => "No MySQL test database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
-plan tests => 14;
+plan tests => 10;
 
 my $maxage = 60*60*24;  # 1 day
 
@@ -31,11 +31,26 @@ sub get_utc_time {
 }
 
 use OpenXPKI::Debug;
-if ($ENV{DEBUG_LEVEL}) {
-    $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
+$OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL} if $ENV{DEBUG_LEVEL};
+
+sub is_logentry_count {
+    my ($wf_id, $count) = @_;
+
+    my $result = CTX('dbi')->select(
+        from => 'application_log',
+        columns => [ '*' ],
+        where => {
+            category => 'openxpki.application',
+            workflow_id => $wf_id,
+        }
+    )->fetchall_arrayref({});
+
+    is scalar @{$result}, $count, "$count log entries found via workflow id";
 }
 
-
+#
+# Setup test context
+#
 use OpenXPKI::Test::Context;
 my $test_ctx = OpenXPKI::Test::Context->new;
 $test_ctx->init_db;
@@ -43,90 +58,67 @@ $test_ctx->init_api;
 
 use_ok "OpenXPKI::Server::Context", qw( CTX );
 
-my $dbi = CTX('dbi_backend');
+my $dbi = CTX('dbi');
 my $log = CTX('log');
 
+#
+# Tests
+#
+
+# Setup workflow ID which is part of the logged informations
 my $wf_id = int(rand(10000000));
-my $msg = sprintf "DBI Log Workflow Test %01d", rand(10000000);
 OpenXPKI::Server::Context::setcontext({
     workflow_id => $wf_id
 });
 
-ok ($log->log (FACILITY => "application",
-               PRIORITY => "info",
-               MESSAGE  => $msg), 'Workflow Test message')
-           or diag "ERROR: log=$log";
+# Insert and validate test message via API
+my $msg = sprintf "DBI Log Workflow Test %01d", $wf_id;
+
+ok $log->info($msg, "application"), 'log test message to be kept'
+    or diag "ERROR: log=$log";
 
 my $result = $dbi->select(
-    TABLE => 'APPLICATION_LOG',
-    DYNAMIC =>
-    {
-        CATEGORY => {VALUE => 'openxpki.application' },
-        MESSAGE => {VALUE => "%$msg", OPERATOR => 'LIKE'},
+    from => 'application_log',
+    columns => [ '*' ],
+    where => {
+        category => 'openxpki.application',
+        message => { -like => "%$msg" },
     }
-);
-is(scalar @{$result}, 1, "Log entry found: $msg");
+)->fetchall_arrayref({});
+is scalar @{$result}, 1, "1 log entry found via string search";
 
-my $serial = $dbi->get_new_serial(TABLE => 'APPLICATION_LOG');
-$msg = sprintf "DBI Log Workflow Test Old %01d", rand(10000000);
-my $timestamp = get_utc_time( time - $maxage + 5);
-#diag "WFID=$wf_id, TS=$timestamp, SER=$serial, MSG=$msg";
-isnt($serial, 0, 'serial for test entry not zero') or die "Error: unable to continue without serial";
-ok($dbi->insert(
-        TABLE => 'APPLICATION_LOG',
-        HASH => {
-            APPLICATION_LOG_SERIAL => $serial,
-            TIMESTAMP => $timestamp,
-            WORKFLOW_SERIAL => $wf_id,
-            CATEGORY => 'openxpki.application',
-            PRIORITY => 'info',
-            MESSAGE => $msg,
-        },
-    ), "insert old test message");
-ok($dbi->commit(), "Commit insert of old test message");
+# Insert test message #1 via database
+ok $dbi->insert(
+    into => 'application_log',
+    values => {
+        application_log_id  => $dbi->next_id('application_log'),
+        logtimestamp        => get_utc_time( time - $maxage + 5), # should be kept when calling 'purge'
+        workflow_id         => $wf_id,
+        category            => 'openxpki.application',
+        priority            => 'info',
+        message             => "Blah",
+    },
+), "insert old test message to be kept";
 
-$serial = $dbi->get_new_serial(TABLE => 'APPLICATION_LOG');
-$msg = sprintf "DBI Log Workflow Test Old %01d", rand(10000000);
-$timestamp = get_utc_time( time - $maxage - 5);
-#diag "WFID=$wf_id, TS=$timestamp, SER=$serial, MSG=$msg";
-isnt($serial, 0, 'serial for test entry not zero') or die "Error: unable to continue without serial";
-ok($dbi->insert(
-        TABLE => 'APPLICATION_LOG',
-        HASH => {
-            APPLICATION_LOG_SERIAL => $serial,
-            TIMESTAMP => $timestamp,
-            WORKFLOW_SERIAL => $wf_id,
-            CATEGORY => 'openxpki.application',
-            PRIORITY => 'info',
-            MESSAGE => $msg,
-        },
-    ), "insert old test message");
-ok($dbi->commit(), "Commit insert of old test message");
+# Insert test message #2 via database
+ok $dbi->insert(
+    into => 'application_log',
+    values => {
+        application_log_id  => $dbi->next_id('application_log'),
+        logtimestamp        => get_utc_time( time - $maxage - 5), # should be deleted when calling 'purge'
+        workflow_id         => $wf_id,
+        category            => 'openxpki.application',
+        priority            => 'info',
+        message             => "Blah",
+    },
+), "insert old test message to be purged";
 
-$result = $dbi->select(
-    TABLE => 'APPLICATION_LOG',
-    DYNAMIC =>
-    {
-        CATEGORY => {VALUE => 'openxpki.application' },
-        WORKFLOW_SERIAL => {VALUE => $wf_id, OPERATOR => 'EQUAL'},
-    }
-);
-is(scalar @{$result}, 3, "Log entries found for WFID $wf_id");
+is_logentry_count $wf_id, 3;
 
-# CALL API TO PURGE RECORDS
+# API call to purge records
 my $maxutc = get_utc_time( time - $maxage );
-ok(CTX('api')->purge_application_log( { MAXAGE => $maxage } ), "exec purge_application_log for $maxutc");
+ok CTX('api')->purge_application_log( { MAXAGE => $maxage } ), "call 'purge_application_log' with MAXAGE";
 
-$dbi->commit; # needed for interaction between legacy db and new db
-
-$result = $dbi->select(
-    TABLE => 'APPLICATION_LOG',
-    DYNAMIC =>
-    {
-        CATEGORY => {VALUE => 'openxpki.application' },
-        WORKFLOW_SERIAL => {VALUE => $wf_id, OPERATOR => 'EQUAL'},
-    }
-);
-is(scalar @{$result}, 2, "2 log entries found for WFID $wf_id after purge");
+is_logentry_count $wf_id, 2;
 
 1;
