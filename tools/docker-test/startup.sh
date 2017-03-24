@@ -52,10 +52,10 @@ cpanm --quiet --notest --installdeps $CLONE_DIR/
 echo -e "\n====[ MySQL ]===="
 nohup sh -c mysqld >/tmp/mysqld.log &
 set +e
-$CLONE_DIR/tools/scripts/mysql-wait-for-db.sh
+$CLONE_DIR/tools/testenv/mysql-wait-for-db.sh
 set -e
-$CLONE_DIR/tools/scripts/mysql-create-db.sh
-$CLONE_DIR/tools/scripts/mysql-create-user.sh
+$CLONE_DIR/tools/testenv/mysql-create-db.sh
+$CLONE_DIR/tools/testenv/mysql-create-user.sh
 
 #
 # OpenXPKI compilation
@@ -93,18 +93,18 @@ cp -R $CLONE_DIR/config/openxpki /etc
 
 # customize config
 sed -ri 's/^((user|group):\s+)\w+/\1root/' /etc/openxpki/config.d/system/server.yaml
-$CLONE_DIR/tools/scripts/mysql-oxi-config.sh
+$CLONE_DIR/tools/testenv/mysql-oxi-config.sh
 
 #
 # Database re-init
 #
-$CLONE_DIR/tools/scripts/mysql-create-db.sh
-$CLONE_DIR/tools/scripts/mysql-create-schema.sh
+$CLONE_DIR/tools/testenv/mysql-create-db.sh
+$CLONE_DIR/tools/testenv/mysql-create-schema.sh
 
 #
 # Sample config (CA certificates etc.)
 #
-$CLONE_DIR/tools/testdata/insert-test-certificates.sh
+$CLONE_DIR/tools/testenv/insert-certificates.sh
 
 #
 # Start OpenXPKI

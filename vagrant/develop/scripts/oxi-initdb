@@ -22,10 +22,10 @@ trap '_exit $?' EXIT
 openxpkictl stop
 
 set -e
-/code-repo/tools/scripts/mysql-create-db.sh
-/code-repo/tools/scripts/mysql-create-schema.sh
+/code-repo/tools/testenv/mysql-create-db.sh
+/code-repo/tools/testenv/mysql-create-schema.sh
 
 rm -rf /etc/openxpki/ssl/
-/code-repo/tools/testdata/insert-test-certificates.sh
+/code-repo/tools/testenv/insert-certificates.sh
 
 openxpkictl start

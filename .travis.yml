@@ -37,9 +37,9 @@ addons:
 #
 
 before_install:
-    - ./tools/scripts/mysql-wait-for-db.sh
-    - ./tools/scripts/mysql-create-db.sh
-    - ./tools/scripts/mysql-create-user.sh
+    - ./tools/testenv/mysql-wait-for-db.sh
+    - ./tools/testenv/mysql-create-db.sh
+    - ./tools/testenv/mysql-create-user.sh
     - curl -s -L https://cpanmin.us | perl - App::cpanminus
     - cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
@@ -81,11 +81,11 @@ script:
     - sed -ri 's/^(user:\s+)\S+/\1'$TRAVIS_USER'/'       /etc/openxpki/config.d/system/server.yaml
     - sed -ri 's/^(group:\s+)\S+/\1'$TRAVIS_USERGROUP'/' /etc/openxpki/config.d/system/server.yaml
     - sed -ri 's/^(pid_file:\s+)\S+/\1\/var\/openxpki\/openxpkid.pid/' /etc/openxpki/config.d/system/server.yaml
-    - ./tools/scripts/mysql-oxi-config.sh
+    - ./tools/testenv/mysql-oxi-config.sh
 # Database re-init and sample config (CA certificates etc.)
-    - ./tools/scripts/mysql-create-db.sh
-    - ./tools/scripts/mysql-create-schema.sh
-    - ./tools/testdata/insert-test-certificates.sh
+    - ./tools/testenv/mysql-create-db.sh
+    - ./tools/testenv/mysql-create-schema.sh
+    - ./tools/testenv/insert-certificates.sh
 # Start OpenXPKI (is in PATH)
     - openxpkictl start || cat /var/log/openxpki/*
 # QA tests

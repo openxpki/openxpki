@@ -4,7 +4,7 @@
 # use in test code / environment.
 #
 # The MySQL database should be freshly created, i.e. without any data in it.
-# (e.g. using tools/scripts/mysql-create-db.sh && tools/scripts/mysql-create-schema.sh)
+# (e.g. using tools/testenv/mysql-create-db.sh && tools/testenv/mysql-create-schema.sh)
 #
 # The resulting certificates are available in three forms below ./certificates/:
 # 1. Certificate files

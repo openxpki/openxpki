@@ -49,8 +49,8 @@ fi
 # Database setup
 #
 set -e
-/code-repo/tools/scripts/mysql-wait-for-db.sh
-/code-repo/tools/scripts/mysql-create-db.sh
-/code-repo/tools/scripts/mysql-create-user.sh
-/code-repo/tools/scripts/mysql-create-schema.sh
+/code-repo/tools/testenv/mysql-wait-for-db.sh
+/code-repo/tools/testenv/mysql-create-db.sh
+/code-repo/tools/testenv/mysql-create-user.sh
+/code-repo/tools/testenv/mysql-create-schema.sh
 set +e
