@@ -465,7 +465,7 @@ sub import_certificate {
     );
 
     # cert is self signed
-    if ($issuer_cert eq "SELF") {
+    if ($issuer_cert and $issuer_cert eq "SELF") {
         $cert_legacy->{ISSUER_IDENTIFIER} = $cert_identifier;
     }
     # cert has known issuer
