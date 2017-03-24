@@ -137,15 +137,15 @@ $test->runcmd_ok('import_certificate', { DATA => $cert_pem2, REVOKED => 1 }, "Im
     or diag "ERROR: ".$test->error;
 $test->is($test->get_msg->{PARAMS}->{STATUS}, "REVOKED", "Certificate should be marked as REVOKED");
 
-import_failsok($test, $dbdata->cert("orphan"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER");
-import_ok     ($test, $dbdata->cert("orphan"), FORCE_NOCHAIN => 1);
+import_failsok($test, $dbdata->cert("gamma_bob_1"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER");
+import_ok     ($test, $dbdata->cert("gamma_bob_1"), FORCE_NOCHAIN => 1);
 
-import_ok     ($test, $dbdata->cert("acme_root"));
-import_ok     ($test, $dbdata->cert("acme_signer"));
-import_ok     ($test, $dbdata->cert("expired_root"));
-import_failsok($test, $dbdata->cert("expired_signer"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN");
-import_ok     ($test, $dbdata->cert("expired_signer"), FORCE_ISSUER=>1);
-import_ok     ($test, $dbdata->cert("expired_client"), FORCE_NOVERIFY=>1);
+import_ok     ($test, $dbdata->cert("alpha_root_2"));
+import_ok     ($test, $dbdata->cert("alpha_signer_2"));
+import_ok     ($test, $dbdata->cert("alpha_root_1"));
+import_failsok($test, $dbdata->cert("alpha_signer_1"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN");
+import_ok     ($test, $dbdata->cert("alpha_signer_1"), FORCE_ISSUER=>1);
+import_ok     ($test, $dbdata->cert("alpha_alice_1"), FORCE_NOVERIFY=>1);
 
 # Cleanup database
 $dbdata->delete_all;

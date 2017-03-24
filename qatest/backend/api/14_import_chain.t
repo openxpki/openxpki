@@ -55,47 +55,47 @@ $test->connect_ok(
 # Init helpers
 #
 my $dbdata = OpenXPKI::Test::CertHelper::Database->new;
-
-my @acme_list =  qw( acme_client  acme_signer  acme_root );
-my @acme2_list = qw( acme2_client acme2_signer acme2_root );
-my $acme_pem = [ map { $dbdata->cert($_)->data }  @acme_list ];
-my $acme_ids = [ map { $dbdata->cert($_)->id }    @acme_list ];
-my $acme_pem_string = join "\n", @$acme_pem;
-my $acme2_pem = [ map { $dbdata->cert($_)->data } @acme2_list ];
-my $acme2_ids = [ map { $dbdata->cert($_)->id }   @acme2_list ];
-my $all_pem =  [ map { $dbdata->cert($_)->data }  @acme_list, @acme2_list ];
-my $all_ids =  [ map { $dbdata->cert($_)->id  }   @acme_list, @acme2_list ];
+$dbdata->cert_names_by_realm_gen(alpha => 1);
+my @alpha_list = qw( alpha_alice_2  alpha_signer_2  alpha_root_2 );
+my @beta_list =  qw( beta_alice_1   beta_signer_1   beta_root_1 );
+my $alpha_pem = [ map { $dbdata->cert($_)->data }  @alpha_list ];
+my $alpha_ids = [ map { $dbdata->cert($_)->id }    @alpha_list ];
+my $alpha_pem_string = join "\n", @$alpha_pem;
+my $beta_pem = [ map { $dbdata->cert($_)->data } @beta_list ];
+my $beta_ids = [ map { $dbdata->cert($_)->id }   @beta_list ];
+my $all_pem =  [ map { $dbdata->cert($_)->data }  @alpha_list, @beta_list ];
+my $all_ids =  [ map { $dbdata->cert($_)->id  }   @alpha_list, @beta_list ];
 
 
 # Array import: Try chain with root cert (should fail)
-$test->runcmd_ok('import_chain', { DATA => $acme_pem }, "Array import: chain with root cert");
+$test->runcmd_ok('import_chain', { DATA => $alpha_pem }, "Array import: chain with root cert");
 like $test->get_msg->{PARAMS}->{failed}->[0]->{error},
     qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/,
     "Return error message";
 is scalar @{ $test->get_msg->{PARAMS}->{imported} }, 0, "No certs should have been imported";
 
 # Array import: Chain with root cert (IMPORT_ROOT = 1)
-$test->runcmd_ok('import_chain', { DATA => $acme_pem, IMPORT_ROOT => 1 }, "Array import: chain with root cert (IMPORT_ROOT = 1)");
+$test->runcmd_ok('import_chain', { DATA => $alpha_pem, IMPORT_ROOT => 1 }, "Array import: chain with root cert (IMPORT_ROOT = 1)");
 cmp_bag $test->get_msg->{PARAMS}->{imported}, [
-    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$acme_ids
+    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$alpha_ids
 ], "List imported certs";
 
 # Array import: Same chain again (should recognize existing certs)
-$test->runcmd_ok('import_chain', { DATA => $acme_pem, IMPORT_ROOT => 1 }, "Array import: same chain again");
+$test->runcmd_ok('import_chain', { DATA => $alpha_pem, IMPORT_ROOT => 1 }, "Array import: same chain again");
 cmp_bag $test->get_msg->{PARAMS}->{existed}, [
-    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$acme_ids
+    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$alpha_ids
 ], "List certs as already existing";
 is scalar @{ $test->get_msg->{PARAMS}->{imported} }, 0, "No certs should have been imported";
 
 $dbdata->delete_all;
 
 # Array import: partly existing chain
-$test->runcmd_ok('import_chain', { DATA => $dbdata->cert("acme2_root")->data, IMPORT_ROOT => 1 }, "Prepare next test by importing root certificate");
-$test->runcmd_ok('import_chain', { DATA => $acme2_pem, IMPORT_ROOT => 1 }, "Array import: chain whose root cert is already in PKI");
+$test->runcmd_ok('import_chain', { DATA => $dbdata->cert("beta_root_1")->data, IMPORT_ROOT => 1 }, "Prepare next test by importing root certificate");
+$test->runcmd_ok('import_chain', { DATA => $beta_pem, IMPORT_ROOT => 1 }, "Array import: chain whose root cert is already in PKI");
 cmp_deeply $test->get_msg->{PARAMS},
     superhashof({
-        existed =>  bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } $dbdata->cert("acme2_root")->id),
-        imported => bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } ($dbdata->cert("acme2_signer")->id, $dbdata->cert("acme2_client")->id) ),
+        existed =>  bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } $dbdata->cert("beta_root_1")->id),
+        imported => bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } ($dbdata->cert("beta_signer_1")->id, $dbdata->cert("beta_alice_1")->id) ),
     }),
     "List certs as imported and existing";
 
@@ -110,17 +110,17 @@ cmp_bag $test->get_msg->{PARAMS}->{imported}, [
 $dbdata->delete_all;
 
 # PEM block import: Chain with root cert (IMPORT_ROOT = 1)
-$test->runcmd_ok('import_chain', { DATA => $acme_pem_string, IMPORT_ROOT => 1 }, "String import: chain with root cert (IMPORT_ROOT = 1)");
+$test->runcmd_ok('import_chain', { DATA => $alpha_pem_string, IMPORT_ROOT => 1 }, "String import: chain with root cert (IMPORT_ROOT = 1)");
 cmp_bag $test->get_msg->{PARAMS}->{imported}, [
-    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$acme_ids
+    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$alpha_ids
 ], "List imported certs";
 
 $dbdata->delete_all;
 
 # PKCS7 import
-$test->runcmd_ok('import_chain', { DATA => $dbdata->acme1_pkcs7, IMPORT_ROOT => 1 }, "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)");
+$test->runcmd_ok('import_chain', { DATA => $dbdata->beta_alice_pkcs7, IMPORT_ROOT => 1 }, "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)");
 cmp_bag $test->get_msg->{PARAMS}->{imported}, [
-    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$acme_ids
+    map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$beta_ids
 ], "List imported certs";
 
 $dbdata->delete_all;

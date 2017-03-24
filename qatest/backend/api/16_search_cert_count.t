@@ -51,11 +51,12 @@ $test->connect_ok(
 my $dbdata = OpenXPKI::Test::CertHelper->via_database;
 
 # By PROFILE
+my $realm = $dbdata->cert("beta_root_1")->db->{pki_realm};
 $test->runcmd_ok('search_cert_count', {
-    PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm},
+    PKI_REALM => $dbdata->cert("beta_root_1")->db->{pki_realm},
 }, "Search and count certificates") or diag Dumper($test->get_msg);
 
-is $test->get_msg->{PARAMS}, 3, "Correct number";
+is $test->get_msg->{PARAMS}, scalar($dbdata->cert_names_where(pki_realm => $realm)), "Correct number";
 
 $dbdata->delete_all; # only deletes those from OpenXPKI::Test::CertHelper::Database
 $test->disconnect;
