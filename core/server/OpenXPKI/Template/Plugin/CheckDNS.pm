@@ -63,12 +63,10 @@ sub new {
     
     if ($args->{timeout}) {
         $self->timeout($args->{timeout});
-        warn "set timeout " . $self->timeout();
     }
     if ($args->{servers}) {
         my @s = split /,/, $args->{servers};
         $self->servers( \@s );
-        warn "set servers " . Dumper $self->servers();
     }
     return $self;    
     
@@ -81,6 +79,11 @@ sub _init_dns {
     
     my $rr = Net::DNS::Resolver->new();
     $rr->udp_timeout($self->timeout());
+    $rr->tcp_timeout($self->timeout());
+    $rr->retry(0);
+    # the resolver waits for retrans even if a timeout occured
+    $rr->retrans($self->timeout());
+    
     if ($self->servers()) {
         $rr->nameservers( @{$self->servers()} );
     }
@@ -111,7 +114,7 @@ sub valid {
     my $valid = shift || '';
     my $timeout = shift;
     
-    my $reply = $self->resolver->search( $fqdn );
+    my $reply = $self->resolver->send( $fqdn );
     
     my $status;
     if ($reply && $reply->answer) {

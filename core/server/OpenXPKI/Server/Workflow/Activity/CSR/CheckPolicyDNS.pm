@@ -61,6 +61,14 @@ sub execute
     
     my $timeout = $self->param('timeout') || 30;
     $resolver->udp_timeout( $timeout );
+    $resolver->tcp_timeout( $timeout );
+    
+    # resolver waits until retrans interval has elapsed and we want the 
+    # resolver to return quickly, so adjust retrans if timeout is small  
+    if ($resolver->retrans > $timeout) {
+        $resolver->retrans($timeout);
+    }
+    $resolver->retry(1);
     
     if ($self->param('servers')) {
         my @server = split /,/, $self->param('servers');
@@ -70,7 +78,7 @@ sub execute
     my @errors;
     FQDN:
     foreach my $fqdn (keys %items) {
-        my $reply = $resolver->search( $fqdn );
+        my $reply = $resolver->send( $fqdn );
 
         ##! 64: 'resolv for ' . $fqdn . Dumper $reply
         if (!$reply || !$reply->answer) {
