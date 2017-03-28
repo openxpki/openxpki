@@ -22,6 +22,7 @@ use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in 
 use OpenXPKI::Config;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
+use OpenXPKI::Server::Session::Mock;
 use OpenXPKI::Test::ConfigWriter;
 
 Moose::Exporter->setup_import_methods(
@@ -106,6 +107,9 @@ Set up the test environment.
 
 =item * C<CTX('api')>
 
+=item * C<CTX('session')> (C<CTX('session')-E<gt>get_pki_realm> will return the
+first realm specified in L<OpenXPKI::Test::ConfigWriter/realms>)
+
 =back
 
 =back
@@ -137,6 +141,12 @@ sub setup_env {
 
     # Init basic CTX objects
     OpenXPKI::Server::Init::init({TASKS  => [ qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api ) ], SILENT => 1, CLI => 0});
+    OpenXPKI::Server::Context::CTX('dbi_backend')->connect;
+    OpenXPKI::Server::Context::CTX('dbi_workflow')->connect;
+
+    my $session = OpenXPKI::Server::Session::Mock->new;
+    OpenXPKI::Server::Context::setcontext({'session' => $session});
+    $session->set_pki_realm($cfg->realms->[0]);
 
     return $tmp;
 }
