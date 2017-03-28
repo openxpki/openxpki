@@ -127,6 +127,7 @@ sub setup_env {
     # Read database configuration
     $self->_db_config_from_production unless ($self->has_db_conf or $self->force_test_db);
     $self->_db_config_from_env        unless $self->has_db_conf;
+    die "Could not read database config from /etc/openxpki or env variables" unless $self->has_db_conf;
 
     # Create base directory for test configuration
     my $tmp = tempdir( CLEANUP => 1 );
@@ -153,6 +154,8 @@ sub setup_env {
 
 sub _db_config_from_production {
     my ($self) = @_;
+
+    return unless (-d "/etc/openxpki/config.d" and -r "/etc/openxpki/config.d");
 
     # make sure OpenXPKI::Config reads from default /etc/openxpki/config.d
     my $old_env = $ENV{OPENXPKI_CONF_PATH}; delete $ENV{OPENXPKI_CONF_PATH};
