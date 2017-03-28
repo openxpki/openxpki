@@ -36,7 +36,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 54 );
+$test->plan( tests => 56 );
 
 $test->connect_ok(
     user => $cfg->{operator}{name},
@@ -302,7 +302,19 @@ cmp_deeply $test->get_msg->{PARAMS}, array_each(
     superhashof({ CSR_SERIAL => re(qr/^\d+$/) })
 ), "Correct result";
 
+# Github issue #501 - SQL JOIN statement breaks when searching for attributes AND profile
+$test->runcmd_ok('search_cert', {
+    CERT_ATTRIBUTES => [
+        { KEY => 'meta_requestor', VALUE => "*$uuid*" }, # default operator is LIKE
+        { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
+    ],
+    PROFILE => $cert_info->{profile},
+    PKI_REALM => "_ANY"
+}, "Search cert by attributes and profile (issue #501)") or diag ref($test->error);
 
+cmp_deeply $test->get_msg->{PARAMS}, [
+    superhashof({ SUBJECT => re(qr/$uuid/i) })
+], "Correct result";
 
 $dbdata->delete_all; # only deletes those from OpenXPKI::Test::CertHelper::Database
 $test->disconnect;
