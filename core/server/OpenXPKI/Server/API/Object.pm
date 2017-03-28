@@ -1063,7 +1063,7 @@ sub __search_cert_db_query {
             my $table_alias = "certattr$ii";
 
             # add join table
-            push @join_spec, ( 'identifier=identifier', "certificate_attributes|$table_alias" );
+            push @join_spec, ( 'certificate.identifier=identifier', "certificate_attributes|$table_alias" );
 
             # add search constraint
             $where->{ "$table_alias.attribute_contentkey" } = $attrib->{KEY};
@@ -1083,7 +1083,7 @@ sub __search_cert_db_query {
     }
 
     if ( $args->{PROFILE} ) {
-        push @join_spec, qw( req_key=req_key csr );
+        push @join_spec, qw( certificate.req_key=req_key csr );
         $where->{ 'csr.profile' } = $args->{PROFILE};
     }
 
