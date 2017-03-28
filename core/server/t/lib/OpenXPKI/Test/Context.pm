@@ -32,6 +32,34 @@ has is_api_initialized          => ( is => 'rw', isa => 'Bool', default => 0 );
 #
 # Init logging
 #
+sub init_screen_log {
+    my ($self) = @_;
+    return if $self->is_log_initialized; # Do not switch back so screen only logging once full logging is enabled
+
+    diag "Initialize CTX('log') for screen only logging";
+    use OpenXPKI::Server::Log;
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'ERROR';
+    OpenXPKI::Server::Context::setcontext({
+        log => OpenXPKI::Server::Log->new(CONFIG => \qq(
+            # Catch-all root logger
+            log4perl.rootLogger = ERROR, Screen
+
+            log4perl.category.openxpki.auth = INFO, Screen
+            log4perl.category.openxpki.audit = INFO, Screen
+            log4perl.category.openxpki.monitor = INFO, Screen
+            log4perl.category.openxpki.system = INFO, Screen
+            log4perl.category.openxpki.workflow = INFO, Screen
+            log4perl.category.openxpki.application = INFO, Screen
+            log4perl.category.connector = INFO, Screen
+
+            log4perl.appender.Screen          = Log::Log4perl::Appender::Screen
+            log4perl.appender.Screen.layout   = Log::Log4perl::Layout::PatternLayout
+            log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
+            log4perl.appender.Screen.Threshold = $threshold_screen
+        ))
+    });
+}
+
 sub init_log {
     my ($self) = @_;
     return if $self->is_log_initialized;
