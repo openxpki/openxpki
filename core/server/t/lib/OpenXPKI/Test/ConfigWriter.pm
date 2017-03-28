@@ -1,10 +1,10 @@
-package OpenXPKI::Test::Config;
+package OpenXPKI::Test::ConfigWriter;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::Context - Initialize C<CTX> for use in test code.
+OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)
 
 =cut
 
@@ -14,21 +14,30 @@ use File::Spec;
 use TAP::Parser::YAMLish::Writer;
 
 # CPAN modules
+use Moose::Util::TypeConstraints;
 use Test::More;
 use Test::Exception;
+use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 
 =head1 DESCRIPTION
 
-This class initializes some parts of the global context C<CTX> for tests of
-encapsulated OpenXPKI functionality that does not need more complex global
-functions like workflows.
-
-This allows for tests to run without starting a complete OpenXPKI server and
-without setting up a configuration file.
+Methods to create a configuration consisting of several YAML files for tests.
 
 =cut
 
-has basedir => ( is => 'rw', isa => 'Str', required => 1 );
+has basedir     => ( is => 'rw', isa => 'Str', required => 1 );
+
+has db_conf => (
+    is => 'rw',
+    isa => 'HashRef',
+    required => 1,
+    trigger => sub {
+        my ($self, $new, $old) = @_;
+        my @keys = qw( type name host port user passwd );
+        die "Required keys missing for 'db_conf': ".join(", ", grep { not defined $new->{$_} } @keys)
+            unless eq_deeply([keys %$new], bag(@keys));
+    },
+);
 
 # Following attributes must be lazy => 1 because their builders access other attributes
 has yaml_crypto     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_crypto" );
@@ -52,13 +61,6 @@ has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub
 has path_openssl        => ( is => 'rw', isa => 'Str', default => "/usr/bin/openssl" );
 has path_javaks_keytool => ( is => 'rw', isa => 'Str', default => "/usr/bin/keytool" );
 has path_openca_scep    => ( is => 'rw', isa => 'Str', default => "/usr/bin/openca-scep" );
-
-has db_type     => ( is => 'rw', isa => 'Str', default => "MySQL" );
-has db_name     => ( is => 'rw', isa => 'Str', default => "openxpki" );
-has db_host     => ( is => 'rw', isa => 'Str', default => "localhost" );
-has db_port     => ( is => 'rw', isa => 'Str', default => 3306 );
-has db_user     => ( is => 'rw', isa => 'Str', default => "openxpki" );
-has db_passwd   => ( is => 'rw', isa => 'Str', default => "openxpki" );
 
 has system_user  => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 has system_group => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
@@ -123,12 +125,12 @@ sub _build_database {
     return {
         main => {
             debug   => 0,
-            type    => $self->db_type,
-            name    => $self->db_name,
-            host    => $self->db_host,
-            port    => $self->db_port,
-            user    => $self->db_user,
-            passwd  => $self->db_passwd,
+            type    => $self->db_conf->{type},
+            name    => $self->db_conf->{name},
+            host    => $self->db_conf->{host},
+            port    => $self->db_conf->{port},
+            user    => $self->db_conf->{user},
+            passwd  => $self->db_conf->{passwd},
         },
     };
 }
@@ -327,4 +329,4 @@ sub _realm_crypto {
     };
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
