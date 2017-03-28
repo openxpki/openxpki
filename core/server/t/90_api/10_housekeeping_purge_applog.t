@@ -8,7 +8,7 @@ use Cwd 'abs_path';
 use lib abs_path(catdir((splitpath(rel2abs(__FILE__)))[0,1], '..', 'lib'));
 
 plan skip_all => "No MySQL test database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
-plan tests => 10;
+plan tests => 7;
 
 my $maxage = 60*60*24;  # 1 day
 
@@ -51,12 +51,8 @@ sub is_logentry_count {
 #
 # Setup test context
 #
-use OpenXPKI::Test::Context;
-my $test_ctx = OpenXPKI::Test::Context->new;
-$test_ctx->init_db;
-$test_ctx->init_api;
-
-use_ok "OpenXPKI::Server::Context", qw( CTX );
+use OpenXPKI::Test;
+OpenXPKI::Test->new->setup_env;
 
 my $dbi = CTX('dbi');
 my $log = CTX('log');
