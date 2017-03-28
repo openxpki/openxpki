@@ -7,7 +7,6 @@ use Carp;
 use English;
 use Data::Dumper;
 use File::Basename;
-use File::Temp qw( tempdir );
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
