@@ -45,6 +45,7 @@ has yaml_database   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_b
 has yaml_realms     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_realms" );
 has yaml_server     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_server" );
 has yaml_watchdog   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_watchdog" );
+has conf_log4perl   => ( is => 'rw', isa => 'Str',     lazy => 1, builder => "_buikd_log4perl" );
 
 has realms          => ( is => 'rw', isa => 'ArrayRef', default => sub { [ 'alpha', 'beta', 'gamma' ] } );
 
@@ -56,6 +57,7 @@ has path_import_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub
 has path_socket_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/openxpki.socket" } );
 has path_pid_file       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/run/openxpkid.pid" } );
 has path_stderr_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/log/openxpki/stderr.log" } );
+has path_log_file       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/log/openxpki/catchall.log" } );
 has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/log.conf" } );
 
 has path_openssl        => ( is => 'rw', isa => 'Str', default => "/usr/bin/openssl" );
@@ -69,7 +71,6 @@ has system_group => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki"
 sub _make_dir {
     my ($self, $dir) = @_;
     return if -d $dir;
-    diag "Creating directory $dir" if $ENV{TEST_VERBOSE};
     make_path($dir) or die "Could not create temporary directory $dir: $@"
 }
 
@@ -79,6 +80,14 @@ sub _make_parent_dir {
     $self->_make_dir( File::Spec->catpath((File::Spec->splitpath( $filepath ))[0,1]) );
 }
 
+sub write_str {
+    my ($self, $filepath, $content) = @_;
+
+    open my $fh, ">", $filepath or die "Could not open $filepath for writing: $@";
+    print $fh $content, "\n";
+    close $fh;
+}
+
 sub write_yaml {
     my ($self, $filepath, $data) = @_;
 
@@ -86,14 +95,13 @@ sub write_yaml {
     TAP::Parser::YAMLish::Writer->new->write($data, $lines);
     pop @$lines; shift @$lines; # remove --- and ... from beginning/end
 
-    open my $fh, ">", $filepath or die "Could not open $filepath for writing: $@";
-    print $fh join("\n", @$lines), "\n";
-    close $fh;
+    $self->write_str($filepath, join("\n", @$lines));
 }
 
 sub make_dirs {
     my ($self) = @_;
     # Do explicitely not create $self->basedir to prevent accidential use of / etc
+    diag "Creating directory ".$self->path_config_dir if $ENV{TEST_VERBOSE};
     $self->_make_dir($self->path_config_dir);
     $self->_make_dir($self->path_config_dir."/realm/$_") for @{$self->realms};
     $self->_make_dir($self->path_config_dir."/system");
@@ -118,6 +126,8 @@ sub create {
 
     $self->write_yaml($self->path_config_dir."/realm/$_/crypto.yaml",  $self->_realm_crypto($_))
         for @{$self->realms};
+
+    $self->write_str ($self->path_log4perl_conf,                       $self->conf_log4perl);
 }
 
 sub _build_database {
@@ -327,6 +337,42 @@ sub _realm_crypto {
             },
         },
     };
+}
+
+sub _buikd_log4perl {
+    my ($self, $realm) = @_;
+
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'ERROR';
+    my $logfile = $self->path_log_file;
+
+    return qq(
+        # Catch-all root logger
+        log4perl.rootLogger                     = ERROR, Screen
+
+        log4perl.category.openxpki.auth         = INFO, Screen, Logfile, DBI
+        log4perl.category.openxpki.audit        = INFO, Screen, DBI
+        log4perl.category.openxpki.monitor      = INFO, Screen, Logfile
+        log4perl.category.openxpki.system       = INFO, Screen, Logfile
+        log4perl.category.openxpki.workflow     = INFO, Screen, Logfile
+        log4perl.category.openxpki.application  = INFO, Screen, Logfile, DBI
+        log4perl.category.connector             = INFO, Screen, Logfile
+
+        log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
+        log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
+        log4perl.appender.Screen.Threshold      = $threshold_screen
+
+        log4perl.appender.Logfile               = Log::Log4perl::Appender::File
+        log4perl.appender.Logfile.filename      = $logfile
+        log4perl.appender.Logfile.layout        = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Logfile.layout.ConversionPattern = %d %c.%p:%P %m%n
+        log4perl.appender.Logfile.syswrite      = 1
+        log4perl.appender.Logfile.utf8          = 1
+
+        log4perl.appender.DBI                   = OpenXPKI::Server::Log::Appender::DBI
+        log4perl.appender.DBI.layout            = Log::Log4perl::Layout::NoopLayout
+        log4perl.appender.DBI.warp_message      = 0
+    );
 }
 
 __PACKAGE__->meta->make_immutable;
