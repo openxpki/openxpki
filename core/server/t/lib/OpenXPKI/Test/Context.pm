@@ -8,8 +8,11 @@ OpenXPKI::Test::Context - Initialize C<CTX> for use in test code.
 
 =cut
 
+use Moose::Util::TypeConstraints;
+
 use Test::More;
 use Test::Exception;
+use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 
 =head1 DESCRIPTION
 
@@ -21,6 +24,19 @@ This allows for tests to run without starting a complete OpenXPKI server and
 without setting up a configuration file.
 
 =cut
+has db_conf => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { {} },
+    predicate => 'has_db_conf',
+    trigger => sub {
+        my ($self, $new, $old) = @_;
+        my @keys = qw( type name host port user passwd );
+        die "Required keys missing for 'db_conf': ".join(", ", grep { not defined $new->{$_} } @keys)
+            unless eq_deeply([keys %$new], bag(@keys));
+    },
+);
 
 has is_log_initialized          => ( is => 'rw', isa => 'Bool', default => 0 );
 has is_legacydb_initialized     => ( is => 'rw', isa => 'Bool', default => 0 );
@@ -62,40 +78,40 @@ sub init_screen_log {
 
 sub init_log {
     my ($self) = @_;
-    return if $self->is_log_initialized;
+    # Always rerun in case we switch from screen logging to full logging
 
-    subtest "Initialize CTX('log')" => sub {
-        $self->_init_legacydb_log;
+    diag "Initialize CTX('log')";
 
-        use_ok "OpenXPKI::Server::Log";
-        use_ok "OpenXPKI::Server::Log::Appender::DBI";
-        lives_ok {
-            my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'ERROR';
-            OpenXPKI::Server::Context::setcontext({
-                log => OpenXPKI::Server::Log->new(CONFIG => \qq(
-                    # Catch-all root logger
-                    log4perl.rootLogger = ERROR, Screen
+    $self->_init_legacydb_log;
 
-                    log4perl.category.openxpki.auth = INFO, Screen, DBI
-                    log4perl.category.openxpki.audit = INFO, Screen, DBI
-                    log4perl.category.openxpki.monitor = INFO, Screen, DBI
-                    log4perl.category.openxpki.system = INFO, Screen, DBI
-                    log4perl.category.openxpki.workflow = INFO, Screen, DBI
-                    log4perl.category.openxpki.application = INFO, Screen, DBI
-                    log4perl.category.connector = INFO, Screen
+    use OpenXPKI::Server::Log;
+    use OpenXPKI::Server::Log::Appender::DBI;
 
-                    log4perl.appender.DBI              = OpenXPKI::Server::Log::Appender::DBI
-                    log4perl.appender.DBI.layout       = Log::Log4perl::Layout::NoopLayout
-                    log4perl.appender.DBI.warp_message = 0
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'ERROR';
+    OpenXPKI::Server::Context::setcontext({
+        log => OpenXPKI::Server::Log->new(CONFIG => \qq(
+            # Catch-all root logger
+            log4perl.rootLogger = ERROR, Screen
 
-                    log4perl.appender.Screen          = Log::Log4perl::Appender::Screen
-                    log4perl.appender.Screen.layout   = Log::Log4perl::Layout::PatternLayout
-                    log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
-                    log4perl.appender.Screen.Threshold = $threshold_screen
-                ))
-            });
-        } "Instantiate class and setup context 'log'";
-    };
+            log4perl.category.openxpki.auth = INFO, Screen, DBI
+            log4perl.category.openxpki.audit = INFO, Screen, DBI
+            log4perl.category.openxpki.monitor = INFO, Screen, DBI
+            log4perl.category.openxpki.system = INFO, Screen, DBI
+            log4perl.category.openxpki.workflow = INFO, Screen, DBI
+            log4perl.category.openxpki.application = INFO, Screen, DBI
+            log4perl.category.connector = INFO, Screen
+
+            log4perl.appender.DBI              = OpenXPKI::Server::Log::Appender::DBI
+            log4perl.appender.DBI.layout       = Log::Log4perl::Layout::NoopLayout
+            log4perl.appender.DBI.warp_message = 0
+
+            log4perl.appender.Screen          = Log::Log4perl::Appender::Screen
+            log4perl.appender.Screen.layout   = Log::Log4perl::Layout::PatternLayout
+            log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
+            log4perl.appender.Screen.Threshold = $threshold_screen
+        ))
+    });
+
     $self->is_log_initialized(1);
 }
 
@@ -106,28 +122,29 @@ sub _init_legacydb_log {
     my ($self) = @_;
     return if $self->is_legacydb_log_initialized;
 
-    subtest "Initialize CTX('dbi_log') / legacy db" => sub {
-        use_ok "OpenXPKI::Server::DBI";
-        use_ok "OpenXPKI::Server::Log::NOOP";
-        use_ok "OpenXPKI::Server::Context", qw( CTX );
+    diag "Initialize CTX('dbi_log') / legacy db";
 
-        lives_ok {
-            OpenXPKI::Server::Context::setcontext({
-                dbi_log => OpenXPKI::Server::DBI->new(
-                    SERVER_ID => 0,
-                    SERVER_SHIFT => 8,
-                    LOG         => OpenXPKI::Server::Log::NOOP->new,
-                    TYPE        => "MySQL",
-                    NAME        => $ENV{OXI_TEST_DB_MYSQL_NAME},
-                    HOST        => $ENV{OXI_TEST_DB_MYSQL_DBHOST},
-                    PORT        => $ENV{OXI_TEST_DB_MYSQL_DBPORT},
-                    USER        => $ENV{OXI_TEST_DB_MYSQL_USER},
-                    PASSWD      => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-                )
-            });
-            CTX('dbi_log')->connect;
-        } "Instantiate class and setup context 'dbi_log'";
-    };
+    die "Database config HashRef 'db_conf' is not set" unless $self->has_db_conf;
+
+    use OpenXPKI::Server::DBI;
+    use OpenXPKI::Server::Log::NOOP;
+    use OpenXPKI::Server::Context qw( CTX );
+
+    OpenXPKI::Server::Context::setcontext({
+        dbi_log => OpenXPKI::Server::DBI->new(
+            SERVER_ID => 0,
+            SERVER_SHIFT => 8,
+            LOG         => OpenXPKI::Server::Log::NOOP->new,
+            TYPE        => $self->db_conf->{type},
+            NAME        => $self->db_conf->{name},
+            HOST        => $self->db_conf->{host},
+            PORT        => $self->db_conf->{port},
+            USER        => $self->db_conf->{user},
+            PASSWD      => $self->db_conf->{passwd},
+        )
+    });
+    CTX('dbi_log')->connect;
+
     $self->is_legacydb_log_initialized(1);
 }
 
@@ -135,46 +152,45 @@ sub _init_legacydb {
     my ($self) = @_;
     return if $self->is_legacydb_initialized;
 
-    subtest "Initialize CTX('dbi_xxx') / legacy db" => sub {
-        $self->init_log;
+    diag "Initialize CTX('dbi_xxx') / legacy db";
 
-        use_ok "OpenXPKI::Server::DBI";
-        use_ok "OpenXPKI::Server::Context", qw( CTX );
+    die "Database config HashRef 'db_conf' is not set" unless $self->has_db_conf;
 
-        lives_ok {
-            OpenXPKI::Server::Context::setcontext({
-                dbi_backend => OpenXPKI::Server::DBI->new(
-                    SERVER_ID => 0,
-                    SERVER_SHIFT => 8,
-                    LOG         => CTX('log'),
-                    TYPE        => "MySQL",
-                    NAME        => $ENV{OXI_TEST_DB_MYSQL_NAME},
-                    HOST        => $ENV{OXI_TEST_DB_MYSQL_DBHOST},
-                    PORT        => $ENV{OXI_TEST_DB_MYSQL_DBPORT},
-                    USER        => $ENV{OXI_TEST_DB_MYSQL_USER},
-                    PASSWD      => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-                )
-            });
-            CTX('dbi_backend')->connect;
-        } "Instantiate class and setup context 'dbi_backend'";
+    $self->init_log;
 
-        lives_ok {
-            OpenXPKI::Server::Context::setcontext({
-                dbi_workflow => OpenXPKI::Server::DBI->new(
-                    SERVER_ID => 0,
-                    SERVER_SHIFT => 8,
-                    LOG         => CTX('log'),
-                    TYPE        => "MySQL",
-                    NAME        => $ENV{OXI_TEST_DB_MYSQL_NAME},
-                    HOST        => $ENV{OXI_TEST_DB_MYSQL_DBHOST},
-                    PORT        => $ENV{OXI_TEST_DB_MYSQL_DBPORT},
-                    USER        => $ENV{OXI_TEST_DB_MYSQL_USER},
-                    PASSWD      => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-                )
-            });
-            CTX('dbi_workflow')->connect;
-        } "Instantiate class and setup context 'dbi_workflow'";
-    };
+    use OpenXPKI::Server::DBI;
+    use OpenXPKI::Server::Context qw( CTX );
+
+    OpenXPKI::Server::Context::setcontext({
+        dbi_backend => OpenXPKI::Server::DBI->new(
+            SERVER_ID => 0,
+            SERVER_SHIFT => 8,
+            LOG         => CTX('log'),
+            TYPE        => $self->db_conf->{type},
+            NAME        => $self->db_conf->{name},
+            HOST        => $self->db_conf->{host},
+            PORT        => $self->db_conf->{port},
+            USER        => $self->db_conf->{user},
+            PASSWD      => $self->db_conf->{passwd},
+        )
+    });
+    CTX('dbi_backend')->connect;
+
+    OpenXPKI::Server::Context::setcontext({
+        dbi_workflow => OpenXPKI::Server::DBI->new(
+            SERVER_ID => 0,
+            SERVER_SHIFT => 8,
+            LOG         => CTX('log'),
+            TYPE        => $self->db_conf->{type},
+            NAME        => $self->db_conf->{name},
+            HOST        => $self->db_conf->{host},
+            PORT        => $self->db_conf->{port},
+            USER        => $self->db_conf->{user},
+            PASSWD      => $self->db_conf->{passwd},
+        )
+    });
+    CTX('dbi_workflow')->connect;
+
     $self->is_legacydb_initialized(1);
 }
 
@@ -185,30 +201,31 @@ sub init_db {
     my ($self) = @_;
     return if $self->is_db_initialized;
 
-    subtest "Initialize CTX('dbi')" => sub {
-        use_ok "OpenXPKI::Server::Init"; # for unknown reason this is needed
-        $self->init_log;
-        $self->_init_legacydb;
+    diag "Initialize CTX('dbi')";
 
-        use_ok "OpenXPKI::Server::Database";
-        use_ok "OpenXPKI::Server::Context", qw( CTX );
+    die "Database config HashRef 'db_conf' is not set" unless $self->has_db_conf;
 
-        lives_ok {
-            OpenXPKI::Server::Context::setcontext({
-                dbi => OpenXPKI::Server::Database->new(
-                    log => CTX('log'),
-                    db_params => {
-                        type    => "MySQL",
-                        name    => $ENV{OXI_TEST_DB_MYSQL_NAME},
-                        host    => $ENV{OXI_TEST_DB_MYSQL_DBHOST},
-                        port    => $ENV{OXI_TEST_DB_MYSQL_DBPORT},
-                        user    => $ENV{OXI_TEST_DB_MYSQL_USER},
-                        passwd  => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-                    },
-                ),
-            });
-        } "Instantiate class and setup context";
-    };
+    use OpenXPKI::Server::Init; # for unknown reason this is needed
+    $self->init_log;
+    $self->_init_legacydb;
+
+    use OpenXPKI::Server::Database;
+    use OpenXPKI::Server::Context qw( CTX );
+
+    OpenXPKI::Server::Context::setcontext({
+        dbi => OpenXPKI::Server::Database->new(
+            log => CTX('log'),
+            db_params => {
+                type        => $self->db_conf->{type},
+                name        => $self->db_conf->{name},
+                host        => $self->db_conf->{host},
+                port        => $self->db_conf->{port},
+                user        => $self->db_conf->{user},
+                passwd      => $self->db_conf->{passwd},
+            },
+        ),
+    });
+
     $self->is_db_initialized(1);
 }
 
@@ -219,15 +236,15 @@ sub init_mock_session {
     my ($self) = @_;
     return if $self->is_mock_session_initialized;
 
-    subtest "Initialize CTX('session')" => sub {
-        use_ok "OpenXPKI::Server::Session::Mock";
-        use_ok "OpenXPKI::Server::Database";
-        lives_ok {
-            OpenXPKI::Server::Context::setcontext({
-                session => OpenXPKI::Server::Session::Mock->new
-            });
-        } "Instantiate class and setup context";
-    };
+    diag "Initialize CTX('session')";
+
+    use OpenXPKI::Server::Session::Mock;
+    use OpenXPKI::Server::Database;
+
+    OpenXPKI::Server::Context::setcontext({
+        session => OpenXPKI::Server::Session::Mock->new
+    });
+
     $self->is_mock_session_initialized(1);
 }
 
@@ -238,16 +255,16 @@ sub init_api {
     my ($self) = @_;
     return if $self->is_api_initialized;
 
-    subtest "Initialize CTX('api')" => sub {
-        $self->init_log;
+    diag "Initialize CTX('api')";
 
-        use_ok "OpenXPKI::Server::API";
-        lives_ok {
-            OpenXPKI::Server::Context::setcontext({
-                api => OpenXPKI::Server::API->new,
-            });
-        } "Instantiate class and setup context";
-    };
+    $self->init_log;
+
+    use OpenXPKI::Server::API;
+
+    OpenXPKI::Server::Context::setcontext({
+        api => OpenXPKI::Server::API->new,
+    });
+
     $self->is_api_initialized(1);
 }
 
@@ -261,4 +278,5 @@ sub init_all {
     }
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
