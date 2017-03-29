@@ -739,7 +739,7 @@ sub __clean_vars {
     map {
         delete $vars->{$_} if ( ref $vars->{$_} eq '' && (!defined $vars->{$_} || $vars->{$_} eq '') );
         delete $vars->{$_} if ( ref $vars->{$_} eq 'HASH' && (!%{$vars->{$_}}) );
-        delete $vars->{$_} if ( ref $vars->{$_} eq 'ARRAY' && (!@{$vars->{$_}} || !$vars->{$_}->[0] ) );
+        delete $vars->{$_} if ( ref $vars->{$_} eq 'ARRAY' && (!@{$vars->{$_}} || !defined $vars->{$_}->[0] ) );
     } keys(%{$vars});
 
 }
