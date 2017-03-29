@@ -53,7 +53,8 @@ $test->connect_ok(
 #
 # Init helpers
 #
-my $dbdata = OpenXPKI::Test->new->certhelper_database;
+my $oxitest = OpenXPKI::Test->new;
+my $dbdata = $oxitest->certhelper_database;
 $dbdata->cert_names_by_realm_gen(alpha => 1);
 my @alpha_list = qw( alpha_alice_2  alpha_signer_2  alpha_root_2 );
 my @beta_list =  qw( beta_alice_1   beta_signer_1   beta_root_1 );
@@ -86,7 +87,7 @@ cmp_bag $test->get_msg->{PARAMS}->{existed}, [
 ], "List certs as already existing";
 is scalar @{ $test->get_msg->{PARAMS}->{imported} }, 0, "No certs should have been imported";
 
-$dbdata->delete_all;
+$oxitest->delete_testcerts;
 
 # Array import: partly existing chain
 $test->runcmd_ok('import_chain', { DATA => $dbdata->cert("beta_root_1")->data, IMPORT_ROOT => 1 }, "Prepare next test by importing root certificate");
@@ -98,7 +99,7 @@ cmp_deeply $test->get_msg->{PARAMS},
     }),
     "List certs as imported and existing";
 
-$dbdata->delete_all;
+$oxitest->delete_testcerts;
 
 # Array import: two chains
 $test->runcmd_ok('import_chain', { DATA => $all_pem, IMPORT_ROOT => 1 }, "Array import: two chains");
@@ -106,7 +107,7 @@ cmp_bag $test->get_msg->{PARAMS}->{imported}, [
     map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$all_ids
 ], "List imported certs";
 
-$dbdata->delete_all;
+$oxitest->delete_testcerts;
 
 # PEM block import: Chain with root cert (IMPORT_ROOT = 1)
 $test->runcmd_ok('import_chain', { DATA => $alpha_pem_string, IMPORT_ROOT => 1 }, "String import: chain with root cert (IMPORT_ROOT = 1)");
@@ -114,7 +115,7 @@ cmp_bag $test->get_msg->{PARAMS}->{imported}, [
     map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$alpha_ids
 ], "List imported certs";
 
-$dbdata->delete_all;
+$oxitest->delete_testcerts;
 
 # PKCS7 import
 $test->runcmd_ok('import_chain', { DATA => $dbdata->beta_alice_pkcs7, IMPORT_ROOT => 1 }, "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)");
@@ -122,6 +123,6 @@ cmp_bag $test->get_msg->{PARAMS}->{imported}, [
     map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$beta_ids
 ], "List imported certs";
 
-$dbdata->delete_all;
+$oxitest->delete_testcerts;
 
 $test->disconnect;

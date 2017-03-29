@@ -48,7 +48,9 @@ $test->connect_ok(
 #
 
 # Import test certificates
-my $dbdata = OpenXPKI::Test->new->certhelper_database->insert_all;
+my $oxitest = OpenXPKI::Test->new;
+my $dbdata = $oxitest->certhelper_database;
+$oxitest->insert_testcerts;
 
 # By PROFILE
 my $realm = $dbdata->cert("beta_root_1")->db->{pki_realm};
@@ -58,5 +60,5 @@ $test->runcmd_ok('search_cert_count', {
 
 is $test->get_msg->{PARAMS}, scalar($dbdata->cert_names_where(pki_realm => $realm)), "Correct number";
 
-$dbdata->delete_all; # only deletes those from OpenXPKI::Test::CertHelper::Database
+$oxitest->delete_testcerts; # only deletes those from OpenXPKI::Test::CertHelper::Database
 $test->disconnect;

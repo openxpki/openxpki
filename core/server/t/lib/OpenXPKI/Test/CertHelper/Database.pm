@@ -5,19 +5,9 @@ use utf8;
 =head1 NAME
 
 OpenXPKI::Test::CertHelper::Database - Test helper that contains raw
-certificate data to be inserted into the database and functions to do so.
+certificate data to be inserted into the database.
 
 =head1 DESCRIPTION
-
-    # instance of OpenXPKI::Test::CertHelper::Database
-    my $db = OpenXPKI::Test->new->certhelper_database->insert_all;
-
-    # # equivalent to:
-    # my $oxitest = OpenXPKI::Test->new;
-    # my $db = OpenXPKI::Test::CertHelper::Database->new(
-    #     dbi => $oxitest->dbi,
-    # );
-    # $db->insert_all;
 
     # instance of OpenXPKI::Test::CertHelper::Database::PEM
     my $cert = $db->cert("alpha_alice_1");
@@ -25,7 +15,7 @@ certificate data to be inserted into the database and functions to do so.
     print $cert->id, "\n";     # certificate identifier
     print $cert->data, "\n";   # PEM encoded certificate
 
-There is a set of predefined test certificates:
+The following predefined test certificates are available:
 
 =over
 
@@ -72,19 +62,7 @@ There is a set of predefined test certificates:
 =cut
 
 # Project modules
-use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Database;
-use OpenXPKI::i18n;
 use OpenXPKI::Test::CertHelper::Database::PEM;
-
-################################################################################
-# Other attributes
-#
-has dbi => (
-    is => 'ro',
-    isa => 'OpenXPKI::Server::Database',
-    required => 1,
-);
 
 ################################################################################
 # Other attributes
@@ -166,58 +144,6 @@ sub all_cert_names {
     return [ keys %{$self->_certs} ];
 }
 
-=head2 insert_all
-
-Inserts all test certificates into the database.
-
-Returns the object instance so the call can be chained to C<new>:
-
-    my $helper = OpenXPKI::Test::CertHelper::Database->new->insert_all;
-
-=cut
-sub insert_all {
-    my ($self) = @_;
-    $self->dbi->start_txn;
-
-    $self->dbi->merge(
-        into => "certificate",
-        set => $self->cert($_)->db,
-        where => { subject_key_identifier => $self->cert($_)->id },
-    ) for @{ $self->all_cert_names };
-
-    for (@{ $self->all_cert_names }) {
-        next unless $self->cert($_)->db_alias->{alias};
-        $self->dbi->merge(
-            into => "aliases",
-            set => {
-                %{ $self->cert($_)->db_alias },
-                identifier  => $self->cert($_)->db->{identifier},
-                notbefore   => $self->cert($_)->db->{notbefore},
-                notafter    => $self->cert($_)->db->{notafter},
-            },
-            where => {
-                pki_realm   => $self->cert($_)->db->{pki_realm},
-                alias       => $self->cert($_)->db_alias->{alias},
-            },
-        );
-    }
-    $self->dbi->commit;
-    return $self;
-}
-
-=head2 delete_all
-
-Deletes all test certificates from the database.
-
-=cut
-sub delete_all {
-    my ($self) = @_;
-    $self->dbi->start_txn;
-    $self->dbi->delete(from => 'certificate', where => { subject_key_identifier => $self->all_cert_ids } );
-    $self->dbi->delete(from => 'aliases',     where => { identifier => [ map { $_->db->{identifier} } values %{$self->_certs} ] } );
-    $self->dbi->commit;
-}
-
 =head2 beta_alice_pkcs7
 
 Returns the PKCS7 file contents that containts the certificates "beta_root_1",
@@ -230,6 +156,10 @@ Returns the PKCS7 file contents that containts the certificates "beta_root_1",
 
 sub beta_alice_pkcs7 {
     return "-----BEGIN PKCS7-----\nMIIKzAYJKoZIhvcNAQcCoIIKvTCCCrkCAQExADALBgkqhkiG9w0BBwGgggqfMIID\niTCCAnGgAwIBAgIBFDANBgkqhkiG9w0BAQsFADBVMRMwEQYKCZImiZPyLGQBGRYD\nT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxFTAT\nBgNVBAMMDEJFVEEgUm9vdCBDQTAiGA8yMDE3MDEwMTAwMDAwMFoYDzIxMTcwMTMx\nMjM1OTU5WjBVMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYI\nT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxFTATBgNVBAMMDEJFVEEgUm9vdCBDQTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKnu8xUzS0Gju41jGoIsweZX\n4Ngc4b7apvVdbMD0e4g8/xRXiC7canYIJznLXaIUXds0js53MQKAquYPfz+slYrX\nvwlZGKggvb9/lGimFwtJfxoJEq/xdgQsW/GfcDatM8N0zA7rfSE6mpo2m/ZKjwcf\nON/FkBx9z0BIvi1sycdnn2fhp/pnqAPdnTy7qJ70aFmM2xyTn/pjq5pJIV4IhX1K\nbqyq1LV375P95B+ZiAxhOESgIG08n8kXil1ob1t64QbliI6GHgxc/Efp43FMNRwu\nTJt4OXSoLX8De9S1ep7NF/cRjzT0UJ7spGYqamMK401JDkaKjog8k6Qw+q+rDJcC\nAwEAAaNgMF4wDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUkxNPqFWZkJwAI5Ky\nQPcC7U7hW40wHwYDVR0jBBgwFoAUkxNPqFWZkJwAI5KyQPcC7U7hW40wCwYDVR0P\nBAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IBAQB1pu5NxHNxJwJu6NHI+s16cEOw0zDF\n2Y3I8oJdEe+D20gLS4inFdgOFFaJEyodatolidy5B2C87gqTyhDnyhs45YBy8suj\n0ZbiLCaGHlLGVszUxNxi6ti/VChiXkbKGdZ0O4lUtgu0h0lYKfX8rLYOLMUdy6Og\npSi/76GcGsgXfM5qTCjAZYBuayXFaox689/3lDwKCFEIcNVYfSPYo7djnUmxAD8o\n05FPScnHa/X/LPWwXzXn5gMt0HtzIRhWFPF04tr9+Px0U1vs3d3dEPn+1D9nPunp\nANu8I8aX/wI+7LoEA4TPxQR3qrF+IROVtlA+Nwf64rA6Yc003C3DHLurMIIDjDCC\nAnSgAwIBAgIBFTANBgkqhkiG9w0BAQsFADBVMRMwEQYKCZImiZPyLGQBGRYDT1JH\nMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxFTATBgNV\nBAMMDEJFVEEgUm9vdCBDQTAiGA8yMDE3MDEwMTAwMDAwMFoYDzIxMTcwMTMxMjM1\nOTU5WjBYMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3Bl\nblhQS0kxDTALBgNVBAsMBEFDTUUxGDAWBgNVBAMMD0JFVEEgU2lnbmluZyBDQTCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALHcv5j4482wY8SI2jBvX2G4\no+8wWif9xtR0wceBZ/94QvWR9eOmKrgpVeV3AshRhkSfxDRFdbXa22oSolFrhgCR\nqlsWBel4F8LE2E2YzEDxMXGABq6jqHTD4/PCB8vyx25savTBco8sBcmnYQJsTExo\nZYzDz8c+F72O6V4tYkbY1FqrxsbEWTjXdf3OZiMj7fbnzFPX1xjpYzBlewHORNdY\nKhFYPlBl0df65CwFCTc+VgeRJgtXiLzha4SkdywYolbJzR7BRz26suguWwkK/xFn\nkaVSxHoo+iCTU3BdstTGPcXiM9LWKf3xvzDU7e9qhssB5harG+IsVkpqidLcAe8C\nAwEAAaNgMF4wDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUwHNFSGaR8rwc0Qcl\nbxQq/zqG/7swHwYDVR0jBBgwFoAUkxNPqFWZkJwAI5KyQPcC7U7hW40wCwYDVR0P\nBAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IBAQA50pzLsCmYOK7dSGtHZesnXrCz9oPI\nt5q9RByVyp+iR0rMbBbjtA0Vah8hb/3KzPdrbdeqlUVmvz2BY+gE24FwEZswXesJ\nP7Af7I7P/QOtcRGyUa0DGuAMTHwykfgng35Rnf8mAghJErKrSdqM6rsgoeIxr0hv\nXg8CmjFqUM7NDy3UIsTITj9Iy/JLIA4y1ALyz0ZU+CrdgaFUA+MtZqGlEkU8GAKb\nEeyjmzgLk6vJKiCkucYxnmZBtYRaRTegiA5iNVr6Y+hA7tj69cwsZc2hm8MgVfnm\nAc+6hTdHY7r9TqjgPU1gSrzrFmV2UVAnjN6fg70mFxqPULYlHt/hKzG9MIIDfjCC\nAmagAwIBAgIBFzANBgkqhkiG9w0BAQsFADBYMRMwEQYKCZImiZPyLGQBGRYDT1JH\nMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxGDAWBgNV\nBAMMD0JFVEEgU2lnbmluZyBDQTAiGA8yMDE3MDEwMTAwMDAwMFoYDzIxMTcwMTMx\nMjM1OTU5WjBaMRMwEQYKCZImiZPyLGQBGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYI\nT3BlblhQS0kxDTALBgNVBAsMBEFDTUUxGjAYBgNVBAMMEUJFVEEgQ2xpZW50IEFs\naWNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5uuJIF5AF3DrsXRF\nBITbda2ftOVtKNdy5QFwV/PA+1wKOO2GwKksbZNpQTlCSaqlSKdjIYEzKEsvHSF1\ndWqEbcHssZkbMZyWXzew5HfN1BV053RjEVuAgHqN+6PsygnIm0oYsULmmlKQH91o\nmTlAmfILNZVCop0gd9jfcBMV0v7VQNrpGRSj4hbwCx6RAKwyDX8nxhetbQXOzmNv\nWKEMLJLiukdtxogUH66aClUq0SpCojgak9/Dr3l+hvQwx3ShRUDQxxPCP+1dKrpl\nsKX9DHyOyvY7uOT3eVAZymgL0qMZQqLIvalbL4cJg/yfOKT0DZ1m9tJyEtqkKoqP\nj5+iMQIDAQABo00wSzAJBgNVHRMEAjAAMB0GA1UdDgQWBBQjXeHFPjlKydJyM6Uw\nXghh3fe6KDAfBgNVHSMEGDAWgBTAc0VIZpHyvBzRByVvFCr/Oob/uzANBgkqhkiG\n9w0BAQsFAAOCAQEAdE2bXUWBKLvXOmTrZm0l+f7c2BAGadDu3XAB+P0v0Hr8hbsf\nggFCjbkgprXc9vxd1IZjYX2WnuRtDWHeiHp0BEsZzczdhFSDPJW06tBizJZvfZ9/\nxgpweWeWX5WWvnnsxPPg95FpexLC9pTX12x0v363aiMQCSaeyNI6xznduG9YgKgK\naJ4thMgaYisOCDKhH6zMMYnYYgrpO5RqJ68Fibmm4HQvtjaqYWt3ovUQZZwvF+cx\nRTLq00vIKXxmi7I/jJdMzODldAI2cHY6XoAjJpi8sD+nWTj7kQP1ks53QnttWnc9\nx8PISmgH/+GSLUZ2e5f+7D9ZEy9o701pSIenjaEAMQA=\n-----END PKCS7-----\n";
+}
+
+sub private_keys {
+
 }
 
 # Test certificate data

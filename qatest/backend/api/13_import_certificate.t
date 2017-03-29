@@ -108,7 +108,8 @@ $test->connect_ok(
 #
 # Init helpers
 #
-my $dbdata = OpenXPKI::Test->new->certhelper_database;
+my $oxitest = OpenXPKI::Test->new;
+my $dbdata = $oxitest->certhelper_database;
 
 #
 # Create new test certificates on disk
@@ -148,6 +149,6 @@ import_ok     ($test, $dbdata->cert("alpha_signer_1"), FORCE_ISSUER=>1);
 import_ok     ($test, $dbdata->cert("alpha_alice_1"), FORCE_NOVERIFY=>1);
 
 # Cleanup database
-$dbdata->delete_all;
+$oxitest->delete_testcerts;
 
 $test->disconnect;

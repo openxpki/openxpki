@@ -48,7 +48,10 @@ $test->connect_ok(
 #
 
 # Import test certificates
-my $dbdata = OpenXPKI::Test->new->certhelper_database->insert_all;
+my $oxitest = OpenXPKI::Test->new;
+my $dbdata = $oxitest->certhelper_database;
+$oxitest->insert_testcerts;
+
 
 =pod
 
@@ -320,5 +323,5 @@ cmp_deeply $test->get_msg->{PARAMS}, [
     superhashof({ SUBJECT => re(qr/$uuid/i) })
 ], "Correct result";
 
-$dbdata->delete_all; # only deletes those from OpenXPKI::Test::CertHelper::Database
+$oxitest->delete_testcerts; # only deletes those from OpenXPKI::Test::CertHelper::Database
 $test->disconnect;

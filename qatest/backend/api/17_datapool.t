@@ -209,14 +209,15 @@ set_entry_ok { KEY => "pill-99", VALUE => "green", ENCRYPT => 1 },
     "Encrypted: store entry";
 
 # Clear secrets cache
-my $db_helper = OpenXPKI::Test->new->certhelper_database;
+my $oxitest = OpenXPKI::Test->new;
+my $dbi = $oxitest->dbi;
 # helper init already empties table "secret", but we want to play safe
-$db_helper->dbi->start_txn;
-$db_helper->dbi->delete(from => 'secret', all => 1);
-$db_helper->dbi->commit;
+$dbi->start_txn;
+$dbi->delete(from => 'secret', all => 1);
+$dbi->commit;
 
 # Check secrets cache
-my $secrets = $db_helper->dbi->select(from => 'secret', columns => [ '*' ])->fetchall_arrayref({});
+my $secrets = $dbi->select(from => 'secret', columns => [ '*' ])->fetchall_arrayref({});
 is scalar(@$secrets), 0,
     "Secrets cache is empty after we cleared it";
 
@@ -225,7 +226,7 @@ entry_is "pill-99", superhashof({ VALUE => "green" }),
     "Encrypted: entry matches the one we stored";
 
 # Check secrets cache
-$secrets = $db_helper->dbi->select(from => 'secret', columns => [ '*' ])->fetchall_arrayref({});
+$secrets = $dbi->select(from => 'secret', columns => [ '*' ])->fetchall_arrayref({});
 is scalar(@$secrets), 1,
     "Secrets cache contains one entry for data pool symmetric key";
 
@@ -239,18 +240,9 @@ entry_is "pill-99", superhashof({ VALUE => "green" }),
 package OpenXPKI::Server::Workflow::Test::DataPool;
 
 use Test::Exception;
+use OpenXPKI::Test; # to import CTX into this package
 
-use OpenXPKI::Server::Init;
-use OpenXPKI::i18n;
-use OpenXPKI::Server::Context qw( CTX );
-
-$ENV{OPENXPKI_CONF_PATH} = '/etc/openxpki/config.d';
-# TODO #legacydb Remove dbi_backend once we got rid of the old DB layer
-OpenXPKI::Server::Init::init({
-    TASKS  => ['config_versioned','log','api','crypto_layer','dbi','dbi_backend','dbi_log','dbi_workflow'],
-    SILENT => 0,
-    CLI => 1,
-});
+$oxitest->setup_env(init => [ 'crypto_layer' ]);
 
 # Try accessing another PKI realm from within OpenXPKI::Server::Workflow namespace
 throws_ok {

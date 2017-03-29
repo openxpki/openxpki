@@ -114,6 +114,21 @@ has force_test_db => (
 
 =cut
 
+=head2 certhelper_database
+
+Returns an instance of L<OpenXPKI::Test::CertHelper::Database> with the database
+configuration set to C<$self-E<gt>db_conf>.
+
+=cut
+has certhelper_database => (
+    is => 'rw',
+    isa => 'OpenXPKI::Test::CertHelper::Database',
+    lazy => 1,
+    default => sub { OpenXPKI::Test::CertHelper::Database->new },
+);
+
+
+
 =head2 setup_env
 
 Set up the test environment.
@@ -196,16 +211,56 @@ sub setup_env {
     return $tmp;
 }
 
-=head2 certhelper_database
+=head2 insert_testcerts
 
-Returns an instance of L<OpenXPKI::Test::CertHelper::Database> with the database
-configuration set to C<$self-E<gt>db_conf>.
+Inserts all test certificates from L<OpenXPKI::Test::CertHelper::Database> into
+the database.
 
 =cut
-sub certhelper_database {
+sub insert_testcerts {
     my ($self) = @_;
+    my $certhelper = $self->certhelper_database;
 
-    return OpenXPKI::Test::CertHelper::Database->new(dbi => $self->dbi);
+    $self->dbi->start_txn;
+
+    $self->dbi->merge(
+        into => "certificate",
+        set => $certhelper->cert($_)->db,
+        where => { subject_key_identifier => $certhelper->cert($_)->id },
+    ) for @{ $certhelper->all_cert_names };
+
+    for (@{ $certhelper->all_cert_names }) {
+        next unless $certhelper->cert($_)->db_alias->{alias};
+        $self->dbi->merge(
+            into => "aliases",
+            set => {
+                %{ $certhelper->cert($_)->db_alias },
+                identifier  => $certhelper->cert($_)->db->{identifier},
+                notbefore   => $certhelper->cert($_)->db->{notbefore},
+                notafter    => $certhelper->cert($_)->db->{notafter},
+            },
+            where => {
+                pki_realm   => $certhelper->cert($_)->db->{pki_realm},
+                alias       => $certhelper->cert($_)->db_alias->{alias},
+            },
+        );
+    }
+    $self->dbi->commit;
+}
+
+=head2 delete_all
+
+Deletes all test certificates from the database.
+
+=cut
+sub delete_testcerts {
+    my ($self) = @_;
+    my $certhelper = $self->certhelper_database;
+
+    $self->dbi->start_txn;
+    $self->dbi->delete(from => 'certificate', where => { subject_key_identifier => $certhelper->all_cert_ids } );
+    $self->dbi->delete(from => 'aliases',     where => { identifier => [ map { $_->db->{identifier} } values %{$certhelper->_certs} ] } );
+    $self->dbi->commit;
 }
 
 sub _build_dbi {
