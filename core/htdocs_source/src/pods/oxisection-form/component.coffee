@@ -27,7 +27,10 @@ Component = Em.Component.extend
         for name in names
             clones = (f for f in fields when f.name is name)
             Em.set clone, "isLast", false for clone in clones
+            Em.set clone, "canDelete", true for clone in clones            
             Em.set clones[clones.length-1], "isLast", true
+            if clones.length == 1
+                Em.set clones[0], "canDelete", false
 
         for field in fields
             if field.value and typeof field.value is "object"
@@ -45,7 +48,9 @@ Component = Em.Component.extend
         addClone: (field) ->
             fields = @get "content.content.fields"
             index = fields.indexOf field
-            fields.insertAt index+1, Em.copy(field)
+            copy = Em.copy(field)
+            copy.value = ""
+            fields.insertAt index+1, copy 
         delClone: (field) ->
             fields = @get "content.content.fields"
             index = fields.indexOf field
