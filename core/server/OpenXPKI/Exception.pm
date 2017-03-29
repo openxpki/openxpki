@@ -100,7 +100,7 @@ sub throw {
     my %logger_args = (
         MESSAGE     => 'Exception: ' . $self->full_message(%args),
         FACILITY    => 'system',
-        PRIORITY    => 'debug',
+        PRIORITY    => 'error',
         CALLERLEVEL => 1,
     );
 
