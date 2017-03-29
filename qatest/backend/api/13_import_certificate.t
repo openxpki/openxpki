@@ -20,7 +20,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
 use OpenXPKI::Test::More;
 use OpenXPKI::Test::CertHelper;
-use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test;
 
 =pod
 
@@ -108,7 +108,7 @@ $test->connect_ok(
 #
 # Init helpers
 #
-my $dbdata = OpenXPKI::Test::CertHelper::Database->new;
+my $dbdata = OpenXPKI::Test->new->certhelper_database;
 
 #
 # Create new test certificates on disk

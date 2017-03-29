@@ -1,11 +1,15 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
-use English;
-use Test::More;
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-use Cwd 'abs_path';
 
-use lib abs_path(catdir((splitpath(rel2abs(__FILE__)))[0,1], '..', 'lib'));
+# Core modules
+use English;
+use FindBin qw( $Bin );
+
+# CPAN modules
+use Test::More;
+
+use lib "$Bin/../lib";
 
 plan skip_all => "No MySQL test database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
 plan tests => 7;

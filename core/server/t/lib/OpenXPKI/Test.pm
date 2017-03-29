@@ -20,16 +20,37 @@ use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in 
 
 # Project modules
 use OpenXPKI::Config;
+use OpenXPKI::Server::Database;
+use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Session::Mock;
 use OpenXPKI::Test::ConfigWriter;
+use OpenXPKI::Test::CertHelper::Database;
 
 Moose::Exporter->setup_import_methods(
     as_is     => [ 'OpenXPKI::Server::Context::CTX' ],
 );
 
 =head1 DESCRIPTION
+
+=head2 Database
+
+C<OpenXPKI::Test> tries to read the following sources to determine the database
+connection parameters and stops as soon as it can find some:
+
+=over
+
+=item 1. Constructor attribute C<db_conf>.
+
+=item 2. I</etc/openxpki/config.d/system/database.yaml>. This can be prevented
+by setting C<force_test_db =E<gt> 1>.
+
+=item 3. Environment variables C<$ENV{OXI_TEST_DB_MYSQL_XXX}>.
+
+=back
+
+If no database parameters are found anywhere it dies with an error.
 
 =cut
 
@@ -39,13 +60,42 @@ Moose::Exporter->setup_import_methods(
 
 Constructor.
 
-Per default, C<OpenXPKI::Test> tries to read the database configuration from
-I</etc/openxpki/config.d/system/database.yaml>. This can be prevented by
-setting C<force_test_db =E<gt> 1>.
-
 B<Parameters>
 
 =over
+
+=item * I<db_conf> (optional) - Database configuration (I<HashRef>).
+
+Per default the configuration is read from an existing configuration file
+(below I</etc/openxpki>) or environment variables.
+
+=cut
+has db_conf => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '_build_db_conf',
+    predicate => 'has_db_conf',
+    trigger => sub {
+        my ($self, $new, $old) = @_;
+        my @keys = qw( type name host port user passwd );
+        die "Required keys missing for 'db_conf': ".join(", ", grep { not defined $new->{$_} } @keys)
+            unless eq_deeply([keys %$new], bag(@keys));
+    },
+);
+
+=item * I<dbi> (optional) - instance of L<OpenXPKI::Server::Database>.
+
+Per default it is initialized with a new instance using C<$self-E<gt>db_conf>.
+
+=cut
+has dbi => (
+    is => 'rw',
+    isa => 'OpenXPKI::Server::Database',
+    lazy => 1,
+    builder => '_build_dbi',
+);
+
 
 =item * I<force_test_db> - Set to 1 to prevent the try to read database config
 from existing configuration file and only read it from environment variables
@@ -59,29 +109,11 @@ has force_test_db => (
     default => 0,
 );
 
-=item * I<db_conf> - Database configuration (I<HashRef>). Setting this will
-prevent the try to read it from an existing configuration file or env vars.
-
-=cut
-has db_conf => (
-    is => 'rw',
-    isa => 'HashRef',
-    lazy => 1,
-    default => sub { {} },
-    predicate => 'has_db_conf',
-    trigger => sub {
-        my ($self, $new, $old) = @_;
-        my @keys = qw( type name host port user passwd );
-        die "Required keys missing for 'db_conf': ".join(", ", grep { not defined $new->{$_} } @keys)
-            unless eq_deeply([keys %$new], bag(@keys));
-    },
-);
-
 =back
 
 =cut
 
-=head2 create
+=head2 setup_env
 
 Set up the test environment.
 
@@ -107,27 +139,30 @@ Set up the test environment.
 
 =item * C<CTX('api')>
 
-=item * C<CTX('session')> (C<CTX('session')-E<gt>get_pki_realm> will return the
-first realm specified in L<OpenXPKI::Test::ConfigWriter/realms>)
+=item * C<CTX('session')>
+
+Note that C<CTX('session')-E<gt>get_pki_realm> will return the first realm
+specified in L<OpenXPKI::Test::ConfigWriter/realms>.
 
 =back
 
 =back
 
-Returns the temporary path which serves as filesystem base for the temporary
-test environment.
+Returns the temporary directory which serves as filesystem base for the test
+environment.
 
 =cut
 sub setup_env {
     my ($self) = @_;
 
+    my $session = OpenXPKI::Server::Session::Mock->new;
+    OpenXPKI::Server::Context::setcontext({'session' => $session});
+    $session->set_pki_realm('dummy'); # initial dummy realm
+
     # Init Log4perl
     $self->_init_screen_log;
 
     # Read database configuration
-    $self->_db_config_from_production unless ($self->has_db_conf or $self->force_test_db);
-    $self->_db_config_from_env        unless $self->has_db_conf;
-    die "Could not read database config from /etc/openxpki or env variables" unless $self->has_db_conf;
 
     # Create base directory for test configuration
     my $tmp = tempdir( CLEANUP => 1 );
@@ -140,16 +175,52 @@ sub setup_env {
     );
     $cfg->create;
 
+    $session->set_pki_realm($cfg->realms->[0]);
+
     # Init basic CTX objects
-    OpenXPKI::Server::Init::init({TASKS  => [ qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api ) ], SILENT => 1, CLI => 0});
+    OpenXPKI::Server::Init::init({
+        TASKS  => [ qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api ) ],
+        SILENT => 1,
+        CLI => 0
+    });
+    # set context session item again because OpenXPKI::Server::Init::init deleted it
+    OpenXPKI::Server::Context::setcontext({'session' => $session});
+
     OpenXPKI::Server::Context::CTX('dbi_backend')->connect;
     OpenXPKI::Server::Context::CTX('dbi_workflow')->connect;
 
-    my $session = OpenXPKI::Server::Session::Mock->new;
-    OpenXPKI::Server::Context::setcontext({'session' => $session});
-    $session->set_pki_realm($cfg->realms->[0]);
-
     return $tmp;
+}
+
+=head2 certhelper_database
+
+Returns an instance of L<OpenXPKI::Test::CertHelper::Database> with the database
+configuration set to C<$self-E<gt>db_conf>.
+
+=cut
+sub certhelper_database {
+    my ($self) = @_;
+
+    return OpenXPKI::Test::CertHelper::Database->new(dbi => $self->dbi);
+}
+
+sub _build_dbi {
+    my ($self) = @_;
+
+    return OpenXPKI::Server::Database->new(
+        log => OpenXPKI::Server::Log::NOOP->new,
+        db_params => $self->db_conf,
+    );
+}
+
+sub _build_db_conf {
+    my ($self) = @_;
+
+    my $conf;
+    $conf = $self->_db_config_from_production unless $self->force_test_db;
+    $conf ||= $self->_db_config_from_env;
+    die "Could not read database config from /etc/openxpki or env variables" unless $conf;
+    return $conf;
 }
 
 sub _db_config_from_production {
@@ -159,30 +230,31 @@ sub _db_config_from_production {
 
     # make sure OpenXPKI::Config reads from default /etc/openxpki/config.d
     my $old_env = $ENV{OPENXPKI_CONF_PATH}; delete $ENV{OPENXPKI_CONF_PATH};
-
     my $config = OpenXPKI::Config->new;
-    my $db_conf = $config->get_hash('system.database.main');
+    $ENV{OPENXPKI_CONF_PATH} = $old_env if $old_env;
 
-    $self->db_conf({
+    my $db_conf = $config->get_hash('system.database.main');
+    my $conf = {
         type    => $db_conf->{type},
         name    => $db_conf->{name},
         host    => $db_conf->{host},
         port    => $db_conf->{port},
         user    => $db_conf->{user},
         passwd  => $db_conf->{passwd},
-    });
-
+    };
     # Set environment variables
     my $db_env = $config->get_hash("system.database.main.environment");
     $ENV{$_} = $db_env->{$_} for (keys %{$db_env});
 
-    $ENV{OPENXPKI_CONF_PATH} = $old_env if $old_env;
+    return $conf;
 }
 
 sub _db_config_from_env {
     my ($self) = @_;
 
-    $self->db_conf({
+    return unless $ENV{OXI_TEST_DB_MYSQL_NAME};
+
+    return {
         type    => "MySQL",
         name    => $ENV{OXI_TEST_DB_MYSQL_NAME},
         host    => $ENV{OXI_TEST_DB_MYSQL_DBHOST},
@@ -190,7 +262,7 @@ sub _db_config_from_env {
         user    => $ENV{OXI_TEST_DB_MYSQL_USER},
         passwd  => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
 
-    });
+    };
 }
 
 sub _init_screen_log {

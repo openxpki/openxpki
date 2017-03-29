@@ -22,7 +22,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
 use OpenXPKI::Test::More;
 use OpenXPKI::Test::CertHelper;
-use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test;
 
 #
 # Init client
@@ -48,7 +48,7 @@ $test->connect_ok(
 #
 
 # Import test certificates
-my $dbdata = OpenXPKI::Test::CertHelper::Database->new->insert_all;
+my $dbdata = OpenXPKI::Test->new->certhelper_database->insert_all;
 
 =pod
 

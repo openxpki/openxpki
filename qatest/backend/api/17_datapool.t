@@ -20,7 +20,7 @@ use Data::UUID;
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
 use OpenXPKI::Test::More;
-use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test;
 
 #
 # Init client
@@ -209,7 +209,8 @@ set_entry_ok { KEY => "pill-99", VALUE => "green", ENCRYPT => 1 },
     "Encrypted: store entry";
 
 # Clear secrets cache
-my $db_helper = OpenXPKI::Test::CertHelper::Database->new; # helper init already empties table "secret", but we want to play safe
+my $db_helper = OpenXPKI::Test->new->certhelper_database;
+# helper init already empties table "secret", but we want to play safe
 $db_helper->dbi->start_txn;
 $db_helper->dbi->delete(from => 'secret', all => 1);
 $db_helper->dbi->commit;

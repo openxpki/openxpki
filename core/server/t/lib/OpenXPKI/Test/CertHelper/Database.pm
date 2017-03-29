@@ -10,49 +10,71 @@ certificate data to be inserted into the database and functions to do so.
 =head1 DESCRIPTION
 
     # instance of OpenXPKI::Test::CertHelper::Database
-    my $db = OpenXPKI::Test::CertHelper::Database->new->insert_all;
+    my $db = OpenXPKI::Test->new->certhelper_database->insert_all;
+
+    # # equivalent to:
+    # my $oxitest = OpenXPKI::Test->new;
+    # my $db = OpenXPKI::Test::CertHelper::Database->new(
+    #     dbi => $oxitest->dbi,
+    # );
+    # $db->insert_all;
 
     # instance of OpenXPKI::Test::CertHelper::Database::PEM
-    my $cert = $db-E<gt>cert("alpha_alice_1");
+    my $cert = $db->cert("alpha_alice_1");
 
     print $cert->id, "\n";     # certificate identifier
     print $cert->data, "\n";   # PEM encoded certificate
 
 There is a set of predefined test certificates:
 
-    # "alpha" PKI realm set 1 (expired certificates)
-    $db-E<gt>cert("alpha_root_1")      # self signed Root Cert
-    $db-E<gt>cert("alpha_signer_1")    # Signing CA   (signed by Root Cert)
-    $db-E<gt>cert("alpha_alice_1")     # client Alice (signed by Signing CA)
-    $db-E<gt>cert("alpha_bob_1")       # client Bob   (signed by Signing CA)
-    $db-E<gt>cert("alpha_scep_1")      # SCEP service (signed by Root Cert)
-    $db-E<gt>cert("alpha_vault_1")     # self signed DataVault Cert
+=over
 
-    # "alpha" PKI realm set 2 (valid till year 2106)
-    $db-E<gt>cert("alpha_root_2")      # self signed Root Cert
+=item * B<alpha> PKI realm
+
+=over 1
+
+=item * set 1 (expired certificates)
+
+    $db->cert("alpha_root_1")      # self signed Root Cert
+    $db->cert("alpha_signer_1")    # Signing CA   (signed by Root Cert)
+    $db->cert("alpha_alice_1")     # client Alice (signed by Signing CA)
+    $db->cert("alpha_bob_1")       # client Bob   (signed by Signing CA)
+    $db->cert("alpha_scep_1")      # SCEP service (signed by Root Cert)
+    $db->cert("alpha_vault_1")     # self signed DataVault Cert
+
+=item * set 2 (valid till year 2106)
+
+    $db->cert("alpha_root_2")      # self signed Root Cert
     ...
 
-    # "alpha" PKI realm set 3 (valid from 2106 onwards)
-    $db-E<gt>cert("alpha_root_3")      # self signed Root Cert
+=item * set 3 (valid from 2106 onwards)
+
+    $db->cert("alpha_root_3")      # self signed Root Cert
     ...
 
-    # "beta" PKI realm (valid till year 2106)
-    $db-E<gt>cert("beta_root_1")      # self signed Root Cert
-    $db-E<gt>cert("beta_signer_1")    # Signing CA   (signed by Root Cert)
-    $db-E<gt>cert("beta_alice_1")     # client Alice (signed by Signing CA)
-    $db-E<gt>cert("beta_bob_1")       # client Bob   (signed by Signing CA)
-    $db-E<gt>cert("beta_scep_1")      # SCEP service (signed by Root Cert)
-    $db-E<gt>cert("beta_vault_1")     # self signed DataVault Cert
+=back
 
-    # "gamma" PKI realm (valid till year 2106)
-    $db-E<gt>cert("gamma_bob_1")       # "Orphan" client cert without known Signing or Root CA
+=item * B<beta> PKI realm (valid till year 2106)
+
+    $db->cert("beta_root_1")      # self signed Root Cert
+    $db->cert("beta_signer_1")    # Signing CA   (signed by Root Cert)
+    $db->cert("beta_alice_1")     # client Alice (signed by Signing CA)
+    $db->cert("beta_bob_1")       # client Bob   (signed by Signing CA)
+    $db->cert("beta_scep_1")      # SCEP service (signed by Root Cert)
+    $db->cert("beta_vault_1")     # self signed DataVault Cert
+
+=item * B<gamma> PKI realm (valid till year 2106)
+
+    $db->cert("gamma_bob_1")       # "Orphan" client cert without known Signing or Root CA
+
+=back
 
 =cut
 
 # Project modules
 use OpenXPKI::Server::Init;
+use OpenXPKI::Server::Database;
 use OpenXPKI::i18n;
-use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Test::CertHelper::Database::PEM;
 
 ################################################################################
@@ -61,10 +83,7 @@ use OpenXPKI::Test::CertHelper::Database::PEM;
 has dbi => (
     is => 'ro',
     isa => 'OpenXPKI::Server::Database',
-    lazy => 1,
-    default => sub {
-        CTX('dbi') or die "Could not instantiate database backend\n";
-    },
+    required => 1,
 );
 
 ################################################################################
@@ -82,23 +101,12 @@ has _certs => (
 
 =cut
 
-sub BUILD {
-    my $self = shift;
-    $ENV{OPENXPKI_CONF_PATH} = '/etc/openxpki/config.d';
-    # TODO #legacydb Remove dbi_backend once we got rid of the old DB layer
-    OpenXPKI::Server::Init::init({
-        TASKS  => ['config_versioned','log','api','crypto_layer','dbi','dbi_backend'],
-        SILENT => 1,
-        CLI => 1,
-    });
-}
-
 =head2 cert
 
 Returns an instance of L<OpenXPKI::Test::CertHelper::Database::PEM> with the
 requested test certificate data.
 
-    print $db->cert("acme_root_2")->id, "\n";
+    print $db->cert("beta_alice_1")->id, "\n";
 
 =cut
 sub cert {
@@ -210,7 +218,7 @@ sub delete_all {
     $self->dbi->commit;
 }
 
-=head2 acme1_pkcs7
+=head2 beta_alice_pkcs7
 
 Returns the PKCS7 file contents that containts the certificates "beta_root_1",
 "beta_signer_1" and "beta_alice_1".

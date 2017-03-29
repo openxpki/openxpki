@@ -19,7 +19,7 @@ use Test::Deep;
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
 use OpenXPKI::Test::More;
-use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test;
 
 sub _slurp {
     my $filename = shift;
@@ -53,7 +53,7 @@ $test->connect_ok(
 #
 # Init helpers
 #
-my $dbdata = OpenXPKI::Test::CertHelper::Database->new;
+my $dbdata = OpenXPKI::Test->new->certhelper_database;
 $dbdata->cert_names_by_realm_gen(alpha => 1);
 my @alpha_list = qw( alpha_alice_2  alpha_signer_2  alpha_root_2 );
 my @beta_list =  qw( beta_alice_1   beta_signer_1   beta_root_1 );
