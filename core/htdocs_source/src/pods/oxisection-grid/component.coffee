@@ -211,7 +211,6 @@ Component = Em.Component.extend
 
                 Em.set button, "loading", true
                 @container.lookup("route:openxpki").sendAjax
-                    type: "GET"
                     data: data
                 .then ->
                     Em.set button, "loading", false
