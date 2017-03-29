@@ -78,7 +78,15 @@ sub execute
     my @errors;
     FQDN:
     foreach my $fqdn (keys %items) {
-        my $reply = $resolver->send( $fqdn );
+        
+        # its useless if it is not a fqdn, we dont accept isolated hostnames here
+        if ($fqdn !~ m{ \A [a-z0-9] [a-z0-9-]* (\.[a-z0-9-]*[a-z0-9])+ \z }xi) {
+            push @errors, $fqdn;
+            next;
+        }
+        
+        my $reply;
+        eval { $reply = $resolver->send( $fqdn ); };
 
         ##! 64: 'resolv for ' . $fqdn . Dumper $reply
         if (!$reply || !$reply->answer) {

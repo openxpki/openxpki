@@ -3,6 +3,6 @@ label: I18N_OPENXPKI_UI_PROFILE_HOSTNAME
 description: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC
 type: freetext
 preset: "[% CN.0.replace(':.*','') %]"
-match: \A [A-Za-z\d\-\.]+ \z
+match: \A [a-z0-9] [a-z0-9-]* (\.[a-z0-9-]*[a-z0-9])* \z
 width: 60
 default: fully.qualified.example.com

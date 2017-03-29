@@ -52,6 +52,15 @@ has 'servers' => (
     default => undef
 );
 
+sub __check_fqdn {
+
+    my $self => shift;
+    my $fqdn = shift;
+    return ($fqdn =~ m{ \A [a-z0-9] [a-z0-9-]* (\.[a-z0-9-]*[a-z0-9])+ \z }xi);
+    
+}
+        
+
 sub new {
     
     my ($class, $context, $args) = @_;
@@ -114,21 +123,29 @@ sub valid {
     my $valid = shift || '';
     my $timeout = shift;
     
-    my $reply = $self->resolver->send( $fqdn );
-    
+
     my $status;
-    if ($reply && $reply->answer) {
-        $status = 'dns-valid';
-        $fqdn .= ' '.$valid if ($valid);
-    } elsif ($self->resolver->errorstring() =~ /query timed out/) {
-        $status = 'dns-timeout';
-        $timeout = $failed unless (defined $timeout);
-        $fqdn .= ' '.$timeout if ($timeout);
-    } else {
+    if (!$self->__check_fqdn( $fqdn )) {
         $status = 'dns-failed';
         $fqdn .= ' '.$failed if ($failed);
-    }
+    } else {
     
+        my $reply;
+        eval { $reply = $self->resolver->send( $fqdn ); };
+        
+        
+        if ($reply && $reply->answer) {
+            $status = 'dns-valid';
+            $fqdn .= ' '.$valid if ($valid);
+        } elsif ($self->resolver->errorstring() =~ /query timed out/) {
+            $status = 'dns-timeout';
+            $timeout = $failed unless (defined $timeout);
+            $fqdn .= ' '.$timeout if ($timeout);
+        } else {
+            $status = 'dns-failed';
+            $fqdn .= ' '.$failed if ($failed);
+        }
+    }    
     return '<span class="'.$status.'">'.encode_entities( $fqdn ).'</span>';
 
 }
@@ -155,23 +172,26 @@ sub resolve {
     my $fqdn = shift;
     my $recurse = shift;
     
-    my $reply = $self->resolver->search( $fqdn );
-    
     my $result;
-    if ($reply && $reply->answer) {        
+    my $reply;
+    if ($self->__check_fqdn( $fqdn )) {
+        eval { $reply = $self->resolver->search( $fqdn ); }
+    }
+    
+    if ($reply && $reply->answer) {
         foreach my $rr ($reply->answer) {
             if ($rr->type eq "A") {
                 $result = $rr->address;
-                last;   
+                last;
             } elsif (!$recurse) {
                 $result = $rr->cname;
                 last;
             }
         }
     }
-    
+
     if ($result) {
-        return '<span class="dns-valid">'. encode_entities( $fqdn ).' ('.encode_entities( $result ).')</span>'; 
+        return '<span class="dns-valid">'. encode_entities( $fqdn ).' ('.encode_entities( $result ).')</span>';
     } else {
         return '<span class="dns-failed">'.encode_entities( $fqdn ).' (???)</span>';
     }
