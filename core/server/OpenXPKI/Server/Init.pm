@@ -403,7 +403,7 @@ sub __do_init_dbi {
     ##! 1: "start"
 
     my $config = CTX('config');
-    my $dbpath = [ 'system','database','main' ];
+    my $dbpath = 'system.database.main';
     my $db_config = $config->get_hash( $dbpath );
 
     # Set environment variables
