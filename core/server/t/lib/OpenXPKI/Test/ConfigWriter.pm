@@ -342,13 +342,10 @@ sub _realm_crypto {
 sub _buikd_log4perl {
     my ($self, $realm) = @_;
 
-    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'ERROR';
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'OFF';
     my $logfile = $self->path_log_file;
 
     return qq(
-        # Catch-all root logger
-        log4perl.rootLogger                     = ERROR, Screen
-
         log4perl.category.openxpki.auth         = INFO, Screen, Logfile, DBI
         log4perl.category.openxpki.audit        = INFO, Screen, DBI
         log4perl.category.openxpki.monitor      = INFO, Screen, Logfile
