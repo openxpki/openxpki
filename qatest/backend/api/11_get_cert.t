@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
 
 use Carp;
 use English;

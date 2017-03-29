@@ -7,6 +7,7 @@ use Carp;
 use English;
 use Data::Dumper;
 use File::Basename;
+use FindBin qw( $Bin );
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
@@ -15,7 +16,7 @@ use Test::More;
 use Test::Deep;
 
 # Project modules
-use lib qw(../../lib);
+use lib "$Bin/../../lib";
 use TestCfg;
 use OpenXPKI::Test::More;
 use OpenXPKI::Test::CertHelper;

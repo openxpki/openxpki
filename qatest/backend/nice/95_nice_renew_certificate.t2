@@ -4,9 +4,8 @@
 use strict;
 use warnings;
 
-use lib qw(
-  ../../lib
-);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
 
 use Carp;
 use English;
@@ -60,14 +59,14 @@ my %cert_info = (
 	requestor_gname => "Robert",
 	requestor_name => "Renew",
 );
- 
-my %wfparam = (	
+
+my %wfparam = (
 	org_cert_identifier => $cert_identifier,
 	csr_type => 'pkcs10'
 );
 
 print "Renewal: $cert_identifier\n";
-	
+
 $test->create_ok( 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST' , \%wfparam, 'Create Renewal Test Workflow')
  or die "Workflow Create failed: $@";
 
@@ -80,13 +79,13 @@ $test->execute_ok( 'generate_key', {
 	_key_type => "RSA",
     _key_gen_params => $param_serializer->serialize( { KEY_LENGTH => 2048, ENC_ALG => "aes128" } ),
     _password => "m4#bDf7m3abd" } ) or die "Error - keygen failed: $@";
- 	
+
 
 $test->state_is('PENDING');
 
 
 $test->disconnect();
- 
+
 # Re-login with Operator for approval
 $test->connect_ok(
     user => $cfg{operator}{name},
@@ -105,6 +104,6 @@ $test->execute_ok( 'I18N_OPENXPKI_WF_ACTION_PERSIST_CSR' );
 $test->state_is('SUCCESS');
 
 open(CERT, ">$cfg{instance}{buffer}");
-print CERT $serializer->serialize({ cert_identifier => $test->param( 'cert_identifier' ) }); 
-close CERT; 
+print CERT $serializer->serialize({ cert_identifier => $test->param( 'cert_identifier' ) });
+close CERT;
 

@@ -9,8 +9,43 @@ certificate data to be inserted into the database and functions to do so.
 
 =head1 DESCRIPTION
 
-This class is not intended for direct use. Please use the class methods in
-L<OpenXPKI::Test::CertHelper> instead.
+    # instance of OpenXPKI::Test::CertHelper::Database
+    my $db = OpenXPKI::Test::CertHelper::Database->new->insert_all;
+
+    # instance of OpenXPKI::Test::CertHelper::Database::PEM
+    my $cert = $db-E<gt>cert("alpha_alice_1");
+
+    print $cert->id, "\n";     # certificate identifier
+    print $cert->data, "\n";   # PEM encoded certificate
+
+There is a set of predefined test certificates:
+
+    # "alpha" PKI realm set 1 (expired certificates)
+    $db-E<gt>cert("alpha_root_1")      # self signed Root Cert
+    $db-E<gt>cert("alpha_signer_1")    # Signing CA   (signed by Root Cert)
+    $db-E<gt>cert("alpha_alice_1")     # client Alice (signed by Signing CA)
+    $db-E<gt>cert("alpha_bob_1")       # client Bob   (signed by Signing CA)
+    $db-E<gt>cert("alpha_scep_1")      # SCEP service (signed by Root Cert)
+    $db-E<gt>cert("alpha_vault_1")     # self signed DataVault Cert
+
+    # "alpha" PKI realm set 2 (valid till year 2106)
+    $db-E<gt>cert("alpha_root_2")      # self signed Root Cert
+    ...
+
+    # "alpha" PKI realm set 3 (valid from 2106 onwards)
+    $db-E<gt>cert("alpha_root_3")      # self signed Root Cert
+    ...
+
+    # "beta" PKI realm (valid till year 2106)
+    $db-E<gt>cert("beta_root_1")      # self signed Root Cert
+    $db-E<gt>cert("beta_signer_1")    # Signing CA   (signed by Root Cert)
+    $db-E<gt>cert("beta_alice_1")     # client Alice (signed by Signing CA)
+    $db-E<gt>cert("beta_bob_1")       # client Bob   (signed by Signing CA)
+    $db-E<gt>cert("beta_scep_1")      # SCEP service (signed by Root Cert)
+    $db-E<gt>cert("beta_vault_1")     # self signed DataVault Cert
+
+    # "gamma" PKI realm (valid till year 2106)
+    $db-E<gt>cert("gamma_bob_1")       # "Orphan" client cert without known Signing or Root CA
 
 =cut
 
@@ -127,6 +162,10 @@ sub all_cert_names {
 
 Inserts all test certificates into the database.
 
+Returns the object instance so the call can be chained to C<new>:
+
+    my $helper = OpenXPKI::Test::CertHelper::Database->new->insert_all;
+
 =cut
 sub insert_all {
     my ($self) = @_;
@@ -155,6 +194,7 @@ sub insert_all {
         );
     }
     $self->dbi->commit;
+    return $self;
 }
 
 =head2 delete_all

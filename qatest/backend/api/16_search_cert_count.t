@@ -6,8 +6,9 @@ use warnings;
 use Carp;
 use English;
 use Data::Dumper;
-use File::Basename;
+use File::Basename qw( dirname );
 use File::Temp qw( tempdir );
+use FindBin qw( $Bin );
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
@@ -18,10 +19,9 @@ use Math::BigInt;
 use Data::UUID;
 
 # Project modules
-use lib qw(../../lib);
+use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
 use OpenXPKI::Test::More;
-use OpenXPKI::Test::CertHelper;
 use OpenXPKI::Test::CertHelper::Database;
 
 #
@@ -48,7 +48,7 @@ $test->connect_ok(
 #
 
 # Import test certificates
-my $dbdata = OpenXPKI::Test::CertHelper->via_database;
+my $dbdata = OpenXPKI::Test::CertHelper::Database->new->insert_all;
 
 # By PROFILE
 my $realm = $dbdata->cert("beta_root_1")->db->{pki_realm};
