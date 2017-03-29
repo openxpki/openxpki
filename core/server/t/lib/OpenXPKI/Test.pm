@@ -20,6 +20,7 @@ use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in 
 
 # Project modules
 use OpenXPKI::Config;
+use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Context;
@@ -125,35 +126,36 @@ Set up the test environment.
 
 =item * initializes the basic context objects:
 
-=over 1
-
-=item * C<CTX('config')>
-
-=item * C<CTX('log')>
-
-=item * C<CTX('dbi_backend')>
-
-=item * C<CTX('dbi_workflow')>
-
-=item * C<CTX('dbi')>
-
-=item * C<CTX('api')>
-
-=item * C<CTX('session')>
+    C<CTX('config')>
+    C<CTX('log')>
+    C<CTX('dbi_backend')>
+    C<CTX('dbi_workflow')>
+    C<CTX('dbi')>
+    C<CTX('api')>
+    C<CTX('session')>
 
 Note that C<CTX('session')-E<gt>get_pki_realm> will return the first realm
 specified in L<OpenXPKI::Test::ConfigWriter/realms>.
 
 =back
 
-=back
-
 Returns the temporary directory which serves as filesystem base for the test
 environment.
 
+B<Parameters>
+
+=over
+
+=item * I<init> (optional) - ArrayRef of additional server tasks to intialize
+(they will be passed on to L<OpenXPKI::Server::Init/init>).
+
+=back
+
 =cut
 sub setup_env {
-    my ($self) = @_;
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        init => { isa => 'ArrayRef[Str]', optional => 1 },
+    );
 
     my $session = OpenXPKI::Server::Session::Mock->new;
     OpenXPKI::Server::Context::setcontext({'session' => $session});
@@ -175,14 +177,16 @@ sub setup_env {
     );
     $cfg->create;
 
-    $session->set_pki_realm($cfg->realms->[0]);
+    $session->set_pki_realm($cfg->realms->[0]); # use first realm from test config
+
+    # our default tasks
+    my @tasks = qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api );
+    my %task_hash = map { $_ => 1 } @tasks;
+    # more tasks requested via "init" parameter
+    push @tasks, grep { not $task_hash{$_} } @{ $params{init} };
 
     # Init basic CTX objects
-    OpenXPKI::Server::Init::init({
-        TASKS  => [ qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api ) ],
-        SILENT => 1,
-        CLI => 0
-    });
+    OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
     # set context session item again because OpenXPKI::Server::Init::init deleted it
     OpenXPKI::Server::Context::setcontext({'session' => $session});
 
