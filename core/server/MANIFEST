@@ -629,6 +629,7 @@ t/80_config_versioning/99_cleanup.t2
 t/80_config_versioning/config.patch
 
 t/90_api/10_housekeeping_purge_applog.t
+t/90_api/20_token_get_ca_list.t
 
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
