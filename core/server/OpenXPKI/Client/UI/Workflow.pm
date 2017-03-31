@@ -2371,6 +2371,8 @@ sub __render_fields {
 
                 if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
                     $item->{value} = $self->serializer()->deserialize( $item->{value} );
+                }
+                if (ref $item->{value}) {
                     if (ref $item->{value} eq 'HASH') {
                         $item->{format} = 'deflist';
                     } elsif (ref $item->{value} eq 'ARRAY') {
