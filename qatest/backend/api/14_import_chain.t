@@ -118,7 +118,7 @@ cmp_bag $test->get_msg->{PARAMS}->{imported}, [
 $oxitest->delete_testcerts;
 
 # PKCS7 import
-$test->runcmd_ok('import_chain', { DATA => $dbdata->beta_alice_pkcs7, IMPORT_ROOT => 1 }, "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)");
+$test->runcmd_ok('import_chain', { DATA => $dbdata->pkcs7->{'beta-alice-1'}, IMPORT_ROOT => 1 }, "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)");
 cmp_bag $test->get_msg->{PARAMS}->{imported}, [
     map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$beta_ids
 ], "List imported certs";

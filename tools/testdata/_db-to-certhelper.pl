@@ -7,6 +7,7 @@ use Carp;
 use English;
 use Data::Dumper;
 use File::Basename;
+use FindBin qw( $Bin );
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
@@ -15,8 +16,7 @@ use Test::More;
 use DateTime;
 
 # Project modules
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-use lib catdir((splitpath(rel2abs(__FILE__)))[0,1])."/../../core/server";
+use lib "$Bin/../../core/server";
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -39,14 +39,17 @@ my $dbh = CTX('dbi')->select(
     from_join => 'aliases|a identifier=identifier certificate|c',
     columns => [ qw( a.alias a.group_id a.generation c.* ) ],
 );
+
+print "sub _build_certs {\n    return {\n";
+
 while (my $data = $dbh->fetchrow_hashref) {
     my $label = (split("=", (split(",", $data->{subject}))[0]))[1];
     my $internal_id = ($data->{group_id}//"") eq "root" ? $data->{pki_realm}."-".$data->{alias} : $data->{alias};
     $internal_id =~ s/-/_/g;
-    print "$internal_id => OpenXPKI::Test::CertHelper::Database::PEM->new(\n";
-    print "    label => '$label',\n";
-    print '    db => {'."\n        ";
-    print join "\n        ",
+    print "        '$internal_id' => OpenXPKI::Test::CertHelper::Database::PEM->new(\n";
+    print "            label => '$label',\n";
+    print '            db => {'."\n                ";
+    print join "\n                ",
         map {
             my $val = $data->{$_};
             my $qc = "'";
@@ -64,9 +67,9 @@ while (my $data = $dbh->fetchrow_hashref) {
         sort
         grep { $_ !~ /^ ( alias | group_id | generation ) $/msx }
         keys %$data;
-    print "\n    },\n";
-    print '    db_alias => {'."\n        ";
-    print join "\n        ",
+    print "\n            },\n";
+    print '            db_alias => {'."\n                ";
+    print join "\n                ",
         map {
             my $val = $data->{$_};
             sprintf("%s => %s,",
@@ -77,6 +80,8 @@ while (my $data = $dbh->fetchrow_hashref) {
         sort
         grep { /^ ( alias | group_id | generation ) $/msx }
         keys %$data;
-    print "\n    },\n";
+    print "\n            },\n        ";
     print "),\n\n";
 };
+
+print "    };\n}\n";

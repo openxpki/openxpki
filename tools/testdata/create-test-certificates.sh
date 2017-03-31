@@ -6,10 +6,9 @@
 # The MySQL database should be freshly created, i.e. without any data in it.
 # (e.g. using tools/testenv/mysql-create-db.sh && tools/testenv/mysql-create-schema.sh)
 #
-# The resulting certificates are available in three forms below ./certificates/:
-# 1. Certificate files
+# The resulting certificates are available in two forms below ./certificates/:
+# 1. Perl code to be inserted into OpenXPKI::Test::CertHelper::Database
 # 2. A MySQL database dump
-# 3. Perl code to be inserted into OpenXPKI::Test::CertHelper::Database
 #
 # The test certificates only need to be regenerated if there are some major
 # changes to the project (like certificate algorithm, database schema change etc.)
@@ -28,20 +27,23 @@ $BASEDIR/_create-config.pl $TEMPDIR
 # 3. Import cert. into MySQL using test config above
 $BASEDIR/_create-certs.sh  $TEMPDIR/etc/openxpki
 
-# 4. Move certificates into ./certificates/
-cp -R $TEMPDIR/etc/openxpki/ssl/* $BASEDIR/certificates/
+# 4. Create Perl code for OpenXPKI::Test::CertHelper::Database
+$BASEDIR/_pem-to-certhelper.pl $TEMPDIR/etc/openxpki/ssl > $BASEDIR/certificates/certhelper-code.pl
+$BASEDIR/_db-to-certhelper.pl                           >> $BASEDIR/certificates/certhelper-code.pl
+echo ""
+echo "Code for OpenXPKI::Test::CertHelper::Database is available in:"
+echo "    $BASEDIR/certificates/certhelper-code.pl"
 
-# 5. Create Perl code for OpenXPKI::Test::CertHelper::Database
-$BASEDIR/_db-to-certhelper.pl > $BASEDIR/certificates/certhelper-code.pl
-
-# 6. Create MySQL dump
+# 5. Create MySQL dump
 mysqldump -h $OXI_TEST_DB_MYSQL_DBHOST -u $OXI_TEST_DB_MYSQL_USER -p"$OXI_TEST_DB_MYSQL_PASSWORD" \
     --set-charset --no-create-info \
     --skip-comments --skip-add-locks --skip-disable-keys \
     --extended-insert --complete-insert --single-transaction \
     $OXI_TEST_DB_MYSQL_NAME > $BASEDIR/certificates/mysql-dump.sql
+echo ""
+echo "MySQL insert script is available in:"
+echo "    $BASEDIR/certificates/mysql-dump.sql"
 
 rm -rf $TEMPDIR
 
 echo "Done"
-

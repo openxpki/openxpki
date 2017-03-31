@@ -8,9 +8,8 @@
 use strict;
 use warnings;
 
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-
-use lib catdir((splitpath(rel2abs(__FILE__)))[0,1])."/../../core/server/t/lib";
+use FindBin qw( $Bin );
+use lib "$Bin/../../core/server/t/lib";
 use OpenXPKI::Test::ConfigWriter;
 
 die "Base path for OpenXPKI test environment must be specified as first parameter"

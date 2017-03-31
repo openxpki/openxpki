@@ -221,7 +221,7 @@ search_cert_ok "limit results and use offset", {
     LIMIT => 2,
     START => 1,
     PKI_REALM => $dbdata->cert("beta_root_1")->db->{pki_realm},
-}, qw( beta_bob_1 beta_vault_1 ), "ORDERED";
+}, qw( beta_bob_1 beta_datavault_1 ), "ORDERED";
 
 # By CSR serial
 my $uuid = Data::UUID->new->create_str;

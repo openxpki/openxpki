@@ -83,9 +83,25 @@ sub _make_parent_dir {
 sub write_str {
     my ($self, $filepath, $content) = @_;
 
+    die "Empty content for $filepath" unless $content;
     open my $fh, ">", $filepath or die "Could not open $filepath for writing: $@";
     print $fh $content, "\n";
     close $fh;
+}
+
+sub write_private_key {
+    my ($self, $realm, $alias, $pem_str) = @_;
+
+    my $filepath = $self->_private_key_path($realm, $alias);
+    $self->_make_parent_dir($filepath);
+    $self->write_str($filepath, $pem_str);
+}
+
+sub remove_private_key {
+    my ($self, $realm, $alias) = @_;
+
+    my $filepath = $self->_private_key_path($realm, $alias);
+    unlink $filepath or die "Could not remove file $filepath: $@";
 }
 
 sub write_yaml {
@@ -95,7 +111,15 @@ sub write_yaml {
     TAP::Parser::YAMLish::Writer->new->write($data, $lines);
     pop @$lines; shift @$lines; # remove --- and ... from beginning/end
 
+    $self->_make_parent_dir($filepath);
     $self->write_str($filepath, join("\n", @$lines));
+}
+
+sub write_realm_config {
+    my ($self, $realm, $config_path, $yaml_hash) = @_;
+
+    my $relpath = $config_path; $relpath =~ s/\./\//g;
+    $self->write_yaml($self->path_config_dir."/realm/$realm/$relpath.yaml",  $yaml_hash)
 }
 
 sub make_dirs {
@@ -103,8 +127,6 @@ sub make_dirs {
     # Do explicitely not create $self->basedir to prevent accidential use of / etc
     diag "Creating directory ".$self->path_config_dir if $ENV{TEST_VERBOSE};
     $self->_make_dir($self->path_config_dir);
-    $self->_make_dir($self->path_config_dir."/realm/$_") for @{$self->realms};
-    $self->_make_dir($self->path_config_dir."/system");
     $self->_make_dir($self->path_session_dir);
     $self->_make_dir($self->path_temp_dir);
     $self->_make_dir($self->path_export_dir);
@@ -124,10 +146,15 @@ sub create {
     $self->write_yaml($self->path_config_dir."/system/server.yaml",    $self->yaml_server);
     $self->write_yaml($self->path_config_dir."/system/watchdog.yaml",  $self->yaml_watchdog);
 
-    $self->write_yaml($self->path_config_dir."/realm/$_/crypto.yaml",  $self->_realm_crypto($_))
-        for @{$self->realms};
+    $self->write_realm_config($_, "crypto", $self->_realm_crypto($_)) for @{$self->realms};
 
     $self->write_str ($self->path_log4perl_conf,                       $self->conf_log4perl);
+}
+
+# Returns the private key path for the certificate specified by realm and alias.
+sub _private_key_path {
+    my ($self, $realm, $alias) = @_;
+    return sprintf "%s/etc/openxpki/ssl/%s/%s.pem", $self->basedir, $realm, $alias;
 }
 
 sub _build_database {
@@ -280,7 +307,7 @@ sub _realm_crypto {
     return {
         type => {
             certsign    => "$realm-signer",
-            datasafe    => "$realm-vault",
+            datasafe    => "$realm-datavault",
             scep        => "$realm-scep",
         },
         # The actual token setup, based on current token.xml
@@ -290,7 +317,7 @@ sub _realm_crypto {
 
                 # Template to create key, available vars are
                 # ALIAS (ca-one-signer-1), GROUP (ca-one-signer), GENERATION (1)
-                key => $self->basedir."/etc/openxpki/ssl/$realm/[% ALIAS %].pem",
+                key => $self->_private_key_path($realm, "[% ALIAS %]"),
 
                 # possible values are OpenSSL, nCipher, LunaCA
                 engine => "OpenSSL",
@@ -313,7 +340,7 @@ sub _realm_crypto {
             "$realm-signer" => {
                 inherit => "default",
             },
-            "$realm-vault" => {
+            "$realm-datavault" => {
                 inherit => "default",
             },
             "$realm-scep" => {

@@ -61,7 +61,7 @@ If no database parameters are found anywhere it dies with an error.
 
 Constructor.
 
-B<Parameters>
+B<Parameters> (these are object attributes and can be accesses as such)
 
 =over
 
@@ -110,6 +110,17 @@ has force_test_db => (
     default => 0,
 );
 
+=item * I<testenv_root> (optional) - Temporary directory that serves as root
+path for the test environment (configuration files etc.)
+
+=cut
+has testenv_root => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { scalar(tempdir( CLEANUP => 1 )) },
+);
+
 =back
 
 =cut
@@ -125,6 +136,24 @@ has certhelper_database => (
     isa => 'OpenXPKI::Test::CertHelper::Database',
     lazy => 1,
     default => sub { OpenXPKI::Test::CertHelper::Database->new },
+);
+
+=head2 config_writer
+
+Returns an instance of L<OpenXPKI::Test::ConfigWriter>.
+
+=cut
+has config_writer => (
+    is => 'rw',
+    isa => 'OpenXPKI::Test::ConfigWriter',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        OpenXPKI::Test::ConfigWriter->new(
+            basedir => $self->testenv_root,
+            db_conf => $self->db_conf,
+        )
+    },
 );
 
 
@@ -154,9 +183,6 @@ specified in L<OpenXPKI::Test::ConfigWriter/realms>.
 
 =back
 
-Returns the temporary directory which serves as filesystem base for the test
-environment.
-
 B<Parameters>
 
 =over
@@ -182,17 +208,19 @@ sub setup_env {
     # Read database configuration
 
     # Create base directory for test configuration
-    my $tmp = tempdir( CLEANUP => 1 );
-    $ENV{OPENXPKI_CONF_PATH} = "$tmp/etc/openxpki/config.d"; # so OpenXPKI::Config will access our config from now on
+    $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d"; # so OpenXPKI::Config will access our config from now on
 
     # Write configuration YAML files
-    my $cfg = OpenXPKI::Test::ConfigWriter->new(
-        basedir     => $tmp,
-        db_conf     => $self->db_conf,
-    );
-    $cfg->create;
+    $self->config_writer->create;
 
-    $session->set_pki_realm($cfg->realms->[0]); # use first realm from test config
+    # Store private key files in temp env/dir
+    # TODO This is hackish, OpenXPKI::Test::CertHelper::Database needs to store infos about realms as well (be authoritative source about realms/certs for tests)
+    for my $alias (keys %{ $self->certhelper_database->private_keys }) {
+        my $realm = (split("-", $alias))[0]; die "Could not extract realm from alias $alias" unless $realm;
+        $self->config_writer->write_private_key($realm, $alias, $self->certhelper_database->private_keys->{$alias});
+    }
+
+    $session->set_pki_realm($self->config_writer->realms->[0]); # use first realm from test config
 
     # our default tasks
     my @tasks = qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api );
@@ -207,8 +235,56 @@ sub setup_env {
 
     OpenXPKI::Server::Context::CTX('dbi_backend')->connect;
     OpenXPKI::Server::Context::CTX('dbi_workflow')->connect;
+}
 
-    return $tmp;
+=head2 add_realm_config
+
+Add another YAML configuration file for the given realm and reload server
+config C<CTX('config')>.
+
+Example:
+
+    $oxitest->add_realm_config(
+        "alpha",
+        "auth.handler",
+        {
+            Signature => {
+                realm => [ "alpha" ],
+                cacert => [ "MyCertId" ],
+            }
+        }
+    );
+
+This would write a file I<etc/openxpki/config.d/realm/alpha/auth/handler.yaml>
+(below C<$oxitest-E<gt>testenv_root>) with this content:
+
+    Signature
+      realm:
+        - alpha
+      cacert:
+        - MyCertId
+
+B<Parameters>
+
+=over
+
+=item * I<$realm> - PKI realm
+
+=item * I<$config_path> - The dot separated config path below C<realm.xxx> where
+to store the configuration
+
+=item * I<$yaml_hash> - A I<HashRef> with configuration data that will be
+converted into YAML and stored on disk.
+
+=cut
+sub add_realm_config {
+    my ($self, $realm, $config_path, $yaml_hash) = @_;
+    $self->config_writer->write_realm_config($realm, $config_path, $yaml_hash);
+    # re-read config
+    OpenXPKI::Server::Context::setcontext({
+        config => OpenXPKI::Config->new,
+        force => 1,
+    });
 }
 
 =head2 insert_testcerts
