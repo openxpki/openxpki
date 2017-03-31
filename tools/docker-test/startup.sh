@@ -29,6 +29,13 @@ REPO=https://dummy:nope@github.com/$GITHUB_USER_REPO.git
 # Local repo from host (if Docker volume is mounted)
 mountpoint -q /repo && test -z "$GITHUB_USER_REPO" && REPO=file:///repo
 
+if [ "$OXI_TEST_ONLY" == "coverage" ]; then
+    if ! mountpoint -q /repo; then
+        echo -e "\nERROR: Code coverage test only work with local repo"
+        exit
+    fi
+fi
+
 echo -e "\n====[ Git checkout: $BRANCH from $REPO ]===="
 git ls-remote -h $REPO >/dev/null 2>&1
 if [ $? -ne 0 ]; then
@@ -67,6 +74,20 @@ export USER=dummy
 cd $CLONE_DIR/core/server
 perl Makefile.PL                                        > /dev/null
 make                                                    > /dev/null
+
+#
+# Test coverage
+#
+if [ "$OXI_TEST_ONLY" == "coverage" ]; then
+    echo -e "\n====[ Testing the code coverage ]===="
+    cpanm --quiet --notest Devel::Cover
+    cover -test
+    dirname="code-coverage-$(date +'%Y%m%d-%H%M%S')"
+    mv ./cover_db "/repo/$dirname"
+    chmod -R g+w,o+w "/repo/$dirname"
+    echo -e "\nCode coverage results available in project root dir:\n$dirname"
+    exit
+fi
 
 #
 # Unit tests

@@ -7,7 +7,9 @@
 #       Test latest commit (!) of the current Git branch in your local repo
 
 #   ./docker-test.sh --only=api
-#       Only run "api" tests (possible values: unit, nice, api, webui)
+#       Only run "api" tests
+#       Possible values: unit, nice, api, webui, coverage
+#       coverage = test the code coverage using "cover -test"
 #
 #   ./docker-test.sh myfix
 #       Test latest commit of branch "myfix" in your local repo
@@ -22,20 +24,32 @@
 #   Then (on every call) a Docker container is created from the image in which
 #   the repo is cloned and the tests are executed (takes a few minutes).
 
-branch=$(git rev-parse --abbrev-ref HEAD)
-repo=""
+root="$(readlink -e "$(dirname "$0")/../")"
 
-RESTRICT_TESTS=""
+# Restricted set of tests specified?
 if [[ $1 == --only=* ]]; then
     TEST_ONLY=${1#--only=}
     RESTRICT_TESTS="-e OXI_TEST_ONLY=$TEST_ONLY"
     shift
+else
+    RESTRICT_TESTS=""
 fi
 
-test ! -z "$1" && branch="$1"
-test ! -z "$2" && repo="$2"
+# Branch specified?
+if [ ! -z "$1" ]; then
+    branch="$1"
+else
+    branch=$(git rev-parse --abbrev-ref HEAD)
+fi
 
-root="$(readlink -e "$(dirname "$0")/../")"
+# Github remote repo specified?
+if [ ! -z "$2" ]; then
+    github_repo="$2"
+    volume=()
+else
+    github_repo=""
+    volume=(-v "$root:/repo")
+fi
 
 set -e
 
@@ -44,9 +58,9 @@ echo "(This might take more than 10 minutes on first execution)"
 docker build $(dirname $0)/docker-test -t oxi-test
 
 echo -e "\n==##[ Run tests in Docker container ]##=="
-test ! -z "$repo" && echo "Repo:   Github - $repo" || echo "Repo:   local"
+test ! -z "$github_repo" && echo "Repo:   Github - $github_repo" || echo "Repo:   local"
 echo "Branch: $branch"
 test ! -z "$RESTRICT_TESTS" && echo "Tests:  '$TEST_ONLY' only" || echo "Tests:  all"
 echo "==#####################################=="
 
-docker run $RESTRICT_TESTS -t -i --rm -v $root:/repo oxi-test $branch $repo
+docker run $RESTRICT_TESTS -t -i --rm "${volume[@]}" oxi-test $branch $github_repo
