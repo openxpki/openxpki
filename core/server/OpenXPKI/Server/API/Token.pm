@@ -342,7 +342,7 @@ sub get_ca_list {
     my $self = shift;
     my $keys = shift;
 
-    my $pki_realm = $keys->{REALM};
+    my $pki_realm = $keys->{PKI_REALM};
     $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
 
     ##! 32: "Lookup group name for certsign"
