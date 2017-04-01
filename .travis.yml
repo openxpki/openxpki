@@ -50,6 +50,7 @@ install:
     - cpanm --quiet --notest PPI
     - ./tools/scripts/makefile2cpanfile.pl > ./cpanfile
     - cpanm --quiet --notest --installdeps ./
+    - cpanm --quiet --notest Devel::Cover::Report::Coveralls
 
 #
 # Build
@@ -63,6 +64,8 @@ script:
     - sed -ri 's/^(WriteMakefile.*)/\1\nMAN1PODS=>{},\nMAN3PODS=>{},/' Makefile.PL
     - perl Makefile.PL
     - make
+# Code Coverage (submitted to coveralls.io)
+    - cover -test -report coveralls
 # Unit tests
     - make test
 # Installation
