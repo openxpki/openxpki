@@ -2519,7 +2519,10 @@ sub __render_fields {
                     $item->{value} = $self->serializer()->deserialize( $item->{value} );
                 }
                 # Sort by label
-                my @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};            
+                my @val;
+                if ($item->{value} && (ref $item->{value} eq 'HASH')) {
+                    @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                }
                 $item->{value} = \@val;
                 
             } elsif ($item->{format} eq "grid") {
