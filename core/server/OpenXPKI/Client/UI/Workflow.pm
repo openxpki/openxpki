@@ -2367,6 +2367,8 @@ sub __render_fields {
                 if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
                     $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
                     $item->{format} = 'code';
+                } elsif ($field->{type} eq 'textarea') {
+                    $item->{format} = 'nl2br';
                 }
 
                 if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {

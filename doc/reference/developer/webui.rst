@@ -365,7 +365,12 @@ Similar to link but expects href to be an external target, default target is bla
 text
 ^^^^
 
-Readable text without html syntax (will be escaped)
+Readable text without html markup (will be escaped)
+
+nl2br
+^^^^^
+
+Like text with line breaks (\n) converted to "<br>"
 
 raw
 ^^^
@@ -375,7 +380,7 @@ Displayed as is.
 code
 ^^^^
 
-Rendered with fixed-with typo, unix linebreaks are converted to html linebreaks. 
+Rendered with fixed-with typo, unix linebreaks are converted to html linebreaks.
  
 defhash/deflist
 ^^^^^^^^^^^^^^^
