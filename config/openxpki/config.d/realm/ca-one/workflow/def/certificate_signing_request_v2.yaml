@@ -539,9 +539,9 @@ action:
     load_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
         param:
-            ds_key_param: workflow_id
-            ds_namespace: workflow.csr.keygen_password
-            ds_value_param: _password
+            _map_key: $workflow_id
+            namespace: workflow.csr.keygen_password
+            target_key: _password
 
     move_key_to_dp:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
