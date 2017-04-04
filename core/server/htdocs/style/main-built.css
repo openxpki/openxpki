@@ -8464,27 +8464,27 @@ div.section {
 
 /* Button format from workflow defs */
 
-.oxi-button-container button.btn.expected,
+.oxi-button-container .btn.expected,
 .oxi-form-button button.btn.submit {
   background-color: #c9e2b3;
 }
 
-.oxi-button-container button.btn.optional {
+.oxi-button-container .btn.optional {
   background-color: #e4e4da;
 }
 
-.oxi-button-container button.btn.failure,
-.oxi-form-button button.btn.failure,
-.oxi-form-button button.btn.cancel {
+.oxi-button-container .btn.failure,
+.oxi-form-button .btn.failure,
+.oxi-form-button .btn.cancel {
   background-color: #e39f9f;
 }
 
-.oxi-form-button button.btn.reset,
-.oxi-button-container button.btn.alternative {
+.oxi-form-button .btn.reset,
+.oxi-button-container .btn.alternative {
   background-color: #ffd78c;
 }
 
-.oxi-button-container button.btn.exceptional {
+.oxi-button-container .btn.exceptional {
   background-color: #79d1f3;
 }
 
