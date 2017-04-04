@@ -609,7 +609,7 @@ sub init_detail {
     
     if ($is_local_entity) {
         
-        $pattern = '<li><a href="#/openxpki/redirect!workflow!index!wf_type!%s!cert_identifier!'.$cert_identifier.'">%s</a></li>';
+        my $baseurl = 'workflow!index!cert_identifier!'.$cert_identifier.'!wf_type!';
         
         my @actions;
         my $reply = $self->send_command ( "get_cert_actions", { IDENTIFIER => $cert_identifier });
@@ -618,14 +618,14 @@ sub init_detail {
         
         if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {
             foreach my $item (@{$reply->{workflow}}) {
-                push @actions, sprintf ($pattern, $item->{workflow}, $item->{label});
+                push @actions, { page => $baseurl.$item->{workflow}, label => $item->{label}, target => '_blank' };
             }
         }
                 
         push @fields, { 
             label => 'I18N_OPENXPKI_UI_CERT_ACTION_LABEL', 
             value => \@actions,
-            format => 'rawlist'
+            format => 'linklist'
         } if (@actions);
     }     
     
