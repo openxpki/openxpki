@@ -32,3 +32,17 @@ main:
 certsearch:
    - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
      key: meta_entity
+
+certaction:
+   - label: I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY
+     workflow: certificate_privkey_export
+     condition: keyexport 
+    
+   - label: I18N_OPENXPKI_UI_CERT_ACTION_RENEW
+     workflow: certificate_renewal_request
+     condition: issued
+
+   - label: I18N_OPENXPKI_UI_CERT_ACTION_REVOKE
+     workflow: certificate_revocation_request_v2
+     condition: issued
+ 
