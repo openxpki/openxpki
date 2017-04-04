@@ -171,6 +171,10 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
 msgstr "Пауза"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
+msgstr "Комментарий"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Статус"
 
@@ -1229,6 +1233,10 @@ msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Субъект"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
+msgstr "Комментарий"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
 msgstr "Статус"
 
@@ -1698,14 +1706,6 @@ msgstr "Экспорт заявки на сертификат (CSR)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL"
 msgstr "Экспорт заявки на сертификат (CSR)"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL"
-msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
@@ -3331,22 +3331,6 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
-msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
@@ -8438,6 +8422,14 @@ msgstr "Имя учетной записи"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CALC_APPROVALS_DESC"
 #~ msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
 
@@ -10689,6 +10681,22 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
+#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"

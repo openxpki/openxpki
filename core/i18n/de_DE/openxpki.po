@@ -169,6 +169,10 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
 msgstr "Warten"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
+msgstr "Kommentar"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Status"
 
@@ -1230,6 +1234,10 @@ msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Name"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
+msgstr "Kommentar"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
 msgstr "Status"
 
@@ -1695,14 +1703,6 @@ msgstr "Exportieren des Zertifzierungsantrages"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL"
 msgstr "Exportieren des Zertifzierungsantrages"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL"
-msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
@@ -3343,22 +3343,6 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
-msgstr "Arbeitsabläufe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
-msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
-msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
@@ -8237,6 +8221,14 @@ msgstr "Benutzername"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_CALC_APPROVALS_DESC"
 #~ msgstr "Löschen der Genehmigung(en)"
 
@@ -10421,6 +10413,22 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_DD0CE3_SUCCESS_LABEL"
 #~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
+#~ msgstr "Untergeordnete Workflows"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
+#~ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_AFTER_REVOKE_QUEUE_DESC"

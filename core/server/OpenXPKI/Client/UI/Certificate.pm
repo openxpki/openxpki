@@ -8,7 +8,9 @@ use Moose;
 use Data::Dumper;
 use OpenXPKI::DN;
 use Math::BigInt;
+use DateTime;
 use Digest::SHA qw(sha1_base64);
+use OpenXPKI::i18n qw( i18nGettext );
 
 
 has __default_grid_head => (
@@ -17,7 +19,7 @@ has __default_grid_head => (
     lazy => 1,
     
     default => sub { return [
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL", sortkey => 'CERTIFICATE.CERTIFICATE_SERIAL' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL", sortkey => 'CERTIFICATE.CERT_KEY' },
         { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT", sortkey => 'CERTIFICATE.SUBJECT' },
         { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_STATUS", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
         { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
@@ -234,6 +236,10 @@ sub init_result {
                   page => 'certificate!search',
                   className => 'failure'
                 },
+                { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT', 
+                  href => $self->_client()->_config()->{'scripturl'} . '?page=certificate!export!id!'.$queryid,
+                  className => 'optional'
+                },
             ]
         }
     });
@@ -242,6 +248,109 @@ sub init_result {
 
 }
 
+
+=head2 init_export
+
+Like init_result but send the data as CSV download, default limit is 500!
+ 
+=cut
+sub init_export {
+
+    my $self = shift;
+    my $args = shift;
+        
+    my $queryid = $self->param('id');
+    
+    my $limit = $self->param('limit') || 500;
+    my $startat = $self->param('startat') || 0; 
+    
+    # Safety rule
+    if ($limit > 500) {  $limit = 500; }
+    
+    
+    # Load query from session
+    my $result = $self->_client->session()->param('query_cert_'.$queryid);
+
+    # result expired or broken id
+    if (!$result || !$result->{count}) {        
+        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        return $self->init_search();        
+    }
+
+    # Add limits
+    my $query = $result->{query};
+    $query->{LIMIT} = $limit;
+    $query->{START} = $startat;
+    
+    if (!$query->{ORDER}) {
+        $query->{ORDER} = 'CERTIFICATE.NOTBEFORE';
+        if (!defined $query->{REVERSE}) {
+            $query->{REVERSE} = 1;
+        }
+    }
+
+    $self->logger()->debug( "persisted query: " . Dumper $result);
+
+    my $search_result = $self->send_command( 'search_cert', $query );
+    
+    $self->logger()->trace( "search result: " . Dumper $search_result);
+    
+    my $header = $result->{header};
+    $header = $self->__default_grid_head() if(!$header);
+
+    my @head;
+    my @cols;
+    
+    my $ii = 0;
+    foreach my $col (@{$header}) {
+        # skip hidden fields
+        if ((!defined $col->{bVisible} || $col->{bVisible}) && $col->{sTitle} !~ /\A_/)  {
+            push @head, i18nGettext($col->{sTitle});
+            push @cols, $ii;
+        }
+        $ii++;
+    }
+
+    my $buffer = join("\t", @head)."\n";
+ 
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+    
+    foreach my $item (@{$search_result}) {
+        
+        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+            
+        my @line;
+        foreach my $cc (@cols) {
+            
+            my $col = $body->[$cc];
+            if ($col->{field} eq 'STATUS') {
+                push @line, i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS});        
+            
+            } elsif ($col->{field} =~ /(NOTAFTER|NOTBEFORE)/) {
+                
+                push @line,  DateTime->from_epoch( epoch => $item->{ $col->{field} } )->iso8601();
+                
+            } else {
+                push @line, $item->{  $col->{field} };
+            }
+        }
+        $buffer .= join("\t", @line)."\n";        
+    }
+    
+    if (scalar @{$search_result} == $limit) {
+        $buffer .= i18nGettext("I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT")."\n";
+    }
+     
+    print $self->cgi()->header( 
+        -type => 'text/tab-separated-values',
+        -expires => "1m",
+        -attachment => "certificate export " . DateTime->now()->iso8601() .  ".txt"
+    );
+    print $buffer;     
+    exit;
+
+}
 
 =head2 init_pager
 

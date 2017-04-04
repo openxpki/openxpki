@@ -155,6 +155,10 @@ msgstr "Revoca"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
 msgstr "Aggiorna i Metadati"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
+msgstr "Richiesta"
+
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_HINT"
 msgstr "Mostra i workflow correlati"
 
@@ -978,6 +982,10 @@ msgstr "Numero di serie del certificato"
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Soggetto Certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
+msgstr "Richiesta"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
@@ -1404,12 +1412,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL"
 msgstr "Carica CSR (PKCS10)"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
-msgstr "Modifica le informazioni relative alla richiesta di revoca"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL"
-msgstr "Modifica richiesta"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
@@ -2784,18 +2786,6 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
 msgstr "Certificato Emesso"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
-msgstr "Modifica le informazioni della Richiesta di Revoca"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
-msgstr "Modifica Richiesta"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
-msgstr "FALLIMENTO"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
@@ -3277,6 +3267,12 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "Approva Richiesta"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
+#~ msgstr "Modifica le informazioni relative alla richiesta di revoca"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL"
+#~ msgstr "Modifica richiesta"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DISAPPROVE_DESC"
 #~ msgstr "Disapprova"
@@ -4257,6 +4253,19 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
 #~ msgstr "ID Workflow"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
+#~ msgstr "Modifica le informazioni della Richiesta di Revoca"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
+#~ msgstr "Modifica Richiesta"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
+#~ msgstr "FALLIMENTO"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_DESC"
 #~ msgstr "Il token di firma della CA è inutilizzabile."
