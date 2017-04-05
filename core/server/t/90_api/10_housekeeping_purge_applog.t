@@ -11,7 +11,6 @@ use Test::More;
 
 use lib "$Bin/../lib";
 
-plan skip_all => "No MySQL test database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
 plan tests => 7;
 
 my $maxage = 60*60*24;  # 1 day

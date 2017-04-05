@@ -17,7 +17,6 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan skip_all => "No MySQL test database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
 plan tests => 13;
 
 #
