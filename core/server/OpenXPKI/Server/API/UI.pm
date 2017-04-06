@@ -1,25 +1,18 @@
-## OpenXPKI::Server::API::Object.pm
-##
-## Written 2005 by Michael Bell and Martin Bartosch for the OpenXPKI project
-## Copyright (C) 2005-2006 by The OpenXPKI Project
-
-=head1 Name
-
-OpenXPKI::Server::API::UI
-
-=head1 Description
-
-
-=head1 Functions
-
-=cut
-
 package OpenXPKI::Server::API::UI;
-
 use strict;
 use warnings;
 use utf8;
 use English;
+
+=head1 NAME
+
+OpenXPKI::Server::API::UI
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=cut
 
 use Data::Dumper;
 
@@ -40,7 +33,6 @@ use List::Util qw(first);
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
 sub START {
-
     # somebody tried to instantiate us, but we are just an
     # utility class with static methods
     OpenXPKI::Exception->throw( message =>
@@ -55,90 +47,68 @@ status of secret groups, expiring crls/tokens, etc.
 =cut
 
 sub get_ui_system_status {
-
     my $self = shift;
 
-    my $result;
     my $crypto = CTX('crypto_layer');
     my $pki_realm = CTX('api')->get_pki_realm();
 
     # Offline Secrets
-    my $offline = 0;
-
+    my $offline_secrets = 0;
     # Secret groups tend to have exceptions in unusual situations
     # To not crash the whole method, we put an eval around until this is
     # resolved, see #255
-
     my %secrets = $crypto->get_secret_groups();
-    foreach my $secret (keys %secrets) {
+    for my $secret (keys %secrets) {
         my $status;
         eval {
             $status = $crypto->is_secret_group_complete( $secret ) || 0;
         };
-        if (!$status) { $offline++ };
+        $offline_secrets++ unless $status;
     }
 
-    $result->{secret_offline} = $offline;
-
-    # Expiring CRLs
-    
-    # find all active tokens    
-    my $group = CTX('config')->get("realm.$pki_realm.crypto.type.certsign");
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE   => 'ALIASES',
-        COLUMNS => [ 'IDENTIFIER' ],
-        VALID_AT => time(),
-        DYNAMIC => {
-            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
-            'ALIASES.GROUP_ID' => { VALUE => $group },            
+    # Next expiring CRL
+    # - query active tokens
+    # - get last expiring CRL for each token (identifier)
+    # - within these get the CRL which expires first
+    my $now = time;
+    my $db_crl = CTX('dbi')->select_one(
+        columns => [ "MAX(next_update) AS latest_update" ],
+        from_join => "aliases identifier=issuer_identifier,pki_realm=pki_realm crl",
+        where => {
+            'aliases.pki_realm' => $pki_realm,
+            group_id => CTX('config')->get("realm.$pki_realm.crypto.type.certsign"),
+            notbefore => { '<', $now },
+            notafter => { '>', $now },
         },
+        group_by => "identifier",
+        order_by => "latest_update",
     );
-    
-    my $crl_expiry = 0;
-    foreach my $ca (@{$db_results}) {
-        my $crl_result = CTX('dbi_backend')->first(
-            TABLE   => 'CRL',
-            COLUMNS => [ 'NEXT_UPDATE' ],
-            DYNAMIC => { 
-                PKI_REALM => { VALUE => $pki_realm },
-                ISSUER_IDENTIFIER => { VALUE => $ca->{IDENTIFIER} }, 
-            },
-            ORDER => [ 'NEXT_UPDATE' ],
-            REVERSE => 1,
-        );
-        next unless ($crl_result);
-        if (($crl_expiry == 0) || ($crl_expiry > $crl_result->{NEXT_UPDATE})) {
-            $crl_expiry  = $crl_result->{NEXT_UPDATE};
-        }         
-    }    
-    $result->{crl_expiry} = $crl_expiry;
+    my $crl_expiry = $db_crl ? $db_crl->{latest_update} : 0;
 
     # Vault Token
-    my $dv_group = CTX('config')->get("crypto.type.datasafe");
-    my $dv_token = CTX('dbi_backend')->first(
-        TABLE   => 'ALIASES',
-        COLUMNS => [
-            'NOTAFTER',
-        ],
-        DYNAMIC => {
-            'PKI_REALM' => { VALUE => $pki_realm },
-            'GROUP_ID' => { VALUE => $dv_group },
+    my $db_datavault = CTX('dbi')->select_one(
+        columns => [ 'notafter' ],
+        from  => 'aliases',
+        where => {
+            pki_realm => $pki_realm,
+            group_id => CTX('config')->get("crypto.type.datasafe"),
         },
-        'ORDER' => [ 'NOTAFTER' ],
-        'REVERSE' => 1,
+        order_by => '-notafter',
     );
+    my $dv_expiry = $db_datavault->{notafter};
 
-    $result->{dv_expiry} = $dv_token->{NOTAFTER};
-
+    # Process count
     my $pids = OpenXPKI::Control::get_pids();
-    $result->{watchdog} =  scalar @{$pids->{watchdog}};
-    $result->{worker} =  scalar @{$pids->{worker}};
-    $result->{workflow} =  scalar @{$pids->{workflow}};
-    
-    $result->{version} = $OpenXPKI::VERSION::VERSION; 
 
-    return $result;
-
+    return {
+        secret_offline  => $offline_secrets,
+        crl_expiry      => $crl_expiry,
+        dv_expiry       => $dv_expiry,
+        watchdog        => scalar @{$pids->{watchdog}},
+        worker          => scalar @{$pids->{worker}},
+        workflow        => scalar @{$pids->{workflow}},
+        version         => $OpenXPKI::VERSION::VERSION,
+    }
 }
 
 sub list_process {
@@ -181,51 +151,51 @@ sub get_motd {
 
     my $role = $args->{ROLE} || CTX('session')->get_role();
 
-    # The role is used as DP Key, can also be "_any" 
+    # The role is used as DP Key, can also be "_any"
     my $datapool = CTX('api')->get_data_pool_entry({
         NAMESPACE   =>  'webui.motd',
-        KEY         =>  $role   
+        KEY         =>  $role
     });
     ##! 16: 'Item for role ' . $role .': ' . Dumper $datapool
-    
+
     # Nothing for role, so try _any
     if (!$datapool) {
         $datapool = CTX('api')->get_data_pool_entry({
             NAMESPACE   =>  'webui.motd',
-            KEY         =>  '_any' 
+            KEY         =>  '_any'
         });
-        ##! 16: 'Item for _any: ' . Dumper $datapool        
+        ##! 16: 'Item for _any: ' . Dumper $datapool
     }
 
     if ($datapool) {
-        return OpenXPKI::Serialization::Simple->new()->deserialize( $datapool->{VALUE} );        
+        return OpenXPKI::Serialization::Simple->new()->deserialize( $datapool->{VALUE} );
     }
 
     return undef;
 }
 
-=head2 render_template 
+=head2 render_template
 
-Wrapper around OpenXPKI::Template->render, expects TEMPLATE and PARAMS. 
+Wrapper around OpenXPKI::Template->render, expects TEMPLATE and PARAMS.
 This is a workaround and should be refactored, see #283
 
 =cut
 sub render_template {
-    
+
     my $self = shift;
     my $args = shift;
-    
+
     my $template = $args->{TEMPLATE};
     my $param = $args->{PARAMS};
-    
-    my $oxtt = OpenXPKI::Template->new();    
+
+    my $oxtt = OpenXPKI::Template->new();
     my $res = $oxtt->render( $template, $param );
-    
+
     # trim whitespace
     $res =~ s{ \A (\s\n)+ }{}xms;
-    $res =~ s{ (\s\n)+ \z }{}xms;    
+    $res =~ s{ (\s\n)+ \z }{}xms;
     return $res;
-    
+
 }
 
 
