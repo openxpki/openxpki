@@ -7,13 +7,14 @@ use Carp;
 use English;
 use Data::Dumper;
 use File::Basename;
+use FindBin qw( $Bin );
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
 # Project modules
-use lib qw(../../lib);
+use lib "$Bin/../../lib";
 use OpenXPKI::Test::More;
 use TestCfg;
 
@@ -51,4 +52,3 @@ $test->runcmd('control_watchdog', { ACTION => 'status' });
 $test->ok(@{$test->get_msg->{PARAMS}->{pid}} > 0);
 
 $test->disconnect();
-$test->diag("done");

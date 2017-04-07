@@ -61,7 +61,6 @@ sub execute
 		    ATTRIBUTE => $key,
 		},
 		log => {
-		    logger   => CTX('log'),
 		    priority => 'error',
 		    facility => 'system',
 		},
@@ -78,7 +77,6 @@ sub execute
 		    TYPE      => ref $value,
 		},
 		log => {
-		    logger   => CTX('log'),
 		    priority => 'error',
 		    facility => 'system',
 		},

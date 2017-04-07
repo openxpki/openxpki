@@ -39,7 +39,9 @@ Named parameters:
 
 =item * B<hostname> - Hostname for certificate (I<Str>, required)
 
-=item * B<hostname2> - List of additional hostnames for the certificate (I<ArrayRef[Str]>, optional)
+=item * B<application_name> - Application name (I<Str>, required for client profile)
+
+=item * B<hostname2> - List of additional hostnames for the certificate (I<ArrayRef[Str]>, optional for server profile)
 
 =item * B<profile> - Certificate profile (I<Str>, optional, default: I18N_OPENXPKI_PROFILE_TLS_SERVER)
 
@@ -66,6 +68,11 @@ has hostname => (
     is => 'rw',
     isa => 'Str',
     required => 1,
+);
+has application_name => (
+    is => 'rw',
+    isa => 'Str',
+    default => "Joust",
 );
 has hostname2 => (
     is => 'rw',
@@ -119,15 +126,23 @@ sub create_cert {
     my $test = $self->tester;
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
+    my $is_server_profile = $self->profile eq "I18N_OPENXPKI_PROFILE_TLS_SERVER";
+    my $is_client_profile = $self->profile eq "I18N_OPENXPKI_PROFILE_TLS_CLIENT";
+
     my %cert_subject_parts = (
         # IP addresses instead of host names will make DNS lookups fail quicker
         hostname => $self->hostname,
-        hostname2 => $self->hostname2,
-        port => 8080,
+        $is_server_profile ? (
+            hostname2 => $self->hostname2,
+            port => 8080,
+        ) : (),
+        $is_client_profile ? (
+            application_name => $self->application_name,
+        ) : (),
     );
 
     subtest "Create certificate (hostname ".$self->hostname.")" => sub {
-        plan tests => 16;
+        plan tests => 14 + ($is_server_profile ? 2 : 0);
         #plan tests => 16 + ($self->notbefore ? 2 : 0);
 
         $test->create_ok('certificate_signing_request_v2', {
@@ -155,10 +170,12 @@ sub create_cert {
             cert_subject_parts => $serializer->serialize( \%cert_subject_parts )
         });
 
-        $test->state_is('ENTER_SAN');
-        $test->execute_ok('csr_edit_san', {
-            cert_san_parts => $serializer->serialize( { } )
-        });
+        if ($is_server_profile) {
+            $test->state_is('ENTER_SAN');
+            $test->execute_ok('csr_edit_san', {
+                cert_san_parts => $serializer->serialize( { } )
+            });
+        }
 
         $test->state_is('ENTER_CERT_INFO');
         $test->execute_ok('csr_edit_cert_info', {
@@ -177,12 +194,12 @@ sub create_cert {
         my $actions = $msg->{PARAMS}->{STATE}->{option};
         my $intermediate_state;
         if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
-            diag "Test FQDNs do not resolve - handling policy violation";
+            diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
             $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
             $intermediate_state ='PENDING_POLICY_VIOLATION';
         }
         else {
-            diag "For whatever reason test FQDNs do resolve - submitting request";
+            diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
             $test->execute_ok( 'csr_submit' );
             $intermediate_state ='PENDING';
         }

@@ -198,6 +198,8 @@ sub certificate_import {
     print "  Identifier: " . $res->{IDENTIFIER} . "\n";
     print "  Realm:      " . ($res->{PKI_REALM} || 'none'). "\n";
 
+    my $return = 0;
+
     # directly register alias
     if ($params{alias} || $params{gen} || $params{token}) {
         if (!$res->{PKI_REALM}) {
@@ -207,11 +209,10 @@ sub certificate_import {
             $params{realm} = $res->{PKI_REALM};
             print "\n";
         }
-        alias_add();
+        $return = alias_add();
     }
 
-    return 0;
-
+    return $return;
 }
 
 
@@ -1481,6 +1482,7 @@ if (ref $EVAL_ERROR eq "OpenXPKI::Exception") {
     print  OpenXPKI::i18n::gettext($EVAL_ERROR->message()) ."\n";
     map { print "   $_: " . $EVAL_ERROR->params->{$_} ."\n";  } keys %{$EVAL_ERROR->params};
     print "\n";
+    exit 1;
 } elsif ($EVAL_ERROR) {
     die $EVAL_ERROR;
     print "\n";

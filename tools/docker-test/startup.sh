@@ -29,6 +29,13 @@ REPO=https://dummy:nope@github.com/$GITHUB_USER_REPO.git
 # Local repo from host (if Docker volume is mounted)
 mountpoint -q /repo && test -z "$GITHUB_USER_REPO" && REPO=file:///repo
 
+if [ "$OXI_TEST_ONLY" == "coverage" ]; then
+    if ! mountpoint -q /repo; then
+        echo -e "\nERROR: Code coverage test only work with local repo"
+        exit
+    fi
+fi
+
 echo -e "\n====[ Git checkout: $BRANCH from $REPO ]===="
 git ls-remote -h $REPO >/dev/null 2>&1
 if [ $? -ne 0 ]; then
@@ -52,10 +59,10 @@ cpanm --quiet --notest --installdeps $CLONE_DIR/
 echo -e "\n====[ MySQL ]===="
 nohup sh -c mysqld >/tmp/mysqld.log &
 set +e
-$CLONE_DIR/tools/scripts/mysql-wait-for-db.sh
+$CLONE_DIR/tools/testenv/mysql-wait-for-db.sh
 set -e
-$CLONE_DIR/tools/scripts/mysql-create-db.sh
-$CLONE_DIR/tools/scripts/mysql-create-user.sh
+$CLONE_DIR/tools/testenv/mysql-create-db.sh
+$CLONE_DIR/tools/testenv/mysql-create-user.sh
 
 #
 # OpenXPKI compilation
@@ -67,6 +74,20 @@ export USER=dummy
 cd $CLONE_DIR/core/server
 perl Makefile.PL                                        > /dev/null
 make                                                    > /dev/null
+
+#
+# Test coverage
+#
+if [ "$OXI_TEST_ONLY" == "coverage" ]; then
+    echo -e "\n====[ Testing the code coverage ]===="
+    cpanm --quiet --notest Devel::Cover
+    cover -test
+    dirname="code-coverage-$(date +'%Y%m%d-%H%M%S')"
+    mv ./cover_db "/repo/$dirname"
+    chmod -R g+w,o+w "/repo/$dirname"
+    echo -e "\nCode coverage results available in project root dir:\n$dirname"
+    exit
+fi
 
 #
 # Unit tests
@@ -93,18 +114,18 @@ cp -R $CLONE_DIR/config/openxpki /etc
 
 # customize config
 sed -ri 's/^((user|group):\s+)\w+/\1root/' /etc/openxpki/config.d/system/server.yaml
-$CLONE_DIR/tools/scripts/mysql-oxi-config.sh
+$CLONE_DIR/tools/testenv/mysql-oxi-config.sh
 
 #
 # Database re-init
 #
-$CLONE_DIR/tools/scripts/mysql-create-db.sh
-$CLONE_DIR/tools/scripts/mysql-create-schema.sh
+$CLONE_DIR/tools/testenv/mysql-create-db.sh
+$CLONE_DIR/tools/testenv/mysql-create-schema.sh
 
 #
 # Sample config (CA certificates etc.)
 #
-$CLONE_DIR/tools/testdata/insert-test-certificates.sh
+$CLONE_DIR/tools/testenv/insert-certificates.sh
 
 #
 # Start OpenXPKI

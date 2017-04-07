@@ -1722,7 +1722,6 @@ sub AUTOMETHOD {
                     'METHOD_NAME' => $method_name,
                 },
         log => {
-            logger => CTX('log'),
             priority => 'info',
             facility => 'system',
         },
@@ -1776,7 +1775,6 @@ sub AUTOMETHOD {
                         'EVAL_ERROR' => $EVAL_ERROR,
                     },
             log => {
-            logger => CTX('log'),
             priority => 'error',
             facility => [ 'system', 'audit' ]
             },

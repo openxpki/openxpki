@@ -6,8 +6,9 @@ use warnings;
 use Carp;
 use English;
 use Data::Dumper;
-use File::Basename;
+use File::Basename qw( dirname );
 use File::Temp qw( tempdir );
+use FindBin qw( $Bin );
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
@@ -18,11 +19,10 @@ use Math::BigInt;
 use Data::UUID;
 
 # Project modules
-use lib qw(../../lib);
+use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
 use OpenXPKI::Test::More;
-use OpenXPKI::Test::CertHelper;
-use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test;
 
 #
 # Init client
@@ -48,14 +48,17 @@ $test->connect_ok(
 #
 
 # Import test certificates
-my $dbdata = OpenXPKI::Test::CertHelper->via_database;
+my $oxitest = OpenXPKI::Test->new;
+my $dbdata = $oxitest->certhelper_database;
+$oxitest->insert_testcerts;
 
 # By PROFILE
+my $realm = $dbdata->cert("beta_root_1")->db->{pki_realm};
 $test->runcmd_ok('search_cert_count', {
-    PKI_REALM => $dbdata->cert("acme_root")->db->{pki_realm},
+    PKI_REALM => $dbdata->cert("beta_root_1")->db->{pki_realm},
 }, "Search and count certificates") or diag Dumper($test->get_msg);
 
-is $test->get_msg->{PARAMS}, 3, "Correct number";
+is $test->get_msg->{PARAMS}, scalar($dbdata->cert_names_where(pki_realm => $realm)), "Correct number";
 
-$dbdata->delete_all; # only deletes those from OpenXPKI::Test::CertHelper::Database
+$oxitest->delete_testcerts; # only deletes those from OpenXPKI::Test::CertHelper::Database
 $test->disconnect;

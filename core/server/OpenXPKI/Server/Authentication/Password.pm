@@ -106,7 +106,6 @@ sub login_step {
             USER => $account, 
         },
         log => {
-            logger => CTX('log'),
             priority => 'fatal',
             facility => 'system',
         },
@@ -121,7 +120,6 @@ sub login_step {
                 SCHEME => $scheme,
             },
             log => {
-                logger => CTX('log'),
                 priority => 'fatal',
                 facility => 'system',
         });

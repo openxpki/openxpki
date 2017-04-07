@@ -56,7 +56,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id");
+diag("Workflow Id is $wf_id") if $ENV{TEST_VERBOSE};
 
 $result = $client->mock_request({
     'page' => $result->{goto},

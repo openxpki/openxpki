@@ -15,7 +15,7 @@ In contrast, the Data Pool feature allows for persistent storage of structured d
 
 == Data Pool properties ==
 
-The Data Pool provides a canonical method for storing key/value tuples that are not specific to a particular workflow instance. This mechanism is available both from the server core and from the Workflow engine. 
+The Data Pool provides a canonical method for storing key/value tuples that are not specific to a particular workflow instance. This mechanism is available both from the server core and from the Workflow engine.
 
 The Data Pool can store plain text and encrypted data. Encrypted data is handled transparently for the caller (see below).
 
@@ -23,7 +23,7 @@ Access to the data pool is allowed only via the defined Server API calls.
 
 === Data access ===
 
-Data is organized by [PKI Realm, namespace, key] which forms the primary key for accessing the corresponding value. This means that the same key 
+Data is organized by [PKI Realm, namespace, key] which forms the primary key for accessing the corresponding value. This means that the same key
 can exist in multiple namespaces and that the same namespace name can exist in multiple PKI Realms.
 
 ==== PKI Realm ====
@@ -59,7 +59,7 @@ Currently only Scalar values may be stored in the data pool.
 
 ==== Modification date ====
 
-The API call to write a value to the data pool also sets a modification time stamp in the created record. The modification time stamp is returned 
+The API call to write a value to the data pool also sets a modification time stamp in the created record. The modification time stamp is returned
 by the corresponding read API calls.
 
 The modification date is specified in seconds since Epoch.
@@ -74,7 +74,7 @@ The expiration date is specified in seconds since Epoch.
 
 === Data pool encryption ===
 
-The data pool supports encryption of individual entries in order to protect sensitive data. The encryption shall prevent administrators and 
+The data pool supports encryption of individual entries in order to protect sensitive data. The encryption shall prevent administrators and
 users of the system from directly accessing stored data. Within the OpenXPKI server data may be transparently decrypted at any time.
 
 When creating a key/value tuple via the corresponding API call the creator may request encryption for the stored data. If encryption is requested and the necessary keys are available the server encrypts the value and stores the encrypted value in the database.
@@ -88,8 +88,8 @@ If the server cannot access the necessary keys to decrypt the value it throws an
 == Encrypted data storage ==
 
 === Key Management Logic ===
- 
-At any given time, the datapool encryption feature uses one single symmetric key for encryption of new keys. 
+
+At any given time, the datapool encryption feature uses one single symmetric key for encryption of new keys.
 
 The same symmetric key will be used for encrypting all data pool entries during the usage time of the password safe, i. e. there is a 1:1 connection
 between password safe and symmetric key used for encryption of data pool entries.
@@ -132,49 +132,49 @@ This namespace maps a symmetric key id to its corresponding encryption key value
 Table: '''datapool'''
 
 {| border="1"
-! pki_realm 
+! pki_realm
 ! namespace
 ! datapool_key
 ! datapool_value
 ! encryption_key
 ! notafter
 ! last_update
-|- 
-| MYREALM 
-| sys.datapool.pwsafe 
+|-
+| MYREALM
+| sys.datapool.pwsafe
 | p7:passwordsafe1
-| 75SKlOB23rVCs0pqGV4iRv2cx2g  
-|                                 
-|  NULL 
+| 75SKlOB23rVCs0pqGV4iRv2cx2g
+|
+|  NULL
 |  1270368620
 |-
-| MYREALM 
-| sys.datapool.keys     
-| 75SKlOB23rVCs0pqGV4iRv2cx2g 
-| -----BEGIN PKCS7-----MIIBu... 
+| MYREALM
+| sys.datapool.keys
+| 75SKlOB23rVCs0pqGV4iRv2cx2g
+| -----BEGIN PKCS7-----MIIBu...
 | p7:passwordsafe1
-| NULL 
+| NULL
 |  1270368620
 |-
-| MYREALM 
-| smartcard.puk          
-| gem2_123456                                  
-| 75SKlOB2;base64-oneline;92wb/FsR+d1/YMs1 
-| 75SKlOB23rVCs0pqGV4iRv2cx2g 
-| 1270368680 
+| MYREALM
+| smartcard.puk
+| gem2_123456
+| 75SKlOB2;base64-oneline;92wb/FsR+d1/YMs1
+| 75SKlOB23rVCs0pqGV4iRv2cx2g
+| 1270368680
 |  1270368620
 |}
 
 ==== Decryption ====
 
-In this example the value for key "gem2_123456" in namespace "smartcard.puk" is encrypted. 
+In this example the value for key "gem2_123456" in namespace "smartcard.puk" is encrypted.
 
-* The data pool is asked to get the corresponding value it checks the encryption_key column. 
-* If it is null, the value is unencrypted and directly returned. 
+* The data pool is asked to get the corresponding value it checks the encryption_key column.
+* If it is null, the value is unencrypted and directly returned.
 * In this case, it finds the value "75SKlOB23rVCs0pqGV4iRv2cx2g", which is the symmetric key identifier used for encryption of the value.
-* Now it tries to obtain the symmetric key by querying namespace "sys.datapool.keys" for "75SKlOB23rVCs0pqGV4iRv2cx2g". 
-* For this key it finds that a value is encrypted with "p7:passwordsafe1". 
-* Now it tries to decrypt the stored value "-----BEGIN PKCS7..." with the asymmetric passwordsafe1 key. 
+* Now it tries to obtain the symmetric key by querying namespace "sys.datapool.keys" for "75SKlOB23rVCs0pqGV4iRv2cx2g".
+* For this key it finds that a value is encrypted with "p7:passwordsafe1".
+* Now it tries to decrypt the stored value "-----BEGIN PKCS7..." with the asymmetric passwordsafe1 key.
 * The resulting value is the used to decrypt the original encrypted value.
 
 ==== Encryption ====
@@ -184,9 +184,9 @@ A new key/value pair "gem2_98765" -> "1234" shall be encrypted.
 * The data pool determines the currently active password safe, which is literally "passwordsafe1"
 * It checks the "sys.datapool.pwsafe" table to obtain the corresponding symmetric key id.
 * It finds "75SKlOB23rVCs0pqGV4iRv2cx2g".
-* Now it tries to obtain the symmetric key by querying namespace "sys.datapool.keys" for "75SKlOB23rVCs0pqGV4iRv2cx2g". 
-* For this key it finds that a value is encrypted with "p7:passwordsafe1". 
-* Now it tries to decrypt the stored value "-----BEGIN PKCS7..." with the asymmetric passwordsafe1 key. 
+* Now it tries to obtain the symmetric key by querying namespace "sys.datapool.keys" for "75SKlOB23rVCs0pqGV4iRv2cx2g".
+* For this key it finds that a value is encrypted with "p7:passwordsafe1".
+* Now it tries to decrypt the stored value "-----BEGIN PKCS7..." with the asymmetric passwordsafe1 key.
 * The resulting value is the used to encrypt the value to store.
 
 === Optimizations ===
@@ -209,7 +209,7 @@ Several optimizations help to avoid unnecessary asymmetric operations which cons
   })
 </code>
 
-Returns: true on success, throws exception on error. 
+Returns: true on success, throws exception on error.
 
 * If directly called from a Workflow Activity the API requires PKI_REALM set identical to session PKI Realm.
 * If VALUE is undefined, the corresponding tuple will be deleted from the table.
@@ -219,10 +219,9 @@ Returns: true on success, throws exception on error.
 safe certificate). Retrieving encrypted information will only work if the password safe key is available during the first access to the symmetric key.
 
 Exceptions:
-; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_PKI_REALM : Invalid PKI Realm was specified.
+; OpenXPKI::Exception : Various causes (invalid PKI realm specified, key already exists).
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_NAMESPACE : Invalid (e. g. reserved) namespace was specified.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_READ_ONLY_DATA : Attempt to modify read-only data.
-; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENTRY_EXISTS : Specified key already exists.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENCRYPTION_NOT_CONFIGURED : Encryption is not set up properly.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENCRYPTION_KEY_UNAVAILABLE : Encryption key is currently not available (e. g. not logged in), cannot encrypt value.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_INVALID_VALUE_DATA_TYPE : Value data type is not supported.
@@ -256,7 +255,7 @@ Returns: Hashref:
 </code>
 
 Exceptions:
-; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_INVALID_PKI_REALM : Invalid PKI Realm was specified.
+; OpenXPKI::Exception : Invalid PKI Realm was specified.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_INVALID_NAMESPACE : Invalid (e. g. reserved) namespace was specified.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_ENCRYPTION_NOT_CONFIGURED : Encryption is not set up properly.
 ; I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_ENTRY_ENCRYPTION_KEY_UNAVAILABLE : Encryption key is currently not available (e. g. not logged in), cannot decrypt value.
@@ -285,7 +284,7 @@ Returns: arrayref:
 </code>
 
 Exceptions:
-; I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM : Invalid PKI Realm was specified.
+; OpenXPKI::Exception : Invalid PKI Realm was specified.
 
 
 
@@ -300,7 +299,7 @@ In order to store a PUK securely from a Workflow the following code could be use
       my $pki_realm  = CTX('api')->get_pki_realm();
       my $smartcard_id = 'gem2_123456';
       my $smartcard_puk = 'sUpers3cr3t';
-  
+
       CTX('api')->set_data_pool_entry(
   	  {
   	      PKI_REALM => $pki_realm,
@@ -317,7 +316,7 @@ In order to retrieve the encrypted PUK the following code is used:
 <code>
       my $pki_realm  = CTX('api')->get_pki_realm();
       my $smartcard_id = 'gem2_123456';
-      my $data = 
+      my $data =
   	CTX('api')->get_data_pool_entry(
   	    {
   		PKI_REALM => $pki_realm,
@@ -380,9 +379,9 @@ The following entry could be written if a new process has been spawned:
                    COUNTER  => [ 0 ],
                    CONFIG_ID => 'default',
   );
-  
+
   my $processes = .... # get server statistics to store
-  
+
   CTX('api')->set_data_pool_entry(
   	  {
   	      PKI_REALM => '/',

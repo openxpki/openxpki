@@ -172,7 +172,6 @@ sub __send_cert : PRIVATE {
                 SERIAL_DEC => $requested_serial_dec,
             },
             log => {
-                logger => CTX('log'),
                 priority => 'error',
                 facility => 'application',
             },

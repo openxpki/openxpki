@@ -276,21 +276,19 @@ sub load_extension
 
             # Special case, Sequences needs to be written to a new section
             if ($attr->{encoding} eq 'SEQUENCE') {
-                
                 $self->set_oid_extension_sequence(
                     NAME => $name,
                     CRITICAL => $attr->{critical} ? 'true' : 'false',
                     VALUES   => $attr->{value}
                 );
-
             } else {
 
                 my $val = '';
-                # format and encoding can be given as extra parameters but 
+                # format and encoding can be given as extra parameters but
                 # finally just end up concatenated with the value
                 if ($attr->{format}) {
                     $val .= $attr->{format}.':';
-                } 
+                }
                 if ($attr->{encoding}) {
                     $val .= $attr->{encoding}.':';
                 }

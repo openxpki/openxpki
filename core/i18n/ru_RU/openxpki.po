@@ -5967,10 +5967,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "IP адрес __IP__ противоречит требованиям стандартов IPv4 и IPv6."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_INVALID_PKI_REALM"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GET_DATA_POOL_SYMMETRIC_ENCRYPTION_KEY_NOT_AVAILABLE"
 #~ msgstr "SPKAC строка пуста."
 
@@ -5983,10 +5979,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_LIST_DATA_POOL_ENTRIES_INVALID_PKI_REALM"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB"
 #~ msgstr "SPKAC строка пуста."
 
@@ -5996,10 +5988,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_CERT_NOT_AVAILABLE"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_ENTRY_ENTRY_EXISTS"
 #~ msgstr "SPKAC строка пуста."
 
 #, fuzzy

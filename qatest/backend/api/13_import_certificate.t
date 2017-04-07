@@ -6,8 +6,8 @@ use warnings;
 use Carp;
 use English;
 use Data::Dumper;
-use File::Basename;
-use File::Temp qw( tempdir );
+use File::Basename qw( dirname );
+use FindBin qw( $Bin );
 
 # CPAN modules
 use Log::Log4perl qw(:easy);
@@ -16,11 +16,11 @@ use Test::More;
 use Test::Deep;
 
 # Project modules
-use lib qw(../../lib);
+use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
 use OpenXPKI::Test::More;
 use OpenXPKI::Test::CertHelper;
-use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test;
 
 =pod
 
@@ -108,7 +108,8 @@ $test->connect_ok(
 #
 # Init helpers
 #
-my $dbdata = OpenXPKI::Test::CertHelper::Database->new;
+my $oxitest = OpenXPKI::Test->new;
+my $dbdata = $oxitest->certhelper_database;
 
 #
 # Create new test certificates on disk
@@ -137,17 +138,17 @@ $test->runcmd_ok('import_certificate', { DATA => $cert_pem2, REVOKED => 1 }, "Im
     or diag "ERROR: ".$test->error;
 $test->is($test->get_msg->{PARAMS}->{STATUS}, "REVOKED", "Certificate should be marked as REVOKED");
 
-import_failsok($test, $dbdata->cert("orphan"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER");
-import_ok     ($test, $dbdata->cert("orphan"), FORCE_NOCHAIN => 1);
+import_failsok($test, $dbdata->cert("gamma_bob_1"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER");
+import_ok     ($test, $dbdata->cert("gamma_bob_1"), FORCE_NOCHAIN => 1);
 
-import_ok     ($test, $dbdata->cert("acme_root"));
-import_ok     ($test, $dbdata->cert("acme_signer"));
-import_ok     ($test, $dbdata->cert("expired_root"));
-import_failsok($test, $dbdata->cert("expired_signer"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN");
-import_ok     ($test, $dbdata->cert("expired_signer"), FORCE_ISSUER=>1);
-import_ok     ($test, $dbdata->cert("expired_client"), FORCE_NOVERIFY=>1);
+import_ok     ($test, $dbdata->cert("alpha_root_2"));
+import_ok     ($test, $dbdata->cert("alpha_signer_2"));
+import_ok     ($test, $dbdata->cert("alpha_root_1"));
+import_failsok($test, $dbdata->cert("alpha_signer_1"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN");
+import_ok     ($test, $dbdata->cert("alpha_signer_1"), FORCE_ISSUER=>1);
+import_ok     ($test, $dbdata->cert("alpha_alice_1"), FORCE_NOVERIFY=>1);
 
 # Cleanup database
-$dbdata->delete_all;
+$oxitest->delete_testcerts;
 
 $test->disconnect;

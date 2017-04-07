@@ -86,7 +86,6 @@ sub validate {
                     'LDAP_PORT'   => $self->ldap_port,
                 },
                 log => {
-                    logger   => CTX('log'),
                     priority => 'error',
                     facility => 'monitor',
                 },
@@ -104,7 +103,6 @@ sub validate {
                     ERROR_DESC => $mesg->error_desc(),
                 },
                 log => {
-                    logger   => CTX('log'),
                     priority => 'error',
                     facility => 'monitor',
                 },

@@ -10,9 +10,8 @@
 use strict;
 use warnings;
 
-use lib qw(
-  ../../lib
-);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
 
 use Carp;
 use English;
@@ -44,7 +43,7 @@ my $test = OpenXPKI::Test::More->new(
 $test->set_verbose($cfg{instance}{verbose});
 
 $test->plan( tests => 4 );
- 
+
 my $buffer = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<', $cfg{instance}{buffer};
@@ -59,7 +58,7 @@ my $wf_id = $input_data->{'wf_id'};
 
 $test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier')
  || die "Unable to proceed without Certificate Identifier: $@";
- 
+
 
 # Login to use socket
 $test->connect_ok(
@@ -81,4 +80,4 @@ if ($test->state() eq 'CHECK_FOR_REVOCATION') {
 $test->state_is('SUCCESS');
 
 $test->disconnect();
- 
+

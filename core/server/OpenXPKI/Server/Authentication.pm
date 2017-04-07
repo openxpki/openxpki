@@ -192,7 +192,6 @@ sub login_step {
 		STACK => $stack
 	    },
 	    log     => {
-		logger => CTX('log'),
 		priority => 'warn',
 		facility => 'auth'
 	    },
@@ -216,7 +215,6 @@ sub login_step {
 		    HANDLER => $handler,
 		},
 		log => {
-		    logger => CTX('log'),
 		    priority => 'error',
 		    facility => 'auth',
 		},
@@ -246,7 +244,6 @@ sub login_step {
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $exc ],
 		log => {
-		    logger => CTX('log'),
 		    priority => 'warn',
 		    facility => 'auth',
 		},
@@ -257,7 +254,6 @@ sub login_step {
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $EVAL_ERROR->message() ],
 		log => {
-		    logger => CTX('log'),
 		    priority => 'warn',
 		    facility => 'auth',
 		},

@@ -43,7 +43,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id");
+diag("Workflow Id is $wf_id") if $ENV{TEST_VERBOSE};
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -92,7 +92,7 @@ if ($result->{main}->[0]->{content}->{buttons}->[0]->{action} =~ /csr_submit/) {
     $result = $client->mock_request({
         'action' => 'workflow!select!wf_action!csr_enter_policy_violation_comment!wf_id!' . $wf_id
     });
-    
+
     $result = $client->mock_request({
         'action' => 'workflow!index',
         'policy_comment' => 'Reason for Exception',

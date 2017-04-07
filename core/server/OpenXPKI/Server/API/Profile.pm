@@ -43,7 +43,7 @@ sub __fetch_input_element_definitions {
     my $profile = shift;
     my $input_names = shift;
     my $csr_info = shift;
-    
+
     if ($csr_info) {
         OpenXPKI::Exception->throw(
             message => 'input rendering with pkcs10 is deprecated',
@@ -88,7 +88,7 @@ sub __fetch_input_element_definitions {
 
         # Uppercase the keys and push it to the array
         my %ucinput = map { uc $_ => $input->{$_} } keys %{$input};
-        
+
         # if type is select, add options array ref
         if ($ucinput{TYPE} eq 'select') {
             ##! 32: 'type is select'
@@ -152,7 +152,7 @@ sub get_cert_subject_styles {
     ##! 1: 'start'
 
     my $config = CTX('config');
- 
+
     my $styles = {};
 
     my @style_names = $config->get_keys("profile.$profile.style");
@@ -263,7 +263,7 @@ sub get_field_definition {
 
 }
 
- 
+
 sub get_cert_profiles {
 
     my $self = shift;
@@ -302,38 +302,27 @@ sub get_cert_profiles {
 =head2
 
 List profiles that are used for entity certificates in the current realm
- 
+
 =cut
 
-sub list_used_profiles { 
-    
-    my $self = shift;
-    my $args = shift;
-        
-    my $cfg = CTX('config');
-    
-    my $pki_realm = $args->{PKI_REALM} ? $args->{PKI_REALM} : CTX('session')->get_pki_realm();    
-    
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE   => [ 'CSR' ],
-        DISTINCT => 1,
-        COLUMNS => [ 'CSR.PROFILE' ],
-        JOIN => [['CSR_SERIAL']],        
-        DYNAMIC => { 'CSR.PKI_REALM' => $pki_realm }
-    );
-    
-    my @result;
-    while (my $line = shift @{$db_results}) {
-        my $profile = $line->{'CSR.PROFILE'}; 
-        my $label = $cfg->get([ 'profile', $profile, 'label' ]);
-        push @result, {
-            value => $profile,
-            label => $label || $profile,             
-        };
-    }
-       
-    return \@result;
-    
+sub list_used_profiles {
+    my ($self, $args) = @_;
+    my $pki_realm = $args->{PKI_REALM} ? $args->{PKI_REALM} : CTX('session')->get_pki_realm();
+
+    my $profiles = CTX('dbi')->select(
+        from => 'csr',
+        columns => [ -distinct => 'profile' ],
+        where => { pki_realm => $pki_realm },
+    )->fetchall_arrayref({});
+
+    return [
+        map {
+            {
+                value => $_->{profile},
+                label => CTX('config')->get(['profile', $_->{profile}, 'label']) || $_->{profile},
+            }
+        } @$profiles
+    ];
 }
 
 

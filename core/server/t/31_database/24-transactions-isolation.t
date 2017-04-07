@@ -48,6 +48,16 @@ my $db_params = {
 my $db_alice = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params);
 my $db_bob   = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params);
 
+# Checks if db handle "bob" sees the given data in table "test"
+sub bob_sees {
+    my ($id, $text, $message) = @_;
+    my $data;
+    lives_and {
+        $data = $db_bob->select_one(from => "test", columns => [ "id", "text" ], where => { id => $id });
+        is_deeply $data, ($text ? { id => $id, text => $text } : undef);
+    } $message;
+}
+
 #
 # create test table
 #
@@ -56,7 +66,6 @@ $db_alice->start_txn;
 $db_alice->run("CREATE TABLE test (id INTEGER PRIMARY KEY, text VARCHAR(100))");
 $db_alice->insert(into => "test", values => { id => 1, text => "Litfasssaeule" });
 $db_alice->insert(into => "test", values => { id => 2, text => "Buergersteig" });
-$db_alice->insert(into => "test", values => { id => 3, text => "Rathaus" });
 $db_alice->commit;
 
 #
@@ -70,19 +79,13 @@ lives_ok {
     $db_alice->update(table => "test", set => { text => "LED-Panel" }, where => { id => 1 });
 } "Test 1: Alice starts an update transaction";
 
-lives_and {
-    $data = $db_bob->select_one(from => "test", columns => [ "id", "text" ], where => { id => 1 });
-    is_deeply $data, { id => 1, text => "Litfasssaeule" };
-} "Test 1: Bob still sees old data";
+bob_sees 1, "Litfasssaeule", "Test 1: Bob still sees old data";
 
 lives_ok {
     $db_alice->commit;
 } "Test 1: Alice commits transaction";
 
-lives_and {
-    $data = $db_bob->select_one(from => "test", columns => [ "id", "text" ], where => { id => 1 });
-    is_deeply $data, { id => 1, text => "LED-Panel" };
-} "Test 1: Bob sees Alices new data";
+bob_sees 1, "LED-Panel", "Test 1: Bob sees Alices new data";
 
 # Two instances writing
 lives_ok {
@@ -98,21 +101,40 @@ dies_ok {
     $db_bob->update(table => "test", set => { text => "Marktgasse" }, where => { id => 2 });
 } "Test 2: Bob fails trying to update the same row (MySQL lock)";
 
-lives_and {
-    $data = $db_bob->select_one(from => "test", columns => [ "id", "text" ], where => { id => 2 });
-    is_deeply $data, { id => 2, text => "Buergersteig" };
-} "Test 2: Bob still sees old data";
+bob_sees 2, "Buergersteig", "Test 2: Bob still sees old data";
 
 lives_ok {
     $db_alice->commit;
 } "Test 2: Alice commits transaction";
 
-lives_and {
-    $data = $db_bob->select_one(from => "test", columns => [ "id", "text" ], where => { id => 2 });
-    is_deeply $data, { id => 2, text => "Shopping-Meile" };
-} "Test 2: Bob sees Alices new data";
+bob_sees 2, "Shopping-Meile", "Test 2: Bob sees Alices new data";
+
+# Combined "query & commit" commands
+lives_ok {
+    $db_alice->insert_and_commit(into => "test", values => { text => "Hutladen", id => 3 });
+} "Test 3: Alice runs an 'insert & commit' command";
+
+bob_sees 3, "Hutladen", "Test 3: Bob sees Alices new data";
+
+lives_ok {
+    $db_alice->update_and_commit(table => "test", set => { text => "Basecap-Shop" }, where => { id => 3 });
+} "Test 3: Alice runs an 'update & commit' command";
+
+bob_sees 3, "Basecap-Shop", "Test 3: Bob sees Alices new data";
+
+lives_ok {
+    $db_alice->merge_and_commit(into => "test", set => { text => "Happy Hat" }, where => { id => 3 });
+} "Test 3: Alice runs an 'merge & commit' command";
+
+bob_sees 3, "Happy Hat", "Test 3: Bob sees Alices new data";
+
+lives_ok {
+    $db_alice->delete_and_commit(from => "test", where => { id => 3 });
+} "Test 3: Alice runs an 'delete & commit' command";
+
+bob_sees 3, undef, "Test 3: Bob sees Alices deletions";
 
 $db_bob->commit; # to be able to drop database
 $db_alice->run("DROP TABLE test");
 
-done_testing(12);
+done_testing(20);

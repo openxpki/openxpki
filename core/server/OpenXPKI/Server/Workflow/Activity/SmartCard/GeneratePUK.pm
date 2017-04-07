@@ -119,7 +119,6 @@ sub execute {
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENERATEPUK_BAD_POLICY',
             params => {},
             log    => {
-                logger   => CTX('log'),
                 priority => 'warn',
                 facility => 'system',
             },

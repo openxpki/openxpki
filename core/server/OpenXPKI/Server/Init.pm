@@ -395,7 +395,7 @@ sub __do_init_dbi_log {
     CTX('dbi_log')->connect();
 }
 
-
+# TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
 sub __do_init_dbi {
 
     my $args = shift;
@@ -403,7 +403,7 @@ sub __do_init_dbi {
     ##! 1: "start"
 
     my $config = CTX('config');
-    my $dbpath = [ 'system','database','main' ];
+    my $dbpath = 'system.database.main';
     my $db_config = $config->get_hash( $dbpath );
 
     # Set environment variables
@@ -420,7 +420,7 @@ sub __do_init_dbi {
     );
     delete $params{environment};
     delete $params{log};
-    delete $params{debug};         # TODO Legacy: remove treatment of DB parameter "debug" (occurs in example database.yaml)
+    delete $params{debug};         # TODO #legacydb Remove treatment of DB parameter "debug" (occurs in example database.yaml)
 
     OpenXPKI::Server::Context::setcontext({
         dbi => OpenXPKI::Server::Database->new(

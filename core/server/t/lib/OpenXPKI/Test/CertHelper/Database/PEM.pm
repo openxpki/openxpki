@@ -10,7 +10,7 @@ OpenXPKI::Test::CertHelper::Database::PEM - Represents a test certificate (PEM +
 
     my $pem = OpenXPKI::Test::CertHelper::Database::PEM->new(
         label => "ACME Root CA",
-        database => {
+        db => {
             authority_key_identifier => 'C6:17:6E:AC:2E:7F:3C:9B:B0:AB:83:B6:5A:C2:F0:14:6C:A9:A4:4A',
             cert_key => '15209797771827521724',
             # ... all fields of table "certificate"
@@ -22,7 +22,15 @@ OpenXPKI::Test::CertHelper::Database::PEM - Represents a test certificate (PEM +
 
 =cut
 
+# HashRef containing all fields from table "certificate"
 has db => (
+    is => "rw",
+    isa => "HashRef",
+    required => 1,
+);
+
+# HashRef containing these fields from table "aliases": alias, group_id, generation
+has db_alias => (
     is => "rw",
     isa => "HashRef",
     required => 1,

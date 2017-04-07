@@ -117,7 +117,6 @@ sub execute
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER',
                 log     => {
-                    logger   => CTX('log'),
                     priority => 'info',
                     facility => 'system',
                 },
