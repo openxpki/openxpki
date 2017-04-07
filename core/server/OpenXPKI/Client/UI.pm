@@ -7,6 +7,7 @@ package OpenXPKI::Client::UI;
 use Moose;
 
 use English;
+use CGI::Session;
 use OpenXPKI::Client;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;

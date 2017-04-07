@@ -9,7 +9,7 @@
 
 use CGI 4.08;
 use CGI::Fast;
-use CGI::Session qw/-ip-match/;
+use CGI::Session;
 use CGI::Carp qw (fatalsToBrowser);
 use JSON;
 use English;
@@ -61,7 +61,12 @@ foreach my $key (keys %{$config{header}}) {
     $key =~ s/-/_/g;
     push @header_tpl, ("-$key", $val);
 }
-   
+
+
+if ($config{global}{ip_match}) {
+   $CGI::Session::IP_MATCH = 1;
+}
+
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 
 # We persist the client in the CGI *per session*

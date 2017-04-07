@@ -16,8 +16,7 @@ use OpenXPKI::i18n;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 
-## switch off IP checks
-use CGI::Session qw/-ip-match/;
+use CGI::Session;
 use Digest::SHA qw( sha1_hex );;
 
 ## constructor and destructor stuff
