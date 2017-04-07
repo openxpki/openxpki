@@ -25,7 +25,7 @@ use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session::Mock;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
 
@@ -198,14 +198,15 @@ sub setup_env {
         init => { isa => 'ArrayRef[Str]', optional => 1 },
     );
 
-    my $session = OpenXPKI::Server::Session::Mock->new;
-    OpenXPKI::Server::Context::setcontext({'session' => $session});
-    $session->set_pki_realm('dummy'); # initial dummy realm
+    # Start with mock session
+    #  - Setting PKI realm to first realm from test config. This is important as
+    #    different constructors for context (CTX) objects query the realm (???)
+    my $mock_session = OpenXPKI::Server::Session::Mock->new;
+    $mock_session->set_pki_realm('dummy');
+    OpenXPKI::Server::Context::setcontext({'session' => $mock_session});
 
     # Init Log4perl
     $self->_init_screen_log;
-
-    # Read database configuration
 
     # Create base directory for test configuration
     $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d"; # so OpenXPKI::Config will access our config from now on
@@ -220,8 +221,6 @@ sub setup_env {
         $self->config_writer->write_private_key($realm, $alias, $self->certhelper_database->private_keys->{$alias});
     }
 
-    $session->set_pki_realm($self->config_writer->realms->[0]); # use first realm from test config
-
     # our default tasks
     my @tasks = qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api );
     my %task_hash = map { $_ => 1 } @tasks;
@@ -230,12 +229,20 @@ sub setup_env {
 
     # Init basic CTX objects
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
-    # set context session item again because OpenXPKI::Server::Init::init deleted it
-    OpenXPKI::Server::Context::setcontext({'session' => $session});
+
+    # Set real session (OpenXPKI::Server::Init::init "killed" the old one anyway)
+    my $session = OpenXPKI::Server::Session->new({
+        DIRECTORY => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.directory"),
+        LIFETIME  => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.lifetime"),
+    });
+    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+    # set PKI realm after init() as various init procedures overwrite the realm
+    $session->set_pki_realm($self->config_writer->realms->[0]);
 
     OpenXPKI::Server::Context::CTX('dbi_backend')->connect;
     OpenXPKI::Server::Context::CTX('dbi_workflow')->connect;
 }
+
 
 =head2 add_realm_config
 
@@ -270,23 +277,69 @@ B<Parameters>
 
 =item * I<$realm> - PKI realm
 
-=item * I<$config_path> - The dot separated config path below C<realm.xxx> where
+=item * I<$config_path> - dot separated config path below C<realm.xxx> where
 to store the configuration
 
-=item * I<$yaml_hash> - A I<HashRef> with configuration data that will be
-converted into YAML and stored on disk.
+=item * I<$yaml_hash> - I<HashRef> with configuration data that will be
+converted into YAML and stored on disk
 
 =cut
 sub add_realm_config {
     my ($self, $realm, $config_path, $yaml_hash) = @_;
-    $self->config_writer->write_realm_config($realm, $config_path, $yaml_hash);
-    # re-read config
-    OpenXPKI::Server::Context::setcontext({
-        config => OpenXPKI::Config->new,
-        force => 1,
-    });
+    $self->config_writer->add_realm_config($realm, $config_path, $yaml_hash);
 }
 
+=head2 add_workflow
+
+Add a workflow definition and reload server config C<CTX('config')>.
+
+Example:
+
+    $oxitest->add_workflow(
+        "def.set_motd",
+        {
+            head => {
+                prefix    => "motd",
+                persister => "Volatile",
+                label     => "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL",
+            },
+            state => {
+                INITIAL => {
+                    ...
+                },
+            },
+            ....
+        },
+    );
+
+This would write a file I<etc/openxpki/config.d/realm/alpha/workflow/def/set_motd.yaml>
+(below C<$oxitest-E<gt>testenv_root>) with this content:
+
+    head:
+      prefix: motd
+      persister: Volatile
+      label: I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL
+
+    state:
+      INITIAL:
+      ...
+
+B<Parameters>
+
+=over
+
+=item * I<$realm> - PKI realm
+
+=item * I<$name> - name of the workflow to be added below C<realm.xxx.workflow.def>
+
+=item * I<$yaml_hash> - I<HashRef> with configuration data that will be
+converted into YAML and stored on disk
+
+=cut
+sub add_workflow {
+    my ($self, $realm, $name, $yaml_hash) = @_;
+    $self->config_writer->add_realm_config($realm, "workflow.def.$name", $yaml_hash);
+}
 =head2 insert_testcerts
 
 Inserts all test certificates from L<OpenXPKI::Test::CertHelper::Database> into
