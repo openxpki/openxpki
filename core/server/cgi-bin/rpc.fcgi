@@ -68,6 +68,8 @@ while (my $cgi = CGI::Fast->new()) {
         foreach my $key (@keys) {
             my $val = $cgi->param($key);
             if (defined $val) {
+                $val =~ s/\A\s+//;
+                $val =~ s/\s+\z//;
                 $param->{$key} = $val;
             }
         }
@@ -158,11 +160,14 @@ while (my $cgi = CGI::Fast->new()) {
         my $error = $client->last_error();
         if ($error) {
             $log->error("Unable to create workflow: ". $error );
+            if ($error !~ /I18N_OPENXPKI_UI_/) {
+                $error = 'uncaught error';
+            }
         } else {
             $log->error("Unable to create workflow: ". $EVAL_ERROR );
             $error = 'uncaught error';
-        }        
-        $res = { error => { code => 42, message => $error, data => { pid => $$ } } };                
+        }
+        $res = { error => { code => 42, message => $error, data => { pid => $$ } } };
     } elsif (( $workflow->{'PROC_STATE'} ne 'finished' && !$workflow->{ID} ) || $workflow->{'PROC_STATE'} eq 'exception') {
         # TODO: Return as "500 Internal Server Error"?
         $log->error("workflow terminated in unexpected state" );
