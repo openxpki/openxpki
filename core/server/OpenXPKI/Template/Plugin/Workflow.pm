@@ -65,6 +65,8 @@ sub _load {
     if ($self->{_workflow} && $self->{_workflow}->{'WORKFLOW.WORKFLOW_ID'} == $wf_id) {
         return $self->{_workflow};
     }
+    
+    $self->{_workflow} = undef;
 
     eval {
         my $result = CTX('api')->search_workflow_instances({ SERIAL => [ $wf_id ]});

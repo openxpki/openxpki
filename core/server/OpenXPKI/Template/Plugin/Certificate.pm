@@ -73,6 +73,7 @@ sub get_hash {
         return $self->{_hash};
     }
 
+    $self->{_hash} = undef;
     eval {
         $self->{_hash} = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
     };

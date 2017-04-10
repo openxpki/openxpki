@@ -68,6 +68,9 @@ sub _load {
     if ($self->{_pkcs10} && ($self->{_hash} eq sha1_hex($pkcs10))) {
         return $self->{_pkcs10};
     }
+    
+    $self->{_pkcs10} = undef;
+    $self->{_hash} = undef;
 
     eval {
         Crypt::PKCS10->setAPIversion(1);
