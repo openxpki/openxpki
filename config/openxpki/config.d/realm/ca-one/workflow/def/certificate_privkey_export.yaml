@@ -5,7 +5,7 @@ head:
 # If you use a persister, every download creates a workflow which is handy 
 # for audit but increases your database size. Persistance is also required
 # to have the error handling loop using the FAILED state. so if you decide 
-# to make this volatile, please use "FAILURE" as action target in EXPORT.        
+# to make this volatile, please use "FAILURE" as action target in EXPORT. 
 #    persister: Volatile
 
 state:
@@ -113,7 +113,7 @@ action:
             _map_value: $_export
             encrypt: 1
             force: 1
-            expiration_date: "+00000003"
+            expiration_date: "+0000000003"
 
     set_alias:
         class: OpenXPKI::Server::Workflow::Activity::Noop
