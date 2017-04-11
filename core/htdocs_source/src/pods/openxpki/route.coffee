@@ -153,8 +153,12 @@ Route = Em.Route.extend
 
                 source.endPropertyChanges()
                 resolve doc
-            , (err) ->
+            , (err) =>
                 $(".loading").removeClass "in-progress"
+                @controllerFor("openxpki").set("model", source)
+                Em.run.scheduleOnce "afterRender", ->
+                    $ ".modal.oxi-error-modal"
+                    .modal "show"
                 source.set "error",
                     message: "The server did not return JSON data as
                     expected.\nMaybe your authentication session has expired."
