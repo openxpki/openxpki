@@ -73,19 +73,57 @@ $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 # Sharing one client with multiple sessions requires some work on detach/
 # switching sessions in backend to prevent users from getting wrong sessions!
 
+my $json = new JSON();
 my $backend_client;
+
+sub __handle_error {
+    
+    my $cgi = shift;
+    my $error = shift;
+    if ($error) {
+        $log->error('error while handling request');
+        $log->debug($error);
+        
+        # only echo UI error messages to prevent data leakage
+        if ($error !~ /I18N_OPENXPKI_UI/) {
+            $error = 'I18N_OPENXPKI_UI_APPLICATION_ERROR';    
+        }
+        $error = i18nGettext($error);
+    } else {
+        $log->error('uncaught application error');
+        $error = 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
+    }
+
+    if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
+        print $cgi->header( -type => 'application/json' );
+        print $json->encode( { status => { 'level' => 'error', 'message' => $error } });
+    } else {
+        print $cgi->header( -type => 'text/html' );
+        print $cgi->start_html( -title => $error );
+        print "<h1>An error occured</h1><p>$error</p>";
+        print $cgi->end_html;
+    }
+    return;
+}
 
 while (my $cgi = CGI::Fast->new()) {
 
     $log->debug('check for cgi session, fcgi pid '. $$ );
 
-    if (!$backend_client || !$backend_client->is_connected()) {
-        $backend_client = OpenXPKI::Client->new({ 
-            SOCKETFILE => $config{'global'}{'socket'}             
-        });
-    } else {
-        # Detach session from shared client, safety hook
-        $backend_client->detach();
+    eval {
+        if (!$backend_client || !$backend_client->is_connected()) {
+            $backend_client = OpenXPKI::Client->new({ 
+                SOCKETFILE => $config{'global'}{'socket'}             
+            });
+        } else {
+            # Detach session from shared client, safety hook
+            $backend_client->detach();
+        }
+    };
+    if ($EVAL_ERROR) {
+       $log->error('Error creating backend client ' . $EVAL_ERROR);
+       __handle_error($cgi, $EVAL_ERROR);
+       next;
     }
 
     my $sess_id = $cgi->cookie('oxisess-webui') || undef;
@@ -156,26 +194,7 @@ while (my $cgi = CGI::Fast->new()) {
     };
 
     if (!$result || ref $result !~ /OpenXPKI::Client::UI/) {
-        my $json = new JSON();
-        my $error;
-        if ($EVAL_ERROR) {
-            $log->error('eval error during handle' );
-            $log->debug($EVAL_ERROR);
-            $error = i18nGettext($EVAL_ERROR);
-        } else {
-            $log->error('uncaught application error');
-            $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR')
-        }
-
-        if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
-            print $cgi->header( -type => 'application/json' );
-            print $json->encode( { status => { 'level' => 'error', 'message' => $error } });
-        } else {
-            print $cgi->header( -type => 'text/html' );
-            print $cgi->start_html( -title => $error );
-            print "<h1>An error occured</h1><p>$error</p>";
-            print $cgi->end_html;
-        }
+        __handle_error($cgi, $EVAL_ERROR);
         $log->trace('result was ' . Dumper $result);
     }
     
