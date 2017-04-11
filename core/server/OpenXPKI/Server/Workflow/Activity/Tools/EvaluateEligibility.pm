@@ -38,6 +38,13 @@ sub execute {
         $config_path = join ".", @prefix;
     }
 
+
+    # Reset the context
+    $context->param( $target_key => undef );
+    if ($self->param('raw_result')) {
+        $context->param( $self->param('raw_result') => undef );
+    }
+
     my $res = 0;
 
     # check if there are arguments
