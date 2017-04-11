@@ -407,9 +407,24 @@ sub handle_login {
             # Do a real exit to skip the error handling of the script body
             exit;
                     
-        } else {
-            $self->logger()->debug('Redirect to login page');
+        } elsif ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
+
+            # Session is gone but we are still in the ember application
             $result->redirect('login');
+
+        } else {
+
+            # This is not an ember request so we need to redirect 
+            # back to the ember page - try if the session has a baseurl
+            my $url = $self->session()->param('baseurl');
+            # if not, get the path from the referer 
+            if (!$url && ($ENV{HTTP_REFERER} =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
+                $url = $1;
+                $self->logger()->debug('Restore redirect from referer');
+            }
+            $url .= '/#/openxpki/login';
+            $self->logger()->debug('Redirect to login page: ' . $url);
+            $result->redirect($url);
         }
     }  
 
