@@ -1483,6 +1483,9 @@ msgstr "Retries"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "You are not allowed to initiate this workflow"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
+msgstr "Cannot initiate workflow: type unknown"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Creator"
 

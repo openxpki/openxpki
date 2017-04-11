@@ -148,7 +148,7 @@ sub get_action_info {
         ##! 64: 'Field info ' . Dumper $field
 
         my $field = $self->get_field_info( $field_name, $wf_name );
-        
+
         $field->{type} = 'text' unless ($field->{type});
         $field->{clonable} = ($field->{min} || $field->{max}) || 0;
 
@@ -161,13 +161,13 @@ sub get_action_info {
 }
 
 sub get_field_info {
-    
+
     my $self = shift;
     my $field_name = shift;
     my $wf_name = shift;
-    
+
     my $conn = CTX('config');
-    
+
     my @field_path;
     # Fields can be defined local or global (only actions inside workflow)
     if ($wf_name) {
@@ -195,31 +195,31 @@ sub get_field_info {
         }
         $field->{option} = \@option;
     }
-    
+
     return $field;
-    
+
 }
 
-=head2 authorize_workflow 
+=head2 authorize_workflow
 
-Public wrapper around __authorize_workflow, boolean return (true if 
+Public wrapper around __authorize_workflow, boolean return (true if
 access it granted).
 
 =cut
- 
+
 sub authorize_workflow {
 
     my $self     = shift;
     my $arg_ref  = shift;
-    
+
     eval {
-        $self->__authorize_workflow( $arg_ref );    
+        $self->__authorize_workflow( $arg_ref );
     };
     if ($EVAL_ERROR) {
         return 0;
-    }    
+    }
     return 1;
-    
+
 }
 
 
@@ -255,13 +255,18 @@ sub __authorize_workflow {
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
 
-        my $creator = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
-        # if creator is set to any value, access is allowed
-        my $is_allowed = defined $creator;
+        $conn->exists([ 'workflow', 'def', $type])
+            or OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE',
+                params  => {
+                    'REALM'   => $realm,
+                    'WF_TYPE' => $type,
+                },
+            );
 
-        ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows
-        if (! $is_allowed ) {
-            OpenXPKI::Exception->throw(
+        # if creator is set then access is allowed
+        $conn->exists([ 'workflow', 'def', $type, 'acl', $role, 'creator' ])
+            or OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED',
                 params  => {
                     'REALM'   => $realm,
@@ -269,7 +274,7 @@ sub __authorize_workflow {
                     'WF_TYPE' => $type,
                 },
             );
-        }
+
         return 1;
     }
     elsif ($action eq 'access') {
