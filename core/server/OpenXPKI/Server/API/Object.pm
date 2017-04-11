@@ -516,7 +516,7 @@ sub get_cert_actions {
             foreach my $rule (@cond) {
                 
                 if ($rule eq 'keyexport') {
-                    next OPTION if CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_id });
+                    next OPTION unless CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_id });
                                             
                 } elsif ($rule eq 'issued') {
                     next OPTION  unless ($cert->{STATUS} eq 'ISSUED' or $cert->{STATUS} eq 'EXPIRED');
