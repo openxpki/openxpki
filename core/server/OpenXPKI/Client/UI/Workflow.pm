@@ -959,11 +959,12 @@ sub action_index {
 
         if (!$wf_info) {
             $self->logger()->error("workflow acton failed!");
+            $self->extra({ wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} });
+            $self->init_load();
             return $self;
         }
         
         $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
-        #$self->set_status('I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED','success');
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
@@ -973,8 +974,10 @@ sub action_index {
             WORKFLOW => $wf_args->{wf_type}, PARAMS   => \%wf_param, UIINFO => 1
         });
         if (!$wf_info) {
-            # todo - handle workflow errors
             $self->logger()->error("Create workflow failed");
+            # pass required arguments via extra and reload init page
+            $self->extra({ wf_type => $wf_args->{wf_type} });
+            $self->init_index();
             return $self;
         }
         $self->logger()->trace("wf info on create: " . Dumper $wf_info );
@@ -1647,8 +1650,11 @@ sub __render_from_workflow {
             if ( $wf_info->{STATE}->{output} ) {
                 push @fields, @{$self->__render_fields( $wf_info, $view )};
             }
-                 
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
+            
+            # if we come here from a failed action the status is set already
+            if (!$self->_status()) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
+            }
             $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION';
             
         } # end proc_state switch
