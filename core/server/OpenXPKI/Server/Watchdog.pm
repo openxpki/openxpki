@@ -533,39 +533,19 @@ sub __scan_for_paused_workflows {
     my $wf_id = $workflow->{workflow_id};
     $self->__flag_and_fetch_workflow( $wf_id ) or return;
 
-    ##! 16: 'WF now ready to re-instantiate: '.Dumper($db_result)
+    ##! 16: 'WF now ready to re-instantiate '
     CTX('log')->log(
         MESSAGE  => sprintf( 'watchdog, paused wf %d now ready to re-instantiate, start fork process', $wf_id ),
         PRIORITY => "info",
         FACILITY => "workflow",
     );
 
-    eval{
-        # create a forked child process which "wakes up the workflow"
-        my $instance = OpenXPKI::Server::Watchdog::WorkflowInstance->new(
-            workflow_id         => $workflow->{workflow_id},
-            workflow_type       => $workflow->{workflow_type},
-            workflow_session    => $workflow->{workflow_session},
-            pki_realm           => $workflow->{pki_realm},
-        );
-        $instance->run;
-    };
-    # all exceptions/fatals which occur in the forked child will be handled there
-    # if an error/exception occurs here, it must be within the main (watchdog) process, so we log it as "system" error
-    my $error_msg;
-    if ( my $exc = OpenXPKI::Exception->caught() ) {
-        $exc->show_trace(1);
-        $error_msg = "Exception caught while forking child instance: $exc";
-    } elsif ($EVAL_ERROR) {
-        $error_msg = "Fatal error while forking child instance:" . $EVAL_ERROR;
-    }
-    if ($error_msg) {
-        CTX('log')->log(
-            MESSAGE  => $error_msg,
-            PRIORITY => "fatal",
-            FACILITY => "system"
-        );
-    }
+    $self->__wake_up_workflow({
+        workflow_id         => $workflow->{workflow_id},
+        workflow_type       => $workflow->{workflow_type},
+        workflow_session    => $workflow->{workflow_session},
+        pki_realm           => $workflow->{pki_realm},
+    });
 
     # security measure: for child processes no further than here! (all childprocesses in WorkflowInstance should
     # exit properly and handle their exceptions on their own... but just in case...)
@@ -592,6 +572,7 @@ method first writes a random marker to create "row lock" and tries to reload
 the row using this marker. If either one fails, returnes undef.
 
 =cut
+
 sub __flag_and_fetch_workflow {
     my ($self, $wf_id) = @_;
 
@@ -651,6 +632,57 @@ sub __flag_and_fetch_workflow {
 
     return $wf_id;
 }
+
+
+=head2 __wake_up_workflow
+
+Restore the session environment and execute the action, runs in eval 
+block and returns the error message in case of error.
+
+=cut
+
+sub __wake_up_workflow {
+    
+    my $self = shift;
+    my $args = shift;
+
+    # errors here are fork errors and we dont want the watchdog to die!
+    eval {
+        $self->__check_session();
+    
+        CTX('session')->set_pki_realm($args->{pki_realm});
+        CTX('session')->import_serialized_info($args->{workflow_session});
+    
+        ##! 1: 'call wakeup'
+    
+        my $wf_info = CTX('api')->wakeup_workflow({
+            WORKFLOW => $args->{workflow_type},
+            ID => $args->{workflow_id},
+            ASYNC => 'fork'
+        });
+    };
+    my $error_msg;
+    if ( my $exc = OpenXPKI::Exception->caught() ) {
+        $exc->show_trace(1);
+        $error_msg = "Failed to wakeup workflow $args->{workflow_id} with error $exc";
+    }
+    elsif ($EVAL_ERROR) {
+        $error_msg = $error_msg = "Failed to wakeup workflow $args->{workflow_id} with error ". $EVAL_ERROR;
+    }
+    
+    if ($error_msg) {
+        CTX('log')->log(
+            MESSAGE  => $error_msg,
+            PRIORITY => "error",
+            FACILITY => "system"
+        );
+        return $error_msg; 
+    } 
+    
+    return 0;
+ 
+}
+
 
 =head2
 
