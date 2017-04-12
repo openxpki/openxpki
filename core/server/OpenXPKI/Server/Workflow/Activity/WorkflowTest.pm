@@ -14,22 +14,9 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
 use Data::Dumper;
-
-sub init {
-    my ( $self, $workflow, $params ) = @_;
-    $self->SUPER::init($workflow, $params);
-    my $context = $workflow->context();
-    my $reap_at = $context->param('reap_at');
-    if($reap_at){
-        ##! 1: 'set given reap_at interval: ' .$reap_at; 
-        $self->set_reap_at_interval( $reap_at );
-        $context->param('reap_at','');
-    }
-    
-    
-}
-
+ 
 sub execute {
+    
     my $self     = shift;
     my $workflow = shift;
 
@@ -38,28 +25,11 @@ sub execute {
     ##! 1: 'Workflow Test entered - Workflow Id: ' .$workflow->id(); 
     
     # parameter ""action" decides, what should happen:
-	my $action = $context->param('action');
-    # Den parameter gleich wieder aus dem Context löschen
-	$context->param({ 'action' => '' });
+	my $action = $self->param('perform');
 	
-	#optional parameter "cause":
-	my $pause_cause = $context->param('cause');
-	$context->param({ 'cause' => '' });
+	# optional parameter "cause":
+	my $pause_cause = $self->param('cause');
 	$pause_cause ||= 'some terrific cause';
-	
-	my $retry_interval = $context->param('retry_interval');
-    if($retry_interval){
-        ##! 1: 'set given retry_interval: ' .$retry_interval; 
-        $self->set_retry_interval( $retry_interval );
-        $context->param('retry_interval','');
-    }
-	
-	my $reap_at_dyn = $context->param('reap_at_dyn');
-    if($reap_at_dyn){
-        ##! 1: 'set given reap_at interval: ' .$reap_at_dyn; 
-        $self->set_reap_at_interval( $reap_at_dyn );
-        $context->param('reap_at_dyn','');
-    }
 	
 	#when execute runs till end, "test_job_is_done" is set to "1"
 	$context->param({ 'test_job_is_done' => '0' });
@@ -89,6 +59,7 @@ sub execute {
 	##! 1: 'Workflow Test: passed all hurdles ...execute my job'; 
 	$context->param({ 'test_job_is_done' => '1' });
 }
+
 sub resume{
     my $self     = shift;
     my ($workflow,$proc_state_resume_from) = @_;
