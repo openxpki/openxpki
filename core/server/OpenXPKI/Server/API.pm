@@ -1352,6 +1352,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_boolean,
                 },
+                ASYNC => {
+                    type     => SCALAR,
+                    regex    => qr{ fork|watch }x,
+                    optional => 1,
+                },
             },
         },
         'create_workflow_instance' => {
@@ -1407,7 +1412,12 @@ sub BUILD {
                 ID => {
                     type     => SCALAR,
                     regex    => $re_integer_string,
-                }
+                },
+                ASYNC => {
+                    type     => SCALAR,
+                    regex    => qr{ fork|watch }x,
+                    optional => 1,
+                },
             },
         },
         'resume_workflow' => {
@@ -1421,7 +1431,12 @@ sub BUILD {
                 ID => {
                     type     => SCALAR,
                     regex    => $re_integer_string,
-                }
+                },
+                ASYNC => {
+                    type     => SCALAR,
+                    regex    => qr{ fork|watch }x,
+                    optional => 1,
+                },
             },
         },
         'get_workflow_activities' => {

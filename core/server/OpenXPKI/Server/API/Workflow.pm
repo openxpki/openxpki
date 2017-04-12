@@ -564,10 +564,31 @@ sub resume_workflow {
     return $self->__wakeup_resume_workflow( 'resume', $args );
 }
 
-=head2 __wakeup_resume_workflow 
+=head2 __wakeup_resume_workflow ( mode, args )
 
 Does the work for resume and wakeup, pulls the last action from the history
 and executes it. 
+
+=over
+
+=item mode
+
+one of I<wakeup> or I<resume>, must match with the current proc state
+
+=item args
+
+Hash holding the workflow information, mandatory key is I<ID>, the 
+workflow type can be given as I<WORKFLOW> if its known, otherwise 
+its looked up from the database.
+
+By default, the action is executed inline and the method returns after
+all actions are handled. You can detach from the exection by adding 
+I<ASYNC> as argument: I<fork> will do the fork and return the ui control 
+structure of the OLD state, I<watch> will fork, wait until the workflow 
+was started or 15 seconds have elapsed and return the ui structure from 
+the running workflow. 
+
+=back 
 
 =cut 
 
@@ -576,6 +597,7 @@ sub __wakeup_resume_workflow {
     my $self  = shift;
     my $mode  = shift; # resume or wakeup
     my $args  = shift;
+    my $fork_mode = $args->{ASYNC} || '';
     
     if ($mode ne 'wakeup' && $mode ne 'resume') {
         OpenXPKI::Exception->throw(
@@ -591,8 +613,6 @@ sub __wakeup_resume_workflow {
         $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
     }
 
-    CTX('dbi_workflow')->commit();
-    
     ##! 2: "load workflow"
     my $factory = __get_workflow_factory({
         WORKFLOW_ID => $wf_id,
@@ -602,6 +622,8 @@ sub __wakeup_resume_workflow {
         $wf_title,
         $wf_id
     );
+    
+    ##! 64: 'Got workflow ' . Dumper $workflow
 
     my $proc_state = $workflow->proc_state();
     
@@ -620,28 +642,53 @@ sub __wakeup_resume_workflow {
     
     $workflow->reload_observer();
     
-    # pull off the latest action from the history    
-    my $history = CTX('dbi_workflow')->first(        
-        TABLE => 'WORKFLOW_HISTORY',
-        DYNAMIC => {
-            WORKFLOW_SERIAL => {VALUE => $wf_id},
-        },
-        ORDER => [ 'WORKFLOW_HISTORY_DATE', 'WORKFLOW_HISTORY_SERIAL' ],
-        REVERSE => 1,
-    ); 
-    
-    my $wf_activity = $history->{WORKFLOW_ACTION};
+    # pull off the latest action from the history
+    my $history = CTX('dbi')->select_one(
+        from => 'workflow_history',
+        columns => [ 'workflow_action' ],
+        where => { 'workflow_id' => $wf_id },
+        order_by => [ '-workflow_history_date', '-workflow_hist_id' ]
+    );
+    my $wf_activity = $history->{workflow_action};
     
     CTX('log')->log(
         MESSAGE  => "$mode workflow $wf_id (type '$wf_title') with activity $wf_activity",
         PRIORITY => 'info',
         FACILITY => 'workflow',
     );
-   
-    $self->__execute_workflow_activity( $workflow, $wf_activity );
+    ##! 16: 'execute activity ' . $wf_activity
     
+    if ($fork_mode) {
+        $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
+        
+        if ($fork_mode eq 'watch') {
+            # we poll the workflow table and watch if the update timestamp changed  
+            my $old_time = $workflow->last_update->strftime("%Y-%m-%d %H:%M:%S"); 
+            my $timeout = time()+15;
+            ##! 32:' Fork mode watch - timeout - '.$timeout.' - last update ' . $old_time 
+            
+            do {
+                my $workflow_state = CTX('dbi')->select_one(
+                    from => 'workflow',
+                    columns => [ 'workflow_last_update' ],
+                    where => { 'workflow_id' => $wf_id },
+                );
+                ##! 64: 'Wfl update is ' . $workflow_state->{workflow_last_update}
+                if ($workflow_state->{workflow_last_update} ne $old_time) {
+                    ##! 8: 'Refetch workflow'
+                    # refetch the workflow to get the updates
+                    $workflow = $factory->fetch_workflow( $wf_title, $wf_id );
+                    $timeout = 0;
+                } else {
+                    ##! 64: 'sleep'
+                    sleep 2;
+                }
+            } while (time() < $timeout);
+        }
+    } else {
+        $self->__execute_workflow_activity( $workflow, $wf_activity );
+    }
     return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
-    
 }
 
 sub get_workflow_activities_params {
@@ -1278,11 +1325,55 @@ sub __validate_input_param {
     return $result;
 }
 
+=head2 __execute_workflow_activity
+
+ASYNC=FORK just forks and returns empty UI info, ASYNC=WATCH waits until
+the 
+
+=cut
+
 sub __execute_workflow_activity {
 
     my $self = shift;
     my $workflow = shift;
     my $wf_activity = shift;
+    my $run_async = shift || '';
+
+    # fork if async is requested
+    if ($run_async) {
+        $SIG{'CHLD'} = sub { wait; };
+        ##! 16: 'trying to fork'
+        my $pid = fork();
+        ##! 16: 'pid: ' . $pid
+
+        OpenXPKI::Exception->throw( 
+            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_FORK_FAILED'
+        ) unless (defined $pid);
+    
+        # Reconnect the db handles - required until all old handles are replaced!
+        CTX('dbi_log')->new_dbh();
+        CTX('dbi_workflow')->new_dbh();
+        CTX('dbi_backend')->new_dbh();
+        CTX('dbi_log')->connect();
+        CTX('dbi_workflow')->connect();
+        CTX('dbi_backend')->connect();
+
+        if ( $pid != 0 ) {
+            ##! 16: ' Workflow instance succesfully forked'
+            # parent here - noop
+            return $pid;
+        }
+        ##! 16: ' Workflow instance succesfully forked - I am the workflow'
+        # We need to unset the child reaper (waitpid) as the universal waitpid
+        # causes problems with Proc::SafeExec
+        $SIG{CHLD} = 'DEFAULT';
+
+        # Re-seed Perl random number generator
+        srand(time ^ $PROCESS_ID);
+
+        # append fork info to process name
+        $0 = sprintf('openxpkid (%s) workflow: id %d', (CTX('config')->get('system.server.name') || 'main'), $workflow->id());
+    }
 
     ##! 64: Dumper $workflow
     eval {
@@ -1319,6 +1410,11 @@ sub __execute_workflow_activity {
             }
         } while( $wf_activity );
     };
+    
+    if ($run_async) {
+        exit;
+    }
+    
     if ($EVAL_ERROR) {
         my $eval = $EVAL_ERROR;
         CTX('log')->log(
