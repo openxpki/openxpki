@@ -1057,20 +1057,19 @@ sub action_handle {
         $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
         $wf_info = $self->send_command( 'fail_workflow', {
-            ID => $wf_args->{wf_id},        
+            ID => $wf_args->{wf_id},
         });
     } elsif ($wf_args->{wf_handle} eq 'wakeup') {
         $self->logger()->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
-
         $wf_info = $self->send_command( 'wakeup_workflow', {
-            ID => $wf_args->{wf_id},        
+            ID => $wf_args->{wf_id}, ASYNC => 'watch',
         });
-    } elsif ($wf_args->{wf_handle} eq 'resume') {        
-        
+    } elsif ($wf_args->{wf_handle} eq 'resume') {
         $self->logger()->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
         $wf_info = $self->send_command( 'resume_workflow', {
-            ID => $wf_args->{wf_id},        
+            ID => $wf_args->{wf_id},  ASYNC => 'watch',
         });
+        
     } 
     
     $self->__render_from_workflow({ WF_INFO => $wf_info });

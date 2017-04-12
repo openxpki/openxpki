@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2017-04-04 12:39+0200\n"
+"PO-Revision-Date: 2017-04-12 17:05+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -2579,9 +2579,8 @@ msgstr ""
 "This workflow was interrupted by an unexpected event, please contact the "
 "support team!"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr " "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
