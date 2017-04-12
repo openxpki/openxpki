@@ -425,6 +425,44 @@ sub get_workflow_creator {
     
 }
 
+=head2 execute_workflow_activity 
+
+Execute a given action on a workflow, arguments are passed as hash
+
+=over 
+
+=item ID
+
+The workflow id
+
+=item ACTIVITY
+
+The name of the action to execute
+
+=item PARAMS
+
+hash with the params to be passed to the action
+
+=item UIIINFO
+
+boolean, the method will return the full uinfo hash if set and the
+workflow state information if not.
+
+=item WORKFLOW
+
+The name of the workflow, optional (read from the tables)
+
+=item ASYNC
+
+By default, the action is executed inline and the method returns after
+all actions are handled. You can detach from the execution by adding 
+I<ASYNC> as argument: I<fork> will do the fork and return the ui control 
+structure of the OLD state, I<watch> will fork, wait until the workflow 
+was started or 15 seconds have elapsed and return the ui structure from 
+the running workflow. 
+
+=cut
+
 sub execute_workflow_activity {
     my $self  = shift;
     my $args  = shift;
@@ -435,18 +473,15 @@ sub execute_workflow_activity {
     my $wf_id       = $args->{ID};
     my $wf_activity = $args->{ACTIVITY};
     my $wf_params   = $args->{PARAMS};
-    my $wf_uiinfo  = $args->{UIINFO};
+    my $wf_uiinfo   = $args->{UIINFO};
+    my $fork_mode   = $args->{ASYNC} || '';
 
     ##! 32: 'params ' . Dumper $wf_params
 
     if (! defined $wf_title) {
         $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
     }
-    # commit to get a current snapshot of the database in the
-    # highest isolation level.
-    # Without this, we will only see old data, especially if
-    # other processes are writing to the database at the same time
-    CTX('dbi_workflow')->commit();
+
     ##! 2: "load workflow"
     my $factory = __get_workflow_factory({
         WORKFLOW_ID => $wf_id,
@@ -474,14 +509,24 @@ sub execute_workflow_activity {
     $context->param ( $params ) if ($params);
 
     ##! 64: Dumper $workflow
-
-    $self->__execute_workflow_activity( $workflow, $wf_activity );
-
-    CTX('log')->log(
-        MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
-        PRIORITY => 'info',
-        FACILITY => 'workflow',
-    );
+    if ($fork_mode) {
+        $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
+        CTX('log')->log(
+            MESSAGE  => "Background execution of workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
+            PRIORITY => 'debug',
+            FACILITY => 'workflow',
+        );
+        if ($fork_mode eq 'watch') {
+            $workflow = $self->__watch_workflow( $workflow );
+        }
+    } else {
+        $self->__execute_workflow_activity( $workflow, $wf_activity );
+        CTX('log')->log(
+            MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
+            PRIORITY => 'debug',
+            FACILITY => 'workflow',
+        );
+    }
 
     if ($wf_uiinfo) {
         return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
@@ -506,7 +551,6 @@ sub fail_workflow {
         $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
     }
 
-    CTX('dbi_workflow')->commit();
     ##! 2: "load workflow"
     my $factory = __get_workflow_factory({
         WORKFLOW_ID => $wf_id,
@@ -651,6 +695,10 @@ sub __wakeup_resume_workflow {
     );
     my $wf_activity = $history->{workflow_action};
     
+    if ($fork_mode) {
+        $mode .= "($fork_mode)";
+    }
+    
     CTX('log')->log(
         MESSAGE  => "$mode workflow $wf_id (type '$wf_title') with activity $wf_activity",
         PRIORITY => 'info',
@@ -660,30 +708,8 @@ sub __wakeup_resume_workflow {
     
     if ($fork_mode) {
         $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
-        
         if ($fork_mode eq 'watch') {
-            # we poll the workflow table and watch if the update timestamp changed  
-            my $old_time = $workflow->last_update->strftime("%Y-%m-%d %H:%M:%S"); 
-            my $timeout = time()+15;
-            ##! 32:' Fork mode watch - timeout - '.$timeout.' - last update ' . $old_time 
-            
-            do {
-                my $workflow_state = CTX('dbi')->select_one(
-                    from => 'workflow',
-                    columns => [ 'workflow_last_update' ],
-                    where => { 'workflow_id' => $wf_id },
-                );
-                ##! 64: 'Wfl update is ' . $workflow_state->{workflow_last_update}
-                if ($workflow_state->{workflow_last_update} ne $old_time) {
-                    ##! 8: 'Refetch workflow'
-                    # refetch the workflow to get the updates
-                    $workflow = $factory->fetch_workflow( $wf_title, $wf_id );
-                    $timeout = 0;
-                } else {
-                    ##! 64: 'sleep'
-                    sleep 2;
-                }
-            } while (time() < $timeout);
+            $workflow = $self->__watch_workflow( $workflow );
         }
     } else {
         $self->__execute_workflow_activity( $workflow, $wf_activity );
@@ -698,9 +724,6 @@ sub get_workflow_activities_params {
 
     my $wf_title = $args->{WORKFLOW};
     my $wf_id = $args-> {ID};
-
-    # Commit to get a current snapshot and avoid old data
-    CTX('dbi_workflow')->commit();
 
     my $factory = __get_workflow_factory({
             WORKFLOW_ID => $wf_id,
@@ -846,12 +869,6 @@ sub get_workflow_activities {
 
     my $wf_title = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
-
-    # commit to get a current snapshot of the database in the
-    # highest isolation level.
-    # Without this, we will only see old data, especially if
-    # other processes are writing to the database at the same time
-    CTX('dbi_workflow')->commit();
 
     my $factory = __get_workflow_factory({
         WORKFLOW_ID => $wf_id,
@@ -1472,6 +1489,52 @@ sub __execute_workflow_activity {
 
     return 1;
 }
+
+=head2 __watch_workflow ( workflow, duration = 15, sleep = 2 )
+
+Watch a workflow for changes based on the last_update column.
+Expects the workflow object as first parameter, the duration to watch
+and the sleep interval between the checks can be passed as second and
+third parameters, default is 15s/2s.
+
+The method returns the changed workflow object if a change was detected
+or the initial workflow object if no change happend.
+
+=cut
+sub __watch_workflow {
+    
+    my $self = shift;
+    my $workflow = shift;
+    my $duration= shift || 15;
+    my $sleep = shift || 2;
+    
+    # we poll the workflow table and watch if the update timestamp changed  
+    my $old_time = $workflow->last_update->strftime("%Y-%m-%d %H:%M:%S"); 
+    my $timeout = time() + $duration;
+    ##! 32:' Fork mode watch - timeout - '.$timeout.' - last update ' . $old_time 
+    
+    do {
+        my $workflow_state = CTX('dbi')->select_one(
+            from => 'workflow',
+            columns => [ 'workflow_last_update' ],
+            where => { 'workflow_id' => $workflow->id() },
+        );
+        ##! 64: 'Wfl update is ' . $workflow_state->{workflow_last_update}
+        if ($workflow_state->{workflow_last_update} ne $old_time) {
+            ##! 8: 'Refetch workflow'
+            # refetch the workflow to get the updates
+            my $factory = $workflow->factory();
+            $workflow = $factory->fetch_workflow( $workflow->type(), $workflow->id() );
+            $timeout = 0;
+        } else {
+            ##! 64: 'sleep'
+            sleep 2;
+        }
+    } while (time() < $timeout);
+    
+    return $workflow;
+}
+
 1;
 __END__
 
