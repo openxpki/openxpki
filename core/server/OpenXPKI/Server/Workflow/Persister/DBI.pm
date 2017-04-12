@@ -94,7 +94,7 @@ sub update_workflow {
             workflow_id   => $id,
         }
     );
-    CTX('log')->info( "Saved workflow $id", "system" );
+    CTX('log')->debug( "Saved workflow $id", "system" );
 
     # Do not persist context while we are doing "overhead"
     if ( !$workflow->persist_context() ) {
@@ -182,7 +182,7 @@ sub update_workflow {
     # Reset the update marker - only if full update was requested
     $context->reset_updated if $workflow->persist_context > 1;
 
-    CTX('log')->info( "Updated workflow $id", "workflow" );
+    CTX('log')->debug( "Updated workflow $id", "workflow" );
 
     return 1;
 }
