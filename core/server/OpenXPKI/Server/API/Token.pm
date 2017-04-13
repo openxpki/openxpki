@@ -265,14 +265,16 @@ sub list_active_aliases {
 
 }
 
-=head2 get_ca_list( {REALM} )
+=head2 get_ca_list( {PKI_REALM} )
 
 List all items in the certsign group of the requested REALM.
 REALM is optional and defaults to the session realm.
 Each entry of the list is a hashref holding the full alias name (ALIAS),
 the certificate identifier (IDENTIFIER), the notbefore/notafter date,
-the subject and the verbose status of the token. Possbile status values are
-EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN.
+the subject and the verbose status of the token. Possbile status values
+are EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN. The ONLINE/OFFLINE 
+check is only possible from within the current realm, for requests outside
+the current realm the status of a valid token is always UNKNOWN.
 
 The list is sorted by notbefore date, starting with the newest date.
 Dates are taken from the alias table and therefore might differ
@@ -287,10 +289,13 @@ sub get_ca_list {
     my $keys = shift;
 
     my $pki_realm = $keys->{PKI_REALM};
-    $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
+    my $session_pki_realm = CTX('session')->get_pki_realm();
+    if (!$pki_realm) {
+        $pki_realm = $session_pki_realm;
+    }
 
     ##! 32: "Lookup group name for certsign"
-    my $group = CTX('config')->get("realm.$pki_realm.crypto.type.certsign");
+    my $group = CTX('config')->get(['realm', $pki_realm, 'crypto', 'type', 'certsign']);
 
     my $db_results = CTX('dbi')->select(
         from_join => 'certificate identifier=identifier aliases',
@@ -326,8 +331,8 @@ sub get_ca_list {
             $item->{STATUS} = 'UPCOMING';
         } elsif ($row->{notafter} < $now) {
             $item->{STATUS} = 'EXPIRED';
-        } else {
-            # Check if the key is usable
+        } elsif ($pki_realm eq $session_pki_realm) {
+            # Check if the key is usable, only in current realm
             my $token;
             eval {
                 $token = CTX('crypto_layer')->get_token({
