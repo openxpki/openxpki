@@ -440,6 +440,8 @@ structure of the OLD state, I<watch> will fork, wait until the workflow
 was started or 15 seconds have elapsed and return the ui structure from
 the running workflow.
 
+=back
+
 =cut
 
 sub execute_workflow_activity {
