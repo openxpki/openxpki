@@ -49,6 +49,12 @@ has 'db_params' => (
     required => 1,
 );
 
+has 'autocommit' => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 0,
+);
+
 has 'driver' => (
     is => 'ro',
     does => 'OpenXPKI::Server::Database::Role::Driver',
@@ -180,7 +186,7 @@ sub _build_dbix_handler {
         {
             RaiseError => 0,
             PrintError => 0,
-            AutoCommit => 0,
+            AutoCommit => $self->autocommit,
             LongReadLen => 10_000_000,
             %params,
         },
@@ -383,9 +389,9 @@ sub delete {
 #
 sub _run_and_commit {
     my ($self, $method, @args) = @_;
-    $self->start_txn;
+    $self->start_txn unless $self->autocommit;
     my $result = $self->$method(@args);
-    $self->commit;
+    $self->commit unless $self->autocommit;
     return $result;
 }
 
@@ -440,6 +446,7 @@ sub drop_table {
 
 sub start_txn {
     my $self = shift;
+    return $self->log->warn("AutoCommit is on, start_txn() is useless") if $self->autocommit;
     if ($self->in_txn) {
         $self->log->error(
             sprintf "start_txn() was called during a running transaction (started in %s, line %i). Most likely this error is caused by a missing commit() or exception handling without rollback()",
@@ -454,6 +461,7 @@ sub start_txn {
 
 sub commit {
     my $self = shift;
+    return $self->log->warn("AutoCommit is on, commit() is useless") if $self->autocommit;
     $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
         unless $self->in_txn;
     ##! 16: "Commit of changes"
@@ -463,6 +471,7 @@ sub commit {
 
 sub rollback {
     my $self = shift;
+    return $self->log->warn("AutoCommit is on, rollback() is useless") if $self->autocommit;
     $self->log->warn("rollback() was called without indicating a transaction start via start_txn() first")
         unless $self->in_txn;
     ##! 16: "Rollback of changes"
@@ -533,7 +542,7 @@ For more details see L<OpenXPKI::Server::Database::Role::Driver>.
 =item * B<log> - Log object (I<OpenXPKI::Server::Log>, required)
 
 =item * B<db_params> - I<HashRef> with parameters for the DBI data source name
-string.
+string (required).
 
 Required keys in this hash:
 
@@ -546,6 +555,8 @@ Required keys in this hash:
 =item * Additional parameters required by the specific driver
 
 =back
+
+=item * B<autocommit> - I<Bool> to switch on L<DBI/AutoCommit> (optional, default: 0)
 
 =back
 
