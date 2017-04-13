@@ -237,8 +237,6 @@ sub run {
 
 
     # Reconnect the dbi
-    CTX('dbi_log')->new_dbh();
-    CTX('dbi_log')->connect();
     CTX('dbi_backend')->new_dbh();
     CTX('dbi_backend')->connect();
     CTX('dbi_workflow')->new_dbh();

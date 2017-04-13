@@ -1,7 +1,7 @@
 ## OpenXPKI::Server::Log::NOOP.pm
 ##
 ## a dummy class that behaves like OpenXPKI::Server::Log, but does
-## not log anything (used during server startup where dbi_log is noy
+## not log anything (used during server startup where logger is noy
 ## yet available)
 ## Written in 2007 by Alexander Klink for the OpenXPKI Project
 ## (C) Copyright 2007 by The OpenXPKI Project
@@ -63,4 +63,4 @@ OpenXPKI::Server::Log:NOOP - not a logging implementation for OpenXPKI
 
 This is a class that behaves from the outside like OpenXPKI::Server::Log,
 but does not log anything. It is used during server initialization when
-dbi_log is not yet available.
+logger is not yet available.

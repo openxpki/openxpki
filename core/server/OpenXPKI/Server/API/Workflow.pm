@@ -1368,10 +1368,8 @@ sub __execute_workflow_activity {
         ) unless (defined $pid);
     
         # Reconnect the db handles - required until all old handles are replaced!
-        CTX('dbi_log')->new_dbh();
         CTX('dbi_workflow')->new_dbh();
         CTX('dbi_backend')->new_dbh();
-        CTX('dbi_log')->connect();
         CTX('dbi_workflow')->connect();
         CTX('dbi_backend')->connect();
 

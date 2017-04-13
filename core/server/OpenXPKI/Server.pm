@@ -126,7 +126,6 @@ sub new
 
     CTX('dbi_workflow')->disconnect();
     CTX('dbi_backend')->disconnect();
-    CTX('dbi_log')->disconnect();
 
     $self->{PARAMS}->{no_client_stdout} = 1;
 
@@ -448,23 +447,7 @@ sub do_process_request
 {
     ##! 2: "start"
     my $self = shift;
-
-    eval {
-        CTX('dbi_log')->new_dbh();
-	    CTX('dbi_log')->connect();
-    };
-    if ($EVAL_ERROR)
-    {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_COULD_NOT_RECONNECT_DBI_LOG',
-            params  => {
-                ERROR => $EVAL_ERROR,
-            },
-        );
-        return;
-    }
-    ##! 16: 'dbi_log reconnected with new dbh'
-
+ 
     my $log = CTX('log');
 
     ## recover from umask of Net::Server->run
@@ -1029,7 +1012,7 @@ the user interface will be initialized and started.
 
 =head2 do_process_request
 
-does the actual work of process_request: it reconnects dbi_log,
+does the actual work of process_request: 
 determines transport, serialization and service from the user
 input and calls the init() and run() methods on the corresponding
 service. It also does some housekeeping such as setting permissions,

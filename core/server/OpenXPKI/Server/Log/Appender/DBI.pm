@@ -1,7 +1,3 @@
-## OpenXPKI::Server::Log::Appender::DBI.pm 
-##
-## Written in 2007 by Alexander Klink for the OpenXPKI Project
-## Copyright (C) 2007 by The OpenXPKI Project
 package OpenXPKI::Server::Log::Appender::DBI;
 
 use strict;
@@ -13,6 +9,7 @@ use Data::Dumper;
 use English;
 use Log::Log4perl::Level;
 use Carp;
+use OpenXPKI::Server::Database; # we must import "auto_id" 
 
 my %LOGLEVELS = (
     ALL     => 0,
@@ -43,7 +40,6 @@ sub log {
 
     ##! 128: 'arg_ref: ' . Dumper $arg_ref
 
-
     my $timestamp = $self->__get_current_utc_time();
     ##! 64: 'timestamp: ' . $timestamp
     my $category  = $arg_ref->{'log4p_category'};
@@ -68,32 +64,16 @@ sub log {
     #       write to application_log and also put workflow_id into its
     #       own column instead of in the message.
     if ( $category =~ m{\.audit$} ) {
-        my $serial;
-        eval {
-            $serial = $dbi->get_new_serial(
-                TABLE => 'AUDITTRAIL',
-            );
-            ##! 64: 'serial: ' . $serial
-        };
-        if (my $exc = OpenXPKI::Exception->caught()) {
-            ##! 16: 'exception caught'
-            if ($exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED') {
-                ##! 16: 'dbi_log not connected'
-                print STDERR "dbi_log not connected! (tried to log: $timestamp, $category, $loglevel, $message)\n";
-                return; 
-            }
-            else {
-                $exc->rethrow();
-            }
-        }
+        # do NOT catch DBI errors here as we want to fail if audit 
+        # is not working
         $dbi->insert(
-            TABLE => 'AUDITTRAIL',
-            HASH  => {
-                AUDITTRAIL_SERIAL => $serial,
-                TIMESTAMP         => $timestamp,
-                CATEGORY          => $category,
-                LOGLEVEL           => $loglevel,
-                MESSAGE           => $message,
+            into => 'audittrail',
+            values  => {
+                audittrail_key => AUTO_ID,
+                logtimestamp   => $timestamp,
+                loglevel       => $loglevel,
+                category       => $category,
+                message        => $message,
             },    
         );
     } else {
@@ -102,12 +82,23 @@ sub log {
         if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
             $wf_id = CTX('workflow_id');
         }
-        eval {
-            $serial = $dbi->get_new_serial(
-                TABLE => 'APPLICATION_LOG',
-            );
-            ##! 64: 'serial: ' . $serial
-        };
+
+        my $loglevel_int = 0;
+        if ( exists $LOGLEVELS{$loglevel} ) {
+            $loglevel_int = $LOGLEVELS{$loglevel};
+        }
+        $dbi->insert(
+            into => 'application_log',
+            values  => {
+                application_log_id => AUTO_ID,
+                logtimestamp       => $timestamp,
+                workflow_id        => $wf_id,
+                priority           => $loglevel,
+                category           => $category,
+                message            => $message,
+            },    
+        );
+        
         if (my $exc = OpenXPKI::Exception->caught()) {
             ##! 16: 'exception caught'
             if ($exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED') {
@@ -119,25 +110,7 @@ sub log {
                 $exc->rethrow();
             }
         }
-        my $loglevel_int = 0;
-        if ( exists $LOGLEVELS{$loglevel} ) {
-            $loglevel_int = $LOGLEVELS{$loglevel};
-        }
-
-        $dbi->insert(
-            TABLE => 'APPLICATION_LOG',
-            HASH  => {
-                APPLICATION_LOG_SERIAL => $serial,
-                TIMESTAMP       => $timestamp,
-                WORKFLOW_SERIAL        => $wf_id,
-                CATEGORY           => $category,
-                PRIORITY           => $loglevel_int,
-                MESSAGE            => $message,
-            },    
-        );
     }
-
-    $dbi->commit();
 
     ##! 1: 'end'
     return 1;
@@ -171,18 +144,8 @@ OpenXPKI::Server::Log::Appender::DBI
 
 =head1 Description
 
-This is a special log appender for Log::Log4perl. It only implements a
-delayed connection setup. We use exactly the way described by the modules
-description.
+This is a special log appender for Log::Log4perl. It uses the dbi_log
+handle generated during server init to write to the audittrail and
+application_log tables. 
 
-=head1 Functions
-
-=head2 _init
-
-stores the parameters in a variable of the instance for later access.
-
-=head2 create_statement
-
-calls _init of the SUPER class (Log::Log4perl::Appender::DBI) and if
-this succeeds then the create_statement of the SUPER class is called. The
-_init enforces a delayed connection setup to the database.
+ 

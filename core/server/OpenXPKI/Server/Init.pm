@@ -382,17 +382,18 @@ sub __do_init_dbi_workflow {
 }
 
 sub __do_init_dbi_log {
-    ### init backend dbi...
-    my $dbi = get_dbi(
-    {
-        PURPOSE => 'log',
+    
+    ##! 1: "start"
+    my $args = shift;
+    
+    OpenXPKI::Server::Context::setcontext({
+        dbi_log => OpenXPKI::Server::Database->new(
+            log => CTX('log'),
+            db_params => __dbi_config('log'),
+            autocommit => 1
+        ),
     });
-
-    OpenXPKI::Server::Context::setcontext(
-    {
-        dbi_log => $dbi,
-    });
-    CTX('dbi_log')->connect();
+    
 }
 
 # TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
@@ -402,12 +403,32 @@ sub __do_init_dbi {
 
     ##! 1: "start"
 
+    OpenXPKI::Server::Context::setcontext({
+        dbi => OpenXPKI::Server::Database->new(
+            log => CTX('log'),
+            db_params => __dbi_config('main'),
+        ),
+    });
+}
+
+
+# TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
+sub __dbi_config {
+
+    my $section = shift || 'main';
+
+    ##! 1: "start"
     my $config = CTX('config');
-    my $dbpath = 'system.database.main';
-    my $db_config = $config->get_hash( $dbpath );
+    
+    # Fallback for logger/audit configs which can be separate
+    if (!$config->exists(['system','database',$section])) {
+        $section = 'main';
+    }
+    
+    my $db_config = $config->get_hash(['system','database',$section]);
 
     # Set environment variables
-    my $db_env = $config->get_hash("$dbpath.environment");
+    my $db_env = $config->get_hash( ['system','database',$section,'environment'] );
     foreach my $env_name (keys %{$db_env}) {
         $ENV{$env_name} = $db_env->{$env_name};
         ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
@@ -422,13 +443,10 @@ sub __do_init_dbi {
     delete $params{log};
     delete $params{debug};         # TODO #legacydb Remove treatment of DB parameter "debug" (occurs in example database.yaml)
 
-    OpenXPKI::Server::Context::setcontext({
-        dbi => OpenXPKI::Server::Database->new(
-            log => CTX('log'),
-            db_params => \%params,
-        ),
-    });
+    return \%params;
 }
+
+
 
 sub __do_init_acl {
     ### init acl...
