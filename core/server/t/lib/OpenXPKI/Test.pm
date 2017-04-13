@@ -222,13 +222,15 @@ sub setup_env {
     }
 
     # our default tasks
-    my @tasks = qw( config_versioned dbi_log log dbi_backend dbi_workflow dbi api );
+    my @tasks = qw( config_versioned dbi_log dbi_backend dbi_workflow dbi api );
     my %task_hash = map { $_ => 1 } @tasks;
     # more tasks requested via "init" parameter
     push @tasks, grep { not $task_hash{$_} } @{ $params{init} };
 
     # Init basic CTX objects
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
+
+    OpenXPKI::Server::Context::setcontext({'log' => OpenXPKI::Server::Log->new (CONFIG => OpenXPKI::Server::Context::CTX('config')->get('system.server.log4perl')), force => 1});
 
     # Set real session (OpenXPKI::Server::Init::init "killed" the old one anyway)
     my $session = OpenXPKI::Server::Session->new({
