@@ -6139,10 +6139,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NO_WORKFLOW_GIVEN"
 #~ msgstr "SPKAC-строка пуста."
 
@@ -7291,14 +7287,6 @@ msgstr "Имя учетной записи"
 #~ "Контекст технологического процесса изменился со времени последнего "
 #~ "просмотра, поэтому факт утверждения не записан. Зайдите, пожалуйста, на "
 #~ "страницу информации о технологическом процессе еще раз."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_REALM_MISSMATCH"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_LOAD_WORKFLOW_INFO"
-#~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_PARSE_WORKFLOW_INFO"

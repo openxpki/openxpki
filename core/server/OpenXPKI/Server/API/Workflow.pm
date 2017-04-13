@@ -33,39 +33,28 @@ sub START {
 # lowlevel workflow functions
 
 sub list_workflow_titles {
+    my ($self) = @_;
     ##! 1: "list_workflow_titles"
-    return __get_workflow_factory()->list_workflow_titles();
+    return CTX('workflow_factory')->get_factory->list_workflow_titles;
 }
 
 sub get_workflow_type_for_id {
-    my $self    = shift;
-    my $arg_ref = shift;
-    my $id      = $arg_ref->{ID};
+    my ($self, $args) = @_;
+
+    my $id      = $args->{ID};
     ##! 1: 'start'
     ##! 16: 'id: ' . $id
 
-    my $dbi = CTX('dbi_workflow');
-    # commit to get a current snapshot of the database in the
-    # highest isolation level.
-    # Without this, we will only see old data, especially if
-    # other processes are writing to the database at the same time
-    $dbi->commit();
-
-    my $db_result = $dbi->first(
-    TABLE    => 'WORKFLOW',
-    DYNAMIC  => {
-            'WORKFLOW_SERIAL' => {VALUE => $id},
-        },
+    my $db_result = CTX('dbi')->select_one(
+        from => 'workflow',
+        columns => [ 'workflow_type' ],
+        where => { workflow_id => $id },
+    )
+    or OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID',
+        params  => { ID => $id },
     );
-    if (! defined $db_result) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID',
-            params  => {
-                'ID' => $id,
-            },
-        );
-    }
-    my $type = $db_result->{'WORKFLOW_TYPE'};
+    my $type = $db_result->{workflow_type};
     ##! 16: 'type: ' . $type
     return $type;
 }
@@ -94,66 +83,49 @@ TIMESTAMP, PRIORITY, MESSAGE
 =cut
 
 sub get_workflow_log {
-
-    my $self  = shift;
-    my $args  = shift;
+    my ($self, $args)  = @_;
 
     ##! 1: "get_workflow_log"
-
     my $wf_id = $args->{ID};
 
     # ACL check
     my $wf_type = CTX('api')->get_workflow_type_for_id({ ID => $wf_id });
 
-
     my $role = CTX('session')->get_role() || 'Anonymous';
     my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'techlog' ] );
 
-    if (!$allowed) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG',
-            params  => {
-                'ID' => $wf_id,
-                'TYPE' => $wf_type,
-                'USER' => CTX('session')->get_user(),
-                'ROLE' => $role
-            },
-        );
-    }
-
-    my $limit = 50;
-    if (defined $args->{LIMIT}) {
-        $limit = $args->{LIMIT};
-    }
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG',
+        params  => {
+            'ID' => $wf_id,
+            'TYPE' => $wf_type,
+            'USER' => CTX('session')->get_user(),
+            'ROLE' => $role
+        },
+    ) unless $allowed;
 
     # we want to track the usage
     CTX('log')->usage()->info("get_workflow_log");
 
     # Reverse is inverted as we want to have reversed order by default
-    my $reverse = 1;
-    if ($args->{REVERSE}) {
-        $reverse = 0;
-    }
+    my $order = $args->{REVERSE} ? 'ASC' : 'DESC';
 
-    my $result = CTX('dbi_workflow')->select(
-        TABLE => 'APPLICATION_LOG',
-        DYNAMIC => {
-            WORKFLOW_SERIAL => { VALUE => $wf_id },
-        },
-        ORDER => [ 'TIMESTAMP', 'APPLICATION_LOG_SERIAL' ],
-        REVERSE => $reverse,
-        LIMIT => $limit
+    my $sth = CTX('dbi')->select(
+        from => 'application_log',
+        columns => [ qw( logtimestamp priority message ) ],
+        where => { workflow_id => $wf_id },
+        order_by => [ "logtimestamp $order", "application_log_id $order" ],
+        limit => $args->{LIMIT} // 50,
     );
 
     my @log;
-    while (my $line = shift @{$result}) {
+    while (my $entry = $sth->fetchrow_hashref) {
        # remove the package and session info from the message
-       $line->{MESSAGE} =~ s/\A\[OpenXPKI::.*\]//;
-       push @log, [ $line->{TIMESTAMP}, $line->{PRIORITY}, $line->{MESSAGE} ];
+       $entry->{message} =~ s/\A\[OpenXPKI::.*\]//;
+       push @log, [ $entry->{logtimestamp}, $entry->{priority}, $entry->{message} ];
     }
 
     return \@log;
-
 }
 
 
@@ -359,13 +331,11 @@ sub __get_workflow_ui_info {
 }
 
 sub get_workflow_history {
-    my $self    = shift;
-    my $arg_ref = shift;
+    my ($self, $args) = @_;
     ##! 1: 'start'
 
-    my $wf_id   = $arg_ref->{ID};
-
-    my $noacl = $arg_ref->{NOACL};
+    my $wf_id = $args->{ID};
+    my $noacl = $args->{NOACL};
 
     if (!$noacl) {
         my $role = CTX('session')->get_role() || 'Anonymous';
@@ -385,18 +355,31 @@ sub get_workflow_history {
         }
     }
 
-    my $history = CTX('dbi_workflow')->select(
-        TABLE => 'WORKFLOW_HISTORY',
-        DYNAMIC => {
-            WORKFLOW_SERIAL => {VALUE => $wf_id},
-        },
-        ORDER => [ 'WORKFLOW_HISTORY_DATE', 'WORKFLOW_HISTORY_SERIAL' ]
-    );
-    # sort ascending (unsorted within seconds)
-    #@{$history} = sort { $a->{WORKFLOW_HISTORY_SERIAL} <=> $b->{WORKFLOW_HISTORY_SERIAL} } @{$history};
-    ##! 64: 'history: ' . Dumper $history
+    my $history = CTX('dbi')->select(
+        from => 'workflow_history',
+        columns => [ '*' ],
+        where => { workflow_id => $wf_id },
+        order_by => [ 'workflow_history_date', 'workflow_hist_id' ],
+    )->fetchall_arrayref({});
 
-    return $history;
+    # TODO #legacydb get_workflow_history() returns HashRef with old DB layer's keys
+    my $history_legacy = [
+        map {
+            {
+                WORKFLOW_HISTORY_SERIAL => $_->{workflow_hist_id},
+                WORKFLOW_SERIAL         => $_->{workflow_id},
+                WORKFLOW_ACTION         => $_->{workflow_action},
+                WORKFLOW_DESCRIPTION    => $_->{workflow_description},
+                WORKFLOW_STATE          => $_->{workflow_state},
+                WORKFLOW_USER           => $_->{workflow_user},
+                WORKFLOW_HISTORY_DATE   => $_->{workflow_history_date},
+            }
+        }
+        @$history
+    ];
+
+    ##! 64: 'history: ' . Dumper $history
+    return $history_legacy;
 }
 
 =head2 get_workflow_creator
@@ -408,9 +391,7 @@ rules or matching realm.
 =cut
 
 sub get_workflow_creator {
-
-    my $self  = shift;
-    my $args  = shift;
+    my ($self, $args) = @_;
 
     my $result = CTX('dbi')->select_one(
         from => 'workflow_attributes',
@@ -418,9 +399,7 @@ sub get_workflow_creator {
         where => { 'attribute_contentkey' => 'creator', 'workflow_id' => $args->{ID} },
     );
 
-    if (!$result) {
-        return '';
-    }
+    return "" unless $result;
     return $result->{attribute_value};
 
 }
@@ -464,36 +443,22 @@ the running workflow.
 =cut
 
 sub execute_workflow_activity {
-    my $self  = shift;
-    my $args  = shift;
-
+    my ($self, $args) = @_;
     ##! 1: "execute_workflow_activity"
 
-    my $wf_title    = $args->{WORKFLOW};
     my $wf_id       = $args->{ID};
+    my $wf_type     = $args->{WORKFLOW} // $self->get_workflow_type_for_id({ ID => $wf_id });
     my $wf_activity = $args->{ACTIVITY};
     my $wf_params   = $args->{PARAMS};
     my $wf_uiinfo   = $args->{UIINFO};
     my $fork_mode   = $args->{ASYNC} || '';
 
-    ##! 32: 'params ' . Dumper $wf_params
-
-    if (! defined $wf_title) {
-        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
-    }
-
     ##! 2: "load workflow"
-    my $factory = __get_workflow_factory({
-        WORKFLOW_ID => $wf_id,
-    });
-    my $workflow = $factory->fetch_workflow(
-        $wf_title,
-        $wf_id
-    );
+    my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id });
 
     my $proc_state = $workflow->proc_state();
     # should be prevented by the UI but can happen if workflow moves while UI shows old state
-    if (!grep /$proc_state/, (qw(manual))) {
+    if ($proc_state ne "manual") {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_EXECUTE_NOT_IN_VALID_STATE',
             params => { ID => $wf_id, PROC_STATE => $proc_state }
@@ -512,7 +477,7 @@ sub execute_workflow_activity {
     if ($fork_mode) {
         $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
         CTX('log')->log(
-            MESSAGE  => "Background execution of workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
+            MESSAGE  => "Background execution of workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')",
             PRIORITY => 'debug',
             FACILITY => 'workflow',
         );
@@ -522,44 +487,31 @@ sub execute_workflow_activity {
     } else {
         $self->__execute_workflow_activity( $workflow, $wf_activity );
         CTX('log')->log(
-            MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_title')",
+            MESSAGE  => "Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')",
             PRIORITY => 'debug',
             FACILITY => 'workflow',
         );
     }
 
-    if ($wf_uiinfo) {
-        return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
-    } else {
-        return __get_workflow_info($workflow);
-    }
+    return $self->__get_workflow_ui_info({ WORKFLOW => $workflow }) if $wf_uiinfo;
+    return $self->__get_workflow_info($workflow);
 }
 
 sub fail_workflow {
-
-    my $self  = shift;
-    my $args  = shift;
-
+    my ($self, $args) = @_;
     ##! 1: "fail_workflow"
 
-    my $wf_title  = $args->{WORKFLOW};
+    my $wf_type  = $args->{WORKFLOW};
     my $wf_id     = $args->{ID};
     my $reason    = $args->{REASON};
     my $error     = $args->{ERROR};
 
-    if (! defined $wf_title) {
-        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
+    if (! defined $wf_type) {
+        $wf_type = $self->get_workflow_type_for_id({ ID => $wf_id });
     }
 
     ##! 2: "load workflow"
-    my $factory = __get_workflow_factory({
-        WORKFLOW_ID => $wf_id,
-    });
-
-    my $workflow = $factory->fetch_workflow(
-        $wf_title,
-        $wf_id
-    );
+    my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id });
 
     if (!$error) { $error = 'Failed by user'; }
     if (!$reason) { $reason = 'userfail'; }
@@ -567,7 +519,7 @@ sub fail_workflow {
     $workflow->set_failed( $error, $reason );
 
     CTX('log')->log(
-        MESSAGE  => "Failed workflow $wf_id (type '$wf_title') with error $error",
+        MESSAGE  => "Failed workflow $wf_id (type '$wf_type') with error $error",
         PRIORITY => 'info',
         FACILITY => 'workflow',
     );
@@ -583,12 +535,8 @@ the history and reruns it. This method is also used by the watchdog.
 
 =cut
 sub wakeup_workflow {
-
-    my $self  = shift;
-    my $args  = shift;
-
+    my ($self, $args) = @_;
     ##! 1: "wakeup workflow"
-
     return $self->__wakeup_resume_workflow( 'wakeup', $args );
 }
 
@@ -599,12 +547,8 @@ Only valid if the workflow is in exception state, same as wakeup
 
 =cut
 sub resume_workflow {
-
-    my $self  = shift;
-    my $args  = shift;
-
+    my ($self, $args) = @_;
     ##! 1: "resume workflow"
-
     return $self->__wakeup_resume_workflow( 'resume', $args );
 }
 
@@ -637,10 +581,7 @@ the running workflow.
 =cut
 
 sub __wakeup_resume_workflow {
-
-    my $self  = shift;
-    my $mode  = shift; # resume or wakeup
-    my $args  = shift;
+    my ($self, $mode, $args) = @_; # mode: resume or wakeup
     my $fork_mode = $args->{ASYNC} || '';
 
     if ($mode ne 'wakeup' && $mode ne 'resume') {
@@ -650,22 +591,16 @@ sub __wakeup_resume_workflow {
         );
     }
 
-    my $wf_title  = $args->{WORKFLOW};
+    my $wf_type  = $args->{WORKFLOW};
     my $wf_id     = $args->{ID};
 
-    if (! defined $wf_title) {
-        $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
+    if (! defined $wf_type) {
+        $wf_type = $self->get_workflow_type_for_id({ ID => $wf_id });
     }
 
     ##! 2: "load workflow"
-    my $factory = __get_workflow_factory({
-        WORKFLOW_ID => $wf_id,
-    });
-
-    my $workflow = $factory->fetch_workflow(
-        $wf_title,
-        $wf_id
-    );
+    my $factory = $self->__get_workflow_factory({ WORKFLOW_ID => $wf_id });
+    my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id, FACTORY => $factory });
 
     ##! 64: 'Got workflow ' . Dumper $workflow
 
@@ -700,7 +635,7 @@ sub __wakeup_resume_workflow {
     }
 
     CTX('log')->log(
-        MESSAGE  => "$mode workflow $wf_id (type '$wf_title') with activity $wf_activity",
+        MESSAGE  => "$mode workflow $wf_id (type '$wf_type') with activity $wf_activity",
         PRIORITY => 'info',
         FACILITY => 'workflow',
     );
@@ -718,21 +653,13 @@ sub __wakeup_resume_workflow {
 }
 
 sub get_workflow_activities_params {
-    my $self = shift;
-    my $args = shift;
+    my ($self, $args) = @_;
     my @list = ();
 
-    my $wf_title = $args->{WORKFLOW};
+    my $wf_type = $args->{WORKFLOW};
     my $wf_id = $args-> {ID};
 
-    my $factory = __get_workflow_factory({
-            WORKFLOW_ID => $wf_id,
-        });
-
-    my $workflow = $factory->fetch_workflow(
-        $wf_title,
-        $wf_id,
-    );
+    my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id });
 
     foreach my $action ( $workflow->get_current_actions() ) {
         my $fields = [];
@@ -766,21 +693,19 @@ be continued.
 
 =cut
 sub create_workflow_instance {
-    my $self  = shift;
-    my $args  = shift;
-
+    my ($self, $args) = @_;
     ##! 1: "create workflow instance"
     ##! 2: Dumper $args
 
-    my $wf_title = $args->{WORKFLOW};
+    my $wf_type = $args->{WORKFLOW};
     my $wf_uiinfo = $args->{UIINFO};
 
-    my $workflow = __get_workflow_factory()->create_workflow($wf_title);
+    my $workflow = CTX('workflow_factory')->get_factory->create_workflow($wf_type);
 
     if (! defined $workflow) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_ILLEGAL_WORKFLOW_TITLE",
-            params => { WORKFLOW => $wf_title }
+            params => { WORKFLOW => $wf_type }
         );
     }
 
@@ -805,7 +730,7 @@ sub create_workflow_instance {
 
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->log(
-        MESSAGE  => "Workflow instance $wf_id created for $creator (type: '$wf_title')",
+        MESSAGE  => "Workflow instance $wf_id created for $creator (type: '$wf_type')",
         PRIORITY => 'info',
         FACILITY => 'workflow',
     );
@@ -818,7 +743,7 @@ sub create_workflow_instance {
     if (not scalar @actions || scalar @actions != 1) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_NO_FIRST_ACTIVITY",
-            params => { WORKFLOW => $wf_title }
+            params => { WORKFLOW => $wf_type }
         );
     }
     my $initial_action = shift @actions;
@@ -855,28 +780,17 @@ sub create_workflow_instance {
     }
     $workflow->attrib({ creator => $context->param( 'creator' ) });
 
-    if ($wf_uiinfo) {
-        return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
-    } else {
-        return __get_workflow_info($workflow);
-    }
-
+    return $self->__get_workflow_ui_info({ WORKFLOW => $workflow }) if $wf_uiinfo;
+    return $self->__get_workflow_info($workflow);
 }
 
 sub get_workflow_activities {
-    my $self  = shift;
-    my $args  = shift;
+    my ($self, $args) = @_;
 
-    my $wf_title = $args->{WORKFLOW};
+    my $wf_type = $args->{WORKFLOW};
     my $wf_id    = $args->{ID};
 
-    my $factory = __get_workflow_factory({
-        WORKFLOW_ID => $wf_id,
-    });
-    my $workflow = $factory->fetch_workflow(
-        $wf_title,
-        $wf_id,
-    );
+    my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id });
     my @list = $workflow->get_current_actions();
 
     ##! 128: 'workflow after get_workflow_activities: ' . Dumper $workflow
@@ -897,24 +811,20 @@ with label/description as value.
 =cut
 
 sub get_workflow_instance_types {
-
-    my $self  = shift;
-    my $args  = shift;
+    my ($self, $args) = @_;
 
     my $cfg = CTX('config');
     my $pki_realm = CTX('session')->get_pki_realm();
 
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE   => [ 'WORKFLOW' ],
-        DISTINCT => 1,
-        COLUMNS => [ 'WORKFLOW.WORKFLOW_TYPE' ],
-        JOIN => [['WORKFLOW_ID']],
-        DYNAMIC => { 'WORKFLOW.PKI_REALM' => $pki_realm }
+    my $sth = CTX('dbi')->select(
+        from   => 'workflow',
+        columns => [ -distinct => 'workflow_type' ],
+        where => { pki_realm => $pki_realm },
     );
 
     my $result = {};
-    while (my $line = shift @{$db_results}) {
-        my $type = $line->{'WORKFLOW.WORKFLOW_TYPE'};
+    while (my $line = $sth->fetchrow_hashref) {
+        my $type = $line->{workflow_type};
         my $label = $cfg->get([ 'workflow', 'def', $type, 'head', 'label' ]);
         my $desc = $cfg->get([ 'workflow', 'def', $type, 'head', 'description' ]);
         $result->{$type} = {
@@ -922,18 +832,14 @@ sub get_workflow_instance_types {
             description => $desc || $label || '',
         };
     }
-
     return $result;
-
 }
 
 
 sub search_workflow_instances_count {
+    my ($self, $args) = @_;
 
-    my $self     = shift;
-    my $arg_ref  = shift;
-
-    my $params = $self->__search_workflow_instances( $arg_ref );
+    my $params = $self->__search_workflow_instances($args);
 
     $params->{COLUMNS} = [{ COLUMN => 'WORKFLOW.WORKFLOW_SERIAL', AGGREGATE => 'COUNT' }];
 
@@ -955,11 +861,9 @@ sub search_workflow_instances_count {
 }
 
 sub search_workflow_instances {
+    my ($self, $args) = @_;
 
-    my $self     = shift;
-    my $arg_ref  = shift;
-
-    my $param = $self->__search_workflow_instances( $arg_ref );
+    my $param = $self->__search_workflow_instances($args);
 
     my $dbi = CTX('dbi_workflow');
     $dbi->commit();
@@ -979,25 +883,24 @@ sub search_workflow_instances {
 }
 
 sub __search_workflow_instances {
+    my ($self, $args) = @_;
 
-    my $self     = shift;
-    my $arg_ref  = shift;
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
 
     my @attrib;
 
     # We want to drop searches in context, so log a deprecation warning if context is used
-    if ($arg_ref->{CONTEXT} && ref $arg_ref->{CONTEXT} eq 'ARRAY') {
+    if ($args->{CONTEXT} && ref $args->{CONTEXT} eq 'ARRAY') {
         CTX('log')->log(
             MESSAGE  => "workflow search using context - please fix",
             PRIORITY => 'warn',
             FACILITY => 'application',
         );
-        @attrib = @{ $arg_ref->{CONTEXT} };
+        @attrib = @{ $args->{CONTEXT} };
     }
 
-    if ($arg_ref->{ATTRIBUTE} && ref $arg_ref->{ATTRIBUTE} eq 'ARRAY') {
-        @attrib = @{ $arg_ref->{ATTRIBUTE} };
+    if ($args->{ATTRIBUTE} && ref $args->{ATTRIBUTE} eq 'ARRAY') {
+        @attrib = @{ $args->{ATTRIBUTE} };
     }
 
     my $dynamic;
@@ -1006,8 +909,8 @@ sub __search_workflow_instances {
 
 
     # Search for known serials, used e.g. for certificate relations
-    if ($arg_ref->{SERIAL} && ref $arg_ref->{SERIAL} eq 'ARRAY') {
-        $dynamic->{'WORKFLOW.WORKFLOW_SERIAL'} = {VALUE => $arg_ref->{SERIAL}  };
+    if ($args->{SERIAL} && ref $args->{SERIAL} eq 'ARRAY') {
+        $dynamic->{'WORKFLOW.WORKFLOW_SERIAL'} = {VALUE => $args->{SERIAL}  };
     }
 
     ## create complex select structures, similar to the following:
@@ -1043,25 +946,25 @@ sub __search_workflow_instances {
     push @joins, 'WORKFLOW_SERIAL';
 
     # Do not restrict if PKI_REALM => "_any"
-    if (not $arg_ref->{PKI_REALM} or $arg_ref->{PKI_REALM} !~ /_any/i) {
-        $dynamic->{'WORKFLOW.PKI_REALM'} = $arg_ref->{PKI_REALM} // CTX('session')->get_pki_realm();
+    if (not $args->{PKI_REALM} or $args->{PKI_REALM} !~ /_any/i) {
+        $dynamic->{'WORKFLOW.PKI_REALM'} = $args->{PKI_REALM} // CTX('session')->get_pki_realm();
     }
 
-    if (defined $arg_ref->{TYPE}) {
+    if (defined $args->{TYPE}) {
         # do parameter validation (here instead of the API because
         # the API can't do regex checks on arrayrefs)
-        if (! ref $arg_ref->{TYPE}) {
-            if ($arg_ref->{TYPE} !~ $re_alpha_string) {
+        if (! ref $args->{TYPE}) {
+            if ($args->{TYPE} !~ $re_alpha_string) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC',
                     params  => {
-                        TYPE => $arg_ref->{TYPE},
+                        TYPE => $args->{TYPE},
                     },
                 );
             }
         }
-        elsif (ref $arg_ref->{TYPE} eq 'ARRAYREF') {
-            foreach my $subtype (@{$arg_ref->{TYPE}}) {
+        elsif (ref $args->{TYPE} eq 'ARRAYREF') {
+            foreach my $subtype (@{$args->{TYPE}}) {
                 if ($subtype !~ $re_alpha_string) {
                     OpenXPKI::Exception->throw(
                         message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC',
@@ -1072,21 +975,21 @@ sub __search_workflow_instances {
                 }
             }
         }
-        $dynamic->{'WORKFLOW.WORKFLOW_TYPE'} = {VALUE => $arg_ref->{TYPE}};
+        $dynamic->{'WORKFLOW.WORKFLOW_TYPE'} = {VALUE => $args->{TYPE}};
     }
-    if (defined $arg_ref->{STATE}) {
-        if (! ref $arg_ref->{STATE}) {
-            if ($arg_ref->{STATE} !~ $re_alpha_string) {
+    if (defined $args->{STATE}) {
+        if (! ref $args->{STATE}) {
+            if ($args->{STATE} !~ $re_alpha_string) {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC',
                     params  => {
-                        STATE => $arg_ref->{STATE},
+                        STATE => $args->{STATE},
                     },
                 );
             }
         }
-        elsif (ref $arg_ref->{STATE} eq 'ARRAYREF') {
-            foreach my $substate (@{$arg_ref->{STATE}}) {
+        elsif (ref $args->{STATE} eq 'ARRAYREF') {
+            foreach my $substate (@{$args->{STATE}}) {
                 if ($substate !~ $re_alpha_string) {
                     OpenXPKI::Exception->throw(
                         message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC',
@@ -1097,33 +1000,33 @@ sub __search_workflow_instances {
                 }
             }
         }
-        $dynamic->{'WORKFLOW.WORKFLOW_STATE'} = {VALUE => $arg_ref->{STATE}};
+        $dynamic->{'WORKFLOW.WORKFLOW_STATE'} = {VALUE => $args->{STATE}};
     }
 
-    if (defined $arg_ref->{PROC_STATE}) {
-        $dynamic->{'WORKFLOW.WORKFLOW_PROC_STATE'} = { VALUE => $arg_ref->{PROC_STATE} };
+    if (defined $args->{PROC_STATE}) {
+        $dynamic->{'WORKFLOW.WORKFLOW_PROC_STATE'} = { VALUE => $args->{PROC_STATE} };
     }
 
     my %limit;
-    if (defined $arg_ref->{LIMIT} && !defined $arg_ref->{START}) {
-        $limit{'LIMIT'} = $arg_ref->{LIMIT};
+    if (defined $args->{LIMIT} && !defined $args->{START}) {
+        $limit{'LIMIT'} = $args->{LIMIT};
     }
-    elsif (defined $arg_ref->{LIMIT} && defined $arg_ref->{START}) {
+    elsif (defined $args->{LIMIT} && defined $args->{START}) {
         $limit{'LIMIT'} = {
-            AMOUNT => $arg_ref->{LIMIT},
-            START  => $arg_ref->{START},
+            AMOUNT => $args->{LIMIT},
+            START  => $args->{START},
         };
     }
 
     # Custom ordering
     my $order = 'WORKFLOW.WORKFLOW_SERIAL';
-    if ($arg_ref->{ORDER}) {
-       $order = $arg_ref->{ORDER};
+    if ($args->{ORDER}) {
+       $order = $args->{ORDER};
     }
 
     my $reverse = 1;
-    if (defined $arg_ref->{REVERSE}) {
-       $reverse = $arg_ref->{REVERSE};
+    if (defined $args->{REVERSE}) {
+       $reverse = $args->{REVERSE};
     }
 
     ##! 16: 'dynamic: ' . Dumper $dynamic
@@ -1153,97 +1056,56 @@ sub __search_workflow_instances {
 ###########################################################################
 # private functions
 
-sub __get_workflow_factory {
-    ##! 1: 'start'
+# Returns an instance of OpenXPKI::Server::Workflow
+sub __fetch_workflow {
+    my ($self, $args) = @_;
 
-    my $arg_ref = shift;
+    my $wf_id = $args->{ID};
+    my $factory = $args->{FACTORY} // CTX('workflow_factory')->get_factory;
 
-    # No Workflow - just get the standard factory
-    if (!$arg_ref->{WORKFLOW_ID}) {
-        ##! 16: 'No workflow id - create factory from session info'
-        return CTX('workflow_factory')->get_factory();
-    }
-
-    # Fetch the serialized session from the workflow table
-    ##! 16: 'determine factory for workflow ' . $arg_ref->{WORKFLOW_ID}
-    my $wf = CTX('dbi_workflow')->first(
-        TABLE   => 'WORKFLOW',
-        KEY => $arg_ref->{WORKFLOW_ID}
+    #
+    # Check workflow PKI realm and set type (if not given)
+    #
+    my $dbresult = CTX('dbi')->select_one(
+        from => 'workflow',
+        columns => [ qw( workflow_type pki_realm ) ],
+        where => { workflow_id => $wf_id },
+    )
+    or OpenXPKI::Exception->throw(
+        message => 'Requested workflow not found',
+        params  => { WORKFLOW_ID => $wf_id },
     );
-    if (! defined $wf) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_LOAD_WORKFLOW_INFO',
-            params  => {
-                WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
-            },
-        );
-    }
+
+    my $wf_type = $args->{TYPE} // $dbresult->{workflow_type};
 
     # We can not load workflows from other realms as this will break config and security
     # The watchdog switches the session realm before instantiating a new factory
-    if (CTX('session')->get_pki_realm() ne $wf->{PKI_REALM}) {
+    if (CTX('session')->get_pki_realm ne $dbresult->{pki_realm}) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_REALM_MISSMATCH',
+            message => 'Requested workflow is not in current PKI realm',
             params  => {
-                WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
-                WORKFLOW_REALM => $wf->{PKI_REALM},
-                SESSION_REALM => CTX('session')->get_pki_realm()
+                WORKFLOW_ID => $wf_id,
+                WORKFLOW_REALM => $dbresult->{pki_realm},
+                SESSION_REALM => CTX('session')->get_pki_realm,
             },
         );
     }
 
-    my $wf_session_info = CTX('session')->parse_serialized_info($wf->{WORKFLOW_SESSION});
-    if (!$wf_session_info || ref $wf_session_info ne 'HASH') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_PARSE_WORKFLOW_INFO',
-            params  => {
-                WORKFLOW_ID => $arg_ref->{WORKFLOW_ID},
-                WORKFLOW_SESSION => $wf->{WORKFLOW_SESSION}
-            },
-        );
-    }
+    #
+    # Fetch workflow via Workflow engine
+    #
+    my $workflow = $factory->fetch_workflow($wf_type, $wf_id);
 
-    OpenXPKI::Server::Context::setcontext(
-	{
-	    workflow_id => $arg_ref->{WORKFLOW_ID},
-	    force       => 1,
-	});
+    OpenXPKI::Server::Context::setcontext({
+        workflow_id => $wf_id,
+        force       => 1,
+    });
 
-    # We have now obtained the configuration id that was active during
-    # creation of the workflow instance. However, if for some reason
-    # the matching configuration is not available we have two options:
-    # 1. bail out with an error
-    # 2. accept that there is an error and continue anyway with a different
-    #    configuration
-    # Option 1 is not ideal: if the corresponding configuration has for
-    # some reason be deleted from the database the workflow cannot be
-    # instantiated any longer. This is often not really a problem but
-    # sometimes this will lead to severe problems, e. g. for long
-    # running workflows. unfortunately, if a workflow cannot be instantiated
-    # it can neither be displayed, nor executed.
-    # In order to make things a bit more robust fall back to using a newer
-    # configuration than the one missing. As we don't have a timestamp
-    # for the configuration, a safe bet is to use the current configuration.
-    # Caveat: the current workflow definition might not be compatible with
-    # the particular workflow instance. There is a risk that the workflow
-    # instance gets stuck in an unreachable state.
-    # In comparison to not being able to even view the workflow this seems
-    # to be an acceptable tradeoff.
-
-    my $factory = CTX('workflow_factory')->get_factory({ });
-
-    ##! 64: 'factory: ' . Dumper $factory
-    if (! defined $factory) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED',
-        );
-    }
-
-    return $factory;
+    return $workflow;
 }
 
 sub __get_workflow_info {
-    my $workflow  = shift;
+    my ($self, $workflow) = @_;
 
     ##! 1: "__get_workflow_info"
 
@@ -1639,7 +1501,26 @@ Works exactly the same as search_workflow_instances, but returns the
 number of results instead of the results themselves.
 
 
-=head2 __get_workflow_factory
+=head2 __fetch_workflow
 
-Get a suitable factory from handler. If a workflow id is given, the config
-version and realm are extracted from the workflow system.
+Fetch a workflow from the workflow factory. Throws an exception if the
+workflow's PKI realm is different from the current one.
+
+B<Parameters>
+
+=over
+
+=item * ID
+
+Workflow identifier.
+
+=item * TYPE (optional)
+
+Workflow type. Read from database if omitted.
+
+=item * FACTORY (optional)
+
+Workflow factory (instance of L<OpenXPKI::Workflow::Handler>). Can be given to
+speed up function call if the factory is already known.
+
+=back
