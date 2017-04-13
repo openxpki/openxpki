@@ -41,19 +41,21 @@ sub execute {
 	    OpenXPKI::Exception->throw(
 	       message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TEST_CRASHED',	       
        );
-	}
-	
-	if ($action eq 'fatal_err') {
+       
+	} elsif ($action eq 'fatal_err') {
 	    ##! 16: 'fatal error on request'	    
 	    OpenXPKI::Server::Workflow::Pause->throw(
 	       cause => 'a manually triggered pause - this should NEVER happen in real code. throws an exception in OpenXPKI::Server::Workflow::execute_action()',	       
        );
-	}
-	
-	if ($action eq 'pause') {
+       
+	} elsif ($action eq 'pause') {
 	    ##! 16: 'Pause on request '	
 	    $self->pause($pause_cause);
-	}
+	    
+	} elsif ($action eq 'sleep') {
+        ##! 16: 'Pause on request ' 
+        sleep(  $self->param('sleep') || 15 );
+    }
 	
 	#if pause or crash is given, we should never reach this part: 
 	##! 1: 'Workflow Test: passed all hurdles ...execute my job'; 
