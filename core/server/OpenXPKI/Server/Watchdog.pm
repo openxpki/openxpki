@@ -75,7 +75,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Watchdog::WorkflowInstance;
 use OpenXPKI::DateTime;
 use Proc::ProcessTable;
 
@@ -241,7 +240,7 @@ sub run {
     CTX('dbi_backend')->connect();
     CTX('dbi_workflow')->new_dbh();
     CTX('dbi_workflow')->connect();
-    
+
     # parent process returns
     return $pid unless $pid == 0;
 
@@ -634,25 +633,25 @@ sub __flag_and_fetch_workflow {
 
 =head2 __wake_up_workflow
 
-Restore the session environment and execute the action, runs in eval 
+Restore the session environment and execute the action, runs in eval
 block and returns the error message in case of error.
 
 =cut
 
 sub __wake_up_workflow {
-    
+
     my $self = shift;
     my $args = shift;
 
     # errors here are fork errors and we dont want the watchdog to die!
     eval {
         $self->__check_session();
-    
+
         CTX('session')->set_pki_realm($args->{pki_realm});
         CTX('session')->import_serialized_info($args->{workflow_session});
-    
+
         ##! 1: 'call wakeup'
-    
+
         my $wf_info = CTX('api')->wakeup_workflow({
             WORKFLOW => $args->{workflow_type},
             ID => $args->{workflow_id},
@@ -667,18 +666,18 @@ sub __wake_up_workflow {
     elsif ($EVAL_ERROR) {
         $error_msg = $error_msg = "Failed to wakeup workflow $args->{workflow_id} with error ". $EVAL_ERROR;
     }
-    
+
     if ($error_msg) {
         CTX('log')->log(
             MESSAGE  => $error_msg,
             PRIORITY => "error",
             FACILITY => "system"
         );
-        return $error_msg; 
-    } 
-    
+        return $error_msg;
+    }
+
     return 0;
- 
+
 }
 
 
