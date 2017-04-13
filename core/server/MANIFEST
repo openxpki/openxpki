@@ -261,7 +261,6 @@ OpenXPKI/Server/Workflow.pm
 OpenXPKI/Server/Workflow/Pause.pm
 OpenXPKI/Server/Workflow/Stub.pm
 OpenXPKI/Server/Watchdog.pm
-OpenXPKI/Server/Watchdog/WorkflowInstance.pm
 
 OpenXPKI/Server/Workflow/WFObject.pm
 OpenXPKI/Server/Workflow/WFObject/WFArray.pm
@@ -554,7 +553,6 @@ t/28_log/01.t
 t/28_log/log4perl.conf
 t/28_log/README
 
-t/30_dbi/01.t
 t/30_dbi/02.t
 t/30_dbi/03.t
 t/30_dbi/04_quoting_bug.t
@@ -633,6 +631,7 @@ t/80_config_versioning/config.patch
 
 t/90_api/10_housekeeping_purge_applog.t
 t/90_api/20_token.t
+t/90_api/30_workflow.t
 
 t/99_cleanup/25_crypto.t
 t/99_cleanup/28_log.t
