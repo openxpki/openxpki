@@ -52,7 +52,14 @@ sub fetch_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
 
 
-    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' )
+        or OpenXPKI::Exception->throw(
+            message => 'Requested workflow not found',
+            params  => {
+                WORKFLOW_TYPE => $wf_type,
+                WORKFLOW_ID => $wf_id,
+            },
+        );
     # the following both checks whether the user is allowed to
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
@@ -73,7 +80,14 @@ sub fetch_workflow {
 
 sub fetch_unfiltered_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
-    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' )
+        or OpenXPKI::Exception->throw(
+            message => 'Requested workflow not found',
+            params  => {
+                WORKFLOW_TYPE => $wf_type,
+                WORKFLOW_ID => $wf_id,
+            },
+        );
 
     $self->__authorize_workflow({
         ACTION   => 'access',
