@@ -29,7 +29,6 @@ use OpenXPKI::Server::API::Object;
 use OpenXPKI::Server::API::Profile;
 use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Token;
-use OpenXPKI::Server::API::Visualization;
 use OpenXPKI::Server::API::Housekeeping;
 use OpenXPKI::Server::API::Workflow;
 use OpenXPKI::Server::API::Smartcard;
@@ -1199,24 +1198,6 @@ sub BUILD {
                     optional => 1,
                 },
             }
-        },
-
-        ### Visualization API
-        'get_workflow_instance_info' => {
-            class  => 'Visualization',
-            params => {
-                ID => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-                FORMAT => {
-                    type  => SCALAR,
-                    regex => $re_image_format,
-                },
-                LANGUAGE => {
-                    type => SCALAR, # TODO: regexp?
-                },
-            },
         },
 
         ### Housekeeping API 

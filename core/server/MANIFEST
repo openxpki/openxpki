@@ -223,7 +223,6 @@ OpenXPKI/Server/API/Secret.pm
 OpenXPKI/Server/API/Smartcard.pm
 OpenXPKI/Server/API/Token.pm
 OpenXPKI/Server/API/UI.pm
-OpenXPKI/Server/API/Visualization.pm
 OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
