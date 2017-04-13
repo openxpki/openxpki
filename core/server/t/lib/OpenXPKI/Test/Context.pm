@@ -131,19 +131,11 @@ sub _init_legacydb_log {
     use OpenXPKI::Server::Context qw( CTX );
 
     OpenXPKI::Server::Context::setcontext({
-        dbi_log => OpenXPKI::Server::DBI->new(
-            SERVER_ID => 0,
-            SERVER_SHIFT => 8,
-            LOG         => OpenXPKI::Server::Log::NOOP->new,
-            TYPE        => $self->db_conf->{type},
-            NAME        => $self->db_conf->{name},
-            HOST        => $self->db_conf->{host},
-            PORT        => $self->db_conf->{port},
-            USER        => $self->db_conf->{user},
-            PASSWD      => $self->db_conf->{passwd},
-        )
-    });
-    CTX('dbi_log')->connect;
+        dbi_log => OpenXPKI::Server::Database->new(
+            log => OpenXPKI::Server::Log::NOOP->new,
+            db_params => $self->db_conf,
+            autocommit => 1
+        ),
 
     $self->is_legacydb_log_initialized(1);
 }

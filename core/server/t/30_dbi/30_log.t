@@ -10,7 +10,6 @@ if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
 
-
 our $dbi;
 our $token;
 require 't/30_dbi/common.pl';
