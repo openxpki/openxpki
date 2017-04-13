@@ -12,6 +12,7 @@ use POSIX qw( strftime );
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use JSON;
 
 use OpenXPKI::Client;
 
@@ -24,6 +25,7 @@ my %params = (
     param => [],
     arg => [],
     timeout => 30,
+    json => undef,
     );
 
 sub debug {
@@ -31,6 +33,11 @@ sub debug {
     if ($params{debug}) {
     print $arg . "\n";
     }
+}
+
+sub print_json {
+    my $msg = shift;
+    print JSON->new->pretty(1)->encode($msg);
 }
 
 GetOptions(\%params,
@@ -48,6 +55,7 @@ GetOptions(\%params,
             arg=s@
             timeout|to=i
             debug
+            json
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -90,14 +98,13 @@ if($params{instance}){
     $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
 } elsif(!$params{socketfile}){
     $params{socketfile} = '/var/openxpki/openxpki.socket';
-    printf("using default socket %s \n", $params{socketfile});
+    printf STDERR "using default socket %s \n", $params{socketfile};
 }
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
-my $client = OpenXPKI::Client->new(
-    {
+my $client = OpenXPKI::Client->new({
     SOCKETFILE => $params{socketfile},
     TIMEOUT  => $params{timeout},
     });
@@ -122,52 +129,61 @@ while (1) {
     my $status = $reply->{SERVICE_MSG};
 
     if ($status eq 'GET_PKI_REALM') {
-    if (! $params{realm}) {
-        print "Available PKI realms:\n";
-        foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
-        print "  $entry\n";
+        if (! $params{realm}) {
+            if ($params{json}) {
+                print_json({ result => { pki_realm => keys %{$reply->{PARAMS}->{PKI_REALMS}} } }); 
+            } else {
+                print "Available PKI realms:\n";
+                foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
+                    print "  $entry\n";
+                }
+            }
+            die "No --realm specified. Stopped";
         }
-        die "No --realm specified. Stopped";
-    }
-    $reply = $client->send_receive_service_msg('GET_PKI_REALM',
-                           {
-                               PKI_REALM => $params{realm},
-                           });
-    next SERVICE_MESSAGE;
+        $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
+            PKI_REALM => $params{realm},
+        });
+      next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
-    if (! $params{authstack}) {
-        print "Available authentication stacks:\n";
-        foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
-        print "  $entry\n";
+        if (!$params{authstack}) {
+            if ($params{json}) {
+                print_json({ result => { auth_stack => keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}} } }); 
+            } else {
+                print "Available authentication stacks:\n";
+                foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
+                    print "  $entry\n";
+                }
+            }
+            die "No --authstack specified. Stopped";
         }
-        die "No --authstack specified. Stopped";
-    }
-    $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
-                           {
-                               AUTHENTICATION_STACK => $params{authstack},
-                           });
-    next SERVICE_MESSAGE;
+        $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK', {
+               AUTHENTICATION_STACK => $params{authstack},
+        });
+        next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_PASSWD_LOGIN') {
-    if (! $params{authuser}) {
-        die "No --authuser specified. Stopped";
-    }
-    $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
-                           {
-                               LOGIN => $params{authuser},
-                               PASSWD => $params{authpass},
-                           });
-    next SERVICE_MESSAGE;
+        if (! $params{authuser}) {
+            die "No --authuser specified. Stopped";
+        }
+        $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN', {
+            LOGIN => $params{authuser},
+            PASSWD => $params{authpass},
+        });
+        next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'SERVICE_READY') {
-    last SERVICE_MESSAGE;
+        last SERVICE_MESSAGE;
     }
 
-    print Dumper $reply;
+    if ($params{json}) {
+        print_json({ error => $reply });
+    } else {
+        print Dumper $reply;
+    }
     die "Unhandled service message. Stopped";
 }
 
@@ -189,12 +205,22 @@ $reply = $client->send_receive_service_msg('COMMAND', {
 });
 
 if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-    print Dumper $reply->{PARAMS};
-    print "done\n";
+
+    if (!$params{json}) {
+        print Dumper $reply->{PARAMS};
+        print "done\n";
+    } else {
+       print_json({ result => $reply->{PARAMS} });
+    }
     exit 0;
 } else {
-    print "Error:\n";
-    print Dumper $reply;
+    if (!$params{json}) {
+        print "Error:\n";
+        print Dumper $reply;
+        print "\n";
+    } else {
+        print_json({ error => $reply });
+    }
     exit 1;
 }
 
@@ -222,7 +248,8 @@ openxpkicli [options] command
     --param VALUE     	  stack VALUE onto methods PARAMS array
     --param KEY=VALUE     set VALUE in methods PARAMS hash using KEY
     --debug               enable debug mode
-    --timeout             socket timeout in seconds (default 30s)    
+    --timeout             socket timeout in seconds (default 30s)
+    --json
 
 =head1 INVOCATION
 
