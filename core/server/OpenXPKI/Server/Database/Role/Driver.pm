@@ -79,6 +79,18 @@ some standard attributes which represent database connection parameters of the
 same name (not all are required for every DBMS). Furthermore it requires the
 consuming class to implement certain methods.
 
+=head2 Transaction isolation level
+
+Please make sure that the database transaction isolation level is
+"READ COMMITTED" as OpenXPKI expects this. If your DBMS has another default
+transaction level please change it in L</dbi_on_connect_do>.
+
+Example for MySQL:
+
+    sub dbi_on_connect_do {
+        "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
+    }
+
 =head2 Writing an own driver
 
 If you have a DBMS that is not yet supported by OpenXPKI you can write and use
