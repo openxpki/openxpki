@@ -31,7 +31,7 @@ sub START {
 
 ###########################################################################
 # lowlevel workflow functions
-  
+
 sub list_workflow_titles {
     ##! 1: "list_workflow_titles"
     return __get_workflow_factory()->list_workflow_titles();
@@ -75,10 +75,10 @@ sub get_workflow_type_for_id {
 
 Return the workflow log for a given workflow id (ID), by default you get
 the last 50 items of the log sorted neweset first. Set LIMIT to the number
-of lines expected or 0 to get all lines (might be huge!). Set REVERSE = 1 
-to reverse sorting (oldest first). 
+of lines expected or 0 to get all lines (might be huge!). Set REVERSE = 1
+to reverse sorting (oldest first).
 
-The return value is a list of arrays with a fixed order of fields: 
+The return value is a list of arrays with a fixed order of fields:
 TIMESTAMP, PRIORITY, MESSAGE
 
 =over
@@ -94,22 +94,22 @@ TIMESTAMP, PRIORITY, MESSAGE
 =cut
 
 sub get_workflow_log {
-    
+
     my $self  = shift;
     my $args  = shift;
 
     ##! 1: "get_workflow_log"
-    
+
     my $wf_id = $args->{ID};
-    
+
     # ACL check
     my $wf_type = CTX('api')->get_workflow_type_for_id({ ID => $wf_id });
-    
-    
-    my $role = CTX('session')->get_role() || 'Anonymous';   
+
+
+    my $role = CTX('session')->get_role() || 'Anonymous';
     my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'techlog' ] );
-    
-    if (!$allowed) { 
+
+    if (!$allowed) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG',
             params  => {
@@ -120,21 +120,21 @@ sub get_workflow_log {
             },
         );
     }
-    
+
     my $limit = 50;
     if (defined $args->{LIMIT}) {
         $limit = $args->{LIMIT};
-    } 
-    
+    }
+
     # we want to track the usage
-    CTX('log')->usage()->info("get_workflow_log"); 
-    
+    CTX('log')->usage()->info("get_workflow_log");
+
     # Reverse is inverted as we want to have reversed order by default
     my $reverse = 1;
     if ($args->{REVERSE}) {
         $reverse = 0;
     }
-     
+
     my $result = CTX('dbi_workflow')->select(
         TABLE => 'APPLICATION_LOG',
         DYNAMIC => {
@@ -144,16 +144,16 @@ sub get_workflow_log {
         REVERSE => $reverse,
         LIMIT => $limit
     );
-    
+
     my @log;
     while (my $line = shift @{$result}) {
-       # remove the package and session info from the message 
-       $line->{MESSAGE} =~ s/\A\[OpenXPKI::.*\]//; 
-       push @log, [ $line->{TIMESTAMP}, $line->{PRIORITY}, $line->{MESSAGE} ]; 
+       # remove the package and session info from the message
+       $line->{MESSAGE} =~ s/\A\[OpenXPKI::.*\]//;
+       push @log, [ $line->{TIMESTAMP}, $line->{PRIORITY}, $line->{MESSAGE} ];
     }
-    
+
     return \@log;
-    
+
 }
 
 
@@ -161,13 +161,13 @@ sub get_workflow_log {
 
 This is a simple passthru to __get_workflow_ui_info
 
-=cut 
+=cut
 
 sub get_workflow_info {
     my $self  = shift;
     my $args  = shift;
 
-    ##! 1: "get_workflow_info" 
+    ##! 1: "get_workflow_info"
     return $self->__get_workflow_ui_info( $args );
 }
 
@@ -190,11 +190,11 @@ Expects one of:
 
 You can pass certain flags to turn on/off components in the returned hash:
 
-=over 
+=over
 
 =item ATTRIBUTE
 
-Boolean, set to get the extra attributes. 
+Boolean, set to get the extra attributes.
 
 =back
 
@@ -224,14 +224,14 @@ sub __get_workflow_ui_info {
         # TODO we might use the OpenXPKI::Workflow::Config object for this
         # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
         $factory = CTX('workflow_factory')->get_factory();
-        
+
         if (!$factory->authorize_workflow({ ACTION => 'create', TYPE => $args->{TYPE} })) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NOT_AUTHORIZED',
                 params => { ARGS => $args }
             );
         }
-        
+
         my $wf_config = $factory->_get_workflow_config($args->{TYPE});
         # extract the action in the initial state from the config
         foreach my $state (@{$wf_config->{state}}) {
@@ -254,9 +254,9 @@ sub __get_workflow_ui_info {
         } else {
             $workflow = $args->{WORKFLOW};
         }
-        
+
         ##! 32: 'Workflow raw result ' . Dumper $workflow
-        
+
         $factory = $workflow->factory();
 
         $result->{WORKFLOW} = {
@@ -270,12 +270,12 @@ sub __get_workflow_ui_info {
             REAP_AT     => $workflow->reap_at(),
             CONTEXT     => { %{$workflow->context()->param() } },
         };
-        
+
         if ($args->{ATTRIBUTE}) {
             $result->{WORKFLOW}->{ATTRIBUTE} = $workflow->attrib();
         }
-        
-        $result->{HANDLES} = $workflow->get_global_actions();   
+
+        $result->{HANDLES} = $workflow->get_global_actions();
 
         ##! 32: 'Workflow result ' . Dumper $result
         if ($args->{ACTIVITY}) {
@@ -304,15 +304,15 @@ sub __get_workflow_ui_info {
         } else {
             @ui_state_out = CTX('config')->get_list([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'state', $result->{WORKFLOW}->{STATE}, 'output' ]);
         }
-        
+
         $ui_state->{output} = [];
-        foreach my $field (@ui_state_out) {           
+        foreach my $field (@ui_state_out) {
             # Load the field definitions
             push @{$ui_state->{output}}, $factory->get_field_info($field, $result->{WORKFLOW}->{TYPE} );
         }
-    } 
-    
-    # Info for buttons       
+    }
+
+    # Info for buttons
     $result->{STATE} = $ui_state;
 
     my $button = $result->{STATE}->{button};
@@ -332,7 +332,7 @@ sub __get_workflow_ui_info {
         $option =~ m{ \A (((global_)?)([^\s>]+))}xs;
         $option = $1;
         my $option_base = $4;
-        
+
         my $action;
         if ($3) { # global or not
             $action = 'global_'.$option_base;
@@ -348,12 +348,12 @@ sub __get_workflow_ui_info {
         # Add button config if available
         $result->{STATE}->{button}->{$action} = $button->{$option} if ($button->{$option});
     }
-    
+
     # Add button markup (Head)
     if ($button->{_head}) {
         $result->{STATE}->{button}->{_head} = $button->{_head};
-    } 
-     
+    }
+
     return $result;
 
 }
@@ -368,11 +368,11 @@ sub get_workflow_history {
     my $noacl = $arg_ref->{NOACL};
 
     if (!$noacl) {
-        my $role = CTX('session')->get_role() || 'Anonymous';   
+        my $role = CTX('session')->get_role() || 'Anonymous';
         my $wf_type = CTX('api')->get_workflow_type_for_id({ ID => $wf_id });
         my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'history' ] );
-        
-        if (!$allowed) { 
+
+        if (!$allowed) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY',
                 params  => {
@@ -399,7 +399,7 @@ sub get_workflow_history {
     return $history;
 }
 
-=head2 get_workflow_creator 
+=head2 get_workflow_creator
 
 Returns the name of the workflow creator as given in the attributes table.
 This method does NOT use the factory and therefore does not check the acl
@@ -411,25 +411,25 @@ sub get_workflow_creator {
 
     my $self  = shift;
     my $args  = shift;
-    
+
     my $result = CTX('dbi')->select_one(
         from => 'workflow_attributes',
         columns => [ 'attribute_value' ],
         where => { 'attribute_contentkey' => 'creator', 'workflow_id' => $args->{ID} },
     );
-    
+
     if (!$result) {
-        return ''; 
+        return '';
     }
     return $result->{attribute_value};
-    
+
 }
 
-=head2 execute_workflow_activity 
+=head2 execute_workflow_activity
 
 Execute a given action on a workflow, arguments are passed as hash
 
-=over 
+=over
 
 =item ID
 
@@ -455,11 +455,11 @@ The name of the workflow, optional (read from the tables)
 =item ASYNC
 
 By default, the action is executed inline and the method returns after
-all actions are handled. You can detach from the execution by adding 
-I<ASYNC> as argument: I<fork> will do the fork and return the ui control 
-structure of the OLD state, I<watch> will fork, wait until the workflow 
-was started or 15 seconds have elapsed and return the ui structure from 
-the running workflow. 
+all actions are handled. You can detach from the execution by adding
+I<ASYNC> as argument: I<fork> will do the fork and return the ui control
+structure of the OLD state, I<watch> will fork, wait until the workflow
+was started or 15 seconds have elapsed and return the ui structure from
+the running workflow.
 
 =cut
 
@@ -491,7 +491,7 @@ sub execute_workflow_activity {
         $wf_id
     );
 
-    my $proc_state = $workflow->proc_state(); 
+    my $proc_state = $workflow->proc_state();
     # should be prevented by the UI but can happen if workflow moves while UI shows old state
     if (!grep /$proc_state/, (qw(manual))) {
         OpenXPKI::Exception->throw(
@@ -536,17 +536,17 @@ sub execute_workflow_activity {
 }
 
 sub fail_workflow {
-    
+
     my $self  = shift;
     my $args  = shift;
 
-    ##! 1: "execute_workflow_activity"
+    ##! 1: "fail_workflow"
 
     my $wf_title  = $args->{WORKFLOW};
     my $wf_id     = $args->{ID};
     my $reason    = $args->{REASON};
     my $error     = $args->{ERROR};
-    
+
     if (! defined $wf_title) {
         $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
     }
@@ -555,35 +555,35 @@ sub fail_workflow {
     my $factory = __get_workflow_factory({
         WORKFLOW_ID => $wf_id,
     });
-    
+
     my $workflow = $factory->fetch_workflow(
         $wf_title,
         $wf_id
     );
-    
+
     if (!$error) { $error = 'Failed by user'; }
     if (!$reason) { $reason = 'userfail'; }
-    
+
     $workflow->set_failed( $error, $reason );
-        
+
     CTX('log')->log(
         MESSAGE  => "Failed workflow $wf_id (type '$wf_title') with error $error",
         PRIORITY => 'info',
         FACILITY => 'workflow',
     );
-    
+
     return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
-    
+
 }
 
-=head2 wakeup_workflow 
+=head2 wakeup_workflow
 
 Only valid if the workflow is in pause state, reads the last action from
 the history and reruns it. This method is also used by the watchdog.
 
 =cut
 sub wakeup_workflow {
-    
+
     my $self  = shift;
     my $args  = shift;
 
@@ -593,25 +593,25 @@ sub wakeup_workflow {
 }
 
 
-=head2 resume_workflow 
+=head2 resume_workflow
 
 Only valid if the workflow is in exception state, same as wakeup
 
 =cut
 sub resume_workflow {
-    
+
     my $self  = shift;
     my $args  = shift;
-    
+
     ##! 1: "resume workflow"
-    
+
     return $self->__wakeup_resume_workflow( 'resume', $args );
 }
 
 =head2 __wakeup_resume_workflow ( mode, args )
 
 Does the work for resume and wakeup, pulls the last action from the history
-and executes it. 
+and executes it.
 
 =over
 
@@ -621,38 +621,38 @@ one of I<wakeup> or I<resume>, must match with the current proc state
 
 =item args
 
-Hash holding the workflow information, mandatory key is I<ID>, the 
-workflow type can be given as I<WORKFLOW> if its known, otherwise 
+Hash holding the workflow information, mandatory key is I<ID>, the
+workflow type can be given as I<WORKFLOW> if its known, otherwise
 its looked up from the database.
 
 By default, the action is executed inline and the method returns after
-all actions are handled. You can detach from the exection by adding 
-I<ASYNC> as argument: I<fork> will do the fork and return the ui control 
-structure of the OLD state, I<watch> will fork, wait until the workflow 
-was started or 15 seconds have elapsed and return the ui structure from 
-the running workflow. 
+all actions are handled. You can detach from the exection by adding
+I<ASYNC> as argument: I<fork> will do the fork and return the ui control
+structure of the OLD state, I<watch> will fork, wait until the workflow
+was started or 15 seconds have elapsed and return the ui structure from
+the running workflow.
 
-=back 
+=back
 
-=cut 
+=cut
 
 sub __wakeup_resume_workflow {
-    
+
     my $self  = shift;
     my $mode  = shift; # resume or wakeup
     my $args  = shift;
     my $fork_mode = $args->{ASYNC} || '';
-    
+
     if ($mode ne 'wakeup' && $mode ne 'resume') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_WAKEUP_RESUME_WRONG_MODE',
             params => { MODE => $mode }
         );
     }
-    
+
     my $wf_title  = $args->{WORKFLOW};
     my $wf_id     = $args->{ID};
-    
+
     if (! defined $wf_title) {
         $wf_title = $self->get_workflow_type_for_id({ ID => $wf_id });
     }
@@ -661,16 +661,16 @@ sub __wakeup_resume_workflow {
     my $factory = __get_workflow_factory({
         WORKFLOW_ID => $wf_id,
     });
-    
+
     my $workflow = $factory->fetch_workflow(
         $wf_title,
         $wf_id
     );
-    
+
     ##! 64: 'Got workflow ' . Dumper $workflow
 
     my $proc_state = $workflow->proc_state();
-    
+
     # check if the workflow is in the correct proc state to get handled
     if ($mode eq 'wakeup' && $proc_state ne 'pause' && $proc_state ne 'retry_exceeded') {
         OpenXPKI::Exception->throw(
@@ -683,9 +683,9 @@ sub __wakeup_resume_workflow {
             params => { ID => $wf_id, PROC_STATE => $workflow->proc_state() }
         );
     }
-    
+
     $workflow->reload_observer();
-    
+
     # pull off the latest action from the history
     my $history = CTX('dbi')->select_one(
         from => 'workflow_history',
@@ -694,18 +694,18 @@ sub __wakeup_resume_workflow {
         order_by => [ '-workflow_history_date', '-workflow_hist_id' ]
     );
     my $wf_activity = $history->{workflow_action};
-    
+
     if ($fork_mode) {
         $mode .= "($fork_mode)";
     }
-    
+
     CTX('log')->log(
         MESSAGE  => "$mode workflow $wf_id (type '$wf_title') with activity $wf_activity",
         PRIORITY => 'info',
         FACILITY => 'workflow',
     );
     ##! 16: 'execute activity ' . $wf_activity
-    
+
     if ($fork_mode) {
         $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
         if ($fork_mode eq 'watch') {
@@ -793,7 +793,7 @@ sub create_workflow_instance {
     $context->param( 'creator'  => $creator );
     $context->param( 'creator_role'  => CTX('session')->get_role() );
 
-    # This is crucial and must be done before the first execute as otherwise 
+    # This is crucial and must be done before the first execute as otherwise
     # workflow acl fails when the first non-initial action is autorun
     $workflow->attrib({ creator => $creator });
 
@@ -889,42 +889,42 @@ sub get_workflow_activities {
 =head2 get_workflow_instance_types
 
 Load a list of workflow types present in the database for the current realm
-and add label and description from the configuration. 
+and add label and description from the configuration.
 
-Return value is a hash with the type name as key and a hashref 
+Return value is a hash with the type name as key and a hashref
 with label/description as value.
- 
+
 =cut
 
 sub get_workflow_instance_types {
-    
+
     my $self  = shift;
     my $args  = shift;
-    
+
     my $cfg = CTX('config');
-    my $pki_realm = CTX('session')->get_pki_realm();    
-    
+    my $pki_realm = CTX('session')->get_pki_realm();
+
     my $db_results = CTX('dbi_backend')->select(
         TABLE   => [ 'WORKFLOW' ],
         DISTINCT => 1,
         COLUMNS => [ 'WORKFLOW.WORKFLOW_TYPE' ],
-        JOIN => [['WORKFLOW_ID']],        
+        JOIN => [['WORKFLOW_ID']],
         DYNAMIC => { 'WORKFLOW.PKI_REALM' => $pki_realm }
     );
-    
+
     my $result = {};
     while (my $line = shift @{$db_results}) {
-        my $type = $line->{'WORKFLOW.WORKFLOW_TYPE'}; 
+        my $type = $line->{'WORKFLOW.WORKFLOW_TYPE'};
         my $label = $cfg->get([ 'workflow', 'def', $type, 'head', 'label' ]);
-        my $desc = $cfg->get([ 'workflow', 'def', $type, 'head', 'description' ]);        
-        $result->{$type} = { 
+        my $desc = $cfg->get([ 'workflow', 'def', $type, 'head', 'description' ]);
+        $result->{$type} = {
             label => $label || $type,
             description => $desc || $label || '',
         };
     }
-       
+
     return $result;
-    
+
 }
 
 
@@ -932,58 +932,58 @@ sub search_workflow_instances_count {
 
     my $self     = shift;
     my $arg_ref  = shift;
-    
+
     my $params = $self->__search_workflow_instances( $arg_ref );
-    
+
     $params->{COLUMNS} = [{ COLUMN => 'WORKFLOW.WORKFLOW_SERIAL', AGGREGATE => 'COUNT' }];
-    
+
     my $dbi = CTX('dbi_workflow');
     $dbi->commit();
-        
+
     my $result = $dbi->select( %{$params} );
-    
+
     if (!(defined $result && ref $result eq 'ARRAY' && scalar @{$result} == 1)) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_COUNT_NOT_ARRAY',
             params => { 'TYPE' => ref $result, },
         );
     }
-    
+
     ##! 16: 'result: ' . Dumper $result
     return $result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
-    
+
 }
 
 sub search_workflow_instances {
-    
+
     my $self     = shift;
     my $arg_ref  = shift;
-    
+
     my $param = $self->__search_workflow_instances( $arg_ref );
-    
+
     my $dbi = CTX('dbi_workflow');
     $dbi->commit();
-        
+
     my $result = $dbi->select( %{$param} );
-    
+
     if (!(defined $result && ref $result eq 'ARRAY')) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_NOT_ARRAY',
             params => { 'TYPE' => ref $result, },
         );
-    }    
-    
+    }
+
     ##! 16: 'result: ' . Dumper $result
     return $result;
-    
+
 }
-    
+
 sub __search_workflow_instances {
-    
+
     my $self     = shift;
     my $arg_ref  = shift;
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
- 
+
     my @attrib;
 
     # We want to drop searches in context, so log a deprecation warning if context is used
@@ -1003,13 +1003,13 @@ sub __search_workflow_instances {
     my $dynamic;
     my @tables;
     my @joins;
-    
-    
+
+
     # Search for known serials, used e.g. for certificate relations
     if ($arg_ref->{SERIAL} && ref $arg_ref->{SERIAL} eq 'ARRAY') {
         $dynamic->{'WORKFLOW.WORKFLOW_SERIAL'} = {VALUE => $arg_ref->{SERIAL}  };
     }
-    
+
     ## create complex select structures, similar to the following:
     # $dbi->select(
     #    TABLE    => [ { WORKFLOW_CONTEXT => WORKFLOW_CONTEXT_0},
@@ -1041,11 +1041,10 @@ sub __search_workflow_instances {
     }
     push @tables, 'WORKFLOW';
     push @joins, 'WORKFLOW_SERIAL';
-    
-    if (!$arg_ref->{PKI_REALM}) {
-        $dynamic->{'WORKFLOW.PKI_REALM'} = { VALUE => CTX('session')->get_pki_realm() };
-    } elsif ($arg_ref->{PKI_REALM} !~ /_any/i) {
-        $dynamic->{'WORKFLOW.PKI_REALM'} = { VALUE => $dynamic->{'WORKFLOW.PKI_REALM'} };    
+
+    # Do not restrict if PKI_REALM => "_any"
+    if (not $arg_ref->{PKI_REALM} or $arg_ref->{PKI_REALM} !~ /_any/i) {
+        $dynamic->{'WORKFLOW.PKI_REALM'} = $arg_ref->{PKI_REALM} // CTX('session')->get_pki_realm();
     }
 
     if (defined $arg_ref->{TYPE}) {
@@ -1100,11 +1099,11 @@ sub __search_workflow_instances {
         }
         $dynamic->{'WORKFLOW.WORKFLOW_STATE'} = {VALUE => $arg_ref->{STATE}};
     }
-    
+
     if (defined $arg_ref->{PROC_STATE}) {
         $dynamic->{'WORKFLOW.WORKFLOW_PROC_STATE'} = { VALUE => $arg_ref->{PROC_STATE} };
     }
-    
+
     my %limit;
     if (defined $arg_ref->{LIMIT} && !defined $arg_ref->{START}) {
         $limit{'LIMIT'} = $arg_ref->{LIMIT};
@@ -1115,13 +1114,13 @@ sub __search_workflow_instances {
             START  => $arg_ref->{START},
         };
     }
-    
+
     # Custom ordering
-    my $order = 'WORKFLOW.WORKFLOW_SERIAL'; 
+    my $order = 'WORKFLOW.WORKFLOW_SERIAL';
     if ($arg_ref->{ORDER}) {
-       $order = $arg_ref->{ORDER}; 
+       $order = $arg_ref->{ORDER};
     }
-    
+
     my $reverse = 1;
     if (defined $arg_ref->{REVERSE}) {
        $reverse = $arg_ref->{REVERSE};
@@ -1147,7 +1146,7 @@ sub __search_workflow_instances {
         ORDER => [ $order ],
         %limit,
     );
-    ##! 32: 'params: ' . Dumper \%params    
+    ##! 32: 'params: ' . Dumper \%params
     return \%params;
 }
 
@@ -1345,7 +1344,7 @@ sub __validate_input_param {
 =head2 __execute_workflow_activity
 
 ASYNC=FORK just forks and returns empty UI info, ASYNC=WATCH waits until
-the 
+the
 
 =cut
 
@@ -1363,10 +1362,10 @@ sub __execute_workflow_activity {
         my $pid = fork();
         ##! 16: 'pid: ' . $pid
 
-        OpenXPKI::Exception->throw( 
+        OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_FORK_FAILED'
         ) unless (defined $pid);
-    
+
         # Reconnect the db handles - required until all old handles are replaced!
         CTX('dbi_workflow')->new_dbh();
         CTX('dbi_backend')->new_dbh();
@@ -1427,11 +1426,11 @@ sub __execute_workflow_activity {
             }
         } while( $wf_activity );
     };
-    
+
     if ($run_async) {
         exit;
     }
-    
+
     if ($EVAL_ERROR) {
         my $eval = $EVAL_ERROR;
         CTX('log')->log(
@@ -1446,7 +1445,7 @@ sub __execute_workflow_activity {
             priority => 'error',
             facility => 'workflow',
         };
-  
+
         ## normal OpenXPKI exception
         $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
 
@@ -1502,17 +1501,17 @@ or the initial workflow object if no change happend.
 
 =cut
 sub __watch_workflow {
-    
+
     my $self = shift;
     my $workflow = shift;
     my $duration= shift || 15;
     my $sleep = shift || 2;
-    
-    # we poll the workflow table and watch if the update timestamp changed  
-    my $old_time = $workflow->last_update->strftime("%Y-%m-%d %H:%M:%S"); 
+
+    # we poll the workflow table and watch if the update timestamp changed
+    my $old_time = $workflow->last_update->strftime("%Y-%m-%d %H:%M:%S");
     my $timeout = time() + $duration;
-    ##! 32:' Fork mode watch - timeout - '.$timeout.' - last update ' . $old_time 
-    
+    ##! 32:' Fork mode watch - timeout - '.$timeout.' - last update ' . $old_time
+
     do {
         my $workflow_state = CTX('dbi')->select_one(
             from => 'workflow',
@@ -1531,7 +1530,7 @@ sub __watch_workflow {
             sleep 2;
         }
     } while (time() < $timeout);
-    
+
     return $workflow;
 }
 
@@ -1599,6 +1598,18 @@ Examples:
           VALUE => 'ECB001D912E2A357E6E813D87A72E641',
           },
       }
+
+Returns a HashRef:
+
+    {
+        'WORKFLOW.PKI_REALM'            => 'alpha',
+        'WORKFLOW.WORKFLOW_TYPE'        => 'wf_type_1',
+        'WORKFLOW.WORKFLOW_SERIAL'      => 511,
+        'WORKFLOW.WORKFLOW_PROC_STATE'  => 'manual',
+        'WORKFLOW.WORKFLOW_STATE'       => 'PERSIST',
+        'WORKFLOW.WORKFLOW_LAST_UPDATE' => '2017-04-07 23:10:05',
+        'WORKFLOW.WORKFLOW_WAKEUP_AT'   => 0,
+    }
 
 =over
 
