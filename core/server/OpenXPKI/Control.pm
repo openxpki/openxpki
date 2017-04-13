@@ -383,7 +383,7 @@ sub status {
 
 =head2 reload
 
-Reload the server (forwards the config pointer)
+Reload some parts of the config (sends a HUP to the server pid)
 
 Parameters:
 
@@ -434,19 +434,19 @@ Holding the pid of the main server process.
 
 =item watchdog
 
-List of running watchdog process. Usually this is only a single pid but can
-also have more than one. If empty, the watchdog was either disabled or
-terminated due to too many internal errors.
+List of running watchdog process. Usually this is only a single pid but 
+can also have more than one. If empty, the watchdog was either disabled
+or terminated due to too many internal errors.
 
 =item worker
 
-List of pids of running session workers (connected to the socket). This might
-also be empty if no process is running.
+List of pids of running session workers (connected to the socket). This 
+might also be empty if no process is running.
 
-=item watchdog
+=item workflow
 
-List of pids of all workers executed by the watchdog (not connected to a
-socket). Might also be empty.
+List of pids of all workers currently handling workflows (contains 
+watchdog and user initiated requests).
 
 =back
 

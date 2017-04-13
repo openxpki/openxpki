@@ -274,7 +274,7 @@ sub run {
 
     # set process name
 
-    $0 = sprintf ('openxpkid (%s) watchdog', CTX('config')->get('system.server.name') || 'main');
+    OpenXPKI::Server::__set_process_name("watchdog");
 
     set_gid($self->_gid()) if( $self->_gid() );
     set_uid($self->_uid()) if( $self->_uid() );

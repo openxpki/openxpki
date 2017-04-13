@@ -286,7 +286,7 @@ sub pre_loop_hook {
     eval{
 
         # Set verbose process name
-        $0 = sprintf ('openxpkid (%s) server', $self->{PARAMS}->{alias});
+        OpenXPKI::Server::__set_process_name("server");
 
         if( $self->{PARAMS}->{process_group} ne $) ){
             $self->log(
@@ -376,27 +376,20 @@ sub sig_term {
 sub sig_hup {
 
     ##! 1: 'start'
+    
+    my $pids = OpenXPKI::Control::get_pids();
+    
     CTX('log')->log(
-        MESSAGE  => "SIGHUP received - reloading config ",
+        MESSAGE  => sprintf("SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}}),
         PRIORITY => "info",
         FACILITY => "system",
     );
+    
+    if (@{$pids->{worker}}) {
+        kill 15, @{$pids->{worker}};
+    }
 
-    ##! 8: 'forward head'
-    CTX('config')->update_head();
-
-    # The notification layer also needs to be re-created
-    # Note: You need to redo this in the watchdog!
-    OpenXPKI::Server::Context::setcontext({
-        notification => OpenXPKI::Server::Notification::Handler->new(),
-        force => 1,
-    });
-
-    # FIXME - reload authentication handlers (cached!)
-    # FIXME - should also reinit some of the services for speed (e.g. workflow)
-
-    # Update head creates a session that blocks new sessions later
-    OpenXPKI::Server::Context::killsession();
+    # FIXME - should also reinit some of the services
 
     ##! 8: 'watchdog'
     CTX('watchdog')->reload();
@@ -478,7 +471,7 @@ sub do_process_request
     umask $self->{umask};
 
     # masquerade process...
-    $0 = sprintf ('openxpkid (%s) worker: idle', (CTX('config')->get('system.server.name') || 'main') );
+    OpenXPKI::Server::__set_process_name("worker: new");
 
     ##! 2: "transport protocol detector"
     my $transport = undef;
@@ -890,7 +883,18 @@ sub __get_server_config
     return \%params;
 }
 
-
+sub __set_process_name {
+    
+    my $identity = shift;
+    my @args = @_;
+    if (@args) {
+        $identity = sprintf $identity, @args;
+    }
+    my $alias = CTX('config')->get(['system','server','name']) || 'main';
+    $0 = "openxpkid ($alias) $identity";
+    return;
+    
+}
 
 ################################################
 ##                 WARNING                    ##

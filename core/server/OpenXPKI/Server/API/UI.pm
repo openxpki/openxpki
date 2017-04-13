@@ -114,7 +114,7 @@ sub get_ui_system_status {
 sub list_process {
 
     my $self = shift;
-
+    
     my $process = OpenXPKI::Control::list_process();
 
     return $process;

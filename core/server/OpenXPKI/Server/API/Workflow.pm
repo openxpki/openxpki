@@ -1389,7 +1389,9 @@ sub __execute_workflow_activity {
         srand(time ^ $PROCESS_ID);
 
         # append fork info to process name
-        $0 = sprintf('openxpkid (%s) workflow: id %d', (CTX('config')->get('system.server.name') || 'main'), $workflow->id());
+        OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
+    } else {
+        OpenXPKI::Server::__set_process_name("workflow: id %d", $workflow->id());
     }
 
     ##! 64: Dumper $workflow
