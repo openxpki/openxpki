@@ -138,15 +138,6 @@ sub import_serialized_info {
     }
 }
 
-sub parse_serialized_info {
-
-    my $self = shift;
-    my $serialized_string = shift;
-    return unless ($serialized_string);
-
-    return $self->_get_serializer()->deserialize($serialized_string);
-}
-
 sub _get_serializer{
     return OpenXPKI::Serialization::Simple->new();
 }
@@ -454,10 +445,6 @@ Return a key/value hash with the keys named in _get_persitence_keys.
 Pass a string with the serialized info as obtained by export_serialized_info.
 The parameters overwrite the current session settings. You can add a hash a
 second parameter with I<skip_variable_name =\> 1> to skip certain values.
-
-=head3 parse_serialized_info
-
-Parse a serialized session blob and return as hash.
 
 =head2 Set/Get functions
 
