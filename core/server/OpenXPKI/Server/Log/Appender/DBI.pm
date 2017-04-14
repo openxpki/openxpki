@@ -9,7 +9,7 @@ use Data::Dumper;
 use English;
 use Log::Log4perl::Level;
 use Carp;
-use OpenXPKI::Server::Database; # we must import "auto_id" 
+use OpenXPKI::Server::Database; # we must import "auto_id"
 
 my %LOGLEVELS = (
     ALL     => 0,
@@ -28,7 +28,7 @@ sub new {
     my($proto, %p) = @_;
     my $class = ref $proto || $proto;
 
-    my $self = bless {}, $class; 
+    my $self = bless {}, $class;
     ##! 1: 'end'
     return $self;
 }
@@ -64,7 +64,7 @@ sub log {
     #       write to application_log and also put workflow_id into its
     #       own column instead of in the message.
     if ( $category =~ m{\.audit$} ) {
-        # do NOT catch DBI errors here as we want to fail if audit 
+        # do NOT catch DBI errors here as we want to fail if audit
         # is not working
         $dbi->insert(
             into => 'audittrail',
@@ -74,42 +74,20 @@ sub log {
                 loglevel       => $loglevel,
                 category       => $category,
                 message        => $message,
-            },    
+            },
         );
     } else {
-        my $serial;
-        my $wf_id = 0;
-        if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
-            $wf_id = CTX('workflow_id');
-        }
-
-        my $loglevel_int = 0;
-        if ( exists $LOGLEVELS{$loglevel} ) {
-            $loglevel_int = $LOGLEVELS{$loglevel};
-        }
         $dbi->insert(
             into => 'application_log',
             values  => {
                 application_log_id => AUTO_ID,
                 logtimestamp       => $timestamp,
-                workflow_id        => $wf_id,
+                workflow_id        => OpenXPKI::Server::Context::hascontext('workflow_id') ? CTX('workflow_id') : 0,
                 priority           => $loglevel,
                 category           => $category,
                 message            => $message,
-            },    
+            },
         );
-        
-        if (my $exc = OpenXPKI::Exception->caught()) {
-            ##! 16: 'exception caught'
-            if ($exc->message() eq 'I18N_OPENXPKI_SERVER_DBI_DBH_DO_QUERY_NOT_CONNECTED') {
-                ##! 16: 'dbi_log not connected'
-                print STDERR "dbi_log not connected! (tried to log: $timestamp, $category, $loglevel, $wf_id, $message)\n";
-                return; 
-            }
-            else {
-                $exc->rethrow();
-            }
-        }
     }
 
     ##! 1: 'end'
@@ -146,6 +124,6 @@ OpenXPKI::Server::Log::Appender::DBI
 
 This is a special log appender for Log::Log4perl. It uses the dbi_log
 handle generated during server init to write to the audittrail and
-application_log tables. 
+application_log tables.
 
- 
+
