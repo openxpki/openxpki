@@ -374,7 +374,7 @@ sub __do_init_dbi_log {
 
     OpenXPKI::Server::Context::setcontext({
         dbi_log => OpenXPKI::Server::Database->new(
-            log => CTX('log'),
+            log => OpenXPKI::Server::Log::NOOP->new,
             db_params => __dbi_config('log'),
             autocommit => 1
         ),
