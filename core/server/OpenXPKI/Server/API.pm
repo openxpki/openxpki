@@ -91,7 +91,7 @@ sub BUILD {
                     regex => $re_cert_string,
                 },
             },
-        },  
+        },
         'get_default_token' => {
             class  => 'Token',
             params => {
@@ -350,7 +350,7 @@ sub BUILD {
                     optional => 1
                 },
             }
-        },               
+        },
         'get_ca_list' => {
             class  => 'Token',
             params => {
@@ -415,7 +415,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_sql_string,
-                },               
+                },
             }
         },
         'get_cert_actions' => {
@@ -427,7 +427,7 @@ sub BUILD {
                 },
                 ROLE => {
                     type     => SCALAR,
-                    optional => 1 
+                    optional => 1
                 }
             }
         },
@@ -440,9 +440,9 @@ sub BUILD {
                 },
                 USER => {
                     type     => SCALAR,
-                    optional => 1 
+                    optional => 1
                 }
-            }            
+            }
         },
         'get_profile_for_cert' => {
             class  => 'Object',
@@ -831,7 +831,7 @@ sub BUILD {
             },
         },
 
-        ## Profile API 
+        ## Profile API
         'get_cert_profiles' => {
             class  => 'Profile',
             params => {
@@ -1029,9 +1029,9 @@ sub BUILD {
                 },
                 FORMAT => {
                     type    => SCALAR,
-                    regex   => qr{ \A (PKCS10) \z }xms, 
+                    regex   => qr{ \A (PKCS10) \z }xms,
                 }
-                
+
             },
         },
         'set_data_pool_entry' => {
@@ -1200,27 +1200,27 @@ sub BUILD {
             }
         },
 
-        ### Housekeeping API 
+        ### Housekeeping API
         'purge_application_log' => {
             class => 'Housekeeping',
             params => {
-                MAXAGE => { 
+                MAXAGE => {
                     type => SCALAR,
                     regex => $re_integer_string,
                 },
             },
         },
 
-        ### Workflow API 
+        ### Workflow API
         'get_workflow_instance_types' => {
             class  => 'Workflow',
             params => {}
-        }, 
+        },
         'list_workflow_titles' => {
             class  => 'Workflow',
             params => { },
             memoize => 1,
-        }, 
+        },
         'get_workflow_type_for_id' => {
             class  => 'Workflow',
             params => {
@@ -1276,7 +1276,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
-                },            
+                },
                 LIMIT => {
                     type  => SCALAR,
                     optional => 1,
@@ -1292,7 +1292,7 @@ sub BUILD {
                     regex => $re_integer_string,
                 },
             }
-        }, 
+        },
         'get_workflow_history' => {
             class  => 'Workflow',
             params => {
@@ -1304,7 +1304,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
-                },        
+                },
             },
         },
         'execute_workflow_activity' => {
@@ -1346,7 +1346,7 @@ sub BUILD {
                 WORKFLOW => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                }, 
+                },
                 PARAMS => {
                     type     => HASHREF,
                     optional => 1,
@@ -1453,10 +1453,6 @@ sub BUILD {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },
-                CONTEXT => {
-                    type     => ARRAYREF | UNDEF,
-                    optional => 1,
-                },
                 ATTRIBUTE => {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
@@ -1511,10 +1507,6 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 SERIAL => {
-                    type     => ARRAYREF | UNDEF,
-                    optional => 1,
-                },
-                CONTEXT => {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },
@@ -1680,7 +1672,7 @@ sub BUILD {
         'get_motd' => {
             class  => 'UI',
             params => {
-                'ROLE' => { 
+                'ROLE' => {
                     type => SCALAR,
                     optional => 1,
                 },
@@ -1690,10 +1682,10 @@ sub BUILD {
         'render_template' => {
             class  => 'UI',
             params => {
-                'TEMPLATE' => { 
+                'TEMPLATE' => {
                     type => SCALAR,
                 },
-                'PARAMS' => { 
+                'PARAMS' => {
                     type => HASHREF,
                     optional => 1,
                 },
@@ -1710,7 +1702,7 @@ sub AUTOMETHOD {
     ##! 16: 'method name: ' . $method_name
     return sub {
         if (!exists $method_info_of{$ident}->{$method_name}) {
-             
+
             ##! 16: 'exception'
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED',
@@ -1820,15 +1812,15 @@ sub AUTOMETHOD {
 }
 
 sub can {
-    
+
     ##! 1: 'Start'
-    
-    # WARNING - we just do not support "can" for autoloaded methods for 
+
+    # WARNING - we just do not support "can" for autoloaded methods for
     # now. This is a workaround to fix an interference between Carp
     # and the automethod in this API, see github ticket #415
-    
+
     # TODO: API handling should be improved
-    
+
     return undef;
 }
 

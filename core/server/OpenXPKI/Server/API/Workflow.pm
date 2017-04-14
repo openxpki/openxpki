@@ -16,6 +16,7 @@ use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Server::Database::Legacy;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
@@ -841,218 +842,139 @@ sub get_workflow_instance_types {
 sub search_workflow_instances_count {
     my ($self, $args) = @_;
 
-    my $params = $self->__search_workflow_instances($args);
+    my $params = $self->__search_query_params($args);
 
-    $params->{COLUMNS} = [{ COLUMN => 'WORKFLOW.WORKFLOW_SERIAL', AGGREGATE => 'COUNT' }];
+    my $result = CTX('dbi')->select_one(
+        %{$params},
+        columns => [ 'COUNT(workflow.workflow_id)|amount' ],
+    );
 
-    my $dbi = CTX('dbi_workflow');
-    $dbi->commit();
-
-    my $result = $dbi->select( %{$params} );
-
-    if (!(defined $result && ref $result eq 'ARRAY' && scalar @{$result} == 1)) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_COUNT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
-        );
-    }
-
-    ##! 16: 'result: ' . Dumper $result
-    return $result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'};
-
+    ##! 1: "finished"
+    return $result->{amount};
 }
 
 sub search_workflow_instances {
     my ($self, $args) = @_;
 
-    my $param = $self->__search_workflow_instances($args);
+    my $params = $self->__search_query_params($args);
 
-    my $dbi = CTX('dbi_workflow');
-    $dbi->commit();
+    my $result = CTX('dbi')->select(
+        %{$params},
+        columns => [ qw(
+            workflow_last_update
+            workflow.workflow_id
+            workflow_type
+            workflow_state
+            workflow_proc_state
+            workflow_wakeup_at
+            pki_realm
+        ) ],
+    )->fetchall_arrayref({});
 
-    my $result = $dbi->select( %{$param} );
+    my $result_legacy = [ map { OpenXPKI::Server::Database::Legacy->workflow_to_legacy($_, 1) } @$result ];
 
-    if (!(defined $result && ref $result eq 'ARRAY')) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_RESULT_NOT_ARRAY',
-            params => { 'TYPE' => ref $result, },
-        );
-    }
-
-    ##! 16: 'result: ' . Dumper $result
-    return $result;
+    ##! 16: 'result: ' . Dumper $result_legacy
+    return $result_legacy;
 
 }
 
-sub __search_workflow_instances {
+sub __search_query_params {
     my ($self, $args) = @_;
 
     my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
 
-    my @attrib;
-
-    # We want to drop searches in context, so log a deprecation warning if context is used
-    if ($args->{CONTEXT} && ref $args->{CONTEXT} eq 'ARRAY') {
-        CTX('log')->log(
-            MESSAGE  => "workflow search using context - please fix",
-            PRIORITY => 'warn',
-            FACILITY => 'application',
-        );
-        @attrib = @{ $args->{CONTEXT} };
-    }
-
-    if ($args->{ATTRIBUTE} && ref $args->{ATTRIBUTE} eq 'ARRAY') {
-        @attrib = @{ $args->{ATTRIBUTE} };
-    }
-
-    my $dynamic;
-    my @tables;
-    my @joins;
-
+    my $where = {};
+    my $params = {
+        where => $where,
+    };
 
     # Search for known serials, used e.g. for certificate relations
     if ($args->{SERIAL} && ref $args->{SERIAL} eq 'ARRAY') {
-        $dynamic->{'WORKFLOW.WORKFLOW_SERIAL'} = {VALUE => $args->{SERIAL}  };
+        $where->{'workflow.workflow_id'} = $args->{SERIAL};
     }
 
-    ## create complex select structures, similar to the following:
-    # $dbi->select(
-    #    TABLE    => [ { WORKFLOW_CONTEXT => WORKFLOW_CONTEXT_0},
-    #                  { WORKFLOW_CONTEXT => WORKFLOW_CONTEXT_1},
-    #                  WORKFLOW
-    #                ],
-    #    COLUMNS   => ...
-    #    JOIN      => [ 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL', 'WORKFLOW_SERIAL' ],
-    #    DYNAMIC   => {
-    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_KEY => $key1,
-    #                   WORKFLOW_CONTEXT_0.WORKFLOW_CONTEXT_VALUE => $value1,
-    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_KEY => $key2,
-    #                   WORKFLOW_CONTEXT_1.WORKFLOW_CONTEXT_VALUE => $value2,
-    #                   WORKFLOW.PKI_REALM = $realm,
-    #                 },
-    # );
-    my $i = 0;
-    foreach my $attrib (@attrib) {
-        my $table_alias = 'WORKFLOW_ATTRIBUTES_' . $i;
-        my $key   = $attrib->{KEY};
-        my $value = $attrib->{VALUE};
-        my $operator = 'EQUAL';
-        $operator = $attrib->{OPERATOR} if($attrib->{OPERATOR});
-        $dynamic->{$table_alias . '.ATTRIBUTE_KEY'}   = {VALUE => $key};
-        $dynamic->{$table_alias . '.ATTRIBUTE_VALUE'} = {VALUE => $value, OPERATOR  => $operator };
-        push @tables, [ 'WORKFLOW_ATTRIBUTES' => $table_alias ];
-        push @joins, 'WORKFLOW_SERIAL';
-        $i++;
+    # we need to join over the workflow_attributes table
+    my @attr_cond;
+    if ($args->{ATTRIBUTE} && ref $args->{ATTRIBUTE} eq 'ARRAY') {
+        @attr_cond = @{ $args->{ATTRIBUTE} };
     }
-    push @tables, 'WORKFLOW';
-    push @joins, 'WORKFLOW_SERIAL';
+    my @join_spec = ();
+    my $ii = 0;
+    for my $cond (@attr_cond) {
+        ##! 16: 'certificate attribute: ' . Dumper $entry
+        my $table_alias = "workflowattr$ii";
+
+        # add join table
+        push @join_spec, ( 'workflow.workflow_id=workflow_id', "workflow_attributes|$table_alias" );
+
+        # add search constraint
+        $where->{ "$table_alias.attribute_contentkey" } = $cond->{KEY};
+
+        $cond->{OPERATOR} //= 'EQUAL';
+        # sanitize wildcards (don't overdo it...)
+        if ($cond->{OPERATOR} eq 'LIKE') {
+            $cond->{VALUE} =~ s/\*/%/g;
+            $cond->{VALUE} =~ s/%%+/%/g;
+        }
+        # TODO #legacydb search_workflow_instances' ATTRIBUTE allows old DB layer syntax
+        $where->{ "$table_alias.attribute_value" } =
+            OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($cond);
+
+        $ii++;
+    }
+
+    if (scalar @join_spec) {
+        $params->{from_join} = join " ", 'workflow', @join_spec;
+    }
+    else {
+        $params->{from} = 'workflow',
+    }
 
     # Do not restrict if PKI_REALM => "_any"
     if (not $args->{PKI_REALM} or $args->{PKI_REALM} !~ /_any/i) {
-        $dynamic->{'WORKFLOW.PKI_REALM'} = $args->{PKI_REALM} // CTX('session')->get_pki_realm();
+        $where->{pki_realm} = $args->{PKI_REALM} // CTX('session')->get_pki_realm();
     }
 
     if (defined $args->{TYPE}) {
-        # do parameter validation (here instead of the API because
-        # the API can't do regex checks on arrayrefs)
-        if (! ref $args->{TYPE}) {
-            if ($args->{TYPE} !~ $re_alpha_string) {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC',
-                    params  => {
-                        TYPE => $args->{TYPE},
-                    },
-                );
-            }
+        # do parameter validation (here instead of the API because the API can
+        # ensure it's an Scalar or ArrayRef but can't do regex checks on it
+        my @types = ref $args->{TYPE} ? @{ $args->{TYPE} } : ($args->{TYPE});
+        for my $type (@types) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC',
+                params  => { TYPE => $type },
+            ) unless $type =~ $re_alpha_string;
         }
-        elsif (ref $args->{TYPE} eq 'ARRAYREF') {
-            foreach my $subtype (@{$args->{TYPE}}) {
-                if ($subtype !~ $re_alpha_string) {
-                    OpenXPKI::Exception->throw(
-                        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_TYPE_NOT_ALPHANUMERIC',
-                        params  => {
-                            TYPE => $subtype,
-                        },
-                    );
-                }
-            }
-        }
-        $dynamic->{'WORKFLOW.WORKFLOW_TYPE'} = {VALUE => $args->{TYPE}};
+        $where->{workflow_type} = $args->{TYPE};
     }
+
     if (defined $args->{STATE}) {
-        if (! ref $args->{STATE}) {
-            if ($args->{STATE} !~ $re_alpha_string) {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC',
-                    params  => {
-                        STATE => $args->{STATE},
-                    },
-                );
-            }
+        my @states = ref $args->{STATE} ? @{ $args->{STATE} } : ($args->{STATE});
+        for my $state (@states) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC',
+                params  => { STATE => $state },
+            ) unless $state =~ $re_alpha_string;
         }
-        elsif (ref $args->{STATE} eq 'ARRAYREF') {
-            foreach my $substate (@{$args->{STATE}}) {
-                if ($substate !~ $re_alpha_string) {
-                    OpenXPKI::Exception->throw(
-                        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_SEARCH_WORKFLOW_INSTANCES_STATE_NOT_ALPHANUMERIC',
-                        params  => {
-                            STATE => $substate,
-                        },
-                    );
-                }
-            }
-        }
-        $dynamic->{'WORKFLOW.WORKFLOW_STATE'} = {VALUE => $args->{STATE}};
+        $where->{workflow_state} = $args->{STATE};
     }
 
-    if (defined $args->{PROC_STATE}) {
-        $dynamic->{'WORKFLOW.WORKFLOW_PROC_STATE'} = { VALUE => $args->{PROC_STATE} };
-    }
+    $where->{workflow_proc_state} = $args->{PROC_STATE} if defined $args->{PROC_STATE};
 
-    my %limit;
-    if (defined $args->{LIMIT} && !defined $args->{START}) {
-        $limit{'LIMIT'} = $args->{LIMIT};
-    }
-    elsif (defined $args->{LIMIT} && defined $args->{START}) {
-        $limit{'LIMIT'} = {
-            AMOUNT => $args->{LIMIT},
-            START  => $args->{START},
-        };
+    if ( defined $args->{LIMIT} ) {
+        $params->{limit} = $args->{LIMIT};
+        $params->{offset} = $args->{START} if $args->{START};
     }
 
     # Custom ordering
-    my $order = 'WORKFLOW.WORKFLOW_SERIAL';
-    if ($args->{ORDER}) {
-       $order = $args->{ORDER};
-    }
+    my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
+    $desc = "" if defined $args->{REVERSE} and $args->{REVERSE} == 0;
+    # TODO #legacydb Code that removes table name prefix
+    $args->{ORDER} =~ s/^WORKFLOW\.// if $args->{ORDER};
+    $params->{order_by} = sprintf "%s%s", $desc, ($args->{ORDER} // 'workflow_id');
 
-    my $reverse = 1;
-    if (defined $args->{REVERSE}) {
-       $reverse = $args->{REVERSE};
-    }
-
-    ##! 16: 'dynamic: ' . Dumper $dynamic
-    ##! 16: 'tables: ' . Dumper(\@tables)
-    my %params = (
-        TABLE   => \@tables,
-        COLUMNS  => [
-            'WORKFLOW.WORKFLOW_LAST_UPDATE',
-            'WORKFLOW.WORKFLOW_SERIAL',
-            'WORKFLOW.WORKFLOW_TYPE',
-            'WORKFLOW.WORKFLOW_STATE',
-            'WORKFLOW.WORKFLOW_PROC_STATE',
-            'WORKFLOW.WORKFLOW_WAKEUP_AT',
-            'WORKFLOW.PKI_REALM',
-        ],
-        JOIN     => [ \@joins, ],
-        REVERSE  => $reverse,
-        DYNAMIC  => $dynamic,
-        DISTINCT => 1,
-        ORDER => [ $order ],
-        %limit,
-    );
-    ##! 32: 'params: ' . Dumper \%params
-    return \%params;
+    ##! 32: 'params: ' . Dumper $params
+    return $params;
 }
 
 ###########################################################################
@@ -1426,10 +1348,11 @@ Returns a hash ref containing all available workflow titles including
 a description.
 
 Return structure:
-{
-  title => description,
-  ...
-}
+
+    {
+      title => description,
+      ...
+    }
 
 =head2 search_workflow_instances
 
@@ -1442,40 +1365,22 @@ Named parameters:
 
 =over
 
-=item * CONTEXT
+=item * ATTRIBUTE
 
-The named parameter CONTEXT must be a hash reference.
+The named parameter ATTRIBUTE must be a hash reference.
 Apply search filter to search using the KEY/VALUE pair passed in
-CONTEXT and match all Workflow instances whose context contain all
+ATTRIBUTE and match all Workflow instances whose attributes contain all
 of the specified tuples.
 It is possible to use SQL wildcards such as % in the VALUE field.
 
-=back
-
 Examples:
 
-  my @workflow_ids = $api->search_workflow_instances(
-      {
-      CONTEXT =>
-          {
-          KEY   => 'SCEP_TID',
-          VALUE => 'ECB001D912E2A357E6E813D87A72E641',
-          },
-      }
-
-Returns a HashRef:
-
-    {
-        'WORKFLOW.PKI_REALM'            => 'alpha',
-        'WORKFLOW.WORKFLOW_TYPE'        => 'wf_type_1',
-        'WORKFLOW.WORKFLOW_SERIAL'      => 511,
-        'WORKFLOW.WORKFLOW_PROC_STATE'  => 'manual',
-        'WORKFLOW.WORKFLOW_STATE'       => 'PERSIST',
-        'WORKFLOW.WORKFLOW_LAST_UPDATE' => '2017-04-07 23:10:05',
-        'WORKFLOW.WORKFLOW_WAKEUP_AT'   => 0,
-    }
-
-=over
+    my @workflow_ids = $api->search_workflow_instances( {
+        ATTRIBUTE => {
+            KEY   => 'SCEP_TID',
+            VALUE => 'ECB001D912E2A357E6E813D87A72E641',
+        }
+    } );
 
 =item * TYPE (optional)
 
@@ -1496,6 +1401,18 @@ If given, limits the amount of workflows returned.
 If given, defines the offset of the returned workflow (use with LIMIT).
 
 =back
+
+Returns a HashRef:
+
+    {
+        'WORKFLOW.PKI_REALM'            => 'alpha',
+        'WORKFLOW.WORKFLOW_TYPE'        => 'wf_type_1',
+        'WORKFLOW.WORKFLOW_SERIAL'      => 511,
+        'WORKFLOW.WORKFLOW_PROC_STATE'  => 'manual',
+        'WORKFLOW.WORKFLOW_STATE'       => 'PERSIST',
+        'WORKFLOW.WORKFLOW_LAST_UPDATE' => '2017-04-07 23:10:05',
+        'WORKFLOW.WORKFLOW_WAKEUP_AT'   => 0,
+    }
 
 =head2 search_workflow_instances_count
 
