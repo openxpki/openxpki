@@ -124,7 +124,6 @@ sub new
 	    FACILITY => "system",
 	);
 
-    CTX('dbi_workflow')->disconnect();
     CTX('dbi_backend')->disconnect();
 
     $self->{PARAMS}->{no_client_stdout} = 1;
@@ -365,8 +364,8 @@ sub sig_term {
     # This is obsolete for a "global shutdown" using the OpenXPKI::Control::stop
     # method but should be kept in case somebody sends a term to the daemon which
     # will stop spawning of new childs but should allow existing ones to finish
-    # FIXME - this will cause the watchdog to terminate if you kill a child, 
-    # so we remove this 
+    # FIXME - this will cause the watchdog to terminate if you kill a child,
+    # so we remove this
     #CTX('watchdog')->terminate();
 
     ##! 1: 'end'
@@ -375,15 +374,15 @@ sub sig_term {
 sub sig_hup {
 
     ##! 1: 'start'
-    
+
     my $pids = OpenXPKI::Control::get_pids();
-    
+
     CTX('log')->log(
         MESSAGE  => sprintf("SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}}),
         PRIORITY => "info",
         FACILITY => "system",
     );
-    
+
     if (@{$pids->{worker}}) {
         kill 15, @{$pids->{worker}};
     }
@@ -447,7 +446,7 @@ sub do_process_request
 {
     ##! 2: "start"
     my $self = shift;
- 
+
     my $log = CTX('log');
 
     ## recover from umask of Net::Server->run
@@ -570,22 +569,6 @@ sub do_process_request
 
     }
     ##! 16: 'dbi_backend reconnected with new dbh'
-
-    eval {
-        CTX('dbi_workflow')->new_dbh();
-	    CTX('dbi_workflow')->connect();
-    };
-    if ($EVAL_ERROR)
-    {
-        $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
-        $log->log (MESSAGE  => "Database connection failed. ".
-                                       $EVAL_ERROR->message(),
-                           PRIORITY => "fatal",
-                           FACILITY => "system");
-        return;
-
-    }
-    ##! 16: 'dbi_workflow reconnected with new dbh'
 
     # this is run until the user has logged in successfully
     CTX('service')->init();
@@ -867,7 +850,7 @@ sub __get_server_config
 }
 
 sub __set_process_name {
-    
+
     my $identity = shift;
     my @args = @_;
     if (@args) {
@@ -876,7 +859,7 @@ sub __set_process_name {
     my $alias = CTX('config')->get(['system','server','name']) || 'main';
     $0 = "openxpkid ($alias) $identity";
     return;
-    
+
 }
 
 ################################################
@@ -1012,7 +995,7 @@ the user interface will be initialized and started.
 
 =head2 do_process_request
 
-does the actual work of process_request: 
+does the actual work of process_request:
 determines transport, serialization and service from the user
 input and calls the init() and run() methods on the corresponding
 service. It also does some housekeeping such as setting permissions,

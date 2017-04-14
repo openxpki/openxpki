@@ -173,7 +173,6 @@ Set up the test environment.
     C<CTX('config')>
     C<CTX('log')>
     C<CTX('dbi_backend')>
-    C<CTX('dbi_workflow')>
     C<CTX('dbi')>
     C<CTX('api')>
     C<CTX('session')>
@@ -222,7 +221,7 @@ sub setup_env {
     }
 
     # our default tasks
-    my @tasks = qw( config_versioned dbi_log dbi_backend dbi_workflow dbi api );
+    my @tasks = qw( config_versioned dbi_log dbi_backend dbi api );
     my %task_hash = map { $_ => 1 } @tasks;
     # more tasks requested via "init" parameter
     push @tasks, grep { not $task_hash{$_} } @{ $params{init} };
@@ -242,7 +241,6 @@ sub setup_env {
     $session->set_pki_realm($self->config_writer->realms->[0]);
 
     OpenXPKI::Server::Context::CTX('dbi_backend')->connect;
-    OpenXPKI::Server::Context::CTX('dbi_workflow')->connect;
 }
 
 

@@ -2,7 +2,7 @@
 ##
 ## Written 2005 by Michael Bell for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
- 
+
 package OpenXPKI::Server::DBI;
 
 use strict;
@@ -55,7 +55,7 @@ sub new {
     $self->{params}->{SERVER_SHIFT} = $keys->{SERVER_SHIFT};
     $self->{params}->{LOG}          = $self->{log};
 
-    # Check for all neccessary variables to initialize OpenXPKI::Server:DBI 
+    # Check for all neccessary variables to initialize OpenXPKI::Server:DBI
 
     $self->{schema} = OpenXPKI::Server::DBI::Schema->new ();
     $self->{dbh}    = OpenXPKI::Server::DBI::DBH->new (%{$self->{params}});
@@ -156,7 +156,7 @@ sub init_schema
     ## NONE
     ## FORCE (overwrite existing tables)
     ## DRYRUN   to get SQL commands
-    my $mode = ""; 
+    my $mode = "";
        $mode = $keys->{MODE} if (exists $keys->{MODE});
     ##! 2: "MODE: $mode"
     if ($mode eq "DRYRUN") {
@@ -168,7 +168,7 @@ sub init_schema
     foreach my $table (@{$self->{schema}->get_tables()})
     {
 	my $result;
-	
+
 	if ($mode eq "FORCE") {
 	    if ($self->{sql}->table_exists (NAME => $table)) {
 		$result = $self->{sql}->drop_table (NAME => $table, MODE => $mode);
@@ -237,7 +237,7 @@ sub init_schema
 
 ########################################################################
 
-## rollback never touch the status because 
+## rollback never touch the status because
 ## rollback is normally the action if a
 ## statement fails
 sub rollback
@@ -483,8 +483,8 @@ cuts the database connection.
 =head3 new_dbh
 
 get a new database handle for the object. This is called on the
-CTX('dbi_workflow') and CTX('dbi_backend') objects when they are
-forked (either in workflow instance forking or Net::Server forking)
+CTX('dbi_backend') object when it is forked (either in workflow instance forking
+or Net::Server forking)
 
 =head3 commit
 
@@ -545,7 +545,7 @@ hide some complexity from the user.
 
 implements an access method to the SQL select operation. Please
 look at OpenXPKI::Server::DBI::SQL to get an overview about the available
-query options. 
+query options.
 
 =head3 get
 

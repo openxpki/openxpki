@@ -238,8 +238,6 @@ sub run {
     # Reconnect the dbi
     CTX('dbi_backend')->new_dbh();
     CTX('dbi_backend')->connect();
-    CTX('dbi_workflow')->new_dbh();
-    CTX('dbi_workflow')->connect();
 
     # parent process returns
     return $pid unless $pid == 0;

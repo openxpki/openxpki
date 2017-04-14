@@ -59,7 +59,6 @@ my @init_tasks = qw(
   redirect_stderr
   prepare_daemon
   dbi_backend
-  dbi_workflow
   dbi
   crypto_layer
   api
@@ -368,24 +367,11 @@ sub __do_init_dbi_backend {
     CTX('dbi_backend')->disconnect();
 }
 
-sub __do_init_dbi_workflow {
-    ### init backend dbi...
-    my $dbi = get_dbi(
-    {
-        PURPOSE => 'workflow',
-    });
-
-    OpenXPKI::Server::Context::setcontext(
-    {
-        dbi_workflow => $dbi,
-    });
-}
-
 sub __do_init_dbi_log {
-    
+
     ##! 1: "start"
     my $args = shift;
-    
+
     OpenXPKI::Server::Context::setcontext({
         dbi_log => OpenXPKI::Server::Database->new(
             log => CTX('log'),
@@ -393,7 +379,7 @@ sub __do_init_dbi_log {
             autocommit => 1
         ),
     });
-    
+
 }
 
 # TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
@@ -419,12 +405,12 @@ sub __dbi_config {
 
     ##! 1: "start"
     my $config = CTX('config');
-    
+
     # Fallback for logger/audit configs which can be separate
     if (!$config->exists(['system','database',$section])) {
         $section = 'main';
     }
-    
+
     my $db_config = $config->get_hash(['system','database',$section]);
 
     # Set environment variables

@@ -168,21 +168,6 @@ sub _init_legacydb {
     });
     CTX('dbi_backend')->connect;
 
-    OpenXPKI::Server::Context::setcontext({
-        dbi_workflow => OpenXPKI::Server::DBI->new(
-            SERVER_ID => 0,
-            SERVER_SHIFT => 8,
-            LOG         => CTX('log'),
-            TYPE        => $self->db_conf->{type},
-            NAME        => $self->db_conf->{name},
-            HOST        => $self->db_conf->{host},
-            PORT        => $self->db_conf->{port},
-            USER        => $self->db_conf->{user},
-            PASSWD      => $self->db_conf->{passwd},
-        )
-    });
-    CTX('dbi_workflow')->connect;
-
     $self->is_legacydb_initialized(1);
 }
 
