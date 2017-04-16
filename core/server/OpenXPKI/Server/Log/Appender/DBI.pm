@@ -3,25 +3,14 @@ package OpenXPKI::Server::Log::Appender::DBI;
 use strict;
 use warnings;
 
-use OpenXPKI::Debug;
-use OpenXPKI::Server::Context qw( CTX );
+# Core modules
 use Data::Dumper;
 use English;
-use Log::Log4perl::Level;
-use Carp;
+
+# Project modules
+use OpenXPKI::Debug;
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Database; # we must import "auto_id"
-
-my %LOGLEVELS = (
-    ALL     => 0,
-    TRACE   => 5000,
-    DEBUG   => 10000,
-    INFO    => 20000,
-    WARN    => 30000,
-    ERROR   => 40000,
-    FATAL   => 50000,
-    OFF     => (2 ** 31) - 1,
-);
-
 
 sub new {
     ##! 1: 'start'
