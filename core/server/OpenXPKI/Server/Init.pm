@@ -374,7 +374,7 @@ sub __do_init_dbi_log {
 
     OpenXPKI::Server::Context::setcontext({
         dbi_log => OpenXPKI::Server::Database->new(
-            log => OpenXPKI::Server::Log::NOOP->new,
+            log => CTX('log'), # we prevent recursive calls to log functions in OpenXPKI::Server::Log::Appender::DBI
             db_params => __dbi_config('log'),
             autocommit => 1
         ),
