@@ -283,6 +283,8 @@ to store the configuration
 =item * I<$yaml_hash> - I<HashRef> with configuration data that will be
 converted into YAML and stored on disk
 
+=back
+
 =cut
 sub add_realm_config {
     my ($self, $realm, $config_path, $yaml_hash) = @_;
@@ -334,6 +336,8 @@ B<Parameters>
 
 =item * I<$yaml_hash> - I<HashRef> with configuration data that will be
 converted into YAML and stored on disk
+
+=back
 
 =cut
 sub add_workflow {
