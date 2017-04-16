@@ -23,6 +23,16 @@ plan tests => 13;
 # Setup test context
 #
 my $oxitest = OpenXPKI::Test->new;
+$oxitest->add_realm_config(
+    "alpha",
+    "auth.handler",
+    {
+        Signature => {
+            realm  => [ "alpha" ],
+            cacert => [ "MyCertId" ],
+        }
+    }
+);
 $oxitest->setup_env(init => [ 'crypto_layer' ]);
 $oxitest->insert_testcerts;
 CTX('session')->set_pki_realm('alpha');
@@ -241,16 +251,6 @@ lives_and {
 
 # get_trust_anchors
 
-$oxitest->add_realm_config(
-    "alpha",
-    "auth.handler",
-    {
-        Signature => {
-            realm  => [ "alpha" ],
-            cacert => [ "MyCertId" ],
-        }
-    }
-);
 lives_and {
     my $a2 = $oxitest->certhelper_database->cert("alpha_signer_2");
 
