@@ -33,9 +33,8 @@ my $context = {
     	log              => undef,
     	dbi              => undef, # v2.0 sql layer!
     	dbi_backend      => undef,
-    	dbi_workflow     => undef,
     	dbi_log          => undef,
-    
+
     	# user-settable
     	api            => undef,
     	server         => undef,
@@ -53,7 +52,7 @@ our %who_forked_me;
 # only called statically
 sub CTX {
     my @objects = @_;
-    
+
     # not needed as we would get an exception if the requested object is not
     # defined anyway. Removed as it affects the new auto mock objects for testing
     if (0) {
@@ -71,7 +70,7 @@ sub CTX {
 
     my @return;
     foreach my $object (@objects) {
-    	
+
     	if (! exists $context->{exported}->{$object}) {
     	    OpenXPKI::Exception->throw (
     		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
@@ -80,26 +79,26 @@ sub CTX {
     		);
     	}
     	if (! defined $context->{exported}->{$object}) {
-    	    
+
     	    # FIXME - should add some code to check if this is a test script!
     	    # For testing, we serve Mock Objects for logger and session without prior init
     	    if ($object eq "session") {
     	        use OpenXPKI::Server::Session::Mock;
     	        my $session = OpenXPKI::Server::Session::Mock->new();
                 OpenXPKI::Server::Context::setcontext({'session' => $session});
-                $session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');	        	        
+                $session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');
     	    } elsif ($object eq 'log') {
     	        #warn "Auto-Init of NOOP-Logger";
     	        use OpenXPKI::Server::Log::NOOP;
-    	        OpenXPKI::Server::Context::setcontext({'log' => OpenXPKI::Server::Log::NOOP->new()});    	        
-    	    } else {        	   
+    	        OpenXPKI::Server::Context::setcontext({'log' => OpenXPKI::Server::Log::NOOP->new()});
+    	    } else {
         	    OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
                     params  => {OBJECT => $object},
                     log => undef, # do not log exception message
         		);
     	    }
-    	}    
+    	}
     	# FIXME: handle objects properly?
     	#push @return, dclone($context->{exported}->{$object});
     	push @return, $context->{exported}->{$object};
@@ -124,10 +123,10 @@ sub CTX {
 # are loaded.
 #
 # Example:
-# 
+#
 # context depends on init and init on dbi
 # dbi uses CTX
-# 
+#
 # Result Context loaded
 #        --> init must be loaded
 #        --> dbi must be loaded
@@ -141,7 +140,7 @@ sub CTX {
 sub setcontext {
     ##! 1: 'start'
     my $params = shift;
-    
+
     my $force = delete($params->{'force'});
     ##! 16: 'force: ' . $force
 
@@ -189,10 +188,10 @@ sub hascontext {
     return defined ($context->{exported}->{$key});
 }
 
-sub killsession {    
+sub killsession {
     $context->{exported}->{session} = undef;
     return 1;
-} 
+}
 
 1;
 __END__
@@ -208,7 +207,7 @@ object references for the OpenXPKI base infrastructure.
 Typically the package is included in every module that needs to access
 basic functions such as logging or database operations.
 
-During startup of the system this Context package must be initialized 
+During startup of the system this Context package must be initialized
 once by passing in the configuration file (see create()).
 After initialization has completed the package holds a global context
 that can be accessed from anywhere within the OpenXPKI code structure.
@@ -235,8 +234,6 @@ by calling CTX('...') once create() has been called:
 
 =item * dbi_backend
 
-=item * dbi_workflow
-
 =back
 
 =head2 Auxiliary objects (only available after explicit addition)
@@ -262,8 +259,8 @@ initialization procedure in order to make the objects available globally.
 
 =head2 CTX($)
 
-Allows to retrieve an object reference for the specified name. 
-If called before initialization has happened (see create() function) 
+Allows to retrieve an object reference for the specified name.
+If called before initialization has happened (see create() function)
 calling CTX() yields an exception.
 CTX() returns the associated object in the global context.
 
@@ -291,7 +288,7 @@ Allows to set additional globally available Context information after
 the Context has been initialized via create().
 
 To prevent abuse (storing arbitrary stuff globally) the Context module
-only allows to set Context entries that are allowed explicitly. 
+only allows to set Context entries that are allowed explicitly.
 Only the keys mentioned above are accepted, trying to set an unsupported
 Context object yields an exception.
 
@@ -307,11 +304,11 @@ Usage:
     api    => OpenXPKI::Server::API->new(),
   });
 
-=head2 hascontext 
+=head2 hascontext
 
 Check if the requested entry is available from the context.
 
 =head2 killsession
 
-Delete the recorded session from the context. Used during server startup 
-where we start with a mock session and need a real one later. 
+Delete the recorded session from the context. Used during server startup
+where we start with a mock session and need a real one later.

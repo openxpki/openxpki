@@ -24,19 +24,9 @@ sub new {
 }
 
 
-sub re_init {
-    my $self = shift;
-
-    return 1;
-}
-
-sub log
-{
-    my $self = shift;
-    my $keys = { @_ };
-
-    return 1;
-}
+sub re_init { 1 }
+sub log { 1 }
+sub usage { return shift } # to provide an info() method
 
 # install wrapper / helper subs
 no strict 'refs';

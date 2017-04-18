@@ -172,7 +172,7 @@ sub init_load {
         my @activities = @{$wf_info->{STATE}->{option}};
         
         # Do not count global_cancel as alternative selection
-        if (scalar @activities == 1 || (scalar @activities == 2 && $activities[1] == 'global_cancel')) {
+        if (scalar @activities == 1 || (scalar @activities == 2 && $activities[1] eq 'global_cancel')) {
             $wf_action = $activities[0];
             $self->logger()->debug('Autoselect action ' . $wf_action );
         }
@@ -1831,7 +1831,7 @@ sub __render_from_workflow {
         # set status decorator on final states, use proc state
         my $desc = $wf_info->{STATE}->{description};
 
-        if ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'finished') {
+        if ($wf_proc_state eq 'finished') {
             # add special colors for success and failure
 
             if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
@@ -1844,7 +1844,7 @@ sub __render_from_workflow {
             } else {
                 $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL','warn');
             }
-        } elsif ($wf_info->{WORKFLOW}->{PROC_STATE} eq 'exception') {
+        } elsif ($wf_proc_state eq 'exception') {
 
             $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
         }
@@ -2372,7 +2372,7 @@ sub __render_fields {
                 if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
                     $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
                     $item->{format} = 'code';
-                } elsif ($field->{type} eq 'textarea') {
+                } elsif ($field->{type} && $field->{type} eq 'textarea') {
                     $item->{format} = 'nl2br';
                 }
 

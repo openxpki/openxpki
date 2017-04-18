@@ -63,6 +63,7 @@ $CLONE_DIR/tools/testenv/mysql-wait-for-db.sh
 set -e
 $CLONE_DIR/tools/testenv/mysql-create-db.sh
 $CLONE_DIR/tools/testenv/mysql-create-user.sh
+$CLONE_DIR/tools/testenv/mysql-create-schema.sh
 
 #
 # OpenXPKI compilation

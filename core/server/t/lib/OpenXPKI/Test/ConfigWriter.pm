@@ -25,7 +25,19 @@ Methods to create a configuration consisting of several YAML files for tests.
 
 =cut
 
-has basedir     => ( is => 'rw', isa => 'Str', required => 1 );
+# TRUE if the initial configuration has been written
+has is_written => (
+    is => 'rw',
+    isa => 'Bool',
+    init_arg => undef,
+    default => 0,
+);
+
+has basedir => (
+    is => 'rw',
+    isa => 'Str',
+    required => 1,
+);
 
 has db_conf => (
     is => 'rw',
@@ -39,13 +51,30 @@ has db_conf => (
     },
 );
 
+# Collection of additional files, maybe for custom tests, that will be inserted
+# into the test environment. They must be declared before we create() everything.
+# HashRef: [path below basedir] => [YAML HashRef]
+has _additional_config_files => (
+    is => 'ro',
+    isa => 'HashRef[HashRef]',
+    traits => ['Hash'],
+    default => sub { {} },
+    init_arg => undef, # disable assignment via construction
+    handles => {
+        add_config_file => 'set',
+        config_file_data => 'get',
+        config_file_paths => 'keys',
+    },
+);
+
 # Following attributes must be lazy => 1 because their builders access other attributes
 has yaml_crypto     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_crypto" );
 has yaml_database   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_database" );
 has yaml_realms     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_realms" );
 has yaml_server     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_server" );
 has yaml_watchdog   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_watchdog" );
-has conf_log4perl   => ( is => 'rw', isa => 'Str',     lazy => 1, builder => "_buikd_log4perl" );
+has yaml_workflow_persister => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_workflow_persister" );
+has conf_log4perl   => ( is => 'rw', isa => 'Str',     lazy => 1, builder => "_build_log4perl" );
 
 has realms          => ( is => 'rw', isa => 'ArrayRef', default => sub { [ 'alpha', 'beta', 'gamma' ] } );
 
@@ -85,8 +114,8 @@ sub write_str {
 
     die "Empty content for $filepath" unless $content;
     open my $fh, ">", $filepath or die "Could not open $filepath for writing: $@";
-    print $fh $content, "\n";
-    close $fh;
+    print $fh $content, "\n" or die "Could not write to $filepath: $@";
+    close $fh or die "Could not close $filepath: $@";
 }
 
 sub write_private_key {
@@ -112,14 +141,15 @@ sub write_yaml {
     pop @$lines; shift @$lines; # remove --- and ... from beginning/end
 
     $self->_make_parent_dir($filepath);
+    diag "Writing $filepath" if $ENV{TEST_VERBOSE};
     $self->write_str($filepath, join("\n", @$lines));
 }
 
-sub write_realm_config {
+sub add_realm_config {
     my ($self, $realm, $config_path, $yaml_hash) = @_;
-
+    die "add_realm_config() must be called before create()" if $self->is_written;
     my $relpath = $config_path; $relpath =~ s/\./\//g;
-    $self->write_yaml($self->path_config_dir."/realm/$realm/$relpath.yaml",  $yaml_hash)
+    $self->add_config_file($self->path_config_dir."/realm/$realm/$relpath.yaml" => $yaml_hash);
 }
 
 sub make_dirs {
@@ -146,9 +176,17 @@ sub create {
     $self->write_yaml($self->path_config_dir."/system/server.yaml",    $self->yaml_server);
     $self->write_yaml($self->path_config_dir."/system/watchdog.yaml",  $self->yaml_watchdog);
 
-    $self->write_realm_config($_, "crypto", $self->_realm_crypto($_)) for @{$self->realms};
+    for my $realm (@{$self->realms}) {
+        $self->add_realm_config($realm, "crypto", $self->_realm_crypto($realm));
+        $self->add_realm_config($realm, "workflow.persister", $self->yaml_workflow_persister);
+        # OpenXPKI::Workflow::Handler checks existance of workflow.def
+        $self->add_realm_config($realm, "workflow.def.empty", { state => { INITIAL => { } } });
+    }
 
-    $self->write_str ($self->path_log4perl_conf,                       $self->conf_log4perl);
+    $self->write_str($self->path_log4perl_conf,                       $self->conf_log4perl);
+    # Write all additional config files
+    $self->write_yaml($_, $self->config_file_data($_)) for sort $self->config_file_paths;
+    $self->is_written(1);
 }
 
 # Returns the private key path for the certificate specified by realm and alias.
@@ -255,7 +293,7 @@ sub _build_server {
         # Session
         session => {
             directory   => $self->path_session_dir,
-            lifetime    => 1200,
+            lifetime    => 600,
         },
         # Which transport to initialize
         transport => {
@@ -366,8 +404,22 @@ sub _realm_crypto {
     };
 }
 
-sub _buikd_log4perl {
-    my ($self, $realm) = @_;
+sub _build_workflow_persister {
+    my ($self) = @_;
+    return {
+        OpenXPKI => {
+            class           => "OpenXPKI::Server::Workflow::Persister::DBI",
+            workflow_table  => "WORKFLOW",
+            history_table   => "WORKFLOW_HISTORY",
+        },
+        Volatile => {
+            class           => "OpenXPKI::Server::Workflow::Persister::Null",
+        },
+    };
+}
+
+sub _build_log4perl {
+    my ($self) = @_;
 
     my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'OFF';
     my $logfile = $self->path_log_file;

@@ -6111,10 +6111,6 @@ msgstr "Benutzername"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_FACTORY_FACTORY_NOT_DEFINED"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NO_WORKFLOW_GIVEN"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
@@ -7159,14 +7155,6 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_SETCONTEXT_INVALID_EXTENDED_SYNTAX_CODEREF"
 #~ msgstr "PKI Realm"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_REALM_MISSMATCH"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_LOAD_WORKFLOW_INFO"
-#~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_API_GET_WORKFLOW_FACTORY_UNABLE_TO_PARSE_WORKFLOW_INFO"

@@ -1,8 +1,9 @@
-## directly taken from documentation of Test::POD
-
 use Test::More;
+use FindBin qw( $Bin );
+
 eval "use Test::Pod 1.00";
 plan skip_all => "Test::Pod 1.00 required for testing POD" if $@;
-my @files = all_pod_files();
+
+my @files = all_pod_files("$Bin/../../");
 diag "Check the POD syntax in ".scalar @files." files\n" if $ENV{VERBOSE};
-all_pod_files_ok();
+all_pod_files_ok(@files);

@@ -67,6 +67,8 @@ $test->is($test->get_msg()->{PARAMS}, $cfg{csr}{profile}, "Profile match");
 # Fetch possible certificate actions
 $test->runcmd_ok('get_cert_actions', { IDENTIFIER => $cert_id, ROLE => "User" }, "Query actions for certificate (role 'User')");
 cmp_deeply($test->get_msg()->{PARAMS}, superhashof({
+    # actions are defined in config/openxpki/config.d/realm/ca-one/uicontrol/_default.yaml,
+    # they must exist and "User" must be defined in their "acl" section as creator
     workflow => superbagof(
         {
             'label' => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY',
@@ -75,10 +77,6 @@ cmp_deeply($test->get_msg()->{PARAMS}, superhashof({
         {
             'label' => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE',
             'workflow' => 'certificate_revocation_request_v2',
-        },
-        {
-            'label' => 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA',
-            'workflow' => 'change_metadata',
         },
     ),
 }), "Default actions exist");
