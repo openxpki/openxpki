@@ -602,8 +602,7 @@ sub __wakeup_resume_workflow {
     }
 
     ##! 2: "load workflow"
-    my $factory = $self->__get_workflow_factory({ WORKFLOW_ID => $wf_id });
-    my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id, FACTORY => $factory });
+    my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id });
 
     ##! 64: 'Got workflow ' . Dumper $workflow
 
@@ -985,7 +984,7 @@ sub __fetch_workflow {
     my ($self, $args) = @_;
 
     my $wf_id = $args->{ID};
-    my $factory = $args->{FACTORY} // CTX('workflow_factory')->get_factory;
+    my $factory = $args->{FACTORY} || CTX('workflow_factory')->get_factory;
 
     #
     # Check workflow PKI realm and set type (if not given)
