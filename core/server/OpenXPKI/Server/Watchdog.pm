@@ -75,7 +75,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Watchdog::WorkflowInstance;
 use OpenXPKI::DateTime;
 use Proc::ProcessTable;
 
