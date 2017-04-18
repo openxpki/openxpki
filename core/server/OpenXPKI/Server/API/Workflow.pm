@@ -969,8 +969,12 @@ sub __search_query_params {
     my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
     $desc = "" if defined $args->{REVERSE} and $args->{REVERSE} == 0;
     # TODO #legacydb Code that removes table name prefix
-    $args->{ORDER} =~ s/^WORKFLOW\.// if $args->{ORDER};
-    $params->{order_by} = sprintf "%s%s", $desc, ($args->{ORDER} // 'workflow_id');
+    if (!$args->{ORDER} || $args->{ORDER} =~ /WORKFLOW_SERIAL/) {
+        $args->{ORDER} = 'workflow_id';
+    } else {
+        $args->{ORDER} =~ s/^WORKFLOW\.//;
+    }
+    $params->{order_by} = sprintf "%s%s", $desc, $args->{ORDER};
 
     ##! 32: 'params: ' . Dumper $params
     return $params;
