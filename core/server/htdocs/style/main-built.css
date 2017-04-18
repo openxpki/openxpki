@@ -8513,6 +8513,12 @@ img.toplogo {
   background: url("../img/remove.png") no-repeat scroll left center;
 }
 
+/* class attached to the column holding the clonable buttons */
+
+.clonable-btn-group {
+  white-space: nowrap;
+}
+
 /*
  * Side navigation
  *
