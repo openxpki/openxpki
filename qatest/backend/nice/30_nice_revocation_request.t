@@ -42,7 +42,7 @@ my $test = OpenXPKI::Test::More->new(
 
 $test->set_verbose($cfg{instance}{verbose});
 
-$test->plan( tests => 20 );
+$test->plan( tests => 19 );
 
 my $buffer = do { # slurp
 	local $INPUT_RECORD_SEPARATOR;
@@ -94,7 +94,6 @@ $test->connect_ok(
     password => $cfg{operator}{password},
 ) or die "Error - connect failed: $@";
 
-$test->execute_ok( 'crr_edit_crr' ); # this need refactoring
 $test->execute_ok( 'crr_update_crr', { reason_code => 'keyCompromise' } );
 
 $test->state_is('PENDING');
