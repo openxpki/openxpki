@@ -434,6 +434,8 @@ The name of the workflow, optional (read from the tables)
 
 =item ASYNC
 
+B<DO NOT USE THIS FLAG - IT IS NOT FULLY WORKING YET> - see #517
+
 By default, the action is executed inline and the method returns after
 all actions are handled. You can detach from the execution by adding
 I<ASYNC> as argument: I<fork> will do the fork and return the ui control
@@ -1130,10 +1132,15 @@ sub __validate_input_param {
     return $result;
 }
 
-=head2 __execute_workflow_activity
+=head2 __execute_workflow_activity( workflow, activity, fork )
 
-ASYNC=FORK just forks and returns empty UI info, ASYNC=WATCH waits until
-the
+Execute the named activity on the given workflow object. Returns
+0 on success and throws exceptions on errors.
+
+B<DO NOT USE THIS FLAG - IT IS NOT FULLY WORKING YET> - see #517
+The third argument is an optional boolean flag weather to executed
+the activity in the background. If used, the return value is the PID
+of the forked child. 
 
 =cut
 
@@ -1146,11 +1153,28 @@ sub __execute_workflow_activity {
 
     # fork if async is requested
     if ($run_async) {
-        $SIG{'CHLD'} = sub { wait; };
-        ##! 16: 'trying to fork'
-        my $pid = fork();
-        ##! 16: 'pid: ' . $pid
 
+        CTX('log')->log(
+            MESSAGE  => sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
+                $workflow->state(), $workflow->id(), $workflow->type()),
+            PRIORITY => 'warn',
+            FACILITY => 'workflow',
+        );
+
+        my $pid;
+        my $redo_count = 5;
+        $SIG{'CHLD'} = sub { wait; };
+        while ( !defined $pid && $redo_count > 0 ) {
+            ##! 16: 'trying to fork'
+            $pid = fork();
+            ##! 16: 'pid: ' . $pid
+            if ( !defined $pid && $!{EAGAIN} ) {
+                # recoverable fork error
+                sleep 1;
+                $redo_count--;
+            }
+        }
+        
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_FORK_FAILED'
         ) unless (defined $pid);
@@ -1160,7 +1184,7 @@ sub __execute_workflow_activity {
         CTX('dbi_backend')->connect();
 
         if ( $pid != 0 ) {
-            ##! 16: ' Workflow instance succesfully forked'
+            ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
             # parent here - noop
             return $pid;
         }
@@ -1181,9 +1205,11 @@ sub __execute_workflow_activity {
     ##! 64: Dumper $workflow
     eval {
 
+        ##! 8: 'execute activity ' . $wf_activity
+        
         # This is a hack to handle simple "autorun" actions which we use to
         # create a bypass around optional actions
-
+       
         do {
             my $last_state = $workflow->state();
             $workflow->execute_action($wf_activity);
@@ -1215,6 +1241,7 @@ sub __execute_workflow_activity {
     };
 
     if ($run_async) {
+        ##! 16: 'Backgrounded workflow finished - exit child'
         exit;
     }
 
@@ -1273,7 +1300,7 @@ sub __execute_workflow_activity {
         );
     };
 
-    return 1;
+    return 0;
 }
 
 =head2 __watch_workflow ( workflow, duration = 15, sleep = 2 )
