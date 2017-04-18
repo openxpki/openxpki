@@ -1065,12 +1065,12 @@ sub action_handle {
     } elsif ($wf_args->{wf_handle} eq 'wakeup') {
         $self->logger()->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
         $wf_info = $self->send_command( 'wakeup_workflow', {
-            ID => $wf_args->{wf_id}, ASYNC => 'watch',
+            ID => $wf_args->{wf_id}, # ASYNC => 'watch', not working see #517
         });
     } elsif ($wf_args->{wf_handle} eq 'resume') {
         $self->logger()->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
         $wf_info = $self->send_command( 'resume_workflow', {
-            ID => $wf_args->{wf_id},  ASYNC => 'watch',
+            ID => $wf_args->{wf_id}, # ASYNC => 'watch', not working see #517
         });
         
     } 
