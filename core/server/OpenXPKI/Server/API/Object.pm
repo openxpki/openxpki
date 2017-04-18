@@ -1023,16 +1023,22 @@ sub search_cert_count {
 
     ##! 1: 'search_cert_count arguments: ' . Dumper $args
     my $params = $self->__search_cert_db_query( $args );
+    
+    # Not usefull and sometimes even dangerous 
+    foreach my $p (qw(limit offset order_by )) {  
+        delete $params->{$p} if (defined $params->{$p});
+    }
+    
     ##! 1: 'database search arguments: ' . Dumper $params
 
-    my $result = CTX('dbi')->select(
+    my $result = CTX('dbi')->select_one(
         %{$params},
         columns => [ 'COUNT(certificate.identifier)|amount' ],
-    )->fetchall_arrayref({});
+    );
     ##! 16: 'Result ' . Dumper $result
 
     ##! 1: "finished"
-    return $result->[0]->{amount};
+    return $result->{amount};
 }
 
 sub __search_cert_db_query {

@@ -844,6 +844,11 @@ sub search_workflow_instances_count {
     my ($self, $args) = @_;
 
     my $params = $self->__search_query_params($args);
+    
+    # Not usefull and sometimes even dangerous 
+    foreach my $p (qw(limit offset order_by )) {  
+        delete $params->{$p} if (defined $params->{$p});
+    }
 
     my $result = CTX('dbi')->select_one(
         %{$params},
@@ -902,7 +907,7 @@ sub __search_query_params {
     my @join_spec = ();
     my $ii = 0;
     for my $cond (@attr_cond) {
-        ##! 16: 'certificate attribute: ' . Dumper $entry
+        ##! 16: 'certificate attribute: ' . Dumper $cond
         my $table_alias = "workflowattr$ii";
 
         # add join table
