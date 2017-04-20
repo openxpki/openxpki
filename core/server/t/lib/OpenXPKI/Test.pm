@@ -407,6 +407,7 @@ sub _build_dbi {
     );
 }
 
+# TODO Remove "force_test_db", add "sqlite", under qatest/ the default should be _db_config_from_env() and under core/server/t it should be an SQLite DB
 sub _build_db_conf {
     my ($self) = @_;
 

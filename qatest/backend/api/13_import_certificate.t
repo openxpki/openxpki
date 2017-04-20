@@ -1,4 +1,9 @@
 #!/usr/bin/perl
+
+#
+# PLEASE KEEP this test in sync with core/server/t/95_openxpkiadm/10_import_certificate.t
+#
+
 use strict;
 use warnings;
 
