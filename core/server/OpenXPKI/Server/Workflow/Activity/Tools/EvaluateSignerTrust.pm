@@ -131,8 +131,8 @@ sub execute {
     my $current_realm = CTX('session')->get_pki_realm();
     
     CTX('log')->log(
-        MESSAGE => "Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier",        
-        PRIORITY => 'trace',
+        MESSAGE => "Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier",
+        PRIORITY => 'debug',
         FACILITY => 'application',
     );            
     

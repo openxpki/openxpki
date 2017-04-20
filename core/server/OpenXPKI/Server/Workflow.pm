@@ -790,7 +790,7 @@ sub _save{
         ($proc_state eq 'init' || $proc_state eq 'running' || $proc_state eq 'exception' )) {
          CTX('log')->log(
             MESSAGE  => "Workflow save requested during startup - wont save! ($proc_state)",
-            PRIORITY => "trace",
+            PRIORITY => "debug",
             FACILITY => ["workflow","application"]
         );
         ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
