@@ -248,7 +248,7 @@ throws_ok { CTX('api')->get_workflow_log({ ID => $wf_t1_a->{ID} }) } qr/unauthor
 CTX('session')->set_role('Guard');
 lives_and {
     my $result = CTX('api')->get_workflow_log({ ID => $wf_t1_a->{ID} });
-    like $result->[-1]->[2], qr/save/;
+    like $result->[-1]->[2], qr/save/ or diag explain $result;
 
     # Check sorting
     my $prev_ts = '30000101120000000000'; # year 3000
