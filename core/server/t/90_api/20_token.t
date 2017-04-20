@@ -33,7 +33,7 @@ $oxitest->add_realm_config(
         }
     }
 );
-$oxitest->setup_env(init => [ 'crypto_layer' ]);
+$oxitest->setup_env->init_server('crypto_layer');
 $oxitest->insert_testcerts;
 CTX('session')->set_pki_realm('alpha');
 

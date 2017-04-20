@@ -242,7 +242,7 @@ package OpenXPKI::Server::Workflow::Test::DataPool;
 use Test::Exception;
 use OpenXPKI::Test; # to import CTX into this package
 
-$oxitest->setup_env(init => [ 'crypto_layer' ]);
+$oxitest->setup_env->init_server('crypto_layer');
 
 # Try accessing another PKI realm from within OpenXPKI::Server::Workflow namespace
 throws_ok {

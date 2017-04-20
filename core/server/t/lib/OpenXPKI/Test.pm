@@ -156,7 +156,8 @@ has config_writer => (
     },
 );
 
-
+# Flag whether setup_env was called
+has _env_initialized => ( is => 'rw', isa => 'Bool', default => 0, init_arg => undef );
 
 =head2 setup_env
 
@@ -168,47 +169,14 @@ Set up the test environment.
 
 =item * creates a temporary directory with YAML configuration files,
 
-=item * initializes the basic context objects:
-
-    C<CTX('config')>
-    C<CTX('log')>
-    C<CTX('dbi_backend')>
-    C<CTX('dbi')>
-    C<CTX('api')>
-    C<CTX('session')>
-
-Note that C<CTX('session')-E<gt>get_pki_realm> will return the first realm
-specified in L<OpenXPKI::Test::ConfigWriter/realms>.
-
-=back
-
-B<Parameters>
-
-=over
-
-=item * I<init> (optional) - ArrayRef of additional server tasks to intialize
-(they will be passed on to L<OpenXPKI::Server::Init/init>).
-
 =back
 
 =cut
 sub setup_env {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        init => { isa => 'ArrayRef[Str]', optional => 1 },
-    );
-
-    # Start with mock session
-    #  - Setting PKI realm to first realm from test config. This is important as
-    #    different constructors for context (CTX) objects query the realm (???)
-    my $mock_session = OpenXPKI::Server::Session::Mock->new;
-    $mock_session->set_pki_realm('dummy');
-    OpenXPKI::Server::Context::setcontext({'session' => $mock_session});
+    my ($self) = @_;
 
     # Init Log4perl
     $self->_init_screen_log;
-
-    # Create base directory for test configuration
-    $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d"; # so OpenXPKI::Config will access our config from now on
 
     # Write configuration YAML files
     $self->config_writer->create;
@@ -220,18 +188,50 @@ sub setup_env {
         $self->config_writer->write_private_key($realm, $alias, $self->certhelper_database->private_keys->{$alias});
     }
 
-    # our default tasks
-    my @tasks = qw( config_versioned dbi_log dbi_backend dbi api );
-    my %task_hash = map { $_ => 1 } @tasks;
-    # more tasks requested via "init" parameter
-    push @tasks, grep { not $task_hash{$_} } @{ $params{init} };
+    # Create base directory for test configuration
+    $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d"; # so OpenXPKI::Config will access our config from now on
+
+    $self->_env_initialized(1);
+
+    return $self;
+}
+
+=head2 init_server
+
+Initializes the basic context objects:
+
+    C<CTX('config')>
+    C<CTX('log')>
+    C<CTX('dbi_backend')>
+    C<CTX('dbi')>
+    C<CTX('api')>
+    C<CTX('session')>
+
+Note that C<CTX('session')-E<gt>get_pki_realm> will return the first realm
+specified in L<OpenXPKI::Test::ConfigWriter/realms>.
+
+B<Parameters>
+
+=over
+
+=item * I<@additional_tasks> (optional) - list of additional server tasks to
+intialize (they will be passed on to L<OpenXPKI::Server::Init/init>).
+
+=back
+
+=cut
+sub init_server {
+    my ($self, @additional_tasks) = @_;
+
+    die "setup_env() must be called before init_server()" unless $self->_env_initialized;
 
     # Init basic CTX objects
+    my @tasks = qw( config_versioned log dbi_log dbi_backend dbi api ); # our default tasks
+    my %task_hash = map { $_ => 1 } @tasks;
+    push @tasks, grep { not $task_hash{$_} } @additional_tasks; # more tasks requested via parameter
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
 
-    OpenXPKI::Server::Context::setcontext({'log' => OpenXPKI::Server::Log->new (CONFIG => OpenXPKI::Server::Context::CTX('config')->get('system.server.log4perl')), force => 1});
-
-    # Set real session (OpenXPKI::Server::Init::init "killed" the old one anyway)
+    # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
     my $session = OpenXPKI::Server::Session->new({
         DIRECTORY => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.directory"),
         LIFETIME  => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.lifetime"),
@@ -241,6 +241,8 @@ sub setup_env {
     $session->set_pki_realm($self->config_writer->realms->[0]);
 
     OpenXPKI::Server::Context::CTX('dbi_backend')->connect;
+
+    return $self;
 }
 
 

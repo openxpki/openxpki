@@ -55,7 +55,7 @@ sub is_logentry_count {
 # Setup test context
 #
 use OpenXPKI::Test;
-OpenXPKI::Test->new->setup_env;
+OpenXPKI::Test->new->setup_env->init_server;
 
 my $dbi = CTX('dbi');
 my $log = CTX('log');
