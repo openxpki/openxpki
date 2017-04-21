@@ -16,6 +16,7 @@ use Test::Deep;
 use base qw( Exporter );
 
 our @EXPORT = qw(
+    openxpkiadm_test
     cert_import_ok
     cert_import_failsok
     cert_list_ok
@@ -57,7 +58,7 @@ sub _cert_import {
     print $fh $test_cert->data or die "Could not write test certificate data";
     close $fh or die "Could not close test certificate file";
 
-    _openxpkiadm(
+    openxpkiadm_test(
         [ 'certificate', 'import', '--file', $filename, ],
         \@args,
         $success_expected,
@@ -75,7 +76,7 @@ sub _cert_import {
 #
 sub cert_list_ok {
     my ($expected_output_re, @args) = @_;
-    _openxpkiadm([ 'certificate', 'list' ], \@args, 1, $expected_output_re, 'list certificates');
+    openxpkiadm_test([ 'certificate', 'list' ], \@args, 1, $expected_output_re, 'list certificates');
 }
 
 #
@@ -88,7 +89,7 @@ sub cert_list_ok {
 #
 sub cert_list_failsok {
     my ($expected_output_re, @args) = @_;
-    _openxpkiadm([ 'certificate', 'list' ], \@args, 0, $expected_output_re, 'list certificates');
+    openxpkiadm_test([ 'certificate', 'list' ], \@args, 0, $expected_output_re, 'list certificates');
 }
 
 #
@@ -101,7 +102,7 @@ sub cert_list_failsok {
 # $expected_output_re - RegEx|String (or ArrayRef of AND combined RegExes|Strings) with the expected output
 # $descr - base test description (String)
 #
-sub _openxpkiadm {
+sub openxpkiadm_test {
     # $basecmd and $args are separated to provide a nicer output message
     my ($basecmd, $args, $shall_succeed, $expected_output_re, $descr) = @_;
 
@@ -110,7 +111,7 @@ sub _openxpkiadm {
     my $msg = sprintf('%s%s %s',
         $descr,
         scalar(@$args) ? " (".join(" ", @$args).")" : "",
-        $shall_succeed ? "successful" : "returns error"
+        $shall_succeed ? "" : "returns error"
     );
 
     # run import

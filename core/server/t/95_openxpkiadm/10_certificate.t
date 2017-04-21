@@ -19,7 +19,7 @@ use lib "$Bin";
 use OpenXPKI::Test;
 use CommandlineTest;
 
-plan tests => 18;
+plan tests => 21;
 
 #
 # Setup test context
@@ -33,21 +33,27 @@ my $dbdata = $oxitest->certhelper_database;
 cert_import_failsok($dbdata->cert("gamma_bob_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
 cert_import_ok     ($dbdata->cert("gamma_bob_1"),    '--force-no-chain');
 
-cert_import_ok     ($dbdata->cert("alpha_root_2"),   qw(--realm alpha));
+cert_import_ok     ($dbdata->cert("alpha_root_2"),      qw(--realm alpha));
 cert_import_failsok($dbdata->cert("alpha_root_2"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS/);
-cert_import_ok     ($dbdata->cert("alpha_root_2"),   qw(--realm alpha), '--force-certificate-already-exists');
+cert_import_ok     ($dbdata->cert("alpha_root_2"),      qw(--realm alpha), '--force-certificate-already-exists');
 
-cert_import_ok     ($dbdata->cert("alpha_signer_2"), qw(--realm alpha));
-cert_import_ok     ($dbdata->cert("alpha_alice_2"),  qw(--realm alpha --revoked --alias MelaleucaAlternifolia));
+cert_import_ok     ($dbdata->cert("alpha_signer_2"),    qw(--realm alpha), '--group' => 'alpha-signer', '--gen' => 2);
+cert_import_ok     ($dbdata->cert("alpha_datavault_2"), qw(--realm alpha), '--token' => 'datasafe',     '--gen' => 2);
+cert_import_ok     ($dbdata->cert("alpha_scep_2"),      qw(--realm alpha), '--token' => 'scep',         '--gen' => 2);
+cert_import_ok     ($dbdata->cert("alpha_alice_2"),     qw(--realm alpha --revoked --alias MelaleucaAlternifolia));
 
-cert_import_ok     ($dbdata->cert("alpha_root_1"),   qw(--realm alpha));
+cert_import_ok     ($dbdata->cert("alpha_root_1"),      qw(--realm alpha));
 # Alpha gen 1 is expired, so we expect ...UNABLE_TO_BUILD_CHAIN
 cert_import_failsok($dbdata->cert("alpha_signer_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
 my $issuer = $dbdata->cert("alpha_signer_1")->db->{issuer_identifier};
-cert_import_ok     ($dbdata->cert("alpha_signer_1"), qw(--realm alpha), '--force-issuer', '--issuer', $issuer );
-cert_import_ok     ($dbdata->cert("alpha_alice_1"),  qw(--realm alpha), '--force-no-verify');
+cert_import_ok     ($dbdata->cert("alpha_signer_1"),    qw(--realm alpha), '--force-issuer', '--issuer', $issuer );
+cert_import_ok     ($dbdata->cert("alpha_alice_1"),     qw(--realm alpha), '--force-no-verify');
 
-my @ids = map { $dbdata->cert($_)->db->{identifier} } qw(alpha_root_2 alpha_signer_2 alpha_alice_2 alpha_root_1 alpha_signer_1 alpha_alice_1);
+my @ids = map { $dbdata->cert($_)->db->{identifier} }
+    qw(
+        alpha_root_1 alpha_signer_1 alpha_alice_1
+        alpha_root_2 alpha_signer_2 alpha_datavault_2 alpha_scep_2 alpha_alice_2
+    );
 my $a_alice_2_id    = $dbdata->cert("alpha_alice_2")->db->{identifier};
 my $a_signer_2_id   = $dbdata->cert("alpha_signer_2")->db->{identifier};
 my $a_root_2_id     = $dbdata->cert("alpha_root_2")->db->{identifier};
@@ -100,6 +106,27 @@ cert_list_ok \@verbose2, qw(--realm alpha -v -v);
 cert_list_ok \@verbose3, qw(--realm alpha -v -v -v);
 cert_list_ok \@verbose4, qw(--realm alpha -v -v -v -v);
 
+#
+# Test KEY LIST
+#
+openxpkiadm_test
+    [ 'key', 'list' ],
+    [ '--realm' => 'alpha' ],
+    1,
+    [qw( alpha-signer-2 alpha-datavault-2 alpha-scep-2 )],
+    'list keys';
+
+#
+# Test CHAIN
+#
+
+# There is a bug that does not allow parameter --realm
+#openxpkiadm_test
+#    [ 'certificate', 'chain' ],
+#    [ '--realm' => 'alpha', '--name' => $a_alice_2_id, '--issuer' => $a_root_2_id ],
+#    1,
+#    qr/jens/,
+#    'change certificate chain';
 
 # Cleanup database
 $oxitest->delete_testcerts;
