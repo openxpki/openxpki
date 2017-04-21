@@ -3,10 +3,10 @@ use strict;
 use warnings;
 
 # Core modules
-use FindBin qw( $Bin );
 use File::Temp qw( tempfile );
 use Symbol qw(gensym);
 use IPC::Open3 qw( open3 );
+use List::Util qw( min );
 
 # CPAN modules
 use Test::More;
@@ -15,14 +15,19 @@ use Test::Deep;
 
 use base qw( Exporter );
 
-our @EXPORT = qw( cert_import_ok cert_import_failsok );
+our @EXPORT = qw(
+    cert_import_ok
+    cert_import_failsok
+    cert_list_ok
+    cert_list_failsok
+);
 
 #
-# Test certificate import via "openxpkiadm certificate import".
+# Test "openxpkiadm certificate import".
 #
 # Positional parameters:
 # * $test_cert - Container with certificate data (OpenXPKI::Test::CertHelper::Database::PEM)
-# * @args - Arguments to pass on the command line
+# * @args - Additional arguments to pass on the command line
 #
 sub cert_import_ok {
     my ($test_cert, @args) = @_;
@@ -32,13 +37,13 @@ sub cert_import_ok {
 }
 
 #
-# Test certificate import via "openxpkiadm certificate import" and expect it to
-# fail with the given error message.
+# Test "openxpkiadm certificate import" and expect it to fail with the given
+# error message.
 #
 # Positional parameters:
 # * $test_cert - Container with certificate data (OpenXPKI::Test::CertHelper::Database::PEM)
-# * $error_re - Expected error string (regex)
-# * @args - Arguments to pass on the command line
+# * $error_re - Expected error string (regex or string)
+# * @args - Additional arguments to pass on the command line
 #
 sub cert_import_failsok {
     my ($test_cert, $error_re, @args) = @_;
@@ -61,31 +66,79 @@ sub _cert_import {
     );
 }
 
+#
+# Test "openxpkiadm certificate list".
+#
+# Positional parameters:
+# * $expected_output_re - RegEx (or ArrayRef of RegExes) with the expected output
+# * @args - Additional arguments to pass on the command line
+#
+sub cert_list_ok {
+    my ($expected_output_re, @args) = @_;
+    _openxpkiadm([ 'certificate', 'list' ], \@args, 1, $expected_output_re, 'list certificates');
+}
+
+#
+# Test "openxpkiadm certificate list" and expect it to fail with the given
+# error message.
+#
+# Positional parameters:
+# * $expected_output_re - RegEx|String (or ArrayRef of RegExes|Strings) with the expected output
+# * @args - Additional arguments to pass on the command line
+#
+sub cert_list_failsok {
+    my ($expected_output_re, @args) = @_;
+    _openxpkiadm([ 'certificate', 'list' ], \@args, 0, $expected_output_re, 'list certificates');
+}
+
+#
+# Test "openxpkiadm xxx" and check its output against the given Regexes/strings.
+#
+# Positional parameters:
+# $basecmd - base command of openxpkiadm which will not be shown in test message (ArrayRef)
+# $args - additional arguments to openxpkiadm that will be shown (ArrayRef)
+# $shall_succeed - whether we expect the test to succeed or fail (Bool)
+# $expected_output_re - RegEx|String (or ArrayRef of AND combined RegExes|Strings) with the expected output
+# $descr - base test description (String)
+#
 sub _openxpkiadm {
     # $basecmd and $args are separated to provide a nicer output message
-    my ($basecmd, $args, $success_expected, $expected_output_re, $descr) = @_;
+    my ($basecmd, $args, $shall_succeed, $expected_output_re, $descr) = @_;
+
+    $expected_output_re = [ $expected_output_re ] unless ref $expected_output_re eq 'ARRAY';
 
     my $msg = sprintf('%s%s %s',
         $descr,
         scalar(@$args) ? " (".join(" ", @$args).")" : "",
-        $success_expected ? "successful" : "fails with $expected_output_re"
+        $shall_succeed ? "successful" : "returns error"
     );
 
     # run import
+    my $output = gensym; # filehandle
     my @cmd = ('openxpkiadm', @$basecmd, @$args);
-
-    my $output = gensym;
     my $pid = open3(0, $output, 0, @cmd); waitpid($pid, 0);
-    local $/;
-    chomp(my $str = <$output>);
 
+    # read output
+    local $/;
+    chomp(my $output_str = <$output>);
+
+    # check exit code
     my $error = $? >> 8;
-    if ( ($error and $success_expected) or (not $error and not $success_expected) ) {
+    if ( ($error and $shall_succeed) or (not $error and not $shall_succeed) ) {
         diag "Error: " . join(' ', @cmd) . " exited with $error";
-        diag $str;
+        diag $output_str;
         fail $msg;
         return;
     }
 
-    like $str, $expected_output_re, $msg;
+    # Grep the output lines for each Regex (or string converted to regex)
+    # and count each occurrance
+    my @occurrances = map {
+        my $re = ref($_) eq 'Regexp' ? $_ : qr/ \Q$_\E /msx;
+        $output_str =~ $re
+            or diag "Output does not match $re:\n$output_str"
+    } @$expected_output_re;
+
+    my $all_found = min(@occurrances);
+    ok $all_found, $msg;
 }
