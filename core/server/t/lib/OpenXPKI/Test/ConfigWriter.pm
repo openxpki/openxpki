@@ -76,7 +76,12 @@ has yaml_watchdog   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_b
 has yaml_workflow_persister => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_workflow_persister" );
 has conf_log4perl   => ( is => 'rw', isa => 'Str',     lazy => 1, builder => "_build_log4perl" );
 
-has realms          => ( is => 'rw', isa => 'ArrayRef', default => sub { [ 'alpha', 'beta', 'gamma' ] } );
+has realms  => ( is => 'rw', isa => 'ArrayRef', default => sub { [ 'alpha', 'beta', 'gamma' ] } );
+has yaml_cert_profile_template => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_template" );
+has yaml_cert_profile_client   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_client" );
+has yaml_cert_profile_server   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_server" );
+has yaml_cert_profile_user     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_user" );
+has yaml_crl_default           => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_crl_default" );
 
 has path_config_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/config.d" } );
 has path_session_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/session" } );
@@ -182,10 +187,12 @@ sub create {
         # OpenXPKI::Workflow::Handler checks existance of workflow.def
         $self->add_realm_config($realm, "workflow.def.empty", { state => { INITIAL => { } } });
         # certificate profiles
-        $self->add_realm_config($realm, "profile.template", $self->cert_profile_template);
-        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_CLIENT", $self->cert_profile_client);
-        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_SERVER", $self->cert_profile_server);
-        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_USER",   $self->cert_profile_user);
+        $self->add_realm_config($realm, "profile.template",                     $self->yaml_cert_profile_template);
+        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_CLIENT", $self->yaml_cert_profile_client);
+        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_SERVER", $self->yaml_cert_profile_server);
+        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_USER",   $self->yaml_cert_profile_user);
+        # CRL
+        $self->add_realm_config($realm, "crl.default",                          $self->yaml_crl_default);
     }
 
     $self->write_str($self->path_log4perl_conf,                       $self->conf_log4perl);
@@ -456,7 +463,24 @@ sub _build_log4perl {
     );
 }
 
-sub cert_profile_client {
+sub _build_crl_default {
+    return {
+        digest     => "sha256",
+        extensions => {
+            authority_info_access => { critical => 0 },
+            authority_key_identifier =>
+                { critical => 0, issuer => 1, keyid => 1 },
+            issuer_alt_name => { copy => 0, critical => 0 },
+        },
+        validity => {
+            lastcrl    => 20301231235900,
+            nextupdate => "+000014",
+            renewal    => "+000003",
+        },
+    };
+}
+
+sub _build_cert_profile_client {
     return {
         label => "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL",
         style => {
@@ -509,7 +533,7 @@ sub cert_profile_client {
     };
 }
 
-sub cert_profile_server {
+sub _build_cert_profile_server {
     return {
         label => "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL",
         style => {
@@ -616,7 +640,7 @@ sub cert_profile_server {
     };
 }
 
-sub cert_profile_user {
+sub _build_cert_profile_user {
     return {
         label => "I18N_OPENXPKI_UI_PROFILE_USER_LABEL",
         style => {
@@ -667,7 +691,7 @@ sub cert_profile_user {
     };
 }
 
-sub cert_profile_default {
+sub _build_cert_profile_template {
     return {
         publish                 => [ "queue", "disk" ],
         randomized_serial_bytes => 8,
