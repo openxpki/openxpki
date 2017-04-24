@@ -659,7 +659,7 @@ sub __wake_up_workflow {
     if ( $pid != 0 ) {
         ##! 16: ' Workflow instance succesfully forked - I am the watchdog'
         # parent here - noop
-        return;
+        return $pid;
     }
 
     #
@@ -711,8 +711,8 @@ sub __wake_up_workflow {
         return $error_msg;
     }
 
-    return 0;
-
+    # The child MUST TERMINATE!
+    exit;
 }
 
 
