@@ -134,7 +134,7 @@ throws_ok {
         ENC_ALG => "AES256",
         PASSWD  => $passwd,
     });
-} qr/ROT13/, 'Refuse to create key with unknown algorithm';
+} 'OpenXPKI::Exception', 'Refuse to create key with unknown algorithm';
 
 ## create CSR (PKCS#10)
 my $subject = "cn=John Dö,dc=OpenXPKI,dc=org";
