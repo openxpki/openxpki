@@ -1,7 +1,7 @@
 # The name of the file equals the name of the profile
 label: I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL
 
-validity: 
+validity:
     notafter: +0006
 
 style:
@@ -13,7 +13,7 @@ style:
                 - hostname
                 - hostname2
                 - port
-            san: 
+            san:
                 - san_dns
                 - san_ipv4
             info:
@@ -23,10 +23,10 @@ style:
                 - requestor_affiliation
                 - comment
 
-        subject: 
+        subject:
             dn: CN=[% hostname.lower %][% IF port AND port != 443 %]:[% port %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
-            san: 
-              DNS: 
+            san:
+              DNS:
                   - "[% hostname.lower %]"
                   - "[% FOREACH entry = hostname2 %][% entry.lower %] | [% END %]"
 
@@ -59,19 +59,19 @@ style:
 
         subject:
             dn: CN=[% CN %][% IF OU %][% FOREACH entry = OU %],OU=[% entry %][% END %][% END %][% IF O %],O=[% O %][% END %][% FOREACH entry = DC %],DC=[% entry %][% END %][% IF C %],C=[% C %][% END %]
-  
+
     enroll:
-        subject: 
+        subject:
             dn: CN=[% CN.0 %],DC=Test Deployment,DC=OpenXPKI,DC=org
-        
+
         metadata:
             system_id: "[% data.cust_id %]"
             server_id: "[% data.server_id %]"
             entity: "[% CN.0 FILTER lower %]"
- 
+
 # Profile extensions - set 0/1 as needed
 # Also see sections defined in default.yaml
-extensions: 
+extensions:
     key_usage:
         critical: 1
         digital_signature: 1
@@ -90,8 +90,8 @@ extensions:
         client_auth:      0
         server_auth:      1
         email_protection: 0
-        codeSigning:      0
-        timeStamping:     0
+        code_signing:     0
+        time_stamping:    0
 
 
     # This is really outdated and should not be used unless really necessary
