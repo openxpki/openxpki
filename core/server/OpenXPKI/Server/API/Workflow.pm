@@ -1259,6 +1259,8 @@ sub __execute_workflow_activity {
             FACILITY => 'workflow',
         );
 
+        OpenXPKI::Server::__set_process_name("workflow: id %d (exception)", $workflow->id());
+
         my $log = {
             logger => CTX('log'),
             priority => 'error',
@@ -1304,7 +1306,9 @@ sub __execute_workflow_activity {
             log     => $log,
         );
     };
-
+    
+    OpenXPKI::Server::__set_process_name("workflow: id %d (cleanup)", $workflow->id());
+    
     return 0;
 }
 

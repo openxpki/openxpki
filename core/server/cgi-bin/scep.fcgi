@@ -99,7 +99,7 @@ while (my $cgi = CGI::Fast->new()) {
     }
     my $result = $scep_client->send_request($params);
     print $result;
-    
+    $scep_client->detach();
     $log->debug('Response send');
 }
 

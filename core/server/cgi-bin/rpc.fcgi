@@ -198,7 +198,10 @@ while (my $cgi = CGI::Fast->new()) {
 
     print $json->encode( $res );
     
-
+    if ($client) {
+        $client->disconnect();
+    }
+    
 }
 
 
