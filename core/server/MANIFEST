@@ -496,8 +496,6 @@ t/01_pod/2.t
 t/05_base/00_prereqs.t
 t/05_base/01.t
 t/05_base/02.t
-t/05_base/03.t
-t/05_base/fix_config.pl
 
 t/08_debug/01_using.t
 t/08_debug/02_color.t
@@ -519,9 +517,6 @@ t/15_dn/2.t
 t/15_dn/3.t
 t/15_dn/4.t
 
-t/25_crypto/00_config.t
-t/25_crypto/01_init_token.t
-t/25_crypto/10_init_ca.t
 t/25_crypto/11_use_ca.t
 t/25_crypto/12_conversion.t
 t/25_crypto/13_pkcs7.t
@@ -542,26 +537,12 @@ t/25_crypto/35_object_pkcs7.t
 t/25_crypto/51_volatile_vault.t
 t/25_crypto/52_object_secret.t
 t/25_crypto/53_is_issuer.t
-t/25_crypto/canciph_scripts/create_cacert.sh
-t/25_crypto/canciph_scripts/openssl.cnf
-t/25_crypto/common.pl
-t/25_crypto/profile.xml
-t/25_crypto/test_profile.xml
-t/25_crypto/token.xml
 
 t/28_log/01.t
 t/28_log/log4perl.conf
 t/28_log/README
 
-t/30_dbi/02.t
-t/30_dbi/03.t
-t/30_dbi/04_quoting_bug.t
 t/30_dbi/30_log.t
-t/30_dbi/70.t2
-t/30_dbi/99.t2
-t/30_dbi/common.pl
-t/30_dbi/log4perl.conf
-t/30_dbi/README
 
 t/31_database/01-base.t
 t/31_database/02-querybuilder.t
@@ -576,6 +557,7 @@ t/31_database/21-merge.t
 t/31_database/22-merge-clob.t
 t/31_database/23-transactions.t
 t/31_database/24-transactions-isolation.t
+t/31_database/25-autocommit.t
 t/31_database/DatabaseTest.pm
 t/31_database/log4perl.conf
 
@@ -697,7 +679,6 @@ t/lib/OpenXPKI/Test/ConfigWriter.pm
 t/lib/OpenXPKI/Test/CertHelper/Database.pm
 t/lib/OpenXPKI/Test/CertHelper/Database/PEM.pm
 
-t/config.xml
 t/tests.mk
 
 # Helpers for workflow tests
