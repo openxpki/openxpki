@@ -633,9 +633,10 @@ t/90_api/10_housekeeping_purge_applog.t
 t/90_api/20_token.t
 t/90_api/30_workflow.t
 
-t/99_cleanup/25_crypto.t
+t/95_openxpkiadm/10_certificate.t
+t/95_openxpkiadm/CommandlineTest.pm
+
 t/99_cleanup/28_log.t
-t/99_cleanup/30_dbi.t2
 t/99_cleanup/50_auth.t
 t/99_cleanup/60_workflow.t
 t/99_cleanup/65_ui.t

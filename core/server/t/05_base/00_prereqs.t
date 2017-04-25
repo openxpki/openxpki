@@ -30,9 +30,6 @@ SKIP: {
                 'Workflow::History',
                 't/common/dbi.pl',
                 't/05_base/fix_config.pl', # test prereqs, no modules ...
-                't/25_crypto/common.pl',
-                't/28_log/common.pl',
-                't/30_dbi/common.pl',
                 't/60_workflow/common.pl',
               ],
     );
