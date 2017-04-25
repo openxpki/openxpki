@@ -34,7 +34,7 @@ If you want to
 use an explicit temporary directory then you must specifiy this
 directory in the variable TMPDIR.
 
-=cut 
+=cut
 
 sub new {
     ##! 1: 'start'
@@ -50,19 +50,13 @@ sub new {
     my $keys = shift;
     $self->{tmp} = $keys->{TMPDIR} if ($keys->{TMPDIR});
 
-    $self->{called_from_testscript} = 1 if ($keys->{'IGNORE_CHECK'});
-
-    if ($caller_package ne 'OpenXPKI::Server::Init' &&
-        ! $self->{called_from_testscript}) {
+    if ($caller_package ne 'OpenXPKI::Server::Init' and not $ENV{TEST_ACTIVE}) {
         # TokenManager instances shall only be created during
         # the server initialization, the rest of the code can
         # use CTX('crypto_layer') as its token manager
-        # IGNORE_CHECK is only meant for unit tests!
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_TOKENMANAGER_INSTANTIATION_OUTSIDE_SERVER_INIT',
-            params => {
-                'CALLER' => $caller_package,
-            },
+            params => { 'CALLER' => $caller_package },
         );
     }
     ##! 1: "end - token manager is ready"
@@ -136,7 +130,7 @@ sub __load_secret
     my $method = $config->get(['crypto','secret',$group,'method']);
     my $label = $config->get(['crypto','secret',$group,'label']);
     my $export = $config->get(['crypto','secret',$group,'export']) || 0;
-    
+
     $self->{SECRET}->{$realm}->{$group}->{TYPE}  = $method;
     $self->{SECRET}->{$realm}->{$group}->{LABEL} = ($label ? $label : $method);
     $self->{SECRET}->{$realm}->{$group}->{EXPORT}  = ($export ? 1 : 0);
@@ -223,8 +217,7 @@ sub __set_secret_from_cache {
     } else {
         ## daemon mode
         ##! 4: "let's get the serialized secret from the database"
-        if (!$self->{called_from_testscript}
-            && CTX('dbi_backend')->is_connected()) {
+        if (CTX('dbi_backend')->is_connected()) {
             # do this only if the database is already connected
             # i.e. not during server startup
             # (this is senseless anyhow, as we will only find
@@ -288,7 +281,7 @@ See #333
 sub reload_all_secret_groups_from_cache {
     ##! 1: 'start'
     my $self = shift;
-   
+
     my @realms = CTX('config')->get_keys('system.realms');
     foreach my $realm (@realms) {
         foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
@@ -332,9 +325,9 @@ sub is_secret_group_complete
 
 =head2 get_secret( group )
 
-Get the plaintext value of the stored secret. This requires that the 
-secret was created with the "export" flag set, otherwise an exception 
-is thrown. Returns undef if the secret is not complete. 
+Get the plaintext value of the stored secret. This requires that the
+secret was created with the "export" flag set, otherwise an exception
+is thrown. Returns undef if the secret is not complete.
 
 =cut
 
@@ -347,21 +340,21 @@ sub get_secret
     if (!$self->is_secret_group_complete($group)) {
         return undef;
     }
-    
+
     my $realm = CTX('session')->get_pki_realm();
 
     if (!$self->{SECRET}->{$realm}->{$group}->{EXPORT}) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");       
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");
     }
-    
+
     return $self->{SECRET}->{$realm}->{$group}->{REF}->get_secret();
-    
+
 }
 
 =head2 set_secret_group_part( { GROUP, VALUE, PART } )
 
-Set the secret value of the given group, for plain secrets ommit PART. 
+Set the secret value of the given group, for plain secrets ommit PART.
 
 =cut
 

@@ -37,7 +37,6 @@ lives_and {
     ok $default_token;
 } 'Get default token';
 
-###########################################################################
 # plain secrets
 use_ok "OpenXPKI::Crypto::Secret";
 my $secret = OpenXPKI::Crypto::Secret->new();

@@ -32,7 +32,7 @@ SKIP: {
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+my $mgmt = OpenXPKI::Crypto::TokenManager->new;
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
 my $token = $mgmt->get_token ({

@@ -32,7 +32,7 @@ use_ok "OpenXPKI::Crypto::TokenManager";
 
 my $mgmt;
 lives_ok {
-    $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+    $mgmt = OpenXPKI::Crypto::TokenManager->new;
 } 'Create OpenXPKI::Crypto::TokenManager instance';
 
 ## parameter checks for get_token

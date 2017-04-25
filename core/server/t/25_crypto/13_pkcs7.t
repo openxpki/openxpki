@@ -42,7 +42,7 @@ use_ok "OpenXPKI::Crypto::TokenManager";
 
 my $default_token;
 lives_and {
-    my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+    my $mgmt = OpenXPKI::Crypto::TokenManager->new;
     $default_token = $mgmt->get_system_token({ TYPE => "DEFAULT" });
     ok $default_token;
 } 'Get default token';
