@@ -7,6 +7,7 @@ use File::Temp qw( tempfile );
 use Symbol qw(gensym);
 use IPC::Open3 qw( open3 );
 use List::Util qw( min );
+use Cwd;
 
 # CPAN modules
 use Test::More;
@@ -116,7 +117,9 @@ sub openxpkiadm_test {
 
     # run import
     my $output = gensym; # filehandle
-    my @cmd = ('openxpkiadm', @$basecmd, @$args);
+
+    my $relpath = getcwd."/bin/openxpkiadm"; # current working dir should be core/server, so try binary at core/server/bin/
+    my @cmd = (-x $relpath ? $relpath : "openxpkiadm", @$basecmd, @$args);
     my $pid = open3(0, $output, 0, @cmd); waitpid($pid, 0);
 
     # read output
