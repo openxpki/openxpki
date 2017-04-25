@@ -5,6 +5,9 @@ use Test::More;
 
 plan tests => 8;
 
+TODO: {
+    todo_skip 'See Issue #188', 8;
+
 use English;
 
 use OpenXPKI::Crypto::TokenManager;
@@ -22,8 +25,6 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-TODO: {
-    todo_skip 'See Issue #188', 6;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',

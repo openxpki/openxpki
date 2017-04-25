@@ -5,6 +5,9 @@ use English;
 
 plan tests => 16;
 
+TODO: {
+    todo_skip 'See Issue #188', 16;
+
 print STDERR "OpenXPKI::Crypto::CRL\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
@@ -26,8 +29,6 @@ SKIP: {
 my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-TODO: {
-    todo_skip 'See Issue #188', 14;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
