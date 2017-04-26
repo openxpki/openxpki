@@ -23,10 +23,10 @@ sub execute {
     my $params     = { PKI_REALM => CTX('api')->get_pki_realm(), };
 
     # fallback to old parameter format
-    my $prefix = '';        
+    my $prefix = '';
     if ($self->param('ds_namespace')) {
         $prefix = 'ds_';
-        
+
         # get the name of the key and resolve it
         my $dp_key_param = $self->param('ds_key_param');
         if ( not $dp_key_param ) {
@@ -35,14 +35,14 @@ sub execute {
             );
         }
         $params->{ KEY } = $context->param( $dp_key_param );
-        
+
         my $dp_value_param = $self->param('ds_value_param');
         if ( not $dp_value_param ) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_VALUE_PARAM' 
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_VALUE_PARAM'
             );
-        }        
-        $params->{ VALUE } = $context->param( $dp_value_param ); 
+        }
+        $params->{ VALUE } = $context->param( $dp_value_param );
 
         CTX('log')->log(
             MESSAGE => 'Old parameter format found in set datapool activity',
@@ -52,23 +52,23 @@ sub execute {
 
     } else {
         $params->{ KEY } = $self->param( 'key' );
-        $params->{ VALUE } = $self->param( 'value' );    
+        $params->{ VALUE } = $self->param( 'value' );
     }
 
-    # map those parameters 1:1 to the API method    
+    # map those parameters 1:1 to the API method
     foreach my $key (qw( namespace encrypt force expiration_date )) {
         my $val =  $self->param($prefix.$key);
         if (defined $val) {
-            $params->{ uc($key) } = $val;            
+            $params->{ uc($key) } = $val;
         }
     }
-    
+
     # check for mandatory fields
-    foreach my $key (qw( namespace key encrypt force )) {                
+    foreach my $key (qw( namespace key encrypt force )) {
         if ( not defined $params->{ uc($key) } ) {
             OpenXPKI::Exception->throw( message =>
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_' .
-                'MISSPARAM_' . uc($key) 
+                'MISSPARAM_' . uc($key)
             );
         }
     }
@@ -83,9 +83,8 @@ sub execute {
     }
 
     CTX('api')->set_data_pool_entry($params);
-    CTX('dbi_backend')->commit();
 
-    # we support this feature only in legacy mode 
+    # we support this feature only in legacy mode
     if ($self->param('ds_unset_context_value')) {
     	##! 16: 'clearing context parameter ' . $valparam
         my $valparam  = $self->param('ds_value_param');
@@ -118,8 +117,8 @@ This class sets an entry in the Datapool.
 
 =head2 Parameters
 
-In the activity definition, the following parameters must be set. The syntax 
-using the I<ds_> prefix is deprecated, use the I<_map> syntax to load key and 
+In the activity definition, the following parameters must be set. The syntax
+using the I<ds_> prefix is deprecated, use the I<_map> syntax to load key and
 value from the context. It is not allowed to mix prefixed and non-prefixed
 parameters!
 
@@ -144,7 +143,7 @@ Causes the set action to overwrite an existing entry.
 
 Sets expiration date of the datapool entry to the specified value.
 The value should be a time specification recognized by OpenXPKI::DateTime
-autodetection. (such as '+000001', which means one day), a terse data or 
+autodetection. (such as '+000001', which means one day), a terse data or
 epoch. See OpenXPKI::DateTime::get_validity for details.
 
 =item key
@@ -190,11 +189,11 @@ I<ds_value_param> parameters.
             _map_key: $token_id
             _map_value: $_puk
             encrypt: 1
-            force: 1            
-            expiration_date: "+10"        
+            force: 1
+            expiration_date: "+10"
 
 =head2 Example (Legacy format - same result as above)
-  
+
     set_puk_in_datapool:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
         param:
@@ -205,4 +204,4 @@ I<ds_value_param> parameters.
             ds_force: 1
             ds_unset_context_value: 0
             ds_expiration_date: "+10"
-        
+
