@@ -155,7 +155,7 @@ sub execute {
                 FACILITY => 'application',
             );
         } else {
-            # Check if the extension has a profile mapping, defined in scep.<server>.profile_map        
+            # Check if the extension has a profile mapping, defined in scep.<server>.profile_map
             my $profile = $config->get("scep.$server.profile_map.$cert_extension_name");
             if ($profile) {
       	        # Move old profile name for reference
@@ -254,21 +254,21 @@ sub execute {
 
     # test drive for new parser
     Crypt::PKCS10->setAPIversion(0);
-    my $decoded = Crypt::PKCS10->new( $pkcs10 );  
+    my $decoded = Crypt::PKCS10->new( $pkcs10 );
     my %attrib = $decoded->attributes();
 
     my $challenge;
     if ($attrib{'challengePassword'}) {
-        # can be utf8string or printable 
-        my $ref = $attrib{'challengePassword'};    
+        # can be utf8string or printable
+        my $ref = $attrib{'challengePassword'};
         if (ref $ref eq '') {
-            $challenge = $ref; 
+            $challenge = $ref;
         } elsif ($ref->{'printableString'}) {
             $challenge = $ref->{'printableString'};
         } elsif ($ref->{'utf8String'}) {
             $challenge = $ref->{'utf8String'};
         }
-        
+
     }
 
     if ($challenge) {
@@ -321,15 +321,15 @@ sub execute {
 
     # Check if revoked in the database
 
-    my $signer_hash = CTX('dbi_backend')->first (
-        TABLE => 'CERTIFICATE',
-        DYNAMIC => {
-            IDENTIFIER => $signer_identifier,
+    my $signer_hash = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => [ 'identifier', 'subject', 'status', 'notafter' ],
+        where => {
+            identifier => $signer_identifier,
         },
-        'COLUMNS' => ['STATUS','NOTAFTER']
     );
     if ($signer_hash) {
-        if ($signer_hash->{STATUS} eq 'REVOKED') {
+        if ($signer_hash->{status} eq 'REVOKED') {
             $context->param('signer_status_revoked' => '1');
              CTX('log')->log(
                 MESSAGE => "SCEP signer certificate revoked; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject",
@@ -344,8 +344,8 @@ sub execute {
                 FACILITY => [ 'audit', 'application'],
             );
         }
-        $context->param('signer_cert_identifier' => $signer_hash->{IDENTIFIER});
-        $context->param('signer_cert_subject' => $signer_hash->{SUBJECT});
+        $context->param('signer_cert_identifier' => $signer_hash->{identifier});
+        $context->param('signer_cert_subject' => $signer_hash->{subject});
     } else {
         $context->param('signer_status_revoked' => '0');
     }
@@ -408,8 +408,8 @@ sub execute {
     }
     $context->param('_url_params' => undef);
 
-    # We search here on the preprocessed subject - otherwise the max_count 
-    # condition is useless.  
+    # We search here on the preprocessed subject - otherwise the max_count
+    # condition is useless.
     my $certs = CTX('api')->search_cert({
         VALID_AT => time(),
         STATUS => 'ISSUED',
@@ -421,41 +421,41 @@ sub execute {
     ##! 64: 'certs found ' . Dumper $certs
     my $cert_count = scalar(@{$certs});
     $context->param('num_active_certs' => $cert_count );
-    
+
     my $renewal_cert_notafter = 0;
     my $renewal_cert_identifier = '';
-    
+
     if ($is_self_signed) {
-       # nothing to do  
+       # nothing to do
     } elsif ($signer_sn_matches_csr) {
         # real scep renewal (signed with old certificate)
-        $renewal_cert_notafter = $signer_hash->{NOTAFTER};
-        $renewal_cert_identifier = $signer_hash->{IDENTIFIER};
-        
+        $renewal_cert_notafter = $signer_hash->{notafter};
+        $renewal_cert_identifier = $signer_hash->{identifier};
+
         CTX('log')->log(
             MESSAGE => "SCEP signed renewal request for $signer_subject / $renewal_cert_identifier",
             PRIORITY => 'info',
             FACILITY => ['audit','application'],
         );
-        
+
     } elsif($cert_count) {
-        
+
         # initial enrollment for subject of existing certificate
         # check renewal on most recent active certificate
         my $recent_cert = shift @{$certs};
-        ##! 32: 'recent cert ' . Dumper $recent_cert 
+        ##! 32: 'recent cert ' . Dumper $recent_cert
         $renewal_cert_notafter = $recent_cert->{NOTAFTER};
         $renewal_cert_identifier = $recent_cert->{IDENTIFIER};
-        
+
         CTX('log')->log(
             MESSAGE => "SCEP initial enrollment for existing subject $signer_subject / $renewal_cert_identifier",
             PRIORITY => 'info',
             FACILITY => ['audit','application'],
         );
     }
-     
-    $context->param('renewal_cert_identifier' => $renewal_cert_identifier) if ($renewal_cert_identifier);    
-     
+
+    $context->param('renewal_cert_identifier' => $renewal_cert_identifier) if ($renewal_cert_identifier);
+
     # Check if the request was received within the renewal window
     my $renewal = $config->get("scep.$server.renewal_period") || 0;
     $context->param('in_renew_window' => 0);
