@@ -51,7 +51,7 @@ sub execute {
     CTX('dbi')->insert(
         into => 'certificate_attributes',
         values => {
-            identifier => $context->param('cert_identifier'),
+            identifier => $crr->{identifier},
             attribute_contentkey => 'system_workflow_crr',
             attribute_value => $workflow->id,
         }
