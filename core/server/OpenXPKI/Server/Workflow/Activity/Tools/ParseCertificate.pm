@@ -13,7 +13,7 @@ use OpenXPKI::Debug;
 
 use Data::Dumper;
 
-my @parameters = qw( 
+my @parameters = qw(
     cert_attrmap
     certificate
 );
@@ -21,71 +21,63 @@ my @parameters = qw(
 __PACKAGE__->mk_accessors(@parameters);
 
 
-sub execute
-{
+sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $dbi         = CTX('dbi_backend');
     my $default_token = CTX('api')->get_default_token();
 
     ##! 16: 'ParseCert'
-    my %contextentry_of = (
-	certificatein => 'certificate',
-	);
-    foreach my $contextkey (keys %contextentry_of) {
-	if (defined $self->param($contextkey . 'contextkey')) {
-	    $contextentry_of{$contextkey} = $self->param($contextkey . 'contextkey');
-	}
+    my %contextentry_of = ( certificatein => 'certificate' );
+    for my $contextkey (keys %contextentry_of) {
+        if (defined $self->param($contextkey . 'contextkey')) {
+            $contextentry_of{$contextkey} = $self->param($contextkey . 'contextkey');
+        }
     }
 
     my %cert_attrmap = map { split(/\s*[=-]>\s*/) }
         split( /\s*,\s*/, $self->param('cert_attrmap') );
-    
-    
+
     my $certificate = $context->param($contextentry_of{'certificatein'});
 
     my $x509 = OpenXPKI::Crypto::X509->new(
-	TOKEN => $default_token,
-	DATA  => $certificate,
-	);
+        TOKEN => $default_token,
+        DATA  => $certificate,
+    );
 
     my $x509_parsed = $x509->get_parsed_ref();
 
     foreach my $key (keys %cert_attrmap) {
-	if (! exists $x509_parsed->{BODY}->{$key}) {
-	    OpenXPKI::Exception->throw(
-		message =>
-		'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PARSE_CERT_INVALID_ATTRIBUTE',
-		params => {
-		    ATTRIBUTE => $key,
-		},
-		log => {
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
-	my $value = $x509_parsed->{BODY}->{$key};
-	
-	if (ref $value ne '') {
-	    OpenXPKI::Exception->throw(
-		message =>
-		'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PARSE_CERT_INVALID_ATTRIBUTE_DATA_TYPE',
-		params => {
-		    ATTRIBUTE => $key,
-		    TYPE      => ref $value,
-		},
-		log => {
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
+        if (! exists $x509_parsed->{BODY}->{$key}) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PARSE_CERT_INVALID_ATTRIBUTE',
+                params => {
+                    ATTRIBUTE => $key,
+                },
+                log => {
+                    priority => 'error',
+                    facility => 'system',
+                },
+            );
+        }
+        my $value = $x509_parsed->{BODY}->{$key};
 
-	my $context_key = $cert_attrmap{$key};
+        if (ref $value ne '') {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PARSE_CERT_INVALID_ATTRIBUTE_DATA_TYPE',
+                params => {
+                    ATTRIBUTE => $key,
+                    TYPE      => ref $value,
+                },
+                log => {
+                    priority => 'error',
+                    facility => 'system',
+                },
+            );
+        }
 
-	$context->param($context_key => $value);
+        my $context_key = $cert_attrmap{$key};
+        $context->param($context_key => $value);
     }
 
     return 1;
@@ -107,8 +99,8 @@ from the certificate.
 
 =head2 cert_attrmap
 
-Map parsed certificate attributes to context parameter names, allowing 
-flexible access and assignment of data parsed certificates into the context. 
+Map parsed certificate attributes to context parameter names, allowing
+flexible access and assignment of data parsed certificates into the context.
 Must be defined, otherwise no output is generated in the context. Mapping
 keys must be specified correctly (including case), otherwise an exception
 is thrown.
