@@ -20,33 +20,33 @@ sub _validate {
 
     ##! 1: 'start'
     ##! 16: 'check identifier' . $cert_identifier
-    CTX('dbi_backend')->commit();
-    my $hash = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => { VALUE => $cert_identifier }, },
+    my $cert = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => [ 'pki_realm', 'req_key' ],
+        where => { identifier => $cert_identifier },
     );
 
-    if (!$hash) {    
+    if (!$cert) {
         ##! 16: 'unknown identifier ' . $cert_identifier
-        validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NO_SUCH_ID");    
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NO_SUCH_ID");
     }
-    
+
     my $pki_realm = $self->param('pki_realm') || CTX('session')->get_pki_realm();
-    
-    if (($hash->{'PKI_REALM'} ne $pki_realm) && ($pki_realm ne '_any')) {
-        validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_IN_REALM");        
+
+    if (($cert->{pki_realm} ne $pki_realm) && ($pki_realm ne '_any')) {
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_IN_REALM");
     }
-    
-    if ($self->param('entity_only') && !$hash->{CSR_SERIAL}) {
+
+    if ($self->param('entity_only') && !$cert->{req_key}) {
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY");
     }
-    
+
     CTX('log')->log(
-        MESSAGE  => "Found certificate, hash is " . Dumper $hash,
+        MESSAGE  => "Found certificate, hash is " . Dumper $cert,
         PRIORITY => 'debug',
         FACILITY => 'application',
     );
-    
+
     return 1;
 }
 
@@ -61,12 +61,12 @@ OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
 =head1 SYNOPSIS
 
     class: OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
-    param: 
+    param:
         entity_only: 1
         pki_realm: _any
-    arg: 
+    arg:
       - $cert_identifier
-      
+
 =head1 DESCRIPTION
 
 This validator checks whether a given certificate identifier exists. Based
@@ -76,17 +76,17 @@ there is no check on the validity of the certificate.
 
 =head2 Argument
 
-=over 
+=over
 
 =item $cert_identifier
 
 The certificate identifier
 
-=back 
- 
+=back
+
 =head2 Parameter
 
-=over 
+=over
 
 =item pki_realm
 
@@ -95,6 +95,6 @@ ist to check in the session realm only!
 
 =item entity_only
 
-If set, the certificate must be an entity certificate. 
+If set, the certificate must be an entity certificate.
 
 =back
