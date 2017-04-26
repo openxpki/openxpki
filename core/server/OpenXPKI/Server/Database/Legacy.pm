@@ -46,6 +46,16 @@ our $workflow_map = {
     watchdog_key            => 'WATCHDOG_KEY',
 };
 
+our $csr_map = {
+    req_key     => 'CSR_SERIAL',
+    pki_realm   => 'PKI_REALM',
+    format      => 'TYPE',
+    profile     => 'PROFILE',
+    loa         => 'LOA',
+    subject     => 'SUBJECT',
+    data        => 'DATA',
+};
+
 # Convert database result hash
 # * $db_hash: HashRef to convert
 # * $new_to_old: Conversion direction, 0 = to legacy, 1 = from legacy
@@ -144,6 +154,27 @@ Parameters:
 sub workflow_to_legacy {
     my ($self, $db_hash, $prefix_table) = @_;
     return $self->_convert($db_hash, 1, $workflow_map, $prefix_table ? "WORKFLOW" : undef);
+}
+
+=head2 csr_to_legacy
+
+Converts the keys of the given data hash from SQL attribute names to legacy
+attribute names.
+
+Parameters:
+
+=over
+
+=item * B<$db_hash> database hash whose keys are to be converted
+
+=item * B<$prefix_table> optional: set to 1 to prefix field names with table name
+
+=back
+
+=cut
+sub csr_to_legacy {
+    my ($self, $db_hash, $prefix_table) = @_;
+    return $self->_convert($db_hash, 1, $csr_map, $prefix_table ? "CSR" : undef);
 }
 
 =head2 convert_dynamic_cond

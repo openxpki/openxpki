@@ -12,34 +12,30 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Database::Legacy;
 
 use OpenXPKI::Server::Workflow::NICE::Factory;
 
 use Data::Dumper;
 
 sub execute {
-    my $self     = shift;
-    my $workflow = shift;
-
+    my ($self, $workflow) = @_;
     my $context = $workflow->context();
-    
     ##! 32: 'context: ' . Dumper( $context )
-    
-    my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
-    
-    # Load the CSR indicated by the context parameter from the database 
-	my $csr_serial = $context->param( 'csr_serial' );
-		
-    ##! 32: 'load csr from db: ' . $csr_serial 	
-    # get a fresh view of the database
-    CTX('dbi_backend')->commit();
 
-    my $csr = CTX('dbi_backend')->first(
-        TABLE   => 'CSR',
-        KEY => $csr_serial,        
+    my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
+
+    # Load the CSR indicated by the context parameter from the database
+	my $csr_serial = $context->param( 'csr_serial' );
+
+    ##! 32: 'load csr from db: ' . $csr_serial
+    my $csr = CTX('dbi')->select_one(
+        from => 'csr',
+        columns => [ '*' ],
+        where => { req_key => $csr_serial },
     );
-    
-    ##! 64: 'csr: ' . Dumper $csr   
+
+    ##! 64: 'csr: ' . Dumper $csr
     if (! defined $csr) {
 	   OpenXPKI::Exception->throw(
 	       message => 'I18N_OPENXPKI_SERVER_NICE_CSR_NOT_FOUND_IN_DATABASE',
@@ -47,12 +43,12 @@ sub execute {
        );
     }
 
-    if ($csr->{TYPE} ne 'pkcs10' && $csr->{TYPE} ne 'spkac') {
+    if ($csr->{format} ne 'pkcs10' && $csr->{format} ne 'spkac') {
 	   OpenXPKI::Exception->throw(
 	       message => 'I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE',
-	       params => { EXPECTED => 'pkcs10/spkac', TYPE => $csr->{TYPE} },
+	       params => { EXPECTED => 'pkcs10/spkac', TYPE => $csr->{format} },
         );
-    }   
+    }
 
     CTX('log')->log(
         MESSAGE  => "start cert issue for serial $csr_serial, workflow " . $workflow->id,
@@ -62,13 +58,14 @@ sub execute {
 
     my $set_context;
     eval {
-        $set_context = $nice_backend->issueCertificate( $csr );
+        # TODO #legacydb CSR parameters are converted
+        $set_context = $nice_backend->issueCertificate( OpenXPKI::Server::Database::Legacy->csr_to_legacy($csr) );
     };
-    
+
     if ($EVAL_ERROR) {
-        my $ee = $EVAL_ERROR; 
+        my $ee = $EVAL_ERROR;
         # Catch exception as "pause" if configured
-        if ($self->param('pause_on_error')) {            
+        if ($self->param('pause_on_error')) {
             CTX('log')->log(
                 MESSAGE  => "NICE issueCertificate failed but pause_on_error is requested ",
                 PRIORITY => 'warn',
@@ -80,8 +77,8 @@ sub execute {
                 FACILITY => [ 'application' ]
             );
             $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
-        } 
-        
+        }
+
         if (my $exc = OpenXPKI::Exception->caught()) {
             $exc->rethrow();
         } else {
@@ -89,33 +86,31 @@ sub execute {
         }
     }
 
-    ##! 64: 'Setting Context ' . Dumper $set_context      
-    foreach my $key (keys %{$set_context} ) {
+    ##! 64: 'Setting Context ' . Dumper $set_context
+    for my $key (keys %{$set_context} ) {
         my $value = $set_context->{$key};
         ##! 64: "Set key: $key to value $value";
         $context->param( $key, $value );
     }
 
     ##! 64: 'Context after issue ' .  Dumper $context
-    
+
     # Record the certificate owner information, see
-    # https://github.com/openxpki/openxpki/issues/183   
+    # https://github.com/openxpki/openxpki/issues/183
     my $owner = $self->param('cert_owner');
-    
+
     ##! 64: 'Params ' . Dumper $self->param()
-    ##! 32: 'Owner ' . $owner 
+    ##! 32: 'Owner ' . $owner
     if ($owner) {
-        CTX('dbi_backend')->insert(
-            TABLE => 'CERTIFICATE_ATTRIBUTES',
-            HASH => {
-                IDENTIFIER => $set_context->{cert_identifier},
-                ATTRIBUTE_KEY => 'system_cert_owner',
-                ATTRIBUTE_VALUE => $owner,
-            }
+        CTX('dbi')->insert(
+            into => 'certificate_attributes',
+            values => {
+                identifier => $set_context->{cert_identifier},
+                attribute_contentkey => 'system_cert_owner',
+                attribute_value => $owner,
+            },
         );
     }
-    
-    		
 }
 
 1;
@@ -132,9 +127,9 @@ parameter from the database and hands it to the configured NICE backend.
 
 Note that it highly depends on the implementation what properties are taken from
 the pkcs10 container and what can be overridden by other means.
-The activity allows request types spkac and pkcs10 - you need to adjust this 
+The activity allows request types spkac and pkcs10 - you need to adjust this
 if you use other formats.
-See documentation of the used backend for details.   
+See documentation of the used backend for details.
 
 See OpenXPKI::Server::Workflow::NICE::issueCertificate for details
 
