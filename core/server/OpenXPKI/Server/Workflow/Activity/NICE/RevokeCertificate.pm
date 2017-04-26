@@ -17,50 +17,45 @@ use OpenXPKI::Server::Workflow::NICE::Factory;
 use Data::Dumper;
 
 sub execute {
-    my $self     = shift;
-    my $workflow = shift;
+    my ($self, $workflow) = @_;
     my $context  = $workflow->context();
-    
     ##! 32: 'context: ' . Dumper( $context )
-    
+
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
-    
-	my $crr_serial = $context->param('crr_serial');	
-	my $dbi = CTX('dbi_backend');
-	
+	my $crr_serial = $context->param('crr_serial');
+	my $dbi = CTX('dbi');
+
     ##! 16: 'searching for crr serial ' . $crr_serial
-	my $crr = $dbi->first(
-	    TABLE   => 'CRR',
-	    COLUMNS => [ 'REASON_CODE', 'IDENTIFIER' ],	    
-		KEY => $crr_serial,		   	    
+	my $crr = $dbi->select_one(
+	    from => 'crr',
+	    columns => [ 'identifier' ],
+		where => { crr_key => $crr_serial },
     );
-    
+
     if (! defined $crr) {
 	   OpenXPKI::Exception->throw(
 	       message => 'I18N_OPENXPKI_SERVER_NICE_CRR_NOT_FOUND_IN_DATABASE',
 	       params => { crr_serial => $crr_serial }
        );
     }
-      
+
     CTX('log')->log(
         MESSAGE  => "start cert revocation for crr_serial $crr_serial, workflow " . $workflow->id,
         PRIORITY => 'info',
         FACILITY => 'application',
     );
-           
-    $nice_backend->revokeCertificate( $crr );
 
-    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier} 
-    CTX('dbi_backend')->insert(
-        TABLE => 'CERTIFICATE_ATTRIBUTES', 
-        HASH => {            
-            IDENTIFIER => $context->param('cert_identifier'),
-            ATTRIBUTE_KEY => 'system_workflow_crr',
-            ATTRIBUTE_VALUE => $workflow->id
+    $nice_backend->revokeCertificate( { IDENTIFIER => $crr->{identifier} } );
+
+    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier}
+    CTX('dbi')->insert(
+        into => 'certificate_attributes',
+        values => {
+            identifier => $context->param('cert_identifier'),
+            attribute_contentkey => 'system_workflow_crr',
+            attribute_value => $workflow->id,
         }
-    );          
-    CTX('dbi_backend')->commit();       
-    	
+    );
 }
 
 1;
