@@ -7263,12 +7263,6 @@ msgstr "Имя учетной записи"
 #~ "некоторых данных (__FIELDS__)."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RETRIEVECERTIFICATE_QUERY_ERROR"
-#~ msgstr ""
-#~ "Для выполнения следующего этапа технологическому процессу не хватает "
-#~ "некоторых данных (__FIELDS__)."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_REVOKE_CERTIFICATE_NO_CERT_IDENTIFIER"
 #~ msgstr ""
 #~ "Для выполнения следующего этапа технологическому процессу не хватает "
