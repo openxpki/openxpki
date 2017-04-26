@@ -602,6 +602,8 @@ t/60_workflow/openssl.cnf
 t/60_workflow/password_safe_key
 t/60_workflow/start.pl
 
+t/61_workflow_activity/10_update_certificate_metadata.t
+
 t/65_ui/10_transport_simple.t
 t/65_ui/20_serialization_simple.t
 t/65_ui/21_serialization_json.t
