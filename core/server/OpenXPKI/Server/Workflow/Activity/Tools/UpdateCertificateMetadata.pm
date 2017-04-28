@@ -11,6 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Database; # to get AUTO_ID
 use Data::Dumper;
 
 sub execute {
@@ -18,30 +19,31 @@ sub execute {
     my ($self, $workflow) = @_;
     my $context  = $workflow->context();
     my $ser  = OpenXPKI::Serialization::Simple->new();
+    my $dbi = CTX('dbi');
 
     my $cert_identifier = $context->param('cert_identifier');
     ##! 16: 'cert_identifier: ' . $cert_identifier
 
-    my $cert_metadata = CTX('dbi_backend')->select(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            'IDENTIFIER' => { VALUE =>  $cert_identifier  },
-            'ATTRIBUTE_KEY' => { OPERATOR => 'LIKE', VALUE => 'meta_%' },
+    # map current database info into ArrayRef [ key => { value => ..., id => ...} ]
+    my $cert_metadata = $dbi->select(
+        from => 'certificate_attributes',
+        columns => ['*'],
+        where => {
+            identifier => $cert_identifier,
+            attribute_contentkey => { -like => 'meta_%' },
         },
     );
-
-    # map current database info into 2-dim hash
     my $old_meta = {};
-    for my $item (@{$cert_metadata}) {
-        $old_meta->{$item->{ATTRIBUTE_KEY}} //= [];
-        push @{ $old_meta->{$item->{ATTRIBUTE_KEY}} }, { value => $item->{ATTRIBUTE_VALUE}, id => $item->{ATTRIBUTE_SERIAL} };
+    while (my $item = $cert_metadata->fetchrow_hashref) {
+        my $key = $item->{attribute_contentkey};
+        $old_meta->{$key} //= [];
+        push @{ $old_meta->{$key} }, { value => $item->{attribute_value}, id => $item->{attribute_key} };
     }
     ##! 32: 'Current meta attributes: ' . Dumper $old_meta
 
     my $param = $context->param();
     ##! 32: 'Update request: ' . Dumper $param
 
-    my $dbi = CTX('dbi_backend');
     for my $rawkey (keys %{$param}) {
         next if ($rawkey !~ m{ \A meta_ }xms);
 
@@ -85,9 +87,9 @@ sub execute {
                 if ($is_scalar and scalar(@$old_to_delete)) {
                     my $oldval = shift(@$old_to_delete); # take first old value (attribute might contain multiple values if it was previously treated as a list)
                     $dbi->update(
-                        TABLE => 'CERTIFICATE_ATTRIBUTES',
-                        DATA => { ATTRIBUTE_VALUE => $newval },
-                        WHERE => { ATTRIBUTE_SERIAL => $oldval->{id} },
+                        table => 'certificate_attributes',
+                        set => { attribute_value => $newval },
+                        where => { attribute_key => $oldval->{id} },
                     );
                     ##! 16: "attr '$key': changed value '".$oldval->{value}."' => '$newval'"
                     CTX('log')->info(
@@ -97,14 +99,13 @@ sub execute {
                     );
                 }
                 else {
-                    my $serial = $dbi->get_new_serial( TABLE => 'CERTIFICATE_ATTRIBUTES' );
                     $dbi->insert(
-                        TABLE => 'CERTIFICATE_ATTRIBUTES',
-                        HASH => {
-                            ATTRIBUTE_SERIAL => $serial,
-                            IDENTIFIER => $cert_identifier,
-                            ATTRIBUTE_KEY => $key,
-                            ATTRIBUTE_VALUE => $newval
+                        into => 'certificate_attributes',
+                        values => {
+                            attribute_key        => AUTO_ID,
+                            identifier           => $cert_identifier,
+                            attribute_contentkey => $key,
+                            attribute_value      => $newval,
                         }
                     );
                     ##! 16: "attr '$key': added value '$newval'"
@@ -120,8 +121,8 @@ sub execute {
         # remove leftovers from the hash
         for my $item (@$old_to_delete) {
             $dbi->delete(
-                TABLE => 'CERTIFICATE_ATTRIBUTES',
-                DATA => { ATTRIBUTE_SERIAL => $item->{id} }
+                from => 'certificate_attributes',
+                where => { attribute_key => $item->{id} }
             );
             ##! 16: "attr '$key': deleted value '" . $item->{value} . "'"
             CTX('log')->info(
@@ -131,7 +132,6 @@ sub execute {
             );
         }
     }
-    $dbi->commit();
     return 1;
 }
 
