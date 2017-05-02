@@ -294,7 +294,7 @@ sub load_extension
                 }
                 $val .= $attr->{value};
                 @values = ( $val );
-            
+
                 $self->set_extension(NAME => $name,
                     CRITICAL => $attr->{critical} ? 'true' : 'false',
                     VALUES   => [@values]);
@@ -413,7 +413,7 @@ sub set_extension
     $self->{PROFILE}->{EXTENSIONS}->{$name}->{CRITICAL} = $critical;
 
 
-    if (!ref $value) {    
+    if (!ref $value) {
         $self->{PROFILE}->{EXTENSIONS}->{$name}->{VALUE} = [ $value ];
     } else {
         ## copy by value (normal array)
@@ -443,10 +443,10 @@ sub set_oid_extension_sequence {
     my @section = split /\r?\n/, $value;
     push @values, @section;
 
-    return $self->set_extension(NAME => $name,        
+    return $self->set_extension(NAME => $name,
         CRITICAL => $critical ? 'true' : 'false',
         VALUES   => [@values]);
-    
+
 }
 
 sub is_critical_extension
@@ -477,7 +477,7 @@ sub get_extension
             },
         );
     }
-    
+
     if (not defined $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE})
     {
         OpenXPKI::Exception->throw (
@@ -489,7 +489,7 @@ sub get_extension
     }
 
     return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE};
-    
+
 }
 
 sub set_serial
@@ -515,6 +515,47 @@ sub get_named_extensions
 {
     my $self = shift;
     return grep /[^(\d+\.)]/, keys %{$self->{PROFILE}->{EXTENSIONS}};
+}
+
+=head2 create_random_serial
+
+Generate a random serial number (ID) and return it as a L<Math::BigInt> object.
+
+B<Parameters>
+
+=over
+
+=item PREFIX - High order bits to prepend to the generated serial number (optional)
+
+=item RANDOM_LENGTH - The desired byte length of the random part
+
+=back
+
+=cut
+sub create_random_serial {
+    my ($self, %args) = @_;
+
+    my $serial = Math::BigInt->new( $args{'PREFIX'} // 0);
+    my $rand_length = $args{'RANDOM_LENGTH'}
+        or OpenXPKI::Exception->throw(message => 'Mandatory parameter RANDOM_LENGTH missing');
+
+    if ($rand_length > 0) {
+        my $default_token = CTX('api')->get_default_token();
+        my $rand_base64 = $default_token->command({
+            COMMAND       => 'create_random',
+            RANDOM_LENGTH => $rand_length,
+        });
+        my $rand_hex = '0x' . unpack 'H*', decode_base64($rand_base64);
+        ##! 16: 'random part in hex: ' . $rand_hex
+
+        # left shift the existing serial by the size of the random part and
+        # add it to the right
+        $serial->blsft($rand_length * 8);
+        ##! 16: 'bit shifted serial: ' . $serial->bstr()
+        $serial->bior(Math::BigInt->new($rand_hex));
+        ##! 16: 'combined with random part: ' . $serial->bstr()
+    }
+    return $serial;
 }
 
 =head2 process_templates
