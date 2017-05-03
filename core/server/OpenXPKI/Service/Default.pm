@@ -54,9 +54,9 @@ sub init {
             MESSAGE => $msg,
         });
         if (! $is_valid) {
-	    $self->__send_error({
-	        ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
-	    });
+        $self->__send_error({
+            ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
+        });
         }
         else { # valid message received
             my $result;
@@ -71,9 +71,9 @@ sub init {
                 });
             }
             elsif ($EVAL_ERROR) {
-	        $self->__send_error({
-	            ERROR     => $EVAL_ERROR,
-	        });
+            $self->__send_error({
+                ERROR     => $EVAL_ERROR,
+            });
             }
             else { # if everything was fine, send the result to the client
                 $self->talk($result);
@@ -157,9 +157,9 @@ sub __is_valid_message : PRIVATE {
         ##! 16: 'message is valid'
         return 1;
     }
-    
+
     CTX('log')->log(
-        MESSAGE  => 'Invalid message '.$message_name.' recevied in state ' . $state_of{$ident}, 
+        MESSAGE  => 'Invalid message '.$message_name.' recevied in state ' . $state_of{$ident},
         PRIORITY => 'warn',
         FACILITY => 'system',
     );
@@ -218,14 +218,14 @@ sub __handle_NEW_SESSION : PRIVATE {
     } else {
         ##! 8: "no language specified"
     }
-        
+
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
 
     CTX('log')->log(
-	MESSAGE  => 'New session created',
-	PRIORITY => 'info',
-	FACILITY => 'system',
-	);
+    MESSAGE  => 'New session created',
+    PRIORITY => 'info',
+    FACILITY => 'system',
+    );
 
     $self->__change_state({
         STATE => 'SESSION_ID_SENT',
@@ -253,18 +253,18 @@ sub __handle_CONTINUE_SESSION {
         });
     };
     if ($EVAL_ERROR) {
-	my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED';
-	if (my $exc = OpenXPKI::Exception->caught()) {
-		OpenXPKI::Exception->throw (
-		    message  => $error,
-		    params   => {ID => $msg->{SESSION_ID}},
-		    children => [ $exc ]);
-	} else {
-	    OpenXPKI::Exception->throw(
-		message => $error,
-		params  => {ID => $msg->{SESSION_ID}}
-	    );
-	}
+    my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED';
+    if (my $exc = OpenXPKI::Exception->caught()) {
+        OpenXPKI::Exception->throw (
+            message  => $error,
+            params   => {ID => $msg->{SESSION_ID}},
+            children => [ $exc ]);
+    } else {
+        OpenXPKI::Exception->throw(
+        message => $error,
+        params  => {ID => $msg->{SESSION_ID}}
+        );
+    }
     }
     if (defined $session) {
 
@@ -325,10 +325,10 @@ sub __handle_PING : PRIVATE {
             $realms{$realm}->{DESCRIPTION} = CTX('config')->get("system.realms.$realm.description") || $label;
         }
         return {
-	       SERVICE_MSG => 'GET_PKI_REALM',
-	       PARAMS => {
-		      'PKI_REALMS' => \%realms,
-	       },
+           SERVICE_MSG => 'GET_PKI_REALM',
+           PARAMS => {
+              'PKI_REALMS' => \%realms,
+           },
         };
     }
     elsif ($state_of{$ident} eq 'WAITING_FOR_AUTHENTICATION_STACK') {
@@ -381,10 +381,10 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
             STATE => 'WAITING_FOR_PKI_REALM',
         });
         return {
-    	    SERVICE_MSG => 'GET_PKI_REALM',
-    	    PARAMS => {
-    		    'PKI_REALMS' => \%realms,
-    	    },
+            SERVICE_MSG => 'GET_PKI_REALM',
+            PARAMS => {
+                'PKI_REALMS' => \%realms,
+            },
         };
     }
 
@@ -505,17 +505,17 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     ## is a known bug (#1909037), and this code is here as a workaround
     ## until it is fixed.
     if (exists $message->{PARAMS}->{LOGIN}) {
-	if (! defined $message->{PARAMS}->{LOGIN}) {
-	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_USERNAME_UNDEFINED',
-		);
-	}
+    if (! defined $message->{PARAMS}->{LOGIN}) {
+        OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_USERNAME_UNDEFINED',
+        );
+    }
 
-	if ($message->{PARAMS}->{LOGIN} !~ m{ \A \p{IsASCII}+ \z }xms) {
-	    OpenXPKI::Exception->throw(
-		message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_NON_ASCII_USERNAME_BUG',
-		);
-	}
+    if ($message->{PARAMS}->{LOGIN} !~ m{ \A \p{IsASCII}+ \z }xms) {
+        OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_NON_ASCII_USERNAME_BUG',
+        );
+    }
     }
 
     my ($user, $role, $reply) = CTX('authentication')->login_step({
@@ -579,20 +579,20 @@ sub __handle_LOGOUT : PRIVATE {
 
     ##! 8: "logout received - terminate session " . $old_session->get_id(),
     CTX('log')->log(
-		MESSAGE  => 'Terminating session ' . $old_session->get_id(),
-		PRIORITY => 'debug',
-		FACILITY => 'system',
-	);
-	    
+        MESSAGE  => 'Terminating session ' . $old_session->get_id(),
+        PRIORITY => 'debug',
+        FACILITY => 'system',
+    );
+
     OpenXPKI::Server::Context::killsession();
-    
+
     $self->__change_state({ STATE => 'NEW' });
-    
+
     $old_session->delete()->flush();
-    
+
     return { 'SERVICE_MSG' => 'LOGOUT' };
 
-    
+
 }
 
 sub __handle_STATUS : PRIVATE {
@@ -603,9 +603,9 @@ sub __handle_STATUS : PRIVATE {
 
     # SERVICE_MSG ?
     return {
-	SESSION => {
-	    ROLE => $self->get_API('Session')->get_role(),
-	    USER => $self->get_API('Session')->get_user(),
+    SESSION => {
+        ROLE => $self->get_API('Session')->get_role(),
+        USER => $self->get_API('Session')->get_user(),
         },
     };
 }
@@ -616,101 +616,93 @@ sub __handle_COMMAND : PRIVATE {
     my $ident   = ident $self;
     my $data    = shift;
 
-    if (exists $data->{PARAMS}->{COMMAND}) {
-        ##! 16: "executing access control before doing anything else"
-        eval {
-            # FIXME - ACL
-            #CTX('acl')->authorize ({
-            #        ACTIVITY      => "Service::".$data->{PARAMS}->{COMMAND},
-            #        AFFECTED_ROLE => "",
-            #});
-        };
-        ##! 32: 'Callstack ' . Dumper $data
-        if ($EVAL_ERROR) {
-            ##! 1: "Permission denied for Service::".$data->{PARAMS}->{COMMAND}."."
-            if (my $exc = OpenXPKI::Exception->caught()) {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED',
-                    params  => {
-                        EXCEPTION => $exc,
-                    },
-                );
-            } else {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED',
-                    params  => {
-                        ERROR => $EVAL_ERROR,
-                    },
-                );
-            }
-            return;
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING',
+    ) unless exists $data->{PARAMS}->{COMMAND};
+
+    ##! 16: "executing access control before doing anything else"
+    eval {
+        # FIXME - ACL
+        #CTX('acl')->authorize ({
+        #        ACTIVITY      => "Service::".$data->{PARAMS}->{COMMAND},
+        #        AFFECTED_ROLE => "",
+        #});
+    };
+    ##! 32: 'Callstack ' . Dumper $data
+    if ($EVAL_ERROR) {
+        ##! 1: "Permission denied for Service::".$data->{PARAMS}->{COMMAND}."."
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED',
+                params  => {
+                    EXCEPTION => $exc,
+                },
+            );
+        } else {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED',
+                params  => {
+                    ERROR => $EVAL_ERROR,
+                },
+            );
         }
-        ##! 16: "access to command granted"
+        return;
+    }
+    ##! 16: "access to command granted"
 
-	my $command;
-	eval {
-	    $command = OpenXPKI::Service::Default::Command->new({
-			    COMMAND => $data->{PARAMS}->{COMMAND},
-			    PARAMS  => $data->{PARAMS}->{PARAMS},
-	    });
-	};
-	if (my $exc = OpenXPKI::Exception->caught()) {
-	    if ($exc->message() =~ m{
-                I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND
-                }xms) {
-		##! 16: "Invalid command $data->{PARAMS}->{COMMAND}"
-		# fall-through intended
-	    } else {
-		$exc->rethrow();
-	    }
-	} elsif ($EVAL_ERROR) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND",
-		params  => {
-		    EVAL_ERROR => $EVAL_ERROR,
-		},
-                );
-	}
-        ##! 16: 'command class instantiated successfully'
-
-	if (defined $command) {
-	    my $result;
-	    eval {
-		$result = $command->execute();
-	    };
-            if (my $exc = OpenXPKI::Exception->caught()) {
-                ##! 16: 'exception caught during execute'
-                $exc->rethrow();
-            }
-	    elsif ($EVAL_ERROR) {
-		##! 14: "Exception caught during command execution"
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR',
-                    params => {
-                        ERROR => $EVAL_ERROR,
-                    },
-                );
-                return;
-	    }
-
-            ##! 16: 'command executed successfully'
-	    # sanity checks on command reply
-	    if (! defined $result || ref $result ne 'HASH') {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_ILLEGAL_COMMAND_RETURN_VALUE',
-                );
-                return;
-            }
-            ##! 16: 'returning result'
-            return $result;
+    my $command;
+    eval {
+        $command = OpenXPKI::Service::Default::Command->new({
+            COMMAND => $data->{PARAMS}->{COMMAND},
+            PARAMS  => $data->{PARAMS}->{PARAMS},
+        });
+    };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+        if ($exc->message() =~ m{ I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND }xms) {
+            ##! 16: "Invalid command $data->{PARAMS}->{COMMAND}"
+            # fall-through intended
+        } else {
+            $exc->rethrow();
         }
     }
-    else {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING',
+    elsif ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND",
+            params  => { EVAL_ERROR => $EVAL_ERROR },
         );
     }
-    return;
+    return unless defined $command;
+
+    ##! 16: 'command class instantiated successfully'
+    my $result;
+    eval {
+        $result = $command->execute();
+    };
+    if (my $exc = OpenXPKI::Exception->caught()) {
+        ##! 16: 'exception caught during execute'
+        $exc->rethrow();
+    }
+    elsif ($EVAL_ERROR) {
+        ##! 16: "Exception caught during command execution"
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR',
+            params => {
+                ERROR => $EVAL_ERROR,
+            },
+        );
+        return;
+    }
+
+    ##! 16: 'command executed successfully'
+    # sanity checks on command reply
+    if (! defined $result || ref $result ne 'HASH') {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_ILLEGAL_COMMAND_RETURN_VALUE',
+        );
+        return;
+    }
+    ##! 16: 'returning result'
+    return $result;
 }
 
 sub __pki_realm_choice_available : PRIVATE {
@@ -721,7 +713,7 @@ sub __pki_realm_choice_available : PRIVATE {
     ##! 2: "check if PKI realm is already known"
     my $realm;
     eval {
-	$realm = $self->get_API('Session')->get_pki_realm();
+    $realm = $self->get_API('Session')->get_pki_realm();
     };
     return $realm if defined $realm;
 
@@ -787,25 +779,25 @@ sub __change_state : PRIVATE {
 
     ##! 4: 'changing state from ' . $state_of{$ident} . ' to ' . $new_state
     CTX('log')->log(
-	MESSAGE  => 'Changing session state from ' . $state_of{$ident} . ' to ' . $new_state,
-	PRIORITY => 'debug',
-	FACILITY => 'system',
-	);
+    MESSAGE  => 'Changing session state from ' . $state_of{$ident} . ' to ' . $new_state,
+    PRIORITY => 'debug',
+    FACILITY => 'system',
+    );
     $state_of{$ident} = $new_state;
     # save the new state in the session
     if (OpenXPKI::Server::Context::hascontext('session')) {
         CTX('session')->set_state($new_state);
     }
-    
+
     # Set the daemon name after enterin MAIN_LOOP
-    
-    
+
+
     if ($new_state eq "MAIN_LOOP") {
         OpenXPKI::Server::__set_process_name("worker: %s (%s)", CTX('session')->get_user(), CTX('session')->get_role());
     } elsif ($new_state eq "NEW") {
         OpenXPKI::Server::__set_process_name("worker: idle");
     }
-    
+
     return 1;
 }
 
@@ -824,30 +816,30 @@ sub run
             $msg = $self->collect();
         };
         if (my $exc = OpenXPKI::Exception->caught()) {
-	    if ($exc->message() =~ m{I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION}xms) {
-		# client closed socket
-		last MESSAGE;
-	    } else {
-		$exc->rethrow();
-	    }
-	} elsif ($EVAL_ERROR) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION",
-		params  => {
-		    EVAL_ERROR => $EVAL_ERROR,
-		});
-	}
+        if ($exc->message() =~ m{I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION}xms) {
+        # client closed socket
+        last MESSAGE;
+        } else {
+        $exc->rethrow();
+        }
+    } elsif ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION",
+        params  => {
+            EVAL_ERROR => $EVAL_ERROR,
+        });
+    }
 
-	last MESSAGE unless defined $msg;
+    last MESSAGE unless defined $msg;
 
         my $is_valid = $self->__is_valid_message({
             MESSAGE => $msg,
         });
-        if (! $is_valid) {            
-    	    $self->__send_error({
-	            ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
-	        });
-	        
+        if (! $is_valid) {
+            $self->__send_error({
+                ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
+            });
+
         }
         else { # valid message received
             my $result;
@@ -1075,7 +1067,7 @@ to the Authentication modules 'login_step' method.
 
 =item * __handle_DETACH
 
-Removes the current session from this worker but does not delete 
+Removes the current session from this worker but does not delete
 the session. The worker is now free to handle requests for other
 sessions.
 
