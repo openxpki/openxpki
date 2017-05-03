@@ -84,7 +84,9 @@ lives_ok {
 } "Create activity object";
 
 lives_ok {
+    CTX('dbi')->start_txn; # can't use $oxitest->dbi->dbh as the called method for some reason gets a new CTX('dbi') connection
     $activity->execute($wf);
+    CTX('dbi')->commit;
 } "Execute activity";
 
 lives_and {
