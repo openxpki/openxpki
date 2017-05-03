@@ -15,6 +15,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database::Legacy;
 
 use OpenXPKI::Server::Workflow::NICE::Factory;
+use OpenXPKI::Server::Database; # to get AUTO_ID
 
 use Data::Dumper;
 
@@ -105,6 +106,7 @@ sub execute {
         CTX('dbi')->insert(
             into => 'certificate_attributes',
             values => {
+                attribute_key => AUTO_ID,
                 identifier => $set_context->{cert_identifier},
                 attribute_contentkey => 'system_cert_owner',
                 attribute_value => $owner,
