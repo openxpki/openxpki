@@ -19,7 +19,6 @@ use OpenXPKI::Crypto::CRL;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
-use MIME::Base64;
 
 use Moose;
 #use namespace::autoclean; # Conflicts with Debugger
@@ -306,12 +305,12 @@ sub checkForRevocation {
     );
 
     CTX('log')->log(
-       MESSAGE => "Check for revocation of $id, result: " . $cert->{STATUS},
+       MESSAGE => "Check for revocation of $id, result: " . $cert->{status},
        PRIORITY => 'debug',
        FACILITY => 'application',
     );
 
-    if ($cert->{STATUS} eq 'REVOKED') {
+    if ($cert->{status} eq 'REVOKED') {
        ##! 32: 'certificate revoked'
        return 1;
     }

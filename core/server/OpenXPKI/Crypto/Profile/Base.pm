@@ -1,37 +1,34 @@
-# OpenXPKI::Crypto::Profile::Base.pm
-# Written 2005 by Michael Bell for the OpenXPKI project
-# Copyright (C) 2005-2006 by The OpenXPKI Project
+package OpenXPKI::Crypto::Profile::Base;
+use strict;
+use warnings;
 
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Crypto::Profile::Base - base class for cryptographic profiles
 for certificates and CRLs.
 
-=head1 Description
+=head1 DESCRIPTION
 
 Base class for profiles used in the CA.
 
 =cut
 
-use strict;
-use warnings;
-
-package OpenXPKI::Crypto::Profile::Base;
-
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
+# Core modules
 use English;
+use Data::Dumper;
+use MIME::Base64;
+
+# CPAN modules
+use DateTime;
 use Template;
 
+# Project modules
+use OpenXPKI::Debug;
+use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use DateTime;
-use Data::Dumper;
 
-# use Smart::Comments;
-
-
-=head1 Functions
+=head1 FUNCTIONS
 
 =head2 load_extension
 
@@ -535,9 +532,12 @@ B<Parameters>
 sub create_random_serial {
     my ($self, %args) = @_;
 
+    OpenXPKI::Exception->throw(message => 'Mandatory parameter RANDOM_LENGTH missing')
+        unless defined $args{'RANDOM_LENGTH'};
+
     my $serial = Math::BigInt->new( $args{'PREFIX'} // 0);
-    my $rand_length = $args{'RANDOM_LENGTH'}
-        or OpenXPKI::Exception->throw(message => 'Mandatory parameter RANDOM_LENGTH missing');
+    my $rand_length = $args{'RANDOM_LENGTH'};
+    ##! 16: "create_random_serial({ RANDOM_LENGTH => $rand_length, PREFIX => " . $serial->as_hex . " })"
 
     if ($rand_length > 0) {
         my $default_token = CTX('api')->get_default_token();
@@ -546,16 +546,16 @@ sub create_random_serial {
             RANDOM_LENGTH => $rand_length,
         });
         my $rand_hex = '0x' . unpack 'H*', decode_base64($rand_base64);
-        ##! 16: 'random part in hex: ' . $rand_hex
+        ##! 16: 'random part: ' . $rand_hex
 
         # left shift the existing serial by the size of the random part and
         # add it to the right
         $serial->blsft($rand_length * 8);
-        ##! 16: 'bit shifted serial: ' . $serial->bstr()
+        ##! 16: 'bit shifted serial: ' . $serial->as_hex
         $serial->bior(Math::BigInt->new($rand_hex));
-        ##! 16: 'combined with random part: ' . $serial->bstr()
     }
-    return $serial;
+    ##! 16: 'returning: ' . $serial->as_hex
+    return $serial->bstr; # return serial as "decimal notation, possibly zero padded"
 }
 
 =head2 process_templates
