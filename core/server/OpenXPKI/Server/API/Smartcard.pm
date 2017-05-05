@@ -688,47 +688,37 @@ sub sc_analyze_smartcard {
     );
 
     if (scalar (@certs_to_load_from_db)) {
-        my $db_results = CTX('dbi_backend')->select(
-            TABLE => [
-                'CERTIFICATE',
-                'CSR',
+        my $sth = CTX('dbi')->select(
+            from => "certificate req_key=req_key csr",
+            columns => [
+                'certificate.subject',
+                'certificate.identifier',
+                'certificate.status',
+                'certificate.data',
+                'certificate.notbefore',
+                'certificate.notafter',
+                'csr.profile',
             ],
-            COLUMNS => [
-                'CSR.PROFILE',
-                'CERTIFICATE.SUBJECT',
-                'CERTIFICATE.IDENTIFIER',
-                'CERTIFICATE.STATUS',
-                'CERTIFICATE.DATA',
-                'CERTIFICATE.NOTBEFORE',
-                'CERTIFICATE.NOTAFTER',
-            ],
-            DYNAMIC => {
-                'CERTIFICATE.PKI_REALM' => { VALUE => $thisrealm },
-                'CERTIFICATE.IDENTIFIER' => { VALUE => \@certs_to_load_from_db },
+            where => {
+                'certificate.pki_realm' => $thisrealm,
+                'certificate.identifier' => \@certs_to_load_from_db,
             },
-            JOIN => [
-                [
-                 'CSR_SERIAL',
-                 'CSR_SERIAL',
-                ],
-            ],
         );
 
         # Push certificate to the user_cert hash
-        foreach my $entry (@{$db_results}) {
-            my $identifier = $entry->{'CERTIFICATE.IDENTIFIER'};
+        while (my $entry = $sth->fetchrow_hashref) {
+            my $identifier = $entry->{identifier};
             ##! 16: " Add certificate from database " . $identifier
             $user_certs->{by_identifier}->{$identifier} = {
                 IDENTIFIER => $identifier,
-                PROFILE    => $entry->{'CSR.PROFILE'},
-                SUBECT     => $entry->{'CERTIFICATE.SUBJECT'},
-                STATUS     => $entry->{'CERTIFICATE.STATUS'},
-                NOTBEFORE  => $entry->{'CERTIFICATE.NOTBEFORE'},
-                NOTAFTER   => $entry->{'CERTIFICATE.NOTAFTER'},
+                PROFILE    => $entry->{profile},
+                SUBECT     => $entry->{subject},
+                STATUS     => $entry->{status},
+                NOTBEFORE  => $entry->{notbefore},
+                NOTAFTER   => $entry->{notafter},
                 ANALYZE    => { ONCARD => 0 }
             };
             ##! 64: Dumper ($user_certs->{by_identifier}->{$identifier})
-
         }
     }
 
@@ -806,7 +796,7 @@ sub sc_analyze_smartcard {
         $type_policy->{max_count} ||= 1;
 
         my @profiles = $policy->get_list("certs.type.$type.allowed_profiles");
-        if (scalar @profiles) {        
+        if (scalar @profiles) {
             $type_policy->{preferred_profile} = shift @profiles;
         } else {
             $type_policy->{preferred_profile} = '';
@@ -1110,16 +1100,17 @@ sub __check_against_policy {
 
         ##! 16: 'checking if private key is available for cert identifier ' . $identifier
 
-        my $private_key_found = CTX('dbi_backend')->first (
-            TABLE => 'DATAPOOL',
-            DYNAMIC => {
-                PKI_REALM    => { VALUE => CTX('session')->get_pki_realm() },
-                NAMESPACE    => { VALUE => 'certificate.privatekey' },
-                DATAPOOL_KEY => { VALUE => $identifier },
+        my $private_key_found = CTX('dbi')->select_one(
+            from => 'datapool',
+            columns => ['datapool_key'],
+            where => {
+                pki_realm    => CTX('session')->get_pki_realm,
+                namespace    => 'certificate.privatekey',
+                datapool_key => $identifier,
             },
         );
 
-        if (defined $private_key_found) {
+        if ($private_key_found) {
             ##! 16: 'private key found - certificate can be restored'
             $analyze->{USABLE} = 1;
         } else {
@@ -1479,45 +1470,34 @@ sub sc_analyze_certificate {
     # search certificate in database
     ##! 16: 'searching certificate with identifier: ' . $identifier
 
-    my $db_results = CTX('dbi_backend')->first(
-    TABLE => [
-        'CERTIFICATE',
-        'CSR',
-    ],
-    COLUMNS => [
-        'CSR.PROFILE',
-        'CERTIFICATE.ISSUER_IDENTIFIER',
-        'CERTIFICATE.STATUS',
-        'CERTIFICATE.PKI_REALM',
-        'CERTIFICATE.DATA',
-        'CERTIFICATE.NOTBEFORE',
-        'CERTIFICATE.NOTAFTER',
-    ],
-    DYNAMIC => {
-        'CERTIFICATE.IDENTIFIER' => { VALUE => $identifier },
-    },
-    JOIN => [
-        [
-         'CSR_SERIAL',
-         'CSR_SERIAL',
+    my $cert_data = CTX('dbi')->select_one(
+        from => "certificate req_key=req_key csr",
+        columns => [
+            'certificate.issuer_identifier',
+            'certificate.status',
+            'certificate.pki_realm',
+            'certificate.data',
+            'certificate.notbefore',
+            'certificate.notafter',
+            'csr.profile',
         ],
-    ],
+        where => {
+            'certificate.identifier' => $identifier,
+        },
     );
 
     # entry was found in the database
-    if (defined $db_results) {
+    if ($cert_data) {
         if (! (defined $x509 || $dontparse)) {
             # cert raw data was not supplied as an argument (but found in
             # the database)
             ##! 16: 'parsing certificate'
             $x509 = OpenXPKI::Crypto::X509->new(
-              DATA => $db_results->{'CERTIFICATE.DATA'},
+              DATA => $cert_data->{data},
               TOKEN => $default_token,
             );
 
-            $db_hash = {
-              $x509->to_db_hash(),
-            };
+            $db_hash = { $x509->to_db_hash() };
         }
 
         # merge database query results with parsed cert
@@ -1525,12 +1505,12 @@ sub sc_analyze_certificate {
         $db_hash = {
             %{$db_hash},
             IDENTIFIER        => $identifier,
-            PKI_REALM         => $db_results->{'CERTIFICATE.PKI_REALM'},
-            ISSUER_IDENTIFIER => $db_results->{'CERTIFICATE.ISSUER_IDENTIFIER'},
-            STATUS            => $db_results->{'CERTIFICATE.STATUS'},
-            PROFILE           => $db_results->{'CSR.PROFILE'},
-            NOTBEFORE         => $db_results->{'CERTIFICATE.NOTBEFORE'},
-            NOTAFTER          => $db_results->{'CERTIFICATE.NOTAFTER'},
+            PKI_REALM         => $cert_data->{pki_realm},
+            ISSUER_IDENTIFIER => $cert_data->{issuer_identifier},
+            STATUS            => $cert_data->{status},
+            PROFILE           => $cert_data->{profile},
+            NOTBEFORE         => $cert_data->{notbefore},
+            NOTAFTER          => $cert_data->{notafter},
         };
 
         ##! 16: 'cert data: ' . Dumper $db_hash
