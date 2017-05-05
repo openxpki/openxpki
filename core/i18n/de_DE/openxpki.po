@@ -6615,10 +6615,6 @@ msgstr "Benutzername"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN"
-#~ msgstr "uid"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_INIT_LOCALE_DIRECTORY_MISSING"
 #~ msgstr "Zertifizierungsantrag in Bearbeitung"
 
@@ -6676,10 +6672,6 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_NICE_DEFAULT_TOKEN_NOT_AVAILABLE"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
@@ -7438,10 +7430,6 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_TOKEN_UNAVAILABLE"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy

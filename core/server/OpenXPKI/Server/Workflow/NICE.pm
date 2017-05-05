@@ -104,15 +104,7 @@ sub __persistCertificateInformation {
     my $persist_data = shift;
 
     my $pki_realm = CTX('api')->get_pki_realm();
-
     my $default_token = CTX('api')->get_default_token();
-
-
-    if (! defined $default_token) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_NICE_DEFAULT_TOKEN_NOT_AVAILABLE",
-        );
-    }
 
     ##! 64: 'certificate information: ' . Dumper ( $certificate_information )
 
@@ -120,7 +112,7 @@ sub __persistCertificateInformation {
         TOKEN => $default_token,
         DATA  => $certificate_information->{'certificate'},
     );
-    
+
     my %insert_hash = $x509->to_db_hash();
     my $identifier = $insert_hash{'IDENTIFIER'};
 
@@ -128,10 +120,10 @@ sub __persistCertificateInformation {
 
     if ($persist_data) {
         my $serialized_data = $serializer->serialize( $persist_data );
-    
+
         ##! 16: 'Persist certificate: ' . $identifier
         ##! 32: 'persisted data: ' . Dumper( $persist_data )
-    
+
         CTX('api')->set_data_pool_entry({
             PKI_REALM => $pki_realm,
             NAMESPACE => 'nice.certificate.information',
@@ -141,7 +133,7 @@ sub __persistCertificateInformation {
             FORCE => 1,
         });
     }
-    
+
     # Try to autodetected the ca_identifier ....
     if (!$certificate_information->{'ca_identifier'}) {
 
@@ -174,13 +166,13 @@ sub __persistCertificateInformation {
             $certificate_information->{'ca_identifier'} = $issuer->{IDENTIFIER};
         } else {
             $certificate_information->{'ca_identifier'} = 'unknown';
-            
+
             CTX('log')->log(
                 MESSAGE => "NICE certificate issued with unknown issuer! ($identifier / ".$insert_hash{ISSUER_DN}.")",
                 PRIORITY => 'warn',
                 FACILITY => 'application'
             );
-            
+
         }
 
     }
@@ -200,6 +192,7 @@ sub __persistCertificateInformation {
         CTX('dbi_backend')->insert(
             TABLE => 'CERTIFICATE_ATTRIBUTES',
             HASH  => {
+                # AFTER MIGRATION: attribute_key        => AUTO_ID,
                 'IDENTIFIER'       => $identifier,
                 'ATTRIBUTE_KEY'    => 'subject_alt_name',
                 'ATTRIBUTE_VALUE'  => $san->[0] . ':' . $san->[1],
@@ -212,6 +205,7 @@ sub __persistCertificateInformation {
         CTX('dbi_backend')->insert(
             TABLE => 'CERTIFICATE_ATTRIBUTES',
             HASH => {
+                # AFTER MIGRATION: attribute_key        => AUTO_ID,
                 IDENTIFIER => $identifier,
                 ATTRIBUTE_KEY => 'system_workflow_csr',
                 ATTRIBUTE_VALUE => $self->_get_workflow()->id

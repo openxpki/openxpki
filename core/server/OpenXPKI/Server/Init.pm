@@ -332,11 +332,6 @@ sub __do_init_volatile_vault {
 
     my $token = CTX('api')->get_default_token();
 
-    if (! defined $token) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN");
-    }
-
     OpenXPKI::Server::Context::setcontext(
     {
         volatile_vault => OpenXPKI::Crypto::VolatileVault->new(
