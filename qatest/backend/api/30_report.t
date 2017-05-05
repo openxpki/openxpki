@@ -39,9 +39,9 @@ $test->plan( tests => 9 );
 
 my $now = time();
 
-$test->diag("Prefix $now");
+$test->diag("Prefix $now") if $ENV{TEST_VERBOSE};
 $dbi->insert(
-    into => 'report', 
+    into => 'report',
     values => {
         report_name => $now.'_test_report',
         pki_realm => 'ca-one',
@@ -53,7 +53,7 @@ $dbi->insert(
 );
 
 $dbi->insert(
-    into => 'report', 
+    into => 'report',
     values => {
         report_name => $now.'_other_test_report',
         pki_realm => 'ca-one',
@@ -101,14 +101,14 @@ $test->runcmd('get_report_list', { NAME => $now.'_%', COLUMNS => 'report_name, m
 # only one report, test_report is hidden by maxage
 cmp_deeply $test->get_msg->{PARAMS}, [
     [$now.'_other_test_report','text/plain'],
-    [$now.'_test_report','text/plain'],  
+    [$now.'_test_report','text/plain'],
 ];
 
 $test->runcmd('get_report_list', { NAME => $now.'_%', COLUMNS => [ 'report_name', 'mime_type' ] });
 # only one report, test_report is hidden by maxage
 cmp_deeply $test->get_msg->{PARAMS}, [
     [$now.'_other_test_report','text/plain'],
-    [$now.'_test_report','text/plain'],  
+    [$now.'_test_report','text/plain'],
 ];
 
 
@@ -142,7 +142,7 @@ $test->is($test->get_msg->{PARAMS}, 'report data');
 $dbi->delete(
     from => 'report',
     where => { report_name => { -like => $now.'_%' }}
-); 
+);
 $dbi->commit;
 
 $test->disconnect();
