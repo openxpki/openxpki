@@ -43,7 +43,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id") if $ENV{TEST_VERBOSE};
+note("Workflow Id is $wf_id");
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -78,7 +78,7 @@ $result = $client->mock_request({
 
 my ($wf_id_resubmit) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id (Resubmit) is $wf_id_resubmit") if $ENV{TEST_VERBOSE};
+note("Workflow Id (Resubmit) is $wf_id_resubmit");
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -215,7 +215,7 @@ $result = $client->mock_request({
 is ($result->{page}->{description}, 'I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC');
 
 # Second test - try to cancel the first workflow and continue the second
-diag("Test with cancel first workflow option") if $ENV{TEST_VERBOSE};
+note("Test with cancel first workflow option");
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
@@ -232,7 +232,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id") if $ENV{TEST_VERBOSE};
+note("Workflow Id is $wf_id");
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -267,7 +267,7 @@ $result = $client->mock_request({
 
 ($wf_id_resubmit) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id (Resubmit) is $wf_id_resubmit") if $ENV{TEST_VERBOSE};
+note("Workflow Id (Resubmit) is $wf_id_resubmit");
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -322,7 +322,7 @@ $result = $client->mock_request({
     'page' => 'workflow!load!wf_id!'.$wf_id_resubmit,
 });
 
-diag("Do recheck") if $ENV{TEST_VERBOSE};
+note("Do recheck");
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!global_noop!wf_id!'.$wf_id_resubmit,
 });

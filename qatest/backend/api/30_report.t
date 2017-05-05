@@ -6,7 +6,6 @@ use warnings;
 use Carp;
 use English;
 use Data::Dumper;
-use Test::Deep;
 use File::Basename;
 
 # CPAN modules
@@ -18,7 +17,8 @@ use lib qw(../../lib);
 use OpenXPKI::Test::More;
 use OpenXPKI::Test::DBI;
 use TestCfg;
-
+use Test::Deep;
+use Test::More;
 
 # Add sample reports
 my $dbi = OpenXPKI::Test::DBI->new()->dbi();
@@ -39,7 +39,7 @@ $test->plan( tests => 9 );
 
 my $now = time();
 
-$test->diag("Prefix $now") if $ENV{TEST_VERBOSE};
+note("Prefix $now");
 $dbi->insert(
     into => 'report',
     values => {

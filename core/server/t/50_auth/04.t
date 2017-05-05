@@ -4,7 +4,7 @@ use English;
 use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
 #plan tests => 10;
 
-diag "OpenXPKI::Server::Authentication::Password\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Authentication::Password\n";
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {

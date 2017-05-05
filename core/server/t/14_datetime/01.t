@@ -10,7 +10,7 @@ use DateTime;
 
 plan tests => 5;
 
-diag "DATETIME FUNCTIONS: DATE CONVERSION\n" if $ENV{VERBOSE};
+note "DATETIME FUNCTIONS: DATE CONVERSION\n";
 
 my $epoch = 1142434089;
 my $dt = DateTime->from_epoch( epoch => $epoch ); 

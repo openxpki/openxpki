@@ -4,7 +4,7 @@ use English;
 use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
 #plan tests => 4;
 
-diag "OpenXPKI::Server::Authentication::External (static role)\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Authentication::External (static role)\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;

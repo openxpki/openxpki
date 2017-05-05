@@ -9,7 +9,7 @@ if ($ENV{DEBUG_LEVEL}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
 }
 
-diag "OpenXPKI::Server::Log: interface of log function\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Log: interface of log function\n";
 use OpenXPKI::Server::Log;
 
 `mkdir -p 't/var/openxpki/session/'`;

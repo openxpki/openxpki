@@ -13,7 +13,7 @@ if ($EVAL_ERROR) {
 
 use_ok('OpenXPKI::Debug');
 
-diag "Colored debug output" if $ENV{VERBOSE};
+note "Colored debug output";
 # first check that everything works with the colored module too
 my $stderr = `$^X -It/08_debug t/08_debug/main.pl TestModuleColor.pm 1 2>&1`;
 ok(! $CHILD_ERROR, 'main.pl execution');

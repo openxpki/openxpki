@@ -6,7 +6,7 @@ plan tests => 18;
 
 use_ok('OpenXPKI::Debug');
 
-diag "Standard debug usage" if $ENV{VERBOSE};
+note "Standard debug usage";
 my $stderr = `$^X -It/08_debug t/08_debug/main.pl TestModule.pm 1 2>&1`;
 ok(! $CHILD_ERROR, 'main.pl execution');
 like($stderr,

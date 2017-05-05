@@ -12,7 +12,7 @@ use OpenXPKI::i18n;
 
 plan tests => 2;
 
-diag "BASE FUNCTIONS: LANGUAGE HANDLING\n" if $ENV{VERBOSE};
+note "BASE FUNCTIONS: LANGUAGE HANDLING\n";
 
 my $language;
 

@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 
 #plan tests => 10;
 
-diag "OpenXPKI::Server::Context - global context entries\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Context - global context entries\n";
 
 $ENV{OPENXPKI_CONF_DB} = 't/config.git/';
 
