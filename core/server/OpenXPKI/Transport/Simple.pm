@@ -30,7 +30,10 @@ sub new
     my $keys = shift;
     $self->{INFILE}  = $keys->{INFILE}  if (exists $keys->{INFILE});
     $self->{OUTFILE} = $keys->{OUTFILE} if (exists $keys->{OUTFILE});
-    $self->{SOCKET}  = $keys->{SOCKET}  if (exists $keys->{SOCKET});
+    if(exists $keys->{SOCKET}) {
+        $self->{SOCKET}  = $keys->{SOCKET}; 
+        binmode($self->{SOCKET},':utf8');
+    }
 
     ##! 1: "transport layer successfully initialized"
     return $self;
