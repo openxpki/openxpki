@@ -19,7 +19,7 @@ use OpenXPKI::DateTime;
 
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context) );
+__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context ) );
 
 my $default_reap_at_interval = '+0000000005';
 
@@ -66,6 +66,11 @@ sub init {
     $self->SUPER::init( $id, $current_state, $config, $wf_state_objects, $factory );
 
     $self->{_CURRENT_ACTION} = '';
+
+    # Workflow attributes (should be stored by persistor class).
+    # Values set to "undef" will be stored like that in $self->{_attributes},
+    # so the persister knows that these shall be deleted from the storage.
+    $self->{_attributes} = {};
 
     my $proc_state = 'init';
     my $count_try =  0;
@@ -285,95 +290,22 @@ sub reload_observer {
 sub attrib {
     my ($self, $arg) = @_;
     ##! 1: 'start'
-    my $wf_id = $self->id();
-    my $dbi = CTX('dbi');
 
-    # return all attributes of workflow
-    if (not $arg) {
-        ##! 8: 'no key, fetch all'
-        my $sth = $dbi->select(
-            from => 'workflow_attributes',
-            columns => [ 'attribute_contentkey', 'attribute_value' ],
-            where => { workflow_id => $wf_id },
-       );
-       my $attribs = {};
-       while (my $line = $sth->fetchrow_hashref) {
-           $attribs->{$line->{attribute_contentkey}} = $line->{attribute_value};
-       }
-       ##! 32: 'Result ' . Dumper $attribs
-       return $attribs;
-    }
+    # GETTER - return all attributes as HashRef
+    return $self->{_attributes} if not $arg;
 
-    # get single value (arg is scalar)
-    if (ref $arg eq '') {
-        ##! 8: 'fetch value for ' . $arg
-        my $result = $dbi->select_one(
-            from => 'workflow_attributes',
-            columns => ['attribute_value'],
-            where => {
-                workflow_id          => $wf_id,
-                attribute_contentkey => $arg,
-            },
-        );
-        ##! 32: 'Result ' . Dumper $result
-        return $result->{attribute_value};
-    }
+    # GETTER - return single value ($arg is scalar)
+    return $self->{_attributes}->{$arg} if not ref $arg;
 
     OpenXPKI::Exception->throw(
         message => 'Wrong type of argument given to attrib()',
         params => { type => ref $arg }
     ) unless ref $arg eq 'HASH';
 
-    ##! 8: 'received hash - setting values'
-    # set multiple values
-    my $join_running_txn = 1;
-    if (not $dbi->in_txn) {
-        $join_running_txn = 0;
-        $dbi->start_txn;
-    }
-
-    eval {
-        for my $key (keys %{$arg}) {
-            # value is undef - delete the item
-            if (not defined $arg->{$key}) {
-                ##! 16: 'got undef, delete item'
-                $dbi->delete(
-                    from => 'workflow_attributes',
-                    where => {
-                        workflow_id          => $wf_id,
-                        attribute_contentkey => $key,
-                    },
-                );
-                next;
-            }
-
-            my $value = $arg->{$key};
-
-            # non scalar values are not allowed
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_GOT_NON_SCALAR_ATTRIBUTE_VALUE',
-                params => { key => $key, type =>  ref $value }
-            ) if ref $value ne '';
-
-            ##! 16: 'set key ' . $key . ' to value ' .  $arg->{$key}
-            # check if the attribute is already in the table
-            $dbi->merge(
-                into => 'workflow_attributes',
-                set => {
-                    attribute_value      => $arg->{$key},
-                },
-                where => {
-                    workflow_id          => $wf_id,
-                    attribute_contentkey => $key,
-                },
-            );
-        }
-    };
-    if ($EVAL_ERROR) {
-        $dbi->rollback unless $join_running_txn;
-        die $EVAL_ERROR;
-    }
-    $dbi->commit unless $join_running_txn;
+    # SETTER - $arg is a HashRef
+    # Values of "undef" will be stored like that in $self->{_attributes},
+    # so the persister knows that these shall be deleted from the storage.
+    $self->{_attributes} = { %{$self->{_attributes}}, %{$arg} };
 }
 
 

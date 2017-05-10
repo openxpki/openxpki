@@ -69,6 +69,7 @@ sub update_workflow {
     $dbi->start_txn;
     $self->__update_workflow($workflow);
     $self->__update_workflow_context($workflow) if $workflow->persist_context;
+    $self->__update_workflow_attributes($workflow);
     $dbi->commit;
 
     # Reset the update marker (after COMMIT) if full update was requested
@@ -184,6 +185,49 @@ sub __update_workflow_context {
     }
 }
 
+sub __update_workflow_attributes {
+    my ($self, $workflow) = @_;
+
+    my $id  = $workflow->id;
+    my $attrs = $workflow->attrib;
+    my $dbi = CTX('dbi');
+
+    for my $key (keys %{$attrs}) {
+        # delete if value = undef
+        if (not defined $attrs->{$key}) {
+            ##! 2: "DELETING attribute: $key => undef"
+            $dbi->delete(
+                from => 'workflow_attributes',
+                where => {
+                    workflow_id          => $id,
+                    attribute_contentkey => $key,
+                },
+            );
+            next;
+        }
+
+        my $value = $attrs->{$key};
+
+        # non scalar values are not allowed
+        OpenXPKI::Exception->throw(
+            message => 'Attempt to persist non-scalar workflow attribute',
+            params => { key => $key, type => ref $value }
+        ) if ref $value ne '';
+
+        ##! 2: "saving attribute: $key => $value"
+        $dbi->merge(
+            into => 'workflow_attributes',
+            set => {
+                attribute_value      => $attrs->{$key},
+            },
+            where => {
+                workflow_id          => $id,
+                attribute_contentkey => $key,
+            },
+        );
+    }
+}
+
 sub fetch_workflow {
     my $self = shift;
     my $id   = shift;
@@ -238,6 +282,9 @@ sub fetch_extra_workflow_data {
     my $id  = $workflow->id();
     my $dbi = CTX('dbi');
 
+    #
+    # Context
+    #
     my $sth = $dbi->select(
         from => "workflow_context",
         columns => [ "workflow_context_key", "workflow_context_value" ],
@@ -251,6 +298,21 @@ sub fetch_extra_workflow_data {
     }
     # clear the updated flag
     $context->reset_updated();
+
+    #
+    # Attributes
+    #
+    $sth = $dbi->select(
+        from => 'workflow_attributes',
+        columns => [ 'attribute_contentkey', 'attribute_value' ],
+        where => { workflow_id => $id },
+    );
+    my $attrs = {};
+    while (my $row = $sth->fetchrow_arrayref) {
+        ##! 32: "Setting attribute: ".$row->[0]." => ".$row->[1]
+        $attrs->{$row->[0]} = $row->[1];
+    }
+    $workflow->attrib($attrs);
 }
 
 sub create_history {
