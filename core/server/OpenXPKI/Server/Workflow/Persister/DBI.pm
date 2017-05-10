@@ -60,18 +60,31 @@ sub create_workflow {
 }
 
 sub update_workflow {
-    my $self     = shift;
-    my $workflow = shift;
+    my ($self, $workflow) = @_;
 
-    my $id  = $workflow->id();
+    my $id  = $workflow->id;
+    ##! 1: "Updating WF #$id"
     my $dbi = CTX('dbi');
 
-    ##! 1: "WF #$id: update_workflow"
-
     $dbi->start_txn;
+    $self->__update_workflow($workflow);
+    $self->__update_workflow_context($workflow) if $workflow->persist_context;
+    $dbi->commit;
 
+    # Reset the update marker (after COMMIT) if full update was requested
+    $workflow->context->reset_updated if $workflow->persist_context > 1;
+
+    CTX('log')->debug( "Saved workflow $id", "system" );
+    CTX('log')->debug( "Updated workflow $id", "workflow" );
+}
+
+sub __update_workflow {
+    my ($self, $workflow) = @_;
+
+    my $id  = $workflow->id;
     ##! 16: sprintf "WF #$id: saving workflow, state: %s, proc_state: %s", $workflow->state(), $workflow->proc_state()
-    $dbi->merge(
+
+    CTX('dbi')->merge(
         into => 'workflow',
         set  => {
             workflow_state       => $workflow->state(),
@@ -94,38 +107,36 @@ sub update_workflow {
             workflow_id   => $id,
         }
     );
-    CTX('log')->debug( "Saved workflow $id", "system" );
+}
 
-    # Do not persist context while we are doing "overhead"
-    if ( !$workflow->persist_context() ) {
-        ##! 16: "WF #$id: Workflow not executing - skipping context"
-        $dbi->commit();
-        return 2;
-    }
+sub __update_workflow_context {
+    my ($self, $workflow) = @_;
 
-    # ... and write new context / update it
-    my $context = $workflow->context();
-    my $params  = $context->param();
+    my $id  = $workflow->id;
+    my $context = $workflow->context;
+    my $params  = $context->param;
+    my $dbi = CTX('dbi');
+
     ##! 32: 'WF #$id: Context is ' . ref $context
     ##! 128: 'WF #$id: Params from context: ' . Dumper $params
     my @updated = keys %{ $context->{_updated} };
 
     ##! 32: "WF #$id: Params with updates: " . join(":", @updated )
     # persist only the internal context values
-    if ( $workflow->persist_context() == 1 ) {
+    if ($workflow->persist_context == 1) {
         @updated = grep { /^wf_/ } @updated;
         ##! 32: "WF #$id: Only update internals " . join(":", @updated )
     }
 
-    foreach my $key (@updated) {
+    for my $key (@updated) {
         my $value = $params->{$key};
 
-        # parameters with undefined values are not stored / deleted
-        if ( !defined $value ) {
+        # ignore "volatile" context parameters starting with an underscore
+        next if ( $key =~ m{ \A _ }xms );
 
-            # TODO - figure out if deletion is really necessary?
-            # HEAD does not have the delete part ...
-            ##! 4: "WF #$id: Deleting param '$key' (value == undef)"
+        # parameters with undefined values are not stored / deleted
+        if (not defined $value ) {
+            ##! 2: "DELETING context key: $key => undef"
             $dbi->delete(
                 from  => 'workflow_context',
                 where => {
@@ -136,10 +147,7 @@ sub update_workflow {
             next;
         }
 
-        # ignore "volatile" context parameters starting with an underscore
-        next if ( $key =~ m{ \A _ }xms );
-
-        ##! 2: "WF #$id: Persisting context parameter '$key'"
+        ##! 2: "  saving context key: $key => $value"
 
         # automatic serialization
         if ( ref $value eq 'ARRAY' or ref $value eq 'HASH' ) {
@@ -173,18 +181,7 @@ sub update_workflow {
                 workflow_context_key => $key,
             },
         );
-
-        delete $self->{_updated}->{$key};
     }
-
-    $dbi->commit;
-
-    # Reset the update marker - only if full update was requested
-    $context->reset_updated if $workflow->persist_context > 1;
-
-    CTX('log')->debug( "Updated workflow $id", "workflow" );
-
-    return 1;
 }
 
 sub fetch_workflow {
@@ -234,11 +231,9 @@ sub fetch_workflow {
     return $return;
 }
 
-# Overwrites empty implementation in Workflow::Persister
+# Called by Workflow::Factory->fetch_workflow(), overwrites empty impl. in Workflow::Persister
 sub fetch_extra_workflow_data {
-    my $self     = shift;
-    my $workflow = shift;
-
+    my ($self, $workflow) = @_;
     ##! 1: "fetch_extra_workflow_data"
     my $id  = $workflow->id();
     my $dbi = CTX('dbi');
@@ -248,17 +243,14 @@ sub fetch_extra_workflow_data {
         columns => [ "workflow_context_key", "workflow_context_value" ],
         where => { workflow_id => $id },
     );
-
     # context was set in fetch_workflow
     my $context = $workflow->context();
     while (my $row = $sth->fetchrow_arrayref) {
+        ##! 32: "Setting context param: ".$row->[0]." => ".$row->[1]
         $context->param($row->[0] => $row->[1]);
     }
-
     # clear the updated flag
     $context->reset_updated();
-
-    return 1;
 }
 
 sub create_history {
