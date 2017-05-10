@@ -125,7 +125,7 @@ sub update_workflow {
 
             # TODO - figure out if deletion is really necessary?
             # HEAD does not have the delete part ...
-            ##! 4: "WF #$id: Deleting param '$key' (value == undef)'
+            ##! 4: "WF #$id: Deleting param '$key' (value == undef)"
             $dbi->delete(
                 from  => 'workflow_context',
                 where => {
@@ -145,7 +145,7 @@ sub update_workflow {
         if ( ref $value eq 'ARRAY' or ref $value eq 'HASH' ) {
             $value = OpenXPKI::Serialization::Simple->new->serialize($value);
         }
- 
+
         # check for illegal characters
         if ( $value =~ m{ (?:\p{Unassigned}|\x00) }xms ) {
             ##! 4: "parameter contains illegal characters"
