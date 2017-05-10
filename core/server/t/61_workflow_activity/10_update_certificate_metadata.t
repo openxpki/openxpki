@@ -61,7 +61,7 @@ insert_meta_attribute($oxitest->dbi, $cert_id, meta_equal2    => 'yo');
 my $wf = OpenXPKI::Test::WorkflowMock->new;
 $wf->context->param(cert_identifier   => $cert_id);
 $wf->context->param(meta_color        => 'red');
-$wf->context->param(meta_hairstyle    => undef); # should be deleted
+$wf->context->param({ meta_hairstyle  => undef }); # setting to "undef" only works when passing a HashRef
 $wf->context->param('meta_cars[]'     => ['horch', 'tesla']);
 $wf->context->param('meta_birds[]'    => []);
 $wf->context->param(meta_morphosis    => 'butterfly');
@@ -99,10 +99,6 @@ lives_and {
     cmp_deeply $meta, bag(
         superhashof({ attribute_contentkey => 'meta_shoesize',  attribute_value => '9' }),
         superhashof({ attribute_contentkey => 'meta_color',     attribute_value => 'red' }),
-
-        # TODO This metadata entry should be deleted - see https://github.com/openxpki/openxpki/issues/527
-        superhashof({ attribute_contentkey => 'meta_hairstyle', attribute_value => 'bald' }),
-
         superhashof({ attribute_contentkey => 'meta_cars',      attribute_value => 'horch' }),
         superhashof({ attribute_contentkey => 'meta_cars',      attribute_value => 'tesla' }),
         superhashof({ attribute_contentkey => 'meta_morphosis', attribute_value => 'butterfly' }),
