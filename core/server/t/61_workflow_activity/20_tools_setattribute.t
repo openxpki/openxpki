@@ -24,8 +24,9 @@ plan tests => 5;
 #
 # Setup test context
 #
+my $workflow_type = "TESTWORKFLOW".int(rand(2**32));
 my $oxitest = OpenXPKI::Test->new;
-$oxitest->add_realm_config("alpha", "workflow.def.TESTWORKFLOW", {
+$oxitest->add_realm_config("alpha", "workflow.def.$workflow_type", {
     head => { prefix => "testwf", persister => 'OpenXPKI' },
     state => {
         INITIAL => { action => [ 'doit > DONE' ] },
@@ -64,7 +65,7 @@ my $workflow;
 
 # Create workflow
 lives_and {
-    $workflow = CTX('workflow_factory')->get_factory->create_workflow("TESTWORKFLOW");
+    $workflow = CTX('workflow_factory')->get_factory->create_workflow($workflow_type);
     ok ref $workflow;
 } "Create test workflow";
 
@@ -97,7 +98,7 @@ cmp_deeply $meta, bag(
 # Refetch workflow
 my $workflow_dup;
 lives_and {
-    $workflow_dup = CTX('workflow_factory')->get_factory->fetch_workflow("TESTWORKFLOW", $workflow->id);
+    $workflow_dup = CTX('workflow_factory')->get_factory->fetch_workflow($workflow_type, $workflow->id);
     ok ref $workflow_dup;
 } "Refetch workflow from database";
 
@@ -112,4 +113,5 @@ lives_and {
     };
 } "Attributes are correctly set";
 
-$oxitest->dbi->delete(from => 'workflow_attributes', where => { workflow_id => $workflow->id });
+$oxitest->dbi->delete_and_commit(from => 'workflow', where => { workflow_type => $workflow_type });
+$oxitest->dbi->delete_and_commit(from => 'workflow_attributes', where => { workflow_id => $workflow->id });

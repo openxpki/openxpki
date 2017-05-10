@@ -23,6 +23,8 @@ use OpenXPKI::Test::WorkflowMock;
 
 plan tests => 4;
 
+# TODO Change test to start real workflow similar to 20_tools_setattribute.t
+
 #
 # Setup test context
 #
@@ -112,4 +114,4 @@ lives_and {
     );
 } "Correctly updated database";
 
-$oxitest->dbi->delete(from => 'certificate_attributes', where => { identifier => $cert_id });
+$oxitest->dbi->delete_and_commit(from => 'certificate_attributes', where => { identifier => $cert_id });
