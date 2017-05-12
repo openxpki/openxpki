@@ -551,8 +551,9 @@ t/40_context/01.t
 t/40_context/02.t2
 t/40_context/03.t
 
+t/45_session/01_base.t
+
 t/50_auth/00.t
-t/50_auth/01.t
 t/50_auth/02.t
 t/50_auth/03.t
 t/50_auth/04.t
