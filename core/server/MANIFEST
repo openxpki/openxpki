@@ -553,6 +553,7 @@ t/40_context/03.t
 
 t/45_session/01_base.t
 t/45_session/02_import_export.t
+t/45_session/10_session_database.t
 
 t/50_auth/00.t
 t/50_auth/02.t

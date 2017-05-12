@@ -112,12 +112,20 @@ CREATE TABLE IF NOT EXISTS `report` (
   `mime_type` varchar(63) NOT NULL,
   `description` varchar(255) NOT NULL,
   `report_value` longblob NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `secret` (
   `pki_realm` varchar(255) NOT NULL,
   `group_id` varchar(255) NOT NULL,
   `data` longtext
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `session` (
+  `session_id` varchar(255) NOT NULL,
+  `data` longtext,
+  `created` int(10) unsigned NOT NULL,
+  `modified` int(10) unsigned NOT NULL,
+  `ip_address` varchar(45) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `seq_application_log` (
@@ -244,9 +252,12 @@ ALTER TABLE `datapool`
 
 ALTER TABLE `report`
  ADD PRIMARY KEY (`report_name`,`pki_realm`);
- 
+
 ALTER TABLE `secret`
  ADD PRIMARY KEY (`pki_realm`,`group_id`);
+
+ALTER TABLE `session`
+ ADD PRIMARY KEY (`session_id`);
 
 ALTER TABLE `seq_application_log`
  ADD PRIMARY KEY (`seq_number`);
