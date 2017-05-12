@@ -1,108 +1,114 @@
 use strict;
 use warnings;
+
+# Core modules
+use File::Temp qw( tempdir );
 use English;
+
+# CPAN modules
 use Test::More;
-BEGIN { plan tests => 24 };
+use Test::Exception;
 
-print STDERR "OpenXPKI::Server::Session\n" if $ENV{VERBOSE};
+plan tests => 20;
 
-use OpenXPKI::Server::Session;
-ok(1);
+use_ok "OpenXPKI::Server::Session";
+
+my $session_dir = tempdir( CLEANUP => 1 );
 
 ## create new session
-my $session = OpenXPKI::Server::Session->new ({
-                  DIRECTORY => "t/50_auth/",
-                  LIFETIME  => 2,
-                  VERSION => 'ignored'});
-ok($session);
+my $session;
+lives_ok {
+    $session = OpenXPKI::Server::Session->new({
+        DIRECTORY => $session_dir,
+        LIFETIME  => 2,
+        VERSION   => 'ignored',
+    });
+} "create session 1";
+
+my $challenge = "This is challenge.";
 
 ## get ID
-my $id = $session->get_id();
-ok($id);
+my $id = $session->get_id;
+ok $id, "session ID exists";
 
-## check that is not valid
-ok(!$session->is_valid());
+isnt       $session->is_valid, 1,                   "session is still invalid";
+lives_ok { $session->start_authentication }         "start authentication phase";
+isnt       $session->is_valid, 1,                   "session is still invalid";
+lives_ok { $session->set_challenge($challenge) }    "store challenge string";
 
-## switch to authentication mode
-ok($session->start_authentication());
-
-## check that it is not valid
-ok(!$session->is_valid());
-
-## save challenge
-my $challenge = "This is challenge.";
-ok($session->set_challenge($challenge));
-
-## DESTROY
+note "destroy session 1 object";
 undef $session;
-ok(not defined $session);
+
+## load existing session
+lives_ok {
+    $session = OpenXPKI::Server::Session->new ({
+        DIRECTORY => $session_dir,
+        LIFETIME  => 2,
+        ID        => $id,
+    });
+} "load previously persisted session 1";
+
+isnt       $session->is_valid, 1,                   "session is still invalid";
+is         $session->get_challenge, $challenge,     "challenge is the same as before persisting";
+lives_ok { $session->make_valid }                   "define session as valid";
+is         $session->is_valid, 1,                   "session is valid";
+
+note "destroy session 1 object";
+undef $session;
 
 ## load
-$session = OpenXPKI::Server::Session->new ({
-               DIRECTORY => "t/50_auth/",
-               LIFETIME  => 2,
-               ID        => $id});
-ok($session);
+lives_ok {
+    $session = OpenXPKI::Server::Session->new ({
+        DIRECTORY => $session_dir,
+        LIFETIME  => 2,
+        ID        => $id,
+    });
+} "load previously persisted session 1 again";
 
-## check that it is not valid
-ok(!$session->is_valid());
+is $session->is_valid, 1, "session is valid";
 
-## get challenge
-ok ($challenge eq $session->get_challenge());
-
-## make it a valid session
-ok ($session->make_valid());
-
-## check that it is valid
-ok($session->is_valid());
-
-## DESTROY
+note "destroy session 1 object";
 undef $session;
-ok(not defined $session);
 
-## load
-$session = OpenXPKI::Server::Session->new ({
-               DIRECTORY => "t/50_auth/",
-               LIFETIME  => 2,
-               ID        => $id});
-ok($session);
-
-## check that it is valid
-ok($session->is_valid());
-
-## DESTROY
-undef $session;
-ok(not defined $session);
-
-## wait five seconds to timeout
-ok(sleep 2);
+note "wait to exceed session lifetime";
+ok(sleep 3);
 
 ## try to load
-eval {$session = OpenXPKI::Server::Session->new ({
-                     DIRECTORY => "t/50_auth/",
-                     LIFETIME  => 2,
-                     ID        => $id});};
-ok($EVAL_ERROR);
+throws_ok {
+    $session = OpenXPKI::Server::Session->new ({
+        DIRECTORY => $session_dir,
+        LIFETIME  => 2,
+        ID        => $id,
+    });
+} qr/load.*fail/i, "attempt to load persisted session 1 fails because of exceeded session lifetime";
+
+#diag `cat t/50_auth/cgisess_$id`;
 
 ## create new session
-$session = OpenXPKI::Server::Session->new ({
-               DIRECTORY => "t/50_auth/",
-               LIFETIME  => 2,
-               VERSION => 'ignored'});
-ok($session);
-$id = $session->get_id();
-ok($id);
+lives_ok {
+    $session = OpenXPKI::Server::Session->new({
+        DIRECTORY => $session_dir,
+        LIFETIME  => 2,
+        VERSION   => 'ignored',
+    });
+} "create session 2";
+
+my $id2 = $session->get_id;
+isnt $id2, $id, "session 2 id differs from 1 id";
 
 ## delete session
-ok($session->delete());
+lives_ok { $session->delete } "delete (i.e. close) session";
+
+note "destroy session 2 object";
 undef $session;
-ok(!-e "t/50_auth/cgisess_$id");
 
 ## try to load dropped session
-eval {$session = OpenXPKI::Server::Session->new ({
-                     DIRECTORY => "t/50_auth/",
-                     LIFETIME  => 2,
-                     ID        => $id});};
-ok($EVAL_ERROR);
+throws_ok {
+    $session = OpenXPKI::Server::Session->new ({
+        DIRECTORY => $session_dir,
+        LIFETIME  => 2,
+        ID        => $id2,
+    });
+} qr/load.*fail/i, "attempt to load persisted session 2 fails because it was deleted";
 
 1;
