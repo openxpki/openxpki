@@ -425,7 +425,7 @@ sub alias_add {
             print "Creating alias for root ca:\n";
             # Get the notebefore/notafter date
             $certificate = $dbi->select_one(
-                from   => 'aliases',
+                from   => 'certificate',
                 columns => ['notbefore' , 'notafter' ],
                 where => { identifier => $root_identifier },
             );
