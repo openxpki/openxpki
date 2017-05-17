@@ -50,7 +50,7 @@ sub new {
     my $keys = shift;
     $self->{tmp} = $keys->{TMPDIR} if ($keys->{TMPDIR});
 
-    if ($caller_package ne 'OpenXPKI::Server::Init' and not $ENV{TEST_ACTIVE}) {
+    if ($caller_package ne 'OpenXPKI::Server::Init' and not ($ENV{TEST_ACTIVE} or $ENV{HARNESS_ACTIVE})) {
         # TokenManager instances shall only be created during
         # the server initialization, the rest of the code can
         # use CTX('crypto_layer') as its token manager
