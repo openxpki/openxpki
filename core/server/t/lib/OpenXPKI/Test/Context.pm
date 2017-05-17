@@ -42,7 +42,6 @@ has db_conf => (
 );
 
 has is_log_initialized          => ( is => 'rw', isa => 'Bool', default => 0 );
-has is_legacydb_initialized     => ( is => 'rw', isa => 'Bool', default => 0 );
 has is_db_log_initialized       => ( is => 'rw', isa => 'Bool', default => 0 );
 has is_db_initialized           => ( is => 'rw', isa => 'Bool', default => 0 );
 has is_mock_session_initialized => ( is => 'rw', isa => 'Bool', default => 0 );
@@ -141,36 +140,6 @@ sub init_db_log {
     });
 
     $self->is_db_log_initialized(1);
-}
-
-sub _init_legacydb {
-    my ($self) = @_;
-    return if $self->is_legacydb_initialized;
-
-    diag "Initialize CTX('dbi_backend') / legacy db";
-
-    die "Database config HashRef 'db_conf' is not set" unless $self->has_db_conf;
-
-    $self->init_log;
-
-    use OpenXPKI::Server::DBI;
-
-    OpenXPKI::Server::Context::setcontext({
-        dbi_backend => OpenXPKI::Server::DBI->new(
-            SERVER_ID => 0,
-            SERVER_SHIFT => 8,
-            LOG         => CTX('log'),
-            TYPE        => $self->db_conf->{type},
-            NAME        => $self->db_conf->{name},
-            HOST        => $self->db_conf->{host},
-            PORT        => $self->db_conf->{port},
-            USER        => $self->db_conf->{user},
-            PASSWD      => $self->db_conf->{passwd},
-        )
-    });
-    CTX('dbi_backend')->connect;
-
-    $self->is_legacydb_initialized(1);
 }
 
 #

@@ -14,11 +14,11 @@ ok(1);
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {	
+    {
 	TASKS => [
         'config_test',
         'log',
-        'dbi_backend',
+        'dbi',
     ],
 	SILENT => 1,
     });

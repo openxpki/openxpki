@@ -124,7 +124,7 @@ ok(OpenXPKI::Server::Init::init(
 	       'api',
            'dbi_log',
 	       'log',
-	       'dbi_backend',
+	       'dbi',
 	       'crypto_layer',
 	       'volatile_vault',
            'authentication',

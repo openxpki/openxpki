@@ -25,7 +25,7 @@ ok(OpenXPKI::Server::Init::init(
 		       'i18n',
                'dbi_log',
 		       'log',
-		       'dbi_backend',
+		       'dbi',
 		       'crypto_layer',
 		       'volatile_vault',
 #               'acl',
@@ -46,8 +46,8 @@ is(ref CTX('volatile_vault'),
 is(ref CTX('log'),
     'OpenXPKI::Server::Log', "CTX('log')");
 
-is(ref CTX('dbi_backend'),
-   'OpenXPKI::Server::DBI', "CTX('dbi_backend')"
+is(ref CTX('dbi'),
+   'OpenXPKI::Server::Database', "CTX('dbi')"
 );
 
 is(ref CTX('api'),

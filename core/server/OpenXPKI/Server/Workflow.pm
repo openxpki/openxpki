@@ -759,14 +759,14 @@ This is the OpenXPKI specific subclass of Workflow.
 
 Purpose: overwrite the Method "execute_action" of the baseclass to implement the feature of "pauseing / wake-up / resuming" workflows
 
-The workflow-table is expanded with 4 new persistent fields (see OpenXPKI::Server::DBI::Schema)
+The workflow-table is expanded with 4 new persistent fields (see database schema)
 
-WORKFLOW_PROC_STATE
-WORKFLOW_WAKEUP_AT
-WORKFLOW_COUNT_TRY
-WORKFLOW_REAP_AT
+    workflow_proc_state
+    workflow_wakeup_at
+    workflow_count_try
+    workflow_reap_at
 
-Essential field is WORKFLOW_PROC_STATE, internally "proc_state". All known and possible proc_states and their follow-up actions are defined in %known_proc_states.
+Essential field is C<workflow_proc_state>, internally "proc_state". All known and possible proc_states and their follow-up actions are defined in %known_proc_states.
 "running" will be set, before SUPER::execute_action/Activity::run is called.
 After execution of one or more Activities, either "manual" (waiting for interaction)  or "finished" will be set.
 If an exception occurs, the proc state "exception" is set. Also the message code (not translation) will be saved in WF context (key "wf_exception")

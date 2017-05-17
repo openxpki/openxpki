@@ -24,7 +24,7 @@ OpenXPKI::Server::Init::init(
 	TASKS => [
         'config_test',
         'log',
-        'dbi_backend',
+        'dbi',
     ],
 	SILENT => 1,
     });
@@ -46,7 +46,7 @@ my ($user, $role, $reply) = $auth->login_step({
 });
 
 ok($user eq 'John Doe');
-ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 
 ## perform authentication
 ($user, $role, $reply) = $auth->login_step({
@@ -61,7 +61,7 @@ ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 });
 
 ok($user eq 'Foo');
-ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 
 
 # Exisiting user - wrong password
@@ -119,7 +119,7 @@ $reply = undef;
 
 
 ok($user eq 'root');
-ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 
 
 

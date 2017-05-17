@@ -17,7 +17,7 @@ OpenXPKI::Server::Init::init(
 	TASKS => [
         'config_test',
         'log',
-        'dbi_backend',
+        'dbi',
     ],
 	SILENT => 1,
     });
@@ -39,5 +39,5 @@ my ($user, $role, $reply) = $auth->login_step({
 
 is($user, 'John Doe', 'Correct user');
 is($role, 'RA Operator', 'Correct role');
-is($reply->{'SERVICE_MSG'}, 'SERVICE_READY', 'Service ready.');    
+is($reply->{'SERVICE_MSG'}, 'SERVICE_READY', 'Service ready.');
 1;

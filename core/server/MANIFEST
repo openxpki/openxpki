@@ -175,20 +175,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/XS/ECDH.xs
 
 ## database interface of the server
 
-OpenXPKI/Server/DBI.pm
-OpenXPKI/Server/DBI/Hash.pm
-OpenXPKI/Server/DBI/SQL.pm
-OpenXPKI/Server/DBI/DBH.pm
-OpenXPKI/Server/DBI/Schema.pm
-OpenXPKI/Server/DBI/Driver.pm
-OpenXPKI/Server/DBI/Driver/DB2.pm
-OpenXPKI/Server/DBI/Driver/MySQL.pm
-OpenXPKI/Server/DBI/Driver/Oracle.pm
-OpenXPKI/Server/DBI/Driver/PostgreSQL.pm
-OpenXPKI/Server/DBI/Driver/SQLite.pm
-
-## new database interface of the server
-
 OpenXPKI/Server/Database.pm
 OpenXPKI/Server/Database/Legacy.pm
 OpenXPKI/Server/Database/Query.pm
@@ -628,8 +614,6 @@ t/99_cleanup/65_ui.t
 t/99_cleanup/80_client.t
 
 t/cfg.binary.openssl
-
-t/common/dbi.pl
 
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/handler.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/roles.yaml

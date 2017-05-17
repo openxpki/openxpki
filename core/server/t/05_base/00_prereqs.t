@@ -28,7 +28,6 @@ SKIP: {
                 'Workflow::Exception',
                 'Workflow::Factory',
                 'Workflow::History',
-                't/common/dbi.pl',
                 't/05_base/fix_config.pl', # test prereqs, no modules ...
                 't/60_workflow/common.pl',
               ],

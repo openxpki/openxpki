@@ -31,8 +31,7 @@ my $context = {
         pki_realm_by_cfg => undef,
     	volatile_vault   => undef,
     	log              => undef,
-    	dbi              => undef, # v2.0 sql layer!
-    	dbi_backend      => undef,
+    	dbi              => undef,
     	dbi_log          => undef,
 
     	# user-settable
@@ -232,7 +231,7 @@ by calling CTX('...') once create() has been called:
 
 =item * log
 
-=item * dbi_backend
+=item * dbi
 
 =back
 
@@ -279,7 +278,7 @@ or simpler:
 It is also possible to call CTX() in array context to obtain multiple
 context entries at once:
 
-  my ($config, $log, $dbi) = CTX('xml_config', 'log', 'dbi_backend');
+  my ($config, $log, $dbi) = CTX('xml_config', 'log', 'dbi');
 
 
 =head2 setcontext(%)

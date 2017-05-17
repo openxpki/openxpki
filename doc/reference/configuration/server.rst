@@ -22,7 +22,7 @@ The general configuration block looks like::
 
 OpenXPKI supports MySQL, PostgreSQL, Oracle and DB2. The *namespace* parameter is used only by the Oracle driver. DB2 uses only the *name* parameter and reads other settings from the environment, which are passed as a key/value list below the *environment* key.
 
-Check perldoc OpenXPKI::Server::DBI::Driver::<type> for more info on the parameters.
+Check perldoc OpenXPKI::Server::Database::Driver::<type> for more info on the parameters.
 
 System
 -----------------------

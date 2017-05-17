@@ -19,7 +19,7 @@ OpenXPKI::Server::Init::init(
 	TASKS => [
         'current_xml_config',
         'log',
-        'dbi_backend',
+        'dbi',
         'xml_config',
     ],
 	SILENT => 1,

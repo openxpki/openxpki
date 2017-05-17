@@ -23,7 +23,6 @@ use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server;
-use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::NOOP;
@@ -58,7 +57,6 @@ my @init_tasks = qw(
   dbi_log
   redirect_stderr
   prepare_daemon
-  dbi_backend
   dbi
   crypto_layer
   api
@@ -341,27 +339,6 @@ sub __do_init_volatile_vault {
     });
 }
 
-sub __do_init_dbi_backend {
-    ### init backend dbi...
-    my $dbi = get_dbi(
-    {
-        PURPOSE => 'backend',
-    });
-
-    OpenXPKI::Server::Context::setcontext(
-    {
-        dbi_backend => $dbi,
-    });
-    # delete leftover secrets
-    CTX('dbi_backend')->connect();
-    CTX('dbi_backend')->delete(
-        TABLE => 'SECRET',
-        ALL   => 1,
-    );
-    CTX('dbi_backend')->commit();
-    CTX('dbi_backend')->disconnect();
-}
-
 sub __do_init_dbi_log {
 
     ##! 1: "start"
@@ -531,58 +508,6 @@ sub get_crypto_layer
     } else {
         return OpenXPKI::Crypto::TokenManager->new();
     }
-}
-
-sub get_dbi
-{
-    my $args = shift;
-
-    ##! 1: "start"
-
-    my $config = CTX('config');
-    my %params;
-
-    my $dbpath = 'system.database.main';
-    if (exists $args->{PURPOSE} && $args->{PURPOSE} eq 'log') {
-        ##! 16: 'purpose: log'
-        # if there is a logging section we use it
-        if ($config->exists('system.database.logging')) {
-            ##! 16: 'use logging section'
-            $dbpath = 'system.database.logging';
-        }
-        %params = (LOG => OpenXPKI::Server::Log::NOOP->new());
-    }
-    else {
-        %params = (LOG => CTX('log'));
-    }
-
-    my $db_config = $config->get_hash($dbpath);
-
-    foreach my $key (qw(type name namespace host port user passwd)) {
-        ##! 16: "dbi: $key => " . $db_config->{$key}
-        $params{uc($key)} = $db_config->{$key};
-    }
-
-   $params{SERVER_ID} = $config->get('system.server.node.id');
-   $params{SERVER_SHIFT} = $config->get('system.server.shift');
-
-    # environment
-    my $db_env = $config->get_hash("$dbpath.environment");
-    foreach my $env_name (keys %{$db_env}) {
-        my $env_value = $db_env->{$env_name};
-        $ENV{$env_name} = $env_value;
-        ##! 4: "DBI Environment: $env_name => $env_value"
-    }
-
-    # special handling for SQLite databases
-    if ($params{TYPE} eq "SQLite") {
-        if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne "")) {
-            $params{NAME} .= "._" . $args->{PURPOSE} . "_";
-            ##! 16: 'SQLite, name: ' . $params{NAME}
-        }
-    }
-
-    return OpenXPKI::Server::DBI->new (%params);
 }
 
 sub get_log
@@ -765,17 +690,6 @@ The ID of CRL validities is the internal CA name.
 
 
 =head2 Non-Cryptographic Object Initialization
-
-=head3 get_dbi
-
-Initializes the database interface and returns the database object reference.
-
-Requires 'log' and 'config' in the Server Context.
-
-If database type is SQLite and the named parameter 'PURPOSE' exists,
-this parameter is appended to the SQLite database name.
-This is necessary because of a limitation in SQLite that prevents multiple
-open transactions on the same database.
 
 =head3 get_log
 

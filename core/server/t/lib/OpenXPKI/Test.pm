@@ -202,7 +202,6 @@ Initializes the basic context objects:
 
     C<CTX('config')>
     C<CTX('log')>
-    C<CTX('dbi_backend')>
     C<CTX('dbi')>
     C<CTX('api')>
     C<CTX('session')>
@@ -226,7 +225,7 @@ sub init_server {
     die "setup_env() must be called before init_server()" unless $self->_env_initialized;
 
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log dbi_backend dbi api ); # our default tasks
+    my @tasks = qw( config_versioned log dbi_log dbi api ); # our default tasks
     my %task_hash = map { $_ => 1 } @tasks;
     push @tasks, grep { not $task_hash{$_} } @additional_tasks; # more tasks requested via parameter
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
@@ -239,8 +238,6 @@ sub init_server {
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
     # set PKI realm after init() as various init procedures overwrite the realm
     $session->set_pki_realm($self->config_writer->realms->[0]);
-
-    OpenXPKI::Server::Context::CTX('dbi_backend')->connect;
 
     return $self;
 }

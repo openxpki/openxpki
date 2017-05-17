@@ -24,7 +24,7 @@ ok(OpenXPKI::Server::Init::init(
                'dbi_log',
 		       'log',
 #		       'redirect_stderr',
-		       'dbi_backend',
+		       'dbi',
                'xml_config',
 		       'crypto_layer',
 		       'pki_realm',
