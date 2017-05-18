@@ -6,6 +6,39 @@ use utf8;
 
 OpenXPKI::Test - Set up an OpenXPKI test environment.
 
+=head1 SYNOPSIS
+
+To only write the config files into C<$oxitest-E<gt>testenv_root."/etc/openxpki/config.d">:
+
+    my $oxitest = OpenXPKI::Test->new;
+    $oxitest->setup_env;
+
+To quickly initialize the default test environment and server:
+
+    my $oxitest = OpenXPKI::Test->new;
+    $oxitest->setup_env->init_server;
+    # we now have CTX('config'), CTX('log'), CTX('dbi'), CTX('api') and CTX('session')
+
+Or you might want to add some custom workflow config:
+
+    my $oxitest = OpenXPKI::Test->new;
+    $oxitest->add_workflow("alpha", "wf_type_1", {
+        'head' => {
+            'label' => 'Perfect workflow',
+            'persister' => 'OpenXPKI',
+            'prefix' => 'liar',
+        },
+        'state' => {
+            'INITIAL' => {
+                'action' => [ 'initialize > PERSIST' ],
+            },
+            ...
+        }
+    );
+    $oxitest->setup_env;
+    $oxitest->init_server('workflow_factory');
+    # we now have CTX('workflow_factory') besides the default ones
+
 =cut
 
 # Core modules
