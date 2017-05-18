@@ -340,71 +340,15 @@ sub __do_init_volatile_vault {
 }
 
 sub __do_init_dbi_log {
-
     ##! 1: "start"
-    my $args = shift;
-
-    OpenXPKI::Server::Context::setcontext({
-        dbi_log => OpenXPKI::Server::Database->new(
-            log => CTX('log'), # we prevent recursive calls to log functions in OpenXPKI::Server::Log::Appender::DBI
-            db_params => __dbi_config('log'),
-            autocommit => 1
-        ),
-    });
-
+    OpenXPKI::Server::Context::setcontext({ dbi_log => get_database("log") });
 }
 
 # TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
 sub __do_init_dbi {
-
-    my $args = shift;
-
     ##! 1: "start"
-
-    OpenXPKI::Server::Context::setcontext({
-        dbi => OpenXPKI::Server::Database->new(
-            log => CTX('log'),
-            db_params => __dbi_config('main'),
-        ),
-    });
+    OpenXPKI::Server::Context::setcontext({ dbi => get_database("main") });
 }
-
-
-# TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
-sub __dbi_config {
-
-    my $section = shift || 'main';
-
-    ##! 1: "start"
-    my $config = CTX('config');
-
-    # Fallback for logger/audit configs which can be separate
-    if (!$config->exists(['system','database',$section])) {
-        $section = 'main';
-    }
-
-    my $db_config = $config->get_hash(['system','database',$section]);
-
-    # Set environment variables
-    my $db_env = $config->get_hash( ['system','database',$section,'environment'] );
-    foreach my $env_name (keys %{$db_env}) {
-        $ENV{$env_name} = $db_env->{$env_name};
-        ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
-    }
-
-    # Read database driver/DSN parameters
-    my %params = (
-        db_type => 'MySQL', # default
-        %{$db_config},
-    );
-    delete $params{environment};
-    delete $params{log};
-    delete $params{debug};         # TODO #legacydb Remove treatment of DB parameter "debug" (occurs in example database.yaml)
-
-    return \%params;
-}
-
-
 
 sub __do_init_acl {
     ### init acl...
@@ -523,6 +467,42 @@ sub get_log
     ##! 64: 'log during get_log: ' . $log
 
     return $log;
+}
+
+sub get_database {
+    my ($section) = @_;
+    ##! 1: "start"
+
+    #
+    # Read DB config
+    #
+    my $config = CTX('config');
+    # Fallback for logger/audit configs which can be separate
+    $section = 'main' unless $config->exists(['system','database',$section]);
+    my $db_config = $config->get_hash(['system','database',$section]);
+
+    # Set environment variables
+    my $db_env = $config->get_hash(['system','database',$section,'environment']);
+    for my $env_name (keys %{$db_env}) {
+        $ENV{$env_name} = $db_env->{$env_name};
+        ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
+    }
+    delete $db_config->{environment};
+
+    # TODO #legacydb Remove treatment of DB parameters "debug" and "log" (occurs in example database.yaml)
+    delete $db_config->{log};
+    delete $db_config->{debug};
+
+    return OpenXPKI::Server::Database->new(
+        # if this DB object should be used for logging: we prevent recursive
+        # calls to log functions in OpenXPKI::Server::Log::Appender::DBI
+        log => CTX('log'),
+        db_params => {
+            db_type => 'MySQL', # default
+            %{ $db_config },
+        },
+        $section eq "log" ? (autocommit => 1) : (),
+    );
 }
 
 sub redirect_stderr
@@ -697,12 +677,13 @@ Returns an instance of the module OpenXPKI::Log.
 
 Requires 'config' in the Server Context.
 
-=head3 get_log
+=head3 get_database
 
-requires no arguments.
-It returns an instance of the module OpenXPKI::Server::Authentication.
-The context must be already established because OpenXPKI::XML::Config is
-loaded from the context.
+Returns an instance of the L<OpenXPKI::Server::Database>.
+
+A section name must be given below the config path I<system.database>.
+
+Requires 'log' in the Server Context.
 
 =head3 redirect_stderr
 
