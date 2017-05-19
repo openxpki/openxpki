@@ -54,8 +54,8 @@ my @init_tasks = qw(
   config_versioned
   config_test
   i18n
-  dbi_log
   log
+  dbi_log
   redirect_stderr
   prepare_daemon
   dbi_backend
