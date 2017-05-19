@@ -56,6 +56,11 @@ sub execute {
                     $p->{NOPASSWD} = 1;
                 }
             }
+
+            if ( $self->param('include_root_cert') ) {
+                $p->{KEEPROOT} = 1;
+            }
+
             $privkey = CTX('api')->get_private_key_for_cert($p);
         };
         if (!$privkey) {
@@ -198,6 +203,14 @@ string to export the key unencrypted.
 For PKCS12 sets the so called "friendly name" for the certificate.
 For Java Keystore sets the keystore alias.
 Parameter is ignored for any other key types.
+
+=item include_root_cert, optional
+
+Only valid with PKCS12 or JavaKeyStore format.
+If set to a true value, the root certificate will be included in the file.
+B<Warning>: Root certificates should be distributed and validated with a
+defined process and not as a "drive-by"! Enable this only if you are sure
+about the implications.
 
 =item die_on_error
 
