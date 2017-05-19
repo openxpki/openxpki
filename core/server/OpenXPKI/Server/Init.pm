@@ -478,8 +478,9 @@ sub get_database {
     #
     my $config = CTX('config');
     # Fallback for logger/audit configs which can be separate
-    $section = 'main' unless $config->exists(['system','database',$section]);
-    my $db_config = $config->get_hash(['system','database',$section]);
+    my $config_section = $section;
+    $config_section = 'main' unless $config->exists(['system','database',$section]);
+    my $db_config = $config->get_hash(['system','database',$config_section]);
 
     # Set environment variables
     my $db_env = $config->get_hash(['system','database',$section,'environment']);

@@ -55,7 +55,29 @@ sub is_logentry_count {
 # Setup test context
 #
 use OpenXPKI::Test;
-OpenXPKI::Test->new->setup_env->init_server;
+my $oxitest = OpenXPKI::Test->new;
+
+my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'OFF';
+$oxitest->config_writer->conf_log4perl(
+    qq(
+        log4perl.category.openxpki.auth         = INFO, Screen
+        log4perl.category.openxpki.audit        = INFO, Screen
+        log4perl.category.openxpki.monitor      = INFO, Screen
+        log4perl.category.openxpki.system       = INFO, Screen
+        log4perl.category.openxpki.workflow     = INFO, Screen
+        log4perl.category.openxpki.application  = INFO, Screen, DBI
+
+        log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
+        log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
+        log4perl.appender.Screen.Threshold      = $threshold_screen
+
+        log4perl.appender.DBI                   = OpenXPKI::Server::Log::Appender::DBI
+        log4perl.appender.DBI.layout            = Log::Log4perl::Layout::NoopLayout
+        log4perl.appender.DBI.warp_message      = 0
+    )
+);
+$oxitest->setup_env->init_server;
 
 my $dbi = CTX('dbi');
 my $log = CTX('log');
@@ -84,10 +106,11 @@ my $result = $dbi->select(
         message => { -like => "%$msg" },
     }
 )->fetchall_arrayref({});
+
 is scalar @{$result}, 1, "1 log entry found via string search";
 
 # Insert test message #1 via database
-ok $dbi->insert(
+ok $dbi->insert_and_commit(
     into => 'application_log',
     values => {
         application_log_id  => $dbi->next_id('application_log'),
@@ -100,7 +123,7 @@ ok $dbi->insert(
 ), "insert old test message to be kept";
 
 # Insert test message #2 via database
-ok $dbi->insert(
+ok $dbi->insert_and_commit(
     into => 'application_log',
     values => {
         application_log_id  => $dbi->next_id('application_log'),
