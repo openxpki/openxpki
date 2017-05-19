@@ -57,7 +57,6 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC
         action:
           - edit_cert_info > BUILD_SUBJECT ? profile_has_info_section
-          - global_cancel > CLEANUP_BEFORE_CANCEL ? profile_has_info_section
           - global_skip  > BUILD_SUBJECT ? !profile_has_info_section
 
     ENTER_KEY_PASSWORD:
@@ -66,7 +65,6 @@ state:
         action:
           - retype_server_password > PERSIST_KEY_PASSWORD ? key_password_server
           - ask_client_password > PERSIST_KEY_PASSWORD ? !key_password_server
-          - global_cancel > CLEANUP_BEFORE_CANCEL
 
     ENTER_SAN:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL
@@ -74,14 +72,12 @@ state:
         action:
           - edit_san > ENTER_CERT_INFO ? profile_has_san_section
           - global_skip > ENTER_CERT_INFO ? !profile_has_san_section
-          - global_cancel > CLEANUP_BEFORE_CANCEL ? profile_has_san_section
 
     ENTER_SUBJECT:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_DESC
         action:
           - edit_subject > ENTER_SAN
-          - global_cancel > CLEANUP_BEFORE_CANCEL
 
     EVAL_ELIGIBILITY:
         autorun: 1

@@ -21,10 +21,24 @@ application_log tables.
 use Data::Dumper;
 use English;
 
+use Log::Log4perl::Level;
+use Carp;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Database; # we must import "auto_id"
+
+my %LOGLEVELS = (
+    ALL     => 0,
+    TRACE   => 5000,
+    DEBUG   => 10000,
+    INFO    => 20000,
+    WARN    => 30000,
+    ERROR   => 40000,
+    FATAL   => 50000,
+    OFF     => (2 ** 31) - 1,
+);
+
 
 sub new {
     ##! 1: 'start'
@@ -112,6 +126,12 @@ sub log {
     } else {
         # Prevent exceptions in the DB layer from bubbling up and probably
         # causing more logging (into the database)
+
+        my $loglevel_int = 0;
+        if ( exists $LOGLEVELS{$loglevel} ) {
+            $loglevel_int = $LOGLEVELS{$loglevel};
+        }
+
         eval {
             $dbi->insert(
                 into => 'application_log',
@@ -119,7 +139,7 @@ sub log {
                     application_log_id => AUTO_ID,
                     logtimestamp       => $timestamp,
                     workflow_id        => OpenXPKI::Server::Context::hascontext('workflow_id') ? CTX('workflow_id') : 0,
-                    priority           => $loglevel,
+                    priority           => $loglevel_int,
                     category           => $category,
                     message            => $message,
                 },

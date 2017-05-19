@@ -32,58 +32,6 @@ my @options_spec = ('config=s','instance|i=s');
 my $cmd = shift || 'help';
 my $ret = 255;
 
-sub initdb {
-
-    my @databases = qw( backend );
-
-    # Check if a seperate logging database is defined
-
-    if (CTX('config')->exists('system.database.logging')) {
-        push @databases, 'log';
-    }
-
-    print STDERR "WARNING: Usage if initdb is deprecated!\nPlease use the provided schema dumps to setup your database.";
-
-  DB:
-    foreach my $db (@databases) {
-        my $params = {};
-        $params->{PURPOSE} = $db;
-
-        if ( defined $params->{PURPOSE} ) {
-            print STDERR "Setting up database '$db'\n";
-        }
-        my $dbi = OpenXPKI::Server::Init::get_dbi($params);
-
-        eval { $dbi->connect() };
-        if ($EVAL_ERROR) {
-            print STDERR
-              "ERROR: Could not connect to '$db' database ($EVAL_ERROR)\n";
-            return 2;
-        }
-
-        if ( $params{'dry-run'} ) {
-            print $dbi->init_schema( MODE => 'DRYRUN' ) . "\n";
-            last DB;
-        }
-        else {
-            my %args = ();
-            if ( $params{force} ) {
-                $args{MODE} = 'FORCE';
-            }
-
-            #### args for init_schema : Dumper(\%args)
-            eval { $dbi->init_schema(%args); };
-            if ($EVAL_ERROR) {
-                print STDERR
-                  "ERROR: init_schema on '$db' failed (${EVAL_ERROR})\n";
-                return 2;
-            }
-            print STDERR "Database '$db' initialized.\n";
-        }
-    }
-    return 0;
-}
-
 
 sub certificate_id {
 
@@ -107,13 +55,6 @@ sub certificate_id {
         return 1;
     }
 
-    my $defaulttoken = CTX('crypto_layer')->get_system_token({TYPE => 'DEFAULT'});
-
-    if ( !defined $defaulttoken ) {
-        print STDERR "ERROR: Could not get default token\n";
-        return 2;
-    }
-
     my $FileUtils = OpenXPKI::FileUtils->new();
     my $certdata  = $FileUtils->read_file($filename);
 
@@ -124,12 +65,10 @@ sub certificate_id {
 
     my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
 
-    my $cert = OpenXPKI::Crypto::X509->new(
-        TOKEN => $defaulttoken,
-        DATA  => $extracted_certdata,
-    );
 
-    print $cert->get_identifier();
+    my $res = CTX('api')->get_cert_identifier({ 'CERT' => $extracted_certdata });
+
+    print $res;
     print "\n";
 
     return 0;
@@ -223,52 +162,54 @@ sub certificate_remove {
 
     my $identifier = $name;
 
-    my $dbi = __get_dbi();
-
-    if ( defined $realm ) {
-        $identifier = __resolve_alias(
-            {
-                DBI   => $dbi,
-                NAME  => $name,
-                REALM => $realm,
-            }
-        );
+    if ( $realm ) {
+        $identifier = __resolve_alias({
+            NAME  => $name,
+            REALM => $realm,
+        });
+    } else {
+        $realm = '_any';
     }
 
-    # check if certificate is issuer of something
-    my $children_dbi = $dbi->select(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { ISSUER_IDENTIFIER => $identifier, },
-    );
-    my @children = @{$children_dbi};
+    # we dont need those checks if force-is-issuer is set
+    if (!defined $params{'force-is-issuer'}) {
 
-    my $is_issuer = 0;
-    if ( scalar @children > 0 ) {
-        $is_issuer = 1;
-        if ( scalar @children == 1 ) {
-            if ( $children[0]->{'ISSUER_IDENTIFIER'} eq $identifier ) {
+        # check if certificate is issuer of something
+        my $cnt = CTX('api')->search_cert_count({
+            ISSUER_IDENTIFIER => $identifier,
+            PKI_REALM => $realm,
+        });
 
-                # only self-signed certificate, delete even though
-                # it formally is the issuer of a certificate in the DB
-                $is_issuer = 0;
-            }
+        my $is_issuer = 0;
+        if ($cnt > 1) {
+            # this is definitly an active issuer certificate
+            $is_issuer = 1;
+        } elsif ($cnt == 1) {
+            # might be a self-signed certificate
+            my $cert = CTX('api')->search_cert({
+                ISSUER_IDENTIFIER => $identifier,
+                PKI_REALM => $realm
+            });
+            $is_issuer = ( $cert->[0]->{'ISSUER_IDENTIFIER'} ne $identifier );
+        }
+
+        if ( $is_issuer ) {
+            print STDERR "ERROR: Certificate not deleted because it is referenced as the issuer of "
+                . $cnt . " certificate(s) in the database.\n";
+            return 2;
         }
     }
 
-    if ( $is_issuer && !defined $params{'force-is-issuer'} ) {
-        print STDERR "ERROR: Certificate not deleted because it is referenced as the issuer of "
-          . scalar @children
-          . " certificate(s) in the database.\n";
-        return 2;
-    }
-    my $certificate = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => $identifier, },
+    my $dbi = CTX('dbi');
+    my $certificate = $dbi->select_one(
+        from   => 'certificate',
+        columns => ['identifier'],
+        where => { identifier => $identifier, },
     );
     if ( defined $certificate ) {
         $dbi->delete(
-            TABLE => 'CERTIFICATE',
-            DATA  => { IDENTIFIER => $identifier, },
+            from => 'certificate',
+            where  => { identifier => $identifier, },
         );
         $dbi->commit();
         print "Successfully deleted certificate $name "
@@ -286,10 +227,9 @@ sub alias_add {
 
     my %insert_hash = ();
 
-    my $dbi = __get_dbi();
-
     $insert_hash{PKI_REALM} = $params{realm};
 
+    my $dbi = CTX('dbi');
     # Import is possible with symbolic token or group name
     if ( $params{token} || $params{group} ) {
 
@@ -298,7 +238,7 @@ sub alias_add {
             $group = $params{group};
         } else {
             $group = ($params{token} eq "root") ? 'root' :
-                CTX('config')->get("realm.$params{realm}.crypto.type.$params{token}");
+                CTX('config')->get(['realm', $params{realm}, 'crypto','type', $params{token}]);
 
             if (!$group) {
                 print STDERR "There is no token of type $params{token} defined\n";
@@ -310,40 +250,41 @@ sub alias_add {
         if ($params{gen} && $params{gen} =~ m{\A \d+ \z}x) {
 
             # check for duplicate
-            my $check_duplicate = $dbi->first(
-                TABLE   => 'ALIASES',
-                DYNAMIC => {
-                    PKI_REALM => $params{realm},
-                    GROUP_ID => $group,
-                    GENERATION => $params{gen}
+            my $check_duplicate = $dbi->select_one(
+                from   => 'aliases',
+                columns => ['*'],
+                where => {
+                    pki_realm => $params{realm},
+                    group_id => $group,
+                    generation => $params{gen}
                 }
             );
             if ($check_duplicate) {
                 print STDERR sprintf("A token with generation %01d for group %s already exists:\n",
-                    $params{gen}, $params{token}, $check_duplicate->{IDENTIFIER});
+                    $params{gen}, $params{token}, $check_duplicate->{identifier});
                 __alias_print($check_duplicate);
                 return 2;
             }
 
-           $insert_hash{GENERATION} = $params{gen};
+           $insert_hash{generation} = $params{gen};
 
         # no generation, autodetected
         } else {
 
             # query aliases to get next generation id
-            my $next_generation = $dbi->first(
-                TABLE   => 'ALIASES',
-                DYNAMIC => {
-                    PKI_REALM => $params{realm},
-                    GROUP_ID => $group,
+            my $next_generation = $dbi->select_one(
+                from   => 'aliases',
+                columns => ['*'],
+                where => {
+                    pki_realm => $params{realm},
+                    group_id => $group,
                 },
-                'ORDER' => [ 'GENERATION' ],
-                'REVERSE' => 1,
+                order_by => '-generation',
             );
-            $insert_hash{GENERATION} = ($next_generation->{GENERATION} || 0) + 1;
+            $insert_hash{generation} = ($next_generation->{generation} || 0) + 1;
         }
-        $insert_hash{GROUP_ID} = $group;
-        $insert_hash{ALIAS} = sprintf "%s-%01d", $group, $insert_hash{GENERATION};
+        $insert_hash{group_id} = $group;
+        $insert_hash{alias} = sprintf "%s-%01d", $group, $insert_hash{generation};
 
     } elsif ( !exists( $params{alias} ) || $params{alias} eq '' ) {
         print STDERR "Please specify an alias with --alias\n";
@@ -351,38 +292,46 @@ sub alias_add {
 
     } else {
 
-        $insert_hash{ALIAS} = $params{alias};
+        $insert_hash{alias} = $params{alias};
     }
 
     if ( !exists( $params{identifier} ) || $params{identifier} eq '' ) {
         print STDERR "Please specify an identifier with --identifier\n";
         return 1;
     } else {
-        $insert_hash{IDENTIFIER} = $params{identifier};
+        $insert_hash{identifier} = $params{identifier};
     }
 
     # Prevent duplicate entries (each identifier is allowed only once per group)
-    my $duplicate_alias = $dbi->first(
-        TABLE   => 'ALIASES',
-        DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, PKI_REALM => $params{realm}, 'GROUP_ID' => $insert_hash{GROUP_ID} },
+    my $duplicate_alias = $dbi->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => {
+            identifier => $insert_hash{identifier},
+            pki_realm => $params{realm},
+            group_id => $insert_hash{group_id}
+        },
     );
 
     if ($duplicate_alias) {
         print STDERR "ERROR: certificate already exisits in group\n";
-        print STDERR "Alias: " . $duplicate_alias->{ALIAS} . "\n";
+        print STDERR "Alias: " . $duplicate_alias->{alias} . "\n";
         return 2;
     }
 
     # query certificate table to check whether --identifer actually exists
-    my $certificate = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => $insert_hash{IDENTIFIER}, },
+    my $certificate = $dbi->select_one(
+        from    => 'certificate',
+        columns => ['*'],
+        where => {
+            identifier => $insert_hash{identifier}
+        },
     );
 
     if ( !defined $certificate ) {
         # there is no cert with given identifier
         print STDERR "ERROR: Could not find a certificate with "
-          . "identifier '$insert_hash{IDENTIFIER}', ";
+          . "identifier '$insert_hash{identifier}', ";
         return 2;
     }
 
@@ -400,21 +349,21 @@ sub alias_add {
                 return 1;
             }
 
-            $insert_hash{NOTBEFORE} = $dt->epoch();
+            $insert_hash{notbefore} = $dt->epoch();
 
-            if ($insert_hash{NOTBEFORE} < $certificate->{NOTBEFORE}) {
+            if ($insert_hash{notbefore} < $certificate->{notbefore}) {
                 print STDERR "ERROR: notbefore exceeds certificate validity";
                 return 1;
             }
         }
     } else {
-        $insert_hash{NOTBEFORE} = $certificate->{NOTBEFORE};
+        $insert_hash{notbefore} = $certificate->{notbefore};
     }
 
 
     if ($params{notafter}) {
         if ($params{notafter} =~ /^\d+$/) {
-            $insert_hash{NOTAFTER} = $params{notafter};
+            $insert_hash{notafter} = $params{notafter};
         } else {
             my $dt;
             eval {
@@ -424,35 +373,35 @@ sub alias_add {
                 print STDERR "ERROR: Could not parse notafter date";
                 return 1;
             }
-            $insert_hash{NOTAFTER} = $dt->epoch();
+            $insert_hash{notafter} = $dt->epoch();
 
-            if ($insert_hash{NOTAFTER} > $certificate->{NOTAFTER}) {
+            if ($insert_hash{notafter} > $certificate->{notafter}) {
                 print STDERR "ERROR: notafter exceeds certificate validity";
                 return 1;
             }
         }
     } else {
-        $insert_hash{NOTAFTER} = $certificate->{NOTAFTER};
+        $insert_hash{notafter} = $certificate->{notafter};
     }
 
     #### insert_hash : Dumper(\%insert_hash)
     $dbi->insert(
-        TABLE => 'ALIASES',
-        HASH  => \%insert_hash,
+        into => 'aliases',
+        values  => \%insert_hash,
     );
     $dbi->commit();
 
     print "Successfully created alias in realm $params{realm}:\n";
-    __alias_print( \%insert_hash, $certificate );
+    __alias_print( \%insert_hash );
 
 
     # Check if the alias is for an issuing ca cert -> create root ca alias
-    my $cs_group = CTX('config')->get("realm.$params{realm}.crypto.type.certsign");
-    if ( $insert_hash{ALIAS} =~ /^$cs_group-(\d+)/ ) {
+    my $cs_group = CTX('config')->get(['realm', $params{realm}, 'crypto', 'type', 'certsign']);
+    if ( $insert_hash{alias} =~ /^$cs_group-(\d+)/ ) {
         print "\nToken is certsign, looking for root...\n";
         my $gen = $1;
 
-        my $chain_ref = CTX('api')->get_chain({ 'START_IDENTIFIER' => $insert_hash{IDENTIFIER} });
+        my $chain_ref = CTX('api')->get_chain({ 'START_IDENTIFIER' => $insert_hash{identifier} });
 
         if ($chain_ref->{COMPLETE} != 1) {
             print STDERR "ERROR: unable to find root certificate";
@@ -460,34 +409,39 @@ sub alias_add {
         }
         my $root_identifier = pop @{$chain_ref->{IDENTIFIERS}};
 
-        # check if this root is already definde
-        my $root_alias = $dbi->first(
-            TABLE   => 'ALIASES',
-            DYNAMIC => { IDENTIFIER => $root_identifier, PKI_REALM => $params{realm}, 'GROUP_ID' => 'root' },
+        # check if this root is already defined
+        my $root_alias = $dbi->select_one(
+            from   => 'aliases',
+            columns => ['*'],
+            where => {
+                identifier => $root_identifier,
+                pki_realm => $params{realm},
+                group_id => 'root'
+            },
         );
         if ($root_alias) {
             print "Root ca already in alias table:\n";
         } else {
             print "Creating alias for root ca:\n";
             # Get the notebefore/notafter date
-            $certificate = $dbi->first(
-                TABLE   => 'CERTIFICATE',
-                COLUMNS => ['NOTBEFORE' , 'NOTAFTER' ],
-                DYNAMIC => { IDENTIFIER => $root_identifier },
+            $certificate = $dbi->select_one(
+                from   => 'certificate',
+                columns => ['notbefore' , 'notafter' ],
+                where => { identifier => $root_identifier },
             );
 
             $root_alias = {
-                IDENTIFIER => $root_identifier,
-                PKI_REALM => $params{realm},
-                GROUP_ID => 'root',
-                GENERATION => $gen,
-                ALIAS => sprintf ('root-%01d', $gen),
-                NOTBEFORE => $certificate->{NOTBEFORE},
-                NOTAFTER => $certificate->{NOTAFTER},
+                identifier => $root_identifier,
+                pki_realm => $params{realm},
+                group_id => 'root',
+                generation => $gen,
+                alias => sprintf ('root-%01d', $gen),
+                notbefore => $certificate->{notbefore},
+                notafter => $certificate->{notafter},
             };
             $dbi->insert(
-                TABLE => 'ALIASES',
-                HASH  => $root_alias,
+                into => 'aliases',
+                values  => $root_alias,
             );
             $dbi->commit();
         }
@@ -503,23 +457,24 @@ sub alias_add {
 sub alias_update {
 
     my %query_hash = (
-        PKI_REALM =>  $params{realm}
+        pki_realm =>  $params{realm}
     );
 
     if ($params{identifier}) {
-        $query_hash{IDENTIFIER} = $params{identifier};
+        $query_hash{identifier} = $params{identifier};
     } elsif ($params{alias}) {
-        $query_hash{ALIAS} = $params{alias};
+        $query_hash{alias} = $params{alias};
     } else {
         print STDERR "You must specify either --identifier or --alias\n";
         return 1;
     }
 
-    my $dbi = __get_dbi();
+    my $dbi = CTX('dbi');
 
-    my $alias = $dbi->first(
-        TABLE   => 'ALIASES',
-        DYNAMIC => \%query_hash,
+    my $alias = $dbi->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => \%query_hash,
     );
 
     if (!$alias) {
@@ -530,14 +485,15 @@ sub alias_update {
     my %update_hash = ();
 
     # query certificate table to check whether --identifer actually exists
-    my $certificate = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => $alias->{IDENTIFIER}, },
+    my $certificate = $dbi->select_one(
+        from   => 'certificate',
+        columns => ['*'],
+        where => { identifier => $alias->{identifier}, },
     );
 
     if ($params{notbefore}) {
         if ($params{notbefore} =~ /^\d+$/) {
-            $update_hash{NOTBEFORE} = $params{notbefore};
+            $update_hash{notbefore} = $params{notbefore};
         } else {
             my $dt;
             eval {
@@ -547,20 +503,20 @@ sub alias_update {
                 print STDERR "ERROR: Could not parse notbefore date";
                 return 2;
             }
-            $update_hash{NOTBEFORE} = $dt->epoch();
-
-            if ($update_hash{NOTBEFORE} < $certificate->{NOTBEFORE}) {
-                print STDERR "ERROR: notbefore exceeds certificate validity";
-                return 2;
-            }
+            $update_hash{notbefore} = $dt->epoch();
+        }
+        if ($update_hash{notbefore} < $certificate->{notbefore}) {
+            print STDERR "ERROR: notbefore exceeds certificate validity";
+            return 2;
         }
     } elsif(defined $params{notbefore}) {
-        $update_hash{NOTBEFORE} = $certificate->{NOTBEFORE};
+        # this passed the literal 0 used to reset the date!
+        $update_hash{notbefore} = $certificate->{notbefore};
     }
 
     if ($params{notafter}) {
         if ($params{notafter} =~ /^\d+$/) {
-            $update_hash{NOTAFTER} = $params{notafter};
+            $update_hash{notafter} = $params{notafter};
         } else {
             my $dt;
             eval {
@@ -570,15 +526,15 @@ sub alias_update {
                 print STDERR "ERROR: Could not parse notafter date";
                 return 2;
             }
-            $update_hash{NOTAFTER} = $dt->epoch();
-
-            if ($update_hash{NOTAFTER} > $certificate->{NOTAFTER}) {
-                print STDERR "ERROR: notafter exceeds certificate validity";
-                return 2;
-            }
+            $update_hash{notafter} = $dt->epoch();
+        }
+        if ($update_hash{notafter} > $certificate->{notafter}) {
+            print STDERR "ERROR: notafter exceeds certificate validity";
+            return 2;
         }
     } elsif(defined $params{notafter}) {
-        $update_hash{NOTAFTER} = $certificate->{NOTAFTER};
+        # this passed the literal 0 used to reset the date!
+        $update_hash{notafter} = $certificate->{notafter};
     }
 
     if (!%update_hash) {
@@ -587,22 +543,23 @@ sub alias_update {
     }
 
     $dbi->update(
-        TABLE => 'ALIASES',
-        DATA => \%update_hash,
-        WHERE => {
-            ALIAS =>  $alias->{ALIAS},
-            PKI_REALM => $alias->{PKI_REALM}
+        table => 'aliases',
+        set => \%update_hash,
+        where => {
+            alias =>  $alias->{alias},
+            pki_realm => $alias->{pki_realm}
         }
     );
     $dbi->commit();
 
-    $alias = $dbi->first(
-        TABLE   => 'ALIASES',
-        DYNAMIC => \%query_hash,
+    $alias = $dbi->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => \%query_hash,
     );
 
     print "Successfully updated alias:\n";
-    __alias_print( $alias, $certificate );
+    __alias_print( $alias );
 
 
     return 0;
@@ -613,9 +570,9 @@ sub alias_list {
 
     my $realm = $params{realm};
     # get names of groups
-    my $groups = CTX('config')->get_hash("realm.$realm.crypto.type");
+    my $groups = CTX('config')->get_hash(['realm',$realm,'crypto','type']);
 
-    my $dbi = __get_dbi();
+    my $dbi = CTX('dbi');
     my $alias;
     my $db_alias;
     my $cert;
@@ -623,13 +580,13 @@ sub alias_list {
     my $show_subject = $params{subject} ? 1 :0;
 
     # Prepare template for where part based on filter
-    my $where = { 'PKI_REALM' => { VALUE => $realm } };
-    my $limit;
+    my $where = { 'pki_realm' => { value => $realm } };
+    my $limit = 999;
     if ($filter ne 'all') {
         # not all => active or current
         my $now = time();
-        $where->{'NOTBEFORE'} = { VALUE => $now, OPERATOR => 'LESS_THAN' };
-        $where->{'NOTAFTER'}  = { VALUE => $now, OPERATOR => 'GREATER_THAN' };
+        $where->{'notbefore'} = { '<' => $now };
+        $where->{'notafter'} = { '>' => $now };
 
         # Current is only the latest one
         if ($filter ne 'active') {
@@ -639,45 +596,39 @@ sub alias_list {
 
     # No group list
     if ($params{nogroup}) {
-        $where->{GROUP_ID} = { VALUE => undef };
-
+        $where->{group_id} = undef;
         $db_alias = $dbi->select(
-            TABLE   => 'ALIASES',
-            DYNAMIC =>  $where,
-            'ORDER' => [ 'ALIAS', 'NOTBEFORE' ],
-            'REVERSE' => 1,
+            from   => 'aliases',
+            columns => ['*'],
+            where =>  $where,
+            order_by => [ '-alias', '-notbefore' ],
         );
-        print "=== alias without group ===\n" if (@{$db_alias});
-        foreach my $alias (@{$db_alias}) {
 
-            $cert = $dbi->first(
-                TABLE   => 'CERTIFICATE',
-                DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
-            );
-
-            __alias_print( $alias, $cert, $show_subject);
+        print "=== alias without group ===\n" if ($db_alias->rows);
+        while (my $alias = $db_alias->fetchrow_hashref) {
+            __alias_print( $alias, $show_subject);
         }
         return 0;
     }
 
     if ($params{group}) {
-        $where->{GROUP_ID} = { VALUE => $params{group} };
+        $where->{group_id} = $params{group};
     } else {
-        $where->{GROUP_ID} = { VALUE => '', OPERATOR => 'NOT_EQUAL' };
+        $where->{group_id} = { '!=', '' };
     }
 
     # Load the list of exisiting aliased groups as there can be custom tokens
     # outside the main groups (e.g. alternative scep tokens)
     my $db_results = $dbi->select(
-        TABLE  => 'ALIASES',
-        'DYNAMIC' => $where,
-        'ORDER' => [ 'NOTBEFORE' ],
-        'REVERSE' => 1,
+        from  => 'aliases',
+        columns => ['*'],
+        where => $where,
+        order_by => '-notbefore',
     );
 
     my %anon_groups;
-    foreach my $entry (@{ $db_results }) {
-        $anon_groups{ $entry->{GROUP_ID} } = 1;
+    while (my $entry = $db_results->fetchrow_hashref) {
+        $anon_groups{ $entry->{group_id} } = 1;
     }
     # remove root from the list
     delete $anon_groups{'root'};
@@ -691,28 +642,23 @@ sub alias_list {
 
         print "$group ($type):\n";
 
-        $where->{'GROUP_ID'} = { VALUE => $group };
+        $where->{'group_id'} = $group;
 
         $db_alias = $dbi->select(
-            TABLE   => 'ALIASES',
-            DYNAMIC =>  $where,
-            LIMIT => $limit,
-            'ORDER' => [ 'NOTBEFORE' ],
-            'REVERSE' => 1,
+            from   => 'aliases',
+            columns => ['*'],
+            where =>  $where,
+            limit => $limit,
+            order_by => [ '-notbefore' ],
         );
 
-        foreach my $alias (@{$db_alias}) {
-            $cert = $dbi->first(
-                TABLE   => 'CERTIFICATE',
-                DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
-            );
-
-            __alias_print( $alias, $cert, $show_subject );
+        while (my $alias = $db_alias->fetchrow_hashref) {
+            __alias_print( $alias, $show_subject );
         }
 
         # print empty message if none found and not in group mode
-        if (!scalar @{$db_alias}) {
-            __alias_print( undef, undef );
+        if (!$db_alias->rows) {
+            __alias_print( undef );
         }
 
         # unset in anon group list
@@ -725,23 +671,18 @@ sub alias_list {
 
         print "$group:\n";
 
-        $where->{'GROUP_ID'} = { VALUE => $group };
+        $where->{'group_id'} = $group;
 
         $db_alias = $dbi->select(
-            TABLE   => 'ALIASES',
-            DYNAMIC =>  $where,
-            LIMIT => $limit,
-            'ORDER' => [ 'NOTBEFORE' ],
-            'REVERSE' => 1,
+            from   => 'aliases',
+            columns => ['*'],
+            where =>  $where,
+            limit => $limit,
+            order_by => [ '-notbefore' ],
         );
 
-        foreach my $alias (@{$db_alias}) {
-            $cert = $dbi->first(
-                TABLE   => 'CERTIFICATE',
-                DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
-            );
-
-            __alias_print( $alias, $cert, $show_subject );
+        while (my $alias = $db_alias->fetchrow_hashref) {
+            __alias_print( $alias, $show_subject );
         }
 
     }
@@ -750,43 +691,35 @@ sub alias_list {
     return 0 if ($params{group});
 
     # Check for root ca
-    $alias = $dbi->first(
-        TABLE   => 'ALIASES',
-        DYNAMIC => {
-            'PKI_REALM' => { VALUE => $realm },
-            'GROUP_ID' => { VALUE => 'root' },
-            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'LESS_THAN' },
-            'NOTAFTER' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
+    $alias = $dbi->select_one(
+        from    => 'aliases',
+        columns => ['*'],
+        where => {
+            'pki_realm' => $realm,
+            'group_id' => 'root',
+            'notbefore' => { '<' => time() },
+            'notafter' => { '>' => time() },
         },
-        'ORDER' => [ 'NOTBEFORE' ],
-        'REVERSE' => 1,
-    );
-    $cert = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+        order_by => '-notbefore'
     );
 
     print "=== root ca ===\ncurrent root ca:\n";
-    __alias_print( $alias, $cert, $show_subject );
+    __alias_print( $alias, $show_subject );
 
     # Check for root ca
-    $alias = $dbi->first(
-        TABLE   => 'ALIASES',
-        DYNAMIC => {
-            'PKI_REALM' => { VALUE => $realm },
-            'GROUP_ID' => { VALUE => 'root' },
-            'NOTBEFORE' => { VALUE => time(), OPERATOR => 'GREATER_THAN' },
+    $alias = $dbi->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => {
+            'pki_realm' => $realm,
+            'group_id' => 'root',
+            'notbefore' => { '>', time() },
         },
-        'ORDER' => [ 'NOTBEFORE' ],
-    );
-
-    $cert = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => { VALUE => $alias->{IDENTIFIER} }, },
+        order_by => '-notbefore',
     );
 
     print "upcoming root ca:\n";
-    __alias_print( $alias, $cert, $show_subject );
+    __alias_print( $alias, $show_subject );
 
 
     return 0;
@@ -797,30 +730,29 @@ sub alias_list {
 sub __alias_print {
 
     my $alias = shift;
-    my $cert = shift;
     my $subject = shift;
 
-    if (!$alias || !$alias->{ALIAS}) {
+    if (!$alias || !$alias->{alias}) {
         print "  not set\n\n";
         return;
     }
 
-    print "  Alias     : $alias->{ALIAS}\n";
-    print "  Identifier: $alias->{IDENTIFIER}\n";
+    my $cert = CTX('api')->get_cert({ IDENTIFIER => $alias->{identifier}, FORMAT => 'DBINFO' });
+
+    print "  Alias     : $alias->{alias}\n";
+    print "  Identifier: $alias->{identifier}\n";
 
     print "  Subject   : $cert->{SUBJECT}\n" if ($subject);
 
-    print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{NOTBEFORE} )->strftime("%F %T");
+    print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{notbefore} )->strftime("%F %T");
     print DateTime->from_epoch( epoch => $cert->{NOTBEFORE} )->strftime(" (%F %T)")
-        if ($cert && $cert->{NOTBEFORE} != $alias->{NOTBEFORE});
+        if ($cert && $cert->{NOTBEFORE} != $alias->{notbefore});
 
     print "\n";
-    print "  NotAfter  : " . DateTime->from_epoch( epoch => $alias->{NOTAFTER} )->strftime("%F %T");
+    print "  NotAfter  : " . DateTime->from_epoch( epoch => $alias->{notafter} )->strftime("%F %T");
 
     print DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime(" (%F %T)")
-        if ($cert && $cert->{NOTAFTER} != $alias->{NOTAFTER});
-
-
+        if ($cert && $cert->{NOTAFTER} != $alias->{notafter});
 
     print "\n\n";
 
@@ -846,26 +778,23 @@ sub certificate_chain {
         $issuer_name = $params{issuer};
     }
 
-    my $dbi = __get_dbi();
-
     # maybe the certificate name is an alias, try to resolve it
-    my $cert_identifier = __resolve_alias(
-        {
-            DBI   => $dbi,
-            NAME  => $cert_name,
-            REALM => $params{realm},
+    my $cert_identifier = __resolve_alias({
+        NAME  => $cert_name,
+        REALM => $params{realm},
+    });
+
+    # check whether the certificate is in the DB
+    my $certificate = CTX('dbi')->select_one(
+        columns => [ '*' ],
+        from => 'certificate',
+        where => {
+            'identifier' => $cert_identifier,
+            pki_realm  => $params{realm}
         }
     );
 
-    # check whether the certificate is in the DB
-    my $certificate = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => {
-            IDENTIFIER => $cert_identifier,
-            PKI_REALM  => $params{realm}
-        },
-    );
-    if (   !defined $certificate
+    if ( !defined $certificate
         && !defined $params{'force-certificate-not-found'} )
     {
         print STDERR "ERROR: Certificate '$cert_name' not found in realm "
@@ -883,20 +812,20 @@ sub certificate_chain {
     else {
         $realm = $params{realm};
     }
-    $issuer_identifier = __resolve_alias(
-        {
-            DBI   => $dbi,
-            NAME  => $issuer_name,
-            REALM => $realm,
-        }
-    );
+    $issuer_identifier = __resolve_alias({
+        NAME  => $issuer_name,
+        REALM => $realm,
+    });
 
+    my $dbi = CTX('dbi');
     # check whether the issuer is in the DB
-    my $issuer = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => { IDENTIFIER => $issuer_identifier, },
+    my $issuer = $dbi->select_one(
+        columns => [ '*' ],
+        from => 'certificate',
+        where => {
+            'identifier' => $issuer_identifier},
     );
-    if (   !defined $issuer
+    if ( !defined $issuer
         && !defined $params{'force-issuer-certificate-not-found'} )
     {
         print STDERR "ERROR: Issuer certificate '$issuer_name' "
@@ -906,12 +835,12 @@ sub certificate_chain {
 
     # set the issuer_identifier for the given certificate
     $dbi->update(
-        TABLE => 'CERTIFICATE',
-        DATA  => { ISSUER_IDENTIFIER => $issuer_identifier, },
-        WHERE => {
-            CERTIFICATE_SERIAL => $certificate->{CERTIFICATE_SERIAL},
-            IDENTIFIER         => $cert_identifier,
-            PKI_REALM          => $certificate->{PKI_REALM},
+        table => 'certificate',
+        set  => { issuer_identifier => $issuer_identifier },
+        where => {
+            cert_key => $certificate->{cert_key},
+            identifier      => $cert_identifier,
+            pki_realm       => $certificate->{pki_realm},
         },
     );
     $dbi->commit();
@@ -921,17 +850,17 @@ sub certificate_chain {
 
     # TODO: maybe don't warn only, but let the user use --force to
     # specify that he knows what he is doing ...?
-    if ( $issuer->{SUBJECT_KEY_IDENTIFIER} ne
-        $certificate->{AUTHORITY_KEY_IDENTIFIER} )
+    if ( $issuer->{subject_key_identifier} ne
+        $certificate->{authority_key_identifier} )
     {
         print STDERR "WARNING: The issuer's subject key identifier "
           . "extension ($issuer->{SUBJECT_KEY_IDENTIFIER}) does not "
           . "match the authority key identifier extension contained "
           . "in the certificate "
-          . "($certificate->{AUTHORITY_KEY_IDENTIFIER}). Are you sure "
+          . "($certificate->{authority_key_identifier}). Are you sure "
           . "your chain is correct?\n";
     }
-    if ( $issuer->{SUBJECT} ne $certificate->{ISSUER_DN} ) {
+    if ( $issuer->{subject} ne $certificate->{issuer_dn} ) {
         print STDERR "WARNING: The issuer's subject ($issuer->{SUBJECT}) "
           . "does not match the issuer DN contained in the certificate "
           . "($certificate->{ISSUER_DN}). Are you sure your chain is "
@@ -948,11 +877,11 @@ sub certificate_list {
         push @realms, $params{realm};
     }
     else {
-        @realms = CTX('config')->get_keys('system.realms');
-        push @realms, undef;    # add the magic empty realm
+        @realms = CTX('config')->get_keys(['system','realms']);
+        push @realms, undef;  # add the magic empty realm
     }
 
-    my $dbi = __get_dbi();
+    my $dbi = CTX('dbi');
     foreach my $realm (@realms) {
         if ( defined $realm ) {
             print "\nCertificates in $realm:\n";
@@ -963,83 +892,79 @@ sub certificate_list {
         my $certificates;
         if ( defined $params{all} ) {
             $certificates = $dbi->select(
-                TABLE   => 'CERTIFICATE',
-                DYNAMIC => { PKI_REALM => $realm, },
+                from   => 'certificate',
+                columns => ['*'],
+                where => { pki_realm => $realm, },
             );
         }
         else {
             $certificates = $dbi->select(
-                TABLE   => [ 'ALIASES', 'CERTIFICATE' ],
-                COLUMNS => [
-                    'ALIASES.ALIAS',
-                    'ALIASES.IDENTIFIER',
-                    'CERTIFICATE.SUBJECT',
-                    'CERTIFICATE.ISSUER_DN',
-                    'CERTIFICATE.CERTIFICATE_SERIAL',
-                    'CERTIFICATE.ISSUER_IDENTIFIER',
-                    'CERTIFICATE.DATA',
-                    'CERTIFICATE.STATUS',
-                    'CERTIFICATE.PUBKEY',
-                    'CERTIFICATE.SUBJECT_KEY_IDENTIFIER',
-                    'CERTIFICATE.AUTHORITY_KEY_IDENTIFIER',
-                    'CERTIFICATE.NOTAFTER',
-                    'CERTIFICATE.LOA',
-                    'CERTIFICATE.NOTBEFORE',
-                    'CERTIFICATE.CSR_SERIAL',
+                from_join   => 'aliases aliases.identifier=certificate.identifier certificate',
+                columns => [
+                    'aliases.alias',
+                    'aliases.identifier',
+                    'certificate.subject',
+                    'certificate.issuer_dn',
+                    'certificate.cert_key',
+                    'certificate.issuer_identifier',
+                    'certificate.data',
+                    'certificate.status',
+                    'certificate.public_key',
+                    'certificate.subject_key_identifier',
+                    'certificate.authority_key_identifier',
+                    'certificate.notafter',
+                    'certificate.loa',
+                    'certificate.notbefore',
+                    'certificate.req_key',
                 ],
-                JOIN => [ [ 'IDENTIFIER', 'IDENTIFIER', ], ],
-                DYNAMIC => { 'ALIASES.PKI_REALM' => $realm, },
+                where => { 'aliases.pki_realm' => $realm, },
             );
         }
-        for ( my $i = 0 ; $i < scalar @{$certificates} ; $i++ ) {
-            my $cert = $certificates->[$i];
+
+        while (my $cert = $certificates->fetchrow_hashref) {
             my $identifier;
             if ( defined $params{all} ) {    # look up aliases
-                $identifier = $cert->{IDENTIFIER};
-                my $status = $cert->{STATUS};
+                $identifier = $cert->{identifier};
+                my $status = $cert->{status};
                 if ( defined $status && $status eq 'REVOKED' ) {
                     print "\n  Identifier: "
-                      . $cert->{IDENTIFIER}
+                      . $cert->{identifier}
                       . " (REVOKED)\n";
                 }
                 else {
-                    print "\n  Identifier: " . $cert->{IDENTIFIER} . "\n";
+                    print "\n  Identifier: " . $cert->{identifier} . "\n";
                 }
                 my $aliases = $dbi->select(
-                    TABLE   => 'ALIASES',
-                    DYNAMIC => { IDENTIFIER => $cert->{IDENTIFIER}, },
+                    from   => 'aliases',
+                    columns => ['*'],
+                    where => { identifier => $cert->{identifier}, },
                 );
-                for ( my $j = 0 ; $j < scalar @{$aliases} ; $j++ ) {
+                while (my $alias = $aliases->fetchrow_hashref) {
                     print "    Alias:\n      "
-                      . $aliases->[$j]->{ALIAS}
-                      . " (in realm: "
-                      . $aliases->[$j]->{PKI_REALM} . ")\n";
+                      . $alias->{alias} . " (in realm: " . $alias->{pki_realm} . ")\n";
                 }
             }
             else {
-                $identifier = $cert->{'ALIASES.IDENTIFIER'};
-                my $status = $cert->{'CERTIFICATE.STATUS'};
+                $identifier = $cert->{'identifier'};
+                my $status = $cert->{'status'};
                 if ( defined $status && $status eq 'REVOKED' ) {
                     print "\n  Identifier: "
-                      . $cert->{'ALIASES.IDENTIFIER'}
+                      . $cert->{'identifier'}
                       . " (REVOKED)\n";
                 }
                 else {
-                    print "\n  Identifier: "
-                      . $cert->{'ALIASES.IDENTIFIER'} . "\n";
+                    print "\n  Identifier: " . $cert->{'identifier'} . "\n";
                 }
-                print "    Alias:\n       "
-                  . $cert->{'ALIASES.ALIAS'} . "\n";
+                print "    Alias:\n      "
+                  . $cert->{'alias'} . "\n";
             }
+
             my $prefix = '';
-            if ( !defined $params{all} ) {
-                $prefix = 'CERTIFICATE.';
-            }
             if ( defined $params{v} && $params{v} > 0 ) {
 
                 # show subject and issuer dn
-                my $subject   = $cert->{ $prefix . 'SUBJECT' };
-                my $issuer_dn = $cert->{ $prefix . 'ISSUER_DN' };
+                my $subject   = $cert->{ 'subject' };
+                my $issuer_dn = $cert->{ 'issuer_dn' };
                 print "    Subject:\n      " . $subject . "\n";
                 print "    Issuer DN:\n      " . $issuer_dn . "\n";
             }
@@ -1051,7 +976,7 @@ sub certificate_list {
                   $api->get_chain( { START_IDENTIFIER => $identifier, } );
                 my $chain_str = join( ' -> ', @{ $chain->{IDENTIFIERS} } );
 
-                print "    Chain: $chain_str ";
+                print "    Chain:\n      $chain_str";
                 if ( $chain->{COMPLETE} == 1 ) {
                     print "(complete)\n";
                 }
@@ -1063,29 +988,29 @@ sub certificate_list {
 
                 # show database entry
                 my @fields = qw(
-                  SUBJECT_KEY_IDENTIFIER
-                  AUTHORITY_KEY_IDENTIFIER
-                  CERTIFICATE_SERIAL
-                  ISSUER_IDENTIFIER
-                  STATUS
-                  NOTAFTER
-                  NOTBEFORE
-                  CSR_SERIAL
-                  LOA
+                  subject_key_identifier
+                  authority_key_identifier
+                  cert_key
+                  issuer_identifier
+                  status
+                  notafter
+                  notbefore
+                  req_key
                 );
 
                 if ( $params{v} > 3 ) {
-                    push @fields, qw(PUBKEY DATA);
+                    push @fields, qw(public_key data);
                 }
 
                 foreach my $field (@fields) {
                     my $value;
-                    if ( defined $cert->{ $prefix . $field } ) {
-                        $value = $cert->{ $prefix . $field };
+                    if ( defined $cert->{ $field } ) {
+                        $value = $cert->{ $field };
                     }
                     else {
                         $value = 'NULL';
                     }
+                    $field =~ s/_/ /g;
                     print "    $field:\n      " . $value . "\n";
                 }
             }
@@ -1101,19 +1026,19 @@ sub alias_del {
     $delete_hash{PKI_REALM} = $params{realm};
 
     if ($params{identifier}) {
-        $delete_hash{IDENTIFIER} = $params{identifier};
+        $delete_hash{identifier} = $params{identifier};
     } elsif ($params{alias}) {
-        $delete_hash{ALIAS} = $params{alias};
+        $delete_hash{alias} = $params{alias};
     } else {
         print STDERR "You must specify either --identifier or --alias\n";
         return 1;
     }
 
-    my $dbi = __get_dbi();
-
-    my $alias = $dbi->first(
-        TABLE   => 'ALIASES',
-        DYNAMIC => \%delete_hash,
+    my $dbi = CTX('dbi');
+    my $alias = $dbi->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => \%delete_hash,
     );
 
     if (!$alias) {
@@ -1121,15 +1046,18 @@ sub alias_del {
         return 2;
     }
 
-    $dbi->delete(TABLE => 'ALIASES', DATA => {
-        ALIAS => $alias->{ALIAS},
-        PKI_REALM => $alias->{PKI_REALM},
-    });
+    $dbi->delete(
+        from => 'aliases',
+        where => {
+            alias => $alias->{alias},
+            pki_realm => $alias->{pki_realm},
+        }
+    );
     $dbi->commit();
 
-    print "Successfully removed the alias $alias->{ALIAS}:\n";
-    print "   Identifier: $alias->{IDENTIFIER}\n";
-    print "   Realm:      $alias->{PKI_REALM}\n";
+    print "Successfully removed the alias $alias->{alias}:\n";
+    print "   Identifier: $alias->{identifier}\n";
+    print "   Realm:      $alias->{pki_realm}\n";
 
     return 0;
 
@@ -1137,7 +1065,7 @@ sub alias_del {
 
 sub key_list {
 
-    my $dbi = __get_dbi();
+    my $dbi = CTX('dbi');
     my $config = CTX('config');
     my $realm = $params{realm};
 
@@ -1145,28 +1073,29 @@ sub key_list {
     # We use the alias table to find all keys in the realm
     # For the moment we assume the keys are defined explicit in the config
     # this will change in the future when we allow autodiscovery and default inheritance
-    my $token_class = $config->get_hash("realm.$realm.crypto.type");
+    my $token_class = $config->get_hash(['realm',$realm,'crypto','type']);
 
     foreach my $class (keys %{$token_class}) {
         my $db_alias = $dbi->select(
-            TABLE   => 'ALIASES',
-            DYNAMIC => {
-                GROUP_ID     => $token_class->{$class},
-                PKI_REALM => $realm,
+            from    => 'aliases',
+            columns => ['*'],
+            where => {
+                group_id     => $token_class->{$class},
+                pki_realm => $realm,
             },
         );
 
         print "Keys for token group $token_class->{$class}\n";
-        foreach my $entry (@{ $db_alias }) {
-            my $alias = $entry->{ALIAS};
-            my $key = $config->get("realm.$realm.crypto.token.$alias.key");
+        while (my $entry = $db_alias->fetchrow_hashref) {
+            my $alias = $entry->{alias};
+            my $key = $config->get(['realm',$realm,'crypto','token',$alias,'key']);
 
             my $status_flag = '?';
             if (!$key) {
                 $status_flag = 'c';
-            }elsif ( -e $key && ( !-s $key ) ) {
+            } elsif ( -e $key && ( !-s $key ) ) {
                 $status_flag = '0';    # file exists but is of size zero
-            }   elsif ( -e $key ) {        # file exists and is non-zero
+            } elsif ( -e $key ) {        # file exists and is non-zero
                 $status_flag = '+';
             } else {                     # file does not exist (yet)
                 $status_flag = '!';
@@ -1235,36 +1164,24 @@ sub hash_password {
     return 0;
 }
 
-sub __get_dbi {
-
-    my $dbi = CTX('dbi_backend');
-    if ( !defined $dbi ) {
-        die "ERROR: Could not instantiate database backend\n";
-    }
-    $dbi->connect();
-    return $dbi;
-}
-
 sub __resolve_alias {
 
     my $arg_ref = shift;
-    my $dbi     = $arg_ref->{DBI};
-    my $name    = $arg_ref->{NAME};
-    my $realm   = $arg_ref->{REALM};
-
-    my $alias = $dbi->first(
-        TABLE   => 'ALIASES',
-        DYNAMIC => {
-            ALIAS     => $name,
-            PKI_REALM => $realm,
-        },
+    my $alias = CTX('dbi')->select_one(
+        from => 'aliases',
+        columns => [ 'identifier' ],
+        where => {
+            'alias'     => $arg_ref->{NAME},
+            'pki_realm' => $arg_ref->{REALM},
+        }
     );
-    if ( defined $alias ) {
-        return $alias->{IDENTIFIER};
+
+    if (!$alias->{identifier}) {
+        # likely it was an identifier already
+        return $arg_ref->{NAME};
     }
-    else {
-        return $name;
-    }
+    return $alias->{identifier};
+
 }
 
 sub __init {
@@ -1301,9 +1218,7 @@ eval {
 if ($cmd eq 'initdb') {
 
     push @options_spec, qw(dry-run force);
-    __init();
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned'], SILENT => 1,});
-    $ret = initdb();
+    die "initdb is no longer supported!\nPlease use the provided schema dumps to setup your database.";
 
 } elsif ($cmd eq 'certificate') {
 
@@ -1316,7 +1231,8 @@ if ($cmd eq 'initdb') {
             format=s
         );
         __init();
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
+
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         $ret = certificate_id();
 
@@ -1346,7 +1262,7 @@ if ($cmd eq 'initdb') {
 
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         if (!$params{file}) {
             die "You need to specify the certificate to import with --file\n";
@@ -1369,7 +1285,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         __check_realm() if ($params{realm});
 
@@ -1380,13 +1296,14 @@ if ($cmd eq 'initdb') {
         push @options_spec, qw(
             issuer=s
             issuer-realm=s
+            realm=s
             name=s
             force-certificate-not-found
             force-issuer-certificate-not-found
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         $ret = certificate_chain();
 
@@ -1399,7 +1316,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi_backend','dbi'], SILENT => 1, CLI => 1});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
         __check_realm();
 
@@ -1426,13 +1343,15 @@ if ($cmd eq 'initdb') {
     );
     __init();
 
-    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','dbi_backend','dbi'], SILENT => 1, CLI => 1});
-
+    OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api','dbi'], SILENT => 1, CLI => 1});
+    
     __check_realm();
 
-    if ($params{remove}) {
+    my $subcmd = shift || '';
+
+    if ($params{remove} || $subcmd eq 'remove') {
         $ret = alias_del();
-    } elsif ($params{update}) {
+    } elsif ($params{update}  || $subcmd eq 'update') {
         $ret = alias_update();
     } elsif (!$params{identifier}) {
         $ret = alias_list();
@@ -1441,7 +1360,7 @@ if ($cmd eq 'initdb') {
     }
 } elsif ($cmd eq 'key') {
 
-    my $subcmd = shift;
+    my $subcmd = shift || '';
 
     if ($subcmd eq 'list') {
 
@@ -1450,7 +1369,7 @@ if ($cmd eq 'initdb') {
         );
         __init();
 
-        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi_backend','dbi'], SILENT => 1,});
+        OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','api','dbi'], SILENT => 1,});
 
         __check_realm();
 
@@ -1517,7 +1436,6 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
    help                  brief help message
    man                   full documentation
    version               print program version and exit
-   initdb                Initialize database
    key                   Manage keys
    certificate           Manage certificates
    hashpwd               Create the salted hash for a password
@@ -1529,14 +1447,7 @@ Available commands:
 
 =head2 initdb
 
-Command options:
-
-   --force               Force operation (may be destructive)
-   --dryrun              Don't change anything, just print what would
-                         be done
-
-Initializes the OpenXPKI database schema. Will not destroy existing data
-unless called with --force.
+Command was removed, use provided sql schema dumps to create database.
 
 =head2 key
 

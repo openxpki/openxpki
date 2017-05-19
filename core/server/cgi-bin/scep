@@ -133,6 +133,8 @@ else {
     }
     my $result = $scep_client->send_request($params);
     print $result;
+    
+    $scep_client->detach();
 }
 
 =head1 Description

@@ -172,7 +172,7 @@ sub init_load {
         my @activities = @{$wf_info->{STATE}->{option}};
         
         # Do not count global_cancel as alternative selection
-        if (scalar @activities == 1 || (scalar @activities == 2 && $activities[1] eq 'global_cancel')) {
+        if (scalar @activities == 1 || (scalar @activities == 2 && (grep /global_cancel/, @activities))) {
             $wf_action = $activities[0];
             $self->logger()->debug('Autoselect action ' . $wf_action );
         }
@@ -996,28 +996,32 @@ sub action_index {
         return $self;
     }
 
+
+    # Check if we can auto-load the next available action
+    my $wf_action;
+    my @activities = keys %{$wf_info->{ACTIVITY}};
+    if (scalar @activities == 1 || (scalar @activities == 2 && (grep /global_cancel/, @activities))) {
+        $wf_action = $activities[0];
+    }
+    
     # If we call the token action from within a result list we want
     # to "break out" and set the new url instead rendering the result inline
     if ($wf_args->{redirect}) {
         # Check if we can auto-load the next available action
         my $redirect = 'workflow!load!wf_id!'.$wf_info->{WORKFLOW}->{ID};
-        my @activity = keys %{$wf_info->{ACTIVITY}};
-        if (scalar @activity == 1) {
-            $redirect .= '!wf_action!'.$activity[0];
+        if ($wf_action) {
+            $redirect .= '!wf_action!'.$wf_action;
         }
         $self->redirect($redirect);
         return $self;
     }
 
-    # Check if we can auto-load the next available action
-    my $wf_action;
-    my @activity = keys %{$wf_info->{ACTIVITY}};
-    if (scalar @activity == 1 && 
+    if ($wf_action && 
         (ref $wf_info->{STATE}->{output} ne 'ARRAY' || scalar(@{$wf_info->{STATE}->{output}}) == 0)) {        
-        $wf_action = $activity[0];
+        $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action });
+    } else {
+        $self->__render_from_workflow({ WF_INFO => $wf_info });
     }
-
-    $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action });
 
     return $self;
 
@@ -1065,12 +1069,12 @@ sub action_handle {
     } elsif ($wf_args->{wf_handle} eq 'wakeup') {
         $self->logger()->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
         $wf_info = $self->send_command( 'wakeup_workflow', {
-            ID => $wf_args->{wf_id}, ASYNC => 'watch',
+            ID => $wf_args->{wf_id}, # ASYNC => 'watch', not working see #517
         });
     } elsif ($wf_args->{wf_handle} eq 'resume') {
         $self->logger()->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
         $wf_info = $self->send_command( 'resume_workflow', {
-            ID => $wf_args->{wf_id},  ASYNC => 'watch',
+            ID => $wf_args->{wf_id}, # ASYNC => 'watch', not working see #517
         });
         
     } 

@@ -158,6 +158,8 @@ sub __dispatch_revoke {
         $res = { error => '', id => $workflow->{ID}, 'state' => $workflow->{'STATE'} };
     }
     
+    $client->disconnect();
+    
     return SOAP::Data->new( name => 'result', value => $res );
     
 }

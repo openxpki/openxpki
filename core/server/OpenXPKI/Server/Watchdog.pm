@@ -77,6 +77,7 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use Proc::ProcessTable;
+use POSIX;
 
 use Net::Server::Daemonize qw( set_uid set_gid );
 
@@ -204,11 +205,20 @@ sub run {
     }
 
     $SIG{CHLD} = 'IGNORE';
+    my $sigint = POSIX::SigSet->new(SIGINT);
     while ( !defined $pid and $redo_count < $self->max_fork_redo ) {
+        # block SIGINT during fork and initialization
+        sigprocmask(SIG_BLOCK, $sigint)
+            or OpenXPKI::Exception->throw(
+                message => 'Unable to block SIGINT before fork()',
+                log => { priority => 'fatal', facility => 'system' }
+            );
+
         ##! 16: 'trying to fork'
         $pid = fork();
         ##! 16: 'pid: ' . $pid
         if ( !defined $pid ) {
+            sigprocmask(SIG_UNBLOCK, $sigint); # unblock SIGINT for parent
             if ( $!{EAGAIN} ) {
                 # recoverable fork error
                 sleep 2;
@@ -225,15 +235,12 @@ sub run {
             }
         }
     }
+    sigprocmask(SIG_UNBLOCK, $sigint) if ($pid or not defined $pid); # unblock SIGINT for parent
 
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED_MAX_REDO',
-        log => {
-            priority => 'fatal',
-            facility => 'system',
-        }
-    ) unless (defined $pid);
-
+        log => { priority => 'fatal', facility => 'system' }
+    ) unless defined $pid;
 
     # Reconnect the dbi
     CTX('dbi_backend')->new_dbh();
@@ -248,6 +255,11 @@ sub run {
     $SIG{'HUP'} = \&OpenXPKI::Server::Watchdog::_sig_hup;
     $SIG{'TERM'} = \&OpenXPKI::Server::Watchdog::_sig_term;
 
+    umask 0;
+    chdir '/';
+    open STDIN,  '<', '/dev/null';
+    open STDOUT, '>', '/dev/null';
+    open STDERR, '>', '/dev/null';
 
     # The caller sets the watchdog only in the global context
     # we reuse the context to set a pointer to ourselves for signal handling
@@ -279,6 +291,8 @@ sub run {
 
     # Force new session as the initialized session is a Mock-Session which we can not use!
     $self->__check_session(1);
+
+    sigprocmask(SIG_UNBLOCK, $sigint);
 
     CTX('log')->log(
         MESSAGE  => sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
@@ -542,19 +556,6 @@ sub __scan_for_paused_workflows {
         pki_realm           => $workflow->{pki_realm},
     });
 
-    # security measure: for child processes no further than here! (all childprocesses in WorkflowInstance should
-    # exit properly and handle their exceptions on their own... but just in case...)
-    # $self->{original_pid} == PID of Watchdog process
-    if( $self->{original_pid} ne $PID ){
-        ##! 16: sprintf('exit this process: current pid %s is not the watchdog pid %s' , $PID, $self->{original_pid});
-        CTX('log')->log(
-            MESSAGE  => "Resumed workflow in child process did not exit properly",
-            PRIORITY => "fatal",
-            FACILITY => "system"
-        );
-        exit;
-    }
-
     return $wf_id;
 }
 
@@ -641,6 +642,55 @@ sub __wake_up_workflow {
     my $self = shift;
     my $args = shift;
 
+    my $pid;
+    my $redo_count = 0;
+
+    $SIG{'CHLD'} = sub { wait; };
+    while ( !defined $pid && $redo_count < 5 ) {
+        ##! 16: 'trying to fork'
+        $pid = fork();
+        ##! 16: 'pid: ' . $pid
+        if ( !defined $pid ) {
+            if ( $!{EAGAIN} ) {
+
+                # recoverable fork error
+                sleep 2;
+                $redo_count++;
+            } else {
+
+                # other fork error
+                OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_EXECUTION_FAILED', );
+            }
+        }
+    }
+
+    OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_EXECUTION_FAILED' )
+        unless( defined $pid );
+
+    # Reconnect the db handles
+    CTX('dbi_backend')->new_dbh();
+    CTX('dbi_backend')->connect();
+
+    if ( $pid != 0 ) {
+        ##! 16: ' Workflow instance succesfully forked - I am the watchdog'
+        # parent here - noop
+        return $pid;
+    }
+
+    #
+    # Child process from here on
+    #
+
+    ##! 16: ' Workflow instance succesfully forked - I am the workflow'
+    # We need to unset the child reaper (waitpid) as the universal waitpid
+    # causes problems with Proc::SafeExec
+    $SIG{CHLD} = 'DEFAULT';
+
+    # Re-seed Perl random number generator
+    srand(time ^ $PROCESS_ID);
+
+    OpenXPKI::Server::__set_process_name("workflow: id %d (watchdog)", $args->{workflow_id});
+
     # errors here are fork errors and we dont want the watchdog to die!
     eval {
         $self->__check_session();
@@ -649,12 +699,14 @@ sub __wake_up_workflow {
         CTX('session')->import_serialized_info($args->{workflow_session});
 
         ##! 1: 'call wakeup'
-
         my $wf_info = CTX('api')->wakeup_workflow({
             WORKFLOW => $args->{workflow_type},
             ID => $args->{workflow_id},
-            ASYNC => 'fork'
+            # ASYNC => 'fork' # fork inside API causes issues with SIGCHLD
         });
+
+        ##! 32: 'wakeup returned ' . Dumper $wf_info
+
     };
     my $error_msg;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
@@ -674,8 +726,8 @@ sub __wake_up_workflow {
         return $error_msg;
     }
 
-    return 0;
-
+    # The child MUST TERMINATE!
+    exit;
 }
 
 

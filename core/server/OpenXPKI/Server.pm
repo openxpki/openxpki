@@ -856,6 +856,7 @@ sub __set_process_name {
     if (@args) {
         $identity = sprintf $identity, @args;
     }
+    
     my $alias = CTX('config')->get(['system','server','name']) || 'main';
     $0 = "openxpkid ($alias) $identity";
     return;
