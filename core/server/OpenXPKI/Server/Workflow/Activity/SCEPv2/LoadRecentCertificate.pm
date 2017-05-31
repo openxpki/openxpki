@@ -29,7 +29,7 @@ sub execute {
     # select current certificate from database
     my $cert = $dbi->select_one(
         from => 'certificate',
-        columns => [ 'subject', 'req_key', 'notbefore', 'notafter' ],
+        columns => [ 'subject', 'req_key', 'notbefore', 'notafter', 'identifier' ],
         where => {
             identifier => $cert_identifier,
             status    => 'ISSUED',
