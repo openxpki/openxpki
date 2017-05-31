@@ -24,7 +24,7 @@ if [ $installed -eq 0 ]; then
     echo "Installing OpenXPKI package dependencies"
     apt update                                                        >$LOG 2>&1
     DEBIAN_FRONTEND=noninteractive \
-     apt-get -q=2 install libapache2-mod-fcgid libssl-dev             >$LOG 2>&1
+     apt-get -q=2 install apache2 libapache2-mod-fcgid libssl-dev     >$LOG 2>&1
     set +e
 fi
 
