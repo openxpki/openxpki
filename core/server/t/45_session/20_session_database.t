@@ -14,6 +14,7 @@ use Test::Deep;
 # Project modules
 use lib "$Bin/../lib";
 use OpenXPKI::Server::Log;
+use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Test;
 
 
@@ -28,7 +29,9 @@ plan tests => 8;
 my $oxitest = OpenXPKI::Test->new;
 $oxitest->setup_env->init_server;
 
-my $log = OpenXPKI::Server::Log->new(CONFIG => "$Bin/log4perl.conf");
+my $log = $ENV{VERBOSE}
+    ? OpenXPKI::Server::Log->new(CONFIG => "$Bin/log4perl.conf")
+    : OpenXPKI::Server::Log::NOOP->new;
 
 #
 # Tests
