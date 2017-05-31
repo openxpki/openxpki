@@ -36,33 +36,32 @@ sub execute {
             OpenXPKI::Exception->throw( message =>
                         'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_NAMESPACE');
         };
-    
+
         $params->{NAMESPACE} = $self->param('ds_namespace');
-    
+
         if (!$self->param('ds_key_name') && !$self->param('ds_key_param')) {
             OpenXPKI::Exception->throw( message =>
                         'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_KEY');
         };
-        
-        if ($self->param('ds_key_param')) {   
+
+        if ($self->param('ds_key_param')) {
             $params->{KEY} = $context->param( $self->param('ds_key_param') );
         } else {
             $params->{KEY} = $self->param('ds_key_name');
         }
-        
+
     }
-     
+
     $params->{VALUE} = undef;
 
-      
+
     CTX('log')->log(
         MESSAGE => 'Remove datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE},
         PRIORITY => 'info',
         FACILITY => [ 'application' ],
     );
-    
+
     CTX('api')->set_data_pool_entry($params);
-    CTX('dbi_backend')->commit();
     return 1;
 }
 
@@ -85,7 +84,7 @@ This class deletes an entry from the Datapool, defined by namespace and key.
 
 =item namespace
 
-=item key 
+=item key
 
 =back
 
@@ -110,5 +109,5 @@ datastore entry.
 =item ds_key_name
 
 The name of the key for the datastore entry.
- 
-=back 
+
+=back

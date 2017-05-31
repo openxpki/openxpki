@@ -9,7 +9,7 @@ use OpenXPKI::Client;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
-diag("Certificate revocation list workflow\n") if $ENV{VERBOSE};
+note("Certificate revocation list workflow\n");
 
 # reuse the already deployed server
 my $socketfile = 't/var/openxpki/openxpki.socket';
@@ -67,5 +67,5 @@ ok($openssl_output =~ m{ Cessation\ Of\ Operation }xms,
 eval {
     $msg = $client->send_receive_service_msg('LOGOUT');
 };
-diag "Terminated connection" if $ENV{VERBOSE};
+note "Terminated connection";
 }

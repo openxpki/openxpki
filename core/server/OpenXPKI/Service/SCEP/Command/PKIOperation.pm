@@ -77,7 +77,7 @@ sub execute {
                 PKCS7 => $pkcs7_base64,
                 PARAMS => $url_params,
             }
-        );      
+        );
         $result = $resp->[1];
         if ($resp->[0] && (ref $resp->[0] eq 'ARRAY')) {
             @extra_header = @{$resp->[0]};
@@ -105,7 +105,7 @@ sub execute {
         );
     }
     elsif ( $message_type_ref->{MESSAGE_TYPE_NAME} eq 'GetCRL' ) {
-        
+
         ##! 32: 'PKCS7 GetCRL ' . $pkcs7_base64
         $result = $self->__send_crl(
             {   TOKEN => $token,
@@ -125,11 +125,11 @@ sub execute {
         );
     }
 
-    push @extra_header, "Content-Type: application/x-pki-message"; 
+    push @extra_header, "Content-Type: application/x-pki-message";
     my $header = join("\n", @extra_header );
     return $self->command_response( $header . "\n\n" . $result);
 }
- 
+
 
 =head2 __send_cert
 
@@ -225,31 +225,31 @@ sub __send_crl : PRIVATE {
     my $token = $arg_ref->{TOKEN};
     my $pkcs7_base64 = $arg_ref->{PKCS7};
     my $pkcs7_decoded = decode_base64($pkcs7_base64);
-    
+
     my $requested_issuer_serial = $token->command({
         COMMAND => 'get_getcrl_issuer_serial',
         PKCS7   => $pkcs7_decoded
     });
-    
+
     ##! 16: 'Issuer Serial ' . Dumper $requested_issuer_serial
-    
+
     # convert serial to decimal
     my $mbi = Math::BigInt->from_hex( $requested_issuer_serial->{SERIAL} );
     my $issuer_serial = scalar $mbi->bstr();
-    
+
     # from scep draft (as of March 2015)
     # ..containing the issuer name and serial number of
     # the certificate whose revocation status is being checked.
     # -> we search for this entity certificate and grab the issuer from the
     # certificate table, this will also catch situations where the Issuer DN
-    # is reused over generations as the serial inside OXI is unique  
-   
+    # is reused over generations as the serial inside OXI is unique
+
     my $res = CTX('api')->search_cert({
         PKI_REALM => '_ANY',
         ISSUER_DN => $requested_issuer_serial->{ISSUER},
         CERT_SERIAL => $issuer_serial,
     });
-    
+
     if (!$res || scalar @{$res} != 1) {
           CTX('log')->log(
             MESSAGE => "SCEP getcrl - no issuer found for serial $issuer_serial and issuer " . $requested_issuer_serial->{ISSUER},
@@ -265,15 +265,15 @@ sub __send_crl : PRIVATE {
             }
         );
     }
-    
+
     ##! 32: 'Issuer Info ' . Dumper $res
-    
+
     my $crl_res = CTX('api')->get_crl_list({
         ISSUER => $res->[0]->{ISSUER_IDENTIFIER},
         FORMAT => 'PEM',
         LIMIT => 1
     });
-    
+
     if (!scalar $crl_res) {
         return $token->command(
             {   COMMAND      => 'create_error_reply',
@@ -285,8 +285,8 @@ sub __send_crl : PRIVATE {
     }
 
     ##! 32: 'CRL Result ' . Dumper $crl_res
-    my $crl_pem = $crl_res->[0];  
-    
+    my $crl_pem = $crl_res->[0];
+
     my $result = $token->command(
         {   COMMAND        => 'create_crl_reply',
             PKCS7          => $pkcs7_decoded,
@@ -359,7 +359,6 @@ sub __pkcs_req : PRIVATE {
     my $wf_info; # filled in either one of the branches
 
     # Search transaction id in datapool
-    CTX('dbi_backend')->commit();
     my $res = CTX('api')->get_data_pool_entry({
         NAMESPACE => 'scep.transaction_id',
         KEY => "$server:$transaction_id",
@@ -400,7 +399,7 @@ sub __pkcs_req : PRIVATE {
 
         # get workflow type and profile from config layer
         my $workflow_type = CTX('config')->get(['scep', $server, 'workflow_type']);
-        
+
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_NO_WORKFLOW_TYPE_DEFINED",
             params => {
@@ -416,7 +415,7 @@ sub __pkcs_req : PRIVATE {
             PRIORITY => 'info',
             FACILITY => 'application',
         );
-        
+
         # inject newlines if not already present
         # this is necessary for openssl / openca-scep to parse
         # the data correctly
@@ -548,11 +547,11 @@ sub __pkcs_req : PRIVATE {
                 HASH_ALG => CTX('session')->get_hash_alg(),
             }
         );
-        
+
         if ($wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'}) {
             push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
         }
-        
+
         return [ \@extra_header, $pending_msg ];
     }
 
@@ -617,9 +616,9 @@ sub __pkcs_req : PRIVATE {
     }
 
     ##! 32: 'FAILURE'
-    # must be one of the error codes defined in the SCEP protocol 
+    # must be one of the error codes defined in the SCEP protocol
     my $scep_error_code = $wf_info->{WORKFLOW}->{CONTEXT}->{'scep_error'};
-    
+
     if ( !defined $scep_error_code || ($scep_error_code !~ m{ badAlg | badMessageCheck | badTime | badCertId }xms)) {
         CTX('log')->log(
             MESSAGE => "SCEP Request failed without error code set - default to badRequest",
@@ -645,7 +644,7 @@ sub __pkcs_req : PRIVATE {
     if ($wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'}) {
         push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
     }
-            
+
 
     return [ \@extra_header, $error_msg ];
 }

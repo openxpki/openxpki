@@ -45,11 +45,10 @@ sub purge_application_log {
     my ($self, $args)  = @_;
     ##! 1: "purge_application_log"
 
-    my $dbi = CTX('dbi');
     my $maxage = $args->{MAXAGE} // 60*60*24*180;  #  180 days
     my $maxutc = get_utc_time( time - $maxage );
 
-    return $dbi->delete_and_commit(
+    return CTX('dbi_log')->delete(
         from => 'application_log',
         where => { logtimestamp => { "<", $maxutc } },
     );

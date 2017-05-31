@@ -67,7 +67,7 @@ my %cert_info = (
 my %cert_subject_alt_name_parts = (
 );
 
-diag "CSR Subject: $sSubject\n" if $ENV{TEST_VERBOSE};
+note "CSR Subject: $sSubject\n";
 
 $test->create_ok( 'certificate_signing_request_v2' , {
     cert_profile => $cfg{csr}{profile},
@@ -114,12 +114,12 @@ my $msg = $test->get_client->send_receive_command_msg('get_workflow_info', { ID 
 my $actions = $msg->{PARAMS}->{STATE}->{option};
 my $intermediate_state;
 if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
-    diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
+    note "Test FQDNs do not resolve - handling policy violation";
     $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
     $intermediate_state ='PENDING_POLICY_VIOLATION';
 }
 else {
-    diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
+    note "For whatever reason test FQDNs do resolve - submitting request";
     $test->execute_ok( 'csr_submit' );
     $intermediate_state ='PENDING';
 }
@@ -161,7 +161,7 @@ $test->connect_ok(
 # Fetch certificate via API
 #
 my $cert_id = $test->param( 'cert_identifier' );
-diag "Test certificate ID: $cert_id" if $ENV{TEST_VERBOSE};
+note "Test certificate ID: $cert_id";
 
 #
 # Fetch private key

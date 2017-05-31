@@ -19,7 +19,7 @@ use OpenXPKI::DateTime;
 
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context) );
+__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context ) );
 
 my $default_reap_at_interval = '+0000000005';
 
@@ -67,9 +67,14 @@ sub init {
 
     $self->{_CURRENT_ACTION} = '';
 
+    # Workflow attributes (should be stored by persistor class).
+    # Values set to "undef" will be stored like that in $self->{_attributes},
+    # so the persister knows that these shall be deleted from the storage.
+    $self->{_attributes} = {};
+
     my $proc_state = 'init';
     my $count_try =  0;
-    
+
     # For existing workflows - check for the watchdog extra fields
     if ($id) {
         my $persister = $self->_factory()->get_persister( $config->{persister} );
@@ -78,7 +83,7 @@ sub init {
         # fetch additional infos from database:
         $count_try = $wf_info->{count_try} if ($wf_info->{count_try});
         $proc_state = $wf_info->{proc_state} if ($wf_info->{proc_state});
-        
+
         $self->wakeup_at( $wf_info->{wakeup_at} );
         $self->reap_at( $wf_info->{reap_at} );
     }
@@ -96,13 +101,13 @@ sub context {
     if (!$context && !$self->{context} ) {
         $self->{context} = OpenXPKI::Workflow::Context->new();
     }
-    
+
     return $self->SUPER::context( $context );
 }
 
 
 sub execute_action {
-    
+
     my ( $self, $action_name, $autorun ) = @_;
     ##! 1: 'execute_action '.$action_name
 
@@ -113,11 +118,11 @@ sub execute_action {
     ##! 32: 'session_info: '.$session_info
     $self->session_info($session_info);
 
-    # The workflow module internally caches conditions and does NOT clear 
-    # this cache if you just refetch a workflow! As the workflow state 
+    # The workflow module internally caches conditions and does NOT clear
+    # this cache if you just refetch a workflow! As the workflow state
     # object is shares, this leads to wrong states in the condition cache
     # if you reopen two different workflows in the same state!
-    
+
     my $wf_state = $self->_get_workflow_state->clear_condition_cache();
 
 
@@ -139,7 +144,7 @@ sub execute_action {
     }
 
     # skip auto-persist as this will happen on next call anyway
-    $self->set_reap_at_interval($reap_at_interval, 1); 
+    $self->set_reap_at_interval($reap_at_interval, 1);
 
     ##! 16: 'set proc_state "running"'
     $self->_set_proc_state('running'); # writes workflow metadata
@@ -158,10 +163,10 @@ sub execute_action {
 
     $self->persist_context(2);
     ##! 16: 'Run super::execute_action'
-    eval{        
-        $state = $self->SUPER::execute_action( $action_name, $autorun );        
+    eval{
+        $state = $self->SUPER::execute_action( $action_name, $autorun );
     };
-        
+
     ##! 16: 'super::execute_action returned'
 
     # As pause comes up with an exception we can never have pause + an extra exception
@@ -173,14 +178,14 @@ sub execute_action {
 
         my $error = $EVAL_ERROR;
 
-        ##! 16: 'action failed with error: ' .$error 
+        ##! 16: 'action failed with error: ' .$error
         # Check for validation errors (dont set the workflow to exception)
         if (ref $error eq 'Workflow::Exception::Validation') {
-            
+
             # We reset the flag to prevent the context to be persisted
             # when we reset the status now, see #236
-            $self->persist_context(0);    
-            
+            $self->persist_context(0);
+
             ##! 32: 'validator exception: ' . Dumper $error
             # Set workflow status to manual
             $self->_set_proc_state( 'manual' );
@@ -215,7 +220,7 @@ sub execute_action {
 
         # Note: This will also persist the context in the "broken" state!
         # This is reasonable as we might otherwise loose information on
-        # things which have been done in the meantime  
+        # things which have been done in the meantime
         $self->_proc_state_exception($error);
 
         # Look into the workflow definiton weather to autofail
@@ -241,12 +246,12 @@ sub execute_action {
         $self->count_try(0);
 
         #determine proc_state: do we still hace actions to do?
-        ##! 32: 'Workflow action ' . Dumper $self->_get_workflow_state()->{_actions} 
-        
-        # Check if there are actions, get_current_actions is not working 
+        ##! 32: 'Workflow action ' . Dumper $self->_get_workflow_state()->{_actions}
+
+        # Check if there are actions, get_current_actions is not working
         # here as it will hide non available actions based on acl or volatile state
         if ((ref $self->_get_workflow_state()->{_actions} eq 'HASH') && (keys %{$self->_get_workflow_state()->{_actions}}) ) {
-            $self->_set_proc_state('manual');    
+            $self->_set_proc_state('manual');
         } else {
             $self->_set_proc_state('finished');
         }
@@ -257,15 +262,15 @@ sub execute_action {
 }
 
 sub set_failed {
-    
+
     my $self = shift;
     my $error = shift;
     my $reason = shift;
-    
+
     $self->_fail($error, $reason);
-    
+
     return $self;
-    
+
 }
 
 # migrated from api - i have no idea what this is good for
@@ -283,105 +288,24 @@ sub reload_observer {
 }
 
 sub attrib {
-
+    my ($self, $arg) = @_;
     ##! 1: 'start'
-    my $self = shift;
-    my $arg = shift;
 
-    my $wf_id = $self->id();
-    # return all attributes of workflow
-    if (!$arg) {
-        ##! 8: 'no key, fetch all'
+    # GETTER - return all attributes as HashRef
+    return $self->{_attributes} if not $arg;
 
-        my $result = CTX('dbi_backend')->select(
-            TABLE => 'WORKFLOW_ATTRIBUTES',
-            COLUMNS => [ 'ATTRIBUTE_KEY', 'ATTRIBUTE_VALUE' ],
-            DYNAMIC => { WORKFLOW_SERIAL => { VALUE => $wf_id } }
-       );
-        my $attribs = {};
-        foreach my $line (@{$result}) {
-           $attribs->{$line->{ATTRIBUTE_KEY}} = $line->{ATTRIBUTE_VALUE};
-        }
-        ##! 32: 'Result ' . Dumper $attribs
-        return $attribs;
+    # GETTER - return single value ($arg is scalar)
+    return $self->{_attributes}->{$arg} if not ref $arg;
 
-    # arg is scalar - get value
-    } elsif (ref $arg eq '') {
+    OpenXPKI::Exception->throw(
+        message => 'Wrong type of argument given to attrib()',
+        params => { type => ref $arg }
+    ) unless ref $arg eq 'HASH';
 
-        ##! 8: 'fetch value for ' . $arg
-        my $result = CTX('dbi_backend')->first(
-            TABLE => 'WORKFLOW_ATTRIBUTES',
-            DYNAMIC => {
-                WORKFLOW_SERIAL => { VALUE => $wf_id },
-                ATTRIBUTE_KEY => { VALUE => $arg },
-        });
-        ##! 32: 'Result ' . Dumper $result
-        return $result->{ATTRIBUTE_VALUE};
-
-    # set multi
-    } elsif (ref $arg eq 'HASH') {
-
-        ##! 8: 'received hash - setting values'
-        foreach my $key (keys %{$arg}) {
-            if (defined $arg->{$key}) {
-                my $value = $arg->{$key};
-                
-                # non scalar values are not allowed
-                if (ref $value ne '') {
-                   OpenXPKI::Exception->throw(
-                       message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_GOT_NON_SCALAR_ATTRIBUTE_VALUE',
-                       params => { key => $key, type =>  ref $value }
-                   );
-                }
-                
-                ##! 16: 'set key ' . $key . ' to value ' .  $arg->{$key}
-                # check if the attribute is already in the table
-                my $result = CTX('dbi_backend')->select (
-                    TABLE => 'WORKFLOW_ATTRIBUTES',
-                    DYNAMIC => {
-                        WORKFLOW_SERIAL => { VALUE => $wf_id },
-                        ATTRIBUTE_KEY => { VALUE => $key },
-                    }
-                );
-
-                # update
-                ##! 64: 'check result ' . Dumper $result
-                if (scalar @{$result}) {
-                    ##! 32: 'key exisits, update'
-                    CTX('dbi_backend')->update (
-                        TABLE => 'WORKFLOW_ATTRIBUTES',
-                        DATA  => { ATTRIBUTE_VALUE => $arg->{$key} },
-                        WHERE => {
-                            WORKFLOW_SERIAL => $wf_id,
-                            ATTRIBUTE_KEY => $key,
-                        }
-                    );
-                # insert new
-                } else {
-                    ##! 32: 'new item, insert'
-                    CTX('dbi_backend')->insert(
-                        TABLE => 'WORKFLOW_ATTRIBUTES',
-                        HASH => {
-                            WORKFLOW_SERIAL => $wf_id,
-                            ATTRIBUTE_KEY => $key,
-                            ATTRIBUTE_VALUE => $arg->{$key}
-                        }
-                    );
-                }
-
-            # value is undef - delete the item
-            } else {
-                ##! 16: 'got undef, delete item'
-                CTX('dbi_backend')->delete(
-                    TABLE => 'WORKFLOW_ATTRIBUTES',
-                    DATA => {
-                        WORKFLOW_SERIAL => $wf_id,
-                        ATTRIBUTE_KEY => $key,
-                });
-            }
-        }
-        CTX('dbi_backend')->commit();
-    }
+    # SETTER - $arg is a HashRef
+    # Values of "undef" will be stored like that in $self->{_attributes},
+    # so the persister knows that these shall be deleted from the storage.
+    $self->{_attributes} = { %{$self->{_attributes}}, %{$arg} };
 }
 
 
@@ -441,10 +365,10 @@ sub pause {
 
 =head2 set_reap_at_interval
 
-Set the given argument as reap_at time in the database, calls the 
+Set the given argument as reap_at time in the database, calls the
 persister if the workflow is already in run state. The interval must
-be in relativedate format (@see OpenXPKI::DateTime). Auto-Persist 
-can be skipped by passing a true value as second argument.    
+be in relativedate format (@see OpenXPKI::DateTime). Auto-Persist
+can be skipped by passing a true value as second argument.
 
 =cut
 sub set_reap_at_interval {
@@ -467,23 +391,23 @@ sub set_reap_at_interval {
 =head2 get_global_actions
 
 Return an arrayref with the names of the global actions wakeup, resume, fail
-that are available to the session user on this workflow. 
+that are available to the session user on this workflow.
 
 =cut
 
 sub get_global_actions {
-    
+
     my $self = shift;
-    
+
     # volatile or non initial workflow do not have any actions
     if ($self->id() < 1) {
          return [];
     }
-    
+
     my $role = CTX('session')->get_role() || 'Anonymous';
-    
+
     my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type(), 'acl', $role ] );
-    
+
     my @possible_action;
     my $proc_state = $self->proc_state();
     if ($proc_state eq 'exception') {
@@ -494,24 +418,24 @@ sub get_global_actions {
 
     } elsif ($proc_state eq 'retry_exceeded') {
         @possible_action = ('wakeup','fail');
-        
+
     } elsif ($proc_state ne 'finished') {
         @possible_action = ('fail');
-        
+
     }
-    
+
     # always possible
     push @possible_action, ('history', 'techlog', 'context');
-    
+
     my @allowed;
     foreach my $action (@possible_action) {
         if ($acl->{$action}) {
             push @allowed, $action;
-        }  
+        }
     }
-    
+
     return \@allowed;
-            
+
 }
 
 
@@ -723,7 +647,7 @@ sub _fail {
 
     eval{
         $self->state('FAILURE');
-        $self->_set_proc_state('finished');               
+        $self->_set_proc_state('finished');
         $self->notify_observers( $reason, $self->state, $self->{_CURRENT_ACTION}, $error);
         $self->add_history(
             Workflow::History->new(
@@ -736,8 +660,8 @@ sub _fail {
         );
         $self->_save();
     };
-    
-    if ($reason eq 'autofail') {        
+
+    if ($reason eq 'autofail') {
         CTX('log')->log(
             MESSAGE  => "Auto-Fail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." with error " . $error,
             PRIORITY => "error",
@@ -751,7 +675,7 @@ sub _fail {
         );
     }
 
-} 
+}
 
 sub is_running(){
     my $self = shift;
@@ -790,7 +714,7 @@ sub _save{
         ($proc_state eq 'init' || $proc_state eq 'running' || $proc_state eq 'exception' )) {
          CTX('log')->log(
             MESSAGE  => "Workflow save requested during startup - wont save! ($proc_state)",
-            PRIORITY => "trace",
+            PRIORITY => "debug",
             FACILITY => ["workflow","application"]
         );
         ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
@@ -835,14 +759,14 @@ This is the OpenXPKI specific subclass of Workflow.
 
 Purpose: overwrite the Method "execute_action" of the baseclass to implement the feature of "pauseing / wake-up / resuming" workflows
 
-The workflow-table is expanded with 4 new persistent fields (see OpenXPKI::Server::DBI::Schema)
+The workflow-table is expanded with 4 new persistent fields (see database schema)
 
-WORKFLOW_PROC_STATE
-WORKFLOW_WAKEUP_AT
-WORKFLOW_COUNT_TRY
-WORKFLOW_REAP_AT
+    workflow_proc_state
+    workflow_wakeup_at
+    workflow_count_try
+    workflow_reap_at
 
-Essential field is WORKFLOW_PROC_STATE, internally "proc_state". All known and possible proc_states and their follow-up actions are defined in %known_proc_states.
+Essential field is C<workflow_proc_state>, internally "proc_state". All known and possible proc_states and their follow-up actions are defined in %known_proc_states.
 "running" will be set, before SUPER::execute_action/Activity::run is called.
 After execution of one or more Activities, either "manual" (waiting for interaction)  or "finished" will be set.
 If an exception occurs, the proc state "exception" is set. Also the message code (not translation) will be saved in WF context (key "wf_exception")

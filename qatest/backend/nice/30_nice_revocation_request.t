@@ -23,6 +23,7 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
 use OpenXPKI::Test::More;
+use Test::More;
 use TestCfg;
 
 my $dirname = dirname($0);
@@ -136,7 +137,7 @@ $test->state_is('CHECK_FOR_REVOCATION');
 # Finally, check if the delayed workflow has finished
 $test->set_wfid( $delayed_revoke_id );
 
-$test->diag('Switch back to delayed workflow #'.$delayed_revoke_id) if $ENV{TEST_VERBOSE};
+note('Switch back to delayed workflow #'.$delayed_revoke_id);
 my $i = 0;
 do {
     sleep 5;

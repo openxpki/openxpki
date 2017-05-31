@@ -23,7 +23,6 @@ TODO: {
 
     OpenXPKI::Server::Context::setcontext({
         dbi_log => $dbi,
-        dbi_backend => $dbi
     });
     my $log = OpenXPKI::Server::Log->new( CONFIG => 't/30_dbi/log4perl.conf' );
 

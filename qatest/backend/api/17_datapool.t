@@ -117,7 +117,7 @@ set_entry_ok { KEY => "pill-33", VALUE => "blue", EXPIRATION_DATE => time+1 },
 entry_is "pill-33", superhashof({ VALUE => "blue" }),
     "Expiration: load entry";
 
-diag "Wait for 2 seconds" if $ENV{TEST_VERBOSE};
+note "Wait for 2 seconds";
 sleep 2;
 
 set_entry_ok { KEY => "pill-dummy", VALUE => "dummy" },
@@ -242,7 +242,7 @@ package OpenXPKI::Server::Workflow::Test::DataPool;
 use Test::Exception;
 use OpenXPKI::Test; # to import CTX into this package
 
-$oxitest->setup_env(init => [ 'crypto_layer' ]);
+$oxitest->setup_env->init_server('crypto_layer');
 
 # Try accessing another PKI realm from within OpenXPKI::Server::Workflow namespace
 throws_ok {

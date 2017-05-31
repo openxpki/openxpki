@@ -80,6 +80,7 @@ make                                                    > /dev/null
 # Test coverage
 #
 if [ "$OXI_TEST_ONLY" == "coverage" ]; then
+    set +e
     echo -e "\n====[ Testing the code coverage ]===="
     cpanm --quiet --notest Devel::Cover
     cover -test

@@ -1,44 +1,55 @@
-use Test::More;
-BEGIN {  plan tests => 27 };
+#!/usr/bin/perl
+use strict;
+use warnings;
+use utf8;
 
-print STDERR "OpenXPKI::Crypto::VolatileVault\n" if $ENV{VERBOSE};
-
+# Core modules
 use English;
+use FindBin qw( $Bin );
 
-use OpenXPKI::Crypto::VolatileVault;
-# use Smart::Comments;
-use OpenXPKI::Crypto::TokenManager;
+# CPAN modules
+use Test::More;
+use Test::Deep;
+use Test::Exception;
 
-our $cache;
-eval `cat t/25_crypto/common.pl`;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Crypto::CLI.*'} = 100;
 
-ok(1);
+# Project modules
+use OpenXPKI::FileUtils;
+use lib "$Bin/../lib";
+use OpenXPKI::Test;
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
-ok (1);
+plan tests => 27;
 
-## parameter checks for get_token
+#
+# Setup env
+#
+my $oxitest = OpenXPKI::Test->new->setup_env->init_server();
 
-my $token = $mgmt->get_system_token (
-    {
-        TYPE => "DEFAULT", 
-    }
-);
-ok (1);
+#
+# Tests
+#
+use_ok "OpenXPKI::Crypto::TokenManager";
+my $default_token;
+lives_and {
+    my $mgmt = OpenXPKI::Crypto::TokenManager->new;
+    $default_token = $mgmt->get_system_token({ TYPE => "DEFAULT" });
+    ok $default_token;
+} 'Get default token';
 
+use_ok "OpenXPKI::Crypto::VolatileVault";
 my $vault = OpenXPKI::Crypto::VolatileVault->new(
     {
-	TOKEN => $token,
+	TOKEN => $default_token,
 	EXPORTABLE => 2,
     });
 
 my $secret = 'abc123' x 10;
 
-my $public = $vault->encrypt(
-    {
+my $public = $vault->encrypt({
 	DATA => $secret,
 	ENCODING => 'base64-oneline',
-    });
+});
 
 ok($public);
 
@@ -46,7 +57,6 @@ ok($vault->can_decrypt($public));
 
 my $tmp;
 $tmp = $vault->decrypt($public);
-
 ok($secret, $tmp);
 
 #####
@@ -74,15 +84,12 @@ eval {
 };
 ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED');
 
-
 ###########################################################################
 
 # try to decrypt it with another vault instance
-my $othervault = OpenXPKI::Crypto::VolatileVault->new(
-    {
-	TOKEN => $token,
-    });
-
+my $othervault = OpenXPKI::Crypto::VolatileVault->new({
+	TOKEN => $default_token,
+});
 ok(! $othervault->can_decrypt($public));
 
 eval {
@@ -97,20 +104,15 @@ eval {
 };
 ok($EVAL_ERROR, 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED');
 
-
-
 ###########################################################################
 
-
 # try to decrypt it with reinstantiated vault instance
-my $reused_vault = OpenXPKI::Crypto::VolatileVault->new(
-    {
-	TOKEN => $token,
+my $reused_vault = OpenXPKI::Crypto::VolatileVault->new({
+	TOKEN => $default_token,
 	KEY   => $key_backup->{KEY},
 	IV    => $key_backup->{IV},
 	EXPORTABLE => -1,
-    });
-
+});
 ok($reused_vault->can_decrypt($public));
 
 $tmp = undef;

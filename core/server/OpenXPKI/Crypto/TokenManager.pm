@@ -34,7 +34,7 @@ If you want to
 use an explicit temporary directory then you must specifiy this
 directory in the variable TMPDIR.
 
-=cut 
+=cut
 
 sub new {
     ##! 1: 'start'
@@ -50,19 +50,13 @@ sub new {
     my $keys = shift;
     $self->{tmp} = $keys->{TMPDIR} if ($keys->{TMPDIR});
 
-    $self->{called_from_testscript} = 1 if ($keys->{'IGNORE_CHECK'});
-
-    if ($caller_package ne 'OpenXPKI::Server::Init' &&
-        ! $self->{called_from_testscript}) {
+    if ($caller_package ne 'OpenXPKI::Server::Init' and not ($ENV{TEST_ACTIVE} or $ENV{HARNESS_ACTIVE})) {
         # TokenManager instances shall only be created during
         # the server initialization, the rest of the code can
         # use CTX('crypto_layer') as its token manager
-        # IGNORE_CHECK is only meant for unit tests!
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_TOKENMANAGER_INSTANTIATION_OUTSIDE_SERVER_INIT',
-            params => {
-                'CALLER' => $caller_package,
-            },
+            params => { 'CALLER' => $caller_package },
         );
     }
     ##! 1: "end - token manager is ready"
@@ -136,7 +130,7 @@ sub __load_secret
     my $method = $config->get(['crypto','secret',$group,'method']);
     my $label = $config->get(['crypto','secret',$group,'label']);
     my $export = $config->get(['crypto','secret',$group,'export']) || 0;
-    
+
     $self->{SECRET}->{$realm}->{$group}->{TYPE}  = $method;
     $self->{SECRET}->{$realm}->{$group}->{LABEL} = ($label ? $label : $method);
     $self->{SECRET}->{$realm}->{$group}->{EXPORT}  = ($export ? 1 : 0);
@@ -223,21 +217,15 @@ sub __set_secret_from_cache {
     } else {
         ## daemon mode
         ##! 4: "let's get the serialized secret from the database"
-        if (!$self->{called_from_testscript}
-            && CTX('dbi_backend')->is_connected()) {
-            # do this only if the database is already connected
-            # i.e. not during server startup
-            # (this is senseless anyhow, as we will only find
-            # outdated secrets at that point)
-            # ... and not during test script execution, as we don't
-            # have a dbi_backend context there
-            my $secret_result = CTX('dbi_backend')->first (
-                                    TABLE   => "SECRET",
-                                    DYNAMIC => {
-                                        PKI_REALM => {VALUE => $realm},
-                                        GROUP_ID  => {VALUE => $group}});
-            $secret = $secret_result->{DATA};
-        }
+        my $row = CTX('dbi')->select_one(
+            from    => "secret",
+            columns => [ 'data' ],
+            where => {
+                pki_realm => $realm,
+                group_id  => $group,
+            }
+        );
+        $secret = $row->{data};
         ##! 16: 'secret: ' . $secret
     }
     if (defined $secret and length $secret)
@@ -288,7 +276,7 @@ See #333
 sub reload_all_secret_groups_from_cache {
     ##! 1: 'start'
     my $self = shift;
-   
+
     my @realms = CTX('config')->get_keys('system.realms');
     foreach my $realm (@realms) {
         foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
@@ -332,9 +320,9 @@ sub is_secret_group_complete
 
 =head2 get_secret( group )
 
-Get the plaintext value of the stored secret. This requires that the 
-secret was created with the "export" flag set, otherwise an exception 
-is thrown. Returns undef if the secret is not complete. 
+Get the plaintext value of the stored secret. This requires that the
+secret was created with the "export" flag set, otherwise an exception
+is thrown. Returns undef if the secret is not complete.
 
 =cut
 
@@ -347,21 +335,21 @@ sub get_secret
     if (!$self->is_secret_group_complete($group)) {
         return undef;
     }
-    
+
     my $realm = CTX('session')->get_pki_realm();
 
     if (!$self->{SECRET}->{$realm}->{$group}->{EXPORT}) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");       
+            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");
     }
-    
+
     return $self->{SECRET}->{$realm}->{$group}->{REF}->get_secret();
-    
+
 }
 
 =head2 set_secret_group_part( { GROUP, VALUE, PART } )
 
-Set the secret value of the given group, for plain secrets ommit PART. 
+Set the secret value of the given group, for plain secrets ommit PART.
 
 =cut
 
@@ -393,38 +381,20 @@ sub set_secret_group_part
     my $secret = $self->{SECRET}->{$realm}->{$group}->{REF}->get_serialized();
     if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
     {
-        ##! 4: "let's store the serialized secret in the session"
-        CTX('session')->set_secret ({
+        ##! 4: "store secret in session"
+        CTX('session')->set_secret({
             GROUP  => $group,
             SECRET => $secret});
     } else {
-        ##! 4: "let's store the serialized secret in the database"
-        my $result = CTX('dbi_backend')->select (
-                         TABLE => "SECRET",
-                         DYNAMIC => {
-                             PKI_REALM => {VALUE => $realm},
-                             GROUP_ID  => {VALUE => $group}});
-        if (scalar @{$result})
-        {
-            ##! 8: "this is an update in daemon mode"
-            CTX('dbi_backend')->update (
-                TABLE => "SECRET",
-                DATA  => {DATA => $secret},
-                WHERE => {
-                    PKI_REALM => $realm,
-                    GROUP_ID  => $group});
-        }
-        else
-        {
-            ##! 8: "this is an insert in daemon mode"
-            CTX('dbi_backend')->insert (
-                TABLE => "SECRET",
-                HASH  => {
-                    DATA      => $secret,
-                    PKI_REALM => $realm,
-                    GROUP_ID  => $group});
-        }
-        CTX('dbi_backend')->commit();
+        ##! 4: "merge secret into database"
+        CTX('dbi')->merge(
+            into => "secret",
+            set  => { data => $secret },
+            where => {
+                pki_realm => $realm,
+                group_id  => $group,
+            },
+        );
     }
 
     ##! 1: "finished"
@@ -451,27 +421,19 @@ sub clear_secret_group
             not exists $self->{SECRET}->{$realm}->{$group});
 
     ##! 2: "check for the cache"
-    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
-    {
-        ##! 4: "let's store the serialized secret in the session"
-        CTX('session')->clear_secret ($group);
-    } else {
-        ##! 4: "let's store the serialized secret in the database"
-        my $result = CTX('dbi_backend')->select (
-                         TABLE => "SECRET",
-                         DYNAMIC => {
-                             PKI_REALM => {VALUE => $realm},
-                             GROUP_ID  => {VALUE => $group}});
-        if (scalar @{$result})
-        {
-            ##! 8: "we have to delete something"
-            CTX('dbi_backend')->delete (
-                TABLE => "SECRET",
-                DATA  => {
-                    PKI_REALM => $realm,
-                    GROUP_ID  => $group});
-	    CTX('dbi_backend')->commit();
-        }
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session") {
+        ##! 4: "delete secret in session"
+        CTX('session')->clear_secret($group);
+    }
+    else {
+        ##! 4: "delete secret in database"
+        my $result = CTX('dbi')->delete(
+            from => "secret",
+            where => {
+                pki_realm => $realm,
+                group_id  => $group,
+            }
+        );
     }
     delete $self->{SECRET}->{$realm}->{$group};
     $self->__load_secret({
@@ -512,15 +474,11 @@ Can be omitted, if the API can resolve the given name.
 
 =cut
 
-sub get_token
-{
-    my $self = shift;
-    my $keys = shift;
+sub get_token {
+    my ($self, $keys) = @_;
     ##! 1: "start"
 
-    if ( ref($keys) ne 'HASH' ) {
-        croak("parameter must be hash ref, but got '$keys'");
-    }
+    croak("parameter must be hash ref, but got '$keys'") unless ref($keys) eq 'HASH';
 
     #my $name   = $keys->{ID};
     my $type   = $keys->{TYPE};
@@ -529,37 +487,23 @@ sub get_token
     my $realm = CTX('session')->get_pki_realm();
 
     ##! 32: "Load token $name of type $type"
-    if (not $type)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE");
-    }
-
-    if (not $name)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME");
-    }
-    if (not $realm)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_PKI_REALM");
-    }
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE")
+        unless $type;
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_NAME")
+        unless $name;
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_PKI_REALM")
+        unless $realm;
     ##! 2: "$realm: $type -> $name"
 
-    if (not $self->{TOKEN}->{$realm}->{$type}->{$name}) {
-        $self->__add_token($keys);
-    }
-    ##! 2: "token added"
+    $self->__add_token($keys)
+        unless $self->{TOKEN}->{$realm}->{$type}->{$name};
 
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
-        if (not $self->{TOKEN}->{$realm}->{$type}->{$name});
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
+        unless $self->{TOKEN}->{$realm}->{$type}->{$name};
     ##! 2: "token is present"
 
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
-        if (not $self->__use_token (TYPE => $type, NAME => $name, PKI_REALM => $realm));
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
+        unless $self->__use_token(TYPE => $type, NAME => $name, PKI_REALM => $realm);
     ##! 2: "token is usable"
 
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
@@ -577,62 +521,49 @@ You neeed to specify at least C<api> and C<backend> for all tokens.
 =cut
 
 sub get_system_token {
-
-    my $self = shift;
-    my $keys = shift;
+    my ($self, $keys) = @_;
     ##! 1: "start"
 
     my $type   = lc($keys->{TYPE});
 
     ##! 32: "Load token system of type $type"
-    if (not $type)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_MISSING_TYPE");
-    }
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_MISSING_TYPE")
+        unless $type;
 
     my $config = CTX('config');
     my $backend = $config->get("system.crypto.token.$type.backend");
 
-    if (not $backend) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_UNKNOWN_TYPE",
-            params => { TYPE => $type }
-        );
-    }
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SYSTEM_TOKEN_UNKNOWN_TYPE",
+        params => { TYPE => $type }
+    ) unless $backend;
 
     if (not $self->{TOKEN}->{system}->{$type}) {
-
         my $backend_api_class = CTX('config')->get("system.crypto.token.$type.api");
 
         ##! 16: 'instantiating token, API:' . $backend_api_class . ' - Backend: ' .$backend
-        $self->{TOKEN}->{system}->{$type} =
-                $backend_api_class->new ({
-                    CLASS => $backend,
-                    TMP   => $self->{tmp},
-                    TOKEN_TYPE => $type,
-                });
+        $self->{TOKEN}->{system}->{$type} = $backend_api_class->new({
+            CLASS => $backend,
+            TMP   => $self->{tmp},
+            TOKEN_TYPE => $type,
+        });
     }
     ##! 2: "token added"
 
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
-        if (not $self->{TOKEN}->{system}->{$type});
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_EXIST")
+        unless $self->{TOKEN}->{system}->{$type};
     ##! 2: "token is present"
 
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
-        if (not $self->__use_token(TYPE => $type, PKI_REALM => 'system'));
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_NOT_USABLE")
+        unless $self->__use_token(TYPE => $type, PKI_REALM => 'system');
     ##! 2: "token is usable"
 
     return $self->{TOKEN}->{system}->{$type};
 
 }
 
-sub __add_token
-{
-    my $self = shift;
-    my $keys = shift;
+sub __add_token {
+    my ($self, $keys) = @_;
     ##! 1: "start"
 
     my $type   = $keys->{TYPE};
@@ -690,22 +621,22 @@ sub __add_token
     eval {
         ##! 16: 'instantiating token, API class: ' . $backend_api_class . ' using backend ' . $backend_class
         $self->{TOKEN}->{$realm}->{$type}->{$name} =
-                $backend_api_class->new ({
-                    CLASS => $backend_class,
-                    TMP   => $self->{tmp},
-                    NAME  => $name,
-                    TOKEN_TYPE => $type,
-                    SECRET     => $secret,
-                    CERTIFICATE => $keys->{CERTIFICATE},
-                });
+            $backend_api_class->new ({
+                CLASS       => $backend_class,
+                TMP         => $self->{tmp},
+                NAME        => $name,
+                TOKEN_TYPE  => $type,
+                SECRET      => $secret,
+                CERTIFICATE => $keys->{CERTIFICATE},
+            });
     };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
+    if (my $exc = OpenXPKI::Exception->caught()) {
         delete $self->{TOKEN}->{$realm}->{$type}->{$name}
             if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
         OpenXPKI::Exception->throw (
             message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
-            children => [ $exc ]);
+            children => [ $exc ],
+        );
     }
     elsif ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
@@ -728,11 +659,10 @@ sub __add_token
     return $self->{TOKEN}->{$realm}->{$type}->{$name};
 }
 
-sub __use_token
-{
-    ##! 16: 'start'
+sub __use_token {
     my $self = shift;
     my $keys = { @_ };
+    ##! 16: 'start'
 
     my $type  = $keys->{TYPE};
     my $name  = $keys->{NAME};
@@ -741,27 +671,20 @@ sub __use_token
     my $instance;
     if ($realm eq 'system') {
         $instance = $self->{TOKEN}->{system}->{$type};
-    } else {
+    }
+    else {
         $instance = $self->{TOKEN}->{$realm}->{$type}->{$name};
     }
 
     ## the token must be present
-    if (not $instance) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT");
-    }
+    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT")
+        unless $instance;
 
     return $instance->login()
-        if (not $instance->online());
+        unless $instance->online();
 
     return 1;
     ##! 16: 'end'
-}
-
-sub DESTROY {
-    my $self = shift;
-
-    return 1;
 }
 
 1;

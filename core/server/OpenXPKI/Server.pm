@@ -124,8 +124,6 @@ sub new
 	    FACILITY => "system",
 	);
 
-    CTX('dbi_backend')->disconnect();
-
     $self->{PARAMS}->{no_client_stdout} = 1;
 
     CTX('log')->log(
@@ -556,19 +554,16 @@ sub do_process_request
     ##! 2: "update pre-initialized variables"
 
     eval {
-        CTX('dbi_backend')->new_dbh();
-	    CTX('dbi_backend')->connect();
+        CTX('dbi')->dbh;
     };
-    if ($EVAL_ERROR)
-    {
+    if ($EVAL_ERROR) {
         $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
         $log->log (MESSAGE  => "Database connection failed. ".$EVAL_ERROR,
                    PRIORITY => "fatal",
                    FACILITY => "system");
         return;
-
     }
-    ##! 16: 'dbi_backend reconnected with new dbh'
+    ##! 16: 'connection to database successful'
 
     # this is run until the user has logged in successfully
     CTX('service')->init();
@@ -856,7 +851,7 @@ sub __set_process_name {
     if (@args) {
         $identity = sprintf $identity, @args;
     }
-    
+
     my $alias = CTX('config')->get(['system','server','name']) || 'main';
     $0 = "openxpkid ($alias) $identity";
     return;

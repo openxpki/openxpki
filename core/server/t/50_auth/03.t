@@ -4,7 +4,7 @@ use English;
 use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
 #plan tests => 3;
 
-diag "OpenXPKI::Server::Authentication::Anonymous\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Authentication::Anonymous\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
@@ -14,11 +14,11 @@ ok(1);
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {	
+    {
 	TASKS => [
         'config_test',
         'log',
-        'dbi_backend',
+        'dbi',
     ],
 	SILENT => 1,
     });

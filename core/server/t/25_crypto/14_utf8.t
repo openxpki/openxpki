@@ -8,6 +8,9 @@ use English;
 
 plan tests => 20;
 
+TODO: {
+    todo_skip 'See Issue #188', 20;
+
 print STDERR "OpenXPKI::Crypto::Command: Create user certs and issue CRLs with UTF-8 characters\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Crypto::TokenManager;
@@ -27,11 +30,9 @@ SKIP: {
 ## parameter checks for TokenManager init
 
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+my $mgmt = OpenXPKI::Crypto::TokenManager->new;
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-TODO: {
-    todo_skip 'See Issue #188', 18;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -44,7 +45,7 @@ my $token = $mgmt->get_token ({
 ok(defined $token, 'CA Token defined');
 
 my $default_token = $mgmt->get_system_token ({
-        TYPE      => "DEFAULT",        
+        TYPE      => "DEFAULT",
 });
 
 ok(defined $default_token, 'Default Token defined');
@@ -83,7 +84,7 @@ for (my $i=0; $i < scalar @example; $i++)
 
     ## create profile
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
-            TYPE  => "ENDENTITY",                                    
+            TYPE  => "ENDENTITY",
             ID    => "I18N_OPENXPKI_PROFILE_USER",
             CA    => "test-ca",
             CACERTIFICATE => $cacert);
@@ -109,7 +110,7 @@ for (my $i=0; $i < scalar @example; $i++)
     ok ($pkcs12);
     print STDERR "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
     # FIXME: this test fails since at least 495, so it has nothing to
-    # do with the changes from 495 to 496. 
+    # do with the changes from 495 to 496.
     # It just was not noticed because it had ok(1) and the CLI did
     # not catch the error
     # The openssl error is

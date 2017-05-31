@@ -2,7 +2,7 @@ id: dns
 label: I18N_OPENXPKI_UI_PROFILE_SAN_DNS
 description: I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION
 type: freetext
-match: \A [a-z0-9] [a-z0-9-]* (\.[a-z0-9-]*[a-z0-9])* \z
+match: \A [a-zA-Z0-9] [a-zA-Z0-9-]* (\.[a-zA-Z0-9-]*[a-zA-Z0-9])* \z
 width: 40
 min: 0
 max: 20

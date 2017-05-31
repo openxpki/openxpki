@@ -2,14 +2,14 @@ use strict;
 use warnings;
 use Test::More;
 
-my @files = (             
-             "t/28_log/openxpki.log",             
+my @files = (
+             "t/28_log/openxpki.log",
             );
 
 ## 2 * number of files
 plan tests => (scalar @files) * 2;
 
-diag "OpenXPKI::Crypto Cleanup\n" if $ENV{VERBOSE};
+note "OpenXPKI::Crypto Cleanup";
 
 foreach my $filename (@files)
 {

@@ -74,8 +74,7 @@ sub sql_autoinc_column { return "INT PRIMARY KEY AUTO_INCREMENT" }
 sub last_auto_id {
     my ($self, $dbi) = @_;
     my $sth = $dbi->run('select last_insert_id()');
-    my $row = $sth->fetchrow_arrayref
-        or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
+    my $row = $sth->fetchrow_arrayref;
     return $row->[0];
 }
 

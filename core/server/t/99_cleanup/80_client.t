@@ -10,7 +10,7 @@ my @files = (
 ## 2 * number of file
 plan tests => (scalar @files) * 2;
 
-diag "OpenXPKI:UI (Transport) Cleanup\n" if $ENV{VERBOSE};
+note "OpenXPKI:UI (Transport) Cleanup\n";
 
 foreach my $filename (@files)
 {

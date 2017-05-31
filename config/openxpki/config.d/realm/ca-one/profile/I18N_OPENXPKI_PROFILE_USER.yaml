@@ -4,7 +4,7 @@ label: I18N_OPENXPKI_UI_PROFILE_USER_LABEL
 
 validity:
     notafter: +0006
- 
+
 style:
     00_user_basic_style:
         label: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL
@@ -18,9 +18,9 @@ style:
             info:
                 - comment
 
-        subject: 
+        subject:
             dn: CN=[% realname %]+UID=[% username %][% IF department %],DC=[% department %][% END %],DC=Test Deployment,DC=OpenXPKI,DC=org
-            san: 
+            san:
                email: "[% email.lower %]"
 
         metadata:
@@ -48,12 +48,12 @@ extensions:
         client_auth:      1
         server_auth:      0
         email_protection: 1
-        codeSigning:      0
-        timeStamping:     0
+        code_signing:     0
+        time_stamping:    0
         # MS Smartcard Logon
         1.3.6.1.4.1.311.20.2.2: 1
- 
-   
+
+
 # Define the input fields you used below here or in template.yaml
 #template:
 

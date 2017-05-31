@@ -1,388 +1,223 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
-use English;
 use utf8;
- 
+
+# Core modules
+use English;
+use FindBin qw( $Bin );
+
+# CPAN modules
 use Test::More;
- 
-plan tests => 20;
+use Test::Deep;
+use Test::Exception;
 
-diag "OpenXPKI::Crypto::Command: Create a user cert and issue a CRL\n" if $ENV{VERBOSE};
+# Project modules
+use OpenXPKI::FileUtils;
+use lib "$Bin/../lib";
+use OpenXPKI::Test;
 
-use OpenXPKI::Debug;
-if ($ENV{DEBUG_LEVEL}) {
-    $OpenXPKI::Debug::LEVEL{'.*'} = $ENV{DEBUG_LEVEL};
-}
+plan tests => 17;
 
-use OpenXPKI::Crypto::TokenManager;
-use OpenXPKI::Crypto::Profile::Certificate;
-use OpenXPKI::Crypto::Profile::CRL;
+#
+# Setup env
+#
+my $oxitest = OpenXPKI::Test->new->setup_env->init_server();
+$oxitest->insert_testcerts;
 
-# use Smart::Comments;
+#
+# Tests
+#
+use_ok "OpenXPKI::Crypto::TokenManager";
 
-our $cache;
-our $basedir;
-our $cacert;
-eval `cat t/25_crypto/common.pl`;
+my $mgmt;
+lives_ok {
+    $mgmt = OpenXPKI::Crypto::TokenManager->new;
+} 'Create OpenXPKI::Crypto::TokenManager instance';
 
-is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+## parameter checks for get_token
+my $ca_token;
+lives_and {
+    $ca_token = $mgmt->get_token ({
+       TYPE => 'certsign',
+       NAME => 'alpha-signer-2',
+       CERTIFICATE => {
+            DATA => $oxitest->certhelper_database->cert("alpha_signer_2")->data,
+            IDENTIFIER => 'ignored',
+       }
+    });
+    ok $ca_token;
+} 'Get CA token';
 
-SKIP: {
-    skip 'crypt init failed', 19 if $EVAL_ERROR;
-
-
-my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
-ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
-
-TODO: {
-    todo_skip 'See Issue #188', 18;
-my $ca_token = $mgmt->get_token ({
-   TYPE => 'certsign',
-   NAME => 'test-ca',
-   CERTIFICATE => {
-        DATA => $cacert,
-        IDENTIFIER => 'ignored',
-   }
-});
-
-ok(defined $ca_token, 'CA Token defined');
-
-my $default_token = $mgmt->get_system_token ({
-        TYPE      => "DEFAULT",        
-});
-
-ok(defined $default_token, 'Default Token defined');
+my $default_token;
+lives_and {
+    $default_token = $mgmt->get_system_token({ TYPE => "DEFAULT" });
+    ok $default_token;
+} 'Get default token';
 
 ## create PIN (128 bit == 16 byte)
-my $passwd = $default_token->command ({COMMAND       => "create_random",
-                                       RANDOM_LENGTH => 16});
-                                       
-ok($passwd, 'Random password created');
-diag "passwd: $passwd\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/passwd.txt",
-                      CONTENT  => $passwd,
-                      FORCE    => 1);
+my $passwd;
+lives_and {
+    $passwd = $default_token->command({
+        COMMAND  => "create_random",
+        RANDOM_LENGTH => 16
+    });
+    ok $passwd;
+} 'Create random password';
+
+
+# TODO Should $default_token->command({COMMAND => "create_pkey"}) be replaced with "generate_key" API method (OpenXPKI::Server::API::Object)?
 
 ## create DSA key
-my $key = $default_token->command ({COMMAND    => "create_key",
-                                    TYPE       => "DSA",
-                                    PASSWD     => $passwd,
-                                    PARAMETERS => {
-                                        KEY_LENGTH => "1024",
-                                        ENC_ALG    => "aes256"}});
-ok ($key, 'DSA key created');
-diag "DSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/dsa.pem",
-                      CONTENT  => $key,
-                      FORCE    => 1);
+lives_and {
+    # OpenSSL <= 1.0.1 needs a separate parameter file for DSA keys
+    my $params = $default_token->command({
+        COMMAND => "create_params",
+        TYPE    => "DSA",
+        PKEYOPT => {
+            dsa_paramgen_bits => "2048",
+        },
+    });
+    my $key = $default_token->command({
+        COMMAND => "create_pkey",
+        ENC_ALG => "AES256",
+        PASSWD  => $passwd,
+        PARAM   => $params,
+    });
+    like $key, qr/^-----BEGIN ENCRYPTED PRIVATE KEY-----/;
+} 'Create DSA key';
+
+# TODO test DSA/RSA key creation with wrong parameters (should fail if/once we use "generate_key" API method)
+# - wrong KEY_LENGTH value
+# - wrong ENC_ALG value
 
 ## create EC key
-$key = $default_token->command ({COMMAND    => "create_key",
-                                 TYPE       => "EC",
-                                 PASSWD     => $passwd,
-                                 PARAMETERS => {
-                                     CURVE_NAME => "sect571r1",
-                                     ENC_ALG    => "aes256"}});
-ok ($key, 'EC key created');
-diag "EC: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/ec.pem",
-                      CONTENT  => $key,
-                      FORCE    => 1);
+lives_and {
+    # OpenSSL <= 1.0.1 needs a separate parameter file for EC keys
+    my $params = $default_token->command({
+        COMMAND => "create_params",
+        TYPE    => "EC",
+        PKEYOPT => {
+            ec_paramgen_curve => "sect571r1",
+        },
+    });
+    my $key = $default_token->command({
+        COMMAND => "create_pkey",
+        ENC_ALG => "AES256",
+        PASSWD  => $passwd,
+        PARAM   => $params,
+    });
+    like $key, qr/^-----BEGIN ENCRYPTED PRIVATE KEY-----/;
+} 'Create EC key';
+
 
 ## create RSA key
-$key = $default_token->command ({COMMAND    => "create_key",
-                                 TYPE       => "RSA",
-                                 PASSWD     => $passwd,
-                                 PARAMETERS => {
-                                     KEY_LENGTH => "1024",
-                                     ENC_ALG    => "aes256"}});
-ok ($key, 'RSA key created');
-diag "RSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/rsa.pem",
-                      CONTENT  => $key,
-                      FORCE    => 1);
+my $rsa_key;
+lives_and {
+    $rsa_key = $default_token->command({
+        COMMAND => "create_pkey",
+        KEY_ALG => "RSA",
+        ENC_ALG => "AES256",
+        PASSWD  => $passwd,
+        PKEYOPT => {
+            rsa_keygen_bits => 2048,
+        },
+    });
+    like $rsa_key, qr/^-----BEGIN ENCRYPTED PRIVATE KEY-----/;
+} 'Create RSA key';
 
-## try to create UNSUPPORTED_ALGORITHM key 
-eval
-{
-    $key = $default_token->command ({COMMAND    => "create_key",
-                                     TYPE       => "UNSUPPORTED_ALGORITHM",
-                                     PASSWD     => $passwd,
-                                     PARAMETERS => {
-                                         KEY_LENGTH => "1024",
-                                         ENC_ALG    => "aes256"}});
-};
+## try to create UNSUPPORTED_ALGORITHM key
+throws_ok {
+    $default_token->command({
+        COMMAND => "create_pkey",
+        KEY_ALG => "ROT13",
+        ENC_ALG => "AES256",
+        PASSWD  => $passwd,
+    });
+} 'OpenXPKI::Exception', 'Refuse to create key with unknown algorithm';
 
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1, 'Unsupported algorithm caught');
-    }
-    else
-    {
-        diag "Unknown eval error: ${EVAL_ERROR}\n";
-        ok(0, 'Unsupported algorithm caught');
-    }
-}
-else
-{
-    diag "Eval error does not occur when algorithm is not supported\n";
-    ok(0, 'Unsupported algorithm caught');
-}
-
-## test DSA parameters
-## create DSA key with wrong KEY_LENGTH value
-eval
-{
-    $key = $default_token->command ({COMMAND    => "create_key",
-                                     TYPE       => "DSA",
-                                     PASSWD     => $passwd,
-                                     PARAMETERS => {
-                                         KEY_LENGTH => "11024",
-                                         ENC_ALG    => "aes256"}});
-};
-
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1, 'Catching wrong keylength');
-    }
-    else
-    {
-        diag "Unknown eval error: ${EVAL_ERROR}\n";
-        ok(0, 'Catching wrong keylength');
-    }
-}
-else
-{
-    diag "Eval error does not occur when DSA KEY_LENGTH value is wrong\n";
-    ok(0, 'Catching wrong keylength');
-}
-
-## create DSA key with wrong ENC_ALG value
-eval
-{
-    $key = $default_token->command ({COMMAND    => "create_key",
-                                     TYPE       => "DSA",
-                                     PASSWD     => $passwd,
-                                     PARAMETERS => {
-                                         KEY_LENGTH => "1024",
-                                         ENC_ALG    => "unknown_alg"}});
-};
-
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1, 'Catching unknown algorithm');
-    }
-    else
-    {
-        diag "Unknown eval error: ${EVAL_ERROR}\n";
-        ok(0, 'Catching unknown algorithm');
-    }
-}
-else
-{
-    diag "Eval error does not occur when DSA ENC_ALG value is wrong\n" ;
-    ok(0, 'Catching unknown algorithm');
-}
-
-## test RSA parameters
-## create RSA key with wrong KEY_LENGTH value
-eval
-{
-    $key = $default_token->command ({COMMAND    => "create_key",
-                                     TYPE       => "RSA",
-                                     PASSWD     => $passwd,
-                                     PARAMETERS => {
-                                         KEY_LENGTH => "11024",
-                                         ENC_ALG    => "aes256"}});
-};
-
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1, 'Catching RSA wrong keylength');
-    }
-    else
-    {
-        diag "Unknown eval error: ${EVAL_ERROR}\n";
-        ok(0, 'Catching RSA wrong keylength');
-    }
-}
-else
-{
-    diag "Eval error does not occur when RSA KEY_LENGTH value is wrong\n" ;
-    ok(0, 'Catching RSA wrong keylength');
-}
-
-## create RSA key with wrong ENC_ALG value
-eval
-{
-    $key = $default_token->command ({COMMAND    => "create_key",
-                                     TYPE       => "RSA",
-                                     PASSWD     => $passwd,
-                                     PARAMETERS => {
-                                         KEY_LENGTH => "1024",
-                                         ENC_ALG    => "unknown_alg"}});
-};
-
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1, 'Catching RSA unknown encryption algorithm');
-    }
-    else
-    {
-        diag "Unknown eval error: ${EVAL_ERROR}\n";
-        ok(0, 'Catching RSA unknown encryption algorithm');
-    }
-}
-else
-{
-    diag "Eval error does not occur when RSA ENC_ALG value is wrong\n";
-    ok(0, 'Catching RSA unknown encryption algorithm');
-}
-
-## test EC parameters
-## create EC key with wrong ENC_ALG value
-eval
-{
-
-    $key = $default_token->command ({COMMAND    => "create_key",
-                                     TYPE       => "EC",
-                                     PASSWD     => $passwd,
-                                     PARAMETERS => {
-                                         CURVE_NAME => "sect571r1",
-                                         ENC_ALG    => "unknown_alg"}});
-};
-
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1, 'Catching EC unknown encryption algorithm');
-    }
-    else
-    {
-        diag "Unknown eval error: ${EVAL_ERROR}\n";
-        ok(0, 'Catching EC unknown encryption algorithm');
-    }
-}
-else
-{
-    diag "Eval error does not occur when EC CURVE_NAME value is wrong\n";
-    ok(0, 'Catching EC unknown encryption algorithm');
-}
-
-## create EC key with wrong CURVE_NAME value
-eval
-{
-    $key = $default_token->command ({COMMAND    => "create_key",
-                                     TYPE       => "EC",
-                                     PASSWD     => $passwd,
-                                     PARAMETERS => {
-                                         CURVE_NAME => "unknown_curve",
-                                         ENC_ALG    => "aes256"}});
-};
-
-if ($EVAL_ERROR) {
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        diag "OpenXPKI::Exception => ".$exc->as_string()."\n" if ($ENV{DEBUG});
-        ok(1, 'Catching EC wrong curve name');
-    }
-    else
-    {
-        diag "Unknown eval error: ${EVAL_ERROR}\n";
-        ok(0, 'Catching EC wrong curve name');
-    }
-}
-else
-{
-    diag "Eval error does not occur when EC CURVE_NAME value is wrong\n";
-    ok(0, 'Catching EC wrong curve name');
-}
-
-## create CSR
+## create CSR (PKCS#10)
 my $subject = "cn=John Dö,dc=OpenXPKI,dc=org";
-ok(Encode::is_utf8($subject), 'utf8 String ok');
-print "Subject: $subject\n";
-my $csr = $default_token->command ({COMMAND => "create_pkcs10",
-                                    KEY     => $key,
-                                    PASSWD  => $passwd,
-                                    SUBJECT => $subject});
-ok($csr, 'PKCS#10 creation');
-diag "CSR: $csr\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/pkcs10.pem",
-                      CONTENT  => $csr,
-                      FORCE    => 1);
+die "Test string is not UTF-8 encoded" unless Encode::is_utf8($subject);
+my $csr;
+lives_and {
+    $csr = $default_token->command({
+        COMMAND => "create_pkcs10",
+        KEY     => $rsa_key,
+        PASSWD  => $passwd,
+        SUBJECT => $subject,
+    });
+    like $csr, qr/^-----BEGIN CERTIFICATE REQUEST-----/;
+} 'Create PKCS#10';
 
 ## create profile
-my $profile = OpenXPKI::Crypto::Profile::Certificate->new (                  
-                  TYPE  => "ENDENTITY",                                    
-                  ID    => "I18N_OPENXPKI_PROFILE_USER",
-                  CA    => "test-ca",
-                  CACERTIFICATE => $cacert,
-		  );
-$profile->set_serial  (1);
-$profile->set_subject ($subject);
-ok($profile, 'Certificate profile');
+my $cert_profile;
+use_ok "OpenXPKI::Crypto::Profile::Certificate";
+lives_and {
+    $cert_profile = OpenXPKI::Crypto::Profile::Certificate->new(
+        TYPE  => "ENDENTITY",
+        ID    => "I18N_OPENXPKI_PROFILE_USER",
+        CA    => "alpha",
+        CACERTIFICATE => $oxitest->certhelper_database->cert("alpha_signer_2")->data,
+    );
+    $cert_profile->set_serial(1);
+    $cert_profile->set_subject($subject);
+    is $cert_profile->{PROFILE}->{SUBJECT}, $subject;
+} "Create certificate profile";
 
 ## create cert
-my $cert = $ca_token->command ({COMMAND => "issue_cert",
-                                CSR     => $csr,
-                                PROFILE => $profile});
+my $cert;
+lives_and {
+    $cert = $ca_token->command({
+        COMMAND => "issue_cert",
+        CSR     => $csr,
+        PROFILE => $cert_profile,
+    });
+    like $cert, qr/^-----BEGIN CERTIFICATE-----/;
+} "Issue certificate";
 
-ok($cert =~ /^-----BEGIN CERTIFICATE-----/, 'Certificate issue');
-
-diag "cert: $cert\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/test-ca/cert.pem",
-                      CONTENT  => $cert,
-                      FORCE    => 1);
-
-my @chain = [ $cert ];
 ## build the PKCS#12 file
-my $pkcs12 = $default_token->command ({COMMAND => "create_pkcs12",
-                                       PASSWD  => $passwd,
-                                       KEY     => $key,
-                                       CERT    => $cert,
-                                       CHAIN   => @chain});
-ok ($pkcs12, 'PKCS#12 creation');
-diag "PKCS#12 length: ".length ($pkcs12)."\n" if ($ENV{DEBUG});
+lives_and {
+    my $pkcs12 = $default_token->command({
+        COMMAND => "create_pkcs12",
+        PASSWD  => $passwd,
+        KEY     => $rsa_key,
+        CERT    => $cert,
+        CHAIN   => [ $cert ],
+    });
+    ok $pkcs12;
+} "Create PKCS#12";
 
-### create CRL profile...
-$profile = OpenXPKI::Crypto::Profile::CRL->new (
-                  CA    => "test-ca",
-                  VALIDITY => {
-                        VALIDITYFORMAT => 'relativedate',
-                        VALIDITY    => "+000014",
-                  },
-                  CACERTIFICATE => $cacert,
-                  );
-                  
+## create CRL profile
+my $crl_profile;
+use_ok "OpenXPKI::Crypto::Profile::CRL";
+lives_and {
+    $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
+        CA => "alpha",
+        VALIDITY => {
+            VALIDITYFORMAT => 'relativedate',
+            VALIDITY => "+000014",
+        },
+        CACERTIFICATE => $oxitest->certhelper_database->cert("alpha_signer_2")->data,
+    );
+    is $crl_profile->{PROFILE}->{DAYS}, 14;
+} "Create CRL profile";
+
 ## otherwise test 34 fails
-$profile->set_serial (23);
-### issue crl...
-my $crl;
-eval
-{
-    $crl = $ca_token->command ({COMMAND => "issue_crl",
-                                   REVOKED => [$cert],
-                                   PROFILE => $profile});
-    diag "CRL: $crl\n" if ($ENV{DEBUG});
-    OpenXPKI->write_file (FILENAME => "$basedir/test-ca/crl.pem",
-                          CONTENT  => $crl,
-                          FORCE    => 1);
-};
-ok($crl, 'CRL creation') or diag "Exception: $EVAL_ERROR";
+$crl_profile->set_serial (23);
 
-}
-}
+
+
+
+#### issue crl...
+my $crl;
+lives_and {
+    $crl = $ca_token->command({
+        COMMAND => "issue_crl",
+        REVOKED => [$cert],
+        PROFILE => $crl_profile,
+    });
+    like $crl, qr/^-----BEGIN X509 CRL-----/;
+} "Create CRL";
 
 1;

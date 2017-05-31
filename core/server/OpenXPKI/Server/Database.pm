@@ -165,6 +165,38 @@ sub _build_driver {
     return $instance;
 }
 
+# Converts DBI errors into OpenXPKI exceptions
+sub _dbi_error_handler {
+    my ($self, $msg, $dbh, $more_details) = @_;
+
+    my $details = {
+        source => "?",
+        dbi_error => $dbh->errstr,
+        dsn => $self->driver->dbi_dsn,
+        user => $self->driver->user,
+        $more_details ? %$more_details : (),
+    };
+
+    my $method = "";
+    my $our_msg;
+
+    # original message is like: [class] [method] failed: [message]
+    if ($msg =~ m/^(?<class>[a-z:_]+)\s+(?<method>[^\(\s]+)/i) {
+        $details->{source} = sprintf("%s::%s", $+{class}, $+{method});
+        $method = $+{method};
+    }
+
+    $our_msg = "connection failed"                          if "connect" eq $method;
+    $our_msg = "preparing SQL query failed"                 if "prepare" eq $method;
+    $our_msg = "binding parameters to SQL statement failed" if "bind_params" eq $method;
+    $our_msg = "execution of SQL query failed"              if "execute" eq $method;
+
+    OpenXPKI::Exception->throw(
+        message => "Database error" . ($our_msg ? ": $our_msg" : ""),
+        params => $details,
+    );
+};
+
 sub _build_dbix_handler {
     my $self = shift;
     ##! 4: "DSN: ".$self->driver->dbi_dsn
@@ -179,15 +211,20 @@ sub _build_dbix_handler {
     );
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
     ##! 4: "SQL commands after each connect: ".join("; ", @on_connect_do);
+
     my $dbix = DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
         $self->driver->passwd,
         {
-            RaiseError => 0,
-            PrintError => 0,
             AutoCommit => $self->autocommit,
             LongReadLen => 10_000_000,
+            RaiseError => 0,
+            PrintError => 0,
+            HandleError => sub {
+                my ($msg, $dbh, $retval) = @_;
+                $self->_dbi_error_handler($msg, $dbh);
+            },
             %params,
         },
         {
@@ -200,13 +237,6 @@ sub _build_dbix_handler {
                 $self->_clear_txn_starter;
             },
         }
-    ) or OpenXPKI::Exception->throw(
-        message => "Could not connect to database",
-        params => {
-            dbi_error => $DBI::errstr,
-            dsn => $self->driver->dbi_dsn,
-            user => $self->driver->user,
-        },
     );
     return $dbix;
 }
@@ -279,36 +309,19 @@ sub run {
     else {
         $query_string = $query;
     }
+
+    # pass extra info about $query_string to our error handler
+    local $self->dbh->{HandleError} = sub {
+        my ($msg, $dbh, $retval) = @_;
+        $self->_dbi_error_handler($msg, $dbh, { query => $query_string });
+    };
+
     ##! 16: "Query: " . $query_string;
-    my $sth = $self->dbh->prepare($query_string)
-        or OpenXPKI::Exception->throw(
-            message => "Could not prepare SQL query",
-            params => {
-                query => $query_string,
-                dbi_error => $self->dbh->errstr,
-            },
-        );
-
+    my $sth = $self->dbh->prepare($query_string);
     # bind parameters via SQL::Abstract::More to do some magic
-    if ($query_params) {
-        $self->sqlam->bind_params($sth, @{$query_params}); # can't use "or ..." here
-        OpenXPKI::Exception->throw(
-            message => "Could not bind parameters to SQL statement",
-            params => {
-                query => $query_string,
-                dbi_error => $sth->errstr,
-            },
-        ) if $sth->err;
-    }
+    $self->sqlam->bind_params($sth, @{$query_params}) if $query_params;
 
-    my $rownum = $sth->execute
-        or OpenXPKI::Exception->throw(
-            message => "Could not execute SQL query",
-            params => {
-                query => $query_string,
-                dbi_error => $sth->errstr,
-            },
-        );
+    my $rownum = $sth->execute;
 
     return $return_rownum ? $rownum : $sth;
 }

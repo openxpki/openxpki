@@ -6,9 +6,9 @@ main:
     port: 3306
     user: openxpki
     passwd: openxpki
-    environment:          
+    environment:
         key: value
-    
+
 # To log to a different database copy and adjust the upper block
 # logging: ~
-     
+

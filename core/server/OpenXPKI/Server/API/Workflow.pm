@@ -844,9 +844,9 @@ sub search_workflow_instances_count {
     my ($self, $args) = @_;
 
     my $params = $self->__search_query_params($args);
-    
-    # Not usefull and sometimes even dangerous 
-    foreach my $p (qw(limit offset order_by )) {  
+
+    # Not usefull and sometimes even dangerous
+    foreach my $p (qw(limit offset order_by )) {
         delete $params->{$p} if (defined $params->{$p});
     }
 
@@ -1145,7 +1145,7 @@ Execute the named activity on the given workflow object. Returns
 B<DO NOT USE THIS FLAG - IT IS NOT FULLY WORKING YET> - see #517
 The third argument is an optional boolean flag weather to executed
 the activity in the background. If used, the return value is the PID
-of the forked child. 
+of the forked child.
 
 =cut
 
@@ -1179,14 +1179,10 @@ sub __execute_workflow_activity {
                 $redo_count--;
             }
         }
-        
+
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_FORK_FAILED'
         ) unless (defined $pid);
-
-        # Reconnect the db handles - required until all old handles are replaced!
-        CTX('dbi_backend')->new_dbh();
-        CTX('dbi_backend')->connect();
 
         if ( $pid != 0 ) {
             ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
@@ -1211,10 +1207,10 @@ sub __execute_workflow_activity {
     eval {
 
         ##! 8: 'execute activity ' . $wf_activity
-        
+
         # This is a hack to handle simple "autorun" actions which we use to
         # create a bypass around optional actions
-       
+
         do {
             my $last_state = $workflow->state();
             $workflow->execute_action($wf_activity);
@@ -1306,9 +1302,9 @@ sub __execute_workflow_activity {
             log     => $log,
         );
     };
-    
+
     OpenXPKI::Server::__set_process_name("workflow: id %d (cleanup)", $workflow->id());
-    
+
     return 0;
 }
 

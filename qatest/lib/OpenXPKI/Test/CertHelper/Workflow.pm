@@ -149,44 +149,44 @@ sub create_cert {
             cert_profile => $self->profile,
             cert_subject_style => "00_basic_style",
         }, 'Create workflow: certificate signing request (hostname: '.$cert_subject_parts{hostname}.')')
-         or die "Workflow Create failed: $@";
+            or die(explain($test->get_msg));
 
-        $test->state_is('SETUP_REQUEST_TYPE');
+        $test->state_is('SETUP_REQUEST_TYPE') or die(explain($test->get_msg));
         $test->execute_ok('csr_provide_server_key_params', {
             key_alg => "rsa",
             enc_alg => 'aes256',
             key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
             password_type => 'client',
             csr_type => 'pkcs10'
-        });
+        }) or die(explain($test->get_msg));
 
-        $test->state_is('ENTER_KEY_PASSWORD');
+        $test->state_is('ENTER_KEY_PASSWORD') or die(explain($test->get_msg));
         $test->execute_ok('csr_ask_client_password', {
             _password => "m4#bDf7m3abd",
-        });
+        }) or die(explain($test->get_msg));
 
-        $test->state_is('ENTER_SUBJECT');
+        $test->state_is('ENTER_SUBJECT') or die(explain($test->get_msg));
         $test->execute_ok('csr_edit_subject', {
             cert_subject_parts => $serializer->serialize( \%cert_subject_parts )
-        });
+        }) or die(explain($test->get_msg));
 
         if ($is_server_profile) {
-            $test->state_is('ENTER_SAN');
+            $test->state_is('ENTER_SAN') or die(explain($test->get_msg));
             $test->execute_ok('csr_edit_san', {
                 cert_san_parts => $serializer->serialize( { } )
-            });
+            }) or die(explain($test->get_msg));
         }
 
-        $test->state_is('ENTER_CERT_INFO');
+        $test->state_is('ENTER_CERT_INFO') or die(explain($test->get_msg));
         $test->execute_ok('csr_edit_cert_info', {
             cert_info => $serializer->serialize( {
                 requestor_gname => $self->requestor_gname,
                 requestor_name  => $self->requestor_name,
                 requestor_email => $self->requestor_email,
             } )
-        });
+        }) or die(explain($test->get_msg));
 
-        $test->state_is('SUBJECT_COMPLETE');
+        $test->state_is('SUBJECT_COMPLETE') or die(explain($test->get_msg));
 
         # Test FQDNs should not validate so we need a policy exception request
         # (on rare cases the responsible router might return a valid address, so we check)
@@ -195,15 +195,16 @@ sub create_cert {
         my $intermediate_state;
         if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
             diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
-            $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
+            $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } )
+                or die(explain($test->get_msg));
             $intermediate_state ='PENDING_POLICY_VIOLATION';
         }
         else {
             diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
-            $test->execute_ok( 'csr_submit' );
+            $test->execute_ok( 'csr_submit' ) or die(explain($test->get_msg));
             $intermediate_state ='PENDING';
         }
-        $test->state_is($intermediate_state);
+        $test->state_is($intermediate_state) or die(explain($test->get_msg));
 
 #        if ($self->notbefore) {
 #            $test->execute_ok('csr_edit_validity', {
@@ -213,8 +214,8 @@ sub create_cert {
 #            $test->state_is( ??? );
 #        }
 
-        $test->execute_ok('csr_approve_csr');
-        $test->state_is('SUCCESS');
+        $test->execute_ok('csr_approve_csr') or die(explain($test->get_msg));
+        $test->state_is('SUCCESS') or die(explain($test->get_msg));
     };
 
     return {

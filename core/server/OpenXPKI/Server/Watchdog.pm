@@ -242,10 +242,6 @@ sub run {
         log => { priority => 'fatal', facility => 'system' }
     ) unless defined $pid;
 
-    # Reconnect the dbi
-    CTX('dbi_backend')->new_dbh();
-    CTX('dbi_backend')->connect();
-
     # parent process returns
     return $pid unless $pid == 0;
 
@@ -666,10 +662,6 @@ sub __wake_up_workflow {
 
     OpenXPKI::Exception->throw( message => 'I18N_OPENXPKI_SERVER_WATCHDOG_FORK_WORKFLOW_EXECUTION_FAILED' )
         unless( defined $pid );
-
-    # Reconnect the db handles
-    CTX('dbi_backend')->new_dbh();
-    CTX('dbi_backend')->connect();
 
     if ( $pid != 0 ) {
         ##! 16: ' Workflow instance succesfully forked - I am the watchdog'

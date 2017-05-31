@@ -20,7 +20,7 @@ style:
                 - requestor_affiliation
                 - comment
 
-        subject: 
+        subject:
             dn: CN=[% hostname %]:[% application_name %],DC=Test Deployment,DC=OpenXPKI,DC=org
 
         metadata:
@@ -30,7 +30,7 @@ style:
 
 
 # Profile extensions - set 0/1 as needed
-extensions: 
+extensions:
     key_usage:
         critical:          1
         digital_signature: 1
@@ -44,10 +44,10 @@ extensions:
         decipher_only:     0
 
     extended_key_usage:
-        critical:         1 	   
+        critical:         1
         client_auth:      1
         server_auth:      0
         email_protection: 0
-        codeSigning:      0
-        timeStamping:     0
- 
+        code_signing:     0
+        time_stamping:    0
+

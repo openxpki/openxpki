@@ -41,14 +41,21 @@ $test->connect_ok(
 # Tests
 #
 $test->runcmd('control_watchdog', { ACTION => 'stop' });
-$test->is($test->get_msg->{COMMAND}, 'control_watchdog');
+$test->is($test->get_msg->{COMMAND}, 'control_watchdog', "Correct command");
 
-$test->runcmd('control_watchdog', { ACTION => 'status' });
-$test->is($test->get_msg->{PARAMS}->{children},0);
+my $MAX_WAIT = 10;
+my $tick = 0;
+while ($tick < $MAX_WAIT) {
+    $test->runcmd('control_watchdog', { ACTION => 'status' });
+    last if $test->get_msg->{PARAMS}->{children} == 0;
+    $tick++;
+    sleep 1;
+}
+$test->is($test->get_msg->{PARAMS}->{children}, 0, "Stop all child processes");
 
 $test->runcmd('control_watchdog', { ACTION => 'start' });
 
 $test->runcmd('control_watchdog', { ACTION => 'status' });
-$test->ok(@{$test->get_msg->{PARAMS}->{pid}} > 0);
+$test->ok(@{$test->get_msg->{PARAMS}->{pid}} > 0, "Create child processes");
 
 $test->disconnect();

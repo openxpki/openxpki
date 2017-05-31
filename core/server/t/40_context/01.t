@@ -8,7 +8,7 @@ use Data::Dumper;
 use OpenXPKI::Debug;
 if ($ENV{DEBUG}) {
     $OpenXPKI::Debug::LEVEL{'.*'} = 128;
-    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;    
+    $OpenXPKI::Debug::LEVEL{'OpenXPKI::XML::Cache'} = 0;
 }
 
 require OpenXPKI::Server::Init;
@@ -22,20 +22,20 @@ $ENV{OPENXPKI_CONF_DB} = 't/config.git/';
 
 ## init XML cache
 ok(OpenXPKI::Server::Init::init(
-       {	   
+       {
 	   TASKS  => [ 'api',
-	           'config_versioned', 		                      
-		       'log', 
-		       'dbi_backend', 		       
+	           'config_versioned',
+		       'log',
+		       'dbi',
                ],
        }));
-   
+
 my $var;
 
 ### try to get basic (database) object...
 $var = undef;
 eval {
-    $var = CTX('dbi_backend');
+    $var = CTX('dbi');
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
     ok(0);
@@ -69,7 +69,7 @@ eval {
     OpenXPKI::Server::Context::setcontext({'server' => 'baz'});
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
-    ok($exc->message(), 
+    ok($exc->message(),
        "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ALREADY_DEFINED"); # expected error
 } else {
     ok(0);
@@ -91,7 +91,7 @@ eval {
     OpenXPKI::Server::Context::setcontext({'foo' => 'bar'});
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
-    ok($exc->message(), 
+    ok($exc->message(),
        "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ILLEGAL_ENTRY"); # expected error
 } else {
     ok(0);
@@ -103,7 +103,7 @@ eval {
     $var = CTX('foo');
 };
 if (my $exc = OpenXPKI::Exception->caught()) {
-    ok($exc->message(), 
+    ok($exc->message(),
        "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND"); # expected error
 } else {
     ok(0);

@@ -18,7 +18,8 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypto::X509;
 use OpenXPKI::Serialization::Simple;
-
+use OpenXPKI::Server::Database::Legacy;
+use OpenXPKI::Server::Database; # to get AUTO_ID
 use Moose;
 #use namespace::autoclean; # Comnflicts with Debugger
 
@@ -81,7 +82,6 @@ sub _set_context_param {
 }
 
 sub __context_param {
-
     my ($self , $attrib_map, $context_parameter_name, $set_to_value) = @_;
 
     # Lookup map if there is a mapping
@@ -93,136 +93,106 @@ sub __context_param {
     } else {
         return $self->_get_context()->param( $real_parameter_name );
     }
-
 }
 
 # Put Information into the DataPool and write certificate table
 sub __persistCertificateInformation {
-
-    my $self = shift;
-    my $certificate_information = shift;
-    my $persist_data = shift;
+    my ($self, $cert_info, $persist_data) = @_;
+    ##! 64: 'certificate information: ' . Dumper ( $cert_info )
 
     my $pki_realm = CTX('api')->get_pki_realm();
-
     my $default_token = CTX('api')->get_default_token();
-
-
-    if (! defined $default_token) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_NICE_DEFAULT_TOKEN_NOT_AVAILABLE",
-        );
-    }
-
-    ##! 64: 'certificate information: ' . Dumper ( $certificate_information )
 
     my $x509 = OpenXPKI::Crypto::X509->new(
         TOKEN => $default_token,
-        DATA  => $certificate_information->{'certificate'},
+        DATA  => $cert_info->{certificate},
     );
-    
-    my %insert_hash = $x509->to_db_hash();
-    my $identifier = $insert_hash{'IDENTIFIER'};
+
+    # FIXME #legacydb Migrate OpenXPKI::Crypto::X509->to_db_hash() later on
+    my $cert_data = OpenXPKI::Server::Database::Legacy->certificate_from_legacy({ $x509->to_db_hash });
+    my $identifier = $cert_data->{identifier};
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     if ($persist_data) {
         my $serialized_data = $serializer->serialize( $persist_data );
-    
         ##! 16: 'Persist certificate: ' . $identifier
         ##! 32: 'persisted data: ' . Dumper( $persist_data )
-    
         CTX('api')->set_data_pool_entry({
             PKI_REALM => $pki_realm,
             NAMESPACE => 'nice.certificate.information',
-            KEY => $identifier,
-            VALUE => $serialized_data,
-            ENCRYPT => 0,
-            FORCE => 1,
+            KEY       => $identifier,
+            VALUE     => $serialized_data,
+            ENCRYPT   => 0,
+            FORCE     => 1,
         });
     }
-    
+
     # Try to autodetected the ca_identifier ....
-    if (!$certificate_information->{'ca_identifier'}) {
-
-        my ($issuer_key, $issuer_value);
-
-        # based on aik
-        if (defined $insert_hash{'AUTHORITY_KEY_IDENTIFIER'} && $insert_hash{'AUTHORITY_KEY_IDENTIFIER'}) {
-            $issuer_value = $insert_hash{AUTHORITY_KEY_IDENTIFIER};
-            $issuer_key = 'SUBJECT_KEY_IDENTIFIER';
-            ##! 16: "autodetected the ca_identifier using aki " . $issuer_value
-        } else {
-            # based on the issuer dn
-            $issuer_value = $insert_hash{ISSUER_DN};
-            $issuer_key = 'SUBJECT';
-            ##! 16: "autodetected the ca_identifier using issuer dn " . $issuer_value
-        }
-        my $issuer = CTX('dbi_backend')->first(
-            TABLE   => 'CERTIFICATE',
-            COLUMNS => [
-                'IDENTIFIER'
-            ],
-            DYNAMIC => {
-                $issuer_key => $issuer_value,
-                'STATUS'    => 'ISSUED',
-                'PKI_REALM' => [ $pki_realm, undef ]
+    my $ca_id = $cert_info->{ca_identifier};
+    if (not $ca_id) {
+        my $issuer = CTX('dbi')->select_one(
+            from => 'certificate',
+            columns => [ 'identifier' ],
+            where => {
+                $cert_data->{authority_key_identifier}
+                    ? (subject_key_identifier => $cert_data->{authority_key_identifier})
+                    : (subject => $cert_data->{issuer_dn}),
+                status    => 'ISSUED',
+                pki_realm => [ $pki_realm, undef ],
             },
         );
         ##! 32: 'returned issuer ' . Dumper( $issuer )
-        if ($issuer->{IDENTIFIER}) {
-            $certificate_information->{'ca_identifier'} = $issuer->{IDENTIFIER};
+        if ($issuer->{identifier}) {
+            $ca_id = $issuer->{identifier};
         } else {
-            $certificate_information->{'ca_identifier'} = 'unknown';
-            
+            $ca_id = 'unknown';
             CTX('log')->log(
-                MESSAGE => "NICE certificate issued with unknown issuer! ($identifier / ".$insert_hash{ISSUER_DN}.")",
+                MESSAGE => "NICE certificate issued with unknown issuer! ($identifier / ".$cert_data->{issuer_dn}.")",
                 PRIORITY => 'warn',
                 FACILITY => 'application'
             );
-            
+
         }
-
     }
-
-    $insert_hash{'PKI_REALM'} = $pki_realm;
-    $insert_hash{'ISSUER_IDENTIFIER'} = $certificate_information->{'ca_identifier'};
-    $insert_hash{'CSR_SERIAL'} = $certificate_information->{'csr_serial'};
-    $insert_hash{'STATUS'} = 'ISSUED';
-    CTX('dbi_backend')->insert(
-        TABLE => 'CERTIFICATE',
-        HASH  => \%insert_hash,
+    CTX('dbi')->insert(
+        into => 'certificate',
+        values=> {
+            %$cert_data,
+            issuer_identifier => $ca_id,
+            pki_realm         => $pki_realm,
+            req_key           => $cert_info->{csr_serial},
+            status            => 'ISSUED',
+        },
     );
 
     my @parsed_subject_alt_names = $x509->get_subject_alt_names();
     ##! 32: 'sans (parsed): ' . Dumper \@parsed_subject_alt_names
-    foreach my $san (@parsed_subject_alt_names) {
-        CTX('dbi_backend')->insert(
-            TABLE => 'CERTIFICATE_ATTRIBUTES',
-            HASH  => {
-                'IDENTIFIER'       => $identifier,
-                'ATTRIBUTE_KEY'    => 'subject_alt_name',
-                'ATTRIBUTE_VALUE'  => $san->[0] . ':' . $san->[1],
+    for my $san (@parsed_subject_alt_names) {
+        CTX('dbi')->insert(
+            into => 'certificate_attributes',
+            values => {
+                attribute_key        => AUTO_ID,
+                identifier           => $identifier,
+                attribute_contentkey => 'subject_alt_name',
+                attribute_value      => join(":", @$san),
             },
         );
     }
 
     # if this originates from a workflow, register the workflow id in the attribute table
     if ($self->_get_workflow()) {
-        CTX('dbi_backend')->insert(
-            TABLE => 'CERTIFICATE_ATTRIBUTES',
-            HASH => {
-                IDENTIFIER => $identifier,
-                ATTRIBUTE_KEY => 'system_workflow_csr',
-                ATTRIBUTE_VALUE => $self->_get_workflow()->id
+        CTX('dbi')->insert(
+            into => 'certificate_attributes',
+            values => {
+                attribute_key        => AUTO_ID,
+                identifier           => $identifier,
+                attribute_contentkey => 'system_workflow_csr',
+                attribute_value      => $self->_get_workflow()->id,
             }
         );
     }
-
-    CTX('dbi_backend')->commit();
-
     return $identifier;
-
 }
 
 sub __fetchPersistedCertificateInformation {

@@ -6673,10 +6673,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN"
-#~ msgstr "Заявка находится в стадии редактирования"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_INIT_LOCALE_DIRECTORY_MISSING"
 #~ msgstr "Заявка находится в стадии редактирования"
 
@@ -6739,12 +6735,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE"
 #~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_NICE_DEFAULT_TOKEN_NOT_AVAILABLE"
-#~ msgstr ""
-#~ "Выбранный способ построения имени требует наличия, как минимум, одного "
-#~ "названия подразделения и двух компонентов доменного имени."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE"
@@ -7263,12 +7253,6 @@ msgstr "Имя учетной записи"
 #~ "некоторых данных (__FIELDS__)."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RETRIEVECERTIFICATE_QUERY_ERROR"
-#~ msgstr ""
-#~ "Для выполнения следующего этапа технологическому процессу не хватает "
-#~ "некоторых данных (__FIELDS__)."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_REVOKE_CERTIFICATE_NO_CERT_IDENTIFIER"
 #~ msgstr ""
 #~ "Для выполнения следующего этапа технологическому процессу не хватает "
@@ -7578,10 +7562,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER"
-#~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_TOKEN_UNAVAILABLE"
 #~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy

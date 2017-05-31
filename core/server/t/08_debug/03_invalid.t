@@ -6,7 +6,7 @@ plan tests => 24;
 
 use_ok('OpenXPKI::Debug');
 
-diag "Catching invalid debug output" if $ENV{VERBOSE};
+note "Catching invalid debug output";
 # first check that everything works with the invalid module
 my $stderr = `$^X -It/08_debug t/08_debug/main.pl TestModuleInvalid.pm 1 2>&1`;
 ok(! $CHILD_ERROR, 'main.pl execution');

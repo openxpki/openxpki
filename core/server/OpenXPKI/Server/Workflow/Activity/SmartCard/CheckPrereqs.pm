@@ -65,10 +65,10 @@ sub execute {
     if ($wf_types) {
         CTX('log')->log(
             MESSAGE => 'SmartCard found existing workflows: ' . Dumper $result->{WORKFLOWS},
-            PRIORITY => 'trace',
+            PRIORITY => 'debug',
             FACILITY => [ 'application' ],
         );
-    } 
+    }
 
 	# set cert ids in context
 	my $cert_ids = OpenXPKI::Server::Workflow::WFObject::WFArray->new(

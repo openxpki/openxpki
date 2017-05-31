@@ -39,7 +39,7 @@ my @test_tasks = (
 my $test_number = scalar @test_tasks;
 plan tests =>  $test_number;
 
-diag "Cleaning after LDAP tests\n" if $ENV{VERBOSE};
+note "Cleaning after LDAP tests\n";
 
 #### 1) DELETING SEMAPHORE FILE
 

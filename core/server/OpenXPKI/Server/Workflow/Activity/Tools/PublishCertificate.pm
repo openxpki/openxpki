@@ -88,15 +88,15 @@ sub execute {
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
 
     # Load and convert the certificate
-    CTX('dbi_backend')->commit();
-    my $hash = CTX('dbi_backend')->first (
-        TABLE => 'CERTIFICATE',
-        DYNAMIC => {
-           IDENTIFIER => { VALUE => $cert_identifier },
+    my $cert = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => [ 'data', 'subject' ],
+        where => {
+           identifier => $cert_identifier,
         },
     );
 
-    if (!$hash || !$hash->{DATA}) {
+    if (!$cert || !$cert->{data}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE',
             params => { 'CERT_IDENTIFIER' => $cert_identifier },
@@ -108,15 +108,15 @@ sub execute {
     }
 
     CTX('log')->log(
-        MESSAGE => 'Publication for ' . $hash->{SUBJECT} . ', targets ' . join(",", @target),
+        MESSAGE => 'Publication for ' . $cert->{subject} . ', targets ' . join(",", @target),
         PRIORITY => 'debug',
         FACILITY => [ 'application' ],
     );
 
     # Prepare the data
     my $data = {};
-    $data->{pem} = $hash->{DATA};
-    $data->{subject} = $hash->{SUBJECT};
+    $data->{pem} = $cert->{data};
+    $data->{subject} = $cert->{subject};
 
     # Convert to DER
     $data->{der} = $default_token->command({
@@ -189,11 +189,11 @@ sub execute {
         my $queue =  $context->param( 'tmp_publish_queue' );
         ##! 16: 'Load targets from context queue'
         if (!ref $queue) {
-            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue ); 
+            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
         }
         @target = @{$queue};
     }
-    
+
     my $on_error = $self->param('on_error') || '';
     my @failed;
     ##! 32: 'Targets ' . Dumper \@target
@@ -218,7 +218,7 @@ sub execute {
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
                     params => {
                         TARGET => $target,
-                        ERROR => $EVAL_ERROR 
+                        ERROR => $EVAL_ERROR
                     }
                 );
             }
@@ -230,13 +230,13 @@ sub execute {
             );
         }
     }
-  
+
     if (@failed) {
         $context->param( 'tmp_publish_queue' => \@failed );
         $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
         # pause stops execution of the remaining code
     }
-    
+
     $context->param( { 'tmp_publish_queue' => undef });
 
     ##! 4: 'end'
@@ -334,6 +334,6 @@ the queue is not empty, pause/wake_up is used to retry those targets
 with the retry parameters set. This obvioulsy requires I<retry_count>
 to be set.
 
-=back 
+=back
 
 =back

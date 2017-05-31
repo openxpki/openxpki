@@ -1,48 +1,52 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More;
+use utf8;
+
+# Core modules
 use English;
+use FindBin qw( $Bin );
 
-plan tests => 19;
+# CPAN modules
+use Test::More;
+use Test::Deep;
+use Test::Exception;
 
-print STDERR "OpenXPKI::Crypto::Backend::OpenSSL::PKCS10\n" if $ENV{VERBOSE};
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Crypto.*'} = 100;
 
-use OpenXPKI::Crypto::TokenManager;
+# Project modules
+use OpenXPKI::FileUtils;
+use lib "$Bin/../lib";
+use OpenXPKI::Test;
 
-our $cache;
-our $basedir;
-our $cacert;
-eval `cat t/25_crypto/common.pl`;
+plan tests => 17;
 
-is($EVAL_ERROR, '', 'common.pl evaluated correctly');
+#
+# Setup env
+#
+my $oxitest = OpenXPKI::Test->new->setup_env->init_server();
+#$oxitest->insert_testcerts;
 
-SKIP: {
-    skip 'crypt init failed', 18 if $EVAL_ERROR;
+my $csr    = "-----BEGIN CERTIFICATE REQUEST-----\nMIIChzCCAW8CAQAwQjETMBEGCgmSJomT8ixkARkWA29yZzEYMBYGCgmSJomT8ixk\nARkWCE9wZW5YUEtJMREwDwYDVQQDDAhKb2huIETDtjCCASIwDQYJKoZIhvcNAQEB\nBQADggEPADCCAQoCggEBAO6ulq2Jj5DDOcSpqesTMsxlzdNixpYTHVMxslRl+Lob\nu18yQNRyTSp6JpoiAlW0QHLwUO5o9EJ7lT0WBkuVsfL8I1o5RYVzl5/stLEvC1BV\nLQqw21TNuj7jkWDKiz1ekkkeVqZVfBJdTooVYfhL2FFM6ctLFg5z9eWpkdmfaKbQ\nIqmwEfu6XdWozqzdseX3/Q6CH2Q6g4tZsklGZf/+3XAdGf32OtWDBFU+4KpiU5DL\nwwCWbs3CFLVGBZR9ZQNSJYGmqeP+HqoUgi/l+JqyK3j3X/3Aa8z8E+hmpxjBh10b\nZyR18oTOvyRD9c+CPHUPMvnd28i+asV8qa282jAPMZECAwEAAaAAMA0GCSqGSIb3\nDQEBCwUAA4IBAQCLNy08onPziRPLxvtqeI5staff0qSXVKmT1nKPGGnNp5PHg8NJ\n4q17cUVNY/mP9GfVl6J3lp8iv8FoqdaOP5O/cAx1ROSPHKAN9P347OZ5hAPxCazg\nrZdRhCVcQsDb1pRXLWvTOo8phKBOa9yIQQqO+oGMB7oSGe39+wN7QmyQGD1f4+dq\nkaQa2kzEMOsCRYKtcQrRm2rNtqzwe/vLUdqsuSYvTFY2WRNkOj548L3sG0AI9+Nl\nxZVvgZqgRlX3naIVKtZt3lBkIJjiNvVxGrgBRLeSoJ5hZRbAMSuX+En0dy/90DQk\n8ToYNrytQlgEsyg9kTZaYbMPTn/aJSrgNYdM\n-----END CERTIFICATE REQUEST-----\n";
 
-## parameter checks for TokenManager init
+#
+# Tests
+#
+use_ok "OpenXPKI::Crypto::TokenManager";
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
-ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
+my $default_token;
+lives_and {
+    my $mgmt = OpenXPKI::Crypto::TokenManager->new;
+    $default_token = $mgmt->get_system_token({ TYPE => "DEFAULT" });
+    ok $default_token;
+} 'Get default token';
 
-TODO: {
-    todo_skip 'See Issue #188', 17;
-my $token = $mgmt->get_token ({
-   TYPE => 'certsign',
-   NAME => 'test-ca',
-   CERTIFICATE => {
-        DATA => $cacert,
-        IDENTIFIER => 'ignored',
-   }
-});
-
-ok (defined $token, 'Parameter checks for get_token');
-
-## create PKCS#10 request
-my $csr = OpenXPKI->read_file ("$basedir/test-ca/pkcs10.pem");
-ok(1);
 
 ## get object
-$csr = $token->get_object ({DATA => $csr, TYPE => "CSR"});
+my $csr_obj = $default_token->get_object({
+    DATA => $csr,
+    TYPE => "CSR"
+});
 ok(1);
 
 ## check that all required functions are available and work
@@ -50,25 +54,17 @@ foreach my $func ("version", "subject", "subject_hash", "fingerprint",
                   "emailaddress", "extensions", # "attributes",
                   "pubkey_algorithm", "pubkey", "keysize", "modulus", "exponent",
                   "pubkey_hash",
-                  "signature_algorithm", "signature")
-{
+                  "signature_algorithm", "signature") {
     ## FIXME: this is a bypass of the API !!!
-    my $result = $csr->$func();
-    if (defined $result)
-    {
-        ok(1);
-        print STDERR "$func: $result\n" if ($ENV{DEBUG});
+    my $result = $csr_obj->$func();
+    if (defined $result) {
+        pass "$func";
     }
-    elsif (grep /$func/, ("extensions", "emailaddress"))
-    {
-        ok(1);
-        print STDERR "$func: not available\n" if ($ENV{DEBUG});
+    elsif (grep /$func/, ("extensions", "emailaddress")) {
+        pass "$func: should not be available";
     } else {
-        ok(0);
-        print STDERR "Error: function $func failed\n";
+        fail "$func";
     }
-}
 }
 
-}
 1;

@@ -2,17 +2,17 @@ use strict;
 use warnings;
 use Test::More;
 
-my @files = (                          
+my @files = (
             "t/var/openxpki/connector.log",
             "t/var/openxpki/stderr.log",
             "t/var/openxpki/openxpkid.pid",
-            "t/var/openxpki/openxpki.socket",                          
+            "t/var/openxpki/openxpki.socket",
             );
 
 ## 2 * number of files
 plan tests => (scalar @files) * 2;
 
-diag "OpenXPKI::Server Cleanup\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server Cleanup";
 
 foreach my $filename (@files)
 {
