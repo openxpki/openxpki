@@ -45,8 +45,8 @@ EXTERNAL2= \
 
 CORE = \
     CGI \
-    Module__Build__Tiny
-
+    Module__Build__Tiny \
+    Module__Load
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) CGI DateTime__Format__DateParse
 
@@ -54,7 +54,7 @@ cpan_dependency: $(EXTERNAL)
 
 cpan_dependency2: $(EXTERNAL2) 
 
-trusty: CGI Module__Build__Tiny
+trusty: CGI Module__Build__Tiny Module__Load
 
 default:	clean
 	$(MAKE) $(EXTERNAL)
