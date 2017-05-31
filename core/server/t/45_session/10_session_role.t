@@ -98,6 +98,6 @@ throws_ok {
             log => OpenXPKI::Server::Log::NOOP->new,
         )
         ->resume(25);
-} qr/missing/i, "complain about session attributes";
+} qr/TestDriver/i, "complain about wrong results from driver";
 
 1;

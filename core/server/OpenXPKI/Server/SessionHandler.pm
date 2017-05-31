@@ -2,6 +2,9 @@ package OpenXPKI::Server::SessionHandler;
 use Moose;
 use utf8;
 
+# Core modules
+use Scalar::Util qw( blessed );
+
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Session::Data;
@@ -191,7 +194,7 @@ sub resume {
     OpenXPKI::Exception->throw(
         message => "Session backend driver did not return session data",
         params => { driver => ref $driver },
-    ) unless (ref $data and $data->isa('OpenXPKI::Server::Session::Data'));
+    ) unless (blessed($data) and $data->isa('OpenXPKI::Server::Session::Data'));
 
     # Store data object
     $self->data($data);
