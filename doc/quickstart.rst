@@ -17,14 +17,14 @@ Debian/Ubuntu Builds
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
 
-Current release is 1.16 which is out for debian jessie on the package mirror at http://packages.openxpki.org/. 
+Current release is 1.17.4 which is out for debian jessie and ubuntu trusty (14.04 LTS) on the package mirror at http://packages.openxpki.org/. 
 
 Add the repository to your source list (jessie)::
 
     echo "deb http://packages.openxpki.org/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update   
     
-or ubuntu trusty (still on 1.13 due to compatiblity issues)::
+or ubuntu *trusty (14.04 LTS)* (those *DONT* work on recent Xenial 16.04!) ::
 
     echo "deb http://packages.openxpki.org/ubuntu/ dists/trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
@@ -39,7 +39,7 @@ As the init script uses mysql as default, but does not force it as a dependency,
 
 We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend mod_fcgid as it is in the official main repository (mod_fastcgi will also work but is only available in the non-free repo)::
 
-    aptitude install libapache2-mod-fcgid
+    aptitude install libapache2-mod-fcgid 
 
 Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text (this is usually done by the installer already)::
 
@@ -47,13 +47,13 @@ Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
 
 Some people reported that a2enmod is not available on their system, in this case try to install the apache2.2-common package.
 
-*Ubuntu*: The provided CGI.pm does not support para_multi, either install a recent version from CPAN or manually grab an install the package from our package server! 
+*Ubuntu only*: Some of the provided perl packages are too old, you need to install recent versions from our package server by hand! The packages signatures are not working on ubuntu, so you need to confirm that you want to install the "untrusted packages". 
+
+    aptitude install libcgi-perl libmodule-load-perl
 
 Now install the OpenXPKI core package and the translation package::
 
     aptitude install libopenxpki-perl openxpki-i18n
-
-*Note: It looks like we solved this for debian but the ubuntu signatures are still "broken" and installing on ubuntu causes a "gpg error". We are still working on this issue (see #181).* 
 
 You should now restart the apache server to activate the new config::
 
@@ -62,7 +62,7 @@ You should now restart the apache server to activate the new config::
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 1.0.0
+    Version (core): 1.17.4
 
 Now, create an empty database and assign a database user::
 
