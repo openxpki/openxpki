@@ -27,11 +27,7 @@ use OpenXPKI::Debug;
 has dbi => (
     is => 'rw',
     isa => 'OpenXPKI::Server::Database',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return OpenXPKI::Server::Init::get_database("main");
-    },
+    required => 1,
 );
 
 ################################################################################

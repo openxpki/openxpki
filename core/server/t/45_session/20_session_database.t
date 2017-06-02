@@ -35,6 +35,7 @@ use_ok "OpenXPKI::Server::SessionHandler";
 my %base_args = (
     type => "Database",
     log  => Log::Log4perl->get_logger(),
+    driver_config => { dbi => $oxitest->dbi },
 );
 
 ## create new session
