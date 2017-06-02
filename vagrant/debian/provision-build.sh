@@ -1,6 +1,7 @@
 #!/bin/bash
 #wget http://packages.openxpki.org/debian/openxpki.list -O /etc/apt/sources.list.d/openxpki.list
-
+set -e
+set -x
 apt-get update
 
 # Install the deps
@@ -42,18 +43,24 @@ cd ../
 
 # Now build the deps
 make clean
-make cpan_dependency cpan_dependency2
 
 # on Ubuntu 14 we also need CGI and Module::Load
-if [ `grep "Ubuntu 14" /etc/issue` ]; then
+if [ "`grep "Ubuntu 14" /etc/issue`" ]; then
     make trusty
+    # Module::* is required by the cpan deps already 
+    dpkg -i deb/cpan/*deb 
 fi
+
+make cpan_dependency cpan_dependency2
+
+# Install remaining deps 
+dpkg -i deb/cpan/*deb 
 
 make core
 make i18n
 
-# Install the stuff
-dpkg -i deb/cpan/*deb deb/core/*deb
+# Install the stuff - this exits with false due to unresolved deps
+dpkg -i deb/core/*deb || /bin/true
 
 # This pulls in the deps from the openxpki packages
 apt-get  install --fix-broken --yes
