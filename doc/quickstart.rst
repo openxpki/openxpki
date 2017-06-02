@@ -47,7 +47,7 @@ Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
 
 Some people reported that a2enmod is not available on their system, in this case try to install the apache2.2-common package.
 
-*Ubuntu only*: Some of the provided perl packages are too old, you need to install recent versions from our package server by hand! The packages signatures are not working on ubuntu, so you need to confirm that you want to install the "untrusted packages". 
+*Ubuntu only*: Some of the provided perl packages are too old, you need to install recent versions from our package server by hand! The packages signatures are not working on ubuntu, so you need to confirm that you want to install the "untrusted packages":: 
 
     aptitude install libcgi-perl libmodule-load-perl
 

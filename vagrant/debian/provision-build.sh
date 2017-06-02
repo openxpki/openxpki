@@ -20,8 +20,8 @@ apt-get install --assume-yes libtest-deep-perl
 
 # This inits the cpan module for dh-make-perl
 (echo y;echo o conf prerequisites_policy follow;echo o conf commit)|cpan
- 
-# Now chdir to the debian package dir 
+
+# Now chdir to the debian package dir
 cd /code-repo/package/debian
 
 # For stupid deps problem, unpack current MakeMaker and Module::Build in lib
@@ -29,7 +29,7 @@ mkdir -p lib/
 cd lib/
 
 if [ ! -d "ExtUtils-MakeMaker-6.98" ]; then
-        test -e ExtUtils-MakeMaker-6.98.tar.gz || wget http://search.cpan.org/CPAN/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-6.98.tar.gz 
+        test -e ExtUtils-MakeMaker-6.98.tar.gz || wget http://search.cpan.org/CPAN/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-6.98.tar.gz
     tar -ax --strip-components=2 -f  ExtUtils-MakeMaker-6.98.tar.gz ExtUtils-MakeMaker-6.98/lib/
 fi
 
@@ -42,7 +42,13 @@ cd ../
 
 # Now build the deps
 make clean
-make cpan_dependency cpan_dependency2 
+make cpan_dependency cpan_dependency2
+
+# on Ubuntu 14 we also need CGI and Module::Load
+if [ `grep "Ubuntu 14" /etc/issue` ]; then
+    make trusty
+fi
+
 make core
 make i18n
 
@@ -60,8 +66,8 @@ sleep 30;
 
 # Kick off prove
 cd /code-repo/qatest/backend/nice
-prove . 
+prove .
 
 cd /code-repo/qatest/backend/webui
-prove . 
+prove .
 
