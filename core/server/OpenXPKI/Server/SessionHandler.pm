@@ -56,17 +56,10 @@ has type => (
 );
 
 # Additional configuration options for the driver
-has driver_config => (
+has config => (
     is => 'ro',
     isa => 'HashRef',
     default => sub { {} },
-);
-
-# session lifetime
-has lifetime => (
-    is => 'ro',
-    isa => 'Int',
-    default => 1800, # 30 minutes
 );
 
 # storage driver
@@ -76,6 +69,13 @@ has driver => (
     lazy => 1,
     builder => '_build_driver',
     init_arg => undef,
+);
+
+# session lifetime
+has lifetime => (
+    is => 'ro',
+    isa => 'Int',
+    default => 1800, # 30 minutes
 );
 
 has data => (
@@ -102,7 +102,7 @@ sub _build_driver {
     ) if $@;
 
     my $instance;
-    eval { $instance = $class->new($self->driver_config) };
+    eval { $instance = $class->new($self->config) };
     OpenXPKI::Exception->throw (
         message => "Unable to instantiate session driver class",
         params => { class_name => $class, message => $@ }
