@@ -715,7 +715,6 @@ sub __wake_up_workflow {
             PRIORITY => "error",
             FACILITY => "system"
         );
-        return $error_msg;
     }
 
     # The child MUST TERMINATE!
