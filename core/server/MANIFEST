@@ -71,7 +71,6 @@ OpenXPKI/Client/SC/Utilities.pm
 
 
 ## Config Layers
-OpenXPKI/Config/Merge.pm
 OpenXPKI/Config/Test.pm
 OpenXPKI/Config/Backend.pm
 
