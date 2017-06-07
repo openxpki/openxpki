@@ -349,6 +349,8 @@ sub __pkcs_req : PRIVATE {
         }
     );
 
+    Log::Log4perl::MDC->put('sceptid', $transaction_id);
+
     CTX('log')->log(
         MESSAGE => "SCEP incoming request, id $transaction_id",
         PRIORITY => 'info',

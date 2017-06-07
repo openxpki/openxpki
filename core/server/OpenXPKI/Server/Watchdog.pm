@@ -78,6 +78,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use Proc::ProcessTable;
 use POSIX;
+use Log::Log4perl::MDC;
 
 use Net::Server::Daemonize qw( set_uid set_gid );
 
@@ -689,6 +690,11 @@ sub __wake_up_workflow {
 
         CTX('session')->set_pki_realm($args->{pki_realm});
         CTX('session')->import_serialized_info($args->{workflow_session});
+
+        # Set MDC for logging
+        Log::Log4perl::MDC->put('user', CTX('session')->get_user());
+        Log::Log4perl::MDC->put('role', CTX('session')->get_role());
+        Log::Log4perl::MDC->put('sid', substr(CTX('session')->get_id(),0,4));
 
         ##! 1: 'call wakeup'
         my $wf_info = CTX('api')->wakeup_workflow({

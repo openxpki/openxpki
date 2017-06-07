@@ -21,6 +21,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
+use Log::Log4perl::MDC;
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -458,6 +459,9 @@ sub execute_workflow_activity {
     my $wf_uiinfo   = $args->{UIINFO};
     my $fork_mode   = $args->{ASYNC} || '';
 
+    Log::Log4perl::MDC->put('wfid', $wf_id);
+    Log::Log4perl::MDC->put('wftype', $wf_type);
+
     ##! 2: "load workflow"
     my $workflow = $self->__fetch_workflow({ TYPE => $wf_type, ID => $wf_id });
 
@@ -717,6 +721,10 @@ sub create_workflow_instance {
 
     ## init creator
     my $wf_id = $workflow->id();
+
+    Log::Log4perl::MDC->put('wfid', $wf_id);
+    Log::Log4perl::MDC->put('wftype', $wf_type);
+
     my $context = $workflow->context();
     my $creator = CTX('session')->get_user();
     $context->param( 'creator'  => $creator );
@@ -727,10 +735,10 @@ sub create_workflow_instance {
     $workflow->attrib({ creator => $creator });
 
     OpenXPKI::Server::Context::setcontext(
-	{
-	    workflow_id => $wf_id,
-	    force       => 1,
-	});
+    {
+        workflow_id => $wf_id,
+        force       => 1,
+    });
 
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->log(
@@ -783,6 +791,11 @@ sub create_workflow_instance {
         $context->param( 'creator' => $creator );
     }
     $workflow->attrib({ creator => $context->param( 'creator' ) });
+
+    # TODO - we need to persist the workflow here again!
+
+    Log::Log4perl::MDC->put('wfid', undef);
+    Log::Log4perl::MDC->put('wftype', undef);
 
     return $self->__get_workflow_ui_info({ WORKFLOW => $workflow }) if $wf_uiinfo;
     return $self->__get_workflow_info($workflow);
@@ -1262,6 +1275,10 @@ sub __execute_workflow_activity {
             priority => 'error',
             facility => 'workflow',
         };
+
+        # clear MDC
+        Log::Log4perl::MDC->put('wfid', undef);
+        Log::Log4perl::MDC->put('wftype', undef);
 
         ## normal OpenXPKI exception
         $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");

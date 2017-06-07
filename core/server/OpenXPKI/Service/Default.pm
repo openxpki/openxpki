@@ -28,6 +28,7 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::Default::Command;
+use Log::Log4perl::MDC;
 
 my %state_of :ATTR;     # the current state of the service
 
@@ -205,6 +206,8 @@ sub __handle_NEW_SESSION : PRIVATE {
     my $ident   = ident $self;
     my $msg     = shift;
 
+    Log::Log4perl::MDC->put('sid', undef);
+
     ##! 4: "new session"
     my $session = OpenXPKI::Server::Session->new({
         DIRECTORY => CTX('config')->get("system.server.session.directory"),
@@ -220,6 +223,8 @@ sub __handle_NEW_SESSION : PRIVATE {
     }
 
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+
+    Log::Log4perl::MDC->put('sid', substr($session->get_id(),0,4));
 
     CTX('log')->log(
     MESSAGE  => 'New session created',
@@ -243,6 +248,8 @@ sub __handle_CONTINUE_SESSION {
     my $msg     = shift;
 
     my $session;
+
+    Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
 
     ##! 4: "try to continue session"
     eval {
@@ -294,6 +301,8 @@ sub __handle_DETACH_SESSION: PRIVATE {
     ##! 4: "detach session " . $sessid
 
     OpenXPKI::Server::Context::killsession();
+
+    Log::Log4perl::MDC->put('sid', undef);
 
     $self->__change_state({
         STATE => 'NEW',
@@ -435,6 +444,7 @@ sub __handle_GET_PKI_REALM : PRIVATE {
     if ($self->__is_valid_pki_realm($requested_realm)) {
         ##! 2: "update session with PKI realm"
         CTX('session')->set_pki_realm($requested_realm);
+        Log::Log4perl::MDC->put('pki_realm', $requested_realm);
     }
     else {
         OpenXPKI::Exception->throw(
@@ -532,6 +542,10 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
         CTX('session')->set_user($user);
         CTX('session')->set_role($role);
         CTX('session')->make_valid();
+
+        Log::Log4perl::MDC->put('user', $user);
+        Log::Log4perl::MDC->put('role', $role);
+
         $self->__change_state({
             STATE => 'MAIN_LOOP',
         });
@@ -587,6 +601,8 @@ sub __handle_LOGOUT : PRIVATE {
     OpenXPKI::Server::Context::killsession();
 
     $self->__change_state({ STATE => 'NEW' });
+
+    Log::Log4perl::MDC->remove();
 
     $old_session->delete()->flush();
 
