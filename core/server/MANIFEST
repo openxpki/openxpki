@@ -470,7 +470,6 @@ OpenXPKI/Serialization/JSON.pm
 OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
-OpenXPKI/Service/Default/Command/nop.pm
 
 OpenXPKI/Service/SCEP.pm
 OpenXPKI/Service/SCEP/Command/PKIOperation.pm
