@@ -453,9 +453,9 @@ sub _db_config_from_production {
 
     return unless (-d "/etc/openxpki/config.d" and -r "/etc/openxpki/config.d");
 
-    # make sure OpenXPKI::Config::Backend reads from default /etc/openxpki/config.d
+    # make sure OpenXPKI::Config::Backend reads from the given LOCATION
     my $old_env = $ENV{OPENXPKI_CONF_PATH}; delete $ENV{OPENXPKI_CONF_PATH};
-    my $config = OpenXPKI::Config::Backend->new;
+    my $config = OpenXPKI::Config::Backend->new(LOCATION => "/etc/openxpki/config.d");
     $ENV{OPENXPKI_CONF_PATH} = $old_env if $old_env;
 
     my $db_conf = $config->get_hash('system.database.main');
