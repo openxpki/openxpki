@@ -71,7 +71,7 @@ script:
 # Code Coverage (submitted to coveralls.io)
     - ~/perl5/bin/cover -test -report coveralls
 # Unit tests
-    - make test
+###    - make test    (already done via "cover -test")
 # Installation
     - make install
     - popd
