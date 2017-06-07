@@ -493,6 +493,7 @@ t/01_pod/2.t
 t/05_base/00_prereqs.t
 t/05_base/01.t
 t/05_base/02.t
+t/05_base/03_config.t
 
 t/08_debug/01_using.t
 t/08_debug/02_color.t
