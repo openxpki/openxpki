@@ -461,12 +461,14 @@ sub start_txn {
     my $self = shift;
     return $self->log->warn("AutoCommit is on, start_txn() is useless") if $self->autocommit;
     if ($self->in_txn) {
-        $self->log->error(
-            sprintf "start_txn() was called during a running transaction (started in %s, line %i). Most likely this error is caused by a missing commit() or exception handling without rollback()",
+        my $caller = [ caller ];
+        $self->log->debug(
+            sprintf "start_txn() was called from %s, line %i during a running transaction (started in %s, line %i).",
+            $caller->[1],
+            $caller->[2],
             $self->_txn_starter->[1],
             $self->_txn_starter->[2],
         );
-        $self->rollback;
     }
     ##! 16: "Flagging a transaction start"
     $self->_txn_starter([ caller ]);
@@ -485,7 +487,7 @@ sub commit {
 sub rollback {
     my $self = shift;
     return $self->log->warn("AutoCommit is on, rollback() is useless") if $self->autocommit;
-    $self->log->warn("rollback() was called without indicating a transaction start via start_txn() first")
+    $self->log->debug("rollback() was called without indicating a transaction start via start_txn() first")
         unless $self->in_txn;
     ##! 16: "Rollback of changes"
     $self->dbh->rollback;

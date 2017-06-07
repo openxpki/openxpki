@@ -130,10 +130,9 @@ $db->run("Transactions", 12, sub {
         );
         $dbi->commit;
         is_deeply $t->get_data, [
-            [ 1, "Litfasssaeule" ],
-            [ 2, "Buergersteig" ],
+            [ 1, "Litfasssaeule" ]
         ];
-    } "start transaction twice, pending changes from #1 should be discarded";
+    } "start transaction twice, should be ignored";
     like $t->get_log, qr/running/, "warn about starting a transaction while another one is not finished";
 });
 
@@ -146,7 +145,6 @@ $db_check->run("Data verification", 1, sub {
     #
     is_deeply $t->get_data, [
         [ 1, "Litfasssaeule" ],
-        [ 2, "Buergersteig" ],
     ], "correct data in other handle";
 });
 
