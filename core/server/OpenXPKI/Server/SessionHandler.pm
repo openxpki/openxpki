@@ -278,4 +278,4 @@ sub is_valid {
     return ($self->data->status eq "valid");
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
