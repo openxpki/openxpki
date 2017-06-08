@@ -637,15 +637,15 @@ sub __handle_COMMAND : PRIVATE {
     ) unless exists $data->{PARAMS}->{COMMAND};
 
     ##! 16: "executing access control before doing anything else"
-    eval {
+    #eval {
         # FIXME - ACL
         #CTX('acl')->authorize ({
         #        ACTIVITY      => "Service::".$data->{PARAMS}->{COMMAND},
         #        AFFECTED_ROLE => "",
         #});
-    };
+    #};
     ##! 32: 'Callstack ' . Dumper $data
-    if ($EVAL_ERROR) {
+    if (0 || $EVAL_ERROR) {
         ##! 1: "Permission denied for Service::".$data->{PARAMS}->{COMMAND}."."
         if (my $exc = OpenXPKI::Exception->caught()) {
             OpenXPKI::Exception->throw(
