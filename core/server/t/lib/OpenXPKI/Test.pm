@@ -415,6 +415,17 @@ sub get_config {
     $self->config_writer->get_config_node($config_key, $allow_undef);
 }
 
+=head2 get_default_realm
+
+Returns the name of the default realm in the test environment that can be used
+in test code.
+
+=cut
+sub get_default_realm {
+    my ($self) = @_;
+    return $self->config_writer->realms->[0];
+}
+
 =head2 insert_testcerts
 
 Inserts all test certificates from L<OpenXPKI::Test::CertHelper::Database> into
