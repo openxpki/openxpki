@@ -648,7 +648,7 @@ sub _fail {
     eval{
         $self->state('FAILURE');
         $self->_set_proc_state('finished');
-        $self->notify_observers( $reason, $self->state, $self->{_CURRENT_ACTION}, $error);
+        $self->notify_observers( 'fail', $self->state, $self->{_CURRENT_ACTION}, $error);
         $self->add_history(
             Workflow::History->new(
                 {
@@ -701,7 +701,7 @@ sub _get_next_state {
     return $self->SUPER::_get_next_state( $action_name, $action_return );
 }
 
-sub _save{
+sub _save {
     my $self = shift;
     ##! 20: 'save workflow!'
 
