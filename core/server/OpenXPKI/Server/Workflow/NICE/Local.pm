@@ -393,8 +393,6 @@ sub issueCRL {
         },
     );
 
-    $dbi->start_txn;
-
     push @cert_timestamps, $self->__prepare_crl_data($certs);
 
     ##! 2: 'maxhq cert_timestamps: ' . join(", ", map { join "/", @$_ } @cert_timestamps)
@@ -445,8 +443,6 @@ sub issueCRL {
         publication_date  => 0,
     };
     $dbi->insert( into => 'crl', values => $data );
-
-    $dbi->commit;
 
     return { crl_serial => $serial };
 }

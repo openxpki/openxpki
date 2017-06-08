@@ -520,7 +520,6 @@ sub import_certificate {
         set => $cert_hash,
         where => { identifier => $cert_hash->{identifier} },
     );
-    $dbi->commit();
 
     # unset data to save bytes and return the remainder of the hash
     delete $cert_legacy->{DATA};

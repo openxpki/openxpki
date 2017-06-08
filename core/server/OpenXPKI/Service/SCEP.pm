@@ -390,8 +390,15 @@ MESSAGE:
 
                 if ( defined $command ) {
                     my $result;
-                    eval { $result = $command->execute(); };
+                    eval {
+                        CTX('dbi')->start_txn();
+                        $result = $command->execute();
+                        CTX('dbi')->commit();
+                    };
                     if ($EVAL_ERROR) {
+                        # the datapool semaphore and the workflow make intermediate commits
+                        # so the rollback only affects any uncompleted actions
+                        CTX('dbi')->rollback();
                         CTX('log')->log(
                             MESSAGE =>
                                 "Error executing SCEP command '$received_command': $EVAL_ERROR",

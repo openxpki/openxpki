@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Log.pm 
+## OpenXPKI::Server::Log.pm
 ##
 ## Written by Michael Bell for the OpenCA project 2004
 ## Migrated to the OpenXPKI Project 2005
@@ -55,7 +55,7 @@ sub init {
     $self->{log4perl} = Log::Log4perl->init($self->{configfile});
     if (not  $self->{log4perl})
     {
-	# Log4Perl does not export any initialization errors
+    # Log4Perl does not export any initialization errors
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_LOG_NEW_LOG4PERL_INIT_FAILED");
     }
@@ -72,8 +72,8 @@ sub init {
                 $self->{'usage'} = $self->{'monitor'};
                 $self->{'system'}->warn("Log facility 'usage' is missing - falling back to monitor");
                 return 1;
-            } 
-            
+            }
+
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_LOG_NEW_MISSING_LOGGER",
                 params  => {"FACILITY" => $facility});
@@ -89,12 +89,12 @@ sub re_init {
     return $self->init();
 }
 
-# todo - if this PoC is valuable, we should change all logger calls 
+# todo - if this PoC is valuable, we should change all logger calls
 sub usage {
-    
+
     my $self = shift;
-    return $self->{'usage'};    
-    
+    return $self->{'usage'};
+
 }
 
 sub log
@@ -107,22 +107,22 @@ sub log
 
     my $callerlevel = 0;
     if (defined $keys->{CALLERLEVEL}) {
-	$callerlevel = $keys->{CALLERLEVEL};
+    $callerlevel = $keys->{CALLERLEVEL};
     }
     my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) 
-	= caller($callerlevel);
+        $wantarray, $evaltext, $is_require, $hints, $bitmask)
+    = caller($callerlevel);
 
     ## get parameters
     if (ref $keys->{FACILITY} eq 'ARRAY') {
-	foreach my $entry (@{$keys->{FACILITY}}) {
-	    $self->log(
-		%{$keys},
-		FACILITY    => $entry,
-		CALLERLEVEL => $callerlevel + 1,
-		);
-	}
-	return 1;
+    foreach my $entry (@{$keys->{FACILITY}}) {
+        $self->log(
+        %{$keys},
+        FACILITY    => $entry,
+        CALLERLEVEL => $callerlevel + 1,
+        );
+    }
+    return 1;
     }
 
     $facility = lc($keys->{FACILITY})
@@ -136,19 +136,8 @@ sub log
     if (exists $keys->{MESSAGE} and length ($keys->{MESSAGE}))
     {
         $package  = $keys->{MODULE}   if (exists $keys->{MODULE});
-        $filename = $keys->{FILENAME} if (exists $keys->{FILENAME});
         $line     = $keys->{LINE}     if (exists $keys->{LINE});
         $msg      = $keys->{MESSAGE};
-    }
-
-    # only write the full filename for this module once (don't clobber log
-    # with the same filename over and over again)
-    if (exists $filename_of_package{$package} && ($filename_of_package{$package} eq $filename)) {
-	$filename = undef;
-    } else {
-	# write out the full file name this time, but remember it for the
-	# next message
-	$filename_of_package{$package} = $filename;
     }
 
     # get session information
@@ -157,45 +146,44 @@ sub log
     my $session_short;
     if (OpenXPKI::Server::Context::hascontext('session')) {
         eval {
-    	no warnings;
-    	$user = CTX('session')->get_user();
+        no warnings;
+        $user = CTX('session')->get_user();
         };
         eval {
-    	no warnings;
-    	$role = '(' . CTX('session')->get_role() . ')';
+        no warnings;
+        $role = '(' . CTX('session')->get_role() . ')';
         };
         eval {
-    	no warnings;
-    	# first 4 characters of session id are enough to trace flow in sessions
-    	$session_short = substr(CTX('session')->get_id(), 0, 4);
+        no warnings;
+        # first 4 characters of session id are enough to trace flow in sessions
+        $session_short = substr(CTX('session')->get_id(), 0, 4);
         };
     }
 
     # get workflow instance information
     my $wf_id;
     if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
-	$wf_id = CTX('workflow_id');
+    $wf_id = CTX('workflow_id');
     }
 
     ## build and store message
     $msg = "[$package"
-	. " (" 
-	. (defined $filename      ? $filename . ':'      : '') 
-	. "$line)"
-	. (defined $user          ? '; ' . $user . $role : '')
-	. (defined $session_short ? '@' . $session_short : '')
-	. (defined $wf_id         ? '#' . $wf_id : '')
+    . " ("
+    . "$line)"
+    . (defined $user          ? '; ' . $user . $role : '')
+    . (defined $session_short ? '@' . $session_short : '')
+    . (defined $wf_id         ? '#' . $wf_id : '')
         . "] $msg";
 
     # remove trailing newline characters
     {
-	local $INPUT_RECORD_SEPARATOR = '';
-	chomp $msg;    
+    local $INPUT_RECORD_SEPARATOR = '';
+    chomp $msg;
     }
 
     ## get an ID for the message
-    
-    #FIXME - eval for logger prio is ugly 
+
+    #FIXME - eval for logger prio is ugly
     my $return = $self->{$facility}->log (eval ("\$${prio}"), $msg);
 
     return $return if (defined $keys->{MESSAGE} and length ($keys->{MESSAGE}));
@@ -209,7 +197,7 @@ sub log
 
 # install wrapper / helper subs
 no strict 'refs';
-for my $prio (qw/ debug info warn error fatal /) {
+for my $prio (qw/ debug info warn error fatal trace /) {
     *{$prio} = sub {
         my ($self, $message, $facility) = @_;
         $self->log(
@@ -219,6 +207,12 @@ for my $prio (qw/ debug info warn error fatal /) {
             FACILITY => $facility // "monitor",
         );
     };
+}
+
+# dummy used for transition for now
+for my $prio (qw/ debug info warn error fatal trace /) {
+    my $method = "is_$prio";
+    *{$method} = sub { return 1; };
 }
 
 1;

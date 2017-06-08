@@ -257,7 +257,6 @@ sub get_cert {
     ##! 2: "Requested output format: $format"
 
     ##! 2: "Fetching certificate from database"
-    $dbi->commit;
     my $cert = $dbi->select_one(
         columns => [ '*' ],
         from => 'certificate',
@@ -891,8 +890,6 @@ sub import_crl {
 
     ##! 32: 'Issuer ' . Dumper $issuer
 
-    $dbi->start_txn;
-
     my $serial = $dbi->next_id('crl');
 
     my $ca_identifier = $issuer->{identifier};
@@ -931,8 +928,6 @@ sub import_crl {
     ##! 32: 'CRL Data ' . Dumper $data
 
     $dbi->insert( into => 'crl', values => $data );
-
-    $dbi->commit;
 
     CTX('log')->log(
         MESSAGE  => "Imported CRL for issuer $issuer_dn",
@@ -1850,7 +1845,6 @@ sub get_data_pool_entry {
 
                 # cache encryption key in volatile vault
                 eval {
-                    $dbi->start_txn;
                     $dbi->insert(
                         into => 'secret',
                         values => {
@@ -1859,7 +1853,6 @@ sub get_data_pool_entry {
                             group_id  => $secret_id,
                         },
                     );
-                    $dbi->commit;
                 };
             }
 
@@ -2003,7 +1996,6 @@ sub set_data_pool_entry {
 
     # erase expired entries
     $self->__cleanup_data_pool;
-    # TODO #legacydb DB commit is always done in __set_data_pool_entry so we can remove COMMIT parameter (introduced in https://github.com/openxpki/openxpki/commit/a46909dcb347450677dbe3c8c34d9657d77de7b8)
     $self->__set_data_pool_entry($args);
 
     return 1;
@@ -2131,7 +2123,6 @@ sub modify_data_pool_entry {
     ##! 16: 'update database condition: ' . Dumper \%condition
     ##! 16: 'update database values: ' . Dumper \%values
 
-    CTX('dbi')->start_txn;
     my $result = CTX('dbi')->update(
         table => 'datapool',
         set   => \%values,
@@ -2142,7 +2133,6 @@ sub modify_data_pool_entry {
                 ? ( namespace => $namespace ) : (),
         },
     );
-    CTX('dbi')->commit;
 
     return 1;
 }
@@ -2366,9 +2356,7 @@ sub __set_data_pool_entry : PRIVATE {
     # undefined or missing value: delete entry
     if ( not defined($value) or $value eq '' ) {
         eval {
-            $dbi->start_txn;
             $dbi->delete(from => 'datapool', where => $key_values );
-            $dbi->commit;
         };
         return 1;
     }
@@ -2505,7 +2493,6 @@ sub __set_data_pool_entry : PRIVATE {
         notafter        => $expiration_date // undef,
     };
 
-    $dbi->start_txn;
     if ($force) {
         # force = allow overwriting entries
         $dbi->merge(
@@ -2520,7 +2507,6 @@ sub __set_data_pool_entry : PRIVATE {
             values  => { %$key_values, %$data_values },
         );
     }
-    $dbi->commit;
 
     return 1;
 }
@@ -2530,12 +2516,10 @@ sub __cleanup_data_pool : PRIVATE {
     ##! 1: 'start'
     my ($self) = @_;
 
-    CTX('dbi')->start_txn;
     CTX('dbi')->delete(
         from  => 'datapool',
         where => { notafter => { '<' => time } },
     );
-    CTX('dbi')->commit;
     return 1;
 }
 
@@ -2663,7 +2647,6 @@ sub __get_current_datapool_encryption_key : PRIVATE {
 
             # cache encryption key in volatile vault
             eval {
-                CTX('dbi')->start_txn;
                 CTX('dbi')->insert(
                     into => 'secret',
                     values => {
@@ -2672,7 +2655,6 @@ sub __get_current_datapool_encryption_key : PRIVATE {
                         group_id  => $secret_id,
                     },
                 );
-                CTX('dbi')->commit;
             };
 
         }

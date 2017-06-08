@@ -692,13 +692,23 @@ sub __handle_COMMAND : PRIVATE {
     ##! 16: 'command class instantiated successfully'
     my $result;
     eval {
+        # enclose command with DBI transaction
+        CTX('dbi')->start_txn();
         $result = $command->execute();
+        CTX('dbi')->commit();
     };
-    if (my $exc = OpenXPKI::Exception->caught()) {
-        ##! 16: 'exception caught during execute'
-        $exc->rethrow();
-    }
-    elsif ($EVAL_ERROR) {
+
+    if ($EVAL_ERROR) {
+
+        # rollback DBI (should not matter as we throw exception anyway)
+        CTX('dbi')->rollback();
+
+        # just rethrow if we have an exception
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            ##! 16: 'exception caught during execute'
+            $exc->rethrow();
+        }
+
         ##! 16: "Exception caught during command execution"
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR',
@@ -706,7 +716,6 @@ sub __handle_COMMAND : PRIVATE {
                 ERROR => $EVAL_ERROR,
             },
         );
-        return;
     }
 
     ##! 16: 'command executed successfully'

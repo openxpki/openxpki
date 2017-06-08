@@ -471,6 +471,8 @@ sub __pkcs_req : PRIVATE {
                 VALUE => 'creating',
                 EXPIRATION_DATE => time() + 300, # Creating the workflow should never take any longer
             });
+            # As the API does NOT commit to the datapool, we need an explicit commit now
+            CTX('dbi')->commit();
         };
         if ($EVAL_ERROR) {
             OpenXPKI::Exception->throw(
@@ -522,6 +524,8 @@ sub __pkcs_req : PRIVATE {
             VALUE => $workflow_id,
             FORCE => 1,
          });
+         # commit required
+         CTX('dbi')->commit();
     }
 
     # We should now have a workflow object,

@@ -66,14 +66,18 @@ sub update_workflow {
     ##! 1: "Updating WF #$id"
     my $dbi = CTX('dbi');
 
-    $dbi->start_txn;
+    ##! 1: "WF #$id: update_workflow"
     $self->__update_workflow($workflow);
-    $self->__update_workflow_context($workflow) if $workflow->persist_context;
-    $self->__update_workflow_attributes($workflow);
-    $dbi->commit;
 
-    # Reset the update marker (after COMMIT) if full update was requested
-    $workflow->context->reset_updated if $workflow->persist_context > 1;
+    if ($workflow->persist_context) {
+        $self->__update_workflow_context($workflow) ;
+
+        if ($workflow->persist_context > 1) {
+            $self->__update_workflow_attributes($workflow) ;
+            # Reset the update marker (after COMMIT) if full update was requested
+            $workflow->context->reset_updated if $workflow->persist_context > 1;
+        }
+    }
 
     CTX('log')->debug( "Saved workflow $id", "system" );
     CTX('log')->debug( "Updated workflow $id", "workflow" );
@@ -350,8 +354,6 @@ sub create_history {
         CTX('log')->debug("Created workflow history entry $id", "workflow");
     }
 
-    $dbi->commit;
-
     return @history;
 }
 
@@ -402,6 +404,19 @@ sub fetch_history {
 
     return @history;
 }
+
+sub commit_transaction {
+    CTX('dbi')->commit;
+    CTX('dbi')->start_txn;
+    return;
+}
+
+sub rollback_transaction {
+    CTX('dbi')->rollback;
+    CTX('dbi')->start_txn;
+    return;
+}
+
 
 1;
 __END__

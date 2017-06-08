@@ -27,7 +27,10 @@ sub update {
     );
     ## save this history entry
     $workflow->factory()->save_workflow( $workflow );
-    
+
+    # we need to commit to not loose this
+    $workflow->_factory()->_commit_transaction( $workflow );
+
 }
 
 1;

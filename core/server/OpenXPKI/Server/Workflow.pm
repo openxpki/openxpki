@@ -111,6 +111,12 @@ sub execute_action {
     my ( $self, $action_name, $autorun ) = @_;
     ##! 1: 'execute_action '.$action_name
 
+    # if we are in a recursive run or in an initial create the dbi
+    # transaction is already open and the autorun flag is set
+    if (!$autorun) {
+        CTX('dbi')->start_txn;
+    }
+
     $self->persist_context(1);
 
     my $session =  CTX('session');
@@ -165,6 +171,10 @@ sub execute_action {
     ##! 16: 'Run super::execute_action'
     eval{
         $state = $self->SUPER::execute_action( $action_name, $autorun );
+
+        # if we are here, anything should have been persisted and commited
+        # by the workflow internals (execute_action in the upstream class
+        # calls update_workflow and commit on the persister after each action)
     };
 
     ##! 16: 'super::execute_action returned'
@@ -181,6 +191,8 @@ sub execute_action {
         ##! 16: 'action failed with error: ' .$error
         # Check for validation errors (dont set the workflow to exception)
         if (ref $error eq 'Workflow::Exception::Validation') {
+
+            # nothing was persisted so far, no rollback required
 
             # We reset the flag to prevent the context to be persisted
             # when we reset the status now, see #236
@@ -204,6 +216,7 @@ sub execute_action {
         # If we have consecutive autorun actions the error bubbles up as the
         # workflow engine makes recursive calls, rethrow the first exception
         # instead of cascading them
+
         $e = OpenXPKI::Exception->caught();
         if ( (ref $e eq 'OpenXPKI::Exception') &&
             ( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE') ) {
@@ -218,9 +231,13 @@ sub execute_action {
             $e->rethrow;
         }
 
-        # Note: This will also persist the context in the "broken" state!
-        # This is reasonable as we might otherwise loose information on
-        # things which have been done in the meantime
+        # if we are here something IS wrong and we dont want to persist
+        # whats in the transaction, so we do a rollback. This WILL drop any
+        # traces of what happend in the meantime so make your workflow steps
+        # as small and atomic as possible!
+        CTX('dbi')->rollback();
+
+        # this will update the workflow status data and commit internally
         $self->_proc_state_exception($error);
 
         # Look into the workflow definiton weather to autofail
@@ -840,11 +857,11 @@ overwritten from parent Workflow class. handles the special case "pause", otherw
 
 =head2 persist_context
 
-Internal flag to control the behaviour of the context persister:
+Internal flag to control the behaviour of the context/attribute persister:
 
   0: do not persist anything
-  1: persist only the internal flags (starting with wf_)
-  2: persist all updated values
+  1: persist only the internal flags (context starting with wf_)
+  2: persist all updated values (context and attributes)
 
 =head2 factory
 

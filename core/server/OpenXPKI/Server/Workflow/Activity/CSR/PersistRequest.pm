@@ -23,7 +23,7 @@ sub execute
     my $pki_realm  = CTX('session')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi        = CTX('dbi');
-    
+
     my $type = $self->param('csr_type') || 'pkcs10';
 
     my $profile = $context->param('cert_profile');
@@ -187,7 +187,6 @@ sub execute
         }
     }
 
-    $dbi->commit();
     $context->param('csr_serial' => $csr_serial);
 
     CTX('log')->log(

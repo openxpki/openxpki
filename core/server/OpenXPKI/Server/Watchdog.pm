@@ -604,6 +604,7 @@ sub __flag_and_fetch_workflow {
                 workflow_id         => $wf_id,
             },
         );
+        $self->{dbi}->commit;
     };
     # We use DB transaction isolation level "READ COMMITTED":
     # So in the meantime another watchdog process might have picked up this
@@ -612,6 +613,7 @@ sub __flag_and_fetch_workflow {
     # 2. other process did not commit -> timeout exception because of DB row lock
     if ($@ or $row_count < 1) {
         ##! 16: sprintf('some other process took wf %s, return', $wf_id)
+        $self->{dbi}->rollback;
         CTX('log')->log(
             MESSAGE  => sprintf( 'watchdog, paused wf %d: update with mark "%s" failed', $wf_id, $rand_key ),
             PRIORITY => "warn",
@@ -619,9 +621,6 @@ sub __flag_and_fetch_workflow {
         );
         return;
     }
-
-    # Cancel if committing fails (e.g. because another process committed the same update)
-    $self->{dbi}->commit;
 
     return $wf_id;
 }
@@ -686,6 +685,9 @@ sub __wake_up_workflow {
 
     # errors here are fork errors and we dont want the watchdog to die!
     eval {
+
+        $self->{dbi}->start_txn;
+
         $self->__check_session();
 
         CTX('session')->set_pki_realm($args->{pki_realm});
@@ -705,6 +707,8 @@ sub __wake_up_workflow {
 
         ##! 32: 'wakeup returned ' . Dumper $wf_info
 
+        # commit is done inside workflow engine
+        # no need for rollback as this will terminate now anyway
     };
     my $error_msg;
     if ( my $exc = OpenXPKI::Exception->caught() ) {

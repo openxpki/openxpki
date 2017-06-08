@@ -464,14 +464,18 @@ sub start_txn {
         my $caller = [ caller ];
         $self->log->debug(
             sprintf "start_txn() was called from %s, line %i during a running transaction (started in %s, line %i).",
-            $caller->[1],
+            $caller->[0],
             $caller->[2],
-            $self->_txn_starter->[1],
+            $self->_txn_starter->[0],
             $self->_txn_starter->[2],
         );
     }
     ##! 16: "Flagging a transaction start"
     $self->_txn_starter([ caller ]);
+
+    $self->log->trace(
+        sprintf "start_txn() in %s, %i", $self->_txn_starter->[0], $self->_txn_starter->[2],
+    ) if ($self->log->is_trace);
 }
 
 sub commit {
@@ -481,6 +485,15 @@ sub commit {
         unless $self->in_txn;
     ##! 16: "Commit of changes"
     $self->dbh->commit;
+
+    if ($self->log->is_trace) {
+        my $caller = [ caller ];
+        $self->log->trace(
+            sprintf "commit for txn from %s, %i called in %s, %i",
+                $self->_txn_starter->[0], $self->_txn_starter->[2],
+                $caller->[0], $caller->[2]
+        );
+    }
     $self->_clear_txn_starter;
 }
 
