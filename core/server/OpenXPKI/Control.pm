@@ -213,7 +213,8 @@ sub start {
                 ## SILENT is required to work correctly with start-stop-daemons
                 ## during a normal System V init
                 require OpenXPKI::Server;
-                OpenXPKI::Server->new ( "SILENT" => $silent ? 1 : 0 );
+                my $server = OpenXPKI::Server->new ( "SILENT" => $silent ? 1 : 0 );
+                $server->start;
             };
             if ($EVAL_ERROR)
             {
@@ -229,10 +230,11 @@ sub start {
         # foreground requested, do not fork
         eval {
             require OpenXPKI::Server;
-            OpenXPKI::Server->new(
+            my $server = OpenXPKI::Server->new(
                 'SILENT' => $silent ? 1 : 0,
                 'TYPE'   => 'Simple',
             );
+            $server->start;
         };
         if ($EVAL_ERROR) {
             print STDERR $EVAL_ERROR;
@@ -434,18 +436,18 @@ Holding the pid of the main server process.
 
 =item watchdog
 
-List of running watchdog process. Usually this is only a single pid but 
+List of running watchdog process. Usually this is only a single pid but
 can also have more than one. If empty, the watchdog was either disabled
 or terminated due to too many internal errors.
 
 =item worker
 
-List of pids of running session workers (connected to the socket). This 
+List of pids of running session workers (connected to the socket). This
 might also be empty if no process is running.
 
 =item workflow
 
-List of pids of all workers currently handling workflows (contains 
+List of pids of all workers currently handling workflows (contains
 watchdog and user initiated requests).
 
 =back
@@ -497,7 +499,7 @@ sub list_process {
             next;
         }
 
-        if (!$p->cmndline) { 
+        if (!$p->cmndline) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => '' };
         } elsif ($p->cmndline =~ m{ ((worker|workflow): .*) \z }x) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => $1 };
