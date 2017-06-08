@@ -375,6 +375,46 @@ sub add_workflow {
     my ($self, $realm, $name, $yaml_hash) = @_;
     $self->config_writer->add_realm_config($realm, "workflow.def.$name", $yaml_hash);
 }
+
+
+=head2 get_config
+
+Returns a all config data that was defined below the given dot separated config
+path. This might be a HashRef (config node) or a Scalar (config leaf).
+
+The data might be taken from parent and/or child config definitions, e.g.:
+
+C<get_config_entry('realm.alpha.workflow')> might return data from
+
+=over
+
+=item * realm/alpha.yaml
+
+=item * realm/alpha/workflow.yaml
+
+=item * realm/alpha/workflow/def/creation.yaml
+
+=item * realm/alpha/workflow/def/deletion.yaml
+
+=back
+
+B<Parameters>
+
+=over
+
+=item * I<$config_key> - dot separated configuration key/path
+
+=item * I<$allow_undef> - set to 1 to return C<undef> instead of dying if the
+config key is not found
+
+=back
+
+=cut
+sub get_config {
+    my ($self, $config_key, $allow_undef) = @_;
+    $self->config_writer->get_config_node($config_key, $allow_undef);
+}
+
 =head2 insert_testcerts
 
 Inserts all test certificates from L<OpenXPKI::Test::CertHelper::Database> into
