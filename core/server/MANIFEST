@@ -567,6 +567,7 @@ t/45_session/02_import_export.t
 t/45_session/10_session_role.t
 t/45_session/20_session_database.t
 t/45_session/30_session_file.t
+t/45_session/log4perl.conf
 
 t/50_auth/00.t
 t/50_auth/02.t
@@ -622,6 +623,8 @@ t/90_api/30_workflow.t
 
 t/95_openxpkiadm/10_certificate.t
 t/95_openxpkiadm/CommandlineTest.pm
+
+t/97_client/01_login.t
 
 t/99_cleanup/28_log.t
 t/99_cleanup/50_auth.t
