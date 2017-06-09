@@ -21,7 +21,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 
 
-plan tests => 3;
+plan tests => 10;
 
 
 #
@@ -43,7 +43,7 @@ $sem->setval(0,1)
 note "Starting test server...";
 my $daemon = Proc::Daemon->new(
     work_dir => $dir,
-    # dont_close_fh => [ 'STDOUT', 'STDERR' ],
+    $ENV{TEST_VERBOSE} ? ( dont_close_fh => [ 'STDOUT', 'STDERR' ] ) : (),
 );
 my $child_pid = $daemon->Init;
 
@@ -56,7 +56,7 @@ unless ( $child_pid ) {
     $oxitest->init_server;
     use OpenXPKI::Server;
     my $server = OpenXPKI::Server->new(
-        'SILENT' => $ENV{VERBOSE} ? 0 : 1,
+        'SILENT' => $ENV{TEST_VERBOSE} ? 0 : 1,
         'TYPE'   => 'Simple',
     );
     $server->__init_user_interfaces;
@@ -85,6 +85,39 @@ sleep 1; # give Net::Server->run() a little bit time
 #
 # Tests
 #
+sub is_next_step {
+    my ($hash, $msg) = @_;
+    ok (
+        ($hash and exists $hash->{SERVICE_MSG} and $hash->{SERVICE_MSG} eq $msg),
+        "<< server expects $msg"
+    ) or diag explain $hash;
+}
+
+sub send_ok {
+    my ($client, $msg, $args) = @_;
+    my $resp;
+    lives_and {
+        $resp = $client->send_receive_service_msg($msg, $args);
+        if (my $err = get_error($resp)) {
+            diag $err;
+            fail;
+        }
+        else {
+            pass;
+        }
+    } ">> send $msg";
+
+    return $resp;
+}
+
+sub get_error {
+    my ($resp) = @_;
+    if ($resp and exists $resp->{SERVICE_MSG} and $resp->{SERVICE_MSG} eq 'ERROR') {
+        return $resp->{LIST}->[0]->{LABEL} || 'Unknown error';
+    }
+    return;
+}
+
 use_ok "OpenXPKI::Client";
 
 my $client;
@@ -97,51 +130,31 @@ lives_ok {
 
 my $realm = $oxitest->get_default_realm;
 
+my $resp;
+
 lives_ok {
-    $client->init_session();
+    $resp = $client->init_session();
 } "initialize client session";
+is_next_step $resp, "GET_PKI_REALM";
+
+$resp = send_ok $client, 'GET_PKI_REALM', { PKI_REALM => $realm };
+is_next_step $resp, "GET_AUTHENTICATION_STACK";
+
+$resp = send_ok $client, 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => "Test" };
+is_next_step $resp, "GET_PASSWD_LOGIN";
+
+$resp = send_ok $client, 'GET_PASSWD_LOGIN', { LOGIN => "caop", PASSWD => $oxitest->config_writer->password };
+is_next_step $resp, "SERVICE_READY";
+
+#            $resp = $client->send_receive_service_msg( 'PING', );
+#            $self->set_msg($resp);
+#            if ( $self->error ) {
+#                $self->diag( "Login failed (ping): " . Dumper $resp);
+#                return;
+#            }
 
 $daemon->Kill_Daemon($child_pid) or diag "Could not kill test server";
 
 remove_tree $dir;
 
-#$msg = $client->send_receive_service_msg( 'GET_PKI_REALM',
-#                { PKI_REALM => $realm } );
-#            $self->set_msg($msg);
-#            if ( $self->error ) {
-#                $self->diag(
-#                    "Login failed (get pki realm $realm): " . Dumper $msg);
-#                return;
-#            }
-#            $msg = $client->send_receive_service_msg( 'PING', );
-#            $self->set_msg($msg);
-#            if ( $self->error ) {
-#                $self->diag( "Login failed (ping): " . Dumper $msg);
-#                return;
-#            }
-#
-#my $stack = $self->get_stack || 'Testing';
-#            $msg
-#                = $client->send_receive_service_msg(
-#                'GET_AUTHENTICATION_STACK',
-#                { 'AUTHENTICATION_STACK' => $stack, },
-#                );
-#            $self->set_msg($msg);
-#            if ( $self->error ) {
-#                $self->diag(
-#                    "Login failed (stack selection): " . Dumper $msg);
-#                return;
-#            }
-#
-#            $msg = $client->send_receive_service_msg(
-#                'GET_PASSWD_LOGIN',
-#                {   'LOGIN'  => $user,
-#                    'PASSWD' => $pass,
-#                },
-#            );
-#            $self->set_msg($msg);
-#            if ( $self->error ) {
-#                $self->diag( "Login failed: " . Dumper $msg);
-#                return;
-#            }
 1;
