@@ -41,7 +41,7 @@ sub new {
     $self->{SILENT} = $keys->{SILENT};
 
     ## group access is allowed
-    $self->{umask} = umask 0007;
+    $self->{umask} = 0007; # octal
 
     return $self;
 }
@@ -98,6 +98,7 @@ sub __init_net_server {
 sub start {
     my $self = shift;
 
+    umask $self->{umask};
     $self->__init_server;
     $self->__init_user_interfaces;
     $self->__init_net_server;
