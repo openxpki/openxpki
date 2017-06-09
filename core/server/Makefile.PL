@@ -379,6 +379,7 @@ WriteMakefile(
         'Time::HiRes'                   => '1',
         'Workflow'                      => '0.27',
         'XML::Simple'                   => '1',
+        'YAML::Tiny'                    => '1.69',
     },
     test       => {TESTS => 't/*/*.t',
                   },

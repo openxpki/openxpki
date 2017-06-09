@@ -11,11 +11,11 @@ OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)
 # Core modules
 use File::Path qw(make_path);
 use File::Spec;
-use TAP::Parser::YAMLish::Writer;
 use POSIX;
 
 # CPAN modules
 use Moose::Util::TypeConstraints;
+use YAML::Tiny 1.69;
 use Test::More;
 use Test::Exception;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
@@ -119,7 +119,7 @@ sub write_str {
     my ($self, $filepath, $content) = @_;
 
     die "Empty content for $filepath" unless $content;
-    open my $fh, ">", $filepath or die "Could not open $filepath for writing: $@";
+    open my $fh, ">:encoding(UTF-8)", $filepath or die "Could not open $filepath for UTF-8 encoded writing: $@";
     print $fh $content, "\n" or die "Could not write to $filepath: $@";
     close $fh or die "Could not close $filepath: $@";
 }
@@ -142,13 +142,9 @@ sub remove_private_key {
 sub write_yaml {
     my ($self, $filepath, $data) = @_;
 
-    my $lines = [];
-    TAP::Parser::YAMLish::Writer->new->write($data, $lines);
-    pop @$lines; shift @$lines; # remove --- and ... from beginning/end
-
     $self->_make_parent_dir($filepath);
-    diag "Writing $filepath" if $ENV{TEST_VERBOSE};
-    $self->write_str($filepath, join("\n", @$lines));
+    note "Writing $filepath";
+    $self->write_str($filepath, YAML::Tiny->new($data)->write_string);
 }
 
 sub add_config {
@@ -215,7 +211,7 @@ sub add_realm_config {
 sub make_dirs {
     my ($self) = @_;
     # Do explicitely not create $self->basedir to prevent accidential use of / etc
-    diag "Creating directory ".$self->path_config_dir if $ENV{TEST_VERBOSE};
+    note "Creating directory ".$self->path_config_dir;
     $self->_make_dir($self->path_config_dir);
     $self->_make_dir($self->path_session_dir);
     $self->_make_dir($self->path_temp_dir);
