@@ -257,7 +257,7 @@ sub init_server {
     die "setup_env() must be called before init_server()" unless $self->_env_initialized;
 
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log dbi api ); # our default tasks
+    my @tasks = qw( config_versioned log dbi_log dbi api authentication ); # our default tasks
     my %task_hash = map { $_ => 1 } @tasks;
     push @tasks, grep { not $task_hash{$_} } @additional_tasks; # more tasks requested via parameter
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });

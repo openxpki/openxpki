@@ -12,6 +12,8 @@ OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)
 use File::Path qw(make_path);
 use File::Spec;
 use POSIX;
+use Digest::SHA;
+use MIME::Base64;
 
 # CPAN modules
 use Moose::Util::TypeConstraints;
@@ -83,6 +85,9 @@ has yaml_cert_profile_client   => ( is => 'rw', isa => 'HashRef', lazy => 1, bui
 has yaml_cert_profile_server   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_server" );
 has yaml_cert_profile_user     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_user" );
 has yaml_crl_default           => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_crl_default" );
+
+# password for all openxpki users
+has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 
 has path_config_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/config.d" } );
 has path_session_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/session" } );
@@ -233,6 +238,7 @@ sub create {
     $self->add_config("system.watchdog" => $self->yaml_watchdog);
 
     for my $realm (@{$self->realms}) {
+        $self->add_realm_config($realm, "auth", $self->_realm_auth);
         $self->add_realm_config($realm, "crypto", $self->_realm_crypto($realm));
         $self->add_realm_config($realm, "workflow.persister", $self->yaml_workflow_persister);
         # OpenXPKI::Workflow::Handler checks existance of workflow.def
@@ -469,6 +475,84 @@ sub _realm_crypto {
                 value => "root",
                 cache => "daemon",
             },
+        },
+    };
+}
+
+sub _get_password_hash {
+    my ($self, $password) = @_;
+    my $salt = "";
+    $salt .= chr(int(rand(256))) for (1..3);
+    $salt = encode_base64($salt);
+
+    my $ctx = Digest::SHA->new;
+    $ctx->add($password);
+    $ctx->add($salt);
+    return "{ssha}".encode_base64($ctx->digest . $salt, '');
+}
+
+sub _realm_auth {
+    my ($self) = @_;
+    return {
+        stack => {
+            _System    => {
+                description => "System",
+                handler => "System",
+            },
+            Anonymous => {
+                description => "Anonymous",
+                handler => "Anonymous",
+            },
+            Test => {
+                description => "OpenXPKI test auth stack",
+                handler => "OxiTest",
+            },
+        },
+        handler => {
+            "System" => {
+                type => "Anonymous",
+                label => "System",
+                role => "System",
+            },
+            "Anonymous" => {
+                type => "Anonymous",
+                label => "System",
+            },
+            "OxiTest" => {
+                label => "OpenXPKI Test Authentication Handler",
+                type  => "Password",
+                user  => {
+                    # password is always "openxpki"
+                    caop => {
+                        digest => $self->_get_password_hash($self->password), # "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B",
+                        role   => "CA Operator",
+                    },
+                    raop => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "RA Operator",
+                    },
+                    raop2 => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "RA Operator",
+                    },
+                    user => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "User"
+                    },
+                    user2 => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "User"
+                    },
+                },
+            },
+        },
+        roles => {
+            "Anonymous"   => { label => "Anonymous" },
+            "CA Operator" => { label => "CA Operator" },
+            "RA Operator" => { label => "RA Operator" },
+            "SmartCard"   => { label => "SmartCard" },
+            "System"      => { label => "System" },
+            "User"        => { label => "User" },
         },
     };
 }
