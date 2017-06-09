@@ -12,6 +12,7 @@ OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)
 use File::Path qw(make_path);
 use File::Spec;
 use TAP::Parser::YAMLish::Writer;
+use POSIX;
 
 # CPAN modules
 use Moose::Util::TypeConstraints;
@@ -98,8 +99,8 @@ has path_openssl        => ( is => 'rw', isa => 'Str', default => "/usr/bin/open
 has path_javaks_keytool => ( is => 'rw', isa => 'Str', default => "/usr/bin/keytool" );
 has path_openca_scep    => ( is => 'rw', isa => 'Str', default => "/usr/bin/openca-scep" );
 
-has system_user  => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
-has system_group => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
+has system_user  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { (getpwuid(geteuid))[0] } ); # run under same user as test scripts
+has system_group => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { (getgrgid(getegid))[0] } );
 
 
 sub _make_dir {
