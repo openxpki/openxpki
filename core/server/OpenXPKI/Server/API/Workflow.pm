@@ -120,9 +120,13 @@ sub get_workflow_log {
 
     my @log;
     while (my $entry = $sth->fetchrow_hashref) {
-       # remove the package and session info from the message
-       $entry->{message} =~ s/\A\[OpenXPKI::.*\]//;
-       push @log, [ $entry->{logtimestamp}, $entry->{priority}, $entry->{message} ];
+        # remove the package and session info from the message
+        $entry->{message} =~ s/\A\[OpenXPKI::.*\]//;
+        push @log, [
+            $entry->{logtimestamp},
+            Log::Log4perl::Level::to_level($entry->{priority}),
+            $entry->{message}
+        ];
     }
 
     return \@log;
