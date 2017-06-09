@@ -4,7 +4,6 @@ package OpenXPKI::Server::Log::Appender::Database;
 use strict;
 use English;
 use Log::Log4perl;
-use Data::Dumper;
 use Log::Log4perl::MDC;
 use Log::Log4perl::Level;
 use OpenXPKI::Server::Context qw( CTX );
@@ -28,8 +27,6 @@ sub new {
     my $class = ref $proto || $proto;
 
     my $self = bless {}, $class;
-
-    warn Dumper \%p;
 
     if ($p{table}) {
         $self->{table} = $p{table};
@@ -72,21 +69,14 @@ sub log {
     }
     $occupied = 1;
 
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
-        gmtime(time);
-    $year += 1900;
-    $mon++;
-    my $microseconds = 0;
-
+    my $timestamp;
     if ($self->{microseconds}) {
         use Time::HiRes qw( gettimeofday );
         my ($seconds, $micro) = gettimeofday();
-        $microseconds = $micro;
+        $timestamp = $seconds + $micro/1000000;
+    } else {
+        $timestamp = time();
     }
-
-    my $timestamp = sprintf("%04d%02d%02d%02d%02d%02d%06d", $year, $mon, $mday, $hour, $min, $sec, $microseconds);
-
-    ##! 64: 'timestamp: ' . $timestamp
 
     my $loglevel_int = 0;
     if ( exists $LOGLEVELS{$loglevel} ) {
@@ -98,7 +88,7 @@ sub log {
         CTX('dbi')->insert(
             into => $self->{table},
             values  => {
-                application_log_id => AUTO_ID,
+                $self->{table}.'_id' => AUTO_ID,
                 logtimestamp       => $timestamp,
                 workflow_id        => $wf_id,
                 priority           => $loglevel_int,
@@ -157,9 +147,11 @@ class.
 
 =over
 
-=item log4perl.appender.Application.table = application
+=item log4perl.appender.Application.table = application_log
 
-The name of the table to write the data too
+The name of the table to write the data too. This also implies the name
+of the primary key column as "<table>_id" and the name of the sequence
+"seq_<table>".
 
 =item log4perl.appender.Application.microseconds = 1
 
@@ -174,7 +166,7 @@ This option requries the Time::HiRes module to be installed.
 
     CREATE TABLE IF NOT EXISTS `application_log` (
       `application_log_id` bigint(20) unsigned NOT NULL,
-      `logtimestamp` decimal(20,0) DEFAULT NULL,
+      `logtimestamp` decimal(20,6) DEFAULT NULL,
       `workflow_id` decimal(49,0) NOT NULL,
       `priority` int(3) DEFAULT '999',
       `category` varchar(255) NOT NULL,
@@ -192,10 +184,9 @@ or a sequence emulation table), see the default schema for your DBI.
 
 =item logtimestamp
 
-The timestamp of the log item, given as string representation of
-  $year, $mon, $mday, $hour, $min, $sec, $microseconds
-each item has 2 digits, year has 4 digits, microseconds 6 digits.
-If microseconds is off, its set to zero ("000000").
+timestamp of the event as epoch, microseconds are appended as fraction.
+Note that this format has changed with v1.18 and you must adjust your
+database to use the new format!
 
 =item workflow_id
 

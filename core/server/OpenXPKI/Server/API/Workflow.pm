@@ -22,6 +22,7 @@ use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
 use Log::Log4perl::MDC;
+use Log::Log4perl::Level;
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -105,9 +106,6 @@ sub get_workflow_log {
             'ROLE' => $role
         },
     ) unless $allowed;
-
-    # we want to track the usage
-    CTX('log')->usage()->info("get_workflow_log");
 
     # Reverse is inverted as we want to have reversed order by default
     my $order = $args->{REVERSE} ? 'ASC' : 'DESC';
