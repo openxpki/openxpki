@@ -598,7 +598,7 @@ sub __get_server_config {
     $params{socketfile} = $socketfile;
     $params{proto}      = "unix";
     if ($self->{TYPE} eq 'Simple') {
-        $params{server_type} = 'Simple';
+        $params{server_type} = 'Single';
     }
     elsif ($self->{TYPE} eq 'Fork') {
         $params{server_type} = 'Fork'; # TODO - try to make it possible to use PreFork
