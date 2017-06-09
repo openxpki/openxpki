@@ -155,10 +155,10 @@ use Data::Dumper;
 
 
 my $oxitest = OpenXPKI::Test->new;
-$oxitest->add_workflow("alpha", "wf_type_1", workflow_def("wf_type_1"));
-$oxitest->add_workflow("alpha", "wf_type_2", workflow_def("wf_type_2"));
-$oxitest->add_workflow("alpha", "wf_type_3_unused", workflow_def("wf_type_3_unused"));
-$oxitest->add_workflow("beta",  "wf_type_4", workflow_def("wf_type_4"));
+$oxitest->workflow_config("alpha", "wf_type_1", workflow_def("wf_type_1"));
+$oxitest->workflow_config("alpha", "wf_type_2", workflow_def("wf_type_2"));
+$oxitest->workflow_config("alpha", "wf_type_3_unused", workflow_def("wf_type_3_unused"));
+$oxitest->workflow_config("beta",  "wf_type_4", workflow_def("wf_type_4"));
 $oxitest->setup_env->init_server('workflow_factory');
 
 CTX('session')->set_role('User');

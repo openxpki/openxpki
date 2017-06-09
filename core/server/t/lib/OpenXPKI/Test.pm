@@ -22,7 +22,7 @@ To quickly initialize the default test environment and server:
 Or you might want to add some custom workflow config:
 
     my $oxitest = OpenXPKI::Test->new;
-    $oxitest->add_workflow("alpha", "wf_type_1", {
+    $oxitest->workflow_config("alpha", wf_type_1 => {
         'head' => {
             'label' => 'Perfect workflow',
             'persister' => 'OpenXPKI',
@@ -275,32 +275,31 @@ sub init_server {
 }
 
 
-=head2 add_realm_config
+=head2 realm_config
 
 Add another YAML configuration file for the given realm and reload server
 config C<CTX('config')>.
 
 Example:
 
-    $oxitest->add_realm_config(
+    $oxitest->realm_config(
         "alpha",
-        "auth.handler",
-        {
-            Signature => {
-                realm => [ "alpha" ],
-                cacert => [ "MyCertId" ],
-            }
+        "auth.handler.Signature" => {
+            realm => [ "alpha" ],
+            cacert => [ "MyCertId" ],
         }
     );
 
-This would write a file I<etc/openxpki/config.d/realm/alpha/auth/handler.yaml>
-(below C<$oxitest-E<gt>testenv_root>) with this content:
+This would write the following content into I<etc/openxpki/config.d/realm/alpha.yaml>
+(below C<$oxitest-E<gt>testenv_root>):
 
+    ...
     Signature
       realm:
         - alpha
       cacert:
         - MyCertId
+    ...
 
 B<Parameters>
 
@@ -317,20 +316,21 @@ converted into YAML and stored on disk
 =back
 
 =cut
-sub add_realm_config {
-    my ($self, $realm, $config_path, $yaml_hash) = @_;
-    $self->config_writer->add_realm_config($realm, $config_path, $yaml_hash);
+sub realm_config {
+    my ($self, $realm, $config_relpath, $yaml_hash) = @_;
+    my $config_path = "realm.$realm.$config_relpath";
+    $self->config_writer->add_user_config($config_path => $yaml_hash);
 }
 
-=head2 add_workflow
+=head2 workflow_config
 
 Add a workflow definition and reload server config C<CTX('config')>.
 
 Example:
 
-    $oxitest->add_workflow(
-        "def.set_motd",
-        {
+    $oxitest->workflow_config(
+        "alpha",
+        set_motd => {
             head => {
                 prefix    => "motd",
                 persister => "Volatile",
@@ -345,17 +345,21 @@ Example:
         },
     );
 
-This would write a file I<etc/openxpki/config.d/realm/alpha/workflow/def/set_motd.yaml>
-(below C<$oxitest-E<gt>testenv_root>) with this content:
+This would write the following content into
+I<etc/openxpki/config.d/realm/alpha.yaml> (below
+C<$oxitest-E<gt>testenv_root>):
 
-    head:
-      prefix: motd
-      persister: Volatile
-      label: I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL
+    ...
+    def:
+      set_motd:
+        head:
+          prefix: motd
+          persister: Volatile
+          label: I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL
 
-    state:
-      INITIAL:
-      ...
+        state:
+          INITIAL:
+    ...
 
 B<Parameters>
 
@@ -371,9 +375,9 @@ converted into YAML and stored on disk
 =back
 
 =cut
-sub add_workflow {
+sub workflow_config {
     my ($self, $realm, $name, $yaml_hash) = @_;
-    $self->config_writer->add_realm_config($realm, "workflow.def.$name", $yaml_hash);
+    $self->realm_config($realm, "workflow.def.$name" => $yaml_hash);
 }
 
 

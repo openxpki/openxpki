@@ -54,19 +54,26 @@ has db_conf => (
     },
 );
 
-# Collection of all config files (default and custom / user provided) that will
-# be inserted into the test environment.
+has _config => (
+    is => 'ro',
+    isa => 'HashRef',
+    default => sub { {} },
+    init_arg => undef, # disable assignment via construction
+);
+
+# additional configuration added in tests.
 # They must be declared before we create() everything.
 # HashRef: [dot-separated config path] => [YAML HashRef]
-has _config_data => (
+has _user_config => (
     is => 'ro',
-    isa => 'HashRef[HashRef]',
+    isa => 'HashRef',
     traits => ['Hash'],
     default => sub { {} },
     init_arg => undef, # disable assignment via construction
     handles => {
-        get_config_rootentry => 'get',
-        get_config_keys => 'keys',
+        add_user_config      => 'set',
+        get_user_config_keys => 'keys',
+        get_user_config_node => 'get',
     },
 );
 
@@ -152,65 +159,44 @@ sub write_yaml {
     $self->write_str($filepath, YAML::Tiny->new($data)->write_string);
 }
 
+# Add a configuration node (I<HashRef>) below the given configuration key
+# (dot separated path in the config hierarchy)
+#
+#     $config_writer->add_config_node('realm.alpha.workflow', $workflow);
 sub add_config {
-    my ($self, $config_path, $yaml_hash) = @_;
+    my ($self, $key, $data) = @_;
     die "add_config() must be called before create()" if $self->is_written;
-    $self->_config_data->{$config_path} = $yaml_hash;
+
+    my @parts = split /\./, $key;
+    my $node = $self->_config; # root node
+    for my $i (0..$#parts) {
+        $node->{$parts[$i]} //= {};
+        $node = $node->{$parts[$i]};
+    }
+    %{$node} = %$data; # intentionally replace any probably existing data
+}
+
+sub add_realm_config {
+    my ($self, $realm, $config_relpath, $yaml_hash) = @_;
+    die "add_realm_config() must be called before create()" if $self->is_written;
+    my $config_path = "realm.$realm.$config_relpath";
+    $self->add_config($config_path => $yaml_hash);
 }
 
 # Returns a hash that contains all config data that was defined for the given
 # config path.
-# The data might be taken from parent and/or child keys, e.g.:
-# get_config_entry('realm.alpha.workflow') might return data from
-#  realm/alpha.yaml
-#  realm/alpha/workflow.yaml
-#  realm/alpha/workflow/def/creation.yaml
-#  realm/alpha/workflow/def/deletion.yaml
 sub get_config_node {
     my ($self, $config_key, $allow_undef) = @_;
-    my $result = {};
 
     # Part 1: exact matches and superkeys
     my @parts = split /\./, $config_key;
+    my $node = $self->_config; # root node
+
     for my $i (0..$#parts) {
-        my $curr_path = join ".", @parts[0..$i];
-        if (my $config_hash = $self->_config_data->{$curr_path}) {
-            # see if we the requested config path is part of the hash
-            my $node = $config_hash;
-            for (my $r=$i+1; $r <= $#parts; $r++) {
-                $node = $node->{$parts[$r]} or last;
-            }
-            if ($node) {
-                return $node unless ref $node; # special treatment for leafs
-                %$result = (%$node, %$result);
-            }
-        }
+        $node = $node->{$parts[$i]}
+            or ($allow_undef ? return : die "Configuration key $config_key not found");
     }
-
-    # Part 2: subkeys
-    my @subkeys = grep { $_ =~ / ^ \Q$config_key\E \. /msx } sort $self->get_config_keys;
-    for my $subkey (@subkeys) {
-        my $rel_key = $subkey; $rel_key =~ s/ ^ \Q$config_key\E \. //msx;
-        my @rel_parts = split /\./, $rel_key;
-        my $node = $result;
-        for my $i (0..$#rel_parts-1) {
-            $node->{$rel_parts[$i]} //= {};
-            $node = $node->{$rel_parts[$i]};
-        }
-        $node->{$rel_parts[$#rel_parts]} = $self->get_config_rootentry($subkey);
-    }
-
-    if (not %$result) {
-        die "Configuration key $config_key not found" unless $allow_undef;
-        $result = undef;
-    }
-    return $result;
-}
-
-sub add_realm_config {
-    my ($self, $realm, $config_path, $yaml_hash) = @_;
-    die "add_realm_config() must be called before create()" if $self->is_written;
-    $self->add_config("realm.$realm.$config_path" => $yaml_hash);
+    return $node;
 }
 
 sub make_dirs {
@@ -230,7 +216,10 @@ sub make_dirs {
 
 sub create {
     my ($self) = @_;
+
     $self->make_dirs;
+
+    # default test config
     $self->add_config("system.crypto"   => $self->yaml_crypto);
     $self->add_config("system.database" => $self->yaml_database);
     $self->add_config("system.realms"   => $self->yaml_realms);
@@ -252,11 +241,17 @@ sub create {
         $self->add_realm_config($realm, "crl.default",                          $self->yaml_crl_default);
     }
 
+    # user specified config data (might overwrite default configs)
+    for my $key ($self->get_user_config_keys) {
+        $self->add_config($key => $self->get_user_config_node($key));
+    }
+
     # write all config files
-    for my $key (sort $self->get_config_keys) { # $key is the dot separated config path (e.g. system.database)
-        my $relpath = $key; $relpath =~ s/\./\//g;
-        my $filepath = sprintf "%s/%s.yaml", $self->path_config_dir, $relpath;
-        $self->write_yaml($filepath, $self->get_config_rootentry($key));
+    for my $level1 (sort keys %{$self->_config}) {
+        for my $level2 (sort keys %{$self->_config->{$level1}}) {
+            my $filepath = sprintf "%s/%s/%s.yaml", $self->path_config_dir, $level1, $level2;
+            $self->write_yaml($filepath, $self->_config->{$level1}->{$level2});
+        }
     }
     # write Log4perl config
     $self->write_str($self->path_log4perl_conf, $self->conf_log4perl);
