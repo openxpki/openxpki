@@ -14,7 +14,7 @@ use Data::Dumper;
 use Config::Std;
 use File::Basename;
 use File::Slurp;
-use Digest::SHA1 qw(sha1_hex);
+use Digest::SHA qw(sha1_hex);
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);

@@ -97,4 +97,3 @@ $test->execute_ok('scunblock_post_codes', {  _auth1_code => 'wrong', _auth2_code
 # After 3 failures the workflow should stop
 $test->state('FAILURE');
 
- 
