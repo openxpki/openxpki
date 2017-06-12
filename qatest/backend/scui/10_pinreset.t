@@ -13,7 +13,7 @@ use Log::Log4perl qw(:easy);
 use Digest::SHA qw(sha256_hex);
 use MIME::Base64;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 #Log::Log4perl->easy_init($DEBUG);
 
@@ -56,6 +56,15 @@ my $code1 = $result->{code};
 
 diag('Got first auth code: ' . $code1);
 
+
+# wrong user
+$ENV{'REMOTE_USER'} = $cardOwner;
+$result = $pinclient->mock_request( 'getauthcode', 'getauthcode', { 'id' => $wf_id });
+
+is($result->{errors}->[0], 'I18N_OPENXPKI_CLIENT_GETAUTHCODE_ERROR_EXECUTING_SCPU_GENERATE_ACTIVATION_CODE');
+ok($result->{error});
+
+
 $ENV{'REMOTE_USER'} = $auth2;
 $result = $pinclient->mock_request( 'getauthcode', 'getauthcode', { 'id' => $wf_id });
 is ($result->{foruser}, $cardOwnerName);
@@ -91,3 +100,4 @@ $result = $client->mock_request( 'pinreset', 'pinreset_confirm', {
 } );
 
 is($result->{'wfstate'}, 'SUCCESS');
+
