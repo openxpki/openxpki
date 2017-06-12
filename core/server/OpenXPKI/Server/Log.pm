@@ -1,5 +1,21 @@
 package OpenXPKI::Server::Log;
 
+=head1 Name
+
+OpenXPKI::Server::Log - logging implementation for OpenXPKI
+
+=head1 Description
+
+This is the logging layer of OpenXPKI. Mainly we use Log::Log4perl.
+The important difference is that we replace the original DBI appender
+with our own appender which can handle some funny details of some
+special databases. Additionally our log function do some special
+things to meet our requirements.
+
+=head1 Functions
+
+=cut
+
 use strict;
 use warnings;
 use English;
@@ -26,6 +42,13 @@ for my $name (qw( application auth system workflow )) {
     );
 }
 
+=head2 Constructor
+
+This function only accepts one parameter - C<CONFIG>.
+C<CONFIG> includes the filename of the Log::Log4perl configuration.
+
+=cut
+
 sub BUILD {
     my $self = shift;
 
@@ -40,21 +63,46 @@ sub BUILD {
     }
 }
 
-=item audit
+=head2 audit
 
 Audit logger has a subcategory
 
 =cut
+
 sub audit {
     my $self = shift;
     my $subcat = shift || 'system';
     return Log::Log4perl->get_logger("openxpki.audit.$subcat");
 }
 
-=item log DEPRECATED
+=head2 log DEPRECATED
 
 This is the old method used in pre 1.18 and shouldnt be used any longer!
 Each call triggers a deprecation warning with facility "openxpki.deprecated"
+
+This function creates a new log message it accept the following
+parameters:
+
+=over
+
+=item * PRIORITY (debug, info, warn, error, fatal)
+
+=item * FACILITY (auth, audit, monitor, system, workflow)
+
+It is possible to specify more than one facility by passing an array
+reference here.
+
+=item * MESSAGE (normal text string)
+
+=item * MODULE (overwrites the internally determined caller) - optional
+
+=item * FILENAME (overwrites the internally determined caller) - optional
+
+=item * LINE (overwrites the internally determined caller - optional)
+
+=back
+
+Default is C<system.fatal: [OpenXPKI] undefined message>.
 
 =cut
 
@@ -157,77 +205,6 @@ sub log {
 
 }
 
-# install wrapper / helper subs - DEPRECATED, use new format
-no strict 'refs';
-for my $prio (qw/ debug info warn error fatal trace /) {
-    *{$prio} = sub {
-        my ( $self, $message, $facility ) = @_;
-
-        if (!$facility ||
-            $facility !~ m{ \A (?:application|auth|audit|system|workflow) \z }xms) {
-            $facility = 'system';
-        }
-        $self->$facility()->$prio($message);
-    };
-}
-
-1;
-__END__
-
-=head1 Name
-
-OpenXPKI::Server::Log - logging implementation for OpenXPKI
-
-=head1 Description
-
-This is the logging layer of OpenXPKI. Mainly we use Log::Log4perl.
-The important difference is that we replace the original DBI appender
-with our own appender which can handle some funny details of some
-special databases. Additionally our log function do some special
-things to meet our requirements.
-
-=head1 Functions
-
-=head2 new
-
-This function only accepts one parameter - C<CONFIG>.
-C<CONFIG> includes the filename of the Log::Log4perl configuration.
-
-=head2 init
-
-is used by both new and re_init to initialize the Log4perl objects
-
-=head2 re_init
-
-is just a fancier name for init, is called in the forked child
-at ForkWorkflowInstance.pm
-
-=head2 log
-
-This function creates a new log message it accept the following
-parameters:
-
-=over
-
-=item * PRIORITY (debug, info, warn, error, fatal)
-
-=item * FACILITY (auth, audit, monitor, system, workflow)
-
-It is possible to specify more than one facility by passing an array
-reference here.
-
-=item * MESSAGE (normal text string)
-
-=item * MODULE (overwrites the internally determined caller) - optional
-
-=item * FILENAME (overwrites the internally determined caller) - optional
-
-=item * LINE (overwrites the internally determined caller - optional)
-
-=back
-
-Default is C<system.fatal: [OpenXPKI] undefined message>.
-
 =head2 debug
 
 Shortcut to L</log> that logs a message with C<< PRIORITY => "debug" >>.
@@ -238,7 +215,7 @@ Positional parameters:
 
 =item * B<$message> log message
 
-=item * B<$facility> the logging facility - optional, default: C<monitor>
+=item * B<$facility> the logging facility - optional, default: C<system>
 
 =back
 
@@ -265,3 +242,24 @@ Similar to L</debug>.
 Shortcut to L</log> that logs a message with C<< PRIORITY => "fatal" >>.
 
 Similar to L</debug>.
+
+=cut
+
+# install wrapper / helper subs - DEPRECATED, use new format
+no strict 'refs';
+for my $prio (qw/ debug info warn error fatal trace /) {
+    *{$prio} = sub {
+        my ( $self, $message, $facility ) = @_;
+
+        if (!$facility ||
+            $facility !~ m{ \A (?:application|auth|audit|system|workflow) \z }xms) {
+            $facility = 'system';
+        }
+        $self->$facility()->$prio($message);
+    };
+}
+
+1;
+
+__END__
+
