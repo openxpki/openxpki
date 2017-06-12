@@ -29,11 +29,10 @@ sub new {
     return $self;
 }
 
-
-sub re_init {
+# system is used as default logger for the DBI class
+sub system {
     my $self = shift;
-
-    return 1;
+    return $self->{logger};
 }
 
 sub log

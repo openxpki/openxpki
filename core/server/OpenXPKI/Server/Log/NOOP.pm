@@ -3,14 +3,13 @@
 ## a dummy class that behaves like OpenXPKI::Server::Log, but does
 ## not log anything (used during server startup where logger is noy
 ## yet available)
-## Written in 2007 by Alexander Klink for the OpenXPKI Project
-## (C) Copyright 2007 by The OpenXPKI Project
 
 package OpenXPKI::Server::Log::NOOP;
 
 use strict;
 use warnings;
 use English;
+use Log::Log4perl qw(:easy);
 
 sub new {
     my $that = shift;
@@ -20,26 +19,23 @@ sub new {
 
     bless $self, $class;
 
+    $self->{logger} = Log::Log4perl->easy_init($OFF);
+
     return $self;
 }
 
+sub log { 1; }
 
-sub re_init { 1 }
-sub log { 1 }
-sub usage { return shift } # to provide an info() method
+# system is used as default logger for the DBI class
+sub system {
+    my $self = shift;
+    return $self->{logger};
+}
 
 # install wrapper / helper subs
 no strict 'refs';
 for my $prio (qw/ debug info warn error fatal /) {
-    *{$prio} = sub {
-        my ($self, $message, $facility) = @_;
-        $self->log(
-            MESSAGE  => $message,
-            PRIORITY => $prio,
-            CALLERLEVEL => 1,
-            FACILITY => $facility // "monitor",
-        );
-    };
+    *{$prio} = sub { 1; };
 }
 
 1;
