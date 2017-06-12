@@ -689,7 +689,7 @@ sub sc_analyze_smartcard {
 
     if (scalar (@certs_to_load_from_db)) {
         my $sth = CTX('dbi')->select(
-            from => "certificate req_key=req_key csr",
+            from_join => "certificate req_key=req_key csr",
             columns => [
                 'certificate.subject',
                 'certificate.identifier',
@@ -1471,7 +1471,7 @@ sub sc_analyze_certificate {
     ##! 16: 'searching certificate with identifier: ' . $identifier
 
     my $cert_data = CTX('dbi')->select_one(
-        from => "certificate req_key=req_key csr",
+        from_join => "certificate req_key=req_key csr",
         columns => [
             'certificate.issuer_identifier',
             'certificate.status',
