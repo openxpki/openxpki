@@ -28,7 +28,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
 has 'CONFIG' => (
-    isa     => 'Str',
+    isa     => 'Str|ScalarRef',
     is      => 'ro',
     default => '/etc/openxpki/log.conf',
 );
@@ -46,6 +46,7 @@ for my $name (qw( application auth system workflow )) {
 
 This function only accepts one parameter - C<CONFIG>.
 C<CONFIG> includes the filename of the Log::Log4perl configuration.
+You can also pass a scalar ref holding the Log4perl init string.
 
 =cut
 
@@ -54,10 +55,11 @@ sub BUILD {
 
     my $config = $self->CONFIG();
 
-    if ( $config && -e $config ) {
+    if (ref $config eq 'SCALAR') {
         Log::Log4perl->init($config);
-    }
-    else {
+    } elsif ( $config && -e $config ) {
+        Log::Log4perl->init($config);
+    } else {
         warn "Do easy_init - config $config not found ";
         Log::Log4perl->easy_init($WARN);
     }
