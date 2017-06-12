@@ -364,7 +364,7 @@ sub param {
         }
     } else {
         $result = $self->extra();
-        @keys = $cgi->param if ($cgi);
+        @keys = $cgi->multi_param if ($cgi);
         $self->logger()->trace('Param request for full set - cgi keys ' . Dumper \@keys );
     }
 
