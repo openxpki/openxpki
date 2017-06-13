@@ -24,11 +24,10 @@ use Moose;
 use Log::Log4perl qw(:easy);
 use Log::Log4perl::Level;
 use Log::Log4perl::MDC;
-use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
 has 'CONFIG' => (
-    isa     => 'Str|ScalarRef',
+    isa     => 'Str|ScalarRef|Undef',
     is      => 'ro',
     default => '/etc/openxpki/log.conf',
 );
@@ -55,14 +54,24 @@ sub BUILD {
 
     my $config = $self->CONFIG();
 
-    if (ref $config eq 'SCALAR') {
-        Log::Log4perl->init($config);
-    } elsif ( $config && -e $config ) {
-        Log::Log4perl->init($config);
-    } else {
-        warn "Do easy_init - config $config not found ";
-        Log::Log4perl->easy_init($WARN);
+    # CONFIG was provided
+    if (defined $config) {
+        if (ref $config eq 'SCALAR') {
+            Log::Log4perl->init($config);
+            return;
+        }
+        elsif ( $config && -e $config ) {
+            Log::Log4perl->init($config);
+            return;
+        }
     }
+    # caller explicitely asked to NOT use config: try reusing Log4perl
+    else {
+        return if Log::Log4perl->initialized;
+    }
+    # if not initialized: complain and init screen logger
+    warn "Do easy_init - config $config not found ";
+    Log::Log4perl->easy_init($WARN);
 }
 
 =head2 audit
@@ -163,25 +172,9 @@ sub log {
     ) unless ($msg);
 
     # get session information
-    my $user;
-    my $role = '';
-    my $session_short;
-    if ( OpenXPKI::Server::Context::hascontext('session') ) {
-        eval {
-            no warnings;
-            $user = CTX('session')->get_user();
-        };
-        eval {
-            no warnings;
-            $role = '(' . CTX('session')->get_role() . ')';
-        };
-        eval {
-            no warnings;
-
-         # first 4 characters of session id are enough to trace flow in sessions
-            $session_short = substr( CTX('session')->get_id(), 0, 4 );
-        };
-    }
+    my $user = Log::Log4perl::MDC->get('user');
+    my $role = Log::Log4perl::MDC->get('role');
+    my $session_short = Log::Log4perl::MDC->get('sid');
 
     # get workflow instance information
     my $wf_id = Log::Log4perl::MDC->get('wfid');
@@ -189,8 +182,8 @@ sub log {
     ## build and store message
     $msg =
         "[$package" . " ($line)"
-      . ( defined $user          ? '; ' . $user . $role : '' )
-      . ( defined $session_short ? '@' . $session_short : '' )
+      . ( $user ? '; ' . $user . ($role ? "($role)" : "") : '' )
+      . ( $session_short ? '@' . $session_short : '' )
       . ( $wf_id         ? '#' . $wf_id         : '' )
       . "] $msg";
 

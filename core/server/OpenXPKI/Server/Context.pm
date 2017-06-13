@@ -87,9 +87,8 @@ sub CTX {
                 OpenXPKI::Server::Context::setcontext({'session' => $session});
                 $session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');
     	    } elsif ($object eq 'log') {
-    	        #warn "Auto-Init of NOOP-Logger";
-    	        use OpenXPKI::Server::Log::NOOP;
-    	        OpenXPKI::Server::Context::setcontext({'log' => OpenXPKI::Server::Log::NOOP->new()});
+    	        use OpenXPKI::Server::Log;
+    	        OpenXPKI::Server::Context::setcontext({ 'log' => OpenXPKI::Server::Log->new(CONFIG => undef) });
     	    } else {
         	    OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",

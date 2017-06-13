@@ -194,7 +194,6 @@ OpenXPKI/Server/Database/Role/SequenceSupport.pm
 
 OpenXPKI/Server/Log.pm
 OpenXPKI/Server/Log/CLI.pm
-OpenXPKI/Server/Log/NOOP.pm
 OpenXPKI/Server/Log/Appender/DBI.pm
 OpenXPKI/Server/Log/Appender/Database.pm
 OpenXPKI/Server/Log/Appender/Audit.pm
