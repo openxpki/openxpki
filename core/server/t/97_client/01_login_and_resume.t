@@ -21,7 +21,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 
 
-plan tests => 10;
+plan tests => 15;
 
 
 #
@@ -53,7 +53,7 @@ unless ( $child_pid ) {
 
     # init_server() must be called after Proc::Daemon->Init() because the latter
     # closes all file handles which would cause problems with Log4perl
-    $oxitest->init_server;
+    $oxitest->init_server('crypto_layer');
     use OpenXPKI::Server;
     my $server = OpenXPKI::Server->new(
         'SILENT' => $ENV{TEST_VERBOSE} ? 0 : 1,
@@ -118,6 +118,9 @@ sub get_error {
     return;
 }
 
+my $realm = $oxitest->get_default_realm;
+my $resp;
+
 use_ok "OpenXPKI::Client";
 
 my $client;
@@ -126,16 +129,14 @@ lives_ok {
         TIMEOUT => 5,
         SOCKETFILE => $oxitest->get_config("system.server.socket_file"),
     });
-} "OpenXPKI::Client->new";
-
-my $realm = $oxitest->get_default_realm;
-
-my $resp;
+} "client instance";
 
 lives_ok {
     $resp = $client->init_session();
 } "initialize client session";
 is_next_step $resp, "GET_PKI_REALM";
+
+my $session_id = $client->get_session_id;
 
 $resp = send_ok $client, 'GET_PKI_REALM', { PKI_REALM => $realm };
 is_next_step $resp, "GET_AUTHENTICATION_STACK";
@@ -146,12 +147,23 @@ is_next_step $resp, "GET_PASSWD_LOGIN";
 $resp = send_ok $client, 'GET_PASSWD_LOGIN', { LOGIN => "caop", PASSWD => $oxitest->config_writer->password };
 is_next_step $resp, "SERVICE_READY";
 
-#            $resp = $client->send_receive_service_msg( 'PING', );
-#            $self->set_msg($resp);
-#            if ( $self->error ) {
-#                $self->diag( "Login failed (ping): " . Dumper $resp);
-#                return;
-#            }
+$resp = send_ok $client, 'COMMAND', { COMMAND => "get_session_info" };
+is $resp->{PARAMS}->{name}, "caop", "session info contains user name";
+
+$client->close_connection;
+
+lives_ok {
+    $client = OpenXPKI::Client->new({
+        TIMEOUT => 5,
+        SOCKETFILE => $oxitest->get_config("system.server.socket_file"),
+    });
+} "client instance no. 2";
+
+lives_ok {
+    $resp = $client->init_session({ SESSION_ID => $session_id });
+} "initialize client session no. 2 with previous session id";
+
+is_next_step $resp, "SERVICE_READY";
 
 $daemon->Kill_Daemon($child_pid) or diag "Could not kill test server";
 
