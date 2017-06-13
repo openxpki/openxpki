@@ -347,8 +347,7 @@ sub process_request {
 }
 
 
-sub do_process_request
-{
+sub do_process_request {
     ##! 2: "start"
     my $self = shift;
 
@@ -362,12 +361,10 @@ sub do_process_request
 
     ##! 2: "transport protocol detector"
     my $transport = undef;
-    my $line      = "";
-    while (not $transport)
-    {
+    my $line = "";
+    while (not $transport) {
         my $char;
-        if (! read($self->{server}->{client}, $char, 1))
-        {
+        if (! read($self->{server}->{client}, $char, 1)) {
             print STDOUT "OpenXPKI::Server: Connection closed unexpectly.\n";
             $log->fatal("Connection closed unexpectly.");
             return;
@@ -395,14 +392,14 @@ sub do_process_request
         eval "\$serializer = OpenXPKI::Serialization::$msg->new();";
 
         if (! defined $serializer) {
-                $transport->write ("OpenXPKI::Server: Serializer failed to initialize.\n");
-                $log->fatal("Serializer '$msg' failed to initialize.");
-                return;
+            $transport->write("OpenXPKI::Server: Serializer failed to initialize.\n");
+            $log->fatal("Serializer '$msg' failed to initialize.");
+            return;
         }
         $transport->write ("OK");
     }
     else {
-        $transport->write ("OpenXPKI::Server: Unsupported serializer.\n");
+        $transport->write("OpenXPKI::Server: Unsupported serializer.\n");
         $log->fatal("Unsupported serializer.");
         return;
     }
@@ -413,33 +410,24 @@ sub do_process_request
     # By the way, if you're adding support for a new service here,
     # You need to add a matching entry in system/server.yaml
     # below the "service" key.
-    if ($data eq "Default")
-    {
-        OpenXPKI::Server::Context::setcontext
-        ({
-            "service" => OpenXPKI::Service::Default->new
-                         ({
-                             TRANSPORT     => $transport,
-                             SERIALIZATION => $serializer,
-                         })
+    my $service;
+
+    if ($data eq "Default") {
+        $service = OpenXPKI::Service::Default->new({
+             TRANSPORT     => $transport,
+             SERIALIZATION => $serializer,
         });
-        $transport->write ($serializer->serialize ("OK"));
+        $transport->write($serializer->serialize ("OK"));
     }
-    elsif ($data eq 'SCEP')
-    {
-        OpenXPKI::Server::Context::setcontext
-        ({
-            "service" => OpenXPKI::Service::SCEP->new
-                         ({
-                            TRANSPORT     => $transport,
-                            SERIALIZATION => $serializer,
-                         })
+    elsif ($data eq 'SCEP') {
+        $service = OpenXPKI::Service::SCEP->new({
+            TRANSPORT     => $transport,
+            SERIALIZATION => $serializer,
         });
         $transport->write($serializer->serialize('OK'));
     }
-    else
-    {
-        $transport->write ($serializer->serialize ("OpenXPKI::Server: Unsupported service.\n"));
+    else {
+        $transport->write($serializer->serialize("OpenXPKI::Server: Unsupported service.\n"));
         $log->fatal("Unsupported service.");
         return;
     }
@@ -457,14 +445,14 @@ sub do_process_request
     ##! 16: 'connection to database successful'
 
     # this is run until the user has logged in successfully
-    CTX('service')->init();
+    $service->init();
 
     CTX('crypto_layer')->reload_all_secret_groups_from_cache();
 
     ##! 16: 'secret groups reloaded from cache'
 
     ## use user interface
-    CTX('service')->run();
+    $service->run();
 }
 
 ###########################################################################
