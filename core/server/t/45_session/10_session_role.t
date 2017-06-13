@@ -31,7 +31,8 @@ use Test::Exception;
 use Test::Deep;
 
 # Project modules
-use OpenXPKI::Server::Log::NOOP;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($OFF);
 
 
 plan tests => 10;
@@ -44,7 +45,7 @@ my $session;
 lives_ok {
     $session = OpenXPKI::Server::SessionHandler->new(
         type => "TestDriver",
-        log => OpenXPKI::Server::Log::NOOP->new,
+        log => Log::Log4perl->get_logger(),
     );
 } "create session 1";
 
@@ -95,7 +96,7 @@ throws_ok {
     OpenXPKI::Server::SessionHandler
         ->new(
             type => "TestDriver",
-            log => OpenXPKI::Server::Log::NOOP->new,
+            log =>  Log::Log4perl->get_logger(),
         )
         ->resume(25);
 } qr/TestDriver/i, "complain about wrong results from driver";

@@ -13,13 +13,11 @@ use Test::Deep;
 
 # Project modules
 use lib "$Bin/../lib";
-use OpenXPKI::Server::Log;
-use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Test;
-
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($OFF);
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Session.*'} = 100;
-
 
 plan tests => 8;
 
@@ -29,10 +27,6 @@ plan tests => 8;
 my $oxitest = OpenXPKI::Test->new;
 $oxitest->setup_env->init_server;
 
-my $log = $ENV{VERBOSE}
-    ? OpenXPKI::Server::Log->new(CONFIG => "$Bin/log4perl.conf")
-    : OpenXPKI::Server::Log::NOOP->new;
-
 #
 # Tests
 #
@@ -40,7 +34,7 @@ use_ok "OpenXPKI::Server::SessionHandler";
 
 my %base_args = (
     type => "Database",
-    log  => $log,
+    log  => Log::Log4perl->get_logger(),
 );
 
 ## create new session

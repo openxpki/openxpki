@@ -25,7 +25,6 @@ use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
-use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;

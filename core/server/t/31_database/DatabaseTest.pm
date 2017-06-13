@@ -6,7 +6,7 @@ use Test::More;
 use Test::Exception;
 use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
 use OpenXPKI::MooseParams;
-use Log::Log4perl;
+use Log::Log4perl qw(:easy);
 use Moose::Util::TypeConstraints;
 
 ################################################################################
@@ -89,6 +89,8 @@ has 'test_no' => (
 has '_log' => (
     is => 'rw',
     isa => 'Object',
+#    lazy => 1,
+#    default => sub { Log::Log4perl->easy_init($OFF); return Log::Log4perl->get_logger(); }
 );
 
 sub set_dbi {
@@ -112,17 +114,14 @@ sub set_dbi {
 sub BUILD {
     my $self = shift;
     use_ok "OpenXPKI::Server::Database"; $self->count_test;
-    use_ok "OpenXPKI::Server::Log";      $self->count_test;
-    $self->_log( OpenXPKI::Server::Log->new(
-        CONFIG => \"
-# Catch-all root logger
-log4perl.rootLogger = DEBUG, Everything
 
-log4perl.appender.Everything          = Log::Log4perl::Appender::String
-log4perl.appender.Everything.layout   = Log::Log4perl::Layout::PatternLayout
-log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
-"
-    ) );
+    Log::Log4perl->init(\"
+        log4perl.rootLogger = DEBUG, Everything
+        log4perl.appender.Everything          = Log::Log4perl::Appender::String
+        log4perl.appender.Everything.layout   = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
+    ");
+    $self->_log( Log::Log4perl->get_logger() );
 }
 
 sub run {

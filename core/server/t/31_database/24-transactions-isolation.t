@@ -16,6 +16,7 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
+use Log::Log4perl qw(:easy);
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
 
@@ -25,17 +26,8 @@ plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unle
 # setup
 #
 use_ok "OpenXPKI::Server::Database";
-use_ok "OpenXPKI::Server::Log";
-my $log = OpenXPKI::Server::Log->new(
-    CONFIG => \"
-# Catch-all root logger
-log4perl.rootLogger = DEBUG, Everything
-
-log4perl.appender.Everything          = Log::Log4perl::Appender::String
-log4perl.appender.Everything.layout   = Log::Log4perl::Layout::PatternLayout
-log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
-"
-);
+Log::Log4perl->easy_init($OFF);
+my $log = Log::Log4perl->get_logger();
 
 my $db_params = {
     type => "MySQLTest",
@@ -137,4 +129,4 @@ bob_sees 3, undef, "Test 3: Bob sees Alices deletions";
 $db_bob->commit; # to be able to drop database
 $db_alice->run("DROP TABLE test");
 
-done_testing(20);
+done_testing();

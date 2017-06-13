@@ -173,7 +173,7 @@ This option requries the Time::HiRes module to be installed.
       `message` longtext
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-=head Fields
+=head2 Fields
 
 =over
 

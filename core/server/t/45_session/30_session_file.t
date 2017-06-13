@@ -11,13 +11,13 @@ use File::Temp qw( tempdir );
 use Test::More;
 use Test::Exception;
 use Test::Deep;
+use Log::Log4perl qw(:easy);
 
 # Project modules
 use lib "$Bin/../lib";
-use OpenXPKI::Server::Log;
-use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Test;
 
+Log::Log4perl->easy_init($OFF);
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Session.*'} = 100;
 
@@ -30,10 +30,6 @@ plan tests => 8;
 my $oxitest = OpenXPKI::Test->new;
 $oxitest->setup_env->init_server;
 
-my $log = $ENV{VERBOSE}
-    ? OpenXPKI::Server::Log->new(CONFIG => "$Bin/log4perl.conf")
-    : OpenXPKI::Server::Log::NOOP->new;
-
 my $session_dir = tempdir( CLEANUP => 1 );
 
 #
@@ -43,7 +39,7 @@ use_ok "OpenXPKI::Server::SessionHandler";
 
 my %base_args = (
     type => "File",
-    log  => $log,
+    log  => Log::Log4perl->get_logger(),
     driver_config => { directory => $session_dir },
 );
 

@@ -47,7 +47,7 @@ use File::Temp qw( tempdir );
 
 # CPAN modules
 use Moose::Exporter;
-use Log::Log4perl;
+use Log::Log4perl qw(:easy);
 use Moose::Util::TypeConstraints;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 
@@ -55,7 +55,6 @@ use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in 
 use OpenXPKI::Config;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
-use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Session;
@@ -431,8 +430,9 @@ sub delete_testcerts {
 sub _build_dbi {
     my ($self) = @_;
 
+    #Log::Log4perl->easy_init($OFF);
     return OpenXPKI::Server::Database->new(
-        log => OpenXPKI::Server::Log::NOOP->new,
+        log => Log::Log4perl->get_logger(),
         db_params => $self->db_conf,
     );
 }
