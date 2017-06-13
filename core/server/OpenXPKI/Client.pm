@@ -129,14 +129,14 @@ sub collect {
 
     my $result;
     eval {
-         local $SIG{ALRM} = sub { die "alarm\n" };
+        local $SIG{ALRM} = sub { die "alarm\n" };
 
-         alarm $read_timeout{$ident};
-         $result = $serialization{$ident}->deserialize(
-             $transport{$ident}->read()
-         );
+        alarm $read_timeout{$ident};
+        $result = $serialization{$ident}->deserialize(
+            $transport{$ident}->read()
+        );
         $self->set_communication_state('can_send');
-         alarm 0;
+        alarm 0;
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
         $self->set_communication_state('can_send');
@@ -375,9 +375,9 @@ sub rekey_session {
     $sessionid{$ident} = $msg->{SESSION_ID};
 
     $self->talk(
-    {
-        SERVICE_MSG => 'SESSION_ID_ACCEPTED',
-    });
+	{
+	    SERVICE_MSG => 'SESSION_ID_ACCEPTED',
+	});
 
     # we want to be able to send after initialization, so collect a message!
     $msg = $self->collect();
@@ -481,6 +481,13 @@ sub is_connected
     return 1;
 }
 
+sub close_connection {
+    my $self = shift;
+    my $ident = ident $self;
+
+    shutdown($socket{$ident}, 2); # we have stopped using this socket
+}
+
 ###########################################################################
 # private methods
 
@@ -509,7 +516,6 @@ sub __init_connection : PRIVATE {
     ##! 4: "finished"
     return 1;
 }
-
 
 sub __init_transport_protocol : PRIVATE {
     my $self = shift;
@@ -679,7 +685,6 @@ See send_service_msg.
 Send a service command message, reads the response and returns it.
 See send_command_msg.
 
-
 =head2 init_session
 
 Initialize session. If the named argument SESSION_ID exists, this session
@@ -702,6 +707,10 @@ Returns current session ID (or undef if no session is active).
 =head2 set_timeout
 
 Set socket read timeout (seconds, default: 30).
+
+=head2 close_connection
+
+Closes the socket connection to the server.
 
 =head1 DIAGNOSTICS
 
