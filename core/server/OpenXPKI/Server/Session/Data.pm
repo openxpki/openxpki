@@ -4,9 +4,11 @@ use utf8;
 
 # CPAN modules
 use Data::UUID;
+use Digest::SHA qw( sha1_hex );
 
 # Project modules
 use OpenXPKI::Exception;
+use OpenXPKI::MooseParams;
 
 =head1 NAME
 
@@ -50,12 +52,15 @@ my %ATTR_TYPES = (
     ip_address              => 'Str',
     created                 => 'Int',
     modified                => 'Int',
+    _secrets                => 'HashRef',
 );
 for my $name (keys %ATTR_TYPES) {
+    my $type = $ATTR_TYPES{$name};
     has $name => (
         is => 'rw',
         isa => $ATTR_TYPES{$name},
         trigger => sub { shift->_attr_change },
+        $type eq "HashRef" ? (default => sub { {} }) : (),
     );
 }
 
@@ -114,6 +119,55 @@ sub get_attributes {
     }
 
     return { map { $_ => $self->$_ } @names };
+}
+
+=head2 secret
+
+Set or get the secret of the given group (default group: "").
+
+B<Named parameters>
+
+=over
+
+=item * group - optional: the secrets group
+
+=item * secret - optional: the value to set
+
+=back
+
+=cut
+sub secret {
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        group => { isa => 'Str' },
+        secret => { isa => 'Str' },
+    );
+    my $digest = sha1_hex($params{group} || "");
+
+    # getter
+    return $self->_secrets->{$digest} unless $params{secret};
+    # setter
+    $self->_secrets->{$digest} = $params{secret};
+}
+
+=head2 clear_secret
+
+Clear (delete) the secret of the given group (default group: "").
+
+B<Named parameters>
+
+=over
+
+=item * group - optional: the secrets group
+
+=back
+
+=cut
+sub clear_secret {
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        group => { isa => 'Str' },
+    );
+    my $digest = sha1_hex($params{group} || "");
+    delete $self->_secrets->{$digest};
 }
 
 1;

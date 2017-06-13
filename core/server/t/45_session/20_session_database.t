@@ -42,9 +42,11 @@ sub driver_ok {
         } "create session";
 
         # set all attributes
-        for my $name (grep { $_ ne "modified" } @{ $session->data->get_attribute_names }) {
+        for my $name (grep { $_ !~ /^(modified|_secrets)$/ } @{ $session->data->get_attribute_names }) {
             $session->data->$name(int(rand(2**32-1)));
         }
+        $session->data->secret(group => "golf", secret => 333);
+        $session->data->secret(group => "ballet", secret => 222);
 
         # persist
         lives_ok {
