@@ -194,7 +194,6 @@ OpenXPKI/Server/Database/Role/SequenceSupport.pm
 
 OpenXPKI/Server/Log.pm
 OpenXPKI/Server/Log/CLI.pm
-OpenXPKI/Server/Log/NOOP.pm
 OpenXPKI/Server/Log/Appender/DBI.pm
 OpenXPKI/Server/Log/Appender/Database.pm
 OpenXPKI/Server/Log/Appender/Audit.pm
@@ -553,7 +552,6 @@ t/31_database/23-transactions.t
 t/31_database/24-transactions-isolation.t
 t/31_database/25-autocommit.t
 t/31_database/DatabaseTest.pm
-t/31_database/log4perl.conf
 
 t/40_context/01.t
 t/40_context/02.t2

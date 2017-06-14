@@ -16,7 +16,7 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
-use Log::Log4perl qw(:easy);
+use Log::Log4perl;
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
 
@@ -25,15 +25,15 @@ plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unle
 #
 # setup
 #
-sub get_log {
+sub log_contains {
+    my ($regex) = @_;
     my $appender = Log::Log4perl->appender_by_name("Everything")
         or BAIL_OUT("Could not access Log4perl appender");
     my $messages = $appender->string;
     $appender->string("");
-    return $messages;
+    like $messages, $regex;
 }
 
-use_ok "OpenXPKI::Server::Database";
 Log::Log4perl->init(\"
     log4perl.rootLogger = DEBUG, Everything
     log4perl.appender.Everything          = Log::Log4perl::Appender::String
@@ -49,6 +49,8 @@ my $db_params = {
     user => $ENV{OXI_TEST_DB_MYSQL_USER},
     passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
 };
+
+use_ok "OpenXPKI::Server::Database";
 
 my $db_alice = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params, autocommit => 1);
 my $db_bob   = OpenXPKI::Server::Database->new(log => $log, db_params => $db_params);
@@ -66,7 +68,7 @@ sub bob_sees {
 #
 # create test table
 #
-eval { $db_alice->run("DROP TABLE test") };
+eval { $db_alice->run("DROP TABLE test"); };
 $db_alice->run("CREATE TABLE test (id INTEGER PRIMARY KEY, text VARCHAR(100))");
 $db_alice->insert(into => "test", values => { id => 1, text => "Litfasssaeule" });
 
@@ -75,26 +77,21 @@ $db_alice->insert(into => "test", values => { id => 1, text => "Litfasssaeule" }
 #
 my $data;
 
-TODO : {
-
-    todo_skip 'get_log needs fixing', 3;
-
 lives_and {
     $db_alice->start_txn;
-    like get_log(), qr/autocommit.*start_txn/i;
+    log_contains qr/autocommit.*start_txn/i;
 } "Warn about useless start_txn()";
 
 lives_and {
     $db_alice->commit;
-    like get_log(), qr/autocommit.*commit/i;
+    log_contains qr/autocommit.*commit/i;
 } "Warn about useless commit()";
 
 lives_and {
     $db_alice->rollback;
-    like get_log(), qr/autocommit.*rollback/i;
+    log_contains qr/autocommit.*rollback/i;
 } "Warn about useless rollback()";
 
-}
 # Writing and reading
 lives_ok {
     $db_alice->update(table => "test", set => { text => "LED-Panel" }, where => { id => 1 });

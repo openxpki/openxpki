@@ -8,6 +8,8 @@ use English;
 # CPAN modules
 use Test::More;
 use Test::Exception;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 plan tests => 20;
 

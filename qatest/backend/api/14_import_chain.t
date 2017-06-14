@@ -21,16 +21,6 @@ use TestCfg;
 use OpenXPKI::Test::More;
 use OpenXPKI::Test;
 
-sub _slurp {
-    my $filename = shift;
-    my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
-    return do { # slurp
-        local $INPUT_RECORD_SEPARATOR;
-        open my $fh, '<', catfile($basedir, $filename) or die "Could not open file $filename: $!";
-        <$fh>;
-    };
-}
-
 #
 # Init client
 #

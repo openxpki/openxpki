@@ -24,11 +24,10 @@ use Moose;
 use Log::Log4perl qw(:easy);
 use Log::Log4perl::Level;
 use Log::Log4perl::MDC;
-use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 
 has 'CONFIG' => (
-    isa     => 'Str|ScalarRef',
+    isa     => 'Str|ScalarRef|Undef',
     is      => 'ro',
     default => '/etc/openxpki/log.conf',
 );
@@ -44,9 +43,18 @@ for my $name (qw( application auth system workflow )) {
 
 =head2 Constructor
 
-This function only accepts one parameter - C<CONFIG>.
-C<CONFIG> includes the filename of the Log::Log4perl configuration.
-You can also pass a scalar ref holding the Log4perl init string.
+The constructor only accepts the named parameter C<CONFIG> which can either be
+
+=over
+
+=item * a path to the L<Log::Log4perl> configuration file,
+
+=item * a reference to a scalar holding the Log4perl configuration string or
+
+=item * undef to either use an already initialized Log4perl or create a screen
+only logger using L<Log::Log4perl/easy_init>
+
+=back
 
 =cut
 
@@ -55,19 +63,39 @@ sub BUILD {
 
     my $config = $self->CONFIG();
 
-    if (ref $config eq 'SCALAR') {
-        Log::Log4perl->init($config);
-    } elsif ( $config && -e $config ) {
-        Log::Log4perl->init($config);
-    } else {
-        warn "Do easy_init - config $config not found ";
-        Log::Log4perl->easy_init($WARN);
+    # CONFIG was provided
+    if (defined $config) {
+        if (ref $config eq 'SCALAR') {
+            Log::Log4perl->init($config);
+            return;
+        }
+        elsif (-e $config ) {
+            Log::Log4perl->init($config);
+            return;
+        }
+        warn "Configuration file $config not found";
     }
+    # caller explicitely asked to NOT use config: try reusing Log4perl
+    else {
+        return if Log::Log4perl->initialized;
+    }
+    # if not initialized: complain and init screen logger
+    warn "Initializing Log4perl with easy_init()";
+    Log::Log4perl->easy_init($WARN);
 }
 
 =head2 audit
 
-Audit logger has a subcategory
+Returns the audit logger of the given subcategory I<openxpki.audit.$subcat>.
+
+Positional parameters:
+
+=over
+
+=item * B<$subcat> sub category - optional, default: I<system>
+
+=back
+
 
 =cut
 
@@ -163,25 +191,9 @@ sub log {
     ) unless ($msg);
 
     # get session information
-    my $user;
-    my $role = '';
-    my $session_short;
-    if ( OpenXPKI::Server::Context::hascontext('session') ) {
-        eval {
-            no warnings;
-            $user = CTX('session')->get_user();
-        };
-        eval {
-            no warnings;
-            $role = '(' . CTX('session')->get_role() . ')';
-        };
-        eval {
-            no warnings;
-
-         # first 4 characters of session id are enough to trace flow in sessions
-            $session_short = substr( CTX('session')->get_id(), 0, 4 );
-        };
-    }
+    my $user = Log::Log4perl::MDC->get('user');
+    my $role = Log::Log4perl::MDC->get('role');
+    my $session_short = Log::Log4perl::MDC->get('sid');
 
     # get workflow instance information
     my $wf_id = Log::Log4perl::MDC->get('wfid');
@@ -189,8 +201,8 @@ sub log {
     ## build and store message
     $msg =
         "[$package" . " ($line)"
-      . ( defined $user          ? '; ' . $user . $role : '' )
-      . ( defined $session_short ? '@' . $session_short : '' )
+      . ( $user ? '; ' . $user . ($role ? "($role)" : "") : '' )
+      . ( $session_short ? '@' . $session_short : '' )
       . ( $wf_id         ? '#' . $wf_id         : '' )
       . "] $msg";
 
@@ -209,7 +221,7 @@ sub log {
 
 =head2 debug
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "debug" >>.
+Shortcut method that logs a message with C<< PRIORITY => "debug" >>.
 
 Positional parameters:
 
@@ -223,27 +235,19 @@ Positional parameters:
 
 =head2 info
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "info" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "info" >>. Similar to L</debug>.
 
 =head2 warn
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "warn" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "warn" >>. Similar to L</debug>.
 
 =head2 error
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "error" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "error" >>. Similar to L</debug>.
 
 =head2 fatal
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "fatal" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "fatal" >>. Similar to L</debug>.
 
 =cut
 

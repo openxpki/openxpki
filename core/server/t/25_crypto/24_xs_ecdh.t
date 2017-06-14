@@ -4,6 +4,8 @@ use Digest::SHA qw (sha256_hex sha512_hex);
 use Test::More;
 use Test::Exception;
 use English;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($OFF);
 
 plan tests => 12;
 

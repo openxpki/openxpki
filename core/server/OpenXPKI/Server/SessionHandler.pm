@@ -20,7 +20,7 @@ To start a new session:
 
     my $session = OpenXPKI::Server::SessionHandler->new(
         type => "Database",
-        log => OpenXPKI::Server::Log::NOOP->new,
+        log => OpenXPKI::Server::Log->new,
     );
     $session->data->pki_realm("ca-one");
     ...
@@ -30,7 +30,7 @@ To resume an existing session:
 
     my $session = OpenXPKI::Server::SessionHandler->new(
         type => "Database",
-        log => OpenXPKI::Server::Log::NOOP->new,
+        log => OpenXPKI::Server::Log->new,
     );
     $session->resume($id);
 
