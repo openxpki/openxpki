@@ -346,7 +346,9 @@ sub __do_init_dbi_log {
 # TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
 sub __do_init_dbi {
     ##! 1: "start"
-    OpenXPKI::Server::Context::setcontext({ dbi => get_database("main") });
+    my $keys = shift;
+    # enforce autocommit for init from CLI script
+    OpenXPKI::Server::Context::setcontext({ dbi => get_database("main", ($keys->{CLI} ? 1 : 0) ) });
 }
 
 sub __do_init_acl {
@@ -469,7 +471,13 @@ sub get_log
 }
 
 sub get_database {
-    my ($section) = @_;
+    my ($section, $autocommit) = @_;
+
+    # enforce autocommit on the log handle if not explicitly disabled
+    if ($section eq 'log' && !defined $autocommit){
+        $autocommit = 1;
+    }
+
     ##! 1: "start"
 
     #
@@ -501,7 +509,7 @@ sub get_database {
             db_type => 'MySQL', # default
             %{ $db_config },
         },
-        $section eq "log" ? (autocommit => 1) : (),
+        $autocommit ? (autocommit => 1) : (),
     );
 }
 

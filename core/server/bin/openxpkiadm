@@ -971,9 +971,7 @@ sub certificate_list {
             if ( defined $params{v} && $params{v} > 1 ) {
 
                 # show chain
-                my $api = CTX('api');
-                my $chain =
-                  $api->get_chain( { START_IDENTIFIER => $identifier, } );
+                my $chain = CTX('api')->get_chain( { START_IDENTIFIER => $identifier, } );
                 my $chain_str = join( ' -> ', @{ $chain->{IDENTIFIERS} } );
 
                 print "    Chain:\n      $chain_str";
