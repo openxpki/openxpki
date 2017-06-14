@@ -1208,6 +1208,11 @@ sub BUILD {
                     type => SCALAR,
                     regex => $re_integer_string,
                 },
+                LEGACY => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
+                    optional => 1,
+                },
             },
         },
 

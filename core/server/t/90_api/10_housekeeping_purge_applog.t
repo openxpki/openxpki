@@ -139,7 +139,7 @@ is_logentry_count $wf_id, 3;
 
 # API call to purge records
 my $maxutc = get_utc_time( time - $maxage );
-ok CTX('api')->purge_application_log( { MAXAGE => $maxage } ), "call 'purge_application_log' with MAXAGE";
+ok CTX('api')->purge_application_log( { MAXAGE => $maxage, LEGACY => 1 } ), "call 'purge_application_log' with MAXAGE";
 
 is_logentry_count $wf_id, 2;
 

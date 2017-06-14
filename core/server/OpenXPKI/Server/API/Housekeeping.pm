@@ -46,9 +46,9 @@ sub purge_application_log {
     ##! 1: "purge_application_log"
 
     my $maxage = $args->{MAXAGE} // 60*60*24*180;  #  180 days
-    my $maxutc = get_utc_time( time - $maxage );
+    my $maxutc = $args->{LEGACY} ? get_utc_time( time - $maxage ) : (time - $maxage);
 
-    return CTX('dbi_log')->delete(
+    return CTX('dbi')->delete(
         from => 'application_log',
         where => { logtimestamp => { "<", $maxutc } },
     );
@@ -89,6 +89,10 @@ Named parameters:
 
 The maximum age (in seconds) of the application log entries to preserve.
 [default: 1 year (60*60*24*365)]
+
+=item * LEGACY
+
+Boolean, set to 1 to use the old timestamp format when purging.
 
 =back
 
