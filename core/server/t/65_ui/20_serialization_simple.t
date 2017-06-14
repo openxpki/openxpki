@@ -1,10 +1,10 @@
-
 use strict;
 use warnings;
 use Test::More tests => 35;
 use English;
 use utf8; # otherwise the utf8 tests does not work
-# use Smart::Comments;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::Simple' ); }
 

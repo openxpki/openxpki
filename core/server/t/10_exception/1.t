@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($OFF);
+
 plan tests => 7;
 
 use_ok('OpenXPKI::Exception');
@@ -40,7 +43,7 @@ eval {
             $exc,
         ],
     );
-    
+
 };
 my $parent_exc = OpenXPKI::Exception->caught();
 ok(defined $parent_exc, 'exception with child defined');

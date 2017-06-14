@@ -17,6 +17,7 @@ use English;
 use Test::More;
 use Test::Exception;
 use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
 
@@ -26,8 +27,7 @@ plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unle
 # setup
 #
 use_ok "OpenXPKI::Server::Database";
-Log::Log4perl->easy_init($OFF);
-my $log = Log::Log4perl->get_logger();
+my $log = Log::Log4perl->get_logger;
 
 my $db_params = {
     type => "MySQLTest",

@@ -4,9 +4,8 @@ use utf8;
 
 use Test::More;
 use Test::Exception;
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
 use OpenXPKI::MooseParams;
-use Log::Log4perl qw(:easy);
+use Log::Log4perl;
 use Moose::Util::TypeConstraints;
 
 ################################################################################
