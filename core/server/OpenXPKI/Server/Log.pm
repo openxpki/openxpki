@@ -43,9 +43,18 @@ for my $name (qw( application auth system workflow )) {
 
 =head2 Constructor
 
-This function only accepts one parameter - C<CONFIG>.
-C<CONFIG> includes the filename of the Log::Log4perl configuration.
-You can also pass a scalar ref holding the Log4perl init string.
+The constructor only accepts the named parameter C<CONFIG> which can either be
+
+=over
+
+=item * a path to the L<Log::Log4perl> configuration file,
+
+=item * a reference to a scalar holding the Log4perl configuration string or
+
+=item * undef to either use an already initialized Log4perl or create a screen
+only logger using L<Log::Log4perl/easy_init>
+
+=back
 
 =cut
 
@@ -77,7 +86,16 @@ sub BUILD {
 
 =head2 audit
 
-Audit logger has a subcategory
+Returns the audit logger of the given subcategory I<openxpki.audit.$subcat>.
+
+Positional parameters:
+
+=over
+
+=item * B<$subcat> sub category - optional, default: I<system>
+
+=back
+
 
 =cut
 
@@ -203,7 +221,7 @@ sub log {
 
 =head2 debug
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "debug" >>.
+Shortcut method that logs a message with C<< PRIORITY => "debug" >>.
 
 Positional parameters:
 
@@ -217,27 +235,19 @@ Positional parameters:
 
 =head2 info
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "info" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "info" >>. Similar to L</debug>.
 
 =head2 warn
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "warn" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "warn" >>. Similar to L</debug>.
 
 =head2 error
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "error" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "error" >>. Similar to L</debug>.
 
 =head2 fatal
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "fatal" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "fatal" >>. Similar to L</debug>.
 
 =cut
 
