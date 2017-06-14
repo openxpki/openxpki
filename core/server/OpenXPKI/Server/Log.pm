@@ -60,17 +60,18 @@ sub BUILD {
             Log::Log4perl->init($config);
             return;
         }
-        elsif ( $config && -e $config ) {
+        elsif (-e $config ) {
             Log::Log4perl->init($config);
             return;
         }
+        warn "Configuration file $config not found";
     }
     # caller explicitely asked to NOT use config: try reusing Log4perl
     else {
         return if Log::Log4perl->initialized;
     }
     # if not initialized: complain and init screen logger
-    warn "Do easy_init - config $config not found ";
+    warn "Initializing Log4perl with easy_init()";
     Log::Log4perl->easy_init($WARN);
 }
 
