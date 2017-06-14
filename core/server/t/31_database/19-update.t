@@ -3,15 +3,14 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
-use File::Spec::Functions qw( catdir splitpath rel2abs );
+use FindBin qw( $Bin );
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
 
 #
 # setup
 #
-my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
-require "$basedir/DatabaseTest.pm";
+require "$Bin/DatabaseTest.pm";
 
 my $db = DatabaseTest->new(
     columns => [ # yes an ArrayRef to have a defined order!

@@ -3,11 +3,8 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
-
-my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
 
 #
 # setup
