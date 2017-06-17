@@ -57,7 +57,7 @@ my %serialization          : ATTR;
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
-    
+
     ##! 1: "Initialize protocol stack"
     $self->__init_connection();
     $self->__init_transport_protocol();
@@ -67,8 +67,8 @@ sub START {
     # attach API to this instance
     $api{$ident} = OpenXPKI::Client::API->new(
         {
-	    CLIENT => $self,
-	});
+        CLIENT => $self,
+    });
 
 }
 
@@ -86,10 +86,10 @@ sub talk {
     if ($self->get_communication_state() eq 'can_send') {
         my $rc;
         eval {
-	    $rc = $transport{$ident}->write(
-	        $serialization{$ident}->serialize($arg)
-	        );
-	    $self->set_communication_state('can_receive');
+        $rc = $transport{$ident}->write(
+            $serialization{$ident}->serialize($arg)
+            );
+        $self->set_communication_state('can_receive');
         };
         if ($EVAL_ERROR) {
             OpenXPKI::Exception->throw(
@@ -100,14 +100,14 @@ sub talk {
                 },
             );
         }
-	return $rc;
+    return $rc;
     } else {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
-	    params => {
-		STATUS => $self->get_communication_state(),
-	    },
-	    );
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
+        params => {
+        STATUS => $self->get_communication_state(),
+        },
+        );
     }
     return 1;
 }
@@ -119,24 +119,24 @@ sub collect {
 
     ##! 1: "collect"
     if ($self->get_communication_state() ne 'can_receive') {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
-	    params => {
-		STATUS => $self->get_communication_state(),
-	    },
-	    );
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
+        params => {
+        STATUS => $self->get_communication_state(),
+        },
+        );
     }
 
     my $result;
     eval {
- 	    local $SIG{ALRM} = sub { die "alarm\n" };
-	
- 	    alarm $read_timeout{$ident};
- 	    $result = $serialization{$ident}->deserialize(
- 	        $transport{$ident}->read()
- 	    );
+         local $SIG{ALRM} = sub { die "alarm\n" };
+
+         alarm $read_timeout{$ident};
+         $result = $serialization{$ident}->deserialize(
+             $transport{$ident}->read()
+         );
         $self->set_communication_state('can_send');
- 	    alarm 0;
+         alarm 0;
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
         $self->set_communication_state('can_send');
@@ -173,7 +173,7 @@ sub collect {
                 ],
             };
         }
-	}
+    }
     return $result;
 }
 
@@ -192,9 +192,9 @@ sub send_service_msg {
     ##! 4: Dumper $arg
 
     my %arguments = (
-	SERVICE_MSG => $cmd,
-	PARAMS => $arg,
-	);
+    SERVICE_MSG => $cmd,
+    PARAMS => $arg,
+    );
 
     ##! 4: Dumper \%arguments
     eval {
@@ -209,7 +209,7 @@ sub send_service_msg {
             },
         );
     }
-        
+
     return 1;
 }
 
@@ -225,11 +225,11 @@ sub send_command_msg {
     ##! 4: Dumper $arg
 
     return $self->send_service_msg(
-	'COMMAND',
-	{
-	    COMMAND     => $cmd,
-	    PARAMS      => $arg,
-	});
+    'COMMAND',
+    {
+        COMMAND     => $cmd,
+        PARAMS      => $arg,
+    });
 }
 
 ###########################################################################
@@ -262,13 +262,13 @@ sub send_receive_service_msg {
         $rc = $self->collect();
     };
     if ($EVAL_ERROR) {
-        
+
         # TODO - server closes socket when getting the LOGOUT command
         # which crahes the collect method, should be fixed in server, see #300
         if ($cmd eq 'LOGOUT') {
              return { 'SERVICE_MSG' => 'LOGOUT' };
         }
-        
+
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT',
             params  => {
@@ -309,39 +309,76 @@ sub init_session {
 
     ##! 4: "initialize session"
     if (defined $args->{SESSION_ID}) {
-	##! 8: "using existing session"
-        $self->talk(
-	    {
-		SERVICE_MSG => 'CONTINUE_SESSION',
-		SESSION_ID  => $args->{SESSION_ID},
-	    });
+        ##! 8: "using existing session"
+        $self->talk({
+            SERVICE_MSG => 'CONTINUE_SESSION',
+            SESSION_ID  => $args->{SESSION_ID},
+        });
     } else {
-	##! 8: "creating new session"
+        ##! 8: "creating new session"
         ##! 8: "FIXME: we should send the preferred language here"
-        $self->talk(
-	    {
-		SERVICE_MSG => "NEW_SESSION",
-	    });
+        $self->talk({
+            SERVICE_MSG => "NEW_SESSION",
+        });
     }
 
     my $msg = $self->collect();
-    
-    if (! defined $msg->{SESSION_ID})
-    {
-        OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED",
-	    params  => {
-		    MESSAGE_FROM_SERVER => Dumper $msg,
-	    });
+
+    # init a new session if reload failed
+    if (! defined $msg->{SESSION_ID} &&
+        $args->{SESSION_ID} && $args->{NEW_ON_FAIL}) {
+        $self->talk({
+            SERVICE_MSG => "NEW_SESSION",
+        });
+        $msg = $self->collect();
     }
-    
+
+    if (! defined $msg->{SESSION_ID}) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED",
+            params  => {
+                MESSAGE_FROM_SERVER => Dumper $msg,
+            });
+    }
+
     $sessionid{$ident} = $msg->{SESSION_ID};
-    
+
     $self->talk(
-	{
-	    SERVICE_MSG => 'SESSION_ID_ACCEPTED',
-	});
-    
+    {
+        SERVICE_MSG => 'SESSION_ID_ACCEPTED',
+    });
+
+    # we want to be able to send after initialization, so collect a message!
+    $msg = $self->collect();
+    return $msg;
+}
+
+sub rekey_session {
+    my $self  = shift;
+    my $ident = ident $self;
+    my $args  = shift;
+
+    $self->talk({
+        SERVICE_MSG => "RESET_SESSIONID",
+    });
+
+    my $msg = $self->collect();
+
+    if (! defined $msg->{SESSION_ID}) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CLIENT_REKEY_SESSION_FAILED",
+            params  => {
+                MESSAGE_FROM_SERVER => Dumper $msg,
+            });
+    }
+
+    $sessionid{$ident} = $msg->{SESSION_ID};
+
+    $self->talk(
+    {
+        SERVICE_MSG => 'SESSION_ID_ACCEPTED',
+    });
+
     # we want to be able to send after initialization, so collect a message!
     $msg = $self->collect();
     return $msg;
@@ -352,21 +389,21 @@ sub detach {
     my $self  = shift;
     my $ident = ident $self;
     my $args  = shift;
- 
+
 
     my $msg;
     eval {
         $msg = $self->send_receive_service_msg('DETACH_SESSION')
     };
-    
+
     $sessionid{$ident} = undef;
-    
+
     if (defined $msg &&
         ref $msg eq 'HASH' &&
-        $msg->{SERVICE_MSG} eq 'DETACH') {        
+        $msg->{SERVICE_MSG} eq 'DETACH') {
         return 1;
     }
-    
+
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_CLIENT_DETACH_FAILED",
         params  => {
@@ -382,23 +419,23 @@ sub logout {
     my $args  = shift;
 
     my $msg;
-    
+
     $msg = $self->send_receive_service_msg('LOGOUT');
-    
+
     $sessionid{$ident} = undef;
-    
+
     if (defined $msg &&
         ref $msg eq 'HASH' &&
-        $msg->{SERVICE_MSG} eq 'LOGOUT') {        
+        $msg->{SERVICE_MSG} eq 'LOGOUT') {
         return 1;
     }
-    
+
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_CLIENT_LOGOUT_FAILED",
         params  => {
             MESSAGE_FROM_SERVER => Dumper $msg,
     });
-    
+
 }
 
 
@@ -455,19 +492,19 @@ sub __init_connection : PRIVATE {
     ##! 4: "socket..."
     if (! socket($socket{$ident}, PF_UNIX, SOCK_STREAM, 0))
     {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_NO_SOCKET",
-	    );
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_NO_SOCKET",
+        );
     }
     ##! 4: "connect..."
     if (! connect($socket{$ident}, sockaddr_un($socketfile{$ident})))
     {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_FAILED",
-	    params  => {
-		    SOCKETFILE => $socketfile{$ident},
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_FAILED",
+        params  => {
+            SOCKETFILE => $socketfile{$ident},
             ERROR      => $!,
-	    });
+        });
     }
     ##! 4: "finished"
     return 1;
@@ -492,15 +529,15 @@ sub __init_transport_protocol : PRIVATE {
         ##! 16: "transport protocol was not accepted by server - $msg"
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_CLIENT_INIT_TRANSPORT_PROTOCOL_REJECTED",
-	    );
+        );
     }
 
     ##! 8: "intializing transport protocol"
     # FIXME: dynamically assign transport protocol
     $transport{$ident} = OpenXPKI::Transport::Simple->new(
-	{
-	    SOCKET => $socket{$ident},
-	});
+    {
+        SOCKET => $socket{$ident},
+    });
 
     ##! 4: "finished"
     return 1;
@@ -523,7 +560,7 @@ sub __init_serialization_protocol : PRIVATE {
     {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_CLIENT_INIT_SERIALIZATION_PROTOCOL_REJECTED",
-	    );
+        );
     }
 
     ##! 8: "intializing serialization protocol"
@@ -550,229 +587,12 @@ sub __init_service_protocol : PRIVATE {
     {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_CLIENT_INIT_SERVICE_PROTOCOL_REJECTED",
-	    );
+        );
     }
-    
+
     ##! 4: "finished"
     return 1;
 }
-
-###########################################################################
-###########################################################################
-###########################################################################
-###########################################################################
-# FIXME: not yet ported from Michael's code
-
-# sub __init_pki_realm
-# {
-#     ##! 4: "init pki realm"
-#     my $self = shift;
-
-#     ##! 8: "get_pki_realms"
-#     if (not exists $self->{MESSAGE}->{PKI_REALMS})
-#     {
-#         OpenXPKI::Exception->throw
-#         (
-#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_PKI_REALM_LIST_FAILED",
-#             params  => {ERROR => $self->{MESSAGE}->{ERROR}}
-#         );
-#     }
-#     my $loop = 0;
-#     my $loop_max = 100;
-#     while (not exists $self->{PKI_REALM})
-#     {
-#         if ($loop > $loop_max)
-#         {
-#             OpenXPKI::Exception->throw
-#             (
-#                 message => "I18N_OPENXPKI_CLIENT_CLI_INIT_PKI_REALM_INFINITE_LOOP_DETECTED",
-#                 params  => {MAXIMUM => $loop_max}
-#             );
-#         }
-#         eval {$self->__init_get_pki_realm({PKI_REALMS => $self->{MESSAGE}->{PKI_REALMS}});};
-#         $loop++;
-#     }
-
-#     ##! 8: "set_pki_realm"
-#     $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize(
-#     {
-#         PKI_REALM => $self->{PKI_REALM}
-#     }));
-
-#     ##! 4: "end"
-#     return 1;
-# }
-
-# sub __init_get_pki_realm
-# {
-#     my $self = shift;
-#     my $keys = shift;
-#     ##! 8: "read the pki realm from the CLI"
-
-#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_MESSAGE")."\n";
-#     my @list  = ();
-#     my $i = 1;
-#     foreach my $realm (sort keys %{$keys->{PKI_REALMS}})
-#     {
-#         $list[$i] = $realm;
-#         print STDOUT "    ".$keys->{PKI_REALMS}->{$realm}->{NAME}." [$i]\n";
-#         for (my $i=0; $i < length($keys->{PKI_REALMS}->{$realm}->{DESCRIPTION}) / 56; $i++)
-#         {
-#             print STDOUT "        ".
-#                          substr($keys->{PKI_REALMS}->{$realm}->{DESCRIPTION},$i*56,56).
-#                          "\n";
-#         }
-#         $i++;
-#     }
-#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_ENTER_ID");
-#     my $id = readline (*STDIN);
-#        $id =~ s/\n$//s;
-#     if (not exists $list[$id])
-#     {
-#         print STDERR i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_WRONG_ID")."\n";
-#         OpenXPKI::Exception->throw
-#         (
-#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_GET_PKI_REALM_WRONG_ID",
-#         );
-#     }
-#     $self->{PKI_REALM} = $list[$id];
-
-#     ##! 8: "end"
-#     return $self->{PKI_REALM};
-# }
-
-# sub __init_user
-# {
-#     ##! 4: "init user"
-#     my $self = shift;
-
-#     ##! 8: "get_login_stack"
-#     if (not exists $self->{MESSAGE}->{AUTHENTICATION_STACKS})
-#     {
-#         OpenXPKI::Exception->throw
-#         (
-#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_AUTH_LIST_FAILED",
-#             params  => {ERROR => $self->{MESSAGE}->{ERROR}}
-#         );
-#     }
-#     my $loop = 0;
-#     my $loop_max = 100;
-#     while (not $self->{AUTH_STACK})
-#     {
-#         if ($loop > $loop_max)
-#         {
-#             OpenXPKI::Exception->throw
-#             (
-#                 message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_INFINITE_LOOP_DETECTED",
-#                 params  => {MAXIMUM => $loop_max}
-#             );
-#         }
-#         eval {$self->__init_get_auth_stack({AUTH_STACKS => $self->{MESSAGE}->{AUTHENTICATION_STACKS}});};
-#         $loop++;
-#     }
-
-#     ##! 8: "login via stack"
-#     $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize(
-#     {
-#         SERVICE_MESSAGE      => "SET_AUTHENTICATION_STACK",
-#         AUTHENTICATION_STACK => $self->{AUTH_STACK}
-#     }));
-
-#     ##! 8: "login with passphrase or anonymous"
-#     $self->{MESSAGE} = $self->{SERIALIZATION}->deserialize ($self->{TRANSPORT}->read());
-#     if (not exists $self->{MESSAGE}->{SERVICE_MSG})
-#     {
-#         ##! 16: "we expect a service message and received something else"
-#         OpenXPKI::Exception->throw
-#         (
-#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNEXPECTED_MESSAGE",
-#         );
-#     }
-#     elsif ($self->{MESSAGE}->{SERVICE_MSG} eq "GET_LOGIN_PASSWD")
-#     {
-#         ##! 16: "passwd_login requested"
-#         $self->__init_passwd_login();
-#     }
-#     elsif ($self->{MESSAGE}->{SERVICE_MSG} ne "SERVICE_READY")
-#     {
-#         ##! 16: "unknown service message - ".$self->{MESSAGE}->{SERVICE_MSG}
-#         OpenXPKI::Exception->throw
-#         (
-#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_USER_UNSUPPORTED_SERVICE_MSG",
-#             params  => {SERVICE_MSG => $self->{MESSAGE}->{SERVICE_MSG}}
-#         );
-#     }
-
-#     ##! 4: "end"
-#     return 1;
-# }
-
-# sub __init_get_auth_stack
-# {
-#     my $self = shift;
-#     my $keys = shift;
-#     ##! 8: "read the auth stacks from the CLI"
-
-#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_GET_AUTH_STACK_MESSAGE")."\n";
-#     my @list  = ();
-#     my $i = 1;
-#     foreach my $stack (sort keys %{$keys->{AUTH_STACKS}})
-#     {
-#         $list[$i] = $stack;
-#         print "    ".$keys->{AUTH_STACKS}->{$stack}->{NAME}." [$i]\n";
-#         for (my $i=0; $i < length($keys->{AUTH_STACKS}->{$stack}->{DESCRIPTION}) / 56; $i++)
-#         {
-#             print STDOUT "        ".
-#                          substr($keys->{AUTH_STACKS}->{$stack}->{DESCRIPTION},$i*56,56).
-#                          "\n";
-#         }
-#         $i++;
-#     }
-#     print STDOUT i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_ENTER_ID");
-#     my $id = readline (*STDIN);
-#        $id =~ s/\n$//s;
-#     if (not exists $list[$id])
-#     {
-#         print STDERR i18nGettext ("I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_WRONG_ID")."\n";
-#         OpenXPKI::Exception->throw
-#         (
-#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_AUTH_STACK_WRONG_ID",
-#         );
-#     }
-#     $self->{AUTH_STACK} = $list[$id];
-
-#     ##! 8: "end"
-#     return $self->{AUTH_STACK};
-# }
-
-# sub __init_passwd_login
-# {
-#     my $self = shift;
-#     ##! 8: "login with login and passphrase"
-#     print STDOUT "Login: ";
-#     my $login = readline (*STDIN);
-#     print STDOUT "Password: ";
-#     my $passwd = readline (*STDIN);
-    
-#     $self->{TRANSPORT}->write ($self->{SERIALIZATION}->serialize(
-#     {
-#         LOGIN  => $login,
-#         PASSWD => $passwd
-#     }));
-#     $self->{MESSAGE} = $self->{SERIALIZATION}->deserialize ($self->{TRANSPORT}->read());
-#     if (exists $self->{MESSAGE}->{ERROR})
-#     {
-#         OpenXPKI::Exception->throw
-#         (
-#             message => "I18N_OPENXPKI_CLIENT_CLI_INIT_PASSWD_LOGIN_FAILED",
-#             params  => {ERROR => $self->{MESSAGE}->{ERROR}}
-#         );
-#     }
-
-#     ##! 4: "end"
-#     return 1;
-# }
-
 
 1;
 __END__
@@ -802,9 +622,9 @@ This document describes OpenXPKI::Client version 0.0.1
 =head1 DESCRIPTION
 
 OpenXPKI::Client is a base class for client communication with an
-OpenXPKI server daemon. 
+OpenXPKI server daemon.
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 =head2 BUILD
 
@@ -836,7 +656,7 @@ be a collect() call.
 
 =head2 send_service_msg
 
-Send a service message. 
+Send a service message.
 The first argument must be a string identifying the service command to send.
 The (optional) second argument is a hash reference containing the
 arguments to be sent along with the service message.
@@ -863,8 +683,17 @@ See send_command_msg.
 =head2 init_session
 
 Initialize session. If the named argument SESSION_ID exists, this session
-is re-opened, otherwise a new session is created.
+is re-opened. If it can not be loaded, and expcetion is thrown. If you don't
+pass a session id, a new session is created.
+If you want to create a new session if the existing one is no longer
+available, pass NEW_ON_FAIL with a true value as extra argument.
+
 Returns the first server response (see collect()).
+
+=head2 rekey_session
+
+Assign a new session id to the existing session. The old session id is
+deleted. Returns the new session id.
 
 =head2 get_session_id
 
