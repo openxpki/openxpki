@@ -103,6 +103,7 @@ sub __is_valid_message : PRIVATE {
             'CONTINUE_SESSION',
             'NEW_SESSION',
             'DETACH_SESSION',
+            'FRONTEND_SESSION'
         ],
         'SESSION_ID_SENT' => [
             'PING',
@@ -116,12 +117,19 @@ sub __is_valid_message : PRIVATE {
             'CONTINUE_SESSION',
             'DETACH_SESSION',
         ],
+        'SESSION_ID_SENT_FROM_RESET' => [
+            'PING',
+            'SESSION_ID_ACCEPTED',
+            'CONTINUE_SESSION',
+            'DETACH_SESSION',
+        ],
         'WAITING_FOR_PKI_REALM' => [
             'PING',
             'GET_PKI_REALM',
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
+            'FRONTEND_SESSION',
         ],
         'WAITING_FOR_AUTHENTICATION_STACK' => [
             'PING',
@@ -129,6 +137,7 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
+            'FRONTEND_SESSION',
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
@@ -139,6 +148,7 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
+            'FRONTEND_SESSION',
         ],
         'MAIN_LOOP' => [
             'PING',
@@ -148,6 +158,8 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
+            'FRONTEND_SESSION',
+            'RESET_SESSIONID',
         ],
     };
 
@@ -291,6 +303,78 @@ sub __handle_CONTINUE_SESSION {
     return;
 }
 
+sub __handle_FRONTEND_SESSION {
+
+    ##! 1: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $msg     = shift;
+
+    ##! 1: 'Frontend Data ' . Dumper $msg
+
+    if (!OpenXPKI::Server::Context::hascontext('session')) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVICE_ATTACH_DATA_FAILED_NO_SESSION',
+        );
+    }
+
+    my $data;
+    my $sess = CTX('session')->{session};
+    if (exists $msg->{PARAMS}->{SESSION_DATA}) {
+        if (defined $msg->{PARAMS}->{SESSION_DATA}) {
+            my $data = $msg->{PARAMS}->{SESSION_DATA};
+            ##! 16: 'Setting ui session data ' . $data
+            $sess->param('UISESSION', $data);
+        } else {
+            ##! 16: 'Clear ui session data '
+            $sess->clear('UISESSION');
+        }
+        CTX('session')->flush();
+    } else {
+        $data = $sess->param('UISESSION');
+        ##! 32: 'Read ui session data ' . $data
+    }
+
+    return {
+        SESSION_DATA => $data,
+    };
+
+}
+
+sub __handle_RESET_SESSIONID: PRIVATE {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $msg     = shift;
+
+    my $session = OpenXPKI::Server::Session->new({
+        DIRECTORY => CTX('config')->get("system.server.session.directory"),
+        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
+    });
+
+    my $data = CTX('session')->{session}->dataref();
+    map {  if ($_ !~ /_SESSION/) { $session->{session}->param($_ => $data->{$_}); } } keys %{$data};
+
+    CTX('session')->delete();
+
+    ##! 32: 'Session data ' . Dumper $session->{session}->dataref()
+    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+
+    my $sess_id = CTX('session')->get_id();
+    Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
+
+    ##! 4: 'new session id ' . $sess_id
+
+    $self->__change_state({
+        STATE => 'SESSION_ID_SENT_FROM_RESET',
+    });
+
+    return {
+        SESSION_ID => $sess_id,
+    };
+
+}
+
 sub __handle_DETACH_SESSION: PRIVATE {
     ##! 1: 'start'
     my $self    = shift;
@@ -361,6 +445,15 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     my $self    = shift;
     my $ident   = ident $self;
     my $message = shift;
+
+    if ($state_of{$ident} eq 'SESSION_ID_SENT_FROM_RESET') {
+        ##! 4: 'existing session detected'
+        my $session = CTX('session');
+        ##! 8: 'Session ' . Dumper $session
+        $self->__change_state({
+            STATE => 'MAIN_LOOP',
+        });
+    }
 
     if ($state_of{$ident} eq 'SESSION_ID_SENT_FROM_CONTINUE') {
         ##! 4: 'existing session detected'
@@ -604,7 +697,7 @@ sub __handle_LOGOUT : PRIVATE {
 
     Log::Log4perl::MDC->remove();
 
-    $old_session->delete()->flush();
+    $old_session->delete();
 
     return { 'SERVICE_MSG' => 'LOGOUT' };
 
@@ -804,9 +897,9 @@ sub __change_state : PRIVATE {
 
     ##! 4: 'changing state from ' . $state_of{$ident} . ' to ' . $new_state
     CTX('log')->log(
-    MESSAGE  => 'Changing session state from ' . $state_of{$ident} . ' to ' . $new_state,
-    PRIORITY => 'debug',
-    FACILITY => 'system',
+        MESSAGE  => 'Changing session state from ' . $state_of{$ident} . ' to ' . $new_state,
+        PRIORITY => 'debug',
+        FACILITY => 'system',
     );
     $state_of{$ident} = $new_state;
     # save the new state in the session
@@ -815,7 +908,6 @@ sub __change_state : PRIVATE {
     }
 
     # Set the daemon name after enterin MAIN_LOOP
-
 
     if ($new_state eq "MAIN_LOOP") {
         OpenXPKI::Server::__set_process_name("worker: %s (%s)", CTX('session')->get_user(), CTX('session')->get_role());

@@ -146,13 +146,18 @@ sub _get_persitence_keys{
     return qw(user role);
 }
 
-
 sub delete
 {
     my $self = shift;
     $self->{session}->delete();
     $self->{session}->flush();
     delete $self->{session};
+}
+
+sub flush
+{
+    my $self = shift;
+    $self->{session}->flush();
 }
 
 sub DESTROY
