@@ -9,10 +9,12 @@ use Moose;
 use English;
 use CGI::Session;
 use OpenXPKI::Client;
+use OpenXPKI::Client::Session;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
 use OpenXPKI::Server::Context qw( CTX );
+use Log::Log4perl::MDC;
 use Data::Dumper;
 
 # ref to the cgi frontend session
@@ -75,28 +77,31 @@ sub _init_backend {
         });
         $self->logger()->debug('Create backend client instance');
     } else {
-        $self->logger()->debug('Use provide client instance');
+        $self->logger()->debug('Use provided client instance');
     }
     
     my $session = $self->session();
     my $old_session =  $session->param('backend_session_id') || undef;
-    eval {
-        $self->logger()->debug('First session reinit with id ' . ($old_session || 'init'));        
-        $client->init_session({ SESSION_ID => $old_session });
-    };
-    
-    if ($EVAL_ERROR) {
-        my $exc = OpenXPKI::Exception->caught();
-        if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
-            $self->logger()->info('Backend session was gone - start a new one');
-            # The session has gone - start a new one - might happen if the gui
-            # was idle too long or the server was flushed
-            $client->init_session({ SESSION_ID => undef });            
-            $self->_status({ level => 'warn', i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
-        } else {
-            $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
-            $self->logger()->trace($EVAL_ERROR);
-            die "Backend communication problem";
+    if ($old_session && $old_session eq $client->get_session_id()) {
+        $self->logger()->debug('Backend session already loaded');
+    } else {
+        eval {
+            $self->logger()->debug('First session reinit with id ' . ($old_session || 'init'));
+            $client->init_session({ SESSION_ID => $old_session });
+        };
+        if ($EVAL_ERROR) {
+            my $exc = OpenXPKI::Exception->caught();
+            if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
+                $self->logger()->info('Backend session was gone - start a new one');
+                # The session has gone - start a new one - might happen if the gui
+                # was idle too long or the server was flushed
+                $client->init_session({ SESSION_ID => undef });
+                $self->_status({ level => 'warn', i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
+            } else {
+                $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
+                $self->logger()->trace($EVAL_ERROR);
+                die "Backend communication problem";
+            }
         }
     }
 
@@ -124,6 +129,9 @@ sub BUILD {
         $session->param('initialized', 1);
         $session->param('is_logged_in', 0);
         $session->param('user', undef);
+    } elsif (my $user = $self->session()->param('user')) {
+        Log::Log4perl::MDC->put('name', $user->{name});
+        Log::Log4perl::MDC->put('role', $user->{role});
     }
 
 }
@@ -149,13 +157,13 @@ sub handle_request {
     # Handle logout / session restart
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
-    if ($page eq 'logout' || $action eq 'logout') {        
-        if ($self->backend()->is_logged_in()) {        
+    if ($page eq 'logout' || $action eq 'logout') {
+        $self->logout_session();
+        if ($self->backend()->is_logged_in()) {
             $self->backend()->logout();
         }
         $self->logger()->info('Logout from session');
-        $self->flush_session();
-    }    
+    }
 
     my $reply = $self->backend()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
@@ -188,7 +196,7 @@ sub handle_request {
    
     # if the backend session logged out but did not terminate
     # we get the problem that ui is logged in but backend is not
-    $self->flush_session() if ($self->session()->param('is_logged_in'));
+    $self->logout_session() if ($self->session()->param('is_logged_in'));
 
     # try to log in
     return $self->handle_login( { cgi => $cgi, reply => $reply } );
@@ -268,7 +276,7 @@ sub __get_action {
         }
     }
     return;
-    
+
 }
 
 sub handle_page {
@@ -508,40 +516,65 @@ sub handle_login {
         # Fetch the user info from the server
         $reply = $self->backend()->send_receive_command_msg( 'get_session_info' );
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
-            
-            # Generate a new frontend session to prevent session fixation
-            # The backend session remains the same but can not be used by an 
-            # adversary as the id is never exposed and we destroy the old frontend
-            # session so access to the old session is not possible
-           
-            my $sess_path = $self->_config()->{session_path} || '/tmp';
-            my $new_session_front = new CGI::Session(undef, undef, { Directory => $sess_path });
-            $new_session_front->param('backend_session_id', $self->backend()->get_session_id() );
-            $new_session_front->param('user', $reply->{PARAMS});
-            $new_session_front->param('pki_realm', $reply->{PARAMS}->{pki_realm});
-            $new_session_front->param('is_logged_in', 1);
-            $new_session_front->param('initialized', 1);
-            
-            if ($self->_config()->{session_timeout}) {
-                $new_session_front->expire( $self->_config()->{session_timeout} );
+
+
+            #$self->backend()->rekey_session();
+            #my $new_backend_session_id = $self->backend()->get_session_id();
+
+            # extra handling for OpenXPKI session handler
+            if (ref $session eq 'OpenXPKI::Client::Session') {
+
+                $session->renew_session_id();
+                # this is not strictly necessary but gives some extra
+                # security if the session renegotation breaks
+                $session->param('rtoken' => undef );
+
+                $self->logger()->debug('Regenerated backend session id: '. $session->id );
+                Log::Log4perl::MDC->put('ssid', substr($session->id,0,4));
+
+            } else {
+
+                # Generate a new frontend session to prevent session fixation
+                # The backend session remains the same but can not be used by an
+                # adversary as the id is never exposed and we destroy the old frontend
+                # session so access to the old session is not possible
+
+                # fetch redirect from old session before deleting it!
+                my $redirect = $session->param('redirect');
+
+                # delete the old instance data
+                $session->delete();
+                $session->flush();
+                # call new on the existing session object to reuse settings
+                $session = $session->new();
+
+                $self->logger()->debug('New frontend session id : '. $session->id );
+
+                # set some data
+                $session->param('backend_session_id', $self->backend()->get_session_id() );
+                Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
             }
-            
-            # fetch redirect from old session before deleting it!
-            $new_session_front->param('redirect', $self->session()->param('redirect'));
-               
-            $self->session()->delete();                                           
-            $self->session( $new_session_front );
-            
+
+            # this is valid in both cases
+            $session->param('user', $reply->{PARAMS});
+            $session->param('pki_realm', $reply->{PARAMS}->{pki_realm});
+            $session->param('is_logged_in', 1);
+            $session->param('initialized', 1);
+
+            $self->session($session);
+
             # Check for MOTD
             my $motd = $self->backend()->send_receive_command_msg( 'get_motd' );
             if (ref $motd->{PARAMS} eq 'HASH') {
                 $self->logger()->debug('Got MOTD: '. Dumper $motd->{PARAMS} );
                 $self->session()->param('motd', $motd->{PARAMS} );
-            }  
-            
-            $main::cookie->{'-value'} = $new_session_front->id;
-            push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
-            
+            }
+
+            if ($main::cookie) {
+                $main::cookie->{'-value'} = main::encrypt_cookie($session->id);
+                push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
+            }
+
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});
             $self->logger()->debug('CGI Header ' . Dumper \@main::header );
                         
@@ -568,13 +601,28 @@ sub handle_login {
 
 }
 
-sub flush_session {
+=head2 logout_session
+
+Delete and flush the current session and recreate a new one using
+the remaining class object. If the internal session handler is used,
+the session is cleared but not destreoyed.
+
+=cut
+
+sub logout_session {
 
     my $self = shift;
-    $self->logger()->info("flush session");
-    $self->session()->delete();
-    $self->session()->flush();
-    $self->session( new CGI::Session(undef, undef, {Directory=>'/tmp'}) );
+    $self->logger()->info("remove session");
+
+    my $session = $self->session();
+    if (ref $session eq 'OpenXPKI::Client::Session') {
+        $session->clear();
+        $session->renew_session_id();
+    } else {
+            $self->session()->delete();
+        $self->session()->flush();
+        $self->session( $self->session()->new() );
+    }
 
 }
 
