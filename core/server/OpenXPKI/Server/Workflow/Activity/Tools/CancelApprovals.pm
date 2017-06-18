@@ -23,12 +23,9 @@ sub execute
 
     my $user = CTX('session')->get_user();
     my $role = CTX('session')->get_role();
-    CTX('log')->log(
-    MESSAGE => 'All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role",
-    PRIORITY => 'info',
-    FACILITY => ['audit','application']
-    );
- 
+
+    CTX('log')->application()->info('All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role");
+
     return 1;
 }
 

@@ -100,17 +100,11 @@ sub execute {
         if ($EVAL_ERROR) {
             if ($on_error eq 'queue') {
                 push @failed, $target;
-                CTX('log')->log(
-                    MESSAGE => "CA pubication failed for target $target, requeuing",
-                    PRIORITY => 'info',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->info("CA pubication failed for target $target, requeuing");
+ 
             } elsif ($on_error eq 'skip') {
-                CTX('log')->log(
-                    MESSAGE => "CA pubication failed for target $target and skip is set",
-                    PRIORITY => 'warn',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->warn("CA pubication failed for target $target and skip is set");
+ 
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
@@ -121,11 +115,8 @@ sub execute {
                 );
             }
         } else {
-            CTX('log')->log(
-                MESSAGE => "CA pubication to $target for ". $data->{dn}{CN}[0]." done",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("CA pubication to $target for ". $data->{dn}{CN}[0]." done");
+ 
         }
     }
   

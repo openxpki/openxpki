@@ -24,11 +24,8 @@ sub execute {
   		$self->pause('I18N_OPENXPKI_UI_PAUSED_WAITING');
   	}
   	
-  	CTX('log')->log(
-        MESSAGE => "Please use the application facility to log your stuff, and please be verbose!",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );         
+  	CTX('log')->application()->debug("Please use the application facility to log your stuff, and please be verbose!");
+          
      
     
 }

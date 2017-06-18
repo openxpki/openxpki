@@ -61,11 +61,8 @@ sub evaluate
     my $context_key = $self->context_key();
     my $condition = $self->condition();
 
-    CTX('log')->log(
-        MESSAGE => "Testing context $context_key for $condition", 
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+    CTX('log')->application()->debug("Testing context $context_key for $condition");
+  
 
     my $context_value = $context->param($context_key);
 

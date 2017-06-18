@@ -155,11 +155,8 @@ sub execute_action {
     ##! 16: 'set proc_state "running"'
     $self->_set_proc_state('running'); # writes workflow metadata
 
-    CTX('log')->log(
-        MESSAGE  => "Execute action $action_name on workflow #" . $self->id,
-        PRIORITY => "info",
-        FACILITY => "application"
-    );
+    CTX('log')->application()->info("Execute action $action_name on workflow #" . $self->id);
+
 
     my $state='';
     # the double eval construct is used, because the handling of a caught pause throws a runtime error as real exception,
@@ -222,11 +219,8 @@ sub execute_action {
             ( $e->message_code() eq 'I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE') ) {
 
             ##! 16: 'bubbled up error - rethrow'
-            CTX('log')->log(
-                MESSAGE  => "Bubble up error from nested action",
-                PRIORITY => "debug",
-                FACILITY => "application"
-            );
+            CTX('log')->application()->debug("Bubble up error from nested action");
+
 
             $e->rethrow;
         }
@@ -372,11 +366,8 @@ sub pause {
     );
     $self->_set_proc_state('pause');#saves wf data
 
-    CTX('log')->log(
-        MESSAGE  => "Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup $dt_wakeup_at",
-        PRIORITY => "info",
-        FACILITY => "application"
-    );
+    CTX('log')->application()->info("Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup $dt_wakeup_at");
+
 }
 
 
@@ -478,27 +469,18 @@ sub _handle_proc_state{
     #we COULD use symbolic references to method-calls here, but - for the moment - we handle it explizit:
     if($action_needed eq '_wake_up'){
         ##! 1: 'paused, call wakeup '
-         CTX('log')->log(
-            MESSAGE  => "Action $action_name waking up",
-            PRIORITY => "debug",
-            FACILITY => "application"
-        );
+         CTX('log')->application()->debug("Action $action_name waking up");
+
         $self->_wake_up($action_name);
     }elsif($action_needed eq '_resume'){
         ##! 1: 'call _resume '
-        CTX('log')->log(
-            MESSAGE  => "Action $action_name resume",
-            PRIORITY => "debug",
-            FACILITY => "application"
-        );
+        CTX('log')->application()->debug("Action $action_name resume");
+
         $self->_resume($action_name);
     }elsif($action_needed eq '_runtime_exception'){
         ##! 1: 'call _runtime_exception '
-        CTX('log')->log(
-            MESSAGE  => "Action $action_name runtime exception",
-            PRIORITY => "debug",
-            FACILITY => "application"
-        );
+        CTX('log')->application()->debug("Action $action_name runtime exception");
+
         $self->_runtime_exception($action_name);
     }else{
         OpenXPKI::Exception->throw (
@@ -679,17 +661,11 @@ sub _fail {
     };
 
     if ($reason eq 'autofail') {
-        CTX('log')->log(
-            MESSAGE  => "Auto-Fail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." with error " . $error,
-            PRIORITY => "error",
-            FACILITY => "application"
-        );
+        CTX('log')->application()->error("Auto-Fail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." with error " . $error);
+
     } else {
-        CTX('log')->log(
-            MESSAGE  => "Forced Fail for workflow ".$self->id." after action ".$self->{_CURRENT_ACTION},
-            PRIORITY => "info",
-            FACILITY => "application"
-        );
+        CTX('log')->application()->info("Forced Fail for workflow ".$self->id." after action ".$self->{_CURRENT_ACTION});
+
     }
 
 }
@@ -729,11 +705,7 @@ sub _save {
 
     if ($self->state() eq 'INITIAL' &&
         ($proc_state eq 'init' || $proc_state eq 'running' || $proc_state eq 'exception' )) {
-         CTX('log')->log(
-            MESSAGE  => "Workflow save requested during startup - wont save! ($proc_state)",
-            PRIORITY => "debug",
-            FACILITY => ["workflow","application"]
-        );
+        CTX('log')->workflow()->debug("Workflow save requested during startup - wont save! ($proc_state)");
         ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
         return;
     }

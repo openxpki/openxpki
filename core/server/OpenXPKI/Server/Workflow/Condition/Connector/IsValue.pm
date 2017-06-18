@@ -32,11 +32,8 @@ sub _evaluate
     
     my $expected = $self->param('value');
     
-    CTX('log')->log(
-        MESSAGE => "Check IsValue '$value' != '$expected'",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+    CTX('log')->application()->debug("Check IsValue '$value' != '$expected'");
+  
     
     if ($value != $expected ) {
         ##! 16: " Values differ - expected: $expected, found: $value "   

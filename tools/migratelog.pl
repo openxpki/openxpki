@@ -19,7 +19,9 @@ my $string;
 }
 
 
-$string =~ s{(([ \t]*?)CTX\('log'\)->log\(\s*MESSAGE\s*=>\s*([^,]*),\s*PRIORITY\s*=>[\s\'\"]+(debug|info|warn|error|fatal)[^)]*FACILITY\s*=>[\s\'\"\[]+(system|audit|auth|workflow|application)[\s\'\"\]\,]+\);) }{=cut LOGMIGRATE\n$1\n=cut LOGMIGRATE\n$2CTX('log')->$5()->$4($3);\n$2#LOGMIGRATE }xmsg;
+$string =~ s{(([ \t]*?)CTX\('log'\)->log\(\s*MESSAGE\s*=>\s*(.*?),\s*PRIORITY\s*=>[\s\'\"]+(debug|info|warn|error|fatal)[^)]*FACILITY\s*=>[\s\'\"\[]+(system|audit|auth|workflow|application)[\s\'\"\]\,]+\);) }{$2CTX('log')->$5()->$4($3);\n }xmsg;
+
+#$string =~ s{(([ \t]*?)CTX\('log'\)->log\(\s*MESSAGE\s*=>\s*([^,]*),\s*FACILITY\s*=>[\s\'\"\[]+(system|audit|auth|workflow|application)[\s\'\"\]\,]+,\s*PRIORITY\s*=>[\s\'\"]+(debug|info|warn|error|fatal)[^)]+\);) }{$2CTX('log')->$4()->$5($3);\n }xmsg;
 
 open FILE, ">", $file or die "Couldn't open file for writing: $!";
 print FILE $string;

@@ -54,17 +54,11 @@ sub set_secret_part
 	    });
 
     if ($result) {
-	CTX('log')->log(
-	    MESSAGE  => "Secret part $args->{PART} set for group $args->{SECRET}",
-	    PRIORITY => 'info',
-	    FACILITY => 'audit',
-	    );
+    CTX('log')->audit('secret')->info("Secret part $args->{PART} set for group $args->{SECRET}");
+
     } else {
-	CTX('log')->log(
-	    MESSAGE  => "Incorrect secret part $args->{PART} entered for group $args->{SECRET}",
-	    PRIORITY => 'warn',
-	    FACILITY => 'audit',
-	    );
+    CTX('log')->audit('secret')->warn("Incorrect secret part $args->{PART} entered for group $args->{SECRET}");
+
     }
     
     return $result;
@@ -76,11 +70,8 @@ sub clear_secret
     my $self = shift;
     my $args = shift;
 
-    CTX('log')->log(
-	MESSAGE  => "Clearing secret for group $args->{SECRET}",
-	PRIORITY => 'info',
-	FACILITY => 'audit',
-	);
+    CTX('log')->audit('secret')->info("Clearing secret for group $args->{SECRET}");
+
 
     return CTX('crypto_layer')->clear_secret_group($args->{SECRET});
 }

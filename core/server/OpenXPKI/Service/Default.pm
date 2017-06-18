@@ -171,11 +171,8 @@ sub __is_valid_message : PRIVATE {
         return 1;
     }
 
-    CTX('log')->log(
-        MESSAGE  => 'Invalid message '.$message_name.' recevied in state ' . $state_of{$ident},
-        PRIORITY => 'warn',
-        FACILITY => 'system',
-    );
+    CTX('log')->system()->warn('Invalid message '.$message_name.' recevied in state ' . $state_of{$ident});
+ 
     ##! 16: 'message is NOT valid'
     return;
 }
@@ -238,11 +235,8 @@ sub __handle_NEW_SESSION : PRIVATE {
 
     Log::Log4perl::MDC->put('sid', substr($session->get_id(),0,4));
 
-    CTX('log')->log(
-    MESSAGE  => 'New session created',
-    PRIORITY => 'info',
-    FACILITY => 'system',
-    );
+    CTX('log')->system()->info('New session created');
+ 
 
     $self->__change_state({
         STATE => 'SESSION_ID_SENT',
@@ -685,11 +679,8 @@ sub __handle_LOGOUT : PRIVATE {
     my $old_session = CTX('session');
 
     ##! 8: "logout received - terminate session " . $old_session->get_id(),
-    CTX('log')->log(
-        MESSAGE  => 'Terminating session ' . $old_session->get_id(),
-        PRIORITY => 'debug',
-        FACILITY => 'system',
-    );
+    CTX('log')->system()->debug('Terminating session ' . $old_session->get_id());
+ 
 
     OpenXPKI::Server::Context::killsession();
 
@@ -896,11 +887,8 @@ sub __change_state : PRIVATE {
     my $new_state = $arg_ref->{STATE};
 
     ##! 4: 'changing state from ' . $state_of{$ident} . ' to ' . $new_state
-    CTX('log')->log(
-        MESSAGE  => 'Changing session state from ' . $state_of{$ident} . ' to ' . $new_state,
-        PRIORITY => 'debug',
-        FACILITY => 'system',
-    );
+    CTX('log')->system()->debug('Changing session state from ' . $state_of{$ident} . ' to ' . $new_state);
+ 
     $state_of{$ident} = $new_state;
     # save the new state in the session
     if (OpenXPKI::Server::Context::hascontext('session')) {

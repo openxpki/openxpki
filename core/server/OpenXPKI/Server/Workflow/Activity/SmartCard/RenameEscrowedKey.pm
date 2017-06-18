@@ -44,11 +44,8 @@ sub execute {
     ##! 16: 'modify_data_pool_entry params: ' . Dumper $params
     CTX('api')->modify_data_pool_entry($params);
 
-    CTX('log')->log(
-        MESSAGE => "SmartCard escrow key renamed for csr_serial " . $context->param('csr_serial'),
-        PRIORITY => 'info',
-        FACILITY => 'application'
-    );
+    CTX('log')->application()->info("SmartCard escrow key renamed for csr_serial " . $context->param('csr_serial'));
+ 
 
     return 1;
 }

@@ -79,11 +79,8 @@ sub execute {
     # truncate password to maximum length
     $password = substr( $password, 0, $password_length );
 
-    CTX('log')->log(
-        MESSAGE => 'Generated random password with length ' . $password_length,  
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );  
+    CTX('log')->application()->debug('Generated random password with length ' . $password_length);
+   
 
     # pass on the password
     $context->param( '_password' => $password );

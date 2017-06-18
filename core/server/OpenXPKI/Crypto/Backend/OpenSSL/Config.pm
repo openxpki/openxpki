@@ -171,11 +171,8 @@ sub set_cert_list
                 my $reason_code = $arrayref->[2];
     	
                 if ($reason_code !~ m{ \A (?: unspecified | keyCompromise | CACompromise | affiliationChanged | superseded | cessationOfOperation | certificateHold | removeFromCRL ) \z }xms) {
-                    CTX('log')->log(
-                        MESSAGE => "Invalid reason code '" . $reason_code . "' specified",
-                        PRIORITY => 'warn',
-                        FACILITY => [ 'application' ],
-                    );
+                    CTX('log')->application()->warn("Invalid reason code '" . $reason_code . "' specified");
+ 
                     $reason_code = 'unspecified';
                 } 
 
@@ -195,11 +192,8 @@ sub set_cert_list
                         $reason_code = 'keyTime,'.$invalidity_date;
                     };
                     if ($EVAL_ERROR) {
-                        CTX('log')->log(
-                            MESSAGE => "Unparsable invalidity_date given: " . $arrayref->[3],
-                            PRIORITY => 'warn',
-                            FACILITY => [ 'application' ],
-                        );    
+                        CTX('log')->application()->warn("Unparsable invalidity_date given: " . $arrayref->[3]);
+     
                     }
                 }
                 

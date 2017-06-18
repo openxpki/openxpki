@@ -147,11 +147,8 @@ sub __persistCertificateInformation {
             $ca_id = $issuer->{identifier};
         } else {
             $ca_id = 'unknown';
-            CTX('log')->log(
-                MESSAGE => "NICE certificate issued with unknown issuer! ($identifier / ".$cert_data->{issuer_dn}.")",
-                PRIORITY => 'warn',
-                FACILITY => 'application'
-            );
+            CTX('log')->application()->warn("NICE certificate issued with unknown issuer! ($identifier / ".$cert_data->{issuer_dn}.")");
+ 
 
         }
     }

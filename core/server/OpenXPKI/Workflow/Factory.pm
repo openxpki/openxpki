@@ -95,11 +95,8 @@ sub fetch_unfiltered_workflow {
         FILTER   => 0,
     });
 
-    CTX('log')->log(
-        MESSAGE  => 'Unfiltered access to workflow ' . $wf->id . ' by ' . CTX('session')->get_user() . ' with role ' . CTX('session')->get_role(),
-        PRIORITY => 'info',
-        FACILITY => 'audit',
-    );
+    CTX('log')->workflow()->info('Unfiltered access to workflow');
+
 
     return $wf;
 

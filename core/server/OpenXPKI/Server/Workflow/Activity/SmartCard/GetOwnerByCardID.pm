@@ -74,11 +74,8 @@ sub execute {
         );
     }
     
-    CTX('log')->log(
-        MESSAGE => "SmartCard got owner for $tokenid, ". $employeeinfo->{VALUE}->{mail} ." / ". $employeeinfo->{VALUE}->{cn}, 
-        PRIORITY => 'info',
-        FACILITY => 'application'
-    );
+    CTX('log')->application()->info("SmartCard got owner for $tokenid, ". $employeeinfo->{VALUE}->{mail} ." / ". $employeeinfo->{VALUE}->{cn});
+ 
 
     $context->param( 'owner_mail' => $employeeinfo->{VALUE}->{mail} );
     $context->param( 'owner_cn'   => $employeeinfo->{VALUE}->{cn} );

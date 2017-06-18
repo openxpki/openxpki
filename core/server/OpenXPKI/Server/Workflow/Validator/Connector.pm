@@ -43,11 +43,8 @@ sub _validate {
     
     ##! 32: 'Raw result is ' . (defined $result ? $result : 'undef')
     if (!$result) {              
-        CTX('log')->log(
-            MESSAGE  => "Validator failed on path " . $self->path(),
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("Validator failed on path " . $self->path());
+ 
         validation_error( $self->error() );
         return 0;
     }

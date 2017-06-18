@@ -24,11 +24,8 @@ sub evaluate {
         condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_VALIDCSRSERIALPRESENT_NO_CSR_SERIAL_PRESENT');
     }
 
-    CTX('log')->log(
-        MESSAGE => "Testing for CSR serial $csr_serial",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug("Testing for CSR serial $csr_serial");
+ 
 
     CTX('dbi')->select_one(
         from => 'csr',

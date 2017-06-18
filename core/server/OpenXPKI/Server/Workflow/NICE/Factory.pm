@@ -44,11 +44,8 @@ sub getHandler {
       		}                  
     	);        
     }
-    CTX('log')->log(
-        MESSAGE => "NICE backend $backend loaded, execute $activity->name", 
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 	
+    CTX('log')->application()->debug("NICE backend $backend loaded, execute $activity->name");
+  	
     return $BackendClass->new( $activity );
 	 	
 }

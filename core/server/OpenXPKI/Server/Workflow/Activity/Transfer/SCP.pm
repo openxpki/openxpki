@@ -107,11 +107,8 @@ sub execute {
 		# possibly a temporary network error, pause and try again
 		my $ee = $EVAL_ERROR;
 		##! 16: 'Eval said ' . $ee
-		CTX('log')->log(
-	        MESSAGE => 'Transfer failed, do pause' ,
-	        PRIORITY => 'info',
-	        FACILITY => 'application',
-	    );
+		CTX('log')->application()->info('Transfer failed, do pause' );
+ 
 		$self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');
 	}
 	
@@ -121,11 +118,8 @@ sub execute {
 		unlink $source_file;
 	} 
 	    
-    CTX('log')->log(
-		MESSAGE => 'Transfer of file successful' ,
-		PRIORITY => 'info',
-		FACILITY => 'application',
-	);
+    CTX('log')->application()->info('Transfer of file successful' );
+ 
     
     return 1;
     

@@ -54,11 +54,8 @@ sub evaluate {
             );
     }
 
-    CTX('log')->log(
-        MESSAGE => "Subject mismatch $subject != $parsed_subject",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );
+    CTX('log')->application()->debug("Subject mismatch $subject != $parsed_subject");
+ 
 
     condition_error( "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SUBJECT_MISMATCH_PKCS10" )
         if ( $subject != $parsed_subject );

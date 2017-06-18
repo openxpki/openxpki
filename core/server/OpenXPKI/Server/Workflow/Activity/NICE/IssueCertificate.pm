@@ -27,7 +27,7 @@ sub execute {
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
 
     # Load the CSR indicated by the context parameter from the database
-	my $csr_serial = $context->param( 'csr_serial' );
+    my $csr_serial = $context->param( 'csr_serial' );
 
     ##! 32: 'load csr from db: ' . $csr_serial
     my $csr = CTX('dbi')->select_one(
@@ -38,24 +38,20 @@ sub execute {
 
     ##! 64: 'csr: ' . Dumper $csr
     if (! defined $csr) {
-	   OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_CSR_NOT_FOUND_IN_DATABASE',
-	       params => { csr_serial => $csr_serial }
+       OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_NICE_CSR_NOT_FOUND_IN_DATABASE',
+           params => { csr_serial => $csr_serial }
        );
     }
 
     if ($csr->{format} ne 'pkcs10' && $csr->{format} ne 'spkac') {
-	   OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE',
-	       params => { EXPECTED => 'pkcs10/spkac', TYPE => $csr->{format} },
+       OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE',
+           params => { EXPECTED => 'pkcs10/spkac', TYPE => $csr->{format} },
         );
     }
 
-    CTX('log')->log(
-        MESSAGE  => "start cert issue for serial $csr_serial, workflow " . $workflow->id,
-        PRIORITY => 'info',
-        FACILITY => [ 'application', 'audit' ]
-    );
+    CTX('log')->application()->info("start cert issue for serial $csr_serial, workflow " . $workflow->id);
 
     my $set_context;
     eval {
@@ -67,16 +63,10 @@ sub execute {
         my $ee = $EVAL_ERROR;
         # Catch exception as "pause" if configured
         if ($self->param('pause_on_error')) {
-            CTX('log')->log(
-                MESSAGE  => "NICE issueCertificate failed but pause_on_error is requested ",
-                PRIORITY => 'warn',
-                FACILITY => [ 'application' ]
-            );
-            CTX('log')->log(
-                MESSAGE  => "Original error: " . $ee,
-                PRIORITY => 'error',
-                FACILITY => [ 'application' ]
-            );
+            CTX('log')->application()->warn("NICE issueCertificate failed but pause_on_error is requested ");
+
+            CTX('log')->application()->error("Original error: " . $ee);
+
             $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
         }
 

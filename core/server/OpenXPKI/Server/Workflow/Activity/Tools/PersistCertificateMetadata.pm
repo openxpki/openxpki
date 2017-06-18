@@ -37,11 +37,8 @@ sub execute {
     }
 
     if (!$style) {
-        CTX('log')->log(
-            MESSAGE => "No style defined, skipping metadata",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("No style defined, skipping metadata");
+ 
         return 1;
     }
 
@@ -63,11 +60,8 @@ sub execute {
     });
 
     if (not defined $metadata) {
-        CTX('log')->log(
-            MESSAGE => "No metadata for $profile / $style ",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("No metadata for $profile / $style ");
+ 
         return 1;
     }
 
@@ -79,12 +73,9 @@ sub execute {
         my $value = $metadata->{$key};
         next if ($value eq '');
         $value = $ser->serialize( $value ) if (ref $value ne '');
-        CTX('log')->log(
-            MESSAGE => sprintf ('cert metadata added, cert %s, attr %s, value %s',
-               $cert_identifier, $key, $value),
-            PRIORITY => 'info',
-            FACILITY => 'audit',
-        );
+        CTX('log')->audit()->info(sprintf ('cert metadata added, cert %s, attr %s, value %s',
+               $cert_identifier, $key, $value));
+ 
 
         ##! 32: 'Add new attribute ' . $key . ' value ' . $value
 
@@ -95,12 +86,9 @@ sub execute {
 
         if ($value =~ m{ \A (-|\.|e|\+) \z }x) {
             $value = 'n/a';
-            CTX('log')->log(
-                MESSAGE => sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
-                    $cert_identifier, $key),
-                PRIORITY => 'debug',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->debug(sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
+                    $cert_identifier, $key));
+ 
         }
 
         $dbi->insert(

@@ -52,11 +52,8 @@ sub execute {
         ##! 32: 'Found persisted data: ' . Dumper $handles  
     }
     
-    CTX('log')->log(
-        MESSAGE => 'Trigger notification message ' .$message,    
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );  
+    CTX('log')->application()->info('Trigger notification message ' .$message);
+   
     
     # Re-Assign the handles from the return value 
     $handles = CTX('notification')->notify({

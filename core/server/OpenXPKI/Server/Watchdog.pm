@@ -291,12 +291,9 @@ sub run {
 
     sigprocmask(SIG_UNBLOCK, $sigint);
 
-    CTX('log')->log(
-        MESSAGE  => sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
-            $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ),
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
+    CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
+            $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
+
 
     sleep($self->interval_wait_initial());
 
@@ -332,11 +329,8 @@ sub run {
             print STDERR $error_msg, "\n";
 
             my $sleep = $self->interval_sleep_exception();
-            CTX('log')->log(
-                MESSAGE  => "Watchdog error, have a nap ($sleep sec, $exception_count cnt, $error_msg)",
-                PRIORITY => "error",
-                FACILITY => "system"
-            );
+            CTX('log')->system()->error("Watchdog error, have a nap ($sleep sec, $exception_count cnt, $error_msg)");
+
 
             my $threshold = $self->max_exception_threshhold();
             if (($threshold > 0) && ($exception_count > $threshold )) {
@@ -397,11 +391,8 @@ sub _sig_hup {
         force => 1,
     });
 
-    CTX('log')->log(
-        MESSAGE  => 'Watchdog worker reloaded',
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
+    CTX('log')->system()->info('Watchdog worker reloaded');
+
     return;
 }
 
@@ -415,11 +406,8 @@ sub _sig_term {
     ##! 1: 'Got TERM'
     $OpenXPKI::Server::Watchdog::terminate  = 1;
 
-    CTX('log')->log(
-        MESSAGE  => "Watchdog worker $$ got term signal - cleaning up.",
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
+    CTX('log')->system()->info("Watchdog worker $$ got term signal - cleaning up.");
+
 
     return;
 }
@@ -442,20 +430,14 @@ sub reload {
 
     # Terminate if we have a watchdog where we should not have one
     if ($disabled and scalar @{$pids->{watchdog}}) {
-        CTX('log')->log(
-            MESSAGE  => 'Watchdog should not run - terminating.',
-            PRIORITY => "info",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->info('Watchdog should not run - terminating.');
+
         kill 'TERM', @{$pids->{watchdog}};
     }
     # Start watchdog if not running
     elsif (not scalar @{$pids->{watchdog}}) {
-        CTX('log')->log(
-            MESSAGE  => 'Watchdog missing - starting it.',
-            PRIORITY => "info",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->info('Watchdog missing - starting it.');
+
         CTX('watchdog')->run();
     }
     # Signal reload
@@ -483,17 +465,11 @@ sub terminate {
 
     if (scalar $pids->{watchdog}) {
         kill 'TERM', @{$pids->{watchdog}};
-        CTX('log')->log(
-            MESSAGE  => 'Told watchdog to terminate',
-            PRIORITY => "info",
-            FACILITY => "system",
-       );
+        CTX('log')->system()->info('Told watchdog to terminate');
+
     } else {
-        CTX('log')->log(
-            MESSAGE  => 'No watchdog pids to terminate',
-            PRIORITY => "error",
-            FACILITY => "system",
-       );
+        CTX('log')->system()->error('No watchdog pids to terminate');
+
     }
 
     return 1;
@@ -540,11 +516,8 @@ sub __scan_for_paused_workflows {
     $self->__flag_and_fetch_workflow( $wf_id ) or return;
 
     ##! 16: 'WF now ready to re-instantiate '
-    CTX('log')->log(
-        MESSAGE  => sprintf( 'watchdog, paused wf %d now ready to re-instantiate, start fork process', $wf_id ),
-        PRIORITY => "info",
-        FACILITY => "workflow",
-    );
+    CTX('log')->workflow()->info(sprintf( 'watchdog, paused wf %d now ready to re-instantiate, start fork process', $wf_id ));
+
 
     $self->__wake_up_workflow({
         workflow_id         => $workflow->{workflow_id},
@@ -576,11 +549,8 @@ sub __flag_and_fetch_workflow {
 
     ##! 16: 'set random key '.$rand_key
 
-    CTX('log')->log(
-        MESSAGE  => sprintf( 'watchdog: paused wf %d found, mark with flag "%s"', $wf_id, $rand_key ),
-        PRIORITY => "debug",
-        FACILITY => "workflow",
-    );
+    CTX('log')->workflow()->debug(sprintf( 'watchdog: paused wf %d found, mark with flag "%s"', $wf_id, $rand_key ));
+
 
     $self->{dbi}->start_txn;
 
@@ -614,11 +584,7 @@ sub __flag_and_fetch_workflow {
     if ($@ or $row_count < 1) {
         ##! 16: sprintf('some other process took wf %s, return', $wf_id)
         $self->{dbi}->rollback;
-        CTX('log')->log(
-            MESSAGE  => sprintf( 'watchdog, paused wf %d: update with mark "%s" failed', $wf_id, $rand_key ),
-            PRIORITY => "warn",
-            FACILITY => ["workflow","system"]
-        );
+        CTX('log')->system()->warn(sprintf( 'watchdog, paused wf %d: update with mark "%s" failed', $wf_id, $rand_key ));
         return;
     }
 
@@ -720,11 +686,8 @@ sub __wake_up_workflow {
     }
 
     if ($error_msg) {
-        CTX('log')->log(
-            MESSAGE  => $error_msg,
-            PRIORITY => "error",
-            FACILITY => "system"
-        );
+        CTX('log')->system()->error($error_msg);
+
     }
 
     # The child MUST TERMINATE!

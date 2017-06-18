@@ -123,11 +123,8 @@ sub execute
             );
         }
 
-        CTX('log')->log(
-            MESSAGE => 'Signed approval for workflow ' . $workflow->id() . " by user $user, role $role",
-            PRIORITY => 'info',
-            FACILITY => ['audit', 'application' ],
-        );
+        CTX('log')->application()->info('Signed approval for workflow ' . $workflow->id() . " by user $user, role $role");
+        CTX('log')->audit('approval')->info('Signed approval for workflow ' . $workflow->id() . " by user $user, role $role");
 
         # look for already present approvals by someone with the same
         # certificate and role
@@ -195,11 +192,8 @@ sub execute
                 'session_role'      => $role,
             };
         }
-        CTX('log')->log(
-		    MESSAGE => 'Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role",
-		    PRIORITY => 'info',
-		    FACILITY => ['audit', 'application' ],
-        );
+        CTX('log')->application()->info('Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role");
+        CTX('log')->audit('approval')->info('Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role");
     } else {
         configuration_error('Unsuported mode given');
     }
@@ -208,11 +202,8 @@ sub execute
     $approvals = $serializer->serialize(\@approvals);
     ##! 64: 'approvals serialized: ' . Dumper $approvals
 
-    CTX('log')->log(
-        MESSAGE => 'Total number of approvals ' . scalar @approvals,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug('Total number of approvals ' . scalar @approvals);
+
 
     $context->param ('approvals' => $approvals);
 

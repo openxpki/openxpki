@@ -41,11 +41,8 @@ sub _validate {
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY");
     }
 
-    CTX('log')->log(
-        MESSAGE  => "Found certificate, hash is " . Dumper $cert,
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("Found certificate, hash is " . Dumper $cert);
+ 
 
     return 1;
 }

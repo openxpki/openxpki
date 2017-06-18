@@ -200,29 +200,20 @@ sub key_usable {
     if ($EVAL_ERROR) {
         alarm 0;
         if ($EVAL_ERROR ne "alarm\n") {            
-            CTX('log')->log(
-                MESSAGE => 'nCipher key_usable failed with ' . $EVAL_ERROR,
-                PRIORITY => 'error',
-                FACILITY => 'system',
-            );            
+            CTX('log')->system()->error('nCipher key_usable failed with ' . $EVAL_ERROR);
+             
             return 0;            
         }
         ##! 4: "nCipher nfkminfo did not terminate within timeout and was interrupted administratively"
-        CTX('log')->log(
-            MESSAGE => 'nCipher key_usable command timeout',
-            PRIORITY => 'error',
-            FACILITY => 'system',
-        );
+        CTX('log')->system()->error('nCipher key_usable command timeout');
+ 
         return 0;
     }
     
     if ($CHILD_ERROR != 0) {
         ##! 4: "nCipher nfkminfo returned error code $CHILD_ERROR"
-        CTX('log')->log(
-            MESSAGE => 'nCipher key_usable command returned with error: ' . $CHILD_ERROR,
-            PRIORITY => 'error',
-            FACILITY => 'system',
-        );
+        CTX('log')->system()->error('nCipher key_usable command returned with error: ' . $CHILD_ERROR);
+ 
         return 0;
     }
 
@@ -237,21 +228,15 @@ sub key_usable {
 
     if (! $initialized) {
         ##! 4: "security world is not initialized"
-        CTX('log')->log(
-            MESSAGE => 'nCipher security world not initialized',
-            PRIORITY => 'error',
-            FACILITY => 'system',
-        );
+        CTX('log')->system()->error('nCipher security world not initialized');
+ 
         return 0;
     }
     
     if (! $usable) {
         ##! 4: "security world is not usable"
-        CTX('log')->log(
-            MESSAGE => 'nCipher security world not usable',
-            PRIORITY => 'error',
-            FACILITY => 'system',
-        );
+        CTX('log')->system()->error('nCipher security world not usable');
+ 
         return 0;
     }
 

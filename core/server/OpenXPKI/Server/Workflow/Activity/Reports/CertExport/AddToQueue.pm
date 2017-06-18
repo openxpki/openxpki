@@ -32,11 +32,8 @@ sub execute {
        $export->{$key} = $self->param($key) || '';  
     }    
 
-    CTX('log')->log(
-        MESSAGE  => "prepare cert ".$context->param( 'cert_identifier' )." for export",
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("prepare cert ".$context->param( 'cert_identifier' )." for export");
+ 
 
     ##! 16: 'Mapping attributes: ' . Dumper $export  
     

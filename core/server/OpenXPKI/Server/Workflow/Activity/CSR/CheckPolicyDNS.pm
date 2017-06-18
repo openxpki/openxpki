@@ -51,11 +51,8 @@ sub execute
     }
     
     
-    CTX('log')->log(
-        MESSAGE => "Check DNS policy on these items: " . (join "|", keys %items),
-        PRIORITY => 'info',
-        FACILITY => [ 'application', ],
-    );         
+    CTX('log')->application()->info("Check DNS policy on these items: " . (join "|", keys %items));
+          
      
     my $resolver = Net::DNS::Resolver->new; 
     
@@ -128,11 +125,8 @@ sub execute
     if (@errors) {
         $context->param('check_policy_dns', $ser->serialize(\@errors) );
                 
-        CTX('log')->log(
-            MESSAGE => "Policy DNS check failed on " . scalar @errors . " items",
-            PRIORITY => 'info',
-            FACILITY => [ 'application', ],
-        );
+        CTX('log')->application()->info("Policy DNS check failed on " . scalar @errors . " items");
+ 
                 
     } else {
         $context->param( { 'check_policy_dns' => undef } );        

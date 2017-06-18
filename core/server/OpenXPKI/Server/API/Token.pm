@@ -272,7 +272,7 @@ REALM is optional and defaults to the session realm.
 Each entry of the list is a hashref holding the full alias name (ALIAS),
 the certificate identifier (IDENTIFIER), the notbefore/notafter date,
 the subject and the verbose status of the token. Possbile status values
-are EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN. The ONLINE/OFFLINE 
+are EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN. The ONLINE/OFFLINE
 check is only possible from within the current realm, for requests outside
 the current realm the status of a valid token is always UNKNOWN.
 
@@ -347,11 +347,10 @@ sub get_ca_list {
                     ? 'ONLINE'
                     : 'OFFLINE';
             };
-            CTX('log')->log(
-                MESSAGE  => 'I18N_OPENXPKI_API_TOKEN_GET_CA_LIST_TOKEN_STATUS_EVAL_ERROR',
-                PRIORITY => "error",
-                FACILITY => [ 'application', 'system', 'monitor' ],
-            ) if $EVAL_ERROR;
+            if ($EVAL_ERROR) {
+                CTX('log')->application()->error("Eval error getting ca token $token for ca_list");
+            }
+
         }
 
         push @token, $item;
@@ -449,21 +448,15 @@ sub is_token_usable {
 
     # Shortcut method, ask the token engine
     if ($keys->{ENGINE}) {
-        CTX('log')->log(
-            MESSAGE  => 'Check if token is usable using engine',
-            PRIORITY => "debug",
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug('Check if token is usable using engine');
+
         return $token->key_usable()
     }
 
     eval {
 
-        CTX('log')->log(
-            MESSAGE  => 'Check if token is usable using crypto operation',
-            PRIORITY => "debug",
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug('Check if token is usable using crypto operation');
+
 
         my $probe = 'OpenXPKI Encryption Test';
 

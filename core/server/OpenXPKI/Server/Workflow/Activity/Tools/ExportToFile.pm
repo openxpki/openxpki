@@ -29,11 +29,8 @@ sub execute {
     
     
     if (!defined $value || $value eq '') {
-        CTX('log')->log(
-            MESSAGE => "Nothing written - export data is empty",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug("Nothing written - export data is empty");
+ 
         return 1;
     }
         
@@ -80,11 +77,8 @@ sub execute {
     
     my $bytes = length($value);
     
-    CTX('log')->log(
-        MESSAGE => "Wrote export ($bytes bytes) to $target_name",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug("Wrote export ($bytes bytes) to $target_name");
+ 
     
     return 1;
      

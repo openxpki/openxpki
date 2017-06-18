@@ -30,21 +30,15 @@ sub evaluate {
     
     if (!defined $res) {
         ##! 16: 'owner is not defined'
-        CTX('log')->log(
-            MESSAGE  => "IsCertificateOwner condition failed - no owner found",
-            PRIORITY => 'warn',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->warn("IsCertificateOwner condition failed - no owner found");
+ 
         condition_error('I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND');       
     } 
     
     if (!$res) {
         ##! 16: 'owner does not match'
-        CTX('log')->log(        
-            MESSAGE  => "IsCertificateOwner condition failed - owner not matches",
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug("IsCertificateOwner condition failed - owner not matches");
+ 
         condition_error('I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED');
     }
 

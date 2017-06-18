@@ -127,11 +127,8 @@ sub issueCertificate {
 
     ##! 32: 'issuing ca: ' . $issuing_ca
 
-    CTX('log')->log(
-       MESSAGE => "try to issue csr $csr_serial using token $issuing_ca",
-       PRIORITY => 'debug',
-       FACILITY => [ 'application', ],
-    );
+    CTX('log')->application()->debug("try to issue csr $csr_serial using token $issuing_ca");
+
 
     my $default_token = CTX('api')->get_default_token();
     my $ca_token = CTX('crypto_layer')->get_token({
@@ -224,11 +221,7 @@ sub issueCertificate {
 
     ##! 16: 'performing key online test'
     if (! $ca_token->key_usable()) {
-        CTX('log')->log(
-                MESSAGE => "Token for $issuing_ca not usable",
-                PRIORITY => 'info',
-                FACILITY => [ 'monitor', 'audit', 'application' ],
-        );
+        CTX('log')->application()->warn("Token for $issuing_ca not usable");
         $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
     }
 
@@ -253,11 +246,10 @@ sub issueCertificate {
     }
     ##! 64: 'cert: ' . $certificate
 
-    CTX('log')->log(
-       MESSAGE => "CA '$issuing_ca' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . CTX('api')->get_pki_realm() . "'",
-       PRIORITY => 'info',
-       FACILITY => [ 'audit', 'application', ],
-    );
+    my $msg = sprintf("Certificate %s (%s) issued by %s", $profile->get_subject(), $serial, $issuing_ca);
+    CTX('log')->application()->info($msg);
+    CTX('log')->audit('entity')->info($msg);
+    CTX('log')->audit('cakey')->info($msg);
 
     my $cert_identifier = $self->__persistCertificateInformation(
         {
@@ -304,11 +296,7 @@ sub checkForRevocation {
         where => { identifier => $id },
     );
 
-    CTX('log')->log(
-       MESSAGE => "Check for revocation of $id, result: " . $cert->{status},
-       PRIORITY => 'debug',
-       FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("Check for revocation of $id, result: " . $cert->{status});
 
     if ($cert->{status} eq 'REVOKED') {
        ##! 32: 'certificate revoked'
@@ -405,11 +393,7 @@ sub issueCRL {
     #
     ##! 16: 'performing key online test'
     if (! $ca_token->key_usable()) {
-        CTX('log')->log(
-            MESSAGE => "Token for $ca_identifier not usable",
-            PRIORITY => 'info',
-            FACILITY => [ 'monitor', 'audit', 'workflow' ],
-        );
+        CTX('log')->application()->warn("Token for $ca_identifier not usable");
         $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE');
     }
     #
@@ -425,11 +409,9 @@ sub issueCRL {
     );
     ##! 128: 'crl: ' . Dumper($crl)
     #
-    CTX('log')->log(
-        MESSAGE => 'CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm,
-        PRIORITY => 'info',
-        FACILITY => [ 'audit', 'system' ],
-    );
+    CTX('log')->application()->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
+    CTX('log')->audit('cakey')->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
+
     #
     # publish_crl can then publish all those with a PUBLICATION_DATE of 0
     # and set it accordingly

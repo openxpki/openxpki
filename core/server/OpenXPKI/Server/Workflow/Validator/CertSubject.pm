@@ -28,11 +28,8 @@ sub validate {
     };
     if ($EVAL_ERROR)
     {        
-	    CTX('log')->log(
-    	    MESSAGE  => "Could not create DN object from subject '$subject'",
-    	    PRIORITY => 'error',
-    	    FACILITY => 'application',
-	    );
+	    CTX('log')->application()->error("Could not create DN object from subject '$subject'");
+ 
 
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_MATCH_INVALID_FORMAT');
     }
@@ -56,11 +53,8 @@ sub validate {
     }
     
     if (@errors) {        
-	    CTX('log')->log(
-    	    MESSAGE  => "Certificate subject validation error for subject '$subject'",
-    	    PRIORITY => 'error',
-    	    FACILITY => 'application',
-	    );
+	    CTX('log')->application()->error("Certificate subject validation error for subject '$subject'");
+ 
         validation_error ( 'I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_MATCH_FAILED', { invalid_fields => \@errors } );
     }
 

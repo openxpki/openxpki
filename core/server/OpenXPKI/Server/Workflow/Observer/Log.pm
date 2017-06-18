@@ -59,7 +59,7 @@ sub update {
         $prio = 'error';
         $msg = "Workflow $id/$type/$state failed on $action_name from $last_state, error: $exception";
     }
-    
+
 
     # in case more events are ever added to Workflow
     if ( $msg eq '' ) {
@@ -70,11 +70,7 @@ sub update {
             "Params=" . join( ', ', @_ ) );
     }
 
-    CTX('log')->log(
-        MESSAGE  => $msg,
-        PRIORITY => $prio,
-        FACILITY => 'workflow',
-    );
+    CTX('log')->workflow()->$prio($msg);
 
     return 1;
 }

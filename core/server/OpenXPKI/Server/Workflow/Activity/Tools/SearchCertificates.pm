@@ -169,11 +169,8 @@ sub execute
         my $ser = OpenXPKI::Serialization::Simple->new();
         $context->param( $target_key , $ser->serialize(\@identifier) );
                 
-        CTX('log')->log(
-            MESSAGE => "SearchCertificates result " . Dumper \@identifier,
-            PRIORITY => 'debug',
-            FACILITY => [ 'application', ],
-        );
+        CTX('log')->application()->debug("SearchCertificates result " . Dumper \@identifier);
+ 
                   
     } else {
         

@@ -53,8 +53,8 @@ sub execute {
         # Convert to hex string
         my $puk_hex = unpack( 'H*', $puk_raw );
         $puk_hex = substr($puk_hex . "00" x ($puk_length * 2),
-			  0,
-			  $puk_length * 2);
+              0,
+              $puk_length * 2);
 
         # In this next block, we fetch the current puk from the datapool
         # and save this new puk together with the current puk in an array.
@@ -101,11 +101,7 @@ sub execute {
         $params->{ENCRYPT} = 1;
         $msg = CTX('api')->set_data_pool_entry($params);
 
-        CTX('log')->log(
-            MESSAGE => 'SmartCard new puk generated for token ' . $context->param('token_id'),
-            PRIORITY => 'info',
-            FACILITY => ['audit','application']
-        );
+        CTX('log')->application()->info('SmartCard new puk generated for token ' . $context->param('token_id'));
 
 #        # set a flag in the context so the wf knows this was successful
         $context->param( 'generated_new_puk', 'yes' );

@@ -40,11 +40,8 @@ sub execute {
        );
     }
 
-    CTX('log')->log(
-        MESSAGE  => "start cert revocation for crr_serial $crr_serial, workflow " . $workflow->id,
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("start cert revocation for crr_serial $crr_serial, workflow " . $workflow->id);
+ 
 
     $nice_backend->revokeCertificate( { IDENTIFIER => $crr->{identifier} } );
 

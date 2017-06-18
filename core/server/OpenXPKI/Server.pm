@@ -60,19 +60,19 @@ sub new
     # we need to get a usable logger as soon as possible, hence:
     # initialize configuration, i18n and log
     OpenXPKI::Server::Init::init({
-	    TASKS  => [ 'config_versioned', 'i18n', 'log' ],
+        TASKS  => [ 'config_versioned', 'i18n', 'log' ],
         SILENT => $keys->{SILENT},
-	});
+    });
 
     # from now on we can assume that we have CTX('log') available
     # perform the rest of the initialization
 
     eval
     {
-	    OpenXPKI::Server::Init::init(
-	    {
+        OpenXPKI::Server::Init::init(
+        {
             SILENT => $keys->{SILENT}
-	    });
+        });
     };
     if ($EVAL_ERROR) {
         $self->__log_and_die($EVAL_ERROR, 'server initialization');
@@ -84,7 +84,7 @@ sub new
     ## load the user interfaces
     eval
     {
-	    $self->__get_user_interfaces();
+        $self->__get_user_interfaces();
     };
     if ($EVAL_ERROR) {
         $self->__log_and_die($EVAL_ERROR, 'interface initialization');
@@ -93,7 +93,7 @@ sub new
     ## start the server
     eval
     {
-	    $self->{PARAMS} = $self->__get_server_config();
+        $self->{PARAMS} = $self->__get_server_config();
     };
     if ($EVAL_ERROR) {
         $self->__log_and_die($EVAL_ERROR, 'server daemon setup');
@@ -107,30 +107,24 @@ sub new
     # to make this work, delete the corresponding settings from the
     # Net::Server init params
     if (exists $self->{PARAMS}->{user}) {
-	    $self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
-	    delete $self->{PARAMS}->{user};
+        $self->{PARAMS}->{process_owner} = $self->{PARAMS}->{user};
+        delete $self->{PARAMS}->{user};
     }
     if (exists $self->{PARAMS}->{group}) {
-	    $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
-	    delete $self->{PARAMS}->{group};
+        $self->{PARAMS}->{process_group} = $self->{PARAMS}->{group};
+        delete $self->{PARAMS}->{group};
     }
 
 
 
     unlink ($self->{PARAMS}->{socketfile});
-    CTX('log')->log(
-	    MESSAGE  => "Server initialization completed",
-	    PRIORITY => "info",
-	    FACILITY => "system",
-	);
+    CTX('log')->system()->info("Server initialization completed");
+
 
     $self->{PARAMS}->{no_client_stdout} = 1;
 
-    CTX('log')->log(
-	    MESSAGE  => "Server is running",
-	    PRIORITY => "info",
-	    FACILITY => "monitor",
-	);
+    CTX('log')->system()->info("Server is running");
+ 
     $self->run(%{$self->{PARAMS}});
 
     return $self;
@@ -220,14 +214,11 @@ sub post_bind_hook {
 
     if (($socket_owner != -1) || ($socket_group != -1)) {
         # try to change socket ownership
-        CTX('log')->log(
-            MESSAGE  => "Setting socket file '$socketfile' ownership to "
+        CTX('log')->system()->debug("Setting socket file '$socketfile' ownership to "
             . (( $socket_owner != -1) ? $socket_owner : 'unchanged' )
             . '/'
-            . (( $socket_group != -1) ? $socket_group : 'unchanged' ),
-            PRIORITY => "debug",
-            FACILITY => "system",
-        );
+            . (( $socket_group != -1) ? $socket_group : 'unchanged' ));
+
 
         if (! chown $socket_owner, $socket_group, $socketfile) {
             OpenXPKI::Exception->throw (
@@ -250,11 +241,8 @@ sub post_bind_hook {
     my $pidfile = $self->{PARAMS}->{pid_file};
     ##! 16: 'chown pidfile: ' .  $pidfile . ' user: ' . $self->{PARAMS}->{process_owner} . ' group: ' . $self->{PARAMS}->{process_group}
     if (! chown $self->{PARAMS}->{process_owner}, $self->{PARAMS}->{process_group}, $pidfile) {
-        CTX('log')->log(
-            MESSAGE => "Could not change ownership for pidfile '$pidfile' to '$socket_owner:$socket_group'",
-            FACILITY => 'system',
-            PRIORITY => 'error',
-        );
+        CTX('log')->system()->error("Could not change ownership for pidfile '$pidfile' to '$socket_owner:$socket_group'");
+ 
     }
 
     my $env = CTX('config')->get_hash('system.server.environment');
@@ -289,12 +277,9 @@ sub pre_loop_hook {
                 2,
                 "Setting gid to \"$self->{PARAMS}->{process_group}\""
             );
-            CTX('log')->log(
-                MESSAGE  => "Setting gid to to "
-                            . $self->{PARAMS}->{process_group},
-                PRIORITY => "debug",
-                FACILITY => "system",
-            );
+            CTX('log')->system()->debug("Setting gid to to "
+                            . $self->{PARAMS}->{process_group});
+
             set_gid( $self->{PARAMS}->{process_group} );
         }
         if( $self->{PARAMS}->{process_owner} ne $> ){
@@ -302,35 +287,21 @@ sub pre_loop_hook {
                 2,
                 "Setting uid to \"$self->{PARAMS}->{process_owner}\""
             );
-            CTX('log')->log(
-                MESSAGE  => "Setting uid to to "
-                    . $self->{PARAMS}->{process_owner},
-                PRIORITY => "debug",
-                FACILITY => "system",
-            );
+            CTX('log')->system()->debug("Setting uid to to " . $self->{PARAMS}->{process_owner});
+
             set_uid( $self->{PARAMS}->{process_owner} );
         }
     };
     if( $EVAL_ERROR ){
         if ( $> == 0 ) {
-            CTX('log')->log(
-                MESSAGE  => $EVAL_ERROR,
-                PRIORITY => "fatal",
-                FACILITY => "system",
-            );
+            CTX('log')->system()->fatal($EVAL_ERROR);
+
         die $EVAL_ERROR;
         } elsif( $< == 0) {
-            CTX('log')->log(
-                MESSAGE  => "Effective UID changed, but Real UID is 0: $EVAL_ERROR",
-                PRIORITY => "warn",
-                FACILITY => "system",
-            );
+            CTX('log')->system()->warn("Effective UID changed, but Real UID is 0: $EVAL_ERROR");
         } else {
-            CTX('log')->log(
-                MESSAGE  => $EVAL_ERROR,
-                PRIORITY => "error",
-                FACILITY => "system",
-            );
+            CTX('log')->system()->error($EVAL_ERROR);
+
         }
     }
     if ($self->{TYPE} eq 'Simple') {
@@ -375,11 +346,7 @@ sub sig_hup {
 
     my $pids = OpenXPKI::Control::get_pids();
 
-    CTX('log')->log(
-        MESSAGE  => sprintf("SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}}),
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
+    CTX('log')->system()->info(sprintf "SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}});
 
     if (@{$pids->{worker}}) {
         kill 15, @{$pids->{worker}};
@@ -424,11 +391,8 @@ sub process_request {
     }
 
     if (defined $msg) {
-        CTX('log')->log(
-            MESSAGE  => "Uncaught exception: " . $msg,
-            PRIORITY => "fatal",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->fatal("Uncaught exception: " . $msg);
+
         # die gracefully
         ##! 1: "Uncaught exception: " . Dumper $msg
         $ERRNO = 1;
@@ -903,19 +867,16 @@ sub __log_and_die {
     }
     ##! 16: 'log_message: ' . $log_message
 
-    CTX('log')->log(
-        MESSAGE  => $log_message,
-        PRIORITY => "fatal",
-        FACILITY => "system",
-    );
+    CTX('log')->system()->fatal($log_message);
+
 
     # Check if watchdog was already started and kill
     if (OpenXPKI::Server::Context::hascontext('watchdog')) {
-    	CTX('watchdog')->terminate();
+        CTX('watchdog')->terminate();
     }
 
- 	# die gracefully
- 	$ERRNO = 1;
+     # die gracefully
+     $ERRNO = 1;
     ##! 1: 'end, dying'
     die $log_message;
 

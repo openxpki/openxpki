@@ -49,11 +49,8 @@ sub execute {
         );
     }
 
-    CTX('log')->log(
-        MESSAGE  => "start cert renewal for csr_serial $csr_serial, workflow " . $workflow->id,
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("start cert renewal for csr_serial $csr_serial, workflow " . $workflow->id);
+ 
 
     my $set_context = $nice_backend->renewCertificate(
         OpenXPKI::Server::Database::Legacy->csr_to_legacy($csr),

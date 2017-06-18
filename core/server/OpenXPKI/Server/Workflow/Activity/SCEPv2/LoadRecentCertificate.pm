@@ -95,11 +95,7 @@ sub execute {
         # Check if we should revoke the replaced certificate
         my $revoke_on_replace = CTX('config')->get_hash( ['scep', $context->param('server'), 'revoke_on_replace' ] );
         if (ref $revoke_on_replace eq 'HASH') {
-            CTX('log')->log(
-                MESSAGE => "SCEP certificate added for revocation due to replace " . $cert->{identifier},
-                PRIORITY => 'info',
-                FACILITY => ['audit','application'],
-            );
+            CTX('log')->application()->info("SCEP certificate added for revocation due to replace " . $cert->{identifier});
             # we use the context settings as in the CRR workflow,
             # so the activity can just pick them up
             $context->param( 'replace_cert_identifier' => $cert->{identifier} );
@@ -107,17 +103,11 @@ sub execute {
             $context->param( 'revocation_time' => $revoke_on_replace->{invalidity_time} || 0 );
         }
 
-        CTX('log')->log(
-            MESSAGE => "SCEP replace for old csr " . $cert->{req_key} . " with profile " . $old_profile->{profile},
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP replace for old csr " . $cert->{req_key} . " with profile " . $old_profile->{profile});
+
     } else {
-        CTX('log')->log(
-            MESSAGE => "SCEP renewal from old csr " . $cert->{req_key} . " with profile " . $old_profile->{profile},
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP renewal from old csr " . $cert->{req_key} . " with profile " . $old_profile->{profile});
+
         $context->param( 'renewal_mode' => 'renew' );
     }
 

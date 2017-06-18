@@ -45,11 +45,7 @@ sub execute {
         foreach my $ca (@{$active_ca_token}) {
             $ca_alias_list->push($ca->{ALIAS});
         }
-         CTX('log')->log(
-            MESSAGE  => sprintf( "Forced CRL update requested on realm $pki_realm" ),
-            PRIORITY => "info",
-            FACILITY => [ 'audit', "application" ],
-        );
+        CTX('log')->application()->info("Forced CRL update requested on realm $pki_realm");
         return 1;
     }
 
@@ -66,11 +62,8 @@ sub execute {
     my %ca_identifier;
     while (my $entry = $sth->fetchrow_hashref) {
         ##! 16: ' ca has revoked certificates pending ' . $entry->{'CERTIFICATE.ISSUER_IDENTIFIER'}
-        CTX('log')->log(
-            MESSAGE  => 'ca has revoked certificates pending ' . $entry->{issuer_identifier},
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug('ca has revoked certificates pending ' . $entry->{issuer_identifier});
+
         $ca_identifier{$entry->{issuer_identifier}} = 1;
     }
 
@@ -125,11 +118,8 @@ sub execute {
 
         if ($crl) {
             ##! 32: ' ca '. $ca->{IDENTIFIER} .' has crl beyond next renewal date '
-            CTX('log')->log(
-                MESSAGE  => ' ca '. $ca->{IDENTIFIER} .' has crl beyond next renewal date ',
-                PRIORITY => 'debug',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->debug(' ca '. $ca->{IDENTIFIER} .' has crl beyond next renewal date ');
+
             next;
         }
 

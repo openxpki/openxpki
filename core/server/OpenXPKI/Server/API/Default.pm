@@ -475,11 +475,8 @@ sub import_certificate {
         # No verfication requested ?
         #
         if ($arg_ref->{FORCE_NOVERIFY}) {
-            CTX('log')->log(
-                MESSAGE  => "Importing certificate without chain verification! $cert_identifier / " . $cert->get_subject,
-                PRIORITY => 'warn',
-                FACILITY => ['audit','system']
-            );
+            CTX('log')->system()->warn("Importing certificate without chain verification! $cert_identifier / " . $cert->get_subject);
+            # LOGMIGRATE CTX('log')->audit()->warn();
             $valid = 1;
         }
         else {
@@ -494,11 +491,8 @@ sub import_certificate {
         if (!$valid) {
             # force the invalid issuer
             if ($arg_ref->{FORCE_ISSUER}) {
-                CTX('log')->log(
-                    MESSAGE  => "Importing certificate with invalid chain with force! $cert_identifier / " . $cert->get_subject(),
-                    PRIORITY => 'warn',
-                    FACILITY => ['audit','system']
-                );
+                CTX('log')->system->warn("Importing certificate with invalid chain with force! $cert_identifier / " . $cert->get_subject());
+                # LOGMIGRATE CTX('log')->audit()->warn();
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN',
@@ -578,11 +572,7 @@ sub _get_issuer {
     # No issuer found
     if (not $issuer_cert) {
         if ($force_nochain) {
-            CTX('log')->log(
-                MESSAGE  => "Importing certificate without issuer! $cert_identifier / " . $cert->get_subject(),
-                PRIORITY => 'warn',
-                FACILITY => ['audit','system']
-            );
+            CTX('log')->system()->warn("Importing certificate without issuer! $cert_identifier / " . $cert->get_subject());
             return;
         }
         OpenXPKI::Exception->throw(
@@ -649,11 +639,7 @@ sub _is_issuer_valid  {
 
     # Accept an incomplete chain
     if ($force_nochain) {
-        CTX('log')->log(
-            MESSAGE  => "Importing certificate with incomplete chain! $cert_identifier / " . $cert->get_subject(),
-            PRIORITY => 'warn',
-            FACILITY => ['audit','system']
-        );
+        CTX('log')->system()->warn("Importing certificate with incomplete chain! $cert_identifier / " . $cert->get_subject());
         return 1;
     }
 

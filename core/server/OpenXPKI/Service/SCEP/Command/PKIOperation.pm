@@ -179,11 +179,8 @@ sub __send_cert : PRIVATE {
     }
 
     if ($cert_count == 0) {
-         CTX('log')->log(
-            MESSAGE => "SCEP getcert - no certificate found for serial $requested_serial_hex",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+         CTX('log')->application()->info("SCEP getcert - no certificate found for serial $requested_serial_hex");
+ 
 
         return $token->command(
             {   COMMAND      => 'create_error_reply',
@@ -251,11 +248,8 @@ sub __send_crl : PRIVATE {
     });
 
     if (!$res || scalar @{$res} != 1) {
-          CTX('log')->log(
-            MESSAGE => "SCEP getcrl - no issuer found for serial $issuer_serial and issuer " . $requested_issuer_serial->{ISSUER},
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+          CTX('log')->application()->error("SCEP getcrl - no issuer found for serial $issuer_serial and issuer " . $requested_issuer_serial->{ISSUER});
+ 
 
         return $token->command(
             {   COMMAND      => 'create_error_reply',
@@ -351,11 +345,8 @@ sub __pkcs_req : PRIVATE {
 
     Log::Log4perl::MDC->put('sceptid', $transaction_id);
 
-    CTX('log')->log(
-        MESSAGE => "SCEP incoming request, id $transaction_id",
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("SCEP incoming request, id $transaction_id");
+ 
 
     my $workflow_id = 0;
     my $wf_info; # filled in either one of the branches
@@ -389,11 +380,8 @@ sub __pkcs_req : PRIVATE {
             ID       => $workflow_id,
         });
 
-        CTX('log')->log(
-            MESSAGE => "SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE});
+ 
 
     } else {
 
@@ -412,11 +400,8 @@ sub __pkcs_req : PRIVATE {
 
 
 
-        CTX('log')->log(
-            MESSAGE => "SCEP try to start new workflow for $transaction_id",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP try to start new workflow for $transaction_id");
+ 
 
         # inject newlines if not already present
         # this is necessary for openssl / openca-scep to parse
@@ -511,11 +496,8 @@ sub __pkcs_req : PRIVATE {
         $workflow_id = $wf_info->{WORKFLOW}->{ID};
         ##! 16: 'workflow_id: ' . $workflow_id
 
-        CTX('log')->log(
-            MESSAGE => "SCEP started new workflow with id $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE},
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP started new workflow with id $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE});
+ 
 
         # Record the scep tid and the workflow in the datapool
         CTX('api')->set_data_pool_entry({
@@ -540,11 +522,8 @@ sub __pkcs_req : PRIVATE {
     my @extra_header = ( "X-OpenXPKI-WorkflowId: " . $wf_info->{WORKFLOW}->{ID} );
 
     if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {
-        CTX('log')->log(
-            MESSAGE => "SCEP $workflow_id in state $wf_state, send pending reply",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP $workflow_id in state $wf_state, send pending reply");
+ 
 
         # we are still pending
         my $pending_msg = $token->command(
@@ -612,11 +591,8 @@ sub __pkcs_req : PRIVATE {
             }
         );
 
-        CTX('log')->log(
-            MESSAGE => "Delivered certificate via SCEP ($cert_identifier)",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("Delivered certificate via SCEP ($cert_identifier)");
+ 
 
         return [ '', $certificate_msg ];
     }
@@ -626,18 +602,12 @@ sub __pkcs_req : PRIVATE {
     my $scep_error_code = $wf_info->{WORKFLOW}->{CONTEXT}->{'scep_error'};
 
     if ( !defined $scep_error_code || ($scep_error_code !~ m{ badAlg | badMessageCheck | badTime | badCertId }xms)) {
-        CTX('log')->log(
-            MESSAGE => "SCEP Request failed without error code set - default to badRequest",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("SCEP Request failed without error code set - default to badRequest");
+ 
         $scep_error_code = 'badRequest';
     } else {
-        CTX('log')->log(
-            MESSAGE => "SCEP Request failed with error $scep_error_code",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("SCEP Request failed with error $scep_error_code");
+ 
     }
     my $error_msg = $token->command(
         {   COMMAND      => 'create_error_reply',

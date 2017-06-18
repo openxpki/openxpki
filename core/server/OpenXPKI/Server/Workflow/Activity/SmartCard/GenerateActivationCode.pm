@@ -269,11 +269,9 @@ sub execute {
 
         $context->param('error_code', '');
 
-        CTX('log')->log(
-            MESSAGE => 'SmartCard delivered activation code to ' . $user,
-            PRIORITY => 'info',
-            FACILITY => ['audit','application']
-        );
+        CTX('log')->application()->info('SmartCard delivered activation code to ' . $user);
+        CTX('log')->audit('smartcard')->info('SmartCard delivered activation code to ' . $user);
+
         # pass on the activation code back to the user interface
         $context->param( '_password', $code );
         return $self;
@@ -283,11 +281,8 @@ sub execute {
         $context->param('error_code','I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS');
 
         ##! 1: "Failed to set salt/hash for user $user - not in auth1,2"
-        CTX('log')->log(
-            MESSAGE => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENACTCODE_USER_NOT_AUTH_PERS',
-            PRIORITY => 'warn',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->warn('current user is not a listed auth person');
+
         return $self;
     }
 }

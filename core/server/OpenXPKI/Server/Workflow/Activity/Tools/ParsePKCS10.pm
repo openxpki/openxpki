@@ -246,19 +246,13 @@ sub execute {
             if (scalar @val) {
                 if ($field->{CLONABLE}) {
                     $cert_subject_parts->{ $field->{ID} } = \@val;
-                    CTX('log')->log(
-                        MESSAGE => "subject preset - field $field, pattern $preset, values " . join('|', @val),
-                        PRIORITY => 'debug',
-                        FACILITY => 'application',
-                    );
+                    CTX('log')->application()->debug("subject preset - field $field, pattern $preset, values " . join('|', @val));
+ 
                 } else {
                     $cert_subject_parts->{ $field->{ID} } = $val[0];
 
-                    CTX('log')->log(
-                        MESSAGE => "subject preset - field $field, pattern $preset, value " . $val[0],
-                        PRIORITY => 'debug',
-                        FACILITY => 'application',
-                    );
+                    CTX('log')->application()->debug("subject preset - field $field, pattern $preset, value " . $val[0]);
+ 
                 }
             }
 

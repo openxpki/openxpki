@@ -48,11 +48,8 @@ sub execute {
     my $csr_subject = $csr_body->{'SUBJECT'};
     # Explicit check for empty subject - should never happen but if it crashes the logic
     if (!$csr_subject) {
-        CTX('log')->log(
-            MESSAGE => "SCEP csr has no subject",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("SCEP csr has no subject");
+
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_ACTIVITY_SCEP_EXTRACT_CSR_NO_SUBJECT'
         );
@@ -75,34 +72,22 @@ sub execute {
     $context->param('csr_key_type_ok' => 0 );
 
     if (!$key_size_allowed->{$csr_key_type}) {
-        CTX('log')->log(
-            MESSAGE => "SCEP csr key type not known ($csr_key_type)",
-            PRIORITY => 'warn',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->warn("SCEP csr key type not known ($csr_key_type)");
+
     } else {
         $key_size_allowed->{$csr_key_type} =~ m{ (\d+)(\s*\-\s*(\d+))? }x;
         my $min = $1; my $max = $3 ? $3 : undef;
         $context->param('csr_key_type_ok' => 1 );
         if ($csr_key_size < $min) {
-            CTX('log')->log(
-                MESSAGE => "SCEP csr key size is too small ($csr_key_type / $csr_key_size < $min)",
-                PRIORITY => 'warn',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->warn("SCEP csr key size is too small ($csr_key_type / $csr_key_size < $min)");
+
         } elsif($max && $csr_key_size > $max)  {
-            CTX('log')->log(
-                MESSAGE => "SCEP csr key size is too long ($csr_key_type / $csr_key_size > $max)",
-                PRIORITY => 'warn',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->warn("SCEP csr key size is too long ($csr_key_type / $csr_key_size > $max)");
+
         } else {
             $context->param('csr_key_size_ok' => 1 );
-            CTX('log')->log(
-                MESSAGE => "SCEP csr key size is ok ($csr_key_type / $csr_key_size)",
-                PRIORITY => 'warn',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->warn("SCEP csr key size is ok ($csr_key_type / $csr_key_size)");
+
         }
     }
 
@@ -111,18 +96,12 @@ sub execute {
     my %hash_allowed = map { lc($_) => 1 } @hash_allowed;
     if ($hash_allowed{$csr_hash_type}) {
         $context->param('csr_hash_type_ok' => 1 );
-        CTX('log')->log(
-            MESSAGE => "SCEP csr hash type is ok ($csr_hash_type)",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP csr hash type is ok ($csr_hash_type)");
+
     } else {
         $context->param('csr_hash_type_ok' => 0 );
-        CTX('log')->log(
-            MESSAGE => "SCEP csr hash type not in allowed list ($csr_hash_type)",
-            PRIORITY => 'warn',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->warn("SCEP csr hash type not in allowed list ($csr_hash_type)");
+
     }
 
 
@@ -149,29 +128,20 @@ sub execute {
         $context->param('cert_extension_name' => $cert_extension_name);
 
         if (!$cert_extension_name) {
-            CTX('log')->log(
-                MESSAGE => "SCEP found Microsoft Certificate Name Extension but was unable to parse it",
-                PRIORITY => 'error',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->error("SCEP found Microsoft Certificate Name Extension but was unable to parse it");
+
         } else {
             # Check if the extension has a profile mapping, defined in scep.<server>.profile_map
             my $profile = $config->get("scep.$server.profile_map.$cert_extension_name");
             if ($profile) {
-      	        # Move old profile name for reference
+                  # Move old profile name for reference
                 $context->param('cert_profile_default' => $context->param('cert_profile') );
                 $context->param('cert_profile' => $profile );
-                CTX('log')->log(
-    	            MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile",
-    	            PRIORITY => 'info',
-    	            FACILITY => 'application',
-    	        );
+                CTX('log')->application()->info("SCEP found Microsoft Certificate Name Extension: $cert_extension_name, mapped to $profile");
+
             } else {
-            	CTX('log')->log(
-                    MESSAGE => "SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile",
-                    PRIORITY => 'warn',
-                    FACILITY => 'application',
-                );
+                CTX('log')->application()->warn("SCEP found Microsoft Certificate Name Extension: $cert_extension_name, ignored - no matching profile");
+
             }
         }
     }
@@ -196,11 +166,8 @@ sub execute {
         my $profile = $context->param('cert_profile');
 
         $context->param('cert_subject_style' => $subject_style);
-        CTX('log')->log(
-            MESSAGE => "SCEP subject rendering enabled ( $profile / $subject_style ) ",
-            PRIORITY => 'info',
-            FACILITY => ['application'],
-        );
+        CTX('log')->application()->info("SCEP subject rendering enabled ( $profile / $subject_style ) ");
+
 
         my %subject_vars = %hashed_dn;
 
@@ -225,11 +192,8 @@ sub execute {
         my @san_template_keys = $config->get_keys("profile.$profile.style.$subject_style.subject.san");
         if (scalar @san_template_keys > 0) {
 
-            CTX('log')->log(
-                MESSAGE => "SCEP san rendering enabled ( $profile / $subject_style ) ",
-                PRIORITY => 'info',
-                FACILITY => ['application'],
-            );
+            CTX('log')->application()->info("SCEP san rendering enabled ( $profile / $subject_style ) ");
+
 
             my $csr_info = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });
             @subject_alt_names = @{CTX('api')->render_san_from_template({
@@ -274,11 +238,7 @@ sub execute {
     if ($challenge) {
         ##! 32: 'challenge: ' . Dumper $challenge
         $context->param('_challenge_password' => $challenge);
-        CTX('log')->log(
-            MESSAGE => "SCEP challenge password present on CSR subject: " . $context->param('cert_subject'),
-            PRIORITY => 'info',
-            FACILITY => ['audit','application'],
-        );
+        CTX('log')->application()->info("SCEP challenge password present on CSR subject: " . $context->param('cert_subject'));
     }
 
     my $signer_cert = $context->param('signer_cert');
@@ -313,11 +273,8 @@ sub execute {
     my $is_self_signed = ($csr_pubkey_hash eq $x509_pubkey_hash ? 1 : 0);
     $context->param('signer_is_self_signed' => $is_self_signed);
 
-    CTX('log')->log(
-        MESSAGE => "SCEP signer subject: " . $signer_subject . ($is_self_signed ? ' - is selfsign' : ''),
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("SCEP signer subject: " . $signer_subject . ($is_self_signed ? ' - is selfsign' : ''));
+
 
     # Check if revoked in the database
 
@@ -331,18 +288,10 @@ sub execute {
     if ($signer_hash) {
         if ($signer_hash->{status} eq 'REVOKED') {
             $context->param('signer_status_revoked' => '1');
-             CTX('log')->log(
-                MESSAGE => "SCEP signer certificate revoked; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject",
-                PRIORITY => 'info',
-                FACILITY => ['audit','monitor','application']
-            );
+             CTX('log')->application()->warn("SCEP signer certificate revoked; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject");
         } else {
             $context->param('signer_status_revoked' => '0');
-            CTX('log')->log(
-                MESSAGE => "SCEP signer certificate valid; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject",
-                PRIORITY => 'info',
-                FACILITY => [ 'audit', 'application'],
-            );
+            CTX('log')->application()->debug("SCEP signer certificate valid; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject");
         }
         $context->param('signer_cert_identifier' => $signer_hash->{identifier});
         $context->param('signer_cert_subject' => $signer_hash->{subject});
@@ -371,23 +320,12 @@ sub execute {
     };
     if ($EVAL_ERROR) {
         ##! 4: 'signature invalid: ' . $EVAL_ERROR
-        CTX('log')->log(
-            MESSAGE => "Invalid SCEP signature; CSR subject: " . $context->param('cert_subject'),
-            PRIORITY => 'warn',
-            FACILITY => ['audit','application'],
-        );
-        CTX('log')->log(
-            MESSAGE => "SCEP signature failed, reason $EVAL_ERROR",
-            PRIORITY => 'debug',
-            FACILITY => ['application'],
-        );
+        CTX('log')->application()->warn("Invalid SCEP signature; CSR subject: " . $context->param('cert_subject'));
+        CTX('log')->application()->debug("SCEP signature failed, reason $EVAL_ERROR");
+
         $context->param('signer_signature_valid' => 0);
     } else {
-        CTX('log')->log(
-            MESSAGE => "SCEP signature verified; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject",
-            PRIORITY => 'info',
-            FACILITY => ['audit','application'],
-        );
+        CTX('log')->application()->debug("SCEP signature verified; CSR subject: " . $context->param('cert_subject') .", Signer $signer_subject");
         $context->param('signer_signature_valid' => 1);
     }
     # unset pkcs7
@@ -432,11 +370,7 @@ sub execute {
         $renewal_cert_notafter = $signer_hash->{notafter};
         $renewal_cert_identifier = $signer_hash->{identifier};
 
-        CTX('log')->log(
-            MESSAGE => "SCEP signed renewal request for $signer_subject / $renewal_cert_identifier",
-            PRIORITY => 'info',
-            FACILITY => ['audit','application'],
-        );
+        CTX('log')->application()->info("SCEP signed renewal request for $signer_subject / $renewal_cert_identifier");
 
     } elsif($cert_count) {
 
@@ -447,11 +381,7 @@ sub execute {
         $renewal_cert_notafter = $recent_cert->{NOTAFTER};
         $renewal_cert_identifier = $recent_cert->{IDENTIFIER};
 
-        CTX('log')->log(
-            MESSAGE => "SCEP initial enrollment for existing subject $signer_subject / $renewal_cert_identifier",
-            PRIORITY => 'info',
-            FACILITY => ['audit','application'],
-        );
+        CTX('log')->application()->info("SCEP initial enrollment for existing subject $signer_subject / $renewal_cert_identifier");
     }
 
     $context->param('renewal_cert_identifier' => $renewal_cert_identifier) if ($renewal_cert_identifier);
@@ -467,11 +397,7 @@ sub execute {
         })->epoch();
 
         if ($renewal_cert_notafter <= $renewal_time) {
-            CTX('log')->log(
-                MESSAGE => "SCEP for $signer_subject is in renewal period ($renewal_cert_identifier)",
-                PRIORITY => 'debug',
-                FACILITY => ['audit','application'],
-            );
+            CTX('log')->application()->debug("SCEP for $signer_subject is in renewal period ($renewal_cert_identifier)");
             $context->param('in_renew_window' => 1);
         }
     }
@@ -488,11 +414,7 @@ sub execute {
         })->epoch();
 
         if ($renewal_cert_notafter <= $replace_time) {
-            CTX('log')->log(
-                MESSAGE => "SCEP for $signer_subject is in replace period ($renewal_cert_identifier)",
-                PRIORITY => 'debug',
-                FACILITY => ['audit','application'],
-            );
+            CTX('log')->application()->debug("SCEP for $signer_subject is in replace period ($renewal_cert_identifier)");
             $context->param('in_replace_window' => 1);
         }
     }

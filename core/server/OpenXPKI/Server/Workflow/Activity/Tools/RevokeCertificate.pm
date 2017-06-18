@@ -85,11 +85,8 @@ sub execute {
     }
 
     ##! 32: 'Prepare revocation with params: ' . Dumper $param
-    CTX('log')->log(
-        MESSAGE => 'Prepare revocation with params: ' . Dumper $param, 
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug('Prepare revocation with params: ' . Dumper $param);
+ 
 
     # Parse invalidity_time if set - workflow requires epoch
     if ($param->{invalidity_time}) {
@@ -109,21 +106,15 @@ sub execute {
         })->epoch();
 
 
-        CTX('log')->log(
-            MESSAGE => 'Delayed revoke requested', 
-            PRIORITY => 'info',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->info('Delayed revoke requested');
+ 
       
         # Remove delayed revocation if the requested date is in the past
         # or near future as its useless and the validator wont accept it!
         if ($param->{delay_revocation_time} < (time() + 15)) {
             $param->{delay_revocation_time} = 0;
-            CTX('log')->log(
-                MESSAGE => 'Delayed revoke with timestamp in the past - removing it', 
-                PRIORITY => 'warn',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->warn('Delayed revoke with timestamp in the past - removing it');
+ 
         }
     }
 
@@ -138,11 +129,8 @@ sub execute {
     # put together the log statement
     my $msg = join (",", map {  $_ . ' => ' . $param->{$_} } keys(%{$param}));
 
-    CTX('log')->log(
-	    MESSAGE => 'Revocation workflow #'. $wf_info->{WORKFLOW}->{ID}.' '. $msg,
-	    PRIORITY => 'info',
-	    FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info('Revocation workflow #'. $wf_info->{WORKFLOW}->{ID}.' '. $msg);
+ 
 
     if ($self->param('target_key')) {
         $context->param( $self->param('target_key') => $wf_info->{WORKFLOW}->{ID} );

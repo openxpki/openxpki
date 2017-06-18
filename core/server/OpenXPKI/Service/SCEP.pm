@@ -344,11 +344,8 @@ MESSAGE:
         ##! 4: "check for logout"
         if ( $service_msg eq 'LOGOUT' ) {
             ##! 8: "logout received - killing session and connection"
-            CTX('log')->log(
-                MESSAGE  => 'Terminating session',
-                PRIORITY => 'info',
-                FACILITY => 'system',
-            );
+            CTX('log')->system()->info('Terminating session');
+ 
             exit 0;
         }
 
@@ -399,12 +396,8 @@ MESSAGE:
                         # the datapool semaphore and the workflow make intermediate commits
                         # so the rollback only affects any uncompleted actions
                         CTX('dbi')->rollback();
-                        CTX('log')->log(
-                            MESSAGE =>
-                                "Error executing SCEP command '$received_command': $EVAL_ERROR",
-                            PRIORITY => 'error',
-                            FACILITY => 'system',
-                        );
+                        CTX('log')->system()->error("Error executing SCEP command '$received_command': $EVAL_ERROR");
+ 
                         ##! 14: "Exception caught during command execution"
                         ##! 14: "$EVAL_ERROR"
                         $self->talk(
@@ -418,12 +411,8 @@ MESSAGE:
 
                         next MESSAGE;
                     }
-                    CTX('log')->log(
-                        MESSAGE =>
-                            "Executed SCEP command '$received_command'",
-                        PRIORITY => 'debug',
-                        FACILITY => 'system',
-                    );
+                    CTX('log')->system()->debug("Executed SCEP command '$received_command'");
+ 
 
                     # sanity checks on command reply
                     if ( !defined $result || ref $result ne 'HASH' ) {

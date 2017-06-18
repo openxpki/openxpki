@@ -24,11 +24,8 @@ sub _evaluate
 
     my $exists = CTX('config')->exists( \@path );
     
-    CTX('log')->log(
-        MESSAGE => "Condition check for exist: path $path, exist: " . ($exists ? 'yes' : 'no'),
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );
+    CTX('log')->application()->debug("Condition check for exist: path $path, exist: " . ($exists ? 'yes' : 'no'));
+ 
         
     if (!$exists) {
         condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CONNECTOR_EXISTS_FAILED");

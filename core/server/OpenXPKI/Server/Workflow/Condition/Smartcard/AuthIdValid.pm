@@ -43,11 +43,8 @@ sub evaluate {
 		return -1;
 	}
 	
-	 CTX('log')->log(
-        MESSAGE => "AuthId checked.",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+	 CTX('log')->application()->debug("AuthId checked.");
+  
 	return 1;
 }
 

@@ -50,11 +50,8 @@ sub create_workflow {
 
     ##! 2: "BTW we shredder many workflow IDs here"
 
-    CTX('log')->log(
-        MESSAGE  => "Created workflow ID $id.",
-        PRIORITY => "info",
-        FACILITY => "workflow"
-    );
+    CTX('log')->workflow()->info("Created workflow ID $id.");
+ 
 
     return $id;
 }

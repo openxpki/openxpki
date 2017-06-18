@@ -81,11 +81,8 @@ sub execute {
         }
     }
 
-    CTX('log')->log(
-        MESSAGE => 'Found metadata keys '. join(", ", keys %{$context_data}) .' for ' . $cert_identifier,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug('Found metadata keys '. join(", ", keys %{$context_data}) .' for ' . $cert_identifier);
+ 
 
     return 1;
 }

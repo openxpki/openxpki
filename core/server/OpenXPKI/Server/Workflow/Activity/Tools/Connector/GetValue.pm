@@ -61,11 +61,8 @@ sub execute {
         );
     } 
     
-    CTX('log')->log(
-        MESSAGE => "Calling Connector::GetValue in mode $mode with path " . join('|', @path),
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+    CTX('log')->application()->debug("Calling Connector::GetValue in mode $mode with path " . join('|', @path));
+  
      
     my $config = CTX('config');   
     if ($mode eq 'map') {

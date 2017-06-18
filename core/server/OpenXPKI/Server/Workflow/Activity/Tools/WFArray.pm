@@ -51,11 +51,8 @@ sub execute {
     my $array = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
         { workflow => $wf, context_key => $self->array_name } );
 
-    CTX('log')->log(
-        MESSAGE => "Mangling wf array ".$self->array_name." with $function",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );         
+    CTX('log')->application()->debug("Mangling wf array ".$self->array_name." with $function");
+          
      
 
     # read operations that do not take a parameter

@@ -33,11 +33,8 @@ sub execute {
         );
     }
        
-    CTX('log')->log(
-        MESSAGE  => "start crl issue for ca $ca_alias, workflow " . $workflow->id,
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("start crl issue for ca $ca_alias, workflow " . $workflow->id);
+ 
     
     my $set_context = $nice_backend->issueCRL( $ca_alias );
         

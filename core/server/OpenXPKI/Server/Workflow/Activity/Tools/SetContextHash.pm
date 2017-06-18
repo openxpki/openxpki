@@ -43,11 +43,8 @@ sub execute
 		
         $hash->{$key} = $value;
          
-        CTX('log')->log(
-            MESSAGE => "Setting $key to $value in context hash ",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application', ],
-        );
+        CTX('log')->application()->debug("Setting $key to $value in context hash ");
+ 
     }
     
     ##! 32: 'hash ' . Dumper $hash

@@ -30,11 +30,8 @@ sub execute {
         $context->param( "p_$key" => $config->get("scep.$server.policy.$key") );        
     }
 
-    CTX('log')->log(
-        MESSAGE => "SCEP policy loaded for $server", 
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );       
+    CTX('log')->application()->debug("SCEP policy loaded for $server");
+        
 
     # Set static policy for our test CA
     #$context->param( p_allow_anon_enroll => 0 );

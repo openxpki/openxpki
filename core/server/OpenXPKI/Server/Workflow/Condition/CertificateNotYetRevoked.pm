@@ -34,11 +34,8 @@ sub evaluate {
         }
     );
 
-    CTX('log')->log(
-        MESSAGE => "Cert status is ".$cert->{status},
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );
+    CTX('log')->application()->debug("Cert status is ".$cert->{status});
+ 
 
     ##! 16: 'status: ' . $cert->{'STATUS'}
 

@@ -86,11 +86,8 @@ sub evaluate
         }
     }
  
-    CTX('log')->log(
-        MESSAGE => "Too few approvals, missing: " . Dumper \%required,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+    CTX('log')->application()->debug("Too few approvals, missing: " . Dumper \%required);
+  
 
     ## if the required list contains still some requirements
     ## then the approval is not complete

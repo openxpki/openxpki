@@ -31,28 +31,19 @@ sub execute {
             # Wakeup elapsed, so do nothing
             if ($wakeup_at->epoch() <= time()) {
                 ##! 8: 'wakeup with elapsed time, continue'
-                CTX('log')->log(
-                    MESSAGE => 'Requested pause with wakeup but timestamp has already elapsed ($wakeup_at) - continue',
-                    PRIORITY => 'info',
-                    FACILITY => [ 'workflow' ],
-                );
+                CTX('log')->workflow()->info("Requested pause with wakeup but timestamp has already elapsed ($wakeup_at) - continue");
+
                 return 1;
             }
-            CTX('log')->log(
-                MESSAGE => 'Requested pause with absolute wakeup - retire till $wakeup_at',
-                PRIORITY => 'info',
-                FACILITY => [ 'workflow' ],
-            );
+            CTX('log')->workflow()->info("Requested pause with absolute wakeup - retire till $wakeup_at");
+
             ##! 8: 'wakeup - sleep till ' . $wakeup_at
             $interval = $wakeup_at->epoch();
         } else {
             # Workflow will consume the date as is, so ne need to convert
             $interval = $self->param('sleep');
-            CTX('log')->log(
-                MESSAGE => 'Requested pause with relative sleep $interval',
-                PRIORITY => 'info',
-                FACILITY => [ 'workflow' ],
-            );
+            CTX('log')->workflow()->info('Requested pause with relative sleep ' .$interval);
+
         }
 
         OpenXPKI::Exception->throw (
@@ -67,11 +58,7 @@ sub execute {
     }
 
     ##! 8: 'Resumed'
-    CTX('log')->log(
-        MESSAGE => 'Resume after explicit pause, workflow id ' . $workflow->id,
-        PRIORITY => 'info',
-        FACILITY => [ 'workflow' ],
-    );
+    CTX('log')->workflow()->info('Resume after explicit pause, workflow id ' . $workflow->id);
     return 1;
 
 }

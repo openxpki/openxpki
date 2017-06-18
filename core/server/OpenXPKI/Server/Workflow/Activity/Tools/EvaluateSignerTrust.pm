@@ -26,11 +26,7 @@ sub execute {
     my $signer_cert = $context->param('signer_cert');
 
     if (!$signer_cert) {
-        CTX('log')->log(
-            MESSAGE => "Trusted Signer validation skipped, no certificate found",
-            PRIORITY => 'debug',
-            FACILITY => ['application']
-        );
+        CTX('log')->application()->debug("Trusted Signer validation skipped, no certificate found");
         return 1;
     }
 
@@ -94,29 +90,18 @@ sub execute {
     }
 
     if ($cert_hash->{status} && ($cert_hash->{status} ne 'ISSUED')) {
-        CTX('log')->log(
-            MESSAGE => "Trusted Signer certificate is revoked",
-            PRIORITY => 'info',
-            FACILITY => ['application','audit']
-        );
+        CTX('log')->application()->warn("Trusted Signer certificate is revoked");
         $context->param('signer_revoked' => 1);
 
     } elsif ($signer_root) {
 
         $context->param('signer_trusted' => 1);
 
-        CTX('log')->log(
-            MESSAGE => "Trusted Signer chain validated - trusted root is $signer_root",
-            PRIORITY => 'info',
-            FACILITY => ['application','audit']
-        );
+        CTX('log')->application()->info("Trusted Signer chain validated - trusted root is $signer_root");
 
     } else {
-        CTX('log')->log(
-            MESSAGE => "Trusted Signer chain validation FAILED",
-            PRIORITY => 'info',
-            FACILITY => ['application']
-        );
+        CTX('log')->application()->warn("Trusted Signer chain validation FAILED");
+
     }
 
     # End chain validation, now check the authorization
@@ -130,11 +115,8 @@ sub execute {
     my $matched = 0;
     my $current_realm = CTX('session')->get_pki_realm();
 
-    CTX('log')->log(
-        MESSAGE => "Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier");
+
 
     TRUST_RULE:
     foreach my $rule (@rules) {
@@ -159,40 +141,27 @@ sub execute {
                 $matched = ($signer_profile eq $match);
 
             } else {
-                CTX('log')->log(
-                    MESSAGE => "Trusted Signer Authorization unknown ruleset $key:$match",
-                    PRIORITY => 'error',
-                    FACILITY => 'system',
-                );
+                CTX('log')->system()->error("Trusted Signer Authorization unknown ruleset $key:$match");
+
                 $matched = 0;
             }
             next TRUST_RULE if (!$matched);
 
-            CTX('log')->log(
-                MESSAGE => "Trusted Signer Authorization matched subrule $rule/$match",
-                PRIORITY => 'debug',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->debug("Trusted Signer Authorization matched subrule $rule/$match");
+
             ##! 32: 'Matched ' . $match
         }
 
         if ($matched) {
             ##! 16: 'Passed validation rule #'.$rule,
-            CTX('log')->log(
-                MESSAGE => "Trusted Signer Authorization matched rule $rule",
-                PRIORITY => 'info',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->info("Trusted Signer Authorization matched rule $rule");
+
             $context->param('signer_authorized' => 1);
             return 1;
         }
     }
 
-    CTX('log')->log(
-        MESSAGE => "Trusted Signer not found in trust list ($signer_subject).",
-        PRIORITY => 'info',
-        FACILITY => ['application','audit']
-    );
+    CTX('log')->application()->info("Trusted Signer not found in trust list ($signer_subject).");
 
     $context->param('signer_authorized' => 0);
     return 1;

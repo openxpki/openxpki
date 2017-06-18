@@ -84,20 +84,15 @@ sub init {
     }
 
     if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-    log_wrapper(
-        {
-        MESSAGE  => "OpenXPKI initialization",
-        PRIORITY => "info",
-        FACILITY => "system",
-        });
+        log_wrapper("OpenXPKI initialization");
     }
 
     my @tasks;
 
     if (defined $keys->{TASKS} && (ref $keys->{TASKS} eq 'ARRAY')) {
-    @tasks = @{$keys->{TASKS}};
+        @tasks = @{$keys->{TASKS}};
     } else {
-    @tasks = @init_tasks;
+        @tasks = @init_tasks;
     }
 
     delete $keys->{TASKS};
@@ -107,75 +102,51 @@ sub init {
   TASK:
     foreach my $task (@tasks) {
         ##! 16: 'task: ' . $task
-    if (! exists $is_initialized{$task}) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
-        params  => {
-            task => $task,
-        });
-    }
-    next TASK if $is_initialized{$task};
+        if (! exists $is_initialized{$task}) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
+            params  => {
+                task => $task,
+            });
+        }
+        next TASK if $is_initialized{$task};
 
-    ##! 16: 'do_init_' . $task
-    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-        log_wrapper(
+        ##! 16: 'do_init_' . $task
+        if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+            log_wrapper("Initialization task '$task'");
+        }
+
+        eval "__do_init_$task(\$keys);";
+        if (my $exc = OpenXPKI::Exception->caught())
         {
-            MESSAGE  => "Initialization task '$task'",
-            PRIORITY => "info",
-            FACILITY => "system",
-        });
-    }
-
-    eval "__do_init_$task(\$keys);";
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        my $msg = $exc->message() || '<no message>';
-        log_wrapper(
+            my $msg = $exc->message() || '<no message>';
+            log_wrapper("Exception during initialization task '$task': " . $msg, "fatal");
+            print "Exception during initialization task '$task': " . $msg;
+            $exc->rethrow();
+        }
+        elsif ($EVAL_ERROR)
         {
-            MESSAGE  => "Exception during initialization task '$task': " . $msg,
-            PRIORITY => "fatal",
-            FACILITY => "system",
-        });
-        print "Exception during initialization task '$task': " . $msg;
-        $exc->rethrow();
-    }
-    elsif ($EVAL_ERROR)
-    {
-        my $error = $EVAL_ERROR;
-        log_wrapper({
-            MESSAGE  => "Eval error during initialization task '$task': " . $error,
-            PRIORITY => "fatal",
-            FACILITY => "system",
-        });
+            my $error = $EVAL_ERROR;
+            log_wrapper("Eval error during initialization task '$task': " . $error, "fatal");
 
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
-        params  => {
-            task => $task,
-            EVAL_ERROR => $error,
-        });
-    }
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
+            params  => {
+                task => $task,
+                EVAL_ERROR => $error,
+            });
+        }
 
-    $is_initialized{$task}++;
+        $is_initialized{$task}++;
 
-    # suppress informational output if SILENT is specified
-    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-        log_wrapper(
-        {
-            MESSAGE  => "Initialization task '$task' finished",
-            PRIORITY => "debug",
-            FACILITY => "system",
-        });
-    }
+        # suppress informational output if SILENT is specified
+        if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+            log_wrapper("Initialization task '$task' finished","debug");
+        }
     }
 
     if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-    log_wrapper(
-        {
-        MESSAGE  => "OpenXPKI initialization finished",
-        PRIORITY => "info",
-        FACILITY => "system",
-        });
+        log_wrapper("OpenXPKI initialization finished");
     }
 
     OpenXPKI::Server::Context::killsession();
@@ -185,23 +156,24 @@ sub init {
 
 
 sub log_wrapper {
-    my $arg = shift;
+
+    my $msg = shift;
+    my $prio = shift || 'info';
 
     if ($is_initialized{'log'}) {
-    if (scalar @log_queue) {
-        foreach my $entry (@log_queue) {
-        CTX('log')->log(
-            %{$entry},
-            );
+
+        if (scalar @log_queue) {
+            foreach my $entry (@log_queue) {
+                my $msg = $entry->[0];
+                my $prio = $entry->[1];
+                CTX('log')->system()->$prio($msg);
+            }
+            @log_queue = ();
         }
-        @log_queue = ();
-    }
-    CTX('log')->log(
-        %{$arg},
-        );
+        CTX('log')->system()->$prio($msg);
     } else {
-    # log system not yet prepared, queue log statement
-    push @log_queue, $arg;
+        # log system not yet prepared, queue log statement
+        push @log_queue, [$msg, $prio];
     }
     return 1;
 }

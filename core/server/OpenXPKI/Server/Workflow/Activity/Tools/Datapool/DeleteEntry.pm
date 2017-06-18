@@ -55,11 +55,8 @@ sub execute {
     $params->{VALUE} = undef;
 
 
-    CTX('log')->log(
-        MESSAGE => 'Remove datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE},
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info('Remove datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE});
+ 
 
     CTX('api')->set_data_pool_entry($params);
     return 1;

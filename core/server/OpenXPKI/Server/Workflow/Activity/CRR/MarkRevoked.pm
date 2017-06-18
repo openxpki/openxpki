@@ -43,11 +43,8 @@ sub execute
         },
     );
 
-    CTX('log')->log(
-        MESSAGE  => "mark certificate $identifier as revoked in database",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("mark certificate $identifier as revoked in database");
+ 
 }
 
 1;

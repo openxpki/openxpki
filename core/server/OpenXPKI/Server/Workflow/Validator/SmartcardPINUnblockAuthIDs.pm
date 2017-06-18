@@ -132,11 +132,8 @@ sub validate {
     }
 
     if ( scalar @{$errors} ) {
-        CTX('log')->log(
-            MESSAGE  => "Errors valdiating authorizing persons",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("Errors valdiating authorizing persons");
+ 
 
         #		validation_error($errors->[scalar @{$errors} -1]);
         validation_error( Dumper($errors) );

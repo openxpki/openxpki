@@ -42,11 +42,8 @@ sub execute {
     my $prefix = $self->param('prefix');
     if (defined $prefix) {
         if (!$prefix || !$config->exists( $prefix )) {
-            CTX('log')->log(
-                MESSAGE => 'Publication in prefix mode but prefix not set or empty',
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug('Publication in prefix mode but prefix not set or empty');
+ 
             return 1;
         }
 
@@ -107,11 +104,8 @@ sub execute {
         );
     }
 
-    CTX('log')->log(
-        MESSAGE => 'Publication for ' . $cert->{subject} . ', targets ' . join(",", @target),
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug('Publication for ' . $cert->{subject} . ', targets ' . join(",", @target));
+ 
 
     # Prepare the data
     my $data = {};
@@ -140,11 +134,8 @@ sub execute {
 
     # Defined but empty, stop publication
     if (defined($publish_key) && !$publish_key) {
-        CTX('log')->log(
-            MESSAGE => 'Dont publish as publish_key is defined but empty for ' .$data->{subject},
-            PRIORITY => 'info',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->info('Dont publish as publish_key is defined but empty for ' .$data->{subject});
+ 
         return 1;
     }
 
@@ -170,11 +161,8 @@ sub execute {
 
     ##! 32: 'Data for publication '. Dumper ( $data )
 
-    CTX('log')->log(
-        MESSAGE => 'Start publication to '.$publish_key.' for ' .$data->{subject},
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info('Start publication to '.$publish_key.' for ' .$data->{subject});
+ 
 
     # Required for special connectors (grabbing extended data from the workflow)
     # TODO: should be replaced by e.g. a static factory
@@ -202,17 +190,11 @@ sub execute {
         if ($EVAL_ERROR) {
             if ($on_error eq 'queue') {
                 push @failed, $target;
-                CTX('log')->log(
-                    MESSAGE => "Entity pubication failed for target $target, requeuing",
-                    PRIORITY => 'info',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->info("Entity pubication failed for target $target, requeuing");
+ 
             } elsif ($on_error eq 'skip') {
-                CTX('log')->log(
-                    MESSAGE => "Entity pubication failed for target $target and skip is set",
-                    PRIORITY => 'warn',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->warn("Entity pubication failed for target $target and skip is set");
+ 
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
@@ -223,11 +205,8 @@ sub execute {
                 );
             }
         } else {
-            CTX('log')->log(
-                MESSAGE => "Entity pubication to $target for ". $publish_key." done",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Entity pubication to $target for ". $publish_key." done");
+ 
         }
     }
 

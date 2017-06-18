@@ -109,11 +109,8 @@ sub sc_analyze_smartcard {
         );
     }
 
-    CTX('log')->log(
-        MESSAGE => "Start analyze, ChipId: $chipid, TokenId: $tokenid",
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("Start analyze, ChipId: $chipid, TokenId: $tokenid");
+
 
     my $thisrealm = CTX('session')->get_pki_realm();
 
@@ -253,11 +250,8 @@ sub sc_analyze_smartcard {
     ##! 16: 'Employeeid is ' . $holder_employee_id
 
 
-    CTX('log')->log(
-        MESSAGE => "card is assigned to $holder_employee_id - status is $cardstatus",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug("card is assigned to $holder_employee_id - status is $cardstatus");
+
 
 
 
@@ -294,11 +288,7 @@ sub sc_analyze_smartcard {
             $result->{SMARTCARD}->{token_chipid_match} = 'new';
         } elsif( $retval ne $chipid ) {
             $result->{SMARTCARD}->{token_chipid_match} = 'mismatch';
-            CTX('log')->log(
-                MESSAGE => "Chip Id of presented token mismatches recorded value! Token: $tokenid, Expected: $chipid, Presented: $retval",
-                PRIORITY => 'warn',
-                FACILITY => [ 'audit', 'application', ],
-            );
+            CTX('log')->application()->warn("Chip Id of presented token mismatches recorded value! Token: $tokenid, Expected: $chipid, Presented: $retval");
         }
     }
 
@@ -372,11 +362,7 @@ sub sc_analyze_smartcard {
 
     ##! 16: 'smartcard holder details from connector: ' . Dumper $employeeinfo
 
-    CTX('log')->log(
-        MESSAGE => "Holder Details: Name: $employeeinfo->{VALUE}->{cn}, Mail: $employeeinfo->{VALUE}->{mail}",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug("Holder Details: Name: $employeeinfo->{VALUE}->{cn}, Mail: $employeeinfo->{VALUE}->{mail}");
 
     # We use the mail address for the workflows
     my $card_owner = $employeeinfo->{VALUE}->{mail};
@@ -402,11 +388,7 @@ sub sc_analyze_smartcard {
         }
 
         if ($employee_data_has_changed) {
-            CTX('log')->log(
-                MESSAGE => "Holder Details have changed $employee_data_has_changed",
-                PRIORITY => 'info',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->info("Holder Details have changed $employee_data_has_changed");
         }
     } else {
         foreach my $key (qw(givenname sn mail)) {
@@ -524,11 +506,8 @@ sub sc_analyze_smartcard {
     if (defined $puk_found) {
        $result->{PROCESS_FLAGS}->{puk_found_in_datapool} = 1;
 
-        CTX('log')->log(
-            MESSAGE => "PUK for the card was found in datapool (TokenId $tokenid)",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug("PUK for the card was found in datapool (TokenId $tokenid)");
+
 
     }
 
@@ -634,19 +613,12 @@ sub sc_analyze_smartcard {
         if (!$certs_in_datapool{$cert->{IDENTIFIER}} && $autodiscover) {
             $certs_in_datapool{$cert->{IDENTIFIER}} = 1;
             $update_datapool = 1;
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} found on card but not registered in datapool",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} found on card but not registered in datapool");
+
         }
     }
 
-    CTX('log')->log(
-        MESSAGE => "Certificates found on card: " . join(', ', keys %{$user_certs->{by_identifier}}),
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info("Certificates found on card: " . join(', ', keys %{$user_certs->{by_identifier}}));
 
     if ($update_datapool) {
         my @certificate_identifiers = keys %certs_in_datapool;
@@ -657,11 +629,7 @@ sub sc_analyze_smartcard {
             VALUE => $ser->serialize( \@certificate_identifiers ),
             FORCE => 1
         } );
-        CTX('log')->log(
-            MESSAGE => "Found unassigned certificates, updating datapool.",
-            PRIORITY => 'info',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->info("Found unassigned certificates, updating datapool.");
 
     }
 
@@ -681,11 +649,8 @@ sub sc_analyze_smartcard {
     }
 
     ##! 32: 'Need to load ' . scalar @certs_to_load_from_db . ' from database '
-    CTX('log')->log(
-        MESSAGE => "Certificates to load from database: " . join(', ', @certs_to_load_from_db),
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info("Certificates to load from database: " . join(', ', @certs_to_load_from_db));
+
 
     if (scalar (@certs_to_load_from_db)) {
         my $sth = CTX('dbi')->select(
@@ -752,11 +717,8 @@ sub sc_analyze_smartcard {
             $user_certs->{by_identifier}->{$identifier};
 
         ##! 64: "Certificate $identifier has profile $cert->{PROFILE} and type $cert->{CERTIFICATE_TYPE}"
-        CTX('log')->log(
-            MESSAGE => "Certificate $identifier has profile $cert->{PROFILE} and type $cert->{CERTIFICATE_TYPE}",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug("Certificate $identifier has profile $cert->{PROFILE} and type $cert->{CERTIFICATE_TYPE}");
+
     }
 
     #### Analyse Step 4 #####################################################
@@ -773,11 +735,8 @@ sub sc_analyze_smartcard {
 
     foreach my $type (keys %{$user_certs->{by_type}}) {
 
-        CTX('log')->log(
-            MESSAGE => "Start evaluation for type $type",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug("Start evaluation for type $type");
+
 
         # Sort the list by NOTBEFORE date
         @{$user_certs->{by_type}->{$type}}
@@ -822,11 +781,8 @@ sub sc_analyze_smartcard {
         if (scalar(@{$user_certs->{by_type}->{$type}}) == 0 && $type_policy->{preferred_profile})  {
             push @{$result->{TASKS}->{CREATE}}, $type;
             $result->{TASKS}->{SOFT} = 0;
-            CTX('log')->log(
-                MESSAGE => "create initial certificate of $type",
-                PRIORITY => 'info',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->info("create initial certificate of $type");
+
         }
 
         CERT_ANALYZE_LOOP:
@@ -842,11 +798,8 @@ sub sc_analyze_smartcard {
                 push @{$result->{TASKS}->{CREATE}}, $type;
                 $result->{TASKS}->{SOFT} &&= $cert->{ANALYZE}->{SOFT};
                 $cert_on_card_count++;
-                CTX('log')->log(
-                    MESSAGE => "add certificate of $type",
-                    PRIORITY => 'info',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->info("add certificate of $type");
+
             }
 
             if ($cutoff_date) {
@@ -861,22 +814,16 @@ sub sc_analyze_smartcard {
                         push @{$result->{TASKS}->{REVOKE}}, $cert;
                         $result->{TASKS}->{SOFT} &&= $cert->{PROCESS_FLAGS}->{SOFT};
                         ##! 64: "certificate is beyond cutoff date, certificate will be revoked"
-                        CTX('log')->log(
-                            MESSAGE => "certificate is beyond cutoff date, certificate $identifier will be revoked",
-                            PRIORITY => 'debug',
-                            FACILITY => [ 'application' ],
-                        );
+                        CTX('log')->application()->debug("certificate is beyond cutoff date, certificate $identifier will be revoked");
+
                     }
 
                     if ($cert->{PROCESS_FLAGS}->{PURGE}) {
                         push @{$result->{TASKS}->{PURGE}}, $cert;
                         $result->{TASKS}->{SOFT} &&= $cert->{PROCESS_FLAGS}->{SOFT};
                         ##! 64: "certificate is beyond cutoff date, certificate will be purged"
-                        CTX('log')->log(
-                            MESSAGE => "certificate is beyond cutoff date, certificate $identifier will be purged",
-                            PRIORITY => 'debug',
-                            FACILITY => [ 'application' ],
-                        );
+                        CTX('log')->application()->debug("certificate is beyond cutoff date, certificate $identifier will be purged");
+
                     }
                     next CERT_ANALYZE_LOOP;
                 }
@@ -892,22 +839,16 @@ sub sc_analyze_smartcard {
                     push @{$result->{TASKS}->{REVOKE}}, $cert;
                     $result->{TASKS}->{SOFT} &&= $cert->{PROCESS_FLAGS}->{SOFT};
                     ##! 64: "max_count for type $type reached, certificate will be revoked"
-                    CTX('log')->log(
-                        MESSAGE => "max_count for type $type reached, certificate $identifier will be revoked",
-                        PRIORITY => 'debug',
-                        FACILITY => [ 'application' ],
-                    );
+                    CTX('log')->application()->debug("max_count for type $type reached, certificate $identifier will be revoked");
+
                 }
 
                 if ($cert->{PROCESS_FLAGS}->{PURGE}) {
                     push @{$result->{TASKS}->{PURGE}}, $cert;
                     $result->{TASKS}->{SOFT} &&= $cert->{PROCESS_FLAGS}->{SOFT};
                     ##! 64: "max_count for type $type reached, certificate will be purged"
-                    CTX('log')->log(
-                        MESSAGE => "max_count for type $type reached, certificate $identifier will be purged",
-                        PRIORITY => 'debug',
-                        FACILITY => [ 'application' ],
-                    );
+                    CTX('log')->application()->debug("max_count for type $type reached, certificate $identifier will be purged");
+
                 }
 
                 next CERT_ANALYZE_LOOP;
@@ -929,11 +870,8 @@ sub sc_analyze_smartcard {
                     }
 
                     ##! 64: "certificate will be $action 'ed due to policy"
-                    CTX('log')->log(
-                        MESSAGE => "certificate $identifier of type $type will be $action 'ed due to policy",
-                        PRIORITY => 'debug',
-                        FACILITY => [ 'application' ],
-                    );
+                    CTX('log')->application()->debug("certificate $identifier of type $type will be $action 'ed due to policy");
+
                 }
             }
 
@@ -946,11 +884,8 @@ sub sc_analyze_smartcard {
                 ##! 32: ' Set overall validity by cert '.$identifier.' to ' . $cert->{NOTAFTER};
                 $result->{VALIDITY}->{set_by_type} = $type;
                 $result->{VALIDITY}->{set_to_value} = $cert->{NOTAFTER};
-                CTX('log')->log(
-                    MESSAGE => "Set validity based on $identifier to " . DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime("%F %T"),
-                    PRIORITY => 'info',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->info("Set validity based on $identifier to " . DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime("%F %T"));
+
             }
 
         }
@@ -982,11 +917,8 @@ sub sc_analyze_smartcard {
     $result->{PROCESS_FLAGS}->{allow_personalization} =  ($result->{OVERALL_STATUS} eq 'green' ? 0 : 1);
 
     ##! 16: 'overall status: ' . $result->{OVERALL_STATUS}
-    CTX('log')->log(
-        MESSAGE => "Overall Status is $result->{OVERALL_STATUS}",
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info("Overall Status is $result->{OVERALL_STATUS}");
+
 
     # SC UI needs info about the certs on card
     $result->{PARSED_CERTS} = $user_certs->{on_card};
@@ -1085,11 +1017,8 @@ sub __check_against_policy {
         ##! 64: "$identifier needs profile update"
         # Promote is only a "soft" validity exception
         $analyze->{EXPECTED} = 0;
-        CTX('log')->log(
-            MESSAGE => "Certificate $identifier needs profile update ($cert->{PROFILE} to $policy->{preferred_profile})",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug("Certificate $identifier needs profile update ($cert->{PROFILE} to $policy->{preferred_profile})");
+
     }
 
     # Check if cert is usable (on card or escrow key exists)
@@ -1115,11 +1044,8 @@ sub __check_against_policy {
             $analyze->{USABLE} = 1;
         } else {
             ##! 16: 'private key not in datapool '
-            CTX('log')->log(
-                MESSAGE  => "Private key not found for escrow certificate [$identifier], dequeueing",
-                PRIORITY => 'info',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->info("Private key not found for escrow certificate [$identifier], dequeueing");
+
         }
     } else {
         ##! 64: $identifier . ' is unusable as not on card and not escrowed'
@@ -1137,11 +1063,8 @@ sub __check_against_policy {
         $analyze->{SOFT} = 0;
 
         ##! 64: $identifier . ' is not in validity period'
-        CTX('log')->log(
-            MESSAGE => "Certificate $identifier is outside validity period ($cert->{NOTBEFORE} to $cert->{NOTAFTER})",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug("Certificate $identifier is outside validity period ($cert->{NOTBEFORE} to $cert->{NOTAFTER})");
+
     } else {
         ##! 64: $identifier. ' is in validity period, check renewals'
         # Check for renewal - only possible during validity period
@@ -1161,18 +1084,12 @@ sub __check_against_policy {
                     # Soft only for allow_renewal
                     $analyze->{SOFT} = 0 if ($entry eq 'force_renewal');
                     ##! 64: "Validity: $entry is scheduled for $renewal_date - needs renewal"
-                    CTX('log')->log(
-                        MESSAGE => "Validity: $entry is scheduled for $renewal_date - needs renewal",
-                        PRIORITY => 'debug',
-                        FACILITY => [ 'application' ],
-                    );
+                    CTX('log')->application()->debug("Validity: $entry is scheduled for $renewal_date - needs renewal");
+
                 } else {
                     ##! 64: "Validity: $entry is scheduled for $renewal_date - no action"
-                    CTX('log')->log(
-                        MESSAGE => "Validity: $entry is scheduled for $renewal_date - no action",
-                        PRIORITY => 'debug',
-                        FACILITY => [ 'application' ],
-                    );
+                    CTX('log')->application()->debug("Validity: $entry is scheduled for $renewal_date - no action");
+
                 }
             }
         }
@@ -1187,11 +1104,8 @@ sub __check_against_policy {
     }
 
     ##! 16: "$identifier analyzed: visual status is $cert->{VISUAL_STATUS}"
-     CTX('log')->log(
-        MESSAGE => "Certificate $identifier analyzed, visual status is $cert->{VISUAL_STATUS}",
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+     CTX('log')->application()->info("Certificate $identifier analyzed, visual status is $cert->{VISUAL_STATUS}");
+
 
     ##! 32: "Analyze result of $identifier: " . Dumper( $cert->{ANALYZE} )
 }
@@ -1227,11 +1141,8 @@ sub __check_actions_on_install_candidate {
 
         # Purge valid certifiates - always a hard requirement
         if ($policy->{purge_valid} && $analyze->{VALID}) {
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} is valid and purged from card",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} is valid and purged from card");
+
             $flags->{PURGE} = 1;
             $flags->{SOFT} = 0;
             last IF_PURGE;
@@ -1240,22 +1151,16 @@ sub __check_actions_on_install_candidate {
         if ($policy->{purge_invalid} && !$analyze->{VALID}) {
             # Purge invalid certifiates - soft requirement
             $flags->{PURGE} = 1;
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} is invalid and purged from card",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} is invalid and purged from card");
+
             last IF_PURGE;
         }
 
         # Look into the future - this certificate is superseeded by the current workflow
         if ($policy->{purge_invalid} && ($policy->{revoke_unused} && !$analyze->{EXPECTED})) {
             $flags->{PURGE} = 1;
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} will be superseeded and is purged from card",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} will be superseeded and is purged from card");
+
             last IF_PURGE;
         }
     }
@@ -1266,18 +1171,12 @@ sub __check_actions_on_install_candidate {
     if ($policy->{revoke_unused} && $analyze->{VALID}) {
         if (!$analyze->{USABLE}) {
             $flags->{REVOKE} = 1;
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} is not usable and will be revoked",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} is not usable and will be revoked");
+
         } elsif (!$analyze->{EXPECTED}) {
             $flags->{REVOKE} = 1;
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} is not expected and will be revoked",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} is not expected and will be revoked");
+
         }
     }
 
@@ -1294,11 +1193,8 @@ sub __check_actions_on_install_candidate {
         if (!$policy->{purge_valid} && ($analyze->{VALID} && !$flags->{REVOKE})) {
             $flags->{INSTALL} = 1;
             $flags->{SOFT} = 0;
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} is valid/usable and restored to card",
-                PRIORITY => 'info',
-                FACILITY => [ 'application', 'audit' ],
-            );
+            CTX('log')->application()->info("Certificate $cert->{IDENTIFIER} is valid/usable and restored to card");
+            #LOGMIGRATE Todo Audit?
             last IF_INSTALL;
         }
 
@@ -1307,11 +1203,8 @@ sub __check_actions_on_install_candidate {
         if (!$policy->{purge_invalid} && (!$analyze->{VALID} || $flags->{REVOKE})) {
             $flags->{INSTALL} = 1;
             $flags->{SOFT} = 0;
-            CTX('log')->log(
-                MESSAGE => "Certificate $cert->{IDENTIFIER} is invalid and restored to card",
-                PRIORITY => 'info',
-                FACILITY => [ 'application', 'audit' ],
-            );
+            CTX('log')->application()->info("Certificate $cert->{IDENTIFIER} is invalid and restored to card");
+            #LOGMIGRATE Todo Audit?
             last IF_INSTALL;
         }
 
@@ -1346,21 +1239,15 @@ sub __check_actions_on_discard_candidate {
     # Purge certifiate from card
     if ($analyze->{ONCARD}) {
          $flags->{PURGE} = 1;
-         CTX('log')->log(
-            MESSAGE => "Certificate $cert->{IDENTIFIER} is discarded and purged from card",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+         CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} is discarded and purged from card");
+
     }
 
     # Check if certificate needs to be revoked
     if ($policy->{revoke_unused} && $analyze->{VALID}) {
         $flags->{REVOKE} = 1;
-        CTX('log')->log(
-            MESSAGE => "Certificate $cert->{IDENTIFIER} is not expected and will be revoked",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug("Certificate $cert->{IDENTIFIER} is not expected and will be revoked");
+
     }
 
     # Final result

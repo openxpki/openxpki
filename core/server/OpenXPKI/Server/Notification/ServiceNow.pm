@@ -116,11 +116,8 @@ sub notify {
 	##! 32: 'Template vars: ' . Dumper $template_vars
 
 	if ( !@handles ) {
-		CTX('log')->log(
-			MESSAGE  => "No notifcations to send for $msgconfig",
-			PRIORITY => "debug",
-			FACILITY => "system",
-		);
+		CTX('log')->system()->debug("No notifcations to send for $msgconfig");
+ 
 		return 0;
 	}
 
@@ -209,14 +206,11 @@ sub notify {
 		$token->{$handle} = $pi;
 
 		if ($EVAL_ERROR) {
-			CTX('log')->log(
-				MESSAGE => 'ServiceNow action failed on ticket '
+			CTX('log')->system()->error('ServiceNow action failed on ticket '
 				  . $pi->{sys_id}
 				  . ' with '
-				  . $EVAL_ERROR,
-				PRIORITY => 'error',
-				FACILITY => 'system',
-			);
+				  . $EVAL_ERROR);
+ 
 			
 			push @failed, $handle;
 		}
@@ -308,11 +302,8 @@ sub _insert {
 
     ##! 8: "Created a new ticket, ID " . $ticket->{ticket_id}
     	
-    CTX('log')->log(
-        MESSAGE  => 'Opening new ServiceNow ticket - id ' . $ticket->{ticket_id},
-        PRIORITY => 'info',
-        FACILITY => 'system'
-    );
+    CTX('log')->system()->info('Opening new ServiceNow ticket - id ' . $ticket->{ticket_id});
+ 
     
     ##! 1: 'end'
     return $ticket;
@@ -339,11 +330,8 @@ sub _update {
      
     ##! 8: "Ticket updated " . $cfg->{sys_id}
         
-    CTX('log')->log(
-        MESSAGE  => "ServiceNow Ticket updated " . $cfg->{sys_id},
-        PRIORITY => 'info',
-        FACILITY => 'system'
-    );
+    CTX('log')->system()->info("ServiceNow Ticket updated " . $cfg->{sys_id});
+ 
     
     ##! 1: 'end'
     return $result;

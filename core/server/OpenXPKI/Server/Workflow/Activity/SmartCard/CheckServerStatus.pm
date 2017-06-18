@@ -45,11 +45,8 @@ sub execute {
     
     $context->param({'server_status' => $status });
   
-    CTX('log')->log(
-        MESSAGE => "Smartcard server load status is $status ($proc_count/$max_process, $load/$curr_load)",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );         
+    CTX('log')->application()->debug("Smartcard server load status is $status ($proc_count/$max_process, $load/$curr_load)");
+          
      
     return 1;
     

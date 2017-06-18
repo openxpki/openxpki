@@ -92,11 +92,8 @@ sub load_extension
         $critical = 'true';
     } else {
         if (!(defined $critical || $ext eq 'oid' )) {
-            CTX('log')->log(
-                MESSAGE  => "Critical flag is not set for $ext in profile $profile_path!",
-                PRIORITY => 'warn',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->warn("Critical flag is not set for $ext in profile $profile_path!");
+ 
         }
         $critical = 'false';
     }

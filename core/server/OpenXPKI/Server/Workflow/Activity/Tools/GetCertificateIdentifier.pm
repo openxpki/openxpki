@@ -47,11 +47,8 @@ sub execute {
 	);
     my $cert_identifier  = $x509->get_identifier();
 
-    CTX('log')->log(
-        MESSAGE => 'Identifier of certificate is ' . $cert_identifier,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug('Identifier of certificate is ' . $cert_identifier);
+ 
 	$context->param($contextentry_of{'certidentifierout'} => $cert_identifier );
 
     return 1;

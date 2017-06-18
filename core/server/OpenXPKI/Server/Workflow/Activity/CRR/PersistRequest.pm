@@ -60,11 +60,8 @@ sub execute
     );
     $context->param('crr_serial' => $crr_serial);
 
-    CTX('log')->log(
-        MESSAGE  => "crr for $identifier persisted",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("crr for $identifier persisted");
+ 
 }
 
 1;

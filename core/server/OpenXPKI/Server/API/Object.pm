@@ -138,11 +138,8 @@ sub generate_key {
         $command->{PARAM} = $params->{DSAPARAM};
     }
 
-    CTX('log')->log(
-        MESSAGE  => "Creating private $key_alg key with params " . Dumper $command->{PKEYOPT},
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->audit('key')->info("Creating private $key_alg key with params: " .
+        join(";", map { "$_: ".$command->{PKEYOPT}->{$_} } keys %{$command->{PKEYOPT}}));
 
     ##! 16: 'command: ' . Dumper $command
 
@@ -415,7 +412,7 @@ sub get_profile_for_cert {
 Requires a certificate identifier (IDENTIFIER) and optional ROLE.
 Returns a list of actions that the given role (defaults to current
 session role) can do with the given certificate. The return value is a
-nested hash with options available for lifecyle actions. The list of 
+nested hash with options available for lifecyle actions. The list of
 workflows is read from the roles uicontrol. The key I<certaction>
 must contain a list where each item is a hash giving label and workflow
 and optional a set of conditions to be met.
@@ -425,17 +422,17 @@ Example:
   certaction:
    - label: I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY
      workflow: certificate_privkey_export
-     condition: keyexport 
-    
+     condition: keyexport
+
    - label: I18N_OPENXPKI_UI_CERT_ACTION_RENEW
      workflow: certificate_renewal_request
      condition: issued
 
 Valid conditions are:
 
-=over 
+=over
 
-=item keyexport 
+=item keyexport
 
 A private key must exist in the datapool
 
@@ -451,9 +448,9 @@ The certificate is not revoked and within the validity interval
 
 current user is the certificate owner (see is_certificate_owner)
 
-=back 
+=back
 
-In addition to the conditional checks, the given workflow must be 
+In addition to the conditional checks, the given workflow must be
 accessible by the given role.
 
 =cut
@@ -478,34 +475,34 @@ sub get_cert_actions {
     # check if certaction list is defined for this role
     if ($conn->exists( ['uicontrol', $role, 'certaction' ])) {
         @options = $conn->get_list(['uicontrol', $role, 'certaction']);
-        ##! 32: 'Got action list for role ' . Dumper \@options     
+        ##! 32: 'Got action list for role ' . Dumper \@options
     # default uicontrol
     } elsif ($conn->exists( ['uicontrol', '_default', 'certaction'] )) {
         @options = $conn->get_list(['uicontrol', '_default', 'certaction']) unless(@options);
         ##! 32: 'Got action list for ui default ' . Dumper \@options
-    # Legacy - fallback to the default set        
+    # Legacy - fallback to the default set
     } else {
 
         ##! 32: 'No action list, fall back to default'
-        @options = ({ 
-            label => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY', 
-            workflow => 'certificate_privkey_export', 
+        @options = ({
+            label => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY',
+            workflow => 'certificate_privkey_export',
             condition => 'keyexport'
         }, {
-            label => 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW', 
+            label => 'I18N_OPENXPKI_UI_CERT_ACTION_RENEW',
             workflow => 'certificate_renewal_request',
-            condition => 'issued' 
-        }, { 
-            label => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE', 
+            condition => 'issued'
+        }, {
+            label => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE',
             workflow => 'certificate_revocation_request_v2',
-            condition => 'issued' 
-        }, { 
-            label => 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA', 
-            workflow => 'change_metadata' 
+            condition => 'issued'
+        }, {
+            label => 'I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA',
+            workflow => 'change_metadata'
         });
     }
-    
-        
+
+
     OPTION:
     foreach my $item (@options) {
         ##! 32: 'Checking Item ' . Dumper $item
@@ -513,31 +510,31 @@ sub get_cert_actions {
             my @cond = split /[\W]/, $item->{condition};
             ##! 32: 'Conditions ' . join " + ", @cond
             foreach my $rule (@cond) {
-                
+
                 if ($rule eq 'keyexport') {
                     next OPTION unless CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_id });
-                                            
+
                 } elsif ($rule eq 'issued') {
                     next OPTION  unless ($cert->{STATUS} eq 'ISSUED' or $cert->{STATUS} eq 'EXPIRED');
-                
+
                 } elsif ($rule eq 'valid') {
                     next OPTION  unless ($cert->{STATUS} eq 'ISSUED');
-                
+
                 } elsif ($rule eq 'owner') {
                     next OPTION  unless ($self->is_certificate_owner({ IDENTIFIER => $cert_id }));
                 }
-                
+
             }
         }
-        
+
         # all conditions are met, check workflow permissions
         if ($conn->exists([ 'workflow', 'def', $item->{workflow}, 'acl', $role, 'creator' ] )) {
             ##! 32: 'Adding Item ' . $item->{label}
             push @actions, { label => $item->{label}, workflow => $item->{workflow} };
         }
-        
+
     }
-    
+
     return { workflow => \@actions };
 }
 
@@ -614,11 +611,8 @@ sub get_crl {
     if ($serial) {
         $crl_key = $serial;
 
-        CTX('log')->log(
-            MESSAGE  => "Call to get_crl using deprecated parameter 'serial', please use 'crl_key'!",
-            PRIORITY => 'warn',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->warn("Call to get_crl using deprecated parameter 'serial', please use 'crl_key'!");
+
     }
 
     if ($crl_key) {
@@ -929,11 +923,8 @@ sub import_crl {
 
     $dbi->insert( into => 'crl', values => $data );
 
-    CTX('log')->log(
-        MESSAGE  => "Imported CRL for issuer $issuer_dn",
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("Imported CRL for issuer $issuer_dn");
+
 
     delete $data->{data};
     return $data;
@@ -1018,12 +1009,12 @@ sub search_cert_count {
 
     ##! 1: 'search_cert_count arguments: ' . Dumper $args
     my $params = $self->__search_cert_db_query( $args );
-    
-    # Not usefull and sometimes even dangerous 
-    foreach my $p (qw(limit offset order_by )) {  
+
+    # Not usefull and sometimes even dangerous
+    foreach my $p (qw(limit offset order_by )) {
         delete $params->{$p} if (defined $params->{$p});
     }
-    
+
     ##! 1: 'database search arguments: ' . Dumper $params
 
     my $result = CTX('dbi')->select_one(
@@ -1286,11 +1277,9 @@ sub get_private_key_for_cert {
         );
     }
 
-    CTX('log')->log(
-        MESSAGE  => "Private key export without password for certificate $identifier",
-        PRIORITY => 'warn',
-        FACILITY => 'audit',
-    ) if $nopassword;
+    if ($nopassword) {
+        CTX('log')->audit('key')->warn("Private key export without password for certificate $identifier");
+    }
 
     my $default_token = CTX('api')->get_default_token();
     ##! 4: 'identifier: ' . $identifier
@@ -1411,11 +1400,8 @@ sub get_private_key_for_cert {
         );
     }
 
-    CTX('log')->log(
-        MESSAGE  => "Private key requested for certificate $identifier",
-        PRIORITY => 'info',
-        FACILITY => 'audit',
-    );
+    CTX('log')->audit('key')->info("Private key requested for certificate $identifier");
+
 
     return { PRIVATE_KEY => $result, };
 }
@@ -1672,12 +1658,8 @@ sub get_data_pool_entry {
     # chain we assume it's ok.
     $self->__assert_current_pki_realm_within_workflow($requested_pki_realm);
 
-    CTX('log')->log(
-        MESSAGE =>
-          "Reading data pool entry [$requested_pki_realm:$namespace:$key]",
-        PRIORITY => 'debug',
-        FACILITY => 'system',
-    );
+    CTX('log')->system()->debug("Reading data pool entry [$requested_pki_realm:$namespace:$key]");
+
 
     my $where = {
         pki_realm    => $requested_pki_realm,
@@ -1693,11 +1675,8 @@ sub get_data_pool_entry {
 
     # no entry found, do not raise exception but simply return undef
     unless ($result) {
-        CTX('log')->log(
-            MESSAGE => "Requested data pool entry [$requested_pki_realm:$namespace:$key] not available",
-            PRIORITY => 'debug',
-            FACILITY => 'system',
-        );
+        CTX('log')->system()->debug("Requested data pool entry [$requested_pki_realm:$namespace:$key] not available");
+
         return;
     }
 
@@ -2141,29 +2120,29 @@ sub modify_data_pool_entry {
 =head2 get_report { NAME, FORMAT => { HASH|DATA|ALL }  }
 
 retrieve data from the report table, name is mandatory, realm is always
-the session realm. By default, only the meta-information of the report is 
-returned (report_name, description, mime_type, created). With I<FORMAT=DATA> 
+the session realm. By default, only the meta-information of the report is
+returned (report_name, description, mime_type, created). With I<FORMAT=DATA>
 only the data blob is given (might be binary!), I<FORMAT=ALL> is the same
 as HASH with the data added in the "report_value" column.
 
 =cut
 
 sub get_report {
-    
+
     my $self = shift;
     my $args = shift;
-    
+
     if (!$args->{NAME}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_REPORT_NAME_MISSING'
         );
     }
-    
+
     my $name = $args->{NAME};
-    
+
     my $retval;
     my $format = $args->{FORMAT} || '';
-    
+
 
     my $columns;
     if ($format eq 'ALL') {
@@ -2175,7 +2154,7 @@ sub get_report {
     }
 
     ##! 16: 'Search for ' . $name
-            
+
     my $report = CTX('dbi')->select_one(
         columns => $columns,
         from => 'report',
@@ -2184,40 +2163,40 @@ sub get_report {
         message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_REPORT_NOT_FOUND_IN_DB',
         params => { name => $name },
     );
-    
+
     ##! 64: 'Return value ' . Dumper $report
-    
+
     if ($format eq 'DATA') {
         return $report->{report_value};
     } else {
         return $report;
     }
-    
+
 }
 
 
 =head2 get_report_list { NAME, MAXAGE, COLUMNS }
 
-Return a list of reports, both parameters are optionsal. 
-I<NAME> is evaluated using SQL Like so it can be used to filter for a 
-name pattern. I<MAXAGE> must be a definition parsable by 
-OpenXPKI::DateTime, items older than MAXAGE or not returned. 
+Return a list of reports, both parameters are optionsal.
+I<NAME> is evaluated using SQL Like so it can be used to filter for a
+name pattern. I<MAXAGE> must be a definition parsable by
+OpenXPKI::DateTime, items older than MAXAGE or not returned.
 
 The default is to return a list of hashes with the metadata for each
 item. If you specify a list of column names, you will receive a list of
-the selected columns in given order as list of arrays! The I<COLUMNS> 
-parameter expects either an arrayref or a comma seperated string. 
+the selected columns in given order as list of arrays! The I<COLUMNS>
+parameter expects either an arrayref or a comma seperated string.
 
 =cut
 
 sub get_report_list {
-    
+
     my $self = shift;
     my $args = shift;
-    
-    
+
+
     my $where = { pki_realm => CTX('session')->get_pki_realm() };
-    
+
     if ($args->{NAME}) {
         $where->{report_name} = { -like => $args->{NAME} };
     }
@@ -2228,9 +2207,9 @@ sub get_report_list {
         });
         $where->{created} = { '>=', $maxage->epoch() };
     }
-    
+
     ##! 32: 'Search report ' . Dumper $where
-    
+
     my $col;
     if ($args->{COLUMNS}) {
         $col = $args->{COLUMNS};
@@ -2241,15 +2220,15 @@ sub get_report_list {
         ##! 32: 'Custom columns ' . Dumper $col
     } else {
         $col = [ 'report_name', 'created', 'description', 'mime_type' ];
-    }; 
-    
+    };
+
     my $sth = CTX('dbi')->select(
         from => 'report',
         order_by => [ 'report_name' ],
         columns  => $col,
         where => $where,
     );
-    
+
     my @items;
     if ($args->{COLUMNS}) {
         while (my @item = $sth->fetchrow_array) {
@@ -2281,11 +2260,8 @@ sub control_watchdog {
             );
         }
 
-        CTX('log')->log(
-            MESSAGE => "Watchdog termination requested via API",
-            PRIORITY => 'info',
-            FACILITY => 'system',
-        );
+        CTX('log')->system()->info("Watchdog termination requested via API");
+
 
         CTX('watchdog')->terminate();
 

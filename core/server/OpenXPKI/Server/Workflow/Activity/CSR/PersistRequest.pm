@@ -189,11 +189,8 @@ sub execute
 
     $context->param('csr_serial' => $csr_serial);
 
-    CTX('log')->log(
-        MESSAGE  => "persisted csr for $subject with csr_serial $csr_serial",
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("persisted csr for $subject with csr_serial $csr_serial");
+ 
 }
 
 1;

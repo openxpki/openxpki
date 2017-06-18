@@ -42,11 +42,8 @@ sub execute
 
     # TODO - add SANs
 
-    CTX('log')->log(
-        MESSAGE  => "generated pkcs#10 request for $subject",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("generated pkcs#10 request for $subject");
+ 
 
     $context->param($target_key => $pkcs10);
 

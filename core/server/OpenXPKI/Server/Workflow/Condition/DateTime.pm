@@ -58,18 +58,12 @@ sub evaluate
             : $dt_now;
             
         if ($dt_probe <= $dt_notbefore) {
-            CTX('log')->log(
-                MESSAGE  => "DateTime condition failed $key $dt_probe < $dt_notbefore",
-                PRIORITY => 'info',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->info("DateTime condition failed $key $dt_probe < $dt_notbefore");
+ 
             condition_error ("$key $dt_probe is less then notbefore $dt_notbefore");        
         }
-        CTX('log')->log(
-            MESSAGE  => "DateTime condition passed $key $dt_probe > $dt_notbefore",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );                
+        CTX('log')->application()->info("DateTime condition passed $key $dt_probe > $dt_notbefore");
+                 
     }
     
     if (defined $notafter) {  
@@ -82,19 +76,13 @@ sub evaluate
             : $dt_now;
         
         if ($dt_probe >= $dt_notafter) {
-            CTX('log')->log(
-                MESSAGE  => "DateTime condition failed - $key $dt_probe > $dt_notafter",
-                PRIORITY => 'debug',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->debug("DateTime condition failed - $key $dt_probe > $dt_notafter");
+ 
             condition_error ("$key $dt_probe is larger then notafter $dt_notafter");        
         }
             
-        CTX('log')->log(
-            MESSAGE  => "DateTime condition passed $key $dt_probe < $dt_notafter",
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );        
+        CTX('log')->application()->debug("DateTime condition passed $key $dt_probe < $dt_notafter");
+         
     }
     
     return 1;

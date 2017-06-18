@@ -51,11 +51,8 @@ sub _validate {
     
     if (!grep(/\A$key_alg\z/, @{$algs})) {
         ##! 8: "KeyParam validation failed on algo $key_alg"
-        CTX('log')->log(
-            MESSAGE  => "KeyParam validation failed on algo $key_alg",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("KeyParam validation failed on algo $key_alg");
+ 
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED');
     }
     
@@ -72,11 +69,8 @@ sub _validate {
         ##! 32: "Validate param $param, $val, " . Dumper \@expect 
         if (!grep(/$val/, @expect)) {
             ##! 32: 'Failed on ' . $val
-            CTX('log')->log(
-                MESSAGE  => "KeyParam validation failed on $param with value $val",
-                PRIORITY => 'error',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->error("KeyParam validation failed on $param with value $val");
+ 
             validation_error("I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED ($param)");
         }
     }
@@ -84,21 +78,15 @@ sub _validate {
     my $enc_algs = CTX('api')->get_key_enc({ PROFILE => $cert_profile, NOHIDE => 1 });
     if ($enc_alg && !grep(/\A$enc_alg\z/, @{$enc_algs})) {
         ##! 32: 'Failed on ' . $enc_alg
-        CTX('log')->log(
-            MESSAGE  => "KeyParam validation failed on enc_alg with value $enc_alg",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("KeyParam validation failed on enc_alg with value $enc_alg");
+ 
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED (enc_alg)");
     }
     
 
     ##! 1: 'Validation succeeded'
-    CTX('log')->log(
-        MESSAGE  => "KeyParam validation succeeded",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("KeyParam validation succeeded");
+ 
         
     return 1;
 }

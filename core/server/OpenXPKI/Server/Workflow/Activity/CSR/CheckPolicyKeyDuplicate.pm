@@ -56,11 +56,8 @@ sub execute
         my $ser = OpenXPKI::Serialization::Simple->new();
         $context->param('check_policy_key_duplicate', $ser->serialize(\@identifier) );
                 
-        CTX('log')->log(
-            MESSAGE => "Policy key duplicate check failed, found certs " . Dumper \@identifier,
-            PRIORITY => 'info',
-            FACILITY => [ 'application', ],
-        );
+        CTX('log')->application()->info("Policy key duplicate check failed, found certs " . Dumper \@identifier);
+ 
                   
     } else {
         

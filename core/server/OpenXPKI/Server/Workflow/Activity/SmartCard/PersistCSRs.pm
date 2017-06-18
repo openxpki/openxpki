@@ -107,11 +107,8 @@ sub execute {
             $cert_escrow_handle_context->setValueForKey( $csr_serial => $csr_data->{'escrow_key_handle'} );
         }
 
-        CTX('log')->log(
-            MESSAGE => "SmartCard persisted csrs serials " .join(", ",@csr_serials),
-            PRIORITY => 'info',
-            FACILITY => 'application'
-        );
+        CTX('log')->application()->info("SmartCard persisted csrs serials " .join(", ",@csr_serials));
+ 
     }
 
     return;

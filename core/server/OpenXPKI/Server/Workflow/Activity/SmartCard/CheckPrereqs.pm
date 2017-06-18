@@ -38,11 +38,8 @@ sub execute {
     # This is the case when using this activity from the admin wfl   
     my $wf_types = $self->param('wf_types');    
     if ($wf_types) {
-        CTX('log')->log(
-            MESSAGE => 'SmartCard will search for workflows of type : ' . $wf_types,
-            PRIORITY => 'info',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->info('SmartCard will search for workflows of type : ' . $wf_types);
+ 
         my @wf_type_list = split /,/, $wf_types if ($wf_types);        
         $params{WORKFLOW_TYPES} = \@wf_type_list;
     }
@@ -63,11 +60,8 @@ sub execute {
 
     $context->param('_workflows', $result->{WORKFLOWS});
     if ($wf_types) {
-        CTX('log')->log(
-            MESSAGE => 'SmartCard found existing workflows: ' . Dumper $result->{WORKFLOWS},
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug('SmartCard found existing workflows: ' . Dumper $result->{WORKFLOWS});
+ 
     }
 
 	# set cert ids in context
@@ -214,11 +208,8 @@ sub execute {
         $context->param('max_validity' => 0);
     }
 
-    CTX('log')->log(
-        MESSAGE => 'SmartCard status: ' . $result->{SMARTCARD}->{status},
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );   
+    CTX('log')->application()->info('SmartCard status: ' . $result->{SMARTCARD}->{status});
+    
 
 	##! 1: 'Leaving Initialize::execute()'
 	return 1;

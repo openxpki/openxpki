@@ -84,11 +84,8 @@ sub _render_template_file {
     
     ##! 16: 'Load template: ' . $filename
     if (! -e $filename  ) {
-        CTX('log')->log(
-            MESSAGE  => "Template file missing $filename  ",
-            PRIORITY => "warn",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->warn("Template file missing $filename  ");
+ 
         return undef;
     }
     
@@ -98,11 +95,8 @@ sub _render_template_file {
     
     my $tt = OpenXPKI::Template->new();    
     if (!$tt->process(\$template, $vars, \$output)) {
-        CTX('log')->log(
-            MESSAGE  => "Error parsing templatefile ($filename): " . $tt->error(),
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error("Error parsing templatefile ($filename): " . $tt->error());
+ 
         return; 
     }
     
@@ -129,11 +123,8 @@ sub _render_template {
     
     my $tt = OpenXPKI::Template->new();        
     if (!$tt->process(\$template, $vars, \$output)) {
-        CTX('log')->log(
-            MESSAGE  => "Error parsing template ($template): " . $tt->error(),
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error("Error parsing template ($template): " . $tt->error());
+ 
         return; 
     }
     
