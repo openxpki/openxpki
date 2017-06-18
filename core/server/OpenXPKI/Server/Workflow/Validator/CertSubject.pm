@@ -7,19 +7,19 @@ use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 
-## TODO: This currently not in use and therefor untested! 
+## TODO: This currently not in use and therefor untested!
 
 sub validate {
     my ( $self, $wf, $profile, $style, $subject ) = @_;
 
     ## prepare the environment
     my $context = $wf->context();
-    my $api     = CTX('api');    
-    
+    my $api     = CTX('api');
+
     return if (not defined $profile);
     return if (not defined $style);
     return if (not defined $subject);
-    
+
     my @errors;
 
     ## check correctness of subject
@@ -36,22 +36,22 @@ sub validate {
 
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_MATCH_INVALID_FORMAT');
     }
- 
-    my $always = CTX('config')->get_hash(['profile', $profile, , 'style', $style, 'always');
- 
+
+    my $always = CTX('config')->get_hash(['profile', $profile, , 'style', $style, 'always']);
+
     foreach my $label (keys %{$always}) {
         my $regex = $always->{$label};
         if (not $subject =~ m{$regex}xs) {
-            push @errors, { label => $label, regex => $regex, subject => $subject } ];
+            push @errors, { label => $label, regex => $regex, subject => $subject };
         }
     }
 
-    my $never = CTX('config')->get_hash(['profile', $profile, , 'style', $style, 'never');
- 
+    my $never = CTX('config')->get_hash(['profile', $profile, , 'style', $style, 'never']);
+
     foreach my $label (keys %{$never}) {
         my $regex = $never->{$label};
         if (not $subject !~ m{$regex}xs) {
-            push @errors, { label => $label, regex => $regex, subject => $subject } ];
+            push @errors, { label => $label, regex => $regex, subject => $subject };
         }
     }
     
