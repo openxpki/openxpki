@@ -20,7 +20,6 @@ application logic
 ################################################################################
 # Attributes
 #
-has backend => ( is => 'ro', does => 'OpenXPKI::Server::Session::DriverRole' );
 has _is_persisted => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
 has _is_empty     => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
 
@@ -118,36 +117,6 @@ sub get_attributes {
     }
 
     return { map { $_ => $self->$_ } grep { $self->meta->find_attribute_by_name($_)->has_value($self) } @names };
-}
-
-=head2 check_attributes
-
-Checks the given HashRef of attribute names/values to see if they are valid
-session attributes (i.e. attributes specified in C<OpenXPKI::Server::Session::Data>).
-
-Throws an exception on unknown attributes.
-
-B<Parameters>
-
-=over
-
-=item * $attrs - attribute names and values (I<HashRef>)
-
-=back
-
-=cut
-sub check_attributes {
-    my ($self, $attrs) = @_;
-    my %all_attrs = ( map { $_ => 1 } @{ $self->get_attribute_names } );
-
-    my $id = $attrs->{id} // undef;
-
-    for my $name (keys %{ $attrs }) {
-        OpenXPKI::Exception->throw(
-            message => "Unknown attribute in session data",
-            params => { $id ? (session_id => $id) : (), attr => $name },
-        ) unless $all_attrs{$name};
-    }
 }
 
 =head2 secret

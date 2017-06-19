@@ -226,17 +226,12 @@ sub resume {
     my $driver = $self->driver;
 
     # Load data from backend (return if session was not found)
-    my $data_hash = $driver->load($id);
-    if (not $data_hash) {
+    my $data = $driver->load($id);
+    if (not $data) {
         $self->log->info("Session #$id is unknown (maybe expired and purged from backend)", "auth");
         return;
     }
-    # Provide understandable error message on unknown attributes
-    OpenXPKI::Server::Session::Data->check_attributes($data_hash);
-    # Store data object
-    $self->data(
-        OpenXPKI::Server::Session::Data->new( %{ $data_hash } )
-    );
+    $self->data($data);
 
     if ($self->is_expired) {
         $self->log->info("Session #$id is expired", "auth");
@@ -257,7 +252,7 @@ lead to exceptions.
 sub persist {
     my $self = shift;
     $self->data->modified(time);        # update timestamp
-    $self->driver->save($self->data->get_attributes);   # implemented by the class that consumes this role
+    $self->driver->save($self->data);   # implemented by the class that consumes this role
     $self->data->_is_persisted(1);
     $self->log->info("Session #".$self->id." persisted", "auth");
 }

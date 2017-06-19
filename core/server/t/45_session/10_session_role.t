@@ -99,6 +99,6 @@ throws_ok {
             log =>  Log::Log4perl->get_logger(),
         )
         ->resume(25);
-} qr/incomplete/i, "complain about wrong results from driver";
+} qr/validation failed/i, "complain about wrong results from driver";
 
 1;

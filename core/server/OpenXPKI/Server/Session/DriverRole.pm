@@ -7,7 +7,6 @@ use JSON;
 
 # Project modules
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Session::Data;
 
 =head1 NAME
 
@@ -115,7 +114,6 @@ sub thaw {
     $frozen =~ s/^JSON://;
 
     my $data = decode_json($frozen);
-    OpenXPKI::Server::Session::Data->check_attributes($data);
     return $data;
 }
 

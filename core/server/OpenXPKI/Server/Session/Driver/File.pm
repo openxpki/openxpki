@@ -58,10 +58,12 @@ sub BUILD {
 
 # DBI compliant driver name
 sub save {
-    my ($self, $data_hash) = @_;
-    ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data_hash->{$_} } sort keys %$data_hash)
+    my ($self, $data) = @_;
+    my $data_hash = $data->get_attributes; # HashRef
+    ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data->{$_} } sort keys %$data_hash)
 
-    my $filepath = $self->_make_filepath($data_hash->{id});
+    my $id = $data_hash->{id} or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'id' is not set");
+    my $filepath = $self->_make_filepath($id);
 
     my $mode = O_WRONLY | O_TRUNC;
     $mode |= O_EXCL | O_CREAT unless -e $filepath;
@@ -104,9 +106,8 @@ sub load {
     local $INPUT_RECORD_SEPARATOR;     # long version of $/
     my $frozen = <$fh>;
 
-    my $data = $self->thaw($frozen);
-
-    return $data;
+    my $data_hash = $self->thaw($frozen);
+    return OpenXPKI::Server::Session::Data->new( %{ $data_hash } );
 }
 
 sub delete_all_before {

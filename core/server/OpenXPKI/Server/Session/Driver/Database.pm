@@ -19,6 +19,7 @@ available methods.
 use OpenXPKI::Server::Init;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
+use OpenXPKI::Server::Session::Data;
 
 ################################################################################
 # Attributes
@@ -36,13 +37,14 @@ has dbi => (
 
 # DBI compliant driver name
 sub save {
-    my ($self, $data_hash) = @_;
+    my ($self, $data) = @_;
+    my $data_hash = $data->get_attributes; # HashRef
     ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data_hash->{$_} } sort keys %$data_hash)
 
-    my $created     = delete $data_hash->{created};
-    my $modified    = delete $data_hash->{modified};
-    my $ip_address  = delete $data_hash->{ip_address};
-    my $id          = delete $data_hash->{id};
+    my $id          = delete $data_hash->{id}         or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'id' is not set");
+    my $created     = delete $data_hash->{created}    or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'created' is not set");
+    my $modified    = delete $data_hash->{modified}   or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'modified' is not set");
+    my $ip_address  = delete $data_hash->{ip_address} or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'ip_address' is not set");
 
     $self->dbi->merge_and_commit(
         into => 'session',
@@ -81,7 +83,7 @@ sub load {
         % { $self->thaw($db->{data}) },
     };
 
-    return $data_hash;
+    return OpenXPKI::Server::Session::Data->new( %{ $data_hash } );
 }
 
 sub delete_all_before {
