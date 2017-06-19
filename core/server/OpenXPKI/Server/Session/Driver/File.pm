@@ -59,7 +59,7 @@ sub BUILD {
 # DBI compliant driver name
 sub save {
     my ($self, $data) = @_;
-    ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data->{$_} } sort keys %$data_hash)
+    ##! 8: "saving session #".$data->id
 
     my $id = $data->id or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'id' is not set");
     my $filepath = $self->_make_filepath($id);
@@ -106,6 +106,20 @@ sub load {
     my $frozen = <$fh>;
 
     return OpenXPKI::Server::Session::Data->new->thaw($frozen);
+}
+
+sub delete {
+    my ($self, $data) = @_;
+    ##! 8: "deleting session #".$data->id
+
+    my $id = $data->id or OpenXPKI::Exception->throw(message => "Cannot delete session: value 'id' is not set");
+    my $filepath = $self->_make_filepath($id);
+    return unless -f $filepath;
+    unlink $filepath
+        or OpenXPKI::Exception->throw (
+            message => 'Failed to delete session data file',
+            params  => { file => $filepath, error => $! }
+        );
 }
 
 sub delete_all_before {

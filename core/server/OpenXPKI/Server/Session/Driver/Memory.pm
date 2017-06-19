@@ -22,6 +22,8 @@ sub load {
     OpenXPKI::Exception->throw(message => __PACKAGE__." does not support persistant sessions");
 }
 
+sub delete { 1 }
+
 sub delete_all_before { 1 }
 
 __PACKAGE__->meta->make_immutable;

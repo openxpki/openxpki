@@ -38,12 +38,12 @@ has dbi => (
 # DBI compliant driver name
 sub save {
     my ($self, $data) = @_;
-    ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data_hash->{$_} } sort keys %$data_hash)
+    ##! 8: "saving session #".$data->id
 
     my $id          = $data->id         or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'id' is not set");
     my $created     = $data->created    or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'created' is not set");
     my $modified    = $data->modified   or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'modified' is not set");
-    my $ip_address  = $data->ip_address or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'ip_address' is not set");
+    my $ip_address  = $data->ip_address; # undef allowed
 
     $self->dbi->merge_and_commit(
         into => 'session',
@@ -80,9 +80,24 @@ sub load {
             id         => $db->{session_id},
             created    => $db->{created},
             modified   => $db->{modified},
-            ip_address => $db->{ip_address},
+            $db->{ip_address} ? (ip_address => $db->{ip_address}) : (),
         )
         ->thaw($db->{data});
+}
+
+sub delete {
+    my ($self, $data) = @_;
+    ##! 8: "deleting session #".$data->id
+
+    my $id = $data->id or OpenXPKI::Exception->throw(message => "Cannot delete session: value 'id' is not set");
+
+    $self->dbi->delete(
+        from => 'session',
+        where => {
+            session_id  => $id,
+        },
+    )
+    or OpenXPKI::Exception->throw(message => "Failed to delete session from database");
 }
 
 sub delete_all_before {

@@ -75,15 +75,27 @@ sub driver_ok {
             ok not $temp->resume($session->id);
         } "fail resuming an expired session";
 
-        my $session3;
-        lives_ok {
-            $session3 = OpenXPKI::Server::SessionHandler->new(%{ $args }, lifetime => 1)->create;
-            $session3->purge_expired;
+        lives_and {
+            my $temp = OpenXPKI::Server::SessionHandler->new(%{ $args }, lifetime => 1)->create;
+            $temp->purge_expired;
+            ok not $temp->driver->load($session->id);
         } "purge expired sessions from backend";
 
+        # delete a session
+        my $session3;
         lives_and {
-            ok not $session3->driver->load($session->id);
-        } "fail loading a purged session";
+            $session3 = OpenXPKI::Server::SessionHandler->new(%{ $args })->create;
+            $session3->data->user("test");
+            $session3->persist;
+            my $temp = OpenXPKI::Server::SessionHandler->new(%{ $args })->resume($session3->id);
+            is $temp->data->user, $session3->data->user;
+        } "delete test: create and persist session";
+
+        lives_and {
+            my $id = $session3->id;
+            $session3->delete;
+            ok not OpenXPKI::Server::SessionHandler->new(%{ $args })->resume($id);
+        } "delete test: delete session";
 
     }
 }

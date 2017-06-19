@@ -11,6 +11,7 @@ has load_called => (is => 'rw', isa => 'Bool', default => 0 );
 
 sub save { shift->save_called(1) }
 sub load { shift->load_called(1); return {} }
+sub delete {  }
 sub delete_all_before {  }
 
 __PACKAGE__->meta->make_immutable;
@@ -35,7 +36,7 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($OFF);
 
 
-plan tests => 11;
+plan tests => 10;
 
 
 use_ok "OpenXPKI::Server::SessionHandler";
@@ -91,7 +92,7 @@ lives_and {
     my $session3 = OpenXPKI::Server::SessionHandler->new(type => "TestDriver")->create;
     $session3->data->thaw($frozen2);
 
-    cmp_deeply $session3->data_as_hashref, { user => $session->data->user };
+    cmp_deeply $session3->data_as_hashref, { user => $session->data->user, created => ignore() };
 } "thaw data (only 'user') into session 3";
 
 # Persist (virtually in our test case)
@@ -101,10 +102,6 @@ lives_and {
 } "persist session / call _save()";
 
 throws_ok {
-    $session->data->user("foxi");
-} qr/persist/i, "prevent changing attributes after session was persisted";
-
-throws_ok {
     # our test driver just returns an empty hash in _load()
     OpenXPKI::Server::SessionHandler
         ->new(
@@ -112,6 +109,6 @@ throws_ok {
             log =>  Log::Log4perl->get_logger(),
         )
         ->resume(25);
-} qr/validation failed/i, "complain about wrong results from driver";
+} qr/invalid/i, "complain about wrong results from driver";
 
 1;

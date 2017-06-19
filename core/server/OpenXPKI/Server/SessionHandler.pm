@@ -11,6 +11,7 @@ use OpenXPKI::Server::Session::Data;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::MooseParams;
 
 =head1 NAME
 
@@ -94,6 +95,7 @@ has data => (
         data_as_hashref => "get_attributes",
     },
     predicate => "is_initialized",
+    clearer => "clear_data",
 );
 
 sub _build_driver {
@@ -231,6 +233,15 @@ sub resume {
         $self->log->info("Session #$id is unknown (maybe expired and purged from backend)", "auth");
         return;
     }
+
+    # Check return type
+    OpenXPKI::Exception->throw(
+        message => "Session backend driver returned invalid data",
+        params => { driver => ref $driver },
+    ) unless (blessed($data) and $data->isa('OpenXPKI::Server::Session::Data'));
+
+    # Store data
+    $data->is_dirty(0);
     $self->data($data);
 
     if ($self->is_expired) {
@@ -244,17 +255,42 @@ sub resume {
 
 =head2 persist
 
-Saves the given session to the backend storage and marks it as "persisted".
-Changes to attributes are not allowed anymore on a persisted session and will
-lead to exceptions.
+Saves the session to the backend storage if any session data has changed.
+
+B<Named parameters>
+
+=over
+
+=item * force - C<Bool> force writing session even if nothing has changed. This
+will update the I<modified> timestamp of the stored session.
+
+=back
 
 =cut
 sub persist {
-    my $self = shift;
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        force => { isa => 'Bool', optional => 1 },
+    );
+    return unless ($self->data->is_dirty or $params{force});
     $self->data->modified(time);        # update timestamp
     $self->driver->save($self->data);   # implemented by the class that consumes this role
-    $self->data->_is_persisted(1);
+    $self->data->is_dirty(0);
     $self->log->info("Session #".$self->id." persisted", "auth");
+}
+
+=head2 delete
+
+Deletes the session data from the backend storage and then from this session
+object, so that it cannot be access anymore.
+
+=cut
+sub delete {
+    my ($self) = @_;
+    return unless $self->is_initialized;
+    $self->driver->delete($self->data);   # implemented by the class that consumes this role
+    my $id = $self->id;
+    $self->clear_data;
+    $self->log->info("Session #".$id." deleted", "auth");
 }
 
 =head2 purge_expired

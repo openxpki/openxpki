@@ -20,15 +20,14 @@ application logic
 ################################################################################
 # Attributes
 #
-has _is_persisted => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
-has _is_empty     => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
+has is_dirty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
+has _is_empty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
 
 # handler that gets triggered on attribute changes
 sub _attr_change {
     my ($self, $val, $old_val) = @_;
-    OpenXPKI::Exception->throw(message => "Attempt to modify session data after it has been persisted")
-        if $self->_is_persisted;
     $self->_is_empty(0);
+    $self->is_dirty(1);
 }
 
 # automatically set for new (empty) sessions
@@ -42,6 +41,8 @@ has id => (
 
 # create several Moose attributes
 my %ATTR_TYPES = (
+    created              => { isa => 'Int', default => sub { time } },
+    modified             => { isa => 'Int', }, # will be set before session is persisted
     user                 => { isa => 'Str', },
     role                 => { isa => 'Str', },
     pki_realm            => { isa => 'Str', },
@@ -50,8 +51,7 @@ my %ATTR_TYPES = (
     language             => { isa => 'Str', },
     status               => { isa => 'Str', },
     ip_address           => { isa => 'Str', },
-    created              => { isa => 'Int', },
-    modified             => { isa => 'Int', },
+    ui_session           => { isa => 'Str', },
     _secrets => {
         # we do not use "default => sub { {} }" as this would confuse code that
         # detects if this Moose attribute was set.
@@ -70,6 +70,7 @@ for my $name (keys %ATTR_TYPES) {
         %$type_def,
         is => 'rw',
         trigger => sub { shift->_attr_change },
+        clearer => "clear_$name",
     );
 }
 
@@ -93,6 +94,25 @@ sub get_attribute_names {
 }
 
 =head1 METHODS
+
+=head2 Session attributes
+
+The following methods are available to access the session attributes:
+
+    getter/setter           clearer
+    --------------------------------------------------
+    user                    clear_user
+    role                    clear_role
+    pki_realm               clear_pki_realm
+    challenge               clear_challenge
+    authentication_stack    clear_authentication_stack
+    language                clear_language
+    status                  clear_status
+    ip_address              clear_ip_address
+    created                 clear_created
+    modified                clear_modified
+    ui_session              clear_ui_session
+
 
 =head2 get_attributes
 

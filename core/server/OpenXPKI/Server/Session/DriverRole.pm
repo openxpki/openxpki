@@ -20,6 +20,7 @@ implementation has to consume
 #
 requires 'save';              # argument: $session, should write the attributes to the storage
 requires 'load';              # argument: $id, should load data from storage and return a HashRef
+requires 'delete';            # argument: $session, should delete the session from the storage
 requires 'delete_all_before'; # argument: $epoch, should delete all sessions which were created before the given timestamp
 
 ################################################################################
@@ -61,6 +62,20 @@ B<Parameters>
 =item * $id - ID of the session whose data is to be loaded
 
 =back
+
+=head2 delete
+
+Deletes the session data from the backend storage.
+
+B<Parameters>
+
+=over
+
+=item * $session - a L<OpenXPKI::Server::Session::Data> object
+
+=back
+
+=cut
 
 =head2 delete_all_before
 
