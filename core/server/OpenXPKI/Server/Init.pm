@@ -78,11 +78,8 @@ sub init {
     my $keys = shift;
 
     # TODO Rework this: we create a temporary in-memory session to allow access to realm parts of the config
-    OpenXPKI::Server::Context::setcontext({
-        'session' => OpenXPKI::Server::SessionHandler->new(
-            type => "Memory",
-            log => OpenXPKI::Server::Log->new(CONFIG => undef)->application,
-        )
+    OpenXPKI::Server::Context::setcontext({ 'session' =>
+        OpenXPKI::Server::SessionHandler->new(type => "Memory")->create()
     }) unless OpenXPKI::Server::Context::hascontext('session');
 
     log_wrapper("OpenXPKI initialization")

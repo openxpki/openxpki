@@ -46,7 +46,7 @@ lives_ok {
     $session = OpenXPKI::Server::SessionHandler->new(
         type => "TestDriver",
         log => Log::Log4perl->get_logger(),
-    );
+    )->create;
 } "create session 1";
 
 # Test single attribute

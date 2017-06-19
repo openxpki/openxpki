@@ -57,7 +57,7 @@ use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
+use OpenXPKI::Server::SessionHandler;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
 
@@ -263,10 +263,7 @@ sub init_server {
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
 
     # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
-    my $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.lifetime"),
-    });
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
     # set PKI realm after init() as various init procedures overwrite the realm
     $session->set_pki_realm($self->config_writer->realms->[0]);

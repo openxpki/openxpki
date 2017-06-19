@@ -20,7 +20,7 @@ OpenXPKI::Server::SessionHandler - Factory to create, persist and resume session
 
 To start a new session:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     $session->data->pki_realm("ca-one");
     ...
     $session->persist;
@@ -32,11 +32,13 @@ To resume an existing session:
 
 Or if you want to specify config and logger explicitely:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(
-        type => "Database",
-        config => { dbi => $dbi },
-        log => OpenXPKI::Server::Log->new,
-    );
+    my $session = OpenXPKI::Server::SessionHandler
+        ->new(
+            type => "Database",
+            config => { dbi => $dbi },
+            log => OpenXPKI::Server::Log->new,
+        )
+        ->create;
     ...
 
 =cut
@@ -87,8 +89,6 @@ has lifetime => (
 has data => (
     is => 'rw',
     isa => 'OpenXPKI::Server::Session::Data',
-    lazy => 1,
-    default => sub { OpenXPKI::Server::Session::Data->new },
     handles => {
         id => "id",
         data_as_hashref => "get_attributes",
@@ -185,12 +185,24 @@ persisted session was resumed.
 
 #######################################
 
+=head2 create
+
+Creates a new sesssion.
+
+=cut
+sub create {
+    my ($self) = @_;
+    $self->data(OpenXPKI::Server::Session::Data->new);
+    return $self;
+}
+
 =head2 resume
 
 Resume the specified session by loading its data from the backend storage.
 
-Returns 1 if the session was successfully resumed or 0 otherwise (i.e. expired
-session or unknown ID).
+Returns the object reference to C<OpenXPKI::Server::SessionHandler> if the
+session was successfully resumed or undef otherwise (i.e. expired session or
+unknown ID).
 
 B<Parameters>
 
@@ -221,17 +233,10 @@ sub resume {
     }
     # Make sure all attributes are correct
     OpenXPKI::Server::Session::Data->check_attributes($data_hash, 1);
-
-    my $data = OpenXPKI::Server::Session::Data->new( %{ $data_hash } );
-
-    # Check return type
-    OpenXPKI::Exception->throw(
-        message => "Session backend driver did not return session data",
-        params => { driver => ref $driver },
-    ) unless (blessed($data) and $data->isa('OpenXPKI::Server::Session::Data'));
-
     # Store data object
-    $self->data($data);
+    $self->data(
+        OpenXPKI::Server::Session::Data->new( %{ $data_hash } )
+    );
 
     if ($self->is_expired) {
         $self->log->info("Session #$id is expired", "auth");
@@ -239,7 +244,7 @@ sub resume {
     }
 
     $self->log->info("Session #".$self->id." resumed", "auth");
-    return 1;
+    return $self;
 }
 
 =head2 persist

@@ -20,6 +20,7 @@ use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server;
+use OpenXPKI::Server::SessionHandler;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::SCEP::Command;
 use OpenXPKI::Serialization::Simple;
@@ -216,21 +217,9 @@ sub __init_encryption_alg : PRIVATE {
 }
 
 sub __init_session : PRIVATE {
-
-    ##! 4: 'start'
-
-    my $self  = shift;
-    my $ident = ident $self;
-    my $arg   = shift;
-
-    my $session = undef;
-
-    $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
+    OpenXPKI::Server::Context::setcontext({
+        'session' => OpenXPKI::Server::SessionHandler->new(load_config => 1)->create
     });
-
-    OpenXPKI::Server::Context::setcontext( { 'session' => $session } );
 }
 
 sub __init_pki_realm : PRIVATE {

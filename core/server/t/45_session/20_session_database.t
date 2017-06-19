@@ -38,7 +38,7 @@ sub driver_ok {
         ## create new session
         my $session;
         lives_ok {
-            $session = OpenXPKI::Server::SessionHandler->new(%{ $args });
+            $session = OpenXPKI::Server::SessionHandler->new(%{ $args })->create;
         } "create session";
 
         # set all attributes
@@ -76,7 +76,7 @@ sub driver_ok {
 
         my $session3;
         lives_ok {
-            $session3 = OpenXPKI::Server::SessionHandler->new(%{ $args }, lifetime => 1);
+            $session3 = OpenXPKI::Server::SessionHandler->new(%{ $args }, lifetime => 1)->create;
             $session3->purge_expired;
         } "purge expired sessions from backend";
 

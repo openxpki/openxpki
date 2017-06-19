@@ -73,7 +73,7 @@ use strict;
 use English;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Session;
+use OpenXPKI::Server::SessionHandler;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use Proc::ProcessTable;
@@ -711,14 +711,8 @@ sub __check_session {
         return if $session;
     }
 
-    my $directory = CTX('config')->get("system.server.session.directory");
-    my $lifetime  = CTX('config')->get("system.server.session.lifetime");
-
     ##! 4: "create new session dir: $directory, lifetime: $lifetime "
-    $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => $directory,
-        LIFETIME  => $lifetime,
-    });
+    $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
     ##! 4: sprintf(" session %s created" , $session->get_id())
 }

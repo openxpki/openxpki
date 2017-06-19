@@ -25,7 +25,7 @@ use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server;
-use OpenXPKI::Server::Session;
+use OpenXPKI::Server::SessionHandler;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::Default::Command;
 use Log::Log4perl::MDC;
@@ -172,7 +172,7 @@ sub __is_valid_message : PRIVATE {
     }
 
     CTX('log')->system()->warn('Invalid message '.$message_name.' recevied in state ' . $state_of{$ident});
- 
+
     ##! 16: 'message is NOT valid'
     return;
 }
@@ -218,10 +218,7 @@ sub __handle_NEW_SESSION : PRIVATE {
     Log::Log4perl::MDC->put('sid', undef);
 
     ##! 4: "new session"
-    my $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
-    });
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
 
     if (exists $msg->{LANGUAGE}) {
         ##! 8: "set language"
@@ -233,14 +230,9 @@ sub __handle_NEW_SESSION : PRIVATE {
 
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
 
-    Log::Log4perl::MDC->put('sid', substr($session->get_id(),0,4));
-
     CTX('log')->system()->info('New session created');
- 
 
-    $self->__change_state({
-        STATE => 'SESSION_ID_SENT',
-    });
+    $self->__change_state({ STATE => 'SESSION_ID_SENT', });
 
     return {
         SESSION_ID => $session->get_id(),
@@ -255,29 +247,25 @@ sub __handle_CONTINUE_SESSION {
 
     my $session;
 
-    Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
-
     ##! 4: "try to continue session"
     eval {
-        $session = OpenXPKI::Server::Session->new({
-            DIRECTORY => CTX('config')->get("system.server.session.directory"),
-            LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
-            ID        => $msg->{SESSION_ID}
-        });
+        $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
+        $session->resume($msg->{SESSION_ID});
     };
     if ($EVAL_ERROR) {
-    my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED';
-    if (my $exc = OpenXPKI::Exception->caught()) {
-        OpenXPKI::Exception->throw (
-            message  => $error,
-            params   => {ID => $msg->{SESSION_ID}},
-            children => [ $exc ]);
-    } else {
-        OpenXPKI::Exception->throw(
-        message => $error,
-        params  => {ID => $msg->{SESSION_ID}}
-        );
-    }
+        my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED';
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            OpenXPKI::Exception->throw (
+                message  => $error,
+                params   => {ID => $msg->{SESSION_ID}},
+                children => [ $exc ]
+            );
+        } else {
+            OpenXPKI::Exception->throw(
+                message => $error,
+                params  => {ID => $msg->{SESSION_ID}}
+            );
+        }
     }
     if (defined $session) {
 
@@ -341,10 +329,7 @@ sub __handle_RESET_SESSIONID: PRIVATE {
     my $ident   = ident $self;
     my $msg     = shift;
 
-    my $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
-    });
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
 
     my $data = CTX('session')->{session}->dataref();
     map {  if ($_ !~ /_SESSION/) { $session->{session}->param($_ => $data->{$_}); } } keys %{$data};
@@ -680,7 +665,7 @@ sub __handle_LOGOUT : PRIVATE {
 
     ##! 8: "logout received - terminate session " . $old_session->get_id(),
     CTX('log')->system()->debug('Terminating session ' . $old_session->get_id());
- 
+
 
     OpenXPKI::Server::Context::killsession();
 
@@ -888,7 +873,7 @@ sub __change_state : PRIVATE {
 
     ##! 4: 'changing state from ' . $state_of{$ident} . ' to ' . $new_state
     CTX('log')->system()->debug('Changing session state from ' . $state_of{$ident} . ' to ' . $new_state);
- 
+
     $state_of{$ident} = $new_state;
     # save the new state in the session
     if (OpenXPKI::Server::Context::hascontext('session')) {
