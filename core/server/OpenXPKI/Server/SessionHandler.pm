@@ -9,32 +9,35 @@ use Scalar::Util qw( blessed );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Session::Data;
 use OpenXPKI::Debug;
+use OpenXPKI::Server::Log;
+use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
-OpenXPKI::Server::SessionHandler - Create, persist and resume sessions
+OpenXPKI::Server::SessionHandler - Factory to create, persist and resume sessions
 
 =head1 SYNOPSIS
 
 To start a new session:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(
-        type => "Database",
-        config => { dbi => $dbi },
-        log => OpenXPKI::Server::Log->new,
-    );
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
     $session->data->pki_realm("ca-one");
     ...
     $session->persist;
 
 To resume an existing session:
 
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
+    $session->resume($id);
+
+Or if you want to specify config and logger explicitely:
+
     my $session = OpenXPKI::Server::SessionHandler->new(
         type => "Database",
         config => { dbi => $dbi },
         log => OpenXPKI::Server::Log->new,
     );
-    $session->resume($id);
+    ...
 
 =cut
 
@@ -43,9 +46,13 @@ To resume an existing session:
 #
 
 has log => (
-    is => 'ro',
-    isa => 'Object',
-    required => 1,
+    is => 'rw',
+    isa => 'Log::Log4perl::Logger',
+    lazy => 1,
+    default => sub {
+        my $log = OpenXPKI::Server::Context::hascontext('log') ? CTX('log') : OpenXPKI::Server::Log->new(CONFIG => undef);
+        return $log->application,
+    },
 );
 
 # storage driver name (= last part of any package in the OpenXPKI::Server::Session::Driver::* namespace)
@@ -55,7 +62,6 @@ has type => (
     required => 1,
 );
 
-# Additional configuration options for the driver
 has config => (
     is => 'ro',
     isa => 'HashRef',
@@ -124,6 +130,28 @@ sub _build_driver {
 ################################################################################
 # Methods
 #
+around BUILDARGS => sub {
+    my ($orig, $class, %args) = @_;
+
+    # Load config if load_config => 1 was given
+    if (delete $args{load_config}) {
+        my $conf = CTX('config')->get_hash("system.server.session")
+            or OpenXPKI::Exception->throw (
+                message => "Session configuration 'system.server.session' missing",
+            );
+        $args{type} = delete($conf->{type});
+        # backwards compatibility: default to type "File"
+        if (not $args{type}) {
+            $args{type} = "File";
+            my $log = $args{log};
+            $log //= CTX('log')->system if OpenXPKI::Server::Context::hascontext('log');
+            $log->warn("Configuration syntax has changed: please specify 'system.server.session.type' (defaulting to 'File' for now)") if $log;
+        }
+        $args{lifetime} = delete($conf->{lifetime}) if $conf->{lifetime};
+        $args{config} = $conf; # rest of it
+    }
+    return $class->$orig(%args);
+};
 
 =head1 METHODS
 
