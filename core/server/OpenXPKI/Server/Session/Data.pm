@@ -42,22 +42,33 @@ has id => (
 
 # create several Moose attributes
 my %ATTR_TYPES = (
-    user                 => { is => 'rw', isa => 'Str', },
-    role                 => { is => 'rw', isa => 'Str', },
-    pki_realm            => { is => 'rw', isa => 'Str', },
-    challenge            => { is => 'rw', isa => 'Str', },
-    authentication_stack => { is => 'rw', isa => 'Str', },
-    language             => { is => 'rw', isa => 'Str', },
-    status               => { is => 'rw', isa => 'Str', },
-    ip_address           => { is => 'rw', isa => 'Str', },
-    created              => { is => 'rw', isa => 'Int', },
-    modified             => { is => 'rw', isa => 'Int', },
-    _secrets             => { is => 'rw', isa => 'HashRef', default => sub { {} }, },
+    user                 => { isa => 'Str', },
+    role                 => { isa => 'Str', },
+    pki_realm            => { isa => 'Str', },
+    challenge            => { isa => 'Str', },
+    authentication_stack => { isa => 'Str', },
+    language             => { isa => 'Str', },
+    status               => { isa => 'Str', },
+    ip_address           => { isa => 'Str', },
+    created              => { isa => 'Int', },
+    modified             => { isa => 'Int', },
+    _secrets => {
+        # we do not use "default => sub { {} }" as this would confuse code that
+        # detects if this Moose attribute was set.
+        isa => 'HashRef',
+        traits => ['Hash'],
+        handles => {
+            _set_secret => 'set',
+            _get_secret => 'get',
+            _delete_secret => 'delete',
+        },
+    },
 );
 for my $name (keys %ATTR_TYPES) {
     my $type_def = $ATTR_TYPES{$name};
     has $name => (
         %$type_def,
+        is => 'rw',
         trigger => sub { shift->_attr_change },
     );
 }
@@ -142,9 +153,9 @@ sub secret {
     my $digest = sha1_hex($params{group} || "");
 
     # getter
-    return $self->_secrets->{$digest} unless $params{secret};
+    return $self->_get_secret($digest) unless $params{secret};
     # setter
-    $self->_secrets->{$digest} = $params{secret};
+    $self->_set_secret($digest => $params{secret});
 }
 
 =head2 clear_secret
@@ -165,7 +176,7 @@ sub clear_secret {
         group => { isa => 'Str' },
     );
     my $digest = sha1_hex($params{group} || "");
-    delete $self->_secrets->{$digest};
+    $self->_delete_secret($digest);
 }
 
 =head1 METHODS
