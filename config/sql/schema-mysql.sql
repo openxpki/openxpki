@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `session` (
   `data` longtext,
   `created` int(10) unsigned NOT NULL,
   `modified` int(10) unsigned NOT NULL,
-  `ip_address` varchar(45) NOT NULL
+  `ip_address` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `seq_application_log` (
