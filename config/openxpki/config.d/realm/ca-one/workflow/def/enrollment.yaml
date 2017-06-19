@@ -18,9 +18,9 @@ state:
         autorun: 1
         action:
           - set_error_not_approved > FAILURE ?  !allow_manual_approval_or_eligibility_recheck  !have_all_approvals
-          - notify_pending_approval set_error_not_approved > PENDING_APPROVAL ? allow_manual_approval_or_eligibility_recheck !have_all_approvals 
+          - notify_pending_approval set_error_not_approved > PENDING_APPROVAL ? allow_manual_approval_or_eligibility_recheck !have_all_approvals
           - global_noop2 > APPROVED ? have_all_approvals
-          
+
     APPROVED:
         autorun: 1
         action:
@@ -47,7 +47,7 @@ state:
         autorun: 1
         action:
           - revoke_existing_certs > QUEUED_FOR_REVOCATION
- 
+
     CA_POLICY_APPROVAL:
         autorun: 1
         action:
@@ -131,23 +131,23 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC
         output:
           - error_code
-          - cert_profile 	
+          - cert_profile
           - cert_subject
-          - creator 	
-          - request_mode 	
+          - creator
+          - request_mode
           - num_active_certs
           - p_max_active_certs
           - in_renewal_window
           - in_replace_window
-          - eligibility_result 	
+          - eligibility_result
           - eligible_for_initial_enroll
           - eligible_for_renewal
-          - scep_tid 	
-          - signer_is_self_signed
+          - scep_tid
           - signer_revoked
+          - signer_validity_ok
           - signer_signature_valid
           - signer_sn_matches_csr
-          - signer_validity_ok
+          - signer_is_self_signed
 
     FINISHED_PERSIST:
         autorun: 1
@@ -196,19 +196,19 @@ state:
 
         output:
           - error_code
-          - cert_profile 	
+          - cert_profile
           - cert_subject
-          - creator 	
-          - eligibility_result 	
+          - creator
+          - eligibility_result
           - eligible_for_initial_enroll
           - eligible_for_renewal
-          - request_mode 	
-          - scep_tid 	
-          - signer_is_self_signed
+          - request_mode
+          - scep_tid
           - signer_revoked
+          - signer_validity_ok
           - signer_signature_valid
           - signer_sn_matches_csr
-          - signer_validity_ok
+          - signer_is_self_signed
 
         button:
           approve_csr:
@@ -227,21 +227,21 @@ state:
           - deny_authentication set_error_not_authenticated > FAILURE ? global_is_operator
         output:
           - error_code
-          - cert_profile 	
+          - cert_profile
           - cert_subject
           - creator
           - signer_trusted
           - signer_authorized
           - valid_chall_pass
-          - eligibility_result 	
+          - eligibility_result
           - eligible_for_initial_enroll
           - eligible_for_renewal
           - scep_tid
-          - signer_is_self_signed
           - signer_revoked
+          - signer_validity_ok
           - signer_signature_valid
           - signer_sn_matches_csr
-          - signer_validity_ok
+          - signer_is_self_signed
 
         button:
           add_authentication:
@@ -260,29 +260,29 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC
         action:
           - set_error_policy_violated > FAILURE ? global_is_operator
-          - allow_retry > FAILURE 
+          - allow_retry > FAILURE
           - override_policy global_clear_error_code > APPROVAL ? global_is_operator
         output:
           - error_code
-          - cert_profile 	
+          - cert_profile
           - cert_subject
-          - creator 	
-          - request_mode 	
+          - creator
+          - request_mode
           - num_active_certs
           - p_max_active_certs
           - in_renewal_window
           - in_replace_window
-          - eligibility_result 	
+          - eligibility_result
           - eligible_for_initial_enroll
           - eligible_for_renewal
-          - scep_tid 	
-          - signer_is_self_signed
-          - signer_revoked
+          - scep_tid
           - signer_trusted
           - signer_authorized
+          - signer_revoked
+          - signer_validity_ok
           - signer_signature_valid
           - signer_sn_matches_csr
-          - signer_validity_ok
+          - signer_is_self_signed
 
         button:
           set_error_policy_violated:
@@ -318,14 +318,14 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_DESC
         output:
-          - cert_profile 	
+          - cert_profile
           - cert_identifier
           - renewal_cert_identifier
-          - creator 	
-          - request_mode 	
+          - creator
+          - request_mode
           - in_renewal_window
           - in_replace_window
-          - eligibility_result 	
+          - eligibility_result
           - scep_tid
 
 action:
@@ -428,7 +428,7 @@ action:
         param:
             _map_cert_identifier: $renewal_cert_identifier
             prefix: old_meta
- 
+
     next_cert_to_revoke:
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
         input:
@@ -527,12 +527,12 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
         param:
             error_code: I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST
-    
+
     set_error_policy_violated:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
         param:
             error_code: I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED
-    
+
 condition:
     allow_manual_approval:
         class: Workflow::Condition::Evaluate
@@ -548,7 +548,7 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{p_allow_eligibility_recheck};
-            
+
     allow_manual_approval_or_eligibility_recheck:
         class: Workflow::Condition::LazyOR
         param:
@@ -773,7 +773,7 @@ field:
         type: text
         required: 0
 
-    policy_comment: 
+    policy_comment:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC
         placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER
@@ -815,7 +815,7 @@ field:
         type: text
 
 
-    # Fields used for display purposes only          
+    # Fields used for display purposes only
     creator:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL
         name: creator
@@ -839,11 +839,6 @@ field:
         name: signer_sn_matches_csr
         template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
 
-    signer_validity_ok:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL
-        name: signer_validity_ok
-        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
-
     num_active_certs:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL
         name: num_active_certs
@@ -860,16 +855,6 @@ field:
     in_replace_window:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL
         name: in_replace_window
-        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
-
-    signer_trusted:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_TRUSTED_LABEL
-        name: signer_trusted
-        template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
-
-    signer_authorized:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_AUTHORIZED_LABEL
-        name: signer_authorized
         template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
 
     valid_chall_pass:
