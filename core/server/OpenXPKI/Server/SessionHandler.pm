@@ -165,8 +165,8 @@ Shortcut for C<$session-E<gt>data-E<gt>id>
 
 =head2 data_as_hashref
 
-Returns a HashRef containing session attribute names and their value (which
-might be undef).
+Returns a HashRef containing names and values of all previously set session
+attributes.
 
 B<Parameters>
 
@@ -231,8 +231,8 @@ sub resume {
         $self->log->info("Session #$id is unknown (maybe expired and purged from backend)", "auth");
         return;
     }
-    # Make sure all attributes are correct
-    OpenXPKI::Server::Session::Data->check_attributes($data_hash, 1);
+    # Provide understandable error message on unknown attributes
+    OpenXPKI::Server::Session::Data->check_attributes($data_hash);
     # Store data object
     $self->data(
         OpenXPKI::Server::Session::Data->new( %{ $data_hash } )

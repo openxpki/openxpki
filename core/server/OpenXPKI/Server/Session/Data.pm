@@ -43,25 +43,23 @@ has id => (
 
 # create several Moose attributes
 my %ATTR_TYPES = (
-    user                    => 'Str',
-    role                    => 'Str',
-    pki_realm               => 'Str',
-    challenge               => 'Str',
-    authentication_stack    => 'Str',
-    language                => 'Str',
-    status                  => 'Str',
-    ip_address              => 'Str',
-    created                 => 'Int',
-    modified                => 'Int',
-    _secrets                => 'HashRef',
+    user                 => { is => 'rw', isa => 'Str', },
+    role                 => { is => 'rw', isa => 'Str', },
+    pki_realm            => { is => 'rw', isa => 'Str', },
+    challenge            => { is => 'rw', isa => 'Str', },
+    authentication_stack => { is => 'rw', isa => 'Str', },
+    language             => { is => 'rw', isa => 'Str', },
+    status               => { is => 'rw', isa => 'Str', },
+    ip_address           => { is => 'rw', isa => 'Str', },
+    created              => { is => 'rw', isa => 'Int', },
+    modified             => { is => 'rw', isa => 'Int', },
+    _secrets             => { is => 'rw', isa => 'HashRef', default => sub { {} }, },
 );
 for my $name (keys %ATTR_TYPES) {
-    my $type = $ATTR_TYPES{$name};
+    my $type_def = $ATTR_TYPES{$name};
     has $name => (
-        is => 'rw',
-        isa => $ATTR_TYPES{$name},
+        %$type_def,
         trigger => sub { shift->_attr_change },
-        $type eq "HashRef" ? (default => sub { {} }) : (),
     );
 }
 
@@ -88,8 +86,8 @@ sub get_attribute_names {
 
 =head2 get_attributes
 
-Returns a HashRef containing all session attribute names and their value (which
-might be undef).
+Returns a HashRef containing names and values of all previously set session
+attributes.
 
 B<Parameters>
 
@@ -119,7 +117,7 @@ sub get_attributes {
         @names = @{ get_attribute_names() };
     }
 
-    return { map { $_ => $self->$_ } @names };
+    return { map { $_ => $self->$_ } grep { $self->meta->find_attribute_by_name($_)->has_value($self) } @names };
 }
 
 =head2 check_attributes
@@ -135,14 +133,11 @@ B<Parameters>
 
 =item * $attrs - attribute names and values (I<HashRef>)
 
-=item * $expect_all - optional: additionally check that all attributes of
-C<OpenXPKI::Server::Session::Data> are present in the HashRef (I<Bool>)
-
 =back
 
 =cut
 sub check_attributes {
-    my ($self, $attrs, $expect_all) = @_;
+    my ($self, $attrs) = @_;
     my %all_attrs = ( map { $_ => 1 } @{ $self->get_attribute_names } );
 
     my $id = $attrs->{id} // undef;
@@ -151,14 +146,8 @@ sub check_attributes {
         OpenXPKI::Exception->throw(
             message => "Unknown attribute in session data",
             params => { $id ? (session_id => $id) : (), attr => $name },
-        ) unless delete $all_attrs{$name};
+        ) unless $all_attrs{$name};
     }
-
-    # check if there are attributes missing
-    OpenXPKI::Exception->throw(
-        message => "Session data is incomplete",
-        params => { $id ? (session_id => $id) : (), missing => join(", ", keys %all_attrs) },
-    ) if ($expect_all and scalar keys %all_attrs);
 }
 
 =head2 secret
