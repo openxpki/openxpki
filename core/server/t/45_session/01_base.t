@@ -30,13 +30,13 @@ lives_ok {
 my $challenge = "This is challenge.";
 
 ## get ID
-my $id = $session->get_id;
+my $id = $session->data->id;
 ok $id, "session ID exists";
 
 isnt       $session->is_valid, 1,                   "session is still invalid";
-lives_ok { $session->start_authentication }         "start authentication phase";
+lives_ok { $session->set_status_auth}              "start authentication phase";
 isnt       $session->is_valid, 1,                   "session is still invalid";
-lives_ok { $session->set_challenge($challenge) }    "store challenge string";
+lives_ok { $session->data->challenge($challenge) }    "store challenge string";
 
 note "destroy session 1 object";
 undef $session;
@@ -51,8 +51,8 @@ lives_ok {
 } "load previously persisted session 1";
 
 isnt       $session->is_valid, 1,                   "session is still invalid";
-is         $session->get_challenge, $challenge,     "challenge is the same as before persisting";
-lives_ok { $session->make_valid }                   "define session as valid";
+is         $session->data->challenge, $challenge,     "challenge is the same as before persisting";
+lives_ok { $session->set_status_valid}             "define session as valid";
 is         $session->is_valid, 1,                   "session is valid";
 
 note "destroy session 1 object";
@@ -95,7 +95,7 @@ lives_ok {
     });
 } "create session 2";
 
-my $id2 = $session->get_id;
+my $id2 = $session->data->id;
 isnt $id2, $id, "session 2 id differs from 1 id";
 
 ## delete session

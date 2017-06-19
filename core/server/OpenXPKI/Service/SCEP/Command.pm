@@ -186,7 +186,7 @@ sub __get_token_alias {
               
     my $self = shift;
     my $server = shift;
-    $server = CTX('session')->get_server() unless($server);
+    $server = CTX('session')->data->server unless($server);
     
     my $token = CTX('config')->get(['scep', $server, 'token']);
      
@@ -213,7 +213,7 @@ sub __get_token {
     
     my $self = shift;
     my $server = shift;
-    $server = CTX('session')->get_server() unless($server);
+    $server = CTX('session')->data->server unless($server);
     
     my $scep_token_alias = $self->__get_token_alias( $server );
             

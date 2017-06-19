@@ -24,7 +24,7 @@ sub execute
     my $name       = $self->name;
     ##! 16: 'name: ' . $name
     ##! 16: 'source: ' . $source
-    $source        = CTX('session')->get_user()
+    $source        = CTX('session')->data->user
         if (not defined $source or not length $source);
     ##! 16: 'source: ' . $source
 

@@ -24,7 +24,7 @@ sub execute {
     my $ident   = ident $self;
     
     ##! 8: "execute GetCACert"
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my @ca_cert_chain = $self->__get_ca_certificate_chains();
 
@@ -50,8 +50,8 @@ sub __get_ca_certificate_chains : PRIVATE {
     ##! 4: 'start'
     my $self = shift;
 
-    my $pki_realm = CTX('session')->get_pki_realm();
-    my $server = CTX('session')->get_server();
+    my $pki_realm = CTX('session')->data->pki_realm;
+    my $server = CTX('session')->data->server;
     
     my $strip_root;
     if ($server) {

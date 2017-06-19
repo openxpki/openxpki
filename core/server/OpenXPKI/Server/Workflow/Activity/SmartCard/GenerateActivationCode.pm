@@ -165,7 +165,7 @@ sub execute {
     my $self          = shift;
     my $workflow      = shift;
     my $context       = $workflow->context();
-    my $user          = CTX('session')->get_user();
+    my $user          = CTX('session')->data->user;
     my $default_token = CTX('api')->get_default_token();
 
     my $code = '';

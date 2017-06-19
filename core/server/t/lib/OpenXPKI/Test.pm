@@ -266,7 +266,7 @@ sub init_server {
     my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
     # set PKI realm after init() as various init procedures overwrite the realm
-    $session->set_pki_realm($self->config_writer->realms->[0]);
+    $session->data->pki_realm($self->config_writer->realms->[0]);
 
     return $self;
 }

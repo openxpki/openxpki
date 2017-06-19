@@ -69,7 +69,7 @@ before '_route_call' => sub {
     } else {
         my $session = CTX('session');
         # there is no realm during init - hide tree by setting non existing prefix
-        my $pki_realm = $session->get_pki_realm();
+        my $pki_realm = $session->data->pki_realm;
         if ($pki_realm) {
             ##! 16: "_route_call: realm value, set prefix to " . $pki_realm
             $self->_config()->{''}->PREFIX( [ 'realm', $pki_realm ] );

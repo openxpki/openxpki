@@ -360,7 +360,7 @@ sub pause {
                 action      => $self->{_CURRENT_ACTION},
                 description => sprintf( 'PAUSED because of %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
                 state       => $self->state(),
-                user        => CTX('session')->get_user(),
+                user        => CTX('session')->data->user,
             }
         )
     );
@@ -412,7 +412,7 @@ sub get_global_actions {
          return [];
     }
 
-    my $role = CTX('session')->get_role() || 'Anonymous';
+    my $role = CTX('session')->data->role || 'Anonymous';
 
     my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type(), 'acl', $role ] );
 
@@ -502,7 +502,7 @@ sub _wake_up {
                     action      => $action_name,
                     description => 'WAKEUP',
                     state       => $self->state(),
-                    user        => CTX('session')->get_user(),
+                    user        => CTX('session')->data->user,
                 }
             )
         );
@@ -533,7 +533,7 @@ sub _resume {
                     action      => $action_name,
                     description => 'RESUME',
                     state       => $self->state(),
-                    user        => CTX('session')->get_user(),
+                    user        => CTX('session')->data->user,
                 }
             )
         );
@@ -628,7 +628,7 @@ sub _proc_state_exception {
                 {
                     action      => $self->{_CURRENT_ACTION},
                     description => sprintf( 'EXCEPTION: %s ', $error_msg ),
-                    user        => CTX('session')->get_user(),
+                    user        => CTX('session')->data->user,
                 }
             )
         );
@@ -653,7 +653,7 @@ sub _fail {
                 {
                     action      => $self->{_CURRENT_ACTION},
                     description => $reason,
-                    user        => CTX('session')->get_user(),
+                    user        => CTX('session')->data->user,
                 }
             )
         );

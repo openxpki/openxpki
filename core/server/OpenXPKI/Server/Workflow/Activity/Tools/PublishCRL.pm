@@ -22,7 +22,7 @@ sub execute {
     my $workflow = shift;
     my $context  = $workflow->context();
     my $config        = CTX('config');
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my $dbi = CTX('dbi');
     

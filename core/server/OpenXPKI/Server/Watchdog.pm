@@ -656,12 +656,12 @@ sub __wake_up_workflow {
 
         $self->__check_session();
 
-        CTX('session')->set_pki_realm($args->{pki_realm});
+        CTX('session')->data->pki_realm($args->{pki_realm});
         CTX('session')->import_serialized_info($args->{workflow_session});
 
         # Set MDC for logging
-        Log::Log4perl::MDC->put('user', CTX('session')->get_user());
-        Log::Log4perl::MDC->put('role', CTX('session')->get_role());
+        Log::Log4perl::MDC->put('user', CTX('session')->data->user);
+        Log::Log4perl::MDC->put('role', CTX('session')->data->role);
         Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 
         ##! 1: 'call wakeup'
@@ -715,7 +715,7 @@ sub __check_session {
     $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
     Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
-    ##! 4: sprintf(" session %s created" , $session->get_id())
+    ##! 4: sprintf(" session %s created" , $session->data->id)
 }
 
 

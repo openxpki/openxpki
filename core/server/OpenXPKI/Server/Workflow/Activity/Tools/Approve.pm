@@ -23,9 +23,9 @@ sub execute
 
     ## get needed information
     my $context   = $workflow->context();
-    my $user      = CTX('session')->get_user();
-    my $role      = CTX('session')->get_role();
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $user      = CTX('session')->data->user;
+    my $role      = CTX('session')->data->role;
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     # not supported / used at the moment
     if (defined $context->param('_check_hash')) {

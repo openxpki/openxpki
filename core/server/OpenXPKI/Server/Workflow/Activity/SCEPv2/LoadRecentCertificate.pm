@@ -18,7 +18,7 @@ use Data::Dumper;
 sub execute {
     ##! 1: 'start'
     my ($self, $workflow) = @_;
-    my $pki_realm  = CTX('session')->get_pki_realm();
+    my $pki_realm  = CTX('session')->data->pki_realm;
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $context    = $workflow->context();
 

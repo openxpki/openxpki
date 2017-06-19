@@ -21,7 +21,7 @@ sub evaluate
 
 =begin temporarily_disabled
 
-    my $realm   = CTX('session')->get_pki_realm();
+    my $realm   = CTX('session')->data->pki_realm;
 
     ##! 16: 'realm: ' . $realm
     ##! 16: 'ca: ' . $ca

@@ -23,7 +23,7 @@ sub execute {
     ##! 1: 'execute'
     my $self       = shift;
     my $workflow   = shift;
-    my $pki_realm  = CTX('session')->get_pki_realm();
+    my $pki_realm  = CTX('session')->data->pki_realm;
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 

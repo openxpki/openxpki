@@ -223,19 +223,20 @@ sub __handle_NEW_SESSION : PRIVATE {
     if (exists $msg->{LANGUAGE}) {
         ##! 8: "set language"
         set_language($msg->{LANGUAGE});
-        $session->set_language($msg->{LANGUAGE});
+        $session->data->language($msg->{LANGUAGE});
     } else {
         ##! 8: "no language specified"
     }
 
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+
     Log::Log4perl::MDC->put('sid', substr($session->get_id(),0,4));
     CTX('log')->system()->info('New session created');
 
     $self->__change_state({ STATE => 'SESSION_ID_SENT', });
 
     return {
-        SESSION_ID => $session->get_id(),
+        SESSION_ID => $session->data->id,
     };
 }
 
@@ -280,7 +281,7 @@ sub __handle_CONTINUE_SESSION {
         $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
 
         return {
-            SESSION_ID => $session->get_id(),
+            SESSION_ID => $session->data->id,
         };
     }
 
@@ -341,7 +342,7 @@ sub __handle_RESET_SESSIONID: PRIVATE {
     ##! 32: 'Session data ' . Dumper $session->{session}->dataref()
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
 
-    my $sess_id = CTX('session')->get_id();
+    my $sess_id = CTX('session')->data->id;
     Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
 
     ##! 4: 'new session id ' . $sess_id
@@ -362,7 +363,7 @@ sub __handle_DETACH_SESSION: PRIVATE {
     my $ident   = ident $self;
     my $msg     = shift;
 
-    my $sessid = CTX('session')->get_id();
+    my $sessid = CTX('session')->data->id;
     ##! 4: "detach session " . $sessid
 
     OpenXPKI::Server::Context::killsession();
@@ -410,10 +411,10 @@ sub __handle_PING : PRIVATE {
     }
     elsif ($state_of{$ident} eq 'WAITING_FOR_LOGIN') {
         ##! 16: 'we are in state WAITING_FOR_LOGIN'
-        ##! 16: 'auth stack: ' . CTX('session')->get_authentication_stack()
-        ##! 16: 'pki realm: ' . CTX('session')->get_pki_realm()
+        ##! 16: 'auth stack: ' . CTX('session')->data->authentication_stack
+        ##! 16: 'pki realm: ' . CTX('session')->data->pki_realm
         my ($user, $role, $reply) = CTX('authentication')->login_step({
-            STACK   => CTX('session')->get_authentication_stack(),
+            STACK   => CTX('session')->data->authentication_stack,
             MESSAGE => $message,
         });
         return $reply;
@@ -441,7 +442,7 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
         my $session = CTX('session');
         ##! 8: 'Session ' . Dumper $session
         $self->__change_state({
-            STATE => CTX('session')->get_state(),
+            STATE => CTX('session')->data->status,
         });
     }
     ##! 16: 'state: ' . $state_of{$ident}
@@ -475,7 +476,7 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
     # send all available stacks to the user and set the state to
     # 'WAITING_FOR_AUTHENTICATION_STACK'
     if ($state_of{$ident} =~ m{\A SESSION_ID_SENT.* \z}xms
-       && (! defined CTX('session')->get_authentication_stack()) ) {
+       && (! defined CTX('session')->data->authentication_stack) ) {
         ##! 4: 'sending authentication stacks'
         $self->__change_state({
             STATE => 'WAITING_FOR_AUTHENTICATION_STACK',
@@ -489,10 +490,10 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
 
     if ($state_of{$ident} eq 'WAITING_FOR_LOGIN') {
         ##! 16: 'we are in state WAITING_FOR_LOGIN'
-        ##! 16: 'auth stack: ' . CTX('session')->get_authentication_stack()
-        ##! 16: 'pki realm: ' . CTX('session')->get_pki_realm()
+        ##! 16: 'auth stack: ' . CTX('session')->data->authentication_stack
+        ##! 16: 'pki realm: ' . CTX('session')->data->pki_realm
         my ($user, $role, $reply) = CTX('authentication')->login_step({
-            STACK   => CTX('session')->get_authentication_stack(),
+            STACK   => CTX('session')->data->authentication_stack,
             MESSAGE => $message,
         });
         return $reply;
@@ -517,7 +518,7 @@ sub __handle_GET_PKI_REALM : PRIVATE {
 
     if ($self->__is_valid_pki_realm($requested_realm)) {
         ##! 2: "update session with PKI realm"
-        CTX('session')->set_pki_realm($requested_realm);
+        CTX('session')->data->pki_realm($requested_realm);
         Log::Log4perl::MDC->put('pki_realm', $requested_realm);
     }
     else {
@@ -526,7 +527,7 @@ sub __handle_GET_PKI_REALM : PRIVATE {
         );
     }
 
-    if (! defined CTX('session')->get_authentication_stack() ) {
+    if (! defined CTX('session')->data->authentication_stack ) {
         $self->__change_state({
             STATE => 'WAITING_FOR_AUTHENTICATION_STACK',
         });
@@ -552,8 +553,8 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
         $self->__change_state({
             STATE => 'WAITING_FOR_LOGIN',
         });
-        CTX('session')->start_authentication();
-        CTX('session')->set_authentication_stack($requested_stack);
+        CTX('session')->set_status_auth();
+        CTX('session')->data->authentication_stack($requested_stack);
         my ($user, $role, $reply) = CTX('authentication')->login_step({
             STACK   => $requested_stack,
             MESSAGE => $message,
@@ -562,9 +563,9 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
             ##! 4: 'login successful'
             # successful login, save it in the session
             # and make the session valid
-            CTX('session')->set_user($user);
-            CTX('session')->set_role($role);
-            CTX('session')->make_valid();
+            CTX('session')->data->user($user);
+            CTX('session')->data->role($role);
+            CTX('session')->set_status_valid();
             $self->__change_state({
                 STATE => 'MAIN_LOOP',
             });
@@ -603,7 +604,7 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     }
 
     my ($user, $role, $reply) = CTX('authentication')->login_step({
-        STACK   => CTX('session')->get_authentication_stack(),
+        STACK   => CTX('session')->data->authentication_stack,
         MESSAGE => $message,
     });
     ##! 16: 'user: ' . $user
@@ -613,9 +614,9 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
         ##! 4: 'login successful'
         # successful login, save it in the session
         # and make the session valid
-        CTX('session')->set_user($user);
-        CTX('session')->set_role($role);
-        CTX('session')->make_valid();
+        CTX('session')->data->user($user);
+        CTX('session')->data->role($role);
+        CTX('session')->set_status_valid();
 
         Log::Log4perl::MDC->put('user', $user);
         Log::Log4perl::MDC->put('role', $role);
@@ -665,21 +666,15 @@ sub __handle_LOGOUT : PRIVATE {
 
     my $old_session = CTX('session');
 
-    ##! 8: "logout received - terminate session " . $old_session->get_id(),
+    ##! 8: "logout received - terminate session " . $old_session->id,
     CTX('log')->system()->debug('Terminating session ' . $old_session->get_id());
 
-
     OpenXPKI::Server::Context::killsession();
-
     $self->__change_state({ STATE => 'NEW' });
-
     Log::Log4perl::MDC->remove();
-
     $old_session->delete();
 
     return { 'SERVICE_MSG' => 'LOGOUT' };
-
-
 }
 
 sub __handle_STATUS : PRIVATE {
@@ -825,7 +820,7 @@ sub __pki_realm_choice_available : PRIVATE {
     elsif (scalar @list == 1) {
         ##! 4: "update session with PKI realm"
         ##! 16: 'PKI realm: ' . $list[0]
-        CTX('session')->set_pki_realm($list[0]);
+        CTX('session')->data->pki_realm($list[0]);
         return 0;
     }
     else { # more than one PKI realm available
@@ -879,13 +874,13 @@ sub __change_state : PRIVATE {
     $state_of{$ident} = $new_state;
     # save the new state in the session
     if (OpenXPKI::Server::Context::hascontext('session')) {
-        CTX('session')->set_state($new_state);
+        CTX('session')->data->status($new_state);
     }
 
     # Set the daemon name after enterin MAIN_LOOP
 
     if ($new_state eq "MAIN_LOOP") {
-        OpenXPKI::Server::__set_process_name("worker: %s (%s)", CTX('session')->get_user(), CTX('session')->get_role());
+        OpenXPKI::Server::__set_process_name("worker: %s (%s)", CTX('session')->data->user, CTX('session')->data->role);
     } elsif ($new_state eq "NEW") {
         OpenXPKI::Server::__set_process_name("worker: idle");
     }

@@ -22,8 +22,8 @@ lives_ok {
     $session2 = OpenXPKI::Server::Session->new({ DIRECTORY => $session_dir, LIFETIME  => 2 });
 } "create session 1 and 2";
 
-lives_ok { $session->set_user("dummy") }                "set user";
-lives_ok { $session->set_role("dancer") }               "set role";
+lives_ok { $session->data->user("dummy") }                "set user";
+lives_ok { $session->data->role("dancer") }               "set role";
 my $info;
 lives_ok { $info = $session->export_serialized_info }   "export serialized data from session 1";
 lives_ok { $session2->import_serialized_info($info) }   "import serialized data into session 2";

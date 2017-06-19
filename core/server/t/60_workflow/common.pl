@@ -140,9 +140,9 @@ ok($log);
 my $session = OpenXPKI::Server::Session->new ({
                   DIRECTORY => "t/60_workflow/",
                   LIFETIME  => 100});
-$session->set_pki_realm ("I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA");
-$session->set_role ("CA Operator");
-$session->make_valid ();
+$session->data->pki_realm("I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA");
+$session->data->role("CA Operator");
+$session->set_status_valid;
 ok(OpenXPKI::Server::Context::setcontext ({session => $session}));
 
 1;

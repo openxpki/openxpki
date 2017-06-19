@@ -65,7 +65,7 @@ sub get_head_version_id {
 sub get_approval_message {
     my $self      = shift;
     my $arg_ref   = shift;
-    my $sess_lang = CTX('session')->get_language();
+    my $sess_lang = CTX('session')->data->language;
     ##! 16: 'session language: ' . $sess_lang
 
     my $result;
@@ -131,17 +131,17 @@ sub get_approval_message {
 
 # get current pki realm
 sub get_pki_realm {
-    return CTX('session')->get_pki_realm();
+    return CTX('session')->data->pki_realm;
 }
 
 # get current user
 sub get_user {
-    return CTX('session')->get_user();
+    return CTX('session')->data->user;
 }
 
 # get current user
 sub get_role {
-    return CTX('session')->get_role();
+    return CTX('session')->data->role;
 }
 
 sub get_session_info {
@@ -150,11 +150,11 @@ sub get_session_info {
 
     my $session = CTX('session');
     return {
-        name => $session->get_user(),
-        role => $session->get_role(),
-        role_label => CTX('config')->get([ 'auth', 'roles', $session->get_role(), 'label' ]),
-        pki_realm => $session->get_pki_realm(),
-        pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->get_pki_realm(), 'label' ]),
+        name => $session->data->user,
+        role => $session->data->role,
+        role_label => CTX('config')->get([ 'auth', 'roles', $session->data->role, 'label' ]),
+        pki_realm => $session->data->pki_realm,
+        pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]),
         lang => 'en',
         version => CTX('config')->get_version(),
     }
@@ -655,7 +655,7 @@ sub import_chain {
     my ($self, $arg_ref) = @_;
 
     my $default_token = CTX('api')->get_default_token();
-    my $realm = $arg_ref->{PKI_REALM} || CTX('session')->get_pki_realm();
+    my $realm = $arg_ref->{PKI_REALM} || CTX('session')->data->pki_realm;
 
     my @chain;
     if (ref $arg_ref->{DATA} eq 'ARRAY') {

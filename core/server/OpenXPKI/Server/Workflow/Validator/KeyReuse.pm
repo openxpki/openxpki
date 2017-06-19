@@ -45,7 +45,7 @@ sub _validate {
         where => {
             public_key => { -like => $pubkey },
             $self->param('realm_only')
-                ? ( pki_realm => CTX('session')->get_pki_realm )
+                ? ( pki_realm => CTX('session')->data->pki_realm )
                 : (),
         },
     );

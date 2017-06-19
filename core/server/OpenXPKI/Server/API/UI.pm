@@ -127,7 +127,7 @@ sub get_menu {
 
     my $self = shift;
 
-    my $role = CTX('session')->get_role();
+    my $role = CTX('session')->data->role;
 
     ##! 16: 'role is ' . $role
     if (!CTX('config')->exists( ['uicontrol', $role ] )) {
@@ -149,7 +149,7 @@ sub get_motd {
     my $self = shift;
     my $args = shift;
 
-    my $role = $args->{ROLE} || CTX('session')->get_role();
+    my $role = $args->{ROLE} || CTX('session')->data->role;
 
     # The role is used as DP Key, can also be "_any"
     my $datapool = CTX('api')->get_data_pool_entry({

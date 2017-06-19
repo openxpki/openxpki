@@ -94,7 +94,7 @@ sub get_workflow_log {
     # ACL check
     my $wf_type = CTX('api')->get_workflow_type_for_id({ ID => $wf_id });
 
-    my $role = CTX('session')->get_role() || 'Anonymous';
+    my $role = CTX('session')->data->role || 'Anonymous';
     my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'techlog' ] );
 
     OpenXPKI::Exception->throw(
@@ -102,7 +102,7 @@ sub get_workflow_log {
         params  => {
             'ID' => $wf_id,
             'TYPE' => $wf_type,
-            'USER' => CTX('session')->get_user(),
+            'USER' => CTX('session')->data->user,
             'ROLE' => $role
         },
     ) unless $allowed;
@@ -342,7 +342,7 @@ sub get_workflow_history {
     my $noacl = $args->{NOACL};
 
     if (!$noacl) {
-        my $role = CTX('session')->get_role() || 'Anonymous';
+        my $role = CTX('session')->data->role || 'Anonymous';
         my $wf_type = CTX('api')->get_workflow_type_for_id({ ID => $wf_id });
         my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'history' ] );
 
@@ -352,7 +352,7 @@ sub get_workflow_history {
                 params  => {
                     'ID' => $wf_id,
                     'TYPE' => $wf_type,
-                    'USER' => CTX('session')->get_user(),
+                    'USER' => CTX('session')->data->user,
                     'ROLE' => $role
                 },
             );
@@ -716,9 +716,9 @@ sub create_workflow_instance {
     Log::Log4perl::MDC->put('wftype', $wf_type);
 
     my $context = $workflow->context();
-    my $creator = CTX('session')->get_user();
+    my $creator = CTX('session')->data->user;
     $context->param( 'creator'  => $creator );
-    $context->param( 'creator_role'  => CTX('session')->get_role() );
+    $context->param( 'creator_role'  => CTX('session')->data->role );
 
     # This is crucial and must be done before the first execute as otherwise
     # workflow acl fails when the first non-initial action is autorun
@@ -818,7 +818,7 @@ sub get_workflow_instance_types {
     my ($self, $args) = @_;
 
     my $cfg = CTX('config');
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my $sth = CTX('dbi')->select(
         from   => 'workflow',
@@ -938,7 +938,7 @@ sub __search_query_params {
 
     # Do not restrict if PKI_REALM => "_any"
     if (not $args->{PKI_REALM} or $args->{PKI_REALM} !~ /_any/i) {
-        $where->{pki_realm} = $args->{PKI_REALM} // CTX('session')->get_pki_realm();
+        $where->{pki_realm} = $args->{PKI_REALM} // CTX('session')->data->pki_realm;
     }
 
     if (defined $args->{TYPE}) {
@@ -1014,13 +1014,13 @@ sub __fetch_workflow {
 
     # We can not load workflows from other realms as this will break config and security
     # The watchdog switches the session realm before instantiating a new factory
-    if (CTX('session')->get_pki_realm ne $dbresult->{pki_realm}) {
+    if (CTX('session')->data->pki_realm ne $dbresult->{pki_realm}) {
         OpenXPKI::Exception->throw(
             message => 'Requested workflow is not in current PKI realm',
             params  => {
                 WORKFLOW_ID => $wf_id,
                 WORKFLOW_REALM => $dbresult->{pki_realm},
-                SESSION_REALM => CTX('session')->get_pki_realm,
+                SESSION_REALM => CTX('session')->data->pki_realm,
             },
         );
     }

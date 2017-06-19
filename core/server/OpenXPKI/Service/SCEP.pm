@@ -38,19 +38,19 @@ sub init {
 
     # get realm from client and save in session
     my $realm = $self->__init_pki_realm();
-    CTX('session')->set_pki_realm($realm);
+    CTX('session')->data->pki_realm($realm);
     my $profile = $self->__init_profile();
-    CTX('session')->set_profile($profile);
+    CTX('session')->data->profile($profile);
     my $server = $self->__init_server();
-    CTX('session')->set_server($server);
+    CTX('session')->data->server($server);
     my $encryption_alg = $self->__init_encryption_alg();
-    CTX('session')->set_enc_alg($encryption_alg);
+    CTX('session')->data->enc_alg($encryption_alg);
     my $hash_alg = $self->__init_hash_alg();
-    CTX('session')->set_hash_alg($hash_alg);
+    CTX('session')->data->hash_alg($hash_alg);
 
     #my $context = $self->__init_context_parameter();
 
-    CTX('session')->set_user($server);
+    CTX('session')->data->user($server);
 
     return 1;
 }
@@ -101,7 +101,7 @@ sub __init_server : PRIVATE {
     my $ident   = ident $self;
     my $arg_ref = shift;
 
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
     my $message = $self->collect();
@@ -144,7 +144,7 @@ sub __init_hash_alg : PRIVATE {
     my $ident   = ident $self;
     my $arg_ref = shift;
 
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
 
     my $message = $self->collect();
     ##! 16: "message collected: " . Dumper($message)
@@ -183,7 +183,7 @@ sub __init_encryption_alg : PRIVATE {
     my $ident   = ident $self;
     my $arg_ref = shift;
 
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
 
     my $message = $self->collect();
     ##! 16: "message collected: " . Dumper($message)

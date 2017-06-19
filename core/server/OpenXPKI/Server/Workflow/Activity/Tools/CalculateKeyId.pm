@@ -23,7 +23,7 @@ sub execute {
     # you may wish to use these shortcuts
     my $context      = $workflow->context();
 
-    my $pki_realm   = CTX('session')->get_pki_realm();   
+    my $pki_realm   = CTX('session')->data->pki_realm;   
     my $default_token = CTX('api')->get_default_token();
 
     # The default is to fetch the certificate PEM from the "certificate" 

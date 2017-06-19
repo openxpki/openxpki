@@ -21,9 +21,8 @@ sub execute
     ## delete approvals (set to a serialized empty arrayref)
     $context->param('approvals' => $serializer->serialize([])) ;
 
-    my $user = CTX('session')->get_user();
-    my $role = CTX('session')->get_role();
-
+    my $user = CTX('session')->data->user;
+    my $role = CTX('session')->data->role;
     CTX('log')->application()->info('All existing approvals canceled for workflow ' . $workflow->id() . " by user $user, role $role");
 
     return 1;

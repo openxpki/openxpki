@@ -113,7 +113,7 @@ sub execute {
     my @rules = $config->get_keys( $rules_prefix );
 
     my $matched = 0;
-    my $current_realm = CTX('session')->get_pki_realm();
+    my $current_realm = CTX('session')->data->pki_realm;
 
     CTX('log')->application()->debug("Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier");
 

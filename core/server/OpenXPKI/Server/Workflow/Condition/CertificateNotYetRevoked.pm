@@ -19,7 +19,7 @@ sub evaluate {
     my $context     = $workflow->context();
     my $identifier  = $context->param('cert_identifier');
     my $reason_code = $context->param('reason_code');
-    my $pki_realm   = CTX('session')->get_pki_realm();
+    my $pki_realm   = CTX('session')->data->pki_realm;
 
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_IDENTIFIER_MISSING',

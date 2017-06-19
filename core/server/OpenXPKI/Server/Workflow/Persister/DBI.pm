@@ -102,7 +102,7 @@ sub __update_workflow {
             watchdog_key => '__CATCHME',
         },
         set_once => {
-            pki_realm     => CTX('session')->get_pki_realm(),
+            pki_realm     => CTX('session')->data->pki_realm,
             workflow_type => $workflow->type(),
         },
         where => {
@@ -249,7 +249,7 @@ sub fetch_workflow {
         ) ],
         where => {
             workflow_id => $id,
-            pki_realm => CTX('session')->get_pki_realm(),
+            pki_realm => CTX('session')->data->pki_realm,
         },
     );
 
@@ -340,7 +340,7 @@ sub create_history {
                 workflow_description  => $entry->description(),
                 workflow_state        => $entry->state(),
                 ## user set by workflow factory class
-                workflow_user         => ($entry->user ne 'n/a' ? $entry->user : CTX('session')->get_user()),
+                workflow_user         => ($entry->user ne 'n/a' ? $entry->user : CTX('session')->data->user),
                 workflow_history_date => DateTime->now->strftime('%Y-%m-%d %H:%M:%S'),
             },
         );

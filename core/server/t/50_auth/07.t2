@@ -30,9 +30,9 @@ ok($session, 'Session object creation');
 ok(OpenXPKI::Server::Context::setcontext({session => $session}), 'Set session in CTX');
 
 ## configure the session
-$session->set_pki_realm ("Test Root CA");
-$session->set_role ("CA Operator");
-$session->make_valid ();
+$session->data->pki_realm("Test Root CA");
+$session->data->role("CA Operator");
+$session->set_status_valid;
 ok($session->is_valid(), 'Session made valid');
 
 ## initialize the ACL

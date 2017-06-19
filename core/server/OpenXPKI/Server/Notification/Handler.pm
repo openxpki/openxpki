@@ -60,7 +60,7 @@ sub _init_backends {
     my $backends;
     foreach my $realm (@realms) {
         ##! 8: 'load realm $realm'
-        CTX('session')->set_pki_realm( $realm );
+        CTX('session')->data->pki_realm( $realm );
         $backends->{$realm} = $self->_init_backends_for_realm();
     }
 
@@ -127,7 +127,7 @@ sub notify {
 
     ##! 16: 'Got token ' . Dumper $token
 
-    my $realm = CTX('session')->get_pki_realm( );
+    my $realm = CTX('session')->data->pki_realm;
     my $backends = $self->_backends()->{$realm};
 
     if (!$backends) { return; }
@@ -193,7 +193,7 @@ sub _prepare_template_vars {
 
     my $template_vars;
     # Name and Url of the Realm
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     $template_vars->{'meta_pki_realm'} = $realm;
     $template_vars->{'meta_label'} = CTX('config')->get("system.realms.$realm.label");
     $template_vars->{'meta_baseurl'} = CTX('config')->get("system.realms.$realm.baseurl");

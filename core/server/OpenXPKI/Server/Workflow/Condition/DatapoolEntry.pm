@@ -50,7 +50,7 @@ sub evaluate
     my $context     = $workflow->context();
 
     my $ds_params      = { 
-	PKI_REALM => CTX('session')->get_pki_realm(),
+	PKI_REALM => CTX('session')->data->pki_realm,
     };
 
     my $params = {};

@@ -99,7 +99,7 @@ sub __load_profile
     my $config = CTX('config');
 
     my $ca_profile_name = $self->{CA};
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my $path;
     my $validity;

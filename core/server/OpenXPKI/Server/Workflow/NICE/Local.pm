@@ -31,7 +31,7 @@ sub issueCertificate {
 
     ##! 1: 'Starting '
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
     my $csr_serial = $csr->{CSR_SERIAL};
@@ -316,7 +316,7 @@ sub issueCRL {
     my $self = shift;
     my $ca_alias = shift;
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
     # FIXME - we want to have a context free api....
@@ -435,7 +435,7 @@ sub __prepare_crl_data {
 
     my @cert_timestamps = ();
     my $dbi       = CTX('dbi');
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     while (my $cert = $sth_certs->fetchrow_hashref) {
         ##! 32: 'cert to be revoked: ' . Data::Dumper->new([$cert])->Indent(0)->Terse(1)->Sortkeys(1)->Dump

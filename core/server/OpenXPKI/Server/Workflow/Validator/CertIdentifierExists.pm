@@ -31,7 +31,7 @@ sub _validate {
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NO_SUCH_ID");
     }
 
-    my $pki_realm = $self->param('pki_realm') || CTX('session')->get_pki_realm();
+    my $pki_realm = $self->param('pki_realm') || CTX('session')->data->pki_realm;
 
     if (($cert->{pki_realm} ne $pki_realm) && ($pki_realm ne '_any')) {
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_IN_REALM");

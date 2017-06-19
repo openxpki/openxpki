@@ -133,7 +133,7 @@ sub workflow_def {
 
 sub test_wf_instance {
     my ($pki_realm, $name) = @_;
-    CTX('session')->set_pki_realm($pki_realm);
+    CTX('session')->data->pki_realm($pki_realm);
     my $wfinfo = CTX('api')->create_workflow_instance({
         WORKFLOW => $name,
         PARAMS => {
@@ -161,19 +161,19 @@ $oxitest->workflow_config("alpha", "wf_type_3_unused", workflow_def("wf_type_3_u
 $oxitest->workflow_config("beta",  "wf_type_4", workflow_def("wf_type_4"));
 $oxitest->setup_env->init_server('workflow_factory');
 
-CTX('session')->set_role('User');
+CTX('session')->data->role('User');
 
-CTX('session')->set_user('wilhelm');
+CTX('session')->data->user('wilhelm');
 my $wf_t1_a = test_wf_instance "alpha", "wf_type_1";
-CTX('session')->set_user('franz');
+CTX('session')->data->user('franz');
 my $wf_t1_b = test_wf_instance "alpha", "wf_type_1";
-CTX('session')->set_user('wilhelm');
+CTX('session')->data->user('wilhelm');
 my $wf_t2 =   test_wf_instance "alpha", "wf_type_2";
 my $wf_t4 =   test_wf_instance "beta",  "wf_type_4";
 
 
 
-CTX('session')->set_pki_realm('alpha');
+CTX('session')->data->pki_realm('alpha');
 
 #diag Dumper(OpenXPKI::Workflow::Config->new->workflow_config);
 
@@ -245,7 +245,7 @@ lives_and {
 throws_ok { CTX('api')->get_workflow_log({ ID => $wf_t1_a->{ID} }) } qr/unauthorized/i,
     "get_workflow_log() - throw exception on unauthorized user";
 
-CTX('session')->set_role('Guard');
+CTX('session')->data->role('Guard');
 lives_and {
     my $result = CTX('api')->get_workflow_log({ ID => $wf_t1_a->{ID} });
     like $result->[-1]->[2], qr/ execute .* initialize /msxi or diag explain $result;
@@ -260,12 +260,12 @@ lives_and {
     }
     is $sorting_ok, 1;
 } "get_workflow_log() - return 'save' as first message and sort correctly";
-CTX('session')->set_role('User');
+CTX('session')->data->role('User');
 
 #
 # get_workflow_history
 #
-CTX('session')->set_role('Guard');
+CTX('session')->data->role('Guard');
 lives_and {
     my $result = CTX('api')->get_workflow_history({ ID => $wf_t1_a->{ID} });
     cmp_deeply $result, [
@@ -276,7 +276,7 @@ lives_and {
         superhashof({ WORKFLOW_STATE => re(qr/^PERSIST/), WORKFLOW_ACTION => re(qr/set_motd/i) }),
     ];
 } "get_workflow_history()";
-CTX('session')->set_role('User');
+CTX('session')->data->role('User');
 
 #
 # get_workflow_creator
