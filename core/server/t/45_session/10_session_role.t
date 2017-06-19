@@ -35,7 +35,7 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($OFF);
 
 
-plan tests => 10;
+plan tests => 11;
 
 
 use_ok "OpenXPKI::Server::SessionHandler";
@@ -70,16 +70,29 @@ throws_ok {
     $session->data_as_hashref("id", "ink");
 } qr/ unknown .* ink /msxi, "get_attributes() - complain about wrong attribute";
 
-# Freeze (serialize)
-my $frozen;
+# Freeze (serialize) and thaw (deserialize)
+my ($frozen1, $frozen2);
 lives_ok {
-    $frozen = $session->driver->freeze($session->data_as_hashref);
+    $frozen1 = $session->data->freeze(except => [ "user" ]);
+    $frozen2 = $session->data->freeze(only => [ "user" ]);
 } "freeze session 1 data";
 
-# Thaw (deserialize)
 lives_and {
-    cmp_deeply $session->driver->thaw($frozen), $session->data_as_hashref;
-} "thaw and verify data";
+    my $session_data = $session->data_as_hashref;
+    delete $session_data->{user}; # we specified freeze(except => "user") above
+
+    my $session2 = OpenXPKI::Server::SessionHandler->new(type => "TestDriver")->create;
+    $session2->data->thaw($frozen1);
+
+    cmp_deeply $session2->data_as_hashref, $session_data;
+} "thaw data (except 'user') into session 2";
+
+lives_and {
+    my $session3 = OpenXPKI::Server::SessionHandler->new(type => "TestDriver")->create;
+    $session3->data->thaw($frozen2);
+
+    cmp_deeply $session3->data_as_hashref, { user => $session->data->user };
+} "thaw data (only 'user') into session 3";
 
 # Persist (virtually in our test case)
 lives_and {

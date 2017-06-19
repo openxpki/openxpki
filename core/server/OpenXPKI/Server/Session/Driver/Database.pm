@@ -38,20 +38,19 @@ has dbi => (
 # DBI compliant driver name
 sub save {
     my ($self, $data) = @_;
-    my $data_hash = $data->get_attributes; # HashRef
     ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data_hash->{$_} } sort keys %$data_hash)
 
-    my $id          = delete $data_hash->{id}         or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'id' is not set");
-    my $created     = delete $data_hash->{created}    or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'created' is not set");
-    my $modified    = delete $data_hash->{modified}   or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'modified' is not set");
-    my $ip_address  = delete $data_hash->{ip_address} or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'ip_address' is not set");
+    my $id          = $data->id         or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'id' is not set");
+    my $created     = $data->created    or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'created' is not set");
+    my $modified    = $data->modified   or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'modified' is not set");
+    my $ip_address  = $data->ip_address or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'ip_address' is not set");
 
     $self->dbi->merge_and_commit(
         into => 'session',
         set => {
             modified    => $modified,
             ip_address  => $ip_address,
-            data        => $self->freeze($data_hash),
+            data        => $data->freeze(except => [ "id", "created", "modified", "ip_address" ]),
         },
         set_once => {
             created     => $created,
@@ -75,15 +74,15 @@ sub load {
     ) or return;
     ##! 8: "loaded raw session #$id: ".join(", ", map { "$_ = ".$db->{$_} } sort keys %$db)
 
-    my $data_hash = {
-        id          => $db->{session_id},
-        created     => $db->{created},
-        modified    => $db->{modified},
-        ip_address  => $db->{ip_address},
-        % { $self->thaw($db->{data}) },
-    };
-
-    return OpenXPKI::Server::Session::Data->new( %{ $data_hash } );
+    return
+        OpenXPKI::Server::Session::Data
+        ->new(
+            id         => $db->{session_id},
+            created    => $db->{created},
+            modified   => $db->{modified},
+            ip_address => $db->{ip_address},
+        )
+        ->thaw($db->{data});
 }
 
 sub delete_all_before {

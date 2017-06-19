@@ -83,44 +83,4 @@ Constructor that creates a new session with an empty data object.
 
 =cut
 
-=head1 METHODS
-
-=head2 freeze
-
-Serializes the given HashRef into a string. The first characters of the
-string until the first colon indicate the type of serialization (encoder).
-
-Returns a string with the serialized data.
-
-=cut
-sub freeze {
-    my ($self, $data) = @_;
-    return "JSON:".encode_json($data);
-}
-
-=head2 thaw
-
-Deserializes the session attributes from a string and returns them as C<HashRef>.
-
-The first characters of the string until the first colon must indicate the type
-of serialization (encoder).
-
-=cut
-sub thaw {
-    my ($self, $frozen) = @_;
-
-    # backwards compatibility
-    if ($frozen =~ /^HASH\n/ ) {
-        use OpenXPKI::Serialization::Simple;
-        return OpenXPKI::Serialization::Simple->new->deserialize($frozen);
-    }
-
-    OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
-        unless $frozen =~ /^JSON:/;
-    $frozen =~ s/^JSON://;
-
-    my $data = decode_json($frozen);
-    return $data;
-}
-
 1;

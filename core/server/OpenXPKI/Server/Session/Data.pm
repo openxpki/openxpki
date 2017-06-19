@@ -168,4 +168,62 @@ sub clear_secret {
     delete $self->_secrets->{$digest};
 }
 
+=head1 METHODS
+
+=head2 freeze
+
+Serializes the session attributes into a string. The first characters of the
+string until the first colon indicate the type of serialization (encoder ID).
+
+Returns a string with the serialized data.
+
+=cut
+sub freeze {
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        except => { isa => 'ArrayRef', optional => 1 },
+        only => { isa => 'ArrayRef', optional => 1 },
+    );
+
+    my $data_hash = $params{only}
+        ? $self->get_attributes(@{ $params{only} })
+        : $self->get_attributes;
+
+    if ($params{except}) {
+        delete $data_hash->{$_} for @{ $params{except} };
+    }
+
+    return "JSON:".encode_json($data_hash);
+}
+
+=head2 thaw
+
+Deserializes the session attributes from a string and sets them. Attributes
+which are not mentioned will not be touched.
+
+The first characters of the string until the first colon must indicate the type
+of serialization (encoder ID).
+
+Returns the object instance (allows for method chaining).
+
+=cut
+sub thaw {
+    my ($self, $frozen) = @_;
+
+    # backwards compatibility
+    if ($frozen =~ /^HASH\n/ ) {
+        use OpenXPKI::Serialization::Simple;
+        return OpenXPKI::Serialization::Simple->new->deserialize($frozen);
+    }
+
+    OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
+        unless $frozen =~ /^JSON:/;
+    $frozen =~ s/^JSON://;
+
+    my $data_hash = decode_json($frozen);
+    # set session attributes via accessor methods
+    $self->$_($data_hash->{$_}) for keys %$data_hash;
+
+    return $self;
+}
+
 1;
