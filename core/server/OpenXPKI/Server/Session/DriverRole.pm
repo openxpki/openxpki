@@ -109,6 +109,12 @@ of serialization (encoder).
 sub thaw {
     my ($self, $frozen) = @_;
 
+    # backwards compatibility
+    if ($frozen =~ /^HASH\n/ ) {
+        use OpenXPKI::Serialization::Simple;
+        return OpenXPKI::Serialization::Simple->new->deserialize($frozen);
+    }
+
     OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
         unless $frozen =~ /^JSON:/;
     $frozen =~ s/^JSON://;
