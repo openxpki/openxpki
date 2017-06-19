@@ -119,10 +119,9 @@ sub execute_action {
 
     $self->persist_context(1);
 
-    my $session =  CTX('session');
-    my $session_info = $session->export_serialized_info();
-    ##! 32: 'session_info: '.$session_info
-    $self->session_info($session_info);
+    $self->session_info(
+        CTX('session')->data->freeze(only => [ "user", "role" ])
+    );
 
     # The workflow module internally caches conditions and does NOT clear
     # this cache if you just refetch a workflow! As the workflow state

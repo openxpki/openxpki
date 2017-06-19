@@ -657,7 +657,7 @@ sub __wake_up_workflow {
         $self->__check_session();
 
         CTX('session')->data->pki_realm($args->{pki_realm});
-        CTX('session')->import_serialized_info($args->{workflow_session});
+        CTX('session')->data->thaw($args->{workflow_session});
 
         # Set MDC for logging
         Log::Log4perl::MDC->put('user', CTX('session')->data->user);
