@@ -217,9 +217,9 @@ sub __init_encryption_alg : PRIVATE {
 }
 
 sub __init_session : PRIVATE {
-    OpenXPKI::Server::Context::setcontext({
-        'session' => OpenXPKI::Server::SessionHandler->new(load_config => 1)->create
-    });
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
+    OpenXPKI::Server::Context::setcontext({ 'session' => $session });
+    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 }
 
 sub __init_pki_realm : PRIVATE {

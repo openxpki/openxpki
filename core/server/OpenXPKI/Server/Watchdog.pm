@@ -662,7 +662,7 @@ sub __wake_up_workflow {
         # Set MDC for logging
         Log::Log4perl::MDC->put('user', CTX('session')->get_user());
         Log::Log4perl::MDC->put('role', CTX('session')->get_role());
-        Log::Log4perl::MDC->put('sid', substr(CTX('session')->get_id(),0,4));
+        Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 
         ##! 1: 'call wakeup'
         my $wf_info = CTX('api')->wakeup_workflow({
@@ -714,6 +714,7 @@ sub __check_session {
     ##! 4: "create new session dir: $directory, lifetime: $lifetime "
     $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
+    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
     ##! 4: sprintf(" session %s created" , $session->get_id())
 }
 
