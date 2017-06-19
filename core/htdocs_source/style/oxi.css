@@ -86,7 +86,7 @@ div.section{
 /* Button format from workflow defs */
 .oxi-button-container .btn.expected,
 .oxi-form-button button.btn.submit {
-	background-color: #c9e2b3;
+    background-color: #c9e2b3;
 }
 
 .oxi-button-container .btn.optional {
@@ -226,30 +226,37 @@ img.toplogo{
 ul.pagination li:not(.disabled) > a {
     cursor: pointer;
 }
- 
+
 /* Status Labels inside key/value lists, e.g */
+span.styled-valid,
 span.dns-valid,
 span.certstatus-issued {
     color: green;
 }
 
+span.styled-failed,
 span.dns-failed,
 span.certstatus-revoked {
     color: red;
 }
 
+span.styled-attention,
 span.certstatus-crl_issuance_pending {
-	color: orange;
+    color: orange;
 }
 
 span.certstatus-expired {
     color: #444;
 }
 
-span.dns-timeout, 
+span.dns-timeout,
 span.certstatus-unknown {
     color: #79d1f3;
 }
 
+span.styled-attention,
+span.styled-failed {
+    font-weight: bold;
+}
 /* keep line wraps in code */
 code { white-space: pre; }

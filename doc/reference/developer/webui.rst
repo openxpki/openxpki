@@ -12,15 +12,15 @@ This is the root element of any json result::
     %structure = (
 
         page => { TOP_LEVEL_INFO},
-        
+
         right => [ PAGE_SECTION, PAGE_SECTION,...] , # optional, information which will be displayed in additional right pane
-        
+
         main => [ PAGE_SECTION, PAGE_SECTION,...] , # information which will be displayed in the main section
-        
+
         reloadTree => BOOL (1/0), # optional, the browser will perform a complete reload. If an additional "goto" is set, the page-url will change to this target
-        
-        goto => STRING PAGE, # optional, will be evaluated as url-hashtag target                 
-        
+
+        goto => STRING PAGE, # optional, will be evaluated as url-hashtag target
+
         status => { STATUS_INFO } # optional
     );
 
@@ -38,7 +38,7 @@ This is rendered as the page main headline and intro text.
         label => STRING, #Page Header
         description => STRING, # additional text (opt.)
     }
-            
+
     Example: page => {label => 'OpenXPKI Login', description => 'Please log in!'}
 
 
@@ -49,19 +49,19 @@ Show a status bar on top of the page, the level indicates the severity and resul
 ::
 
     STATUS_INFO:
-    { 
+    {
         level => STRING, # allowed values: "info", "success","warn", "error"
         message => STRING # status message shown
     }
-       
-    Example:   status => { level => 'error', message => 'Login credentials are wrong!' } 
+
+    Example:   status => { level => 'error', message => 'Login credentials are wrong!' }
 
 
 Page Level
 ==========
 
 The page sections (``main`` and ``right``) can hold multiple subpage definitions. The main section must always contain at least one section while right can be omitted or empty.
-      
+
 Page Section (PAGE_SECTION)
 --------------------------------
 
@@ -71,17 +71,17 @@ This is the top level container of each page section.
     PAGE_SECTION:
     {
         type => STRING # determines type of section, can be one of: text|grid|form|keyvalue
-            
+
         content => {
             label => STRING # optional, section headline
-            
+
             description => STRING , # optional, additional text (html is allowed)
-                    
+
             buttons => [BUTTON_DEF, BUTTON_DEF, BUTTON_DEF] , #optional, defines the buttons/links for this section
-                    
+
             # additional content-params depending on type (see below)
         },
-                            
+
         # additional section-params depending on type:
     }
 
@@ -102,7 +102,7 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
         columns => [ GRID_COL_DEF, GRID_COL_DEF , GRID_COL_DEF... ],
         data => [ GRID_ROW, GRID_ROW, GRID_ROW, ... ],
         actions => [ GRID_ACTION_DEF, GRID_ACTION_DEF, GRID_ACTION_DEF... ], # defines available actions, displayed as context menu
-        processing_type => STRING, # only possible value (for now) is "all" 
+        processing_type => STRING, # only possible value (for now) is "all"
     }
 
     GRID_COL_DEF:
@@ -122,9 +122,9 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
         target => STRING_TARGET # optional, where to open the new page, one of main|right|modal|tab
         icon => STRING , # optional, file name of image icon, must be placed in htdocs/img/contextmenu
     }
-        
 
-Columns, whose sTitle begin with an underscore will not be displayed but used as internal information (e.g. as path in GRID_ACTION_DEF). A column with the special title ``_status`` is used as css class for the row. Also a pulldown menu to filter by status will be displayed. 
+
+Columns, whose sTitle begin with an underscore will not be displayed but used as internal information (e.g. as path in GRID_ACTION_DEF). A column with the special title ``_status`` is used as css class for the row. Also a pulldown menu to filter by status will be displayed.
 The rows hold the data in form of a positional array.
 
 Action target ``modal`` creates a modal popup, ``tab`` inits or extends a tabbed window view in the current section.
@@ -133,19 +133,19 @@ Action target ``modal`` creates a modal popup, ``tab`` inits or extends a tabbed
 
     content => {
         columns => [
-	    { sTitle => "Serial" },	
-            { sTitle => "Subject" },                                                
-	    { sTitle => "date_issued", format => 'timestamp'},
-	    { sTitle => "link", format => 'link'},
-	    { sTitle => "_id"}, # internal ID (will not be displayed)
-	    { sTitle => "_status"}, # row status 
+        { sTitle => "Serial" },
+            { sTitle => "Subject" },
+        { sTitle => "date_issued", format => 'timestamp'},
+        { sTitle => "link", format => 'link'},
+        { sTitle => "_id"}, # internal ID (will not be displayed)
+        { sTitle => "_status"}, # row status
         ],
         data => [
             ['0123','CN=John M Miller,DC=My Company,DC=com',1379587708, {page => 'http://../', label => 'Click On Me'}, 'swBdX','issued'],
             ['0456','CN=Bob Builder,DC=My Company,DC=com',1379587517,{...},'qqA2H','expired'],
         ],
         actions => [
-            { 
+            {
                 path => 'cert!detail!{_id}',
                 label => 'Details',
                 icon => 'view',
@@ -157,7 +157,7 @@ Action target ``modal`` creates a modal popup, ``tab`` inits or extends a tabbed
             },
         ]
     }
-            
+
 SECTION-TYPE "form"
 -------------------
 
@@ -165,20 +165,20 @@ Render a form to submit data to the server
 ::
 
     content => {
-        label => .., description => .., 
+        label => .., description => ..,
         buttons => [ ... ], # a form must contain at least one button to be useful
         fields => [ FORM_FIELD_DEF,FORM_FIELD_DEF,FORM_FIELD_DEF ],
     }
-    
+
     FORM_FIELD_DEF:
     {
         name => STRING # internal key - will be transmitted to server
         value => MIXED, # value of the field, scalar or array (depending on type)
         label => STRING, # displayed label
-        type => STRING_FIELD_TYPE, # see below for supported field types 
+        type => STRING_FIELD_TYPE, # see below for supported field types
         is_optional => BOOL, # if false (or not given at all) the field is required
         clonable => BOOL,  creates fields that can be added more than once
-        visible => BOOL, #if set to "false" ("0" in perl) this field will be not displayed (initial) 
+        visible => BOOL, #if set to "false" ("0" in perl) this field will be not displayed (initial)
         keys => ARRAY ,#optional, activates the special feature of "dynamic key value fields", see below.
         # + additional keys depending for some types
     }
@@ -195,7 +195,7 @@ Field-Type "checkbox/bool"
 A html checkbox, ``value`` and ``is_optional`` are without effect, as always 0 or 1 is send to the server.
 
 Field-Type "date"
-^^^^^^^^^^^^^^^^^^ 
+^^^^^^^^^^^^^^^^^^
 
 A text field with a jquery datapicker attached. Additional (all optional) params are:
 ::
@@ -203,12 +203,12 @@ A text field with a jquery datapicker attached. Additional (all optional) params
     FORM_FIELD_DEF:
     {
         notbefore => INTEGER, # optional, unixtime, earliest selectable date
-        notafter => INTEGER, # optional, unixtime, earliest selectable date 
+        notafter => INTEGER, # optional, unixtime, earliest selectable date
         return_format => STRING # one of terse|printable|iso8601|epoch, see OpenXPKI::Datetime
     }
-    
+
 Field-Type "select"
-^^^^^^^^^^^^^^^^^^^^ 
+^^^^^^^^^^^^^^^^^^^^
 
 A html select element, the options parameter is required, others are optional::
 
@@ -234,7 +234,7 @@ The radio type is the little brother of the select field, but renders the items 
         options => [{....}] or 'ajax_action_string'..
         multi => BOOL, # optional, if true, uses checkbox elements instead radio buttons
     }
-       
+
 
 Field-Type "upload"
 ^^^^^^^^^^^^^^^^^^^
@@ -244,13 +244,13 @@ Renders a field to upload files with some additional benefits::
     FORM_FIELD_DEF:
     {
         mode => STRING, # one of hidden, visible, raw
-        allowedFiles => ARRAY OF STRING, # ['txt', 'jpg'], 
+        allowedFiles => ARRAY OF STRING, # ['txt', 'jpg'],
         textAreaSize => {width => '10', height => '15'},
     }
 
 By default, a file upload button is shown which loads the selected file into a hidden textarea. Binary content is encoded with base64 and prefixed with the word "binary:". With `mode = visible` the textarea is also shown so the user can either upload or paste the data (which is very handy for CSR uploads), the textAreaSize will affect the size of the area field. With ``mode = raw`` the element degrades to a html form upload button and the selected file is send with the form as raw data.
 
-AllowedFiles can contain a list of allowed file extensions. 
+AllowedFiles can contain a list of allowed file extensions.
 
 Dynamic key value fields
 ^^^^^^^^^^^^^^^^^^^
@@ -259,10 +259,10 @@ The content of the actual field will be submitted to the server with the selecte
 
 Example:
     { name => '...', label => 'Dyn Key-Value', 'keys' => [{value=>"key_x",label=>"Typ X"},{value=>"key_y",label=>"Typ Y"}], type => 'text' },
-                        
+
     This example definition will render a Textfield with label "Dyn Key-Value". Above the textfield a select is displayed with three options ("Typ x","Typ y" and "Typ z").
     If the user chooses "Typ Z", the entered value in the textfield will be posted to server with key "key_z".
-    
+
     This feature makes often more sense in combination with "clonable" fields.
 
 Dynamic form rendering
@@ -270,7 +270,7 @@ Dynamic form rendering
 If a select field is defined with the property "actionOnChange", each change event of this pulldown will trigger
 an submit of all formvalues (without validity checks etc) to the server with key "action" set to the value of "actionOnChange".
 
-The returned JSON must contain the key "_returnType" which should have the value "partial" or "full".  
+The returned JSON must contain the key "_returnType" which should have the value "partial" or "full".
 This "_returnType" defines the mode of re-definition of the content of the form.
 
 Partial redefinition:
@@ -281,40 +281,40 @@ Partial redefinition:
     The property "type" can not be subject to changes. With aid of the property "visible" one can dynamically show or hide some fields.
     Only known fields (which are already defined in the initial "fields"-property of the form-section) can be subject of the "partial" re-rendering.
     Its not possible to add new fields here.
-    
+
     You can define more than one (cascading) dependent select.
-    
+
     *Example*::
-    
+
     Initial definition of fields:
     fields => [
                     { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
-                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!', type => 'select',options=>[] },                    
-                    
+                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!', type => 'select',options=>[] },
+
                     { name => 'special', label => 'Spezial (nur Typ 2',  type => 'checkbox',visible => 0 },
-                    
+
                     ]
-    
-    Action "test_dep_select!change_type" returns a (partially updated) definition of fields 
-    
+
+    Action "test_dep_select!change_type" returns a (partially updated) definition of fields
+
     {
         _returnType => 'partial',
         fields => [
               { name => 'cert_subtyp', options=> [{value=>'x', label => 'Subtyp X'},...],value=>'x'} ,
               { name => 'special',visible=> 1 }
-              ]   
-        
+              ]
+
         };
-    
-    
-    
+
+
+
 Full redefinition:
     is not implemented yet.
-    
+
 
 Item Level
 ==========
-     
+
 Buttons (BUTTON_DEF)
 --------------------
 
@@ -322,14 +322,14 @@ Defines a button.::
 
     {
         page => STRING_PAGE,
-        action => STRING_ACTION, # parameters "page" and "action" will be transmitted to server. if an "action" is given, POST will be used instead of GET 
+        action => STRING_ACTION, # parameters "page" and "action" will be transmitted to server. if an "action" is given, POST will be used instead of GET
         label => STRING, # The label of the button
         target => STRING_TARGET, # one of main|modal|right|tab (optional, default is main)
         css_class => STRING, # optional, css class for the button element
         do_submit => BOOL, # optional, if true, the button submits the contents of the form to the given page/action target, only available with form-section
     }
 
-                  
+
 Formattet Strings (STRING_FORMAT)
 ---------------------------------
 
@@ -361,7 +361,7 @@ extlink
 ^^^^^^^
 
 Similar to link but expects href to be an external target, default target is blank.
- 
+
 text
 ^^^^
 
@@ -381,28 +381,37 @@ code
 ^^^^
 
 Rendered with fixed-with typo, unix linebreaks are converted to html linebreaks.
- 
+
 defhash/deflist
 ^^^^^^^^^^^^^^^
 
-Outputs a key/value list (dl/dt/dd) - defhash expects a hash where keys are 
-labels. deflist expects an array where each item is a hash with keys key and 
-value. 
+Outputs a key/value list (dl/dt/dd) - defhash expects a hash where keys are
+labels. deflist expects an array where each item is a hash with keys key and
+value.
 
 ullist
 ^^^^^^
 
-Array of values, each item becomes a <li> in the list, values are html-escaped. 
+Array of values, each item becomes a <li> in the list, values are html-escaped.
 
 rawlist
 ^^^^^^^
 
 Like ullist but displays the items "as is" (can contain HTML markup)
 
-linklist 
+linklist
 ^^^^^^^^
 
 Array, where each item is a hash describing a link
+
+styled
+^^^^^^
+
+Expects a value in the format ``stylename:Text to display``. The part left
+of the colon is extracted and the text at the right is wrapped with span
+with style class "styled-``stylename``. Predefined stylenames are
+``valid``, ``failed`` and ``attention``
+
 
 Customization
 =============
@@ -415,14 +424,14 @@ Form-Field
 Add a new FormField-Type::
 
     OXI.FormFieldFactory.registerComponent('type','ComponentName',JS_CODE [,bOverwriteExisting]);
-        
+
 *Example*::
 
     OXI.FormFieldFactory.registerComponent('select','MySpecialSelect', OXI.FormFieldContainer.extend({
         ....
     }), true);
 
-This will overwrite the handler for the select element. The ComponentName will be registered in the OXI Namespace and can be used to call the object from within userdefined code. 
+This will overwrite the handler for the select element. The ComponentName will be registered in the OXI Namespace and can be used to call the object from within userdefined code.
 
 
 Formatter
@@ -431,7 +440,7 @@ Formatter
 Add a new Format-Handler::
 
     OXI.FormatHelperFactory.registerComponent('format','ComponentName',JS_CODE [,bOverwriteExisting])
-        
+
 
 
 

@@ -8628,16 +8628,19 @@ ul.pagination li:not(.disabled) > a {
 
 /* Status Labels inside key/value lists, e.g */
 
+span.styled-valid,
 span.dns-valid,
 span.certstatus-issued {
   color: green;
 }
 
+span.styled-failed,
 span.dns-failed,
 span.certstatus-revoked {
   color: red;
 }
 
+span.styled-attention,
 span.certstatus-crl_issuance_pending {
   color: orange;
 }
@@ -8649,6 +8652,11 @@ span.certstatus-expired {
 span.dns-timeout,
 span.certstatus-unknown {
   color: #79d1f3;
+}
+
+span.styled-attention,
+span.styled-failed {
+  font-weight: bold;
 }
 
 /* keep line wraps in code */
