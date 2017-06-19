@@ -488,14 +488,14 @@ sub execute_workflow_activity {
     if ($fork_mode) {
         $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
         CTX('log')->workflow()->debug("Background execution of workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')");
- 
+
         if ($fork_mode eq 'watch') {
             $workflow = $self->__watch_workflow( $workflow );
         }
     } else {
         $self->__execute_workflow_activity( $workflow, $wf_activity );
         CTX('log')->workflow()->debug("Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')");
- 
+
     }
 
     return $self->__get_workflow_ui_info({ WORKFLOW => $workflow }) if $wf_uiinfo;
@@ -524,7 +524,7 @@ sub fail_workflow {
     $workflow->set_failed( $error, $reason );
 
     CTX('log')->workflow()->info("Failed workflow $wf_id (type '$wf_type') with error $error");
- 
+
 
     return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
 
@@ -636,7 +636,7 @@ sub __wakeup_resume_workflow {
     }
 
     CTX('log')->workflow()->info("$mode workflow $wf_id (type '$wf_type') with activity $wf_activity");
- 
+
     ##! 16: 'execute activity ' . $wf_activity
 
     if ($fork_mode) {
@@ -732,7 +732,7 @@ sub create_workflow_instance {
 
     ##! 16: 'workflow id ' .  $wf_id
     CTX('log')->workflow()->info("Workflow instance $wf_id created for $creator (type: '$wf_type')");
- 
+
 
 
     # load the first state and check for the initial action
@@ -764,10 +764,10 @@ sub create_workflow_instance {
     # Workflow is still in initial state - so something went wrong.
     if ($workflow->state() eq 'INITIAL') {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_API_CREATE_WORKFLOW_INSTANCE_CREATE_FAILED",
+            message => "Failed to create workflow instance!",
             log =>  {
                 priority => 'error',
-                facility => [ 'system', 'workflow' ]
+                facility => 'workflow'
             }
         );
     }
@@ -1161,7 +1161,7 @@ sub __execute_workflow_activity {
 
         CTX('log')->workflow()->warn(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
                 $workflow->state(), $workflow->id(), $workflow->type()));
- 
+
 
         my $pid;
         my $redo_count = 5;
@@ -1228,7 +1228,7 @@ sub __execute_workflow_activity {
                 $wf_activity = $action[0];
                 CTX('log')->workflow()->info(sprintf ("Found internal bypass action, leave state %s in workflow id %01d (type %s)",
                         $workflow->state(), $workflow->id(), $workflow->type()));
- 
+
             } else {
                 $wf_activity = '';
             }
@@ -1244,7 +1244,7 @@ sub __execute_workflow_activity {
         my $eval = $EVAL_ERROR;
         CTX('log')->workflow()->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
                 $wf_activity, $workflow->id(), $workflow->type(), $eval));
- 
+
 
         OpenXPKI::Server::__set_process_name("workflow: id %d (exception)", $workflow->id());
 

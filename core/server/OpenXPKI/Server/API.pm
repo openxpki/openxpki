@@ -1767,16 +1767,15 @@ sub AUTOMETHOD {
                     params  => {
                         'EVAL_ERROR' => $EVAL_ERROR,
                     },
-            log => {
-            priority => 'error',
-            facility => [ 'system', 'audit' ]
-            },
-                );
+                log => {
+                    priority => 'error',
+                    facility => 'system'
+                });
             }
         }
 
         CTX('log')->system()->debug("Method '$method_name' called via API");
- 
+
 
         my $memoization_key;
         if (exists $method_info_of{$ident}->{$method_name}->{memoize} &&

@@ -88,7 +88,7 @@ sub _convert {
                 my $key = $from_legacy->{$_} or OpenXPKI::Exception->throw(
                     message => 'Unknown field name while trying to convert from legacy database attributes',
                     params  => { legacy_fieldname => $_ },
-                    log => { logger => CTX('log'), priority => 'fatal', facility => [ 'system', ] },
+                    log => { priority => 'fatal', facility =>  'system', },
                 );
                 ( $key => $data->{$_} )
             }

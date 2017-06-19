@@ -1706,7 +1706,7 @@ sub get_data_pool_entry {
                     },
                     log => {
                         priority => 'error',
-                        facility => [ 'system', ],
+                        facility => 'system',
                     },
                 );
             }
@@ -1733,7 +1733,7 @@ sub get_data_pool_entry {
                         },
                         log => {
                             priority => 'error',
-                            facility => [ 'system', ],
+                            facility => 'system',
                         },
                     );
                 }
@@ -1814,7 +1814,7 @@ sub get_data_pool_entry {
                         },
                         log => {
                             priority => 'fatal',
-                            facility => [ 'system', ],
+                            facility => 'system',
                         },
                     );
                 }
@@ -1938,7 +1938,7 @@ sub set_data_pool_entry {
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_NAMESPACE_AND_KEY_ARE_REQUIRED',
             log => {
                 priority => 'error',
-                facility => [ 'system' ],
+                facility => 'system',
             }
         );
     }
@@ -1956,7 +1956,7 @@ sub set_data_pool_entry {
             params => { NAMESPACE => $args->{NAMESPACE}, },
             log    => {
                 priority => 'error',
-                facility => [ 'audit', 'system', ],
+                facility => 'system',
             },
         );
 
@@ -2090,7 +2090,7 @@ sub modify_data_pool_entry {
                     },
                     log => {
                         priority => 'error',
-                        facility => [ 'system', ],
+                        facility => 'system',
                     },
                 );
             }
@@ -2349,7 +2349,7 @@ sub __set_data_pool_entry : PRIVATE {
             },
             log => {
                 priority => 'error',
-                facility => [ 'system', ],
+                facility =>  'system',
             },
         );
     }
@@ -2365,7 +2365,7 @@ sub __set_data_pool_entry : PRIVATE {
             },
             log => {
                 priority => 'error',
-                facility => [ 'system', ],
+                facility =>  'system',
             },
         );
     }
@@ -2383,7 +2383,7 @@ sub __set_data_pool_entry : PRIVATE {
                 },
                 log => {
                     priority => 'error',
-                    facility => [ 'system', ],
+                    facility =>  'system',
                 },
             );
         }
@@ -2400,7 +2400,7 @@ sub __set_data_pool_entry : PRIVATE {
             },
             log => {
                 priority => 'error',
-                facility => [ 'system', ],
+                facility =>  'system',
             },
         );
     }
@@ -2444,7 +2444,7 @@ sub __set_data_pool_entry : PRIVATE {
                     },
                     log => {
                         priority => 'error',
-                        facility => [ 'system', ],
+                        facility =>  'system',
                     },
                 );
             }
@@ -2614,7 +2614,7 @@ sub __get_current_datapool_encryption_key : PRIVATE {
                     },
                     log => {
                         priority => 'fatal',
-                        facility => [ 'system', ],
+                        facility =>  'system',
                     },
                 );
             }
@@ -2665,7 +2665,7 @@ sub __assert_current_pki_realm_within_workflow : PRIVATE {
         },
         log => {
             priority => 'error',
-            facility => [ 'audit', 'system', ],
+            facility => 'system',
         },
     );
 }

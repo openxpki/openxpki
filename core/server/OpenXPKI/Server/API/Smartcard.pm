@@ -50,7 +50,7 @@ sub sc_parse_certificates {
         },
         log => {
         priority => 'error',
-        facility => [ 'application', ],
+        facility => 'application',
         },
         );
     }
@@ -104,7 +104,7 @@ sub sc_analyze_smartcard {
         },
         log => {
         priority => 'error',
-        facility => [ 'application', ],
+        facility => 'application',
         },
         );
     }
@@ -200,7 +200,7 @@ sub sc_analyze_smartcard {
             },
             log => {
                 priority => 'error',
-                facility => [ 'application', ],
+                facility => 'application',
             },
         );
     }
@@ -218,7 +218,7 @@ sub sc_analyze_smartcard {
         },
         log => {
             priority => 'error',
-            facility => [ 'application', ],
+            facility => 'application',
         },
         );
     } # Status Check
@@ -242,7 +242,7 @@ sub sc_analyze_smartcard {
         },
         log => {
             priority => 'error',
-            facility => [ 'application', ],
+            facility => 'application',
         },
         );
     }
@@ -327,7 +327,7 @@ sub sc_analyze_smartcard {
         },
         log => {
             priority => 'error',
-            facility => [ 'application', ],
+            facility => 'application',
         },
         );
     }
@@ -340,7 +340,7 @@ sub sc_analyze_smartcard {
         },
         log => {
             priority => 'error',
-            facility => [ 'application', ],
+            facility => 'application',
         },
         );
     }
@@ -419,7 +419,7 @@ sub sc_analyze_smartcard {
                 },
                 log => {
                     priority => 'error',
-                    facility => [ 'application', ],
+                    facility => 'application',
                 },
                 );
         }
@@ -528,7 +528,7 @@ sub sc_analyze_smartcard {
         },
         log => {
         priority => 'error',
-        facility => [ 'application', ],
+        facility => 'application',
         },
         );
     }
@@ -1293,7 +1293,7 @@ sub sc_analyze_certificate {
             },
             log => {
                 priority => 'error',
-                facility => [ 'application', ],
+                facility => 'application',
            },
         );
     }
@@ -1310,7 +1310,7 @@ sub sc_analyze_certificate {
             },
            log => {
               priority => 'error',
-              facility => [ 'application', ],
+              facility => 'application',
            },
         );
     }
@@ -1349,7 +1349,7 @@ sub sc_analyze_certificate {
            },
            log => {
               priority => 'error',
-              facility => [ 'application' ],
+              facility => 'application',
            },
         );
     }

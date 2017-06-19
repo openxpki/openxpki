@@ -36,12 +36,12 @@ sub execute {
 
     if ( !$holder_id ) {
         OpenXPKI::Exception->throw(
-            message => 
+            message =>
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID',
             params => { TOKEN_ID => $tokenid, },
             log    => {
                 priority => 'error',
-                facility => ['application'],
+                facility => 'application',
             },
         );
     }
@@ -58,7 +58,7 @@ sub execute {
             params => { EMPLOYEEID => $holder_id },
             log    => {
                 priority => 'error',
-                facility => ['application'],
+                facility => 'application'
             },
         );
     }
@@ -69,13 +69,13 @@ sub execute {
             params => { EMPLOYEEINFO => $employeeinfo->{VALUE} },
             log    => {
                 priority => 'error',
-                facility => [ 'application', ],
+                facility => 'application',
             },
         );
     }
-    
+
     CTX('log')->application()->info("SmartCard got owner for $tokenid, ". $employeeinfo->{VALUE}->{mail} ." / ". $employeeinfo->{VALUE}->{cn});
- 
+
 
     $context->param( 'owner_mail' => $employeeinfo->{VALUE}->{mail} );
     $context->param( 'owner_cn'   => $employeeinfo->{VALUE}->{cn} );
@@ -92,7 +92,7 @@ OpenXPKI::Server::Workflow::Activity::SmartCard::GetOwnerByCardID
 
 =head1 Description
 
-Obtain the holder of a Smartcard (by querying the connector) 
+Obtain the holder of a Smartcard (by querying the connector)
 Duplicates the methods used in API::Smartcard to first find the
 employee-id and then get the user information.
 

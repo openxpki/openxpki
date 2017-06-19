@@ -51,7 +51,7 @@ sub create_workflow {
     ##! 2: "BTW we shredder many workflow IDs here"
 
     CTX('log')->workflow()->info("Created workflow ID $id.");
- 
+
 
     return $id;
 }
@@ -161,14 +161,14 @@ sub __update_workflow_context {
             ##! 4: "parameter contains illegal characters"
             $dbi->rollback;
             OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_UPDATE_WORKFLOW_CONTEXT_VALUE_ILLEGAL_DATA",
+                message => "Illegal data in workflow context persister",
                 params => {
                     workflow_id => $id,
                     context_key => $key,
                 },
                 log => {
-                    priority => 'error',
-                    facility => [ 'audit', 'system', ],
+                    priority => 'fatal',
+                    facility => 'workflow',
                 },
             );
         }
