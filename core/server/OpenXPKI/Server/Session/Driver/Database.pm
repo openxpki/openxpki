@@ -36,27 +36,26 @@ has dbi => (
 
 # DBI compliant driver name
 sub save {
-    my ($self, $data) = @_;
+    my ($self, $data_hash) = @_;
+    ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data_hash->{$_} } sort keys %$data_hash)
 
-    my $data_hash = $data->get_attributes; # HashRef
-    ##! 8: "saving session #".$data->{id}.": ".join(", ", map { "$_ = ".$data->{$_} } sort keys %$data)
-    delete $data_hash->{created};
-    delete $data_hash->{modified};
-    delete $data_hash->{ip_address};
-    delete $data_hash->{id};
+    my $created     = delete $data_hash->{created};
+    my $modified    = delete $data_hash->{modified};
+    my $ip_address  = delete $data_hash->{ip_address};
+    my $id          = delete $data_hash->{id};
 
     $self->dbi->merge_and_commit(
         into => 'session',
         set => {
-            modified    => $data->modified,
-            ip_address  => $data->ip_address,
+            modified    => $modified,
+            ip_address  => $ip_address,
             data        => $self->freeze($data_hash),
         },
         set_once => {
-            created     => $data->created,
+            created     => $created,
         },
         where => {
-            session_id  => $data->id,
+            session_id  => $id,
         },
     )
     or OpenXPKI::Exception->throw(message => "Failed to write session to database");
@@ -81,10 +80,8 @@ sub load {
         ip_address  => $db->{ip_address},
         % { $self->thaw($db->{data}) },
     };
-    # Make sure all attributes are correct
-    $self->check_attributes($data_hash, 1);
 
-    return OpenXPKI::Server::Session::Data->new( %{ $data_hash } );
+    return $data_hash;
 }
 
 sub delete_all_before {

@@ -58,12 +58,10 @@ sub BUILD {
 
 # DBI compliant driver name
 sub save {
-    my ($self, $data) = @_;
+    my ($self, $data_hash) = @_;
+    ##! 8: "saving session #".$data_hash->{id}.": ".join(", ", map { "$_ = ".$data_hash->{$_} } sort keys %$data_hash)
 
-    my $data_hash = $data->get_attributes; # HashRef
-    ##! 8: "saving session #".$data->{id}.": ".join(", ", map { "$_ = ".$data->{$_} } sort keys %$data)
-
-    my $filepath = $self->_make_filepath($data->id);
+    my $filepath = $self->_make_filepath($data_hash->{id});
 
     my $mode = O_WRONLY | O_TRUNC;
     $mode |= O_EXCL | O_CREAT unless -e $filepath;
@@ -78,7 +76,7 @@ sub save {
     print $fh $self->freeze($data_hash);
     close $fh;
 
-    utime(time, $data->modified, $filepath)
+    utime(time, $data_hash->{modified}, $filepath)
         or OpenXPKI::Exception->throw (
             message => 'Could not set modification time of session data file',
             params  => { file => $filepath, user => getpwent() },
@@ -108,10 +106,7 @@ sub load {
 
     my $data = $self->thaw($frozen);
 
-    # Make sure all attributes are correct
-    $self->check_attributes($data, 1);
-
-    return OpenXPKI::Server::Session::Data->new( %{ $data } );
+    return $data;
 }
 
 sub delete_all_before {

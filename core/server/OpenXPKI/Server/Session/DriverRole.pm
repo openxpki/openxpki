@@ -115,47 +115,8 @@ sub thaw {
     $frozen =~ s/^JSON://;
 
     my $data = decode_json($frozen);
-    $self->check_attributes($data);
+    OpenXPKI::Server::Session::Data->check_attributes($data);
     return $data;
-}
-
-=head2 check_attributes
-
-Checks the given HashRef of attribute names/values to see if they are valid
-session attributes (i.e. attributes specified in L<OpenXPKI::Server::Session::Data>).
-
-Throws an exception on unknown attributes.
-
-B<Parameters>
-
-=over
-
-=item * $attrs - attribute names and values (I<HashRef>)
-
-=item * $expect_all - optional: additionally check that all attributes of
-L<OpenXPKI::Server::Session::Data> are present in the HashRef (I<Bool>)
-
-=back
-
-=cut
-sub check_attributes {
-    my ($self, $attrs, $expect_all) = @_;
-    my %all_attrs = ( map { $_ => 1 } @{ OpenXPKI::Server::Session::Data::get_attribute_names() } );
-
-    my $id = $attrs->{id} // undef;
-
-    for my $name (keys %{ $attrs }) {
-        OpenXPKI::Exception->throw(
-            message => "Unknown attribute in session data",
-            params => { $id ? (session_id => $id) : (), attr => $name },
-        ) unless delete $all_attrs{$name};
-    }
-
-    # check if there are attributes missing
-    OpenXPKI::Exception->throw(
-        message => "Session data is incomplete",
-        params => { $id ? (session_id => $id) : (), missing => join(", ", keys %all_attrs) },
-    ) if ($expect_all and scalar keys %all_attrs);
 }
 
 1;

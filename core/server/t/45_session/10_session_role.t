@@ -61,7 +61,7 @@ lives_and {
 } "session ID is automatically created";
 
 # Set all attributes
-for my $name (grep { $_ ne "modified" } @{ $session->data->get_attribute_names }) {
+for my $name (grep { $_ !~ /^ ( modified | _secrets ) $/msx } @{ $session->data->get_attribute_names }) {
     $session->data->$name(int(rand(2**32-1)));
 }
 
@@ -99,6 +99,6 @@ throws_ok {
             log =>  Log::Log4perl->get_logger(),
         )
         ->resume(25);
-} qr/TestDriver/i, "complain about wrong results from driver";
+} qr/incomplete/i, "complain about wrong results from driver";
 
 1;

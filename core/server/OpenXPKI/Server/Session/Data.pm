@@ -20,6 +20,7 @@ application logic
 ################################################################################
 # Attributes
 #
+has backend => ( is => 'ro', does => 'OpenXPKI::Server::Session::DriverRole' );
 has _is_persisted => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
 has _is_empty     => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
 
@@ -119,6 +120,45 @@ sub get_attributes {
     }
 
     return { map { $_ => $self->$_ } @names };
+}
+
+=head2 check_attributes
+
+Checks the given HashRef of attribute names/values to see if they are valid
+session attributes (i.e. attributes specified in C<OpenXPKI::Server::Session::Data>).
+
+Throws an exception on unknown attributes.
+
+B<Parameters>
+
+=over
+
+=item * $attrs - attribute names and values (I<HashRef>)
+
+=item * $expect_all - optional: additionally check that all attributes of
+C<OpenXPKI::Server::Session::Data> are present in the HashRef (I<Bool>)
+
+=back
+
+=cut
+sub check_attributes {
+    my ($self, $attrs, $expect_all) = @_;
+    my %all_attrs = ( map { $_ => 1 } @{ $self->get_attribute_names } );
+
+    my $id = $attrs->{id} // undef;
+
+    for my $name (keys %{ $attrs }) {
+        OpenXPKI::Exception->throw(
+            message => "Unknown attribute in session data",
+            params => { $id ? (session_id => $id) : (), attr => $name },
+        ) unless delete $all_attrs{$name};
+    }
+
+    # check if there are attributes missing
+    OpenXPKI::Exception->throw(
+        message => "Session data is incomplete",
+        params => { $id ? (session_id => $id) : (), missing => join(", ", keys %all_attrs) },
+    ) if ($expect_all and scalar keys %all_attrs);
 }
 
 =head2 secret
