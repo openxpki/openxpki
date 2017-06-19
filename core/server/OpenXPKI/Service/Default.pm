@@ -229,7 +229,7 @@ sub __handle_NEW_SESSION : PRIVATE {
     }
 
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-
+    Log::Log4perl::MDC->put('sid', substr($session->get_id(),0,4));
     CTX('log')->system()->info('New session created');
 
     $self->__change_state({ STATE => 'SESSION_ID_SENT', });
@@ -246,6 +246,8 @@ sub __handle_CONTINUE_SESSION {
     my $msg     = shift;
 
     my $session;
+
+    Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
 
     ##! 4: "try to continue session"
     eval {

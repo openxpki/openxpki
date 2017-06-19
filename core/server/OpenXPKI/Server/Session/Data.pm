@@ -36,17 +36,9 @@ sub _attr_change {
 has id => (
     is => 'rw',
     isa => 'Str',
-    # DO NOT use "lazy => 1" as Log::Log4perl::MDC->put would not be called immediately
-    default => sub {
-        my $id = Data::UUID->new->create_b64;
-        Log::Log4perl::MDC->put('sid', substr($id,0,4));
-        return $id;
-    },
-    trigger => sub {
-        my ($self, $new, $old) = @_;
-        Log::Log4perl::MDC->put('sid', substr($new,0,4));
-        $self->_attr_change;
-    },
+    lazy => 1,
+    default => sub { Data::UUID->new->create_b64 },
+    trigger => sub { shift->_attr_change },
 );
 
 # create several Moose attributes
