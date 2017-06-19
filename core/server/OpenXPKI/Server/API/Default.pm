@@ -217,14 +217,6 @@ sub get_chain {
     my ($self, $args) = @_;
 
     my $default_token;
-    eval {
-        # ignore if this fails, as this is only needed within the
-        # server if a user is connected. openxpkiadm -v -v uses this
-        # method to show the chain (but not to convert the certificates)
-        # we check later where the default token is needed whether it is
-        # available
-        $default_token = CTX('api')->get_default_token();
-    };
 
     my $cert_list = [];
     my $id_list = [];
@@ -264,12 +256,7 @@ sub get_chain {
                 push @$cert_list, $cert->{data};
             }
             elsif ($inner_format eq 'DER') {
-                if (! defined $default_token) {
-                    OpenXPKI::Exception->throw(
-                        message => 'I18N_OPENXPKI_SERVER_API_DEFAULT_GET_CHAIN_MISSING_DEFAULT_TOKEN',
-                        log     => { logger => CTX('log') },
-                    );
-                }
+                $default_token = CTX('api')->get_default_token() unless($default_token);
                 my $utf8fix = $default_token->command({
                     COMMAND => 'convert_cert',
                     DATA    => $cert->{data},
@@ -305,6 +292,7 @@ sub get_chain {
         # we do NOT include the root in p7 bundles
         pop @$cert_list if ($complete and !$args->{KEEPROOT});
 
+        $default_token = CTX('api')->get_default_token() unless($default_token);
         my $result = $default_token->command({
             COMMAND          => 'convert_cert',
             DATA             => $cert_list,

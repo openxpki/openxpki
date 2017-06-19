@@ -124,7 +124,7 @@ sub new
     $self->{PARAMS}->{no_client_stdout} = 1;
 
     CTX('log')->system()->info("Server is running");
- 
+
     $self->run(%{$self->{PARAMS}});
 
     return $self;
@@ -186,11 +186,11 @@ sub post_bind_hook {
                 params  => {
                     SOCKET_OWNER => $self->{PARAMS}->{socket_owner},
                 },
-		log => {
-		    message => "Incorrect socket owner '$self->{PARAMS}->{socket_owner}'",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
+        log => {
+            message => "Incorrect socket owner '$self->{PARAMS}->{socket_owner}'",
+            facility => 'system',
+            priority => 'fatal',
+        },
             );
         }
     }
@@ -203,11 +203,11 @@ sub post_bind_hook {
                 params  => {
                     SOCKET_GROUP => $self->{PARAMS}->{socket_group},
                 },
-		log => {
-		    message => "Incorrect socket group '$self->{PARAMS}->{socket_group}'",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
+        log => {
+            message => "Incorrect socket group '$self->{PARAMS}->{socket_group}'",
+            facility => 'system',
+            priority => 'fatal',
+        },
             );
         }
     }
@@ -228,11 +228,11 @@ sub post_bind_hook {
                     SOCKET_OWNER => $socket_owner,
                     SOCKET_GROUP => $socket_group,
                 },
-		log => {
-		    message => "Could not change ownership for socket '$socketfile' to '$socket_owner:$socket_group'",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
+        log => {
+            message => "Could not change ownership for socket '$socketfile' to '$socket_owner:$socket_group'",
+            facility => 'system',
+            priority => 'fatal',
+        },
             );
         }
     }
@@ -242,7 +242,7 @@ sub post_bind_hook {
     ##! 16: 'chown pidfile: ' .  $pidfile . ' user: ' . $self->{PARAMS}->{process_owner} . ' group: ' . $self->{PARAMS}->{process_group}
     if (! chown $self->{PARAMS}->{process_owner}, $self->{PARAMS}->{process_group}, $pidfile) {
         CTX('log')->system()->error("Could not change ownership for pidfile '$pidfile' to '$socket_owner:$socket_group'");
- 
+
     }
 
     my $env = CTX('config')->get_hash('system.server.environment');
@@ -375,13 +375,13 @@ sub process_request {
         $rc = do_process_request(@_);
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
-	    if ($exc->message() =~ m{ (?:
+        if ($exc->message() =~ m{ (?:
                 I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION
                 | I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT
             ) }xms) {
-	        # exit quietly
-	        return 1;
-	    }
+            # exit quietly
+            return 1;
+        }
 
         # other OpenXPKI exceptions
         $msg = $exc->full_message();
@@ -409,7 +409,7 @@ sub do_process_request
     ##! 2: "start"
     my $self = shift;
 
-    my $log = CTX('log');
+    my $log = CTX('log')->system();
 
     ## recover from umask of Net::Server->run
     umask $self->{umask};
@@ -426,9 +426,7 @@ sub do_process_request
         if (! read($self->{server}->{client}, $char, 1))
         {
             print STDOUT "OpenXPKI::Server: Connection closed unexpectly.\n";
-            $log->log (MESSAGE  => "Connection closed unexpectly.",
-	               PRIORITY => "fatal",
-                       FACILITY => "system");
+            $log->fatal("Connection closed unexpectly.");
             return;
         }
         $line .= $char;
@@ -443,9 +441,7 @@ sub do_process_request
         elsif ($char eq "\n")
         {
             print STDOUT "OpenXPKI::Server: Unsupported protocol.\n";
-            $log->log (MESSAGE  => "Unsupported protocol.",
-	               PRIORITY => "fatal",
-                       FACILITY => "system");
+            $log->fatal("Unsupported protocol.");
             return;
         }
     }
@@ -455,24 +451,20 @@ sub do_process_request
     my $msg = $transport->read();
 
     if ($msg =~ m{ \A (?:Simple|JSON|Fast) \z }xms) {
-	eval "\$serializer = OpenXPKI::Serialization::$msg->new();";
+    eval "\$serializer = OpenXPKI::Serialization::$msg->new();";
 
-	if (! defined $serializer) {
+    if (! defined $serializer) {
             $transport->write ("OpenXPKI::Server: Serializer failed to initialize.\n");
-            $log->log (MESSAGE  => "Serializer '$msg' failed to initialize.",
-	               PRIORITY => "fatal",
-                       FACILITY => "system");
+            $log->fatal("Serializer '$msg' failed to initialize.");
             return;
-	}
+    }
         $transport->write ("OK");
 
     }
     else
     {
             $transport->write ("OpenXPKI::Server: Unsupported serializer.\n");
-            $log->log (MESSAGE  => "Unsupported serializer.",
-	               PRIORITY => "fatal",
-                       FACILITY => "system");
+            $log->fatal("Unsupported serializer.");
             return;
     }
 
@@ -509,9 +501,7 @@ sub do_process_request
     else
     {
         $transport->write ($serializer->serialize ("OpenXPKI::Server: Unsupported service.\n"));
-        $log->log (MESSAGE  => "Unsupported service.",
-                   PRIORITY => "fatal",
-                   FACILITY => "system");
+        $log->fatal("Unsupported service.");
         return;
     }
 
@@ -522,9 +512,7 @@ sub do_process_request
     };
     if ($EVAL_ERROR) {
         $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
-        $log->log (MESSAGE  => "Database connection failed. ".$EVAL_ERROR,
-                   PRIORITY => "fatal",
-                   FACILITY => "system");
+        $log->fatal("Database connection failed. ".$EVAL_ERROR);
         return;
     }
     ##! 16: 'connection to database successful'
@@ -565,15 +553,15 @@ sub __get_user_interfaces
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_TRANSPORT_FAILED",
                 params  => {
-		    EVAL_ERROR => $EVAL_ERROR,
-		    MODULE     => $class
-		},
-		log => {
-		    message => "Could not initialize configured transport layer '$class': $EVAL_ERROR",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
-		);
+            EVAL_ERROR => $EVAL_ERROR,
+            MODULE     => $class
+        },
+        log => {
+            message => "Could not initialize configured transport layer '$class': $EVAL_ERROR",
+            facility => 'system',
+            priority => 'fatal',
+        },
+        );
         }
     }
 
@@ -593,15 +581,15 @@ sub __get_user_interfaces
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_GET_USER_INTERFACE_SERVICE_FAILED",
                 params  => {
-		    EVAL_ERROR => $EVAL_ERROR,
-		    MODULE     => $class
-		},
-		log => {
-		    message => "Could not initialize configured service layer '$class': $EVAL_ERROR",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
-		);
+            EVAL_ERROR => $EVAL_ERROR,
+            MODULE     => $class
+        },
+        log => {
+            message => "Could not initialize configured service layer '$class': $EVAL_ERROR",
+            facility => 'system',
+            priority => 'fatal',
+        },
+        );
         }
     }
 
@@ -618,12 +606,12 @@ sub __get_numerical_user_id {
 
     my ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
         $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-	    getpwnam ($arg);
+        getpwnam ($arg);
 
     if (! defined $pw_uid && ($arg =~ m{ \A \d+ \z }xms)) {
-	($pw_name,$pw_passwd,$pw_uid,$pw_gid,
-	 $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
-	     getpwuid ($arg);
+    ($pw_name,$pw_passwd,$pw_uid,$pw_gid,
+     $pw_quota,$pw_comment,$pw_gcos,$pw_dir,$pw_shell,$pw_expire) =
+         getpwuid ($arg);
     }
 
     return $pw_uid;
@@ -640,8 +628,8 @@ sub __get_numerical_group_id {
         getgrnam ($arg);
 
     if (! defined $gr_gid && ($arg =~ m{ \A \d+ \z }xms)) {
-	($gr_name,$gr_passwd,$gr_gid,$gr_members) =
-	    getgrgid ($arg);
+    ($gr_name,$gr_passwd,$gr_gid,$gr_members) =
+        getgrgid ($arg);
     }
 
     return $gr_gid;
@@ -660,17 +648,17 @@ sub __get_server_config
 
     # check if socket filename is too long
     if (unpack_sockaddr_un(pack_sockaddr_un($socketfile)) ne $socketfile) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_SERVER_CONFIG_SOCKETFILE_TOO_LONG",
-	    params  => {
-		"SOCKETFILE" => $socketfile
-	    },
-	    log => {
-		message => "Socket file '$socketfile' path length exceeds system limits",
-		facility => 'system',
-		priority => 'fatal',
-	    },
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_CONFIG_SOCKETFILE_TOO_LONG",
+        params  => {
+        "SOCKETFILE" => $socketfile
+        },
+        log => {
+        message => "Socket file '$socketfile' path length exceeds system limits",
+        facility => 'system',
+        priority => 'fatal',
+        },
+        );
     }
 
     my %params = ();
@@ -690,11 +678,11 @@ sub __get_server_config
             params  => {
                 TYPE => $self->{TYPE},
             },
-	    log => {
-		message => "Unknown Net::Server type '$self->{TYPE}'",
-		facility => 'system',
-		priority => 'fatal',
-	    },
+        log => {
+        message => "Unknown Net::Server type '$self->{TYPE}'",
+        facility => 'system',
+        priority => 'fatal',
+        },
         );
     }
     $params{user}       = $config->get('system.server.user');
@@ -705,19 +693,19 @@ sub __get_server_config
     ## check daemon user
 
     foreach my $param (qw( user group port pid_file )) {
-	if (! defined $params{$param} || $params{$param} eq "") {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_CONFIG_MISSING_PARAMETER",
-		params  => {
-		    "PARAMETER" => $param,
-		},
-		log => {
-		    message => "Missing server configuration parameter '$param'",
-		    facility => 'system',
-		    priority => 'fatal',
-		},
-		);
-	}
+    if (! defined $params{$param} || $params{$param} eq "") {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVER_CONFIG_MISSING_PARAMETER",
+        params  => {
+            "PARAMETER" => $param,
+        },
+        log => {
+            message => "Missing server configuration parameter '$param'",
+            facility => 'system',
+            priority => 'fatal',
+        },
+        );
+    }
     }
 
     my $user  = __get_numerical_user_id($params{user});
@@ -726,14 +714,14 @@ sub __get_server_config
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_USER",
             params  => {
-		"USER" => $params{"user"},
-	    },
-	    log => {
-		message => "Incorrect system user '$params{user}'",
-		facility => 'system',
-		priority => 'fatal',
-	    },
-	    );
+        "USER" => $params{"user"},
+        },
+        log => {
+        message => "Incorrect system user '$params{user}'",
+        facility => 'system',
+        priority => 'fatal',
+        },
+        );
     }
     # convert user id to numerical
     $params{user} = __get_numerical_user_id($user);
@@ -745,14 +733,14 @@ sub __get_server_config
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_DAEMON_GROUP",
             params  => {
-		"GROUP" => $params{"group"},
-	    },
-	    log => {
-		message => "Incorrect system group '$params{group}'",
-		facility => 'system',
-		priority => 'fatal',
-	    },
-	    );
+        "GROUP" => $params{"group"},
+        },
+        log => {
+        message => "Incorrect system group '$params{group}'",
+        facility => 'system',
+        priority => 'fatal',
+        },
+        );
     }
     # convert group id to numerical
     $params{group} = __get_numerical_group_id($group);
@@ -762,47 +750,47 @@ sub __get_server_config
     my $socket_owner = $config->get('system.server.socket_owner');
 
     if (defined $socket_owner) {
-    	# convert user id to numerical
-    	$params{socket_owner} = __get_numerical_user_id($socket_owner);
+        # convert user id to numerical
+        $params{socket_owner} = __get_numerical_user_id($socket_owner);
 
-    	if (! defined $params{socket_owner} || ($params{socket_owner} eq ''))
-    	{
-    	    OpenXPKI::Exception->throw (
-    		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER",
-    		params  => {
-    		    "SOCKET_OWNER" => $socket_owner,
-    		},
-    		log => {
-    		    message => "Incorrect socket owner '$socket_owner'",
-    		    facility => 'system',
-    		    priority => 'fatal',
-    		},
-    		);
-    	}
-    	$params{socket_owner} = $socket_owner;
+        if (! defined $params{socket_owner} || ($params{socket_owner} eq ''))
+        {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER",
+            params  => {
+                "SOCKET_OWNER" => $socket_owner,
+            },
+            log => {
+                message => "Incorrect socket owner '$socket_owner'",
+                facility => 'system',
+                priority => 'fatal',
+            },
+            );
+        }
+        $params{socket_owner} = $socket_owner;
     }
 
     my $socket_group = $config->get('system.server.socket_group');
 
     if (defined $socket_group) {
-    	# convert group id to numerical
-    	$params{socket_group} = __get_numerical_group_id($socket_group);
+        # convert group id to numerical
+        $params{socket_group} = __get_numerical_group_id($socket_group);
 
-    	if (! defined $params{socket_group} || ($params{socket_group} eq ''))
-    	{
-    	    OpenXPKI::Exception->throw (
-    		message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP",
-    		params  => {
-    		    "SOCKET_GROUP" => $socket_group,
-    		},
-    		log => {
-    		    message => "Incorrect socket group '$socket_group'",
-    		    facility => 'system',
-    		    priority => 'fatal',
-    		},
-    		);
-    	}
-    	$params{socket_group} = $socket_group;
+        if (! defined $params{socket_group} || ($params{socket_group} eq ''))
+        {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_CONFIG_INCORRECT_SOCKET_OWNER_GROUP",
+            params  => {
+                "SOCKET_GROUP" => $socket_group,
+            },
+            log => {
+                message => "Incorrect socket group '$socket_group'",
+                facility => 'system',
+                priority => 'fatal',
+            },
+            );
+        }
+        $params{socket_group} = $socket_group;
     };
 
     return \%params;
