@@ -20,7 +20,6 @@ use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server;
-use OpenXPKI::Server::Session::Mock;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::SCEP::Command;
 use OpenXPKI::Serialization::Simple;
@@ -231,8 +230,6 @@ sub __init_session : PRIVATE {
         LIFETIME  => CTX('config')->get("system.server.session.lifetime"),
     });
 
-    # use a mock session to save the PKI realm in
-    #$session = OpenXPKI::Server::Session::Mock->new();
     OpenXPKI::Server::Context::setcontext( { 'session' => $session } );
 }
 
