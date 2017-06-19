@@ -188,6 +188,17 @@ string until the first colon indicate the type of serialization (encoder ID).
 
 Returns a string with the serialized data.
 
+B<Named parameters>
+
+=over
+
+=item * only - C<ArrayRef> of attributes that shall be included (optional,
+default: all attributes)
+
+=item * except - C<ArrayRef> of attributes that shall be excluded (optional)
+
+=back
+
 =cut
 sub freeze {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
