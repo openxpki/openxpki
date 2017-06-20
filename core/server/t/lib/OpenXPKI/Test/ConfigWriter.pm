@@ -573,13 +573,13 @@ sub _build_log4perl {
     my $logfile = $self->path_log_file;
 
     return qq(
-        log4perl.category.openxpki.auth         = INFO, Screen, Logfile, DBI
-        log4perl.category.openxpki.audit        = INFO, Screen, DBI
-        log4perl.category.openxpki.monitor      = INFO, Screen, Logfile
-        log4perl.category.openxpki.system       = INFO, Screen, Logfile
-        log4perl.category.openxpki.workflow     = INFO, Screen, Logfile
-        log4perl.category.openxpki.application  = INFO, Screen, Logfile, DBI
-        log4perl.category.connector             = INFO, Screen, Logfile
+        log4perl.category.openxpki.auth         = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.audit        = DEBUG, Screen, DBI
+        log4perl.category.openxpki.monitor      = DEBUG, Screen, Logfile
+        log4perl.category.openxpki.system       = DEBUG, Screen, Logfile
+        log4perl.category.openxpki.workflow     = DEBUG, Screen, Logfile
+        log4perl.category.openxpki.application  = DEBUG, Screen, Logfile, DBI
+        log4perl.category.connector             = DEBUG, Screen, Logfile
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
