@@ -111,7 +111,7 @@ sub _build_driver {
     ) if $@;
 
     my $instance;
-    eval { $instance = $class->new($self->config) };
+    eval { $instance = $class->new(%{ $self->config }, log => $self->log) };
     OpenXPKI::Exception->throw (
         message => "Unable to instantiate session driver class",
         params => { class_name => $class, message => $@ }

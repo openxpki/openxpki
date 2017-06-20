@@ -20,7 +20,7 @@ Log::Log4perl->easy_init($OFF);
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Session.*'} = 100;
 
-plan tests => 4;
+plan tests => 5;
 
 #
 # Setup test env
@@ -34,7 +34,7 @@ $oxitest->setup_env;
 sub driver_ok {
     my ($args) = @_;
 
-    subtest lc($args->{type})." backed session" => sub {
+    subtest $args->{descr} => sub {
         ## create new session
         my $session;
         lives_ok {
@@ -123,20 +123,57 @@ sub dir_empty {
 
 use_ok "OpenXPKI::Server::SessionHandler";
 
-# FILE backed session
 my $tempdir = tempdir( CLEANUP => 1 );
+
+# FILE backed session
 driver_ok {
     type => "File",
-#    log  => Log::Log4perl->get_logger(),
     config => { directory => $tempdir },
+    descr => "Session with file backend",
 };
 ok dir_empty($tempdir), "Session storage directory is empty";
 
 # DATABASE backed session
 driver_ok {
     type => "Database",
-#    log  => Log::Log4perl->get_logger(),
     config => { dbi => $oxitest->dbi },
+    descr => "Session with database backend (existing DB handle)",
+};
+
+
+# CUSTOM DATABASE backed session
+my $dbi = OpenXPKI::Server::Database->new(
+    db_params => {
+        type => "SQLite",
+        name => "$tempdir/test.sqlite",
+    },
+    autocommit => 1,
+    log => Log::Log4perl->get_logger,
+);
+
+#
+# Uuuh oooh this is ugly copy-n-paste, I know.
+# Currently there is no way to access the DB schema to rebuild it in tests
+#
+$dbi->run(qq(
+CREATE TABLE session (
+  session_id varchar(255) NOT NULL,
+  data longtext,
+  created decimal(49,0) NOT NULL,
+  modified decimal(49,0) NOT NULL,
+  ip_address varchar(45),
+  PRIMARY KEY (session_id)
+);
+));
+
+# DATABASE backed session with custom DB driver
+driver_ok {
+    type => "Database",
+    config => {
+        driver => "SQLite",
+        name => "$tempdir/test.sqlite",
+    },
+    descr => "Session with custom database backend",
 };
 
 1;

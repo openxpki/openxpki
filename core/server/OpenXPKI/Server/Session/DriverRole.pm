@@ -15,6 +15,12 @@ implementation has to consume
 
 =cut
 
+has 'log' => (
+    is => 'ro',
+    isa => 'Log::Log4perl::Logger',
+    required => 1,
+);
+
 ################################################################################
 # Required in session implementations that consume this role
 #
