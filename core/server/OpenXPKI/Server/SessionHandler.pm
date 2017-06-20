@@ -230,7 +230,7 @@ sub resume {
     # Load data from backend (return if session was not found)
     my $data = $driver->load($id);
     if (not $data) {
-        $self->log->info("Session #$id is unknown (maybe expired and purged from backend)", "auth");
+        $self->log->info("Session #$id is unknown (maybe expired and purged from backend)");
         return;
     }
 
@@ -245,17 +245,19 @@ sub resume {
     $self->data($data);
 
     if ($self->is_expired) {
-        $self->log->info("Session #$id is expired", "auth");
+        $self->log->info("Session #$id is expired");
         return;
     }
 
-    $self->log->info("Session #".$self->id." resumed", "auth");
+    $self->log->info("Session #".$self->id." resumed");
     return $self;
 }
 
 =head2 persist
 
 Saves the session to the backend storage if any session data has changed.
+
+Returns C<1> if data was actually written to the backend, C<undef> otherwise.
 
 B<Named parameters>
 
@@ -275,13 +277,17 @@ sub persist {
     $self->data->modified(time);        # update timestamp
     $self->driver->save($self->data);   # implemented by the class that consumes this role
     $self->data->is_dirty(0);
-    $self->log->info("Session #".$self->id." persisted", "auth");
+    $self->log->info("Session #".$self->id." persisted");
+    return 1;
 }
 
 =head2 delete
 
 Deletes the session data from the backend storage and then from this session
 object, so that it cannot be access anymore.
+
+Returns C<1> if data was actually written to the backend or C<undef> if there is
+no session data yet.
 
 =cut
 sub delete {

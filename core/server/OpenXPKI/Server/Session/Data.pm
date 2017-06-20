@@ -30,17 +30,10 @@ sub _attr_change {
     $self->is_dirty(1);
 }
 
-# automatically set for new (empty) sessions
-has id => (
-    is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    default => sub { Data::UUID->new->create_b64 },
-    trigger => sub { shift->_attr_change },
-);
-
 # create several Moose attributes
 my %ATTR_TYPES = (
+    # ID is automatically set for new (empty) sessions
+    id                   => { isa => 'Str', lazy => 1, default => sub { Data::UUID->new->create_b64 }, },
     created              => { isa => 'Int', default => sub { time } },
     modified             => { isa => 'Int', }, # will be set before session is persisted
     user                 => { isa => 'Str', },
@@ -72,6 +65,10 @@ for my $name (keys %ATTR_TYPES) {
         trigger => sub { shift->_attr_change },
         clearer => "clear_$name",
     );
+    after "clear_$name" => sub {
+        my $self = shift;
+        $self->is_dirty(1);
+    };
 }
 
 ################################################################################
@@ -101,6 +98,7 @@ The following methods are available to access the session attributes:
 
     getter/setter           clearer
     --------------------------------------------------
+    id                      clear_id
     user                    clear_user
     role                    clear_role
     pki_realm               clear_pki_realm

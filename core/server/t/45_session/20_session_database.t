@@ -26,7 +26,7 @@ plan tests => 4;
 # Setup test env
 #
 my $oxitest = OpenXPKI::Test->new;
-$oxitest->setup_env->init_server;
+$oxitest->setup_env;
 
 #
 # Tests
@@ -115,7 +115,7 @@ use_ok "OpenXPKI::Server::SessionHandler";
 my $tempdir = tempdir( CLEANUP => 1 );
 driver_ok {
     type => "File",
-    log  => Log::Log4perl->get_logger(),
+#    log  => Log::Log4perl->get_logger(),
     config => { directory => $tempdir },
 };
 ok dir_empty($tempdir), "Session storage directory is empty";
@@ -123,7 +123,7 @@ ok dir_empty($tempdir), "Session storage directory is empty";
 # DATABASE backed session
 driver_ok {
     type => "Database",
-    log  => Log::Log4perl->get_logger(),
+#    log  => Log::Log4perl->get_logger(),
     config => { dbi => $oxitest->dbi },
 };
 
