@@ -382,6 +382,7 @@ sub set_secret_group_part
     if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session") {
         ##! 4: "store secret in session"
         CTX('session')->data->secret(group  => $group, value => $secret);
+        CTX('session')->persist;
     } else {
         ##! 4: "merge secret into database"
         CTX('dbi')->merge(

@@ -202,6 +202,7 @@ Creates a new sesssion.
 sub create {
     my ($self) = @_;
     $self->data(OpenXPKI::Server::Session::Data->new);
+    $self->log->debug(sprintf("New session of type '%s' created", $self->type));
     return $self;
 }
 
@@ -237,7 +238,7 @@ sub resume {
     # Load data from backend (return if session was not found)
     my $data = $driver->load($id);
     if (not $data) {
-        $self->log->info("Session #$id is unknown (maybe expired and purged from backend)");
+        $self->log->info("Failed to resume session #$id: unknown ID (maybe expired and purged from backend)");
         return;
     }
 
@@ -252,11 +253,11 @@ sub resume {
     $self->data($data);
 
     if ($self->is_expired) {
-        $self->log->info("Session #$id is expired");
+        $self->log->info("Failed to resume session #$id: expired");
         return;
     }
 
-    $self->log->info("Session #".$self->id." resumed");
+    $self->log->debug("Session resumed");
     return $self;
 }
 
@@ -280,11 +281,11 @@ sub persist {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         force => { isa => 'Bool', optional => 1 },
     );
-    return unless ($self->data->is_dirty or $params{force});
+    return unless ($self->is_initialized and ($self->data->is_dirty or $params{force}));
     $self->data->modified(time);        # update timestamp
     $self->driver->save($self->data);   # implemented by the class that consumes this role
     $self->data->is_dirty(0);
-    $self->log->info("Session #".$self->id." persisted");
+    $self->log->debug("Session persisted");
     return 1;
 }
 
@@ -303,7 +304,7 @@ sub delete {
     $self->driver->delete($self->data);   # implemented by the class that consumes this role
     my $id = $self->id;
     $self->clear_data;
-    $self->log->info("Session #".$id." deleted");
+    $self->log->debug("Session deleted");
     return 1;
 }
 
@@ -320,7 +321,7 @@ sub new_id {
     $self->driver->delete($self->data);   # implemented by the class that consumes this role
     my $oldid = $self->id;
     $self->data->clear_id;
-    $self->log->info("Session #".$oldid." got a new ID #".$self->id);
+    $self->log->debug("Session got a new ID: #".$self->id);
     $self->persist(force => 1); # enforce it for double safety
     return $self->id;
 }

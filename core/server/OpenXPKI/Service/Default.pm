@@ -55,26 +55,21 @@ sub init {
             MESSAGE => $msg,
         });
         if (! $is_valid) {
-        $self->__send_error({
-            ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
-        });
+            $self->__send_error({
+                ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
+            });
         }
         else { # valid message received
             my $result;
             eval { # try to handle it
-                $result = $self->__handle_message({
-                    MESSAGE => $msg
-                });
+                $result = $self->__handle_message({ MESSAGE => $msg });
+                CTX('session')->persist;
             };
             if (my $exc = OpenXPKI::Exception->caught()) {
-                $self->__send_error({
-                    EXCEPTION => $exc,
-                });
+                $self->__send_error({ EXCEPTION => $exc });
             }
             elsif ($EVAL_ERROR) {
-            $self->__send_error({
-                ERROR     => $EVAL_ERROR,
-            });
+                $self->__send_error({ ERROR => $EVAL_ERROR });
             }
             else { # if everything was fine, send the result to the client
                 $self->talk($result);
@@ -180,7 +175,6 @@ sub __is_valid_message : PRIVATE {
 sub __handle_message : PRIVATE {
     ##! 1: 'start'
     my $self    = shift;
-    my $ident   = ident $self;
     my $arg_ref = shift;
     my $message = $arg_ref->{'MESSAGE'};
     my $message_name = $message->{'SERVICE_MSG'};
@@ -229,8 +223,7 @@ sub __handle_NEW_SESSION : PRIVATE {
     }
 
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-
-    Log::Log4perl::MDC->put('sid', substr($session->get_id(),0,4));
+    Log::Log4perl::MDC->put('sid', substr($session->data->id,0,4));
     CTX('log')->system()->info('New session created');
 
     $self->__change_state({ STATE => 'SESSION_ID_SENT', });
@@ -251,41 +244,24 @@ sub __handle_CONTINUE_SESSION {
     Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
 
     ##! 4: "try to continue session"
-    eval {
-        $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
-        $session->resume($msg->{SESSION_ID});
+    $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
+    $session->resume($msg->{SESSION_ID})
+        or OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED',
+            params  => {ID => $msg->{SESSION_ID}}
+        );
+
+    # There might be an exisiting session if the child did some work before
+    # we therefore use force to overwrite exisiting entries
+    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+
+    # do not use __change_state here, as we want to have access
+    # to the old session in __handle_SESSION_ID_ACCEPTED
+    $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
+
+    return {
+        SESSION_ID => $session->data->id,
     };
-    if ($EVAL_ERROR) {
-        my $error = 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED';
-        if (my $exc = OpenXPKI::Exception->caught()) {
-            OpenXPKI::Exception->throw (
-                message  => $error,
-                params   => {ID => $msg->{SESSION_ID}},
-                children => [ $exc ]
-            );
-        } else {
-            OpenXPKI::Exception->throw(
-                message => $error,
-                params  => {ID => $msg->{SESSION_ID}}
-            );
-        }
-    }
-    if (defined $session) {
-
-        # There might be an exisiting session if the child did some work before
-        # we therefore use force to overwrite exisiting entries
-        OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-
-        # do not use __change_state here, as we want to have access
-        # to the old session in __handle_SESSION_ID_ACCEPTED
-        $state_of{$ident} = 'SESSION_ID_SENT_FROM_CONTINUE';
-
-        return {
-            SESSION_ID => $session->data->id,
-        };
-    }
-
-    return;
 }
 
 sub __handle_FRONTEND_SESSION {
@@ -304,19 +280,19 @@ sub __handle_FRONTEND_SESSION {
     }
 
     my $data;
-    my $sess = CTX('session')->{session};
+    my $sess = CTX('session');
     if (exists $msg->{PARAMS}->{SESSION_DATA}) {
         if (defined $msg->{PARAMS}->{SESSION_DATA}) {
-            my $data = $msg->{PARAMS}->{SESSION_DATA};
+            my $data_str = $msg->{PARAMS}->{SESSION_DATA};
             ##! 16: 'Setting ui session data ' . $data
-            $sess->param('UISESSION', $data);
+            $sess->data->ui_session($data_str);
         } else {
             ##! 16: 'Clear ui session data '
-            $sess->clear('UISESSION');
+            $sess->clear_ui_session;
         }
-        CTX('session')->flush();
+        $sess->persist;
     } else {
-        $data = $sess->param('UISESSION');
+        $data = $sess->data->ui_session;
         ##! 32: 'Read ui session data ' . $data
     }
 
@@ -332,17 +308,7 @@ sub __handle_RESET_SESSIONID: PRIVATE {
     my $ident   = ident $self;
     my $msg     = shift;
 
-    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
-
-    my $data = CTX('session')->{session}->dataref();
-    map {  if ($_ !~ /_SESSION/) { $session->{session}->param($_ => $data->{$_}); } } keys %{$data};
-
-    CTX('session')->delete();
-
-    ##! 32: 'Session data ' . Dumper $session->{session}->dataref()
-    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-
-    my $sess_id = CTX('session')->data->id;
+    my $sess_id = CTX('session')->new_id;
     Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
 
     ##! 4: 'new session id ' . $sess_id
@@ -899,30 +865,27 @@ sub run
             $msg = $self->collect();
         };
         if (my $exc = OpenXPKI::Exception->caught()) {
-        if ($exc->message() =~ m{I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION}xms) {
-        # client closed socket
-        last MESSAGE;
-        } else {
-        $exc->rethrow();
+            if ($exc->message() =~ m{I18N_OPENXPKI_TRANSPORT.*CLOSED_CONNECTION}xms) {
+                # client closed socket
+                last MESSAGE;
+            } else {
+                $exc->rethrow();
+            }
+        } elsif ($EVAL_ERROR) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION",
+            params  => {
+                EVAL_ERROR => $EVAL_ERROR,
+            });
         }
-    } elsif ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_READ_EXCEPTION",
-        params  => {
-            EVAL_ERROR => $EVAL_ERROR,
-        });
-    }
 
-    last MESSAGE unless defined $msg;
+        last MESSAGE unless defined $msg;
 
-        my $is_valid = $self->__is_valid_message({
-            MESSAGE => $msg,
-        });
+        my $is_valid = $self->__is_valid_message({ MESSAGE => $msg });
         if (! $is_valid) {
             $self->__send_error({
                 ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
             });
-
         }
         else { # valid message received
             my $result;
@@ -937,19 +900,14 @@ sub run
             else {
                 # our session is just fine
                 eval { # try to handle it
-                    $result = $self->__handle_message({
-                        MESSAGE => $msg
-                    });
+                    $result = $self->__handle_message({ MESSAGE => $msg });
+                    CTX('session')->persist;
                 };
                 if (my $exc = OpenXPKI::Exception->caught()) {
-                    $self->__send_error({
-                        EXCEPTION => $exc,
-                    });
+                    $self->__send_error({ EXCEPTION => $exc, });
                 }
                 elsif ($EVAL_ERROR) {
-                $self->__send_error({
-                    ERROR     => $EVAL_ERROR,
-                });
+                    $self->__send_error({ ERROR => $EVAL_ERROR, });
                 }
                 else { # if everything was fine, send the result to the client
                     $self->talk($result);

@@ -283,18 +283,14 @@ sub run {
     set_gid($self->_gid()) if( $self->_gid() );
     set_uid($self->_uid()) if( $self->_uid() );
 
-    # wait some time for server startup...
-    ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
-
-    # Force new session as the initialized session is a Mock-Session which we can not use!
-    $self->__check_session(1);
-
     sigprocmask(SIG_UNBLOCK, $sigint);
 
     CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
             $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
 
 
+    # wait some time for server startup...
+    ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
     sleep($self->interval_wait_initial());
 
     ### TODO: maybe we should measure the count of exception in a certain time interval?
@@ -304,9 +300,6 @@ sub run {
 
     while ( ! $OpenXPKI::Server::Watchdog::terminate ) {
         ##! 80: 'watchdog: do loop'
-        #ensure that we have a valid session
-        $self->__check_session();
-
         eval {
             my $wf_id = $self->__scan_for_paused_workflows();
             # duration of pause depends on whether a workflow was found or not
@@ -639,6 +632,11 @@ sub __wake_up_workflow {
     # Child process from here on
     #
 
+    # create memory-only session for workflow
+    my $session = OpenXPKI::Server::SessionHandler->new(type => "Memory")->create;
+    OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+
     ##! 16: ' Workflow instance succesfully forked - I am the workflow'
     # We need to unset the child reaper (waitpid) as the universal waitpid
     # causes problems with Proc::SafeExec
@@ -654,10 +652,8 @@ sub __wake_up_workflow {
 
         $self->{dbi}->start_txn;
 
-        $self->__check_session();
-
         CTX('session')->data->pki_realm($args->{pki_realm});
-        CTX('session')->data->thaw($args->{workflow_session});
+        CTX('session')->data->thaw($args->{workflow_session}); # "user" and "role" will be set
 
         # Set MDC for logging
         Log::Log4perl::MDC->put('user', CTX('session')->data->user);
@@ -693,31 +689,6 @@ sub __wake_up_workflow {
     # The child MUST TERMINATE!
     exit;
 }
-
-
-=head2
-
-Check and, if necessary, create the session context
-
-=cut
-
-sub __check_session {
-
-    my $self = shift;
-    my ($force_new) = @_;
-    my $session;
-    unless($force_new){
-        eval{$session = CTX('session');};
-        return if $session;
-    }
-
-    ##! 4: "create new session dir: $directory, lifetime: $lifetime "
-    $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
-    OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
-    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
-    ##! 4: sprintf(" session %s created" , $session->data->id)
-}
-
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
