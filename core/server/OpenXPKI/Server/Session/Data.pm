@@ -159,7 +159,7 @@ B<Named parameters>
 
 =item * group - optional: the secrets group
 
-=item * secret - optional: the value to set
+=item * value - optional: the value to set
 
 =back
 
@@ -167,14 +167,14 @@ B<Named parameters>
 sub secret {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         group => { isa => 'Str' },
-        secret => { isa => 'Str' },
+        value => { isa => 'Str' },
     );
     my $digest = sha1_hex($params{group} || "");
 
     # getter
-    return $self->_get_secret($digest) unless $params{secret};
+    return $self->_get_secret($digest) unless $params{value};
     # setter
-    $self->_set_secret($digest => $params{secret});
+    $self->_set_secret($digest => $params{value});
 }
 
 =head2 clear_secret

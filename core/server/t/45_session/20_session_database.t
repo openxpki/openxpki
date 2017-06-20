@@ -46,9 +46,9 @@ sub driver_ok {
         for my $name (grep { $_ !~ /^(modified|_secrets|user|is_valid)$/ } @{ $session->data->get_attribute_names }) {
             $session->data->$name(int(rand(2**32-1)));
         }
-        $session->data->secret(group => "golf", secret => 333);
-        $session->data->secret(group => "ballet", secret => 222);
         $session->is_valid(1);
+        $session->data->secret(group => "golf", value => 333);
+        $session->data->secret(group => "ballet", value => 222);
 
         # persist
         lives_ok {

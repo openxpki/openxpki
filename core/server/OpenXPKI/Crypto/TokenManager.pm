@@ -379,12 +379,9 @@ sub set_secret_group_part
 
     ##! 2: "store the secrets"
     my $secret = $self->{SECRET}->{$realm}->{$group}->{REF}->get_serialized();
-    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
-    {
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session") {
         ##! 4: "store secret in session"
-        CTX('session')->data->secret({
-            GROUP  => $group,
-            SECRET => $secret});
+        CTX('session')->data->secret(group  => $group, value => $secret);
     } else {
         ##! 4: "merge secret into database"
         CTX('dbi')->merge(
