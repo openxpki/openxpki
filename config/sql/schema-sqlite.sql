@@ -1,7 +1,7 @@
--- 
+--
 -- Created by SQL::Translator::Producer::SQLite
 -- Created on Wed Nov  9 02:25:41 2016
--- 
+--
 
 BEGIN TRANSACTION;
 
@@ -177,6 +177,20 @@ CREATE TABLE secret (
   group_id varchar(255) NOT NULL,
   data longtext,
   PRIMARY KEY (pki_realm, group_id)
+);
+
+--
+-- Table: session
+--
+DROP TABLE IF EXISTS session;
+
+CREATE TABLE session (
+  session_id varchar(255) NOT NULL,
+  data longtext,
+  created decimal(49,0) NOT NULL,
+  modified decimal(49,0) NOT NULL,
+  ip_address varchar(45),
+  PRIMARY KEY (session_id)
 );
 
 --
