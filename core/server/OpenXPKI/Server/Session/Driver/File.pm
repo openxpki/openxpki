@@ -40,7 +40,8 @@ has directory => (
 #
 sub _make_filepath {
     my ($self, $id) = @_;
-    return sprintf("%s/openxpki_session_%s", $self->directory, $id);
+    my $hex_str = join "", map { sprintf("%2.2x",ord($_)) } split //, $id;
+    return sprintf("%s/openxpki_session_%s", $self->directory, $hex_str);
 }
 
 sub BUILD {
