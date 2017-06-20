@@ -8,7 +8,6 @@ print STDERR "OpenXPKI::Server::Authentication\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 ok(1);
 

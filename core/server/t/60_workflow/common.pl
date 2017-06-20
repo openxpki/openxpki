@@ -10,7 +10,7 @@ use English;
 use Log::Log4perl qw(:easy);
 use File::Spec;
 
-use OpenXPKI::Server::Session;
+use OpenXPKI::Server::SessionHandler;
 use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
@@ -137,9 +137,10 @@ our $log = CTX('log');
 ok($log);
 
 ## create a valid session
-my $session = OpenXPKI::Server::Session->new ({
-                  DIRECTORY => "t/60_workflow/",
-                  LIFETIME  => 100});
+my $session = OpenXPKI::Server::SessionHandler->new(
+    type => "File",
+    config => { directory => "t/60_workflow/" },
+)->create;
 $session->data->pki_realm("I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA");
 $session->data->role("CA Operator");
 $session->is_valid(1);

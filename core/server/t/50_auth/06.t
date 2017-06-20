@@ -8,7 +8,6 @@ note "OpenXPKI::Server::Authentication::External (static role)\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 
 ## init XML cache
