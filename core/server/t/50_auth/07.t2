@@ -32,8 +32,8 @@ ok(OpenXPKI::Server::Context::setcontext({session => $session}), 'Set session in
 ## configure the session
 $session->data->pki_realm("Test Root CA");
 $session->data->role("CA Operator");
-$session->set_status_valid;
-ok($session->is_valid(), 'Session made valid');
+$session->is_valid(1);
+ok($session->is_valid, 'Session made valid');
 
 ## initialize the ACL
 my $acl = OpenXPKI::Server::ACL->new();

@@ -43,6 +43,7 @@ my %ATTR_TYPES = (
     authentication_stack => { isa => 'Str', },
     language             => { isa => 'Str', },
     status               => { isa => 'Str', },
+    is_valid             => { isa => 'Bool', default => 0 },
     ip_address           => { isa => 'Str', },
     ui_session           => { isa => 'Str', },
     _secrets => {

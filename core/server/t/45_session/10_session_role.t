@@ -62,7 +62,7 @@ lives_and {
 } "session ID is automatically created";
 
 # Set all attributes
-for my $name (grep { $_ !~ /^ ( modified | _secrets ) $/msx } @{ $session->data->get_attribute_names }) {
+for my $name (grep { $_ !~ /^ ( modified | _secrets | is_valid ) $/msx } @{ $session->data->get_attribute_names }) {
     $session->data->$name(int(rand(2**32-1)));
 }
 
@@ -92,7 +92,7 @@ lives_and {
     my $session3 = OpenXPKI::Server::SessionHandler->new(type => "TestDriver")->create;
     $session3->data->thaw($frozen2);
 
-    cmp_deeply $session3->data_as_hashref, { user => $session->data->user, created => ignore() };
+    cmp_deeply $session3->data_as_hashref, { user => $session->data->user, created => ignore(), is_valid => ignore() };
 } "thaw data (only 'user') into session 3";
 
 # Persist (virtually in our test case)

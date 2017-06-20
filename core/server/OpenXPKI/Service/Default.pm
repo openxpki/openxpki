@@ -553,7 +553,6 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
         $self->__change_state({
             STATE => 'WAITING_FOR_LOGIN',
         });
-        CTX('session')->set_status_auth();
         CTX('session')->data->authentication_stack($requested_stack);
         my ($user, $role, $reply) = CTX('authentication')->login_step({
             STACK   => $requested_stack,
@@ -565,7 +564,7 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
             # and make the session valid
             CTX('session')->data->user($user);
             CTX('session')->data->role($role);
-            CTX('session')->set_status_valid();
+            CTX('session')->is_valid(1); # mark session as "valid"
             $self->__change_state({
                 STATE => 'MAIN_LOOP',
             });
@@ -612,18 +611,15 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     ##! 16: 'reply: ' . Dumper $reply
     if (defined $user && defined $role) {
         ##! 4: 'login successful'
-        # successful login, save it in the session
-        # and make the session valid
+        # successful login, save it in the session and mark session as valid
         CTX('session')->data->user($user);
         CTX('session')->data->role($role);
-        CTX('session')->set_status_valid();
+        CTX('session')->is_valid(1);
 
         Log::Log4perl::MDC->put('user', $user);
         Log::Log4perl::MDC->put('role', $role);
 
-        $self->__change_state({
-            STATE => 'MAIN_LOOP',
-        });
+        $self->__change_state({ STATE => 'MAIN_LOOP', });
     }
     else {
         ##! 4: 'login unsuccessful'
@@ -931,7 +927,7 @@ sub run
         else { # valid message received
             my $result;
             # we dont need a valid session when we are not in main loop state
-            if ($state_of{$ident} eq 'MAIN_LOOP' && ! CTX('session')->is_valid()) {
+            if ($state_of{$ident} eq 'MAIN_LOOP' && ! CTX('session')->is_valid) {
                 # check whether we still have a valid session (someone
                 # might have logged out on a different forked server)
                 $self->__send_error({

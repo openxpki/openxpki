@@ -786,10 +786,7 @@ sub command
 
     ## try to authenticate the user
 
-    if (not CTX('session')->is_valid())
-    {
-        CTX('authentication')->login();
-    }
+    CTX('authentication')->login() unless CTX('session')->is_valid;
 }
 
 1;

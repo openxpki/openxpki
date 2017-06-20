@@ -92,6 +92,7 @@ has data => (
     isa => 'OpenXPKI::Server::Session::Data',
     handles => {
         id => "id",
+        is_valid => "is_valid",
         data_as_hashref => "get_attributes",
     },
     predicate => "is_initialized",
@@ -163,7 +164,13 @@ around BUILDARGS => sub {
 
 =head2 id
 
-Shortcut for C<$session-E<gt>data-E<gt>id>
+Accessor to get or set the session ID
+(shortcut for C<$session-E<gt>data-E<gt>id>).
+
+=head2 is_valid
+
+Accessor to mark the session as "valid" or query the current state
+(shortcut for C<$session-E<gt>data-E<gt>is_valid>).
 
 =head2 data_as_hashref
 
@@ -339,36 +346,6 @@ sub is_expired {
     my $result = (($self->data->modified + $self->lifetime) < time);
     ##! 32: "checking if ".($self->data->modified + $self->lifetime)." (modified + lifetime) < ".time." (now): ".($result ? "EXPIRED" : "VALID")
     return $result;
-}
-
-=head2 set_status_auth
-
-Declare the session to be in status "authentication".
-
-=cut
-sub set_status_auth {
-    my $self = shift;
-    $self->data->status("auth");
-}
-
-=head2 set_status_auth
-
-Declare the session to be (in status) "valid".
-
-=cut
-sub set_status_valid {
-    my $self = shift;
-    $self->data->status("valid");
-}
-
-=head2 is_valid
-
-Returns true if the session is (in status) "valid".
-
-=cut
-sub is_valid {
-    my $self = shift;
-    return ($self->data->status eq "valid");
 }
 
 __PACKAGE__->meta->make_immutable;

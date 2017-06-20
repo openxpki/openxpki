@@ -142,7 +142,7 @@ my $session = OpenXPKI::Server::Session->new ({
                   LIFETIME  => 100});
 $session->data->pki_realm("I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA");
 $session->data->role("CA Operator");
-$session->set_status_valid;
+$session->is_valid(1);
 ok(OpenXPKI::Server::Context::setcontext ({session => $session}));
 
 1;
