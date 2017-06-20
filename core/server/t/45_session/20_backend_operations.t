@@ -156,7 +156,7 @@ my $dbi = OpenXPKI::Server::Database->new(
 # Currently there is no way to access the DB schema to rebuild it in tests
 #
 $dbi->run(qq(
-CREATE TABLE session (
+CREATE TABLE mysess (
   session_id varchar(255) NOT NULL,
   data longtext,
   created decimal(49,0) NOT NULL,
@@ -172,6 +172,7 @@ driver_ok {
     config => {
         driver => "SQLite",
         name => "$tempdir/test.sqlite",
+        table => "mysess",
     },
     descr => "Session with custom database backend",
 };
