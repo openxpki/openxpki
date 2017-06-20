@@ -81,22 +81,33 @@ sub driver_ok {
             ok not $temp->driver->load($session->id);
         } "purge expired sessions from backend";
 
-        # delete a session
+        # regenerate session ID
         my $session3;
         lives_and {
             $session3 = OpenXPKI::Server::SessionHandler->new(%{ $args })->create;
-            $session3->data->user("test");
+            $session3->data->user("sally");
             $session3->persist;
             my $temp = OpenXPKI::Server::SessionHandler->new(%{ $args })->resume($session3->id);
-            is $temp->data->user, $session3->data->user;
-        } "delete test: create and persist session";
+            is $temp->data->user, "sally";
+        } "create, persist and resume new session";
 
+        lives_and {
+            my $oldid = $session3->id;
+            $session3->new_id;
+            isnt $session3->id, $oldid;
+        } "create a new ID for existing session";
+
+        lives_and {
+            my $temp = OpenXPKI::Server::SessionHandler->new(%{ $args })->resume($session3->id);
+            is $temp->data->user, "sally";
+        } "resume session using the new ID";
+
+        # delete a session
         lives_and {
             my $id = $session3->id;
             $session3->delete;
             ok not OpenXPKI::Server::SessionHandler->new(%{ $args })->resume($id);
-        } "delete test: delete session";
-
+        } "delete session";
     }
 }
 

@@ -296,7 +296,26 @@ sub delete {
     $self->driver->delete($self->data);   # implemented by the class that consumes this role
     my $id = $self->id;
     $self->clear_data;
-    $self->log->info("Session #".$id." deleted", "auth");
+    $self->log->info("Session #".$id." deleted");
+    return 1;
+}
+
+=head2 new_id
+
+Switches the session to a new ID and updates the backend.
+
+Returns the new session ID.
+
+=cut
+sub new_id {
+    my ($self) = @_;
+    return unless $self->is_initialized;
+    $self->driver->delete($self->data);   # implemented by the class that consumes this role
+    my $oldid = $self->id;
+    $self->data->clear_id;
+    $self->log->info("Session #".$oldid." got a new ID #".$self->id);
+    $self->persist(force => 1); # enforce it for double safety
+    return $self->id;
 }
 
 =head2 purge_expired
