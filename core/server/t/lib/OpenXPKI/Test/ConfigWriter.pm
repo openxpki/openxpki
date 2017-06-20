@@ -97,7 +97,6 @@ has yaml_crl_default           => ( is => 'rw', isa => 'HashRef', lazy => 1, bui
 has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 
 has path_config_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/config.d" } );
-has path_session_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/session" } );
 has path_temp_dir       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/tmp" } );
 has path_export_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/dataexchange/export" } );
 has path_import_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/dataexchange/import" } );
@@ -204,7 +203,6 @@ sub make_dirs {
     # Do explicitely not create $self->basedir to prevent accidential use of / etc
     note "Creating directory ".$self->path_config_dir;
     $self->_make_dir($self->path_config_dir);
-    $self->_make_dir($self->path_session_dir);
     $self->_make_dir($self->path_temp_dir);
     $self->_make_dir($self->path_export_dir);
     $self->_make_dir($self->path_import_dir);
@@ -362,7 +360,7 @@ sub _build_server {
         #}
         # Session
         session => {
-            directory   => $self->path_session_dir,
+            type => "Database",
             lifetime    => 600,
         },
         # Which transport to initialize
