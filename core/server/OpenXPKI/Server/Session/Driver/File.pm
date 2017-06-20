@@ -40,7 +40,8 @@ has directory => (
 #
 sub _make_filepath {
     my ($self, $id) = @_;
-    return sprintf("%s/openxpki_session_%s", $self->directory, $id);
+    my $hex_str = join "", map { sprintf("%2.2x",ord($_)) } split //, $id;
+    return sprintf("%s/openxpki_session_%s", $self->directory, $hex_str);
 }
 
 sub BUILD {
@@ -59,11 +60,10 @@ sub BUILD {
 # DBI compliant driver name
 sub save {
     my ($self, $data) = @_;
+    ##! 8: "saving session #".$data->id
 
-    my $data_hash = $data->get_attributes; # HashRef
-    ##! 8: "saving session #".$data->{id}.": ".join(", ", map { "$_ = ".$data->{$_} } sort keys %$data)
-
-    my $filepath = $self->_make_filepath($data->id);
+    my $id = $data->id or OpenXPKI::Exception->throw(message => "Cannot persist session: value 'id' is not set");
+    my $filepath = $self->_make_filepath($id);
 
     my $mode = O_WRONLY | O_TRUNC;
     $mode |= O_EXCL | O_CREAT unless -e $filepath;
@@ -75,7 +75,7 @@ sub save {
             params  => { file => $filepath, filemode => $mode, user => getpwent() },
         );
 
-    print $fh $self->freeze($data_hash);
+    print $fh $data->freeze;
     close $fh;
 
     utime(time, $data->modified, $filepath)
@@ -106,12 +106,21 @@ sub load {
     local $INPUT_RECORD_SEPARATOR;     # long version of $/
     my $frozen = <$fh>;
 
-    my $data = $self->thaw($frozen);
+    return OpenXPKI::Server::Session::Data->new->thaw($frozen);
+}
 
-    # Make sure all attributes are correct
-    $self->check_attributes($data, 1);
+sub delete {
+    my ($self, $data) = @_;
+    ##! 8: "deleting session #".$data->id
 
-    return OpenXPKI::Server::Session::Data->new( %{ $data } );
+    my $id = $data->id or OpenXPKI::Exception->throw(message => "Cannot delete session: value 'id' is not set");
+    my $filepath = $self->_make_filepath($id);
+    return unless -f $filepath;
+    unlink $filepath
+        or OpenXPKI::Exception->throw (
+            message => 'Failed to delete session data file',
+            params  => { file => $filepath, error => $! }
+        );
 }
 
 sub delete_all_before {

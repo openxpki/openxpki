@@ -58,8 +58,8 @@ sub execute {
     my $pkcs7_decoded = decode_base64($pkcs7_base64);
 
     my $api       = CTX('api');
-    my $pki_realm = CTX('session')->get_pki_realm();
-    my $server    = CTX('session')->get_server();
+    my $pki_realm = CTX('session')->data->pki_realm;
+    my $server    = CTX('session')->data->server;
 
     my $token = $self->__get_token();
 
@@ -119,7 +119,7 @@ sub execute {
         $result = $token->command(
             {   COMMAND      => 'create_error_reply',
                 PKCS7        => $pkcs7_decoded,
-                HASH_ALG     => CTX('session')->get_hash_alg(),
+                HASH_ALG     => CTX('session')->data->hash_alg,
                 'ERROR_CODE' => 'badRequest',
             }
         );
@@ -185,7 +185,7 @@ sub __send_cert : PRIVATE {
         return $token->command(
             {   COMMAND      => 'create_error_reply',
                 PKCS7        => $pkcs7_decoded,
-                HASH_ALG     => CTX('session')->get_hash_alg(),
+                HASH_ALG     => CTX('session')->data->hash_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
@@ -200,8 +200,8 @@ sub __send_cert : PRIVATE {
         {   COMMAND        => 'create_certificate_reply',
             PKCS7          => $pkcs7_decoded,
             CERTIFICATE    => $cert_pem,
-            HASH_ALG       => CTX('session')->get_hash_alg(),
-            ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
+            HASH_ALG       => CTX('session')->data->hash_alg,
+            ENCRYPTION_ALG => CTX('session')->data->enc_alg,
         }
     );
     return $result;
@@ -254,7 +254,7 @@ sub __send_crl : PRIVATE {
         return $token->command(
             {   COMMAND      => 'create_error_reply',
                 PKCS7        => $pkcs7_decoded,
-                HASH_ALG     => CTX('session')->get_hash_alg(),
+                HASH_ALG     => CTX('session')->data->hash_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
@@ -272,7 +272,7 @@ sub __send_crl : PRIVATE {
         return $token->command(
             {   COMMAND      => 'create_error_reply',
                 PKCS7        => $pkcs7_decoded,
-                HASH_ALG     => CTX('session')->get_hash_alg(),
+                HASH_ALG     => CTX('session')->data->hash_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
@@ -285,8 +285,8 @@ sub __send_crl : PRIVATE {
         {   COMMAND        => 'create_crl_reply',
             PKCS7          => $pkcs7_decoded,
             CRL            => $crl_pem,
-            HASH_ALG       => CTX('session')->get_hash_alg(),
-            ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
+            HASH_ALG       => CTX('session')->data->hash_alg,
+            ENCRYPTION_ALG => CTX('session')->data->enc_alg,
         }
     );
     return $result;
@@ -326,9 +326,9 @@ sub __pkcs_req : PRIVATE {
     my $self      = shift;
     my $arg_ref   = shift;
     my $api       = CTX('api');
-    my $pki_realm = CTX('session')->get_pki_realm();
-    my $profile   = CTX('session')->get_profile();
-    my $server    = CTX('session')->get_server();
+    my $pki_realm = CTX('session')->data->pki_realm;
+    my $profile   = CTX('session')->data->profile;
+    my $server    = CTX('session')->data->server;
 
     my $url_params =  $arg_ref->{PARAMS};
 
@@ -529,7 +529,7 @@ sub __pkcs_req : PRIVATE {
         my $pending_msg = $token->command(
             {   COMMAND  => 'create_pending_reply',
                 PKCS7    => $pkcs7_decoded,
-                HASH_ALG => CTX('session')->get_hash_alg(),
+                HASH_ALG => CTX('session')->data->hash_alg,
             }
         );
 
@@ -586,8 +586,8 @@ sub __pkcs_req : PRIVATE {
             {   COMMAND        => 'create_certificate_reply',
                 PKCS7          => $pkcs7_decoded,
                 CERTIFICATE    => $certificate,
-                ENCRYPTION_ALG => CTX('session')->get_enc_alg(),
-                HASH_ALG       => CTX('session')->get_hash_alg(),
+                ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+                HASH_ALG       => CTX('session')->data->hash_alg,
             }
         );
 
@@ -612,7 +612,7 @@ sub __pkcs_req : PRIVATE {
     my $error_msg = $token->command(
         {   COMMAND      => 'create_error_reply',
             PKCS7        => $pkcs7_decoded,
-            HASH_ALG     => CTX('session')->get_hash_alg(),
+            HASH_ALG     => CTX('session')->data->hash_alg,
             'ERROR_CODE' => $scep_error_code,
         }
     );

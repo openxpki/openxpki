@@ -28,7 +28,7 @@ sub execute {
 	my $workflow   = shift;
 	my $context    = $workflow->context();
 	my $serializer = OpenXPKI::Serialization::Simple->new();
-	my $realm      = CTX('session')->get_pki_realm();
+	my $realm      = CTX('session')->data->pki_realm;
 
     # Check existance of necessary values
 	foreach my $key (qw( namespace key_param value_param encrypt force )) {

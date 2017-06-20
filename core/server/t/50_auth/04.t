@@ -13,7 +13,6 @@ if ($ENV{DEBUG_LEVEL}) {
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
 require OpenXPKI::Server::Authentication;
 
 

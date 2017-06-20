@@ -27,7 +27,7 @@ __PACKAGE__->mk_accessors(@parameters);
 
 sub execute {
     my ($self, $workflow) = @_;
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     my $context = $workflow->context();
 
     ##! 16: 'RetrieveCertificate'

@@ -8,7 +8,6 @@ print STDERR "OpenXPKI::Server::Authentication::External (dynamic role)\n" if $E
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 
 ## init XML cache

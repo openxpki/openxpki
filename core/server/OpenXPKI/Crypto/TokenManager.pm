@@ -108,7 +108,7 @@ sub __load_secret
 
     ##! 2: "get the arguments"
     my $group  = $keys->{GROUP};
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
 
     ##! 16: 'group: ' . $group
 
@@ -188,7 +188,7 @@ sub __set_secret_from_cache {
     my $arg_ref = shift;
 
     my $group  = $arg_ref->{'GROUP'};
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
 
     my $config = CTX('config');
     my $cache_config = $config->get("crypto.secret.$group.cache");
@@ -212,7 +212,7 @@ sub __set_secret_from_cache {
     {
         ## session mode
         ##! 4: "let's load the serialized secret in the session"
-        $secret = CTX('session')->get_secret ($group);
+        $secret = CTX('session')->data->secret(group => $group);
         ##! 16: 'secret: ' . $secret
     } else {
         ## daemon mode
@@ -248,7 +248,7 @@ sub get_secret_groups
     my $self = shift;
 
     ##! 2: "init"
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     $self->__load_secret_groups()
         if (not exists $self->{SECRET_COUNT});
 
@@ -304,7 +304,7 @@ sub is_secret_group_complete
     my $group = shift;
 
     ##! 2: "init"
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     $self->__load_secret({ GROUP => $group})
         if (not exists $self->{SECRET} or
             not exists $self->{SECRET}->{$realm} or
@@ -336,7 +336,7 @@ sub get_secret
         return undef;
     }
 
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
 
     if (!$self->{SECRET}->{$realm}->{$group}->{EXPORT}) {
         OpenXPKI::Exception->throw (
@@ -363,7 +363,7 @@ sub set_secret_group_part
     my $value = $args->{VALUE};
 
     ##! 2: "init"
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     $self->__load_secret({  GROUP => $group})
         if (not exists $self->{SECRET} or
             not exists $self->{SECRET}->{$realm} or
@@ -379,12 +379,10 @@ sub set_secret_group_part
 
     ##! 2: "store the secrets"
     my $secret = $self->{SECRET}->{$realm}->{$group}->{REF}->get_serialized();
-    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
-    {
+    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session") {
         ##! 4: "store secret in session"
-        CTX('session')->set_secret({
-            GROUP  => $group,
-            SECRET => $secret});
+        CTX('session')->data->secret(group  => $group, value => $secret);
+        CTX('session')->persist;
     } else {
         ##! 4: "merge secret into database"
         CTX('dbi')->merge(
@@ -414,7 +412,7 @@ sub clear_secret_group
     my $group = shift;
 
     ##! 2: "init"
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     $self->__load_secret({ GROUP => $group})
         if (not exists $self->{SECRET} or
             not exists $self->{SECRET}->{$realm} or
@@ -484,7 +482,7 @@ sub get_token {
     my $type   = $keys->{TYPE};
     my $name   = $keys->{NAME};
 
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
 
     ##! 32: "Load token $name of type $type"
     OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_TOKEN_MISSING_TYPE")
@@ -568,7 +566,7 @@ sub __add_token {
 
     my $type   = $keys->{TYPE};
     my $name   = $keys->{NAME};
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
     my $backend_class;

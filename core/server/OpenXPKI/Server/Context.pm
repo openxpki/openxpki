@@ -37,7 +37,6 @@ my $context = {
     	# user-settable
     	api            => undef,
     	server         => undef,
-        service        => undef,
         acl            => undef,
         session        => undef,
         authentication => undef,
@@ -69,48 +68,24 @@ sub CTX {
 
     my @return;
     foreach my $object (@objects) {
-
-    	if (! exists $context->{exported}->{$object}) {
-    	    OpenXPKI::Exception->throw (
-    		message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
-                    params  => {OBJECT => $object},
+	    OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
+            params  => {OBJECT => $object},
     		log => undef, # do not log exception message
-    		);
-    	}
-    	if (! defined $context->{exported}->{$object}) {
+		) unless exists $context->{exported}->{$object};
 
-    	    # FIXME - should add some code to check if this is a test script!
-    	    # For testing, we serve Mock Objects for logger and session without prior init
-    	    if ($object eq "session") {
-    	        use OpenXPKI::Server::Session::Mock;
-    	        my $session = OpenXPKI::Server::Session::Mock->new();
-                OpenXPKI::Server::Context::setcontext({'session' => $session});
-                $session->set_pki_realm('I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA');
-    	    } elsif ($object eq 'log') {
-    	        use OpenXPKI::Server::Log;
-    	        OpenXPKI::Server::Context::setcontext({ 'log' => OpenXPKI::Server::Log->new(CONFIG => undef) });
-    	    } else {
-        	    OpenXPKI::Exception->throw (
-                    message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
-                    params  => {OBJECT => $object},
-                    log => undef, # do not log exception message
-        		);
-    	    }
-    	}
-    	# FIXME: handle objects properly?
-    	#push @return, dclone($context->{exported}->{$object});
+	    OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
+            params  => {OBJECT => $object},
+            log => undef, # do not log exception message
+		) unless defined $context->{exported}->{$object};
+
     	push @return, $context->{exported}->{$object};
     }
 
-    if (wantarray) {
-	   return @return;
-    } else {
-	   if (scalar @return) {
-	       return $return[0];
-	   } else {
-	       return;
-	   }
-    }
+    return @return if wantarray;
+    return $return[0] if scalar @return;
+    return;
 }
 
 # you cannot initialize the stored objects in the context

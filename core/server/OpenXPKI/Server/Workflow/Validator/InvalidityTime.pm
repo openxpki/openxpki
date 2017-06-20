@@ -46,7 +46,7 @@ sub _validate {
     ##! 16: 'invalidity time: ' . $invalidity_time
     ##! 16: 'identifier: ' . $identifier
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     my $now = time();
     ##! 16: 'now: ' . $now
 

@@ -4,9 +4,11 @@ use utf8;
 
 # CPAN modules
 use Data::UUID;
+use Digest::SHA qw( sha1_hex );
 
 # Project modules
 use OpenXPKI::Exception;
+use OpenXPKI::MooseParams;
 
 =head1 NAME
 
@@ -18,45 +20,56 @@ application logic
 ################################################################################
 # Attributes
 #
-has _is_persisted => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
-has _is_empty     => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
+has is_dirty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
+has _is_empty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
 
 # handler that gets triggered on attribute changes
 sub _attr_change {
     my ($self, $val, $old_val) = @_;
-    OpenXPKI::Exception->throw(message => "Attempt to modify session data after it has been persisted")
-        if $self->_is_persisted;
     $self->_is_empty(0);
+    $self->is_dirty(1);
 }
-
-# automatically set for new (empty) sessions
-has id => (
-    is => 'rw',
-    isa => 'Str',
-    lazy => 1,
-    default => sub { Data::UUID->new->create_b64 },
-    trigger => sub { shift->_attr_change },
-);
 
 # create several Moose attributes
 my %ATTR_TYPES = (
-    user                    => 'Str',
-    role                    => 'Str',
-    pki_realm               => 'Str',
-    challenge               => 'Str',
-    authentication_stack    => 'Str',
-    language                => 'Str',
-    state                   => 'Str',
-    ip_address              => 'Str',
-    created                 => 'Int',
-    modified                => 'Int',
+    # ID is automatically set for new (empty) sessions
+    id                   => { isa => 'Str', lazy => 1, default => sub { Data::UUID->new->create_b64 }, },
+    created              => { isa => 'Int', default => sub { time } },
+    modified             => { isa => 'Int', }, # will be set before session is persisted
+    user                 => { isa => 'Str', },
+    role                 => { isa => 'Str', },
+    pki_realm            => { isa => 'Str', },
+    challenge            => { isa => 'Str', },
+    authentication_stack => { isa => 'Str', },
+    language             => { isa => 'Str', },
+    status               => { isa => 'Str', },
+    is_valid             => { isa => 'Bool', default => 0 },
+    ip_address           => { isa => 'Str', },
+    ui_session           => { isa => 'Str', },
+    _secrets => {
+        # we do not use "default => sub { {} }" as this would confuse code that
+        # detects if this Moose attribute was set.
+        isa => 'HashRef',
+        traits => ['Hash'],
+        handles => {
+            _set_secret => 'set',
+            _get_secret => 'get',
+            _delete_secret => 'delete',
+        },
+    },
 );
 for my $name (keys %ATTR_TYPES) {
+    my $type_def = $ATTR_TYPES{$name};
     has $name => (
+        %$type_def,
         is => 'rw',
-        isa => $ATTR_TYPES{$name},
         trigger => sub { shift->_attr_change },
+        clearer => "clear_$name",
     );
+    after "clear_$name" => sub {
+        my $self = shift;
+        $self->is_dirty(1);
+    };
 }
 
 ################################################################################
@@ -80,10 +93,30 @@ sub get_attribute_names {
 
 =head1 METHODS
 
+=head2 Session attributes
+
+The following methods are available to access the session attributes:
+
+    getter/setter           clearer
+    --------------------------------------------------
+    id                      clear_id
+    user                    clear_user
+    role                    clear_role
+    pki_realm               clear_pki_realm
+    challenge               clear_challenge
+    authentication_stack    clear_authentication_stack
+    language                clear_language
+    status                  clear_status
+    ip_address              clear_ip_address
+    created                 clear_created
+    modified                clear_modified
+    ui_session              clear_ui_session
+
+
 =head2 get_attributes
 
-Returns a HashRef containing all session attribute names and their value (which
-might be undef).
+Returns a HashRef containing names and values of all previously set session
+attributes.
 
 B<Parameters>
 
@@ -113,7 +146,125 @@ sub get_attributes {
         @names = @{ get_attribute_names() };
     }
 
-    return { map { $_ => $self->$_ } @names };
+    return { map { $_ => $self->$_ } grep { $self->meta->find_attribute_by_name($_)->has_value($self) } @names };
+}
+
+=head2 secret
+
+Set or get the secret of the given group (default group: "").
+
+B<Named parameters>
+
+=over
+
+=item * group - optional: the secrets group
+
+=item * value - optional: the value to set
+
+=back
+
+=cut
+sub secret {
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        group => { isa => 'Str' },
+        value => { isa => 'Str' },
+    );
+    my $digest = sha1_hex($params{group} || "");
+
+    # getter
+    return $self->_get_secret($digest) unless $params{value};
+    # setter
+    $self->_set_secret($digest => $params{value});
+}
+
+=head2 clear_secret
+
+Clear (delete) the secret of the given group (default group: "").
+
+B<Named parameters>
+
+=over
+
+=item * group - optional: the secrets group
+
+=back
+
+=cut
+sub clear_secret {
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        group => { isa => 'Str' },
+    );
+    my $digest = sha1_hex($params{group} || "");
+    $self->_delete_secret($digest);
+}
+
+=head1 METHODS
+
+=head2 freeze
+
+Serializes the session attributes into a string. The first characters of the
+string until the first colon indicate the type of serialization (encoder ID).
+
+Returns a string with the serialized data.
+
+B<Named parameters>
+
+=over
+
+=item * only - C<ArrayRef> of attributes that shall be included (optional,
+default: all attributes)
+
+=item * except - C<ArrayRef> of attributes that shall be excluded (optional)
+
+=back
+
+=cut
+sub freeze {
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        except => { isa => 'ArrayRef', optional => 1 },
+        only => { isa => 'ArrayRef', optional => 1 },
+    );
+
+    my $data_hash = $params{only}
+        ? $self->get_attributes(@{ $params{only} })
+        : $self->get_attributes;
+
+    if ($params{except}) {
+        delete $data_hash->{$_} for @{ $params{except} };
+    }
+
+    return "JSON:".encode_json($data_hash);
+}
+
+=head2 thaw
+
+Deserializes the session attributes from a string and sets them. Attributes
+which are not mentioned will not be touched.
+
+The first characters of the string until the first colon must indicate the type
+of serialization (encoder ID).
+
+Returns the object instance (allows for method chaining).
+
+=cut
+sub thaw {
+    my ($self, $frozen) = @_;
+
+    # backwards compatibility
+    if ($frozen =~ /^HASH\n/ ) {
+        use OpenXPKI::Serialization::Simple;
+        return OpenXPKI::Serialization::Simple->new->deserialize($frozen);
+    }
+
+    OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
+        unless $frozen =~ /^JSON:/;
+    $frozen =~ s/^JSON://;
+
+    my $data_hash = decode_json($frozen);
+    # set session attributes via accessor methods
+    $self->$_($data_hash->{$_}) for keys %$data_hash;
+
+    return $self;
 }
 
 1;

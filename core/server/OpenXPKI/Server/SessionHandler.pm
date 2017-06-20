@@ -9,30 +9,38 @@ use Scalar::Util qw( blessed );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Session::Data;
 use OpenXPKI::Debug;
+use OpenXPKI::Server::Log;
+use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::MooseParams;
 
 =head1 NAME
 
-OpenXPKI::Server::SessionHandler - Create, persist and resume sessions
+OpenXPKI::Server::SessionHandler - Factory to create, persist and resume sessions
 
 =head1 SYNOPSIS
 
 To start a new session:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(
-        type => "Database",
-        log => OpenXPKI::Server::Log->new,
-    );
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     $session->data->pki_realm("ca-one");
     ...
     $session->persist;
 
 To resume an existing session:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(
-        type => "Database",
-        log => OpenXPKI::Server::Log->new,
-    );
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
     $session->resume($id);
+
+Or if you want to specify config and logger explicitely:
+
+    my $session = OpenXPKI::Server::SessionHandler
+        ->new(
+            type => "Database",
+            config => { dbi => $dbi },
+            log => OpenXPKI::Server::Log->new,
+        )
+        ->create;
+    ...
 
 =cut
 
@@ -41,9 +49,13 @@ To resume an existing session:
 #
 
 has log => (
-    is => 'ro',
-    isa => 'Object',
-    required => 1,
+    is => 'rw',
+    isa => 'Log::Log4perl::Logger',
+    lazy => 1,
+    default => sub {
+        my $log = OpenXPKI::Server::Context::hascontext('log') ? CTX('log') : OpenXPKI::Server::Log->new(CONFIG => undef);
+        return $log->application,
+    },
 );
 
 # storage driver name (= last part of any package in the OpenXPKI::Server::Session::Driver::* namespace)
@@ -53,18 +65,10 @@ has type => (
     required => 1,
 );
 
-# Additional configuration options for the driver
-has driver_config => (
+has config => (
     is => 'ro',
     isa => 'HashRef',
     default => sub { {} },
-);
-
-# session lifetime
-has lifetime => (
-    is => 'ro',
-    isa => 'Int',
-    default => 1800, # 30 minutes
 );
 
 # storage driver
@@ -76,16 +80,23 @@ has driver => (
     init_arg => undef,
 );
 
+# session lifetime
+has lifetime => (
+    is => 'ro',
+    isa => 'Int',
+    default => 1800, # 30 minutes
+);
+
 has data => (
     is => 'rw',
     isa => 'OpenXPKI::Server::Session::Data',
-    lazy => 1,
-    default => sub { OpenXPKI::Server::Session::Data->new },
     handles => {
         id => "id",
+        is_valid => "is_valid",
         data_as_hashref => "get_attributes",
     },
     predicate => "is_initialized",
+    clearer => "clear_data",
 );
 
 sub _build_driver {
@@ -100,7 +111,7 @@ sub _build_driver {
     ) if $@;
 
     my $instance;
-    eval { $instance = $class->new($self->driver_config) };
+    eval { $instance = $class->new(%{ $self->config }, log => $self->log) };
     OpenXPKI::Exception->throw (
         message => "Unable to instantiate session driver class",
         params => { class_name => $class, message => $@ }
@@ -122,6 +133,28 @@ sub _build_driver {
 ################################################################################
 # Methods
 #
+around BUILDARGS => sub {
+    my ($orig, $class, %args) = @_;
+
+    # Load config if load_config => 1 was given
+    if (delete $args{load_config}) {
+        my $conf = CTX('config')->get_hash("system.server.session")
+            or OpenXPKI::Exception->throw (
+                message => "Session configuration 'system.server.session' missing",
+            );
+        $args{type} = delete($conf->{type});
+        # backwards compatibility: default to type "File"
+        if (not $args{type}) {
+            $args{type} = "File";
+            my $log = $args{log};
+            $log //= CTX('log')->system if OpenXPKI::Server::Context::hascontext('log');
+            $log->warn("Configuration syntax has changed: please specify 'system.server.session.type' (defaulting to 'File' for now)") if $log;
+        }
+        $args{lifetime} = delete($conf->{lifetime}) if $conf->{lifetime};
+        $args{config} = $conf; # rest of it
+    }
+    return $class->$orig(%args);
+};
 
 =head1 METHODS
 
@@ -131,12 +164,18 @@ sub _build_driver {
 
 =head2 id
 
-Shortcut for C<$session-E<gt>data-E<gt>id>
+Accessor to get or set the session ID
+(shortcut for C<$session-E<gt>data-E<gt>id>).
+
+=head2 is_valid
+
+Accessor to mark the session as "valid" or query the current state
+(shortcut for C<$session-E<gt>data-E<gt>is_valid>).
 
 =head2 data_as_hashref
 
-Returns a HashRef containing session attribute names and their value (which
-might be undef).
+Returns a HashRef containing names and values of all previously set session
+attributes.
 
 B<Parameters>
 
@@ -155,12 +194,25 @@ persisted session was resumed.
 
 #######################################
 
+=head2 create
+
+Creates a new sesssion.
+
+=cut
+sub create {
+    my ($self) = @_;
+    $self->data(OpenXPKI::Server::Session::Data->new);
+    $self->log->debug(sprintf("New session of type '%s' created", $self->type));
+    return $self;
+}
+
 =head2 resume
 
 Resume the specified session by loading its data from the backend storage.
 
-Returns 1 if the session was successfully resumed or 0 otherwise (i.e. expired
-session or unknown ID).
+Returns the object reference to C<OpenXPKI::Server::SessionHandler> if the
+session was successfully resumed or undef otherwise (i.e. expired session or
+unknown ID).
 
 B<Parameters>
 
@@ -186,41 +238,92 @@ sub resume {
     # Load data from backend (return if session was not found)
     my $data = $driver->load($id);
     if (not $data) {
-        $self->log->info("Session #$id is unknown (maybe expired and purged from backend)", "auth");
+        $self->log->info("Failed to resume session #$id: unknown ID (maybe expired and purged from backend)");
         return;
     }
 
     # Check return type
     OpenXPKI::Exception->throw(
-        message => "Session backend driver did not return session data",
+        message => "Session backend driver returned invalid data",
         params => { driver => ref $driver },
     ) unless (blessed($data) and $data->isa('OpenXPKI::Server::Session::Data'));
 
-    # Store data object
+    # Store data
+    $data->is_dirty(0);
     $self->data($data);
 
     if ($self->is_expired) {
-        $self->log->info("Session #$id is expired", "auth");
+        $self->log->info("Failed to resume session #$id: expired");
         return;
     }
 
-    $self->log->info("Session #".$self->id." resumed", "auth");
-    return 1;
+    $self->log->debug("Session resumed");
+    return $self;
 }
 
 =head2 persist
 
-Saves the given session to the backend storage and marks it as "persisted".
-Changes to attributes are not allowed anymore on a persisted session and will
-lead to exceptions.
+Saves the session to the backend storage if any session data has changed.
+
+Returns C<1> if data was actually written to the backend, C<undef> otherwise.
+
+B<Named parameters>
+
+=over
+
+=item * force - C<Bool> force writing session even if nothing has changed. This
+will update the I<modified> timestamp of the stored session.
+
+=back
 
 =cut
 sub persist {
-    my $self = shift;
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        force => { isa => 'Bool', optional => 1 },
+    );
+    return unless ($self->is_initialized and ($self->data->is_dirty or $params{force}));
     $self->data->modified(time);        # update timestamp
     $self->driver->save($self->data);   # implemented by the class that consumes this role
-    $self->data->_is_persisted(1);
-    $self->log->info("Session #".$self->id." persisted", "auth");
+    $self->data->is_dirty(0);
+    $self->log->debug("Session persisted");
+    return 1;
+}
+
+=head2 delete
+
+Deletes the session data from the backend storage and then from this session
+object, so that it cannot be access anymore.
+
+Returns C<1> if data was actually written to the backend or C<undef> if there is
+no session data yet.
+
+=cut
+sub delete {
+    my ($self) = @_;
+    return unless $self->is_initialized;
+    $self->driver->delete($self->data);   # implemented by the class that consumes this role
+    my $id = $self->id;
+    $self->clear_data;
+    $self->log->debug("Session deleted");
+    return 1;
+}
+
+=head2 new_id
+
+Switches the session to a new ID and updates the backend.
+
+Returns the new session ID.
+
+=cut
+sub new_id {
+    my ($self) = @_;
+    return unless $self->is_initialized;
+    $self->driver->delete($self->data);   # implemented by the class that consumes this role
+    my $oldid = $self->id;
+    $self->data->clear_id;
+    $self->log->debug("Session got a new ID: #".$self->id);
+    $self->persist(force => 1); # enforce it for double safety
+    return $self->id;
 }
 
 =head2 purge_expired
@@ -246,34 +349,4 @@ sub is_expired {
     return $result;
 }
 
-=head2 set_status_auth
-
-Declare the session to be in status "authentication".
-
-=cut
-sub set_status_auth {
-    my $self = shift;
-    $self->data->status("auth");
-}
-
-=head2 set_status_auth
-
-Declare the session to be (in status) "valid".
-
-=cut
-sub set_status_valid {
-    my $self = shift;
-    $self->data->status("valid");
-}
-
-=head2 is_valid
-
-Returns true if the session is (in status) "valid".
-
-=cut
-sub is_valid {
-    my $self = shift;
-    return ($self->data->status eq "valid");
-}
-
-1;
+__PACKAGE__->meta->make_immutable;

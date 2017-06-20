@@ -132,6 +132,7 @@ $CLONE_DIR/tools/testenv/insert-certificates.sh
 #
 # Start OpenXPKI
 #
+echo "Starting OpenXPKI"
 /usr/local/bin/openxpkictl start
 
 #

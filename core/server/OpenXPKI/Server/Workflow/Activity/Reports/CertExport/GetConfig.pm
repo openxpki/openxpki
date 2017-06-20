@@ -68,7 +68,7 @@ sub execute {
     }
 
     # Realm might be empty
-    $enc_target->{realm} = CTX('session')->get_pki_realm() unless($enc_target->{realm});
+    $enc_target->{realm} = CTX('session')->data->pki_realm unless($enc_target->{realm});
 
     my $enc_cert = CTX('api')->search_cert({ SUBJECT => $enc_target->{subject}, PKI_REALM => $enc_target->{realm}, VALID_AT => time() });
 

@@ -43,7 +43,7 @@ sub load_default_factories {
     foreach my $realm (@realms) {
         ##! 8: 'load realm $realm'
         $self->_cache->{$realm} = undef;
-        CTX('session')->set_pki_realm( $realm );
+        CTX('session')->data->pki_realm( $realm );
         $self->get_factory();
     }
 }
@@ -78,13 +78,13 @@ sub get_workflow {
 
     # We can not load workflows from other realms as this will break config and security
     # The watchdog switches the session realm before instantiating a new factory
-    if (CTX('session')->get_pki_realm ne $wf->{pki_realm}) {
+    if (CTX('session')->data->pki_realm ne $wf->{pki_realm}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_WORKFLOW_HANDLER_NOT_IN_CURRENT_REALM',
             params  => {
                 WORKFLOW_ID => $wf_id,
                 WORKFLOW_REALM => $wf->{pki_realm},
-                SESSION_REALM => CTX('session')->get_pki_realm
+                SESSION_REALM => CTX('session')->data->pki_realm
             },
         );
     }
@@ -141,7 +141,7 @@ sub get_factory {
     ##! 1: 'start'
     ##! 16: Dumper $args
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     # Check if we already have that factory in the cache
     if (defined $self->_cache->{ $pki_realm } ) {
         return $self->_cache->{ $pki_realm };

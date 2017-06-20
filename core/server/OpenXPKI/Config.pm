@@ -21,7 +21,23 @@ use Connector 1.08;
 
 extends 'Connector::Multi';
 
-has '+BASECONNECTOR' => ( required => 0 );
+has '+BASECONNECTOR' => (
+    is => 'ro',
+    isa => 'Connector',
+    init_arg => undef,
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return OpenXPKI::Config::Backend->new(LOCATION => $self->config_dir);
+    },
+);
+
+has 'config_dir' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => '/etc/openxpki/config.d',
+);
 
 has '_head_version' => (
     is => 'rw',
@@ -29,13 +45,6 @@ has '_head_version' => (
     required => 0,
     default => '',
 );
-
-
-around BUILDARGS => sub {
-    my $orig = shift;
-    my $class = shift;
-    return $class->$orig( { BASECONNECTOR => OpenXPKI::Config::Backend->new() } );
-};
 
 before '_route_call' => sub {
 
@@ -60,7 +69,7 @@ before '_route_call' => sub {
     } else {
         my $session = CTX('session');
         # there is no realm during init - hide tree by setting non existing prefix
-        my $pki_realm = $session->get_pki_realm();
+        my $pki_realm = $session->data->pki_realm;
         if ($pki_realm) {
             ##! 16: "_route_call: realm value, set prefix to " . $pki_realm
             $self->_config()->{''}->PREFIX( [ 'realm', $pki_realm ] );
@@ -215,11 +224,14 @@ OpenXPKI::Config - Connector based configuration layer using Config::Versioned
 
 =head1 SYNOPSIS
 
- use OpenXPKI::Config;
+    use OpenXPKI::Config;
 
- my $cfg = OpenXPKI::Config->new();
+    my $cfg = OpenXPKI::Config->new(); # defaults to /etc/openxpki/config.d
+    print "Param1=", $cfg->get('subsystem1.group1.param1'), "\n";
 
- print "Param1=", $cfg->get('subsystem1.group1.param1'), "\n";
+You can also specify a different directory holding the configuration:
+
+    my $cfg = OpenXPKI::Config->new(config_dir => "/tmp/openxpki");
 
 =head1 DESCRIPTION
 

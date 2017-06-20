@@ -18,7 +18,7 @@ sub evaluate
     
     my $wf_creator = $workflow->attrib('creator') || '';
 
-    my $current_user      = CTX('session')->get_user();
+    my $current_user      = CTX('session')->data->user;
     ##! 16: 'workflow creator: ' . $wf_creator
     ##! 16: 'current user: ' . $current_user
 

@@ -16,7 +16,7 @@ sub execute {
 
     ##! 1: 'Start'
     my $context = $workflow->context();
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my $valid_at;
     if ($self->param('valid_at')) {

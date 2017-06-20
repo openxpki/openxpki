@@ -71,7 +71,6 @@ OpenXPKI/Client/SC/Utilities.pm
 
 
 ## Config Layers
-OpenXPKI/Config/Merge.pm
 OpenXPKI/Config/Test.pm
 OpenXPKI/Config/Backend.pm
 
@@ -220,13 +219,12 @@ OpenXPKI/Server/API/UI.pm
 OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
-OpenXPKI/Server/Session.pm
 OpenXPKI/Server/SessionHandler.pm
-OpenXPKI/Server/Session/Mock.pm
 OpenXPKI/Server/Session/Data.pm
 OpenXPKI/Server/Session/DriverRole.pm
 OpenXPKI/Server/Session/Driver/Database.pm
 OpenXPKI/Server/Session/Driver/File.pm
+OpenXPKI/Server/Session/Driver/Memory.pm
 OpenXPKI/Server/Authentication.pm
 OpenXPKI/Server/Authentication/Anonymous.pm
 OpenXPKI/Server/Authentication/ClientSSO.pm
@@ -494,6 +492,7 @@ t/01_pod/2.t
 t/05_base/00_prereqs.t
 t/05_base/01.t
 t/05_base/02.t
+t/05_base/03_config.t
 
 t/08_debug/01_using.t
 t/08_debug/02_color.t
@@ -562,11 +561,9 @@ t/40_context/01.t
 t/40_context/02.t2
 t/40_context/03.t
 
-t/45_session/01_base.t
-t/45_session/02_import_export.t
 t/45_session/10_session_role.t
-t/45_session/20_session_database.t
-t/45_session/30_session_file.t
+t/45_session/20_backend_operations.t
+t/45_session/log4perl.conf
 
 t/50_auth/00.t
 t/50_auth/02.t
@@ -622,6 +619,8 @@ t/90_api/30_workflow.t
 
 t/95_openxpkiadm/10_certificate.t
 t/95_openxpkiadm/CommandlineTest.pm
+
+t/97_client/01_login_and_resume.t
 
 t/99_cleanup/28_log.t
 t/99_cleanup/50_auth.t

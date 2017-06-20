@@ -20,7 +20,7 @@ sub execute {
     my $workflow = shift;
     my $context  = $workflow->context();
     my $config        = CTX('config');
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     if (!$self->param('prefix')) {
         OpenXPKI::Exception->throw(

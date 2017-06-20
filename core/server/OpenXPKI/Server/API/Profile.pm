@@ -307,7 +307,7 @@ List profiles that are used for entity certificates in the current realm
 
 sub list_used_profiles {
     my ($self, $args) = @_;
-    my $pki_realm = $args->{PKI_REALM} ? $args->{PKI_REALM} : CTX('session')->get_pki_realm();
+    my $pki_realm = $args->{PKI_REALM} ? $args->{PKI_REALM} : CTX('session')->data->pki_realm;
 
     my $profiles = CTX('dbi')->select(
         from => 'csr',

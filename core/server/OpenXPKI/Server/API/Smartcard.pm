@@ -112,7 +112,7 @@ sub sc_analyze_smartcard {
     CTX('log')->application()->info("Start analyze, ChipId: $chipid, TokenId: $tokenid");
 
 
-    my $thisrealm = CTX('session')->get_pki_realm();
+    my $thisrealm = CTX('session')->data->pki_realm;
 
     my $config = CTX('config');
 
@@ -1033,7 +1033,7 @@ sub __check_against_policy {
             from => 'datapool',
             columns => ['datapool_key'],
             where => {
-                pki_realm    => CTX('session')->get_pki_realm,
+                pki_realm    => CTX('session')->data->pki_realm,
                 namespace    => 'certificate.privatekey',
                 datapool_key => $identifier,
             },
@@ -1279,7 +1279,7 @@ sub sc_analyze_certificate {
     my $dontparse  = $arg_ref->{DONTPARSE};
     my $data       = $arg_ref->{DATA};
 
-    my $thisrealm   = CTX('session')->get_pki_realm();
+    my $thisrealm   = CTX('session')->data->pki_realm;
 
     my $default_token = CTX('api')->get_default_token();
 

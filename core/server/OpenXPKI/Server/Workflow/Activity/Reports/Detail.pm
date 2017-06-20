@@ -18,7 +18,7 @@ sub execute {
     my $workflow = shift;
 
     my $context = $workflow->context();
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     # write report to the context - WARNING: might eat up some memory
     my $target_key = $self->param('target_key');

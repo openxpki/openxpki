@@ -118,7 +118,7 @@ sub _load_anchors {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION',
             params => {
-                PKI_REALM => CTX('session')->get_pki_realm() 
+                PKI_REALM => CTX('session')->data->pki_realm 
             }
         );
    }

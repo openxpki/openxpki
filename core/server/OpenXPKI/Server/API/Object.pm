@@ -459,13 +459,13 @@ sub get_cert_actions {
     ##! 1: "start"
     my ($self, $args) = @_;
 
-    my $role    = $args->{ROLE} || CTX('session')->get_role();
+    my $role    = $args->{ROLE} || CTX('session')->data->role;
     my $cert_id = $args->{IDENTIFIER};
     my $cert    = CTX('api')->get_cert({ IDENTIFIER => $cert_id, FORMAT => 'DBINFO' });
     ##! 2: "cert $cert_id, role $role"
 
     # check if this is a entity certificate from the current realm
-    return {} unless $cert->{CSR_SERIAL} and $cert->{PKI_REALM} eq CTX('session')->get_pki_realm();
+    return {} unless $cert->{CSR_SERIAL} and $cert->{PKI_REALM} eq CTX('session')->data->pki_realm;
 
     my @actions;
     my @options;
@@ -555,7 +555,7 @@ sub is_certificate_owner {
     ##! 1: "start"
     my ($self, $args) = @_;
 
-    my $user = $args->{USER} || CTX('session')->get_user();
+    my $user = $args->{USER} || CTX('session')->data->user;
     my $cert_id = $args->{IDENTIFIER};
 
     my $result = CTX('dbi')->select_one(
@@ -600,7 +600,7 @@ sub get_crl {
     my $format   = "PEM";
 
     $format = $args->{FORMAT} if exists $args->{FORMAT};
-    $pki_realm =  CTX('session')->get_pki_realm() unless $args->{PKI_REALM};
+    $pki_realm =  CTX('session')->data->pki_realm unless $args->{PKI_REALM};
 
     my $db_results;
 
@@ -732,7 +732,7 @@ sub get_crl_list {
     my ($self, $keys) = @_;
 
     my $pki_realm = $keys->{PKI_REALM};
-    $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
+    $pki_realm = CTX('session')->data->pki_realm unless($pki_realm);
 
 
     my $format = $keys->{FORMAT};
@@ -839,7 +839,7 @@ sub import_crl {
     ##! 1: "start"
     my ($self, $keys) = @_;
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my $dbi = CTX('dbi');
 
@@ -1060,7 +1060,7 @@ sub __search_cert_db_query {
 
     # pki realm
     if (not $args->{PKI_REALM}) {
-        $where->{'certificate.pki_realm'} = CTX('session')->get_pki_realm();
+        $where->{'certificate.pki_realm'} = CTX('session')->data->pki_realm;
     } elsif ($args->{PKI_REALM} !~ /_any/i) {
         $where->{'certificate.pki_realm'} = $args->{PKI_REALM};
     }
@@ -1649,7 +1649,7 @@ sub get_data_pool_entry {
     my $namespace = $args->{NAMESPACE};
     my $key       = $args->{KEY};
 
-    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $current_pki_realm   = CTX('session')->data->pki_realm;
     my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
     my $dbi = CTX('dbi');
 
@@ -1927,7 +1927,7 @@ sub set_data_pool_entry {
     ##! 1: 'start'
     my ($self, $args) = @_;
 
-    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $current_pki_realm   = CTX('session')->data->pki_realm;
     my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
     # modify arguments, as they are passed to the worker method
     $args->{PKI_REALM} = $requested_pki_realm;
@@ -2006,7 +2006,7 @@ sub list_data_pool_entries {
     my $namespace = $args->{NAMESPACE};
     my $limit = $args->{LIMIT};
 
-    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $current_pki_realm   = CTX('session')->data->pki_realm;
     my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
 
     # when called from a workflow we only allow the current realm
@@ -2063,7 +2063,7 @@ sub modify_data_pool_entry {
     my $namespace = $args->{NAMESPACE};
     my $oldkey    = $args->{KEY};
 
-    my $current_pki_realm   = CTX('session')->get_pki_realm();
+    my $current_pki_realm   = CTX('session')->data->pki_realm;
     my $requested_pki_realm = $args->{PKI_REALM} // $current_pki_realm;
 
     # when called from a workflow we only allow the current realm
@@ -2158,7 +2158,7 @@ sub get_report {
     my $report = CTX('dbi')->select_one(
         columns => $columns,
         from => 'report',
-        where => { report_name => $name, pki_realm => CTX('session')->get_pki_realm() },
+        where => { report_name => $name, pki_realm => CTX('session')->data->pki_realm },
     ) or OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_REPORT_NOT_FOUND_IN_DB',
         params => { name => $name },
@@ -2190,12 +2190,10 @@ parameter expects either an arrayref or a comma seperated string.
 =cut
 
 sub get_report_list {
-
     my $self = shift;
     my $args = shift;
 
-
-    my $where = { pki_realm => CTX('session')->get_pki_realm() };
+    my $where = { pki_realm => CTX('session')->data->pki_realm };
 
     if ($args->{NAME}) {
         $where->{report_name} = { -like => $args->{NAME} };
@@ -2311,7 +2309,7 @@ sub __set_data_pool_entry : PRIVATE {
     ##! 1: 'start'
     my ($self, $args) = @_;
 
-    my $current_pki_realm = CTX('session')->get_pki_realm();
+    my $current_pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
     my $requested_pki_realm = $args->{PKI_REALM};
@@ -2654,7 +2652,7 @@ sub __assert_current_pki_realm_within_workflow : PRIVATE {
 
     return 1 unless scalar(caller(2)) =~ m{ \A OpenXPKI::Server::Workflow }xms;
 
-    my $current_pki_realm = CTX('session')->get_pki_realm;
+    my $current_pki_realm = CTX('session')->data->pki_realm;
     return 1 if $requested_pki_realm eq $current_pki_realm;
 
     OpenXPKI::Exception->throw(

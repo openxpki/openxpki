@@ -29,7 +29,7 @@ sub init {
     $self->resulting_state($wf->{_states}->{$wf->state()}->{_actions}->{$params->{name}}->{resulting_state});
     ##! 16: 'Workflow :'.ref $wf
     ##! 16: 'resulting_state: ' . $self->resulting_state()
-    $self->{PKI_REALM} = CTX('session')->get_pki_realm();
+    $self->{PKI_REALM} = CTX('session')->data->pki_realm;
     ##! 16: 'self->{PKI_REALM} = ' . $self->{PKI_REALM}
 
     $self->workflow( $wf );
@@ -458,7 +458,7 @@ situation!
 =head2 init
 
 Is called during the creation of the activity class.
-Sets $self->{PKI_REALM} to CTX('session')->get_pki_realm()
+Sets $self->{PKI_REALM} to CTX('session')->data->pki_realm
 
 Sets $self->workflow() as a reference to the current workflow.
 

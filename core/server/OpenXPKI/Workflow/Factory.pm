@@ -97,7 +97,6 @@ sub fetch_unfiltered_workflow {
 
     CTX('log')->workflow()->info('Unfiltered access to workflow');
 
-
     return $wf;
 
 }
@@ -252,14 +251,14 @@ sub __authorize_workflow {
     my $filter   = $arg_ref->{ACTION};
     ##! 16: 'filter: ' . $filter
 
-    my $realm    = CTX('session')->get_pki_realm();
+    my $realm    = CTX('session')->data->pki_realm;
     ##! 16: 'realm: ' . $realm
 
-    my $role     = CTX('session')->get_role();
+    my $role     = CTX('session')->data->role;
     $role = 'Anonymous' unless($role);
     ##! 16: 'role: ' . $role
 
-    my $user     = CTX('session')->get_user();
+    my $user     = CTX('session')->data->user;
     ##! 16: 'user: ' . $user
 
 

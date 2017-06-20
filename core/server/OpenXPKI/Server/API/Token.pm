@@ -116,7 +116,7 @@ sub get_token_alias_by_group {
     my $group  = $keys->{GROUP} or OpenXPKI::Exception->throw (
         message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
     );
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     ##! 16: "Find token for group $group in realm $pki_realm"
 
     my $validity = $self->_validity_param_to_epoch($keys->{VALIDITY});
@@ -163,7 +163,7 @@ sub get_certificate_for_alias {
         message => 'I18N_OPENXPKI_API_TOKEN_GET_CERTIFICATE_NO_ALIAS_GIVEN',
     ) unless $keys->{ALIAS};
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     ##! 32: "Search for alias $keys->{ALIAS}"
     my $certificate = CTX('dbi')->select_one(
         from_join => 'certificate identifier=identifier aliases',
@@ -216,7 +216,7 @@ sub list_active_aliases {
     ##! 1: 'start'
     my $group = $keys->{GROUP};
     my $type = $keys->{TYPE};
-    my $pki_realm = $keys->{PKI_REALM} // CTX('session')->get_pki_realm;
+    my $pki_realm = $keys->{PKI_REALM} // CTX('session')->data->pki_realm;
 
     if (not $group) {
        $group = CTX('config')->get("realm.$pki_realm.crypto.type.$type") if $type;
@@ -289,7 +289,7 @@ sub get_ca_list {
     my $keys = shift;
 
     my $pki_realm = $keys->{PKI_REALM};
-    my $session_pki_realm = CTX('session')->get_pki_realm();
+    my $session_pki_realm = CTX('session')->data->pki_realm;
     if (!$pki_realm) {
         $pki_realm = $session_pki_realm;
     }

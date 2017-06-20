@@ -26,7 +26,7 @@ plan tests => 5;
 #
 my $workflow_type = "TESTWORKFLOW".int(rand(2**32));
 my $oxitest = OpenXPKI::Test->new;
-$oxitest->add_realm_config("alpha", "workflow.def.$workflow_type", {
+$oxitest->realm_config("alpha", "workflow.def.$workflow_type" => {
     head => { prefix => "testwf", persister => 'OpenXPKI' },
     state => {
         INITIAL => { action => [ 'doit > DONE' ] },

@@ -11,10 +11,13 @@ OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)
 # Core modules
 use File::Path qw(make_path);
 use File::Spec;
-use TAP::Parser::YAMLish::Writer;
+use POSIX;
+use Digest::SHA;
+use MIME::Base64;
 
 # CPAN modules
 use Moose::Util::TypeConstraints;
+use YAML::Tiny 1.69;
 use Test::More;
 use Test::Exception;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
@@ -51,19 +54,26 @@ has db_conf => (
     },
 );
 
-# Collection of additional files, maybe for custom tests, that will be inserted
-# into the test environment. They must be declared before we create() everything.
-# HashRef: [path below basedir] => [YAML HashRef]
-has _additional_config_files => (
+has _config => (
     is => 'ro',
-    isa => 'HashRef[HashRef]',
+    isa => 'HashRef',
+    default => sub { {} },
+    init_arg => undef, # disable assignment via construction
+);
+
+# additional configuration added in tests.
+# They must be declared before we create() everything.
+# HashRef: [dot-separated config path] => [YAML HashRef]
+has _user_config => (
+    is => 'ro',
+    isa => 'HashRef',
     traits => ['Hash'],
     default => sub { {} },
     init_arg => undef, # disable assignment via construction
     handles => {
-        add_config_file => 'set',
-        config_file_data => 'get',
-        config_file_paths => 'keys',
+        add_user_config      => 'set',
+        get_user_config_keys => 'keys',
+        get_user_config_node => 'get',
     },
 );
 
@@ -83,8 +93,10 @@ has yaml_cert_profile_server   => ( is => 'rw', isa => 'HashRef', lazy => 1, bui
 has yaml_cert_profile_user     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_user" );
 has yaml_crl_default           => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_crl_default" );
 
+# password for all openxpki users
+has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
+
 has path_config_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/config.d" } );
-has path_session_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/session" } );
 has path_temp_dir       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/tmp" } );
 has path_export_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/dataexchange/export" } );
 has path_import_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/dataexchange/import" } );
@@ -98,8 +110,8 @@ has path_openssl        => ( is => 'rw', isa => 'Str', default => "/usr/bin/open
 has path_javaks_keytool => ( is => 'rw', isa => 'Str', default => "/usr/bin/keytool" );
 has path_openca_scep    => ( is => 'rw', isa => 'Str', default => "/usr/bin/openca-scep" );
 
-has system_user  => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
-has system_group => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
+has system_user  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { (getpwuid(geteuid))[0] } ); # run under same user as test scripts
+has system_group => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { (getgrgid(getegid))[0] } );
 
 
 sub _make_dir {
@@ -118,7 +130,7 @@ sub write_str {
     my ($self, $filepath, $content) = @_;
 
     die "Empty content for $filepath" unless $content;
-    open my $fh, ">", $filepath or die "Could not open $filepath for writing: $@";
+    open my $fh, ">:encoding(UTF-8)", $filepath or die "Could not open $filepath for UTF-8 encoded writing: $@";
     print $fh $content, "\n" or die "Could not write to $filepath: $@";
     close $fh or die "Could not close $filepath: $@";
 }
@@ -141,28 +153,56 @@ sub remove_private_key {
 sub write_yaml {
     my ($self, $filepath, $data) = @_;
 
-    my $lines = [];
-    TAP::Parser::YAMLish::Writer->new->write($data, $lines);
-    pop @$lines; shift @$lines; # remove --- and ... from beginning/end
-
     $self->_make_parent_dir($filepath);
-    diag "Writing $filepath" if $ENV{TEST_VERBOSE};
-    $self->write_str($filepath, join("\n", @$lines));
+    note "Writing $filepath";
+    $self->write_str($filepath, YAML::Tiny->new($data)->write_string);
+}
+
+# Add a configuration node (I<HashRef>) below the given configuration key
+# (dot separated path in the config hierarchy)
+#
+#     $config_writer->add_config_node('realm.alpha.workflow', $workflow);
+sub add_config {
+    my ($self, $key, $data) = @_;
+    die "add_config() must be called before create()" if $self->is_written;
+
+    my @parts = split /\./, $key;
+    my $node = $self->_config; # root node
+    for my $i (0..$#parts) {
+        $node->{$parts[$i]} //= {};
+        $node = $node->{$parts[$i]};
+    }
+    %{$node} = %$data; # intentionally replace any probably existing data
 }
 
 sub add_realm_config {
-    my ($self, $realm, $config_path, $yaml_hash) = @_;
+    my ($self, $realm, $config_relpath, $yaml_hash) = @_;
     die "add_realm_config() must be called before create()" if $self->is_written;
-    my $relpath = $config_path; $relpath =~ s/\./\//g;
-    $self->add_config_file($self->path_config_dir."/realm/$realm/$relpath.yaml" => $yaml_hash);
+    my $config_path = "realm.$realm.$config_relpath";
+    $self->add_config($config_path => $yaml_hash);
+}
+
+# Returns a hash that contains all config data that was defined for the given
+# config path.
+sub get_config_node {
+    my ($self, $config_key, $allow_undef) = @_;
+
+    # Part 1: exact matches and superkeys
+    my @parts = split /\./, $config_key;
+    my $node = $self->_config; # root node
+
+    for my $i (0..$#parts) {
+        $node = $node->{$parts[$i]}
+            or ($allow_undef ? return : die "Configuration key $config_key not found");
+    }
+    return $node;
 }
 
 sub make_dirs {
     my ($self) = @_;
     # Do explicitely not create $self->basedir to prevent accidential use of / etc
-    diag "Creating directory ".$self->path_config_dir if $ENV{TEST_VERBOSE};
+    note "Creating directory ".$self->path_config_dir;
     $self->_make_dir($self->path_config_dir);
-    $self->_make_dir($self->path_session_dir);
     $self->_make_dir($self->path_temp_dir);
     $self->_make_dir($self->path_export_dir);
     $self->_make_dir($self->path_import_dir);
@@ -174,14 +214,18 @@ sub make_dirs {
 
 sub create {
     my ($self) = @_;
+
     $self->make_dirs;
-    $self->write_yaml($self->path_config_dir."/system/crypto.yaml",    $self->yaml_crypto);
-    $self->write_yaml($self->path_config_dir."/system/database.yaml",  $self->yaml_database);
-    $self->write_yaml($self->path_config_dir."/system/realms.yaml",    $self->yaml_realms);
-    $self->write_yaml($self->path_config_dir."/system/server.yaml",    $self->yaml_server);
-    $self->write_yaml($self->path_config_dir."/system/watchdog.yaml",  $self->yaml_watchdog);
+
+    # default test config
+    $self->add_config("system.crypto"   => $self->yaml_crypto);
+    $self->add_config("system.database" => $self->yaml_database);
+    $self->add_config("system.realms"   => $self->yaml_realms);
+    $self->add_config("system.server"   => $self->yaml_server);
+    $self->add_config("system.watchdog" => $self->yaml_watchdog);
 
     for my $realm (@{$self->realms}) {
+        $self->add_realm_config($realm, "auth", $self->_realm_auth);
         $self->add_realm_config($realm, "crypto", $self->_realm_crypto($realm));
         $self->add_realm_config($realm, "workflow.persister", $self->yaml_workflow_persister);
         # OpenXPKI::Workflow::Handler checks existance of workflow.def
@@ -195,9 +239,21 @@ sub create {
         $self->add_realm_config($realm, "crl.default",                          $self->yaml_crl_default);
     }
 
-    $self->write_str($self->path_log4perl_conf,                       $self->conf_log4perl);
-    # Write all additional config files
-    $self->write_yaml($_, $self->config_file_data($_)) for sort $self->config_file_paths;
+    # user specified config data (might overwrite default configs)
+    for my $key ($self->get_user_config_keys) {
+        $self->add_config($key => $self->get_user_config_node($key));
+    }
+
+    # write all config files
+    for my $level1 (sort keys %{$self->_config}) {
+        for my $level2 (sort keys %{$self->_config->{$level1}}) {
+            my $filepath = sprintf "%s/%s/%s.yaml", $self->path_config_dir, $level1, $level2;
+            $self->write_yaml($filepath, $self->_config->{$level1}->{$level2});
+        }
+    }
+    # write Log4perl config
+    $self->write_str($self->path_log4perl_conf, $self->conf_log4perl);
+
     $self->is_written(1);
 }
 
@@ -304,7 +360,7 @@ sub _build_server {
         #}
         # Session
         session => {
-            directory   => $self->path_session_dir,
+            type => "Database",
             lifetime    => 600,
         },
         # Which transport to initialize
@@ -416,6 +472,84 @@ sub _realm_crypto {
     };
 }
 
+sub _get_password_hash {
+    my ($self, $password) = @_;
+    my $salt = "";
+    $salt .= chr(int(rand(256))) for (1..3);
+    $salt = encode_base64($salt);
+
+    my $ctx = Digest::SHA->new;
+    $ctx->add($password);
+    $ctx->add($salt);
+    return "{ssha}".encode_base64($ctx->digest . $salt, '');
+}
+
+sub _realm_auth {
+    my ($self) = @_;
+    return {
+        stack => {
+            _System    => {
+                description => "System",
+                handler => "System",
+            },
+            Anonymous => {
+                description => "Anonymous",
+                handler => "Anonymous",
+            },
+            Test => {
+                description => "OpenXPKI test auth stack",
+                handler => "OxiTest",
+            },
+        },
+        handler => {
+            "System" => {
+                type => "Anonymous",
+                label => "System",
+                role => "System",
+            },
+            "Anonymous" => {
+                type => "Anonymous",
+                label => "System",
+            },
+            "OxiTest" => {
+                label => "OpenXPKI Test Authentication Handler",
+                type  => "Password",
+                user  => {
+                    # password is always "openxpki"
+                    caop => {
+                        digest => $self->_get_password_hash($self->password), # "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B",
+                        role   => "CA Operator",
+                    },
+                    raop => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "RA Operator",
+                    },
+                    raop2 => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "RA Operator",
+                    },
+                    user => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "User"
+                    },
+                    user2 => {
+                        digest => $self->_get_password_hash($self->password),
+                        role   => "User"
+                    },
+                },
+            },
+        },
+        roles => {
+            "Anonymous"   => { label => "Anonymous" },
+            "CA Operator" => { label => "CA Operator" },
+            "RA Operator" => { label => "RA Operator" },
+            "SmartCard"   => { label => "SmartCard" },
+            "System"      => { label => "System" },
+            "User"        => { label => "User" },
+        },
+    };
+}
+
 sub _build_workflow_persister {
     my ($self) = @_;
     return {
@@ -437,13 +571,13 @@ sub _build_log4perl {
     my $logfile = $self->path_log_file;
 
     return qq(
-        log4perl.category.openxpki.auth         = INFO, Screen, Logfile, DBI
-        log4perl.category.openxpki.audit        = INFO, Screen, DBI
-        log4perl.category.openxpki.monitor      = INFO, Screen, Logfile
-        log4perl.category.openxpki.system       = INFO, Screen, Logfile
-        log4perl.category.openxpki.workflow     = INFO, Screen, Logfile
-        log4perl.category.openxpki.application  = INFO, Screen, Logfile, DBI
-        log4perl.category.connector             = INFO, Screen, Logfile
+        log4perl.category.openxpki.auth         = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.audit        = DEBUG, Screen, DBI
+        log4perl.category.openxpki.monitor      = DEBUG, Screen, Logfile
+        log4perl.category.openxpki.system       = DEBUG, Screen, Logfile
+        log4perl.category.openxpki.workflow     = DEBUG, Screen, Logfile
+        log4perl.category.openxpki.application  = DEBUG, Screen, Logfile, DBI
+        log4perl.category.connector             = DEBUG, Screen, Logfile
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout

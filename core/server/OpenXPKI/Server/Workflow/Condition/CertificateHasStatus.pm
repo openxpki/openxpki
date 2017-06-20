@@ -18,7 +18,7 @@ sub _evaluate {
     ##! 1: 'start'
     my ( $self, $workflow ) = @_;
     my $context     = $workflow->context();
-    my $pki_realm   = CTX('session')->get_pki_realm();
+    my $pki_realm   = CTX('session')->data->pki_realm;
 
     my $identifier = $self->param('cert_identifier') // $context->param('cert_identifier');
 

@@ -22,7 +22,7 @@ To quickly initialize the default test environment and server:
 Or you might want to add some custom workflow config:
 
     my $oxitest = OpenXPKI::Test->new;
-    $oxitest->add_workflow("alpha", "wf_type_1", {
+    $oxitest->workflow_config("alpha", wf_type_1 => {
         'head' => {
             'label' => 'Perfect workflow',
             'persister' => 'OpenXPKI',
@@ -57,7 +57,7 @@ use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
+use OpenXPKI::Server::SessionHandler;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
 
@@ -257,50 +257,46 @@ sub init_server {
     die "setup_env() must be called before init_server()" unless $self->_env_initialized;
 
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log dbi api ); # our default tasks
+    my @tasks = qw( config_versioned log dbi_log dbi api authentication ); # our default tasks
     my %task_hash = map { $_ => 1 } @tasks;
     push @tasks, grep { not $task_hash{$_} } @additional_tasks; # more tasks requested via parameter
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
 
     # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
-    my $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.directory"),
-        LIFETIME  => OpenXPKI::Server::Context::CTX('config')->get("system.server.session.lifetime"),
-    });
+    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
     # set PKI realm after init() as various init procedures overwrite the realm
-    $session->set_pki_realm($self->config_writer->realms->[0]);
+    $session->data->pki_realm($self->config_writer->realms->[0]);
 
     return $self;
 }
 
 
-=head2 add_realm_config
+=head2 realm_config
 
 Add another YAML configuration file for the given realm and reload server
 config C<CTX('config')>.
 
 Example:
 
-    $oxitest->add_realm_config(
+    $oxitest->realm_config(
         "alpha",
-        "auth.handler",
-        {
-            Signature => {
-                realm => [ "alpha" ],
-                cacert => [ "MyCertId" ],
-            }
+        "auth.handler.Signature" => {
+            realm => [ "alpha" ],
+            cacert => [ "MyCertId" ],
         }
     );
 
-This would write a file I<etc/openxpki/config.d/realm/alpha/auth/handler.yaml>
-(below C<$oxitest-E<gt>testenv_root>) with this content:
+This would write the following content into I<etc/openxpki/config.d/realm/alpha.yaml>
+(below C<$oxitest-E<gt>testenv_root>):
 
+    ...
     Signature
       realm:
         - alpha
       cacert:
         - MyCertId
+    ...
 
 B<Parameters>
 
@@ -317,20 +313,21 @@ converted into YAML and stored on disk
 =back
 
 =cut
-sub add_realm_config {
-    my ($self, $realm, $config_path, $yaml_hash) = @_;
-    $self->config_writer->add_realm_config($realm, $config_path, $yaml_hash);
+sub realm_config {
+    my ($self, $realm, $config_relpath, $yaml_hash) = @_;
+    my $config_path = "realm.$realm.$config_relpath";
+    $self->config_writer->add_user_config($config_path => $yaml_hash);
 }
 
-=head2 add_workflow
+=head2 workflow_config
 
 Add a workflow definition and reload server config C<CTX('config')>.
 
 Example:
 
-    $oxitest->add_workflow(
-        "def.set_motd",
-        {
+    $oxitest->workflow_config(
+        "alpha",
+        set_motd => {
             head => {
                 prefix    => "motd",
                 persister => "Volatile",
@@ -345,17 +342,21 @@ Example:
         },
     );
 
-This would write a file I<etc/openxpki/config.d/realm/alpha/workflow/def/set_motd.yaml>
-(below C<$oxitest-E<gt>testenv_root>) with this content:
+This would write the following content into
+I<etc/openxpki/config.d/realm/alpha.yaml> (below
+C<$oxitest-E<gt>testenv_root>):
 
-    head:
-      prefix: motd
-      persister: Volatile
-      label: I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL
+    ...
+    def:
+      set_motd:
+        head:
+          prefix: motd
+          persister: Volatile
+          label: I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL
 
-    state:
-      INITIAL:
-      ...
+        state:
+          INITIAL:
+    ...
 
 B<Parameters>
 
@@ -371,10 +372,61 @@ converted into YAML and stored on disk
 =back
 
 =cut
-sub add_workflow {
+sub workflow_config {
     my ($self, $realm, $name, $yaml_hash) = @_;
-    $self->config_writer->add_realm_config($realm, "workflow.def.$name", $yaml_hash);
+    $self->realm_config($realm, "workflow.def.$name" => $yaml_hash);
 }
+
+
+=head2 get_config
+
+Returns a all config data that was defined below the given dot separated config
+path. This might be a HashRef (config node) or a Scalar (config leaf).
+
+The data might be taken from parent and/or child config definitions, e.g.:
+
+C<get_config_entry('realm.alpha.workflow')> might return data from
+
+=over
+
+=item * realm/alpha.yaml
+
+=item * realm/alpha/workflow.yaml
+
+=item * realm/alpha/workflow/def/creation.yaml
+
+=item * realm/alpha/workflow/def/deletion.yaml
+
+=back
+
+B<Parameters>
+
+=over
+
+=item * I<$config_key> - dot separated configuration key/path
+
+=item * I<$allow_undef> - set to 1 to return C<undef> instead of dying if the
+config key is not found
+
+=back
+
+=cut
+sub get_config {
+    my ($self, $config_key, $allow_undef) = @_;
+    $self->config_writer->get_config_node($config_key, $allow_undef);
+}
+
+=head2 get_default_realm
+
+Returns the name of the default realm in the test environment that can be used
+in test code.
+
+=cut
+sub get_default_realm {
+    my ($self) = @_;
+    return $self->config_writer->realms->[0];
+}
+
 =head2 insert_testcerts
 
 Inserts all test certificates from L<OpenXPKI::Test::CertHelper::Database> into
@@ -453,9 +505,9 @@ sub _db_config_from_production {
 
     return unless (-d "/etc/openxpki/config.d" and -r "/etc/openxpki/config.d");
 
-    # make sure OpenXPKI::Config::Backend reads from default /etc/openxpki/config.d
+    # make sure OpenXPKI::Config::Backend reads from the given LOCATION
     my $old_env = $ENV{OPENXPKI_CONF_PATH}; delete $ENV{OPENXPKI_CONF_PATH};
-    my $config = OpenXPKI::Config::Backend->new;
+    my $config = OpenXPKI::Config::Backend->new(LOCATION => "/etc/openxpki/config.d");
     $ENV{OPENXPKI_CONF_PATH} = $old_env if $old_env;
 
     my $db_conf = $config->get_hash('system.database.main');

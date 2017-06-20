@@ -22,7 +22,7 @@ sub execute {
     
     my $server = $context->param('server');
     
-#    my $pki_realm  = CTX('session')->get_pki_realm();
+#    my $pki_realm  = CTX('session')->data->pki_realm;
 
     my @policy_params = $config->get_keys("scep.$server.policy");
 

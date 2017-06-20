@@ -32,7 +32,7 @@ use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Session::Mock;
+use OpenXPKI::Server::SessionHandler;
 
 use OpenXPKI::Crypto::X509;
 
@@ -77,15 +77,13 @@ my @log_queue;
 sub init {
     my $keys = shift;
 
-    # We need a valid session to access the realm parts of the config
-    if (!OpenXPKI::Server::Context::hascontext('session')) {
-        my $session = OpenXPKI::Server::Session::Mock->new();
-        OpenXPKI::Server::Context::setcontext({'session' => $session});
-    }
+    # TODO Rework this: we create a temporary in-memory session to allow access to realm parts of the config
+    OpenXPKI::Server::Context::setcontext({ 'session' =>
+        OpenXPKI::Server::SessionHandler->new(type => "Memory")->create()
+    }) unless OpenXPKI::Server::Context::hascontext('session');
 
-    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-        log_wrapper("OpenXPKI initialization");
-    }
+    log_wrapper("OpenXPKI initialization")
+        unless (exists $keys->{SILENT} and $keys->{SILENT});
 
     my @tasks;
 
@@ -96,7 +94,6 @@ sub init {
     }
 
     delete $keys->{TASKS};
-
 
 
   TASK:
@@ -156,7 +153,6 @@ sub init {
 
 
 sub log_wrapper {
-
     my $msg = shift;
     my $prio = shift || 'info';
 

@@ -20,7 +20,7 @@ sub execute {
 
     ##! 1: "start"
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my $next_ca = CTX('dbi')->select_one(
         from_join => "certificate identifier=identifier aliases",
@@ -61,7 +61,7 @@ sub execute {
     my $result = $scep_token->command({
         COMMAND  => 'create_nextca_reply',
         CHAIN    => $next_ca->{data},
-        HASH_ALG => CTX('session')->get_hash_alg(),
+        HASH_ALG => CTX('session')->data->hash_alg,
     });
 
     $result = "Content-Type: application/x-x509-next-ca-cert\n\n" . $result;
