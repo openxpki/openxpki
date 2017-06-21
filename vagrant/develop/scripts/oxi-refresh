@@ -67,10 +67,13 @@ make install                                                          >$LOG 2>&1
 
 if [ "$1" != "--no-restart" ]; then
     echo "Restarting OpenXPKI"
-    openxpkictl restart >/dev/null                                    >$LOG 2>&1
+    openxpkictl restart                                               >$LOG 2>&1
 
     if [[ $(openxpkictl status 2>&1) == *"not running"* ]]; then
         echo "Error starting OpenXPKI"
         exit 333
     fi
+
+    echo "Restarting Apache"
+    systemctl restart apache2                                         >$LOG 2>&1
 fi
