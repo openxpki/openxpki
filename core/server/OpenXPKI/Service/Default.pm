@@ -63,7 +63,8 @@ sub init {
             my $result;
             eval { # try to handle it
                 $result = $self->__handle_message({ MESSAGE => $msg });
-                CTX('session')->persist;
+                # persist session unless it was killed (we assume someone saved it before)
+                CTX('session')->persist if OpenXPKI::Server::Context::hascontext('session');
             };
             if (my $exc = OpenXPKI::Exception->caught()) {
                 $self->__send_error({ EXCEPTION => $exc });
@@ -901,7 +902,8 @@ sub run
                 # our session is just fine
                 eval { # try to handle it
                     $result = $self->__handle_message({ MESSAGE => $msg });
-                    CTX('session')->persist;
+                    # persist session unless it was killed (we assume someone saved it before)
+                    CTX('session')->persist if OpenXPKI::Server::Context::hascontext('session');
                 };
                 if (my $exc = OpenXPKI::Exception->caught()) {
                     $self->__send_error({ EXCEPTION => $exc, });
