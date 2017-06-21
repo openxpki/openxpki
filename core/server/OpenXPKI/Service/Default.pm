@@ -630,7 +630,7 @@ sub __handle_LOGOUT : PRIVATE {
     my $old_session = CTX('session');
 
     ##! 8: "logout received - terminate session " . $old_session->id,
-    CTX('log')->system()->debug('Terminating session ' . $old_session->get_id());
+    CTX('log')->system()->debug('Terminating session ' . $old_session->id);
 
     OpenXPKI::Server::Context::killsession();
     $self->__change_state({ STATE => 'NEW' });
@@ -648,9 +648,9 @@ sub __handle_STATUS : PRIVATE {
 
     # SERVICE_MSG ?
     return {
-    SESSION => {
-        ROLE => $self->get_API('Session')->get_role(),
-        USER => $self->get_API('Session')->get_user(),
+        SESSION => {
+            ROLE => $self->get_API('Session')->role,
+            USER => $self->get_API('Session')->user,
         },
     };
 }
@@ -767,7 +767,7 @@ sub __pki_realm_choice_available : PRIVATE {
     ##! 2: "check if PKI realm is already known"
     my $realm;
     eval {
-    $realm = $self->get_API('Session')->get_pki_realm();
+        $realm = $self->get_API('Session')->pki_realm;
     };
     return $realm if defined $realm;
 

@@ -238,7 +238,7 @@ Initializes the basic context objects:
     C<CTX('api')>
     C<CTX('session')>
 
-Note that C<CTX('session')-E<gt>get_pki_realm> will return the first realm
+Note that C<CTX('session')-E<gt>data-E<gt>pki_realm> will return the first realm
 specified in L<OpenXPKI::Test::ConfigWriter/realms>.
 
 B<Parameters>
