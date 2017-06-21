@@ -64,9 +64,7 @@ switching/creating the backend session
 
 =cut
 sub _init_backend {
-
     my $self = shift;
-
     # the trigger has the client as argument, the builder has not
     my $client = shift;
 
@@ -79,14 +77,16 @@ sub _init_backend {
         $self->logger()->debug('Use provided client instance');
     }
 
+    my $client_id = $client->get_session_id();
     my $session = $self->session();
-    my $old_session =  $session->param('backend_session_id') || undef;
-    if ($old_session && $old_session eq $client->get_session_id()) {
+    my $backend_id =  $session->param('backend_session_id') || undef;
+
+    if ($backend_id and $client_id and $backend_id eq $client_id) {
         $self->logger()->debug('Backend session already loaded');
     } else {
         eval {
-            $self->logger()->debug('First session reinit with id ' . ($old_session || 'init'));
-            $client->init_session({ SESSION_ID => $old_session });
+            $self->logger()->debug('First session reinit with id ' . ($backend_id || 'init'));
+            $client->init_session({ SESSION_ID => $backend_id });
         };
         if ($EVAL_ERROR) {
             my $exc = OpenXPKI::Exception->caught();
@@ -102,18 +102,19 @@ sub _init_backend {
                 die "Backend communication problem";
             }
         }
+        # refresh variable to current id
+        $client_id = $client->get_session_id();
     }
 
-    my $client_session = $client->get_session_id();
     # logging stuff only
-    if ($old_session && $client_session eq $old_session) {
-        $self->logger()->info('Resume backend session with id ' . $client_session);
-    } elsif ($old_session) {
-        $self->logger()->info('Re-Init backend session ' . $client_session . '/' . $old_session );
+    if ($backend_id and $client_id eq $backend_id) {
+        $self->logger()->info('Resume backend session with id ' . $client_id);
+    } elsif ($backend_id) {
+        $self->logger()->info('Re-Init backend session ' . $client_id . '/' . $backend_id );
     } else {
-        $self->logger()->info('New backend session with id ' . $client_session);
+        $self->logger()->info('New backend session with id ' . $client_id);
     }
-    $session->param('backend_session_id', $client_session);
+    $session->param('backend_session_id', $client_id);
 
     $self->logger()->trace( Dumper $session );
     return $client;
