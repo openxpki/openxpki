@@ -2,9 +2,6 @@ package OpenXPKI::Server::Session::DriverRole;
 use Moose::Role;
 use utf8;
 
-# CPAN modules
-use JSON;
-
 # Project modules
 use OpenXPKI::Exception;
 
