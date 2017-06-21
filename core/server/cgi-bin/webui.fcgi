@@ -76,7 +76,7 @@ if ($config{global}{session_path} || defined $config{global}{ip_match} || $confi
         $log->warn('Session parameters in [global] are deprecated, please use [session]');
         $config{session} = {
             'ip_match' => $config{global}{ip_match} || 0,
-            'timeout' => $config{global}{session_timeout} || '',
+            'timeout' => $config{global}{session_timeout} || undef,
         };
         $config{session_driver} = { Directory => ( $config{global}{session_path} || '/tmp') };
     }
