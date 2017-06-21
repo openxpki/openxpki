@@ -73,7 +73,7 @@ use strict;
 use English;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use Proc::ProcessTable;
@@ -633,7 +633,7 @@ sub __wake_up_workflow {
     #
 
     # create memory-only session for workflow
-    my $session = OpenXPKI::Server::SessionHandler->new(type => "Memory")->create;
+    my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
     OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
     Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 

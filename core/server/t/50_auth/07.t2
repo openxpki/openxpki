@@ -8,7 +8,7 @@ diag "OpenXPKI::Server::ACL Correctness\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Server::ACL;
 
 ## init XML cache
@@ -23,7 +23,7 @@ OpenXPKI::Server::Init::init(
     });
 
 ## create new session
-my $session = OpenXPKI::Server::SessionHandler->new(
+my $session = OpenXPKI::Server::Session->new(
     type => "File",
     config => { directory => "t/50_auth/", },
 )->create;

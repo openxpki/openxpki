@@ -10,7 +10,7 @@ use English;
 use Log::Log4perl qw(:easy);
 use File::Spec;
 
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Server::ACL;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
@@ -137,7 +137,7 @@ our $log = CTX('log');
 ok($log);
 
 ## create a valid session
-my $session = OpenXPKI::Server::SessionHandler->new(
+my $session = OpenXPKI::Server::Session->new(
     type => "File",
     config => { directory => "t/60_workflow/" },
 )->create;

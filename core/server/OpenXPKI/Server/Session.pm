@@ -1,4 +1,4 @@
-package OpenXPKI::Server::SessionHandler;
+package OpenXPKI::Server::Session;
 use Moose;
 use utf8;
 
@@ -15,25 +15,25 @@ use OpenXPKI::MooseParams;
 
 =head1 NAME
 
-OpenXPKI::Server::SessionHandler - Factory to create, persist and resume sessions
+OpenXPKI::Server::Session - Factory to create, persist and resume sessions
 
 =head1 SYNOPSIS
 
 To start a new session:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
+    my $session = OpenXPKI::Server::Session->new(load_config => 1)->create;
     $session->data->pki_realm("ca-one");
     ...
     $session->persist;
 
 To resume an existing session:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
+    my $session = OpenXPKI::Server::Session->new(load_config => 1);
     $session->resume($id);
 
 Or if you want to specify config and logger explicitely:
 
-    my $session = OpenXPKI::Server::SessionHandler
+    my $session = OpenXPKI::Server::Session
         ->new(
             type => "Database",
             config => { dbi => $dbi },
@@ -210,7 +210,7 @@ sub create {
 
 Resume the specified session by loading its data from the backend storage.
 
-Returns the object reference to C<OpenXPKI::Server::SessionHandler> if the
+Returns the object reference to C<OpenXPKI::Server::Session> if the
 session was successfully resumed or undef otherwise (i.e. expired session or
 unknown ID).
 

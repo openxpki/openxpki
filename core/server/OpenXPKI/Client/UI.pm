@@ -13,7 +13,6 @@ use OpenXPKI::Client::Session;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
-use OpenXPKI::Server::Context qw( CTX );
 use Log::Log4perl::MDC;
 use Data::Dumper;
 
@@ -63,14 +62,12 @@ has _status => (
 Builder that creates an instance of OpenXPKI::Client and cares about
 switching/creating the backend session
 
-=cut 
+=cut
 sub _init_backend {
- 
     my $self = shift;
- 
     # the trigger has the client as argument, the builder has not
     my $client = shift;
-    
+
     if (!$client) {
         $client = OpenXPKI::Client->new({
             SOCKETFILE => $self->_config()->{'socket'},
@@ -79,15 +76,17 @@ sub _init_backend {
     } else {
         $self->logger()->debug('Use provided client instance');
     }
-    
+
+    my $client_id = $client->get_session_id();
     my $session = $self->session();
-    my $old_session =  $session->param('backend_session_id') || undef;
-    if ($old_session && $old_session eq $client->get_session_id()) {
+    my $backend_id =  $session->param('backend_session_id') || undef;
+
+    if ($backend_id and $client_id and $backend_id eq $client_id) {
         $self->logger()->debug('Backend session already loaded');
     } else {
         eval {
-            $self->logger()->debug('First session reinit with id ' . ($old_session || 'init'));
-            $client->init_session({ SESSION_ID => $old_session });
+            $self->logger()->debug('First session reinit with id ' . ($backend_id || 'init'));
+            $client->init_session({ SESSION_ID => $backend_id });
         };
         if ($EVAL_ERROR) {
             my $exc = OpenXPKI::Exception->caught();
@@ -103,19 +102,20 @@ sub _init_backend {
                 die "Backend communication problem";
             }
         }
+        # refresh variable to current id
+        $client_id = $client->get_session_id();
     }
 
-    my $client_session = $client->get_session_id();
     # logging stuff only
-    if ($old_session && $client_session eq $old_session) {
-        $self->logger()->info('Resume backend session with id ' . $client_session);
-    } elsif ($old_session) {
-        $self->logger()->info('Re-Init backend session ' . $client_session . '/' . $old_session );
+    if ($backend_id and $client_id eq $backend_id) {
+        $self->logger()->info('Resume backend session with id ' . $client_id);
+    } elsif ($backend_id) {
+        $self->logger()->info('Re-Init backend session ' . $client_id . '/' . $backend_id );
     } else {
-        $self->logger()->info('New backend session with id ' . $client_session);
+        $self->logger()->info('New backend session with id ' . $client_id);
     }
-    $session->param('backend_session_id', $client_session);
-    
+    $session->param('backend_session_id', $client_id);
+
     $self->logger()->trace( Dumper $session );
     return $client;
 }
@@ -175,13 +175,13 @@ sub handle_request {
         $self->logger()->debug('Init new session');
         $self->logger()->trace('Init replied ' . Dumper $reply);
     }
-    
+
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });
         $self->logger()->debug("Got error from server");
         return $result->set_status_from_error_reply( $reply );
     }
-    
+
 
     # Call to bootstrap components
     if ($page =~ /^bootstrap!(.+)/) {
@@ -193,7 +193,7 @@ sub handle_request {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
         return $self->handle_page( $args );
     }
-   
+
     # if the backend session logged out but did not terminate
     # we get the problem that ui is logged in but backend is not
     $self->logout_session() if ($self->session()->param('is_logged_in'));
@@ -203,13 +203,13 @@ sub handle_request {
 
 }
 
-=head2 __load_class 
+=head2 __load_class
 
 Expect the page/action string and a reference to the cgi object
 Extracts the expected class and method name and extra params encoded in
 the given parameter and tries to instantiate the class. On success, the
 class instance and the extracted method name is returned (two element
-array). On error, both elements in the array are set to undef. 
+array). On error, both elements in the array are set to undef.
 
 =cut
 
@@ -241,7 +241,7 @@ sub __load_class {
     if ($EVAL_ERROR) {
         $self->logger()->error("Failed loading handler class $class");
         return (undef, undef);
-    } 
+    }
 
     my $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });
 
@@ -250,11 +250,11 @@ sub __load_class {
 }
 
 
-=head2 __get_action 
+=head2 __get_action
 
-Expect a reference to the cgi object. Returns the value of 
-cgi->param('action') if set and the XSRFtoken is valid. If the token is 
-invalid, returns undef and sets the global status to error. If parameter 
+Expect a reference to the cgi object. Returns the value of
+cgi->param('action') if set and the XSRFtoken is valid. If the token is
+invalid, returns undef and sets the global status to error. If parameter
 is empty or not set returns undef.
 
 =cut
@@ -263,12 +263,12 @@ sub __get_action {
 
     my $self = shift;
     my $cgi = shift;
-    
+
     my $rtoken_session = $self->session()->param('rtoken') || '';
     my $rtoken_request = $cgi->param('_rtoken') || '';
     # check XSRF token
     if ($cgi->param('action')) {
-        if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {        
+        if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {
             return $cgi->param('action');
         } else {
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
@@ -288,7 +288,7 @@ sub handle_page {
     my $cgi = $args->{cgi};
 
     # set action and page - args always wins about cgi
-    
+
     my $result;
     my $action = '';
     # action is only valid explicit or within a post request
@@ -297,7 +297,7 @@ sub handle_page {
     } else {
         $action = $self->__get_action( $cgi );
     }
-    
+
     my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
 
     if ($action) {
@@ -361,10 +361,10 @@ sub handle_login {
 
     my $session = $self->session();
     my $page = $cgi->param('page') || '';
-    
+
     # action is only valid within a post request
     my $action = $self->__get_action( $cgi ) || '';
-    
+
     $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
     # Special handling for pki_realm and stack params
@@ -377,7 +377,7 @@ sub handle_login {
         $session->param('auth_stack', scalar $cgi->param('auth_stack'));
         $self->logger()->debug('set auth_stack in session: ' . $cgi->param('auth_stack') );
     }
-    
+
     # ENV always overrides session, keep this after the above block to prevent
     # people from hacking into the session parameters
     if ($ENV{OPENXPKI_PKI_REALM}) {
@@ -394,27 +394,27 @@ sub handle_login {
 
     # if this is an initial request, force redirect to the login page
     # will do an external redirect in case loginurl is set in config
-    if ($action !~ /^login/ && $page !~ /^login/) {                 
-        # Requests to pages can be redirected after login, store page in session       
+    if ($action !~ /^login/ && $page !~ /^login/) {
+        # Requests to pages can be redirected after login, store page in session
         if ($page && $page ne 'logout' && $page ne 'welcome') {
             $self->logger()->debug("Store page request for later redirect " . $page);
             $self->session()->param('redirect', $page);
         }
-        
-        # Link to an internal method using the class!method 
+
+        # Link to an internal method using the class!method
         if (my $loginpage = $self->_config()->{loginpage}) {
-            
+
             # internal call to handle_page
             return $self->handle_page({ action => '', page => $loginpage, cgi => $cgi });
-        
+
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
-                        
+
             $self->logger()->debug("Redirect to external login page " . $loginurl );
-            $result->redirect( { goto => $loginurl, target => '_blank' } );  
+            $result->redirect( { goto => $loginurl, target => '_blank' } );
             return $result->render();
             # Do a real exit to skip the error handling of the script body
             exit;
-                    
+
         } elsif ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
 
             # Session is gone but we are still in the ember application
@@ -422,10 +422,10 @@ sub handle_login {
 
         } else {
 
-            # This is not an ember request so we need to redirect 
+            # This is not an ember request so we need to redirect
             # back to the ember page - try if the session has a baseurl
             my $url = $self->session()->param('baseurl');
-            # if not, get the path from the referer 
+            # if not, get the path from the referer
             if (!$url && ($ENV{HTTP_REFERER} =~ m{https?://[^/]+(/[\w/]*[\w])/?}i)) {
                 $url = $1;
                 $self->logger()->debug('Restore redirect from referer');
@@ -434,7 +434,7 @@ sub handle_login {
             $self->logger()->debug('Redirect to login page: ' . $url);
             $result->redirect($url);
         }
-    }  
+    }
 
     if ( $status eq 'GET_PKI_REALM' ) {
         if ($pki_realm) {
@@ -457,18 +457,18 @@ sub handle_login {
             $status = $reply->{SERVICE_MSG};
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
-            
+
             # List stacks and hide those starting with an underscore
             my @stack_list = map {
                 ($stacks->{$_}->{NAME} !~ /^_/) ? ($_ = {'value' => $stacks->{$_}->{NAME}, 'label' => i18nGettext($stacks->{$_}->{LABEL})} ) : ()
             } keys %{$stacks};
-              
+
             # Directly load stack if there is only one
             if (scalar @stack_list == 1)  {
                 $self->logger()->trace("Only one stacks avail - autoselect: " . Dumper $stacks );
                 $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $stack_list[0]->{value} } );
                 $status = $reply->{SERVICE_MSG};
-            } else {            
+            } else {
                 $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
                 return $result->init_auth_stack( \@stack_list )->render();
             }
@@ -577,19 +577,19 @@ sub handle_login {
 
             $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});
             $self->logger()->debug('CGI Header ' . Dumper \@main::header );
-                        
-            $result->init_index(); 
+
+            $result->init_index();
             return $result->render();
         }
     }
-    
+
     if ( $reply->{SERVICE_MSG} eq 'ERROR') {
-        
+
         $self->logger()->debug('Server Error Msg: '. Dumper $reply);
-        
+
         # Failure here is likely a wrong password
         if ($reply->{'LIST'} && $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {
-            $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');            
+            $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');
         } else {
             $result->set_status_from_error_reply($reply);
         }

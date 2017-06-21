@@ -25,7 +25,7 @@ use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server;
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::Default::Command;
 use Log::Log4perl::MDC;
@@ -63,7 +63,8 @@ sub init {
             my $result;
             eval { # try to handle it
                 $result = $self->__handle_message({ MESSAGE => $msg });
-                CTX('session')->persist;
+                # persist session unless it was killed (we assume someone saved it before)
+                CTX('session')->persist if OpenXPKI::Server::Context::hascontext('session');
             };
             if (my $exc = OpenXPKI::Exception->caught()) {
                 $self->__send_error({ EXCEPTION => $exc });
@@ -212,7 +213,7 @@ sub __handle_NEW_SESSION : PRIVATE {
     Log::Log4perl::MDC->put('sid', undef);
 
     ##! 4: "new session"
-    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
+    my $session = OpenXPKI::Server::Session->new(load_config => 1)->create;
 
     if (exists $msg->{LANGUAGE}) {
         ##! 8: "set language"
@@ -244,7 +245,7 @@ sub __handle_CONTINUE_SESSION {
     Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
 
     ##! 4: "try to continue session"
-    $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
+    $session = OpenXPKI::Server::Session->new(load_config => 1);
     $session->resume($msg->{SESSION_ID})
         or OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED',
@@ -629,7 +630,7 @@ sub __handle_LOGOUT : PRIVATE {
     my $old_session = CTX('session');
 
     ##! 8: "logout received - terminate session " . $old_session->id,
-    CTX('log')->system()->debug('Terminating session ' . $old_session->get_id());
+    CTX('log')->system()->debug('Terminating session ' . $old_session->id);
 
     OpenXPKI::Server::Context::killsession();
     $self->__change_state({ STATE => 'NEW' });
@@ -647,9 +648,9 @@ sub __handle_STATUS : PRIVATE {
 
     # SERVICE_MSG ?
     return {
-    SESSION => {
-        ROLE => $self->get_API('Session')->get_role(),
-        USER => $self->get_API('Session')->get_user(),
+        SESSION => {
+            ROLE => $self->get_API('Session')->role,
+            USER => $self->get_API('Session')->user,
         },
     };
 }
@@ -766,7 +767,7 @@ sub __pki_realm_choice_available : PRIVATE {
     ##! 2: "check if PKI realm is already known"
     my $realm;
     eval {
-    $realm = $self->get_API('Session')->get_pki_realm();
+        $realm = $self->get_API('Session')->pki_realm;
     };
     return $realm if defined $realm;
 
@@ -901,7 +902,8 @@ sub run
                 # our session is just fine
                 eval { # try to handle it
                     $result = $self->__handle_message({ MESSAGE => $msg });
-                    CTX('session')->persist;
+                    # persist session unless it was killed (we assume someone saved it before)
+                    CTX('session')->persist if OpenXPKI::Server::Context::hascontext('session');
                 };
                 if (my $exc = OpenXPKI::Exception->caught()) {
                     $self->__send_error({ EXCEPTION => $exc, });

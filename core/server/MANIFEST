@@ -219,7 +219,7 @@ OpenXPKI/Server/API/UI.pm
 OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
-OpenXPKI/Server/SessionHandler.pm
+OpenXPKI/Server/Session.pm
 OpenXPKI/Server/Session/Data.pm
 OpenXPKI/Server/Session/DriverRole.pm
 OpenXPKI/Server/Session/Driver/Database.pm

@@ -39,12 +39,12 @@ Log::Log4perl->easy_init($OFF);
 plan tests => 10;
 
 
-use_ok "OpenXPKI::Server::SessionHandler";
+use_ok "OpenXPKI::Server::Session";
 
 ## create new session
 my $session;
 lives_ok {
-    $session = OpenXPKI::Server::SessionHandler->new(
+    $session = OpenXPKI::Server::Session->new(
         type => "TestDriver",
         log => Log::Log4perl->get_logger(),
     )->create;
@@ -82,14 +82,14 @@ lives_and {
     my $session_data = $session->data_as_hashref;
     delete $session_data->{user}; # we specified freeze(except => "user") above
 
-    my $session2 = OpenXPKI::Server::SessionHandler->new(type => "TestDriver")->create;
+    my $session2 = OpenXPKI::Server::Session->new(type => "TestDriver")->create;
     $session2->data->thaw($frozen1);
 
     cmp_deeply $session2->data_as_hashref, $session_data;
 } "thaw data (except 'user') into session 2";
 
 lives_and {
-    my $session3 = OpenXPKI::Server::SessionHandler->new(type => "TestDriver")->create;
+    my $session3 = OpenXPKI::Server::Session->new(type => "TestDriver")->create;
     $session3->data->thaw($frozen2);
 
     cmp_deeply $session3->data_as_hashref, { user => $session->data->user, created => ignore(), is_valid => ignore() };
@@ -103,7 +103,7 @@ lives_and {
 
 throws_ok {
     # our test driver just returns an empty hash in _load()
-    OpenXPKI::Server::SessionHandler
+    OpenXPKI::Server::Session
         ->new(
             type => "TestDriver",
             log =>  Log::Log4perl->get_logger(),

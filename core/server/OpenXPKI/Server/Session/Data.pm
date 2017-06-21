@@ -5,6 +5,7 @@ use utf8;
 # CPAN modules
 use Data::UUID;
 use Digest::SHA qw( sha1_hex );
+use JSON;
 
 # Project modules
 use OpenXPKI::Exception;

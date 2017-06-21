@@ -12,13 +12,13 @@ persists to the database
 
 To use the global database handle:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(
+    my $session = OpenXPKI::Server::Session->new(
         type => "Database",
     );
 
 To specify a different database:
 
-    my $session = OpenXPKI::Server::SessionHandler->new(
+    my $session = OpenXPKI::Server::Session->new(
         type => "Database",
         config => {
             driver => "SQLite",
