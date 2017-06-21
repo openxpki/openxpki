@@ -5,7 +5,6 @@
 package OpenXPKI::Client::SCEP;
 
 use base qw( OpenXPKI::Client );
-use OpenXPKI::Server::Context qw( CTX );
 
 use Data::Dumper;
 
