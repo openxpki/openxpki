@@ -8,7 +8,7 @@ diag "OpenXPKI::Server::ACL Performance\n" if $ENV{VERBOSE};
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Server::ACL;
 ok(1);
 
@@ -26,7 +26,7 @@ OpenXPKI::Server::Init::init(
     });
 
 ## create new session
-my $session = OpenXPKI::Server::SessionHandler->new(
+my $session = OpenXPKI::Server::Session->new(
     type => "File",
     config => { directory => "t/50_auth/", },
 )->create;

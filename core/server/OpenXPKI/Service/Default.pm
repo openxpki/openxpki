@@ -25,7 +25,7 @@ use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server;
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::Default::Command;
 use Log::Log4perl::MDC;
@@ -212,7 +212,7 @@ sub __handle_NEW_SESSION : PRIVATE {
     Log::Log4perl::MDC->put('sid', undef);
 
     ##! 4: "new session"
-    my $session = OpenXPKI::Server::SessionHandler->new(load_config => 1)->create;
+    my $session = OpenXPKI::Server::Session->new(load_config => 1)->create;
 
     if (exists $msg->{LANGUAGE}) {
         ##! 8: "set language"
@@ -244,7 +244,7 @@ sub __handle_CONTINUE_SESSION {
     Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
 
     ##! 4: "try to continue session"
-    $session = OpenXPKI::Server::SessionHandler->new(load_config => 1);
+    $session = OpenXPKI::Server::Session->new(load_config => 1);
     $session->resume($msg->{SESSION_ID})
         or OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED',

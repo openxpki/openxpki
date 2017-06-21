@@ -20,7 +20,7 @@ use OpenXPKI::i18n qw(set_language);
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server;
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::SCEP::Command;
 use OpenXPKI::Serialization::Simple;
@@ -212,7 +212,7 @@ sub __init_encryption_alg : PRIVATE {
 
 sub __init_session : PRIVATE {
     # memory-only session is sufficient for SCEP
-    my $session = OpenXPKI::Server::SessionHandler->new(type => "Memory")->create;
+    my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
     OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
     Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 }

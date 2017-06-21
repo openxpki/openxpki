@@ -32,7 +32,7 @@ use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::SessionHandler;
+use OpenXPKI::Server::Session;
 
 use OpenXPKI::Crypto::X509;
 
@@ -79,7 +79,7 @@ sub init {
 
     # TODO Rework this: we create a temporary in-memory session to allow access to realm parts of the config
     OpenXPKI::Server::Context::setcontext({ 'session' =>
-        OpenXPKI::Server::SessionHandler->new(type => "Memory")->create()
+        OpenXPKI::Server::Session->new(type => "Memory")->create()
     }) unless OpenXPKI::Server::Context::hascontext('session');
 
     log_wrapper("OpenXPKI initialization")
