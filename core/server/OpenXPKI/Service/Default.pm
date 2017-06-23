@@ -215,6 +215,10 @@ sub __handle_NEW_SESSION : PRIVATE {
     ##! 4: "new session"
     my $session = OpenXPKI::Server::Session->new(load_config => 1)->create;
 
+    # purge expired sessions
+    # (it's ok to do this unregularly as expired sessions will always be rejected)
+    $session->purge_expired;
+
     if (exists $msg->{LANGUAGE}) {
         ##! 8: "set language"
         set_language($msg->{LANGUAGE});

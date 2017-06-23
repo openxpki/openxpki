@@ -10,13 +10,13 @@ persists to the database
 
 =head1 SYNOPSIS
 
-To use the global database handle:
+To use the global database handle (C<CTX('dbi')>:
 
     my $session = OpenXPKI::Server::Session->new(
         type => "Database",
     );
 
-To specify a different database:
+To specify a different database (i.e. use a separate database handle):
 
     my $session = OpenXPKI::Server::Session->new(
         type => "Database",
@@ -27,6 +27,14 @@ To specify a different database:
     );
 
 =head1 DESCRIPTION
+
+The methods in this class do not execute C<COMMIT>s on the database if it's
+configured to reuse the global database handle. This is to make sure
+transcations started in the core application logic are not disturbed.
+
+If an own database handle is created, it's configured to do C<AUTOCOMMIT>s.
+
+=head1 METHODS
 
 Please see L<OpenXPKI::Server::Session::DriverRole> for a description of the
 available methods.
@@ -165,7 +173,7 @@ sub delete {
 sub delete_all_before {
     my ($self, $epoch) = @_;
     ##! 8: "deleting all sessions where modified < $epoch"
-    return $self->dbi->delete_and_commit(
+    return $self->dbi->delete(
         from => $self->table,
         where => {
             modified => { '<' => $epoch },
