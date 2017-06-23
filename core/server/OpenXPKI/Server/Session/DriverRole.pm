@@ -93,12 +93,6 @@ B<Parameters>
 
 =back
 
-=head1 STATIC METHODS
-
-=head2 new
-
-Constructor that creates a new session with an empty data object.
-
 =cut
 
 1;
