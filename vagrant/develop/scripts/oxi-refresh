@@ -48,22 +48,30 @@ chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
 # Compile OpenXPKI
 #
 OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
-echo "Compiling OpenXPKI $OXI_VERSION in $OXI_COMPILE_DIR"
-rsync -a --exclude=.git/ /code-repo/core/server/ $OXI_COMPILE_DIR
+echo "Compiling OpenXPKI $OXI_VERSION in $OXI_CORE_DIR"
+rsync -a --exclude=.git/ /code-repo/core/ $OXI_CORE_DIR
 
-# Set version so Makefile.PL does not need "vergen" (which we did not copy to $OXI_COMPILE_DIR)
-cat <<__VERSION > $OXI_COMPILE_DIR/OpenXPKI/VERSION.pm
+# Set version so Makefile.PL does not need "vergen" (which we did not copy to $OXI_CORE_DIR)
+cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm
 package OpenXPKI::VERSION;
 our \$VERSION = '$OXI_VERSION';
 1;
 __VERSION
 
-cd $OXI_COMPILE_DIR
+pushd $OXI_CORE_DIR/server                                            >$LOG 2>&1
 perl Makefile.PL                                                      >$LOG 2>&1
 make                                                                  >$LOG 2>&1
 
 echo "Installing OpenXPKI"
 make install                                                          >$LOG 2>&1
+popd                                                                  >$LOG 2>&1
+
+echo "Compiling and installing I18N files"
+echo "$OXI_VERSION" > $OXI_CORE_DIR/i18n/VERSION
+pushd $OXI_CORE_DIR/i18n                                              >$LOG 2>&1
+make                                                                  >$LOG 2>&1
+make install                                                          >$LOG 2>&1
+popd                                                                  >$LOG 2>&1
 
 if [ "$1" != "--no-restart" ]; then
     echo "Restarting OpenXPKI"
