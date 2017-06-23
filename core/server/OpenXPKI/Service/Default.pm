@@ -655,7 +655,7 @@ sub __handle_STATUS : PRIVATE {
         my $param = shift;
         return CTX('session')->data->$param if OpenXPKI::Server::Context::hascontext('session');
         return undef;
-    }
+    };
     # SERVICE_MSG ?
     return {
         SESSION => {
