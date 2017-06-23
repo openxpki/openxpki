@@ -655,7 +655,7 @@ sub __handle_STATUS : PRIVATE {
         my $param = shift;
         return CTX('session')->data->$param if OpenXPKI::Server::Context::hascontext('session');
         return undef;
-    }
+    };
     # SERVICE_MSG ?
     return {
         SESSION => {
@@ -776,7 +776,7 @@ sub __pki_realm_choice_available : PRIVATE {
 
     ##! 2: "check if PKI realm is already known"
     my $realm = OpenXPKI::Server::Context::hascontext('session')
-        ? CTX('session')->data->pki_realm;
+        ? CTX('session')->data->pki_realm
         : undef;
     return $realm if defined $realm;
 
