@@ -650,11 +650,17 @@ sub __handle_STATUS : PRIVATE {
     my $ident   = ident $self;
     my $message = shift;
 
+    # closure to access session parameters or return undef if CTX('session') is not defined
+    my $session_param = sub {
+        my $param = shift;
+        return CTX('session')->data->$param if OpenXPKI::Server::Context::hascontext('session');
+        return undef;
+    }
     # SERVICE_MSG ?
     return {
         SESSION => {
-            ROLE => $self->get_API('Session')->role,
-            USER => $self->get_API('Session')->user,
+            ROLE => $session_param->("role"),
+            USER => $session_param->("user"),
         },
     };
 }
@@ -769,10 +775,9 @@ sub __pki_realm_choice_available : PRIVATE {
     my $ident   = ident $self;
 
     ##! 2: "check if PKI realm is already known"
-    my $realm;
-    eval {
-        $realm = $self->get_API('Session')->pki_realm;
-    };
+    my $realm = OpenXPKI::Server::Context::hascontext('session')
+        ? CTX('session')->data->pki_realm;
+        : undef;
     return $realm if defined $realm;
 
     ##! 2: "check if there is more than one realm"
