@@ -12,7 +12,7 @@ use CGI::Carp qw( fatalsToBrowser );
 use Config::Std;
 use NetAddr::IP;
 use English;
-use Log::Log4perl qw( :easy );
+use OpenXPKI::Log4perl;
 
 require OpenXPKI::Client::SCEP;
 my $query = new CGI;
@@ -68,15 +68,8 @@ my $server  = $config{global}{servername};
 my $enc_alg = $config{global}{encryption_algorithm};
 my $hash_alg = $config{global}{hash_algorithm};
 
-my $log;
-my $log_config = $config{global}{log_config};
-if ($log_config) {
-    Log::Log4perl->init_once($log_config);
-    $log = Log::Log4perl->get_logger( $config{global}{log_facility} || 'scep' );
-} else {
-    Log::Log4perl->easy_init( $ERROR );
-    $log = Log::Log4perl->get_logger();
-}
+OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
+my $log = Log::Log4perl->get_logger( $config{global}{log_facility} || 'scep' );
 
 my $allowed_range = new NetAddr::IP $iprange; # the allowed IP range
                      # from the config file
@@ -133,7 +126,7 @@ else {
     }
     my $result = $scep_client->send_request($params);
     print $result;
-    
+
     $scep_client->detach();
 }
 

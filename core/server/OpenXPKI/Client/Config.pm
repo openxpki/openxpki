@@ -51,7 +51,7 @@ package OpenXPKI::Client::Config;
 
 use Moose;
 use File::Spec;
-use Log::Log4perl qw(:easy);
+use OpenXPKI::Log4perl;
 use Data::Dumper;
 use Config::Std;
 
@@ -232,23 +232,12 @@ sub config() {
 }
 
 sub __init_logger {
-
     my $self = shift;
     my $config = $self->default();
 
-    my $logger;
-    my $log_config = $config->{global}->{log_config};
-    if ($log_config) {
-        Log::Log4perl->init_once($log_config);
-        my $facility = $config->{global}->{log_facility} || '';
-        $logger = Log::Log4perl->get_logger($facility);
-        $logger->debug('Starting logger from config with config '.$log_config.', facility ' . $facility);
-    } else {
-        Log::Log4perl->easy_init();
-        $logger = Log::Log4perl->get_logger();
-    }
+    OpenXPKI::Log4perl->init_or_fallback( $config->{global}->{log_config} );
 
-    return $logger;
+    return Log::Log4perl->get_logger($config->{global}->{log_facility} || '');
 }
 
 1;
