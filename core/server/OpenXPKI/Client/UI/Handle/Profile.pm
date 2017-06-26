@@ -130,7 +130,7 @@ sub render_subject_form {
         wf_action => $wf_action,
         wf_fields => $fields,
     });
-          
+
     $self->add_section({
         type => 'form',
         action => 'workflow',
@@ -140,7 +140,7 @@ sub render_subject_form {
             buttons => $self->__get_form_buttons( $wf_info ),
         }
     });
-    
+
     return $self;
 
 }
@@ -225,7 +225,7 @@ sub render_key_select {
             fields => \@fields
         }
     });
-    
+
     return $self;
 
 }
@@ -247,18 +247,18 @@ sub render_server_password {
     foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
         my $value;
         if ($field->{name} eq '_password') {
-            $value = $self->send_command( 'get_random', { LENGTH => 16 });            
+            $value = $self->send_command( 'get_random', { LENGTH => 16 });
             if (!$value) {
                 $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
                 $self->add_section({
-                    type => 'text',                    
+                    type => 'text',
                     content => {
-                        label => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL',                    
+                        label => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL',
                         description => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_DESC'
-                    }                    
+                    }
                 });
                 return $self;
-            }            
+            }
         } else {
             $value = $context->{$field->{name}};
         }
@@ -301,7 +301,7 @@ sub __translate_form_def {
             label => $field->{LABEL},
             tooltip => $field->{DESCRIPTION},
              # Placeholder is the new attribute, fallback to old default
-            placeholder => (defined $field->{PLACEHOLDER} ? $field->{PLACEHOLDER} ? $field->{DEFAULT}),
+            placeholder => (defined $field->{PLACEHOLDER} ? $field->{PLACEHOLDER} : $field->{DEFAULT}),
             value => $values->{$field->{ID}}
         };
 
