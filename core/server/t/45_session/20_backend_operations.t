@@ -37,8 +37,10 @@ sub driver_ok {
     subtest $args->{descr} => sub {
         ## create new session
         my $session;
+        my $factory = sub { OpenXPKI::Server::Session->new(%{ $args }, @_) };
+
         lives_ok {
-            $session = OpenXPKI::Server::Session->new(%{ $args })->create;
+            $session = $factory->()->create;
         } "create session";
 
         # set all attributes except "user" (and those not comparable as scalars):
@@ -57,7 +59,7 @@ sub driver_ok {
 
         my $session2;
         lives_and {
-            $session2 = OpenXPKI::Server::Session->new(%{ $args });
+            $session2 = $factory->();
             ok $session2->resume($session->id);
         } "resume session";
 
@@ -72,12 +74,12 @@ sub driver_ok {
         sleep 2;
 
         lives_and {
-            my $temp = OpenXPKI::Server::Session->new(%{ $args }, lifetime => 1);
+            my $temp = $factory->(lifetime => 1);
             ok not $temp->resume($session->id);
         } "fail resuming an expired session";
 
         lives_and {
-            my $temp = OpenXPKI::Server::Session->new(%{ $args }, lifetime => 1)->create;
+            my $temp = $factory->(lifetime => 1)->create;
             $temp->purge_expired;
             ok not $temp->driver->load($session->id);
         } "purge expired sessions from backend";
@@ -85,10 +87,10 @@ sub driver_ok {
         # regenerate session ID
         my $session3;
         lives_and {
-            $session3 = OpenXPKI::Server::Session->new(%{ $args })->create;
+            $session3 = $factory->()->create;
             $session3->data->user("sally");
             $session3->persist;
-            my $temp = OpenXPKI::Server::Session->new(%{ $args })->resume($session3->id);
+            my $temp = $factory->()->resume($session3->id);
             is $temp->data->user, "sally";
         } "create, persist and resume new session";
 
@@ -99,7 +101,7 @@ sub driver_ok {
         } "create a new ID for existing session";
 
         lives_and {
-            my $temp = OpenXPKI::Server::Session->new(%{ $args })->resume($session3->id);
+            my $temp = $factory->()->resume($session3->id);
             is $temp->data->user, "sally";
         } "resume session using the new ID";
 
@@ -107,8 +109,24 @@ sub driver_ok {
         lives_and {
             my $id = $session3->id;
             $session3->delete;
-            ok not OpenXPKI::Server::Session->new(%{ $args })->resume($id);
+            ok not $factory->()->resume($id);
         } "delete session";
+
+        # SCEP data object
+        use_ok "OpenXPKI::Server::Session::Data::SCEP";
+
+        my $session4;
+        lives_and {
+            # persist
+            $session4 = $factory->(data_class => "OpenXPKI::Server::Session::Data::SCEP")->create;
+            $session4->data->profile("low");
+            $session4->persist;
+            # resume
+            my $temp = $factory->(data_class => "OpenXPKI::Server::Session::Data::SCEP")->resume($session4->id);
+            # check
+            is $temp->data->profile, "low";
+            $session4->delete;
+        } "create, persist and resume session with SCEP data object";
     }
 }
 

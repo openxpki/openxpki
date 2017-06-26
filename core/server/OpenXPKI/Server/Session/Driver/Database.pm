@@ -46,7 +46,6 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Session::Data;
 use OpenXPKI::Server::Database;
 
 ################################################################################
@@ -145,8 +144,7 @@ sub load {
     ##! 8: "loaded raw session #$id: ".join(", ", map { "$_ = ".$db->{$_} } sort keys %$db)
 
     return
-        OpenXPKI::Server::Session::Data
-        ->new(
+        $self->data_factory->(
             id         => $db->{session_id},
             created    => $db->{created},
             modified   => $db->{modified},

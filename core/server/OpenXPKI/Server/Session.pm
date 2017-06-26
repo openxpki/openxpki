@@ -99,6 +99,24 @@ has data => (
     clearer => "clear_data",
 );
 
+has data_class => (
+    is => 'ro',
+    isa => 'ClassName',
+    lazy => 1,
+    default => 'OpenXPKI::Server::Session::Data',
+);
+
+has data_factory => (
+    is => 'ro',
+    isa => 'CodeRef',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        # data_factory = an anonymous subroutine which creates an instance
+        return sub { $self->data_class->new(@_) };
+    },
+);
+
 sub _build_driver {
     my $self = shift;
 
@@ -111,7 +129,13 @@ sub _build_driver {
     ) if $@;
 
     my $instance;
-    eval { $instance = $class->new(%{ $self->config }, log => $self->log) };
+    eval {
+        $instance = $class->new(
+            %{ $self->config },
+            log => $self->log,
+            data_factory => $self->data_factory,
+        );
+    };
     OpenXPKI::Exception->throw (
         message => "Unable to instantiate session driver class",
         params => { class_name => $class, message => $@ }
@@ -207,7 +231,7 @@ Creates a new sesssion.
 =cut
 sub create {
     my ($self) = @_;
-    $self->data(OpenXPKI::Server::Session::Data->new);
+    $self->data( $self->data_factory->() );
     $self->log->debug(sprintf("New session of type '%s' created", $self->type));
     return $self;
 }

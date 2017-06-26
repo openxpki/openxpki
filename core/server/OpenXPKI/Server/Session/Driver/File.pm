@@ -106,7 +106,7 @@ sub load {
     local $INPUT_RECORD_SEPARATOR;     # long version of $/
     my $frozen = <$fh>;
 
-    return OpenXPKI::Server::Session::Data->new->thaw($frozen);
+    return $self->data_factory->()->thaw($frozen);
 }
 
 sub delete {
