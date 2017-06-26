@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Config::Std;
-use Log::Log4perl qw(:easy);
+use OpenXPKI::Log4perl;
 use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix );
 use OpenXPKI::Client::SC;
 use OpenXPKI::Client::Config;
@@ -23,13 +23,9 @@ my $log = $config->logger();
 
 $log->info("SmartCard handler initialized, " . $$ );
 
-if ($conf->{global}->{log_config} && -f $conf->{global}->{log_config}) {
-    Log::Log4perl->init( $conf->{global}->{log_config} );
-} else {
-    Log::Log4perl->easy_init({ level => $DEBUG });
-}
+OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
 
-my $locale_directory = $conf->{global}->{locale_directory} || '/usr/share/locale';  
+my $locale_directory = $conf->{global}->{locale_directory} || '/usr/share/locale';
 my $default_language = $conf->{global}->{default_language} || 'en_US';
 
 set_locale_prefix ($locale_directory);
@@ -52,23 +48,23 @@ while (my $cgi = CGI::Fast->new()) {
     my $sess_id = $cgi->cookie('oxisess-sc') || undef;
     my $session_front = new CGI::Session(undef, $sess_id, {Directory=>'/tmp'});
     $log->debug('session id (front) is '. $session_front->id);
-    
-    our $cookie = { 
-        -name => 'oxisess-sc', 
-        -value => $session_front->id, 
+
+    our $cookie = {
+        -name => 'oxisess-sc',
+        -value => $session_front->id,
         -Secure => ($ENV{'HTTPS'} ? 1 : 0),
-        -HttpOnly => 1 
+        -HttpOnly => 1
     };
-    our @header = @header_tpl;    
+    our @header = @header_tpl;
     push @header, ('-cookie', $cgi->cookie( $cookie ));
-    push @header, ('-type','application/json; charset=UTF-8');        
-  
+    push @header, ('-type','application/json; charset=UTF-8');
+
     my %global = %{$conf->{global}};
     my %auth   = %{$conf->{auth}};
-  
+
     $log->debug('Global ' . Dumper \%global );
     $log->debug('Auth ' . Dumper \%auth );
-  
+
     my $client = OpenXPKI::Client::SC->new({
         session => $session_front,
         logger => $log,
@@ -76,12 +72,12 @@ while (my $cgi = CGI::Fast->new()) {
         card_config => \%card_config,
         auth => \%auth
     });
-    
+
     my $result = $client->handle_request({ cgi => $cgi });
     if ($result) {
         $result->render();
     }
- 
+
 }
 
 $log->info('end fcgi loop ' . $$);

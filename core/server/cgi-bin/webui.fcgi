@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Config::Std;
-use Log::Log4perl qw(:easy);
+use OpenXPKI::Log4perl;
 use Log::Log4perl::MDC;
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
@@ -39,11 +39,7 @@ if ($ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE}
 
 read_config $configfile => my %config;
 
-if ($config{global}{log_config} && -f $config{global}{log_config}) {
-    Log::Log4perl->init( $config{global}{log_config} );
-} else {
-    Log::Log4perl->easy_init({ level => $DEBUG });
-}
+OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
 
 my $locale_directory = $config{global}{locale_directory} || '/usr/share/locale';
 my $default_language = $config{global}{default_language} || 'en_US';

@@ -21,7 +21,7 @@ use warnings;
 use English;
 use Moose;
 
-use Log::Log4perl qw(:easy);
+use OpenXPKI::Log4perl;
 use Log::Log4perl::Level;
 use Log::Log4perl::MDC;
 use OpenXPKI::Exception;
@@ -63,25 +63,11 @@ sub BUILD {
 
     my $config = $self->CONFIG();
 
-    # CONFIG was provided
-    if (defined $config) {
-        if (ref $config eq 'SCALAR') {
-            Log::Log4perl->init($config);
-            return;
-        }
-        elsif (-e $config ) {
-            Log::Log4perl->init($config);
-            return;
-        }
-        warn "Configuration file $config not found";
-    }
     # caller explicitely asked to NOT use config: try reusing Log4perl
-    else {
-        return if Log::Log4perl->initialized;
-    }
-    # if not initialized: complain and init screen logger
-    warn "Initializing Log4perl with easy_init()";
-    Log::Log4perl->easy_init($WARN);
+    return if not(defined $config) and Log::Log4perl->initialized;
+
+    # CONFIG was provided
+    OpenXPKI::Log4perl->init_or_fallback( $config );
 }
 
 =head2 audit

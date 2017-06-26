@@ -51,9 +51,8 @@ if [ $(grep -c '/vagrant/scripts' /root/.bashrc) -eq 0 ]; then
     echo "export PATH=$PATH:/vagrant/scripts"              >> /home/vagrant/.profile
     echo "/vagrant/scripts/oxi-help"                       >> /home/vagrant/.profile
 fi
-
-OXI_COMPILE_DIR=$(mktemp -d)
-echo "OXI_COMPILE_DIR=$OXI_COMPILE_DIR" >> /etc/environment
+OXI_CORE_DIR=$(mktemp -d)
+echo "OXI_CORE_DIR=$OXI_CORE_DIR" >> /etc/environment
 
 # Read our configuration and the one written by MySQL provisioning script
 while read def; do export $def; done < /etc/environment

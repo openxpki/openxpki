@@ -156,6 +156,12 @@ around BUILDARGS => sub {
     return $class->$orig(%args);
 };
 
+=head1 STATIC METHODS
+
+=head2 new
+
+Constructor that creates a new session with an empty data object.
+
 =head1 METHODS
 
 =cut
