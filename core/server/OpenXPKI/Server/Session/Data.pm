@@ -10,6 +10,7 @@ use JSON;
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::MooseParams;
+use OpenXPKI::Debug;
 
 =head1 NAME
 
@@ -65,12 +66,8 @@ for my $name (keys %ATTR_TYPES) {
         %$type_def,
         is => 'rw',
         trigger => sub { shift->_attr_change },
-        clearer => "clear_$name",
+        documentation => 'session',
     );
-    after "clear_$name" => sub {
-        my $self = shift;
-        $self->is_dirty(1);
-    };
 }
 
 ################################################################################
@@ -83,16 +80,40 @@ for my $name (keys %ATTR_TYPES) {
 
 =head1 STATIC CLASS METHODS
 
+=cut
+
+sub BUILD {
+    my $self = shift;
+    # Install methods modifiers to set is_dirty whenever one of the clearers
+    # built by Moose is called.
+    # (we do that here to allow for easy subclassing and addition of attributes)
+    for my $attr (@{ $self->get_attribute_names }) {
+        ##! 16: "creating method clear_$attr"
+        $self->meta->add_method("clear_$attr" => sub {
+            my $inner_self = shift;
+            $inner_self->is_dirty(1);
+            $inner_self->meta->find_attribute_by_name($attr)->clear_value($inner_self);
+        });
+    }
+}
+
+=head1 METHODS
+
 =head2 get_attribute_names
 
 Returns an ArrayRef containing the names of all session attributes.
 
 =cut
 sub get_attribute_names {
-    return [ sort ("id", "modified", keys %ATTR_TYPES) ];
-}
+    my $self = shift;
+    my $meta = $self->meta;
 
-=head1 METHODS
+    return [
+        map { $_->name }
+        grep { $_->documentation and $_->documentation eq "session" }
+        sort $meta->get_all_attributes
+    ];
+}
 
 =head2 Session attributes
 
@@ -133,7 +154,7 @@ sub get_attributes {
     my @names;
     # Check given attribute names
     if (scalar(@attrs)) {
-        my %all_attrs = ( map { $_ => 1 } @{ get_attribute_names() } );
+        my %all_attrs = ( map { $_ => 1 } @{ $self->get_attribute_names } );
         for my $name (@attrs) {
             OpenXPKI::Exception->throw(
                 message => "Unknown session attribute requested",
@@ -144,7 +165,7 @@ sub get_attributes {
     }
     # or use all attributes per default
     else {
-        @names = @{ get_attribute_names() };
+        @names = @{ $self->get_attribute_names };
     }
 
     return { map { $_ => $self->$_ } grep { $self->meta->find_attribute_by_name($_)->has_value($self) } @names };
@@ -268,4 +289,5 @@ sub thaw {
     return $self;
 }
 
+# this Moose instance MUST NOT be made immutable as we add methods in BUILD()
 1;
