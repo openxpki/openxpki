@@ -73,15 +73,15 @@ sub load_extension
     ## is the extension used at all?
     if (!$config->exists($path)) {
 
-    	# Test for default settings
-    	$path =~ /(profile|crl)/;
-    	$path = $1.'.default.extensions.'.$ext;
-    	if ($config->exists($path)) {
-    		##! 16: 'Using default value for ' . $ext
-    	} else {
-    	    ##! 16: "Extension $ext is not used"
-    	    return 0;
-    	}
+        # Test for default settings
+        $path =~ /(profile|crl)/;
+        $path = $1.'.default.extensions.'.$ext;
+        if ($config->exists($path)) {
+            ##! 16: 'Using default value for ' . $ext
+        } else {
+            ##! 16: "Extension $ext is not used"
+            return 0;
+        }
     }
 
     ## is this a critical extension?
@@ -93,7 +93,7 @@ sub load_extension
     } else {
         if (!(defined $critical || $ext eq 'oid' )) {
             CTX('log')->application()->warn("Critical flag is not set for $ext in profile $profile_path!");
- 
+
         }
         $critical = 'false';
     }
@@ -207,8 +207,8 @@ sub load_extension
             }
         }
 
-    	if (scalar @values)
-    	{
+        if (scalar @values)
+        {
             $self->set_extension (NAME     => "authority_info_access",
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
@@ -360,9 +360,9 @@ sub set_extension
 
 
     if (! defined $name) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_NAME_NOT_SPECIFIED",
-	    );
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_NAME_NOT_SPECIFIED",
+        );
     }
 
     if ($self->{PROFILE}->{EXTENSIONS}->{$name}) {
@@ -376,26 +376,26 @@ sub set_extension
     }
 
     if (! defined $value) {
-    	OpenXPKI::Exception->throw (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_VALUE_NOT_SPECIFIED",
-	    );
+        );
     }
     if (! defined $critical) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_CRITICALITY_NOT_SPECIFIED",
-	    params => {
-		NAME => $name,
-		VALUE => $value,
-	    });
+        params => {
+        NAME => $name,
+        VALUE => $value,
+        });
     }
     if ($critical !~ m{ \A (?:true|false) }xms) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_INVALID_CRITICALITY",
-	    params => {
-		NAME => $name,
-		VALUE => $value,
-		CRITICALITY => $critical,
-	    });
+        params => {
+        NAME => $name,
+        VALUE => $value,
+        CRITICALITY => $critical,
+        });
     }
 
     ##! 16: 'name: ' . $name
@@ -483,6 +483,17 @@ sub get_extension
     }
 
     return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE};
+
+}
+
+
+sub has_extension
+{
+    my $self = shift;
+    my $ext  = shift;
+
+    return ((exists $self->{PROFILE}->{EXTENSIONS}->{$ext})
+        && (defined $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE}));
 
 }
 
