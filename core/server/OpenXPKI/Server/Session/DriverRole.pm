@@ -17,6 +17,11 @@ has 'log' => (
     isa => 'Log::Log4perl::Logger',
     required => 1,
 );
+has 'data_factory' => (
+    is => 'ro',
+    isa => 'CodeRef',
+    required => 1,
+);
 
 ################################################################################
 # Required in session implementations that consume this role

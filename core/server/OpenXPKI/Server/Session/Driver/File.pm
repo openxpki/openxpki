@@ -89,6 +89,7 @@ sub load {
     my ($self, $id) = @_;
 
     my $filepath = $self->_make_filepath($id);
+    ##! 8: "loading session from ".$filepath
 
     (-e $filepath) or return;
     (-r $filepath)
@@ -106,7 +107,7 @@ sub load {
     local $INPUT_RECORD_SEPARATOR;     # long version of $/
     my $frozen = <$fh>;
 
-    return OpenXPKI::Server::Session::Data->new->thaw($frozen);
+    return $self->data_factory->()->thaw($frozen);
 }
 
 sub delete {
