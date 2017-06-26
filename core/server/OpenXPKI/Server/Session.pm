@@ -311,11 +311,14 @@ sub persist {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         force => { isa => 'Bool', optional => 1 },
     );
+    ##! 1: "persist()"
     return unless ($self->is_initialized and ($self->data->is_dirty or $params{force}));
+    ##! 1: "- data is set and dirty (or 'force' was specified)"
     $self->data->modified(time);        # update timestamp
     $self->driver->save($self->data);   # implemented by the class that consumes this role
     $self->data->is_dirty(0);
     $self->log->debug("Session persisted");
+    ##! 1: "- done"
     return 1;
 }
 

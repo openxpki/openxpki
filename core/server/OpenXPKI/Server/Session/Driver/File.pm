@@ -89,6 +89,7 @@ sub load {
     my ($self, $id) = @_;
 
     my $filepath = $self->_make_filepath($id);
+    ##! 8: "loading session from ".$filepath
 
     (-e $filepath) or return;
     (-r $filepath)
