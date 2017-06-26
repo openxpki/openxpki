@@ -29,12 +29,12 @@ has session_id => (
 
 sub update_rtoken {
 
-    my $self = shift;    
+    my $self = shift;
     my $result = $self->mock_request({'page' => 'bootstrap!structure'});
     my $rtoken = $result->{rtoken};
     $self->rtoken( $rtoken );
     return $rtoken;
-    
+
 }
 
 has rtoken => (
@@ -52,10 +52,10 @@ sub mock_request {
     if (exists $data->{wf_token} && !$data->{wf_token}) {
         $data->{wf_token} = $self->wf_token();
     }
-    
+
     my $ua = LWP::UserAgent->new;
     my $server_endpoint = 'http://localhost/cgi-bin/webui.fcgi';
-        
+
     $ua->default_header( 'Accept'       => 'application/json' );
     $ua->default_header( 'X-OPENXPKI-Client' => 1);
 
@@ -71,30 +71,30 @@ sub mock_request {
             $data->{_rtoken} = $self->rtoken();
         }
         $ua->default_header( 'content-type' => 'application/x-www-form-urlencoded');
-        $res = $ua->post($server_endpoint, $data);    
-    } else {        
+        $res = $ua->post($server_endpoint, $data);
+    } else {
         my $qsa = '?';
         map { $qsa .= sprintf "%s=%s&", $_, uri_escape($data->{$_}); } keys %{$data};
         $res = $ua->get( $server_endpoint.$qsa );
     }
-    
+
     # Check the outcome of the response
     if (!$res->is_success) {
         warn $res->status_line;
         return {};
     }
-    
+
     if ($res->header('Content-Type') !~ /application\/json/) {
         return $res->content;
     }
-    
+
     my $json = $self->json()->decode( $res->content );
     if (ref $json->{main} && $json->{main}->[0]->{content}->{fields}) {
         map {  $self->wf_token($_->{value}) if ($_->{name} eq 'wf_token') } @{$json->{main}->[0]->{content}->{fields}};
     }
-        
+
     if (my $cookie = $res->header('Set-Cookie')) {
-        if ($cookie =~ /oxisess-webui=([0-9a-f]+);/) {
+        if ($cookie =~ /oxisess-webui=([^;]+);/) {
             $self->session_id($1);
         }
     }
@@ -106,9 +106,9 @@ sub mock_request {
 sub factory {
 
     my $client = TestCGI->new();
-    
+
     $client->update_rtoken();
-    
+
     $client ->mock_request({ page => 'login'});
 
     $client ->mock_request({
@@ -121,10 +121,10 @@ sub factory {
         'username' => 'raop',
         'password' => 'openxpki'
     });
-    
+
     # refetch new rtoken, also inits session via bootstrap
     $client->update_rtoken();
-    
+
     return $client;
 }
 
