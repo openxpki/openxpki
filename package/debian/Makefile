@@ -28,6 +28,7 @@ PACKAGES=			\
 
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
+	Crypt__Cipher__AES \
 	Data__SpreadPagination		\
 	Class__Observable 		\
 	Git__PurePerl \

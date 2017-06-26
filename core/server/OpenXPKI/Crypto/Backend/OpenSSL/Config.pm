@@ -2,7 +2,7 @@
 ## Written 2005 and 2006 by Julia Dubenskaya and Michael Bell for the OpenXPKI project
 ## Improved 2011 by Martin Bartosch for the OpenXPKI project
 ## (C) Copyright 2005-2011 by The OpenXPKI Project
-	
+
 use strict;
 use warnings;
 
@@ -94,69 +94,69 @@ sub set_cert_list
         }
 
         if (ref($cert) eq '') {
-    	    # scalar string, it may either be a PEM encoded cert or the
-    	    # raw certificate serial number (decimal)
-    	    
-    	    if ($cert =~ m{ \A \d+ \z }xms) {
-        		# passed argument is numeric only and hence is the serial
-        		# number of the certificate to revoke
-        		$serial = $cert;
-        		$cert = '';
-    	    } else {
-        		# PEM encoded certificate, instantiate object
-        		eval {
-        		    ##! 1: "FIXME: where is the related free_object call?"
-        		    ##! 1: "FIXME: this is a memory leak"
-        		    $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
-        		};
-        		if (my $exc = OpenXPKI::Exception->caught())
-        		{
-        		    OpenXPKI::Exception->throw (
-        			message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
-        			children => [ $exc ]);
-        		} elsif ($EVAL_ERROR) {
-        		    $EVAL_ERROR->rethrow();
-        		}
-    	    }
+            # scalar string, it may either be a PEM encoded cert or the
+            # raw certificate serial number (decimal)
+
+            if ($cert =~ m{ \A \d+ \z }xms) {
+                # passed argument is numeric only and hence is the serial
+                # number of the certificate to revoke
+                $serial = $cert;
+                $cert = '';
+            } else {
+                # PEM encoded certificate, instantiate object
+                eval {
+                    ##! 1: "FIXME: where is the related free_object call?"
+                    ##! 1: "FIXME: this is a memory leak"
+                    $cert = $self->{XS}->get_object({DATA => $cert, TYPE => "X509"});
+                };
+                if (my $exc = OpenXPKI::Exception->caught())
+                {
+                    OpenXPKI::Exception->throw (
+                    message  => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CRL_REVOKED_CERT_FAILED",
+                    children => [ $exc ]);
+                } elsif ($EVAL_ERROR) {
+                    $EVAL_ERROR->rethrow();
+                }
+            }
         }
 
         if (ref($cert)) {
             # cert is available as an object, obtain necessary data from it
-        
+
             # $timestamp = [ gmtime ($timestamp) ];
             # $timestamp = POSIX::strftime ("%y%m%d%H%M%S",@{$timestamp})."Z";
             ##! 4: "timestamp = $timestamp"
-    
+
             ##! 4: "create start time - notbefore"
             $start = $self->{XS}->get_object_function ({
                 OBJECT   => $cert,
                 FUNCTION => "notbefore"});
-    	    
+
             $start = OpenXPKI::DateTime::convert_date(
             {
                 DATE      => $start,
                 OUTFORMAT => 'openssltime',
             });
-    	    
-    	    ##! 4: "OpenSSL notbefore date: $start"
-    
-    	    ##! 4: "create OpenSSL subject"
-    	    $subject = $self->{XS}->get_object_function ({
+
+            ##! 4: "OpenSSL notbefore date: $start"
+
+            ##! 4: "create OpenSSL subject"
+            $subject = $self->{XS}->get_object_function ({
                 OBJECT   => $cert,
                 FUNCTION => "subject"});
-                
-    	    $subject = OpenXPKI::DN->new ($subject);
-    	    $subject = $subject->get_openssl_dn ();
-    
-    
+
+            $subject = OpenXPKI::DN->new ($subject);
+            $subject = $subject->get_openssl_dn ();
+
+
             ##! 4: "create serials"
             $serial = $self->{XS}->get_object_function ({
                     OBJECT   => $cert,
                     FUNCTION => "serial"});
         }
-	
 
-    	if (ref($arrayref) eq 'ARRAY') {
+
+        if (ref($arrayref) eq 'ARRAY') {
             if (scalar @{$arrayref} > 1) {
                 $timestamp = $arrayref->[1];
                 ##! 4: "create timestamp"
@@ -169,39 +169,39 @@ sub set_cert_list
             }
             if (scalar @{$arrayref} > 2) {
                 my $reason_code = $arrayref->[2];
-    	
+
                 if ($reason_code !~ m{ \A (?: unspecified | keyCompromise | CACompromise | affiliationChanged | superseded | cessationOfOperation | certificateHold | removeFromCRL ) \z }xms) {
                     CTX('log')->application()->warn("Invalid reason code '" . $reason_code . "' specified");
- 
-                    $reason_code = 'unspecified';
-                } 
 
-                ##! 16: 'reason code is present: ' . $reason_code 
-        
+                    $reason_code = 'unspecified';
+                }
+
+                ##! 16: 'reason code is present: ' . $reason_code
+
                 # invaldity time is only expected when the reason is keyCompromise
                 if ( ($arrayref->[2] eq 'keyCompromise') && (scalar @{$arrayref} > 3) && $arrayref->[3]) {
-                    eval {         
+                    eval {
                         my $invalidity_date = OpenXPKI::DateTime::convert_date({
                             DATE      => DateTime->from_epoch( epoch => $arrayref->[3] ),
                             OUTFORMAT => 'generalizedtime',
                         });
-                        ##! 16: 'invalidity date is present: ' . $invalidity_date . ' / ' . $arrayref->[3] 
-                        
-                        # openssl needs a special reason code keyword to pickup 
+                        ##! 16: 'invalidity date is present: ' . $invalidity_date . ' / ' . $arrayref->[3]
+
+                        # openssl needs a special reason code keyword to pickup
                         # the invalidity time parameter
                         $reason_code = 'keyTime,'.$invalidity_date;
                     };
                     if ($EVAL_ERROR) {
                         CTX('log')->application()->warn("Unparsable invalidity_date given: " . $arrayref->[3]);
-     
+
                     }
                 }
-                
+
                 # append reasonCode, includes invalidity time if set
                 $timestamp .= ',' . $reason_code;
-                
+
             }
-	    }
+        }
         $serial = Math::BigInt->new ($serial);
         my $hex = substr ($serial->as_hex(), 2);
         $hex    = "0".$hex if (length ($hex) % 2);
@@ -296,7 +296,7 @@ sub dump
         ##! 4: "PROFILE exists => CRL or cert generation"
         $config .= $self->__get_ca();
         $config .= $self->__get_extensions();
-    
+
     }
 
     ##! 2: "write configuration file"
@@ -357,7 +357,7 @@ sub __get_oids
         "jOILocalityName = 1.3.6.1.4.1.311.60.2.1.1 \n".
         "joiL = 1.3.6.1.4.1.311.60.2.1.1\n".
         "jurisdictionOfIncorporationStateOrProvinceName = 1.3.6.1.4.1.311.60.2.1.2\n".
-        "jOIStateOrProvinceName = 1.3.6.1.4.1.311.60.2.1.2\n". 
+        "jOIStateOrProvinceName = 1.3.6.1.4.1.311.60.2.1.2\n".
         "joiST = 1.3.6.1.4.1.311.60.2.1.2\n".
         "jurisdictionOfIncorporationCountryName = 1.3.6.1.4.1.311.60.2.1.3 \n".
         "jOICountryName = 1.3.6.1.4.1.311.60.2.1.3 \n".
@@ -393,23 +393,23 @@ sub __get_ca
     $config .= "private_key       = ".$self->{ENGINE}->get_keyfile."\n";
 
     if (my $notbefore = $self->{PROFILE}->get_notbefore()) {
-	$config .= "default_startdate = " 
-	    . OpenXPKI::DateTime::convert_date(
-	    {
-		OUTFORMAT => 'openssltime',
-		DATE      => $notbefore,
-	    })
-	    . "\n";
+    $config .= "default_startdate = "
+        . OpenXPKI::DateTime::convert_date(
+        {
+        OUTFORMAT => 'openssltime',
+        DATE      => $notbefore,
+        })
+        . "\n";
     }
-    
+
     if (my $notafter = $self->{PROFILE}->get_notafter()) {
-	$config .= "default_enddate = " 
-	    . OpenXPKI::DateTime::convert_date(
-	    {
-		OUTFORMAT => 'openssltime',
-		DATE      => $notafter,
-	    })
-	    . "\n";
+    $config .= "default_enddate = "
+        . OpenXPKI::DateTime::convert_date(
+        {
+        OUTFORMAT => 'openssltime',
+        DATE      => $notafter,
+        })
+        . "\n";
     }
 
     if (exists $self->{FILENAME}->{SERIAL})
@@ -442,7 +442,7 @@ sub __get_ca
     if ($copy_ext && $copy_ext ne 'none') {
         $config .= "copy_extensions = $copy_ext\n";
     }
-    
+
     ##! 4: "end"
     return $config;
 }
@@ -455,14 +455,14 @@ sub __get_extensions
     my $config   = "\n[ v3ca ]\n";
     my $profile  = $self->{PROFILE};
     my $sections = "";
-    
+
    EXTENSIONS:
     foreach my $name (sort $profile->get_named_extensions())
     {
         ##! 64: 'name: ' . $name
         my $critical = "";
         $critical = "critical," if ($profile->is_critical_extension ($name));
-	
+
         if ($name eq "authority_info_access")
         {
             $config .= "authorityInfoAccess = $critical";
@@ -545,31 +545,22 @@ sub __get_extensions
                 $sections .= "\n";
             }
             my @user_notices;
-            my $old_eval_error = $EVAL_ERROR;
-            eval {
-                # a user_notice might not be present, just leave the
-                # array empty then
-                #OpenXPKI::Exception->throw(
-                #    message => 'I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NOT_FOUND',
-                #);
+
+            if ($profile->has_extension('user_notice')) {
                 @user_notices = @{$profile->get_extension('user_notice')};
-            };
-            my $exc = OpenXPKI::Exception->caught();
-            if (defined $exc && $exc->message() eq 'I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NOT_FOUND') {
-                $EVAL_ERROR = $old_eval_error;
+                foreach my $notice (@user_notices) {
+                    $sections .= qq{userNotice.$i = \@notice$i\n};
+                    $i++;
+                }
+                $sections .= "\n";
+                $i = 0;
+                foreach my $notice (@user_notices) {
+                    $sections .= "\n[ notice$i ]\n";
+                    $sections .= qq{explicitText = "$notice"\n\n};
+                    $i++;
+                }
+                $sections .= "\n";
             }
-            foreach my $notice (@user_notices) {
-                $sections .= qq{userNotice.$i = \@notice$i\n};
-                $i++;
-            }
-            $sections .= "\n";
-            $i = 0;
-            foreach my $notice (@user_notices) {
-                $sections .= "\n[ notice$i ]\n";
-                $sections .= qq{explicitText = "$notice"\n\n};
-                $i++;
-            }
-            $sections .= "\n";
         }
         elsif ($name eq "extended_key_usage")
         {
@@ -623,7 +614,7 @@ sub __get_extensions
                 push @tmp_array, join(q{:}, @{$entry});
             }
             my $string = join(q{,}, @tmp_array);
-            
+
             if ($string ne '') {
                 $config .= "subjectAltName=" . $string . "\n";
             }
@@ -664,8 +655,8 @@ sub __get_extensions
         {
             $config .= "nsComment = $critical\"";
             my $string =  join ("", @{$profile->get_extension("netscape.comment")});
-	    # FIXME: this inserts a literal \n - is this intended?
-	    $string =~ s/\n/\\\\n/g;
+        # FIXME: this inserts a literal \n - is this intended?
+        $string =~ s/\n/\\\\n/g;
             $config .= "$string\"\n";
         }
         else
@@ -675,7 +666,7 @@ sub __get_extensions
                 params  => {NAME => $name});
         }
     }
-    
+
     foreach my $oid(sort $profile->get_oid_extensions()) {
 
         # Single line OIDs have only one element in the array
@@ -687,7 +678,7 @@ sub __get_extensions
         # if there are lines left, it goes into the section part
         $sections .= join ("\n", @val)."\n\n";
     }
-    
+
     $config .= "\n".$sections;
     ##! 16: "extensions ::= $config"
 
@@ -809,7 +800,7 @@ A single entry in this array may be one of the following:
 
 =back
 
-With the exception of the certificate all additional parameters 
+With the exception of the certificate all additional parameters
 are optional and can be left out.
 
 If a revocation_timestamp is specified, it is used as the revocation
@@ -828,7 +819,7 @@ The reason codes
   'certificateHold',
   'removeFromCRL'.
 are currently not handled correctly and should be avoided. However, they
-will currently simply be passed in the CRL which may not have the desired 
+will currently simply be passed in the CRL which may not have the desired
 result.
 
 If the reason code is incorrect, a warning is logged and the reason code
@@ -861,8 +852,8 @@ behaviour if many certificates are to be revoked.
 The lowest possible overhead is introduced by the literal specification
 of the serial number to put on the revocation list.
 
-NOTE: No attempt to verify the validity of the specified serial numbers 
-is done, in particular in the "raw serial number" case there is even 
+NOTE: No attempt to verify the validity of the specified serial numbers
+is done, in particular in the "raw serial number" case there is even
 no check if such a serial number exists at all.
 
 =item - dump

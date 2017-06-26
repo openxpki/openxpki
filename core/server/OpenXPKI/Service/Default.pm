@@ -284,12 +284,12 @@ sub __handle_FRONTEND_SESSION {
         );
     }
 
-    my $data;
+    my $data_str;
     my $sess = CTX('session');
     if (exists $msg->{PARAMS}->{SESSION_DATA}) {
         if (defined $msg->{PARAMS}->{SESSION_DATA}) {
-            my $data_str = $msg->{PARAMS}->{SESSION_DATA};
-            ##! 16: 'Setting ui session data ' . $data
+            $data_str = $msg->{PARAMS}->{SESSION_DATA};
+            ##! 16: 'Setting ui session data ' . $data_str
             $sess->data->ui_session($data_str);
         } else {
             ##! 16: 'Clear ui session data '
@@ -297,12 +297,12 @@ sub __handle_FRONTEND_SESSION {
         }
         $sess->persist;
     } else {
-        $data = $sess->data->ui_session;
+        $data_str = $sess->data->ui_session;
         ##! 32: 'Read ui session data ' . $data
     }
 
     return {
-        SESSION_DATA => $data,
+        SESSION_DATA => $data_str,
     };
 
 }
@@ -776,7 +776,7 @@ sub __pki_realm_choice_available : PRIVATE {
 
     ##! 2: "check if PKI realm is already known"
     my $realm = OpenXPKI::Server::Context::hascontext('session')
-        ? CTX('session')->data->pki_realm;
+        ? CTX('session')->data->pki_realm
         : undef;
     return $realm if defined $realm;
 
