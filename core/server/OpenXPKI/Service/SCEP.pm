@@ -21,6 +21,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
+use OpenXPKI::Server::Session::Data::SCEP;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::SCEP::Command;
 use OpenXPKI::Serialization::Simple;
@@ -212,7 +213,10 @@ sub __init_encryption_alg : PRIVATE {
 
 sub __init_session : PRIVATE {
     # memory-only session is sufficient for SCEP
-    my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
+    my $session = OpenXPKI::Server::Session->new(
+        type => "Memory",
+        data_class => "OpenXPKI::Server::Session::Data::SCEP",
+    )->create;
     OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
     Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 }
@@ -326,7 +330,7 @@ MESSAGE:
         if ( $service_msg eq 'LOGOUT' ) {
             ##! 8: "logout received - killing session and connection"
             CTX('log')->system()->info('Terminating session');
- 
+
             exit 0;
         }
 
@@ -378,7 +382,7 @@ MESSAGE:
                         # so the rollback only affects any uncompleted actions
                         CTX('dbi')->rollback();
                         CTX('log')->system()->error("Error executing SCEP command '$received_command': $EVAL_ERROR");
- 
+
                         ##! 14: "Exception caught during command execution"
                         ##! 14: "$EVAL_ERROR"
                         $self->talk(
@@ -393,7 +397,7 @@ MESSAGE:
                         next MESSAGE;
                     }
                     CTX('log')->system()->debug("Executed SCEP command '$received_command'");
- 
+
 
                     # sanity checks on command reply
                     if ( !defined $result || ref $result ne 'HASH' ) {
