@@ -272,17 +272,19 @@ Returns the object instance (allows for method chaining).
 sub thaw {
     my ($self, $frozen) = @_;
 
+    my $data_hash;
     # backwards compatibility
     if ($frozen =~ /^HASH\n/ ) {
         use OpenXPKI::Serialization::Simple;
-        return OpenXPKI::Serialization::Simple->new->deserialize($frozen);
+        $data_hash = OpenXPKI::Serialization::Simple->new->deserialize($frozen);
+    }
+    else {
+        OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
+            unless $frozen =~ /^JSON:/;
+        $frozen =~ s/^JSON://;
+        $data_hash = decode_json($frozen);
     }
 
-    OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
-        unless $frozen =~ /^JSON:/;
-    $frozen =~ s/^JSON://;
-
-    my $data_hash = decode_json($frozen);
     # set session attributes via accessor methods
     $self->$_($data_hash->{$_}) for keys %$data_hash;
 
