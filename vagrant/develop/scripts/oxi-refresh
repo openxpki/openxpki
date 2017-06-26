@@ -69,7 +69,8 @@ popd                                                                  >$LOG 2>&1
 echo "Compiling and installing I18N files"
 echo "$OXI_VERSION" > $OXI_CORE_DIR/i18n/VERSION
 pushd $OXI_CORE_DIR/i18n                                              >$LOG 2>&1
-make                                                                  >$LOG 2>&1
+langs=$(grep '^LANGS\s*=' Makefile | cut -d= -f2)
+for lang in $langs; do msgfmt -o $lang/openxpki.mo $lang/openxpki.po; done
 make install                                                          >$LOG 2>&1
 popd                                                                  >$LOG 2>&1
 
