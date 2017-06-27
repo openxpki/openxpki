@@ -1244,6 +1244,7 @@ sub __execute_workflow_activity {
             CTX('dbi')->commit;
         }
         ##! 16: 'Backgrounded workflow finished - exit child'
+        CTX('dbi')->disconnect;
         exit;
     }
 
