@@ -37,6 +37,7 @@ EXTERNAL=				\
 	Proc__SafeExec \
 	XML__Filter__XInclude \
 	Crypt__PKCS10 \
+	Crypt__X509 \
 	DBIx__Handler \
     DBIx__TransactionManager
 

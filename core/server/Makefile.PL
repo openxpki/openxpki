@@ -332,6 +332,7 @@ WriteMakefile(
         'Crypt::OpenSSL::AES'           => '0.02',      # for e.g. OpenXPKI::Crypto::VolatileVault
         'Crypt::Cipher::AES'               => 0,           # replacement to support keysize > 128
         'Crypt::PKCS10'                 => '1.8',
+        'Crypt::X509'                   => 0,
         'Data::Password'                => '1.07',
         'Data::Serializer'              => '0.44',
         'Data::UUID'                    => 0,           # for OpenXPKI::Template::Plugin::Utils and CPAN
