@@ -565,6 +565,12 @@ CREATE INDEX csr_profile_index ON csr USING btree (profile);
 CREATE INDEX csr_subject_index ON csr USING btree (subject);
 
 --
+-- Name: session_modified_index; Type: INDEX; Schema: public; Tablespace:
+--
+
+CREATE INDEX session_modified_index ON session USING btree (modified);
+
+--
 -- Name: wf_attributes_key_index; Type: INDEX; Schema: public; Tablespace:
 --
 

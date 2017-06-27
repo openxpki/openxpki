@@ -257,7 +257,7 @@ ALTER TABLE `secret`
  ADD PRIMARY KEY (`pki_realm`,`group_id`);
 
 ALTER TABLE `session`
- ADD PRIMARY KEY (`session_id`);
+ ADD PRIMARY KEY (`session_id`), ADD INDEX(`modified`);
 
 ALTER TABLE `seq_application_log`
  ADD PRIMARY KEY (`seq_number`);
