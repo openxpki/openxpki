@@ -16,6 +16,7 @@ OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
+OpenXPKI/Log4perl.pm
 OpenXPKI/MooseParams.pm
 OpenXPKI/Template.pm
 OpenXPKI/Template/Plugin/Certificate.pm
@@ -221,6 +222,7 @@ OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm
 OpenXPKI/Server/Session/Data.pm
+OpenXPKI/Server/Session/Data/SCEP.pm
 OpenXPKI/Server/Session/DriverRole.pm
 OpenXPKI/Server/Session/Driver/Database.pm
 OpenXPKI/Server/Session/Driver/File.pm
