@@ -46,7 +46,7 @@ Setup and Configuration
    reference/tools/openxpkiadm
    reference/tools/openxpkictl
    reference/tools/openxpkicmd
-   reference/tools/openxpkicli   
+   reference/tools/openxpkicli
    reference/interfaces
    reference/developer/conventions
    reference/developer/coding
@@ -59,6 +59,7 @@ Operation
    :maxdepth: 3
 
    operation/index
+   operation/logging
    operation/tokenconfig
    operation/maintenance
    operation/troubleshooting
