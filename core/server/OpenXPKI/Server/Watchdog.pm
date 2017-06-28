@@ -142,6 +142,12 @@ has interval_loop_run => (
     default =>  1
 );
 
+has interval_session_purge => (
+    is => 'rw',
+    isa => 'Int',
+    default => 0
+);
+
 has _uid => (
     is => 'ro',
     isa => 'Str',
@@ -296,12 +302,28 @@ sub run {
     ### TODO: maybe we should measure the count of exception in a certain time interval?
     my $exception_count = 0;
 
+
+    my $next_session_cleanup = time();
+    my $session_purge_handler;
+    if ($self->interval_session_purge()) {
+        $session_purge_handler = OpenXPKI::Server::Session->new(load_config => 1);
+        CTX('log')->system()->info("Initialize session purge from watchdog with interval " . $self->interval_session_purge());
+    }
+
     ##! 16: 'watchdog: start looping'
 
     while ( ! $OpenXPKI::Server::Watchdog::terminate ) {
         ##! 80: 'watchdog: do loop'
         eval {
             my $wf_id = $self->__scan_for_paused_workflows();
+
+            # purge expired sessions if enough time elapsed
+            if ($session_purge_handler && $next_session_cleanup < time()) {
+                CTX('log')->system()->debug("Init session purge from watchdog");
+                $session_purge_handler->purge_expired;
+                $next_session_cleanup = time() + $self->interval_session_purge();
+            }
+
             # duration of pause depends on whether a workflow was found or not
             my $sec = $wf_id ? $self->interval_loop_run : $self->interval_loop_idle;
             ##! 80: sprintf('watchdog sleeps %d secs (%s)', $sec, $wf_id ? 'busy' : 'idle')
@@ -371,6 +393,7 @@ sub _sig_hup {
         interval_wait_initial
         interval_loop_idle
         interval_loop_run
+        interval_session_purge
     )) {
         if ($new_cfg->{$key}) {
             ##! 16: 'Update key ' . $key

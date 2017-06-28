@@ -170,16 +170,29 @@ sub delete {
 
 sub delete_all_before {
     my ($self, $epoch) = @_;
+
     ##! 8: "deleting all sessions where modified < $epoch"
-    # WARNING: It is crucial to have an index on the modified column
-    # Otherwise you might get a lock timeout when a long running
-    # session or workflow keeps an open lock on its session
-    return $self->dbi->delete(
+
+    # There is a problem with deadlocks on (at least) mysql if we use a
+    # table wide delete query so we first load all to-be-expired sessions
+    # and delete them one by one
+
+    my $sth = $self->dbi->select(
         from => $self->table,
+        columns => ['session_id'],
         where => {
             modified => { '<' => $epoch },
         },
     );
+    $self->dbi->start_txn();
+    while (my $row = $sth->fetchrow_arrayref) {
+        $self->dbi->delete(
+            from => $self->table,
+            where => { session_id => $row->[0] }
+        );
+    }
+    $self->dbi->commit();
+    return 1;
 }
 
 __PACKAGE__->meta->make_immutable;
