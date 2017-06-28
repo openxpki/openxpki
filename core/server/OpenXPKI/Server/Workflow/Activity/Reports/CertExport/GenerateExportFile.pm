@@ -143,7 +143,9 @@ sub execute {
                 $cert_xml->{'pkcs12-container'} = { "enc-password" => encode_base64( $p7_secrets, ''), content => encode_base64( $p12, '') };
 
                 CTX('log')->application()->info("added private key to export for $cert_identifier");
-                CTX('log')->audit('key')->info("added private key to export for $cert_identifier");
+                CTX('log')->audit('key')->info("private key export", {
+                    certid => $cert_identifier
+                });
             }
         }
 

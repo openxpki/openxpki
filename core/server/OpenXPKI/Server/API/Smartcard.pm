@@ -1194,7 +1194,6 @@ sub __check_actions_on_install_candidate {
             $flags->{INSTALL} = 1;
             $flags->{SOFT} = 0;
             CTX('log')->application()->info("Certificate $cert->{IDENTIFIER} is valid/usable and restored to card");
-            #LOGMIGRATE Todo Audit?
             last IF_INSTALL;
         }
 
@@ -1204,7 +1203,6 @@ sub __check_actions_on_install_candidate {
             $flags->{INSTALL} = 1;
             $flags->{SOFT} = 0;
             CTX('log')->application()->info("Certificate $cert->{IDENTIFIER} is invalid and restored to card");
-            #LOGMIGRATE Todo Audit?
             last IF_INSTALL;
         }
 

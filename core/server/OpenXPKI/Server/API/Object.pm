@@ -138,8 +138,9 @@ sub generate_key {
         $command->{PARAM} = $params->{DSAPARAM};
     }
 
-    CTX('log')->audit('key')->info("Creating private $key_alg key with params: " .
-        join(";", map { "$_: ".$command->{PKEYOPT}->{$_} } keys %{$command->{PKEYOPT}}));
+    CTX('log')->audit('key')->info("generating private key", {
+        'key_alg' => $key_alg,
+    });
 
     ##! 16: 'command: ' . Dumper $command
 
@@ -1278,7 +1279,9 @@ sub get_private_key_for_cert {
     }
 
     if ($nopassword) {
-        CTX('log')->audit('key')->warn("Private key export without password for certificate $identifier");
+        CTX('log')->audit('key')->warn("private key export without password", {
+            certid => $identifier,
+        });
     }
 
     my $default_token = CTX('api')->get_default_token();
@@ -1400,8 +1403,9 @@ sub get_private_key_for_cert {
         );
     }
 
-    CTX('log')->audit('key')->info("Private key requested for certificate $identifier");
-
+    CTX('log')->audit('key')->info("private key export", {
+        certid => $identifier,
+    });
 
     return { PRIVATE_KEY => $result, };
 }

@@ -133,7 +133,6 @@ sub execute {
     CTX('log')->application()->info("SCEP eligibility for " .
             ($is_initial ? 'initial enrollment ' : 'renewal ' ) .
             ($res ? 'granted' : 'failed'));
-    #CTX('log')->audit('approval')->
 
     return 1;
 }

@@ -104,8 +104,8 @@ sub execute
     my $key = $default_token->command($command);
     ##! 16: 'key: ' . $key
 
-    CTX('log')->audit()->info('Created ' . $key_type . ' private key for ' . $context->param('creator'));
- 
+    CTX('log')->application()->info('Created ' . $key_type . ' private key for ' . $context->param('creator'));
+
 
     $context->param('private_key' => $key);
 

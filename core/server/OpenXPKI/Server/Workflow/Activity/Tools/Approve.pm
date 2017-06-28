@@ -193,7 +193,12 @@ sub execute
             };
         }
         CTX('log')->application()->info('Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role");
-        CTX('log')->audit('approval')->info('Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role");
+
+        CTX('log')->audit('approval')->info('operator approval given', {
+            wfid => $workflow->id(),
+            user => $user,
+            role => $role
+        });
     } else {
         configuration_error('Unsuported mode given');
     }

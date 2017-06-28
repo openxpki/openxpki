@@ -270,7 +270,10 @@ sub execute {
         $context->param('error_code', '');
 
         CTX('log')->application()->info('SmartCard delivered activation code to ' . $user);
-        CTX('log')->audit('smartcard')->info('SmartCard delivered activation code to ' . $user);
+        CTX('log')->audit('smartcard')->info('delivered smartcard activation code', {
+            user => $user,
+            sctoken_id => $context->param('token_id'),
+        });
 
         # pass on the activation code back to the user interface
         $context->param( '_password', $code );

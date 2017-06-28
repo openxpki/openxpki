@@ -16,36 +16,37 @@ logger.
 
 CA Key Usage (cakey)
 --------------------
-* Certificate Issued
-* CRL Issued
+* certificate issued
+* crl issued
 
 Entity Key Usage (key)
 ----------------------
-* Key Generated
-* Key Exported
-* Key Destroyed
+* key generated
+* key exported
+* key destroyed
 
 Certificate (entity)
 ----------------------
-* Request Received
-* Request Fully Approved
-* Issued
-* Revoked
+* request received
+* request fully approved
+* issued
+* revoked
 
 Approval (approval)
 ---------------------
-* Operator approval given via UI
-* Automated approval derived from backend checks
+* operator approval given via ui
+* automated approval derived from backend checks
 
 ACL (acl)
 ---------------------
-* Access to Workflow
-* Access to API
+* access to workflow
+* access to api
 
 System (system)
 ----------------
 * start/stop of system
-* import/activation of Tokens
+* import/activation of tokens
+* import of certificates
 
 Application
 -----------

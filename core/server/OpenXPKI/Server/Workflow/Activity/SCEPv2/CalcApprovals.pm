@@ -63,13 +63,22 @@ sub execute {
         ##! 16: 'auto approve for initial enrollment'
         $approvals = 1;
         CTX('log')->application()->info('SCEP auto approval for initial enrollment of ' . $context->param('cert_subject'));
-        CTX('log')->audit('approval')->info('SCEP auto approval for initial enrollment of ' . $context->param('cert_subject'));
+
+        CTX('log')->audit('approval')->info('scep add approval point', {
+            mode => 'initial',
+            subject => $context->param('cert_subject'),
+            points => $approvals
+        });
 
     } elsif ( $context->param('request_mode' ) eq 'renewal'  && $context->param('eligible_for_renewal') ) {
         ##! 16: 'auto approve for renewal'
         $approvals = 1;
         CTX('log')->application()->info('SCEP auto approval for renwal of ' . $context->param('cert_subject'));
-        CTX('log')->audit('approval')->info('SCEP auto approval for renwal of ' . $context->param('cert_subject'));
+        CTX('log')->audit('approval')->info('scep add approval point', {
+            mode => 'renewal',
+            subject => $context->param('cert_subject'),
+            points => $approvals
+        });
     } else {
         CTX('log')->application()->debug('SCEP no auto approval for eligibility!');
     }
@@ -91,10 +100,14 @@ sub execute {
 
     } else {
         $context->param('have_all_approvals' => '1');
+
         CTX('log')->application()->info(sprintf('SCEP got required approval points (%01d/%01d) for %s',
                $approvals, $approval_points, $context->param('cert_subject')));
 
-        CTX('log')->audit('approval')->info('...');
+        CTX('log')->audit('approval')->info('scep request fully approved', {
+            subject => $context->param('cert_subject'),
+            points => $approval_points
+        });
     }
 
     return 1;

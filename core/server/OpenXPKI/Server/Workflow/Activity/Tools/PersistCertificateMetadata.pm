@@ -38,7 +38,7 @@ sub execute {
 
     if (!$style) {
         CTX('log')->application()->info("No style defined, skipping metadata");
- 
+
         return 1;
     }
 
@@ -61,7 +61,7 @@ sub execute {
 
     if (not defined $metadata) {
         CTX('log')->application()->info("No metadata for $profile / $style ");
- 
+
         return 1;
     }
 
@@ -73,9 +73,6 @@ sub execute {
         my $value = $metadata->{$key};
         next if ($value eq '');
         $value = $ser->serialize( $value ) if (ref $value ne '');
-        CTX('log')->audit()->info(sprintf ('cert metadata added, cert %s, attr %s, value %s',
-               $cert_identifier, $key, $value));
- 
 
         ##! 32: 'Add new attribute ' . $key . ' value ' . $value
 
@@ -88,7 +85,7 @@ sub execute {
             $value = 'n/a';
             CTX('log')->application()->debug(sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
                     $cert_identifier, $key));
- 
+
         }
 
         $dbi->insert(

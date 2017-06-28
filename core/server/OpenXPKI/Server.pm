@@ -104,6 +104,9 @@ sub start {
     $self->__init_net_server;
 
     CTX('log')->system()->info("Server is running");
+
+    CTX('log')->audit('system')->info('server was started');
+
     $self->run(%{$self->{PARAMS}}); # from Net::Server::MultiType
 }
 

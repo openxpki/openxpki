@@ -248,8 +248,6 @@ sub issueCertificate {
 
     my $msg = sprintf("Certificate %s (%s) issued by %s", $profile->get_subject(), $serial, $issuing_ca);
     CTX('log')->application()->info($msg);
-    CTX('log')->audit('entity')->info($msg);
-    CTX('log')->audit('cakey')->info($msg);
 
     my $cert_identifier = $self->__persistCertificateInformation(
         {
@@ -259,6 +257,7 @@ sub issueCertificate {
         },
         {}
     );
+
     ##! 16: 'cert_identifier: ' . $cert_identifier
 
     return { 'cert_identifier' => $cert_identifier };
@@ -410,12 +409,18 @@ sub issueCRL {
     ##! 128: 'crl: ' . Dumper($crl)
     #
     CTX('log')->application()->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
-    CTX('log')->audit('cakey')->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
 
     #
     # publish_crl can then publish all those with a PUBLICATION_DATE of 0
     # and set it accordingly
     my $data = { $crl_obj->to_db_hash() };
+
+    CTX('log')->audit('cakey')->info('crl issued', {
+        cakey     => $data->{authority_key_identifier},
+        token     => $ca_alias,
+        pki_realm => $pki_realm,
+    });
+
     $data = {
         # FIXME #legacydb Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
         ( map { lc($_) => $data->{$_} } keys %$data ),

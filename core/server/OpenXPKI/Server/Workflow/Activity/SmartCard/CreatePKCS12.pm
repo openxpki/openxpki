@@ -50,7 +50,7 @@ sub execute {
     $context->param('_pkcs12' => $pkcs12 );
 
     CTX('log')->application()->info('SmartCard created pkcs12 container');
-    CTX('log')->audit('key')->info('SmartCard created pkcs12 container');
+
     return 1;
 }
 1;

@@ -71,8 +71,11 @@ sub execute
          PARAMS     => $param,
     });
 
-    CTX('log')->audit('key')->info('Created ' . $key_alg . ' private key for ' . $context->param('creator'));
 
+    CTX('log')->audit('key')->info("generating private key", {
+        'key_alg' => $key_alg,
+        %{$param}
+    });
 
     my $target_key = $self->param('target_key') || 'private_key';
 

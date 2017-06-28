@@ -75,7 +75,10 @@ sub execute {
         } else {
 
             CTX('log')->application()->info("Export of private key to context for $cert_identifier");
-            CTX('log')->audit('key')->info("Export of private key to context for $cert_identifier");
+
+            CTX('log')->audit('key')->info("private key export to context", {
+                certid => $cert_identifier
+            });
 
             # If no template is given, we export only the private key
             if (!$template) {

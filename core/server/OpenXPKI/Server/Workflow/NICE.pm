@@ -148,10 +148,25 @@ sub __persistCertificateInformation {
         } else {
             $ca_id = 'unknown';
             CTX('log')->application()->warn("NICE certificate issued with unknown issuer! ($identifier / ".$cert_data->{issuer_dn}.")");
- 
+
 
         }
     }
+
+    CTX('log')->audit('cakey')->info('certificate signed', {
+        cakey     => $cert_data->{authority_key_identifier},
+        certid    => $identifier,
+        key       => $cert_data->{subject_key_identifier},
+        pki_realm => $pki_realm,
+    });
+
+    CTX('log')->audit('entity')->info('certificate issued', {
+        certid    => $identifier,
+        key       => $cert_data->{subject_key_identifier},
+        pki_realm => $pki_realm,
+    });
+
+
     CTX('dbi')->insert(
         into => 'certificate',
         values=> {
@@ -162,6 +177,7 @@ sub __persistCertificateInformation {
             status            => 'ISSUED',
         },
     );
+
 
     my @parsed_subject_alt_names = $x509->get_subject_alt_names();
     ##! 32: 'sans (parsed): ' . Dumper \@parsed_subject_alt_names

@@ -60,7 +60,12 @@ sub execute {
 
     ##! 16: 'datapool entry saved to ' . $namespace . ':' . $temp_handle
     CTX('log')->application()->info('Created ' . $key_alg . ' private key for ' . $context->param('creator') . ', saved to datapool entry ' . $dp_namespace . '/' . $temp_handle);
-    #CTX('log')->audit('key')->info();
+
+
+    CTX('log')->audit('key')->info("generating private key", {
+        'key_alg' => $key_alg,
+        %{$key_param}
+    });
 
     my $csr = $default_token->command (
     {
