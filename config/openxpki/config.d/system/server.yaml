@@ -19,11 +19,14 @@ tmpdir:       /var/tmp
 environment:
 #    key: value
 
-# Session
+# Session - default is now to use the database to enable node failover
 session:
-    type: File
-    directory: /var/openxpki/session
+    type: Database
     lifetime: 1200
+
+# if you want to keep the session in the filesystem, switch to
+# type: File
+# directory: /var/openxpki/session
 
 # Which transport to initialize
 transport:
