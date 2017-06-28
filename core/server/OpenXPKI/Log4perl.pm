@@ -97,7 +97,7 @@ sub _add_patternlayout_spec {
         my $layout = shift;
         my @order = qw( user role sid wftype wfid scepid );
         my $mdc = Log::Log4perl::MDC->get_context;
-        my %keys = ( map { $_ => $_ } sort keys %{$mdc} );
+        my %keys = ( map { $_ => $_ } grep { defined $mdc->{$_} } sort keys %{$mdc} );
         my @keys_ordered = ();
         # Add keys in our desired order if they exist
         for my $k (@order) {
