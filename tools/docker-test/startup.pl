@@ -140,7 +140,6 @@ execute capture => [ "git", "clone", "--depth=1", @branch_spec, $repo, $clone_di
 # Grab and install Perl module dependencies from Makefile.PL using PPI
 #
 print "\n====[ Scanning Makefile.PL for new Perl dependencies ]====\n";
-execute show => [ qw( cpanm --quiet --notest PPI ) ];
 my $cpanfile = execute capture => "$clone_dir/tools/scripts/makefile2cpanfile.pl";
 open my $fh, ">", "$clone_dir/cpanfile";
 print $fh $cpanfile;
@@ -178,7 +177,6 @@ chdir "$clone_dir/core/server";
 #
 if ($mode eq "coverage") {
     print "\n====[ Testing the code coverage (this will take a while) ]====\n";
-    execute show => "cpanm --quiet --notest Devel::Cover DateTime";
     my $code = execute code => "cover -test";
     print "Please note that some unit tests did not pass\n" if $code != 0;
     use DateTime;
@@ -213,7 +211,6 @@ make_path "/var/openxpki/session", "/var/log/openxpki";
 `cp -R $clone_dir/config/openxpki /etc`;
 
 # customize config
-execute show => "cpanm --quiet --notest Devel::Cover File::Slurp";
 use File::Slurp qw( edit_file );
 edit_file { s/ ^ ( (user|group): \s+ ) \w+ /$1root/gmsx } "/etc/openxpki/config.d/system/server.yaml";
 execute show => "$clone_dir/tools/testenv/mysql-oxi-config.sh";

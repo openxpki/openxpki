@@ -33,8 +33,11 @@ RUN apt-get update && \
 #
 COPY cpanminus /
 RUN cat /cpanminus | perl - App::cpanminus && rm /cpanminus
+# modules needed by OpenXPKI
 COPY cpanfile /
 RUN cpanm --quiet --notest --installdeps /
+# modules needed in startup.pl
+RUN cpanm --quiet --notest PPI Devel::Cover DateTime File::Slurp
 
 #
 # Setup - locales
