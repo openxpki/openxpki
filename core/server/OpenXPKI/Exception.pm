@@ -107,6 +107,11 @@ sub throw {
     my $priority = $args{log}->{priority} || 'error';
 
     eval {
+        # this hides this subroutine from the call stack to get the real
+        # location of the exception
+        local $Log::Log4perl::caller_depth =
+              $Log::Log4perl::caller_depth + 2;
+
         if (OpenXPKI::Server::Context::hascontext('log')) {
             my $log = OpenXPKI::Server::Context::CTX('log');
             $log->$facility()->$priority( $message );
