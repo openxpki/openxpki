@@ -29,18 +29,12 @@ sub new {
     return $self;
 }
 
-# system is used as default logger for the DBI class
-sub system {
-    my $self = shift;
-    return $self->{logger};
-}
-
 sub log
 {
     my $self = shift;
     my $keys = { @_ };
 
-    if ($keys->{PRIORITY} =~ / \A (debug|info|warn|error|fatal) \z /i) {
+    if ($keys->{PRIORITY} =~ / \A (trace|debug|info|warn|error|fatal) \z /i) {
         my $prio = $1;
         $self->{logger}->$prio( $keys->{MESSAGE} );
     }
@@ -50,15 +44,17 @@ sub log
 
 # install wrapper / helper subs
 no strict 'refs';
-for my $prio (qw/ debug info warn error fatal /) {
+for my $prio (qw/ trace debug info warn error fatal /) {
     *{$prio} = sub {
         my ($self, $message, $facility) = @_;
-        $self->log(
-            MESSAGE  => $message,
-            PRIORITY => $prio,
-            CALLERLEVEL => 1,
-            FACILITY => $facility // "monitor",
-        );
+        $self->{logger}->$prio( $message );
+    };
+}
+
+for my $facility (qw/ application auth system workflow audit /) {
+    *{$facility} = sub {
+        my ($self) = @_;
+        return $self->{logger};
     };
 }
 
