@@ -159,10 +159,13 @@ sub handle_request {
     # new session and to recover from backend session failure
     if ($page eq 'logout' || $action eq 'logout') {
         $self->logout_session();
-        if ($self->backend()->is_logged_in()) {
-            $self->backend()->logout();
-        }
         $self->logger()->info('Logout from session');
+
+        # flush the session cookie
+        if ($main::cookie) {
+            $main::cookie->{'-value'} = main::encrypt_cookie($self->session->id);
+            push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
+        }
     }
 
     my $reply = $self->backend()->send_receive_service_msg('PING');
@@ -612,14 +615,18 @@ the session is cleared but not destreoyed.
 sub logout_session {
 
     my $self = shift;
-    $self->logger()->info("remove session");
+    $self->logger()->info("session logout");
 
     my $session = $self->session();
     if (ref $session eq 'OpenXPKI::Client::Session') {
+        # this clears the local cache
         $session->clear();
+        # this deletes the session from the backend
+        $session->delete();
         $session->renew_session_id();
     } else {
-            $self->session()->delete();
+        $self->backend()->logout();
+        $self->session()->delete();
         $self->session()->flush();
         $self->session( $self->session()->new() );
     }

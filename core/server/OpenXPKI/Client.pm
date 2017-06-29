@@ -358,6 +358,12 @@ sub rekey_session {
     my $ident = ident $self;
     my $args  = shift;
 
+    # if no session exists (e.g after logout or socket timeout)
+    # we start a new session
+    if (!$sessionid{$ident}) {
+        return $self->init_session();
+    }
+
     $self->talk({
         SERVICE_MSG => "RESET_SESSIONID",
     });
@@ -375,9 +381,9 @@ sub rekey_session {
     $sessionid{$ident} = $msg->{SESSION_ID};
 
     $self->talk(
-	{
-	    SERVICE_MSG => 'SESSION_ID_ACCEPTED',
-	});
+    {
+        SERVICE_MSG => 'SESSION_ID_ACCEPTED',
+    });
 
     # we want to be able to send after initialization, so collect a message!
     $msg = $self->collect();

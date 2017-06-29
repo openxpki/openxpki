@@ -121,6 +121,7 @@ sub __is_valid_message : PRIVATE {
         ],
         'WAITING_FOR_PKI_REALM' => [
             'PING',
+            'LOGOUT',
             'GET_PKI_REALM',
             'NEW_SESSION',
             'CONTINUE_SESSION',
@@ -129,6 +130,7 @@ sub __is_valid_message : PRIVATE {
         ],
         'WAITING_FOR_AUTHENTICATION_STACK' => [
             'PING',
+            'LOGOUT',
             'GET_AUTHENTICATION_STACK',
             'NEW_SESSION',
             'CONTINUE_SESSION',
@@ -137,6 +139,7 @@ sub __is_valid_message : PRIVATE {
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
+            'LOGOUT',
             'GET_PASSWD_LOGIN',
             'GET_CLIENT_SSO_LOGIN',
             'GET_CLIENT_X509_LOGIN',
@@ -292,7 +295,7 @@ sub __handle_FRONTEND_SESSION {
         } else {
             ##! 16: 'Clear ui session data '
             CTX('log')->system->debug('Clearing frontend session data');
-            $sess->clear_ui_session;
+            $sess->data->clear_ui_session;
         }
         $sess->persist;
     } else {
