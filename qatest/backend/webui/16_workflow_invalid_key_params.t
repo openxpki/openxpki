@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
+
 use strict;
 use warnings;
 use CGI::Session;

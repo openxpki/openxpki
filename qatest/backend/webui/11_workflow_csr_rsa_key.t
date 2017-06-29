@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
+
 use strict;
 use warnings;
 use CGI::Session;
@@ -31,7 +33,7 @@ my $session_id = $session->id;
 ok ($session->id, 'Session id ok');
 
 
-my $result; 
+my $result;
 my $client = MockUI::factory();
 
 $result = $client->mock_request({
