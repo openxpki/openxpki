@@ -186,6 +186,7 @@ sub __handle_message : PRIVATE {
     # get the result from a method specific to the message name
     eval {
         my $method = '__handle_' . $message_name;
+        CTX('log')->system->debug("<< $message_name (message from client)");
         $result = $self->$method($message);
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
@@ -225,7 +226,7 @@ sub __handle_NEW_SESSION : PRIVATE {
 
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
     Log::Log4perl::MDC->put('sid', substr($session->data->id,0,4));
-    CTX('log')->system()->info('New session created');
+    CTX('log')->system->info('New session created');
 
     $self->__change_state({ STATE => 'SESSION_ID_SENT', });
 
@@ -242,8 +243,6 @@ sub __handle_CONTINUE_SESSION {
 
     my $session;
 
-    Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
-
     ##! 4: "try to continue session"
     $session = OpenXPKI::Server::Session->new(load_config => 1);
     $session->resume($msg->{SESSION_ID})
@@ -255,6 +254,8 @@ sub __handle_CONTINUE_SESSION {
     # There might be an exisiting session if the child did some work before
     # we therefore use force to overwrite exisiting entries
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+    Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
+    CTX('log')->system->debug('Session resumed');
 
     # do not use __change_state here, as we want to have access
     # to the old session in __handle_SESSION_ID_ACCEPTED
@@ -286,13 +287,16 @@ sub __handle_FRONTEND_SESSION {
         if (defined $msg->{PARAMS}->{SESSION_DATA}) {
             $data_str = $msg->{PARAMS}->{SESSION_DATA};
             ##! 16: 'Setting ui session data ' . $data_str
+            CTX('log')->system->debug('Updating frontend session data');
             $sess->data->ui_session($data_str);
         } else {
             ##! 16: 'Clear ui session data '
+            CTX('log')->system->debug('Clearing frontend session data');
             $sess->clear_ui_session;
         }
         $sess->persist;
     } else {
+        CTX('log')->system->debug('Frontend session data requested by client');
         $data_str = $sess->data->ui_session;
         ##! 32: 'Read ui session data ' . $data
     }
@@ -310,6 +314,7 @@ sub __handle_RESET_SESSIONID: PRIVATE {
     my $msg     = shift;
 
     my $sess_id = CTX('session')->new_id;
+    CTX('log')->system->debug("Changing session ID to ".substr($sess_id,0,4));
     Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
 
     ##! 4: 'new session id ' . $sess_id
@@ -332,17 +337,12 @@ sub __handle_DETACH_SESSION: PRIVATE {
 
     my $sessid = CTX('session')->data->id;
     ##! 4: "detach session " . $sessid
-
     OpenXPKI::Server::Context::killsession();
-
     Log::Log4perl::MDC->put('sid', undef);
 
-    $self->__change_state({
-        STATE => 'NEW',
-    });
+    $self->__change_state({ STATE => 'NEW' });
 
     return { 'SERVICE_MSG' => 'DETACH' };
-
 }
 
 
@@ -577,6 +577,7 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     ##! 16: 'role: ' . $role
     ##! 16: 'reply: ' . Dumper $reply
     if (defined $user && defined $role) {
+        CTX('log')->system->debug("Successful login from user $user, role $role");
         ##! 4: 'login successful'
         # successful login, save it in the session and mark session as valid
         CTX('session')->data->user($user);
@@ -630,7 +631,7 @@ sub __handle_LOGOUT : PRIVATE {
     my $old_session = CTX('session');
 
     ##! 8: "logout received - terminate session " . $old_session->id,
-    CTX('log')->system()->debug('Terminating session ' . $old_session->id);
+    CTX('log')->system->debug('Terminating session ' . $old_session->id);
 
     OpenXPKI::Server::Context::killsession();
     $self->__change_state({ STATE => 'NEW' });
@@ -727,6 +728,7 @@ sub __handle_COMMAND : PRIVATE {
     ##! 16: 'command class instantiated successfully'
     my $result;
     eval {
+        CTX('log')->system->debug("Executing command ".$data->{PARAMS}->{COMMAND});
         # enclose command with DBI transaction
         CTX('dbi')->start_txn();
         $result = $command->execute();
@@ -889,6 +891,7 @@ sub run
 
         my $is_valid = $self->__is_valid_message({ MESSAGE => $msg });
         if (! $is_valid) {
+            CTX('log')->system->debug("Invalid message received from client: ".($msg->{SERVICE_MSG} // "(empty)"));
             $self->__send_error({
                 ERROR => "I18N_OPENXPKI_SERVICE_DEFAULT_RUN_UNRECOGNIZED_SERVICE_MESSAGE",
             });
@@ -899,6 +902,7 @@ sub run
             if ($state_of{$ident} eq 'MAIN_LOOP' && ! CTX('session')->is_valid) {
                 # check whether we still have a valid session (someone
                 # might have logged out on a different forked server)
+                CTX('log')->system->debug("Can't process client message: session is not valid (login incomplete)");
                 $self->__send_error({
                     ERROR => 'I18N_OPENXPKI_SERVICE_DEFAULT_RUN_SESSION_INVALID',
                 });

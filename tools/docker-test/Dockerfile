@@ -22,7 +22,10 @@ RUN apt-get update && \
         apache2 \
         mysql-server \
         curl \
-        pkg-config && \
+        pkg-config \
+        nano \
+        figlet \
+        && \
     apt-get clean
 
 #
@@ -30,8 +33,11 @@ RUN apt-get update && \
 #
 COPY cpanminus /
 RUN cat /cpanminus | perl - App::cpanminus && rm /cpanminus
+# modules needed by OpenXPKI
 COPY cpanfile /
 RUN cpanm --quiet --notest --installdeps /
+# modules needed in startup.pl
+RUN cpanm --quiet --notest PPI Devel::Cover DateTime File::Slurp
 
 #
 # Setup - locales
@@ -51,8 +57,8 @@ ENV OXI_TEST_DB_MYSQL_NAME=openxpki \
     OXI_TEST_DB_MYSQL_DBPASSWORD="" \
     OXI_TEST_ONLY=""
 
-COPY startup.sh /
-RUN chmod 0755 startup.sh
-ENTRYPOINT ["/startup.sh"]
+COPY startup.pl /
+RUN chmod 0755 startup.pl
+ENTRYPOINT ["/startup.pl"]
 # Defaults for "user+repo" and "branch" to test:
-CMD ["develop", "openxpki/openxpki"]
+#CMD ["develop", "openxpki/openxpki"]

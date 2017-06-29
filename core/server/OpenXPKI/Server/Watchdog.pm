@@ -363,8 +363,9 @@ sub run {
             sleep($sleep);
         }
     }
-    exit;
     ##! 4: 'End of run'
+    $self->{dbi}->disconnect;
+    exit;
 }
 
 =head2 _sig_hup
@@ -710,6 +711,7 @@ sub __wake_up_workflow {
     }
 
     # The child MUST TERMINATE!
+    $self->{dbi}->disconnect;
     exit;
 }
 

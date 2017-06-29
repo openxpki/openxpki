@@ -403,12 +403,14 @@ sub fetch_history {
 }
 
 sub commit_transaction {
+    CTX('log')->workflow->debug("Executing database COMMIT (requested by workflow engine)");
     CTX('dbi')->commit;
     CTX('dbi')->start_txn;
     return;
 }
 
 sub rollback_transaction {
+    CTX('log')->workflow->debug("Executing database ROLLBACK (requested by workflow engine)");
     CTX('dbi')->rollback;
     CTX('dbi')->start_txn;
     return;

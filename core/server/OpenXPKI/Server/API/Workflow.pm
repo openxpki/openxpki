@@ -1236,7 +1236,15 @@ sub __execute_workflow_activity {
     };
 
     if ($run_async) {
+        # close open transactions if run asynchronically
+        if ($EVAL_ERROR) {
+            CTX('dbi')->rollback;
+        }
+        else {
+            CTX('dbi')->commit;
+        }
         ##! 16: 'Backgrounded workflow finished - exit child'
+        CTX('dbi')->disconnect;
         exit;
     }
 
