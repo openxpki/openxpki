@@ -187,10 +187,7 @@ sub _init_transport {
     my $transport = Net::SMTP->new( %smtp );
     # Net::SMTP returns undef if it can not reach the configured socket
     if (!$transport || !ref $transport) {
-        CTX('log')->system()->error(sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}),
-            PRIORITY => "fatal",
-            FACILITY => [ "system", "monitor" ]
-        );
+        CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}));
         return undef;
     }
     $self->is_smtp_open(1);
@@ -266,7 +263,7 @@ sub _init_smime {
         my $pkcs12 = OpenXPKI::FileUtils->read_file( $cfg->{certificate_p12_file} );
         $smime = Crypt::SMIME->new()->setPrivateKeyPkcs12($pkcs12, $cfg->{certificate_key_password});
 
-        CTX('log')->application()->debug("Enable SMIME signer for notification backend (PKCS12)");
+        CTX('log')->system()->debug("Enable SMIME signer for notification backend (PKCS12)");
 
 
     } elsif( $cfg->{certificate_key_file} )  {
@@ -275,7 +272,7 @@ sub _init_smime {
         my $cert = OpenXPKI::FileUtils->read_file( $cfg->{certificate_file} );
         $smime = Crypt::SMIME->new()->setPrivateKey( $key, $cert, $cfg->{certificate_key_password} );
 
-        CTX('log')->application()->debug("Enable SMIME signer for notification backend");
+        CTX('log')->system()->debug("Enable SMIME signer for notification backend");
 
 
     }
@@ -313,7 +310,7 @@ sub notify {
     ##! 16: 'Found handles ' . Dumper @handles
 
     if (!@handles) {
-        CTX('log')->application()->debug("No notifcations to send for $msgconfig");
+        CTX('log')->system()->debug("No notifcations to send for $msgconfig");
 
         return undef;
     }
@@ -405,7 +402,7 @@ sub notify {
         }
 
         if (!$vars{to}) {
-            CTX('log')->application()->warn("Failed sending notification - no receipient");
+            CTX('log')->system()->warn("Failed sending notification - no receipient");
 
             push @failed, $handle;
             next MAIL_HANDLE;
@@ -445,7 +442,7 @@ sub _render_receipient {
 
     if ($mail !~ /^[\w\.-]+\@[\w\.-]+$/) {
         ##! 8: 'This is not an address ' . $mail
-        CTX('log')->application()->warn("Not a mail address: $mail");
+        CTX('log')->system()->warn("Not a mail address: $mail");
 
         return undef;
     }

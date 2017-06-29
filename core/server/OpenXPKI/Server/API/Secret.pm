@@ -74,7 +74,7 @@ sub clear_secret
     my $self = shift;
     my $args = shift;
 
-    CTX('log')->audit('secret')->info("clearing secret",{
+    CTX('log')->audit('system')->info("clearing secret",{
         group => $args->{SECRET},
     });
 

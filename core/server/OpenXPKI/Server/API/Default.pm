@@ -666,7 +666,7 @@ sub import_chain {
     my @chain;
     if (ref $arg_ref->{DATA} eq 'ARRAY') {
         @chain = @{$arg_ref->{DATA}};
-        CTX('log')->debug("Importing chain from array", "system");
+        CTX('log')->system()->debug("Importing chain from array");
     }
     # extract the entity certificate from the pkcs7
     elsif ($arg_ref->{DATA} =~ /-----BEGIN PKCS7-----/) {
@@ -675,13 +675,13 @@ sub import_chain {
             PKCS7       => $arg_ref->{DATA},
         });
         @chain = @{$chainref};
-        CTX('log')->debug("Importing chain from PKCS7", "system");
+        CTX('log')->system()->debug("Importing chain from PKCS7");
 
     }
     # expect PEM block
     else {
         @chain = ($arg_ref->{DATA} =~ m/(-----BEGIN CERTIFICATE-----[^-]+-----END CERTIFICATE-----)/gm);
-        CTX('log')->debug("Importing chain from PEM block", "system");
+        CTX('log')->system()->debug("Importing chain from PEM block");
     }
 
     my @imported;
@@ -705,7 +705,7 @@ sub import_chain {
         );
 
         if ($cert_hash) {
-            CTX('log')->debug("Certificate $cert_identifier already in database, skipping", "system");
+            CTX('log')->system()->debug("Certificate $cert_identifier already in database, skipping");
             delete $cert_hash->{DATA};
             # TODO #legacydb Mapping for compatibility to old DB layer
             push @exist, OpenXPKI::Server::Database::Legacy->certificate_to_legacy($cert_hash);
@@ -719,7 +719,7 @@ sub import_chain {
 
         # Do not import root certs unless specified
         if ($self_signed and !$arg_ref->{IMPORT_ROOT}) {
-            CTX('log')->debug("Certificate $cert_identifier is self-signed, skipping", "system");
+            CTX('log')->system()->debug("Certificate $cert_identifier is self-signed, skipping");
             next;
         }
 
@@ -733,11 +733,11 @@ sub import_chain {
                 FORCE_NOCHAIN => $arg_ref->{FORCE_NOCHAIN},
             });
             push @imported, $db_insert;
-            CTX('log')->info("Certificate $cert_identifier imported with success", "system");
+            CTX('log')->system()->info("Certificate $cert_identifier imported with success");
         };
         if ($EVAL_ERROR) {
             my $ee = $EVAL_ERROR;
-            CTX('log')->error("Certificate $cert_identifier imported failed with $ee", "system");
+            CTX('log')->system()->error("Certificate $cert_identifier imported failed with $ee");
             push @failed, { cert_identifier => $cert_identifier, error => $ee };
         }
 

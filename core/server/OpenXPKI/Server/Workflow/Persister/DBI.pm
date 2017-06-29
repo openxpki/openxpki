@@ -76,8 +76,7 @@ sub update_workflow {
         }
     }
 
-    CTX('log')->debug( "Saved workflow $id", "system" );
-    CTX('log')->debug( "Updated workflow $id", "workflow" );
+    CTX('log')->workflow()->debug( "Updated workflow $id");
 }
 
 sub __update_workflow {
@@ -254,7 +253,7 @@ sub fetch_workflow {
     );
 
     if (not ($result and $result->{workflow_state} and $result->{workflow_last_update}) ) {
-        CTX('log')->warn("Could not retrieve workflow #$id", "workflow");
+        CTX('log')->workflow()->warn("Could not retrieve workflow #$id");
 
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_FETCH_WORKFLOW_NOT_FOUND",
@@ -348,7 +347,7 @@ sub create_history {
         $entry->id($id);
         $entry->set_saved;
 
-        CTX('log')->debug("Created workflow history entry $id", "workflow");
+        CTX('log')->workflow()->debug("Created workflow history entry $id");
     }
 
     return @history;
@@ -396,7 +395,7 @@ sub fetch_history {
         });
         $hist->set_saved();
         push @history, $hist;
-        CTX('log')->debug("Fetched history object '$histid'", "workflow");
+        CTX('log')->workflow()->debug("Fetched history object '$histid'");
     }
 
     return @history;

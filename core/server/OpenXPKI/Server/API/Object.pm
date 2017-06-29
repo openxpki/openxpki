@@ -2462,7 +2462,7 @@ sub __set_data_pool_entry : PRIVATE {
         }
     }
 
-    CTX('log')->debug("Writing data pool entry [$requested_pki_realm:$namespace:$key]", 'system');
+    CTX('log')->system()->debug("Writing data pool entry [$requested_pki_realm:$namespace:$key]");
 
     my $data_values = {
         datapool_value  => $value,

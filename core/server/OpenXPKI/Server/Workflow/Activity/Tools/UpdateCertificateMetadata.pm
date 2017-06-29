@@ -92,11 +92,8 @@ sub execute {
                         where => { attribute_key => $oldval->{id} },
                     );
                     ##! 16: "attr '$key': changed value '".$oldval->{value}."' => '$newval'"
-                    CTX('log')->info(
-                        sprintf ('cert metadata changed, cert %s, attr %s, old value %s, new value %s',
-                           $cert_identifier, $key, $oldval->{value}, $newval),
-                        ['audit','application'],
-                    );
+                    CTX('log')->application()->info(sprintf ('cert metadata changed, cert %s, attr %s, old value %s, new value %s',
+                           $cert_identifier, $key, $oldval->{value}, $newval));
                 }
                 else {
                     $dbi->insert(
@@ -109,11 +106,8 @@ sub execute {
                         }
                     );
                     ##! 16: "attr '$key': added value '$newval'"
-                    CTX('log')->info(
-                        sprintf ('cert metadata added, cert %s, attr %s, value %s',
-                           $cert_identifier, $key, $newval),
-                        ['audit','application'],
-                    );
+                    CTX('log')->application()->info(sprintf ('cert metadata added, cert %s, attr %s, value %s',
+                           $cert_identifier, $key, $newval));
                 }
             }
         }
@@ -125,11 +119,8 @@ sub execute {
                 where => { attribute_key => $item->{id} }
             );
             ##! 16: "attr '$key': deleted value '" . $item->{value} . "'"
-            CTX('log')->info(
-                sprintf ('cert metadata deleted, cert %s, attr %s, value %s',
-                   $cert_identifier, $key, $item->{value}),
-                ['audit','application'],
-            );
+            CTX('log')->application()->info(sprintf ('cert metadata deleted, cert %s, attr %s, value %s',
+                   $cert_identifier, $key, $item->{value}));
         }
     }
     return 1;
