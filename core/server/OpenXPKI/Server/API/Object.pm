@@ -1707,11 +1707,7 @@ sub get_data_pool_entry {
                         NAMESPACE => $namespace,
                         KEY       => $key,
                         SAFE_ID   => $safe_id,
-                    },
-                    log => {
-                        priority => 'error',
-                        facility => 'system',
-                    },
+                    }
                 );
             }
             ##! 16: 'asymmetric decryption via passwordsafe ' . $safe_id
@@ -1734,11 +1730,7 @@ sub get_data_pool_entry {
                             NAMESPACE => $namespace,
                             KEY       => $key,
                             SAFE_ID   => $safe_id,
-                        },
-                        log => {
-                            priority => 'error',
-                            facility => 'system',
-                        },
+                        }
                     );
                 }
 
@@ -1940,10 +1932,6 @@ sub set_data_pool_entry {
     if (!$args->{NAMESPACE} or !$args->{KEY}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_NAMESPACE_AND_KEY_ARE_REQUIRED',
-            log => {
-                priority => 'error',
-                facility => 'system',
-            }
         );
     }
 
@@ -1958,10 +1946,6 @@ sub set_data_pool_entry {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_NAMESPACE',
             params => { NAMESPACE => $args->{NAMESPACE}, },
-            log    => {
-                priority => 'error',
-                facility => 'system',
-            },
         );
 
     }
@@ -2091,10 +2075,6 @@ sub modify_data_pool_entry {
                         NAMESPACE       => $namespace,
                         KEY             => $oldkey,
                         EXPIRATION_DATE => $expiration_date,
-                    },
-                    log => {
-                        priority => 'error',
-                        facility => 'system',
                     },
                 );
             }
@@ -2349,10 +2329,6 @@ sub __set_data_pool_entry : PRIVATE {
                 KEY        => $key,
                 VALUE_TYPE => ref $value,
             },
-            log => {
-                priority => 'error',
-                facility =>  'system',
-            },
         );
     }
 
@@ -2364,10 +2340,6 @@ sub __set_data_pool_entry : PRIVATE {
                 PKI_REALM => $requested_pki_realm,
                 NAMESPACE => $namespace,
                 KEY       => $key,
-            },
-            log => {
-                priority => 'error',
-                facility =>  'system',
             },
         );
     }
@@ -2383,10 +2355,6 @@ sub __set_data_pool_entry : PRIVATE {
                     KEY             => $key,
                     ENCRYPTION_MODE => $encrypt,
                 },
-                log => {
-                    priority => 'error',
-                    facility =>  'system',
-                },
             );
         }
     }
@@ -2399,10 +2367,6 @@ sub __set_data_pool_entry : PRIVATE {
                 NAMESPACE       => $namespace,
                 KEY             => $key,
                 EXPIRATION_DATE => $expiration_date,
-            },
-            log => {
-                priority => 'error',
-                facility =>  'system',
             },
         );
     }
@@ -2443,10 +2407,6 @@ sub __set_data_pool_entry : PRIVATE {
                         NAMESPACE => $namespace,
                         KEY       => $key,
                         SAFE_ID   => $safe_id,
-                    },
-                    log => {
-                        priority => 'error',
-                        facility =>  'system',
                     },
                 );
             }
@@ -2664,10 +2624,6 @@ sub __assert_current_pki_realm_within_workflow : PRIVATE {
         params => {
             REQUESTED_REALM => $requested_pki_realm,
             CURRENT_REALM   => $current_pki_realm,
-        },
-        log => {
-            priority => 'error',
-            facility => 'system',
         },
     );
 }

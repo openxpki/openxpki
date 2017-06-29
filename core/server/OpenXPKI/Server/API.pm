@@ -1767,10 +1767,7 @@ sub AUTOMETHOD {
                     params  => {
                         'EVAL_ERROR' => $EVAL_ERROR,
                     },
-                log => {
-                    priority => 'error',
-                    facility => 'system'
-                });
+                );
             }
         }
 

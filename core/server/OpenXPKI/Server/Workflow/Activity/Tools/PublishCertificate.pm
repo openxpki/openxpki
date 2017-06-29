@@ -43,7 +43,7 @@ sub execute {
     if (defined $prefix) {
         if (!$prefix || !$config->exists( $prefix )) {
             CTX('log')->application()->debug('Publication in prefix mode but prefix not set or empty');
- 
+
             return 1;
         }
 
@@ -97,15 +97,11 @@ sub execute {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE',
             params => { 'CERT_IDENTIFIER' => $cert_identifier },
-            log => {
-                priority => 'error',
-                facility => 'system',
-            },
         );
     }
 
     CTX('log')->application()->debug('Publication for ' . $cert->{subject} . ', targets ' . join(",", @target));
- 
+
 
     # Prepare the data
     my $data = {};
@@ -122,10 +118,6 @@ sub execute {
     if (!defined $data->{der} || $data->{der} eq '') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER',
-            log => {
-                priority => 'error',
-                facility => 'system',
-            },
         );
     }
 
@@ -135,7 +127,7 @@ sub execute {
     # Defined but empty, stop publication
     if (defined($publish_key) && !$publish_key) {
         CTX('log')->application()->info('Dont publish as publish_key is defined but empty for ' .$data->{subject});
- 
+
         return 1;
     }
 
@@ -149,10 +141,6 @@ sub execute {
         if (!$rdn_hash{CN}[0]) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT',
-                log => {
-                    priority => 'error',
-                    facility => 'system',
-                },
             );
         }
         $publish_key = $rdn_hash{CN}[0];
@@ -162,7 +150,7 @@ sub execute {
     ##! 32: 'Data for publication '. Dumper ( $data )
 
     CTX('log')->application()->info('Start publication to '.$publish_key.' for ' .$data->{subject});
- 
+
 
     # Required for special connectors (grabbing extended data from the workflow)
     # TODO: should be replaced by e.g. a static factory
@@ -191,10 +179,10 @@ sub execute {
             if ($on_error eq 'queue') {
                 push @failed, $target;
                 CTX('log')->application()->info("Entity pubication failed for target $target, requeuing");
- 
+
             } elsif ($on_error eq 'skip') {
                 CTX('log')->application()->warn("Entity pubication failed for target $target and skip is set");
- 
+
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
@@ -206,7 +194,7 @@ sub execute {
             }
         } else {
             CTX('log')->application()->debug("Entity pubication to $target for ". $publish_key." done");
- 
+
         }
     }
 

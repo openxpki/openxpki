@@ -112,11 +112,6 @@ sub execute {
         OpenXPKI::Exception->throw(
             message =>
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENERATEPUK_BAD_POLICY',
-            params => {},
-            log    => {
-                priority => 'warn',
-                facility => 'system',
-            },
         );
     }
 

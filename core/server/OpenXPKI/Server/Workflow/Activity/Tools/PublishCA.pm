@@ -67,31 +67,27 @@ sub execute {
     if (!defined $data->{der} || $data->{der} eq '') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CA_COULD_NOT_CONVERT_CERT_TO_DER',
-            log => {
-                priority => 'error',
-                facility => 'system',
-            },
         );
     }
 
     my @target;
     my @prefix = split /\./, $prefix;
-        
+
     # overwrite targets when we are in the wake up loop
     if ( $context->param( 'tmp_publish_queue' ) ) {
         my $queue =  $context->param( 'tmp_publish_queue' );
         ##! 16: 'Load targets from context queue'
         if (!ref $queue) {
-            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue ); 
+            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
         }
         @target = @{$queue};
     } else {
         @target = $config->get_keys( \@prefix );
     }
-    
+
     # If the data point does not exist, we get a one item undef array
     return unless ($target[0]);
-    
+
     my $on_error = $self->param('on_error') || '';
     my @failed;
     ##! 32: 'Targets ' . Dumper \@target
@@ -101,33 +97,33 @@ sub execute {
             if ($on_error eq 'queue') {
                 push @failed, $target;
                 CTX('log')->application()->info("CA pubication failed for target $target, requeuing");
- 
+
             } elsif ($on_error eq 'skip') {
                 CTX('log')->application()->warn("CA pubication failed for target $target and skip is set");
- 
+
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
                     params => {
                         TARGET => $target,
-                        ERROR => $EVAL_ERROR 
+                        ERROR => $EVAL_ERROR
                     }
                 );
             }
         } else {
             CTX('log')->application()->debug("CA pubication to $target for ". $data->{dn}{CN}[0]." done");
- 
+
         }
     }
-  
+
     if (@failed) {
         $context->param( 'tmp_publish_queue' => \@failed );
         $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
         # pause stops execution of the remaining code
     }
-    
+
     $context->param( { 'tmp_publish_queue' => undef });
-    
+
 
     ##! 4: 'end'
     return;
@@ -195,7 +191,7 @@ here is an example connector:
 
 =head2 Activity parameters
 
-=over 
+=over
 
 =item prefix
 
@@ -223,23 +219,23 @@ the queue is not empty, pause/wake_up is used to retry those targets
 with the retry parameters set. This obvioulsy requires I<retry_count>
 to be set.
 
-=back 
+=back
 
-=back 
+=back
 
 =head2 Context parameters
 
-=over 
+=over
 
 =item ca_alias
 
 The alias name of the CA
- 
+
 =item tmp_publish_queue
 
 Used to temporary store unpublished targets when on_error is set.
 
 =back
-     
-                
+
+
 

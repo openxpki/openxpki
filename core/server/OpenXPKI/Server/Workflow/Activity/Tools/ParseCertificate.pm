@@ -54,10 +54,6 @@ sub execute {
                 params => {
                     ATTRIBUTE => $key,
                 },
-                log => {
-                    priority => 'error',
-                    facility => 'system',
-                },
             );
         }
         my $value = $x509_parsed->{BODY}->{$key};
@@ -68,10 +64,6 @@ sub execute {
                 params => {
                     ATTRIBUTE => $key,
                     TYPE      => ref $value,
-                },
-                log => {
-                    priority => 'error',
-                    facility => 'system',
                 },
             );
         }

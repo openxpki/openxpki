@@ -11,7 +11,7 @@ OpenXPKI::Server::Notification::SMTP - Notification via SMTP
 =head1 Description
 
 Base class for all notifications handlers.
- 
+
 =cut
 
 package OpenXPKI::Server::Notification::Base;
@@ -35,7 +35,7 @@ use Moose;
 # The path-string for calling the connector
 has 'config' => (
     is  => 'rw',
-    isa => 'Str', 
+    isa => 'Str',
 );
 
 has 'failed' => (
@@ -52,20 +52,16 @@ must be implemented in the parent class, expects
 the name of the message and a hashref to the template vars.
 TOKEN is optional and exchanges persisted information for this
 handler with the workflow.
-If the method returns a non-empty value, it is persisted back 
+If the method returns a non-empty value, it is persisted back
 into the workflow.
 
 =cut
 sub notify {
-    
+
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_BASE_NOTIFY_UNIMPLEMENTED',
-        log => {
-            priority => 'error',
-            facility => 'system',
-        },        
     );
-    
+
 }
 
 =head2 _render_template_file( FILENAME, VARS )
@@ -76,32 +72,32 @@ returns the template with vars inserted as string.
 
 =cut
 sub _render_template_file {
-        
+
     ##! 4: 'start'
     my $self = shift;
     my $filename = shift;
     my $vars = shift;
-    
+
     ##! 16: 'Load template: ' . $filename
     if (! -e $filename  ) {
         CTX('log')->system()->warn("Template file missing $filename  ");
- 
+
         return undef;
     }
-    
+
     my $template = OpenXPKI::FileUtils->read_file( $filename );
     # Parse using TT
     my $output;
-    
-    my $tt = OpenXPKI::Template->new();    
+
+    my $tt = OpenXPKI::Template->new();
     if (!$tt->process(\$template, $vars, \$output)) {
         CTX('log')->system()->error("Error parsing templatefile ($filename): " . $tt->error());
- 
-        return; 
+
+        return;
     }
-    
+
     return $output;
-    
+
 }
 
 =head2 _render_template ( TEMPLATE, VARS )
@@ -112,24 +108,24 @@ returns the template with vars inserted as string.
 
 =cut
 sub _render_template {
-        
+
     ##! 4: 'start'
     my $self = shift;
     my $template = shift;
     my $vars = shift;
-    
+
     # Parse using TT
     my $output;
-    
-    my $tt = OpenXPKI::Template->new();        
+
+    my $tt = OpenXPKI::Template->new();
     if (!$tt->process(\$template, $vars, \$output)) {
         CTX('log')->system()->error("Error parsing template ($template): " . $tt->error());
- 
-        return; 
+
+        return;
     }
-    
+
     return $output;
-    
+
 }
 
 
@@ -137,4 +133,3 @@ sub _render_template {
 
 __END__
 
- 

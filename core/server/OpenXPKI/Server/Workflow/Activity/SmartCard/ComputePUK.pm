@@ -30,10 +30,6 @@ sub execute {
         message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_COMPUTEPUK_TOKEN_NOT_SUPPORTED',
             params  => {
             TOKEN_ID => $token_id,
-            },
-        log => {
-            priority => 'error',
-            facility =>  'system',
         },
         );
     }
@@ -61,10 +57,6 @@ sub execute {
             CHIP_ID => $chip_id,
             LOT_ID => $lot_id,
             },
-        log => {
-            priority => 'error',
-            facility =>  'system',
-        },
         );
     }
 

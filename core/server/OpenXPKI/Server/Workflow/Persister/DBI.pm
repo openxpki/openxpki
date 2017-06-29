@@ -25,11 +25,7 @@ my $parser = DateTime::Format::Strptime->new(
     pattern  => '%Y-%m-%d %H:%M:%S',
     on_error => sub { OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_SERVER_WORKFLOW_PERSISTER_DBI_PARSE_DATE_ERROR",
-        log => {
-            priority => 'error',
-            facility => 'system',
-        }
-    ) },
+    )},
 );
 
 sub init {
