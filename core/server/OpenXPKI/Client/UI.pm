@@ -273,7 +273,14 @@ sub __get_action {
     if ($cgi->param('action')) {
         if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {
             return $cgi->param('action');
+
+        # required to make the login page work when the session expires, #552
+        } elsif( !$rtoken_session and ($cgi->param('action') =~ /^login\!/ )) {
+
+            $self->logger()->debug("Login with expired session - ignoring rtoken");
+            return $cgi->param('action');
         } else {
+
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
             $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID')});
         }
