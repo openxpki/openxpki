@@ -1,0 +1,5 @@
+name: run_in_background
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL
+description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_DESC
+type: bool
+required: 0

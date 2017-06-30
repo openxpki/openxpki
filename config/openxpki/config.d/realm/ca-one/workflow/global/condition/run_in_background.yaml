@@ -1,0 +1,3 @@
+class: Workflow::Condition::Evaluate
+param:
+   test:  $context->{run_in_background}
