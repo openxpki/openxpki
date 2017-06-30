@@ -192,7 +192,7 @@ if ($mode eq "coverage") {
 #
 if (scalar @tests_unit) {
     print "\n====[ Testing: unit tests ]====\n";
-    execute show => "prove -b -r -q $_", 1 for @tests_unit;
+    execute show => "prove -b -r -q $_" for @tests_unit;
 }
 
 exit unless scalar @tests_qa;
@@ -237,4 +237,4 @@ execute show => "/usr/local/bin/openxpkictl start";
 print "\n====[ Testing: QA tests ]====\n";
 chdir "$clone_dir/qatest";
 my @t = map { $_ =~ s/ ^ qatest\/ //x; $_ } @tests_qa;
-execute show => "prove -l -r -q $_", 1 for @t;
+execute show => "prove -l -r -q $_" for @t;
