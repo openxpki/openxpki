@@ -116,6 +116,11 @@ sub __process_workflow {
 
     my @states = $conn->get_keys( ['workflow', 'def', $wf_name, 'state' ] );
 
+    # The FAILURE state is required for the autofail feature
+    if (!grep /FAILURE/, @states) {
+        push @states, 'FAILURE';
+    }
+
     foreach my $state_name (@states) {
 
         # We are not interessted in eye candy, just the logic
@@ -132,11 +137,11 @@ sub __process_workflow {
                 ($action_item =~ m{ \A (global_)?([\w\s]+\w)\s*>\s*(\w+)(\s*\?\s*([!\w\s]+))? }xs);
 
             # Support for internal chaining of actions, sep. by space
-            my @inline_action = split /\s+/, $action_name;            
+            my @inline_action = split /\s+/, $action_name;
             $action_name = shift @inline_action;
-                
+
             CTX('log')->workflow()->debug("Adding action: $action_name -> $next_state");
- 
+
 
             my $prefix;
             # As actions share a global namespace, we add a prefix to their names
@@ -174,21 +179,21 @@ sub __process_workflow {
 
                 }
             }
-            
+
             # TODO - this is experimental!
             if (scalar @inline_action) {
-                
+
                 CTX('log')->workflow()->debug("Auto append inline actions: " . join (" > ", @inline_action));
- 
-                                
+
+
                 my $generator_name = uc($state_name.'_'.$item->{name}).'_%01d';
                 my $generator_index = 0;
-                                
+
                 # point the first action to the first auto generated state
                 $item->{resulting_state} = sprintf($generator_name, $generator_index);
-                
+
                 while (my $auto_action = shift @inline_action) {
-                    
+
                     if ($auto_action !~ /^global_/) {
                         $auto_action = $wf_prefix.'_'.$auto_action;
                     }
@@ -196,16 +201,16 @@ sub __process_workflow {
                     push @{$workflow->{state}}, {
                         name => sprintf($generator_name, $generator_index++),
                         autorun => 'yes',
-                        action => [{ 
+                        action => [{
                             name => $auto_action,
                             resulting_state => (scalar @inline_action ? sprintf($generator_name, $generator_index) : $next_state),
                         }]
-                    };                   
+                    };
                 }
             }
-                        
+
             push @actions, $item;
-            
+
         } # end actions
 
         my $state = {
@@ -227,7 +232,7 @@ sub __process_workflow {
     push @{$self->_workflow_config()->{workflow}}, $workflow;
 
     CTX('log')->workflow()->info("Adding workflow: $wf_name");
- 
+
 
     return $workflow;
 
@@ -252,7 +257,7 @@ sub __process_action {
     my @path = @{$path};
 
     CTX('log')->workflow()->debug("Adding action definition: " . join (".", @path));
- 
+
 
     my $wf_name;
     # check if its a global or workflow path to determine prefix
@@ -303,7 +308,7 @@ sub __process_action {
         my $is_required = (defined $required && $required =~ m/(yes|1)/i);
 
         CTX('log')->workflow()->debug("Adding field $field_name / $context_key");
- 
+
 
         # Push to the field list for the action
         push @fields, { name => $context_key, is_required => $is_required ? 'yes' : 'no' };
@@ -337,7 +342,7 @@ sub __process_action {
         ##! 16: 'Validator arguments ' . Dumper @extra_args
 
         CTX('log')->workflow()->debug("Adding validator $valid_name with args " . (join", ", @extra_args));
- 
+
 
         # Push to the field list for the action
         push @validators, { name => $valid_name,  arg => \@extra_args };
@@ -356,7 +361,7 @@ sub __process_action {
     map {  $action->{$_} = $param->{$_} } keys %{$param};
 
     CTX('log')->workflow()->debug("Adding action " . (Dumper $action));
- 
+
 
     push @{$self->_workflow_config()->{action}}, $action;
 
@@ -382,7 +387,7 @@ sub __process_condition {
     my @path = @{$path};
 
     CTX('log')->workflow()->debug("Adding condition " . join(".", @path));
- 
+
 
     my $wf_name;
     # check if its a global or workflow path to determine prefix
@@ -413,7 +418,7 @@ sub __process_condition {
     }
 
     CTX('log')->workflow()->debug("Adding condition " . (Dumper $condition));
- 
+
 
     push @{$self->_workflow_config()->{condition}}, $condition;
 
@@ -440,7 +445,7 @@ sub __process_validator {
     my @path = @{$path};
 
     CTX('log')->workflow()->debug("Adding validator " . join(".", @path));
- 
+
 
     my $wf_name;
     # check if its a global or workflow path to determine prefix
@@ -471,7 +476,7 @@ sub __process_validator {
     }
 
     CTX('log')->workflow()->debug("Adding validator " . (Dumper $validator));
- 
+
 
     push @{$self->_workflow_config()->{validator}}, $validator;
 
