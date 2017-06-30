@@ -1159,7 +1159,7 @@ sub __execute_workflow_activity {
     # fork if async is requested
     if ($run_async) {
 
-        CTX('log')->workflow()->warn(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
+        CTX('log')->workflow()->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
                 $workflow->state(), $workflow->id(), $workflow->type()));
 
 
@@ -1193,6 +1193,18 @@ sub __execute_workflow_activity {
 
         # Re-seed Perl random number generator
         srand(time ^ $PROCESS_ID);
+
+        # create memory-only session for workflow if its not already
+
+        if (CTX('session')->type ne 'Memory') {
+            my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
+            $session->data->user      = CTX('session')->data->user;
+            $session->data->role      = CTX('session')->data->role;
+            $session->data->pki_realm = CTX('session')->data->pki_realm;
+
+            OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+            Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+        }
 
         # append fork info to process name
         OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
