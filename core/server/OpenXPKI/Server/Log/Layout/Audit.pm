@@ -18,7 +18,7 @@ sub render {
         $message = $message->[0];
         if ($param) {
             my @keys = sort keys %{$param};
-            $message .= '|'. join("|", map { $_.'='.$param->{$_} } @keys);
+            $message .= '|'. join("|", map { $_.'='.($param->{$_} // 'undef') } @keys);
         }
     }
 
