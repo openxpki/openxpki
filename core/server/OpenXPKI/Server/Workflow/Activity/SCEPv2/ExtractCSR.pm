@@ -318,10 +318,10 @@ sub execute {
             PKCS7   => $pkcs7,
         });
     };
-    if ($EVAL_ERROR) {
-        ##! 4: 'signature invalid: ' . $EVAL_ERROR
+    if (my $eval_err = $EVAL_ERROR) {
+        ##! 4: 'signature invalid: ' . $eval_err
         CTX('log')->application()->warn("Invalid SCEP signature; CSR subject: " . $context->param('cert_subject'));
-        CTX('log')->application()->debug("SCEP signature failed, reason $EVAL_ERROR");
+        CTX('log')->application()->debug("SCEP signature failed, reason $eval_err");
 
         $context->param('signer_signature_valid' => 0);
     } else {

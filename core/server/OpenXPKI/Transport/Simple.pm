@@ -249,18 +249,16 @@ sub __receive
         eval {
             $length = CORE::read STDIN, $msg, $length;
         };
-        if ($EVAL_ERROR) {
-	    if ($EVAL_ERROR eq "alarm\n") {
-		# our caller may have set an alarm signal handler, if we
-		# die here, simply propagate this exception
-		die $EVAL_ERROR;
-	    }
+        if (my $eval_err = $EVAL_ERROR) {
+    	    if ($eval_err eq "alarm\n") {
+        		# our caller may have set an alarm signal handler, if we
+        		# die here, simply propagate this exception
+        		die $eval_err;
+    	    }
             ##! 16: 'EVAL_ERROR!'
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED',
-                params  => {
-                    'EVAL_ERROR' => $EVAL_ERROR,
-                },
+                params  => { EVAL_ERROR => $eval_err },
             );
         }
         ##! 8: "read $length bytes - $msg"

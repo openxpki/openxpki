@@ -125,9 +125,9 @@ sub handle_server_personalization {
         eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
-        if ($EVAL_ERROR) {
+        if (my $eval_err = $EVAL_ERROR) {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_CREATE_PERSONALIZATION_WORKFLOW");
-            $log->error(sprintf('Unable to create workflow for card %s. EE: %s', $cardData->{'id_cardID'}, $EVAL_ERROR));
+            $log->error(sprintf('Unable to create workflow for card %s. EE: %s', $cardData->{'id_cardID'}, $eval_err));
             return 1;
         }
 

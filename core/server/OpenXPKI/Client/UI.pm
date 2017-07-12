@@ -88,7 +88,7 @@ sub _init_backend {
             $self->logger()->debug('First session reinit with id ' . ($backend_id || 'init'));
             $client->init_session({ SESSION_ID => $backend_id });
         };
-        if ($EVAL_ERROR) {
+        if (my $eval_err = $EVAL_ERROR) {
             my $exc = OpenXPKI::Exception->caught();
             if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
                 $self->logger()->info('Backend session was gone - start a new one');
@@ -97,8 +97,8 @@ sub _init_backend {
                 $client->init_session({ SESSION_ID => undef });
                 $self->_status({ level => 'warn', i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
             } else {
-                $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
-                $self->logger()->trace($EVAL_ERROR);
+                $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
+                $self->logger()->trace($eval_err);
                 die "Backend communication problem";
             }
         }
