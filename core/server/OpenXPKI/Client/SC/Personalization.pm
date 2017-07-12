@@ -188,10 +188,11 @@ sub handle_server_personalization {
                 'login_ids' => $self->serializer()->serialize( [ $user ] )
             }
         };
-        
-        $log->debug('Execute select_useraccount with params ' . Dumper $params );
-        
-        eval {    
+
+        $log->debug('Execute select_useraccount');
+        $log->trace('Parameters: ' . Dumper $params );
+
+        eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
         if ($EVAL_ERROR) {

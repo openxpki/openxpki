@@ -18,7 +18,7 @@ my $log = $main::config->logger();
 
 $log->info("SOAP interface NG initialized ");
 
-#$log->debug('Env ' . Dumper \%ENV);
+#$log->trace('Env ' . Dumper \%ENV);
 
 # Adjust path to binary!
 sub RevokeSmartcard {
@@ -98,14 +98,14 @@ sub RevokeSmartcard {
             signer_cert => $auth_pem
         );
 
-        $log->debug( "WF parameters: " . Dumper \%param );
+        $log->trace( "WF parameters: " . Dumper \%param );
 
         $workflow = $client->handle_workflow({
             TYPE => $workflow_type,
             PARAMS => \%param
         });
 
-        $log->debug( 'Workflow info '  . Dumper $workflow );
+        $log->trace( 'Workflow info '  . Dumper $workflow );
     };
 
     if ( my $exc = OpenXPKI::Exception->caught() ) {

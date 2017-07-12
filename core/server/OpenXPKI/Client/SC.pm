@@ -29,7 +29,7 @@ sub handle_request {
     }
 
     my $log = $self->logger();
-    $log->debug("Loading handler class $class, method $method, extra params " . Dumper \%extra );
+    $log->trace("Loading handler class $class, method $method, extra params " . Dumper \%extra );
 
     $class = 'OpenXPKI::Client::SC::'.ucfirst($class);
     $method = 'handle_' . $method;

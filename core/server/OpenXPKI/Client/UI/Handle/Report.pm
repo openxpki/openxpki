@@ -12,13 +12,13 @@ sub render_report_list {
 
     my $wf_info = $args->{WF_INFO}->{WORKFLOW};
 
-    $self->logger()->debug( 'render_report_list: ' . Dumper $wf_info );
+    $self->logger()->trace( 'render_report_list: ' . Dumper $wf_info );
 
     $self->_page({
         label => $wf_info->{label},
         description => $wf_info->{description},
     });
-    
+
     my @data = @{$wf_info->{CONTEXT}->{report_list}};
     my @source;
     my $i=0;
