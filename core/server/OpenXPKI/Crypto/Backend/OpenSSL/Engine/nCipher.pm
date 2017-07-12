@@ -197,10 +197,10 @@ sub key_usable {
     ##! 32: 'worldinfo ' . Dumper $worldinfo
 
     # handle exceptions
-    if ($EVAL_ERROR) {
+    if (my $eval_err = $EVAL_ERROR) {
         alarm 0;
-        if ($EVAL_ERROR ne "alarm\n") {
-            CTX('log')->system()->error('nCipher key_usable failed with ' . $EVAL_ERROR);
+        if ($eval_err ne "alarm\n") {
+            CTX('log')->system()->error('nCipher key_usable failed with ' . $eval_err);
 
             return 0;
         }
@@ -370,22 +370,18 @@ sub online {
     };
 
     # handle exceptions
-    if ($EVAL_ERROR) {
+    if (my $eval_err = $EVAL_ERROR) {
         alarm 0;
-    if ($EVAL_ERROR ne "alarm\n") {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
-        params  => {
-            EVAL_ERROR => $EVAL_ERROR,
-        },
-        );
-    }
+        if ($eval_err ne "alarm\n") {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
+                params  => { EVAL_ERROR => $eval_err },
+            );
+        }
 
         ##! 4: "nCipher enquiry did not terminate within timeout and was interrupted administratively"
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_TIMEOUT",
-        params  => {
-        },
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_TIMEOUT",
         );
     }
 
@@ -486,21 +482,17 @@ sub __getKeyHash {
     alarm 0;
     };
     # handle exceptions
-    if ($EVAL_ERROR) {
+    if (my $eval_err = $EVAL_ERROR) {
         alarm 0;
-    if ($EVAL_ERROR ne "alarm\n") {
+        if ($eval_err ne "alarm\n") {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
+                params  => { EVAL_ERROR => $eval_err },
+            );
+        }
+        ##! 2: "nCipher nfkmverify did not terminate within timeout and was interrupted administratively"
         OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_UNEXPECTED_EXCEPTION",
-        params  => {
-            EVAL_ERROR => $EVAL_ERROR,
-        },
-        );
-    }
-    ##! 2: "nCipher nfkmverify did not terminate within timeout and was interrupted administratively"
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_TIMEOUT",
-        params  => {
-        },
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_TIMEOUT",
         );
     }
 

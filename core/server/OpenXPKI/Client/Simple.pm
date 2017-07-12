@@ -326,15 +326,15 @@ sub __reinit_session {
     eval {
         $client->init_session({ SESSION_ID => $old_session });
     };
-    if ($EVAL_ERROR) {
+    if (my $eval_err = $EVAL_ERROR) {
         my $exc = OpenXPKI::Exception->caught();
         if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
             # The session has gone - start a new one - might happen if the client was idle too long
             $client->init_session({ SESSION_ID => undef });
             $self->logger()->info('Backend session was gone - start a new one');
         } else {
-            $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
-            $self->logger()->trace($EVAL_ERROR);
+            $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
+            $self->logger()->trace($eval_err);
             die "Backend communication problem";
         }
     }

@@ -103,10 +103,9 @@ sub execute {
 			);
 		}
     };
-	if ($EVAL_ERROR) {
+	if (my $eval_err = $EVAL_ERROR) {
 		# possibly a temporary network error, pause and try again
-		my $ee = $EVAL_ERROR;
-		##! 16: 'Eval said ' . $ee
+		##! 16: 'Eval said ' . $eval_err
 		CTX('log')->application()->info('Transfer failed, do pause' );
 
 		$self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');

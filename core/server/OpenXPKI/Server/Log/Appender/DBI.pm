@@ -117,11 +117,11 @@ sub log {
                 },
             );
         };
-        if ($EVAL_ERROR) {
+        if (my $eval_err = $EVAL_ERROR) {
             $occupied = 0;
             # do NOT catch DBI errors here as we want to fail if audit
             # is not working
-            die $EVAL_ERROR;
+            die $eval_err;
         }
     } else {
         # Prevent exceptions in the DB layer from bubbling up and probably

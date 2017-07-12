@@ -36,10 +36,10 @@ sub execute
             PKCS7   => $pkcs7,
         });
     };
-    if ($EVAL_ERROR) {
-        ##! 4: 'signature invalid: ' . $EVAL_ERROR
+    if (my $eval_err = $EVAL_ERROR) {
+        ##! 4: 'signature invalid: ' . $eval_err
         CTX('log')->application()->warn("Invalid PKCS7 signature");
-        CTX('log')->application()->debug("PKCS7 signature verification failed, reason $EVAL_ERROR");
+        CTX('log')->application()->debug("PKCS7 signature verification failed, reason $eval_err");
 
     } else {
         CTX('log')->application()->info("PKC7 signature verified");

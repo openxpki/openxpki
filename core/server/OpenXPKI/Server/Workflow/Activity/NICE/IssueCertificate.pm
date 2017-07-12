@@ -59,13 +59,12 @@ sub execute {
         $set_context = $nice_backend->issueCertificate( OpenXPKI::Server::Database::Legacy->csr_to_legacy($csr) );
     };
 
-    if ($EVAL_ERROR) {
-        my $ee = $EVAL_ERROR;
+    if (my $eval_err = $EVAL_ERROR) {
         # Catch exception as "pause" if configured
         if ($self->param('pause_on_error')) {
             CTX('log')->application()->warn("NICE issueCertificate failed but pause_on_error is requested ");
 
-            CTX('log')->application()->error("Original error: " . $ee);
+            CTX('log')->application()->error("Original error: " . $eval_err);
 
             $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
         }
@@ -73,7 +72,7 @@ sub execute {
         if (my $exc = OpenXPKI::Exception->caught()) {
             $exc->rethrow();
         } else {
-            OpenXPKI::Exception->throw( message => $ee  );
+            OpenXPKI::Exception->throw( message => $eval_err  );
         }
     }
 

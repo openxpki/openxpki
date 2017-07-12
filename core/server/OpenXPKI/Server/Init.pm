@@ -121,16 +121,15 @@ sub init {
             print "Exception during initialization task '$task': " . $msg;
             $exc->rethrow();
         }
-        elsif ($EVAL_ERROR)
+        elsif (my $eval_err = $EVAL_ERROR)
         {
-            my $error = $EVAL_ERROR;
-            log_wrapper("Eval error during initialization task '$task': " . $error, "fatal");
+            log_wrapper("Eval error during initialization task '$task': " . $eval_err, "fatal");
 
             OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
             params  => {
                 task => $task,
-                EVAL_ERROR => $error,
+                EVAL_ERROR => $eval_err,
             });
         }
 
