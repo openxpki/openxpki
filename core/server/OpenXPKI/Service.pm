@@ -104,17 +104,18 @@ sub collect {
         );
         alarm 0;
     };
-    if ($EVAL_ERROR) {
+    if (my $error = $EVAL_ERROR) {
         alarm 0;
+        ##! 1: "ERROR: " . Dumper($error)
         $self->set_communication_state('can_send');
-        if ($EVAL_ERROR eq "alarm\n") {
+        if ($error eq "alarm\n") {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT",
                 log => undef, # do not log this exception
             );
         }
         # FIXME
-        die $EVAL_ERROR;
+        die $error;
     }
     $self->set_communication_state('can_send');
     ##! 128: 'collect: ' . Dumper $result
