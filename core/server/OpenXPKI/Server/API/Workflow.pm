@@ -1198,9 +1198,9 @@ sub __execute_workflow_activity {
 
         if (CTX('session')->type ne 'Memory') {
             my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
-            $session->data->user      = CTX('session')->data->user;
-            $session->data->role      = CTX('session')->data->role;
-            $session->data->pki_realm = CTX('session')->data->pki_realm;
+            $session->data->user( CTX('session')->data->user );
+            $session->data->role( CTX('session')->data->role );
+            $session->data->pki_realm( CTX('session')->data->pki_realm );
 
             OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
             Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
