@@ -738,8 +738,7 @@ sub __handle_COMMAND : PRIVATE {
         CTX('dbi')->commit();
     };
 
-    if ($EVAL_ERROR) {
-
+    if (my $error = $EVAL_ERROR) {
         # rollback DBI (should not matter as we throw exception anyway)
         CTX('dbi')->rollback();
 
@@ -752,9 +751,7 @@ sub __handle_COMMAND : PRIVATE {
         ##! 16: "Exception caught during command execution"
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR',
-            params => {
-                ERROR => $EVAL_ERROR,
-            },
+            params => { ERROR => $error },
         );
     }
 
