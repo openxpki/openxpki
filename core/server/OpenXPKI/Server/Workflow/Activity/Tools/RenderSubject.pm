@@ -60,9 +60,7 @@ sub execute {
 
 
     ##! 16: 'Cleaned subject_vars' . Dumper $subject_vars
-
-    CTX('log')->application()->debug("Subject render input vars " . Dumper $subject_vars);
-
+    CTX('log')->application()->trace("Subject render input vars " . Dumper $subject_vars);
 
     my $cert_subject = CTX('api')->render_subject_from_template({
         PROFILE => $profile,

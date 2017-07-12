@@ -47,9 +47,9 @@ sub handle_get_server_status {
     if ($result->{get_server_status} ne 'OK') {
         $self->logger()->warn( "Server Status is : " . $result->{get_server_status} );
     }
-     
-    $self->logger()->debug( "Server Status " . Dumper $result );
-           
+
+    $self->logger()->trace( "Server Status " . Dumper $result );
+
     $self->_result($result);
 
     return 0;
@@ -100,9 +100,9 @@ sub handle_get_card_status {
     $log->info('Request for card status for cardID ' .  $cardData->{'cardID'} );
 
     my $p = $self->param();
-    $log->debug('Request params ' . Dumper $p );
-    
-    # Load the certificates from the request 
+    $log->trace('Request params ' . Dumper $p );
+
+    # Load the certificates from the request
     my @certs;
 
     my $wf_type_unblock = $config->{workflow}->{pinunblock};
@@ -151,7 +151,8 @@ sub handle_get_card_status {
 
     my @workflows;
 
-    $log->debug( 'sc_analyse reply ' . Dumper $reply );
+    $log->trace( 'sc_analyse reply ' . Dumper $reply );
+
 
 
     if ( scalar @{$reply->{WORKFLOWS}->{ $wf_type_unblock }} ) {
@@ -186,7 +187,7 @@ sub handle_get_card_status {
 
         my $wf_info = $self->_client()->handle_workflow({ 'ID' => $newentry{'WORKFLOW_SERIAL'} });
 
-        $log->debug( 'user workflow ' . Dumper $wf_info );
+        $log->trace( 'user workflow ' . Dumper $wf_info );
 
         if ($wf_info->{'TYPE'} eq $wf_type_unblock) {
             $newentry{'auth1_ldap_mail'} = $wf_info->{CONTEXT}->{auth1_mail};
@@ -196,7 +197,7 @@ sub handle_get_card_status {
             $newentry{'TOKEN_ID'} = $wf_info->{CONTEXT}->{token_id};
         }
 
-        $log->debug( 'Workflow Item after process ' . Dumper \%newentry ); 
+        $log->trace( 'Workflow Item after process ' . Dumper \%newentry );
         push @mangled_workflows, \%newentry;
     }
 

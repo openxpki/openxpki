@@ -45,7 +45,7 @@ sub store {
         SESSION_DATA => $datastr,
     });
 
-    $self->logger()->debug('Session store result ' . Dumper $res);
+    $self->logger()->trace('Session store result ' . Dumper $res);
 
 }
 
@@ -54,7 +54,7 @@ sub retrieve {
     my ($self, $sid) = @_;
 
     my $res = $self->backend()->send_receive_service_msg('FRONTEND_SESSION');
-    $self->logger()->debug('Session retrieve ' . Dumper $res);
+    $self->logger()->trace('Session retrieve ' . Dumper $res);
     return $res->{SESSION_DATA} || '';
 
 

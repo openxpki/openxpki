@@ -360,7 +360,7 @@ sub __process_action {
     my $param = $conn->get_hash([ @path, 'param' ] );
     map {  $action->{$_} = $param->{$_} } keys %{$param};
 
-    CTX('log')->workflow()->debug("Adding action " . (Dumper $action));
+    CTX('log')->workflow()->trace("Adding action " . (Dumper $action));
 
 
     push @{$self->_workflow_config()->{action}}, $action;
@@ -417,7 +417,7 @@ sub __process_condition {
         $condition->{param} = \@param;
     }
 
-    CTX('log')->workflow()->debug("Adding condition " . (Dumper $condition));
+    CTX('log')->workflow()->trace("Adding condition " . (Dumper $condition));
 
 
     push @{$self->_workflow_config()->{condition}}, $condition;
@@ -475,7 +475,7 @@ sub __process_validator {
         $validator->{param} = \@param;
     }
 
-    CTX('log')->workflow()->debug("Adding validator " . (Dumper $validator));
+    CTX('log')->workflow()->trace("Adding validator " . (Dumper $validator));
 
 
     push @{$self->_workflow_config()->{validator}}, $validator;
