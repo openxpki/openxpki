@@ -276,7 +276,7 @@ sub __handle_FRONTEND_SESSION {
     my $ident   = ident $self;
     my $msg     = shift;
 
-    ##! 1: 'Frontend Data ' . Dumper $msg
+    ##! 16: 'Frontend Data ' . Dumper $msg
 
     if (!OpenXPKI::Server::Context::hascontext('session')) {
         OpenXPKI::Exception->throw(
