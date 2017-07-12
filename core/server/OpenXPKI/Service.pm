@@ -82,6 +82,8 @@ sub collect {
     }
 
     my $communication_state = $self->get_communication_state();
+    ##! 2: "communication state: $communication_state"
+
     # this may be undefined in the first invocation, accept it this way
     if (defined $communication_state && ($communication_state ne 'can_receive')) {
         OpenXPKI::Exception->throw(
@@ -92,8 +94,11 @@ sub collect {
 
     my $result;
     eval {
+        ##! 32: "setting signal handler ALRM"
         my $h = set_sig_handler('ALRM', sub { die "alarm\n"; });
+        ##! 32: "scheduling SIGALRM in $read_timeout{$ident} seconds" if defined $read_timeout{$ident};
         alarm $read_timeout{$ident} if defined $read_timeout{$ident};
+        ##! 2: "reading data from " . ref $transport{$ident}
         $result = $serialization{$ident}->deserialize(
             $transport{$ident}->read()
         );
