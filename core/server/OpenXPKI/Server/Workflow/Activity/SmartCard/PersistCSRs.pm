@@ -108,7 +108,7 @@ sub execute {
         }
 
         CTX('log')->application()->info("SmartCard persisted csrs serials " .join(", ",@csr_serials));
- 
+
     }
 
     return;

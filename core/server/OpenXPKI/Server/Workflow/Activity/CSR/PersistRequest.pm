@@ -84,7 +84,7 @@ sub execute
         'subject'    => $subject,
     });
 
-    
+
     my $san_serialized = $context->param('cert_subject_alt_name');
     if ($san_serialized) {
         my $subj_alt_names = $serializer->deserialize($san_serialized);
@@ -124,7 +124,7 @@ sub execute
         if (defined $context->param($validity_param)) {
             my $source = $source_ref->{$validity_param};
             my $val = $context->param($validity_param);
-            ##! 16: $validity_param . ' ' .$val  
+            ##! 16: $validity_param . ' ' .$val
             $dbi->insert(
                 into => 'csr_attributes',
                 values  => {
@@ -139,7 +139,7 @@ sub execute
         }
     }
 
-    # x509 extensions - array of extension items 
+    # x509 extensions - array of extension items
     my $cert_ext = $context->param('cert_extension');
     if ($cert_ext) {
         foreach my $ext (@{$serializer->deserialize($cert_ext)}) {
@@ -165,14 +165,14 @@ sub execute
         ##! 16: 'additional certificate information: ' . Dumper $cert_info
 
         foreach my $custom_key (keys %{$cert_info}) {
-        
+
             # We can have array/hash values from the input, need serialize
             my $value = $cert_info->{$custom_key};
             if (ref $value) {
                 ##! 32: 'Serializing non scalar item for key ' . $custom_key
                 $value= $serializer->serialize( $value );
             }
-    
+
             $dbi->insert(
                 into => 'csr_attributes',
                 values => {
@@ -190,7 +190,7 @@ sub execute
     $context->param('csr_serial' => $csr_serial);
 
     CTX('log')->application()->info("persisted csr for $subject with csr_serial $csr_serial");
- 
+
 }
 
 1;

@@ -155,7 +155,7 @@ sub get_safe_tmpfile
     my $template = File::Spec->catfile($keys->{TMP}, "openxpki${PID}XXXXXXXX");
 
     ##! 2: "build tmp file"
-    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );          
+    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );
     if (! $fh) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_GET_SAFE_TMPFILE_MAKE_FAILED"

@@ -33,7 +33,7 @@ sub execute {
     # Get the profile name and style
     my $profile = $self->param('cert_profile');
     $profile = $context->param('cert_profile') unless($profile);
-    
+
     my $style = $self->param('cert_subject_style');
     $style = $context->param('cert_subject_style') unless($style);
 
@@ -49,20 +49,20 @@ sub execute {
 
     # Render the DN - get the input data from the context
     my $subject_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
-    
+
     ##! 16: 'Deserialized cert_subject_parts ' . Dumper $subject_vars
-    
-    # TODO - this does not work! Will fail with non-scalar items and 
+
+    # TODO - this does not work! Will fail with non-scalar items and
     # crashes the search_cert method used in csr workflow!
-    map { 
-        $subject_vars->{$_} =~ s{,}{\\,}xmsg if ($subject_vars->{$_} && !ref $subject_vars->{$_}); 
+    map {
+        $subject_vars->{$_} =~ s{,}{\\,}xmsg if ($subject_vars->{$_} && !ref $subject_vars->{$_});
     } keys %{$subject_vars};
-    
+
 
     ##! 16: 'Cleaned subject_vars' . Dumper $subject_vars
 
     CTX('log')->application()->debug("Subject render input vars " . Dumper $subject_vars);
- 
+
 
     my $cert_subject = CTX('api')->render_subject_from_template({
         PROFILE => $profile,
@@ -81,13 +81,13 @@ sub execute {
     }
 
     CTX('log')->application()->info("Rendering subject: $cert_subject");
- 
+
 
 
     my $cert_san_parts  = $context->param('cert_san_parts');
     my $extra_san = {};
     if ($cert_san_parts) {
-        $extra_san = $ser->deserialize( $cert_san_parts );    
+        $extra_san = $ser->deserialize( $cert_san_parts );
     }
 
     ##! 32: 'extra san' . Dumper $extra_san
@@ -124,7 +124,7 @@ sub execute {
         }
 
         CTX('log')->application()->debug("San template empty but extra_san present");
- 
+
     }
 
     ##! 64: "Entries in san_list \n" .  Dumper $san_list;
@@ -254,7 +254,7 @@ Determines the used profile, has priority over context key.
 
 Determines the used profile substyle, has priority over context key.
 
-=back 
+=back
 
 =head2 context values
 

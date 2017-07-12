@@ -37,7 +37,7 @@ sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
     ##! 1: "BUILD"
     ##! 2: ref $self
- 
+
     $command{$ident}        = $arg_ref->{COMMAND};
     $command_params{$ident} = $arg_ref->{PARAMS};
     $api{$ident}            = OpenXPKI::Server::API->new();
@@ -83,7 +83,7 @@ sub attach_impl : PRIVATE {
 
     if (defined $cmd && $allowed_command{$cmd}) {
 	# command was white-listed and explicitly allowed
-	
+
 	my $class = $base . '::' . $cmd;
 	##! 8: "loading class $class"
 	eval "use $class;";
@@ -109,7 +109,7 @@ sub attach_impl : PRIVATE {
 	    message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND",
 	);
     }
-    
+
     return 1;
 }
 
@@ -163,7 +163,7 @@ sub command_response {
     if (! defined $command_name) {
 	my ($package, $filename, $line, $subroutine, $hasargs,
 	    $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
-	
+
 	# only leave the last part of the package name
 	($command_name) = ($package =~ m{ ([^:]+) \z }xms);
     }
@@ -177,55 +177,55 @@ sub command_response {
 
 
 
-=head2 __get_token 
+=head2 __get_token
 
 Get the scep token alias for the current server
 
 =cut
 sub __get_token_alias {
-              
+
     my $self = shift;
     my $server = shift;
     $server = CTX('session')->data->server unless($server);
-    
+
     my $token = CTX('config')->get(['scep', $server, 'token']);
-     
+
     my $scep_token_alias;
     if ($token) {
         # Special token group requested
         $scep_token_alias = CTX('api')->get_token_alias_by_group({ 'GROUP' => $token });
         CTX('log')->application()->debug("SCEP command requested special token ($token -> $scep_token_alias)");
-         
+
     } else {
-        # Use the default token group        
+        # Use the default token group
         $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
     }
- 
-    return $scep_token_alias;   
+
+    return $scep_token_alias;
 }
 
-=head2 __get_token 
+=head2 __get_token
 
 Get the scep token from the crypto layer
 
 =cut
 sub __get_token {
-    
+
     my $self = shift;
     my $server = shift;
     $server = CTX('session')->data->server unless($server);
-    
+
     my $scep_token_alias = $self->__get_token_alias( $server );
-            
+
     my $scep_token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
-    
+
     if ( !defined $scep_token ) {
-        OpenXPKI::Exception->throw( 
+        OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING',
             params => { ALIAS => $scep_token_alias }
         );
     }
-    
+
     return $scep_token;
 }
 
@@ -245,11 +245,11 @@ distinct command implementations.
 
 =head2 START - new()
 
-This class derives from Class::Std. Please read the corresponding 
+This class derives from Class::Std. Please read the corresponding
 documentation concerning BUILD, START construction methods and other
 class-specific internals.
 
-The new() constructor creates a new command object that is capable 
+The new() constructor creates a new command object that is capable
 of executing the referenced interface command.
 Expects the following named parameters:
   COMMAND => name of the command to execute
@@ -257,18 +257,18 @@ Expects the following named parameters:
 
 The constructor makes sure that only explicitly allowed commands are
 accepted and throws an exception otherwise. If the constructor returns
-without error (exception), the command was accepted as valid and the 
-passed parameters have been stored internally to be processed later 
+without error (exception), the command was accepted as valid and the
+passed parameters have been stored internally to be processed later
 by the execute() method.
 
 When attaching the implementation the class tries to 'use'
 an actual Perl module which is named like the command. E. g.
-if command 'foo' is requested, it tries to attach 
+if command 'foo' is requested, it tries to attach
 OpenXPKI::Service::SCEP::Command::foo.pm.
 
 =head2 execute
 
-Executes the specified command implementation. Returns a data structure 
+Executes the specified command implementation. Returns a data structure
 that can be serialized and directly returned to the client.
 
 =head2 command_response

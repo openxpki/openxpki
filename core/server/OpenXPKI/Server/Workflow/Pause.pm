@@ -25,7 +25,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Pause - special Workflow-Exception 
+OpenXPKI::Server::Workflow::Pause - special Workflow-Exception
 
 =head1 Description
 

@@ -20,7 +20,7 @@ sub get_command
     ## normal CSR: engine (optional), passwd, key
 
     my ($engine, $keyform, $passwd, $key) = ("", "", undef);
-    
+
     ## user CSR generation
 
     # check minimum requirements
@@ -83,7 +83,7 @@ sub get_command
     return [ \@command ];
 }
 
-sub __get_used_engine 
+sub __get_used_engine
 {
     my $self = shift;
     my $engine_usage = $self->{ENGINE}->get_engine_usage();

@@ -22,7 +22,7 @@ use MIME::Base64;
 sub new {
     my $class = shift;
     my $context = shift;
-    
+
     return bless {
 	_CONTEXT => $context,
     }, $class;
@@ -60,7 +60,7 @@ sub generate {
 	$password = substr($ctx->b64digest, 0, 8);
 	$rv = "{PLAIN}$password";
     }
-    
+
     if ($args->{scheme} eq 'sha') {
 	$password = $self->generate(
 	    {
@@ -134,7 +134,7 @@ sub generate {
 
     if (defined $args->{callback}) {
 	my $callback = eval "$args->{callback}";
-	
+
 	if (ref $callback eq 'CODE') {
 	    eval {
 		$_ = $password;
@@ -170,7 +170,7 @@ After doing so, you can use the class like this:
     <digest>[% password.generate(scheme => 'ssha', callback => 'sub { print STDERR "*** NOTE: Password for user <John Doe> is: $_\n" }') %]</digest>
   ...
 
-This invocation will call the generate() method on the template's 
+This invocation will call the generate() method on the template's
 password instance variable. It passes the named parameters 'scheme' and
 'callback' to the function. The return value of the method is rendered
 into the template output.
@@ -193,7 +193,7 @@ Named parameters:
 
 =item scheme
 
-Required. Specifies the password scheme to use. Supported values are 'plain', 
+Required. Specifies the password scheme to use. Supported values are 'plain',
 'sha' (SHA1 hash), 'ssha' (seeded SHA1 hash), 'md5' (MD5 hash), 'ssha'
 (seeded SHA1 hash) and 'smd5' (seeded MD5 hash).
 
@@ -201,9 +201,9 @@ The recommended scheme is 'ssha'.
 
 =item callback
 
-Optional. String containing a valid Perl closure subroutine. 
-The closure is called after generating the password with two parameters. 
-The first parameter is the unencrypted password, the second one is 
+Optional. String containing a valid Perl closure subroutine.
+The closure is called after generating the password with two parameters.
+The first parameter is the unencrypted password, the second one is
 the encrypted value.
 
 $_ will contain the unencrypted password.

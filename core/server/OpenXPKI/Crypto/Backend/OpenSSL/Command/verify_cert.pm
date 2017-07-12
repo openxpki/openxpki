@@ -21,14 +21,14 @@ sub get_command
                 "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_VERIFY_CERT_MISSING_CERTIFICATE",
         );
     }
-    
-    if (!$self->{TRUSTED}) {        
+
+    if (!$self->{TRUSTED}) {
         OpenXPKI::Exception->throw (
             message =>
                 "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_VERIFY_CERT_MISSING_CERTIFICATE",
         );
     }
-    
+
     $self->get_tmpfile ('CERTIFICATE', 'CHAIN', 'TRUSTED');
 
     $self->write_file (FILENAME => $self->{CERTIFICATEFILE},
@@ -49,11 +49,11 @@ sub get_command
     push @command, ('-CAfile', $self->{TRUSTEDFILE});
     push @command, ('-untrusted', $self->{CHAINFILE}) if ($self->{CHAIN});
     push @command, ( $self->{CERTIFICATEFILE} );
-    
+
     ##! 32: 'SSL verify command ' . join " ", @command
-    
+
     return [ \@command ];
-  
+
 }
 
 sub hide_output

@@ -194,7 +194,7 @@ DATA is a PEM encoded CRL. TOKEN is a token from the token manager
 (OpenXPKI::TokenManager). The token is needed to parse the CRL.
 
 You can optionally pass EXTENSIONS and REVOKED as boolean flags.
-EXTENSIONS parses the extension section and looks for the Authority Key 
+EXTENSIONS parses the extension section and looks for the Authority Key
 Identifier. REVOKED reads the list of revoked certificates from the
 CRL and adds it to the return structure.
 

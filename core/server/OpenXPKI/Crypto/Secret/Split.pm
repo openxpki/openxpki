@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::Secret::Split.pm 
+## OpenXPKI::Crypto::Secret::Split.pm
 ##
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
@@ -26,7 +26,7 @@ use OpenXPKI::Server::Context qw( CTX );
     my $DEFAULT_SECRET_BITLENGTH = 128;
     my %n_of               :ATTR; # the n
     my %k_of               :ATTR; # and k parameters for the algorithm
-    my %received_shares_of :ATTR; # an array of shares acquired using 
+    my %received_shares_of :ATTR; # an array of shares acquired using
                                   # set_secret
     my %prime_of           :ATTR; # the prime used for Z/Zp
     my %coefficient_of     :ATTR; # an array of coefficients
@@ -218,10 +218,10 @@ use OpenXPKI::Server::Context qw( CTX );
         my $ident   = ident $self;
         my $arg_ref = shift;
         my $bit_length = Math::BigInt->new("$arg_ref->{BIT_LENGTH}");
-    
+
         my $TWO = Math::BigInt->new("2");
         my $ONE = Math::BigInt->bone();
-    
+
         my $test_prime = $TWO->copy();
         $test_prime->bpow($bit_length);
         $test_prime->badd($ONE);
@@ -261,14 +261,14 @@ use OpenXPKI::Server::Context qw( CTX );
         my $checksum = uc(substr(sha1_hex($p_x), 0, 4));
         return $SHARE_FORMAT_VERSION . $x . $p_x . $checksum . $prime_bitlength;
     }
-    
+
 
     sub __evaluate_polynomial :PRIVATE {
         my $self  = shift;
         my $ident = ident $self;
         my $x     = shift;
         my $x_bigint = Math::BigInt->new("$x");
-        
+
         my $sum = Math::BigInt->bzero();
         if ($x == 0) { # Math::BigInt sets 0^i, i>0 = 1 ?
             return $coefficient_of{$ident}[0];
@@ -293,7 +293,7 @@ use OpenXPKI::Server::Context qw( CTX );
         my $ident = ident $self;
         my $share = shift;
         my $share_length = length($share);
-    
+
         my $version = hex(substr($share, 0, 1)); # first char is version number
         if ($version != 0) {
             OpenXPKI::Exception->throw(
@@ -310,7 +310,7 @@ use OpenXPKI::Server::Context qw( CTX );
         my $p_x_string = substr($share, 3, $share_length - 9);
         my $correct_checksum = uc(substr(sha1_hex($p_x_string), 0, 4));
         my $entered_checksum = uc(substr($share, $share_length - 6, 4));
-    
+
         if ($correct_checksum ne $entered_checksum) {
             OpenXPKI::Exception->throw(
                 message =>
@@ -322,26 +322,26 @@ use OpenXPKI::Server::Context qw( CTX );
             );
         }
         my $p_x = Math::BigInt->new("0x" . $p_x_string);
-    
+
         my $result_ref = {
             X               => $x,
             BITLENGTH_PRIME => $bitlength_p,
             P_X             => $p_x,
         };
         return $result_ref;
-    } 
-    
+    }
+
     sub __reconstruct_secret :PRIVATE {
         my $self    = shift;
         my $ident   = ident $self;
-        my $arg_ref = shift; 
-        
+        my $arg_ref = shift;
+
         my @shares = @{$arg_ref->{SHARES}};
         my $deconstructed_share = $self->__deconstruct_share($shares[0]);
         my $prime = $self->__get_smallest_prime_of_bitlength({
             BIT_LENGTH => $deconstructed_share->{BITLENGTH_PRIME},
         });
-        
+
         my %points;
         foreach my $share (@shares) {
             my $decon_share = $self->__deconstruct_share($share);
@@ -351,7 +351,7 @@ use OpenXPKI::Server::Context qw( CTX );
         }
         # %points is a hash of points (Math::BigInt objects) to interpolate
         # with in P[Z/Zp].
-    
+
         my $secret = Math::BigInt->bzero();
         foreach my $x_j (keys %points) { # do Lagrange interpolation at 0
             my $y_j = $points{$x_j};
@@ -367,7 +367,7 @@ use OpenXPKI::Server::Context qw( CTX );
         }
         return $secret;
     }
-    
+
     sub __l :PRIVATE { # this is l_j(0), i.e.
                        # \prod_{x_j \neq x_i} \frac{-x_i}{x_j - x_i}
                        # for more information compare Wikipedia:
@@ -375,13 +375,13 @@ use OpenXPKI::Server::Context qw( CTX );
         my $self    = shift;
         my $ident   = ident $self;
         my $arg_ref = shift;
-    
+
         my $x_j    = $arg_ref->{X_J};
         my %points = %{$arg_ref->{POINTS}};
         my $prime  = $arg_ref->{PRIME};
-    
+
         my $MINUS_ONE = Math::BigInt->new("-1");
-    
+
         my $product = Math::BigInt->bone();
         foreach my $point (keys %points) {
             my $x_i         = Math::BigInt->new("$point");

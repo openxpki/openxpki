@@ -13,17 +13,17 @@ use MIME::Base64;
 use Workflow::Exception qw(configuration_error);
 
 sub execute {
-     
+
     ##! 1: 'start'
-    
+
     my $self = shift;
     my $workflow = shift;
-   
-   
+
+
     my $data = $self->param('data');
-    
+
     my $target_key = $self->param('target_key') || 'crl_serial';
-        
+
     if ($data) {
         my $crl = CTX('api')->import_crl({ DATA => $data });
         $workflow->context()->param( { $target_key => $crl->{crl_key} } );
@@ -42,11 +42,11 @@ __END__
 OpenXPKI::Server::Workflow::Activity::CRLIssuance::ImportCRL
 
 =head1 Description
- 
-This activity can be used to import CRLs into the system. It should be 
+
+This activity can be used to import CRLs into the system. It should be
 used for externally controlled realms only.
- 
-=head2 Activity Configuration 
+
+=head2 Activity Configuration
 
 =over
 
@@ -57,7 +57,7 @@ if this is empty.
 
 =item target_key
 
-Name of context key to write the serial number of the imported CRL to. 
+Name of context key to write the serial number of the imported CRL to.
 Optional, default is crl_serial.
- 
+
 =back

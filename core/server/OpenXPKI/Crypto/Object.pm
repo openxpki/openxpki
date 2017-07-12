@@ -44,13 +44,13 @@ sub get_parsed
         if (defined $ref and exists $ref->{$name})
         {
             $ref = $ref->{$name};
-                       
+
         } else {
             $ref = undef;
         }
     }
     if (not defined $ref or ref($ref) eq "HASH")
-    {               
+    {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OBJECT_GET_PARSED_NO_VALUE",
             params  => {"NAME" => join ("/", @_)});
@@ -97,9 +97,9 @@ sub set_header_attribute
 sub get_subject_alt_names {
     my $self = shift;
     my $args = shift;
-    
+
     my @subject_alt_names;
-    eval { 
+    eval {
         @subject_alt_names = @{$self->get_parsed('BODY',
                                                  'OPENSSL_EXTENSIONS',
                                     'X509v3 Subject Alternative Name')};
@@ -110,13 +110,13 @@ sub get_subject_alt_names {
     }
     else {
         ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)
-    
+
         my $all_sans = '';
         foreach my $san_line (@subject_alt_names) {
             $all_sans .= $san_line;
         }
         my @sans = split q{, }, $all_sans;
-        
+
         if (defined $args->{FORMAT} && ($args->{FORMAT} eq 'HASH')) {
             my $ret = {};
             foreach my $san (@sans) {
@@ -126,7 +126,7 @@ sub get_subject_alt_names {
                 if (!$ret->{$temp[0]}) { $ret->{$temp[0]} = []; }
                 push @{$ret->{$temp[0]}}, $temp[1];
             }
-            return $ret; 
+            return $ret;
         } else {
             foreach my $san (@sans) {
                 ##! 64: 'san: ' . $san
@@ -207,7 +207,7 @@ If you pass { FORMAT => HASH } as parameter, you will get the sans as hash:
 
    {
        DNS => [ 'www.example.com', 'www.example.org' ],
-       IP  => [ '1.2.3.4' ]       
-   } 
+       IP  => [ '1.2.3.4' ]
+   }
 
 

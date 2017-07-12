@@ -108,7 +108,7 @@ sub update_head {
         $self->_head_version( $head_id );
 
         CTX('log')->system()->info("system config advanced to new head commit: $head_id");
- 
+
 
         return 1;
     }
@@ -164,7 +164,7 @@ sub get_scalar_as_list {
         @values = ( $val ) if (defined $val);
     } else {
         CTX('log')->system()->error("get_scalar_as_list got invalid node type");
- 
+
     }
     ##! 16: 'values ' . Dumper @values
     return @values;

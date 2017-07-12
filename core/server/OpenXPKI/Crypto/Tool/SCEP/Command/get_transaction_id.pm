@@ -29,9 +29,9 @@ sub START {
 sub get_command {
     my $self = shift;
     my $ident = ident $self;
-    
+
     my $command = ' -print_transid -noout -inform DER ';
-    
+
     my $in_filename = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
     });
@@ -43,7 +43,7 @@ sub get_command {
         CONTENT  => $pkcs7_of{$ident},
         FORCE    => 1,
     });
-   
+
     $command .= '-in ' . $in_filename,
     $command .= ' -out ' . $outfile_of{$ident};
 
@@ -74,13 +74,13 @@ sub get_result
 }
 
 sub cleanup {
-    
+
     my $self = shift;
     my $ident = ident $self;
-    
+
     $ENV{pwd} = '';
     $fu_of{$ident}->cleanup();
-    
+
 }
 
 1;

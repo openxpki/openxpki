@@ -18,13 +18,13 @@ extends 'OpenXPKI::Client::SC::Result';
 =head2 handle_server_personalization
 
 Main interface to personalization workflow, translates action commands
-and parameters from the frontend to the backend workflow. 
+and parameters from the frontend to the backend workflow.
 
 =head3 parameters
 
-Parameters depend on the current state. 
+Parameters depend on the current state.
 
-=over 
+=over
 
 =item wf_action
 
@@ -45,8 +45,8 @@ Status word from the card plugin, I<SUCCESS> if ok, anything else if not.
 =item Reason
 
 Verbose reason in case of failure.
- 
-=back 
+
+=back
 
 =head3 response
 
@@ -55,9 +55,9 @@ wf_state
 perso_wfID
 exec
 action
- 
+
 =cut
- 
+
 sub handle_server_personalization {
 
     my $self = shift;
@@ -71,30 +71,30 @@ sub handle_server_personalization {
     my $result = {};
     my $log = $self->logger();
     my $cardData = $self->cardData();
-    
+
     # We try to install the PUK more than once as this fails sometime
     # this session value tracks the number of times we tried already
     # TODO - move this to the workflow
     my $puk_install_retry = $session->param('puk_install_retry') || 0;
- 
+
     # this seems to be the result of the pkcs11 plugin operation (status word)
     my $ui_result = $self->param("Result") || '';
-    # verbose message for ui result 
+    # verbose message for ui result
     my $ui_reason = $self->param("Reason") || '';
- 
+
     $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSO_CALL");
- 
+
     # on reconnect error
     #"I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CANT_CONNECT_TO_PKI_SESSION_START_FAILED"
 
 
     # $responseData->{'found_wf_ID'} = $self->param("perso_wfID");
-    
-    
+
+
     my $wf_action = $self->param("wf_action") || '';
-    my $wf_id;    
+    my $wf_id;
     my $wf_state;
-     
+
     if ($self->param("perso_wfID") && $self->param("perso_wfID") =~ /^([0-9]+)$/) {
         $wf_id = $1;
     }
@@ -121,7 +121,7 @@ sub handle_server_personalization {
                 'chip_id'       => $cardData->{'ChipSerial'},
             },
         };
-        
+
         eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
@@ -130,34 +130,34 @@ sub handle_server_personalization {
             $log->error(sprintf('Unable to create workflow for card %s. EE: %s', $cardData->{'id_cardID'}, $EVAL_ERROR));
             return 1;
         }
-        
-        $wf_id = $wf_info->{ID};        
+
+        $wf_id = $wf_info->{ID};
         $wf_state = $wf_info->{STATE};
-        
-        $log->info(sprintf('New workflow created for card %s, id %01d, state %s ', 
+
+        $log->info(sprintf('New workflow created for card %s, id %01d, state %s ',
             $cardData->{'id_cardID'}, $wf_id, $wf_state) );
-            
+
         # Prereqs failed - workflow crashed finally
         if ($wf_state eq 'FAIULRE') {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_PERSONALIZATION_WORKFLOW_FAILED_ON_INIT");
             return 1;
         }
-        
-        
+
+
     }
 
-    if ( $wf_action ) {        
+    if ( $wf_action ) {
         $log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSONALIZATION_ACTION:"
               . $wf_action . " WFID_" . $wf_id );
     }
-    
+
     ######################################################################
     ##
     ## Run actions on the workflow engine based on the wf_action parameter
     ##
     ######################################################################
     if ( $wf_action eq 'prepare' ) {
-        
+
         if ( $ui_result eq 'SUCCESS' ) {
 
             if ( !$session->param('tmp_rndPIN') ) {
@@ -166,7 +166,7 @@ sub handle_server_personalization {
                 $log->debug('I18N_OPENXPKI_CLIENT_WEBAPI_SC_PERSONALIZATION_INSTALLED_RNDPIN');
                 $session->param('rndPIN', $session->param('tmp_rndPIN') );
             }
-            
+
         } else {
             $log->error( sprintf("Plugin action %s failed: %s / %s" , $wf_action, $ui_result, $ui_reason ));
         }
@@ -175,15 +175,15 @@ sub handle_server_personalization {
     elsif ( $wf_action eq 'select_useraccount' ) {
 
         my $user = $self->param("userAccount");
-        
+
         if (!$user) {
             $self->_add_error("Plugin called select_useraccount without passing account name!");
-            return 1;    
+            return 1;
         }
-        
+
         my $params = {
             'ID'       => $wf_id,
-            'ACTIVITY' => 'scpers_apply_csr_policy',          
+            'ACTIVITY' => 'scpers_apply_csr_policy',
             'PARAMS'   => {
                 'login_ids' => $self->serializer()->serialize( [ $user ] )
             }
@@ -196,62 +196,62 @@ sub handle_server_personalization {
         };
         if ($EVAL_ERROR) {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_APPLY_CSR_POLICY");
-            return 1;                
+            return 1;
         }
     }
     elsif ( $wf_action eq 'install_puk' ) {
-        
+
         # Plugin has installed the PUK on the card
         if ( $ui_result eq 'SUCCESS' ) {
-        
+
             my $params = {
                 'ID'       => $wf_id,
                 'ACTIVITY' => 'scpers_puk_write_ok',
                 'PARAMS'   => {},
             };
 
-            eval {    
+            eval {
                 $wf_info = $self->_client->handle_workflow( $params );
             };
             if ($EVAL_ERROR) {
                 $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_WRITE_PUK_STATUS");
-                return 1;                
+                return 1;
             }
             $log->info("install PUK was successful");
 
-        # In case a prior PUK change failed, we try again with the old PUK 
+        # In case a prior PUK change failed, we try again with the old PUK
         } elsif ( $puk_install_retry  == 1 ) {
-                
+
             $log->warn("install PUK failed, try one more time ");
 
             # PUK failed to install if it was the first try stay in the state and try one more time
 
         } else {
-                
+
             $log->error( sprintf("Plugin action %s failed: %s / %s" , $wf_action, $ui_result, $ui_reason ));
-                            
+
             my $params = {
                 'ID'       => $wf_id,
                 'ACTIVITY' => 'scpers_puk_write_err',
                 'PARAMS'   => { 'sc_error_reason' => 'FATAL PUK ERROR' },
             };
-            eval {    
+            eval {
                 $wf_info = $self->_client->handle_workflow( $params );
             };
             if ($EVAL_ERROR) {
                 $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_WRITE_PUK_STATUS");
-                return 1;                
+                return 1;
             }
-                            
-        } 
+
+        }
     }
     elsif ( $wf_action eq 'upload_csr' ) {
 
-        my $pkcs10 = $self->param('PKCS10Request') || '';        
+        my $pkcs10 = $self->param('PKCS10Request') || '';
         my $keyid = $self->param('KeyID') || '';
 
         $log->info("Plugin csr upload for keyid $keyid");
-       
+
         #	$log->debug("choosen_login". $chosenLoginID);
         #	if ( defined $self->param('chosenLoginID') ) {
         #		$chosenLoginID = $self->param('chosenLoginID');
@@ -281,7 +281,7 @@ sub handle_server_personalization {
 
         my $params = {
             'ID'       => $wf_id,
-            'ACTIVITY' => 'scpers_post_non_escrow_csr',         
+            'ACTIVITY' => 'scpers_post_non_escrow_csr',
             'PARAMS'   => {
                 'pkcs10' => $pkcs10,
                 'keyid'  => $keyid,
@@ -289,43 +289,43 @@ sub handle_server_personalization {
             },
         };
 
-        eval {    
+        eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
         if ($EVAL_ERROR) {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UPLOAD_CSR");
-            return 1;                
+            return 1;
         }
- 
+
         $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_SUCCESS_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_UPLOAD_CSR");
 
     }
     elsif ( $wf_action eq 'install_cert' || $wf_action eq 'install_p12' ) {
 
         my $params = { 'ID' => $wf_id, 'PARAMS'   => {} };
-        
+
         # Frontend was able to install certificate
         if ( $ui_result eq 'SUCCESS' ) {
             $params->{'ACTIVITY'} = 'scpers_cert_inst_ok';
-            
-        # Frontend had problems to install certificate            
+
+        # Frontend had problems to install certificate
         } else {
-            $params->{'ACTIVITY'} = 'scpers_cert_inst_err';                
+            $params->{'ACTIVITY'} = 'scpers_cert_inst_err';
             $params->{'PARAMS'} = {'sc_error_reason' => $ui_reason };
             $log->error( sprintf("Plugin action %s failed: %s / %s" , $wf_action, $ui_result, $ui_reason ));
         }
 
-        eval {    
+        eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
         if ($EVAL_ERROR) {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_CERT_INST_OK");
-            return 1;                
+            return 1;
         }
 
     }
     elsif ( $wf_action eq 'delete_cert' ) {
-        
+
         my $params = { 'ID' => $wf_id, 'PARAMS'   => {} };
         if ( $ui_result eq 'SUCCESS' ) {
             $params->{'ACTIVITY'} = 'scpers_cert_del_ok';
@@ -334,16 +334,16 @@ sub handle_server_personalization {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_SMARTCARD_ACTIVITY_CERT_INSTALL");
         }
 
-        eval {    
+        eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
         if ($EVAL_ERROR) {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_CERT_DEL_STATUS");
-            return 1;                
+            return 1;
         }
-        
+
     }
-    
+
     # we need the wf_info to decide on the next steps, load if not set
     if (!$wf_info) {
         eval {
@@ -351,51 +351,51 @@ sub handle_server_personalization {
         };
         if ($EVAL_ERROR) {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_FETCHING_WORKFLOW_INFO");
-            return 1;                
+            return 1;
         }
-        $log->debug('Fetch workflow info');        
+        $log->debug('Fetch workflow info');
     }
-    
+
     $log->trace('Workflow Info ' . Dumper $wf_info );
-    
-    $wf_state = $wf_info->{STATE}; 
+
+    $wf_state = $wf_info->{STATE};
     $result->{'perso_wfID'} = $wf_id;
     $result->{'wf_state'} = $wf_state;
     $self->_result( $result );
-    
+
     ######################################################################
     ##
     ## check if the workflow has finished
     ##
-    ######################################################################    
+    ######################################################################
 
-    if ($wf_state eq 'SUCCESS') {        
-        $log->info(sprintf'Personalization workflow %01d for card %s finished with success', $wf_id, $cardData->{'id_cardID'} );    
-        return 0;         
-    }
-    elsif ($wf_state eq 'FAILURE') {        
-        $log->info(sprintf'Personalization workflow %01d for card %s failed finally', $wf_id, $cardData->{'id_cardID'} );    
+    if ($wf_state eq 'SUCCESS') {
+        $log->info(sprintf'Personalization workflow %01d for card %s finished with success', $wf_id, $cardData->{'id_cardID'} );
         return 0;
-    } 
-    
+    }
+    elsif ($wf_state eq 'FAILURE') {
+        $log->info(sprintf'Personalization workflow %01d for card %s failed finally', $wf_id, $cardData->{'id_cardID'} );
+        return 0;
+    }
+
     $log->info(sprintf'Personalization workflow %01d for card %s now in state %s', $wf_id, $cardData->{'id_cardID'}, $wf_state );
-    
+
     ######################################################################
     ##
     ## Assemble the next command for the pkcs11 plugin
     ##
-    ######################################################################    
+    ######################################################################
 
     my $plugincommand;
     my $plugin_action;
     my $context = $wf_info->{CONTEXT};
-    
-    # a random pin already exists, so we can take care of installing data 
-    # onto the card. If no pin exists, we need to set one on the card first 
+
+    # a random pin already exists, so we can take care of installing data
+    # onto the card. If no pin exists, we need to set one on the card first
     if (my $random_pin = $session->param('rndPIN')) {
-        
+
         if ( $wf_state eq 'NEED_NON_ESCROW_CSR' ) {
-            
+
             $plugin_action = 'upload_csr';
 
             $plugincommand =
@@ -408,9 +408,9 @@ sub handle_server_personalization {
               . ';KeyLength='
               . $keysize . ';';
 
-        } 
+        }
         elsif ( $wf_state eq 'POLICY_INPUT_REQUIRED' ) {
-            
+
             $plugin_action = 'select_useraccount';
             $plugincommand = 'NOCOMMAND';
 
@@ -420,7 +420,7 @@ sub handle_server_personalization {
             $plugin_action = 'install_cert';
 
             $context->{certificate} =~ m{ -----BEGIN\ CERTIFICATE-----(.*?)-----END }xms;
-            
+
             my $certificate_to_install = $1;
             $certificate_to_install =~ s{ \s }{}xgms;
 
@@ -433,7 +433,7 @@ sub handle_server_personalization {
               . $random_pin
               . ';B64Data='
               . $certificate_to_install . ';';
-        } 
+        }
         elsif ( $wf_state eq 'HAVE_CERT_TO_DELETE' ) {
 
             $plugin_action = 'delete_cert';
@@ -456,22 +456,22 @@ sub handle_server_personalization {
 
             if ( ! $context->{_pkcs12} ) {
 
-                eval {    
+                eval {
                     $wf_info = $self->_client->handle_workflow( {
                         'ID'       => $wf_id,
                         'ACTIVITY' => 'scpers_refetch_p12',
                         'PARAMS'   => {},
                     });
                     $result->{'wf_state'} = $wf_state;
-                };  
+                };
                 if ($EVAL_ERROR) {
                     $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCH_P12_PW");
-                    return 1;                
+                    return 1;
                 }
             }
             my $p12_pin = $wf_info->{CONTEXT}->{_password};
             my $p12 = $wf_info->{CONTEXT}->{_pkcs12};
-        
+
             $plugincommand =
                 'ImportP12;CardSerial='
               . $cardData->{'cardID'}
@@ -481,24 +481,24 @@ sub handle_server_personalization {
               . $session->param('rndPIN')
               . ';B64Data='
               . $p12 . ';';
-        
+
         }
-    } 
-    
+    }
+
     # no pin in session, generate a new pin and set it on the card
     else {
-        
+
         $log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_GET_PREPARE" );
 
         my $rnd;
-                
+
         eval {
             my $count = 0;
             do {
                 my $rndmsg = $self->_client()->run_command( 'get_random', { 'LENGTH' => 15 } );
                 $rnd = lc( $rndmsg );
                 $rnd =~ tr{[a-z0-9]}{}cd;
-                $count++;            
+                $count++;
             } while ( length($rnd) < 8 && $count < 3 );
         };
         if ($EVAL_ERROR) {
@@ -516,35 +516,35 @@ sub handle_server_personalization {
         $session->param('tmp_rndPIN',  $rnd );
 
         $log->info( "Fetch PUK to set new PIN for workflow " . $wf_id );
-        
-        eval {    
+
+        eval {
             $wf_info = $self->_client->handle_workflow( {
                 'ID'       => $wf_id,
                 'ACTIVITY' => 'scpers_fetch_puk',
             });
             $result->{'wf_state'} = $wf_state;
-        };  
+        };
         if ($EVAL_ERROR) {
-            $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK");            
-            return 1;                
+            $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_EXECUTE_PERSONALIZATION_WORKFLOW_ACTIVITY_FETCHPUK");
+            return 1;
         }
-            
+
         my $PUK = $self->serializer()->deserialize( $wf_info->{CONTEXT}->{_puk} );
 
         # If this is a new card, we write a new PUK to the card
         if ($wf_info->{STATE} eq 'PUK_TO_INSTALL') {
-        
+
             $log->info( "New card - install custom PUK " );
-        
+
             if (scalar @{$PUK} == 1) {
                 # if we have only one PUK, we fake a failed try
                 $puk_install_retry = 1;
             }
-        
+
             # try a PUK Change first
             $plugin_action     = 'install_puk';
             if ($puk_install_retry == 0)  {
-                
+
                 $session->param( 'puk_install_retry', 1 );
                 $plugincommand =
                     'ChangePUK;CardSerial='
@@ -552,11 +552,11 @@ sub handle_server_personalization {
                     . $PUK->[1]
                     . ';NewPUK='
                     . $PUK->[0] . ';';
-                    
+
             } elsif ($puk_install_retry == 1) {
-                
-                # First try with two PUKs failed  
-                
+
+                # First try with two PUKs failed
+
                 $session->param( 'puk_install_retry', 2 );
                 $plugincommand =
                     'ChangePUK;CardSerial='
@@ -564,16 +564,16 @@ sub handle_server_personalization {
                     . $PUK->[1]
                     . ';NewPUK='
                     . $PUK->[0] . ';';
-                     
-            } else { 
+
+            } else {
                 $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_PUK_TO_INSTALL_RECOVERY_TRY_2_FAILED");
                 return 1;
             }
         # The default case, we have a PUK on card and set the new random PIN
-        } else {    
-            
+        } else {
+
             $plugin_action = 'prepare';
-                           
+
             $plugincommand =
                 'ResetPIN;CardSerial='
                 . $cardData->{'cardID'} . ';PUK='
@@ -583,7 +583,7 @@ sub handle_server_personalization {
         }
 
     }  # end no pin
- 
+
     $log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_ENCRYPT_OUT_DATA" );
 
     # If we have a plugin command, encrypt it with the session key
@@ -596,11 +596,11 @@ sub handle_server_personalization {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_PERSONALIZATION_FAILED_TO_ENCRYPT_COMMAND");
             return 1;
         }
-        
+
         $result->{'action'} = $plugin_action;
-        $log->info( 'Plugin action:' . $plugin_action );        
+        $log->info( 'Plugin action:' . $plugin_action );
     }
-    
+
     $log->info( "I18N_OPENXPKI_CLIENT_WEBAPI_SC_EXECUTE_OUT_DATA_ENCRYPTED" );
 
     #$result->{'perso_wf_type'} = $wf_type;

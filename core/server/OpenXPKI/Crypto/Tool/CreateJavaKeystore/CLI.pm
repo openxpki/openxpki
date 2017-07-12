@@ -33,7 +33,7 @@ OpenXPKI::Crypto::Tool::CreateJavaKeystore::CLI
 =head1 Desription
 
 This module implements the handling of the CreateKeystore java program.
-It is a child of OpenXPKI::Crypto::CLI. 
+It is a child of OpenXPKI::Crypto::CLI.
 
 =head1 Functions
 

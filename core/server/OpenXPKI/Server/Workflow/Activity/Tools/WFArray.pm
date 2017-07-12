@@ -52,8 +52,8 @@ sub execute {
         { workflow => $wf, context_key => $self->array_name } );
 
     CTX('log')->application()->debug("Mangling wf array ".$self->array_name." with $function");
-          
-     
+
+
 
     # read operations that do not take a parameter
     if ( $function =~ m/^(pop|shift|count)$/ ) {
@@ -152,12 +152,12 @@ The following functions are supported:
 
 =item push
 
-Adds the value of the context parameter named in I<context_key> to the 
+Adds the value of the context parameter named in I<context_key> to the
 end of the array
 
 =item pusharray
 
-Adds the array contents contained in context parameter named in 
+Adds the array contents contained in context parameter named in
 I<context_key> to the end of the array.
 
 =item pop
@@ -167,12 +167,12 @@ context parameter named in I<context_key>.
 
 =item unshift
 
-Adds the value of the context parameter named in I<context_key> to the 
+Adds the value of the context parameter named in I<context_key> to the
 beginning of the array
 
 =item unshiftarray
 
-Adds the array contents contained in context parameter named in 
+Adds the array contents contained in context parameter named in
 I<context_key> to the beginning of the array
 
 =item shift
@@ -182,7 +182,7 @@ to the context parameter named in I<context_key>.
 
 =item value
 
-Returns the value at the position specified in I<array_index> and 
+Returns the value at the position specified in I<array_index> and
 assigns it to the context parameter named in I<context_key>.
 
 If activity configuration explicitly sets I<index> this value is taken,

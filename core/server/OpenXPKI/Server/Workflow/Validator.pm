@@ -23,7 +23,7 @@ has '_map' => (
 
 has 'workflow' => (
     is => 'rw',
-    isa => 'Object',    
+    isa => 'Object',
 );
 
 
@@ -86,7 +86,7 @@ sub param {
         if ($template =~ /^\$(\S+)/) {
             my $ctxkey = $1;
             ##! 16: 'load from context ' . $ctxkey
-            my $ctx = $self->workflow()->context()->param( $ctxkey );            
+            my $ctx = $self->workflow()->context()->param( $ctxkey );
             if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
                 ##! 32: ' needs deserialize '
                 my $ser  = OpenXPKI::Serialization::Simple->new();
@@ -95,11 +95,11 @@ sub param {
                 return $ctx;
             }
         } else {
-            
-            ##! 16: 'parse using tt ' . $template            
+
+            ##! 16: 'parse using tt ' . $template
             my $oxtt = OpenXPKI::Template->new();
             my $out = $oxtt->render( $template, {  context => $self->workflow()->context()->param() } );
-            
+
             ##! 32: 'tt result ' . $out
             return $out;
         }
@@ -110,21 +110,21 @@ sub param {
 sub validate {
 
     ##! 1: 'start'
-    
+
     my $self = shift;
     my $workflow = shift;
     my @args = @_;
-    
+
     $self->workflow( $workflow );
-    
+
     my @args_parsed = ();
-    
-    # evaluate the arguments, $context escaping is already done by the 
+
+    # evaluate the arguments, $context escaping is already done by the
     # workflow factory, now we look for TT strings and parse them.
     # Note that the string must start with the TT marker to be recognized
-    
+
     my $oxtt = OpenXPKI::Template->new();
-                                  
+
     if (scalar @args) {
         ##! 32: 'validator args are ' . Dumper \@args
         foreach my $arg (@args) {
@@ -133,24 +133,24 @@ sub validate {
             } elsif (ref $arg eq '' && $arg =~ m{ \A \s* \[%.+%\] }xsm) {
                 ##! 16: 'Found template ' . $arg
                 $arg = $oxtt->render( $arg, {  context => $workflow->context()->param() } );
-                ##! 16: 'render result ' . $arg                        
+                ##! 16: 'render result ' . $arg
             }
-            push @args_parsed, $arg;               
+            push @args_parsed, $arg;
         }
     } else {
-        ##! 8: 'Use preset'        
+        ##! 8: 'Use preset'
         my $preset = $self->_preset_args();
-        foreach my $arg (@{$preset}) {            
+        foreach my $arg (@{$preset}) {
             my $value = $workflow->context()->param( $arg );
             ##! 16: 'Push preset ' . $arg . ' : ' . (defined $value ? $value : 'undef')
             push @args_parsed, $value;
-        }        
+        }
     }
 
     ##! 32: 'Validator argument values: ' . Dumper \@args_parsed
 
     unshift @args_parsed, $workflow;
-    
+
     $self->_validate( @args_parsed );
 
     return 1;
@@ -170,8 +170,8 @@ sub _validate {
 
 }
 
-sub _preset_args {    
-    my $self = shift;    
+sub _preset_args {
+    my $self = shift;
     return undef;
 }
 
@@ -183,12 +183,12 @@ __END__
 OpenXPKI::Server::Workflow::Validator
 
 =head1 SYNOPSIS
-    
+
   my_validator
     class: OpenXPKI::Server::Workflow::Validator::MyValidatorClass
-    param:      
-      _map_path: [% context.key_in_context %] 
-    arg: 
+    param:
+      _map_path: [% context.key_in_context %]
+    arg:
       - $cert_profile
       - $cert_subject_style
       - "[% context.other_key_in_context %]"
@@ -196,24 +196,24 @@ OpenXPKI::Server::Workflow::Validator
 =head1 Description
 
 A base clase for Validators, providing some magic for handling parameters
-and arguments. 
+and arguments.
 
 =head2 Parameter Mapping
 
-All parameters (instance configuration), can use the I<_map> syntax to 
+All parameters (instance configuration), can use the I<_map> syntax to
 resolve values from the context. @see OpenXPKI::Server::Workflow::Activity.
-B<Note>: Validators are created ONCE per workflow instance and the 
-parameters are read and evaluated when the validator is created first.  
- 
+B<Note>: Validators are created ONCE per workflow instance and the
+parameters are read and evaluated when the validator is created first.
+
 
 =head2 Argument Parsing
 
-The Workflow base class already replaces arguments starting with a dollar 
-sign by the approprate context values. In addition, argument values 
-starting with a template toolkit sequence I<[%...> are parsed using 
+The Workflow base class already replaces arguments starting with a dollar
+sign by the approprate context values. In addition, argument values
+starting with a template toolkit sequence I<[%...> are parsed using
 OpenXPKI::Template with the full workflow context as parameters and the
-given argument as template. 
- 
+given argument as template.
+
 =head1 Sub-Classing
 
 =head2 validation
@@ -226,38 +226,37 @@ can also subclass directly from Workflow::Validator.
 Validation errors MUST be thrown using the I<validation_error> method. The
 first argument MUST be a verbose description starting with I<I18N_OPENXPKI_UI_>,
 you SHOULD pass a list of the fields that caused the error as second argument:
-   
-   validation_error ('I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS', 
+
+   validation_error ('I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS',
        { invalid_fields => \@fields_with_error } );
-       
-Where each item in the list is a hash with the key I<name> and, optional, 
+
+Where each item in the list is a hash with the key I<name> and, optional,
 additional infos on the error. (this is not fully specified and also not
 evaluated on the UI)
 
 =head2 preset
 
 The validator pattern is usually not bound to the context sensitive and
-expects the values to be validated as arguments. As OpenXPKI widely uses 
-normalized context key names, you can define a preset list to be used 
-instead of arguments set in the config. Define the sub I<_preset_args>:  
- 
+expects the values to be validated as arguments. As OpenXPKI widely uses
+normalized context key names, you can define a preset list to be used
+instead of arguments set in the config. Define the sub I<_preset_args>:
+
   sub _preset_args {
     return [ qw(cert_profile cert_subject_style) ];
   }
-  
+
 If no arguments are set in the validator definition, the constructor reads
 the context values at the given keys and injects them as arguments to the
 _validate method. The given preset example will set the first two arguments
-in the same way as the initial example code with the third parameter 
-remaining undefined. B<Note>: The preset arguments are not expanded! You 
+in the same way as the initial example code with the third parameter
+remaining undefined. B<Note>: The preset arguments are not expanded! You
 need to pass the context keys as string without leading "$" and can not use
-templates or static values.  
+templates or static values.
 
 =head2 Logging
 
 Log event for validation process must use facility application and
-should use priorities error and debug. Configuration errors should 
+should use priorities error and debug. Configuration errors should
 trigger OpenXPKI::Exception and log to workflow/error.
 
 
- 

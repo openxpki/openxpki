@@ -45,7 +45,7 @@ sub execute {
         $params->{ VALUE } = $context->param( $dp_value_param );
 
         CTX('log')->application()->debug('Old parameter format found in set datapool activity');
- 
+
 
     } else {
         $params->{ KEY } = $self->param( 'key' );
@@ -89,7 +89,7 @@ sub execute {
     }
 
     CTX('log')->application()->info('Set datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE});
- 
+
 
     # TODO: handle return code from set_data_pool_entry()
 

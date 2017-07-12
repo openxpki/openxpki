@@ -21,12 +21,12 @@ sub execute
     my $context = $workflow->context();
     my $dest    = $self->param('export_destination');
     my $state   = $self->param('export_state');
-    
+
     my $config = CTX('config');
-    
+
     my $server = $config->get('system.server.node.id');
-                
-    my $dir = CTX('config')->get('system.server.data_exchange.export'); 
+
+    my $dir = CTX('config')->get('system.server.data_exchange.export');
        $dir =~ s{/\s*$}{}xs;
 
     ## check the parameters
@@ -85,9 +85,9 @@ sub execute
     }
     print FD $msg;
     close FD;
-    
+
     CTX('log')->application()->info('serialized workflow for export in ' . $filename);
-    
+
 
     # workflow is now serialized in the export directory
 }

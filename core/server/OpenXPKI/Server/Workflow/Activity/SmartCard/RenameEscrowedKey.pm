@@ -45,7 +45,7 @@ sub execute {
     CTX('api')->modify_data_pool_entry($params);
 
     CTX('log')->application()->info("SmartCard escrow key renamed for csr_serial " . $context->param('csr_serial'));
- 
+
 
     return 1;
 }

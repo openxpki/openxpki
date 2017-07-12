@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::VolatileVault.pm 
+## OpenXPKI::Crypto::VolatileVault.pm
 ##
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
@@ -68,7 +68,7 @@ use Digest::SHA qw( sha1_base64 );
 		});
 
 	    # convert base64 to binary and get hex representation of this data
-	    $session_key{$ident} = uc(unpack('H*', 
+	    $session_key{$ident} = uc(unpack('H*',
 					     MIME::Base64::decode_base64($key)));
 	} else {
 	    # specifying key without iv is at least stupid...
@@ -90,9 +90,9 @@ use Digest::SHA qw( sha1_base64 );
 		    RANDOM_LENGTH => 16,
 		    INCLUDE_PADDING => 1,
 		});
-	    
+
 	    # convert base64 to binary and get hex representation of this data
-	    $session_iv{$ident} = uc(unpack('H*', 
+	    $session_iv{$ident} = uc(unpack('H*',
 					    MIME::Base64::decode_base64($iv)));
 	}
 
@@ -100,7 +100,7 @@ use Digest::SHA qw( sha1_base64 );
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR");
 	}
-	
+
 	if ($session_key{$ident} !~ m{ \A [0-9A-F]+ \z }xms) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_KEY");
@@ -133,12 +133,12 @@ use Digest::SHA qw( sha1_base64 );
 	} elsif (defined $args && (ref $args eq '')) {
 	    $data     = $args;
 	}
-	
+
 	if (! defined $data || ! defined $encoding) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
 	}
-	
+
     my $cipher = Crypt::CBC->new(
         -cipher => 'Crypt::OpenSSL::AES',
         -key    => pack('H*', $session_key{$ident}),
@@ -152,16 +152,16 @@ use Digest::SHA qw( sha1_base64 );
 	if ($encoding eq 'base64') {
 	    $blob = MIME::Base64::encode_base64($encrypted);
 	}
-	
+
 	if ($encoding eq 'base64-oneline') {
 	    $blob = MIME::Base64::encode_base64($encrypted, '');
 	}
 
-	if ($encoding eq 'raw') {	 
+	if ($encoding eq 'raw') {
 	    $blob = $encrypted;
 	}
 
-	if (! defined $blob) {	 
+	if (! defined $blob) {
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING",
 		params => {
@@ -169,9 +169,9 @@ use Digest::SHA qw( sha1_base64 );
 		});
 	}
 
-	return join(';', 
+	return join(';',
 		    $self->get_key_id(),
-		    $encoding, 
+		    $encoding,
 		    $blob);
     }
 
@@ -185,7 +185,7 @@ use Digest::SHA qw( sha1_base64 );
                 message => 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_CAN_DECRYPT_MISSING_ARGUMENT',
             );
         }
-	my ($creator_ident, $encoding, $encrypted_data) = 
+	my ($creator_ident, $encoding, $encrypted_data) =
 	    ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
 
 	if (! defined $encrypted_data) {
@@ -205,7 +205,7 @@ use Digest::SHA qw( sha1_base64 );
 	my $ident = ident $self;
 	my $arg = shift;
 
-	my ($creator_ident, $encoding, $encrypted_data) = 
+	my ($creator_ident, $encoding, $encrypted_data) =
 	    ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
 
 	if (! defined $encrypted_data) {
@@ -231,7 +231,7 @@ use Digest::SHA qw( sha1_base64 );
         -header => 'none',
     );
 	return $cipher->decrypt($encrypted_data);
-    }    
+    }
 
 
     sub export_key {
@@ -246,7 +246,7 @@ use Digest::SHA qw( sha1_base64 );
 		params => {
 		});
 	}
-	
+
 	if ($exportable{$ident} > 0) {
 	    # decrement export counter
 	    $exportable{$ident}--;
@@ -297,7 +297,7 @@ use Digest::SHA qw( sha1_base64 );
 	    OpenXPKI::Exception->throw (
 		message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_COMPUTE_KEY_ID_MISSING_PARAMETERS");
 	}
-	
+
 	my $digest = sha1_base64(join(':', $arg->{ALGORITHM}, $arg->{IV}, $arg->{KEY}));
 
 	if ($arg->{LONG}) {
@@ -330,11 +330,11 @@ during the runtime of a program.
 
   ...
 
-  my $tmp = $vault->decrypt($encrypted);  
+  my $tmp = $vault->decrypt($encrypted);
 
 The constructor will generate a random symmetric key and store it in an
-instance variable. 
-The class uses inside-out objects via Class::Std to make sure that 
+instance variable.
+The class uses inside-out objects via Class::Std to make sure that
 the secret key is strictly internal to the instance and not
 accessible from the outside.
 
@@ -373,21 +373,21 @@ greater or equal -1.
 
 =head2 encrypt()
 
-If the first argument to encrypt() is a hash reference the method 
+If the first argument to encrypt() is a hash reference the method
 accepts the named arguments 'DATA' and 'ENCODING'.
 
 DATA contains the scalar data to encrypt.
 
-ENCODING defaults to the default encoding for the instance and may be 
-one of 'base64' (base64 encoding), 'base64-oneline' (base64 encoding 
-on one single line without any whitespace or line breaks) or 
+ENCODING defaults to the default encoding for the instance and may be
+one of 'base64' (base64 encoding), 'base64-oneline' (base64 encoding
+on one single line without any whitespace or line breaks) or
 'raw' (binary data).
 
 If the first argument to encrypt() is a scalar instead of a hash reference
-it is assumed to contain the data to encrypt (just like a DATA named 
+it is assumed to contain the data to encrypt (just like a DATA named
 argument).
 
-During the lifetime of the instance the caller may call the encrypt() 
+During the lifetime of the instance the caller may call the encrypt()
 method in order to protect sensitive data. The method encrypts the
 specified data with the secret key and returns the encrypted value.
 This encrypted data may now be stored in insecure places because the
@@ -417,7 +417,7 @@ it.
 There is a small probability that the method returns a false positive
 (if a previous instance used the same instance ID).
 
-The method throws an exception if the data to be decrypted is not 
+The method throws an exception if the data to be decrypted is not
 recognized to be a valid VolatileVault data block.
 
 =head2 export_key()
@@ -430,7 +430,7 @@ possible as long as the maximum export counter has not been exceeded.
 If exporting the key is not explicitly allowed the method throws an
 exception.
 The returned key is returned in a hash reference with KEY, IV and
-ALGORITHM keys. The values for KEY and IV are hexadecimal (uppercase) 
+ALGORITHM keys. The values for KEY and IV are hexadecimal (uppercase)
 numbers specifying the key and initialization vector.
 
 =head2 lock_vault()
@@ -444,7 +444,7 @@ internally used key.
 =head2 get_key_id()
 
 Returns a key id which may be used to identify the used symmetric key. The
-returned key id is a truncated base64 encoded SHA1 hash (8 characters) of 
+returned key id is a truncated base64 encoded SHA1 hash (8 characters) of
 key and iv. Collisions may occur.
 
 If the named argument LONG is set, the returned key id is the full base64
@@ -468,7 +468,7 @@ Provide externally generated key and IV:
 
   ...
 
-  my $tmp = $vault->decrypt($encrypted);  
+  my $tmp = $vault->decrypt($encrypted);
 
 
 
@@ -485,10 +485,10 @@ Let VolatileVault pick its own random key but allow exporting the key.
 
   ...
 
-  my $tmp = $vault->decrypt($encrypted);  
+  my $tmp = $vault->decrypt($encrypted);
 
   my $key;
   $key = $vault->export_key(); # works
   $key = $vault->export_key(); # works
   $key = $vault->export_key(); # fails (export was only allowed 2 times above)
- 
+

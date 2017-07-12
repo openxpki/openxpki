@@ -131,7 +131,7 @@ while (1) {
     if ($status eq 'GET_PKI_REALM') {
         if (! $params{realm}) {
             if ($params{json}) {
-                print_json({ result => { pki_realm => keys %{$reply->{PARAMS}->{PKI_REALMS}} } }); 
+                print_json({ result => { pki_realm => keys %{$reply->{PARAMS}->{PKI_REALMS}} } });
             } else {
                 print "Available PKI realms:\n";
                 foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
@@ -149,7 +149,7 @@ while (1) {
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
         if (!$params{authstack}) {
             if ($params{json}) {
-                print_json({ result => { auth_stack => keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}} } }); 
+                print_json({ result => { auth_stack => keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}} } });
             } else {
                 print "Available authentication stacks:\n";
                 foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {

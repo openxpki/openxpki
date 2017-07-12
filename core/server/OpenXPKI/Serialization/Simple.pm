@@ -70,15 +70,15 @@ sub serialize {
 
     return $self->__write_data($data);
 }
- 
+
 # this is static!
 sub is_serialized {
-    
-    my $msg  = shift;    
-    return (defined $msg && 
-        ref $msg eq '' && 
+
+    my $msg  = shift;
+    return (defined $msg &&
+        ref $msg eq '' &&
         $msg =~ /^(SCALAR|BASE64|ARRAY|HASH|UNDEF)/);
-    
+
 }
 
 sub __write_data {
@@ -203,7 +203,7 @@ sub deserialize {
         );
     }
 
-    # Catch situations where the value is already deserialized, this can 
+    # Catch situations where the value is already deserialized, this can
     # happens when the workflow context is handed over via memory
     if ($msg && (ref $msg eq 'HASH') || (ref $msg eq 'ARRAY')) {
         return $msg;
@@ -591,7 +591,7 @@ Returns the deserialization of data passed as argument.
 
 =head2 is_serialized (static!)
 
-This checks if a given argument is a serialized string. This method is static! 
+This checks if a given argument is a serialized string. This method is static!
 
 =head1 Internal Functions
 

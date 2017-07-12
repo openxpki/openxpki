@@ -28,7 +28,7 @@ sub validate {
 
     if (!defined $value || $value eq '') {
          CTX('log')->application()->info("Regex validator skipped - value is empty");
- 
+
         return 1;
     }
 
@@ -43,8 +43,8 @@ sub validate {
         $regex = qr/ \A [a-z0-9\.-]+\@([\w_-]+\.)+(\w+) \z /xi;
 
     } elsif ($regex eq 'fqdn') {
-        $regex = qr/ \A (([\w\-]+\.)+)[\w\-]{2,} \z /xi;        
-        
+        $regex = qr/ \A (([\w\-]+\.)+)[\w\-]{2,} \z /xi;
+
     # or quote the string if no named match
     } else {
         # Extended Pattern notation, see http://perldoc.perl.org/perlre.html#Extended-Patterns
@@ -85,10 +85,10 @@ sub validate {
         #$wf->context()->param( '__error' => [ $self->error(), { FIELD => $field, VALUES => \@errors }]);
         ##! 32: 'Regex errors with regex ' . $regex. ', values '  . Dumper \@errors
         CTX('log')->application()->error("Regex validator failed on regex $regex");
- 
-        my @fields_with_error = ({ name => 'link', error => $self->error() }); 
+
+        my @fields_with_error = ({ name => 'link', error => $self->error() });
         validation_error( $self->error(), { invalid_fields => \@fields_with_error } );
-        
+
         return 0;
     }
 
@@ -105,13 +105,13 @@ OpenXPKI::Server::Workflow::Validator::Regex
 =head1 SYNOPSIS
 
     class: OpenXPKI::Server::Workflow::Validator::Regex
-    arg: 
+    arg:
      - $link
     param:
         regex: "\\A http(s)?://[a-zA-Z0-9-\\.]+"
         modifier: xi
         error: Please provide a well-formed URL starting with http://
-            
+
 =head1 DESCRIPTION
 
 Validates the context value referenced by argument against a regex. The regex
@@ -119,16 +119,16 @@ can be passed either as second argument or specified in the param section.
 The value given as argument is always preferred.
 
     class: OpenXPKI::Server::Workflow::Validator::Regex
-    arg: 
+    arg:
      - $link
      - email
 
 The error parameter is optional, if set this is shown in the UI if the validator
 fails instead of the default message.
 
-The regex must be given as pattern without delimiters and modifiers. The 
-default modifier is "xi" (case-insensitive, whitespace pattern), you can 
-override it using the key "modifier" in the param section. (@see 
+The regex must be given as pattern without delimiters and modifiers. The
+default modifier is "xi" (case-insensitive, whitespace pattern), you can
+override it using the key "modifier" in the param section. (@see
 http://perldoc.perl.org/perlre.html#Modifiers).
 
 Some common formats can also be referenced by name:
@@ -141,7 +141,7 @@ Basic check for valid email syntax
 
 =item fqdn
 
-A fully qualified domain name, must have at least one dot, all "word" 
+A fully qualified domain name, must have at least one dot, all "word"
 characters are accepted for the domain parts. Last domain part must have
 at least two characters
 

@@ -115,7 +115,7 @@ sub get_safe_tmpfile {
     my $template = $self->__get_safe_template ($arg_ref);
 
     ##! 2: 'build tmp file'
-    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );      
+    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );
     if (! $fh) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED'
@@ -183,14 +183,14 @@ sub cleanup {
 
     my $self = shift;
     my $ident = ident $self;
-    
+
     foreach my $file (keys %{$safe_filename_of{$ident}}) {
         if (-e $file) {
             unlink($file);
             delete $safe_filename_of{$ident}->{$file};
         }
     }
-    return 1;    
+    return 1;
 }
 
 1;

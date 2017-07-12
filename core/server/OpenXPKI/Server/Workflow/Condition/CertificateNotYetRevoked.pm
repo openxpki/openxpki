@@ -35,7 +35,7 @@ sub evaluate {
     );
 
     CTX('log')->application()->debug("Cert status is ".$cert->{status});
- 
+
 
     ##! 16: 'status: ' . $cert->{'STATUS'}
 

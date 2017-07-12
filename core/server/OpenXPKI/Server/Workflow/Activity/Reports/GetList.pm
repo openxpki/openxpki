@@ -23,7 +23,7 @@ sub execute {
     my $target_key = $self->param('target_key') || 'report_list';
 
     my $items = CTX('api')->get_report_list({ COLUMNS => [ 'report_name', 'created', 'description' ] });
- 
+
     $context->param({ $target_key => $items });
 
     return 1;
@@ -37,7 +37,7 @@ __END__
 OpenXPKI::Server::Workflow::Activity::Reports::GetList
 
 =head1 Description
- 
+
 
 =head1 Configuration
 
@@ -50,7 +50,7 @@ OpenXPKI::Server::Workflow::Activity::Reports::GetList
 Write the report data into the workflow context using this key. The
 filesystem is not used in this case, so all file related settings are
 ignored.
-  
+
 
 =back
- 
+

@@ -22,8 +22,8 @@ sub execute {
 
     my $target_key;
     my $default_value;
-    
-    # Legacy mode 
+
+    # Legacy mode
     if ($self->param('ds_namespace')) {
         ##! 16: 'Doing Legacy mode'
         foreach my $key (qw( namespace key_param value_param )) {
@@ -47,35 +47,35 @@ sub execute {
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
                   . 'MISSPARAM_KEY_PARAM' );
         }
-    
+
         $params->{KEY} = $context->param($keyparam);
-    
+
         $target_key = $self->param('ds_value_param');
         if ( not $target_key ) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
                 . 'MISSPARAM_VALUE_PARAM' );
         }
-        
+
         $default_value = $self->param('ds_default_value');
-        
+
     } else {
-        
+
         $params->{NAMESPACE} = $self->param('namespace');
         if (!$params->{NAMESPACE}) {
             configuration_error('Datapool::GetEntry requires the namespace parameter');
         }
-        
+
         $params->{KEY} = $self->param('key');
         if (!$params->{KEY}) {
             configuration_error('Datapool::GetEntry requires the key parameter');
         }
-        
+
         $target_key = $self->param('target_key') || '_tmp';
-        
+
         $default_value = $self->param('default_value');
     }
-  
+
 
     ##! 16: ' Fetch from datapool ' . Dumper $params
 
@@ -116,8 +116,8 @@ This class sets an entry in the Datapool.
 
 =head2 Parameters
 
-In the activity definition, the following parameters must be set. The syntax 
-using the I<ds_> prefix is deprecated, use the I<_map> syntax to load key and 
+In the activity definition, the following parameters must be set. The syntax
+using the I<ds_> prefix is deprecated, use the I<_map> syntax to load key and
 value from the context. It is not allowed to mix prefixed and non-prefixed
 parameters!
 
@@ -137,7 +137,7 @@ The value used as datapool key, use I<_map> syntax to use values from context!
 
 The context target key to write the result to, the default is I<_tmp>.
 
-B<Note:> If the retrieved value was encrypted in the datapool, the 
+B<Note:> If the retrieved value was encrypted in the datapool, the
 target parameter must start with an underscore (=volatile parameter).
 
 =item ds_key_param, deprecated
@@ -147,11 +147,11 @@ datastore entry.
 
 =item ds_value_param, deprecated
 
-The name of the context parameter that contains the value for this 
+The name of the context parameter that contains the value for this
 datastore entry.
 
 
-B<Note:> If the retrieved value was encrypted in the datapool, the 
+B<Note:> If the retrieved value was encrypted in the datapool, the
 target parameter must start with an underscore (=volatile parameter).
 
 =item ds_default_value
@@ -161,5 +161,5 @@ found. If preceeded with a dollar symbol '$', then the workflow
 context variable with the given name will be used.
 
 =back
- 
+
 
