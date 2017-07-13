@@ -253,20 +253,20 @@ sub handle_server_personalization {
 
         $log->info("Plugin csr upload for keyid $keyid");
 
-        #	$log->debug("choosen_login". $chosenLoginID);
-        #	if ( defined $self->param('chosenLoginID') ) {
-        #		$chosenLoginID = $self->param('chosenLoginID');
-        #	}
+        #    $log->debug("choosen_login". $chosenLoginID);
+        #    if ( defined $self->param('chosenLoginID') ) {
+        #        $chosenLoginID = $self->param('chosenLoginID');
+        #    }
 
-        #	if( defined $session->param('dbntloginid') ){
-        #		eval{
-        #			  $log->info("LoginID:". $session->param('dbntloginid'});
-        #			 # $log->info("LoginID:". Dumper($session->param('dbntloginid'})));
-        #			  $log->info("LoginID:". $session->param('dbntloginid')->{0});
-        #		};
-        #		##FIXME Always use first ID regardless of number of ID'S
-        #		$chosenLoginID = $session->param('dbntloginid')->[0];
-        #	}
+        #    if( defined $session->param('dbntloginid') ){
+        #        eval{
+        #              $log->info("LoginID:". $session->param('dbntloginid'});
+        #             # $log->info("LoginID:". Dumper($session->param('dbntloginid'})));
+        #              $log->info("LoginID:". $session->param('dbntloginid')->{0});
+        #        };
+        #        ##FIXME Always use first ID regardless of number of ID'S
+        #        $chosenLoginID = $session->param('dbntloginid')->[0];
+        #    }
 
 
         # split line into 76 character long chunks
@@ -286,7 +286,7 @@ sub handle_server_personalization {
             'PARAMS'   => {
                 'pkcs10' => $pkcs10,
                 'keyid'  => $keyid,
-                #		'chosen_loginid' => $chosenLoginID
+                #        'chosen_loginid' => $chosenLoginID
             },
         };
 

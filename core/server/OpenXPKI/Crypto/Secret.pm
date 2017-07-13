@@ -23,71 +23,71 @@ use OpenXPKI::Exception;
 
 
     sub START {
-	my ($self, $ident, $arg_ref) = @_;
+    my ($self, $ident, $arg_ref) = @_;
 
-	# only in Command.pm base class: get implementation
-	if (ref $self eq 'OpenXPKI::Crypto::Secret') {
-	    $self->attach_impl($arg_ref);
-	}
+    # only in Command.pm base class: get implementation
+    if (ref $self eq 'OpenXPKI::Crypto::Secret') {
+        $self->attach_impl($arg_ref);
+    }
     }
 
     sub attach_impl : PRIVATE {
-	my $self = shift;
-	my $ident = ident $self;
-	my $arg_ref = shift;
+    my $self = shift;
+    my $ident = ident $self;
+    my $arg_ref = shift;
 
-	my $type = 'Plain';
-	if (defined $arg_ref
-	    && defined $arg_ref->{TYPE}
-	    && (ref $arg_ref->{TYPE} eq '')) {
-	    $type = $arg_ref->{TYPE};
-	}
+    my $type = 'Plain';
+    if (defined $arg_ref
+        && defined $arg_ref->{TYPE}
+        && (ref $arg_ref->{TYPE} eq '')) {
+        $type = $arg_ref->{TYPE};
+    }
 
     # Mark exportable
     if (defined $arg_ref->{EXPORT} && $arg_ref->{EXPORT}) {
         $exportable{$ident} = 1;
     }
 
-	my $base = 'OpenXPKI::Crypto::Secret';
-	my $class = $base . '::' . $type;
+    my $base = 'OpenXPKI::Crypto::Secret';
+    my $class = $base . '::' . $type;
 
-	##! 8: "try to load class $class"
-	eval "use $class;";
-	if ($EVAL_ERROR) {
-	    OpenXPKI::Exception->throw(
-		message => "I18N_OPENXPKI_CRYPTO_SECRET_IMPLEMENTATION_UNAVAILABLE",
-		params  =>
-		{
-		    EVAL_ERROR => $EVAL_ERROR,
-		    MODULE     => $class,
-		});
-	}
+    ##! 8: "try to load class $class"
+    eval "use $class;";
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_IMPLEMENTATION_UNAVAILABLE",
+        params  =>
+        {
+            EVAL_ERROR => $EVAL_ERROR,
+            MODULE     => $class,
+        });
+    }
 
-	$impl{$ident} = eval "$class->new(\$arg_ref)";
+    $impl{$ident} = eval "$class->new(\$arg_ref)";
 
-	if (! defined $impl{$ident}) {
-	    OpenXPKI::Exception->throw(
-		message => "I18N_OPENXPKI_CRYPTO_SECRET_INSTANTIATION_FAILED",
-		params  =>
-		{
-		    EVAL_ERROR => $EVAL_ERROR,
-		    MODULE     => $class,
-		});
-	}
+    if (! defined $impl{$ident}) {
+        OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_INSTANTIATION_FAILED",
+        params  =>
+        {
+            EVAL_ERROR => $EVAL_ERROR,
+            MODULE     => $class,
+        });
+    }
 
-	return 1;
+    return 1;
     }
 
     # dispatch client call to secret class implementation
     sub AUTOMETHOD {
-	my ($self, $ident, @other_args) = @_;
+    my ($self, $ident, @other_args) = @_;
 
-	##! 1: "AUTOMETHOD($_)"
+    ##! 1: "AUTOMETHOD($_)"
 
-	my $method = $_;
-	return sub {
-	    return $impl{$ident}->$method(@other_args);
-	}
+    my $method = $_;
+    return sub {
+        return $impl{$ident}->$method(@other_args);
+    }
     }
 
     sub is_exportable {

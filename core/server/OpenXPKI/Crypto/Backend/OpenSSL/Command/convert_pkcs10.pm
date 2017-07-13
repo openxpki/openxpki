@@ -17,7 +17,7 @@ sub get_command
     $self->get_tmpfile ('IN', 'OUT');
     $self->write_file (FILENAME => $self->{INFILE},
                        CONTENT  => $self->{DATA},
-	               FORCE    => 1);
+                   FORCE    => 1);
 
     ## check parameters
 

@@ -36,10 +36,10 @@ sub evaluate {
 
     my $csr;
     eval {
-	$csr = OpenXPKI::Crypto::CSR->new(
-	    TOKEN => $default_token,
-	    DATA => $pkcs10,
-	    );
+    $csr = OpenXPKI::Crypto::CSR->new(
+        TOKEN => $default_token,
+        DATA => $pkcs10,
+        );
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (

@@ -33,13 +33,13 @@ sub execute
     foreach my $key (keys %{$params}) {
 
         ##! 16: 'Key ' . $key
-    	my $value = $self->param($key);
+        my $value = $self->param($key);
 
         ##! 16: 'Value ' . $value
 
-    	if (!defined $value) {
-    	    next;
-    	}
+        if (!defined $value) {
+            next;
+        }
 
         $hash->{$key} = $value;
 

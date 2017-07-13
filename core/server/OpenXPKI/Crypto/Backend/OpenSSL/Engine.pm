@@ -37,10 +37,10 @@ sub new {
                         KEY_STORE
                        }) {
 
-	if (exists $keys->{$key}) {
+    if (exists $keys->{$key}) {
             ##! 128: 'setting key ' . $key . ' to value ' . Dumper $keys->{$key}
-	    $self->{$key} = $keys->{$key};
-	}
+        $self->{$key} = $keys->{$key};
+    }
     }
     $self->__check_engine_usage();
     $self->__check_key_store();
@@ -117,10 +117,10 @@ sub login {
     } elsif ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED_EVAL_ERROR",
-	    params => {
-		EVAL_ERROR => $EVAL_ERROR,
-	    },
-	);
+        params => {
+        EVAL_ERROR => $EVAL_ERROR,
+        },
+    );
     }
 
     $self->{ONLINE} = 1;
@@ -196,8 +196,8 @@ sub get_passwd
     my $self = shift;
 
     if (defined $self->{SECRET} && $self->{SECRET}->is_complete()) {
-	##! 16: 'secret is_complete: ' . $self->{SECRET}->is_complete()
-	return $self->{SECRET}->get_secret();
+    ##! 16: 'secret is_complete: ' . $self->{SECRET}->is_complete()
+    return $self->{SECRET}->get_secret();
     }
 
     return $self->{PASSWD} if (exists $self->{PASSWD});

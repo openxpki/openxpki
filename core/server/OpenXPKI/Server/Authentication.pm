@@ -189,12 +189,12 @@ sub login_step {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
             params  => {
-		STACK => $stack
-	    },
-	    log     => {
-		priority => 'warn',
-		facility => 'auth'
-	    },
+        STACK => $stack
+        },
+        log     => {
+        priority => 'warn',
+        facility => 'auth'
+        },
         );
     }
 
@@ -211,14 +211,14 @@ sub login_step {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_INCORRECT_HANDLER",
                 params  => {
-		    PKI_REALM => $realm,
-		    HANDLER => $handler,
-		},
-		log => {
-		    priority => 'error',
-		    facility => 'auth',
-		},
-		);
+            PKI_REALM => $realm,
+            HANDLER => $handler,
+        },
+        log => {
+            priority => 'error',
+            facility => 'auth',
+        },
+        );
         }
         eval {
             ($user, $role, $return_msg) = $ref->login_step({
@@ -243,26 +243,26 @@ sub login_step {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $exc ],
-		log => {
-		    priority => 'warn',
-		    facility => 'auth',
-		},
-		);
+        log => {
+            priority => 'warn',
+            facility => 'auth',
+        },
+        );
         }
         else {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $EVAL_ERROR->message() ],
-		log => {
-		    priority => 'warn',
-		    facility => 'auth',
-		},
-		);
+        log => {
+            priority => 'warn',
+            facility => 'auth',
+        },
+        );
         }
     }
 
     if (defined $user && defined $role) {
-	    CTX('log')->auth()->info("Login successful using authentication stack '$stack' (user: '$user', role: '$role')");
+        CTX('log')->auth()->info("Login successful using authentication stack '$stack' (user: '$user', role: '$role')");
         return ($user, $role, $return_msg);
     }
 

@@ -127,22 +127,22 @@ sub value {
     if ( defined $data ) {
         if ( ref($data) eq 'ARRAY' ) {
 #            $self->_will_need_update;
-	    if (defined $index) {
-		return $data->[$index];
-	    } else {
-		return $data;
-	    }
+        if (defined $index) {
+        return $data->[$index];
+        } else {
+        return $data;
+        }
         }
         else {
             confess "data in ", $self->get_context_key, " is not ARRAY";
         }
     }
     else { # if array appears to be empty, just return an empty string/array
-    	if (defined $index) {
-    	    return '';
-    	} else {
-    	    return [];
-    	}
+        if (defined $index) {
+            return '';
+        } else {
+            return [];
+        }
     }
 }
 

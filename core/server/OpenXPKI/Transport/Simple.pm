@@ -250,11 +250,11 @@ sub __receive
             $length = CORE::read STDIN, $msg, $length;
         };
         if (my $eval_err = $EVAL_ERROR) {
-    	    if ($eval_err eq "alarm\n") {
-        		# our caller may have set an alarm signal handler, if we
-        		# die here, simply propagate this exception
-        		die $eval_err;
-    	    }
+            if ($eval_err eq "alarm\n") {
+                # our caller may have set an alarm signal handler, if we
+                # die here, simply propagate this exception
+                die $eval_err;
+            }
             ##! 16: 'EVAL_ERROR!'
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED',
@@ -267,9 +267,9 @@ sub __receive
     {
         ##! 8: "connection closed"
         OpenXPKI::Exception->throw(
-	       message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION",
-	       log => undef, # do not log exception
-	    );
+           message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION",
+           log => undef, # do not log exception
+        );
     }
     ##! 4: "read message - $msg"
     return $msg;

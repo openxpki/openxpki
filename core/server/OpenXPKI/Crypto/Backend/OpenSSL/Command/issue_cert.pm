@@ -78,7 +78,7 @@ sub get_command
     #my $config = $self->{CONFIG}->get_config_filename();
     $self->write_file (FILENAME => $self->{CSRFILE},
                        CONTENT  => $self->{CSR},
-	               FORCE    => 1);
+                   FORCE    => 1);
 
     ## build the command
 

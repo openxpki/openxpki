@@ -27,9 +27,9 @@ sub read_file {
     my $filename = shift;
 
     if (! defined $filename) {
-	OpenXPKI::Exception->throw (
-	    message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_MISSING_PARAMETER',
-	    );
+    OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_MISSING_PARAMETER',
+        );
     }
 
     if (! -e $filename) {
@@ -45,15 +45,15 @@ sub read_file {
     }
 
     my $result = do {
-	open my $HANDLE, '<', $filename;
-	if (! $HANDLE) {
-	    OpenXPKI::Exception->throw (
-		message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED',
-		params  => {'FILENAME' => $filename});
-	}
-	# slurp mode
-	local $INPUT_RECORD_SEPARATOR;     # long version of $/
-	<$HANDLE>;
+    open my $HANDLE, '<', $filename;
+    if (! $HANDLE) {
+        OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED',
+        params  => {'FILENAME' => $filename});
+    }
+    # slurp mode
+    local $INPUT_RECORD_SEPARATOR;     # long version of $/
+    <$HANDLE>;
     };
 
     return $result;
@@ -70,13 +70,13 @@ sub write_file {
     if (! defined $filename) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_FILENAME_SPECIFIED',
-	    );
+        );
     }
 
     if (! defined $content) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_CONTENT_SPECIFIED',
-	    );
+        );
     }
 
     if ((-e $filename) and
@@ -91,7 +91,7 @@ sub write_file {
 
     my $mode = O_WRONLY | O_TRUNC;
     if (! -e $filename) {
-	$mode |= O_EXCL | O_CREAT;
+    $mode |= O_EXCL | O_CREAT;
     }
 
     my $HANDLE;

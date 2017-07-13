@@ -57,10 +57,10 @@ sub import
         foreach my $regex (keys %LEVEL)
         {
             #print STDERR "Regex $regex ~ $module\n";
-	       if ($module =~ /^$regex$/) {
-		      print STDERR "Debugging module(s) '$module' with level $LEVEL{$regex}.\n";
-		      $LEVEL{$module} = $LEVEL{$regex};
-	       }
+           if ($module =~ /^$regex$/) {
+              print STDERR "Debugging module(s) '$module' with level $LEVEL{$regex}.\n";
+              $LEVEL{$module} = $LEVEL{$regex};
+           }
         }
     }
 
@@ -180,7 +180,7 @@ sub debug
     $msg = OpenXPKI::Debug::__censor_msg($msg);
 
     if (! defined $msg) {
-	    $msg = 'undef';
+        $msg = 'undef';
     }
     $msg = "(line $line): $msg";
 

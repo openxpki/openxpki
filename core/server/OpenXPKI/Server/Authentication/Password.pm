@@ -57,11 +57,11 @@ sub login_step {
         ##! 4: 'no login data received (yet)'
         return (undef, undef,
             {
-		SERVICE_MSG => "GET_PASSWD_LOGIN",
-		PARAMS      => {
+        SERVICE_MSG => "GET_PASSWD_LOGIN",
+        PARAMS      => {
                     NAME        => $self->{NAME},
                     DESCRIPTION => $self->{DESC},
-	        },
+            },
             },
         );
     }
@@ -125,47 +125,47 @@ sub login_step {
         });
     }
 
-	my ($computed_secret, $salt);
-	if ($scheme eq 'sha') {
- 	    my $ctx = Digest::SHA->new();
- 	    $ctx->add($passwd);
-	    $computed_secret = $ctx->b64digest();
-	}
-	if ($scheme eq 'ssha') {
-	    $salt = substr(decode_base64($encrypted), 20);
- 	    my $ctx = Digest::SHA->new();
- 	    $ctx->add($passwd);
-	    $ctx->add($salt);
-	    $computed_secret = encode_base64($ctx->digest() . $salt, '');
-	}
-	if ($scheme eq 'md5') {
- 	    my $ctx = Digest::MD5->new();
- 	    $ctx->add($passwd);
-	    $computed_secret = $ctx->b64digest();
-	}
-	if ($scheme eq 'smd5') {
-	    $salt = substr(decode_base64($encrypted), 16);
- 	    my $ctx = Digest::MD5->new();
- 	    $ctx->add($passwd);
-	    $ctx->add($salt);
-	    $computed_secret = encode_base64($ctx->digest() . $salt, '');
-	}
-	if ($scheme eq 'crypt') {
-	    $computed_secret = crypt($passwd, $encrypted);
-	}
+    my ($computed_secret, $salt);
+    if ($scheme eq 'sha') {
+         my $ctx = Digest::SHA->new();
+         $ctx->add($passwd);
+        $computed_secret = $ctx->b64digest();
+    }
+    if ($scheme eq 'ssha') {
+        $salt = substr(decode_base64($encrypted), 20);
+         my $ctx = Digest::SHA->new();
+         $ctx->add($passwd);
+        $ctx->add($salt);
+        $computed_secret = encode_base64($ctx->digest() . $salt, '');
+    }
+    if ($scheme eq 'md5') {
+         my $ctx = Digest::MD5->new();
+         $ctx->add($passwd);
+        $computed_secret = $ctx->b64digest();
+    }
+    if ($scheme eq 'smd5') {
+        $salt = substr(decode_base64($encrypted), 16);
+         my $ctx = Digest::MD5->new();
+         $ctx->add($passwd);
+        $ctx->add($salt);
+        $computed_secret = encode_base64($ctx->digest() . $salt, '');
+    }
+    if ($scheme eq 'crypt') {
+        $computed_secret = crypt($passwd, $encrypted);
+    }
 
     if (! defined $computed_secret) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
             params  => {
-		      USER => $account,
+              USER => $account,
             },
-		);
+        );
     }
 
     ##! 2: "ident user ::= $account and digest ::= $computed_secret"
-	$computed_secret =~ s{ =+ \z }{}xms;
-	$encrypted       =~ s{ =+ \z }{}xms;
+    $computed_secret =~ s{ =+ \z }{}xms;
+    $encrypted       =~ s{ =+ \z }{}xms;
 
     ## compare passphrases
     if ($computed_secret ne $encrypted) {
@@ -173,9 +173,9 @@ sub login_step {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
             params  => {
-		      USER => $account,
+              USER => $account,
             },
-		);
+        );
     }
     else { # hash is fine, return user, role, service ready message
         return ($account, $user_info->{role},

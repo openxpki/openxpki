@@ -663,11 +663,11 @@ sub get_workflow_activities_params {
         my $fields = [];
         foreach my $field ($workflow->get_action_fields( $action ) ) {
             push @{ $fields }, {
-                'name'		=> $field->name(),
-                'label'		=> $field->label(),
-                'description'	=> $field->description(),
-                'type'		=> $field->type(),
-                'requirement'	=> $field->requirement(),
+                'name'        => $field->name(),
+                'label'        => $field->label(),
+                'description'    => $field->description(),
+                'type'        => $field->type(),
+                'requirement'    => $field->requirement(),
             };
         };
         push @list, $action, $fields;

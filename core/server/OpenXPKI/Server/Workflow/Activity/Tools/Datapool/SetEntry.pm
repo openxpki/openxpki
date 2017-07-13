@@ -71,21 +71,21 @@ sub execute {
     }
 
     if (defined $params->{EXPIRATION_DATE}) {
-	    my $then = OpenXPKI::DateTime::get_validity({
+        my $then = OpenXPKI::DateTime::get_validity({
             REFERENCEDATE  => DateTime->now(),
             VALIDITY       => $params->{EXPIRATION_DATE},
             VALIDITYFORMAT => 'detect',
-	    });
-	    $params->{EXPIRATION_DATE} = $then->epoch();
+        });
+        $params->{EXPIRATION_DATE} = $then->epoch();
     }
 
     CTX('api')->set_data_pool_entry($params);
 
     # we support this feature only in legacy mode
     if ($self->param('ds_unset_context_value')) {
-    	##! 16: 'clearing context parameter ' . $valparam
+        ##! 16: 'clearing context parameter ' . $valparam
         my $valparam  = $self->param('ds_value_param');
-	    $context->param( $valparam => undef );
+        $context->param( $valparam => undef );
     }
 
     CTX('log')->application()->info('Set datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE});

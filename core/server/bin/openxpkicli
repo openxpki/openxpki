@@ -245,7 +245,7 @@ openxpkicli [options] command
     --authuser USER       authentication user
     --authpass PASS       password for authentication user
     --arg KEY=VALUE       pass VALUE to method as parameter KEY
-    --param VALUE     	  stack VALUE onto methods PARAMS array
+    --param VALUE         stack VALUE onto methods PARAMS array
     --param KEY=VALUE     set VALUE in methods PARAMS hash using KEY
     --debug               enable debug mode
     --timeout             socket timeout in seconds (default 30s)

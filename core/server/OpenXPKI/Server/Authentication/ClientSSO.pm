@@ -30,11 +30,11 @@ sub login_step {
         ##! 4: 'no login data received (yet)'
         return (undef, undef,
             {
-		SERVICE_MSG => "GET_CLIENT_SSO_LOGIN",
-		PARAMS      => {
+        SERVICE_MSG => "GET_CLIENT_SSO_LOGIN",
+        PARAMS      => {
                     NAME        => $self->{NAME},
                     DESCRIPTION => $self->{DESC},
-	        },
+            },
             },
         );
     }
@@ -87,8 +87,8 @@ sub login_step {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED",
                 params  => {
-		    USER => $account,
-		});
+            USER => $account,
+        });
             return (undef, undef, {});
         }
 

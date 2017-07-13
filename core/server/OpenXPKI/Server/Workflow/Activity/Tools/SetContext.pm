@@ -32,13 +32,13 @@ sub execute
     foreach my $key (keys %{$params}) {
 
         ##! 16: 'Key ' . $key
-    	my $value = $self->param($key);
+        my $value = $self->param($key);
 
         ##! 16: 'Value ' . Dumper $value
 
-    	if (defined $value) {
-		    $context->param($key => $value);
-	    }
+        if (defined $value) {
+            $context->param($key => $value);
+        }
 
         CTX('log')->application()->debug("Setting context $key to $value");
 
