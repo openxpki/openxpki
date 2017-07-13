@@ -15,24 +15,24 @@ use OpenXPKI::Serialization::Simple;
 sub new {
     my $class = shift;
     my $args = shift;
-    
+
     $args->{PLUGIN_BASE} = 'OpenXPKI::Template::Plugin';
-    
+
     my $self = $class->SUPER::new($args);
-    
+
     return $self;
 }
 
 
-=head2 render 
+=head2 render
 
 This wraps around the process method of the original Template class. It expects
-the parameter string as first argument (scalar, not reference!) and a hashref 
+the parameter string as first argument (scalar, not reference!) and a hashref
 with the params for template. The class tries to auto-deserialize parameters
 from the params array by evaluating the template string for sequences like
-I<context.upper.lower> (this is yet done for the context prefix only). The 
+I<context.upper.lower> (this is yet done for the context prefix only). The
 result is returned as a string, if processing fails, an OpenXPKI::Exception is
-thrown. 
+thrown.
 
 =cut
 sub render {
@@ -44,17 +44,17 @@ sub render {
     ##! 16: 'template: ' . $template
     ##! 32: 'input params: ' . Dumper $tt_param
     # Try to detect access to non-scalar values and check if those are deserialized
-    # Works only for stuff below the key context   
-    my @non_scalar_refs = ($template =~ m{ context\.([^\s\.]+)\.\S+ }xsg);            
+    # Works only for stuff below the key context
+    my @non_scalar_refs = ($template =~ m{ context\.([^\s\.]+)\.\S+ }xsg);
     foreach my $refkey (@non_scalar_refs) {
-        ##! 16: 'auto deserialize for ' . $refkey 
+        ##! 16: 'auto deserialize for ' . $refkey
         if (!ref $tt_param->{'context'}->{$refkey}) {
             if (defined $tt_param->{'context'}->{$refkey} &&
                 OpenXPKI::Serialization::Simple::is_serialized( $tt_param->{'context'}->{$refkey} )) {
                 my $ser  = OpenXPKI::Serialization::Simple->new();
                 $tt_param->{'context'}->{$refkey} = $ser->deserialize( $tt_param->{'context'}->{$refkey} );
-                ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}        
-            }                                 
+                ##! 32: 'deserialized value ' . Dumper $tt_param->{$refkey}
+            }
         }
     }
 
@@ -68,16 +68,16 @@ sub render {
             }
         );
     }
-    
+
     # trim spaces and newlines
     $out =~ s{ \A \s* }{}xms;
     $out =~ s{ \s* \z }{}xms;
-    
+
     ##! 32: 'output: #' . $out . '#'
-    
+
     return $out;
-    
+
 }
-    
-    
+
+
 1;

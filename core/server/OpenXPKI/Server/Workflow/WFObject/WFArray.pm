@@ -25,7 +25,7 @@ sub pop {
     my ($self) = @_;
     my $data = $self->_get_data_ref;
 #    my $data = $data_ref{ ident $self };
-    
+
     if ( defined $data ) {
         if ( ref($data) eq 'ARRAY' ) {
 #            $self->_will_need_update;
@@ -104,7 +104,7 @@ sub count {
     my ($self) = @_;
     my $data = $self->_get_data_ref;
 #    my $data = $data_ref{ ident $self };
-    
+
     if ( defined $data ) {
         if ( ref($data) eq 'ARRAY' ) {
 #            $self->_will_need_update;
@@ -123,7 +123,7 @@ sub value {
     my ($self, $index) = @_;
     my $data = $self->_get_data_ref;
 #    my $data = $data_ref{ ident $self };
-    
+
     if ( defined $data ) {
         if ( ref($data) eq 'ARRAY' ) {
 #            $self->_will_need_update;
@@ -151,7 +151,7 @@ sub values {
     my ($self) = @_;
     my $data = $self->_get_data_ref;
 #    my $data = $data_ref{ ident $self };
-    
+
     if ( defined $data ) {
         if ( ref($data) eq 'ARRAY' ) {
 #            $self->_will_need_update;
@@ -197,7 +197,7 @@ accessors and additional properties.
 
 =head2 count
 
-Returns the number of elements stored in the array. If the array is not 
+Returns the number of elements stored in the array. If the array is not
 initialized, 0 is returned.
 
 =head2 value INDEX
@@ -209,7 +209,7 @@ array as a reference.
 
 =head2 values
 
-Returns a reference to a copy of the array stored in the instance. 
+Returns a reference to a copy of the array stored in the instance.
 
 =head2 pop, shift
 

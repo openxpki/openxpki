@@ -21,12 +21,12 @@ sub execute {
     my $workflow = shift;
 
     ##! 32: 'context: ' . Dumper( $workflow->context() )
-    
+
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
-    
+
     # We do not need an attribute map here
     $nice_backend->checkForRevocation();
-    	
+
 }
 
 1;

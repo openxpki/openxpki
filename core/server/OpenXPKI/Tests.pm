@@ -238,7 +238,7 @@ sub create_ca_cert {
 --- $instancedir/etc/openxpki/config.xml  2006-12-04 10:41:16.000000000 +0100
 +++ $instancedir/etc/openxpki/config.xml  2006-12-04 10:49:32.000000000 +0100
 @@ -46,8 +46,8 @@
- 
+
        <secret>
          <group id="default" label="I18N_OPENXPKI_CONFIG_DEFAULT_SECRET_AUTHENTICATION_GROUP">
 -          <method id="plain">
@@ -622,7 +622,7 @@ OpenXPKI::Tests
 
 =head1 Description
 
-This is a helper module for the OpenXPKI test suites. It 
+This is a helper module for the OpenXPKI test suites. It
 adds a lot of helper functions for deploying, starting,
 stopping a server as well as own test functions that add tests for
 various things.

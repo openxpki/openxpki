@@ -8,9 +8,9 @@
 ## BIG FAT WARNING: This class works using so called compile time filters
 # The decission weather to apply debugging to a class or not is made based
 # on the %FILTER hash at the time the module is included for the first time
-# In turn, if you load a module before you set up the %FILTER hash, the 
+# In turn, if you load a module before you set up the %FILTER hash, the
 # module will not be decorated with debug output!
-# The fastest way to ruin the story is "use" in the head of your start scripts. 
+# The fastest way to ruin the story is "use" in the head of your start scripts.
 
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ sub import
         # import function (which is the normal use anyways)
         $module = (caller(0))[0];
     }
-    
+
      #foreach my $key (keys %LEVEL)
      #{
      #   print STDERR "Debugging module(s) '$key' with level $LEVEL{$key}.\n";
@@ -119,7 +119,7 @@ sub filter
                     # extensively in debug comments ...
                     # HERE BE DRAGONS ... HERE BE DRAGONS ...
                     ##--------------------------------------------------##
-                    $_ = << "XEOF"; 
+                    $_ = << "XEOF";
 {
     my \$subroutine = (caller(0))[3];
     my \$line       = __LINE__;
@@ -191,7 +191,7 @@ sub debug
         # if HiRes is available, we want HiRes timestamps ...
         require Time::HiRes;
         my ($seconds, $microseconds) = Time::HiRes::gettimeofday();
-        $timestamp .= '.' . sprintf("%06d", $microseconds); 
+        $timestamp .= '.' . sprintf("%06d", $microseconds);
     };
     my $output = "$timestamp DEBUG:$level PID:$PROCESS_ID $msg";
     if ($USE_COLOR && $color) {
@@ -205,7 +205,7 @@ sub debug
 
 sub __censor_msg {
     my $msg  = shift;
-    
+
     $msg =~ s{openssl\ enc.*}{openssl enc \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
     $msg =~ s{_password([A-Za-z_]*) .*}{_password$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;
     $msg =~ s{PASS([A-Za-z_]*) .*}{PASS$1 \*the rest of this debug message is censored by OpenXPKI::Debug\* }xms;

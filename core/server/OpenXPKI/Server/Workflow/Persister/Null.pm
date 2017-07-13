@@ -27,7 +27,7 @@ sub create_workflow {
     ##! 1: "create volatile workflow"
 
     CTX('log')->workflow()->info("Created volatile workflow for type ".$workflow->type());
- 
+
 
     return 0;
 }

@@ -16,23 +16,23 @@ use English;
 __PACKAGE__->mk_accessors( qw( emptyok ) );
 
 sub _init {
-    
+
     my ( $self, $params ) = @_;
-            
+
     $self->emptyok( exists $params->{'emptyok'} ? $params->{'emptyok'} : 0 );
-    
+
     return 1;
 }
 
 
 sub validate {
-    
+
     my ( $self, $wf, $timespec ) = @_;
-    
+
     if ($self->emptyok && !$timespec) {
-        return 1;    
-    } 
-    
+        return 1;
+    }
+
     if ($timespec !~ /^[+-](\d{2}){1,6}$/) {
         ##! 16: 'invalid timespec: ' . $timespec
         validation_error("I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_RELATIVEDATE_WRONG_TIMESPEC");
@@ -57,7 +57,7 @@ OpenXPKI::DateTime
 
 =over 8
 
-=item emptyok 
+=item emptyok
 
 =back
 

@@ -26,14 +26,14 @@ sub get_command {
         $passwd           = $self->{ENGINE}->get_passwd();
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
         $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
-        
+
     } elsif ( $self->{PASSWD} or $self->{KEY} ) {
         ## external signature wit provided key
         ## user signature
 
         # check minimum requirements
         if ( not exists $self->{PASSWD} ) {
-            OpenXPKI::Exception->throw( message => 
+            OpenXPKI::Exception->throw( message =>
                 "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_PASSWD"
             );
         }
@@ -73,9 +73,9 @@ sub get_command {
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
         $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
     }
-    
+
     ## check parameters
-    
+
     if ( not $self->{CONTENT} ) {
       OpenXPKI::Exception->throw( message =>
             "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CONTENT" );
@@ -88,17 +88,17 @@ sub get_command {
       OpenXPKI::Exception->throw( message =>
             "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY" );
     }
-    
+
     ## prepare data
-    
+
     $self->write_file(
       FILENAME => $self->{CONTENTFILE},
       CONTENT  => $self->{CONTENT},
       FORCE    => 1
       );
-    
+
     ## build the command
-    
+
     my $command = "smime -sign";
         $command .= " -nodetach"                    if ( not $self->{DETACH} );
         $command .= " -engine $engine"              if ($engine);
@@ -108,7 +108,7 @@ sub get_command {
         $command .= " -in " . $self->{CONTENTFILE};
         $command .= " -out " . $self->{OUTFILE};
         $command .= " -outform PEM";
-    
+
     if ( defined $passwd ) {
       $command .= " -passin env:pwd";
       $self->set_env( "pwd" => $passwd );

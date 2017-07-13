@@ -247,12 +247,12 @@ sub execute {
                 if ($field->{CLONABLE}) {
                     $cert_subject_parts->{ $field->{ID} } = \@val;
                     CTX('log')->application()->debug("subject preset - field $field, pattern $preset, values " . join('|', @val));
- 
+
                 } else {
                     $cert_subject_parts->{ $field->{ID} } = $val[0];
 
                     CTX('log')->application()->debug("subject preset - field $field, pattern $preset, value " . $val[0]);
- 
+
                 }
             }
 
@@ -313,13 +313,13 @@ OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
 
 =head1 Description
 
-Take a pkcs10 container and extract information to the context. If a 
-profile name and style are given and the profile has a ui section, the 
+Take a pkcs10 container and extract information to the context. If a
+profile name and style are given and the profile has a ui section, the
 data extracted from the CSR is used to prefill the profile ui fields.
 Otherwise the extracted subject and san information is put "as is" into
 the context. Output definition is given below.
 
-To get extra information from the CSR, add parameters key_params, 
+To get extra information from the CSR, add parameters key_params,
 req_attributes and req_extensions to your activity configuration.
 
 =head1 Configuration
@@ -390,28 +390,28 @@ The extracted subject as string (comma seperated)
 =item cert_subject_parts
 
 If a valid profile is given, contains the preset values for all fields given
-in the profiles subject section. The values are determined by running the 
+in the profiles subject section. The values are determined by running the
 appropriate template string for each field with the data extracted from the
-csr. 
+csr.
 
-In plain mode, it contains the parsed DN as key-value pairs where the key 
+In plain mode, it contains the parsed DN as key-value pairs where the key
 is the shortname of the component (e.g: OU) and the value is an array of
 values found. Note that any component is an array even if it has only one
-item. All items found in the SAN part are also added with a prefix "SAN_" 
-and all uppercased names as used by openssl (SAN_OTHERNAME, SAN_EMAIL, 
+item. All items found in the SAN part are also added with a prefix "SAN_"
+and all uppercased names as used by openssl (SAN_OTHERNAME, SAN_EMAIL,
 SAN_DNS, SAN_DIRNAME, SAN_URI, SAN_IP, SAN_RID)
 
 
 =item cert_san_parts
 
 Only in profile mode. Contains the preset values for all fields
-given in the profiles san section. The values are determined by running the 
+given in the profiles san section. The values are determined by running the
 appropriate template string for each field with the data extracted from the
-csr.  
+csr.
 
 =item cert_subject_alt_name
 
-Only in plain mode. All SAN items as nested array list. Each item of the 
+Only in plain mode. All SAN items as nested array list. Each item of the
 list is a two item array with name and value of one SAN item. The names
 are given as required to build then openssl extension file (otherName,
 email, DNS, dirName, URI, IP, RID).

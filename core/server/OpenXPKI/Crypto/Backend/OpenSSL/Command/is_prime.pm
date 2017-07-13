@@ -23,7 +23,7 @@ sub get_command
                 "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_IS_PRIME_MISSING_PRIME",
         );
     }
-    
+
     my $command = "";
     $command .= "prime -hex $prime";
 
@@ -65,7 +65,7 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::is_prime
 =head2 get_command
 
 Checks whether a given hexadecimal number (the parameter "PRIME") is a
-prime or not. 
+prime or not.
 
 =head2 hide_output
 

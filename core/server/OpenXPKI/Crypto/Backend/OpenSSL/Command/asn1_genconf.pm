@@ -14,20 +14,20 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ASN1_GENCONF_DATA_MISSING"
         );
     }
-    
+
     $self->get_tmpfile ('IN');
     $self->write_file (
         FILENAME => $self->{INFILE},
         CONTENT  => $self->{DATA},
         FORCE    => 1);
-    
+
     $self->get_tmpfile ('OUT');
 
     my $command = "asn1parse ";
-    
-    $command .= "-genconf " . $self->{INFILE};    
+
+    $command .= "-genconf " . $self->{INFILE};
     $command .= " -out ". $self->{OUTFILE};
-    
+
 
     return [ $command ];
 }

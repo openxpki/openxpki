@@ -86,7 +86,7 @@ use Class::Std;
             if (ref $raw_data) {
                 $data = $raw_data;
             } else {
-                # put this in eval to prevent complete blow-up                
+                # put this in eval to prevent complete blow-up
                 eval { $data = $ser->deserialize($raw_data); };
             }
             if ( my $exc = OpenXPKI::Exception->caught() ) {
@@ -181,7 +181,7 @@ OpenXPKI::Server::Workflow::WFObject
 
 =head1 DESCRIPTION
 
-WFObject is the root class for the data objects like WFArray and WFHash. 
+WFObject is the root class for the data objects like WFArray and WFHash.
 It is used to manage the basic attributes and serialization needed
 by the inheriting classes. It inherits from Class::Std.
 
@@ -196,7 +196,7 @@ by the inheriting classes. It inherits from Class::Std.
 =head1 DEFAULT ACCESSORS
 
 Default accessor methods are available for the supported properties,
-depending on how they are declared. 
+depending on how they are declared.
 
 =over 8
 
@@ -204,7 +204,7 @@ depending on how they are declared.
 
 When creating a new instance, the named-parameter list with the keys
 "workflow" and "context_key" is passed. When creating a new parameter,
-use the corresponding data type (e.g.: WFArray). If the parameter 
+use the corresponding data type (e.g.: WFArray). If the parameter
 already exists, WFObject will try to determine the current contents
 and return the correct object type.
 
@@ -224,7 +224,7 @@ with 'set_'. The new value is passed as a parameter.
 
 =head2 workflow
 
-A reference to the current workflow instance. 
+A reference to the current workflow instance.
 
 =head2 context_key
 

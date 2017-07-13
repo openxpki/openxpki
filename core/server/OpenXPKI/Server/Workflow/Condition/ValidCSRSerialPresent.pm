@@ -25,7 +25,7 @@ sub evaluate {
     }
 
     CTX('log')->application()->debug("Testing for CSR serial $csr_serial");
- 
+
 
     CTX('dbi')->select_one(
         from => 'csr',

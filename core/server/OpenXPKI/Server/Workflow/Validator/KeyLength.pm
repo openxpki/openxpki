@@ -88,21 +88,21 @@ sub validate {
     if ($self->fail_on_unknown_algorithm && ! exists $self->min()->{$key_algorithm}) {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM');
     }
-    
+
     if (exists $self->min()->{$key_algorithm}) {
         ##! 16: 'min length: ' . $self->min()->{$key_algorithm}
         if ($key_length < $self->min()->{$key_algorithm}) {
             validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT');
         }
     }
-    
+
     if (defined $self->max() && exists $self->max()->{$key_algorithm}) {
         ##! 16: 'max length: ' . $self->max()->{$key_algorithm}
         if ($key_length > $self->max()->{$key_algorithm}) {
             validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_LONG');
         }
     }
-    
+
     return 1;
 }
 

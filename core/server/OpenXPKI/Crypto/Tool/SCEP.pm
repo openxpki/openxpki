@@ -3,7 +3,7 @@
 ## based on OpenXPKI::Crypto::Toolkit
 ## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Tool::SCEP;
-use base qw( OpenXPKI::Crypto::Toolkit );	
+use base qw( OpenXPKI::Crypto::Toolkit );
 
 use strict;
 use warnings;

@@ -30,7 +30,7 @@ sub START {
 sub get_command {
     my $self  = shift;
     my $ident = ident $self;
-    
+
     # keyfile, signcert, passin
     if (! defined $engine_of{$ident}) {
         OpenXPKI::Exception->throw(
@@ -57,8 +57,8 @@ sub get_command {
         CONTENT  => $pkcs7_of{$ident},
         FORCE    => 1,
     });
-   
-    my $command = " -print_req -noout -passin env:pwd -keyfile $keyfile -in $in_filename -out $outfile_of{$ident} "; 
+
+    my $command = " -print_req -noout -passin env:pwd -keyfile $keyfile -in $in_filename -out $outfile_of{$ident} ";
     return $command;
 }
 
@@ -85,7 +85,7 @@ sub get_result
 sub cleanup {
     my $self = shift;
     my $ident = ident $self;
-    
+
     $ENV{pwd} = '';
     $fu_of{$ident}->cleanup();
 

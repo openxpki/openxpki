@@ -100,16 +100,16 @@ sub i18nGettext {
 }
 
 sub i18nTokenizer {
-    
-    my $string = shift;    
-    my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);    
+
+    my $string = shift;
+    my %tokens = map { $_ => '' } ($string =~ /(I18N_OPENXPKI_UI_[A-Z0-9a-z\_-]+)/g);
     foreach my $token (keys %tokens) {
-        my $replace = i18nGettext( $token );        
+        my $replace = i18nGettext( $token );
         $string =~ s/$token\b/$replace/g;
     }
-    
+
     return $string;
-    
+
 }
 
 sub set_language

@@ -4,7 +4,7 @@
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::Backend::OpenSSL;
 use base qw( OpenXPKI::Crypto::Toolkit );
-	
+
 use strict;
 use warnings;
 use English;
@@ -28,7 +28,7 @@ sub START {
 sub __init_local {
     my $self = shift;
     my $ident = ident $self;
-    
+
     $xs_of{$ident} = OpenXPKI::Crypto::Backend::OpenSSL::XS->new();
     $self->__init_config ();
 }
@@ -36,7 +36,7 @@ sub __init_local {
 sub __init_config {
     my $self = shift;
     my $ident = ident $self;
-    
+
     $config_of{$ident} = OpenXPKI::Crypto::Backend::OpenSSL::Config->new({
                           TMP => $self->get_tmp_dir(),
                           XS  => $xs_of{$ident},
@@ -77,7 +77,7 @@ sub __instantiate_cli {
     my $ident = ident $self;
     my $cli_class = shift;
     my $cli_obj;
-    
+
     eval {
         $cli_obj = $cli_class->new({
                                ENGINE => $self->get_engine(),
@@ -126,7 +126,7 @@ sub __prepare_cli {
     my $self = shift;
     my $ident = ident $self;
     my $cmds = shift;
-    
+
     $self->get_cli()->prepare({
         COMMAND => $cmds,
         CONFIG  => $config_of{$ident},

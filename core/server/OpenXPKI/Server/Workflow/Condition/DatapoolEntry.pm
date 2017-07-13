@@ -34,7 +34,7 @@ sub _init
 	}
     }
     if (! (defined $self->datapool_namespace()
-	   && defined $self->datapool_key() 
+	   && defined $self->datapool_key()
 	   && defined $self->condition())) {
 	##! 16: 'error: no conditions defined'
 	configuration_error
@@ -49,14 +49,14 @@ sub evaluate
     my ( $self, $workflow ) = @_;
     my $context     = $workflow->context();
 
-    my $ds_params      = { 
+    my $ds_params      = {
 	PKI_REALM => CTX('session')->data->pki_realm,
     };
 
     my $params = {};
     foreach my $arg (@parameters) {
 	# access workflow context instead of literal value if value starts
-	# with a $	
+	# with a $
 	if (defined $self->$arg() && ($self->$arg() =~ m{ \A \$ (.*) }xms)) {
 	    my $wf_key = $1;
 	    ##! 32: ' Set Identifier ' . $wf_key . ' - ' . $context->param($wf_key)
@@ -71,14 +71,14 @@ sub evaluate
 
     $ds_params->{NAMESPACE} = $params->{datapool_namespace};
     $ds_params->{KEY}       = $params->{datapool_key};
-    
+
     ##! 32: 'Query params ' . Dumper $ds_params
 
     my $msg = CTX('api')->get_data_pool_entry($ds_params);
 
     ##! 32: 'api returned ' . Dumper $msg
 
-    my $datapool_value = $msg->{VALUE};    
+    my $datapool_value = $msg->{VALUE};
 
     if ($condition eq 'exists') {
 	if (! defined $datapool_value) {
@@ -92,17 +92,17 @@ sub evaluate
 	}
     } elsif ($condition eq 'equals') {
 	if ($datapool_value ne $params->{datapool_value}) {
-        ##! 64: ' value equality mismatch '	    
+        ##! 64: ' value equality mismatch '
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_EQUALITY_MISMATCH';
 	}
     } elsif ($condition eq 'regex') {
 	my $regex = qr/$params->{datapool_value}/ms;
 	if ($datapool_value =~ /$regex/) {
-        ##! 64: ' value regex mismatch '        
+        ##! 64: ' value regex mismatch '
 	    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOL_REGEX_MISMATCH';
 	}
     } else {
-        ##! 64: ' invalid condition '     
+        ##! 64: ' invalid condition '
 	condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_INVALID_CONDITION';
     }
 
@@ -118,8 +118,8 @@ __END__
 OpenXPKI::Server::Workflow::Condition::DatapoolEntry
 
 =head1 SYNOPSIS
-  <condition 
-     name="private_key_not_empty" 
+  <condition
+     name="private_key_not_empty"
      class="OpenXPKI::Server::Workflow::Condition::DatapoolEntry">
     <param name="datapool_key" value="$cert_identifier"/>
     <param name="datapool_namespace" value="certificate.privatekey"/>

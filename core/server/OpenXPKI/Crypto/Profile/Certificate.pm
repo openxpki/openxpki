@@ -146,12 +146,12 @@ sub __load_profile
     ## check if those are overriden in config
     foreach my $key (keys %{$self->{PROFILE}} ) {
         my $value = $config->get("profile.$profile_name.".lc($key));
-        
+
         # Test for realm default
         if (!defined $value) {
         	$value = $config->get("profile.default.".lc($key));
         }
-        
+
         if (defined $value) {
             $self->{PROFILE}->{$key} = $value;
             ##! 16: "Override $key from profile with $value"

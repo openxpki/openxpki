@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine 
+## OpenXPKI::Crypto::Backend::OpenSSL::Engine
 ## Copyright (C) 2003-2005 Michael Bell
 
 use strict;
@@ -44,7 +44,7 @@ sub new {
     }
     $self->__check_engine_usage();
     $self->__check_key_store();
-    
+
     return $self;
 }
 
@@ -58,11 +58,11 @@ sub __check_engine_usage {
             if ($part !~ m{( \A ALWAYS \z )|( \A NEVER \z )|( \A NEW_ALG \z )|( \A PRIV_KEY_OPS \z )|( \A RANDOM \z ) }xms) {
                 OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_ENGINE_USAGE",
-                    params  => { "ATTRIBUTE" => $part},   
+                    params  => { "ATTRIBUTE" => $part},
                     );
             }
             # if NEVER is not the only one value
-            if (($part =~ m{ \A NEVER \z }xms) and 
+            if (($part =~ m{ \A NEVER \z }xms) and
                 ($#{engine_usage_parts} >= 1)) {
                 OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_NEVER_ENGINE_USAGE" );
@@ -330,12 +330,12 @@ returns the OpenSSL engine section from the configuration or the empty string if
 is used or the engine section is empty.
 
 =head2 get_engine_usage
- 
+
 returns the OpenSSL engine_usage section from the configuration or the empty string if no engine
 is used or the engine_usage section is empty.
 
 =head2 get_key_store
- 
+
 returns the OpenSSL key_store section from the configuration.
 
 =head2 get_keyfile

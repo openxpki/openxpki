@@ -67,7 +67,7 @@ sub __init_command_params : PRIVATE {
                           "IN"         => ["PEM","DER"],
                           "OUT"        => ["PEM","DER"],
                           "DATA"       => 1,
-                          "REVERSE"    => 1                          
+                          "REVERSE"    => 1
                          },
     "convert_pkcs10"  => {"DATA" => 1,
                           "IN"   => [ 'DER', 'PEM' ],
@@ -134,9 +134,9 @@ sub __init_command_params : PRIVATE {
                           "PKEYOPT" => 1,
                           },
     "asn1_genconf"    => {"DATA" => 1 },
-    
-    }; 
-    
+
+    };
+
     ## reassign the updated value to the command_params attribute
     $self->set_command_params($command_params);
    ##! 16: 'end'

@@ -13,53 +13,53 @@ use OpenXPKI::Exception;
 use Workflow::Exception qw( validation_error configuration_error );
 
 extends 'OpenXPKI::Server::Workflow::Validator';
- 
+
 sub _validate {
 
     ##! 1: 'start'
-    
+
     my ( $self, $wf, $timestamp ) = @_;
 
     ##! 16: 'timestamp ' . $timestamp
-    
+
     if (!$timestamp) {
         return 1;
     }
-    
+
     my $condition = $self->param('condition') || '';
-    
+
     ##! 16: 'condition ' . $condition
-  
+
     my $time = OpenXPKI::DateTime::get_validity({
         VALIDITY => $timestamp,
         VALIDITYFORMAT => ( $self->param('format') || 'detect' ),
     })->epoch();
- 
-    
+
+
     my $valid = 0;
     if ($condition eq '') {
         $valid = 1;
-    } else { 
+    } else {
         my $now = time();
         ##! 16: 'now: ' . $now
-        if ($condition eq 'lt') { 
+        if ($condition eq 'lt') {
             $valid = ( $time < $now );
-        } elsif ($condition eq 'lte') { 
+        } elsif ($condition eq 'lte') {
             $valid = ( $time <= $now );
-        } elsif ($condition eq 'gt') { 
+        } elsif ($condition eq 'gt') {
             $valid = ( $time > $now );
-        } elsif ($condition eq 'gte') { 
+        } elsif ($condition eq 'gte') {
             $valid = ( $time >= $now );
-        } else { 
+        } else {
             configuration_error('Invalid condition given in Validator::ValidityString');
         }
     }
-    
+
     if (!$valid) {
         validation_error( $self->param('error') || 'I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED' );
     }
-    
- 
+
+
     return 1;
 }
 
@@ -83,26 +83,26 @@ OpenXPKI::Server::Workflow::Validator::ValidityString
 
 =head1 DESCRIPTION
 
-This validator checks whether a given timestamp can be handled by 
-OpenXPKI::Datetime::get_validity. In addition, it can test if the result 
+This validator checks whether a given timestamp can be handled by
+OpenXPKI::Datetime::get_validity. In addition, it can test if the result
 is in the past/future.
 
 =head2 Validator Parameters
 
-=over 
+=over
 
 =item format
 
-Any format which is accepted as VALIDITYFORMAT by 
+Any format which is accepted as VALIDITYFORMAT by
 OpenXPKI::Datetime::get_validity. The default is 'detect';
 
 =item condition
 
 Optional, if set the resulting timestamp is checked using the equotation
-I<$timestamp $condition time()>, e.g. "lte" will accepts timestamps in 
-the past including now. 
+I<$timestamp $condition time()>, e.g. "lte" will accepts timestamps in
+the past including now.
 
-=over 
+=over
 
 =item lt (less than)
 

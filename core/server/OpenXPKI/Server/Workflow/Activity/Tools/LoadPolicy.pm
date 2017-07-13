@@ -14,7 +14,7 @@ sub execute {
     my $workflow   = shift;
     my $context   = $workflow->context();
     my $config = CTX('config');
-    
+
     my $policy_params;
     my $config_path = $self->param('config_path');
     if ($config_path) {
@@ -28,20 +28,20 @@ sub execute {
             $policy_params = $config->get_hash([ $interface, $server, 'policy' ]);
         } else {
             CTX('log')->application()->warn("Server or interface not set in LoadPolicy");
- 
+
         }
     }
 
     if (!$policy_params) {
         CTX('log')->application()->warn("No policy params set in LoadPolicy");
- 
+
     } else {
         foreach my $key (keys (%{$policy_params})) {
             $context->param( "p_$key" => $policy_params->{$key} );
         }
-    
+
         CTX('log')->application()->debug("Server policy loaded");
- 
+
     }
     return 1;
 }
@@ -55,16 +55,16 @@ OpenXPKI::Server::Workflow::Activity::Tools::LoadPolicy
 
 =head1 Description
 
-Load the policy section for a server endpoint. 
+Load the policy section for a server endpoint.
 
 The path to load defaults to $interface.$server.policy where interface
-and server are read from the context. You can override the full path by 
+and server are read from the context. You can override the full path by
 setting the key I<config_path>.
 
-The given path is expected to return a hash, each key/value pair is read 
-into the context with the I<p_> prefix added to each key! 
+The given path is expected to return a hash, each key/value pair is read
+into the context with the I<p_> prefix added to each key!
 
-=head1 Configuration 
+=head1 Configuration
 
 =head2 Activity Parameter
 

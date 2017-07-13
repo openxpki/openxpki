@@ -16,18 +16,18 @@ extends 'OpenXPKI::Client::SC::Result';
 =head2 handle_get_card_policy
 
 Get the card command to enable/disable the PUK policy on the card.
-Requires the aes key set in the session.  
+Requires the aes key set in the session.
 
 =head3 parameters
 
-=over 
+=over
 
 =item disable
 
 Set to the string I<true> to get the PUK disable command, all other values
 will result in the PUK enable command.
 
-=back 
+=back
 
 =head3 response
 
@@ -35,21 +35,21 @@ will result in the PUK enable command.
 
 =item changecardpolicy_wfID
 
-=item exec 
+=item exec
 
-=back 
-        
+=back
+
 =cut
 
 sub handle_get_card_policy {
-    
+
     my $self = shift;
 
     my $wf_type = $self->config()->{workflow}->{changecardpolicy};
-    my $wf_id; 
+    my $wf_id;
     my $wf_info;
     my $wf_state;
-    
+
     my $session = $self->_session();
     my $cardData = $self->cardData();
     my $log = $self->logger();
@@ -59,8 +59,8 @@ sub handle_get_card_policy {
         return 1;
     }
 
-    eval {       
-        $wf_info = $self->_client->handle_workflow( {             
+    eval {
+        $wf_info = $self->_client->handle_workflow( {
             'TYPE' => $wf_type,
             'PARAMS'   => { token_id => $cardData->{'id_cardID'}, },
         });
@@ -71,22 +71,22 @@ sub handle_get_card_policy {
         $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_CHANGECARDPOLICY_ERROR_CREATE_WORKFLOW_INSTANCE");
         return 1;
     }
-  
+
     my $_puks = $wf_info->{CONTEXT}->{_puk};
 
     if (!$_puks) {
         $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_CHANGECARDPOLICY_ERROR_CREATING_WORKFLOW");
-        return 1;        
+        return 1;
     }
-    
+
     my $_puk = $self->serializer()->deserialize( $_puks );
-    
+
     my $card_policy_string;
     if ( $self->param("disable") &&  $self->param("disable") eq 'true' ) {
-        $card_policy_string = $self->config()->{card}->{b64cardPolicyOff}; 
+        $card_policy_string = $self->config()->{card}->{b64cardPolicyOff};
         $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_CHANGECARDPOLICY_DISABLE_TRUE");
     } else {
-        $card_policy_string = $self->config()->{card}->{b64cardPolicyOn}; 
+        $card_policy_string = $self->config()->{card}->{b64cardPolicyOn};
         $log->info("I18N_OPENXPKI_CLIENT_WEBAPI_SC_CHANGECARDPOLICY_DISABLE_FALSE");
     }
 
@@ -123,14 +123,14 @@ Status word from the card plugin, I<SUCCESS> if ok, anything else if not.
 =item Reason
 
 Verbose reason in case of failure.
- 
-=back 
+
+=back
 
 =head3 response
 
 =over
 
-=item state 
+=item state
 
 =back
 
@@ -141,43 +141,43 @@ sub handle_confirm_policy_change {
     my $self = shift;
 
     my $wf_info;
-    
+
     my $log = $self->logger();
-    
+
     my $wf_id = $self->param("changecardpolicy_wfID");
     my $ui_result = $self->param("Result");
     my $ui_reason = $self->param("Reason") || '';
 
-    if (!$ui_result) {        
+    if (!$ui_result) {
         $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_NO_CHANGECARDPOLICY_RESULT");
         return 1;
     }
-    
+
     eval {
         if ( $ui_result eq "SUCCESS" ) {
-            
-            $wf_info = $self->_client->handle_workflow( { 
+
+            $wf_info = $self->_client->handle_workflow( {
                 ID => $wf_id,
-                'ACTIVITY' => 'scfp_ack_fetch_puk',                
+                'ACTIVITY' => 'scfp_ack_fetch_puk',
             });
-                    
+
         } else {
-            $wf_info = $self->_client->handle_workflow( { 
+            $wf_info = $self->_client->handle_workflow( {
                 ID => $wf_id,
                 'ACTIVITY' => 'scfp_puk_fetch_err',
-                'PARAMS' => { 'error_reason' => $ui_reason }                
+                'PARAMS' => { 'error_reason' => $ui_reason }
             });
-        }        
+        }
     };
     if ($EVAL_ERROR) {
         $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_CHANGECARDPOLICY_ERROR_CONFIRM_CHANGE_RESULT");
         return 1;
-    }   
-    
+    }
+
     $self->_result({
-        'state' => $wf_info->{STATE},        
+        'state' => $wf_info->{STATE},
     });
-    
+
     return 1;
 
 }

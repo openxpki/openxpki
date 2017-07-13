@@ -107,7 +107,7 @@ sub __parse
             ## begin of multirow
             $active_multirow = 1;
         } else {
-            ## no multirow 
+            ## no multirow
             ## if multirow then $ret->{key} is initially empty)
             ## fix CR
             $i =~ s/\s*\r$//;

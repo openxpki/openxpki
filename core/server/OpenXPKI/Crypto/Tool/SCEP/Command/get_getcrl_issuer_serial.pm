@@ -30,7 +30,7 @@ sub START {
 sub get_command {
     my $self  = shift;
     my $ident = ident $self;
-    
+
     # keyfile, signcert, passin
     if (! defined $engine_of{$ident}) {
         OpenXPKI::Exception->throw(
@@ -57,8 +57,8 @@ sub get_command {
         CONTENT  => $pkcs7_of{$ident},
         FORCE    => 1,
     });
-   
-    my $command = " -text -inform DER -noout -passin env:pwd -keyfile $keyfile -in $in_filename -out $outfile_of{$ident} "; 
+
+    my $command = " -text -inform DER -noout -passin env:pwd -keyfile $keyfile -in $in_filename -out $outfile_of{$ident} ";
     return $command;
 }
 
@@ -78,44 +78,44 @@ sub get_result
     my $ident = ident $self;
 
     my $crl_info = $fu_of{$ident}->read_file($outfile_of{$ident});
-    
+
     # this is a verbose output that looks like
     # Issuer and Serial:
     #  Issuer: CN=Root CA,OU=Test CA,DC=OpenXPKI,DC=ORG
     #  Serial: 0x03
 
     my @crl_info = split /\n/, $crl_info;
-            
+
     while ((shift @crl_info) !~ /Issuer and Serial:/) {
         if (scalar(@crl_info) < 2) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_GET_CRL_ISSUER_SERIAL_FAILED',
-            );              
+            );
         }
     }
-    
+
     $crl_info[0] =~ /Issuer:\s+(.+)\z/;
     my $issuer = $1;
     $crl_info[1] =~ /Serial:\s+(.+)\z/;
-    my $serial= $1; 
-    
+    my $serial= $1;
+
     if (!$issuer || !$serial) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_TOOL_SCEP_COMMAND_GET_CRL_ISSUER_SERIAL_FAILED',
-        );    
+        );
     }
 
     return { ISSUER => $issuer, SERIAL => $serial };
 }
 
 sub cleanup {
-    
+
     my $self = shift;
     my $ident = ident $self;
-    
+
     $ENV{pwd} = '';
     $fu_of{$ident}->cleanup();
-    
+
 }
 
 1;

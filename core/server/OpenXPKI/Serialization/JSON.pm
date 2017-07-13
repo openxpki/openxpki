@@ -15,7 +15,7 @@ use English;
 
 sub new
 {
-    eval { 
+    eval {
 	require JSON;
 	import JSON;
     };
@@ -46,7 +46,7 @@ sub serialize
 sub deserialize
 {
     my $self = shift;
-    
+
     return $self->{JSON}->decode(shift);
 }
 

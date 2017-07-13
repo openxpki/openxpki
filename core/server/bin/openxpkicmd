@@ -54,7 +54,7 @@ sub dump_workflow {
             foreach my $key (keys %{$context}) {
                 printf "=%-20s: %s\n", $key, $context->{$key};
             }
-        } 
+        }
     }
 
     if ($params{attribute} && $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE}) {
@@ -70,7 +70,7 @@ sub dump_workflow {
     }
 
     if ($params{json}) {
-        $json->{workflow} = { id => $reply->{PARAMS}->{WORKFLOW}->{ID}, 
+        $json->{workflow} = { id => $reply->{PARAMS}->{WORKFLOW}->{ID},
             state => $reply->{PARAMS}->{WORKFLOW}->{STATE} };
         print JSON::to_json($json);
         print "\n";
@@ -241,9 +241,9 @@ if ($params{wfid}) {
                 WORKFLOW => $wf_type,
             }
         );
-        
+
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-        
+
             my $json = {};
             if (!$params{json}) {
                 print "Possible Actions:\n";
@@ -274,7 +274,7 @@ if ($params{wfid}) {
                            PARAMS => \%wf_parameters,
                            }
                        });
-                       
+
     if ($reply->{SERVICE_MSG} eq 'COMMAND') {
         printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE}
             unless($params{json});

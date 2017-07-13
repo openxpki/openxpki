@@ -1,7 +1,7 @@
 ## OpenXPKI::Crypto::Tool::CreateJavaKeystore::API
 ## Written 2006 by Alexander Klink for the OpenXPKI project
 ## (C) Copyright 2006 by The OpenXPKI Project
-	
+
 use strict;
 use warnings;
 
@@ -51,7 +51,7 @@ __END__
 
 OpenXPKI::Crypto::Tool::CreateJavaKeystore::API - API for the CreateJavaKeystore functions.
 
-=head1 Description   
-    
+=head1 Description
+
 This is the basic class for the CreateJavaKeystore tool API. It inherits from
 OpenXPKI::Crypto::API. It defines a hash of valid commands.

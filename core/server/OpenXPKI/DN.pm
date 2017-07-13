@@ -75,7 +75,7 @@ sub convert_openssl_dn
  	    sep_char    => q{/},    # Fields are separated by /
  	    escape_char => q{\\},   # Backslashed characters are always data
 	});
-    
+
     if (!$openssl_format->parse($dn)) {
  	OpenXPKI::Exception->throw (
  	    message => "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR",
@@ -84,7 +84,7 @@ sub convert_openssl_dn
  		BADARGUMENT => $openssl_format->error_input(),
  	    });
     }
-    
+
     my @rdn = $openssl_format->fields();
 
     # remove first empty element (OpenSSL DN starts with /)
@@ -137,7 +137,7 @@ sub get_openssl_dn
     my @rdns = @{$self->{RDNS}};
 
     # escape / to \/ and return /-separated DN
-    return "/" . join("/", 
+    return "/" . join("/",
 		      reverse map { s{/}{\\/}xsg; $_; } @rdns);
 }
 
@@ -185,16 +185,16 @@ sub __build_attributes
 
     for my $entry (@{$self->{PARSED}}) {
 	my @attributes = ();
-	
+
  	for my $item (@{$entry}) {
  	    my $key   = $item->[0];
  	    my $value = $item->[1];
 
-	    # escape + and , 
+	    # escape + and ,
 	    $value =~ s{ ([+,]) }{\\$1}xs;
  	    push(@attributes, $key . '=' . $value);
  	}
-	
+
  	push(@{$self->{ATTRIBUTES}}, \@attributes);
      }
 
@@ -328,7 +328,7 @@ foreach my $function (qw (__get_parsed_rfc_2253
     memoize($function);
 }
 
-		      
+
 1;
 __END__
 
@@ -366,7 +366,7 @@ OpenXPKI::DN.
 
 This is a static function which requires an OpenSSL DN as
 argument. It returns a proper RFC 2253 DN. It is used by the 'new'
-constructor to convert OpenSSL DNs but you can use it also if you 
+constructor to convert OpenSSL DNs but you can use it also if you
 don't need a full parser (which is slower).
 
 =head1 Output Functions

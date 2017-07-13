@@ -15,7 +15,7 @@ sub evaluate
 {
     ##! 1: 'start'
     my ($self, $workflow) = @_;
-    
+
     my $wf_creator = $workflow->attrib('creator') || '';
 
     my $current_user      = CTX('session')->data->user;
@@ -23,7 +23,7 @@ sub evaluate
     ##! 16: 'current user: ' . $current_user
 
      CTX('log')->application()->debug("Check workflow creator: $wf_creator ?= $current_user");
-  
+
 
     if ($wf_creator ne $current_user) {
         condition_error ('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCREATOR_CREATOR_AND_USER_DIFFER');
@@ -43,7 +43,7 @@ OpenXPKI::Server::Workflow::Condition::WorkflowCreator
 
    is_workflow_creator"
         class: OpenXPKI::Server::Workflow::Condition::WorkflowCreator
-  
+
 
 =head1 DESCRIPTION
 

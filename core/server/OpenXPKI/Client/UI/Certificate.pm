@@ -17,7 +17,7 @@ has __default_grid_head => (
     is => 'rw',
     isa => 'ArrayRef',
     lazy => 1,
-    
+
     default => sub { return [
         { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL", sortkey => 'CERTIFICATE.CERT_KEY' },
         { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT", sortkey => 'CERTIFICATE.SUBJECT' },
@@ -67,7 +67,7 @@ sub init_search {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
-        description => '',  
+        description => '',
     });
 
     my $profile = $self->send_command( 'list_used_profiles' );
@@ -83,34 +83,34 @@ sub init_search {
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_REVOKED', value => 'REVOKED'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_CRL_ISSUANCE_PENDING', value => 'CRL_ISSUANCE_PENDING'},
     );
-    
+
     my $preset;
     if ($args->{preset}) {
-        $preset = $args->{preset};    
+        $preset = $args->{preset};
     } elsif (my $queryid = $self->param('query')) {
         my $result = $self->_client->session()->param('query_cert_'.$queryid);
         $preset = $result->{input};
     }
-    
+
     my @fields = (
         { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', type => 'text', is_optional => 1, value => $preset->{subject} },
         { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', type => 'text', is_optional => 1, value => $preset->{san} },
         { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
-        { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },        
+        { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
     if (defined $attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
         foreach my $item (@{$attributes}) {
-            push @attrib, { value => $item->{key}, label=> $item->{label} };                    
+            push @attrib, { value => $item->{key}, label=> $item->{label} };
         }
         push @fields, {
-            name => 'attributes', 
-            label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', 
-            'keys' => \@attrib,                  
+            name => 'attributes',
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA',
+            'keys' => \@attrib,
             type => 'text',
-            is_optional => 1, 
+            is_optional => 1,
             'clonable' => 1,
             'value' => $preset->{attributes} || [],
         } if (@attrib);
@@ -124,9 +124,9 @@ sub init_search {
            title => '',
            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
            fields => \@fields
-        }},        
+        }},
     );
-    
+
     $self->add_section({
         type => 'form',
         action => 'certificate!find',
@@ -136,9 +136,9 @@ sub init_search {
            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
            fields => [
                { name => 'cert_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', type => 'text', is_optional => 1, value => $preset->{cert_identifier} },
-               { name => 'cert_serial', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', type => 'text', is_optional => 1, value => $preset->{cert_serial} },              
+               { name => 'cert_serial', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', type => 'text', is_optional => 1, value => $preset->{cert_serial} },
            ]
-        }},        
+        }},
     );
 
     return $self;
@@ -147,19 +147,19 @@ sub init_search {
 =head2 init_result
 
 Load the result of a query, based on a query id and paging information
- 
+
 =cut
 sub init_result {
 
     my $self = shift;
     my $args = shift;
-        
+
     my $queryid = $self->param('id');
     my $limit = $self->param('limit') || 25;
-    
-    
-    my $startat = $self->param('startat') || 0; 
-    
+
+
+    my $startat = $self->param('startat') || 0;
+
     # Safety rule
     if ($limit > 500) {  $limit = 500; }
 
@@ -167,16 +167,16 @@ sub init_result {
     my $result = $self->_client->session()->param('query_cert_'.$queryid);
 
     # result expired or broken id
-    if (!$result || !$result->{count}) {        
+    if (!$result || !$result->{count}) {
         $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
-        return $self->init_search();        
+        return $self->init_search();
     }
 
     # Add limits
-    my $query = $result->{query};    
+    my $query = $result->{query};
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
-    
+
     if (!$query->{ORDER}) {
         $query->{ORDER} = 'CERTIFICATE.NOTBEFORE';
         if (!defined $query->{REVERSE}) {
@@ -202,12 +202,12 @@ sub init_result {
 
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);
-    
+
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
 
     my @result = $self->__render_result_list( $search_result, $body );
-    
+
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
     $self->add_section({
@@ -219,24 +219,24 @@ sub init_result {
                 label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
                 target => 'modal'
-            }], 
+            }],
             columns => $header,
             data => \@result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
             buttons => [
-                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM', 
+                { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM',
                   page => 'certificate!search!query!' .$queryid,
-                  className => 'expected' 
+                  className => 'expected'
                 },
-                { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH', 
+                { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH',
                   page => 'redirect!certificate!result!id!' .$queryid,
                   className => 'alternative' },
-                { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH', 
+                { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH',
                   page => 'certificate!search',
                   className => 'failure'
                 },
-                { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT', 
+                { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
                   href => $self->_client()->_config()->{'scripturl'} . '?page=certificate!export!id!'.$queryid,
                   className => 'optional'
                 },
@@ -252,36 +252,36 @@ sub init_result {
 =head2 init_export
 
 Like init_result but send the data as CSV download, default limit is 500!
- 
+
 =cut
 sub init_export {
 
     my $self = shift;
     my $args = shift;
-        
+
     my $queryid = $self->param('id');
-    
+
     my $limit = $self->param('limit') || 500;
-    my $startat = $self->param('startat') || 0; 
-    
+    my $startat = $self->param('startat') || 0;
+
     # Safety rule
     if ($limit > 500) {  $limit = 500; }
-    
-    
+
+
     # Load query from session
     my $result = $self->_client->session()->param('query_cert_'.$queryid);
 
     # result expired or broken id
-    if (!$result || !$result->{count}) {        
+    if (!$result || !$result->{count}) {
         $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
-        return $self->init_search();        
+        return $self->init_search();
     }
 
     # Add limits
     my $query = $result->{query};
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
-    
+
     if (!$query->{ORDER}) {
         $query->{ORDER} = 'CERTIFICATE.NOTBEFORE';
         if (!defined $query->{REVERSE}) {
@@ -312,42 +312,42 @@ sub init_export {
     }
 
     my $buffer = join("\t", @head)."\n";
- 
+
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);
-    
+
     foreach my $item (@{$search_result}) {
-        
+
         $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
-            
+
         my @line;
         foreach my $cc (@cols) {
-            
+
             my $col = $body->[$cc];
             if ($col->{field} eq 'STATUS') {
-                push @line, i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS});        
-            
+                push @line, i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS});
+
             } elsif ($col->{field} =~ /(NOTAFTER|NOTBEFORE)/) {
-                
+
                 push @line,  DateTime->from_epoch( epoch => $item->{ $col->{field} } )->iso8601();
-                
+
             } else {
                 push @line, $item->{  $col->{field} };
             }
         }
-        $buffer .= join("\t", @line)."\n";        
+        $buffer .= join("\t", @line)."\n";
     }
-    
+
     if (scalar @{$search_result} == $limit) {
         $buffer .= i18nGettext("I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT")."\n";
     }
-     
-    print $self->cgi()->header( 
+
+    print $self->cgi()->header(
         -type => 'text/tab-separated-values',
         -expires => "1m",
         -attachment => "certificate export " . DateTime->now()->iso8601() .  ".txt"
     );
-    print $buffer;     
+    print $buffer;
     exit;
 
 }
@@ -360,38 +360,38 @@ partial result.
 =cut
 
 sub init_pager {
-    
+
     my $self = shift;
     my $args = shift;
-        
+
     my $queryid = $self->param('id');
-    
+
     # Load query from session
     my $result = $self->_client->session()->param('query_cert_'.$queryid);
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
         $self->set_status('Search result expired or empty!','error');
-        return $self->init_search();               
+        return $self->init_search();
     }
 
     # will be removed once inline paging works
-    my $startat = $self->param('startat'); 
+    my $startat = $self->param('startat');
 
-    my $limit = $self->param('limit') || 25;  
+    my $limit = $self->param('limit') || 25;
     if ($limit > 500) {  $limit = 500; }
-    
+
     $startat = int($startat / $limit) * $limit;
 
     # Add limits
     my $query = $result->{query};
     $query->{LIMIT} = $limit;
     $query->{START} = $startat;
-    
+
     if ($self->param('order')) {
         $query->{ORDER} = uc($self->param('order'));
     }
-    
+
     if (defined $self->param('reverse')) {
         $query->{REVERSE} = $self->param('reverse');
     }
@@ -400,45 +400,45 @@ sub init_pager {
     $self->logger()->debug( "executed query: " . Dumper $query);
 
     my $search_result = $self->send_command( 'search_cert', $query );
-    
+
     $self->logger()->trace( "search result: " . Dumper $search_result);
-     
+
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);
-     
-    my @result = $self->__render_result_list( $search_result, $body ); 
-        
+
+    my @result = $self->__render_result_list( $search_result, $body );
+
     $self->logger()->trace( "dumper result: " . Dumper @result);
 
     $self->_result()->{_raw} = {
         _returnType => 'partial',
         data => \@result,
     };
-    
+
     return $self;
 }
 =head2 init_mine
 
 my certificates view, finds certificates based on the current logged in userid
- 
+
 =cut
 sub init_mine {
 
     my $self = shift;
     my $args = shift;
-           
+
     my $limit = $self->param('limit') || 25;
-    
+
     # Safety rule
     if ($limit > 500) {  $limit = 500; }
-    
+
     # will be removed once inline paging works
-    my $startat = $self->param('startat') || 0; 
-    
-    my $query = {          
-        CERT_ATTRIBUTES => [{ 
-            KEY => 'system_cert_owner', 
-            VALUE =>  $self->_session->param('user')->{name}, 
+    my $startat = $self->param('startat') || 0;
+
+    my $query = {
+        CERT_ATTRIBUTES => [{
+            KEY => 'system_cert_owner',
+            VALUE =>  $self->_session->param('user')->{name},
             OPERATOR => 'EQUAL'
         }],
         ORDER => 'CERTIFICATE.NOTBEFORE',
@@ -448,14 +448,14 @@ sub init_mine {
     $self->logger()->debug( "search query: " . Dumper $query);
 
     my $search_result = $self->send_command( 'search_cert', { %$query, ( LIMIT => $limit, START => $startat ) } );
-    
+
     my $result_count = scalar @{$search_result};
     my $pager;
     if ($result_count == $limit) {
         my %count_query = %{$query};
         delete $count_query{ORDER};
         delete $count_query{REVERSE};
-        
+
         $result_count = $self->send_command( 'search_cert_count', \%count_query );
 
         my $queryid = $self->__generate_uid();
@@ -468,19 +468,19 @@ sub init_mine {
         $self->_client->session()->param('query_cert_'.$queryid, $_query );
         $pager = $self->__render_pager( $_query, { limit => $limit, startat => $startat } )
 
-    } 
-    
+    }
+
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
     $self->_page({
-        label => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL',        
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC',
     });
-    
+
     my @result = $self->__render_result_list( $search_result, $self->__default_grid_row() );
-     
+
     $self->logger()->trace( "dumper result: " . Dumper @result);
-    
+
     $self->add_section({
         type => 'grid',
         className => 'certificate',
@@ -490,10 +490,10 @@ sub init_mine {
                 label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
                 target => 'modal'
-            }], 
+            }],
             columns => $self->__default_grid_head(),
             data => \@result,
-            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',            
+            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             pager => $pager,
         }
     });
@@ -502,10 +502,10 @@ sub init_mine {
 
 }
 
-=head2 init_detail 
+=head2 init_detail
 
 Show details on the certificate, includes basic certificate information,
-status, issuer and links to download chains and related workflow. Designed to 
+status, issuer and links to download chains and related workflow. Designed to
 be shown in a modal popup.
 
 =cut
@@ -519,18 +519,18 @@ sub init_detail {
 
     # empty submission
     if (!$cert_identifier) {
-        $self->redirect('certificate!search');                
+        $self->redirect('certificate!search');
         return;
     }
 
     my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' }, 1);
-    
+
     if (!$cert) {
         $self->_page({
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
             shortlabel => 'I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN'
         });
-            
+
         $self->add_section({
             type => 'keyvalue',
             content => {
@@ -560,24 +560,24 @@ sub init_detail {
 
 
     my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', value => $cert->{SUBJECT} } );
-     
-    if ($cert_attribute && $cert_attribute->{subject_alt_name}) {        
+
+    if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
         #my $cert_attribute->{subject_alt_name};
         push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => $cert_attribute->{subject_alt_name}, 'format' => 'ullist' };
-    } 
-        
+    }
+
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
     if ($cert->{CSR_SERIAL} && $cert->{PKI_REALM} eq $self->_session->param('pki_realm')) {
         $self->logger()->debug("cert is local entity");
         $is_local_entity = 1;
     }
-    
+
     if ($is_local_entity) {
         my $cert_profile  = $self->send_command( 'get_profile_for_cert', {  IDENTIFIER => $cert_identifier }, 1);
         if ($cert_profile) {
-            push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', value => $cert_profile };    
-        }   
+            push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', value => $cert_profile };
+        }
     }
 
     push @fields, (
@@ -603,14 +603,14 @@ sub init_detail {
         sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT'),
         sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE'),
         sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL'),
-        '<li><a href="#/openxpki/certificate!text!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT</a></li>', ],        
+        '<li><a href="#/openxpki/certificate!text!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT</a></li>', ],
         format => 'rawlist'
     };
-    
+
     if ($is_local_entity) {
-        
+
         my $baseurl = 'workflow!index!cert_identifier!'.$cert_identifier.'!wf_type!';
-        
+
         my @actions;
         my $reply = $self->send_command ( "get_cert_actions", { IDENTIFIER => $cert_identifier });
         
@@ -621,15 +621,15 @@ sub init_detail {
                 push @actions, { page => $baseurl.$item->{workflow}, label => $item->{label}, target => '_blank' };
             }
         }
-                
-        push @fields, { 
-            label => 'I18N_OPENXPKI_UI_CERT_ACTION_LABEL', 
+
+        push @fields, {
+            label => 'I18N_OPENXPKI_UI_CERT_ACTION_LABEL',
             value => \@actions,
             format => 'linklist'
         } if (@actions);
-    }     
-    
-    push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => { 
+    }
+
+    push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => {
         page => 'certificate!related!identifier!'.$cert_identifier,
         label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT'
     }};
@@ -674,10 +674,10 @@ sub init_text {
             description => '<code>'  . $pem . '</code>',
         }},
     );
-    
+
     return $self;
-    
-    
+
+
 }
 
 =head2 init_chain
@@ -760,8 +760,8 @@ sub init_related {
     # run a workflow search using the given ids from the cert attributes
     my @wfid = ( 0 );
     foreach my $key (keys %{$cert->{CERT_ATTRIBUTES}}) {
-        if ($key !~ m{ \A system_workflow }xs ) { 
-            next; 
+        if ($key !~ m{ \A system_workflow }xs ) {
+            next;
         }
         push @wfid, @{$cert->{CERT_ATTRIBUTES}->{$key}};
     }
@@ -782,7 +782,7 @@ sub init_related {
             $line->{'WORKFLOW.WORKFLOW_SERIAL'},
         ];
     }
-    
+
     $self->add_section({
         type => 'grid',
         className => 'workflow',
@@ -808,8 +808,8 @@ sub init_related {
 
 
 }
- 
-=head2 init_download 
+
+=head2 init_download
 
 Handle download requests, required the cert_identifier and the expected format.
 Redirects to init_detail if no format is given.
@@ -827,7 +827,7 @@ sub init_download {
     if (!$format) {
 
         return $self->init_detail();
-         
+
     } elsif ($format eq 'pkcs7') {
 
         my $keeproot = $self->param('root') ? 1 : 0;
@@ -898,20 +898,20 @@ sub init_download {
     return $self;
 }
 
-=head2 init_parse 
+=head2 init_parse
 
-not implemented 
+not implemented
 
 receive a PEM encoded x509/pkcs10/pkcs7 block and output information.
 
 =cut
 sub init_parse {
-    
+
     my $self = shift;
     my $args = shift;
 
     my $pem = $self->param('body');
-    
+
     my @fields = ({
         label => 'Body',
         value => $pem
@@ -930,9 +930,9 @@ sub init_parse {
             data => \@fields,
         }},
     );
-    
+
     return $self;
-    
+
 }
 
 =head2 action_autocomplete
@@ -950,17 +950,17 @@ sub action_autocomplete {
 
     $self->logger()->debug( "autocomplete term: " . Dumper $term);
 
-    my @result;    
-    # If we see a string with length of 25 to 27 with only base64 chars 
+    my @result;
+    # If we see a string with length of 25 to 27 with only base64 chars
     # we assume it is a cert identifier - this might fail in few cases
     # Note - we replace + and / by - and _ in our base64 strings!
-    if ($term =~ /[a-zA-Z0-9-_]{25,27}/) {   
+    if ($term =~ /[a-zA-Z0-9-_]{25,27}/) {
         $self->logger()->debug( "search for identifier: $term ");
         my $search_result = $self->send_command( 'get_cert', {
             IDENTIFIER => $term,
             FORMAT => 'DBINFO',
         });
-        
+
         if ($search_result) {
             push @result, {
                 value => $search_result->{IDENTIFIER},
@@ -969,18 +969,18 @@ sub action_autocomplete {
                 notafter => $search_result->{NOTAFTER}
             };
         }
-    } 
+    }
 
     if (!@result) {
         my $search_result = $self->send_command( 'search_cert', {
             SUBJECT => "%$term%",
             VALID_AT => time(),
             STATUS => 'ISSUED',
-            ENTITY_ONLY => 1        
+            ENTITY_ONLY => 1
         });
-        
+
         $self->logger()->trace( "search result: " . Dumper $search_result);
-    
+
         foreach my $item (@{$search_result}) {
             push @result, {
                 value => $item->{IDENTIFIER},
@@ -1001,7 +1001,7 @@ sub action_autocomplete {
 
 =head2 action_find
 
-Handle search requests for a single certificate by its identifier 
+Handle search requests for a single certificate by its identifier
 
 =cut
 
@@ -1009,7 +1009,7 @@ sub action_find {
 
     my $self = shift;
     my $args = shift;
-    
+
     my $cert_identifier = $self->param('cert_identifier');
     if ($cert_identifier) {
         my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
@@ -1018,7 +1018,7 @@ sub action_find {
             return $self->init_search();
         }
     } elsif (my $serial = $self->param('cert_serial')) {
-        
+
         if ($serial =~ /[a-f]/ && substr($serial,0,2) ne '0x') {
             $serial = '0x' . $serial;
         }
@@ -1039,14 +1039,14 @@ sub action_find {
             # this should not happen
             $self->set_status('Query ambigous - got more than one result on this serial number?!.','error');
             return $self->init_search();
-        } else {            
+        } else {
             $cert_identifier = $search_result->[0]->{"IDENTIFIER"};
-        } 
+        }
     } else {
         $self->set_status('Please enter either certificate identifier or certificate serial number.','error');
         return $self->init_search();
     }
-    
+
     $self->redirect( 'certificate!detail!identifier!'.$cert_identifier );
 
 }
@@ -1063,7 +1063,7 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
-    my $query = { ENTITY_ONLY => 1 }; 
+    my $query = { ENTITY_ONLY => 1 };
     my $input = {}; # store the input data the reopen the form later
     foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
@@ -1072,7 +1072,7 @@ sub action_search {
             $input->{$key} = $val;
         }
     }
-    
+
     foreach my $key (qw(profile)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
@@ -1080,21 +1080,21 @@ sub action_search {
             $query->{uc($key)} = $val;
         }
     }
-    
+
     if (my $status = $self->param('status')) {
         $input->{'status'} = $status;
         if ($status eq 'VALID') {
             $status = 'ISSUED';
             $query->{VALID_AT} = time();
         }
-        $query->{STATUS} = $status;        
+        $query->{STATUS} = $status;
     }
 
     $self->logger()->debug("query : " . Dumper $self->cgi()->param());
 
-    # Read the query pattern for extra attributes from the session 
+    # Read the query pattern for extra attributes from the session
     my $spec = $self->_client->session()->param('certsearch')->{default};
-    my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};        
+    my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};
 
     if (@attr) {
         $input->{attributes} = $self->__build_attribute_preset( $spec->{attributes} );
@@ -1102,34 +1102,34 @@ sub action_search {
 
     # Add san search to attributes
     if (my $val = $self->param('san')) {
-        $input->{'san'} = $val;        
+        $input->{'san'} = $val;
         push @attr, { KEY => 'subject_alt_name', VALUE => '%'.$val.'%' };
     }
-    
+
     if (scalar @attr) {
         $query->{CERT_ATTRIBUTES} = \@attr;
     }
-    
+
     $self->logger()->debug("query : " . Dumper $query);
-    
-    
+
+
     my $result_count = $self->send_command( 'search_cert_count', $query );
-    
+
     # No results founds
     if (!$result_count) {
         $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
         return $self->init_search({ preset => $input });
     }
-    
+
     # check if there is a custom column set defined
-    my ($header,  $body);    
+    my ($header,  $body);
     if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
         ($header, $body) = $self->__render_list_spec( $spec->{cols} );
     } else {
         $body = $self->__default_grid_row;
         $header = $self->__default_grid_head;
     }
-    
+
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_cert_'.$queryid, {
         'id' => $queryid,
@@ -1140,17 +1140,17 @@ sub action_search {
         'header' => $header,
         'column' => $body,
     });
- 
+
     $self->redirect( 'certificate!result!id!'.$queryid  );
-    
+
     return $self;
- 
+
 }
- 
+
 =head2 __render_result_list
 
 Helper to render the output result list from a sql query result.
- 
+
 
 =cut
 sub __render_result_list {
@@ -1158,16 +1158,16 @@ sub __render_result_list {
     my $self = shift;
     my $search_result = shift;
     my $colums = shift;
-    
+
     my @result;
     foreach my $item (@{$search_result}) {
 
         $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
-            
+
         my @line;
         foreach my $col (@{$colums}) {
             if ($col->{field} eq 'STATUS') {
-                push @line, { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} };        
+                push @line, { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} };
             } elsif ($col->{field} eq 'STATUSCLASS') {
                 push @line, lc($item->{STATUS});
             } else {
@@ -1187,18 +1187,18 @@ sub __render_result_list {
 
 Create array to pass to UI from specification in config file
 
-=cut 
+=cut
 
 sub __render_list_spec {
 
     my $self = shift;
     my $cols = shift;
-    
+
     my @header;
     my @column;
-    
+
     for (my $ii = 0; $ii < scalar @{$cols}; $ii++) {
-        
+
         # we must create a copy as we change the hash in the session info otherwise
         my %col = %{$cols->[$ii]};
         my $head = { sTitle => $col{label} };
@@ -1208,7 +1208,7 @@ sub __render_list_spec {
         if ($col{format}) {
             $head->{format} = $col{format};
         }
-        push @header, $head; 
+        push @header, $head;
 
         if ($col{template}) {
 
@@ -1230,8 +1230,7 @@ sub __render_list_spec {
 
     push @column, { source => 'certificate', field => 'IDENTIFIER' };
     push @column, { source => 'certificate', field => 'STATUSCLASS' };
-    
+
     return ( \@header, \@column );
 }
 1;
- 

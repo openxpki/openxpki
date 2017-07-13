@@ -28,9 +28,9 @@ sub START {
 sub get_command {
     my $self = shift;
     my $ident = ident $self;
-    
+
     my $command = ' -print_msgtype -noout -inform DER ';
-    
+
     my $in_filename = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
     });
@@ -44,7 +44,7 @@ sub get_command {
         FORCE    => 1,
     });
     ##! 16: 'stat: ' . Dumper(stat $in_filename)
-   
+
     $command .= '-in ' . $in_filename;
     $command .= ' -out ' . $outfile_of{$ident};
     return $command;
@@ -81,13 +81,13 @@ sub get_result
 }
 
 sub cleanup {
-    
+
     my $self = shift;
     my $ident = ident $self;
-    
+
     $ENV{pwd} = '';
     $fu_of{$ident}->cleanup();
-    
+
 }
 
 1;
