@@ -1198,7 +1198,7 @@ sub __execute_workflow_activity {
         my $fork_helper = OpenXPKI::Daemonize->new;
 
         # FORK
-        my $pid = $fork_helper->fork_child;
+        my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0
 
         # parent process
         if ($pid > 0) {

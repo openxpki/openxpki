@@ -213,10 +213,10 @@ sub run {
     $fork_helper->uid($self->_uid) if $self->_uid;
 
     # FORK
-    my $pid = $fork_helper->fork_child;
+    my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0
 
     # parent process: return
-    if ($pid > 0) { return $pid } # parent returns PID, child returns 0
+    if ($pid > 0) { return $pid }
 
     # child process
     eval {
@@ -577,10 +577,10 @@ sub __wake_up_workflow {
     my $fork_helper = OpenXPKI::Daemonize->new;
 
     # FORK
-    my $pid = $fork_helper->fork_child;
+    my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0
 
     # parent process: return
-    if ($pid > 0) { return $pid } # parent returns PID, child returns 0
+    if ($pid > 0) { return $pid }
 
     # child process
     eval {
