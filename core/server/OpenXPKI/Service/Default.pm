@@ -189,7 +189,7 @@ sub __handle_message : PRIVATE {
     # get the result from a method specific to the message name
     eval {
         my $method = '__handle_' . $message_name;
-        CTX('log')->system->debug("<< $message_name (message from client)");
+        CTX('log')->system->trace("<< $message_name (message from client)");
         $result = $self->$method($message);
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
