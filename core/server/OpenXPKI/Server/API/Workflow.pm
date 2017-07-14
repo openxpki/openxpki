@@ -1195,7 +1195,7 @@ sub __execute_workflow_activity {
         CTX('log')->workflow()->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
                 $workflow->state(), $workflow->id(), $workflow->type()));
 
-        my $fork_helper = OpenXPKI::ForkUtils->new;
+        my $fork_helper = OpenXPKI::Daemonize->new;
 
         # FORK
         my $pid = $fork_helper->fork_child;

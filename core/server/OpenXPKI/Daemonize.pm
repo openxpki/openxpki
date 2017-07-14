@@ -1,9 +1,9 @@
-package OpenXPKI::ForkUtils;
+package OpenXPKI::Daemonize;
 use Moose;
 
 =head1 Name
 
-OpenXPKI::ForkUtils - Helper functions to cleanly fork background processes
+OpenXPKI::Daemonize - Helper functions to cleanly fork background processes
 
 =cut
 

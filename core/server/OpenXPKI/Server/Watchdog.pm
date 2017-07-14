@@ -76,7 +76,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
-use OpenXPKI::ForkUtils;
+use OpenXPKI::Daemonize;
 use Proc::ProcessTable;
 use POSIX;
 use Log::Log4perl::MDC;
@@ -205,7 +205,7 @@ sub run {
         );
     }
 
-    my $fork_helper = OpenXPKI::ForkUtils->new(
+    my $fork_helper = OpenXPKI::Daemonize->new(
         sighup_handler  => \&OpenXPKI::Server::Watchdog::_sig_hup,
         sigterm_handler => \&OpenXPKI::Server::Watchdog::_sig_term,
     );
@@ -574,7 +574,7 @@ sub __wake_up_workflow {
     my $self = shift;
     my $args = shift;
 
-    my $fork_helper = OpenXPKI::ForkUtils->new;
+    my $fork_helper = OpenXPKI::Daemonize->new;
 
     # FORK
     my $pid = $fork_helper->fork_child;
