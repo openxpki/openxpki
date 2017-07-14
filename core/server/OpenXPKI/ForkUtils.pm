@@ -11,19 +11,17 @@ OpenXPKI::ForkUtils - Helper functions to cleanly fork background processes
 use English;
 
 # CPAN modules
-use POSIX;
+use POSIX qw(:signal_h);
 
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::MooseParams;
 
-has sigint_set => (
+has old_sig_set => (
     is => 'rw',
     isa => 'POSIX::SigSet',
-    lazy => 1,
     init_arg => undef,
-    default => sub { POSIX::SigSet->new(SIGINT) },
 );
 
 =head1 METHODS
@@ -104,17 +102,19 @@ sub fork_child {
 # (https://docstore.mik.ua/orelly/perl/cookbook/ch16_21.htm)
 sub _block_sigint {
     my ($self) = @_;
-    sigprocmask(SIG_BLOCK, $self->sigint_set)
+    my $sigint = POSIX::SigSet->new(SIGINT);
+    sigprocmask(SIG_BLOCK, $sigint, $self->old_sig_set)
         or OpenXPKI::Exception->throw(
             message => 'Unable to block SIGINT before fork()',
             log => { priority => 'fatal', facility => 'system' }
         );
 }
+
 sub _unblock_sigint {
     my ($self) = @_;
-    sigprocmask(SIG_UNBLOCK, $self->sigint_set)
+    sigprocmask(SIG_SETMASK, $self->old_sig_set)
         or OpenXPKI::Exception->throw(
-            message => 'Unable to unblock SIGINT after fork()',
+            message => 'Unable to reset old signals after fork()',
             log => { priority => 'fatal', facility => 'system' }
         );
 }
