@@ -11,12 +11,37 @@ OpenXPKI::ForkUtils - Helper functions to cleanly fork background processes
 use English;
 
 # CPAN modules
-use POSIX qw(:signal_h);
+use POSIX qw(:signal_h setuid setgid);
 
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::MooseParams;
+
+has max_fork_redo => (
+    is => 'rw',
+    isa => 'Int',
+    default => 5,
+);
+
+has sighup_handler => (
+    is => 'rw',
+    isa => 'CodeRef',
+);
+
+has sigterm_handler => (
+    is => 'rw',
+    isa => 'CodeRef',
+);
+
+has uid => (
+    is => 'rw',
+    isa => 'Int',
+);
+
+has gid => (
+    is => 'rw',
+    isa => 'Int',
+);
 
 has old_sig_set => (
     is => 'rw',
@@ -59,16 +84,11 @@ C<$SIG{CHLD} = "DEFAULT"> if you want to do system calls.
 
 =cut
 sub fork_child {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        max_fork_redo   => { isa => 'Int', default => 5 },
-        sighup_handler  => { isa => 'CodeRef', optional => 1 },
-        sigterm_handler => { isa => 'CodeRef', optional => 1 },
-        stderr          => { isa => 'Str', default => '/dev/null' },
-    );
+    my ($self) = @_;
 
     $SIG{CHLD} = 'IGNORE'; # IGNORE means: child zombies are auto-removed from process table
 
-    my $pid = $self->_try_fork($params{max_fork_redo});
+    my $pid = $self->_try_fork($self->max_fork_redo);
 
     # parent process: return on successful fork
     if ($pid > 0) { return $pid }
@@ -81,8 +101,17 @@ sub fork_child {
     # IGNORE could prevent Proc::SafeExec or system() from working correctly
     # (see https://docstore.mik.ua/orelly/perl/cookbook/ch16_20.htm)
     $SIG{CHLD} = 'DEFAULT';
-    $SIG{HUP}  = $params{sighup_handler}  if $params{sighup_handler};
-    $SIG{TERM} = $params{sigterm_handler} if $params{sigterm_handler};
+    $SIG{HUP}  = $self->sighup_handler  if $self->sighup_handler;
+    $SIG{TERM} = $self->sigterm_handler if $self->sigterm_handler;
+
+    if ($self->gid) {
+        setgid($self->gid);
+    }
+    if ($self->uid) {
+        setuid($self->uid);
+        $ENV{USER} = getpwuid($self->uid);
+        $ENV{HOME} = ((getpwuid($self->uid))[7]);
+    }
 
     umask 0;
     chdir '/';

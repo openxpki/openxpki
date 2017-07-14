@@ -81,8 +81,6 @@ use Proc::ProcessTable;
 use POSIX;
 use Log::Log4perl::MDC;
 
-use Net::Server::Daemonize qw( set_uid set_gid );
-
 use Moose;
 
 use Data::Dumper;
@@ -207,11 +205,16 @@ sub run {
         );
     }
 
-    my $fork_helper = OpenXPKI::ForkUtils->new;
-    my $pid = $fork_helper->fork_child(
+    my $fork_helper = OpenXPKI::ForkUtils->new(
         sighup_handler  => \&OpenXPKI::Server::Watchdog::_sig_hup,
         sigterm_handler => \&OpenXPKI::Server::Watchdog::_sig_term,
     );
+    $fork_helper->gid($self->_gid) if $self->_gid;
+    $fork_helper->uid($self->_uid) if $self->_uid;
+
+    # FORK
+    my $pid = $fork_helper->fork_child;
+
     # parent process: return
     if ($pid > 0) { return $pid } # parent returns PID, child returns 0
 
@@ -234,9 +237,6 @@ sub run {
 
         # set process name
         OpenXPKI::Server::__set_process_name("watchdog");
-
-        set_gid($self->_gid()) if( $self->_gid() );
-        set_uid($self->_uid()) if( $self->_uid() );
 
         CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
                 $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
@@ -575,7 +575,9 @@ sub __wake_up_workflow {
     my $args = shift;
 
     my $fork_helper = OpenXPKI::ForkUtils->new;
-    my $pid = $fork_helper->fork_child();
+
+    # FORK
+    my $pid = $fork_helper->fork_child;
 
     # parent process: return
     if ($pid > 0) { return $pid } # parent returns PID, child returns 0

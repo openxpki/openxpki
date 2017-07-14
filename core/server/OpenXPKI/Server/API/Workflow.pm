@@ -1196,7 +1196,9 @@ sub __execute_workflow_activity {
                 $workflow->state(), $workflow->id(), $workflow->type()));
 
         my $fork_helper = OpenXPKI::ForkUtils->new;
-        my $pid = $fork_helper->fork_child();
+
+        # FORK
+        my $pid = $fork_helper->fork_child;
 
         # parent process
         if ($pid > 0) {
