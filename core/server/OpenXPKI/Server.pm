@@ -19,7 +19,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use Data::Dumper;
 
