@@ -1155,6 +1155,8 @@ sub __execute_workflow_activity {
     my $wf_activity = shift;
     my $run_async = shift || '';
 
+    my $log = CTX('log')->workflow;
+
     my $activity = sub {
         ##! 8: 'execute activity ' . $wf_activity
 
@@ -1178,8 +1180,8 @@ sub __execute_workflow_activity {
                     );
                 }
                 $wf_activity = $action[0];
-                CTX('log')->workflow()->info(sprintf ("Found internal bypass action, leave state %s in workflow id %01d (type %s)",
-                        $workflow->state(), $workflow->id(), $workflow->type()));
+                $log->info(sprintf ("Found internal bypass action, leave state %s in workflow id %01d (type %s)",
+                    $workflow->state(), $workflow->id(), $workflow->type()));
 
             } else {
                 $wf_activity = '';
@@ -1192,8 +1194,8 @@ sub __execute_workflow_activity {
     # ASYNCHRONOUS - fork
     #
     if ($run_async) {
-        CTX('log')->workflow()->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
-                $workflow->state(), $workflow->id(), $workflow->type()));
+        $log->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
+            $workflow->state(), $workflow->id(), $workflow->type()));
 
         my $fork_helper = OpenXPKI::Daemonize->new;
 
@@ -1203,6 +1205,7 @@ sub __execute_workflow_activity {
         # parent process
         if ($pid > 0) {
             ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
+            $log->trace("Forked workflow instance with PID $pid") if $log->is_trace;
             return $pid;
         }
 
@@ -1228,17 +1231,13 @@ sub __execute_workflow_activity {
             # run activity
             $activity->();
 
-            CTX('dbi')->commit;  # close open transactions if run asynchronically
-            CTX('dbi')->disconnect;
+            # DB commits are done inside the workflow engine
         };
         if ($@) {
-            # make sure cleanup code does not die as this would escape this method
-            eval {
-                CTX('log')->system->error($@);
-                CTX('dbi')->rollback; # close open transactions if run asynchronically
-                CTX('dbi')->disconnect;
-            }
+            # DB rollback is not needed as this process will terminate now anyway
+            eval { CTX('log')->system->error($@) } # make sure cleanup code does not die as this would escape this method
         }
+        eval { CTX('dbi')->disconnect };
         ##! 16: 'Backgrounded workflow finished - exit child'
         exit;
     }
@@ -1253,12 +1252,12 @@ sub __execute_workflow_activity {
     eval { $activity->() };
 
     if (my $eval_err = $EVAL_ERROR) {
-       CTX('log')->workflow()->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
-                $wf_activity, $workflow->id(), $workflow->type(), $eval_err));
+       $log->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
+            $wf_activity, $workflow->id(), $workflow->type(), $eval_err));
 
         OpenXPKI::Server::__set_process_name("workflow: id %d (exception)", $workflow->id());
 
-        my $log = { priority => 'error', facility => 'workflow' };
+        my $logcfg = { priority => 'error', facility => 'workflow' };
 
         # clear MDC
         Log::Log4perl::MDC->put('wfid', undef);
@@ -1273,7 +1272,7 @@ sub __execute_workflow_activity {
             if (ref $error eq '') {
                 OpenXPKI::Exception->throw (
                     message => $error,
-                    log     => $log,
+                    log     => $logcfg,
                 );
             }
             if (ref $error eq 'ARRAY') {
@@ -1290,7 +1289,7 @@ sub __execute_workflow_activity {
                 OpenXPKI::Exception->throw (
                     message  => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED",
                     children => [ @list ],
-                    log      => $log,
+                    log      => $logcfg,
                 );
             }
         }
@@ -1298,7 +1297,7 @@ sub __execute_workflow_activity {
         ## unknown exception
         OpenXPKI::Exception->throw(
             message => scalar $eval_err,
-            log     => $log,
+            log     => $logcfg,
         );
     };
 

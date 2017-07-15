@@ -321,6 +321,8 @@ sub run {
     # bind parameters via SQL::Abstract::More to do some magic
     $self->sqlam->bind_params($sth, @{$query_params}) if $query_params;
 
+    $self->log->trace(sprintf "DB query: %s", $query_string) if $self->log->is_trace;
+
     my $rownum = $sth->execute;
 
     return $return_rownum ? $rownum : $sth;
@@ -460,8 +462,8 @@ sub drop_table {
 sub start_txn {
     my $self = shift;
     return $self->log->warn("AutoCommit is on, start_txn() is useless") if $self->autocommit;
+    my $caller = [ caller ];
     if ($self->in_txn) {
-        my $caller = [ caller ];
         $self->log->debug(
             sprintf "start_txn() was called from %s, line %i during a running transaction (started in %s, line %i).",
             $caller->[0],
@@ -471,37 +473,54 @@ sub start_txn {
         );
     }
     ##! 16: "Flagging a transaction start"
-    $self->_txn_starter([ caller ]);
+    $self->_txn_starter($caller);
 
     $self->log->trace(
-        sprintf "start_txn() in %s, %i", $self->_txn_starter->[0], $self->_txn_starter->[2],
-    ) if ($self->log->is_trace);
+        sprintf "start_txn() in %s, %i", $caller->[0], $caller->[2],
+    ) if $self->log->is_trace;
 }
 
 sub commit {
     my $self = shift;
     return $self->log->warn("AutoCommit is on, commit() is useless") if $self->autocommit;
-    $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
-        unless $self->in_txn;
+
+    if ($self->in_txn) {
+        if ($self->log->is_trace) {
+            my $caller = [ caller ];
+            $self->log->trace(
+                sprintf "commit for txn from %s, %i called in %s, %i",
+                    $self->_txn_starter->[0], $self->_txn_starter->[2],
+                    $caller->[0], $caller->[2]
+            );
+        }
+    }
+    else {
+        $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
+    }
+
     ##! 16: "Commit of changes"
     $self->dbh->commit;
-
-    if ($self->log->is_trace) {
-        my $caller = [ caller ];
-        $self->log->trace(
-            sprintf "commit for txn from %s, %i called in %s, %i",
-                $self->_txn_starter->[0], $self->_txn_starter->[2],
-                $caller->[0], $caller->[2]
-        );
-    }
     $self->_clear_txn_starter;
 }
 
 sub rollback {
     my $self = shift;
     return $self->log->warn("AutoCommit is on, rollback() is useless") if $self->autocommit;
-    $self->log->debug("rollback() was called without indicating a transaction start via start_txn() first")
-        unless $self->in_txn;
+
+    if ($self->in_txn) {
+        if ($self->log->is_trace) {
+            my $caller = [ caller ];
+            $self->log->trace(
+                sprintf "rollback for txn from %s, %i called in %s, %i",
+                    $self->_txn_starter->[0], $self->_txn_starter->[2],
+                    $caller->[0], $caller->[2]
+            );
+        }
+    }
+    else {
+        $self->log->debug("rollback() was called without indicating a transaction start via start_txn() first");
+    }
+
     ##! 16: "Rollback of changes"
     $self->dbh->rollback;
     $self->_clear_txn_starter;
