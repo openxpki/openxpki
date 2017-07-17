@@ -219,6 +219,11 @@ sub run {
 
     # child process
     eval {
+        # create memory-only session for workflow
+        my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
+        OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+        Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+
         # The caller sets the watchdog only in the global context
         # we reuse the context to set a pointer to ourselves for signal handling
         # in the forked process - we need the force if the watchdog is forked
@@ -583,11 +588,6 @@ sub __wake_up_workflow {
 
     # child process
     eval {
-        # create memory-only session for workflow
-        my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
-        OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
-        Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
-
         OpenXPKI::Server::__set_process_name("workflow: id %d (watchdog)", $args->{workflow_id});
 
         # errors here are fork errors and we dont want the watchdog to die!
