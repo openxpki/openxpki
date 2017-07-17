@@ -219,6 +219,7 @@ Triggered by the master process when a reload happens.
 sub _sig_hup {
     ##! 1: 'Got HUP'
     $RELOAD = 1;
+    CTX('log')->system->info("Watchdog worker $$ got HUP signal - reloading config");
 }
 
 =head2 _sig_term
@@ -231,8 +232,7 @@ Trigger by the master process to terminate the worker.
 sub _sig_term {
     ##! 1: 'Got TERM'
     $TERMINATE  = 1;
-    CTX('log')->system()->info("Watchdog worker $$ got term signal - cleaning up.");
-    return;
+    CTX('log')->system->info("Watchdog worker $$ got TERM signal - stopping");
 }
 
 =head2 start_or_reload
@@ -483,7 +483,7 @@ sub __reload {
     CTX('log')->system()->info('Watchdog worker reloaded');
 }
 
-=head2
+=head2 __scan_for_paused_workflows
 
 Do a select on the database to check for waiting or stale workflows,
 if found, the workflow is marked and reinstantiated, the id of the
