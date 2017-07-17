@@ -86,8 +86,8 @@ use Moose;
 
 use Data::Dumper;
 
-our $terminate = 0;
-our $reload = 0;
+our $TERMINATE = 0;
+our $RELOAD = 0;
 
 has workflow_table => (
     is => 'ro',
@@ -258,9 +258,9 @@ sub run {
         }
 
         ##! 16: 'watchdog: start looping'
-        while ( ! $OpenXPKI::Server::Watchdog::terminate ) {
-            if ($OpenXPKI::Server::Watchdog::reload) {
-                $OpenXPKI::Server::Watchdog::reload = 0;
+        while (not $TERMINATE) {
+            if ($RELOAD) {
+                $RELOAD = 0;
                 $self->__reload;
             }
             ##! 80: 'watchdog: do loop'
@@ -335,7 +335,7 @@ Trigger via IPC by the master process when a reload happens.
 =cut
 sub _sig_hup {
     ##! 1: 'Got HUP'
-    $OpenXPKI::Server::Watchdog::reload = 1;
+    $RELOAD = 1;
 }
 
 # Does the actual reloading during the main loop
@@ -383,7 +383,7 @@ Trigger via IPC by the master process to terminate the worker.
 =cut
 sub _sig_term {
     ##! 1: 'Got TERM'
-    $OpenXPKI::Server::Watchdog::terminate  = 1;
+    $TERMINATE  = 1;
     CTX('log')->system()->info("Watchdog worker $$ got term signal - cleaning up.");
     return;
 }
