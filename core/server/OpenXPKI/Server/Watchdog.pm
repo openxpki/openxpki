@@ -206,7 +206,89 @@ around BUILDARGS => sub {
 
 };
 
-=head1 Methods
+=head1 STATIC METHODS
+
+=head2 _sig_hup
+
+Signal handler for SIGHUP registered with the forked worker process.
+
+Triggered by the master process when a reload happens.
+
+=cut
+sub _sig_hup {
+    ##! 1: 'Got HUP'
+    $RELOAD = 1;
+}
+
+=head2 _sig_term
+
+Signal handler for SIGTERM registered with the forked worker process.
+
+Trigger by the master process to terminate the worker.
+
+=cut
+sub _sig_term {
+    ##! 1: 'Got TERM'
+    $TERMINATE  = 1;
+    CTX('log')->system()->info("Watchdog worker $$ got term signal - cleaning up.");
+    return;
+}
+
+=head2 start_or_reload
+
+Static method to instantiate and start the watchdog or make it reload it's
+config.
+
+=cut
+sub start_or_reload {
+    ##! 1: 'start_or_reload'
+    my $pids = OpenXPKI::Control::get_pids();
+
+    # Start watchdog if not running
+    if (not scalar @{$pids->{watchdog}}) {
+        my $config = CTX('config');
+
+        return 0 if $config->get('system.watchdog.disabled');
+
+        my $watchdog = OpenXPKI::Server::Watchdog->new( {
+            user  => OpenXPKI::Server::__get_numerical_user_id(  $config->get('system.server.user') ),
+            group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') ),
+        } );
+
+        $watchdog->run;
+    }
+    # Signal reload
+    else {
+        kill 'HUP', @{$pids->{watchdog}};
+    }
+
+    return 1;
+}
+
+=head2 terminate
+
+Static method that looks for watchdog instances and sends them a SIGHUP signal.
+
+This will NOT kill the watchdog but tell it to gracefully stop.
+
+=cut
+sub terminate {
+    ##! 1: 'terminate'
+    my $pids = OpenXPKI::Control::get_pids();
+
+    if (scalar $pids->{watchdog}) {
+        kill 'TERM', @{$pids->{watchdog}};
+        CTX('log')->system()->info('Told watchdog to terminate');
+    }
+    else {
+        CTX('log')->system()->error('No watchdog instances to terminate');
+    }
+
+    return 1;
+}
+
+=head1 METHODS
+
 =head2 run
 
 Forks away a worker child, returns the pid of the worker
@@ -349,17 +431,6 @@ sub run {
     exit;
 }
 
-=head2 _sig_hup
-
-signalhandler registered with the forked worker.
-Trigger via IPC by the master process when a reload happens.
-
-=cut
-sub _sig_hup {
-    ##! 1: 'Got HUP'
-    $RELOAD = 1;
-}
-
 # Does the actual reloading during the main loop
 sub __reload {
     my $self = shift;
@@ -395,72 +466,6 @@ sub __reload {
     });
 
     CTX('log')->system()->info('Watchdog worker reloaded');
-}
-
-=head2 _sig_term
-
-signalhandler registered with the forked worker.
-Trigger via IPC by the master process to terminate the worker.
-
-=cut
-sub _sig_term {
-    ##! 1: 'Got TERM'
-    $TERMINATE  = 1;
-    CTX('log')->system()->info("Watchdog worker $$ got term signal - cleaning up.");
-    return;
-}
-
-=head2 start_or_reload
-
-Static method to instantiate and start the watchdog or make it reload it's
-config.
-
-=cut
-sub start_or_reload {
-    ##! 1: 'start_or_reload'
-    my $pids = OpenXPKI::Control::get_pids();
-
-    # Start watchdog if not running
-    if (not scalar @{$pids->{watchdog}}) {
-        my $config = CTX('config');
-
-        return 0 if $config->get('system.watchdog.disabled');
-
-        my $watchdog = OpenXPKI::Server::Watchdog->new( {
-            user  => OpenXPKI::Server::__get_numerical_user_id(  $config->get('system.server.user') ),
-            group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') ),
-        } );
-
-        $watchdog->run;
-    }
-    # Signal reload
-    else {
-        kill 'HUP', @{$pids->{watchdog}};
-    }
-
-    return 1;
-}
-
-=head2 terminate
-
-Static method that looks for watchdog instances and sends them a SIGHUP signal.
-
-This will NOT kill the watchdog but tell it to gracefully stop.
-
-=cut
-sub terminate {
-    ##! 1: 'terminate'
-    my $pids = OpenXPKI::Control::get_pids();
-
-    if (scalar $pids->{watchdog}) {
-        kill 'TERM', @{$pids->{watchdog}};
-        CTX('log')->system()->info('Told watchdog to terminate');
-    }
-    else {
-        CTX('log')->system()->error('No watchdog instances to terminate');
-    }
-
-    return 1;
 }
 
 =head2
