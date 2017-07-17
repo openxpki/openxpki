@@ -42,7 +42,8 @@ sub _exit {
 sub _failure {
     my ($die_on_error, $code, $msg) = @_;
     return $code unless $die_on_error;
-    _exit 1, $code, $msg;
+    my $start_bash = not $ENV{OXI_TEST_NONINTERACTIVE};
+    _exit $start_bash, $code, $msg;
 }
 
 sub _stop {
@@ -63,13 +64,14 @@ sub execute {
     my $pid = open3(0, $output, 0, @$args);
     waitpid($pid, 0);
 
-    my $die_on_error = ($mode ne "code") && (!$tolerate_errors);
+    my $die_on_error = not ($mode eq "code" or $tolerate_errors);
+    my $output_str = ref $output eq "GLOB" ? do { local $/; <$output> } : "";
     return _failure($die_on_error, -1) if $? == -1; # execute failed: error message was already shown by system()
-    return _failure($die_on_error, $? & 127, sprintf( "'%s' died with signal %d", $args->[0], ($? & 127) )) if ($? & 127);
-    return _failure($die_on_error, $? >> 8,  sprintf( "'%s' exited with code %d", $args->[0], $? >> 8 ))    if ($? >> 8);
+    return _failure($die_on_error, $? & 127, sprintf( "'%s' died with signal %d: %s", $args->[0], ($? & 127), $output_str )) if ($? & 127);
+    return _failure($die_on_error, $? >> 8,  sprintf( "'%s' exited with code %d: %s", $args->[0], $? >> 8,    $output_str )) if ($? >> 8);
 
     return if $mode eq "show";
-    return do { local $/; return <$output> } if $mode eq "capture";
+    return $output_str if $mode eq "capture";
     return 0;
 }
 
@@ -99,6 +101,7 @@ elsif ($mode eq "selected") {
 print  "\n.--==##[ Run tests in Docker container ]##==\n";
 printf "| Repo:   %s\n", $ENV{OXI_TEST_GITREPO} ? $ENV{OXI_TEST_GITREPO} : "local";
 printf "| Branch: %s\n", $ENV{OXI_TEST_GITBRANCH} // "(default)";
+printf "| Commit: %s\n", $ENV{OXI_TEST_GITCOMMIT} // "HEAD";
 my $msg = $ENV{OXI_TEST_ALL} ? " all tests" : ($ENV{OXI_TEST_COVERAGE} ? " code coverage" : " selected tests:");
 my $big_msg = `figlet '$msg'`; $big_msg =~ s/^/| /msg;
 print $big_msg;
@@ -129,12 +132,20 @@ else {
 _stop 103, "Code coverage tests only work with local repo" if ($mode eq "coverage" and not $is_local_repo);
 
 print "\n====[ Git checkout ]====\n";
+print "Testing repo\n";
 my $code = execute code => [ "git", "ls-remote", "-h", $repo ];
 _stop 104, "Remote repo either does not exist or is not readable" if $code;
 
 # clone repo
+print "Cloning repo\n";
 my @branch_spec = $ENV{OXI_TEST_GITBRANCH} ? "--branch=".$ENV{OXI_TEST_GITBRANCH} : ();
-execute capture => [ "git", "clone", "--depth=1", @branch_spec, $repo, $clone_dir ];
+my @restrict_depth = $ENV{OXI_TEST_GITCOMMIT} ? () : ("--depth=1");
+execute capture => [ "git", "clone", @restrict_depth, @branch_spec, $repo, $clone_dir ];
+if ($ENV{OXI_TEST_GITCOMMIT}) {
+    print "Checking out commit $ENV{OXI_TEST_GITCOMMIT}\n";
+    chdir $clone_dir;
+    execute capture => [ "git", "checkout", $ENV{OXI_TEST_GITCOMMIT} ];
+}
 
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI
