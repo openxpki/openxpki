@@ -161,6 +161,29 @@ has _gid => (
     default => '0',
 );
 
+### TODO: maybe we should measure the count of exception in a certain time interval?
+has _exception_count => (
+    is => 'rw',
+    isa => 'Int',
+    init_arg => undef,
+    default => 0,
+);
+
+has _next_session_cleanup => (
+    is => 'rw',
+    isa => 'Int',
+    init_arg => undef,
+);
+
+has _session_purge_handler => (
+    is => 'rw',
+    isa => 'OpenXPKI::Server::Session',
+    init_arg => undef,
+    predicate => 'do_session_purge',
+);
+
+
+
 around BUILDARGS => sub {
 
     my $orig = shift;
@@ -247,13 +270,12 @@ sub run {
         sleep($self->interval_wait_initial());
 
         ### TODO: maybe we should measure the count of exception in a certain time interval?
-        my $exception_count = 0;
+        $self->_exception_count(0);
 
 
-        my $next_session_cleanup = time();
-        my $session_purge_handler;
-        if ($self->interval_session_purge()) {
-            $session_purge_handler = OpenXPKI::Server::Session->new(load_config => 1);
+        if ($self->interval_session_purge) {
+            $self->_next_session_cleanup( time );
+            $self->_session_purge_handler( OpenXPKI::Server::Session->new(load_config => 1) );
             CTX('log')->system()->info("Initialize session purge from watchdog with interval " . $self->interval_session_purge());
         }
 
@@ -268,10 +290,10 @@ sub run {
                 my $wf_id = $self->__scan_for_paused_workflows();
 
                 # purge expired sessions if enough time elapsed
-                if ($session_purge_handler && $next_session_cleanup < time()) {
+                if ($self->do_session_purge && $self->_next_session_cleanup < time) {
                     CTX('log')->system()->debug("Init session purge from watchdog");
-                    $session_purge_handler->purge_expired;
-                    $next_session_cleanup = time() + $self->interval_session_purge();
+                    $self->_session_purge_handler->purge_expired;
+                    $self->_next_session_cleanup( time + $self->interval_session_purge );
                 }
 
                 # duration of pause depends on whether a workflow was found or not
@@ -279,26 +301,26 @@ sub run {
                 ##! 80: sprintf('watchdog sleeps %d secs (%s)', $sec, $wf_id ? 'busy' : 'idle')
                 sleep($sec);
                 # Reset the exception counter after every successfull loop
-                $exception_count = 0;
+                $self->_exception_count(0);
             };
             my $error_msg;
             if ( my $exc = OpenXPKI::Exception->caught() ) {
-                ##! 16: 'Got OpenXPKI::Exception in watchdog - count is ' . $exception_count
+                ##! 16: 'Got OpenXPKI::Exception in watchdog - count is ' . $self->_exception_count
                 ##! 32: 'Exception message is ' . $exc->message_code
                 $error_msg = "Watchdog, fatal exception: " . $exc->message_code;
             } elsif ($EVAL_ERROR) {
                 $error_msg = "Watchdog, fatal error: " . $EVAL_ERROR;
             }
             if ($error_msg) {
-                $exception_count++;
+                $self->_exception_count($self->_exception_count + 1);
                 print STDERR $error_msg, "\n";
 
                 my $sleep = $self->interval_sleep_exception();
-                CTX('log')->system()->error("Watchdog error, have a nap ($sleep sec, $exception_count cnt, $error_msg)");
+                CTX('log')->system()->error("Watchdog error, have a nap ($sleep sec, ".$self->_exception_count." cnt, $error_msg)");
 
 
                 my $threshold = $self->max_exception_threshhold();
-                if (($threshold > 0) && ($exception_count > $threshold )) {
+                if (($threshold > 0) && ($self->_exception_count > $threshold )) {
                     my $msg = 'Watchdog exception limit ($threshold) reached, exiting!';
                     print STDERR $msg, "\n";
                     OpenXPKI::Exception->throw(
