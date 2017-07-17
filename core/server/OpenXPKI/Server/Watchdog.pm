@@ -1,7 +1,5 @@
-## OpenXPKI::Server::Watchdog.pm
-##
-## Written by Dieter Siebeck and Oliver Welter for the OpenXPKI project
-## Copyright (C) 2012-2013 by The OpenXPKI Project
+package OpenXPKI::Server::Watchdog;
+use Moose;
 
 
 =head1 NAME
@@ -68,9 +66,16 @@ default: 1
 
 =cut
 
-package OpenXPKI::Server::Watchdog;
-use strict;
+# Core modules
 use English;
+use Data::Dumper;
+use POSIX;
+
+# CPAN modules
+use Log::Log4perl::MDC;
+use Try::Tiny;
+
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Control;
@@ -79,15 +84,11 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use OpenXPKI::Daemonize;
-use POSIX;
-use Log::Log4perl::MDC;
 
-use Moose;
-
-use Data::Dumper;
 
 our $TERMINATE = 0;
 our $RELOAD = 0;
+
 
 has workflow_table => (
     is => 'ro',
@@ -327,10 +328,12 @@ sub run {
     # parent process: return
     if ($pid > 0) { return $pid }
 
-    ##! 16: 'child here'
-
     # child process
-    eval {
+    ##! 16: 'child here'
+    try {
+        #
+        # init
+        #
         # create memory-only session for workflow
         my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
         OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
@@ -368,7 +371,7 @@ sub run {
                 $self->__reload;
             }
             ##! 80: 'watchdog: do loop'
-            eval {
+            try {
                 my $wf_id = $self->__scan_for_paused_workflows();
 
                 # purge expired sessions if enough time elapsed
@@ -384,51 +387,41 @@ sub run {
                 sleep($sec);
                 # Reset the exception counter after every successfull loop
                 $self->_exception_count(0);
-            };
-            my $error_msg;
-            if ( my $exc = OpenXPKI::Exception->caught() ) {
-                ##! 16: 'Got OpenXPKI::Exception in watchdog - count is ' . $self->_exception_count
-                ##! 32: 'Exception message is ' . $exc->message_code
-                $error_msg = "Watchdog, fatal exception: " . $exc->message_code;
-            } elsif ($EVAL_ERROR) {
-                $error_msg = "Watchdog, fatal error: " . $EVAL_ERROR;
             }
-            if ($error_msg) {
+            catch {
                 $self->_exception_count($self->_exception_count + 1);
+
+                my $error_msg = "Watchdog fatal error: $_";
+                my $sleep = $self->interval_sleep_exception();
+
                 print STDERR $error_msg, "\n";
 
-                my $sleep = $self->interval_sleep_exception();
-                CTX('log')->system()->error("Watchdog error, have a nap ($sleep sec, ".$self->_exception_count." cnt, $error_msg)");
-
+                CTX('log')->system->error("$error_msg (having a nap for $sleep sec; ".$self->_exception_count." exceptions in a row)");
 
                 my $threshold = $self->max_exception_threshhold();
-                if (($threshold > 0) && ($self->_exception_count > $threshold )) {
+                if ($threshold > 0 and $self->_exception_count > $threshold) {
                     my $msg = 'Watchdog exception limit ($threshold) reached, exiting!';
                     print STDERR $msg, "\n";
                     OpenXPKI::Exception->throw(
                         message => $msg,
-                        log => {
-                            priority => 'fatal',
-                            facility => 'system',
-                    });
+                        log => { priority => 'fatal', facility => 'system' },
+                    );
                 }
 
                 # sleep to give the system a chance to recover
                 sleep($sleep);
-            }
-        }
-        ##! 4: 'End of run'
-        $self->{dbi}->disconnect;
-    };
-    if ($@) {
-        # make sure the cleanup code does not die as this would escape run()
-        eval {
-            CTX('log')->system->error($@);
-            $self->{dbi}->disconnect;
+            };
         }
     }
-    # child process MUST never leave run()
-    exit;
+    catch {
+        # make sure the cleanup code does not die as this would escape run()
+        eval { CTX('log')->system->error($_) };
+    };
+
+    eval { $self->{dbi}->disconnect };
+
+    ##! 1: 'End of run()'
+    exit;   # child process MUST never leave run()
 }
 
 # Does the actual reloading during the main loop
@@ -605,7 +598,7 @@ sub __wake_up_workflow {
     if ($pid > 0) { return $pid }
 
     # child process
-    eval {
+    try {
         OpenXPKI::Server::__set_process_name("workflow: id %d (watchdog)", $args->{workflow_id});
 
         # errors here are fork errors and we dont want the watchdog to die!
@@ -645,18 +638,15 @@ sub __wake_up_workflow {
         if ($error_msg) {
             CTX('log')->system()->error($error_msg);
         }
-
-        $self->{dbi}->disconnect;
-    };
-    if ($@) {
-        # make sure the cleanup code does not die as this would escape run()
-        eval {
-            CTX('log')->system->error($@);
-            $self->{dbi}->disconnect;
-        }
     }
-    # child process MUST never leave this method
-    exit;
+    catch {
+        # make sure the cleanup code does not die as this would escape run()
+        eval { CTX('log')->system->error($_) };
+    };
+
+    eval { $self->{dbi}->disconnect };
+
+    exit;   # child process MUST never leave this method
 }
 
 no Moose;
