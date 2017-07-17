@@ -5900,10 +5900,6 @@ msgstr "Benutzername"
 #~ msgstr "PKI Realm"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_NO_WATCHDOG"
-#~ msgstr "PKI Realm"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM"
 #~ msgstr "PKI Realm"
 

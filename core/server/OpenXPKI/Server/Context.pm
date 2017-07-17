@@ -24,7 +24,6 @@ my $context = {
     exported => {
         # always created by this package
         config           => undef,
-        watchdog         => undef,
         workflow_factory => undef,
         crypto_layer     => undef,
         pki_realm        => undef,

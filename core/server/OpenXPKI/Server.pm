@@ -19,6 +19,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
+use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
 use Data::Dumper;
 
@@ -59,6 +60,7 @@ sub __init_server {
         # from now on we can assume that we have CTX('log') available
         # perform the rest of the initialization
         OpenXPKI::Server::Init::init({ SILENT => $self->{SILENT} });
+        OpenXPKI::Server::Watchdog->start_or_reload;
     };
     $self->__log_and_die($EVAL_ERROR, 'server initialization') if $EVAL_ERROR;
 }
@@ -280,15 +282,13 @@ sub sig_term {
     # will stop spawning of new childs but should allow existing ones to finish
     # FIXME - this will cause the watchdog to terminate if you kill a child,
     # so we remove this
-    #CTX('watchdog')->terminate();
+    #OpenXPKI::Server::Watchdog->terminate;
 
     ##! 1: 'end'
 }
 
 sub sig_hup {
-
     ##! 1: 'start'
-
     my $pids = OpenXPKI::Control::get_pids();
 
     CTX('log')->system()->info(sprintf "SIGHUP received - cleanup childs (%01d found)", scalar @{$pids->{worker}});
@@ -300,9 +300,13 @@ sub sig_hup {
     # FIXME - should also reinit some of the services
 
     ##! 8: 'watchdog'
-    CTX('watchdog')->reload();
-
-
+    my $watchdog_disabled = CTX('config')->get('system.watchdog.disabled') || 0;
+    if ($watchdog_disabled) {
+        OpenXPKI::Server::Watchdog->terminate;
+    }
+    else {
+        OpenXPKI::Server::Watchdog->start_or_reload;
+    }
 }
 
 sub process_request {
@@ -763,13 +767,11 @@ sub __log_and_die {
     CTX('log')->system()->fatal($log_message);
 
 
-    # Check if watchdog was already started and kill
-    if (OpenXPKI::Server::Context::hascontext('watchdog')) {
-        CTX('watchdog')->terminate();
-    }
+    # kill watchdog instances (if running)
+    OpenXPKI::Server::Watchdog->terminate;
 
-     # die gracefully
-     $ERRNO = 1;
+    # die gracefully
+    $ERRNO = 1;
     ##! 1: 'end, dying'
     die $log_message;
 

@@ -73,6 +73,8 @@ use strict;
 use English;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Control;
+use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
@@ -85,6 +87,7 @@ use Moose;
 use Data::Dumper;
 
 our $terminate = 0;
+our $reload = 0;
 
 has workflow_table => (
     is => 'ro',
@@ -190,6 +193,8 @@ Forks away a worker child, returns the pid of the worker
 sub run {
     my $self = shift;
 
+    CTX('log')->system->info('Starting watchdog');
+
     # Check if we already have a watchdog running
     my $result = OpenXPKI::Control::get_pids();
     my $instance_count = scalar @{$result->{watchdog}};
@@ -217,22 +222,14 @@ sub run {
     # parent process: return
     if ($pid > 0) { return $pid }
 
+    ##! 16: 'child here'
+
     # child process
     eval {
         # create memory-only session for workflow
         my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
         OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
         Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
-
-        # The caller sets the watchdog only in the global context
-        # we reuse the context to set a pointer to ourselves for signal handling
-        # in the forked process - we need the force if the watchdog is forked
-        # during runtime to overwrite the main context
-        OpenXPKI::Server::Context::setcontext({
-            watchdog => $self, force => 1
-        });
-
-        ##! 16: 'child here'
 
         $self->{dbi}                      = CTX('dbi');
         $self->{hanging_workflows}        = {};
@@ -262,6 +259,10 @@ sub run {
 
         ##! 16: 'watchdog: start looping'
         while ( ! $OpenXPKI::Server::Watchdog::terminate ) {
+            if ($OpenXPKI::Server::Watchdog::reload) {
+                $OpenXPKI::Server::Watchdog::reload = 0;
+                $self->__reload;
+            }
             ##! 80: 'watchdog: do loop'
             eval {
                 my $wf_id = $self->__scan_for_paused_workflows();
@@ -334,7 +335,12 @@ Trigger via IPC by the master process when a reload happens.
 =cut
 sub _sig_hup {
     ##! 1: 'Got HUP'
-    my $watchdog = CTX('watchdog');
+    $OpenXPKI::Server::Watchdog::reload = 1;
+}
+
+# Does the actual reloading during the main loop
+sub __reload {
+    my $self = shift;
 
     ##! 4: 'run update head on watchdog child ' . $$
     my $config = CTX('config');
@@ -356,7 +362,7 @@ sub _sig_hup {
     )) {
         if ($new_cfg->{$key}) {
             ##! 16: 'Update key ' . $key
-            $watchdog->$key( $new_cfg->{$key} )
+            $self->$key( $new_cfg->{$key} )
         }
     }
 
@@ -367,8 +373,6 @@ sub _sig_hup {
     });
 
     CTX('log')->system()->info('Watchdog worker reloaded');
-
-    return;
 }
 
 =head2 _sig_term
@@ -380,40 +384,32 @@ Trigger via IPC by the master process to terminate the worker.
 sub _sig_term {
     ##! 1: 'Got TERM'
     $OpenXPKI::Server::Watchdog::terminate  = 1;
-
     CTX('log')->system()->info("Watchdog worker $$ got term signal - cleaning up.");
-
-
     return;
 }
 
-=head2 reload
+=head2 start_or_reload
 
-This method is called from the main server to inform the watchdog
-to reload the config. You should not call this from inside a watchdog worker.
+Static method to instantiate and start the watchdog or make it reload it's
+config.
 
 =cut
-
-sub reload {
-    my $self = shift;
-    ##! 1: 'reloading'
-
+sub start_or_reload {
+    ##! 1: 'start_or_reload'
     my $pids = OpenXPKI::Control::get_pids();
 
-    # Check for enable/disable change
-    my $disabled = CTX('config')->get('system.watchdog.disabled') || 0;
-
-    # Terminate if we have a watchdog where we should not have one
-    if ($disabled and scalar @{$pids->{watchdog}}) {
-        CTX('log')->system()->info('Watchdog should not run - terminating.');
-
-        kill 'TERM', @{$pids->{watchdog}};
-    }
     # Start watchdog if not running
-    elsif (not scalar @{$pids->{watchdog}}) {
-        CTX('log')->system()->info('Watchdog missing - starting it.');
+    if (not scalar @{$pids->{watchdog}}) {
+        my $config = CTX('config');
 
-        CTX('watchdog')->run();
+        return 0 if $config->get('system.watchdog.disabled');
+
+        my $watchdog = OpenXPKI::Server::Watchdog->new( {
+            user  => OpenXPKI::Server::__get_numerical_user_id(  $config->get('system.server.user') ),
+            group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') ),
+        } );
+
+        $watchdog->run;
     }
     # Signal reload
     else {
@@ -425,26 +421,21 @@ sub reload {
 
 =head2 terminate
 
-This method uses the process table to look for watchdog instances and workers
-and sends them a SIGHUP signal. This will NOT kill the watchdog but tell it
-to not start any new workers. Running workers won't be touched.
-You should not call this from inside a watchdog worker.
+Static method that looks for watchdog instances and sends them a SIGHUP signal.
+
+This will NOT kill the watchdog but tell it to gracefully stop.
 
 =cut
-
 sub terminate {
-    my $self = shift;
     ##! 1: 'terminate'
-
     my $pids = OpenXPKI::Control::get_pids();
 
     if (scalar $pids->{watchdog}) {
         kill 'TERM', @{$pids->{watchdog}};
         CTX('log')->system()->info('Told watchdog to terminate');
-
-    } else {
-        CTX('log')->system()->error('No watchdog pids to terminate');
-
+    }
+    else {
+        CTX('log')->system()->error('No watchdog instances to terminate');
     }
 
     return 1;
