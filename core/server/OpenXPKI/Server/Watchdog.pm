@@ -77,7 +77,6 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use OpenXPKI::Daemonize;
-use Proc::ProcessTable;
 use POSIX;
 use Log::Log4perl::MDC;
 
