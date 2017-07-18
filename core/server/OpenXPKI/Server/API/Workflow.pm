@@ -4,16 +4,22 @@
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 
 package OpenXPKI::Server::API::Workflow;
-
 use strict;
 use warnings;
 use utf8;
-use English;
 
-use Class::Std;
-use Workflow::Factory;
+# Core modules
+use English;
 use Data::Dumper;
 
+# CPAN modules
+use Class::Std;
+use Workflow::Factory;
+use Log::Log4perl::MDC;
+use Log::Log4perl::Level;
+use Try::Tiny;
+
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
@@ -21,8 +27,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
-use Log::Log4perl::MDC;
-use Log::Log4perl::Level;
+
+
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -1197,10 +1203,8 @@ sub __execute_workflow_activity {
         $log->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
             $workflow->state(), $workflow->id(), $workflow->type()));
 
-        my $fork_helper = OpenXPKI::Daemonize->new;
-
         # FORK
-        my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0
+        my $pid = OpenXPKI::Daemonize->new->fork_child; # parent returns PID, child returns 0
 
         # parent process
         if ($pid > 0) {
@@ -1210,12 +1214,12 @@ sub __execute_workflow_activity {
         }
 
         # child process
-        eval {
+        try {
             ##! 16: ' Workflow instance succesfully forked - I am the workflow'
-            # We need to unset the child reaper (waitpid) as the universal waitpid
-            # causes problems with Proc::SafeExec
+            # append fork info to process name
+            OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
 
-            # create memory-only session for workflow if its not already
+            # create memory-only session for workflow if it's not already one
             if (CTX('session')->type ne 'Memory') {
                 my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
                 $session->data->user( CTX('session')->data->user );
@@ -1226,18 +1230,23 @@ sub __execute_workflow_activity {
                 Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
             }
 
-            # append fork info to process name
-            OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
             # run activity
             $activity->();
 
             # DB commits are done inside the workflow engine
-        };
-        if ($@) {
-            # DB rollback is not needed as this process will terminate now anyway
-            eval { CTX('log')->system->error($@) } # make sure cleanup code does not die as this would escape this method
         }
+        catch {
+            # DB rollback is not needed as this process will terminate now anyway
+            local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
+            if (my $exc = OpenXPKI::Exception->caught) {
+                $exc->show_trace(1);
+            }
+            # make sure the cleanup code does not die as this would escape this method
+            eval { CTX('log')->system->error($_) };
+        };
+
         eval { CTX('dbi')->disconnect };
+
         ##! 16: 'Backgrounded workflow finished - exit child'
         exit;
     }

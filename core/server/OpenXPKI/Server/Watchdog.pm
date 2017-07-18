@@ -608,55 +608,27 @@ block and returns the error message in case of error.
 =cut
 
 sub __wake_up_workflow {
-    my $self = shift;
-    my $args = shift;
+    my ($self, $args) = @_;
 
-    my $fork_helper = OpenXPKI::Daemonize->new;
+    CTX('session')->data->pki_realm($args->{pki_realm});
+    CTX('session')->data->thaw($args->{workflow_session}); # "user" and "role" will be set
 
-    # FORK
-    my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0
+    # Set MDC for logging
+    Log::Log4perl::MDC->put('user', CTX('session')->data->user);
+    Log::Log4perl::MDC->put('role', CTX('session')->data->role);
+    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 
-    # parent process: return
-    if ($pid > 0) { return $pid }
+    $self->{dbi}->start_txn;
 
-    # child process
-    try {
-        OpenXPKI::Server::__set_process_name("workflow: id %d (watchdog)", $args->{workflow_id});
+    ##! 1: 'call wakeup'
+    my $wf_info = CTX('api')->wakeup_workflow({
+        WORKFLOW => $args->{workflow_type},
+        ID => $args->{workflow_id},
+        ASYNC => 'fork',
+    });
+    ##! 32: 'wakeup returned ' . Dumper $wf_info
 
-        $self->{dbi}->start_txn;
-
-        CTX('session')->data->pki_realm($args->{pki_realm});
-        CTX('session')->data->thaw($args->{workflow_session}); # "user" and "role" will be set
-
-        # Set MDC for logging
-        Log::Log4perl::MDC->put('user', CTX('session')->data->user);
-        Log::Log4perl::MDC->put('role', CTX('session')->data->role);
-        Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
-
-        ##! 1: 'call wakeup'
-        my $wf_info = CTX('api')->wakeup_workflow({
-            WORKFLOW => $args->{workflow_type},
-            ID => $args->{workflow_id},
-            # ASYNC => 'fork' # fork inside API causes issues with SIGCHLD
-        });
-
-        ##! 32: 'wakeup returned ' . Dumper $wf_info
-
-        # commit is done inside workflow engine
-        # no need for rollback as this will terminate now anyway
-    }
-    catch {
-        local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
-        if (my $exc = OpenXPKI::Exception->caught) {
-            $exc->show_trace(1);
-        }
-        # make sure the cleanup code does not die as this would escape run()
-        eval { CTX('log')->system()->error("Failed to wakeup workflow $args->{workflow_id} with error: $_") };
-    };
-
-    eval { $self->{dbi}->disconnect };
-
-    exit;   # child process MUST never leave this method
+    # commit/rollback is done inside workflow engine
 }
 
 no Moose;
