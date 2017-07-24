@@ -23,8 +23,6 @@ my $log = $config->logger();
 
 $log->info("SmartCard handler initialized, " . $$ );
 
-OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
-
 my $locale_directory = $conf->{global}->{locale_directory} || '/usr/share/locale';
 my $default_language = $conf->{global}->{default_language} || 'en_US';
 
