@@ -341,7 +341,8 @@ sub __handle_DETACH_SESSION: PRIVATE {
     my $sessid = CTX('session')->data->id;
     ##! 4: "detach session " . $sessid
     OpenXPKI::Server::Context::killsession();
-    Log::Log4perl::MDC->put('sid', undef);
+    # Cleanup ALL items from the MDC!
+    Log::Log4perl::MDC->remove();
 
     $self->__change_state({ STATE => 'NEW' });
 
