@@ -33,7 +33,7 @@ sub execute {
     # Get the profile name and style
     my $profile = $self->param('cert_profile');
     $profile = $context->param('cert_profile') unless($profile);
-    
+
     my $style = $self->param('cert_subject_style');
     $style = $context->param('cert_subject_style') unless($style);
 
@@ -47,22 +47,27 @@ sub execute {
         );
     }
 
+    if (!$context->param('cert_subject_parts')) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_RENDER_SUBJECT_NO_SUBJECT_VARS_IN_CONTEXT',
+        );
+    }
     # Render the DN - get the input data from the context
     my $subject_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
-    
+
     ##! 16: 'Deserialized cert_subject_parts ' . Dumper $subject_vars
-    
-    # TODO - this does not work! Will fail with non-scalar items and 
+
+    # TODO - this does not work! Will fail with non-scalar items and
     # crashes the search_cert method used in csr workflow!
-    map { 
-        $subject_vars->{$_} =~ s{,}{\\,}xmsg if ($subject_vars->{$_} && !ref $subject_vars->{$_}); 
+    map {
+        $subject_vars->{$_} =~ s{,}{\\,}xmsg if ($subject_vars->{$_} && !ref $subject_vars->{$_});
     } keys %{$subject_vars};
-    
+
 
     ##! 16: 'Cleaned subject_vars' . Dumper $subject_vars
 
     CTX('log')->application()->debug("Subject render input vars " . Dumper $subject_vars);
- 
+
 
     my $cert_subject = CTX('api')->render_subject_from_template({
         PROFILE => $profile,
@@ -81,13 +86,13 @@ sub execute {
     }
 
     CTX('log')->application()->info("Rendering subject: $cert_subject");
- 
+
 
 
     my $cert_san_parts  = $context->param('cert_san_parts');
     my $extra_san = {};
     if ($cert_san_parts) {
-        $extra_san = $ser->deserialize( $cert_san_parts );    
+        $extra_san = $ser->deserialize( $cert_san_parts );
     }
 
     ##! 32: 'extra san' . Dumper $extra_san
@@ -124,7 +129,7 @@ sub execute {
         }
 
         CTX('log')->application()->debug("San template empty but extra_san present");
- 
+
     }
 
     ##! 64: "Entries in san_list \n" .  Dumper $san_list;
@@ -142,7 +147,13 @@ sub execute {
     # If the SAN come from the internal rendering we need to set the source
     # parameter for as this is required by persist_csr
 
-    my $source_ref = $ser->deserialize($context->param('sources'));
+    my $source_ref;
+    if ($context->param('sources')) {
+        $source_ref = $ser->deserialize($context->param('sources'));
+    } else {
+        $source_ref =  {};
+    }
+
     if (!$source_ref->{cert_subject_alt_name_parts} && !$source_ref->{cert_subject_alt_name}) {
         $source_ref->{cert_subject_alt_name} = 'PROFILE';
     }
@@ -254,7 +265,7 @@ Determines the used profile, has priority over context key.
 
 Determines the used profile substyle, has priority over context key.
 
-=back 
+=back
 
 =head2 context values
 
