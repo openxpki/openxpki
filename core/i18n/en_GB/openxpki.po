@@ -1921,6 +1921,9 @@ msgstr "Your PKCS10 encoded request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Duplicated Key Certificates"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_SUBJECT_DUPLICATE_LABEL"
+msgstr "Failed Policy Check Subject Duplicate"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
 msgstr ""
 "Please explain in brief why your request should be processed even if it "

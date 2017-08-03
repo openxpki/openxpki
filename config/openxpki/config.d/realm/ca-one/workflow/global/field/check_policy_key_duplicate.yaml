@@ -1,0 +1,12 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE
+name: check_policy_key_duplicate
+format: rawlist
+template: >
+  [% USE Certificate %]
+  [% IF value %]
+    CN / Identifier |
+    [% FOREACH identifier = value %]
+      <a target="modal" href="#certificate!detail!identifier![% identifier %]">
+        [% Certificate.dn(identifier,'CN') %] / [% identifier %]</a>|
+    [% END %]
+  [% END %]

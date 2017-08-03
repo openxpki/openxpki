@@ -36,22 +36,22 @@ state:
         autorun: 1
         action:
           - cleanup_key_password > NICE_SEND_NOTIFICATION
-    
+
     CLEANUP_BEFORE_CANCEL:
         autorun: 1
         action: remove_public_key_identifier > CANCELED
-        
+
     CHECK_FOR_DUPLICATE_KEY:
         autorun: 1
         action: initialize_duplicate_key_check set_public_key_identifier search_key_duplicate_workflow search_key_duplicate_certificate > CHECK_DUPLICATE_KEY_POLICY
-          
+
     CHECK_DUPLICATE_KEY_POLICY:
         autorun: 1
         action:
           - global_noop > KEY_DUPLICATE_ERROR_CERTIFICATE ? has_duplicate_key_certificate
           - global_noop2 > KEY_DUPLICATE_ERROR_WORKFLOW ? has_duplicate_key_workflow !has_duplicate_key_certificate
           - global_noop3 > ENTER_SUBJECT ? !has_duplicate_key_workflow !has_duplicate_key_certificate
-    
+
     ENTER_CERT_INFO:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC
@@ -123,7 +123,7 @@ state:
         action:
           - upload_pkcs10 > CHECK_FOR_DUPLICATE_KEY
           - global_cancel > CLEANUP_BEFORE_CANCEL
-        output: 
+        output:
           - key_duplicate_certificate
         button:
           upload_pkcs10:
@@ -206,7 +206,7 @@ state:
           - notbefore
           - notafter
           - cert_profile
-          - cert_info           
+          - cert_info
         button:
           release_on_hold:
             format: expected
@@ -239,7 +239,7 @@ state:
           - cert_info
 #          - approval_count
         button:
-          edit_subject: 
+          edit_subject:
             format: optional
           edit_san:
             format: optional
@@ -295,7 +295,7 @@ state:
           global_noop:
             label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
             format: expected
-          edit_subject: 
+          edit_subject:
             format: optional
           edit_san:
             format: optional
@@ -331,25 +331,25 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_DESC
         action:
-          - provide_server_key_params > ENTER_KEY_PASSWORD ? can_use_server_key 
-          - upload_pkcs10 > CHECK_FOR_DUPLICATE_KEY ? can_use_client_key 
+          - provide_server_key_params > ENTER_KEY_PASSWORD ? can_use_server_key
+          - upload_pkcs10 > CHECK_FOR_DUPLICATE_KEY ? can_use_client_key
           - select_profile > SETUP_REQUEST_TYPE
         output:
           - cert_profile
           - cert_subject_style
         button:
           _head: I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED
-          provide_server_key_params: 
+          provide_server_key_params:
             description: I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS
             format: expected
-          upload_pkcs10: 
+          upload_pkcs10:
             description: I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD
             format: expected
-          select_profile: 
+          select_profile:
             label: I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE_LABEL
             description: I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE
             format: optional
-        
+
 
     SUBJECT_COMPLETE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL
@@ -371,7 +371,7 @@ state:
           - cert_profile
           - cert_info
         button:
-          submit:        
+          submit:
             format: expected
           enter_policy_violation_comment:
             label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL
@@ -379,7 +379,7 @@ state:
           global_noop:
             label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
             format: expected
-          edit_subject: 
+          edit_subject:
             format: optional
           edit_san:
             format: optional
@@ -475,7 +475,7 @@ action:
           - cert_san_parts
         param:
             source: USER
-        validator: 
+        validator:
           - global_cert_san_parts
 
     edit_subject:
@@ -487,7 +487,7 @@ action:
           - cert_subject_parts
         param:
             source: USER
-        validator: 
+        validator:
           - global_cert_subject_parts
           - global_common_name_length
 
@@ -682,17 +682,17 @@ action:
             _map__request_subject_key_identifier: "[% USE PKCS10 %][% PKCS10.subject_key_identifier(context.pkcs10) %]"
             check_policy_key_duplicate_workflow: ''
             check_policy_key_duplicate_certificate: ''
-            
+
     set_public_key_identifier:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param:
             _map_subject_key_identifier: $_request_subject_key_identifier
-            
+
     remove_public_key_identifier:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param:
             subject_key_identifier: ''
-            
+
     search_key_duplicate_workflow:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SearchWorkflow
         param:
@@ -700,7 +700,7 @@ action:
             mode: list
             _map_attr_subject_key_identifier: $_request_subject_key_identifier
             target_key: check_policy_key_duplicate_workflow
-                        
+
     search_key_duplicate_certificate:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
         param:
@@ -727,7 +727,7 @@ condition:
 #            condition2: "!global_is_creator"
 
     # If you want a 4-eyes approval, just add a second "RA Operator"
-    # e.g. "role: RA Operator, RA Operator" - you should add also 
+    # e.g. "role: RA Operator, RA Operator" - you should add also
     # add current approval count to the output in the relevant states
     is_approved:
         class: OpenXPKI::Server::Workflow::Condition::Approved
@@ -758,12 +758,12 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{check_policy_key_duplicate_certificate}
-        
+
     has_duplicate_key_workflow:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{check_policy_key_duplicate_workflow}
-        
+
     pending_notification_send:
         class: Workflow::Condition::Evaluate
         param:
@@ -790,7 +790,7 @@ condition:
             _map_config_path: profile.[% context.cert_profile %].style.[% context.cert_subject_style %].ui.info
 
 
-field:   
+field:
     cert_profile:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL
         name: cert_profile
@@ -843,34 +843,6 @@ field:
             [% END %]
           [% END %]
 
-    check_policy_subject_duplicate:
-        label: Failed Policy Check Subject Duplicate
-        name: check_policy_subject_duplicate
-        format: rawlist
-        template: >
-          [% USE Certificate %]
-          [% IF value %]
-            Expiry / Identifier |
-            [% FOREACH identifier = value %]
-              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
-                [% Certificate.notafter(identifier) %] / [% identifier %]</a>| 
-            [% END %]
-          [% END %]
-
-    check_policy_key_duplicate:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE
-        name: check_policy_key_duplicate
-        format: rawlist
-        template: >
-          [% USE Certificate %]
-          [% IF value %]
-            CN / Identifier |
-            [% FOREACH identifier = value %]
-              <a target="modal" href="#certificate!detail!identifier![% identifier %]">
-                [% Certificate.dn(identifier,'CN') %] / [% identifier %]</a>| 
-            [% END %]
-          [% END %]
-
     csr_type:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_LABEL
         name: csr_type
@@ -904,7 +876,7 @@ field:
         type: text
         # This is expanded to a hash with profile dependent values
         required: 1
-        
+
     key_duplicate_certificate:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE
         name: check_policy_key_duplicate_certificate
@@ -915,10 +887,10 @@ field:
             I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME / I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER / I18N_OPENXPKI_UI_PKI_REALM_LABEL |
             [% FOREACH identifier = value %]
               <a target="modal" href="#certificate!detail!identifier![% identifier %]">
-                [% Certificate.dn(identifier,'CN') %] / [% identifier %] / [% Certificate.realm(identifier) %]</a>| 
+                [% Certificate.dn(identifier,'CN') %] / [% identifier %] / [% Certificate.realm(identifier) %]</a>|
             [% END %]
           [% END %]
-          
+
     key_duplicate_workflow_id:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID
         name: check_policy_key_duplicate_workflow
@@ -928,7 +900,7 @@ field:
           [% IF value %]
             I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL / I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL / I18N_OPENXPKI_UI_PKI_REALM_LABEL |
             [% FOREACH wf_id = value %]
-                [% wf_id %] / [% Workflow.creator(wf_id) %] / [% Workflow.realm(wf_id) %] | 
+                [% wf_id %] / [% Workflow.creator(wf_id) %] / [% Workflow.realm(wf_id) %] |
             [% END %]
           [% END %]
 
@@ -967,7 +939,7 @@ field:
 # For i18n parser I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT
 
 
-    policy_comment: 
+    policy_comment:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC
         placeholder: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER
