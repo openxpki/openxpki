@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Authentication::Anonymous.pm 
+## OpenXPKI::Server::Authentication::Anonymous.pm
 ##
 ## Written 2006 by Michael Bell
 ## Updated to use new Service::Default semantics 2007 by Alexander Klink
@@ -24,21 +24,21 @@ sub new {
     bless $self, $class;
 
     my $path = shift;
-    ##! 1: "start" 
-    
+    ##! 1: "start"
+
     $self->{ROLE} = CTX('config')->get("$path.role") || 'Anonymous';
     $self->{USER} = CTX('config')->get("$path.user") || 'anonymous';
-    
+
     ##! 2: "role: ".$self->{ROLE}
 
     return $self;
 }
 
 sub login_step {
-    ##! 1: 'start' 
+    ##! 1: 'start'
     my $self    = shift;
     my $arg_ref = shift;
- 
+
     my $name    = $arg_ref->{HANDLER};
     my $msg     = $arg_ref->{MESSAGE};
 
@@ -56,11 +56,11 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Authentication::Anonymous 
+OpenXPKI::Server::Authentication::Anonymous
 
 =head1 Description
 
-This is the class which supports OpenXPKI with an anonymous authentication 
+This is the class which supports OpenXPKI with an anonymous authentication
 method. The parameters are passed as a hash reference. You can give a role
 and a user name in the config, default is role = Anonymous, User = anonymous
 

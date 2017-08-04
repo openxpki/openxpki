@@ -239,22 +239,22 @@ sub execute {
             where => \%where,
         );
     }
-    
+
     my $delim = $p->{delimiter} || '|';
-    
+
     if (!defined $p->{head}) {
-        $p->{head} = "Full Certificate Report, Realm [% pki_realm %], Validity Date: [% valid_at %], Export Date: [% export_date %][% IF report_config %], Report Config [% report_config %][% END %]"; 
+        $p->{head} = "Full Certificate Report, Realm [% pki_realm %], Validity Date: [% valid_at %], Export Date: [% export_date %][% IF report_config %], Report Config [% report_config %][% END %]";
     }
 
-    my $head = $tt->render($p->{head}, { 
-        pki_realm => $pki_realm, 
-        valid_at => $valid_at->iso8601(), 
+    my $head = $tt->render($p->{head}, {
+        pki_realm => $pki_realm,
+        valid_at => $valid_at->iso8601(),
         export_date => DateTime->now()->iso8601,
         report_config => $report_config
-    }); 
+    });
 
     if ($head) { print $fh $head."\n"; }
-    
+
     print $fh join("|", "request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head)."\n";
 
     my $subject_seen = {};
@@ -311,7 +311,7 @@ sub execute {
                 }
             }
         }
-        
+
         print $fh join($delim, @line) . "\n";
     }
 
@@ -390,10 +390,10 @@ is a tab (\t), semicolon (;) or hash (#);
 =item head
 
 A string or template toolkit pattern to put into the first line of the report
-file. If not set, a default header is added. Available template vars are 
+file. If not set, a default header is added. Available template vars are
 (both dates are in ISO8601 format):
 
-=over 
+=over
 
 =item export_date
 

@@ -24,22 +24,22 @@ sub __dispatch_revoke {
 
     my $class   = shift;
     my $arg     = shift;
-    
+
     my $config = $main::config->config();
-    
+
     my $client_ip   = $ENV{REMOTE_ADDR};    # dotted quad
     my $server_name = $ENV{SERVER_NAME};    # ca.company.com
     my $request_uri = $ENV{REQUEST_URI};    # "/soap/"
-   
+
     my $canonical_uri = $server_name . $request_uri;
-   
+
     my $auth_dn = '';
     my $auth_pem = '';
     if ( defined $ENV{HTTPS} && lc( $ENV{HTTPS} ) eq 'on' ) {
 
         $log->debug("calling context is https");
         $auth_dn = $ENV{SSL_CLIENT_S_DN};
-        $auth_pem = $ENV{SSL_CLIENT_CERT};        
+        $auth_pem = $ENV{SSL_CLIENT_CERT};
         if ( defined $auth_dn ) {
             $log->info("SOAP Revoke authenticated client DN: $auth_dn");
         }
@@ -50,53 +50,53 @@ sub __dispatch_revoke {
     else {
         $log->debug("calling context is http");
     }
-    
+
     my $package = __PACKAGE__;
-    
+
     # Workflow and endpoint name is held in the package config
     my $workflow_type = $config->{$package}->{workflow};
     my $servername = $config->{$package}->{servername};
-    
+
     if ( !defined $workflow_type ) {
         $log->error("SOAP CertificateRevoke: Unable to read config / workflow type not set, url: $canonical_uri");
-        return SOAP::Data->new( name => 'result', value => { 
-            error => 'Unable to read config / workflow type not set', 
+        return SOAP::Data->new( name => 'result', value => {
+            error => 'Unable to read config / workflow type not set',
         });
     }
-    
+
     my $crr_info = {
-        requester_sn => $auth_dn || '',                
+        requester_sn => $auth_dn || '',
         client_ip    => $client_ip,
     };
-    
+
     my $workflow;
     my $client;
     eval {
-                
-        $client = OpenXPKI::Client::Simple->new({        
+
+        $client = OpenXPKI::Client::Simple->new({
             logger => $log,
             config => $config->{global}, # realm and locale
             auth => $config->{auth}, # auth config
         });
-        
+
         if ( !$client ) {
             $log->error("Could not instantiate client object");
-            return SOAP::Data->new( name => 'result', value => { 
+            return SOAP::Data->new( name => 'result', value => {
                 error => 'Could not instantiate client object'
             });
         }
-        
+
         # if revoke by serial is requested, use API to resolve the identifier
         if (!$arg->{cert_identifier}) {
             my $res = $client->run_command( 'search_cert', {
                 CERT_SERIAL => $arg->{serial},
                 ISSUER_DN   => $arg->{issuer_dn},
-                ENTITY_ONLY => 1        
-            });            
+                ENTITY_ONLY => 1
+            });
             if (ref $res ne 'ARRAY' || scalar @{$res} != 1) {
                 $log->error("SOAP: RevokeCertificateByIssuerSerial - no certificate found: " .
                     "serial: " . $arg->{serial} . ", issuer: " . $arg->{issuer_dn});
-                    
+
                 OpenXPKI::Exception->throw(
                     message => 'Unable to find a certificate for given issuer/serial',
                     params => { CERT_SERIAL => $arg->{serial}, ISSUER_DN   => $arg->{issuer_dn} }
@@ -106,15 +106,15 @@ sub __dispatch_revoke {
             # Add original data to the crr info hash
             $crr_info->{serial} = $arg->{serial};
             $crr_info->{issuer_dn} = $arg->{issuer_dn};
-            
-            $arg->{cert_identifier} = $res->[0]->{IDENTIFIER};            
+
+            $arg->{cert_identifier} = $res->[0]->{IDENTIFIER};
             $log->debug('Found certificate ' . $arg->{cert_identifier});
         }
-        
+
         $log->info("SOAP Revoke (uri: $canonical_uri, client ip=$client_ip, cert=".$arg->{cert_identifier}.", reason=" . $arg->{reason});
-    
+
         my $serializer = OpenXPKI::Serialization::Simple->new();
-        
+
         my %param = (
             cert_identifier => $arg->{cert_identifier},
             reason_code     => $arg->{reason},
@@ -122,21 +122,21 @@ sub __dispatch_revoke {
             server          => $servername,
             interface       => 'soap',
             signer_cert     => $auth_pem,
-            flag_batch_mode => 1,        
+            flag_batch_mode => 1,
             comment         => 'via soap',
             invalidity_time => 0,
         );
 
         $log->debug( "WF parameters: " . Dumper \%param );
-        
+
         $workflow = $client->handle_workflow({
             TYPE => $workflow_type,
             PARAMS => \%param
         });
-        
+
         $log->debug( 'Workflow info '  . Dumper $workflow );
     };
-  
+
     my $res;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $log->error("Unable to create workflow: ". $exc->message );
@@ -153,15 +153,15 @@ sub __dispatch_revoke {
         $log->error("Workflow terminated in unexpected state" );
         $res = { error => 'workflow terminated in unexpected state', pid => $$, id => $workflow->{id}, 'state' => $workflow->{'STATE'} };
     } else {
-        $log->info(sprintf("Revocation request was processed properly (Workflow: %01d, State: %s", 
+        $log->info(sprintf("Revocation request was processed properly (Workflow: %01d, State: %s",
             $workflow->{ID}, $workflow->{STATE}) );
         $res = { error => '', id => $workflow->{ID}, 'state' => $workflow->{'STATE'} };
     }
-    
+
     $client->disconnect();
-    
+
     return SOAP::Data->new( name => 'result', value => $res );
-    
+
 }
 
 # Keep the old method intact
@@ -172,11 +172,11 @@ sub RevokeCertificate{
     $log->warn('SOAP: RevokeCertificate - deprecated method, use RevokeCertificateByIdentifier.');
 
     return $self->RevokeCertificateByIdentifier( @_ );
-            
+
 }
 
 sub RevokeCertificateByIdentifier {
-    
+
     my $self = shift;
     my $cert_identifier = shift;
     my $reason          = shift || 'unspecified';
@@ -186,16 +186,16 @@ sub RevokeCertificateByIdentifier {
         "certificate: $cert_identifier, ",
         "reason: $reason"
     );
-    
+
     if (!$cert_identifier) {
-        return SOAP::Data->new( name => 'result', value => { error => 'parameter missing'} );    
+        return SOAP::Data->new( name => 'result', value => { error => 'parameter missing'} );
     }
-    
+
     return $self->__dispatch_revoke({
         cert_identifier => $cert_identifier,
         reason => $reason
     });
-    
+
 }
 
 sub RevokeCertificateByIssuerSerial {
@@ -209,11 +209,11 @@ sub RevokeCertificateByIssuerSerial {
         "SOAP: RevokeCertificateByIssuerSerial - ",
         "Issuer: $issuer_dn, ",
         "Serial: $serial, ",
-        "reason: $reason"        
+        "reason: $reason"
     );
 
     if (!$issuer_dn || !$serial) {
-        return SOAP::Data->new( name => 'result', value => { error => 'parameter missing' } );    
+        return SOAP::Data->new( name => 'result', value => { error => 'parameter missing' } );
     }
 
     return $self->__dispatch_revoke({
@@ -221,7 +221,7 @@ sub RevokeCertificateByIssuerSerial {
         serial => $serial,
         reason => $reason
     });
-        
+
 }
 
 

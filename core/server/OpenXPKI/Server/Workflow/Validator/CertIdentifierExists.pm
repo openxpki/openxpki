@@ -42,7 +42,7 @@ sub _validate {
     }
 
     CTX('log')->application()->debug("Found certificate, hash is " . Dumper $cert);
- 
+
 
     return 1;
 }

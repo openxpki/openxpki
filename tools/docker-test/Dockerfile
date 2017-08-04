@@ -40,6 +40,11 @@ RUN cpanm --quiet --notest --installdeps /
 RUN cpanm --quiet --notest PPI Devel::Cover DateTime File::Slurp
 
 #
+# Copy scripts from symlinked directories
+#
+ADD scripts.tar /tools-copy/
+
+#
 # Setup - locales
 #
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8

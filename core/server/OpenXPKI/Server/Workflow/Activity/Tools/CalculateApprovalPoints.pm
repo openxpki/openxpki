@@ -35,12 +35,12 @@ sub execute {
             $approvals = scalar ( @{$context->param('approvals')} );
         } else {
             CTX('log')->application()->debug('No approvals or value in invalid format!');
- 
+
         }
     }
 
     CTX('log')->application()->info(sprintf ('Approval points for workflow %01d: %01d', $workflow->id, $approvals));
- 
+
 
     return 1;
 

@@ -60,9 +60,9 @@ sub get_command
 
         my $command  = "x509";
 
-        ## option '-engine' is needed here for correct cert convertion 
-        ## in a case when engine introduces new crypto algorithms (like GOST ones), 
-        ## which are not available in a classical OpenSSL library 
+        ## option '-engine' is needed here for correct cert convertion
+        ## in a case when engine introduces new crypto algorithms (like GOST ones),
+        ## which are not available in a classical OpenSSL library
         my $engine_usage = $self->{ENGINE}->get_engine_usage();
         $command .= " -engine ".$self->{ENGINE}->get_engine()
             if ($self->{ENGINE}->get_engine() and
@@ -97,7 +97,7 @@ sub get_command
         if ($self->{OUT} eq 'DER')
         {
             $command .= ' -outform DER ';
-        } 
+        }
         elsif ($self->{OUT} eq 'PEM') {
             $command .= ' -outform PEM ';
         }

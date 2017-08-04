@@ -27,9 +27,9 @@ sub render_report_list {
         push @source, { source => 'report:'.$_->[0] };
         push @{$_}, $i++;
     } @data;
-        
+
     my $fetchid = $self->__persist_response( \@source );
-    
+
     $self->add_section({
         type => 'grid',
         className => 'report',

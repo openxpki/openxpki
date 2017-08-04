@@ -19,7 +19,7 @@ my %config_of :ATTR( :init_arg<CONFIG> ); # the config object
 sub set_environment {
     my $self = shift;
     my $ident = ident $self;
-    
+
     ##! 2: "set the configuration"
     $config_of{$ident}->dump();
     $ENV{OPENSSL_CONF} = $config_of{$ident}->get_config_filename();

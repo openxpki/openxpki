@@ -45,11 +45,11 @@ sub execute {
 
             ##! 32: 'Publishing not enabled for profile ' . $cert_profile
             CTX('log')->application()->debug('Publishing not enabled for profile ' . $cert_profile);
- 
+
             return 1;
-        }        
+        }
     }
-    
+
     # Create publishing workflow
     my $wf_info = CTX('api')->create_workflow_instance({
         WORKFLOW      => $workflow_type,
@@ -57,7 +57,7 @@ sub execute {
     });
 
     CTX('log')->application()->info('Publishing workflow created with id ' . $wf_info->{WORKFLOW}->{ID});
- 
+
 
     ##! 16: 'Publishing Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
 

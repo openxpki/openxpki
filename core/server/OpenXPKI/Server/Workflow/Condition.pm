@@ -97,7 +97,7 @@ sub param {
         if ($template =~ /^\$(\S+)/) {
             my $ctxkey = $1;
             ##! 16: 'load from context ' . $ctxkey
-            my $ctx = $self->workflow()->context()->param( $ctxkey );            
+            my $ctx = $self->workflow()->context()->param( $ctxkey );
             if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
                 ##! 32: ' needs deserialize '
                 my $ser  = OpenXPKI::Serialization::Simple->new();
@@ -106,11 +106,11 @@ sub param {
                 return $ctx;
             }
         } else {
-            
-            ##! 16: 'parse using tt ' . $template            
+
+            ##! 16: 'parse using tt ' . $template
             my $oxtt = OpenXPKI::Template->new();
             my $out = $oxtt->render( $template, {  context => $self->workflow()->context()->param() } );
-            
+
             ##! 32: 'tt result ' . $out
             return $out;
         }

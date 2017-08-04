@@ -140,7 +140,7 @@ execute capture => [ "git", "clone", "--depth=1", @branch_spec, $repo, $clone_di
 # Grab and install Perl module dependencies from Makefile.PL using PPI
 #
 print "\n====[ Scanning Makefile.PL for new Perl dependencies ]====\n";
-my $cpanfile = execute capture => "$clone_dir/tools/scripts/makefile2cpanfile.pl";
+my $cpanfile = execute capture => "/tools-copy/scripts/makefile2cpanfile.pl $clone_dir/core/server/Makefile.PL";
 open my $fh, ">", "$clone_dir/cpanfile";
 print $fh $cpanfile;
 close $fh;
@@ -153,12 +153,12 @@ execute show => "cpanm --quiet --notest --installdeps $clone_dir";
 print "\n====[ MySQL ]====\n";
 my $dummy = gensym;
 my $pid = open3(0, $dummy, 0, qw(sh -c mysqld) );
-execute show => "$clone_dir/tools/testenv/mysql-wait-for-db.sh";
-execute show => "$clone_dir/tools/testenv/mysql-create-user.sh";
+execute show => "/tools-copy/testenv/mysql-wait-for-db.sh";
+execute show => "/tools-copy/testenv/mysql-create-user.sh";
 # if there are only qatests, we create the database later on
 if ($mode eq "coverage" or scalar @tests_unit) {
-    execute show => "$clone_dir/tools/testenv/mysql-create-db.sh";
-    execute show => "$clone_dir/tools/testenv/mysql-create-schema.sh";
+    execute show => "/tools-copy/testenv/mysql-create-db.sh";
+    execute show => "/tools-copy/testenv/mysql-create-schema.sh $clone_dir/config/sql/schema-mysql.sql";
 }
 
 #
@@ -192,7 +192,7 @@ if ($mode eq "coverage") {
 #
 if (scalar @tests_unit) {
     print "\n====[ Testing: unit tests ]====\n";
-    execute show => "prove -b -r -q $_", 1 for @tests_unit;
+    execute show => "prove -b -r -q $_" for @tests_unit;
 }
 
 exit unless scalar @tests_qa;
@@ -213,18 +213,18 @@ make_path "/var/openxpki/session", "/var/log/openxpki";
 # customize config
 use File::Slurp qw( edit_file );
 edit_file { s/ ^ ( (user|group): \s+ ) \w+ /$1root/gmsx } "/etc/openxpki/config.d/system/server.yaml";
-execute show => "$clone_dir/tools/testenv/mysql-oxi-config.sh";
+execute show => "/tools-copy/testenv/mysql-oxi-config.sh";
 
 #
 # Database (re-)creation
 #
-execute show => "$clone_dir/tools/testenv/mysql-create-db.sh";
-execute show => "$clone_dir/tools/testenv/mysql-create-schema.sh";
+execute show => "/tools-copy/testenv/mysql-create-db.sh";
+execute show => "/tools-copy/testenv/mysql-create-schema.sh $clone_dir/config/sql/schema-mysql.sql";
 
 #
 # Sample config (CA certificates etc.)
 #
-execute show => "$clone_dir/tools/testenv/insert-certificates.sh";
+execute show => "/tools-copy/testenv/insert-certificates.sh";
 
 #
 # Start OpenXPKI
@@ -237,4 +237,4 @@ execute show => "/usr/local/bin/openxpkictl start";
 print "\n====[ Testing: QA tests ]====\n";
 chdir "$clone_dir/qatest";
 my @t = map { $_ =~ s/ ^ qatest\/ //x; $_ } @tests_qa;
-execute show => "prove -l -r -q $_", 1 for @t;
+execute show => "prove -l -r -q $_" for @t;

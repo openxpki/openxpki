@@ -33,19 +33,19 @@ sub _validate {
         'certificateHold',
         'removeFromCRL',
     );
-    
+
     CTX('log')->application()->warn('Call to deprecated class OpenXPKI::Server::Workflow::Validator::ReasonCode');
- 
-    
+
+
     my $codes = $self->param('valid_reason_codes');
     if ($codes) {
-        @valid_reason_codes = split /,\s*/, $codes; 
+        @valid_reason_codes = split /,\s*/, $codes;
     }
-    
+
     if (! grep { $_ eq $reason_code} @valid_reason_codes) {
-        
+
         CTX('log')->application()->error('Got invalid reason code: ' . $reason_code);
- 
+
         validation_error('I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_REASON_CODE_INVALID');
     }
     return 1;
@@ -61,7 +61,7 @@ OpenXPKI::Server::Workflow::Validator::ReasonCode
 
 =head1 DEPRECATION WARNING
 
-Class is deprecated - use the predefined global validator which is based 
+Class is deprecated - use the predefined global validator which is based
 on OpenXPKI::Server::Workflow::Validator::Regex
 
     class: OpenXPKI::Server::Workflow::Validator::Regex
@@ -77,7 +77,7 @@ on OpenXPKI::Server::Workflow::Validator::Regex
     class: OpenXPKI::Server::Workflow::Validator::ReasonCode
     param:
        valid_reason_codes: unspecified, superseded
-       
+
   arg:
     - $reason_code
 
@@ -85,7 +85,7 @@ on OpenXPKI::Server::Workflow::Validator::Regex
 =head1 DESCRIPTION
 
 This validator checks whether a given CRR reason code is valid. The accepted
-reason codes are preset to those accepted by openssl but you can also pass 
+reason codes are preset to those accepted by openssl but you can also pass
 your own list of accepted codes as param (comma separated list of values!).
 
 =head2 Default Codes
@@ -93,4 +93,4 @@ your own list of accepted codes as param (comma separated list of values!).
 unspecified, keyCompromise, CACompromise, affiliationChanged, superseded,
 cessationOfOperation, certificateHold, removeFromCRL
 
- 
+

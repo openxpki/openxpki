@@ -44,7 +44,7 @@ sub _evaluate {
     if (not $cert) {
         ##! 16: 'cert not found '
         CTX('log')->application()->debug("Cert status check failed, certificate not found " . $identifier);
- 
+
         condition_error 'I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND';
 
     }
@@ -52,7 +52,7 @@ sub _evaluate {
     ##! 16: 'status: ' . $cert->{'STATUS'}
     if ($cert->{status} ne $expected_status) {
         CTX('log')->application()->debug("Cert status check failed: ".$cert->{status}. " != ".$expected_status);
- 
+
         condition_error 'I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH';
     }
 

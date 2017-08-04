@@ -11,7 +11,7 @@ use Workflow::Exception qw( condition_error configuration_error );
 sub evaluate {
     return 1;
 }
-    
+
 1;
 
 __END__

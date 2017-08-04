@@ -8,40 +8,40 @@ use OpenXPKI::Debug;
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
- 
- 
+
+
 sub _preset_args {
     return [ qw(cert_profile pkcs10) ];
 }
- 
- 
+
+
 sub _validate {
-    
+
     ##! 1: 'start'
     my ( $self, $wf, $cert_profile, $pkcs10 ) = @_;
-    
+
     if (!$pkcs10) {
-        ##! 8: 'skip - no data' 
-        return 1; 
+        ##! 8: 'skip - no data'
+        return 1;
     }
-        
+
     my $default_token = CTX('api')->get_default_token();
     my $csr_obj = OpenXPKI::Crypto::CSR->new(
         DATA  => $pkcs10,
-        TOKEN => $default_token 
+        TOKEN => $default_token
     );
-    
+
     my $csr_body = $csr_obj->get_parsed_ref()->{BODY};
     ##! 32: 'csr_parsed: ' . Dumper $csr_body
     if (!$csr_body) {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10');
     }
-      
+
     ##! 32: 'CSR body ' . Dumper $csr_body
-    
+
     my $key_alg;
     my $key_params = {};
-    
+
     if ($csr_body->{PUBKEY_ALGORITHM} eq 'rsaEncryption') {
         $key_alg = 'rsa';
         $key_params = { key_length =>  $csr_body->{KEYSIZE} };
@@ -55,45 +55,45 @@ sub _validate {
     } else {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
     }
-    
+
     ##! 16: "Alg: $key_alg"
     ##! 16: 'Params ' . Dumper $key_params
-    
+
     # get the list of allowed algorithms from the config
     my $algs = CTX('api')->get_key_algs({ PROFILE => $cert_profile, NOHIDE => 1 });
-    
+
     ##! 32: 'Alg expected ' . Dumper $algs
-    
+
     if (!grep(/$key_alg/, @{$algs})) {
         ##! 8: "KeyParam validation failed on algo $key_alg"
         CTX('log')->application()->error("KeyParam validation failed on algo $key_alg");
- 
+
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED');
     }
-    
+
     my $params = CTX('api')->get_key_params({ PROFILE => $cert_profile, ALG => $key_alg, NOHIDE => 1 });
-    
+
     ##! 32: 'Params expected ' . Dumper $params
-    
+
     foreach my $param (keys %{$params}) {
         my $val = $key_params->{$param} || '';
-        
+
         if ($val eq '_any') { next; }
-        
+
         my @expect = @{$params->{$param}};
-        ##! 32: "Validate param $param, $val, " . Dumper \@expect 
+        ##! 32: "Validate param $param, $val, " . Dumper \@expect
         if (!grep(/$val/, @expect)) {
             ##! 32: 'Failed on ' . $val
             CTX('log')->application()->error("KeyParam validation failed on $param with value $val");
- 
+
             validation_error("I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED ($param)");
         }
     }
 
     ##! 1: 'Validation succeeded'
     CTX('log')->application()->debug("KeyParam validation succeeded");
- 
-        
+
+
     return 1;
 }
 
@@ -107,7 +107,7 @@ OpenXPKI::Server::Workflow::Validator::KeyParams
 
 =head1 Description
 
-Extracts the key parameters form the passed PKCS10 and checks them 
+Extracts the key parameters form the passed PKCS10 and checks them
 againstthe one of the profile.
 
 =head1 Configuration
@@ -117,7 +117,7 @@ againstthe one of the profile.
       arg:
        - $cert_profile
        - $pkcs10
-      
+
 =head2 Arguments
 
 =over

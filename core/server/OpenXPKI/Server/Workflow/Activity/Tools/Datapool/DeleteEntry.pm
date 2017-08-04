@@ -56,7 +56,7 @@ sub execute {
 
 
     CTX('log')->application()->info('Remove datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE});
- 
+
 
     CTX('api')->set_data_pool_entry($params);
     return 1;

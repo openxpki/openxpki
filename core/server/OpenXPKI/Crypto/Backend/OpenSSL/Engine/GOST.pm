@@ -1,6 +1,6 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine::GOST 
+## OpenXPKI::Crypto::Backend::OpenSSL::Engine::GOST
 ## Written 2006 by Julia Dubenskaya for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project 
+## (C) Copyright 2006 by The OpenXPKI Project
 
 use strict;
 use warnings;

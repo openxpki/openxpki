@@ -19,8 +19,8 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    
-    ##! 1: 'Start' 
+
+    ##! 1: 'Start'
     my $cert_subject = $self->param('cert_subject');
     my $realm = $self->param('realm');
     my $profile = $self->param('profile');
@@ -32,22 +32,22 @@ sub execute
     my $cutoff_notbefore = $self->param('cutoff_notbefore');
     my $cutoff_notafter = $self->param('cutoff_notafter');
     my $entity_only = $self->param('entity_only');
-    
+
     my @param = $self->param();
 
     my $query = {
         ENTITY_ONLY => 1,
-        CERT_ATTRIBUTES => [] 
+        CERT_ATTRIBUTES => []
     };
-    
+
     if (!$include_revoked) {
         $query->{STATUS} = 'ISSUED';
     };
-    
+
     if ($entity_only) {
         $query->{ENTITY_ONLY} = 1;
     }
-    
+
     my $valid_at;
     if (my $v_at = $self->param('valid_at')) {
         ##! 16: 'valid_At ' . $v_at
@@ -58,9 +58,9 @@ sub execute
     } else {
        $valid_at = DateTime->now();
     }
- 
+
     my $epoch = $valid_at->epoch();
- 
+
     # if cutoff is set, we filter on notbefore between valid_at and cutoff
     if ($cutoff_notbefore) {
         my $cutoff = OpenXPKI::DateTime::get_validity({
@@ -104,49 +104,49 @@ sub execute
     } elsif($expiry_cutoff) {
         $query->{NOTAFTER} = { VALUE => $expiry_cutoff, OPERATOR => "GREATER_THAN" };
     }
-    
-    
+
+
     if ($cert_subject) {
         ##! 16: 'Adding subject ' . $cert_subject
         $query->{SUBJECT} = $cert_subject;
     }
-    
+
     if ($realm) {
         ##! 16: 'Adding realm ' . $realm
         $query->{PKI_REALM} = $realm;
     }
-    
+
     if ($profile) {
         ##! 16: 'Adding profile ' . $profile
         $query->{PROFILE} = $profile;
     }
-   
+
     if ($issuer) {
         ##! 16: 'Adding issuer ' . $issuer
         $query->{ISSUER_IDENTIFIER} = $issuer;
     }
-    
+
     if ($order && ($order =~ /\A ([a-z0-9]+)(\s+(asc|desc))? \z/xms)) {
         my $col = uc($1);
         my $reverse = lc($3) || '';
         $query->{ORDER} = "CERTIFICATE." . $col;
         $query->{REVERSE} = ($reverse eq 'desc') ? 1 : 0;
     }
-    
+
     if ($limit && ($limit =~ /\A\d+\z/)) {
         $query->{LIMIT} = $limit;
     }
-   
-    
+
+
     foreach my $key (@param) {
         ##! 16: 'Checking key ' . $key
         if ($key =~ /^(meta_|system_|subject_alt_name)/) {
             my $value = $self->param($key);
-            ##! 16: 'Add key with value ' . $value 
+            ##! 16: 'Add key with value ' . $value
             push @{$query->{CERT_ATTRIBUTES}},  { KEY => $key, VALUE => $value };
         }
     }
-    
+
     if ($self->param('subject_key_identifier')) {
         # uppercase the value to match the database format
         $query->{'SUBJECT_KEY_IDENTIFIER'} = uc($self->param('subject_key_identifier'));
@@ -155,29 +155,29 @@ sub execute
     if (scalar (keys %{$query}) == 3 && scalar(@{$query->{CERT_ATTRIBUTES}}) == 0) {
         configuration_error('I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY');
     }
- 
+
     ##! 32: 'Full query ' . Dumper $query;
     my $result = CTX('api')->search_cert($query);
-    
+
     ##! 64: 'Search returned ' . Dumper $result
     my @identifier = map {  $_->{IDENTIFIER} } @{$result};
 
     my $target_key = $self->param('target_key') || 'cert_identifier_list';
-    
+
     if (@identifier) {
-        
+
         my $ser = OpenXPKI::Serialization::Simple->new();
         $context->param( $target_key , $ser->serialize(\@identifier) );
-                
+
         CTX('log')->application()->debug("SearchCertificates result " . Dumper \@identifier);
- 
-                  
+
+
     } else {
-        
+
         $context->param( { $target_key => undef } );
-        
+
     }
-    
+
     return 1;
 }
 
@@ -190,7 +190,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
 =head1 DESCRIPTION
 
 Search for certificates based on several criteria, useful as prestage for
-duplicate/renewal check or for bulk actions. The result is a list of 
+duplicate/renewal check or for bulk actions. The result is a list of
 identifiers written to context defined by target_key.
 
 See the parameter section for available filters.
@@ -205,16 +205,16 @@ See the parameter section for available filters.
         realm: ca-one
         issuer: YHkkLxEKtqbopNbcFwdBcHqKWPE
         target_key: other_key
-        
+
 =head2 Configuration parameters
 
-=over 
+=over
 
 =item realm
 
 The realm to search in, default is the current realm, I<_any> searches globally
 
-=item profile 
+=item profile
 
 The profile of the certificate, default is all profiles.
 
@@ -228,8 +228,8 @@ Searches the full DN for an exact match! The '*' as wildcard is supported.
 
 =item subject_alt_name
 
-Searches in the SAN section, you must prefix the value with the SAN type, 
-e.g. DNS:www.openxpki.org or IP:1.2.3.4. There might be some difficulties 
+Searches in the SAN section, you must prefix the value with the SAN type,
+e.g. DNS:www.openxpki.org or IP:1.2.3.4. There might be some difficulties
 with non-ascii strings/encodings.
 
 =item issuer
@@ -246,12 +246,12 @@ Lets you search for any certificate attribute having a listed prefix.
 
 =item target_key
 
-Name of the context value to write the result to, the default is 
+Name of the context value to write the result to, the default is
 I<cert_identifier_list>.
 
 =item order
 
-Sort the result, accepts a single column name, optionally 
+Sort the result, accepts a single column name, optionally
 prefixed by "asc" (default) or "desc" (reversed sorting)
 
 =item limit
@@ -266,7 +266,7 @@ include expired certificates.
 
 =item include_revoked
 
-If set to a true value, certificates which are not in ISSUED state 
+If set to a true value, certificates which are not in ISSUED state
 (revoked, crl pending, on hold) are also included in the report. Default
 is to show only issued certificates.
 
@@ -278,7 +278,7 @@ calculation. Default is now.
 =item cutoff_notbefore
 
 Parseable OpenXPKI::Datetime value (autodetected), show only certificates
-where notebefore is between valid_at and this value. Relative intervals 
+where notebefore is between valid_at and this value. Relative intervals
 are calculated against the given valid_at date!
 
 =item cutoff_notafter

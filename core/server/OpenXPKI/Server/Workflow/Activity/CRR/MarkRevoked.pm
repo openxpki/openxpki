@@ -44,7 +44,7 @@ sub execute
     );
 
     CTX('log')->application()->debug("mark certificate $identifier as revoked in database");
- 
+
 }
 
 1;

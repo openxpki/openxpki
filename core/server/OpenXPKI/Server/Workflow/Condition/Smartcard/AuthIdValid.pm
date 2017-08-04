@@ -42,9 +42,9 @@ sub evaluate {
 			'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTHS_NOT_UNIQUE');
 		return -1;
 	}
-	
+
 	 CTX('log')->application()->debug("AuthId checked.");
-  
+
 	return 1;
 }
 

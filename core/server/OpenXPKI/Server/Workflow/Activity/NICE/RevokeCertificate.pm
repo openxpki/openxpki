@@ -41,7 +41,7 @@ sub execute {
     }
 
     CTX('log')->application()->info("start cert revocation for crr_serial $crr_serial, workflow " . $workflow->id);
- 
+
 
     $nice_backend->revokeCertificate( { IDENTIFIER => $crr->{identifier} } );
 

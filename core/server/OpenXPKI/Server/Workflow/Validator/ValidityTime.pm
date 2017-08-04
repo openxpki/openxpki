@@ -7,7 +7,7 @@ use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use English;
 
-# @TODO: unused / untested 
+# @TODO: unused / untested
 
 sub validate {
     my ( $self, $wf, $time ) = @_;
@@ -21,7 +21,7 @@ sub validate {
                          {TIME => $time} ];
         $context->param ("__error" => $errors);
         CTX('log')->application()->error("Invalid validity time '$time'");
- 
+
         validation_error ($errors->[scalar @{$errors} -1]);
     }
     my ($year, $month, $day, $hour, $minute, $seconds)
@@ -36,7 +36,7 @@ sub validate {
                          {TIME => $time} ];
         $context->param ("__error" => $errors);
         CTX('log')->application()->error("Invalid validity time '$time'");
- 
+
         validation_error ($errors->[scalar @{$errors} -1]);
     }
 
@@ -55,7 +55,7 @@ OpenXPKI::Server::Workflow::Validator::ValidityTime
 
   validate_validitytime"
        class: OpenXPKI::Server::Workflow::Validator::ValidityTime
-  
+
 =head1 DESCRIPTION
 
 The validator verifies that a validity time input looks like an ISO-date

@@ -17,21 +17,21 @@ use OpenXPKI::Server::Workflow::WFObject::WFHash;
 
 sub execute {
     my ( $self, $wf ) = @_;
-    
+
     ##! 1: 'start';
 
     my $operation = $self->param('function');
-    
+
     my $hash_name =  $self->param('hash_name');
-    
+
     my $key =  $self->param('hash_key');
     my $value =  $self->param('hash_value');
     my $target =  $self->param('context_key');
 
     my $item = { workflow => $wf, context_key => $hash_name };
-    
+
     ##! 16: 'item ' . Dumper $item;
-        
+
     my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new( $item );
 
     # auto detect operation
@@ -41,7 +41,7 @@ sub execute {
         $hash->setValueForKey($key, $value);
     }
 
-    return 1;        
+    return 1;
 #
 #    if ( $function eq 'valueForKey' ) {
 #        my $ret = $hash->$function( $context->param( $context_key ) );
@@ -120,7 +120,7 @@ The following functions are supported:
 
 =item setValueForKey
 
-Adds the value of the context parameter named in I<context_val_key> to the 
+Adds the value of the context parameter named in I<context_val_key> to the
 the hash in the key name currently in the context parameter named in
 I<context_key>.
 

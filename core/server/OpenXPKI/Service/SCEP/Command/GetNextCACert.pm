@@ -43,7 +43,7 @@ sub execute {
     if (not $next_ca) {
         ##! 16: 'No cert found'
         CTX('log')->application()->debug("SCEP GetNextCACert nothing found (realm $pki_realm).");
- 
+
 
         # Send a 404 header with a verbose explanation
         return $self->command_response(

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 # Core modules
-use Cwd qw( realpath );
+use Cwd qw( realpath getcwd );
 use FindBin qw( $Bin );
 use Getopt::Long;
 use List::Util qw( sum );
@@ -123,6 +123,13 @@ push @docker_args,
 print "\n====[ Build Docker image ]====\n";
 print "(This might take more than 10 minutes on first execution)\n";
 
+# Make scripts accessible for "docker build" (Dockerfile).
+# Without "--append" Docker would always see a new file and rebuild the image
+my $tar_mode = -f "$Bin/docker-test/scripts.tar" ? '--update' : '--create';
+my $olddir = getcwd; chdir $Bin;
+`tar $tar_mode -f "$Bin/docker-test/scripts.tar" scripts testenv`;
+chdir $olddir;
+
 my @cmd = ( qw( docker build -t oxi-test ), "$Bin/docker-test");
 execute \@cmd;
 
@@ -130,7 +137,7 @@ execute \@cmd;
 # Run container
 #
 @cmd = ( qw( docker run -it --rm ), @docker_args, "oxi-test" );
-printf "Executing: %s\n", join(" ", @cmd);
+printf "\nExecuting: %s\n", join(" ", @cmd);
 execute \@cmd, 1;
 
 __END__

@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL.pm 
+## OpenXPKI::Crypto::Backend::OpenSSL::Engine::OpenSSL.pm
 ## Copyright (C) 2003-2005 Michael Bell
 
 use strict;

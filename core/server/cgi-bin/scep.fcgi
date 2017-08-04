@@ -29,7 +29,7 @@ my $json = new JSON();
 while (my $cgi = CGI::Fast->new()) {
 
     my $conf = $config->config();
- 
+
     my $socket  = $conf->{global}->{socket};
     my $realm   = $conf->{global}->{realm};
     my $iprange = $conf->{global}->{iprange};
@@ -41,7 +41,7 @@ while (my $cgi = CGI::Fast->new()) {
     my $log = $config->logger();
 
     # the allowed IP range from the config file
-    my $allowed_range = new NetAddr::IP $iprange; 
+    my $allowed_range = new NetAddr::IP $iprange;
 
     my $requesting_host = new NetAddr::IP $ENV{'REMOTE_ADDR'}; # the host
 
@@ -53,13 +53,13 @@ while (my $cgi = CGI::Fast->new()) {
            -type => 'text/plain',
            -status => '403 Access denied'
         );
-        
+
         print "Access to this service was denied by configuration.";
-        
+
         $log->error("Unauthorized access from $requesting_host");
         next;
-    } 
-    
+    }
+
     # Fetch SCEP message from CGI (cf. Section 3.1 of the SCEP draft)
     # http://www.ietf.org/internet-drafts/draft-nourse-scep-13.txt
     my $operation = $cgi->param('operation') || '';

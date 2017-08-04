@@ -19,9 +19,9 @@ has 'uuid_gen' => (
     default => sub { use Data::UUID; return Data::UUID->new(); }
 );
 
-sub uuid {   
+sub uuid {
     my $self = shift;
-    return $self->uuid_gen()->create_str();    
+    return $self->uuid_gen()->create_str();
 }
 
 

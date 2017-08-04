@@ -1,6 +1,6 @@
 ## OpenXPKI::Server::Workflow::NICE::Null.pm
 ## NICE Backend for Realms without any issuance of certificates
-## (e. g. CA only realms where CA certificates and CRLs are imported from outside) 
+## (e. g. CA only realms where CA certificates and CRLs are imported from outside)
 ##
 ## Written 2016 by Martin Bartosch <m.bartosch@cynops.de>
 ## for the OpenXPKI project
@@ -29,7 +29,7 @@ OpenXPKI::Server::Workflow::NICE::Null
 
 =head1 Description
 
-This module implements a dummy OpenXPKI NICE Interface for Realms which do not issue 
+This module implements a dummy OpenXPKI NICE Interface for Realms which do not issue
 certificates themselves but which are used to manage external information, e. g. a
 "CA Only" Realm which manages externally issued CA certificates or CRLs.
 
