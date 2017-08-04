@@ -1,9 +1,9 @@
 SOAP Server
 ===========
 
-The builtin SOAP Server provides methods to revoke certificates. The 
+The builtin SOAP Server provides methods to revoke certificates. The
 service is implemented using a cgi-wrapper script, so there is no need
-for the webserver to support SOAP, you just need to setup the wrapper 
+for the webserver to support SOAP, you just need to setup the wrapper
 script. For apache, just add a ScriptAlias::
 
    ScriptAlias /soap  /usr/lib/cgi-bin/soap.fcgi
@@ -23,7 +23,6 @@ The config uses plain ini format, a default is deployed by the package::
 
   [auth]
   stack = _System
-  pki_realm = ca-one
 
   [OpenXPKI::SOAP::Revoke]
   workflow = certificate_revocation_request_v2
@@ -32,6 +31,15 @@ The config uses plain ini format, a default is deployed by the package::
   [OpenXPKI::SOAP::Smartcard]
   workflow = sc_revoke
   servername = smartcard-revoke
+
+
+The global/auth parameters are described in the common wrapper documentation
+(:ref:`subsystem-wrapper`). Config path extension is supported.
+
+The ``modules`` key must list the class names of
+all modules that should be exposed. Most modules expect some extra
+configuration. Put your parameters into a section with the name of the module,
+those will be passed to the module when initialized.
 
 
 Endpoint Configuration
@@ -43,7 +51,7 @@ You can define the rules for the signer authorization here::
   authorized_signer:
       rule1:
           subject: CN=.+:soapclient,.*
-      rule2:    
+      rule2:
           subject: CN=.+:pkiclient,.*
 
 
@@ -58,11 +66,11 @@ RevokeCertificateByIssuerSerial
 ################################
 
 This expects the full DN of the certificate issuer and the serial number
-of the certificate to revoke. The serial can be either in decimal or 
+of the certificate to revoke. The serial can be either in decimal or
 hexadecimal format prefixed with '0x'::
 
     RevokeCertificateByIssuerSerial(
-        'CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG', 
+        'CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG',
         '0xdb7d5b06600bddcbecff',
         'keyCompromise'
     )
@@ -79,23 +87,16 @@ Expects the OpenXPKI identifier of the certificate::
 
 Both calls return a hash with id and state of the started workflow::
 
-  {  
+  {
     'id' => '145919',
     'state' => 'PENDING',
     'error' => ''
   }
 
 If anything goes wrong, you get a verbose error message in error::
-  
+
   {
     'error' => 'parameter missing'
   }
-
-
-
-Multiple Endpoints
-------------------
-
-t.b.d
 
 
