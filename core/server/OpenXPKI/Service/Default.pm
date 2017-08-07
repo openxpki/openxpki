@@ -276,7 +276,7 @@ sub __handle_FRONTEND_SESSION {
     my $ident   = ident $self;
     my $msg     = shift;
 
-    ##! 1: 'Frontend Data ' . Dumper $msg
+    ##! 16: 'Frontend Data ' . Dumper $msg
 
     if (!OpenXPKI::Server::Context::hascontext('session')) {
         OpenXPKI::Exception->throw(
@@ -739,8 +739,7 @@ sub __handle_COMMAND : PRIVATE {
         CTX('dbi')->commit();
     };
 
-    if ($EVAL_ERROR) {
-
+    if (my $error = $EVAL_ERROR) {
         # rollback DBI (should not matter as we throw exception anyway)
         CTX('dbi')->rollback();
 
@@ -753,9 +752,7 @@ sub __handle_COMMAND : PRIVATE {
         ##! 16: "Exception caught during command execution"
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_EXECUTION_ERROR',
-            params => {
-                ERROR => $EVAL_ERROR,
-            },
+            params => { ERROR => $error },
         );
     }
 

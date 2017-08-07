@@ -407,8 +407,10 @@ sub do_process_request {
         return;
     }
 
-    ##! 2: "service detector"
+    ##! 2: "service detector - deserializing data"
     my $data = $serializer->deserialize ($transport->read());
+
+    ##! 64: "service detector - received type: $data"
 
     # By the way, if you're adding support for a new service here,
     # You need to add a matching entry in system/server.yaml
@@ -448,13 +450,14 @@ sub do_process_request {
     ##! 16: 'connection to database successful'
 
     # this is run until the user has logged in successfully
+    ##! 16: 'calling OpenXPKI::Service::*->init()'
     $service->init();
 
+    ##! 16: 'reloading secret groups in crypto layer'
     CTX('crypto_layer')->reload_all_secret_groups_from_cache();
 
-    ##! 16: 'secret groups reloaded from cache'
-
     ## use user interface
+    ##! 16: 'calling OpenXPKI::Service::*->run()'
     $service->run();
 }
 
