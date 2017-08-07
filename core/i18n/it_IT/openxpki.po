@@ -251,6 +251,10 @@ msgstr "Numero di serie del certificato"
 msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "mostra le liste di revoca precedenti"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
+msgstr "Creator"
+
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
 msgstr ""
 "Scarica la catena di certificazione in formato PEM bundle, incluso il "
@@ -313,6 +317,13 @@ msgstr "Errore sconosciuto"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
+msgstr ""
+"Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
+"proprietario ha richiesto lo stesso un’approvazione. Vedi i commenti e i "
+"risultati qui sotto."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
@@ -888,6 +899,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
 msgstr "Client TLS / Denominazione di Default"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
+msgstr "Client TLS"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_NETWORK_LABEL"
 msgstr "Client TLS"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
@@ -2147,6 +2162,10 @@ msgstr "Spiegazione della violazione della Policy"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
 msgstr ""
 "ad es. DNS ancora in fase di impostazione, sostituzione di certificato, ecc."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_SUBJECT_DUPLICATE_LABEL"
+msgstr "Componenti Subject"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID"

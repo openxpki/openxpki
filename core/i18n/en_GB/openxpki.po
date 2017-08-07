@@ -217,6 +217,10 @@ msgstr "CRL Serial"
 msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "show details in brower"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
+msgstr "Creator"
+
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
 msgstr "Download chain as PEM bundle, including root"
 
@@ -270,6 +274,9 @@ msgstr "Request was not approved"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Request was not authenticated"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
+msgstr "Policy failed (key reuse detected)"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
 msgstr "Policy definition not found/loaded."
@@ -789,6 +796,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
 msgstr "TLS Client / Default Naming"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
+msgstr "TLS Client"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_NETWORK_LABEL"
 msgstr "TLS Client"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
@@ -1921,9 +1932,6 @@ msgstr "Your PKCS10 encoded request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Duplicated Key Certificates"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_SUBJECT_DUPLICATE_LABEL"
-msgstr "Failed Policy Check Subject Duplicate"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
 msgstr ""
 "Please explain in brief why your request should be processed even if it "
@@ -1934,6 +1942,9 @@ msgstr "Explanation for Policy Violation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
 msgstr "e.g. DNS still in setup, Certificate Replacement, etc."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_SUBJECT_DUPLICATE_LABEL"
+msgstr "Failed Policy Check Subject Duplicate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID"
 msgstr "Duplicated Key Workflow Ids"
