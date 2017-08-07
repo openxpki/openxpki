@@ -141,9 +141,9 @@ sub __dispatch_revoke {
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $log->error("Unable to create workflow: ". $exc->message );
         $res = { error => $exc->message, pid => $$ };
-    } elsif ($EVAL_ERROR) {
+    } elsif (my $eval_err = $EVAL_ERROR) {
         my $ee = $client->last_error();
-        $log->error("Unable to create workflow: ". $EVAL_ERROR );
+        $log->error("Unable to create workflow: ". $eval_err );
         if ($ee) {
             $res = { error => $ee, pid => $$ };
         } else {

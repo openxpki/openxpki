@@ -1260,10 +1260,9 @@ sub __execute_workflow_activity {
         exit;
     }
 
-    if ($EVAL_ERROR) {
-        my $eval = $EVAL_ERROR;
-        CTX('log')->workflow()->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
-                $wf_activity, $workflow->id(), $workflow->type(), $eval));
+    if (my $eval_err = $EVAL_ERROR) {
+       CTX('log')->workflow()->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
+                $wf_activity, $workflow->id(), $workflow->type(), $eval_err));
 
 
         OpenXPKI::Server::__set_process_name("workflow: id %d (exception)", $workflow->id());
@@ -1278,7 +1277,7 @@ sub __execute_workflow_activity {
         Log::Log4perl::MDC->put('wftype', undef);
 
         ## normal OpenXPKI exception
-        $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
+        $eval_err->rethrow() if (ref $eval_err eq "OpenXPKI::Exception");
 
         ## workflow exception
         my $error = $workflow->context->param('__error');
@@ -1312,7 +1311,7 @@ sub __execute_workflow_activity {
 
         ## unknown exception
         OpenXPKI::Exception->throw(
-            message => scalar $eval,
+            message => scalar $eval_err,
             log     => $log,
         );
     };

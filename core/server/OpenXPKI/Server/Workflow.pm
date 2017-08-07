@@ -509,13 +509,12 @@ sub _wake_up {
         $self->context->param( wf_pause_msg => '' );
         $action->wake_up($self);
     };
-    if ($EVAL_ERROR) {
-        my $error = $EVAL_ERROR;
-        $self->_proc_state_exception( $error );
+    if (my $eval_err = $EVAL_ERROR) {
+        $self->_proc_state_exception( $eval_err );
 
-        # Don't use 'workflow_error' here since $error should already
+        # Don't use 'workflow_error' here since $eval_err should already
         # be a Workflow::Exception object or subclass
-        croak $error;
+        croak $eval_err;
     }
 }
 
@@ -541,13 +540,12 @@ sub _resume {
         $action->resume($self,$old_state);
 
     };
-    if ($EVAL_ERROR) {
-        my $error = $EVAL_ERROR;
-        $self->_proc_state_exception(  $error );
+    if (my $eval_err = $EVAL_ERROR) {
+        $self->_proc_state_exception(  $eval_err );
 
-        # Don't use 'workflow_error' here since $error should already
+        # Don't use 'workflow_error' here since $eval_err should already
         # be a Workflow::Exception object or subclass
-        croak $error;
+        croak $eval_err;
     }
 
 }
@@ -566,13 +564,12 @@ sub _runtime_exception {
             );
 
     };
-    if ($EVAL_ERROR) {
-        my $error = $EVAL_ERROR;
-        $self->_proc_state_exception( $error );
+    if (my $eval_err = $EVAL_ERROR) {
+        $self->_proc_state_exception( $eval_err );
 
-        # Don't use 'workflow_error' here since $error should already
+        # Don't use 'workflow_error' here since $eval_err should already
         # be a Workflow::Exception object or subclass
-        croak $error;
+        croak $eval_err;
     }
 
 }

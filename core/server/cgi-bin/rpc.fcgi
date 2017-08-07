@@ -154,7 +154,8 @@ while (my $cgi = CGI::Fast->new()) {
         # TODO: Return as "500 Internal Server Error"?
         $log->error("Unable to create workflow: ". $exc->message );
         $res = { error => { code => 42, message => $exc->message, data => { pid => $$ } } };
-    } elsif ($EVAL_ERROR) {
+    }
+    elsif (my $eval_err = $EVAL_ERROR) {
 
         # TODO: Return as "500 Internal Server Error"?
         my $error = $client->last_error();
@@ -164,7 +165,7 @@ while (my $cgi = CGI::Fast->new()) {
                 $error = 'uncaught error';
             }
         } else {
-            $log->error("Unable to create workflow: ". $EVAL_ERROR );
+            $log->error("Unable to create workflow: ". $eval_err );
             $error = 'uncaught error';
         }
         $res = { error => { code => 42, message => $error, data => { pid => $$ } } };

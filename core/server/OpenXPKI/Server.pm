@@ -440,9 +440,9 @@ sub do_process_request {
     eval {
         CTX('dbi')->dbh;
     };
-    if ($EVAL_ERROR) {
-        $transport->write ($serializer->serialize ($EVAL_ERROR->message()));
-        $log->fatal("Database connection failed. ".$EVAL_ERROR);
+    if (my $eval_err = $EVAL_ERROR) {
+        $transport->write ($serializer->serialize ($eval_err->message()));
+        $log->fatal("Database connection failed. ".$eval_err);
         return;
     }
     ##! 16: 'connection to database successful'
