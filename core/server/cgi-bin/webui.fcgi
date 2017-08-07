@@ -277,7 +277,7 @@ while (my $cgi = CGI::Fast->new()) {
     push @header, ('-cookie', $cgi->cookie( $cookie ));
     push @header, ('-type','application/json; charset=UTF-8');
 
-    $log->debug('Init UI using backend ' . Dumper $backend_client);
+    $log->trace('Init UI using backend ' . Dumper $backend_client);
 
     my $result;
     eval {

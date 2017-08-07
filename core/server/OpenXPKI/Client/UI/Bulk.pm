@@ -117,8 +117,8 @@ sub action_result {
 
     $query->{ATTRIBUTE} = \@attr;
 
-    $self->logger()->debug("query : " . Dumper $query);
-    
+    $self->logger()->trace("query : " . Dumper $query);
+
     my $result_count = $self->send_command( 'search_workflow_instances_count',  {
         'STATE' => $query->{STATE},
         'TYPE' => $query->{TYPE},

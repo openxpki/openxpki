@@ -14,7 +14,7 @@ sub render_profile_select {
     my $wf_action = shift;
 
 
-    $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
 
     my $wf_info = $args->{WF_INFO};
 
@@ -110,7 +110,7 @@ sub render_subject_form {
     my $fields = $self->send_command( 'get_field_definition',
         { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  substr($field_type, 5) });
 
-    $self->logger()->debug( 'Profile fields' . Dumper $fields );
+    $self->logger()->trace( 'Profile fields' . Dumper $fields );
 
     # Load preexisiting values from context
     my $values = {};
@@ -118,12 +118,12 @@ sub render_subject_form {
         $values = $self->serializer()->deserialize( $context->{$field_name} );
     }
 
-    $self->logger()->debug( 'Preset ' . Dumper $values );
+    $self->logger()->trace( 'Preset ' . Dumper $values );
 
     # Map the old notation for the new UI
     $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values );
 
-    $self->logger()->debug( 'Mapped fields' . Dumper $fields );
+    $self->logger()->trace( 'Mapped fields' . Dumper $fields );
 
     # record the workflow info in the session
     push @{$fields}, $self->__register_wf_token($wf_info, {
@@ -152,7 +152,7 @@ sub render_key_select {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
 
     my $wf_info = $args->{WF_INFO};
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
@@ -237,7 +237,7 @@ sub render_server_password {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->debug( 'render_server_password with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_server_password with args: ' . Dumper $args );
 
     my $wf_info = $args->{WF_INFO};
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};

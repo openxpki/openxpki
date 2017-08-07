@@ -125,7 +125,7 @@ sub action_unlock {
         { SECRET => $secret, VALUE => $phrase });
 
    $self->logger()->info('Secret was send');
-   $self->logger()->debug('Return ' . Dumper $msg);
+   $self->logger()->trace('Return ' . Dumper $msg);
 
     if ($msg) {
         $self->set_status('Secret accepted','success');

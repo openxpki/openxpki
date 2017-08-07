@@ -116,9 +116,9 @@ while (my $cgi = CGI::Fast->new()) {
     } else {
         $log->debug("RPC unauthenticated (plain http)");
     }
-     
-    $log->debug( "WF parameters: " . Dumper $param );
-        
+
+    $log->trace( "WF parameters: " . Dumper $param );
+
     my $workflow;
     my $client;
     eval {
@@ -145,8 +145,8 @@ while (my $cgi = CGI::Fast->new()) {
             TYPE => $workflow_type,
             PARAMS => $param
         });
-        
-        $log->debug( 'Workflow info '  . Dumper $workflow );
+
+        $log->trace( 'Workflow info '  . Dumper $workflow );
     };
 
     my $res;
@@ -183,7 +183,7 @@ while (my $cgi = CGI::Fast->new()) {
             my @keys;
             @keys = split /\s*,\s*/, $conf->{$method}->{output};
             $log->debug("Keys " . join(", ", @keys));
-            $log->debug("Raw context: ". Dumper $workflow->{CONTEXT});
+            $log->trace("Raw context: ". Dumper $workflow->{CONTEXT});
             foreach my $key (@keys) {
                 my $val = $workflow->{CONTEXT}->{$key};
                 next unless (defined $val);

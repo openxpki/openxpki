@@ -60,8 +60,7 @@ sub execute {
 
     $context->param('_workflows', $result->{WORKFLOWS});
     if ($wf_types) {
-        CTX('log')->application()->debug('SmartCard found existing workflows: ' . Dumper $result->{WORKFLOWS});
-
+        CTX('log')->application()->trace('SmartCard found existing workflows: ' . Dumper $result->{WORKFLOWS});
     }
 
 	# set cert ids in context

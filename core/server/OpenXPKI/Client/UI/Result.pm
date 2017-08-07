@@ -183,10 +183,10 @@ sub send_command {
             my @fields = (ref $field_errors eq 'ARRAY') ? map { $_->{name} } @$field_errors : ();
             $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
             $self->logger()->error("Input validation error on fields ". join ",", @fields);
-            $self->logger()->debug('validation details' . Dumper $field_errors );
+            $self->logger()->trace('validation details' . Dumper $field_errors );
         } elsif (!$nostatus) {
             $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
-            $self->logger()->debug("command reply ". Dumper $reply);
+            $self->logger()->trace("command reply ". Dumper $reply);
             $self->set_status_from_error_reply( $reply );
         }
         return undef;
@@ -461,7 +461,7 @@ sub init_fetch {
         return $self;
     }
 
-    $self->logger()->debug('Got response ' . Dumper $data);
+    $self->logger()->trace('Got response ' . Dumper $data);
 
     # support multi-valued responses (persisted as array ref)
     if (ref $data eq 'ARRAY') {
@@ -740,7 +740,7 @@ sub __render_pager {
         $args->{pagersize} = 20;
     }
 
-    $self->logger()->debug('pager query' . Dumper $args);
+    $self->logger()->trace('pager query' . Dumper $args);
 
     return {
         startat => $startat,
