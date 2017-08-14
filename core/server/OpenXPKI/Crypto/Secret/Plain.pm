@@ -101,8 +101,8 @@ use OpenXPKI::Server::Context qw( CTX );
         }
 
         OpenXPKI::Exception->throw(
-	        message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-	    );
+            message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+        );
     }
 
     sub is_complete {
@@ -141,7 +141,7 @@ use OpenXPKI::Server::Context qw( CTX );
         my $self  = shift;
         my $ident = ident $self;
         my $dump  = shift;
-	    return if (not defined $dump or not length $dump);
+        return if (not defined $dump or not length $dump);
         return if (not CTX('volatile_vault')->can_decrypt($dump));
         my $obj = OpenXPKI::Serialization::Simple->new();
         $parts{$ident} = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));

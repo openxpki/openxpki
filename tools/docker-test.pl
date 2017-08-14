@@ -58,13 +58,15 @@ my $project_root = realpath("$Bin/../");
 #
 # Parse command line arguments
 #
-my ($help, $branch, $repo, $test_all, @_only, $test_coverage);
+my ($help, $commit, $branch, $repo, $test_all, @_only, $test_coverage, $batch);
 my $parseok = GetOptions(
     'all'            => \$test_all,
     'only=s'         => \@_only,
     'cover|coverage' => \$test_coverage,
+    'c|commit=s'     => \$commit,
     'b|branch=s'     => \$branch,
     'r|repo=s'       => \$repo,
+    'batch'          => \$batch,
     'help'           => \$help,
 );
 
@@ -82,11 +84,13 @@ die "ERROR: Please specify only one of: --all | --only | --cover\n" if $mode_swi
 # Construct Docker arguments
 #
 my %docker_env = (
-    OXI_TEST_ONLY      => undef,
-    OXI_TEST_ALL       => undef,
-    OXI_TEST_COVERAGE  => undef,
-    OXI_TEST_GITREPO   => undef,
-    OXI_TEST_GITBRANCH => undef,
+    OXI_TEST_ONLY           => undef,
+    OXI_TEST_ALL            => undef,
+    OXI_TEST_COVERAGE       => undef,
+    OXI_TEST_GITCOMMIT      => undef,
+    OXI_TEST_GITREPO        => undef,
+    OXI_TEST_GITBRANCH      => undef,
+    OXI_TEST_NONINTERACTIVE => undef,
 );
 my @docker_args = ();
 
@@ -94,6 +98,7 @@ my @docker_args = ();
 $docker_env{OXI_TEST_ONLY}     = $test_only if $test_only;
 $docker_env{OXI_TEST_ALL}      = $test_all if $test_all;
 $docker_env{OXI_TEST_COVERAGE} = $test_coverage if $test_coverage;
+$docker_env{OXI_TEST_NONINTERACTIVE} = 1 if $batch;
 
 if ($repo) {
     $docker_env{OXI_TEST_GITREPO} = $repo =~ / \A [[:word:]-]+ \/ [[:word:]-]+ \Z /msx
@@ -108,6 +113,7 @@ else {
 }
 
 $docker_env{OXI_TEST_GITBRANCH} = $branch if $branch;
+$docker_env{OXI_TEST_GITCOMMIT} = $commit if $commit;
 
 push @docker_args,
     map {
@@ -121,17 +127,23 @@ push @docker_args,
 # Build container
 #
 print "\n====[ Build Docker image ]====\n";
-print "(This might take more than 10 minutes on first execution)\n";
+my @cmd;
+if ($batch) {
+    print "Skipping (batch mode)\n";
+}
+else {
+    print "(This might take more than 10 minutes on first execution)\n";
 
-# Make scripts accessible for "docker build" (Dockerfile).
-# Without "--append" Docker would always see a new file and rebuild the image
-my $tar_mode = -f "$Bin/docker-test/scripts.tar" ? '--update' : '--create';
-my $olddir = getcwd; chdir $Bin;
-`tar $tar_mode -f "$Bin/docker-test/scripts.tar" scripts testenv`;
-chdir $olddir;
+    # Make scripts accessible for "docker build" (Dockerfile).
+    # Without "--append" Docker would always see a new file and rebuild the image
+    my $tar_mode = -f "$Bin/docker-test/scripts.tar" ? '--update' : '--create';
+    my $olddir = getcwd; chdir $Bin;
+    `tar $tar_mode -f "$Bin/docker-test/scripts.tar" scripts testenv`;
+    chdir $olddir;
 
-my @cmd = ( qw( docker build -t oxi-test ), "$Bin/docker-test");
-execute \@cmd;
+    @cmd = ( qw( docker build -t oxi-test ), "$Bin/docker-test");
+    execute \@cmd;
+}
 
 #
 # Run container
@@ -167,6 +179,10 @@ Modes:
 
 Options:
 
+    -c COMMIT
+    --commit COMMIT
+        Use the given COMMIT instead of "HEAD" (can be anything git understands)
+
     -b BRANCH
     --branch BRANCH
         Use the given BRANCH instead of the current (local repo) or the default
@@ -176,6 +192,11 @@ Options:
     --repo REPO
         Use the given (remote) REPOsitory instead of the local one where we are
         currently in
+
+    --batch
+        Run the tests non-interactively in "batch"/"script" mode:
+        1. Do not try to rebuild the Docker image
+        2. In case of errors, do not open a shell in the container, just exit.
 
     --help
         Show full documentation

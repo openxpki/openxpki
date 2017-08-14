@@ -184,14 +184,14 @@ sub init_result {
         }
     }
 
-    $self->logger()->debug( "persisted query: " . Dumper $result);
+    $self->logger()->trace( "persisted query: " . Dumper $result);
 
     my $search_result = $self->send_command( 'search_cert', $query );
-    
+
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
     $self->_page({
-        label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',       
+        label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC',
     });
 
@@ -289,18 +289,18 @@ sub init_export {
         }
     }
 
-    $self->logger()->debug( "persisted query: " . Dumper $result);
+    $self->logger()->trace( "persisted query: " . Dumper $result);
 
     my $search_result = $self->send_command( 'search_cert', $query );
-    
+
     $self->logger()->trace( "search result: " . Dumper $search_result);
-    
+
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
 
     my @head;
     my @cols;
-    
+
     my $ii = 0;
     foreach my $col (@{$header}) {
         # skip hidden fields
@@ -396,8 +396,8 @@ sub init_pager {
         $query->{REVERSE} = $self->param('reverse');
     }
 
-    $self->logger()->debug( "persisted query: " . Dumper $result);
-    $self->logger()->debug( "executed query: " . Dumper $query);
+    $self->logger()->trace( "persisted query: " . Dumper $result);
+    $self->logger()->trace( "executed query: " . Dumper $query);
 
     my $search_result = $self->send_command( 'search_cert', $query );
 
@@ -445,7 +445,7 @@ sub init_mine {
         REVERSE => 1,
     };
 
-    $self->logger()->debug( "search query: " . Dumper $query);
+    $self->logger()->trace( "search query: " . Dumper $query);
 
     my $search_result = $self->send_command( 'search_cert', { %$query, ( LIMIT => $limit, START => $startat ) } );
 
@@ -542,17 +542,17 @@ sub init_detail {
                 ],
             }},
         );
-        
+
         return;
     }
-    
-    $self->logger()->debug("result: " . Dumper $cert);
-    
+
+    $self->logger()->trace("result: " . Dumper $cert);
+
     my $cert_attribute = $self->send_command( 'get_cert_attributes', {  IDENTIFIER => $cert_identifier, ATTRIBUTE => 'subject_%' });
-    $self->logger()->debug("result: " . Dumper $cert_attribute);
-            
+    $self->logger()->trace("result: " . Dumper $cert_attribute);
+
     my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
-    
+
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $dn{CN}[0]
@@ -613,9 +613,9 @@ sub init_detail {
 
         my @actions;
         my $reply = $self->send_command ( "get_cert_actions", { IDENTIFIER => $cert_identifier });
-        
-        $self->logger()->debug("available actions for cert " . Dumper $reply);
-        
+
+        $self->logger()->trace("available actions for cert " . Dumper $reply);
+
         if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {
             foreach my $item (@{$reply->{workflow}}) {
                 push @actions, { page => $baseurl.$item->{workflow}, label => $item->{label}, target => '_blank' };
@@ -645,28 +645,28 @@ sub init_detail {
 
 }
 
-=head2 init_text 
+=head2 init_text
 
 Show the PEM block as text in a modal
 
 =cut
 
 sub init_text {
-    
+
     my $self = shift;
     my $args = shift;
 
     my $cert_identifier = $self->param('identifier');
-    
+
     my $pem = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'PEM' });
-    
-    $self->logger()->debug("Cert data: " . Dumper $pem);
-    
+
+    $self->logger()->trace("Cert data: " . Dumper $pem);
+
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $cert_identifier,
     });
-    
+
     $self->add_section({
         type => 'text',
         content => {
@@ -748,10 +748,10 @@ sub init_related {
     my $cert_identifier = $self->param('identifier');
 
     my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
-    $self->logger()->debug("result: " . Dumper $cert);
-    
+    $self->logger()->trace("result: " . Dumper $cert);
+
     my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
-    
+
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL',
         shortlabel => $dn{CN}[0]
@@ -765,9 +765,9 @@ sub init_related {
         }
         push @wfid, @{$cert->{CERT_ATTRIBUTES}->{$key}};
     }
-    
-    $self->logger()->debug("related workflows " . Dumper \@wfid);
-    
+
+    $self->logger()->trace("related workflows " . Dumper \@wfid);
+
     my $cert_workflows = $self->send_command( 'search_workflow_instances', {  SERIAL => \@wfid });
 
     $self->logger()->trace("workflow results" . Dumper $cert_workflows);
@@ -843,7 +843,7 @@ sub init_download {
     } elsif ($format eq 'bundle') {
 
         my $chain = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM', 'KEEPROOT' => 1 });
-        $self->logger()->debug("chain info " . Dumper $chain );
+        $self->logger()->trace("chain info " . Dumper $chain );
 
         my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
         my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
@@ -861,7 +861,7 @@ sub init_download {
     } else {
 
         my $cert_info = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
-        $self->logger()->debug("cert info " . Dumper $cert_info );
+        $self->logger()->trace("cert info " . Dumper $cert_info );
 
         my $content_type = 'application/octet-string';
         my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
@@ -948,7 +948,7 @@ sub action_autocomplete {
 
     my $term = $self->param('query') || '';
 
-    $self->logger()->debug( "autocomplete term: " . Dumper $term);
+    $self->logger()->trace( "autocomplete term: " . Dumper $term);
 
     my @result;
     # If we see a string with length of 25 to 27 with only base64 chars
@@ -990,8 +990,8 @@ sub action_autocomplete {
             };
         }
     }
-    
-    $self->logger()->debug( "search result: " . Dumper \@result);
+
+    $self->logger()->trace( "search result: " . Dumper \@result);
 
     $self->_result()->{_raw} = \@result;
 
@@ -1090,7 +1090,7 @@ sub action_search {
         $query->{STATUS} = $status;
     }
 
-    $self->logger()->debug("query : " . Dumper $self->cgi()->param());
+    $self->logger()->trace("query : " . Dumper $self->cgi()->param());
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_client->session()->param('certsearch')->{default};
@@ -1110,7 +1110,7 @@ sub action_search {
         $query->{CERT_ATTRIBUTES} = \@attr;
     }
 
-    $self->logger()->debug("query : " . Dumper $query);
+    $self->logger()->trace("query : " . Dumper $query);
 
 
     my $result_count = $self->send_command( 'search_cert_count', $query );

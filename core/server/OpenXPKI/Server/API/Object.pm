@@ -2235,47 +2235,26 @@ sub control_watchdog {
     my $action = $args->{ACTION};
 
     if ($action =~ /STOP/i) {
-
-        if (!OpenXPKI::Server::Context::hascontext('watchdog')) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_NO_WATCHDOG'
-            );
-        }
-
         CTX('log')->system()->info("Watchdog termination requested via API");
-
-
-        CTX('watchdog')->terminate();
-
-    } elsif ($action =~ /START/i) {
-
-        if (!OpenXPKI::Server::Context::hascontext('watchdog')) {
-            OpenXPKI::Server::Context::setcontext({
-                watchdog => OpenXPKI::Server::Watchdog->new()
-            });
-        }
-
-        my $worker = CTX('watchdog')->run();
-        return $worker;
-
-
-    } elsif ($action =~ /STATUS/i) {
-
+        OpenXPKI::Server::Watchdog->terminate;
+    }
+    elsif ($action =~ /START/i) {
+        CTX('log')->system()->info("Watchdog start requested via API");
+        OpenXPKI::Server::Watchdog->start_or_reload;
+    }
+    elsif ($action =~ /STATUS/i) {
         my $result = OpenXPKI::Control::get_pids();
 
         return {
             pid => $result->{watchdog},
             children => ref $result->{workflow} ? scalar @{$result->{workflow}} : 0
         }
-
-    } else {
-
+    }
+    else {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_INVALID_ACTION',
-            params => {
-                ACTION => $action,
-        });
-
+            params => { ACTION => $action }
+        );
     }
 }
 

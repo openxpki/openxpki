@@ -108,7 +108,7 @@ sub __init_command_params : PRIVATE {
                           "CERT"   => 0,
                           "PKCS7"  => 1},
     "pkcs7_encrypt"   => {"CERT"    => 0,
-    					  "OUTFORM"    => 0,
+                          "OUTFORM"    => 0,
                           "ENC_ALG" => ["__undef", "aes256","aes192","aes128","idea","des3","des"],
                           "CONTENT" => 1},
     "pkcs7_get_chain" => {"NOCHAIN" => 0,

@@ -22,27 +22,27 @@ use OpenXPKI::Server::Workflow::NICE;
 
 sub getHandler {
 
-	shift; # Pull of class
-	my $activity = shift;
+    shift; # Pull of class
+    my $activity = shift;
 
-	my $backend = CTX('config')->get('nice.backend');
+    my $backend = CTX('config')->get('nice.backend');
 
-	$backend = 'Local' unless( $backend );
+    $backend = 'Local' unless( $backend );
 
-	my $BackendClass = 'OpenXPKI::Server::Workflow::NICE::'.$backend;
-	##! 16: 'Load Backend: '.$backend
+    my $BackendClass = 'OpenXPKI::Server::Workflow::NICE::'.$backend;
+    ##! 16: 'Load Backend: '.$backend
 
     use OpenXPKI::Server::Workflow::NICE::Local;
 
     if(!eval("require $BackendClass")){
         OpenXPKI::Exception->throw(
-      		message => "I18N_OPENXPKI_SERVER_NICE_NO_SUCH_BACKEND",
-      		params => {
-      		    backend => $backend,
-      		    class =>  $BackendClass,
-      		    error => $EVAL_ERROR
-      		}
-    	);
+              message => "I18N_OPENXPKI_SERVER_NICE_NO_SUCH_BACKEND",
+              params => {
+                  backend => $backend,
+                  class =>  $BackendClass,
+                  error => $EVAL_ERROR
+              }
+        );
     }
     CTX('log')->application()->debug("NICE backend $backend loaded, execute $activity->name");
 

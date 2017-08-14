@@ -21,7 +21,7 @@ use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
 
 use SOAP::Lite on_fault => sub {
-	my($soap, $res) = @_;
+    my($soap, $res) = @_;
     OpenXPKI::Exception->throw(message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_SERVICENOW_SOAP_ERROR',
         params => { error => ref $res ? $res->faultdetail : $soap->transport->status } );
 };
@@ -31,61 +31,61 @@ use Moose;
 extends 'OpenXPKI::Server::Notification::Base';
 
 has 'transport' => (
-	is      => 'ro',
-	isa     => 'Object',
-	reader  => '_transport',
-	builder => '_init_transport',
-	lazy    => 1,
+    is      => 'ro',
+    isa     => 'Object',
+    reader  => '_transport',
+    builder => '_init_transport',
+    lazy    => 1,
 );
 
 has 'template_dir' => (
-	is      => 'ro',
-	isa     => 'Str',
-	builder => '_init_template_dir',
-	lazy    => 1,
+    is      => 'ro',
+    isa     => 'Str',
+    builder => '_init_template_dir',
+    lazy    => 1,
 );
 
 has 'xmlns' => (
-	is        => 'ro',
-	isa       => 'Str',
-	'default' => 'http://www.service-now.com/',
+    is        => 'ro',
+    isa       => 'Str',
+    'default' => 'http://www.service-now.com/',
 );
 
 sub _init_transport {
 
-	my $self = shift;
+    my $self = shift;
 
-	##! 8: 'creating transport'
-	my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
+    ##! 8: 'creating transport'
+    my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
 
-	my $endpoint = $cfg->{server}.'?SOAP';
+    my $endpoint = $cfg->{server}.'?SOAP';
 
-	# pass in credentials by overriding the method
-	our @credentials = ($cfg->{username} => $cfg->{password});
-	BEGIN {
-	   sub SOAP::Transport::HTTP::Client::get_basic_credentials { return @credentials; }
-	}
+    # pass in credentials by overriding the method
+    our @credentials = ($cfg->{username} => $cfg->{password});
+    BEGIN {
+       sub SOAP::Transport::HTTP::Client::get_basic_credentials { return @credentials; }
+    }
 
-	my $soap;
-	my $timeout = $cfg->{timeout} || 30;
-	# declare the SOAP endpoint here
-	eval { $soap = SOAP::Lite->proxy($endpoint, timeout => $timeout); };
+    my $soap;
+    my $timeout = $cfg->{timeout} || 30;
+    # declare the SOAP endpoint here
+    eval { $soap = SOAP::Lite->proxy($endpoint, timeout => $timeout); };
 
-	if ($EVAL_ERROR) {
-		OpenXPKI::Exception->throw(
-			message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_SERVICENOW_COULD_NOT_INSTANTIATE_CLIENT',
-			params => { 'ERROR' => $EVAL_ERROR, },
-		);
-	}
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_SERVICENOW_COULD_NOT_INSTANTIATE_CLIENT',
+            params => { 'ERROR' => $EVAL_ERROR, },
+        );
+    }
 
-	return $soap;
+    return $soap;
 }
 
 sub _init_template_dir {
-	my $self         = shift;
-	my $template_dir = CTX('config')->get( $self->config() . '.template.dir' );
-	$template_dir .= '/' unless ( $template_dir =~ /\/$/ );
-	return $template_dir;
+    my $self         = shift;
+    my $template_dir = CTX('config')->get( $self->config() . '.template.dir' );
+    $template_dir .= '/' unless ( $template_dir =~ /\/$/ );
+    return $template_dir;
 }
 
 =head1 Functions
@@ -95,49 +95,49 @@ see @OpenXPKI::Server::Notification::Base
 
 sub notify {
 
-	##! 1: 'start'
+    ##! 1: 'start'
 
-	my $self = shift;
-	my $args = shift;
+    my $self = shift;
+    my $args = shift;
 
-	my $msg           = $args->{MESSAGE};
-	my $token         = $args->{TOKEN};
-	my $template_vars = $args->{VARS};
+    my $msg           = $args->{MESSAGE};
+    my $token         = $args->{TOKEN};
+    my $template_vars = $args->{VARS};
 
-	my $msgconfig = $self->config() . '.message.' . $msg;
+    my $msgconfig = $self->config() . '.message.' . $msg;
 
-	# Test if there is an entry for this kind of message
-	my @handles = CTX('config')->get_keys($msgconfig);
+    # Test if there is an entry for this kind of message
+    my @handles = CTX('config')->get_keys($msgconfig);
 
-	##! 8: 'Starting message ' . $msg
+    ##! 8: 'Starting message ' . $msg
 
-	##! 16: 'Found handles ' . Dumper @handles
+    ##! 16: 'Found handles ' . Dumper @handles
 
-	##! 32: 'Template vars: ' . Dumper $template_vars
+    ##! 32: 'Template vars: ' . Dumper $template_vars
 
-	if ( !@handles ) {
-		CTX('log')->system()->debug("No notifcations to send for $msgconfig");
+    if ( !@handles ) {
+        CTX('log')->system()->debug("No notifcations to send for $msgconfig");
 
-		return 0;
-	}
+        return 0;
+    }
 
-	# Walk through the handles
+    # Walk through the handles
 
     my @failed;
   QUEUE_HANDLE:
-	foreach my $handle (@handles) {
+    foreach my $handle (@handles) {
 
-		my $pi = $token->{$handle};
+        my $pi = $token->{$handle};
 
-		##! 16: 'Starting handle '.$handle.', PI: ' . Dumper $pi
+        ##! 16: 'Starting handle '.$handle.', PI: ' . Dumper $pi
 
-		# We do the eval per handle
-		eval {
+        # We do the eval per handle
+        eval {
 
             my $cfg = CTX('config')->get_hash("$msgconfig.$handle");
 
-			# Check if there is a ticket or the first action is open
-			my $sys_id;
+            # Check if there is a ticket or the first action is open
+            my $sys_id;
 
             OpenXPKI::Exception->throw(
                 message =>
@@ -157,68 +157,68 @@ sub notify {
                     params => { HANDLE => $msgconfig . $handle, }
                 ) if ( $action eq "open" );
 
-            	$sys_id = $pi->{sys_id};
+                $sys_id = $pi->{sys_id};
 
-			} elsif ( $action ne "open" ) {
-				OpenXPKI::Exception->throw(
-					message =>
-					  'I18N_OPENXPKI_SERVER_NOTIFICATION_SERVICENOW_NO_OPEN_TICKET',
-					params => { HANDLE => "$msgconfig.$handle", }
-				);
-			}
+            } elsif ( $action ne "open" ) {
+                OpenXPKI::Exception->throw(
+                    message =>
+                      'I18N_OPENXPKI_SERVER_NOTIFICATION_SERVICENOW_NO_OPEN_TICKET',
+                    params => { HANDLE => "$msgconfig.$handle", }
+                );
+            }
 
-			##! 16: 'action ' . $action
-			##! 32: 'Config ' . Dumper $cfg
-			if ( $action eq "open" ) {
+            ##! 16: 'action ' . $action
+            ##! 32: 'Config ' . Dumper $cfg
+            if ( $action eq "open" ) {
 
                 my $ticket =
                     $self->_insert( { CFG => $cfg, VARS => $template_vars } );
-					##! 16: 'Initial open - new ticket id: ' . $ticket->{ticket_id}
-					$pi->{ticket} = $ticket->{ticket_id};
-					$pi->{sys_id} = $ticket->{sys_id};
+                    ##! 16: 'Initial open - new ticket id: ' . $ticket->{ticket_id}
+                    $pi->{ticket} = $ticket->{ticket_id};
+                    $pi->{sys_id} = $ticket->{sys_id};
 
 
-			}
-			# Update a ticket
-			elsif ( $action eq "update" ) {
+            }
+            # Update a ticket
+            elsif ( $action eq "update" ) {
 
-				$cfg->{sys_id} = $pi->{sys_id};
-				$self->_update( { CFG => $cfg, VARS => $template_vars } );
+                $cfg->{sys_id} = $pi->{sys_id};
+                $self->_update( { CFG => $cfg, VARS => $template_vars } );
 
             }
             # Shortcut for setting the status to resolved
-			elsif ( $action eq "close" ) {
-				##! 32: 'Closing ticket '
+            elsif ( $action eq "close" ) {
+                ##! 32: 'Closing ticket '
 
-				$cfg->{sys_id} = $pi->{sys_id};
-				$cfg->{state} = 7;
+                $cfg->{sys_id} = $pi->{sys_id};
+                $cfg->{state} = 7;
                 $self->_update( { CFG => $cfg, VARS => $template_vars } );
 
             } else {
-		    	OpenXPKI::Exception->throw(
+                OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_SERVICENOW_UNKNOWN_ACTION',
                     params => { HANDLE => $msgconfig . $handle, ACTION => $action }
                 );
-		    }
+            }
 
-		};
+        };
 
-		$token->{$handle} = $pi;
+        $token->{$handle} = $pi;
 
-		if ($EVAL_ERROR) {
-			CTX('log')->system()->error('ServiceNow action failed on ticket '
-				  . $pi->{sys_id}
-				  . ' with '
-				  . $EVAL_ERROR);
+        if ($EVAL_ERROR) {
+            CTX('log')->system()->error('ServiceNow action failed on ticket '
+                  . $pi->{sys_id}
+                  . ' with '
+                  . $EVAL_ERROR);
 
 
-			push @failed, $handle;
-		}
-	}    # end handle
+            push @failed, $handle;
+        }
+    }    # end handle
 
     $self->failed( \@failed );
 
-	return $token;
+    return $token;
 
 }
 
@@ -250,9 +250,9 @@ Dispatch the call to the SOAP API and do error handling
 =cut
 sub _do_call {
 
-	my $self = shift;
-	my $action = shift;
-	my @args = @_;
+    my $self = shift;
+    my $action = shift;
+    my @args = @_;
 
     # invoke the SOAP call
     my $method = SOAP::Data->name($action)
@@ -280,24 +280,24 @@ Prepare
 =cut
 sub _insert {
 
-	##! 1: 'start'
+    ##! 1: 'start'
 
-	my $self = shift;
-	my $args = shift;
-	my $cfg  = $args->{CFG};
-	my $vars = $args->{VARS};
+    my $self = shift;
+    my $args = shift;
+    my $cfg  = $args->{CFG};
+    my $vars = $args->{VARS};
 
-	##! 16: 'Template vars: ' . Dumper $vars
+    ##! 16: 'Template vars: ' . Dumper $vars
 
-	# create params list
-	my @params = @{$self->_prepare_params( $args )};
+    # create params list
+    my @params = @{$self->_prepare_params( $args )};
 
-	# invoke the SOAP call - insert to create a ticket
-	my $result = $self->_do_call( 'insert', @params );
+    # invoke the SOAP call - insert to create a ticket
+    my $result = $self->_do_call( 'insert', @params );
 
     my $ticket = {
-	   'sys_id' => $result->{sys_id},
-	   'ticket_id' => $result->{number}
+       'sys_id' => $result->{sys_id},
+       'ticket_id' => $result->{number}
     };
 
     ##! 8: "Created a new ticket, ID " . $ticket->{ticket_id}
@@ -365,9 +365,9 @@ sub _prepare_params {
         push( @params, SOAP::Data->name( $key => $val  ) ) if ($val);
     }
 
-	##! 32: 'Params: ' . Dumper @params
+    ##! 32: 'Params: ' . Dumper @params
 
-	return \@params;
+    return \@params;
 
 
 

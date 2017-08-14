@@ -582,17 +582,17 @@ sub __add_token {
     # The generation tag is always a suffix "-X" where X is a decimal
 
     # A token config must have at least a backend (inherit is done by the connector)
-	$backend_class = $config->get_inherit("crypto.token.$name.backend");
+    $backend_class = $config->get_inherit("crypto.token.$name.backend");
 
     # Nothing found with the full token name, so try to load from the group name
     if (!$backend_class) {
-		$config_name_group =~ /^(.+)-(\d+)$/;
-		$config_name_group = $1;
-		##! 16: 'use group config ' . $config_name_group
-		$backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
+        $config_name_group =~ /^(.+)-(\d+)$/;
+        $config_name_group = $1;
+        ##! 16: 'use group config ' . $config_name_group
+        $backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
     }
 
-	if (not $backend_class)  {
+    if (not $backend_class)  {
         OpenXPKI::Exception->throw (
             message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_NO_BACKEND_CLASS",
             params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
@@ -650,7 +650,7 @@ sub __add_token {
             if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INIT_FAILED",
-	    );
+        );
     }
 
     ##! 2: "$type token $name for $realm successfully added"

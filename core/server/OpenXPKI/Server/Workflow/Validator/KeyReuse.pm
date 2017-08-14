@@ -58,7 +58,7 @@ sub _validate {
             identifier => $cert_with_same_pubkey->{IDENTIFIER},
         }]);
 
-	    CTX('log')->application()->error("Trying to reuse private key of certificate " . $cert_with_same_pubkey->{IDENTIFIER});
+        CTX('log')->application()->error("Trying to reuse private key of certificate " . $cert_with_same_pubkey->{IDENTIFIER});
 
         validation_error ( 'I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS' );
     }

@@ -16,8 +16,8 @@ use English;
 sub new
 {
     eval {
-	require JSON;
-	import JSON;
+    require JSON;
+    import JSON;
     };
     return if ($EVAL_ERROR);
 

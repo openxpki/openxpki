@@ -25,7 +25,7 @@ sub execute {
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
 
     # Load the CSR indicated by the context parameter from the database
-	my $csr_serial = $context->param( 'csr_serial' );
+    my $csr_serial = $context->param( 'csr_serial' );
 
     ##! 64: 'load csr from db: ' . $csr_serial
     my $csr = CTX('dbi')->select_one(
@@ -36,16 +36,16 @@ sub execute {
 
     ##! 64: 'csr: ' . Dumper %csr
     if (! defined $csr) {
-	   OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_CSR_NOT_FOUND_IN_DATABASE',
-	       params => { csr_serial => $csr_serial }
+       OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_NICE_CSR_NOT_FOUND_IN_DATABASE',
+           params => { csr_serial => $csr_serial }
        );
     }
 
     if ($csr->{format} ne 'pkcs10') {
-	   OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE',
-	       params => { EXPECTED => 'pkcs10', TYPE => $csr->{format} },
+       OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE',
+           params => { EXPECTED => 'pkcs10', TYPE => $csr->{format} },
         );
     }
 

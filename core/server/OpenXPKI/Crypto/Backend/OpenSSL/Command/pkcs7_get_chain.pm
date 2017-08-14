@@ -141,9 +141,9 @@ sub get_result
 
     # Requestor was just interessted in the entity
     if ($self->{NOCHAIN}) {
-    	##! 8: 'entity only requested '
-    	##! 32: 'Entity pem ' . $certsBySubject{$subject}->{CERT}
-    	return $certsBySubject{$subject}->{CERT};
+        ##! 8: 'entity only requested '
+        ##! 32: 'Entity pem ' . $certsBySubject{$subject}->{CERT}
+        return $certsBySubject{$subject}->{CERT};
     }
 
     # Start with the entity and build the chain

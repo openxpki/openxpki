@@ -480,9 +480,8 @@ sub is_token_usable {
         }
         ##! 16: 'probe matches'
     };
-    if ($EVAL_ERROR) {
-        my $ee = $EVAL_ERROR;
-        ##! 16: 'got eval error ' . $ee
+    if (my $eval_err = $EVAL_ERROR) {
+        ##! 16: 'got eval error ' . $eval_err
         return 0;
     }
 

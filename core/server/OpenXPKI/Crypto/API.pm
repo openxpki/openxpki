@@ -98,8 +98,8 @@ sub __check_command_param : PRIVATE {
     my $ident = ident $self;
 
     if (! defined $arg_ref->{COMMAND}) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_SPECIFIED',
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_SPECIFIED',
             );
     }
 
@@ -124,8 +124,8 @@ sub __check_command_param : PRIVATE {
 
     my $command_params = $self->get_command_params();
     if (! defined $command_params || ref $command_params ne 'HASH') {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_PARAMS',
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_PARAMS',
             );
     }
 

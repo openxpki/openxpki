@@ -56,18 +56,18 @@ sub START {
 
   CHECKTMPDIRS:
     for my $path ($requestedtmp,    # user's preference
-		  File::Spec->catfile('', 'var', 'tmp'), # suitable for large files
-		  File::Spec->catfile('', 'tmp'),        # present on all UNIXes
-	) {
+          File::Spec->catfile('', 'var', 'tmp'), # suitable for large files
+          File::Spec->catfile('', 'tmp'),        # present on all UNIXes
+    ) {
 
-	# directory must be readable & writable to be usable as tmp
-	if (defined $path &&
-	    (-d $path) &&
-	    (-r $path) &&
-	    (-w $path)) {
-	    $tmp_dir_of{$ident} = $path;
-	    last CHECKTMPDIRS;
-	}
+    # directory must be readable & writable to be usable as tmp
+    if (defined $path &&
+        (-d $path) &&
+        (-r $path) &&
+        (-w $path)) {
+        $tmp_dir_of{$ident} = $path;
+        last CHECKTMPDIRS;
+    }
     }
 
     if (! (exists $tmp_dir_of{$ident} && -d $tmp_dir_of{$ident}))
@@ -158,20 +158,20 @@ sub __load_config_realm_token {
 
 
     # Magic inheritance code - see also TokenManager::__add_token
-	# Use backend to test for instance / group
-	my $backend_class = $config->get_inherit("crypto.token.$name.backend");
+    # Use backend to test for instance / group
+    my $backend_class = $config->get_inherit("crypto.token.$name.backend");
 
     my $config_name_group = $name;
     # Nothing found with the full token name, so try to load from the group name
     if (!$backend_class) {
-		$config_name_group =~ /^(.+)-(\d+)$/;
-		$config_name_group = $1;
-		##! 16: 'use group config ' . $config_name_group
-		$backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
+        $config_name_group =~ /^(.+)-(\d+)$/;
+        $config_name_group = $1;
+        ##! 16: 'use group config ' . $config_name_group
+        $backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
     }
 
     if (!$backend_class) {
-     	OpenXPKI::Exception->throw(
+         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION_NO_BACKEND',
         );
     }
@@ -181,10 +181,10 @@ sub __load_config_realm_token {
     my @keylist = (qw(engine shell wrapper randfile
                     engine_section engine_usage key key_store));
 
-	foreach my $key (@keylist) {
-		my $value = $config->get_inherit("crypto.token.$config_name_group.$key");
-		$params_of{$ident}->{uc($key)} = $value if (defined $value);
-	}
+    foreach my $key (@keylist) {
+        my $value = $config->get_inherit("crypto.token.$config_name_group.$key");
+        $params_of{$ident}->{uc($key)} = $value if (defined $value);
+    }
 
     # FIXME - most of this params are not usefull for all tokens, need a better error checking concept
     foreach my $key (@keylist) {
@@ -270,7 +270,7 @@ sub __init_engine
     if (!exists $params_of{$ident}->{ENGINE} || $params_of{$ident}->{ENGINE} eq '') {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_TOOLKIT_ENGINE_UNDEFINED',
-	    );
+        );
     }
 
     my $engine = $base_class_of{$ident} . '::Engine::' . $params_of{$ident}->{ENGINE};
@@ -318,17 +318,17 @@ sub __init_shell
     if (not -e $params_of{$ident}->{SHELL}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_TOOLKIT_BINARY_NOT_FOUND',
-	    params => {
-		SHELL => $params_of{$ident}->{SHELL},
-	    },
+        params => {
+        SHELL => $params_of{$ident}->{SHELL},
+        },
         );
     }
     elsif (not -x $params_of{$ident}->{SHELL}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_TOOLKIT_BINARY_NOT_EXECUTABLE',
-	    params => {
-		SHELL => $params_of{$ident}->{SHELL},
-	    },
+        params => {
+        SHELL => $params_of{$ident}->{SHELL},
+        },
         );
     }
     else {
@@ -434,29 +434,29 @@ sub command {
         # a stderr log file, which leads to multiple exceptions
         # for one error
         $self->__instantiate_cli($cli_class);
-	if (ref $cmds ne 'HASH') {
-	    ##! 16: "standard invocation"
+    if (ref $cmds ne 'HASH') {
+        ##! 16: "standard invocation"
             $self->__prepare_cli($cmds);
 
-	    $cli_of{$ident}->execute();
-	} else {
-	    # command returned a hash instead of a arrayref, this means
-	    # that we need to extract parameters for execute
+        $cli_of{$ident}->execute();
+    } else {
+        # command returned a hash instead of a arrayref, this means
+        # that we need to extract parameters for execute
 
-	    if (! exists $cmds->{COMMAND}) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_COMMAND");
-	    }
-	    if (! exists $cmds->{PARAMS}) {
-		OpenXPKI::Exception->throw (
-		    message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_PARAMS");
-	    }
+        if (! exists $cmds->{COMMAND}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_COMMAND");
+        }
+        if (! exists $cmds->{PARAMS}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_PARAMS");
+        }
 
             $self->__prepare_cli($cmds->{COMMAND});
-	    $cli_of{$ident}->execute({
+        $cli_of{$ident}->execute({
                 PARAMS => $cmds->{PARAMS},
-	    });
-	}
+        });
+    }
 
         my $result = $cli_of{$ident}->get_result();
         ##! 128: 'before get_result()'

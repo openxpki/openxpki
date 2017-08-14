@@ -5914,10 +5914,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_CONTROL_WATCHDOG_NO_WATCHDOG"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_DSA_UNABLE_TO_GENERATE_DSA_PARAM"
 #~ msgstr "SPKAC строка пуста."
 

@@ -23,34 +23,34 @@ use Data::Dumper;
 
 sub execute {
 
-	##! 1: 'start'
-	my $self       = shift;
-	my $workflow   = shift;
-	my $context    = $workflow->context();
-	my $serializer = OpenXPKI::Serialization::Simple->new();
-	my $realm      = CTX('session')->data->pki_realm;
+    ##! 1: 'start'
+    my $self       = shift;
+    my $workflow   = shift;
+    my $context    = $workflow->context();
+    my $serializer = OpenXPKI::Serialization::Simple->new();
+    my $realm      = CTX('session')->data->pki_realm;
 
     # Check existance of necessary values
-	foreach my $key (qw( namespace key_param value_param encrypt force )) {
-		my $pkey = 'ds_' . $key;
-		my $val  = $self->param($pkey);
-		if ( not defined $val ) {
-			OpenXPKI::Exception->throw( message =>
-				    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
-				  . 'MISSPARAM_'
-				  . uc($key) );
-		}
-	}
+    foreach my $key (qw( namespace key_param value_param encrypt force )) {
+        my $pkey = 'ds_' . $key;
+        my $val  = $self->param($pkey);
+        if ( not defined $val ) {
+            OpenXPKI::Exception->throw( message =>
+                    'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
+                  . 'MISSPARAM_'
+                  . uc($key) );
+        }
+    }
 
-	# Resolve key and value
-	my $keyparam = $self->param('ds_key_param');
-	if ( not defined $keyparam ) {
-		OpenXPKI::Exception->throw(
-			message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
-			  . 'MISSPARAM_KEY_PARAM' );
-	}
-	my $keyvalue = $context->param( $keyparam );
-	if ( not $keyvalue ) {
+    # Resolve key and value
+    my $keyparam = $self->param('ds_key_param');
+    if ( not defined $keyparam ) {
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
+              . 'MISSPARAM_KEY_PARAM' );
+    }
+    my $keyvalue = $context->param( $keyparam );
+    if ( not $keyvalue ) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
               . 'KEY_PARAM_EMPTY' );
@@ -77,13 +77,13 @@ sub execute {
     my $value = [];
     if ($dp_entry && $dp_entry->{VALUE}) {
 
-    	##! 8: 'Appending'
+        ##! 8: 'Appending'
 
-    	$value = $serializer->deserialize( $dp_entry->{VALUE} );
+        $value = $serializer->deserialize( $dp_entry->{VALUE} );
 
-    	##!16: 'Exisiting value ' . Dumper $value
+        ##!16: 'Exisiting value ' . Dumper $value
 
-    	if (ref $value ne "ARRAY") {
+        if (ref $value ne "ARRAY") {
             if ($params->{FORCE}) {
                 $value = [];
             } else {
@@ -91,7 +91,7 @@ sub execute {
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_EXISTING_VALUE_NOT_AN_ARRAY',
                     params => { REFTYPE => ref $value, VALUE => $value }
                 );
-    	    }
+            }
         }
 
         # Force needed to overwrite exisiting entry
@@ -101,9 +101,9 @@ sub execute {
         $params->{EXPIRATION_DATE} = $dp_entry->{EXPIRATION_DATE} if ($dp_entry->{EXPIRATION_DATE});
 
     } else {
-    	##! 8: 'Create new'
-    	$dp_entry = $params;
-    	$params->{ENCRYPT} = $self->param('ds_encrypt');
+        ##! 8: 'Create new'
+        $dp_entry = $params;
+        $params->{ENCRYPT} = $self->param('ds_encrypt');
     }
 
     if ( $self->param('ds_expiration_date') ) {
@@ -118,22 +118,22 @@ sub execute {
     }
 
     if ($params->{ENCRYPT} and not $valparam =~ m/^_/ ) {
-		OpenXPKI::Exception->throw(
-			message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_ENCRYPT_PARAM_NONVOL' );
-	}
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_ENCRYPT_PARAM_NONVOL' );
+    }
 
-	# Append new value
-	push @{$value},  $context->param($valparam);
+    # Append new value
+    push @{$value},  $context->param($valparam);
 
-	# serialize the value
-	$params->{VALUE} = $serializer->serialize( $value );
-
-
-
-	##! 16: 'Store with params: ' . Dumper $dp_entry
+    # serialize the value
+    $params->{VALUE} = $serializer->serialize( $value );
 
 
-	CTX('api')->set_data_pool_entry( $params );
+
+    ##! 16: 'Store with params: ' . Dumper $dp_entry
+
+
+    CTX('api')->set_data_pool_entry( $params );
 
     if ($self->param('ds_unset_context_value')) {
         ##! 16: 'clearing context parameter ' . $valparam
@@ -144,7 +144,7 @@ sub execute {
         $context->param($valparam => '');
     }
 
-	return 1;
+    return 1;
 }
 
 1;

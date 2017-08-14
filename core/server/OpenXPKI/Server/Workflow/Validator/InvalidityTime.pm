@@ -36,10 +36,10 @@ sub _validate {
     if (!defined $identifier || $identifier !~ m{\A [a-zA-Z0-9\-_]+ \z}xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
-    	    log => {
-        		priority => 'warn',
-        		facility => 'application',
-	        },
+            log => {
+                priority => 'warn',
+                facility => 'application',
+            },
         );
     }
 

@@ -27,17 +27,17 @@ sub execute
    # Status in db might already be revoked when using local issuance
    # Fetch reason code from CRR db (onHold)
 
-	# update certificate database:
+    # update certificate database:
     #my $status = 'REVOKED';
     #if ($reason_code eq 'certificateHold') {
     #        $status = 'HOLD';
     #}
 
    $dbi->update(
-   		table => 'certificate',
+           table => 'certificate',
         set  => { status => 'REVOKED' },
         where => {
-        	status => 'CRL_ISSUANCE_PENDING',
+            status => 'CRL_ISSUANCE_PENDING',
             pki_realm  => $pki_realm,
             identifier => $identifier,
         },

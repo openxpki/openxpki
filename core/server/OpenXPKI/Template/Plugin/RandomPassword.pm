@@ -24,7 +24,7 @@ sub new {
     my $context = shift;
 
     return bless {
-	_CONTEXT => $context,
+    _CONTEXT => $context,
     }, $class;
 }
 
@@ -36,111 +36,111 @@ sub generate {
     my $rv = '';
 
     if (! defined $args || ref $args ne 'HASH') {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_MISSING_SCHEME_SPECIFICATION",
-	    params  => {
-	    },
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_MISSING_SCHEME_SPECIFICATION",
+        params  => {
+        },
+        );
     }
 
     if ($args->{scheme} eq 'plain') {
-	my $pool = '';
-	foreach my $cmd ('ps',
-			 'netstat -na',
-			 'date',
-			 'openssl rand -base 64 128',
-			 'vmstat',
-			 'free',
-			 'df',
-	    ) {
-	    $pool .= `$cmd 2>&1` || '';
-	}
-	my $ctx = Digest::SHA->new();
-	$ctx->add($pool);
-	$password = substr($ctx->b64digest, 0, 8);
-	$rv = "{PLAIN}$password";
+    my $pool = '';
+    foreach my $cmd ('ps',
+             'netstat -na',
+             'date',
+             'openssl rand -base 64 128',
+             'vmstat',
+             'free',
+             'df',
+        ) {
+        $pool .= `$cmd 2>&1` || '';
+    }
+    my $ctx = Digest::SHA->new();
+    $ctx->add($pool);
+    $password = substr($ctx->b64digest, 0, 8);
+    $rv = "{PLAIN}$password";
     }
 
     if ($args->{scheme} eq 'sha') {
-	$password = $self->generate(
-	    {
-		scheme => 'plain',
-	    });
-	$password = substr($password, 7);
+    $password = $self->generate(
+        {
+        scheme => 'plain',
+        });
+    $password = substr($password, 7);
 
-	my $ctx = Digest::SHA->new();
-	$ctx->add($password);
-	$rv = '{SHA}' . $ctx->b64digest;
+    my $ctx = Digest::SHA->new();
+    $ctx->add($password);
+    $rv = '{SHA}' . $ctx->b64digest;
     }
 
     if ($args->{scheme} eq 'ssha') {
-	my $salt = $self->generate(
-	    {
-		scheme => 'plain',
-	    });
-	$salt = substr($salt, 7, 4);
+    my $salt = $self->generate(
+        {
+        scheme => 'plain',
+        });
+    $salt = substr($salt, 7, 4);
 
-	$password = $self->generate(
-	    {
-		scheme => 'plain',
-	    });
-	$password = substr($password, 7);
+    $password = $self->generate(
+        {
+        scheme => 'plain',
+        });
+    $password = substr($password, 7);
 
-	my $ctx = Digest::SHA->new();
-	$ctx->add($password);
-	$ctx->add($salt);
-	$rv = '{SSHA}' . MIME::Base64::encode_base64($ctx->digest . $salt, '');
+    my $ctx = Digest::SHA->new();
+    $ctx->add($password);
+    $ctx->add($salt);
+    $rv = '{SSHA}' . MIME::Base64::encode_base64($ctx->digest . $salt, '');
     }
 
     if ($args->{scheme} eq 'md5') {
-	$password = $self->generate(
-	    {
-		scheme => 'plain',
-	    });
-	$password = substr($password, 7);
+    $password = $self->generate(
+        {
+        scheme => 'plain',
+        });
+    $password = substr($password, 7);
 
-	my $ctx = Digest::MD5->new();
-	$ctx->add($password);
-	$rv = '{MD5}' . $ctx->b64digest;
+    my $ctx = Digest::MD5->new();
+    $ctx->add($password);
+    $rv = '{MD5}' . $ctx->b64digest;
     }
 
     if ($args->{scheme} eq 'smd5') {
-	my $salt = $self->generate(
-	    {
-		scheme => 'plain',
-	    });
-	$salt = substr($salt, 7, 4);
+    my $salt = $self->generate(
+        {
+        scheme => 'plain',
+        });
+    $salt = substr($salt, 7, 4);
 
-	$password = $self->generate(
-	    {
-		scheme => 'plain',
-	    });
-	$password = substr($password, 7);
+    $password = $self->generate(
+        {
+        scheme => 'plain',
+        });
+    $password = substr($password, 7);
 
-	my $ctx = Digest::MD5->new();
-	$ctx->add($password);
-	$ctx->add($salt);
-	$rv = '{SMD5}' . MIME::Base64::encode_base64($ctx->digest . $salt, '');
+    my $ctx = Digest::MD5->new();
+    $ctx->add($password);
+    $ctx->add($salt);
+    $rv = '{SMD5}' . MIME::Base64::encode_base64($ctx->digest . $salt, '');
     }
 
     if ($rv eq '') {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION",
-	    params  => {
-		SCHEME => $args->{scheme},
-	    },
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION",
+        params  => {
+        SCHEME => $args->{scheme},
+        },
+        );
     }
 
     if (defined $args->{callback}) {
-	my $callback = eval "$args->{callback}";
+    my $callback = eval "$args->{callback}";
 
-	if (ref $callback eq 'CODE') {
-	    eval {
-		$_ = $password;
-		&$callback($password, $rv);
-	    };
-	}
+    if (ref $callback eq 'CODE') {
+        eval {
+        $_ = $password;
+        &$callback($password, $rv);
+        };
+    }
     }
     return $rv;
 }

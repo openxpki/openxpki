@@ -86,7 +86,7 @@ sub evaluate
         }
     }
 
-    CTX('log')->application()->debug("Too few approvals, missing: " . Dumper \%required);
+    CTX('log')->application()->trace("Too few approvals, missing: " . Dumper \%required);
 
 
     ## if the required list contains still some requirements

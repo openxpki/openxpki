@@ -25,7 +25,7 @@ sub get_command
     }
     $self->write_file (FILENAME => $self->{INFILE},
                        CONTENT  => $self->{DATA},
-	               FORCE    => 1);
+                   FORCE    => 1);
 
     ## check parameters
 

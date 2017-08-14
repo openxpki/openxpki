@@ -74,29 +74,29 @@ sub execute {
     }
     # write operations that take a parameter
     elsif ( $function =~ m/^(pusharray|unshiftarray)$/ ) {
-	$function =~ s{ array \z }{}xms;
+    $function =~ s{ array \z }{}xms;
 
-	my $arg = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-	    { workflow => $wf, context_key => $context_key } );
+    my $arg = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
+        { workflow => $wf, context_key => $context_key } );
 
         $array->$function( @{$arg->value()} );
     }
     # other operations
     elsif ( $function eq 'value' ) {
-	my $index = $self->index;
+    my $index = $self->index;
 
-	if (! defined $index) {
-	    my $index_key = $self->index_key;
-	    $index = $context->param($index_key);
-	}
+    if (! defined $index) {
+        my $index_key = $self->index_key;
+        $index = $context->param($index_key);
+    }
 
-	if (! defined $index) {
-	    OpenXPKI::Exception->throw(
-		message =>
+    if (! defined $index) {
+        OpenXPKI::Exception->throw(
+        message =>
                 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_NSARRAY_MISSING_INDEX',
-		params => { name => $function, },
-		);
-	}
+        params => { name => $function, },
+        );
+    }
 
         $context->param( $context_key, $array->$function($index) );
     }

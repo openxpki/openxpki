@@ -25,41 +25,41 @@ sub execute {
     ##! 1: 'Workflow Test entered - Workflow Id: ' .$workflow->id();
 
     # parameter ""action" decides, what should happen:
-	my $action = $self->param('perform');
+    my $action = $self->param('perform');
 
-	# optional parameter "cause":
-	my $pause_cause = $self->param('cause');
-	$pause_cause ||= 'some terrific cause';
+    # optional parameter "cause":
+    my $pause_cause = $self->param('cause');
+    $pause_cause ||= 'some terrific cause';
 
-	#when execute runs till end, "test_job_is_done" is set to "1"
-	$context->param({ 'test_job_is_done' => '0' });
+    #when execute runs till end, "test_job_is_done" is set to "1"
+    $context->param({ 'test_job_is_done' => '0' });
 
-	$context->param('test', time());
+    $context->param('test', time());
 
-	if ($action eq 'crash') {
-	    ##! 16: 'Crash on request'
-	    OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TEST_CRASHED',
+    if ($action eq 'crash') {
+        ##! 16: 'Crash on request'
+        OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TEST_CRASHED',
        );
 
-	} elsif ($action eq 'fatal_err') {
-	    ##! 16: 'fatal error on request'
-	    OpenXPKI::Server::Workflow::Pause->throw(
-	       cause => 'a manually triggered pause - this should NEVER happen in real code. throws an exception in OpenXPKI::Server::Workflow::execute_action()',
+    } elsif ($action eq 'fatal_err') {
+        ##! 16: 'fatal error on request'
+        OpenXPKI::Server::Workflow::Pause->throw(
+           cause => 'a manually triggered pause - this should NEVER happen in real code. throws an exception in OpenXPKI::Server::Workflow::execute_action()',
        );
 
-	} elsif ($action eq 'pause') {
-	    ##! 16: 'Pause on request '
-	    $self->pause($pause_cause);
+    } elsif ($action eq 'pause') {
+        ##! 16: 'Pause on request '
+        $self->pause($pause_cause);
 
-	} elsif ($action eq 'sleep') {
+    } elsif ($action eq 'sleep') {
         ##! 16: 'Pause on request '
         sleep(  $self->param('sleep') || 15 );
     }
 
-	#if pause or crash is given, we should never reach this part:
-	##! 1: 'Workflow Test: passed all hurdles ...execute my job';
-	$context->param({ 'test_job_is_done' => '1' });
+    #if pause or crash is given, we should never reach this part:
+    ##! 1: 'Workflow Test: passed all hurdles ...execute my job';
+    $context->param({ 'test_job_is_done' => '1' });
 }
 
 sub resume{
@@ -103,8 +103,8 @@ Retry 5 times with a 15 minute pause interval and terminate workflow with
 FAILURE state if the retries are exceeded.
 
   <action name="I18N_OPENXPKI_WF_ACTION_TEST_ACTIVITY"
- 	class="OpenXPKI::Server::Workflow::Activity::WorkflowTest"
- 	retry_count="5" retry_interval="+0000000015" autofail="yes">
+     class="OpenXPKI::Server::Workflow::Activity::WorkflowTest"
+     retry_count="5" retry_interval="+0000000015" autofail="yes">
   </action>
 
 Retry Interval is a OpenXPKI::DateTime specification

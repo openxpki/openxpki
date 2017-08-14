@@ -38,10 +38,10 @@ around BUILDARGS => sub {
 
     if (! -d $dbpath) {
         OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_INIT_TASK_GIT_DBPATH_DOES_NOT_EXIST",
-		params  => {
-		    dbpath => $dbpath,
-		});
+        message => "I18N_OPENXPKI_SERVER_INIT_TASK_GIT_DBPATH_DOES_NOT_EXIST",
+        params  => {
+            dbpath => $dbpath,
+        });
     }
 
     my $cv = Connector::Proxy::Config::Versioned->new(
@@ -52,10 +52,10 @@ around BUILDARGS => sub {
 
     if (!$cv) {
         OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_SERVER_INIT_TASK_CONFIG_LAYER_NOT_INITIALISED",
-		params  => {
-		    dbpath => $dbpath,
-		});
+        message => "I18N_OPENXPKI_SERVER_INIT_TASK_CONFIG_LAYER_NOT_INITIALISED",
+        params  => {
+            dbpath => $dbpath,
+        });
     }
     ##! 16: "Init config system - head version " . $cv->version()
     return $class->$orig( { BASECONNECTOR => $cv, _head_version => $cv->version() } );
