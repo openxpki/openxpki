@@ -44,12 +44,12 @@ sub login_step {
 
         return (undef, undef,
             {
-		SERVICE_MSG => "GET_X509_LOGIN",
-		PARAMS      => {
+        SERVICE_MSG => "GET_X509_LOGIN",
+        PARAMS      => {
                     NAME        => $self->{NAME},
                     DESCRIPTION => $self->{DESC},
                     CHALLENGE   => $challenge,
-	        },
+            },
             },
         );
     }
@@ -112,8 +112,8 @@ sub login_step {
         # Looks like firefox adds \r to the p7
         $pkcs7 =~ s/\r//g;
         my $validate = CTX('api')->validate_certificate({
-        	PKCS7 => $pkcs7,
-        	ANCHOR => $self->trust_anchors(),
+            PKCS7 => $pkcs7,
+            ANCHOR => $self->trust_anchors(),
         });
 
         return $self->_validation_result( $validate );

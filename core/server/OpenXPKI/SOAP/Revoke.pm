@@ -18,7 +18,7 @@ my $log = $main::config->logger();
 
 $log->info("SOAP interface NG initialized ");
 
-#$log->debug('Env ' . Dumper \%ENV);
+#$log->trace('Env ' . Dumper \%ENV);
 
 sub __dispatch_revoke {
 
@@ -127,23 +127,23 @@ sub __dispatch_revoke {
             invalidity_time => 0,
         );
 
-        $log->debug( "WF parameters: " . Dumper \%param );
+        $log->trace( "WF parameters: " . Dumper \%param );
 
         $workflow = $client->handle_workflow({
             TYPE => $workflow_type,
             PARAMS => \%param
         });
 
-        $log->debug( 'Workflow info '  . Dumper $workflow );
+        $log->trace( 'Workflow info '  . Dumper $workflow );
     };
 
     my $res;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $log->error("Unable to create workflow: ". $exc->message );
         $res = { error => $exc->message, pid => $$ };
-    } elsif ($EVAL_ERROR) {
+    } elsif (my $eval_err = $EVAL_ERROR) {
         my $ee = $client->last_error();
-        $log->error("Unable to create workflow: ". $EVAL_ERROR );
+        $log->error("Unable to create workflow: ". $eval_err );
         if ($ee) {
             $res = { error => $ee, pid => $$ };
         } else {

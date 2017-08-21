@@ -88,7 +88,7 @@ sub _init_backend {
             $self->logger()->debug('First session reinit with id ' . ($backend_id || 'init'));
             $client->init_session({ SESSION_ID => $backend_id });
         };
-        if ($EVAL_ERROR) {
+        if (my $eval_err = $EVAL_ERROR) {
             my $exc = OpenXPKI::Exception->caught();
             if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
                 $self->logger()->info('Backend session was gone - start a new one');
@@ -97,8 +97,8 @@ sub _init_backend {
                 $client->init_session({ SESSION_ID => undef });
                 $self->_status({ level => 'warn', i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
             } else {
-                $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
-                $self->logger()->trace($EVAL_ERROR);
+                $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
+                $self->logger()->trace($eval_err);
                 die "Backend communication problem";
             }
         }
@@ -234,7 +234,7 @@ sub __load_class {
     my %extra;
     if ($param) {
         %extra = split /!/, $param;
-        $self->logger()->debug("Found extra params " . Dumper \%extra );
+        $self->logger()->trace("Found extra params " . Dumper \%extra );
     }
 
     $self->logger()->debug("Loading handler class $class");
@@ -576,7 +576,7 @@ sub handle_login {
             # Check for MOTD
             my $motd = $self->backend()->send_receive_command_msg( 'get_motd' );
             if (ref $motd->{PARAMS} eq 'HASH') {
-                $self->logger()->debug('Got MOTD: '. Dumper $motd->{PARAMS} );
+                $self->logger()->trace('Got MOTD: '. Dumper $motd->{PARAMS} );
                 $self->session()->param('motd', $motd->{PARAMS} );
             }
 
@@ -585,8 +585,8 @@ sub handle_login {
                 push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
             }
 
-            $self->logger()->debug('Got session info: '. Dumper $reply->{PARAMS});
-            $self->logger()->debug('CGI Header ' . Dumper \@main::header );
+            $self->logger()->trace('Got session info: '. Dumper $reply->{PARAMS});
+            $self->logger()->trace('CGI Header ' . Dumper \@main::header );
 
             $result->init_index();
             return $result->render();
@@ -595,7 +595,7 @@ sub handle_login {
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR') {
 
-        $self->logger()->debug('Server Error Msg: '. Dumper $reply);
+        $self->logger()->trace('Server Error Msg: '. Dumper $reply);
 
         # Failure here is likely a wrong password
         if ($reply->{'LIST'} && $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {

@@ -85,7 +85,7 @@ sub set_tmpfile
 
     foreach my $key (keys %{$keys})
     {
-	push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
+    push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
 
         $self->{$key."FILE"} = $keys->{$key};
     }
@@ -98,15 +98,15 @@ sub get_tmpfile
 
     if (scalar(@_) == 0) {
         my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
-	push @{$self->{CLEANUP}->{FILE}}, $filename;
-	return $filename;
+    push @{$self->{CLEANUP}->{FILE}}, $filename;
+    return $filename;
     }
     else
     {
-	while (my $arg = shift) {
+    while (my $arg = shift) {
             my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
-	    $self->set_tmpfile($arg => $filename);
-	}
+        $self->set_tmpfile($arg => $filename);
+    }
     }
 }
 
@@ -117,7 +117,7 @@ sub set_env
 
     foreach my $key (keys %{$keys})
     {
-	push @{$self->{CLEANUP}->{ENV}}, $key;
+    push @{$self->{CLEANUP}->{ENV}}, $key;
         $ENV{$key} = $keys->{$key};
     }
     return 1;
@@ -132,9 +132,9 @@ sub cleanup
     foreach my $file (@{$self->{CLEANUP}->{FILE}})
     {
         if (-e $file)
-	{
-	    unlink $file;
-	}
+    {
+        unlink $file;
+    }
         if (-e $file)
         {
             OpenXPKI::Exception->throw (

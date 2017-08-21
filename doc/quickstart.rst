@@ -31,7 +31,12 @@ or ubuntu *trusty (14.04 LTS)* (those *DONT* work on recent Xenial 16.04!) ::
 
 To avoid an "untrusted package" warning, you should add our package signing key (works only on debian yet)::
 
-    wget http://packages.openxpki.org/debian/Release.key -O - | apt-key add -
+    wget https://packages.openxpki.org/debian/Release.key -O - | apt-key add -
+
+The https connection is protected by a Let's Encrypt certificate but if you want to validate the key on your own, the fingerprint is::
+
+    gpg --print-md sha256 Release.key 
+    Release.key: 78FE9779 A10D64CA 3CBB8D4C CE1DE44C 1AC69A93 FF2EFCF9 3AADBEC9 D3378F7B
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 

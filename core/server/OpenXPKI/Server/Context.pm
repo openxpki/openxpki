@@ -22,21 +22,20 @@ my $context = {
     initialized => 0,
 
     exported => {
-    	# always created by this package
+        # always created by this package
         config           => undef,
-        watchdog         => undef,
         workflow_factory => undef,
-    	crypto_layer     => undef,
-    	pki_realm        => undef,
+        crypto_layer     => undef,
+        pki_realm        => undef,
         pki_realm_by_cfg => undef,
-    	volatile_vault   => undef,
-    	log              => undef,
-    	dbi              => undef,
-    	dbi_log          => undef,
+        volatile_vault   => undef,
+        log              => undef,
+        dbi              => undef,
+        dbi_log          => undef,
 
-    	# user-settable
-    	api            => undef,
-    	server         => undef,
+        # user-settable
+        api            => undef,
+        server         => undef,
         acl            => undef,
         session        => undef,
         authentication => undef,
@@ -58,8 +57,8 @@ sub CTX {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_NOT_INITIALIZED",
             params => { 'objects' => join ":", @objects },
-	        log => undef, # do not log exception
-	    );
+            log => undef, # do not log exception
+        );
     }}
 
     # TODO: add access control? (idea: limit access to this method to
@@ -68,19 +67,19 @@ sub CTX {
 
     my @return;
     foreach my $object (@objects) {
-	    OpenXPKI::Exception->throw (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_FOUND",
             params  => {OBJECT => $object},
-    		log => undef, # do not log exception message
-		) unless exists $context->{exported}->{$object};
+            log => undef, # do not log exception message
+        ) unless exists $context->{exported}->{$object};
 
-	    OpenXPKI::Exception->throw (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_CONTEXT_CTX_OBJECT_NOT_DEFINED",
             params  => {OBJECT => $object},
             log => undef, # do not log exception message
-		) unless defined $context->{exported}->{$object};
+        ) unless defined $context->{exported}->{$object};
 
-    	push @return, $context->{exported}->{$object};
+        push @return, $context->{exported}->{$object};
     }
 
     return @return if wantarray;
@@ -118,39 +117,39 @@ sub setcontext {
     ##! 16: 'force: ' . $force
 
     if (not $context->{initialized}) {
-	   $context->{initialized} = 1;
+       $context->{initialized} = 1;
     }
 
     foreach my $key (keys %{$params}) {
-	### setting $key in context...
-	if (! exists $context->{exported}->{$key} ) {
-	    ### unknown key...
-	    OpenXPKI::Exception->throw (
+    ### setting $key in context...
+    if (! exists $context->{exported}->{$key} ) {
+        ### unknown key...
+        OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ILLEGAL_ENTRY",
                 params  => {NAME => $key},
             );
-	}
+    }
 
-	### already defined?
-	if (defined ($context->{exported}->{$key}) && (! $force)) {
-	    ### yes, bail out
-	    OpenXPKI::Exception->throw (
+    ### already defined?
+    if (defined ($context->{exported}->{$key}) && (! $force)) {
+        ### yes, bail out
+        OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_ALREADY_DEFINED",
                 params  => {NAME => $key},
             );
-	}
+    }
 
-	##! 128: 'trying to set value for key: ' . $key
-	##! 128: 'value: ' . Dumper $params->{$key}
-	if (! defined $params->{$key}) {
-	    OpenXPKI::Exception->throw (
+    ##! 128: 'trying to set value for key: ' . $key
+    ##! 128: 'value: ' . Dumper $params->{$key}
+    if (! defined $params->{$key}) {
+        OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_CONTEXT_SETCONTEXT_UNDEFINED_VALUE",
                 params  => {NAME => $key},
             );
-	}
+    }
 
-	### setting internal state...
-	$context->{exported}->{$key} = $params->{$key};
+    ### setting internal state...
+    $context->{exported}->{$key} = $params->{$key};
     }
 
     return 1;
@@ -218,7 +217,7 @@ via setcontext().
 
 =over
 
-=item *	api
+=item *    api
 
 =item * server
 

@@ -33,8 +33,8 @@ use OpenXPKI::Server::Context qw( CTX );
     my %token_of           :ATTR; # a token for random numbers + prime test
 
     sub BUILD {
-	my ($self, $ident, $arg_ref) = @_;
-	if (defined $arg_ref && defined $arg_ref->{QUORUM}) {
+    my ($self, $ident, $arg_ref) = @_;
+    if (defined $arg_ref && defined $arg_ref->{QUORUM}) {
             if (defined $arg_ref->{QUORUM}->{N} && defined $arg_ref->{QUORUM}->{K}) {
                 $n_of{$ident} = $arg_ref->{QUORUM}->{N};
                 $k_of{$ident} = $arg_ref->{QUORUM}->{K};
@@ -44,7 +44,7 @@ use OpenXPKI::Server::Context qw( CTX );
                     message => 'I18N_OPENXPKI_CRYPTO_SECRET_SPIT_N_OR_K_MISSING',
                 );
             }
-	}
+    }
         else {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_QUORUM_MISSING",
@@ -106,9 +106,9 @@ use OpenXPKI::Server::Context qw( CTX );
     }
 
     sub set_secret {
-	my $self    = shift;
-	my $ident   = ident $self;
-	my $share   = shift;
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $share   = shift;
 
         if ($share eq '') {
             OpenXPKI::Exception->throw(
@@ -128,15 +128,15 @@ use OpenXPKI::Server::Context qw( CTX );
                 [scalar @{$received_shares_of{$ident}}]
                 = $share;
         }
-	return 1;
+    return 1;
     }
 
     sub is_complete {
-	my $self = shift;
-	my $ident = ident $self;
-	my $arg = shift;
+    my $self = shift;
+    my $ident = ident $self;
+    my $arg = shift;
 
-	if (defined $received_shares_of{$ident} && ($k_of{$ident} <= scalar @{$received_shares_of{$ident}})) {
+    if (defined $received_shares_of{$ident} && ($k_of{$ident} <= scalar @{$received_shares_of{$ident}})) {
             return 1;
         }
         else {
@@ -145,13 +145,13 @@ use OpenXPKI::Server::Context qw( CTX );
     }
 
     sub get_secret {
-	my $self  = shift;
-	my $ident = ident $self;
+    my $self  = shift;
+    my $ident = ident $self;
 
         if (defined $coefficient_of{$ident}) {
             # this is during the phase where the secret is created initially
             # thus we can just return a[0] in uppercase hex
-	    return uc(substr($coefficient_of{$ident}[0]->as_hex(), 2));
+        return uc(substr($coefficient_of{$ident}[0]->as_hex(), 2));
         }
         else { # we have to reconstruct the secret
             if ($self->is_complete()) {
@@ -185,7 +185,7 @@ use OpenXPKI::Server::Context qw( CTX );
             COMMAND       => 'create_random',
             RETURN_LENGTH => $byte_length,
             RANDOM_LENGTH => $byte_length,
-	    INCLUDE_PADDING => 1,
+        INCLUDE_PADDING => 1,
         });
 
         my $secret_data = decode_base64($random);

@@ -60,8 +60,8 @@ while (my $cgi = CGI::Fast->new()) {
     my %global = %{$conf->{global}};
     my %auth   = %{$conf->{auth}};
 
-    $log->debug('Global ' . Dumper \%global );
-    $log->debug('Auth ' . Dumper \%auth );
+    $log->trace('Global ' . Dumper \%global );
+    $log->trace('Auth ' . Dumper \%auth );
 
     my $client = OpenXPKI::Client::SC->new({
         session => $session_front,

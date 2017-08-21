@@ -28,15 +28,15 @@ sub _init
 
     # propagate workflow condition parametrisation to our object
     foreach my $arg (@parameters) {
-	if (defined $params->{$arg}) {
-	    $self->$arg( $params->{$arg} );
-	}
+    if (defined $params->{$arg}) {
+        $self->$arg( $params->{$arg} );
+    }
     }
     if (! (defined $self->context_key() && defined $self->condition())) {
-	##! 16: 'error: no conditions defined'
-	configuration_error
-	    "Missing parameters in ",
-	    "declaration of condition ", $self->name;
+    ##! 16: 'error: no conditions defined'
+    configuration_error
+        "Missing parameters in ",
+        "declaration of condition ", $self->name;
     }
 }
 
@@ -49,13 +49,13 @@ sub evaluate
 
     # FIXME - I do not see a reason why we need to map all the stuff first...
     foreach my $arg (@parameters) {
-	# access workflow context instead of literal value if value starts
-	# with a $
-	if (defined $self->$arg() && ($self->$arg() =~ m{ \A \$ (.*) }xms)) {
-	    my $wf_key = $1;
-	    $self->$arg( $context->param($wf_key) )
-	}
-	##! 64: 'param: ' . $arg . '; value: ' . $self->$arg()
+    # access workflow context instead of literal value if value starts
+    # with a $
+    if (defined $self->$arg() && ($self->$arg() =~ m{ \A \$ (.*) }xms)) {
+        my $wf_key = $1;
+        $self->$arg( $context->param($wf_key) )
+    }
+    ##! 64: 'param: ' . $arg . '; value: ' . $self->$arg()
     }
 
     my $context_key = $self->context_key();
@@ -68,31 +68,31 @@ sub evaluate
 
     if ($condition eq 'exists') {
 
-	    if (! defined $context_value) {
-	        condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_DOES_NOT_EXIST';
-	    }
+        if (! defined $context_value) {
+            condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_DOES_NOT_EXIST';
+        }
 
     } elsif ($condition eq 'notnull') {
 
-	   if (! defined $context_value || ($context_value eq '')) {
-	       condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_EMPTY';
-	   }
+       if (! defined $context_value || ($context_value eq '')) {
+           condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_VALUE_EMPTY';
+       }
 
     } elsif ($condition eq 'equals') {
 
-	   if (! defined $context_value || $context_value ne $self->context_value()) {
-	       condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_EQUALITY_MISMATCH';
-	   }
+       if (! defined $context_value || $context_value ne $self->context_value()) {
+           condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_EQUALITY_MISMATCH';
+       }
 
     } elsif ($condition eq 'regex') {
 
-	   my $regex = qr/$self->context_value()/ms;
-	   if (! defined $context_value || $context_value =~ /$regex/) {
-	       condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_REGEX_MISMATCH';
-	   }
+       my $regex = qr/$self->context_value()/ms;
+       if (! defined $context_value || $context_value =~ /$regex/) {
+           condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_CONTEXT_REGEX_MISMATCH';
+       }
 
     } else {
-	   condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_INVALID_CONDITION';
+       condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WORKFLOWCONTEXT_INVALID_CONDITION';
     }
 
     return 1;

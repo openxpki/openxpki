@@ -175,7 +175,7 @@ sub execute {
     ##! 32: 'Targets ' . Dumper \@target
     foreach my $target (@target) {
         eval{ $config->set( [ @path, $target, $publish_key ], $data, $param ); };
-        if ($EVAL_ERROR) {
+        if (my $eval_err = $EVAL_ERROR) {
             if ($on_error eq 'queue') {
                 push @failed, $target;
                 CTX('log')->application()->info("Entity pubication failed for target $target, requeuing");
@@ -188,7 +188,7 @@ sub execute {
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
                     params => {
                         TARGET => $target,
-                        ERROR => $EVAL_ERROR
+                        ERROR => $eval_err
                     }
                 );
             }

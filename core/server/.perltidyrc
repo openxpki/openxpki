@@ -1,0 +1,17 @@
+-b          # Replace files inline
+-bext='/'   # Delete backups if all went fine
+-i=4        # Indent level is 4 cols
+-ci=4       # Continuation indent is 4 cols
+-l=78       # Max line width is 78 cols
+-pt=2       # High parentheses tightness
+-bt=1       # Medium brace tightness
+-sbt=2      # High square bracket tightness
+-bbt=0      # Low block brace tightness
+-nsfs       # No space before semicolons in for-loops
+-nolq       # Don't outdent long quoted strings
+-msc=1      # Don't add many extra spaces before side comments
+-iscl       # Don't break side comments (i.e. ignore max line width in this case)
+-ncsc       # Don't add comments like "## end sub message"
+-nsot       # Don't modify stacking of opening tokens
+-nsct       # Don't modify stacking of closing tokens
+-kis        # Keep interior semicolons (i.e. don't touch multiple statements in one line)

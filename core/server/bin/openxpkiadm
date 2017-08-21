@@ -10,7 +10,6 @@ use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
-use Proc::ProcessTable;
 
 # For the password hasher
 use IO::Prompt;
@@ -1400,8 +1399,8 @@ if (ref $EVAL_ERROR eq "OpenXPKI::Exception") {
     map { print "   $_: " . $EVAL_ERROR->params->{$_} ."\n";  } keys %{$EVAL_ERROR->params};
     print "\n";
     exit 1;
-} elsif ($EVAL_ERROR) {
-    die $EVAL_ERROR;
+} elsif (my $eval_err = $EVAL_ERROR) {
+    die $eval_err;
     print "\n";
 } elsif ($ret) {
     print "\n";

@@ -165,7 +165,7 @@ sub execute {
                         message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDIN_FAILED',
                         params  => {
                             'EXIT_STATUS' => $command->exit_status(),
-#			    'ERROR' => $stderr,
+#                'ERROR' => $stderr,
                         },
                     );
                 }
@@ -203,7 +203,7 @@ sub execute {
                         message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED',
                         params  => {
                             'EXIT_STATUS' => $command->exit_status(),
-#			    'ERROR' => $stderr,
+#                'ERROR' => $stderr,
                         },
                     );
                 }
@@ -243,7 +243,7 @@ sub execute {
                     message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_WAIT_FAILED',
                     params  => {
                         EVAL_ERROR => $EVAL_ERROR,
-#			'ERROR' => $stderr,
+#            'ERROR' => $stderr,
                     },
                 );
             }
@@ -261,7 +261,7 @@ sub execute {
                     message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED',
                     params  => {
                         'EXIT_STATUS' => $command->exit_status(),
-#			'ERROR' => $stderr,
+#            'ERROR' => $stderr,
                     },
                 );
             }

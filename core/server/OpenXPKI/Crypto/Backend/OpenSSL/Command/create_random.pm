@@ -63,7 +63,7 @@ sub get_result
     ## remove trailing =
     $random =~ s/\n//gs;
     if (! (exists $self->{INCLUDE_PADDING} && $self->{INCLUDE_PADDING})) {
-	$random =~ s/=*$//gs;
+    $random =~ s/=*$//gs;
     }
 
     if ($self->{RETURN_LENGTH} and not $self->{RANDOM_LENGTH}) {

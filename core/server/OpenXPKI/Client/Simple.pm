@@ -122,7 +122,7 @@ sub _build_client {
         my $realm = $self->_config()->{'realm'};
         if (! $realm ) {
             $log->fatal("Found more than one realm but no realm is specified");
-            $log->debug("Realms found:" . Dumper (keys %{$reply->{PARAMS}->{PKI_REALMS}}));
+            $log->trace("Realms found:" . Dumper (keys %{$reply->{PARAMS}->{PKI_REALMS}}));
             die "No realm specified";
         }
         $log->debug("Selecting realm $realm");
@@ -134,7 +134,7 @@ sub _build_client {
         my $auth = $self->auth();
         if (! $auth || !$auth->{stack}) {
             $log->fatal("Found more than one auth stack but no stack is specified");
-            $log->debug("Stacks found:" . Dumper (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}));
+            $log->trace("Stacks found:" . Dumper (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}));
             die "No auth stack specified";
         }
         $log->debug("Selecting auth stack ". $auth->{stack});
@@ -158,7 +158,7 @@ sub _build_client {
 
     if ($reply->{SERVICE_MSG} ne 'SERVICE_READY') {
         $log->fatal("Initialization failed - message is " . $reply->{SERVICE_MSG});
-        $log->debug('Last reply: ' .Dumper $reply);
+        $log->trace('Last reply: ' .Dumper $reply);
         die "Initialization failed. Stopped";
     }
     return $client;
@@ -189,7 +189,7 @@ sub run_command {
             $message = 'unknown error';
         }
         $self->logger()->error($message);
-        $self->logger()->debug(Dumper $reply);
+        $self->logger()->trace(Dumper $reply);
         $self->last_error($message);
         die "Error running command: $message";
     }
@@ -244,7 +244,7 @@ sub handle_workflow {
     if ($params->{ACTIVITY} && $params->{ID}) {
 
         $self->logger()->info(sprintf('execute workflow action %s on %01d', $params->{ACTIVITY}, $params->{ID}));
-        $self->logger()->debug('workflow params:  '. Dumper $params->{PARAMS});
+        $self->logger()->trace('workflow params:  '. Dumper $params->{PARAMS});
         $reply = $self->run_command('execute_workflow_activity',{
             ID => $params->{ID},
             ACTIVITY => $params->{ACTIVITY},
@@ -292,7 +292,7 @@ sub handle_workflow {
         die "Neither workflow id nor type given";
     }
 
-    $self->logger()->debug('Result of workflow action: ' . Dumper $reply);
+    $self->logger()->trace('Result of workflow action: ' . Dumper $reply);
 
     return $reply->{WORKFLOW};
 }
@@ -326,15 +326,15 @@ sub __reinit_session {
     eval {
         $client->init_session({ SESSION_ID => $old_session });
     };
-    if ($EVAL_ERROR) {
+    if (my $eval_err = $EVAL_ERROR) {
         my $exc = OpenXPKI::Exception->caught();
         if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
             # The session has gone - start a new one - might happen if the client was idle too long
             $client->init_session({ SESSION_ID => undef });
             $self->logger()->info('Backend session was gone - start a new one');
         } else {
-            $self->logger()->error('Error creating backend session: ' . $EVAL_ERROR->{message});
-            $self->logger()->trace($EVAL_ERROR);
+            $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
+            $self->logger()->trace($eval_err);
             die "Backend communication problem";
         }
     }

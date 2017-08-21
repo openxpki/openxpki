@@ -122,7 +122,7 @@ sub _init_carddata {
     my $cardData = {};
     if ($session->param('cardData')) {
         $cardData = $session->param('cardData');
-        $self->logger()->debug('Restore card data from session: ' . Dumper $cardData); 
+        $self->logger()->trace('Restore card data from session: ' . Dumper $cardData);
     }
 
     if ( ! defined $cardID ) {
@@ -163,9 +163,9 @@ sub _init_carddata {
     if ($ChipSerial) {
         $cardData->{'ChipSerial'} = $ChipSerial;
     }
-    
-    $self->logger()->debug('Card Data ' . Dumper $cardData);
-    
+
+    $self->logger()->trace('Card Data ' . Dumper $cardData);
+
     $session->param('cardData', $cardData );
 
     return $cardData;

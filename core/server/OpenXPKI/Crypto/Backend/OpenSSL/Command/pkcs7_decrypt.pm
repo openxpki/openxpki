@@ -61,11 +61,11 @@ sub get_command
             $self->get_tmpfile ('KEY', 'CERT');
             $self->write_file (FILENAME => $self->{KEYFILE},
                                CONTENT  => $self->{KEY},
-	                       FORCE    => 1);
+                           FORCE    => 1);
 
             $self->write_file (FILENAME => $self->{CERTFILE},
                                CONTENT  => $self->{CERT},
-	                       FORCE    => 1);
+                           FORCE    => 1);
     } else {
             ##! 16: 'external signature '
             ## CA external signature
@@ -101,7 +101,7 @@ sub get_command
 
     $self->write_file (FILENAME => $self->{PKCS7FILE},
                        CONTENT  => $self->{PKCS7},
-	               FORCE    => 1);
+                   FORCE    => 1);
 
     ## build the command
 

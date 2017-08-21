@@ -335,12 +335,12 @@ Examples:
   $offset->add( months => 2 );
 
   my $somedate = OpenXPKI::DateTime::get_validity(
-	    {
-		REFERENCEDATE => $offset,
-		VALIDITY => '+0205',
-		VALIDITYFORMAT => 'relativedate',
-	    },
-	);
+        {
+        REFERENCEDATE => $offset,
+        VALIDITY => '+0205',
+        VALIDITYFORMAT => 'relativedate',
+        },
+    );
   print $somedate->datetime()
 
 After this has been executed a date should be printed that is 2 years

@@ -10,7 +10,6 @@ use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
-use Proc::ProcessTable;
 
 use OpenXPKI::VERSION;
 

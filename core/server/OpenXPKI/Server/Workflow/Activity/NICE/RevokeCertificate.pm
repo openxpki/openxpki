@@ -23,20 +23,20 @@ sub execute {
     ##! 32: 'context: ' . Dumper( $context )
 
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
-	my $crr_serial = $context->param('crr_serial');
-	my $dbi = CTX('dbi');
+    my $crr_serial = $context->param('crr_serial');
+    my $dbi = CTX('dbi');
 
     ##! 16: 'searching for crr serial ' . $crr_serial
-	my $crr = $dbi->select_one(
-	    from => 'crr',
-	    columns => [ 'identifier' ],
-		where => { crr_key => $crr_serial },
+    my $crr = $dbi->select_one(
+        from => 'crr',
+        columns => [ 'identifier' ],
+        where => { crr_key => $crr_serial },
     );
 
     if (! defined $crr) {
-	   OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_CRR_NOT_FOUND_IN_DATABASE',
-	       params => { crr_serial => $crr_serial }
+       OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_NICE_CRR_NOT_FOUND_IN_DATABASE',
+           params => { crr_serial => $crr_serial }
        );
     }
 

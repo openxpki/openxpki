@@ -379,6 +379,7 @@ WriteMakefile(
         'Test::Pod'                     => '1.00',
         'Text::CSV_XS'                  => '0.23',
         'Time::HiRes'                   => '1',
+        'Try::Tiny'                     => '0.28',
         'Workflow'                      => '0.27',
         'XML::Simple'                   => '1',
         'YAML::Tiny'                    => '1.69',

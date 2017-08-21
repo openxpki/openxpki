@@ -476,7 +476,7 @@ sub __read_hash {
                     ACTUAL_LENGTH  => length($hashkey),
                     DENOTED_LENGTH => $hashkeylength,
                     SCALAR_VALUE   => $hashkey,
-		    MSG            => $msg
+            MSG            => $msg
                 }
             );
         }

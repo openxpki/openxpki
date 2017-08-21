@@ -27,33 +27,33 @@ sub execute {
     ##! 16: 'using config at ' . $config_path
 
     if (!$config_path) {
-    	configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_CONFIG_PATH' );
+        configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_CONFIG_PATH' );
     }
 
     my $config = CTX('config')->get_hash( $config_path );
 
-	##! 32: 'Config is ' . Dumper $config
+    ##! 32: 'Config is ' . Dumper $config
 
     if (!$config->{'target'}) {
-    	configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_TARGET_SPEC' );
+        configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_TARGET_SPEC' );
     }
 
     my $source_file = $self->param('source');
 
     if (!$source_file) {
-    	configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_SOURCEFILE' );
+        configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_SOURCEFILE' );
     }
 
-	if (! -f $source_file ) {
-		OpenXPKI::Exception->throw (
-			message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_SOURCEFILE_NOT_EXISTS',
-			params => { SOURCE => $source_file }
-		);
-	}
+    if (! -f $source_file ) {
+        OpenXPKI::Exception->throw (
+            message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_SOURCEFILE_NOT_EXISTS',
+            params => { SOURCE => $source_file }
+        );
+    }
 
     my $target_file = $self->param('target');
 
-	my %filehandles;
+    my %filehandles;
     my $stdout = File::Temp->new();
     $filehandles{stdout} = \*$stdout;
 
@@ -65,58 +65,57 @@ sub execute {
 
     push @cmd, ($config->{'command'} || '/usr/bin/scp');
 
-	push @cmd, '-P'.$config->{'port'} if ($config->{'port'});
+    push @cmd, '-P'.$config->{'port'} if ($config->{'port'});
     push @cmd, '-F'.$config->{'sshconfig'} if ($config->{'sshconfig'});
-	push @cmd, '-i'.$config->{'identity'} if ($config->{'identity'});
+    push @cmd, '-i'.$config->{'identity'} if ($config->{'identity'});
 
     push @cmd, $source_file;
 
     # If we have an explicit filename, we append this to the base target
     if ($target_file) {
-    	my $base = $config->{'target'};
-    	if ($base != /\/$/) {
-    		$base .= '/';
-    	}
-    	push @cmd, $base.$target_file;
+        my $base = $config->{'target'};
+        if ($base != /\/$/) {
+            $base .= '/';
+        }
+        push @cmd, $base.$target_file;
     } else {
         push @cmd, $config->{'target'};
     }
 
-	##! 16: 'Command ' . join " ",@cmd
+    ##! 16: 'Command ' . join " ",@cmd
 
     my $command = Proc::SafeExec->new(
-	{
-	    exec => \@cmd,
-	    %filehandles,
-	});
+    {
+        exec => \@cmd,
+        %filehandles,
+    });
 
-	#TODO - improve handling of temporary errors
+    #TODO - improve handling of temporary errors
     eval{
-		local $SIG{ALRM} = sub { die "alarm\n" };
-		alarm ($config->{'timeout'} || 30);
-		$command->wait();
+        local $SIG{ALRM} = sub { die "alarm\n" };
+        alarm ($config->{'timeout'} || 30);
+        $command->wait();
 
-		if ($command->exit_status() != 0) {
-			OpenXPKI::Exception->throw (
-				message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_EXEC_ERROR',
-				params => { EXITSTATUS => $command->exit_status() }
-			);
-		}
+        if ($command->exit_status() != 0) {
+            OpenXPKI::Exception->throw (
+                message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_EXEC_ERROR',
+                params => { EXITSTATUS => $command->exit_status() }
+            );
+        }
     };
-	if ($EVAL_ERROR) {
-		# possibly a temporary network error, pause and try again
-		my $ee = $EVAL_ERROR;
-		##! 16: 'Eval said ' . $ee
-		CTX('log')->application()->info('Transfer failed, do pause' );
+    if (my $eval_err = $EVAL_ERROR) {
+        # possibly a temporary network error, pause and try again
+        ##! 16: 'Eval said ' . $eval_err
+        CTX('log')->application()->info('Transfer failed, do pause' );
 
-		$self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');
-	}
+        $self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');
+    }
 
-	alarm 0;
+    alarm 0;
 
-	if ($config->{'unlink'}) {
-		unlink $source_file;
-	}
+    if ($config->{'unlink'}) {
+        unlink $source_file;
+    }
 
     CTX('log')->application()->info('Transfer of file successful' );
 
@@ -154,8 +153,8 @@ optional and appended to the target given in the transfer config.
 
 The configuration of the transport layer is done via the config layer:
 
-	target: upload@localhost:~/incoming/
-	command: /my/local/version/of/bin/scp
+    target: upload@localhost:~/incoming/
+    command: /my/local/version/of/bin/scp
     port: 22
     identity: /home/pkiadm/id_scp
     sshconfig: /home/pkiadm/ssh_copy_config

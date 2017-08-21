@@ -125,9 +125,9 @@ sub handle_server_personalization {
         eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
-        if ($EVAL_ERROR) {
+        if (my $eval_err = $EVAL_ERROR) {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_ERROR_CREATE_PERSONALIZATION_WORKFLOW");
-            $log->error(sprintf('Unable to create workflow for card %s. EE: %s', $cardData->{'id_cardID'}, $EVAL_ERROR));
+            $log->error(sprintf('Unable to create workflow for card %s. EE: %s', $cardData->{'id_cardID'}, $eval_err));
             return 1;
         }
 
@@ -188,10 +188,11 @@ sub handle_server_personalization {
                 'login_ids' => $self->serializer()->serialize( [ $user ] )
             }
         };
-        
-        $log->debug('Execute select_useraccount with params ' . Dumper $params );
-        
-        eval {    
+
+        $log->debug('Execute select_useraccount');
+        $log->trace('Parameters: ' . Dumper $params );
+
+        eval {
             $wf_info = $self->_client->handle_workflow( $params );
         };
         if ($EVAL_ERROR) {
@@ -252,20 +253,20 @@ sub handle_server_personalization {
 
         $log->info("Plugin csr upload for keyid $keyid");
 
-        #	$log->debug("choosen_login". $chosenLoginID);
-        #	if ( defined $self->param('chosenLoginID') ) {
-        #		$chosenLoginID = $self->param('chosenLoginID');
-        #	}
+        #    $log->debug("choosen_login". $chosenLoginID);
+        #    if ( defined $self->param('chosenLoginID') ) {
+        #        $chosenLoginID = $self->param('chosenLoginID');
+        #    }
 
-        #	if( defined $session->param('dbntloginid') ){
-        #		eval{
-        #			  $log->info("LoginID:". $session->param('dbntloginid'});
-        #			 # $log->info("LoginID:". Dumper($session->param('dbntloginid'})));
-        #			  $log->info("LoginID:". $session->param('dbntloginid')->{0});
-        #		};
-        #		##FIXME Always use first ID regardless of number of ID'S
-        #		$chosenLoginID = $session->param('dbntloginid')->[0];
-        #	}
+        #    if( defined $session->param('dbntloginid') ){
+        #        eval{
+        #              $log->info("LoginID:". $session->param('dbntloginid'});
+        #             # $log->info("LoginID:". Dumper($session->param('dbntloginid'})));
+        #              $log->info("LoginID:". $session->param('dbntloginid')->{0});
+        #        };
+        #        ##FIXME Always use first ID regardless of number of ID'S
+        #        $chosenLoginID = $session->param('dbntloginid')->[0];
+        #    }
 
 
         # split line into 76 character long chunks
@@ -285,7 +286,7 @@ sub handle_server_personalization {
             'PARAMS'   => {
                 'pkcs10' => $pkcs10,
                 'keyid'  => $keyid,
-                #		'chosen_loginid' => $chosenLoginID
+                #        'chosen_loginid' => $chosenLoginID
             },
         };
 

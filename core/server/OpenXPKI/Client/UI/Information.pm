@@ -44,7 +44,7 @@ sub init_issuer {
     my $args = shift;
 
     my $issuers = $self->send_command( 'get_ca_list' );
-    $self->logger()->debug("result: " . Dumper $issuers);
+    $self->logger()->trace("result: " . Dumper $issuers);
 
     $self->_page({
         label => 'Issuing certificates of this Realm',

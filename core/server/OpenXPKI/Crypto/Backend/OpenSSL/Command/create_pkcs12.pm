@@ -91,16 +91,16 @@ sub get_command
 
     $self->write_file (FILENAME => $self->{KEYFILE},
                        CONTENT  => $self->{KEY},
-	               FORCE    => 1);
+                   FORCE    => 1);
     $self->write_file (FILENAME => $self->{CERTFILE},
                        CONTENT  => $self->{CERT},
-	               FORCE    => 1);
+                   FORCE    => 1);
     if (exists $self->{CHAIN} && scalar @{$self->{CHAIN}}) {
         my $chain = join("\n", @{$self->{CHAIN}});
         $self->write_file(
             FILENAME => $self->{CHAINFILE},
             CONTENT  => $chain,
-	        FORCE    => 1
+            FORCE    => 1
         );
     } else {
         $self->{CHAIN} = undef;

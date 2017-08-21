@@ -216,9 +216,9 @@ while (my $cgi = CGI::Fast->new()) {
         }
     };
 
-    if ($EVAL_ERROR) {
-       $log->error('Error creating backend client ' . $EVAL_ERROR);
-       __handle_error($cgi, $EVAL_ERROR);
+    if (my $eval_err = $EVAL_ERROR) {
+       $log->error('Error creating backend client ' . $eval_err);
+       __handle_error($cgi, $eval_err);
        next;
     }
 
@@ -277,7 +277,7 @@ while (my $cgi = CGI::Fast->new()) {
     push @header, ('-cookie', $cgi->cookie( $cookie ));
     push @header, ('-type','application/json; charset=UTF-8');
 
-    $log->debug('Init UI using backend ' . Dumper $backend_client);
+    $log->trace('Init UI using backend ' . Dumper $backend_client);
 
     my $result;
     eval {

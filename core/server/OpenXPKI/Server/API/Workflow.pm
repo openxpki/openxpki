@@ -4,16 +4,22 @@
 ## Copyright (C) 2005-2006 by The OpenXPKI Project
 
 package OpenXPKI::Server::API::Workflow;
-
 use strict;
 use warnings;
 use utf8;
-use English;
 
-use Class::Std;
-use Workflow::Factory;
+# Core modules
+use English;
 use Data::Dumper;
 
+# CPAN modules
+use Class::Std;
+use Workflow::Factory;
+use Log::Log4perl::MDC;
+use Log::Log4perl::Level;
+use Try::Tiny;
+
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
@@ -21,8 +27,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
-use Log::Log4perl::MDC;
-use Log::Log4perl::Level;
+
+
 
 sub START {
     # somebody tried to instantiate us, but we are just an
@@ -663,11 +669,11 @@ sub get_workflow_activities_params {
         my $fields = [];
         foreach my $field ($workflow->get_action_fields( $action ) ) {
             push @{ $fields }, {
-                'name'		=> $field->name(),
-                'label'		=> $field->label(),
-                'description'	=> $field->description(),
-                'type'		=> $field->type(),
-                'requirement'	=> $field->requirement(),
+                'name'        => $field->name(),
+                'label'        => $field->label(),
+                'description'    => $field->description(),
+                'type'        => $field->type(),
+                'requirement'    => $field->requirement(),
             };
         };
         push @list, $action, $fields;
@@ -1150,76 +1156,18 @@ of the forked child.
 =cut
 
 sub __execute_workflow_activity {
-
     my $self = shift;
     my $workflow = shift;
     my $wf_activity = shift;
     my $run_async = shift || '';
 
-    # fork if async is requested
-    if ($run_async) {
+    my $log = CTX('log')->workflow;
 
-        CTX('log')->workflow()->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
-                $workflow->state(), $workflow->id(), $workflow->type()));
-
-
-        my $pid;
-        my $redo_count = 5;
-        $SIG{'CHLD'} = sub { wait; };
-        while ( !defined $pid && $redo_count > 0 ) {
-            ##! 16: 'trying to fork'
-            $pid = fork();
-            ##! 16: 'pid: ' . $pid
-            if ( !defined $pid && $!{EAGAIN} ) {
-                # recoverable fork error
-                sleep 1;
-                $redo_count--;
-            }
-        }
-
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_FORK_FAILED'
-        ) unless (defined $pid);
-
-        if ( $pid != 0 ) {
-            ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
-            # parent here - noop
-            return $pid;
-        }
-        ##! 16: ' Workflow instance succesfully forked - I am the workflow'
-        # We need to unset the child reaper (waitpid) as the universal waitpid
-        # causes problems with Proc::SafeExec
-        $SIG{CHLD} = 'DEFAULT';
-
-        # Re-seed Perl random number generator
-        srand(time ^ $PROCESS_ID);
-
-        # create memory-only session for workflow if its not already
-
-        if (CTX('session')->type ne 'Memory') {
-            my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
-            $session->data->user      = CTX('session')->data->user;
-            $session->data->role      = CTX('session')->data->role;
-            $session->data->pki_realm = CTX('session')->data->pki_realm;
-
-            OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
-            Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
-        }
-
-        # append fork info to process name
-        OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
-    } else {
-        OpenXPKI::Server::__set_process_name("workflow: id %d", $workflow->id());
-    }
-
-    ##! 64: Dumper $workflow
-    eval {
-
+    my $activity = sub {
         ##! 8: 'execute activity ' . $wf_activity
 
         # This is a hack to handle simple "autorun" actions which we use to
         # create a bypass around optional actions
-
         do {
             my $last_state = $workflow->state();
             $workflow->execute_action($wf_activity);
@@ -1238,8 +1186,8 @@ sub __execute_workflow_activity {
                     );
                 }
                 $wf_activity = $action[0];
-                CTX('log')->workflow()->info(sprintf ("Found internal bypass action, leave state %s in workflow id %01d (type %s)",
-                        $workflow->state(), $workflow->id(), $workflow->type()));
+                $log->info(sprintf ("Found internal bypass action, leave state %s in workflow id %01d (type %s)",
+                    $workflow->state(), $workflow->id(), $workflow->type()));
 
             } else {
                 $wf_activity = '';
@@ -1247,78 +1195,122 @@ sub __execute_workflow_activity {
         } while( $wf_activity );
     };
 
+
+    #
+    # ASYNCHRONOUS - fork
+    #
     if ($run_async) {
-        # close open transactions if run asynchronically
-        if ($EVAL_ERROR) {
-            CTX('dbi')->rollback;
+        $log->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
+            $workflow->state(), $workflow->id(), $workflow->type()));
+
+        # FORK
+        my $pid = OpenXPKI::Daemonize->new->fork_child; # parent returns PID, child returns 0
+
+        # parent process
+        if ($pid > 0) {
+            ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
+            $log->trace("Forked workflow instance with PID $pid") if $log->is_trace;
+            return $pid;
         }
-        else {
-            CTX('dbi')->commit;
+
+        # child process
+        try {
+            ##! 16: ' Workflow instance succesfully forked - I am the workflow'
+            # append fork info to process name
+            OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
+
+            # create memory-only session for workflow if it's not already one
+            if (CTX('session')->type ne 'Memory') {
+                my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
+                $session->data->user( CTX('session')->data->user );
+                $session->data->role( CTX('session')->data->role );
+                $session->data->pki_realm( CTX('session')->data->pki_realm );
+
+                OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+                Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+            }
+
+            # run activity
+            $activity->();
+
+            # DB commits are done inside the workflow engine
         }
+        catch {
+            # DB rollback is not needed as this process will terminate now anyway
+            local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
+            if (my $exc = OpenXPKI::Exception->caught) {
+                $exc->show_trace(1);
+            }
+            # make sure the cleanup code does not die as this would escape this method
+            eval { CTX('log')->system->error($_) };
+        };
+
+        eval { CTX('dbi')->disconnect };
+
         ##! 16: 'Backgrounded workflow finished - exit child'
-        CTX('dbi')->disconnect;
         exit;
     }
 
-    if ($EVAL_ERROR) {
-        my $eval = $EVAL_ERROR;
-        CTX('log')->workflow()->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
-                $wf_activity, $workflow->id(), $workflow->type(), $eval));
+    #
+    # SYNCHRONOUS
+    #
 
+    ##! 64: Dumper $workflow
+    OpenXPKI::Server::__set_process_name("workflow: id %d", $workflow->id());
+    # run activity
+    eval { $activity->() };
+
+    if (my $eval_err = $EVAL_ERROR) {
+       $log->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
+            $wf_activity, $workflow->id(), $workflow->type(), $eval_err));
 
         OpenXPKI::Server::__set_process_name("workflow: id %d (exception)", $workflow->id());
 
-        my $log = {
-            priority => 'error',
-            facility => 'workflow',
-        };
+        my $logcfg = { priority => 'error', facility => 'workflow' };
 
         # clear MDC
         Log::Log4perl::MDC->put('wfid', undef);
         Log::Log4perl::MDC->put('wftype', undef);
 
         ## normal OpenXPKI exception
-        $eval->rethrow() if (ref $eval eq "OpenXPKI::Exception");
+        $eval_err->rethrow() if (ref $eval_err eq "OpenXPKI::Exception");
 
         ## workflow exception
         my $error = $workflow->context->param('__error');
-        if (defined $error)
-        {
+        if (defined $error) {
             if (ref $error eq '') {
                 OpenXPKI::Exception->throw (
                     message => $error,
-                    log     => $log,
+                    log     => $logcfg,
                 );
             }
-            if (ref $error eq 'ARRAY')
-            {
+            if (ref $error eq 'ARRAY') {
                 my @list = ();
-                foreach my $item (@{$error})
-                {
+                for my $item (@{$error}) {
                     eval {
-                        OpenXPKI::Exception->throw (
+                        OpenXPKI::Exception->throw(
                             message => $item->[0],
-                            params  => $item->[1]);
+                            params  => $item->[1]
+                        );
                     };
                     push @list, $EVAL_ERROR;
                 }
                 OpenXPKI::Exception->throw (
                     message  => "I18N_OPENXPKI_SERVER_API_EXECUTE_WORKFLOW_ACTIVITY_FAILED",
                     children => [ @list ],
-                    log      => $log,
+                    log      => $logcfg,
                 );
             }
         }
 
         ## unknown exception
         OpenXPKI::Exception->throw(
-            message => scalar $eval,
-            log     => $log,
+            message => scalar $eval_err,
+            log     => $logcfg,
         );
     };
 
     OpenXPKI::Server::__set_process_name("workflow: id %d (cleanup)", $workflow->id());
-
     return 0;
 }
 

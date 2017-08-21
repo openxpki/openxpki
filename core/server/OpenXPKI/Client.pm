@@ -147,9 +147,9 @@ sub collect {
         }
         die $exc->message();
     }
-    elsif ($EVAL_ERROR) {
+    elsif (my $eval_err = $EVAL_ERROR) {
         $self->set_communication_state('can_send');
-        if ($EVAL_ERROR =~ m{\A alarm }xms) {
+        if ($eval_err =~ m{\A alarm }xms) {
             # Timeout from the above alarm signal handler
             return {
                 'SERVICE_MSG' => 'ERROR',
@@ -167,7 +167,7 @@ sub collect {
                     {
                         'LABEL'  => 'I18N_OPENXPKI_CLIENT_COLLECT_EVAL_ERROR',
                         'PARAMS' => {
-                            ERROR => $EVAL_ERROR,
+                            ERROR => $eval_err,
                         },
                     },
                 ],
@@ -261,7 +261,7 @@ sub send_receive_service_msg {
     eval {
         $rc = $self->collect();
     };
-    if ($EVAL_ERROR) {
+    if (my $eval_err = $EVAL_ERROR) {
 
         # TODO - server closes socket when getting the LOGOUT command
         # which crahes the collect method, should be fixed in server, see #300
@@ -272,7 +272,7 @@ sub send_receive_service_msg {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT',
             params  => {
-                EVAL_ERROR => $EVAL_ERROR,
+                EVAL_ERROR => $eval_err,
                 STATE      => $self->get_communication_state(),
             },
         );

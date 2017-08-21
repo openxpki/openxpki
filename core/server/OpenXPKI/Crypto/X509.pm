@@ -93,11 +93,11 @@ sub __init
                        "keysize", "extensions", "openssl_subject" )
     {
         $self->{PARSED}->{BODY}->{uc($attr)}
-	= $self->{TOKEN}->get_object_function (
-	    {
-		OBJECT   => $self->{x509},
-		FUNCTION => $attr,
-	    });
+    = $self->{TOKEN}->get_object_function (
+        {
+        OBJECT   => $self->{x509},
+        FUNCTION => $attr,
+        });
         if ($attr eq 'serial') {
             # add serial in hex as well so clients do not have to convert
             # it themselves
@@ -126,29 +126,29 @@ sub __init
     ## FIXME: because it is no special character
     ## FIXME: if there is a problem with a DN parser then this
     ## FIXME: parser has a bug
-    #	## OpenSSL includes a bug in -nameopt RFC2253
-    #	## = signs are not escaped if they are normal values
-    #	my $i = 0;
-    #	my $now = "name";
-    #	while ($i < length ($ret->{DN}))
-    #	{
-    #		if (substr ($ret->{DN}, $i, 1) =~ /\\/)
-    #		{
-    #			$i++;
-    #		} elsif (substr ($ret->{DN}, $i, 1) =~ /=/) {
-    #			if ($now =~ /value/)
-    #			{
-    #				## OpenSSL forgets to escape =
-    #				$ret->{DN} = substr ($ret->{DN}, 0, $i)."\\".substr ($ret->{DN}, $i);
-    #				$i++;
-    #			} else {
-    #				$now = "value";
-    #			}
-    #		} elsif (substr ($ret->{DN}, $i, 1) =~ /[,+]/) {
-    #			$now = "name";
-    #		}
-    #		$i++;
-    #	}
+    #    ## OpenSSL includes a bug in -nameopt RFC2253
+    #    ## = signs are not escaped if they are normal values
+    #    my $i = 0;
+    #    my $now = "name";
+    #    while ($i < length ($ret->{DN}))
+    #    {
+    #        if (substr ($ret->{DN}, $i, 1) =~ /\\/)
+    #        {
+    #            $i++;
+    #        } elsif (substr ($ret->{DN}, $i, 1) =~ /=/) {
+    #            if ($now =~ /value/)
+    #            {
+    #                ## OpenSSL forgets to escape =
+    #                $ret->{DN} = substr ($ret->{DN}, 0, $i)."\\".substr ($ret->{DN}, $i);
+    #                $i++;
+    #            } else {
+    #                $now = "value";
+    #            }
+    #        } elsif (substr ($ret->{DN}, $i, 1) =~ /[,+]/) {
+    #            $now = "name";
+    #        }
+    #        $i++;
+    #    }
 
     ##################################
     ##     parse emailaddresses     ##
@@ -201,15 +201,15 @@ sub __init
                 $val =~ s/\s+$//;
                 $i++;
                 next if $val =~ /^$/;
-		if ($key eq 'X509v3 Subject Alternative Name') {
-		    # when OpenSSL encounters CSR IP Subject Alternative Names
-		    # the parsed output contains "IP Address:d.d.d.d", however
-		    # OpenSSL expects "IP:d.d.d.d" in a config file for
-		    # certificate issuance if you intend to issue a certificate
-		    # we hereby declare that "IP" is the canonical identifier
-		    # for an IP Subject Alternative Name
-		    $val =~ s{ \A IP\ Address: }{IP:}xms;
-		}
+        if ($key eq 'X509v3 Subject Alternative Name') {
+            # when OpenSSL encounters CSR IP Subject Alternative Names
+            # the parsed output contains "IP Address:d.d.d.d", however
+            # OpenSSL expects "IP:d.d.d.d" in a config file for
+            # certificate issuance if you intend to issue a certificate
+            # we hereby declare that "IP" is the canonical identifier
+            # for an IP Subject Alternative Name
+            $val =~ s{ \A IP\ Address: }{IP:}xms;
+        }
                 push(@{$ret->{OPENSSL_EXTENSIONS}->{$key}}, $val);
             }
         } else {

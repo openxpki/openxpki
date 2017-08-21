@@ -29,7 +29,7 @@ sub get_command
     $self->get_tmpfile ('KEY', 'OUT');
     $self->write_file (FILENAME => $self->{KEYFILE},
                        CONTENT  => $self->{DATA},
-	               FORCE    => 1);
+                   FORCE    => 1);
     if (not exists $self->{PASSWD})
     {
         OpenXPKI::Exception->throw (

@@ -377,19 +377,19 @@ MESSAGE:
                         $result = $command->execute();
                         CTX('dbi')->commit();
                     };
-                    if ($EVAL_ERROR) {
+                    if (my $eval_err = $EVAL_ERROR) {
                         # the datapool semaphore and the workflow make intermediate commits
                         # so the rollback only affects any uncompleted actions
                         CTX('dbi')->rollback();
-                        CTX('log')->system()->error("Error executing SCEP command '$received_command': $EVAL_ERROR");
+                        CTX('log')->system()->error("Error executing SCEP command '$received_command': $eval_err");
 
                         ##! 14: "Exception caught during command execution"
-                        ##! 14: "$EVAL_ERROR"
+                        ##! 14: "$eval_err"
                         $self->talk(
                             $self->__get_error(
                                 {   ERROR =>
                                         'I18N_OPENXPKI_SERVICE_SCEP_RUN_COMMAND_EXECUTION_FAILED',
-                                    EXCEPTION => $EVAL_ERROR,
+                                    EXCEPTION => $eval_err,
                                 }
                             )
                         );

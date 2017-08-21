@@ -82,7 +82,7 @@ sub execute {
     }
 
     ##! 32: 'Prepare revocation with params: ' . Dumper $param
-    CTX('log')->application()->debug('Prepare revocation with params: ' . Dumper $param);
+    CTX('log')->application()->trace('Prepare revocation with params: ' . Dumper $param);
 
 
     # Parse invalidity_time if set - workflow requires epoch

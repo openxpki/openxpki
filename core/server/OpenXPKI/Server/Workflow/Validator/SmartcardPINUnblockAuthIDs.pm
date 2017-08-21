@@ -127,7 +127,7 @@ sub validate {
         CTX('log')->application()->error("Errors valdiating authorizing persons");
 
 
-        #		validation_error($errors->[scalar @{$errors} -1]);
+        #        validation_error($errors->[scalar @{$errors} -1]);
         validation_error( Dumper($errors) );
         return -1;
     }

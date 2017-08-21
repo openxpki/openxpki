@@ -37,11 +37,11 @@ sub login_step {
         ##! 4: 'no login data received (yet)'
         return (undef, undef,
             {
-		SERVICE_MSG => "GET_CLIENT_X509_LOGIN",
-		PARAMS      => {
+        SERVICE_MSG => "GET_CLIENT_X509_LOGIN",
+        PARAMS      => {
                     NAME        => $self->{NAME},
                     DESCRIPTION => $self->{DESC},
-	        },
+            },
             },
         );
     }

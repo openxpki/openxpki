@@ -30,7 +30,6 @@ use OpenXPKI::Server::API;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
-use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
 
@@ -64,7 +63,6 @@ my @init_tasks = qw(
   authentication
   notification
   server
-  watchdog
 );
 #
 
@@ -121,16 +119,15 @@ sub init {
             print "Exception during initialization task '$task': " . $msg;
             $exc->rethrow();
         }
-        elsif ($EVAL_ERROR)
+        elsif (my $eval_err = $EVAL_ERROR)
         {
-            my $error = $EVAL_ERROR;
-            log_wrapper("Eval error during initialization task '$task': " . $error, "fatal");
+            log_wrapper("Eval error during initialization task '$task': " . $eval_err, "fatal");
 
             OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
             params  => {
                 task => $task,
-                EVAL_ERROR => $error,
+                EVAL_ERROR => $eval_err,
             });
         }
 
@@ -366,25 +363,6 @@ sub __do_init_notification {
     });
     return 1;
 }
-
-sub __do_init_watchdog{
-    my $keys = shift;
-
-    my $config = CTX('config');
-
-    my $Watchdog = OpenXPKI::Server::Watchdog->new( {
-        user => OpenXPKI::Server::__get_numerical_user_id( $config->get('system.server.user') ),
-        group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )
-    } );
-
-    $Watchdog->run() unless ( $config->get('system.watchdog.disabled') );
-
-    OpenXPKI::Server::Context::setcontext({
-        watchdog => $Watchdog
-    });
-    return 1;
-}
-
 
 ###########################################################################
 

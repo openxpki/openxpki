@@ -129,8 +129,8 @@ while (my $cgi = CGI::Fast->new()) {
         print $cert;
     };
 
-    if ($EVAL_ERROR) {
-        $log->error('Got error from backend ' . $EVAL_ERROR );
+    if (my $eval_err = $EVAL_ERROR) {
+        $log->error('Got error from backend ' . $eval_err );
 
         print $cgi->header(-status => 404),
             $cgi->start_html('Requested entity not found'),
