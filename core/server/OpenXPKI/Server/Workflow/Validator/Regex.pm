@@ -17,8 +17,17 @@ sub _init {
 
     # Default modifier is /xi
     $self->modifier( $params->{modifier} ? $params->{modifier} : 'xi') ;
-    $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
-    $self->error( $params->{error} ) if ($params->{error});
+
+    if ($params->{error}) {
+        $self->error( $params->{error} );
+    } elsif ($regex eq 'email') {
+        $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_EMAIL_FAILED' );
+    } elsif ($regex eq 'fqdn') {
+        $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED' );
+    } else {
+        $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
+    }
+
 }
 
 sub validate {

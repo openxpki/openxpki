@@ -1201,7 +1201,15 @@ msgstr "La richiesta PKCS10 non può essere letta"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR"
 msgstr "La richiesta PKCS10 non può essere letta"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_EMAIL_FAILED"
+msgstr "Fallita convalida dell’espressione data"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
