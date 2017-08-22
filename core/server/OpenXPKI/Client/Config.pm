@@ -27,6 +27,13 @@ OPENXPKI_I<SERVICE>_CLIENT_CONF_FILE!
 
 =item OPENXPKI_I<SERVICE>_CLIENT_CONF_FILE
 
+The full path of the config file to use.
+
+=item OPENXPKI_CLIENT_SERVICE_NAME
+
+The name of the service.
+B<Note> This overrides the service name passed to the constructor!
+
 =back
 
 =head2 Default Configuration
@@ -97,6 +104,12 @@ around BUILDARGS => sub {
     if (!ref $args) {
         $args = { service => $args };
     }
+
+    # try to read service name from ENV
+    if ($ENV{OPENXPKI_CLIENT_SERVICE_NAME}) {
+        $args->{service} = $ENV{OPENXPKI_CLIENT_SERVICE_NAME};
+    }
+
     return $class->$orig( $args );
 
 };
