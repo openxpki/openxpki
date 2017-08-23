@@ -29,7 +29,7 @@ sub execute {
     ##! 16: 'searching for crr serial ' . $crr_serial
     my $crr = $dbi->select_one(
         from => 'crr',
-        columns => [ 'identifier' ],
+        columns => [ 'identifier', 'reason_code', 'invalidity_time' ],
         where => { crr_key => $crr_serial },
     );
 
@@ -42,8 +42,11 @@ sub execute {
 
     CTX('log')->application()->info("start cert revocation for crr_serial $crr_serial, workflow " . $workflow->id);
 
-
-    $nice_backend->revokeCertificate( { IDENTIFIER => $crr->{identifier} } );
+    $nice_backend->revokeCertificate( {
+        IDENTIFIER => $crr->{identifier},
+        REASON_CODE => $crr->{reason_code},
+        INVALIDITY_TIME => $crr->{invalidity_time},
+    } );
 
     ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier}
     CTX('dbi')->insert(
