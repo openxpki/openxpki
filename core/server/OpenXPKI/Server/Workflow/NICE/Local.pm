@@ -369,12 +369,13 @@ sub issueCRL {
 
     my @cert_timestamps; # array with certificate data and timestamp
 
-    # fetch certificates that are already revoked or to be revoked
+    # fetch certificates that are already revoked or to be revoked, must
+    # use LEFT JOIN as there can be revoked certificates without CRR items!
     my $certs = $dbi->select(
-        from => 'certificate',
-        columns => [ 'cert_key', 'identifier' ],
+        from_join => 'certificate =>certificate.identifier=crr.identifier crr',
+        columns => [ 'cert_key', 'certificate.identifier identifier', 'revocation_time', 'reason_code', 'invalidity_time', 'status' ],
         where => {
-            pki_realm => $pki_realm,
+            'certificate.pki_realm' => $pki_realm,
             issuer_identifier => $ca_identifier,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         },
@@ -382,11 +383,11 @@ sub issueCRL {
 
     push @cert_timestamps, $self->__prepare_crl_data($certs);
 
-    ##! 2: 'maxhq cert_timestamps: ' . join(", ", map { join "/", @$_ } @cert_timestamps)
+    ##! 32: 'cert_timestamps: ' . join(", ", map { join "/", @$_ } @cert_timestamps)
 
     my $serial = $dbi->next_id('crl');
 
-    ##! 2: "maxhq id: $serial"
+    ##! 2: "id: $serial"
 
     $crl_profile->set_serial($serial);
     #
@@ -446,35 +447,28 @@ sub __prepare_crl_data {
         ##! 32: 'cert to be revoked: ' . Data::Dumper->new([$cert])->Indent(0)->Terse(1)->Sortkeys(1)->Dump
         my $serial      = $cert->{cert_key};
         my $identifier  = $cert->{identifier};
-        my $reason_code = '';
+        my $reason_code = $cert->{reason_code}  || '';
+        my $revocation_time = $cert->{revocation_time};
+        my $invalidity_time = $cert->{invalidity_time};
 
-        my $crr = $dbi->select_one(
-            from => 'crr',
-            columns => [ qw( revocation_time reason_code invalidity_time ) ],
-            where => {
-                identifier => $identifier,
-                pki_realm => $pki_realm,
-            },
-            order_by => [ '-revocation_time' ],
-            limit => 1,
-        );
-        if ($crr) {
-            $reason_code = $crr->{reason_code};
-            ##! 32: 'last approved crr present: ' . $crr->{revocation_time}
-            push @cert_timestamps, [ $serial, $crr->{revocation_time}, $reason_code, $crr->{invalidity_time} ];
-        }
-        else {
+        # there might be certificates set to revoked that do not have a CRR item
+        if ($reason_code) {
+            ##! 32: 'approved crr present: ' . Dumper $cert
+            push @cert_timestamps, [ $serial, $revocation_time, $reason_code, $invalidity_time ];
+        } else {
             push @cert_timestamps, [ $serial ];
         }
+
         # update certificate database:
         my $status = 'REVOKED';
         $status = 'HOLD'   if $reason_code eq 'certificateHold';
         $status = 'ISSUED' if $reason_code eq 'removeFromCRL';
+
         $dbi->update(
             table => 'certificate',
             set   => { status => $status },
             where => { identifier => $identifier },
-        );
+        ) if ($status ne $cert->{status});
     }
     return @cert_timestamps;
 }
