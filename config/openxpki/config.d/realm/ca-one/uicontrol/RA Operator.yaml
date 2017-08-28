@@ -8,7 +8,7 @@ landmark:
 main:
   - key: home
     label: I18N_OPENXPKI_UI_MENU_HOME
-    entries: 
+    entries:
       - key:    workflow!task
         label:  I18N_OPENXPKI_UI_MENU_MY_TASK
       - key:    workflow!mine
@@ -18,7 +18,7 @@ main:
 
   - key: request
     label: I18N_OPENXPKI_UI_MENU_REQUEST
-    entries: 
+    entries:
       - key:   workflow!index!wf_type!certificate_signing_request_v2
         label: I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE
       - key:   workflow!index!wf_type!certificate_revocation_request_v2
@@ -43,7 +43,7 @@ main:
 
   - key:   info
     label: I18N_OPENXPKI_UI_MENU_INFORMATION
-    entries: 
+    entries:
       - key:   information!issuer
         label: I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES
       - key:   crl!index
@@ -128,13 +128,13 @@ bulk:
      - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
        key: cert_subject
        pattern: '*%s*'
-       operator: like 
+       operator: like
 
      - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
-       key: requestor  
+       key: requestor
 
      - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
-       key: scep_tid 
+       key: scep_tid
 
     query:
       TYPE:
@@ -160,7 +160,7 @@ bulk:
       -  label: I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL
          action: workflow!bulk!wf_action!csr_approve_csr
          format: expected
-         # this is the string used as key 
+         # this is the string used as key
          select: serial
          # this is the name of the object property used as value
          selection: wf_id
@@ -176,7 +176,7 @@ bulk:
      - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
        key: cert_subject
        pattern: '*%s*'
-       operator: like 
+       operator: like
 
     query:
       TYPE:
@@ -200,7 +200,7 @@ bulk:
       -  label: I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL
          action: workflow!bulk!wf_action!crr_approve_crr
          format: expected
-         # this is the string used as key 
+         # this is the string used as key
          select: serial
          # this is the name of the object property used as value
          selection: wf_id
@@ -209,8 +209,8 @@ bulk:
          action: workflow!bulk!wf_action!crr_reject_crr
          select: serial
          selection: wf_id
-         
-         
+
+
 wfsearch:
     default:
         cols:
@@ -226,38 +226,40 @@ wfsearch:
             template: "[% IF context.cert_subject %][% context.cert_subject %][% ELSIF context.cert_identifier %][% USE Certificate %][% Certificate.body(context.cert_identifier, 'subject') %][% ELSE %]-[% END %]"
           - label: I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL
             template: "[% context.creator %] / [% context.cert_info.requestor_email %]"
-            
+
         attributes:
           - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL
             key: cert_subject
             pattern: '*%s*'
-            operator: like 
+            operator: like
 
           - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
             key: requestor
-           
+
           - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
-            key: scep_tid 
- 
+            key: scep_tid
+
 
 certsearch:
    - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
      key: meta_requestor
      pattern: '*%s*'
-     operator: like 
+     operator: inlike
 
    - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL
      key: meta_email
+     operator: in
 
    - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
      key: meta_entity
+     operator: inlike
 
 
 certaction:
    - label: I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY
      workflow: certificate_privkey_export
-     condition: keyexport 
-    
+     condition: keyexport
+
    - label: I18N_OPENXPKI_UI_CERT_ACTION_RENEW
      workflow: certificate_renewal_request
      condition: issued

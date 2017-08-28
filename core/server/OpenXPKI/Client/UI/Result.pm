@@ -802,14 +802,20 @@ sub __build_attribute_subquery {
     foreach my $item (@{$attributes}) {
         my $key = $item->{key};
         my $pattern = $item->{pattern} || '';
-        my $operator = $item->{operator} || 'EQUAL';
+        my $operator = uc($item->{operator}) || 'IN';
         my $transform = $item->{transform} || '';
         my @val = $self->param($key.'[]');
+
+        my @preprocessed;
+
         while (my $val = shift @val) {
             # embed into search pattern from config
             $val = sprintf($pattern, $val) if ($pattern);
-            # replace asterisk as wildcard
-            $val =~ s/\*/%/g;
+
+            # replace asterisk as wildcard for like fields
+            if ($operator =~ /LIKE/) {
+                $val =~ s/\*/%/g;
+            }
 
             if ($transform =~ /lower/) {
                 $val = lc($val);
@@ -818,10 +824,25 @@ sub __build_attribute_subquery {
             }
 
             $self->logger()->debug( "Query: $key $operator $val" );
+            push @preprocessed, $val;
+        }
 
-            push @attr,  { KEY => $key, VALUE => $val, OPERATOR => uc($operator) };
+        if (!@preprocessed) {
+            next;
+        }
+
+        if ($operator eq 'IN') {
+            push @attr,  { KEY => $key, VALUE => \@preprocessed };
+        } elsif ($operator eq 'INLIKE' ) {
+            push @attr,  { KEY => $key, VALUE => \@preprocessed, OPERATOR => 'LIKE' };
+        } else {
+            map {
+                push @attr,  { KEY => $key, VALUE => $_, OPERATOR => $operator };
+            } @preprocessed;
         }
     }
+
+    $self->logger()->trace('Attribute subquery ' . Dumper \@attr);
 
     return \@attr;
 

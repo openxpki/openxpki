@@ -1,7 +1,7 @@
 main:
   - key: home
     label: I18N_OPENXPKI_UI_MENU_HOME
-    entries: 
+    entries:
       - key:    home!index
         label:  I18N_OPENXPKI_UI_MENU_HOME
       - key:    workflow!mine
@@ -14,10 +14,10 @@ main:
 
   - key:   workflow!index!wf_type!certificate_revocation_request_v2
     label: I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE
- 
+
   - key:   info
     label: I18N_OPENXPKI_UI_MENU_INFORMATION
-    entries: 
+    entries:
       - key:   information!issuer
         label: I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES
       - key:   crl!index
@@ -25,19 +25,20 @@ main:
 
   - key:   certificate!search
     label: I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH
- 
+
   - key:   workflow!index!wf_type!search_scep_workflow
     label: I18N_OPENXPKI_UI_MENU_SCEP_SEARCH
- 
+
 certsearch:
    - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
      key: meta_entity
+     operator: inlike
 
 certaction:
    - label: I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY
      workflow: certificate_privkey_export
-     condition: keyexport 
-    
+     condition: keyexport
+
    - label: I18N_OPENXPKI_UI_CERT_ACTION_RENEW
      workflow: certificate_renewal_request
      condition: issued
@@ -45,4 +46,3 @@ certaction:
    - label: I18N_OPENXPKI_UI_CERT_ACTION_REVOKE
      workflow: certificate_revocation_request_v2
      condition: issued
- 

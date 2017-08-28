@@ -1038,6 +1038,7 @@ sub __search_cert_db_query {
     };
 
     ##! 2: "initialize arguments"
+    ##! 32: 'Arguments ' . Dumper $args
 
     if ( $args->{CERT_SERIAL} ) {
         my $serial = $args->{CERT_SERIAL};
@@ -1142,7 +1143,7 @@ sub __search_cert_db_query {
 
             $attrib->{OPERATOR} //= 'LIKE';
             # sanitize wildcards (don't overdo it...)
-            if ($attrib->{OPERATOR} eq 'LIKE') {
+            if ($attrib->{OPERATOR} eq 'LIKE' && !(ref $attrib->{VALUE})) {
                 $attrib->{VALUE} =~ s/\*/%/g;
                 $attrib->{VALUE} =~ s/%%+/%/g;
             }
