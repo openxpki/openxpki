@@ -20,9 +20,9 @@ sub _init {
 
     if ($params->{error}) {
         $self->error( $params->{error} );
-    } elsif ($regex eq 'email') {
+    } elsif ($self->regex() eq 'email') {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_EMAIL_FAILED' );
-    } elsif ($regex eq 'fqdn') {
+    } elsif ($self->regex() eq 'fqdn') {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED' );
     } else {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
