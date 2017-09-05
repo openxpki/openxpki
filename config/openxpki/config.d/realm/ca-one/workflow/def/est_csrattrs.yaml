@@ -1,0 +1,34 @@
+head:
+    prefix: estcsrattr
+    persister: Volatile
+
+state:
+    INITIAL:
+        action: initialize > SUCCESS
+
+    SUCCESS: ~
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::EST::GenerateCSRAttribute
+        input:
+          - server
+          - interface
+
+        param:
+          target_key: output
+          oidlist: |
+            1.3.6.1.1.1.1.22
+            emailAddress
+            secp384r1
+            sha384
+
+acl:
+    System:
+        creator: any
+        context: 1
+
+    RA Operator:
+        creator: any
+        context: 1
+
