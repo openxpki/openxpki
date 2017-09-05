@@ -308,6 +308,17 @@ sub get_cert {
 
     ##! 2: "Requesting crypto token via API and creating X509 object"
     my $token = CTX('api')->get_default_token();
+
+    if ( $format eq 'PKCS7' ) {
+        my $result = $token->command({
+            COMMAND          => 'convert_cert',
+            DATA             => [ $cert->{data} ],
+            OUT              => 'PEM',
+            CONTAINER_FORMAT => 'PKCS7',
+        });
+        return $result;
+    }
+
     my $obj   = OpenXPKI::Crypto::X509->new(
         TOKEN => $token,
         DATA  => $cert->{data},
