@@ -11,6 +11,7 @@ OpenXPKI.pm
 OpenXPKI/VERSION.pm
 OpenXPKI/Config.pm
 OpenXPKI/Control.pm
+OpenXPKI/Daemonize.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
 OpenXPKI/DN.pm
