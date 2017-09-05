@@ -193,7 +193,6 @@ sub config() {
 
     my $self = shift;
 
-    my $configfile = '';
     # generate name of the environemnt values from the service name
     my $service = $self->service();
 
@@ -210,13 +209,24 @@ sub config() {
         $file = "$1.conf";
 
     # Hopefully never seen
+    # TODO no path is fine with e.g. EST
     } else {
-        warn "Unable to detect script name - please check the docs";
-        warn Dumper \%ENV;
+        $self->logger()->warn("Unable to detect script name - please check the docs");
+        $self->logger()->debug(Dumper \%ENV);
     }
 
+    # non existing files and other errors are handled inside loader
+    return $self->load_config($file);
+}
+
+sub load_config {
+
+    my $self = shift;
+    my $file = shift;
+
+    my $configfile = '';
     if ($file) {
-        $self->logger()->debug('Autodetect config file for service ' . $service . ': ' . $file );
+        $self->logger()->debug('Autodetect config file for service ' . $self->service() . ': ' . $file );
         $file = File::Spec->catfile( ($self->basepath() ), $file );
         if (! -f $file ) {
             $self->logger()->debug('No config file found, falling back to default');
