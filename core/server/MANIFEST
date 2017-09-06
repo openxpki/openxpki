@@ -13,6 +13,7 @@ OpenXPKI/Config.pm
 OpenXPKI/Control.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
+OpenXPKI/Daemonize.pm
 OpenXPKI/DN.pm
 OpenXPKI/Exception.pm
 OpenXPKI/FileUtils.pm
@@ -619,6 +620,8 @@ t/80_config_versioning/config.patch
 t/90_api/10_housekeeping_purge_applog.t
 t/90_api/20_token.t
 t/90_api/30_workflow.t
+t/90_api/31_workflow_async.t
+t/90_api/lib/OpenXPKI/Test/Is13Prime.pm
 
 t/95_openxpkiadm/10_certificate.t
 t/95_openxpkiadm/CommandlineTest.pm
