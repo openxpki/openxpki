@@ -573,21 +573,21 @@ sub _build_log4perl {
     return qq(
         log4perl.category.openxpki.auth         = DEBUG, Screen, Logfile, DBI
         log4perl.category.openxpki.audit        = DEBUG, Screen, DBI
-        log4perl.category.openxpki.monitor      = DEBUG, Screen, Logfile
         log4perl.category.openxpki.system       = DEBUG, Screen, Logfile
         log4perl.category.openxpki.workflow     = DEBUG, Screen, Logfile
         log4perl.category.openxpki.application  = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.deprecated   = WARN,  Screen
         log4perl.category.connector             = DEBUG, Screen, Logfile
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
+        log4perl.appender.Screen.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
 
         log4perl.appender.Logfile               = Log::Log4perl::Appender::File
         log4perl.appender.Logfile.filename      = $logfile
         log4perl.appender.Logfile.layout        = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Logfile.layout.ConversionPattern = %d %c.%p:%P %m%n
+        log4perl.appender.Logfile.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
         log4perl.appender.Logfile.syswrite      = 1
         log4perl.appender.Logfile.utf8          = 1
 
