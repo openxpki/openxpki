@@ -45,7 +45,7 @@ sub execute {
         ##! 32: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
         my $key = $metadata->{attribute_contentkey};
         my $value = $metadata->{attribute_value};
-        if ($value =~ /^(ARRAY|HASH)/) {
+        if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
             ##! 32: 'Deserialize '
             $value = $ser->deserialize( $value );
         }

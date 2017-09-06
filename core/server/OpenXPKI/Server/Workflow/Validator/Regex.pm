@@ -73,7 +73,7 @@ sub validate {
     # Array Magic
     my @errors;
     ##! 32: 'ref of value ' . ref $value
-    if (ref $value eq 'ARRAY' || $value =~ /^ARRAY/) {
+    if (ref $value eq 'ARRAY' || OpenXPKI::Serialization::Simple::is_serialized($value)) {
         ##! 8: 'Array mode'
         if (!ref $value) {
             $value = OpenXPKI::Serialization::Simple->new()->deserialize( $value );

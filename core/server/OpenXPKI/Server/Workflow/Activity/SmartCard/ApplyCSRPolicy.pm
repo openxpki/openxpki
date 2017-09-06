@@ -84,7 +84,7 @@ sub execute {
             ##! 64: 'adding param ' . $param . ' to userinfo, value: ' . $context->param('userinfo_' . $param)
             $userinfo->{$param} = $context->param('userinfo_' . $param);
             # Some entries are arrays
-            if ($userinfo->{$param} =~ /\A ARRAY/xms) {
+            if ($userinfo->{$param} =~ OpenXPKI::Serialization::Simple::is_serialized($userinfo->{$param})) {
                 $userinfo->{$param} = $serializer->deserialize($userinfo->{$param});
             }
         }

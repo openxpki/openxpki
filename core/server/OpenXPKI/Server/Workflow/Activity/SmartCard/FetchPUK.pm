@@ -37,8 +37,8 @@ sub execute {
 
     my $ser = OpenXPKI::Serialization::Simple->new();
     # autodetect serialized arrays
-    if ($value =~ m{ \A ARRAY }xms) {
-    $value = $ser->deserialize($value);
+    if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
+        $value = $ser->deserialize($value);
     } else {
     # coerce returned value into an array. the parent implementation
     # does not care about the PUK handling at all, but on this level
