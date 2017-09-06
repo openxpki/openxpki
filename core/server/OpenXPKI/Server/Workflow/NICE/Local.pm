@@ -379,6 +379,7 @@ sub issueCRL {
             issuer_identifier => $ca_identifier,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         },
+        order_by => [ 'cert_key', 'revocation_time desc' ]
     );
 
     push @cert_timestamps, $self->__prepare_crl_data($certs);
@@ -443,9 +444,15 @@ sub __prepare_crl_data {
     my $dbi       = CTX('dbi');
     my $pki_realm = CTX('session')->data->pki_realm;
 
+    my $last_serial;
     while (my $cert = $sth_certs->fetchrow_hashref) {
         ##! 32: 'cert to be revoked: ' . Data::Dumper->new([$cert])->Indent(0)->Terse(1)->Sortkeys(1)->Dump
         my $serial      = $cert->{cert_key};
+        if ($last_serial eq $serial) {
+            ##! 16: 'Skipping duplicate crr for serial ' . $serial
+            next;
+        }
+        $last_serial = $serial;
         my $identifier  = $cert->{identifier};
         my $reason_code = $cert->{reason_code}  || '';
         my $revocation_time = $cert->{revocation_time};
