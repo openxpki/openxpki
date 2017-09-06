@@ -21,7 +21,6 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $default_token = CTX('api')->get_default_token();
 
     my $key_alg = $self->param('key_alg');
     ##! 16: 'key_type: ' . $key_type
