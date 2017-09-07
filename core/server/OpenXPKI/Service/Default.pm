@@ -939,8 +939,17 @@ sub __send_error
     my $self = shift;
     my $params = shift;
 
-    return $self->talk({SERVICE_MSG => "ERROR",
-                        LIST        => [ $self->__get_error ($params) ] });
+    my $error;
+    if ($params->{ERROR}) {
+        $error = scalar $params->{ERROR};
+    } elsif ($params->{EXCEPTION}) {
+        $error = $params->{EXCEPTION}->message();
+    }
+
+    return $self->talk({
+        SERVICE_MSG => "ERROR",
+        LIST        => [ { LABEL => $error } ]
+    });
 }
 
 ################################
