@@ -5,9 +5,6 @@ use warnings;
 # Core modules
 use English;
 use FindBin qw( $Bin );
-use File::Path qw( remove_tree );
-use File::Temp qw( tempdir );
-use Proc::Daemon;
 use IPC::SysV qw(IPC_PRIVATE IPC_CREAT IPC_EXCL S_IRWXU IPC_NOWAIT);
 use IPC::Semaphore;
 
@@ -19,6 +16,7 @@ use Test::Deep;
 # Project modules
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
+use OpenXPKI::Test::Server;
 
 
 plan tests => 15;
@@ -27,60 +25,12 @@ plan tests => 15;
 #
 # Setup test env
 #
-my $dir = tempdir();
-
-my $oxitest = OpenXPKI::Test->new(testenv_root => $dir);
+my $oxitest = OpenXPKI::Test->new();
 $oxitest->setup_env;
 
-# create semaphore set with 1 member
-my $sem = IPC::Semaphore->new(IPC_PRIVATE, 1, S_IRWXU | IPC_CREAT | IPC_EXCL)
-    or die "Could not create semaphore: $!";
-# lock semaphore (set semaphore #0 to 1)
-$sem->setval(0,1)
-    or die "Could not set semaphore: $!";
-
-# fork server process
-note "Starting test server...";
-my $daemon = Proc::Daemon->new(
-    work_dir => $dir,
-    $ENV{TEST_VERBOSE} ? ( dont_close_fh => [ 'STDOUT', 'STDERR' ] ) : (),
-);
-my $child_pid = $daemon->Init;
-
-
-unless ( $child_pid ) {
-    # code executed only by the child ...
-
-    # init_server() must be called after Proc::Daemon->Init() because the latter
-    # closes all file handles which would cause problems with Log4perl
-    $oxitest->init_server('crypto_layer');
-    use OpenXPKI::Server;
-    my $server = OpenXPKI::Server->new(
-        'SILENT' => $ENV{TEST_VERBOSE} ? 0 : 1,
-        'TYPE'   => 'Simple',
-    );
-    $server->__init_user_interfaces;
-    $server->__init_net_server;
-
-    # unlock semaphore
-    $sem->op(0, -1, IPC_NOWAIT);
-
-    $server->run(%{$server->{PARAMS}}); # from Net::Server::MultiType
-    exit;
-}
-
-# wait till child process unlocks semaphore
-# (# semaphore #0, operation 0)
-for (my $tick = 0; $tick < 3 and not $sem->op(0, 0, IPC_NOWAIT); $tick++) {
-    sleep 1;
-}
-if (not $sem->op(0, 0, IPC_NOWAIT)) {
-    $daemon->Kill_Daemon($child_pid);
-    remove_tree $dir;
-    die "Server startup seems to have failed";
-}
-
-sleep 1; # give Net::Server->run() a little bit time
+my $server = OpenXPKI::Test::Server->new(oxitest => $oxitest);
+$server->init_tasks( ['crypto_layer'] );
+$server->start;
 
 #
 # Tests
@@ -165,8 +115,6 @@ lives_ok {
 
 is_next_step $resp, "SERVICE_READY";
 
-$daemon->Kill_Daemon($child_pid) or diag "Could not kill test server";
-
-remove_tree $dir;
+$server->stop or diag "Could not shutdown test server";
 
 1;
