@@ -18,8 +18,7 @@ use Test::More tests => 12;
 
 package main;
 
-my $host = '10.16.6.42:8085';
-#$host = 'localhost';
+my $host = 'localhost';
 
 sub LWP::UserAgent::get_basic_credentials {
     my ($self, $realm, $url, $isproxy) = @_;
@@ -48,8 +47,6 @@ ok($length);
 is($length, length($body));
 like($body,"/[a-z0-9 ]+/");
 
-print $body ;
-
 $response = $ua->get("https://$host/.well-known/est/csrattrs");
 ok($response->is_success);
 
@@ -57,7 +54,7 @@ $length = $response->header( 'Content-Length' );
 $body = $response->decoded_content;
 ok($length);
 is($length, length($body));
-is($body,"MCYGBysGAQEBARYGCSqGSIb3DQEJAQYFK4EEACIGCWCGSAFlAwQCAg==");
+like($body, "/^MCYGBysGAQEBARYGCSqGSIb3DQEJAQYFK4EEACIGCWCGSAFlAwQCAg==\\s*/");
 
 my $pkcs10 = `openssl req -new -subj "/CN=est-test.openxpki.org" -nodes -newkey rsa:1024 -keyout tmp/estcert.key -outform der | openssl base64 -e 2>/dev/null`;
 
@@ -73,4 +70,5 @@ ok($response->is_success);
 ok($length);
 is($length, length($body));
 like($body,"/[a-z0-9 ]+/");
+
 

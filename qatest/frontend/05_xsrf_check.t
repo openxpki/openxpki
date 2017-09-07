@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 
 use lib qw(../lib);
 use strict;
@@ -29,6 +29,10 @@ $result = $client->mock_request({
 is($result->{page}->{label}, 'Please log in');
 is($result->{main}->[0]->{action}, 'login!stack');
 
+# update token in session but delete it (login is allowed without session)
+$client->update_rtoken();
+$client->rtoken('');
+
 $result = $client->mock_request({
     'action' => 'login!stack',
     'auth_stack' => "Testing",
@@ -38,7 +42,7 @@ $result = $client->mock_request({
 is($result->{goto}, 'login');
 
 # load rtoken and try again
-$client->update_rtoken(); 
+$client->update_rtoken();
 $result = $client->mock_request({
     'action' => 'login!stack',
     'auth_stack' => "Testing",
@@ -81,7 +85,7 @@ $result = $client->mock_request({
 # empty token must not work
 like($result->{status}->{message}, "/security token was invalid/");
 
-# refresh the token 
+# refresh the token
 my $rtoken = $client->update_rtoken();
 $result = $client->mock_request({
     'action' => 'workflow!index',

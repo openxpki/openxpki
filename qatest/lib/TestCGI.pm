@@ -44,6 +44,12 @@ has rtoken => (
     default => ''
 );
 
+has logger => (
+    is => 'rw',
+    isa => 'Object',
+    default =>  sub { return  Log::Log4perl->get_logger(); }
+);
+
 sub mock_request {
 
     my $self = shift;
@@ -70,6 +76,9 @@ sub mock_request {
         if (!exists $data->{_rtoken}) {
             $data->{_rtoken} = $self->rtoken();
         }
+
+        $self->logger()->is_trace() && $self->logger()->trace( Dumper $data );
+
         $ua->default_header( 'content-type' => 'application/x-www-form-urlencoded');
         $res = $ua->post($server_endpoint, $data);
     } else {

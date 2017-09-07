@@ -8,7 +8,7 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
-  
+
 use Test::More tests => 3;
 
 package main;
@@ -16,7 +16,7 @@ package main;
 my $result;
 my $client = TestCGI::factory();
 
-# create temp dir 
+# create temp dir
 -d "tmp/" || mkdir "tmp/";
 
 $result = $client->mock_request({
@@ -51,7 +51,7 @@ $result = $client->mock_request({
 });
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!crr_edit_crr!wf_id!'.$wf_id,
+    'action' => 'workflow!select!wf_action!crr_update_crr!wf_id!'.$wf_id,
 });
 
 $result = $client->mock_request({
@@ -70,6 +70,6 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!crr_approve_crr!wf_id!'.$wf_id,
 });
-  
+
 is ($result->{status}->{level}, 'info', 'Status is paused (waiting for revocation)');
 
