@@ -99,6 +99,29 @@ sub send_command {
     return $tester->send_ok('COMMAND', { COMMAND => $command, PARAMS => $args });
 }
 
+sub wait_for_proc_state {
+    my ($wfid, $state_regex) = @_;
+    my $testname = "Waiting for workflow state $state_regex";
+    my $result;
+    my $count = 0;
+    while ($count++ < 10) {
+        $result = send_command "search_workflow_instances" => { SERIAL => [ $wfid ] };
+        # no workflow found?
+        if ($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'} != $wfid) {
+            diag "Workflow with ID $wfid not found!";
+            fail $testname;
+            return;
+        }
+        # wait if paused (i.e. resuming in progress) or still running (the remaining steps)
+        if (not $result->[0]->{'WORKFLOW.WORKFLOW_PROC_STATE'} =~ $state_regex) {
+            sleep 1;
+            next;
+        }
+        # expected proc state reached
+        return $result;
+    }
+    return;
+}
 my $result;
 
 lives_ok {
@@ -116,28 +139,14 @@ my $wf_t1_a = $result->{WORKFLOW};
 # wait for wakeup by watchdog
 #
 note "waiting for backgrounded (forked) workflow to finish";
-my $count = 0;
-while ($count++ < 10) {
-    $result = send_command "search_workflow_instances" => { SERIAL => [ $wf_t1_a->{ID} ] };
-    # no workflow found?
-    if ($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'} != $wf_t1_a->{ID}) {
-        diag "Workflow with ID ".$wf_t1_a->{ID}." not found!";
-        fail "Workflow finished successfully";
-        last;
-    }
-    # wait if paused (i.e. resuming in progress) or still running (the remaining steps)
-    if ($result->[0]->{'WORKFLOW.WORKFLOW_PROC_STATE'} =~ /^(running|pause)$/) {
-        sleep 1;
-        next;
-    }
-    # compare result
-    cmp_deeply $result, [ superhashof({
-        'WORKFLOW.WORKFLOW_SERIAL' => $wf_t1_a->{ID},
-        'WORKFLOW.WORKFLOW_PROC_STATE' => 'finished', # could be 'exception' if things go wrong
-        'WORKFLOW.WORKFLOW_STATE' => 'SUCCESS',
-    }) ], "Workflow finished successfully" or diag explain $result;
-    last;
-}
+$result = wait_for_proc_state $wf_t1_a->{ID}, qr/^(finished|exception)$/;
+
+# compare result
+cmp_deeply $result, [ superhashof({
+    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t1_a->{ID},
+    'WORKFLOW.WORKFLOW_PROC_STATE' => 'finished', # could be 'exception' if things go wrong
+    'WORKFLOW.WORKFLOW_STATE' => 'SUCCESS',
+}) ], "Workflow finished successfully" or diag explain $result;
 
 #
 # get_workflow_info - check action results
