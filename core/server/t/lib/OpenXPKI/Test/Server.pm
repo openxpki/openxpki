@@ -16,7 +16,6 @@ use IPC::Semaphore;
 use Test::More;
 
 # CPAN modules
-use Proc::ProcessTable;
 use Proc::Daemon;
 
 # Project modules
@@ -188,8 +187,7 @@ Returns TRUE if the OpenXPKI server process is running (i.e. checks the PID).
 =cut
 sub is_alive {
     my $self = shift;
-    my $pt = Proc::ProcessTable->new;
-    return scalar grep { $_->pid eq $self->server_pid } @{$pt->table};
+    return (kill(0, $self->server_pid) != 0);
 }
 
 =head2 stop
