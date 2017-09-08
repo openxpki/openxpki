@@ -62,7 +62,7 @@ use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
 
 Moose::Exporter->setup_import_methods(
-    as_is     => [ 'OpenXPKI::Server::Context::CTX' ],
+    as_is     => [ \&OpenXPKI::Server::Context::CTX ],
 );
 
 =head1 DESCRIPTION
