@@ -17,103 +17,58 @@ use Test::Deep;
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::Server;
+use OpenXPKI::Test::Client;
 
 
-plan tests => 15;
+plan tests => 14;
 
 
 #
 # Setup test env
 #
-my $oxitest = OpenXPKI::Test->new();
-$oxitest->setup_env;
+my $oxitest = OpenXPKI::Test->new->setup_env;
 
 my $server = OpenXPKI::Test::Server->new(oxitest => $oxitest);
 $server->init_tasks( ['crypto_layer'] );
 $server->start;
 
+my $tester = OpenXPKI::Test::Client->new(oxitest => $oxitest);
+$tester->start;
+
 #
 # Tests
 #
-sub is_next_step {
-    my ($hash, $msg) = @_;
-    ok (
-        ($hash and exists $hash->{SERVICE_MSG} and $hash->{SERVICE_MSG} eq $msg),
-        "<< server expects $msg"
-    ) or diag explain $hash;
-}
-
-sub send_ok {
-    my ($client, $msg, $args) = @_;
-    my $resp;
-    lives_and {
-        $resp = $client->send_receive_service_msg($msg, $args);
-        if (my $err = get_error($resp)) {
-            diag $err;
-            fail;
-        }
-        else {
-            pass;
-        }
-    } ">> send $msg";
-
-    return $resp;
-}
-
-sub get_error {
-    my ($resp) = @_;
-    if ($resp and exists $resp->{SERVICE_MSG} and $resp->{SERVICE_MSG} eq 'ERROR') {
-        return $resp->{LIST}->[0]->{LABEL} || 'Unknown error';
-    }
-    return;
-}
 
 my $realm = $oxitest->get_default_realm;
 my $resp;
 
-use_ok "OpenXPKI::Client";
+lives_ok { $tester->init_session } "initialize client session";
+$tester->is_next_step("GET_PKI_REALM");
 
-my $client;
-lives_ok {
-    $client = OpenXPKI::Client->new({
-        TIMEOUT => 5,
-        SOCKETFILE => $oxitest->get_config("system.server.socket_file"),
-    });
-} "client instance";
+my $session_id = $tester->client->get_session_id;
 
-lives_ok {
-    $resp = $client->init_session();
-} "initialize client session";
-is_next_step $resp, "GET_PKI_REALM";
+$tester->send_ok('GET_PKI_REALM', { PKI_REALM => $realm });
+$tester->is_next_step("GET_AUTHENTICATION_STACK");
 
-my $session_id = $client->get_session_id;
+$tester->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => "Test" });
+$tester->is_next_step("GET_PASSWD_LOGIN");
 
-$resp = send_ok $client, 'GET_PKI_REALM', { PKI_REALM => $realm };
-is_next_step $resp, "GET_AUTHENTICATION_STACK";
+$tester->send_ok('GET_PASSWD_LOGIN', { LOGIN => "caop", PASSWD => $oxitest->config_writer->password });
+$tester->is_next_step("SERVICE_READY");
 
-$resp = send_ok $client, 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => "Test" };
-is_next_step $resp, "GET_PASSWD_LOGIN";
+$tester->send_ok('COMMAND', { COMMAND => "get_session_info" });
+is $tester->response->{PARAMS}->{name}, "caop", "session info contains user name";
 
-$resp = send_ok $client, 'GET_PASSWD_LOGIN', { LOGIN => "caop", PASSWD => $oxitest->config_writer->password };
-is_next_step $resp, "SERVICE_READY";
+$tester->client->close_connection;
 
-$resp = send_ok $client, 'COMMAND', { COMMAND => "get_session_info" };
-is $resp->{PARAMS}->{name}, "caop", "session info contains user name";
-
-$client->close_connection;
+my $tester2 = OpenXPKI::Test::Client->new(oxitest => $oxitest);
+$tester2->start;
 
 lives_ok {
-    $client = OpenXPKI::Client->new({
-        TIMEOUT => 5,
-        SOCKETFILE => $oxitest->get_config("system.server.socket_file"),
-    });
-} "client instance no. 2";
-
-lives_ok {
-    $resp = $client->init_session({ SESSION_ID => $session_id });
+    $tester2->init_session({ SESSION_ID => $session_id });
 } "initialize client session no. 2 with previous session id";
 
-is_next_step $resp, "SERVICE_READY";
+$tester2->is_next_step("SERVICE_READY");
 
 $server->stop or diag "Could not shutdown test server";
 
