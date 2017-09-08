@@ -20,8 +20,9 @@ use Proc::ProcessTable;
 use Proc::Daemon;
 
 # Project modules
-use OpenXPKI::Server;
 use OpenXPKI;
+use OpenXPKI::Control;
+use OpenXPKI::Server;
 
 =head1 DESCRIPTION
 
@@ -81,6 +82,8 @@ sub _openxpki_server_start {
     # init_server() must be called after Proc::Daemon->Init() because the latter
     # closes all file handles which would cause problems with Log4perl
     $self->oxitest->init_server(@{$self->init_tasks});
+
+    OpenXPKI::Server::Watchdog->start_or_reload;
 
     my $server = OpenXPKI::Server->new(
         'SILENT' => $ENV{TEST_VERBOSE} ? 0 : 1,
@@ -199,10 +202,11 @@ sub stop {
 
     # Try to stop the OpenXPKI process and wait max. 5 seconds for OpenXPKI to finish shutdown
     if ($self->server_pid) {
-        kill 'INT', $self->server_pid;
-        my $count = 0;
-        while ($count++ < 5 and $self->is_alive) { sleep 1 }
-        diag "Could not shutdown test server" if $self->is_alive;
+        OpenXPKI::Control::stop({ PID => $self->server_pid}); # stop server and child processes
+#        kill 'INT', $self->server_pid;
+#        my $count = 0;
+#        while ($count++ < 5 and $self->is_alive) { sleep 1 }
+#        diag "Could not shutdown test server" if $self->is_alive;
         $self->clear_server_pid;
     }
 
