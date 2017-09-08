@@ -67,6 +67,22 @@ sub init_session {
     } "initialize client session";
 }
 
+sub login {
+    my ($self, $user) = @_;
+    subtest "client login" => sub {
+        plan tests => 6;
+
+        $self->send_ok('GET_PKI_REALM', { PKI_REALM => $self->oxitest->get_default_realm });
+        $self->is_next_step("GET_AUTHENTICATION_STACK");
+
+        $self->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => "Test" });
+        $self->is_next_step("GET_PASSWD_LOGIN");
+
+        $self->send_ok('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->oxitest->config_writer->password });
+        $self->is_next_step("SERVICE_READY");
+    }
+}
+
 sub is_next_step {
     my ($self, $msg) = @_;
     ok $self->is_service_msg($msg), "<< server expects $msg"
