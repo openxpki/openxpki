@@ -143,7 +143,8 @@ has force_test_db => (
 );
 
 =item * I<testenv_root> (optional) - Temporary directory that serves as root
-path for the test environment (configuration files etc.)
+path for the test environment (configuration files etc.). Default: newly created
+directory
 
 =cut
 has testenv_root => (
@@ -151,6 +152,17 @@ has testenv_root => (
     isa => 'Str',
     lazy => 1,
     default => sub { scalar(tempdir( CLEANUP => 1 )) },
+);
+
+=item * I<start_watchdog> (optional) - Set to 1 to start the watchdog when the
+test server starts up. Default: 0
+
+=cut
+has start_watchdog => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => 0,
 );
 
 =back
@@ -184,6 +196,7 @@ has config_writer => (
         OpenXPKI::Test::ConfigWriter->new(
             basedir => $self->testenv_root,
             db_conf => $self->db_conf,
+            start_watchdog => $self->start_watchdog,
         )
     },
 );
