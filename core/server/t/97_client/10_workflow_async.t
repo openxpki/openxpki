@@ -81,7 +81,7 @@ sub workflow_def {
     };
 };
 
-my $oxitest = OpenXPKI::Test->new;
+my $oxitest = OpenXPKI::Test->new(start_watchdog => 1);
 $oxitest->workflow_config("alpha", "wf_type_1", workflow_def("wf_type_1"));
 $oxitest->setup_env;
 
@@ -113,19 +113,11 @@ my $wf_t1_a = $result->{WORKFLOW};
 ##diag explain OpenXPKI::Workflow::Config->new->workflow_config;
 
 #
-# wakeup_workflow
+# wait for wakeup by watchdog
 #
-lives_and {
-    $result = send_command "wakeup_workflow" => {
-        ID => $wf_t1_a->{ID},
-        ASYNC => 'fork',
-    };
-    # ... this will automatically call "add_link" and "set_motd"
-    is $result->{WORKFLOW}->{STATE}, 'BACKGROUNDING';
-} "wakeup_workflow() - wakeup workflow and run in backround (fork)";
-
 note "waiting for backgrounded (forked) workflow to finish";
-while (1) {
+my $count = 0;
+while ($count++ < 10) {
     $result = send_command "search_workflow_instances" => { SERIAL => [ $wf_t1_a->{ID} ] };
     # no workflow found?
     if ($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'} != $wf_t1_a->{ID}) {
@@ -147,13 +139,16 @@ while (1) {
     last;
 }
 
+#
+# get_workflow_info - check action results
+#
 lives_and {
     $result = send_command "get_workflow_info" => { ID => $wf_t1_a->{ID} };
     cmp_deeply $result->{WORKFLOW}->{CONTEXT}->{is_13_prime}, 1;
 } "Workflow action returns correct result";
 
 #
-# get_workflow_history
+# get_workflow_history - check correct execution history
 #
 lives_and {
     $result = send_command "get_workflow_history" => { ID => $wf_t1_a->{ID} };
