@@ -49,6 +49,6 @@ my $tester2 = OpenXPKI::Test::Client->new(oxitest => $oxitest);
 $tester2->connect;
 $tester2->init_session({ SESSION_ID => $session_id });
 
-$server->stop or diag "Could not shutdown test server";
+$server->stop;
 
 1;

@@ -52,12 +52,14 @@ has parent_pid => (
     is => 'rw',
     isa => 'Int',
     init_arg => undef,
+    clearer => 'clear_parent_pid',
 );
 
 has server_pid => (
     is => 'rw',
     isa => 'Int',
     init_arg => undef,
+    clearer => 'clear_server_pid',
 );
 
 has semaphore => (
@@ -65,6 +67,11 @@ has semaphore => (
     isa => 'IPC::Semaphore',
     init_arg => undef,
 );
+
+sub DEMOLISH {
+    my $self = shift;
+    $self->stop;
+}
 
 # Imitate OpenXPKI::Server->start()
 sub _openxpki_server_start {
@@ -191,16 +198,20 @@ sub stop {
     my $self = shift;
 
     # Try to stop the OpenXPKI process and wait max. 5 seconds for OpenXPKI to finish shutdown
-    kill 'INT', $self->server_pid;
-    my $count = 0;
-    while ($count++ < 5 and $self->is_alive) { sleep 1 }
+    if ($self->server_pid) {
+        kill 'INT', $self->server_pid;
+        my $count = 0;
+        while ($count++ < 5 and $self->is_alive) { sleep 1 }
+        diag "Could not shutdown test server" if $self->is_alive;
+        $self->clear_server_pid;
+    }
 
     # Kill the Proc::Daemon child process that started OpenXPKI
     # (although it should be dead by now)
     if ($self->daemon and $self->parent_pid) {
         $self->daemon->Kill_Daemon($self->parent_pid);
+        $self->clear_parent_pid;
     }
-
-    return not $self->is_alive;
 }
+
 __PACKAGE__->meta->make_immutable;
