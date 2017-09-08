@@ -43,7 +43,7 @@ has response => (
 =head1 METHODS
 
 =cut
-sub start {
+sub connect {
     my $self = shift;
 
     my $client;
