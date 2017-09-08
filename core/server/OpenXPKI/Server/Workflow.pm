@@ -203,7 +203,7 @@ sub execute_action {
                 message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE",
                 params => {
                     ACTION => $action_name,
-                    ERROR => scalar $error,
+                    ERROR => $error->message(),
                     FIELDS => $invalid_fields
                 }
             );

@@ -941,14 +941,33 @@ sub __send_error
 
     my $error;
     if ($params->{ERROR}) {
-        $error = scalar $params->{ERROR};
+        $error = { LABEL => scalar $params->{ERROR} };
     } elsif ($params->{EXCEPTION}) {
-        $error = $params->{EXCEPTION}->message();
+        $error = { LABEL => $params->{EXCEPTION}->message() };
+
+        # get all scalar/hash/array parameters from OXI::Exceptions
+        # this is used to transport some extra infos for validators, etc
+        if (ref $params->{EXCEPTION} eq 'OpenXPKI::Exception' &&
+            defined $params->{EXCEPTION}->params) {
+            my $p = $params->{EXCEPTION}->params;
+            map {
+                my $key = $_;
+                my $val = $p->{$_};
+                my $ref = ref $val;
+                delete $p->{$_} unless(defined $val && $ref =~ /^(|HASH|ARRAY)$/);
+            } keys %{$p};
+
+            #if($p) {
+                $error->{PARAMS} = $p;
+            #}
+        }
     }
+
+    CTX('log')->system->error('Sending error ' . Dumper $error);
 
     return $self->talk({
         SERVICE_MSG => "ERROR",
-        LIST        => [ { LABEL => $error } ]
+        LIST        => [ $error ]
     });
 }
 
