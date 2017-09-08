@@ -101,6 +101,8 @@ sub send_ok {
             pass;
         }
     } ">> send $msg";
+
+    return $self->response->{PARAMS};
 }
 
 sub is_service_msg {

@@ -38,8 +38,8 @@ $tester->connect;
 $tester->init_session;
 $tester->login("caop");
 
-$tester->send_ok('COMMAND', { COMMAND => "get_session_info" });
-is $tester->response->{PARAMS}->{name}, "caop", "session info contains user name";
+my $result = $tester->send_ok('COMMAND', { COMMAND => "get_session_info" });
+is $result->{name}, "caop", "session info contains user name";
 
 my $session_id = $tester->client->get_session_id;
 
