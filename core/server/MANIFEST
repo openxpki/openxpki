@@ -620,13 +620,13 @@ t/80_config_versioning/config.patch
 t/90_api/10_housekeeping_purge_applog.t
 t/90_api/20_token.t
 t/90_api/30_workflow.t
-t/90_api/31_workflow_async.t
-t/90_api/lib/OpenXPKI/Test/Is13Prime.pm
 
 t/95_openxpkiadm/10_certificate.t
 t/95_openxpkiadm/CommandlineTest.pm
 
 t/97_client/01_login_and_resume.t
+t/97_client/10_workflow_async.t
+t/97_client/lib/OpenXPKI/Test/Is13Prime.pm
 
 t/99_cleanup/28_log.t
 t/99_cleanup/50_auth.t

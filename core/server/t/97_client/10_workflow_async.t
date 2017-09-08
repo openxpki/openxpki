@@ -22,8 +22,10 @@ use lib "$Bin/lib";
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test::Server;
+use OpenXPKI::Test::Client;
 
-plan tests => 4;
+# plan tests => 14; WE CANNOT PLAN tests as there is a while loop that sends commands (which are tests)
 
 #
 # Setup test context
@@ -74,53 +76,57 @@ sub workflow_def {
         'field' => {},
         'validator' => {},
         'acl' => {
-            'User' => { creator => 'any', techlog => 1, history => 1 },
+            'CA Operator' => { creator => 'any', techlog => 1, history => 1 },
         },
     };
 };
 
-sub test_wf_instance {
-    my ($pki_realm, $name) = @_;
-    CTX('session')->data->pki_realm($pki_realm);
-    my $wfinfo = CTX('api')->create_workflow_instance({
-        WORKFLOW => $name,
-        PARAMS => {},
-    });
-
-    die($wfinfo->{LIST}->[0]->{LABEL} || 'Unknown error occured during workflow creation')
-        if $wfinfo and exists $wfinfo->{SERVICE_MSG} and $wfinfo->{SERVICE_MSG} eq 'ERROR';
-
-    return $wfinfo->{WORKFLOW};
-}
-
 my $oxitest = OpenXPKI::Test->new;
 $oxitest->workflow_config("alpha", "wf_type_1", workflow_def("wf_type_1"));
-$oxitest->setup_env->init_server('workflow_factory', 'crypto_layer');
+$oxitest->setup_env;
 
-CTX('session')->data->role('User');
-CTX('session')->data->user('wilhelm');
-my $wf_t1_a = test_wf_instance "alpha", "wf_type_1";
+my $server = OpenXPKI::Test::Server->new(oxitest => $oxitest);
+$server->init_tasks( ['crypto_layer', 'workflow_factory'] );
+$server->start;
 
-CTX('session')->data->pki_realm('alpha');
+my $tester = OpenXPKI::Test::Client->new(oxitest => $oxitest);
+$tester->connect;
+$tester->init_session;
+$tester->login("caop");
 
-#diag explain OpenXPKI::Workflow::Config->new->workflow_config;
+sub send_command {
+    my ($command, $args) = @_;
+    return $tester->send_ok('COMMAND', { COMMAND => $command, PARAMS => $args });
+}
+
+my $result;
+
+lives_ok {
+    $result = send_command "create_workflow_instance" => {
+        WORKFLOW => "wf_type_1",
+        PARAMS => {},
+    };
+} "create_workflow_instance()";
+
+my $wf_t1_a = $result->{WORKFLOW};
+
+##diag explain OpenXPKI::Workflow::Config->new->workflow_config;
 
 #
 # wakeup_workflow
 #
 lives_and {
-    my $result = CTX('api')->wakeup_workflow({
+    $result = send_command "wakeup_workflow" => {
         ID => $wf_t1_a->{ID},
         ASYNC => 'fork',
-    });
+    };
     # ... this will automatically call "add_link" and "set_motd"
     is $result->{WORKFLOW}->{STATE}, 'BACKGROUNDING';
 } "wakeup_workflow() - wakeup workflow and run in backround (fork)";
 
-# Wait for backgrounded (forked) workflow to finish
-my $result;
+note "waiting for backgrounded (forked) workflow to finish";
 while (1) {
-    my $result = CTX('api')->search_workflow_instances({ SERIAL => [ $wf_t1_a->{ID} ] });
+    $result = send_command "search_workflow_instances" => { SERIAL => [ $wf_t1_a->{ID} ] };
     # no workflow found?
     if ($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'} != $wf_t1_a->{ID}) {
         diag "Workflow with ID ".$wf_t1_a->{ID}." not found!";
@@ -142,7 +148,7 @@ while (1) {
 }
 
 lives_and {
-    my $result = CTX('api')->get_workflow_info({ ID => $wf_t1_a->{ID} });
+    $result = send_command "get_workflow_info" => { ID => $wf_t1_a->{ID} };
     cmp_deeply $result->{WORKFLOW}->{CONTEXT}->{is_13_prime}, 1;
 } "Workflow action returns correct result";
 
@@ -150,7 +156,7 @@ lives_and {
 # get_workflow_history
 #
 lives_and {
-    my $result = CTX('api')->get_workflow_history({ ID => $wf_t1_a->{ID} });
+    $result = send_command "get_workflow_history" => { ID => $wf_t1_a->{ID} };
     cmp_deeply $result, [
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/create/i) }),
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/initialize/i) }),
@@ -160,5 +166,9 @@ lives_and {
         superhashof({ WORKFLOW_STATE => "LOITERING", WORKFLOW_ACTION => re(qr/do_something/i) }),
     ] or diag explain $result;
 } "get_workflow_history()";
+
+$server->stop;
+
+done_testing;
 
 1;
