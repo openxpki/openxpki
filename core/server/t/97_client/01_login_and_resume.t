@@ -5,8 +5,6 @@ use warnings;
 # Core modules
 use English;
 use FindBin qw( $Bin );
-use IPC::SysV qw(IPC_PRIVATE IPC_CREAT IPC_EXCL S_IRWXU IPC_NOWAIT);
-use IPC::Semaphore;
 
 # CPAN modules
 use Test::More;
@@ -20,7 +18,7 @@ use OpenXPKI::Test::Server;
 use OpenXPKI::Test::Client;
 
 
-plan tests => 14;
+plan tests => 12;
 
 
 #
@@ -42,8 +40,7 @@ $tester->start;
 my $realm = $oxitest->get_default_realm;
 my $resp;
 
-lives_ok { $tester->init_session } "initialize client session";
-$tester->is_next_step("GET_PKI_REALM");
+$tester->init_session;
 
 my $session_id = $tester->client->get_session_id;
 
@@ -64,11 +61,7 @@ $tester->client->close_connection;
 my $tester2 = OpenXPKI::Test::Client->new(oxitest => $oxitest);
 $tester2->start;
 
-lives_ok {
-    $tester2->init_session({ SESSION_ID => $session_id });
-} "initialize client session no. 2 with previous session id";
-
-$tester2->is_next_step("SERVICE_READY");
+$tester2->init_session({ SESSION_ID => $session_id });
 
 $server->stop or diag "Could not shutdown test server";
 

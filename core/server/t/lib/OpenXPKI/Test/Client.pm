@@ -60,8 +60,11 @@ sub start {
 }
 
 sub init_session {
-    my ($self, @args) = @_;
-    $self->response($self->client->init_session(@args));
+    my ($self, $args) = @_;
+    lives_and {
+        $self->response($self->client->init_session($args));
+        $self->is_next_step(($args and $args->{'SESSION_ID'}) ? "SERVICE_READY" : "GET_PKI_REALM");
+    } "initialize client session";
 }
 
 sub is_next_step {
