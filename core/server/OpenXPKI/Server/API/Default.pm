@@ -736,6 +736,9 @@ sub import_chain {
             CTX('log')->system()->info("Certificate $cert_identifier imported with success");
         };
         if (my $eval_err = $EVAL_ERROR) {
+            if (ref $eval_err eq 'OpenXPKI::Exception') {
+                $eval_err = $eval_err->message;
+            }
             CTX('log')->system()->error("Certificate $cert_identifier imported failed with $eval_err");
             push @failed, { cert_identifier => $cert_identifier, error => $eval_err };
         }
