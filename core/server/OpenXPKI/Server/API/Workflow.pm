@@ -245,7 +245,7 @@ sub __get_workflow_ui_info {
             ID          => $workflow->id(),
             STATE       => $workflow->state(),
             TYPE        => $workflow->type(),
-            LAST_UPDATE => $workflow->last_update(),
+            LAST_UPDATE => $workflow->last_update()->iso8601(),
             PROC_STATE  => $workflow->proc_state(),
             COUNT_TRY   => $workflow->count_try(),
             WAKE_UP_AT  => $workflow->wakeup_at(),
@@ -1057,7 +1057,7 @@ sub __get_workflow_info {
         STATE       => $workflow->state(),
         TYPE        => $workflow->type(),
         DESCRIPTION => $workflow->description(),
-        LAST_UPDATE => $workflow->last_update(),
+        LAST_UPDATE => $workflow->last_update()->iso8601(),
         PROC_STATE  => $workflow->proc_state(),
         COUNT_TRY  => $workflow->count_try(),
         WAKE_UP_AT  => $workflow->wakeup_at(),
@@ -1305,7 +1305,7 @@ sub __execute_workflow_activity {
 
         ## unknown exception
         OpenXPKI::Exception->throw(
-            message => scalar $eval_err,
+            message => "$eval_err", # stringify bubble up exceptions
             log     => $logcfg,
         );
     };
