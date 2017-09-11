@@ -70,7 +70,7 @@ sub init {
                 $self->__send_error({ EXCEPTION => $exc });
             }
             elsif ($EVAL_ERROR) {
-                $self->__send_error({ ERROR => $EVAL_ERROR });
+                $self->__send_error({ EXCEPTION => $EVAL_ERROR });
             }
             else { # if everything was fine, send the result to the client
                 $self->talk($result);
@@ -919,7 +919,7 @@ sub run
                     $self->__send_error({ EXCEPTION => $exc, });
                 }
                 elsif ($EVAL_ERROR) {
-                    $self->__send_error({ ERROR => $EVAL_ERROR, });
+                    $self->__send_error({ EXCEPTION => $EVAL_ERROR, });
                 }
                 else { # if everything was fine, send the result to the client
                     $self->talk($result);
@@ -941,9 +941,14 @@ sub __send_error
 
     my $error;
     if ($params->{ERROR}) {
-        $error = { LABEL => scalar $params->{ERROR} };
-    } elsif ($params->{EXCEPTION}) {
-        $error = { LABEL => $params->{EXCEPTION}->message() };
+        $error = { LABEL => $params->{ERROR} };
+    } elsif (ref $params->{EXCEPTION} eq '') {
+        # got exception with already stringified error
+        $error = { LABEL => $params->{EXCEPTION} };
+    } else {
+        # blessed exception object - there are some bubble ups where message
+        # is an exception again => enforce stringification on message
+        $error = { LABEL => "".$params->{EXCEPTION}->message() };
 
         # get all scalar/hash/array parameters from OXI::Exceptions
         # this is used to transport some extra infos for validators, etc
@@ -957,9 +962,9 @@ sub __send_error
                 delete $p->{$_} unless(defined $val && $ref =~ /^(|HASH|ARRAY)$/);
             } keys %{$p};
 
-            #if($p) {
+            if($p) {
                 $error->{PARAMS} = $p;
-            #}
+            }
         }
     }
 

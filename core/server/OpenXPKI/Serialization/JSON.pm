@@ -60,8 +60,8 @@ sub serialize
     eval { $json = $self->{JSON}->encode( $args ); };
     if (!$json) {
         Log::Log4perl->get_logger('openxpki.system')->fatal('Unable to serialize ' . ref $args);
-        Log::Log4perl->get_logger('openxpki.system')->error( Dumper $args );
-        die 'Unable to serialize ' . ref $args . '#' . Dumper $args;
+        Log::Log4perl->get_logger('openxpki.system')->debug( Dumper $args );
+        OpenXPKI::Exception->throw( message => 'Unable to serialize' );
     }
     return $json;
 
