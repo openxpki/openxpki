@@ -54,6 +54,13 @@ has db_conf => (
     },
 );
 
+has start_watchdog => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => 0,
+);
+
 has _config => (
     is => 'ro',
     isa => 'HashRef',
@@ -395,16 +402,16 @@ sub _build_watchdog {
     return {
         max_fork_redo => 5,
         max_exception_threshhold => 10,
-        interval_sleep_exception => 60,
+        interval_sleep_exception => 1,
         max_tries_hanging_workflows =>  3,
 
-        interval_wait_initial => 30,
-        interval_loop_idle => 5,
+        interval_wait_initial => 1,
+        interval_loop_idle => 1,
         interval_loop_run => 1,
 
         # You should not change this unless you know what you are doing
         max_instance_count => 1,
-        disabled => 0,
+        disabled => $self->start_watchdog ? 0 : 1,
     };
 }
 
@@ -573,21 +580,21 @@ sub _build_log4perl {
     return qq(
         log4perl.category.openxpki.auth         = DEBUG, Screen, Logfile, DBI
         log4perl.category.openxpki.audit        = DEBUG, Screen, DBI
-        log4perl.category.openxpki.monitor      = DEBUG, Screen, Logfile
         log4perl.category.openxpki.system       = DEBUG, Screen, Logfile
         log4perl.category.openxpki.workflow     = DEBUG, Screen, Logfile
         log4perl.category.openxpki.application  = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.deprecated   = WARN,  Screen
         log4perl.category.connector             = DEBUG, Screen, Logfile
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
+        log4perl.appender.Screen.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
 
         log4perl.appender.Logfile               = Log::Log4perl::Appender::File
         log4perl.appender.Logfile.filename      = $logfile
         log4perl.appender.Logfile.layout        = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Logfile.layout.ConversionPattern = %d %c.%p:%P %m%n
+        log4perl.appender.Logfile.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
         log4perl.appender.Logfile.syswrite      = 1
         log4perl.appender.Logfile.utf8          = 1
 
