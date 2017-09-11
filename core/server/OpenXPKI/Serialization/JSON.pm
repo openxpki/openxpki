@@ -28,7 +28,7 @@ sub new
     my $keys = shift;
 
     $self->{JSON} = new JSON(%{$keys});
-    $self->{JSON}->convert_blessed->allow_nonref;
+    $self->{JSON}->allow_nonref;
     return unless defined $self->{JSON};
 
     return $self;
