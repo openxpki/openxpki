@@ -10,54 +10,13 @@ state:
 
 action:
     initialize:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        class: OpenXPKI::Server::Workflow::Activity::EST::CACerts
         input:
           - server
           - interface
 
         param:
-          _map_output: |
-            -----BEGIN PKCS7-----
-            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
-            -----END PKCS7-----
+          target_key: output
 
 acl:
     System:

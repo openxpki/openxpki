@@ -79,6 +79,9 @@ while (my $cgi = CGI::Fast->new()) {
 
         $out = $workflow->{CONTEXT}->{output};
 
+        $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+        $out =~ s{\s}{}gxms;
+
     } elsif($operation eq 'csrattrs') {
 
         my $workflow = $client->handle_workflow({
@@ -115,7 +118,13 @@ while (my $cgi = CGI::Fast->new()) {
         });
         $log->debug( 'Sending cert ' . $cert_identifier);
 
+        $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+        $out =~ s{\s}{}gxms;
+
     }
+
+    $out =~ s{^\s*}{}gxms;
+    $out =~ s{\s*$}{}gxms;
 
     $log->trace( $out );
 

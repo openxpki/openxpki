@@ -14,7 +14,7 @@ use LWP::UserAgent;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 package main;
 
@@ -45,7 +45,16 @@ my $length = $response->header( 'Content-Length' );
 my $body = $response->decoded_content;
 ok($length);
 is($length, length($body));
-like($body,"/[a-z0-9 ]+/");
+like($body,"/\\A[a-zA-Z0-9\+\/ ]+=*\\z/xms");
+
+$body =~ s{^\s*}{}gxms;
+$body =~ s{\s*$}{}gxms;
+
+open CHAIN, ">", "tmp/estchain.p7";
+print CHAIN "-----BEGIN PKCS7-----\n$body\n-----END PKCS7-----\n";
+close CHAIN;
+
+`openssl pkcs7 -in tmp/estchain.p7 -print_certs > tmp/estchain.pem`;
 
 $response = $ua->get("https://$host/.well-known/est/csrattrs");
 ok($response->is_success);
@@ -64,11 +73,23 @@ $response = $ua->post("https://$host/.well-known/est/simpleenroll",
 $length = $response->header( 'Content-Length' );
 $body = $response->decoded_content;
 
-print $body ;
-
 ok($response->is_success);
 ok($length);
 is($length, length($body));
-like($body,"/[a-z0-9 ]+/");
+like($body,"/\\A[a-zA-Z0-9\+\/ ]+=*\\z/xms");
+
+$body =~ s{^\s*}{}gxms;
+$body =~ s{\s*$}{}gxms;
+
+open CERT, ">", "tmp/estclient.p7";
+print CERT "-----BEGIN PKCS7-----\n$body\n-----END PKCS7-----\n";
+close CERT;
+
+`openssl pkcs7 -in tmp/estclient.p7 -print_certs > tmp/estclient.crt`;
+
+my $verify = `openssl verify -CAfile tmp/estchain.pem tmp/estclient.crt`;
+like($verify,"/OK/",'verify ok');
+
+
 
 
