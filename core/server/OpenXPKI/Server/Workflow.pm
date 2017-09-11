@@ -335,37 +335,48 @@ sub pause {
     ##! 16: sprintf('pause because of %s, max retries %d, retry interval %d, count try: %d ',$cause_description, $max_retries, $retry_interval, $wakeup_at)
 
     # maximum exceeded?
-    if($count_try > $max_retries){
-        #this exception will be catched from the workflow::execute_action method
-        #proc_state and notifies/history-events will be handled there
-        OpenXPKI::Exception->throw(
-           message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED',
-           params => { retries => $count_try, next_proc_state => 'retry_exceeded' }
-       );
-    }
+    if($count_try > $max_retries) {
 
-
-    # This will catch invalid time formats
-    my $dt_wakeup_at = DateTime->from_epoch( epoch => $wakeup_at );
-    ##! 16: 'Wakeup at '. $dt_wakeup_at
-
-    $self->wakeup_at( $dt_wakeup_at->epoch() );
-    $self->count_try($count_try);
-    $self->context->param( wf_pause_msg => $cause_description );
-    $self->notify_observers( 'pause', $self->{_CURRENT_ACTION}, $cause_description );
-    $self->add_history(
-        Workflow::History->new(
-            {
+        $self->context->param( wf_exception => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_RETRIES_EXEEDED' );
+        $self->notify_observers( 'retry_exceeded' );
+        $self->wakeup_at( 0 );
+        $self->count_try($count_try);
+        $self->add_history(
+            Workflow::History->new({
                 action      => $self->{_CURRENT_ACTION},
-                description => sprintf( 'PAUSED because of %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
+                description => sprintf( 'Retry exceeded, count try %d', $count_try ),
                 state       => $self->state(),
                 user        => CTX('session')->data->user,
-            }
-        )
-    );
-    $self->_set_proc_state('pause');#saves wf data
+            })
+        );
+        $self->_set_proc_state('retry_exceeded');#saves wf data
 
-    CTX('log')->application()->info("Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup $dt_wakeup_at");
+        CTX('log')->application()->warn("Retry exceeded on action ".$self->{_CURRENT_ACTION});
+
+    } else {
+
+        # This will catch invalid time formats
+        my $dt_wakeup_at = DateTime->from_epoch( epoch => $wakeup_at );
+        ##! 16: 'Wakeup at '. $dt_wakeup_at
+
+        $self->wakeup_at( $dt_wakeup_at->epoch() );
+        $self->count_try($count_try);
+        $self->context->param( wf_pause_msg => $cause_description );
+        $self->notify_observers( 'pause', $self->{_CURRENT_ACTION}, $cause_description );
+        $self->add_history(
+            Workflow::History->new(
+                {
+                    action      => $self->{_CURRENT_ACTION},
+                    description => sprintf( 'PAUSED because of %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
+                    state       => $self->state(),
+                    user        => CTX('session')->data->user,
+                }
+            )
+        );
+        $self->_set_proc_state('pause');#saves wf data
+
+        CTX('log')->application()->info("Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup $dt_wakeup_at");
+    }
 
 }
 
@@ -673,7 +684,7 @@ sub is_running(){
 
 sub _has_paused {
     my $self = shift;
-    return ( $self->proc_state eq 'pause' );
+    return ( $self->proc_state eq 'pause' || $self->proc_state eq 'retry_exceeded' );
 }
 
 sub _get_next_state {
@@ -813,7 +824,7 @@ if not otherwise specified (via param "next_proc_state" given to Exception::thro
 
 =head2 _has_paused
 
-true, if the workflow has paused (i.e. the proc state is "pause")
+true, if the workflow has paused (i.e. the proc state is "pause" or "retry_exeeded")
 
 =head2 is_running
 
