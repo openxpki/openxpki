@@ -766,18 +766,20 @@ sub init_related {
         push @wfid, @{$cert->{CERT_ATTRIBUTES}->{$key}};
     }
 
-    $self->logger()->trace("related workflows " . Dumper \@wfid);
+    $self->logger()->trace("related workflows " . Dumper \@wfid) if($self->logger()->is_trace());
 
     my $cert_workflows = $self->send_command( 'search_workflow_instances', {  SERIAL => \@wfid });
 
-    $self->logger()->trace("workflow results" . Dumper $cert_workflows);
+    $self->logger()->trace("workflow results" . Dumper $cert_workflows) if ($self->logger()->is_trace());;
 
+    my $workflow_labels = $self->send_command( 'get_workflow_instance_types');
 
     my @result;
     foreach my $line (@{$cert_workflows}) {
+        my $label = $workflow_labels->{$line->{'WORKFLOW.WORKFLOW_TYPE'}}->{label};
         push @result, [
             $line->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $line->{'WORKFLOW.WORKFLOW_TYPE'},
+            $label || $line->{'WORKFLOW.WORKFLOW_TYPE'},
             $line->{'WORKFLOW.WORKFLOW_STATE'},
             $line->{'WORKFLOW.WORKFLOW_SERIAL'},
         ];
