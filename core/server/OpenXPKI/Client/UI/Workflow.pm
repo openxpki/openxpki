@@ -85,6 +85,11 @@ sub init_index {
     # Pass the initial activity so we get the form right away
     my $wf_action = (keys %{$wf_info->{ACTIVITY}})[0];
 
+    my $wf_param = $self->extra()->{wf_param};
+    if ($wf_param && ref $wf_param eq 'HASH') {
+        $wf_info->{WORKFLOW}->{CONTEXT} = $wf_param;
+    }
+
     $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action });
     return $self;
 
@@ -164,6 +169,12 @@ sub init_load {
     if (!$wf_info) {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
         return $self->init_search({ preset => { wf_id => $id } });
+    }
+
+
+    my $wf_param = $self->extra()->{wf_param};
+    if ($wf_param && ref $wf_param eq 'HASH') {
+        %{$wf_info->{WORKFLOW}->{CONTEXT}} = (%{$wf_info->{WORKFLOW}->{CONTEXT} }, %{$wf_param});
     }
 
     # Set single action if no special view is requested and only single action is avail
@@ -959,7 +970,12 @@ sub action_index {
 
         if (!$wf_info) {
             $self->logger()->error("workflow acton failed!");
-            $self->extra({ wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} });
+            # if field_errors is set, this is a validation error
+            my $extra = { wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} };
+            if ($self->_status->{field_errors}) {
+                $extra->{wf_param} = \%wf_param;
+            }
+            $self->extra($extra);
             $self->init_load();
             return $self;
         }
@@ -976,7 +992,13 @@ sub action_index {
         if (!$wf_info) {
             $self->logger()->error("Create workflow failed");
             # pass required arguments via extra and reload init page
-            $self->extra({ wf_type => $wf_args->{wf_type} });
+
+            my $extra = { wf_type => $wf_args->{wf_type} };
+            # if field_errors is set, this is a validation error
+            if ($self->_status->{field_errors}) {
+                $extra->{wf_param} = \%wf_param;
+            }
+            $self->extra($extra);
             $self->init_index();
             return $self;
         }
