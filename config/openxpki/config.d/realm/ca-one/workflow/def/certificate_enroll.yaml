@@ -5,7 +5,7 @@ head:
 
 state:
     INITIAL:
-        action: initialize set_profile parse_pkcs10 render_subject global_load_policy > CREATED
+        action: initialize global_load_policy set_profile parse_pkcs10 render_subject > CREATED
 
     CREATED:
         autorun: 1
@@ -27,7 +27,7 @@ state:
     MANUAL_AUTHORIZATION:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC
-        action: 
+        action:
           - reject_request > FAILURE
           - accept_request > AUTHORIZED
         output:
@@ -47,7 +47,7 @@ state:
             format: expected
           reject_request:
             format: failure
- 
+
     AUTHORIZED:
         autorun: 1
         action: global_noop > PERFORM_POLICY_CHECK
@@ -80,31 +80,31 @@ state:
     ELIGIBILITY:
         autorun: 1
         action: check_eligibility > EVALUATE_AUTOAPPROVAL
-        
+
     EVALUATE_AUTOAPPROVAL:
         autorun: 1
-        action: 
+        action:
          - approve_by_eligiblity calculate_approval_points > CHECK_APPROVAL ? is_eligible
          - calculate_approval_points > CHECK_APPROVAL ? !is_eligible
-    
+
     CHECK_APPROVAL:
         autorun: 1
         action:
          - notify_approval_pending global_set_error_not_approved > PENDING ? !is_approved is_manual_approval_allowed
          - notify_rejected global_set_error_rejected > FAILURE ? !is_approved !is_manual_approval_allowed
          - global_clear_error_code > APPROVED ? is_approved
-         
+
     PENDING:
        action:
         - reject_request notify_rejected global_set_error_rejected > FAILURE
         - approve_csr calculate_approval_points > RECHECK_APPROVAL
-         
+
     RECHECK_APPROVAL:
         autorun: 1
         action:
          - global_set_error_not_approved > PENDING ? !is_approved
          - global_clear_error_code > APPROVED ? is_approved
-         
+
     APPROVED:
         autorun: 1
         action: persist_csr > PREPARED
@@ -113,16 +113,16 @@ state:
         autorun: 1
         action:
           - global_nice_issue_certificate > SUCCESS
-        
+
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC
-        
+
     FAILURE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC
-        
-action: 
+
+action:
     initialize:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
         param:
@@ -145,12 +145,12 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_DESC
-        
+
     approve_csr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC
-        
+
     override_policy:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL
@@ -160,18 +160,19 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
         param:
             check_policy_duplicate: ''
-            check_policy_dns: ''        
+            check_policy_dns: ''
 
     check_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateEligibility
         param:
-            _map_config_path: "[% context.interface %].[% context.server %].eligibility" 
+            _map_config_path: "[% context.interface %].[% context.server %].eligibility"
             target_key: is_eligible
             raw_result: eligibility_result
 
     approve_by_eligiblity:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
         param:
+            mode: generated
             _map_comment: "Auto-Approval based on eligibility result: [% context.eligibility_result %]"
 
     calculate_approval_points:
@@ -181,26 +182,26 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         param:
             message: enroll_notify_approval_pending
-            
+
     persist_csr:
         class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
         param:
             csr_type: pkcs10
-            
+
     parse_pkcs10:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
-        
+
     render_subject:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
         param:
             cert_subject_style: enroll
-        
+
     set_profile:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
         param:
-            cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
-            cert_subject_style: enroll
-        
+            mode: hash
+            _map_config_path: "[% context.interface %].[% context.server %].profile"
+
 condition:
     is_requestor_authorized:
         class: Workflow::Condition::Evaluate
@@ -265,37 +266,3 @@ acl:
 
     User:
         creator: self
-
-ignore:
-
-#Keysize und hash + (Policy Check -> Validator)
-#Subject 
-#Extact profile from CSR extension + apply map
-#Challenge Password into context
-
-
-#Split CSR subject , set cert_subject and cert_san
-
-#translate profile + apply subject rendering
-
-#Get mode from signer cert
-
-#Check pkcs7 signature
-
-#Map url params to context
-
-#cert count / renewal certificate 
-
-    verify_pkcs7:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::VerifyPKCS7
-        param:
-            pkcs7: $_pkcs7
-
-    parse_pkcs10:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
-        
-    map_url_param:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::InjectExtraParam;
-        param:
-            data: $_url_params
-            prefix: url_ 

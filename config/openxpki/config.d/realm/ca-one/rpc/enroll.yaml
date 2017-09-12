@@ -1,0 +1,21 @@
+authorized_signer:
+    rule1:
+        # Full DN
+        subject: CN=.+:scepclient,.*
+    rule2:
+        # Full DN
+        subject: CN=.+:pkiclient,.*
+
+# You must set at least one of both options or remove the is_policy_loaded
+# condition in the workflow definition
+policy:
+    allow_man_authen: 0
+    allow_man_approv: 1
+    approval_points: 1
+
+profile:
+    cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
+    cert_subject_style: enroll
+
+eligibility:
+    value: 1
