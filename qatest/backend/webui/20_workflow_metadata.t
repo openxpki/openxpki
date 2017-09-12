@@ -67,14 +67,7 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'meta_email[]' => [ 'mail1@openxpki.org', 'mail2@openxpki.org' ],
-});
-
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'wf_token' => undef,
-    'meta_email[]' => [ 'mail1@openxpki.org', 'mail2@openxpki.org' ],
+    'meta_email' =>  'mail1@openxpki.org',
 });
 
 $result = $client->mock_request({
@@ -83,6 +76,5 @@ $result = $client->mock_request({
 
 
 is ($result->{status}->{level}, 'success', 'Status is success');
-
-is( $result->{main}->[0]->{content}->{data}->[3]->{value}->[0], 'mail1@openxpki.org', 'data validated');
+is( $result->{main}->[0]->{content}->{data}->[3]->{value}, 'mail1@openxpki.org', 'data validated');
 
