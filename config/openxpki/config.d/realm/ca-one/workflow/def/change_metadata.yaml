@@ -82,10 +82,12 @@ validator:
 
     validate_email:
         class: OpenXPKI::Server::Workflow::Validator::Regex
+        param:
+            regex: email
+            field: meta_email
+
         arg:
           - $meta_email
-          - email
-
 
 field:
     meta_email:
@@ -96,7 +98,6 @@ field:
         tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP
         type: text
         required: 0
-        max: 10
 
     meta_requestor:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL
