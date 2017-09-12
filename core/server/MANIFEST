@@ -483,6 +483,7 @@ OpenXPKI/Transport/Simple.pm
 OpenXPKI/Serialization/Simple.pm
 OpenXPKI/Serialization/Fast.pm
 OpenXPKI/Serialization/JSON.pm
+OpenXPKI/Serialization/Legacy.pm
 OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
