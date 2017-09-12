@@ -9,7 +9,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Serialization::Simple;
 
-__PACKAGE__->mk_accessors(qw(regex error modifier));
+__PACKAGE__->mk_accessors(qw(regex error modifier field));
 
 sub _init {
     my ( $self, $params ) = @_;
@@ -26,6 +26,12 @@ sub _init {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED' );
     } else {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
+    }
+
+    if ($params->{field}) {
+        $self->field($params->{field});
+    } else {
+        $self->field('');
     }
 
 }
@@ -95,7 +101,7 @@ sub validate {
         ##! 32: 'Regex errors with regex ' . $regex. ', values '  . Dumper \@errors
         CTX('log')->application()->error("Regex validator failed on regex $regex");
 
-        my @fields_with_error = ({ name => 'link', error => $self->error() });
+        my @fields_with_error = ({ name => $self->field(), error => $self->error() });
         validation_error( $self->error(), { invalid_fields => \@fields_with_error } );
 
         return 0;
@@ -111,7 +117,22 @@ sub validate {
 
 OpenXPKI::Server::Workflow::Validator::Regex
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
+
+Validates the context value referenced by argument against a regex. The regex
+can be passed either as second argument or specified in the param section.
+The value given as argument is always preferred.
+
+=head1 Configuration
+
+=head2 Example with arguments
+
+    class: OpenXPKI::Server::Workflow::Validator::Regex
+    arg:
+     - $link
+     - email
+
+=head2 Example with parameters
 
     class: OpenXPKI::Server::Workflow::Validator::Regex
     arg:
@@ -120,20 +141,13 @@ OpenXPKI::Server::Workflow::Validator::Regex
         regex: "\\A http(s)?://[a-zA-Z0-9-\\.]+"
         modifier: xi
         error: Please provide a well-formed URL starting with http://
+        field: link
 
-=head1 DESCRIPTION
+=head2 Parameters
 
-Validates the context value referenced by argument against a regex. The regex
-can be passed either as second argument or specified in the param section.
-The value given as argument is always preferred.
+=over
 
-    class: OpenXPKI::Server::Workflow::Validator::Regex
-    arg:
-     - $link
-     - email
-
-The error parameter is optional, if set this is shown in the UI if the validator
-fails instead of the default message.
+=item regex
 
 The regex must be given as pattern without delimiters and modifiers. The
 default modifier is "xi" (case-insensitive, whitespace pattern), you can
@@ -153,5 +167,23 @@ Basic check for valid email syntax
 A fully qualified domain name, must have at least one dot, all "word"
 characters are accepted for the domain parts. Last domain part must have
 at least two characters
+
+=back
+
+=item modifier
+
+=item error
+
+The error parameter is optional, if set this is shown in the UI if the validator
+fails instead of the default message.
+
+=item field
+
+As the validator only received the value, it does not know which field holds
+the faulty input. If you pass the name of the input field here the UI will
+highlight the field with the error.
+
+B<Note>: You still need to pass the value as argument to the validator as
+there is no way to get it from the field name.
 
 =back
