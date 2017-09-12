@@ -41,6 +41,8 @@ sub execute {
 
     CTX('log')->application()->info(sprintf ('Approval points for workflow %01d: %01d', $workflow->id, $approvals));
 
+    $context->param({ $target_key => $approvals });
+
 
     return 1;
 
