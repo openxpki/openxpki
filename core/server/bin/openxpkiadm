@@ -140,14 +140,18 @@ sub certificate_import {
 
     # directly register alias
     if ($params{alias} || $params{gen} || $params{token}) {
-        if (!$res->{PKI_REALM}) {
-            print "*Unable to register alias without realm!*\n";
-        } else {
-            $params{identifier} = $res->{IDENTIFIER};
-            $params{realm} = $res->{PKI_REALM};
-            print "\n";
+        if (!$params{realm}) {
+            if (!$res->{PKI_REALM}) {
+                print "*Unable to register alias without realm!*\n";
+            } else {
+                $params{realm} = $res->{PKI_REALM};
+            }
         }
-        $return = alias_add();
+        $params{identifier} = $res->{IDENTIFIER};
+        print "\n";
+        if ($params{realm}) {
+            $return = alias_add();
+        }
     }
 
     return $return;
