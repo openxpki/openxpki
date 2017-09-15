@@ -1,5 +1,6 @@
 package OpenXPKI::Server::API2::Command::Cert::search_cert;
 #use Moose;
+
 use OpenXPKI::Server::API2::Command;
 
 =head1 Name
@@ -10,6 +11,7 @@ OpenXPKI::Server::API2::Command::Cert::search_cert - search certificates
 
 =cut
 
+#extends 'OpenXPKI::Server::API2::CommandBase';
 #with 'OpenXPKI::Server::API2::CommandRole';
 
 use Regexp::Common;

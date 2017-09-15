@@ -4,9 +4,9 @@ package OpenXPKI::Server::API2::Command;
 OpenXPKI::Server::API2::CommandRole
 
 =cut
-use Moose ();
+use Moose;
 use Moose::Exporter;
-use Moose::Util qw( apply_all_roles );
+use Moose::Util;
 
 use OpenXPKI::Server::API2::CommandRole;
 
@@ -15,11 +15,6 @@ use OpenXPKI::Server::API2::CommandRole;
 Moose::Exporter->setup_import_methods(
     with_meta => [ "param" ],
     also => "Moose",
-#    as_is => [
-#        qw( super inner ),
-#        'Carp::confess',
-#        'Scalar::Util::blessed',
-#    ],
 );
 
 sub init_meta {
@@ -28,7 +23,7 @@ sub init_meta {
 
     Moose->init_meta(%args);
 
-    apply_all_roles($args{for_class}, 'OpenXPKI::Server::API2::CommandRole');
+    Moose::Util::apply_all_roles($args{for_class}, 'OpenXPKI::Server::API2::CommandRole');
 
     return $args{for_class}->meta();
 }
