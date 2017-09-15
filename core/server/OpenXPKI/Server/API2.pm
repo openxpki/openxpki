@@ -1,9 +1,11 @@
 package OpenXPKI::Server::API2;
 use Moose;
 use utf8;
+
 =head1 Name
 
 OpenXPKI::Server::API2
+
 =cut
 
 # Core modules
@@ -15,7 +17,7 @@ use Module::Load;
 use Module::List qw(list_modules);
 use Try::Tiny;
 
-use Test::More;
+
 
 has namespace => (
     is => 'rw',
@@ -24,11 +26,11 @@ has namespace => (
     default => __PACKAGE__."::Command",
 );
 
-has plugin_role => (
+has plugin_base_class => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    default => "OpenXPKI::Server::API2::CommandRole",
+    default => "OpenXPKI::Server::API2::CommandBase",
 );
 
 has plugins => (
@@ -45,7 +47,6 @@ sub _build_plugins {
     my $self = shift;
 
     my @modules = ();
-#diag "Searching namespace $item";
     my $candidates = {};
     try {
         $candidates = list_modules($self->namespace."::", { list_modules => 1, recurse => 1 });
@@ -55,7 +56,6 @@ sub _build_plugins {
     };
 
     for my $module (keys %{ $candidates }) {
-diag "Candidate $module";
         my $ok;
         try {
             load $module;
@@ -64,22 +64,23 @@ diag "Candidate $module";
         catch {
             warn "Error loading module $module: $_\n";
         };
-diag "--> OK" if $ok;
         push @modules, $module if $ok;
     }
 
     my @plugins = ();
+    my @ignored = ();
 
+    print "Registering command modules:\n";
     for my $mod (@modules){
-        if ($mod->isa("Moose::Object") and $mod->DOES($self->plugin_role)) {
+        if ($mod->isa($self->plugin_base_class)) {
             push @plugins, $mod;
-            print "$mod\n";
+            print "- register: $mod\n";
         }
         else {
-            print "IGNORING $mod (does not have ".$self->plugin_role." role)\n";
+            push @ignored, $mod;
+            print "- ignore:   $mod (no subclass of ".$self->plugin_base_class.")\n";
         }
     }
-
     return \@plugins;
 }
 

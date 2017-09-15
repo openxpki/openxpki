@@ -1,6 +1,4 @@
 package OpenXPKI::Server::API2::Command::Cert::search_cert;
-#use Moose;
-
 use OpenXPKI::Server::API2::Command;
 
 =head1 Name
@@ -10,9 +8,6 @@ OpenXPKI::Server::API2::Command::Cert::search_cert - search certificates
 =head1 Parameters
 
 =cut
-
-#extends 'OpenXPKI::Server::API2::CommandBase';
-#with 'OpenXPKI::Server::API2::CommandRole';
 
 use Regexp::Common;
 
@@ -59,6 +54,35 @@ param status                   => (isa => 'Value',         matching => $re_sql_s
 param subject                  => (isa => 'Value',         matching => $re_sql_string,        );
 param subject_key_identifier   => (isa => 'Value',         matching => $re_alpha_string,      );
 param valid_at                 => (isa => 'Value',         matching => $re_integer_string,    );
+
+api "search_cert" => {
+    authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
+    cert_attributes          => {isa => 'ArrayRef',      },
+    cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },
+    csr_serial               => {isa => 'Value',         matching => $re_integer_string,    },
+    email                    => {isa => 'Value',         matching => $re_sql_string,        },
+    entity_only              => {isa => 'Value',         matching => $re_boolean,           },
+    identifier               => {isa => 'Value',         matching => $re_base64_string,     },
+    issuer_dn                => {isa => 'Value',         matching => $re_sql_string,        },
+    issuer_identifier        => {isa => 'Value',         matching => $re_base64_string,     },
+    limit                    => {isa => 'Value',         matching => $re_integer_string,    },
+    notafter                 => {isa => 'Value|HashRef', },
+    notbefore                => {isa => 'Value|HashRef', },
+    order                    => {isa => 'Value',         matching => $re_sql_field_name,    },
+    pki_realm                => {isa => 'Value',         matching => $re_alpha_string,      },
+    profile                  => {isa => 'Value',         matching => $re_alpha_string,      },
+    reverse                  => {isa => 'Value',         matching => $re_boolean,           },
+    start                    => {isa => 'Value',         matching => $re_integer_string,    },
+    status                   => {isa => 'Value',         matching => $re_sql_string,        },
+    subject                  => {isa => 'Value',         matching => $re_sql_string,        },
+    subject_key_identifier   => {isa => 'Value',         matching => $re_alpha_string,      },
+    valid_at                 => {isa => 'Value',         matching => $re_integer_string,    },
+} => sub {
+    my ($self, $params) = @_;
+
+    use Test::More;
+    diag explain $params;
+};
 
 =over
 

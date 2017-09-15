@@ -15,7 +15,7 @@ use DateTime;
 # Project modules
 use lib "$Bin/lib";
 
-plan tests => 3;
+plan tests => 4;
 
 
 #use_ok "OpenXPKI::Test::API";
@@ -30,6 +30,12 @@ lives_ok {
     diag explain $api->plugins;
 } "query plugins";
 
+
+lives_ok {
+    use OpenXPKI::Server::API2::Command::Cert::search_cert;
+    my $t = OpenXPKI::Server::API2::Command::Cert::search_cert->new(csr_serial => "5");
+    diag $t->csr_serial;
+} "query plugins";
 
 #lives_and {
 #    my $result = CTX('api')->get_workflow_instance_types;
