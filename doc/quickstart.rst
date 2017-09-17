@@ -190,7 +190,7 @@ In the process list, you should see two process running::
     14302 ?        S      0:00 openxpki watchdog ( main )
     14303 ?        S      0:00 openxpki server ( main )
 
-If this is not the case, check */var/openxpki/stderr.log*.
+If this is not the case, check */var/log/openxpki/stderr.log*. 
 
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
@@ -198,6 +198,10 @@ Adding the Webclient
 The new webclient is included in the core packages now. Just open your browser and navigate to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
 
 You can log in as user with any username/password combination, the operator login has two preconfigured operator accounts raop and raop2 with password openxpki.
+
+If you only get the "Open Source Trustcenter" banner without a login prompt,
+check that fcgid is enabled as described above with 
+(*a2enmod fcgid; service apache2 restart).
 
 Testdrive
 ^^^^^^^^^
