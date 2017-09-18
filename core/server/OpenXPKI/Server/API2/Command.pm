@@ -34,7 +34,7 @@ sub init_meta {
     Moose->init_meta(%args);
 
     # Modify the class that imports us:
-    # 1. change the classes' metaclass to be able to use the api_param_classes() HashRef
+    # 1. change the classes' metaclass to e.g. inject the param_classes() HashRef
     Moose::Util::MetaRole::apply_metaroles(
         for => $args{for_class},
         class_metaroles => {
@@ -123,32 +123,11 @@ the specifications in I<$params> above.
 sub api {
     my ($meta, $method_name, $params, $code_ref) = @_;
 
-    # Simply add a method of the given name to the calling class
-    $meta->add_method($method_name => $code_ref);
+    # Add a method of the given name to the calling class
+    $meta->add_method($method_name, $code_ref);
 
-    # Create a class that will hold the parameter values
-    my $param_metaclass = Moose::Meta::Class->create(
-        join("::", $meta->name, "${method_name}_ParamObject"),
-#        superclasses => ,
-#        roles => ,
-    );
-
-    # Add API command parameters to the newly created class as Moose attributes
-    for my $param_name (sort keys %{ $params }) {
-        # the parameter specs like "isa => ..., required => ..."
-        my $param_spec = $params->{$param_name};
-        if ($param_spec->{matching}) {
-            # FIXME Implement
-            delete $param_spec->{matching};
-        }
-        # add a Moose attribute to the parameter container class
-        $param_metaclass->add_attribute($param_name,
-            is => 'ro',
-            %{ $param_spec },
-        );
-    }
-
-    $meta->api_param_classes->{$method_name} = $param_metaclass;
+    # Add a parameter class (see OpenXPKI::Server::API2::MetaClassCommandTrait)
+    $meta->add_param_class($method_name, $params);
 }
 
 1;

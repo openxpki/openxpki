@@ -105,8 +105,8 @@ sub _build_commands {
     print "Registering command modules:\n";
     for my $mod (@modules){
         if ($mod->DOES($self->command_role)) {
-            $commands{$_} = $mod for keys %{ $mod->meta->api_param_classes };
-            print "- register $mod: ".join(", ", keys %{ $mod->meta->api_param_classes })."\n";
+            $commands{$_} = $mod for keys %{ $mod->meta->param_classes };
+            print "- register $mod: ".join(", ", keys %{ $mod->meta->param_classes })."\n";
         }
         else {
             print "- ignore   $mod (does not have role ".$self->command_role.")\n";
