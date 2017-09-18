@@ -8,9 +8,11 @@ OpenXPKI::Server::API2::Command
 # CPAN modules
 use Moose ();
 use Moose::Exporter;
+use Moose::Util;
+use Moose::Util::MetaRole;
 
 # Project modules
-use OpenXPKI::Server::API2::CommandMetaClass;
+use OpenXPKI::Server::API2::CommandMetaClassTrait;
 
 #
 # Exports (imported when calling "use OpenXPKI::Server::API2::Command;")
@@ -37,7 +39,12 @@ sub init_meta {
     # 1. plant a new parent class into
     $importing_class_meta->superclasses("OpenXPKI::Server::API2::CommandBase");
     # 2. change the classes' metaclass to be able to use the api_param_classes() HashRef
-    OpenXPKI::Server::API2::CommandMetaClass->meta->rebless_instance($importing_class_meta);
+    Moose::Util::MetaRole::apply_metaroles(
+        for => $args{for_class},
+        class_metaroles => {
+            class => ['OpenXPKI::Server::API2::CommandMetaClassTrait'],
+        },
+    );
 
     return $importing_class_meta;
 }

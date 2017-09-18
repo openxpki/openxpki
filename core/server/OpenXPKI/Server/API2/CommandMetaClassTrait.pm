@@ -1,24 +1,27 @@
-package OpenXPKI::Server::API2::CommandMetaClass;
+package OpenXPKI::Server::API2::CommandMetaClassTrait;
 =head1 Name
 
-OpenXPKI::Server::API2::CommandMetaClass - Moose metaclass for command classes
-used to store some meta information (like the anonymous command parameter
-classes)
+OpenXPKI::Server::API2::CommandMetaClassTrait - Moose metaclass role (aka.
+"trait") for command classes.
+
+=head2 Description
+
+This role is not intended to be used directly. It will be applied when you say
+C<use OpenXPKI::Server::API2::Command>.
+
+This role adds meta functionality to the classes that implement API commands.
 
 =cut
 use strict;
 use warnings;
 
-use Class::MOP;
+use Moose::Role;
 
-use parent 'Moose::Meta::Class';
-
-# This is like: has api_param_classes => (...);
-__PACKAGE__->meta->add_attribute('api_param_classes' => ( # copied from Moose::Meta::Class
-    accessor => 'api_param_classes',
+has api_param_classes => (
+    is => 'rw',
+    isa => 'HashRef[Str]',
     default => sub { {} },
-    Class::MOP::_definition_context(),
-));
+);
 
 sub new_param_object {
     my ($self, $api_method, %params) = @_;
