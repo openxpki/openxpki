@@ -1,15 +1,15 @@
-package OpenXPKI::Server::API2::MetaClassCommandTrait;
+package OpenXPKI::Server::API2::MetaClassPluginTrait;
 use Moose::Role;
 
 =head1 Name
 
-OpenXPKI::Server::API2::MetaClassCommandTrait - Moose metaclass role (aka.
-"trait") for command classes.
+OpenXPKI::Server::API2::MetaClassPluginTrait - Moose metaclass role (aka.
+"trait") for API plugins
 
 =head2 Description
 
 This role is not intended to be used directly. It will be applied when you say
-C<use OpenXPKI::Server::API2::Command>.
+C<use OpenXPKI::Server::API2::Plugin>.
 
 This role adds meta functionality to the classes that implement API commands.
 

@@ -1,9 +1,9 @@
-package OpenXPKI::Server::API2::Command::Cert::Actions;
+package OpenXPKI::Server::API2::Plugin::Cert::Actions;
 use Moose;
 
 =head1 Name
 
-OpenXPKI::Server::API2::Command::Cert::Actions - utility functions that do some
+OpenXPKI::Server::API2::Plugin::Cert::Actions - utility functions that do some
 work for API commands
 
 =cut

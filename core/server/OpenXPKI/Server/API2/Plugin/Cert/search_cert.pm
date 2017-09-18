@@ -1,9 +1,9 @@
-package OpenXPKI::Server::API2::Command::Cert::search_cert;
-use OpenXPKI::Server::API2::Command;
+package OpenXPKI::Server::API2::Plugin::Cert::search_cert;
+use OpenXPKI::Server::API2::Plugin;
 
 =head1 Name
 
-OpenXPKI::Server::API2::Command::Cert::search_cert - search certificates
+OpenXPKI::Server::API2::Plugin::Cert::search_cert - search certificates
 
 =head1 Parameters
 
@@ -33,7 +33,7 @@ my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
 my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
 my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
 
-api "search_cert" => {
+command "search_cert" => {
     authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef',      },
     cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },

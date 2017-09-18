@@ -18,14 +18,14 @@ use Module::List qw(list_modules);
 use Try::Tiny;
 
 # Project modules
-use OpenXPKI::Server::API2::CommandRole;
+use OpenXPKI::Server::API2::PluginRole;
 
 =head1 Attributes
 
 =head2 namespace
 
 Optional: Perl package namespace that will be searched for the command plugins
-(classes). Default: C<OpenXPKI::Server::API2::Command>
+(classes). Default: C<OpenXPKI::Server::API2::Plugin>
 
 Example:
 
@@ -43,14 +43,14 @@ has namespace => (
 
 Optional: role that all command classes are expected to have. This allows
 the API to distinct between command modules that shall be registered and helper
-classes. Default: C<OpenXPKI::Server::API2::CommandRole>.
+classes. Default: C<OpenXPKI::Server::API2::PluginRole>.
 
 =cut
 has command_role => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    default => "OpenXPKI::Server::API2::CommandRole",
+    default => "OpenXPKI::Server::API2::PluginRole",
 );
 
 =head2 commands
