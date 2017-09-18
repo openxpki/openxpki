@@ -15,7 +15,7 @@ use DateTime;
 # Project modules
 use lib "$Bin/lib";
 
-plan tests => 4;
+plan tests => 5;
 
 
 #use_ok "OpenXPKI::Test::API";
@@ -27,15 +27,22 @@ lives_ok {
 } "instantiation";
 
 lives_ok {
-    diag explain $api->plugins;
-} "query plugins";
+    diag explain $api->commands;
+} "query commands";
 
+dies_ok {
+    $api->dispatch("search_cert", test => 1);
+} "search_cert complains about unknown parameter";
 
-lives_ok {
-    use OpenXPKI::Server::API2::Command::Cert::search_cert;
-    my $t = OpenXPKI::Server::API2::Command::Cert::search_cert->new(csr_serial => "5");
-    diag $t->csr_serial;
-} "query plugins";
+throws_ok {
+    $api->dispatch("search_cert", cert_attributes => "blah");
+} "Moose::Exception::ValidationFailedForTypeConstraint", "search_cert complains about wrong parameter type";
+
+#lives_ok {
+#    use OpenXPKI::Server::API2::Command::Cert::search_cert;
+#    my $t = OpenXPKI::Server::API2::Command::Cert::search_cert->new(csr_serial => "5");
+#    diag $t->csr_serial;
+#} "query plugins";
 
 #lives_and {
 #    my $result = CTX('api')->get_workflow_instance_types;

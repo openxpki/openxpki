@@ -18,7 +18,18 @@ use Module::List qw(list_modules);
 use Try::Tiny;
 
 
+=head1 Attributes
 
+=head2 namespace
+
+Optional: Perl package namespace that will be searched for the command plugins
+(classes). Default: C<OpenXPKI::Server::API2::Command>
+
+Example:
+
+    my $api = OpenXPKI::Server::API2->new(namespace => "My::App::Command");
+
+=cut
 has namespace => (
     is => 'rw',
     isa => 'Str',
@@ -26,23 +37,43 @@ has namespace => (
     default => __PACKAGE__."::Command",
 );
 
-has plugin_base_class => (
+=head2 command_base_class
+
+Optional: base class that all command modules are expected to have. This allows
+the API to distinct between command modules that shall be registered and helper
+classes. Default: C<OpenXPKI::Server::API2::CommandBase>.
+
+=cut
+has command_base_class => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
     default => "OpenXPKI::Server::API2::CommandBase",
 );
 
-has plugins => (
+=head2 commands
+
+I<HashRef> containing registered API commands and their Perl packages. The hash
+is built on first access, you should rarely have a reason to set this manually.
+
+Structure:
+
+    {
+        "API command 1" => "Perl package name",
+        "API command 2" => ...,
+    }
+
+=cut
+has commands => (
     is => 'rw',
-    isa => 'ArrayRef',
+    isa => 'HashRef[Str]',
     lazy => 1,
-    builder => "_build_plugins",
+    builder => "_build_commands",
 );
 
 
 
-sub _build_plugins {
+sub _build_commands {
     # Code taken from Plugin::Simple
     my $self = shift;
 
@@ -67,21 +98,29 @@ sub _build_plugins {
         push @modules, $module if $ok;
     }
 
-    my @plugins = ();
-    my @ignored = ();
+    my %commands = ();
 
     print "Registering command modules:\n";
     for my $mod (@modules){
-        if ($mod->isa($self->plugin_base_class)) {
-            push @plugins, $mod;
-            print "- register: $mod\n";
+        if ($mod->isa($self->command_base_class)) {
+            $commands{$_} = $mod for keys %{ $mod->meta->api_param_classes };
+            print "- register $mod: ".join(", ", keys %{ $mod->meta->api_param_classes })."\n";
         }
         else {
-            push @ignored, $mod;
-            print "- ignore:   $mod (no subclass of ".$self->plugin_base_class.")\n";
+            print "- ignore   $mod (no subclass of ".$self->command_base_class.")\n";
         }
     }
-    return \@plugins;
+    return \%commands;
+}
+
+sub dispatch {
+    my ($self, $command, %params) = @_;
+
+    my $package = $self->commands->{$command};
+    die "Unknown API command $command\n" unless $package;
+
+    my $params = $package->meta->new_param_object($command, %params);
+    return $package->new->$command($params);
 }
 
 __PACKAGE__->meta->make_immutable;

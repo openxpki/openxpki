@@ -33,28 +33,6 @@ my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
 my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
 my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
 
-param authority_key_identifier => (isa => 'Value',         matching => $re_alpha_string,      );
-param cert_attributes          => (isa => 'ArrayRef',      );
-param cert_serial              => (isa => 'Value',         matching => $re_int_or_hex_string, );
-param csr_serial               => (isa => 'Value',         matching => $re_integer_string,    );
-param email                    => (isa => 'Value',         matching => $re_sql_string,        );
-param entity_only              => (isa => 'Value',         matching => $re_boolean,           );
-param identifier               => (isa => 'Value',         matching => $re_base64_string,     );
-param issuer_dn                => (isa => 'Value',         matching => $re_sql_string,        );
-param issuer_identifier        => (isa => 'Value',         matching => $re_base64_string,     );
-param limit                    => (isa => 'Value',         matching => $re_integer_string,    );
-param notafter                 => (isa => 'Value|HashRef', );
-param notbefore                => (isa => 'Value|HashRef', );
-param order                    => (isa => 'Value',         matching => $re_sql_field_name,    );
-param pki_realm                => (isa => 'Value',         matching => $re_alpha_string,      );
-param profile                  => (isa => 'Value',         matching => $re_alpha_string,      );
-param reverse                  => (isa => 'Value',         matching => $re_boolean,           );
-param start                    => (isa => 'Value',         matching => $re_integer_string,    );
-param status                   => (isa => 'Value',         matching => $re_sql_string,        );
-param subject                  => (isa => 'Value',         matching => $re_sql_string,        );
-param subject_key_identifier   => (isa => 'Value',         matching => $re_alpha_string,      );
-param valid_at                 => (isa => 'Value',         matching => $re_integer_string,    );
-
 api "search_cert" => {
     authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef',      },
@@ -81,6 +59,7 @@ api "search_cert" => {
     my ($self, $params) = @_;
 
     use Test::More;
+    diag "search_cert called:";
     diag explain $params;
 };
 

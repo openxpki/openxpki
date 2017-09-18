@@ -6,7 +6,7 @@ OpenXPKI::Server::API2::Command
 =cut
 
 # CPAN modules
-use Moose;
+use Moose ();
 use Moose::Exporter;
 
 # Project modules
@@ -16,7 +16,7 @@ use OpenXPKI::Server::API2::CommandMetaClass;
 # Exports (imported when calling "use OpenXPKI::Server::API2::Command;")
 #
 Moose::Exporter->setup_import_methods(
-    with_meta => [ "param", "api" ],
+    with_meta => [ "api" ],
     also => "Moose",
 );
 
@@ -29,6 +29,10 @@ sub init_meta {
     Moose->init_meta(%args);
     my $importing_class_meta = $args{for_class}->meta;
 
+#my @supers = $meta->superclasses;
+#$meta->superclasses('MooseX::Embiggen::Base::Class')
+#  if @supers == 1 && $supers[0] eq 'Moose::Object';
+
     # We modify the class that imports us:
     # 1. plant a new parent class into
     $importing_class_meta->superclasses("OpenXPKI::Server::API2::CommandBase");
@@ -36,20 +40,6 @@ sub init_meta {
     OpenXPKI::Server::API2::CommandMetaClass->meta->rebless_instance($importing_class_meta);
 
     return $importing_class_meta;
-}
-
-sub param {
-    my ($meta, $name, %spec) = @_;
-
-    if ($spec{matching}) {
-        # FIXME Implement
-        delete $spec{matching};
-    }
-
-    $meta->add_attribute($name,
-        is => 'ro',
-        %spec,
-    );
 }
 
 sub api {
@@ -61,7 +51,6 @@ sub api {
         join("::", $meta->name, "${method_name}_ParamObject"),
 #        superclasses => ,
 #        roles => ,
-#        cache => 1,
     );
 
     for my $param_name (sort keys %{ $params }) {
