@@ -17,6 +17,8 @@ use Module::Load;
 use Module::List qw(list_modules);
 use Try::Tiny;
 
+# Project modules
+use OpenXPKI::Server::API2::CommandRole;
 
 =head1 Attributes
 
@@ -39,16 +41,16 @@ has namespace => (
 
 =head2 command_base_class
 
-Optional: base class that all command modules are expected to have. This allows
+Optional: role that all command classes are expected to have. This allows
 the API to distinct between command modules that shall be registered and helper
-classes. Default: C<OpenXPKI::Server::API2::CommandBase>.
+classes. Default: C<OpenXPKI::Server::API2::CommandRole>.
 
 =cut
-has command_base_class => (
+has command_role => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    default => "OpenXPKI::Server::API2::CommandBase",
+    default => "OpenXPKI::Server::API2::CommandRole",
 );
 
 =head2 commands
@@ -102,12 +104,12 @@ sub _build_commands {
 
     print "Registering command modules:\n";
     for my $mod (@modules){
-        if ($mod->isa($self->command_base_class)) {
+        if ($mod->DOES($self->command_role)) {
             $commands{$_} = $mod for keys %{ $mod->meta->api_param_classes };
             print "- register $mod: ".join(", ", keys %{ $mod->meta->api_param_classes })."\n";
         }
         else {
-            print "- ignore   $mod (no subclass of ".$self->command_base_class.")\n";
+            print "- ignore   $mod (does not have role ".$self->command_role.")\n";
         }
     }
     return \%commands;

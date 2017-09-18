@@ -10,6 +10,7 @@ use Moose ();
 use Moose::Exporter;
 use Moose::Util;
 use Moose::Util::MetaRole;
+use B::Hooks::EndOfScope;
 
 # Project modules
 use OpenXPKI::Server::API2::CommandMetaClassTrait;
@@ -31,20 +32,20 @@ sub init_meta {
     Moose->init_meta(%args);
     my $importing_class_meta = $args{for_class}->meta;
 
-#my @supers = $meta->superclasses;
-#$meta->superclasses('MooseX::Embiggen::Base::Class')
-#  if @supers == 1 && $supers[0] eq 'Moose::Object';
-
     # We modify the class that imports us:
-    # 1. plant a new parent class into
-    $importing_class_meta->superclasses("OpenXPKI::Server::API2::CommandBase");
-    # 2. change the classes' metaclass to be able to use the api_param_classes() HashRef
+    # 1. change the classes' metaclass to be able to use the api_param_classes() HashRef
     Moose::Util::MetaRole::apply_metaroles(
         for => $args{for_class},
         class_metaroles => {
             class => ['OpenXPKI::Server::API2::CommandMetaClassTrait'],
         },
     );
+    # 2. apply a role that marks it as a command and adds some functions
+    # NOTE: Without on_scope_end() the role would be applied immediately when
+    # the Perl compiler parses the importing classes' "use" statement. Methods
+    # required by the role would not yet be defined. on_scope_end() defers that.
+    # The solution was kindly suggested by mst on IRC.
+    on_scope_end { Moose::Util::apply_all_roles($args{for_class}, 'OpenXPKI::Server::API2::CommandRole') };
 
     return $importing_class_meta;
 }
