@@ -1,7 +1,7 @@
 package OpenXPKI::Server::API2::PluginRole;
 =head1 Name
 
-OpenXPKI::Server::API2::PluginBase - Base class for API plugins
+OpenXPKI::Server::API2::PluginRole - Base role for API plugins
 
 =cut
 use Moose::Role;

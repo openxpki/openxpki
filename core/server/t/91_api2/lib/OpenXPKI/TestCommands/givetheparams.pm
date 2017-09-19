@@ -1,5 +1,5 @@
 package OpenXPKI::TestCommands::givetheparams;
-use OpenXPKI::Server::API2::Plugin;
+use OpenXPKI::Server::API2::EasyPlugin;
 
 command "givetheparams" => {
     name => { isa => 'Str', matching => qr/^(?!Donald).*/, required => 1 },

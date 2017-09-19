@@ -1,30 +1,8 @@
-package OpenXPKI::Server::API2::Plugin;
+package OpenXPKI::Server::API2::EasyPlugin;
+
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin - Define an OpenXPKI API plugin
-
-=head1 DESCRIPTION
-
-To define a new API plugin simply say:
-
-    package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
-    use OpenXPKI::Server::API2::Plugin;
-
-This will modify your package as follows:
-
-=over
-
-=item * imports Moose (i.e. adds "use Moose;" so you don't have to do it)
-
-=item * provides the new L</command> keyword (just an imported sub really) to
-define API commands
-
-=item * applies the Moose role L<OpenXPKI::Server::API2::PluginRole>
-
-=item * applies the Moose metaclass role (aka. "trait")
-L<OpenXPKI::Server::API2::MetaClassPluginTrait>
-
-=back
+OpenXPKI::Server::API2::EasyPlugin - Define an OpenXPKI API plugin
 
 =cut
 
@@ -36,47 +14,47 @@ use Moose::Util::MetaRole;
 use B::Hooks::EndOfScope;
 
 # Project modules
-use OpenXPKI::Server::API2::MetaClassPluginTrait;
+use OpenXPKI::Server::API2::EasyPluginMetaClassTrait;
 
-#
-# Export (imported when calling "use OpenXPKI::Server::API2::Plugin;")
-#
+
+=head1 DESCRIPTION
+
+To define a new API plugin simply say:
+
+    package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
+    use OpenXPKI::Server::API2::EasyPlugin;
+
+This will modify your package as follows:
+
+=over
+
+=item * imports Moose (i.e. adds "use Moose;" so you don't have to do it)
+
+=item * provides the L</command> keyword (just an imported sub really) to
+define API commands
+
+=item * applies the Moose role L<OpenXPKI::Server::API2::EasyPluginRole>
+
+=item * applies the Moose metaclass role (aka. "trait")
+L<OpenXPKI::Server::API2::EasyPluginMetaClassTrait>
+
+=back
+
+=cut
 Moose::Exporter->setup_import_methods(
-    # functions
+    also => [ "Moose" ],
     with_meta => [ "command" ],
-    # other modules
-    also => "Moose",
+    base_class_roles => [ "OpenXPKI::Server::API2::EasyPluginRole" ],
+    class_metaroles => {
+        class => [ 'OpenXPKI::Server::API2::EasyPluginMetaClassTrait' ],
+    },
 );
 
-# Moose::Exporter calls init_meta() when the package that uses us calls IMPORT().
-# $args{for_class} contains the metaclass of the class that imports us.
-sub init_meta {
-    shift; # our class name
-    my %args = @_;
 
-    Moose->init_meta(%args);
-
-    # Modify the class that imports us:
-    # 1. change the classes' metaclass to e.g. inject the param_classes() HashRef
-    Moose::Util::MetaRole::apply_metaroles(
-        for => $args{for_class},
-        class_metaroles => {
-            class => ['OpenXPKI::Server::API2::MetaClassPluginTrait'],
-        },
-    );
-
-    # 2. apply a role that marks it as a command and adds some functions
-    # NOTE: Without on_scope_end() the role would be applied immediately when
-    # the Perl compiler parses the importing classes' "use" statement. Methods
-    # required by the role would not yet be defined. on_scope_end() defers that.
-    # The solution was kindly suggested by mst on IRC.
-    on_scope_end { Moose::Util::apply_all_roles($args{for_class}, 'OpenXPKI::Server::API2::PluginRole') };
-}
-
-=head1 Imported functions
+=head1 KEYWORDS (imported functions)
 
 The following functions are imported into the package that uses
-C<OpenXPKI::Server::API2::Plugin>.
+C<OpenXPKI::Server::API2::EasyPlugin>.
 
 =head2 command
 
@@ -149,7 +127,7 @@ sub command {
     # Add a method of the given name to the calling class
     $meta->add_method($command_name, $code_ref);
 
-    # Add a parameter class (see OpenXPKI::Server::API2::MetaClassPluginTrait)
+    # Add a parameter class (see OpenXPKI::Server::API2::EasyPluginMetaClassTrait)
     $meta->add_param_class($command_name, $params);
 }
 

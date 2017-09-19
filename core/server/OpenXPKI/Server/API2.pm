@@ -2,9 +2,10 @@ package OpenXPKI::Server::API2;
 use Moose;
 use utf8;
 
-=head1 Name
+=head1 NAME
 
-OpenXPKI::Server::API2
+OpenXPKI::Server::API2 - Standardized internal and external access to sensitive
+functions
 
 =cut
 
@@ -20,7 +21,29 @@ use Try::Tiny;
 # Project modules
 use OpenXPKI::Server::API2::PluginRole;
 
-=head1 Attributes
+
+
+=head1 DESCRIPTION
+
+=head2 Call API commands
+
+This class acts as a dispatcher (single entrypoint) to execute API commands via
+L<dispatch>.
+
+It makes available all API commands defined in the C<OpenXPKI::Server::API2::Plugin>
+namespace.
+
+=head2 Create a plugin class
+
+The standard (and easy) way to define a new plugin class with API commands is to
+create a new package in the C<OpenXPKI::Server::API2::Plugin> namespace and use
+L<OpenXPKI::Server::API2::EasyPlugin> as described there.
+
+=cut
+
+
+
+=head1 ATTRIBUTES
 
 =head2 namespace
 
@@ -73,8 +96,6 @@ has commands => (
     builder => "_build_commands",
 );
 
-
-
 sub _build_commands {
     # Code taken from Plugin::Simple
     my $self = shift;
@@ -115,6 +136,24 @@ sub _build_commands {
     return \%commands;
 }
 
+
+=head1 METHODS
+
+=head2 dispatch
+
+Dispatches an API command call to the responsible plugin instance.
+
+B<Parameters>
+
+=over
+
+=item * C<$command> - API command name
+
+=item * C<%params> - Parameter hash
+
+=back
+
+=cut
 sub dispatch {
     my ($self, $command, %params) = @_;
 
@@ -126,3 +165,26 @@ sub dispatch {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+=head1 INTERNALS
+
+=head2 Design principles
+
+=over
+
+=item * B<No base class>: when you use L<OpenXPKI::Server::API2::EasyPlugin> to
+define a plugin class all functionality is added via Moose roles instead of
+a base class. This allows for plugin classes to be based on any other classes
+if needed.
+
+=item * B<Standard magic>: syntactic sugar and helper functions only use Moose's
+standard way to e.g. customize meta classes or inject roles. No other black
+magic is used.
+
+=item * B<Breakout allowed>: using L<OpenXPKI::Server::API2::EasyPlugin> is not
+a must, API plugins might be implemented differently by manually adding the role
+L<OpenXPKI::Server::API2::PluginRole> to a plugin class.
+
+=back
+
+=cut
