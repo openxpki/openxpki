@@ -77,7 +77,7 @@ sub execute {
                     $plain_result = $config->get( [ @prefix, 'value', @path ] );
                 };
                 if ($EVAL_ERROR) {
-                    CTX('log')->application()->warn("Eligibility check chrashed - do pause");
+                    CTX('log')->application()->warn(sprintf("Eligibility check chrashed - do pause (%s) ", $EVAL_ERROR));
 
                     ##! 32: 'Doing pause'
                     $self->pause('I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR');
