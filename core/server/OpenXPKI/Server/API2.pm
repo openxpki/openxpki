@@ -23,6 +23,30 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::API2::PluginRole;
 
 
+=head1 SYNOPSIS
+
+Default usage:
+
+    use OpenXPKI::Server::API2;
+
+    my $api = OpenXPKI::Server::API2->new();
+    printf "Available commands: %s\n", join(", ", keys %{$api->commands});
+
+    my $result = $api->dispatch("mycommand", myaction => "go");
+
+To manually register a plugin outside the default namespace:
+
+    my @commands = $api->register_plugin("OpenXPKI::MyAlienplugin");
+
+Set a different plugin namespace for auto-discovery:
+
+    my $api = OpenXPKI::Server::API2->new(
+        namespace => "My::Command::Plugins",
+    );
+
+Instantiate the API without plugin auto-discovery:
+
+    my $api = OpenXPKI::Server::API2->new(commands => {});
 
 =head1 DESCRIPTION
 
@@ -36,8 +60,10 @@ namespace.
 
 =head2 Create a plugin class
 
-The standard (and easy) way to define a new plugin class with API commands is to
-create a new package in the C<OpenXPKI::Server::API2::Plugin> namespace and use
+Standard (and easy) way to define a new plugin class with API commands:
+
+Create a new package in the C<OpenXPKI::Server::API2::Plugin> namespace (any
+deeper hierarchy is OK) and in your package use
 L<OpenXPKI::Server::API2::EasyPlugin> as described there.
 
 =cut
@@ -108,10 +134,21 @@ Structure:
         "API command 2" => ...,
     }
 
+=head1 METHODS
+
+=head2 add_commands
+
+Register the given C<command =E<gt> package> mappings to the list of known API
+commands.
+
 =cut
 has commands => (
     is => 'rw',
     isa => 'HashRef[Str]',
+    traits => [ 'Hash' ],
+    handles => {
+        add_commands => 'set',
+    },
     lazy => 1,
     builder => "_build_commands",
 );
@@ -132,35 +169,69 @@ sub _build_commands {
         );
     };
 
-    for my $module (keys %{ $candidates }) {
+    return $self->_load_plugins( [ keys %{ $candidates } ] );
+}
+
+#
+# Tries to load the given plugin classes.
+#
+# Returns a HashRef that contains the C<command =E<gt> package> mappings.
+#
+sub _load_plugins {
+    my ($self, $packages) = @_;
+
+    my $cmd_package_map = {};
+
+    for my $pkg (@{ $packages }) {
         my $ok;
         try {
-            load $module;
+            load $pkg;
             $ok = 1;
         }
         catch {
-            $self->log->warn("Error loading API plugin $module: $_");
+            $self->log->warn("Error loading API plugin $pkg: $_");
+            next;
         };
-        push @modules, $module if $ok;
+
+        if (not $pkg->DOES($self->command_role)) {
+            $self->log->debug("API - ignore   $pkg (does not have role ".$self->command_role.")");
+            next;
+        }
+
+        $self->log->debug("API - register $pkg: ".join(", ", @{ $pkg->commands }));
+        # FIXME test for duplicate command names
+        $cmd_package_map->{$_} = $pkg for @{ $pkg->commands };
     }
 
-    my %commands = ();
-
-    $self->log->debug("Registering API plugins:");
-    for my $mod (@modules){
-        if ($mod->DOES($self->command_role)) {
-            $commands{$_} = $mod for @{ $mod->commands };
-           $self->log->debug("- register $mod: ".join(", ", @{ $mod->commands }));
-        }
-        else {
-            $self->log->debug("- ignore   $mod (does not have role ".$self->command_role.")");
-        }
-    }
-    return \%commands;
+    return $cmd_package_map;
 }
 
+=head2 register_plugin
 
-=head1 METHODS
+Manually register a plugin class containing API commands.
+
+This is usually not neccessary because plugin classes are auto-discovered
+as described L<above|/DESCRIPTION>.
+
+Returns a plain C<list> of API commands that were found.
+
+B<Parameters>
+
+=over
+
+=item * C<$packages> - class/package name I<Str> or I<ArrayRef> of package names
+
+=back
+
+=cut
+sub register_plugin {
+    my ($self, $packages) = @_;
+    $packages = [ $packages ] unless (ref $packages or "") eq "ARRAY";
+
+    my $pkg_by_cmd = $self->_load_plugins($packages);
+    $self->add_commands( %{ $pkg_by_cmd } );
+    return ( keys %{ $pkg_by_cmd } );
+}
 
 =head2 dispatch
 
@@ -197,6 +268,11 @@ __PACKAGE__->meta->make_immutable;
 =head2 Design principles
 
 =over
+
+=item * B<One or more commands per class>: each plugin class can specify one or
+more API commands. This allows to keep helper functions that are shared between
+several API commands close to the command code. It also helps reducing the
+number of individual Perl module files.
 
 =item * B<No base class>: when you use L<OpenXPKI::Server::API2::EasyPlugin> to
 define a plugin class all functionality is added via Moose roles instead of
