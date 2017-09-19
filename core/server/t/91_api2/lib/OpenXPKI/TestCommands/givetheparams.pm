@@ -12,6 +12,4 @@ command "givetheparams" => {
     };
 };
 
-sub blah {}
-
 __PACKAGE__->meta->make_immutable;

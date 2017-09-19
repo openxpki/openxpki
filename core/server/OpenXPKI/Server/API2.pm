@@ -10,8 +10,6 @@ functions
 =cut
 
 # Core modules
-use Carp qw(croak);
-use Cwd qw (abs_path);
 use Module::Load;
 
 # CPAN modules
@@ -19,6 +17,9 @@ use Module::List qw(list_modules);
 use Try::Tiny;
 
 # Project modules
+use OpenXPKI::Server::Context;
+use OpenXPKI::Server::Log;
+use OpenXPKI::Exception;
 use OpenXPKI::Server::API2::PluginRole;
 
 
@@ -45,6 +46,22 @@ L<OpenXPKI::Server::API2::EasyPlugin> as described there.
 
 =head1 ATTRIBUTES
 
+=head2 log
+
+Optional: L<Log::Log4perl::Logger>. Default: C<CTX('log')-E<gt>application> if
+available or a new logger instance.
+
+=cut
+has log => (
+    is => 'rw',
+    isa => 'Log::Log4perl::Logger',
+    lazy => 1,
+    default => sub {
+        my $log = OpenXPKI::Server::Context::hascontext('log') ? CTX('log') : OpenXPKI::Server::Log->new(CONFIG => undef);
+        return $log->application,
+    },
+);
+
 =head2 namespace
 
 Optional: Perl package namespace that will be searched for the command plugins
@@ -62,11 +79,14 @@ has namespace => (
     default => __PACKAGE__."::Command",
 );
 
-=head2 command_base_class
+=head2 command_role
 
 Optional: role that all command classes are expected to have. This allows
 the API to distinct between command modules that shall be registered and helper
 classes. Default: C<OpenXPKI::Server::API2::PluginRole>.
+
+B<ATTENTION>: if you change this make sure the role you specify requires at
+least the same methods as L<OpenXPKI::Server::API2::PluginRole>.
 
 =cut
 has command_role => (
@@ -106,7 +126,10 @@ sub _build_commands {
         $candidates = list_modules($self->namespace."::", { list_modules => 1, recurse => 1 });
     }
     catch {
-        die "Error listing modules in namespace ".$self->namespace.": $_";
+        OpenXPKI::Exception->throw (
+            message => "Error listing API plugins",
+            params => { namespace => $self->namespace, error => $_ }
+        );
     };
 
     for my $module (keys %{ $candidates }) {
@@ -116,21 +139,21 @@ sub _build_commands {
             $ok = 1;
         }
         catch {
-            warn "Error loading module $module: $_\n";
+            $self->log->warn("Error loading API plugin $module: $_");
         };
         push @modules, $module if $ok;
     }
 
     my %commands = ();
 
-    print "Registering command modules:\n";
+    $self->log->debug("Registering API plugins:");
     for my $mod (@modules){
         if ($mod->DOES($self->command_role)) {
-            $commands{$_} = $mod for keys %{ $mod->meta->param_classes };
-            print "- register $mod: ".join(", ", keys %{ $mod->meta->param_classes })."\n";
+            $commands{$_} = $mod for @{ $mod->commands };
+           $self->log->debug("- register $mod: ".join(", ", @{ $mod->commands }));
         }
         else {
-            print "- ignore   $mod (does not have role ".$self->command_role.")\n";
+            $self->log->debug("- ignore   $mod (does not have role ".$self->command_role.")");
         }
     }
     return \%commands;
@@ -157,11 +180,14 @@ B<Parameters>
 sub dispatch {
     my ($self, $command, %params) = @_;
 
-    my $package = $self->commands->{$command};
-    die "Unknown API command $command\n" unless $package;
+    my $package = $self->commands->{$command}
+        or OpenXPKI::Exception->throw(
+            message => "Unknown API command",
+            params => { command => $command }
+        );
 
-    my $params = $package->meta->new_param_object($command, %params);
-    return $package->new->$command($params);
+    # FIXME Implement one-time instantiation
+    return $package->new->execute($command, \%params);
 }
 
 __PACKAGE__->meta->make_immutable;

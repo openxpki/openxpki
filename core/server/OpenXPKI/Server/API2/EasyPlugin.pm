@@ -128,7 +128,7 @@ sub command {
     $meta->add_method($command_name, $code_ref);
 
     # Add a parameter class (see OpenXPKI::Server::API2::EasyPluginMetaClassTrait)
-    $meta->add_param_class($command_name, $params);
+    $meta->add_param_specs($command_name, $params);
 }
 
 1;
