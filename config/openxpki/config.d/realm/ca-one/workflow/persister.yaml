@@ -6,3 +6,5 @@ OpenXPKI:
 Volatile:
     class: OpenXPKI::Server::Workflow::Persister::Null
 
+NoHistory:
+    class: OpenXPKI::Server::Workflow::Persister::NoHistory

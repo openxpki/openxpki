@@ -397,6 +397,7 @@ OpenXPKI/Server/Workflow/Activity/SmartCard/CheckServerStatus.pm
 
 OpenXPKI/Server/Workflow/Persister/Null.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
+OpenXPKI/Server/Workflow/Persister/NoHistory.pm
 
 OpenXPKI/Server/Workflow/Observer/AddExecuteHistory.pm
 OpenXPKI/Server/Workflow/Observer/Debug.pm
