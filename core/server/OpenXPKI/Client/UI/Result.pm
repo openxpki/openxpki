@@ -342,7 +342,7 @@ sub param {
         if ($name =~ m{ \A (\w+)\[\] \z }xms) {
             my @val = $self->param($name);
             $result->{$1} = \@val;
-        } elsif ($name =~ m{ \A (\w+){(\w+)}(\[\])? \z }xms) {
+        } elsif ($name =~ m{ \A (\w+)\{(\w+)\}(\[\])? \z }xms) {
             # if $3 is set we have an array element of a named parameter
             # (e.g. multivalued subject_parts)
             $result->{$1} = {} unless( $result->{$1} );
