@@ -348,7 +348,7 @@ sub get_ca_list {
                     : 'OFFLINE';
             };
             if ($EVAL_ERROR) {
-                CTX('log')->application()->error("Eval error getting ca token $token for ca_list");
+                CTX('log')->application()->error("Eval error getting ca token ".$row->{alias}." for ca_list");
             }
 
         }
