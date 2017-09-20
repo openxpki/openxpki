@@ -41,7 +41,6 @@ sub log {
     my ($seconds, $micro) = Time::HiRes::gettimeofday();
     $seconds += $micro/1000000;
 
-    my $wf_id = Log::Log4perl::MDC->get('wfid') || 0;
     CTX('dbi_log')->insert(
         into => 'audittrail',
         values  => {
