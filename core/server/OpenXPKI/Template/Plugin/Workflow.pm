@@ -62,7 +62,7 @@ sub _load {
 
     return unless ($wf_id);
 
-    if ($self->{_workflow} && $self->{_workflow}->{'WORKFLOW.WORKFLOW_ID'} == $wf_id) {
+    if ($self->{_workflow} && $self->{_workflow}->{'WORKFLOW.WORKFLOW_SERIAL'} == $wf_id) {
         return $self->{_workflow};
     }
 
@@ -74,6 +74,7 @@ sub _load {
             $self->{_workflow} = $result->[0];
         }
     };
+
     return $self->{_workflow};
 
 }
