@@ -1,10 +1,10 @@
-package OpenXPKI::Test::More::Workflow::TestPausedWorkflow;
+package OpenXPKI::Test::QA::More::Workflow::TestPausedWorkflow;
 
 
 use Data::Dumper;
 
 {
-    use base qw( OpenXPKI::Test::More );
+    use base qw( OpenXPKI::Test::QA::More );
     sub wftype { return qw( I18N_OPENXPKI_WF_TYPE_TESTING ) };
 
     sub proc_state_is {

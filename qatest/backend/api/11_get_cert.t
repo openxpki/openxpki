@@ -16,17 +16,17 @@ use File::Temp qw( tempfile );
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use Test::More;
 use Test::Deep;
 use TestCfg;
-use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::QA::CertHelper;
 
 our %cfg = ();
 my $testcfg = new TestCfg;
 $testcfg->read_config_path( 'api.cfg', \%cfg, dirname($0) );
 
-my $test = OpenXPKI::Test::More->new({
+my $test = OpenXPKI::Test::QA::More->new({
     socketfile => $cfg{instance}{socketfile},
     realm => $cfg{instance}{realm},
 }) or die "Error creating new test instance: $@";
@@ -41,7 +41,7 @@ $test->connect_ok(
 
 # Create certificate
 use DateTime;
-my $cert_info = OpenXPKI::Test::CertHelper->via_workflow(
+my $cert_info = OpenXPKI::Test::QA::CertHelper->via_workflow(
     tester => $test,
     hostname => "127.0.0.1",
 );

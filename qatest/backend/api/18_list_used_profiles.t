@@ -18,8 +18,8 @@ use Test::Deep;
 # Project modules
 use lib "$Bin/../../lib";
 use TestCfg;
-use OpenXPKI::Test::More;
-use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::QA::More;
+use OpenXPKI::Test::QA::CertHelper;
 
 #
 # Init client
@@ -27,7 +27,7 @@ use OpenXPKI::Test::CertHelper;
 our $cfg = {};
 TestCfg->new->read_config_path( 'api.cfg', $cfg, dirname($0) );
 
-my $test = OpenXPKI::Test::More->new({
+my $test = OpenXPKI::Test::QA::More->new({
     socketfile => $cfg->{instance}{socketfile},
     realm => $cfg->{instance}{realm},
 }) or die "Error creating new test instance: $@";
@@ -45,12 +45,12 @@ $test->connect_ok(
 #
 
 # Create test certificates
-OpenXPKI::Test::CertHelper->via_workflow(
+OpenXPKI::Test::QA::CertHelper->via_workflow(
     tester => $test,
     hostname => "127.0.0.1",
     profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
 );
-OpenXPKI::Test::CertHelper->via_workflow(
+OpenXPKI::Test::QA::CertHelper->via_workflow(
     tester => $test,
     hostname => "127.0.0.1",
     application_name => "Joust",

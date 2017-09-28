@@ -22,9 +22,9 @@ use Math::BigInt;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use TestCfg;
-use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::QA::CertHelper;
 use utf8;
 
 my $dirname = dirname($0);
@@ -36,7 +36,7 @@ my $certs_to_create = 4;
 my $testcfg = new TestCfg;
 $testcfg->read_config_path( '9x_nice.cfg', \%cfg, @cfgpath );
 
-my $test = OpenXPKI::Test::More->new( {
+my $test = OpenXPKI::Test::QA::More->new( {
     socketfile => $cfg{instance}{socketfile},
     realm => $cfg{instance}{realm},
 } ) or die "Error creating new test instance: $@";
@@ -53,7 +53,7 @@ my @cert_serials = ();
 
 for my $certno (1..$certs_to_create) {
     # Create certificate
-    my $cert_info = OpenXPKI::Test::CertHelper->via_workflow(
+    my $cert_info = OpenXPKI::Test::QA::CertHelper->via_workflow(
         tester          => $test,
         hostname        => "127.0.0.".(1+$certno*3),
         hostname2       => [ "127.0.0.".(2+$certno*3) , "127.0.0.".(3+$certno*3) ],

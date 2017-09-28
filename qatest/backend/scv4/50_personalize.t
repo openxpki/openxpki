@@ -31,7 +31,7 @@ use Digest::SHA qw(sha1_hex);
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use TestCfg;
 
 my $dirname = dirname($0);
@@ -53,7 +53,7 @@ if ($cert_dir !~ '^/') {
 -d $cert_dir || die "Please create certificate directory $cert_dir " ;
 -w $cert_dir || die "Please make certificate directory $cert_dir writable" ; 
 
-my $test = OpenXPKI::Test::More->new(
+my $test = OpenXPKI::Test::QA::More->new(
     {
         socketfile => $cfg{instance}{socketfile},
         realm => $cfg{instance}{realm},

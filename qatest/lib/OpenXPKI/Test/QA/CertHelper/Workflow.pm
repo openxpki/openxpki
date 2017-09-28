@@ -1,16 +1,16 @@
-package OpenXPKI::Test::CertHelper::Workflow;
+package OpenXPKI::Test::QA::CertHelper::Workflow;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::CertHelper::Workflow - Test helper that creates certificates
+OpenXPKI::Test::QA::CertHelper::Workflow - Test helper that creates certificates
 using OpenXPKI workflows
 
 =head1 DESCRIPTION
 
 This class is not intended for direct use. Please use the class methods in
-L<OpenXPKI::Test::CertHelper> instead.
+L<OpenXPKI::Test::QA::CertHelper> instead.
 
 =cut
 
@@ -35,7 +35,7 @@ Named parameters:
 
 =over
 
-=item * B<tester> - Instance of L<OpenXPKI::Test::More> (required)
+=item * B<tester> - Instance of L<OpenXPKI::Test::QA::More> (required)
 
 =item * B<hostname> - Hostname for certificate (I<Str>, required)
 
@@ -61,7 +61,7 @@ Named parameters:
 
 has tester => (
     is => 'rw',
-    isa => 'OpenXPKI::Test::More',
+    isa => 'OpenXPKI::Test::QA::More',
     required => 1,
 );
 has hostname => (

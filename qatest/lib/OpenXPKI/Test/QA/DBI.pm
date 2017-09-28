@@ -1,10 +1,10 @@
-package OpenXPKI::Test::DBI;
+package OpenXPKI::Test::QA::DBI;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::DBI - Test helper to get a database handle
+OpenXPKI::Test::QA::DBI - Test helper to get a database handle
 
 =cut
 

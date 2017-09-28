@@ -1,16 +1,16 @@
-package OpenXPKI::Test::CertHelper;
+package OpenXPKI::Test::QA::CertHelper;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::CertHelper - Helper class for tests to quickly create
+OpenXPKI::Test::QA::CertHelper - Helper class for tests to quickly create
 certificates etc.
 
 =head1 SYNOPSIS
 
 This class is an entry point for other classes in the
-C<OpenXPKI::Test::CertHelper::*> namespace and provides three ways to interact
+C<OpenXPKI::Test::QA::CertHelper::*> namespace and provides three ways to interact
 with test certificates:
 
 =over
@@ -27,8 +27,8 @@ L</via_openssl>.
 =cut
 
 # Project modules
-use OpenXPKI::Test::CertHelper::OpenSSL;
-use OpenXPKI::Test::CertHelper::Workflow;
+use OpenXPKI::Test::QA::CertHelper::OpenSSL;
+use OpenXPKI::Test::QA::CertHelper::Workflow;
 
 ################################################################################
 # METHODS
@@ -39,7 +39,7 @@ use OpenXPKI::Test::CertHelper::Workflow;
 Class method (does not require instantiation) that creates a CSR and the
 certificate on disk using the OpenSSL binary.
 
-    my $cert = OpenXPKI::Test::CertHelper-E<gt>via_openssl(
+    my $cert = OpenXPKI::Test::QA::CertHelper-E<gt>via_openssl(
         basedir => '/tmp',  # default to an auto-generated temp dir
         verbose => 0,
         stateOrProvinceName => 'bla',
@@ -53,14 +53,14 @@ certificate on disk using the OpenSSL binary.
     );
     print $cert->cert_pem;
 
-Possible arguments are all attributes of L<OpenXPKI::Test::CertHelper::OpenSSL>.
+Possible arguments are all attributes of L<OpenXPKI::Test::QA::CertHelper::OpenSSL>.
 
-Returns the instance of L<OpenXPKI::Test::CertHelper::OpenSSL>.
+Returns the instance of L<OpenXPKI::Test::QA::CertHelper::OpenSSL>.
 
 =cut
 sub via_openssl {
     my $class = shift;
-    my $helper = OpenXPKI::Test::CertHelper::OpenSSL->new(@_);
+    my $helper = OpenXPKI::Test::QA::CertHelper::OpenSSL->new(@_);
     $helper->create_cert;
     return $helper;
 }
@@ -70,8 +70,8 @@ sub via_openssl {
 Class method (does not require instantiation) that creates a CSR and the
 certificate in OpenXPKI via workflows.
 
-    my $cert_info = OpenXPKI::Test::CertHelper-E<gt>via_workflow(
-        tester => $test,                      # Instance of L<OpenXPKI::Test::More> (required)
+    my $cert_info = OpenXPKI::Test::QA::CertHelper-E<gt>via_workflow(
+        tester => $test,                      # Instance of L<OpenXPKI::Test::QA::More> (required)
         hostname => "myhost",                 # Hostname for certificate (I<Str>, required)
         application_name => "myapp",          # Name of the application (I<Str>, required for client profile)
         hostname2 => [],                      # List of additional hostnames (I<ArrayRef[Str]>, optional for server profile)
@@ -82,14 +82,14 @@ certificate in OpenXPKI via workflows.
     );
     diag $cert_info->{identifier};
 
-Possible arguments are all attributes of L<OpenXPKI::Test::CertHelper::Workflow>.
+Possible arguments are all attributes of L<OpenXPKI::Test::QA::CertHelper::Workflow>.
 
 Returns a HashRef containing some info about the created certificate.
 
 =cut
 sub via_workflow {
     my $class = shift;
-    my $helper = OpenXPKI::Test::CertHelper::Workflow->new(@_);
+    my $helper = OpenXPKI::Test::QA::CertHelper::Workflow->new(@_);
     return $helper->create_cert; # returns certificate info HashRef
 }
 

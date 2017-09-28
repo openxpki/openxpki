@@ -23,8 +23,8 @@ use Test::Deep;
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
-use OpenXPKI::Test::More;
-use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::QA::More;
+use OpenXPKI::Test::QA::CertHelper;
 use OpenXPKI::Test;
 
 =pod
@@ -97,7 +97,7 @@ sub import_failsok {
 our $cfg = {};
 TestCfg->new->read_config_path( 'api.cfg', $cfg, dirname($0) );
 
-my $test = OpenXPKI::Test::More->new({
+my $test = OpenXPKI::Test::QA::More->new({
     socketfile => $cfg->{instance}{socketfile},
     realm => $cfg->{instance}{realm},
 }) or die "Error creating new test instance: $@";
@@ -119,8 +119,8 @@ my $dbdata = $oxitest->certhelper_database;
 #
 # Create new test certificates on disk
 #
-my $cert_pem = OpenXPKI::Test::CertHelper->via_openssl->cert_pem;
-my $cert_pem2 = OpenXPKI::Test::CertHelper->via_openssl(commonName => 'test2.openxpki.org')->cert_pem;
+my $cert_pem = OpenXPKI::Test::QA::CertHelper->via_openssl->cert_pem;
+my $cert_pem2 = OpenXPKI::Test::QA::CertHelper->via_openssl(commonName => 'test2.openxpki.org')->cert_pem;
 
 #
 # Tests

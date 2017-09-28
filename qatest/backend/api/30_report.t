@@ -14,14 +14,14 @@ Log::Log4perl->easy_init($WARN);
 
 # Project modules
 use lib qw(../../lib);
-use OpenXPKI::Test::More;
-use OpenXPKI::Test::DBI;
+use OpenXPKI::Test::QA::More;
+use OpenXPKI::Test::QA::DBI;
 use TestCfg;
 use Test::Deep;
 use Test::More;
 
 # Add sample reports
-my $dbi = OpenXPKI::Test::DBI->new()->dbi();
+my $dbi = OpenXPKI::Test::QA::DBI->new()->dbi();
 
 #
 # Init client
@@ -29,7 +29,7 @@ my $dbi = OpenXPKI::Test::DBI->new()->dbi();
 our $cfg = {};
 TestCfg->new->read_config_path( 'api.cfg', $cfg, dirname($0) );
 
-my $test = OpenXPKI::Test::More->new({
+my $test = OpenXPKI::Test::QA::More->new({
     socketfile => $cfg->{instance}{socketfile},
     realm => $cfg->{instance}{realm},
 }) or die "Error creating new test instance: $@";

@@ -19,7 +19,7 @@ use Data::UUID;
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use TestCfg;
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use OpenXPKI::Test;
 
 #
@@ -28,7 +28,7 @@ use OpenXPKI::Test;
 our $cfg = {};
 TestCfg->new->read_config_path( 'api.cfg', $cfg, dirname($0) );
 
-my $test = OpenXPKI::Test::More->new({
+my $test = OpenXPKI::Test::QA::More->new({
     socketfile => $cfg->{instance}{socketfile},
     realm => $cfg->{instance}{realm},
 }) or die "Error creating new test instance: $@";
