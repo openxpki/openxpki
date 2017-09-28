@@ -66,11 +66,16 @@ Example:
         name => { isa => 'Str', matching => qr/^(?!Donald).*/, required => 1 },
         size => { isa => 'Int', matching => sub { $_ > 0 } },
     } => sub {
-        my ($self, $param_obj) = @_;
-        return {
-            name => $param_obj->name,
-            size => $param_obj->size,
-        };
+        my ($self, $po) = @_;
+
+        $po->name("The genious ".$po->name) if $po->has_name;
+
+        if ($po->has_size) {
+            $self->some_helper($po->size);
+            $po->clear_size; # unset the attribute
+        }
+
+        $self->process($po);
     };
 
 Note that this can be written as (except for the dots obviously)
@@ -82,7 +87,7 @@ Note that this can be written as (except for the dots obviously)
             size => ...
         },
         sub {
-            my ($self, $param_obj) = @_;
+            my ($self, $po) = @_;
             return { ... };
         }
     );
@@ -113,8 +118,13 @@ it gets passed two parameters:
 
 =item * C<$self> - the instance of the command class (that called C<api>).
 
-=item * C<$param_obj> - a parameter data object with Moose attributes that follow
+=item * C<$po> - a parameter data object with Moose attributes that follow
 the specifications in I<$params> above.
+
+For each attribute two additional methods are available on the C<$po>:
+A clearer named C<clear_*> to clear the attribute and a predicate C<has_*> to
+test if it's set. See L<Moose::Manual::Attributes/Predicate and clearer methods>
+if you don't know what that means.
 
 =back
 
