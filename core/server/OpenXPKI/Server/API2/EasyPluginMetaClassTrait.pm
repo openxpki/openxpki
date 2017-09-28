@@ -84,7 +84,9 @@ sub add_param_specs {
         }
         # add a Moose attribute to the parameter container class
         $param_metaclass->add_attribute($param_name,
-            is => 'ro',
+            accessor => $param_name,
+            clearer => "clear_${param_name}",
+            predicate => "has_${param_name}",
             %{ $spec },
         );
     }
