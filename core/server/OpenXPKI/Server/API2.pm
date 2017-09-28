@@ -17,7 +17,7 @@ use Module::List qw(list_modules);
 use Try::Tiny;
 
 # Project modules
-use OpenXPKI::Server::Context;
+use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Log;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API2::PluginRole;
@@ -102,7 +102,7 @@ has namespace => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    default => __PACKAGE__."::Command",
+    default => __PACKAGE__."::Plugin",
 );
 
 =head2 command_role
