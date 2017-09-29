@@ -11,9 +11,10 @@ functions
 
 # Core modules
 use Module::Load;
+use File::Spec;
+use IO::Dir 1.03;
 
 # CPAN modules
-use Module::List qw(list_modules);
 use Try::Tiny;
 
 # Project modules
@@ -160,7 +161,7 @@ sub _build_commands {
     my @modules = ();
     my $candidates = {};
     try {
-        $candidates = list_modules($self->namespace."::", { list_modules => 1, recurse => 1 });
+        $candidates = list_modules($self->namespace."::");
     }
     catch {
         OpenXPKI::Exception->throw (
@@ -259,6 +260,65 @@ sub dispatch {
 
     # FIXME Implement one-time instantiation
     return $package->new->execute($command, \%params);
+}
+
+use Carp qw(croak);
+
+# Taken from Module::List
+sub list_modules {
+    my ($prefix) = @_;
+
+    my $root_rx = qr/[a-zA-Z_][0-9a-zA-Z_]*/;
+    my $notroot_rx = qr/[0-9a-zA-Z_]+/;
+
+    OpenXPKI::Exception->throw(message => "Bad module name given to list_modules()", params => { prefix => $prefix })
+        unless (
+            $prefix =~ /\A(?:${root_rx}::(?:${notroot_rx}::)*)?\z/x
+            and $prefix !~ /(?:\A|[^:]::)\.\.?::/
+        );
+
+    my @prefixes = ($prefix);
+    my %seen_prefixes;
+    my %results;
+
+    while(@prefixes) {
+        my $prefix = pop(@prefixes);
+        my @dir_suffix = split(/::/, $prefix);
+        my $module_rx = $prefix eq "" ? $root_rx : $notroot_rx;
+        my $pmc_rx = qr/\A($module_rx)\.pmc\z/;
+        my $pm_rx = qr/\A($module_rx)\.pm\z/;
+        my $dir_rx = $prefix eq "" ? $root_rx : $notroot_rx;
+        $dir_rx = qr/\A$dir_rx\z/;
+        for my $incdir (@INC) {
+            my $dir = File::Spec->catdir($incdir, @dir_suffix);
+            my $dh = IO::Dir->new($dir) or next;
+            my @entries = $dh->read;
+            $dh->close;
+            # list modules
+            for my $pmish_rx ($pmc_rx, $pm_rx) {
+                foreach my $entry (@entries) {
+                    if($entry =~ $pmish_rx) {
+                        my $name = $prefix.$1;
+                        $results{$name} = undef;
+                    }
+                }
+            }
+            # recurse
+            for my $entry (@entries) {
+                next unless (
+                    File::Spec->no_upwards($entry)
+                    and $entry =~ $dir_rx
+                    and -d File::Spec->catdir($dir, $entry)
+                );
+                my $newpfx = $prefix.$entry."::";
+                if (!exists($seen_prefixes{$newpfx})) {
+                    push @prefixes, $newpfx;
+                    $seen_prefixes{$newpfx} = undef;
+                }
+            }
+        }
+    }
+    return \%results;
 }
 
 __PACKAGE__->meta->make_immutable;
