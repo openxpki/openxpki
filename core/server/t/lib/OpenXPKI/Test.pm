@@ -165,6 +165,18 @@ has start_watchdog => (
     default => 0,
 );
 
+=item * I<log_level> (optional) - L<Log::Log4Perl> log level for screen output.
+This is only relevant if C<$ENV{TEST_VERBOSE}> is set, i.e. user calls C<prove -v ...>.
+Otherwise logging will be disabled anyway. Default: WARN
+
+=cut
+has log_level => (
+    is => 'rw',
+    isa => 'Str',
+    default => "WARN",
+);
+
+
 =back
 
 =cut
@@ -197,6 +209,7 @@ has config_writer => (
             basedir => $self->testenv_root,
             db_conf => $self->db_conf,
             start_watchdog => $self->start_watchdog,
+            log_level => $self->log_level,
         )
     },
 );

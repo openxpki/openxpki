@@ -28,6 +28,12 @@ Methods to create a configuration consisting of several YAML files for tests.
 
 =cut
 
+has log_level => (
+    is => 'rw',
+    isa => 'Str',
+    required => 1,
+);
+
 # TRUE if the initial configuration has been written
 has is_written => (
     is => 'rw',
@@ -574,33 +580,27 @@ sub _build_workflow_persister {
 sub _build_log4perl {
     my ($self) = @_;
 
-    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'OFF';
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
     my $logfile = $self->path_log_file;
 
     return qq(
-        log4perl.category.openxpki.auth         = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.auth         = DEBUG, Screen, DBI
         log4perl.category.openxpki.audit        = DEBUG, Screen, DBI
-        log4perl.category.openxpki.system       = DEBUG, Screen, Logfile
-        log4perl.category.openxpki.workflow     = DEBUG, Screen, Logfile
-        log4perl.category.openxpki.application  = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.system       = DEBUG, Screen
+        log4perl.category.openxpki.workflow     = DEBUG, Screen
+        log4perl.category.openxpki.application  = DEBUG, Screen, DBI
         log4perl.category.openxpki.deprecated   = WARN,  Screen
-        log4perl.category.connector             = DEBUG, Screen, Logfile
+        log4perl.category.connector             = WARN, Screen
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
+        log4perl.appender.Screen.layout.ConversionPattern = # %d %c %p %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
-
-        log4perl.appender.Logfile               = Log::Log4perl::Appender::File
-        log4perl.appender.Logfile.filename      = $logfile
-        log4perl.appender.Logfile.layout        = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Logfile.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
-        log4perl.appender.Logfile.syswrite      = 1
-        log4perl.appender.Logfile.utf8          = 1
 
         log4perl.appender.DBI                   = OpenXPKI::Server::Log::Appender::DBI
         log4perl.appender.DBI.layout            = Log::Log4perl::Layout::NoopLayout
         log4perl.appender.DBI.warp_message      = 0
+        log4perl.appender.DBI.Threshold         = INFO
     );
 }
 
