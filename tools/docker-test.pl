@@ -109,6 +109,12 @@ if ($repo) {
 else {
     $branch ||= `git rev-parse --abbrev-ref HEAD`;
     chomp $branch;
+    # if we are currently in a detached head (i.e. no branch name)
+    if ($branch eq 'HEAD') {
+        $commit = `git rev-parse --short HEAD`; # get commit ID
+        chomp $commit;
+        $branch = undef;
+    }
     push @docker_args, "-v", "$project_root:/repo";
 }
 
