@@ -181,6 +181,17 @@ has log_level => (
 
 =cut
 
+has default_tasks => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    builder => '_build_default_tasks',
+);
+
+sub _build_default_tasks {
+    return [ qw( config_versioned log dbi_log dbi api authentication ) ];
+}
+
 =head2 certhelper_database
 
 Returns an instance of L<OpenXPKI::Test::CertHelper::Database> with the database
@@ -283,7 +294,7 @@ sub init_server {
     die "setup_env() must be called before init_server()" unless $self->_env_initialized;
 
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log dbi api authentication ); # our default tasks
+    my @tasks = @{ $self->default_tasks };
     my %task_hash = map { $_ => 1 } @tasks;
     push @tasks, grep { not $task_hash{$_} } @additional_tasks; # more tasks requested via parameter
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
