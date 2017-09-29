@@ -47,9 +47,13 @@ Must be set to I<ENDENTITY>
 
 =item CACERTIFICATE
 
-PEM encoded ca certificate to use. This is mainly for testing, in regular
-operation the certificate is determined using the API.
+CA certificate to use.
 
+Must be a I<HashRef> as returned by L<API::Token/get_certificate_for_alias( { ALIAS } )>
+including the PEM encoded certificate.
+
+This is mainly for testing, in regular operation the certificate is determined
+using the API.
 
 =back
 
