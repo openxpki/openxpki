@@ -21,7 +21,7 @@ To quickly initialize the default test environment and server:
 
 Or you might want to add some custom workflow config:
 
-    my $oxitest = OpenXPKI::Test->new;
+    my $oxitest = OpenXPKI::Test->new(with_workflows => 1);
     $oxitest->workflow_config("alpha", wf_type_1 => {
         'head' => {
             'label' => 'Perfect workflow',
@@ -36,7 +36,7 @@ Or you might want to add some custom workflow config:
         }
     );
     $oxitest->setup_env;
-    $oxitest->init_server('workflow_factory');
+    $oxitest->init_server;
     # we now have CTX('workflow_factory') besides the default ones
 
 =cut
@@ -47,6 +47,7 @@ use File::Temp qw( tempdir );
 
 # CPAN modules
 use Moose::Exporter;
+use Moose::Util;
 use Log::Log4perl qw(:easy);
 use Moose::Util::TypeConstraints;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
@@ -60,6 +61,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test::Role::WithWorkflows;
 
 Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],
@@ -165,6 +167,18 @@ has start_watchdog => (
     default => 0,
 );
 
+=item * I<with_workflows> (optional) - Set to 1 to be able to create workflows
+(also inserts some standard workflows, see L<OpenXPKI::Test::CertHelper::Workflow>).
+Default: 0
+
+=cut
+has with_workflows => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    default => 0,
+);
+
 =item * I<log_level> (optional) - L<Log::Log4Perl> log level for screen output.
 This is only relevant if C<$ENV{TEST_VERBOSE}> is set, i.e. user calls C<prove -v ...>.
 Otherwise logging will be disabled anyway. Default: WARN
@@ -176,6 +190,12 @@ has log_level => (
     default => "WARN",
 );
 
+=item * I<with_workflows> (optional) - Prepares the test server to be able to
+execute workflows, also installs some helper methods for tests. Technically
+the role L<OpenXPKI::Test::Role::WithWorkflows> is applied to C<OpenXPKI::Test>
+so see there for more details.
+
+=cut
 
 =back
 
@@ -227,6 +247,23 @@ has config_writer => (
 
 # Flag whether setup_env was called
 has _env_initialized => ( is => 'rw', isa => 'Bool', default => 0, init_arg => undef );
+
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my @args = @_;
+
+    if (@args % 2 == 0) {
+        my %arg_hash = @args;
+        if (delete $arg_hash{with_workflows}) {
+            Moose::Util::apply_all_roles($class, "OpenXPKI::Test::Role::WithWorkflows");
+        }
+        @args = %arg_hash;
+    }
+    return $class->$orig(@args);
+};
+
 
 =head2 setup_env
 
@@ -604,4 +641,4 @@ sub _init_screen_log {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;
