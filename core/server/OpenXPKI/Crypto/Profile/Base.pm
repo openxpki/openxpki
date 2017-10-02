@@ -196,8 +196,6 @@ sub load_extension
     }
     elsif ($ext eq "authority_info_access")
     {
-
-        my @bits = ( "keyid", "issuer" );
         foreach my $bit (qw(ca_issuers ocsp)) {
 
             my @template_list = $config->get_scalar_as_list("$path.$bit");
