@@ -126,7 +126,7 @@ sub _make_db_query_additional_params {
     # Custom ordering
     my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
     $desc = "" if $po->has_reverse and $po->reverse == 0;
-    $params->{order_by} = sprintf "%s%s", $desc, ($po->has_order ? $po->order : 'cert_key');
+    $params->{order_by} = sprintf "%scertificate.%s", $desc, lc($po->has_order ? $po->order : 'cert_key');
 
     return $params;
 }

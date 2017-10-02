@@ -16,10 +16,10 @@ use Log::Log4perl qw(:easy);
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
-use OpenXPKI::Test::CertHelper::Workflow;
+use OpenXPKI::Test::QA::CertHelper::Workflow;
 use OpenXPKI::Server::Context;
 
-plan tests => 37;
+plan tests => 39;
 
 
 #
@@ -318,6 +318,20 @@ $result = search_cert_ok "by attributes and profile (issue #501)" => {
         { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
     ],
     profile => $cert_info->{profile},
+    pki_realm => "_ANY"
+}, "NO_CHECK";
+
+cmp_deeply $result, [
+    superhashof({ subject => re(qr/$uuid/i) })
+], "Correct result";
+
+# Github issue #575 - search_cert fails on Oracle when ORDER = 'identifier'
+$result = search_cert_ok "by attributes and with ORDER = 'identifier' (issue #575)" => {
+    cert_attributes => [
+        { KEY => 'meta_requestor', VALUE => "*$uuid*" }, # default operator is LIKE
+        { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
+    ],
+    order => "identifier",
     pki_realm => "_ANY"
 }, "NO_CHECK";
 
