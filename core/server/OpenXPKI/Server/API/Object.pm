@@ -1083,7 +1083,7 @@ sub __search_cert_db_query {
     $desc = "" if defined $args->{REVERSE} and $args->{REVERSE} == 0;
     # TODO #legacydb Code that removes table name prefix
     $args->{ORDER} =~ s/^CERTIFICATE\.// if $args->{ORDER};
-    $params->{order_by} = sprintf "%s%s", $desc, ($args->{ORDER} // 'cert_key');
+    $params->{order_by} = sprintf "%scertificate.%s", $desc, lc($args->{ORDER} // 'cert_key');
 
     # Handle status
     if ($args->{STATUS} and $args->{STATUS} eq 'EXPIRED') {
