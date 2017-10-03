@@ -22,7 +22,7 @@ plan tests => 17;
 #
 # Setup env
 #
-my $oxitest = OpenXPKI::Test->new->setup_env->init_server();
+my $oxitest = OpenXPKI::Test->new->setup_env->init_server("crypto_layer");
 $oxitest->insert_testcerts;
 
 #
@@ -154,11 +154,18 @@ lives_and {
 my $cert_profile;
 use_ok "OpenXPKI::Crypto::Profile::Certificate";
 lives_and {
+    my $cert = $oxitest->certhelper_database->cert("alpha_signer_2");
     $cert_profile = OpenXPKI::Crypto::Profile::Certificate->new(
         TYPE  => "ENDENTITY",
         ID    => "I18N_OPENXPKI_PROFILE_USER",
         CA    => "alpha",
-        CACERTIFICATE => $oxitest->certhelper_database->cert("alpha_signer_2")->data,
+        CACERTIFICATE => {
+            DATA        => $cert->data,
+            SUBJECT     => $cert->db->{subject},
+            IDENTIFIER  => $cert->db->{identifier},
+            NOTBEFORE   => $cert->db->{notbefore},
+            NOTAFTER    => $cert->db->{notafter},
+        },
     );
     $cert_profile->set_serial(1);
     $cert_profile->set_subject($subject);
