@@ -225,6 +225,14 @@ msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_NICE_UNABLE_TO_DETERMINE_NOTAFTER_DATE"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "gültig"
 
@@ -1124,14 +1132,6 @@ msgstr "Einfache Benennungsart"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
-msgstr ""
-"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
-"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
-"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
-"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_TLS_NETWORK_LABEL"
 msgstr ""
 "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
 "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
@@ -3628,6 +3628,26 @@ msgstr "Arbeitsabläufe"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
 msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_DESC"
+msgstr "Arbeitsabläufe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_PROCEED_BUTTON_LABEL"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
@@ -7989,6 +8009,14 @@ msgstr "Benutzername"
 #~ "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_NETWORK_LABEL"
+#~ msgstr ""
+#~ "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+#~ "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+#~ "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+#~ "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS-Server"
 
@@ -10403,19 +10431,7 @@ msgstr "Benutzername"
 #~ msgstr "Arbeitsabläufe"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
-#~ msgstr "Arbeitsabläufe"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL"
-#~ msgstr "Übergeordneter Workflow"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
-#~ msgstr "Untergeordnete Workflows"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL"
 #~ msgstr "Untergeordnete Workflows"
 
 #, fuzzy
@@ -11416,6 +11432,14 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION"
+#~ msgstr "Arbeitsabläufe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_DESC"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_LABEL"
 #~ msgstr "Arbeitsabläufe"
 
 #, fuzzy

@@ -478,6 +478,7 @@ OpenXPKI/Server/Workflow/Activity/NICE/UnrevokeCertificate.pm
 
 OpenXPKI/Server/Workflow/Condition/NICE/IsCertificateIssued.pm
 OpenXPKI/Server/Workflow/Condition/NICE/IsCertificatePending.pm
+OpenXPKI/Server/Workflow/Condition/NICE/UsableTokenForValidity.pm
 
 ## User Interface Layers
 OpenXPKI/Transport/Simple.pm

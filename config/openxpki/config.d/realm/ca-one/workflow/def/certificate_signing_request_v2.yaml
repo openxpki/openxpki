@@ -15,6 +15,34 @@ state:
         action:
           - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate check_policy_key_duplicate > SUBJECT_COMPLETE
 
+
+    CHECK_VALIDITY:
+        autorun: 1
+        action:
+         - global_noop > UPDATE_REQUEST ? is_validity_window_in_ca_lifetime
+         - global_noop2 > VALIDITY_WARNING ? !is_validity_window_in_ca_lifetime
+
+    VALIDITY_WARNING:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_DESC
+        action:
+           - edit_validity > CHECK_VALIDITY
+           - global_noop > UPDATE_REQUEST
+        output:
+          - cert_profile
+          - notbefore
+          - notafter
+        button:
+          edit_validity:
+            format: expected
+          global_noop:
+            label: I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_PROCEED_BUTTON_LABEL
+            format: alternative
+            confirm:
+                label: I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_LABEL
+                description: I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC
+
+
     UPDATE_REQUEST:
         autorun: 1
         action:
@@ -221,7 +249,7 @@ state:
           - edit_subject > UPDATE_REQUEST ? acl_can_approve
           - edit_san > UPDATE_REQUEST ? profile_has_san_section acl_can_approve
           - edit_cert_info > UPDATE_REQUEST ? profile_has_info_section acl_can_approve
-          - edit_validity > UPDATE_REQUEST  ? acl_can_approve
+          - edit_validity > CHECK_VALIDITY  ? acl_can_approve
           - global_noop > RUN_POLICY_CHECKS ? acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
           - put_request_on_hold > ONHOLD ? acl_can_approve
@@ -271,7 +299,7 @@ state:
           - edit_subject > UPDATE_REQUEST ? acl_can_approve
           - edit_san > UPDATE_REQUEST ? profile_has_san_section acl_can_approve
           - edit_cert_info > UPDATE_REQUEST ? profile_has_info_section acl_can_approve
-          - edit_validity > UPDATE_REQUEST  ? acl_can_approve
+          - edit_validity > CHECK_VALIDITY  ? acl_can_approve
           - global_noop > RUN_POLICY_CHECKS ? has_policy_violation acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
           - put_request_on_hold > ONHOLD ? acl_can_approve
@@ -789,6 +817,12 @@ condition:
         param:
             _map_config_path: profile.[% context.cert_profile %].style.[% context.cert_subject_style %].ui.info
 
+    is_validity_window_in_ca_lifetime:
+        class: OpenXPKI::Server::Workflow::Condition::NICE::UsableTokenForValidity
+        param:
+            _map_cert_profile: $cert_profile
+            _map_notbefore: $notbefore
+            _map_notafter: $notafter
 
 field:
     cert_profile:
