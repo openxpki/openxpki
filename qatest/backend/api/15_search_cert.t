@@ -36,7 +36,7 @@ my $test = OpenXPKI::Test::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 56 );
+$test->plan( tests => 58 );
 
 $test->connect_ok(
     user => $cfg->{operator}{name},
@@ -318,6 +318,20 @@ $test->runcmd_ok('search_cert', {
     PROFILE => $cert_info->{profile},
     PKI_REALM => "_ANY"
 }, "Search cert by attributes and profile (issue #501)") or diag ref($test->error);
+
+cmp_deeply $test->get_msg->{PARAMS}, [
+    superhashof({ SUBJECT => re(qr/$uuid/i) })
+], "Correct result";
+
+# Github issue #575 - search_cert fails on Oracle when order = identifier
+$test->runcmd_ok('search_cert', {
+    CERT_ATTRIBUTES => [
+        { KEY => 'meta_requestor', VALUE => "*$uuid*" }, # default operator is LIKE
+        { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
+    ],
+    ORDER => "IDENTIFIER",
+    PKI_REALM => "_ANY"
+}, "Search cert by attributes and with ORDER = 'identifier' (issue #575)") or diag ref($test->error);
 
 cmp_deeply $test->get_msg->{PARAMS}, [
     superhashof({ SUBJECT => re(qr/$uuid/i) })
