@@ -1,14 +1,14 @@
 # Definition of supported/accepted key algorithms
-# This is used as option list for key generation 
+# This is used as option list for key generation
 # as well as validation list for uploaded keys
-# If you prefix a value with an underscore, is is accepted for validation 
+# If you prefix a value with an underscore, is is accepted for validation
 # but not presented on key generation
 # The frontend will prefix all values with I18N_OPENXPKI_UI_KEY_XX_YY
 # where XX is the key and yy is the value, so if you add new items make sure
 # you also add a translation for it.
 key:
-    # Supported key algorithms (details need to be defined below!)    
-    alg: 
+    # Supported key algorithms (details need to be defined below!)
+    alg:
       - rsa
       - ec
       - dsa
@@ -27,24 +27,35 @@ key:
     rsa:
         key_length:
           - 2048
-          - 4096	
+          - 4096
           - _1024
 
     ec:
+        # those names are used for validation and to render the
+        # option lit when server key generation is allowed
+        # The preset is the recommended list from RFC5480
+        # The possbile "named" curves are limited by the ones supported
+        # by Crypt::PKCS10 at the moment. For NIST P-192/256 you can use
+        # either the secpXXXr1 or primeXXXv1 alias
         curve_name:
-          - prime192v1
-          - c2tnb191v1
-          - prime239v1
-          - sect571r1
-          
-        key_length:
-          - _192
-          - _256
+          - prime256v1
+          - secp384r1
+          - secp521r1
+
+        # Curves imply key lengths, setting key length here makes only
+        # sense if you do NOT set curve names and want to allow all
+        # ecc curves that provided a key length. Note this is the REAL
+        # number of key bits, not the nominal security bits value!
+        # Always set this with an underscore to hide the key lenght from the
+        # key generation parameters dialog (it does not make sense there)
+        # key_length:
+        #  - _192
+        #  - _256
 
     dsa:
         key_length:
           - 2048
-          - 4096	
+          - 4096
 
     # I18N_OPENXPKI_UI_KEY_ALG_GOST94
 #    gost94:
@@ -52,7 +63,7 @@ key:
 #    gost2001:
 
 
-validity: 
+validity:
     notafter: +01
 
 digest: sha256
@@ -60,10 +71,10 @@ increasing_serials: 1
 randomized_serial_bytes: 8
 
 
-publish: 
-  - queue 
+publish:
+  - queue
   - disk
- 
+
 # Profile extensions - set 0/1 as needed
 extensions:
     copy: copy
@@ -71,7 +82,7 @@ extensions:
     basic_constraints:
         critical: 1
         ca: 0
- 
+
     subject_key_identifier:
         critical: 0
         hash: 1
@@ -128,7 +139,7 @@ extensions:
             critical: 0
             uri: http://localhost/cacrl.crt
             ca_uri: http://localhost/cacrl.crt
-     # end of netscape section 
+     # end of netscape section
 
 
 # I18N Placeholders for key settings

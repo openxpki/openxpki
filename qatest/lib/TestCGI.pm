@@ -83,7 +83,7 @@ sub mock_request {
         $res = $ua->post($server_endpoint, $data);
     } else {
         my $qsa = '?';
-        map { $qsa .= sprintf "%s=%s&", $_, uri_escape($data->{$_}); } keys %{$data};
+        map { $qsa .= sprintf "%s=%s&", $_, uri_escape($data->{$_} // ''); } keys %{$data};
         $res = $ua->get( $server_endpoint.$qsa );
     }
 

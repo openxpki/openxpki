@@ -75,7 +75,7 @@ sub execute {
             $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
         } elsif ($key_param->{keytype} eq 'ECC') {
             $param->{csr_key_alg} = 'ec';
-            $param->{csr_key_params} = { key_length =>  $key_param->{keylen}, curve => $key_param->{curve} };
+            $param->{csr_key_params} = { key_length =>  $key_param->{keylen}, curve_name => $key_param->{curve} };
         } else {
             $param->{csr_key_alg} = 'unsupported';
         }

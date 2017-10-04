@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base qw( OpenXPKI::Server::Workflow::Validator );
 use Data::Dumper;
+use Crypt::PKCS10;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Server::Context qw( CTX );
@@ -25,36 +26,31 @@ sub _validate {
         return 1;
     }
 
-    my $default_token = CTX('api')->get_default_token();
-    my $csr_obj = OpenXPKI::Crypto::CSR->new(
-        DATA  => $pkcs10,
-        TOKEN => $default_token
-    );
-
-    my $csr_body = $csr_obj->get_parsed_ref()->{BODY};
-    ##! 32: 'csr_parsed: ' . Dumper $csr_body
-    if (!$csr_body) {
-        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10');
-    }
-
-    ##! 32: 'CSR body ' . Dumper $csr_body
-
     my $key_alg;
     my $key_params = {};
 
-    if ($csr_body->{PUBKEY_ALGORITHM} eq 'rsaEncryption') {
+    Crypt::PKCS10->setAPIversion(1);
+    my $decoded = Crypt::PKCS10->new( $pkcs10, ignoreNonBase64 => 1, verifySignature => 0);
+    if (!$decoded) {
+        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10');
+    }
+
+    my $key_param = $decoded->subjectPublicKeyParams();
+    my $key_alg;
+
+    if ($key_param->{keytype} eq 'RSA') {
         $key_alg = 'rsa';
-        $key_params = { key_length =>  $csr_body->{KEYSIZE} };
-    } elsif ($csr_body->{PUBKEY_ALGORITHM} eq 'dsaEncryption') {
+        $key_params = { key_length =>  $key_param->{keylen} };
+    } elsif ($key_param->{keytype} eq 'DSA') {
         $key_alg = 'dsa';
-        $key_params = { key_length =>  $csr_body->{KEYSIZE} };
-    } elsif ($csr_body->{PUBKEY_ALGORITHM} eq 'id-ecPublicKey') {
+        $key_params = { key_length =>  $key_param->{keylen} };
+    } elsif ($key_param->{keytype} eq 'ECC') {
         $key_alg = 'ec';
-        $key_params = { key_length =>  $csr_body->{KEYSIZE}, curve_name => '_any' };
-        # not yet defined
+        $key_params = { key_length =>  $key_param->{keylen}, curve_name => $key_param->{curve} };
     } else {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
     }
+
 
     ##! 16: "Alg: $key_alg"
     ##! 16: 'Params ' . Dumper $key_params
@@ -81,6 +77,17 @@ sub _validate {
         if ($val eq '_any') { next; }
 
         my @expect = @{$params->{$param}};
+
+        # resolve ambigous curve names for NIST P-192/256
+        if ($param eq 'curve_name') {
+            if (grep(/prime192v1/, @expect)) {
+                push @expect, 'secp192r1';
+            }
+            if (grep(/prime256v1/, @expect)) {
+                push @expect, 'secp256r1';
+            }
+        }
+
         ##! 32: "Validate param $param, $val, " . Dumper \@expect
         if (!grep(/$val/, @expect)) {
             ##! 32: 'Failed on ' . $val
