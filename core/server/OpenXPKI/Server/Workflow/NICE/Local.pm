@@ -444,7 +444,7 @@ sub __prepare_crl_data {
     my $dbi       = CTX('dbi');
     my $pki_realm = CTX('session')->data->pki_realm;
 
-    my $last_serial;
+    my $last_serial = '';
     while (my $cert = $sth_certs->fetchrow_hashref) {
         ##! 32: 'cert to be revoked: ' . Data::Dumper->new([$cert])->Indent(0)->Terse(1)->Sortkeys(1)->Dump
         my $serial      = $cert->{cert_key};
