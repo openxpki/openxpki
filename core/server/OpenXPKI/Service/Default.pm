@@ -279,8 +279,12 @@ sub __handle_FRONTEND_SESSION {
     ##! 16: 'Frontend Data ' . Dumper $msg
 
     if (!OpenXPKI::Server::Context::hascontext('session')) {
+        my $mode = (exists $msg->{PARAMS}->{SESSION_DATA} ? (defined $msg->{PARAMS}->{SESSION_DATA} ? 'update' : 'clear') : 'retrieve');
+        CTX('log')->system->error('Error handling frontend session (mode '.$mode.')');
+
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_ATTACH_DATA_FAILED_NO_SESSION',
+            params =>  { MODE => $mode }
         );
     }
 
