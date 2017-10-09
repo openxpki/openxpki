@@ -59,10 +59,13 @@ sub serialize
     my $self = shift;
     my $args = shift;
 
+    # undef is handled by the serialization layer as empty string
+    if (!defined $args) {
+        return "OXJSF1:";
 
     # using json to transmit binary data is very inefficient so we try to
     # detect binary data and decode this as base64
-    if (!ref $args && $args =~ m{[\x00-\x09]}s) {
+    } elsif (!ref $args && $args =~ m{[\x00-\x09]}s) {
         ##! 8: 'Found binary data - do base64'
         return "OXB64:" . encode_base64( $args );
     } else {
