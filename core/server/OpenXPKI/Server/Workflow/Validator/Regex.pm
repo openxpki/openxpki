@@ -13,7 +13,7 @@ __PACKAGE__->mk_accessors(qw(regex error modifier field));
 
 sub _init {
     my ( $self, $params ) = @_;
-    $self->regex( $params->{regex} ) if ($params->{regex});
+    $self->regex( $params->{regex} // '' );
 
     # Default modifier is /xi
     $self->modifier( $params->{modifier} ? $params->{modifier} : 'xi') ;

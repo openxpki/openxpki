@@ -36,7 +36,6 @@ sub _validate {
     }
 
     my $key_param = $decoded->subjectPublicKeyParams();
-    my $key_alg;
 
     if ($key_param->{keytype} eq 'RSA') {
         $key_alg = 'rsa';
