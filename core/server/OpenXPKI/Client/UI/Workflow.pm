@@ -85,11 +85,6 @@ sub init_index {
     # Pass the initial activity so we get the form right away
     my $wf_action = (keys %{$wf_info->{ACTIVITY}})[0];
 
-    my $wf_param = $self->extra()->{wf_param};
-    if ($wf_param && ref $wf_param eq 'HASH') {
-        $wf_info->{WORKFLOW}->{CONTEXT} = $wf_param;
-    }
-
     $self->__render_from_workflow({ WF_INFO => $wf_info, WF_ACTION => $wf_action });
     return $self;
 
@@ -169,12 +164,6 @@ sub init_load {
     if (!$wf_info) {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
         return $self->init_search({ preset => { wf_id => $id } });
-    }
-
-
-    my $wf_param = $self->extra()->{wf_param};
-    if ($wf_param && ref $wf_param eq 'HASH') {
-        %{$wf_info->{WORKFLOW}->{CONTEXT}} = (%{$wf_info->{WORKFLOW}->{CONTEXT} }, %{$wf_param});
     }
 
     # Set single action if no special view is requested and only single action is avail
@@ -969,13 +958,13 @@ sub action_index {
         });
 
         if (!$wf_info) {
-            $self->logger()->error("workflow acton failed!");
-            # if field_errors is set, this is a validation error
-            my $extra = { wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} };
-            if ($self->_status->{field_errors}) {
-                $extra->{wf_param} = \%wf_param;
+
+            if ($self->__check_for_validation_error()) {
+                return $self;
             }
-            $self->extra($extra);
+
+            $self->logger()->error("workflow acton failed!");
+            my $extra = { wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} };
             $self->init_load();
             return $self;
         }
@@ -990,15 +979,15 @@ sub action_index {
             WORKFLOW => $wf_args->{wf_type}, PARAMS   => \%wf_param, UIINFO => 1
         });
         if (!$wf_info) {
+
+            if ($self->__check_for_validation_error()) {
+                return $self;
+            }
+
             $self->logger()->error("Create workflow failed");
             # pass required arguments via extra and reload init page
 
             my $extra = { wf_type => $wf_args->{wf_type} };
-            # if field_errors is set, this is a validation error
-            if ($self->_status->{field_errors}) {
-                $extra->{wf_param} = \%wf_param;
-            }
-            $self->extra($extra);
             $self->init_index();
             return $self;
         }
@@ -2633,6 +2622,32 @@ sub __render_fields {
 
         return \@fields;
 
+}
+
+=head2 __check_for_validation_error
+
+Uses last_reply to check if there was a validation error. If a validation
+error occured, the field_errors hash is returned and the status variable is
+set to render the errors in the form view. Returns undef otherwise.
+
+=cut
+
+sub __check_for_validation_error {
+
+    my $self = shift;
+    my $reply = $self->_last_reply();
+    if ($reply->{LIST} && ref $reply->{LIST} eq 'ARRAY' &&
+        $reply->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE') {
+        my $p = $reply->{LIST}->[0]->{PARAMS};
+        my $validator_msg = $p->{__ERROR__};
+        my $field_errors = $p->{__FIELDS__};
+        my @fields = (ref $field_errors eq 'ARRAY') ? map { $_->{name} } @$field_errors : ();
+        $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
+        $self->logger()->error("Input validation error on fields ". join ",", @fields);
+        $self->logger()->trace('validation details' . Dumper $field_errors );
+        return $field_errors;
+    }
+    return;
 }
 
 =head1 example workflow config
