@@ -76,15 +76,20 @@ set of options::
 
     id: hostname
     label: I18N_OPENXPKI_UI_PROFILE_HOSTNAME
+    placeholder: fully.qualified.example.com
+    tooltip: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_TOOLTIP
     description: I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC
     type: freetext
     preset: "[% CN.0.replace(':.*','') %]"
     match: \A [A-Za-z\d\-\.]+ \z
     width: 60
-    default: fully.qualified.example.com
 
 The definition can be placed in the node `template` inside the profile
 file or globally in the template directory.
+
+To not break legacy configurations, the placeholder can be set using
+"default" as keyword. The tooltip is set to description if missing.
+
 
 Field Definition
 ^^^^^^^^^^^^^^^^

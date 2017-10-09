@@ -118,6 +118,12 @@ sub render_subject_form {
         $values = $self->serializer()->deserialize( $context->{$field_name} );
     }
 
+
+    my @fielddesc;
+    foreach my $field (@{$fields}) {
+        push @fielddesc, { label => $field->{LABEL}, value => $field->{DESCRIPTION}, format => 'raw' } if ($field->{DESCRIPTION});
+    }
+
     $self->logger()->trace( 'Preset ' . Dumper $values );
 
     # Map the old notation for the new UI
@@ -140,6 +146,16 @@ sub render_subject_form {
             buttons => $self->__get_form_buttons( $wf_info ),
         }
     });
+
+    if (@fielddesc) {
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
+                description => '',
+                data => \@fielddesc
+        }});
+    }
 
     return $self;
 
@@ -299,7 +315,7 @@ sub __translate_form_def {
         my $new = {
             name => $field_name.'{'.$field->{ID}.'}',
             label => $field->{LABEL},
-            tooltip => $field->{DESCRIPTION},
+            tooltip => defined $field->{TOOLTIP} ? $field->{TOOLTIP} : $field->{DESCRIPTION},
              # Placeholder is the new attribute, fallback to old default
             placeholder => (defined $field->{PLACEHOLDER} ? $field->{PLACEHOLDER} : $field->{DEFAULT}),
             value => $values->{$field->{ID}}
