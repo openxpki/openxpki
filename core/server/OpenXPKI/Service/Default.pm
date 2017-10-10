@@ -972,7 +972,7 @@ sub __send_error
         }
     }
 
-    CTX('log')->system->error('Sending error ' . Dumper $error);
+    CTX('log')->system->debug('Sending error ' . Dumper $error);
 
     return $self->talk({
         SERVICE_MSG => "ERROR",
