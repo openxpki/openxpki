@@ -37,15 +37,20 @@ sub store {
 
     my ($self, $sid, $datastr) = @_;
 
-    $self->logger()->debug('Session store with id ' . $sid);
+    my $backend_sid = $self->backend()->get_session_id();
+    if (!$backend_sid) {
+        $self->logger()->debug('Skipping session store for id ' . $sid . ' - backend already gone');
+    } elsif($backend_sid ne $sid) {
+        $self->logger()->error("Backend session missmatches frontend session! ($backend_sid / $sid)");
+    } else {
+        $self->logger()->debug('Session store with id ' . $sid);
 
-    $self->logger()->debug('Backend session ' . $self->backend()->get_session_id() );
+        my $res = $self->backend()->send_receive_service_msg('FRONTEND_SESSION',{
+            SESSION_DATA => $datastr,
+        });
 
-    my $res = $self->backend()->send_receive_service_msg('FRONTEND_SESSION',{
-        SESSION_DATA => $datastr,
-    });
-
-    $self->logger()->trace('Session store result ' . Dumper $res);
+        $self->logger()->trace('Session store result ' . Dumper $res);
+    }
 
 }
 
