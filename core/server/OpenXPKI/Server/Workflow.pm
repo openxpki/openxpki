@@ -651,6 +651,12 @@ sub _fail {
     my $error = shift;
     my $reason = shift || 'autofail';
 
+    # do not fail workflow that are finished
+    if ( $self->proc_state eq 'finished' ) {
+        CTX('log')->workflow()->warn("Called fail on already finished workflow #" . $self->id);
+        return;
+    }
+
     eval{
         $self->state('FAILURE');
         $self->_set_proc_state('finished');
