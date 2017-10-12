@@ -792,7 +792,7 @@ sub __build_attribute_subquery {
     foreach my $item (@{$attributes}) {
         my $key = $item->{key};
         my $pattern = $item->{pattern} || '';
-        my $operator = uc($item->{operator}) || 'IN';
+        my $operator = uc($item->{operator} || 'IN');
         my $transform = $item->{transform} || '';
         my @val = $self->param($key.'[]');
 

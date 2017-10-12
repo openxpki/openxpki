@@ -1737,9 +1737,9 @@ sub __render_from_workflow {
             push @fields, $item;
 
             # if the field has a description text, push it to the @fielddesc list
-            if ($field->{description} !~ /^\s*$/ && $field->{type} ne 'hidden') {
-                my $descr = $field->{description};
-                push @fielddesc, { label => $item->{label}, value => $descr, format => 'raw' } if ($descr);
+            my $descr = $field->{description};
+            if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
+                push @fielddesc, { label => $item->{label}, value => $descr, format => 'raw' };
             }
 
         }
