@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Encode;
 
 package OpenXPKI::Transport::Simple;
 
@@ -51,11 +52,8 @@ sub write
 
     my @list = ();
 
-    # The data string might have the utf8 flag set - to prevent messing with
-    # wide chars / length issues on the transport, we do a "downgrade" which
-    # will make the string look like a sequence of 8-bit chars.
-    # We will upgrade on the other side of the transport again
-    utf8::downgrade( $data );
+    # Encode data from perl internal utf8 representation to octets
+    $data = Encode::encode_utf8( $data );
 
 #    $data = encode_base64( $data );
 
@@ -164,9 +162,8 @@ sub read
 
 
 #    $msg = decode_base64( $msg );
-    # Transmission is done with plain 8-bit, we make the string "be" utf8
-    # again by calling upgrade. See docs for known issues
-    utf8::upgrade( $msg );
+    # Decode octets in $msg to the perl utf8 string.
+    $msg = Encode::decode_utf8($msg, Encode::LEAVE_SRC | Encode::FB_CROAK);
 
     return $msg;
 }
