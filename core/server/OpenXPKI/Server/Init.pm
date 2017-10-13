@@ -40,8 +40,6 @@ use OpenXPKI::Serialization::Fast;
 
 use Data::Dumper;
 
-use Test::More;
-
 use Digest::SHA qw( sha1_base64 );
 
 # define an array of hash refs mapping the task id to the corresponding
