@@ -28,7 +28,6 @@ plan tests => 39;
 
 # Import test certificates
 my $oxitest = OpenXPKI::Test->new(with_workflows => 1);
-diag explain $oxitest->default_tasks;
 my $dbdata = $oxitest->certhelper_database;
 $oxitest->insert_testcerts;
 $oxitest->setup_env;
