@@ -78,12 +78,33 @@ sub add_param_specs {
     for my $param_name (sort keys %{ $params_specs }) {
         # the parameter specs like "isa => ..., required => ..."
         my $spec = $params_specs->{$param_name};
+
+        OpenXPKI::Exception->throw(
+            message => "'isa' must specified when defining an API command parameter",
+            params => { command => $command, parameter => $param_name }
+        ) unless $spec->{isa};
+
+        my $isa = delete $spec->{isa};
         if ($spec->{matching}) {
             # FIXME Implement
-            delete $spec->{matching};
+            my $matching = delete $spec->{matching};
+            OpenXPKI::Exception->throw(
+                message => "'matching' must be a referenc either of type Regexp or CODE",
+                params => { command => $command, parameter => $param_name }
+            ) unless (ref $matching eq 'Regexp' or ref $matching eq 'CODE');
+
+            require Moose::Util::TypeConstraints;
+            my $parent_type = Moose::Util::TypeConstraints::find_or_create_isa_type_constraint($isa);
+            # we create a new anonymous subtype and overwrite the old type in $isa
+            $isa = Moose::Meta::TypeConstraint->new(
+                parent => $parent_type,
+                constraint => ( ref $matching eq 'CODE' ? $matching : sub { $_ =~ $matching } ),
+                message => sub { my $val = shift; return "constraints defined in 'matching' where violated (API command '$command')" },
+            );
         }
         # add a Moose attribute to the parameter container class
         $param_metaclass->add_attribute($param_name,
+            isa => $isa,
             accessor => $param_name,
             clearer => "clear_${param_name}",
             predicate => "has_${param_name}",

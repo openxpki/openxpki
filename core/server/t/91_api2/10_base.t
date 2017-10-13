@@ -21,7 +21,7 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-plan tests => 8;
+plan tests => 10;
 
 
 use_ok "OpenXPKI::Server::API2";
@@ -57,6 +57,14 @@ throws_ok {
 throws_ok {
     $api->dispatch("givetheparams", name => "Max", size => "blah");
 } "Moose::Exception::ValidationFailedForTypeConstraint", "complain about wrong parameter type";
+
+throws_ok {
+    $api->dispatch("givetheparams", name => "Donald");
+} "Moose::Exception::ValidationFailedForTypeConstraint", "complain about parameter validation failure (regex)";
+
+throws_ok {
+    $api->dispatch("givetheparams", name => "Max", size => -1);
+} "Moose::Exception::ValidationFailedForTypeConstraint", "complain about parameter validation failure (sub)";
 
 lives_and {
     my $result = $api->dispatch("givetheparams", name => "Max", size => 5 );
