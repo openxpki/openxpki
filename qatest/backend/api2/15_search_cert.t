@@ -37,7 +37,7 @@ use_ok "OpenXPKI::Server::API2";
 
 my $api;
 lives_ok {
-    $api = OpenXPKI::Server::API2->new();
+    $api = OpenXPKI::Server::API2->new(enable_acls => 0);
 } "instantiate API";
 
 =pod
@@ -96,7 +96,7 @@ sub search_cert_ok {
     if (scalar(@expected_names) and $expected_names[0] eq "NO_CHECK") {
         my $result = [];
         lives_ok {
-            $result = $api->dispatch("search_cert", %$conditions);
+            $result = $api->dispatch(command => "search_cert", params => $conditions);
         } "Search cert $message";
         return $result;
     }
@@ -112,7 +112,7 @@ sub search_cert_ok {
 
     my $result;
     lives_and {
-        $result = $api->dispatch("search_cert", %$conditions);
+        $result = $api->dispatch(command => "search_cert", params => $conditions);
         cmp_deeply $result, ($respect_order ? \@hashes : bag(@hashes));
     } "Search cert $message";
 }
