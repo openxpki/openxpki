@@ -41,7 +41,7 @@ lives_and {
 } "manually register a plugin class";
 
 lives_and {
-    cmp_deeply [ keys %{ $api->commands } ], bag('givetheparams', 'alienplugin');
+    cmp_deeply [ keys %{ $api->commands } ], bag('givetheparams', 'scream', 'alienplugin');
 } "query available commands";
 
 TODO: {

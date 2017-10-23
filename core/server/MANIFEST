@@ -641,6 +641,7 @@ t/90_api/20_token.t
 t/90_api/30_workflow.t
 
 t/91_api2/10_base.t
+t/91_api2/20_acl.t
 t/91_api2/lib/OpenXPKI/TestCommands/Ignored.pm
 t/91_api2/lib/OpenXPKI/TestCommands/givetheparams.pm
 t/91_api2/lib/OpenXPKI/Testalienplugin.pm

@@ -41,15 +41,25 @@ To manually register a plugin outside the default namespace:
 
     my @commands = $api->register_plugin("OpenXPKI::MyAlienplugin");
 
+Do not check command ACLs:
+
+    my $api = OpenXPKI::Server::API2->new(
+        enable_acls => 0,
+    );
+
 Set a different plugin namespace for auto-discovery:
 
     my $api = OpenXPKI::Server::API2->new(
+        enable_acls => 0,
         namespace => "My::Command::Plugins",
     );
 
 Instantiate the API without plugin auto-discovery:
 
-    my $api = OpenXPKI::Server::API2->new(commands => {});
+    my $api = OpenXPKI::Server::API2->new(
+        enable_acls => 0,
+        commands => {},
+    );
 
 =head1 DESCRIPTION
 
@@ -91,9 +101,23 @@ has log => (
     },
 );
 
+=head2 enable_acls
+
+Optional: set to FALSE to disable ACLs checks when commands are executed.
+
+Can only be set via constructor.
+
+=cut
+has enable_acls => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 1,
+);
+
 =head2 role_config_accessor
 
-Required: a callback that must return the ACL configuration of a given role.
+Optional (only if C<enable_acls = 1>): a callback that returns the ACL
+configuration I<HashRef> of a given role.
 
 Example:
 
@@ -103,7 +127,6 @@ Example:
 has role_config_accessor => (
     is => 'rw',
     isa => 'CodeRef',
-    required => 1,
 );
 
 =head2 namespace
@@ -271,11 +294,7 @@ B<Parameters>
 sub dispatch {
     my ($self, $role, $command, %params) = @_;
 
-    my $rules = $self->get_acl_rules($role, $command)
-        or OpenXPKI::Exception->throw(
-            message => "Role is not allowed to call API command",
-            params => { role => $role, command => $command }
-        );
+    $self->log->debug("Processing API command '$command'");
 
     my $package = $self->commands->{$command}
         or OpenXPKI::Exception->throw(
@@ -283,8 +302,92 @@ sub dispatch {
             params => { command => $command }
         );
 
-    # FIXME Implement one-time instantiation
-    return $package->new->execute($command, \%params);
+    my $all_params;
+    if ($self->enable_acls) {
+        my $rules = $self->get_acl_rules($role, $command)
+            or OpenXPKI::Exception->throw(
+                message => "ACL does not permit call to API command",
+                params => { role => $role, command => $command }
+            );
+
+        $all_params = $self->apply_param_acl_rules($role, $command, $rules, \%params);
+    }
+    else {
+        $all_params = \%params;
+    }
+
+    return $package->new->execute($command, $all_params);
+}
+
+=head2 apply_param_acl_rules
+
+Enforces the given ACL rules on the given API command parameters (e.g. applies
+defaults or checks ACL constraints).
+
+Returns a I<HashRef> containing the resulting parameters.
+
+B<Parameters>
+
+=over
+
+=item * C<$role> - user role
+
+=item * C<$command> - API command name
+
+=item * C<$rules> - I<HashRef> containing the parameter rules
+
+=item * C<$params> - I<HashRef> of API command parameters as received by the caller
+
+=back
+
+=cut
+sub apply_param_acl_rules {
+    my ($self, $role, $command, $rules, $params) = @_;
+
+    my $result = { %$params }; # copy given params so we can modify hash without side effects
+
+    for my $param (keys %$rules) {
+        my $rule = $rules->{$param};
+        # enforced parameter
+        if ($rule->{force}) {
+            if ($result->{$param}) {
+                $self->log->warn("API command '$command': overwriting '$param' with forced value via ACL config (role '$role')");
+            }
+            elsif ($self->log->is_debug) {
+                $self->log->debug("API command '$command': setting '$param' to forced value via ACL config (role '$role')");
+            }
+            $result->{$param} = $rule->{force};
+        }
+        # parameter not set
+        elsif (not $result->{$param}) {
+            if ($rule->{required}) {
+                OpenXPKI::Exception->throw(
+                    message => "API command parameter required by ACL but not given",
+                    params => { command => $command, param => $param },
+                );
+            }
+            if ($rule->{default}) {
+                $result->{$param} = $rule->{default};
+                $self->log->debug("API command '$command': setting '$param' to default via ACL config (role '$role')")
+                  if $self->log->is_debug;
+            }
+        }
+        # parameter set but blocked
+        elsif ($rule->{block}) {
+            OpenXPKI::Exception->throw(
+                message => "API command parameter was given but blocked via ACL",
+                params => { command => $command, param => $param },
+            );
+        }
+        # non-matching parameter
+        elsif ($rule->{match} and not $result->{$param} =~ qr/$rule->{match}/msx) {
+            OpenXPKI::Exception->throw(
+                message => "API command parameter does not match regex in ACL",
+                params => { command => $command, param => $param, value => $result->{$param} },
+            );
+        }
+    }
+    return $result;
 }
 
 =head2 get_acl_rules
@@ -323,34 +426,38 @@ sub get_acl_rules {
     my $conf = $self->role_config_accessor->($role); # invoke the CodeRef
     # no ACL config
     if (not $conf) {
-        $self->log->debug("ACL config does not mention role $role")
+        $self->log->debug("ACL config: unknown role '$role'")
           if $self->log->is_debug;
         return;
     }
 
-    $self->log->debug("ACL config of role '$role' allows all API commands")
+    $self->log->debug("ACL config: all API commands for role '$role'")
       if ($conf->{allow_all_commands} and $self->log->is_debug);
 
     my $all_cmd_configs = $conf->{commands};
     # no command config hash
     if (not $all_cmd_configs) {
         return {} if $conf->{allow_all_commands};
-        $self->log->debug("ACL config of role '$role' does not contain any allowed commands")
+        $self->log->debug("ACL config: no allowed commands specified for role '$role'")
           if $self->log->is_debug;
         return;
     }
 
     my $cmd_config = $all_cmd_configs->{$command};
-    # command not specified
+    # command not specified (or not a TRUE value)
     if (not $cmd_config) {
         return {} if $conf->{allow_all_commands};
-        $self->log->debug("ACL config of role '$role' does not allow command '$command'")
+        $self->log->debug("ACL config: command '$command' not allowed for role '$role'")
           if $self->log->is_debug;
         return;
     }
 
     # TODO check ACL config structure
 
+    # non-hashref TRUE values are allowed as command config value
+    return {} unless ref $cmd_config eq 'HASH';
+
+    # command config details
     return $cmd_config;
 }
 
@@ -425,6 +532,77 @@ sub list_modules {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+=head1 ACL
+
+ACLs for the API commands can be defined on a per-role basis in each realm.
+
+If ACLs are enabled (see L</enable_acls>) then the default is to forbid all API
+commands. Allowed commands have to be specified for each role in the realm.
+
+The structure of the configuration subtree (below the realm) is as follows:
+
+    acl:
+        rules:
+            <role name>:
+                allow_all_commands: 1
+                commands:
+                    <command>:
+                        <parameter>:
+                            default: <string>
+                            force:   <string>
+                            match:   <regex>
+                            block:   1
+
+                    <command>:
+                        ...
+
+            <role name>:
+                ...
+
+B<allow_all_commands> is a shortcut that quickly grants access to all commands:
+
+    acl:
+        rules:
+            CA Operator:
+                allow_all_commands: 1
+
+For command parameters the following options are available:
+
+=over
+
+=item * B<force>
+
+Enforce parameter to the given value (overwrites a given value).
+
+    acl:
+        rules:
+            CA Operator:
+                search_cert:
+                    status:
+                        force: ISSUED
+
+=item * B<default>
+
+Default value if none was given.
+
+                        default: ISSUED
+
+=item * B<match>
+
+Match parameter against regular expression. The Regex is executed using the
+modifiers C</msx>, so please escape spaces.
+
+                        match: \A (ISSUED|REVOKED) \z
+
+=item * B<block>
+
+Block parameter so that an exception will be thrown if the caller tries to set
+it.
+
+                        block: 1
+
+=back
 
 =head1 INTERNALS
 
