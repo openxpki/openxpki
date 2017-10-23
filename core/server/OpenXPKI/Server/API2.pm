@@ -262,8 +262,19 @@ sub dispatch {
     return $package->new->execute($command, \%params);
 }
 
-use Carp qw(croak);
+=head2 list_modules
 
+Lists all modules below the given namespace.
+
+B<Parameters>
+
+=over
+
+=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::Plugin>)
+
+=back
+
+=cut
 # Taken from Module::List
 sub list_modules {
     my ($prefix) = @_;
