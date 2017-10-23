@@ -31,6 +31,7 @@ lives_ok {
     $api = OpenXPKI::Server::API2->new(
         namespace => "OpenXPKI::TestCommands",
         log => Log::Log4perl->get_logger(),
+        role_config_accessor => sub { { allow_all_commands => 1 } },
     );
 } "instantiate";
 
@@ -46,28 +47,28 @@ lives_and {
 TODO: {
     local $TODO = "Implement strict constructor check for parameter objects";
     dies_ok {
-        $api->dispatch("givetheparams", name => "Max", test => 1);
+        $api->dispatch("master", "givetheparams", name => "Max", test => 1);
     } "complain about unknown parameter";
 };
 
 throws_ok {
-    $api->dispatch("iamnothere");
+    $api->dispatch("master", "iamnothere");
 } "OpenXPKI::Exception", "complain about unknown API command";
 
 throws_ok {
-    $api->dispatch("givetheparams", name => "Max", size => "blah");
+    $api->dispatch("master", "givetheparams", name => "Max", size => "blah");
 } "Moose::Exception::ValidationFailedForTypeConstraint", "complain about wrong parameter type";
 
 throws_ok {
-    $api->dispatch("givetheparams", name => "Donald");
+    $api->dispatch("master", "givetheparams", name => "Donald");
 } "Moose::Exception::ValidationFailedForTypeConstraint", "complain about parameter validation failure (regex)";
 
 throws_ok {
-    $api->dispatch("givetheparams", name => "Max", size => -1);
+    $api->dispatch("master", "givetheparams", name => "Max", size => -1);
 } "Moose::Exception::ValidationFailedForTypeConstraint", "complain about parameter validation failure (sub)";
 
 lives_and {
-    my $result = $api->dispatch("givetheparams", name => "Max", size => 5 );
+    my $result = $api->dispatch("master", "givetheparams", name => "Max", size => 5 );
     cmp_deeply $result, { name => "Max", size => 5 };
 } "correctly execute command";
 

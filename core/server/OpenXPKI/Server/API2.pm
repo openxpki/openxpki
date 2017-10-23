@@ -30,7 +30,9 @@ Default usage:
 
     use OpenXPKI::Server::API2;
 
-    my $api = OpenXPKI::Server::API2->new();
+    my $api = OpenXPKI::Server::API2->new(
+        role_config_accessor => sub { CTX('config')->get('acl.rules.' . shift) },
+    );
     printf "Available commands: %s\n", join(", ", keys %{$api->commands});
 
     my $result = $api->dispatch("mycommand", myaction => "go");
@@ -87,6 +89,21 @@ has log => (
         my $log = OpenXPKI::Server::Context::hascontext('log') ? CTX('log') : OpenXPKI::Server::Log->new(CONFIG => undef);
         return $log->application,
     },
+);
+
+=head2 role_config_accessor
+
+Required: a callback that must return the ACL configuration of a given role.
+
+Example:
+
+    my $cfg = $api2->role_config_accessor->($role);
+
+=cut
+has role_config_accessor => (
+    is => 'rw',
+    isa => 'CodeRef',
+    required => 1,
 );
 
 =head2 namespace
@@ -242,6 +259,8 @@ B<Parameters>
 
 =over
 
+=item * C<$role> - user role
+
 =item * C<$command> - API command name
 
 =item * C<%params> - Parameter hash
@@ -250,7 +269,13 @@ B<Parameters>
 
 =cut
 sub dispatch {
-    my ($self, $command, %params) = @_;
+    my ($self, $role, $command, %params) = @_;
+
+    my $rules = $self->get_acl_rules($role, $command)
+        or OpenXPKI::Exception->throw(
+            message => "Role is not allowed to call API command",
+            params => { role => $role, command => $command }
+        );
 
     my $package = $self->commands->{$command}
         or OpenXPKI::Exception->throw(
@@ -260,6 +285,73 @@ sub dispatch {
 
     # FIXME Implement one-time instantiation
     return $package->new->execute($command, \%params);
+}
+
+=head2 get_acl_rules
+
+Checks if the given OpenXPKI role is allowed to execute the given command.
+
+On success it returns the command configuration (might be an empty I<HashRef>),
+e.g.:
+
+    {
+        param_a => {
+            default => "lawn",
+            match => "^la",
+        }
+        param_b => {
+            force => "green",
+        }
+    }
+
+On failure (if role has no access) returns I<undef>.
+
+B<Parameters>
+
+=over
+
+=item * C<$role> - OpenXPKI role name
+
+=item * C<$command> - API command name
+
+=back
+
+=cut
+sub get_acl_rules {
+    my ($self, $role, $command) = @_;
+
+    my $conf = $self->role_config_accessor->($role); # invoke the CodeRef
+    # no ACL config
+    if (not $conf) {
+        $self->log->debug("ACL config does not mention role $role")
+          if $self->log->is_debug;
+        return;
+    }
+
+    $self->log->debug("ACL config of role '$role' allows all API commands")
+      if ($conf->{allow_all_commands} and $self->log->is_debug);
+
+    my $all_cmd_configs = $conf->{commands};
+    # no command config hash
+    if (not $all_cmd_configs) {
+        return {} if $conf->{allow_all_commands};
+        $self->log->debug("ACL config of role '$role' does not contain any allowed commands")
+          if $self->log->is_debug;
+        return;
+    }
+
+    my $cmd_config = $all_cmd_configs->{$command};
+    # command not specified
+    if (not $cmd_config) {
+        return {} if $conf->{allow_all_commands};
+        $self->log->debug("ACL config of role '$role' does not allow command '$command'")
+          if $self->log->is_debug;
+        return;
+    }
+
+    # TODO check ACL config structure
+
+    return $cmd_config;
 }
 
 =head2 list_modules
