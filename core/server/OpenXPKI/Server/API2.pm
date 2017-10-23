@@ -22,6 +22,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Log;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API2::PluginRole;
+use OpenXPKI::MooseParams;
 
 
 =head1 SYNOPSIS
@@ -280,45 +281,51 @@ sub register_plugin {
 
 Dispatches an API command call to the responsible plugin instance.
 
-B<Parameters>
+B<Named parameters>
 
 =over
 
-=item * C<$role> - user role
+=item * C<command> - API command name
 
-=item * C<$command> - API command name
+=item * C<params> - Parameter hash
 
-=item * C<%params> - Parameter hash
+=item * C<role> - user role (only needed if L</enable_acls> = 1)
 
 =back
 
 =cut
 sub dispatch {
-    my ($self, $role, $command, %params) = @_;
+    my ($self, %p) = named_args(\@_,   # OpenXPKI::MooseParams
+        command => { isa => 'Str' },
+        params  => { isa => 'HashRef', optional => 1, default => sub { {} } },
+        role    => { isa => 'Str', optional => 1 },
+    );
 
-    $self->log->debug("Processing API command '$command'");
-
-    my $package = $self->commands->{$command}
+    my $package = $self->commands->{ $p{command} }
         or OpenXPKI::Exception->throw(
             message => "Unknown API command",
-            params => { command => $command }
+            params => { command => $p{command} }
         );
 
     my $all_params;
     if ($self->enable_acls) {
-        my $rules = $self->get_acl_rules($role, $command)
+        OpenXPKI::Exception->throw(
+            message => "API 'dispatch' method: 'role' must be specified if ACLs are enabled",
+        ) unless $p{role};
+
+        my $rules = $self->get_acl_rules($p{role}, $p{command})
             or OpenXPKI::Exception->throw(
                 message => "ACL does not permit call to API command",
-                params => { role => $role, command => $command }
+                params => { role => $p{role}, command => $p{command} }
             );
 
-        $all_params = $self->apply_acl_rules($role, $command, $rules, \%params);
+        $all_params = $self->apply_acl_rules($p{role}, $p{command}, $rules, $p{params});
     }
     else {
-        $all_params = \%params;
+        $all_params = $p{params};
     }
 
-    return $package->new->execute($command, $all_params);
+    return $package->new->execute($p{command}, $all_params);
 }
 
 =head2 apply_acl_rules

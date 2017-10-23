@@ -74,40 +74,40 @@ lives_ok {
 
 
 throws_ok {
-    my $result = $api->dispatch("unborn_child", "scream");
+    my $result = $api->dispatch(role => "unborn_child", command => "scream");
 } qr/not permit/, "complain about unknown role" or die;
 
 throws_ok {
-    my $result = $api->dispatch("mean_child", "givetheparams");
+    my $result = $api->dispatch(role => "mean_child", command => "givetheparams");
 } qr/not permit/, "complain about forbidden command" or die;
 
 #
 # default parameters
 #
 lives_and {
-    my $result = $api->dispatch("mean_child", "scream", what => "boo" );
+    my $result = $api->dispatch(role => "mean_child", command => "scream", params => { what => "boo" } );
     like $result, qr/:loud:.*boo/;
 } "apply parameter defaults" or die;
 
 lives_and {
-    my $result = $api->dispatch("mean_child", "scream", how => "louder", what => "boo" );
+    my $result = $api->dispatch(role => "mean_child", command => "scream", params => { how => "louder", what => "boo" } );
     like $result, qr/:louder:.*boo/;
 } "overwrite parameter defaults and match regex" or die;
 
 throws_ok {
-    my $result = $api->dispatch("mean_child", "scream", how => "insanely", what => "boo" );
+    my $result = $api->dispatch(role => "mean_child", command => "scream", params => { how => "insanely", what => "boo" } );
 } qr/does not match/, "complain about non-matching parameters" or die;
 
 #
 # forced parameters
 #
 lives_and {
-    my $result = $api->dispatch("sweet_child", "scream", what => "boo" );
+    my $result = $api->dispatch(role => "sweet_child", command => "scream", params => { what => "boo" } );
     like $result, qr/:never:.*boo/;
 } "set parameter to forced value" or die;
 
 lives_and {
-    my $result = $api->dispatch("sweet_child", "scream", how => "loud", what => "boo" );
+    my $result = $api->dispatch(role => "sweet_child", command => "scream", params => { how => "loud", what => "boo" } );
     like $result, qr/:never:.*boo/;
 } "overwrite given parameter with forced value" or die;
 
@@ -115,7 +115,7 @@ lives_and {
 # quick spec of allowed command
 #
 lives_and {
-    my $result = $api->dispatch("quick_child", "scream", how => "shortly", what => "boo" );
+    my $result = $api->dispatch(role => "quick_child", command => "scream", params => { how => "shortly", what => "boo" } );
     like $result, qr/:shortly:.*boo/;
 } "accept quick command spec in ACL" or die;
 
@@ -123,12 +123,12 @@ lives_and {
 # blocked parameters
 #
 lives_and {
-    my $result = $api->dispatch("regulated_child", "scream", how => "properly", what => "Hi" );
+    my $result = $api->dispatch(role => "regulated_child", command => "scream", params => { how => "properly", what => "Hi" } );
     like $result, qr/:properly:.*Hi.*to Albert/;
 } "ignored blocked parameters if not given" or die;
 
 throws_ok {
-    my $result = $api->dispatch("regulated_child", "scream", how => "properly", what => "Hi", whom => "Mom" );
+    my $result = $api->dispatch(role => "regulated_child", command => "scream", params => { how => "properly", what => "Hi", whom => "Mom" } );
 } qr/blocked/, "complain about blocked parameters if given" or die;
 
 1;
