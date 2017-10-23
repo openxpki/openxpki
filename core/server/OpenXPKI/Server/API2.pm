@@ -127,6 +127,7 @@ Example:
 has acl_rule_accessor => (
     is => 'rw',
     isa => 'CodeRef',
+    lazy => 1,
     default => sub { die "Attribute 'acl_rule_accessor' not set in ".__PACKAGE__."\n" },
 );
 
