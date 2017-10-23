@@ -31,7 +31,7 @@ lives_ok {
     $api = OpenXPKI::Server::API2->new(
         namespace => "OpenXPKI::TestCommands",
         log => Log::Log4perl->get_logger(),
-        role_config_accessor => sub {
+        acl_rule_accessor => sub {
             my $role = shift;
             return {
                 mean_child => {

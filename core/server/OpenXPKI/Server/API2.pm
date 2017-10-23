@@ -31,7 +31,7 @@ Default usage:
     use OpenXPKI::Server::API2;
 
     my $api = OpenXPKI::Server::API2->new(
-        role_config_accessor => sub { CTX('config')->get('acl.rules.' . shift) },
+        acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . shift) },
     );
     printf "Available commands: %s\n", join(", ", keys %{$api->commands});
 
@@ -114,19 +114,20 @@ has enable_acls => (
     default => 1,
 );
 
-=head2 role_config_accessor
+=head2 acl_rule_accessor
 
 Optional (only if C<enable_acls = 1>): a callback that returns the ACL
 configuration I<HashRef> of a given role.
 
 Example:
 
-    my $cfg = $api2->role_config_accessor->($role);
+    my $cfg = $api2->acl_rule_accessor->($role);
 
 =cut
-has role_config_accessor => (
+has acl_rule_accessor => (
     is => 'rw',
     isa => 'CodeRef',
+    default => sub { die "Attribute 'acl_rule_accessor' not set in ".__PACKAGE__."\n" },
 );
 
 =head2 namespace
@@ -310,7 +311,7 @@ sub dispatch {
                 params => { role => $role, command => $command }
             );
 
-        $all_params = $self->apply_param_acl_rules($role, $command, $rules, \%params);
+        $all_params = $self->apply_acl_rules($role, $command, $rules, \%params);
     }
     else {
         $all_params = \%params;
@@ -319,7 +320,7 @@ sub dispatch {
     return $package->new->execute($command, $all_params);
 }
 
-=head2 apply_param_acl_rules
+=head2 apply_acl_rules
 
 Enforces the given ACL rules on the given API command parameters (e.g. applies
 defaults or checks ACL constraints).
@@ -341,7 +342,7 @@ B<Parameters>
 =back
 
 =cut
-sub apply_param_acl_rules {
+sub apply_acl_rules {
     my ($self, $role, $command, $rules, $params) = @_;
 
     my $result = { %$params }; # copy given params so we can modify hash without side effects
@@ -423,7 +424,7 @@ B<Parameters>
 sub get_acl_rules {
     my ($self, $role, $command) = @_;
 
-    my $conf = $self->role_config_accessor->($role); # invoke the CodeRef
+    my $conf = $self->acl_rule_accessor->($role); # invoke the CodeRef
     # no ACL config
     if (not $conf) {
         $self->log->debug("ACL config: unknown role '$role'")
