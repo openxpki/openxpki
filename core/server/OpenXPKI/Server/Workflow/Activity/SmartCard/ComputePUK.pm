@@ -25,7 +25,7 @@ sub execute {
 
     # if smartcard type is "rsa[23]": throw an error (PUK is static and has to be administratively
     # imported into the datapool before a personalization can happen). End processing.
-    if ($token_id !~ /^gem2/) {
+    if ($token_id !~ /^gem[23]/) {
         OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_COMPUTEPUK_TOKEN_NOT_SUPPORTED',
             params  => {
@@ -98,7 +98,7 @@ Contains the computed default puk.
 
 =head1 Algorithm
 
-Only Gemalto cards with a card id starting with gem2_ are supported.
+Only Gemalto cards with a card id starting with gem2_ or gem3_ are supported.
 There are multiple generations of cards in use and we need to obtain a
 "lot id" to get the correct puk deriviation algorithm.
 

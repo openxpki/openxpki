@@ -37,7 +37,7 @@ sub execute {
     my ( $puk_length, $puk );
 
 
-    if ( $puk_policy eq 'gem2' ) {
+    if ( $puk_policy =~ /gem[23]/ ) {
         $puk_length = 24; # bytes
 
         my $command = {
@@ -152,7 +152,7 @@ B<Note:> Planned for future version. For now, 'gem2' is always used.
 
 Specifies the name of the puk policy to use. Possible choices are:
 
- gem2   48 hex chars, as required by Gemalto 2 cards [default]
+ gem2/gem3  48 hex chars, as required by Gemalto 2 cards [default]
 
 =back
 
