@@ -204,7 +204,7 @@ sub _build_commands {
     my @modules = ();
     my $candidates = {};
     try {
-        $candidates = list_modules($self->namespace."::");
+        $candidates = _list_modules($self->namespace."::");
     }
     catch {
         OpenXPKI::Exception->throw (
@@ -313,13 +313,13 @@ sub dispatch {
             message => "API 'dispatch' method: 'role' must be specified if ACLs are enabled",
         ) unless $p{role};
 
-        my $rules = $self->get_acl_rules($p{role}, $p{command})
+        my $rules = $self->_get_acl_rules($p{role}, $p{command})
             or OpenXPKI::Exception->throw(
                 message => "ACL does not permit call to API command",
                 params => { role => $p{role}, command => $p{command} }
             );
 
-        $all_params = $self->apply_acl_rules($p{role}, $p{command}, $rules, $p{params});
+        $all_params = $self->_apply_acl_rules($p{role}, $p{command}, $rules, $p{params});
     }
     else {
         $all_params = $p{params};
@@ -328,12 +328,15 @@ sub dispatch {
     return $package->new->execute($p{command}, $all_params);
 }
 
-=head2 apply_acl_rules
+=head2 _apply_acl_rules
 
 Enforces the given ACL rules on the given API command parameters (e.g. applies
 defaults or checks ACL constraints).
 
 Returns a I<HashRef> containing the resulting parameters.
+
+Throws an exception if the given role is not permitted to access the given
+command.
 
 B<Parameters>
 
@@ -350,7 +353,7 @@ B<Parameters>
 =back
 
 =cut
-sub apply_acl_rules {
+sub _apply_acl_rules {
     my ($self, $role, $command, $rules, $params) = @_;
 
     my $result = { %$params }; # copy given params so we can modify hash without side effects
@@ -399,7 +402,7 @@ sub apply_acl_rules {
     return $result;
 }
 
-=head2 get_acl_rules
+=head2 _get_acl_rules
 
 Checks if the given OpenXPKI role is allowed to execute the given command.
 
@@ -429,7 +432,7 @@ B<Parameters>
 =back
 
 =cut
-sub get_acl_rules {
+sub _get_acl_rules {
     my ($self, $role, $command) = @_;
 
     my $conf = $self->acl_rule_accessor->($role); # invoke the CodeRef
@@ -470,7 +473,7 @@ sub get_acl_rules {
     return $cmd_config;
 }
 
-=head2 list_modules
+=head2 _list_modules
 
 Lists all modules below the given namespace.
 
@@ -484,13 +487,13 @@ B<Parameters>
 
 =cut
 # Taken from Module::List
-sub list_modules {
+sub _list_modules {
     my ($prefix) = @_;
 
     my $root_rx = qr/[a-zA-Z_][0-9a-zA-Z_]*/;
     my $notroot_rx = qr/[0-9a-zA-Z_]+/;
 
-    OpenXPKI::Exception->throw(message => "Bad module name given to list_modules()", params => { prefix => $prefix })
+    OpenXPKI::Exception->throw(message => "Bad module name given to _list_modules()", params => { prefix => $prefix })
         unless (
             $prefix =~ /\A(?:${root_rx}::(?:${notroot_rx}::)*)?\z/x
             and $prefix !~ /(?:\A|[^:]::)\.\.?::/
