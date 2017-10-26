@@ -27,7 +27,7 @@ use OpenXPKI::MooseParams;
 
 =head1 SYNOPSIS
 
-Default usage:
+B<Default usage>:
 
     use OpenXPKI::Server::API2;
 
@@ -38,29 +38,29 @@ Default usage:
 
     my $result = $api->dispatch("mycommand", myaction => "go");
 
-To manually register a plugin outside the default namespace:
-
-    my @commands = $api->register_plugin("OpenXPKI::MyAlienplugin");
-
-Do not check command ACLs:
+B<Disable ACL checks> when executing a command:
 
     my $api = OpenXPKI::Server::API2->new(
         enable_acls => 0,
     );
 
-Set a different plugin namespace for auto-discovery:
+B<Different plugin namespace> for auto-discovery:
 
     my $api = OpenXPKI::Server::API2->new(
         enable_acls => 0,
         namespace => "My::Command::Plugins",
     );
 
-Instantiate the API without plugin auto-discovery:
+B<Disable plugin auto-discovery>:
 
     my $api = OpenXPKI::Server::API2->new(
         enable_acls => 0,
         commands => {},
     );
+
+B<Manually register> a plugin outside the default namespace:
+
+    my @commands = $api->register_plugin("OpenXPKI::MyAlienplugin");
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ namespace.
 Standard (and easy) way to define a new plugin class with API commands:
 
 Create a new package in the C<OpenXPKI::Server::API2::Plugin> namespace (any
-deeper hierarchy is OK) and in your package use
+deeper hierarchy is okay) and in your package use
 L<OpenXPKI::Server::API2::EasyPlugin> as described there.
 
 =cut
@@ -106,6 +106,8 @@ has log => (
 
 Optional: set to FALSE to disable ACLs checks when commands are executed.
 
+Default: TRUE
+
 Can only be set via constructor.
 
 =cut
@@ -117,8 +119,8 @@ has enable_acls => (
 
 =head2 acl_rule_accessor
 
-Optional (only if C<enable_acls = 1>): a callback that returns the ACL
-configuration I<HashRef> of a given role.
+Only if C<enable_acls = 1>: callback that returns the ACL configuration
+I<HashRef> of a given role.
 
 Example:
 
@@ -135,7 +137,9 @@ has acl_rule_accessor => (
 =head2 namespace
 
 Optional: Perl package namespace that will be searched for the command plugins
-(classes). Default: C<OpenXPKI::Server::API2::Plugin>
+(classes).
+
+Default: C<OpenXPKI::Server::API2::Plugin>
 
 Example:
 
@@ -153,7 +157,9 @@ has namespace => (
 
 Optional: role that all command classes are expected to have. This allows
 the API to distinct between command modules that shall be registered and helper
-classes. Default: C<OpenXPKI::Server::API2::PluginRole>.
+classes.
+
+Default: C<OpenXPKI::Server::API2::PluginRole>.
 
 B<ATTENTION>: if you change this make sure the role you specify requires at
 least the same methods as L<OpenXPKI::Server::API2::PluginRole>.
@@ -169,7 +175,8 @@ has command_role => (
 =head2 commands
 
 I<HashRef> containing registered API commands and their Perl packages. The hash
-is built on first access, you should rarely have a reason to set this manually.
+is built on first access, only manually set this if you want to disable the
+auto-discovery of plugin modules.
 
 Structure:
 
@@ -328,31 +335,31 @@ sub dispatch {
     return $package->new->execute($p{command}, $all_params);
 }
 
-=head2 _apply_acl_rules
-
-Enforces the given ACL rules on the given API command parameters (e.g. applies
-defaults or checks ACL constraints).
-
-Returns a I<HashRef> containing the resulting parameters.
-
-Throws an exception if the given role is not permitted to access the given
-command.
-
-B<Parameters>
-
-=over
-
-=item * C<$role> - user role
-
-=item * C<$command> - API command name
-
-=item * C<$rules> - I<HashRef> containing the parameter rules
-
-=item * C<$params> - I<HashRef> of API command parameters as received by the caller
-
-=back
-
-=cut
+#=head2 _apply_acl_rules
+#
+#Enforces the given ACL rules on the given API command parameters (e.g. applies
+#defaults or checks ACL constraints).
+#
+#Returns a I<HashRef> containing the resulting parameters.
+#
+#Throws an exception if the given role is not permitted to access the given
+#command.
+#
+#B<Parameters>
+#
+#=over
+#
+#=item * C<$role> - user role
+#
+#=item * C<$command> - API command name
+#
+#=item * C<$rules> - I<HashRef> containing the parameter rules
+#
+#=item * C<$params> - I<HashRef> of API command parameters as received by the caller
+#
+#=back
+#
+#=cut
 sub _apply_acl_rules {
     my ($self, $role, $command, $rules, $params) = @_;
 
@@ -402,36 +409,36 @@ sub _apply_acl_rules {
     return $result;
 }
 
-=head2 _get_acl_rules
-
-Checks if the given OpenXPKI role is allowed to execute the given command.
-
-On success it returns the command configuration (might be an empty I<HashRef>),
-e.g.:
-
-    {
-        param_a => {
-            default => "lawn",
-            match => "^la",
-        }
-        param_b => {
-            force => "green",
-        }
-    }
-
-On failure (if role has no access) returns I<undef>.
-
-B<Parameters>
-
-=over
-
-=item * C<$role> - OpenXPKI role name
-
-=item * C<$command> - API command name
-
-=back
-
-=cut
+#=head2 _get_acl_rules
+#
+#Checks if the given OpenXPKI role is allowed to execute the given command.
+#
+#On success it returns the command configuration (might be an empty I<HashRef>),
+#e.g.:
+#
+#    {
+#        param_a => {
+#            default => "lawn",
+#            match => "^la",
+#        }
+#        param_b => {
+#            force => "green",
+#        }
+#    }
+#
+#On failure (if role has no access) returns I<undef>.
+#
+#B<Parameters>
+#
+#=over
+#
+#=item * C<$role> - OpenXPKI role name
+#
+#=item * C<$command> - API command name
+#
+#=back
+#
+#=cut
 sub _get_acl_rules {
     my ($self, $role, $command) = @_;
 
@@ -473,19 +480,19 @@ sub _get_acl_rules {
     return $cmd_config;
 }
 
-=head2 _list_modules
-
-Lists all modules below the given namespace.
-
-B<Parameters>
-
-=over
-
-=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::Plugin>)
-
-=back
-
-=cut
+#=head2 _list_modules
+#
+#Lists all modules below the given namespace.
+#
+#B<Parameters>
+#
+#=over
+#
+#=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::Plugin>)
+#
+#=back
+#
+#=cut
 # Taken from Module::List
 sub _list_modules {
     my ($prefix) = @_;
@@ -545,12 +552,13 @@ sub _list_modules {
 
 __PACKAGE__->meta->make_immutable;
 
-=head1 ACL
+=head1 ACLs
 
-ACLs for the API commands can be defined on a per-role basis in each realm.
+ACLs for the API commands can be defined on a per-role basis in each OpenXPKI
+realm.
 
 If ACLs are enabled (see L</enable_acls>) then the default is to forbid all API
-commands. Allowed commands have to be specified for each role in the realm.
+commands. Allowed commands have to be specified per role in the realm.
 
 The structure of the configuration subtree (below the realm) is as follows:
 
@@ -622,21 +630,29 @@ it.
 
 =over
 
-=item * B<One or more commands per class>: each plugin class can specify one or
+=item * B<One or more commands per class>:
+
+Each plugin class can specify one or
 more API commands. This allows to keep helper functions that are shared between
 several API commands close to the command code. It also helps reducing the
 number of individual Perl module files.
 
-=item * B<No base class>: when you use L<OpenXPKI::Server::API2::EasyPlugin> to
+=item * B<No base class>:
+
+When you use L<OpenXPKI::Server::API2::EasyPlugin> to
 define a plugin class all functionality is added via Moose roles instead of
 a base class. This allows for plugin classes to be based on any other classes
 if needed.
 
-=item * B<Standard magic>: syntactic sugar and helper functions only use Moose's
+=item * B<Standard magic>:
+
+Syntactic sugar and helper functions only use Moose's
 standard way to e.g. customize meta classes or inject roles. No other black
 magic is used.
 
-=item * B<Breakout allowed>: using L<OpenXPKI::Server::API2::EasyPlugin> is not
+=item * B<Breakout allowed>:
+
+Using L<OpenXPKI::Server::API2::EasyPlugin> is not
 a must, API plugins might be implemented differently by manually adding the role
 L<OpenXPKI::Server::API2::PluginRole> to a plugin class.
 

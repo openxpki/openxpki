@@ -8,6 +8,25 @@ use Moose::Role;
 
 with 'OpenXPKI::Server::API2::PluginRole';
 
+=head1 DESCRIPTION
+
+B<Not intended for direct use.> Please C<use OpenXPKI::Server::API2::EasyPlugin;>
+instead.
+
+This role implements the methods required by L<OpenXPKI::Server::API2::PluginRole>
+by accessing the metadata that is provided by meta class role
+L<OpenXPKI::Server::API2::EasyPluginMetaClassTrait>.
+
+Therefore it expects the consuming class to also have
+L<OpenXPKI::Server::API2::EasyPluginMetaClassTrait> applied.
+
+=head1 METHODS
+
+=head2 commands
+
+Returns a list of the commands that the
+
+=cut
 sub commands {
     my $self = shift;
     return [ $self->meta->command_list ]; # provided by OpenXPKI::Server::API2::EasyPluginMetaClassTrait

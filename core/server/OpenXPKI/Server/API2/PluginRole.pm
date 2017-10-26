@@ -15,7 +15,7 @@ This role requires the consuming class to implement the following methods:
 =head2 commands
 
 Must return an I<ArrayRef> with the names of all API commands that this class
-implements (i.e. that can be passes to L<execute>).
+implements (i.e. that can be passed to L<execute>).
 
 =cut
 requires 'commands';
