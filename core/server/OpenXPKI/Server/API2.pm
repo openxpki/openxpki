@@ -18,7 +18,6 @@ use IO::Dir 1.03;
 use Try::Tiny;
 
 # Project modules
-use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Log;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API2::PluginRole;
@@ -32,7 +31,7 @@ B<Default usage>:
     use OpenXPKI::Server::API2;
 
     my $api = OpenXPKI::Server::API2->new(
-        acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . shift) },
+        acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . CTX('session')->data->role ) },
     );
     printf "Available commands: %s\n", join(", ", keys %{$api->commands});
 
@@ -64,6 +63,9 @@ B<Manually register> a plugin outside the default namespace:
 
 =head1 DESCRIPTION
 
+Please note that all classes in the C<OpenXPKI::Server::API2::> namespace are
+context free, i.e. do not use the C<CTX> object.
+
 =head2 Call API commands
 
 This class acts as a dispatcher (single entrypoint) to execute API commands via
@@ -90,14 +92,14 @@ L<OpenXPKI::Server::API2::EasyPlugin> as described there.
 
 Optional: L<Log::Log4perl::Logger>.
 
-Default: C<OpenXPKI::Server::Log-E<gt>new(CONFIG =E<gt> undef)-E<gt>application>.
+Default: C<OpenXPKI::Server::Log-E<gt>new(CONFIG =E<gt> undef)-E<gt>system>.
 
 =cut
 has log => (
     is => 'rw',
     isa => 'Log::Log4perl::Logger',
     lazy => 1,
-    default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->application },
+    default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->system },
 );
 
 =head2 enable_acls
@@ -117,12 +119,12 @@ has enable_acls => (
 
 =head2 acl_rule_accessor
 
-Only if C<enable_acls = 1>: callback that returns the ACL configuration
-I<HashRef> of a given role.
+Only if C<enable_acls = 1>: callback that should return the ACL configuration
+I<HashRef> for the current user (role).
 
 Example:
 
-    my $cfg = $api2->acl_rule_accessor->($role);
+    my $cfg = $api2->acl_rule_accessor->();
 
 =cut
 has acl_rule_accessor => (
@@ -294,8 +296,6 @@ B<Named parameters>
 
 =item * C<params> - Parameter hash
 
-=item * C<role> - user role (only needed if L</enable_acls> = 1)
-
 =back
 
 =cut
@@ -303,32 +303,29 @@ sub dispatch {
     my ($self, %p) = named_args(\@_,   # OpenXPKI::MooseParams
         command => { isa => 'Str' },
         params  => { isa => 'HashRef', optional => 1, default => sub { {} } },
-        role    => { isa => 'Str', optional => 1 },
     );
 
     my $package = $self->commands->{ $p{command} }
         or OpenXPKI::Exception->throw(
             message => "Unknown API command",
-            params => { command => $p{command} }
+            params => { command => $p{command} },
         );
 
     my $all_params;
     if ($self->enable_acls) {
-        OpenXPKI::Exception->throw(
-            message => "API 'dispatch' method: 'role' must be specified if ACLs are enabled",
-        ) unless $p{role};
-
-        my $rules = $self->_get_acl_rules($p{role}, $p{command})
+        my $rules = $self->_get_acl_rules($p{command})
             or OpenXPKI::Exception->throw(
                 message => "ACL does not permit call to API command",
-                params => { role => $p{role}, command => $p{command} }
+                params => { command => $p{command} }
             );
 
-        $all_params = $self->_apply_acl_rules($p{role}, $p{command}, $rules, $p{params});
+        $all_params = $self->_apply_acl_rules($p{command}, $rules, $p{params});
     }
     else {
         $all_params = $p{params};
     }
+
+    $self->log->debug("API call to '$p{command}'") if $self->log->is_debug;
 
     return $package->new->execute($p{command}, $all_params);
 }
@@ -340,14 +337,12 @@ sub dispatch {
 #
 #Returns a I<HashRef> containing the resulting parameters.
 #
-#Throws an exception if the given role is not permitted to access the given
-#command.
+#Throws an exception if the current user role is not permitted to access the
+#given command.
 #
 #B<Parameters>
 #
 #=over
-#
-#=item * C<$role> - user role
 #
 #=item * C<$command> - API command name
 #
@@ -359,7 +354,7 @@ sub dispatch {
 #
 #=cut
 sub _apply_acl_rules {
-    my ($self, $role, $command, $rules, $params) = @_;
+    my ($self, $command, $rules, $params) = @_;
 
     my $result = { %$params }; # copy given params so we can modify hash without side effects
 
@@ -368,10 +363,10 @@ sub _apply_acl_rules {
         # enforced parameter
         if ($rule->{force}) {
             if ($result->{$param}) {
-                $self->log->warn("API command '$command': overwriting '$param' with forced value via ACL config (role '$role')");
+                $self->log->warn("API command '$command': overwriting '$param' with forced value via ACL config");
             }
             elsif ($self->log->is_debug) {
-                $self->log->debug("API command '$command': setting '$param' to forced value via ACL config (role '$role')");
+                $self->log->debug("API command '$command': setting '$param' to forced value via ACL config");
             }
             $result->{$param} = $rule->{force};
         }
@@ -385,7 +380,7 @@ sub _apply_acl_rules {
             }
             if ($rule->{default}) {
                 $result->{$param} = $rule->{default};
-                $self->log->debug("API command '$command': setting '$param' to default via ACL config (role '$role')")
+                $self->log->debug("API command '$command': setting '$param' to default via ACL config")
                   if $self->log->is_debug;
             }
         }
@@ -409,7 +404,8 @@ sub _apply_acl_rules {
 
 #=head2 _get_acl_rules
 #
-#Checks if the given OpenXPKI role is allowed to execute the given command.
+#Checks if the given current OpenXPKI user's role is allowed to execute the
+#given command.
 #
 #On success it returns the command configuration (might be an empty I<HashRef>),
 #e.g.:
@@ -424,13 +420,11 @@ sub _apply_acl_rules {
 #        }
 #    }
 #
-#On failure (if role has no access) returns I<undef>.
+#On failure (if user role has no access) returns I<undef>.
 #
 #B<Parameters>
 #
 #=over
-#
-#=item * C<$role> - OpenXPKI role name
 #
 #=item * C<$command> - API command name
 #
@@ -438,25 +432,23 @@ sub _apply_acl_rules {
 #
 #=cut
 sub _get_acl_rules {
-    my ($self, $role, $command) = @_;
+    my ($self, $command) = @_;
 
-    my $conf = $self->acl_rule_accessor->($role); # invoke the CodeRef
+    my $conf = $self->acl_rule_accessor->(); # invoke the CodeRef
     # no ACL config
     if (not $conf) {
-        $self->log->debug("ACL config: unknown role '$role'")
-          if $self->log->is_debug;
+        $self->log->debug("ACL config: unknown role") if $self->log->is_debug;
         return;
     }
 
-    $self->log->debug("ACL config: all API commands for role '$role'")
+    $self->log->debug("ACL config: all API commands allowed")
       if ($conf->{allow_all_commands} and $self->log->is_debug);
 
     my $all_cmd_configs = $conf->{commands};
     # no command config hash
     if (not $all_cmd_configs) {
         return {} if $conf->{allow_all_commands};
-        $self->log->debug("ACL config: no allowed commands specified for role '$role'")
-          if $self->log->is_debug;
+        $self->log->debug("ACL config: no allowed commands specified") if $self->log->is_debug;
         return;
     }
 
@@ -464,8 +456,7 @@ sub _get_acl_rules {
     # command not specified (or not a TRUE value)
     if (not $cmd_config) {
         return {} if $conf->{allow_all_commands};
-        $self->log->debug("ACL config: command '$command' not allowed for role '$role'")
-          if $self->log->is_debug;
+        $self->log->debug("ACL config: command '$command' not allowed") if $self->log->is_debug;
         return;
     }
 
