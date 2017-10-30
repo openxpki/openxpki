@@ -14,6 +14,7 @@ use Moose::Util::MetaRole;
 use B::Hooks::EndOfScope;
 
 # Project modules
+use OpenXPKI::Server::API2::EasyPluginRole;
 use OpenXPKI::Server::API2::EasyPluginMetaClassTrait;
 
 
