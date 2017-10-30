@@ -88,18 +88,16 @@ L<OpenXPKI::Server::API2::EasyPlugin> as described there.
 
 =head2 log
 
-Optional: L<Log::Log4perl::Logger>. Default: C<CTX('log')-E<gt>application> if
-available or a new logger instance.
+Optional: L<Log::Log4perl::Logger>.
+
+Default: C<OpenXPKI::Server::Log-E<gt>new(CONFIG =E<gt> undef)-E<gt>application>.
 
 =cut
 has log => (
     is => 'rw',
     isa => 'Log::Log4perl::Logger',
     lazy => 1,
-    default => sub {
-        my $log = OpenXPKI::Server::Context::hascontext('log') ? CTX('log') : OpenXPKI::Server::Log->new(CONFIG => undef);
-        return $log->application,
-    },
+    default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->application },
 );
 
 =head2 enable_acls
