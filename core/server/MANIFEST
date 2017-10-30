@@ -287,6 +287,7 @@ OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicyDNS.pm
 OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicySubjectDuplicate.pm
 OpenXPKI/Server/Workflow/Activity/CSR/CheckPolicyKeyDuplicate.pm
 
+
 OpenXPKI/Server/Workflow/Activity/CRR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/CRR/MarkRevoked.pm
 
@@ -380,6 +381,7 @@ OpenXPKI/Server/Workflow/Activity/SCEPv2/LoadRecentCertificate.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/CalcApprovals.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/FetchGroupPolicy.pm
 OpenXPKI/Server/Workflow/Activity/SCEPv2/ExtractCSR.pm
+OpenXPKI/Server/Workflow/Activity/SCEPv2/CalculateRequestHMAC.pm
 
 OpenXPKI/Server/Workflow/Activity/SmartCard/PersistCSRs.pm
 OpenXPKI/Server/Workflow/Activity/SmartCard/CreatePKCS12.pm

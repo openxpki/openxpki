@@ -56,6 +56,9 @@ profile_map:
 
 subject_style: enroll
 
+# HMAC based authentication
+hmac: verysecret
+
 challenge:
    value: SecretChallenge
 

@@ -173,7 +173,7 @@ state:
     INITIALIZED:
         autorun: 1
         action:
-          - extract_csr set_workflow_attributes > READY_TO_PROCESS
+          - extract_csr calculate_hmac set_workflow_attributes > READY_TO_PROCESS
 
     ISSUANCE:
         autorun: 1
@@ -329,6 +329,9 @@ state:
           - scep_tid
 
 action:
+    calculate_hmac:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::CalculateRequestHMAC
+
     approve_csr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL
@@ -613,6 +616,7 @@ condition:
             condition2: scep_trusted_signer_on_behalf
             condition3: scep_allow_anonymous_enrollment
 
+
     valid_request:
         class: Workflow::Condition::LazyAND
         param:
@@ -716,6 +720,7 @@ condition:
             condition1: scep_valid_challenge_password
             condition3: scep_policy_allows_anon_scep
             condition2: scep_valid_kerberos_authentication
+            condition4: scep_valid_hmac
 
     policy_allows_anon_scep:
         class: Workflow::Condition::Evaluate
@@ -731,6 +736,11 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
              test: $context->{valid_kerb_authen}
+
+    valid_hmac:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{url_hmac} && $context->{url_hmac} eq $context->{csr_hmac})
 
     signer_validity_ok:
         class: Workflow::Condition::Evaluate
