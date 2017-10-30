@@ -20,8 +20,9 @@ use Try::Tiny;
 # Project modules
 use OpenXPKI::Server::Log;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::MooseParams;
+use OpenXPKI::Server::API2::PluginRole;
+use OpenXPKI::Server::API2::Autoloader;
 
 
 =head1 SYNOPSIS
@@ -539,7 +540,20 @@ sub _list_modules {
     return \%results;
 }
 
+=head2 autoloader
+
+Returns an instance of L<OpenXPKI::Server::API2::Autoloader> for easier access
+to API functions.
+
+=cut
+sub autoloader {
+    my $self = shift;
+    return OpenXPKI::Server::API2::Autoloader->new(api => $self);
+}
+
+
 __PACKAGE__->meta->make_immutable;
+
 
 =head1 ACLs
 

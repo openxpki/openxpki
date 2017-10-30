@@ -35,6 +35,7 @@ my $context = {
 
         # user-settable
         api            => undef,
+        api2           => undef,
         server         => undef,
         acl            => undef,
         session        => undef,

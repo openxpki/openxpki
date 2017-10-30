@@ -27,6 +27,7 @@ use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API;
+use OpenXPKI::Server::API2;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
@@ -55,6 +56,7 @@ my @init_tasks = qw(
   dbi
   crypto_layer
   api
+  api2
   workflow_factory
   volatile_vault
   authentication
@@ -312,6 +314,16 @@ sub __do_init_api {
     OpenXPKI::Server::Context::setcontext(
     {
         api => OpenXPKI::Server::API->new(),
+    });
+}
+
+sub __do_init_api2 {
+    my $api = OpenXPKI::Server::API2->new(
+        acl_rule_accessor => sub { CTX('config')->get('acl.rules.' . CTX('session')->data->role ) },
+        log => CTX('log')->system,
+    );
+    OpenXPKI::Server::Context::setcontext({
+        api2 => $api->autoloader,
     });
 }
 
