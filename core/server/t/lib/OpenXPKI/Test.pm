@@ -246,8 +246,10 @@ has config_writer => (
 );
 
 
-=item * I<session> - Returns the session context object (C<CTX('session')>
-once L</init_server> was called.
+=head2 session
+
+Returns the session context object (C<CTX('session')> once L</init_server> was
+called.
 
 =cut
 has session => (
