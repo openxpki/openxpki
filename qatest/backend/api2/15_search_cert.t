@@ -19,7 +19,7 @@ use OpenXPKI::Test;
 use OpenXPKI::Test::QA::CertHelper::Workflow;
 use OpenXPKI::Server::Context;
 
-plan tests => 39;
+plan tests => 38;
 
 
 #
@@ -30,14 +30,17 @@ plan tests => 39;
 my $oxitest = OpenXPKI::Test->new(with_workflows => 1);
 my $dbdata = $oxitest->certhelper_database;
 $oxitest->insert_testcerts;
+$oxitest->realm_config("alpha", "acl.rules" => {
+    supertux => { allow_all_commands => 1 },
+});
 $oxitest->setup_env;
-$oxitest->init_server('workflow_factory');
+$oxitest->init_server('api2');
 
-use_ok "OpenXPKI::Server::API2";
+$oxitest->session->data->role("supertux");
 
 my $api;
 lives_ok {
-    $api = OpenXPKI::Server::API2->new(enable_acls => 0);
+    $api = OpenXPKI::Server::Context::CTX("api2");
 } "instantiate API";
 
 =pod
@@ -96,7 +99,7 @@ sub search_cert_ok {
     if (scalar(@expected_names) and $expected_names[0] eq "NO_CHECK") {
         my $result = [];
         lives_ok {
-            $result = $api->dispatch(command => "search_cert", params => $conditions);
+            $result = $api->search_cert(%$conditions);
         } "Search cert $message";
         return $result;
     }
@@ -112,7 +115,7 @@ sub search_cert_ok {
 
     my $result;
     lives_and {
-        $result = $api->dispatch(command => "search_cert", params => $conditions);
+        $result = $api->search_cert(%$conditions);
         cmp_deeply $result, ($respect_order ? \@hashes : bag(@hashes));
     } "Search cert $message";
 }
@@ -226,6 +229,7 @@ search_cert_ok "limit results and use offset", {
     pki_realm => $dbdata->cert("beta_root_1")->db->{pki_realm},
 }, qw( beta_bob_1 beta_datavault_1 ), "ORDERED";
 
+
 # By CSR serial
 my $uuid = Data::UUID->new->create_str;
 my $cert_info = $oxitest->create_cert(
@@ -234,6 +238,7 @@ my $cert_info = $oxitest->create_cert(
     requestor_name => $uuid,
     requestor_email => 'tilltom@morning',
 );
+
 
 $result = search_cert_ok "by CSR serial", {
     csr_serial => $cert_info->{req_key},
