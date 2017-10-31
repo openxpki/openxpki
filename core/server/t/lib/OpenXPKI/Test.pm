@@ -245,6 +245,17 @@ has config_writer => (
     },
 );
 
+
+=item * I<session> - Returns the session context object (C<CTX('session')>
+once L</init_server> was called.
+
+=cut
+has session => (
+    is => 'rw',
+    isa => 'Object',
+    init_arg => undef,
+);
+
 # Flag whether setup_env was called
 has _env_initialized => ( is => 'rw', isa => 'Bool', default => 0, init_arg => undef );
 
@@ -337,10 +348,10 @@ sub init_server {
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
 
     # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
-    my $session = OpenXPKI::Server::Session->new(load_config => 1)->create;
-    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+    $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
+    OpenXPKI::Server::Context::setcontext({'session' => $self->session, force => 1});
     # set PKI realm after init() as various init procedures overwrite the realm
-    $session->data->pki_realm($self->config_writer->realms->[0]);
+    $self->session->data->pki_realm($self->config_writer->realms->[0]);
 
     return $self;
 }
