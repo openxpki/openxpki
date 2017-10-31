@@ -62,14 +62,6 @@ before 'setup_env' => sub {
         OpenXPKI::Test::Role::WithWorkflows::Definition->def_certificate_signing_request_v2);
 };
 
-after 'init_server' => sub {
-    my $self = shift;
-
-    OpenXPKI::Server::Context::CTX('session')->data->pki_realm($self->config_writer->realms->[0]);
-    OpenXPKI::Server::Context::CTX('session')->data->user('raop');
-    OpenXPKI::Server::Context::CTX('session')->data->role('RA Operator');
-};
-
 =head1 METHODS
 
 The following methods are added to L<OpenXPKI::Test> when this role is applied:
@@ -148,6 +140,15 @@ sub create_cert {
         #plan tests => 16 + ($self->notbefore ? 2 : 0);
 
         my $result;
+
+        # change PKI realm, user and role to get permission to create workflow
+        my $sess_data = $self->session->data;
+        my $old_realm = $sess_data->has_pki_realm ? $sess_data->pki_realm : undef;
+        my $old_user =  $sess_data->has_user      ? $sess_data->user : undef;
+        my $old_role =  $sess_data->has_role      ? $sess_data->role : undef;
+        $sess_data->pki_realm($self->config_writer->realms->[0]);
+        $sess_data->user('raop');
+        $sess_data->role('RA Operator');
 
         lives_ok {
             $result = $self->api_command(
@@ -261,7 +262,11 @@ sub create_cert {
                 identifier => $temp->{WORKFLOW}->{CONTEXT}->{cert_identifier},
                 profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
             }
-        }
+        };
+
+        if ($old_realm) { $sess_data->pki_realm($old_realm) } else { $sess_data->clear_pki_realm }
+        if ($old_user)  { $sess_data->user($old_user) }       else { $sess_data->clear_user }
+        if ($old_role)  { $sess_data->role($old_role) }       else { $sess_data->clear_role }
     };
 
     return $cert_info;
