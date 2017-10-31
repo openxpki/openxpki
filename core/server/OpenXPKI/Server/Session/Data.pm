@@ -66,6 +66,7 @@ for my $name (keys %ATTR_TYPES) {
         %$type_def,
         is => 'rw',
         trigger => sub { shift->_attr_change },
+        predicate => "has_$name",
         documentation => 'session',
     );
 }
