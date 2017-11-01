@@ -25,6 +25,12 @@ To define a new API plugin simply say:
     package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
     use OpenXPKI::Server::API2::EasyPlugin;
 
+    command "aaa" => {
+        # parameters
+    } => sub {
+        # actions
+    };
+
 This will modify your package as follows:
 
 =over

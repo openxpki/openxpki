@@ -6,7 +6,12 @@ use utf8;
 =head1 NAME
 
 OpenXPKI::Server::API2::Autoloader - Thin wrapper around the API that virtually
-provides all API commands as instance methods and injects context (CTX)
+provides all API commands as instance methods
+
+=head2 DESCRIPTION
+
+B<Not intended for direct use.> Please use L<OpenXPKI::Server::API2/autoloader>
+instead.
 
 =cut
 

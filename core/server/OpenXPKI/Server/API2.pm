@@ -36,7 +36,10 @@ B<Default usage>:
     );
     printf "Available commands: %s\n", join(", ", keys %{$api->commands});
 
-    my $result = $api->dispatch("mycommand", myaction => "go");
+    my $api_direct = $api->autoloader;
+
+    my $result = $api_direct->mycommand(myaction => "go");
+    # same as: $result = $api->dispatch("mycommand", myaction => "go");
 
 B<Disable ACL checks> when executing a command:
 
@@ -47,14 +50,12 @@ B<Disable ACL checks> when executing a command:
 B<Different plugin namespace> for auto-discovery:
 
     my $api = OpenXPKI::Server::API2->new(
-        enable_acls => 0,
         namespace => "My::Command::Plugins",
     );
 
 B<Disable plugin auto-discovery>:
 
     my $api = OpenXPKI::Server::API2->new(
-        enable_acls => 0,
         commands => {},
     );
 
@@ -67,6 +68,9 @@ B<Manually register> a plugin outside the default namespace:
 Please note that all classes in the C<OpenXPKI::Server::API2::> namespace are
 context free, i.e. do not use the C<CTX> object.
 
+Within the OpenXPKI server the API (or L<OpenXPKI::Server::API2::Autoloader>, to be
+more precise) is available via C<CTX('api2')>.
+
 =head2 Call API commands
 
 This class acts as a dispatcher (single entrypoint) to execute API commands via
@@ -75,11 +79,13 @@ L<dispatch>.
 It makes available all API commands defined in the C<OpenXPKI::Server::API2::Plugin>
 namespace.
 
+For easy access to the API commands you should use the autoloader instance
+returned by L</autoloader>.
+
 =head2 Create a plugin class
 
-Standard (and easy) way to define a new plugin class with API commands:
-
-Create a new package in the C<OpenXPKI::Server::API2::Plugin> namespace (any
+Standard (and easy) way to define a new plugin class with API commands: create
+a new package in the C<OpenXPKI::Server::API2::Plugin> namespace (any
 deeper hierarchy is okay) and in your package use
 L<OpenXPKI::Server::API2::EasyPlugin> as described there.
 
@@ -105,7 +111,7 @@ has log => (
 
 =head2 enable_acls
 
-Optional: set to FALSE to disable ACLs checks when commands are executed.
+Optional: set to FALSE to disable ACL checks when commands are executed.
 
 Default: TRUE
 
@@ -542,8 +548,12 @@ sub _list_modules {
 
 =head2 autoloader
 
-Returns an instance of L<OpenXPKI::Server::API2::Autoloader> for easier access
-to API functions.
+Returns an instance of L<OpenXPKI::Server::API2::Autoloader> that allows to
+directly call API commands:
+
+    my $api = OpenXPKI::Server::API2->new( ... );
+    my $api_direct = $api->autoloader;
+    $api_direct->search_cert(pki_realm => ...)
 
 =cut
 sub autoloader {

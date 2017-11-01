@@ -8,7 +8,8 @@ OpenXPKI::Server::API2::EasyPluginMetaClassTrait - Moose metaclass role (aka.
 
 =head2 DESCRIPTION
 
-B<Not intended to be used directly.>
+B<Not intended for direct use.> Please C<use OpenXPKI::Server::API2::EasyPlugin;>
+instead.
 
 This role manages API parameters and their specifications for the API plugin classes.
 It will be applied when you say C<use OpenXPKI::Server::API2::EasyPlugin>.
