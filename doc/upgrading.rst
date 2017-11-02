@@ -15,6 +15,16 @@ For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
 
+Release v1.19
+-------------
+
+**Warning** We changed the internal serialization format which also
+affects the workflow persistance layer. Workflows or datapool structures
+that are created or modified will use the new serialization format which
+can not be read by older versions! So be aware that a downgrade or parallel
+operaton of new and old release versions is not possible!
+
+
 Release v1.18
 -------------
 
