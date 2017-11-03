@@ -112,15 +112,16 @@ extensions:
 
     policy_identifier:
         critical: 0
-        # WARNING: if use_loa is set to yes, the policy_identifier
-        # will be extended by the values in the appropriate loa tag
-        oid: 1.2.3.4
-
-    cps:
-        critical: 0
-        # WARNING: if use_loa is set to yes, the cps will be
-        # extended by the values in the appropriate loa tag
-        uri: http://localhost/cps.html
+        # you can combine both notations but do not use the same OID twice
+        # short notation, if you just need OIDs
+        oid: 1.2.3.5
+        # for OIDs with CPS/Notice, put the OID as key.
+        1.2.3.4:
+          # CPS/Notice can be scalar or list
+          cps:
+            - http://openxpki.org/cps.html
+            - http://openxpki.net/cps.html
+          user_notice: This is a comment for policy oid 1.2.3.4
 
     netscape:
         comment:

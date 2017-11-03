@@ -529,38 +529,57 @@ sub __get_extensions
             }
             $sections .= "\n";
         }
-        elsif ($name eq 'user_notice') {
-            # FIXME - currently, you can only have a user_notice
-            # together with a policy_identifier
-            next EXTENSIONS;
-        }
         elsif ($name eq 'policy_identifier') {
-            $config .= "certificatePolicies = $critical\@cert_policies\n";
-            $sections .= "\n[ cert_policies ]\n";
-            my $i = 0;
-            my @oids = @{ $profile->get_extension('policy_identifier') };
-            ##! 16: '@oids: ' . Dumper \@oids
-            if (scalar @oids) {
-                $sections .= "policyIdentifier = " . join (", ", @oids);
-                $sections .= "\n";
-            }
-            my @user_notices;
 
-            if ($profile->has_extension('user_notice')) {
-                @user_notices = @{$profile->get_extension('user_notice')};
-                foreach my $notice (@user_notices) {
-                    $sections .= qq{userNotice.$i = \@notice$i\n};
-                    $i++;
+            my $i = 0;
+            my @policy = @{ $profile->get_extension('policy_identifier') };
+            ##! 16: '@policy : ' . Dumper \@policy
+
+            my $sn = 0;
+            my $nn = 0;
+            my @policies;
+            my @psection;
+            my @notices;
+
+            foreach my $item (@policy) {
+                if (!ref $item) {
+                    push @policies, $item;
+                } else {
+                    $sn++;
+                    push @policies, '@policysection'.$sn;
+
+                    push @psection, "[ policysection$sn ]";
+                    push @psection, "policyIdentifier = " . $item->{oid};
+
+                    my $cc = 0;
+                    foreach my $cps (@{$item->{cps}}) {
+                        $cc++;
+                        push @psection, "CPS.$cc=\"$cps\"";
+                    }
+
+                    foreach my $note (@{$item->{user_notice}}) {
+                        $nn++;
+                        push @psection, "userNotice.$nn = \@notice$nn";
+                        push @notices, "[ notice$nn ]";
+                        push @notices, "explicitText = \"$note\"";
+                        # Note - RFC recommends this to be an UTF8 string but
+                        # openssl 1.0 seems not to be able to do so. The UTF8
+                        # prefix was introduced with openssl 1.1
+                    }
                 }
-                $sections .= "\n";
-                $i = 0;
-                foreach my $notice (@user_notices) {
-                    $sections .= "\n[ notice$i ]\n";
-                    $sections .= qq{explicitText = "$notice"\n\n};
-                    $i++;
-                }
-                $sections .= "\n";
             }
+
+            if (@policies) {
+
+                ##! 32: 'sections: ' . Dumper \@psection
+                ##! 32: 'notices: ' . Dumper \@notices
+
+                $config .= "certificatePolicies = $critical".join(",",@policies)."\n\n";
+                $sections .= join("\n", @psection) . "\n\n";
+                $sections .= join("\n", @notices) . "\n\n";
+            }
+
+
         }
         elsif ($name eq "extended_key_usage")
         {

@@ -212,39 +212,56 @@ sub load_extension
                                   VALUES   => [@values]);
         }
     }
-    elsif ($ext eq "user_notice")
-    {
-
-        @values = $config->get_scalar_as_list("$path");
-
-        if (scalar @values) {
-            $self->set_extension (NAME     => "user_notice",
-                              CRITICAL => $critical,
-                              VALUES   => [@values]);
-        }
-
-    }
     elsif ($ext eq "policy_identifier")
     {
+        # OIDs only
+        my @basepath = split /\./, $path;
+        my @oids = $config->get_scalar_as_list([ @basepath , 'oid' ]);
+        ##! 16: 'short oids ' . Dumper \@oids
+        foreach my $oid (@oids) {
+            next if ($oid !~ /\d+(\.\d+)+/);
+            push @values, $oid;
+        }
 
-        @values = $config->get_scalar_as_list("$path.oid");
-        if (scalar @values)
-        {
+
+        # Support the old config format with one oid and
+        # user_notice in a seperate section
+        if (scalar @values == 1) {
+            pop @basepath;
+            my @user_notice = $config->get_scalar_as_list([ @basepath, "user_notice" ]);
+            if (@user_notice) {
+                $values[0] = {
+                    oid => $values[0],
+                    user_notice => \@user_notice
+                };
+            }
+            push @basepath, "policy_identifier";
+        }
+
+        # check remaining keys for policy with extra sections (CPS + Notice)
+        @oids = $config->get_keys(\@basepath);
+        ##! 16: 'full oid sections ' . Dumper \@oids
+        foreach my $name (@oids) {
+            next if ($name !~/\d+(\.\d+)+/);
+            my $attr = { oid => $name };
+            my @cps = $config->get_scalar_as_list( [ @basepath, $name, 'cps' ] );
+            if (@cps) {
+                $attr->{cps} = \@cps;
+            }
+            my @notice = $config->get_scalar_as_list( [ @basepath, $name, 'user_notice' ] );
+            if (@notice) {
+                $attr->{user_notice} = \@notice;
+            }
+            ##! 32: 'Policy Attribute ' . Dumper $attr
+            push @values, $attr;
+        }
+
+        if (scalar @values) {
             $self->set_extension (NAME     => "policy_identifier",
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
         }
-    }
-    elsif ($ext eq "cps")
-    {
 
-        @values = $config->get_scalar_as_list("$path.uri");
-        if (scalar @values)
-        {
-            $self->set_extension (NAME     => "cps",
-                                  CRITICAL => $critical,
-                                  VALUES   => [@values]);
-        }
     }
     elsif ($ext eq "oid")
     {
