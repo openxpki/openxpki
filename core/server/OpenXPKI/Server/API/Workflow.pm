@@ -628,14 +628,8 @@ sub __wakeup_resume_workflow {
 
     $workflow->reload_observer();
 
-    # pull off the latest action from the history
-    my $history = CTX('dbi')->select_one(
-        from => 'workflow_history',
-        columns => [ 'workflow_action' ],
-        where => { 'workflow_id' => $wf_id },
-        order_by => [ '-workflow_history_date', '-workflow_hist_id' ]
-    );
-    my $wf_activity = $history->{workflow_action};
+    # get the last action from the context
+    my $wf_activity = $workflow->context()->param('wf_current_action');
 
     if ($fork_mode) {
         $mode .= "($fork_mode)";
