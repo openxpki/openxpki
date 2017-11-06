@@ -17,12 +17,12 @@ ok(1);
 ## init XML cache
 OpenXPKI::Server::Init::init(
     {
-	TASKS => [
-	    'config_test',
+    TASKS => [
+        'config_versioned',
         'log',
         'dbi',
     ],
-	SILENT => 1,
+    SILENT => 1,
     });
 
 ## load authentication configuration

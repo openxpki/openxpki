@@ -49,7 +49,6 @@ use Digest::SHA qw( sha1_base64 );
 # order.
 my @init_tasks = qw(
   config_versioned
-  config_test
   i18n
   log
   dbi_log
@@ -209,20 +208,6 @@ sub __do_init_config_versioned {
         config => $config,
     });
     # Otherwise the init all routine tries to instantiate the test config
-    $is_initialized{config_test} = 1;
-    return 1;
-}
-
-
-# Special init for test cases
-sub __do_init_config_test {
-    ##! 1: "init OpenXPKI config"
-    require OpenXPKI::Config::Test;
-    my $config = OpenXPKI::Config::Test->new();
-    OpenXPKI::Server::Context::setcontext(
-    {
-        config => $config,
-    });
     return 1;
 }
 
