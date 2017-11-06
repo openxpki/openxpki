@@ -18,9 +18,15 @@ use Digest::MD5;
 use Proc::SafeExec;
 use MIME::Base64;
 
+
+# Config Builder
+use Storable qw(freeze);
+
+use OpenXPKI::FileUtils;
 use OpenXPKI::Server::Init;
 use OpenXPKI::i18n;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Config::Backend;
 
 use OpenXPKI::VERSION;
 
@@ -1391,6 +1397,51 @@ if ($cmd eq 'initdb') {
     }
 
     $ret = hash_password();
+
+
+} elsif ($cmd eq 'buildconfig') {
+
+    push @options_spec, qw(
+      output=s
+      key=s
+      cert=s
+      force
+    );
+    __init();
+
+    $Storable::canonical = 1;
+
+    if ($ENV{OPENXPKI_CONF_PATH} && $ENV{OPENXPKI_CONF_PATH} =~ /.oxi$/) {
+        warn "OPENXPKI_CONF_PATH points to a cached config!\nResult of this call might not what you expect!";
+    }
+
+    my $config = OpenXPKI::Config::Backend->new( LOCATION => "/etc/openxpki/config.d");
+    my $raw = freeze($config->_config());
+
+    my $target = $params{output} || 'config.oxi';
+    (-e $target && !$params{force}) && die "Target $target already exists, please remove first\n";
+
+    open FILE, ">", $target || die "Unable to open/write to $target";
+    # Signed config
+    if ($params{key} && $params{cert}) {
+        my $fu = OpenXPKI::FileUtils->new;
+        my $infile = $fu->get_safe_tmpfile({ TMP => "/tmp"});
+        $fu->write_file({ FILENAME => $infile, CONTENT => $raw, FORCE => 1 });
+        my $outfile = $fu->get_safe_tmpfile({ TMP => "/tmp"});
+        my $pkcs7 = `openssl smime -md sha256 -binary -sign -nodetach -inkey $params{key} -signer $params{cert} -in $infile -outform PEM`;
+
+        # replace headers
+        $pkcs7 =~ s{-----(BEGIN|END)[^-]+-----}{-----$1 OPENXPKI SIGNED CONFIG V1-----}g;
+        print FILE $pkcs7;
+    } else {
+        print FILE "-----BEGIN OPENXPKI CONFIG V1 -----\n".encode_base64($raw)."\n-----END OPENXPKI CONFIG V1-----";
+    }
+    close (FILE);
+
+    print "File written to $target\nConfig hash is " . Digest::SHA::sha256_hex($raw) . "\n";
+
+    $ret = 0;
+
 } elsif ($cmd eq 'version') {
     print "Version (core): " . $OpenXPKI::VERSION::VERSION . "\n";
     $ret = 0;
@@ -1441,6 +1492,7 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
    certificate           Manage certificates
    hashpwd               Create the salted hash for a password
    alias                 Manage the token alias table
+   buildconfig           Create (signed) config blob from config tree
 
 =head1 ARGUMENTS
 
@@ -1774,6 +1826,18 @@ Command options:
 
 Prompts for the password and prints the hashed value including the used
  scheme as defined in RFC2307.
+
+=head2 buildconfig
+
+Serializes the config tree into a single transportable file that can be
+signed.
+
+Command options:
+
+    --output  Name of the output file, default is config.oxi
+    --key     Filename of the key to use for signing
+    --cert    Filename of the certificate (together with key)
+    --force   Force overwrite of existing file
 
 =head1 DESCRIPTION
 
