@@ -450,11 +450,8 @@ sub __reload {
 
     $RELOAD = 0;
 
-    ##! 4: 'run update head on watchdog child ' . $$
     my $config = CTX('config');
-    $config->update_head();
 
-    ##! 16: 'new head version is ' . $config->get_head_version()
     my $new_cfg = $config->get_hash('system.watchdog');
 
     # set the config values from new head

@@ -15,6 +15,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
+use Log::Log4perl;
 
 # Make sure the underlying connector is recent
 use Connector 1.08;
@@ -24,7 +25,7 @@ extends 'Connector::Multi';
 has '+BASECONNECTOR' => (
     is => 'ro',
     isa => 'Connector',
-    init_arg => undef,
+    init_arg => 'backend',
     lazy => 1,
     default => sub {
         my $self = shift;
@@ -37,13 +38,6 @@ has 'config_dir' => (
     isa => 'Str',
     lazy => 1,
     default => '/etc/openxpki/config.d',
-);
-
-has '_head_version' => (
-    is => 'rw',
-    isa => 'Str',
-    required => 0,
-    default => '',
 );
 
 before '_route_call' => sub {
@@ -81,38 +75,26 @@ before '_route_call' => sub {
     ##! 8: 'Full path: ' . Dumper $path
 };
 
+sub checksum {
+    my $self = shift;
+    $self->BASECONNECTOR()->_config(); # makes sure the backend is initialized
+    return $self->BASECONNECTOR()->checksum();
+}
+
 sub get_version {
     my $self = shift;
+    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to get_version in config layer');
     return '';
-    ##! 16: 'Config version requested ' . Dumper( $self->BASECONNECTOR()->version() )
-    #return $self->BASECONNECTOR()->version();
 }
 
 sub get_head_version {
-    my $self = shift;
-    return '';
-    #return $self->_head_version();
+    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to get_head_version in config layer');
 }
 
 sub update_head {
     my $self = shift;
-
+    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to update_head in config layer');
     return '';
-
-    my $head_id = $self->BASECONNECTOR()->fetch_head_commit();
-
-    # if the head version has evolved, update the session context
-    ##! 32: sprintf 'My head: %s,  Repo head: %s ',  $self->_head_version(), $head_id
-    if ( $self->_head_version() ne $head_id ) {
-        ##! 16: 'Advance to head commit ' . $head_id
-        $self->_head_version( $head_id );
-
-        CTX('log')->system()->info("system config advanced to new head commit: $head_id");
-
-
-        return 1;
-    }
-    return;
 }
 
 sub walkQueryPoints {
@@ -220,7 +202,7 @@ __DATA__
 
 =head1 NAME
 
-OpenXPKI::Config - Connector based configuration layer using Config::Versioned
+OpenXPKI::Config - Connector based configuration layer
 
 =head1 SYNOPSIS
 
@@ -252,24 +234,14 @@ the current head version and the root context.
 
 =head1 Methods
 
-=head2 update_head
+=head2 update_head, get_version, get_head_version
 
-The commit id of the head is determined at startup. Changes to the config
-repository during runtime are not visible to the connector. This method
-updates the internal head pointer to the current head of the underlying
-repository.
+No longer supported
 
-Returns true if the head has changed, false otherwise.
+=head2 checksum
 
-=head2 get_version
-
-Return the sha1 value of the current head of the config tree.
-This is the version which is used, when you dont pass a version or
-when you query a value in the C<system> namespace.
-
-=head2 get_head_version
-
-Return the sha1 value of the latest commit of the config tree.
+Print out the checksum of the current backend, might not be available
+with all backends.
 
 =head2 walkQueryPoints
 

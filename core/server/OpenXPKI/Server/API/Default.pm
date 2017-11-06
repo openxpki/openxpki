@@ -57,9 +57,9 @@ sub get_cert_identifier {
     return $identifier;
 }
 
-sub get_head_version_id {
+sub get_config_checksum {
     my $self = shift;
-    return CTX('config')->get_head_version();
+    return CTX('config')->checksum();
 }
 
 sub get_approval_message {
@@ -156,7 +156,7 @@ sub get_session_info {
         pki_realm => $session->data->pki_realm,
         pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]),
         lang => 'en',
-        version => CTX('config')->get_version(),
+        checksum => CTX('config')->checksum(),
     }
 
 }

@@ -212,7 +212,7 @@ sub BUILD {
             },
             memoize => 1,
         },
-        'get_head_version_id'  => {
+        'get_config_checksum'  => {
             class  => 'Default',
             params => { },
         },

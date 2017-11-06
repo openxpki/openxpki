@@ -1,10 +1,23 @@
 package OpenXPKI::Config::Backend;
 
+use Storable qw(freeze);
 use Config::Merge;
 use Data::Dumper;
+use Digest::SHA qw(sha256_hex);
 
 use Moose;
 extends 'Connector::Builtin::Memory';
+
+has 'checksum' => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    init_arg => undef,
+    default => sub {
+        my $self = shift;
+        return sha256_hex(freeze($self->_config()));
+    },
+);
 
 around BUILDARGS => sub {
     my ($orig, $class, %params) = @_;
