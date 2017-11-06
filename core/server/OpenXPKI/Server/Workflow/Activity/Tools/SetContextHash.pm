@@ -67,7 +67,7 @@ into a hash in the context.
 
 =head2 Configuration
 
-    class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+    class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
     param:
        target_key: name_of_the_hash
        key1: value1
