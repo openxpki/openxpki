@@ -23,7 +23,17 @@ use Connector 1.08;
 extends 'Connector::Multi';
 
 has '+BASECONNECTOR' => (
-    is => 'ro',
+    is => 'rw',
+    isa => 'Connector',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->backend();
+    },
+);
+
+has backend => (
+    is => 'rw',
     isa => 'Connector',
     init_arg => 'backend',
     lazy => 1,
@@ -32,6 +42,37 @@ has '+BASECONNECTOR' => (
         return OpenXPKI::Config::Backend->new(LOCATION => $self->config_dir);
     },
 );
+
+# Here we do the chain loading of a serialized/signed config
+sub BUILD {
+    my $self = shift;
+    my $args = shift;
+
+    # when we are here, the BASECONNECTOR is already initialized which is
+    # usually an instance of O::C::Backend. We now probe if there is a
+    # node called "bootstrap" and if so we replace the current backend
+    if ($self->backend()->exists('bootstrap')) {
+
+        # this is a connector definition
+        my $bootstrap = $self->backend()->get_hash('bootstrap');
+
+        my $class = $bootstrap->{class} || 'OpenXPKI::Config::Loader';
+        if ($class !~ /\A(\w+\:\:)+\w+\z/) {
+            die "Invalid class name $class";
+        }
+        ##! 16: 'Config bootstrap ' . Dumper $bootstrap
+        eval "use $class;1;" or die "Unable to bootstrap config, can not use $class: $@";
+
+        delete $bootstrap->{class};
+
+        my $conn = $class->new( $bootstrap );
+        $self->backend( $conn );
+    }
+
+    # check if the system node is present
+    $self->backend()->exists('system') || die "Loaded config does not contain system node.";
+
+}
 
 has 'config_dir' => (
     is => 'ro',

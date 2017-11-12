@@ -2,6 +2,7 @@ package OpenXPKI::Config::Backend;
 
 use Storable qw(freeze);
 use Config::Merge;
+use YAML;
 use Data::Dumper;
 use Digest::SHA qw(sha256_hex);
 
@@ -31,13 +32,15 @@ around BUILDARGS => sub {
 sub _build_config {
     my $self = shift;
 
-    # Skip the workflow directories
-    my $cm    = Config::Merge->new( path => $self->LOCATION, skip => qr/realm\.\w+\._workflow/ );
-    my $cmref = $cm->();
-
-    my $tree = $self->cm2tree($cmref);
-
-    return $tree;
+    my $config;
+    if (-f $self->LOCATION && $self->LOCATION =~ /.yaml$/) {
+        $config = YAML::LoadFile( $self->LOCATION );
+    } else {
+        # Skip the workflow directories (legacy only!)
+        my $cm    = Config::Merge->new( path => $self->LOCATION, skip => qr/realm\.\w+\._workflow/ );
+        $config = $cm->();
+    }
+    return $self->cm2tree($config);
 }
 
 # cm2tree is just a helper routine for recursively traversing the data

@@ -7,6 +7,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Control;
 use Getopt::Long;
 use Pod::Usage;
+use Proc::SafeExec;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
@@ -1405,36 +1406,73 @@ if ($cmd eq 'initdb') {
       output=s
       key=s
       cert=s
+      chain=s
+      openssl=s
       force
     );
     __init();
 
     $Storable::canonical = 1;
 
-    if ($ENV{OPENXPKI_CONF_PATH} && $ENV{OPENXPKI_CONF_PATH} =~ /.oxi$/) {
-        warn "OPENXPKI_CONF_PATH points to a cached config!\nResult of this call might not what you expect!";
+    delete $ENV{OPENXPKI_CONF_PATH};
+
+    if (!$params{config}) {
+        die "You must provide the path to the source config using --config!";
     }
 
-    my $config = OpenXPKI::Config::Backend->new( LOCATION => "/etc/openxpki/config.d");
-    my $raw = freeze($config->_config());
+    -e $params{config} || die "Given config path does not exist!";
+    my $config = OpenXPKI::Config::Backend->new( LOCATION => $params{config} );
+    if (!$config->exists('system')) {
+        die "Loaded config does not contain the system node!";
+    }
 
     my $target = $params{output} || 'config.oxi';
-    (-e $target && !$params{force}) && die "Target $target already exists, please remove first\n";
 
+    if (-e $target) {
+        if (!$params{force}) {
+            die "Target $target already exists, please remove first\n";
+        }
+        unlink $target;
+    }
+
+    my $raw = freeze($config->_config());
     open FILE, ">", $target || die "Unable to open/write to $target";
     # Signed config
     if ($params{key} && $params{cert}) {
-        my $fu = OpenXPKI::FileUtils->new;
-        my $infile = $fu->get_safe_tmpfile({ TMP => "/tmp"});
-        $fu->write_file({ FILENAME => $infile, CONTENT => $raw, FORCE => 1 });
-        my $outfile = $fu->get_safe_tmpfile({ TMP => "/tmp"});
-        my $pkcs7 = `openssl smime -md sha256 -binary -sign -nodetach -inkey $params{key} -signer $params{cert} -in $infile -outform PEM`;
+        my $FileUtils = OpenXPKI::FileUtils->new;
+        my $infile = $FileUtils->get_safe_tmpfile({ TMP => "/tmp"});
+        $FileUtils->write_file({ FILENAME => $infile, CONTENT => $raw, FORCE => 1 });
+        my $outfile = $FileUtils->get_safe_tmpfile({ TMP => "/tmp"});
 
+        my @command = ( $params{openssl} || 'openssl',
+            'smime', '-md', 'sha256', '-binary', '-sign', '-nodetach',
+            '-outform', 'PEM',
+            '-in', $infile,
+            '-signer', $params{cert},
+            '-inkey', $params{key},
+            '-out', $outfile,
+        );
+
+        push @command, '-certfile', $params{chain} if ($params{chain});
+
+        my $command = Proc::SafeExec->new({
+            exec   => \@command,
+            #stdin  => 'new',
+            #stdout => 'new',
+            #stderr => 'new',
+        });
+        $command->wait();
+
+        if ($command->exit_status() != 0 || ! -e $outfile) {
+            die "Signature creation failed (OpenSSL returned ".$command->exit_status().")";
+        }
+
+        my $pkcs7  = $FileUtils->read_file($outfile);
         # replace headers
         $pkcs7 =~ s{-----(BEGIN|END)[^-]+-----}{-----$1 OPENXPKI SIGNED CONFIG V1-----}g;
         print FILE $pkcs7;
     } else {
-        print FILE "-----BEGIN OPENXPKI CONFIG V1 -----\n".encode_base64($raw)."\n-----END OPENXPKI CONFIG V1-----";
+        print FILE "-----BEGIN OPENXPKI CONFIG V1 -----\n".encode_base64($raw)."-----END OPENXPKI CONFIG V1-----";
     }
     close (FILE);
 
@@ -1837,6 +1875,7 @@ Command options:
     --output  Name of the output file, default is config.oxi
     --key     Filename of the key to use for signing
     --cert    Filename of the certificate (together with key)
+    --chain   Filename holding additonal certificates added as chain
     --force   Force overwrite of existing file
 
 =head1 DESCRIPTION
