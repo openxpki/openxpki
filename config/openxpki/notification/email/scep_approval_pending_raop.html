@@ -1,0 +1,27 @@
+<html><body>
+
+<img src="cid:banner" />
+
+<p>
+Dear Operator,
+</p>
+
+<p>We have received a new certification request via SCEP with the following
+data:<br/><br/>
+
+Subject: [% cert_subject %]<br/>
+[% FOREACH san = cert_subject_alt_name  -%]
+Subject alternative name: [% san.0 %]: [% san.1 %]<br/>
+[% END -%]
+</p>
+<p>
+For this request, a new workflow has been created on the CA system
+with ID [% meta_wf_id %].
+</p>
+<p><i>
+Regards,<br/>
+  PKI Team</i>
+</p>
+
+<img src="cid:footer" />
+</body></html>
