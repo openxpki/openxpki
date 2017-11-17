@@ -211,6 +211,7 @@ OpenXPKI/Server/Log/Layout/Audit.pm
 
 OpenXPKI/Server.pm
 OpenXPKI/Server/API.pm
+OpenXPKI/Server/API/API2.pm
 OpenXPKI/Server/API/Default.pm
 OpenXPKI/Server/API/Housekeeping.pm
 OpenXPKI/Server/API/Object.pm

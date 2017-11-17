@@ -55,8 +55,8 @@ my @init_tasks = qw(
   prepare_daemon
   dbi
   crypto_layer
-  api
   api2
+  api
   workflow_factory
   volatile_vault
   authentication
