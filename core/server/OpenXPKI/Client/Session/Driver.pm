@@ -34,7 +34,6 @@ sub init { 1 }
 sub dump { 1 }
 
 sub store {
-
     my ($self, $sid, $datastr) = @_;
 
     my $backend_sid = $self->backend()->get_session_id();
@@ -46,7 +45,8 @@ sub store {
         $self->logger()->debug('Session store with id ' . $sid);
 
         my $res = $self->backend()->send_receive_service_msg('FRONTEND_SESSION',{
-            SESSION_DATA => $datastr,
+            # encode_base64 prevents problems with non-ASCII characters sent over the socket (Perls UTF-8 flag gets lost)
+            SESSION_DATA => encode_base64($datastr),
         });
 
         $self->logger()->trace('Session store result ' . Dumper $res);
@@ -55,18 +55,17 @@ sub store {
 }
 
 sub retrieve {
-
     my ($self, $sid) = @_;
 
     my $res = $self->backend()->send_receive_service_msg('FRONTEND_SESSION');
     $self->logger()->trace('Session retrieve ' . Dumper $res);
-    return $res->{SESSION_DATA} || '';
-
-
+    $res = $res->{SESSION_DATA} || '';
+    # TODO Remove "unless..." somewhen: it's only to restore old unencoded sessions
+    $res = decode_base64($res) if ($res and $res !~ /\{/);
+    return $res;
 };
 
 sub remove {
-
     my ($self, $sid) = @_;
 
     my $backend_sid = $self->backend()->get_session_id();
