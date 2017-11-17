@@ -33,6 +33,7 @@ use OpenXPKI::Server::API::Housekeeping;
 use OpenXPKI::Server::API::Workflow;
 use OpenXPKI::Server::API::Smartcard;
 use OpenXPKI::Server::API::UI;
+use OpenXPKI::Server::API::API2;
 
 my %external_of    :ATTR;
 my %method_info_of :ATTR;
@@ -582,199 +583,51 @@ sub BUILD {
             },
         },
         'search_cert_count' => {
-            class  => 'Object',
+            class  => 'API2',
             params => {
-                IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                EMAIL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                SUBJECT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_DN => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                SUBJECT_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                AUTHORITY_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                CSR_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                CERT_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_int_or_hex_string,
-                },
-                'PKI_REALM' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                NOTBEFORE => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                NOTAFTER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                PROFILE => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                CERT_ATTRIBUTES => {
-                    type     => ARRAYREF,
-                    optional => 1,
-                },
-                VALID_AT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                STATUS => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ENTITY_ONLY => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_boolean,
-                }
+                IDENTIFIER =>               { optional => 1, type => SCALAR },
+                EMAIL =>                    { optional => 1, type => SCALAR },
+                SUBJECT =>                  { optional => 1, type => SCALAR },
+                ISSUER_DN =>                { optional => 1, type => SCALAR },
+                ISSUER_IDENTIFIER =>        { optional => 1, type => SCALAR },
+                SUBJECT_KEY_IDENTIFIER =>   { optional => 1, type => SCALAR },
+                AUTHORITY_KEY_IDENTIFIER => { optional => 1, type => SCALAR },
+                CSR_SERIAL =>               { optional => 1, type => SCALAR },
+                CERT_SERIAL =>              { optional => 1, type => SCALAR },
+                PKI_REALM =>                { optional => 1, type => SCALAR },
+                NOTBEFORE =>                { optional => 1, type => SCALAR },
+                NOTAFTER =>                 { optional => 1, type => SCALAR },
+                PROFILE =>                  { optional => 1, type => SCALAR },
+                CERT_ATTRIBUTES =>          { optional => 1, type => ARRAYREF },
+                VALID_AT =>                 { optional => 1, type => SCALAR },
+                STATUS =>                   { optional => 1, type => SCALAR },
+                ENTITY_ONLY =>              { optional => 1, type => SCALAR },
             },
         },
         'search_cert' => {
-            class  => 'Object',
+            class  => 'API2',
             params => {
-                IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                EMAIL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                SUBJECT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_DN => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                CSR_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                CERT_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_int_or_hex_string,
-                },
-                'PKI_REALM' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                 SUBJECT_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                AUTHORITY_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                NOTBEFORE => {
-                    type     => SCALAR|HASHREF,
-                    optional => 1,
-                },
-                NOTAFTER => {
-                    type     => SCALAR|HASHREF,
-                    optional => 1,
-                },
-                PROFILE => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                CERT_ATTRIBUTES => {
-                    type     => ARRAYREF,
-                    optional => 1,
-                },
-                LIMIT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                START => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                VALID_AT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                STATUS => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ENTITY_ONLY => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_boolean,
-                },
-                ORDER => {
-                    type  => SCALAR,
-                    regex => $re_sql_field_name,
-                    optional => 1,
-                },
-                REVERSE => {
-                    type  => SCALAR,
-                    regex => $re_boolean,
-                    optional => 1,
-                },
+                IDENTIFIER =>               { optional => 1, type => SCALAR },
+                EMAIL =>                    { optional => 1, type => SCALAR },
+                SUBJECT =>                  { optional => 1, type => SCALAR },
+                ISSUER_DN =>                { optional => 1, type => SCALAR },
+                ISSUER_IDENTIFIER =>        { optional => 1, type => SCALAR },
+                SUBJECT_KEY_IDENTIFIER =>   { optional => 1, type => SCALAR },
+                AUTHORITY_KEY_IDENTIFIER => { optional => 1, type => SCALAR },
+                CSR_SERIAL =>               { optional => 1, type => SCALAR },
+                CERT_SERIAL =>              { optional => 1, type => SCALAR },
+                PKI_REALM =>                { optional => 1, type => SCALAR },
+                NOTBEFORE =>                { optional => 1, type => SCALAR },
+                NOTAFTER =>                 { optional => 1, type => SCALAR },
+                PROFILE =>                  { optional => 1, type => SCALAR },
+                CERT_ATTRIBUTES =>          { optional => 1, type => ARRAYREF },
+                VALID_AT =>                 { optional => 1, type => SCALAR },
+                STATUS =>                   { optional => 1, type => SCALAR },
+                ENTITY_ONLY =>              { optional => 1, type => SCALAR },
+                ORDER =>                    { optional => 1, type => SCALAR },
+                REVERSE =>                  { optional => 1, type => SCALAR },
+                LIMIT =>                    { optional => 1, type => SCALAR },
+                START =>                    { optional => 1, type => SCALAR },
             },
         },
         'control_watchdog' => {
