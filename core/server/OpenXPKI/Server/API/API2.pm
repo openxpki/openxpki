@@ -50,10 +50,7 @@ sub search_cert_count {
 sub _clean_args {
     my ($self, $args) = @_;
     my $cleaned_args = { map { lc($_) => $args->{$_} } keys %$args };
-    if ($cleaned_args->{order}) {
-        ($cleaned_args->{order_by} = lc $cleaned_args->{order}) =~ s/ ^ certificate\. //msxi;
-        delete $cleaned_args->{order};
-    }
+    ($cleaned_args->{order} = lc $cleaned_args->{order}) =~ s/ ^ certificate\. //msxi if $cleaned_args->{order};
     return $cleaned_args;
 }
 
