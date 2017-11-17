@@ -9,7 +9,7 @@ use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
 use Encode;
-use CGI 4.08;
+use CGI 4.08 qw( -utf8 );
 
 use Data::Dumper;
 
@@ -272,7 +272,7 @@ sub param {
         # We need to fetch from cgi as array for multivalues
         if (wantarray) {
             my @raw = $cgi->multi_param($key);
-            @raw = map { $_ =~ s/^\s+|\s+$//g; decode utf8 => $_ } @raw if(defined $raw[0]);
+            @raw = map { $_ =~ s/^\s+|\s+$//g; $_ } @raw if(defined $raw[0]);
             return @raw;
         }
 
