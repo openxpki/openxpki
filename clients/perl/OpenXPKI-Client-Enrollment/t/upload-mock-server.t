@@ -23,7 +23,7 @@ use File::Path qw(make_path);
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../../../qatest/lib";
 
-use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::QA::CertHelper;
 
 #my $config = plugin 'Config';
 my $config = {};
@@ -123,7 +123,7 @@ sleep 2;
 # 3. Create cert used by scep client (i.e.: on behalf)
 ############################################################
 {
-    OpenXPKI::Test::CertHelper->via_openssl(
+    OpenXPKI::Test::QA::CertHelper->via_openssl(
         basedir    => $config->{basedir} . '/onbehalf',
         commonName => 'onbehalf.test.openxpki.org',
     );

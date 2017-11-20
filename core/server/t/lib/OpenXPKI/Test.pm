@@ -21,7 +21,7 @@ To quickly initialize the default test environment and server:
 
 Or you might want to add some custom workflow config:
 
-    my $oxitest = OpenXPKI::Test->new;
+    my $oxitest = OpenXPKI::Test->new(with_workflows => 1);
     $oxitest->workflow_config("alpha", wf_type_1 => {
         'head' => {
             'label' => 'Perfect workflow',
@@ -36,7 +36,7 @@ Or you might want to add some custom workflow config:
         }
     );
     $oxitest->setup_env;
-    $oxitest->init_server('workflow_factory');
+    $oxitest->init_server;
     # we now have CTX('workflow_factory') besides the default ones
 
 =cut
@@ -47,6 +47,7 @@ use File::Temp qw( tempdir );
 
 # CPAN modules
 use Moose::Exporter;
+use Moose::Util;
 use Log::Log4perl qw(:easy);
 use Moose::Util::TypeConstraints;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
@@ -60,6 +61,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test::Role::WithWorkflows;
 
 Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],
@@ -165,9 +167,50 @@ has start_watchdog => (
     default => 0,
 );
 
+=item * I<with_workflows> (optional) - Set to 1 to be able to create workflows
+(also inserts some standard workflows, see L<OpenXPKI::Test::CertHelper::Workflow>).
+Default: 0
+
+=cut
+has with_workflows => (
+    is => 'rw',
+    isa => 'Bool',
+    lazy => 1,
+    default => 0,
+);
+
+=item * I<log_level> (optional) - L<Log::Log4Perl> log level for screen output.
+This is only relevant if C<$ENV{TEST_VERBOSE}> is set, i.e. user calls C<prove -v ...>.
+Otherwise logging will be disabled anyway. Default: WARN
+
+=cut
+has log_level => (
+    is => 'rw',
+    isa => 'Str',
+    default => "WARN",
+);
+
+=item * I<with_workflows> (optional) - Prepares the test server to be able to
+execute workflows, also installs some helper methods for tests. Technically
+the role L<OpenXPKI::Test::Role::WithWorkflows> is applied to C<OpenXPKI::Test>
+so see there for more details.
+
+=cut
+
 =back
 
 =cut
+
+has default_tasks => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    builder => '_build_default_tasks',
+);
+
+sub _build_default_tasks {
+    return [ qw( config_versioned log dbi_log dbi api authentication ) ];
+}
 
 =head2 certhelper_database
 
@@ -197,12 +240,43 @@ has config_writer => (
             basedir => $self->testenv_root,
             db_conf => $self->db_conf,
             start_watchdog => $self->start_watchdog,
+            log_level => $self->log_level,
         )
     },
 );
 
+
+=head2 session
+
+Returns the session context object (C<CTX('session')> once L</init_server> was
+called.
+
+=cut
+has session => (
+    is => 'rw',
+    isa => 'Object',
+    init_arg => undef,
+);
+
 # Flag whether setup_env was called
 has _env_initialized => ( is => 'rw', isa => 'Bool', default => 0, init_arg => undef );
+
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my @args = @_;
+
+    if (@args % 2 == 0) {
+        my %arg_hash = @args;
+        if (delete $arg_hash{with_workflows}) {
+            Moose::Util::apply_all_roles($class, "OpenXPKI::Test::Role::WithWorkflows");
+        }
+        @args = %arg_hash;
+    }
+    return $class->$orig(@args);
+};
+
 
 =head2 setup_env
 
@@ -270,16 +344,16 @@ sub init_server {
     die "setup_env() must be called before init_server()" unless $self->_env_initialized;
 
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log dbi api authentication ); # our default tasks
+    my @tasks = @{ $self->default_tasks };
     my %task_hash = map { $_ => 1 } @tasks;
     push @tasks, grep { not $task_hash{$_} } @additional_tasks; # more tasks requested via parameter
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
 
     # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
-    my $session = OpenXPKI::Server::Session->new(load_config => 1)->create;
-    OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
+    $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
+    OpenXPKI::Server::Context::setcontext({'session' => $self->session, force => 1});
     # set PKI realm after init() as various init procedures overwrite the realm
-    $session->data->pki_realm($self->config_writer->realms->[0]);
+    $self->session->data->pki_realm($self->config_writer->realms->[0]);
 
     return $self;
 }
@@ -580,4 +654,4 @@ sub _init_screen_log {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

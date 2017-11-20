@@ -1,16 +1,16 @@
-package OpenXPKI::Test::CertHelper::OpenSSL;
+package OpenXPKI::Test::QA::CertHelper::OpenSSL;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::CertHelper::OpenSSL - Test helper that creates certificates
+OpenXPKI::Test::QA::CertHelper::OpenSSL - Test helper that creates certificates
 using the OpenSSL binary.
 
 =head1 DESCRIPTION
 
 This class is not intended for direct use. Please use the class methods in
-L<OpenXPKI::Test::CertHelper> instead.
+L<OpenXPKI::Test::QA::CertHelper> instead.
 
 =cut
 

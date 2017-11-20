@@ -26,7 +26,7 @@ use Moose;
 use File::Temp();
 use MIME::Base64;
 
-use OpenXPKI::Test::CertHelper;
+use OpenXPKI::Test::QA::CertHelper;
 
 has 'config' => (is => 'rw');
 
@@ -121,7 +121,7 @@ sub BUILD {
     $config->{crt_der} ||= $config->{basedir} . '/crt.der';
     $config->{crt_pem} ||= $config->{basedir} . '/crt.pem';
 
-    OpenXPKI::Test::CertHelper->via_openssl(
+    OpenXPKI::Test::QA::CertHelper->via_openssl(
         basedir    => $config->{basedir},
         commonName => 'scepserver.test.openxpki.org',
         password => 'my-scep-server-passphrase',

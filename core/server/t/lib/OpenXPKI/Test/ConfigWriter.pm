@@ -28,6 +28,12 @@ Methods to create a configuration consisting of several YAML files for tests.
 
 =cut
 
+has log_level => (
+    is => 'rw',
+    isa => 'Str',
+    required => 1,
+);
+
 # TRUE if the initial configuration has been written
 has is_written => (
     is => 'rw',
@@ -99,6 +105,7 @@ has yaml_cert_profile_client   => ( is => 'rw', isa => 'HashRef', lazy => 1, bui
 has yaml_cert_profile_server   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_server" );
 has yaml_cert_profile_user     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_user" );
 has yaml_crl_default           => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_crl_default" );
+has yaml_profile_default       => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_profile_default" );
 
 # password for all openxpki users
 has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
@@ -238,12 +245,13 @@ sub create {
         # OpenXPKI::Workflow::Handler checks existance of workflow.def
         $self->add_realm_config($realm, "workflow.def.empty", { state => { INITIAL => { } } });
         # certificate profiles
-        $self->add_realm_config($realm, "profile.template",                     $self->yaml_cert_profile_template);
-        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_CLIENT", $self->yaml_cert_profile_client);
-        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_SERVER", $self->yaml_cert_profile_server);
-        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_USER",   $self->yaml_cert_profile_user);
+        $self->add_realm_config($realm, "profile.default",                          $self->yaml_profile_default);
+        $self->add_realm_config($realm, "profile.template",                         $self->yaml_cert_profile_template);
+        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_TLS_CLIENT", $self->yaml_cert_profile_client);
+        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_TLS_SERVER", $self->yaml_cert_profile_server);
+        $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_USER",       $self->yaml_cert_profile_user);
         # CRL
-        $self->add_realm_config($realm, "crl.default",                          $self->yaml_crl_default);
+        $self->add_realm_config($realm, "crl.default",                              $self->yaml_crl_default);
     }
 
     # user specified config data (might overwrite default configs)
@@ -574,33 +582,27 @@ sub _build_workflow_persister {
 sub _build_log4perl {
     my ($self) = @_;
 
-    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'OFF';
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
     my $logfile = $self->path_log_file;
 
     return qq(
-        log4perl.category.openxpki.auth         = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.auth         = DEBUG, Screen, DBI
         log4perl.category.openxpki.audit        = DEBUG, Screen, DBI
-        log4perl.category.openxpki.system       = DEBUG, Screen, Logfile
-        log4perl.category.openxpki.workflow     = DEBUG, Screen, Logfile
-        log4perl.category.openxpki.application  = DEBUG, Screen, Logfile, DBI
+        log4perl.category.openxpki.system       = DEBUG, Screen
+        log4perl.category.openxpki.workflow     = DEBUG, Screen
+        log4perl.category.openxpki.application  = DEBUG, Screen, DBI
         log4perl.category.openxpki.deprecated   = WARN,  Screen
-        log4perl.category.connector             = DEBUG, Screen, Logfile
+        log4perl.category.connector             = WARN, Screen
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
+        log4perl.appender.Screen.layout.ConversionPattern = # %d %c %p %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
-
-        log4perl.appender.Logfile               = Log::Log4perl::Appender::File
-        log4perl.appender.Logfile.filename      = $logfile
-        log4perl.appender.Logfile.layout        = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Logfile.layout.ConversionPattern = %d %p %m [pid=%P|%i]%n
-        log4perl.appender.Logfile.syswrite      = 1
-        log4perl.appender.Logfile.utf8          = 1
 
         log4perl.appender.DBI                   = OpenXPKI::Server::Log::Appender::DBI
         log4perl.appender.DBI.layout            = Log::Log4perl::Layout::NoopLayout
         log4perl.appender.DBI.warp_message      = 0
+        log4perl.appender.DBI.Threshold         = INFO
     );
 }
 
@@ -833,71 +835,6 @@ sub _build_cert_profile_user {
 }
 
 sub _build_cert_profile_template {
-    return {
-        publish                 => [ "queue", "disk" ],
-        randomized_serial_bytes => 8,
-        increasing_serials => 1,
-        digest     => "sha256",
-        key                => {
-            alg => [ "rsa", "ec", "dsa" ],
-            dsa => { key_length => [ 2048, 4096 ] },
-            ec  => {
-                curve_name =>
-                    [ "prime192v1", "c2tnb191v1", "prime239v1", "sect571r1" ],
-                key_length => [ "_192", "_256" ],
-            },
-            enc      => [ "aes256", "_3des", "idea" ],
-            generate => "both",
-            rsa => { key_length => [ 2048, 4096, "_1024" ] },
-        },
-        validity => { notafter => "+01" },
-        extensions => {
-            authority_info_access => {
-                ca_issuers => "http://localhost/cacert.crt",
-                critical   => 0,
-                ocsp       => "http://ocsp.openxpki.org/",
-            },
-            authority_key_identifier =>
-                { critical => 0, issuer => 1, keyid => 1 },
-            basic_constraints => { ca => 0, critical => 1 },
-            copy              => "copy",
-            cps => { critical => 0, uri => "http://localhost/cps.html" },
-            crl_distribution_points => {
-                critical => 0,
-                uri      => [
-                    "http://localhost/crl/[% ISSUER.CN.0 %].pem",
-                    "ldap://localhost/[% ISSUER.DN %]",
-                ],
-            },
-            issuer_alt_name => { copy => 1, critical => 0 },
-            netscape        => {
-                cdp => {
-                    ca_uri   => "http://localhost/cacrl.crt",
-                    critical => 0,
-                    uri      => "http://localhost/cacrl.crt",
-                },
-                certificate_type => {
-                    critical          => 0,
-                    object_signing    => 0,
-                    object_signing_ca => 0,
-                    smime_client      => 0,
-                    smime_client_ca   => 0,
-                    ssl_client        => 0,
-                    ssl_client_ca     => 0,
-                },
-                comment => {
-                    critical => 0,
-                    text =>
-                        "This is a generic certificate. Generated with OpenXPKI trustcenter software.",
-                },
-            },
-            policy_identifier      => { critical => 0, oid  => "1.2.3.4" },
-            subject_key_identifier => { critical => 0, hash => 1 },
-        },
-    };
-}
-
-sub cert_profile_template {
     return {
         application_name => {
             description => "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC",
@@ -1147,6 +1084,71 @@ sub cert_profile_template {
             type        => "freetext",
             width       => 20,
         },
+    };
+}
+
+sub _build_profile_default {
+    return {
+        digest     => "sha256",
+        extensions => {
+            authority_info_access => {
+                ca_issuers => "http://localhost/cacert.crt",
+                critical   => 0,
+                ocsp       => "http://ocsp.openxpki.org/",
+            },
+            authority_key_identifier =>
+                { critical => 0, issuer => 1, keyid => 1 },
+            basic_constraints => { ca => 0, critical => 1 },
+            copy              => "copy",
+            cps => { critical => 0, uri => "http://localhost/cps.html" },
+            crl_distribution_points => {
+                critical => 0,
+                uri      => [
+                    "http://localhost/crl/[% ISSUER.CN.0 %].pem",
+                    "ldap://localhost/[% ISSUER.DN %]",
+                ],
+            },
+            issuer_alt_name => { copy => 1, critical => 0 },
+            netscape        => {
+                cdp => {
+                    ca_uri   => "http://localhost/cacrl.crt",
+                    critical => 0,
+                    uri      => "http://localhost/cacrl.crt",
+                },
+                certificate_type => {
+                    critical          => 0,
+                    object_signing    => 0,
+                    object_signing_ca => 0,
+                    smime_client      => 0,
+                    smime_client_ca   => 0,
+                    ssl_client        => 0,
+                    ssl_client_ca     => 0,
+                },
+                comment => {
+                    critical => 0,
+                    text =>
+                        "This is a generic certificate. Generated with OpenXPKI trustcenter software.",
+                },
+            },
+            policy_identifier      => { critical => 0, oid  => "1.2.3.4" },
+            subject_key_identifier => { critical => 0, hash => 1 },
+        },
+        increasing_serials => 1,
+        key                => {
+            alg => [ "rsa", "ec", "dsa" ],
+            dsa => { key_length => [ 2048, 4096 ] },
+            ec  => {
+                curve_name =>
+                    [ "prime192v1", "c2tnb191v1", "prime239v1", "sect571r1" ],
+                key_length => [ "_192", "_256" ],
+            },
+            enc      => [ "aes256", "_3des", "idea" ],
+            generate => "both",
+            rsa => { key_length => [ 2048, 4096, "_1024" ] },
+        },
+        publish                 => [ "queue", "disk" ],
+        randomized_serial_bytes => 8,
+        validity => { notafter => "+01" },
     };
 }
 

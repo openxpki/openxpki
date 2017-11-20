@@ -211,6 +211,7 @@ OpenXPKI/Server/Log/Layout/Audit.pm
 
 OpenXPKI/Server.pm
 OpenXPKI/Server/API.pm
+OpenXPKI/Server/API/API2.pm
 OpenXPKI/Server/API/Default.pm
 OpenXPKI/Server/API/Housekeeping.pm
 OpenXPKI/Server/API/Object.pm
@@ -220,6 +221,13 @@ OpenXPKI/Server/API/Smartcard.pm
 OpenXPKI/Server/API/Token.pm
 OpenXPKI/Server/API/UI.pm
 OpenXPKI/Server/API/Workflow.pm
+OpenXPKI/Server/API2.pm
+OpenXPKI/Server/API2/EasyPlugin.pm
+OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
+OpenXPKI/Server/API2/EasyPluginRole.pm
+OpenXPKI/Server/API2/Plugin/Cert/Actions.pm
+OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
+OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm
@@ -578,6 +586,7 @@ t/40_context/03.t
 
 t/45_session/10_session_role.t
 t/45_session/20_backend_operations.t
+t/45_session/30_old_workflow_sessions.t
 t/45_session/log4perl.conf
 
 t/50_auth/00.t
@@ -631,6 +640,13 @@ t/80_config_versioning/config.patch
 t/90_api/10_housekeeping_purge_applog.t
 t/90_api/20_token.t
 t/90_api/30_workflow.t
+
+t/91_api2/10_base.t
+t/91_api2/11_autoloader.t
+t/91_api2/20_acl.t
+t/91_api2/lib/OpenXPKI/TestCommands/Ignored.pm
+t/91_api2/lib/OpenXPKI/TestCommands/givetheparams.pm
+t/91_api2/lib/OpenXPKI/Testalienplugin.pm
 
 t/95_openxpkiadm/10_certificate.t
 t/95_openxpkiadm/CommandlineTest.pm
@@ -699,6 +715,9 @@ t/lib/OpenXPKI/Test/Server.pm
 t/lib/OpenXPKI/Test/WorkflowMock.pm
 t/lib/OpenXPKI/Test/CertHelper/Database.pm
 t/lib/OpenXPKI/Test/CertHelper/Database/PEM.pm
+t/lib/OpenXPKI/Test/Role/WithWorkflows.pm
+t/lib/OpenXPKI/Test/Role/WithWorkflows/CertParams.pm
+t/lib/OpenXPKI/Test/Role/WithWorkflows/Definition.pm
 
 t/tests.mk
 

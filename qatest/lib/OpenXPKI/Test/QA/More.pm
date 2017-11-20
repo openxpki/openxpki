@@ -1,7 +1,7 @@
 # Written by Scott Hardin for the OpenXPKI Project 2010
 # Copyright (c) 2010 by the OpenXPKI Project
 
-package OpenXPKI::Test::More;
+package OpenXPKI::Test::QA::More;
 use Test::More;
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use OpenXPKI::Client;
@@ -619,7 +619,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Test::More
+OpenXPKI::Test::QA::More
 
 =head1 DESCRIPTION
 
@@ -638,7 +638,7 @@ definition to extend this class.
   use warnings;
 
   package MyWFModuleTest;
-  use base qw( OpenXPKI::Test::More );
+  use base qw( OpenXPKI::Test::QA::More );
 
   # object attributes
   my %myattrs : ATTR;

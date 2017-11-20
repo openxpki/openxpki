@@ -15,7 +15,7 @@ use OpenXPKI::Serialization::Simple;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use TestCfg;
 
 my $dirname = dirname($0);
@@ -23,7 +23,7 @@ my $dirname = dirname($0);
 our @cfgpath = ( $dirname );
 our %cfg = ();
 
-my $test = OpenXPKI::Test::More->new({
+my $test = OpenXPKI::Test::QA::More->new({
     socketfile => '/var/openxpki/openxpki.socket',
     realm => '',
 }) or die "Error creating new test instance: $@";

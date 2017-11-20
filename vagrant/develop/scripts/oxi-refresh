@@ -35,11 +35,11 @@ cpanm --quiet --notest --installdeps /
 #
 echo "Copying current code and binaries from repo"
 
-rsync -a /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/           >$LOG 2>&1
-rsync -a /code-repo/core/server/htdocs/*  /var/www/openxpki/          >$LOG 2>&1
+rsync -a --delete /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/           >$LOG 2>&1
+rsync -a --delete /code-repo/core/server/htdocs/*  /var/www/openxpki/          >$LOG 2>&1
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
-rsync -a  \
+rsync -a --delete \
   /code-repo/config/openxpki/config.d/realm/ca-one/* \
   /etc/openxpki/config.d/realm/ca-one/                                >$LOG 2>&1
 chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
@@ -49,7 +49,7 @@ chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
 #
 OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
 echo "Compiling OpenXPKI $OXI_VERSION in $OXI_CORE_DIR"
-rsync -a --exclude=.git/ /code-repo/core/ $OXI_CORE_DIR
+rsync -a --delete --exclude=.git/ /code-repo/core/ $OXI_CORE_DIR
 
 # Set version so Makefile.PL does not need "vergen" (which we did not copy to $OXI_CORE_DIR)
 cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm

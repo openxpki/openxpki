@@ -23,7 +23,7 @@ use File::Temp qw( tempfile );
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use Test::More;
 use Test::Deep;
 use TestCfg;
@@ -45,7 +45,7 @@ my $cert_id = $input_data->{'cert_identifier'};
 #
 # Init
 #
-my $test = OpenXPKI::Test::More->new({
+my $test = OpenXPKI::Test::QA::More->new({
     socketfile => $cfg{instance}{socketfile},
     realm      => $cfg{instance}{realm},
 }) or die "Error creating new test instance: $@";

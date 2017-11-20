@@ -27,6 +27,7 @@ use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API;
+use OpenXPKI::Server::API2;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
@@ -39,8 +40,6 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Serialization::Fast;
 
 use Data::Dumper;
-
-use Test::More;
 
 use Digest::SHA qw( sha1_base64 );
 
@@ -56,6 +55,7 @@ my @init_tasks = qw(
   prepare_daemon
   dbi
   crypto_layer
+  api2
   api
   workflow_factory
   volatile_vault
@@ -314,6 +314,17 @@ sub __do_init_api {
     OpenXPKI::Server::Context::setcontext(
     {
         api => OpenXPKI::Server::API->new(),
+    });
+}
+
+sub __do_init_api2 {
+    my $api = OpenXPKI::Server::API2->new(
+        enable_acls => 0,
+        # acl_rule_accessor => sub { CTX('config')->get_hash('acl.rules.' . CTX('session')->data->role ) },
+        log => CTX('log')->system,
+    );
+    OpenXPKI::Server::Context::setcontext({
+        api2 => $api->autoloader,
     });
 }
 
