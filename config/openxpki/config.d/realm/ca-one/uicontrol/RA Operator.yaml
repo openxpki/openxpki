@@ -25,6 +25,9 @@ main:
         label: I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE
       - key:   workflow!index!wf_type!certificate_bulk_revoke
         label: I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE
+      - key:   workflow!index!wf_type!request_checker
+        label: I18N_OPENXPKI_UI_MENU_CSR_CHECK
+
 
   - key:   pkiadm
     label: I18N_OPENXPKI_UI_MENU_PKI_OPERATION

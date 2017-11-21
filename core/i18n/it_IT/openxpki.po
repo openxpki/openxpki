@@ -265,6 +265,14 @@ msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "mostra le liste di revoca precedenti"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
+msgstr "non dopo il"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
+msgstr "Password della Chiave"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 msgstr "Creator"
 
@@ -585,6 +593,14 @@ msgstr "Scegli tu stesso la password"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER"
 msgstr "Crea la password sul server"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_IDENTIFIER"
+msgstr "Cifratura"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_ALG"
+msgstr "Algoritmo della Chiave"
+
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
 msgstr "Lunghezza della Chiave"
 
@@ -624,6 +640,11 @@ msgstr "Mostra Liste Revoche (CRL)"
 
 msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
 msgstr "Emissione Lista Revoche (CRL)"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
+msgstr "Mostra Liste Revoche (CRL)"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_HOME"
@@ -3213,6 +3234,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL"
 msgstr "Report Riassuntivo Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
+msgstr "Codice Motivazione"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"

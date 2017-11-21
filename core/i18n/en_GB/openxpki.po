@@ -226,6 +226,14 @@ msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "show details in brower"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
+msgstr "not after"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
+msgstr "Key password"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 msgstr "Creator"
 
@@ -487,6 +495,12 @@ msgstr "Choose password yourself"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER"
 msgstr "Generate password on server"
 
+msgid "I18N_OPENXPKI_UI_KEY_IDENTIFIER"
+msgstr "Key Identifier"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_ALG"
+msgstr "Key algorithm"
+
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
 msgstr "Key length"
 
@@ -524,6 +538,9 @@ msgstr "Show Revocation Lists (CRL)"
 
 msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
 msgstr "Issue a certificate revocation list (CRL)"
+
+msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
+msgstr "Request Checker"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_HOME"
@@ -1686,9 +1703,8 @@ msgstr "Extra Information"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_DESC"
 msgstr "The certificate's subject."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_LABEL"
-msgstr "Certificate Subject"
+msgstr "Request Subject"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_DESC"
 msgstr "Type of CSR (PCKS10, server generated, SPKAC"
@@ -2926,6 +2942,13 @@ msgstr "Report showing certificate count in several states."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL"
 msgstr "Certificates Status Report"
+
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_DESC"
+msgstr "This workflow allows you to upload a PKCS10 request and shows you the details encoded in it."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
+msgstr "Request Checker"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
 msgstr "Search for SCEP workflows by  transaction id"

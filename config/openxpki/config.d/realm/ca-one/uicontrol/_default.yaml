@@ -29,6 +29,9 @@ main:
   - key:   workflow!index!wf_type!search_scep_workflow
     label: I18N_OPENXPKI_UI_MENU_SCEP_SEARCH
 
+  - key:   workflow!index!wf_type!request_checker
+    label: I18N_OPENXPKI_UI_MENU_CSR_CHECK
+
 certsearch:
    - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
      key: meta_entity

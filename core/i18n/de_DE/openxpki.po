@@ -277,6 +277,14 @@ msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "gültig"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 msgstr "Untergeordnete Workflows"
 
@@ -639,6 +647,14 @@ msgstr ""
 "beliebigeralternativer Zertifikatsnamen."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_IDENTIFIER"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_ALG"
+msgstr "Benutzername"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
 msgstr "Prozesse anzeigen"
 
@@ -685,6 +701,10 @@ msgstr "Benutzername"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
 msgstr "Dieser Workflow erstellt neue CRLs."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
+msgstr "Benutzername"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HOME"
@@ -3792,6 +3812,14 @@ msgstr "Export"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL"
 msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_DESC"
+msgstr "Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
+msgstr "Prozesse anzeigen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
@@ -11575,10 +11603,6 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_ACL_CHANGE_NOTBEFORE"
-#~ msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_ACL_CHANGE_PASSWORD"
 #~ msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
 
 #, fuzzy

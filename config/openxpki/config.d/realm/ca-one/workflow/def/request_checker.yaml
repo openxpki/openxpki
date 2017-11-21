@@ -1,0 +1,127 @@
+head:
+    prefix: csrcheck
+    label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL
+    description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_DESC
+    persister: Volatile
+
+state:
+    INITIAL:
+        action: parse_pkcs10 check_policy_key_duplicate > SUCCESS
+
+    SUCCESS:
+        output:
+          - csr_subject
+          - common_name
+          - cert_subject_alt_name
+          - key_alg
+          - key_length
+          - curve_name
+          - csr_subject_key_identifier
+          - certificate_template
+          - certificate_template_name
+          - challenge_password
+          - key_duplicate
+
+action:
+    parse_pkcs10:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_DESC
+        input:
+          - pkcs10
+        param:
+          req_attributes: challengePassword
+          req_extensions: certificateTemplate certificateTemplateName
+          key_params: 1
+        validator:
+          - global_pkcs10_valid
+
+    check_policy_key_duplicate:
+        class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyKeyDuplicate
+
+
+field:
+    common_name:
+        label: I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME
+        name: cert_subject_parts
+        format: raw
+        template: >
+          [% FOREACH p IN value %]
+            [% IF p.key == 'CN' %]
+              [% p.value.0 %]
+            [% END %]
+          [% END %]
+
+    cert_subject_alt_name:
+      label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_LABEL
+      name: cert_subject_alt_name
+      description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC
+      type: cert_subject_alt_name
+      format: rawlist
+      template: >
+        [% FOREACH san = value %][% san.0 %]:
+          [% IF san.0 == 'DNS' %]
+            [% USE CheckDNS %][% CheckDNS.valid(san.1, '(FAIL)', '(ok)','(unknown)') %]
+          [% ELSE %][% san.1 %][% END %]
+          |
+        [% END %]
+
+    key_alg:
+        label: I18N_OPENXPKI_UI_KEY_KEY_ALG
+        name:  csr_key_alg
+        format: raw
+        template: "[% value FILTER upper %]"
+
+    key_length:
+        label:  I18N_OPENXPKI_UI_KEY_KEY_LENGTH
+        name:   csr_key_params
+        format: raw
+        template: "[% value.key_length %]"
+
+    curve_name:
+        label:  I18N_OPENXPKI_UI_KEY_CURVE_NAME
+        name:   csr_key_params
+        format: raw
+        template: "[% value.curve_name %]"
+
+    csr_subject_key_identifier:
+        label:  I18N_OPENXPKI_UI_KEY_IDENTIFIER
+        name:   csr_subject_key_identifier
+
+    certificate_template:
+        label:  I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE
+        name:   req_extensions
+        format: raw
+        template: >
+          [% IF value.certificateTemplate %][% value.certificateTemplate.templateID %] (v[% value.certificateTemplate.templateMajorVersion %].[% value.certificateTemplate.templateMinorVersion %]) [% END %]
+
+    certificate_template_name:
+        label:  I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE
+        name:   req_extensions
+        format: raw
+        template: "[% value.certificateTemplateName %]"
+
+    challenge_password:
+        label:  I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD
+        name:   req_attributes
+        format: raw
+        template: "[% value.challenge_password %]"
+
+    key_duplicate:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE
+        name:  check_policy_key_duplicate
+        format: styled
+        template: "[% IF value %]failed:I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS[% END %]"
+
+acl:
+    Anonymous:
+        creator: any
+        context: 1
+
+    User:
+        creator: any
+        context: 1
+
+    RA Operator:
+        creator: any
+        context: 1
