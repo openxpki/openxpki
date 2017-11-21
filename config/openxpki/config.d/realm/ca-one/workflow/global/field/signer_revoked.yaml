@@ -1,5 +1,5 @@
 label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL
 name: signer_revoked
-template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSE %]failed:I18N_OPENXPKI_UI_NO[% END %]"
+template: "[% IF value %]failed:I18N_OPENXPKI_UI_YES[% ELSE %]I18N_OPENXPKI_UI_NO[% END %]"
 format: styled
 
