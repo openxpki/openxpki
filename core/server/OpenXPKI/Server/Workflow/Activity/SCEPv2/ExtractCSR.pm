@@ -147,7 +147,7 @@ sub execute {
     }
 
     my %hashed_dn = OpenXPKI::DN->new( $csr_subject )->get_hashed_content();
-    ##! 16: 'DN ' . Dumper \%dn
+    ##! 16: 'DN ' . Dumper \%hashed_dn
     $context->param('cert_subject_parts' => $serializer->serialize( \%hashed_dn ) );
 
     # Fetch the sources hash from the context and extend it
