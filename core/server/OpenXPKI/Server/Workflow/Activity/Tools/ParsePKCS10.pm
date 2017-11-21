@@ -16,6 +16,7 @@ use Crypt::PKCS10;
 use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
 use Template;
+use Digest::SHA qw(sha1_hex);
 
 sub execute {
     ##! 1: 'execute'
@@ -38,7 +39,7 @@ sub execute {
         'cert_subject_parts' => '',
         'cert_san_parts' => '',
         'cert_subject_alt_name' => '',
-
+        'csr_subject_key_identifier' => '',
     });
 
     # Source hash
@@ -91,6 +92,12 @@ sub execute {
             $param->{csr_key_alg} = 'unsupported';
         }
     }
+
+    $param->{csr_subject_key_identifier} =
+        uc( join ':', ( unpack '(A2)*', sha1_hex(
+                $decoded->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0]
+        )));
+
 
     # Get the profile name and style - required for templating
     my $cert_profile = $self->param('cert_profile');
@@ -437,5 +444,11 @@ ec keys only, name of the curve - can be empty if curve is not known to
 the current openssl version or if custom parameters have been used.
 
 =back
+
+=item csr_subject_key_identifier
+
+The key identifier of the used public key, Hex with uppercased letters.
+The format is identical to the return value of the API method
+get_key_identifier_from_data and the format used in the certificates table.
 
 =back
