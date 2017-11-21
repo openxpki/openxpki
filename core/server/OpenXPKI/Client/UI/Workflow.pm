@@ -1107,7 +1107,7 @@ sub action_load {
     my $self = shift;
     my $args = shift;
 
-    $self->redirect('workflow!load!wf_id!'.$self->param('wf_id') );
+    $self->redirect('workflow!load!wf_id!'.$self->param('wf_id').'!_seed!'.time() );
     return $self;
 
 }
