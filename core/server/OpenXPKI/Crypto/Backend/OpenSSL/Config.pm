@@ -629,11 +629,24 @@ sub __get_extensions
         {
             my $subj_alt_name = $profile->get_extension("subject_alt_name");
             my @tmp_array;
+            my $sectidx = 0;
+            my $string;
             foreach my $entry (@{$subj_alt_name}) {
-                push @tmp_array, join(q{:}, @{$entry});
-            }
-            my $string = join(q{,}, @tmp_array);
 
+                # Handle dirName
+                if ($entry->[0] eq 'dirName') {
+                    # split at comma, this has the side effect that we can
+                    # not handle DNs with comma in the subparts
+                    my @tt = split(/,/, $entry->[1]);
+                    $sectidx++;
+                    $sections .= "\n[dirname_sect_${sectidx}]\n" . join("\n", @tt). "\n";
+                    push @tmp_array, "dirName:dirname_sect_${sectidx}";
+                } else {
+                    push @tmp_array, join(q{:}, @{$entry});
+                }
+            }
+
+            my $string = join(q{,}, @tmp_array);
             if ($string ne '') {
                 $config .= "subjectAltName=" . $string . "\n";
             }
