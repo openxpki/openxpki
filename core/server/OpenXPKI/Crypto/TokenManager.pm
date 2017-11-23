@@ -421,7 +421,7 @@ sub clear_secret_group
     ##! 2: "check for the cache"
     if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session") {
         ##! 4: "delete secret in session"
-        CTX('session')->clear_secret($group);
+        CTX('session')->data->clear_secret($group);
     }
     else {
         ##! 4: "delete secret in database"
