@@ -189,8 +189,8 @@ B<Named parameters>
 =cut
 sub secret {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
-        group => { isa => 'Str' },
-        value => { isa => 'Str' },
+        group => { isa => 'Str', optional => 1 },
+        value => { isa => 'Str', optional => 1 },
     );
     my $digest = sha1_hex($params{group} || "");
 
