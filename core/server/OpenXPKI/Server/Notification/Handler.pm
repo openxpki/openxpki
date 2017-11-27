@@ -166,6 +166,9 @@ Creates a hashref containing useful values from the realm and the workflow.
 =item realm info, from I<system.realms>
 
     meta_pki_realm, meta_label, meta_baseurl
+    plus all other keys found at system.realms.$pki_realm with I<meta_>
+    added as prefix. Label and baseurl are alway set but empty if not
+    present in the config. Keys must not start with I<wf_>.
 
 =item scalar values from the context
 
@@ -191,12 +194,26 @@ sub _prepare_template_vars {
 
     my $ser = $self->serializer();
 
-    my $template_vars;
-    # Name and Url of the Realm
-    my $realm = CTX('session')->data->pki_realm;
-    $template_vars->{'meta_pki_realm'} = $realm;
-    $template_vars->{'meta_label'} = CTX('config')->get("system.realms.$realm.label");
-    $template_vars->{'meta_baseurl'} = CTX('config')->get("system.realms.$realm.baseurl");
+    my $pki_realm = CTX('session')->data->pki_realm;
+
+    # prevent undef warnings if those are not set
+    my $template_vars = {
+        meta_label => '',
+        meta_baseurl => '',
+        meta_pki_realm => $pki_realm,
+    };
+
+    # Map all text items from the hash at system.realm with meta_ prefix
+    my $conf = CTX('config');
+    foreach my $key ($conf->get_keys(["system","realms", $pki_realm])) {
+
+        # do not accept keys that polute the workflow namespace or override
+        # the pki_realm
+        if ($key !~ /^(wf_|pki_realm)/) {
+            $template_vars->{'meta_' . $key} = $conf->get(["system","realms", $pki_realm, $key]);
+        }
+
+    }
 
     # We might use the notification for non-workflow issues
     if ($workflow) {
