@@ -274,6 +274,10 @@ while (my $cgi = CGI::Fast->new()) {
         $session_front->param('pki_realm', $config{global}{realm});
     }
 
+    if ($config{login} && $config{login}{stack}) {
+        $ENV{OPENXPKI_AUTH_STACK} = $config{login}{stack};
+    }
+
     push @header, ('-cookie', $cgi->cookie( $cookie ));
     push @header, ('-type','application/json; charset=UTF-8');
 
