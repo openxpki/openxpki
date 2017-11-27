@@ -367,10 +367,23 @@ sub handle_login {
 
     my $status = $reply->{SERVICE_MSG};
 
+    my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
+
     # Login works in three steps realm -> auth stack -> credentials
 
     my $session = $self->session();
     my $page = $cgi->param('page') || '';
+
+    # this is the incoming logout action
+    if ($page eq 'logout') {
+        $result->redirect( { goto => 'login!logout' } );
+        return $result->render();
+    }
+
+    # this is the redirect to the "you have been logged out page"
+    if ($page eq 'login!logout') {
+        return $result->init_logout()->render();
+    }
 
     # action is only valid within a post request
     my $action = $self->__get_action( $cgi ) || '';
@@ -400,7 +413,6 @@ sub handle_login {
     my $pki_realm = $session->param('pki_realm') || '';
     my $auth_stack =  $session->param('auth_stack') || '';
 
-    my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
 
     # if this is an initial request, force redirect to the login page
     # will do an external redirect in case loginurl is set in config
@@ -463,7 +475,9 @@ sub handle_login {
         # Never auth with an internal stack!
         if ( $auth_stack && $auth_stack !~ /^_/) {
             $self->logger()->debug("Authentication stack: $auth_stack");
-            $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $auth_stack, } );
+            $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
+               AUTHENTICATION_STACK => $auth_stack
+            });
             $status = $reply->{SERVICE_MSG};
         } else {
             my $stacks = $reply->{'PARAMS'}->{'AUTHENTICATION_STACKS'};
@@ -475,8 +489,12 @@ sub handle_login {
 
             # Directly load stack if there is only one
             if (scalar @stack_list == 1)  {
-                $self->logger()->trace("Only one stacks avail - autoselect: " . Dumper $stacks );
-                $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $stack_list[0]->{value} } );
+                $auth_stack = $stack_list[0]->{value};
+                $session->param('auth_stack', $auth_stack);
+                $self->logger()->debug("Only one stack avail ($auth_stack) - autoselect");
+                $reply = $self->backend()->send_receive_service_msg( 'GET_AUTHENTICATION_STACK', {
+                    AUTHENTICATION_STACK => $auth_stack
+                } );
                 $status = $reply->{SERVICE_MSG};
             } else {
                 $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
@@ -587,6 +605,8 @@ sub handle_login {
 
             $self->logger()->trace('Got session info: '. Dumper $reply->{PARAMS});
             $self->logger()->trace('CGI Header ' . Dumper \@main::header );
+
+            $session->flush();
 
             $result->init_index();
             return $result->render();

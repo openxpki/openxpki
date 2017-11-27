@@ -58,10 +58,10 @@ sub retrieve {
     my ($self, $sid) = @_;
 
     my $res = $self->backend()->send_receive_service_msg('FRONTEND_SESSION');
-    $self->logger()->trace('Session retrieve ' . Dumper $res);
     $res = $res->{SESSION_DATA} || '';
     # TODO Remove "unless..." somewhen: it's only to restore old unencoded sessions
     $res = decode_base64($res) if ($res and $res !~ /\{/);
+    $self->logger()->trace('Session retrieve ' . Dumper $res);
     return $res;
 };
 

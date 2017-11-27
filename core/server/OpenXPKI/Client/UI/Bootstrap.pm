@@ -86,6 +86,8 @@ sub init_structure {
     $session->param('baseurl',  $baseurl.'/#/');
     $self->logger->debug("Baseurl from referrer: " . $baseurl);
 
+    $session->flush();
+
     if (!$self->_result()->{structure}) {
         $self->_result()->{structure} =
         [{

@@ -520,6 +520,18 @@ msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
 msgstr "Действителен"
 
@@ -1518,6 +1530,10 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
+msgstr "Имя учетной записи"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"

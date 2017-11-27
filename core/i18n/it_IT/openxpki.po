@@ -508,6 +508,20 @@ msgstr "Catena di certificazione"
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Paese"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
+msgstr "Home"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE"
+msgstr "Curva Ellittica"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
+msgstr "Home"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
 msgstr "mostra le liste di revoca precedenti"
@@ -1245,6 +1259,10 @@ msgstr "Fallita convalida dell’espressione data"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "Il valore date/time inserito non è stato convalidato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
+msgstr "Curva Ellittica"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"

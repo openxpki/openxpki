@@ -305,7 +305,7 @@ sub __handle_FRONTEND_SESSION {
     } else {
         CTX('log')->system->debug('Frontend session data requested by client');
         $data_str = $sess->data->ui_session;
-        ##! 32: 'Read ui session data ' . $data
+        ##! 32: 'Read ui session data ' . $data_str
     }
 
     return {
@@ -540,9 +540,11 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
             CTX('session')->data->user($user);
             CTX('session')->data->role($role);
             CTX('session')->is_valid(1); # mark session as "valid"
-            $self->__change_state({
-                STATE => 'MAIN_LOOP',
-            });
+
+            Log::Log4perl::MDC->put('user', $user);
+            Log::Log4perl::MDC->put('role', $role);
+
+            $self->__change_state({ STATE => 'MAIN_LOOP', });
         }
         else {
             ##! 4: 'login unsuccessful'

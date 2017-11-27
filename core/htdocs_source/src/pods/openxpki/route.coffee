@@ -14,7 +14,7 @@ Route = Em.Route.extend
             beforeSend: (xhr) ->
                 xhr.setRequestHeader "X-OPENXPKI-Client", "1"
 
-    needReboot: [ "login", "logout", "welcome" ]
+    needReboot: [ "login", "login!logout", "welcome" ]
 
     source: Em.computed -> Em.Object.create
         page: null
@@ -76,10 +76,10 @@ Route = Em.Route.extend
         $(".loading").addClass "in-progress"
 
         source = @get "source"
-        
-        if req.type is "POST" 
+
+        if req.type is "POST"
             req.data._rtoken = source.rtoken
-        
+
         target = req.data.target or "self"
         if target is "self"
             if source.get "modal"

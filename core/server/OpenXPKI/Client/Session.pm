@@ -97,6 +97,7 @@ sub renew_session_id {
     my $new_backend_session_id = $self->backend()->get_session_id();
     $self->param('backend_session_id', $new_backend_session_id);
     $self->dataref->{_SESSION_ID} = $new_backend_session_id;
+    $self->flush();
     return $new_backend_session_id;
 }
 

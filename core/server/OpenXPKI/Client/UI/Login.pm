@@ -69,11 +69,33 @@ sub init_login_passwd {
 
 }
 
+
+sub init_logout {
+
+    my $self = shift;
+    my $args = shift;
+
+    $self->_page ({
+        'label' => 'I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD'
+    });
+
+    $self->add_section({
+        type => 'text',
+        content => {
+            label => '',
+            description => 'I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE'
+        }
+    });
+
+    return $self;
+}
+
+
 sub init_index {
 
     my $self = shift;
 
-    $self->redirect('welcome');
+    $self->redirect('redirect!welcome');
 
     return $self;
 }

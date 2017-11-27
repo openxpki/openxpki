@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2017-10-03 13:30+0200\n"
+"PO-Revision-Date: 2017-11-27 14:35+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -411,6 +411,19 @@ msgstr "Private key could not be decrypted/loaded."
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
+msgstr "Logout Successful"
+
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE"
+msgstr ""
+"You have beend logged out. <a href=\\\"#/openxpki/login\\\">Go back to login "
+"page</a>."
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
+msgstr "Welcome to your OpenXPKI Trustcenter"
 
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
 msgstr ""
@@ -1084,6 +1097,9 @@ msgstr "Given FQDN has an invalid format"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "The entered date/time could not be validated."
+
+msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
+msgstr "Welcome to your OpenXPKI Trustcenter"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Message of the Day"
@@ -2943,9 +2959,10 @@ msgstr "Report showing certificate count in several states."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL"
 msgstr "Certificates Status Report"
 
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_DESC"
-msgstr "This workflow allows you to upload a PKCS10 request and shows you the details encoded in it."
+msgstr ""
+"This workflow allows you to upload a PKCS10 request and shows you the "
+"details encoded in it."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
 msgstr "Request Checker"

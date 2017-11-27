@@ -13,7 +13,7 @@ extends 'OpenXPKI::Client::UI::Result';
 sub BUILD {
 
     my $self = shift;
-    $self->_page ({'label' => 'Welcome to your OpenXPKI Trustcenter'});
+    $self->_page ({'label' => 'I18N_OPENXPKI_UI_HOME_WELCOME_HEAD'});
 }
 
 sub init_welcome {
@@ -24,7 +24,7 @@ sub init_welcome {
     # check for redirect
     my $redirect = $self->_client->session()->param('redirect') || '';
     $self->_client->session()->param('redirect','');
-    if ($redirect eq 'welcome') {
+    if ($redirect =~ /welcome/) {
         # redirect to myself causes the UI to loop
         $redirect = "";
     }
@@ -46,7 +46,6 @@ sub init_welcome {
     return $self;
 }
 
-
 sub init_index {
 
     my $self = shift;
@@ -56,7 +55,7 @@ sub init_index {
         type => 'text',
         content => {
             label => '',
-            description => 'This page was left blank.'
+            description => 'I18N_OPENXPKI_UI_WELCOME_PAGE'
         }
     });
 

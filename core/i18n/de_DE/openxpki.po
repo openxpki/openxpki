@@ -519,6 +519,18 @@ msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Ihr Name, z.B. 'Peter Müller'"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE"
+msgstr "Benutzername"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
+msgstr "Benutzername"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
 msgstr "gültig"
 
@@ -1515,6 +1527,10 @@ msgstr "Prozesse anzeigen"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
+msgstr "Benutzername"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
