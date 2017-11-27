@@ -1359,6 +1359,11 @@ sub BUILD {
                     regex => $re_alpha_string,
                     optional => 1,
                 },
+                CHECK_ACL => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
+                    optional => 1,
+                },
             },
         },
         'search_workflow_instances_count' => {

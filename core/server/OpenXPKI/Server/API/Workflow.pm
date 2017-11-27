@@ -877,7 +877,22 @@ sub search_workflow_instances {
         ) ],
     )->fetchall_arrayref({});
 
-    my $result_legacy = [ map { OpenXPKI::Server::Database::Legacy->workflow_to_legacy($_, 1) } @$result ];
+    # if this is set, only return items that the user can access
+
+    my $result_legacy;
+    if ($args->{CHECK_ACL}) {
+        my $factory = $args->{FACTORY} || CTX('workflow_factory')->get_factory;
+
+        foreach my $workflow (@$result) {
+            my $wf_type = $workflow->{workflow_type};
+            my $wf_id = $workflow->{'workflow.workflow_id'};
+            if ($factory->check_acl($wf_type, $wf_id)) {
+                push @$result_legacy, OpenXPKI::Server::Database::Legacy->workflow_to_legacy($workflow, 1);
+            }
+        }
+    } else {
+        $result_legacy = [ map { OpenXPKI::Server::Database::Legacy->workflow_to_legacy($_, 1) } @$result ];
+    }
 
     ##! 16: 'result: ' . Dumper $result_legacy
     return $result_legacy;
@@ -1432,6 +1447,11 @@ If given, limits the amount of workflows returned.
 =item * START (optional)
 
 If given, defines the offset of the returned workflow (use with LIMIT).
+
+=item CHECK_ACL (optional)
+
+Check if the current user is authorized to access the workflow. Note that
+this will intantiate every result and is therefore a very expensive task!
 
 =back
 

@@ -293,9 +293,11 @@ sub __authorize_workflow {
         my $filter   = $arg_ref->{FILTER};
         my $type     = $workflow->type();
 
-        my $allowed_creator_re = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
+        my $wf_creator = $workflow->attrib('creator') || '';
 
-        if (! defined $allowed_creator_re) {
+        my $is_allowed = $self->check_acl( $type, $wf_creator, $user, $role );
+
+        if (! defined $is_allowed) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE',
                 params  => {
@@ -304,31 +306,8 @@ sub __authorize_workflow {
                     'WF_TYPE' => $type,
                 },
             );
-        }
 
-        # get the workflow creator from the attributes table
-        my $wf_creator = $workflow->attrib('creator') || '';
-
-        # Creator can be self, any, others or a regex
-        my $is_allowed = 0;
-        # Access only to own workflows - check session user against creator
-        if ($allowed_creator_re eq 'self') {
-            $is_allowed = ($wf_creator eq $user);
-
-        # No access to own workflows
-        } elsif ($allowed_creator_re eq 'others') {
-            $is_allowed = ($wf_creator ne $user);
-
-        # access to any workflow
-        } elsif ($allowed_creator_re eq 'any') {
-            $is_allowed = 1;
-
-        # Access by Regex - check
-        } else {
-            $is_allowed = ($wf_creator =~ qr/$allowed_creator_re/);
-        }
-
-        if (!$is_allowed) {
+        } elsif (!$is_allowed) {
             ##! 16: 'workflow creator does not match allowed creator'
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER',
@@ -336,7 +315,6 @@ sub __authorize_workflow {
                     'REALM'   => $realm,
                     'ROLE'    => $role,
                     'WF_TYPE' => $type,
-                    'ALLOWED_CREATOR' => $allowed_creator_re,
                     'ACTIVE_USER' => $user,
                     'WF_CREATOR' => $wf_creator,
                 }
@@ -359,6 +337,57 @@ sub __authorize_workflow {
     );
 }
 
+=head2 check_acl (TYPE, WF_CREATOR, USER, ROLE)
+
+Helper method to evaluate the acl given in the workflow config against
+against a concrete instance. Type and creator are mandatory, user and
+role is read from the current session if user not set.
+
+Returns 1 if the user can access the workflow. Return undef if no acl
+is defined for the current role and 0 if an acl was found but does not
+authorize the current user.
+
+=cut
+
+sub check_acl {
+
+    my $self = shift;
+    my ($type, $wf_creator, $user, $role) = @_;
+
+    if (!$user) {
+        $role = 'Anonymous' unless($role);
+        $user = CTX('session')->data->user;
+        $role = CTX('session')->data->role;
+    }
+
+    my $allowed_creator_re = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
+
+    if (!defined $allowed_creator_re) {
+        return;
+    }
+
+    # Creator can be self, any, others or a regex
+    my $is_allowed = 0;
+    # Access only to own workflows - check session user against creator
+    if ($allowed_creator_re eq 'self') {
+        $is_allowed = ($wf_creator eq $user);
+
+    # No access to own workflows
+    } elsif ($allowed_creator_re eq 'others') {
+        $is_allowed = ($wf_creator ne $user);
+
+    # access to any workflow
+    } elsif ($allowed_creator_re eq 'any') {
+        $is_allowed = 1;
+
+    # Access by Regex - check
+    } else {
+        $is_allowed = ($wf_creator =~ qr/$allowed_creator_re/);
+    }
+
+    return $is_allowed;
+
+}
 
 1;
 __END__
