@@ -344,7 +344,7 @@ sub pause {
         $self->add_history(
             Workflow::History->new({
                 action      => $self->{_CURRENT_ACTION},
-                description => sprintf( 'Retry exceeded, count try %d', $count_try ),
+                description => sprintf( 'EXCEEDED: count try %d', $count_try ),
                 state       => $self->state(),
                 user        => CTX('session')->data->user,
             })
@@ -367,7 +367,7 @@ sub pause {
             Workflow::History->new(
                 {
                     action      => $self->{_CURRENT_ACTION},
-                    description => sprintf( 'PAUSED because of %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
+                    description => sprintf( 'PAUSED: %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
                     state       => $self->state(),
                     user        => CTX('session')->data->user,
                 }
@@ -665,7 +665,7 @@ sub _fail {
             Workflow::History->new(
                 {
                     action      => $self->{_CURRENT_ACTION},
-                    description => $reason,
+                    description => 'FAIL:' . $reason,
                     user        => CTX('session')->data->user,
                 }
             )

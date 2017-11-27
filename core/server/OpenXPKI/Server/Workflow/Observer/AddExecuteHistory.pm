@@ -13,14 +13,10 @@ sub update {
 
     return if ($event ne "execute");
 
-    my $desc_start = "NEW_STATE: ";
-    if ($autorun) {
-        $desc_start = "NEW_STATE_AUTORUN: ";
-    };
     $workflow->add_history(
         Workflow::History->new({
             action      => $action_name,
-            description => $desc_start . $workflow->state(),
+            description => $autorun ? 'AUTORUN' : 'EXECUTE',
             state       => $old_state,
             user        => CTX('session')->data->user,
         })
