@@ -768,7 +768,7 @@ sub init_related {
 
     $self->logger()->trace("related workflows " . Dumper \@wfid) if($self->logger()->is_trace());
 
-    my $cert_workflows = $self->send_command( 'search_workflow_instances', {  SERIAL => \@wfid });
+    my $cert_workflows = $self->send_command( 'search_workflow_instances', {  SERIAL => \@wfid, CHECK_ACL => 1 });
 
     $self->logger()->trace("workflow results" . Dumper $cert_workflows) if ($self->logger()->is_trace());;
 
