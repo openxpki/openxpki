@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-
 use strict;
 use warnings;
 
 use FindBin qw( $Bin );
 use lib "$Bin/../../lib";
+use lib "$Bin/../../../core/server/t/lib";
 
 use Carp;
 use English;
@@ -12,8 +12,11 @@ use Data::Dumper;
 use Config::Std;
 use File::Basename;
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
+# Project modules
+use OpenXPKI::Test;
+
+
+my $t = OpenXPKI::Test->new(with => "SampleConfig");
 
 use OpenXPKI::Test::QA::More;
 use TestCfg;
@@ -47,3 +50,5 @@ $test->is( $styles[0], '00_basic_style' );
 $test->ok( $params->{ $styles[0] }->{LABEL} );
 
 $test->disconnect();
+
+1;

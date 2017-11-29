@@ -22,38 +22,33 @@ plan tests => 8;
 #
 # Setup test context
 #
-my $oxitest = OpenXPKI::Test->new;
-$oxitest->realm_config(
-    "alpha",
-    "crypto.secret.monkey_island_daemon" => {
-        label => "Monkey Island",
-        export => 1,
-        method => "literal",
-        value => "root",
-        cache => "daemon",
-    }
+my $oxitest = OpenXPKI::Test->new(
+    with => "CryptoLayer",
+    also_init => "volatile_vault",
+    add_config => {
+        "realm.alpha.crypto.secret.monkey_island_daemon" => {
+            label => "Monkey Island",
+            export => 1,
+            method => "literal",
+            value => "root",
+            cache => "daemon",
+        },
+        "realm.alpha.crypto.secret.monkey_island_session" => {
+            label => "Monkey Island",
+            export => 1,
+            method => "literal",
+            value => "root",
+            cache => "session",
+        },
+        "realm.alpha.crypto.secret.gentleman" => {
+            label => "Gentleman",
+            export => 0,
+            method => "literal",
+            value => "root",
+            cache => "daemon",
+        },
+    },
 );
-$oxitest->realm_config(
-    "alpha",
-    "crypto.secret.monkey_island_session" => {
-        label => "Monkey Island",
-        export => 1,
-        method => "literal",
-        value => "root",
-        cache => "session",
-    }
-);
-$oxitest->realm_config(
-    "alpha",
-    "crypto.secret.gentleman" => {
-        label => "Gentleman",
-        export => 0,
-        method => "literal",
-        value => "root",
-        cache => "daemon",
-    }
-);
-$oxitest->setup_env->init_server('crypto_layer', 'volatile_vault');
 CTX('session')->data->pki_realm('alpha');
 
 #

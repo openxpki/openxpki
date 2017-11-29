@@ -1,11 +1,11 @@
-package OpenXPKI::Test::Client;
+package OpenXPKI::Test::QA::Role::Server::ClientHelper;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::Client - Helper functions to test OpenXPKI client talking to a
-running (test) server
+OpenXPKI::Test::QA::Role::Server::ClientHelper - Helper functions to test
+OpenXPKI client talking to a running (test) server
 
 =cut
 
@@ -22,9 +22,22 @@ use OpenXPKI::Client;
 
 =cut
 
-has oxitest => (
+has socket_file => (
     is => 'rw',
-    isa => 'OpenXPKI::Test',
+    does => 'Str',
+    required => 1,
+);
+
+has default_realm => (
+    is => 'rw',
+    does => 'Str',
+    required => 1,
+);
+
+# password for all test users
+has password => (
+    is => 'rw',
+    does => 'Str',
     required => 1,
 );
 
@@ -52,7 +65,7 @@ sub connect {
         # done in the constructor
         $client = OpenXPKI::Client->new({
             TIMEOUT => 5,
-            SOCKETFILE => $self->oxitest->get_config("system.server.socket_file"),
+            SOCKETFILE => $self->socket_file,
         });
     } "create client instance" or BAIL_OUT "Could not create client instance";
 
@@ -72,13 +85,13 @@ sub login {
     subtest "client login" => sub {
         plan tests => 6;
 
-        $self->send_ok('GET_PKI_REALM', { PKI_REALM => $self->oxitest->get_default_realm });
+        $self->send_ok('GET_PKI_REALM', { PKI_REALM => $self->default_realm });
         $self->is_next_step("GET_AUTHENTICATION_STACK");
 
         $self->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => "Test" });
         $self->is_next_step("GET_PASSWD_LOGIN");
 
-        $self->send_ok('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->oxitest->config_writer->password });
+        $self->send_ok('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });
         $self->is_next_step("SERVICE_READY");
     }
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
 
 # Core modules
 use English;
@@ -19,7 +20,7 @@ use OpenXPKI::Test;
 use OpenXPKI::Test::QA::CertHelper::Workflow;
 use OpenXPKI::Server::Context;
 
-plan tests => 38;
+plan tests => 39;
 
 
 #
@@ -27,16 +28,11 @@ plan tests => 38;
 #
 
 # Import test certificates
-my $oxitest = OpenXPKI::Test->new(with_workflows => 1);
+my $oxitest = OpenXPKI::Test->new(
+    with => [ qw( SampleConfig Workflows WorkflowCreateCert ) ],
+);
 my $dbdata = $oxitest->certhelper_database;
 $oxitest->insert_testcerts;
-$oxitest->realm_config("alpha", "acl.rules" => {
-    supertux => { allow_all_commands => 1 },
-});
-$oxitest->setup_env;
-$oxitest->init_server('api2');
-
-$oxitest->session->data->role("supertux");
 
 my $api;
 lives_ok {
@@ -342,5 +338,13 @@ $result = search_cert_ok "by attributes and with ORDER = 'identifier' (issue #57
 cmp_deeply $result, [
     superhashof({ subject => re(qr/$uuid/i) })
 ], "Correct result";
+
+$uuid = Data::UUID->new->create_str;
+my $umlaut_cert_info = $oxitest->create_cert(
+    hostname => "acme-$uuid.local",
+    requestor_gname => 'Till Tyskøl',
+    requestor_name => $uuid,
+    requestor_email => 'tilltom@morning',
+);
 
 $oxitest->delete_testcerts; # only deletes those from OpenXPKI::Test::CertHelper::Database

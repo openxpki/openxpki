@@ -22,7 +22,9 @@ plan tests => 17;
 #
 # Setup env
 #
-my $oxitest = OpenXPKI::Test->new->setup_env->init_server("crypto_layer");
+my $oxitest = OpenXPKI::Test->new(
+    with => "CryptoLayer",
+);
 $oxitest->insert_testcerts;
 
 #

@@ -18,14 +18,12 @@ use Test::Exception;
 use DateTime;
 
 # Project modules
-use lib "$Bin/lib";
-use lib "$Bin/../lib";
+use lib "$Bin/lib", "$Bin/../lib", "$Bin/../../core/server/t/lib";
 use OpenXPKI::Test;
-use OpenXPKI::Test::CertHelper::Database;
-use OpenXPKI::Test::Server;
-use OpenXPKI::Test::Client;
+
 
 # plan tests => 14; WE CANNOT PLAN tests as there is a while loop that sends commands (which are tests)
+
 
 #
 # Setup test context
@@ -81,15 +79,16 @@ sub workflow_def {
     };
 };
 
-my $oxitest = OpenXPKI::Test->new(start_watchdog => 1);
-$oxitest->workflow_config("alpha", "wf_type_1", workflow_def("wf_type_1"));
-$oxitest->setup_env;
+my $oxitest = OpenXPKI::Test->new(
+    with => [ "SampleConfig", "Server", "Workflows" ],
+    also_init => "crypto_layer",
+    start_watchdog => 1,
+    add_config => {
+        "realm.ca-one.workflow.def.wf_type_1" => workflow_def("wf_type_1"),
+    },
+);
 
-my $server = OpenXPKI::Test::Server->new(oxitest => $oxitest);
-$server->init_tasks( ['crypto_layer', 'workflow_factory'] );
-$server->start;
-
-my $tester = OpenXPKI::Test::Client->new(oxitest => $oxitest);
+my $tester = $oxitest->new_client_tester;
 $tester->connect;
 $tester->init_session;
 $tester->login("caop");
@@ -171,7 +170,7 @@ lives_and {
     ] or diag explain $result;
 } "get_workflow_history()";
 
-$server->stop;
+$oxitest->stop_server;
 
 done_testing;
 

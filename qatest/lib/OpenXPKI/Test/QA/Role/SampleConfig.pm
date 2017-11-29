@@ -1,0 +1,204 @@
+package OpenXPKI::Test::QA::Role::SampleConfig;
+use Moose::Role;
+
+=head1 NAME
+
+OpenXPKI::Test::QA::Role::SampleConfig - Moose role that extends L<OpenXPKI::Test>
+to include the complete sample configuration from `config/openxpki/config.d`
+
+=cut
+
+# Core modules
+use POSIX;
+
+# CPAN modules
+use Test::More;
+use File::Find;
+use File::Spec;
+use File::Basename qw( fileparse );
+use Cwd qw( abs_path );
+use FindBin qw( $Bin );
+
+# Project modules
+use YAML::Tiny;
+
+
+
+=head1 CONSTRUCTOR ENHANCEMENTS
+
+This role add the following parameters to L<OpenXPKI::Test>s constructor:
+
+=item * I<start_watchdog> (optional) - Set to 1 to start the watchdog when the
+test server starts up. Default: 0
+
+=cut
+has start_watchdog => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => 0,
+);
+
+=back
+
+=cut
+
+=head2 default_realm
+
+Returns the name of the default realm in the test environment that can be used
+in test code.
+
+=cut
+# Is set after the realm has been read from the default configs
+has default_realm => (
+    is => 'rw',
+    isa => 'Str',
+    init_arg => undef,
+);
+
+has src_config_dir   => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my(undef, $mydir, undef) = fileparse(__FILE__); abs_path($mydir."../../../../../../config/openxpki/config.d"); } );
+has path_temp_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/tmp" } );
+has path_export_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/openxpki/dataexchange/export" } );
+has path_import_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/openxpki/dataexchange/import" } );
+has path_socket_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/openxpki/openxpki.socket" } );
+has path_pid_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/run/openxpkid.pid" } );
+has path_stderr_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/log/openxpki/stderr.log" } );
+
+after 'init_base_config' => sub { # happens before init_additional_config() so we do not overwrite more specific configs of other roles
+    my $self = shift;
+
+    my(undef, $mydir, undef) = fileparse(__FILE__);
+    my $config_dir = abs_path($mydir."../../../../../../config/openxpki/config.d");
+    die "Could not find OpenXPKI sample config dir" unless -d $config_dir;
+
+    my $config = $self->config_writer;
+
+    # Do explicitely not create $self->basedir to prevent accidential use of / etc
+    $config->_make_dir($self->path_temp_dir);
+    $config->_make_dir($self->path_export_dir);
+    $config->_make_dir($self->path_import_dir);
+    $config->_make_parent_dir($self->path_socket_file);
+    $config->_make_parent_dir($self->path_pid_file);
+    $config->_make_parent_dir($self->path_stderr_file);
+
+    # add default configs
+    $self->_load_default_config("realm/ca-one"); $self->default_realm("ca-one");
+    $self->_load_default_config("system/crypto.yaml");
+    # NO $self->_load_default_config("system.database") -- it's completely customized for tests
+    $self->_load_default_config("system/realms.yaml");
+    $self->_load_default_config("system/server.yaml",   $self->can('_customize_system_server')); # can() return a CodeRef
+    $self->_load_default_config("system/watchdog.yaml", $self->can('_customize_system_watchdog'));
+};
+
+after 'init_server' => sub {
+    my $self = shift;
+    # set PKI realm after init() as various init procedures overwrite the realm
+    $self->session->data->pki_realm("ca-one") if $self->has_session;
+};
+
+# Loads the given default config YAML and adds it to the test environment,
+# customizing it if an additional CodeRef is given.
+sub _load_default_config {
+    my ($self, $node, $customizer_coderef) = @_;
+    my @parts = split /\//, $node;
+    $parts[-1] =~ s/\.yaml$//; # strip ".yaml" if it's a file
+
+    # read original sample confog
+    my $config_hash = $self->_yaml2perl($self->src_config_dir, $node);
+    # descent into config hash down to $node
+    for (@parts) { $config_hash = $config_hash->{$_} };
+    # customize config (call supplied method)
+    $customizer_coderef->($self, $config_hash) if $customizer_coderef;
+    # add configuration
+    $self->config_writer->add_user_config(join(".",@parts) => $config_hash);
+    return $config_hash;
+}
+
+sub _customize_system_server {
+    my ($self, $conf) = @_;
+
+    $conf->{log4perl} = $self->path_log4perl_conf;
+
+    # Daemon settings
+    $conf->{user} =  (getpwuid(geteuid))[0]; # run under same user as test scripts
+    $conf->{group} = (getgrgid(getegid))[0];
+    $conf->{socket_file} = $self->path_socket_file;
+    $conf->{pid_file} = $self->path_pid_file;
+    $conf->{stderr} = $self->path_stderr_file;
+    $conf->{tmpdir} = $self->path_temp_dir;
+
+    $conf->{data_exchange} = {
+        export => $self->path_export_dir,
+        import => $self->path_import_dir,
+    };
+}
+
+sub _customize_system_watchdog {
+    my ($self, $conf) = @_;
+
+    $conf->{interval_sleep_exception} = 1;
+    $conf->{interval_wait_initial} = 1;
+    $conf->{interval_loop_idle} = 1;
+    $conf->{interval_loop_run} = 1;
+    $conf->{disabled} = $self->start_watchdog ? 0 : 1;
+}
+
+# Reads the given single YAML file or directory with YAML files an parses
+# them into a single huge configuration hash.
+# Besides the config nodes in the YAML each subdirectory and file name also
+# form one node in the hierarchy.
+sub _yaml2perl {
+    my ($self, $basedir, $path) = @_;
+    $path =~ s/\/*$//; # strip trailing slash
+    my $fullpath = $basedir."/".$path;
+    my $filemap = {};
+
+    my @basedir_parts = File::Spec->splitdir($basedir);
+
+    my $processor = sub {
+        my ($filepath) = @_;
+        return unless $filepath =~ / \.yaml $/msxi;
+
+        my ($vol, $tmp, $filename) = File::Spec->splitpath($filepath);
+        my $dir = File::Spec->catpath($vol, $tmp);
+        $dir =~ s/\/*$//; # strip trailing slash
+
+        # slurp
+        my $yaml = YAML::Tiny->read($filepath);
+
+        # assemble relative path
+        my @relpath = File::Spec->splitdir($dir);
+        for (my $i=0; $i < scalar(@basedir_parts) and @relpath and $relpath[0] eq $basedir_parts[$i]; $i++) {
+            shift @relpath; # remove parts of current path that equal base path
+        }
+
+        # strip extension from filename
+        (my $leaf = $filename) =~ s/ \. [^\.]+ $//msxi;
+
+        # merge definitions into config tree (root node is last dir of @base)
+        my $node = $filemap;
+        # create HashRef structure out of file paths
+        for (@relpath) {
+            $node->{$_} //= {}; # open new "node" if not existing
+            $node = $node->{$_};
+        }
+        $node->{$leaf} = $yaml->[0];
+    };
+
+    if (-f $fullpath) {
+        $processor->($fullpath);
+    }
+    else {
+        find(
+            {
+                wanted => sub { $processor->($File::Find::name) },
+                no_chdir => 1,
+            },
+            $fullpath
+        );
+    }
+
+    return $filemap;
+}
+
+1;

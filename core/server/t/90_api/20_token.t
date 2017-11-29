@@ -22,18 +22,19 @@ plan tests => 13;
 #
 # Setup test context
 #
-my $oxitest = OpenXPKI::Test->new;
-$oxitest->realm_config(
-    "alpha",
-    "auth.handler.Signature" => {
-        type             => "ChallengeX509",
-        challenge_length => 256,
-        role             => "User",
-        realm            => [ "alpha" ],
-        cacert           => [ "MyCertId" ],
-    }
+my $oxitest = OpenXPKI::Test->new(
+    with => "CryptoLayer",
+    add_config => {
+        "realm.alpha.auth.handler.Signature" => {
+            type             => "ChallengeX509",
+            challenge_length => 256,
+            role             => "User",
+            realm            => [ "alpha" ],
+            cacert           => [ "MyCertId" ],
+        },
+    },
 );
-$oxitest->setup_env->init_server('crypto_layer');
+
 $oxitest->insert_testcerts;
 CTX('session')->data->pki_realm('alpha');
 

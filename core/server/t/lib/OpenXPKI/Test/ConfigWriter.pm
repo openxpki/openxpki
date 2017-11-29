@@ -11,7 +11,6 @@ OpenXPKI::Test::ConfigWriter - Create test configuration files (YAML)
 # Core modules
 use File::Path qw(make_path);
 use File::Spec;
-use POSIX;
 use Digest::SHA;
 use MIME::Base64;
 
@@ -27,12 +26,6 @@ use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in 
 Methods to create a configuration consisting of several YAML files for tests.
 
 =cut
-
-has log_level => (
-    is => 'rw',
-    isa => 'Str',
-    required => 1,
-);
 
 # TRUE if the initial configuration has been written
 has is_written => (
@@ -60,13 +53,6 @@ has db_conf => (
     },
 );
 
-has start_watchdog => (
-    is => 'rw',
-    isa => 'Int',
-    lazy => 1,
-    default => 0,
-);
-
 has _config => (
     is => 'ro',
     isa => 'HashRef',
@@ -79,27 +65,25 @@ has _config => (
 # HashRef: [dot-separated config path] => [YAML HashRef]
 has _user_config => (
     is => 'ro',
-    isa => 'HashRef',
-    traits => ['Hash'],
-    default => sub { {} },
+    isa => 'ArrayRef[ArrayRef]',
+    traits => [ 'Array' ],
+    default => sub { [] },
     init_arg => undef, # disable assignment via construction
     handles => {
-        add_user_config      => 'set',
-        get_user_config_keys => 'keys',
-        get_user_config_node => 'get',
+        _add_user_config_pair => 'push',
+        _map_user_config => 'map',
     },
 );
 
-# Following attributes must be lazy => 1 because their builders access other attributes
-has yaml_crypto     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_crypto" );
-has yaml_database   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_database" );
-has yaml_realms     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_realms" );
-has yaml_server     => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_server" );
-has yaml_watchdog   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_watchdog" );
-has yaml_workflow_persister => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_workflow_persister" );
-has conf_log4perl   => ( is => 'rw', isa => 'Str',     lazy => 1, builder => "_build_log4perl" );
+sub add_user_config {
+    my ($self, %entries) = @_;
+    $self->_add_user_config_pair([ $_ => $entries{$_} ]) for keys %entries;
+}
 
-has realms  => ( is => 'rw', isa => 'ArrayRef', default => sub { [ 'alpha', 'beta', 'gamma' ] } );
+# Following attributes must be lazy => 1 because their builders access other attributes
+has yaml_database   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_database" );
+has yaml_workflow_persister => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_workflow_persister" );
+
 has yaml_cert_profile_template => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_template" );
 has yaml_cert_profile_client   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_client" );
 has yaml_cert_profile_server   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_server" );
@@ -111,21 +95,11 @@ has yaml_profile_default       => ( is => 'rw', isa => 'HashRef', lazy => 1, bui
 has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 
 has path_config_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/config.d" } );
-has path_temp_dir       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/tmp" } );
-has path_export_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/dataexchange/export" } );
-has path_import_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/dataexchange/import" } );
-has path_socket_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/openxpki/openxpki.socket" } );
-has path_pid_file       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/run/openxpkid.pid" } );
-has path_stderr_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/log/openxpki/stderr.log" } );
 has path_log_file       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/var/log/openxpki/catchall.log" } );
-has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/log.conf" } );
 
 has path_openssl        => ( is => 'rw', isa => 'Str', default => "/usr/bin/openssl" );
 has path_javaks_keytool => ( is => 'rw', isa => 'Str', default => "/usr/bin/keytool" );
 has path_openca_scep    => ( is => 'rw', isa => 'Str', default => "/usr/bin/openca-scep" );
-
-has system_user  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { (getpwuid(geteuid))[0] } ); # run under same user as test scripts
-has system_group => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { (getgrgid(getegid))[0] } );
 
 
 sub _make_dir {
@@ -144,6 +118,7 @@ sub write_str {
     my ($self, $filepath, $content) = @_;
 
     die "Empty content for $filepath" unless $content;
+    $self->_make_parent_dir($filepath);
     open my $fh, ">:encoding(UTF-8)", $filepath or die "Could not open $filepath for UTF-8 encoded writing: $@";
     print $fh $content, "\n" or die "Could not write to $filepath: $@";
     close $fh or die "Could not close $filepath: $@";
@@ -178,8 +153,14 @@ sub write_yaml {
 #     $config_writer->add_config_node('realm.alpha.workflow', $workflow);
 sub add_config {
     my ($self, $key, $data) = @_;
-    die "add_config() must be called before create()" if $self->is_written;
 
+    use Test::More;
+    my ($package, $filename, $line, $subroutine, $hasargs,
+    $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
+    = caller(1);
+#    note "CONFIG $key - $package";
+
+    die "add_config() must be called before create()" if $self->is_written;
     my @parts = split /\./, $key;
     my $node = $self->_config; # root node
     for my $i (0..$#parts) {
@@ -212,33 +193,16 @@ sub get_config_node {
     return $node;
 }
 
-sub make_dirs {
-    my ($self) = @_;
-    # Do explicitely not create $self->basedir to prevent accidential use of / etc
-    note "Creating directory ".$self->path_config_dir;
-    $self->_make_dir($self->path_config_dir);
-    $self->_make_dir($self->path_temp_dir);
-    $self->_make_dir($self->path_export_dir);
-    $self->_make_dir($self->path_import_dir);
-    $self->_make_parent_dir($self->path_socket_file);
-    $self->_make_parent_dir($self->path_pid_file);
-    $self->_make_parent_dir($self->path_stderr_file);
-    $self->_make_parent_dir($self->path_log4perl_conf);
-}
-
 sub create {
     my ($self) = @_;
 
-    $self->make_dirs;
+    $self->_make_dir($self->path_config_dir);
+    $self->_make_parent_dir($self->path_log_file);
 
     # default test config
-    $self->add_config("system.crypto"   => $self->yaml_crypto);
     $self->add_config("system.database" => $self->yaml_database);
-    $self->add_config("system.realms"   => $self->yaml_realms);
-    $self->add_config("system.server"   => $self->yaml_server);
-    $self->add_config("system.watchdog" => $self->yaml_watchdog);
 
-    for my $realm (@{$self->realms}) {
+    for my $realm (qw( alpha beta gamma )) {
         $self->add_realm_config($realm, "auth", $self->_realm_auth);
         $self->add_realm_config($realm, "crypto", $self->_realm_crypto($realm));
         $self->add_realm_config($realm, "workflow.persister", $self->yaml_workflow_persister);
@@ -255,9 +219,11 @@ sub create {
     }
 
     # user specified config data (might overwrite default configs)
-    for my $key ($self->get_user_config_keys) {
-        $self->add_config($key => $self->get_user_config_node($key));
-    }
+    $self->_map_user_config(sub { $self->add_config($_->[0] => $_->[1]) });
+
+    # this should be the last config setting as get_realms() needs to see all
+    # defined realms (our configs and user (or role) supplied configs)
+    $self->add_config("system.realms.$_" => $self->yaml_realms->{$_}) for @{$self->get_realms};
 
     # write all config files
     for my $level1 (sort keys %{$self->_config}) {
@@ -266,8 +232,6 @@ sub create {
             $self->write_yaml($filepath, $self->_config->{$level1}->{$level2});
         }
     }
-    # write Log4perl config
-    $self->write_str($self->path_log4perl_conf, $self->conf_log4perl);
 
     $self->is_written(1);
 }
@@ -333,7 +297,17 @@ sub _build_crypto {
     };
 }
 
-sub _build_realms {
+=head2 get_realms
+
+Returns an ArrayRef with all realm names defined by default, by roles or user.
+
+=cut
+sub get_realms {
+    my ($self) = @_;
+    return [ keys %{ $self->_config->{realm} } ];
+}
+
+sub yaml_realms {
     my ($self) = @_;
 
     my $i = 0;
@@ -343,83 +317,11 @@ sub _build_realms {
             $i++;
             $_ => {
                 label => uc($_)." test realm",
-                baseurl => "http://127.0.0.1:808$i/openxpki/",
-                description => "This is the realm description #$i",
+                baseurl => sprintf("http://127.0.0.1:%i/openxpki/", 8080+$i),
+                description => "Realm description #$i",
             }
         }
-        @{$self->realms}
-    };
-}
-
-sub _build_server {
-    my ($self) = @_;
-    return {
-        # Shown in the processlist to distinguish multiple instances
-        name => "oxi-test",
-        # this is the former server_id/server_shift from the database config
-        shift => 8,
-        node => {
-            id =>  0,
-        },
-        # Location of the log4perl configuration
-        log4perl => $self->path_log4perl_conf,
-        # Daemon settings
-        user        => $self->system_user,
-        group       => $self->system_group,
-        socket_file => $self->path_socket_file,
-        pid_file    => $self->path_pid_file,
-        stderr      => $self->path_stderr_file,
-        tmpdir      => $self->path_temp_dir,
-        #environment => {
-        #    key => value,
-        #}
-        # Session
-        session => {
-            type => "Database",
-            lifetime    => 600,
-        },
-        # Which transport to initialize
-        transport => {
-            Simple => 1,
-        },
-        # Which services to initialize
-        service => {
-            Default => {
-                enabled => 1,
-                timeout => 120,
-            },
-            SCEP => {
-                enabled => 1,
-            },
-        },
-        # settings for i18n
-        i18n => {
-            locale_directory => "/usr/share/locale",
-            default_language => "C",
-        },
-        # Dataexhange directories - might be wise to have this per realm?
-        data_exchange => {
-            export => $self->path_export_dir,
-            import => $self->path_import_dir,
-        },
-    };
-}
-
-sub _build_watchdog {
-    my ($self) = @_;
-    return {
-        max_fork_redo => 5,
-        max_exception_threshhold => 10,
-        interval_sleep_exception => 1,
-        max_tries_hanging_workflows =>  3,
-
-        interval_wait_initial => 1,
-        interval_loop_idle => 1,
-        interval_loop_run => 1,
-
-        # You should not change this unless you know what you are doing
-        max_instance_count => 1,
-        disabled => $self->start_watchdog ? 0 : 1,
+        @{$self->get_realms}
     };
 }
 
@@ -577,33 +479,6 @@ sub _build_workflow_persister {
             class           => "OpenXPKI::Server::Workflow::Persister::Null",
         },
     };
-}
-
-sub _build_log4perl {
-    my ($self) = @_;
-
-    my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
-    my $logfile = $self->path_log_file;
-
-    return qq(
-        log4perl.category.openxpki.auth         = DEBUG, Screen, DBI
-        log4perl.category.openxpki.audit        = DEBUG, Screen, DBI
-        log4perl.category.openxpki.system       = DEBUG, Screen
-        log4perl.category.openxpki.workflow     = DEBUG, Screen
-        log4perl.category.openxpki.application  = DEBUG, Screen, DBI
-        log4perl.category.openxpki.deprecated   = WARN,  Screen
-        log4perl.category.connector             = WARN, Screen
-
-        log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
-        log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = # %d %c %p %m [pid=%P|%i]%n
-        log4perl.appender.Screen.Threshold      = $threshold_screen
-
-        log4perl.appender.DBI                   = OpenXPKI::Server::Log::Appender::DBI
-        log4perl.appender.DBI.layout            = Log::Log4perl::Layout::NoopLayout
-        log4perl.appender.DBI.warp_message      = 0
-        log4perl.appender.DBI.Threshold         = INFO
-    );
 }
 
 sub _build_crl_default {

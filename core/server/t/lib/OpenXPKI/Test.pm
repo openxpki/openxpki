@@ -19,9 +19,13 @@ To quickly initialize the default test environment and server:
     $oxitest->setup_env->init_server;
     # we now have CTX('config'), CTX('log'), CTX('dbi'), CTX('api') and CTX('session')
 
-Or you might want to add some custom workflow config:
+Or you might want to add test functionality by applying Moose roles:
 
-    my $oxitest = OpenXPKI::Test->new(with_workflows => 1);
+    # apply Moose role OpenXPKI::Test::QA::Role::Workflows to OpenXPKI::Test
+    my $oxitest = OpenXPKI::Test->new(with => "Workflows");
+
+    # now there is an additional method C<workflow_config> and you can also
+    # access CTX('workflow_factory')
     $oxitest->workflow_config("alpha", wf_type_1 => {
         'head' => {
             'label' => 'Perfect workflow',
@@ -37,18 +41,21 @@ Or you might want to add some custom workflow config:
     );
     $oxitest->setup_env;
     $oxitest->init_server;
-    # we now have CTX('workflow_factory') besides the default ones
 
 =cut
 
 # Core modules
 use Data::Dumper;
 use File::Temp qw( tempdir );
+use Module::Load qw( autoload );
 
 # CPAN modules
 use Moose::Exporter;
 use Moose::Util;
+use Moose::Meta::Class;
 use Log::Log4perl qw(:easy);
+use Log::Log4perl::Appender;
+use Log::Log4perl::Filter::MDC;
 use Moose::Util::TypeConstraints;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 
@@ -61,11 +68,13 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
-use OpenXPKI::Test::Role::WithWorkflows;
 
 Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],
 );
+
+subtype 'TolerantArrayRef', as 'ArrayRef[Any]';
+coerce 'TolerantArrayRef', from 'Str', via { [ $_ ] };
 
 =head1 DESCRIPTION
 
@@ -87,8 +96,6 @@ by setting C<force_test_db =E<gt> 1>.
 
 If no database parameters are found anywhere it dies with an error.
 
-=cut
-
 =head1 METHODS
 
 =head2 new
@@ -98,6 +105,85 @@ Constructor.
 B<Parameters> (these are object attributes and can be accesses as such)
 
 =over
+
+=item * I<with> (optional) - Scalar or ArrayRef containing the full package or
+last part of Moose roles to apply.
+
+Enhances this test object (test server) with additional behaviour. Technically
+Moose roles are applied to C<OpenXPKI::Test>.
+
+For each given string C<NAME> the following packages are tried for Moose role
+application: C<NAME> (unmodified string), C<OpenXPKI::Test::Role::NAME>,
+C<OpenXPKI::Test::QA::Role::NAME>
+
+Currently the following names might be specified:
+
+For unit tests below I<core/server/t/>:
+
+=over
+
+=item * C<Workflows> (or L<OpenXPKI::Test::QA::Role::Workflows>)
+
+=back
+
+For complex QA tests below I<qatest/>:
+
+=over
+
+=item * C<SampleConfig> (or L<OpenXPKI::Test::QA::Role::SampleConfig>)
+
+=back
+
+=item * I<add_config> (optional) - HashRef with additional configuration entries
+that complement or replace the default config.
+
+Keys are the dot separated configuration paths, values are HashRefs with the
+actual configuration data that will be converted into YAML and stored on disk.
+
+Example:
+
+    OpenXPKI::Test->new(
+        add_config => {
+            "realm.alpha.auth.handler.Signature" => {
+                realm => [ "alpha" ],
+                cacert => [ "MyCertId" ],
+            }
+        }
+    );
+
+This would write the following content into I<etc/openxpki/config.d/realm/alpha.yaml>
+(below C<$oxitest-E<gt>testenv_root>):
+
+    ...
+    Signature
+      realm:
+        - alpha
+      cacert:
+        - MyCertId
+    ...
+
+=cut
+has add_config => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { {} },
+);
+
+=item * I<also_init> (optional) - ArrayRef (or Str) of additional init tasks
+that the OpenXPKI server shall perform.
+
+You have to make sure (e.g. by adding additional config entries) that the
+prerequisites for each task are met.
+
+=cut
+has also_init => (
+    is => 'rw',
+    isa => 'TolerantArrayRef',
+    lazy => 1,
+    coerce => 1,
+    default => sub { [] },
+);
 
 =item * I<db_conf> (optional) - Database configuration (I<HashRef>).
 
@@ -131,7 +217,6 @@ has dbi => (
     builder => '_build_dbi',
 );
 
-
 =item * I<force_test_db> - Set to 1 to prevent the try to read database config
 from existing configuration file and only read it from environment variables
 C<$ENV{OXI_TEST_DB_MYSQL_XXX}>.
@@ -156,29 +241,6 @@ has testenv_root => (
     default => sub { scalar(tempdir( CLEANUP => 1 )) },
 );
 
-=item * I<start_watchdog> (optional) - Set to 1 to start the watchdog when the
-test server starts up. Default: 0
-
-=cut
-has start_watchdog => (
-    is => 'rw',
-    isa => 'Int',
-    lazy => 1,
-    default => 0,
-);
-
-=item * I<with_workflows> (optional) - Set to 1 to be able to create workflows
-(also inserts some standard workflows, see L<OpenXPKI::Test::CertHelper::Workflow>).
-Default: 0
-
-=cut
-has with_workflows => (
-    is => 'rw',
-    isa => 'Bool',
-    lazy => 1,
-    default => 0,
-);
-
 =item * I<log_level> (optional) - L<Log::Log4Perl> log level for screen output.
 This is only relevant if C<$ENV{TEST_VERBOSE}> is set, i.e. user calls C<prove -v ...>.
 Otherwise logging will be disabled anyway. Default: WARN
@@ -190,27 +252,7 @@ has log_level => (
     default => "WARN",
 );
 
-=item * I<with_workflows> (optional) - Prepares the test server to be able to
-execute workflows, also installs some helper methods for tests. Technically
-the role L<OpenXPKI::Test::Role::WithWorkflows> is applied to C<OpenXPKI::Test>
-so see there for more details.
-
-=cut
-
 =back
-
-=cut
-
-has default_tasks => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    lazy => 1,
-    builder => '_build_default_tasks',
-);
-
-sub _build_default_tasks {
-    return [ qw( config_versioned log dbi_log dbi api authentication ) ];
-}
 
 =head2 certhelper_database
 
@@ -239,12 +281,10 @@ has config_writer => (
         OpenXPKI::Test::ConfigWriter->new(
             basedir => $self->testenv_root,
             db_conf => $self->db_conf,
-            start_watchdog => $self->start_watchdog,
             log_level => $self->log_level,
         )
     },
 );
-
 
 =head2 session
 
@@ -256,10 +296,11 @@ has session => (
     is => 'rw',
     isa => 'Object',
     init_arg => undef,
+    predicate => 'has_session',
 );
 
-# Flag whether setup_env was called
-has _env_initialized => ( is => 'rw', isa => 'Bool', default => 0, init_arg => undef );
+has path_log4perl_conf => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
+has conf_log4perl   => ( is => 'rw', isa => 'Str',    lazy => 1, builder => "_build_log4perl" );
 
 
 around BUILDARGS => sub {
@@ -269,201 +310,215 @@ around BUILDARGS => sub {
 
     if (@args % 2 == 0) {
         my %arg_hash = @args;
-        if (delete $arg_hash{with_workflows}) {
-            Moose::Util::apply_all_roles($class, "OpenXPKI::Test::Role::WithWorkflows");
+
+        if (my $roles = delete $arg_hash{with}) {
+            die "Parameter 'with' must be a Scalar or an ArrayRef of role names" if (ref $roles and ref $roles ne 'ARRAY');
+            $roles = [ $roles ] if not ref $roles;
+            for my $shortname (@$roles) {
+                my $role;
+                # Try loading the role with given name and below both test namespaces
+                for my $namespace ("", "OpenXPKI::Test::Role::", "OpenXPKI::Test::QA::Role::") {
+                    my $p = "${namespace}${shortname}";
+                    # if package is not found, autoload() dies and eval() returns
+                    eval { autoload $p };
+                    if (not $@) { $role = $p; last }
+                }
+                die "Could not find test class role '$shortname'" unless $role;
+                Moose::Util::apply_all_roles($class, $role);
+            }
         }
         @args = %arg_hash;
     }
     return $class->$orig(@args);
 };
 
+sub BUILD {
+    my $self = shift;
+    $self->init_logging;
+    $self->init_base_config;
+    $self->init_additional_config;
+    $self->write_config;
+    $self->init_server;
+    # Set PKI realm if not already set (e.g. by a role)
+    # ($self->session might not be set if a role modifes init_server)
+    $self->session->data->pki_realm("alpha")
+      if ($self->has_session and not $self->session->data->pki_realm);
+}
 
-=head2 setup_env
-
-Set up the test environment.
-
-=over
-
-=item * reads the database configuration,
-
-=item * creates a temporary directory with YAML configuration files,
-
-=back
-
-=cut
-sub setup_env {
+sub _build_log4perl {
     my ($self) = @_;
 
-    # Init Log4perl
-    $self->_init_screen_log;
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
 
-    # Write configuration YAML files
+    return qq(
+        log4perl.category.openxpki.auth         = DEBUG, Screen
+        log4perl.category.openxpki.audit        = DEBUG, Screen
+        log4perl.category.openxpki.system       = DEBUG, Screen
+        log4perl.category.openxpki.workflow     = DEBUG, Screen
+        log4perl.category.openxpki.application  = DEBUG, Screen
+        log4perl.category.openxpki.deprecated   = WARN,  Screen
+        log4perl.category.connector             = WARN,  Screen
+
+        log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
+        log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Screen.layout.ConversionPattern = # %d %c %p %m [pid=%P|%i]%n
+        log4perl.appender.Screen.Threshold      = $threshold_screen
+    );
+}
+
+# while testing we do not log to database by default
+=head2 enable_workflow_log
+
+Enables writing of workflow related log entries into the database. This allows
+e.g. for querying the workflow log.
+
+Per default when using this test class there is only screen logging.
+
+=cut
+sub enable_workflow_log {
+    my ($self) = @_;
+
+    my $appender = Log::Log4perl::Appender->new(
+        "OpenXPKI::Server::Log::Appender::Database",
+        layout   => Log::Log4perl::Layout::PatternLayout->new("%m (%X{user}"),
+        table => "application_log",
+        microseconds => 1,
+    );
+    $appender->filter(Log::Log4perl::Filter::MDC->new(
+        KeyToMatch    => "wfid",
+        RegexToMatch  => '\d+',
+    ));
+    Log::Log4perl->get_logger("openxpki.application")->add_appender($appender);
+}
+
+=head2 init_logging
+
+Basic test setup: logging.
+
+=cut
+sub init_logging {
+    my ($self) = @_;
+    Log::Log4perl->init( \($self->conf_log4perl) );
+}
+
+=head2 init_base_config
+
+Basic test setup: pass base config entries to L<OpenXPKI::Test::ConfigWriter>.
+
+This is the standard hook for roles to add configuration entries:
+
+    after 'init_base_config' => sub {
+        my $self = shift;
+
+        # do not overwrite existing node (e.g. inserted by OpenXPKI::Test::QA::Role::SampleConfig)
+        if (not $self->config_writer->get_config_node("a.b.c", 1)) {
+            $self->config_writer->add_user_config(
+                "a.b.c" => {
+                    key   => "value",
+                },
+            );
+        }
+    };
+
+=cut
+sub init_base_config {
+    my ($self) = @_;
+    $self->config_writer->add_user_config(
+        "system.server" => {
+            session => {
+                type => "Database",
+                lifetime => "1200",
+            },
+            log4perl => $self->path_log4perl_conf,
+        },
+    );
+}
+
+=head2 init_additional_config
+
+Basic test setup: pass additional config entries (supplied via constructor
+parameter C<add_config>) to L<OpenXPKI::Test::ConfigWriter>.
+
+This method does mainly exist to provide a hook for roles (to be extended e.g. via
+C<after 'init_additional_config' =E<gt> sub { ... }>.
+
+=cut
+sub init_additional_config {
+    my ($self) = @_;
+    for (keys %{ $self->add_config }) {
+        $self->config_writer->add_user_config($_ => $self->add_config->{$_});
+    }
+}
+
+=head2 write_config
+
+Write test configuration to disk (temporary directory).
+
+=cut
+sub write_config {
+    my ($self) = @_;
+
+    # write configuration YAML files
     $self->config_writer->create;
 
-    # Store private key files in temp env/dir
+    # write Log4perl config: it's OK to do this late because we already initialize Log4perl in init_logging()
+    $self->config_writer->write_str($self->path_log4perl_conf, $self->conf_log4perl);
+
+    # store private key files in temp env/dir
     # TODO This is hackish, OpenXPKI::Test::CertHelper::Database needs to store infos about realms as well (be authoritative source about realms/certs for tests)
     for my $alias (keys %{ $self->certhelper_database->private_keys }) {
         my $realm = (split("-", $alias))[0]; die "Could not extract realm from alias $alias" unless $realm;
         $self->config_writer->write_private_key($realm, $alias, $self->certhelper_database->private_keys->{$alias});
     }
 
-    # Create base directory for test configuration
-    $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d"; # so OpenXPKI::Config will access our config from now on
-
-    $self->_env_initialized(1);
+    # set test config dir in ENV so OpenXPKI::Config will access it from now on
+    $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d";
 
     return $self;
 }
 
 =head2 init_server
 
-Initializes the basic context objects:
+Initializes the basic server context objects:
 
     C<CTX('config')>
     C<CTX('log')>
     C<CTX('dbi')>
     C<CTX('api')>
+    C<CTX('api2')>
     C<CTX('session')>
-
-Note that C<CTX('session')-E<gt>data-E<gt>pki_realm> will return the first realm
-specified in L<OpenXPKI::Test::ConfigWriter/realms>.
-
-B<Parameters>
-
-=over
-
-=item * I<@additional_tasks> (optional) - list of additional server tasks to
-intialize (they will be passed on to L<OpenXPKI::Server::Init/init>).
-
-=back
+    C<CTX('authentication')>
 
 =cut
 sub init_server {
-    my ($self, @additional_tasks) = @_;
-
-    die "setup_env() must be called before init_server()" unless $self->_env_initialized;
+    my ($self) = @_;
 
     # Init basic CTX objects
-    my @tasks = @{ $self->default_tasks };
+    my @tasks = qw( config_versioned log dbi_log dbi api2 api authentication );
     my %task_hash = map { $_ => 1 } @tasks;
-    push @tasks, grep { not $task_hash{$_} } @additional_tasks; # more tasks requested via parameter
+    # add tasks requested via constructor parameter "also_init" (or injected by roles)
+    for (grep { not $task_hash{$_} } @{ $self->also_init }) {
+        push @tasks, $_;
+        $task_hash{$_} = 1; # prevent duplicate tasks in "also_init"
+    }
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
+
+    # Set fake notification object
+    OpenXPKI::Server::Context::setcontext({
+        'notification' =>
+            Moose::Meta::Class->create('OpenXPKI::Test::AnonymousClass::Notification::Mockup' => (
+                methods => {
+                    notify => sub { },
+                },
+            ))->new_object
+    });
 
     # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
     $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
     OpenXPKI::Server::Context::setcontext({'session' => $self->session, force => 1});
-    # set PKI realm after init() as various init procedures overwrite the realm
-    $self->session->data->pki_realm($self->config_writer->realms->[0]);
 
     return $self;
 }
-
-
-=head2 realm_config
-
-Add another YAML configuration file for the given realm and reload server
-config C<CTX('config')>.
-
-Example:
-
-    $oxitest->realm_config(
-        "alpha",
-        "auth.handler.Signature" => {
-            realm => [ "alpha" ],
-            cacert => [ "MyCertId" ],
-        }
-    );
-
-This would write the following content into I<etc/openxpki/config.d/realm/alpha.yaml>
-(below C<$oxitest-E<gt>testenv_root>):
-
-    ...
-    Signature
-      realm:
-        - alpha
-      cacert:
-        - MyCertId
-    ...
-
-B<Parameters>
-
-=over
-
-=item * I<$realm> - PKI realm
-
-=item * I<$config_path> - dot separated config path below C<realm.xxx> where
-to store the configuration
-
-=item * I<$yaml_hash> - I<HashRef> with configuration data that will be
-converted into YAML and stored on disk
-
-=back
-
-=cut
-sub realm_config {
-    my ($self, $realm, $config_relpath, $yaml_hash) = @_;
-    my $config_path = "realm.$realm.$config_relpath";
-    $self->config_writer->add_user_config($config_path => $yaml_hash);
-}
-
-=head2 workflow_config
-
-Add a workflow definition and reload server config C<CTX('config')>.
-
-Example:
-
-    $oxitest->workflow_config(
-        "alpha",
-        set_motd => {
-            head => {
-                prefix    => "motd",
-                persister => "Volatile",
-                label     => "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL",
-            },
-            state => {
-                INITIAL => {
-                    ...
-                },
-            },
-            ....
-        },
-    );
-
-This would write the following content into
-I<etc/openxpki/config.d/realm/alpha.yaml> (below
-C<$oxitest-E<gt>testenv_root>):
-
-    ...
-    def:
-      set_motd:
-        head:
-          prefix: motd
-          persister: Volatile
-          label: I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL
-
-        state:
-          INITIAL:
-    ...
-
-B<Parameters>
-
-=over
-
-=item * I<$realm> - PKI realm
-
-=item * I<$name> - name of the workflow to be added below C<realm.xxx.workflow.def>
-
-=item * I<$yaml_hash> - I<HashRef> with configuration data that will be
-converted into YAML and stored on disk
-
-=back
-
-=cut
-sub workflow_config {
-    my ($self, $realm, $name, $yaml_hash) = @_;
-    $self->realm_config($realm, "workflow.def.$name" => $yaml_hash);
-}
-
 
 =head2 get_config
 
@@ -501,17 +556,6 @@ config key is not found
 sub get_config {
     my ($self, $config_key, $allow_undef) = @_;
     $self->config_writer->get_config_node($config_key, $allow_undef);
-}
-
-=head2 get_default_realm
-
-Returns the name of the default realm in the test environment that can be used
-in test code.
-
-=cut
-sub get_default_realm {
-    my ($self) = @_;
-    return $self->config_writer->realms->[0];
 }
 
 =head2 insert_testcerts
@@ -627,31 +671,6 @@ sub _db_config_from_env {
         passwd  => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
 
     };
-}
-
-sub _init_screen_log {
-    my ($self) = @_;
-
-    my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'ERROR';
-    Log::Log4perl->init(
-        \qq(
-            # Catch-all root logger
-            log4perl.rootLogger = ERROR, Screen
-
-            log4perl.category.openxpki.auth = INFO, Screen
-            log4perl.category.openxpki.audit = INFO, Screen
-            log4perl.category.openxpki.monitor = INFO, Screen
-            log4perl.category.openxpki.system = INFO, Screen
-            log4perl.category.openxpki.workflow = INFO, Screen
-            log4perl.category.openxpki.application = INFO, Screen
-            log4perl.category.connector = INFO, Screen
-
-            log4perl.appender.Screen          = Log::Log4perl::Appender::Screen
-            log4perl.appender.Screen.layout   = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.Screen.layout.ConversionPattern = %d %c.%p %m%n
-            log4perl.appender.Screen.Threshold = $threshold_screen
-        )
-    );
 }
 
 1;

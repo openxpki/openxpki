@@ -209,7 +209,7 @@ set_entry_ok { KEY => "pill-99", VALUE => "green", ENCRYPT => 1 },
     "Encrypted: store entry";
 
 # Clear secrets cache
-my $oxitest = OpenXPKI::Test->new;
+my $oxitest = OpenXPKI::Test->new(with => "CryptoLayer");
 my $dbi = $oxitest->dbi;
 # helper init already empties table "secret", but we want to play safe
 $dbi->start_txn;
@@ -241,8 +241,6 @@ package OpenXPKI::Server::Workflow::Test::DataPool;
 
 use Test::Exception;
 use OpenXPKI::Test; # to import CTX into this package
-
-$oxitest->setup_env->init_server('crypto_layer');
 
 # Try accessing another PKI realm from within OpenXPKI::Server::Workflow namespace
 throws_ok {
