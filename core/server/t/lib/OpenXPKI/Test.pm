@@ -346,11 +346,33 @@ sub BUILD {
 }
 
 sub _build_log4perl {
+    my ($self, $is_early_init) = @_;
+
+    # special behaviour CI environments: log to file
+    # (detects Travis CI/CircleCI/Gitlab CI/Appveyor/CodeShip + Jenkins/TeamCity)
+    if ($ENV{CI} or $ENV{BUILD_NUMBER}) {
+        my $logfile = $self->config_writer->path_log_file;
+        return qq(
+            log4perl.rootLogger = INFO, CatchAll
+            log4perl.category.Workflow = OFF
+            log4perl.appender.CatchAll = Log::Log4perl::Appender::File
+            log4perl.appender.CatchAll.filename = $logfile
+            log4perl.appender.CatchAll.layout = Log::Log4perl::Layout::PatternLayout
+            log4perl.appender.CatchAll.layout.ConversionPattern = %d %c.%p %m [pid=%P|%i]%n
+            log4perl.appender.CatchAll.syswrite  = 1
+            log4perl.appender.CatchAll.utf8 = 1
+        );
+    }
+    # default: only log to screen
+    return $self->_log4perl_screen;
+}
+
+sub _log4perl_screen {
     my ($self) = @_;
 
     my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
-
     return qq(
+        log4perl.rootLogger                     = INFO,  Screen
         log4perl.category.openxpki.auth         = DEBUG, Screen
         log4perl.category.openxpki.audit        = DEBUG, Screen
         log4perl.category.openxpki.system       = DEBUG, Screen
@@ -358,6 +380,7 @@ sub _build_log4perl {
         log4perl.category.openxpki.application  = DEBUG, Screen
         log4perl.category.openxpki.deprecated   = WARN,  Screen
         log4perl.category.connector             = WARN,  Screen
+        log4perl.category.Workflow              = OFF
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
@@ -398,7 +421,7 @@ Basic test setup: logging.
 =cut
 sub init_logging {
     my ($self) = @_;
-    Log::Log4perl->init( \($self->conf_log4perl) );
+    Log::Log4perl->init( \($self->_log4perl_screen) );
 }
 
 =head2 init_base_config
