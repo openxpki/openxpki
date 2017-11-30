@@ -23,6 +23,8 @@ use FindBin qw( $Bin );
 use YAML::Tiny;
 
 
+requires "testenv_root";
+
 
 =head1 CONSTRUCTOR ENHANCEMENTS
 
@@ -57,18 +59,18 @@ has default_realm => (
 );
 
 has src_config_dir   => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my(undef, $mydir, undef) = fileparse(__FILE__); abs_path($mydir."../../../../../../config/openxpki/config.d"); } );
-has path_temp_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/tmp" } );
-has path_export_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/openxpki/dataexchange/export" } );
-has path_import_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/openxpki/dataexchange/import" } );
-has path_socket_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/openxpki/openxpki.socket" } );
-has path_pid_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/run/openxpkid.pid" } );
-has path_stderr_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->config_writer->basedir."/var/log/openxpki/stderr.log" } );
+has path_temp_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/tmp" } );
+has path_export_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/export" } );
+has path_import_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/import" } );
+has path_socket_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/openxpki.socket" } );
+has path_pid_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/run/openxpkid.pid" } );
+has path_stderr_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" } );
 
 after 'init_base_config' => sub { # happens before init_additional_config() so we do not overwrite more specific configs of other roles
     my $self = shift;
 
     my(undef, $mydir, undef) = fileparse(__FILE__);
-    my $config_dir = abs_path($mydir."../../../../../../config/openxpki/config.d");
+    my $config_dir = abs_path($mydir."/../../../../../../config/openxpki/config.d");
     die "Could not find OpenXPKI sample config dir" unless -d $config_dir;
 
     my $config = $self->config_writer;
