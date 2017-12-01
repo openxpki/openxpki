@@ -3,64 +3,44 @@ use strict;
 use warnings;
 
 # Core modules
-use Carp;
-use English;
-use Data::Dumper;
-use File::Basename;
 use FindBin qw( $Bin );
 
 # CPAN modules
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
 use Test::More;
 use Test::Deep;
 
 # Project modules
 use lib "$Bin/../../lib";
-use TestCfg;
-use OpenXPKI::Test::QA::More;
-use OpenXPKI::Test::QA::CertHelper;
+use lib "$Bin/../../../core/server/t/lib";
+use OpenXPKI::Test;
 
-#
-# Init client
-#
-our $cfg = {};
-TestCfg->new->read_config_path( 'api.cfg', $cfg, dirname($0) );
 
-my $test = OpenXPKI::Test::QA::More->new({
-    socketfile => $cfg->{instance}{socketfile},
-    realm => $cfg->{instance}{realm},
-}) or die "Error creating new test instance: $@";
 
-$test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 5 );
-
-$test->connect_ok(
-    user => $cfg->{operator}{name},
-    password => $cfg->{operator}{password},
-) or die "Error - connect failed: $@";
-
-#
-# Tests
-#
+# Init server
+my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server Workflows WorkflowCreateCert ) ]);
 
 # Create test certificates
-OpenXPKI::Test::QA::CertHelper->via_workflow(
-    tester => $test,
-    hostname => "127.0.0.1",
+$oxitest->create_cert(
     profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    hostname => "127.0.0.1",
 );
-OpenXPKI::Test::QA::CertHelper->via_workflow(
-    tester => $test,
+$oxitest->create_cert(
+    profile => "I18N_OPENXPKI_PROFILE_TLS_CLIENT",
     hostname => "127.0.0.1",
     application_name => "Joust",
-    profile => "I18N_OPENXPKI_PROFILE_TLS_CLIENT",
 );
 
-$test->runcmd_ok('list_used_profiles')
-    or die Dumper($test->get_msg);
+# Init client
+my $client = $oxitest->new_client_tester;
+$client->connect;
+$client->init_session;
+$client->login("caop");
 
-cmp_deeply $test->get_msg->{PARAMS}, superbagof(
+my $result = $client->send_command_ok('list_used_profiles');
+
+cmp_deeply $result, superbagof(
     superhashof( { value => "I18N_OPENXPKI_PROFILE_TLS_SERVER" } ),
     superhashof( { value => "I18N_OPENXPKI_PROFILE_TLS_CLIENT" } ),
 ), "Show expected profiles";
+
+done_testing;
