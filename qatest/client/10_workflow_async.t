@@ -93,18 +93,13 @@ $tester->connect;
 $tester->init_session;
 $tester->login("caop");
 
-sub send_command {
-    my ($command, $args) = @_;
-    return $tester->send_ok('COMMAND', { COMMAND => $command, PARAMS => $args });
-}
-
 sub wait_for_proc_state {
     my ($wfid, $state_regex) = @_;
     my $testname = "Waiting for workflow state $state_regex";
     my $result;
     my $count = 0;
-    while ($count++ < 10) {
-        $result = send_command "search_workflow_instances" => { SERIAL => [ $wfid ] };
+    while ($count++ < 20) {
+        $result = $tester->send_command_ok("search_workflow_instances" => { SERIAL => [ $wfid ] });
         # no workflow found?
         if ($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'} != $wfid) {
             diag "Workflow with ID $wfid not found!";
@@ -123,11 +118,11 @@ sub wait_for_proc_state {
 }
 my $result;
 
-lives_ok {
-    $result = send_command "create_workflow_instance" => {
+lives_and {
+    $result = $tester->send_command_ok("create_workflow_instance" => {
         WORKFLOW => "wf_type_1",
         PARAMS => {},
-    };
+    });
 } "create_workflow_instance()";
 
 my $wf_t1_a = $result->{WORKFLOW};
@@ -151,7 +146,7 @@ cmp_deeply $result, [ superhashof({
 # get_workflow_info - check action results
 #
 lives_and {
-    $result = send_command "get_workflow_info" => { ID => $wf_t1_a->{ID} };
+    $result = $tester->send_command_ok("get_workflow_info" => { ID => $wf_t1_a->{ID} });
     cmp_deeply $result->{WORKFLOW}->{CONTEXT}->{is_13_prime}, 1;
 } "Workflow action returns correct result";
 
@@ -159,7 +154,7 @@ lives_and {
 # get_workflow_history - check correct execution history
 #
 lives_and {
-    $result = send_command "get_workflow_history" => { ID => $wf_t1_a->{ID} };
+    $result = $tester->send_command_ok("get_workflow_history" => { ID => $wf_t1_a->{ID} });
     cmp_deeply $result, [
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/create/i) }),
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/initialize/i) }),

@@ -118,6 +118,11 @@ sub send_ok {
     return $self->response->{PARAMS};
 }
 
+sub send_command_ok {
+    my ($self, $command, $args) = @_;
+    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $args });
+}
+
 sub is_service_msg {
     my ($self, $msg) = @_;
     return unless $self->response;
