@@ -33,6 +33,7 @@ requires 'also_init';
 requires 'default_realm'; # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
                           # we can't use with '...' because if other roles also said that then it would be applied more than once
 requires 'api_command';   # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
+requires 'session';
 
 
 before 'init_server' => sub {
@@ -47,17 +48,20 @@ This role adds the following methods to L<OpenXPKI::Test>:
 
 =head2 create_cert
 
-Runs a L<subtest|Test::More/subtest> that creates a certificate via workflow
-I<certificate_signing_request_v2> (which is part of this role) and returns a
-I<HashRef> with some certificate info.
+Runs a L<subtest|Test::More/subtest> that creates a certificate via API by
+starting the workflow I<certificate_signing_request_v2>.
 
-Returned I<HashRef>:
+Returns a I<HashRef> with some certificate info:
 
     {
         req_key    => ...,
         identifier => ...,
         profile    => ...,
     }
+
+Please note that if used in conjunction with L<OpenXPKI::Test::QA::Role::Server>
+the workflow is still directly created by accessing the API methods, i.e. there
+is NO socket communication to the running server daemon.
 
 =cut
 sub create_cert {
