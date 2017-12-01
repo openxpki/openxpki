@@ -121,6 +121,9 @@ around 'init_server' => sub {
     my $orig = shift;
     my $self = shift;
 
+    # prepend to existing array in case a user supplied "also_init" needs our modules
+    unshift @{ $self->also_init }, 'crypto_layer';
+
     # fork server process
     note "Starting test server...";
 
