@@ -149,10 +149,16 @@ around 'init_server' => sub {
     my $parentpid = $self->daemon->Init;
     die "Error forking client process which should start OpenXPKI" unless defined $parentpid;
 
-    # Proc::Daemon child ...
+    # Proc::Daemon child (forked server)...
     unless ($parentpid) {
         # start up server
-        eval { $self->_openxpki_server_start($orig) };
+        eval {
+            # init_server() must be called after Proc::Daemon->Init() because the latter
+            # closes all file handles which would cause problems with Log4perl
+            $self->$orig();                  # OpenXPKI::Test->init_server
+            $self->init_session_and_context; # this step from OpenXPKI::Test->BUILD would otherwise not be executed as this method never returns
+            $self->_start_openxpki_server($orig);
+        };
         exit;
     }
     # Proc::Daemon parent ...
@@ -184,16 +190,15 @@ around 'init_server' => sub {
     my $socket = $self->path_socket_file;
     while ($count++ < 5 and not -e $socket) { sleep 1 }
     if (not -e $socket) { $self->stop_server; die "Server startup seems to have failed" }
+
+    note "Main test process: server startup completed";
+    $self->$orig(); # to make context etc. also available to main test process
 };
 
 # Imitate OpenXPKI::Server->start()
-sub _openxpki_server_start {
+sub _start_openxpki_server {
     my ($self, $server_init_callback) = @_;
     # TODO Replace test specific server startup with OpenXPKI::Server->start() once we have a complete test env (so all context objects + watchdog will be initialized)
-
-    # init_server() must be called after Proc::Daemon->Init() because the latter
-    # closes all file handles which would cause problems with Log4perl
-    $self->$server_init_callback();
 
     OpenXPKI::Server::Watchdog->start_or_reload;
 

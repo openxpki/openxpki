@@ -339,10 +339,7 @@ sub BUILD {
     $self->init_additional_config;
     $self->write_config;
     $self->init_server;
-    # Set PKI realm if not already set (e.g. by a role)
-    # ($self->session might not be set if a role modifes init_server)
-    $self->session->data->pki_realm("alpha")
-      if ($self->has_session and not $self->session->data->pki_realm);
+    $self->init_session_and_context;
 }
 
 sub _build_log4perl {
@@ -496,8 +493,6 @@ sub write_config {
 
     # set test config dir in ENV so OpenXPKI::Config will access it from now on
     $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d";
-
-    return $self;
 }
 
 =head2 init_server
@@ -525,6 +520,19 @@ sub init_server {
         $task_hash{$_} = 1; # prevent duplicate tasks in "also_init"
     }
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
+}
+
+sub init_session_and_context {
+    my ($self) = @_;
+
+    # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
+    $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
+    OpenXPKI::Server::Context::setcontext({'session' => $self->session, force => 1});
+
+    # Set PKI realm if not already set (e.g. by a role)
+    # ($self->session might not be set if a role modifes init_server)
+    $self->session->data->pki_realm("alpha")
+      if ($self->has_session and not $self->session->data->pki_realm);
 
     # Set fake notification object
     OpenXPKI::Server::Context::setcontext({
@@ -535,12 +543,6 @@ sub init_server {
                 },
             ))->new_object
     });
-
-    # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
-    $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
-    OpenXPKI::Server::Context::setcontext({'session' => $self->session, force => 1});
-
-    return $self;
 }
 
 =head2 get_config
