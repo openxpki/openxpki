@@ -6,41 +6,93 @@ use utf8;
 
 OpenXPKI::Test - Set up an OpenXPKI test environment.
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-To only write the config files into C<$oxitest-E<gt>testenv_root."/etc/openxpki/config.d">:
+This class is the central new (as of 2017) test vehicle for OpenXPKI that sets
+up a separate test environment where all configuration data resides in a
+temporary directory C<$oxitest-E<gt>testenv_root."/etc/openxpki/config.d">.
+
+Tests in OpenXPKI are split into two groups:
+
+=over
+
+=item * I<unit tests> in C<core/server/t/> that test single classes and limited
+functionality and don't need a running server or a complete configuration.
+
+=item * I<QA tests> in C<qatest/> that need a running server or a more complete
+test configuration.
+
+=back
+
+This class can be used for both types of tests.
+
+To set up a basic test environment, just do
 
     my $oxitest = OpenXPKI::Test->new;
-    $oxitest->setup_env;
 
-To quickly initialize the default test environment and server:
+This provides the following OpenXPKI context objects:
 
-    my $oxitest = OpenXPKI::Test->new;
-    $oxitest->setup_env->init_server;
-    # we now have CTX('config'), CTX('log'), CTX('dbi'), CTX('api') and CTX('session')
+    CTX('config')
+    CTX('log')
+    CTX('dbi')
+    CTX('api')
+    CTX('api2')
+    CTX('authentication')
+    CTX('session') (in-memory)
+    CTX('notification') (mockup)
 
-Or you might want to add test functionality by applying Moose roles:
+At this point, various more complex functions (e.g. crypto operations) will not
+be available, but the test environment can be extended via:
 
-    # apply Moose role OpenXPKI::Test::QA::Role::Workflows to OpenXPKI::Test
-    my $oxitest = OpenXPKI::Test->new(with => "Workflows");
+=over
 
-    # now there is an additional method C<workflow_config> and you can also
-    # access CTX('workflow_factory')
-    $oxitest->workflow_config("alpha", wf_type_1 => {
-        'head' => {
-            'label' => 'Perfect workflow',
-            'persister' => 'OpenXPKI',
-            'prefix' => 'liar',
-        },
-        'state' => {
-            'INITIAL' => {
-                'action' => [ 'initialize > PERSIST' ],
-            },
-            ...
-        }
-    );
-    $oxitest->setup_env;
-    $oxitest->init_server;
+=item * B<additional configuration entries> (constructor parameter
+C<add_config>)
+
+=item * B<additional OpenXPKI context objects> that should be initialized
+(constructor parameter C<also_init>)
+
+=item * B<Moose roles> to apply to C<OpenXPKI::Test> that provide more complex
+extensions (constructor parameter C<with>)
+
+=back
+
+For more details, see the L<constructor documentation|/new>.
+
+=head2 Moose roles
+
+The existing roles add more complex configuration and initialization to test
+more functions. They can easily be applied by using the L<constructor|/new>
+parameter C<with>.
+
+Available Moose roles can be found at these two locations:
+
+=over
+
+=item * C<core/server/t/lib/OpenXPKI/Test/Role> (roles for unit tests and QA
+tests)
+
+=item * C<qatest/lib/OpenXPKI/Test/QA/Role/> (roles exclusively for QA tests)
+
+=back
+
+PLEASE NOTE: tests currently still use the production database but it is planned
+to use a separate SQLite DB for all tests in the future.
+
+=head2 More complex tests via Moose roles
+
+For details please see L<constructor|/new> parameter C<with>.
+
+B<Examples:>
+
+Additionally provide C<CTX('crypto_layer')>:
+
+    my $oxitest = OpenXPKI::Test->new(with => "CryptoLayer");
+
+Use default configuration shipped with OpenXPKI and start a test server (only
+available for QA tests):
+
+    my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server ) ]);
 
 =cut
 
@@ -107,32 +159,39 @@ B<Parameters> (these are object attributes and can be accesses as such)
 =over
 
 =item * I<with> (optional) - Scalar or ArrayRef containing the full package or
-last part of Moose roles to apply.
+last part of Moose roles to apply to C<OpenXPKI::Test>. Currently the
+following names might be specified:
 
-Enhances this test object (test server) with additional behaviour. Technically
-Moose roles are applied to C<OpenXPKI::Test>.
+For unit tests below I<core/server/t/> or QA tests:
+
+=over
+
+=item * L<CryptoLayer|OpenXPKI::Test::Role::CryptoLayer> - also init
+C<CTX('crypto_layer')>
+
+=back
+
+Only for QA tests below I<qatest/>:
+
+=over
+
+=item * L<SampleConfig|OpenXPKI::Test::QA::Role::SampleConfig> - use
+the complete default configuration shipped with OpenXPKI (slightly modified)
+
+=item * L<Server|OpenXPKI::Test::QA::Role::Server> - run OpenXPKI as a
+background server daemon and talk to it via client (socket)
+
+=item * L<Workflows|OpenXPKI::Test::QA::Role::Workflows> - also init
+C<CTX('workflow_factory')> and provide some helper methods
+
+=item * L<WorkflowCreateCert|OpenXPKI::Test::QA::Role::WorkflowCreateCert>
+- easily create test certificates
+
+=back
 
 For each given string C<NAME> the following packages are tried for Moose role
 application: C<NAME> (unmodified string), C<OpenXPKI::Test::Role::NAME>,
 C<OpenXPKI::Test::QA::Role::NAME>
-
-Currently the following names might be specified:
-
-For unit tests below I<core/server/t/>:
-
-=over
-
-=item * C<Workflows> (or L<OpenXPKI::Test::QA::Role::Workflows>)
-
-=back
-
-For complex QA tests below I<qatest/>:
-
-=over
-
-=item * C<SampleConfig> (or L<OpenXPKI::Test::QA::Role::SampleConfig>)
-
-=back
 
 =item * I<add_config> (optional) - HashRef with additional configuration entries
 that complement or replace the default config.
@@ -231,7 +290,7 @@ has force_test_db => (
 
 =item * I<testenv_root> (optional) - Temporary directory that serves as root
 path for the test environment (configuration files etc.). Default: newly created
-directory
+directory that will be deleted on object destruction
 
 =cut
 has testenv_root => (
@@ -459,9 +518,6 @@ sub init_base_config {
 Basic test setup: pass additional config entries (supplied via constructor
 parameter C<add_config>) to L<OpenXPKI::Test::ConfigWriter>.
 
-This method does mainly exist to provide a hook for roles (to be extended e.g. via
-C<after 'init_additional_config' =E<gt> sub { ... }>.
-
 =cut
 sub init_additional_config {
     my ($self) = @_;
@@ -504,7 +560,6 @@ Initializes the basic server context objects:
     C<CTX('dbi')>
     C<CTX('api')>
     C<CTX('api2')>
-    C<CTX('session')>
     C<CTX('authentication')>
 
 =cut
@@ -522,6 +577,19 @@ sub init_server {
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
 }
 
+=head2 init_session_and_context
+
+Basic test setup: create in-memory session (C<CTX('session')>) and a mock
+notification objection (C<CTX('notification')>).
+
+This is the standard hook for roles to modify session data, e.g.:
+
+    after 'init_session_and_context' => sub {
+        my $self = shift;
+        $self->session->data->pki_realm("ca-one") if $self->has_session;
+    };
+
+=cut
 sub init_session_and_context {
     my ($self) = @_;
 

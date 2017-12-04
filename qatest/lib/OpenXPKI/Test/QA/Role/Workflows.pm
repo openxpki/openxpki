@@ -3,8 +3,8 @@ use Moose::Role;
 
 =head1 NAME
 
-OpenXPKI::Test::QA::Role::Workflows - Moose role that extends L<OpenXPKI::Test> to
-prepare the test server for workflow execution.
+OpenXPKI::Test::QA::Role::Workflows - Moose role that extends L<OpenXPKI::Test>
+for workflow execution.
 
 =cut
 

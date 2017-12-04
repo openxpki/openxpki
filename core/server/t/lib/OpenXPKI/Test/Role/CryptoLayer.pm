@@ -6,6 +6,10 @@ use Moose::Role;
 OpenXPKI::Test::Role::CryptoLayer - Moose role that extends L<OpenXPKI::Test>
 to be able to test the crypto layer
 
+=head1 DESCRIPTION
+
+This role expects the OpenSSL binary to be available at C</usr/bin/openssl>.
+
 =cut
 
 # Core modules

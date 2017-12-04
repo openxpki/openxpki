@@ -4,7 +4,7 @@ use Moose::Role;
 =head1 NAME
 
 OpenXPKI::Test::QA::Role::Workflows - Moose role that extends L<OpenXPKI::Test>
-for workflow execution.
+with a quick way to create certificates
 
 =head1 DESCRIPTION
 
