@@ -525,18 +525,19 @@ sub init_server {
 sub init_session_and_context {
     my ($self) = @_;
 
-    # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
     $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
-    OpenXPKI::Server::Context::setcontext({'session' => $self->session, force => 1});
+    # set default PKI realm
+    $self->session->data->pki_realm("alpha");
 
-    # Set PKI realm if not already set (e.g. by a role)
-    # ($self->session might not be set if a role modifes init_server)
-    $self->session->data->pki_realm("alpha")
-      if ($self->has_session and not $self->session->data->pki_realm);
+    # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
+    OpenXPKI::Server::Context::setcontext({
+        session => $self->session,
+        force => 1,
+    });
 
     # Set fake notification object
     OpenXPKI::Server::Context::setcontext({
-        'notification' =>
+        notification =>
             Moose::Meta::Class->create('OpenXPKI::Test::AnonymousClass::Notification::Mockup' => (
                 methods => {
                     notify => sub { },

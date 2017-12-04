@@ -92,7 +92,7 @@ after 'init_base_config' => sub { # happens before init_additional_config() so w
     $self->_load_default_config("system/watchdog.yaml", $self->can('_customize_system_watchdog'));
 };
 
-after 'init_server' => sub {
+after 'init_session_and_context' => sub {
     my $self = shift;
     # set PKI realm after init() as various init procedures overwrite the realm
     $self->session->data->pki_realm("ca-one") if $self->has_session;
