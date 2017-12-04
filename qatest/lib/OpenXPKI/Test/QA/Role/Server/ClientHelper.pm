@@ -113,7 +113,7 @@ sub send_ok {
         else {
             pass;
         }
-    } ">> send $msg";
+    } ">> send $msg".($msg eq "COMMAND" ? ": ".$args->{COMMAND} : "");
 
     return $self->response->{PARAMS};
 }
