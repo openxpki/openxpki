@@ -16,11 +16,24 @@ use lib "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 39;
+plan tests => 41;
 
 
 # Init server
-my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server Workflows WorkflowCreateCert ) ]);
+my $oxitest = OpenXPKI::Test->new(
+    with => [ qw( SampleConfig Server Workflows WorkflowCreateCert ) ],
+    add_config => {
+        "realm.ca-one.profile.I18N_OPENXPKI_PROFILE_USER_HIDDEN" => {
+            label => "Blah",
+            style => {
+                "00_user_basic_style" => {
+                    label => "Blah",
+                    description => "Blah",
+                },
+            },
+        },
+    },
+);
 
 # Init client
 my $client = $oxitest->new_client_tester;
@@ -44,6 +57,19 @@ cmp_deeply $result, superhashof({
         I18N_OPENXPKI_PROFILE_USER
     )
 }), "list profiles";
+
+$result = $client->send_command_ok('get_cert_profiles' => { NOHIDE => 1 });
+cmp_deeply $result, superhashof({
+    map {
+        $_ => { label => ignore(), value => ignore() }
+    }
+    qw(
+        I18N_OPENXPKI_PROFILE_TLS_CLIENT
+        I18N_OPENXPKI_PROFILE_TLS_SERVER
+        I18N_OPENXPKI_PROFILE_USER
+        I18N_OPENXPKI_PROFILE_USER_HIDDEN
+    )
+}), "list profiles incl. hidden ones (without any UI definition)";
 
 #
 # list_used_profiles
