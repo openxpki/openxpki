@@ -45,6 +45,7 @@ has client => (
     is => 'rw',
     isa => 'OpenXPKI::Client',
     init_arg => undef,
+    predicate => 'is_connected',
 );
 
 has response => (
@@ -59,21 +60,25 @@ has response => (
 sub connect {
     my $self = shift;
 
-    my $client;
+    return if $self->is_connected;
+
     lives_ok {
         # instantiating the client means starting it as all initialization is
         # done in the constructor
-        $client = OpenXPKI::Client->new({
-            TIMEOUT => 5,
-            SOCKETFILE => $self->socket_file,
-        });
+        $self->client(
+            OpenXPKI::Client->new({
+                TIMEOUT => 5,
+                SOCKETFILE => $self->socket_file,
+            })
+        );
     } "create client instance" or BAIL_OUT "Could not create client instance";
-
-    $self->client($client);
 }
 
 sub init_session {
     my ($self, $args) = @_;
+
+    $self->connect;
+
     lives_and {
         $self->response($self->client->init_session($args));
         $self->is_next_step(($args and $args->{'SESSION_ID'}) ? "SERVICE_READY" : "GET_PKI_REALM");
@@ -82,6 +87,9 @@ sub init_session {
 
 sub login {
     my ($self, $user) = @_;
+
+    $self->init_session unless ($self->is_connected and $self->client->get_session_id);
+
     subtest "client login" => sub {
         plan tests => 6;
 
@@ -97,8 +105,8 @@ sub login {
 }
 
 sub is_next_step {
-    my ($self, $msg) = @_;
-    ok $self->is_service_msg($msg), "<< server expects $msg"
+    my ($self, $step) = @_;
+    ok $self->is_service_msg($step), "<< server expects $step"
         or diag explain $self->response;
 }
 
@@ -119,8 +127,8 @@ sub send_ok {
 }
 
 sub send_command_ok {
-    my ($self, $command, $args) = @_;
-    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $args });
+    my ($self, $command, $params) = @_;
+    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params });
 }
 
 sub is_service_msg {

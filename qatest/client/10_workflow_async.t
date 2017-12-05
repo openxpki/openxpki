@@ -89,8 +89,6 @@ my $oxitest = OpenXPKI::Test->new(
 );
 
 my $tester = $oxitest->new_client_tester;
-$tester->connect;
-$tester->init_session;
 $tester->login("caop");
 
 sub wait_for_proc_state {

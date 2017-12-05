@@ -31,8 +31,6 @@ my $oxitest = OpenXPKI::Test->new(
 # Tests
 #
 my $tester = $oxitest->new_client_tester;
-$tester->connect;
-$tester->init_session;
 $tester->login("caop");
 
 my $result = $tester->send_ok('COMMAND', { COMMAND => "get_session_info" });
@@ -44,7 +42,6 @@ $tester->client->close_connection;
 
 
 my $tester2 = $oxitest->new_client_tester;
-$tester2->connect;
 $tester2->init_session({ SESSION_ID => $session_id });
 
 
