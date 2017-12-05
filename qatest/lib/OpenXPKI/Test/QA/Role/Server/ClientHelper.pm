@@ -7,6 +7,28 @@ use utf8;
 OpenXPKI::Test::QA::Role::Server::ClientHelper - Helper functions to test
 OpenXPKI client talking to a running (test) server
 
+=head1 SYNOPSIS
+
+This class is not meant to be instantiated directly but via
+L<OpenXPKI::Test::QA::Role::Server/new_client_tester>, ie:
+
+    my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server ) ]);
+    my $client = $oxitest->new_client_tester;
+
+To automatically connect and start a new session just call L</login>:
+
+    $client = $oxitest->login("caop");
+
+This is equivalent to:
+
+    $client = $oxitest->connect;
+    $client = $oxitest->init_session;
+    $client = $oxitest->login("caop");
+
+Alternatively to continue an existing session:
+
+    $client = $oxitest->init_session({ SESSION_ID => $session_id });
+
 =cut
 
 # Core modules
@@ -18,29 +40,53 @@ use Test::Exception;
 # Project modules
 use OpenXPKI::Client;
 
-=head1 DESCRIPTION
+=head1 METHODS
+
+=head2 new
+
+Constructor.
+
+B<Parameters> (these are Moose attributes and can be accessed as such)
+
+=over
+
+=item * I<socket_file> (Str) - path to the Unix communication socket between
+server and client
 
 =cut
-
 has socket_file => (
     is => 'rw',
     does => 'Str',
     required => 1,
 );
 
+=item * I<default_realm> (Str) - default PKI realm
+
+=cut
 has default_realm => (
     is => 'rw',
     does => 'Str',
     required => 1,
 );
 
-# password for all test users
+=item * I<password> (Str) - password for all test users (for login)
+
+=cut
 has password => (
     is => 'rw',
     does => 'Str',
     required => 1,
 );
 
+=back
+
+=head1 METHODS
+
+=head2 client
+
+Returns a reference to the L<OpenXPKI::Client> object internally used.
+
+=cut
 has client => (
     is => 'rw',
     isa => 'OpenXPKI::Client',
@@ -48,13 +94,20 @@ has client => (
     predicate => 'is_connected',
 );
 
+=head2 response
+
+Returns the server response of the last command (I<Hashref>).
+
+=cut
 has response => (
     is => 'rw',
     isa => 'HashRef',
     init_arg => undef,
 );
 
-=head1 METHODS
+=head2 connect
+
+Connects to the OpenXPKI test server via socket.
 
 =cut
 sub connect {
@@ -74,6 +127,21 @@ sub connect {
     } "create client instance" or BAIL_OUT "Could not create client instance";
 }
 
+=head2 init_session
+
+Initializes a new or continues an existing client session.
+
+Automatically calls L</connect> if neccessary.
+
+B<Positional parameters>
+
+=over
+
+=item * I<$args> (HashRef) - arguments passed to L<OpenXPKI::Client/init_session>
+
+=back
+
+=cut
 sub init_session {
     my ($self, $args) = @_;
 
@@ -85,6 +153,21 @@ sub init_session {
     } "initialize client session";
 }
 
+=head2 login
+
+Asks the server to log in the given user with the authentication stack I<Test>.
+
+Automatically calls L</init_session> if neccessary.
+
+B<Positional parameters>
+
+=over
+
+=item * I<$user> (Str) - user name to log in (password is taken from C<$self-E<gt>password>)
+
+=back
+
+=cut
 sub login {
     my ($self, $user) = @_;
 
@@ -104,12 +187,43 @@ sub login {
     }
 }
 
+=head2 is_next_step
+
+Tests if the next step as returned by the server matches the given string.
+
+B<Positional parameters>
+
+=over
+
+=item * I<$step> (Str) - login workflow step
+
+=back
+
+=cut
 sub is_next_step {
     my ($self, $step) = @_;
     ok $self->is_service_msg($step), "<< server expects $step"
         or diag explain $self->response;
 }
 
+=head2 send_ok
+
+Sends the given message to the server using
+L<OpenXPKI::Client/send_receive_service_msg> and wraps that in a test.
+
+Returns the server response (I<HashRef>).
+
+B<Positional parameters>
+
+=over
+
+=item * I<$msg> (Str) - message to send to the server
+
+=item * I<$args> (HashRef) - additional arguments
+
+=back
+
+=cut
 sub send_ok {
     my ($self, $msg, $args) = @_;
     lives_and {
@@ -126,11 +240,43 @@ sub send_ok {
     return $self->response->{PARAMS};
 }
 
+=head2 send_command_ok
+
+Sends the given command (ie. message "COMMAND") to the server using and wraps
+that in a test.
+
+Returns the server response (I<HashRef>).
+
+B<Positional parameters>
+
+=over
+
+=item * I<$command> (Str) - command to send to the server
+
+=item * I<$params> (HashRef) - additional command parameters
+
+=back
+
+=cut
 sub send_command_ok {
     my ($self, $command, $params) = @_;
     return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params });
 }
 
+=head2 is_service_msg
+
+Returns TRUE if the last server response equals the given string, FALSE
+otherwise.
+
+B<Positional parameters>
+
+=over
+
+=item * I<$msg> (Str) - expected server message
+
+=back
+
+=cut
 sub is_service_msg {
     my ($self, $msg) = @_;
     return unless $self->response;
@@ -138,6 +284,11 @@ sub is_service_msg {
     return $self->response->{SERVICE_MSG} eq $msg;
 }
 
+=head2 get_error
+
+Returns the last error message from the server or UNDEF if there was none.
+
+=cut
 sub get_error {
     my $self = shift;
     if ($self->is_service_msg('ERROR')) {

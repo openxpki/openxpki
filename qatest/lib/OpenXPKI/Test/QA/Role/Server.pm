@@ -9,7 +9,7 @@ start a (forking) OpenXPKI test server.
 =head1 DESCRIPTION
 
 This role replaces L<OpenXPKI::Test/init_server> with a version that actually
-runs the server instead of just setting up the C<CTX> context objects.
+starts a server daemon instead of just setting up the C<CTX> context objects.
 
 Please note that this role requires another role to be applied:
 L<OpenXPKI::Test::QA::Role::SampleConfig>, i.e.:

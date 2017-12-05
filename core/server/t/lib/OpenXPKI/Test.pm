@@ -6,6 +6,22 @@ use utf8;
 
 OpenXPKI::Test - Set up an OpenXPKI test environment.
 
+=head1 SYNOPSIS
+
+Basic test environment:
+
+    my $oxitest = OpenXPKI::Test->new;
+
+Running OpenXPKI test server:
+
+    my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server ) ]);
+    my $client = $oxitest->new_client_tester;
+    # $client is a "OpenXPKI::Test::QA::Role::Server::ClientHelper"
+    $client->connect;
+    $client->init_session;
+    $client->login("caop");
+
+
 =head1 DESCRIPTION
 
 This class is the central new (as of 2017) test vehicle for OpenXPKI that sets
@@ -154,7 +170,7 @@ If no database parameters are found anywhere it dies with an error.
 
 Constructor.
 
-B<Parameters> (these are object attributes and can be accesses as such)
+B<Parameters> (these are Moose attributes and can be accessed as such)
 
 =over
 
