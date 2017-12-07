@@ -54,4 +54,5 @@ extensions:
         email_protection: 0
         code_signing:     0
         time_stamping:    0
+        ocsp_signing:     0
 

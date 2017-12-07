@@ -659,6 +659,7 @@ sub _build_cert_profile_client {
                 email_protection => 0,
                 server_auth      => 0,
                 time_stamping    => 0,
+                ocsp_signing     => 0,
             },
             key_usage => {
                 critical          => 1,
