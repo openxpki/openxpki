@@ -16,6 +16,7 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Serialization::Simple;
 
 use Log::Log4perl;
+use Log::Log4perl::MDC;
 
 our $config = OpenXPKI::Client::Config->new('rpc');
 my $log = $config->logger();
@@ -27,6 +28,12 @@ my $json = new JSON();
 while (my $cgi = CGI::Fast->new()) {
 
     my $conf = $config->config();
+
+    my $servername = $conf->{$method}->{servername} || '';
+
+    Log::Log4perl::MDC->put('server', $servername);
+    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
+
 
     my $error = '';
 
@@ -76,7 +83,6 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     # if given, append to the paramter list
-    my $servername = $conf->{$method}->{servername} || '';
     if ($servername) {
         $param->{'server'} = $servername;
         $param->{'interface'} = 'rpc';

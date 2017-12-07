@@ -43,6 +43,8 @@ $log->info('Start fcgi loop ' . $$);
 
 while (my $cgi = CGI::Fast->new()) {
 
+    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
+
     my $sess_id = $cgi->cookie('oxisess-sc') || undef;
     my $session_front = new CGI::Session(undef, $sess_id, {Directory=>'/tmp'});
     $log->debug('session id (front) is '. $session_front->id);

@@ -85,6 +85,13 @@ has 'default' => (
     builder => '__init_default',
 );
 
+has 'endpoint' => (
+    required => 0,
+    is => 'rw',
+    isa => 'Str|Undef',
+    lazy => 1,
+    default => '',
+);
 
 has 'logger' => (
     required => 0,
@@ -202,11 +209,13 @@ sub config() {
     if (defined $ENV{SCRIPT_URL}) {
         $ENV{SCRIPT_URL} =~ qq|${service}/([^/]+)(/[^/]*)?\$|;
         $file = "$1.conf";
+        $self->endpoint($1);
 
     # Should always work
     } elsif (defined $ENV{REQUEST_URI}) {
         $ENV{REQUEST_URI} =~ qq|${service}/([^/\?]+)(/[^/\\?]*)?(\\?.*)?\$|;
         $file = "$1.conf";
+        $self->endpoint($1);
 
     # Hopefully never seen
     # TODO no path is fine with e.g. EST

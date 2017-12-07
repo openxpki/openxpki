@@ -18,6 +18,7 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Serialization::Simple;
 
 use Log::Log4perl;
+use Log::Log4perl::MDC;
 
 our $config = OpenXPKI::Client::Config->new('scep');
 my $log = $config->logger();
@@ -39,6 +40,9 @@ while (my $cgi = CGI::Fast->new()) {
     my $hash_alg = $conf->{global}->{hash_algorithm};
 
     my $log = $config->logger();
+
+    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
+    Log::Log4perl::MDC->put('server', $server);
 
     # the allowed IP range from the config file
     my $allowed_range = new NetAddr::IP $iprange;
