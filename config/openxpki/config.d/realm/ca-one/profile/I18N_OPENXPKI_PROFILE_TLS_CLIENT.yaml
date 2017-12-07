@@ -28,6 +28,10 @@ style:
             email: "[% requestor_email %]"
             entity: "[% hostname FILTER lower %]"
 
+    enroll:
+        subject:
+            dn: CN=[% serial %],DC=Test Deployment,DC=OpenXPKI,DC=org
+
 
 # Profile extensions - set 0/1 as needed
 extensions:
