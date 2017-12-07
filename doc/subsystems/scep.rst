@@ -64,6 +64,48 @@ Config Path Expansion
 Is supported by the SCEP wrapper, the service name is ``scep``. See the
 common wrapper documentation (:ref:`subsystem-wrapper`) for details.
 
+Support for Root Rollover using GetNextCA
+-----------------------------------------
+
+One of the most powerful features of OpenXPKI is the support for a seamless
+rollover of CA generations. To distribute a new root certificate in your
+infrastructure, SCEP provides the "GetNextCA" command which sends the new
+root certificate signed by the current SCEP service.
+
+To configure the certificate delivered by GetNextCa, you must add a
+certificate alias into the CA realm with a future notbefore date.
+
+If not done already, import your new root certificate into the database::
+
+    openxpkiadm certificate import --file my-new-rootca.pem
+
+Now create a new alias in the ``root`` group to point to this certificate.
+Replace the XXXX with the identifier shown by the import command::
+
+    openxpki alias --realm ca-one --token root \
+       --identifier XXXX   --notbefore "2020-01-01 00:00:00"
+
+The actual value of the notbefore date is irrelevant, it just must be in
+the future.
+
+Check the result by listing your aliases::
+
+    openxpki alias --realm ca-one
+
+    === root ca ===
+    current root ca:
+      Alias     : root-1
+      Identifier: 9p_FxU-wdTaciZD5lcOIiP-CLxk
+      NotBefore : 2015-10-02 09:26:28
+      NotAfter  : 2020-10-01 09:26:28
+
+    upcoming root ca:
+      Alias     : root-2
+      Identifier: Als6THNt9jedxlF5AD0P5a4bhjY
+      NotBefore : 2020-10-01 09:26:25 (2006-11-03 07:00:58)
+      NotAfter  : 2030-12-31 23:59:00
+
+
 Caveats
 -------
 
