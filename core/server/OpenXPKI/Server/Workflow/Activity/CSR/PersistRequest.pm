@@ -26,13 +26,17 @@ sub execute
 
     my $type = $self->param('csr_type') || 'pkcs10';
 
-    my $profile = $context->param('cert_profile');
+    my $profile = $self->param('cert_profile');
+    $profile = $context->param('cert_profile') unless ($profile);
     if (! defined $profile) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_PROFILE_UNDEFINED',
         );
     }
-    my $subject = $context->param('cert_subject');
+
+
+    my $subject = $self->param('cert_subject');
+    $subject = $context->param('cert_subject') unless($subject);
     if (! defined $subject) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDEFINED',
@@ -222,5 +226,13 @@ requests that are not formated as expected.
 
 If you want to persist the CSR "as is", set this to a true value and we
 wont touch it.
+
+=item cert_profile
+
+The profile to use. Read from cert_profile context value if not set.
+
+=item cert_subject
+
+The subject to use. Read from cert_subject context value if not set.
 
 =back
