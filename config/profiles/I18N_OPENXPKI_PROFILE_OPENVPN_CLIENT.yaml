@@ -57,8 +57,9 @@ extensions:
         client_auth:      1
         server_auth:      0
         email_protection: 0
-        codeSigning:      0
-        timeStamping:     0
+        code_signing:     0
+        time_stamping:    0
+        ocsp_signing:     0
  
 
 

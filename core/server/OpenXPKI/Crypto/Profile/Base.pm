@@ -128,7 +128,7 @@ sub load_extension
     {
         my $bits_set = $config->get_hash("$path");
         ##! 16: "ext key usage bits: ". Dumper $bits_set
-        my @bits = ( "client_auth", "server_auth","email_protection","code_signing","time_stamping");
+        my @bits = ( "client_auth", "server_auth","email_protection","code_signing","time_stamping", "ocsp_signing");
 
         foreach my $bit (@bits) {
             push @values, $bit if ( $bits_set->{$bit} );

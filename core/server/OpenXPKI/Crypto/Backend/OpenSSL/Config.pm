@@ -590,6 +590,7 @@ sub __get_extensions
             $config .= "emailProtection," if (grep /email_protection/, @bits);
             $config .= "codeSigning,"     if (grep /code_signing/, @bits);
             $config .= "timeStamping,"    if (grep /time_stamping/, @bits);
+            $config .= "OCSPSigning,"     if (grep /ocsp_signing/, @bits);
             my @oids = grep m{\.}, @bits;
             foreach my $oid (@oids)
             {
