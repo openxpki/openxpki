@@ -103,6 +103,7 @@ use OpenXPKI::Serialization::Simple;
 use Net::SMTP;
 
 use Moose;
+use Encode;
 
 extends 'OpenXPKI::Server::Notification::Base';
 
@@ -598,10 +599,11 @@ sub _send_html {
     }
 
     my @args = (
-        From    => $cfg->{from},
-        To      => $vars->{to},
-        Subject => "$vars->{prefix} $subject",
+        From    => Encode::encode_utf8($cfg->{from}),
+        To      => Encode::encode_utf8($vars->{to}),
+        Subject => Encode::encode_utf8("$vars->{prefix} $subject"),
         Type    =>'multipart/alternative',
+        Charset => 'UTF-8',
     );
 
     push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
@@ -616,7 +618,7 @@ sub _send_html {
         ##! 16: ' Attach plain text'
         $msg->attach(
             Type     =>'text/plain',
-            Data     => $plain
+            Data     => Encode::encode_utf8($plain)
         );
     }
 
@@ -634,7 +636,7 @@ sub _send_html {
         # The HTML Body
         $html_part->attach(
             Type        =>'text/html',
-            Data        => $html
+            Data        => Encode::encode_utf8($html)
         );
 
         # The hash contains the image id and the filename
@@ -670,7 +672,7 @@ sub _send_html {
         ## Add the html part:
         $msg->attach(
             Type        =>'text/html',
-            Data        => $html
+            Data        => Encode::encode_utf8($html)
         );
     }
 
