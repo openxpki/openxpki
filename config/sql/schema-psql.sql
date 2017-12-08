@@ -397,7 +397,7 @@ CREATE TABLE workflow_history (
 --
 
 CREATE TABLE ocsp_responses (
-    identifier text NOT NULL,
+    identifier text,
     serial_number bytea NOT NULL,
     authority_key_identifier bytea NOT NULL,
     body bytea NOT NULL,

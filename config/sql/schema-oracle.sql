@@ -295,7 +295,7 @@ CREATE TABLE workflow_history (
 DROP TABLE ocsp_responses CASCADE CONSTRAINTS;
 
 CREATE TABLE ocsp_responses (
-  identifier varchar2(64) NOT NULL,
+  identifier varchar2(64),
   serial_number varbinary(128) NOT NULL,
   authority_key_identifier varbinary(128) NOT NULL,
   body varbinary(4096) NOT NULL,

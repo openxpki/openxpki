@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `workflow_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `ocsp_responses` (
-  `identifier` varchar(64) NOT NULL,
+  `identifier` varchar(64),
   `serial_number` varbinary(128) NOT NULL,
   `authority_key_identifier` varbinary(128) NOT NULL,
   `body` varbinary(4096) NOT NULL,

@@ -368,7 +368,7 @@ CREATE TABLE workflow_history (
 );
 
 CREATE TABLE ocsp_responses (
-  identifier               varchar(64) NOT NULL,
+  identifier               varchar(64),
   serial_number            blob NOT NULL,
   authority_key_identifier blob NOT NULL,
   body                     blob NOT NULL,
