@@ -7,6 +7,7 @@
 
 # Exit on error
 set -e
+set -x
 
 basedir="$PWD"
 
@@ -23,7 +24,10 @@ rpmsdir=~/rpmbuild/RPMS/x86_64
 # Directory where we consolidate the new packages
 test -d $basedir/rpms || mkdir -p $basedir/rpms
 
-OXI_VERSION=$(perl tools/vergen --format version)
+echo "DEBUG: determining oxi version" >&2
+: ${OXI_VERSION:=$(perl tools/vergen --format version)}
+echo "DEBUG: OXI_VERSION=$OXI_VERSION" >&2
+
 if [ -z "$OXI_VERSION" ]; then
     echo "ERROR - failed to detect OpenXPKI version" 1>&2
     exit 1
