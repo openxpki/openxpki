@@ -601,6 +601,10 @@ The hash also has ISSUER.DN set with the full dn.
 
 Offers the keys ALIAS, GROUP, GENERATION as given in the alias table.
 
+=item PKI_REALM
+
+The internal name of the realm (e.g. "ca-one").
+
 =back
 
 =cut
@@ -644,8 +648,9 @@ sub process_templates {
         'CAALIAS' => {
             'ALIAS' => $self->{CA},
             'GROUP' => $group,
-            'GENERATION' => $generation
-        }
+            'GENERATION' => $generation,
+        },
+        'PKI_REALM' => CTX('api')->get_pki_realm(),
     );
     ##! 32: ' Template Vars ' . Dumper ( %template_vars )
 

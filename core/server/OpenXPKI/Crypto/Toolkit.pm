@@ -200,8 +200,9 @@ sub __load_config_realm_token {
     }
 
 
-    # Use Template Toolkit to assemble the key name,
-    # we offer the full alias, group and generation as vars (similar to cdp)
+    # Use Template Toolkit to assemble the key name, we offer the internal
+    # realm name, full alias, group and generation as vars (similar to cdp)
+
     # Split alias into generation and group name
     $name =~ /^(.*)-(\d+)$/;
     my $group = $1;
@@ -210,7 +211,8 @@ sub __load_config_realm_token {
     my $template_vars = {
         'ALIAS' => $name,
         'GROUP' => $group,
-        'GENERATION' => $generation
+        'GENERATION' => $generation,
+        'PKI_REALM' => CTX('api')->get_pki_realm(),
     };
 
     ##! 16: 'Building key name from template ' . $params_of{$ident}->{KEY}
