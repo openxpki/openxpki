@@ -443,7 +443,7 @@ sub get_database {
     delete $db_config->{log};
     delete $db_config->{debug};
 
-    return OpenXPKI::Server::Database->new(
+    my $db = OpenXPKI::Server::Database->new(
         # if this DB object should be used for logging: we prevent recursive
         # calls to log functions in OpenXPKI::Server::Log::Appender::DBI
         log => CTX('log')->system(),
@@ -453,6 +453,9 @@ sub get_database {
         },
         $autocommit ? (autocommit => 1) : (),
     );
+    # do a database ping to ensure the DB is connected
+    $db->ping();
+    return $db;
 }
 
 sub redirect_stderr
