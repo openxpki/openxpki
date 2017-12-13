@@ -294,6 +294,11 @@ sub dbh {
     return $dbh;
 }
 
+sub ping {
+    my $self = shift;
+    return $self->_dbix_handler->dbh->ping();
+}
+
 # Execute given query
 sub run {
     my ($self, $query, $return_rownum) = positional_args(\@_,
