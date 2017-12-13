@@ -24,6 +24,7 @@ use OpenXPKI::Server::Notification::Handler;
 use Data::Dumper;
 
 our $stop_soon = 0;
+our $main_pid;
 
 sub new {
     my $that = shift;
@@ -68,6 +69,8 @@ sub __init_server {
 sub __init_net_server {
     my $self = shift;
 
+    ##! 1: "start"
+
     eval {
         ## start the server
         $self->{PARAMS} = $self->__get_server_config();
@@ -94,6 +97,9 @@ sub __init_net_server {
         $self->{PARAMS}->{no_client_stdout} = 1;
     };
     $self->__log_and_die($EVAL_ERROR, 'server daemon setup') if $EVAL_ERROR;
+
+    ##! 1: "finished"
+
 }
 
 sub start {
@@ -103,6 +109,8 @@ sub start {
     $self->__init_server;
     $self->__init_user_interfaces;
     $self->__init_net_server;
+
+    ##! 1: "server is up"
 
     CTX('log')->system()->info("Server is running");
 
@@ -137,6 +145,12 @@ sub DESTROY {
         $self->pre_server_close_hook();
     }
 
+    # if this is the main process try to kill the watchdog
+    if ($main_pid && $main_pid == $$) {
+        ##! 1: 'DESTROY in main server - terminate watchdog'
+        OpenXPKI::Server::Watchdog->terminate;
+    }
+
     return 1;
 }
 
@@ -152,6 +166,7 @@ sub post_bind_hook {
     # it runs as. The admin may want to make this configurable differently,
     # though.
 
+    $main_pid = $$;
     my $socketfile = $self->{PARAMS}->{socketfile};
 
     # socket ownership defaults to daemon user/group...
@@ -702,6 +717,8 @@ sub __get_server_config {
         }
     };
 
+    ##! 1: "finished"
+
     return \%params;
 }
 
@@ -765,10 +782,6 @@ sub __log_and_die {
     ##! 16: 'log_message: ' . $log_message
 
     CTX('log')->system()->fatal($log_message);
-
-
-    # kill watchdog instances (if running)
-    OpenXPKI::Server::Watchdog->terminate;
 
     # die gracefully
     $ERRNO = 1;
