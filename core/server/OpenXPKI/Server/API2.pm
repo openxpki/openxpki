@@ -13,6 +13,7 @@ functions
 use Module::Load;
 use File::Spec;
 use IO::Dir 1.03;
+use Scalar::Util qw( blessed );
 
 # CPAN modules
 use Try::Tiny;
@@ -334,7 +335,26 @@ sub dispatch {
 
     $self->log->debug("API call to '$p{command}'") if $self->log->is_debug;
 
-    return $package->new->execute($p{command}, $all_params);
+    my $result;
+    try {
+        $result = $package->new->execute($p{command}, $all_params);
+    }
+    catch {
+        my $err = $_;
+        if (blessed($_)) {
+            if ($_->isa("OpenXPKI::Exception")) {
+                $_->rethrow;
+            }
+            elsif ($_->isa("Moose::Exception")) {
+                $err = $_->message;
+            }
+        }
+        OpenXPKI::Exception->throw(
+            message => "Error while executing API command",
+            params => { command => $p{command}, error => $err }, # stringify in case error is an object
+        );
+    };
+    return $result;
 }
 
 #=head2 _apply_acl_rules
