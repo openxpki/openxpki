@@ -16,7 +16,7 @@ use lib "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 41;
+plan tests => 43;
 
 
 # Init server
@@ -109,6 +109,21 @@ cmp_deeply $result, superhashof({
         05_advanced_style
     )
 }), "list profile styles";
+
+$result = $client->send_command_ok('get_cert_subject_profiles' => {
+    PROFILE => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+    NOHIDE => 1,
+});
+cmp_deeply $result, superhashof({
+    map {
+        $_ => superhashof({ LABEL => ignore() })
+    }
+    qw(
+        00_basic_style
+        05_advanced_style
+        enroll
+    )
+}), "list profile styles incl. hidden ones (without UI definition)";
 
 #
 # get_cert_subject_styles
