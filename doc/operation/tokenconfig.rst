@@ -57,7 +57,7 @@ Datasafe Token
 
 The datasafe token is represented by a certificate but is never
 exposed to the public so it is acceptable to use a self-signed 
-certificate here. 
+certificate here:: 
 
     openxpkiadm certificate import  --file ca-one-vault-1.crt \
         --realm ca-one --token datasafe
