@@ -1326,12 +1326,64 @@ msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
+msgstr "Name"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
+msgstr "Vollständig"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "Vollständig"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "Unvollständig"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_DESC"
+msgstr "Ihr Benutzername, z. B. 'pmueller'"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_DESC"
+msgstr "Ihr Benutzername, z. B. 'pmueller'"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL"
+msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED"
+msgstr "abgelaufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED"
+msgstr "abgelaufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED"
+msgstr "abgelaufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED"
+msgstr "widerrufen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
+msgstr "Unvollständig"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
+msgstr "PEM (CRT) Format"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
@@ -11561,9 +11613,6 @@ msgstr "Benutzername"
 
 #~ msgid "I18N_OPENXPKI_USERNAME"
 #~ msgstr "Benutzername"
-
-#~ msgid "I18N_OPENXPKI_USERNAME_DESC"
-#~ msgstr "Ihr Benutzername, z. B. 'pmueller'"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_VALIDATOR_REGEX_INVALID_MODIFIER"

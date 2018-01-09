@@ -1325,12 +1325,64 @@ msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
+msgstr "Субъект"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
+msgstr "Завершено"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "Завершено"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "Не завершено"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_DESC"
+msgstr "Имя Вашей учетной записи в информационной системе, например aivanov"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL"
+msgstr "Субъект"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_DESC"
+msgstr "Имя Вашей учетной записи в информационной системе, например aivanov"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED"
+msgstr "С истекшим сроком действия"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED"
+msgstr "С истекшим сроком действия"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED"
+msgstr "С истекшим сроком действия"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED"
+msgstr "Отозван"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
+msgstr "Не завершено"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
@@ -11856,9 +11908,6 @@ msgstr "Имя учетной записи"
 
 #~ msgid "I18N_OPENXPKI_USERNAME"
 #~ msgstr "Имя учетной записи"
-
-#~ msgid "I18N_OPENXPKI_USERNAME_DESC"
-#~ msgstr "Имя Вашей учетной записи в информационной системе, например aivanov"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_VALIDATOR_REGEX_INVALID_MODIFIER"

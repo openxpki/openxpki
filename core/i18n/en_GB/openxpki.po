@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2017-11-27 14:35+0100\n"
+"PO-Revision-Date: 2018-01-09 11:21+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -946,11 +946,52 @@ msgstr "Search result expired or empty!"
 msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 msgstr "SCEP Transaction Id"
 
+msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
+msgstr "clear secret"
+
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Ready"
 
+msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
+msgstr "Secret is complete"
+
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "Incomplete"
+
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_DESC"
+msgstr "Literal secrets do not have any managable options."
+
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL"
+msgstr "Literal Secret"
+
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_DESC"
+msgstr ""
+"The list shows the state of your secret groups defined in this realm. To "
+"login/logout click on the row."
+
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_LABEL"
+msgstr "Manage Secrets"
+
+msgid "I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL"
+msgstr "Passphrase"
+
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED"
+msgstr "Secret Accepted"
+
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED"
+msgstr "Secret Cleared"
+
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED"
+msgstr "Clear Failed"
+
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED"
+msgstr "Unlock Failed"
+
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
+msgstr "Unlock"
+
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
+msgstr "Unlock"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."

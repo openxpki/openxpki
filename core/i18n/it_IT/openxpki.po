@@ -1085,11 +1085,63 @@ msgstr "Stato del Certificato"
 msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 msgstr "Azione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
+msgstr "Soggetto Certificato"
+
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
+msgstr "Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO"
 msgstr "Completo"
 
 msgid "I18N_OPENXPKI_UI_SECRET_INCOMPLETE"
 msgstr "Incompleto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_DESC"
+msgstr "Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL"
+msgstr "Soggetto Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_DESC"
+msgstr "Completo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PAGE_LABEL"
+msgstr "Relazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL"
+msgstr "Relazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED"
+msgstr "Scaduto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED"
+msgstr "Scaduto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED"
+msgstr "Scaduto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED"
+msgstr "Revocato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
+msgstr "Incompleto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
+msgstr "Scarica"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Workflow Adesione SCEP in attesa di approvazione."
