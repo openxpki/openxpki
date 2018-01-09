@@ -81,6 +81,7 @@ sub BUILD {
     my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
     my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
     my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
+    my $re_sql_string_utf8   = qr{ \A [a-zA-Z0-9\@\-_\.\&\/\s\%\*\+\=\,\:\ ]* \z }xms;
 
     $method_info_of{$ident} = {
         ### Default API
@@ -598,7 +599,7 @@ sub BUILD {
                 SUBJECT => {
                     type     => SCALAR,
                     optional => 1,
-                    regex    => $re_sql_string,
+                    regex    => $re_sql_string_utf8,
                 },
                 ISSUER_DN => {
                     type     => SCALAR,
@@ -687,7 +688,7 @@ sub BUILD {
                 SUBJECT => {
                     type     => SCALAR,
                     optional => 1,
-                    regex    => $re_sql_string,
+                    regex    => $re_sql_string_utf8,
                 },
                 ISSUER_DN => {
                     type     => SCALAR,
