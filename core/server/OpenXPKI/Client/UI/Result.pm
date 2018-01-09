@@ -377,7 +377,19 @@ sub render {
     my $result = $self->_result();
 
     $result->{error} = $self->_error() if $self->_error();
-    $result->{status} = $self->_status() if $self->_status();
+
+
+    if ($self->_status()) {
+        $result->{status} = $self->_status();
+    } elsif ($self->param('_status')) {
+        my $status = $self->_client->session()->param($self->param('_status'));
+        if ($status && ref $status eq 'HASH') {
+            $self->logger()->debug("Set persisted status " . $status->{message});
+            $result->{status} = $status;
+        }
+    }
+
+
     $result->{page} = $self->_page() if $self->_page();
     $result->{refresh} = $self->_refresh() if ($self->_refresh());
 
@@ -389,6 +401,14 @@ sub render {
         if (ref $redirect ne 'HASH') {
             $redirect = { goto => $redirect };
         }
+
+        # Persist and append status
+        if ($result->{status}) {
+            my $uid = $self->__generate_uid();
+            $self->__temp_param($uid, $result->{status}, 15);
+            $redirect->{goto} .= '!_status!' . $uid;
+        }
+
         $body = $json->encode( $redirect );
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );
