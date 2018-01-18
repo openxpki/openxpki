@@ -35,7 +35,7 @@ This will modify your package as follows:
 
 =over
 
-=item * imports Moose (i.e. adds "use Moose;" so you don't have to do it)
+=item * imports C<Moose> (i.e. adds "use Moose;" so you don't have to do it)
 
 =item * provides the L</command> keyword (just an imported sub really) to
 define API commands
