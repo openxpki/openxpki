@@ -631,7 +631,6 @@ sub __get_extensions
             my $subj_alt_name = $profile->get_extension("subject_alt_name");
             my @tmp_array;
             my $sectidx = 0;
-            my $string;
             foreach my $entry (@{$subj_alt_name}) {
 
                 # Handle dirName
