@@ -37,7 +37,7 @@ lives_ok {
 
 lives_and {
     my $result = $auto->givetheparams(name => "Max", size => 5);
-    cmp_deeply $result, { name => "Max", size => 5 };
+    cmp_deeply $result, { name => "Max", size => 5, level => 0 };
 } "correctly execute command";
 
 1;
