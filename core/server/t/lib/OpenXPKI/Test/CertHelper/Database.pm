@@ -37,7 +37,7 @@ The following predefined test certificates are available:
     $db->cert("alpha_root_2")      # self signed Root Cert
     ...
 
-=item * set 3 (valid from 2100 till 2015)
+=item * set 3 (valid from 2100 till 2105)
 
     $db->cert("alpha_root_3")      # self signed Root Cert
     ...

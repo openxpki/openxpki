@@ -127,7 +127,7 @@ sub write_str {
 sub write_private_key {
     my ($self, $realm, $alias, $pem_str) = @_;
 
-    my $filepath = $self->_private_key_path($realm, $alias);
+    my $filepath = $self->get_private_key_path($realm, $alias);
     $self->_make_parent_dir($filepath);
     $self->write_str($filepath, $pem_str);
 }
@@ -135,7 +135,7 @@ sub write_private_key {
 sub remove_private_key {
     my ($self, $realm, $alias) = @_;
 
-    my $filepath = $self->_private_key_path($realm, $alias);
+    my $filepath = $self->get_private_key_path($realm, $alias);
     unlink $filepath or die "Could not remove file $filepath: $@";
 }
 
@@ -150,15 +150,9 @@ sub write_yaml {
 # Add a configuration node (I<HashRef>) below the given configuration key
 # (dot separated path in the config hierarchy)
 #
-#     $config_writer->add_config_node('realm.alpha.workflow', $workflow);
+#     $config_writer->add_config('realm.alpha.workflow', $workflow);
 sub add_config {
     my ($self, $key, $data) = @_;
-
-    use Test::More;
-    my ($package, $filename, $line, $subroutine, $hasargs,
-    $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
-    = caller(1);
-#    note "CONFIG $key - $package";
 
     die "add_config() must be called before create()" if $self->is_written;
     my @parts = split /\./, $key;
@@ -236,8 +230,22 @@ sub create {
     $self->is_written(1);
 }
 
-# Returns the private key path for the certificate specified by realm and alias.
-sub _private_key_path {
+=head2 get_private_key_path
+
+Returns the private key path for the certificate specified by realm and alias.
+
+B<Parameters>
+
+=over
+
+=item * C<$realm> (I<Str>) - PKI realm
+
+=item * C<$alias> (I<Str>) - Token alias incl. generation (i.e. "ca-one-signer-1")
+
+=back
+
+=cut
+sub get_private_key_path {
     my ($self, $realm, $alias) = @_;
     return sprintf "%s/etc/openxpki/ssl/%s/%s.pem", $self->basedir, $realm, $alias;
 }
@@ -340,7 +348,7 @@ sub _realm_crypto {
 
                 # Template to create key, available vars are
                 # ALIAS (ca-one-signer-1), GROUP (ca-one-signer), GENERATION (1)
-                key => $self->_private_key_path($realm, "[% ALIAS %]"),
+                key => $self->get_private_key_path($realm, "[% ALIAS %]"),
 
                 # possible values are OpenSSL, nCipher, LunaCA
                 engine => "OpenSSL",

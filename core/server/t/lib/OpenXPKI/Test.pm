@@ -141,8 +141,8 @@ Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],
 );
 
-subtype 'TolerantArrayRef', as 'ArrayRef[Any]';
-coerce 'TolerantArrayRef', from 'Str', via { [ $_ ] };
+subtype 'ArrayRefOrStr', as 'ArrayRef[Any]';
+coerce 'ArrayRefOrStr', from 'Str', via { [ $_ ] };
 
 =head1 DESCRIPTION
 
@@ -209,8 +209,8 @@ For each given string C<NAME> the following packages are tried for Moose role
 application: C<NAME> (unmodified string), C<OpenXPKI::Test::Role::NAME>,
 C<OpenXPKI::Test::QA::Role::NAME>
 
-=item * I<add_config> (optional) - HashRef with additional configuration entries
-that complement or replace the default config.
+=item * I<add_config> (optional) - I<HashRef> with additional configuration
+entries that complement or replace the default config.
 
 Keys are the dot separated configuration paths, values are HashRefs with the
 actual configuration data that will be converted into YAML and stored on disk.
@@ -242,7 +242,37 @@ has add_config => (
     is => 'rw',
     isa => 'HashRef',
     lazy => 1,
-    default => sub { {} },
+    default => sub {
+        my $self = shift;
+        $self->has_config_sub ? $self->add_config_sub->($self) : {};
+    },
+);
+
+=item * I<add_config_sub> (optional) - intead of C<add_config> specifies a
+I<CodeRef> which must return a I<HashRef> with additional configuration
+entries.
+
+The specified sub receives the C<OpenXPKI::Test> object as first parameter, so
+it is able to access other configuration entries.
+
+Please note that you CANNOT specify both C<add_config> and C<add_config_sub>.
+
+Example:
+
+    OpenXPKI::Test->new(
+        add_config_sub => sub {
+            my $test = shift;
+            return {
+                "some.special.entry" => $test->testenv_root . "/mydir";
+            };
+        }
+    );
+
+=cut
+has add_config_sub => (
+    is => 'rw',
+    isa => 'CodeRef',
+    predicate => "has_config_sub",
 );
 
 =item * I<also_init> (optional) - ArrayRef (or Str) of additional init tasks
@@ -254,7 +284,7 @@ prerequisites for each task are met.
 =cut
 has also_init => (
     is => 'rw',
-    isa => 'TolerantArrayRef',
+    isa => 'ArrayRefOrStr',
     lazy => 1,
     coerce => 1,
     default => sub { [] },
