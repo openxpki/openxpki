@@ -161,6 +161,7 @@ sub add_config {
         $node->{$parts[$i]} //= {};
         $node = $node->{$parts[$i]};
     }
+    note "NOTE: overwriting existing config node $key (to prevent this, split up the config into multiple more precise paths)" if scalar keys %$node;
     %{$node} = %$data; # intentionally replace any probably existing data
 }
 
