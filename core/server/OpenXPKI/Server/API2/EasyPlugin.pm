@@ -9,9 +9,6 @@ OpenXPKI::Server::API2::EasyPlugin - Define an OpenXPKI API plugin
 # CPAN modules
 use Moose ();
 use Moose::Exporter;
-use Moose::Util;
-use Moose::Util::MetaRole;
-use B::Hooks::EndOfScope;
 
 # Project modules
 use OpenXPKI::Server::API2::EasyPluginRole;

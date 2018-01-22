@@ -6,7 +6,7 @@ use Moose::Util::TypeConstraints;
 OpenXPKI::Server::API2::Types - Collection of Moose types used for API command
 parameters
 
-=head2 DESCRIPTION
+=head1 TYPES
 
 =cut
 
@@ -32,9 +32,21 @@ parameters
 #my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
 #my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
 
+=head2 AlphaPunct
 
+Text with space and punctuation characters. Allowed: alphanumeric, underscore ("_"),
+other connector punctuation chars, Unicode marks, dash ("-"), colon (":"), space
+
+=cut
 subtype 'AlphaPunct', # named $re_alpha_string in old API
     as 'Str',
     where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms };
+
+=head2 TokenType
+
+Enumeration: I<certsign>, I<crlsign>, I<datasafe> or I<scep>.
+
+=cut
+enum 'TokenType', [qw( certsign crlsign datasafe scep )];
 
 no Moose::Util::TypeConstraints;
