@@ -8,6 +8,19 @@ OpenXPKI::Server::API2::PluginRole - Base role for API plugins
 
 use Moose::Role;
 
+=head1 ATTRIBUTES
+
+=head2 api
+
+Instance of the L<API autoloader|OpenXPKI::Server::API2::Autoloader>. Will be
+injected by the API upon instantiation.
+
+=cut
+has api => (
+    is => 'ro',
+    isa => 'OpenXPKI::Server::API2::Autoloader',
+);
+
 =head1 REQUIRES
 
 This role requires the consuming class to implement the following methods:

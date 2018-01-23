@@ -357,7 +357,9 @@ sub dispatch {
 
     my $result;
     try {
-        $result = $package->new->execute($p{command}, $all_params);
+        $result = $package
+            ->new(api => $self->autoloader)
+            ->execute($p{command}, $all_params);
     }
     catch {
         my $err = $_;
