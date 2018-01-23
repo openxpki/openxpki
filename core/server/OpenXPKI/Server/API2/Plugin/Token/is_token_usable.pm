@@ -21,9 +21,8 @@ Checks if the token with the given alias is usable and returns true (1) or
 false (undef).
 
 By default, a pkcs7 encrypt / decrypt cycle is used to test if the token is
-working (i.e. "online").
-
-If you set C<engine> to 1 the crypto engine's C<key_usable> method is used instead.
+working (i.e. "online"). If you set C<engine> to 1 the crypto engine's
+C<key_usable> method is used instead.
 
 B<Parameters>
 

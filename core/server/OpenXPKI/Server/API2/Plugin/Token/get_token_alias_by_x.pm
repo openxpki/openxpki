@@ -30,7 +30,7 @@ B<Parameters>
 
 =item * C<validity> I<HashRef> - two datetime objects, given as hash keys
 I<notbefore> and I<notafter>. Hash values of C<undef> will be interpreted as
-"now". Optional, default: now
+"now". Default: now
 
 =back
 
@@ -68,7 +68,7 @@ B<Parameters>
 
 =item * C<validity> I<HashRef> - two datetime objects, given as hash keys
 I<notbefore> and I<notafter>. Hash values of C<undef> will be interpreted as
-"now". Optional, default: now
+"now". Default: now
 
 =back
 

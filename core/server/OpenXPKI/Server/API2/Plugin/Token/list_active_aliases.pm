@@ -43,25 +43,25 @@ B<Parameters>
 
 =over
 
-=item * C<group> I<Str> - Token group. Optional, default: none
+=item * C<group> I<Str> - Token group. Default: none
 
 =item * C<type> I<Str> - Token type, might be specified instead of token group
 to query one of the predefined token types (for possible values see
-L<OpenXPKI::Server::API2::Types/TokenType>). Optional, default: none
+L<OpenXPKI::Server::API2::Types/TokenType>). Default: none
 
 =item * C<pki_realm> I<Str> - PK realm, specify this to query another realm.
-Optional, default: current session's realm.
+Default: current session's realm.
 
 =item * C<validity> I<HashRef> - two datetime objects, given as hash keys
 I<notbefore> and I<notafter>. Hash values of C<undef> will be interpreted as
-"now". Optional, default: now
+"now". Default: current time
 
 
 =item * C<check_online> I<Bool> - Set to 1 to get the token online status
-(L<OpenXPKI::Server::API2::Plugin::Token::is_token_usable/is_token_usable> is
+(L<is_token_usable|OpenXPKI::Server::API2::Plugin::Token::is_token_usable/is_token_usable> is
 called for each alias). The status check is only possible from within the
 current session's realm, for requests regarding another realm the status is
-always C<UNKNOWN>. Optional, default: 0
+always C<UNKNOWN>. Default: 0
 
 =back
 

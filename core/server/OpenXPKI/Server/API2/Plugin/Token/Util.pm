@@ -55,12 +55,14 @@ Converts a I<HashRef> with a validity interval given as L<DateTime> objects into
 a I<HashRef> with Unix epoch timestamps.
 
 Expects undef or DateTime objects in a HashRef like this:
+
     {
-        NOTBEFORE => DateTime->new(year => 1980, month => 12, day => 1),
-        NOTAFTER => undef, # means: now
+        notbefore => DateTime->new(year => 1980, month => 12, day => 1),
+        notafter => undef, # means: now
     }
 
 and converts it to:
+
     {
         notbefore => 344476800,
         notafter => 1491328939,
