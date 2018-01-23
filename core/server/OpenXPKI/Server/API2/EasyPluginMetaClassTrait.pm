@@ -49,6 +49,11 @@ has param_classes => (
 
 Adds parameter specifications for the given API command.
 
+A new L<Moose::Meta::Class> is created with the name I<${command}_ParamObject>.
+Attributes are added to the class that will hold the API command parameters.
+Type constraints specified via 'matching' are created and attached to the
+attributes.
+
 B<Parameters>
 
 =over
@@ -112,7 +117,7 @@ sub add_param_specs {
             %{ $spec },
         );
     }
-
+    # internally register the new parameter class
     $self->param_classes->{$command} = $param_metaclass;
 }
 
