@@ -110,6 +110,26 @@ has log => (
     default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->system },
 );
 
+=head2 autoloader
+
+Returns an instance of L<OpenXPKI::Server::API2::Autoloader> that allows to
+directly call API commands:
+
+    my $api = OpenXPKI::Server::API2->new( ... );
+    my $api_direct = $api->autoloader;
+    $api_direct->search_cert(pki_realm => ...)
+
+=cut
+has autoloader => (
+    is => 'ro',
+    isa => 'OpenXPKI::Server::API2::Autoloader',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return OpenXPKI::Server::API2::Autoloader->new(api => $self);
+    },
+);
+
 =head2 enable_acls
 
 Optional: set to FALSE to disable ACL checks when commands are executed.
@@ -565,22 +585,6 @@ sub _list_modules {
     }
     return \%results;
 }
-
-=head2 autoloader
-
-Returns an instance of L<OpenXPKI::Server::API2::Autoloader> that allows to
-directly call API commands:
-
-    my $api = OpenXPKI::Server::API2->new( ... );
-    my $api_direct = $api->autoloader;
-    $api_direct->search_cert(pki_realm => ...)
-
-=cut
-sub autoloader {
-    my $self = shift;
-    return OpenXPKI::Server::API2::Autoloader->new(api => $self);
-}
-
 
 __PACKAGE__->meta->make_immutable;
 
