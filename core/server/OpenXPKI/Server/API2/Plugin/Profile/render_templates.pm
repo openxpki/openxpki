@@ -33,11 +33,11 @@ B<Parameters>
 
 =over
 
-=item * C<profile> (Str) - certificate profile, required
+=item * C<profile> I<Str> - certificate profile, required
 
-=item * C<style> (Str) - profile substyle, default: first style found in profile
+=item * C<style> I<Str> - profile substyle, default: first style found in profile
 
-=item * C<vars> (HashRef) - variables to be inserted into (i.e. required by) the template text, required
+=item * C<vars> I<HashRef> - variables to be inserted into (i.e. required by) the template text, required
 
 =back
 

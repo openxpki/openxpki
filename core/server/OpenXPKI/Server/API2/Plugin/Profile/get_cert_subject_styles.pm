@@ -39,7 +39,7 @@ B<Parameters>
 
 =over
 
-=item * C<profile> (Str) - profile name to query
+=item * C<profile> I<Str> - profile name to query
 
 =back
 

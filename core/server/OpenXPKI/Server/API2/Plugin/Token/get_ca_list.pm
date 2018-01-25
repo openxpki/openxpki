@@ -46,7 +46,7 @@ B<Parameters>
 
 =over
 
-=item * C<realm> I<Str> - PKI realm to query, defaults to the session realm
+=item * C<pki_realm> I<Str> - PKI realm to query, defaults to the session realm
 
 =back
 

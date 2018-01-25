@@ -15,7 +15,15 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 list_used_profiles
 
-List profiles that are used for entity certificates in the current realm.
+List profiles that are used for entity certificates in specified PKI realm.
+
+B<Parameters>
+
+=over
+
+=item * C<pki_realm> I<Str> - PKI realm to query, defaults to the session realm
+
+=back
 
 =cut
 command "list_used_profiles" => {

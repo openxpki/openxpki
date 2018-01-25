@@ -22,14 +22,14 @@ B<Parameters>
 
 =over
 
-=item * C<profile> (Str) - certificate profile name, required
+=item * C<profile> I<Str> - certificate profile name, required
 
-=item * C<fields> (ArrayRef) - list of field names to query, default: all fields
+=item * C<fields> I<ArrayRef> - list of field names to query, default: all fields
 of the given style
 
-=item * C<style> (Bool) - profile style to query, required if C<fields> is not specified
+=item * C<style> I<Bool> - profile style to query, required if C<fields> is not specified
 
-=item * C<section> (Str) - ui section (only used if C<style> was specified), default: "subject"
+=item * C<section> I<Str> - ui section (only used if C<style> was specified), default: "subject"
 
 =back
 

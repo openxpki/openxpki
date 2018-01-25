@@ -13,15 +13,16 @@ OpenXPKI::Server::API2::Plugin::Profile::get_cert_subject_profiles
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
-=head2 list_used_profiles
+=head2 get_cert_subject_profiles
 
-List profiles that are used for entity certificates in the current realm.
+Returns a I<HashRef> with label and description of all subject styles for a
+given profile.
 
 B<Parameters>
 
 =over
 
-=item * C<showall> (Bool) - show also non-UI profiles, default: FALSE
+=item * C<showall> I<Bool> - show also non-UI profiles, default: FALSE
 Note that this parameter has a deprecated alias C<nohide>
 
 =back

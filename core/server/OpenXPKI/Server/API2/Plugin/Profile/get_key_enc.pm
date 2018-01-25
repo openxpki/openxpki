@@ -22,9 +22,9 @@ B<Parameters>
 
 =over
 
-=item * C<profile> (Str) - certificate profile, required
+=item * C<profile> I<Str> - certificate profile, required
 
-=item * C<showall> (Bool) - also show hidden algorithms (beginning with an underscore)
+=item * C<showall> I<Bool> - also show hidden algorithms (beginning with an underscore)
 
 =back
 

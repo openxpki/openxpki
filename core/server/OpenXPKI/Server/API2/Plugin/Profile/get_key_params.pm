@@ -17,8 +17,10 @@ use OpenXPKI::Server::API2::Types;
 
 Returns all input parameters accepted by the selected algorithm as defined for
 the given profile (or the default).
+
 If no algorithm is given, only returns a list of all possible parameters in all
 algorithms (used for prerendering the UI forms).
+
 Note: This does not check if the algorithm is in the supported list for the
 given profile, use API command C<get_key_alg> to accomplish this.
 
@@ -26,13 +28,15 @@ B<Parameters>
 
 =over
 
-=item * C<profile> (Str) - certificate profile, required
+=item * C<profile> I<Str> - certificate profile, required
 
-=item * C<alg> (Str) - algorithm, default: all algorithms
+=item * C<alg> I<Str> - algorithm, default: all algorithms
 
-=item * C<showall> (Bool) - also show hidden algorithms (beginning with an underscore)
+=item * C<showall> I<Bool> - also show hidden algorithms (beginning with an underscore)
 
 =back
+
+B<Changes compared to API v1:> Parameter C<NOHIDE> was renamed to C<showall>
 
 =cut
 command "get_key_params" => {
