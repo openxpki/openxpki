@@ -118,7 +118,7 @@ sub _make_db_query_additional_params {
 
     if ( $po->has_limit ) {
         $params->{limit} = $po->limit;
-        $params->{offset} = $po->start if $po->start;
+        $params->{offset} = $po->start if $po->has_start;
     }
 
     # Custom ordering
