@@ -49,4 +49,15 @@ Enumeration: I<certsign>, I<crlsign>, I<datasafe> or I<scep>.
 =cut
 enum 'TokenType', [qw( certsign crlsign datasafe scep )];
 
+=head2 CertStatus
+
+Enumeration of certificate stati: I<ISSUED>, I<REVOKED>, I<CRL_ISSUANCE_PENDING>
+or I<EXPIRED>.
+
+Please note that in queries specifying a validity date the returned status can
+also be I<VALID>.
+
+=cut
+enum 'CertStatus', [qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED )];
+
 no Moose::Util::TypeConstraints;
