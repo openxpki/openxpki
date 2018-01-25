@@ -26,14 +26,15 @@ Note that this parameter has a deprecated alias C<nohide>
 
 =back
 
+B<Changes compared to API v1:> this command was previously named
+I<get_cert_subject_profiles>. Parameter C<NOHIDE> was renamed to C<showall>.
+
 =cut
 command "get_cert_subject_profiles" => {
     profile => { isa => 'AlphaPunct', required => 1 },
-    showall => { isa => 'Bool' },
-    nohide  => { isa => 'Bool' }, # deprecated alias of "showall"
+    showall => { isa => 'Bool', default => 0, },
 } => sub {
     my ($self, $params) = @_;
-    $params->showall(1) if $params->nohide; # backwards compatibility
 
     my $profile = $params->profile;
 

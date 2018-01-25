@@ -22,18 +22,17 @@ B<Parameters>
 
 =over
 
-=item * C<showall> (Bool) - show also non-UI profiles, default: FALSE
-Note that this parameter has a deprecated alias C<nohide>
+=item * C<showall> I<Bool> - show also non-UI profiles. Default: FALSE
 
 =back
 
+B<Changes compared to API v1:> Parameter C<NOHIDE> was renamed to C<showall>
+
 =cut
 command "get_cert_profiles" => {
-    showall => { isa => 'Bool' },
-    nohide  => { isa => 'Bool' }, # deprecated alias of "showall"
+    showall => { isa => 'Bool', default => 0, },
 } => sub {
     my ($self, $params) = @_;
-    $params->showall(1) if $params->nohide; # backwards compatibility
 
     my $config = CTX('config');
 
