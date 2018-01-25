@@ -226,7 +226,6 @@ OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/EasyPlugin.pm
 OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
-OpenXPKI/Server/API2/Plugin/Cert/Actions.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
 OpenXPKI/Server/API2/Plugin/Profile/Util.pm
 OpenXPKI/Server/API2/Plugin/Profile/get_additional_information_fields.pm
