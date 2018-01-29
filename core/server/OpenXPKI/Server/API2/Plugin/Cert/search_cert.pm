@@ -78,11 +78,13 @@ so you can use asterisk (*) as placeholder)
 
 =item * C<profile> I<Str> - certificate profile name
 
-=item * C<valid_at> I<Int> - certificate must be valid at this UNIX epoch timestamp
+=item * C<valid_before> I<Int> - certificate validity must start before this UNIX epoch timestamp
 
-=item * C<notbefore> I<Int> - certificate must be valid before this UNIX epoch timestamp
+=item * C<valid_after> I<Int> - certificate validity must after before this UNIX epoch timestamp
 
-=item * C<notafter> I<Int> - certificate must be valid after this UNIX epoch timestamp
+=item * C<expires_before> I<Int> - certificate validity must end before this UNIX epoch timestamp
+
+=item * C<expires_after> I<Int> - certificate validity must end after this UNIX epoch timestamp
 
 =item * C<status> I<Str> - certificate status (for possible values see
 L<OpenXPKI::Server::API2::Types/CertStatus>)
@@ -102,6 +104,13 @@ index (can only be used if C<limit> was specified)
 
 =back
 
+B<Changes compared to API v1:> The following parameters where removed in favor
+of C<[valid|expires]_[before|after]>:
+
+    valid_at
+    notbefore
+    notafter
+
 =cut
 
 command "search_cert" => {
@@ -110,12 +119,12 @@ command "search_cert" => {
     cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',         matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',         matching => $re_boolean,           },
+    expires_after            => {isa => 'Int', },
+    expires_before           => {isa => 'Int', },
     identifier               => {isa => 'Value',         matching => $re_base64_string,     },
     issuer_dn                => {isa => 'Value' },
     issuer_identifier        => {isa => 'Value',         matching => $re_base64_string,     },
     limit                    => {isa => 'Value',         matching => $re_integer_string,    },
-    notafter                 => {isa => 'Value|HashRef', },
-    notbefore                => {isa => 'Value|HashRef', },
     order                    => {isa => 'Value' },
     pki_realm                => {isa => 'Value',         matching => $re_alpha_string,      },
     profile                  => {isa => 'Value',         matching => $re_alpha_string,      },
@@ -124,7 +133,8 @@ command "search_cert" => {
     status                   => {isa => 'CertStatus' },
     subject                  => {isa => 'Value' },
     subject_key_identifier   => {isa => 'Value' },
-    valid_at                 => {isa => 'Value',         matching => $re_integer_string,    },
+    valid_after              => {isa => 'Int', },
+    valid_before             => {isa => 'Int', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -176,12 +186,6 @@ so you can use asterisk (*) as placeholder)
 
 =item * C<profile> I<Str> - certificate profile name
 
-=item * C<valid_at> I<Int> - certificate must be valid at this UNIX epoch timestamp
-
-=item * C<notbefore> I<Int> - certificate must be valid before this UNIX epoch timestamp
-
-=item * C<notafter> I<Int> - certificate must be valid after this UNIX epoch timestamp
-
 =item * C<status> I<Str> - certificate status (for possible values see
 L<OpenXPKI::Server::API2::Types/CertStatus>)
 
@@ -191,6 +195,13 @@ in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 
 =back
 
+B<Changes compared to API v1:> The following parameters where removed in favor
+of C<[valid|expires]_[before|after]>:
+
+    valid_at
+    notbefore
+    notafter
+
 =cut
 command "search_cert_count" => {
     authority_key_identifier => {isa => 'Value',    matching => $re_alpha_string,      },
@@ -198,17 +209,18 @@ command "search_cert_count" => {
     cert_serial              => {isa => 'Value',    matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',    matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',    matching => $re_boolean,           },
+    expires_after            => {isa => 'Int', },
+    expires_before           => {isa => 'Int', },
     identifier               => {isa => 'Value',    matching => $re_base64_string,     },
     issuer_dn                => {isa => 'Value' },
     issuer_identifier        => {isa => 'Value',    matching => $re_base64_string,     },
-    notafter                 => {isa => 'Value|HashRef', },
-    notbefore                => {isa => 'Value|HashRef', },
     pki_realm                => {isa => 'Value',    matching => $re_alpha_string,      },
     profile                  => {isa => 'Value',    matching => $re_alpha_string,      },
     status                   => {isa => 'CertStatus' },
     subject                  => {isa => 'Value' },
     subject_key_identifier   => {isa => 'Value' },
-    valid_at                 => {isa => 'Value',    matching => $re_integer_string,    },
+    valid_after              => {isa => 'Int', },
+    valid_before             => {isa => 'Int', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -299,26 +311,10 @@ sub _make_db_query {
     $where->{'certificate.subject'}                   = { -like => $po->subject }       if $po->has_subject;
     $where->{'certificate.issuer_dn'}                 = { -like => $po->issuer_dn }     if $po->has_issuer_dn;
 
-    if ($po->has_valid_at) {
-        $where->{'certificate.notbefore'} = { '<=', $po->valid_at };
-        $where->{'certificate.notafter'} =  { '>=', $po->valid_at };
-    }
-
-    # notbefore/notafter should only be used for timestamps outside
-    # the validity interval, therefore the operators are fixed
-    if ($po->has_notbefore) {
-        # TODO #legacydb search_cert's NOTBEFORE allows old DB layer syntax
-        $where->{'certificate.notbefore'} = ref $po->notbefore eq 'HASH'
-            ? OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($po->notbefore)
-            : { '<', $po->notbefore };
-    }
-
-    if ($po->has_notafter ) {
-        # TODO #legacydb search_cert's NOTAFTER allows old DB layer syntax
-        $where->{'certificate.notafter'} = ref $po->notafter eq 'HASH'
-            ? OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($po->notafter)
-            : { '>', $po->notafter };
-    }
+    $where->{'certificate.notbefore'} = { '<', $po->valid_before }   if $po->has_valid_before;
+    $where->{'certificate.notbefore'} = { '>', $po->valid_after }    if $po->has_valid_after;
+    $where->{'certificate.notafter'} =  { '<', $po->expires_before } if $po->has_expires_before;
+    $where->{'certificate.notafter'} =  { '>', $po->expires_after}   if $po->has_expires_after;
 
     my @join_spec = ();
 

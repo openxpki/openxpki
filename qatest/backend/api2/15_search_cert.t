@@ -20,7 +20,7 @@ use OpenXPKI::Test;
 use OpenXPKI::Test::QA::CertHelper::Workflow;
 use OpenXPKI::Server::Context;
 
-plan tests => 39;
+plan tests => 40;
 
 
 #
@@ -205,7 +205,8 @@ search_cert_ok "by issuer DN (with wildcards)", {
 }, qw( gamma_bob_1 );
 
 search_cert_ok "by validity date", {
-    valid_at => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+    valid_before  => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+    expires_after => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
     pki_realm => "_ANY"
 }, $dbdata->cert_names_by_realm_gen(alpha => 1);
 
@@ -256,20 +257,27 @@ cmp_bag $result, [
     superhashof({ identifier => $cert_info->{identifier} })
 ], "Correct result";
 
-# By NOTBEFORE/NOTAFTER (Int: searches "other side" of validity)
-search_cert_ok "whose validity period started before given date (NOTBEFORE < x)", {
-    notbefore => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+# By validity date
+search_cert_ok "whose validity period started before given date (valid_before)", {
+    valid_before => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
     pki_realm => "_ANY"
 }, $dbdata->cert_names_by_realm_gen(alpha => 1); # chain #1 are expired certificates
 
-search_cert_ok "that was not yet valid at given date (NOTBEFORE > x)", {
-    # TODO #legacydb Using old DB layer syntax in "search_cert"
-    notbefore => { OPERATOR => "GREATER_THAN", VALUE => $dbdata->cert("alpha_root_3")->db->{notbefore} - 100 },
+search_cert_ok "that was not yet valid at given date (valid_after)", {
+    valid_after => $dbdata->cert("alpha_root_3")->db->{notbefore} - 100,
     pki_realm => $dbdata->cert("alpha_root_3")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
 
-search_cert_ok "whose validity period ends after given date (NOTAFTER > x)", {
-    notafter => $dbdata->cert("alpha_root_2")->db->{notafter} - 100,
+my $ar3nb = $dbdata->cert("alpha_root_3")->db->{notbefore};
+
+search_cert_ok "whose validity starts between two given dates", {
+    valid_after => $ar3nb - 100,
+    valid_before => $ar3nb + 100,
+    pki_realm => $dbdata->cert("alpha_root_3")->db->{pki_realm}
+}, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
+
+search_cert_ok "whose validity period ends after given date (expires_after)", {
+    expires_after => $dbdata->cert("alpha_root_2")->db->{notafter} - 100,
     pki_realm => $dbdata->cert("alpha_root_2")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 2), $dbdata->cert_names_by_realm_gen(alpha => 3);
 

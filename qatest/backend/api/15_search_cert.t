@@ -36,7 +36,7 @@ my $test = OpenXPKI::Test::QA::More->new({
 }) or die "Error creating new test instance: $@";
 
 $test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 58 );
+$test->plan( tests => 60 );
 
 $test->connect_ok(
     user => $cfg->{operator}{name},
@@ -259,9 +259,17 @@ search_cert_ok "whose validity period started before given date (NOTBEFORE < x)"
     PKI_REALM => "_ANY"
 }, $dbdata->cert_names_by_realm_gen(alpha => 1); # chain #1 are expired certificates
 
-search_cert_ok "that was not yet valid at given date (NOTBEFORE > x)", {
+my $ar3nb = $dbdata->cert("alpha_root_3")->db->{notbefore};
+
+search_cert_ok "that is not yet valid at given date (NOTBEFORE > x)", {
     # TODO #legacydb Using old DB layer syntax in "search_cert"
-    NOTBEFORE => { OPERATOR => "GREATER_THAN", VALUE => $dbdata->cert("alpha_root_3")->db->{notbefore} - 100 },
+    NOTBEFORE => { OPERATOR => "GREATER_THAN", VALUE => $ar3nb - 100 },
+    PKI_REALM => $dbdata->cert("alpha_root_3")->db->{pki_realm}
+}, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
+
+search_cert_ok "whose validity starts between two given dates", {
+    # TODO #legacydb Using old DB layer syntax in "search_cert"
+    NOTBEFORE => { OPERATOR => "BETWEEN", VALUE => [ $ar3nb - 100, $ar3nb + 100 ] },
     PKI_REALM => $dbdata->cert("alpha_root_3")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
 
