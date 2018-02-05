@@ -21,12 +21,6 @@ use OpenXPKI::Serialization::Simple;
 requires 'also_init';
 
 
-has _last_api_result => (
-    is => 'rw',
-    isa => 'HashRef',
-    init_arg => undef,
-    default => sub { {} },
-);
 has _workflow_id => (
     is => 'rw',
     isa => 'Str',
@@ -46,17 +40,8 @@ This role adds the following methods to L<OpenXPKI::Test>:
 
 =cut
 
-sub api_command {
-    my ($self, $command, $params) = @_;
 
-    my $result;
-    lives_ok {
-        $result = OpenXPKI::Server::Context::CTX('api')->$command($params);
-        $self->_last_api_result($result);
-    } "API command '$command'";
 
-    return $result;
-}
 
 sub wf_activity {
     my ($self, $expected_state, $activity, $params) = @_;

@@ -28,6 +28,9 @@ This class is the central new (as of 2017) test vehicle for OpenXPKI that sets
 up a separate test environment where all configuration data resides in a
 temporary directory C<$oxitest-E<gt>testenv_root."/etc/openxpki/config.d">.
 
+Methods of this class do not execute any tests themselves, i.e. do not increment
+the test count of L<Test::More>.
+
 Tests in OpenXPKI are split into two groups:
 
 =over
@@ -404,6 +407,14 @@ has session => (
     predicate => 'has_session',
 );
 
+# result of last call to this classes method api_command()
+has _last_api_result => (
+    is => 'rw',
+    isa => 'HashRef',
+    init_arg => undef,
+    default => sub { {} },
+);
+
 has path_log4perl_conf => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
 has conf_log4perl   => ( is => 'rw', isa => 'Str',    lazy => 1, builder => "_build_log4perl" );
 
@@ -696,6 +707,56 @@ config key is not found
 sub get_config {
     my ($self, $config_key, $allow_undef) = @_;
     $self->config_writer->get_config_node($config_key, $allow_undef);
+}
+
+=head2 api_command
+
+Executes the given API command. Convenience method to prevent usage of CTX('api')
+in test files.
+
+B<Positional Parameters>
+
+=over
+
+=item * C<$command> I<Str> - command name
+
+=item * C<$params> I<HashRef> - parameters
+
+=back
+
+=cut
+sub api_command {
+    my ($self, $command, $params) = @_;
+
+    my $result = OpenXPKI::Server::Context::CTX('api')->$command($params);
+    $self->_last_api_result($result);
+
+    return $result;
+}
+
+=head2 api2_command
+
+Executes the given API2 command. Convenience method to prevent usage of CTX('api2')
+in test files.
+
+B<Positional Parameters>
+
+=over
+
+=item * C<$command> I<Str> - command name
+
+=item * C<%params> I<Hash> - parameters as plain list
+
+=back
+
+=cut
+sub api2_command {
+    my ($self, $command, %params) = @_;
+
+    my $result = OpenXPKI::Server::Context::CTX('api2')->$command(%params);
+    $self->_last_api_result($result);
+
+    return $result;
 }
 
 =head2 insert_testcerts
