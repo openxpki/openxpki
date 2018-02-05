@@ -150,8 +150,7 @@ sub create_cert {
             },
         );
 
-        die "workflow state is not 'SUBJECT_COMPLETE'"
-         unless $self->_last_api_result->{WORKFLOW}->{STATE} eq 'SUBJECT_COMPLETE';
+        die "workflow state is not 'SUBJECT_COMPLETE'" unless $self->wf_is_state('SUBJECT_COMPLETE');
 
         # Test FQDNs should not validate so we need a policy exception request
         # (on rare cases the responsible router might return a valid address, so we check)
@@ -190,8 +189,7 @@ sub create_cert {
             $intermediate_state,
             csr_approve_csr => {},
         );
-        die "workflow state is not 'SUCCESS'"
-         unless $self->_last_api_result->{WORKFLOW}->{STATE} eq 'SUCCESS';
+        die "workflow state is not 'SUCCESS'" unless $self->wf_is_state('SUCCESS');
 
         my $temp = $self->api_command(
             get_workflow_info => { ID => $self->_workflow_id }

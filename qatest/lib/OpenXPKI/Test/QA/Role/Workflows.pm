@@ -107,8 +107,7 @@ sub wf_activity {
     my ($self, $expected_state, $activity, $params) = @_;
 
     if ($expected_state) {
-        die "workflow state is not '$expected_state'"
-         unless $self->_last_api_result->{WORKFLOW}->{STATE} eq $expected_state;
+        die "workflow state is not '$expected_state'" unless $self->wf_is_state($expected_state);
     }
 
     return $self->api_command(
@@ -118,6 +117,27 @@ sub wf_activity {
             PARAMS => $params,
         }
     );
+}
+
+=head2 wf_is_state
+
+Checks if the state of the workflow currently referenced by I<_workflow_id>.
+
+This command only works if the workflow has previously been modified by (
+directly or indirectly) using L<OpenXPKI::Test/api_command>.
+
+B<Positional Parameters>
+
+=over
+
+=item * C<$expected_state> I<Str> - expected current workflow state
+
+=back
+
+=cut
+sub wf_is_state {
+    my ($self, $expected_state) = @_;
+    return ($self->_last_api_result->{WORKFLOW}->{STATE} eq $expected_state);
 }
 
 1;
