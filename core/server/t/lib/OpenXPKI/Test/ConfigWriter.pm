@@ -157,13 +157,28 @@ sub add_config {
     die "add_config() must be called before create()" if $self->is_written;
     my @parts = split /\./, $key;
     my $node = $self->_config; # root node
-    for my $i (0..$#parts) {
-        $node->{$parts[$i]} //= {};
-        $node = $node->{$parts[$i]};
+
+    # given data is a structure (i.e.: "node")
+    if (ref $data eq 'HASH') {
+        for my $i (0..$#parts) {
+            $node->{$parts[$i]} //= {};
+            $node = $node->{$parts[$i]};
+        }
+        note "NOTE: overwriting existing config node $key (to prevent this, split up the config into multiple more precise paths)" if scalar keys %$node;
+        %{$node} = %$data; # intentionally replace any probably existing data
     }
-    note "NOTE: overwriting existing config node $key (to prevent this, split up the config into multiple more precise paths)" if scalar keys %$node;
-    %{$node} = %$data; # intentionally replace any probably existing data
+    # given data is a config value (i.e. "leaf": scalar or e.g. array ref)
+    else {
+        my $last_key = $parts[-1];
+        for my $i (0..$#parts-1) {
+            $node->{$parts[$i]} //= {};
+            $node = $node->{$parts[$i]};
+        }
+        note "NOTE: overwriting existing config entry $key" if $node->{$last_key};
+        $node->{$last_key} = $data;
+    }
 }
+
 
 sub add_realm_config {
     my ($self, $realm, $config_relpath, $yaml_hash) = @_;
