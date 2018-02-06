@@ -415,9 +415,10 @@ has _last_api_result => (
     default => sub { {} },
 );
 
-has path_log4perl_conf => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
-has conf_log4perl   => ( is => 'rw', isa => 'Str',    lazy => 1, builder => "_build_log4perl" );
-has conf_session => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_conf_session" );
+has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
+has conf_log4perl       => ( is => 'rw', isa => 'Str',    lazy => 1, builder => "_build_log4perl" );
+has conf_session        => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_conf_session" );
+has conf_database       => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_conf_database" );
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -510,6 +511,22 @@ sub _build_conf_session {
     };
 }
 
+
+sub _build_conf_database {
+    my ($self) = @_;
+    return {
+        main => {
+            debug   => 0,
+            type    => $self->db_conf->{type},
+            name    => $self->db_conf->{name},
+            host    => $self->db_conf->{host},
+            port    => $self->db_conf->{port},
+            user    => $self->db_conf->{user},
+            passwd  => $self->db_conf->{passwd},
+        },
+    };
+}
+
 # while testing we do not log to database by default
 =head2 enable_workflow_log
 
@@ -568,6 +585,7 @@ This is the standard hook for roles to add configuration entries:
 sub init_base_config {
     my ($self) = @_;
     $self->config_writer->add_user_config(
+        "system.database" => $self->conf_database,
         "system.server.session" => $self->conf_session,
         "system.server.log4perl" => $self->path_log4perl_conf,
     );

@@ -41,18 +41,6 @@ has basedir => (
     required => 1,
 );
 
-has db_conf => (
-    is => 'rw',
-    isa => 'HashRef',
-    required => 1,
-    trigger => sub {
-        my ($self, $new, $old) = @_;
-        my @keys = qw( type name host port user passwd );
-        die "Required keys missing for 'db_conf': ".join(", ", grep { not defined $new->{$_} } @keys)
-            unless eq_deeply([keys %$new], bag(@keys));
-    },
-);
-
 has _config => (
     is => 'ro',
     isa => 'HashRef',
@@ -83,13 +71,18 @@ sub add_user_config {
     while ($pkg and ($pkg eq __PACKAGE__ or $pkg =~ /^(Eval::Closure::|Class::MOP::)/)) {
         ($pkg, $line) = (caller(++$i))[0,2];
     }
-    note "$pkg:$line adds config: ".join(", ", keys %entries);
 
-    $self->_add_user_config_pair([ $_ => $entries{$_} ]) for keys %entries;
+    for (keys %entries) {
+        $self->_add_user_config_pair([
+            $_ => {
+                source => "$pkg:$line",
+                config => $entries{$_},
+            }
+        ]);
+    }
 }
 
 # Following attributes must be lazy => 1 because their builders access other attributes
-has yaml_database   => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_database" );
 has yaml_workflow_persister => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_workflow_persister" );
 
 has yaml_cert_profile_template => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_cert_profile_template" );
@@ -160,19 +153,20 @@ sub write_yaml {
 #
 #     $config_writer->add_config('realm.alpha.workflow', $workflow);
 sub add_config {
-    my ($self, $key, $data) = @_;
+    my ($self, $key, $data, $source) = @_;
 
     die "add_config() must be called before create()" if $self->is_written;
     my @parts = split /\./, $key;
     my $node = $self->_config; # root node
 
+    my $overwrite_hint ="";
     # given data is a structure (i.e.: "node")
     if (ref $data eq 'HASH') {
         for my $i (0..$#parts) {
             $node->{$parts[$i]} //= {};
             $node = $node->{$parts[$i]};
         }
-        note "NOTE: overwriting existing config node $key (to prevent this, split up the config into multiple more precise paths)" if scalar keys %$node;
+        $overwrite_hint = " # replaces existing node (may be prevented by more precise config path)" if scalar keys %$node;
         %{$node} = %$data; # intentionally replace any probably existing data
     }
     # given data is a config value (i.e. "leaf": scalar or e.g. array ref)
@@ -182,9 +176,15 @@ sub add_config {
             $node->{$parts[$i]} //= {};
             $node = $node->{$parts[$i]};
         }
-        note "NOTE: overwriting existing config entry $key" if $node->{$last_key};
+        $overwrite_hint = " # replaces existing value" if $node->{$last_key};
         $node->{$last_key} = $data;
     }
+
+    note sprintf("- %s%s%s",
+        $key,
+        $source ? " ($source)" : "",
+        $overwrite_hint,
+    );
 }
 
 
@@ -218,8 +218,9 @@ sub create {
     $self->_make_parent_dir($self->path_log_file);
 
     # default test config
-    $self->add_config("system.database" => $self->yaml_database);
+    note "Adding config nodes:";
 
+    # sample realms
     for my $realm (qw( alpha beta gamma )) {
         $self->add_realm_config($realm, "auth", $self->_realm_auth);
         $self->add_realm_config($realm, "crypto", $self->_realm_crypto($realm));
@@ -234,14 +235,14 @@ sub create {
         $self->add_realm_config($realm, "profile.I18N_OPENXPKI_PROFILE_USER",       $self->yaml_cert_profile_user);
         # CRL
         $self->add_realm_config($realm, "crl.default",                              $self->yaml_crl_default);
+
+        $self->add_config("system.realms.$realm" => $self->yaml_realm($realm));
     }
 
     # user specified config data (might overwrite default configs)
-    $self->_map_user_config(sub { $self->add_config($_->[0] => $_->[1]) });
-
-    # this should be the last config setting as get_realms() needs to see all
-    # defined realms (our configs and user (or role) supplied configs)
-    $self->add_config("system.realms.$_" => $self->yaml_realms->{$_}) for @{$self->get_realms};
+    $self->_map_user_config(sub {
+        $self->add_config($_->[0], $_->[1]->{config}, $_->[1]->{source})
+    });
 
     # write all config files
     for my $level1 (sort keys %{$self->_config}) {
@@ -272,21 +273,6 @@ B<Parameters>
 sub get_private_key_path {
     my ($self, $realm, $alias) = @_;
     return sprintf "%s/etc/openxpki/ssl/%s/%s.pem", $self->basedir, $realm, $alias;
-}
-
-sub _build_database {
-    my ($self) = @_;
-    return {
-        main => {
-            debug   => 0,
-            type    => $self->db_conf->{type},
-            name    => $self->db_conf->{name},
-            host    => $self->db_conf->{host},
-            port    => $self->db_conf->{port},
-            user    => $self->db_conf->{user},
-            passwd  => $self->db_conf->{passwd},
-        },
-    };
 }
 
 sub _build_crypto {
@@ -329,31 +315,12 @@ sub _build_crypto {
     };
 }
 
-=head2 get_realms
-
-Returns an ArrayRef with all realm names defined by default, by roles or user.
-
-=cut
-sub get_realms {
-    my ($self) = @_;
-    return [ keys %{ $self->_config->{realm} } ];
-}
-
-sub yaml_realms {
-    my ($self) = @_;
-
-    my $i = 0;
-
+sub yaml_realm {
+    my ($self, $realm) = @_;
     return {
-        map {
-            $i++;
-            $_ => {
-                label => uc($_)." test realm",
-                baseurl => sprintf("http://127.0.0.1:%i/openxpki/", 8080+$i),
-                description => "Realm description #$i",
-            }
-        }
-        @{$self->get_realms}
+        label => uc($realm)." test realm",
+        baseurl => sprintf("http://127.0.0.1:8080/openxpki/$realm/"),
+        description => "Description for $realm",
     };
 }
 
