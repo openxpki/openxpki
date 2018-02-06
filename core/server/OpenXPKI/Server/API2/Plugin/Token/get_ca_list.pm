@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Token::get_ca_list
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
 # CPAN modules

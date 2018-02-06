@@ -115,6 +115,10 @@ L<TRUE|perldata/"Scalar values"> value is returned.
 
 =back
 
+You can use all Moose types (I<Str>, I<Int> etc) plus OpenXPKI's own types
+defined in L<OpenXPKI::Server::API2::Types> (C<OpenXPKI::Server::API2>
+automatically imports them).
+
 =item * C<$function> - I<CodeRef> with the command implementation. On invocation
 it gets passed two parameters:
 

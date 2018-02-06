@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Token::get_certificate_for_alias
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 
 =head2 get_certificate_for_alias
 

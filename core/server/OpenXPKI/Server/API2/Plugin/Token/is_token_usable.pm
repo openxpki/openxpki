@@ -9,7 +9,6 @@ OpenXPKI::Server::API2::Plugin::Token::is_token_usable
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 
 
 

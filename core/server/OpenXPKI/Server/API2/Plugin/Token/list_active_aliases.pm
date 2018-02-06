@@ -9,7 +9,6 @@ OpenXPKI::Server::API2::Plugin::Token::list_active_aliases
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
 

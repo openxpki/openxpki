@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Profile::list_supported_san
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 
 =head2 list_supported_san
 

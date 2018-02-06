@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Profile::get_additional_information_fields
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 
 =head2 get_additional_information_fields
 

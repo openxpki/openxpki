@@ -14,7 +14,6 @@ use Template;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 
 has tt => (
     is => 'rw',

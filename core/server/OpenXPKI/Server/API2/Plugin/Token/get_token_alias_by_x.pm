@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Token::get_token_alias_by_x
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
 =head2 get_token_alias_by_type

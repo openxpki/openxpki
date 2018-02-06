@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Token::get_default_token
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 
 =head2 get_default_token
 

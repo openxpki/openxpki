@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Profile::get_cert_subject_profiles
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 
 =head2 get_cert_subject_profiles
 

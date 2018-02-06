@@ -24,7 +24,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::Server::API2::Autoloader;
-
+use OpenXPKI::Server::API2::Types;
 
 =head1 SYNOPSIS
 

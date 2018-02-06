@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Profile::get_field_definition
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Profile::Util;
 
 =head2 get_field_definition
