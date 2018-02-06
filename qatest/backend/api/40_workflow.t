@@ -152,7 +152,7 @@ sub test_wf_instance {
 
 
 my $oxitest = OpenXPKI::Test->new(
-    with => ["Workflows"],
+    with => [ qw( TestRealms Workflows ) ],
     add_config => {
         "realm.alpha.workflow.def.wf_type_1" => workflow_def("wf_type_1"),
         "realm.alpha.workflow.def.wf_type_2" => workflow_def("wf_type_2"),

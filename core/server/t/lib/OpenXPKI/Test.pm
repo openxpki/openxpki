@@ -129,6 +129,8 @@ use Log::Log4perl::Appender;
 use Log::Log4perl::Filter::MDC;
 use Moose::Util::TypeConstraints;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
+use Digest::SHA;
+use MIME::Base64;
 
 # Project modules
 use OpenXPKI::Config;
@@ -419,6 +421,9 @@ has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub
 has conf_log4perl       => ( is => 'rw', isa => 'Str',    lazy => 1, builder => "_build_log4perl" );
 has conf_session        => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_conf_session" );
 has conf_database       => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_conf_database" );
+# password for all openxpki users
+has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
+has password_hash       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my $self = shift; $self->_get_password_hash($self->password) } );
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -893,6 +898,19 @@ sub _db_config_from_env {
         passwd  => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
 
     };
+}
+
+
+sub _get_password_hash {
+    my ($self, $password) = @_;
+    my $salt = "";
+    $salt .= chr(int(rand(256))) for (1..3);
+    $salt = encode_base64($salt);
+
+    my $ctx = Digest::SHA->new;
+    $ctx->add($password);
+    $ctx->add($salt);
+    return "{ssha}".encode_base64($ctx->digest . $salt, '');
 }
 
 1;

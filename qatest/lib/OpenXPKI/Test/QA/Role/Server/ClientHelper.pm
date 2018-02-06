@@ -149,7 +149,16 @@ sub init_session {
 
     lives_and {
         $self->response($self->client->init_session($args));
-        $self->is_next_step(($args and $args->{'SESSION_ID'}) ? "SERVICE_READY" : "GET_PKI_REALM");
+        # if we sent an active session...
+        if ($args and $args->{'SESSION_ID'}) {
+            $self->is_next_step("SERVICE_READY");
+        }
+        else {
+            # server wants the PKI realm only if there is more than one available
+            ok ($self->is_service_msg("GET_PKI_REALM") or $self->is_service_msg("GET_AUTHENTICATION_STACK")),
+             "<< server expects GET_PKI_REALM or GET_AUTHENTICATION_STACK"
+             or diag explain $self->response;
+        }
     } "initialize client session";
 }
 
@@ -174,10 +183,15 @@ sub login {
     $self->init_session unless ($self->is_connected and $self->client->get_session_id);
 
     subtest "client login" => sub {
-        plan tests => 6;
-
-        $self->send_ok('GET_PKI_REALM', { PKI_REALM => $self->default_realm });
-        $self->is_next_step("GET_AUTHENTICATION_STACK");
+        # requested by server only if there is more than one realm in the config
+        if ($self->is_service_msg("GET_PKI_REALM")) {
+            plan tests => 6;
+            $self->send_ok('GET_PKI_REALM', { PKI_REALM => $self->default_realm });
+            $self->is_next_step("GET_AUTHENTICATION_STACK");
+        }
+        else {
+            plan tests => 4;
+        }
 
         $self->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => "Test" });
         $self->is_next_step("GET_PASSWD_LOGIN");

@@ -24,7 +24,7 @@ plan tests => 16;
 # Setup test context
 #
 my $oxitest = OpenXPKI::Test->new(
-    with => "CryptoLayer",
+    with => [ qw( TestRealms CryptoLayer ) ],
     add_config => {
         "realm.alpha.auth.handler.Signature" => {
             type             => "ChallengeX509",

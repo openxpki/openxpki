@@ -23,7 +23,7 @@ plan tests => 17;
 # Setup env
 #
 my $oxitest = OpenXPKI::Test->new(
-    with => "CryptoLayer",
+    with => [ qw( TestRealms CryptoLayer ) ],
 );
 $oxitest->insert_testcerts;
 

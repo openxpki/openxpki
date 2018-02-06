@@ -21,7 +21,7 @@ plan tests => 43;
 
 # Init server
 my $oxitest = OpenXPKI::Test->new(
-    with => [ qw( SampleConfig Server Workflows WorkflowCreateCert ) ],
+    with => [ qw( TestRealms SampleConfig Server Workflows WorkflowCreateCert ) ],
     add_config => {
         "realm.ca-one.profile.I18N_OPENXPKI_PROFILE_USER_HIDDEN" => {
             label => "Blah",

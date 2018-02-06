@@ -79,7 +79,6 @@ before 'init_additional_config' => sub { # ... so we do not overwrite user suppl
     # add authentication handler required by OpenXPKI::Test::QA::Role::Server::ClientHelper
     #
     my $realm = $self->default_realm;
-    my $pwd = $self->config_writer->_get_password_hash($self->config_writer->password);
     $self->config_writer->add_user_config(
         "realm.$realm.auth.stack" => {
             Test => {
@@ -93,11 +92,11 @@ before 'init_additional_config' => sub { # ... so we do not overwrite user suppl
                 type  => "Password",
                 user  => {
                     # password is always "openxpki"
-                    caop =>  { digest => $pwd, role => "CA Operator" },
-                    raop =>  { digest => $pwd, role => "RA Operator" },
-                    raop2 => { digest => $pwd, role => "RA Operator" },
-                    user =>  { digest => $pwd, role => "User" },
-                    user2 => { digest => $pwd, role => "User" },
+                    caop =>  { digest => $self->password_hash, role => "CA Operator" },
+                    raop =>  { digest => $self->password_hash, role => "RA Operator" },
+                    raop2 => { digest => $self->password_hash, role => "RA Operator" },
+                    user =>  { digest => $self->password_hash, role => "User" },
+                    user2 => { digest => $self->password_hash, role => "User" },
                 },
             },
         },
@@ -269,7 +268,7 @@ sub new_client_tester {
     return OpenXPKI::Test::QA::Role::Server::ClientHelper->new(
         socket_file => $self->get_config("system.server.socket_file"),
         default_realm => $self->default_realm,
-        password => $self->config_writer->password,
+        password => $self->password,
     );
 }
 

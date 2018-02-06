@@ -25,7 +25,7 @@ plan tests => 21;
 # Setup test context
 #
 my $oxitest = OpenXPKI::Test->new(
-    with => "CryptoLayer",
+    with => [ qw( TestRealms CryptoLayer ) ],
 );
 my $dbdata = $oxitest->certhelper_database;
 
