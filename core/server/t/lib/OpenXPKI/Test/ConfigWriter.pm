@@ -77,6 +77,14 @@ has _user_config => (
 
 sub add_user_config {
     my ($self, %entries) = @_;
+
+    # notify user about added custom config
+    my $pkg = __PACKAGE__; my $line; my $i = 0;
+    while ($pkg and ($pkg eq __PACKAGE__ or $pkg =~ /^(Eval::Closure::|Class::MOP::)/)) {
+        ($pkg, $line) = (caller(++$i))[0,2];
+    }
+    note "$pkg:$line adds config: ".join(", ", keys %entries);
+
     $self->_add_user_config_pair([ $_ => $entries{$_} ]) for keys %entries;
 }
 
