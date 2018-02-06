@@ -66,7 +66,8 @@ has path_socket_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { 
 has path_pid_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/run/openxpkid.pid" } );
 has path_stderr_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" } );
 
-after 'init_base_config' => sub { # happens before init_additional_config() so we do not overwrite more specific configs of other roles
+# BEFORE ... so OpenXPKI::Test->init_base_config wins with it's few base settings
+before 'init_base_config' => sub { # happens before init_additional_config() so we do not overwrite more specific configs of other roles
     my $self = shift;
 
     my(undef, $mydir, undef) = fileparse(__FILE__);
@@ -119,7 +120,8 @@ sub _load_default_config {
 sub _customize_system_server {
     my ($self, $conf) = @_;
 
-    $conf->{log4perl} = $self->path_log4perl_conf;
+    # $conf->{log4perl} is set by OpenXPKI::Test->init_base_config later on
+    # $conf->{session}  is set by OpenXPKI::Test->init_base_config later on
 
     # Daemon settings
     $conf->{user} =  (getpwuid(geteuid))[0]; # run under same user as test scripts
