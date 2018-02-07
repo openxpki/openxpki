@@ -44,10 +44,12 @@ my $oxitest = OpenXPKI::Test->new(
                     },
                 },
             },
-            acl => { Anonymous => { creator => 'any' } },
+            acl => { PrincesOfTheUniverse => { creator => 'any' } },
         },
     },
 );
+
+$oxitest->session->data->role("PrincesOfTheUniverse");
 
 sub insert_meta_attribute {
     my ($db, $wf_id, $key, $value) = @_;

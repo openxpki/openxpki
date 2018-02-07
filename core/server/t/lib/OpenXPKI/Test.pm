@@ -63,6 +63,8 @@ This provides the following OpenXPKI context objects:
 At this point, various more complex functions (e.g. crypto operations) will not
 be available, but the test environment can be extended via:
 
+The session PKI realm is set to I<SomeRealm> and the user role to I<SomeRole>.
+
 =over
 
 =item * B<additional configuration entries> (constructor parameter
@@ -128,6 +130,7 @@ use Log::Log4perl qw(:easy);
 use Log::Log4perl::Appender;
 use Log::Log4perl::Filter::MDC;
 use Moose::Util::TypeConstraints;
+use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 use Digest::SHA;
 use MIME::Base64;
@@ -472,6 +475,7 @@ sub BUILD {
     $self->write_config;
     $self->init_server;
     $self->init_session_and_context;
+    note sprintf("Starting tests with PKI realm '%s' and role '%s'", $self->session->data->pki_realm, $self->session->data->role);
 }
 
 sub _build_log4perl {
@@ -688,7 +692,8 @@ sub init_session_and_context {
 
     $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
     # set default PKI realm
-    $self->session->data->pki_realm("alpha");
+    $self->session->data->pki_realm("SomeRealm");
+    $self->session->data->role("SomeRole");
 
     # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
     OpenXPKI::Server::Context::setcontext({

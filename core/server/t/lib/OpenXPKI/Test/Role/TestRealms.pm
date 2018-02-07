@@ -8,6 +8,16 @@ and adds test realms 'alpha', 'beta' and 'gamma' to configuration
 
 =head1 DESCRIPTION
 
+Applying this role performs the following actions:
+
+=over
+
+=item * inject test configuration for the three PKI realms
+
+=item * set C<CTX('session')->data->pki_realm> to I<alpha>
+
+=back
+
 =cut
 
 # Core modules
@@ -51,6 +61,12 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
             "system.realms.$realm" => $self->_system_realm($realm)
         );
     }
+};
+
+after 'init_session_and_context' => sub {
+    my $self = shift;
+    # set PKI realm after init() as various init procedures overwrite the realm
+    $self->session->data->pki_realm("alpha") if $self->has_session;
 };
 
 sub _auth {

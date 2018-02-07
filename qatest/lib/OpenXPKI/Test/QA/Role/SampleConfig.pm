@@ -25,13 +25,31 @@ use YAML::Tiny;
 
 requires "testenv_root";
 
+=head1 DESCRIPTION
+
+Applying this role performs the following actions:
+
+=over
+
+=item * create various new directories below L<testenv_root|OpenXPKI::Test/testenv_root>.
+
+=item * load the OpenXPKI default configuration (shipped with the project), modify
+it slightly to work with tests and inject it into the test configuration
+
+=item * set C<CTX('session')->data->pki_realm> to I<ca-one>
+
+=back
 
 =head1 CONSTRUCTOR ENHANCEMENTS
 
 This role add the following parameters to L<OpenXPKI::Test>s constructor:
 
+=over
+
 =item * I<start_watchdog> (optional) - Set to 1 to start the watchdog when the
 test server starts up. Default: 0
+
+=back
 
 =cut
 has start_watchdog => (
