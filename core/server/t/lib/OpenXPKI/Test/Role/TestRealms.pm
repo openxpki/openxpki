@@ -4,7 +4,7 @@ use Moose::Role;
 =head1 NAME
 
 OpenXPKI::Test::Role::TestRealms - Moose role that extends L<OpenXPKI::Test>
-with test realms 'alpha', 'beta' and 'gamma'
+and adds test realms 'alpha', 'beta' and 'gamma' to configuration
 
 =head1 DESCRIPTION
 

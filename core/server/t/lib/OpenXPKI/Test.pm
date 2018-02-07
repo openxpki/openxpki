@@ -12,7 +12,7 @@ Basic test environment:
 
     my $oxitest = OpenXPKI::Test->new;
 
-Running OpenXPKI test server:
+Start an OpenXPKI test server:
 
     my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server ) ]);
     my $client = $oxitest->new_client_tester;
@@ -29,7 +29,7 @@ up a separate test environment where all configuration data resides in a
 temporary directory C<$oxitest-E<gt>testenv_root."/etc/openxpki/config.d">.
 
 Methods of this class do not execute any tests themselves, i.e. do not increment
-the test count of L<Test::More>.
+the test count of C<Test::More>.
 
 Tests in OpenXPKI are split into two groups:
 
@@ -57,8 +57,8 @@ This provides the following OpenXPKI context objects:
     CTX('api')
     CTX('api2')
     CTX('authentication')
-    CTX('session') (in-memory)
-    CTX('notification') (mockup)
+    CTX('session')        # in-memory
+    CTX('notification')   # mockup
 
 At this point, various more complex functions (e.g. crypto operations) will not
 be available, but the test environment can be extended via:
@@ -189,6 +189,9 @@ For unit tests below I<core/server/t/> or QA tests:
 
 =item * L<CryptoLayer|OpenXPKI::Test::Role::CryptoLayer> - also init
 C<CTX('crypto_layer')>
+
+=item * L<TestRealms|OpenXPKI::Test::Role::TestRealms> - add test realms
+I<alpha>, I<beta> and I<gamma> to configuration
 
 =back
 
