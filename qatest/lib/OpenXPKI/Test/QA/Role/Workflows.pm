@@ -137,7 +137,7 @@ B<Positional Parameters>
 =cut
 sub wf_is_state {
     my ($self, $expected_state) = @_;
-    return ($self->_last_api_result->{WORKFLOW}->{STATE} eq $expected_state);
+    return ($self->has_last_api_result and $self->last_api_result->{WORKFLOW}->{STATE} eq $expected_state);
 }
 
 1;

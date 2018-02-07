@@ -22,7 +22,7 @@ requires "config_writer";
 requires "testenv_root";
 requires 'also_init';
 
-before 'init_additional_config' => sub { # ... so we do not overwrite user supplied configs
+before 'init_user_config' => sub { # ... so we do not overwrite user supplied configs
     my $self = shift;
 
     # do not overwrite existing node (e.g. inserted by OpenXPKI::Test::QA::Role::SampleConfig)

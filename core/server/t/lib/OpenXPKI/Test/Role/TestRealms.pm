@@ -21,7 +21,7 @@ requires "password_hash";
 requires "testenv_root";
 
 
-before 'init_additional_config' => sub { # ... so we do not overwrite user supplied configs
+before 'init_user_config' => sub { # ... so we do not overwrite user supplied configs
     my $self = shift;
 
     # sample realms

@@ -72,7 +72,7 @@ has semaphore => (
     init_arg => undef,
 );
 
-before 'init_additional_config' => sub { # ... so we do not overwrite user supplied configs
+before 'init_user_config' => sub { # ... so we do not overwrite user supplied configs
     my $self = shift;
 
     #

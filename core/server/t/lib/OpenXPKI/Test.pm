@@ -243,13 +243,14 @@ This would write the following content into I<etc/openxpki/config.d/realm/alpha.
     ...
 
 =cut
-has add_config => (
+has user_config => (
     is => 'rw',
     isa => 'HashRef',
+    init_arg => 'add_config',
     lazy => 1,
     default => sub {
         my $self = shift;
-        $self->has_config_sub ? $self->add_config_sub->($self) : {};
+        $self->has_user_config_sub ? $self->user_config_sub->($self) : {};
     },
 );
 
@@ -274,10 +275,11 @@ Example:
     );
 
 =cut
-has add_config_sub => (
+has user_config_sub => (
     is => 'rw',
     isa => 'CodeRef',
-    predicate => "has_config_sub",
+    init_arg => 'add_config_sub',
+    predicate => 'has_user_config_sub',
 );
 
 =item * I<also_init> (optional) - ArrayRef (or Str) of additional init tasks
@@ -409,12 +411,17 @@ has session => (
     predicate => 'has_session',
 );
 
-# result of last call to this classes method api_command()
-has _last_api_result => (
+=head2 last_api_result
+
+Returns the result of last call to L</api_command> or L</api2_command>.
+
+=cut
+#
+has last_api_result => (
     is => 'rw',
-    isa => 'HashRef',
+    isa => 'Any',
     init_arg => undef,
-    default => sub { {} },
+    predicate => 'has_last_api_result',
 );
 
 has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
@@ -458,7 +465,7 @@ sub BUILD {
     my $self = shift;
     $self->init_logging;
     $self->init_base_config;
-    $self->init_additional_config;
+    $self->init_user_config;
     $self->write_config;
     $self->init_server;
     $self->init_session_and_context;
@@ -596,16 +603,16 @@ sub init_base_config {
     );
 }
 
-=head2 init_additional_config
+=head2 init_user_config
 
 Basic test setup: pass additional config entries (supplied via constructor
 parameter C<add_config>) to L<OpenXPKI::Test::ConfigWriter>.
 
 =cut
-sub init_additional_config {
+sub init_user_config {
     my ($self) = @_;
-    for (keys %{ $self->add_config }) {
-        $self->config_writer->add_user_config($_ => $self->add_config->{$_});
+    for (keys %{ $self->user_config }) {
+        $self->config_writer->add_user_config($_ => $self->user_config->{$_});
     }
 }
 
@@ -737,8 +744,10 @@ sub get_config {
 
 =head2 api_command
 
-Executes the given API command. Convenience method to prevent usage of CTX('api')
-in test files.
+Executes the given API2 command and stores the result in L</last_api_result>
+(additionally to returning it).
+
+Convenience method to prevent usage of CTX('api') in test files.
 
 B<Positional Parameters>
 
@@ -755,15 +764,17 @@ sub api_command {
     my ($self, $command, $params) = @_;
 
     my $result = OpenXPKI::Server::Context::CTX('api')->$command($params);
-    $self->_last_api_result($result);
+    $self->last_api_result($result);
 
     return $result;
 }
 
 =head2 api2_command
 
-Executes the given API2 command. Convenience method to prevent usage of CTX('api2')
-in test files.
+Executes the given API2 command and stores the result in L</last_api_result>
+(additionally to returning it).
+
+Convenience method to prevent usage of CTX('api2') in test files.
 
 B<Positional Parameters>
 
@@ -780,7 +791,7 @@ sub api2_command {
     my ($self, $command, %params) = @_;
 
     my $result = OpenXPKI::Server::Context::CTX('api2')->$command(%params);
-    $self->_last_api_result($result);
+    $self->last_api_result($result);
 
     return $result;
 }

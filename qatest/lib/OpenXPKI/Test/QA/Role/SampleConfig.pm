@@ -67,7 +67,7 @@ has path_pid_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { 
 has path_stderr_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" } );
 
 # BEFORE ... so OpenXPKI::Test->init_base_config wins with it's few base settings
-before 'init_base_config' => sub { # happens before init_additional_config() so we do not overwrite more specific configs of other roles
+before 'init_base_config' => sub { # happens before init_user_config() so we do not overwrite more specific configs of other roles
     my $self = shift;
 
     my(undef, $mydir, undef) = fileparse(__FILE__);
