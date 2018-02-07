@@ -152,6 +152,13 @@ $result = $client->mock_request({
 
 is ($result->{status}->{level}, 'success', 'Status is success');
 
+# Give workflow engine some time to persist data to prevent
+#   Failed test 'Duplicate key (certificate)'
+#   at ./18_workflow_csr_key_reuse.t line 173.
+#          got: 'KEY_DUPLICATE_ERROR_WORKFLOW'
+#     expected: 'KEY_DUPLICATE_ERROR_CERTIFICATE'
+sleep 2;
+
 # certificate was issued, the duplicate key check should now end with a
 # certificate error instead of a workflow error
 
