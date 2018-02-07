@@ -217,7 +217,7 @@ B<Positional parameters>
 sub is_next_step {
     my ($self, $step) = @_;
     ok $self->is_service_msg($step), "<< server expects $step"
-        or diag explain $self->response;
+        or diag("server response: ".explain($self->response));
 }
 
 =head2 send_ok
@@ -243,7 +243,7 @@ sub send_ok {
     lives_and {
         $self->response($self->client->send_receive_service_msg($msg, $args));
         if (my $err = $self->get_error) {
-            diag $err;
+            diag "error: $err";
             fail;
         }
         else {

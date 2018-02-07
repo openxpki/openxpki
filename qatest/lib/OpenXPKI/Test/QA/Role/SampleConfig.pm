@@ -85,7 +85,8 @@ before 'init_base_config' => sub { # happens before init_additional_config() so 
     $config->_make_parent_dir($self->path_stderr_file);
 
     # add default configs
-    $self->_load_default_config("realm/ca-one"); $self->default_realm("ca-one");
+    $self->_load_default_config("realm/ca-one");
+    $self->default_realm("ca-one");
     $self->_load_default_config("system/crypto.yaml");
     # NO $self->_load_default_config("system.database") -- it's completely customized for tests
     $self->_load_default_config("system/realms.yaml");
