@@ -1,10 +1,14 @@
 Realm configuration
 ====================================
 
-To create a new realm for your OpenXPKI installation, you need to create a
-configuration for it. The fastest way is to copy ``config.d/realm.tpl`` to
-``config.d/<realm_name>``. *realm_name* must match the name you gave the realm
-in ``system.realms``.
+In order to create a new realm the easiest way is to copy the sample directory 
+tree ``realm/ca-one`` to a new directoy within the ``realm`` directory. Adjust the 
+realm configuration file contents accordingly (see below).
+
+Then add a new section in the file ``system/realms.yaml`` where the new section key is 
+identical to the new realm directory name used for the realm copy. Change the new realm
+section entries to match the desired values for the new realm.
+
 
 The realm configuration consists of five major parts:
 
