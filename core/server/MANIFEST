@@ -239,6 +239,14 @@ OpenXPKI/Server/API2/Plugin/Profile/get_key_params.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_supported_san.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_used_profiles.pm
 OpenXPKI/Server/API2/Plugin/Profile/render_templates.pm
+OpenXPKI/Server/API2/Plugin/Token/Util.pm
+OpenXPKI/Server/API2/Plugin/Token/get_ca_list.pm
+OpenXPKI/Server/API2/Plugin/Token/get_certificate_for_alias.pm
+OpenXPKI/Server/API2/Plugin/Token/get_default_token.pm
+OpenXPKI/Server/API2/Plugin/Token/get_token_alias_by_x.pm
+OpenXPKI/Server/API2/Plugin/Token/get_trust_anchors.pm
+OpenXPKI/Server/API2/Plugin/Token/is_token_usable.pm
+OpenXPKI/Server/API2/Plugin/Token/list_active_aliases.pm
 OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/Context.pm
@@ -657,6 +665,7 @@ t/90_api/20_token.t
 t/91_api2/10_base.t
 t/91_api2/11_autoloader.t
 t/91_api2/20_acl.t
+t/91_api2/30_plugin_token.t
 t/91_api2/lib/OpenXPKI/TestCommands/Ignored.pm
 t/91_api2/lib/OpenXPKI/TestCommands/givetheparams.pm
 t/91_api2/lib/OpenXPKI/TestCommands/scream.pm
@@ -723,6 +732,8 @@ t/lib/OpenXPKI/Test/ConfigWriter.pm
 t/lib/OpenXPKI/Test/WorkflowMock.pm
 t/lib/OpenXPKI/Test/CertHelper/Database.pm
 t/lib/OpenXPKI/Test/CertHelper/Database/PEM.pm
+t/lib/OpenXPKI/Test/Role/CryptoLayer.pm
+t/lib/OpenXPKI/Test/Role/TestRealms.pm
 
 t/tests.mk
 
