@@ -1448,7 +1448,7 @@ If given, limits the amount of workflows returned.
 
 If given, defines the offset of the returned workflow (use with LIMIT).
 
-=item CHECK_ACL (optional)
+=item * CHECK_ACL (optional)
 
 Check if the current user is authorized to access the workflow. Note that
 this will intantiate every result and is therefore a very expensive task!
