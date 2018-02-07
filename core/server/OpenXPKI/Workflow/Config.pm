@@ -35,10 +35,22 @@ sub _build_workflow_config {
 
     my $conn = $self->_config();
 
-    # Init the structure
+    # Fetch serialized workflow definition from config layer
+    if (!$conn->exists('workflow.def')) {
+        my $pki_realm = CTX('session')->data->pki_realm;
+        OpenXPKI::Exception->throw(
+            message => 'No workflow configuration found for current realm',
+            params => {
+                realm => $pki_realm,
+                config_path => "realm.$pki_realm.workflow.def",
+            },
+        );
+    }
+
+    # Init structure
     $self->_workflow_config({ condition => [], validator => [], action =>[], workflow => [], persister => [] });
 
-    # Add Persisters
+    # Add persisters
     my @persister = $conn->get_keys('workflow.persister');
     foreach my $persister (@persister) {
         my $conf = $conn->get_hash(['workflow','persister', $persister]);
