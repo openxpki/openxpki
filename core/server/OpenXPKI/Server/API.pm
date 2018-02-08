@@ -630,6 +630,16 @@ sub BUILD {
                 START =>                    { optional => 1, type => SCALAR },
             },
         },
+         'list_issuers' => {
+            class  => 'Default',
+            params => {
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            }
+        },
         'control_watchdog' => {
             class => 'Object',
             params => {

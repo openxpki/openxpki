@@ -322,6 +322,34 @@ sub list_ca_ids {
     );
 }
 
+
+sub list_issuers {
+    my $self    = shift;
+    my $args = shift;
+
+    my $requested_pki_realm = $args->{PKI_REALM} // CTX('session')->data->pki_realm;
+
+    my $result = CTX('dbi')->select(
+        from   => 'certificate',
+        columns => [ 'issuer_identifier', 'issuer_dn' ],
+        where => {
+            pki_realm => $requested_pki_realm,
+            issuer_identifier => { '!=' => 'unkown' },
+            req_key => { '!=' => undef },
+        },
+        group_by => 'issuer_identifier',
+    )->fetchall_arrayref({});
+
+    return [
+        map {{
+            value => $_->{issuer_identifier},
+            label => $_->{issuer_dn},
+        }} @$result
+    ];
+
+
+}
+
 sub get_pki_realm_index {
      ##! 1: 'start'
     OpenXPKI::Exception->throw(
