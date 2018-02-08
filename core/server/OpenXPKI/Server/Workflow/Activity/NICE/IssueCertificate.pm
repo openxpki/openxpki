@@ -44,6 +44,8 @@ sub execute {
        );
     }
 
+    my $ca_alias = $self->param( 'ca_alias' ) || '';
+
     if ($csr->{format} ne 'pkcs10' && $csr->{format} ne 'spkac') {
        OpenXPKI::Exception->throw(
            message => 'I18N_OPENXPKI_SERVER_NICE_CSR_WRONG_TYPE',
@@ -56,7 +58,7 @@ sub execute {
     my $set_context;
     eval {
         # TODO #legacydb CSR parameters are converted
-        $set_context = $nice_backend->issueCertificate( OpenXPKI::Server::Database::Legacy->csr_to_legacy($csr) );
+        $set_context = $nice_backend->issueCertificate( OpenXPKI::Server::Database::Legacy->csr_to_legacy($csr), $ca_alias );
     };
 
     if (my $eval_err = $EVAL_ERROR) {
@@ -130,7 +132,15 @@ See OpenXPKI::Server::Workflow::NICE::issueCertificate for details
 
 =over
 
-=item csr_serial - the serial number of the certificate signing request
+=item csr_serial
+
+the serial number of the certificate signing request
+
+=item ca_alias (optional)
+
+the ca alias to use for this signing operation, the default is to use
+the "latest" token from the certsign group.
+B<Might not be supported by all backends!>
 
 =back
 

@@ -28,6 +28,7 @@ sub issueCertificate {
 
     my $self = shift;
     my $csr = shift;
+    my $issuing_ca = shift || '';
 
     ##! 1: 'Starting '
     my $serializer = OpenXPKI::Serialization::Simple->new();
@@ -116,18 +117,51 @@ sub issueCertificate {
         });
     }
 
-    # Determine issuing ca
-    my $issuing_ca = CTX('api')->get_token_alias_by_type( {
-        TYPE => 'certsign',
-        VALIDITY => {
-            NOTBEFORE => $notbefore,
-            NOTAFTER => $notafter,
-        },
-    });
+    # $issuing_ca set by user, check if the validity is ok
+    if ($issuing_ca) {
+
+        CTX('log')->application()->debug("Use ca set by user $issuing_ca to issue $csr_serial");
+
+        my $cert = CTX('api')->get_certificate_for_alias({ ALIAS => $issuing_ca });
+
+        if ($notafter->epoch() > $cert->{NOTAFTER}) {
+            $notafter = DateTime->from_epoch( epoch => $cert->{NOTAFTER} );
+            CTX('log')->application()->warn("Validity exceeds selected issuing ca - truncating notafter");
+
+        } elsif ($notafter->epoch() < $cert->{NOTBEFORE}) {
+            CTX('log')->application()->error("Expected notafter is before CA lifetime!");
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_NOTAFTER_BEFORE_CA_LIFETIME',
+            );
+        }
+
+        if ($notbefore->epoch() < $cert->{NOTBEFORE}) {
+            $notbefore = DateTime->from_epoch( epoch => $cert->{NOTBEFORE} );
+            CTX('log')->application()->warn("Validity exceeds selected issuing ca - truncating notbefore");
+
+        } elsif ($notbefore->epoch() > $cert->{NOTAFTER}) {
+            CTX('log')->application()->error("Expected notbefore is after CA lifetime!");
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_NOTBEFORE_AFTER_CA_LIFETIME',
+            );
+        }
+
+
+    } else {
+        # Determine issuing ca
+        $issuing_ca = CTX('api')->get_token_alias_by_type( {
+            TYPE => 'certsign',
+            VALIDITY => {
+                NOTBEFORE => $notbefore,
+                NOTAFTER => $notafter,
+            },
+        });
+
+        CTX('log')->application()->debug("Found $issuing_ca to issue $csr_serial");
+
+    }
 
     ##! 32: 'issuing ca: ' . $issuing_ca
-
-    CTX('log')->application()->debug("try to issue csr $csr_serial using token $issuing_ca");
 
 
     my $default_token = CTX('api')->get_default_token();
@@ -500,7 +534,9 @@ The module does not require nor accept any configuration options.
 =head2 issueCertificate
 
 Issues a certitficate, will autodetect the most current ca for the requested
-profile.
+profile. Issuer can be enforced by passing the issuer alias as second
+parameter, the certificates validity will be tailored to fit into the CA
+validity window.
 
 Takes only the key information from the pkcs10 and requires subject, SAN and
 validity to be given as context parameters. Also supports SPKAC request format.
