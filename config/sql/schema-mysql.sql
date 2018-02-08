@@ -40,7 +40,10 @@ CREATE TABLE IF NOT EXISTS `certificate` (
   `authority_key_identifier` varchar(255) DEFAULT NULL,
   `notbefore` int(10) unsigned DEFAULT NULL,
   `notafter` int(10) unsigned DEFAULT NULL,
-  `loa` varchar(255) DEFAULT NULL,
+  `revocation_time` int(10) unsigned DEFAULT NULL,
+  `invalidity_time` int(10) unsigned DEFAULT NULL,
+  `reason_code` varchar(50) DEFAULT NULL,
+  `hold_instruction_code` varchar(50) DEFAULT NULL,
   `req_key` bigint(20) unsigned DEFAULT NULL,
   `public_key` text,
   `data` longtext
@@ -57,6 +60,8 @@ CREATE TABLE IF NOT EXISTS `crl` (
   `pki_realm` varchar(255) NOT NULL,
   `issuer_identifier` varchar(64) NOT NULL,
   `crl_key` decimal(49,0) NOT NULL,
+  `crl_number` decimal(49,0) DEFAULT NULL,
+  `items` int(10) DEFAULT 0,
   `data` longtext,
   `last_update` int(10) unsigned DEFAULT NULL,
   `next_update` int(10) unsigned DEFAULT NULL,
@@ -230,13 +235,13 @@ ALTER TABLE `audittrail`
  ADD PRIMARY KEY (`audittrail_key`);
 
 ALTER TABLE `certificate`
- ADD PRIMARY KEY (`issuer_identifier`,`cert_key`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `identifier` (`identifier`), ADD KEY `issuer_identifier` (`issuer_identifier`), ADD KEY `subject` (`subject`(255)), ADD KEY `status` (`status`), ADD KEY `pki_realm_2` (`pki_realm`,`req_key`), ADD KEY `notbefore` (`notbefore`), ADD KEY `notafter` (`notafter`);
+ ADD PRIMARY KEY (`issuer_identifier`,`cert_key`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `identifier` (`identifier`), ADD KEY `issuer_identifier` (`issuer_identifier`), ADD KEY `subject` (`subject`(255)), ADD KEY `status` (`status`), ADD KEY `pki_realm_2` (`pki_realm`,`req_key`), ADD KEY `notbefore` (`notbefore`), ADD KEY `notafter` (`notafter`), ADD KEY `revocation_time` (`revocation_time`), ADD KEY `invalidity_time` (`invalidity_time`), ADD KEY `reason_code` (`reason_code`), ADD KEY `hold_instruction_code` (`hold_instruction_code`);
 
 ALTER TABLE `certificate_attributes`
  ADD PRIMARY KEY (`attribute_key`,`identifier`), ADD KEY `attribute_contentkey` (`attribute_contentkey`), ADD KEY `attribute_value` (`attribute_value`(255)), ADD KEY `identifier` (`identifier`), ADD KEY `identifier_2` (`identifier`,`attribute_contentkey`), ADD KEY `attribute_contentkey_2` (`attribute_contentkey`,`attribute_value`(255));
 
 ALTER TABLE `crl`
- ADD PRIMARY KEY (`issuer_identifier`,`crl_key`), ADD KEY `issuer_identifier` (`issuer_identifier`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `issuer_identifier_2` (`issuer_identifier`,`last_update`);
+ ADD PRIMARY KEY (`issuer_identifier`,`crl_key`), ADD KEY `issuer_identifier` (`issuer_identifier`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `issuer_identifier_2` (`issuer_identifier`,`last_update`), ADD KEY `crl_number` (`issuer_identifier`,`crl_number`);
 
 ALTER TABLE `crr`
  ADD PRIMARY KEY (`pki_realm`,`crr_key`), ADD KEY `identifier` (`identifier`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `creator` (`creator`);
