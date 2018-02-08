@@ -76,6 +76,9 @@ sub init_search {
 
     my @profile_list = sort { $a->{label} cmp $b->{label} } @{$profile};
 
+    my $issuer = $self->send_command( 'list_issuers' );
+    my @issuer_list = sort { $a->{label} cmp $b->{label} } @{$issuer};
+
     my @states = (
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_ISSUED', value => 'ISSUED'},
         { label => 'I18N_OPENXPKI_UI_CERT_STATUS_VALID', value => 'VALID'},
@@ -97,6 +100,7 @@ sub init_search {
         { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', type => 'text', is_optional => 1, value => $preset->{san} },
         { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
         { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
+        { name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier} },
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
@@ -1075,7 +1079,7 @@ sub action_search {
         }
     }
 
-    foreach my $key (qw(profile)) {
+    foreach my $key (qw(profile issuer_identifier)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
             $input->{$key} = $val;
